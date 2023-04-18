@@ -1,16 +1,16 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func ZEND_FETCH_CLASS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var class_name *types2.Zval
+	var class_name *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 
 	{
-		var ce *types2.ClassEntry = CACHED_PTR(opline.GetExtendedValue())
+		var ce *types.ClassEntry = CACHED_PTR(opline.GetExtendedValue())
 		if ce == nil {
 			class_name = opline.Const2()
 			ce = ZendFetchClassByName(class_name.String(), (class_name + 1).GetStr(), opline.GetOp1().GetNum())
@@ -23,18 +23,18 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 }
 func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op2 ZendFreeOp
-	var class_name *types2.Zval
+	var class_name *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 
 	{
 		class_name = opline.Op2()
 	try_class_name:
 		if class_name.IsObject() {
-			opline.Result().SetCe(types2.Z_OBJCE_P(class_name))
+			opline.Result().SetCe(types.Z_OBJCE_P(class_name))
 		} else if class_name.IsString() {
 			opline.Result().SetCe(ZendFetchClass(class_name.String().GetStr(), opline.GetOp1().GetNum()))
 		} else if class_name.IsReference() {
-			class_name = types2.Z_REFVAL_P(class_name)
+			class_name = types.Z_REFVAL_P(class_name)
 			goto try_class_name
 		} else {
 			if class_name.IsUndef() {
@@ -50,7 +50,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var class_name *types2.Zval
+	var class_name *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 	{
 		opline.Result().SetCe(ZendFetchClass(nil, opline.GetOp1().GetNum()))
@@ -60,18 +60,18 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) i
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_CLASS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
-	var class_name *types2.Zval
+	var class_name *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 
 	{
 		class_name = opline.Op2()
 	try_class_name:
 		if class_name.IsObject() {
-			opline.Result().SetCe(types2.Z_OBJCE_P(class_name))
+			opline.Result().SetCe(types.Z_OBJCE_P(class_name))
 		} else if class_name.IsString() {
 			opline.Result().SetCe(ZendFetchClass(class_name.String().GetStr(), opline.GetOp1().GetNum()))
 		} else if class_name.IsReference() {
-			class_name = types2.Z_REFVAL_P(class_name)
+			class_name = types.Z_REFVAL_P(class_name)
 			goto try_class_name
 		} else {
 			if class_name.IsUndef() {

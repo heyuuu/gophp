@@ -1,9 +1,9 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
-type RsrcDtorFuncT func(res *types2.ZendResource)
+type RsrcDtorFuncT func(res *types.ZendResource)
 
-var ListDestructors types2.Array
+var ListDestructors types.Array

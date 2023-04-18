@@ -5,7 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -65,10 +65,10 @@ func BinaryStrcspn(s *byte, e *byte, chars string) *byte {
 	return e
 }
 func PhpUrlParseEx(str *byte, length int) *PhpUrl {
-	var has_port types2.ZendBool
+	var has_port types.ZendBool
 	return PhpUrlParseEx2(str, length, &has_port)
 }
-func PhpUrlParseEx2(str *byte, length int, has_port *types2.ZendBool) *PhpUrl {
+func PhpUrlParseEx2(str *byte, length int, has_port *types.ZendBool) *PhpUrl {
 	var port_buf []byte
 	var ret *PhpUrl = zend.Ecalloc(1, b.SizeOf("php_url"))
 	var s *byte
@@ -105,7 +105,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *types2.ZendBool) *PhpUrl {
 			p++
 		}
 		if e+1 == ue {
-			ret.SetScheme(types2.NewString(b.CastStr(s, e-s)))
+			ret.SetScheme(types.NewString(b.CastStr(s, e-s)))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			return ret
 		}
@@ -128,12 +128,12 @@ func PhpUrlParseEx2(str *byte, length int, has_port *types2.ZendBool) *PhpUrl {
 			if (p == ue || (*p) == '/') && p-e < 7 {
 				goto parse_port
 			}
-			ret.SetScheme(types2.NewString(b.CastStr(s, e-s)))
+			ret.SetScheme(types.NewString(b.CastStr(s, e-s)))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			s = e + 1
 			goto just_path
 		} else {
-			ret.SetScheme(types2.NewString(b.CastStr(s, e-s)))
+			ret.SetScheme(types.NewString(b.CastStr(s, e-s)))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			if e+2 < ue && (*(e + 2)) == '/' {
 				s = e + 3
@@ -204,13 +204,13 @@ parse_host:
 
 	if b.Assign(&p, zend.ZendMemrchr(s, '@', e-s)) {
 		if b.Assign(&pp, memchr(s, ':', p-s)) {
-			ret.SetUser(types2.NewString(b.CastStr(s, pp-s)))
+			ret.SetUser(types.NewString(b.CastStr(s, pp-s)))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 			pp++
-			ret.SetPass(types2.NewString(b.CastStr(pp, p-pp)))
+			ret.SetPass(types.NewString(b.CastStr(pp, p-pp)))
 			PhpReplaceControlcharsEx(ret.GetPass().GetVal(), ret.GetPass().GetLen())
 		} else {
-			ret.SetUser(types2.NewString(b.CastStr(s, p-s)))
+			ret.SetUser(types.NewString(b.CastStr(s, p-s)))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 		}
 		s = p + 1
@@ -265,7 +265,7 @@ parse_host:
 		PhpUrlFree(ret)
 		return nil
 	}
-	ret.SetHost(types2.NewString(b.CastStr(s, p-s)))
+	ret.SetHost(types.NewString(b.CastStr(s, p-s)))
 	PhpReplaceControlcharsEx(ret.GetHost().GetVal(), ret.GetHost().GetLen())
 	if e == ue {
 		return ret
@@ -277,7 +277,7 @@ just_path:
 	if p {
 		p++
 		if p < e {
-			ret.SetFragment(types2.NewString(b.CastStr(p, e-p)))
+			ret.SetFragment(types.NewString(b.CastStr(p, e-p)))
 			PhpReplaceControlcharsEx(ret.GetFragment().GetVal(), ret.GetFragment().GetLen())
 		}
 		e = p - 1
@@ -286,24 +286,24 @@ just_path:
 	if p {
 		p++
 		if p < e {
-			ret.SetQuery(types2.NewString(b.CastStr(p, e-p)))
+			ret.SetQuery(types.NewString(b.CastStr(p, e-p)))
 			PhpReplaceControlcharsEx(ret.GetQuery().GetVal(), ret.GetQuery().GetLen())
 		}
 		e = p - 1
 	}
 	if s < e || s == ue {
-		ret.SetPath(types2.NewString(b.CastStr(s, e-s)))
+		ret.SetPath(types.NewString(b.CastStr(s, e-s)))
 		PhpReplaceControlcharsEx(ret.GetPath().GetVal(), ret.GetPath().GetLen())
 	}
 	return ret
 }
-func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types2.Zval, _ zpp.Opt, component *types2.Zval) {
+func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zpp.Opt, component *types.Zval) {
 	var str *byte
 	var str_len int
 	var resource *PhpUrl
 	var key zend.ZendLong = -1
-	var tmp types2.Zval
-	var has_port types2.ZendBool
+	var tmp types.Zval
+	var has_port types.ZendBool
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -374,35 +374,35 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types2.Zval, _ z
 
 	if resource.GetScheme() != nil {
 		tmp.SetStringCopy(resource.GetScheme())
-		return_value.Array().KeyAddNew(types2.STR_SCHEME, &tmp)
+		return_value.Array().KeyAddNew(types.STR_SCHEME, &tmp)
 	}
 	if resource.GetHost() != nil {
 		tmp.SetStringCopy(resource.GetHost())
-		return_value.Array().KeyAddNew(types2.STR_HOST, &tmp)
+		return_value.Array().KeyAddNew(types.STR_HOST, &tmp)
 	}
 	if has_port != 0 {
 		tmp.SetLong(resource.GetPort())
-		return_value.Array().KeyAddNew(types2.STR_PORT, &tmp)
+		return_value.Array().KeyAddNew(types.STR_PORT, &tmp)
 	}
 	if resource.GetUser() != nil {
 		tmp.SetStringCopy(resource.GetUser())
-		return_value.Array().KeyAddNew(types2.STR_USER, &tmp)
+		return_value.Array().KeyAddNew(types.STR_USER, &tmp)
 	}
 	if resource.GetPass() != nil {
 		tmp.SetStringCopy(resource.GetPass())
-		return_value.Array().KeyAddNew(types2.STR_PASS, &tmp)
+		return_value.Array().KeyAddNew(types.STR_PASS, &tmp)
 	}
 	if resource.GetPath() != nil {
 		tmp.SetStringCopy(resource.GetPath())
-		return_value.Array().KeyAddNew(types2.STR_PATH, &tmp)
+		return_value.Array().KeyAddNew(types.STR_PATH, &tmp)
 	}
 	if resource.GetQuery() != nil {
 		tmp.SetStringCopy(resource.GetQuery())
-		return_value.Array().KeyAddNew(types2.STR_QUERY, &tmp)
+		return_value.Array().KeyAddNew(types.STR_QUERY, &tmp)
 	}
 	if resource.GetFragment() != nil {
 		tmp.SetStringCopy(resource.GetFragment())
-		return_value.Array().KeyAddNew(types2.STR_FRAGMENT, &tmp)
+		return_value.Array().KeyAddNew(types.STR_FRAGMENT, &tmp)
 	}
 done:
 	PhpUrlFree(resource)
@@ -453,15 +453,15 @@ func PhpUrlEncodeEx(s string) string {
 	}
 	return buf.String()
 }
-func PhpUrlEncode(s *byte, len_ int) *types2.String {
+func PhpUrlEncode(s *byte, len_ int) *types.String {
 	var c uint8
 	var to *uint8
 	var from *uint8
 	var end uint8
-	var start *types2.String
+	var start *types.String
 	from = (*uint8)(s)
 	end = (*uint8)(s + len_)
-	start = types2.ZendStringSafeAlloc(3, len_, 0, 0)
+	start = types.ZendStringSafeAlloc(3, len_, 0, 0)
 	to = (*uint8)(start.GetVal())
 	for from < end {
 		*from++
@@ -478,7 +478,7 @@ func PhpUrlEncode(s *byte, len_ int) *types2.String {
 		}
 	}
 	*to = '0'
-	start = types2.ZendStringTruncate(start, to-(*uint8)(start.GetVal()))
+	start = types.ZendStringTruncate(start, to-(*uint8)(start.GetVal()))
 	return start
 }
 func ZifUrlencode(str string) string {
@@ -523,12 +523,12 @@ func PhpUrlDecode(str *byte, len_ int) int {
 	*dest = '0'
 	return dest - str
 }
-func PhpRawUrlEncode(s *byte, len_ int) *types2.String {
+func PhpRawUrlEncode(s *byte, len_ int) *types.String {
 	var x int
 	var y int
-	var str *types2.String
+	var str *types.String
 	var ret *byte
-	str = types2.ZendStringSafeAlloc(3, len_, 0, 0)
+	str = types.ZendStringSafeAlloc(3, len_, 0, 0)
 	ret = str.GetVal()
 	x = 0
 	y = 0
@@ -544,11 +544,11 @@ func PhpRawUrlEncode(s *byte, len_ int) *types2.String {
 		y++
 	}
 	ret[y] = '0'
-	str = types2.ZendStringTruncate(str, y)
+	str = types.ZendStringTruncate(str, y)
 	return str
 }
-func ZifRawurlencode(executeData zpp.Ex, return_value zpp.Ret, str *types2.Zval) {
-	var in_str *types2.String
+func ZifRawurlencode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
+	var in_str *types.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -597,14 +597,14 @@ func PhpRawUrlDecode(str *byte, len_ int) int {
 	*dest = '0'
 	return dest - str
 }
-func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types2.Zval, _ zpp.Opt, format *types2.Zval, context *types2.Zval) {
+func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zpp.Opt, format *types.Zval, context *types.Zval) {
 	var url *byte
 	var url_len int
 	var stream *core.PhpStream
-	var prev_val *types2.Zval
-	var hdr *types2.Zval = nil
+	var prev_val *types.Zval
+	var hdr *types.Zval = nil
 	var format zend.ZendLong = 0
-	var zcontext *types2.Zval = nil
+	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
 		for {
@@ -625,18 +625,18 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types2.Zval, _
 		return_value.SetFalse()
 		return
 	}
-	if stream.GetWrapperdata().GetType() != types2.IS_ARRAY {
+	if stream.GetWrapperdata().GetType() != types.IS_ARRAY {
 		core.PhpStreamClose(stream)
 		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)
-	var __ht *types2.Array = stream.GetWrapperdata().Array()
+	var __ht *types.Array = stream.GetWrapperdata().Array()
 	for _, _p := range __ht.ForeachData() {
-		var _z *types2.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		hdr = _z
-		if hdr.GetType() != types2.IS_STRING {
+		if hdr.GetType() != types.IS_STRING {
 			continue
 		}
 		if format == 0 {

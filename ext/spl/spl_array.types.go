@@ -1,24 +1,24 @@
 package spl
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 /**
  * SplArrayObject
  */
 type SplArrayObject struct {
-	array           types2.Zval
+	array           types.Zval
 	ht_iter         uint32
 	ar_flags        int
 	nApplyCount     uint8
-	fptr_offset_get types2.IFunction
-	fptr_offset_set types2.IFunction
-	fptr_offset_has types2.IFunction
-	fptr_offset_del types2.IFunction
-	fptr_count      types2.IFunction
-	ce_get_iterator *types2.ClassEntry
-	std             types2.ZendObject
+	fptr_offset_get types.IFunction
+	fptr_offset_set types.IFunction
+	fptr_offset_has types.IFunction
+	fptr_offset_del types.IFunction
+	fptr_count      types.IFunction
+	ce_get_iterator *types.ClassEntry
+	std             types.ZendObject
 }
 
 //             func MakeSplArrayObject(
@@ -48,7 +48,7 @@ type SplArrayObject struct {
 //                     std:std,
 //                 }
 //             }
-func (this *SplArrayObject) GetArray() types2.Zval { return this.array }
+func (this *SplArrayObject) GetArray() types.Zval { return this.array }
 
 // func (this *SplArrayObject) SetArray(value zend.Zval) { this.array = value }
 func (this *SplArrayObject) GetHtIter() uint32      { return this.ht_iter }
@@ -58,21 +58,21 @@ func (this *SplArrayObject) SetArFlags(value int)   { this.ar_flags = value }
 func (this *SplArrayObject) GetNApplyCount() uint8  { return this.nApplyCount }
 
 // func (this *SplArrayObject) SetNApplyCount(value uint8) { this.nApplyCount = value }
-func (this *SplArrayObject) GetFptrOffsetGet() types2.IFunction      { return this.fptr_offset_get }
-func (this *SplArrayObject) SetFptrOffsetGet(value types2.IFunction) { this.fptr_offset_get = value }
-func (this *SplArrayObject) GetFptrOffsetSet() types2.IFunction      { return this.fptr_offset_set }
-func (this *SplArrayObject) SetFptrOffsetSet(value types2.IFunction) { this.fptr_offset_set = value }
-func (this *SplArrayObject) GetFptrOffsetHas() types2.IFunction      { return this.fptr_offset_has }
-func (this *SplArrayObject) SetFptrOffsetHas(value types2.IFunction) { this.fptr_offset_has = value }
-func (this *SplArrayObject) GetFptrOffsetDel() types2.IFunction      { return this.fptr_offset_del }
-func (this *SplArrayObject) SetFptrOffsetDel(value types2.IFunction) { this.fptr_offset_del = value }
-func (this *SplArrayObject) GetFptrCount() types2.IFunction          { return this.fptr_count }
-func (this *SplArrayObject) SetFptrCount(value types2.IFunction)     { this.fptr_count = value }
-func (this *SplArrayObject) GetCeGetIterator() *types2.ClassEntry    { return this.ce_get_iterator }
-func (this *SplArrayObject) SetCeGetIterator(value *types2.ClassEntry) {
+func (this *SplArrayObject) GetFptrOffsetGet() types.IFunction      { return this.fptr_offset_get }
+func (this *SplArrayObject) SetFptrOffsetGet(value types.IFunction) { this.fptr_offset_get = value }
+func (this *SplArrayObject) GetFptrOffsetSet() types.IFunction      { return this.fptr_offset_set }
+func (this *SplArrayObject) SetFptrOffsetSet(value types.IFunction) { this.fptr_offset_set = value }
+func (this *SplArrayObject) GetFptrOffsetHas() types.IFunction      { return this.fptr_offset_has }
+func (this *SplArrayObject) SetFptrOffsetHas(value types.IFunction) { this.fptr_offset_has = value }
+func (this *SplArrayObject) GetFptrOffsetDel() types.IFunction      { return this.fptr_offset_del }
+func (this *SplArrayObject) SetFptrOffsetDel(value types.IFunction) { this.fptr_offset_del = value }
+func (this *SplArrayObject) GetFptrCount() types.IFunction          { return this.fptr_count }
+func (this *SplArrayObject) SetFptrCount(value types.IFunction)     { this.fptr_count = value }
+func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry    { return this.ce_get_iterator }
+func (this *SplArrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplArrayObject) GetStd() types2.ZendObject { return this.std }
+func (this *SplArrayObject) GetStd() types.ZendObject { return this.std }
 
 // func (this *SplArrayObject) SetStd(value zend.ZendObject) { this.std = value }
 

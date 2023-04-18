@@ -2,18 +2,18 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var array *types2.Zval
-	var value *types2.Zval
+	var array *types.Zval
+	var value *types.Zval
 	var value_type uint32
-	var fe_ht *types2.Array
-	var pos types2.ArrayPosition
-	var p *types2.Bucket
+	var fe_ht *types.Array
+	var pos types.ArrayPosition
+	var p *types.Bucket
 	array = opline.Op1()
 	if array.IsArray() {
 		fe_ht = array.GetArr()
@@ -30,11 +30,11 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			value = p.GetVal()
 			value_type = value.GetTypeInfo()
-			if value_type != types2.IS_UNDEF {
-				if value_type == types2.IS_INDIRECT {
+			if value_type != types.IS_UNDEF {
+				if value_type == types.IS_INDIRECT {
 					value = value.GetZv()
 					value_type = value.GetTypeInfo()
-					if value_type != types2.IS_UNDEF {
+					if value_type != types.IS_UNDEF {
 						break
 					}
 				} else {
@@ -59,8 +59,8 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			/* plain object */
 
-			fe_ht = types2.Z_OBJPROP_P(array)
-			pos = types2.ZendHashIteratorPos(array.GetFeIterIdx(), fe_ht)
+			fe_ht = types.Z_OBJPROP_P(array)
+			pos = types.ZendHashIteratorPos(array.GetFeIterIdx(), fe_ht)
 			p = fe_ht.Bucket(pos)
 			for true {
 				if pos >= fe_ht.GetNNumUsed() {
@@ -74,14 +74,14 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 				value = p.GetVal()
 				value_type = value.GetTypeInfo()
-				if value_type != types2.IS_UNDEF {
-					if value_type == types2.IS_INDIRECT {
+				if value_type != types.IS_UNDEF {
+					if value_type == types.IS_INDIRECT {
 						value = value.GetZv()
 						value_type = value.GetTypeInfo()
-						if value_type != types2.IS_UNDEF && ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 0) == types2.SUCCESS {
+						if value_type != types.IS_UNDEF && ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 0) == types.SUCCESS {
 							break
 						}
-					} else if types2.Z_OBJCE_P(array).GetDefaultPropertiesCount() == 0 || p.GetKey() == nil || ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 1) == types2.SUCCESS {
+					} else if types.Z_OBJCE_P(array).GetDefaultPropertiesCount() == 0 || p.GetKey() == nil || ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 1) == types.SUCCESS {
 						break
 					}
 				}
@@ -113,7 +113,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					UNDEF_RESULT()
 					return 0
 				}
-				if iter.GetFuncs().GetValid()(iter) == types2.FAILURE {
+				if iter.GetFuncs().GetValid()(iter) == types.FAILURE {
 
 					/* reached end of iteration */
 
@@ -153,11 +153,11 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	if opline.GetOp2Type() == IS_CV {
-		var variable_ptr *types2.Zval = opline.Op2()
+		var variable_ptr *types.Zval = opline.Op2()
 		ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
 	} else {
-		var res *types2.Zval = opline.Op2()
-		var gc *types2.ZendRefcounted = value.GetCounted()
+		var res *types.Zval = opline.Op2()
+		var gc *types.ZendRefcounted = value.GetCounted()
 		types.ZVAL_COPY_VALUE_EX(res, value, gc, value_type)
 		if types.Z_TYPE_INFO_REFCOUNTED(value_type) {
 			// 			gc.AddRefcount()

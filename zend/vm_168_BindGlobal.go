@@ -2,17 +2,17 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var varname *types2.String
-	var value *types2.Zval
-	var variable_ptr *types2.Zval
+	var varname *types.String
+	var value *types.Zval
+	var variable_ptr *types.Zval
 	var idx uintPtr
-	var ref *types2.ZendReference
+	var ref *types.ZendReference
 	for {
 		varname = opline.Const2().String()
 
@@ -20,9 +20,9 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 		idx = uintPtr(CACHED_PTR(opline.GetExtendedValue()) - 1)
 		if idx < EG__().GetSymbolTable().GetNNumUsed()*b.SizeOf("Bucket") {
-			var p *types2.Bucket = (*types2.Bucket)((*byte)(EG__().GetSymbolTable().Bucket(idx)))
+			var p *types.Bucket = (*types.Bucket)((*byte)(EG__().GetSymbolTable().Bucket(idx)))
 			if p.GetVal().IsNotUndef() && (p.GetKey() == varname || p.GetH() == varname.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), varname) != 0) {
-				value = (*types2.Zval)(p)
+				value = (*types.Zval)(p)
 				goto check_indirect
 			}
 		}
@@ -58,7 +58,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 		}
 		if !(value.IsReference()) {
-			types2.ZVAL_MAKE_REF_EX(value, 2)
+			types.ZVAL_MAKE_REF_EX(value, 2)
 			ref = value.Reference()
 		} else {
 			ref = value.Reference()
@@ -66,7 +66,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 		variable_ptr = opline.Op1()
 		if variable_ptr.IsRefcounted() {
-			var ref *types2.ZendRefcounted = variable_ptr.RefCounted()
+			var ref *types.ZendRefcounted = variable_ptr.RefCounted()
 			var refcnt uint32 = ref.DelRefcount()
 			if variable_ptr != value {
 				if refcnt == 0 {

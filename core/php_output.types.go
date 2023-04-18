@@ -1,7 +1,7 @@
 package core
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -43,20 +43,20 @@ func (this *PhpOutputContext) GetOut() *PhpOutputBuffer { return &this.out }
  * PhpOutputHandlerUserFuncT
  */
 type PhpOutputHandlerUserFuncT struct {
-	fci types2.ZendFcallInfo
-	fcc types2.ZendFcallInfoCache
-	zoh types2.Zval
+	fci types.ZendFcallInfo
+	fcc types.ZendFcallInfoCache
+	zoh types.Zval
 }
 
-func (this *PhpOutputHandlerUserFuncT) GetFci() types2.ZendFcallInfo      { return this.fci }
-func (this *PhpOutputHandlerUserFuncT) GetFcc() types2.ZendFcallInfoCache { return this.fcc }
-func (this *PhpOutputHandlerUserFuncT) GetZoh() types2.Zval               { return this.zoh }
+func (this *PhpOutputHandlerUserFuncT) GetFci() types.ZendFcallInfo      { return this.fci }
+func (this *PhpOutputHandlerUserFuncT) GetFcc() types.ZendFcallInfoCache { return this.fcc }
+func (this *PhpOutputHandlerUserFuncT) GetZoh() types.Zval               { return this.zoh }
 
 /**
  * PhpOutputHandler
  */
 type PhpOutputHandler struct {
-	name   *types2.String
+	name   *types.String
 	flags  int
 	level  int
 	size   int
@@ -69,15 +69,15 @@ type PhpOutputHandler struct {
 	}
 }
 
-func (this *PhpOutputHandler) GetName() *types2.String      { return this.name }
-func (this *PhpOutputHandler) SetName(value *types2.String) { this.name = value }
-func (this *PhpOutputHandler) GetFlags() int                { return this.flags }
-func (this *PhpOutputHandler) SetFlags(value int)           { this.flags = value }
-func (this *PhpOutputHandler) GetLevel() int                { return this.level }
-func (this *PhpOutputHandler) SetLevel(value int)           { this.level = value }
-func (this *PhpOutputHandler) GetSize() int                 { return this.size }
-func (this *PhpOutputHandler) SetSize(value int)            { this.size = value }
-func (this *PhpOutputHandler) GetBuffer() PhpOutputBuffer   { return this.buffer }
+func (this *PhpOutputHandler) GetName() *types.String      { return this.name }
+func (this *PhpOutputHandler) SetName(value *types.String) { this.name = value }
+func (this *PhpOutputHandler) GetFlags() int               { return this.flags }
+func (this *PhpOutputHandler) SetFlags(value int)          { this.flags = value }
+func (this *PhpOutputHandler) GetLevel() int               { return this.level }
+func (this *PhpOutputHandler) SetLevel(value int)          { this.level = value }
+func (this *PhpOutputHandler) GetSize() int                { return this.size }
+func (this *PhpOutputHandler) SetSize(value int)           { this.size = value }
+func (this *PhpOutputHandler) GetBuffer() PhpOutputBuffer  { return this.buffer }
 
 // func (this *PhpOutputHandler) SetBuffer(value PhpOutputBuffer) { this.buffer = value }
 func (this *PhpOutputHandler) GetOpaq() any                              { return this.opaq }

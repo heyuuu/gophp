@@ -1,7 +1,7 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
@@ -29,10 +29,10 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Const1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
 					generator.GetValue().TryAddRefcount()
@@ -50,12 +50,12 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Const1()
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
 				generator.GetValue().TryAddRefcount()
 
@@ -73,12 +73,12 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Const2()
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
 			generator.GetKey().TryAddRefcount()
 
@@ -136,10 +136,10 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Const1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
 					generator.GetValue().TryAddRefcount()
@@ -157,12 +157,12 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Const1()
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
 				generator.GetValue().TryAddRefcount()
 
@@ -181,12 +181,12 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var key *types.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -241,10 +241,10 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Const1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
 					generator.GetValue().TryAddRefcount()
@@ -262,12 +262,12 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Const1()
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
 				generator.GetValue().TryAddRefcount()
 
@@ -286,12 +286,12 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = opline.Op2()
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -346,10 +346,10 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Const1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
 					generator.GetValue().TryAddRefcount()
@@ -367,12 +367,12 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Const1()
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
 				generator.GetValue().TryAddRefcount()
 
@@ -443,10 +443,10 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Const1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
 					generator.GetValue().TryAddRefcount()
@@ -464,12 +464,12 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Const1()
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
 				generator.GetValue().TryAddRefcount()
 
@@ -487,12 +487,12 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Cv2OrUndef()
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -548,10 +548,10 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -564,12 +564,12 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
+			var value *types.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -584,12 +584,12 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Const2()
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
 			generator.GetKey().TryAddRefcount()
 
@@ -648,10 +648,10 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -664,12 +664,12 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
+			var value *types.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -685,12 +685,12 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var key *types.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -746,10 +746,10 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -762,12 +762,12 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
+			var value *types.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -783,12 +783,12 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = opline.Op2()
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -844,10 +844,10 @@ func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -860,12 +860,12 @@ func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
+			var value *types.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -934,10 +934,10 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -950,12 +950,12 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
+			var value *types.Zval = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -970,12 +970,12 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Cv2OrUndef()
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -1031,10 +1031,10 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Op1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -1044,12 +1044,12 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Op1()
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -1064,12 +1064,12 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Const2()
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
 			generator.GetKey().TryAddRefcount()
 
@@ -1128,10 +1128,10 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Op1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -1141,12 +1141,12 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Op1()
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -1162,12 +1162,12 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var key *types.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -1223,10 +1223,10 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Op1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -1236,12 +1236,12 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Op1()
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -1257,12 +1257,12 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = opline.Op2()
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -1318,10 +1318,10 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Op1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -1331,12 +1331,12 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Op1()
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -1405,10 +1405,10 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Op1()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -1418,12 +1418,12 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Op1()
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -1438,12 +1438,12 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Cv2OrUndef()
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -1520,12 +1520,12 @@ func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Const2()
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
 			generator.GetKey().TryAddRefcount()
 
@@ -1606,12 +1606,12 @@ func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var key *types.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -1689,12 +1689,12 @@ func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = opline.Op2()
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -1846,12 +1846,12 @@ func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Cv2OrUndef()
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -1906,10 +1906,10 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Cv1OrUndef()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -1922,12 +1922,12 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Cv1OrUndef()
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -1942,12 +1942,12 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Const2()
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
 			generator.GetKey().TryAddRefcount()
 
@@ -2005,10 +2005,10 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Cv1OrUndef()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -2021,12 +2021,12 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Cv1OrUndef()
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -2042,12 +2042,12 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var key *types.Zval = _getZvalPtrTmp(opline.GetOp2().GetVar(), &free_op2, executeData)
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -2102,10 +2102,10 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Cv1OrUndef()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -2118,12 +2118,12 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Cv1OrUndef()
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -2139,12 +2139,12 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types2.Zval = opline.Op2()
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {
@@ -2199,10 +2199,10 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Cv1OrUndef()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -2215,12 +2215,12 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Cv1OrUndef()
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -2288,10 +2288,10 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 			{
-				var value *types2.Zval
+				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = opline.Cv1OrUndef()
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* If a function call result is yielded and the function did
@@ -2304,12 +2304,12 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types2.Zval = opline.Cv1OrUndef()
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
 			{
-				types2.ZVAL_COPY_VALUE(generator.GetValue(), value)
+				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -2324,12 +2324,12 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types2.Zval = opline.Cv2OrUndef()
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 
 		{
-			types2.ZVAL_COPY_VALUE(generator.GetKey(), key)
+			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().Long() > generator.GetLargestUsedIntegerKey() {

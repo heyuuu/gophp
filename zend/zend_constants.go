@@ -1,7 +1,7 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 /**
@@ -28,7 +28,7 @@ const IS_CONSTANT_VISITED_MARK = 0x80
  * ZendConstant
  */
 type ZendConstant struct {
-	value types2.Zval
+	value types.Zval
 	name  string
 	// 标识符(原 value.u2.constant_flags)
 	flags uint32
@@ -47,13 +47,13 @@ func CopyConstant(c *ZendConstant) *ZendConstant {
 	}
 }
 
-func (c *ZendConstant) Name() string        { return c.name }
-func (c *ZendConstant) Value() *types2.Zval { return &c.value }
-func (c *ZendConstant) Flags() uint8        { return uint8(c.flags & 0xff) }
-func (c *ZendConstant) ModuleNumber() int   { return int(c.flags >> 8) }
+func (c *ZendConstant) Name() string       { return c.name }
+func (c *ZendConstant) Value() *types.Zval { return &c.value }
+func (c *ZendConstant) Flags() uint8       { return uint8(c.flags & 0xff) }
+func (c *ZendConstant) ModuleNumber() int  { return int(c.flags >> 8) }
 
-func (c *ZendConstant) GetName() *types2.String { return types2.NewString(c.name) }
-func (c *ZendConstant) SetName(name string)     { c.name = name }
+func (c *ZendConstant) GetName() *types.String { return types.NewString(c.name) }
+func (c *ZendConstant) SetName(name string)    { c.name = name }
 func (c *ZendConstant) SetFlags(flags int, moduleNumber int) {
 	realFlags := uint32(flags&0xff | moduleNumber<<8)
 	c.flags = realFlags

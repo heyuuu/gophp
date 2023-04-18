@@ -2,23 +2,23 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func ZEND_SEND_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var args *types2.Zval
+	var args *types.Zval
 	var arg_num int
 	args = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 	arg_num = executeData.GetCall().NumArgs() + 1
 send_again:
 	if args.IsArray() {
-		var ht *types2.Array = args.GetArr()
-		var arg *types2.Zval
-		var top *types2.Zval
-		var name *types2.String
+		var ht *types.Array = args.GetArr()
+		var arg *types.Zval
+		var top *types.Zval
+		var name *types.String
 		ZendVmStackExtendCallFrame(&(executeData.GetCall()), arg_num-1, ht.Len())
 		if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && args.GetRefcount() > 1 {
 			var i uint32
@@ -33,13 +33,13 @@ send_again:
 				}
 			}
 			if separate != 0 {
-				types2.SeparateArray(args)
+				types.SeparateArray(args)
 				ht = args.GetArr()
 			}
 		}
-		var __ht *types2.Array = ht
+		var __ht *types.Array = ht
 		for _, _p := range __ht.ForeachData() {
-			var _z *types2.Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			name = _p.GetKey()
 			arg = _z
@@ -57,21 +57,21 @@ send_again:
 
 					/* array is already separated above */
 
-					types2.ZVAL_MAKE_REF_EX(arg, 2)
+					types.ZVAL_MAKE_REF_EX(arg, 2)
 					top.SetReference(arg.Reference())
 				} else {
 					// arg.TryAddRefcount()
 					top.SetNewRef(arg)
 				}
 			} else {
-				types2.ZVAL_COPY_DEREF(top, arg)
+				types.ZVAL_COPY_DEREF(top, arg)
 			}
 			executeData.GetCall().
 				NumArgs()++
 			arg_num++
 		}
 	} else if args.IsObject() {
-		var ce *types2.ClassEntry = types2.Z_OBJCE_P(args)
+		var ce *types.ClassEntry = types.Z_OBJCE_P(args)
 		var iter *ZendObjectIterator
 		if ce == nil || ce.GetGetIterator() == nil {
 			faults.Error(faults.E_WARNING, "Only arrays and Traversables can be unpacked")
@@ -87,9 +87,9 @@ send_again:
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
 			}
-			for ; iter.GetFuncs().GetValid()(iter) == types2.SUCCESS; arg_num++ {
-				var arg *types2.Zval
-				var top *types2.Zval
+			for ; iter.GetFuncs().GetValid()(iter) == types.SUCCESS; arg_num++ {
+				var arg *types.Zval
+				var top *types.Zval
 				if EG__().GetException() != nil {
 					break
 				}
@@ -98,12 +98,12 @@ send_again:
 					break
 				}
 				if iter.GetFuncs().GetGetCurrentKey() != nil {
-					var key types2.Zval
+					var key types.Zval
 					iter.GetFuncs().GetGetCurrentKey()(iter, &key)
 					if EG__().GetException() != nil {
 						break
 					}
-					if key.GetType() != types2.IS_LONG {
+					if key.GetType() != types.IS_LONG {
 						faults.ThrowError(nil, b.Cond(key.IsString(), "Cannot unpack Traversable with string keys", "Cannot unpack Traversable with non-integer keys"))
 						// ZvalPtrDtor(&key)
 						break
@@ -112,7 +112,7 @@ send_again:
 				if ARG_MUST_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
 					faults.Error(faults.E_WARNING, "Cannot pass by-reference argument %d of %s%s%s()"+" by unpacking a Traversable, passing by-value instead", arg_num, b.CondF1(executeData.GetCall().func_.common.scope, func() []byte { return executeData.GetCall().func_.common.scope.name.GetVal() }, ""), b.Cond(executeData.GetCall().func_.common.scope, "::", ""), executeData.GetCall().func_.common.function_name.GetVal())
 				}
-				arg = types2.ZVAL_DEREF(arg)
+				arg = types.ZVAL_DEREF(arg)
 				// arg.TryAddRefcount()
 				ZendVmStackExtendCallFrame(&(executeData.GetCall()), arg_num-1, 1)
 				top = executeData.GetCall().Arg(arg_num)
@@ -124,7 +124,7 @@ send_again:
 			//ZendIteratorDtor(iter)
 		}
 	} else if args.IsReference() {
-		args = types2.Z_REFVAL_P(args)
+		args = types.Z_REFVAL_P(args)
 		goto send_again
 	} else {
 		if opline.GetOp1Type() == IS_CV && args.IsUndef() {

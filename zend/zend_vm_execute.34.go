@@ -1,7 +1,7 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
@@ -25,7 +25,7 @@ func ExecuteEx(ex *ZendExecuteData) {
 		}
 	}
 }
-func ZendExecute(opArray *types2.ZendOpArray, returnValue *types2.Zval) {
+func ZendExecute(opArray *types.ZendOpArray, returnValue *types.Zval) {
 	var executeData *ZendExecuteData
 	var objectOrCalledScope any
 	var callInfo uint32
@@ -39,7 +39,7 @@ func ZendExecute(opArray *types2.ZendOpArray, returnValue *types2.Zval) {
 	} else {
 		callInfo = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE | ZEND_CALL_HAS_THIS
 	}
-	executeData = ZendVmStackPushCallFrame(callInfo, (types2.IFunction)(opArray), 0, objectOrCalledScope)
+	executeData = ZendVmStackPushCallFrame(callInfo, (types.IFunction)(opArray), 0, objectOrCalledScope)
 	if CurrEX() != nil {
 		executeData.SetSymbolTable(ZendRebuildSymbolTable())
 	} else {

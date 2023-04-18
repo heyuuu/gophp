@@ -2,25 +2,25 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZendObjectsNew(ce *types2.ClassEntry) *types2.ZendObject {
+func ZendObjectsNew(ce *types.ClassEntry) *types.ZendObject {
 	handle := EG__().NextObjectHandle()
-	return types2.NewObject(ce, handle, StdObjectHandlersPtr)
+	return types.NewObject(ce, handle, StdObjectHandlersPtr)
 }
-func ZendObjectStdInit(object *types2.ZendObject, ce *types2.ClassEntry) {
+func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
 	handle := EG__().NextObjectHandle()
 	object.Init(ce, handle)
 }
-func ZendObjectStdDtor(object *types2.ZendObject) {
-	var p *types2.Zval
-	var end *types2.Zval
+func ZendObjectStdDtor(object *types.ZendObject) {
+	var p *types.Zval
+	var end *types.Zval
 	if object.GetProperties() != nil {
-		if (object.GetProperties().GetGcFlags() & types2.IS_ARRAY_IMMUTABLE) == 0 {
-			if object.GetProperties().DelRefcount() == 0 && object.GetProperties().GetGcType() != types2.IS_NULL {
+		if (object.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+			if object.GetProperties().DelRefcount() == 0 && object.GetProperties().GetGcType() != types.IS_NULL {
 				object.GetProperties().DestroyEx()
 			}
 		}
@@ -48,31 +48,31 @@ func ZendObjectStdDtor(object *types2.ZendObject) {
 		if p.IsString() {
 
 		} else if p.IsArray() {
-			var guards *types2.Array
+			var guards *types.Array
 			guards = p.Array()
 			b.Assert(guards != nil)
 			guards.Destroy()
 			FREE_HASHTABLE(guards)
 		}
 	}
-	if (object.GetGcFlags() & types2.IS_OBJ_WEAKLY_REFERENCED) != 0 {
+	if (object.GetGcFlags() & types.IS_OBJ_WEAKLY_REFERENCED) != 0 {
 		ZendWeakrefsNotify(object)
 	}
 }
-func ZendObjectsDestroyObject(object *types2.ZendObject) {
-	var destructor types2.IFunction = object.GetCe().GetDestructor()
+func ZendObjectsDestroyObject(object *types.ZendObject) {
+	var destructor types.IFunction = object.GetCe().GetDestructor()
 	if destructor != nil {
-		var old_exception *types2.ZendObject
-		var orig_fake_scope *types2.ClassEntry
-		var fci types2.ZendFcallInfo
-		var fcic types2.ZendFcallInfoCache
-		var ret types2.Zval
+		var old_exception *types.ZendObject
+		var orig_fake_scope *types.ClassEntry
+		var fci types.ZendFcallInfo
+		var fcic types.ZendFcallInfoCache
+		var ret types.Zval
 		if destructor.GetOpArray().HasFnFlags(AccPrivate | AccProtected) {
 			if destructor.GetOpArray().IsPrivate() {
 				/* Ensure that if we're calling a private function, we're allowed to do so.
 				 */
 				if CurrEX() != nil {
-					var scope *types2.ClassEntry = ZendGetExecutedScope()
+					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
 						faults.ThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
@@ -85,7 +85,7 @@ func ZendObjectsDestroyObject(object *types2.ZendObject) {
 				/* Ensure that if we're calling a protected function, we're allowed to do so.
 				 */
 				if CurrEX() != nil {
-					var scope *types2.ClassEntry = ZendGetExecutedScope()
+					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if !ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) {
 						faults.ThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
@@ -138,14 +138,14 @@ func ZendObjectsDestroyObject(object *types2.ZendObject) {
 		EG__().SetFakeScope(orig_fake_scope)
 	}
 }
-func ZendObjectsCloneMembers(new_object *types2.ZendObject, old_object *types2.ZendObject) {
+func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.ZendObject) {
 	if old_object.GetCe().GetDefaultPropertiesCount() != 0 {
-		var src *types2.Zval = old_object.GetPropertiesTable()
-		var dst *types2.Zval = new_object.GetPropertiesTable()
-		var end *types2.Zval = src + old_object.GetCe().GetDefaultPropertiesCount()
+		var src *types.Zval = old_object.GetPropertiesTable()
+		var dst *types.Zval = new_object.GetPropertiesTable()
+		var end *types.Zval = src + old_object.GetCe().GetDefaultPropertiesCount()
 		for {
 			// IZvalPtrDtor(dst)
-			types2.ZVAL_COPY_VALUE_PROP(dst, src)
+			types.ZVAL_COPY_VALUE_PROP(dst, src)
 			ZvalAddRef(dst)
 			if dst.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(dst.Reference()) {
 				var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(new_object, dst)
@@ -164,7 +164,7 @@ func ZendObjectsCloneMembers(new_object *types2.ZendObject, old_object *types2.Z
 		/* fast copy */
 
 		if old_object.GetHandlers() == StdObjectHandlersPtr {
-			if (old_object.GetProperties().GetGcFlags() & types2.IS_ARRAY_IMMUTABLE) == 0 {
+			if (old_object.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 				old_object.GetProperties().AddRefcount()
 			}
 			new_object.SetProperties(old_object.GetProperties())
@@ -175,22 +175,22 @@ func ZendObjectsCloneMembers(new_object *types2.ZendObject, old_object *types2.Z
 
 	}
 	if old_object.GetProperties() != nil && old_object.GetProperties().Len() {
-		var prop *types2.Zval
-		var new_prop types2.Zval
+		var prop *types.Zval
+		var new_prop types.Zval
 		var num_key ZendUlong
-		var key *types2.String
+		var key *types.String
 		if new_object.GetProperties() == nil {
-			new_object.SetProperties(types2.NewArray(old_object.GetProperties().Len()))
-			types2.ZendHashRealInitMixed(new_object.GetProperties())
+			new_object.SetProperties(types.NewArray(old_object.GetProperties().Len()))
+			types.ZendHashRealInitMixed(new_object.GetProperties())
 		} else {
 			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed() + old_object.GetProperties().Len())
 		}
 		new_object.GetProperties().CopyFlags(old_object.GetProperties())
 		new_object.GetProperties().SetIteratorsCount(old_object.GetProperties().GetIteratorsCount())
 		new_object.GetProperties().MarkHasEmptyIndex()
-		var __ht *types2.Array = old_object.GetProperties()
+		var __ht *types.Array = old_object.GetProperties()
 		for _, _p := range __ht.ForeachData() {
-			var _z *types2.Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			num_key = _p.GetH()
 			key = _p.GetKey()
@@ -198,7 +198,7 @@ func ZendObjectsCloneMembers(new_object *types2.ZendObject, old_object *types2.Z
 			if prop.IsIndirect() {
 				new_prop.SetIndirect(new_object.GetPropertiesTable() + (prop.Indirect() - old_object.GetPropertiesTable()))
 			} else {
-				types2.ZVAL_COPY_VALUE(&new_prop, prop)
+				types.ZVAL_COPY_VALUE(&new_prop, prop)
 				ZvalAddRef(&new_prop)
 			}
 			if key != nil {
@@ -209,9 +209,9 @@ func ZendObjectsCloneMembers(new_object *types2.ZendObject, old_object *types2.Z
 		}
 	}
 	if old_object.GetCe().GetClone() != nil {
-		var fci types2.ZendFcallInfo
-		var fcic types2.ZendFcallInfoCache
-		var ret types2.Zval
+		var fci types.ZendFcallInfo
+		var fcic types.ZendFcallInfoCache
+		var ret types.Zval
 		// 		new_object.AddRefcount()
 		ret.SetUndef()
 		fci.SetSize(b.SizeOf("fci"))
@@ -229,9 +229,9 @@ func ZendObjectsCloneMembers(new_object *types2.ZendObject, old_object *types2.Z
 		// OBJ_RELEASE(new_object)
 	}
 }
-func ZendObjectsCloneObj(zobject *types2.Zval) *types2.ZendObject {
-	var old_object *types2.ZendObject
-	var new_object *types2.ZendObject
+func ZendObjectsCloneObj(zobject *types.Zval) *types.ZendObject {
+	var old_object *types.ZendObject
+	var new_object *types.ZendObject
 
 	/* assume that create isn't overwritten, so when clone depends on the
 	 * overwritten one then it must itself be overwritten */
@@ -242,8 +242,8 @@ func ZendObjectsCloneObj(zobject *types2.Zval) *types2.ZendObject {
 	/* zend_objects_clone_members() expect the properties to be initialized. */
 
 	if new_object.GetCe().GetDefaultPropertiesCount() != 0 {
-		var p *types2.Zval = new_object.GetPropertiesTable()
-		var end *types2.Zval = p + new_object.GetCe().GetDefaultPropertiesCount()
+		var p *types.Zval = new_object.GetPropertiesTable()
+		var end *types.Zval = p + new_object.GetCe().GetDefaultPropertiesCount()
 		for {
 			p.SetUndef()
 			p++

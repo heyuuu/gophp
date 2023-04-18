@@ -4,7 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -51,16 +51,16 @@ func PhpStrtr(str *byte, len_ int, from string, to string) {
 
 func ZifParseStr(encodedString string, _ zpp.Opt, result zpp.RefZval) {
 	if result == nil {
-		if zend.ZendForbidDynamicCall("parse_str() with a single argument") == types2.FAILURE {
+		if zend.ZendForbidDynamicCall("parse_str() with a single argument") == types.FAILURE {
 			return
 		}
 		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
-		var tmp types2.Zval
-		var symbol_table *types2.Array
+		var tmp types.Zval
+		var symbol_table *types.Array
 		symbol_table = zend.ZendRebuildSymbolTable()
 		tmp.SetArray(symbol_table)
 		core.SM__().GetTreatData()(core.PARSE_STRING, encodedString, &tmp)
-		if types2.ZendHashDel(symbol_table, types2.STR_THIS) == types2.SUCCESS {
+		if types.ZendHashDel(symbol_table, types.STR_THIS) == types.SUCCESS {
 			faults.ThrowError(nil, "Cannot re-assign $this")
 		}
 	} else {
@@ -72,8 +72,8 @@ func ZifParseStr(encodedString string, _ zpp.Opt, result zpp.RefZval) {
 	}
 }
 
-func ZifStrGetcsv(return_value zpp.Ret, string_ string, _ zpp.Opt, delimiter *string, enclosure *string, escape *string) *types2.Array {
-	var str *types2.String = string_
+func ZifStrGetcsv(return_value zpp.Ret, string_ string, _ zpp.Opt, delimiter *string, enclosure *string, escape *string) *types.Array {
+	var str *types.String = string_
 	var delim byte = ','
 	var enc byte = '"'
 	var esc byte = '\\'
@@ -95,8 +95,8 @@ func ZifStrGetcsv(return_value zpp.Ret, string_ string, _ zpp.Opt, delimiter *st
 	standard.PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetVal(), return_value)
 }
 
-func ZifSscanf(str string, format string, vars []zpp.RefZval) *types2.Zval {
-	var args *types2.Zval = nil
+func ZifSscanf(str string, format string, vars []zpp.RefZval) *types.Zval {
+	var args *types.Zval = nil
 	var result int
 	var num_args int = 0
 	result = standard.PhpSscanfInternal(str, format, num_args, args, 0, return_value)
@@ -122,13 +122,13 @@ func ZifUtf8Decode(data string) string {
 	var pos int = 0
 	var buf strings.Builder
 	for pos < len(data) {
-		var status int = types2.FAILURE
+		var status int = types.FAILURE
 		c := standard.PhpNextUtf8Char((*uint8)(data), len(data), &pos, &status)
 
 		/* The lower 256 codepoints of Unicode are identical to Latin-1,
 		 * so we don't need to do any mapping here beyond replacing non-Latin-1
 		 * characters. */
-		if status == types2.FAILURE || c > 0xff {
+		if status == types.FAILURE || c > 0xff {
 			c = '?'
 		}
 		buf.WriteRune(rune(c))

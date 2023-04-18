@@ -3,7 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
@@ -27,7 +27,7 @@ func REGISTER_INI_DISPLAYER(name *byte, displayer func(ini_entry *ZendIniEntry, 
 func REGISTER_INI_BOOLEAN(name *byte) int {
 	return REGISTER_INI_DISPLAYER(name, ZendIniBooleanDisplayerCb)
 }
-func ZendRemoveIniEntries(el *types2.Zval, arg any) int {
+func ZendRemoveIniEntries(el *types.Zval, arg any) int {
 	var ini_entry *ZendIniEntry = (*ZendIniEntry)(el.Ptr())
 	var module_number int = *((*int)(arg))
 	return ini_entry.GetModuleNumber() == module_number
@@ -62,11 +62,11 @@ func ZendIniStartup() int {
 	EG__().InitIniDirectives()
 	EG__().ModifiedIniDirectives().Destroy()
 	EG__().SetErrorReportingIniEntry(nil)
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZendIniShutdown() int {
 	EG__().IniDirectives().Destroy()
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZendIniDeactivate() int {
 	if EG__().ModifiedIniDirectives() != nil {
@@ -75,10 +75,10 @@ func ZendIniDeactivate() int {
 		})
 		EG__().ModifiedIniDirectives().Destroy()
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZendIniSortEntries() {
-	EG__().IniDirectives().SortByArrayKey(func(k1, k2 types2.ArrayKey) bool {
+	EG__().IniDirectives().SortByArrayKey(func(k1, k2 types.ArrayKey) bool {
 		// 数字 < 字符串
 		if k1.IsStrKey() && k2.IsStrKey() {
 			return ascii.StrCaseCompare(k1.StrKey(), k2.StrKey()) < 0
@@ -98,18 +98,18 @@ func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) in
 		p := NewZendIniEntry(iniEntryDef, moduleNumber)
 		if !directives.Add(p.GetName().GetStr(), p) {
 			ZendUnregisterIniEntries(moduleNumber)
-			return types2.FAILURE
+			return types.FAILURE
 		}
 
-		var defaultValue *types2.Zval = ZendGetConfigurationDirective(p.GetName())
+		var defaultValue *types.Zval = ZendGetConfigurationDirective(p.GetName())
 		if defaultValue != nil && p.EmitOnModify(defaultValue.String(), ZEND_INI_STAGE_STARTUP) {
-			p.SetValue(types2.NewString(defaultValue.StringVal()))
+			p.SetValue(types.NewString(defaultValue.StringVal()))
 		} else {
 			p.SetValueStr(iniEntryDef.GetValueStr())
 			p.EmitOnModify(p.GetValue(), ZEND_INI_STAGE_STARTUP)
 		}
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZendUnregisterIniEntries(module_number int) {
 	RegisteredZendIniDirectives.Filter(func(_ string, ini_entry *ZendIniEntry) bool {
@@ -117,12 +117,12 @@ func ZendUnregisterIniEntries(module_number int) {
 	})
 }
 func ZendAlterIniEntryChars(name string, value string, modify_type int, stage int) bool {
-	return ZendAlterIniEntryEx(types2.NewString(name).GetStr(), types2.NewString(value), modify_type, stage, 0)
+	return ZendAlterIniEntryEx(types.NewString(name).GetStr(), types.NewString(value), modify_type, stage, 0)
 }
-func ZendAlterIniEntryEx(name string, new_value *types2.String, modify_type int, stage int, force_change int) bool {
-	var duplicate *types2.String
+func ZendAlterIniEntryEx(name string, new_value *types.String, modify_type int, stage int, force_change int) bool {
+	var duplicate *types.String
 	var modifiable uint8
-	var modified types2.ZendBool
+	var modified types.ZendBool
 
 	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
 	if ini_entry == nil {
@@ -135,7 +135,7 @@ func ZendAlterIniEntryEx(name string, new_value *types2.String, modify_type int,
 	}
 	if force_change == 0 {
 		if (ini_entry.GetModifiable() & modify_type) == 0 {
-			return types2.FAILURE
+			return types.FAILURE
 		}
 	}
 	if EG__().ModifiedIniDirectives() == nil {
@@ -159,27 +159,27 @@ func ZendAlterIniEntryEx(name string, new_value *types2.String, modify_type int,
 	}
 	return true
 }
-func ZendRestoreIniEntry(name *types2.String, stage int) int {
+func ZendRestoreIniEntry(name *types.String, stage int) int {
 	var ini_entry = EG__().IniDirectives().Get(name.GetStr())
 	if ini_entry == nil || stage == ZEND_INI_STAGE_RUNTIME && (ini_entry.GetModifiable()&ZEND_INI_USER) == 0 {
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	if EG__().ModifiedIniDirectives() != nil {
 		if ZendRestoreIniEntryCb(ini_entry, stage) == 0 {
 			EG__().ModifiedIniDirectives().Del(name.GetStr())
 		} else {
-			return types2.FAILURE
+			return types.FAILURE
 		}
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZendIniRegisterDisplayer(name *byte, name_length uint32, displayer func(ini_entry *ZendIniEntry, type_ int)) int {
 	var ini_entry *ZendIniEntry = RegisteredZendIniDirectives.Get(b.CastStr(name, name_length))
 	if ini_entry == nil {
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	ini_entry.SetDisplayer(displayer)
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZendIniLong(name string, orig int) ZendLong {
 	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
@@ -200,7 +200,7 @@ func ZendIniLong(name string, orig int) ZendLong {
 	}
 	return 0
 }
-func ZendIniStringEx(name string, orig int, exists *types2.ZendBool) *byte {
+func ZendIniStringEx(name string, orig int, exists *types.ZendBool) *byte {
 	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
 	if ini_entry != nil {
 		if exists != nil {
@@ -227,7 +227,7 @@ func ZendIniStringEx(name string, orig int, exists *types2.ZendBool) *byte {
 	}
 }
 func ZendIniString(name string, orig int) *byte {
-	var exists types2.ZendBool = 1
+	var exists types.ZendBool = 1
 	var return_value *byte
 	return_value = ZendIniStringEx(name, orig, &exists)
 	if exists == 0 {
@@ -249,13 +249,13 @@ func ZendIniGetValueEx(name string) (string, bool) {
 		return "", false
 	}
 }
-func ZendIniGetValue(name string) *types2.String {
+func ZendIniGetValue(name string) *types.String {
 	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
 	if ini_entry != nil {
 		if ini_entry.GetValue() != nil {
 			return ini_entry.GetValue()
 		} else {
-			return types2.NewString("")
+			return types.NewString("")
 		}
 	} else {
 		return nil
@@ -268,7 +268,7 @@ func ZendIniStringParseBool(str string) bool {
 		return b.Atoi(str) != 0
 	}
 }
-func ZendIniParseBool(str *types2.String) types2.ZendBool {
+func ZendIniParseBool(str *types.String) types.ZendBool {
 	if str.GetLen() == 4 && strcasecmp(str.GetVal(), "true") == 0 || str.GetLen() == 3 && strcasecmp(str.GetVal(), "yes") == 0 || str.GetLen() == 2 && strcasecmp(str.GetVal(), "on") == 0 {
 		return 1
 	} else {
@@ -277,7 +277,7 @@ func ZendIniParseBool(str *types2.String) types2.ZendBool {
 }
 func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 	var value int
-	var tmp_value *types2.String
+	var tmp_value *types.String
 	if type_ == ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
 		if ini_entry.GetOrigValue() != nil {
 			tmp_value = ini_entry.GetOrigValue()
@@ -325,21 +325,21 @@ func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 }
 func OnUpdateBool(
 	entry *ZendIniEntry,
-	new_value *types2.String,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
 	stage int,
 ) int {
-	var p *types2.ZendBool
+	var p *types.ZendBool
 	var base *byte = (*byte)(mh_arg2)
-	p = (*types2.ZendBool)(base + int(mh_arg1))
+	p = (*types.ZendBool)(base + int(mh_arg1))
 	*p = ZendIniParseBool(new_value)
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func OnUpdateLong(
 	entry *ZendIniEntry,
-	new_value *types2.String,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -349,11 +349,11 @@ func OnUpdateLong(
 	var base *byte = (*byte)(mh_arg2)
 	p = (*ZendLong)(base + int(mh_arg1))
 	*p = StrToLongWithUnit(new_value.GetStr())
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func OnUpdateLongGEZero(
 	entry *ZendIniEntry,
-	new_value *types2.String,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -364,15 +364,15 @@ func OnUpdateLongGEZero(
 	var base *byte = (*byte)(mh_arg2)
 	tmp = StrToLongWithUnit(new_value.GetStr())
 	if tmp < 0 {
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	p = (*ZendLong)(base + int(mh_arg1))
 	*p = tmp
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func OnUpdateReal(
 	entry *ZendIniEntry,
-	new_value *types2.String,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -382,11 +382,11 @@ func OnUpdateReal(
 	var base *byte = (*byte)(mh_arg2)
 	p = (*float64)(base + int(mh_arg1))
 	*p = ZendStrtod(new_value.GetVal(), nil)
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func OnUpdateString(
 	entry *ZendIniEntry,
-	new_value *types2.String,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -400,11 +400,11 @@ func OnUpdateString(
 	} else {
 		*p = nil
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func OnUpdateStringUnempty(
 	entry *ZendIniEntry,
-	new_value *types2.String,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -413,7 +413,7 @@ func OnUpdateStringUnempty(
 	var p **byte
 	var base *byte = (*byte)(mh_arg2)
 	if new_value != nil && !(new_value.GetStr()[0]) {
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	p = (**byte)(base + int(mh_arg1))
 	if new_value != nil {
@@ -421,5 +421,5 @@ func OnUpdateStringUnempty(
 	} else {
 		*p = nil
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }

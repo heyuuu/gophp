@@ -3,7 +3,7 @@ package standard
 import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard/str"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -13,17 +13,17 @@ import (
 type PhpBasicGlobals struct {
 	strTokState str.StrTokState
 
-	user_shutdown_function_names *types2.Array
-	putenv_ht                    types2.Array
-	locale_string                *types2.String
-	locale_changed               types2.ZendBool
+	user_shutdown_function_names *types.Array
+	putenv_ht                    types.Array
+	locale_string                *types.String
+	locale_changed               types.ZendBool
 	str_ebuf                     []byte
-	array_walk_fci               types2.ZendFcallInfo
-	array_walk_fci_cache         types2.ZendFcallInfoCache
-	user_compare_fci             types2.ZendFcallInfo
-	user_compare_fci_cache       types2.ZendFcallInfoCache
+	array_walk_fci               types.ZendFcallInfo
+	array_walk_fci_cache         types.ZendFcallInfoCache
+	user_compare_fci             types.ZendFcallInfo
+	user_compare_fci_cache       types.ZendFcallInfoCache
 	user_tick_functions          *zend.ZendLlist
-	active_ini_file_section      types2.Zval
+	active_ini_file_section      types.Zval
 	page_uid                     zend.ZendLong
 	page_gid                     zend.ZendLong
 	page_inode                   zend.ZendLong
@@ -35,10 +35,10 @@ type PhpBasicGlobals struct {
 	state                        []uint32
 	next                         *uint32
 	left                         int
-	mt_rand_is_seeded            types2.ZendBool
+	mt_rand_is_seeded            types.ZendBool
 	mt_rand_mode                 zend.ZendLong
 	syslog_device                *byte
-	incomplete_class             *types2.ClassEntry
+	incomplete_class             *types.ClassEntry
 	serialize_lock               unsigned
 	serialize                    struct {
 		data  *PhpSerializeData
@@ -49,9 +49,9 @@ type PhpBasicGlobals struct {
 		level unsigned
 	}
 	url_adapt_session_ex       UrlAdaptStateExT
-	url_adapt_session_hosts_ht types2.Array
+	url_adapt_session_hosts_ht types.Array
 	url_adapt_output_ex        UrlAdaptStateExT
-	url_adapt_output_hosts_ht  types2.Array
+	url_adapt_output_hosts_ht  types.Array
 	mmap_file                  any
 	mmap_len                   int
 	UserFilterMap              map[string]*PhpUserFilterData
@@ -63,12 +63,12 @@ func (this *PhpBasicGlobals) GetUrlAdaptSessionEx() UrlAdaptStateExT {
 	return this.url_adapt_session_ex
 }
 
-func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() types2.Array {
+func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() types.Array {
 	return this.url_adapt_session_hosts_ht
 }
 
 func (this *PhpBasicGlobals) GetUrlAdaptOutputEx() UrlAdaptStateExT { return this.url_adapt_output_ex }
-func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() types2.Array {
+func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() types.Array {
 	return this.url_adapt_output_hosts_ht
 }
 
@@ -99,27 +99,27 @@ func (this *PutenvEntry) SetKeyLen(value int)          { this.key_len = value }
  * PhpShutdownFunctionEntry
  */
 type PhpShutdownFunctionEntry struct {
-	arguments *types2.Zval
+	arguments *types.Zval
 	arg_count int
 }
 
-func (this *PhpShutdownFunctionEntry) GetArguments() *types2.Zval      { return this.arguments }
-func (this *PhpShutdownFunctionEntry) SetArguments(value *types2.Zval) { this.arguments = value }
-func (this *PhpShutdownFunctionEntry) GetArgCount() int                { return this.arg_count }
-func (this *PhpShutdownFunctionEntry) SetArgCount(value int)           { this.arg_count = value }
+func (this *PhpShutdownFunctionEntry) GetArguments() *types.Zval      { return this.arguments }
+func (this *PhpShutdownFunctionEntry) SetArguments(value *types.Zval) { this.arguments = value }
+func (this *PhpShutdownFunctionEntry) GetArgCount() int               { return this.arg_count }
+func (this *PhpShutdownFunctionEntry) SetArgCount(value int)          { this.arg_count = value }
 
 /**
  * UserTickFunctionEntry
  */
 type UserTickFunctionEntry struct {
-	arguments *types2.Zval
+	arguments *types.Zval
 	arg_count int
 	calling   int
 }
 
-func (this *UserTickFunctionEntry) GetArguments() *types2.Zval      { return this.arguments }
-func (this *UserTickFunctionEntry) SetArguments(value *types2.Zval) { this.arguments = value }
-func (this *UserTickFunctionEntry) GetArgCount() int                { return this.arg_count }
-func (this *UserTickFunctionEntry) SetArgCount(value int)           { this.arg_count = value }
-func (this *UserTickFunctionEntry) GetCalling() int                 { return this.calling }
-func (this *UserTickFunctionEntry) SetCalling(value int)            { this.calling = value }
+func (this *UserTickFunctionEntry) GetArguments() *types.Zval      { return this.arguments }
+func (this *UserTickFunctionEntry) SetArguments(value *types.Zval) { this.arguments = value }
+func (this *UserTickFunctionEntry) GetArgCount() int               { return this.arg_count }
+func (this *UserTickFunctionEntry) SetArgCount(value int)          { this.arg_count = value }
+func (this *UserTickFunctionEntry) GetCalling() int                { return this.calling }
+func (this *UserTickFunctionEntry) SetCalling(value int)           { this.calling = value }

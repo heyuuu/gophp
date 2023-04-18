@@ -2,27 +2,27 @@ package spl
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
-func SplInstantiateArgEx1(pce *types2.ClassEntry, retval *types2.Zval, arg1 *types2.Zval) int {
-	var func_ types2.IFunction = pce.GetConstructor()
+func SplInstantiateArgEx1(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval) int {
+	var func_ types.IFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
 	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetStr(), nil, 1, arg1, nil)
 	return 0
 }
-func SplInstantiateArgEx2(pce *types2.ClassEntry, retval *types2.Zval, arg1 *types2.Zval, arg2 *types2.Zval) int {
-	var func_ types2.IFunction = pce.GetConstructor()
+func SplInstantiateArgEx2(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval, arg2 *types.Zval) int {
+	var func_ types.IFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
 	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetStr(), nil, 2, arg1, arg2)
 	return 0
 }
-func SplInstantiateArgN(pce *types2.ClassEntry, retval *types2.Zval, argc int, argv *types2.Zval) {
-	var func_ types2.IFunction = pce.GetConstructor()
-	var fci types2.ZendFcallInfo
-	var fcc types2.ZendFcallInfoCache
-	var dummy types2.Zval
+func SplInstantiateArgN(pce *types.ClassEntry, retval *types.Zval, argc int, argv *types.Zval) {
+	var func_ types.IFunction = pce.GetConstructor()
+	var fci types.ZendFcallInfo
+	var fcc types.ZendFcallInfoCache
+	var dummy types.Zval
 	SplInstantiate(pce, retval)
 	fci.SetSize(b.SizeOf("zend_fcall_info"))
 	fci.GetFunctionName().SetString(func_.GetFunctionName())
@@ -36,28 +36,28 @@ func SplInstantiateArgN(pce *types2.ClassEntry, retval *types2.Zval, argc int, a
 	fcc.SetObject(retval.Object())
 	zend.ZendCallFunction(&fci, &fcc)
 }
-func SplInstantiate(pce *types2.ClassEntry, object *types2.Zval) { zend.ObjectInitEx(object, pce) }
-func SplOffsetConvertToLong(offset *types2.Zval) zend.ZendLong {
+func SplInstantiate(pce *types.ClassEntry, object *types.Zval) { zend.ObjectInitEx(object, pce) }
+func SplOffsetConvertToLong(offset *types.Zval) zend.ZendLong {
 	var idx zend.ZendUlong
 try_again:
 	switch offset.GetType() {
-	case types2.IS_STRING:
-		if types2.HandleNumericStr(offset.String().GetStr(), &idx) {
+	case types.IS_STRING:
+		if types.HandleNumericStr(offset.String().GetStr(), &idx) {
 			return idx
 		}
-	case types2.IS_DOUBLE:
+	case types.IS_DOUBLE:
 		return zend.ZendLong(offset.Double())
-	case types2.IS_LONG:
+	case types.IS_LONG:
 		return offset.Long()
-	case types2.IS_FALSE:
+	case types.IS_FALSE:
 		return 0
-	case types2.IS_TRUE:
+	case types.IS_TRUE:
 		return 1
-	case types2.IS_REFERENCE:
-		offset = types2.Z_REFVAL_P(offset)
+	case types.IS_REFERENCE:
+		offset = types.Z_REFVAL_P(offset)
 		goto try_again
-	case types2.IS_RESOURCE:
-		return types2.Z_RES_HANDLE_P(offset)
+	case types.IS_RESOURCE:
+		return types.Z_RES_HANDLE_P(offset)
 	}
 	return -1
 }

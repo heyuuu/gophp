@@ -1,13 +1,13 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
-func ZvalAddRef(p *types2.Zval) {
+func ZvalAddRef(p *types.Zval) {
 	if p.IsRefcounted() {
 		if p.IsReference() && p.GetRefcount() == 1 {
-			types2.ZVAL_COPY(p, types2.Z_REFVAL_P(p))
+			types.ZVAL_COPY(p, types.Z_REFVAL_P(p))
 		} else {
 			// 			p.AddRefcount()
 		}

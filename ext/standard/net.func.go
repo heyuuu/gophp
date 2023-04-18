@@ -3,13 +3,13 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func PhpInetNtop(addr *__struct__sockaddr) *types2.String {
+func PhpInetNtop(addr *__struct__sockaddr) *types.String {
 	var addrlen socklen_t = b.SizeOf("struct sockaddr_in")
 	if addr == nil {
 		return nil
@@ -19,7 +19,7 @@ func PhpInetNtop(addr *__struct__sockaddr) *types2.String {
 
 	switch addr.sa_family {
 	case AF_INET:
-		var ret *types2.String = types2.ZendStringAlloc(INET_ADDRSTRLEN, 0)
+		var ret *types.String = types.ZendStringAlloc(INET_ADDRSTRLEN, 0)
 		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), ret.GetVal(), INET_ADDRSTRLEN) {
 			return ret.Cutoff(strlen(ret.GetVal()))
 		}
@@ -29,8 +29,8 @@ func PhpInetNtop(addr *__struct__sockaddr) *types2.String {
 
 	switch addr.sa_family {
 	case AF_INET:
-		var ret *types2.String = types2.ZendStringAlloc(NI_MAXHOST, 0)
-		if getnameinfo(addr, addrlen, ret.GetVal(), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == types2.SUCCESS {
+		var ret *types.String = types.ZendStringAlloc(NI_MAXHOST, 0)
+		if getnameinfo(addr, addrlen, ret.GetVal(), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == types.SUCCESS {
 
 			/* Also demangle numeric host with %name suffix */
 
@@ -45,15 +45,15 @@ func PhpInetNtop(addr *__struct__sockaddr) *types2.String {
 	return nil
 }
 func IfaceAppendUnicast(
-	unicast *types2.Zval,
+	unicast *types.Zval,
 	flags zend.ZendLong,
 	addr *__struct__sockaddr,
 	netmask *__struct__sockaddr,
 	broadcast *__struct__sockaddr,
 	ptp *__struct__sockaddr,
 ) {
-	var host *types2.String
-	var u types2.Zval
+	var host *types.String
+	var u types.Zval
 	zend.ArrayInit(&u)
 	zend.AddAssocLong(&u, "flags", flags)
 	if addr != nil {
@@ -86,17 +86,17 @@ func ZifNetGetInterfaces(executeData zpp.Ex, return_value zpp.Ret) {
 	}
 	zend.ArrayInit(return_value)
 	for p = addrs; p != nil; p = p.ifa_next {
-		var iface *types2.Zval = return_value.Array().KeyFind(b.CastStrAuto(p.ifa_name))
-		var unicast *types2.Zval
-		var status *types2.Zval
+		var iface *types.Zval = return_value.Array().KeyFind(b.CastStrAuto(p.ifa_name))
+		var unicast *types.Zval
+		var status *types.Zval
 		if iface == nil {
-			var newif types2.Zval
+			var newif types.Zval
 			zend.ArrayInit(&newif)
 			iface = return_value.Array().KeyAdd(b.CastStrAuto(p.ifa_name), &newif)
 		}
 		unicast = iface.Array().KeyFind("unicast")
 		if unicast == nil {
-			var newuni types2.Zval
+			var newuni types.Zval
 			zend.ArrayInit(&newuni)
 			unicast = iface.Array().KeyAdd("unicast", &newuni)
 		}

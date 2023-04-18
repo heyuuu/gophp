@@ -4,14 +4,14 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func DIRG(v __auto__) __auto__ { return DirGlobals.v }
-func PhpSetDefaultDir(res *types2.ZendResource) {
+func PhpSetDefaultDir(res *types.ZendResource) {
 	if DIRG(default_dir) {
 		zend.ZendListDelete(DIRG(default_dir))
 	}
@@ -22,14 +22,14 @@ func PhpSetDefaultDir(res *types2.ZendResource) {
 }
 func ZmActivateDir(type_ int, module_number int) int {
 	DIRG(default_dir) = nil
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZmStartupDir(type_ int, module_number int) int {
 	var dirsep_str []byte
 	var pathsep_str []byte
-	var dir_class_entry types2.ClassEntry
+	var dir_class_entry types.ClassEntry
 	memset(&dir_class_entry, 0, b.SizeOf("zend_class_entry"))
-	dir_class_entry.SetName(types2.NewString("Directory"))
+	dir_class_entry.SetName(types.NewString("Directory"))
 	dir_class_entry.SetBuiltinFunctions(PhpDirClassFunctions)
 	DirClassEntryPtr = zend.ZendRegisterInternalClass(&dir_class_entry)
 	dirsep_str[0] = zend.DEFAULT_SLASH
@@ -58,12 +58,12 @@ func ZmStartupDir(type_ int, module_number int) int {
 	const GLOB_AVAILABLE_FLAGS zend.ZendLong = 0 | GLOB_BRACE | GLOB_MARK | GLOB_NOSORT | GLOB_NOCHECK | GLOB_NOESCAPE | GLOB_ERR | GLOB_ONLYDIR
 	zend.RegisterLongConstant("GLOB_ONLYDIR", GLOB_ONLYDIR, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("GLOB_AVAILABLE_FLAGS", GLOB_AVAILABLE_FLAGS, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	return types2.SUCCESS
+	return types.SUCCESS
 }
-func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types2.Zval, createobject int) {
+func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval, createobject int) {
 	var dirname *byte
 	var dir_len int
-	var zcontext *types2.Zval = nil
+	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext = nil
 	var dirp *core.PhpStream
 	for {
@@ -96,18 +96,18 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types2.Zval,
 		core.PhpStreamToZval(dirp, return_value)
 	}
 }
-func ZifOpendir(executeData zpp.Ex, return_value zpp.Ret, path *types2.Zval, _ zpp.Opt, context *types2.Zval) {
+func ZifOpendir(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ zpp.Opt, context *types.Zval) {
 	_phpDoOpendir(executeData, return_value, 0)
 }
-func ZifGetdir(executeData zpp.Ex, return_value zpp.Ret, directory *types2.Zval, _ zpp.Opt, context *types2.Zval) {
+func ZifGetdir(executeData zpp.Ex, return_value zpp.Ret, directory *types.Zval, _ zpp.Opt, context *types.Zval) {
 	_phpDoOpendir(executeData, return_value, 1)
 }
-func ZifClosedir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle *types2.Zval) {
-	var id *types2.Zval = nil
-	var tmp *types2.Zval
-	var myself *types2.Zval
+func ZifClosedir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle *types.Zval) {
+	var id *types.Zval = nil
+	var tmp *types.Zval
+	var myself *types.Zval
 	var dirp *core.PhpStream
-	var res *types2.ZendResource
+	var res *types.ZendResource
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 0, 1, 0)
@@ -123,7 +123,7 @@ func ZifClosedir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle 
 	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, types2.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
+			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
@@ -155,7 +155,7 @@ func ZifClosedir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle 
 		PhpSetDefaultDir(nil)
 	}
 }
-func ZifChroot(executeData zpp.Ex, return_value zpp.Ret, directory *types2.Zval) {
+func ZifChroot(executeData zpp.Ex, return_value zpp.Ret, directory *types.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -187,7 +187,7 @@ func ZifChroot(executeData zpp.Ex, return_value zpp.Ret, directory *types2.Zval)
 	return_value.SetTrue()
 	return
 }
-func ZifChdir(executeData zpp.Ex, return_value zpp.Ret, directory *types2.Zval) {
+func ZifChdir(executeData zpp.Ex, return_value zpp.Ret, directory *types.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -239,10 +239,10 @@ func ZifGetcwd(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 }
-func ZifRewinddir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle *types2.Zval) {
-	var id *types2.Zval = nil
-	var tmp *types2.Zval
-	var myself *types2.Zval
+func ZifRewinddir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle *types.Zval) {
+	var id *types.Zval = nil
+	var tmp *types.Zval
+	var myself *types.Zval
 	var dirp *core.PhpStream
 	for {
 		for {
@@ -259,7 +259,7 @@ func ZifRewinddir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle
 	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, types2.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
+			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
@@ -287,10 +287,10 @@ func ZifRewinddir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle
 	}
 	core.PhpStreamRewinddir(dirp)
 }
-func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types2.Zval) {
-	var id *types2.Zval = nil
-	var tmp *types2.Zval
-	var myself *types2.Zval
+func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var id *types.Zval = nil
+	var tmp *types.Zval
+	var myself *types.Zval
 	var dirp *core.PhpStream
 	var entry core.PhpStreamDirent
 	for {
@@ -308,7 +308,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types2.Zval) 
 	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, types2.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
+			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
@@ -341,7 +341,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types2.Zval) 
 	return_value.SetFalse()
 	return
 }
-func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types2.Zval, _ zpp.Opt, flags *types2.Zval) {
+func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, _ zpp.Opt, flags *types.Zval) {
 	var cwd_skip int = 0
 	var pattern *byte = nil
 	var pattern_len int
@@ -349,7 +349,7 @@ func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types2.Zval, _ z
 	var globbuf glob_t
 	var n int
 	var ret int
-	var basedir_limit types2.ZendBool = 0
+	var basedir_limit types.ZendBool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -435,14 +435,14 @@ func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types2.Zval, _ z
 		return
 	}
 }
-func ZifScandir(executeData zpp.Ex, return_value zpp.Ret, dir *types2.Zval, _ zpp.Opt, sortingOrder *types2.Zval, context *types2.Zval) {
+func ZifScandir(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, _ zpp.Opt, sortingOrder *types.Zval, context *types.Zval) {
 	var dirn *byte
 	var dirn_len int
 	var flags zend.ZendLong = 0
-	var namelist **types2.String
+	var namelist **types.String
 	var n int
 	var i int
-	var zcontext *types2.Zval = nil
+	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext = nil
 	for {
 		for {

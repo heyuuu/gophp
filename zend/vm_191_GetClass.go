@@ -1,7 +1,7 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
@@ -9,13 +9,13 @@ func ZEND_GET_CLASS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	var opline *ZendOp = executeData.GetOpline()
 
 	{
-		var op1 *types2.Zval
+		var op1 *types.Zval
 		op1 = executeData.GetOp1(opline)
 		for true {
 			if op1.IsObject() {
-				opline.Result().SetStringCopy(types2.Z_OBJCE_P(op1).GetName())
+				opline.Result().SetStringCopy(types.Z_OBJCE_P(op1).GetName())
 			} else {
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types2.ZendGetTypeByConst(op1.GetType()))
+				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				opline.Result().SetFalse()
 			}
 			break
@@ -28,19 +28,19 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 
 	{
 		var free_op1 ZendFreeOp
-		var op1 *types2.Zval
+		var op1 *types.Zval
 		op1 = opline.Op1()
 		for true {
 			if op1.IsObject() {
-				opline.Result().SetStringCopy(types2.Z_OBJCE_P(op1).GetName())
+				opline.Result().SetStringCopy(types.Z_OBJCE_P(op1).GetName())
 			} else if op1.IsReference() {
-				op1 = types2.Z_REFVAL_P(op1)
+				op1 = types.Z_REFVAL_P(op1)
 				continue
 			} else {
 				if op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1(executeData)
 				}
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types2.ZendGetTypeByConst(op1.GetType()))
+				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				opline.Result().SetFalse()
 			}
 			break
@@ -67,19 +67,19 @@ func ZEND_GET_CLASS_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 
 	{
-		var op1 *types2.Zval
+		var op1 *types.Zval
 		op1 = opline.Op1()
 		for true {
 			if op1.IsObject() {
-				opline.Result().SetStringCopy(types2.Z_OBJCE_P(op1).GetName())
+				opline.Result().SetStringCopy(types.Z_OBJCE_P(op1).GetName())
 			} else if op1.IsReference() {
-				op1 = types2.Z_REFVAL_P(op1)
+				op1 = types.Z_REFVAL_P(op1)
 				continue
 			} else {
 				if op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1(executeData)
 				}
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types2.ZendGetTypeByConst(op1.GetType()))
+				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				opline.Result().SetFalse()
 			}
 			break

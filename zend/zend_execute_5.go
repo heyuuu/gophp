@@ -3,41 +3,41 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func zend_fetch_dimension_address_W(container_ptr *types2.Zval, dim *types2.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types2.Zval = opline.Result()
+func zend_fetch_dimension_address_W(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_W, executeData)
 }
-func zend_fetch_dimension_address_RW(container_ptr *types2.Zval, dim *types2.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types2.Zval = opline.Result()
+func zend_fetch_dimension_address_RW(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_RW, executeData)
 }
-func zend_fetch_dimension_address_UNSET(container_ptr *types2.Zval, dim *types2.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types2.Zval = opline.Result()
+func zend_fetch_dimension_address_UNSET(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_UNSET, executeData)
 }
 func ZendFetchDimensionAddressRead(
-	result *types2.Zval,
-	container *types2.Zval,
-	dim *types2.Zval,
+	result *types.Zval,
+	container *types.Zval,
+	dim *types.Zval,
 	dim_type int,
 	type_ int,
 	is_list int,
 	slow int,
 	executeData *ZendExecuteData,
 ) {
-	var retval *types2.Zval
+	var retval *types.Zval
 	if slow == 0 {
 		if container.IsArray() {
 		try_array:
 			retval = ZendFetchDimensionAddressInner(container.Array(), dim, dim_type, type_, executeData)
-			types2.ZVAL_COPY_DEREF(result, retval)
+			types.ZVAL_COPY_DEREF(result, retval)
 			return
 		} else if container.IsReference() {
-			container = types2.Z_REFVAL_P(container)
+			container = types.Z_REFVAL_P(container)
 			if container.IsArray() {
 				goto try_array
 			}
@@ -46,10 +46,10 @@ func ZendFetchDimensionAddressRead(
 	if is_list == 0 && container.IsString() {
 		var offset ZendLong
 	try_string_offset:
-		if dim.GetType() != types2.IS_LONG {
+		if dim.GetType() != types.IS_LONG {
 			switch dim.GetType() {
-			case types2.IS_STRING:
-				if types2.IS_LONG == IsNumericString(dim.String().GetStr(), nil, nil, -1) {
+			case types.IS_STRING:
+				if types.IS_LONG == IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 					break
 				}
 				if type_ == BP_VAR_IS {
@@ -57,21 +57,21 @@ func ZendFetchDimensionAddressRead(
 					return
 				}
 				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.String().GetVal())
-			case types2.IS_UNDEF:
+			case types.IS_UNDEF:
 				ZVAL_UNDEFINED_OP2(executeData)
 				fallthrough
-			case types2.IS_DOUBLE:
+			case types.IS_DOUBLE:
 				fallthrough
-			case types2.IS_NULL:
+			case types.IS_NULL:
 				fallthrough
-			case types2.IS_FALSE:
+			case types.IS_FALSE:
 				fallthrough
-			case types2.IS_TRUE:
+			case types.IS_TRUE:
 				if type_ != BP_VAR_IS {
 					faults.Error(faults.E_NOTICE, "String offset cast occurred")
 				}
-			case types2.IS_REFERENCE:
-				dim = types2.Z_REFVAL_P(dim)
+			case types.IS_REFERENCE:
+				dim = types.Z_REFVAL_P(dim)
 				goto try_string_offset
 			default:
 				ZendIllegalOffset()
@@ -88,14 +88,14 @@ func ZendFetchDimensionAddressRead(
 				result.SetNull()
 			}
 		} else {
-			var c types2.ZendUchar
+			var c types.ZendUchar
 			var real_offset ZendLong
 			if offset < 0 {
 				real_offset = ZendLong(container.String().GetLen() + offset)
 			} else {
 				real_offset = offset
 			}
-			c = types2.ZendUchar(container.String().GetStr()[real_offset])
+			c = types.ZendUchar(container.String().GetStr()[real_offset])
 			result.SetStringVal(string(c))
 		}
 	} else if container.IsObject() {
@@ -105,11 +105,11 @@ func ZendFetchDimensionAddressRead(
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
 			dim++
 		}
-		retval = types2.Z_OBJ_HT_P(container).GetReadDimension()(container, dim, type_, result)
+		retval = types.Z_OBJ_HT_P(container).GetReadDimension()(container, dim, type_, result)
 		b.Assert(result != nil)
 		if retval != nil {
 			if result != retval {
-				types2.ZVAL_COPY_DEREF(result, retval)
+				types.ZVAL_COPY_DEREF(result, retval)
 			} else if retval.IsReference() {
 				ZendUnwrapReference(result)
 			}
@@ -124,31 +124,31 @@ func ZendFetchDimensionAddressRead(
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if is_list == 0 && type_ != BP_VAR_IS {
-			faults.Error(faults.E_NOTICE, "Trying to access array offset on value of type %s", types2.ZendZvalTypeName(container))
+			faults.Error(faults.E_NOTICE, "Trying to access array offset on value of type %s", types.ZendZvalTypeName(container))
 		}
 		result.SetNull()
 	}
 }
-func zend_fetch_dimension_address_read_R(container *types2.Zval, dim *types2.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types2.Zval = opline.Result()
+func zend_fetch_dimension_address_read_R(container *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 0, 0, executeData)
 }
-func zend_fetch_dimension_address_read_R_slow(container *types2.Zval, dim *types2.Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types2.Zval = opline.Result()
+func zend_fetch_dimension_address_read_R_slow(container *types.Zval, dim *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, IS_CV, BP_VAR_R, 0, 1, executeData)
 }
-func zend_fetch_dimension_address_read_IS(container *types2.Zval, dim *types2.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types2.Zval = opline.Result()
+func zend_fetch_dimension_address_read_IS(container *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_IS, 0, 0, executeData)
 }
-func zend_fetch_dimension_address_LIST_r(container *types2.Zval, dim *types2.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types2.Zval = opline.Result()
+func zend_fetch_dimension_address_LIST_r(container *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 1, 0, executeData)
 }
-func ZendFetchDimensionConst(result *types2.Zval, container *types2.Zval, dim *types2.Zval, type_ int) {
+func ZendFetchDimensionConst(result *types.Zval, container *types.Zval, dim *types.Zval, type_ int) {
 	ZendFetchDimensionAddressRead(result, container, dim, IS_TMP_VAR, type_, 0, 0, nil)
 }
-func ZendFindArrayDimSlow(ht *types2.Array, offset *types2.Zval, executeData *ZendExecuteData) *types2.Zval {
+func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	var hval ZendUlong
 	if offset.IsDouble() {
 		hval = DvalToLval(offset.Double())
@@ -156,7 +156,7 @@ func ZendFindArrayDimSlow(ht *types2.Array, offset *types2.Zval, executeData *Ze
 		return ht.IndexFind(hval)
 	} else if offset.IsNull() {
 	str_idx:
-		return types2.ZendHashFindInd(ht, types2.NewString("").GetStr())
+		return types.ZendHashFindInd(ht, types.NewString("").GetStr())
 	} else if offset.IsFalse() {
 		hval = 0
 		goto num_idx
@@ -164,7 +164,7 @@ func ZendFindArrayDimSlow(ht *types2.Array, offset *types2.Zval, executeData *Ze
 		hval = 1
 		goto num_idx
 	} else if offset.IsResource() {
-		hval = types2.Z_RES_HANDLE_P(offset)
+		hval = types.Z_RES_HANDLE_P(offset)
 		goto num_idx
 	} else if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
@@ -174,12 +174,12 @@ func ZendFindArrayDimSlow(ht *types2.Array, offset *types2.Zval, executeData *Ze
 		return nil
 	}
 }
-func ZendIssetDimSlow(container *types2.Zval, offset *types2.Zval, executeData *ZendExecuteData) int {
+func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
 		offset = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	if container.IsObject() {
-		return types2.Z_OBJ_HT_P(container).GetHasDimension()(container, offset, 0)
+		return types.Z_OBJ_HT_P(container).GetHasDimension()(container, offset, 0)
 	} else if container.IsString() {
 		var lval ZendLong
 		if offset.IsLong() {
@@ -197,11 +197,11 @@ func ZendIssetDimSlow(container *types2.Zval, offset *types2.Zval, executeData *
 
 			/*if (OP2_TYPE & (IS_CV|IS_VAR)) {*/
 
-			offset = types2.ZVAL_DEREF(offset)
+			offset = types.ZVAL_DEREF(offset)
 
 			/*}*/
 
-			if offset.GetType() < types2.IS_STRING || offset.IsString() && types2.IS_LONG == IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == IsNumericString(offset.String().GetStr(), nil, nil, 0) {
 				lval = ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -211,12 +211,12 @@ func ZendIssetDimSlow(container *types2.Zval, offset *types2.Zval, executeData *
 		return 0
 	}
 }
-func ZendIsemptyDimSlow(container *types2.Zval, offset *types2.Zval, executeData *ZendExecuteData) int {
+func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
 		offset = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	if container.IsObject() {
-		return !(types2.Z_OBJ_HT_P(container).GetHasDimension()(container, offset, 1))
+		return !(types.Z_OBJ_HT_P(container).GetHasDimension()(container, offset, 1))
 	} else if container.IsString() {
 		var lval ZendLong
 		if offset.IsLong() {
@@ -234,11 +234,11 @@ func ZendIsemptyDimSlow(container *types2.Zval, offset *types2.Zval, executeData
 
 			/*if (OP2_TYPE & (IS_CV|IS_VAR)) {*/
 
-			offset = types2.ZVAL_DEREF(offset)
+			offset = types.ZVAL_DEREF(offset)
 
 			/*}*/
 
-			if offset.GetType() < types2.IS_STRING || offset.IsString() && types2.IS_LONG == IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == IsNumericString(offset.String().GetStr(), nil, nil, 0) {
 				lval = ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -248,47 +248,47 @@ func ZendIsemptyDimSlow(container *types2.Zval, offset *types2.Zval, executeData
 		return 1
 	}
 }
-func ZendArrayKeyExistsFast(ht *types2.Array, key *types2.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
-	var str *types2.String
+func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
+	var str *types.String
 	var hval ZendUlong
 try_again:
 	if key.IsString() {
 		str = key.String()
-		if types2.HandleNumericStr(str.GetStr(), &hval) {
+		if types.HandleNumericStr(str.GetStr(), &hval) {
 			goto num_key
 		}
 	str_key:
-		if types2.ZendHashFindInd(ht, str.GetStr()) != nil {
-			return types2.IS_TRUE
+		if types.ZendHashFindInd(ht, str.GetStr()) != nil {
+			return types.IS_TRUE
 		} else {
-			return types2.IS_FALSE
+			return types.IS_FALSE
 		}
 	} else if key.IsLong() {
 		hval = key.Long()
 	num_key:
 		if ht.IndexFind(hval) != nil {
-			return types2.IS_TRUE
+			return types.IS_TRUE
 		} else {
-			return types2.IS_FALSE
+			return types.IS_FALSE
 		}
 	} else if key.IsReference() {
-		key = types2.Z_REFVAL_P(key)
+		key = types.Z_REFVAL_P(key)
 		goto try_again
-	} else if key.GetType() <= types2.IS_NULL {
+	} else if key.GetType() <= types.IS_NULL {
 		if key.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		str = types2.NewString("")
+		str = types.NewString("")
 		goto str_key
 	} else {
 		faults.Error(faults.E_WARNING, "array_key_exists(): The first argument should be either a string or an integer")
-		return types2.IS_FALSE
+		return types.IS_FALSE
 	}
 }
-func ZendArrayKeyExistsSlow(subject *types2.Zval, key *types2.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
+func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
 	if subject.IsObject() {
 		faults.Error(faults.E_DEPRECATED, "array_key_exists(): "+"Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
-		var ht *types2.Array = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
+		var ht *types.Array = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
 		var result uint32 = ZendArrayKeyExistsFast(ht, key, opline, executeData)
 		ZendReleaseProperties(ht)
 		return result
@@ -299,24 +299,24 @@ func ZendArrayKeyExistsSlow(subject *types2.Zval, key *types2.Zval, opline *Zend
 		if subject.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", types2.ZendGetTypeByConst(subject.GetType()))
-		return types2.IS_NULL
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", types.ZendGetTypeByConst(subject.GetType()))
+		return types.IS_NULL
 	}
 }
-func PromotesToArray(val *types2.Zval) types2.ZendBool {
-	return val.GetType() <= types2.IS_FALSE || val.IsReference() && types2.Z_REFVAL_P(val).GetType() <= types2.IS_FALSE
+func PromotesToArray(val *types.Zval) types.ZendBool {
+	return val.GetType() <= types.IS_FALSE || val.IsReference() && types.Z_REFVAL_P(val).GetType() <= types.IS_FALSE
 }
-func PromotesToObject(val *types2.Zval) types2.ZendBool {
-	val = types2.ZVAL_DEREF(val)
-	return val.GetType() <= types2.IS_FALSE || val.IsString() && val.String().GetLen() == 0
+func PromotesToObject(val *types.Zval) types.ZendBool {
+	val = types.ZVAL_DEREF(val)
+	return val.GetType() <= types.IS_FALSE || val.IsString() && val.String().GetLen() == 0
 }
-func CheckTypeArrayAssignable(type_ types2.ZendType) types2.ZendBool {
+func CheckTypeArrayAssignable(type_ types.ZendType) types.ZendBool {
 	if type_ == 0 {
 		return 1
 	}
-	return type_.IsCode() && (type_.Code() == types2.IS_ARRAY || type_.Code() == types2.IS_ITERABLE)
+	return type_.IsCode() && (type_.Code() == types.IS_ARRAY || type_.Code() == types.IS_ITERABLE)
 }
-func check_type_stdClass_assignable(type_ types2.ZendType) types2.ZendBool {
+func check_type_stdClass_assignable(type_ types.ZendType) types.ZendBool {
 	if type_ == 0 {
 		return 1
 	}
@@ -327,19 +327,19 @@ func check_type_stdClass_assignable(type_ types2.ZendType) types2.ZendBool {
 			return ascii.StrCaseEquals(type_.Name().GetStr(), "stdclass")
 		}
 	} else {
-		return type_.Code() == types2.IS_OBJECT
+		return type_.Code() == types.IS_OBJECT
 	}
 }
-func ZendVerifyRefArrayAssignable(ref *types2.ZendReference) types2.ZendBool {
+func ZendVerifyRefArrayAssignable(ref *types.ZendReference) types.ZendBool {
 	var prop *ZendPropertyInfo
 	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
-	var _source_list *types2.ZendPropertyInfoSourceList = &(ref.GetSources())
+	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
-	var _list *types2.ZendPropertyInfoList
+	var _list *types.ZendPropertyInfoList
 	if _source_list.GetPtr() != nil {
-		if types2.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {
-			_list = types2.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(_source_list.GetList())
+		if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {
+			_list = types.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(_source_list.GetList())
 			_prop = _list.GetPtr()
 			_end = _list.GetPtr() + _list.GetNum()
 		} else {
@@ -356,16 +356,16 @@ func ZendVerifyRefArrayAssignable(ref *types2.ZendReference) types2.ZendBool {
 	}
 	return 1
 }
-func zend_verify_ref_stdClass_assignable(ref *types2.ZendReference) types2.ZendBool {
+func zend_verify_ref_stdClass_assignable(ref *types.ZendReference) types.ZendBool {
 	var prop *ZendPropertyInfo
 	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
-	var _source_list *types2.ZendPropertyInfoSourceList = &(ref.GetSources())
+	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
-	var _list *types2.ZendPropertyInfoList
+	var _list *types.ZendPropertyInfoList
 	if _source_list.GetPtr() != nil {
-		if types2.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {
-			_list = types2.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(_source_list.GetList())
+		if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {
+			_list = types.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(_source_list.GetList())
 			_prop = _list.GetPtr()
 			_end = _list.GetPtr() + _list.GetNum()
 		} else {

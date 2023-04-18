@@ -1,7 +1,7 @@
 package spl
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -12,7 +12,7 @@ type SplPtrLlistElement struct {
 	prev *SplPtrLlistElement
 	next *SplPtrLlistElement
 	rc   int
-	data types2.Zval
+	data types.Zval
 }
 
 // func MakeSplPtrLlistElement(prev *SplPtrLlistElement, next *SplPtrLlistElement, rc int, data zend.Zval) SplPtrLlistElement {
@@ -29,7 +29,7 @@ func (this *SplPtrLlistElement) GetNext() *SplPtrLlistElement      { return this
 func (this *SplPtrLlistElement) SetNext(value *SplPtrLlistElement) { this.next = value }
 func (this *SplPtrLlistElement) GetRc() int                        { return this.rc }
 func (this *SplPtrLlistElement) SetRc(value int)                   { this.rc = value }
-func (this *SplPtrLlistElement) GetData() types2.Zval              { return this.data }
+func (this *SplPtrLlistElement) GetData() types.Zval               { return this.data }
 
 // func (this *SplPtrLlistElement) SetData(value zend.Zval) { this.data = value }
 
@@ -72,15 +72,15 @@ type SplDllistObject struct {
 	traverse_position int
 	traverse_pointer  *SplPtrLlistElement
 	flags             int
-	fptr_offset_get   types2.IFunction
-	fptr_offset_set   types2.IFunction
-	fptr_offset_has   types2.IFunction
-	fptr_offset_del   types2.IFunction
-	fptr_count        types2.IFunction
-	ce_get_iterator   *types2.ClassEntry
-	gc_data           *types2.Zval
+	fptr_offset_get   types.IFunction
+	fptr_offset_set   types.IFunction
+	fptr_offset_has   types.IFunction
+	fptr_offset_del   types.IFunction
+	fptr_count        types.IFunction
+	ce_get_iterator   *types.ClassEntry
+	gc_data           *types.Zval
 	gc_data_count     int
-	std               types2.ZendObject
+	std               types.ZendObject
 }
 
 //             func MakeSplDllistObject(
@@ -122,35 +122,35 @@ func (this *SplDllistObject) GetTraversePointer() *SplPtrLlistElement { return t
 func (this *SplDllistObject) SetTraversePointer(value *SplPtrLlistElement) {
 	this.traverse_pointer = value
 }
-func (this *SplDllistObject) GetFlags() int                      { return this.flags }
-func (this *SplDllistObject) SetFlags(value int)                 { this.flags = value }
-func (this *SplDllistObject) GetFptrOffsetGet() types2.IFunction { return this.fptr_offset_get }
-func (this *SplDllistObject) SetFptrOffsetGet(value types2.IFunction) {
+func (this *SplDllistObject) GetFlags() int                     { return this.flags }
+func (this *SplDllistObject) SetFlags(value int)                { this.flags = value }
+func (this *SplDllistObject) GetFptrOffsetGet() types.IFunction { return this.fptr_offset_get }
+func (this *SplDllistObject) SetFptrOffsetGet(value types.IFunction) {
 	this.fptr_offset_get = value
 }
-func (this *SplDllistObject) GetFptrOffsetSet() types2.IFunction { return this.fptr_offset_set }
-func (this *SplDllistObject) SetFptrOffsetSet(value types2.IFunction) {
+func (this *SplDllistObject) GetFptrOffsetSet() types.IFunction { return this.fptr_offset_set }
+func (this *SplDllistObject) SetFptrOffsetSet(value types.IFunction) {
 	this.fptr_offset_set = value
 }
-func (this *SplDllistObject) GetFptrOffsetHas() types2.IFunction { return this.fptr_offset_has }
-func (this *SplDllistObject) SetFptrOffsetHas(value types2.IFunction) {
+func (this *SplDllistObject) GetFptrOffsetHas() types.IFunction { return this.fptr_offset_has }
+func (this *SplDllistObject) SetFptrOffsetHas(value types.IFunction) {
 	this.fptr_offset_has = value
 }
-func (this *SplDllistObject) GetFptrOffsetDel() types2.IFunction { return this.fptr_offset_del }
-func (this *SplDllistObject) SetFptrOffsetDel(value types2.IFunction) {
+func (this *SplDllistObject) GetFptrOffsetDel() types.IFunction { return this.fptr_offset_del }
+func (this *SplDllistObject) SetFptrOffsetDel(value types.IFunction) {
 	this.fptr_offset_del = value
 }
-func (this *SplDllistObject) GetFptrCount() types2.IFunction       { return this.fptr_count }
-func (this *SplDllistObject) SetFptrCount(value types2.IFunction)  { this.fptr_count = value }
-func (this *SplDllistObject) GetCeGetIterator() *types2.ClassEntry { return this.ce_get_iterator }
-func (this *SplDllistObject) SetCeGetIterator(value *types2.ClassEntry) {
+func (this *SplDllistObject) GetFptrCount() types.IFunction       { return this.fptr_count }
+func (this *SplDllistObject) SetFptrCount(value types.IFunction)  { this.fptr_count = value }
+func (this *SplDllistObject) GetCeGetIterator() *types.ClassEntry { return this.ce_get_iterator }
+func (this *SplDllistObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplDllistObject) GetGcData() *types2.Zval      { return this.gc_data }
-func (this *SplDllistObject) SetGcData(value *types2.Zval) { this.gc_data = value }
-func (this *SplDllistObject) GetGcDataCount() int          { return this.gc_data_count }
-func (this *SplDllistObject) SetGcDataCount(value int)     { this.gc_data_count = value }
-func (this *SplDllistObject) GetStd() types2.ZendObject    { return this.std }
+func (this *SplDllistObject) GetGcData() *types.Zval      { return this.gc_data }
+func (this *SplDllistObject) SetGcData(value *types.Zval) { this.gc_data = value }
+func (this *SplDllistObject) GetGcDataCount() int         { return this.gc_data_count }
+func (this *SplDllistObject) SetGcDataCount(value int)    { this.gc_data_count = value }
+func (this *SplDllistObject) GetStd() types.ZendObject    { return this.std }
 
 // func (this *SplDllistObject) SetStd(value zend.ZendObject) { this.std = value }
 

@@ -3,7 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -420,9 +420,9 @@ func PhpSscanfInternal(
 	string *byte,
 	format *byte,
 	argCount int,
-	args *types2.Zval,
+	args *types.Zval,
 	varStart int,
-	return_value *types2.Zval,
+	return_value *types.Zval,
 ) int {
 	var numVars int
 	var nconversions int
@@ -433,7 +433,7 @@ func PhpSscanfInternal(
 	var objIndex int
 	var end *byte
 	var baseString *byte
-	var current *types2.Zval
+	var current *types.Zval
 	var op byte = 0
 	var base int = 0
 	var underflow int = 0
@@ -488,16 +488,16 @@ func PhpSscanfInternal(
 	 */
 
 	if numVars == 0 {
-		var tmp types2.Zval
+		var tmp types.Zval
 
 		/* allocate an array for return */
 
 		zend.ArrayInit(return_value)
 		for i = 0; i < totalVars; i++ {
 			tmp.SetNull()
-			if zend.AddNextIndexZval(return_value, &tmp) == types2.FAILURE {
+			if zend.AddNextIndexZval(return_value, &tmp) == types.FAILURE {
 				ScanSetErrorReturn(0, return_value)
-				return types2.FAILURE
+				return types.FAILURE
 			}
 		}
 		varStart = 0
@@ -1091,7 +1091,7 @@ done:
 	}
 	return result
 }
-func ScanSetErrorReturn(numVars int, return_value *types2.Zval) {
+func ScanSetErrorReturn(numVars int, return_value *types.Zval) {
 	if numVars != 0 {
 		return_value.SetLong(SCAN_ERROR_EOF)
 	} else {

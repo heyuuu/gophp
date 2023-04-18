@@ -2,7 +2,7 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/core/streams"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -14,16 +14,16 @@ var LeUserfilters int
 var LeBucketBrigade int
 var LeBucket int
 
-var UserFilterClassFuncs []types2.FunctionEntry = []types2.FunctionEntry{
-	types2.MakeZendFunctionEntryEx("filter", 0, ZifUserFilterNop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+var UserFilterClassFuncs []types.FunctionEntry = []types.FunctionEntry{
+	types.MakeZendFunctionEntryEx("filter", 0, ZifUserFilterNop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("in"),
 		zend.MakeArgName("out"),
 		zend.MakeArgByRef("consumed"),
 		zend.MakeArgName("closing"),
 	}),
-	types2.MakeZendFunctionEntryEx("onCreate", 0, ZifUserFilterNop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types2.MakeZendFunctionEntryEx("onClose", 0, ZifUserFilterNop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("onCreate", 0, ZifUserFilterNop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("onClose", 0, ZifUserFilterNop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var UserFilterClassEntry types2.ClassEntry
+var UserFilterClassEntry types.ClassEntry
 var UserfilterOps streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(UserfilterFilter, UserfilterDtor, "user-filter")
 var UserFilterFactory streams.PhpStreamFilterFactory = streams.MakePhpStreamFilterFactory(UserFilterFactoryCreate)

@@ -8,7 +8,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/strutil"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -47,12 +47,12 @@ const (
 /**
  * helpers
  */
-func PhpStringToupper(s *types2.String) *types2.String {
-	return types2.NewString(ascii.StrToUpper(s.GetStr()))
+func PhpStringToupper(s *types.String) *types.String {
+	return types.NewString(ascii.StrToUpper(s.GetStr()))
 }
 
-func PhpStringTolower(s *types2.String) *types2.String {
-	return types2.NewString(ascii.StrToLower(s.GetStr()))
+func PhpStringTolower(s *types.String) *types.String {
+	return types.NewString(ascii.StrToLower(s.GetStr()))
 }
 
 func substr(str string, offset int, length *int) (string, bool) {
@@ -480,10 +480,10 @@ func ZifExplode(separator string, str string, _ zpp.Opt, limit_ *int) ([]string,
 }
 
 //@zif -alias join
-func ZifImplode(glue_ *types2.Zval, _ zpp.Opt, pieces_ *types2.Zval) string {
+func ZifImplode(glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
 	var arg1 = glue_
 	var arg2 = pieces_
-	var pieces *types2.Array
+	var pieces *types.Array
 	var glue string
 
 	// 兼容多种参数传递方法，但后两种会有 E_DEPRECATED 提示
@@ -498,11 +498,11 @@ func ZifImplode(glue_ *types2.Zval, _ zpp.Opt, pieces_ *types2.Zval) string {
 		glue = ""
 		pieces = arg1.Array()
 	} else {
-		if arg1.IsType(types2.IS_ARRAY) {
+		if arg1.IsType(types.IS_ARRAY) {
 			glue = zend.ZvalGetStrVal(arg2)
 			pieces = arg1.Array()
 			core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
-		} else if arg2.IsType(types2.IS_ARRAY) {
+		} else if arg2.IsType(types.IS_ARRAY) {
 			glue = zend.ZvalGetStrVal(arg1)
 			pieces = arg2.Array()
 		} else {
@@ -512,9 +512,9 @@ func ZifImplode(glue_ *types2.Zval, _ zpp.Opt, pieces_ *types2.Zval) string {
 	}
 	return PhpImplode(glue, pieces)
 }
-func PhpImplode(glue string, pieces *types2.Array) string {
+func PhpImplode(glue string, pieces *types.Array) string {
 	var parts []string
-	pieces.ForeachIndirect(func(_ types2.ArrayKey, value *types2.Zval) {
+	pieces.ForeachIndirect(func(_ types.ArrayKey, value *types.Zval) {
 		parts = append(parts, zend.ZvalGetStrVal(value))
 	})
 	return strings.Join(parts, glue)
@@ -568,8 +568,8 @@ func ZifStrtoupper(str string) string {
 func ZifStrtolower(str string) string {
 	return ascii.StrToLower(str)
 }
-func PhpBasenameZStr(str string, suffix string) *types2.String {
-	return types2.NewString(PhpBasename(str, suffix))
+func PhpBasenameZStr(str string, suffix string) *types.String {
+	return types.NewString(PhpBasename(str, suffix))
 }
 func PhpBasename(s string, suffix string) string {
 	if s == "" {
@@ -615,42 +615,42 @@ func ZifDirname(path string, _ zpp.Opt, levels_ *int) string {
 	}
 }
 
-func ZifPathinfo(path string, _ zpp.Opt, options *int) *types2.Zval {
+func ZifPathinfo(path string, _ zpp.Opt, options *int) *types.Zval {
 	opt := b.Option(options, PHP_PATHINFO_ALL)
 
-	arr := types2.NewArray(0)
+	arr := types.NewArray(0)
 	if (opt & PHP_PATHINFO_DIRNAME) == PHP_PATHINFO_DIRNAME {
 		dirname := zend.ZendDirname(path)
 		if dirname != "" {
-			arr.KeyUpdate("dirname", types2.NewZvalString(dirname))
+			arr.KeyUpdate("dirname", types.NewZvalString(dirname))
 		}
 	}
 
 	basename := PhpBasename(path, "")
 	if (opt & PHP_PATHINFO_BASENAME) == PHP_PATHINFO_BASENAME {
-		arr.KeyUpdate("basename", types2.NewZvalString(basename))
+		arr.KeyUpdate("basename", types.NewZvalString(basename))
 	}
 	if (opt & PHP_PATHINFO_EXTENSION) == PHP_PATHINFO_EXTENSION {
 		if pos := strings.LastIndexByte(basename, '.'); pos >= 0 {
-			arr.KeyUpdate("extension", types2.NewZvalString(basename[pos+1:]))
+			arr.KeyUpdate("extension", types.NewZvalString(basename[pos+1:]))
 		}
 	}
 	if (opt & PHP_PATHINFO_FILENAME) == PHP_PATHINFO_FILENAME {
 		if pos := strings.LastIndexByte(basename, '.'); pos >= 0 {
-			arr.KeyUpdate("filename", types2.NewZvalString(basename[:pos]))
+			arr.KeyUpdate("filename", types.NewZvalString(basename[:pos]))
 		} else {
-			arr.KeyUpdate("filename", types2.NewZvalString(basename))
+			arr.KeyUpdate("filename", types.NewZvalString(basename))
 		}
 	}
 
 	if opt == PHP_PATHINFO_ALL {
-		return types2.NewZvalArray(arr)
+		return types.NewZvalArray(arr)
 	} else {
 		_, element := arr.First()
 		if element != nil {
 			return element
 		} else {
-			return types2.NewZvalString("")
+			return types.NewZvalString("")
 		}
 	}
 }
@@ -677,22 +677,22 @@ func PhpStrcspnEx(s1 string, s2 string) int {
 	}
 	return len(s1)
 }
-func PhpNeedleChar(needle *types2.Zval) (byte, bool) {
+func PhpNeedleChar(needle *types.Zval) (byte, bool) {
 	switch needle.GetType() {
-	case types2.IS_LONG:
+	case types.IS_LONG:
 		return byte(needle.Long()), true
-	case types2.IS_NULL, types2.IS_FALSE:
+	case types.IS_NULL, types.IS_FALSE:
 		return 0, true
-	case types2.IS_TRUE:
+	case types.IS_TRUE:
 		return 1, true
-	case types2.IS_DOUBLE, types2.IS_OBJECT:
+	case types.IS_DOUBLE, types.IS_OBJECT:
 		return byte(zend.ZvalGetLong(needle)), true
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "needle is not a string or an integer")
 		return 0, false
 	}
 }
-func ZifStristr(haystack string, needle *types2.Zval, _ zpp.Opt, part bool) (string, bool) {
+func ZifStristr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
 	needleStr, ok := parseNeedle(needle)
 	if !ok {
 		return "", false
@@ -716,7 +716,7 @@ func ZifStristr(haystack string, needle *types2.Zval, _ zpp.Opt, part bool) (str
 }
 
 //@zif -alias strchr
-func ZifStrstr(haystack string, needle *types2.Zval, _ zpp.Opt, part bool) (string, bool) {
+func ZifStrstr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
 	needleStr, ok := parseNeedle(needle)
 	if !ok {
 		return "", false
@@ -750,7 +750,7 @@ func posSubstr(str string, offset int) (string, bool) {
 	}
 	return str, true
 }
-func parseNeedle(needle *types2.Zval) (string, bool) {
+func parseNeedle(needle *types.Zval) (string, bool) {
 	if needle.IsString() {
 		return needle.StringVal(), true
 	} else {
@@ -769,7 +769,7 @@ func parseNeedle(needle *types2.Zval) (string, bool) {
 	}
 }
 
-func ZifStrpos(haystack string, needle *types2.Zval, _ zpp.Opt, offset int) (int, bool) {
+func ZifStrpos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	haystack, ok := posSubstr(haystack, offset)
 	if !ok {
 		return 0, false
@@ -789,7 +789,7 @@ func ZifStrpos(haystack string, needle *types2.Zval, _ zpp.Opt, offset int) (int
 		return 0, false
 	}
 }
-func ZifStripos(haystack string, needle *types2.Zval, _ zpp.Opt, offset int) (int, bool) {
+func ZifStripos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	haystack, ok := posSubstr(haystack, offset)
 	if !ok {
 		return 0, false
@@ -811,7 +811,7 @@ func ZifStripos(haystack string, needle *types2.Zval, _ zpp.Opt, offset int) (in
 		return 0, false
 	}
 }
-func ZifStrrpos(haystack string, needle *types2.Zval, _ zpp.Opt, offset int) (int, bool) {
+func ZifStrrpos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	needleStr, ok := parseNeedle(needle)
 	if !ok {
 		return 0, false
@@ -848,7 +848,7 @@ func ZifStrrpos(haystack string, needle *types2.Zval, _ zpp.Opt, offset int) (in
 		}
 	}
 }
-func ZifStrripos(haystack string, needle *types2.Zval, _ zpp.Opt, offset int) (int, bool) {
+func ZifStrripos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	needleStr, ok := parseNeedle(needle)
 	if !ok {
 		return 0, false
@@ -887,7 +887,7 @@ func ZifStrripos(haystack string, needle *types2.Zval, _ zpp.Opt, offset int) (i
 		}
 	}
 }
-func ZifStrrchr(haystack string, needle *types2.Zval) (string, bool) {
+func ZifStrrchr(haystack string, needle *types.Zval) (string, bool) {
 	needleStr, ok := parseNeedle(needle)
 	if !ok || needleStr == "" {
 		return "", false
@@ -963,7 +963,7 @@ func substrReplaceSingle(str string, replace string, start int, l int) string {
 	return str[:f] + replace + str[f+l:]
 }
 
-func substrReplaceStr(str string, replace *types2.Zval, start *types2.Zval, length *types2.Zval) string {
+func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length *types.Zval) string {
 	// str 为字符串时，允许的参数类型:
 	// - substr_replace(string, array|string, int, int|null)
 	// 其他情况都会触发 warning 并返回原字符串
@@ -1005,32 +1005,32 @@ func substrReplaceStr(str string, replace *types2.Zval, start *types2.Zval, leng
 	return res
 }
 
-func substrReplaceArray(str *types2.Array, replace *types2.Zval, start *types2.Zval, length *types2.Zval) *types2.Array {
-	arr := types2.NewArray(str.Len())
+func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval, length *types.Zval) *types.Array {
+	arr := types.NewArray(str.Len())
 
 	var replaceStr []string
 	if replace.IsArray() {
-		replace.Array().Foreach(func(_ types2.ArrayKey, value *types2.Zval) {
+		replace.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
 			replaceStr = append(replaceStr, zend.ZvalGetStrVal(value))
 		})
 	}
 
 	var startPoints []int
 	if start.IsArray() {
-		start.Array().Foreach(func(_ types2.ArrayKey, value *types2.Zval) {
+		start.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
 			startPoints = append(startPoints, zend.ZvalGetLong(value))
 		})
 	}
 
 	var lengthPoints []int
 	if length != nil && length.IsArray() {
-		length.Array().Foreach(func(_ types2.ArrayKey, value *types2.Zval) {
+		length.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
 			lengthPoints = append(lengthPoints, zend.ZvalGetLong(value))
 		})
 	}
 
 	idx := -1
-	str.ForeachIndirect(func(key types2.ArrayKey, value *types2.Zval) {
+	str.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 		idx++
 
 		origStr := zend.ZvalGetStrVal(value)
@@ -1069,15 +1069,15 @@ func substrReplaceArray(str *types2.Array, replace *types2.Zval, start *types2.Z
 
 		ret := substrReplaceSingle(origStr, replStr, f, l)
 		if key.IsStrKey() {
-			arr.SymtableUpdate(key.StrKey(), types2.NewZvalString(ret))
+			arr.SymtableUpdate(key.StrKey(), types.NewZvalString(ret))
 		} else {
-			arr.IndexUpdate(key.IndexKey(), types2.NewZvalString(ret))
+			arr.IndexUpdate(key.IndexKey(), types.NewZvalString(ret))
 		}
 	})
 	return arr
 }
 
-func ZifSubstrReplace(returnValue zpp.Ret, str *types2.Zval, replace *types2.Zval, start *types2.Zval, _ zpp.Opt, length *types2.Zval) {
+func ZifSubstrReplace(returnValue zpp.Ret, str *types.Zval, replace *types.Zval, start *types.Zval, _ zpp.Opt, length *types.Zval) {
 	// 限定参数类型
 	// - substr_replace(array|string $str, array|string $replace, array|int $start, array|int|null $length = null)
 	if !str.IsArray() {
@@ -1187,15 +1187,15 @@ func Strtr(str string, from string, to string) string {
 		return b
 	}, str)
 }
-func phpStrtrArray(str string, pats *types2.Array) (string, bool) {
+func phpStrtrArray(str string, pats *types.Array) (string, bool) {
 	// 扫描替换数组
 	var minLen int = 128 * 1024        // 最长扫描字符串长度
 	var maxLen int = 0                 // 最短扫描字符串长度
 	numBitset := b.NewBitset(len(str)) // 标记是否有对应长度的扫描字符串
 	bitset := ascii.NewAsciiSet()      // 标记是否有对应字符开头的扫描字符串
 
-	var strMap = make(map[string]*types2.Zval, pats.Len())
-	pats.ForeachIndirect(func(key types2.ArrayKey, value *types2.Zval) {
+	var strMap = make(map[string]*types.Zval, pats.Len())
+	pats.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 		var strKey string
 		if !key.IsStrKey() {
 			strKey = strconv.Itoa(key.IndexKey())
@@ -1335,7 +1335,7 @@ func PhpStrToStrI(haystack string, lcHaystack string, needle string, str string)
 	}
 }
 
-func ZifStrtr(str string, from *types2.Zval, _ zpp.Opt, to_ *string) (string, bool) {
+func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, bool) {
 	// 支持两种参数形式:
 	// - strtr(string, array)
 	// - strtr(string, string, string)
@@ -1349,7 +1349,7 @@ func ZifStrtr(str string, from *types2.Zval, _ zpp.Opt, to_ *string) (string, bo
 		return "", true
 	}
 	if to_ == nil {
-		var pats *types2.Array = from.Array()
+		var pats *types.Array = from.Array()
 		switch pats.Len() {
 		case 0:
 			return str, true
@@ -1446,7 +1446,7 @@ func ZifAddcslashes(str string, charlist string) string { return PhpAddcslashes(
 func ZifStripslashes(str string) string                 { return PhpStripslashes(str) }
 func ZifStripcslashes(str string) string                { return PhpStripcslashes(str) }
 
-func strReplaceStr(subject string, search *types2.Zval, replace *types2.Zval, caseSensitivity bool) (string, int) {
+func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, caseSensitivity bool) (string, int) {
 	if subject == "" {
 		return "", 0
 	}
@@ -1456,7 +1456,7 @@ func strReplaceStr(subject string, search *types2.Zval, replace *types2.Zval, ca
 		var replaceStr string
 		if replace.IsArray() {
 			replaceStrings = make([]string, replace.Array().Len())
-			replace.Array().Foreach(func(key types2.ArrayKey, value *types2.Zval) {
+			replace.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 				replaceStrings = append(replaceStrings, zend.ZvalGetStrVal(value))
 			})
 		} else {
@@ -1466,7 +1466,7 @@ func strReplaceStr(subject string, search *types2.Zval, replace *types2.Zval, ca
 		var result = subject
 		var replaceCount = 0
 		i := -1
-		search.Array().ForeachIndirect(func(key types2.ArrayKey, val *types2.Zval) {
+		search.Array().ForeachIndirect(func(key types.ArrayKey, val *types.Zval) {
 			if subject == "" {
 				return
 			}
@@ -1522,19 +1522,19 @@ func strReplaceStr(subject string, search *types2.Zval, replace *types2.Zval, ca
 		}
 	}
 }
-func strReplaceArray(subject *types2.Array, search *types2.Zval, replace *types2.Zval, caseSensitivity bool) (*types2.Array, int) {
-	arr := types2.NewArray(subject.Len())
+func strReplaceArray(subject *types.Array, search *types.Zval, replace *types.Zval, caseSensitivity bool) (*types.Array, int) {
+	arr := types.NewArray(subject.Len())
 	replaceCount := 0
-	subject.ForeachIndirect(func(key types2.ArrayKey, value *types2.Zval) {
-		value = types2.ZVAL_DEREF(value)
+	subject.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+		value = types.ZVAL_DEREF(value)
 
-		var result types2.Zval
+		var result types.Zval
 		if !value.IsArray() && !value.IsObject() {
 			tmpResult, count := strReplaceStr(zend.ZvalGetStrVal(value), search, replace, caseSensitivity)
 			result.SetStringVal(tmpResult)
 			replaceCount += count
 		} else {
-			types2.ZVAL_COPY(&result, value)
+			types.ZVAL_COPY(&result, value)
 		}
 
 		if key.IsStrKey() {
@@ -1545,7 +1545,7 @@ func strReplaceArray(subject *types2.Array, search *types2.Zval, replace *types2
 	})
 	return arr, replaceCount
 }
-func strReplace(returnValue *types2.Zval, search *types2.Zval, replace *types2.Zval, subject *types2.Zval, replaceCount zpp.RefZval, caseSensitivity bool) {
+func strReplace(returnValue *types.Zval, search *types.Zval, replace *types.Zval, subject *types.Zval, replaceCount zpp.RefZval, caseSensitivity bool) {
 	// 限定参数类型
 	// - str_replace(array|string $search, array|string $replace, array|string $subject, int|null &$count == null): string|array
 	if !search.IsArray() {
@@ -1560,8 +1560,8 @@ func strReplace(returnValue *types2.Zval, search *types2.Zval, replace *types2.Z
 
 	// 主逻辑
 	var count int
-	if subject.IsType(types2.IS_ARRAY) {
-		var arr *types2.Array
+	if subject.IsType(types.IS_ARRAY) {
+		var arr *types.Array
 		arr, count = strReplaceArray(subject.Array(), search, replace, caseSensitivity)
 		returnValue.SetArray(arr)
 	} else {
@@ -1575,10 +1575,10 @@ func strReplace(returnValue *types2.Zval, search *types2.Zval, replace *types2.Z
 	}
 }
 
-func ZifStrReplace(returnValue zpp.Ret, search *types2.Zval, replace *types2.Zval, subject *types2.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
+func ZifStrReplace(returnValue zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
 	strReplace(returnValue, search, replace, subject, replaceCount, true)
 }
-func ZifStrIreplace(returnValue zpp.Ret, search *types2.Zval, replace *types2.Zval, subject *types2.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
+func ZifStrIreplace(returnValue zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
 	strReplace(returnValue, search, replace, subject, replaceCount, false)
 }
 
@@ -2019,13 +2019,13 @@ func PhpStripTags(str string, state uint8, allowTags string) (string, uint8) {
 
 	return buf.String(), state
 }
-func ZifStripTags(str string, _ zpp.Opt, allowableTags *types2.Zval) string {
-	var allow *types2.Zval = allowableTags
+func ZifStripTags(str string, _ zpp.Opt, allowableTags *types.Zval) string {
+	var allow *types.Zval = allowableTags
 	var allowTagsStr string
 	if allow != nil {
-		if allow.IsType(types2.IS_ARRAY) {
+		if allow.IsType(types.IS_ARRAY) {
 			var buf strings.Builder
-			allow.Array().Foreach(func(key types2.ArrayKey, value *types2.Zval) {
+			allow.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 				tag := zend.ZvalGetStrVal(value)
 				buf.WriteByte('<')
 				buf.WriteString(tag)
@@ -2055,7 +2055,7 @@ func ZifStrRepeat(input string, mult int) (string, bool) {
 
 	return strings.Repeat(input, mult), true
 }
-func ZifCountChars(input string, _ zpp.Opt, mode int) (*types2.Zval, bool) {
+func ZifCountChars(input string, _ zpp.Opt, mode int) (*types.Zval, bool) {
 	if mode < 0 || mode > 4 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown mode")
 		return nil, false
@@ -2068,14 +2068,14 @@ func ZifCountChars(input string, _ zpp.Opt, mode int) (*types2.Zval, bool) {
 	}
 
 	if mode < 3 { // mode=0,1,2 以数组返回
-		arr := types2.NewArray(0)
+		arr := types.NewArray(0)
 		for i := 0; i < 256; i++ {
 			count := charCount[i]
 			if mode == 0 || (mode == 1 && count != 0) || (mode == 2 && count == 0) {
-				arr.IndexUpdate(i, types2.NewZvalLong(charCount[i]))
+				arr.IndexUpdate(i, types.NewZvalLong(charCount[i]))
 			}
 		}
-		return types2.NewZvalArray(arr), true
+		return types.NewZvalArray(arr), true
 	} else { // mode=3,4 以字符串返回
 		var str []byte
 		for i := 0; i < 256; i++ {
@@ -2084,7 +2084,7 @@ func ZifCountChars(input string, _ zpp.Opt, mode int) (*types2.Zval, bool) {
 				str = append(str, byte(i))
 			}
 		}
-		return types2.NewZvalString(string(str)), true
+		return types.NewZvalString(string(str)), true
 	}
 }
 func ZifStrnatcmp(s1 string, s2 string) int {
@@ -2207,7 +2207,7 @@ func ZifStrShuffle(str string) string {
 	}
 	return string(bin)
 }
-func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*types2.Zval, bool) {
+func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*types.Zval, bool) {
 	var mask = ""
 	if charlist != nil {
 		mask, _ = PhpCharmaskEx(*charlist)
@@ -2239,19 +2239,19 @@ func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*type
 	switch format {
 	case 0:
 		count := len(spans)
-		return types2.NewZvalLong(count), true
+		return types.NewZvalLong(count), true
 	case 1:
-		arr := types2.NewArray(len(spans))
+		arr := types.NewArray(len(spans))
 		for _, span := range spans {
-			arr.NextIndexInsert(types2.NewZvalString(str[span.start:span.end]))
+			arr.NextIndexInsert(types.NewZvalString(str[span.start:span.end]))
 		}
-		return types2.NewZvalArray(arr), true
+		return types.NewZvalArray(arr), true
 	case 2:
-		arr := types2.NewArray(len(spans))
+		arr := types.NewArray(len(spans))
 		for _, span := range spans {
-			arr.IndexUpdate(span.start, types2.NewZvalString(str[span.start:span.end]))
+			arr.IndexUpdate(span.start, types.NewZvalString(str[span.start:span.end]))
 		}
-		return types2.NewZvalArray(arr), true
+		return types.NewZvalArray(arr), true
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, format)
 		return nil, false

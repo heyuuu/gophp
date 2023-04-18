@@ -1,7 +1,7 @@
 package spl
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -9,14 +9,14 @@ import (
  * spl_SplObjectStorage
  */
 type spl_SplObjectStorage struct {
-	storage       types2.Array
+	storage       types.Array
 	index         zend.ZendLong
-	pos           types2.ArrayPosition
+	pos           types.ArrayPosition
 	flags         zend.ZendLong
-	fptr_get_hash types2.IFunction
-	gcdata        *types2.Zval
+	fptr_get_hash types.IFunction
+	gcdata        *types.Zval
 	gcdata_num    int
-	std           types2.ZendObject
+	std           types.ZendObject
 }
 
 //             func Makespl_SplObjectStorage(
@@ -40,24 +40,24 @@ type spl_SplObjectStorage struct {
 //                     std:std,
 //                 }
 //             }
-func (this *spl_SplObjectStorage) GetStorage() *types2.Array { return &this.storage }
+func (this *spl_SplObjectStorage) GetStorage() *types.Array { return &this.storage }
 
 // func (this *spl_SplObjectStorage) SetStorage(value zend.HashTable) { this.storage = value }
-func (this *spl_SplObjectStorage) GetIndex() zend.ZendLong           { return this.index }
-func (this *spl_SplObjectStorage) SetIndex(value zend.ZendLong)      { this.index = value }
-func (this *spl_SplObjectStorage) GetPos() types2.ArrayPosition      { return this.pos }
-func (this *spl_SplObjectStorage) SetPos(value types2.ArrayPosition) { this.pos = value }
-func (this *spl_SplObjectStorage) GetFlags() zend.ZendLong           { return this.flags }
-func (this *spl_SplObjectStorage) SetFlags(value zend.ZendLong)      { this.flags = value }
-func (this *spl_SplObjectStorage) GetFptrGetHash() types2.IFunction  { return this.fptr_get_hash }
-func (this *spl_SplObjectStorage) SetFptrGetHash(value types2.IFunction) {
+func (this *spl_SplObjectStorage) GetIndex() zend.ZendLong          { return this.index }
+func (this *spl_SplObjectStorage) SetIndex(value zend.ZendLong)     { this.index = value }
+func (this *spl_SplObjectStorage) GetPos() types.ArrayPosition      { return this.pos }
+func (this *spl_SplObjectStorage) SetPos(value types.ArrayPosition) { this.pos = value }
+func (this *spl_SplObjectStorage) GetFlags() zend.ZendLong          { return this.flags }
+func (this *spl_SplObjectStorage) SetFlags(value zend.ZendLong)     { this.flags = value }
+func (this *spl_SplObjectStorage) GetFptrGetHash() types.IFunction  { return this.fptr_get_hash }
+func (this *spl_SplObjectStorage) SetFptrGetHash(value types.IFunction) {
 	this.fptr_get_hash = value
 }
-func (this *spl_SplObjectStorage) GetGcdata() *types2.Zval      { return this.gcdata }
-func (this *spl_SplObjectStorage) SetGcdata(value *types2.Zval) { this.gcdata = value }
-func (this *spl_SplObjectStorage) GetGcdataNum() int            { return this.gcdata_num }
-func (this *spl_SplObjectStorage) SetGcdataNum(value int)       { this.gcdata_num = value }
-func (this *spl_SplObjectStorage) GetStd() *types2.ZendObject   { return &this.std }
+func (this *spl_SplObjectStorage) GetGcdata() *types.Zval      { return this.gcdata }
+func (this *spl_SplObjectStorage) SetGcdata(value *types.Zval) { this.gcdata = value }
+func (this *spl_SplObjectStorage) GetGcdataNum() int           { return this.gcdata_num }
+func (this *spl_SplObjectStorage) SetGcdataNum(value int)      { this.gcdata_num = value }
+func (this *spl_SplObjectStorage) GetStd() *types.ZendObject   { return &this.std }
 
 // func (this *spl_SplObjectStorage) SetStd(value zend.ZendObject) { this.std = value }
 
@@ -81,9 +81,9 @@ func (this *spl_SplObjectStorage) SetIsKeysAssoc(cond bool) { this.SwitchFlags(M
  * spl_SplObjectStorageElement
  */
 type spl_SplObjectStorageElement struct {
-	obj types2.Zval
-	inf types2.Zval
+	obj types.Zval
+	inf types.Zval
 }
 
-func (this *spl_SplObjectStorageElement) GetObj() types2.Zval { return this.obj }
-func (this *spl_SplObjectStorageElement) GetInf() types2.Zval { return this.inf }
+func (this *spl_SplObjectStorageElement) GetObj() types.Zval { return this.obj }
+func (this *spl_SplObjectStorageElement) GetInf() types.Zval { return this.inf }

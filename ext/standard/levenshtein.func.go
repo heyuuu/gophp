@@ -3,7 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -72,7 +72,7 @@ func CustomLevdist(str1 *byte, str2 *byte, callback_name *byte) int {
 
 	/* not there yet */
 }
-func ZifLevenshtein(executeData zpp.Ex, return_value zpp.Ret, str1 *types2.Zval, str2 *types2.Zval, _ zpp.Opt, costIns *types2.Zval, costRep *types2.Zval, costDel *types2.Zval) {
+func ZifLevenshtein(executeData zpp.Ex, return_value zpp.Ret, str1 *types.Zval, str2 *types.Zval, _ zpp.Opt, costIns *types.Zval, costRep *types.Zval, costDel *types.Zval) {
 	var argc int = executeData.NumArgs()
 	var str1 *byte
 	var str2 *byte
@@ -86,17 +86,17 @@ func ZifLevenshtein(executeData zpp.Ex, return_value zpp.Ret, str1 *types2.Zval,
 	var distance zend.ZendLong = -1
 	switch argc {
 	case 2:
-		if zend.ZendParseParameters(2, "ss", &str1, &str1_len, &str2, &str2_len) == types2.FAILURE {
+		if zend.ZendParseParameters(2, "ss", &str1, &str1_len, &str2, &str2_len) == types.FAILURE {
 			return
 		}
 		distance = ReferenceLevdist(str1, str1_len, str2, str2_len, 1, 1, 1)
 	case 5:
-		if zend.ZendParseParameters(5, "sslll", &str1, &str1_len, &str2, &str2_len, &cost_ins, &cost_rep, &cost_del) == types2.FAILURE {
+		if zend.ZendParseParameters(5, "sslll", &str1, &str1_len, &str2, &str2_len, &cost_ins, &cost_rep, &cost_del) == types.FAILURE {
 			return
 		}
 		distance = ReferenceLevdist(str1, str1_len, str2, str2_len, cost_ins, cost_rep, cost_del)
 	case 3:
-		if zend.ZendParseParameters(3, "sss", &str1, &str1_len, &str2, &str2_len, &callback_name, &callback_len) == types2.FAILURE {
+		if zend.ZendParseParameters(3, "sss", &str1, &str1_len, &str2, &str2_len, &callback_name, &callback_len) == types.FAILURE {
 			return
 		}
 		distance = CustomLevdist(str1, str2, callback_name)

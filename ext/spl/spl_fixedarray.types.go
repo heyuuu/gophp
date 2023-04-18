@@ -1,7 +1,7 @@
 package spl
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -10,7 +10,7 @@ import (
  */
 type SplFixedarray struct {
 	size     zend.ZendLong
-	elements *types2.Zval
+	elements *types.Zval
 }
 
 // func MakeSplFixedarray(size zend.ZendLong, elements *zend.Zval) SplFixedarray {
@@ -19,57 +19,57 @@ type SplFixedarray struct {
 //         elements:elements,
 //     }
 // }
-func (this *SplFixedarray) GetSize() zend.ZendLong         { return this.size }
-func (this *SplFixedarray) SetSize(value zend.ZendLong)    { this.size = value }
-func (this *SplFixedarray) GetElements() *types2.Zval      { return this.elements }
-func (this *SplFixedarray) SetElements(value *types2.Zval) { this.elements = value }
+func (this *SplFixedarray) GetSize() zend.ZendLong        { return this.size }
+func (this *SplFixedarray) SetSize(value zend.ZendLong)   { this.size = value }
+func (this *SplFixedarray) GetElements() *types.Zval      { return this.elements }
+func (this *SplFixedarray) SetElements(value *types.Zval) { this.elements = value }
 
 /**
  * SplFixedarrayObject
  */
 type SplFixedarrayObject struct {
 	array           SplFixedarray
-	fptr_offset_get types2.IFunction
-	fptr_offset_set types2.IFunction
-	fptr_offset_has types2.IFunction
-	fptr_offset_del types2.IFunction
-	fptr_count      types2.IFunction
+	fptr_offset_get types.IFunction
+	fptr_offset_set types.IFunction
+	fptr_offset_has types.IFunction
+	fptr_offset_del types.IFunction
+	fptr_count      types.IFunction
 	current         int
 	flags           int
-	ce_get_iterator *types2.ClassEntry
-	std             types2.ZendObject
+	ce_get_iterator *types.ClassEntry
+	std             types.ZendObject
 }
 
-func (this *SplFixedarrayObject) GetArray() SplFixedarray            { return this.array }
-func (this *SplFixedarrayObject) SetArray(value SplFixedarray)       { this.array = value }
-func (this *SplFixedarrayObject) GetFptrOffsetGet() types2.IFunction { return this.fptr_offset_get }
-func (this *SplFixedarrayObject) SetFptrOffsetGet(value types2.IFunction) {
+func (this *SplFixedarrayObject) GetArray() SplFixedarray           { return this.array }
+func (this *SplFixedarrayObject) SetArray(value SplFixedarray)      { this.array = value }
+func (this *SplFixedarrayObject) GetFptrOffsetGet() types.IFunction { return this.fptr_offset_get }
+func (this *SplFixedarrayObject) SetFptrOffsetGet(value types.IFunction) {
 	this.fptr_offset_get = value
 }
-func (this *SplFixedarrayObject) GetFptrOffsetSet() types2.IFunction { return this.fptr_offset_set }
-func (this *SplFixedarrayObject) SetFptrOffsetSet(value types2.IFunction) {
+func (this *SplFixedarrayObject) GetFptrOffsetSet() types.IFunction { return this.fptr_offset_set }
+func (this *SplFixedarrayObject) SetFptrOffsetSet(value types.IFunction) {
 	this.fptr_offset_set = value
 }
-func (this *SplFixedarrayObject) GetFptrOffsetHas() types2.IFunction { return this.fptr_offset_has }
-func (this *SplFixedarrayObject) SetFptrOffsetHas(value types2.IFunction) {
+func (this *SplFixedarrayObject) GetFptrOffsetHas() types.IFunction { return this.fptr_offset_has }
+func (this *SplFixedarrayObject) SetFptrOffsetHas(value types.IFunction) {
 	this.fptr_offset_has = value
 }
-func (this *SplFixedarrayObject) GetFptrOffsetDel() types2.IFunction { return this.fptr_offset_del }
-func (this *SplFixedarrayObject) SetFptrOffsetDel(value types2.IFunction) {
+func (this *SplFixedarrayObject) GetFptrOffsetDel() types.IFunction { return this.fptr_offset_del }
+func (this *SplFixedarrayObject) SetFptrOffsetDel(value types.IFunction) {
 	this.fptr_offset_del = value
 }
-func (this *SplFixedarrayObject) GetFptrCount() types2.IFunction      { return this.fptr_count }
-func (this *SplFixedarrayObject) SetFptrCount(value types2.IFunction) { this.fptr_count = value }
-func (this *SplFixedarrayObject) GetCurrent() int                     { return this.current }
-func (this *SplFixedarrayObject) SetCurrent(value int)                { this.current = value }
+func (this *SplFixedarrayObject) GetFptrCount() types.IFunction      { return this.fptr_count }
+func (this *SplFixedarrayObject) SetFptrCount(value types.IFunction) { this.fptr_count = value }
+func (this *SplFixedarrayObject) GetCurrent() int                    { return this.current }
+func (this *SplFixedarrayObject) SetCurrent(value int)               { this.current = value }
 
 // func (this *SplFixedarrayObject)  GetFlags() int      { return this.flags }
-func (this *SplFixedarrayObject) SetFlags(value int)                   { this.flags = value }
-func (this *SplFixedarrayObject) GetCeGetIterator() *types2.ClassEntry { return this.ce_get_iterator }
-func (this *SplFixedarrayObject) SetCeGetIterator(value *types2.ClassEntry) {
+func (this *SplFixedarrayObject) SetFlags(value int)                  { this.flags = value }
+func (this *SplFixedarrayObject) GetCeGetIterator() *types.ClassEntry { return this.ce_get_iterator }
+func (this *SplFixedarrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplFixedarrayObject) GetStd() types2.ZendObject { return this.std }
+func (this *SplFixedarrayObject) GetStd() types.ZendObject { return this.std }
 
 // func (this *SplFixedarrayObject) SetStd(value zend.ZendObject) { this.std = value }
 

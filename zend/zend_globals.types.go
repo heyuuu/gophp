@@ -2,12 +2,12 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/internal"
 )
 
-type ClassTable = *internal.Table[*types2.ClassEntry]
-type FunctionTable = *internal.Table[types2.IFunction]
+type ClassTable = *internal.Table[*types.ClassEntry]
+type FunctionTable = *internal.Table[types.IFunction]
 type ConstantTable = *internal.Table[*ZendConstant]
 type IniDirectives = *internal.Table[*ZendIniEntry]
 
@@ -16,25 +16,25 @@ type IniDirectives = *internal.Table[*ZendIniEntry]
  */
 type ZendCompilerGlobals struct {
 	loop_var_stack     ZendStack
-	active_class_entry *types2.ClassEntry
-	compiled_filename  *types2.String
+	active_class_entry *types.ClassEntry
+	compiled_filename  *types.String
 	zend_lineno        int
-	active_op_array    *types2.ZendOpArray
+	active_op_array    *types.ZendOpArray
 	functionTable      FunctionTable
 	classTable         ClassTable
 	filenamesTable     map[string]string //filenames_table              HashTable
 
-	auto_globals                 *types2.Array
-	parse_error                  types2.ZendBool
-	in_compilation               types2.ZendBool
-	short_tags                   types2.ZendBool
-	unclean_shutdown             types2.ZendBool
-	ini_parser_unbuffered_errors types2.ZendBool
+	auto_globals                 *types.Array
+	parse_error                  types.ZendBool
+	in_compilation               types.ZendBool
+	short_tags                   types.ZendBool
+	unclean_shutdown             types.ZendBool
+	ini_parser_unbuffered_errors types.ZendBool
 	open_files                   ZendLlist
 	ini_parser_param             *ZendIniParserParam
 	skip_shebang                 bool
-	increment_lineno             types2.ZendBool
-	doc_comment                  *types2.String
+	increment_lineno             types.ZendBool
+	doc_comment                  *types.String
 	extra_fn_flags               uint32
 	compiler_options             uint32
 	context                      ZendOparrayContext
@@ -44,20 +44,20 @@ type ZendCompilerGlobals struct {
 	ast                          *ZendAst
 	ast_arena                    *ZendArena
 	delayed_oplines_stack        ZendStack
-	memoized_exprs               *types2.Array
+	memoized_exprs               *types.Array
 	memoize_mode                 int
 	map_ptr_base                 any
 	map_ptr_size                 int
 	map_ptr_last                 int
-	delayed_variance_obligations *types2.Array
-	delayed_autoloads            *types2.Array
+	delayed_variance_obligations *types.Array
+	delayed_autoloads            *types.Array
 	rtd_key_counter              uint32
 }
 
 func (this *ZendCompilerGlobals) InitTables() {
-	this.functionTable = internal.NewLcTable[types2.IFunction](ZendFunctionDtorEx)
-	this.classTable = internal.NewLcTable[*types2.ClassEntry](DestroyZendClassEntry)
-	this.auto_globals = types2.NewArray(8)
+	this.functionTable = internal.NewLcTable[types.IFunction](ZendFunctionDtorEx)
+	this.classTable = internal.NewLcTable[*types.ClassEntry](DestroyZendClassEntry)
+	this.auto_globals = types.NewArray(8)
 }
 
 func (this *ZendCompilerGlobals) DestroyTables() {
@@ -76,40 +76,40 @@ func (this *ZendCompilerGlobals) FunctionTable() FunctionTable { return this.fun
 // getter/setter
 func (this *ZendCompilerGlobals) GetLoopVarStack() ZendStack      { return this.loop_var_stack }
 func (this *ZendCompilerGlobals) SetLoopVarStack(value ZendStack) { this.loop_var_stack = value }
-func (this *ZendCompilerGlobals) GetActiveClassEntry() *types2.ClassEntry {
+func (this *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
 	return this.active_class_entry
 }
-func (this *ZendCompilerGlobals) SetActiveClassEntry(value *types2.ClassEntry) {
+func (this *ZendCompilerGlobals) SetActiveClassEntry(value *types.ClassEntry) {
 	this.active_class_entry = value
 }
-func (this *ZendCompilerGlobals) GetCompiledFilename() *types2.String {
+func (this *ZendCompilerGlobals) GetCompiledFilename() *types.String {
 	return this.compiled_filename
 }
-func (this *ZendCompilerGlobals) SetCompiledFilename(value *types2.String) {
+func (this *ZendCompilerGlobals) SetCompiledFilename(value *types.String) {
 	this.compiled_filename = value
 }
-func (this *ZendCompilerGlobals) GetZendLineno() int                    { return this.zend_lineno }
-func (this *ZendCompilerGlobals) SetZendLineno(value int)               { this.zend_lineno = value }
-func (this *ZendCompilerGlobals) GetActiveOpArray() *types2.ZendOpArray { return this.active_op_array }
-func (this *ZendCompilerGlobals) SetActiveOpArray(value *types2.ZendOpArray) {
+func (this *ZendCompilerGlobals) GetZendLineno() int                   { return this.zend_lineno }
+func (this *ZendCompilerGlobals) SetZendLineno(value int)              { this.zend_lineno = value }
+func (this *ZendCompilerGlobals) GetActiveOpArray() *types.ZendOpArray { return this.active_op_array }
+func (this *ZendCompilerGlobals) SetActiveOpArray(value *types.ZendOpArray) {
 	this.active_op_array = value
 }
-func (this *ZendCompilerGlobals) GetAutoGlobals() *types2.Array          { return this.auto_globals }
-func (this *ZendCompilerGlobals) SetAutoGlobals(value *types2.Array)     { this.auto_globals = value }
-func (this *ZendCompilerGlobals) GetParseError() types2.ZendBool         { return this.parse_error }
-func (this *ZendCompilerGlobals) SetParseError(value types2.ZendBool)    { this.parse_error = value }
-func (this *ZendCompilerGlobals) GetInCompilation() types2.ZendBool      { return this.in_compilation }
-func (this *ZendCompilerGlobals) SetInCompilation(value types2.ZendBool) { this.in_compilation = value }
-func (this *ZendCompilerGlobals) GetShortTags() types2.ZendBool          { return this.short_tags }
-func (this *ZendCompilerGlobals) SetShortTags(value types2.ZendBool)     { this.short_tags = value }
-func (this *ZendCompilerGlobals) GetUncleanShutdown() types2.ZendBool    { return this.unclean_shutdown }
-func (this *ZendCompilerGlobals) SetUncleanShutdown(value types2.ZendBool) {
+func (this *ZendCompilerGlobals) GetAutoGlobals() *types.Array          { return this.auto_globals }
+func (this *ZendCompilerGlobals) SetAutoGlobals(value *types.Array)     { this.auto_globals = value }
+func (this *ZendCompilerGlobals) GetParseError() types.ZendBool         { return this.parse_error }
+func (this *ZendCompilerGlobals) SetParseError(value types.ZendBool)    { this.parse_error = value }
+func (this *ZendCompilerGlobals) GetInCompilation() types.ZendBool      { return this.in_compilation }
+func (this *ZendCompilerGlobals) SetInCompilation(value types.ZendBool) { this.in_compilation = value }
+func (this *ZendCompilerGlobals) GetShortTags() types.ZendBool          { return this.short_tags }
+func (this *ZendCompilerGlobals) SetShortTags(value types.ZendBool)     { this.short_tags = value }
+func (this *ZendCompilerGlobals) GetUncleanShutdown() types.ZendBool    { return this.unclean_shutdown }
+func (this *ZendCompilerGlobals) SetUncleanShutdown(value types.ZendBool) {
 	this.unclean_shutdown = value
 }
-func (this *ZendCompilerGlobals) GetIniParserUnbufferedErrors() types2.ZendBool {
+func (this *ZendCompilerGlobals) GetIniParserUnbufferedErrors() types.ZendBool {
 	return this.ini_parser_unbuffered_errors
 }
-func (this *ZendCompilerGlobals) SetIniParserUnbufferedErrors(value types2.ZendBool) {
+func (this *ZendCompilerGlobals) SetIniParserUnbufferedErrors(value types.ZendBool) {
 	this.ini_parser_unbuffered_errors = value
 }
 func (this *ZendCompilerGlobals) GetOpenFiles() ZendLlist      { return this.open_files }
@@ -120,14 +120,14 @@ func (this *ZendCompilerGlobals) GetIniParserParam() *ZendIniParserParam {
 func (this *ZendCompilerGlobals) SetIniParserParam(value *ZendIniParserParam) {
 	this.ini_parser_param = value
 }
-func (this *ZendCompilerGlobals) GetSkipShebang() types2.ZendBool      { return this.skip_shebang }
-func (this *ZendCompilerGlobals) SetSkipShebang(value types2.ZendBool) { this.skip_shebang = value }
-func (this *ZendCompilerGlobals) GetIncrementLineno() types2.ZendBool  { return this.increment_lineno }
-func (this *ZendCompilerGlobals) SetIncrementLineno(value types2.ZendBool) {
+func (this *ZendCompilerGlobals) GetSkipShebang() types.ZendBool      { return this.skip_shebang }
+func (this *ZendCompilerGlobals) SetSkipShebang(value types.ZendBool) { this.skip_shebang = value }
+func (this *ZendCompilerGlobals) GetIncrementLineno() types.ZendBool  { return this.increment_lineno }
+func (this *ZendCompilerGlobals) SetIncrementLineno(value types.ZendBool) {
 	this.increment_lineno = value
 }
-func (this *ZendCompilerGlobals) GetDocComment() *types2.String        { return this.doc_comment }
-func (this *ZendCompilerGlobals) SetDocComment(value *types2.String)   { this.doc_comment = value }
+func (this *ZendCompilerGlobals) GetDocComment() *types.String         { return this.doc_comment }
+func (this *ZendCompilerGlobals) SetDocComment(value *types.String)    { this.doc_comment = value }
 func (this *ZendCompilerGlobals) GetExtraFnFlags() uint32              { return this.extra_fn_flags }
 func (this *ZendCompilerGlobals) SetExtraFnFlags(value uint32)         { this.extra_fn_flags = value }
 func (this *ZendCompilerGlobals) GetCompilerOptions() uint32           { return this.compiler_options }
@@ -147,8 +147,8 @@ func (this *ZendCompilerGlobals) GetDelayedOplinesStack() ZendStack {
 func (this *ZendCompilerGlobals) SetDelayedOplinesStack(value ZendStack) {
 	this.delayed_oplines_stack = value
 }
-func (this *ZendCompilerGlobals) GetMemoizedExprs() *types2.Array { return this.memoized_exprs }
-func (this *ZendCompilerGlobals) SetMemoizedExprs(value *types2.Array) {
+func (this *ZendCompilerGlobals) GetMemoizedExprs() *types.Array { return this.memoized_exprs }
+func (this *ZendCompilerGlobals) SetMemoizedExprs(value *types.Array) {
 	this.memoized_exprs = value
 }
 func (this *ZendCompilerGlobals) GetMemoizeMode() int      { return this.memoize_mode }
@@ -159,16 +159,16 @@ func (this *ZendCompilerGlobals) GetMapPtrSize() int       { return this.map_ptr
 func (this *ZendCompilerGlobals) SetMapPtrSize(value int)  { this.map_ptr_size = value }
 func (this *ZendCompilerGlobals) GetMapPtrLast() int       { return this.map_ptr_last }
 func (this *ZendCompilerGlobals) SetMapPtrLast(value int)  { this.map_ptr_last = value }
-func (this *ZendCompilerGlobals) GetDelayedVarianceObligations() *types2.Array {
+func (this *ZendCompilerGlobals) GetDelayedVarianceObligations() *types.Array {
 	return this.delayed_variance_obligations
 }
-func (this *ZendCompilerGlobals) SetDelayedVarianceObligations(value *types2.Array) {
+func (this *ZendCompilerGlobals) SetDelayedVarianceObligations(value *types.Array) {
 	this.delayed_variance_obligations = value
 }
-func (this *ZendCompilerGlobals) GetDelayedAutoloads() *types2.Array {
+func (this *ZendCompilerGlobals) GetDelayedAutoloads() *types.Array {
 	return this.delayed_autoloads
 }
-func (this *ZendCompilerGlobals) SetDelayedAutoloads(value *types2.Array) {
+func (this *ZendCompilerGlobals) SetDelayedAutoloads(value *types.Array) {
 	this.delayed_autoloads = value
 }
 func (this *ZendCompilerGlobals) GetRtdKeyCounter() uint32      { return this.rtd_key_counter }
@@ -192,13 +192,13 @@ func (this *ZendCompilerGlobals) SwitchExtraFnFlags(value uint32, cond bool) {
  * ZendExecutorGlobals
  */
 type ZendExecutorGlobals struct {
-	uninitialized_zval   types2.Zval
-	error_zval           types2.Zval
-	symtable_cache       []*types2.Array
-	symtable_cache_limit **types2.Array
-	symtable_cache_ptr   **types2.Array
-	symbol_table         *types2.Array
-	included_files       types2.Array
+	uninitialized_zval   types.Zval
+	error_zval           types.Zval
+	symtable_cache       []*types.Array
+	symtable_cache_limit **types.Array
+	symtable_cache_ptr   **types.Array
+	symbol_table         *types.Array
+	included_files       types.Array
 	error_reporting      int
 	exit_status          int
 	functionTable        FunctionTable
@@ -207,27 +207,27 @@ type ZendExecutorGlobals struct {
 	vmStack              VmStack
 
 	current_execute_data                *ZendExecuteData
-	fake_scope                          *types2.ClassEntry
+	fake_scope                          *types.ClassEntry
 	precision                           ZendLong
 	persistent_constants_count          uint32
 	persistent_functions_count          uint32
 	persistent_classes_count            uint32
-	in_autoload                         *types2.Array
-	autoload_func                       types2.IFunction
-	no_extensions                       types2.ZendBool
-	vm_interrupt                        types2.ZendBool
-	timed_out                           types2.ZendBool
+	in_autoload                         *types.Array
+	autoload_func                       types.IFunction
+	no_extensions                       types.ZendBool
+	vm_interrupt                        types.ZendBool
+	timed_out                           types.ZendBool
 	hard_timeout                        ZendLong
-	regular_list                        types2.Array
-	persistent_list                     types2.Array
+	regular_list                        types.Array
+	persistent_list                     types.Array
 	user_error_handler_error_reporting  int
-	user_error_handler                  types2.Zval
-	user_exception_handler              *types2.Zval
+	user_error_handler                  types.Zval
+	user_exception_handler              *types.Zval
 	user_error_handlers_error_reporting ZendStack
 	user_error_handlers                 ZendStack
 	user_exception_handlers             ZendStack
 	error_handling                      ZendErrorHandlingT
-	exception_class                     *types2.ClassEntry
+	exception_class                     *types.ClassEntry
 	timeout_seconds                     ZendLong
 	lambda_count                        int
 
@@ -235,24 +235,24 @@ type ZendExecutorGlobals struct {
 	modifiedIniDirectives IniDirectives
 
 	error_reporting_ini_entry *ZendIniEntry
-	exception                 *types2.ZendObject
-	prev_exception            **types2.ZendObject
+	exception                 *types.ZendObject
+	prev_exception            **types.ZendObject
 	opline_before_exception   *ZendOp
 	exception_op              [3]ZendOp
 	current_module            *ModuleEntry
-	active                    types2.ZendBool
-	flags                     types2.ZendUchar
+	active                    types.ZendBool
+	flags                     types.ZendUchar
 	assertions                ZendLong
 	ht_iterators_count        uint32
 	ht_iterators_used         uint32
-	ht_iterators              *types2.HashTableIterator
-	ht_iterators_slots        []types2.HashTableIterator
+	ht_iterators              *types.HashTableIterator
+	ht_iterators_slots        []types.HashTableIterator
 	saved_fpu_cw_ptr          any
-	trampoline                types2.IFunction
+	trampoline                types.IFunction
 	call_trampoline_op        ZendOp
-	each_deprecation_thrown   types2.ZendBool
-	weakrefs                  types2.Array
-	exception_ignore_args     types2.ZendBool
+	each_deprecation_thrown   types.ZendBool
+	weakrefs                  types.Array
+	exception_ignore_args     types.ZendBool
 	reserved                  []any
 
 	lastObjectHandle uint32 // 最后一个object的handle值，初始为0
@@ -268,7 +268,7 @@ func (this *ZendExecutorGlobals) DestroyTables() {
 /**
  * 辅助方法
  */
-func (this *ZendExecutorGlobals) HtIterators() []types2.HashTableIterator {
+func (this *ZendExecutorGlobals) HtIterators() []types.HashTableIterator {
 	// todo 待调整
 	return b.CastSlice(this.ht_iterators, this.ht_iterators_count)
 }
@@ -305,46 +305,46 @@ func (this *ZendExecutorGlobals) VmStack() *VmStack { return &this.vmStack }
  * 以下是自动生成的方法
  */
 
-func (this *ZendExecutorGlobals) GetUninitializedZval() types2.Zval { return this.uninitialized_zval }
-func (this *ZendExecutorGlobals) SetUninitializedZval(value types2.Zval) {
+func (this *ZendExecutorGlobals) GetUninitializedZval() types.Zval { return this.uninitialized_zval }
+func (this *ZendExecutorGlobals) SetUninitializedZval(value types.Zval) {
 	this.uninitialized_zval = value
 }
-func (this *ZendExecutorGlobals) GetErrorZval() types2.Zval         { return this.error_zval }
-func (this *ZendExecutorGlobals) SetErrorZval(value types2.Zval)    { this.error_zval = value }
-func (this *ZendExecutorGlobals) GetSymtableCache() []*types2.Array { return this.symtable_cache }
-func (this *ZendExecutorGlobals) SetSymtableCache(value []*types2.Array) {
+func (this *ZendExecutorGlobals) GetErrorZval() types.Zval         { return this.error_zval }
+func (this *ZendExecutorGlobals) SetErrorZval(value types.Zval)    { this.error_zval = value }
+func (this *ZendExecutorGlobals) GetSymtableCache() []*types.Array { return this.symtable_cache }
+func (this *ZendExecutorGlobals) SetSymtableCache(value []*types.Array) {
 	this.symtable_cache = value
 }
-func (this *ZendExecutorGlobals) GetSymtableCacheLimit() **types2.Array {
+func (this *ZendExecutorGlobals) GetSymtableCacheLimit() **types.Array {
 	return this.symtable_cache_limit
 }
-func (this *ZendExecutorGlobals) SetSymtableCacheLimit(value **types2.Array) {
+func (this *ZendExecutorGlobals) SetSymtableCacheLimit(value **types.Array) {
 	this.symtable_cache_limit = value
 }
-func (this *ZendExecutorGlobals) GetSymtableCachePtr() **types2.Array {
+func (this *ZendExecutorGlobals) GetSymtableCachePtr() **types.Array {
 	return this.symtable_cache_ptr
 }
-func (this *ZendExecutorGlobals) SetSymtableCachePtr(value **types2.Array) {
+func (this *ZendExecutorGlobals) SetSymtableCachePtr(value **types.Array) {
 	this.symtable_cache_ptr = value
 }
-func (this *ZendExecutorGlobals) GetSymbolTable() *types2.Array       { return this.symbol_table }
-func (this *ZendExecutorGlobals) SetSymbolTable(value *types2.Array)  { this.symbol_table = value }
-func (this *ZendExecutorGlobals) GetIncludedFiles() *types2.Array     { return &this.included_files }
-func (this *ZendExecutorGlobals) SetIncludedFiles(value types2.Array) { this.included_files = value }
-func (this *ZendExecutorGlobals) GetErrorReporting() int              { return this.error_reporting }
-func (this *ZendExecutorGlobals) SetErrorReporting(value int)         { this.error_reporting = value }
-func (this *ZendExecutorGlobals) GetExitStatus() int                  { return this.exit_status }
-func (this *ZendExecutorGlobals) SetExitStatus(value int)             { this.exit_status = value }
+func (this *ZendExecutorGlobals) GetSymbolTable() *types.Array       { return this.symbol_table }
+func (this *ZendExecutorGlobals) SetSymbolTable(value *types.Array)  { this.symbol_table = value }
+func (this *ZendExecutorGlobals) GetIncludedFiles() *types.Array     { return &this.included_files }
+func (this *ZendExecutorGlobals) SetIncludedFiles(value types.Array) { this.included_files = value }
+func (this *ZendExecutorGlobals) GetErrorReporting() int             { return this.error_reporting }
+func (this *ZendExecutorGlobals) SetErrorReporting(value int)        { this.error_reporting = value }
+func (this *ZendExecutorGlobals) GetExitStatus() int                 { return this.exit_status }
+func (this *ZendExecutorGlobals) SetExitStatus(value int)            { this.exit_status = value }
 func (this *ZendExecutorGlobals) GetCurrentExecuteData() *ZendExecuteData {
 	return this.current_execute_data
 }
 func (this *ZendExecutorGlobals) SetCurrentExecuteData(value *ZendExecuteData) {
 	this.current_execute_data = value
 }
-func (this *ZendExecutorGlobals) GetFakeScope() *types2.ClassEntry      { return this.fake_scope }
-func (this *ZendExecutorGlobals) SetFakeScope(value *types2.ClassEntry) { this.fake_scope = value }
-func (this *ZendExecutorGlobals) GetPrecision() ZendLong                { return this.precision }
-func (this *ZendExecutorGlobals) SetPrecision(value ZendLong)           { this.precision = value }
+func (this *ZendExecutorGlobals) GetFakeScope() *types.ClassEntry      { return this.fake_scope }
+func (this *ZendExecutorGlobals) SetFakeScope(value *types.ClassEntry) { this.fake_scope = value }
+func (this *ZendExecutorGlobals) GetPrecision() ZendLong               { return this.precision }
+func (this *ZendExecutorGlobals) SetPrecision(value ZendLong)          { this.precision = value }
 func (this *ZendExecutorGlobals) GetPersistentConstantsCount() uint32 {
 	return this.persistent_constants_count
 }
@@ -363,25 +363,25 @@ func (this *ZendExecutorGlobals) GetPersistentClassesCount() uint32 {
 func (this *ZendExecutorGlobals) SetPersistentClassesCount(value uint32) {
 	this.persistent_classes_count = value
 }
-func (this *ZendExecutorGlobals) GetInAutoload() *types2.Array      { return this.in_autoload }
-func (this *ZendExecutorGlobals) SetInAutoload(value *types2.Array) { this.in_autoload = value }
-func (this *ZendExecutorGlobals) GetAutoloadFunc() types2.IFunction { return this.autoload_func }
-func (this *ZendExecutorGlobals) SetAutoloadFunc(value types2.IFunction) {
+func (this *ZendExecutorGlobals) GetInAutoload() *types.Array      { return this.in_autoload }
+func (this *ZendExecutorGlobals) SetInAutoload(value *types.Array) { this.in_autoload = value }
+func (this *ZendExecutorGlobals) GetAutoloadFunc() types.IFunction { return this.autoload_func }
+func (this *ZendExecutorGlobals) SetAutoloadFunc(value types.IFunction) {
 	this.autoload_func = value
 }
-func (this *ZendExecutorGlobals) GetFullTablesCleanup() types2.ZendBool { return 0 }
-func (this *ZendExecutorGlobals) GetNoExtensions() types2.ZendBool      { return this.no_extensions }
-func (this *ZendExecutorGlobals) SetNoExtensions(value types2.ZendBool) { this.no_extensions = value }
-func (this *ZendExecutorGlobals) GetVmInterrupt() types2.ZendBool       { return this.vm_interrupt }
-func (this *ZendExecutorGlobals) SetVmInterrupt(value types2.ZendBool)  { this.vm_interrupt = value }
-func (this *ZendExecutorGlobals) GetTimedOut() types2.ZendBool          { return this.timed_out }
-func (this *ZendExecutorGlobals) SetTimedOut(value types2.ZendBool)     { this.timed_out = value }
-func (this *ZendExecutorGlobals) GetHardTimeout() ZendLong              { return this.hard_timeout }
-func (this *ZendExecutorGlobals) SetHardTimeout(value ZendLong)         { this.hard_timeout = value }
-func (this *ZendExecutorGlobals) GetRegularList() types2.Array          { return this.regular_list }
-func (this *ZendExecutorGlobals) SetRegularList(value types2.Array)     { this.regular_list = value }
-func (this *ZendExecutorGlobals) GetPersistentList() types2.Array       { return this.persistent_list }
-func (this *ZendExecutorGlobals) SetPersistentList(value types2.Array) {
+func (this *ZendExecutorGlobals) GetFullTablesCleanup() types.ZendBool { return 0 }
+func (this *ZendExecutorGlobals) GetNoExtensions() types.ZendBool      { return this.no_extensions }
+func (this *ZendExecutorGlobals) SetNoExtensions(value types.ZendBool) { this.no_extensions = value }
+func (this *ZendExecutorGlobals) GetVmInterrupt() types.ZendBool       { return this.vm_interrupt }
+func (this *ZendExecutorGlobals) SetVmInterrupt(value types.ZendBool)  { this.vm_interrupt = value }
+func (this *ZendExecutorGlobals) GetTimedOut() types.ZendBool          { return this.timed_out }
+func (this *ZendExecutorGlobals) SetTimedOut(value types.ZendBool)     { this.timed_out = value }
+func (this *ZendExecutorGlobals) GetHardTimeout() ZendLong             { return this.hard_timeout }
+func (this *ZendExecutorGlobals) SetHardTimeout(value ZendLong)        { this.hard_timeout = value }
+func (this *ZendExecutorGlobals) GetRegularList() types.Array          { return this.regular_list }
+func (this *ZendExecutorGlobals) SetRegularList(value types.Array)     { this.regular_list = value }
+func (this *ZendExecutorGlobals) GetPersistentList() types.Array       { return this.persistent_list }
+func (this *ZendExecutorGlobals) SetPersistentList(value types.Array) {
 	this.persistent_list = value
 }
 func (this *ZendExecutorGlobals) GetUserErrorHandlerErrorReporting() int {
@@ -390,14 +390,14 @@ func (this *ZendExecutorGlobals) GetUserErrorHandlerErrorReporting() int {
 func (this *ZendExecutorGlobals) SetUserErrorHandlerErrorReporting(value int) {
 	this.user_error_handler_error_reporting = value
 }
-func (this *ZendExecutorGlobals) GetUserErrorHandler() *types2.Zval { return &this.user_error_handler }
-func (this *ZendExecutorGlobals) SetUserErrorHandler(value types2.Zval) {
+func (this *ZendExecutorGlobals) GetUserErrorHandler() *types.Zval { return &this.user_error_handler }
+func (this *ZendExecutorGlobals) SetUserErrorHandler(value types.Zval) {
 	this.user_error_handler = value
 }
-func (this *ZendExecutorGlobals) GetUserExceptionHandler() *types2.Zval {
+func (this *ZendExecutorGlobals) GetUserExceptionHandler() *types.Zval {
 	return this.user_exception_handler
 }
-func (this *ZendExecutorGlobals) SetUserExceptionHandler(value *types2.Zval) {
+func (this *ZendExecutorGlobals) SetUserExceptionHandler(value *types.Zval) {
 	this.user_exception_handler = value
 }
 func (this *ZendExecutorGlobals) GetUserErrorHandlersErrorReporting() ZendStack {
@@ -420,8 +420,8 @@ func (this *ZendExecutorGlobals) GetErrorHandling() ZendErrorHandlingT { return 
 func (this *ZendExecutorGlobals) SetErrorHandling(value ZendErrorHandlingT) {
 	this.error_handling = value
 }
-func (this *ZendExecutorGlobals) GetExceptionClass() *types2.ClassEntry { return this.exception_class }
-func (this *ZendExecutorGlobals) SetExceptionClass(value *types2.ClassEntry) {
+func (this *ZendExecutorGlobals) GetExceptionClass() *types.ClassEntry { return this.exception_class }
+func (this *ZendExecutorGlobals) SetExceptionClass(value *types.ClassEntry) {
 	this.exception_class = value
 }
 func (this *ZendExecutorGlobals) GetTimeoutSeconds() ZendLong      { return this.timeout_seconds }
@@ -435,10 +435,10 @@ func (this *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
 func (this *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
 	this.error_reporting_ini_entry = value
 }
-func (this *ZendExecutorGlobals) GetException() *types2.ZendObject      { return this.exception }
-func (this *ZendExecutorGlobals) SetException(value *types2.ZendObject) { this.exception = value }
-func (this *ZendExecutorGlobals) GetPrevException() **types2.ZendObject { return this.prev_exception }
-func (this *ZendExecutorGlobals) SetPrevException(value **types2.ZendObject) {
+func (this *ZendExecutorGlobals) GetException() *types.ZendObject      { return this.exception }
+func (this *ZendExecutorGlobals) SetException(value *types.ZendObject) { this.exception = value }
+func (this *ZendExecutorGlobals) GetPrevException() **types.ZendObject { return this.prev_exception }
+func (this *ZendExecutorGlobals) SetPrevException(value **types.ZendObject) {
 	this.prev_exception = value
 }
 func (this *ZendExecutorGlobals) GetOplineBeforeException() *ZendOp {
@@ -452,54 +452,54 @@ func (this *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry { return this.c
 func (this *ZendExecutorGlobals) SetCurrentModule(value *ModuleEntry) {
 	this.current_module = value
 }
-func (this *ZendExecutorGlobals) GetActive() types2.ZendBool                { return this.active }
-func (this *ZendExecutorGlobals) SetActive(value types2.ZendBool)           { this.active = value }
-func (this *ZendExecutorGlobals) GetFlags() types2.ZendUchar                { return this.flags }
-func (this *ZendExecutorGlobals) SetFlags(value types2.ZendUchar)           { this.flags = value }
-func (this *ZendExecutorGlobals) GetAssertions() ZendLong                   { return this.assertions }
-func (this *ZendExecutorGlobals) SetAssertions(value ZendLong)              { this.assertions = value }
-func (this *ZendExecutorGlobals) GetHtIteratorsCount() uint32               { return this.ht_iterators_count }
-func (this *ZendExecutorGlobals) SetHtIteratorsCount(value uint32)          { this.ht_iterators_count = value }
-func (this *ZendExecutorGlobals) GetHtIteratorsUsed() uint32                { return this.ht_iterators_used }
-func (this *ZendExecutorGlobals) SetHtIteratorsUsed(value uint32)           { this.ht_iterators_used = value }
-func (this *ZendExecutorGlobals) GetHtIterators() *types2.HashTableIterator { return this.ht_iterators }
-func (this *ZendExecutorGlobals) SetHtIterators(value *types2.HashTableIterator) {
+func (this *ZendExecutorGlobals) GetActive() types.ZendBool                { return this.active }
+func (this *ZendExecutorGlobals) SetActive(value types.ZendBool)           { this.active = value }
+func (this *ZendExecutorGlobals) GetFlags() types.ZendUchar                { return this.flags }
+func (this *ZendExecutorGlobals) SetFlags(value types.ZendUchar)           { this.flags = value }
+func (this *ZendExecutorGlobals) GetAssertions() ZendLong                  { return this.assertions }
+func (this *ZendExecutorGlobals) SetAssertions(value ZendLong)             { this.assertions = value }
+func (this *ZendExecutorGlobals) GetHtIteratorsCount() uint32              { return this.ht_iterators_count }
+func (this *ZendExecutorGlobals) SetHtIteratorsCount(value uint32)         { this.ht_iterators_count = value }
+func (this *ZendExecutorGlobals) GetHtIteratorsUsed() uint32               { return this.ht_iterators_used }
+func (this *ZendExecutorGlobals) SetHtIteratorsUsed(value uint32)          { this.ht_iterators_used = value }
+func (this *ZendExecutorGlobals) GetHtIterators() *types.HashTableIterator { return this.ht_iterators }
+func (this *ZendExecutorGlobals) SetHtIterators(value *types.HashTableIterator) {
 	this.ht_iterators = value
 }
-func (this *ZendExecutorGlobals) GetHtIteratorsSlots() []types2.HashTableIterator {
+func (this *ZendExecutorGlobals) GetHtIteratorsSlots() []types.HashTableIterator {
 	return this.ht_iterators_slots
 }
-func (this *ZendExecutorGlobals) SetHtIteratorsSlots(value []types2.HashTableIterator) {
+func (this *ZendExecutorGlobals) SetHtIteratorsSlots(value []types.HashTableIterator) {
 	this.ht_iterators_slots = value
 }
-func (this *ZendExecutorGlobals) GetSavedFpuCwPtr() any                { return this.saved_fpu_cw_ptr }
-func (this *ZendExecutorGlobals) SetSavedFpuCwPtr(value any)           { this.saved_fpu_cw_ptr = value }
-func (this *ZendExecutorGlobals) GetTrampoline() types2.IFunction      { return this.trampoline }
-func (this *ZendExecutorGlobals) SetTrampoline(value types2.IFunction) { this.trampoline = value }
-func (this *ZendExecutorGlobals) GetCallTrampolineOp() ZendOp          { return this.call_trampoline_op }
-func (this *ZendExecutorGlobals) SetCallTrampolineOp(value ZendOp)     { this.call_trampoline_op = value }
-func (this *ZendExecutorGlobals) GetEachDeprecationThrown() types2.ZendBool {
+func (this *ZendExecutorGlobals) GetSavedFpuCwPtr() any               { return this.saved_fpu_cw_ptr }
+func (this *ZendExecutorGlobals) SetSavedFpuCwPtr(value any)          { this.saved_fpu_cw_ptr = value }
+func (this *ZendExecutorGlobals) GetTrampoline() types.IFunction      { return this.trampoline }
+func (this *ZendExecutorGlobals) SetTrampoline(value types.IFunction) { this.trampoline = value }
+func (this *ZendExecutorGlobals) GetCallTrampolineOp() ZendOp         { return this.call_trampoline_op }
+func (this *ZendExecutorGlobals) SetCallTrampolineOp(value ZendOp)    { this.call_trampoline_op = value }
+func (this *ZendExecutorGlobals) GetEachDeprecationThrown() types.ZendBool {
 	return this.each_deprecation_thrown
 }
-func (this *ZendExecutorGlobals) SetEachDeprecationThrown(value types2.ZendBool) {
+func (this *ZendExecutorGlobals) SetEachDeprecationThrown(value types.ZendBool) {
 	this.each_deprecation_thrown = value
 }
-func (this *ZendExecutorGlobals) GetWeakrefs() types2.Array      { return this.weakrefs }
-func (this *ZendExecutorGlobals) SetWeakrefs(value types2.Array) { this.weakrefs = value }
-func (this *ZendExecutorGlobals) GetExceptionIgnoreArgs() types2.ZendBool {
+func (this *ZendExecutorGlobals) GetWeakrefs() types.Array      { return this.weakrefs }
+func (this *ZendExecutorGlobals) SetWeakrefs(value types.Array) { this.weakrefs = value }
+func (this *ZendExecutorGlobals) GetExceptionIgnoreArgs() types.ZendBool {
 	return this.exception_ignore_args
 }
-func (this *ZendExecutorGlobals) SetExceptionIgnoreArgs(value types2.ZendBool) {
+func (this *ZendExecutorGlobals) SetExceptionIgnoreArgs(value types.ZendBool) {
 	this.exception_ignore_args = value
 }
 func (this *ZendExecutorGlobals) GetReserved() []any      { return this.reserved }
 func (this *ZendExecutorGlobals) SetReserved(value []any) { this.reserved = value }
 
 /* ZendExecutorGlobals.flags */
-func (this *ZendExecutorGlobals) AddFlags(value types2.ZendUchar)      { this.flags |= value }
-func (this *ZendExecutorGlobals) SubFlags(value types2.ZendUchar)      { this.flags &^= value }
-func (this *ZendExecutorGlobals) HasFlags(value types2.ZendUchar) bool { return this.flags&value != 0 }
-func (this *ZendExecutorGlobals) SwitchFlags(value types2.ZendUchar, cond bool) {
+func (this *ZendExecutorGlobals) AddFlags(value types.ZendUchar)      { this.flags |= value }
+func (this *ZendExecutorGlobals) SubFlags(value types.ZendUchar)      { this.flags &^= value }
+func (this *ZendExecutorGlobals) HasFlags(value types.ZendUchar) bool { return this.flags&value != 0 }
+func (this *ZendExecutorGlobals) SwitchFlags(value types.ZendUchar, cond bool) {
 	if cond {
 		this.AddFlags(value)
 	} else {
@@ -580,9 +580,9 @@ type ZendPhpScannerGlobals struct {
 	yy_state                        int
 	state_stack                     b.Stack[int]
 	heredoc_label_stack             b.Stack[*ZendHeredocLabel]
-	heredoc_scan_ahead              types2.ZendBool
+	heredoc_scan_ahead              types.ZendBool
 	heredoc_indentation             int
-	heredoc_indentation_uses_spaces types2.ZendBool
+	heredoc_indentation_uses_spaces types.ZendBool
 	script_org                      *uint8
 	script_org_size                 int
 	script_filtered                 *uint8

@@ -2,11 +2,11 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var return_value *types2.Zval = executeData.GetReturnValue()
+	var return_value *types.Zval = executeData.GetReturnValue()
 	if return_value != nil {
 		var opline *ZendOp = executeData.GetOpline()
 		var generator *ZendGenerator
@@ -44,14 +44,14 @@ func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		generator.GetExecuteFake().SetOpline(nil)
 		generator.GetExecuteFake().SetFunc(nil)
 		generator.GetExecuteFake().SetPrevExecuteData(nil)
-		generator.GetExecuteFake().GetThis().SetObject((*types2.ZendObject)(generator))
+		generator.GetExecuteFake().GetThis().SetObject((*types.ZendObject)(generator))
 		gen_execute_data.SetOpline(opline + 1)
 
 		/* EX(return_value) keeps pointer to zend_object (not a real zval) */
-		gen_execute_data.SetReturnValue((*types2.Zval)(generator))
+		gen_execute_data.SetReturnValue((*types.Zval)(generator))
 
 		call_info = executeData.GetThis().GetTypeInfo()
-		if (call_info&types2.Z_TYPE_MASK) == types2.IS_OBJECT && ((call_info&(ZEND_CALL_CLOSURE|ZEND_CALL_RELEASE_THIS)) == 0 || ZendExecuteEx != ExecuteEx) {
+		if (call_info&types.Z_TYPE_MASK) == types.IS_OBJECT && ((call_info&(ZEND_CALL_CLOSURE|ZEND_CALL_RELEASE_THIS)) == 0 || ZendExecuteEx != ExecuteEx) {
 			ZEND_ADD_CALL_FLAG_EX(call_info, ZEND_CALL_RELEASE_THIS)
 		}
 		ZEND_ADD_CALL_FLAG_EX(call_info, ZEND_CALL_TOP_FUNCTION|ZEND_CALL_ALLOCATED|ZEND_CALL_GENERATOR)

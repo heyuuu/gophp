@@ -1,7 +1,7 @@
 package core
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 func Config() *Configuration {
@@ -9,24 +9,24 @@ func Config() *Configuration {
 }
 
 type Configuration struct {
-	hash types2.Array
+	hash types.Array
 }
 
 func (this *Configuration) Init() {
 	this.hash.Init(8, ConfigZvalDtor)
 }
 
-func (this *Configuration) Set(key string, value string) *types2.Zval {
-	var zv types2.Zval
+func (this *Configuration) Set(key string, value string) *types.Zval {
+	var zv types.Zval
 	zv.SetStringVal(value)
 	this.hash.KeyUpdate(key, &zv)
 }
 
-func (this *Configuration) KeyFind(key string) *types2.Zval {
+func (this *Configuration) KeyFind(key string) *types.Zval {
 	return this.hash.KeyFind(key)
 }
 
-func (this *Configuration) GetHash() *types2.Array {
+func (this *Configuration) GetHash() *types.Array {
 	return &this.hash
 }
 

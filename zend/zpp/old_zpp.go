@@ -2,7 +2,7 @@ package zpp
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) bool {
@@ -71,7 +71,7 @@ func checkTypeSpec(typeSpec string) (minNumArgs int, maxNumArgs int, postVarargs
 }
 
 func parseVaArgs(p *FastParser, typeSpec string, postVarargs int, args []any) bool {
-	var varargs **types2.Zval
+	var varargs **types.Zval
 	var nVarargs *int
 	r := typeSpecReader{typeSpec}
 	va := newVaList(args)
@@ -82,7 +82,7 @@ func parseVaArgs(p *FastParser, typeSpec string, postVarargs int, args []any) bo
 			var numVarargs = p.numArgs - (p.idx - 1) - postVarargs
 
 			/* eat up the passed in storage even if it won't be filled in with varargs */
-			varargs = va.Pop().(**types2.Zval)
+			varargs = va.Pop().(**types.Zval)
 			nVarargs = va.Pop().(*int)
 
 			if numVarargs > 0 {
@@ -169,15 +169,15 @@ func parseArg(p *FastParser, va *vaList, typ byte, checkNull bool, separate bool
 		obj := p.ParseObjectEx(checkNull, separate)
 		va.Zval(obj)
 	case 'O':
-		objPtr := va.Pop().(**types2.Zval)
-		ce := va.Pop().(*types2.ClassEntry)
+		objPtr := va.Pop().(**types.Zval)
+		ce := va.Pop().(*types.ClassEntry)
 		*objPtr = p.ParseObjectOfClassEx(ce, checkNull, separate)
 	case 'C':
-		pce := va.Pop().(**types2.ClassEntry)
+		pce := va.Pop().(**types.ClassEntry)
 		*pce = p.ParseClassEx(*pce, checkNull, separate)
 	case 'f':
-		fci := va.Pop().(*types2.ZendFcallInfo)
-		fcc := va.Pop().(*types2.ZendFcallInfoCache)
+		fci := va.Pop().(*types.ZendFcallInfo)
+		fcc := va.Pop().(*types.ZendFcallInfoCache)
 		p.ParseFuncEx(fci, fcc, checkNull, false)
 	case 'z':
 		zv := p.ParseZvalDerefEx(checkNull, separate)

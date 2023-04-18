@@ -2,12 +2,12 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var ce *types2.ClassEntry
+	var ce *types.ClassEntry
 	var opline *ZendOp = executeData.GetOpline()
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
@@ -17,7 +17,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		if ce == nil {
 			for {
 				b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & AccPreloaded) != 0)
-				if ZendPreloadAutoload != nil && ZendPreloadAutoload(executeData.GetFunc().GetOpArray().GetFilename()) == types2.SUCCESS {
+				if ZendPreloadAutoload != nil && ZendPreloadAutoload(executeData.GetFunc().GetOpArray().GetFilename()) == types.SUCCESS {
 					ce = EG__().ClassTable().Get(rtd_key)
 					if ce != nil {
 						goto afterGetCe
@@ -31,7 +31,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	afterGetCe:
 		b.Assert(ce != nil)
 		if !ce.IsLinked() {
-			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *types2.String { return opline.Const2().String() }, nil)) == types2.FAILURE {
+			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return opline.Const2().String() }, nil)) == types.FAILURE {
 				return 0
 			}
 		}

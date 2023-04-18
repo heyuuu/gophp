@@ -1,19 +1,19 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 func ZEND_SWITCH_LONG_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op *types2.Zval
-	var jump_zv *types2.Zval
-	var jumptable *types2.Array
+	var op *types.Zval
+	var jump_zv *types.Zval
+	var jumptable *types.Array
 	op = opline.Const1()
 	jumptable = opline.Const2().Array()
-	if op.GetType() != types2.IS_LONG {
-		op = types2.ZVAL_DEREF(op)
-		if op.GetType() != types2.IS_LONG {
+	if op.GetType() != types.IS_LONG {
+		op = types.ZVAL_DEREF(op)
+		if op.GetType() != types.IS_LONG {
 
 			/* Wrong type, fall back to ZEND_CASE chain */
 
@@ -37,14 +37,14 @@ func ZEND_SWITCH_LONG_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int
 }
 func ZEND_SWITCH_LONG_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op *types2.Zval
-	var jump_zv *types2.Zval
-	var jumptable *types2.Array
+	var op *types.Zval
+	var jump_zv *types.Zval
+	var jumptable *types.Array
 	op = opline.Op1()
 	jumptable = opline.Const2().Array()
-	if op.GetType() != types2.IS_LONG {
-		op = types2.ZVAL_DEREF(op)
-		if op.GetType() != types2.IS_LONG {
+	if op.GetType() != types.IS_LONG {
+		op = types.ZVAL_DEREF(op)
+		if op.GetType() != types.IS_LONG {
 
 			/* Wrong type, fall back to ZEND_CASE chain */
 

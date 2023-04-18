@@ -3,7 +3,7 @@ package cgi
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/globals"
@@ -13,7 +13,7 @@ import (
 	"sort"
 )
 
-func UserConfigCacheEntryDtor(el *types2.Zval) {
+func UserConfigCacheEntryDtor(el *types.Zval) {
 	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.Ptr())
 	entry.GetUserConfig().Destroy()
 	zend.Free(entry.GetUserConfig())
@@ -103,14 +103,14 @@ func SapiFcgiFlush(server_context any) {
 func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 	var h *core.SapiHeader
 	var pos zend.ZendLlistPosition
-	var ignore_status types2.ZendBool = 0
+	var ignore_status types.ZendBool = 0
 	var response_status int = core.SG__().sapi_headers.http_response_code
 	if core.SG__().RequestInfo.no_headers == 1 {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
 	if CGIG(nph) || core.SG__().sapi_headers.http_response_code != 200 {
 		var len_ int
-		var has_status types2.ZendBool = 0
+		var has_status types.ZendBool = 0
 		var buf []byte
 		if CGIG(rfc2616_headers) && core.SG__().sapi_headers.http_status_line {
 			var s *byte
@@ -247,21 +247,21 @@ func SapiFcgiReadCookies() *byte {
 	return core.FCGI_GETENV(request, "HTTP_COOKIE")
 }
 func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
-	var array_ptr *types2.Zval = (*types2.Zval)(arg)
+	var array_ptr *types.Zval = (*types.Zval)(arg)
 	var filter_arg int = b.Cond(array_ptr.Array() == core.PG__().http_globals[core.TRACK_VARS_ENV].Array(), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
 	if core.SM__().GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe(b.CastStrAuto(var_), b.CastStr(val, new_val_len), array_ptr)
 	}
 }
-func CgiPhpImportEnvironmentVariables(array_ptr *types2.Zval) {
+func CgiPhpImportEnvironmentVariables(array_ptr *types.Zval) {
 	if core.PG__().variables_order && (strchr(core.PG__().variables_order, 'E') || strchr(core.PG__().variables_order, 'e')) {
-		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() != types2.IS_ARRAY {
+		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() != types.IS_ARRAY {
 			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
 		}
-		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() == types2.IS_ARRAY && array_ptr.Array() != core.PG__().http_globals[core.TRACK_VARS_ENV].Array() {
+		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() == types.IS_ARRAY && array_ptr.Array() != core.PG__().http_globals[core.TRACK_VARS_ENV].Array() {
 			array_ptr.Array().DestroyEx()
-			array_ptr.SetArray(types2.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].Array()))
+			array_ptr.SetArray(types.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].Array()))
 			return
 		}
 	}
@@ -274,7 +274,7 @@ func CgiPhpImportEnvironmentVariables(array_ptr *types2.Zval) {
 		core.FcgiLoadenv(request, CgiPhpLoadEnvVar, array_ptr)
 	}
 }
-func SapiCgiRegisterVariables(track_vars_array *types2.Zval) {
+func SapiCgiRegisterVariables(track_vars_array *types.Zval) {
 	var php_self_len int
 	var php_self *byte
 
@@ -366,11 +366,11 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 
 	/* Find cached config entry: If not found, create one */
 
-	if b.Assign(&entry, types2.ZendHashStrFindPtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len))) == nil {
+	if b.Assign(&entry, types.ZendHashStrFindPtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len))) == nil {
 		new_entry = zend.Pemalloc(b.SizeOf("user_config_cache_entry"))
 		new_entry.SetExpires(0)
-		new_entry.SetUserConfig(types2.NewArrayEx(8, core.ConfigZvalDtor()))
-		entry = types2.ZendHashUpdatePtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len), new_entry)
+		new_entry.SetUserConfig(types.NewArrayEx(8, core.ConfigZvalDtor()))
+		entry = types.ZendHashUpdatePtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len), new_entry)
 	}
 
 	/* Check whether cache entry has expired and rescan if it is */
@@ -436,7 +436,7 @@ func SapiCgiActivate() int {
 	/* PATH_TRANSLATED should be defined at this stage but better safe than sorry :) */
 
 	if !(core.SG__().RequestInfo.path_translated) {
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	if core.PhpIniHasPerHostConfig() != 0 {
 		var server_name *byte
@@ -504,7 +504,7 @@ func SapiCgiActivate() int {
 		}
 		zend.Efree(path)
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func SapiCgiDeactivate() int {
 	/* flush only when SAPI was started. The reasons are:
@@ -521,13 +521,13 @@ func SapiCgiDeactivate() int {
 			SapiCgiFlush(core.SG__().server_context)
 		}
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func PhpCgiStartup(sapi_module *core.sapi_module_struct) int {
-	if core.PhpModuleStartup(sapi_module, &CgiModuleEntry, 1) == types2.FAILURE {
-		return types2.FAILURE
+	if core.PhpModuleStartup(sapi_module, &CgiModuleEntry, 1) == types.FAILURE {
+		return types.FAILURE
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func PhpCgiUsage(argv0 *byte) {
 	var prog *byte
@@ -890,12 +890,12 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 }
 func ZmStartupCgi(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZmShutdownCgi(type_ int, module_number int) int {
 	CGIG(user_config_cache).Destroy()
 	zend.UNREGISTER_INI_ENTRIES(module_number)
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZmInfoCgi(zend_module *zend.ModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
 func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
@@ -1000,7 +1000,7 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 		}
 	}
 }
-func AddResponseHeader(h *core.SapiHeader, return_value *types2.Zval) {
+func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 	if h.GetHeaderLen() > 0 {
 		var s *byte
 		var len_ int = 0

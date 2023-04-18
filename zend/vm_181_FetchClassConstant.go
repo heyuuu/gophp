@@ -2,15 +2,15 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var ce *types2.ClassEntry
-	var scope *types2.ClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var c *ZendClassConstant
-	var value *types2.Zval
+	var value *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 	for {
 		{
@@ -53,15 +53,15 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 		}
 		break
 	}
-	types2.ZVAL_COPY_OR_DUP(opline.Result(), value)
+	types.ZVAL_COPY_OR_DUP(opline.Result(), value)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var ce *types2.ClassEntry
-	var scope *types2.ClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var c *ZendClassConstant
-	var value *types2.Zval
-	var zv *types2.Zval
+	var value *types.Zval
+	var zv *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 	for {
 
@@ -99,14 +99,14 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 		}
 		break
 	}
-	types2.ZVAL_COPY_OR_DUP(opline.Result(), value)
+	types.ZVAL_COPY_OR_DUP(opline.Result(), value)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var ce *types2.ClassEntry
-	var scope *types2.ClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var c *ZendClassConstant
-	var value *types2.Zval
+	var value *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 	for {
 
@@ -149,6 +149,6 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 		}
 		break
 	}
-	types2.ZVAL_COPY_OR_DUP(opline.Result(), value)
+	types.ZVAL_COPY_OR_DUP(opline.Result(), value)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

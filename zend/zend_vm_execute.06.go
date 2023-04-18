@@ -2,17 +2,17 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var varname *types2.Zval
-	var retval *types2.Zval
-	var name *types2.String
-	var tmp_name *types2.String
-	var target_symbol_table *types2.Array
+	var varname *types.Zval
+	var retval *types.Zval
+	var name *types.String
+	var tmp_name *types.String
+	var target_symbol_table *types.Array
 	varname = opline.Const1()
 	{
 		name = varname.String()
@@ -21,7 +21,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	retval = target_symbol_table.KeyFind(name.GetStr())
 	if retval == nil {
-		if name.GetStr() == types2.STR_THIS {
+		if name.GetStr() == types.STR_THIS {
 		fetch_this:
 			ZendFetchThisVar(type_, opline, executeData)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -41,7 +41,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	} else if retval.IsIndirect() {
 		retval = retval.Indirect()
 		if retval.IsUndef() {
-			if name.GetStr() == types2.STR_THIS {
+			if name.GetStr() == types.STR_THIS {
 				goto fetch_this
 			}
 			if type_ == BP_VAR_W {
@@ -62,7 +62,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	}
 	b.Assert(retval != nil)
 	if type_ == BP_VAR_R || type_ == BP_VAR_IS {
-		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else {
 		opline.Result().SetIndirect(retval)
 	}

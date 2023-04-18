@@ -3,7 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
@@ -22,19 +22,19 @@ func PHP_UU_ENC_C3(c int) __auto__ {
 	return PHP_UU_ENC((*(c + 1))<<2&074 | (*(c + 2))>>6&3)
 }
 func PHP_UU_DEC(c char) int { return c - ' '&077 }
-func PhpUuencode(src *byte, src_len int) *types2.String {
+func PhpUuencode(src *byte, src_len int) *types.String {
 	var len_ int = 45
 	var p *uint8
 	var s *uint8
 	var e *uint8
 	var ee *uint8
-	var dest *types2.String
+	var dest *types.String
 
 	/* encoded length is ~ 38% greater than the original
 	   Use 1.5 for easier calculation.
 	*/
 
-	dest = types2.ZendStringSafeAlloc(src_len/2, 3, 46, 0)
+	dest = types.ZendStringSafeAlloc(src_len/2, 3, 46, 0)
 	p = (*uint8)(dest.GetVal())
 	s = (*uint8)(src)
 	e = s + src_len
@@ -83,18 +83,18 @@ func PhpUuencode(src *byte, src_len int) *types2.String {
 	b.PostInc(&(*p)) = PHP_UU_ENC('0')
 	b.PostInc(&(*p)) = '\n'
 	*p = '0'
-	dest = types2.ZendStringTruncate(dest, (*byte)(p-dest.GetVal()))
+	dest = types.ZendStringTruncate(dest, (*byte)(p-dest.GetVal()))
 	return dest
 }
-func PhpUudecode(src *byte, src_len int) *types2.String {
+func PhpUudecode(src *byte, src_len int) *types.String {
 	var len_ int
 	var total_len int = 0
 	var s *byte
 	var e *byte
 	var p *byte
 	var ee *byte
-	var dest *types2.String
-	dest = types2.ZendStringAlloc(int(ceil(src_len*0.75)), 0)
+	var dest *types.String
+	dest = types.ZendStringAlloc(int(ceil(src_len*0.75)), 0)
 	p = dest.GetVal()
 	s = src
 	e = src + src_len
@@ -150,8 +150,8 @@ func PhpUudecode(src *byte, src_len int) *types2.String {
 err:
 	return nil
 }
-func ZifConvertUuencode(executeData zpp.Ex, return_value zpp.Ret, data *types2.Zval) {
-	var src *types2.String
+func ZifConvertUuencode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
+	var src *types.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -171,9 +171,9 @@ func ZifConvertUuencode(executeData zpp.Ex, return_value zpp.Ret, data *types2.Z
 	return_value.SetString(PhpUuencode(src.GetVal(), src.GetLen()))
 	return
 }
-func ZifConvertUudecode(executeData zpp.Ex, return_value zpp.Ret, data *types2.Zval) {
-	var src *types2.String
-	var dest *types2.String
+func ZifConvertUudecode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
+	var src *types.String
+	var dest *types.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 1, 0)

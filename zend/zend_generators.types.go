@@ -1,7 +1,7 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 /**
@@ -11,7 +11,7 @@ type ZendGeneratorNode struct {
 	parent   *ZendGenerator
 	children uint32
 	child    struct /* union */ {
-		ht     *types2.Array
+		ht     *types.Array
 		single struct {
 			leaf  *ZendGenerator
 			child *ZendGenerator
@@ -27,8 +27,8 @@ func (this *ZendGeneratorNode) GetParent() *ZendGenerator          { return this
 func (this *ZendGeneratorNode) SetParent(value *ZendGenerator)     { this.parent = value }
 func (this *ZendGeneratorNode) GetChildren() uint32                { return this.children }
 func (this *ZendGeneratorNode) SetChildren(value uint32)           { this.children = value }
-func (this *ZendGeneratorNode) GetHt() *types2.Array               { return this.child.ht }
-func (this *ZendGeneratorNode) SetHt(value *types2.Array)          { this.child.ht = value }
+func (this *ZendGeneratorNode) GetHt() *types.Array                { return this.child.ht }
+func (this *ZendGeneratorNode) SetHt(value *types.Array)           { this.child.ht = value }
 func (this *ZendGeneratorNode) GetChildSingleLeaf() *ZendGenerator { return this.child.single.leaf }
 func (this *ZendGeneratorNode) SetChildSingleLeaf(value *ZendGenerator) {
 	this.child.single.leaf = value
@@ -46,20 +46,20 @@ func (this *ZendGeneratorNode) SetRoot(value *ZendGenerator)    { this.ptr.root 
  * ZendGenerator
  */
 type ZendGenerator struct {
-	std                      types2.ZendObject
+	std                      types.ZendObject
 	iterator                 *ZendObjectIterator
 	executeData              *ZendExecuteData
 	frozen_call_stack        *ZendExecuteData
-	value                    types2.Zval
-	key                      types2.Zval
-	retval                   types2.Zval
-	send_target              *types2.Zval
+	value                    types.Zval
+	key                      types.Zval
+	retval                   types.Zval
+	send_target              *types.Zval
 	largest_used_integer_key ZendLong
-	values                   types2.Zval
+	values                   types.Zval
 	node                     ZendGeneratorNode
 	execute_fake             ZendExecuteData
-	flags                    types2.ZendUchar
-	gc_buffer                *types2.Zval
+	flags                    types.ZendUchar
+	gc_buffer                *types.Zval
 	gc_buffer_size           uint32
 }
 
@@ -98,7 +98,7 @@ type ZendGenerator struct {
 //                     gc_buffer_size:gc_buffer_size,
 //                 }
 //             }
-func (this *ZendGenerator) GetStd() types2.ZendObject { return this.std }
+func (this *ZendGenerator) GetStd() types.ZendObject { return this.std }
 
 // func (this *ZendGenerator) SetStd(value ZendObject) { this.std = value }
 func (this *ZendGenerator) GetIterator() *ZendObjectIterator          { return this.iterator }
@@ -107,22 +107,22 @@ func (this *ZendGenerator) GetExecuteData() *ZendExecuteData          { return t
 func (this *ZendGenerator) SetExecuteData(value *ZendExecuteData)     { this.executeData = value }
 func (this *ZendGenerator) GetFrozenCallStack() *ZendExecuteData      { return this.frozen_call_stack }
 func (this *ZendGenerator) SetFrozenCallStack(value *ZendExecuteData) { this.frozen_call_stack = value }
-func (this *ZendGenerator) GetValue() types2.Zval                     { return this.value }
+func (this *ZendGenerator) GetValue() types.Zval                      { return this.value }
 
 // func (this *ZendGenerator) SetValue(value Zval) { this.value = value }
-func (this *ZendGenerator) GetKey() types2.Zval { return this.key }
+func (this *ZendGenerator) GetKey() types.Zval { return this.key }
 
 // func (this *ZendGenerator) SetKey(value Zval) { this.key = value }
-func (this *ZendGenerator) GetRetval() types2.Zval { return this.retval }
+func (this *ZendGenerator) GetRetval() types.Zval { return this.retval }
 
 // func (this *ZendGenerator) SetRetval(value Zval) { this.retval = value }
-func (this *ZendGenerator) GetSendTarget() *types2.Zval        { return this.send_target }
-func (this *ZendGenerator) SetSendTarget(value *types2.Zval)   { this.send_target = value }
+func (this *ZendGenerator) GetSendTarget() *types.Zval         { return this.send_target }
+func (this *ZendGenerator) SetSendTarget(value *types.Zval)    { this.send_target = value }
 func (this *ZendGenerator) GetLargestUsedIntegerKey() ZendLong { return this.largest_used_integer_key }
 func (this *ZendGenerator) SetLargestUsedIntegerKey(value ZendLong) {
 	this.largest_used_integer_key = value
 }
-func (this *ZendGenerator) GetValues() types2.Zval { return this.values }
+func (this *ZendGenerator) GetValues() types.Zval { return this.values }
 
 // func (this *ZendGenerator) SetValues(value Zval) { this.values = value }
 func (this *ZendGenerator) GetNode() ZendGeneratorNode { return this.node }
@@ -133,16 +133,16 @@ func (this *ZendGenerator) GetExecuteFake() *ZendExecuteData { return &this.exec
 // func (this *ZendGenerator) SetExecuteFake(value ZendExecuteData) { this.execute_fake = value }
 // func (this *ZendGenerator)  GetFlags() ZendUchar      { return this.flags }
 // func (this *ZendGenerator) SetFlags(value ZendUchar) { this.flags = value }
-func (this *ZendGenerator) GetGcBuffer() *types2.Zval      { return this.gc_buffer }
-func (this *ZendGenerator) SetGcBuffer(value *types2.Zval) { this.gc_buffer = value }
-func (this *ZendGenerator) GetGcBufferSize() uint32        { return this.gc_buffer_size }
-func (this *ZendGenerator) SetGcBufferSize(value uint32)   { this.gc_buffer_size = value }
+func (this *ZendGenerator) GetGcBuffer() *types.Zval      { return this.gc_buffer }
+func (this *ZendGenerator) SetGcBuffer(value *types.Zval) { this.gc_buffer = value }
+func (this *ZendGenerator) GetGcBufferSize() uint32       { return this.gc_buffer_size }
+func (this *ZendGenerator) SetGcBufferSize(value uint32)  { this.gc_buffer_size = value }
 
 /* ZendGenerator.flags */
-func (this *ZendGenerator) AddFlags(value types2.ZendUchar)      { this.flags |= value }
-func (this *ZendGenerator) SubFlags(value types2.ZendUchar)      { this.flags &^= value }
-func (this *ZendGenerator) HasFlags(value types2.ZendUchar) bool { return this.flags&value != 0 }
-func (this *ZendGenerator) SwitchFlags(value types2.ZendUchar, cond bool) {
+func (this *ZendGenerator) AddFlags(value types.ZendUchar)      { this.flags |= value }
+func (this *ZendGenerator) SubFlags(value types.ZendUchar)      { this.flags &^= value }
+func (this *ZendGenerator) HasFlags(value types.ZendUchar) bool { return this.flags&value != 0 }
+func (this *ZendGenerator) SwitchFlags(value types.ZendUchar, cond bool) {
 	if cond {
 		this.AddFlags(value)
 	} else {

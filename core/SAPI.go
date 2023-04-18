@@ -1,7 +1,7 @@
 package core
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -21,7 +21,7 @@ type ISapiModule interface {
 	SendHeader(header *SapiHeader, serverContext any)
 	ReadPost(buffer *byte, count_bytes int) int
 	ReadCookies() (string, bool)
-	RegisterServerVariables(trackVarsArray []types2.Zval)
+	RegisterServerVariables(trackVarsArray []types.Zval)
 	LogMessage(message string, syslogType int)
 	InputFilter(arg int, name string, value string) string
 
@@ -30,14 +30,14 @@ type ISapiModule interface {
 	GetSendHeader() func(sapi_header *SapiHeader, server_context any)
 	GetReadPost() func(buffer *byte, count_bytes int) int
 	GetReadCookies() func() *byte
-	GetRegisterServerVariables() func(track_vars_array *types2.Zval)
+	GetRegisterServerVariables() func(track_vars_array *types.Zval)
 	GetLogMessage() func(message *byte, syslog_type_int int)
 	GetPhpIniPathOverride() *byte
 	SetPhpIniPathOverride(value *byte)
 	GetDefaultPostReader() func()
 	SetDefaultPostReader(value func())
-	GetTreatData() func(arg int, str *byte, destArray *types2.Zval)
-	SetTreatData(value func(arg int, str *byte, destArray *types2.Zval))
+	GetTreatData() func(arg int, str *byte, destArray *types.Zval)
+	SetTreatData(value func(arg int, str *byte, destArray *types.Zval))
 	GetExecutableLocation() *byte
 	SetExecutableLocation(value *byte)
 	GetPhpIniIgnore() int
@@ -48,14 +48,14 @@ type ISapiModule interface {
 	GetForceHttp10() func() int
 	GetInputFilter() func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint
 	SetInputFilter(value func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint)
-	GetIniDefaults() func(configuration_hash *types2.Array)
-	SetIniDefaults(value func(configuration_hash *types2.Array))
+	GetIniDefaults() func(configuration_hash *types.Array)
+	SetIniDefaults(value func(configuration_hash *types.Array))
 	GetPhpinfoAsText() int
 	SetPhpinfoAsText(value int)
 	GetIniEntries() *byte
 	SetIniEntries(value *byte)
-	GetAdditionalFunctions() *types2.FunctionEntry
-	SetAdditionalFunctions(value *types2.FunctionEntry)
+	GetAdditionalFunctions() *types.FunctionEntry
+	SetAdditionalFunctions(value *types.FunctionEntry)
 	GetInputFilterInit() func() uint
 	SetInputFilterInit(value func() uint)
 }
@@ -73,22 +73,22 @@ type BaseSapiModule struct {
 	send_header               func(sapi_header *SapiHeader, server_context any)
 	read_post                 func(buffer *byte, count_bytes int) int
 	read_cookies              func() *byte
-	register_server_variables func(track_vars_array *types2.Zval)
+	register_server_variables func(track_vars_array *types.Zval)
 	log_message               func(message *byte, syslog_type_int int)
 
 	php_ini_path_override *byte
 	default_post_reader   func()
-	treat_data            func(arg int, str *byte, destArray *types2.Zval)
+	treat_data            func(arg int, str *byte, destArray *types.Zval)
 	executable_location   *byte
 	php_ini_ignore        int
 	php_ini_ignore_cwd    int
 	get_fd                func(fd *int) int
 	force_http_10         func() int
 	input_filter          func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint
-	ini_defaults          func(configuration_hash *types2.Array)
+	ini_defaults          func(configuration_hash *types.Array)
 	phpinfo_as_text       int
 	ini_entries           *byte
-	additional_functions  *types2.FunctionEntry
+	additional_functions  *types.FunctionEntry
 	input_filter_init     func() uint
 }
 
@@ -121,7 +121,7 @@ func (this *BaseSapiModule) ReadCookies() (string, bool) {
 	panic("implement me")
 }
 
-func (this *BaseSapiModule) RegisterServerVariables(trackVarsArray []types2.Zval) {
+func (this *BaseSapiModule) RegisterServerVariables(trackVarsArray []types.Zval) {
 	panic("implement me")
 }
 
@@ -162,7 +162,7 @@ func (this *BaseSapiModule) GetReadPost() func(buffer *byte, count_bytes int) in
 }
 func (this *BaseSapiModule) GetReadCookies() func() *byte      { return this.read_cookies }
 func (this *BaseSapiModule) SetReadCookies(value func() *byte) { this.read_cookies = value }
-func (this *BaseSapiModule) GetRegisterServerVariables() func(track_vars_array *types2.Zval) {
+func (this *BaseSapiModule) GetRegisterServerVariables() func(track_vars_array *types.Zval) {
 	return this.register_server_variables
 }
 func (this *BaseSapiModule) GetLogMessage() func(message *byte, syslog_type_int int) {
@@ -172,10 +172,10 @@ func (this *BaseSapiModule) GetPhpIniPathOverride() *byte      { return this.php
 func (this *BaseSapiModule) SetPhpIniPathOverride(value *byte) { this.php_ini_path_override = value }
 func (this *BaseSapiModule) GetDefaultPostReader() func()      { return this.default_post_reader }
 func (this *BaseSapiModule) SetDefaultPostReader(value func()) { this.default_post_reader = value }
-func (this *BaseSapiModule) GetTreatData() func(arg int, str *byte, destArray *types2.Zval) {
+func (this *BaseSapiModule) GetTreatData() func(arg int, str *byte, destArray *types.Zval) {
 	return this.treat_data
 }
-func (this *BaseSapiModule) SetTreatData(value func(arg int, str *byte, destArray *types2.Zval)) {
+func (this *BaseSapiModule) SetTreatData(value func(arg int, str *byte, destArray *types.Zval)) {
 	this.treat_data = value
 }
 func (this *BaseSapiModule) GetExecutableLocation() *byte      { return this.executable_location }
@@ -192,20 +192,20 @@ func (this *BaseSapiModule) GetInputFilter() func(arg int, var_ *byte, val **byt
 func (this *BaseSapiModule) SetInputFilter(value func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint) {
 	this.input_filter = value
 }
-func (this *BaseSapiModule) GetIniDefaults() func(configuration_hash *types2.Array) {
+func (this *BaseSapiModule) GetIniDefaults() func(configuration_hash *types.Array) {
 	return this.ini_defaults
 }
-func (this *BaseSapiModule) SetIniDefaults(value func(configuration_hash *types2.Array)) {
+func (this *BaseSapiModule) SetIniDefaults(value func(configuration_hash *types.Array)) {
 	this.ini_defaults = value
 }
 func (this *BaseSapiModule) GetPhpinfoAsText() int      { return this.phpinfo_as_text }
 func (this *BaseSapiModule) SetPhpinfoAsText(value int) { this.phpinfo_as_text = value }
 func (this *BaseSapiModule) GetIniEntries() *byte       { return this.ini_entries }
 func (this *BaseSapiModule) SetIniEntries(value *byte)  { this.ini_entries = value }
-func (this *BaseSapiModule) GetAdditionalFunctions() *types2.FunctionEntry {
+func (this *BaseSapiModule) GetAdditionalFunctions() *types.FunctionEntry {
 	return this.additional_functions
 }
-func (this *BaseSapiModule) SetAdditionalFunctions(value *types2.FunctionEntry) {
+func (this *BaseSapiModule) SetAdditionalFunctions(value *types.FunctionEntry) {
 	this.additional_functions = value
 }
 func (this *BaseSapiModule) GetInputFilterInit() func() uint      { return this.input_filter_init }

@@ -2,13 +2,13 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types2.Zval, mode int) {
-	var get_as_float types2.ZendBool = 0
+func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types.Zval, mode int) {
+	var get_as_float types.ZendBool = 0
 	var tp __struct__timeval = __struct__timeval{0}
 	for {
 		for {
@@ -43,13 +43,13 @@ func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types2.Zv
 		return
 	}
 }
-func ZifMicrotime(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, getAsFloat *types2.Zval) {
+func ZifMicrotime(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, getAsFloat *types.Zval) {
 	_phpGettimeofday(executeData, return_value, 0)
 }
-func ZifGettimeofday(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, getAsFloat *types2.Zval) {
+func ZifGettimeofday(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, getAsFloat *types.Zval) {
 	_phpGettimeofday(executeData, return_value, 1)
 }
-func ZifGetrusage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, who *types2.Zval) {
+func ZifGetrusage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, who *types.Zval) {
 	var usg __struct__rusage
 	var pwho zend.ZendLong = 0
 	var who int = RUSAGE_SELF

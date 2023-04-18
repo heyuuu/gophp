@@ -2,7 +2,7 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/core"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
@@ -63,14 +63,14 @@ func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
 	}
 	return (*byte)(str)
 }
-func ZifConvertCyrString(executeData zpp.Ex, return_value zpp.Ret, str *types2.Zval, from *types2.Zval, to *types2.Zval) {
+func ZifConvertCyrString(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, from *types.Zval, to *types.Zval) {
 	var input *byte
 	var fr_cs *byte
 	var to_cs *byte
 	var input_len int
 	var fr_cs_len int
 	var to_cs_len int
-	var str *types2.String
+	var str *types.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 3, 3, 0)
@@ -84,7 +84,7 @@ func ZifConvertCyrString(executeData zpp.Ex, return_value zpp.Ret, str *types2.Z
 		}
 		break
 	}
-	str = types2.NewString(b.CastStr(input, input_len))
+	str = types.NewString(b.CastStr(input, input_len))
 	PhpConvertCyrString((*uint8)(str.GetVal()), str.GetLen(), fr_cs[0], to_cs[0])
 	return_value.SetString(str)
 }

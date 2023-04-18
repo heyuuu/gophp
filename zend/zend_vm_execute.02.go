@@ -1,13 +1,13 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var arg *types2.Zval
+	var arg *types.Zval
 	var arg_num uint32 = opline.GetOp2().GetNum()
 	faults.ThrowError(nil, "Cannot pass parameter %d by reference", arg_num)
 	FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
@@ -15,7 +15,7 @@ func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
 	arg.SetUndef()
 	return 0
 }
-func zend_case_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
+func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -43,7 +43,7 @@ func zend_case_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *Ze
 func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num uint32, executeData *ZendExecuteData) int {
 	/* May be NULL during generator closing (only finally blocks are executed) */
 
-	var ex *types2.ZendObject = EG__().GetException()
+	var ex *types.ZendObject = EG__().GetException()
 
 	/* Walk try/catch/finally structures upwards, performing the necessary actions */
 
@@ -59,19 +59,19 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 
 			/* Go to finally block */
 
-			var fast_call *types2.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.var_)
+			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.var_)
 			CleanupLiveVars(executeData, op_num, try_catch.GetFinallyOp())
 			fast_call.SetObject(EG__().GetException())
 			EG__().SetException(nil)
 			fast_call.SetOplineNum(uint32 - 1)
 			return ZEND_VM_JMP_EX(executeData, executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyOp()], 0)
 		} else if op_num < try_catch.GetFinallyEnd() {
-			var fast_call *types2.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.var_)
+			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.var_)
 
 			/* cleanup incomplete RETURN statement */
 
 			if fast_call.GetOplineNum() != uint32-1 && (executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2_type&(IS_TMP_VAR|IS_VAR)) != 0 {
-				var return_value *types2.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2.var_)
+				var return_value *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2.var_)
 				// ZvalPtrDtor(return_value)
 			}
 

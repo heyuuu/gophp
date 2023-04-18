@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -58,7 +58,7 @@ func PhpFtpFopenConnect(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types2.String,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 	preuseid **core.PhpStream,
 	presource **PhpUrl,
@@ -381,7 +381,7 @@ func PhpStreamUrlWrapFtp(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types2.String,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var stream *core.PhpStream = nil
@@ -396,12 +396,12 @@ func PhpStreamUrlWrapFtp(
 	var use_ssl_on_data int = 0
 	var reuseid *core.PhpStream = nil
 	var file_size int = 0
-	var tmpzval *types2.Zval
-	var allow_overwrite types2.ZendBool = 0
+	var tmpzval *types.Zval
+	var allow_overwrite types.ZendBool = 0
 	var read_write int8_t = 0
 	var transport *byte
 	var transport_len int
-	var error_message *types2.String = nil
+	var error_message *types.String = nil
 	tmp_line[0] = '0'
 	if strpbrk(mode, "r+") {
 		read_write = 1
@@ -522,7 +522,7 @@ func PhpStreamUrlWrapFtp(
 
 		/* set resume position if applicable */
 
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(types2.IS_LONG) && tmpzval.Long() > 0 {
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(types.IS_LONG) && tmpzval.Long() > 0 {
 			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", tmpzval.Long())
 			result = GET_FTP_RESULT(stream)
 			if result < 300 || result > 399 {
@@ -615,7 +615,7 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var ent *core.PhpStreamDirent = (*core.PhpStreamDirent)(buf)
 	var innerstream *core.PhpStream
 	var tmp_len int
-	var basename *types2.String
+	var basename *types.String
 	innerstream = (*PhpFtpDirstreamData)(stream.GetAbstract()).GetDatastream()
 	if count != b.SizeOf("php_stream_dirent") {
 		return -1
@@ -662,7 +662,7 @@ func PhpStreamFtpOpendir(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types2.String,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var stream *core.PhpStream

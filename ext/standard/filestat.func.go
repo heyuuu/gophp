@@ -5,7 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -14,7 +14,7 @@ import (
 func ZmActivateFilestat(type_ int, module_number int) int {
 	BG__().CurrentStatFile = nil
 	BG__().CurrentLStatFile = nil
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZmDeactivateFilestat(type_ int, module_number int) int {
 	if BG__().CurrentStatFile {
@@ -25,14 +25,14 @@ func ZmDeactivateFilestat(type_ int, module_number int) int {
 		zend.Efree(BG__().CurrentLStatFile)
 		BG__().CurrentLStatFile = nil
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func PhpDiskTotalSpace(path *byte, space *float64) int {
 	var bytestotal float64 = 0
 	var buf __struct__statvfs
 	if statvfs(path, &buf) {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	if buf.f_frsize {
 		bytestotal = float64(buf.f_blocks) * float64(buf.f_frsize)
@@ -40,9 +40,9 @@ func PhpDiskTotalSpace(path *byte, space *float64) int {
 		bytestotal = float64(buf.f_blocks) * float64(buf.f_bsize)
 	}
 	*space = bytestotal
-	return types2.SUCCESS
+	return types.SUCCESS
 }
-func ZifDiskTotalSpace(executeData zpp.Ex, return_value zpp.Ret, path *types2.Zval) {
+func ZifDiskTotalSpace(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval) {
 	var bytestotal float64
 	var path *byte
 	var fullpath []*byte
@@ -66,7 +66,7 @@ func ZifDiskTotalSpace(executeData zpp.Ex, return_value zpp.Ret, path *types2.Zv
 		return_value.SetFalse()
 		return
 	}
-	if PhpDiskTotalSpace(fullpath, &bytestotal) == types2.SUCCESS {
+	if PhpDiskTotalSpace(fullpath, &bytestotal) == types.SUCCESS {
 		return_value.SetDouble(bytestotal)
 		return
 	}
@@ -78,7 +78,7 @@ func PhpDiskFreeSpace(path *byte, space *float64) int {
 	var buf __struct__statvfs
 	if statvfs(path, &buf) {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	if buf.f_frsize {
 		bytesfree = float64(buf.f_bavail) * float64(buf.f_frsize)
@@ -86,11 +86,11 @@ func PhpDiskFreeSpace(path *byte, space *float64) int {
 		bytesfree = float64(buf.f_bavail) * float64(buf.f_bsize)
 	}
 	*space = bytesfree
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 
 //@zif -alias diskfreespace
-func ZifDiskFreeSpace(executeData zpp.Ex, return_value zpp.Ret, path *types2.Zval) {
+func ZifDiskFreeSpace(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval) {
 	var bytesfree float64
 	var path *byte
 	var fullpath []*byte
@@ -114,7 +114,7 @@ func ZifDiskFreeSpace(executeData zpp.Ex, return_value zpp.Ret, path *types2.Zva
 		return_value.SetFalse()
 		return
 	}
-	if PhpDiskFreeSpace(fullpath, &bytesfree) == types2.SUCCESS {
+	if PhpDiskFreeSpace(fullpath, &bytesfree) == types.SUCCESS {
 		return_value.SetDouble(bytesfree)
 		return
 	}
@@ -124,15 +124,15 @@ func ZifDiskFreeSpace(executeData zpp.Ex, return_value zpp.Ret, path *types2.Zva
 func PhpGetGidByName(name *byte, gid *gid_t) int {
 	var gr *__struct__group = getgrnam(name)
 	if gr == nil {
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	*gid = gr.gr_gid
-	return types2.SUCCESS
+	return types.SUCCESS
 }
-func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types2.Zval, do_lchgrp int) {
+func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_lchgrp int) {
 	var filename *byte
 	var filename_len int
-	var group *types2.Zval
+	var group *types.Zval
 	var gid gid_t
 	var ret int
 	var wrapper *core.PhpStreamWrapper
@@ -154,14 +154,14 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types2.Zval, do
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if group.IsType(types2.IS_LONG) {
+			if group.IsType(types.IS_LONG) {
 				option = core.PHP_STREAM_META_GROUP
 				value = &(group.Long())
-			} else if group.IsType(types2.IS_STRING) {
+			} else if group.IsType(types.IS_STRING) {
 				option = core.PHP_STREAM_META_GROUP_NAME
 				value = group.String().GetVal()
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types2.ZendZvalTypeName(group))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(group))
 				return_value.SetFalse()
 				return
 			}
@@ -181,16 +181,16 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types2.Zval, do
 			return
 		}
 	}
-	if group.IsType(types2.IS_LONG) {
+	if group.IsType(types.IS_LONG) {
 		gid = gid_t(group.Long())
-	} else if group.IsType(types2.IS_STRING) {
-		if PhpGetGidByName(group.String().GetVal(), &gid) != types2.SUCCESS {
+	} else if group.IsType(types.IS_STRING) {
+		if PhpGetGidByName(group.String().GetVal(), &gid) != types.SUCCESS {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find gid for %s", group.String().GetVal())
 			return_value.SetFalse()
 			return
 		}
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types2.ZendZvalTypeName(group))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(group))
 		return_value.SetFalse()
 		return
 	}
@@ -214,24 +214,24 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types2.Zval, do
 	return_value.SetTrue()
 	return
 }
-func ZifChgrp(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, group *types2.Zval) {
+func ZifChgrp(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, group *types.Zval) {
 	PhpDoChgrp(executeData, return_value, 0)
 }
-func ZifLchgrp(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, group *types2.Zval) {
+func ZifLchgrp(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, group *types.Zval) {
 	PhpDoChgrp(executeData, return_value, 1)
 }
 func PhpGetUidByName(name *byte, uid *uid_t) uid_t {
 	var pw *__struct__passwd = getpwnam(name)
 	if pw == nil {
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	*uid = pw.pw_uid
-	return types2.SUCCESS
+	return types.SUCCESS
 }
-func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types2.Zval, do_lchown int) {
+func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_lchown int) {
 	var filename *byte
 	var filename_len int
-	var user *types2.Zval
+	var user *types.Zval
 	var uid uid_t
 	var ret int
 	var wrapper *core.PhpStreamWrapper
@@ -252,14 +252,14 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types2.Zval, do
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if user.IsType(types2.IS_LONG) {
+			if user.IsType(types.IS_LONG) {
 				option = core.PHP_STREAM_META_OWNER
 				value = &(user.Long())
-			} else if user.IsType(types2.IS_STRING) {
+			} else if user.IsType(types.IS_STRING) {
 				option = core.PHP_STREAM_META_OWNER_NAME
 				value = user.String().GetVal()
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types2.ZendZvalTypeName(user))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(user))
 				return_value.SetFalse()
 				return
 			}
@@ -279,16 +279,16 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types2.Zval, do
 			return
 		}
 	}
-	if user.IsType(types2.IS_LONG) {
+	if user.IsType(types.IS_LONG) {
 		uid = uid_t(user.Long())
-	} else if user.IsType(types2.IS_STRING) {
-		if PhpGetUidByName(user.String().GetVal(), &uid) != types2.SUCCESS {
+	} else if user.IsType(types.IS_STRING) {
+		if PhpGetUidByName(user.String().GetVal(), &uid) != types.SUCCESS {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find uid for %s", user.String().GetVal())
 			return_value.SetFalse()
 			return
 		}
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types2.ZendZvalTypeName(user))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(user))
 		return_value.SetFalse()
 		return
 	}
@@ -312,14 +312,14 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types2.Zval, do
 	return_value.SetTrue()
 	return
 }
-func ZifChown(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, user *types2.Zval) {
+func ZifChown(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, user *types.Zval) {
 	PhpDoChown(executeData, return_value, 0)
 }
-func ZifLchown(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, user *types2.Zval) {
+func ZifLchown(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, user *types.Zval) {
 	return_value.SetTrue()
 	PhpDoChown(executeData, return_value, 1)
 }
-func ZifChmod(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, mode *types2.Zval) {
+func ZifChmod(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, mode *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var mode zend.ZendLong
@@ -371,7 +371,7 @@ func ZifChmod(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, m
 	return_value.SetTrue()
 	return
 }
-func ZifTouch(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, _ zpp.Opt, time *types2.Zval, atime *types2.Zval) {
+func ZifTouch(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, time *types.Zval, atime *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var filetime zend.ZendLong = 0
@@ -472,7 +472,7 @@ func ZifTouch(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, _
 	return_value.SetTrue()
 	return
 }
-func PhpClearStatCache(clear_realpath_cache types2.ZendBool, filename *byte, filename_len int) {
+func PhpClearStatCache(clear_realpath_cache types.ZendBool, filename *byte, filename_len int) {
 	/* always clear CurrentStatFile and CurrentLStatFile even if filename is not NULL
 	 * as it may contain outdated data (e.g. "nlink" for a directory when deleting a file
 	 * in this directory, as shown by lstat_stat_variation9.phpt) */
@@ -493,8 +493,8 @@ func PhpClearStatCache(clear_realpath_cache types2.ZendBool, filename *byte, fil
 		}
 	}
 }
-func ZifClearstatcache(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, clearRealpathCache *types2.Zval, filename *types2.Zval) {
-	var clear_realpath_cache types2.ZendBool = 0
+func ZifClearstatcache(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, clearRealpathCache *types.Zval, filename *types.Zval) {
+	var clear_realpath_cache types.ZendBool = 0
 	var filename *byte = nil
 	var filename_len int = 0
 	for {
@@ -524,20 +524,20 @@ func IS_ABLE_CHECK(__t int) bool {
 func IS_ACCESS_CHECK(__t int) bool {
 	return IS_ABLE_CHECK(type_) || __t == FS_EXISTS
 }
-func PhpStat(filename *byte, filename_length int, type_ int, return_value *types2.Zval) {
-	var stat_dev types2.Zval
-	var stat_ino types2.Zval
-	var stat_mode types2.Zval
-	var stat_nlink types2.Zval
-	var stat_uid types2.Zval
-	var stat_gid types2.Zval
-	var stat_rdev types2.Zval
-	var stat_size types2.Zval
-	var stat_atime types2.Zval
-	var stat_mtime types2.Zval
-	var stat_ctime types2.Zval
-	var stat_blksize types2.Zval
-	var stat_blocks types2.Zval
+func PhpStat(filename *byte, filename_length int, type_ int, return_value *types.Zval) {
+	var stat_dev types.Zval
+	var stat_ino types.Zval
+	var stat_mode types.Zval
+	var stat_nlink types.Zval
+	var stat_uid types.Zval
+	var stat_gid types.Zval
+	var stat_rdev types.Zval
+	var stat_size types.Zval
+	var stat_atime types.Zval
+	var stat_mtime types.Zval
+	var stat_ctime types.Zval
+	var stat_blksize types.Zval
+	var stat_blocks types.Zval
 	var stat_sb *zend.ZendStatT
 	var ssb core.PhpStreamStatbuf
 	var flags int = 0
@@ -751,7 +751,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 	return_value.SetFalse()
 	return
 }
-func ZifFileperms(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFileperms(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -767,7 +767,7 @@ func ZifFileperms(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zva
 	}
 	PhpStat(filename, filename_len, FS_PERMS, return_value)
 }
-func ZifFileinode(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFileinode(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -783,7 +783,7 @@ func ZifFileinode(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zva
 	}
 	PhpStat(filename, filename_len, FS_INODE, return_value)
 }
-func ZifFilesize(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFilesize(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -799,7 +799,7 @@ func ZifFilesize(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval
 	}
 	PhpStat(filename, filename_len, FS_SIZE, return_value)
 }
-func ZifFileowner(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFileowner(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -815,7 +815,7 @@ func ZifFileowner(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zva
 	}
 	PhpStat(filename, filename_len, FS_OWNER, return_value)
 }
-func ZifFilegroup(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFilegroup(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -831,7 +831,7 @@ func ZifFilegroup(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zva
 	}
 	PhpStat(filename, filename_len, FS_GROUP, return_value)
 }
-func ZifFileatime(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFileatime(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -847,7 +847,7 @@ func ZifFileatime(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zva
 	}
 	PhpStat(filename, filename_len, FS_ATIME, return_value)
 }
-func ZifFilemtime(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFilemtime(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -863,7 +863,7 @@ func ZifFilemtime(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zva
 	}
 	PhpStat(filename, filename_len, FS_MTIME, return_value)
 }
-func ZifFilectime(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFilectime(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -879,7 +879,7 @@ func ZifFilectime(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zva
 	}
 	PhpStat(filename, filename_len, FS_CTIME, return_value)
 }
-func ZifFiletype(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFiletype(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -897,7 +897,7 @@ func ZifFiletype(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval
 }
 
 //@zif -alias is_writeable
-func ZifIsWritable(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifIsWritable(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -913,7 +913,7 @@ func ZifIsWritable(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zv
 	}
 	PhpStat(filename, filename_len, FS_IS_W, return_value)
 }
-func ZifIsReadable(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifIsReadable(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -929,7 +929,7 @@ func ZifIsReadable(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zv
 	}
 	PhpStat(filename, filename_len, FS_IS_R, return_value)
 }
-func ZifIsExecutable(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifIsExecutable(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -945,7 +945,7 @@ func ZifIsExecutable(executeData zpp.Ex, return_value zpp.Ret, filename *types2.
 	}
 	PhpStat(filename, filename_len, FS_IS_X, return_value)
 }
-func ZifIsFile(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifIsFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -961,7 +961,7 @@ func ZifIsFile(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) 
 	}
 	PhpStat(filename, filename_len, FS_IS_FILE, return_value)
 }
-func ZifIsDir(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifIsDir(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -977,7 +977,7 @@ func ZifIsDir(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_IS_DIR, return_value)
 }
-func ZifIsLink(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifIsLink(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -993,7 +993,7 @@ func ZifIsLink(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) 
 	}
 	PhpStat(filename, filename_len, FS_IS_LINK, return_value)
 }
-func ZifFileExists(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval) {
+func ZifFileExists(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1058,7 +1058,7 @@ func ZifRealpathCacheGet(executeData zpp.Ex, return_value zpp.Ret) {
 	for buckets < end {
 		var bucket *zend.RealpathCacheBucket = *buckets
 		for bucket != nil {
-			var entry types2.Zval
+			var entry types.Zval
 			zend.ArrayInit(&entry)
 
 			/* bucket->key is unsigned long */

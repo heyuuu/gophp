@@ -1,13 +1,13 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 func ZEND_QM_ASSIGN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var value *types2.Zval
-	var result *types2.Zval = opline.Result()
+	var value *types.Zval
+	var result *types.Zval = opline.Result()
 	value = opline.Const1()
 	{
 		result.CopyValueFrom(value)
@@ -22,8 +22,8 @@ func ZEND_QM_ASSIGN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_QM_ASSIGN_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var value *types2.Zval
-	var result *types2.Zval = opline.Result()
+	var value *types.Zval
+	var result *types.Zval = opline.Result()
 	value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if value.IsUndef() {
 		ZVAL_UNDEFINED_OP1(executeData)
@@ -31,7 +31,7 @@ func ZEND_QM_ASSIGN_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 	{
-		types2.ZVAL_COPY_DEREF(result, value)
+		types.ZVAL_COPY_DEREF(result, value)
 	}
 
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -39,8 +39,8 @@ func ZEND_QM_ASSIGN_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_QM_ASSIGN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var value *types2.Zval
-	var result *types2.Zval = opline.Result()
+	var value *types.Zval
+	var result *types.Zval = opline.Result()
 	value = opline.Op1()
 	if value.IsUndef() {
 		ZVAL_UNDEFINED_OP1(executeData)
@@ -48,15 +48,15 @@ func ZEND_QM_ASSIGN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 	{
-		types2.ZVAL_COPY_DEREF(result, value)
+		types.ZVAL_COPY_DEREF(result, value)
 	}
 
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_QM_ASSIGN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var value *types2.Zval
-	var result *types2.Zval = opline.Result()
+	var value *types.Zval
+	var result *types.Zval = opline.Result()
 	value = opline.Op1()
 	if value.IsUndef() {
 		ZVAL_UNDEFINED_OP1(executeData)
@@ -64,7 +64,7 @@ func ZEND_QM_ASSIGN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 	{
-		types2.ZVAL_COPY_DEREF(result, value)
+		types.ZVAL_COPY_DEREF(result, value)
 	}
 
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)

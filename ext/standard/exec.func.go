@@ -7,7 +7,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-func PhpExec(type_ int, cmd *byte, array *types2.Zval, return_value *types2.Zval) int {
+func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) int {
 	var fp *r.File
 	var buf *byte
 	var l int = 0
@@ -124,11 +124,11 @@ err:
 	pclose_return = -1
 	goto done
 }
-func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types2.Zval, mode int) {
+func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode int) {
 	var cmd *byte
 	var cmd_len int
-	var ret_code *types2.Zval = nil
-	var ret_array *types2.Zval = nil
+	var ret_code *types.Zval = nil
+	var ret_array *types.Zval = nil
 	var ret int
 	for {
 		var _flags int = 0
@@ -164,9 +164,9 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types2.Zval, mod
 	if ret_array == nil {
 		ret = PhpExec(mode, cmd, nil, return_value)
 	} else {
-		if types2.Z_REFVAL_P(ret_array).IsType(types2.IS_ARRAY) {
-			ret_array = types2.ZVAL_DEREF(ret_array)
-			types2.SeparateArray(ret_array)
+		if types.Z_REFVAL_P(ret_array).IsType(types.IS_ARRAY) {
+			ret_array = types.ZVAL_DEREF(ret_array)
+			types.SeparateArray(ret_array)
 		} else {
 			ret_array = zend.ZendTryArrayInit(ret_array)
 			if ret_array == nil {
@@ -179,13 +179,13 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types2.Zval, mod
 		zend.ZEND_TRY_ASSIGN_REF_LONG(ret_code, ret)
 	}
 }
-func ZifExec(executeData zpp.Ex, return_value zpp.Ret, command *types2.Zval, _ zpp.Opt, output zpp.RefZval, returnValue zpp.RefZval) {
+func ZifExec(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, _ zpp.Opt, output zpp.RefZval, returnValue zpp.RefZval) {
 	PhpExecEx(executeData, return_value, 0)
 }
-func ZifSystem(executeData zpp.Ex, return_value zpp.Ret, command *types2.Zval, _ zpp.Opt, returnValue zpp.RefZval) {
+func ZifSystem(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, _ zpp.Opt, returnValue zpp.RefZval) {
 	PhpExecEx(executeData, return_value, 1)
 }
-func ZifPassthru(executeData zpp.Ex, return_value zpp.Ret, command *types2.Zval, _ zpp.Opt, returnValue zpp.RefZval) {
+func ZifPassthru(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, _ zpp.Opt, returnValue zpp.RefZval) {
 	PhpExecEx(executeData, return_value, 3)
 }
 func PhpEscapeShellCmd(str string) string {
@@ -282,11 +282,11 @@ func ZifEscapeshellarg(arg string) string {
 	}
 	return PhpEscapeShellArg(arg)
 }
-func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types2.Zval) {
+func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types.Zval) {
 	var in *r.File
 	var command *byte
 	var command_len int
-	var ret *types2.String
+	var ret *types.String
 	var stream *core.PhpStream
 	for {
 		for {

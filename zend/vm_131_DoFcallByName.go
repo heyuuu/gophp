@@ -2,15 +2,15 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc types2.IFunction = call.GetFunc()
-	var ret *types2.Zval
+	var fbc types.IFunction = call.GetFunc()
+	var ret *types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
 	if fbc.GetType() == ZEND_USER_FUNCTION {
 		ret = nil
@@ -20,7 +20,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteDa
 		IInitFuncExecuteData(fbc.GetOpArray(), ret, 0, executeData)
 		return 1
 	} else {
-		var retval types2.Zval
+		var retval types.Zval
 		b.Assert(fbc.GetType() == ZEND_INTERNAL_FUNCTION)
 		if fbc.IsDeprecated() {
 			ZendDeprecatedFunction(fbc)
@@ -59,8 +59,8 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteDa
 func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc types2.IFunction = call.GetFunc()
-	var ret *types2.Zval
+	var fbc types.IFunction = call.GetFunc()
+	var ret *types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
 	if fbc.GetType() == ZEND_USER_FUNCTION {
 		ret = nil
@@ -70,7 +70,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData
 		IInitFuncExecuteData(fbc.GetOpArray(), ret, 0, executeData)
 		return 1
 	} else {
-		var retval types2.Zval
+		var retval types.Zval
 		b.Assert(fbc.GetType() == ZEND_INTERNAL_FUNCTION)
 		if fbc.IsDeprecated() {
 			ZendDeprecatedFunction(fbc)

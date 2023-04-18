@@ -3,7 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"strings"
 )
@@ -97,7 +97,7 @@ func ZendGetSpecialConstant(name string) *ZendConstant {
 		return nil
 	}
 }
-func ZendVerifyConstAccess(c *ZendClassConstant, scope *types2.ClassEntry) bool {
+func ZendVerifyConstAccess(c *ZendClassConstant, scope *types.ClassEntry) bool {
 	if (c.GetValue().GetAccessFlags() & AccPublic) != 0 {
 		return 1
 	} else if (c.GetValue().GetAccessFlags() & AccPrivate) != 0 {
@@ -122,7 +122,7 @@ func ZendGetConstantImpl(name string) *ZendConstant {
 	}
 	return c
 }
-func ZendGetConstant(name string) *types2.Zval {
+func ZendGetConstant(name string) *types.Zval {
 	var c *ZendConstant = ZendGetConstantImpl(name)
 	if c != nil {
 		return c.Value()
@@ -139,7 +139,7 @@ func IsAccessDeprecated(c *ZendConstant, accessName string) bool {
 		return accessName != c.Name()
 	}
 }
-func ZendGetConstantEx(name string, scope *types2.ClassEntry, flags uint32) *types2.Zval {
+func ZendGetConstantEx(name string, scope *types.ClassEntry, flags uint32) *types.Zval {
 	var c *ZendConstant
 
 	/* Skip leading \\ */
@@ -151,7 +151,7 @@ func ZendGetConstantEx(name string, scope *types2.ClassEntry, flags uint32) *typ
 		var className = name[:pos-1]
 
 		// get ce
-		var ce *types2.ClassEntry
+		var ce *types.ClassEntry
 		switch ascii.StrToLower(className) {
 		case "self":
 			if scope == nil {
@@ -209,7 +209,7 @@ func ZendGetConstantEx(name string, scope *types2.ClassEntry, flags uint32) *typ
 			c.MarkVisited()
 			ret = ZvalUpdateConstantEx(retConstant, c.GetCe())
 			c.ResetVisited()
-			if ret != types2.SUCCESS {
+			if ret != types.SUCCESS {
 				retConstant = nil
 				return nil
 			}

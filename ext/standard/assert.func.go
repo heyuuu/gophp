@@ -3,7 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -19,7 +19,7 @@ func SAFE_STRING(s *byte) string {
 }
 func OnChangeCallback(
 	entry *zend.ZendIniEntry,
-	new_value *types2.String,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -45,14 +45,14 @@ func OnChangeCallback(
 			ASSERTG(cb) = nil
 		}
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func PhpAssertInitGlobals(assert_globals_p *ZendAssertGlobals) {
 	assert_globals_p.GetCallback().SetUndef()
 	assert_globals_p.SetCb(nil)
 }
 func ZmStartupAssert(type_ int, module_number int) int {
-	var ce types2.ClassEntry
+	var ce types.ClassEntry
 	PhpAssertInitGlobals(&AssertGlobals)
 	zend.REGISTER_INI_ENTRIES(module_number)
 	zend.RegisterLongConstant("ASSERT_ACTIVE", ASSERT_ACTIVE, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
@@ -62,29 +62,29 @@ func ZmStartupAssert(type_ int, module_number int) int {
 	zend.RegisterLongConstant("ASSERT_QUIET_EVAL", ASSERT_QUIET_EVAL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("ASSERT_EXCEPTION", ASSERT_EXCEPTION, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(types2.NewString("AssertionError"))
+	ce.SetName(types.NewString("AssertionError"))
 	ce.SetBuiltinFunctions(nil)
 	AssertionErrorCe = zend.ZendRegisterInternalClassEx(&ce, faults.ZendCeError)
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZmShutdownAssert(type_ int, module_number int) int {
 	if ASSERTG(cb) {
 		zend.Pefree(ASSERTG(cb), 1)
 		ASSERTG(cb) = nil
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZmDeactivateAssert(type_ int, module_number int) int {
 	if ASSERTG(callback).IsNotUndef() {
 		// zend.ZvalPtrDtor(&(ASSERTG(callback)))
 		ASSERTG(callback).SetUndef()
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }
 func ZmInfoAssert(zend_module *zend.ModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
-func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types2.Zval, _ zpp.Opt, description *types2.Zval) {
-	var assertion *types2.Zval
-	var description *types2.Zval = nil
+func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, _ zpp.Opt, description *types.Zval) {
+	var assertion *types.Zval
+	var description *types.Zval = nil
 	var val int
 	var myeval *byte = nil
 	var compiled_string_description *byte
@@ -105,10 +105,10 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types2.Zval,
 		}
 		break
 	}
-	if assertion.IsType(types2.IS_STRING) {
-		var retval types2.Zval
+	if assertion.IsType(types.IS_STRING) {
+		var retval types.Zval
 		var old_error_reporting int = 0
-		if zend.ZendForbidDynamicCall("assert() with string argument") == types2.FAILURE {
+		if zend.ZendForbidDynamicCall("assert() with string argument") == types.FAILURE {
 			return_value.SetFalse()
 			return
 		}
@@ -119,12 +119,12 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types2.Zval,
 			zend.EG__().SetErrorReporting(0)
 		}
 		compiled_string_description = zend.ZendMakeCompiledStringDescription("assert code")
-		if zend.ZendEvalStringl(myeval, assertion.String().GetLen(), &retval, compiled_string_description) == types2.FAILURE {
+		if zend.ZendEvalStringl(myeval, assertion.String().GetLen(), &retval, compiled_string_description) == types.FAILURE {
 			zend.Efree(compiled_string_description)
 			if description == nil {
 				faults.ThrowError(nil, "Failure evaluating code: %s%s", core.PHP_EOL, myeval)
 			} else {
-				var str *types2.String = zend.ZvalGetString(description)
+				var str *types.String = zend.ZvalGetString(description)
 				faults.ThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, str.GetVal(), myeval)
 				// types.ZendStringReleaseEx(str, 0)
 			}
@@ -139,7 +139,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types2.Zval,
 			zend.EG__().SetErrorReporting(old_error_reporting)
 		}
 		zend.ConvertToBoolean(&retval)
-		val = retval.IsType(types2.IS_TRUE)
+		val = retval.IsType(types.IS_TRUE)
 	} else {
 		val = zend.ZendIsTrue(assertion)
 	}
@@ -151,8 +151,8 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types2.Zval,
 		(ASSERTG(callback)).SetStringVal(b.CastStrAuto(ASSERTG(cb)))
 	}
 	if ASSERTG(callback).IsNotUndef() {
-		var args []types2.Zval
-		var retval types2.Zval
+		var args []types.Zval
+		var retval types.Zval
 		var lineno uint32 = zend.ZendGetExecutedLineno()
 		var filename *byte = zend.ZendGetExecutedFilename()
 		args[0].SetStringVal(b.CastStrAuto(SAFE_STRING(filename)))
@@ -178,11 +178,11 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types2.Zval,
 	if ASSERTG(exception) {
 		if description == nil {
 			faults.ThrowException(AssertionErrorCe, nil, faults.E_ERROR)
-		} else if description.IsType(types2.IS_OBJECT) && zend.InstanceofFunction(types2.Z_OBJCE_P(description), faults.ZendCeThrowable) != 0 {
+		} else if description.IsType(types.IS_OBJECT) && zend.InstanceofFunction(types.Z_OBJCE_P(description), faults.ZendCeThrowable) != 0 {
 			// 			description.AddRefcount()
 			faults.ThrowExceptionObject(description)
 		} else {
-			var str *types2.String = zend.ZvalGetString(description)
+			var str *types.String = zend.ZvalGetString(description)
 			faults.ThrowException(AssertionErrorCe, str.GetVal(), faults.E_ERROR)
 			// types.ZendStringReleaseEx(str, 0)
 		}
@@ -194,7 +194,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types2.Zval,
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Assertion failed")
 			}
 		} else {
-			var str *types2.String = zend.ZvalGetString(description)
+			var str *types.String = zend.ZvalGetString(description)
 			if myeval != nil {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "%s: \"%s\" failed", str.GetVal(), myeval)
 			} else {
@@ -209,12 +209,12 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types2.Zval,
 	return_value.SetFalse()
 	return
 }
-func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types2.Zval, _ zpp.Opt, value *types2.Zval) {
-	var value *types2.Zval = nil
+func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval, _ zpp.Opt, value *types.Zval) {
+	var value *types.Zval = nil
 	var what zend.ZendLong
-	var oldint types2.ZendBool
+	var oldint types.ZendBool
 	var ac int = executeData.NumArgs()
-	var key *types2.String
+	var key *types.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -232,11 +232,11 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types2.Zva
 	case ASSERT_ACTIVE:
 		oldint = ASSERTG(active)
 		if ac == 2 {
-			var value_str *types2.String = zend.ZvalTryGetString(value)
+			var value_str *types.String = zend.ZvalTryGetString(value)
 			if value_str == nil {
 				return
 			}
-			key = types2.NewString("assert.active")
+			key = types.NewString("assert.active")
 			zend.ZendAlterIniEntryEx(key.GetStr(), value_str, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
 			// types.ZendStringReleaseEx(key, 0)
 			// types.ZendStringReleaseEx(value_str, 0)
@@ -246,11 +246,11 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types2.Zva
 	case ASSERT_BAIL:
 		oldint = ASSERTG(bail)
 		if ac == 2 {
-			var value_str *types2.String = zend.ZvalTryGetString(value)
+			var value_str *types.String = zend.ZvalTryGetString(value)
 			if value_str == nil {
 				return
 			}
-			key = types2.NewString("assert.bail")
+			key = types.NewString("assert.bail")
 			zend.ZendAlterIniEntryEx(key.GetStr(), value_str, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
 			// types.ZendStringReleaseEx(key, 0)
 			// types.ZendStringReleaseEx(value_str, 0)
@@ -260,11 +260,11 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types2.Zva
 	case ASSERT_QUIET_EVAL:
 		oldint = ASSERTG(quiet_eval)
 		if ac == 2 {
-			var value_str *types2.String = zend.ZvalTryGetString(value)
+			var value_str *types.String = zend.ZvalTryGetString(value)
 			if value_str == nil {
 				return
 			}
-			key = types2.NewString("assert.quiet_eval")
+			key = types.NewString("assert.quiet_eval")
 			zend.ZendAlterIniEntryEx(key.GetStr(), value_str, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
 			// types.ZendStringReleaseEx(key, 0)
 			// types.ZendStringReleaseEx(value_str, 0)
@@ -274,11 +274,11 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types2.Zva
 	case ASSERT_WARNING:
 		oldint = ASSERTG(warning)
 		if ac == 2 {
-			var value_str *types2.String = zend.ZvalTryGetString(value)
+			var value_str *types.String = zend.ZvalTryGetString(value)
 			if value_str == nil {
 				return
 			}
-			key = types2.NewString("assert.warning")
+			key = types.NewString("assert.warning")
 			zend.ZendAlterIniEntryEx(key.GetStr(), value_str, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
 			// types.ZendStringReleaseEx(key, 0)
 			// types.ZendStringReleaseEx(value_str, 0)
@@ -287,7 +287,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types2.Zva
 		return
 	case ASSERT_CALLBACK:
 		if ASSERTG(callback).IsNotUndef() {
-			types2.ZVAL_COPY(return_value, &(ASSERTG(callback)))
+			types.ZVAL_COPY(return_value, &(ASSERTG(callback)))
 		} else if ASSERTG(cb) {
 			return_value.SetStringVal(b.CastStrAuto(ASSERTG(cb)))
 		} else {
@@ -295,17 +295,17 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types2.Zva
 		}
 		if ac == 2 {
 			// zend.ZvalPtrDtor(&(ASSERTG(callback)))
-			types2.ZVAL_COPY(&(ASSERTG(callback)), value)
+			types.ZVAL_COPY(&(ASSERTG(callback)), value)
 		}
 		return
 	case ASSERT_EXCEPTION:
 		oldint = ASSERTG(exception)
 		if ac == 2 {
-			var val *types2.String = zend.ZvalTryGetString(value)
+			var val *types.String = zend.ZvalTryGetString(value)
 			if val == nil {
 				return
 			}
-			key = types2.NewString("assert.exception")
+			key = types.NewString("assert.exception")
 			zend.ZendAlterIniEntryEx(key.GetStr(), val, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
 			// types.ZendStringReleaseEx(val, 0)
 			// types.ZendStringReleaseEx(key, 0)

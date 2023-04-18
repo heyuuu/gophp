@@ -2,7 +2,7 @@ package faults
 
 import (
 	"github.com/heyuuu/gophp/core"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -38,13 +38,13 @@ func Bailout() {
 	throw()
 }
 
-func GetException() *types2.ZendObject {
+func GetException() *types.ZendObject {
 	return zend.EG__().GetException()
 }
 func HasException() bool {
 	return GetException() != nil
 }
-func GetUserErrorHandler() *types2.Zval {
+func GetUserErrorHandler() *types.Zval {
 	return zend.EG__().GetUserErrorHandler()
 }
 func GetUserErrorHandlerErrorReporting() int {
@@ -94,7 +94,7 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 			E_COMPILE_WARNING:
 			errorCb(typ, errorFilename, errorLineno, message)
 		default:
-			var params [5]types2.Zval
+			var params [5]types.Zval
 			params[0].SetLong(typ)
 			params[1].SetStringVal(message)
 			if errorFilename != "" {
@@ -109,17 +109,17 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 			if symbolTable == nil {
 				params[4].SetNull()
 			} else {
-				params[4].SetArray(types2.ZendArrayDup(symbolTable))
+				params[4].SetArray(types.ZendArrayDup(symbolTable))
 			}
 
-			var retval types2.Zval
-			var orig_user_error_handler types2.Zval
-			var saved_class_entry *types2.ClassEntry
+			var retval types.Zval
+			var orig_user_error_handler types.Zval
+			var saved_class_entry *types.ClassEntry
 			var loop_var_stack zend.ZendStack[any]
 			var delayed_oplines_stack zend.ZendStack[any]
-			var orig_fake_scope *types2.ClassEntry
+			var orig_fake_scope *types.ClassEntry
 
-			types2.ZVAL_COPY_VALUE(&orig_user_error_handler, zend.EG__().GetUserErrorHandler())
+			types.ZVAL_COPY_VALUE(&orig_user_error_handler, zend.EG__().GetUserErrorHandler())
 			zend.EG__().GetUserErrorHandler().SetUndef()
 
 			/* User error handler may include() additinal PHP files.
@@ -137,7 +137,7 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 			}
 			orig_fake_scope = zend.EG__().GetFakeScope()
 			zend.EG__().SetFakeScope(nil)
-			if zend.CallUserFunction(nil, &orig_user_error_handler, &retval, 5, params[:]) == types2.SUCCESS {
+			if zend.CallUserFunction(nil, &orig_user_error_handler, &retval, 5, params[:]) == types.SUCCESS {
 				if retval.IsNotUndef() {
 					if retval.IsFalse() {
 						errorCb(typ, errorFilename, errorLineno, message)
@@ -159,7 +159,7 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 			// zend.ZvalPtrDtor(&params[2])
 			// zend.ZvalPtrDtor(&params[1])
 			if zend.EG__().GetUserErrorHandler().IsUndef() {
-				types2.ZVAL_COPY_VALUE(zend.EG__().GetUserErrorHandler(), &orig_user_error_handler)
+				types.ZVAL_COPY_VALUE(zend.EG__().GetUserErrorHandler(), &orig_user_error_handler)
 			} else {
 				// zend.ZvalPtrDtor(&orig_user_error_handler)
 			}
@@ -234,7 +234,7 @@ func ErrorNoreturn(typ int, format string, args ...any) {
 	/* Should never reach this. */
 	panic("unreachable")
 }
-func ThrowErrorEx(exceptionCe *types2.ClassEntry, message string) {
+func ThrowErrorEx(exceptionCe *types.ClassEntry, message string) {
 	if exceptionCe != nil {
 		if zend.InstanceofFunction(exceptionCe, ZendCeError) == 0 {
 			Error(E_NOTICE, "Error exceptions must be derived from Error")
@@ -256,7 +256,7 @@ func ThrowErrorEx(exceptionCe *types2.ClassEntry, message string) {
 		Error(E_ERROR, message)
 	}
 }
-func ThrowError(exceptionCe *types2.ClassEntry, format string, args ...any) {
+func ThrowError(exceptionCe *types.ClassEntry, format string, args ...any) {
 	message := zend.ZendSprintf(format, args...)
 	ThrowErrorEx(exceptionCe, message)
 }

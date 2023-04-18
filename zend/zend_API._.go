@@ -1,7 +1,7 @@
 package zend
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 /* End of parameter parsing API -- andrei */
@@ -14,10 +14,10 @@ const IS_CALLABLE_STRICT uint32 = IS_CALLABLE_CHECK_IS_STATIC
 
 //const ZEND_THIS *Zval = &(EX(This))
 
-func ZEND_THIS(executeData *ZendExecuteData) *types2.Zval {
+func ZEND_THIS(executeData *ZendExecuteData) *types.Zval {
 	return executeData.GetThis()
 }
 
 /* these variables are true statics/globals, and have to be mutex'ed on every access */
-var ClassCleanupHandlers **types2.ClassEntry
-var DisabledClassNew = []types2.FunctionEntry{}
+var ClassCleanupHandlers **types.ClassEntry
+var DisabledClassNew = []types.FunctionEntry{}

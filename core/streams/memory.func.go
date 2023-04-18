@@ -5,7 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -135,7 +135,7 @@ func PhpStreamMemorySeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 		return -1
 	}
 }
-func PhpStreamMemoryCast(stream *core.PhpStream, castas int, ret *any) int { return types2.FAILURE }
+func PhpStreamMemoryCast(stream *core.PhpStream, castas int, ret *any) int { return types.FAILURE }
 func PhpStreamMemoryStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int {
 	var timestamp int64 = 0
 	var ms *PhpStreamMemoryData = (*PhpStreamMemoryData)(stream.GetAbstract())
@@ -286,7 +286,7 @@ func PhpStreamTempCast(stream *core.PhpStream, castas int, ret *any) int {
 	var pos zend.ZendOffT
 	b.Assert(ts != nil)
 	if ts.GetInnerstream() == nil {
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	if core.PhpStreamIs(ts.GetInnerstream(), core.PHP_STREAM_IS_STDIO) {
 		return core.PhpStreamCast(ts.GetInnerstream(), castas, ret, 0)
@@ -298,18 +298,18 @@ func PhpStreamTempCast(stream *core.PhpStream, castas int, ret *any) int {
 	 * the memory stream to a tmpfile stream */
 
 	if ret == nil && castas == core.PHP_STREAM_AS_STDIO {
-		return types2.SUCCESS
+		return types.SUCCESS
 	}
 
 	/* say "no" to other stream forms */
 
 	if ret == nil {
-		return types2.FAILURE
+		return types.FAILURE
 	}
 	file = _phpStreamFopenTmpfile(0)
 	if file == nil {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to create temporary file.")
-		return types2.FAILURE
+		return types.FAILURE
 	}
 
 	/* perform the conversion and then pass the request on to the innerstream */
@@ -335,7 +335,7 @@ func PhpStreamTempSetOption(stream *core.PhpStream, option int, value int, ptrpa
 	switch option {
 	case core.PHP_STREAM_OPTION_META_DATA_API:
 		if ts.GetMeta().IsNotUndef() {
-			types2.ZendHashCopy((*types2.Zval)(ptrparam).Array(), ts.GetMeta().Array(), zend.ZvalAddRef)
+			types.ZendHashCopy((*types.Zval)(ptrparam).Array(), ts.GetMeta().Array(), zend.ZvalAddRef)
 		}
 		return core.PHP_STREAM_OPTION_RETURN_OK
 	default:
@@ -350,7 +350,7 @@ func PhpStreamUrlWrapRfc2397(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types2.String,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var stream *core.PhpStream
@@ -364,9 +364,9 @@ func PhpStreamUrlWrapRfc2397(
 	var vlen int
 	var ilen int
 	var newoffs zend.ZendOffT
-	var meta types2.Zval
+	var meta types.Zval
 	var base64 int = 0
-	var base64_comma *types2.String = nil
+	var base64_comma *types.String = nil
 	meta.SetNull()
 	if memcmp(path, "data:", 5) {
 		return nil
@@ -457,7 +457,7 @@ func PhpStreamUrlWrapRfc2397(
 	dlen--
 	if base64 != 0 {
 		if ret, ok := standard.PhpBase64DecodeEx(b.CastStr(comma, dlen), true); ok {
-			base64_comma = types2.NewString(ret)
+			base64_comma = types.NewString(ret)
 		} else {
 			// zend.ZvalPtrDtor(&meta)
 			PhpStreamWrapperLogError(wrapper, options, "rfc2397: unable to decode")
@@ -493,7 +493,7 @@ func PhpStreamUrlWrapRfc2397(
 		} else {
 			ts.SetMode(0)
 		}
-		types2.ZVAL_COPY_VALUE(ts.GetMeta(), &meta)
+		types.ZVAL_COPY_VALUE(ts.GetMeta(), &meta)
 	}
 	if base64_comma != nil {
 		//types.ZendStringFree(base64_comma)

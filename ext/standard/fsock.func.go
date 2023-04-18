@@ -4,18 +4,18 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types2.Zval, persistent int) {
+func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Zval, persistent int) {
 	var host *byte
 	var host_len int
 	var port zend.ZendLong = -1
-	var zerrno *types2.Zval = nil
-	var zerrstr *types2.Zval = nil
+	var zerrno *types.Zval = nil
+	var zerrstr *types.Zval = nil
 	var timeout float64 = float64(FG__().default_socket_timeout)
 	var conv int64
 	var tv __struct__timeval
@@ -24,7 +24,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types2.
 	var err int
 	var hostname *byte = nil
 	var hostname_len int
-	var errstr *types2.String = nil
+	var errstr *types.String = nil
 	return_value.SetFalse()
 	for {
 		for {
@@ -93,9 +93,9 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types2.
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifFsockopen(executeData zpp.Ex, return_value zpp.Ret, hostname *types2.Zval, _ zpp.Opt, port *types2.Zval, errno zpp.RefZval, errstr zpp.RefZval, timeout *types2.Zval) {
+func ZifFsockopen(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval, _ zpp.Opt, port *types.Zval, errno zpp.RefZval, errstr zpp.RefZval, timeout *types.Zval) {
 	PhpFsockopenStream(executeData, return_value, 0)
 }
-func ZifPfsockopen(executeData zpp.Ex, return_value zpp.Ret, hostname *types2.Zval, _ zpp.Opt, port *types2.Zval, errno zpp.RefZval, errstr zpp.RefZval, timeout *types2.Zval) {
+func ZifPfsockopen(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval, _ zpp.Opt, port *types.Zval, errno zpp.RefZval, errstr zpp.RefZval, timeout *types.Zval) {
 	PhpFsockopenStream(executeData, return_value, 1)
 }

@@ -3,16 +3,16 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func PhpPack(val *types2.Zval, size int, map_ *int, output *byte) {
+func PhpPack(val *types.Zval, size int, map_ *int, output *byte) {
 	var i int
 	var v *byte
-	if val.GetType() != types2.IS_LONG {
+	if val.GetType() != types.IS_LONG {
 		zend.ConvertToLong(val)
 	}
 	v = (*byte)(&(val.Long()))
@@ -83,8 +83,8 @@ func PhpPackParseDouble(is_little_endian int, src any) float64 {
 	}
 	return m.d
 }
-func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types2.Zval, _ zpp.Opt, args []*types2.Zval) {
-	var argv *types2.Zval = nil
+func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp.Opt, args []*types.Zval) {
+	var argv *types.Zval = nil
 	var num_args int = 0
 	var i int
 	var currentarg int
@@ -95,7 +95,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types2.Zval, _ zp
 	var formatcount int = 0
 	var outputpos int = 0
 	var outputsize int = 0
-	var output *types2.String
+	var output *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -393,7 +393,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types2.Zval, _ zp
 			outputsize = outputpos
 		}
 	}
-	output = types2.ZendStringAlloc(outputsize, 0)
+	output = types.ZendStringAlloc(outputsize, 0)
 	outputpos = 0
 	currentarg = 0
 
@@ -409,8 +409,8 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types2.Zval, _ zp
 			fallthrough
 		case 'Z':
 			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return b.Max(0, arg-1) })
-			var tmp_str *types2.String
-			var str *types2.String = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
+			var tmp_str *types.String
+			var str *types.String = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
 			memset(&output.GetStr()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
 			memcpy(&output.GetStr()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
@@ -420,8 +420,8 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types2.Zval, _ zp
 		case 'H':
 			var nibbleshift int = b.Cond(code == 'h', 0, 4)
 			var first int = 1
-			var tmp_str *types2.String
-			var str *types2.String = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
+			var tmp_str *types.String
+			var str *types.String = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
 			var v *byte = str.GetVal()
 			outputpos--
 			if int(arg > str.GetLen()) != 0 {
@@ -600,11 +600,11 @@ func PhpUnpack(data *byte, size int, issigned int, map_ *int) zend.ZendLong {
 	}
 	return result
 }
-func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types2.Zval, input *types2.Zval, _ zpp.Opt, offset *types2.Zval) {
+func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, input *types.Zval, _ zpp.Opt, offset *types.Zval) {
 	var format *byte
 	var input *byte
-	var formatarg *types2.String
-	var inputarg *types2.String
+	var formatarg *types.String
+	var inputarg *types.String
 	var formatlen zend.ZendLong
 	var inputpos zend.ZendLong
 	var inputlen zend.ZendLong
@@ -860,7 +860,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types2.Zval, in
 					var len_ zend.ZendLong = (inputlen - inputpos) * 2
 					var nibbleshift int = b.Cond(type_ == 'h', 0, 4)
 					var first int = 1
-					var buf *types2.String
+					var buf *types.String
 					var ipos zend.ZendLong
 					var opos zend.ZendLong
 
@@ -872,7 +872,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types2.Zval, in
 					if len_ > 0 && argb > 0 {
 						len_ -= argb % 2
 					}
-					buf = types2.ZendStringAlloc(len_, 0)
+					buf = types.ZendStringAlloc(len_, 0)
 					opos = 0
 					ipos = opos
 					for ; opos < len_; opos++ {
@@ -1165,5 +1165,5 @@ func ZmStartupPack(type_ int, module_number int) int {
 		LittleEndianLonglongMap[6] = size - 7
 		LittleEndianLonglongMap[7] = size - 8
 	}
-	return types2.SUCCESS
+	return types.SUCCESS
 }

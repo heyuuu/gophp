@@ -1,7 +1,7 @@
 package spl
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -77,10 +77,10 @@ func (this *SplPtrHeap) SetIsHeapCorrupted(cond bool) { this.SwitchFlags(SPL_HEA
 type SplHeapObject struct {
 	heap            *SplPtrHeap
 	flags           int
-	ce_get_iterator *types2.ClassEntry
-	fptr_cmp        types2.IFunction
-	fptr_count      types2.IFunction
-	std             types2.ZendObject
+	ce_get_iterator *types.ClassEntry
+	fptr_cmp        types.IFunction
+	fptr_count      types.IFunction
+	std             types.ZendObject
 }
 
 //             func MakeSplHeapObject(
@@ -100,17 +100,17 @@ type SplHeapObject struct {
 //                     std:std,
 //                 }
 //             }
-func (this *SplHeapObject) GetHeap() *SplPtrHeap                      { return this.heap }
-func (this *SplHeapObject) SetHeap(value *SplPtrHeap)                 { this.heap = value }
-func (this *SplHeapObject) GetFlags() int                             { return this.flags }
-func (this *SplHeapObject) SetFlags(value int)                        { this.flags = value }
-func (this *SplHeapObject) GetCeGetIterator() *types2.ClassEntry      { return this.ce_get_iterator }
-func (this *SplHeapObject) SetCeGetIterator(value *types2.ClassEntry) { this.ce_get_iterator = value }
-func (this *SplHeapObject) GetFptrCmp() types2.IFunction              { return this.fptr_cmp }
-func (this *SplHeapObject) SetFptrCmp(value types2.IFunction)         { this.fptr_cmp = value }
-func (this *SplHeapObject) GetFptrCount() types2.IFunction            { return this.fptr_count }
-func (this *SplHeapObject) SetFptrCount(value types2.IFunction)       { this.fptr_count = value }
-func (this *SplHeapObject) GetStd() types2.ZendObject                 { return this.std }
+func (this *SplHeapObject) GetHeap() *SplPtrHeap                     { return this.heap }
+func (this *SplHeapObject) SetHeap(value *SplPtrHeap)                { this.heap = value }
+func (this *SplHeapObject) GetFlags() int                            { return this.flags }
+func (this *SplHeapObject) SetFlags(value int)                       { this.flags = value }
+func (this *SplHeapObject) GetCeGetIterator() *types.ClassEntry      { return this.ce_get_iterator }
+func (this *SplHeapObject) SetCeGetIterator(value *types.ClassEntry) { this.ce_get_iterator = value }
+func (this *SplHeapObject) GetFptrCmp() types.IFunction              { return this.fptr_cmp }
+func (this *SplHeapObject) SetFptrCmp(value types.IFunction)         { this.fptr_cmp = value }
+func (this *SplHeapObject) GetFptrCount() types.IFunction            { return this.fptr_count }
+func (this *SplHeapObject) SetFptrCount(value types.IFunction)       { this.fptr_count = value }
+func (this *SplHeapObject) GetStd() types.ZendObject                 { return this.std }
 
 // func (this *SplHeapObject) SetStd(value zend.ZendObject) { this.std = value }
 
@@ -162,8 +162,8 @@ func (this *SplHeapIt) SwitchFlags(value int, cond bool) {
  * SplPqueueElem
  */
 type SplPqueueElem struct {
-	data     types2.Zval
-	priority types2.Zval
+	data     types.Zval
+	priority types.Zval
 }
 
 // func MakeSplPqueueElem(data zend.Zval, priority zend.Zval) SplPqueueElem {
@@ -172,9 +172,9 @@ type SplPqueueElem struct {
 //         priority:priority,
 //     }
 // }
-func (this *SplPqueueElem) GetData() types2.Zval { return this.data }
+func (this *SplPqueueElem) GetData() types.Zval { return this.data }
 
 // func (this *SplPqueueElem) SetData(value zend.Zval) { this.data = value }
-func (this *SplPqueueElem) GetPriority() types2.Zval { return this.priority }
+func (this *SplPqueueElem) GetPriority() types.Zval { return this.priority }
 
 // func (this *SplPqueueElem) SetPriority(value zend.Zval) { this.priority = value }
