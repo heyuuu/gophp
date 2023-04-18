@@ -207,7 +207,7 @@ var DefZifCurrent = def.DefFunc("current", 1, 1, []def.ArgInfo{{Name: "arg"}}, f
 	if fp.HasError() {
 		return
 	}
-	ZifCurrent(executeData, returnValue, arg)
+	ZifCurrent(arg)
 })
 
 // generate by ZifCurrent
@@ -217,7 +217,7 @@ var DefZifPos = def.DefFunc("pos", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(exec
 	if fp.HasError() {
 		return
 	}
-	ZifCurrent(executeData, returnValue, arg)
+	ZifCurrent(arg)
 })
 
 // generate by ZifKey

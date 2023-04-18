@@ -110,24 +110,26 @@ func ZendHashMoveBackwardsEx(ht *Array, pos *ArrayPosition) int {
 	return FAILURE
 }
 
-func ZendHashGetCurrentKey(ht *Array, str_index **String, num_index *zend.ZendUlong) int {
-	return ZendHashGetCurrentKeyEx(ht, str_index, num_index, ht.GetNInternalPointer())
+func (ht *Array) Current(indirect bool) (ArrayKey, *Zval, bool) {
+	return ht.CurrentEx(ht.internalPointer, indirect)
 }
-func ZendHashGetCurrentKeyEx(ht *Array, str_index **String, num_index *zend.ZendUlong, pos *ArrayPosition) int {
-	var idx uint32
-	var p *Bucket
-	idx = ht.validPosVal(*pos)
-	if idx < ht.GetNNumUsed() {
-		p = ht.Bucket(idx)
-		if p.IsStrKey() {
-			*str_index = p.GetKey()
-			return HASH_KEY_IS_STRING
-		} else {
-			*num_index = p.GetH()
-			return HASH_KEY_IS_LONG
-		}
+
+func (ht *Array) CurrentEx(pos uint32, indirect bool) (ArrayKey, *Zval, bool) {
+	realPos, ok := ht.validPosEx(pos, indirect)
+	if ok {
+		p := ht.Bucket(realPos)
+		return p.GetArrayKey(), p.GetVal(), true
+	} else {
+		return ArrayKey{}, nil, false
 	}
-	return HASH_KEY_NON_EXISTENT
+}
+
+func ZendHashGetCurrentKeyExEx(ht *Array, pos ArrayPosition) *ArrayKey {
+	key, _, ok := ht.CurrentEx(pos, false)
+	if ok {
+		return &key
+	}
+	return nil
 }
 
 func ZendHashGetCurrentKeyZval(ht *Array, key *Zval) {
@@ -153,15 +155,11 @@ func ZendHashGetCurrentData(ht *Array) *Zval {
 	return ZendHashGetCurrentDataEx(ht, ht.GetNInternalPointer())
 }
 func ZendHashGetCurrentDataEx(ht *Array, pos *ArrayPosition) *Zval {
-	var idx uint32
-	var p *Bucket
-	idx = ht.validPosVal(*pos)
-	if idx < ht.GetNNumUsed() {
-		p = ht.Bucket(idx)
-		return p.GetVal()
-	} else {
+	_, val, ok := ht.CurrentEx(*pos, false)
+	if !ok {
 		return nil
 	}
+	return val
 }
 
 func ZendHashInternalPointerReset(ht *Array) {

@@ -766,28 +766,16 @@ func ZifReset(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval) {
 }
 
 //@zif -alias pos
-func ZifCurrent(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
-	var array *types.Array
-	var entry *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			array = fp.ParseArrayOrObjectHt()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifCurrent(arg zpp.ArrayOrObjectHt) (*types.Zval, bool) {
+	_, val, ok := arg.Current(false)
+	if !ok {
+		return nil, false
 	}
-	if b.Assign(&entry, types.ZendHashGetCurrentData(array)) == nil {
-		return_value.SetFalse()
-		return
+
+	if val.IsIndirect() {
+		val = val.Indirect()
 	}
-	if entry.IsIndirect() {
-		entry = entry.Indirect()
-	}
-	types.ZVAL_COPY_DEREF(return_value, entry)
+	return val.DeRef(), true
 }
 func ZifKey(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
 	var array *types.Array

@@ -1,7 +1,7 @@
 package zpp
 
 import (
-	types2 "github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -11,7 +11,7 @@ import (
 type (
 	/* special */
 	Ex  = *zend.ZendExecuteData
-	Ret = *types2.Zval
+	Ret = *types.Zval
 
 	// FAST_ZPP: Z_PARAM_OPTIONAL
 	Opt any
@@ -37,36 +37,36 @@ type (
 	Path = string
 
 	// FAST_ZPP: Z_PARAM_ARRAY_HT, Type: 'h'，直接使用	 *types.Array
-	ArrayHt = *types2.Array
+	ArrayHt = *types.Array
 
 	// FAST_ZPP: Z_PARAM_ARRAY_OR_OBJECT_HT, Type: 'H'
-	ArrayOrObjectHt = *types2.Array
+	ArrayOrObjectHt = *types.Array
 
 	// FAST_ZPP: Z_PARAM_ARRAY, Type: 'a'
-	Array = *types2.Zval
+	Array = *types.Zval
 
 	// FAST_ZPP: Z_PARAM_ARRAY_OR_OBJECT, Type: 'A'
-	ArrayOrObject = *types2.Zval
+	ArrayOrObject = *types.Zval
 
 	// FAST_ZPP: Z_PARAM_CLASS, Type: 'C'
-	Class = *types2.ClassEntry
+	Class = *types.ClassEntry
 
 	// FAST_ZPP: Z_PARAM_OBJECT, Type: 'o'
-	Object = *types2.Zval
+	Object = *types.Zval
 
 	// FAST_ZPP: Z_PARAM_RESOURCE, Type: 'r'
-	Resource = *types2.Zval
+	Resource = *types.Zval
 
 	// FAST_ZPP: Z_PARAM_ZVAL, Type: 'z', 直接使用 *types.Zval
 	//Zval = *types.Zval
 
 	// FAST_ZPP: Z_PARAM_ZVAL_DEREF, Type: ''
-	ZvalDeref = *types2.Zval
+	ZvalDeref = *types.Zval
 
 	// FAST_ZPP: Z_PARAM_VARIADIC, Type: '*' or '+', 直接使用 []*types.Zval
 	//Variadic = []*types.Zval
 
 	/* ref type */
-	RefZval  = *types2.Zval //
-	RefArray = *types2.Zval // fp.ParseArrayEx(false, true)
+	RefZval  = *types.Zval //
+	RefArray = *types.Zval // fp.ParseArrayEx(false, true)
 )

@@ -564,28 +564,39 @@ func (ht *Array) applyValidBucketReserve(apply_func func(p *Bucket) int) {
 /**
  * Iterator & Pos
  */
+// 查找从当前 pos 开始第一个有效 pos(含当前pos)
+func (ht *Array) validPosEx(pos uint32, indirect bool) (uint32, bool) {
+	dataSize := uint32(len(ht.data))
+	for i := pos; i < dataSize; i++ {
+		val := ht.data[i].GetVal()
+		if indirect && val.IsIndirect() {
+			val = val.Indirect()
+		}
+		if val.IsUndef() {
+			continue
+		}
+		return i, true
+	}
+	// 没有有效pos，此时 pos == ht.DataSize()
+	return pos, false
+}
+
 func (ht *Array) currentPos() (uint32, bool) {
-	return ht.validPos(ht.internalPointer)
+	return ht.validPosEx(ht.internalPointer, false)
 }
 
 func (ht *Array) currentPosVal() uint32 {
-	var pos, _ = ht.currentPos()
-	return pos
-}
-func (ht *Array) validPosVal(pos uint32) uint32 {
-	pos, _ = ht.validPos(pos)
+	var pos, _ = ht.validPosEx(ht.internalPointer, false)
 	return pos
 }
 
 func (ht *Array) validPos(pos uint32) (uint32, bool) {
-	dataSize := uint32(len(ht.data))
-	for i := pos; i < dataSize; i++ {
-		if ht.data[i].IsValid() {
-			return i, true
-		}
-	}
-	// 没有有效pos，此时 pos == ht.DataSize()
-	return pos, false
+	return ht.validPosEx(pos, false)
+}
+
+func (ht *Array) validPosVal(pos uint32) uint32 {
+	pos, _ = ht.validPosEx(pos, false)
+	return pos
 }
 
 /**
