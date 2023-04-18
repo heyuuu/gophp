@@ -211,7 +211,7 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
 			return nil
 		}
 		if (*(*p)) != '\\' {
-			str.GetVal()[i] = byte(*(*p))
+			str.GetStr()[i] = byte(*(*p))
 		} else {
 			var ch uint8 = 0
 			for j = 0; j < 2; j++ {
@@ -227,11 +227,11 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
 					return nil
 				}
 			}
-			str.GetVal()[i] = byte(ch)
+			str.GetStr()[i] = byte(ch)
 		}
 		*p++
 	}
-	str.GetVal()[i] = 0
+	str.GetStr()[i] = 0
 	str.SetLen(i)
 	return str
 }

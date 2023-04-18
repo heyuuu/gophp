@@ -748,7 +748,7 @@ func SplArraySkipProtected(intern *SplArrayObject, aht *types.Array) int {
 				data = types.ZendHashGetCurrentDataEx(aht, pos_ptr)
 				if data != nil && data.IsIndirect() && b.Assign(&data, data.Indirect()).GetType() == types.IS_UNDEF {
 
-				} else if string_key.GetLen() == 0 || string_key.GetVal()[0] {
+				} else if string_key.GetLen() == 0 || string_key.GetStr()[0] {
 					return types.SUCCESS
 				}
 			} else {
@@ -1040,7 +1040,7 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 				if types.Z_INDIRECT_P(val).IsUndef() {
 					continue
 				}
-				if key != nil && key.GetVal()[0] == '0' {
+				if key != nil && key.GetStr()[0] == '0' {
 					continue
 				}
 			}

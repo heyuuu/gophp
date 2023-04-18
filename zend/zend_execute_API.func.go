@@ -622,7 +622,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 		if name == nil || name.GetLen() == 0 {
 			return nil
 		}
-		if name.GetVal()[0] == '\\' {
+		if name.GetStr()[0] == '\\' {
 			lc_name = types.ZendStringAlloc(name.GetLen()-1, 0)
 			ZendStrTolowerCopy(lc_name.GetVal(), name.GetVal()+1, name.GetLen()-1)
 		} else {
@@ -680,7 +680,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 		return nil
 	}
 	local_retval.SetUndef()
-	if name.GetVal()[0] == '\\' {
+	if name.GetStr()[0] == '\\' {
 		args[0].SetStringVal(b.CastStr(name.GetVal()+1, name.GetLen()-1))
 	} else {
 		args[0].SetStringCopy(name)
@@ -751,8 +751,8 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 		pv.SetString(types.ZendStringAlloc(str_len+b.SizeOf("\"return ;\"")-1, 0))
 		memcpy(pv.String().GetVal(), "return ", b.SizeOf("\"return \"")-1)
 		memcpy(pv.String().GetVal()+b.SizeOf("\"return \"")-1, str, str_len)
-		pv.String().GetVal()[pv.String().GetLen()-1] = ';'
-		pv.String().GetVal()[pv.String().GetLen()] = '0'
+		pv.String().GetStr()[pv.String().GetLen()-1] = ';'
+		pv.String().GetStr()[pv.String().GetLen()] = '0'
 	} else {
 		/*printf("Evaluating '%s'\n", pv.value.str.val);*/
 		pv.SetStringVal(b.CastStr(str, str_len))

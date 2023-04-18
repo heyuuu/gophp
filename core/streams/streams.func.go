@@ -123,7 +123,7 @@ func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *types.String {
 		return nil
 	}
 	str.SetLen(read)
-	str.GetVal()[read] = 0
+	str.GetStr()[read] = 0
 	if int(read < len_/2) != 0 {
 		return types.ZendStringTruncate(str, read)
 	}
@@ -281,7 +281,7 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 		stream.SetReadpos(stream.GetReadpos() + delim_len)
 		stream.SetPosition(stream.GetPosition() + delim_len)
 	}
-	ret_buf.GetVal()[ret_buf.GetLen()] = '0'
+	ret_buf.GetStr()[ret_buf.GetLen()] = '0'
 	return ret_buf
 }
 func PhpStreamWrapperSchemeValidate(protocol string) bool {

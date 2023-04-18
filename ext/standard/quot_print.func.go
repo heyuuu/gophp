@@ -175,7 +175,7 @@ func ZifQuotedPrintableDecode(executeData zpp.Ex, return_value zpp.Ret, str *typ
 		switch str_in[i] {
 		case '=':
 			if str_in[i+1] && str_in[i+2] && isxdigit(int(str_in[i+1])) && isxdigit(int(str_in[i+2])) {
-				str_out.GetVal()[b.PostInc(&j)] = (PhpHex2int(int(str_in[i+1])) << 4) + PhpHex2int(int(str_in[i+2]))
+				str_out.GetStr()[b.PostInc(&j)] = (PhpHex2int(int(str_in[i+1])) << 4) + PhpHex2int(int(str_in[i+2]))
 				i += 3
 			} else {
 				k = 1
@@ -213,14 +213,14 @@ func ZifQuotedPrintableDecode(executeData zpp.Ex, return_value zpp.Ret, str *typ
 					/* CR or LF */
 
 				} else {
-					str_out.GetVal()[b.PostInc(&j)] = str_in[b.PostInc(&i)]
+					str_out.GetStr()[b.PostInc(&j)] = str_in[b.PostInc(&i)]
 				}
 			}
 		default:
-			str_out.GetVal()[b.PostInc(&j)] = str_in[b.PostInc(&i)]
+			str_out.GetStr()[b.PostInc(&j)] = str_in[b.PostInc(&i)]
 		}
 	}
-	str_out.GetVal()[j] = '0'
+	str_out.GetStr()[j] = '0'
 	str_out.SetLen(j)
 	return_value.SetString(str_out)
 }

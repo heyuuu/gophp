@@ -67,7 +67,7 @@ func ZendRegisterInternalModule(module *ModuleEntry) *ModuleEntry {
 func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFunction, error_type int) {
 	var lcname []byte
 	var name_len int
-	if fptr.GetFunctionName().GetVal()[0] != '_' || fptr.GetFunctionName().GetVal()[1] != '_' {
+	if fptr.GetFunctionName().GetStr()[0] != '_' || fptr.GetFunctionName().GetStr()[1] != '_' {
 		return
 	}
 
@@ -325,7 +325,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 				serialize_func = reg_function
 			} else if lowercase_name.GetStr() == "unserialize" {
 				unserialize_func = reg_function
-			} else if lowercase_name.GetVal()[0] != '_' || lowercase_name.GetVal()[1] != '_' {
+			} else if lowercase_name.GetStr()[0] != '_' || lowercase_name.GetStr()[1] != '_' {
 				reg_function = nil
 			} else if lowercase_name.GetStr() == ZEND_CONSTRUCTOR_FUNC_NAME {
 				ctor = reg_function

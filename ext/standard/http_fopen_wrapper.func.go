@@ -110,7 +110,7 @@ func PhpStreamUrlWrapHttpEx(
 			PhpUrlFree(resource)
 			return nil
 		}
-		use_ssl = resource.GetScheme() != nil && resource.GetScheme().GetLen() > 4 && resource.GetScheme().GetVal()[4] == 's'
+		use_ssl = resource.GetScheme() != nil && resource.GetScheme().GetLen() > 4 && resource.GetScheme().GetStr()[4] == 's'
 
 		/* choose default ports */
 
@@ -810,7 +810,7 @@ func PhpStreamUrlWrapHttpEx(
 							}
 						}
 						s[1] = '0'
-						if resource.GetPath() != nil && resource.GetPath().GetVal()[0] == '/' && resource.GetPath().GetVal()[1] == '0' {
+						if resource.GetPath() != nil && resource.GetPath().GetStr()[0] == '/' && resource.GetPath().GetStr()[1] == '0' {
 							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s%s", resource.GetPath().GetVal(), location)
 						} else {
 							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s/%s", resource.GetPath().GetVal(), location)

@@ -12,7 +12,12 @@ var DefZifAbs = def.DefFunc("abs", 1, 1, []def.ArgInfo{{Name: "number"}}, func(e
 	if fp.HasError() {
 		return
 	}
-	ZifAbs(executeData, returnValue, number)
+	ret, ok := ZifAbs(number)
+	if ok {
+		returnValue.SetBy(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifCeil
@@ -22,7 +27,12 @@ var DefZifCeil = def.DefFunc("ceil", 1, 1, []def.ArgInfo{{Name: "number"}}, func
 	if fp.HasError() {
 		return
 	}
-	ZifCeil(executeData, returnValue, number)
+	ret, ok := ZifCeil(number)
+	if ok {
+		returnValue.SetDouble(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifFloor
@@ -32,7 +42,12 @@ var DefZifFloor = def.DefFunc("floor", 1, 1, []def.ArgInfo{{Name: "number"}}, fu
 	if fp.HasError() {
 		return
 	}
-	ZifFloor(executeData, returnValue, number)
+	ret, ok := ZifFloor(number)
+	if ok {
+		returnValue.SetDouble(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifRound
@@ -45,7 +60,7 @@ var DefZifRound = def.DefFunc("round", 1, 3, []def.ArgInfo{{Name: "number"}, {Na
 	if fp.HasError() {
 		return
 	}
-	ZifRound(executeData, returnValue, number, nil, precision, mode)
+	ZifRound(number, nil, precision, mode)
 })
 
 // generate by ZifSin
@@ -55,7 +70,7 @@ var DefZifSin = def.DefFunc("sin", 1, 1, []def.ArgInfo{{Name: "number"}}, func(e
 	if fp.HasError() {
 		return
 	}
-	ZifSin(executeData, returnValue, number)
+	ZifSin(number)
 })
 
 // generate by ZifCos
@@ -116,7 +131,7 @@ var DefZifAtan2 = def.DefFunc("atan2", 2, 2, []def.ArgInfo{{Name: "y"}, {Name: "
 	if fp.HasError() {
 		return
 	}
-	ZifAtan2(executeData, returnValue, y, x)
+	ZifAtan2(y, x)
 })
 
 // generate by ZifSinh
@@ -126,7 +141,7 @@ var DefZifSinh = def.DefFunc("sinh", 1, 1, []def.ArgInfo{{Name: "number"}}, func
 	if fp.HasError() {
 		return
 	}
-	ZifSinh(executeData, returnValue, number)
+	ZifSinh(number)
 })
 
 // generate by ZifCosh
@@ -184,7 +199,7 @@ var DefZifPi = def.DefFunc("pi", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex,
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifPi(executeData, returnValue)
+	ZifPi()
 })
 
 // generate by ZifIsFinite
@@ -194,7 +209,7 @@ var DefZifIsFinite = def.DefFunc("is_finite", 1, 1, []def.ArgInfo{{Name: "val"}}
 	if fp.HasError() {
 		return
 	}
-	ZifIsFinite(executeData, returnValue, val)
+	ZifIsFinite(val)
 })
 
 // generate by ZifIsInfinite
@@ -204,7 +219,7 @@ var DefZifIsInfinite = def.DefFunc("is_infinite", 1, 1, []def.ArgInfo{{Name: "va
 	if fp.HasError() {
 		return
 	}
-	ZifIsInfinite(executeData, returnValue, val)
+	ZifIsInfinite(val)
 })
 
 // generate by ZifIsNan
@@ -214,7 +229,7 @@ var DefZifIsNan = def.DefFunc("is_nan", 1, 1, []def.ArgInfo{{Name: "val"}}, func
 	if fp.HasError() {
 		return
 	}
-	ZifIsNan(executeData, returnValue, val)
+	ZifIsNan(val)
 })
 
 // generate by ZifPow
@@ -225,7 +240,7 @@ var DefZifPow = def.DefFunc("pow", 2, 2, []def.ArgInfo{{Name: "base"}, {Name: "e
 	if fp.HasError() {
 		return
 	}
-	ZifPow(executeData, returnValue, base, exponent)
+	ZifPow(returnValue, base, exponent)
 })
 
 // generate by ZifExp
@@ -235,7 +250,7 @@ var DefZifExp = def.DefFunc("exp", 1, 1, []def.ArgInfo{{Name: "number"}}, func(e
 	if fp.HasError() {
 		return
 	}
-	ZifExp(executeData, returnValue, number)
+	ZifExp(number)
 })
 
 // generate by ZifExpm1
@@ -245,7 +260,7 @@ var DefZifExpm1 = def.DefFunc("expm1", 1, 1, []def.ArgInfo{{Name: "number"}}, fu
 	if fp.HasError() {
 		return
 	}
-	ZifExpm1(executeData, returnValue, number)
+	ZifExpm1(number)
 })
 
 // generate by ZifLog1p
@@ -255,7 +270,7 @@ var DefZifLog1p = def.DefFunc("log1p", 1, 1, []def.ArgInfo{{Name: "number"}}, fu
 	if fp.HasError() {
 		return
 	}
-	ZifLog1p(executeData, returnValue, number)
+	ZifLog1p(number)
 })
 
 // generate by ZifLog
@@ -267,7 +282,7 @@ var DefZifLog = def.DefFunc("log", 1, 2, []def.ArgInfo{{Name: "number"}, {Name: 
 	if fp.HasError() {
 		return
 	}
-	ZifLog(executeData, returnValue, number, nil, base)
+	ZifLog(number, nil, base)
 })
 
 // generate by ZifLog10
@@ -277,7 +292,7 @@ var DefZifLog10 = def.DefFunc("log10", 1, 1, []def.ArgInfo{{Name: "number"}}, fu
 	if fp.HasError() {
 		return
 	}
-	ZifLog10(executeData, returnValue, number)
+	ZifLog10(number)
 })
 
 // generate by ZifSqrt
@@ -287,7 +302,7 @@ var DefZifSqrt = def.DefFunc("sqrt", 1, 1, []def.ArgInfo{{Name: "number"}}, func
 	if fp.HasError() {
 		return
 	}
-	ZifSqrt(executeData, returnValue, number)
+	ZifSqrt(number)
 })
 
 // generate by ZifHypot
@@ -298,7 +313,7 @@ var DefZifHypot = def.DefFunc("hypot", 2, 2, []def.ArgInfo{{Name: "num1"}, {Name
 	if fp.HasError() {
 		return
 	}
-	ZifHypot(executeData, returnValue, num1, num2)
+	ZifHypot(num1, num2)
 })
 
 // generate by ZifDeg2rad
@@ -308,7 +323,7 @@ var DefZifDeg2rad = def.DefFunc("deg2rad", 1, 1, []def.ArgInfo{{Name: "number"}}
 	if fp.HasError() {
 		return
 	}
-	ZifDeg2rad(executeData, returnValue, number)
+	ZifDeg2rad(number)
 })
 
 // generate by ZifRad2deg
@@ -318,7 +333,7 @@ var DefZifRad2deg = def.DefFunc("rad2deg", 1, 1, []def.ArgInfo{{Name: "number"}}
 	if fp.HasError() {
 		return
 	}
-	ZifRad2deg(executeData, returnValue, number)
+	ZifRad2deg(number)
 })
 
 // generate by ZifBindec
@@ -328,7 +343,7 @@ var DefZifBindec = def.DefFunc("bindec", 1, 1, []def.ArgInfo{{Name: "binary_numb
 	if fp.HasError() {
 		return
 	}
-	ZifBindec(executeData, returnValue, binary_number)
+	ZifBindec(binary_number)
 })
 
 // generate by ZifHexdec
@@ -338,7 +353,7 @@ var DefZifHexdec = def.DefFunc("hexdec", 1, 1, []def.ArgInfo{{Name: "hexadecimal
 	if fp.HasError() {
 		return
 	}
-	ZifHexdec(executeData, returnValue, hexadecimal_number)
+	ZifHexdec(hexadecimal_number)
 })
 
 // generate by ZifOctdec
@@ -348,7 +363,7 @@ var DefZifOctdec = def.DefFunc("octdec", 1, 1, []def.ArgInfo{{Name: "octal_numbe
 	if fp.HasError() {
 		return
 	}
-	ZifOctdec(executeData, returnValue, octal_number)
+	ZifOctdec(octal_number)
 })
 
 // generate by ZifDecbin
@@ -358,7 +373,7 @@ var DefZifDecbin = def.DefFunc("decbin", 1, 1, []def.ArgInfo{{Name: "decimal_num
 	if fp.HasError() {
 		return
 	}
-	ZifDecbin(executeData, returnValue, decimal_number)
+	ZifDecbin(decimal_number)
 })
 
 // generate by ZifDecoct
@@ -368,7 +383,7 @@ var DefZifDecoct = def.DefFunc("decoct", 1, 1, []def.ArgInfo{{Name: "decimal_num
 	if fp.HasError() {
 		return
 	}
-	ZifDecoct(executeData, returnValue, decimal_number)
+	ZifDecoct(decimal_number)
 })
 
 // generate by ZifDechex
@@ -378,7 +393,7 @@ var DefZifDechex = def.DefFunc("dechex", 1, 1, []def.ArgInfo{{Name: "decimal_num
 	if fp.HasError() {
 		return
 	}
-	ZifDechex(executeData, returnValue, decimal_number)
+	ZifDechex(decimal_number)
 })
 
 // generate by ZifBaseConvert
@@ -390,21 +405,22 @@ var DefZifBaseConvert = def.DefFunc("base_convert", 3, 3, []def.ArgInfo{{Name: "
 	if fp.HasError() {
 		return
 	}
-	ZifBaseConvert(executeData, returnValue, number, frombase, tobase)
+	ZifBaseConvert(number, frombase, tobase)
 })
 
 // generate by ZifNumberFormat
-var DefZifNumberFormat = def.DefFunc("number_format", 1, 4, []def.ArgInfo{{Name: "number"}, {Name: "num_decimal_places"}, {Name: "dec_separator"}, {Name: "thousands_separator"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifNumberFormat = def.DefFunc("number_format", 1, 4, []def.ArgInfo{{Name: "number"}, {Name: "num_decimal_places"}, {Name: "dec_separator_"}, {Name: "thousands_separator"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
-	number := fp.ParseZval()
+	number := fp.ParseDouble()
 	fp.StartOptional()
-	num_decimal_places := fp.ParseZval()
-	dec_separator := fp.ParseZval()
-	thousands_separator := fp.ParseZval()
+	num_decimal_places := fp.ParseLong()
+	dec_separator_ := fp.ParseStringValNullable()
+	thousands_separator := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifNumberFormat(executeData, returnValue, number, nil, num_decimal_places, dec_separator, thousands_separator)
+	ret := ZifNumberFormat(number, nil, num_decimal_places, dec_separator_, thousands_separator)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifFmod
@@ -415,7 +431,7 @@ var DefZifFmod = def.DefFunc("fmod", 2, 2, []def.ArgInfo{{Name: "x"}, {Name: "y"
 	if fp.HasError() {
 		return
 	}
-	ZifFmod(executeData, returnValue, x, y)
+	ZifFmod(x, y)
 })
 
 // generate by ZifIntdiv
@@ -426,5 +442,5 @@ var DefZifIntdiv = def.DefFunc("intdiv", 2, 2, []def.ArgInfo{{Name: "dividend"},
 	if fp.HasError() {
 		return
 	}
-	ZifIntdiv(executeData, returnValue, dividend, divisor)
+	ZifIntdiv(dividend, divisor)
 })

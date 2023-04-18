@@ -288,7 +288,7 @@ var DefZifShowSource = def.DefFunc("show_source", 1, 2, []def.ArgInfo{{Name: "fi
 // generate by ZifPhpStripWhitespace
 var DefZifPhpStripWhitespace = def.DefFunc("php_strip_whitespace", 1, 1, []def.ArgInfo{{Name: "file_name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	file_name := fp.ParseZval()
+	file_name := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
@@ -323,15 +323,15 @@ var DefZifIniGet = def.DefFunc("ini_get", 1, 1, []def.ArgInfo{{Name: "varname"}}
 })
 
 // generate by ZifIniGetAll
-var DefZifIniGetAll = def.DefFunc("ini_get_all", 0, 2, []def.ArgInfo{{Name: "extension"}, {Name: "details"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifIniGetAll = def.DefFunc("ini_get_all", 0, 2, []def.ArgInfo{{Name: "extension"}, {Name: "details_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
-	extension := fp.ParseZval()
-	details := fp.ParseZval()
+	extension := fp.ParseStringValNullable()
+	details_ := fp.ParseBoolValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifIniGetAll(executeData, returnValue, nil, extension, details)
+	ZifIniGetAll(returnValue, nil, extension, details_)
 })
 
 // generate by ZifIniSet
@@ -517,16 +517,16 @@ var DefZifMoveUploadedFile = def.DefFunc("move_uploaded_file", 2, 2, []def.ArgIn
 })
 
 // generate by ZifParseIniFile
-var DefZifParseIniFile = def.DefFunc("parse_ini_file", 1, 3, []def.ArgInfo{{Name: "filename"}, {Name: "process_sections"}, {Name: "scanner_mode"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifParseIniFile = def.DefFunc("parse_ini_file", 1, 3, []def.ArgInfo{{Name: "filename"}, {Name: "process_sections_"}, {Name: "scanner_mode"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
-	filename := fp.ParseZval()
+	filename := fp.ParseStringVal()
 	fp.StartOptional()
-	process_sections := fp.ParseZval()
+	process_sections_ := fp.ParseZval()
 	scanner_mode := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifParseIniFile(executeData, returnValue, filename, nil, process_sections, scanner_mode)
+	ZifParseIniFile(executeData, returnValue, filename, nil, process_sections_, scanner_mode)
 })
 
 // generate by ZifParseIniString

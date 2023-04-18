@@ -91,7 +91,7 @@ func ZifRandomBytes(executeData zpp.Ex, return_value zpp.Ret, length *types.Zval
 		// types.ZendStringReleaseEx(bytes, 0)
 		return
 	}
-	bytes.GetVal()[size] = '0'
+	bytes.GetStr()[size] = '0'
 	return_value.SetString(bytes)
 	return
 }

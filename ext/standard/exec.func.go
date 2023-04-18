@@ -230,9 +230,9 @@ func PhpEscapeShellCmd(str *byte) *types.String {
 			} else if p != nil && (*p) == str[x] {
 				p = nil
 			} else {
-				cmd.GetVal()[b.PostInc(&y)] = '\\'
+				cmd.GetStr()[b.PostInc(&y)] = '\\'
 			}
-			cmd.GetVal()[b.PostInc(&y)] = str[x]
+			cmd.GetStr()[b.PostInc(&y)] = str[x]
 		case '#':
 			fallthrough
 		case '&':
@@ -274,13 +274,13 @@ func PhpEscapeShellCmd(str *byte) *types.String {
 		case 'x':
 			fallthrough
 		case 'x':
-			cmd.GetVal()[b.PostInc(&y)] = '\\'
+			cmd.GetStr()[b.PostInc(&y)] = '\\'
 			fallthrough
 		default:
-			cmd.GetVal()[b.PostInc(&y)] = str[x]
+			cmd.GetStr()[b.PostInc(&y)] = str[x]
 		}
 	}
-	cmd.GetVal()[y] = '0'
+	cmd.GetStr()[y] = '0'
 	if y > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
 		// types.ZendStringReleaseEx(cmd, 0)
@@ -314,7 +314,7 @@ func PhpEscapeShellArg(str *byte) *types.String {
 		return types.NewString("")
 	}
 	cmd = types.ZendStringSafeAlloc(4, l, 2, 0)
-	cmd.GetVal()[b.PostInc(&y)] = '\''
+	cmd.GetStr()[b.PostInc(&y)] = '\''
 	for x = 0; x < l; x++ {
 		var mb_len int = PhpMblen(str+x, l-x)
 
@@ -330,16 +330,16 @@ func PhpEscapeShellArg(str *byte) *types.String {
 		}
 		switch str[x] {
 		case '\'':
-			cmd.GetVal()[b.PostInc(&y)] = '\''
-			cmd.GetVal()[b.PostInc(&y)] = '\\'
-			cmd.GetVal()[b.PostInc(&y)] = '\''
+			cmd.GetStr()[b.PostInc(&y)] = '\''
+			cmd.GetStr()[b.PostInc(&y)] = '\\'
+			cmd.GetStr()[b.PostInc(&y)] = '\''
 			fallthrough
 		default:
-			cmd.GetVal()[b.PostInc(&y)] = str[x]
+			cmd.GetStr()[b.PostInc(&y)] = str[x]
 		}
 	}
-	cmd.GetVal()[b.PostInc(&y)] = '\''
-	cmd.GetVal()[y] = '0'
+	cmd.GetStr()[b.PostInc(&y)] = '\''
+	cmd.GetStr()[y] = '0'
 	if y > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
 		// types.ZendStringReleaseEx(cmd, 0)

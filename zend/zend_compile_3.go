@@ -431,7 +431,7 @@ func ZendCompileFuncChr(result *Znode, args *ZendAstList) int {
 func ZendCompileFuncOrd(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0]).IsString() {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetLong(uint8(ZendAstGetZval(args.GetChild()[0]).String().GetVal()[0]))
+		result.GetConstant().SetLong(uint8(ZendAstGetZval(args.GetChild()[0]).String().GetStr()[0]))
 		return types.SUCCESS
 	} else {
 		return types.FAILURE

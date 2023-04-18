@@ -1157,7 +1157,7 @@ func PhpEscapeHtmlEntitiesEx(
 			if (flags & ENT_HTML_IGNORE_ERRORS) != 0 {
 				continue
 			} else if (flags & ENT_HTML_SUBSTITUTE_ERRORS) != 0 {
-				memcpy(&replaced.GetVal()[len_], replacement, replacement_len)
+				memcpy(&replaced.GetStr()[len_], replacement, replacement_len)
 				len_ += replacement_len
 				continue
 			} else {
@@ -1200,10 +1200,10 @@ func PhpEscapeHtmlEntitiesEx(
 				FindEntityForCharBasic(this_char, entity_table.GetTable(), &rep, &rep_len)
 			}
 			if rep != nil {
-				replaced.GetVal()[b.PostInc(&len_)] = '&'
-				memcpy(&replaced.GetVal()[len_], rep, rep_len)
+				replaced.GetStr()[b.PostInc(&len_)] = '&'
+				memcpy(&replaced.GetStr()[len_], rep, rep_len)
 				len_ += rep_len
-				replaced.GetVal()[b.PostInc(&len_)] = ';'
+				replaced.GetStr()[b.PostInc(&len_)] = ';'
 			} else {
 
 				/* we did not find an entity for this char.
@@ -1253,13 +1253,13 @@ func PhpEscapeHtmlEntitiesEx(
 					memcpy(replaced.GetVal()+len_, mbsequence, mbseqlen)
 					len_ += mbseqlen
 				} else {
-					replaced.GetVal()[b.PostInc(&len_)] = mbsequence[0]
+					replaced.GetStr()[b.PostInc(&len_)] = mbsequence[0]
 				}
 			}
 		} else {
 			if double_encode != 0 {
 			encode_amp:
-				memcpy(&replaced.GetVal()[len_], "&amp;", b.SizeOf("\"&amp;\"")-1)
+				memcpy(&replaced.GetStr()[len_], "&amp;", b.SizeOf("\"&amp;\"")-1)
 				len_ += b.SizeOf("\"&amp;\"") - 1
 			} else {
 
@@ -1318,15 +1318,15 @@ func PhpEscapeHtmlEntitiesEx(
 					replaced = types.ZendStringSafeRealloc(replaced, maxlen, 1, ent_len+128, 0)
 					maxlen += ent_len + 128
 				}
-				replaced.GetVal()[b.PostInc(&len_)] = '&'
-				memcpy(&replaced.GetVal()[len_], &old[cursor], ent_len)
+				replaced.GetStr()[b.PostInc(&len_)] = '&'
+				memcpy(&replaced.GetStr()[len_], &old[cursor], ent_len)
 				len_ += ent_len
-				replaced.GetVal()[b.PostInc(&len_)] = ';'
+				replaced.GetStr()[b.PostInc(&len_)] = ';'
 				cursor += ent_len + 1
 			}
 		}
 	}
-	replaced.GetVal()[len_] = '0'
+	replaced.GetStr()[len_] = '0'
 	replaced.SetLen(len_)
 	return replaced
 }

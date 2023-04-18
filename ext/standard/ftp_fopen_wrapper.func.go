@@ -81,7 +81,7 @@ func PhpFtpFopenConnect(
 		}
 		return nil
 	}
-	use_ssl = resource.GetScheme() != nil && resource.GetScheme().GetLen() > 3 && resource.GetScheme().GetVal()[3] == 's'
+	use_ssl = resource.GetScheme() != nil && resource.GetScheme().GetLen() > 3 && resource.GetScheme().GetStr()[3] == 's'
 
 	/* use port 21 if one wasn't specified */
 

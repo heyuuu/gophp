@@ -54,7 +54,7 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 		key = _p.GetKey()
 		prop = _z
 		if key != nil {
-			if key.GetVal()[0] == '0' {
+			if key.GetStr()[0] == '0' {
 				var class_name *byte
 				var prop_name *byte
 				var prop_name_len int

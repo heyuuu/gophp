@@ -21,6 +21,18 @@ func Max[T integer](a T, b T) T {
 	return b
 }
 
+func FixRange[T integer](num T, min T, max T) T {
+	if min > max {
+		min, max = max, min
+	}
+	if num < min {
+		num = min
+	} else if num > max {
+		num = max
+	}
+	return num
+}
+
 func Compare[T number](a T, b T) int {
 	if a == b {
 		return 0

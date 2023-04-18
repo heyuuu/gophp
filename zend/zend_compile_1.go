@@ -19,11 +19,11 @@ func ZendResolveClassName(name *types.String, type_ uint32) *types.String {
 	if type_ == ZEND_NAME_RELATIVE {
 		return ZendPrefixWithNs(name)
 	}
-	if type_ == ZEND_NAME_FQ || name.GetVal()[0] == '\\' {
+	if type_ == ZEND_NAME_FQ || name.GetStr()[0] == '\\' {
 
 		/* Remove \ prefix (only relevant if this is a string rather than a label) */
 
-		if name.GetVal()[0] == '\\' {
+		if name.GetStr()[0] == '\\' {
 			name = types.NewString(b.CastStr(name.GetVal()+1, name.GetLen()-1))
 		} else {
 			//name.AddRefcount()

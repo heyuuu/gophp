@@ -204,7 +204,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::%s()", ce.GetName().GetVal(), name.GetVal())
 	}
 	if in_interface != 0 {
-		if lcname.GetVal()[0] != '_' || lcname.GetVal()[1] != '_' {
+		if lcname.GetStr()[0] != '_' || lcname.GetStr()[1] != '_' {
 
 		} else if lcname.GetStr() == ZEND_CALL_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
@@ -258,7 +258,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 			if is_static == 0 {
 				op_array.SetIsAllowStatic(true)
 			}
-		} else if lcname.GetVal()[0] != '_' || lcname.GetVal()[1] != '_' {
+		} else if lcname.GetStr()[0] != '_' || lcname.GetStr()[1] != '_' {
 			if is_static == 0 {
 				op_array.SetIsAllowStatic(true)
 			}

@@ -175,11 +175,11 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 			return
 		}
 		string_len = tmp.GetLen()
-		c = types.ZendUchar(tmp.GetVal()[0])
+		c = types.ZendUchar(tmp.GetStr()[0])
 		// types.ZendStringReleaseEx(tmp, 0)
 	} else {
 		string_len = value.String().GetLen()
-		c = types.ZendUchar(value.String().GetVal()[0])
+		c = types.ZendUchar(value.String().GetStr()[0])
 	}
 	if string_len == 0 {
 
@@ -199,7 +199,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		var old_len ZendLong = str.String().GetLen()
 		str.SetString(types.ZendStringExtend(str.String(), offset+1))
 		memset(str.String().GetVal()+old_len, ' ', offset-old_len)
-		str.String().GetVal()[offset+1] = 0
+		str.String().GetStr()[offset+1] = 0
 	} else if !(str.IsRefcounted()) {
 		str.SetString(types.NewString(str.String().GetStr()))
 	} else if str.GetRefcount() > 1 {
@@ -208,7 +208,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 	} else {
 		//types.ZendStringForgetHashVal(str.String())
 	}
-	str.String().GetVal()[offset] = c
+	str.String().GetStr()[offset] = c
 	if RETURN_VALUE_USED(opline) {
 		/* Return the new character */
 		opline.Result().SetStringVal(string(c))

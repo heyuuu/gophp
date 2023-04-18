@@ -14,7 +14,7 @@ func PhpSprintfAppendchar(buffer **types.String, pos *int, add byte) {
 	if (*pos)+1 >= buffer.GetLen() {
 		*buffer = types.ZendStringExtend(*buffer, buffer.GetLen()<<1)
 	}
-	buffer.GetVal()[b.PostInc(&(*pos))] = add
+	buffer.GetStr()[b.PostInc(&(*pos))] = add
 }
 func PhpSprintfAppendchars(buffer **types.String, pos *int, add *byte, len_ int) {
 	if (*pos)+len_ >= buffer.GetLen() {
@@ -75,23 +75,23 @@ func PhpSprintfAppendstring(
 	if alignment == ALIGN_RIGHT {
 		if (neg != 0 || always_sign != 0) && padding == '0' {
 			if neg != 0 {
-				buffer.GetVal()[b.PostInc(&(*pos))] = '-'
+				buffer.GetStr()[b.PostInc(&(*pos))] = '-'
 			} else {
-				buffer.GetVal()[b.PostInc(&(*pos))] = '+'
+				buffer.GetStr()[b.PostInc(&(*pos))] = '+'
 			}
 			add++
 			len_--
 			copy_len--
 		}
 		for b.PostDec(&npad) > 0 {
-			buffer.GetVal()[b.PostInc(&(*pos))] = padding
+			buffer.GetStr()[b.PostInc(&(*pos))] = padding
 		}
 	}
-	memcpy(&buffer.GetVal()[*pos], add, copy_len+1)
+	memcpy(&buffer.GetStr()[*pos], add, copy_len+1)
 	*pos += copy_len
 	if alignment == ALIGN_LEFT {
 		for b.PostDec(&npad) {
-			buffer.GetVal()[b.PostInc(&(*pos))] = padding
+			buffer.GetStr()[b.PostInc(&(*pos))] = padding
 		}
 	}
 }
@@ -477,7 +477,7 @@ exit:
 
 	/* possibly, we have to make sure we have room for the terminating null? */
 
-	result.GetVal()[outpos] = 0
+	result.GetStr()[outpos] = 0
 	result.SetLen(outpos)
 	return result
 }

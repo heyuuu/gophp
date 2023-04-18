@@ -79,7 +79,7 @@ func ZendCompileUse(ast *ZendAst) {
 		if current_ns != nil {
 			var ns_name *types.String = types.ZendStringAlloc(current_ns.GetLen()+1+new_name.GetLen(), 0)
 			ZendStrTolowerCopy(ns_name.GetVal(), current_ns.GetVal(), current_ns.GetLen())
-			ns_name.GetVal()[current_ns.GetLen()] = '\\'
+			ns_name.GetStr()[current_ns.GetLen()] = '\\'
 			memcpy(ns_name.GetVal()+current_ns.GetLen()+1, lookup_name.GetVal(), lookup_name.GetLen()+1)
 			if ZendHaveSeenSymbol(ns_name, type_) != 0 {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, ns_name)

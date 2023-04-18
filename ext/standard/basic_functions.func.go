@@ -1469,67 +1469,50 @@ func ZifHighlightString(executeData zpp.Ex, return_value zpp.Ret, string *types.
 func ZifIniGet(varname string) (string, bool) {
 	return zend.ZendIniGetValueEx(varname)
 }
-func ZifIniGetAll(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension *types.Zval, details *types.Zval) {
-	var extname *byte = nil
-	var extname_len int = 0
-	var module_number int = 0
-	var details types.ZendBool = 1
-	var key *types.String
-	var ini_entry *zend.ZendIniEntry
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 0, 2, 0)
-			fp.StartOptional()
-			extname, extname_len = fp.ParseStringEx(true, false)
-			details = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
+func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *bool) {
+	var details bool = b.Option(details_, true)
+	var moduleNumber int = 0
 	zend.ZendIniSortEntries()
-	if extname != nil {
-		module := globals.G().GetModule(b.CastStr(extname, extname_len))
+	if extension != nil {
+		module := globals.G().GetModule(*extension)
 		if module == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find extension '%s'", extname)
-			return_value.SetFalse()
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find extension '%s'", *extension)
+			returnValue.SetFalse()
 			return
 		}
-		module_number = module.GetModuleNumber()
+		moduleNumber = module.GetModuleNumber()
 	}
-	zend.ArrayInit(return_value)
 
-	zend.EG__().IniDirectives().Foreach(func(key string, ini_entry *zend.ZendIniEntry) {
+	zend.ArrayInit(returnValue)
+	zend.EG__().IniDirectives().Foreach(func(key string, iniEntry *zend.ZendIniEntry) {
 		var option types.Zval
-		if module_number != 0 && ini_entry.GetModuleNumber() != module_number {
+		if moduleNumber != 0 && iniEntry.GetModuleNumber() != moduleNumber {
 			return
 		}
 		if key == nil || key != "" {
-			if details != 0 {
+			if details {
 				zend.ArrayInit(&option)
-				if ini_entry.GetOrigValue() != nil {
-					zend.AddAssocStr(&option, "global_value", ini_entry.GetOrigValue().GetStr())
-				} else if ini_entry.GetValue() != nil {
-					zend.AddAssocStr(&option, "global_value", ini_entry.GetValue().GetStr())
+				if iniEntry.GetOrigValue() != nil {
+					zend.AddAssocStr(&option, "global_value", iniEntry.GetOrigValue().GetStr())
+				} else if iniEntry.GetValue() != nil {
+					zend.AddAssocStr(&option, "global_value", iniEntry.GetValue().GetStr())
 				} else {
 					zend.AddAssocNull(&option, "global_value")
 				}
-				if ini_entry.GetValue() != nil {
-					zend.AddAssocStr(&option, "local_value", ini_entry.GetValue().GetStr())
+				if iniEntry.GetValue() != nil {
+					zend.AddAssocStr(&option, "local_value", iniEntry.GetValue().GetStr())
 				} else {
 					zend.AddAssocNull(&option, "local_value")
 				}
-				zend.AddAssocLong(&option, "access", ini_entry.GetModifiable())
-				return_value.Array().SymtableUpdate(ini_entry.GetName().GetStr(), &option)
+				zend.AddAssocLong(&option, "access", iniEntry.GetModifiable())
+				returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), &option)
 			} else {
-				if ini_entry.GetValue() != nil {
+				if iniEntry.GetValue() != nil {
 					var zv types.Zval
-					zv.SetStringCopy(ini_entry.GetValue())
-					return_value.Array().SymtableUpdate(ini_entry.GetName().GetStr(), &zv)
+					zv.SetStringCopy(iniEntry.GetValue())
+					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), &zv)
 				} else {
-					return_value.Array().SymtableUpdate(ini_entry.GetName().GetStr(), zend.EG__().GetUninitializedZval())
+					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), zend.EG__().GetUninitializedZval())
 				}
 			}
 		}
@@ -1908,7 +1891,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			/* bare string - nothing to do */
 
 		}
-		if !(arg1.String().GetLen() > 1 && arg1.String().GetVal()[0] == '0') && zend.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IS_LONG {
+		if !(arg1.String().GetLen() > 1 && arg1.String().GetStr()[0] == '0') && zend.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IS_LONG {
 			var key = zend.StrToLongWithUnit(arg1.StringVal())
 			if b.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)

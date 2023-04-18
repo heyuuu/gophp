@@ -16,7 +16,7 @@ func IsPlaceholder(c byte) types.ZendBool { return c == '?' || c == '*' }
 func BrowscapComputePrefixLen(pattern *types.String) uint8 {
 	var i int
 	for i = 0; i < pattern.GetLen(); i++ {
-		if IsPlaceholder(pattern.GetVal()[i]) != 0 {
+		if IsPlaceholder(pattern.GetStr()[i]) != 0 {
 			break
 		}
 	}
@@ -28,12 +28,12 @@ func BrowscapComputeContains(pattern *types.String, start_pos int, contains_star
 	/* Find first non-placeholder character after prefix */
 
 	for ; i < pattern.GetLen(); i++ {
-		if IsPlaceholder(pattern.GetVal()[i]) == 0 {
+		if IsPlaceholder(pattern.GetStr()[i]) == 0 {
 
 			/* Skip the case of a single non-placeholder character.
 			 * Let's try to find something longer instead. */
 
-			if i+1 < pattern.GetLen() && IsPlaceholder(pattern.GetVal()[i+1]) == 0 {
+			if i+1 < pattern.GetLen() && IsPlaceholder(pattern.GetStr()[i+1]) == 0 {
 				break
 			}
 
@@ -47,7 +47,7 @@ func BrowscapComputeContains(pattern *types.String, start_pos int, contains_star
 	/* Find first placeholder character after that */
 
 	for ; i < pattern.GetLen(); i++ {
-		if IsPlaceholder(pattern.GetVal()[i]) != 0 {
+		if IsPlaceholder(pattern.GetStr()[i]) != 0 {
 			break
 		}
 	}
@@ -58,7 +58,7 @@ func BrowscapComputeRegexLen(pattern *types.String) int {
 	var i int
 	var len_ int = pattern.GetLen()
 	for i = 0; i < pattern.GetLen(); i++ {
-		switch pattern.GetVal()[i] {
+		switch pattern.GetStr()[i] {
 		case '*':
 			fallthrough
 		case '.':
@@ -369,7 +369,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 			var previous_match *types.String = found_entry.GetPattern()
 			var current_match *types.String = entry.GetPattern()
 			for i = 0; i < previous_match.GetLen(); i++ {
-				switch previous_match.GetVal()[i] {
+				switch previous_match.GetStr()[i] {
 				case '?':
 					fallthrough
 				case '*':
@@ -381,7 +381,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 				}
 			}
 			for i = 0; i < current_match.GetLen(); i++ {
-				switch current_match.GetVal()[i] {
+				switch current_match.GetStr()[i] {
 				case '?':
 					fallthrough
 				case '*':

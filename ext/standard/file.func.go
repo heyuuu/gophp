@@ -654,7 +654,7 @@ func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, prefi
 	}
 	p = str.PhpBasenameZStr(b.CastStr(prefix, prefix_len), "")
 	if p.GetLen() > 64 {
-		p.GetVal()[63] = '0'
+		p.GetStr()[63] = '0'
 	}
 	return_value.SetFalse()
 	if b.Assign(&fd, core.PhpOpenTemporaryFdEx(dir, p.GetVal(), &opened_path, core.PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) >= 0 {

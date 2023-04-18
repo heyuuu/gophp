@@ -147,7 +147,7 @@ func PhpUudecode(src *byte, src_len int) *types.String {
 		}
 	}
 	dest.SetLen(total_len)
-	dest.GetVal()[dest.GetLen()] = '0'
+	dest.GetStr()[dest.GetLen()] = '0'
 	return dest
 err:
 	// types.ZendStringEfree(dest)

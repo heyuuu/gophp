@@ -167,7 +167,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		/* Check if function with given name exists.
 		 * This may be a compound name that includes namespace name */
 
-		if callable.String().GetVal()[0] == '\\' {
+		if callable.String().GetStr()[0] == '\\' {
 
 			/* Skip leading \ */
 

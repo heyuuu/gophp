@@ -100,7 +100,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			if RETURN_VALUE_USED(opline) {
 				if p.GetKey() == nil {
 					opline.Result().SetLong(p.GetH())
-				} else if p.GetKey().GetVal()[0] {
+				} else if p.GetKey().GetStr()[0] {
 					opline.Result().SetStringCopy(p.GetKey())
 				} else {
 					var class_name *byte

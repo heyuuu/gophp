@@ -14,7 +14,12 @@ var DefZifSprintf = def.DefFunc("sprintf", 1, -1, []def.ArgInfo{{Name: "format"}
 	if fp.HasError() {
 		return
 	}
-	ZifUserSprintf(format, nil, args)
+	ret, ok := ZifUserSprintf(format, nil, args)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifVsprintf

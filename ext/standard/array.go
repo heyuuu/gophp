@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"math"
 	"strconv"
 )
 
@@ -1339,7 +1340,7 @@ func PhpPrefixVarname(result *types.Zval, prefix *types.Zval, var_name *byte, va
 	result.SetString(types.ZendStringAlloc(prefix.String().GetLen()+b.Cond(add_underscore != 0, 1, 0)+var_name_len, 0))
 	memcpy(result.String().GetVal(), prefix.String().GetVal(), prefix.String().GetLen())
 	if add_underscore != 0 {
-		result.String().GetVal()[prefix.String().GetLen()] = '_'
+		result.String().GetStr()[prefix.String().GetLen()] = '_'
 	}
 	memcpy(result.String().GetVal()+prefix.String().GetLen()+b.Cond(add_underscore != 0, 1, 0), var_name, var_name_len+1)
 	return types.SUCCESS
@@ -2500,8 +2501,8 @@ func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *t
 		} else if type1 == types.IS_LONG || type2 == types.IS_LONG {
 			goto long_str
 		}
-		low = uint8(zlow.String().GetVal()[0])
-		high = uint8(zhigh.String().GetVal()[0])
+		low = uint8(zlow.String().GetStr()[0])
+		high = uint8(zhigh.String().GetStr()[0])
 		if low > high {
 			if lstep <= 0 {
 				err = 1
@@ -2573,7 +2574,7 @@ func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *t
 				return_value.SetFalse()
 				return
 			}
-			size = uint32(_phpMathRound(__calc_size, 0, PHP_ROUND_HALF_UP))
+			size = uint32(math.Round(__calc_size))
 			zend.ArrayInitSize(return_value, size)
 			types.ZendHashRealInitPacked(return_value.Array())
 			fillScope := types.PackedFillStart(return_value.Array())
@@ -2597,7 +2598,7 @@ func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *t
 				return_value.SetFalse()
 				return
 			}
-			size = uint32(_phpMathRound(__calc_size, 0, PHP_ROUND_HALF_UP))
+			size = uint32(math.Round(__calc_size))
 			zend.ArrayInitSize(return_value, size)
 			types.ZendHashRealInitPacked(return_value.Array())
 			fillScope := types.PackedFillStart(return_value.Array())

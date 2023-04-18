@@ -1,1328 +1,393 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
+	"strconv"
+	"strings"
 )
 
-func PhpIntlog10abs(value float64) int {
-	var result int
-	value = fabs(value)
-	if value < 1.0e-8 || value > 1.0e22 {
-		result = int(floor(log10(value)))
+func zvalGetFloat(zv *types.Zval) (float64, bool) {
+	if zv.IsLong() {
+		return float64(zv.Long()), true
+	} else if zv.IsDouble() {
+		return zv.Double(), true
 	} else {
-		var values []float64 = []float64{1.0e-8, 1.0e-7, 1.0e-6, 1.0e-5, 1.0e-4, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, 1.0e7, 1.0e8, 1.0e9, 1.0e10, 9.9999998e10, 1.0e12, 9.9999998e12, 1.0e14, 9.9999999e14, 1.00000003e16, 9.9999998e16, 9.9999998e17, 1.0e19, 1.0e20, 1.0e21, 1.0e22}
-
-		/* Do a binary search with 5 steps */
-
-		result = 15
-		if value < values[result] {
-			result -= 8
-		} else {
-			result += 8
-		}
-		if value < values[result] {
-			result -= 4
-		} else {
-			result += 4
-		}
-		if value < values[result] {
-			result -= 2
-		} else {
-			result += 2
-		}
-		if value < values[result] {
-			result -= 1
-		} else {
-			result += 1
-		}
-		if value < values[result] {
-			result -= 1
-		}
-		result -= 8
+		return 0, false
 	}
-	return result
 }
-func PhpIntpow10(power int) float64 {
-	var powers []float64 = []float64{1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, 1.0e7, 1.0e8, 1.0e9, 1.0e10, 9.9999998e10, 1.0e12, 9.9999998e12, 1.0e14, 9.9999999e14, 1.00000003e16, 9.9999998e16, 9.9999998e17, 1.0e19, 1.0e20, 1.0e21, 1.0e22}
 
-	/* Not in lookup table */
-
-	if power < 0 || power > 22 {
-		return pow(10.0, float64(power))
+func phpRound(f float64, dec int, mode int) float64 {
+	v := f * math.Pow(10, float64(dec))
+	if math.IsInf(v, 1) || math.IsInf(v, -1) {
+		return f
 	}
-	return powers[power]
+	switch mode {
+	case PHP_ROUND_HALF_UP:
+		v = math.Round(v)
+	case PHP_ROUND_HALF_DOWN:
+		v = math.Trunc(v)
+	case PHP_ROUND_HALF_EVEN:
+		v = math.RoundToEven(v)
+	default: // PHP_ROUND_HALF_ODD
+		v = math.RoundToEven(v+1) - 1
+	}
+	v /= math.Pow(10, float64(dec))
+	return v
 }
-func PhpRoundHelper(value float64, mode int) float64 {
-	var tmp_value float64
-	if value >= 0.0 {
-		tmp_value = floor(value + 0.5)
-		if mode == PHP_ROUND_HALF_DOWN && value == -0.5+tmp_value || mode == PHP_ROUND_HALF_EVEN && value == 0.5+2*floor(tmp_value/2.0) || mode == PHP_ROUND_HALF_ODD && value == 0.5+2*floor(tmp_value/2.0)-1.0 {
-			tmp_value = tmp_value - 1.0
-		}
-	} else {
-		tmp_value = ceil(value - 0.5)
-		if mode == PHP_ROUND_HALF_DOWN && value == 0.5+tmp_value || mode == PHP_ROUND_HALF_EVEN && value == -0.5+2*ceil(tmp_value/2.0) || mode == PHP_ROUND_HALF_ODD && value == -0.5+2*ceil(tmp_value/2.0)+1.0 {
-			tmp_value = tmp_value + 1.0
-		}
-	}
-	return tmp_value
-}
-func _phpMathRound(value float64, places int, mode int) float64 {
-	var f1 float64
-	var f2 float64
-	var tmp_value float64
-	var precision_places int
-	if !(core.ZendFinite(value)) || value == 0.0 {
-		return value
-	}
-	if places < core.INT_MIN+1 {
-		places = core.INT_MIN + 1
-	} else {
-		places = places
-	}
-	precision_places = 14 - PhpIntlog10abs(value)
-	f1 = PhpIntpow10(abs(places))
 
-	/* If the decimal precision guaranteed by FP arithmetic is higher than
-	   the requested places BUT is small enough to make sure a non-zero value
-	   is returned, pre-round the result to the precision */
-
-	if precision_places > places && precision_places-15 < places {
-		var use_precision int64 = b.Cond(precision_places < core.INT_MIN+1, core.INT_MIN+1, precision_places)
-		f2 = PhpIntpow10(abs(int(use_precision)))
-		if use_precision >= 0 {
-			tmp_value = value * f2
-		} else {
-			tmp_value = value / f2
-		}
-
-		/* preround the result (tmp_value will always be something * 1e14,
-		   thus never larger than 1e15 here) */
-
-		tmp_value = PhpRoundHelper(tmp_value, mode)
-		use_precision = places - precision_places
-		if use_precision < core.INT_MIN+1 {
-			use_precision = core.INT_MIN + 1
-		} else {
-			use_precision = use_precision
-		}
-
-		/* now correctly move the decimal point */
-
-		f2 = PhpIntpow10(abs(int(use_precision)))
-
-		/* because places < precision_places */
-
-		tmp_value = tmp_value / f2
-
-		/* because places < precision_places */
-
-	} else {
-
-		/* adjust the value */
-
-		if places >= 0 {
-			tmp_value = value * f1
-		} else {
-			tmp_value = value / f1
-		}
-
-		/* This value is beyond our precision, so rounding it is pointless */
-
-		if fabs(tmp_value) >= 9.9999999e14 {
-			return value
-		}
-
-		/* This value is beyond our precision, so rounding it is pointless */
-
-	}
-
-	/* round the temp value */
-
-	tmp_value = PhpRoundHelper(tmp_value, mode)
-
-	/* see if it makes sense to use simple division to round the value */
-
-	if abs(places) < 23 {
-		if places > 0 {
-			tmp_value = tmp_value / f1
-		} else {
-			tmp_value = tmp_value * f1
-		}
-	} else {
-
-		/* Simple division can't be used since that will cause wrong results.
-		   Instead, the number is converted to a string and back again using
-		   strtod(). strtod() will return the nearest possible FP value for
-		   that string. */
-
-		var buf []byte
-		core.Snprintf(buf, 39, "%15fe%d", tmp_value, -places)
-		buf[39] = '0'
-		tmp_value = zend.ZendStrtod(buf, nil)
-
-		/* couldn't convert to string and back */
-
-		if !(core.ZendFinite(tmp_value)) || core.ZendIsNaN(tmp_value) {
-			tmp_value = value
-		}
-
-		/* couldn't convert to string and back */
-
-	}
-	return tmp_value
-}
-func PhpAsinh(z float64) float64 { return asinh(z) }
-func PhpAcosh(x float64) float64 { return acosh(x) }
-func PhpAtanh(z float64) float64 { return atanh(z) }
-func PhpLog1p(x float64) float64 { return log1p(x) }
-func PhpExpm1(x float64) float64 { return expm1(x) }
-func ZifAbs(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var value *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			value = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ConvertScalarToNumberEx(value)
-	if value.IsType(types.IS_DOUBLE) {
-		return_value.SetDouble(fabs(value.Double()))
-		return
-	} else if value.IsType(types.IS_LONG) {
-		if value.Long() == zend.ZEND_LONG_MIN {
-			return_value.SetDouble(-float64(zend.ZEND_LONG_MIN))
-			return
-		} else {
-			return_value.SetLong(b.CondF(value.Long() < 0, func() int { return -(value.Long()) }, func() zend.ZendLong { return value.Long() }))
-			return
-		}
-	}
-	return_value.SetFalse()
-	return
-}
-func ZifCeil(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var value *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			value = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ConvertScalarToNumberEx(value)
-	if value.IsType(types.IS_DOUBLE) {
-		return_value.SetDouble(ceil(value.Double()))
-		return
-	} else if value.IsType(types.IS_LONG) {
-		return_value.SetDouble(zend.ZvalGetDouble(value))
-		return
-	}
-	return_value.SetFalse()
-	return
-}
-func ZifFloor(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var value *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			value = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ConvertScalarToNumberEx(value)
-	if value.IsType(types.IS_DOUBLE) {
-		return_value.SetDouble(floor(value.Double()))
-		return
-	} else if value.IsType(types.IS_LONG) {
-		return_value.SetDouble(zend.ZvalGetDouble(value))
-		return
-	}
-	return_value.SetFalse()
-	return
-}
-func ZifRound(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, _ zpp.Opt, precision *types.Zval, mode *types.Zval) {
-	var value *types.Zval
-	var places int = 0
-	var precision zend.ZendLong = 0
-	var mode zend.ZendLong = PHP_ROUND_HALF_UP
-	var return_val float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			value = fp.ParseZval()
-			fp.StartOptional()
-			precision = fp.ParseLong()
-			mode = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if executeData.NumArgs() >= 2 {
-		if precision >= 0 {
-			if precision > core.INT_MAX {
-				places = core.INT_MAX
-			} else {
-				places = int(precision)
-			}
-		} else {
-			if precision <= core.INT_MIN {
-				places = core.INT_MIN + 1
-			} else {
-				places = int(precision)
-			}
-		}
-	}
-	zend.ConvertScalarToNumberEx(value)
-	switch value.GetType() {
-	case types.IS_LONG:
-
-		/* Simple case - long that doesn't need to be rounded. */
-
-		if places >= 0 {
-			return_value.SetDouble(float64(value.Long()))
-			return
-		}
-		fallthrough
+func ZifAbs(number *types.Zval) (*types.Zval, bool) {
+	switch number.GetType() {
 	case types.IS_DOUBLE:
-		if value.IsType(types.IS_LONG) {
-			return_val = float64(value.Long())
+		num := number.Double()
+		result := math.Abs(num)
+		return types.NewZvalDouble(result), true
+	case types.IS_LONG:
+		num := number.Long()
+		if num == math.MinInt { // overflow
+			result := -float64(num)
+			return types.NewZvalDouble(result), true
 		} else {
-			return_val = value.Double()
+			result := -num
+			return types.NewZvalLong(result), true
 		}
-		return_val = _phpMathRound(return_val, int(places), int(mode))
-		return_value.SetDouble(return_val)
-		return
 	default:
-		return_value.SetFalse()
-		return
+		return nil, false
 	}
 }
-func ZifSin(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifCeil(number *types.Zval) (float64, bool) {
+	zend.ConvertScalarToNumberEx(number)
+	switch number.GetType() {
+	case types.IS_DOUBLE:
+		result := math.Ceil(number.Double())
+		return result, true
+	case types.IS_LONG:
+		result := float64(number.Long())
+		return result, true
+	default:
+		return 0, false
 	}
-	return_value.SetDouble(sin(num))
-	return
 }
-func ZifCos(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifFloor(number *types.Zval) (float64, bool) {
+	zend.ConvertScalarToNumberEx(number)
+	switch number.GetType() {
+	case types.IS_DOUBLE:
+		result := math.Floor(number.Double())
+		return result, true
+	case types.IS_LONG:
+		result := float64(number.Long())
+		return result, true
+	default:
+		return 0, false
 	}
-	return_value.SetDouble(cos(num))
-	return
 }
-func ZifTan(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifRound(number *types.Zval, _ zpp.Opt, precision int, mode_ *int) (float64, bool) {
+	var value *types.Zval = number
+	var mode = b.Option(mode_, PHP_ROUND_HALF_UP)
+
+	precision = b.FixRange(precision, core.INT_MIN+1, core.INT_MAX)
+	zend.ConvertScalarToNumberEx(value)
+	if value.IsLong() && precision >= 0 {
+		/* Simple case - long that doesn't need to be rounded. */
+		return float64(value.Long()), true
+	} else if value.IsLong() || value.IsDouble() {
+		val, _ := zvalGetFloat(value)
+		return phpRound(val, precision, mode), true
 	}
-	return_value.SetDouble(tan(num))
-	return
+	return 0, false
 }
-func ZifAsin(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(asin(num))
-	return
+func ZifSin(number float64) float64 {
+	return math.Sin(number)
 }
-func ZifAcos(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(acos(num))
-	return
+func ZifCos(number float64) float64 {
+	return math.Cos(number)
 }
-func ZifAtan(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(atan(num))
-	return
+func ZifTan(number float64) float64 {
+	return math.Tan(number)
 }
-func ZifAtan2(executeData zpp.Ex, return_value zpp.Ret, y *types.Zval, x *types.Zval) {
-	var num1 float64
-	var num2 float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			num1 = fp.ParseDouble()
-			num2 = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(atan2(num1, num2))
-	return
+func ZifAsin(number float64) float64 {
+	return math.Asin(number)
 }
-func ZifSinh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(sinh(num))
-	return
+func ZifAcos(number float64) float64 {
+	return math.Acos(number)
 }
-func ZifCosh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(cosh(num))
-	return
+func ZifAtan(number float64) float64 {
+	return math.Atan(number)
 }
-func ZifTanh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(tanh(num))
-	return
+func ZifAtan2(y float64, x float64) float64 {
+	return math.Atan2(y, x)
 }
-func ZifAsinh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(PhpAsinh(num))
-	return
+func ZifSinh(number float64) float64 {
+	return math.Sinh(number)
 }
-func ZifAcosh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(PhpAcosh(num))
-	return
+func ZifCosh(number float64) float64 {
+	return math.Cosh(number)
 }
-func ZifAtanh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(PhpAtanh(num))
-	return
+func ZifTanh(number float64) float64 {
+	return math.Tanh(number)
 }
-func ZifPi(executeData zpp.Ex, return_value zpp.Ret) {
-	return_value.SetDouble(M_PI)
-	return
+func ZifAsinh(number float64) float64 {
+	return math.Asinh(number)
 }
-func ZifIsFinite(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
-	var dval float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			dval = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetBool(core.ZendFinite(dval))
-	return
+func ZifAcosh(number float64) float64 {
+	return math.Acosh(number)
 }
-func ZifIsInfinite(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
-	var dval float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			dval = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetBool(core.ZendIsInf(dval))
-	return
+func ZifAtanh(number float64) float64 {
+	return math.Atanh(number)
 }
-func ZifIsNan(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
-	var dval float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			dval = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetBool(core.ZendIsNaN(dval))
-	return
+func ZifPi() float64 {
+	return M_PI
 }
-func ZifPow(executeData zpp.Ex, return_value zpp.Ret, base *types.Zval, exponent *types.Zval) {
-	var zbase *types.Zval
-	var zexp *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			zbase = fp.ParseZval()
-			zexp = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.PowFunction(return_value, zbase, zexp)
+func ZifIsFinite(val float64) bool {
+	return core.ZendFinite(val)
 }
-func ZifExp(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(exp(num))
-	return
+func ZifIsInfinite(val float64) bool {
+	return math.IsInf(val, 1) || math.IsInf(val, -1)
 }
-func ZifExpm1(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(PhpExpm1(num))
-	return
+func ZifIsNan(val float64) bool {
+	return math.IsNaN(val)
 }
-func ZifLog1p(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(PhpLog1p(num))
-	return
+func ZifPow(returnValue zpp.Ret, base *types.Zval, exponent *types.Zval) {
+	zend.PowFunction(returnValue, base, exponent)
 }
-func ZifLog(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, _ zpp.Opt, base *types.Zval) {
-	var num float64
-	var base float64 = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			num = fp.ParseDouble()
-			fp.StartOptional()
-			base = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifExp(number float64) float64 {
+	return math.Exp(number)
+}
+func ZifExpm1(number float64) float64 {
+	return math.Expm1(number)
+}
+func ZifLog1p(number float64) float64 {
+	return math.Log1p(number)
+}
+func ZifLog(number float64, _ zpp.Opt, base *float64) (float64, bool) {
+	if base == nil {
+		return math.Log(number), true
 	}
-	if executeData.NumArgs() == 1 {
-		return_value.SetDouble(log(num))
-		return
+	if *base == 10.0 {
+		return math.Log10(number), true
 	}
-	if base == 10.0 {
-		return_value.SetDouble(log10(num))
-		return
+	if *base == 1.0 {
+		return math.NaN(), true
 	}
-	if base == 1.0 {
-		return_value.SetDouble(math.NaN())
-		return
-	}
-	if base <= 0.0 {
+	if *base <= 0.0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "base must be greater than 0")
-		return_value.SetFalse()
-		return
+		return 0, false
 	}
-	return_value.SetDouble(log(num) / log(base))
-	return
+	return math.Log(number) / math.Log(*base), true
 }
-func ZifLog10(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
+func ZifLog10(number float64) float64 {
+	return math.Log10(number)
+}
+func ZifSqrt(number float64) float64 {
+	return math.Sqrt(number)
+}
+func ZifHypot(num1 float64, num2 float64) float64 {
+	return math.Hypot(num1, num2)
+}
+func ZifDeg2rad(number float64) float64 {
+	return number / 180.0 * M_PI
+}
+func ZifRad2deg(number float64) float64 {
+	return number / M_PI * 180
+}
+
+func _parseStringToNumberZval(s string, base int) (*types.Zval, bool) {
+	num, ok := _parseStringToNumber(s, base)
+	if !ok {
+		return nil, false
+	} else if num.IsInt() {
+		return types.NewZvalLong(num.Int()), true
+	} else {
+		return types.NewZvalDouble(num.Float()), true
+	}
+}
+func _parseStringToNumber(s string, base int) (types.Number, bool) {
+	s = strings.TrimFunc(s, ascii.IsSpaceRune)
+	if len(s) >= 2 {
+		if base == 16 && (s[:2] == "0x" || s[:2] == "0X") {
+			s = s[2:]
 		}
-		break
-	}
-	return_value.SetDouble(log10(num))
-	return
-}
-func ZifSqrt(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var num float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
+		if base == 8 && (s[:2] == "0o" || s[:2] == "0O") {
+			s = s[2:]
 		}
-		break
-	}
-	return_value.SetDouble(sqrt(num))
-	return
-}
-func ZifHypot(executeData zpp.Ex, return_value zpp.Ret, num1 *types.Zval, num2 *types.Zval) {
-	var num1 float64
-	var num2 float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			num1 = fp.ParseDouble()
-			num2 = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
+		if base == 2 && (s[:2] == "0b" || s[:2] == "0B") {
+			s = s[2:]
 		}
-		break
 	}
-	return_value.SetDouble(hypot(num1, num2))
-	return
-}
-func ZifDeg2rad(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var deg float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			deg = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(deg / 180.0 * M_PI)
-	return
-}
-func ZifRad2deg(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
-	var rad float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			rad = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(rad / M_PI * 180)
-	return
-}
-func _phpMathBasetolong(arg *types.Zval, base int) zend.ZendLong {
-	var num zend.ZendLong = 0
-	var digit zend.ZendLong
-	var onum zend.ZendLong
-	var i zend.ZendLong
-	var c byte
-	var s *byte
-	if arg.GetType() != types.IS_STRING || base < 2 || base > 36 {
-		return 0
-	}
-	s = arg.String().GetVal()
-	for i = arg.String().GetLen(); i > 0; i-- {
-		*s++
-		c = (*s) - 1
-		if b.Cond(b.Cond(c >= '0' && c <= '9', c-'0', c >= 'A' && c <= 'Z'), c-'A'+10, c >= 'a' && c <= 'z') {
-			digit = c - 'a' + 10
+
+	cutoff := zend.ZEND_LONG_MAX / base
+	cutlim := zend.ZEND_LONG_MAX % base
+	inum := 0
+	fnum := float64(0)
+	isFloat := false
+
+	invalidchars := 0
+	for _, c := range s {
+		var digit int
+		if c >= '0' && c <= '9' {
+			digit = int(c - '0')
+		} else if c >= 'A' && c <= 'Z' {
+			digit = int(c - 'A' + 10)
+		} else if c >= 'a' && c <= 'z' {
+			digit = int(c - 'a' + 10)
 		} else {
-			digit = base
+			invalidchars++
+			continue
 		}
 		if digit >= base {
+			invalidchars++
 			continue
 		}
-		onum = num
-		num = num*base + digit
-		if num > onum {
-			continue
-		}
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Number '%s' is too big to fit in long", s)
-		return zend.ZEND_LONG_MAX
-	}
-	return num
-}
-func _phpMathBasetozval(arg *types.Zval, base int, ret *types.Zval) int {
-	var num zend.ZendLong = 0
-	var fnum float64 = 0
-	var mode int = 0
-	var c byte
-	var s *byte
-	var e *byte
-	var cutoff zend.ZendLong
-	var cutlim int
-	var invalidchars int = 0
-	if arg.GetType() != types.IS_STRING || base < 2 || base > 36 {
-		return types.FAILURE
-	}
-	s = arg.String().GetVal()
-	e = s + arg.String().GetLen()
-
-	for s < e && isspace(*s) {
-		s++
-	}
-
-	/* Skip trailing whitespace */
-
-	for s < e && isspace(*(e - 1)) {
-		e--
-	}
-	if e-s >= 2 {
-		if base == 16 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X') {
-			s += 2
-		}
-		if base == 8 && s[0] == '0' && (s[1] == 'o' || s[1] == 'O') {
-			s += 2
-		}
-		if base == 2 && s[0] == '0' && (s[1] == 'b' || s[1] == 'B') {
-			s += 2
-		}
-	}
-	cutoff = zend.ZEND_LONG_MAX / base
-	cutlim = zend.ZEND_LONG_MAX % base
-	for s < e {
-		*s++
-		c = (*s) - 1
-
-		/* might not work for EBCDIC */
-
-		if c >= '0' && c <= '9' {
-			c -= '0'
-		} else if c >= 'A' && c <= 'Z' {
-			c -= 'A' - 10
-		} else if c >= 'a' && c <= 'z' {
-			c -= 'a' - 10
+		if !isFloat && (inum < cutoff || inum == cutoff && digit <= cutlim) {
+			inum = inum*base + digit
 		} else {
-			invalidchars++
-			continue
-		}
-		if c >= base {
-			invalidchars++
-			continue
-		}
-		switch mode {
-		case 0:
-			if num < cutoff || num == cutoff && c <= cutlim {
-				num = num*base + c
-				break
-			} else {
-				fnum = float64(num)
-				mode = 1
-			}
-			fallthrough
-		case 1:
-			fnum = fnum*base + c
+			isFloat = true
+			fnum = fnum*float64(base) + float64(digit)
 		}
 	}
 	if invalidchars > 0 {
 		faults.Error(faults.E_DEPRECATED, "Invalid characters passed for attempted conversion, these have been ignored")
 	}
-	if mode == 1 {
-		ret.SetDouble(fnum)
+	if isFloat {
+		return types.FloatNumber(fnum), true
 	} else {
-		ret.SetLong(num)
+		return types.IntNumber(inum), true
 	}
-	return types.SUCCESS
 }
-func _phpMathLongtobase(arg *types.Zval, base int) *types.String {
-	var digits []byte = "0123456789abcdefghijklmnopqrstuvwxyz"
-	var buf []byte
-	var ptr *byte
-	var end *byte
-	var value zend.ZendUlong
-	if arg.GetType() != types.IS_LONG || base < 2 || base > 36 {
-		return types.NewString("")
-	}
-	value = arg.Long()
-	ptr = buf + b.SizeOf("buf") - 1
-	end = ptr
-	*ptr = '0'
-	for {
-		b.Assert(ptr > buf)
-		*(b.PreDec(&ptr)) = digits[value%base]
-		value /= base
-		if value == 0 {
-			break
-		}
-	}
-	return types.NewString(b.CastStr(ptr, end-ptr))
-}
-func _phpMathZvaltobase(arg *types.Zval, base int) *types.String {
-	var digits []byte = "0123456789abcdefghijklmnopqrstuvwxyz"
-	if arg.GetType() != types.IS_LONG && arg.GetType() != types.IS_DOUBLE || base < 2 || base > 36 {
-		return types.NewString("")
-	}
-	if arg.IsType(types.IS_DOUBLE) {
-		var fvalue float64 = floor(arg.Double())
-		var ptr *byte
-		var end *byte
-		var buf []byte
 
-		/* Don't try to convert +/- infinity */
-
-		if math.IsInf(fvalue, 1) || math.IsInf(fvalue, -1) {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Number too large")
-			return types.NewString("")
-		}
-		ptr = buf + b.SizeOf("buf") - 1
-		end = ptr
-		*ptr = '0'
-		for {
-			*(b.PreDec(&ptr)) = digits[int(fmod(fvalue, base))]
-			fvalue /= base
-			if !(ptr > buf && fabs(fvalue) >= 1) {
-				break
-			}
-		}
-		return types.NewString(b.CastStr(ptr, end-ptr))
-	}
-	return _phpMathLongtobase(arg, base)
+func ZifBindec(binaryNumber *types.Zval) (*types.Zval, bool) {
+	zend.ConvertToStringEx(binaryNumber)
+	return _parseStringToNumberZval(binaryNumber.StringVal(), 2)
 }
-func ZifBindec(executeData zpp.Ex, return_value zpp.Ret, binaryNumber *types.Zval) {
-	var arg *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ConvertToStringEx(arg)
-	if _phpMathBasetozval(arg, 2, return_value) == types.FAILURE {
-		return_value.SetFalse()
-		return
-	}
+func ZifHexdec(hexadecimalNumber *types.Zval) (*types.Zval, bool) {
+	zend.ConvertToStringEx(hexadecimalNumber)
+	return _parseStringToNumberZval(hexadecimalNumber.StringVal(), 16)
 }
-func ZifHexdec(executeData zpp.Ex, return_value zpp.Ret, hexadecimalNumber *types.Zval) {
-	var arg *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ConvertToStringEx(arg)
-	if _phpMathBasetozval(arg, 16, return_value) == types.FAILURE {
-		return_value.SetFalse()
-		return
-	}
+func ZifOctdec(octalNumber *types.Zval) (*types.Zval, bool) {
+	zend.ConvertToStringEx(octalNumber)
+	return _parseStringToNumberZval(octalNumber.StringVal(), 8)
 }
-func ZifOctdec(executeData zpp.Ex, return_value zpp.Ret, octalNumber *types.Zval) {
-	var arg *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ConvertToStringEx(arg)
-	if _phpMathBasetozval(arg, 8, return_value) == types.FAILURE {
-		return_value.SetFalse()
-		return
-	}
+func ZifDecbin(decimalNumber int) string {
+	return strconv.FormatInt(int64(decimalNumber), 2)
 }
-func ZifDecbin(executeData zpp.Ex, return_value zpp.Ret, decimalNumber *types.Zval) {
-	var arg *types.Zval
-	var result *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if arg.GetType() != types.IS_LONG {
-		zend.ConvertToLong(arg)
-	}
-	result = _phpMathLongtobase(arg, 2)
-	return_value.SetString(result)
-	return
+func ZifDecoct(decimalNumber int) string {
+	return strconv.FormatInt(int64(decimalNumber), 8)
 }
-func ZifDecoct(executeData zpp.Ex, return_value zpp.Ret, decimalNumber *types.Zval) {
-	var arg *types.Zval
-	var result *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if arg.GetType() != types.IS_LONG {
-		zend.ConvertToLong(arg)
-	}
-	result = _phpMathLongtobase(arg, 8)
-	return_value.SetString(result)
-	return
+func ZifDechex(decimalNumber int) string {
+	return strconv.FormatInt(int64(decimalNumber), 16)
 }
-func ZifDechex(executeData zpp.Ex, return_value zpp.Ret, decimalNumber *types.Zval) {
-	var arg *types.Zval
-	var result *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if arg.GetType() != types.IS_LONG {
-		zend.ConvertToLong(arg)
-	}
-	result = _phpMathLongtobase(arg, 16)
-	return_value.SetString(result)
-	return
-}
-func ZifBaseConvert(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, frombase *types.Zval, tobase *types.Zval) {
-	var number *types.Zval
-	var temp types.Zval
-	var frombase zend.ZendLong
-	var tobase zend.ZendLong
-	var result *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 3, 3, 0)
-			number = fp.ParseZval()
-			frombase = fp.ParseLong()
-			tobase = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if zend.TryConvertToString(number) == 0 {
-		return
+func ZifBaseConvert(number *types.Zval, frombase int, tobase int) (string, bool) {
+	if zend.TryConvertToString(number) == 0 { // fail
+		return "", false
 	}
 	if frombase < 2 || frombase > 36 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid `from base' ("+zend.ZEND_LONG_FMT+")", frombase)
-		return_value.SetFalse()
-		return
+		return "", false
 	}
 	if tobase < 2 || tobase > 36 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid `to base' ("+zend.ZEND_LONG_FMT+")", tobase)
-		return_value.SetFalse()
-		return
+		return "", false
 	}
-	if _phpMathBasetozval(number, int(frombase), &temp) == types.FAILURE {
-		return_value.SetFalse()
-		return
+
+	num, ok := _parseStringToNumber(number.StringVal(), frombase)
+	if !ok {
+		return "", false
 	}
-	result = _phpMathZvaltobase(&temp, int(tobase))
-	return_value.SetString(result)
+
+	/* Don't try to convert +/- infinity */
+	if num.IsInf() {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Number too large")
+		return "", true
+	}
+
+	val := num.Floor()
+	return strconv.FormatInt(int64(val), tobase), true
 }
-func _phpMathNumberFormat(d float64, dec int, dec_point byte, thousand_sep byte) *types.String {
-	return _phpMathNumberFormatEx(d, dec, &dec_point, 1, &thousand_sep, 1)
-}
-func _phpMathNumberFormatEx(
-	d float64,
-	dec int,
-	dec_point *byte,
-	dec_point_len int,
-	thousand_sep *byte,
-	thousand_sep_len int,
-) *types.String {
-	var res *types.String
-	var tmpbuf *types.String
-	var s *byte
-	var t *byte
-	var dp *byte
-	var integral int
-	var reslen int = 0
-	var count int = 0
-	var is_negative int = 0
+func phpMathNumberFormat(d float64, dec int, decPoint string, thousandSep string) string {
+	// special cases
+	if math.IsNaN(d) {
+		return "nan"
+	} else if math.IsInf(d, 1) {
+		return "inf"
+	} else if math.IsInf(d, -1) {
+		return "-inf"
+	}
+
+	//
+	isNegative := false
 	if d < 0 {
-		is_negative = 1
+		isNegative = true
 		d = -d
 	}
-	dec = b.Max(0, dec)
-	d = _phpMathRound(d, dec, PHP_ROUND_HALF_UP)
-	tmpbuf = zend.ZendSprintfZStr("%.*F", dec, d)
-	if tmpbuf == nil {
-		return nil
-	} else if !(isdigit(int(tmpbuf.GetVal()[0]))) {
-		return tmpbuf
+	if dec < 0 {
+		dec = 0
 	}
+	d = phpRound(d, dec, PHP_ROUND_HALF_UP)
 
 	/* Check if the number is no longer negative after rounding */
-
-	if is_negative != 0 && d == 0 {
-		is_negative = 0
+	if isNegative && d == 0 {
+		isNegative = false
 	}
 
-	/* find decimal point, if expected */
+	//
+	tmp := fmt.Sprintf("%f", dec)
 
-	if dec != 0 {
-		dp = strpbrk(tmpbuf.GetVal(), ".,")
+	var buf strings.Builder
+	if isNegative {
+		buf.WriteByte('-')
+	}
+	var pointPos int
+	if pos := strings.Index(tmp, "."); pos >= 0 {
+		pointPos = pos
 	} else {
-		dp = nil
+		pointPos = len(tmp)
 	}
 
-	/* calculate the length of the return buffer */
-
-	if dp != nil {
-		integral = dp - tmpbuf.GetVal()
-	} else {
-
-		/* no decimal point was found */
-
-		integral = tmpbuf.GetLen()
-
-		/* no decimal point was found */
-
+	first := true
+	for i := pointPos % 3; i < pointPos; i += 3 {
+		if first {
+			first = false
+		} else {
+			buf.WriteString(thousandSep)
+		}
+		buf.WriteString(tmp[i : i+3])
 	}
 
-	/* allow for thousand separators */
-
-	if thousand_sep != nil {
-		integral = zend.ZendSafeAddmult((integral-1)/3, thousand_sep_len, integral, "number formatting")
-	}
-	reslen = integral
-	if dec != 0 {
-		reslen += dec
-		if dec_point != nil {
-			reslen = zend.ZendSafeAddmult(reslen, 1, dec_point_len, "number formatting")
+	if pointPos < len(tmp) {
+		buf.WriteString(decPoint)
+		if pointPos+1+dec < len(tmp) {
+			buf.WriteString(tmp[pointPos+1:])
+		} else {
+			buf.WriteString(tmp[pointPos+1 : pointPos+1+dec])
 		}
 	}
 
-	/* add a byte for minus sign */
-
-	if is_negative != 0 {
-		reslen++
-	}
-	res = types.ZendStringAlloc(reslen, 0)
-	s = tmpbuf.GetVal() + tmpbuf.GetLen() - 1
-	t = res.GetVal() + reslen
-	b.PostDec(&(*t)) = '0'
-
-	/* copy the decimal places.
-	 * Take care, as the sprintf implementation may return less places than
-	 * we requested due to internal buffer limitations */
-
-	if dec != 0 {
-		var declen int = b.Cond(dp != nil, s-dp, 0)
-		var topad int = int(b.Cond(dec > declen, dec-declen, 0))
-
-		/* pad with '0's */
-
-		for b.PostDec(&topad) {
-			b.PostDec(&(*t)) = '0'
-		}
-		if dp != nil {
-			s -= declen + 1
-			t -= declen
-
-			/* now copy the chars after the point */
-
-			memcpy(t+1, dp+1, declen)
-
-			/* now copy the chars after the point */
-
-		}
-
-		/* add decimal point */
-
-		if dec_point != nil {
-			t -= dec_point_len
-			memcpy(t+1, dec_point, dec_point_len)
-		}
-
-		/* add decimal point */
-
-	}
-
-	/* copy the numbers before the decimal point, adding thousand
-	 * separator every three digits */
-
-	for s >= tmpbuf.GetVal() {
-		*s--
-		b.PostDec(&(*t)) = (*s) + 1
-		if thousand_sep != nil && b.PreInc(&count)%3 == 0 && s >= tmpbuf.GetVal() {
-			t -= thousand_sep_len
-			memcpy(t+1, thousand_sep, thousand_sep_len)
-		}
-	}
-
-	/* and a minus sign, if needed */
-
-	if is_negative != 0 {
-		b.PostDec(&(*t)) = '-'
-	}
-	res.SetLen(reslen)
-	// types.ZendStringReleaseEx(tmpbuf, 0)
-	return res
+	return buf.String()
 }
-func ZifNumberFormat(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, _ zpp.Opt, numDecimalPlaces *types.Zval, decSeparator *types.Zval, thousandsSeparator *types.Zval) {
-	var num float64
-	var dec zend.ZendLong = 0
-	var thousand_sep *byte = nil
-	var dec_point *byte = nil
-	var thousand_sep_chr byte = ','
-	var dec_point_chr byte = '.'
-	var thousand_sep_len int = 0
-	var dec_point_len int = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 4, 0)
-			num = fp.ParseDouble()
-			fp.StartOptional()
-			dec = fp.ParseLong()
-			dec_point, dec_point_len = fp.ParseStringEx(true, false)
-			thousand_sep, thousand_sep_len = fp.ParseStringEx(true, false)
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	switch executeData.NumArgs() {
-	case 1:
-		return_value.SetString(_phpMathNumberFormat(num, 0, dec_point_chr, thousand_sep_chr))
-		return
-	case 2:
-		return_value.SetString(_phpMathNumberFormat(num, int(dec), dec_point_chr, thousand_sep_chr))
-		return
-	case 4:
-		if dec_point == nil {
-			dec_point = &dec_point_chr
-			dec_point_len = 1
-		}
-		if thousand_sep == nil {
-			thousand_sep = &thousand_sep_chr
-			thousand_sep_len = 1
-		}
-		return_value.SetString(_phpMathNumberFormatEx(num, int(dec), dec_point, dec_point_len, thousand_sep, thousand_sep_len))
-	default:
-		zend.ZendWrongParamCount()
-		return
-	}
+func ZifNumberFormat(number float64, _ zpp.Opt, numDecimalPlaces int, decSeparator_ *string, thousandsSeparator *string) string {
+	var decPoint = b.Option(decSeparator_, ".")
+	var thousandSep = b.Option(thousandsSeparator, ",")
+	return phpMathNumberFormat(number, numDecimalPlaces, decPoint, thousandSep)
 }
-func ZifFmod(executeData zpp.Ex, return_value zpp.Ret, x *types.Zval, y *types.Zval) {
-	var num1 float64
-	var num2 float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			num1 = fp.ParseDouble()
-			num2 = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetDouble(fmod(num1, num2))
-	return
+func ZifFmod(x float64, y float64) float64 {
+	return math.Mod(x, y)
 }
-func ZifIntdiv(executeData zpp.Ex, return_value zpp.Ret, dividend *types.Zval, divisor *types.Zval) {
-	var dividend zend.ZendLong
-	var divisor zend.ZendLong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			dividend = fp.ParseLong()
-			divisor = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
+func ZifIntdiv(dividend int, divisor int) int {
 	if divisor == 0 {
 		faults.ThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Division by zero")
-		return
+		return 0
 	} else if divisor == -1 && dividend == zend.ZEND_LONG_MIN {
-
 		/* Prevent overflow error/crash ... really should not happen:
 		   We don't return a float here as that violates function contract */
-
 		faults.ThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Division of PHP_INT_MIN by -1 is not an integer")
-		return
+		return 0
 	}
-	return_value.SetLong(dividend / divisor)
-	return
+	return dividend / divisor
 }

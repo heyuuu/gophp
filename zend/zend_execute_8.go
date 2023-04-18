@@ -290,7 +290,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 	} else {
-		if function.GetVal()[0] == '\\' {
+		if function.GetStr()[0] == '\\' {
 			lcname = types.ZendStringAlloc(function.GetLen()-1, 0)
 			ZendStrTolowerCopy(lcname.GetVal(), function.GetVal()+1, function.GetLen()-1)
 		} else {

@@ -796,7 +796,7 @@ func ZendAstExportStr(str *SmartStr, s string) {
 func ZendAstExportQstr(str *SmartStr, quote byte, s *types.String) {
 	var i int
 	for i = 0; i < s.GetLen(); i++ {
-		var c uint8 = s.GetVal()[i]
+		var c uint8 = s.GetStr()[i]
 		if c < ' ' {
 			switch c {
 			case '\n':

@@ -266,7 +266,7 @@ func ZifStreamSocketGetName(executeData zpp.Ex, return_value zpp.Ret, stream *ty
 		return_value.SetFalse()
 		return
 	}
-	if name.GetLen() == 0 || name.GetVal()[0] == 0 {
+	if name.GetLen() == 0 || name.GetStr()[0] == 0 {
 		// types.ZendStringReleaseEx(name, 0)
 		return_value.SetFalse()
 		return
@@ -356,7 +356,7 @@ func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream *t
 		if zremote != nil && remote_addr != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zremote, remote_addr)
 		}
-		read_buf.GetVal()[recvd] = '0'
+		read_buf.GetStr()[recvd] = '0'
 		read_buf.SetLen(recvd)
 		return_value.SetString(read_buf)
 		return

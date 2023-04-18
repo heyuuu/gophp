@@ -17,7 +17,7 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 		var display_string_length int
 		var esc_html int = 0
 		if type_ == zend.ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
-			if ini_entry.GetOrigValue() != nil && ini_entry.GetOrigValue().GetVal()[0] {
+			if ini_entry.GetOrigValue() != nil && ini_entry.GetOrigValue().GetStr()[0] {
 				display_string = ini_entry.GetOrigValue().GetVal()
 				display_string_length = ini_entry.GetOrigValue().GetLen()
 				esc_html = !(SM__().GetPhpinfoAsText())
@@ -30,7 +30,7 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 					display_string_length = b.SizeOf("\"no value\"") - 1
 				}
 			}
-		} else if ini_entry.GetValue() != nil && ini_entry.GetValue().GetVal()[0] {
+		} else if ini_entry.GetValue() != nil && ini_entry.GetValue().GetStr()[0] {
 			display_string = ini_entry.GetValue().GetVal()
 			display_string_length = ini_entry.GetValue().GetLen()
 			esc_html = !(SM__().GetPhpinfoAsText())

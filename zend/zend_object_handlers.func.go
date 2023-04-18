@@ -288,7 +288,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 		return uintPtr(CACHED_PTR_EX(cache_slot + 1))
 	}
 	if ce.PropertyTable().Len() == 0 || b.Assign(&property_info, ce.PropertyTable().Get(member.GetStr())) == nil {
-		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
+		if member.GetStr()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
 			}
@@ -385,7 +385,7 @@ func ZendGetPropertyInfo(ce *types.ClassEntry, member *types.String, silent int)
 	var flags uint32
 	var scope *types.ClassEntry
 	if ce.PropertyTable().Len() == 0 || b.Assign(&property_info, ce.PropertyTable().Get(member.GetStr())) == nil {
-		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
+		if member.GetStr()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
 			}
@@ -447,7 +447,7 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.Strin
 	var prop_name *byte
 	var member *types.String
 	var prop_name_len int
-	if prop_info_name.GetVal()[0] == 0 {
+	if prop_info_name.GetStr()[0] == 0 {
 		if is_dynamic != 0 {
 			return types.SUCCESS
 		}
@@ -1227,7 +1227,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	fbc := ce.FunctionTable().Get(lc_function_name.GetStr())
 	if fbc != nil {
 		// pass
-	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.GetName().GetVal(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetVal()[0] != '_' || ce.GetConstructor().GetFunctionName().GetVal()[1] != '_') {
+	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.GetName().GetVal(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetStr()[0] != '_' || ce.GetConstructor().GetFunctionName().GetStr()[1] != '_') {
 		fbc = ce.GetConstructor()
 	} else {
 		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(CurrEX())) != nil && InstanceofFunction(object.GetCe(), ce) != 0 {

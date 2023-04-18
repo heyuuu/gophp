@@ -447,13 +447,13 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			lc_name = types.ZendStringAlloc(func_name.GetLen()+b.SizeOf("uint32_t"), 0)
 			zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal(), func_name.GetLen())
 			memcpy(lc_name.GetVal()+func_name.GetLen(), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
-			lc_name.GetVal()[lc_name.GetLen()] = '0'
+			lc_name.GetStr()[lc_name.GetLen()] = '0'
 		} else {
 			alfi.GetClosure().SetUndef()
 
 			/* Skip leading \ */
 
-			if func_name.GetVal()[0] == '\\' {
+			if func_name.GetStr()[0] == '\\' {
 				lc_name = types.ZendStringAlloc(func_name.GetLen()-1, 0)
 				zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal()+1, func_name.GetLen()-1)
 			} else {
@@ -476,7 +476,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 
 			lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"))
 			memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
-			lc_name.GetVal()[lc_name.GetLen()] = '0'
+			lc_name.GetStr()[lc_name.GetLen()] = '0'
 			alfi.GetObj().SetObject(obj_ptr)
 			//alfi.GetObj().AddRefcount()
 		} else {
@@ -573,12 +573,12 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 		lc_name = types.ZendStringAlloc(func_name.GetLen()+b.SizeOf("uint32_t"), 0)
 		zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal(), func_name.GetLen())
 		memcpy(lc_name.GetVal()+func_name.GetLen(), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
-		lc_name.GetVal()[lc_name.GetLen()] = '0'
+		lc_name.GetStr()[lc_name.GetLen()] = '0'
 	} else {
 
 		/* Skip leading \ */
 
-		if func_name.GetVal()[0] == '\\' {
+		if func_name.GetStr()[0] == '\\' {
 			lc_name = types.ZendStringAlloc(func_name.GetLen()-1, 0)
 			zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal()+1, func_name.GetLen()-1)
 		} else {
@@ -611,7 +611,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 			if success != types.SUCCESS && obj_ptr != nil {
 				lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"))
 				memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
-				lc_name.GetVal()[lc_name.GetLen()] = '0'
+				lc_name.GetStr()[lc_name.GetLen()] = '0'
 				success = types.ZendHashDel(SPL_G__().autoload_functions, lc_name.GetStr())
 			}
 		}

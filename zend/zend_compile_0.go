@@ -522,7 +522,7 @@ func ZendConcat3(
 	memcpy(res.GetVal(), str1, str1_len)
 	memcpy(res.GetVal()+str1_len, str2, str2_len)
 	memcpy(res.GetVal()+str1_len+str2_len, str3, str3_len)
-	res.GetVal()[len_] = '0'
+	res.GetStr()[len_] = '0'
 	return res
 }
 func ZendConcatNames(name1 *byte, name1_len int, name2 *byte, name2_len int) *types.String {
@@ -548,7 +548,7 @@ func ZendHashFindPtrLc(ht *types.Array, str *byte, len_ int) any {
 func ZendResolveNonClassName(name *types.String, type_ uint32, is_fully_qualified *types.ZendBool, case_sensitive types.ZendBool, current_import_sub *types.Array) *types.String {
 	var compound *byte
 	*is_fully_qualified = 0
-	if name.GetVal()[0] == '\\' {
+	if name.GetStr()[0] == '\\' {
 
 		/* Remove \ prefix (only relevant if this is a string rather than a label) */
 

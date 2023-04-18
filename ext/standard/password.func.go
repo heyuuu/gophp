@@ -41,13 +41,13 @@ func PhpPasswordSaltTo64(str *byte, str_len int, out_len int, ret *byte) int {
 		return types.FAILURE
 	}
 	for pos = 0; pos < out_len; pos++ {
-		if buffer.GetVal()[pos] == '+' {
+		if buffer.GetStr()[pos] == '+' {
 			ret[pos] = '.'
-		} else if buffer.GetVal()[pos] == '=' {
+		} else if buffer.GetStr()[pos] == '=' {
 			//types.ZendStringFree(buffer)
 			return types.FAILURE
 		} else {
-			ret[pos] = buffer.GetVal()[pos]
+			ret[pos] = buffer.GetStr()[pos]
 		}
 	}
 	//types.ZendStringFree(buffer)
@@ -74,7 +74,7 @@ func PhpPasswordMakeSalt(length int) *types.String {
 		return nil
 	}
 	// types.ZendStringReleaseEx(buffer, 0)
-	ret.GetVal()[length] = 0
+	ret.GetStr()[length] = 0
 	return ret
 }
 func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *types.Array) *types.String {
@@ -198,7 +198,7 @@ func PhpPasswordBcryptVerify(password *types.String, hash *types.String) types.Z
 	 * values. */
 
 	for i = 0; i < hash.GetLen(); i++ {
-		status |= ret.GetVal()[i] ^ hash.GetVal()[i]
+		status |= ret.GetStr()[i] ^ hash.GetStr()[i]
 	}
 	//types.ZendStringFree(ret)
 	return status == 0
@@ -222,10 +222,10 @@ func PhpPasswordBcryptHash(password *types.String, options *types.Array) *types.
 	if !(b.Assign(&salt, PhpPasswordGetSalt(nil, uint64(22), options))) {
 		return nil
 	}
-	salt.GetVal()[salt.GetLen()] = 0
+	salt.GetStr()[salt.GetLen()] = 0
 	hash = types.ZendStringAlloc(salt.GetLen()+hash_format_len, 0)
 	sprintf(hash.GetVal(), "%s%s", hash_format, salt.GetVal())
-	hash.GetVal()[hash_format_len+salt.GetLen()] = 0
+	hash.GetStr()[hash_format_len+salt.GetLen()] = 0
 	// types.ZendStringReleaseEx(salt, 0)
 
 	/* This cast is safe, since both values are defined here in code and cannot overflow */

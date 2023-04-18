@@ -651,7 +651,7 @@ func ZifGetObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval)
 
 				/* This case is only possible due to loopholes, e.g. ArrayObject */
 
-			} else if is_dynamic == 0 && key.GetVal()[0] == 0 {
+			} else if is_dynamic == 0 && key.GetStr()[0] == 0 {
 				var prop_name *byte
 				var class_name *byte
 				var prop_len int
@@ -855,7 +855,7 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 		break
 	}
 	if autoload == 0 {
-		if name.GetVal()[0] == '\\' {
+		if name.GetStr()[0] == '\\' {
 
 			/* Ignore leading "\" */
 
@@ -900,7 +900,7 @@ func ZifFunctionExists(executeData zpp.Ex, return_value zpp.Ret, functionName *t
 		}
 		break
 	}
-	if name.GetVal()[0] == '\\' {
+	if name.GetStr()[0] == '\\' {
 
 		/* Ignore leading "\" */
 
@@ -1195,7 +1195,7 @@ func ZifCreateFunction(executeData zpp.Ex, return_value zpp.Ret, args *types.Zva
 		EG__().FunctionTable().Del(LAMBDA_TEMP_FUNCNAME)
 		func_.SetStaticVariables(static_variables)
 		function_name = types.ZendStringAlloc(b.SizeOf("\"0lambda_\"")+MAX_LENGTH_OF_LONG, 0)
-		function_name.GetVal()[0] = '0'
+		function_name.GetStr()[0] = '0'
 		for {
 			function_name.SetLen(core.Snprintf(function_name.GetVal()+1, b.SizeOf("\"lambda_\"")+MAX_LENGTH_OF_LONG, "lambda_%d", b.PreInc(&(EG__().GetLambdaCount()))) + 1)
 			if EG__().FunctionTable().Add(function_name.GetStr(), func_) {

@@ -409,7 +409,7 @@ func OnUpdateStringUnempty(
 ) int {
 	var p **byte
 	var base *byte = (*byte)(mh_arg2)
-	if new_value != nil && !(new_value.GetVal()[0]) {
+	if new_value != nil && !(new_value.GetStr()[0]) {
 		return types.FAILURE
 	}
 	p = (**byte)(base + int(mh_arg1))

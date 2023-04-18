@@ -419,7 +419,7 @@ func PhpParserr(
 			l1 = l1 + n + 1
 			l2 = l2 + n
 		}
-		tp.GetVal()[l2] = '0'
+		tp.GetStr()[l2] = '0'
 		tp.SetLen(l2)
 		cp += dlen
 		zend.AddAssocStr(subarray, "txt", tp.GetStr())

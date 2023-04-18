@@ -154,7 +154,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	/* Don't modify URLs of the format "#mark" */
 
-	if url_parts.GetFragment() != nil && '#' == url.GetS().GetVal()[0] {
+	if url_parts.GetFragment() != nil && '#' == url.GetS().GetStr()[0] {
 		dest.AppendSmartStr(url)
 		PhpUrlFree(url_parts)
 		return
@@ -241,7 +241,7 @@ func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 	/* arg.s is string WITHOUT NUL.
 	   To avoid partial match, NUL is added here */
 
-	ctx.GetArg().GetS().GetVal()[ctx.GetArg().GetS().GetLen()] = '0'
+	ctx.GetArg().GetS().GetStr()[ctx.GetArg().GetS().GetLen()] = '0'
 	if !(strcasecmp(ctx.GetArg().GetS().GetVal(), ctx.GetLookupData())) {
 		f = 1
 	}
@@ -342,7 +342,7 @@ func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	}
 	ctx.GetTag().AppendString(b.CastStr(start, YYCURSOR-start))
 	for i = 0; i < ctx.GetTag().GetS().GetLen(); i++ {
-		ctx.GetTag().GetS().GetVal()[i] = tolower(int(uint8(ctx.GetTag().GetS().GetVal()[i])))
+		ctx.GetTag().GetS().GetStr()[i] = tolower(int(uint8(ctx.GetTag().GetS().GetStr()[i])))
 	}
 
 	/* intentionally using str_find here, in case the hash value is set, but the string val is changed later */
@@ -1113,7 +1113,7 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 
 	memmove(start, end, url_state.GetUrlApp().GetS().GetLen()-(end-url_state.GetUrlApp().GetS().GetVal()))
 	url_state.GetUrlApp().GetS().GetLen() -= end - start
-	url_state.GetUrlApp().GetS().GetVal()[url_state.GetUrlApp().GetS().GetLen()] = '0'
+	url_state.GetUrlApp().GetS().GetStr()[url_state.GetUrlApp().GetS().GetLen()] = '0'
 
 	/* Remove form var */
 
@@ -1143,7 +1143,7 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 
 	memmove(start, end, url_state.GetFormApp().GetS().GetLen()-(end-url_state.GetFormApp().GetS().GetVal()))
 	url_state.GetFormApp().GetS().GetLen() -= end - start
-	url_state.GetFormApp().GetS().GetVal()[url_state.GetFormApp().GetS().GetLen()] = '0'
+	url_state.GetFormApp().GetS().GetStr()[url_state.GetFormApp().GetS().GetLen()] = '0'
 finish:
 	url_app.Free()
 	form_app.Free()

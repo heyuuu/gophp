@@ -176,7 +176,7 @@ again:
 			result = 1
 		}
 	case types.IS_STRING:
-		if op.String().GetLen() > 1 || op.String().GetLen() != 0 && op.String().GetVal()[0] != '0' {
+		if op.String().GetLen() > 1 || op.String().GetLen() != 0 && op.String().GetStr()[0] != '0' {
 			result = 1
 		}
 	case types.IS_ARRAY:
@@ -322,7 +322,7 @@ func ZendFastEqualStringsEx(s1 string, s2 string) bool {
 func ZendFastEqualStrings(s1 *types.String, s2 *types.String) int {
 	if s1 == s2 {
 		return 1
-	} else if s1.GetVal()[0] > '9' || s2.GetVal()[0] > '9' {
+	} else if s1.GetStr()[0] > '9' || s2.GetStr()[0] > '9' {
 		return types.IntBool(s1.GetStr() == s2.GetStr())
 	} else {
 		return ZendiSmartStreq(s1, s2)
@@ -641,7 +641,7 @@ try_again:
 		op.SetBool(op.Double() != 0)
 	case types.IS_STRING:
 		var str *types.String = op.String()
-		if str.GetLen() == 0 || str.GetLen() == 1 && str.GetVal()[0] == '0' {
+		if str.GetLen() == 0 || str.GetLen() == 1 && str.GetStr()[0] == '0' {
 			op.SetFalse()
 		} else {
 			op.SetTrue()
@@ -2144,7 +2144,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 
 		result.SetString(result_str)
 		memcpy(result_str.GetVal()+op1_len, op2.String().GetVal(), op2_len)
-		result_str.GetVal()[result_len] = '0'
+		result_str.GetStr()[result_len] = '0'
 	}
 
 	return types.SUCCESS

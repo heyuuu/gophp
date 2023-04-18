@@ -1350,7 +1350,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFu
 		ce.SetSerializeFunc(fe)
 	} else if mname.GetStr() == "unserialize" {
 		ce.SetUnserializeFunc(fe)
-	} else if ce.GetName().GetLen() != mname.GetLen() && (mname.GetVal()[0] != '_' || mname.GetVal()[1] != '_') {
+	} else if ce.GetName().GetLen() != mname.GetLen() && (mname.GetStr()[0] != '_' || mname.GetStr()[1] != '_') {
 
 	} else if mname.GetStr() == ZEND_CLONE_FUNC_NAME {
 		ce.SetClone(fe)

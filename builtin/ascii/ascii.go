@@ -34,6 +34,8 @@ func IsSpace(c byte) bool {
 	return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r'
 }
 
+func IsSpaceRune(r rune) bool { return r <= 0xff && IsSpace(byte(r)) }
+
 func ToUpper(c byte) byte {
 	if 'a' <= c && c <= 'z' {
 		return c - 'a' + 'A'

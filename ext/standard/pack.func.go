@@ -411,8 +411,8 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return b.Max(0, arg-1) })
 			var tmp_str *types.String
 			var str *types.String = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
-			memset(&output.GetVal()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
-			memcpy(&output.GetVal()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
+			memset(&output.GetStr()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
+			memcpy(&output.GetStr()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
 			// zend.ZendTmpStringRelease(tmp_str)
 		case 'h':
@@ -441,11 +441,11 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 					n = 0
 				}
 				if b.PostDec(&first) {
-					output.GetVal()[b.PreInc(&outputpos)] = 0
+					output.GetStr()[b.PreInc(&outputpos)] = 0
 				} else {
 					first = 1
 				}
-				output.GetVal()[outputpos] |= n << nibbleshift
+				output.GetStr()[outputpos] |= n << nibbleshift
 				nibbleshift = nibbleshift + 4&7
 			}
 			outputpos++
@@ -454,7 +454,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			fallthrough
 		case 'C':
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], 1, ByteMap, &output.GetVal()[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], 1, ByteMap, &output.GetStr()[outputpos])
 				outputpos++
 			}
 		case 's':
@@ -471,14 +471,14 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 				map_ = LittleEndianShortMap
 			}
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], 2, map_, &output.GetVal()[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], 2, map_, &output.GetStr()[outputpos])
 				outputpos += 2
 			}
 		case 'i':
 			fallthrough
 		case 'I':
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], b.SizeOf("int"), IntMap, &output.GetVal()[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], b.SizeOf("int"), IntMap, &output.GetStr()[outputpos])
 				outputpos += b.SizeOf("int")
 			}
 		case 'l':
@@ -495,7 +495,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 				map_ = LittleEndianLongMap
 			}
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], 4, map_, &output.GetVal()[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], 4, map_, &output.GetStr()[outputpos])
 				outputpos += 4
 			}
 		case 'q':
@@ -512,13 +512,13 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 				map_ = LittleEndianLonglongMap
 			}
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], 8, map_, &output.GetVal()[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], 8, map_, &output.GetStr()[outputpos])
 				outputpos += 8
 			}
 		case 'f':
 			for b.PostDec(&arg) > 0 {
-				var v float = float(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				memcpy(&output.GetVal()[outputpos], &v, b.SizeOf("v"))
+				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
+				memcpy(&output.GetStr()[outputpos], &v, b.SizeOf("v"))
 				outputpos += b.SizeOf("v")
 			}
 		case 'g':
@@ -527,7 +527,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 
 			for b.PostDec(&arg) > 0 {
 				var v float = float(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				PhpPackCopyFloat(1, &output.GetVal()[outputpos], v)
+				PhpPackCopyFloat(1, &output.GetStr()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
 		case 'G':
@@ -536,13 +536,13 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 
 			for b.PostDec(&arg) > 0 {
 				var v float = float(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				PhpPackCopyFloat(0, &output.GetVal()[outputpos], v)
+				PhpPackCopyFloat(0, &output.GetStr()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
 		case 'd':
 			for b.PostDec(&arg) > 0 {
 				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				memcpy(&output.GetVal()[outputpos], &v, b.SizeOf("v"))
+				memcpy(&output.GetStr()[outputpos], &v, b.SizeOf("v"))
 				outputpos += b.SizeOf("v")
 			}
 		case 'e':
@@ -551,7 +551,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 
 			for b.PostDec(&arg) > 0 {
 				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				PhpPackCopyDouble(1, &output.GetVal()[outputpos], v)
+				PhpPackCopyDouble(1, &output.GetStr()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
 		case 'E':
@@ -560,11 +560,11 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 
 			for b.PostDec(&arg) > 0 {
 				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				PhpPackCopyDouble(0, &output.GetVal()[outputpos], v)
+				PhpPackCopyDouble(0, &output.GetStr()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
 		case 'x':
-			memset(&output.GetVal()[outputpos], '0', arg)
+			memset(&output.GetStr()[outputpos], '0', arg)
 			outputpos += arg
 		case 'X':
 			outputpos -= arg
@@ -573,14 +573,14 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			}
 		case '@':
 			if arg > outputpos {
-				memset(&output.GetVal()[outputpos], '0', arg-outputpos)
+				memset(&output.GetStr()[outputpos], '0', arg-outputpos)
 			}
 			outputpos = arg
 		}
 	}
 	zend.Efree(formatcodes)
 	zend.Efree(formatargs)
-	output.GetVal()[outputpos] = '0'
+	output.GetStr()[outputpos] = '0'
 	output.SetLen(outputpos)
 	return_value.SetString(output)
 	return
@@ -882,14 +882,14 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 						} else {
 							cc += 'a' - 10
 						}
-						buf.GetVal()[opos] = cc
+						buf.GetStr()[opos] = cc
 						nibbleshift = nibbleshift + 4&7
 						if b.PostDec(&first) == 0 {
 							ipos++
 							first = 1
 						}
 					}
-					buf.GetVal()[len_] = '0'
+					buf.GetStr()[len_] = '0'
 					zend.AddAssocStr(return_value, n, buf.GetStr())
 				case 'c':
 					fallthrough

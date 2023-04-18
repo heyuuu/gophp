@@ -95,7 +95,7 @@ func ZendFetchDimensionAddressRead(
 			} else {
 				real_offset = offset
 			}
-			c = types.ZendUchar(container.String().GetVal()[real_offset])
+			c = types.ZendUchar(container.String().GetStr()[real_offset])
 			result.SetStringVal(string(c))
 		}
 	} else if container.IsObject() {
@@ -226,7 +226,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 				lval += ZendLong(container.String().GetLen())
 			}
 			if lval >= 0 && int(lval < container.String().GetLen()) != 0 {
-				return container.String().GetVal()[lval] == '0'
+				return container.String().GetStr()[lval] == '0'
 			} else {
 				return 1
 			}

@@ -73,7 +73,7 @@ func Phonize(c byte) {
 		*phoned_word = types.ZendStringExtend(*phoned_word, 2*b.SizeOf("char")+max_buffer_len)
 		max_buffer_len += 2
 	}
-	phoned_word.GetVal()[b.PostInc(&p_idx)] = c
+	phoned_word.GetStr()[b.PostInc(&p_idx)] = c
 	phoned_word.GetLen() = p_idx
 }
 func Isbreak(c byte) bool { return !(isalpha(c)) }
@@ -115,7 +115,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 				*phoned_word = types.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len)
 				max_buffer_len += 1
 			}
-			phoned_word.GetVal()[p_idx] = '0'
+			phoned_word.GetStr()[p_idx] = '0'
 			phoned_word.SetLen(p_idx)
 			return types.SUCCESS
 		}
@@ -318,7 +318,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 		*phoned_word = types.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len)
 		max_buffer_len += 1
 	}
-	phoned_word.GetVal()[p_idx] = '0'
+	phoned_word.GetStr()[p_idx] = '0'
 	phoned_word.SetLen(p_idx)
 	return 0
 }
