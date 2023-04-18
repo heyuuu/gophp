@@ -1,9 +1,7 @@
 package types
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/faults"
+	"fmt"
 	"math"
 	"runtime"
 )
@@ -209,10 +207,10 @@ func (ht *Array) appendBucket(bucket *Bucket) *Bucket {
 		var indexKey = bucket.IndexKey()
 		// 更新 nextFreeElement
 		if indexKey > ht.nextFreeElement {
-			if indexKey < zend.ZEND_LONG_MAX {
+			if indexKey < MaxLong {
 				ht.nextFreeElement = indexKey + 1
 			} else {
-				ht.nextFreeElement = zend.ZEND_LONG_MAX
+				ht.nextFreeElement = MaxLong
 			}
 		}
 	}
@@ -226,16 +224,16 @@ func (ht *Array) resizeIfFull() {
 		if dataSize > int(ht.elementsCount+(ht.elementsCount>>5)) {
 			ht.Rehash()
 		} else if dataSize >= math.MaxInt32 {
-			faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%d)", dataSize*2)
+			triggerError(fmt.Sprintf("Possible integer overflow in memory allocation (%d)", dataSize*2))
 		}
 	}
 }
 func (ht *Array) deleteBucket(pos uint32) {
 	ht.assertRc1()
-	b.Assert(int(pos) < len(ht.data))
+	assert(int(pos) < len(ht.data))
 
 	var p = &ht.data[pos]
-	b.Assert(p.IsValid())
+	assert(p.IsValid())
 
 	// 移除映射
 	ht.deleteHash(p.key)
@@ -284,7 +282,7 @@ func (ht *Array) posBucket(p *Bucket) (uint32, bool) {
 
 // 移动 bucket 到新位置
 func (ht *Array) moveBucket(pos uint32, newPos uint32) {
-	b.Assert(newPos <= pos)
+	assert(newPos <= pos)
 	if newPos == pos {
 		return
 	}
@@ -364,7 +362,7 @@ func (ht *Array) Rehash() {
 }
 
 /* misc */
-func (ht *Array) assertRc1() { b.Assert(ht.GetRefcount() == 1) }
+func (ht *Array) assertRc1() { assert(ht.GetRefcount() == 1) }
 
 /** Array.flags */
 func (ht *Array) CopyFlags(arr *Array) { ht.flags = arr.flags }

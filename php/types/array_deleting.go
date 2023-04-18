@@ -2,7 +2,6 @@ package types
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend"
 )
 
 /**
@@ -22,13 +21,13 @@ func (this *Bucket) GetKey() *String {
 		return nil
 	}
 }
-func (this *Bucket) SetH(value zend.ZendUlong) {
+func (this *Bucket) SetH(value int) {
 	// todo remove
-	b.Assert(false)
+	assert(false)
 }
 func (this *Bucket) SetKey(value *String) {
 	// todo remove
-	b.Assert(false)
+	assert(false)
 }
 
 /**
@@ -36,7 +35,7 @@ func (this *Bucket) SetKey(value *String) {
  */
 func (ht *Array) SymtableClean() {
 	// todo 这里可能不会严格对等，需要处理一下
-	//b.Assert(ht.destructor == zend.ZVAL_PTR_DTOR)
+	//assert(ht.destructor == zend.ZVAL_PTR_DTOR)
 
 	ht.Clean()
 }

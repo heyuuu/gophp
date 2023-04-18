@@ -9,20 +9,20 @@ import (
 /**
  * Open methods
  */
-func (ht *Array) RealInit()                               { ht.clearData() } // todo remove 无需init操作
-func (ht *Array) GetArData() *Bucket                      { return ht.arData }
-func (ht *Array) DataSize() uint32                        { return uint32(len(ht.data)) }
-func (ht *Array) LastPos() uint32                         { return ht.DataSize() - 1 }
-func (ht *Array) GetNNumUsed() uint32                     { return ht.DataSize() }
-func (ht *Array) SetNNumUsed(value uint32)                {} // todo remove
-func (ht *Array) SetNNumOfElements(value uint32)          { ht.elementsCount = value }
-func (ht *Array) GetNInternalPointer() uint32             { return ht.internalPointer }
-func (ht *Array) SetNInternalPointer(value uint32)        { ht.internalPointer = value }
-func (ht *Array) GetNNextFreeElement() zend.ZendLong      { return ht.nextFreeElement }
-func (ht *Array) SetNNextFreeElement(value zend.ZendLong) { ht.nextFreeElement = value }
-func (ht *Array) GetPDestructor() DtorFuncT               { return ht.destructor }
-func (ht *Array) SetPDestructor(value DtorFuncT)          { ht.destructor = value }
-func (ht *Array) GetNTableMask() uint32                   { return 0 } // todo remove
+func (ht *Array) RealInit()                        { ht.clearData() } // todo remove 无需init操作
+func (ht *Array) GetArData() *Bucket               { return ht.arData }
+func (ht *Array) DataSize() uint32                 { return uint32(len(ht.data)) }
+func (ht *Array) LastPos() uint32                  { return ht.DataSize() - 1 }
+func (ht *Array) GetNNumUsed() uint32              { return ht.DataSize() }
+func (ht *Array) SetNNumUsed(value uint32)         {} // todo remove
+func (ht *Array) SetNNumOfElements(value uint32)   { ht.elementsCount = value }
+func (ht *Array) GetNInternalPointer() uint32      { return ht.internalPointer }
+func (ht *Array) SetNInternalPointer(value uint32) { ht.internalPointer = value }
+func (ht *Array) GetNNextFreeElement() int         { return ht.nextFreeElement }
+func (ht *Array) SetNNextFreeElement(value int)    { ht.nextFreeElement = value }
+func (ht *Array) GetPDestructor() DtorFuncT        { return ht.destructor }
+func (ht *Array) SetPDestructor(value DtorFuncT)   { ht.destructor = value }
+func (ht *Array) GetNTableMask() uint32            { return 0 } // todo remove
 
 func (ht *Array) IsWithoutHoles() bool { return ht.GetNNumUsed() == ht.elementsCount }
 
