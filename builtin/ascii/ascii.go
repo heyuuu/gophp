@@ -5,6 +5,13 @@ import "strings"
 func IsAscii(c byte) bool {
 	return c <= 0x7f
 }
+func IsAsciiRune(r rune) bool {
+	return 0 <= r && r <= 0x7f
+}
+
+func IsControl(c byte) bool {
+	return c <= 0x1F
+}
 
 func IsAlphaNum(c byte) bool {
 	return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9')

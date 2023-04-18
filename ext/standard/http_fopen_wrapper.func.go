@@ -839,24 +839,19 @@ func PhpStreamUrlWrapHttpEx(
 			}
 			var CHECK_FOR_CNTRL_CHARS func(val *types.String) = func(val *types.String) {
 				if val != nil {
-					var s *uint8
-					var e *uint8
-					val.SetLen(PhpUrlDecode(val.GetVal(), val.GetLen()))
-					s = (*uint8)(val.GetVal())
-					e = s + val.GetLen()
-					for s < e {
-						if iscntrl(*s) {
+					*val = types.String(PhpUrlEncodeEx(val.GetStr()))
+
+					for _, c := range []byte(val.GetStr()) {
+						if ascii.IsControl(c) {
 							streams.PhpStreamWrapperLogError(wrapper, options, "Invalid redirect URL! %s", new_path)
 							goto out
 						}
-						s++
 					}
 				}
 			}
 
 			/* check for control characters in login, password & path */
-
-			if strncasecmp(new_path, "http://", b.SizeOf("\"http://\"")-1) || strncasecmp(new_path, "https://", b.SizeOf("\"https://\"")-1) {
+			if ascii.StrCaseEquals(new_path, "http://") || ascii.StrCaseEquals(new_path, "https://") {
 				CHECK_FOR_CNTRL_CHARS(resource.GetUser())
 				CHECK_FOR_CNTRL_CHARS(resource.GetPass())
 				CHECK_FOR_CNTRL_CHARS(resource.GetPath())

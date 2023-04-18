@@ -3,6 +3,7 @@ package standard
 import (
 	"github.com/heyuuu/gophp/builtin"
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
@@ -10,14 +11,10 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"math"
+	"strings"
 )
 
-func ZmStartupExec(type_ int, module_number int) int {
-	/* This is just an arbitrary value for the fallback case. */
-
-	CmdMaxLen = 4096
-	return types.SUCCESS
-}
 func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) int {
 	var fp *r.File
 	var buf *byte
@@ -191,219 +188,99 @@ func ZifSystem(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, _ 
 func ZifPassthru(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, _ zpp.Opt, returnValue zpp.RefZval) {
 	PhpExecEx(executeData, return_value, 3)
 }
-func PhpEscapeShellCmd(str *byte) *types.String {
-	var x int
-	var y int
-	var l int = strlen(str)
-	var estimate uint64 = 2*uint64(l) + 1
-	var cmd *types.String
-	var p *byte = nil
-
+func PhpEscapeShellCmd(str string) string {
 	/* max command line length - two single quotes - \0 byte length */
-
-	if l > CmdMaxLen-2-1 {
+	if len(str) > CmdMaxLen-2-1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Command exceeds the allowed length of %zu bytes", CmdMaxLen)
-		return types.NewString("")
+		return ""
 	}
-	cmd = types.ZendStringSafeAlloc(2, l, 0, 0)
-	x = 0
-	y = 0
-	for ; x < l; x++ {
-		var mb_len int = PhpMblen(str+x, l-x)
 
-		/* skip non-valid multibyte characters */
-
-		if mb_len < 0 {
-			continue
-		} else if mb_len > 1 {
-			memcpy(cmd.GetVal()+y, str+x, mb_len)
-			y += mb_len
-			x += mb_len - 1
+	var buf strings.Builder
+	var p byte = 0 // 可选值 0, ', "
+	for i, r := range str {
+		/* skip multibyte characters */
+		if r > math.MaxUint8 {
+			buf.WriteRune(r)
 			continue
 		}
-		switch str[x] {
-		case '"':
-			fallthrough
-		case '\'':
-			if p == nil && b.Assign(&p, memchr(str+x+1, str[x], l-x-1)) {
-
-			} else if p != nil && (*p) == str[x] {
-				p = nil
+		//
+		c := byte(r)
+		switch c {
+		case '"', '\'':
+			if p == 0 {
+				if pos := strings.IndexByte(str[i+1:], c); pos >= 0 {
+					p = c
+				} else {
+					buf.WriteByte('\\')
+				}
 			} else {
-				cmd.GetStr()[b.PostInc(&y)] = '\\'
+				if p == c {
+					p = 0
+				} else {
+					buf.WriteRune('\\')
+				}
 			}
-			cmd.GetStr()[b.PostInc(&y)] = str[x]
-		case '#':
-			fallthrough
-		case '&':
-			fallthrough
-		case ';':
-			fallthrough
-		case '`':
-			fallthrough
-		case '|':
-			fallthrough
-		case '*':
-			fallthrough
-		case '?':
-			fallthrough
-		case '~':
-			fallthrough
-		case '<':
-			fallthrough
-		case '>':
-			fallthrough
-		case '^':
-			fallthrough
-		case '(':
-			fallthrough
-		case ')':
-			fallthrough
-		case '[':
-			fallthrough
-		case ']':
-			fallthrough
-		case '{':
-			fallthrough
-		case '}':
-			fallthrough
-		case '$':
-			fallthrough
-		case '\\':
-			fallthrough
-		case 'x':
-			fallthrough
-		case 'x':
-			cmd.GetStr()[b.PostInc(&y)] = '\\'
-			fallthrough
+			buf.WriteByte(c)
+		case '#', '&', ';', '`', '|', '*', '?', '~', '<', '>', '^', '(', ')', '[', ']', '{', '}', '$', '\\', '\x0A', '\xFF':
+			buf.WriteByte('\\')
+			buf.WriteByte(c)
 		default:
-			cmd.GetStr()[b.PostInc(&y)] = str[x]
+			buf.WriteByte(c)
 		}
 	}
-	cmd.GetStr()[y] = '0'
-	if y > CmdMaxLen+1 {
+	if buf.Len() > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
-		// types.ZendStringReleaseEx(cmd, 0)
-		return types.NewString("")
+		return ""
 	}
-	if estimate-y > 4096 {
-
-		/* realloc if the estimate was way overill
-		 * Arbitrary cutoff point of 4096 */
-
-		cmd = types.ZendStringTruncate(cmd, y)
-
-		/* realloc if the estimate was way overill
-		 * Arbitrary cutoff point of 4096 */
-
-	}
-	cmd.SetLen(y)
-	return cmd
+	return buf.String()
 }
-func PhpEscapeShellArg(str *byte) *types.String {
-	var x int
-	var y int = 0
-	var l int = strlen(str)
-	var cmd *types.String
-	var estimate uint64 = 4*uint64(l) + 3
-
+func PhpEscapeShellArg(str string) string {
 	/* max command line length - two single quotes - \0 byte length */
-
-	if l > CmdMaxLen-2-1 {
+	if len(str) > CmdMaxLen-2-1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Argument exceeds the allowed length of %zu bytes", CmdMaxLen)
-		return types.NewString("")
+		return ""
 	}
-	cmd = types.ZendStringSafeAlloc(4, l, 2, 0)
-	cmd.GetStr()[b.PostInc(&y)] = '\''
-	for x = 0; x < l; x++ {
-		var mb_len int = PhpMblen(str+x, l-x)
 
-		/* skip non-valid multibyte characters */
-
-		if mb_len < 0 {
-			continue
-		} else if mb_len > 1 {
-			memcpy(cmd.GetVal()+y, str+x, mb_len)
-			y += mb_len
-			x += mb_len - 1
+	var buf strings.Builder
+	buf.WriteByte('\'')
+	for _, r := range str {
+		/* skip multibyte characters */
+		if !ascii.IsAsciiRune(r) {
+			buf.WriteRune(r)
 			continue
 		}
-		switch str[x] {
+
+		c := byte(r)
+		switch c {
 		case '\'':
-			cmd.GetStr()[b.PostInc(&y)] = '\''
-			cmd.GetStr()[b.PostInc(&y)] = '\\'
-			cmd.GetStr()[b.PostInc(&y)] = '\''
+			buf.WriteString(`'\'`)
 			fallthrough
 		default:
-			cmd.GetStr()[b.PostInc(&y)] = str[x]
+			buf.WriteByte(c)
 		}
 	}
-	cmd.GetStr()[b.PostInc(&y)] = '\''
-	cmd.GetStr()[y] = '0'
-	if y > CmdMaxLen+1 {
+	buf.WriteByte('\'')
+	if buf.Len() > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
-		// types.ZendStringReleaseEx(cmd, 0)
-		return types.NewString("")
+		return ""
 	}
-	if estimate-y > 4096 {
-
-		/* realloc if the estimate was way overill
-		 * Arbitrary cutoff point of 4096 */
-
-		cmd = types.ZendStringTruncate(cmd, y)
-
-		/* realloc if the estimate was way overill
-		 * Arbitrary cutoff point of 4096 */
-
-	}
-	cmd.SetLen(y)
-	return cmd
+	return buf.String()
 }
-func ZifEscapeshellcmd(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval) {
-	var command *byte
-	var command_len int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			command, command_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifEscapeshellcmd(command string) string {
+	if command == "" {
+		return ""
 	}
-	if command_len != 0 {
-		if command_len != strlen(command) {
-			core.PhpErrorDocref(nil, faults.E_ERROR, "Input string contains NULL bytes")
-			return
-		}
-		return_value.SetString(PhpEscapeShellCmd(command))
-	} else {
-		return_value.SetStringVal("")
+	if pos := strings.IndexByte(command, 0); pos >= 0 {
+		core.PhpErrorDocref(nil, faults.E_ERROR, "Input string contains NULL bytes")
 	}
+
+	return PhpEscapeShellCmd(command)
 }
-func ZifEscapeshellarg(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
-	var argument *byte
-	var argument_len int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			argument, argument_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifEscapeshellarg(arg string) string {
+	if pos := strings.IndexByte(arg, 0); pos >= 0 {
+		core.PhpErrorDocref(nil, faults.E_ERROR, "Input string contains NULL bytes")
 	}
-	if argument != nil {
-		if argument_len != strlen(argument) {
-			core.PhpErrorDocref(nil, faults.E_ERROR, "Input string contains NULL bytes")
-			return
-		}
-		return_value.SetString(PhpEscapeShellArg(argument))
-	}
+	return PhpEscapeShellArg(arg)
 }
 func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types.Zval) {
 	var in *r.File

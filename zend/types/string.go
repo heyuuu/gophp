@@ -15,9 +15,10 @@ func NewStringSafe(str *string) *String {
 	return NewString(*str)
 }
 
-func (zs String) Copy() *String  { return &zs }
-func (zs String) GetStr() string { return string(zs) }
-func (zs String) GetLen() int    { return len(zs) }
+func (zs String) Copy() *String        { return &zs }
+func (zs String) GetStr() string       { return string(zs) }
+func (zs String) GetLen() int          { return len(zs) }
+func (zs String) Cutoff(l int) *String { tmp := zs[:l]; return &tmp }
 
 func (zs String) GetVal() []byte    { return []byte(zs) }   // todo remove
 func (zs *String) SetLen(value int) { *zs = (*zs)[:value] } // todo remove

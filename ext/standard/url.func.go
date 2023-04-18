@@ -9,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
 func PhpUrlFree(theurl *PhpUrl) {
@@ -406,6 +407,18 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zp
 done:
 	PhpUrlFree(resource)
 }
+func _H2I(c byte) byte {
+	if '0' <= c && c <= '9' {
+		return c - '0'
+	} else if 'a' <= c && c <= 'z' {
+		return c - 'a' + 10
+	} else if 'A' <= c && c <= 'Z' {
+		return c - 'A' + 10
+	} else {
+		return 0
+	}
+}
+
 func PhpHtoi(s *byte) int {
 	var value int
 	var c int
@@ -424,6 +437,21 @@ func PhpHtoi(s *byte) int {
 		value += c - 'a' + 10
 	}
 	return value
+}
+func PhpUrlEncodeEx(s string) string {
+	var buf strings.Builder
+	for _, c := range []byte(s) {
+		if c == ' ' {
+			buf.WriteByte('+')
+		} else if !ascii.IsAlphaNum(c) && c != '-' && c != '.' && c != '_' {
+			buf.WriteByte('%')
+			buf.WriteByte(c >> 4)
+			buf.WriteByte(c & 0x0F)
+		} else {
+			buf.WriteByte(c)
+		}
+	}
+	return buf.String()
 }
 func PhpUrlEncode(s *byte, len_ int) *types.String {
 	var c uint8
@@ -453,40 +481,28 @@ func PhpUrlEncode(s *byte, len_ int) *types.String {
 	start = types.ZendStringTruncate(start, to-(*uint8)(start.GetVal()))
 	return start
 }
-func ZifUrlencode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var in_str *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			in_str = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetString(PhpUrlEncode(in_str.GetVal(), in_str.GetLen()))
-	return
+func ZifUrlencode(str string) string {
+	return PhpUrlEncodeEx(str)
 }
-func ZifUrldecode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var in_str *types.String
-	var out_str *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			in_str = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
+func ZifUrldecode(str string) string {
+	return PhpUrlDecodeEx(str)
+}
+
+func PhpUrlDecodeEx(str string) string {
+	var buf strings.Builder
+	for i := 0; i < len(str); i++ {
+		c := str[i]
+		if c == '+' {
+			buf.WriteByte(' ')
+		} else if c == '%' && i+2 < len(str) && ascii.IsXDigit(str[i+1]) && ascii.IsXDigit(str[i+2]) {
+			tmp := _H2I(str[i+1])*18 + _H2I(str[i+2])
+			buf.WriteByte(tmp)
+			i += 2
+		} else {
+			buf.WriteByte(c)
 		}
-		break
 	}
-	out_str = types.NewString(in_str.GetStr())
-	out_str.SetLen(PhpUrlDecode(out_str.GetVal(), out_str.GetLen()))
-	return_value.SetString(out_str)
-	return
+	return buf.String()
 }
 func PhpUrlDecode(str *byte, len_ int) int {
 	var dest *byte = str
@@ -547,24 +563,22 @@ func ZifRawurlencode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) 
 	return_value.SetString(PhpRawUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
-func ZifRawurldecode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var in_str *types.String
-	var out_str *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			in_str = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
+func ZifRawurldecode(str string) string {
+	return PhpRawUrlDecodeEx(str)
+}
+func PhpRawUrlDecodeEx(str string) string {
+	var buf strings.Builder
+	for i := 0; i < len(str); i++ {
+		c := str[i]
+		if c == '%' && i+2 < len(str) && ascii.IsXDigit(str[i+1]) && ascii.IsXDigit(str[i+2]) {
+			tmp := _H2I(str[i+1])*18 + _H2I(str[i+2])
+			buf.WriteByte(tmp)
+			i += 2
+		} else {
+			buf.WriteByte(c)
 		}
-		break
 	}
-	out_str = types.NewString(in_str.GetStr())
-	out_str.SetLen(PhpRawUrlDecode(out_str.GetVal(), out_str.GetLen()))
-	return_value.SetString(out_str)
-	return
+	return buf.String()
 }
 func PhpRawUrlDecode(str *byte, len_ int) int {
 	var dest *byte = str

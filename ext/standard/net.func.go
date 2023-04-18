@@ -21,10 +21,8 @@ func PhpInetNtop(addr *__struct__sockaddr) *types.String {
 	case AF_INET:
 		var ret *types.String = types.ZendStringAlloc(INET_ADDRSTRLEN, 0)
 		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), ret.GetVal(), INET_ADDRSTRLEN) {
-			ret.SetLen(strlen(ret.GetVal()))
-			return ret
+			return ret.Cutoff(strlen(ret.GetVal()))
 		}
-		// types.ZendStringEfree(ret)
 	}
 
 	/* Fallback on getnameinfo() */
@@ -40,8 +38,7 @@ func PhpInetNtop(addr *__struct__sockaddr) *types.String {
 			if colon != nil {
 				*colon = 0
 			}
-			ret.SetLen(strlen(ret.GetVal()))
-			return ret
+			return ret.Cutoff(strlen(ret.GetVal()))
 		}
 		// types.ZendStringEfree(ret)
 	}

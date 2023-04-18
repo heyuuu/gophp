@@ -477,9 +477,7 @@ exit:
 
 	/* possibly, we have to make sure we have room for the terminating null? */
 
-	result.GetStr()[outpos] = 0
-	result.SetLen(outpos)
-	return result
+	return result.Cutoff(outpos)
 }
 func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 	var args *types.Zval

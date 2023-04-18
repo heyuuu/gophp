@@ -155,7 +155,7 @@ var DefZifFgets = def.DefFunc("fgets", 1, 2, []def.ArgInfo{{Name: "fp"}, {Name: 
 	if fp.HasError() {
 		return
 	}
-	ZifFgets(executeData, returnValue, fp, nil, length)
+	ZifFgets(fp, nil, length)
 })
 
 // generate by ZifFgetc

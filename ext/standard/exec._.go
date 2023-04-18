@@ -1,3 +1,3 @@
 package standard
 
-var CmdMaxLen int
+const CmdMaxLen = 4096

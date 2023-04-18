@@ -3,7 +3,6 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
-	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
@@ -1146,69 +1145,6 @@ func ZifGetDefinedVars(executeData zpp.Ex, return_value zpp.Ret) {
 	}
 	return_value.SetArray(types.ZendArrayDup(symbol_table))
 	return
-}
-func ZifCreateFunction(executeData zpp.Ex, return_value zpp.Ret, args *types.Zval, code *types.Zval) {
-	var function_name *types.String
-	var eval_code *byte
-	var function_args *byte
-	var function_code *byte
-	var eval_code_length int
-	var function_args_len int
-	var function_code_len int
-	var retval int
-	var eval_name *byte
-	if ZendParseParameters(executeData.NumArgs(), "ss", &function_args, &function_args_len, &function_code, &function_code_len) == types.FAILURE {
-		return
-	}
-	eval_code = (*byte)(Emalloc(b.SizeOf("\"function \" LAMBDA_TEMP_FUNCNAME") + function_args_len + 2 + 2 + function_code_len))
-	eval_code_length = b.SizeOf("\"function \" LAMBDA_TEMP_FUNCNAME \"(\"") - 1
-	memcpy(eval_code, "function "+LAMBDA_TEMP_FUNCNAME+"(", eval_code_length)
-	memcpy(eval_code+eval_code_length, function_args, function_args_len)
-	eval_code_length += function_args_len
-	eval_code[b.PostInc(&eval_code_length)] = ')'
-	eval_code[b.PostInc(&eval_code_length)] = '{'
-	memcpy(eval_code+eval_code_length, function_code, function_code_len)
-	eval_code_length += function_code_len
-	eval_code[b.PostInc(&eval_code_length)] = '}'
-	eval_code[eval_code_length] = '0'
-	eval_name = ZendMakeCompiledStringDescription("runtime-created function")
-	retval = ZendEvalStringl(eval_code, eval_code_length, nil, eval_name)
-	Efree(eval_code)
-	Efree(eval_name)
-	if retval == types.SUCCESS {
-		var func_ *types.ZendOpArray
-		var static_variables *types.Array
-
-		ifunc_ := EG__().FunctionTable().Get(LAMBDA_TEMP_FUNCNAME)
-		if ifunc_ == nil {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unexpected inconsistency in create_function()")
-			return_value.SetFalse()
-			return
-		}
-		func_ = ifunc_.GetOpArray()
-
-		if func_.GetRefcount() != nil {
-			func_.refcount++
-		}
-		static_variables = func_.GetStaticVariables()
-		func_.SetStaticVariables(nil)
-		EG__().FunctionTable().Del(LAMBDA_TEMP_FUNCNAME)
-		func_.SetStaticVariables(static_variables)
-		function_name = types.ZendStringAlloc(b.SizeOf("\"0lambda_\"")+MAX_LENGTH_OF_LONG, 0)
-		function_name.GetStr()[0] = '0'
-		for {
-			function_name.SetLen(core.Snprintf(function_name.GetVal()+1, b.SizeOf("\"lambda_\"")+MAX_LENGTH_OF_LONG, "lambda_%d", b.PreInc(&(EG__().GetLambdaCount()))) + 1)
-			if EG__().FunctionTable().Add(function_name.GetStr(), func_) {
-				break
-			}
-		}
-		return_value.SetString(function_name)
-		return
-	} else {
-		EG__().FunctionTable().Del(LAMBDA_TEMP_FUNCNAME)
-		return_value.SetFalse()
-		return
-	}
 }
 func ZifGetResourceType(executeData zpp.Ex, return_value zpp.Ret, res *types.Zval) {
 	var resource_type *byte

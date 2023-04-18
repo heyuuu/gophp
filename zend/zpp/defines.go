@@ -54,6 +54,9 @@ type (
 	// FAST_ZPP: Z_PARAM_OBJECT, Type: 'o'
 	Object = *types.Zval
 
+	// FAST_ZPP: Z_PARAM_RESOURCE, Type: 'r'
+	Resource = *types.Zval
+
 	// FAST_ZPP: Z_PARAM_ZVAL, Type: 'z', 直接使用 *types.Zval
 	//Zval = *types.Zval
 

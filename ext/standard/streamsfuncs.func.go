@@ -316,39 +316,23 @@ func ZifStreamSocketSendto(executeData zpp.Ex, return_value zpp.Ret, stream *typ
 	return_value.SetLong(streams.PhpStreamXportSendto(stream, data, datalen, int(flags), b.Cond(target_addr_len != 0, &sa, nil), sl))
 	return
 }
-func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, amount *types.Zval, _ zpp.Opt, flags *types.Zval, remoteAddr zpp.RefZval) {
+func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream_ zpp.Resource, amount int, _ zpp.Opt, flags int, remoteAddr zpp.RefZval) (string, bool) {
+	var zstream *types.Zval = stream_
+	var to_read zend.ZendLong = amount
+	var zremote *types.Zval = remoteAddr
 	var stream *core.PhpStream
-	var zstream *types.Zval
-	var zremote *types.Zval = nil
 	var remote_addr *types.String = nil
-	var to_read zend.ZendLong = 0
 	var read_buf *types.String
-	var flags zend.ZendLong = 0
 	var recvd int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 4, 0)
-			zstream = fp.ParseResource()
-			to_read = fp.ParseLong()
-			fp.StartOptional()
-			flags = fp.ParseLong()
-			zremote = fp.ParseZval()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
+
 	core.PhpStreamFromZval(stream, zstream)
 	if zremote != nil {
 		zend.ZEND_TRY_ASSIGN_REF_NULL(zremote)
 	}
+
 	if to_read <= 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter must be greater than 0")
-		return_value.SetFalse()
-		return
+		return "", false
 	}
 	read_buf = types.ZendStringAlloc(to_read, 0)
 	recvd = streams.PhpStreamXportRecvfrom(stream, read_buf.GetVal(), to_read, int(flags), nil, nil, b.Cond(zremote != nil, &remote_addr, nil))
@@ -356,14 +340,9 @@ func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream *t
 		if zremote != nil && remote_addr != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zremote, remote_addr)
 		}
-		read_buf.GetStr()[recvd] = '0'
-		read_buf.SetLen(recvd)
-		return_value.SetString(read_buf)
-		return
+		return read_buf.Cutoff(recvd).GetStr()
 	}
-	// types.ZendStringEfree(read_buf)
-	return_value.SetFalse()
-	return
+	return "", false
 }
 func ZifStreamGetContents(executeData zpp.Ex, return_value zpp.Ret, source *types.Zval, _ zpp.Opt, maxlen *types.Zval, offset *types.Zval) {
 	var stream *core.PhpStream

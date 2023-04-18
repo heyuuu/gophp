@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
 func ZifGethostname(executeData zpp.Ex, return_value zpp.Ret) {
@@ -231,14 +232,14 @@ func ZifDnsCheckRecord(executeData zpp.Ex, return_value zpp.Ret, host *types.Zva
 	return
 }
 func PhpParserr(
-	cp *u_char,
-	end *u_char,
+	cp *byte,
+	end *byte,
 	answer *Querybuf,
 	type_to_fetch int,
 	store int,
 	raw int,
 	subarray *types.Zval,
-) *u_char {
+) *byte {
 	var type_ u_short
 	var class u_short
 	var dlen u_short
@@ -395,34 +396,25 @@ func PhpParserr(
 		cp += n
 	case DNS_T_TXT:
 		var l1 int = 0
-		var l2 int = 0
 		var entries types.Zval
-		var tp *types.String
-		zend.AddAssocString(subarray, "type", "TXT")
-		tp = types.ZendStringAlloc(dlen, 0)
+		zend.AddAssocStr(subarray, "type", "TXT")
 		zend.ArrayInit(&entries)
+
+		var buf strings.Builder
 		for l1 < dlen {
 			n = cp[l1]
 			if l1+n >= dlen {
-
 				// Invalid chunk length, truncate
-
 				n = dlen - (l1 + 1)
-
-				// Invalid chunk length, truncate
-
 			}
-			if n {
-				memcpy(tp.GetVal()+l2, cp+l1+1, n)
+			if n != 0 {
+				buf.WriteString(cp[l1+1 : l1+1+n])
 				zend.AddNextIndexStringl(&entries, (*byte)(cp+l1+1), n)
 			}
 			l1 = l1 + n + 1
-			l2 = l2 + n
 		}
-		tp.GetStr()[l2] = '0'
-		tp.SetLen(l2)
 		cp += dlen
-		zend.AddAssocStr(subarray, "txt", tp.GetStr())
+		zend.AddAssocStr(subarray, "txt", buf.String())
 		zend.AddAssocZval(subarray, "entries", &entries)
 	case DNS_T_SOA:
 		zend.AddAssocString(subarray, "type", "SOA")

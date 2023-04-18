@@ -8,7 +8,7 @@ import (
 // generate by ZifConstant
 var DefZifConstant = def.DefFunc("constant", 1, 1, []def.ArgInfo{{Name: "const_name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	const_name := fp.ParseZval()
+	const_name := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}

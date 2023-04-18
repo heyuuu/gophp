@@ -45,21 +45,23 @@ var DefZifPassthru = def.DefFunc("passthru", 1, 2, []def.ArgInfo{{Name: "command
 // generate by ZifEscapeshellcmd
 var DefZifEscapeshellcmd = def.DefFunc("escapeshellcmd", 1, 1, []def.ArgInfo{{Name: "command"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	command := fp.ParseZval()
+	command := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifEscapeshellcmd(executeData, returnValue, command)
+	ret := ZifEscapeshellcmd(command)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifEscapeshellarg
 var DefZifEscapeshellarg = def.DefFunc("escapeshellarg", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZval()
+	arg := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifEscapeshellarg(executeData, returnValue, arg)
+	ret := ZifEscapeshellarg(arg)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifShellExec

@@ -821,66 +821,34 @@ func ZifFeof(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 		return
 	}
 }
-func ZifFgets(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.Opt, length *types.Zval) {
-	var res *types.Zval
-	var len_ zend.ZendLong = 1024
+func ZifFgets(fp zpp.Resource, _ zpp.Opt, length *int) (string, bool) {
+	var res *types.Zval = fp
+	var len_ zend.ZendLong = b.Option(length, 1024)
 	var buf *byte = nil
-	var argc int = executeData.NumArgs()
 	var line_len int = 0
-	var str *types.String
 	var stream *core.PhpStream
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			res = fp.ParseResource()
-			fp.StartOptional()
-			len_ = fp.ParseLong()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
+
 	PHP_STREAM_TO_ZVAL(stream, res)
-	if argc == 1 {
-
+	if length == nil {
 		/* ask streams to give us a buffer of an appropriate size */
-
 		buf = core.PhpStreamGetLine(stream, nil, 0, &line_len)
 		if buf == nil {
-			return_value.SetFalse()
-			return
+			return "", false
 		}
 
 		// TODO: avoid reallocation ???
-
-		return_value.SetStringVal(b.CastStr(buf, line_len))
-		zend.Efree(buf)
-	} else if argc > 1 {
+		return b.CastStr(buf, line_len), true
+	} else {
 		if len_ <= 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter must be greater than 0")
-			return_value.SetFalse()
-			return
+			return "", false
 		}
-		str = types.ZendStringAlloc(len_, 0)
-		if core.PhpStreamGetLine(stream, str.GetVal(), len_, &line_len) == nil {
-			// types.ZendStringEfree(str)
-			return_value.SetFalse()
-			return
+		s := core.PhpStreamGetLineStr(stream, len_)
+		if s == nil {
+			return "", false
 		}
 
-		/* resize buffer if it's much larger than the result.
-		 * Only needed if the user requested a buffer size. */
-
-		if line_len < int(len_/2) {
-			str = types.ZendStringTruncate(str, line_len)
-		} else {
-			str.SetLen(line_len)
-		}
-		return_value.SetString(str)
-		return
+		return *s, true
 	}
 }
 func ZifFgetc(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {

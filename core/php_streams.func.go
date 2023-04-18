@@ -97,6 +97,18 @@ func PhpStreamGets(stream *PhpStream, buf *byte, maxlen int) *byte {
 func PhpStreamGetLine(stream *PhpStream, buf *byte, maxlen int, retlen *int) *byte {
 	return _phpStreamGetLine(stream, buf, maxlen, retlen)
 }
+
+func PhpStreamGetLineStr(stream *PhpStream, maxlen int) *string {
+	var buf = make([]byte, maxlen)
+	var retlen int
+	ret := PhpStreamGetLine(stream, buf, maxlen, &retlen)
+	if ret == nil {
+		return nil
+	}
+	str := string(buf[:retlen])
+	return &str
+}
+
 func PhpStreamStat(stream *PhpStream, ssb *PhpStreamStatbuf) int { return _phpStreamStat(stream, ssb) }
 func PhpStreamStatPathEx(path *byte, flags int, ssb *PhpStreamStatbuf, context *PhpStreamContext) int {
 	return _phpStreamStatPath(path, flags, ssb, context)

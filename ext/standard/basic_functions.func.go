@@ -165,9 +165,6 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	if ZmStartupUrlScannerEx(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupExec(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
-	}
 	if ZmStartupUserStreams(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}

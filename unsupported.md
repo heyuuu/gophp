@@ -5,13 +5,19 @@
 - `zend.script_encoding`
 - `zend.detect_unicode`
 
-# 不支持的方法
+# 不支持的函数
 
 - `dl`
 - `cli_set_process_title`
 - `cli_get_process_title`
 - `apache_child_terminate`
 - `phpinfo`
+- `eval`
+- `create_function`
+
+# 部分功能不支持的函数
+
+- `assert(mixed $assertion, Throwable $exception = ?)` 不再支持 `$assertion` 为 string 类型的情况
 
 进程控制函数
 

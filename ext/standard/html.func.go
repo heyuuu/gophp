@@ -1326,9 +1326,7 @@ func PhpEscapeHtmlEntitiesEx(
 			}
 		}
 	}
-	replaced.GetStr()[len_] = '0'
-	replaced.SetLen(len_)
-	return replaced
+	return replaced.Cutoff(len_)
 }
 func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval, all int) {
 	var str *types.String

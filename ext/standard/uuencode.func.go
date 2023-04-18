@@ -146,11 +146,8 @@ func PhpUudecode(src *byte, src_len int) *types.String {
 			}
 		}
 	}
-	dest.SetLen(total_len)
-	dest.GetStr()[dest.GetLen()] = '0'
-	return dest
+	return dest.Cutoff(total_len)
 err:
-	// types.ZendStringEfree(dest)
 	return nil
 }
 func ZifConvertUuencode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {

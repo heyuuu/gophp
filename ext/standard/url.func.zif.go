@@ -24,7 +24,7 @@ var DefZifUrlencode = def.DefFunc("urlencode", 1, 1, []def.ArgInfo{{Name: "str"}
 	if fp.HasError() {
 		return
 	}
-	ZifUrlencode(executeData, returnValue, str)
+	ZifUrlencode(str)
 })
 
 // generate by ZifUrldecode
@@ -34,7 +34,7 @@ var DefZifUrldecode = def.DefFunc("urldecode", 1, 1, []def.ArgInfo{{Name: "str"}
 	if fp.HasError() {
 		return
 	}
-	ZifUrldecode(executeData, returnValue, str)
+	ZifUrldecode(str)
 })
 
 // generate by ZifRawurlencode
@@ -54,7 +54,7 @@ var DefZifRawurldecode = def.DefFunc("rawurldecode", 1, 1, []def.ArgInfo{{Name: 
 	if fp.HasError() {
 		return
 	}
-	ZifRawurldecode(executeData, returnValue, str)
+	ZifRawurldecode(str)
 })
 
 // generate by ZifGetHeaders

@@ -18,27 +18,6 @@ type PhpUrl struct {
 	fragment *types.String
 }
 
-//             func MakePhpUrl(
-// scheme *zend.String,
-// user *zend.String,
-// pass *zend.String,
-// host *zend.String,
-// port uint16,
-// path *zend.String,
-// query *zend.String,
-// fragment *zend.String,
-// ) PhpUrl {
-//                 return PhpUrl{
-//                     scheme:scheme,
-//                     user:user,
-//                     pass:pass,
-//                     host:host,
-//                     port:port,
-//                     path:path,
-//                     query:query,
-//                     fragment:fragment,
-//                 }
-//             }
 func (this *PhpUrl) GetScheme() *types.String        { return this.scheme }
 func (this *PhpUrl) SetScheme(value *types.String)   { this.scheme = value }
 func (this *PhpUrl) GetUser() *types.String          { return this.user }
