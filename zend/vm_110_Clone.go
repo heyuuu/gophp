@@ -1,5 +1,10 @@
 package zend
 
+import (
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var obj *types.Zval
@@ -25,9 +30,9 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
-		scope = executeData.GetFunc().GetOpArray().scope
+		scope = executeData.GetFunc().GetOpArray().GetScope()
 		if clone.GetScope() != scope {
-			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
+			if clone.IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) {
 				ZendWrongCloneCall(clone, scope)
 				opline.Result().SetUndef()
 				return 0
@@ -79,7 +84,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	if clone != nil && !clone.IsPublic() {
 		scope = executeData.GetFunc().GetOpArray().scope
 		if clone.GetScope() != scope {
-			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
+			if clone.IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) {
 				ZendWrongCloneCall(clone, scope)
 				// ZvalPtrDtorNogc(free_op1)
 				opline.Result().SetUndef()
@@ -116,7 +121,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if clone != nil && !clone.IsPublic() {
 		scope = executeData.GetFunc().GetOpArray().scope
 		if clone.GetScope() != scope {
-			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
+			if clone.IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) {
 				ZendWrongCloneCall(clone, scope)
 				opline.Result().SetUndef()
 				return 0
@@ -165,7 +170,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	if clone != nil && !clone.IsPublic() {
 		scope = executeData.GetFunc().GetOpArray().scope
 		if clone.GetScope() != scope {
-			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
+			if clone.IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) {
 				ZendWrongCloneCall(clone, scope)
 				opline.Result().SetUndef()
 				return 0

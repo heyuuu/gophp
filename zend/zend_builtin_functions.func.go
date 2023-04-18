@@ -525,7 +525,7 @@ func ZifIsA(executeData zpp.Ex, return_value zpp.Ret, object *types.Zval, classN
 func AddClassVars(scope *types.ClassEntry, ce *types.ClassEntry, statics int, return_value *types.Zval) {
 
 	ce.PropertyTable().ForeachEx(func(key string, prop_info *ZendPropertyInfo) bool {
-		if prop_info.IsProtected() && ZendCheckProtected(prop_info.GetCe(), scope) == 0 || prop_info.IsPrivate() && prop_info.GetCe() != scope {
+		if prop_info.IsProtected() && !ZendCheckProtected(prop_info.GetCe(), scope) || prop_info.IsPrivate() && prop_info.GetCe() != scope {
 			return true
 		}
 		var prop *types.Zval = nil
@@ -729,7 +729,7 @@ func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Z
 	ArrayInit(return_value)
 	scope = ZendGetExecutedScope()
 	ce.FunctionTable().Foreach(func(key string, mptr types.IFunction) {
-		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.IsPrivate() && scope == mptr.GetScope()) {
+		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) || mptr.IsPrivate() && scope == mptr.GetScope()) {
 			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.GetOpArray().refcount > 1) && key != nil && !SameName(key, mptr.GetFunctionName()) {
 				method_name.SetStringCopy(ZendFindAliasName(mptr.GetScope(), key))
 				return_value.Array().NextIndexInsertNew(&method_name)

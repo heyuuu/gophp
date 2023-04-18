@@ -266,7 +266,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		if !fcc.GetFunctionHandler().IsPublic() && (check_flags&IS_CALLABLE_CHECK_NO_ACCESS) == 0 && (fcc.GetCallingScope() != nil && (fcc.GetObject() != nil && fcc.GetCallingScope().GetCall() != nil || fcc.GetObject() == nil && fcc.GetCallingScope().GetCallstatic() != nil)) {
 			scope = ZendGetExecutedScope()
 			if fcc.GetFunctionHandler().GetScope() != scope {
-				if fcc.GetFunctionHandler().IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(fcc.GetFunctionHandler()), scope) == 0 {
+				if fcc.GetFunctionHandler().IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(fcc.GetFunctionHandler()), scope) {
 					retval = 0
 					fcc.SetFunctionHandler(nil)
 					goto get_function_via_handler
@@ -348,7 +348,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			if retval != 0 && !fcc.GetFunctionHandler().IsPublic() && (check_flags&IS_CALLABLE_CHECK_NO_ACCESS) == 0 {
 				scope = ZendGetExecutedScope()
 				if fcc.GetFunctionHandler().GetScope() != scope {
-					if fcc.GetFunctionHandler().IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(fcc.GetFunctionHandler()), scope) == 0 {
+					if fcc.GetFunctionHandler().IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(fcc.GetFunctionHandler()), scope) {
 						if error != nil {
 							if (*error) != nil {
 								Efree(*error)

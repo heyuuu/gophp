@@ -85,7 +85,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 				 */
 				if CurrEX() != nil {
 					var scope *types.ClassEntry = ZendGetExecutedScope()
-					if ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) == 0 {
+					if !ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) {
 						faults.ThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
 					}

@@ -259,7 +259,7 @@ type ZendExecutorGlobals struct {
 }
 
 func (this *ZendExecutorGlobals) InitTables() {
-	this.constantTable = internal.NewTable[*ZendConstant](FreeZendConstantEx)
+	this.constantTable = internal.NewTable[*ZendConstant](nil)
 }
 func (this *ZendExecutorGlobals) DestroyTables() {
 	this.constantTable.Destroy()

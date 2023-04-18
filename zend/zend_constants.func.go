@@ -50,14 +50,6 @@ func RegisterMainStringConstant(name string, str string, flags int) {
 	RegisterStringConstant(name, str, flags, 0)
 }
 
-func FreeZendConstantEx(c *ZendConstant) {
-	if !c.IsPersistent() {
-		// ZvalPtrDtorNogc(c.Value())
-	} else {
-		//ZvalInternalPtrDtor(c.Value())
-	}
-}
-
 func CleanModuleConstants(moduleNumber int) {
 	EG__().ConstantTable().Filter(func(_ string, c *ZendConstant) bool {
 		return c.ModuleNumber() != moduleNumber
@@ -105,7 +97,7 @@ func ZendGetSpecialConstant(name string) *ZendConstant {
 		return nil
 	}
 }
-func ZendVerifyConstAccess(c *ZendClassConstant, scope *types.ClassEntry) int {
+func ZendVerifyConstAccess(c *ZendClassConstant, scope *types.ClassEntry) bool {
 	if (c.GetValue().GetAccessFlags() & AccPublic) != 0 {
 		return 1
 	} else if (c.GetValue().GetAccessFlags() & AccPrivate) != 0 {
@@ -198,7 +190,7 @@ func ZendGetConstantEx(name string, scope *types.ClassEntry, flags uint32) *type
 			}
 			return nil
 		}
-		if ZendVerifyConstAccess(c, scope) == 0 {
+		if !ZendVerifyConstAccess(c, scope) {
 			if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
 				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), className, constantName)
 			}
@@ -282,9 +274,6 @@ func ZendRegisterConstant(c *ZendConstant) bool {
 	/* Check if the user is trying to define the __special__  internal pseudo constant name __COMPILER_HALT_OFFSET__ */
 	if name == "__COMPILER_HALT_OFFSET__" || !EG__().ConstantTable().Add(name, CopyConstant(c)) {
 		faults.Error(faults.E_NOTICE, "Constant %s already defined", name)
-		if !c.IsPersistent() {
-			// ZvalPtrDtorNogc(c.Value())
-		}
 		return false
 	}
 

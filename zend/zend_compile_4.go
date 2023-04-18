@@ -266,14 +266,9 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 			var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
 			fbc = ce.FunctionTable().Get(lcname.GetStr())
 			if fbc != nil && !fbc.IsPublic() {
-				if ce != CG__().GetActiveClassEntry() && (fbc.IsPrivate() || !fbc.GetScope().IsLinked() || CG__().GetActiveClassEntry() != nil && !CG__().GetActiveClassEntry().IsLinked() || ZendCheckProtected(ZendGetFunctionRootClass(fbc), CG__().GetActiveClassEntry()) == 0) {
-
+				if ce != CG__().GetActiveClassEntry() && (fbc.IsPrivate() || !fbc.GetScope().IsLinked() || CG__().GetActiveClassEntry() != nil && !CG__().GetActiveClassEntry().IsLinked() || !ZendCheckProtected(ZendGetFunctionRootClass(fbc), CG__().GetActiveClassEntry())) {
 					/* incompatibe function */
-
 					fbc = nil
-
-					/* incompatibe function */
-
 				}
 			}
 		}

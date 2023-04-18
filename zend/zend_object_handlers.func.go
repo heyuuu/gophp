@@ -1067,7 +1067,7 @@ func ZendGetParentPrivateMethod(scope *types.ClassEntry, ce *types.ClassEntry, f
 	}
 	return nil
 }
-func ZendCheckProtected(ce *types.ClassEntry, scope *types.ClassEntry) int {
+func ZendCheckProtected(ce *types.ClassEntry, scope *types.ClassEntry) bool {
 	var fbc_scope *types.ClassEntry = ce
 
 	/* Is the context that's calling the function, the same as one of
@@ -1076,7 +1076,7 @@ func ZendCheckProtected(ce *types.ClassEntry, scope *types.ClassEntry) int {
 
 	for fbc_scope != nil {
 		if fbc_scope == scope {
-			return 1
+			return true
 		}
 		fbc_scope = fbc_scope.GetParent()
 	}
@@ -1087,11 +1087,11 @@ func ZendCheckProtected(ce *types.ClassEntry, scope *types.ClassEntry) int {
 
 	for scope != nil {
 		if scope == ce {
-			return 1
+			return true
 		}
 		scope = scope.GetParent()
 	}
-	return 0
+	return false
 }
 func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, is_static int) types.IFunction {
 	var mname_len int
@@ -1195,7 +1195,7 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 					goto exit
 				}
 			}
-			if fbc.GetOpArray().IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) == 0 {
+			if fbc.GetOpArray().IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) {
 				if zobj.GetCe().GetCall() != nil {
 					fbc = ZendGetUserCallFunction(zobj.GetCe(), method_name)
 				} else {
@@ -1248,7 +1248,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	if !fbc.GetOpArray().IsPublic() {
 		scope = ZendGetExecutedScope()
 		if fbc.GetScope() != scope {
-			if fbc.GetOpArray().IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) == 0 {
+			if fbc.GetOpArray().IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) {
 				if ce.GetCallstatic() != nil {
 					fbc = ZendGetUserCallstaticFunction(ce, function_name)
 				} else {
@@ -1267,7 +1267,7 @@ func ZendClassInitStatics(class_type *types.ClassEntry) {
 	var i int
 	var p *types.Zval
 	if class_type.GetDefaultStaticMembersCount() != 0 && CE_STATIC_MEMBERS(class_type) == nil {
-		if class_type.GetParent() {
+		if class_type.GetParent() != nil {
 			ZendClassInitStatics(class_type.GetParent())
 		}
 		ZEND_MAP_PTR_SET(class_type.static_members_table, Emalloc(b.SizeOf("zval")*class_type.GetDefaultStaticMembersCount()))
@@ -1362,7 +1362,7 @@ func ZendStdGetConstructor(zobj *types.ZendObject) types.IFunction {
 				scope = ZendGetExecutedScope()
 			}
 			if constructor.GetScope() != scope {
-				if constructor.GetOpArray().IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(constructor), scope) == 0 {
+				if constructor.GetOpArray().IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(constructor), scope) {
 					ZendBadConstructorCall(constructor, scope)
 					constructor = nil
 				}
