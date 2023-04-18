@@ -274,7 +274,6 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 		BG__().user_tick_functions = nil
 	}
 	ZmDeactivateUserFilters(type_, module_number)
-	ZmDeactivateBrowscap(type_, module_number)
 	BG__().page_uid = -1
 	BG__().page_gid = -1
 	return types.SUCCESS

@@ -2720,29 +2720,6 @@ func ZendStrTolower(str *byte, length int) {
 		p++
 	}
 }
-func ZendStrTolowerDupEx(source *byte, length int) *byte {
-	var p *uint8 = (*uint8)(source)
-	var end *uint8 = p + length
-	for p < end {
-		if (*p) != ascii.ToLower(*p) {
-			var res *byte = (*byte)(Emalloc(length + 1))
-			var r *uint8
-			if p != (*uint8)(source) {
-				memcpy(res, source, p-(*uint8)(source))
-			}
-			r = (*uint8)(p + (res - source))
-			for p < end {
-				*r = ascii.ToLower(*p)
-				p++
-				r++
-			}
-			*r = '0'
-			return res
-		}
-		p++
-	}
-	return nil
-}
 func ZendStringTolowerEx(str *types.String) *types.String {
 	return types.NewString(ascii.StrToLower(str.GetStr()))
 }

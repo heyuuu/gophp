@@ -1608,7 +1608,6 @@ func ZifFread(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, length *
 	}
 	str = streams.PhpStreamReadToStr(stream, len_)
 	if str == nil {
-
 		return_value.SetFalse()
 		return
 	}

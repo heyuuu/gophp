@@ -31,8 +31,6 @@ func ArrayRealDup(arr *Array) *Array {
 	return ZendArrayDup(arr)
 }
 
-var emptyArray *Array
-
 func NewArrayOfInt(items []int) *Array {
 	// todo
 	arr := NewArray(0)
@@ -56,11 +54,6 @@ func NewArrayOfZval(items []*Zval) *Array {
 		arr.NextIndexInsert(item)
 	}
 	return arr
-}
-
-func init() {
-	emptyArray = NewArray(0)
-	emptyArray.SetImmutable()
 }
 
 func bucketType(p *Bucket) int {

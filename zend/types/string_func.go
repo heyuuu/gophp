@@ -32,7 +32,6 @@ func ZendStringTruncate(s *String, len_ int) *String {
 	b.Assert(len_ <= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr[:len_]
-	//s.DelRefcount()
 	return NewString(newStr)
 }
 func ZendStringSafeRealloc(s *String, n int, m int, l int, persistent int) *String {

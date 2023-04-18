@@ -4,42 +4,37 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"math"
+	"strings"
 )
 
-func BROWSCAP_G(v __auto__) __auto__      { return BrowscapGlobals.v }
-func IsPlaceholder(c byte) types.ZendBool { return c == '?' || c == '*' }
-func BrowscapComputePrefixLen(pattern *types.String) uint8 {
-	var i int
-	for i = 0; i < pattern.GetLen(); i++ {
-		if IsPlaceholder(pattern.GetStr()[i]) != 0 {
+func IsPlaceholder(c byte) bool { return c == '?' || c == '*' }
+func BrowscapComputePrefixLen(pattern string) uint8 {
+	max := uint8(b.Min(len(pattern), math.MaxUint8))
+
+	var i uint8
+	for i = 0; i < max; i++ {
+		if IsPlaceholder(pattern[i]) {
 			break
 		}
 	}
-	return uint8(cli.MIN(i, UINT8_MAX))
+	return i
 }
 func BrowscapComputeContains(pattern *types.String, start_pos int, contains_start *uint16, contains_len *uint8) int {
 	var i int = start_pos
 
 	/* Find first non-placeholder character after prefix */
-
 	for ; i < pattern.GetLen(); i++ {
-		if IsPlaceholder(pattern.GetStr()[i]) == 0 {
-
+		if !IsPlaceholder(pattern.GetStr()[i]) {
 			/* Skip the case of a single non-placeholder character.
 			 * Let's try to find something longer instead. */
-
-			if i+1 < pattern.GetLen() && IsPlaceholder(pattern.GetStr()[i+1]) == 0 {
+			if i+1 < pattern.GetLen() && !IsPlaceholder(pattern.GetStr()[i+1]) {
 				break
 			}
-
-			/* Skip the case of a single non-placeholder character.
-			 * Let's try to find something longer instead. */
-
 		}
 	}
 	*contains_start = uint16(i)
@@ -47,85 +42,34 @@ func BrowscapComputeContains(pattern *types.String, start_pos int, contains_star
 	/* Find first placeholder character after that */
 
 	for ; i < pattern.GetLen(); i++ {
-		if IsPlaceholder(pattern.GetStr()[i]) != 0 {
+		if IsPlaceholder(pattern.GetStr()[i]) {
 			break
 		}
 	}
-	*contains_len = uint8(cli.MIN(i-(*contains_start), UINT8_MAX))
+	*contains_len = uint8(b.Min(i-(*contains_start), math.MaxUint8))
 	return i
 }
-func BrowscapComputeRegexLen(pattern *types.String) int {
-	var i int
-	var len_ int = pattern.GetLen()
-	for i = 0; i < pattern.GetLen(); i++ {
-		switch pattern.GetStr()[i] {
-		case '*':
-			fallthrough
-		case '.':
-			fallthrough
-		case '\\':
-			fallthrough
-		case '(':
-			fallthrough
-		case ')':
-			fallthrough
-		case '~':
-			fallthrough
-		case '+':
-			len_++
-		}
-	}
-	return len_ + b.SizeOf("\"~^$~\"") - 1
-}
-func BrowscapConvertPattern(pattern *types.String, persistent int) *types.String {
-	var i int
-	var j int = 0
-	var t *byte
-	var res *types.String
-	var lc_pattern *byte
-	res = types.ZendStringAlloc(BrowscapComputeRegexLen(pattern), persistent)
-	t = res.GetVal()
-	lc_pattern = zend.DoAlloca(pattern.GetLen()+1, use_heap)
-	zend.ZendStrTolowerCopy(lc_pattern, pattern.GetVal(), pattern.GetLen())
-	t[b.PostInc(&j)] = '~'
-	t[b.PostInc(&j)] = '^'
-	for i = 0; i < pattern.GetLen(); {
-		switch lc_pattern[i] {
+func BrowscapConvertPatternEx(pattern string) string {
+	pattern = ascii.StrToLower(pattern)
+
+	var buf strings.Builder
+	buf.WriteString("~^")
+	for _, c := range []byte(pattern) {
+		switch c {
 		case '?':
-			t[j] = '.'
+			buf.WriteByte('.')
 		case '*':
-			t[b.PostInc(&j)] = '.'
-			t[j] = '*'
-		case '.':
-			t[b.PostInc(&j)] = '\\'
-			t[j] = '.'
-		case '\\':
-			t[b.PostInc(&j)] = '\\'
-			t[j] = '\\'
-		case '(':
-			t[b.PostInc(&j)] = '\\'
-			t[j] = '('
-		case ')':
-			t[b.PostInc(&j)] = '\\'
-			t[j] = ')'
-		case '~':
-			t[b.PostInc(&j)] = '\\'
-			t[j] = '~'
-		case '+':
-			t[b.PostInc(&j)] = '\\'
-			t[j] = '+'
+			buf.WriteByte('.')
+			buf.WriteByte('*')
+		case '.', '\\', '(', ')', '~', '+':
+			buf.WriteByte('\\')
+			buf.WriteByte(c)
 		default:
-			t[j] = lc_pattern[i]
+			buf.WriteByte(c)
 		}
-		i++
-		j++
 	}
-	t[b.PostInc(&j)] = '$'
-	t[b.PostInc(&j)] = '~'
-	t[j] = 0
-	res.SetLen(j)
-	zend.FreeAlloca(lc_pattern, use_heap)
-	return res
+	buf.WriteString("$~")
+	return buf.String()
 }
 func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.String) *types.String {
 	return ctx.GetInternedStr(str.GetStr())
@@ -134,31 +78,16 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String) *types.Strin
 	lcName := ascii.StrToLower(str.GetStr())
 	return ctx.GetInternedStr(lcName)
 }
-func BrowscapAddKv(bdata *BrowserData, key *types.String, value *types.String, persistent types.ZendBool) {
-	if bdata.GetKvUsed() == bdata.GetKvSize() {
-		bdata.SetKvSize(bdata.GetKvSize() * 2)
-		bdata.SetKv(zend.SafePerealloc(bdata.GetKv(), bdata.GetKvSize()))
-	}
-	bdata.GetKv()[bdata.GetKvUsed()].SetKey(key)
-	bdata.GetKv()[bdata.GetKvUsed()].SetValue(value)
-	bdata.GetKvUsed()++
-}
 func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *types.Array {
-	var tmp types.Zval
-	var i uint32
-	var ht *types.Array = types.NewArray(8)
-	tmp.SetString(BrowscapConvertPattern(entry.GetPattern(), 0))
-	ht.KeyAdd("browser_name_regex", &tmp)
-	tmp.SetStringCopy(entry.GetPattern())
-	ht.KeyAdd("browser_name_pattern", &tmp)
+	var ht = types.NewArray(8)
+	ht.KeyAdd("browser_name_regex", types.NewZvalString(BrowscapConvertPatternEx(entry.GetPattern().GetStr())))
+	ht.KeyAdd("browser_name_pattern", types.NewZvalString(entry.GetPattern().GetStr()))
 	if entry.GetParent() != nil {
-		tmp.SetStringCopy(entry.GetParent())
-		ht.KeyAdd("parent", &tmp)
+		ht.KeyAdd("parent", types.NewZvalString(entry.GetPattern().GetStr()))
 	}
-	for i = entry.GetKvStart(); i < entry.GetKvEnd(); i++ {
-		tmp.SetStringCopy(bdata.GetKv()[i].GetValue())
-		ht.KeyAdd(bdata.GetKv()[i].GetKey().GetStr(), &tmp)
-	}
+	bdata.EachKv(func(key string, value string) {
+		ht.KeyAdd(key, types.NewZvalString(value))
+	})
 	return ht
 }
 func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arg any) {
@@ -197,7 +126,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 				ctx.GetCurrentEntry().SetParent(new_value)
 			} else {
 				new_key = BrowscapInternStrCi(ctx, arg1.String())
-				BrowscapAddKv(bdata, new_key, new_value, persistent)
+				bdata.AddKv(new_key.GetStr(), new_value.GetStr())
 				ctx.GetCurrentEntry().SetKvEnd(bdata.GetKvUsed())
 			}
 		}
@@ -210,79 +139,53 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Skipping excessively long pattern of length %zd", pattern.GetLen())
 			break
 		}
-		//if persistent != 0 {
-		//	pattern = types.ZendNewInternedString(pattern.Copy())
-		//	// types.ZendStringRelease(pattern)
-		//}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry")))
 		entry = ctx.GetCurrentEntry()
 		types.ZendHashUpdatePtr(bdata.GetHtab(), pattern.GetStr(), entry)
-		if ctx.GetCurrentSectionName() != nil {
-			// types.ZendStringRelease(ctx.GetCurrentSectionName())
-		}
 		ctx.SetCurrentSectionName(pattern.Copy())
 		entry.SetPattern(pattern.Copy())
 		entry.SetKvStart(bdata.GetKvUsed())
 		entry.SetKvEnd(entry.GetKvStart())
 		entry.SetParent(nil)
-		entry.SetPrefixLen(BrowscapComputePrefixLen(pattern))
+		entry.SetPrefixLen(BrowscapComputePrefixLen(pattern.GetStr()))
 		pos = entry.GetPrefixLen()
 		for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
 			pos = BrowscapComputeContains(pattern, pos, entry.GetContainsStart()[i], entry.GetContainsLen()[i])
 		}
 	}
 }
-func BrowscapReadFile(filename string, browdata *BrowserData) int {
+func BrowscapReadFileEx(filename string) *BrowserData {
 	if filename == "" {
-		return types.FAILURE
+		return nil
 	}
 	var fh = zend.NewFileHandleByOpenFile(filename)
 	if fh == nil {
 		faults.Error(faults.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
-		return types.FAILURE
+		return nil
 	}
-	browdata.SetHtab(types.NewArray(0))
-	browdata.SetKvSize(16 * 1024)
-	browdata.SetKvUsed(0)
-	browdata.SetKv(zend.Pemalloc(b.SizeOf("browscap_kv") * browdata.GetKvSize()))
+
+	browserData := NewBrowserData(16 * 1024)
 
 	/* Create parser context */
-	var ctx = NewBrowscapParserCtx(browdata)
-	zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_RAW, zend.ZendIniParserCbT(PhpBrowscapParserCb), ctx)
+	var ctx = NewBrowscapParserCtx(browserData)
+	zend.ZendParseIniFile(fh, 1, zend.ZEND_INI_SCANNER_RAW, PhpBrowscapParserCb, ctx)
 
-	return types.SUCCESS
-}
-func BrowscapBdataDtor(bdata *BrowserData, persistent int) {
-	if bdata.GetHtab() != nil {
-		bdata.GetHtab().Destroy()
-		zend.Pefree(bdata.GetHtab(), persistent)
-		bdata.SetHtab(nil)
-		zend.Pefree(bdata.GetKv(), persistent)
-		bdata.SetKv(nil)
-	}
-	bdata.GetFilename()[0] = '0'
+	return browserData
 }
 func ZmStartupBrowscap(type_ int, module_number int) int {
-	var browscap *byte = zend.INI_STR("browscap")
+	var browscap = zend.INI_STRING("browscap")
 
 	/* ctor call not really needed for non-ZTS */
-
-	if browscap != nil && browscap[0] {
-		if BrowscapReadFile(browscap, &GlobalBdata) == types.FAILURE {
+	if browscap != "" {
+		GlobalBdata = BrowscapReadFileEx(browscap)
+		if GlobalBdata == nil {
 			return types.FAILURE
 		}
 	}
 	return types.SUCCESS
 }
-func ZmDeactivateBrowscap(type_ int, module_number int) int {
-	var bdata *BrowserData = &(BROWSCAP_G(activation_bdata))
-	if bdata.GetFilename()[0] != '0' {
-		BrowscapBdataDtor(bdata, 0)
-	}
-	return types.SUCCESS
-}
 func ZmShutdownBrowscap(type_ int, module_number int) int {
-	BrowscapBdataDtor(&GlobalBdata, 1)
+	GlobalBdata = nil
 	return types.SUCCESS
 }
 func BrowscapGetMinimumLength(entry *BrowscapEntry) int {
@@ -296,7 +199,7 @@ func BrowscapGetMinimumLength(entry *BrowscapEntry) int {
 func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_entry_ptr **BrowscapEntry) int {
 	var found_entry *BrowscapEntry = *found_entry_ptr
 	var pattern_lc *types.String
-	var regex *types.String
+	var regex string
 	var cur *byte
 	var i int
 	var re *pcre2_code
@@ -341,11 +244,9 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 		//pattern_lc.Free()
 		return 1
 	}
-	regex = BrowscapConvertPattern(entry.GetPattern(), 0)
+	regex = BrowscapConvertPatternEx(entry.GetPattern().GetStr())
 	re = pcre_get_compiled_regex(regex, &capture_count)
 	if re == nil {
-		//pattern_lc.Free()
-		// types.ZendStringRelease(regex)
 		return 0
 	}
 	match_data = php_pcre_create_match_data(capture_count, re)
@@ -424,29 +325,21 @@ func BrowscapZvalCopyCtor(p *types.Zval) {
 		p.SetString(str)
 	}
 }
-func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserName *types.Zval, returnArray *types.Zval) {
-	var agent_name *types.String = nil
+func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserName *string, returnArray bool) {
+	var agent_name *string = browserName
 	var lookup_browser_name *types.String
 	var return_array types.ZendBool = 0
 	var bdata *BrowserData
 	var found_entry *BrowscapEntry = nil
 	var agent_ht *types.Array
-	if BROWSCAP_G(activation_bdata).filename[0] != '0' {
-		bdata = &(BROWSCAP_G(activation_bdata))
-		if bdata.GetHtab() == nil {
-			if BrowscapReadFile(bdata.GetFilename(), bdata) == types.FAILURE {
-				return_value.SetFalse()
-				return
-			}
-		}
-	} else {
-		if GlobalBdata.GetHtab() == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "browscap ini directive not set")
-			return_value.SetFalse()
-			return
-		}
-		bdata = &GlobalBdata
+
+	if GlobalBdata.GetHtab() == nil {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "browscap ini directive not set")
+		return_value.SetFalse()
+		return
 	}
+	bdata = GlobalBdata
+
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 0, 2, 0)
@@ -514,5 +407,4 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 		agent_ht.Destroy()
 		zend.Efree(agent_ht)
 	}
-	// types.ZendStringReleaseEx(lookup_browser_name, 0)
 }

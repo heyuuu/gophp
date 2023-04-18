@@ -40,7 +40,6 @@ type IRefcounted interface {
 
 	GetGcType() uint8
 	GetGcFlags() uint32
-	GetGcInfo() uint32
 
 	AddGcFlags(flags uint32)
 	DelGcFlags(flags uint32)
@@ -112,9 +111,7 @@ func (this *ZendRefcounted) DelRefcountEx(rc uint32) uint32 {
  */
 const GC_TYPE_MASK = 0xf
 const GC_FLAGS_MASK = 0x3f0
-const GC_INFO_MASK = 0xfffffc00
 const GC_FLAGS_SHIFT = 0
-const GC_INFO_SHIFT = 10
 
 func (this *ZendRefcounted) GetGcTypeInfo() uint32 {
 	return this.gc.u.type_info
@@ -132,11 +129,6 @@ func (this *ZendRefcounted) GetGcType() uint8 {
 func (this *ZendRefcounted) GetGcFlags() uint32 {
 	var typeInfo = this.GetGcTypeInfo()
 	return (typeInfo & GC_FLAGS_MASK) >> GC_FLAGS_SHIFT
-}
-
-func (this *ZendRefcounted) GetGcInfo() uint32 {
-	var typeInfo = this.GetGcTypeInfo()
-	return typeInfo >> GC_INFO_SHIFT
 }
 
 func (this *ZendRefcounted) AddGcFlags(flags uint32) {

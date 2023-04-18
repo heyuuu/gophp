@@ -146,11 +146,6 @@ func (ht *Array) Init(size int, pDestructor DtorFuncT) {
 	// GC 信息
 	ht.SetRefcount(1)
 	ht.SetGcTypeInfo(uint32(IS_ARRAY))
-	//if persistent {
-	//	ht.AddGcFlags(GC_PERSISTENT)
-	//} else {
-	//	ht.AddGcFlags(GC_COLLECTABLE)
-	//}
 
 	// 析构函数
 	if pDestructor != nil {

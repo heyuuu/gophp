@@ -68,6 +68,17 @@ func PhpStreamSeek(stream *PhpStream, offset zend.ZendLong, whence int) int {
 func PhpStreamRead(stream *PhpStream, buf *byte, count int) ssize_t {
 	return _phpStreamRead(stream, buf, count)
 }
+
+func PhpStreamReadStr(stream *PhpStream, count int) *string {
+	var buf = make([]byte, count)
+	var size int = PhpStreamRead(stream, buf, count)
+	if size < 0 {
+		return nil
+	}
+	str := string(buf[:size])
+	return &str
+}
+
 func PhpStreamWriteString(stream *PhpStream, str string) ssize_t {
 	return _phpStreamWrite(stream, str, strlen(str))
 }

@@ -8,20 +8,9 @@ import (
  * BrowscapKv
  */
 type BrowscapKv struct {
-	key   *types.String
-	value *types.String
+	key   string
+	value string
 }
-
-// func MakeBrowscapKv(key *zend.String, value *zend.String) BrowscapKv {
-//     return BrowscapKv{
-//         key:key,
-//         value:value,
-//     }
-// }
-func (this *BrowscapKv) GetKey() *types.String        { return this.key }
-func (this *BrowscapKv) SetKey(value *types.String)   { this.key = value }
-func (this *BrowscapKv) GetValue() *types.String      { return this.value }
-func (this *BrowscapKv) SetValue(value *types.String) { this.value = value }
 
 /**
  * BrowscapEntry
@@ -36,25 +25,6 @@ type BrowscapEntry struct {
 	prefix_len     uint8
 }
 
-//             func MakeBrowscapEntry(
-// pattern *zend.String,
-// parent *zend.String,
-// kv_start uint32,
-// kv_end uint32,
-// contains_start []uint16,
-// contains_len []uint8,
-// prefix_len uint8,
-// ) BrowscapEntry {
-//                 return BrowscapEntry{
-//                     pattern:pattern,
-//                     parent:parent,
-//                     kv_start:kv_start,
-//                     kv_end:kv_end,
-//                     contains_start:contains_start,
-//                     contains_len:contains_len,
-//                     prefix_len:prefix_len,
-//                 }
-//             }
 func (this *BrowscapEntry) GetPattern() *types.String      { return this.pattern }
 func (this *BrowscapEntry) SetPattern(value *types.String) { this.pattern = value }
 func (this *BrowscapEntry) GetParent() *types.String       { return this.parent }
@@ -64,50 +34,42 @@ func (this *BrowscapEntry) SetKvStart(value uint32)        { this.kv_start = val
 func (this *BrowscapEntry) GetKvEnd() uint32               { return this.kv_end }
 func (this *BrowscapEntry) SetKvEnd(value uint32)          { this.kv_end = value }
 func (this *BrowscapEntry) GetContainsStart() []uint16     { return this.contains_start }
-
-// func (this *BrowscapEntry) SetContainsStart(value []uint16) { this.contains_start = value }
-func (this *BrowscapEntry) GetContainsLen() []uint8 { return this.contains_len }
-
-// func (this *BrowscapEntry) SetContainsLen(value []uint8) { this.contains_len = value }
-func (this *BrowscapEntry) GetPrefixLen() uint8      { return this.prefix_len }
-func (this *BrowscapEntry) SetPrefixLen(value uint8) { this.prefix_len = value }
+func (this *BrowscapEntry) GetContainsLen() []uint8        { return this.contains_len }
+func (this *BrowscapEntry) GetPrefixLen() uint8            { return this.prefix_len }
+func (this *BrowscapEntry) SetPrefixLen(value uint8)       { this.prefix_len = value }
 
 /**
  * BrowserData
  */
 type BrowserData struct {
-	htab     *types.Array
-	kv       *BrowscapKv
-	kv_used  uint32
-	kv_size  uint32
-	filename []byte
+	htab    *types.Array
+	kv      []BrowscapKv
+	kv_used uint32
+	kv_size uint32
 }
 
-func MakeBrowserData(htab *types.Array, kv *BrowscapKv, kv_used uint32, kv_size uint32, filename []byte) BrowserData {
-	return BrowserData{
-		htab:     htab,
-		kv:       kv,
-		kv_used:  kv_used,
-		kv_size:  kv_size,
-		filename: filename,
+func NewBrowserData(kvSize uint32) *BrowserData {
+	return &BrowserData{
+		htab:    types.NewArray(0),
+		kv:      make([]BrowscapKv, 0, kvSize),
+		kv_used: 0,
+		kv_size: kvSize,
 	}
 }
-func (this *BrowserData) GetHtab() *types.Array      { return this.htab }
-func (this *BrowserData) SetHtab(value *types.Array) { this.htab = value }
-func (this *BrowserData) GetKv() *BrowscapKv         { return this.kv }
-func (this *BrowserData) SetKv(value *BrowscapKv)    { this.kv = value }
-func (this *BrowserData) GetKvUsed() uint32          { return this.kv_used }
-func (this *BrowserData) SetKvUsed(value uint32)     { this.kv_used = value }
-func (this *BrowserData) GetKvSize() uint32          { return this.kv_size }
-func (this *BrowserData) SetKvSize(value uint32)     { this.kv_size = value }
-func (this *BrowserData) GetFilename() []byte        { return this.filename }
-
-/**
- * ZendBrowscapGlobals
- */
-type ZendBrowscapGlobals struct {
-	activation_bdata BrowserData
+func (d *BrowserData) AddKv(key string, value string) {
+	kv := BrowscapKv{key: key, value: value}
+	d.kv = append(d.kv, kv)
+	d.kv_used++
 }
+
+func (d *BrowserData) EachKv(handler func(key string, value string)) {
+	for _, kv := range d.kv {
+		handler(kv.key, kv.value)
+	}
+}
+
+func (d *BrowserData) GetHtab() *types.Array { return d.htab }
+func (d *BrowserData) GetKvUsed() uint32     { return uint32(len(d.kv)) }
 
 /**
  * BrowscapParserCtx

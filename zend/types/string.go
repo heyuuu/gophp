@@ -5,16 +5,22 @@ import "math"
 /**
  * String
  */
-type String struct{ str string }
+type String string
 
-func NewString(str string) *String { return &String{str: str} }
+func NewString(str string) *String { tmp := String(str); return &tmp }
+func NewStringSafe(str *string) *String {
+	if str == nil {
+		return nil
+	}
+	return NewString(*str)
+}
 
-func (zs String) Copy() *String   { return &zs }
-func (zs *String) GetStr() string { return zs.str }
-func (zs *String) GetLen() int    { return len(zs.str) }
+func (zs String) Copy() *String  { return &zs }
+func (zs String) GetStr() string { return string(zs) }
+func (zs String) GetLen() int    { return len(zs) }
 
-func (zs *String) GetVal() []byte   { return []byte(zs.str) }   // todo remove
-func (zs *String) SetLen(value int) { zs.str = zs.str[:value] } // todo remove
+func (zs String) GetVal() []byte    { return []byte(zs) }   // todo remove
+func (zs *String) SetLen(value int) { *zs = (*zs)[:value] } // todo remove
 
 /**
  * String Constants

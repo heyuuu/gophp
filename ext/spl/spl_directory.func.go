@@ -2224,29 +2224,27 @@ func zim_spl_SplFileObject_fwrite(executeData *zend.ZendExecuteData, return_valu
 	return_value.SetLong(written)
 	return
 }
-func zim_spl_SplFileObject_fread(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func zim_spl_SplFileObject_fread(executeData *zend.ZendExecuteData, return_value *types.Zval) (string, bool) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	var length zend.ZendLong = 0
 	var str *types.String
 	if zend.ZendParseParameters(executeData.NumArgs(), "l", &length) == types.FAILURE {
-		return
+		return "", false
 	}
 	if intern.GetStream() == nil {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
-		return
+		return "", false
 	}
 	if length <= 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter must be greater than 0")
 		return_value.SetFalse()
-		return
+		return "", false
 	}
 	str = streams.PhpStreamReadToStr(intern.GetStream(), length)
 	if str == nil {
-		return_value.SetFalse()
-		return
+		return "", false
 	}
-	return_value.SetString(str)
-	return
+	return str, true
 }
 func zim_spl_SplFileObject_fstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))

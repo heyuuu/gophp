@@ -13,6 +13,9 @@ func INI_INT(name string) ZendLong {
 func INI_STR(name string) *byte {
 	return ZendIniStringEx(name, 0, nil)
 }
+func INI_STRING(name string) string {
+	return ZendIniStringEx(name, 0, nil)
+}
 func REGISTER_INI_ENTRIES(module_number int) int {
 	return ZendRegisterIniEntries(IniEntries, module_number)
 }

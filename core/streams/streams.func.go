@@ -5,7 +5,6 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
-	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -115,19 +114,8 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 
 	}
 }
-func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *types.String {
-	var str *types.String = types.ZendStringAlloc(len_, 0)
-	var read ssize_t = core.PhpStreamRead(stream, str.GetVal(), len_)
-	if read < 0 {
-		// types.ZendStringEfree(str)
-		return nil
-	}
-	str.SetLen(read)
-	str.GetStr()[read] = 0
-	if int(read < len_/2) != 0 {
-		return types.ZendStringTruncate(str, read)
-	}
-	return str
+func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *string {
+	return core.PhpStreamReadStr(stream, len_)
 }
 func PhpStreamLocateEol(stream *core.PhpStream, buf *types.String) *byte {
 	var avail int
@@ -271,18 +259,15 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 		 * in mind, where this situation is frequent */
 
 	}
-	ret_buf = types.ZendStringAlloc(tent_ret_len, 0)
 
 	/* php_stream_read will not call ops->read here because the necessary
 	 * data is guaranteedly buffered */
-
-	ret_buf.SetLen(core.PhpStreamRead(stream, ret_buf.GetVal(), tent_ret_len))
+	retStr := core.PhpStreamReadStr(stream, tent_ret_len)
 	if found_delim != nil {
 		stream.SetReadpos(stream.GetReadpos() + delim_len)
 		stream.SetPosition(stream.GetPosition() + delim_len)
 	}
-	ret_buf.GetStr()[ret_buf.GetLen()] = '0'
-	return ret_buf
+	return types.NewStringSafe(retStr)
 }
 func PhpStreamWrapperSchemeValidate(protocol string) bool {
 	for _, c := range []byte(protocol) {
@@ -353,9 +338,8 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 	}
 	if protocol != nil {
 		if nil == wrapper_hash[b.CastStr(protocol, n)] {
-			var tmp *byte = zend.Estrndup(protocol, n)
-			str.PhpStrtolower(tmp, n)
-			wrapper = wrapper_hash[b.CastStr(tmp, n)]
+			tmp := ascii.StrToLower(b.CastStr(protocol, n))
+			wrapper = wrapper_hash[tmp]
 			if nil == wrapper {
 				var wrapper_name []byte
 				if n >= b.SizeOf("wrapper_name") {
@@ -366,7 +350,6 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 				wrapper = nil
 				protocol = nil
 			}
-			zend.Efree(tmp)
 		}
 	}
 
