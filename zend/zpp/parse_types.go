@@ -207,19 +207,6 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 	}
 }
 
-func ParseStrPtr(arg *types.Zval, checkNull bool, weak bool) (str *byte, len_ int, ok bool) {
-	val, ok := ParseZStr(arg, checkNull, weak)
-	if !ok {
-		return nil, 0, false
-	}
-
-	if checkNull && val == nil {
-		return nil, 0, true
-	} else {
-		return val.GetValPtr(), val.GetLen(), true
-	}
-}
-
 // @see Micro CHECK_NULL_PATH
 func checkNullPath(s string) bool {
 	// todo 待确认此逻辑的生效方式 (当前代码一直为false)
@@ -238,19 +225,6 @@ func ParsePathStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.Strin
 	}
 
 	return
-}
-
-func ParsePathStrPtr(arg *types.Zval, checkNull bool, weak bool) (str *byte, len_ int, ok bool) {
-	val, ok := ParsePathStr(arg, checkNull, weak)
-	if !ok {
-		return nil, 0, false
-	}
-
-	if checkNull && val == nil {
-		return nil, 0, true
-	} else {
-		return val.GetValPtr(), val.GetLen(), true
-	}
 }
 
 func ParseArray(arg *types.Zval, checkNull bool, orObject bool) (dest *types.Zval, ok bool) {

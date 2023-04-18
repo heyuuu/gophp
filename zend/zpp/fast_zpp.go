@@ -445,12 +445,15 @@ func (p *FastParser) ParsePathEx(checkNull bool, separate bool) (strPtr *byte, s
 		return
 	}
 
-	strPtr, strLen, ok := ParsePathStrPtr(p.arg, checkNull, p.useWeakTypes())
+	val, ok := ParsePathStr(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
 	}
-
-	return
+	if checkNull && val == nil {
+		return nil, 0
+	} else {
+		return b.CastStrPtr(val.GetStr()), val.GetLen()
+	}
 }
 
 func (p *FastParser) ParsePathVal() string {
@@ -529,12 +532,15 @@ func (p *FastParser) ParseStringEx(checkNull bool, separate bool) (strPtr *byte,
 		return
 	}
 
-	strPtr, strLen, ok := ParseStrPtr(p.arg, checkNull, p.useWeakTypes())
+	val, ok := ParseZStr(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
 	}
-
-	return
+	if checkNull && val == nil {
+		return nil, 0
+	} else {
+		return b.CastStrPtr(val.GetStr()), val.GetLen()
+	}
 }
 
 // 替代 ParseString, 使用 string 代替 *byte+len

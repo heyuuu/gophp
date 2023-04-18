@@ -13,9 +13,8 @@ func (zs String) Copy() *String   { return &zs }
 func (zs *String) GetStr() string { return zs.str }
 func (zs *String) GetLen() int    { return len(zs.str) }
 
-func (zs *String) GetVal() []byte   { return []byte(zs.str) }         // todo remove
-func (zs *String) GetValPtr() *byte { tmp := zs.str[0]; return &tmp } // todo remove
-func (zs *String) SetLen(value int) { zs.str = zs.str[:value] }       // todo remove
+func (zs *String) GetVal() []byte   { return []byte(zs.str) }   // todo remove
+func (zs *String) SetLen(value int) { zs.str = zs.str[:value] } // todo remove
 
 /**
  * String Constants
