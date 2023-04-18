@@ -356,18 +356,16 @@ func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) int {
 		var ast *ZendAst = types.Z_ASTVAL_P(p)
 		if ast.GetKind() == ZEND_AST_CONSTANT {
 			var name *types.String = ZendAstGetConstantName(ast)
-			var zv *types.Zval = ZendGetConstantEx(name, scope, ast.GetAttr())
+			var zv *types.Zval = ZendGetConstantEx(name.GetStr(), scope, ast.GetAttr())
 			if zv == nil {
 				return ZendUseUndefinedConstant(name, ast.GetAttr(), p)
 			}
-			// ZvalPtrDtorNogc(p)
 			types.ZVAL_COPY_OR_DUP(p, zv)
 		} else {
 			var tmp types.Zval
 			if ZendAstEvaluate(&tmp, ast, scope) != types.SUCCESS {
 				return types.FAILURE
 			}
-			// ZvalPtrDtorNogc(p)
 			types.ZVAL_COPY_VALUE(p, &tmp)
 		}
 	}

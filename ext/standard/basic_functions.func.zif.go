@@ -12,7 +12,7 @@ var DefZifConstant = def.DefFunc("constant", 1, 1, []def.ArgInfo{{Name: "const_n
 	if fp.HasError() {
 		return
 	}
-	ZifConstant(executeData, returnValue, const_name)
+	ZifConstant(returnValue, const_name)
 })
 
 // generate by ZifInetNtop

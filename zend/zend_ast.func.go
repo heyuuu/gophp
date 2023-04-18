@@ -469,7 +469,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		types.ZVAL_COPY(result, zv)
 	case ZEND_AST_CONSTANT:
 		var name *types.String = ZendAstGetConstantName(ast)
-		var zv *types.Zval = ZendGetConstantEx(name, scope, ast.GetAttr())
+		var zv *types.Zval = ZendGetConstantEx(name.GetStr(), scope, ast.GetAttr())
 		if zv == nil {
 			result.SetUndef()
 			ret = ZendUseUndefinedConstant(name, ast.GetAttr(), result)

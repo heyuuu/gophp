@@ -390,7 +390,7 @@ register_constant:
 	return ZendRegisterConstant(&c)
 }
 func ZifDefined(constantName string) bool {
-	if ZendGetConstantEx(types.NewString(constantName), ZendGetExecutedScope(), ZEND_FETCH_CLASS_SILENT|ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) != nil {
+	if ZendGetConstantEx(constantName, ZendGetExecutedScope(), ZEND_FETCH_CLASS_SILENT|ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) != nil {
 		return true
 	} else {
 		return false

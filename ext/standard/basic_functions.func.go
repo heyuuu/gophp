@@ -286,35 +286,21 @@ func ZmInfoBasic(zend_module *zend.ModuleEntry) {
 	PhpInfoPrintTableEnd()
 	ZmInfoAssert(zend_module)
 }
-func ZifConstant(executeData zpp.Ex, return_value zpp.Ret, constName *types.Zval) {
-	var const_name *types.String
-	var c *types.Zval
-	var scope *types.ClassEntry
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			const_name = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	scope = zend.ZendGetExecutedScope()
-	c = zend.ZendGetConstantEx(const_name, scope, zend.ZEND_FETCH_CLASS_SILENT)
+func ZifConstant(returnValue zpp.Ret, constName string) {
+	scope := zend.ZendGetExecutedScope()
+	c := zend.ZendGetConstantEx(constName, scope, zend.ZEND_FETCH_CLASS_SILENT)
 	if c != nil {
-		types.ZVAL_COPY_OR_DUP(return_value, c)
-		if return_value.IsType(types.IS_CONSTANT_AST) {
-			if zend.ZvalUpdateConstantEx(return_value, scope) != types.SUCCESS {
+		types.ZVAL_COPY_OR_DUP(returnValue, c)
+		if returnValue.IsType(types.IS_CONSTANT_AST) {
+			if zend.ZvalUpdateConstantEx(returnValue, scope) != types.SUCCESS {
 				return
 			}
 		}
 	} else {
 		if zend.EG__().GetException() == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Couldn't find constant %s", const_name.GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Couldn't find constant %s", constName)
 		}
-		return_value.SetNull()
+		returnValue.SetNull()
 		return
 	}
 }

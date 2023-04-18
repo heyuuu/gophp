@@ -8,18 +8,6 @@ import (
 	"strings"
 )
 
-func IS_CONSTANT_VISITED(zv *types.Zval) bool {
-	return zv.GetAccessFlags()&IS_CONSTANT_VISITED_MARK != 0
-}
-func MARK_CONSTANT_VISITED(zv *types.Zval) uint32 {
-	zv.AddAccessFlags(IS_CONSTANT_VISITED_MARK)
-	return zv.GetAccessFlags()
-}
-func RESET_CONSTANT_VISITED(zv *types.Zval) uint32 {
-	zv.SubAccessFlags(IS_CONSTANT_VISITED_MARK)
-	return zv.GetAccessFlags()
-}
-
 func RegisterNullConstant(name string, flags int, moduleNumber int) {
 	c := NewConstant(name, flags, moduleNumber)
 	c.Value().SetNull()
@@ -159,90 +147,89 @@ func IsAccessDeprecated(c *ZendConstant, accessName string) bool {
 		return accessName != c.Name()
 	}
 }
-func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint32) *types.Zval {
+func ZendGetConstantEx(name string, scope *types.ClassEntry, flags uint32) *types.Zval {
 	var c *ZendConstant
-	var name_ string = cname.GetStr()
 
 	/* Skip leading \\ */
-	if name_ != "" && name_[0] == '\\' {
-		name_ = name_[1:]
-		cname = nil
+	if name != "" && name[0] == '\\' {
+		name = name[1:]
 	}
-	if pos := strings.LastIndexByte(name_, ':'); pos > 0 && name_[pos-1] == ':' {
-		var constantName = name_[pos+1:]
-		var className = name_[:pos-1]
-		var c *ZendClassConstant = nil
-		var ret_constant *types.Zval = nil
+	if pos := strings.LastIndexByte(name, ':'); pos > 0 && name[pos-1] == ':' {
+		var constantName = name[pos+1:]
+		var className = name[:pos-1]
+
+		// get ce
 		var ce *types.ClassEntry
-		if ascii.StrCaseEquals(className, "self") {
+		switch ascii.StrToLower(className) {
+		case "self":
 			if scope == nil {
 				faults.ThrowError(nil, "Cannot access self:: when no class scope is active")
-				goto failure
+				return nil
 			}
 			ce = scope
-		} else if ascii.StrCaseEquals(className, "parent") {
+		case "parent":
 			if scope == nil {
 				faults.ThrowError(nil, "Cannot access parent:: when no class scope is active")
-				goto failure
-			} else if !(scope.GetParent()) {
+				return nil
+			} else if scope.GetParent() == nil {
 				faults.ThrowError(nil, "Cannot access parent:: when current class scope has no parent")
-				goto failure
-			} else {
-				ce = scope.GetParent()
+				return nil
 			}
-		} else if ascii.StrCaseEquals(className, "static") {
+			ce = scope.GetParent()
+		case "static":
 			ce = ZendGetCalledScope(CurrEX())
 			if ce == nil {
 				faults.ThrowError(nil, "Cannot access static:: when no class scope is active")
-				goto failure
+				return nil
 			}
-		} else {
+		default:
 			ce = ZendFetchClass(className, flags)
 		}
-		if ce != nil {
-			c = ce.ConstantsTable().Get(constantName)
-			if c == nil {
-				if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-					faults.ThrowError(nil, "Undefined class constant '%s::%s'", className, constantName)
-					goto failure
-				}
-				ret_constant = nil
-			} else {
-				if ZendVerifyConstAccess(c, scope) == 0 {
-					if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-						faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), className, constantName)
-					}
-					goto failure
-				}
-				ret_constant = c.GetValue()
-			}
+		if ce == nil {
+			return nil
 		}
-		if ret_constant != nil && ret_constant.IsConstantAst() {
+
+		// get constant
+		var c = ce.ConstantsTable().Get(constantName)
+		if c == nil {
+			if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
+				faults.ThrowError(nil, "Undefined class constant '%s::%s'", className, constantName)
+				return nil
+			}
+			return nil
+		}
+		if ZendVerifyConstAccess(c, scope) == 0 {
+			if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
+				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), className, constantName)
+			}
+			return nil
+		}
+
+		// get val
+		retConstant := c.GetValue()
+		if retConstant != nil && retConstant.IsConstantAst() {
 			var ret int
-			if IS_CONSTANT_VISITED(ret_constant) {
+			if c.IsVisited() {
 				faults.ThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", className, constantName)
-				ret_constant = nil
-				goto failure
+				retConstant = nil
+				return nil
 			}
-			MARK_CONSTANT_VISITED(ret_constant)
-			ret = ZvalUpdateConstantEx(ret_constant, c.GetCe())
-			RESET_CONSTANT_VISITED(ret_constant)
+			c.MarkVisited()
+			ret = ZvalUpdateConstantEx(retConstant, c.GetCe())
+			c.ResetVisited()
 			if ret != types.SUCCESS {
-				ret_constant = nil
-				goto failure
+				retConstant = nil
+				return nil
 			}
 		}
-	failure:
-		// types.ZendStringReleaseEx(class_name, 0)
-		// types.ZendStringEfree(constant_name)
-		return ret_constant
+		return retConstant
 	}
 
 	/* non-class constant */
-	if pos := strings.LastIndexByte(name_, '\\'); pos >= 0 {
+	if pos := strings.LastIndexByte(name, '\\'); pos >= 0 {
 		/* compound constant name */
-		lcPrefix := ascii.StrToLower(name_[:pos]) + "\\"
-		constName := name_[pos+1:]
+		lcPrefix := ascii.StrToLower(name[:pos]) + "\\"
+		constName := name[pos+1:]
 
 		/* Check for namespace constant */
 		// 查找常量顺序
@@ -265,20 +252,16 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 
 			/* name requires runtime resolution, need to check non-namespaced name */
 			c = ZendGetConstantImpl(constName)
-			name_ = constName
+			name = constName
 		}
 	} else {
-		if cname != nil {
-			c = ZendGetConstantImpl(cname.GetStr())
-		} else {
-			c = ZendGetConstantImpl(name_)
-		}
+		c = ZendGetConstantImpl(name)
 	}
 	if c == nil {
 		return nil
 	}
 	if (flags & ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) == 0 {
-		if !c.IsCaseSensitive() && !c.IsCtSubst() && IsAccessDeprecated(c, name_) {
+		if !c.IsCaseSensitive() && !c.IsCtSubst() && IsAccessDeprecated(c, name) {
 			faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
 		}
 	}

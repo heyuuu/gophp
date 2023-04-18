@@ -435,6 +435,15 @@ func CopyClassConstant(c *ZendClassConstant) *ZendClassConstant {
 func (c *ZendClassConstant) GetCe() *types.ClassEntry     { return c.ce }
 func (c *ZendClassConstant) GetValue() *types.Zval        { return &c.value }
 func (c *ZendClassConstant) GetDocComment() *types.String { return c.docComment }
+func (c *ZendClassConstant) IsVisited() bool {
+	return c.value.GetAccessFlags()&IS_CONSTANT_VISITED_MARK != 0
+}
+func (c *ZendClassConstant) MarkVisited() {
+	c.value.AddAccessFlags(IS_CONSTANT_VISITED_MARK)
+}
+func (c *ZendClassConstant) ResetVisited() {
+	c.value.SubAccessFlags(IS_CONSTANT_VISITED_MARK)
+}
 
 /**
  * ZendArgInfo
