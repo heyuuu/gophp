@@ -1,15 +1,17 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_JMPZNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var val *types.Zval
+	var val *types2.Zval
 	val = opline.Const1()
 	if val.IsTrue() {
 		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, opline.GetExtendedValue())
 		return 0
-	} else if val.GetTypeInfo() <= types.IS_TRUE {
+	} else if val.GetTypeInfo() <= types2.IS_TRUE {
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
 	if IZendIsTrue(val) != 0 {
@@ -21,12 +23,12 @@ func ZEND_JMPZNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var val *types.Zval
+	var val *types2.Zval
 	val = opline.Op1()
 	if val.IsTrue() {
 		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, opline.GetExtendedValue())
 		return 0
-	} else if val.GetTypeInfo() <= types.IS_TRUE {
+	} else if val.GetTypeInfo() <= types2.IS_TRUE {
 		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 			if EG__().GetException() != nil {
@@ -44,12 +46,12 @@ func ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_JMPZNZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var val *types.Zval
+	var val *types2.Zval
 	val = opline.Op1()
 	if val.IsTrue() {
 		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, opline.GetExtendedValue())
 		return 0
-	} else if val.GetTypeInfo() <= types.IS_TRUE {
+	} else if val.GetTypeInfo() <= types2.IS_TRUE {
 		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 			if EG__().GetException() != nil {

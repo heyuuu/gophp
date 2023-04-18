@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 const SCAN_MAX_ARGS = 0xff

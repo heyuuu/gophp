@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/php/types"
+
 func ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval

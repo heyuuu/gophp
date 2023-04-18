@@ -1,5 +1,11 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/faults"
+)
+
 func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var fetch_type uint32
 	var called_scope *types.ClassEntry

@@ -1,8 +1,8 @@
 package standard
 
 import (
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**

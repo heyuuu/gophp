@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/php/types"
+
 func ZEND_ISSET_ISEMPTY_CV_SPEC_CV_UNUSED_SET_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval

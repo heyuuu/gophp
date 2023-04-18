@@ -1,14 +1,16 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 /**
  * ZendUserIterator
  */
 type ZendUserIterator struct {
 	it    ZendObjectIterator
-	ce    *types.ClassEntry
-	value types.Zval
+	ce    *types2.ClassEntry
+	value types2.Zval
 }
 
 // func MakeZendUserIterator(it ZendObjectIterator, ce *ClassEntry, value Zval) ZendUserIterator {
@@ -21,8 +23,8 @@ type ZendUserIterator struct {
 func (this *ZendUserIterator) GetIt() ZendObjectIterator { return this.it }
 
 // func (this *ZendUserIterator) SetIt(value ZendObjectIterator) { this.it = value }
-func (this *ZendUserIterator) GetCe() *types.ClassEntry      { return this.ce }
-func (this *ZendUserIterator) SetCe(value *types.ClassEntry) { this.ce = value }
-func (this *ZendUserIterator) GetValue() types.Zval          { return this.value }
+func (this *ZendUserIterator) GetCe() *types2.ClassEntry      { return this.ce }
+func (this *ZendUserIterator) SetCe(value *types2.ClassEntry) { this.ce = value }
+func (this *ZendUserIterator) GetValue() types2.Zval          { return this.value }
 
 // func (this *ZendUserIterator) SetValue(value Zval) { this.value = value }

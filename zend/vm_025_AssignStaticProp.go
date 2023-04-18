@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/php/types"
+
 func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var prop *types.Zval

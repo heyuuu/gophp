@@ -1,9 +1,9 @@
 package core
 
 import (
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PhpDoOpenTemporaryFile(path *byte, pfx *byte, opened_path_p **types.String) int {

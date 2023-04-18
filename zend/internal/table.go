@@ -2,7 +2,7 @@ package internal
 
 import (
 	"github.com/heyuuu/gophp/builtin/ascii"
-	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/php/types"
 	"sort"
 )
 

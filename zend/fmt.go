@@ -2,7 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/core/pfmt"
-	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 // 替代各种 sprintf 方法(限制长度)

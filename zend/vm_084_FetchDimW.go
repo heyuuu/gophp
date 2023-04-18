@@ -1,6 +1,8 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_FETCH_DIM_W_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()

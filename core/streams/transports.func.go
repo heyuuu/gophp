@@ -4,20 +4,20 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
-func PhpStreamXportGetHash() *types.Array { return &XportHash }
-func ERR_REPORT(out_err **types.String, fmt string, arg []byte) {
+func PhpStreamXportGetHash() *types2.Array { return &XportHash }
+func ERR_REPORT(out_err **types2.String, fmt string, arg []byte) {
 	if out_err != nil {
 		*out_err = zend.ZendSprintfZStr(fmt, arg)
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, fmt, arg)
 	}
 }
-func ERR_RETURN(out_err **types.String, local_err *types.String, fmt string) {
+func ERR_RETURN(out_err **types2.String, local_err *types2.String, fmt string) {
 	if out_err != nil {
 		*out_err = local_err
 	} else {
@@ -36,7 +36,7 @@ func _phpStreamXportCreate(
 	persistent_id *byte,
 	timeout *__struct__timeval,
 	context *core.PhpStreamContext,
-	error_string **types.String,
+	error_string **types2.String,
 	error_code *int,
 ) *core.PhpStream {
 	var stream *core.PhpStream = nil
@@ -45,7 +45,7 @@ func _phpStreamXportCreate(
 	var protocol *byte = nil
 	var n int = 0
 	var failed int = 0
-	var error_text *types.String = nil
+	var error_text *types2.String = nil
 	var default_timeout __struct__timeval = __struct__timeval{0, 0}
 	default_timeout.tv_sec = standard.FG__().default_socket_timeout
 	if timeout == nil {
@@ -90,7 +90,7 @@ func _phpStreamXportCreate(
 		n = 3
 	}
 	if protocol != nil {
-		if nil == b.Assign(&factory, types.ZendHashStrFindPtr(&XportHash, b.CastStr(protocol, n))) {
+		if nil == b.Assign(&factory, types2.ZendHashStrFindPtr(&XportHash, b.CastStr(protocol, n))) {
 			var wrapper_name []byte
 			if n >= b.SizeOf("wrapper_name") {
 				n = b.SizeOf("wrapper_name") - 1
@@ -132,7 +132,7 @@ func _phpStreamXportCreate(
 					ERR_RETURN(error_string, error_text, "bind() failed: %s")
 					failed = 1
 				} else if (flags & STREAM_XPORT_LISTEN) != 0 {
-					var zbacklog *types.Zval = nil
+					var zbacklog *types2.Zval = nil
 					var backlog int = 32
 					if core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&zbacklog, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "backlog")) != nil {
 						backlog = zend.ZvalGetLong(zbacklog)
@@ -161,7 +161,7 @@ func _phpStreamXportCreate(
 	}
 	return stream
 }
-func PhpStreamXportBind(stream *core.PhpStream, name *byte, namelen int, error_text **types.String) int {
+func PhpStreamXportBind(stream *core.PhpStream, name *byte, namelen int, error_text **types2.String) int {
 	var param PhpStreamXportParam
 	var ret int
 	memset(&param, 0, b.SizeOf("param"))
@@ -188,7 +188,7 @@ func PhpStreamXportConnect(
 	namelen int,
 	asynchronous int,
 	timeout *__struct__timeval,
-	error_text **types.String,
+	error_text **types2.String,
 	error_code *int,
 ) int {
 	var param PhpStreamXportParam
@@ -219,7 +219,7 @@ func PhpStreamXportConnect(
 	}
 	return ret
 }
-func PhpStreamXportListen(stream *core.PhpStream, backlog int, error_text **types.String) int {
+func PhpStreamXportListen(stream *core.PhpStream, backlog int, error_text **types2.String) int {
 	var param PhpStreamXportParam
 	var ret int
 	memset(&param, 0, b.SizeOf("param"))
@@ -242,11 +242,11 @@ func PhpStreamXportListen(stream *core.PhpStream, backlog int, error_text **type
 func PhpStreamXportAccept(
 	stream *core.PhpStream,
 	client **core.PhpStream,
-	textaddr **types.String,
+	textaddr **types2.String,
 	addr *any,
 	addrlen *socklen_t,
 	timeout *__struct__timeval,
-	error_text **types.String,
+	error_text **types2.String,
 ) int {
 	var param PhpStreamXportParam
 	var ret int
@@ -285,7 +285,7 @@ func PhpStreamXportAccept(
 	}
 	return ret
 }
-func PhpStreamXportGetName(stream *core.PhpStream, want_peer int, textaddr **types.String, addr *any, addrlen *socklen_t) int {
+func PhpStreamXportGetName(stream *core.PhpStream, want_peer int, textaddr **types2.String, addr *any, addrlen *socklen_t) int {
 	var param PhpStreamXportParam
 	var ret int
 	memset(&param, 0, b.SizeOf("param"))
@@ -351,7 +351,7 @@ func PhpStreamXportRecvfrom(
 	flags int,
 	addr *any,
 	addrlen *socklen_t,
-	textaddr **types.String,
+	textaddr **types2.String,
 ) int {
 	var param PhpStreamXportParam
 	var ret int = 0

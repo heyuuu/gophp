@@ -2,22 +2,23 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var array *types.Zval
-	var value *types.Zval
+	var array *types2.Zval
+	var value *types2.Zval
 	var value_type uint32
-	var fe_ht *types.Array
-	var pos types.ArrayPosition
-	var p *types.Bucket
+	var fe_ht *types2.Array
+	var pos types2.ArrayPosition
+	var p *types2.Bucket
 	array = opline.Op1()
-	array = types.ZVAL_DEREF(array)
+	array = types2.ZVAL_DEREF(array)
 	if array.IsArray() {
-		pos = types.ZendHashIteratorPosEx(opline.Op1().GetFeIterIdx(), array)
+		pos = types2.ZendHashIteratorPosEx(opline.Op1().GetFeIterIdx(), array)
 		fe_ht = array.GetArr()
 		p = fe_ht.Bucket(pos)
 		for true {
@@ -32,11 +33,11 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			value = p.GetVal()
 			value_type = value.GetTypeInfo()
-			if value_type != types.IS_UNDEF {
-				if value_type == types.IS_INDIRECT {
+			if value_type != types2.IS_UNDEF {
+				if value_type == types2.IS_INDIRECT {
 					value = value.GetZv()
 					value_type = value.GetTypeInfo()
-					if value_type != types.IS_UNDEF {
+					if value_type != types2.IS_UNDEF {
 						break
 					}
 				} else {
@@ -60,8 +61,8 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			/* plain object */
 
-			fe_ht = types.Z_OBJPROP_P(array)
-			pos = types.ZendHashIteratorPos(opline.Op1().GetFeIterIdx(), fe_ht)
+			fe_ht = types2.Z_OBJPROP_P(array)
+			pos = types2.ZendHashIteratorPos(opline.Op1().GetFeIterIdx(), fe_ht)
 			p = fe_ht.Bucket(pos)
 			for true {
 				if pos >= fe_ht.GetNNumUsed() {
@@ -75,22 +76,22 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 				value = p.GetVal()
 				value_type = value.GetTypeInfo()
-				if value_type != types.IS_UNDEF {
-					if value_type == types.IS_INDIRECT {
+				if value_type != types2.IS_UNDEF {
+					if value_type == types2.IS_INDIRECT {
 						value = value.GetZv()
 						value_type = value.GetTypeInfo()
-						if value_type != types.IS_UNDEF && ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 0) == types.SUCCESS {
-							if (value_type & types.Z_TYPE_MASK) != types.IS_REFERENCE {
+						if value_type != types2.IS_UNDEF && ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 0) == types2.SUCCESS {
+							if (value_type & types2.Z_TYPE_MASK) != types2.IS_REFERENCE {
 								var prop_info *ZendPropertyInfo = ZendGetTypedPropertyInfoForSlot(array.GetObj(), value)
 								if prop_info != nil {
 									value.SetNewRef(value)
 									ZEND_REF_ADD_TYPE_SOURCE(value.Reference(), prop_info)
-									value_type = types.IS_REFERENCE_EX
+									value_type = types2.IS_REFERENCE_EX
 								}
 							}
 							break
 						}
-					} else if types.Z_OBJCE_P(array).GetDefaultPropertiesCount() == 0 || p.GetKey() == nil || ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 1) == types.SUCCESS {
+					} else if types2.Z_OBJCE_P(array).GetDefaultPropertiesCount() == 0 || p.GetKey() == nil || ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 1) == types2.SUCCESS {
 						break
 					}
 				}
@@ -122,7 +123,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					UNDEF_RESULT()
 					return 0
 				}
-				if iter.GetFuncs().GetValid()(iter) == types.FAILURE {
+				if iter.GetFuncs().GetValid()(iter) == types2.FAILURE {
 
 					/* reached end of iteration */
 
@@ -170,17 +171,17 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, opline.GetExtendedValue())
 		return 0
 	}
-	if (value_type & types.Z_TYPE_MASK) != types.IS_REFERENCE {
-		var gc *types.ZendRefcounted = value.GetCounted()
-		var ref *types.Zval
+	if (value_type & types2.Z_TYPE_MASK) != types2.IS_REFERENCE {
+		var gc *types2.ZendRefcounted = value.GetCounted()
+		var ref *types2.Zval
 		value.SetNewEmptyRef()
-		ref = types.Z_REFVAL_P(value)
+		ref = types2.Z_REFVAL_P(value)
 		types.ZVAL_COPY_VALUE_EX(ref, value, gc, value_type)
 	}
 	if opline.GetOp2Type() == IS_CV {
-		var variable_ptr *types.Zval = opline.Op2()
+		var variable_ptr *types2.Zval = opline.Op2()
 		if variable_ptr != value {
-			var ref *types.ZendReference
+			var ref *types2.ZendReference
 			ref = value.Reference()
 			// 			ref.AddRefcount()
 			// IZvalPtrDtor(variable_ptr)

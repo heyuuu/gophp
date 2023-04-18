@@ -2,14 +2,14 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend/types"
+	types2 "github.com/heyuuu/gophp/php/types"
 )
 
 func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var result *types.Zval
-	var constructor types.IFunction
-	var ce *types.ClassEntry
+	var result *types2.Zval
+	var constructor types2.IFunction
+	var ce *types2.ClassEntry
 	var call *ZendExecuteData
 	{
 		ce = CACHED_PTR(opline.GetOp2().GetNum())
@@ -25,11 +25,11 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	}
 
 	result = opline.Result()
-	if ObjectInitEx(result, ce) != types.SUCCESS {
+	if ObjectInitEx(result, ce) != types2.SUCCESS {
 		result.SetUndef()
 		return 0
 	}
-	constructor = types.Z_OBJ_HT_P(result).GetGetConstructor()(result.Object())
+	constructor = types2.Z_OBJ_HT_P(result).GetGetConstructor()(result.Object())
 	if constructor == nil {
 		if EG__().GetException() != nil {
 			return 0
@@ -45,7 +45,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 		/* Perform a dummy function call */
 
-		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (types.IFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
+		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (types2.IFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
 
 		/* Perform a dummy function call */
 
@@ -65,20 +65,20 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var result *types.Zval
-	var constructor types.IFunction
-	var ce *types.ClassEntry
+	var result *types2.Zval
+	var constructor types2.IFunction
+	var ce *types2.ClassEntry
 	var call *ZendExecuteData
 
 	{
 		ce = opline.Op1().Class()
 	}
 	result = opline.Result()
-	if ObjectInitEx(result, ce) != types.SUCCESS {
+	if ObjectInitEx(result, ce) != types2.SUCCESS {
 		result.SetUndef()
 		return 0
 	}
-	constructor = types.Z_OBJ_HT_P(result).GetGetConstructor()(result.Object())
+	constructor = types2.Z_OBJ_HT_P(result).GetGetConstructor()(result.Object())
 	if constructor == nil {
 		if EG__().GetException() != nil {
 			return 0
@@ -94,7 +94,7 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 		/* Perform a dummy function call */
 
-		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (types.IFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
+		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (types2.IFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
 
 		/* Perform a dummy function call */
 
@@ -114,9 +114,9 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var result *types.Zval
-	var constructor types.IFunction
-	var ce *types.ClassEntry
+	var result *types2.Zval
+	var constructor types2.IFunction
+	var ce *types2.ClassEntry
 	var call *ZendExecuteData
 
 	{
@@ -129,11 +129,11 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	}
 
 	result = opline.Result()
-	if ObjectInitEx(result, ce) != types.SUCCESS {
+	if ObjectInitEx(result, ce) != types2.SUCCESS {
 		result.SetUndef()
 		return 0
 	}
-	constructor = types.Z_OBJ_HT_P(result).GetGetConstructor()(result.Object())
+	constructor = types2.Z_OBJ_HT_P(result).GetGetConstructor()(result.Object())
 	if constructor == nil {
 		if EG__().GetException() != nil {
 			return 0
@@ -149,7 +149,7 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 		/* Perform a dummy function call */
 
-		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (types.IFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
+		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (types2.IFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
 
 		/* Perform a dummy function call */
 

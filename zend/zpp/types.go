@@ -1,7 +1,7 @@
 package zpp
 
 import (
-	"github.com/heyuuu/gophp/zend/types"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"log"
 )
 
@@ -72,15 +72,15 @@ func (l *vaList) Pop() any {
 	return arg
 }
 
-func (l *vaList) Bool(val bool)          { PutVaArg(l, types.IntBool(val)) }
-func (l *vaList) IntBool(val int)        { PutVaArg(l, val) }
-func (l *vaList) ZendBool(val int)       { PutVaArg(l, val) }
-func (l *vaList) Long(val int)           { PutVaArg(l, val) }
-func (l *vaList) Double(val float64)     { PutVaArg(l, val) }
-func (l *vaList) Str(val string)         { PutVaArg(l, types.NewString(val)) }
-func (l *vaList) ZStr(val *types.String) { PutVaArg(l, val) }
-func (l *vaList) Array(val *types.Array) { PutVaArg(l, val) }
-func (l *vaList) Zval(val *types.Zval)   { PutVaArg(l, val) }
+func (l *vaList) Bool(val bool)           { PutVaArg(l, types2.IntBool(val)) }
+func (l *vaList) IntBool(val int)         { PutVaArg(l, val) }
+func (l *vaList) ZendBool(val int)        { PutVaArg(l, val) }
+func (l *vaList) Long(val int)            { PutVaArg(l, val) }
+func (l *vaList) Double(val float64)      { PutVaArg(l, val) }
+func (l *vaList) Str(val string)          { PutVaArg(l, types2.NewString(val)) }
+func (l *vaList) ZStr(val *types2.String) { PutVaArg(l, val) }
+func (l *vaList) Array(val *types2.Array) { PutVaArg(l, val) }
+func (l *vaList) Zval(val *types2.Zval)   { PutVaArg(l, val) }
 func (l *vaList) StrPtr(str *byte, len int) {
 	PutVaArg[*byte](l, str)
 	PutVaArg[int](l, len)

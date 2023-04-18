@@ -1,12 +1,14 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_ASSIGN_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var var_ptr *types.Zval
-	var value *types.Zval
+	var var_ptr *types2.Zval
+	var value *types2.Zval
 	value = opline.Const2()
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if var_ptr.IsError() {
@@ -16,8 +18,8 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsReference() {
-				var ref *types.ZendReference = var_ptr.Reference()
-				var_ptr = types.Z_REFVAL_P(var_ptr)
+				var ref *types2.ZendReference = var_ptr.Reference()
+				var_ptr = types2.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
 					break
@@ -27,7 +29,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.Result(), var_ptr)
+			types2.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	if free_op1 != nil {
@@ -39,8 +41,8 @@ func ZEND_ASSIGN_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
-	var var_ptr *types.Zval
-	var value *types.Zval
+	var var_ptr *types2.Zval
+	var value *types2.Zval
 	value = opline.Op2()
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if var_ptr.IsError() {
@@ -50,8 +52,8 @@ func ZEND_ASSIGN_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsReference() {
-				var ref *types.ZendReference = var_ptr.Reference()
-				var_ptr = types.Z_REFVAL_P(var_ptr)
+				var ref *types2.ZendReference = var_ptr.Reference()
+				var_ptr = types2.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
 					break
@@ -61,7 +63,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.Result(), var_ptr)
+			types2.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	// ZvalPtrDtorNogc(free_op2)
@@ -73,8 +75,8 @@ func ZEND_ASSIGN_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_ASSIGN_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var var_ptr *types.Zval
-	var value *types.Zval
+	var var_ptr *types2.Zval
+	var value *types2.Zval
 	value = opline.Cv2OrUndef()
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if var_ptr.IsError() {
@@ -84,8 +86,8 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsReference() {
-				var ref *types.ZendReference = var_ptr.Reference()
-				var_ptr = types.Z_REFVAL_P(var_ptr)
+				var ref *types2.ZendReference = var_ptr.Reference()
+				var_ptr = types2.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
 					break
@@ -95,7 +97,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.Result(), var_ptr)
+			types2.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	if free_op1 != nil {
@@ -105,8 +107,8 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_ASSIGN_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var var_ptr *types.Zval
-	var value *types.Zval
+	var var_ptr *types2.Zval
+	var value *types2.Zval
 	value = opline.Const2()
 	var_ptr = _get_zval_ptr_cv_BP_VAR_RW(opline.GetOp1().GetVar(), executeData)
 	if var_ptr.IsError() {
@@ -116,8 +118,8 @@ func ZEND_ASSIGN_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsReference() {
-				var ref *types.ZendReference = var_ptr.Reference()
-				var_ptr = types.Z_REFVAL_P(var_ptr)
+				var ref *types2.ZendReference = var_ptr.Reference()
+				var_ptr = types2.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
 					break
@@ -127,7 +129,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.Result(), var_ptr)
+			types2.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -135,8 +137,8 @@ func ZEND_ASSIGN_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_ASSIGN_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp
-	var var_ptr *types.Zval
-	var value *types.Zval
+	var var_ptr *types2.Zval
+	var value *types2.Zval
 	value = opline.Op2()
 	var_ptr = _get_zval_ptr_cv_BP_VAR_RW(opline.GetOp1().GetVar(), executeData)
 	if var_ptr.IsError() {
@@ -146,8 +148,8 @@ func ZEND_ASSIGN_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsReference() {
-				var ref *types.ZendReference = var_ptr.Reference()
-				var_ptr = types.Z_REFVAL_P(var_ptr)
+				var ref *types2.ZendReference = var_ptr.Reference()
+				var_ptr = types2.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
 					break
@@ -157,7 +159,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.Result(), var_ptr)
+			types2.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	// ZvalPtrDtorNogc(free_op2)
@@ -165,8 +167,8 @@ func ZEND_ASSIGN_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_ASSIGN_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var var_ptr *types.Zval
-	var value *types.Zval
+	var var_ptr *types2.Zval
+	var value *types2.Zval
 	value = opline.Cv2OrUndef()
 	var_ptr = _get_zval_ptr_cv_BP_VAR_RW(opline.GetOp1().GetVar(), executeData)
 	if var_ptr.IsError() {
@@ -176,8 +178,8 @@ func ZEND_ASSIGN_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsReference() {
-				var ref *types.ZendReference = var_ptr.Reference()
-				var_ptr = types.Z_REFVAL_P(var_ptr)
+				var ref *types2.ZendReference = var_ptr.Reference()
+				var_ptr = types2.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
 					break
@@ -187,7 +189,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.Result(), var_ptr)
+			types2.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

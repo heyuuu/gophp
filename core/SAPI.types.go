@@ -2,8 +2,8 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**
@@ -44,9 +44,9 @@ type SapiRequestInfo struct {
 	request_uri         *byte
 	request_body        *PhpStream
 	content_type        *byte
-	headers_only        types.ZendBool
-	no_headers          types.ZendBool
-	headers_read        types.ZendBool
+	headers_only        types2.ZendBool
+	no_headers          types2.ZendBool
+	headers_read        types2.ZendBool
 	post_entry          *SapiPostEntry
 	content_type_dup    *byte
 	auth_user           *byte
@@ -93,15 +93,15 @@ type SapiGlobals struct {
 	rfc1867_uploaded_files   map[string]bool
 	post_max_size            zend.ZendLong
 	options                  int
-	sapi_started             types.ZendBool
+	sapi_started             types2.ZendBool
 	global_request_time      float64
-	known_post_content_types types.Array
-	callback_func            types.Zval
-	fci_cache                types.ZendFcallInfoCache
+	known_post_content_types types2.Array
+	callback_func            types2.Zval
+	fci_cache                types2.ZendFcallInfoCache
 }
 
 func (this *SapiGlobals) Init() {
-	this.known_post_content_types = *types.NewArray(8)
+	this.known_post_content_types = *types2.NewArray(8)
 	PhpSetupSapiContentTypes()
 }
 
@@ -115,7 +115,7 @@ func (this *SapiGlobals) Destroy() {
 func (this *SapiGlobals) GetDefaultMimetype() *byte     { return this.default_mimetype }
 func (this *SapiGlobals) GetDefaultCharset() *byte      { return this.default_charset }
 func (this *SapiGlobals) GetPostMaxSize() zend.ZendLong { return this.post_max_size }
-func (this *SapiGlobals) GetKnownPostContentTypes() types.Array {
+func (this *SapiGlobals) GetKnownPostContentTypes() types2.Array {
 	return this.known_post_content_types
 }
 

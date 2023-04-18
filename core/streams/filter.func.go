@@ -4,23 +4,23 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PhpStreamFilterRegisterFactory(filterpattern string, factory *PhpStreamFilterFactory) int {
 	if _, exists := StreamFiltersHash[filterpattern]; exists {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 
 	StreamFiltersHash[filterpattern] = factory
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpStreamFilterUnregisterFactory(filterpattern string) {
 	delete(StreamFiltersHash, filterpattern)
 }
-func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory *PhpStreamFilterFactory) int {
+func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types2.String, factory *PhpStreamFilterFactory) int {
 	if standard.FG__().GetStreamFilters() == nil {
 		streamFilters := make(map[string]*PhpStreamFilterFactory, len(StreamFiltersHash))
 		for k, v := range StreamFiltersHash {
@@ -30,11 +30,11 @@ func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory
 	}
 
 	if _, exists := standard.FG__().GetStreamFilters()[filterpattern.GetStr()]; exists {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 
 	standard.FG__().GetStreamFilters()[filterpattern.GetStr()] = factory
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpStreamBucketNew(stream *core.PhpStream, buf *byte, buflen int, own_buf uint8, buf_persistent uint8) *PhpStreamBucket {
 	var is_persistent int = stream.GetIsPersistent()
@@ -129,7 +129,7 @@ func PhpStreamBucketUnlink(bucket *PhpStreamBucket) {
 	bucket.SetPrev(nil)
 	bucket.SetNext(bucket.GetPrev())
 }
-func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
+func PhpStreamFilterCreate(filtername *byte, filterparams *types2.Zval, persistent uint8) *core.PhpStreamFilter {
 	var filter_hash = standard.FG__().GetStreamFilters()
 	if filter_hash == nil {
 		filter_hash = StreamFiltersHash
@@ -139,7 +139,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 	var n int
 	var period *byte
 	n = strlen(filtername)
-	if nil != b.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, b.CastStr(filtername, n))) {
+	if nil != b.Assign(&factory, types2.ZendHashStrFindPtr(filter_hash, b.CastStr(filtername, n))) {
 		filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
 	} else if b.Assign(&period, strrchr(filtername, '.')) {
 
@@ -153,7 +153,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 			b.Assert(period[0] == '.')
 			period[1] = '*'
 			period[2] = '0'
-			if nil != b.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, wildname)) {
+			if nil != b.Assign(&factory, types2.ZendHashStrFindPtr(filter_hash, wildname)) {
 				filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
 			}
 			*period = '0'
@@ -201,7 +201,7 @@ func PhpStreamFilterPrependEx(chain *PhpStreamFilterChain, filter *core.PhpStrea
 	}
 	chain.SetHead(filter)
 	filter.SetChain(chain)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func _phpStreamFilterPrepend(chain *PhpStreamFilterChain, filter *core.PhpStreamFilter) {
 	PhpStreamFilterPrependEx(chain, filter)
@@ -253,7 +253,7 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 				PhpStreamBucketDelref(bucket)
 			}
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Filter failed to process pre-buffered data")
-			return types.FAILURE
+			return types2.FAILURE
 		case PSFS_FEED_ME:
 
 			/* We don't actually need data yet,
@@ -286,10 +286,10 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 			}
 		}
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func _phpStreamFilterAppend(chain *PhpStreamFilterChain, filter *core.PhpStreamFilter) {
-	if PhpStreamFilterAppendEx(chain, filter) != types.SUCCESS {
+	if PhpStreamFilterAppendEx(chain, filter) != types2.SUCCESS {
 		if chain.GetHead() == filter {
 			chain.SetHead(nil)
 			chain.SetTail(nil)
@@ -315,7 +315,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 		/* Filter is not attached to a chain, or chain is somehow not part of a stream */
 
-		return types.FAILURE
+		return types2.FAILURE
 
 		/* Filter is not attached to a chain, or chain is somehow not part of a stream */
 
@@ -329,13 +329,13 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 			/* We've flushed the data far enough */
 
-			return types.SUCCESS
+			return types2.SUCCESS
 
 			/* We've flushed the data far enough */
 
 		}
 		if status == PSFS_ERR_FATAL {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 
 		/* Otherwise we have data available to PASS_ON
@@ -359,7 +359,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 		/* Unlikely, but possible */
 
-		return types.SUCCESS
+		return types2.SUCCESS
 
 		/* Unlikely, but possible */
 
@@ -407,7 +407,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 		/* Send flushed data to the stream */
 
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpStreamFilterRemove(filter *core.PhpStreamFilter, call_dtor int) *core.PhpStreamFilter {
 	if filter.GetPrev() != nil {

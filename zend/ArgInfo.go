@@ -1,13 +1,15 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 type ArgInfoOpt func(*ArgInfo)
 
-func ArgInfoType(typ types.ZendType) ArgInfoOpt {
+func ArgInfoType(typ types2.ZendType) ArgInfoOpt {
 	return func(info *ArgInfo) { info.typ = typ }
 }
-func ArgInfoByRef(byRef types.ZendUchar) ArgInfoOpt {
+func ArgInfoByRef(byRef types2.ZendUchar) ArgInfoOpt {
 	return func(info *ArgInfo) { info.byReference = byRef }
 }
 func ArgInfoVariadic() ArgInfoOpt {
@@ -20,18 +22,18 @@ func ArgInfoVariadic() ArgInfoOpt {
  */
 type ArgInfo struct {
 	name        string
-	typ         types.ZendType
+	typ         types2.ZendType
 	byReference uint8
 	isVariadic  bool
 	// 为 returnArg 临时使用，后续需替换
 	requiredNumArgs int // -1 表示需要所有参数
 }
 
-func (this *ArgInfo) Name() string         { return this.name }
-func (this *ArgInfo) Type() types.ZendType { return this.typ }
-func (this *ArgInfo) ByReference() uint8   { return this.byReference }
-func (this *ArgInfo) IsVariadic() bool     { return this.isVariadic }
-func (this *ArgInfo) RequiredNumArgs() int { return this.requiredNumArgs }
+func (this *ArgInfo) Name() string          { return this.name }
+func (this *ArgInfo) Type() types2.ZendType { return this.typ }
+func (this *ArgInfo) ByReference() uint8    { return this.byReference }
+func (this *ArgInfo) IsVariadic() bool      { return this.isVariadic }
+func (this *ArgInfo) RequiredNumArgs() int  { return this.requiredNumArgs }
 
 // 只可用于 def.DefFunc 使用，后续会做不兼容修改
 func DefArgInfo(name string) ArgInfo {

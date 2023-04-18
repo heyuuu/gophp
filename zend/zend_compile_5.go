@@ -3,8 +3,8 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZendCompileIf(ast *ZendAst) {
@@ -43,13 +43,13 @@ func ZendCompileIf(ast *ZendAst) {
 		Efree(jmp_opnums)
 	}
 }
-func DetermineSwitchJumptableType(cases *ZendAstList) types.ZendUchar {
+func DetermineSwitchJumptableType(cases *ZendAstList) types2.ZendUchar {
 	var i uint32
-	var common_type types.ZendUchar = types.IS_UNDEF
+	var common_type types2.ZendUchar = types2.IS_UNDEF
 	for i = 0; i < cases.GetChildren(); i++ {
 		var case_ast *ZendAst = cases.GetChild()[i]
 		var cond_ast **ZendAst = case_ast.GetChild()[0]
-		var cond_zv *types.Zval
+		var cond_zv *types2.Zval
 		if case_ast.GetChild()[0] == nil {
 
 			/* Skip default clause */
@@ -64,28 +64,28 @@ func DetermineSwitchJumptableType(cases *ZendAstList) types.ZendUchar {
 
 			/* Non-constant case */
 
-			return types.IS_UNDEF
+			return types2.IS_UNDEF
 
 			/* Non-constant case */
 
 		}
 		cond_zv = ZendAstGetZval(case_ast.GetChild()[0])
-		if cond_zv.GetType() != types.IS_LONG && cond_zv.GetType() != types.IS_STRING {
+		if cond_zv.GetType() != types2.IS_LONG && cond_zv.GetType() != types2.IS_STRING {
 
 			/* We only optimize switched on integers and strings */
 
-			return types.IS_UNDEF
+			return types2.IS_UNDEF
 
 			/* We only optimize switched on integers and strings */
 
 		}
-		if common_type == types.IS_UNDEF {
+		if common_type == types2.IS_UNDEF {
 			common_type = cond_zv.GetType()
 		} else if common_type != cond_zv.GetType() {
 
 			/* Non-uniform case types */
 
-			return types.IS_UNDEF
+			return types2.IS_UNDEF
 
 			/* Non-uniform case types */
 
@@ -94,7 +94,7 @@ func DetermineSwitchJumptableType(cases *ZendAstList) types.ZendUchar {
 
 			/* Numeric strings cannot be compared with a simple hash lookup */
 
-			return types.IS_UNDEF
+			return types2.IS_UNDEF
 
 			/* Numeric strings cannot be compared with a simple hash lookup */
 
@@ -102,7 +102,7 @@ func DetermineSwitchJumptableType(cases *ZendAstList) types.ZendUchar {
 	}
 	return common_type
 }
-func ShouldUseJumptable(cases *ZendAstList, jumptable_type types.ZendUchar) types.ZendBool {
+func ShouldUseJumptable(cases *ZendAstList, jumptable_type types2.ZendUchar) types2.ZendBool {
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_NO_JUMPTABLES) != 0 {
 		return 0
 	}
@@ -110,10 +110,10 @@ func ShouldUseJumptable(cases *ZendAstList, jumptable_type types.ZendUchar) type
 	/* Thresholds are chosen based on when the average switch time for equidistributed
 	 * input becomes smaller when using the jumptable optimization. */
 
-	if jumptable_type == types.IS_LONG {
+	if jumptable_type == types2.IS_LONG {
 		return cases.GetChildren() >= 5
 	} else {
-		b.Assert(jumptable_type == types.IS_STRING)
+		b.Assert(jumptable_type == types2.IS_STRING)
 		return cases.GetChildren() >= 2
 	}
 
@@ -124,26 +124,26 @@ func ZendCompileSwitch(ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
 	var cases *ZendAstList = ZendAstGetList(ast.GetChild()[1])
 	var i uint32
-	var has_default_case types.ZendBool = 0
+	var has_default_case types2.ZendBool = 0
 	var expr_node Znode
 	var case_node Znode
 	var opline *ZendOp
 	var jmpnz_opnums *uint32
 	var opnum_default_jmp uint32
 	var opnum_switch uint32 = uint32 - 1
-	var jumptable_type types.ZendUchar
-	var jumptable *types.Array = nil
+	var jumptable_type types2.ZendUchar
+	var jumptable *types2.Array = nil
 	ZendCompileExpr(&expr_node, expr_ast)
 	ZendBeginLoop(ZEND_FREE, &expr_node, 1)
 	case_node.SetOpType(IS_TMP_VAR)
 	case_node.GetOp().SetVar(GetTemporaryVariable())
 	jumptable_type = DetermineSwitchJumptableType(cases)
-	if jumptable_type != types.IS_UNDEF && ShouldUseJumptable(cases, jumptable_type) != 0 {
+	if jumptable_type != types2.IS_UNDEF && ShouldUseJumptable(cases, jumptable_type) != 0 {
 		var jumptable_op Znode
-		jumptable = types.NewArray(cases.GetChildren())
+		jumptable = types2.NewArray(cases.GetChildren())
 		jumptable_op.SetOpType(IS_CONST)
 		jumptable_op.GetConstant().SetArray(jumptable)
-		opline = ZendEmitOp(nil, b.Cond(jumptable_type == types.IS_LONG, ZEND_SWITCH_LONG, ZEND_SWITCH_STRING), &expr_node, &jumptable_op)
+		opline = ZendEmitOp(nil, b.Cond(jumptable_type == types2.IS_LONG, ZEND_SWITCH_LONG, ZEND_SWITCH_STRING), &expr_node, &jumptable_op)
 		if opline.GetOp1Type() == IS_CONST {
 			CT_CONSTANT(opline.GetOp1()).TryAddRefcount()
 		}
@@ -189,8 +189,8 @@ func ZendCompileSwitch(ast *ZendAst) {
 		if cond_ast != nil {
 			ZendUpdateJumpTargetToNext(jmpnz_opnums[i])
 			if jumptable != nil {
-				var cond_zv *types.Zval = ZendAstGetZval(cond_ast)
-				var jmp_target types.Zval
+				var cond_zv *types2.Zval = ZendAstGetZval(cond_ast)
+				var jmp_target types2.Zval
 				jmp_target.SetLong(GetNextOpNumber())
 				b.Assert(cond_zv.IsType(jumptable_type))
 				if cond_zv.IsLong() {
@@ -245,9 +245,9 @@ func ZendCompileTry(ast *ZendAst) {
 
 	if CG__().GetContext().GetLabels() != nil {
 		var label *ZendLabel
-		var __ht *types.Array = CG__().GetContext().GetLabels()
+		var __ht *types2.Array = CG__().GetContext().GetLabels()
 		for _, _p := range __ht.ForeachDataReserve() {
-			var _z types.Zval = _p.GetVal()
+			var _z types2.Zval = _p.GetVal()
 
 			label = _z.Ptr()
 			if label.GetOplineNum() == GetNextOpNumber() {
@@ -282,14 +282,14 @@ func ZendCompileTry(ast *ZendAst) {
 		var classes *ZendAstList = ZendAstGetList(catch_ast.GetChild()[0])
 		var var_ast *ZendAst = catch_ast.GetChild()[1]
 		var stmt_ast *ZendAst = catch_ast.GetChild()[2]
-		var var_name *types.String = ZendAstGetZval(var_ast).String()
-		var is_last_catch types.ZendBool = i+1 == catches.GetChildren()
+		var var_name *types2.String = ZendAstGetZval(var_ast).String()
+		var is_last_catch types2.ZendBool = i+1 == catches.GetChildren()
 		var jmp_multicatch *uint32 = SafeEmalloc(b.SizeOf("uint32_t"), classes.GetChildren()-1, 0)
 		var opnum_catch uint32 = uint32 - 1
 		CG__().SetZendLineno(catch_ast.GetLineno())
 		for j = 0; j < classes.GetChildren(); j++ {
 			var class_ast *ZendAst = classes.GetChild()[j]
-			var is_last_class types.ZendBool = j+1 == classes.GetChildren()
+			var is_last_class types2.ZendBool = j+1 == classes.GetChildren()
 			if ZendIsConstDefaultClassRef(class_ast) == 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Bad class name in the catch statement")
 			}
@@ -381,12 +381,12 @@ func ZendDeclareIsFirstStatement(ast *ZendAst) int {
 
 	for i < file_ast.GetChildren() {
 		if file_ast.GetChild()[i] == ast {
-			return types.SUCCESS
+			return types2.SUCCESS
 		} else if file_ast.GetChild()[i] == nil {
 
 			/* Empty statements are not allowed prior to a declare */
 
-			return types.FAILURE
+			return types2.FAILURE
 
 			/* Empty statements are not allowed prior to a declare */
 
@@ -394,14 +394,14 @@ func ZendDeclareIsFirstStatement(ast *ZendAst) int {
 
 			/* declares can only be preceded by other declares */
 
-			return types.FAILURE
+			return types2.FAILURE
 
 			/* declares can only be preceded by other declares */
 
 		}
 		i++
 	}
-	return types.FAILURE
+	return types2.FAILURE
 }
 func ZendCompileDeclare(ast *ZendAst) {
 	var declares *ZendAstList = ZendAstGetList(ast.GetChild()[0])
@@ -411,26 +411,26 @@ func ZendCompileDeclare(ast *ZendAst) {
 		var declare_ast *ZendAst = declares.GetChild()[i]
 		var name_ast *ZendAst = declare_ast.GetChild()[0]
 		var value_ast *ZendAst = declare_ast.GetChild()[1]
-		var name *types.String = ZendAstGetStr(name_ast)
+		var name *types2.String = ZendAstGetStr(name_ast)
 		if value_ast.GetKind() != ZEND_AST_ZVAL {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "declare(%s) value must be a literal", name.GetVal())
 		}
 		if ascii.StrCaseEquals(name.GetStr(), "ticks") {
 			// todo 触发不支持 ticks 的 warning
 		} else if ascii.StrCaseEquals(name.GetStr(), "encoding") {
-			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
+			if types2.FAILURE == ZendDeclareIsFirstStatement(ast) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Encoding declaration pragma must be "+"the very first statement in the script")
 			}
 		} else if ascii.StrCaseEquals(name.GetStr(), "strict_types") {
-			var value_zv types.Zval
-			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
+			var value_zv types2.Zval
+			if types2.FAILURE == ZendDeclareIsFirstStatement(ast) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must be "+"the very first statement in the script")
 			}
 			if ast.GetChild()[1] != nil {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must not "+"use block mode")
 			}
 			ZendConstExprToZval(&value_zv, value_ast)
-			if value_zv.GetType() != types.IS_LONG || value_zv.Long() != 0 && value_zv.Long() != 1 {
+			if value_zv.GetType() != types2.IS_LONG || value_zv.Long() != 0 && value_zv.Long() != 1 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must have 0 or 1 as its value")
 			}
 			if value_zv.Long() == 1 {
@@ -451,24 +451,24 @@ func ZendCompileStmtList(ast *ZendAst) {
 		ZendCompileStmt(list.GetChild()[i])
 	}
 }
-func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.ZendType {
-	var allow_null types.ZendBool = force_allow_null
+func ZendCompileTypename(ast *ZendAst, force_allow_null types2.ZendBool) types2.ZendType {
+	var allow_null types2.ZendBool = force_allow_null
 	var orig_ast_attr ZendAstAttr = ast.GetAttr()
-	var type_ types.ZendType
+	var type_ types2.ZendType
 	if (ast.GetAttr() & ZEND_TYPE_NULLABLE) != 0 {
 		allow_null = 1
 		ast.SetAttr(ast.GetAttr() &^ ZEND_TYPE_NULLABLE)
 	}
 	if ast.GetKind() == ZEND_AST_TYPE {
-		return types.ZEND_TYPE_ENCODE(ast.GetAttr(), allow_null)
+		return types2.ZEND_TYPE_ENCODE(ast.GetAttr(), allow_null)
 	} else {
-		var class_name *types.String = ZendAstGetStr(ast)
-		var type_code types.ZendUchar = ZendLookupBuiltinTypeByName(class_name)
+		var class_name *types2.String = ZendAstGetStr(ast)
+		var type_code types2.ZendUchar = ZendLookupBuiltinTypeByName(class_name)
 		if type_code != 0 {
 			if (ast.GetAttr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", ZendStringTolower(class_name).GetVal())
 			}
-			type_ = types.ZEND_TYPE_ENCODE(type_code, allow_null)
+			type_ = types2.ZEND_TYPE_ENCODE(type_code, allow_null)
 		} else {
 			var fetch_type uint32 = ZendGetClassFetchTypeAst(ast)
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
@@ -478,7 +478,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 				ZendEnsureValidClassFetchType(fetch_type)
 				//class_name.AddRefcount()
 			}
-			type_ = types.ZEND_TYPE_ENCODE_CLASS(class_name, allow_null)
+			type_ = types2.ZEND_TYPE_ENCODE_CLASS(class_name, allow_null)
 		}
 	}
 	ast.SetAttr(orig_ast_attr)
@@ -487,7 +487,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
-	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
+	var op_array *types2.ZendOpArray = CG__().GetActiveOpArray()
 	var arg_infos *ZendArgInfo
 	if return_type_ast != nil {
 
@@ -498,7 +498,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 			ZendCompileTypename(return_type_ast, 0),
 			op_array.IsReturnReference(),
 		)
-		if arg_infos.GetType().Code() == types.IS_VOID && arg_infos.GetType().AllowNull() {
+		if arg_infos.GetType().Code() == types2.IS_VOID && arg_infos.GetType().AllowNull() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Void type cannot be nullable")
 		}
 		arg_infos++
@@ -514,12 +514,12 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		var type_ast *ZendAst = param_ast.GetChild()[0]
 		var var_ast *ZendAst = param_ast.GetChild()[1]
 		var default_ast *ZendAst = param_ast.GetChild()[2]
-		var name *types.String = ZendAstGetZval(var_ast).String()
-		var is_ref types.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_REF) != 0
-		var is_variadic types.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_VARIADIC) != 0
+		var name *types2.String = ZendAstGetZval(var_ast).String()
+		var is_ref types2.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_REF) != 0
+		var is_variadic types2.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_VARIADIC) != 0
 		var var_node Znode
 		var default_node Znode
-		var opcode types.ZendUchar
+		var opcode types2.ZendUchar
 		var opline *ZendOp
 		var arg_info *ZendArgInfo
 		if ZendIsAutoGlobal(name) != 0 {
@@ -561,47 +561,47 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		*arg_info = MakeZendArgInfo(
 			name.Copy(),
 			/* TODO: Keep compatibility, but may be better reset "allow_null" ??? */
-			types.ZEND_TYPE_ENCODE(0, 1),
+			types2.ZEND_TYPE_ENCODE(0, 1),
 			is_ref,
 			is_variadic,
 		)
 		if type_ast != nil {
-			var has_null_default types.ZendBool = default_ast != nil && (default_node.GetConstant().IsNull() || default_node.GetConstant().IsConstantAst() && types.Z_ASTVAL(default_node.GetConstant()).GetKind() == ZEND_AST_CONSTANT && strcasecmp(ZendAstGetConstantName(types.Z_ASTVAL(default_node.GetConstant())).GetVal(), "NULL") == 0)
+			var has_null_default types2.ZendBool = default_ast != nil && (default_node.GetConstant().IsNull() || default_node.GetConstant().IsConstantAst() && types2.Z_ASTVAL(default_node.GetConstant()).GetKind() == ZEND_AST_CONSTANT && strcasecmp(ZendAstGetConstantName(types2.Z_ASTVAL(default_node.GetConstant())).GetVal(), "NULL") == 0)
 			op_array.SetIsHasTypeHints(true)
 			arg_info.SetType(ZendCompileTypename(type_ast, has_null_default))
-			if arg_info.GetType().Code() == types.IS_VOID {
+			if arg_info.GetType().Code() == types2.IS_VOID {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "void cannot be used as a parameter type")
 			}
 			if type_ast.GetKind() == ZEND_AST_TYPE {
-				if arg_info.GetType().Code() == types.IS_ARRAY {
-					if default_ast != nil && has_null_default == 0 && default_node.GetConstant().GetType() != types.IS_ARRAY && default_node.GetConstant().GetType() != types.IS_CONSTANT_AST {
+				if arg_info.GetType().Code() == types2.IS_ARRAY {
+					if default_ast != nil && has_null_default == 0 && default_node.GetConstant().GetType() != types2.IS_ARRAY && default_node.GetConstant().GetType() != types2.IS_CONSTANT_AST {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with array type can only be an array or NULL")
 					}
-				} else if arg_info.GetType().Code() == types.IS_CALLABLE && default_ast != nil {
-					if has_null_default == 0 && default_node.GetConstant().GetType() != types.IS_CONSTANT_AST {
+				} else if arg_info.GetType().Code() == types2.IS_CALLABLE && default_ast != nil {
+					if has_null_default == 0 && default_node.GetConstant().GetType() != types2.IS_CONSTANT_AST {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with callable type can only be NULL")
 					}
 				}
 			} else {
-				if default_ast != nil && has_null_default == 0 && default_node.GetConstant().GetType() != types.IS_CONSTANT_AST {
+				if default_ast != nil && has_null_default == 0 && default_node.GetConstant().GetType() != types2.IS_CONSTANT_AST {
 					if arg_info.GetType().IsClass() {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a class type can only be NULL")
 					} else {
 						switch arg_info.GetType().Code() {
-						case types.IS_DOUBLE:
-							if default_node.GetConstant().GetType() != types.IS_DOUBLE && default_node.GetConstant().GetType() != types.IS_LONG {
+						case types2.IS_DOUBLE:
+							if default_node.GetConstant().GetType() != types2.IS_DOUBLE && default_node.GetConstant().GetType() != types2.IS_LONG {
 								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a float type can only be float, integer, or NULL")
 							}
 							ConvertToDouble(default_node.GetConstant())
-						case types.IS_ITERABLE:
-							if default_node.GetConstant().GetType() != types.IS_ARRAY {
+						case types2.IS_ITERABLE:
+							if default_node.GetConstant().GetType() != types2.IS_ARRAY {
 								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with iterable type can only be an array or NULL")
 							}
-						case types.IS_OBJECT:
+						case types2.IS_OBJECT:
 							faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with an object type can only be NULL")
 						default:
-							if !(types.ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), default_node.GetConstant().GetType())) {
-								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", types.ZendGetTypeByConst(arg_info.GetType().Code()), types.ZendGetTypeByConst(arg_info.GetType().Code()))
+							if !(types2.ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), default_node.GetConstant().GetType())) {
+								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", types2.ZendGetTypeByConst(arg_info.GetType().Code()), types2.ZendGetTypeByConst(arg_info.GetType().Code()))
 							}
 						}
 					}

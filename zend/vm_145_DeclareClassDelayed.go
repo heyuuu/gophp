@@ -1,18 +1,18 @@
 package zend
 
 import (
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var lcname *types.Zval
-	var ce *types.ClassEntry
+	var lcname *types2.Zval
+	var ce *types2.ClassEntry
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
 		lcname = opline.Const1()
-		var lcname1 *types.Zval = lcname + 1
+		var lcname1 *types2.Zval = lcname + 1
 
 		lcnameStr := lcname.StringVal()
 		lcname1Str := lcname1.StringVal()
@@ -26,7 +26,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 			}
 
 			//
-			if ZendDoLinkClass(ce, opline.Const2().String()) == types.FAILURE {
+			if ZendDoLinkClass(ce, opline.Const2().String()) == types2.FAILURE {
 				return 0
 			}
 

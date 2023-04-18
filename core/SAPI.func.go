@@ -2,9 +2,9 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"strings"
 )
 
@@ -18,7 +18,7 @@ func SapiAddHeader(str string) int {
 func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader()) }
 
 //@alias -old
-func ZifHeaderRegisterCallback(callback *types.Zval) bool {
+func ZifHeaderRegisterCallback(callback *types2.Zval) bool {
 	if zend.ZendIsCallable(callback, 0, nil) == 0 {
 		return false
 	}
@@ -28,20 +28,20 @@ func ZifHeaderRegisterCallback(callback *types.Zval) bool {
 		SG__().fci_cache = zend.EmptyFcallInfoCache
 	}
 
-	types.ZVAL_COPY(&SG__().callback_func, callback)
+	types2.ZVAL_COPY(&SG__().callback_func, callback)
 
 	return true
 }
 
-func SapiRunHeaderCallback(callback *types.Zval) {
+func SapiRunHeaderCallback(callback *types2.Zval) {
 	var error int
-	var fci types.ZendFcallInfo
+	var fci types2.ZendFcallInfo
 	var callback_error *byte = nil
-	var retval types.Zval
-	if zend.ZendFcallInfoInit(callback, 0, &fci, &(SG__().fci_cache), nil, &callback_error) == types.SUCCESS {
+	var retval types2.Zval
+	if zend.ZendFcallInfoInit(callback, 0, &fci, &(SG__().fci_cache), nil, &callback_error) == types2.SUCCESS {
 		fci.SetRetval(&retval)
 		error = zend.ZendCallFunction(&fci, &(SG__().fci_cache))
-		if error == types.FAILURE {
+		if error == types2.FAILURE {
 			goto callback_failed
 		} else {
 			// zend.ZvalPtrDtor(&retval)
@@ -91,7 +91,7 @@ func SapiReadPostData() {
 
 	/* now try to find an appropriate POST content handler */
 
-	if b.Assign(&post_entry, types.ZendHashStrFindPtr(&(SG__().known_post_content_types), b.CastStr(content_type, content_type_length))) != nil {
+	if b.Assign(&post_entry, types2.ZendHashStrFindPtr(&(SG__().known_post_content_types), b.CastStr(content_type, content_type_length))) != nil {
 
 		/* found one, register it for use */
 
@@ -452,12 +452,12 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		} else {
 			SM__().SapiError(faults.E_WARNING, "Cannot modify header information - headers already sent")
 		}
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	switch op {
 	case SAPI_HEADER_SET_STATUS:
-		SapiUpdateResponseCode(int(types.ZendIntptrT(arg)))
-		return types.SUCCESS
+		SapiUpdateResponseCode(int(types2.ZendIntptrT(arg)))
+		return types2.SUCCESS
 	case SAPI_HEADER_ADD:
 		fallthrough
 	case SAPI_HEADER_REPLACE:
@@ -465,7 +465,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 	case SAPI_HEADER_DELETE:
 		var p *SapiHeaderLine = arg
 		if p.GetLine() == nil || p.GetLineLen() == 0 {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 		header_line = p.GetLine()
 		header_line_len = p.GetLineLen()
@@ -473,9 +473,9 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 	case SAPI_HEADER_DELETE_ALL:
 		SM__().HeaderHandler(&sapi_header, op, &(SG__().sapi_headers))
 		SG__().sapi_headers.headers.Clean()
-		return types.SUCCESS
+		return types2.SUCCESS
 	default:
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	header_line = zend.Estrndup(header_line, header_line_len)
 
@@ -494,7 +494,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		if strchr(header_line, ':') {
 			zend.Efree(header_line)
 			SM__().SapiError(faults.E_WARNING, "Header to delete may not contain colon.")
-			return types.FAILURE
+			return types2.FAILURE
 		}
 
 		sapi_header.SetHeader(header_line)
@@ -502,7 +502,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		SM__().HeaderHandler(&sapi_header, op, &(SG__().sapi_headers))
 		SapiRemoveHeader(SG__().sapi_headers.headers, header_line, header_line_len)
 		zend.Efree(header_line)
-		return types.SUCCESS
+		return types2.SUCCESS
 	} else {
 
 		/* new line/NUL character safety check */
@@ -515,12 +515,12 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 			if header_line[i] == '\n' || header_line[i] == '\r' {
 				zend.Efree(header_line)
 				SM__().SapiError(faults.E_WARNING, "Header may not contain "+"more than a single header, new line detected")
-				return types.FAILURE
+				return types2.FAILURE
 			}
 			if header_line[i] == '0' {
 				zend.Efree(header_line)
 				SM__().SapiError(faults.E_WARNING, "Header may not contain NUL bytes")
-				return types.FAILURE
+				return types2.FAILURE
 			}
 		}
 	}
@@ -541,7 +541,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 			zend.Efree(SG__().sapi_headers.http_status_line)
 		}
 		SG__().sapi_headers.http_status_line = header_line
-		return types.SUCCESS
+		return types2.SUCCESS
 	} else {
 		colon_offset = strchr(header_line, ':')
 		if colon_offset != nil {
@@ -560,7 +560,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 				/* Disable possible output compression for images */
 
 				if !(strncmp(ptr, "image/", b.SizeOf("\"image/\"")-1)) {
-					var key *types.String = types.NewString("zlib.output_compression")
+					var key *types2.String = types2.NewString("zlib.output_compression")
 					zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 					// types.ZendStringReleaseEx(key, 0)
 				}
@@ -588,7 +588,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 				 * portable between setups that have and don't have zlib compression
 				 * enabled globally. See req #44164 */
 
-				var key *types.String = types.NewString("zlib.output_compression")
+				var key *types2.String = types2.NewString("zlib.output_compression")
 				zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 				// types.ZendStringReleaseEx(key, 0)
 			} else if !(strcasecmp(header_line, "Location")) {
@@ -619,13 +619,13 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		SapiUpdateResponseCode(http_response_code)
 	}
 	SapiHeaderAddOp(op, &sapi_header)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func SapiSendHeaders() int {
 	var retval int
-	var ret int = types.FAILURE
+	var ret int = types2.FAILURE
 	if SG__().headers_sent || SG__().RequestInfo.no_headers {
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 
 	/* Success-oriented.  We set headers_sent to 1 here to avoid an infinite loop
@@ -649,8 +649,8 @@ func SapiSendHeaders() int {
 		SG__().sapi_headers.send_default_content_type = 0
 	}
 	if SG__().callback_func.IsNotUndef() {
-		var cb types.Zval
-		types.ZVAL_COPY_VALUE(&cb, &(SG__().callback_func))
+		var cb types2.Zval
+		types2.ZVAL_COPY_VALUE(&cb, &(SG__().callback_func))
 		SG__().callback_func.SetUndef()
 		SapiRunHeaderCallback(&cb)
 		// zend.ZvalPtrDtor(&cb)
@@ -663,7 +663,7 @@ func SapiSendHeaders() int {
 	}
 	switch retval {
 	case SAPI_HEADER_SENT_SUCCESSFULLY:
-		ret = types.SUCCESS
+		ret = types2.SUCCESS
 	case SAPI_HEADER_DO_SEND:
 		var http_status_line SapiHeader
 		var buf []byte
@@ -683,10 +683,10 @@ func SapiSendHeaders() int {
 			SapiFreeHeader(&default_header)
 		}
 		SM__().GetSendHeader()(nil, SG__().server_context)
-		ret = types.SUCCESS
+		ret = types2.SUCCESS
 	case SAPI_HEADER_SEND_FAILED:
 		SG__().headers_sent = 0
-		ret = types.FAILURE
+		ret = types2.FAILURE
 	}
 	SapiSendHeadersFree()
 	return ret
@@ -694,45 +694,45 @@ func SapiSendHeaders() int {
 func SapiRegisterPostEntries(postEntries []SapiPostEntry) int {
 	for i := range postEntries {
 		p := &postEntries[i]
-		if SapiRegisterPostEntry(p) == types.FAILURE {
-			return types.FAILURE
+		if SapiRegisterPostEntry(p) == types2.FAILURE {
+			return types2.FAILURE
 		}
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func SapiRegisterPostEntry(postEntry *SapiPostEntry) int {
 	var ret int
-	if SG__().sapi_started == types.SUCCESS && zend.CurrEX() != nil {
-		return types.FAILURE
+	if SG__().sapi_started == types2.SUCCESS && zend.CurrEX() != nil {
+		return types2.FAILURE
 	}
-	if types.ZendHashAddMem(&(SG__().known_post_content_types), postEntry.GetContentType(), any(postEntry), b.SizeOf("sapi_post_entry")) {
-		ret = types.SUCCESS
+	if types2.ZendHashAddMem(&(SG__().known_post_content_types), postEntry.GetContentType(), any(postEntry), b.SizeOf("sapi_post_entry")) {
+		ret = types2.SUCCESS
 	} else {
-		ret = types.FAILURE
+		ret = types2.FAILURE
 	}
 	return ret
 }
 func SapiRegisterDefaultPostReader(default_post_reader func()) int {
 	if SG__().sapi_started && zend.CurrEX() != nil {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	SM__().SetDefaultPostReader(default_post_reader)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func SapiRegisterTreatData(treat_data func(arg int, str *byte, destArray *types.Zval)) int {
+func SapiRegisterTreatData(treat_data func(arg int, str *byte, destArray *types2.Zval)) int {
 	if SG__().sapi_started && zend.CurrEX() != nil {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	SM__().SetTreatData(treat_data)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func SapiRegisterInputFilter(input_filter func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint, input_filter_init func() uint) int {
 	if SG__().sapi_started && zend.CurrEX() != nil {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	SM__().SetInputFilter(input_filter)
 	SM__().SetInputFilterInit(input_filter_init)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func SapiFlush() {
 	SM__().Flush(SG__().server_context)
@@ -772,7 +772,7 @@ func SapiGetRequestTime() float64 {
 	return SG__().global_request_time
 }
 func SapiAddRequestHeader(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
-	var return_value *types.Zval = (*types.Zval)(arg)
+	var return_value *types2.Zval = (*types2.Zval)(arg)
 	var str *byte = nil
 	if var_len > 5 && var_[0] == 'H' && var_[1] == 'T' && var_[2] == 'T' && var_[3] == 'P' && var_[4] == '_' {
 		var p *byte

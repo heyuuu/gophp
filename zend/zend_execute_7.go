@@ -2,19 +2,19 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, value_type types.ZendUchar, strict types.ZendBool, ref *types.ZendRefcounted) *types.Zval {
-	var ret types.ZendBool
-	var value types.Zval
-	types.ZVAL_COPY(&value, orig_value)
+func ZendAssignToTypedRef(variable_ptr *types2.Zval, orig_value *types2.Zval, value_type types2.ZendUchar, strict types2.ZendBool, ref *types2.ZendRefcounted) *types2.Zval {
+	var ret types2.ZendBool
+	var value types2.Zval
+	types2.ZVAL_COPY(&value, orig_value)
 	ret = ZendVerifyRefAssignableZval(variable_ptr.Reference(), &value, strict)
-	variable_ptr = types.Z_REFVAL_P(variable_ptr)
+	variable_ptr = types2.Z_REFVAL_P(variable_ptr)
 	if ret != 0 {
 		//IZvalPtrDtorNoref(variable_ptr)
-		types.ZVAL_COPY_VALUE(variable_ptr, &value)
+		types2.ZVAL_COPY_VALUE(variable_ptr, &value)
 	} else {
 		// ZvalPtrDtorNogc(&value)
 	}
@@ -30,11 +30,11 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, valu
 	}
 	return variable_ptr
 }
-func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *types.Zval, strict types.ZendBool) types.ZendBool {
-	var val *types.Zval = orig_val
+func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *types2.Zval, strict types2.ZendBool) types2.ZendBool {
+	var val *types2.Zval = orig_val
 	if val.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(val.Reference()) {
 		var result int
-		val = types.Z_REFVAL_P(val)
+		val = types2.Z_REFVAL_P(val)
 		result = IZendVerifyTypeAssignableZval(prop_info.GetType(), prop_info.GetCe(), val, strict)
 		if result > 0 {
 			return 1
@@ -53,7 +53,7 @@ func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *types.
 			}
 		}
 	} else {
-		val = types.ZVAL_DEREF(val)
+		val = types2.ZVAL_DEREF(val)
 		if IZendCheckPropertyType(prop_info, val, strict) != 0 {
 			return 1
 		}
@@ -61,14 +61,14 @@ func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *types.
 	ZendVerifyPropertyTypeError(prop_info, val)
 	return 0
 }
-func ZendRefAddTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *ZendPropertyInfo) {
-	var list *types.ZendPropertyInfoList
+func ZendRefAddTypeSource(source_list *types2.ZendPropertyInfoSourceList, prop *ZendPropertyInfo) {
+	var list *types2.ZendPropertyInfoList
 	if source_list.GetPtr() == nil {
 		source_list.SetPtr(prop)
 		return
 	}
-	list = types.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(source_list.GetList())
-	if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(source_list.GetList()) == 0 {
+	list = types2.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(source_list.GetList())
+	if types2.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(source_list.GetList()) == 0 {
 		list = Emalloc(b.SizeOf("zend_property_info_list") + (4-1)*b.SizeOf("zend_property_info *"))
 		list.GetPtr()[0] = source_list.GetPtr()
 		list.SetNumAllocated(4)
@@ -78,13 +78,13 @@ func ZendRefAddTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *Z
 		list = Erealloc(list, b.SizeOf("zend_property_info_list")+(list.GetNumAllocated()-1)*b.SizeOf("zend_property_info *"))
 	}
 	list.GetPtr()[b.PostInc(&(list.GetNum()))] = prop
-	source_list.SetList(types.ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list))
+	source_list.SetList(types2.ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list))
 }
-func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *ZendPropertyInfo) {
-	var list *types.ZendPropertyInfoList = types.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(source_list.GetList())
+func ZendRefDelTypeSource(source_list *types2.ZendPropertyInfoSourceList, prop *ZendPropertyInfo) {
+	var list *types2.ZendPropertyInfoList = types2.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(source_list.GetList())
 	var ptr **ZendPropertyInfo
 	var end ***ZendPropertyInfo
-	if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(source_list.GetList()) == 0 {
+	if types2.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(source_list.GetList()) == 0 {
 		b.Assert(source_list.GetPtr() == prop)
 		source_list.SetPtr(nil)
 		return
@@ -111,11 +111,11 @@ func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *Z
 	*ptr = list.GetPtr()[b.PreDec(&(list.GetNum()))]
 	if list.GetNum() >= 4 && list.GetNum()*4 == list.GetNumAllocated() {
 		list.SetNumAllocated(list.GetNum() * 2)
-		source_list.SetList(types.ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(Erealloc(list, b.SizeOf("zend_property_info_list")+(list.GetNumAllocated()-1)*b.SizeOf("zend_property_info *"))))
+		source_list.SetList(types2.ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(Erealloc(list, b.SizeOf("zend_property_info_list")+(list.GetNumAllocated()-1)*b.SizeOf("zend_property_info *"))))
 	}
 }
 func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types.Zval = opline.Result()
+	var result *types2.Zval = opline.Result()
 	switch type_ {
 	case BP_VAR_R:
 		if executeData.GetThis().IsObject() {
@@ -144,13 +144,13 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 
 	}
 }
-func ZendWrongCloneCall(clone types.IFunction, scope *types.ClassEntry) {
+func ZendWrongCloneCall(clone types2.IFunction, scope *types2.ClassEntry) {
 	faults.ThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 }
-func ExecuteInternal(executeData *ZendExecuteData, return_value *types.Zval) {
+func ExecuteInternal(executeData *ZendExecuteData, return_value *types2.Zval) {
 	executeData.GetFunc().GetInternalFunction().GetHandler()(executeData, return_value)
 }
-func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
+func ZendCleanAndCacheSymbolTable(symbol_table *types2.Array) {
 	/* Clean before putting into the cache, since clean could call dtors,
 	 * which could use the cached hash. Also do this before the check for
 	 * available cache slots, as those may be used by a dtor as well. */
@@ -163,11 +163,11 @@ func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
 	}
 }
 func IFreeCompiledVariables(executeData *ZendExecuteData) {
-	var cv *types.Zval = executeData.VarNum(0)
+	var cv *types2.Zval = executeData.VarNum(0)
 	var count int = executeData.GetFunc().GetOpArray().last_var
 	for count != 0 {
 		if cv.IsRefcounted() {
-			var r *types.ZendRefcounted = cv.RefCounted()
+			var r *types2.ZendRefcounted = cv.RefCounted()
 			if r.DelRefcount() == 0 {
 				cv.SetNull()
 				//RcDtorFunc(r)
@@ -191,10 +191,10 @@ func ZEND_VM_LOOP_INTERRUPT_CHECK(executeData *ZendExecuteData) {
 	}
 }
 func ZendCopyExtraArgs(executeData *ZendExecuteData) {
-	var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
+	var op_array *types2.ZendOpArray = executeData.GetFunc().GetOpArray()
 	var first_extra_arg uint32 = op_array.GetNumArgs()
 	var num_args uint32 = executeData.NumArgs()
-	var src *types.Zval
+	var src *types2.Zval
 	var delta int
 	var count uint32
 	if !op_array.IsHasTypeHints() {
@@ -212,7 +212,7 @@ func ZendCopyExtraArgs(executeData *ZendExecuteData) {
 		isAnyRefcounted := true
 		for {
 			isAnyRefcounted = isAnyRefcounted || src.IsRefcounted()
-			types.ZVAL_COPY_VALUE((*types.Zval)((*byte)(src)+delta), src)
+			types2.ZVAL_COPY_VALUE((*types2.Zval)((*byte)(src)+delta), src)
 			src.SetUndef()
 			src--
 			if !(b.PreDec(&count)) {
@@ -238,7 +238,7 @@ func ZendCopyExtraArgs(executeData *ZendExecuteData) {
 func ZendInitCvs(first uint32, last uint32, executeData *ZendExecuteData) {
 	if first < last {
 		var count uint32 = last - first
-		var var_ *types.Zval = executeData.VarNum(first)
+		var var_ *types2.Zval = executeData.VarNum(first)
 		for {
 			var_.SetUndef()
 			var_++
@@ -248,10 +248,10 @@ func ZendInitCvs(first uint32, last uint32, executeData *ZendExecuteData) {
 		}
 	}
 }
-func IInitFuncExecuteData(op_array *types.ZendOpArray, return_value *types.Zval, may_be_trampoline types.ZendBool, executeData *ZendExecuteData) {
+func IInitFuncExecuteData(op_array *types2.ZendOpArray, return_value *types2.Zval, may_be_trampoline types2.ZendBool, executeData *ZendExecuteData) {
 	var first_extra_arg uint32
 	var num_args uint32
-	b.Assert(executeData.GetFunc() == (types.IFunction)(op_array))
+	b.Assert(executeData.GetFunc() == (types2.IFunction)(op_array))
 	executeData.GetOpline() = op_array.GetOpcodes()
 	executeData.GetCall() = nil
 	executeData.GetReturnValue() = return_value
@@ -277,19 +277,19 @@ func IInitFuncExecuteData(op_array *types.ZendOpArray, return_value *types.Zval,
 	executeData.GetRuntimeCache() = RUN_TIME_CACHE(op_array)
 	EG__().SetCurrentExecuteData(executeData)
 }
-func InitFuncRunTimeCacheI(op_array *types.ZendOpArray) {
+func InitFuncRunTimeCacheI(op_array *types2.ZendOpArray) {
 	var run_time_cache *any
 	b.Assert(RUN_TIME_CACHE(op_array) == nil)
 	run_time_cache = ZendArenaAlloc(CG__().GetArena(), op_array.GetCacheSize())
 	memset(run_time_cache, 0, op_array.GetCacheSize())
 	ZEND_MAP_PTR_SET(op_array.run_time_cache, run_time_cache)
 }
-func InitFuncRunTimeCache(op_array *types.ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
-func ZendFetchFunction(name *types.String) types.IFunction {
+func InitFuncRunTimeCache(op_array *types2.ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
+func ZendFetchFunction(name *types2.String) types2.IFunction {
 	return ZendFetchFunctionStr(name.GetStr())
 }
-func ZendFetchFunctionStr(name string) types.IFunction {
-	var fbc types.IFunction = EG__().FunctionTable().Get(name)
+func ZendFetchFunctionStr(name string) types2.IFunction {
+	var fbc types2.IFunction = EG__().FunctionTable().Get(name)
 	if fbc != nil {
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCacheI(fbc.GetOpArray())
@@ -298,8 +298,8 @@ func ZendFetchFunctionStr(name string) types.IFunction {
 	}
 	return nil
 }
-func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
-	b.Assert(executeData.GetFunc() == (types.IFunction)(op_array))
+func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *types2.ZendOpArray, return_value *types2.Zval) {
+	b.Assert(executeData.GetFunc() == (types2.IFunction)(op_array))
 
 	executeData.GetOpline() = op_array.GetOpcodes()
 	executeData.GetCall() = nil
@@ -317,7 +317,7 @@ func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpAr
 	executeData.GetRuntimeCache() = RUN_TIME_CACHE(op_array)
 	EG__().SetCurrentExecuteData(executeData)
 }
-func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
+func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *types2.ZendOpArray, return_value *types2.Zval) {
 	var executeData *ZendExecuteData = ex
 	executeData.GetPrevExecuteData() = CurrEX()
 	if !(RUN_TIME_CACHE(op_array)) {

@@ -2,7 +2,7 @@ package streams
 
 import (
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 /**

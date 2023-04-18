@@ -2,15 +2,15 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
-func CompileFile(file_handle *FileHandle, type_ int) *types.ZendOpArray {
+func CompileFile(file_handle *FileHandle, type_ int) *types2.ZendOpArray {
 	var original_lex_state ZendLexState
-	var op_array *types.ZendOpArray = nil
+	var op_array *types2.ZendOpArray = nil
 	ZendSaveLexicalState(&original_lex_state)
-	if OpenFileForScanning(file_handle) == types.FAILURE {
+	if OpenFileForScanning(file_handle) == types2.FAILURE {
 		if !(EG__().exception) {
 			if type_ == ZEND_REQUIRE {
 				ZendMessageDispatcher(ZMSG_FAILED_REQUIRE_FOPEN, file_handle.filename)
@@ -42,7 +42,7 @@ type ZendLexState struct {
 
 	in                   *FileHandle
 	lineno               uint32
-	filename             *types.String
+	filename             *types2.String
 	script_org           *uint8
 	script_org_size      int
 	script_filtered      *uint8

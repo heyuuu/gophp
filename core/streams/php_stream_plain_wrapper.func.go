@@ -3,7 +3,7 @@ package streams
 import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 func PhpStreamFopenFromFile(file *r.File, mode *byte) *core.PhpStream {

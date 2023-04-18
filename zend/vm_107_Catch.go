@@ -1,5 +1,10 @@
 package zend
 
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/faults"
+)
+
 func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var ce *types.ClassEntry

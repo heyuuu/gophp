@@ -3,9 +3,9 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func Sha512ProcessBlock(buffer any, len_ int, ctx *Sha512Ctx) {

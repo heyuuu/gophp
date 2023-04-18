@@ -6,20 +6,20 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func FG__() *PhpFileGlobals { return &FileGlobals }
-func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *types.Zval) {
-	b.Assert(arg.IsType(types.IS_RESOURCE))
+func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *types2.Zval) {
+	b.Assert(arg.IsType(types2.IS_RESOURCE))
 	core.PhpStreamFromRes(stream, arg.Resource())
 }
 func PhpLeStreamContext() int { return LeStreamContext }
-func FileContextDtor(res *types.ZendResource) {
+func FileContextDtor(res *types2.ZendResource) {
 	var context *core.PhpStreamContext = (*core.PhpStreamContext)(res.GetPtr())
 	if context.GetOptions().IsNotUndef() {
 		// zend.ZvalPtrDtor(context.GetOptions())
@@ -104,15 +104,15 @@ func ZmStartupFile(type_ int, module_number int) int {
 	zend.RegisterLongConstant("FNM_NOESCAPE", FNM_NOESCAPE, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("FNM_PATHNAME", FNM_PATHNAME, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("FNM_PERIOD", FNM_PERIOD, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmShutdownFile(type_ int, module_number int) int {
 	FileGlobalsDtor(&FileGlobals)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func ZifFlock(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, operation *types.Zval, _ zpp.Opt, wouldblock zpp.RefZval) {
-	var res *types.Zval
-	var wouldblock *types.Zval = nil
+func ZifFlock(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval, operation *types2.Zval, _ zpp.Opt, wouldblock zpp.RefZval) {
+	var res *types2.Zval
+	var wouldblock *types2.Zval = nil
 	var act int
 	var stream *core.PhpStream
 	var operation zend.ZendLong = 0
@@ -154,10 +154,10 @@ func ZifFlock(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, operatio
 	return_value.SetTrue()
 	return
 }
-func ZifGetMetaTags(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, useIncludePath *types.Zval) {
+func ZifGetMetaTags(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, _ zpp.Opt, useIncludePath *types2.Zval) {
 	var filename *byte
 	var filename_len int
-	var use_include_path types.ZendBool = 0
+	var use_include_path types2.ZendBool = 0
 	var in_tag int = 0
 	var done int = 0
 	var looking_for_val int = 0
@@ -329,16 +329,16 @@ func ZifGetMetaTags(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zv
 	}
 	core.PhpStreamClose(md.GetStream())
 }
-func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, flags *types.Zval, context *types.Zval, offset *types.Zval, maxlen *types.Zval) {
+func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, _ zpp.Opt, flags *types2.Zval, context *types2.Zval, offset *types2.Zval, maxlen *types2.Zval) {
 	var filename *byte
 	var filename_len int
-	var use_include_path types.ZendBool = 0
+	var use_include_path types2.ZendBool = 0
 	var stream *core.PhpStream
 	var offset zend.ZendLong = 0
 	var maxlen zend.ZendLong = ssize_t(core.PHP_STREAM_COPY_ALL)
-	var zcontext *types.Zval = nil
+	var zcontext *types2.Zval = nil
 	var context *core.PhpStreamContext = nil
-	var contents *types.String
+	var contents *types2.String
 
 	/* Parse arguments */
 
@@ -382,14 +382,14 @@ func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 	}
 	core.PhpStreamClose(stream)
 }
-func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, data *types.Zval, _ zpp.Opt, flags *types.Zval, context *types.Zval) {
+func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, data *types2.Zval, _ zpp.Opt, flags *types2.Zval, context *types2.Zval) {
 	var stream *core.PhpStream
 	var filename *byte
 	var filename_len int
-	var data *types.Zval
+	var data *types2.Zval
 	var numbytes ssize_t = 0
 	var flags zend.ZendLong = 0
-	var zcontext *types.Zval = nil
+	var zcontext *types2.Zval = nil
 	var context *core.PhpStreamContext = nil
 	var srcstream *core.PhpStream = nil
 	var mode []byte = "wb"
@@ -408,7 +408,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		}
 		break
 	}
-	if data.IsType(types.IS_RESOURCE) {
+	if data.IsType(types2.IS_RESOURCE) {
 		core.PhpStreamFromZval(srcstream, data)
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
@@ -443,9 +443,9 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		core.PhpStreamTruncateSetSize(stream, 0)
 	}
 	switch data.GetType() {
-	case types.IS_RESOURCE:
+	case types2.IS_RESOURCE:
 		var len_ int
-		if core.PhpStreamCopyToStreamEx(srcstream, stream, core.PHP_STREAM_COPY_ALL, &len_) != types.SUCCESS {
+		if core.PhpStreamCopyToStreamEx(srcstream, stream, core.PHP_STREAM_COPY_ALL, &len_) != types2.SUCCESS {
 			numbytes = -1
 		} else {
 			if len_ > zend.ZEND_LONG_MAX {
@@ -454,18 +454,18 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 			}
 			numbytes = len_
 		}
-	case types.IS_NULL:
+	case types2.IS_NULL:
 		fallthrough
-	case types.IS_LONG:
+	case types2.IS_LONG:
 		fallthrough
-	case types.IS_DOUBLE:
+	case types2.IS_DOUBLE:
 		fallthrough
-	case types.IS_FALSE:
+	case types2.IS_FALSE:
 		fallthrough
-	case types.IS_TRUE:
+	case types2.IS_TRUE:
 		zend.ConvertToStringEx(data)
 		fallthrough
-	case types.IS_STRING:
+	case types2.IS_STRING:
 		if data.String().GetLen() != 0 {
 			numbytes = core.PhpStreamWrite(stream, data.String().GetVal(), data.String().GetLen())
 			if numbytes != data.String().GetLen() {
@@ -473,17 +473,17 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 				numbytes = -1
 			}
 		}
-	case types.IS_ARRAY:
+	case types2.IS_ARRAY:
 		if data.Array().Len() {
 			var bytes_written ssize_t
-			var tmp *types.Zval
-			var __ht *types.Array = data.Array()
+			var tmp *types2.Zval
+			var __ht *types2.Array = data.Array()
 			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
+				var _z *types2.Zval = _p.GetVal()
 
 				tmp = _z
-				var t *types.String
-				var str *types.String = zend.ZvalGetTmpString(tmp, &t)
+				var t *types2.String
+				var str *types2.String = zend.ZvalGetTmpString(tmp, &t)
 				if str.GetLen() != 0 {
 					numbytes += str.GetLen()
 					bytes_written = core.PhpStreamWrite(stream, str.GetVal(), str.GetLen())
@@ -497,10 +497,10 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 				// zend.ZendTmpStringRelease(t)
 			}
 		}
-	case types.IS_OBJECT:
-		if types.Z_OBJ_HT_P(data) != nil {
-			var out types.Zval
-			if zend.ZendStdCastObjectTostring(data, &out, types.IS_STRING) == types.SUCCESS {
+	case types2.IS_OBJECT:
+		if types2.Z_OBJ_HT_P(data) != nil {
+			var out types2.Zval
+			if zend.ZendStdCastObjectTostring(data, &out, types2.IS_STRING) == types2.SUCCESS {
 				numbytes = core.PhpStreamWrite(stream, out.String().GetVal(), out.String().GetLen())
 				if numbytes != out.String().GetLen() {
 					core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, out.String().GetLen())
@@ -522,7 +522,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 	return_value.SetLong(numbytes)
 	return
 }
-func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, flags *types.Zval, context *types.Zval) {
+func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, _ zpp.Opt, flags *types2.Zval, context *types2.Zval) {
 	var filename *byte
 	var filename_len int
 	var p *byte
@@ -531,13 +531,13 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 	var i int = 0
 	var eol_marker byte = '\n'
 	var flags zend.ZendLong = 0
-	var use_include_path types.ZendBool
-	var include_new_line types.ZendBool
-	var skip_blank_lines types.ZendBool
+	var use_include_path types2.ZendBool
+	var include_new_line types2.ZendBool
+	var skip_blank_lines types2.ZendBool
 	var stream *core.PhpStream
-	var zcontext *types.Zval = nil
+	var zcontext *types2.Zval = nil
 	var context *core.PhpStreamContext = nil
-	var target_buf *types.String
+	var target_buf *types2.String
 
 	/* Parse arguments */
 
@@ -632,14 +632,14 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 	}
 	core.PhpStreamClose(stream)
 }
-func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, prefix *types.Zval) {
+func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types2.Zval, prefix *types2.Zval) {
 	var dir *byte
 	var prefix *byte
 	var dir_len int
 	var prefix_len int
-	var opened_path *types.String
+	var opened_path *types2.String
 	var fd int
-	var p *types.String
+	var p *types2.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 2, 0)
@@ -676,13 +676,13 @@ func ZifTmpfile(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 }
-func ZifOpen(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, mode *types.Zval, _ zpp.Opt, use_include_path *types.Zval, context *types.Zval) {
+func ZifOpen(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, mode *types2.Zval, _ zpp.Opt, use_include_path *types2.Zval, context *types2.Zval) {
 	var filename *byte
 	var mode *byte
 	var filename_len int
 	var mode_len int
-	var use_include_path types.ZendBool = 0
-	var zcontext *types.Zval = nil
+	var use_include_path types2.ZendBool = 0
+	var zcontext *types2.Zval = nil
 	var stream *core.PhpStream
 	var context *core.PhpStreamContext = nil
 	for {
@@ -709,8 +709,8 @@ func ZifOpen(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, mod
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifFclose(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
-	var res *types.Zval
+func ZifFclose(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval) {
+	var res *types2.Zval
 	var stream *core.PhpStream
 	for {
 		for {
@@ -734,7 +734,7 @@ func ZifFclose(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifPopen(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, mode *types.Zval) {
+func ZifPopen(executeData zpp.Ex, return_value zpp.Ret, command *types2.Zval, mode *types2.Zval) {
 	var command *byte
 	var mode *byte
 	var command_len int
@@ -775,8 +775,8 @@ func ZifPopen(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, mod
 	}
 	zend.Efree(posix_mode)
 }
-func ZifPclose(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
-	var res *types.Zval
+func ZifPclose(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval) {
+	var res *types2.Zval
 	var stream *core.PhpStream
 	for {
 		for {
@@ -797,8 +797,8 @@ func ZifPclose(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	return_value.SetLong(FG__().pclose_ret)
 	return
 }
-func ZifFeof(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
-	var res *types.Zval
+func ZifFeof(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval) {
+	var res *types2.Zval
 	var stream *core.PhpStream
 	for {
 		for {
@@ -822,7 +822,7 @@ func ZifFeof(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	}
 }
 func ZifFgets(fp zpp.Resource, _ zpp.Opt, length *int) (string, bool) {
-	var res *types.Zval = fp
+	var res *types2.Zval = fp
 	var len_ zend.ZendLong = b.Option(length, 1024)
 	var buf *byte = nil
 	var line_len int = 0
@@ -851,8 +851,8 @@ func ZifFgets(fp zpp.Resource, _ zpp.Opt, length *int) (string, bool) {
 		return *s, true
 	}
 }
-func ZifFgetc(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
-	var res *types.Zval
+func ZifFgetc(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval) {
+	var res *types2.Zval
 	var buf []byte
 	var result int
 	var stream *core.PhpStream
@@ -879,7 +879,7 @@ func ZifFgetc(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 		return
 	}
 }
-func ZifFgetss(fp *types.Zval, _ zpp.Opt, length *int, allowableTags string) (string, bool) {
+func ZifFgetss(fp *types2.Zval, _ zpp.Opt, length *int, allowableTags string) (string, bool) {
 	var len_ int = 0
 	var actual_len int
 	var buf *byte = nil
@@ -906,12 +906,12 @@ func ZifFgetss(fp *types.Zval, _ zpp.Opt, length *int, allowableTags string) (st
 	stream.SetFgetssState(state)
 	return result, true
 }
-func ZifFscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFscanf(executeData *zend.ZendExecuteData, return_value *types2.Zval) {
 	var result int
 	var argc int = 0
 	var format_len int
-	var args *types.Zval = nil
-	var file_handle *types.Zval
+	var args *types2.Zval = nil
+	var file_handle *types2.Zval
 	var buf *byte
 	var format *byte
 	var len_ int
@@ -957,8 +957,8 @@ func ZifFscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 
 //@zif -alias fputs
-func ZifFwrite(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, str *types.Zval, _ zpp.Opt, length *types.Zval) {
-	var res *types.Zval
+func ZifFwrite(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval, str *types2.Zval, _ zpp.Opt, length *types2.Zval) {
+	var res *types2.Zval
 	var input *byte
 	var inputlen int
 	var ret ssize_t
@@ -1000,8 +1000,8 @@ func ZifFwrite(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, str *ty
 	return_value.SetLong(ret)
 	return
 }
-func ZifFflush(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
-	var res *types.Zval
+func ZifFflush(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval) {
+	var res *types2.Zval
 	var ret int
 	var stream *core.PhpStream
 	for {
@@ -1025,8 +1025,8 @@ func ZifFflush(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifRewind(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
-	var res *types.Zval
+func ZifRewind(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval) {
+	var res *types2.Zval
 	var stream *core.PhpStream
 	for {
 		for {
@@ -1048,8 +1048,8 @@ func ZifRewind(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifFtell(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
-	var res *types.Zval
+func ZifFtell(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval) {
+	var res *types2.Zval
 	var ret zend.ZendLong
 	var stream *core.PhpStream
 	for {
@@ -1073,8 +1073,8 @@ func ZifFtell(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	return_value.SetLong(ret)
 	return
 }
-func ZifFseek(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, offset *types.Zval, _ zpp.Opt, whence *types.Zval) {
-	var res *types.Zval
+func ZifFseek(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval, offset *types2.Zval, _ zpp.Opt, whence *types2.Zval) {
+	var res *types2.Zval
 	var offset zend.ZendLong
 	var whence zend.ZendLong = r.SEEK_SET
 	var stream *core.PhpStream
@@ -1110,12 +1110,12 @@ func PhpMkdirEx(dir *byte, mode zend.ZendLong, options int) int {
 func PhpMkdir(dir *byte, mode zend.ZendLong) int {
 	return PhpMkdirEx(dir, mode, core.REPORT_ERRORS)
 }
-func ZifMkdir(executeData zpp.Ex, return_value zpp.Ret, pathname *types.Zval, _ zpp.Opt, mode *types.Zval, recursive *types.Zval, context *types.Zval) {
+func ZifMkdir(executeData zpp.Ex, return_value zpp.Ret, pathname *types2.Zval, _ zpp.Opt, mode *types2.Zval, recursive *types2.Zval, context *types2.Zval) {
 	var dir *byte
 	var dir_len int
-	var zcontext *types.Zval = nil
+	var zcontext *types2.Zval = nil
 	var mode zend.ZendLong = 0777
-	var recursive types.ZendBool = 0
+	var recursive types2.ZendBool = 0
 	var context *core.PhpStreamContext
 	for {
 		for {
@@ -1137,10 +1137,10 @@ func ZifMkdir(executeData zpp.Ex, return_value zpp.Ret, pathname *types.Zval, _ 
 	return_value.SetBool(core.PhpStreamMkdir(dir, int(mode), b.Cond(recursive != 0, core.PHP_STREAM_MKDIR_RECURSIVE, 0)|core.REPORT_ERRORS, context) != 0)
 	return
 }
-func ZifRmdir(executeData zpp.Ex, return_value zpp.Ret, dirname *types.Zval, _ zpp.Opt, context *types.Zval) {
+func ZifRmdir(executeData zpp.Ex, return_value zpp.Ret, dirname *types2.Zval, _ zpp.Opt, context *types2.Zval) {
 	var dir *byte
 	var dir_len int
-	var zcontext *types.Zval = nil
+	var zcontext *types2.Zval = nil
 	var context *core.PhpStreamContext
 	for {
 		for {
@@ -1160,12 +1160,12 @@ func ZifRmdir(executeData zpp.Ex, return_value zpp.Ret, dirname *types.Zval, _ z
 	return_value.SetBool(core.PhpStreamRmdir(dir, core.REPORT_ERRORS, context) != 0)
 	return
 }
-func ZifReadfile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, flags *types.Zval, context *types.Zval) {
+func ZifReadfile(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, _ zpp.Opt, flags *types2.Zval, context *types2.Zval) {
 	var filename *byte
 	var filename_len int
 	var size int = 0
-	var use_include_path types.ZendBool = 0
-	var zcontext *types.Zval = nil
+	var use_include_path types2.ZendBool = 0
+	var zcontext *types2.Zval = nil
 	var stream *core.PhpStream
 	var context *core.PhpStreamContext = nil
 	for {
@@ -1194,7 +1194,7 @@ func ZifReadfile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval,
 	return_value.SetFalse()
 	return
 }
-func ZifUmask(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, mask *types.Zval) {
+func ZifUmask(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, mask *types2.Zval) {
 	var mask zend.ZendLong = 0
 	var oldumask int
 	oldumask = umask(077)
@@ -1222,8 +1222,8 @@ func ZifUmask(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, mask *types.Z
 	return_value.SetLong(oldumask)
 	return
 }
-func ZifFpassthru(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
-	var res *types.Zval
+func ZifFpassthru(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval) {
+	var res *types2.Zval
 	var size int
 	var stream *core.PhpStream
 	for {
@@ -1243,12 +1243,12 @@ func ZifFpassthru(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	return_value.SetLong(size)
 	return
 }
-func ZifRename(executeData zpp.Ex, return_value zpp.Ret, oldName *types.Zval, newName *types.Zval, _ zpp.Opt, context *types.Zval) {
+func ZifRename(executeData zpp.Ex, return_value zpp.Ret, oldName *types2.Zval, newName *types2.Zval, _ zpp.Opt, context *types2.Zval) {
 	var old_name *byte
 	var new_name *byte
 	var old_name_len int
 	var new_name_len int
-	var zcontext *types.Zval = nil
+	var zcontext *types2.Zval = nil
 	var wrapper *core.PhpStreamWrapper
 	var context *core.PhpStreamContext
 	for {
@@ -1286,11 +1286,11 @@ func ZifRename(executeData zpp.Ex, return_value zpp.Ret, oldName *types.Zval, ne
 	return_value.SetBool(wrapper.GetWops().GetRename()(wrapper, old_name, new_name, 0, context) != 0)
 	return
 }
-func ZifUnlink(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, context *types.Zval) {
+func ZifUnlink(executeData zpp.Ex, return_value zpp.Ret, filename *types2.Zval, _ zpp.Opt, context *types2.Zval) {
 	var filename *byte
 	var filename_len int
 	var wrapper *core.PhpStreamWrapper
-	var zcontext *types.Zval = nil
+	var zcontext *types2.Zval = nil
 	var context *core.PhpStreamContext = nil
 	for {
 		for {
@@ -1321,8 +1321,8 @@ func ZifUnlink(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _
 	return_value.SetBool(wrapper.GetWops().GetUnlink()(wrapper, filename, core.REPORT_ERRORS, context) != 0)
 	return
 }
-func ZifFtruncate(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, size *types.Zval) {
-	var fp *types.Zval
+func ZifFtruncate(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval, size *types2.Zval) {
+	var fp *types2.Zval
 	var size zend.ZendLong
 	var stream *core.PhpStream
 	for {
@@ -1352,21 +1352,21 @@ func ZifFtruncate(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, size
 	return_value.SetBool(0 == core.PhpStreamTruncateSetSize(stream, size))
 	return
 }
-func ZifFstat(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
-	var fp *types.Zval
-	var stat_dev types.Zval
-	var stat_ino types.Zval
-	var stat_mode types.Zval
-	var stat_nlink types.Zval
-	var stat_uid types.Zval
-	var stat_gid types.Zval
-	var stat_rdev types.Zval
-	var stat_size types.Zval
-	var stat_atime types.Zval
-	var stat_mtime types.Zval
-	var stat_ctime types.Zval
-	var stat_blksize types.Zval
-	var stat_blocks types.Zval
+func ZifFstat(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval) {
+	var fp *types2.Zval
+	var stat_dev types2.Zval
+	var stat_ino types2.Zval
+	var stat_mode types2.Zval
+	var stat_nlink types2.Zval
+	var stat_uid types2.Zval
+	var stat_gid types2.Zval
+	var stat_rdev types2.Zval
+	var stat_size types2.Zval
+	var stat_atime types2.Zval
+	var stat_mtime types2.Zval
+	var stat_ctime types2.Zval
+	var stat_blksize types2.Zval
+	var stat_blocks types2.Zval
 	var stream *core.PhpStream
 	var stat_ssb core.PhpStreamStatbuf
 	var stat_sb_names []*byte = []*byte{"dev", "ino", "mode", "nlink", "uid", "gid", "rdev", "size", "atime", "mtime", "ctime", "blksize", "blocks"}
@@ -1434,12 +1434,12 @@ func ZifFstat(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[11]), &stat_blksize)
 	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[12]), &stat_blocks)
 }
-func ZifCopy(executeData zpp.Ex, return_value zpp.Ret, sourceFile *types.Zval, destinationFile *types.Zval, _ zpp.Opt, context *types.Zval) {
+func ZifCopy(executeData zpp.Ex, return_value zpp.Ret, sourceFile *types2.Zval, destinationFile *types2.Zval, _ zpp.Opt, context *types2.Zval) {
 	var source *byte
 	var target *byte
 	var source_len int
 	var target_len int
-	var zcontext *types.Zval = nil
+	var zcontext *types2.Zval = nil
 	var context *core.PhpStreamContext
 	for {
 		for {
@@ -1460,7 +1460,7 @@ func ZifCopy(executeData zpp.Ex, return_value zpp.Ret, sourceFile *types.Zval, d
 		return
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
-	if PhpCopyFileCtx(source, target, 0, context) == types.SUCCESS {
+	if PhpCopyFileCtx(source, target, 0, context) == types2.SUCCESS {
 		return_value.SetTrue()
 		return
 	} else {
@@ -1475,7 +1475,7 @@ func PhpCopyFileEx(src *byte, dest *byte, src_flg int) int {
 func PhpCopyFileCtx(src *byte, dest *byte, src_flg int, ctx *core.PhpStreamContext) int {
 	var srcstream *core.PhpStream = nil
 	var deststream *core.PhpStream = nil
-	var ret int = types.FAILURE
+	var ret int = types2.FAILURE
 	var src_s core.PhpStreamStatbuf
 	var dest_s core.PhpStreamStatbuf
 	switch core.PhpStreamStatPathEx(src, 0, &src_s, ctx) {
@@ -1491,7 +1491,7 @@ func PhpCopyFileCtx(src *byte, dest *byte, src_flg int, ctx *core.PhpStreamConte
 	}
 	if zend.S_ISDIR(src_s.GetSb().st_mode) {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The first argument to copy() function cannot be a directory")
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	switch core.PhpStreamStatPathEx(dest, core.PHP_STREAM_URL_STAT_QUIET|core.PHP_STREAM_URL_STAT_NOCACHE, &dest_s, ctx) {
 	case -1:
@@ -1506,7 +1506,7 @@ func PhpCopyFileCtx(src *byte, dest *byte, src_flg int, ctx *core.PhpStreamConte
 	}
 	if zend.S_ISDIR(dest_s.GetSb().st_mode) {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The second argument to copy() function cannot be a directory")
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	if !(src_s.GetSb().st_ino) || !(dest_s.GetSb().st_ino) {
 		goto no_stat
@@ -1550,11 +1550,11 @@ safe_to_copy:
 	}
 	return ret
 }
-func ZifFread(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, length *types.Zval) {
-	var res *types.Zval
+func ZifFread(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval, length *types2.Zval) {
+	var res *types2.Zval
 	var len_ zend.ZendLong
 	var stream *core.PhpStream
-	var str *types.String
+	var str *types2.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 2, 0)
@@ -1623,13 +1623,13 @@ quit_loop:
 func FPUTCSV_FLD_CHK(c __auto__) __auto__ {
 	return memchr(field_str.GetVal(), c, field_str.GetLen())
 }
-func ZifFputcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, fields *types.Zval, _ zpp.Opt, delimiter *types.Zval, enclosure *types.Zval, escapeChar *types.Zval) {
+func ZifFputcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval, fields *types2.Zval, _ zpp.Opt, delimiter *types2.Zval, enclosure *types2.Zval, escapeChar *types2.Zval) {
 	var delimiter byte = ','
 	var enclosure byte = '"'
 	var escape_char int = uint8('\\')
 	var stream *core.PhpStream
-	var fp *types.Zval = nil
-	var fields *types.Zval = nil
+	var fp *types2.Zval = nil
+	var fields *types2.Zval = nil
 	var ret ssize_t
 	var delimiter_str *byte = nil
 	var enclosure_str *byte = nil
@@ -1713,21 +1713,21 @@ func ZifFputcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, fields
 	return_value.SetLong(ret)
 	return
 }
-func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, enclosure byte, escape_char int) ssize_t {
+func PhpFputcsv(stream *core.PhpStream, fields *types2.Zval, delimiter byte, enclosure byte, escape_char int) ssize_t {
 	var count int
 	var i int = 0
 	var ret int
-	var field_tmp *types.Zval
+	var field_tmp *types2.Zval
 	var csvline zend.SmartStr = zend.MakeSmartStr(0)
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = fields.Array().Len()
-	var __ht *types.Array = fields.Array()
+	var __ht *types2.Array = fields.Array()
 	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
+		var _z *types2.Zval = _p.GetVal()
 
 		field_tmp = _z
-		var tmp_field_str *types.String
-		var field_str *types.String = zend.ZvalGetTmpString(field_tmp, &tmp_field_str)
+		var tmp_field_str *types2.String
+		var field_str *types2.String = zend.ZvalGetTmpString(field_tmp, &tmp_field_str)
 
 		/* enclose a field that contains a delimiter, an enclosure character, or a newline */
 
@@ -1764,7 +1764,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 }
 
 /* first section exactly as php_fgetss */
-func ZifFgetcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.Opt, length *types.Zval, delimiter *types.Zval, enclosure *types.Zval, escape *types.Zval) {
+func ZifFgetcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types2.Zval, _ zpp.Opt, length *types2.Zval, delimiter *types2.Zval, enclosure *types2.Zval, escape *types2.Zval) {
 	var delimiter byte = ','
 	var enclosure byte = '"'
 	var escape int = uint8('\\')
@@ -1773,8 +1773,8 @@ func ZifFgetcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.
 	var buf_len int
 	var buf *byte
 	var stream *core.PhpStream
-	var fd *types.Zval
-	var len_zv *types.Zval = nil
+	var fd *types2.Zval
+	var len_zv *types2.Zval = nil
 	var delimiter_str *byte = nil
 	var delimiter_str_len int = 0
 	var enclosure_str *byte = nil
@@ -1842,7 +1842,7 @@ func ZifFgetcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.
 			escape = uint8(escape_str[0])
 		}
 	}
-	if len_zv != nil && len_zv.GetType() != types.IS_NULL {
+	if len_zv != nil && len_zv.GetType() != types2.IS_NULL {
 		len_ = zend.ZvalGetLong(len_zv)
 		if len_ < 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter may not be negative")
@@ -1878,7 +1878,7 @@ func PhpFgetcsv(
 	escape_char int,
 	buf_len int,
 	buf *byte,
-	return_value *types.Zval,
+	return_value *types2.Zval,
 ) {
 	var temp *byte
 	var tptr *byte
@@ -1888,7 +1888,7 @@ func PhpFgetcsv(
 	var temp_len int
 	var line_end_len int
 	var inc_len int
-	var first_field types.ZendBool = 1
+	var first_field types2.ZendBool = 1
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 
 	/* initialize internal state */
@@ -2169,7 +2169,7 @@ out:
 		zend.Efree(buf)
 	}
 }
-func ZifRealpath(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval) {
+func ZifRealpath(executeData zpp.Ex, return_value zpp.Ret, path *types2.Zval) {
 	var filename *byte
 	var filename_len int
 	var resolved_path_buff []byte
@@ -2279,7 +2279,7 @@ func PhpNextMetaToken(md *PhpMetaTagsData) PhpMetaTagsToken {
 	}
 	return TOK_EOF
 }
-func ZifFnmatch(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, filename *types.Zval, _ zpp.Opt, flags *types.Zval) {
+func ZifFnmatch(executeData zpp.Ex, return_value zpp.Ret, pattern *types2.Zval, filename *types2.Zval, _ zpp.Opt, flags *types2.Zval) {
 	var pattern *byte
 	var filename *byte
 	var pattern_len int

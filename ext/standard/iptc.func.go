@@ -4,9 +4,9 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -90,7 +90,7 @@ func PhpIptcNextMarker(fp *r.File, spool int, spoolbuf **uint8) int {
 	}
 	return uint(c)
 }
-func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval, jpegFileName *types.Zval, _ zpp.Opt, spool *types.Zval) {
+func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types2.Zval, jpegFileName *types2.Zval, _ zpp.Opt, spool *types2.Zval) {
 	var iptcdata *byte
 	var jpeg_file *byte
 	var iptcdata_len int
@@ -100,10 +100,10 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 	var marker uint
 	var done uint = 0
 	var inx int
-	var spoolbuf *types.String = nil
+	var spoolbuf *types2.String = nil
 	var poi *uint8 = nil
 	var sb zend.ZendStatT
-	var written types.ZendBool = 0
+	var written types2.ZendBool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 3, 0)
@@ -137,7 +137,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 			return_value.SetFalse()
 			return
 		}
-		spoolbuf = types.ZendStringSafeAlloc(1, iptcdata_len+b.SizeOf("psheader")+1024+1, sb.st_size, 0)
+		spoolbuf = types2.ZendStringSafeAlloc(1, iptcdata_len+b.SizeOf("psheader")+1024+1, sb.st_size, 0)
 		poi = (*uint8)(spoolbuf.GetVal())
 		memset(poi, 0, iptcdata_len+b.SizeOf("psheader")+sb.st_size+1024+1)
 	}
@@ -212,7 +212,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 	}
 	fp.Close()
 	if spool < 2 {
-		spoolbuf = types.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()))
+		spoolbuf = types2.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()))
 		return_value.SetString(spoolbuf)
 		return
 	} else {
@@ -220,7 +220,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		return
 	}
 }
-func ZifIptcparse(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval) {
+func ZifIptcparse(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types2.Zval) {
 	var inx int = 0
 	var len_ int
 	var tagsfound uint = 0
@@ -230,8 +230,8 @@ func ZifIptcparse(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 	var str *byte
 	var key []*byte
 	var str_len int
-	var values types.Zval
-	var element *types.Zval
+	var values types2.Zval
+	var element *types2.Zval
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 1, 0)

@@ -4,9 +4,9 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func Fopencookie(cookie any, mode *byte, funcs *COOKIE_IO_FUNCTIONS_T) *r.File {
@@ -96,7 +96,7 @@ func O_phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int)
 		/* if the stream is a stdio stream let's give it a chance to respond
 		 * first, to avoid doubling up the layers of stdio with an fopencookie */
 
-		if core.PhpStreamIs(stream, core.PHP_STREAM_IS_STDIO) && stream.GetOps().GetCast() != nil && !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast()(stream, castas, ret) == types.SUCCESS {
+		if core.PhpStreamIs(stream, core.PHP_STREAM_IS_STDIO) && stream.GetOps().GetCast() != nil && !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast()(stream, castas, ret) == types2.SUCCESS {
 			goto exit_success
 		}
 
@@ -129,14 +129,14 @@ func O_phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int)
 		*/
 
 		core.PhpErrorDocref(nil, faults.E_ERROR, "fopencookie failed")
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	if PhpStreamIsFiltered(stream) {
 		if show_err != 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "cannot cast a filtered stream on this system")
 		}
-		return types.FAILURE
-	} else if stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, ret) == types.SUCCESS {
+		return types2.FAILURE
+	} else if stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, ret) == types2.SUCCESS {
 		goto exit_success
 	}
 	if show_err != 0 {
@@ -146,7 +146,7 @@ func O_phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int)
 		var cast_names []*byte = []*byte{"STDIO FILE*", "File Descriptor", "Socket Descriptor", "select()able descriptor"}
 		core.PhpErrorDocref(nil, faults.E_WARNING, "cannot represent a stream of type %s as a %s", stream.GetOps().GetLabel(), cast_names[castas])
 	}
-	return types.FAILURE
+	return types2.FAILURE
 exit_success:
 	if stream.GetWritepos()-stream.GetReadpos() > 0 && stream.GetFcloseStdiocast() != core.PHP_STREAM_FCLOSE_FOPENCOOKIE && (flags&core.PHP_STREAM_CAST_INTERNAL) == 0 {
 
@@ -167,16 +167,16 @@ exit_success:
 	if (flags & core.PHP_STREAM_CAST_RELEASE) != 0 {
 		core.PhpStreamFree(stream, core.PHP_STREAM_FREE_CLOSE_CASTED)
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **types.String) *r.File {
+func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **types2.String) *r.File {
 	var fp *r.File = nil
 	var stream *core.PhpStream = nil
 	stream = core.PhpStreamOpenWrapperRel(path, mode, options|core.STREAM_WILL_CAST, opened_path)
 	if stream == nil {
 		return nil
 	}
-	if core.PhpStreamCast(stream, core.PHP_STREAM_AS_STDIO|core.PHP_STREAM_CAST_TRY_HARD|core.PHP_STREAM_CAST_RELEASE, (*any)(&fp), core.REPORT_ERRORS) == types.FAILURE {
+	if core.PhpStreamCast(stream, core.PHP_STREAM_AS_STDIO|core.PHP_STREAM_CAST_TRY_HARD|core.PHP_STREAM_CAST_RELEASE, (*any)(&fp), core.REPORT_ERRORS) == types2.FAILURE {
 		core.PhpStreamClose(stream)
 		if opened_path != nil && (*opened_path) != nil {
 			// types.ZendStringReleaseEx(*opened_path, 0)

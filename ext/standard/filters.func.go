@@ -6,9 +6,9 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func StrfilterRot13Filter(
@@ -32,7 +32,7 @@ func StrfilterRot13Filter(
 	}
 	return streams.PSFS_PASS_ON
 }
-func StrfilterRot13Create(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
+func StrfilterRot13Create(filtername *byte, filterparams *types2.Zval, persistent uint8) *core.PhpStreamFilter {
 	return streams.PhpStreamFilterAlloc(&StrfilterRot13Ops, nil, persistent)
 }
 func StrfilterToupperFilter(
@@ -77,16 +77,16 @@ func StrfilterTolowerFilter(
 	}
 	return streams.PSFS_PASS_ON
 }
-func StrfilterToupperCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
+func StrfilterToupperCreate(filtername *byte, filterparams *types2.Zval, persistent uint8) *core.PhpStreamFilter {
 	return streams.PhpStreamFilterAlloc(&StrfilterToupperOps, nil, persistent)
 }
-func StrfilterTolowerCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
+func StrfilterTolowerCreate(filtername *byte, filterparams *types2.Zval, persistent uint8) *core.PhpStreamFilter {
 	return streams.PhpStreamFilterAlloc(&StrfilterTolowerOps, nil, persistent)
 }
-func PhpStripTagsFilterCtor(inst *PhpStripTagsFilter, allowed_tags *types.String, persistent int) int {
+func PhpStripTagsFilterCtor(inst *PhpStripTagsFilter, allowed_tags *types2.String, persistent int) int {
 	if allowed_tags != nil {
 		if nil == b.Assign(&(inst.GetAllowedTags()), zend.Pemalloc(allowed_tags.GetLen()+1)) {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 		memcpy((*byte)(inst.GetAllowedTags()), allowed_tags.GetVal(), allowed_tags.GetLen()+1)
 		inst.SetAllowedTagsLen(int(allowed_tags.GetLen()))
@@ -95,7 +95,7 @@ func PhpStripTagsFilterCtor(inst *PhpStripTagsFilter, allowed_tags *types.String
 	}
 	inst.SetState(0)
 	inst.SetPersistent(persistent)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpStripTagsFilterDtor(inst *PhpStripTagsFilter) {
 	if inst.GetAllowedTags() != nil {
@@ -131,20 +131,20 @@ func StrfilterStripTagsFilter(
 func StrfilterStripTagsDtor(thisfilter *core.PhpStreamFilter) {
 	b.Assert(thisfilter.GetAbstract().Ptr() != nil)
 	PhpStripTagsFilterDtor((*PhpStripTagsFilter)(thisfilter.GetAbstract().Ptr()))
-	zend.Pefree(thisfilter.GetAbstract().Ptr(), (*PhpStripTagsFilter)(types.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
+	zend.Pefree(thisfilter.GetAbstract().Ptr(), (*PhpStripTagsFilter)(types2.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
 }
-func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
+func StrfilterStripTagsCreate(filtername *byte, filterparams *types2.Zval, persistent uint8) *core.PhpStreamFilter {
 	var inst *PhpStripTagsFilter
 	var filter *core.PhpStreamFilter = nil
-	var allowed_tags *types.String = nil
+	var allowed_tags *types2.String = nil
 	core.PhpErrorDocref(nil, faults.E_DEPRECATED, "The string.strip_tags filter is deprecated")
 	if filterparams != nil {
-		if filterparams.IsType(types.IS_ARRAY) {
+		if filterparams.IsType(types2.IS_ARRAY) {
 			var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
-			var tmp *types.Zval
-			var __ht *types.Array = filterparams.Array()
+			var tmp *types2.Zval
+			var __ht *types2.Array = filterparams.Array()
 			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
+				var _z *types2.Zval = _p.GetVal()
 
 				tmp = _z
 				zend.ConvertToStringEx(tmp)
@@ -171,7 +171,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 
 	}
 	inst = zend.Pemalloc(b.SizeOf("php_strip_tags_filter"))
-	if PhpStripTagsFilterCtor(inst, allowed_tags, persistent) == types.SUCCESS {
+	if PhpStripTagsFilterCtor(inst, allowed_tags, persistent) == types2.SUCCESS {
 		filter = streams.PhpStreamFilterAlloc(&StrfilterStripTagsOps, inst, persistent)
 	} else {
 		zend.Pefree(inst, persistent)
@@ -397,7 +397,7 @@ func PhpConvBase64DecodeCtor(inst *PhpConvBase64Decode) int {
 	inst.SetUremNbits(0)
 	inst.SetUstat(0)
 	inst.SetEos(0)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpConvBase64DecodeDtor(inst *PhpConvBase64Decode) {}
 func PhpConvBase64DecodeConvert(inst *PhpConvBase64Decode, in_pp **byte, in_left_p *int, out_pp **byte, out_left_p *int) PhpConvErrT {
@@ -952,19 +952,19 @@ func PhpConvQprintDecodeCtor(inst *PhpConvQprintDecode, lbchars *byte, lbchars_l
 	return PHP_CONV_ERR_SUCCESS
 }
 func PhpConvGetStringPropEx(
-	ht *types.Array,
+	ht *types2.Array,
 	pretval **byte,
 	pretval_len *int,
 	field_name string,
 	field_name_len int,
 	persistent int,
 ) PhpConvErrT {
-	var tmpval *types.Zval
+	var tmpval *types2.Zval
 	*pretval = nil
 	*pretval_len = 0
-	if b.Assign(&tmpval, (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
-		var tmp *types.String
-		var str *types.String = zend.ZvalGetTmpString(tmpval, &tmp)
+	if b.Assign(&tmpval, (*types2.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
+		var tmp *types2.String
+		var str *types2.String = zend.ZvalGetTmpString(tmpval, &tmp)
 		*pretval = zend.Pemalloc(str.GetLen() + 1)
 		*pretval_len = str.GetLen()
 		memcpy(*pretval, str.GetVal(), str.GetLen()+1)
@@ -974,8 +974,8 @@ func PhpConvGetStringPropEx(
 	}
 	return PHP_CONV_ERR_SUCCESS
 }
-func PhpConvGetUlongPropEx(ht *types.Array, pretval *zend.ZendUlong, field_name string, field_name_len int) PhpConvErrT {
-	var tmpval *types.Zval = (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
+func PhpConvGetUlongPropEx(ht *types2.Array, pretval *zend.ZendUlong, field_name string, field_name_len int) PhpConvErrT {
+	var tmpval *types2.Zval = (*types2.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
 	if tmpval != nil {
 		var lval zend.ZendLong = zend.ZvalGetLong(tmpval)
 		if lval < 0 {
@@ -989,8 +989,8 @@ func PhpConvGetUlongPropEx(ht *types.Array, pretval *zend.ZendUlong, field_name 
 		return PHP_CONV_ERR_NOT_FOUND
 	}
 }
-func PhpConvGetBoolPropEx(ht *types.Array, pretval *int, field_name string, field_name_len int) PhpConvErrT {
-	var tmpval *types.Zval = (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
+func PhpConvGetBoolPropEx(ht *types2.Array, pretval *int, field_name string, field_name_len int) PhpConvErrT {
+	var tmpval *types2.Zval = (*types2.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
 	if tmpval != nil {
 		*pretval = zend.ZendIsTrue(tmpval)
 		return PHP_CONV_ERR_SUCCESS
@@ -999,7 +999,7 @@ func PhpConvGetBoolPropEx(ht *types.Array, pretval *int, field_name string, fiel
 		return PHP_CONV_ERR_NOT_FOUND
 	}
 }
-func PhpConvGetUintPropEx(ht *types.Array, pretval *uint, field_name string, field_name_len int) int {
+func PhpConvGetUintPropEx(ht *types2.Array, pretval *uint, field_name string, field_name_len int) int {
 	var l zend.ZendUlong
 	var err PhpConvErrT
 	*pretval = 0
@@ -1008,7 +1008,7 @@ func PhpConvGetUintPropEx(ht *types.Array, pretval *uint, field_name string, fie
 	}
 	return err
 }
-func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
+func PhpConvOpen(conv_mode int, options *types2.Array, persistent int) *PhpConv {
 	/* FIXME: I'll have to replace this ugly code by something neat
 	   (factories?) in the near future. */
 
@@ -1132,14 +1132,14 @@ out_failure:
 	}
 	return nil
 }
-func PhpConvertFilterCtor(inst *PhpConvertFilter, conv_mode int, conv_opts *types.Array, filtername *byte, persistent int) int {
+func PhpConvertFilterCtor(inst *PhpConvertFilter, conv_mode int, conv_opts *types2.Array, filtername *byte, persistent int) int {
 	inst.SetPersistent(persistent)
 	inst.SetFiltername(zend.Pestrdup(filtername))
 	inst.SetStubLen(0)
 	if b.Assign(&(inst.GetCd()), PhpConvOpen(conv_mode, conv_opts, persistent)) == nil {
 		goto out_failure
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 out_failure:
 	if inst.GetCd() != nil {
 		PhpConvDtor(inst.GetCd())
@@ -1148,7 +1148,7 @@ out_failure:
 	if inst.GetFiltername() != nil {
 		zend.Pefree(inst.GetFiltername(), persistent)
 	}
-	return types.FAILURE
+	return types2.FAILURE
 }
 func PhpConvertFilterDtor(inst *PhpConvertFilter) {
 	if inst.GetCd() != nil {
@@ -1316,10 +1316,10 @@ func StrfilterConvertAppendBucket(
 		zend.Pefree(out_buf, persistent)
 	}
 	*consumed += buf_len - icnt
-	return types.SUCCESS
+	return types2.SUCCESS
 out_failure:
 	zend.Pefree(out_buf, persistent)
-	return types.FAILURE
+	return types2.FAILURE
 }
 func StrfilterConvertFilter(
 	stream *core.PhpStream,
@@ -1335,13 +1335,13 @@ func StrfilterConvertFilter(
 	for buckets_in.GetHead() != nil {
 		bucket = buckets_in.GetHead()
 		streams.PhpStreamBucketUnlink(bucket)
-		if StrfilterConvertAppendBucket(inst, stream, thisfilter, buckets_out, bucket.GetBuf(), bucket.GetBuflen(), &consumed, stream.GetIsPersistent()) != types.SUCCESS {
+		if StrfilterConvertAppendBucket(inst, stream, thisfilter, buckets_out, bucket.GetBuf(), bucket.GetBuflen(), &consumed, stream.GetIsPersistent()) != types2.SUCCESS {
 			goto out_failure
 		}
 		streams.PhpStreamBucketDelref(bucket)
 	}
 	if flags != streams.PSFS_FLAG_NORMAL {
-		if StrfilterConvertAppendBucket(inst, stream, thisfilter, buckets_out, nil, 0, &consumed, stream.GetIsPersistent()) != types.SUCCESS {
+		if StrfilterConvertAppendBucket(inst, stream, thisfilter, buckets_out, nil, 0, &consumed, stream.GetIsPersistent()) != types2.SUCCESS {
 			goto out_failure
 		}
 	}
@@ -1358,14 +1358,14 @@ out_failure:
 func StrfilterConvertDtor(thisfilter *core.PhpStreamFilter) {
 	b.Assert(thisfilter.GetAbstract().Ptr() != nil)
 	PhpConvertFilterDtor((*PhpConvertFilter)(thisfilter.GetAbstract().Ptr()))
-	zend.Pefree(thisfilter.GetAbstract().Ptr(), (*PhpConvertFilter)(types.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
+	zend.Pefree(thisfilter.GetAbstract().Ptr(), (*PhpConvertFilter)(types2.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
 }
-func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
+func StrfilterConvertCreate(filtername *byte, filterparams *types2.Zval, persistent uint8) *core.PhpStreamFilter {
 	var inst *PhpConvertFilter
 	var retval *core.PhpStreamFilter = nil
 	var dot *byte
 	var conv_mode int = 0
-	if filterparams != nil && filterparams.GetType() != types.IS_ARRAY {
+	if filterparams != nil && filterparams.GetType() != types2.IS_ARRAY {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): invalid filter parameter", filtername)
 		return nil
 	}
@@ -1383,7 +1383,7 @@ func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persiste
 	} else if strcasecmp(dot, "quoted-printable-decode") == 0 {
 		conv_mode = PHP_CONV_QPRINT_DECODE
 	}
-	if PhpConvertFilterCtor(inst, conv_mode, b.CondF1(filterparams != nil, func() *types.Array { return filterparams.Array() }, nil), filtername, persistent) != types.SUCCESS {
+	if PhpConvertFilterCtor(inst, conv_mode, b.CondF1(filterparams != nil, func() *types2.Array { return filterparams.Array() }, nil), filtername, persistent) != types2.SUCCESS {
 		goto out
 	}
 	retval = streams.PhpStreamFilterAlloc(&StrfilterConvertOps, inst, persistent)
@@ -1427,7 +1427,7 @@ func ConsumedFilterDtor(thisfilter *core.PhpStreamFilter) {
 		zend.Pefree(data, data.GetPersistent())
 	}
 }
-func ConsumedFilterCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
+func ConsumedFilterCreate(filtername *byte, filterparams *types2.Zval, persistent uint8) *core.PhpStreamFilter {
 	var fops *streams.PhpStreamFilterOps = nil
 	var data *PhpConsumedFilterData
 	if strcasecmp(filtername, "consumed") {
@@ -1600,7 +1600,7 @@ func PhpChunkedDtor(thisfilter *core.PhpStreamFilter) {
 		zend.Pefree(data, data.GetPersistent())
 	}
 }
-func ChunkedFilterCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
+func ChunkedFilterCreate(filtername *byte, filterparams *types2.Zval, persistent uint8) *core.PhpStreamFilter {
 	var fops *streams.PhpStreamFilterOps = nil
 	var data *PhpChunkedFilterData
 	if strcasecmp(filtername, "dechunk") {
@@ -1619,16 +1619,16 @@ func ChunkedFilterCreate(filtername *byte, filterparams *types.Zval, persistent 
 func ZmStartupStandardFilters(type_ int, module_number int) int {
 	var i int
 	for i = 0; StandardFilters[i].ops != nil; i++ {
-		if types.FAILURE == streams.PhpStreamFilterRegisterFactory(StandardFilters[i].ops.GetLabel(), StandardFilters[i].factory) {
-			return types.FAILURE
+		if types2.FAILURE == streams.PhpStreamFilterRegisterFactory(StandardFilters[i].ops.GetLabel(), StandardFilters[i].factory) {
+			return types2.FAILURE
 		}
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmShutdownStandardFilters(type_ int, module_number int) int {
 	var i int
 	for i = 0; StandardFilters[i].ops != nil; i++ {
 		streams.PhpStreamFilterUnregisterFactory(StandardFilters[i].ops.GetLabel())
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }

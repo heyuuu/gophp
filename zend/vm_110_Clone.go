@@ -1,16 +1,16 @@
 package zend
 
 import (
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var obj *types.Zval
-	var ce *types.ClassEntry
-	var scope *types.ClassEntry
-	var clone types.IFunction
+	var obj *types2.Zval
+	var ce *types2.ClassEntry
+	var scope *types2.ClassEntry
+	var clone types2.IFunction
 	var clone_call ZendObjectCloneObjT
 	obj = opline.Const1()
 	for {
@@ -21,9 +21,9 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 		break
 	}
-	ce = types.Z_OBJCE_P(obj)
+	ce = types2.Z_OBJCE_P(obj)
 	clone = ce.GetClone()
-	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
+	clone_call = types2.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		opline.Result().SetUndef()
@@ -45,16 +45,16 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var obj *types.Zval
-	var ce *types.ClassEntry
-	var scope *types.ClassEntry
-	var clone types.IFunction
+	var obj *types2.Zval
+	var ce *types2.ClassEntry
+	var scope *types2.ClassEntry
+	var clone types2.IFunction
 	var clone_call ZendObjectCloneObjT
 	obj = opline.Op1()
 	for {
-		if obj.GetType() != types.IS_OBJECT {
+		if obj.GetType() != types2.IS_OBJECT {
 			if obj.IsReference() {
-				obj = types.Z_REFVAL_P(obj)
+				obj = types2.Z_REFVAL_P(obj)
 				if obj.IsObject() {
 					break
 				}
@@ -72,9 +72,9 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 		break
 	}
-	ce = types.Z_OBJCE_P(obj)
+	ce = types2.Z_OBJCE_P(obj)
 	clone = ce.GetClone()
-	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
+	clone_call = types2.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		// ZvalPtrDtorNogc(free_op1)
@@ -98,10 +98,10 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var obj *types.Zval
-	var ce *types.ClassEntry
-	var scope *types.ClassEntry
-	var clone types.IFunction
+	var obj *types2.Zval
+	var ce *types2.ClassEntry
+	var scope *types2.ClassEntry
+	var clone types2.IFunction
 	var clone_call ZendObjectCloneObjT
 	obj = &(executeData.GetThis())
 	if obj.IsUndef() {
@@ -110,9 +110,9 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	for {
 		break
 	}
-	ce = types.Z_OBJCE_P(obj)
+	ce = types2.Z_OBJCE_P(obj)
 	clone = ce.GetClone()
-	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
+	clone_call = types2.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		opline.Result().SetUndef()
@@ -133,16 +133,16 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var obj *types.Zval
-	var ce *types.ClassEntry
-	var scope *types.ClassEntry
-	var clone types.IFunction
+	var obj *types2.Zval
+	var ce *types2.ClassEntry
+	var scope *types2.ClassEntry
+	var clone types2.IFunction
 	var clone_call ZendObjectCloneObjT
 	obj = opline.Op1()
 	for {
-		if obj.GetType() != types.IS_OBJECT {
+		if obj.GetType() != types2.IS_OBJECT {
 			if obj.IsReference() {
-				obj = types.Z_REFVAL_P(obj)
+				obj = types2.Z_REFVAL_P(obj)
 				if obj.IsObject() {
 					break
 				}
@@ -159,9 +159,9 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		break
 	}
-	ce = types.Z_OBJCE_P(obj)
+	ce = types2.Z_OBJCE_P(obj)
 	clone = ce.GetClone()
-	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
+	clone_call = types2.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		opline.Result().SetUndef()

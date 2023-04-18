@@ -3,8 +3,8 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_MM_ALIGNED_SIZE(size int) int {
@@ -23,19 +23,19 @@ func Erealloc(ptr any, size int) any                  { return b.Realloc(ptr, si
 func SafeErealloc(ptr any, nmemb int, size int, offset int) any {
 	return b.Realloc(ptr, nmemb, size, offset)
 }
-func Estrdup(s string) *byte                       { return b.Strdup(s) }
-func Estrndup(s *byte, length int) *byte           { return b.Strndup(s, length) }
-func Pemalloc(size int) any                        { return b.Malloc(size) }
-func Pefree(ptr any, persistent int)               { b.Free(ptr) }
-func Pecalloc(nmemb int, size int) any             { return b.Calloc(nmemb, size) }
-func Perealloc(ptr any, size int) any              { return b.Realloc(ptr, size) }
-func SafePerealloc(ptr any, size int) any          { return b.Realloc(ptr, size) }
-func Pestrdup(s *byte) *byte                       { return b.Strdup(s) }
-func Pestrndup(s *byte, length int) *byte          { return b.Strndup(s, length) }
-func ALLOC_HASHTABLE(ht *types.Array) *types.Array { return types.NewArray(0) }
-func FREE_HASHTABLE(ht *types.Array)               { b.Free(ht) }
-func ZendMmGc() int                                { return 0 }
-func IsZendMm() int                                { return 0 }
+func Estrdup(s string) *byte                         { return b.Strdup(s) }
+func Estrndup(s *byte, length int) *byte             { return b.Strndup(s, length) }
+func Pemalloc(size int) any                          { return b.Malloc(size) }
+func Pefree(ptr any, persistent int)                 { b.Free(ptr) }
+func Pecalloc(nmemb int, size int) any               { return b.Calloc(nmemb, size) }
+func Perealloc(ptr any, size int) any                { return b.Realloc(ptr, size) }
+func SafePerealloc(ptr any, size int) any            { return b.Realloc(ptr, size) }
+func Pestrdup(s *byte) *byte                         { return b.Strdup(s) }
+func Pestrndup(s *byte, length int) *byte            { return b.Strndup(s, length) }
+func ALLOC_HASHTABLE(ht *types2.Array) *types2.Array { return types2.NewArray(0) }
+func FREE_HASHTABLE(ht *types2.Array)                { b.Free(ht) }
+func ZendMmGc() int                                  { return 0 }
+func IsZendMm() int                                  { return 0 }
 func ZendStrndup(s *byte, length int) *byte {
 	var p *byte
 	if length+1 == 0 {
@@ -46,7 +46,7 @@ func ZendStrndup(s *byte, length int) *byte {
 }
 func ZendSetMemoryLimit(memory_limit int) int {
 	// notice memory 限制失效
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZendMemoryUsage(real_usage int) int {
 	// notice 获取 memory 使用情况失效

@@ -4,9 +4,9 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -31,7 +31,7 @@ func ZmStartupImagetypes(type_ int, module_number int) int {
 	zend.RegisterLongConstant("IMAGETYPE_WEBP", IMAGE_FILETYPE_WEBP, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("IMAGETYPE_UNKNOWN", IMAGE_FILETYPE_UNKNOWN, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("IMAGETYPE_COUNT", IMAGE_FILETYPE_COUNT, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpHandleGif(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
@@ -197,11 +197,11 @@ func PhpSkipVariable(stream *core.PhpStream) int {
 	core.PhpStreamSeek(stream, zend.ZendLong(length), r.SEEK_CUR)
 	return 1
 }
-func php_read_APP(stream *core.PhpStream, marker uint, info *types.Zval) int {
+func php_read_APP(stream *core.PhpStream, marker uint, info *types2.Zval) int {
 	var length uint16
 	var buffer *byte
 	var markername []byte
-	var tmp *types.Zval
+	var tmp *types2.Zval
 	length = PhpRead2(stream)
 	if length < 2 {
 		return 0
@@ -225,7 +225,7 @@ func php_read_APP(stream *core.PhpStream, marker uint, info *types.Zval) int {
 	zend.Efree(buffer)
 	return 1
 }
-func PhpHandleJpeg(stream *core.PhpStream, info *types.Zval) *Gfxinfo {
+func PhpHandleJpeg(stream *core.PhpStream, info *types2.Zval) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var marker uint = M_PSEUDO
 	var length uint16
@@ -481,7 +481,7 @@ func PhpIfdGet32s(Long any, motorola_intel int) int {
 func PhpIfdGet32u(Long any, motorola_intel int) unsigned {
 	return unsigned(PhpIfdGet32s(Long, motorola_intel) & 0xffffffff)
 }
-func PhpHandleTiff(stream *core.PhpStream, info *types.Zval, motorola_intel int) *Gfxinfo {
+func PhpHandleTiff(stream *core.PhpStream, info *types2.Zval, motorola_intel int) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var i int
 	var num_entries int
@@ -870,7 +870,7 @@ func PhpImageTypeToMimeType(image_type int) *byte {
 		return "application/octet-stream"
 	}
 }
-func ZifImageTypeToMimeType(executeData zpp.Ex, return_value zpp.Ret, imagetype *types.Zval) {
+func ZifImageTypeToMimeType(executeData zpp.Ex, return_value zpp.Ret, imagetype *types2.Zval) {
 	var p_image_type zend.ZendLong
 	for {
 		for {
@@ -885,9 +885,9 @@ func ZifImageTypeToMimeType(executeData zpp.Ex, return_value zpp.Ret, imagetype 
 	}
 	return_value.SetStringVal(b.CastStrAuto((*byte)(PhpImageTypeToMimeType(p_image_type))))
 }
-func ZifImageTypeToExtension(executeData zpp.Ex, return_value zpp.Ret, imagetype *types.Zval, _ zpp.Opt, includeDot *types.Zval) {
+func ZifImageTypeToExtension(executeData zpp.Ex, return_value zpp.Ret, imagetype *types2.Zval, _ zpp.Opt, includeDot *types2.Zval) {
 	var image_type zend.ZendLong
-	var inc_dot types.ZendBool = 1
+	var inc_dot types2.ZendBool = 1
 	var imgext *byte = nil
 	for {
 		for {
@@ -1038,7 +1038,7 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 	}
 	return IMAGE_FILETYPE_UNKNOWN
 }
-func PhpGetimagesizeFromStream(stream *core.PhpStream, info *types.Zval, executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func PhpGetimagesizeFromStream(stream *core.PhpStream, info *types2.Zval, executeData *zend.ZendExecuteData, return_value *types2.Zval) {
 	var itype int = 0
 	var result *Gfxinfo = nil
 	if stream == nil {
@@ -1109,8 +1109,8 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *types.Zval, execute
 		return
 	}
 }
-func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *types.Zval, mode int) {
-	var info *types.Zval = nil
+func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *types2.Zval, mode int) {
+	var info *types2.Zval = nil
 	var stream *core.PhpStream = nil
 	var input *byte
 	var input_len int
@@ -1150,9 +1150,9 @@ func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *typ
 	PhpGetimagesizeFromStream(stream, info, executeData, return_value)
 	core.PhpStreamClose(stream)
 }
-func ZifGetimagesize(executeData zpp.Ex, return_value zpp.Ret, imagefile *types.Zval, _ zpp.Opt, info zpp.RefZval) {
+func ZifGetimagesize(executeData zpp.Ex, return_value zpp.Ret, imagefile *types2.Zval, _ zpp.Opt, info zpp.RefZval) {
 	PhpGetimagesizeFromAny(executeData, return_value, FROM_PATH)
 }
-func ZifGetimagesizefromstring(executeData zpp.Ex, return_value zpp.Ret, imagefile *types.Zval, _ zpp.Opt, info zpp.RefZval) {
+func ZifGetimagesizefromstring(executeData zpp.Ex, return_value zpp.Ret, imagefile *types2.Zval, _ zpp.Opt, info zpp.RefZval) {
 	PhpGetimagesizeFromAny(executeData, return_value, FROM_DATA)
 }

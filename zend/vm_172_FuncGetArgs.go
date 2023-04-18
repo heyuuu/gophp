@@ -1,10 +1,12 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var ht *types.Array
+	var ht *types2.Array
 	var arg_count uint32
 	var result_size uint32
 	var skip uint32
@@ -20,19 +22,19 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 
 	if result_size != 0 {
 		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().num_args
-		ht = types.NewArray(result_size)
+		ht = types2.NewArray(result_size)
 		opline.Result().SetArray(ht)
-		types.ZendHashRealInitPacked(ht)
-		fillScope := types.PackedFillStart(ht)
-		var p *types.Zval
-		var q *types.Zval
+		types2.ZendHashRealInitPacked(ht)
+		fillScope := types2.PackedFillStart(ht)
+		var p *types2.Zval
+		var q *types2.Zval
 		var i uint32 = skip
 		p = executeData.VarNum(i)
 		if arg_count > first_extra_arg {
 			for i < first_extra_arg {
 				q = p
 				if !q.IsUndef() {
-					q = types.ZVAL_DEREF(q)
+					q = types2.ZVAL_DEREF(q)
 
 					// q.TryAddRefcount()
 
@@ -54,7 +56,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 		for i < arg_count {
 			q = p
 			if !q.IsUndef() {
-				q = types.ZVAL_DEREF(q)
+				q = types2.ZVAL_DEREF(q)
 
 				// q.TryAddRefcount()
 
@@ -75,7 +77,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 }
 func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var ht *types.Array
+	var ht *types2.Array
 	var arg_count uint32
 	var result_size uint32
 	var skip uint32
@@ -87,19 +89,19 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 	}
 	if result_size != 0 {
 		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().num_args
-		ht = types.NewArray(result_size)
+		ht = types2.NewArray(result_size)
 		opline.Result().SetArray(ht)
-		types.ZendHashRealInitPacked(ht)
-		fillScope := types.PackedFillStart(ht)
-		var p *types.Zval
-		var q *types.Zval
+		types2.ZendHashRealInitPacked(ht)
+		fillScope := types2.PackedFillStart(ht)
+		var p *types2.Zval
+		var q *types2.Zval
 		var i uint32 = skip
 		p = executeData.VarNum(i)
 		if arg_count > first_extra_arg {
 			for i < first_extra_arg {
 				q = p
 				if !q.IsUndef() {
-					q = types.ZVAL_DEREF(q)
+					q = types2.ZVAL_DEREF(q)
 
 					// q.TryAddRefcount()
 
@@ -121,7 +123,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 		for i < arg_count {
 			q = p
 			if !q.IsUndef() {
-				q = types.ZVAL_DEREF(q)
+				q = types2.ZVAL_DEREF(q)
 
 				// q.TryAddRefcount()
 

@@ -2,13 +2,13 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var retval_ptr *types.Zval
+	var retval_ptr *types2.Zval
 	for {
 		{
 
@@ -31,7 +31,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			if retval_ptr.IsReference() {
 				// 				retval_ptr.AddRefcount()
 			} else {
-				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
+				types2.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
 			executeData.GetReturnValue().
 				SetReference(retval_ptr.Reference())
@@ -42,7 +42,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var retval_ptr *types.Zval
+	var retval_ptr *types2.Zval
 	var free_op1 ZendFreeOp
 	for {
 		{
@@ -55,7 +55,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				// ZvalPtrDtorNogc(free_op1)
 			} else {
 				if retval_ptr.IsReference() {
-					types.ZVAL_COPY_VALUE(executeData.GetReturnValue(), retval_ptr)
+					types2.ZVAL_COPY_VALUE(executeData.GetReturnValue(), retval_ptr)
 					break
 				}
 				executeData.GetReturnValue().
@@ -79,7 +79,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			if retval_ptr.IsReference() {
 				// 				retval_ptr.AddRefcount()
 			} else {
-				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
+				types2.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
 			executeData.GetReturnValue().
 				SetReference(retval_ptr.Reference())
@@ -90,7 +90,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var retval_ptr *types.Zval
+	var retval_ptr *types2.Zval
 	var free_op1 ZendFreeOp
 	for {
 		{
@@ -103,7 +103,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				// ZvalPtrDtorNogc(free_op1)
 			} else {
 				if retval_ptr.IsReference() {
-					types.ZVAL_COPY_VALUE(executeData.GetReturnValue(), retval_ptr)
+					types2.ZVAL_COPY_VALUE(executeData.GetReturnValue(), retval_ptr)
 					break
 				}
 				executeData.GetReturnValue().
@@ -131,7 +131,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			if retval_ptr.IsReference() {
 				// 				retval_ptr.AddRefcount()
 			} else {
-				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
+				types2.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
 			executeData.GetReturnValue().
 				SetReference(retval_ptr.Reference())
@@ -145,7 +145,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var retval_ptr *types.Zval
+	var retval_ptr *types2.Zval
 	for {
 		{
 
@@ -156,7 +156,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			if !(executeData.GetReturnValue()) {
 			} else {
 				if retval_ptr.IsReference() {
-					types.ZVAL_COPY_VALUE(executeData.GetReturnValue(), retval_ptr)
+					types2.ZVAL_COPY_VALUE(executeData.GetReturnValue(), retval_ptr)
 					break
 				}
 				executeData.GetReturnValue().
@@ -180,7 +180,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			if retval_ptr.IsReference() {
 				// 				retval_ptr.AddRefcount()
 			} else {
-				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
+				types2.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
 			executeData.GetReturnValue().
 				SetReference(retval_ptr.Reference())

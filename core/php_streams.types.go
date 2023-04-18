@@ -3,8 +3,8 @@ package core
 import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/streams"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**
@@ -96,7 +96,7 @@ type PhpStreamWrapperOps struct {
 		filename *byte,
 		mode *byte,
 		options int,
-		opened_path **types.String,
+		opened_path **types2.String,
 		context *PhpStreamContext,
 	) *PhpStream
 	stream_closer func(wrapper *PhpStreamWrapper, stream *PhpStream) int
@@ -107,7 +107,7 @@ type PhpStreamWrapperOps struct {
 		filename *byte,
 		mode *byte,
 		options int,
-		opened_path **types.String,
+		opened_path **types2.String,
 		context *PhpStreamContext,
 	) *PhpStream
 	label           *byte
@@ -124,7 +124,7 @@ func MakePhpStreamWrapperOps(
 		filename *byte,
 		mode *byte,
 		options int,
-		opened_path **types.String,
+		opened_path **types2.String,
 		context *PhpStreamContext,
 	) *PhpStream,
 	stream_closer func(wrapper *PhpStreamWrapper, stream *PhpStream) int,
@@ -135,7 +135,7 @@ func MakePhpStreamWrapperOps(
 		filename *byte,
 		mode *byte,
 		options int,
-		opened_path **types.String,
+		opened_path **types2.String,
 		context *PhpStreamContext,
 	) *PhpStream,
 	label *byte,
@@ -164,7 +164,7 @@ func (this *PhpStreamWrapperOps) GetStreamOpener() func(
 	filename *byte,
 	mode *byte,
 	options int,
-	opened_path **types.String,
+	opened_path **types2.String,
 	context *PhpStreamContext,
 ) *PhpStream {
 	return this.stream_opener
@@ -174,7 +174,7 @@ func (this *PhpStreamWrapperOps) SetStreamOpener(value func(
 	filename *byte,
 	mode *byte,
 	options int,
-	opened_path **types.String,
+	opened_path **types2.String,
 	context *PhpStreamContext,
 ) *PhpStream) {
 	this.stream_opener = value
@@ -193,7 +193,7 @@ func (this *PhpStreamWrapperOps) GetDirOpener() func(
 	filename *byte,
 	mode *byte,
 	options int,
-	opened_path **types.String,
+	opened_path **types2.String,
 	context *PhpStreamContext,
 ) *PhpStream {
 	return this.dir_opener
@@ -203,7 +203,7 @@ func (this *PhpStreamWrapperOps) SetDirOpener(value func(
 	filename *byte,
 	mode *byte,
 	options int,
-	opened_path **types.String,
+	opened_path **types2.String,
 	context *PhpStreamContext,
 ) *PhpStream) {
 	this.dir_opener = value
@@ -258,7 +258,7 @@ type PhpStream struct {
 	writefilters     streams.PhpStreamFilterChain
 	wrapper          *PhpStreamWrapper
 	wrapperthis      any
-	wrapperdata      types.Zval
+	wrapperdata      types2.Zval
 	is_persistent    uint8
 	in_free          uint8
 	eof              uint8
@@ -267,10 +267,10 @@ type PhpStream struct {
 	fgetss_state     uint8
 	mode             []byte
 	flags            uint32
-	res              *types.ZendResource
+	res              *types2.ZendResource
 	stdiocast        *r.File
 	orig_path        *byte
-	ctx              *types.ZendResource
+	ctx              *types2.ZendResource
 	position         zend.ZendOffT
 	readbuf          *uint8
 	readbuflen       int
@@ -290,7 +290,7 @@ func (this *PhpStream) GetWrapper() *PhpStreamWrapper                 { return t
 func (this *PhpStream) SetWrapper(value *PhpStreamWrapper)            { this.wrapper = value }
 func (this *PhpStream) GetWrapperthis() any                           { return this.wrapperthis }
 func (this *PhpStream) SetWrapperthis(value any)                      { this.wrapperthis = value }
-func (this *PhpStream) GetWrapperdata() types.Zval                    { return this.wrapperdata }
+func (this *PhpStream) GetWrapperdata() types2.Zval                   { return this.wrapperdata }
 func (this *PhpStream) GetIsPersistent() uint8                        { return this.is_persistent }
 func (this *PhpStream) SetIsPersistent(value uint8)                   { this.is_persistent = value }
 func (this *PhpStream) GetInFree() uint8                              { return this.in_free }
@@ -305,14 +305,14 @@ func (this *PhpStream) SetFgetssState(state uint8)                    { this.fge
 func (this *PhpStream) GetMode() []byte                               { return this.mode }
 func (this *PhpStream) GetFlags() uint32                              { return this.flags }
 func (this *PhpStream) SetFlags(value uint32)                         { this.flags = value }
-func (this *PhpStream) GetRes() *types.ZendResource                   { return this.res }
-func (this *PhpStream) SetRes(value *types.ZendResource)              { this.res = value }
+func (this *PhpStream) GetRes() *types2.ZendResource                  { return this.res }
+func (this *PhpStream) SetRes(value *types2.ZendResource)             { this.res = value }
 func (this *PhpStream) GetStdiocast() *r.File                         { return this.stdiocast }
 func (this *PhpStream) SetStdiocast(value *r.File)                    { this.stdiocast = value }
 func (this *PhpStream) GetOrigPath() *byte                            { return this.orig_path }
 func (this *PhpStream) SetOrigPath(value *byte)                       { this.orig_path = value }
-func (this *PhpStream) GetCtx() *types.ZendResource                   { return this.ctx }
-func (this *PhpStream) SetCtx(value *types.ZendResource)              { this.ctx = value }
+func (this *PhpStream) GetCtx() *types2.ZendResource                  { return this.ctx }
+func (this *PhpStream) SetCtx(value *types2.ZendResource)             { this.ctx = value }
 func (this *PhpStream) GetPosition() zend.ZendOffT                    { return this.position }
 func (this *PhpStream) SetPosition(value zend.ZendOffT)               { this.position = value }
 func (this *PhpStream) GetReadbuf() *uint8                            { return this.readbuf }

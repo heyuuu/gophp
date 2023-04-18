@@ -2,8 +2,8 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -18,7 +18,7 @@ func PhpHex2int(c int) byte {
 		return -1
 	}
 }
-func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types.String {
+func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types2.String {
 	var i int
 	var p1 *uint8
 	var p2 *uint8
@@ -26,7 +26,7 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types.Str
 	var l_nbl uint
 	var decoded_len int
 	var buf_size int
-	var retval *types.String
+	var retval *types2.String
 	var hexval_tbl []uint = []uint{64, 64, 64, 64, 64, 64, 64, 64, 64, 32, 16, 64, 64, 16, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 32, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 64, 64, 64, 64, 64, 64, 64, 10, 11, 12, 13, 14, 15, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 10, 11, 12, 13, 14, 15, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64}
 	if replace_us_by_ws != 0 {
 		replace_us_by_ws = '_'
@@ -43,7 +43,7 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types.Str
 		p1++
 		i--
 	}
-	retval = types.ZendStringAlloc(buf_size, 0)
+	retval = types2.ZendStringAlloc(buf_size, 0)
 	i = length
 	p1 = str
 	p2 = (*uint8)(retval.GetVal())
@@ -103,13 +103,13 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types.Str
 	retval.SetLen(decoded_len)
 	return retval
 }
-func PhpQuotPrintEncode(str *uint8, length int) *types.String {
+func PhpQuotPrintEncode(str *uint8, length int) *types2.String {
 	var lp zend.ZendUlong = 0
 	var c uint8
 	var d *uint8
 	var hex *byte = "0123456789ABCDEF"
-	var ret *types.String
-	ret = types.ZendStringSafeAlloc(3, length+(3*length/(PHP_QPRINT_MAXL-9)+1), 0, 0)
+	var ret *types2.String
+	ret = types2.ZendStringSafeAlloc(3, length+(3*length/(PHP_QPRINT_MAXL-9)+1), 0, 0)
 	d = (*uint8)(ret.GetVal())
 	for b.PostDec(&length) {
 		if b.Assign(&c, b.PostInc(&(*str))) == '0' && (*str) == '0' && length > 0 {
@@ -141,13 +141,13 @@ func PhpQuotPrintEncode(str *uint8, length int) *types.String {
 		}
 	}
 	*d = '0'
-	ret = types.ZendStringTruncate(ret, d-(*uint8)(ret.GetVal()))
+	ret = types2.ZendStringTruncate(ret, d-(*uint8)(ret.GetVal()))
 	return ret
 }
-func ZifQuotedPrintableDecode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var arg1 *types.String
+func ZifQuotedPrintableDecode(executeData zpp.Ex, return_value zpp.Ret, str *types2.Zval) {
+	var arg1 *types2.String
 	var str_in *byte
-	var str_out *types.String
+	var str_out *types2.String
 	var i int = 0
 	var j int = 0
 	var k int
@@ -170,7 +170,7 @@ func ZifQuotedPrintableDecode(executeData zpp.Ex, return_value zpp.Ret, str *typ
 		return
 	}
 	str_in = arg1.GetVal()
-	str_out = types.ZendStringAlloc(arg1.GetLen(), 0)
+	str_out = types2.ZendStringAlloc(arg1.GetLen(), 0)
 	for str_in[i] {
 		switch str_in[i] {
 		case '=':
@@ -224,9 +224,9 @@ func ZifQuotedPrintableDecode(executeData zpp.Ex, return_value zpp.Ret, str *typ
 	str_out.SetLen(j)
 	return_value.SetString(str_out)
 }
-func ZifQuotedPrintableEncode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var str *types.String
-	var new_str *types.String
+func ZifQuotedPrintableEncode(executeData zpp.Ex, return_value zpp.Ret, str *types2.Zval) {
+	var str *types2.String
+	var new_str *types2.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 1, 0)

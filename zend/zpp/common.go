@@ -2,8 +2,8 @@ package zpp
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func CheckNumArgsNoneError(executeData ExecuteData) bool {
@@ -42,7 +42,7 @@ func CheckNumArgsEx(numArgs int, executeData ExecuteData, minNumArgs int, maxNum
 	return false
 }
 
-func ZendParseArgStrWeak(arg *types.Zval, dest **types.String) int {
+func ZendParseArgStrWeak(arg *types2.Zval, dest **types2.String) int {
 	if val, ok := ParseZStrWeak(arg); ok {
 		*dest = val
 		return 1

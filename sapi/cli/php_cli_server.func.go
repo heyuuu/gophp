@@ -5,9 +5,9 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"log"
 	"net/http"
@@ -63,13 +63,13 @@ func AppendHttpStatusLine(buffer *zend.SmartStr, protocol_version int, response_
 func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, persistent int) {
 	var val *byte
 	var tv __struct__timeval = __struct__timeval{0}
-	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host")) {
+	if nil != b.Assign(&val, types2.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host")) {
 		buffer.AppendString("Host: ")
 		buffer.AppendString(b.CastStrAuto(val))
 		buffer.AppendString("\r\n")
 	}
 	if !(gettimeofday(&tv, nil)) {
-		var dt *types.String = php_format_date("D, d M Y H:i:s", b.SizeOf("\"D, d M Y H:i:s\"")-1, tv.tv_sec, 0)
+		var dt *types2.String = php_format_date("D, d M Y H:i:s", b.SizeOf("\"D, d M Y H:i:s\"")-1, tv.tv_sec, 0)
 		buffer.AppendString("Date: ")
 		buffer.AppendString(b.CastStrAuto(dt.GetVal()))
 		buffer.AppendString(" GMT\r\n")
@@ -89,19 +89,19 @@ func GetMimeType(server *PhpCliServer, ext *byte, ext_len int) *byte {
 //@zif -alias getallheaders
 func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 	var client *PhpCliServerClient
-	var headers *types.Array
-	var key *types.String
+	var headers *types2.Array
+	var key *types2.String
 	var value *byte
-	var tmp types.Zval
+	var tmp types2.Zval
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	client = core.SG__().server_context
 	headers = client.GetRequest().GetHeadersOriginalCase()
 	zend.ArrayInitSize(return_value, headers.Len())
-	var __ht *types.Array = headers
+	var __ht *types2.Array = headers
 	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
+		var _z *types2.Zval = _p.GetVal()
 
 		key = _p.GetKey()
 		value = _z.Ptr()
@@ -109,7 +109,7 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 		return_value.Array().SymtableUpdate(key.GetStr(), &tmp)
 	}
 }
-func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
+func AddResponseHeader(h *core.SapiHeader, return_value *types2.Zval) {
 	var s *byte
 	var p *byte
 	var len_ ptrdiff_t
@@ -145,11 +145,11 @@ func ZifApacheResponseHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 }
 func ZmStartupCliServer(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmShutdownCliServer(type_ int, module_number int) int {
 	zend.UNREGISTER_INI_ENTRIES(module_number)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmInfoCliServer(ZEND_MODULE_INFO_FUNC_ARGS) { zend.DISPLAY_INI_ENTRIES() }
 func SapiCliServerDiscardHeaders(sapi_headers *core.SapiHeaders) int {
@@ -186,7 +186,7 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 func SapiCliServerReadCookies() *byte {
 	var client *PhpCliServerClient = core.SG__().server_context
 	var val *byte
-	if nil == b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "cookie")) {
+	if nil == b.Assign(&val, types2.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "cookie")) {
 		return nil
 	}
 	return val
@@ -202,7 +202,7 @@ func SapiCliServerReadPost(buf *byte, count_bytes int) int {
 	}
 	return 0
 }
-func SapiCliServerRegisterVariable(track_vars_array *types.Zval, key *byte, val *byte) {
+func SapiCliServerRegisterVariable(track_vars_array *types2.Zval, key *byte, val *byte) {
 	var new_val *byte = (*byte)(val)
 	var new_val_len int
 	if nil == val {
@@ -212,8 +212,8 @@ func SapiCliServerRegisterVariable(track_vars_array *types.Zval, key *byte, val 
 		core.PhpRegisterVariableSafe(b.CastStrAuto((*byte)(key)), b.CastStr(new_val, new_val_len), track_vars_array)
 	}
 }
-func SapiCliServerRegisterEntryCb(entry **byte, num_args int, va []any, hash_key *types.ArrayKey) int {
-	var track_vars_array *types.Zval = b.VaArg(&va).(*types.Zval)
+func SapiCliServerRegisterEntryCb(entry **byte, num_args int, va []any, hash_key *types2.ArrayKey) int {
+	var track_vars_array *types2.Zval = b.VaArg(&va).(*types2.Zval)
 	if hash_key.IsStrKey() {
 		var keyBuf strings.Builder
 		for _, c := range []byte(hash_key.StrKey()) {
@@ -233,9 +233,9 @@ func SapiCliServerRegisterEntryCb(entry **byte, num_args int, va []any, hash_key
 		zend.Efree(key)
 		zend.Efree(real_key)
 	}
-	return types.ArrayApplyKeep
+	return types2.ArrayApplyKeep
 }
-func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
+func SapiCliServerRegisterVariables(track_vars_array *types2.Zval) {
 	var client *PhpCliServerClient = core.SG__().server_context
 	SapiCliServerRegisterVariable(track_vars_array, "DOCUMENT_ROOT", client.GetServer().GetDocumentRoot())
 	var tmp *byte
@@ -294,7 +294,7 @@ func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 	if client.GetRequest().GetQueryString() != nil {
 		SapiCliServerRegisterVariable(track_vars_array, "QUERY_STRING", client.GetRequest().GetQueryString())
 	}
-	types.ZendHashApplyWithArguments(client.GetRequest().GetHeaders(), types.ApplyFuncArgsT(SapiCliServerRegisterEntryCb), 1, track_vars_array)
+	types2.ZendHashApplyWithArguments(client.GetRequest().GetHeaders(), types2.ApplyFuncArgsT(SapiCliServerRegisterEntryCb), 1, track_vars_array)
 }
 func SapiCliServerLogWrite(type_ int, msg *byte) {
 	var buf []byte
@@ -321,7 +321,7 @@ func PhpCliServerPollerCtor(poller *PhpCliServerPoller) int {
 	FD_ZERO(poller.GetRfds())
 	FD_ZERO(poller.GetWfds())
 	poller.SetMaxFd(-1)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpCliServerPollerAdd(poller *PhpCliServerPoller, mode int, fd core.PhpSocketT) {
 	if (mode & POLLIN) != 0 {
@@ -496,7 +496,7 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 	var basic_buf *byte
 	var message_buf *byte = ""
 	var error_buf *byte = ""
-	var append_error_message types.ZendBool = 0
+	var append_error_message types2.ZendBool = 0
 	if core.PG__().last_error_message {
 		switch core.PG__().last_error_type {
 		case faults.E_ERROR:
@@ -579,7 +579,7 @@ func PhpCliServerLogf(type_ int, format string, _ ...any) {
 	SapiCliServerLogWrite(type_, buf)
 	zend.Efree(buf)
 }
-func PhpNetworkListenSocket(host *byte, port *int, socktype int, af *int, socklen *socklen_t, errstr **types.String) core.PhpSocketT {
+func PhpNetworkListenSocket(host *byte, port *int, socktype int, af *int, socklen *socklen_t, errstr **types2.String) core.PhpSocketT {
 	var retval core.PhpSocketT = core.SOCK_ERR
 	var err int = 0
 	var sa *__struct__sockaddr = nil
@@ -745,7 +745,7 @@ func PhpCliServerClientPopulateRequestInfo(client *PhpCliServerClient, request_i
 	request_info.SetAuthDigest(nil)
 	request_info.SetAuthPassword(request_info.GetAuthDigest())
 	request_info.SetAuthUser(request_info.GetAuthPassword())
-	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "content-type")) {
+	if nil != b.Assign(&val, types2.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "content-type")) {
 		request_info.SetContentType(val)
 	}
 }
@@ -755,7 +755,7 @@ func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, cl
 	client.SetSock(client_sock)
 	client.SetAddr(addr)
 	client.SetAddrLen(addr_len)
-	var addr_str *types.String = 0
+	var addr_str *types2.String = 0
 	core.PhpNetworkPopulateNameFromSockaddr(addr, addr_len, &addr_str, nil, 0)
 	client.SetAddrStr(zend.Pestrndup(addr_str.GetVal(), addr_str.GetLen()))
 	client.SetAddrStrLen(addr_str.GetLen())
@@ -787,10 +787,10 @@ func PhpCliServerClientDtor(client *PhpCliServerClient) {
 }
 func PhpCliServerCloseConnection(server *PhpCliServer, client *PhpCliServerClient) {
 	PhpCliServerLogf(PHP_CLI_SERVER_LOG_MESSAGE, "%s Closing", client.GetAddrStr())
-	types.ZendHashIndexDel(server.GetClients(), client.GetSock())
+	types2.ZendHashIndexDel(server.GetClients(), client.GetSock())
 }
 func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient, status int) int {
-	var escaped_request_uri *types.String = nil
+	var escaped_request_uri *types2.String = nil
 	var status_string *byte = GetStatusString(status)
 	var content_template string = GetTemplateString(status)
 	var errstr *byte = GetLastError()
@@ -860,13 +860,13 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 		zend.Pefree(errstr, 1)
 	}
 	//types.ZendStringFree(escaped_request_uri)
-	return types.SUCCESS
+	return types2.SUCCESS
 fail:
 	if errstr != nil {
 		zend.Pefree(errstr, 1)
 	}
 	//types.ZendStringFree(escaped_request_uri)
-	return types.FAILURE
+	return types2.FAILURE
 }
 func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient) int {
 	if strlen(client.GetRequest().GetPathTranslated()) != client.GetRequest().GetPathTranslatedLen() {
@@ -883,7 +883,7 @@ func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient
 		core.PhpExecuteScript(zfd)
 	})
 	PhpCliServerLogResponse(client, core.SG__().sapi_headers.http_response_code, nil)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClient) int {
 	var fd int
@@ -917,7 +917,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 		/* out of memory */
 
 		PhpCliServerLogResponse(client, 500, nil)
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	AppendEssentialHeaders(&buffer, client, 1)
 	if mime_type != nil {
@@ -936,29 +936,29 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 	if chunk == nil {
 		buffer.Free()
 		PhpCliServerLogResponse(client, 500, nil)
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	PhpCliServerBufferAppend(client.GetContentSender().GetBuffer(), chunk)
 	PhpCliServerLogResponse(client, 200, nil)
 	PhpCliServerPollerAdd(server.GetPoller(), POLLOUT, client.GetSock())
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient) int {
 	var auth *byte
 	PhpCliServerClientPopulateRequestInfo(client, &(core.SG__().RequestInfo))
-	if nil != b.Assign(&auth, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization")) {
+	if nil != b.Assign(&auth, types2.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization")) {
 		core.PhpHandleAuthData(auth)
 	}
 	core.SG__().sapi_headers.http_response_code = 200
-	if types.FAILURE == core.PhpRequestStartup() {
+	if types2.FAILURE == core.PhpRequestStartup() {
 
 		/* should never be happen */
 
 		DestroyRequestInfo(&(core.SG__().RequestInfo))
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	core.PG__().during_request_startup = 0
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClient) int {
 	core.PhpRequestShutdown(0)
@@ -966,7 +966,7 @@ func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClien
 	DestroyRequestInfo(&(core.SG__().RequestInfo))
 	core.SG__().server_context = nil
 	core.SG__().rfc1867_uploaded_files = nil
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient) int {
 	var decline = false
@@ -977,7 +977,7 @@ func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient
 	core.PhpIgnoreValue(zend.VCWD_GETCWD(old_cwd, core.MAXPATHLEN-1))
 	zfd = zend.NewFileHandleByFilename(server.GetRouter())
 	faults.Try(func() {
-		var retval types.Zval
+		var retval types2.Zval
 		retval.SetUndef()
 		if zend.ZendExecuteScriptsEx(zend.ZEND_REQUIRE, &retval, zfd) {
 			decline = retval.IsFalse()
@@ -989,7 +989,7 @@ func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient
 		core.PhpIgnoreValue(zend.VCWD_CHDIR(old_cwd))
 	}
 	zend.FreeAlloca(old_cwd, use_heap)
-	return types.IntBool(decline)
+	return types2.IntBool(decline)
 }
 func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int {
 	var is_static_file int = 0
@@ -1001,26 +1001,26 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 		is_static_file = 1
 	}
 	if server.GetRouter() != nil || is_static_file == 0 {
-		if types.FAILURE == PhpCliServerRequestStartup(server, client) {
+		if types2.FAILURE == PhpCliServerRequestStartup(server, client) {
 			core.SG__().server_context = nil
 			PhpCliServerCloseConnection(server, client)
 			DestroyRequestInfo(&(core.SG__().RequestInfo))
-			return types.SUCCESS
+			return types2.SUCCESS
 		}
 	}
 	if server.GetRouter() != nil {
 		if PhpCliServerDispatchRouter(server, client) == 0 {
 			PhpCliServerRequestShutdown(server, client)
-			return types.SUCCESS
+			return types2.SUCCESS
 		}
 	}
 	if is_static_file == 0 {
-		if types.SUCCESS == PhpCliServerDispatchScript(server, client) || types.SUCCESS != PhpCliServerSendErrorPage(server, client, 500) {
+		if types2.SUCCESS == PhpCliServerDispatchScript(server, client) || types2.SUCCESS != PhpCliServerSendErrorPage(server, client, 500) {
 			if core.SG__().sapi_headers.http_response_code == 304 {
 				core.SG__().sapi_headers.send_default_content_type = 0
 			}
 			PhpCliServerRequestShutdown(server, client)
-			return types.SUCCESS
+			return types2.SUCCESS
 		}
 	} else {
 		if server.GetRouter() != nil {
@@ -1039,15 +1039,15 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 			core.SG__().sapi_headers.send_default_content_type = 1
 			core.SG__().rfc1867_uploaded_files = nil
 		}
-		if types.SUCCESS != PhpCliServerBeginSendStatic(server, client) {
+		if types2.SUCCESS != PhpCliServerBeginSendStatic(server, client) {
 			PhpCliServerCloseConnection(server, client)
 		}
 		core.SG__().server_context = nil
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 	core.SG__().server_context = nil
 	DestroyRequestInfo(&(core.SG__().RequestInfo))
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpCliServerDtor(server *PhpCliServer) {
 	server.GetClients().Destroy()
@@ -1068,7 +1068,7 @@ func PhpCliServerDtor(server *PhpCliServer) {
 		for php_cli_server_worker = 0; php_cli_server_worker < PhpCliServerWorkersMax; php_cli_server_worker++ {
 			var php_cli_server_worker_status int
 			for {
-				if waitpid(PhpCliServerWorkers[php_cli_server_worker], &php_cli_server_worker_status, 0) == types.FAILURE {
+				if waitpid(PhpCliServerWorkers[php_cli_server_worker], &php_cli_server_worker_status, 0) == types2.FAILURE {
 
 					/* an extremely bad thing happened */
 
@@ -1085,7 +1085,7 @@ func PhpCliServerDtor(server *PhpCliServer) {
 		zend.Free(PhpCliServerWorkers)
 	}
 }
-func PhpCliServerClientDtorWrapper(zv *types.Zval) {
+func PhpCliServerClientDtorWrapper(zv *types2.Zval) {
 	var p *PhpCliServerClient = zv.Ptr()
 	shutdown(p.GetSock(), core.SHUT_RDWR)
 	core.Closesocket(p.GetSock())
@@ -1126,8 +1126,8 @@ func parseServerAddr(addr string) (host string, port int, ok bool) {
 }
 
 func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, router string) bool {
-	var retval int = types.SUCCESS
-	var errstr *types.String = nil
+	var retval int = types2.SUCCESS
+	var errstr *types2.String = nil
 	var _router *byte = nil
 	var err int = 0
 	var server_sock core.PhpSocketT = core.SOCK_ERR
@@ -1136,7 +1136,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, r
 	host, port, ok := parseServerAddr(addr)
 	if !ok {
 		log.Printf("Invalid address: %s\n", addr)
-		retval = types.FAILURE
+		retval = types2.FAILURE
 		goto out
 	}
 
@@ -1146,28 +1146,28 @@ func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, r
 		if errstr != nil {
 			// types.ZendStringReleaseEx(errstr, 0)
 		}
-		retval = types.FAILURE
+		retval = types2.FAILURE
 		goto out
 	}
 	server.SetServerSock(server_sock)
 	err = PhpCliServerPollerCtor(server.GetPoller())
-	if types.SUCCESS != err {
+	if types2.SUCCESS != err {
 		goto out
 	}
 	PhpCliServerPollerAdd(server.GetPoller(), POLLIN, server_sock)
 	server.SetHostStr(host)
 	server.SetPort(port)
-	server.clients = *types.NewArrayEx(0, PhpCliServerClientDtorWrapper)
+	server.clients = *types2.NewArrayEx(0, PhpCliServerClientDtorWrapper)
 	server.SetDocumentRootStr(document_root)
 	server.SetRouterStr(router)
 	server.SetIsRunning(1)
 out:
-	if retval != types.SUCCESS {
+	if retval != types2.SUCCESS {
 		if server_sock > -1 {
 			core.Closesocket(server_sock)
 		}
 	}
-	return retval == types.SUCCESS
+	return retval == types2.SUCCESS
 }
 func PhpCliServerRecvEventReadRequest(server *PhpCliServer, client *PhpCliServerClient, request *http.Request) int {
 	var status int = PhpCliServerClientReadRequest(client, request)
@@ -1176,7 +1176,7 @@ func PhpCliServerRecvEventReadRequest(server *PhpCliServer, client *PhpCliServer
 	} else if status == 1 {
 		PhpCliServerDispatch(server, client)
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpCliServerSendEvent(server *PhpCliServer, client *PhpCliServerClient) int {
 	if client.GetContentSenderInitialized() != 0 {
@@ -1184,7 +1184,7 @@ func PhpCliServerSendEvent(server *PhpCliServer, client *PhpCliServerClient) int
 			var nbytes_read int
 			if PhpCliServerContentSenderPull(client.GetContentSender(), client.GetFileFd(), &nbytes_read) != 0 {
 				PhpCliServerCloseConnection(server, client)
-				return types.FAILURE
+				return types2.FAILURE
 			}
 			if nbytes_read == 0 {
 				close(client.GetFileFd())
@@ -1195,13 +1195,13 @@ func PhpCliServerSendEvent(server *PhpCliServer, client *PhpCliServerClient) int
 		var err int = PhpCliServerContentSenderSend(client.GetContentSender(), client.GetSock(), &nbytes_sent)
 		if err != 0 && err != SOCK_EAGAIN {
 			PhpCliServerCloseConnection(server, client)
-			return types.FAILURE
+			return types2.FAILURE
 		}
 		if client.GetContentSender().GetBuffer().GetFirst() == nil && client.GetFileFd() < 0 {
 			PhpCliServerCloseConnection(server, client)
 		}
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func DoCliServer(optArgs core.OptArgs) int {
 	var server_bind_address string

@@ -1,6 +1,8 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 // ZEND_NOP
 func vmNopHandler(executeData *ZendExecuteData) int {
@@ -11,18 +13,18 @@ func vmNopHandler(executeData *ZendExecuteData) int {
 // ZEND_ADD
 func vmAddHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = executeData.Op1(opline, opMode1)
-	var op2 *types.Zval = executeData.Op2(opline, opMode1)
+	var op1 *types2.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types2.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
-	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+	case TYPE_PAIR(types2.IS_LONG, types2.IS_LONG):
 		result := opline.Result()
 		FastLongAddFunction(result, op1, op2)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+	case TYPE_PAIR(types2.IS_DOUBLE, types2.IS_DOUBLE),
+		TYPE_PAIR(types2.IS_LONG, types2.IS_DOUBLE),
+		TYPE_PAIR(types2.IS_DOUBLE, types2.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -59,18 +61,18 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 // ZEND_SUB
 func vmSubHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = executeData.Op1(opline, opMode1)
-	var op2 *types.Zval = executeData.Op2(opline, opMode1)
+	var op1 *types2.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types2.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
-	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+	case TYPE_PAIR(types2.IS_LONG, types2.IS_LONG):
 		result := opline.Result()
 		FastLongSubFunction(result, op1, op2)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+	case TYPE_PAIR(types2.IS_DOUBLE, types2.IS_DOUBLE),
+		TYPE_PAIR(types2.IS_LONG, types2.IS_DOUBLE),
+		TYPE_PAIR(types2.IS_DOUBLE, types2.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -107,24 +109,24 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 // ZEND_MUL
 func vmMulHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = executeData.Op1(opline, opMode1)
-	var op2 *types.Zval = executeData.Op2(opline, opMode1)
+	var op1 *types2.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types2.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
-	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+	case TYPE_PAIR(types2.IS_LONG, types2.IS_LONG):
 		var overflow ZendLong
 		result := opline.Result()
 		ZEND_SIGNED_MULTIPLY_LONG(op1.Long(), op2.Long(), result.Long(), result.Double(), overflow)
 		if overflow != 0 {
-			result.SetTypeInfo(types.IS_DOUBLE)
+			result.SetTypeInfo(types2.IS_DOUBLE)
 		} else {
-			result.SetTypeInfo(types.IS_LONG)
+			result.SetTypeInfo(types2.IS_LONG)
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+	case TYPE_PAIR(types2.IS_DOUBLE, types2.IS_DOUBLE),
+		TYPE_PAIR(types2.IS_LONG, types2.IS_DOUBLE),
+		TYPE_PAIR(types2.IS_DOUBLE, types2.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -162,8 +164,8 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 func vmDivHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var freeOp1, freeOp2 ZendFreeOp
-	var op1 *types.Zval = executeData.Op1(opline, opMode2)
-	var op2 *types.Zval = executeData.Op2(opline, opMode2)
+	var op1 *types2.Zval = executeData.Op1(opline, opMode2)
+	var op2 *types2.Zval = executeData.Op2(opline, opMode2)
 	FastDivFunction(opline.Result(), op1, op2)
 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -172,8 +174,8 @@ func vmDivHandler(executeData *ZendExecuteData) int {
 // ZEND_MOD
 func vmModHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = executeData.Op1(opline, opMode1)
-	var op2 *types.Zval = executeData.Op2(opline, opMode1)
+	var op1 *types2.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types2.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	if op1.IsLong() && op2.IsLong() {
@@ -195,8 +197,8 @@ func vmModHandler(executeData *ZendExecuteData) int {
 // ZEND_SL
 func vmSlHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = executeData.Op1(opline, opMode1)
-	var op2 *types.Zval = executeData.Op2(opline, opMode1)
+	var op1 *types2.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types2.Zval = executeData.Op2(opline, opMode1)
 
 	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.Long() < SIZEOF_ZEND_LONG*8) != 0 {
 		/* Perform shift on unsigned numbers to get well-defined wrap behavior. */
@@ -209,8 +211,8 @@ func vmSlHandler(executeData *ZendExecuteData) int {
 // ZEND_SR
 func getSrHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = executeData.Op1(opline, opMode1)
-	var op2 *types.Zval = executeData.Op2(opline, opMode1)
+	var op1 *types2.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types2.Zval = executeData.Op2(opline, opMode1)
 
 	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.Long() < SIZEOF_ZEND_LONG*8) != 0 {
 		opline.Result().SetLong(op1.Long() >> op2.Long())
@@ -224,8 +226,8 @@ func getSrHandler(executeData *ZendExecuteData) int {
 func getConcatHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var freeOp1, freeOp2 ZendFreeOp
-	var op1 *types.Zval = executeData.Op1(opline, opMode1)
-	var op2 *types.Zval = executeData.Op2(opline, opMode1)
+	var op1 *types2.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types2.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	if op1.IsString() && op2.IsString() {

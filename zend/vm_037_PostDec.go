@@ -1,6 +1,8 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_POST_DEC_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()

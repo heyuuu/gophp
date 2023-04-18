@@ -2,8 +2,8 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"strconv"
 	"strings"
 )
@@ -85,7 +85,7 @@ func OpenFileForScanning(fileHandle *FileHandle) int {
 	if !ok {
 		/* Still add it to open_files to make destroy_file_handle work */
 		ZendLlistAddElement(CG__().open_files, fileHandle)
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	size := len(buf)
 
@@ -109,10 +109,10 @@ func OpenFileForScanning(fileHandle *FileHandle) int {
 		compiled_filename = fileHandle.filename
 	}
 	ZendSetCompiledFilename(compiled_filename)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func ZendCompile(type_ int) *types.ZendOpArray {
-	var op_array *types.ZendOpArray = nil
+func ZendCompile(type_ int) *types2.ZendOpArray {
+	var op_array *types2.ZendOpArray = nil
 	var original_in_compilation zend_bool = CG__().in_compilation
 	CG__().in_compilation = 1
 	CG__().ast = nil
@@ -149,10 +149,10 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 	CG__().in_compilation = original_in_compilation
 	return op_array
 }
-func CompileFilename(type_ int, filename *types.Zval) int {
-	var tmp types.Zval
+func CompileFilename(type_ int, filename *types2.Zval) int {
+	var tmp types2.Zval
 	var retval int
-	var opened_path *types.String = nil
+	var opened_path *types2.String = nil
 	if filename.IsString() {
 		tmp.SetStringVal(ZvalGetStrVal(filename))
 		filename = &tmp
@@ -174,16 +174,16 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 	}
 	return retval
 }
-func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
+func ZendPrepareStringForScanning(str *types2.Zval, filename string) int {
 	var buf *byte
 	var size int
 	var old_len int
-	var new_compiled_filename *types.String
+	var new_compiled_filename *types2.String
 
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
 	old_len = str.String().GetLen()
-	str.SetString(types.ZendStringExtend(str.String(), old_len+ZEND_MMAP_AHEAD))
+	str.SetString(types2.ZendStringExtend(str.String(), old_len+ZEND_MMAP_AHEAD))
 	memset(str.String().GetVal()+old_len, 0, ZEND_MMAP_AHEAD+1)
 	//LANG_SCNG__().yy_in = nil
 	LANG_SCNG__().yy_start = nil
@@ -196,18 +196,18 @@ func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
 	CG__().zend_lineno = 1
 	CG__().increment_lineno = 0
 	RESET_DOC_COMMENT()
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray {
+func CompileString(source_string *types2.Zval, filename *byte) *types2.ZendOpArray {
 	var original_lex_state ZendLexState
 	var op_array int = nil
-	var tmp types.Zval
+	var tmp types2.Zval
 	tmp.SetStringVal(ZvalGetStrVal(source_string))
 	if tmp.String().GetLen() == 0 {
 		return nil
 	}
 	ZendSaveLexicalState(&original_lex_state)
-	if ZendPrepareStringForScanning(&tmp, filename) == types.SUCCESS {
+	if ZendPrepareStringForScanning(&tmp, filename) == types2.SUCCESS {
 		BEGIN(ST_IN_SCRIPTING)
 		op_array = ZendCompile(ZEND_EVAL_CODE)
 	}
@@ -220,10 +220,10 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlight
 	var file_handle FileHandle
 	zend_stream_init_filename(&file_handle, filename)
 	ZendSaveLexicalState(&original_lex_state)
-	if OpenFileForScanning(&file_handle) == types.FAILURE {
+	if OpenFileForScanning(&file_handle) == types2.FAILURE {
 		zend_message_dispatcher(ZMSG_FAILED_HIGHLIGHT_FOPEN, filename)
 		ZendRestoreLexicalState(&original_lex_state)
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	zend_highlight(syntax_highlighter_ini)
 	if LANG_SCNG__().script_filtered {
@@ -232,21 +232,21 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlight
 	}
 	ZendDestroyFileHandle(&file_handle)
 	ZendRestoreLexicalState(&original_lex_state)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func HighlightString(str *types.Zval, syntax_highlighter_ini *zend_syntax_highlighter_ini, str_name *byte) int {
+func HighlightString(str *types2.Zval, syntax_highlighter_ini *zend_syntax_highlighter_ini, str_name *byte) int {
 	var original_lex_state ZendLexState
-	var tmp types.Zval
-	if Z_TYPE_P(str) != types.IS_STRING {
-		str = types.NewZvalString(ZvalGetStrVal(str))
+	var tmp types2.Zval
+	if Z_TYPE_P(str) != types2.IS_STRING {
+		str = types2.NewZvalString(ZvalGetStrVal(str))
 	}
 	ZendSaveLexicalState(&original_lex_state)
-	if ZendPrepareStringForScanning(str, str_name) == types.FAILURE {
+	if ZendPrepareStringForScanning(str, str_name) == types2.FAILURE {
 		ZendRestoreLexicalState(&original_lex_state)
 		if str == &tmp {
 			zval_ptr_dtor(&tmp)
 		}
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	BEGIN(INITIAL)
 	zend_highlight(syntax_highlighter_ini)
@@ -258,7 +258,7 @@ func HighlightString(str *types.Zval, syntax_highlighter_ini *zend_syntax_highli
 	if str == &tmp {
 		zval_ptr_dtor(&tmp)
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 
 func (sc *LangScanner) setEscapeString(str string, quoteType byte) bool {
@@ -416,7 +416,7 @@ func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 	return nil
 }
 
-func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
+func StripMultilineStringIndentation(zendlval *types2.Zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
 	var str *byte = zendlval.String().GetVal()
 	var end *byte = str + zendlval.String().GetLen()
 	var copy *byte = zendlval.String().GetVal()

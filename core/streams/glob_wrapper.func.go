@@ -3,8 +3,8 @@ package streams
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func _phpGlobStreamGetPath(stream *core.PhpStream, plen *int) *byte {

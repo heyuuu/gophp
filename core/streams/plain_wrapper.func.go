@@ -5,9 +5,9 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"os"
 )
 
@@ -35,7 +35,7 @@ func PhpStreamParseFopenModes(mode *byte, open_flags *int) int {
 
 		/* unknown mode */
 
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	if strchr(mode, '+') {
 		flags |= O_RDWR
@@ -45,7 +45,7 @@ func PhpStreamParseFopenModes(mode *byte, open_flags *int) int {
 		flags |= O_RDONLY
 	}
 	*open_flags = flags
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PHP_STDIOP_GET_FD(anfd int, data *PhpStdioStreamData) int {
 	if data.GetFile() != nil {
@@ -92,8 +92,8 @@ func _phpStreamFopenFromFileInt(file *r.File, mode *byte) *core.PhpStream {
 	self.SetFd(fileno(file))
 	return core.PhpStreamAllocRel(&PhpStreamStdioOps, self, 0, mode)
 }
-func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **types.String) *core.PhpStream {
-	var opened_path *types.String = nil
+func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **types2.String) *core.PhpStream {
+	var opened_path *types2.String = nil
 	var fd int
 	fd = core.PhpOpenTemporaryFd(dir, pfx, &opened_path)
 	if fd != -1 {
@@ -351,26 +351,26 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 				PhpStreamModeSanitizeFdopenFopencookie(stream, fixed_mode)
 				data.SetFile(fdopen(data.GetFd(), fixed_mode))
 				if data.GetFile() == nil {
-					return types.FAILURE
+					return types2.FAILURE
 				}
 			}
 			*((**r.File)(ret)) = data.GetFile()
 			data.SetFd(core.SOCK_ERR)
 		}
-		return types.SUCCESS
+		return types2.SUCCESS
 	case core.PHP_STREAM_AS_FD_FOR_SELECT:
 		PHP_STDIOP_GET_FD(fd, data)
 		if core.SOCK_ERR == fd {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 		if ret != nil {
 			*((*core.PhpSocketT)(ret)) = fd
 		}
-		return types.SUCCESS
+		return types2.SUCCESS
 	case core.PHP_STREAM_AS_FD:
 		PHP_STDIOP_GET_FD(fd, data)
 		if core.SOCK_ERR == fd {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 		if data.GetFile() != nil {
 			data.GetFile().Flush()
@@ -378,9 +378,9 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 		if ret != nil {
 			*((*core.PhpSocketT)(ret)) = fd
 		}
-		return types.SUCCESS
+		return types2.SUCCESS
 	default:
-		return types.FAILURE
+		return types2.FAILURE
 	}
 
 	/* as soon as someone touches the stdio layer, buffering may ensue,
@@ -429,7 +429,7 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 		if fd == -1 {
 			return -1
 		}
-		if types.ZendUintptrT(ptrparam == core.PHP_STREAM_LOCK_SUPPORTED) != 0 {
+		if types2.ZendUintptrT(ptrparam == core.PHP_STREAM_LOCK_SUPPORTED) != 0 {
 			return 0
 		}
 		if !(flock(fd, value)) {
@@ -555,7 +555,7 @@ func PhpPlainFilesDirOpener(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.String,
+	opened_path **types2.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var dir *DIR = nil
@@ -575,14 +575,14 @@ func PhpPlainFilesDirOpener(
 	}
 	return stream
 }
-func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.String, options int) *core.PhpStream {
+func _phpStreamFopen(filename *byte, mode *byte, opened_path **types2.String, options int) *core.PhpStream {
 	var realpath []byte
 	var open_flags int
 	var fd int
 	var ret *core.PhpStream
 	var persistent int = options & core.STREAM_OPEN_PERSISTENT
 	var persistent_id *byte = nil
-	if types.FAILURE == PhpStreamParseFopenModes(mode, &open_flags) {
+	if types2.FAILURE == PhpStreamParseFopenModes(mode, &open_flags) {
 		PhpStreamWrapperLogError(&PhpPlainFilesWrapper, options, "`%s' is not a valid mode for fopen", mode)
 		return nil
 	}
@@ -601,7 +601,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.String, opt
 
 				//TODO: avoid reallocation???
 
-				*opened_path = types.NewString(realpath)
+				*opened_path = types2.NewString(realpath)
 
 				//TODO: avoid reallocation???
 
@@ -621,7 +621,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.String, opt
 		}
 		if ret != nil {
 			if opened_path != nil {
-				*opened_path = types.NewString(realpath)
+				*opened_path = types2.NewString(realpath)
 			}
 			if persistent_id != nil {
 				zend.Efree(persistent_id)
@@ -673,7 +673,7 @@ func PhpPlainFilesStreamOpener(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.String,
+	opened_path **types2.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(path) != 0 {
@@ -883,7 +883,7 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 		fallthrough
 	case core.PHP_STREAM_META_OWNER:
 		if option == core.PHP_STREAM_META_OWNER_NAME {
-			if PhpGetUidByName((*byte)(value), &uid) != types.SUCCESS {
+			if PhpGetUidByName((*byte)(value), &uid) != types2.SUCCESS {
 				core.PhpErrorDocref1(nil, url, faults.E_WARNING, "Unable to find uid for %s", (*byte)(value))
 				return 0
 			}
@@ -895,7 +895,7 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 		fallthrough
 	case core.PHP_STREAM_META_GROUP_NAME:
 		if option == core.PHP_STREAM_META_GROUP_NAME {
-			if PhpGetGidByName((*byte)(value), &gid) != types.SUCCESS {
+			if PhpGetGidByName((*byte)(value), &gid) != types2.SUCCESS {
 				core.PhpErrorDocref1(nil, url, faults.E_WARNING, "Unable to find gid for %s", (*byte)(value))
 				return 0
 			}

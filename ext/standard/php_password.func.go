@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 func PhpPasswordAlgoIdentify(hash *types.String) *PhpPasswordAlgo {

@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 const FCGI_VERSION_1 = 1

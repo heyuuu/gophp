@@ -3,32 +3,32 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) types.ZendBool {
+func ZendVerifyWeakScalarTypeHint(type_hint types2.ZendUchar, arg *types2.Zval) types2.ZendBool {
 	switch type_hint {
-	case types.IS_BOOL:
+	case types2.IS_BOOL:
 		if val, ok := zpp.ParseBoolWeak(arg); ok {
 			// ZvalPtrDtor(arg)
 			arg.SetBool(val)
 			return 1
 		}
-	case types.IS_LONG:
+	case types2.IS_LONG:
 		if val, ok := zpp.ParseLongWeak(arg, false); ok {
 			// ZvalPtrDtor(arg)
 			arg.SetLong(val)
 			return 1
 		}
-	case types.IS_DOUBLE:
+	case types2.IS_DOUBLE:
 		if val, ok := zpp.ParseDoubleWeak(arg); ok {
 			// ZvalPtrDtor(arg)
 			arg.SetDouble(val)
 			return 1
 		}
-	case types.IS_STRING:
+	case types2.IS_STRING:
 		if val, ok := zpp.ParseZStrWeak(arg); ok {
 			arg.SetString(val)
 			return 1
@@ -36,10 +36,10 @@ func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) ty
 	}
 	return 0
 }
-func ZendVerifyScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval, strict types.ZendBool) types.ZendBool {
+func ZendVerifyScalarTypeHint(type_hint types2.ZendUchar, arg *types2.Zval, strict types2.ZendBool) types2.ZendBool {
 	if strict != 0 {
 		/* SSTH Exception: IS_LONG may be accepted as IS_DOUBLE (converted) */
-		if type_hint != types.IS_DOUBLE || arg.GetType() != types.IS_LONG {
+		if type_hint != types2.IS_DOUBLE || arg.GetType() != types2.IS_LONG {
 			return 0
 		}
 	} else if arg.IsNull() {
@@ -48,7 +48,7 @@ func ZendVerifyScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval, strict
 	}
 	return ZendVerifyWeakScalarTypeHint(type_hint, arg)
 }
-func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *types.Zval) {
+func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *types2.Zval) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 
@@ -63,14 +63,14 @@ func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *types.Zval) {
 	ZendFormatType(info.GetType(), &prop_type1, &prop_type2)
 	void(prop_type1)
 	if info.GetType().IsClass() {
-		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
+		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types2.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return types2.ZendGetTypeByConst(property.GetType()) }))
 	} else {
-		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
+		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types2.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return types2.ZendGetTypeByConst(property.GetType()) }))
 	}
 }
-func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) types.ZendBool {
-	var ce *types.ClassEntry
-	var name *types.String = type_.Name()
+func ZendResolveClassType(type_ *types2.ZendType, self_ce *types2.ClassEntry) types2.ZendBool {
+	var ce *types2.ClassEntry
+	var name *types2.String = type_.Name()
 	if ascii.StrCaseEquals(name.GetStr(), "self") {
 
 		/* We need to explicitly check for this here, to avoid updating the type in the trait and
@@ -94,47 +94,47 @@ func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) type
 		}
 	}
 	// types.ZendStringRelease(name)
-	*type_ = types.ZEND_TYPE_ENCODE_CE(ce, type_.AllowNull())
+	*type_ = types2.ZEND_TYPE_ENCODE_CE(ce, type_.AllowNull())
 	return 1
 }
-func IZendCheckPropertyType(info *ZendPropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
+func IZendCheckPropertyType(info *ZendPropertyInfo, property *types2.Zval, strict types2.ZendBool) types2.ZendBool {
 	b.Assert(!(property.IsReference()))
 	if info.GetType().IsClass() {
-		if property.GetType() != types.IS_OBJECT {
+		if property.GetType() != types2.IS_OBJECT {
 			return property.IsNull() && info.GetType().AllowNull()
 		}
 		if !(info.GetType().IsCe()) && ZendResolveClassType(info.GetType(), info.GetCe()) == 0 {
 			return 0
 		}
-		return InstanceofFunction(types.Z_OBJCE_P(property), info.GetType().Ce())
+		return InstanceofFunction(types2.Z_OBJCE_P(property), info.GetType().Ce())
 	}
-	b.Assert(info.GetType().Code() != types.IS_CALLABLE)
+	b.Assert(info.GetType().Code() != types2.IS_CALLABLE)
 	if info.GetType().Code() == property.GetType() {
 		return 1
 	} else if property.IsNull() {
 		return info.GetType().AllowNull()
-	} else if info.GetType().Code() == types.IS_BOOL && property.IsFalse() || property.IsTrue() {
+	} else if info.GetType().Code() == types2.IS_BOOL && property.IsFalse() || property.IsTrue() {
 		return 1
-	} else if info.GetType().Code() == types.IS_ITERABLE {
+	} else if info.GetType().Code() == types2.IS_ITERABLE {
 		return ZendIsIterable(property)
 	} else {
 		return ZendVerifyScalarTypeHint(info.GetType().Code(), property, strict)
 	}
 }
-func IZendVerifyPropertyType(info *ZendPropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
+func IZendVerifyPropertyType(info *ZendPropertyInfo, property *types2.Zval, strict types2.ZendBool) types2.ZendBool {
 	if IZendCheckPropertyType(info, property, strict) != 0 {
 		return 1
 	}
 	ZendVerifyPropertyTypeError(info, property)
 	return 0
 }
-func ZendVerifyPropertyType(info *ZendPropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
+func ZendVerifyPropertyType(info *ZendPropertyInfo, property *types2.Zval, strict types2.ZendBool) types2.ZendBool {
 	return IZendVerifyPropertyType(info, property, strict)
 }
-func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *types.Zval, value *types.Zval, executeData *ZendExecuteData) *types.Zval {
-	var tmp types.Zval
-	value = types.ZVAL_DEREF(value)
-	types.ZVAL_COPY(&tmp, value)
+func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *types2.Zval, value *types2.Zval, executeData *ZendExecuteData) *types2.Zval {
+	var tmp types2.Zval
+	value = types2.ZVAL_DEREF(value)
+	types2.ZVAL_COPY(&tmp, value)
 	if IZendVerifyPropertyType(info, &tmp, executeData.IsCallUseStrictTypes()) == 0 {
 		// ZvalPtrDtor(&tmp)
 		return EG__().GetUninitializedZval()
@@ -142,25 +142,25 @@ func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *types.Zval, val
 	return ZendAssignToVariable(property_val, &tmp, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
 }
 func ZendCheckType(
-	type_ types.ZendType,
-	arg *types.Zval,
-	ce **types.ClassEntry,
+	type_ types2.ZendType,
+	arg *types2.Zval,
+	ce **types2.ClassEntry,
 	cache_slot *any,
-	default_value *types.Zval,
-	scope *types.ClassEntry,
-	is_return_type types.ZendBool,
-) types.ZendBool {
-	var ref *types.ZendReference = nil
+	default_value *types2.Zval,
+	scope *types2.ClassEntry,
+	is_return_type types2.ZendBool,
+) types2.ZendBool {
+	var ref *types2.ZendReference = nil
 	if !(type_.IsSet()) {
 		return 1
 	}
 	if arg.IsReference() {
 		ref = arg.Reference()
-		arg = types.Z_REFVAL_P(arg)
+		arg = types2.Z_REFVAL_P(arg)
 	}
 	if type_.IsClass() {
 		if *cache_slot {
-			*ce = (*types.ClassEntry)(*cache_slot)
+			*ce = (*types2.ClassEntry)(*cache_slot)
 		} else {
 			*ce = ZendFetchClass(type_.Name().GetStr(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if (*ce) == nil {
@@ -169,7 +169,7 @@ func ZendCheckType(
 			*cache_slot = any(*ce)
 		}
 		if arg.IsObject() {
-			return InstanceofFunction(types.Z_OBJCE_P(arg), *ce)
+			return InstanceofFunction(types2.Z_OBJCE_P(arg), *ce)
 		}
 		return arg.IsNull() && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0)
 	} else if type_.Code() == arg.GetType() {
@@ -184,11 +184,11 @@ func ZendCheckType(
 		/* Null passed to nullable type */
 
 	}
-	if type_.Code() == types.IS_CALLABLE {
+	if type_.Code() == types2.IS_CALLABLE {
 		return ZendIsCallable(arg, IS_CALLABLE_CHECK_SILENT, nil)
-	} else if type_.Code() == types.IS_ITERABLE {
+	} else if type_.Code() == types2.IS_ITERABLE {
 		return ZendIsIterable(arg)
-	} else if type_.Code() == types.IS_BOOL && arg.IsFalse() || arg.IsTrue() {
+	} else if type_.Code() == types2.IS_BOOL && arg.IsFalse() || arg.IsTrue() {
 		return 1
 	} else if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref) {
 		return 0
@@ -196,9 +196,9 @@ func ZendCheckType(
 		return ZendVerifyScalarTypeHint(type_.Code(), arg, b.CondF(is_return_type != 0, func() bool { return CurrEX().IsCallUseStrictTypes() }, func() bool { return CurrEX().IsArgUseStrictTypes() }))
 	}
 }
-func ZendVerifyArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
+func ZendVerifyArgType(zf types2.IFunction, arg_num uint32, arg *types2.Zval, default_value *types2.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo
-	var ce *types.ClassEntry
+	var ce *types2.ClassEntry
 	if arg_num <= zf.GetNumArgs() {
 		cur_arg_info = zf.GetArgInfo()[arg_num-1]
 	} else if zf.IsVariadic() {
@@ -213,9 +213,9 @@ func ZendVerifyArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, defa
 	}
 	return 1
 }
-func ZendVerifyRecvArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
+func ZendVerifyRecvArgType(zf types2.IFunction, arg_num uint32, arg *types2.Zval, default_value *types2.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo = zf.GetArgInfo()[arg_num-1]
-	var ce *types.ClassEntry
+	var ce *types2.ClassEntry
 	b.Assert(arg_num <= zf.GetNumArgs())
 	cur_arg_info = zf.GetArgInfo()[arg_num-1]
 	ce = nil
@@ -225,9 +225,9 @@ func ZendVerifyRecvArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, 
 	}
 	return 1
 }
-func ZendVerifyVariadicArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
+func ZendVerifyVariadicArgType(zf types2.IFunction, arg_num uint32, arg *types2.Zval, default_value *types2.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo
-	var ce *types.ClassEntry
+	var ce *types2.ClassEntry
 	b.Assert(arg_num > zf.GetNumArgs())
 	b.Assert(zf.IsVariadic())
 	cur_arg_info = zf.GetArgInfo()[zf.GetNumArgs()]
@@ -238,10 +238,10 @@ func ZendVerifyVariadicArgType(zf types.IFunction, arg_num uint32, arg *types.Zv
 	}
 	return 1
 }
-func ZendVerifyInternalArgTypes(fbc types.IFunction, call *ZendExecuteData) int {
+func ZendVerifyInternalArgTypes(fbc types2.IFunction, call *ZendExecuteData) int {
 	var i uint32
 	var num_args uint32 = call.NumArgs()
-	var p *types.Zval = call.Arg(1)
+	var p *types2.Zval = call.Arg(1)
 	var dummy_cache_slot any
 	for i = 0; i < num_args; i++ {
 		dummy_cache_slot = nil
@@ -261,7 +261,7 @@ func ZendMissingArgError(executeData *ZendExecuteData) {
 		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
 	}
 }
-func ZendVerifyReturnError(zf types.IFunction, ce *types.ClassEntry, value *types.Zval) {
+func ZendVerifyReturnError(zf types2.IFunction, ce *types2.ClassEntry, value *types2.Zval) {
 	var arg_info *ZendArgInfo = zf.GetArgInfo()[-1]
 	var fname *byte
 	var fsep *byte
@@ -274,20 +274,20 @@ func ZendVerifyReturnError(zf types.IFunction, ce *types.ClassEntry, value *type
 	ZendVerifyTypeErrorCommon(zf, arg_info, ce, value, &fname, &fsep, &fclass, &need_msg, &need_kind, &need_or_null, &given_msg, &given_kind)
 	faults.TypeError("Return value of %s%s%s() must %s%s%s, %s%s returned", fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
 }
-func ZendVerifyReturnType(zf types.IFunction, ret *types.Zval, cache_slot *any) {
+func ZendVerifyReturnType(zf types2.IFunction, ret *types2.Zval, cache_slot *any) {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
-	var ce *types.ClassEntry = nil
+	var ce *types2.ClassEntry = nil
 	if ZendCheckType(ret_info.GetType(), ret, &ce, cache_slot, nil, nil, 1) == 0 {
 		ZendVerifyReturnError(zf, ce, ret)
 	}
 }
-func ZendVerifyMissingReturnType(zf types.IFunction, cache_slot *any) int {
+func ZendVerifyMissingReturnType(zf types2.IFunction, cache_slot *any) int {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
-	if ret_info.GetType().IsSet() && ret_info.GetType().Code() != types.IS_VOID {
-		var ce *types.ClassEntry = nil
+	if ret_info.GetType().IsSet() && ret_info.GetType().Code() != types2.IS_VOID {
+		var ce *types2.ClassEntry = nil
 		if ret_info.GetType().IsClass() {
 			if *cache_slot {
-				ce = (*types.ClassEntry)(*cache_slot)
+				ce = (*types2.ClassEntry)(*cache_slot)
 			} else {
 				ce = ZendFetchClass(ret_info.GetType().Name().GetStr(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil {
@@ -306,13 +306,13 @@ func ZendUseObjectAsArray() {
 func ZendIllegalOffset() {
 	faults.Error(faults.E_WARNING, "Illegal offset type")
 }
-func ZendAssignToObjectDim(object *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	types.Z_OBJ_HT_P(object).GetWriteDimension()(object, dim, value)
+func ZendAssignToObjectDim(object *types2.Zval, dim *types2.Zval, value *types2.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	types2.Z_OBJ_HT_P(object).GetWriteDimension()(object, dim, value)
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(opline.Result(), value)
+		types2.ZVAL_COPY(opline.Result(), value)
 	}
 }
-func ZendBinaryOp(ret *types.Zval, op1 *types.Zval, op2 *types.Zval, opline *ZendOp) int {
+func ZendBinaryOp(ret *types2.Zval, op1 *types2.Zval, op2 *types2.Zval, opline *ZendOp) int {
 	var zend_binary_ops []BinaryOpType = []BinaryOpType{AddFunction, SubFunction, MulFunction, DivFunction, ModFunction, ShiftLeftFunction, ShiftRightFunction, ConcatFunction, BitwiseOrFunction, BitwiseAndFunction, BitwiseXorFunction, PowFunction}
 
 	/* size_t cast makes GCC to better optimize 64-bit PIC code */
@@ -320,30 +320,30 @@ func ZendBinaryOp(ret *types.Zval, op1 *types.Zval, op2 *types.Zval, opline *Zen
 	var opcode int = int(opline.GetExtendedValue())
 	return zend_binary_ops[opcode-ZEND_ADD](ret, op1, op2)
 }
-func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendBinaryAssignOpObjDim(object *types2.Zval, property *types2.Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	var free_op_data1 ZendFreeOp
-	var value *types.Zval
-	var z *types.Zval
-	var rv types.Zval
-	var res types.Zval
+	var value *types2.Zval
+	var z *types2.Zval
+	var rv types2.Zval
+	var res types2.Zval
 	value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data1)
-	if b.Assign(&z, types.Z_OBJ_HT_P(object).GetReadDimension()(object, property, BP_VAR_R, &rv)) != nil {
-		if z.IsObject() && types.Z_OBJ_HT_P(z).GetGet() != nil {
-			var rv2 types.Zval
-			var value *types.Zval = types.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
+	if b.Assign(&z, types2.Z_OBJ_HT_P(object).GetReadDimension()(object, property, BP_VAR_R, &rv)) != nil {
+		if z.IsObject() && types2.Z_OBJ_HT_P(z).GetGet() != nil {
+			var rv2 types2.Zval
+			var value *types2.Zval = types2.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 			if z == &rv {
 				// ZvalPtrDtor(&rv)
 			}
 			z.CopyValueFrom(value)
 		}
-		if ZendBinaryOp(&res, z, value, opline) == types.SUCCESS {
-			types.Z_OBJ_HT_P(object).GetWriteDimension()(object, property, &res)
+		if ZendBinaryOp(&res, z, value, opline) == types2.SUCCESS {
+			types2.Z_OBJ_HT_P(object).GetWriteDimension()(object, property, &res)
 		}
 		if z == &rv {
 			// ZvalPtrDtor(&rv)
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.Result(), &res)
+			types2.ZVAL_COPY(opline.Result(), &res)
 		}
 		// ZvalPtrDtor(&res)
 	} else {
@@ -354,8 +354,8 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 	}
 	// 	FREE_OP(free_op_data1)
 }
-func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	var z_copy types.Zval
+func ZendBinaryAssignOpTypedRef(ref *types2.ZendReference, value *types2.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	var z_copy types2.Zval
 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */
 
@@ -367,13 +367,13 @@ func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opl
 	ZendBinaryOp(&z_copy, ref.GetVal(), value, opline)
 	if ZendVerifyRefAssignableZval(ref, &z_copy, executeData.IsCallUseStrictTypes()) != 0 {
 		// ZvalPtrDtor(ref.GetVal())
-		types.ZVAL_COPY_VALUE(ref.GetVal(), &z_copy)
+		types2.ZVAL_COPY_VALUE(ref.GetVal(), &z_copy)
 	} else {
 		// ZvalPtrDtor(&z_copy)
 	}
 }
-func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	var z_copy types.Zval
+func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *types2.Zval, value *types2.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	var z_copy types2.Zval
 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */
 
@@ -385,36 +385,36 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *types.Zval, 
 	ZendBinaryOp(&z_copy, zptr, value, opline)
 	if ZendVerifyPropertyType(prop_info, &z_copy, executeData.IsCallUseStrictTypes()) != 0 {
 		// ZvalPtrDtor(zptr)
-		types.ZVAL_COPY_VALUE(zptr, &z_copy)
+		types2.ZVAL_COPY_VALUE(zptr, &z_copy)
 	} else {
 		// ZvalPtrDtor(&z_copy)
 	}
 }
-func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteData) ZendLong {
+func ZendCheckStringOffset(dim *types2.Zval, type_ int, executeData *ZendExecuteData) ZendLong {
 	var offset ZendLong
 try_again:
-	if dim.GetType() != types.IS_LONG {
+	if dim.GetType() != types2.IS_LONG {
 		switch dim.GetType() {
-		case types.IS_STRING:
-			if types.IS_LONG == IsNumericString(dim.String().GetStr(), nil, nil, -1) {
+		case types2.IS_STRING:
+			if types2.IS_LONG == IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 				break
 			}
 			if type_ != BP_VAR_UNSET {
 				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.String().GetVal())
 			}
-		case types.IS_UNDEF:
+		case types2.IS_UNDEF:
 			ZVAL_UNDEFINED_OP2(executeData)
 			fallthrough
-		case types.IS_DOUBLE:
+		case types2.IS_DOUBLE:
 			fallthrough
-		case types.IS_NULL:
+		case types2.IS_NULL:
 			fallthrough
-		case types.IS_FALSE:
+		case types2.IS_FALSE:
 			fallthrough
-		case types.IS_TRUE:
+		case types2.IS_TRUE:
 			faults.Error(faults.E_NOTICE, "String offset cast occurred")
-		case types.IS_REFERENCE:
-			dim = types.Z_REFVAL_P(dim)
+		case types2.IS_REFERENCE:
+			dim = types2.Z_REFVAL_P(dim)
 			goto try_again
 		default:
 			ZendIllegalOffset()

@@ -1,25 +1,27 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
+	var container *types2.Zval
 	var result int
 	var hval ZendUlong
-	var offset *types.Zval
+	var offset *types2.Zval
 	container = opline.Const1()
 	offset = opline.Const2()
 	if container.IsArray() {
-		var ht *types.Array
-		var value *types.Zval
-		var str *types.String
+		var ht *types2.Array
+		var value *types2.Zval
+		var str *types2.String
 	isset_dim_obj_array:
 		ht = container.GetArr()
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
-			value = types.ZendHashFindInd(ht, str.GetStr())
+			value = types2.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.Long()()
 		num_index_prop:
@@ -35,7 +37,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types2.IS_NULL && (!(value.IsReference()) || types2.Z_REFVAL_P(value).GetType() != types2.IS_NULL)
 			{
 
 				/* avoid exception check */
@@ -67,33 +69,33 @@ isset_dim_obj_exit:
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp
-	var container *types.Zval
+	var container *types2.Zval
 	var result int
 	var hval ZendUlong
-	var offset *types.Zval
+	var offset *types2.Zval
 	container = opline.Const1()
 	offset = opline.Op2()
 	if container.IsArray() {
-		var ht *types.Array
-		var value *types.Zval
-		var str *types.String
+		var ht *types2.Array
+		var value *types2.Zval
+		var str *types2.String
 	isset_dim_obj_array:
 		ht = container.GetArr()
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index_prop
 				}
 			}
-			value = types.ZendHashFindInd(ht, str.GetStr())
+			value = types2.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
@@ -106,7 +108,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types2.IS_NULL && (!(value.IsReference()) || types2.Z_REFVAL_P(value).GetType() != types2.IS_NULL)
 			{
 
 				/* avoid exception check */
@@ -135,33 +137,33 @@ isset_dim_obj_exit:
 }
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
+	var container *types2.Zval
 	var result int
 	var hval ZendUlong
-	var offset *types.Zval
+	var offset *types2.Zval
 	container = opline.Const1()
 	offset = opline.Op2()
 	if container.IsArray() {
-		var ht *types.Array
-		var value *types.Zval
-		var str *types.String
+		var ht *types2.Array
+		var value *types2.Zval
+		var str *types2.String
 	isset_dim_obj_array:
 		ht = container.GetArr()
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index_prop
 				}
 			}
-			value = types.ZendHashFindInd(ht, str.GetStr())
+			value = types2.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
@@ -174,7 +176,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteDa
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types2.IS_NULL && (!(value.IsReference()) || types2.Z_REFVAL_P(value).GetType() != types2.IS_NULL)
 			{
 
 				/* avoid exception check */
@@ -202,22 +204,22 @@ isset_dim_obj_exit:
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var container *types.Zval
+	var container *types2.Zval
 	var result int
 	var hval ZendUlong
-	var offset *types.Zval
+	var offset *types2.Zval
 	container = opline.Op1()
 	offset = opline.Const2()
 	if container.IsArray() {
-		var ht *types.Array
-		var value *types.Zval
-		var str *types.String
+		var ht *types2.Array
+		var value *types2.Zval
+		var str *types2.String
 	isset_dim_obj_array:
 		ht = container.GetArr()
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
-			value = types.ZendHashFindInd(ht, str.GetStr())
+			value = types2.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.Long()()
 		num_index_prop:
@@ -233,7 +235,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types2.IS_NULL && (!(value.IsReference()) || types2.Z_REFVAL_P(value).GetType() != types2.IS_NULL)
 			{
 
 				/* avoid exception check */
@@ -247,7 +249,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
-		container = types.Z_REFVAL_P(container)
+		container = types2.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto isset_dim_obj_array
 		}
@@ -270,33 +272,33 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
-	var container *types.Zval
+	var container *types2.Zval
 	var result int
 	var hval ZendUlong
-	var offset *types.Zval
+	var offset *types2.Zval
 	container = opline.Op1()
 	offset = opline.Op2()
 	if container.IsArray() {
-		var ht *types.Array
-		var value *types.Zval
-		var str *types.String
+		var ht *types2.Array
+		var value *types2.Zval
+		var str *types2.String
 	isset_dim_obj_array:
 		ht = container.GetArr()
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index_prop
 				}
 			}
-			value = types.ZendHashFindInd(ht, str.GetStr())
+			value = types2.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
@@ -309,7 +311,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types2.IS_NULL && (!(value.IsReference()) || types2.Z_REFVAL_P(value).GetType() != types2.IS_NULL)
 			{
 
 				/* avoid exception check */
@@ -324,7 +326,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
-		container = types.Z_REFVAL_P(container)
+		container = types2.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto isset_dim_obj_array
 		}
@@ -344,33 +346,33 @@ isset_dim_obj_exit:
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var container *types.Zval
+	var container *types2.Zval
 	var result int
 	var hval ZendUlong
-	var offset *types.Zval
+	var offset *types2.Zval
 	container = opline.Op1()
 	offset = opline.Op2()
 	if container.IsArray() {
-		var ht *types.Array
-		var value *types.Zval
-		var str *types.String
+		var ht *types2.Array
+		var value *types2.Zval
+		var str *types2.String
 	isset_dim_obj_array:
 		ht = container.GetArr()
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index_prop
 				}
 			}
-			value = types.ZendHashFindInd(ht, str.GetStr())
+			value = types2.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
@@ -383,7 +385,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types2.IS_NULL && (!(value.IsReference()) || types2.Z_REFVAL_P(value).GetType() != types2.IS_NULL)
 			{
 
 				/* avoid exception check */
@@ -397,7 +399,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
-		container = types.Z_REFVAL_P(container)
+		container = types2.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto isset_dim_obj_array
 		}
@@ -415,22 +417,22 @@ isset_dim_obj_exit:
 }
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
+	var container *types2.Zval
 	var result int
 	var hval ZendUlong
-	var offset *types.Zval
+	var offset *types2.Zval
 	container = opline.Op1()
 	offset = opline.Const2()
 	if container.IsArray() {
-		var ht *types.Array
-		var value *types.Zval
-		var str *types.String
+		var ht *types2.Array
+		var value *types2.Zval
+		var str *types2.String
 	isset_dim_obj_array:
 		ht = container.GetArr()
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
-			value = types.ZendHashFindInd(ht, str.GetStr())
+			value = types2.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.Long()()
 		num_index_prop:
@@ -446,7 +448,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteDa
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types2.IS_NULL && (!(value.IsReference()) || types2.Z_REFVAL_P(value).GetType() != types2.IS_NULL)
 			{
 
 				/* avoid exception check */
@@ -460,7 +462,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteDa
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
-		container = types.Z_REFVAL_P(container)
+		container = types2.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto isset_dim_obj_array
 		}
@@ -481,33 +483,33 @@ isset_dim_obj_exit:
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp
-	var container *types.Zval
+	var container *types2.Zval
 	var result int
 	var hval ZendUlong
-	var offset *types.Zval
+	var offset *types2.Zval
 	container = opline.Op1()
 	offset = opline.Op2()
 	if container.IsArray() {
-		var ht *types.Array
-		var value *types.Zval
-		var str *types.String
+		var ht *types2.Array
+		var value *types2.Zval
+		var str *types2.String
 	isset_dim_obj_array:
 		ht = container.GetArr()
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index_prop
 				}
 			}
-			value = types.ZendHashFindInd(ht, str.GetStr())
+			value = types2.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
@@ -520,7 +522,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types2.IS_NULL && (!(value.IsReference()) || types2.Z_REFVAL_P(value).GetType() != types2.IS_NULL)
 			{
 
 				/* avoid exception check */
@@ -535,7 +537,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
-		container = types.Z_REFVAL_P(container)
+		container = types2.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto isset_dim_obj_array
 		}
@@ -553,33 +555,33 @@ isset_dim_obj_exit:
 }
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
+	var container *types2.Zval
 	var result int
 	var hval ZendUlong
-	var offset *types.Zval
+	var offset *types2.Zval
 	container = opline.Op1()
 	offset = opline.Op2()
 	if container.IsArray() {
-		var ht *types.Array
-		var value *types.Zval
-		var str *types.String
+		var ht *types2.Array
+		var value *types2.Zval
+		var str *types2.String
 	isset_dim_obj_array:
 		ht = container.GetArr()
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index_prop
 				}
 			}
-			value = types.ZendHashFindInd(ht, str.GetStr())
+			value = types2.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
@@ -592,7 +594,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types2.IS_NULL && (!(value.IsReference()) || types2.Z_REFVAL_P(value).GetType() != types2.IS_NULL)
 			{
 
 				/* avoid exception check */
@@ -606,7 +608,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
-		container = types.Z_REFVAL_P(container)
+		container = types2.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto isset_dim_obj_array
 		}

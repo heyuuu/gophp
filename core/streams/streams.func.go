@@ -5,18 +5,18 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PhpFileLeStream() int       { return LeStream }
 func PhpFileLePstream() int      { return LePstream }
 func PhpFileLeStreamFilter() int { return LeStreamFilter }
-func ForgetPersistentResourceIdNumbers(el *types.Zval) int {
+func ForgetPersistentResourceIdNumbers(el *types2.Zval) int {
 	var stream *core.PhpStream
-	var rsrc *types.ZendResource = el.Resource()
+	var rsrc *types2.ZendResource = el.Resource()
 	if rsrc.GetType() != LePstream {
 		return 0
 	}
@@ -29,15 +29,15 @@ func ForgetPersistentResourceIdNumbers(el *types.Zval) int {
 	return 0
 }
 func ZmDeactivateStreams(type_ int, module_number int) int {
-	var el *types.Zval
-	var __ht *types.Array = zend.EG__().GetPersistentList()
+	var el *types2.Zval
+	var __ht *types2.Array = zend.EG__().GetPersistentList()
 	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
+		var _z *types2.Zval = _p.GetVal()
 
 		el = _z
 		ForgetPersistentResourceIdNumbers(el)
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpStreamEncloses(enclosing *core.PhpStream, enclosed *core.PhpStream) *core.PhpStream {
 	var orig *core.PhpStream = enclosed.GetEnclosingStream()
@@ -46,20 +46,20 @@ func PhpStreamEncloses(enclosing *core.PhpStream, enclosed *core.PhpStream) *cor
 	return orig
 }
 func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int {
-	var le *types.ZendResource
-	if b.Assign(&le, types.ZendHashStrFindPtr(zend.EG__().GetPersistentList(), persistent_id)) != nil {
+	var le *types2.ZendResource
+	if b.Assign(&le, types2.ZendHashStrFindPtr(zend.EG__().GetPersistentList(), persistent_id)) != nil {
 		if le.GetType() == LePstream {
 			if stream != nil {
-				var regentry *types.ZendResource = nil
+				var regentry *types2.ZendResource = nil
 
 				/* see if this persistent resource already has been loaded to the
 				 * regular list; allowing the same resource in several entries in the
 				 * regular list causes trouble (see bug #54623) */
 
 				*stream = (*core.PhpStream)(le.GetPtr())
-				var __ht *types.Array = zend.EG__().GetRegularList()
+				var __ht *types2.Array = zend.EG__().GetRegularList()
 				for _, _p := range __ht.ForeachData() {
-					var _z *types.Zval = _p.GetVal()
+					var _z *types2.Zval = _p.GetVal()
 
 					regentry = _z.Ptr()
 					if regentry.GetPtr() == le.GetPtr() {
@@ -78,7 +78,7 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 	return core.PHP_STREAM_PERSISTENT_NOT_EXIST
 }
 func WrapperErrorDtor(error any) { zend.Efree(*((**byte)(error))) }
-func WrapperListDtor(item *types.Zval) {
+func WrapperListDtor(item *types2.Zval) {
 	var list *zend.ZendLlist = (*zend.ZendLlist)(item.Ptr())
 	list.Destroy()
 	zend.Efree(list)
@@ -98,12 +98,12 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 			zend.ALLOC_HASHTABLE(standard.FG__().wrapper_errors)
 			standard.FG__().GetWrapperErrors().Init(8, WrapperListDtor)
 		} else {
-			list = types.ZendHashStrFindPtr(standard.FG__().wrapper_errors, b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")))
+			list = types2.ZendHashStrFindPtr(standard.FG__().wrapper_errors, b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")))
 		}
 		if list == nil {
 			var new_list zend.ZendLlist
 			new_list.Init(b.SizeOf("buffer"), WrapperErrorDtor, 0)
-			list = types.ZendHashStrUpdateMem(standard.FG__().wrapper_errors, b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")), &new_list, b.SizeOf("new_list"))
+			list = types2.ZendHashStrUpdateMem(standard.FG__().wrapper_errors, b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")), &new_list, b.SizeOf("new_list"))
 		}
 
 		/* append to linked list */
@@ -117,7 +117,7 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *string {
 	return core.PhpStreamReadStr(stream, len_)
 }
-func PhpStreamLocateEol(stream *core.PhpStream, buf *types.String) *byte {
+func PhpStreamLocateEol(stream *core.PhpStream, buf *types2.String) *byte {
 	var avail int
 	var cr *byte
 	var lf *byte
@@ -181,8 +181,8 @@ func _phpStreamSearchDelim(stream *core.PhpStream, maxlen int, skiplen int, deli
 		return core.PhpMemnstr((*byte)(stream.GetReadbuf()[stream.GetReadpos()+skiplen]), delim, delim_len, (*byte)(stream.GetReadbuf()[stream.GetReadpos()+seek_len]))
 	}
 }
-func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_len int) *types.String {
-	var ret_buf *types.String
+func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_len int) *types2.String {
+	var ret_buf *types2.String
 	var found_delim *byte = nil
 	var buffered_len int
 	var tent_ret_len int
@@ -267,7 +267,7 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 		stream.SetReadpos(stream.GetReadpos() + delim_len)
 		stream.SetPosition(stream.GetPosition() + delim_len)
 	}
-	return types.NewStringSafe(retStr)
+	return types2.NewStringSafe(retStr)
 }
 func PhpStreamWrapperSchemeValidate(protocol string) bool {
 	for _, c := range []byte(protocol) {
@@ -289,29 +289,29 @@ func PhpUnregisterUrlStreamWrapper(protocol string) {
 func CloneWrapperHash() {
 	standard.FG__().SetStreamWrappers(b.CopyMap(UrlStreamWrappersHash))
 }
-func PhpRegisterUrlStreamWrapperVolatile(protocol *types.String, wrapper *core.PhpStreamWrapper) int {
+func PhpRegisterUrlStreamWrapperVolatile(protocol *types2.String, wrapper *core.PhpStreamWrapper) int {
 	if !PhpStreamWrapperSchemeValidate(protocol.GetStr()) {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	if standard.FG__().StreamWrappers() == nil {
 		CloneWrapperHash()
 	}
 	if _, exists := standard.FG__().StreamWrappers()[protocol.GetStr()]; exists {
-		return types.FAILURE
+		return types2.FAILURE
 	} else {
 		standard.FG__().StreamWrappers()[protocol.GetStr()] = wrapper
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 }
-func PhpUnregisterUrlStreamWrapperVolatile(protocol *types.String) int {
+func PhpUnregisterUrlStreamWrapperVolatile(protocol *types2.String) int {
 	if standard.FG__().StreamWrappers() != nil {
 		CloneWrapperHash()
 	}
 	if standard.FG__().StreamWrappers()[protocol.GetStr()] != nil {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	delete(standard.FG__().StreamWrappers(), protocol.GetStr())
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *core.PhpStreamWrapper {
 	var wrapper_hash map[string]*core.PhpStreamWrapper
@@ -396,7 +396,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 			}
 
 			/* Check again, the original check might have not known the protocol name */
-			wrapper = wrapper_hash[types.STR_FILE]
+			wrapper = wrapper_hash[types2.STR_FILE]
 			if wrapper != nil {
 				return wrapper
 			}
@@ -480,31 +480,31 @@ func PhpStreamNotificationFree(notifier *PhpStreamNotifier) {
 	}
 	zend.Efree(notifier)
 }
-func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername string, optionname string) *types.Zval {
-	var wrapperhash *types.Zval
+func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername string, optionname string) *types2.Zval {
+	var wrapperhash *types2.Zval
 	if nil == b.Assign(&wrapperhash, context.GetOptions().Array().KeyFind(b.CastStrAuto(wrappername))) {
 		return nil
 	}
 	return wrapperhash.Array().KeyFind(b.CastStrAuto(optionname))
 }
-func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte, optionname *byte, optionvalue *types.Zval) int {
-	var wrapperhash *types.Zval
-	var category types.Zval
-	types.SeparateArray(context.GetOptions())
+func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte, optionname *byte, optionvalue *types2.Zval) int {
+	var wrapperhash *types2.Zval
+	var category types2.Zval
+	types2.SeparateArray(context.GetOptions())
 	wrapperhash = context.GetOptions().Array().KeyFind(b.CastStrAuto(wrappername))
 	if nil == wrapperhash {
 		zend.ArrayInit(&category)
 		wrapperhash = context.GetOptions().Array().KeyUpdate(b.CastStr((*byte)(wrappername), strlen(wrappername)), &category)
 	}
-	optionvalue = types.ZVAL_DEREF(optionvalue)
+	optionvalue = types2.ZVAL_DEREF(optionvalue)
 	//optionvalue.TryAddRefcount()
-	types.SeparateArray(wrapperhash)
+	types2.SeparateArray(wrapperhash)
 	wrapperhash.Array().KeyUpdate(b.CastStrAuto(optionname), optionvalue)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func PhpStreamDirentAlphasort(a **types.String, b **types.String) int {
+func PhpStreamDirentAlphasort(a **types2.String, b **types2.String) int {
 	return strcoll(a.GetVal(), b.GetVal())
 }
-func PhpStreamDirentAlphasortr(a **types.String, b **types.String) int {
+func PhpStreamDirentAlphasortr(a **types2.String, b **types2.String) int {
 	return strcoll(b.GetVal(), a.GetVal())
 }

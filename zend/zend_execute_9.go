@@ -3,16 +3,16 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
-	var new_op_array *types.ZendOpArray = nil
-	var tmp_inc_filename types.Zval
+func ZendIncludeOrEval(inc_filename *types2.Zval, type_ int) *types2.ZendOpArray {
+	var new_op_array *types2.ZendOpArray = nil
+	var tmp_inc_filename types2.Zval
 	tmp_inc_filename.SetUndef()
-	if inc_filename.GetType() != types.IS_STRING {
-		var tmp *types.String = ZvalTryGetStringFunc(inc_filename)
+	if inc_filename.GetType() != types2.IS_STRING {
+		var tmp *types2.String = ZvalTryGetStringFunc(inc_filename)
 		if tmp == nil {
 			return nil
 		}
@@ -42,8 +42,8 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 			if fh.GetOpenedPath() == "" {
 				fh.SetOpenedPath(*resolved_path)
 			}
-			if types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), fh.GetOpenedPath().GetStr()) != nil {
-				var op_array *types.ZendOpArray = CompileFile(&fh, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
+			if types2.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), fh.GetOpenedPath().GetStr()) != nil {
+				var op_array *types2.ZendOpArray = CompileFile(&fh, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&fh)
 				if tmp_inc_filename.IsNotUndef() {
 
@@ -77,13 +77,13 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 	}
 	return new_op_array
 }
-func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
-	var fbc types.IFunction = call.GetFunc()
-	var object *types.ZendObject
+func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types2.Zval) int {
+	var fbc types2.IFunction = call.GetFunc()
+	var object *types2.ZendObject
 
 	/* Not sure what should be done here if it's a static method */
 
-	if call.GetThis().GetType() != types.IS_OBJECT {
+	if call.GetThis().GetType() != types2.IS_OBJECT {
 		ZendVmStackFreeArgs(call)
 		if fbc.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {
 			// types.ZendStringReleaseEx(fbc.GetFunctionName(), 0)
@@ -105,10 +105,10 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 	Efree(fbc)
 	return 1
 }
-func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, executeData *ZendExecuteData) types.ZendBool {
-	var ce *types.ClassEntry = types.Z_OBJCE_P(array_ptr)
+func ZendFeResetIterator(array_ptr *types2.Zval, by_ref int, opline *ZendOp, executeData *ZendExecuteData) types2.ZendBool {
+	var ce *types2.ClassEntry = types2.Z_OBJCE_P(array_ptr)
 	var iter *ZendObjectIterator = ce.GetGetIterator()(ce, array_ptr, by_ref)
-	var is_empty types.ZendBool
+	var is_empty types2.ZendBool
 	if iter == nil || EG__().GetException() != nil {
 		if iter != nil {
 			// OBJ_RELEASE(iter.GetStd())
@@ -128,7 +128,7 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 			return 1
 		}
 	}
-	is_empty = iter.GetFuncs().GetValid()(iter) != types.SUCCESS
+	is_empty = iter.GetFuncs().GetValid()(iter) != types2.SUCCESS
 	if EG__().GetException() != nil {
 		// OBJ_RELEASE(iter.GetStd())
 		opline.Result().SetUndef()
@@ -139,8 +139,8 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 	opline.Result().SetFeIterIdx(uint32 - 1)
 	return is_empty
 }
-func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int, opline *ZendOp, executeData *ZendExecuteData) int {
-	var orig_key *types.Zval = key
+func _zendQuickGetConstant(key *types2.Zval, flags uint32, check_defined_only int, opline *ZendOp, executeData *ZendExecuteData) int {
+	var orig_key *types2.Zval = key
 	var c *ZendConstant = nil
 	c = EG__().ConstantTable().Get(key.String().GetStr())
 	if c == nil {
@@ -178,17 +178,17 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 				opline.Result().SetUndef()
 			}
 		}
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	if check_defined_only == 0 {
-		types.ZVAL_COPY_OR_DUP(opline.Result(), c.Value())
+		types2.ZVAL_COPY_OR_DUP(opline.Result(), c.Value())
 		if !c.IsCaseSensitive() && !c.IsCtSubst() {
 			var ns_sep *byte
 			var shortname_offset int
 			var shortname_len int
-			var is_deprecated types.ZendBool
+			var is_deprecated types2.ZendBool
 			if (flags & IS_CONSTANT_UNQUALIFIED) != 0 {
-				var access_key *types.Zval
+				var access_key *types2.Zval
 				if (flags & IS_CONSTANT_IN_NAMESPACE) == 0 {
 					access_key = orig_key - 1
 				} else {
@@ -198,7 +198,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 						access_key = orig_key + 2
 					}
 				}
-				is_deprecated = types.IntBool(c.GetName().GetStr() != access_key.StringVal())
+				is_deprecated = types2.IntBool(c.GetName().GetStr() != access_key.StringVal())
 			} else {
 			check_short_name:
 
@@ -216,17 +216,17 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 			}
 			if is_deprecated != 0 {
 				faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
-				return types.SUCCESS
+				return types2.SUCCESS
 			}
 		}
 	}
 	CACHE_PTR(opline.GetExtendedValue(), c)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func ZendQuickGetConstant(key *types.Zval, flags uint32, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendQuickGetConstant(key *types2.Zval, flags uint32, opline *ZendOp, executeData *ZendExecuteData) {
 	_zendQuickGetConstant(key, flags, 0, opline, executeData)
 }
-func ZendQuickCheckConstant(key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) int {
+func ZendQuickCheckConstant(key *types2.Zval, opline *ZendOp, executeData *ZendExecuteData) int {
 	return _zendQuickGetConstant(key, 0, 1, opline, executeData)
 }
 func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData *ZendExecuteData) int {

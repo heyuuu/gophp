@@ -1,5 +1,10 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/types"
+)
+
 func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var arg_num uint32 = opline.GetOp1().GetNum()
@@ -9,9 +14,9 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if arg_num <= arg_count {
 		var param *types.Zval
 		ArrayInitSize(params, arg_count-arg_num+1)
-		types.ZendHashRealInitPacked(params.GetArr())
+		types.ZendHashRealInitPacked(params.Array())
 		for {
-			fillScope := types.PackedFillStart(params.GetArr())
+			fillScope := types.PackedFillStart(params.Array())
 			param = executeData.VarNum(executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T)
 			if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccHasTypeHints) != 0 {
 				ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)

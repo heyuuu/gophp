@@ -1,15 +1,17 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_INIT_FCALL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var fname *types.Zval
-	var fbc types.IFunction
+	var fname *types2.Zval
+	var fbc types2.IFunction
 	var call *ZendExecuteData
 	fbc = CACHED_PTR(opline.GetResult().GetNum())
 	if fbc == nil {
-		fname = (*types.Zval)(opline.Const2())
+		fname = (*types2.Zval)(opline.Const2())
 		fbc = EG__().FunctionTable().Get(fname.String().GetStr())
 		if fbc == nil {
 			return zend_undefined_function_helper_SPEC(executeData)

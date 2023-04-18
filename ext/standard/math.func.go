@@ -5,16 +5,16 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
 	"strconv"
 	"strings"
 )
 
-func zvalGetFloat(zv *types.Zval) (float64, bool) {
+func zvalGetFloat(zv *types2.Zval) (float64, bool) {
 	if zv.IsLong() {
 		return float64(zv.Long()), true
 	} else if zv.IsDouble() {
@@ -43,53 +43,53 @@ func phpRound(f float64, dec int, mode int) float64 {
 	return v
 }
 
-func ZifAbs(number *types.Zval) (*types.Zval, bool) {
+func ZifAbs(number *types2.Zval) (*types2.Zval, bool) {
 	switch number.GetType() {
-	case types.IS_DOUBLE:
+	case types2.IS_DOUBLE:
 		num := number.Double()
 		result := math.Abs(num)
-		return types.NewZvalDouble(result), true
-	case types.IS_LONG:
+		return types2.NewZvalDouble(result), true
+	case types2.IS_LONG:
 		num := number.Long()
 		if num == math.MinInt { // overflow
 			result := -float64(num)
-			return types.NewZvalDouble(result), true
+			return types2.NewZvalDouble(result), true
 		} else {
 			result := -num
-			return types.NewZvalLong(result), true
+			return types2.NewZvalLong(result), true
 		}
 	default:
 		return nil, false
 	}
 }
-func ZifCeil(number *types.Zval) (float64, bool) {
+func ZifCeil(number *types2.Zval) (float64, bool) {
 	zend.ConvertScalarToNumberEx(number)
 	switch number.GetType() {
-	case types.IS_DOUBLE:
+	case types2.IS_DOUBLE:
 		result := math.Ceil(number.Double())
 		return result, true
-	case types.IS_LONG:
+	case types2.IS_LONG:
 		result := float64(number.Long())
 		return result, true
 	default:
 		return 0, false
 	}
 }
-func ZifFloor(number *types.Zval) (float64, bool) {
+func ZifFloor(number *types2.Zval) (float64, bool) {
 	zend.ConvertScalarToNumberEx(number)
 	switch number.GetType() {
-	case types.IS_DOUBLE:
+	case types2.IS_DOUBLE:
 		result := math.Floor(number.Double())
 		return result, true
-	case types.IS_LONG:
+	case types2.IS_LONG:
 		result := float64(number.Long())
 		return result, true
 	default:
 		return 0, false
 	}
 }
-func ZifRound(number *types.Zval, _ zpp.Opt, precision int, mode_ *int) (float64, bool) {
-	var value *types.Zval = number
+func ZifRound(number *types2.Zval, _ zpp.Opt, precision int, mode_ *int) (float64, bool) {
+	var value *types2.Zval = number
 	var mode = b.Option(mode_, PHP_ROUND_HALF_UP)
 
 	precision = b.FixRange(precision, core.INT_MIN+1, core.INT_MAX)
@@ -154,7 +154,7 @@ func ZifIsInfinite(val float64) bool {
 func ZifIsNan(val float64) bool {
 	return math.IsNaN(val)
 }
-func ZifPow(returnValue zpp.Ret, base *types.Zval, exponent *types.Zval) {
+func ZifPow(returnValue zpp.Ret, base *types2.Zval, exponent *types2.Zval) {
 	zend.PowFunction(returnValue, base, exponent)
 }
 func ZifExp(number float64) float64 {
@@ -198,17 +198,17 @@ func ZifRad2deg(number float64) float64 {
 	return number / M_PI * 180
 }
 
-func _parseStringToNumberZval(s string, base int) (*types.Zval, bool) {
+func _parseStringToNumberZval(s string, base int) (*types2.Zval, bool) {
 	num, ok := _parseStringToNumber(s, base)
 	if !ok {
 		return nil, false
 	} else if num.IsInt() {
-		return types.NewZvalLong(num.Int()), true
+		return types2.NewZvalLong(num.Int()), true
 	} else {
-		return types.NewZvalDouble(num.Float()), true
+		return types2.NewZvalDouble(num.Float()), true
 	}
 }
-func _parseStringToNumber(s string, base int) (types.Number, bool) {
+func _parseStringToNumber(s string, base int) (types2.Number, bool) {
 	s = strings.TrimFunc(s, ascii.IsSpaceRune)
 	if len(s) >= 2 {
 		if base == 16 && (s[:2] == "0x" || s[:2] == "0X") {
@@ -256,21 +256,21 @@ func _parseStringToNumber(s string, base int) (types.Number, bool) {
 		faults.Error(faults.E_DEPRECATED, "Invalid characters passed for attempted conversion, these have been ignored")
 	}
 	if isFloat {
-		return types.FloatNumber(fnum), true
+		return types2.FloatNumber(fnum), true
 	} else {
-		return types.IntNumber(inum), true
+		return types2.IntNumber(inum), true
 	}
 }
 
-func ZifBindec(binaryNumber *types.Zval) (*types.Zval, bool) {
+func ZifBindec(binaryNumber *types2.Zval) (*types2.Zval, bool) {
 	zend.ConvertToStringEx(binaryNumber)
 	return _parseStringToNumberZval(binaryNumber.StringVal(), 2)
 }
-func ZifHexdec(hexadecimalNumber *types.Zval) (*types.Zval, bool) {
+func ZifHexdec(hexadecimalNumber *types2.Zval) (*types2.Zval, bool) {
 	zend.ConvertToStringEx(hexadecimalNumber)
 	return _parseStringToNumberZval(hexadecimalNumber.StringVal(), 16)
 }
-func ZifOctdec(octalNumber *types.Zval) (*types.Zval, bool) {
+func ZifOctdec(octalNumber *types2.Zval) (*types2.Zval, bool) {
 	zend.ConvertToStringEx(octalNumber)
 	return _parseStringToNumberZval(octalNumber.StringVal(), 8)
 }
@@ -283,7 +283,7 @@ func ZifDecoct(decimalNumber int) string {
 func ZifDechex(decimalNumber int) string {
 	return strconv.FormatInt(int64(decimalNumber), 16)
 }
-func ZifBaseConvert(number *types.Zval, frombase int, tobase int) (string, bool) {
+func ZifBaseConvert(number *types2.Zval, frombase int, tobase int) (string, bool) {
 	if zend.TryConvertToString(number) == 0 { // fail
 		return "", false
 	}

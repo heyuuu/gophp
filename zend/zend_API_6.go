@@ -2,12 +2,12 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functionTable FunctionTable) {
+func ZendUnregisterFunctions(functions []types2.FunctionEntry, count int, functionTable FunctionTable) {
 	targetFunctionTable := functionTable
 	if targetFunctionTable == nil {
 		targetFunctionTable = CG__().FunctionTable()
@@ -23,7 +23,7 @@ func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functio
 }
 
 func CleanModuleClasses(moduleNumber int) {
-	EG__().ClassTable().Filter(func(_ string, ce *types.ClassEntry) bool {
+	EG__().ClassTable().Filter(func(_ string, ce *types2.ClassEntry) bool {
 		needClean := ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetModule().GetModuleNumber() == moduleNumber
 		return !needClean
 	})
@@ -61,7 +61,7 @@ func ZendActivateModules() {
 		if module.GetModuleStartupFunc() == nil {
 			return
 		}
-		if module.GetRequestStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
+		if module.GetRequestStartupFunc()(module.GetType(), module.GetModuleNumber()) == types2.FAILURE {
 			faults.Error(faults.E_WARNING, "request_startup() for %s module failed", module.GetName())
 			exit(1)
 		}
@@ -78,7 +78,7 @@ func ZendDeactivateModules() {
 	})
 }
 func ZendCleanupInternalClasses() {
-	var p **types.ClassEntry = ClassCleanupHandlers
+	var p **types2.ClassEntry = ClassCleanupHandlers
 	for (*p) != nil {
 		ZendCleanupInternalClassData(*p)
 		p++
@@ -90,8 +90,8 @@ func ZendPostDeactivateModules() {
 func ZendNextFreeModule() int {
 	return globals.G().CountModules() + 1
 }
-func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32) *types.ClassEntry {
-	var class_entry = &types.ClassEntry{}
+func DoRegisterInternalClass(orig_class_entry *types2.ClassEntry, ce_flags uint32) *types2.ClassEntry {
+	var class_entry = &types2.ClassEntry{}
 	*class_entry = *orig_class_entry
 	class_entry.SetType(ZEND_INTERNAL_CLASS)
 	ZendInitializeClassData(class_entry, 0)
@@ -103,8 +103,8 @@ func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32
 	CG__().ClassTable().Update(class_entry.GetName().GetStr(), class_entry)
 	return class_entry
 }
-func ZendRegisterInternalClassEx(class_entry *types.ClassEntry, parent_ce *types.ClassEntry) *types.ClassEntry {
-	var register_class *types.ClassEntry
+func ZendRegisterInternalClassEx(class_entry *types2.ClassEntry, parent_ce *types2.ClassEntry) *types2.ClassEntry {
+	var register_class *types2.ClassEntry
 	register_class = ZendRegisterInternalClass(class_entry)
 	if parent_ce != nil {
 		ZendDoInheritance(register_class, parent_ce)
@@ -112,23 +112,23 @@ func ZendRegisterInternalClassEx(class_entry *types.ClassEntry, parent_ce *types
 	}
 	return register_class
 }
-func ZendClassImplements(class_entry *types.ClassEntry, num_interfaces int, _ ...any) {
-	var interface_entry *types.ClassEntry
+func ZendClassImplements(class_entry *types2.ClassEntry, num_interfaces int, _ ...any) {
+	var interface_entry *types2.ClassEntry
 	var interface_list va_list
 	va_start(interface_list, num_interfaces)
 	for b.PostDec(&num_interfaces) {
-		interface_entry = __va_arg(interface_list, (*types.ClassEntry)(_))
+		interface_entry = __va_arg(interface_list, (*types2.ClassEntry)(_))
 		ZendDoImplementInterface(class_entry, interface_entry)
 	}
 	va_end(interface_list)
 }
-func ZendRegisterInternalClass(orig_class_entry *types.ClassEntry) *types.ClassEntry {
+func ZendRegisterInternalClass(orig_class_entry *types2.ClassEntry) *types2.ClassEntry {
 	return DoRegisterInternalClass(orig_class_entry, 0)
 }
-func ZendRegisterInternalInterface(orig_class_entry *types.ClassEntry) *types.ClassEntry {
+func ZendRegisterInternalInterface(orig_class_entry *types2.ClassEntry) *types2.ClassEntry {
 	return DoRegisterInternalClass(orig_class_entry, AccInterface)
 }
-func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int) int {
+func ZendRegisterClassAliasEx(name string, ce *types2.ClassEntry, persistent int) int {
 	/* TODO: Move this out of here in 7.4. */
 	if persistent != 0 && EG__().GetCurrentModule() != nil && EG__().GetCurrentModule().GetType() == MODULE_TEMPORARY {
 		persistent = 0
@@ -141,23 +141,23 @@ func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int)
 		if !ce.IsImmutable() {
 			ce.GetRefcount()++
 		}
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
-	return types.FAILURE
+	return types2.FAILURE
 }
-func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *types.Zval) {
+func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *types2.Zval) {
 	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())
 }
 func ZendDisableFunction(functionName string) int {
 	f := CG__().FunctionTable().Get(functionName)
 	if f != nil {
-		func_ := f.(*types.InternalFunction)
+		func_ := f.(*types2.InternalFunction)
 		ZendFreeInternalArgInfo(func_)
 		func_.SubFnFlags(AccVariadic | AccHasTypeHints | AccHasReturnType)
 		func_.SetNumArgs(0)
 		func_.SetArgInfo(nil)
 		func_.SetHandler(ZifDisplayDisabledFunction)
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
-	return types.FAILURE
+	return types2.FAILURE
 }

@@ -1,14 +1,16 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_ASSIGN_STATIC_PROP_REF_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op_data ZendFreeOp
-	var prop *types.Zval
-	var value_ptr *types.Zval
+	var prop *types2.Zval
+	var value_ptr *types2.Zval
 	var prop_info *ZendPropertyInfo
-	if ZendFetchStaticPropertyAddress(&prop, &prop_info, opline.GetExtendedValue() & ^ZEND_RETURNS_FUNCTION, BP_VAR_W, 0, opline, executeData) != types.SUCCESS {
+	if ZendFetchStaticPropertyAddress(&prop, &prop_info, opline.GetExtendedValue() & ^ZEND_RETURNS_FUNCTION, BP_VAR_W, 0, opline, executeData) != types2.SUCCESS {
 		FREE_UNFETCHED_OP((opline + 1).GetOp1Type(), (opline + 1).GetOp1().GetVar())
 		UNDEF_RESULT()
 		return 0
@@ -26,7 +28,7 @@ func ZEND_ASSIGN_STATIC_PROP_REF_SPEC_HANDLER(executeData *ZendExecuteData) int 
 		ZendAssignToVariableReference(prop, value_ptr)
 	}
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(opline.Result(), prop)
+		types2.ZVAL_COPY(opline.Result(), prop)
 	}
 	if free_op_data != nil {
 		// ZvalPtrDtorNogc(free_op_data)

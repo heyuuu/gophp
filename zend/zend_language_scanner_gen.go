@@ -2,8 +2,8 @@
 package zend
 
 import (
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func _lexScan(zendlval *types.Zval, elem *ZendParserStackElem, sc *LangScanner) (int, bool) {

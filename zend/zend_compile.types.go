@@ -1,8 +1,8 @@
 package zend
 
 import (
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/internal"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**
@@ -35,15 +35,15 @@ type Znode struct {
 	flag    uint8
 	u       struct /* union */ {
 		op       ZnodeOp
-		constant types.Zval
+		constant types2.Zval
 	}
 }
 
-func (this *Znode) GetOpType() uint8         { return this.op_type }
-func (this *Znode) SetOpType(value uint8)    { this.op_type = value }
-func (this *Znode) GetOp() ZnodeOp           { return this.u.op }
-func (this *Znode) SetOp(value ZnodeOp)      { this.u.op = value }
-func (this *Znode) GetConstant() *types.Zval { return &this.u.constant }
+func (this *Znode) GetOpType() uint8          { return this.op_type }
+func (this *Znode) SetOpType(value uint8)     { this.op_type = value }
+func (this *Znode) GetOp() ZnodeOp            { return this.u.op }
+func (this *Znode) SetOp(value ZnodeOp)       { this.u.op = value }
+func (this *Znode) GetConstant() *types2.Zval { return &this.u.constant }
 
 /**
  * ZendAstZnode
@@ -66,13 +66,13 @@ func (this *ZendAstZnode) SetNode(value Znode)       { this.node = value }
  */
 type ImportNames = *internal.Table[string]
 type ZendFileContext struct {
-	current_namespace        *types.String
-	in_namespace             types.ZendBool
-	has_bracketed_namespaces types.ZendBool
+	current_namespace        *types2.String
+	in_namespace             types2.ZendBool
+	has_bracketed_namespaces types2.ZendBool
 	imports                  ImportNames
 	imports_function         ImportNames
 	imports_const            ImportNames
-	seen_symbols             types.Array
+	seen_symbols             types2.Array
 }
 
 func (this *ZendFileContext) ResetImportTables() {
@@ -100,28 +100,28 @@ func (this *ZendFileContext) ImportsConst() ImportNames {
 	return this.imports_const
 }
 
-func (this *ZendFileContext) GetImports() ImportNames          { return this.imports }
-func (this *ZendFileContext) SetImports(value *types.Array)    { this.imports = value }
-func (this *ZendFileContext) GetImportsFunction() *types.Array { return this.imports_function }
-func (this *ZendFileContext) SetImportsFunction(value *types.Array) {
+func (this *ZendFileContext) GetImports() ImportNames           { return this.imports }
+func (this *ZendFileContext) SetImports(value *types2.Array)    { this.imports = value }
+func (this *ZendFileContext) GetImportsFunction() *types2.Array { return this.imports_function }
+func (this *ZendFileContext) SetImportsFunction(value *types2.Array) {
 	this.imports_function = value
 }
-func (this *ZendFileContext) GetImportsConst() *types.Array      { return this.imports_const }
-func (this *ZendFileContext) SetImportsConst(value *types.Array) { this.imports_const = value }
+func (this *ZendFileContext) GetImportsConst() *types2.Array      { return this.imports_const }
+func (this *ZendFileContext) SetImportsConst(value *types2.Array) { this.imports_const = value }
 
-func (this *ZendFileContext) GetCurrentNamespace() *types.String { return this.current_namespace }
-func (this *ZendFileContext) SetCurrentNamespace(value *types.String) {
+func (this *ZendFileContext) GetCurrentNamespace() *types2.String { return this.current_namespace }
+func (this *ZendFileContext) SetCurrentNamespace(value *types2.String) {
 	this.current_namespace = value
 }
-func (this *ZendFileContext) GetInNamespace() types.ZendBool      { return this.in_namespace }
-func (this *ZendFileContext) SetInNamespace(value types.ZendBool) { this.in_namespace = value }
-func (this *ZendFileContext) GetHasBracketedNamespaces() types.ZendBool {
+func (this *ZendFileContext) GetInNamespace() types2.ZendBool      { return this.in_namespace }
+func (this *ZendFileContext) SetInNamespace(value types2.ZendBool) { this.in_namespace = value }
+func (this *ZendFileContext) GetHasBracketedNamespaces() types2.ZendBool {
 	return this.has_bracketed_namespaces
 }
-func (this *ZendFileContext) SetHasBracketedNamespaces(value types.ZendBool) {
+func (this *ZendFileContext) SetHasBracketedNamespaces(value types2.ZendBool) {
 	this.has_bracketed_namespaces = value
 }
-func (this *ZendFileContext) GetSeenSymbols() types.Array { return this.seen_symbols }
+func (this *ZendFileContext) GetSeenSymbols() types2.Array { return this.seen_symbols }
 
 // func (this *ZendFileContext) SetSeenSymbols(value HashTable) { this.seen_symbols = value }
 
@@ -130,14 +130,14 @@ func (this *ZendFileContext) GetSeenSymbols() types.Array { return this.seen_sym
  */
 type ZendParserStackElem struct /* union */ {
 	ast *ZendAst
-	str *types.String
+	str *types2.String
 	num ZendUlong
 	ptr *uint8
 }
 
-func (this *ZendParserStackElem) GetAst() *ZendAst      { return this.ast }
-func (this *ZendParserStackElem) SetAst(value *ZendAst) { this.ast = value }
-func (this *ZendParserStackElem) GetStr() *types.String { return this.str }
+func (this *ZendParserStackElem) GetAst() *ZendAst       { return this.ast }
+func (this *ZendParserStackElem) SetAst(value *ZendAst)  { this.ast = value }
+func (this *ZendParserStackElem) GetStr() *types2.String { return this.str }
 
 /**
  * ZendOp
@@ -185,10 +185,10 @@ func (op *ZendOp) currEx() *ZendExecuteData {
 /**
  * opGetter
  */
-type opGetter func(node ZnodeOp) *types.Zval
-type opExGetter func(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval
+type opGetter func(node ZnodeOp) *types2.Zval
+type opExGetter func(node ZnodeOp, shouldFree *ZendFreeOp) *types2.Zval
 
-func (op *ZendOp) _complexOp(opType uint8, node ZnodeOp, constGetter opGetter, varGetter opGetter, cvGetter opGetter) *types.Zval {
+func (op *ZendOp) _complexOp(opType uint8, node ZnodeOp, constGetter opGetter, varGetter opGetter, cvGetter opGetter) *types2.Zval {
 	switch opType {
 	case IS_CONST:
 		return constGetter(node)
@@ -199,7 +199,7 @@ func (op *ZendOp) _complexOp(opType uint8, node ZnodeOp, constGetter opGetter, v
 	}
 	panic("unreachable")
 }
-func (op *ZendOp) _complexOpEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp, constGetter opGetter, varGetter opExGetter, cvGetter opGetter) *types.Zval {
+func (op *ZendOp) _complexOpEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp, constGetter opGetter, varGetter opExGetter, cvGetter opGetter) *types2.Zval {
 	switch opType {
 	case IS_CONST:
 		return constGetter(node)
@@ -212,9 +212,9 @@ func (op *ZendOp) _complexOpEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeO
 }
 
 //
-func (op *ZendOp) _const(node ZnodeOp) *types.Zval { return RT_CONSTANT(op, node) }
-func (op *ZendOp) _op(node ZnodeOp) *types.Zval    { return EX_VAR(node.GetVar()) }
-func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
+func (op *ZendOp) _const(node ZnodeOp) *types2.Zval { return RT_CONSTANT(op, node) }
+func (op *ZendOp) _op(node ZnodeOp) *types2.Zval    { return EX_VAR(node.GetVar()) }
+func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types2.Zval {
 	ret := op._op(node)
 	if ret.IsUndef() {
 		return ZvalUndefinedCv(node.var_, op.currEx())
@@ -222,13 +222,13 @@ func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
 	return ret
 }
 
-func (op *ZendOp) Const1() *types.Zval     { return op._const(op.op1) }
-func (op *ZendOp) Const2() *types.Zval     { return op._const(op.op2) }
-func (op *ZendOp) Op1() *types.Zval        { return op._op(op.op1) }
-func (op *ZendOp) Op2() *types.Zval        { return op._op(op.op2) }
-func (op *ZendOp) Result() *types.Zval     { return op._op(op.result) }
-func (op *ZendOp) Cv1OrUndef() *types.Zval { return op._cvOrUndef(op.op1) }
-func (op *ZendOp) Cv2OrUndef() *types.Zval { return op._cvOrUndef(op.op2) }
+func (op *ZendOp) Const1() *types2.Zval     { return op._const(op.op1) }
+func (op *ZendOp) Const2() *types2.Zval     { return op._const(op.op2) }
+func (op *ZendOp) Op1() *types2.Zval        { return op._op(op.op1) }
+func (op *ZendOp) Op2() *types2.Zval        { return op._op(op.op2) }
+func (op *ZendOp) Result() *types2.Zval     { return op._op(op.result) }
+func (op *ZendOp) Cv1OrUndef() *types2.Zval { return op._cvOrUndef(op.op1) }
+func (op *ZendOp) Cv2OrUndef() *types2.Zval { return op._cvOrUndef(op.op2) }
 
 /**
  * ZendBrkContElement
@@ -238,19 +238,19 @@ type ZendBrkContElement struct {
 	cont      int
 	brk       int
 	parent    int
-	is_switch types.ZendBool
+	is_switch types2.ZendBool
 }
 
-func (this *ZendBrkContElement) GetStart() int                    { return this.start }
-func (this *ZendBrkContElement) SetStart(value int)               { this.start = value }
-func (this *ZendBrkContElement) GetCont() int                     { return this.cont }
-func (this *ZendBrkContElement) SetCont(value int)                { this.cont = value }
-func (this *ZendBrkContElement) GetBrk() int                      { return this.brk }
-func (this *ZendBrkContElement) SetBrk(value int)                 { this.brk = value }
-func (this *ZendBrkContElement) GetParent() int                   { return this.parent }
-func (this *ZendBrkContElement) SetParent(value int)              { this.parent = value }
-func (this *ZendBrkContElement) GetIsSwitch() types.ZendBool      { return this.is_switch }
-func (this *ZendBrkContElement) SetIsSwitch(value types.ZendBool) { this.is_switch = value }
+func (this *ZendBrkContElement) GetStart() int                     { return this.start }
+func (this *ZendBrkContElement) SetStart(value int)                { this.start = value }
+func (this *ZendBrkContElement) GetCont() int                      { return this.cont }
+func (this *ZendBrkContElement) SetCont(value int)                 { this.cont = value }
+func (this *ZendBrkContElement) GetBrk() int                       { return this.brk }
+func (this *ZendBrkContElement) SetBrk(value int)                  { this.brk = value }
+func (this *ZendBrkContElement) GetParent() int                    { return this.parent }
+func (this *ZendBrkContElement) SetParent(value int)               { this.parent = value }
+func (this *ZendBrkContElement) GetIsSwitch() types2.ZendBool      { return this.is_switch }
+func (this *ZendBrkContElement) SetIsSwitch(value types2.ZendBool) { this.is_switch = value }
 
 /**
  * ZendLabel
@@ -312,7 +312,7 @@ type ZendOparrayContext struct {
 	current_brk_cont int
 	last_brk_cont    int
 	brk_cont_array   *ZendBrkContElement
-	labels           *types.Array
+	labels           *types2.Array
 }
 
 //             func MakeZendOparrayContext(
@@ -356,8 +356,8 @@ func (this *ZendOparrayContext) GetBrkContArray() *ZendBrkContElement { return t
 func (this *ZendOparrayContext) SetBrkContArray(value *ZendBrkContElement) {
 	this.brk_cont_array = value
 }
-func (this *ZendOparrayContext) GetLabels() *types.Array      { return this.labels }
-func (this *ZendOparrayContext) SetLabels(value *types.Array) { this.labels = value }
+func (this *ZendOparrayContext) GetLabels() *types2.Array      { return this.labels }
+func (this *ZendOparrayContext) SetLabels(value *types2.Array) { this.labels = value }
 
 /**
  * ZendPropertyInfo
@@ -365,24 +365,24 @@ func (this *ZendOparrayContext) SetLabels(value *types.Array) { this.labels = va
 type ZendPropertyInfo struct {
 	offset      uint32
 	flags       uint32
-	name        *types.String
-	doc_comment *types.String
-	ce          *types.ClassEntry
-	type_       types.ZendType
+	name        *types2.String
+	doc_comment *types2.String
+	ce          *types2.ClassEntry
+	type_       types2.ZendType
 }
 
-func (this *ZendPropertyInfo) GetOffset() uint32                 { return this.offset }
-func (this *ZendPropertyInfo) SetOffset(value uint32)            { this.offset = value }
-func (this *ZendPropertyInfo) GetFlags() uint32                  { return this.flags }
-func (this *ZendPropertyInfo) SetFlags(value uint32)             { this.flags = value }
-func (this *ZendPropertyInfo) GetName() *types.String            { return this.name }
-func (this *ZendPropertyInfo) SetName(value *types.String)       { this.name = value }
-func (this *ZendPropertyInfo) GetDocComment() *types.String      { return this.doc_comment }
-func (this *ZendPropertyInfo) SetDocComment(value *types.String) { this.doc_comment = value }
-func (this *ZendPropertyInfo) GetCe() *types.ClassEntry          { return this.ce }
-func (this *ZendPropertyInfo) SetCe(value *types.ClassEntry)     { this.ce = value }
-func (this *ZendPropertyInfo) GetType() types.ZendType           { return this.type_ }
-func (this *ZendPropertyInfo) SetType(value types.ZendType)      { this.type_ = value }
+func (this *ZendPropertyInfo) GetOffset() uint32                  { return this.offset }
+func (this *ZendPropertyInfo) SetOffset(value uint32)             { this.offset = value }
+func (this *ZendPropertyInfo) GetFlags() uint32                   { return this.flags }
+func (this *ZendPropertyInfo) SetFlags(value uint32)              { this.flags = value }
+func (this *ZendPropertyInfo) GetName() *types2.String            { return this.name }
+func (this *ZendPropertyInfo) SetName(value *types2.String)       { this.name = value }
+func (this *ZendPropertyInfo) GetDocComment() *types2.String      { return this.doc_comment }
+func (this *ZendPropertyInfo) SetDocComment(value *types2.String) { this.doc_comment = value }
+func (this *ZendPropertyInfo) GetCe() *types2.ClassEntry          { return this.ce }
+func (this *ZendPropertyInfo) SetCe(value *types2.ClassEntry)     { this.ce = value }
+func (this *ZendPropertyInfo) GetType() types2.ZendType           { return this.type_ }
+func (this *ZendPropertyInfo) SetType(value types2.ZendType)      { this.type_ = value }
 
 /* ZendPropertyInfo.flags */
 func (this *ZendPropertyInfo) AddFlags(value uint32)      { this.flags |= value }
@@ -410,17 +410,17 @@ func (this *ZendPropertyInfo) SetIsChanged(cond bool)   { this.SwitchFlags(AccCh
  * ZendClassConstant
  */
 type ZendClassConstant struct {
-	value      types.Zval
-	docComment *types.String
-	ce         *types.ClassEntry
+	value      types2.Zval
+	docComment *types2.String
+	ce         *types2.ClassEntry
 }
 
-func NewClassConstant(ce *types.ClassEntry, value *types.Zval, docComment *types.String) *ZendClassConstant {
+func NewClassConstant(ce *types2.ClassEntry, value *types2.Zval, docComment *types2.String) *ZendClassConstant {
 	c := &ZendClassConstant{
 		ce:         ce,
 		docComment: docComment,
 	}
-	types.ZVAL_COPY_VALUE(&c.value, value)
+	types2.ZVAL_COPY_VALUE(&c.value, value)
 	return c
 }
 
@@ -432,9 +432,9 @@ func CopyClassConstant(c *ZendClassConstant) *ZendClassConstant {
 	}
 }
 
-func (c *ZendClassConstant) GetCe() *types.ClassEntry     { return c.ce }
-func (c *ZendClassConstant) GetValue() *types.Zval        { return &c.value }
-func (c *ZendClassConstant) GetDocComment() *types.String { return c.docComment }
+func (c *ZendClassConstant) GetCe() *types2.ClassEntry     { return c.ce }
+func (c *ZendClassConstant) GetValue() *types2.Zval        { return &c.value }
+func (c *ZendClassConstant) GetDocComment() *types2.String { return c.docComment }
 func (c *ZendClassConstant) IsVisited() bool {
 	return c.value.GetAccessFlags()&IS_CONSTANT_VISITED_MARK != 0
 }
@@ -449,26 +449,26 @@ func (c *ZendClassConstant) ResetVisited() {
  * ZendArgInfo
  */
 type ZendArgInfo struct {
-	name              *types.String
-	type_             types.ZendType
+	name              *types2.String
+	type_             types2.ZendType
 	pass_by_reference uint8
-	is_variadic       types.ZendBool
+	is_variadic       types2.ZendBool
 }
 
-func MakeZendReturnArgInfo(type_ types.ZendType, pass_by_reference bool) ZendArgInfo {
+func MakeZendReturnArgInfo(type_ types2.ZendType, pass_by_reference bool) ZendArgInfo {
 	return ZendArgInfo{
 		name:              nil,
 		type_:             type_,
-		pass_by_reference: types.IntBool(pass_by_reference),
+		pass_by_reference: types2.IntBool(pass_by_reference),
 		is_variadic:       0,
 	}
 }
 
 func MakeZendArgInfo(
-	name *types.String,
-	type_ types.ZendType,
+	name *types2.String,
+	type_ types2.ZendType,
 	pass_by_reference uint8,
-	is_variadic types.ZendBool,
+	is_variadic types2.ZendBool,
 ) ZendArgInfo {
 	return ZendArgInfo{
 		name:              name,
@@ -478,28 +478,28 @@ func MakeZendArgInfo(
 	}
 }
 
-func (this *ZendArgInfo) SetType(value types.ZendType) { this.type_ = value }
+func (this *ZendArgInfo) SetType(value types2.ZendType) { this.type_ = value }
 
-func (this *ZendArgInfo) GetName() *types.String        { return this.name }
-func (this *ZendArgInfo) GetType() types.ZendType       { return this.type_ }
-func (this *ZendArgInfo) GetPassByReference() uint8     { return this.pass_by_reference }
-func (this *ZendArgInfo) GetIsVariadic() types.ZendBool { return this.is_variadic }
+func (this *ZendArgInfo) GetName() *types2.String        { return this.name }
+func (this *ZendArgInfo) GetType() types2.ZendType       { return this.type_ }
+func (this *ZendArgInfo) GetPassByReference() uint8      { return this.pass_by_reference }
+func (this *ZendArgInfo) GetIsVariadic() types2.ZendBool { return this.is_variadic }
 
 /**
  * ZendInternalFunctionInfo
  */
 type ZendInternalFunctionInfo struct {
-	required_num_args types.ZendUintptrT
-	type_             types.ZendType
-	return_reference  types.ZendBool
-	_is_variadic      types.ZendBool
+	required_num_args types2.ZendUintptrT
+	type_             types2.ZendType
+	return_reference  types2.ZendBool
+	_is_variadic      types2.ZendBool
 }
 
-func (this *ZendInternalFunctionInfo) GetRequiredNumArgs() types.ZendUintptrT {
+func (this *ZendInternalFunctionInfo) GetRequiredNumArgs() types2.ZendUintptrT {
 	return this.required_num_args
 }
-func (this *ZendInternalFunctionInfo) GetType() types.ZendType { return this.type_ }
-func (this *ZendInternalFunctionInfo) GetReturnReference() types.ZendBool {
+func (this *ZendInternalFunctionInfo) GetType() types2.ZendType { return this.type_ }
+func (this *ZendInternalFunctionInfo) GetReturnReference() types2.ZendBool {
 	return this.return_reference
 }
 
@@ -507,10 +507,10 @@ func (this *ZendInternalFunctionInfo) GetReturnReference() types.ZendBool {
  * ZendAutoGlobal
  */
 type ZendAutoGlobal struct {
-	name                 *types.String
+	name                 *types2.String
 	auto_global_callback ZendAutoGlobalCallback
-	jit                  types.ZendBool
-	armed                types.ZendBool
+	jit                  types2.ZendBool
+	armed                types2.ZendBool
 }
 
 // func MakeZendAutoGlobal(name *String, auto_global_callback ZendAutoGlobalCallback, jit ZendBool, armed ZendBool) ZendAutoGlobal {
@@ -521,18 +521,18 @@ type ZendAutoGlobal struct {
 //         armed:armed,
 //     }
 // }
-func (this *ZendAutoGlobal) GetName() *types.String      { return this.name }
-func (this *ZendAutoGlobal) SetName(value *types.String) { this.name = value }
+func (this *ZendAutoGlobal) GetName() *types2.String      { return this.name }
+func (this *ZendAutoGlobal) SetName(value *types2.String) { this.name = value }
 func (this *ZendAutoGlobal) GetAutoGlobalCallback() ZendAutoGlobalCallback {
 	return this.auto_global_callback
 }
 func (this *ZendAutoGlobal) SetAutoGlobalCallback(value ZendAutoGlobalCallback) {
 	this.auto_global_callback = value
 }
-func (this *ZendAutoGlobal) GetJit() types.ZendBool        { return this.jit }
-func (this *ZendAutoGlobal) SetJit(value types.ZendBool)   { this.jit = value }
-func (this *ZendAutoGlobal) GetArmed() types.ZendBool      { return this.armed }
-func (this *ZendAutoGlobal) SetArmed(value types.ZendBool) { this.armed = value }
+func (this *ZendAutoGlobal) GetJit() types2.ZendBool        { return this.jit }
+func (this *ZendAutoGlobal) SetJit(value types2.ZendBool)   { this.jit = value }
+func (this *ZendAutoGlobal) GetArmed() types2.ZendBool      { return this.armed }
+func (this *ZendAutoGlobal) SetArmed(value types2.ZendBool) { this.armed = value }
 
 /**
  * ZendLoopVar
@@ -601,10 +601,10 @@ func (this *BuiltinTypeInfo) GetType() uint8  { return this.type_ }
  * ClosureInfo
  */
 type ClosureInfo struct {
-	uses         *types.Array
-	varvars_used types.ZendBool
+	uses         *types2.Array
+	varvars_used types2.ZendBool
 }
 
-func (this *ClosureInfo) GetUses() *types.Array               { return this.uses }
-func (this *ClosureInfo) SetUses(value *types.Array)          { this.uses = value }
-func (this *ClosureInfo) SetVarvarsUsed(value types.ZendBool) { this.varvars_used = value }
+func (this *ClosureInfo) GetUses() *types2.Array               { return this.uses }
+func (this *ClosureInfo) SetUses(value *types2.Array)          { this.uses = value }
+func (this *ClosureInfo) SetVarvarsUsed(value types2.ZendBool) { this.varvars_used = value }

@@ -1,8 +1,8 @@
 package spl
 
 import (
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 var spl_ce_LogicException *types.ClassEntry

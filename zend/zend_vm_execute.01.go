@@ -2,8 +2,8 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_VM_DISPATCH(executeData *ZendExecuteData, opcode OpCode, opline *ZendOp) int {
@@ -15,7 +15,7 @@ func zend_mod_by_zero_helper_SPEC(executeData *ZendExecuteData) int {
 	opline.Result().SetUndef()
 	return 0
 }
-func zend_mod_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_mod_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -32,7 +32,7 @@ func zend_mod_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendE
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
-func zend_shift_left_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_shift_left_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -49,7 +49,7 @@ func zend_shift_left_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
-func zend_shift_right_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_shift_right_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -66,7 +66,7 @@ func zend_shift_right_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDat
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
-func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_is_equal_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -88,7 +88,7 @@ func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
-func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_is_not_equal_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -110,7 +110,7 @@ func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDa
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
-func zend_is_smaller_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_is_smaller_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -138,7 +138,7 @@ func zend_is_smaller_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
-func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_is_smaller_or_equal_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -166,7 +166,7 @@ func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, ex
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
-func zend_bw_or_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_bw_or_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -183,7 +183,7 @@ func zend_bw_or_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zen
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
-func zend_bw_and_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_bw_and_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -200,7 +200,7 @@ func zend_bw_and_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Ze
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
-func zend_bw_xor_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
+func zend_bw_xor_helper_SPEC(op_1 *types2.Zval, op_2 *types2.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
@@ -229,20 +229,20 @@ func zend_this_not_in_object_context_helper_SPEC(executeData *ZendExecuteData) i
 }
 func zend_undefined_function_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var function_name *types.Zval
+	var function_name *types2.Zval
 	function_name = opline.Const2()
 	faults.ThrowError(nil, "Call to undefined function %s()", function_name.String().GetVal())
 	return 0
 }
 func zend_fetch_static_prop_helper_SPEC(type_ int, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var prop *types.Zval
-	if ZendFetchStaticPropertyAddress(&prop, nil, opline.GetExtendedValue() & ^ZEND_FETCH_OBJ_FLAGS, type_, opline.GetExtendedValue()&ZEND_FETCH_OBJ_FLAGS, opline, executeData) != types.SUCCESS {
+	var prop *types2.Zval
+	if ZendFetchStaticPropertyAddress(&prop, nil, opline.GetExtendedValue() & ^ZEND_FETCH_OBJ_FLAGS, type_, opline.GetExtendedValue()&ZEND_FETCH_OBJ_FLAGS, opline, executeData) != types2.SUCCESS {
 		b.Assert(EG__().GetException() != nil || type_ == BP_VAR_IS)
 		prop = EG__().GetUninitializedZval()
 	}
 	if type_ == BP_VAR_R || type_ == BP_VAR_IS {
-		types.ZVAL_COPY_DEREF(opline.Result(), prop)
+		types2.ZVAL_COPY_DEREF(opline.Result(), prop)
 	} else {
 		opline.Result().SetIndirect(prop)
 	}
@@ -339,7 +339,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 			}
 			return -1
 		} else {
-			var symbol_table *types.Array = executeData.GetSymbolTable()
+			var symbol_table *types2.Array = executeData.GetSymbolTable()
 			ZendDetachSymbolTable(executeData)
 			old_execute_data = executeData.GetPrevExecuteData()
 			for old_execute_data != nil {

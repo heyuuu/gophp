@@ -2,14 +2,14 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func ZifMetaphone(executeData zpp.Ex, return_value zpp.Ret, text *types.Zval, _ zpp.Opt, phones *types.Zval) {
-	var str *types.String
-	var result *types.String = nil
+func ZifMetaphone(executeData zpp.Ex, return_value zpp.Ret, text *types2.Zval, _ zpp.Opt, phones *types2.Zval) {
+	var str *types2.String
+	var result *types2.String = nil
 	var phones zend.ZendLong = 0
 	for {
 		for {
@@ -70,14 +70,14 @@ func Lookahead(word *byte, how_far int) byte {
 }
 func Phonize(c byte) {
 	if p_idx >= max_buffer_len {
-		*phoned_word = types.ZendStringExtend(*phoned_word, 2*b.SizeOf("char")+max_buffer_len)
+		*phoned_word = types2.ZendStringExtend(*phoned_word, 2*b.SizeOf("char")+max_buffer_len)
 		max_buffer_len += 2
 	}
 	phoned_word.GetStr()[b.PostInc(&p_idx)] = c
 	phoned_word.GetLen() = p_idx
 }
 func Isbreak(c byte) bool { return !(isalpha(c)) }
-func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_word **types.String, traditional int) int {
+func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_word **types2.String, traditional int) int {
 	var w_idx int = 0
 	var p_idx int = 0
 	var max_buffer_len int = 0
@@ -98,10 +98,10 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 
 	if max_phonemes == 0 {
 		max_buffer_len = word_len
-		*phoned_word = types.ZendStringAlloc(b.SizeOf("char")*word_len+1, 0)
+		*phoned_word = types2.ZendStringAlloc(b.SizeOf("char")*word_len+1, 0)
 	} else {
 		max_buffer_len = max_phonemes
-		*phoned_word = types.ZendStringAlloc(b.SizeOf("char")*max_phonemes+1, 0)
+		*phoned_word = types2.ZendStringAlloc(b.SizeOf("char")*max_phonemes+1, 0)
 	}
 
 	/*-- The first phoneme has to be processed specially. --*/
@@ -112,12 +112,12 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 
 		if Curr_Letter == '0' {
 			if p_idx == max_buffer_len {
-				*phoned_word = types.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len)
+				*phoned_word = types2.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len)
 				max_buffer_len += 1
 			}
 			phoned_word.GetStr()[p_idx] = '0'
 			phoned_word.SetLen(p_idx)
-			return types.SUCCESS
+			return types2.SUCCESS
 		}
 
 		/* On the off chance we were given nothing but crap... */
@@ -315,7 +315,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 		w_idx += skip_letter
 	}
 	if p_idx == max_buffer_len {
-		*phoned_word = types.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len)
+		*phoned_word = types2.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len)
 		max_buffer_len += 1
 	}
 	phoned_word.GetStr()[p_idx] = '0'

@@ -2,8 +2,8 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -44,24 +44,24 @@ func ZmStartupSyslog(type_ int, module_number int) int {
 	zend.RegisterLongConstant("LOG_ODELAY", LOG_ODELAY, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("LOG_NDELAY", LOG_NDELAY, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	BG__().syslog_device = nil
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmActivateSyslog(type_ int, module_number int) int {
 	BG__().syslog_device = nil
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmShutdownSyslog(type_ int, module_number int) int {
 	if BG__().syslog_device {
 		zend.Free(BG__().syslog_device)
 		BG__().syslog_device = nil
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpOpenlog(ident *byte, option int, facility int) {
 	openlog(ident, option, facility)
 	core.PG__().have_called_openlog = 1
 }
-func ZifOpenlog(executeData zpp.Ex, return_value zpp.Ret, ident *types.Zval, option *types.Zval, facility *types.Zval) {
+func ZifOpenlog(executeData zpp.Ex, return_value zpp.Ret, ident *types2.Zval, option *types2.Zval, facility *types2.Zval) {
 	var ident *byte
 	var option zend.ZendLong
 	var facility zend.ZendLong
@@ -103,7 +103,7 @@ func ZifCloselog(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetTrue()
 	return
 }
-func ZifSyslog(executeData zpp.Ex, return_value zpp.Ret, priority *types.Zval, message *types.Zval) {
+func ZifSyslog(executeData zpp.Ex, return_value zpp.Ret, priority *types2.Zval, message *types2.Zval) {
 	var priority zend.ZendLong
 	var message *byte
 	var message_len int

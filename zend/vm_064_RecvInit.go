@@ -1,5 +1,10 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/types"
+)
+
 func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var arg_num uint32
@@ -9,7 +14,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		param = opline.Result()
 		if arg_num > executeData.NumArgs() {
 			var default_value *types.Zval = opline.Const2()
-			if default_value.IsConstant() {
+			if default_value.IsConstantAst() {
 				var cache_val *types.Zval = (*types.Zval)(CACHE_ADDR(default_value.GetCacheSlot()))
 
 				/* we keep in cache only not refcounted values */

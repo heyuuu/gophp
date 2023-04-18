@@ -1,17 +1,19 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 
 	expr_ptr = opline.Const1()
 	// expr_ptr.TryAddRefcount()
 	{
-		var offset *types.Zval = opline.Const2()
-		var str *types.String
+		var offset *types2.Zval = opline.Const2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
@@ -23,7 +25,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -36,7 +38,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else {
 			ZendIllegalOffset()
@@ -48,8 +50,8 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 }
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 
 	{
 		expr_ptr = opline.Const1()
@@ -61,14 +63,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = opline.Op2()
-		var str *types.String
+		var offset *types2.Zval = opline.Op2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index
 				}
 			}
@@ -79,10 +81,10 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -95,11 +97,11 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -112,8 +114,8 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 }
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 
 	{
 		expr_ptr = opline.Const1()
@@ -134,8 +136,8 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 }
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 
 	{
 		expr_ptr = opline.Const1()
@@ -146,14 +148,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 
 	}
 	{
-		var offset *types.Zval = opline.Op2()
-		var str *types.String
+		var offset *types2.Zval = opline.Op2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index
 				}
 			}
@@ -164,10 +166,10 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -180,11 +182,11 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -197,21 +199,21 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
 		expr_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	}
 	{
-		var offset *types.Zval = opline.Const2()
-		var str *types.String
+		var offset *types2.Zval = opline.Const2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
@@ -223,7 +225,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -236,7 +238,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else {
 			ZendIllegalOffset()
@@ -249,28 +251,28 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
 		expr_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = opline.Op2()
-		var str *types.String
+		var offset *types2.Zval = opline.Op2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index
 				}
 			}
@@ -281,10 +283,10 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -297,11 +299,11 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -315,14 +317,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
 		expr_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
@@ -339,27 +341,27 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
 		expr_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	}
 	{
-		var offset *types.Zval = opline.Op2()
-		var str *types.String
+		var offset *types2.Zval = opline.Op2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index
 				}
 			}
@@ -370,10 +372,10 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -386,11 +388,11 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -403,14 +405,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 		if free_op1 != nil {
 			// ZvalPtrDtorNogc(free_op1)
@@ -419,8 +421,8 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 		expr_ptr = opline.Op1()
 	}
 	{
-		var offset *types.Zval = opline.Const2()
-		var str *types.String
+		var offset *types2.Zval = opline.Const2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
@@ -432,7 +434,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -445,7 +447,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else {
 			ZendIllegalOffset()
@@ -458,14 +460,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 		if free_op1 != nil {
 			// ZvalPtrDtorNogc(free_op1)
@@ -475,14 +477,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = opline.Op2()
-		var str *types.String
+		var offset *types2.Zval = opline.Op2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index
 				}
 			}
@@ -493,10 +495,10 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -509,11 +511,11 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -527,14 +529,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 		if free_op1 != nil {
 			// ZvalPtrDtorNogc(free_op1)
@@ -554,14 +556,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 		if free_op1 != nil {
 			// ZvalPtrDtorNogc(free_op1)
@@ -570,14 +572,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 		expr_ptr = opline.Op1()
 	}
 	{
-		var offset *types.Zval = opline.Op2()
-		var str *types.String
+		var offset *types2.Zval = opline.Op2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index
 				}
 			}
@@ -588,10 +590,10 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -604,11 +606,11 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -620,21 +622,21 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 }
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
 		expr_ptr = opline.Cv1OrUndef()
 	}
 	{
-		var offset *types.Zval = opline.Const2()
-		var str *types.String
+		var offset *types2.Zval = opline.Const2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
@@ -646,7 +648,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -659,7 +661,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else {
 			ZendIllegalOffset()
@@ -671,28 +673,28 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 }
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
 		expr_ptr = opline.Cv1OrUndef()
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = opline.Op2()
-		var str *types.String
+		var offset *types2.Zval = opline.Op2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index
 				}
 			}
@@ -703,10 +705,10 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -719,11 +721,11 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -736,14 +738,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 }
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
 		expr_ptr = opline.Cv1OrUndef()
@@ -759,27 +761,27 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 }
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var expr_ptr *types.Zval
-	var new_expr types.Zval
+	var expr_ptr *types2.Zval
+	var new_expr types2.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		if expr_ptr.IsReference() {
 			// 			expr_ptr.AddRefcount()
 		} else {
-			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
+			types2.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
 		expr_ptr = opline.Cv1OrUndef()
 	}
 	{
-		var offset *types.Zval = opline.Op2()
-		var str *types.String
+		var offset *types2.Zval = opline.Op2()
+		var str *types2.String
 		var hval ZendUlong
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
 			{
-				if types.HandleNumericStr(str.GetStr(), &hval) {
+				if types2.HandleNumericStr(str.GetStr(), &hval) {
 					goto num_index
 				}
 			}
@@ -790,10 +792,10 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
-			offset = types.Z_REFVAL_P(offset)
+			offset = types2.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.Double())
@@ -806,11 +808,11 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 			goto num_index
 		} else if offset.IsResource() {
 			ZendUseResourceAsOffset(offset)
-			hval = types.Z_RES_HANDLE_P(offset)
+			hval = types2.Z_RES_HANDLE_P(offset)
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			str = types.NewString("")
+			str = types2.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()

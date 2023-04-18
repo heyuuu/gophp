@@ -1,6 +1,8 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 /**
  * ZendAst
@@ -69,7 +71,7 @@ func (this *ZendAstList) GetChild() []*ZendAst     { return this.child }
 type ZendAstZval struct {
 	kind ZendAstKind
 	attr ZendAstAttr
-	val  types.Zval
+	val  types2.Zval
 }
 
 // func MakeZendAstZval(kind ZendAstKind, attr ZendAstAttr, val Zval) ZendAstZval {
@@ -84,7 +86,7 @@ func (this *ZendAstZval) SetKind(value ZendAstKind) { this.kind = value }
 
 // func (this *ZendAstZval)  GetAttr() ZendAstAttr      { return this.attr }
 func (this *ZendAstZval) SetAttr(value ZendAstAttr) { this.attr = value }
-func (this *ZendAstZval) GetVal() types.Zval        { return this.val }
+func (this *ZendAstZval) GetVal() types2.Zval       { return this.val }
 
 // func (this *ZendAstZval) SetVal(value Zval) { this.val = value }
 
@@ -98,8 +100,8 @@ type ZendAstDecl struct {
 	end_lineno   uint32
 	flags        uint32
 	lex_pos      *uint8
-	doc_comment  *types.String
-	name         *types.String
+	doc_comment  *types2.String
+	name         *types2.String
 	child        []*ZendAst
 }
 
@@ -139,12 +141,12 @@ func (this *ZendAstDecl) GetFlags() uint32            { return this.flags }
 func (this *ZendAstDecl) SetFlags(value uint32)       { this.flags = value }
 
 // func (this *ZendAstDecl)  GetLexPos() *uint8      { return this.lex_pos }
-func (this *ZendAstDecl) SetLexPos(value *uint8)            { this.lex_pos = value }
-func (this *ZendAstDecl) GetDocComment() *types.String      { return this.doc_comment }
-func (this *ZendAstDecl) SetDocComment(value *types.String) { this.doc_comment = value }
-func (this *ZendAstDecl) GetName() *types.String            { return this.name }
-func (this *ZendAstDecl) SetName(value *types.String)       { this.name = value }
-func (this *ZendAstDecl) GetChild() []*ZendAst              { return this.child }
+func (this *ZendAstDecl) SetLexPos(value *uint8)             { this.lex_pos = value }
+func (this *ZendAstDecl) GetDocComment() *types2.String      { return this.doc_comment }
+func (this *ZendAstDecl) SetDocComment(value *types2.String) { this.doc_comment = value }
+func (this *ZendAstDecl) GetName() *types2.String            { return this.name }
+func (this *ZendAstDecl) SetName(value *types2.String)       { this.name = value }
+func (this *ZendAstDecl) GetChild() []*ZendAst               { return this.child }
 
 // func (this *ZendAstDecl) SetChild(value []*ZendAst) { this.child = value }
 

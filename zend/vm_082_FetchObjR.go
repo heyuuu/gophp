@@ -2,12 +2,12 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend/types"
+	types2 "github.com/heyuuu/gophp/php/types"
 )
 
 func ZEND_FETCH_OBJ_R_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var offset *types.Zval
+	var offset *types2.Zval
 	offset = opline.Const2()
 	ZendWrongPropertyRead(offset)
 	opline.Result().SetNull()
@@ -15,9 +15,9 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int
 }
 func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
+	var container *types2.Zval
 	var free_op2 ZendFreeOp
-	var offset *types.Zval
+	var offset *types2.Zval
 	var cache_slot *any = nil
 	container = opline.Const1()
 	offset = opline.Op2()
@@ -35,8 +35,8 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
-	var retval *types.Zval
+	var zobj *types2.ZendObject = container.GetObj()
+	var retval *types2.Zval
 
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
@@ -44,7 +44,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -54,8 +54,8 @@ fetch_obj_r_finish:
 }
 func ZEND_FETCH_OBJ_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
-	var offset *types.Zval
+	var container *types2.Zval
+	var offset *types2.Zval
 	var cache_slot *any = nil
 	container = opline.Const1()
 	offset = opline.Op2()
@@ -73,8 +73,8 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
-	var retval *types.Zval
+	var zobj *types2.ZendObject = container.GetObj()
+	var retval *types2.Zval
 
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
@@ -82,7 +82,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -92,15 +92,15 @@ fetch_obj_r_finish:
 func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var container *types.Zval
-	var offset *types.Zval
+	var container *types2.Zval
+	var offset *types2.Zval
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Const2()
-	if container.GetType() != types.IS_OBJECT {
+	if container.GetType() != types2.IS_OBJECT {
 		for {
 			if container.IsReference() {
-				container = types.Z_REFVAL_P(container)
+				container = types2.Z_REFVAL_P(container)
 				if container.IsObject() {
 					break
 				}
@@ -117,8 +117,8 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
-	var retval *types.Zval
+	var zobj *types2.ZendObject = container.GetObj()
+	var retval *types2.Zval
 	{
 		cache_slot = CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_FETCH_REF)
 		if zobj.GetCe() == CACHED_PTR_EX(cache_slot) {
@@ -135,7 +135,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 				if !(IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(prop_offset)) {
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
-						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
+						var p *types2.Bucket = (*types2.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
 						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.GetStr() || (p.IsStrKey() && p.StrKey() == offset.StringVal())) {
 							retval = p.GetVal()
 							goto fetch_obj_r_copy
@@ -159,7 +159,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -170,16 +170,16 @@ fetch_obj_r_finish:
 func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var container *types.Zval
+	var container *types2.Zval
 	var free_op2 ZendFreeOp
-	var offset *types.Zval
+	var offset *types2.Zval
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Op2()
-	if container.GetType() != types.IS_OBJECT {
+	if container.GetType() != types2.IS_OBJECT {
 		for {
 			if container.IsReference() {
-				container = types.Z_REFVAL_P(container)
+				container = types2.Z_REFVAL_P(container)
 				if container.IsObject() {
 					break
 				}
@@ -199,8 +199,8 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
-	var retval *types.Zval
+	var zobj *types2.ZendObject = container.GetObj()
+	var retval *types2.Zval
 
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
@@ -208,7 +208,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -220,15 +220,15 @@ fetch_obj_r_finish:
 func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var container *types.Zval
-	var offset *types.Zval
+	var container *types2.Zval
+	var offset *types2.Zval
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Op2()
-	if container.GetType() != types.IS_OBJECT {
+	if container.GetType() != types2.IS_OBJECT {
 		for {
 			if container.IsReference() {
-				container = types.Z_REFVAL_P(container)
+				container = types2.Z_REFVAL_P(container)
 				if container.IsObject() {
 					break
 				}
@@ -248,8 +248,8 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
-	var retval *types.Zval
+	var zobj *types2.ZendObject = container.GetObj()
+	var retval *types2.Zval
 
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
@@ -257,7 +257,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -270,9 +270,9 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 }
 func ZEND_FETCH_OBJ_R_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
+	var container *types2.Zval
 	var free_op2 ZendFreeOp
-	var offset *types.Zval
+	var offset *types2.Zval
 	var cache_slot *any = nil
 	container = &(executeData.GetThis())
 	if container.IsUndef() {
@@ -281,8 +281,8 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	offset = opline.Op2()
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
-	var retval *types.Zval
+	var zobj *types2.ZendObject = container.GetObj()
+	var retval *types2.Zval
 
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
@@ -290,7 +290,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -300,8 +300,8 @@ fetch_obj_r_finish:
 }
 func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
-	var offset *types.Zval
+	var container *types2.Zval
+	var offset *types2.Zval
 	var cache_slot *any = nil
 	container = &(executeData.GetThis())
 	if container.IsUndef() {
@@ -310,8 +310,8 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	offset = opline.Op2()
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
-	var retval *types.Zval
+	var zobj *types2.ZendObject = container.GetObj()
+	var retval *types2.Zval
 
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
@@ -319,7 +319,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -331,16 +331,16 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_FETCH_OBJ_R_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
+	var container *types2.Zval
 	var free_op2 ZendFreeOp
-	var offset *types.Zval
+	var offset *types2.Zval
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Op2()
-	if container.GetType() != types.IS_OBJECT {
+	if container.GetType() != types2.IS_OBJECT {
 		for {
 			if container.IsReference() {
-				container = types.Z_REFVAL_P(container)
+				container = types2.Z_REFVAL_P(container)
 				if container.IsObject() {
 					break
 				}
@@ -360,8 +360,8 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
-	var retval *types.Zval
+	var zobj *types2.ZendObject = container.GetObj()
+	var retval *types2.Zval
 
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
@@ -369,7 +369,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -379,15 +379,15 @@ fetch_obj_r_finish:
 }
 func ZEND_FETCH_OBJ_R_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var container *types.Zval
-	var offset *types.Zval
+	var container *types2.Zval
+	var offset *types2.Zval
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Op2()
-	if container.GetType() != types.IS_OBJECT {
+	if container.GetType() != types2.IS_OBJECT {
 		for {
 			if container.IsReference() {
-				container = types.Z_REFVAL_P(container)
+				container = types2.Z_REFVAL_P(container)
 				if container.IsObject() {
 					break
 				}
@@ -407,8 +407,8 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
-	var retval *types.Zval
+	var zobj *types2.ZendObject = container.GetObj()
+	var retval *types2.Zval
 
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
@@ -416,7 +416,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.Result(), retval)
+		types2.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}

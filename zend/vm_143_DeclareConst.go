@@ -1,17 +1,19 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_DECLARE_CONST_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var name *types.Zval
-	var val *types.Zval
+	var name *types2.Zval
+	var val *types2.Zval
 	var c ZendConstant
 	name = opline.Const1()
 	val = opline.Const2()
-	types.ZVAL_COPY(c.Value(), val)
+	types2.ZVAL_COPY(c.Value(), val)
 	if c.Value().IsConstantAst() {
-		if ZvalUpdateConstantEx(c.Value(), executeData.GetFunc().GetOpArray().scope) != types.SUCCESS {
+		if ZvalUpdateConstantEx(c.Value(), executeData.GetFunc().GetOpArray().scope) != types2.SUCCESS {
 			// ZvalPtrDtorNogc(c.Value())
 			return 0
 		}

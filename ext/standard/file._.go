@@ -2,7 +2,7 @@ package standard
 
 import (
 	r "github.com/heyuuu/gophp/builtin/file"
-	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 var ZmStartupUserStreams func(type_ int, module_number int) int

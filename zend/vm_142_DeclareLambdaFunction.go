@@ -2,14 +2,14 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend/types"
+	types2 "github.com/heyuuu/gophp/php/types"
 )
 
 func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var func_ types.IFunction
-	var object *types.Zval
-	var called_scope *types.ClassEntry
+	var func_ types2.IFunction
+	var object *types2.Zval
+	var called_scope *types2.ClassEntry
 	func_ = CACHED_PTR(opline.GetExtendedValue())
 	if func_ == nil {
 		func_ = EG__().FunctionTable().Get(opline.Const1().String().GetStr())
@@ -18,7 +18,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 		CACHE_PTR(opline.GetExtendedValue(), func_)
 	}
 	if executeData.GetThis().IsObject() {
-		called_scope = types.Z_OBJCE(executeData.GetThis())
+		called_scope = types2.Z_OBJCE(executeData.GetThis())
 		if func_.IsStatic() || (executeData.GetFunc().GetFnFlags()&AccStatic) != 0 {
 			object = nil
 		} else {

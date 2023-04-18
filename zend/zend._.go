@@ -2,7 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/zend/types"
+	types2 "github.com/heyuuu/gophp/php/types"
 )
 
 const ZEND_VERSION = "3.4.0"
@@ -45,10 +45,10 @@ const PRINT_ZVAL_INDENT = 4
 
 /* true multithread-shared globals */
 
-var ZendStandardClassDef *types.ClassEntry = nil
+var ZendStandardClassDef *types2.ClassEntry = nil
 var ZendPostStartupCb func() int = nil
 var ZendPostShutdownCb func() = nil
-var ZendPreloadAutoload func(filename *types.String) int = nil
+var ZendPreloadAutoload func(filename *types2.String) int = nil
 var ZendMessageDispatcherP = core.PhpMessageHandlerForZend
 var ZendGetConfigurationDirectiveP = core.CfgGetEntry
 
@@ -66,7 +66,7 @@ var IniEntries = []ZendIniEntryDef{
 	*NewZendIniEntryDef("zend.exception_ignore_args", ZEND_INI_ALL).Value("0").
 		Displayer(ZendIniBooleanDisplayerCb).
 		OnModify(func(entry *ZendIniEntry, new_value *string, stage int) bool {
-			EG__().exception_ignore_args = types.IntBool(ZendIniStringParseBool(*new_value))
+			EG__().exception_ignore_args = types2.IntBool(ZendIniStringParseBool(*new_value))
 			return true
 		}),
 }

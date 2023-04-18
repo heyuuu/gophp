@@ -4,13 +4,14 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-var TokenizerFunctions = []types.FunctionEntry{
+var TokenizerFunctions = []types2.FunctionEntry{
 	DefZifTokenGetAll,
 	DefZifTokenName,
 }
@@ -38,34 +39,34 @@ func TokenizerTokenGetAllRegisterConstants(type_ int, module_number int) {
 func ZmStartupTokenizer(type_ int, module_number int) int {
 	TokenizerRegisterConstants(type_, module_number)
 	TokenizerTokenGetAllRegisterConstants(type_, module_number)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmInfoTokenizer(zend_module *zend.ModuleEntry) {
 	standard.PhpInfoPrintTableStart()
 	standard.PhpInfoPrintTableRow(2, "Tokenizer Support", "enabled")
 	standard.PhpInfoPrintTableEnd()
 }
-func AddToken(return_value *types.Zval, token_type int, text *uint8, leng int, lineno int) {
+func AddToken(return_value *types2.Zval, token_type int, text *uint8, leng int, lineno int) {
 	if token_type >= 256 {
-		arr := types.NewArray(0)
-		arr.NextIndexInsert(types.NewZvalLong(token_type))
-		arr.NextIndexInsert(types.NewZvalString(b.CastStr(text, leng)))
-		arr.NextIndexInsert(types.NewZvalLong(lineno))
+		arr := types2.NewArray(0)
+		arr.NextIndexInsert(types2.NewZvalLong(token_type))
+		arr.NextIndexInsert(types2.NewZvalString(b.CastStr(text, leng)))
+		arr.NextIndexInsert(types2.NewZvalLong(lineno))
 
-		return_value.Array().NextIndexInsert(types.NewZvalArray(arr))
+		return_value.Array().NextIndexInsert(types2.NewZvalArray(arr))
 	} else {
-		return_value.Array().NextIndexInsert(types.NewZvalString(b.CastStr(text, leng)))
+		return_value.Array().NextIndexInsert(types2.NewZvalString(b.CastStr(text, leng)))
 	}
 }
-func Tokenize(return_value *types.Zval, source string) types.ZendBool {
-	var source_zval types.Zval
+func Tokenize(return_value *types2.Zval, source string) types2.ZendBool {
+	var source_zval types2.Zval
 	var original_lex_state zend.ZendLexState
-	var token types.Zval
+	var token types2.Zval
 	var token_line int = 1
 	var need_tokens int = -1
 	source_zval.SetStringVal(source)
 	zend.ZendSaveLexicalState(&original_lex_state)
-	if zend.ZendPrepareStringForScanning(&source_zval, "") == types.FAILURE {
+	if zend.ZendPrepareStringForScanning(&source_zval, "") == types2.FAILURE {
 		zend.ZendRestoreLexicalState(&original_lex_state)
 		return 0
 	}
@@ -110,9 +111,9 @@ func Tokenize(return_value *types.Zval, source string) types.ZendBool {
 	return 1
 }
 func OnEvent(event zend.ZendPhpScannerEvent, token int, line int, context any) {
-	var token_stream *types.Zval = (*types.Zval)(context)
-	var tokens_ht *types.Array
-	var token_zv *types.Zval
+	var token_stream *types2.Zval = (*types2.Zval)(context)
+	var tokens_ht *types2.Array
+	var token_zv *types2.Zval
 	switch event {
 	case zend.ON_TOKEN:
 		if token == zend.END {
@@ -138,17 +139,17 @@ func OnEvent(event zend.ZendPhpScannerEvent, token int, line int, context any) {
 		}
 	}
 }
-func TokenizeParse(return_value *types.Zval, source string) types.ZendBool {
-	var source_zval types.Zval
+func TokenizeParse(return_value *types2.Zval, source string) types2.ZendBool {
+	var source_zval types2.Zval
 	var original_lex_state zend.ZendLexState
-	var original_in_compilation types.ZendBool
-	var success types.ZendBool
+	var original_in_compilation types2.ZendBool
+	var success types2.ZendBool
 	source_zval.SetStringVal(source)
 	original_in_compilation = zend.CG__().GetInCompilation()
 	zend.CG__().SetInCompilation(1)
 	zend.ZendSaveLexicalState(&original_lex_state)
 	if b.Assign(&success, zend.ZendPrepareStringForScanning(&source_zval, "") == zend.SUCCESS) {
-		var token_stream types.Zval
+		var token_stream types2.Zval
 		zend.ArrayInit(&token_stream)
 		zend.CG__().SetAst(nil)
 		zend.LANG_SCNG__().SetYyState(zend.yycINITIAL)
@@ -171,7 +172,7 @@ func TokenizeParse(return_value *types.Zval, source string) types.ZendBool {
 }
 
 func ZifTokenGetAll(return_value zpp.Ret, source string, _ zpp.Opt, flags int) {
-	var success types.ZendBool
+	var success types2.ZendBool
 	if (flags & 1) != 0 {
 		success = TokenizeParse(return_value, source)
 	} else {

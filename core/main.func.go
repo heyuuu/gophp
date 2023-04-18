@@ -7,10 +7,10 @@ import (
 	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
-	"github.com/heyuuu/gophp/zend/types"
 	"log"
 	"os"
 	"strconv"
@@ -45,18 +45,18 @@ func GetSafeCharsetHint() *byte {
 }
 func OnSetFacility(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
 	stage int,
 ) int {
 	var facility *byte = new_value.GetVal()
-	return types.FAILURE
+	return types2.FAILURE
 }
 func OnSetPrecision(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -66,14 +66,14 @@ func OnSetPrecision(
 	zend.ZEND_ATOL(i, new_value.GetVal())
 	if i >= -1 {
 		zend.EG__().SetPrecision(i)
-		return types.SUCCESS
+		return types2.SUCCESS
 	} else {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 }
 func OnSetSerializePrecision(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -83,14 +83,14 @@ func OnSetSerializePrecision(
 	zend.ZEND_ATOL(i, new_value.GetVal())
 	if i >= -1 {
 		PG__().serialize_precision = i
-		return types.SUCCESS
+		return types2.SUCCESS
 	} else {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 }
 func OnChangeMemoryLimit(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -102,7 +102,7 @@ func OnChangeMemoryLimit(
 	} else {
 		value = 1 << 30
 	}
-	if zend.ZendSetMemoryLimit(value) == types.FAILURE {
+	if zend.ZendSetMemoryLimit(value) == types2.FAILURE {
 
 		/* When the memory limit is reset to the original level during deactivation, we may be
 		 * using more memory than the original limit while shutdown is still in progress.
@@ -111,7 +111,7 @@ func OnChangeMemoryLimit(
 
 		if stage != zend.ZEND_INI_STAGE_DEACTIVATE {
 			faults.Error(faults.E_WARNING, "Failed to set memory limit to %zd bytes (Current memory usage is %zd bytes)", value, zend.ZendMemoryUsage(true))
-			return types.FAILURE
+			return types2.FAILURE
 		}
 
 		/* When the memory limit is reset to the original level during deactivation, we may be
@@ -121,11 +121,11 @@ func OnChangeMemoryLimit(
 
 	}
 	PG__().memory_limit = value
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func OnSetLogFilter(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -134,21 +134,21 @@ func OnSetLogFilter(
 	var filter *byte = new_value.GetVal()
 	if !(strcmp(filter, "all")) {
 		PG__().syslog_filter = PHP_SYSLOG_FILTER_ALL
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 	if !(strcmp(filter, "no-ctrl")) {
 		PG__().syslog_filter = PHP_SYSLOG_FILTER_NO_CTRL
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 	if !(strcmp(filter, "ascii")) {
 		PG__().syslog_filter = PHP_SYSLOG_FILTER_ASCII
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 	if !(strcmp(filter, "raw")) {
 		PG__().syslog_filter = PHP_SYSLOG_FILTER_RAW
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
-	return types.FAILURE
+	return types2.FAILURE
 }
 func PhpDisableFunctions() {
 	var s *byte = nil
@@ -249,7 +249,7 @@ func PhpBinaryInit() {
 }
 func OnUpdateTimeout(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -260,7 +260,7 @@ func OnUpdateTimeout(
 		/* Don't set a timeout on startup, only per-request */
 
 		zend.ZEND_ATOL(zend.EG__().GetTimeoutSeconds(), new_value.GetVal())
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 	zend.ZendUnsetTimeout()
 	zend.ZEND_ATOL(zend.EG__().GetTimeoutSeconds(), new_value.GetVal())
@@ -283,7 +283,7 @@ func OnUpdateTimeout(
 		 */
 
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpGetDisplayErrorsMode(value *byte, value_length int) int {
 	var mode int
@@ -310,14 +310,14 @@ func PhpGetDisplayErrorsMode(value *byte, value_length int) int {
 }
 func OnUpdateDisplayErrors(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
 	stage int,
 ) int {
-	PG__().display_errors = types.ZendBool(PhpGetDisplayErrorsMode(new_value.GetVal(), new_value.GetLen()))
-	return types.SUCCESS
+	PG__().display_errors = types2.ZendBool(PhpGetDisplayErrorsMode(new_value.GetVal(), new_value.GetLen()))
+	return types2.SUCCESS
 }
 func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 	var mode int
@@ -364,14 +364,14 @@ func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 }
 func OnUpdateDefaultCharset(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
 	stage int,
 ) int {
 	if memchr(new_value.GetVal(), '0', new_value.GetLen()) || strpbrk(new_value.GetVal(), "\r\n") {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
 	if PhpInternalEncodingChanged != nil {
@@ -380,24 +380,24 @@ func OnUpdateDefaultCharset(
 	if new_value != nil {
 
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func OnUpdateDefaultMimeTye(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
 	stage int,
 ) int {
 	if memchr(new_value.GetVal(), '0', new_value.GetLen()) || strpbrk(new_value.GetVal(), "\r\n") {
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	return zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
 }
 func OnUpdateInternalEncoding(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -410,11 +410,11 @@ func OnUpdateInternalEncoding(
 	if new_value != nil {
 
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func OnUpdateInputEncoding(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -427,11 +427,11 @@ func OnUpdateInputEncoding(
 	if new_value != nil {
 
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func OnUpdateOutputEncoding(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -444,11 +444,11 @@ func OnUpdateOutputEncoding(
 	if new_value != nil {
 
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func OnUpdateErrorLog(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -458,15 +458,15 @@ func OnUpdateErrorLog(
 
 	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil && strcmp(new_value.GetVal(), "syslog") {
 		if PG__().open_basedir && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 	}
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func OnUpdateMailLog(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -476,15 +476,15 @@ func OnUpdateMailLog(
 
 	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil {
 		if PG__().open_basedir && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 	}
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func OnChangeMailForceExtra(
 	entry *zend.ZendIniEntry,
-	new_value *types.String,
+	new_value *types2.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -493,9 +493,9 @@ func OnChangeMailForceExtra(
 	/* Don't allow changing it in htaccess */
 
 	if stage == PHP_INI_STAGE_HTACCESS {
-		return types.FAILURE
+		return types2.FAILURE
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpDuringModuleStartup() int  { return ModuleStartup }
 func PhpDuringModuleShutdown() int { return ModuleShutdown }
@@ -539,8 +539,8 @@ func PhpPrintf(format string, args ...any) int {
 	return PUTS(pfmt.Sprintf(format, args))
 }
 func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any) {
-	var replace_buffer *types.String = nil
-	var replace_origin *types.String = nil
+	var replace_buffer *types2.String = nil
+	var replace_origin *types2.String = nil
 	var buffer *byte = nil
 	var docref_buf *byte = nil
 	var target *byte = nil
@@ -714,10 +714,10 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		zend.Efree(docref_buf)
 	}
 	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsUndef() || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
-		var tmp types.Zval
+		var tmp types2.Zval
 		tmp.SetStringVal(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {
-			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types.FAILURE {
+			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types2.FAILURE {
 				// zend.ZvalPtrDtor(&tmp)
 			}
 		} else {
@@ -916,7 +916,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 				var append_string *byte = zend.INI_STR("error_append_string")
 				if PG__().html_errors {
 					if type_ == faults.E_ERROR || type_ == faults.E_PARSE {
-						var buf *types.String = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
+						var buf *types2.String = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf.GetVal(), error_filename, error_lineno, STR_PRINT(append_string))
 						//types.ZendStringFree(buf)
 					} else {
@@ -996,10 +996,10 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 		return
 	}
 	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 {
-		var tmp types.Zval
+		var tmp types2.Zval
 		tmp.SetStringVal(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {
-			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types.FAILURE {
+			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types2.FAILURE {
 				// zend.ZvalPtrDtor(&tmp)
 			}
 		} else {
@@ -1050,7 +1050,7 @@ func PhpStreamOpenForZendEx(filename string, mode int) *zend.FileHandle {
 }
 
 func PhpStreamOpenForZendExEx(filename string, mode int) (*PhpStreamForZend, string) {
-	var openedPath *types.String
+	var openedPath *types2.String
 	var stream *PhpStream = PhpStreamOpenWrapper(filename, "rb", mode, &openedPath)
 	if stream != nil {
 		/* suppress warning if this stream is not explicitly closed */
@@ -1154,7 +1154,7 @@ func PhpRequestStartup() int {
 			SapiAddHeader(SAPI_PHP_VERSION_HEADER)
 		}
 		if PG__().output_handler && PG__().output_handler[0] {
-			var oh types.Zval
+			var oh types2.Zval
 			oh.SetStringVal(b.CastStrAuto(PG__().output_handler))
 			PhpOutputStartUser(&oh, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
 			// zend.ZvalPtrDtor(&oh)
@@ -1172,10 +1172,10 @@ func PhpRequestStartup() int {
 	})
 
 	SG__().sapi_started = 1
-	return types.IntBool(retVal)
+	return types2.IntBool(retVal)
 }
 func PhpRequestShutdown(dummy any) {
-	var report_memleaks types.ZendBool
+	var report_memleaks types2.ZendBool
 	zend.EG__().AddFlags(zend.EG_FLAGS_IN_SHUTDOWN)
 	report_memleaks = PG__().report_memleaks
 
@@ -1199,7 +1199,7 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 3. Flush all output buffers */
 	faults.Try(func() {
-		var send_buffer types.ZendBool = b.Cond(SG__().RequestInfo.headers_only, 0, 1)
+		var send_buffer types2.ZendBool = b.Cond(SG__().RequestInfo.headers_only, 0, 1)
 		if zend.CG__().GetUncleanShutdown() != 0 && PG__().last_error_type == faults.E_ERROR && int(PG__().memory_limit < zend.ZendMemoryUsage(1)) != 0 {
 			send_buffer = 0
 		}
@@ -1316,15 +1316,15 @@ func PhpRegisterExtensions(ptrs []*zend.ModuleEntry) bool {
 func PhpRegisterExtensionsBc(ptr *zend.ModuleEntry, count int) int {
 	for b.PostDec(&count) {
 		if zend.ZendRegisterInternalModule(b.PostInc(&ptr)) == nil {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 
 func PhpModuleStartupEx(sf ISapiModule, additional_modules []zend.ModuleEntry) bool {
 	retval := PhpModuleStartup(sf, additional_modules, len(additional_modules))
-	return retval != types.FAILURE
+	return retval != types2.FAILURE
 }
 func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_additional_modules uint32) int {
 	var zuv zend.ZendUtilityValues
@@ -1335,7 +1335,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	SapiInitializeEmptyRequest()
 	SapiActivate()
 	if ModuleInitialized != 0 {
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 	SetSM__(sf)
 	PhpOutputStartup()
@@ -1395,8 +1395,8 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	   load zend extensions and register php function extensions
 	   to be loaded later */
 
-	if PhpInitConfig() == types.FAILURE {
-		return types.FAILURE
+	if PhpInitConfig() == types2.FAILURE {
+		return types2.FAILURE
 	}
 
 	/* Register PHP core ini entries */
@@ -1418,9 +1418,9 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	 * (this uses configuration parameters from php.ini)
 	 */
 
-	if PhpInitStreamWrappers(module_number) == types.FAILURE {
+	if PhpInitStreamWrappers(module_number) == types2.FAILURE {
 		PhpPrintf("PHP:  Unable to initialize stream url wrappers.\n")
-		return types.FAILURE
+		return types2.FAILURE
 	}
 	zuv.SetHtmlErrors(1)
 	PhpStartupAutoGlobals()
@@ -1431,7 +1431,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 
 	if PhpRegisterInternalExtensions() == false {
 		PhpPrintf("Unable to start builtin modules\n")
-		return types.FAILURE
+		return types2.FAILURE
 	}
 
 	/* start additional PHP extensions */
@@ -1474,8 +1474,8 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 		module.SetInfoFunc(ZmInfoPhpCore)
 	}
 	ModuleInitialized = 1
-	if zend.ZendPostStartup() != types.SUCCESS {
-		return types.FAILURE
+	if zend.ZendPostStartup() != types2.SUCCESS {
+		return types2.FAILURE
 	}
 
 	/* Check for deprecated directives */
@@ -1500,7 +1500,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 		for _, directive := range directives {
 			for _, p := range directive.directives {
 				var value zend.ZendLong
-				if CfgGetLong(p, &value) == types.SUCCESS && value != 0 {
+				if CfgGetLong(p, &value) == types2.SUCCESS && value != 0 {
 					faults.Error(directive.error_level, directive.phrase, p)
 				}
 			}
@@ -1514,7 +1514,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	zend.VirtualCwdActivate()
 
 	/* we're done */
-	return types.IntBool(retval)
+	return types2.IntBool(retval)
 }
 func PhpModuleShutdown() {
 	var module_number int = 0
@@ -1572,7 +1572,7 @@ func PhpExecuteScript(primaryFile *zend.FileHandle) bool {
 		if primaryFile.GetFilename() != nil && strcmp("Standard input code", primaryFile.GetFilename()) && primaryFile.GetOpenedPath() == nil && !primaryFile.IsTypeHandleFileName() {
 			if ExpandFilepath(primaryFile.GetFilename(), realfile) != nil {
 				primaryFile.SetOpenedPath(realfile)
-				types.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primaryFile.GetOpenedPath().GetStr())
+				types2.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primaryFile.GetOpenedPath().GetStr())
 			}
 		}
 		if PG__().auto_prepend_file && PG__().auto_prepend_file[0] {
@@ -1629,8 +1629,8 @@ func PhpHandleAuthData(auth *byte) int {
 	var auth_len int = b.CondF1(auth != nil, func() __auto__ { return strlen(auth) }, 0)
 	if auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Basic ", b.SizeOf("\"Basic \"")-1) == 0 {
 		var pass *byte
-		var user *types.String
-		user = types.NewString(standard.PhpBase64Decode(b.CastStr((*uint8)(auth+6), auth_len-6)))
+		var user *types2.String
+		user = types2.NewString(standard.PhpBase64Decode(b.CastStr((*uint8)(auth+6), auth_len-6)))
 		if user != nil {
 			pass = strchr(user.GetVal(), ':')
 			if pass != nil {
@@ -1658,8 +1658,8 @@ func PhpHandleAuthData(auth *byte) int {
 	return ret
 }
 func PhpLintScript(file *zend.FileHandle) int {
-	var op_array *types.ZendOpArray
-	var retval int = types.FAILURE
+	var op_array *types2.ZendOpArray
+	var retval int = types2.FAILURE
 
 	faults.Try(func() {
 		op_array = zend.CompileFile(file, zend.ZEND_INCLUDE)
@@ -1667,7 +1667,7 @@ func PhpLintScript(file *zend.FileHandle) int {
 		if op_array != nil {
 			zend.DestroyOpArray(op_array)
 			zend.Efree(op_array)
-			retval = types.SUCCESS
+			retval = types2.SUCCESS
 		}
 	})
 	if zend.EG__().GetException() != nil {

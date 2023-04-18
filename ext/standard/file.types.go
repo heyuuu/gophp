@@ -3,8 +3,8 @@ package standard
 import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**
@@ -39,7 +39,7 @@ func (this *PhpMetaTagsData) SetInMeta(value int)             { this.in_meta = v
 type PhpFileGlobals struct {
 	pclose_ret                   int
 	def_chunk_size               int
-	auto_detect_line_endings     types.ZendBool
+	auto_detect_line_endings     types2.ZendBool
 	default_socket_timeout       zend.ZendLong
 	user_agent                   *byte
 	from_address                 *byte
@@ -47,7 +47,7 @@ type PhpFileGlobals struct {
 	default_context              *core.PhpStreamContext
 	stream_wrappers              map[string]*core.PhpStreamWrapper
 	stream_filters               map[string]*streams.PhpStreamFilterFactory
-	wrapper_errors               *types.Array
+	wrapper_errors               *types2.Array
 	pclose_wait                  int
 }
 
@@ -64,10 +64,10 @@ func (this *PhpFileGlobals) SetStreamWrappers(value map[string]*core.PhpStreamWr
 //
 func (this *PhpFileGlobals) SetDefChunkSize(value int) { this.def_chunk_size = value }
 
-func (this *PhpFileGlobals) GetAutoDetectLineEndings() types.ZendBool {
+func (this *PhpFileGlobals) GetAutoDetectLineEndings() types2.ZendBool {
 	return this.auto_detect_line_endings
 }
-func (this *PhpFileGlobals) SetAutoDetectLineEndings(value types.ZendBool) {
+func (this *PhpFileGlobals) SetAutoDetectLineEndings(value types2.ZendBool) {
 	this.auto_detect_line_endings = value
 }
 func (this *PhpFileGlobals) GetDefaultSocketTimeout() zend.ZendLong {
@@ -98,7 +98,7 @@ func (this *PhpFileGlobals) SetStreamFilters(value map[string]*streams.PhpStream
 	this.stream_filters = value
 }
 
-func (this *PhpFileGlobals) GetWrapperErrors() *types.Array      { return this.wrapper_errors }
-func (this *PhpFileGlobals) SetWrapperErrors(value *types.Array) { this.wrapper_errors = value }
-func (this *PhpFileGlobals) GetPcloseWait() int                  { return this.pclose_wait }
-func (this *PhpFileGlobals) SetPcloseWait(value int)             { this.pclose_wait = value }
+func (this *PhpFileGlobals) GetWrapperErrors() *types2.Array      { return this.wrapper_errors }
+func (this *PhpFileGlobals) SetWrapperErrors(value *types2.Array) { this.wrapper_errors = value }
+func (this *PhpFileGlobals) GetPcloseWait() int                   { return this.pclose_wait }
+func (this *PhpFileGlobals) SetPcloseWait(value int)              { this.pclose_wait = value }

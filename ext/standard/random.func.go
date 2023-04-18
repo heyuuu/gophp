@@ -2,9 +2,9 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -17,13 +17,13 @@ func RandomGlobalsDtor(random_globals_p *PhpRandomGlobals) {
 }
 func ZmStartupRandom(type_ int, module_number int) int {
 	RandomGlobalsCtor(&RandomGlobals)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmShutdownRandom(type_ int, module_number int) int {
 	RandomGlobalsDtor(&RandomGlobals)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func PhpRandomBytes(bytes any, size int, should_throw types.ZendBool) int {
+func PhpRandomBytes(bytes any, size int, should_throw types2.ZendBool) int {
 	var read_bytes int = 0
 	var n ssize_t
 	if read_bytes < size {
@@ -35,7 +35,7 @@ func PhpRandomBytes(bytes any, size int, should_throw types.ZendBool) int {
 				if should_throw != 0 {
 					faults.ThrowException(faults.ZendCeException, "Cannot open source device", 0)
 				}
-				return types.FAILURE
+				return types2.FAILURE
 			}
 
 			/* Does the file exist and is it a character device? */
@@ -45,7 +45,7 @@ func PhpRandomBytes(bytes any, size int, should_throw types.ZendBool) int {
 				if should_throw != 0 {
 					faults.ThrowException(faults.ZendCeException, "Error reading from source device", 0)
 				}
-				return types.FAILURE
+				return types2.FAILURE
 			}
 			RANDOM_G(fd) = fd
 		}
@@ -59,14 +59,14 @@ func PhpRandomBytes(bytes any, size int, should_throw types.ZendBool) int {
 			if should_throw != 0 {
 				faults.ThrowException(faults.ZendCeException, "Could not gather sufficient random data", 0)
 			}
-			return types.FAILURE
+			return types2.FAILURE
 		}
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func ZifRandomBytes(executeData zpp.Ex, return_value zpp.Ret, length *types.Zval) {
+func ZifRandomBytes(executeData zpp.Ex, return_value zpp.Ret, length *types2.Zval) {
 	var size zend.ZendLong
-	var bytes *types.String
+	var bytes *types2.String
 	for {
 		var _flags int = zpp.FlagThrow
 		var _min_num_args int = 1
@@ -86,8 +86,8 @@ func ZifRandomBytes(executeData zpp.Ex, return_value zpp.Ret, length *types.Zval
 		faults.ThrowException(faults.ZendCeError, "Length must be greater than 0", 0)
 		return
 	}
-	bytes = types.ZendStringAlloc(size, 0)
-	if PhpRandomBytesThrow(bytes.GetVal(), size) == types.FAILURE {
+	bytes = types2.ZendStringAlloc(size, 0)
+	if PhpRandomBytesThrow(bytes.GetVal(), size) == types2.FAILURE {
 		// types.ZendStringReleaseEx(bytes, 0)
 		return
 	}
@@ -95,23 +95,23 @@ func ZifRandomBytes(executeData zpp.Ex, return_value zpp.Ret, length *types.Zval
 	return_value.SetString(bytes)
 	return
 }
-func PhpRandomInt(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong, should_throw types.ZendBool) int {
+func PhpRandomInt(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong, should_throw types2.ZendBool) int {
 	var umax zend.ZendUlong
 	var trial zend.ZendUlong
 	if min == max {
 		*result = min
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 	umax = zend.ZendUlong(max - zend.ZendUlong(min))
-	if PhpRandomBytes(&trial, b.SizeOf("trial"), should_throw) == types.FAILURE {
-		return types.FAILURE
+	if PhpRandomBytes(&trial, b.SizeOf("trial"), should_throw) == types2.FAILURE {
+		return types2.FAILURE
 	}
 
 	/* Special case where no modulus is required */
 
 	if umax == zend.ZEND_ULONG_MAX {
 		*result = zend.ZendLong(trial)
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 
 	/* Increment the max so the range is inclusive of max */
@@ -129,8 +129,8 @@ func PhpRandomInt(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong, s
 		/* Discard numbers over the limit to avoid modulo bias */
 
 		for trial > limit {
-			if PhpRandomBytes(&trial, b.SizeOf("trial"), should_throw) == types.FAILURE {
-				return types.FAILURE
+			if PhpRandomBytes(&trial, b.SizeOf("trial"), should_throw) == types2.FAILURE {
+				return types2.FAILURE
 			}
 		}
 
@@ -138,9 +138,9 @@ func PhpRandomInt(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong, s
 
 	}
 	*result = zend_long(trial%umax + min)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func ZifRandomInt(executeData zpp.Ex, return_value zpp.Ret, min *types.Zval, max *types.Zval) {
+func ZifRandomInt(executeData zpp.Ex, return_value zpp.Ret, min *types2.Zval, max *types2.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
 	var result zend.ZendLong
@@ -164,7 +164,7 @@ func ZifRandomInt(executeData zpp.Ex, return_value zpp.Ret, min *types.Zval, max
 		faults.ThrowException(faults.ZendCeError, "Minimum value must be less than or equal to the maximum value", 0)
 		return
 	}
-	if PhpRandomIntThrow(min, max, &result) == types.FAILURE {
+	if PhpRandomIntThrow(min, max, &result) == types2.FAILURE {
 		return
 	}
 	return_value.SetLong(result)

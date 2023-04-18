@@ -2,15 +2,15 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend/types"
+	types2 "github.com/heyuuu/gophp/php/types"
 )
 
 func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var varname *types.Zval
-	var name *types.String
-	var tmp_name *types.String = nil
-	var ce *types.ClassEntry
+	var varname *types2.Zval
+	var name *types2.String
+	var tmp_name *types2.String = nil
+	var ce *types2.ClassEntry
 	var free_op1 ZendFreeOp
 	if opline.GetOp2Type() == IS_CONST {
 		ce = CACHED_PTR(opline.GetExtendedValue())

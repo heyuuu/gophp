@@ -5,18 +5,18 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
 	"os"
 )
 
 func BG__() *PhpBasicGlobals { return &BasicGlobals }
-func PhpPutenvDestructor(zv *types.Zval) {
+func PhpPutenvDestructor(zv *types2.Zval) {
 	var pe *PutenvEntry = zv.Ptr()
 	if pe.GetPreviousValue() != nil {
 		putenv(pe.GetPreviousValue())
@@ -120,56 +120,56 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	RegisterPhpinfoConstants(type_, module_number)
 	RegisterHtmlConstants(type_, module_number)
 	str.RegisterStringConstants(type_, module_number)
-	if ZmStartupVar(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupVar(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupFile(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupFile(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupPack(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupPack(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupBrowscap(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupBrowscap(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupStandardFilters(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupStandardFilters(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupUserFilters(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupUserFilters(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupPassword(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupPassword(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupMtRand(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupMtRand(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if zm_startup_nl_langinfo(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if zm_startup_nl_langinfo(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupCrypt(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupCrypt(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupDir(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupDir(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupSyslog(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupSyslog(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupArray(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupArray(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupAssert(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupAssert(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupUrlScannerEx(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupUrlScannerEx(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupUserStreams(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupUserStreams(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupImagetypes(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupImagetypes(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
 	streams.PhpRegisterUrlStreamWrapper("php", &PhpStreamPhpWrapper)
 	streams.PhpRegisterUrlStreamWrapper("file", &PhpPlainFilesWrapper)
@@ -177,16 +177,16 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	streams.PhpRegisterUrlStreamWrapper("data", &streams.PhpStreamRfc2397Wrapper)
 	streams.PhpRegisterUrlStreamWrapper("http", &PhpStreamHttpWrapper)
 	streams.PhpRegisterUrlStreamWrapper("ftp", &PhpStreamFtpWrapper)
-	if ZmStartupDns(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupDns(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupRandom(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupRandom(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	if ZmStartupHrtime(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
+	if ZmStartupHrtime(type_, module_number) != types2.SUCCESS {
+		return types2.FAILURE
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmShutdownBasic(type_ int, module_number int) int {
 	ZmShutdownSyslog(type_, module_number)
@@ -203,7 +203,7 @@ func ZmShutdownBasic(type_ int, module_number int) int {
 	ZmShutdownCrypt(type_, module_number)
 	ZmShutdownRandom(type_, module_number)
 	ZmShutdownPassword(type_, module_number)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmActivateBasic(type_ int, module_number int) int {
 	BG__().serialize_lock = 0
@@ -235,7 +235,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 
 	/* Default to global filters only */
 	FG__().SetStreamFilters(nil)
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmDeactivateBasic(type_ int, module_number int) int {
 	tsrm_env_lock()
@@ -273,7 +273,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	ZmDeactivateUserFilters(type_, module_number)
 	BG__().page_uid = -1
 	BG__().page_gid = -1
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmInfoBasic(zend_module *zend.ModuleEntry) {
 	PhpInfoPrintTableStart()
@@ -286,9 +286,9 @@ func ZifConstant(returnValue zpp.Ret, constName string) {
 	scope := zend.ZendGetExecutedScope()
 	c := zend.ZendGetConstantEx(constName, scope, zend.ZEND_FETCH_CLASS_SILENT)
 	if c != nil {
-		types.ZVAL_COPY_OR_DUP(returnValue, c)
-		if returnValue.IsType(types.IS_CONSTANT_AST) {
-			if zend.ZvalUpdateConstantEx(returnValue, scope) != types.SUCCESS {
+		types2.ZVAL_COPY_OR_DUP(returnValue, c)
+		if returnValue.IsType(types2.IS_CONSTANT_AST) {
+			if zend.ZvalUpdateConstantEx(returnValue, scope) != types2.SUCCESS {
 				return
 			}
 		}
@@ -300,7 +300,7 @@ func ZifConstant(returnValue zpp.Ret, constName string) {
 		return
 	}
 }
-func ZifInetNtop(executeData zpp.Ex, return_value zpp.Ret, inAddr *types.Zval) {
+func ZifInetNtop(executeData zpp.Ex, return_value zpp.Ret, inAddr *types2.Zval) {
 	var address *byte
 	var address_len int
 	var af int = AF_INET
@@ -363,7 +363,7 @@ func ZifInetPton(executeData zpp.Ex, return_value zpp.Ret, ipAddress string) {
 	return_value.SetStringVal(b.CastStr(buffer, b.Cond(af == AF_INET, 4, 16)))
 	return
 }
-func ZifIp2long(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types.Zval) {
+func ZifIp2long(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types2.Zval) {
 	var addr *byte
 	var addr_len int
 	var ip __struct__in_addr
@@ -385,7 +385,7 @@ func ZifIp2long(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types.Zval)
 	return_value.SetLong(ntohl(ip.s_addr))
 	return
 }
-func ZifLong2ip(executeData zpp.Ex, return_value zpp.Ret, properAddress *types.Zval) {
+func ZifLong2ip(executeData zpp.Ex, return_value zpp.Ret, properAddress *types2.Zval) {
 	var ip zend.ZendUlong
 	var sip zend.ZendLong
 	var myaddr __struct__in_addr
@@ -414,11 +414,11 @@ func ZifLong2ip(executeData zpp.Ex, return_value zpp.Ret, properAddress *types.Z
 		return
 	}
 }
-func ZifGetenv(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, varname *types.Zval, localOnly *types.Zval) {
+func ZifGetenv(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, varname *types2.Zval, localOnly *types2.Zval) {
 	var ptr *byte
 	var str *byte = nil
 	var str_len int
-	var local_only types.ZendBool = 0
+	var local_only types2.ZendBool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 0, 2, 0)
@@ -467,7 +467,7 @@ func ZifGetenv(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, varname *typ
 	return_value.SetFalse()
 	return
 }
-func ZifPutenv(executeData zpp.Ex, return_value zpp.Ret, setting *types.Zval) {
+func ZifPutenv(executeData zpp.Ex, return_value zpp.Ret, setting *types2.Zval) {
 	var setting *byte
 	var setting_len int
 	var p *byte
@@ -496,7 +496,7 @@ func ZifPutenv(executeData zpp.Ex, return_value zpp.Ret, setting *types.Zval) {
 	}
 	pe.SetKeyLen(strlen(pe.GetKey()))
 	tsrm_env_lock()
-	types.ZendHashStrDel(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()))
+	types2.ZendHashStrDel(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()))
 
 	/* find previous value */
 
@@ -511,7 +511,7 @@ func ZifPutenv(executeData zpp.Ex, return_value zpp.Ret, setting *types.Zval) {
 		unsetenv(pe.GetPutenvString())
 	}
 	if p == nil || putenv(pe.GetPutenvString()) == 0 {
-		types.ZendHashAddMem(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()), &pe, b.SizeOf("putenv_entry"))
+		types2.ZendHashAddMem(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()), &pe, b.SizeOf("putenv_entry"))
 		if !(strncmp(pe.GetKey(), "TZ", pe.GetKeyLen())) {
 			tzset()
 		}
@@ -574,7 +574,7 @@ func ParseOpts(opts *byte, result **core.Opt) int {
 	}
 	return count
 }
-func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ zpp.Opt, opts *types.Zval, optind zpp.RefZval) {
+func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types2.Zval, _ zpp.Opt, opts *types2.Zval, optind zpp.RefZval) {
 	var options *byte = nil
 	var argv **byte = nil
 	var opt []byte = []byte{'0'}
@@ -585,10 +585,10 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 	var len_ int
 	var php_optarg *byte = nil
 	var php_optind int = 1
-	var val types.Zval
-	var args *types.Zval = nil
-	var p_longopts *types.Zval = nil
-	var zoptind *types.Zval = nil
+	var val types2.Zval
+	var args *types2.Zval = nil
+	var p_longopts *types2.Zval = nil
+	var zoptind *types2.Zval = nil
 	var optname_len int = 0
 	var opts *core.Opt
 	var orig_opts *core.Opt
@@ -618,10 +618,10 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr("_SERVER") != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types2.IS_ARRAY || zend.ZendIsAutoGlobalStr("_SERVER") != 0) && (b.Assign(&args, types2.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types2.STR_ARGV)) != nil || b.Assign(&args, types2.ZendHashFindInd(zend.EG__().GetSymbolTable(), types2.STR_ARGV)) != nil) {
 		var pos int = 0
-		var entry *types.Zval
-		if args.GetType() != types.IS_ARRAY {
+		var entry *types2.Zval
+		if args.GetType() != types2.IS_ARRAY {
 			return_value.SetFalse()
 			return
 		}
@@ -634,13 +634,13 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 
 		/* Iterate over the hash to construct the argv array. */
 
-		var __ht *types.Array = args.Array()
+		var __ht *types2.Array = args.Array()
 		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
+			var _z *types2.Zval = _p.GetVal()
 
 			entry = _z
-			var tmp_arg_str *types.String
-			var arg_str *types.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			var tmp_arg_str *types2.String
+			var arg_str *types2.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
 			argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
 			// zend.ZendTmpStringRelease(tmp_arg_str)
 		}
@@ -663,7 +663,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 	len_ = ParseOpts(options, &opts)
 	if p_longopts != nil {
 		var count int
-		var entry *types.Zval
+		var entry *types2.Zval
 		count = p_longopts.Array().Len()
 
 		/* the first <len> slots are filled by the one short ops
@@ -676,13 +676,13 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 
 		/* Iterate over the hash to construct the argv array. */
 
-		var __ht *types.Array = p_longopts.Array()
+		var __ht *types2.Array = p_longopts.Array()
 		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
+			var _z *types2.Zval = _p.GetVal()
 
 			entry = _z
-			var tmp_arg_str *types.String
-			var arg_str *types.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			var tmp_arg_str *types2.String
+			var arg_str *types2.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
 			opts.SetNeedParam(0)
 			opts.SetOptName(zend.Estrdup(arg_str.GetVal()))
 			len_ = strlen(opts.GetOptName())
@@ -752,13 +752,13 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 		/* Add this option / argument pair to the result hash. */
 
 		optname_len = strlen(optname)
-		if !(optname_len > 1 && optname[0] == '0') && zend.IsNumericString(b.CastStr(optname, optname_len), nil, nil, 0) == types.IS_LONG {
+		if !(optname_len > 1 && optname[0] == '0') && zend.IsNumericString(b.CastStr(optname, optname_len), nil, nil, 0) == types2.IS_LONG {
 
 			/* numeric string */
 
 			var optname_int int = atoi(optname)
 			if b.Assign(&args, return_value.Array().IndexFind(optname_int)) != nil {
-				if args.GetType() != types.IS_ARRAY {
+				if args.GetType() != types2.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
 				args.Array().NextIndexInsert(&val)
@@ -770,7 +770,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 			/* other strings */
 
 			if b.Assign(&args, return_value.Array().KeyFind(b.CastStrAuto(optname))) != nil {
-				if args.GetType() != types.IS_ARRAY {
+				if args.GetType() != types2.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
 				args.Array().NextIndexInsert(&val)
@@ -799,7 +799,7 @@ func ZifFlush(executeData zpp.Ex, return_value zpp.Ret) {
 	}
 	core.SapiFlush()
 }
-func ZifSleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types.Zval) {
+func ZifSleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types2.Zval) {
 	var num zend.ZendLong
 	for {
 		for {
@@ -821,7 +821,7 @@ func ZifSleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types.Zval) {
 	return_value.SetLong(core.PhpSleep(uint(num)))
 	return
 }
-func ZifUsleep(executeData zpp.Ex, return_value zpp.Ret, microSeconds *types.Zval) {
+func ZifUsleep(executeData zpp.Ex, return_value zpp.Ret, microSeconds *types2.Zval) {
 	var num zend.ZendLong
 	for {
 		for {
@@ -841,7 +841,7 @@ func ZifUsleep(executeData zpp.Ex, return_value zpp.Ret, microSeconds *types.Zva
 	}
 	usleep(uint(num))
 }
-func ZifTimeNanosleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types.Zval, nanoseconds *types.Zval) {
+func ZifTimeNanosleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types2.Zval, nanoseconds *types2.Zval) {
 	var tv_sec zend.ZendLong
 	var tv_nsec zend.ZendLong
 	var php_req __struct__timespec
@@ -884,7 +884,7 @@ func ZifTimeNanosleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types.Z
 	return_value.SetFalse()
 	return
 }
-func ZifTimeSleepUntil(executeData zpp.Ex, return_value zpp.Ret, timestamp *types.Zval) {
+func ZifTimeSleepUntil(executeData zpp.Ex, return_value zpp.Ret, timestamp *types2.Zval) {
 	var target_secs float64
 	var tm __struct__timeval
 	var php_req __struct__timespec
@@ -937,28 +937,28 @@ func ZifGetCurrentUser(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetStringVal(b.CastStrAuto(core.PhpGetCurrentUser()))
 	return
 }
-func AddConfigEntry(h zend.ZendUlong, key *types.String, entry *types.Zval, retval *types.Zval) {
-	if entry.IsType(types.IS_STRING) {
+func AddConfigEntry(h zend.ZendUlong, key *types2.String, entry *types2.Zval, retval *types2.Zval) {
+	if entry.IsType(types2.IS_STRING) {
 		var str = entry.String().Copy()
 		if key != nil {
 			zend.AddAssocStrEx(retval, key.GetStr(), str.GetStr())
 		} else {
 			zend.AddIndexStr(retval, h, str)
 		}
-	} else if entry.IsType(types.IS_ARRAY) {
-		var tmp types.Zval
+	} else if entry.IsType(types2.IS_ARRAY) {
+		var tmp types2.Zval
 		zend.ArrayInit(&tmp)
 		AddConfigEntries(entry.Array(), &tmp)
 		retval.Array().KeyUpdate(key.GetStr(), &tmp)
 	}
 }
-func AddConfigEntries(hash *types.Array, return_value *types.Zval) {
+func AddConfigEntries(hash *types2.Array, return_value *types2.Zval) {
 	var h zend.ZendUlong
-	var key *types.String
-	var zv *types.Zval
-	var __ht *types.Array = hash
+	var key *types2.String
+	var zv *types2.Zval
+	var __ht *types2.Array = hash
 	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
+		var _z *types2.Zval = _p.GetVal()
 
 		h = _p.GetH()
 		key = _p.GetKey()
@@ -966,10 +966,10 @@ func AddConfigEntries(hash *types.Array, return_value *types.Zval) {
 		AddConfigEntry(h, key, zv, return_value)
 	}
 }
-func ZifGetCfgVar(executeData zpp.Ex, return_value zpp.Ret, optionName *types.Zval) {
+func ZifGetCfgVar(executeData zpp.Ex, return_value zpp.Ret, optionName *types2.Zval) {
 	var varname *byte
 	var varname_len int
-	var retval *types.Zval
+	var retval *types2.Zval
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -983,7 +983,7 @@ func ZifGetCfgVar(executeData zpp.Ex, return_value zpp.Ret, optionName *types.Zv
 	}
 	retval = core.CfgGetEntry(b.CastStr(varname, varname_len))
 	if retval != nil {
-		if retval.IsType(types.IS_ARRAY) {
+		if retval.IsType(types2.IS_ARRAY) {
 			zend.ArrayInit(return_value)
 			AddConfigEntries(retval.Array(), return_value)
 			return
@@ -1010,7 +1010,7 @@ func ZifGetMagicQuotesGpc(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetFalse()
 	return
 }
-func ZifErrorLog(executeData zpp.Ex, return_value zpp.Ret, message *types.Zval, _ zpp.Opt, messageType *types.Zval, destination *types.Zval, extraHeaders *types.Zval) {
+func ZifErrorLog(executeData zpp.Ex, return_value zpp.Ret, message *types2.Zval, _ zpp.Opt, messageType *types2.Zval, destination *types2.Zval, extraHeaders *types2.Zval) {
 	var message *byte
 	var opt *byte = nil
 	var headers *byte = nil
@@ -1038,7 +1038,7 @@ func ZifErrorLog(executeData zpp.Ex, return_value zpp.Ret, message *types.Zval, 
 	if argc > 1 {
 		opt_err = int(erropt)
 	}
-	if _phpErrorLogEx(opt_err, message, message_len, opt, headers) == types.FAILURE {
+	if _phpErrorLogEx(opt_err, message, message_len, opt, headers) == types2.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -1051,31 +1051,31 @@ func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, head
 	switch opt_err {
 	case 1:
 		if PhpMail(opt, "PHP error_log message", message, headers, nil) == 0 {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 	case 2:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "TCP/IP option not available!")
-		return types.FAILURE
+		return types2.FAILURE
 	case 3:
 		stream = core.PhpStreamOpenWrapper(opt, "a", core.IGNORE_URL_WIN|core.REPORT_ERRORS, nil)
 		if stream == nil {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 		nbytes = core.PhpStreamWrite(stream, message, message_len)
 		core.PhpStreamClose(stream)
 		if nbytes != message_len {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 	case 4:
 		if core.SM__().GetLogMessage() != nil {
 			core.SM__().GetLogMessage()(message, -1)
 		} else {
-			return types.FAILURE
+			return types2.FAILURE
 		}
 	default:
 		core.PhpLogErrWithSeverity(message, LOG_NOTICE)
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZifErrorGetLast(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
@@ -1108,10 +1108,10 @@ func ZifErrorClearLast(executeData zpp.Ex, return_value zpp.Ret) {
 		}
 	}
 }
-func ZifCallUserFunc(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
-	var retval types.Zval
-	var fci types.ZendFcallInfo
-	var fci_cache types.ZendFcallInfoCache
+func ZifCallUserFunc(executeData zpp.Ex, return_value zpp.Ret, functionName *types2.Zval, _ zpp.Opt, parameters []*types2.Zval) {
+	var retval types2.Zval
+	var fci types2.ZendFcallInfo
+	var fci_cache types2.ZendFcallInfoCache
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1131,18 +1131,18 @@ func ZifCallUserFunc(executeData zpp.Ex, return_value zpp.Ret, functionName *typ
 		break
 	}
 	fci.SetRetval(&retval)
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types2.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
-		types.ZVAL_COPY_VALUE(return_value, &retval)
+		types2.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 }
-func ZifCallUserFuncArray(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, parameters *types.Zval) {
-	var params *types.Zval
-	var retval types.Zval
-	var fci types.ZendFcallInfo
-	var fci_cache types.ZendFcallInfoCache
+func ZifCallUserFuncArray(executeData zpp.Ex, return_value zpp.Ret, functionName *types2.Zval, parameters *types2.Zval) {
+	var params *types2.Zval
+	var retval types2.Zval
+	var fci types2.ZendFcallInfo
+	var fci_cache types2.ZendFcallInfoCache
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 2, 0)
@@ -1157,19 +1157,19 @@ func ZifCallUserFuncArray(executeData zpp.Ex, return_value zpp.Ret, functionName
 	}
 	zend.ZendFcallInfoArgs(&fci, params)
 	fci.SetRetval(&retval)
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types2.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
-		types.ZVAL_COPY_VALUE(return_value, &retval)
+		types2.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 	zend.ZendFcallInfoArgsClear(&fci, 1)
 }
-func ZifForwardStaticCall(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
-	var retval types.Zval
-	var fci types.ZendFcallInfo
-	var fci_cache types.ZendFcallInfoCache
-	var called_scope *types.ClassEntry
+func ZifForwardStaticCall(executeData zpp.Ex, return_value zpp.Ret, functionName *types2.Zval, _ zpp.Opt, parameters []*types2.Zval) {
+	var retval types2.Zval
+	var fci types2.ZendFcallInfo
+	var fci_cache types2.ZendFcallInfoCache
+	var called_scope *types2.ClassEntry
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1204,19 +1204,19 @@ func ZifForwardStaticCall(executeData zpp.Ex, return_value zpp.Ret, functionName
 	if called_scope != nil && fci_cache.GetCallingScope() != nil && zend.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
 		fci_cache.SetCalledScope(called_scope)
 	}
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types2.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
-		types.ZVAL_COPY_VALUE(return_value, &retval)
+		types2.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 }
-func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, parameters *types.Zval) {
-	var params *types.Zval
-	var retval types.Zval
-	var fci types.ZendFcallInfo
-	var fci_cache types.ZendFcallInfoCache
-	var called_scope *types.ClassEntry
+func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functionName *types2.Zval, parameters *types2.Zval) {
+	var params *types2.Zval
+	var retval types2.Zval
+	var fci types2.ZendFcallInfo
+	var fci_cache types2.ZendFcallInfoCache
+	var called_scope *types2.ClassEntry
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 2, 0)
@@ -1235,15 +1235,15 @@ func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functio
 	if called_scope != nil && fci_cache.GetCallingScope() != nil && zend.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
 		fci_cache.SetCalledScope(called_scope)
 	}
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types2.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
-		types.ZVAL_COPY_VALUE(return_value, &retval)
+		types2.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 	zend.ZendFcallInfoArgsClear(&fci, 1)
 }
-func UserShutdownFunctionDtor(zv *types.Zval) {
+func UserShutdownFunctionDtor(zv *types2.Zval) {
 	var i int
 	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
 	for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
@@ -1259,16 +1259,16 @@ func UserTickFunctionDtor(tick_function_entry *UserTickFunctionEntry) {
 	}
 	zend.Efree(tick_function_entry.GetArguments())
 }
-func UserShutdownFunctionCall(zv *types.Zval) int {
+func UserShutdownFunctionCall(zv *types2.Zval) int {
 	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
-	var retval types.Zval
+	var retval types2.Zval
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var function_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
+		var function_name *types2.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
 		core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
 		// types.ZendStringReleaseEx(function_name, 0)
 		return 0
 	}
-	if zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == types.SUCCESS {
+	if zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == types2.SUCCESS {
 		// zend.ZvalPtrDtor(&retval)
 	}
 	return 0
@@ -1276,7 +1276,7 @@ func UserShutdownFunctionCall(zv *types.Zval) int {
 func PhpCallShutdownFunctions() {
 	if BG__().user_shutdown_function_names {
 		faults.Try(func() {
-			types.ZendHashApply(BG__().user_shutdown_function_names, UserShutdownFunctionCall)
+			types2.ZendHashApply(BG__().user_shutdown_function_names, UserShutdownFunctionCall)
 		})
 	}
 }
@@ -1293,7 +1293,7 @@ func PhpFreeShutdownFunctions() {
 		})
 	}
 }
-func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
+func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types2.Zval, _ zpp.Opt, parameters []*types2.Zval) {
 	var shutdown_function_entry PhpShutdownFunctionEntry
 	var i int
 	shutdown_function_entry.SetArgCount(executeData.NumArgs())
@@ -1301,8 +1301,8 @@ func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, funct
 		zend.ZendWrongParamCount()
 		return
 	}
-	shutdown_function_entry.SetArguments((*types.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), shutdown_function_entry.GetArgCount(), 0)))
-	if zend.ZendGetParametersArray(executeData.NumArgs(), shutdown_function_entry.GetArgCount(), shutdown_function_entry.GetArguments()) == types.FAILURE {
+	shutdown_function_entry.SetArguments((*types2.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), shutdown_function_entry.GetArgCount(), 0)))
+	if zend.ZendGetParametersArray(executeData.NumArgs(), shutdown_function_entry.GetArgCount(), shutdown_function_entry.GetArguments()) == types2.FAILURE {
 		zend.Efree(shutdown_function_entry.GetArguments())
 		return_value.SetFalse()
 		return
@@ -1311,7 +1311,7 @@ func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, funct
 	/* Prevent entering of anything but valid callback (syntax check only!) */
 
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var callback_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
+		var callback_name *types2.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid shutdown callback '%s' passed", callback_name.GetVal())
 		zend.Efree(shutdown_function_entry.GetArguments())
 		// types.ZendStringReleaseEx(callback_name, 0)
@@ -1324,7 +1324,7 @@ func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, funct
 		for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
 			shutdown_function_entry.GetArguments()[i].TryAddRefcount()
 		}
-		types.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
+		types2.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
 	}
 
 	/* Prevent entering of anything but valid callback (syntax check only!) */
@@ -1338,12 +1338,12 @@ func PhpGetHighlight(syntax_highlighter_ini *zend.ZendSyntaxHighlighterIni) {
 }
 
 //@zif -alias show_source
-func ZifHighlightFile(executeData zpp.Ex, return_value zpp.Ret, fileName *types.Zval, _ zpp.Opt, return_ *types.Zval) {
+func ZifHighlightFile(executeData zpp.Ex, return_value zpp.Ret, fileName *types2.Zval, _ zpp.Opt, return_ *types2.Zval) {
 	var filename *byte
 	var filename_len int
 	var ret int
 	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-	var i types.ZendBool = 0
+	var i types2.ZendBool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -1367,7 +1367,7 @@ func ZifHighlightFile(executeData zpp.Ex, return_value zpp.Ret, fileName *types.
 	}
 	PhpGetHighlight(&syntax_highlighter_ini)
 	ret = zend.HighlightFile(filename, &syntax_highlighter_ini)
-	if ret == types.FAILURE {
+	if ret == types2.FAILURE {
 		if i != 0 {
 			core.PhpOutputEnd()
 		}
@@ -1388,7 +1388,7 @@ func ZifPhpStripWhitespace(return_value zpp.Ret, fileName string) {
 
 	fh := zend.NewFileHandleByFilename(fileName)
 	zend.ZendSaveLexicalState(&originalLexState)
-	if zend.OpenFileForScanning(fh) == types.FAILURE {
+	if zend.OpenFileForScanning(fh) == types2.FAILURE {
 		zend.ZendRestoreLexicalState(&originalLexState)
 		core.PhpOutputEnd()
 		return_value.SetStringVal("")
@@ -1400,11 +1400,11 @@ func ZifPhpStripWhitespace(return_value zpp.Ret, fileName string) {
 	core.PhpOutputGetContents(return_value)
 	core.PhpOutputDiscard()
 }
-func ZifHighlightString(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, return_ *types.Zval) {
-	var expr *types.Zval
+func ZifHighlightString(executeData zpp.Ex, return_value zpp.Ret, string *types2.Zval, _ zpp.Opt, return_ *types2.Zval) {
+	var expr *types2.Zval
 	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
 	var hicompiled_string_description *byte
-	var i types.ZendBool = 0
+	var i types2.ZendBool = 0
 	var old_error_reporting int = zend.EG__().GetErrorReporting()
 	for {
 		for {
@@ -1429,7 +1429,7 @@ func ZifHighlightString(executeData zpp.Ex, return_value zpp.Ret, string *types.
 	zend.EG__().SetErrorReporting(faults.E_ERROR)
 	PhpGetHighlight(&syntax_highlighter_ini)
 	hicompiled_string_description = zend.ZendMakeCompiledStringDescription("highlighted code")
-	if zend.HighlightString(expr, &syntax_highlighter_ini, hicompiled_string_description) == types.FAILURE {
+	if zend.HighlightString(expr, &syntax_highlighter_ini, hicompiled_string_description) == types2.FAILURE {
 		zend.Efree(hicompiled_string_description)
 		zend.EG__().SetErrorReporting(old_error_reporting)
 		if i != 0 {
@@ -1467,7 +1467,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 
 	zend.ArrayInit(returnValue)
 	zend.EG__().IniDirectives().Foreach(func(key string, iniEntry *zend.ZendIniEntry) {
-		var option types.Zval
+		var option types2.Zval
 		if moduleNumber != 0 && iniEntry.GetModuleNumber() != moduleNumber {
 			return
 		}
@@ -1490,7 +1490,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 				returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), &option)
 			} else {
 				if iniEntry.GetValue() != nil {
-					var zv types.Zval
+					var zv types2.Zval
 					zv.SetStringCopy(iniEntry.GetValue())
 					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), &zv)
 				} else {
@@ -1535,8 +1535,8 @@ func ZifIniSet(return_value zpp.Ret, varname string, newvalue string) {
 		return
 	}
 }
-func ZifIniRestore(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval) {
-	var varname *types.String
+func ZifIniRestore(executeData zpp.Ex, return_value zpp.Ret, varname *types2.Zval) {
+	var varname *types2.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -1550,10 +1550,10 @@ func ZifIniRestore(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval
 	}
 	zend.ZendRestoreIniEntry(varname, core.PHP_INI_STAGE_RUNTIME)
 }
-func ZifSetIncludePath(executeData zpp.Ex, return_value zpp.Ret, newIncludePath *types.Zval) {
-	var new_value *types.String
+func ZifSetIncludePath(executeData zpp.Ex, return_value zpp.Ret, newIncludePath *types2.Zval) {
+	var new_value *types2.String
 	var old_value *byte
-	var key *types.String
+	var key *types2.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -1574,7 +1574,7 @@ func ZifSetIncludePath(executeData zpp.Ex, return_value zpp.Ret, newIncludePath 
 	} else {
 		return_value.SetFalse()
 	}
-	key = types.NewString("include_path")
+	key = types2.NewString("include_path")
 	if !zend.ZendAlterIniEntryEx(key.GetStr(), new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
 		// types.ZendStringReleaseEx(key, 0)
 
@@ -1597,17 +1597,17 @@ func ZifGetIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
 	return
 }
 func ZifRestoreIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
-	var key *types.String
+	var key *types2.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	key = types.NewString("include_path")
+	key = types2.NewString("include_path")
 	zend.ZendRestoreIniEntry(key, core.PHP_INI_STAGE_RUNTIME)
 	// types.ZendStringEfree(key)
 }
-func ZifPrintR(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
-	var var_ *types.Zval
-	var do_return types.ZendBool = 0
+func ZifPrintR(executeData zpp.Ex, return_value zpp.Ret, var_ *types2.Zval, _ zpp.Opt, return_ *types2.Zval) {
+	var var_ *types2.Zval
+	var do_return types2.ZendBool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -1639,8 +1639,8 @@ func ZifConnectionStatus(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetLong(core.PG__().connection_status)
 	return
 }
-func ZifIgnoreUserAbort(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, value *types.Zval) {
-	var arg types.ZendBool = 0
+func ZifIgnoreUserAbort(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, value *types2.Zval) {
+	var arg types2.ZendBool = 0
 	var old_setting int
 	for {
 		for {
@@ -1656,14 +1656,14 @@ func ZifIgnoreUserAbort(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, val
 	}
 	old_setting = uint16(core.PG__().ignore_user_abort)
 	if executeData.NumArgs() != 0 {
-		var key *types.String = types.NewString("ignore_user_abort")
+		var key *types2.String = types2.NewString("ignore_user_abort")
 		zend.ZendAlterIniEntryChars(key.GetStr(), b.CastStr(b.Cond(arg != 0, "1", "0"), 1), core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
 		// types.ZendStringReleaseEx(key, 0)
 	}
 	return_value.SetLong(old_setting)
 	return
 }
-func ZifGetservbyname(executeData zpp.Ex, return_value zpp.Ret, service *types.Zval, protocol *types.Zval) {
+func ZifGetservbyname(executeData zpp.Ex, return_value zpp.Ret, service *types2.Zval, protocol *types2.Zval) {
 	var name *byte
 	var proto *byte
 	var name_len int
@@ -1693,7 +1693,7 @@ func ZifGetservbyname(executeData zpp.Ex, return_value zpp.Ret, service *types.Z
 	return_value.SetLong(ntohs(serv.s_port))
 	return
 }
-func ZifGetservbyport(executeData zpp.Ex, return_value zpp.Ret, port *types.Zval, protocol *types.Zval) {
+func ZifGetservbyport(executeData zpp.Ex, return_value zpp.Ret, port *types2.Zval, protocol *types2.Zval) {
 	var proto *byte
 	var proto_len int
 	var port zend.ZendLong
@@ -1718,7 +1718,7 @@ func ZifGetservbyport(executeData zpp.Ex, return_value zpp.Ret, port *types.Zval
 	return_value.SetStringVal(b.CastStrAuto(serv.s_name))
 	return
 }
-func ZifGetprotobyname(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval) {
+func ZifGetprotobyname(executeData zpp.Ex, return_value zpp.Ret, name *types2.Zval) {
 	var name *byte
 	var name_len int
 	var ent *__struct__protoent
@@ -1741,7 +1741,7 @@ func ZifGetprotobyname(executeData zpp.Ex, return_value zpp.Ret, name *types.Zva
 	return_value.SetLong(ent.p_proto)
 	return
 }
-func ZifGetprotobynumber(executeData zpp.Ex, return_value zpp.Ret, proto *types.Zval) {
+func ZifGetprotobynumber(executeData zpp.Ex, return_value zpp.Ret, proto *types2.Zval) {
 	var proto zend.ZendLong
 	var ent *__struct__protoent
 	for {
@@ -1763,13 +1763,13 @@ func ZifGetprotobynumber(executeData zpp.Ex, return_value zpp.Ret, proto *types.
 	return_value.SetStringVal(b.CastStrAuto(ent.p_name))
 	return
 }
-func ZifRegisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
+func ZifRegisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types2.Zval, _ zpp.Opt, parameters []*types2.Zval) {
 	// todo 触发 warning
 }
-func ZifUnregisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval) {
+func ZifUnregisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types2.Zval) {
 	// todo 触发 warning
 }
-func ZifIsUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval) {
+func ZifIsUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types2.Zval) {
 	var path *byte
 	var path_len int
 	if !(core.SG__().rfc1867_uploaded_files) {
@@ -1795,12 +1795,12 @@ func ZifIsUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Zva
 		return
 	}
 }
-func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, newPath *types.Zval) {
+func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types2.Zval, newPath *types2.Zval) {
 	var path *byte
 	var new_path *byte
 	var path_len int
 	var new_path_len int
-	var successful types.ZendBool = 0
+	var successful types2.ZendBool = 0
 	var oldmask int
 	var ret int
 	if !(core.SG__().rfc1867_uploaded_files) {
@@ -1835,19 +1835,19 @@ func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Z
 		if ret == -1 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 		}
-	} else if PhpCopyFileEx(path, new_path, core.STREAM_DISABLE_OPEN_BASEDIR) == types.SUCCESS {
+	} else if PhpCopyFileEx(path, new_path, core.STREAM_DISABLE_OPEN_BASEDIR) == types2.SUCCESS {
 		zend.VCWD_UNLINK(path)
 		successful = 1
 	}
 	if successful != 0 {
-		types.ZendHashStrDel(core.SG__().rfc1867_uploaded_files, b.CastStr(path, path_len))
+		types2.ZendHashStrDel(core.SG__().rfc1867_uploaded_files, b.CastStr(path, path_len))
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}
 	return_value.SetBool(successful != 0)
 	return
 }
-func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arr *types.Zval) {
+func PhpSimpleIniParserCb(arg1 *types2.Zval, arg2 *types2.Zval, arg3 *types2.Zval, callback_type int, arr *types2.Zval) {
 	switch callback_type {
 	case zend.ZEND_INI_PARSER_ENTRY:
 		if arg2 == nil {
@@ -1862,8 +1862,8 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 		// arg2.TryAddRefcount()
 		arr.Array().SymtableUpdate(arg1.String().GetStr(), arg2)
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
-		var hash types.Zval
-		var find_hash *types.Zval
+		var hash types2.Zval
+		var find_hash *types2.Zval
 		if arg2 == nil {
 
 			/* bare string - nothing to do */
@@ -1873,7 +1873,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			/* bare string - nothing to do */
 
 		}
-		if !(arg1.String().GetLen() > 1 && arg1.String().GetStr()[0] == '0') && zend.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IS_LONG {
+		if !(arg1.String().GetLen() > 1 && arg1.String().GetStr()[0] == '0') && zend.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types2.IS_LONG {
 			var key = zend.StrToLongWithUnit(arg1.StringVal())
 			if b.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
@@ -1885,11 +1885,11 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 				find_hash = arr.Array().KeyAddNew(arg1.String().GetStr(), &hash)
 			}
 		}
-		if find_hash.GetType() != types.IS_ARRAY {
+		if find_hash.GetType() != types2.IS_ARRAY {
 			// zend.ZvalPtrDtorNogc(find_hash)
 			zend.ArrayInit(find_hash)
 		}
-		if arg3 == nil || arg3.IsType(types.IS_STRING) && arg3.String().GetLen() == 0 {
+		if arg3 == nil || arg3.IsType(types2.IS_STRING) && arg3.String().GetLen() == 0 {
 			// arg2.TryAddRefcount()
 			zend.AddNextIndexZval(find_hash, arg2)
 		} else {
@@ -1899,12 +1899,12 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 
 	}
 }
-func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arr *types.Zval) {
+func PhpIniParserCbWithSections(arg1 *types2.Zval, arg2 *types2.Zval, arg3 *types2.Zval, callback_type int, arr *types2.Zval) {
 	if callback_type == zend.ZEND_INI_PARSER_SECTION {
 		zend.ArrayInit(&(BG__().active_ini_file_section))
 		arr.Array().SymtableUpdate(arg1.String().GetStr(), &(BG__().active_ini_file_section))
 	} else if arg2 != nil {
-		var active_arr *types.Zval
+		var active_arr *types2.Zval
 		if BG__().active_ini_file_section.IsNotUndef() {
 			active_arr = &(BG__().active_ini_file_section)
 		} else {
@@ -1913,8 +1913,8 @@ func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.
 		PhpSimpleIniParserCb(arg1, arg2, arg3, callback_type, active_arr)
 	}
 }
-func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename string, _ zpp.Opt, processSections_ *types.Zval, scannerMode *types.Zval) {
-	var processSections types.ZendBool = 0
+func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename string, _ zpp.Opt, processSections_ *types2.Zval, scannerMode *types2.Zval) {
+	var processSections types2.ZendBool = 0
 	var scanner_mode zend.ZendLong = zend.ZEND_INI_SCANNER_NORMAL
 	var ini_parser_cb zend.ZendIniParserCbT
 	for {
@@ -1950,17 +1950,17 @@ func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename string, 
 
 	fh := zend.NewFileHandleByFilename(filename)
 	zend.ArrayInit(return_value)
-	if zend.ZendParseIniFile(fh, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
+	if zend.ZendParseIniFile(fh, 0, int(scanner_mode), ini_parser_cb, return_value) == types2.FAILURE {
 		return_value.Array().DestroyEx()
 		return_value.SetFalse()
 		return
 	}
 }
-func ZifParseIniString(executeData zpp.Ex, return_value zpp.Ret, iniString *types.Zval, _ zpp.Opt, processSections *types.Zval, scannerMode *types.Zval) {
+func ZifParseIniString(executeData zpp.Ex, return_value zpp.Ret, iniString *types2.Zval, _ zpp.Opt, processSections *types2.Zval, scannerMode *types2.Zval) {
 	var string *byte = nil
 	var str *byte = nil
 	var str_len int = 0
-	var process_sections types.ZendBool = 0
+	var process_sections types2.ZendBool = 0
 	var scanner_mode zend.ZendLong = zend.ZEND_INI_SCANNER_NORMAL
 	var ini_parser_cb zend.ZendIniParserCbT
 	for {
@@ -1997,7 +1997,7 @@ func ZifParseIniString(executeData zpp.Ex, return_value zpp.Ret, iniString *type
 	memcpy(string, str, str_len)
 	memset(string+str_len, 0, zend.ZEND_MMAP_AHEAD)
 	zend.ArrayInit(return_value)
-	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
+	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == types2.FAILURE {
 		return_value.Array().DestroyEx()
 		return_value.SetFalse()
 	}

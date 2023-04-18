@@ -4,8 +4,8 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 const BasicFunctionsModulePtr = &BasicFunctionsModule
@@ -18,9 +18,9 @@ const MT_N = 624
 
 var BasicGlobals PhpBasicGlobals
 
-var IncompleteClassEntry *types.ClassEntry = nil
+var IncompleteClassEntry *types2.ClassEntry = nil
 
-var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
+var BasicFunctions []types2.FunctionEntry = []types2.FunctionEntry{
 	DefZifConstant,
 	str.DefZifBin2hex,
 	str.DefZifHex2bin,
@@ -128,7 +128,7 @@ var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	//	zend.MakeArgInfo("vars", zend.ArgInfoByRef(1), zend.ArgInfoVariadic()),
 	//}),
 	str.DefZifSscanf,
-	types.MakeZendFunctionEntryEx("fscanf", 0, ZifFscanf, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
+	types2.MakeZendFunctionEntryEx("fscanf", 0, ZifFscanf, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
 		zend.MakeArgName("stream"),
 		zend.MakeArgName("format"),
 		zend.MakeArgInfo("vars", zend.ArgInfoByRef(1), zend.ArgInfoVariadic()),
@@ -292,11 +292,11 @@ var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	DefZifCheckdnsrr,
 	DefZifDnsGetMx,
 	DefZifDnsGetMx,
-	types.MakeZendFunctionEntryEx("dns_get_record", 0, ZifDnsGetRecord, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+	types2.MakeZendFunctionEntryEx("dns_get_record", 0, ZifDnsGetRecord, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("hostname"),
 		zend.MakeArgName("type"),
-		zend.MakeArgInfo("authns", zend.ArgInfoType(types.ZEND_TYPE_ENCODE(types.IS_ARRAY, 1)), zend.ArgInfoByRef(1)),
-		zend.MakeArgInfo("addtl", zend.ArgInfoType(types.ZEND_TYPE_ENCODE(types.IS_ARRAY, 1)), zend.ArgInfoByRef(1)),
+		zend.MakeArgInfo("authns", zend.ArgInfoType(types2.ZEND_TYPE_ENCODE(types2.IS_ARRAY, 1)), zend.ArgInfoByRef(1)),
+		zend.MakeArgInfo("addtl", zend.ArgInfoType(types2.ZEND_TYPE_ENCODE(types2.IS_ARRAY, 1)), zend.ArgInfoByRef(1)),
 		zend.MakeArgName("raw"),
 	}),
 	DefZifIntval,
@@ -314,7 +314,7 @@ var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	DefZifIsInteger,
 	DefZifIsLong,
 	DefZifIsDouble,
-	types.MakeZendFunctionEntryEx("is_real", zend.AccDeprecated, ZifIsFloat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+	types2.MakeZendFunctionEntryEx("is_real", zend.AccDeprecated, ZifIsFloat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("var"),
 	}),
 	DefZifIsNumeric,
@@ -416,10 +416,10 @@ var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	DefZifChroot,
 	DefZifGetcwd,
 	DefZifRewinddir,
-	types.MakeZendFunctionEntryEx("readdir", 0, PhpIfReaddir, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
+	types2.MakeZendFunctionEntryEx("readdir", 0, PhpIfReaddir, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
 		zend.MakeArgName("dir_handle"),
 	}),
-	types.MakeZendFunctionEntryEx("dir", 0, ZifGetdir, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+	types2.MakeZendFunctionEntryEx("dir", 0, ZifGetdir, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("directory"),
 		zend.MakeArgName("context"),
 	}),
@@ -501,7 +501,7 @@ var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	DefZifMax,
 	DefZifInArray,
 	DefZifArraySearch,
-	types.MakeZendFunctionEntryEx("extract", 0, ZifExtract, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+	types2.MakeZendFunctionEntryEx("extract", 0, ZifExtract, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgInfo("arg", zend.ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
 		zend.MakeArgName("extract_type"),
 		zend.MakeArgName("prefix"),
@@ -510,7 +510,7 @@ var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	DefZifArrayFill,
 	DefZifArrayFillKeys,
 	DefZifRange,
-	types.MakeZendFunctionEntryEx("array_multisort", 0, ZifArrayMultisort, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+	types2.MakeZendFunctionEntryEx("array_multisort", 0, ZifArrayMultisort, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgInfo("arr1", zend.ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
 		zend.MakeArgInfo("sort_order", zend.ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
 		zend.MakeArgInfo("sort_flags", zend.ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),

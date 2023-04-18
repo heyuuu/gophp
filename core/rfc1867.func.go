@@ -3,9 +3,9 @@ package core
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func DummyEncodingTranslation() int { return 0 }
@@ -84,26 +84,26 @@ func NormalizeProtectedVariable(varname *byte) {
 }
 func AddProtectedVariable(varname *byte) {
 	NormalizeProtectedVariable(varname)
-	types.ZendHashStrAddEmptyElement(&(PG__().rfc1867_protected_variables), varname)
+	types2.ZendHashStrAddEmptyElement(&(PG__().rfc1867_protected_variables), varname)
 }
-func IsProtectedVariable(varname *byte) types.ZendBool {
+func IsProtectedVariable(varname *byte) types2.ZendBool {
 	NormalizeProtectedVariable(varname)
-	return types.IntBool(&(PG__().rfc1867_protected_variables).KeyExists(varname))
+	return types2.IntBool(&(PG__().rfc1867_protected_variables).KeyExists(varname))
 }
-func SafePhpRegisterVariable(var_ *byte, strval *byte, val_len int, track_vars_array *types.Zval, override_protection types.ZendBool) {
+func SafePhpRegisterVariable(var_ *byte, strval *byte, val_len int, track_vars_array *types2.Zval, override_protection types2.ZendBool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {
 		PhpRegisterVariableSafe(b.CastStrAuto(var_), b.CastStr(strval, val_len), track_vars_array)
 	}
 }
-func SafePhpRegisterVariableEx(var_ *byte, val *types.Zval, track_vars_array *types.Zval, override_protection types.ZendBool) {
+func SafePhpRegisterVariableEx(var_ *byte, val *types2.Zval, track_vars_array *types2.Zval, override_protection types2.ZendBool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {
 		PhpRegisterVariableEx(b.CastStrAuto(var_), val, track_vars_array)
 	}
 }
-func RegisterHttpPostFilesVariable(strvar *byte, val *byte, http_post_files *types.Zval, override_protection types.ZendBool) {
+func RegisterHttpPostFilesVariable(strvar *byte, val *byte, http_post_files *types2.Zval, override_protection types2.ZendBool) {
 	SafePhpRegisterVariable(strvar, val, strlen(val), http_post_files, override_protection)
 }
-func RegisterHttpPostFilesVariableEx(var_ *byte, val *types.Zval, http_post_files *types.Zval, override_protection types.ZendBool) {
+func RegisterHttpPostFilesVariableEx(var_ *byte, val *types2.Zval, http_post_files *types2.Zval, override_protection types2.ZendBool) {
 	SafePhpRegisterVariableEx(var_, val, http_post_files, override_protection)
 }
 func DestroyUploadedFilesHash() {
@@ -508,7 +508,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	var array_index *byte = nil
 	var lbuf *byte = nil
 	var abuf *byte = nil
-	var temp_filename *types.String = nil
+	var temp_filename *types2.String = nil
 	var boundary_len int = 0
 	var cancel_upload int = 0
 	var is_arr_upload int = 0
@@ -519,7 +519,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	var anonindex int = 0
 	var is_anonymous int
 	var mbuff *MultipartBuffer
-	var array_ptr *types.Zval = (*types.Zval)(arg)
+	var array_ptr *types2.Zval = (*types2.Zval)(arg)
 	var fd int = -1
 	var header zend.ZendLlist
 	var event_extra_data any = nil
@@ -595,7 +595,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 
 	PG__().rfc1867_protected_variables.Init(8, nil)
 	SG__().rfc1867_uploaded_files = make(map[string]bool)
-	if PG__().http_globals[TRACK_VARS_FILES].GetType() != types.IS_ARRAY {
+	if PG__().http_globals[TRACK_VARS_FILES].GetType() != types2.IS_ARRAY {
 
 		/* php_auto_globals_create_files() might have already done that */
 
@@ -608,7 +608,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	if PhpRfc1867Callback != nil {
 		var event_start MultipartEventStart
 		event_start.SetContentLength(SG__().RequestInfo.content_length)
-		if PhpRfc1867Callback(MULTIPART_EVENT_START, &event_start, &event_extra_data) == types.FAILURE {
+		if PhpRfc1867Callback(MULTIPART_EVENT_START, &event_start, &event_extra_data) == types2.FAILURE {
 			goto fileupload_done
 		}
 	}
@@ -676,7 +676,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 						event_formdata.SetValue(&value)
 						event_formdata.SetLength(new_val_len)
 						event_formdata.SetNewlength(&newlength)
-						if PhpRfc1867Callback(MULTIPART_EVENT_FORMDATA, &event_formdata, &event_extra_data) == types.FAILURE {
+						if PhpRfc1867Callback(MULTIPART_EVENT_FORMDATA, &event_formdata, &event_extra_data) == types2.FAILURE {
 							zend.Efree(param)
 							zend.Efree(value)
 							continue
@@ -769,7 +769,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				event_file_start.SetPostBytesProcessed(SG__().read_post_bytes)
 				event_file_start.SetName(param)
 				event_file_start.SetFilename(&filename)
-				if PhpRfc1867Callback(MULTIPART_EVENT_FILE_START, &event_file_start, &event_extra_data) == types.FAILURE {
+				if PhpRfc1867Callback(MULTIPART_EVENT_FILE_START, &event_file_start, &event_extra_data) == types2.FAILURE {
 					temp_filename = nil
 					zend.Efree(param)
 					zend.Efree(filename)
@@ -812,7 +812,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 					event_file_data.SetData(buff)
 					event_file_data.SetLength(blen)
 					event_file_data.SetNewlength(&blen)
-					if PhpRfc1867Callback(MULTIPART_EVENT_FILE_DATA, &event_file_data, &event_extra_data) == types.FAILURE {
+					if PhpRfc1867Callback(MULTIPART_EVENT_FILE_DATA, &event_file_data, &event_extra_data) == types2.FAILURE {
 						cancel_upload = UPLOAD_ERROR_X
 						continue
 					}
@@ -861,7 +861,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 					event_file_end.SetTempFilename(nil)
 				}
 				event_file_end.SetCancelUpload(cancel_upload)
-				if PhpRfc1867Callback(MULTIPART_EVENT_FILE_END, &event_file_end, &event_extra_data) == types.FAILURE {
+				if PhpRfc1867Callback(MULTIPART_EVENT_FILE_END, &event_file_end, &event_extra_data) == types2.FAILURE {
 					cancel_upload = UPLOAD_ERROR_X
 				}
 			}
@@ -976,7 +976,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			/* store temp_filename as-is (in case upload_tmp_dir
 			 * contains escapeable characters. escape only the variable name.) */
 
-			var zfilename types.Zval
+			var zfilename types2.Zval
 
 			/* Initialize variables */
 
@@ -1007,8 +1007,8 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				zfilename.SetStringVal("")
 			}
 			RegisterHttpPostFilesVariableEx(lbuf, &zfilename, &PG__().http_globals[TRACK_VARS_FILES], 1)
-			var file_size types.Zval
-			var error_type types.Zval
+			var file_size types2.Zval
+			var error_type types2.Zval
 			var size_overflow int = 0
 			var file_size_buf []byte
 			error_type.SetLong(cancel_upload)

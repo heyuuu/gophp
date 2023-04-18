@@ -1,15 +1,17 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	types2 "github.com/heyuuu/gophp/php/types"
+)
 
 func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var value *types.Zval
+	var value *types2.Zval
 	var result int
-	var varname *types.Zval
-	var name *types.String
-	var tmp_name *types.String
-	var target_symbol_table *types.Array
+	var varname *types2.Zval
+	var name *types2.String
+	var tmp_name *types2.String
+	var target_symbol_table *types2.Array
 	varname = opline.Const1()
 	{
 		name = varname.String()
@@ -25,9 +27,9 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 		}
 		if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 			if value.IsReference() {
-				value = types.Z_REFVAL_P(value)
+				value = types2.Z_REFVAL_P(value)
 			}
-			result = value.GetType() > types.IS_NULL
+			result = value.GetType() > types2.IS_NULL
 		} else {
 			result = !(IZendIsTrue(value))
 		}
@@ -38,13 +40,13 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 }
 func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var value *types.Zval
+	var value *types2.Zval
 	var result int
 	var free_op1 ZendFreeOp
-	var varname *types.Zval
-	var name *types.String
-	var tmp_name *types.String
-	var target_symbol_table *types.Array
+	var varname *types2.Zval
+	var name *types2.String
+	var tmp_name *types2.String
+	var target_symbol_table *types2.Array
 	varname = opline.Op1()
 
 	{
@@ -61,9 +63,9 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 		}
 		if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 			if value.IsReference() {
-				value = types.Z_REFVAL_P(value)
+				value = types2.Z_REFVAL_P(value)
 			}
-			result = value.GetType() > types.IS_NULL
+			result = value.GetType() > types2.IS_NULL
 		} else {
 			result = !(IZendIsTrue(value))
 		}
@@ -74,12 +76,12 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 }
 func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var value *types.Zval
+	var value *types2.Zval
 	var result int
-	var varname *types.Zval
-	var name *types.String
-	var tmp_name *types.String
-	var target_symbol_table *types.Array
+	var varname *types2.Zval
+	var name *types2.String
+	var tmp_name *types2.String
+	var target_symbol_table *types2.Array
 	varname = opline.Op1()
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	value = target_symbol_table.KeyFind(name.GetStr())
@@ -91,9 +93,9 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 		}
 		if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 			if value.IsReference() {
-				value = types.Z_REFVAL_P(value)
+				value = types2.Z_REFVAL_P(value)
 			}
-			result = value.GetType() > types.IS_NULL
+			result = value.GetType() > types2.IS_NULL
 		} else {
 			result = !(IZendIsTrue(value))
 		}

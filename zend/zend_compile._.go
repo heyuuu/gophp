@@ -2,7 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend/types"
+	types2 "github.com/heyuuu/gophp/php/types"
 )
 
 /* On 64-bit systems less optimal, but more compact VM code leads to better
@@ -146,9 +146,9 @@ const (
 
 /* zend_internal_function_handler */
 
-type ZifHandler func(executeData *ZendExecuteData, return_value *types.Zval)
+type ZifHandler func(executeData *ZendExecuteData, return_value *types2.Zval)
 
-const ZEND_CALL_HAS_THIS = types.IS_OBJECT_EX
+const ZEND_CALL_HAS_THIS = types2.IS_OBJECT_EX
 
 /* Top 16 bits of Z_TYPE_INFO(EX(This)) are used as call_info flags */
 
@@ -196,8 +196,8 @@ const IS_VAR = 1 << 2
 const IS_CV = 1 << 3
 const ZEND_EXTRA_VALUE = 1
 
-type UnaryOpType func(*types.Zval, *types.Zval) int
-type BinaryOpType func(*types.Zval, *types.Zval, *types.Zval) int
+type UnaryOpType func(*types2.Zval, *types2.Zval) int
+type BinaryOpType func(*types2.Zval, *types2.Zval, *types2.Zval) int
 
 /* Used during AST construction */
 
@@ -207,10 +207,10 @@ const INITIAL_OP_ARRAY_SIZE = 64
 
 /* helper functions in zend_language_scanner.l */
 
-const ZEND_FUNCTION_DTOR types.DtorFuncT = ZendFunctionDtor
+const ZEND_FUNCTION_DTOR types2.DtorFuncT = ZendFunctionDtor
 
-type ZendNeedsLiveRangeCb func(op_array *types.ZendOpArray, opline *ZendOp) types.ZendBool
-type ZendAutoGlobalCallback func(name *types.String) types.ZendBool
+type ZendNeedsLiveRangeCb func(op_array *types2.ZendOpArray, opline *ZendOp) types2.ZendBool
+type ZendAutoGlobalCallback func(name *types2.String) types2.ZendBool
 
 /* BEGIN: OPCODES */
 
@@ -435,13 +435,13 @@ var ReservedClassNames = []ReservedClassName{
 }
 
 var BuiltinTypes = []BuiltinTypeInfo{
-	MakeBuiltinTypeInfo("int", types.IS_LONG),
-	MakeBuiltinTypeInfo("float", types.IS_DOUBLE),
-	MakeBuiltinTypeInfo("string", types.IS_STRING),
-	MakeBuiltinTypeInfo("bool", types.IS_BOOL),
-	MakeBuiltinTypeInfo("void", types.IS_VOID),
-	MakeBuiltinTypeInfo("iterable", types.IS_ITERABLE),
-	MakeBuiltinTypeInfo("object", types.IS_OBJECT),
+	MakeBuiltinTypeInfo("int", types2.IS_LONG),
+	MakeBuiltinTypeInfo("float", types2.IS_DOUBLE),
+	MakeBuiltinTypeInfo("string", types2.IS_STRING),
+	MakeBuiltinTypeInfo("bool", types2.IS_BOOL),
+	MakeBuiltinTypeInfo("void", types2.IS_VOID),
+	MakeBuiltinTypeInfo("iterable", types2.IS_ITERABLE),
+	MakeBuiltinTypeInfo("object", types2.IS_OBJECT),
 }
 
 /* Common part of zend_add_literal and zend_append_individual_literal */

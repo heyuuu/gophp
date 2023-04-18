@@ -1,16 +1,16 @@
 package zend
 
 import (
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc types.IFunction = call.GetFunc()
-	var ret *types.Zval
-	var retval types.Zval
+	var fbc types2.IFunction = call.GetFunc()
+	var ret *types2.Zval
+	var retval types2.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
 	if fbc.HasFnFlags(AccAbstract | AccDeprecated) {
 		if fbc.IsAbstract() {
@@ -87,9 +87,9 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc types.IFunction = call.GetFunc()
-	var ret *types.Zval
-	var retval types.Zval
+	var fbc types2.IFunction = call.GetFunc()
+	var ret *types2.Zval
+	var retval types2.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
 	if fbc.HasFnFlags(AccAbstract | AccDeprecated) {
 		if fbc.IsAbstract() {

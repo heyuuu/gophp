@@ -2,15 +2,15 @@ package cgi
 
 import (
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 var Act __struct__sigaction
 var OldTerm __struct__sigaction
 var OldQuit __struct__sigaction
 var OldInt __struct__sigaction
-var PhpPhpImportEnvironmentVariables func(array_ptr *types.Zval)
+var PhpPhpImportEnvironmentVariables func(array_ptr *types2.Zval)
 
 /* these globals used for forking children on unix systems */
 
@@ -83,10 +83,10 @@ const STDOUT_FILENO = 1
 const SAPI_CGI_MAX_HEADER_LENGTH = 1024
 const STDIN_FILENO = 0
 
-var CgiFunctions = []types.FunctionEntry{
+var CgiFunctions = []types2.FunctionEntry{
 	DefZifApacheRequestHeaders,
 	DefZifApacheResponseHeaders,
-	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types2.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
 var CgiModuleEntry = zend.MakeZendModuleEntry(
 	"cgi-fcgi",

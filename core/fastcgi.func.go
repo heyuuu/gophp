@@ -2,8 +2,8 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func FCGI_HASH_FUNC(var_ __auto__, var_len int) __auto__ {
@@ -557,7 +557,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		}
 	} else if hdr.GetType() == FCGI_GET_VALUES {
 		var p *uint8 = buf + b.SizeOf("fcgi_header")
-		var value *types.Zval
+		var value *types2.Zval
 		var zlen uint
 		var q *FcgiHashBucket
 		if SafeRead(req, buf, len_+padding) != len_+padding {
@@ -916,19 +916,19 @@ func FcgiQuickPutenv(req *FcgiRequest, var_ *byte, var_len int, hash_value uint,
 		return FcgiHashSet(req.GetEnv(), hash_value, var_, var_len, val, uint(strlen(val)))
 	}
 }
-func FcgiLoadenv(req *FcgiRequest, func_ FcgiApplyFunc, array *types.Zval) {
+func FcgiLoadenv(req *FcgiRequest, func_ FcgiApplyFunc, array *types2.Zval) {
 	FcgiHashApply(req.GetEnv(), func_, array)
 }
 func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
-	var zvalue types.Zval
-	var key *types.String = types.NewString(b.CastStr(name, name_len))
-	zvalue.SetString(types.NewString(b.CastStr(value, value_len)))
+	var zvalue types2.Zval
+	var key *types2.String = types2.NewString(b.CastStr(name, name_len))
+	zvalue.SetString(types2.NewString(b.CastStr(value, value_len)))
 	//types.GC_MAKE_PERSISTENT_LOCAL(key)
 	//types.GC_MAKE_PERSISTENT_LOCAL(zvalue.String())
 	FcgiMgmtVars.KeyAdd(key.GetStr(), &zvalue)
 	// types.ZendStringReleaseEx(key, 1)
 }
-func FcgiFreeMgmtVarCb(zv *types.Zval) { zend.Pefree(zv.String(), 1) }
+func FcgiFreeMgmtVarCb(zv *types2.Zval) { zend.Pefree(zv.String(), 1) }
 func FcgiGetLastClientIp() *byte {
 	var str []byte
 

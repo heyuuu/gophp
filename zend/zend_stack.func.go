@@ -1,6 +1,8 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+)
 
 func ZendStackInit(stack *ZendStack, size int)        { stack.Init() }
 func ZendStackPush(stack *ZendStack, element any) int { return stack.Push(element) }

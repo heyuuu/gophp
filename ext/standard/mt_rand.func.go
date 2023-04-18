@@ -3,9 +3,9 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -94,7 +94,7 @@ func PhpMtRand() uint32 {
 }
 
 //@zif -alias srand
-func ZifMtSrand(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, seed *types.Zval, mode *types.Zval) {
+func ZifMtSrand(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, seed *types2.Zval, mode *types2.Zval) {
 	var seed zend.ZendLong = 0
 	var mode zend.ZendLong = MT_RAND_MT19937
 	for {
@@ -170,7 +170,7 @@ func PhpMtRandCommon(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 	RAND_RANGE_BADSCALING(n, min, max, PHP_MT_RAND_MAX)
 	return n
 }
-func ZifMtRand(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, min *types.Zval, max *types.Zval) {
+func ZifMtRand(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, min *types2.Zval, max *types2.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
 	var argc int = executeData.NumArgs()
@@ -219,5 +219,5 @@ func ZifMtGetrandmax(executeData zpp.Ex, return_value zpp.Ret) {
 func ZmStartupMtRand(type_ int, module_number int) int {
 	zend.RegisterLongConstant("MT_RAND_MT19937", MT_RAND_MT19937, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("MT_RAND_PHP", MT_RAND_PHP, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	return types.SUCCESS
+	return types2.SUCCESS
 }

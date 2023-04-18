@@ -2,23 +2,23 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_ADD_ARRAY_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var op1 *types.Zval
+	var op1 *types2.Zval
 	op1 = GetZvalPtr(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 add_unpack_again:
 	if op1.IsArray() {
-		var ht *types.Array = op1.GetArr()
-		var val *types.Zval
-		var key *types.String
-		var __ht *types.Array = ht
+		var ht *types2.Array = op1.GetArr()
+		var val *types2.Zval
+		var key *types2.String
+		var __ht *types2.Array = ht
 		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
+			var _z *types2.Zval = _p.GetVal()
 
 			key = _p.GetKey()
 			val = _z
@@ -28,7 +28,7 @@ add_unpack_again:
 				return 0
 			} else {
 				if val.IsReference() && val.GetRefcount() == 1 {
-					val = types.Z_REFVAL_P(val)
+					val = types2.Z_REFVAL_P(val)
 				}
 				// val.TryAddRefcount()
 				if opline.Result().Array().NextIndexInsert(val) == nil {
@@ -39,7 +39,7 @@ add_unpack_again:
 			}
 		}
 	} else if op1.IsObject() {
-		var ce *types.ClassEntry = types.Z_OBJCE_P(op1)
+		var ce *types2.ClassEntry = types2.Z_OBJCE_P(op1)
 		var iter *ZendObjectIterator
 		if ce == nil || ce.GetGetIterator() == nil {
 			faults.ThrowError(nil, "Only arrays and Traversables can be unpacked")
@@ -55,8 +55,8 @@ add_unpack_again:
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
 			}
-			for iter.GetFuncs().GetValid()(iter) == types.SUCCESS {
-				var val *types.Zval
+			for iter.GetFuncs().GetValid()(iter) == types2.SUCCESS {
+				var val *types2.Zval
 				if EG__().GetException() != nil {
 					break
 				}
@@ -65,18 +65,18 @@ add_unpack_again:
 					break
 				}
 				if iter.GetFuncs().GetGetCurrentKey() != nil {
-					var key types.Zval
+					var key types2.Zval
 					iter.GetFuncs().GetGetCurrentKey()(iter, &key)
 					if EG__().GetException() != nil {
 						break
 					}
-					if key.GetType() != types.IS_LONG {
+					if key.GetType() != types2.IS_LONG {
 						faults.ThrowError(nil, b.Cond(key.IsString(), "Cannot unpack Traversable with string keys", "Cannot unpack Traversable with non-integer keys"))
 						// ZvalPtrDtor(&key)
 						break
 					}
 				}
-				val = types.ZVAL_DEREF(val)
+				val = types2.ZVAL_DEREF(val)
 				// val.TryAddRefcount()
 				if opline.Result().Array().NextIndexInsert(val) == nil {
 					ZendCannotAddElement()
@@ -87,7 +87,7 @@ add_unpack_again:
 			//ZendIteratorDtor(iter)
 		}
 	} else if op1.IsReference() {
-		op1 = types.Z_REFVAL_P(op1)
+		op1 = types2.Z_REFVAL_P(op1)
 		goto add_unpack_again
 	} else {
 		faults.ThrowError(nil, "Only arrays and Traversables can be unpacked")

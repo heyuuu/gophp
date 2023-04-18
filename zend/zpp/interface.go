@@ -1,6 +1,8 @@
 package zpp
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+)
 
 type ExecuteData interface {
 	CalleeName() string

@@ -2,8 +2,8 @@ package core
 
 import (
 	"github.com/heyuuu/gophp/core/streams"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 var PhpFileLeStream func() int
@@ -76,7 +76,7 @@ var _phpStreamMkdir func(path *byte, mode int, options int, context *PhpStreamCo
 var _phpStreamRmdir func(path *byte, options int, context *PhpStreamContext) int
 var _phpStreamOpendir func(path *byte, options int, context *PhpStreamContext) *PhpStream
 var _phpStreamReaddir func(dirstream *PhpStream, ent *PhpStreamDirent) *PhpStreamDirent
-var _phpStreamScandir func(dirname *byte, namelist []**types.String, flags int, context *PhpStreamContext, compare func(a **types.String, b **types.String) int) int
+var _phpStreamScandir func(dirname *byte, namelist []**types2.String, flags int, context *PhpStreamContext, compare func(a **types2.String, b **types2.String) int) int
 var _phpStreamSetOption func(stream *PhpStream, option int, value int, ptrparam any) int
 
 /* Flags for mkdir method in wrapper ops */
@@ -151,7 +151,7 @@ var _phpStreamCopyToStreamEx func(src *PhpStream, dest *PhpStream, maxlen int, l
 /* read all data from stream and put into a buffer. Caller must free buffer
  * when done. */
 
-var _phpStreamCopyToMem func(src *PhpStream, maxlen int, persistent int) *types.String
+var _phpStreamCopyToMem func(src *PhpStream, maxlen int, persistent int) *types2.String
 
 /* output all data from a stream */
 
@@ -258,7 +258,7 @@ const IGNORE_URL_WIN = 0
 var PhpInitStreamWrappers func(module_number int) int
 var PhpShutdownStreamWrappers func(module_number int) int
 var PhpShutdownStreamHashes func()
-var _phpStreamOpenWrapperEx func(path *byte, mode *byte, options int, opened_path **types.String, context *PhpStreamContext) *PhpStream
+var _phpStreamOpenWrapperEx func(path *byte, mode *byte, options int, opened_path **types2.String, context *PhpStreamContext) *PhpStream
 var PhpStreamLocateUrlWrapper func(path *byte, path_for_open **byte, options int) *PhpStreamWrapper
 
 /* pushes an error message onto the stack for a wrapper instance */
@@ -277,8 +277,8 @@ var _phpStreamMakeSeekable func(origstream *PhpStream, newstream **PhpStream, fl
 
 /* Give other modules access to the url_stream_wrappers_hash and stream_filters_hash */
 
-var _phpStreamGetUrlStreamWrappersHash func() *types.Array
-var _phpGetStreamFiltersHash func() *types.Array
+var _phpStreamGetUrlStreamWrappersHash func() *types2.Array
+var _phpGetStreamFiltersHash func() *types2.Array
 
 /* Definitions for user streams */
 

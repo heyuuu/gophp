@@ -3,10 +3,10 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -22,11 +22,11 @@ func ZmStartupCrypt(type_ int, module_number int) int {
 	zend.RegisterLongConstant("CRYPT_SHA256", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("CRYPT_SHA512", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	PhpInitCryptR()
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func ZmShutdownCrypt(type_ int, module_number int) int {
 	PhpShutdownCryptR()
-	return types.SUCCESS
+	return types2.SUCCESS
 }
 func PhpTo64(s *byte, n int) {
 	for b.PreDec(&n) >= 0 {
@@ -35,9 +35,9 @@ func PhpTo64(s *byte, n int) {
 	}
 }
 
-func PhpCrypt(password string, salt string, quiet bool) *types.String {
+func PhpCrypt(password string, salt string, quiet bool) *types2.String {
 	var crypt_res *byte
-	var result *types.String
+	var result *types2.String
 	if salt[0] == '*' && (salt[1] == '0' || salt[1] == '1') {
 		return nil
 	}
@@ -48,7 +48,7 @@ func PhpCrypt(password string, salt string, quiet bool) *types.String {
 	var buffer PhpCryptExtendedData
 	if salt[0] == '$' && salt[1] == '1' && salt[2] == '$' {
 		out := PhpMd5CryptR(password, salt)
-		return types.NewString(out)
+		return types2.NewString(out)
 	} else if salt[0] == '$' && salt[1] == '6' && salt[2] == '$' {
 		var output *byte
 		output = zend.Emalloc(PHP_MAX_SALT_LEN)
@@ -58,7 +58,7 @@ func PhpCrypt(password string, salt string, quiet bool) *types.String {
 			zend.Efree(output)
 			return nil
 		} else {
-			result = types.NewString(output)
+			result = types2.NewString(output)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN)
 			zend.Efree(output)
 			return result
@@ -72,7 +72,7 @@ func PhpCrypt(password string, salt string, quiet bool) *types.String {
 			zend.Efree(output)
 			return nil
 		} else {
-			result = types.NewString(output)
+			result = types2.NewString(output)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN)
 			zend.Efree(output)
 			return result
@@ -85,7 +85,7 @@ func PhpCrypt(password string, salt string, quiet bool) *types.String {
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN+1)
 			return nil
 		} else {
-			result = types.NewString(output)
+			result = types2.NewString(output)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN+1)
 			return result
 		}
@@ -109,14 +109,14 @@ func PhpCrypt(password string, salt string, quiet bool) *types.String {
 		if crypt_res == nil || salt[0] == '*' && salt[1] == '0' {
 			return nil
 		} else {
-			result = types.NewString(crypt_res)
+			result = types2.NewString(crypt_res)
 			return result
 		}
 	}
 	if crypt_res == nil || salt[0] == '*' && salt[1] == '0' {
 		return nil
 	} else {
-		result = types.NewString(crypt_res)
+		result = types2.NewString(crypt_res)
 		return result
 	}
 }
@@ -126,7 +126,7 @@ func ZifCrypt(executeData zpp.Ex, return_value zpp.Ret, str_ string, _ zpp.Opt, 
 	var salt_in *byte = nil
 	var str_len int
 	var salt_in_len int = 0
-	var result *types.String
+	var result *types2.String
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)

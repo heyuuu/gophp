@@ -3,8 +3,8 @@ package cli
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/core"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 	"io/ioutil"
 	"net/http"
 )
@@ -40,8 +40,8 @@ type PhpCliServerRequest struct {
 	path_translated       string
 	path_info             string
 	query_string          string
-	headers               types.Array
-	headers_original_case types.Array
+	headers               types2.Array
+	headers_original_case types2.Array
 	content               string
 	ext                   string
 	sb                    zend.ZendStatT
@@ -96,8 +96,8 @@ func (this *PhpCliServerRequest) GetPathInfoLen() int             { return this.
 func (this *PhpCliServerRequest) SetPathInfoLen(value int)        { this.path_info_len = value }
 func (this *PhpCliServerRequest) GetQueryString() *byte           { return this.query_string }
 func (this *PhpCliServerRequest) GetQueryStringLen() int          { return this.query_string_len }
-func (this *PhpCliServerRequest) GetHeaders() types.Array         { return this.headers }
-func (this *PhpCliServerRequest) GetHeadersOriginalCase() types.Array {
+func (this *PhpCliServerRequest) GetHeaders() types2.Array        { return this.headers }
+func (this *PhpCliServerRequest) GetHeadersOriginalCase() types2.Array {
 	return this.headers_original_case
 }
 func (this *PhpCliServerRequest) GetContent() *byte          { return this.content }
@@ -276,7 +276,7 @@ type PhpCliServer struct {
 	document_root  string
 	router         string
 	socklen        socklen_t
-	clients        types.Array
+	clients        types2.Array
 }
 
 func (this *PhpCliServer) Serve() error {
@@ -299,7 +299,7 @@ func (this *PhpCliServer) handler(writer http.ResponseWriter, request *http.Requ
 func (this *PhpCliServer) NewClient() *PhpCliServerClient {
 	client := NewPhpCliServerClient(this)
 	PhpCliServerClientCtor(client, this)
-	types.ZendHashIndexUpdatePtr(&this.clients, 0, client)
+	types2.ZendHashIndexUpdatePtr(&this.clients, 0, client)
 	return client
 }
 
@@ -323,7 +323,7 @@ func (this *PhpCliServer) GetDocumentRootLen() int             { return this.doc
 func (this *PhpCliServer) GetRouter() *byte                    { return this.router }
 func (this *PhpCliServer) SetRouter(value *byte)               { this.router = value }
 func (this *PhpCliServer) GetSocklen() socklen_t               { return this.socklen }
-func (this *PhpCliServer) GetClients() types.Array             { return this.clients }
+func (this *PhpCliServer) GetClients() types2.Array            { return this.clients }
 
 /**
  * PhpCliServerDoEventForEachFdCallbackParams

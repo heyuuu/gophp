@@ -2,24 +2,24 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var args *types.Array = nil
-	var fbc types.IFunction = executeData.GetFunc()
-	var ret *types.Zval = executeData.GetReturnValue()
+	var args *types2.Array = nil
+	var fbc types2.IFunction = executeData.GetFunc()
+	var ret *types2.Zval = executeData.GetReturnValue()
 	var call_info uint32 = EX_CALL_INFO() & (ZEND_CALL_NESTED | ZEND_CALL_TOP | ZEND_CALL_RELEASE_THIS)
 	var num_args uint32 = executeData.NumArgs()
 	var call *ZendExecuteData
 	if num_args != 0 {
-		var p *types.Zval = executeData.Arg(1)
-		var end *types.Zval = p + num_args
-		args = types.NewArray(num_args)
-		types.ZendHashRealInitPacked(args)
+		var p *types2.Zval = executeData.Arg(1)
+		var end *types2.Zval = p + num_args
+		args = types2.NewArray(num_args)
+		types2.ZendHashRealInitPacked(args)
 		for {
-			fillScope := types.PackedFillStart(args)
+			fillScope := types2.PackedFillStart(args)
 			for {
 				fillScope.FillSet(p)
 				fillScope.FillNext()
@@ -66,7 +66,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			ZendExecuteEx(call)
 		}
 	} else {
-		var retval types.Zval
+		var retval types2.Zval
 		b.Assert(fbc.GetType() == ZEND_INTERNAL_FUNCTION)
 		EG__().SetCurrentExecuteData(call)
 		if fbc.IsHasTypeHints() && ZendVerifyInternalArgTypes(fbc, call) == 0 {
@@ -103,7 +103,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		return -1
 	}
 	if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-		var object *types.ZendObject = call.GetThis().Object()
+		var object *types2.ZendObject = call.GetThis().Object()
 		// OBJ_RELEASE(object)
 	}
 	ZendVmStackFreeCallFrame(call)

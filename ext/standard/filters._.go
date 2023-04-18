@@ -2,7 +2,7 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/core/streams"
-	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 var Rot13From = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

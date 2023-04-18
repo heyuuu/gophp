@@ -3,14 +3,14 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZendDoInheritance(ce *types.ClassEntry, parent_ce *types.ClassEntry) {
+func ZendDoInheritance(ce *types2.ClassEntry, parent_ce *types2.ClassEntry) {
 	ZendDoInheritanceEx(ce, parent_ce, false)
 }
-func OverriddenPtrDtor(zv *types.Zval) {
+func OverriddenPtrDtor(zv *types2.Zval) {
 	EfreeSize(zv.Ptr(), b.SizeOf("zend_function"))
 }
 func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
@@ -22,8 +22,8 @@ func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPro
 	}
 	return new_property_info
 }
-func ZendDuplicateInternalFunction(func_ types.IFunction, ce *types.ClassEntry) types.IFunction {
-	var new_function types.IFunction
+func ZendDuplicateInternalFunction(func_ types2.IFunction, ce *types2.ClassEntry) types2.IFunction {
+	var new_function types2.IFunction
 	if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
 		new_function = Pemalloc(b.SizeOf("zend_internal_function"))
 		memcpy(new_function, func_, b.SizeOf("zend_internal_function"))
@@ -37,8 +37,8 @@ func ZendDuplicateInternalFunction(func_ types.IFunction, ce *types.ClassEntry) 
 	}
 	return new_function
 }
-func ZendDuplicateUserFunction(func_ types.IFunction) types.IFunction {
-	var new_function types.IFunction
+func ZendDuplicateUserFunction(func_ types2.IFunction) types2.IFunction {
+	var new_function types2.IFunction
 	new_function = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
 	memcpy(new_function, func_, b.SizeOf("zend_op_array"))
 	if func_.GetOpArray().GetStaticVariablesPtr() {
@@ -50,7 +50,7 @@ func ZendDuplicateUserFunction(func_ types.IFunction) types.IFunction {
 		/* See: Zend/tests/method_static_var.phpt */
 
 	}
-	if (new_function.GetOpArray().GetStaticVariables().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+	if (new_function.GetOpArray().GetStaticVariables().GetGcFlags() & types2.IS_ARRAY_IMMUTABLE) == 0 {
 		new_function.GetOpArray().GetStaticVariables().AddRefcount()
 	}
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
@@ -61,7 +61,7 @@ func ZendDuplicateUserFunction(func_ types.IFunction) types.IFunction {
 	}
 	return new_function
 }
-func ZendDuplicateFunction(func_ types.IFunction, ce *types.ClassEntry, is_interface types.ZendBool) types.IFunction {
+func ZendDuplicateFunction(func_ types2.IFunction, ce *types2.ClassEntry, is_interface types2.ZendBool) types2.IFunction {
 	if func_.GetType() == ZEND_INTERNAL_FUNCTION {
 		return ZendDuplicateInternalFunction(func_, ce)
 	} else {
@@ -80,8 +80,8 @@ func ZendDuplicateFunction(func_ types.IFunction, ce *types.ClassEntry, is_inter
 		return ZendDuplicateUserFunction(func_)
 	}
 }
-func DoInheritParentConstructor(ce *types.ClassEntry) {
-	var parent *types.ClassEntry = ce.GetParent()
+func DoInheritParentConstructor(ce *types2.ClassEntry) {
+	var parent *types2.ClassEntry = ce.GetParent()
 	b.Assert(parent != nil)
 
 	/* You cannot change create_object */
@@ -162,7 +162,7 @@ func ZendVisibilityString(fn_flags uint32) *byte {
 		return "protected"
 	}
 }
-func ResolveClassName(scope *types.ClassEntry, name *types.String) *types.String {
+func ResolveClassName(scope *types2.ClassEntry, name *types2.String) *types2.String {
 	b.Assert(scope != nil)
 	if ascii.StrCaseEquals(name.GetStr(), "parent") && scope.GetParent() {
 		if scope.IsResolvedParent() {
@@ -176,7 +176,7 @@ func ResolveClassName(scope *types.ClassEntry, name *types.String) *types.String
 		return name
 	}
 }
-func ClassVisible(ce *types.ClassEntry) types.ZendBool {
+func ClassVisible(ce *types2.ClassEntry) types2.ZendBool {
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		return !(CG__().GetCompilerOptions() & ZEND_COMPILE_IGNORE_INTERNAL_CLASSES)
 	} else {
@@ -184,8 +184,8 @@ func ClassVisible(ce *types.ClassEntry) types.ZendBool {
 		return (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || ce.GetFilename() == CG__().GetCompiledFilename()
 	}
 }
-func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry {
-	var ce *types.ClassEntry
+func LookupClass(scope *types2.ClassEntry, name *types2.String) *types2.ClassEntry {
+	var ce *types2.ClassEntry
 	if CG__().GetInCompilation() == 0 {
 		var flags uint32 = ZEND_FETCH_CLASS_ALLOW_UNLINKED | ZEND_FETCH_CLASS_NO_AUTOLOAD
 		ce = ZendLookupClassEx(name, nil, flags)
@@ -199,7 +199,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 			ALLOC_HASHTABLE(CG__().GetDelayedAutoloads())
 			CG__().GetDelayedAutoloads().Init(0, nil)
 		}
-		types.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name.GetStr())
+		types2.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name.GetStr())
 	} else {
 		ce = ZendLookupClassEx(name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		if ce != nil && ClassVisible(ce) != 0 {
@@ -217,7 +217,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 	}
 	return nil
 }
-func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) types.ZendBool {
+func UnlinkedInstanceof(ce1 *types2.ClassEntry, ce2 *types2.ClassEntry) types2.ZendBool {
 	if ce1 == ce2 {
 		return 1
 	}
@@ -225,7 +225,7 @@ func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) types.Zend
 		return InstanceofFunction(ce1, ce2)
 	}
 	if ce1.GetParent() {
-		var parent_ce *types.ClassEntry
+		var parent_ce *types2.ClassEntry
 		if ce1.IsResolvedParent() {
 			parent_ce = ce1.GetParent()
 		} else {
@@ -261,7 +261,7 @@ func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) types.Zend
 
 		} else {
 			for i = 0; i < ce1.GetNumInterfaces(); i++ {
-				var ce *types.ClassEntry = ZendLookupClassEx(ce1.GetInterfaceNames()[i].name, ce1.GetInterfaceNames()[i].lcName, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				var ce *types2.ClassEntry = ZendLookupClassEx(ce1.GetInterfaceNames()[i].name, ce1.GetInterfaceNames()[i].lcName, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil && UnlinkedInstanceof(ce, ce2) != 0 {
 					return 1
 				}
@@ -270,18 +270,18 @@ func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) types.Zend
 	}
 	return 0
 }
-func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFunction, fe_arg_info *ZendArgInfo, proto types.IFunction, proto_arg_info *ZendArgInfo) InheritanceStatus {
-	var fe_type types.ZendType = fe_arg_info.GetType()
-	var proto_type types.ZendType = proto_arg_info.GetType()
+func ZendPerformCovariantTypeCheck(unresolved_class **types2.String, fe types2.IFunction, fe_arg_info *ZendArgInfo, proto types2.IFunction, proto_arg_info *ZendArgInfo) InheritanceStatus {
+	var fe_type types2.ZendType = fe_arg_info.GetType()
+	var proto_type types2.ZendType = proto_arg_info.GetType()
 	b.Assert(fe_type.IsSet() && proto_type.IsSet())
 	if fe_type.AllowNull() && !(proto_type.AllowNull()) {
 		return INHERITANCE_ERROR
 	}
 	if proto_type.IsClass() {
-		var fe_class_name *types.String
-		var proto_class_name *types.String
-		var fe_ce *types.ClassEntry
-		var proto_ce *types.ClassEntry
+		var fe_class_name *types2.String
+		var proto_class_name *types2.String
+		var fe_ce *types2.ClassEntry
+		var proto_ce *types2.ClassEntry
 		if !(fe_type.IsClass()) {
 			return INHERITANCE_ERROR
 		}
@@ -309,10 +309,10 @@ func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFu
 		} else {
 			return INHERITANCE_ERROR
 		}
-	} else if proto_type.Code() == types.IS_ITERABLE {
+	} else if proto_type.Code() == types2.IS_ITERABLE {
 		if fe_type.IsClass() {
-			var fe_class_name *types.String = ResolveClassName(fe.GetScope(), fe_type.Name())
-			var fe_ce *types.ClassEntry = LookupClass(fe.GetScope(), fe_class_name)
+			var fe_class_name *types2.String = ResolveClassName(fe.GetScope(), fe_type.Name())
+			var fe_ce *types2.ClassEntry = LookupClass(fe.GetScope(), fe_class_name)
 			if fe_ce == nil {
 				*unresolved_class = fe_class_name
 				return INHERITANCE_UNRESOLVED
@@ -323,27 +323,27 @@ func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFu
 				return INHERITANCE_ERROR
 			}
 		}
-		if fe_type.Code() == types.IS_ITERABLE || fe_type.Code() == types.IS_ARRAY {
+		if fe_type.Code() == types2.IS_ITERABLE || fe_type.Code() == types2.IS_ARRAY {
 			return INHERITANCE_SUCCESS
 		} else {
 			return INHERITANCE_ERROR
 		}
-	} else if proto_type.Code() == types.IS_OBJECT {
+	} else if proto_type.Code() == types2.IS_OBJECT {
 		if fe_type.IsClass() {
 
 			/* Currently, any class name would be allowed here. We still perform a class lookup
 			 * for forward-compatibility reasons, as we may have named types in the future that
 			 * are not classes (such as enums or typedefs). */
 
-			var fe_class_name *types.String = ResolveClassName(fe.GetScope(), fe_type.Name())
-			var fe_ce *types.ClassEntry = LookupClass(fe.GetScope(), fe_class_name)
+			var fe_class_name *types2.String = ResolveClassName(fe.GetScope(), fe_type.Name())
+			var fe_ce *types2.ClassEntry = LookupClass(fe.GetScope(), fe_class_name)
 			if fe_ce == nil {
 				*unresolved_class = fe_class_name
 				return INHERITANCE_UNRESOLVED
 			}
 			return INHERITANCE_SUCCESS
 		}
-		if fe_type.Code() == types.IS_OBJECT {
+		if fe_type.Code() == types2.IS_OBJECT {
 			return INHERITANCE_SUCCESS
 		} else {
 			return INHERITANCE_ERROR
@@ -356,7 +356,7 @@ func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFu
 		}
 	}
 }
-func ZendDoPerformArgTypeHintCheck(unresolved_class **types.String, fe types.IFunction, fe_arg_info *ZendArgInfo, proto types.IFunction, proto_arg_info *ZendArgInfo) InheritanceStatus {
+func ZendDoPerformArgTypeHintCheck(unresolved_class **types2.String, fe types2.IFunction, fe_arg_info *ZendArgInfo, proto types2.IFunction, proto_arg_info *ZendArgInfo) InheritanceStatus {
 	if !(fe_arg_info.GetType().IsSet()) {
 
 		/* Child with no type is always compatible */
@@ -384,7 +384,7 @@ func ZendDoPerformArgTypeHintCheck(unresolved_class **types.String, fe types.IFu
 	/* Contravariant type check is performed as a covariant type check with swapped
 	 * argument order. */
 }
-func ZendDoPerformImplementationCheck(unresolved_class **types.String, fe types.IFunction, proto types.IFunction) InheritanceStatus {
+func ZendDoPerformImplementationCheck(unresolved_class **types2.String, fe types2.IFunction, proto types2.IFunction) InheritanceStatus {
 	var i uint32
 	var num_args uint32
 	var status InheritanceStatus
@@ -488,15 +488,15 @@ func ZendDoPerformImplementationCheck(unresolved_class **types.String, fe types.
 	}
 	return status
 }
-func ZendAppendTypeHint(str *SmartStr, fptr types.IFunction, arg_info *ZendArgInfo, return_hint int) {
+func ZendAppendTypeHint(str *SmartStr, fptr types2.IFunction, arg_info *ZendArgInfo, return_hint int) {
 	if arg_info.GetType().IsSet() && arg_info.GetType().AllowNull() {
 		str.AppendByte('?')
 	}
 	if arg_info.GetType().IsClass() {
 		var class_name *byte
 		var class_name_len int
-		class_name = types.ZEND_TYPE_NAME(arg_info.GetType()).GetVal()
-		class_name_len = types.ZEND_TYPE_NAME(arg_info.GetType()).GetLen()
+		class_name = types2.ZEND_TYPE_NAME(arg_info.GetType()).GetVal()
+		class_name_len = types2.ZEND_TYPE_NAME(arg_info.GetType()).GetLen()
 		if !(strcasecmp(class_name, "self")) && fptr.GetScope() != nil {
 			class_name = fptr.GetScope().GetName().GetVal()
 			class_name_len = fptr.GetScope().GetName().GetLen()
@@ -509,14 +509,14 @@ func ZendAppendTypeHint(str *SmartStr, fptr types.IFunction, arg_info *ZendArgIn
 			str.AppendByte(' ')
 		}
 	} else if arg_info.GetType().IsCode() {
-		var type_name *byte = types.ZendGetTypeByConst(arg_info.GetType().Code())
+		var type_name *byte = types2.ZendGetTypeByConst(arg_info.GetType().Code())
 		str.AppendString(b.CastStrAuto(type_name))
 		if return_hint == 0 {
 			str.AppendByte(' ')
 		}
 	}
 }
-func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
+func ZendGetFunctionDeclaration(fptr types2.IFunction) *types2.String {
 	var str SmartStr = MakeSmartStr(0)
 	if fptr.GetOpArray().IsReturnReference() {
 		str.AppendString("& ")
@@ -574,7 +574,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 						op++
 					}
 					if precv != nil && precv.GetOpcode() == ZEND_RECV_INIT && precv.GetOp2Type() != IS_UNUSED {
-						var zv *types.Zval = RT_CONSTANT(precv, precv.GetOp2())
+						var zv *types2.Zval = RT_CONSTANT(precv, precv.GetOp2())
 						if zv.IsFalse() {
 							str.AppendString("false")
 						} else if zv.IsTrue() {
@@ -591,15 +591,15 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 						} else if zv.IsArray() {
 							str.AppendString("Array")
 						} else if zv.IsConstantAst() {
-							var ast *ZendAst = types.Z_ASTVAL_P(zv)
+							var ast *ZendAst = types2.Z_ASTVAL_P(zv)
 							if ast.GetKind() == ZEND_AST_CONSTANT {
 								str.AppendString(ZendAstGetConstantName(ast).GetStr())
 							} else {
 								str.AppendString("<expression>")
 							}
 						} else {
-							var tmp_zv_str *types.String
-							var zv_str *types.String = ZvalGetTmpString(zv, &tmp_zv_str)
+							var tmp_zv_str *types2.String
+							var zv_str *types2.String = ZvalGetTmpString(zv, &tmp_zv_str)
 							str.AppendString(zv_str.GetStr())
 							ZendTmpStringRelease(tmp_zv_str)
 						}
@@ -622,7 +622,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 	str.ZeroTail()
 	return str.GetS()
 }
-func FuncLineno(fn types.IFunction) uint32 {
+func FuncLineno(fn types2.IFunction) uint32 {
 	if fn.GetType() == ZEND_USER_FUNCTION {
 		return fn.GetOpArray().GetLineStart()
 	} else {
@@ -632,13 +632,13 @@ func FuncLineno(fn types.IFunction) uint32 {
 func EmitIncompatibleMethodError(
 	error_level int,
 	error_verb *byte,
-	child types.IFunction,
-	parent types.IFunction,
+	child types2.IFunction,
+	parent types2.IFunction,
 	status InheritanceStatus,
-	unresolved_class *types.String,
+	unresolved_class *types2.String,
 ) {
-	var parent_prototype *types.String = ZendGetFunctionDeclaration(parent)
-	var child_prototype *types.String = ZendGetFunctionDeclaration(child)
+	var parent_prototype *types2.String = ZendGetFunctionDeclaration(parent)
+	var child_prototype *types2.String = ZendGetFunctionDeclaration(child)
 	if status == INHERITANCE_UNRESOLVED {
 		faults.ErrorAt(error_level, nil, FuncLineno(child), "Could not check compatibility between %s and %s, because class %s is not available", child_prototype.GetVal(), parent_prototype.GetVal(), unresolved_class.GetVal())
 	} else {
@@ -647,7 +647,7 @@ func EmitIncompatibleMethodError(
 	// types.ZendStringEfree(child_prototype)
 	// types.ZendStringEfree(parent_prototype)
 }
-func EmitIncompatibleMethodErrorOrWarning(child types.IFunction, parent types.IFunction, status InheritanceStatus, unresolved_class *types.String, always_error types.ZendBool) {
+func EmitIncompatibleMethodErrorOrWarning(child types2.IFunction, parent types2.IFunction, status InheritanceStatus, unresolved_class *types2.String, always_error types2.ZendBool) {
 	var error_level int
 	var error_verb *byte
 	if always_error != 0 || child.GetPrototype() != nil && child.GetPrototype().IsAbstract() || parent.IsHasReturnType() && (!child.IsHasReturnType() || ZendPerformCovariantTypeCheck(&unresolved_class, child, child.GetArgInfo()-1, parent, parent.GetArgInfo()-1) != INHERITANCE_SUCCESS) {
@@ -659,8 +659,8 @@ func EmitIncompatibleMethodErrorOrWarning(child types.IFunction, parent types.IF
 	}
 	EmitIncompatibleMethodError(error_level, error_verb, child, parent, status, unresolved_class)
 }
-func PerformDelayableImplementationCheck(ce *types.ClassEntry, fe types.IFunction, proto types.IFunction, always_error types.ZendBool) {
-	var unresolved_class *types.String
+func PerformDelayableImplementationCheck(ce *types2.ClassEntry, fe types2.IFunction, proto types2.IFunction, always_error types2.ZendBool) {
+	var unresolved_class *types2.String
 	var status InheritanceStatus = ZendDoPerformImplementationCheck(&unresolved_class, fe, proto)
 	if status != INHERITANCE_SUCCESS {
 		if status == INHERITANCE_UNRESOLVED {
@@ -676,16 +676,16 @@ func PerformDelayableImplementationCheck(ce *types.ClassEntry, fe types.IFunctio
 	}
 }
 func DoInheritanceCheckOnMethodEx(
-	child types.IFunction,
-	parent types.IFunction,
-	ce *types.ClassEntry,
-	child_dup_callback func(types.IFunction),
-	check_only types.ZendBool,
-	checked types.ZendBool,
+	child types2.IFunction,
+	parent types2.IFunction,
+	ce *types2.ClassEntry,
+	child_dup_callback func(types2.IFunction),
+	check_only types2.ZendBool,
+	checked types2.ZendBool,
 ) InheritanceStatus {
 	var child_flags uint32
 	var parent_flags uint32 = parent.GetFnFlags()
-	var proto types.IFunction
+	var proto types2.IFunction
 	if checked == 0 && (parent_flags&AccFinal) != 0 {
 		if check_only != 0 {
 			return INHERITANCE_ERROR
@@ -746,7 +746,7 @@ func DoInheritanceCheckOnMethodEx(
 
 					/* op_array wasn't duplicated yet */
 
-					var new_function types.IFunction = types.CopyOpArray(child.GetOpArray())
+					var new_function types2.IFunction = types2.CopyOpArray(child.GetOpArray())
 					child = new_function
 					child_dup_callback(child)
 				}
@@ -766,21 +766,21 @@ func DoInheritanceCheckOnMethodEx(
 	}
 	if checked == 0 {
 		if check_only != 0 {
-			var unresolved_class *types.String
+			var unresolved_class *types2.String
 			return ZendDoPerformImplementationCheck(&unresolved_class, child, parent)
 		}
 		PerformDelayableImplementationCheck(ce, child, parent, 0)
 	}
 	return INHERITANCE_SUCCESS
 }
-func DoInheritMethod(key string, parent types.IFunction, ce *types.ClassEntry, is_interface types.ZendBool, checked types.ZendBool) {
+func DoInheritMethod(key string, parent types2.IFunction, ce *types2.ClassEntry, is_interface types2.ZendBool, checked types2.ZendBool) {
 	var func_ = ce.FunctionTable().Get(key)
 	if func_ != nil {
 		if is_interface != 0 && func_ == parent {
 			/* The same method in interface may be inherited few times */
 			return
 		}
-		dupCallback := func(f types.IFunction) { ce.FunctionTable().UpdateDirect(key, f) }
+		dupCallback := func(f types2.IFunction) { ce.FunctionTable().UpdateDirect(key, f) }
 		if checked != 0 {
 			DoInheritanceCheckOnMethodEx(func_, parent, ce, dupCallback, 0, checked)
 		} else {
@@ -801,10 +801,10 @@ func DoInheritMethod(key string, parent types.IFunction, ce *types.ClassEntry, i
 	}
 }
 func PropertyTypesCompatible(parent_info *ZendPropertyInfo, child_info *ZendPropertyInfo) InheritanceStatus {
-	var parent_name *types.String
-	var child_name *types.String
-	var parent_type_ce *types.ClassEntry
-	var child_type_ce *types.ClassEntry
+	var parent_name *types2.String
+	var child_name *types2.String
+	var parent_type_ce *types2.ClassEntry
+	var child_type_ce *types2.ClassEntry
 	if parent_info.GetType() == child_info.GetType() {
 		return INHERITANCE_SUCCESS
 	}
@@ -812,12 +812,12 @@ func PropertyTypesCompatible(parent_info *ZendPropertyInfo, child_info *ZendProp
 		return INHERITANCE_ERROR
 	}
 	if parent_info.GetType().IsCe() {
-		parent_name = types.ZEND_TYPE_CE(parent_info.GetType()).GetName()
+		parent_name = types2.ZEND_TYPE_CE(parent_info.GetType()).GetName()
 	} else {
 		parent_name = ResolveClassName(parent_info.GetCe(), parent_info.GetType().Name())
 	}
 	if child_info.GetType().IsCe() {
-		child_name = types.ZEND_TYPE_CE(child_info.GetType()).GetName()
+		child_name = types2.ZEND_TYPE_CE(child_info.GetType()).GetName()
 	} else {
 		child_name = ResolveClassName(child_info.GetCe(), child_info.GetType().Name())
 	}
@@ -848,10 +848,10 @@ func PropertyTypesCompatible(parent_info *ZendPropertyInfo, child_info *ZendProp
 }
 func EmitIncompatiblePropertyError(child *ZendPropertyInfo, parent *ZendPropertyInfo) {
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must be %s%s (as in class %s)", child.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(child.GetName()), b.Cond(parent.GetType().AllowNull(), "?", ""), b.CondF(parent.GetType().IsClass(), func() []byte {
-		return b.CondF(parent.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(parent.GetType()).GetName() }, func() *types.String { return ResolveClassName(parent.GetCe(), parent.GetType().Name()) }).GetVal()
-	}, func() *byte { return types.ZendGetTypeByConst(parent.GetType().Code()) }), parent.GetCe().GetName().GetVal())
+		return b.CondF(parent.GetType().IsCe(), func() *types2.String { return types2.ZEND_TYPE_CE(parent.GetType()).GetName() }, func() *types2.String { return ResolveClassName(parent.GetCe(), parent.GetType().Name()) }).GetVal()
+	}, func() *byte { return types2.ZendGetTypeByConst(parent.GetType().Code()) }), parent.GetCe().GetName().GetVal())
 }
-func DoInheritProperty(parent_info *ZendPropertyInfo, key string, ce *types.ClassEntry) {
+func DoInheritProperty(parent_info *ZendPropertyInfo, key string, ce *types2.ClassEntry) {
 	var child_info *ZendPropertyInfo = ce.PropertyTable().Get(key)
 	if child_info != nil {
 		if parent_info.HasFlags(AccPrivate | AccChanged) {
@@ -895,8 +895,8 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key string, ce *types.Clas
 		ce.PropertyTable().Add(key, child_info)
 	}
 }
-func DoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
-	if !ce.IsInterface() && iface.GetInterfaceGetsImplemented() && iface.GetInterfaceGetsImplemented()(iface, ce) == types.FAILURE {
+func DoImplementInterface(ce *types2.ClassEntry, iface *types2.ClassEntry) {
+	if !ce.IsInterface() && iface.GetInterfaceGetsImplemented() && iface.GetInterfaceGetsImplemented()(iface, ce) == types2.FAILURE {
 		faults.ErrorNoreturn(faults.E_CORE_ERROR, "Class %s could not implement interface %s", ce.GetName().GetVal(), iface.GetName().GetVal())
 	}
 
@@ -906,18 +906,18 @@ func DoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 
 	/* This should be prevented by the class lookup logic. */
 }
-func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
+func ZendDoInheritInterfaces(ce *types2.ClassEntry, iface *types2.ClassEntry) {
 	/* expects interface to be contained in ce's interface list already */
 
 	var i uint32
 	var ce_num uint32
 	var if_num uint32 = iface.GetNumInterfaces()
-	var entry *types.ClassEntry
+	var entry *types2.ClassEntry
 	ce_num = ce.GetNumInterfaces()
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		ce.SetInterfaces((**types.ClassEntry)(realloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*(ce_num+if_num))))
+		ce.SetInterfaces((**types2.ClassEntry)(realloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*(ce_num+if_num))))
 	} else {
-		ce.SetInterfaces((**types.ClassEntry)(Erealloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*(ce_num+if_num))))
+		ce.SetInterfaces((**types2.ClassEntry)(Erealloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*(ce_num+if_num))))
 	}
 
 	/* Inherit the interfaces, only if they're not already inherited by the class */
@@ -943,7 +943,7 @@ func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
 
 	/* and now call the implementing handlers */
 }
-func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *types.ClassEntry) {
+func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *types2.ClassEntry) {
 	var c = ce.ConstantsTable().Get(name)
 	if c != nil {
 		if (c.GetValue().GetAccessFlags() & AccPppMask) > (parentConst.GetValue().GetAccessFlags() & AccPppMask) {
@@ -959,7 +959,7 @@ func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *typ
 		ce.ConstantsTable().Add(name, parentConst)
 	}
 }
-func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
+func ZendBuildPropertiesInfoTable(ce *types2.ClassEntry) {
 	if ce.GetDefaultPropertiesCount() == 0 {
 		return
 	}
@@ -985,7 +985,7 @@ func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
 		}
 	})
 }
-func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, checked bool) {
+func ZendDoInheritanceEx(ce *types2.ClassEntry, parent_ce *types2.ClassEntry, checked bool) {
 	if ce.IsInterface() {
 		/* Interface can only inherit other interfaces */
 		if !parent_ce.IsInterface() {
@@ -1023,11 +1023,11 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	/* Inherit properties */
 
 	if parent_ce.GetDefaultPropertiesCount() != 0 {
-		var src *types.Zval
-		var dst *types.Zval
-		var end *types.Zval
+		var src *types2.Zval
+		var dst *types2.Zval
+		var end *types2.Zval
 		if ce.GetDefaultPropertiesCount() != 0 {
-			var table *types.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() + parent_ce.GetDefaultPropertiesCount()))
+			var table *types2.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() + parent_ce.GetDefaultPropertiesCount()))
 			src = ce.GetDefaultPropertiesTable() + ce.GetDefaultPropertiesCount()
 			end = table + parent_ce.GetDefaultPropertiesCount()
 			dst = end + ce.GetDefaultPropertiesCount()
@@ -1035,7 +1035,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			for {
 				dst--
 				src--
-				types.ZVAL_COPY_VALUE_PROP(dst, src)
+				types2.ZVAL_COPY_VALUE_PROP(dst, src)
 				if dst == end {
 					break
 				}
@@ -1053,7 +1053,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			for {
 				dst--
 				src--
-				types.ZVAL_COPY_OR_DUP_PROP(dst, src)
+				types2.ZVAL_COPY_OR_DUP_PROP(dst, src)
 				if dst.IsConstantAst() {
 					ce.SetIsConstantsUpdated(false)
 				}
@@ -1066,7 +1066,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			for {
 				dst--
 				src--
-				types.ZVAL_COPY_PROP(dst, src)
+				types2.ZVAL_COPY_PROP(dst, src)
 				if dst.IsConstantAst() {
 					ce.SetIsConstantsUpdated(false)
 				}
@@ -1079,11 +1079,11 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 		ce.SetDefaultPropertiesCount(ce.GetDefaultPropertiesCount() + parent_ce.GetDefaultPropertiesCount())
 	}
 	if parent_ce.GetDefaultStaticMembersCount() != 0 {
-		var src *types.Zval
-		var dst *types.Zval
-		var end *types.Zval
+		var src *types2.Zval
+		var dst *types2.Zval
+		var end *types2.Zval
 		if ce.GetDefaultStaticMembersCount() != 0 {
-			var table *types.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultStaticMembersCount() + parent_ce.GetDefaultStaticMembersCount()))
+			var table *types2.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultStaticMembersCount() + parent_ce.GetDefaultStaticMembersCount()))
 			src = ce.GetDefaultStaticMembersTable() + ce.GetDefaultStaticMembersCount()
 			end = table + parent_ce.GetDefaultStaticMembersCount()
 			dst = end + ce.GetDefaultStaticMembersCount()
@@ -1110,7 +1110,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			if CE_STATIC_MEMBERS(parent_ce) == nil {
 				ZendClassInitStatics(parent_ce)
 			}
-			if ZendUpdateClassConstants(parent_ce) != types.SUCCESS {
+			if ZendUpdateClassConstants(parent_ce) != types2.SUCCESS {
 				b.Assert(false)
 			}
 			src = CE_STATIC_MEMBERS(parent_ce) + parent_ce.GetDefaultStaticMembersCount()
@@ -1140,7 +1140,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				} else {
 					dst.SetIndirect(src)
 				}
-				if types.Z_INDIRECT_P(dst).IsConstantAst() {
+				if types2.Z_INDIRECT_P(dst).IsConstantAst() {
 					ce.SetIsConstantsUpdated(false)
 				}
 				if dst == end {
@@ -1202,11 +1202,11 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	}
 	if parent_ce.FunctionTable().Len() != 0 {
 		if checked {
-			parent_ce.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
+			parent_ce.FunctionTable().Foreach(func(key string, func_ types2.IFunction) {
 				DoInheritMethod(key, func_, ce, 0, 1)
 			})
 		} else {
-			parent_ce.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
+			parent_ce.FunctionTable().Foreach(func(key string, func_ types2.IFunction) {
 				DoInheritMethod(key, func_, ce, 0, 0)
 			})
 		}
@@ -1219,7 +1219,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	}
 	ce.AddCeFlags(parent_ce.GetCeFlags() & (AccHasStaticInMethods | AccHasTypeHints | AccUseGuards))
 }
-func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parentConstant *ZendClassConstant, name string, iface *types.ClassEntry) types.ZendBool {
+func DoInheritConstantCheck(childConstantsTable types2.ClassConstantTable, parentConstant *ZendClassConstant, name string, iface *types2.ClassEntry) types2.ZendBool {
 	var oldConstant *ZendClassConstant = childConstantsTable.Get(name)
 	if oldConstant != nil {
 		if oldConstant.GetCe() != parentConstant.GetCe() {
@@ -1229,7 +1229,7 @@ func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parent
 	}
 	return 1
 }
-func DoInheritIfaceConstant(name string, c *ZendClassConstant, ce *types.ClassEntry, iface *types.ClassEntry) {
+func DoInheritIfaceConstant(name string, c *ZendClassConstant, ce *types2.ClassEntry, iface *types2.ClassEntry) {
 	if DoInheritConstantCheck(ce.ConstantsTable(), c, name, iface) != 0 {
 		var ct *ZendClassConstant
 		if c.GetValue().IsConstantAst() {
@@ -1243,11 +1243,11 @@ func DoInheritIfaceConstant(name string, c *ZendClassConstant, ce *types.ClassEn
 		ce.ConstantsTable().Update(name, c)
 	}
 }
-func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
+func DoInterfaceImplementation(ce *types2.ClassEntry, iface *types2.ClassEntry) {
 	iface.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
 		DoInheritIfaceConstant(key, c, ce, iface)
 	})
-	iface.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
+	iface.FunctionTable().Foreach(func(key string, func_ types2.IFunction) {
 		DoInheritMethod(key, func_, ce, 1, 0)
 	})
 	DoImplementInterface(ce, iface)
@@ -1255,12 +1255,12 @@ func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
 		ZendDoInheritInterfaces(ce, iface)
 	}
 }
-func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
+func ZendDoImplementInterface(ce *types2.ClassEntry, iface *types2.ClassEntry) {
 	var i uint32
 	var ignore uint32 = 0
 	var current_iface_num uint32 = ce.GetNumInterfaces()
 	var parent_iface_num uint32 = b.CondF1(ce.GetParent(), func() __auto__ { return ce.GetParent().num_interfaces }, 0)
-	var key *types.String
+	var key *types2.String
 	var c *ZendClassConstant
 	b.Assert(ce.IsLinked())
 	for i = 0; i < ce.GetNumInterfaces(); i++ {
@@ -1283,20 +1283,20 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 	} else {
 		if ce.GetNumInterfaces() >= current_iface_num {
 			if ce.GetType() == ZEND_INTERNAL_CLASS {
-				ce.SetInterfaces((**types.ClassEntry)(realloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))
+				ce.SetInterfaces((**types2.ClassEntry)(realloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))
 			} else {
-				ce.SetInterfaces((**types.ClassEntry)(Erealloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))
+				ce.SetInterfaces((**types2.ClassEntry)(Erealloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))
 			}
 		}
 		ce.GetInterfaces()[b.PostInc(&(ce.GetNumInterfaces()))] = iface
 		DoInterfaceImplementation(ce, iface)
 	}
 }
-func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEntry) {
-	var iface *types.ClassEntry
+func ZendDoImplementInterfaces(ce *types2.ClassEntry, interfaces **types2.ClassEntry) {
+	var iface *types2.ClassEntry
 	var num_parent_interfaces uint32 = b.CondF1(ce.GetParent(), func() __auto__ { return ce.GetParent().num_interfaces }, 0)
 	var num_interfaces uint32 = num_parent_interfaces
-	var key *types.String
+	var key *types2.String
 	var c *ZendClassConstant
 	var i uint32
 	var j uint32
@@ -1345,7 +1345,7 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 		DoInterfaceImplementation(ce, ce.GetInterfaces()[i])
 	}
 }
-func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFunction) {
+func ZendAddMagicMethods(ce *types2.ClassEntry, mname *types2.String, fe types2.IFunction) {
 	if mname.GetStr() == "serialize" {
 		ce.SetSerializeFunc(fe)
 	} else if mname.GetStr() == "unserialize" {
@@ -1382,7 +1382,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFu
 	} else if mname.GetStr() == ZEND_DEBUGINFO_FUNC_NAME {
 		ce.SetDebugInfo(fe)
 	} else if ce.GetName().GetLen() == mname.GetLen() {
-		var lowercase_name *types.String = ZendStringTolower(ce.GetName())
+		var lowercase_name *types2.String = ZendStringTolower(ce.GetName())
 		// lowercase_name = types.ZendNewInternedString(lowercase_name)
 		if !(memcmp(mname.GetVal(), lowercase_name.GetVal(), mname.GetLen())) {
 			if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
@@ -1394,9 +1394,9 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFu
 		// types.ZendStringReleaseEx(lowercase_name, 0)
 	}
 }
-func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn types.IFunction, overridden **types.Array) {
-	var existing_fn types.IFunction = nil
-	var new_fn types.IFunction
+func ZendAddTraitMethod(ce *types2.ClassEntry, name *byte, key *types2.String, fn types2.IFunction, overridden **types2.Array) {
+	var existing_fn types2.IFunction = nil
+	var new_fn types2.IFunction
 	if b.Assign(&existing_fn, ce.FunctionTable().Get(key.GetStr())) != nil {
 
 		/* if it is the same function with the same visibility and has not been assigned a class scope yet, regardless
@@ -1410,7 +1410,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 			/* members from the current class override trait methods */
 
 			if (*overridden) != nil {
-				if b.Assign(&existing_fn, types.ZendHashFindPtr(*overridden, key.GetStr())) != nil {
+				if b.Assign(&existing_fn, types2.ZendHashFindPtr(*overridden, key.GetStr())) != nil {
 					if existing_fn.IsAbstract() {
 
 						/* Make sure the trait method is compatible with previosly declared abstract method */
@@ -1429,9 +1429,9 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 					}
 				}
 			} else {
-				*overridden = types.NewArrayEx(8, OverriddenPtrDtor)
+				*overridden = types2.NewArrayEx(8, OverriddenPtrDtor)
 			}
-			types.ZendHashUpdateMem(*overridden, key.GetStr(), fn, b.SizeOf("zend_function"))
+			types2.ZendHashUpdateMem(*overridden, key.GetStr(), fn, b.SizeOf("zend_function"))
 			return
 		} else if fn.IsAbstract() && !existing_fn.IsAbstract() {
 
@@ -1469,7 +1469,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 	ce.FunctionTable().Update(key.GetStr(), new_fn)
 	ZendAddMagicMethods(ce, key, new_fn)
 }
-func ZendFixupTraitMethod(fn types.IFunction, ce *types.ClassEntry) {
+func ZendFixupTraitMethod(fn types2.IFunction, ce *types2.ClassEntry) {
 	if (fn.GetScope().GetCeFlags() & AccTrait) == AccTrait {
 		fn.SetScope(ce)
 		if fn.IsAbstract() {
@@ -1482,16 +1482,16 @@ func ZendFixupTraitMethod(fn types.IFunction, ce *types.ClassEntry) {
 }
 func ZendTraitsCopyFunctions(
 	fnname string,
-	fn types.IFunction,
-	ce *types.ClassEntry,
-	overridden **types.Array,
-	exclude_table *types.Array,
-	aliases **types.ClassEntry,
+	fn types2.IFunction,
+	ce *types2.ClassEntry,
+	overridden **types2.Array,
+	exclude_table *types2.Array,
+	aliases **types2.ClassEntry,
 ) {
 	var alias *ZendTraitAlias
 	var alias_ptr **ZendTraitAlias
-	var lcname *types.String
-	var fn_copy types.IFunction
+	var lcname *types2.String
+	var fn_copy types2.IFunction
 	var i int
 
 	/* apply aliases which are qualified with a class name, there should not be any ambiguity */
@@ -1505,7 +1505,7 @@ func ZendTraitsCopyFunctions(
 			/* Scope unset or equal to the function we compare to, and the alias applies to fn */
 
 			if alias.GetAlias() != nil && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetStr(), fnname.GetStr()) == 0 {
-				fn_copy = types.CopyFunction(fn)
+				fn_copy = types2.CopyFunction(fn)
 
 				/* if it is 0, no modifieres has been changed */
 
@@ -1578,7 +1578,7 @@ func ZendTraitsCopyFunctions(
 		ZendAddTraitMethod(ce, fn.GetFunctionName().GetVal(), fnname, &fn_copy, overridden)
 	}
 }
-func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits **types.ClassEntry) uint32 {
+func ZendCheckTraitUsage(ce *types2.ClassEntry, trait *types2.ClassEntry, traits **types2.ClassEntry) uint32 {
 	var i uint32
 	if (trait.GetCeFlags() & AccTrait) != AccTrait {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s is not a trait, Only traits may be used in 'as' and 'insteadof' statements", trait.GetName().GetVal())
@@ -1592,16 +1592,16 @@ func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits *
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Required Trait %s wasn't added to %s", trait.GetName().GetVal(), ce.GetName().GetVal())
 	return 0
 }
-func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEntry, exclude_tables_ptr ***types.Array, aliases_ptr ***types.ClassEntry) {
+func ZendTraitsInitTraitStructures(ce *types2.ClassEntry, traits **types2.ClassEntry, exclude_tables_ptr ***types2.Array, aliases_ptr ***types2.ClassEntry) {
 	var i int
 	var j int = 0
 	var precedences **ZendTraitPrecedence
 	var cur_precedence *ZendTraitPrecedence
 	var cur_method_ref *ZendTraitMethodReference
-	var lcname *types.String
-	var exclude_tables []*types.Array = nil
-	var aliases **types.ClassEntry = nil
-	var trait *types.ClassEntry
+	var lcname *types2.String
+	var exclude_tables []*types2.Array = nil
+	var aliases **types2.ClassEntry = nil
+	var trait *types2.ClassEntry
 
 	/* resolve class references */
 
@@ -1636,8 +1636,8 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 			*/
 
 			for j = 0; j < cur_precedence.GetNumExcludes(); j++ {
-				var class_name *types.String = cur_precedence.GetExcludeClassNames()[j]
-				var exclude_ce *types.ClassEntry = ZendFetchClass(class_name.GetStr(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				var class_name *types2.String = cur_precedence.GetExcludeClassNames()[j]
+				var exclude_ce *types2.ClassEntry = ZendFetchClass(class_name.GetStr(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				var trait_num uint32
 				if exclude_ce == nil {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", class_name.GetVal())
@@ -1647,7 +1647,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 					ALLOC_HASHTABLE(exclude_tables[trait_num])
 					exclude_tables[trait_num].Init(0, nil)
 				}
-				if types.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname.GetStr()) == nil {
+				if types2.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname.GetStr()) == nil {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", precedences[i].GetTraitMethod().GetMethodName().GetVal(), exclude_ce.GetName().GetVal())
 				}
 
@@ -1701,15 +1701,15 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 	*exclude_tables_ptr = exclude_tables
 	*aliases_ptr = aliases
 }
-func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry, exclude_tables []*types.Array, aliases **types.ClassEntry) {
+func ZendDoTraitsMethodBinding(ce *types2.ClassEntry, traits []*types2.ClassEntry, exclude_tables []*types2.Array, aliases **types2.ClassEntry) {
 	var i uint32
-	var overridden *types.Array = nil
+	var overridden *types2.Array = nil
 	if exclude_tables != nil {
 		for i = 0; i < ce.GetNumTraits(); i++ {
 			if traits[i] != nil {
 
 				/* copies functions, applies defined aliasing, and excludes unused trait methods */
-				traits[i].FunctionTable().Foreach(func(key string, fn types.IFunction) {
+				traits[i].FunctionTable().Foreach(func(key string, fn types2.IFunction) {
 					ZendTraitsCopyFunctions(key, fn, ce, &overridden, exclude_tables[i], aliases)
 				})
 				if exclude_tables[i] != nil {
@@ -1722,13 +1722,13 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry,
 	} else {
 		for i = 0; i < ce.GetNumTraits(); i++ {
 			if traits[i] != nil {
-				traits[i].FunctionTable().Foreach(func(key string, fn types.IFunction) {
+				traits[i].FunctionTable().Foreach(func(key string, fn types2.IFunction) {
 					ZendTraitsCopyFunctions(key, fn, ce, &overridden, nil, aliases)
 				})
 			}
 		}
 	}
-	ce.FunctionTable().Foreach(func(_ string, fn types.IFunction) {
+	ce.FunctionTable().Foreach(func(_ string, fn types2.IFunction) {
 		ZendFixupTraitMethod(fn, ce)
 	})
 	if overridden != nil {
@@ -1736,7 +1736,7 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry,
 		FREE_HASHTABLE(overridden)
 	}
 }
-func FindFirstDefinition(ce *types.ClassEntry, traits **types.ClassEntry, current_trait int, prop_name *types.String, coliding_ce *types.ClassEntry) *types.ClassEntry {
+func FindFirstDefinition(ce *types2.ClassEntry, traits **types2.ClassEntry, current_trait int, prop_name *types2.String, coliding_ce *types2.ClassEntry) *types2.ClassEntry {
 	var i int
 	if coliding_ce == ce {
 		for i = 0; i < current_trait; i++ {
@@ -1747,16 +1747,16 @@ func FindFirstDefinition(ce *types.ClassEntry, traits **types.ClassEntry, curren
 	}
 	return coliding_ce
 }
-func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry) {
+func ZendDoTraitsPropertyBinding(ce *types2.ClassEntry, traits **types2.ClassEntry) {
 	var i int
 	var property_info *ZendPropertyInfo
 	var coliding_prop *ZendPropertyInfo
-	var prop_name *types.String
+	var prop_name *types2.String
 	var class_name_unused *byte
-	var not_compatible types.ZendBool
-	var prop_value *types.Zval
+	var not_compatible types2.ZendBool
+	var prop_value *types2.Zval
 	var flags uint32
-	var doc_comment *types.String
+	var doc_comment *types2.String
 
 	/* In the following steps the properties are inserted into the property table
 	 * for that, a very strict approach is applied:
@@ -1768,9 +1768,9 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 		if traits[i] == nil {
 			continue
 		}
-		var __ht *types.Array = traits[i].GetPropertiesInfo()
+		var __ht *types2.Array = traits[i].GetPropertiesInfo()
 		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
+			var _z *types2.Zval = _p.GetVal()
 
 			property_info = _z.Ptr()
 
@@ -1788,7 +1788,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 				/* for private and protected we need to unmangle the names */
 
 				ZendUnmanglePropertyNameEx(property_info.GetName(), &class_name_unused, &pname, &pname_len)
-				prop_name = types.NewString(b.CastStr(pname, pname_len))
+				prop_name = types2.NewString(b.CastStr(pname, pname_len))
 			}
 
 			/* next: check for conflicts with current class */
@@ -1804,15 +1804,15 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 
 						/* the flags are identical, thus, the properties may be compatible */
 
-						var op1 *types.Zval
-						var op2 *types.Zval
-						var op1_tmp types.Zval
-						var op2_tmp types.Zval
+						var op1 *types2.Zval
+						var op2 *types2.Zval
+						var op1_tmp types2.Zval
+						var op2_tmp types2.Zval
 						if (flags & AccStatic) != 0 {
 							op1 = ce.GetDefaultStaticMembersTable()[coliding_prop.GetOffset()]
 							op2 = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
-							op1 = types.ZVAL_DEINDIRECT(op1)
-							op2 = types.ZVAL_DEINDIRECT(op2)
+							op1 = types2.ZVAL_DEINDIRECT(op1)
+							op2 = types2.ZVAL_DEINDIRECT(op2)
 						} else {
 							op1 = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(coliding_prop.GetOffset())]
 							op2 = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
@@ -1821,12 +1821,12 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 						/* if any of the values is a constant, we try to resolve it */
 
 						if op1.IsConstantAst() {
-							types.ZVAL_COPY_OR_DUP(&op1_tmp, op1)
+							types2.ZVAL_COPY_OR_DUP(&op1_tmp, op1)
 							ZvalUpdateConstantEx(&op1_tmp, ce)
 							op1 = &op1_tmp
 						}
 						if op2.IsConstantAst() {
-							types.ZVAL_COPY_OR_DUP(&op2_tmp, op2)
+							types2.ZVAL_COPY_OR_DUP(&op2_tmp, op2)
 							ZvalUpdateConstantEx(&op2_tmp, ce)
 							op2 = &op2_tmp
 						}
@@ -1850,7 +1850,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 
 			if (flags & AccStatic) != 0 {
 				prop_value = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
-				b.Assert(prop_value.GetType() != types.IS_INDIRECT)
+				b.Assert(prop_value.GetType() != types2.IS_INDIRECT)
 			} else {
 				prop_value = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 			}
@@ -1874,10 +1874,10 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 	 * - if compatible, then strict notice
 	 */
 }
-func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **types.ClassEntry) {
+func ZendDoCheckForInconsistentTraitsAliasing(ce *types2.ClassEntry, aliases **types2.ClassEntry) {
 	var i int = 0
 	var cur_alias *ZendTraitAlias
-	var lc_method_name *types.String
+	var lc_method_name *types2.String
 	if ce.GetTraitAliases() != nil {
 		for ce.GetTraitAliases()[i] != nil {
 			cur_alias = ce.GetTraitAliases()[i]
@@ -1918,11 +1918,11 @@ func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **ty
 		}
 	}
 }
-func ZendDoBindTraits(ce *types.ClassEntry) {
-	var exclude_tables **types.Array
-	var aliases **types.ClassEntry
-	var traits **types.ClassEntry
-	var trait **types.ClassEntry
+func ZendDoBindTraits(ce *types2.ClassEntry) {
+	var exclude_tables **types2.Array
+	var aliases **types2.ClassEntry
+	var traits **types2.ClassEntry
+	var trait **types2.ClassEntry
 	var i uint32
 	var j uint32
 	b.Assert(ce.GetNumTraits() > 0)
@@ -1977,15 +1977,15 @@ func ZendDoBindTraits(ce *types.ClassEntry) {
 
 	/* Emit E_DEPRECATED for PHP 4 constructors */
 }
-func ZendHasDeprecatedConstructor(ce *types.ClassEntry) types.ZendBool {
-	var constructor_name *types.String
+func ZendHasDeprecatedConstructor(ce *types2.ClassEntry) types2.ZendBool {
+	var constructor_name *types2.String
 	if ce.GetConstructor() == nil {
 		return 0
 	}
 	constructor_name = ce.GetConstructor().GetFunctionName()
 	return !(ZendBinaryStrcasecmp(ce.GetName().GetStr(), constructor_name.GetStr()))
 }
-func ZendCheckDeprecatedConstructor(ce *types.ClassEntry) {
+func ZendCheckDeprecatedConstructor(ce *types2.ClassEntry) {
 	if ZendHasDeprecatedConstructor(ce) != 0 {
 		faults.Error(faults.E_DEPRECATED, "Methods with the same name as their class will not be constructors in a future version of PHP; %s has a deprecated constructor", ce.GetName().GetVal())
 	}
@@ -2002,7 +2002,7 @@ func DISPLAY_ABSTRACT_FN(idx int) {
 		}
 	})
 }
-func ZendVerifyAbstractClassFunction(fn types.IFunction, ai *ZendAbstractInfo) {
+func ZendVerifyAbstractClassFunction(fn types2.IFunction, ai *ZendAbstractInfo) {
 	if fn.IsAbstract() {
 		if ai.GetCnt() < MAX_ABSTRACT_INFO_CNT {
 			ai.GetAfn()[ai.GetCnt()] = fn
@@ -2019,11 +2019,11 @@ func ZendVerifyAbstractClassFunction(fn types.IFunction, ai *ZendAbstractInfo) {
 		}
 	}
 }
-func ZendVerifyAbstractClass(ce *types.ClassEntry) {
+func ZendVerifyAbstractClass(ce *types2.ClassEntry) {
 	var ai ZendAbstractInfo
 	b.Assert((ce.GetCeFlags() & (AccImplicitAbstractClass | AccInterface | AccTrait | AccExplicitAbstractClass)) == AccImplicitAbstractClass)
 	memset(&ai, 0, b.SizeOf("ai"))
-	ce.FunctionTable().Foreach(func(_ string, func_ types.IFunction) {
+	ce.FunctionTable().Foreach(func(_ string, func_ types2.IFunction) {
 		ZendVerifyAbstractClassFunction(func_, &ai)
 	})
 	if ai.GetCnt() != 0 {
@@ -2038,38 +2038,38 @@ func ZendVerifyAbstractClass(ce *types.ClassEntry) {
 
 	}
 }
-func VarianceObligationDtor(zv *types.Zval) { Efree(zv.Ptr()) }
-func VarianceObligationHtDtor(zv *types.Zval) {
+func VarianceObligationDtor(zv *types2.Zval) { Efree(zv.Ptr()) }
+func VarianceObligationHtDtor(zv *types2.Zval) {
 	zv.Ptr().Destroy()
 	FREE_HASHTABLE(zv.Ptr())
 }
-func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
-	var ht *types.Array
+func GetOrInitObligationsForClass(ce *types2.ClassEntry) *types2.Array {
+	var ht *types2.Array
 	var key ZendUlong
 	if CG__().GetDelayedVarianceObligations() == nil {
 		ALLOC_HASHTABLE(CG__().GetDelayedVarianceObligations())
 		CG__().GetDelayedVarianceObligations().Init(0, VarianceObligationHtDtor)
 	}
 	key = ZendUlong(uintPtr(ce))
-	ht = types.ZendHashIndexFindPtr(CG__().GetDelayedVarianceObligations(), key)
+	ht = types2.ZendHashIndexFindPtr(CG__().GetDelayedVarianceObligations(), key)
 	if ht != nil {
 		return ht
 	}
 	ALLOC_HASHTABLE(ht)
 	ht.Init(0, VarianceObligationDtor)
-	types.ZendHashIndexAddNewPtr(CG__().GetDelayedVarianceObligations(), key, ht)
+	types2.ZendHashIndexAddNewPtr(CG__().GetDelayedVarianceObligations(), key, ht)
 	ce.SetIsUnresolvedVariance(true)
 	return ht
 }
-func AddDependencyObligation(ce *types.ClassEntry, dependency_ce *types.ClassEntry) {
-	var obligations *types.Array = GetOrInitObligationsForClass(ce)
+func AddDependencyObligation(ce *types2.ClassEntry, dependency_ce *types2.ClassEntry) {
+	var obligations *types2.Array = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_DEPENDENCY)
 	obligation.SetDependencyCe(dependency_ce)
-	types.ZendHashNextIndexInsertPtr(obligations, obligation)
+	types2.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
-func AddCompatibilityObligation(ce *types.ClassEntry, child_fn types.IFunction, parent_fn types.IFunction, always_error types.ZendBool) {
-	var obligations *types.Array = GetOrInitObligationsForClass(ce)
+func AddCompatibilityObligation(ce *types2.ClassEntry, child_fn types2.IFunction, parent_fn types2.IFunction, always_error types2.ZendBool) {
+	var obligations *types2.Array = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_COMPATIBILITY)
 
@@ -2086,32 +2086,32 @@ func AddCompatibilityObligation(ce *types.ClassEntry, child_fn types.IFunction, 
 		memcpy(obligation.GetParentFn(), parent_fn, b.SizeOf("zend_op_array"))
 	}
 	obligation.SetAlwaysError(always_error)
-	types.ZendHashNextIndexInsertPtr(obligations, obligation)
+	types2.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
-func AddPropertyCompatibilityObligation(ce *types.ClassEntry, child_prop *ZendPropertyInfo, parent_prop *ZendPropertyInfo) {
-	var obligations *types.Array = GetOrInitObligationsForClass(ce)
+func AddPropertyCompatibilityObligation(ce *types2.ClassEntry, child_prop *ZendPropertyInfo, parent_prop *ZendPropertyInfo) {
+	var obligations *types2.Array = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_PROPERTY_COMPATIBILITY)
 	obligation.SetChildProp(child_prop)
 	obligation.SetParentProp(parent_prop)
-	types.ZendHashNextIndexInsertPtr(obligations, obligation)
+	types2.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
-func CheckVarianceObligation(zv *types.Zval) int {
+func CheckVarianceObligation(zv *types2.Zval) int {
 	var obligation *VarianceObligation = zv.Ptr()
 	if obligation.GetType() == OBLIGATION_DEPENDENCY {
-		var dependency_ce *types.ClassEntry = obligation.GetDependencyCe()
+		var dependency_ce *types2.ClassEntry = obligation.GetDependencyCe()
 		if dependency_ce.IsUnresolvedVariance() {
 			ResolveDelayedVarianceObligations(dependency_ce)
 		}
 		if !dependency_ce.IsLinked() {
-			return types.ArrayApplyKeep
+			return types2.ArrayApplyKeep
 		}
 	} else if obligation.GetType() == OBLIGATION_COMPATIBILITY {
-		var unresolved_class *types.String
+		var unresolved_class *types2.String
 		var status InheritanceStatus = ZendDoPerformImplementationCheck(&unresolved_class, obligation.GetChildFn(), obligation.GetParentFn())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
-				return types.ArrayApplyKeep
+				return types2.ArrayApplyKeep
 			}
 			b.Assert(status == INHERITANCE_ERROR)
 			EmitIncompatibleMethodErrorOrWarning(obligation.GetChildFn(), obligation.GetParentFn(), status, unresolved_class, obligation.GetAlwaysError())
@@ -2121,17 +2121,17 @@ func CheckVarianceObligation(zv *types.Zval) int {
 		var status InheritanceStatus = PropertyTypesCompatible(obligation.GetParentProp(), obligation.GetChildProp())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
-				return types.ArrayApplyKeep
+				return types2.ArrayApplyKeep
 			}
 			b.Assert(status == INHERITANCE_ERROR)
 			EmitIncompatiblePropertyError(obligation.GetChildProp(), obligation.GetParentProp())
 		}
 	}
-	return types.ArrayApplyRemove
+	return types2.ArrayApplyRemove
 }
 func LoadDelayedClasses() {
-	var delayed_autoloads *types.Array = CG__().GetDelayedAutoloads()
-	var name *types.String
+	var delayed_autoloads *types2.Array = CG__().GetDelayedAutoloads()
+	var name *types2.String
 	if delayed_autoloads == nil {
 		return
 	}
@@ -2139,9 +2139,9 @@ func LoadDelayedClasses() {
 	/* Take ownership of this HT, to avoid concurrent modification during autoloading. */
 
 	CG__().SetDelayedAutoloads(nil)
-	var __ht *types.Array = delayed_autoloads
+	var __ht *types2.Array = delayed_autoloads
 	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
+		var _z *types2.Zval = _p.GetVal()
 
 		name = _p.GetKey()
 		ZendLookupClass(name)
@@ -2149,35 +2149,35 @@ func LoadDelayedClasses() {
 	delayed_autoloads.Destroy()
 	FREE_HASHTABLE(delayed_autoloads)
 }
-func ResolveDelayedVarianceObligations(ce *types.ClassEntry) {
-	var all_obligations *types.Array = CG__().GetDelayedVarianceObligations()
-	var obligations *types.Array
+func ResolveDelayedVarianceObligations(ce *types2.ClassEntry) {
+	var all_obligations *types2.Array = CG__().GetDelayedVarianceObligations()
+	var obligations *types2.Array
 	var num_key ZendUlong = ZendUlong(uintPtr(ce))
 	b.Assert(all_obligations != nil)
-	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
+	obligations = types2.ZendHashIndexFindPtr(all_obligations, num_key)
 	b.Assert(obligations != nil)
-	types.ZendHashApply(obligations, CheckVarianceObligation)
+	types2.ZendHashApply(obligations, CheckVarianceObligation)
 	if obligations.Len() == 0 {
 		ce.SetIsUnresolvedVariance(false)
 		ce.SetIsLinked(true)
-		types.ZendHashIndexDel(all_obligations, num_key)
+		types2.ZendHashIndexDel(all_obligations, num_key)
 	}
 }
-func ReportVarianceErrors(ce *types.ClassEntry) {
-	var all_obligations *types.Array = CG__().GetDelayedVarianceObligations()
-	var obligations *types.Array
+func ReportVarianceErrors(ce *types2.ClassEntry) {
+	var all_obligations *types2.Array = CG__().GetDelayedVarianceObligations()
+	var obligations *types2.Array
 	var obligation *VarianceObligation
 	var num_key ZendUlong = ZendUlong(uintPtr(ce))
 	b.Assert(all_obligations != nil)
-	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
+	obligations = types2.ZendHashIndexFindPtr(all_obligations, num_key)
 	b.Assert(obligations != nil)
-	var __ht *types.Array = obligations
+	var __ht *types2.Array = obligations
 	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
+		var _z *types2.Zval = _p.GetVal()
 
 		obligation = _z.Ptr()
 		var status InheritanceStatus
-		var unresolved_class *types.String
+		var unresolved_class *types2.String
 		if obligation.GetType() == OBLIGATION_COMPATIBILITY {
 
 			/* Just used to fetch the unresolved_class in this case. */
@@ -2197,17 +2197,17 @@ func ReportVarianceErrors(ce *types.ClassEntry) {
 
 	ce.SetIsUnresolvedVariance(false)
 	ce.SetIsLinked(true)
-	types.ZendHashIndexDel(all_obligations, num_key)
+	types2.ZendHashIndexDel(all_obligations, num_key)
 }
-func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
+func CheckUnrecoverableLoadFailure(ce *types2.ClassEntry) {
 	/* If this class has been used while unlinked through a variance obligation, it is not legal
 	 * to remove the class from the class table and throw an exception, because there is already
 	 * a dependence on the inheritance hierarchy of this specific class. Instead we fall back to
 	 * a fatal error, as would happen if we did not allow exceptions in the first place. */
 
 	if ce.IsHasUnlinkedUses() {
-		var exception_str *types.String
-		var exception_zv types.Zval
+		var exception_str *types2.String
+		var exception_zv types2.Zval
 		b.Assert(EG__().GetException() != nil && "Exception must have been thrown")
 		exception_zv.SetObject(EG__().GetException())
 		// 		exception_zv.AddRefcount()
@@ -2221,18 +2221,18 @@ func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 	 * a dependence on the inheritance hierarchy of this specific class. Instead we fall back to
 	 * a fatal error, as would happen if we did not allow exceptions in the first place. */
 }
-func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
+func ZendDoLinkClass(ce *types2.ClassEntry, lc_parent_name *types2.String) int {
 	/* Load parent/interface dependencies first, so we can still gracefully abort linking
 	 * with an exception and remove the class from the class table. This is only possible
 	 * if no variance obligations on the current class have been added during autoloading. */
 
-	var parent *types.ClassEntry = nil
-	var interfaces **types.ClassEntry = nil
+	var parent *types2.ClassEntry = nil
+	var interfaces **types2.ClassEntry = nil
 	if ce.GetParentName() {
 		parent = ZendFetchClassByName(ce.GetParentName(), lc_parent_name, ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
 		if parent == nil {
 			CheckUnrecoverableLoadFailure(ce)
-			return types.FAILURE
+			return types2.FAILURE
 		}
 	}
 	if ce.GetNumInterfaces() != 0 {
@@ -2246,11 +2246,11 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 			memcpy(interfaces, parent.GetInterfaces(), b.SizeOf("zend_class_entry *")*num_parent_interfaces)
 		}
 		for i = 0; i < ce.GetNumInterfaces(); i++ {
-			var iface *types.ClassEntry = ZendFetchClassByName(ce.GetInterfaceNames()[i].name, ce.GetInterfaceNames()[i].lcName, ZEND_FETCH_CLASS_INTERFACE|ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
+			var iface *types2.ClassEntry = ZendFetchClassByName(ce.GetInterfaceNames()[i].name, ce.GetInterfaceNames()[i].lcName, ZEND_FETCH_CLASS_INTERFACE|ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
 			if iface == nil {
 				CheckUnrecoverableLoadFailure(ce)
 				Efree(interfaces)
-				return types.FAILURE
+				return types2.FAILURE
 			}
 			interfaces[num_parent_interfaces+i] = iface
 		}
@@ -2273,7 +2273,7 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 	ZendBuildPropertiesInfoTable(ce)
 	if !ce.IsUnresolvedVariance() {
 		ce.SetIsLinked(true)
-		return types.SUCCESS
+		return types2.SUCCESS
 	}
 	ce.SetIsNearlyLinked(true)
 	LoadDelayedClasses()
@@ -2283,15 +2283,15 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 			ReportVarianceErrors(ce)
 		}
 	}
-	return types.SUCCESS
+	return types2.SUCCESS
 }
-func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) InheritanceStatus {
+func ZendCanEarlyBind(ce *types2.ClassEntry, parent_ce *types2.ClassEntry) InheritanceStatus {
 	var ret InheritanceStatus = INHERITANCE_SUCCESS
-	var key *types.String
+	var key *types2.String
 	var parent_info *ZendPropertyInfo
 
-	parent_ce.FunctionTable().ForeachEx(func(key string, parent_func types.IFunction) bool {
-		var child_func types.IFunction = ce.FunctionTable().Get(key)
+	parent_ce.FunctionTable().ForeachEx(func(key string, parent_func types2.IFunction) bool {
+		var child_func types2.IFunction = ce.FunctionTable().Get(key)
 		if child_func != nil {
 			var status InheritanceStatus = DoInheritanceCheckOnMethodEx(child_func, parent_func, ce, nil, 1, 0)
 			if status != INHERITANCE_SUCCESS {
@@ -2330,7 +2330,7 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 
 	return ret
 }
-func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname *types.String) bool {
+func ZendTryEarlyBind(ce *types2.ClassEntry, parent_ce *types2.ClassEntry, lcname *types2.String) bool {
 	var status InheritanceStatus = ZendCanEarlyBind(ce, parent_ce)
 	if status != INHERITANCE_UNRESOLVED {
 		if !CG__().ClassTable().Add(lcname.GetStr(), ce) {

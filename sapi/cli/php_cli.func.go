@@ -5,10 +5,10 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	types2 "github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
-	"github.com/heyuuu/gophp/zend/types"
 	"os"
 	"sort"
 	"strings"
@@ -65,7 +65,7 @@ func PrintModules() {
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
-	return types.ArrayApplyKeep
+	return types2.ArrayApplyKeep
 }
 func PrintExtensions() {
 	elements := zend.ZendExtensions.ElementsData()
@@ -80,7 +80,7 @@ func PrintExtensions() {
 		PrintExtensionInfo(ext, nil)
 	}
 }
-func SapiCliRegisterVariables(track_vars_array *types.Zval) {
+func SapiCliRegisterVariables(track_vars_array *types2.Zval) {
 	var len_ int
 	var docroot *byte = ""
 
@@ -117,7 +117,7 @@ func SapiCliRegisterVariables(track_vars_array *types.Zval) {
 		core.PhpRegisterVariable("DOCUMENT_ROOT", b.CastStrAuto(docroot), track_vars_array)
 	}
 }
-func SapiCliIniDefaults(configuration_hash *types.Array) {
+func SapiCliIniDefaults(configuration_hash *types2.Array) {
 	core.Config().Set("report_zend_debug", "0")
 	core.Config().Set("display_errors", "1")
 }
@@ -203,7 +203,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 		for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
 			switch c {
 			case 'i':
-				if core.PhpRequestStartup() == types.FAILURE {
+				if core.PhpRequestStartup() == types2.FAILURE {
 					goto err
 				}
 				request_started = 1
@@ -216,7 +216,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				core.SapiDeactivate()
 				goto out
 			case 'm':
-				if core.PhpRequestStartup() == types.FAILURE {
+				if core.PhpRequestStartup() == types2.FAILURE {
 					goto err
 				}
 				request_started = 1
@@ -433,7 +433,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 		}
 		argv[php_optind-1] = (*byte)(file_handle.GetFilename())
 		core.SG__().RequestInfo.argv = argv + php_optind - 1
-		if core.PhpRequestStartup() == types.FAILURE {
+		if core.PhpRequestStartup() == types2.FAILURE {
 			*arg_excp = arg_free
 			file_handle.Close()
 			core.PUTS("Could not startup.\n")
@@ -461,21 +461,21 @@ func DoCli(argc int, argv **byte, args []string) int {
 			break
 		case PHP_MODE_LINT:
 			exit_status = core.PhpLintScript(file_handle)
-			if exit_status == types.SUCCESS {
+			if exit_status == types2.SUCCESS {
 				core.PhpPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())
 			} else {
 				core.PhpPrintf("Errors parsing %s\n", file_handle.GetFilename())
 			}
 			break
 		case PHP_MODE_STRIP:
-			if zend.OpenFileForScanning(file_handle) == types.SUCCESS {
+			if zend.OpenFileForScanning(file_handle) == types2.SUCCESS {
 				zend.ZendStrip()
 			}
 			goto out
 			break
 		case PHP_MODE_HIGHLIGHT:
 			var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-			if zend.OpenFileForScanning(file_handle) == types.SUCCESS {
+			if zend.OpenFileForScanning(file_handle) == types2.SUCCESS {
 				standard.PhpGetHighlight(&syntax_highlighter_ini)
 				zend.ZendHighlight(&syntax_highlighter_ini)
 			}
@@ -483,7 +483,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 			break
 		case PHP_MODE_CLI_DIRECT:
 			CliRegisterFileHandles()
-			if zend.ZendEvalStringEx(exec_direct, nil, "Command line code", 1) == types.FAILURE {
+			if zend.ZendEvalStringEx(exec_direct, nil, "Command line code", 1) == types2.FAILURE {
 				exit_status = 254
 			}
 			break
@@ -491,13 +491,13 @@ func DoCli(argc int, argv **byte, args []string) int {
 			var input *byte
 			var len_ int
 			var index int = 0
-			var argn types.Zval
-			var argi types.Zval
+			var argn types2.Zval
+			var argi types2.Zval
 			CliRegisterFileHandles()
-			if exec_begin != nil && zend.ZendEvalStringEx(exec_begin, nil, "Command line begin code", 1) == types.FAILURE {
+			if exec_begin != nil && zend.ZendEvalStringEx(exec_begin, nil, "Command line begin code", 1) == types2.FAILURE {
 				exit_status = 254
 			}
-			for exit_status == types.SUCCESS && b.Assign(&input, core.PhpStreamGets(SInProcess, nil, 0)) != nil {
+			for exit_status == types2.SUCCESS && b.Assign(&input, core.PhpStreamGets(SInProcess, nil, 0)) != nil {
 				len_ = strlen(input)
 				for len_ > 0 && b.PostDec(&len_) && (input[len_] == '\n' || input[len_] == '\r') {
 					input[len_] = '0'
@@ -507,7 +507,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				argi.SetLong(b.PreInc(&index))
 				zend.EG__().GetSymbolTable().KeyUpdate("argi", &argi)
 				if exec_run != nil {
-					if zend.ZendEvalStringEx(exec_run, nil, "Command line run code", 1) == types.FAILURE {
+					if zend.ZendEvalStringEx(exec_run, nil, "Command line run code", 1) == types2.FAILURE {
 						exit_status = 254
 					}
 				} else {
@@ -524,7 +524,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				}
 				zend.Efree(input)
 			}
-			if exec_end != nil && zend.ZendEvalStringEx(exec_end, nil, "Command line end code", 1) == types.FAILURE {
+			if exec_end != nil && zend.ZendEvalStringEx(exec_end, nil, "Command line end code", 1) == types2.FAILURE {
 				exit_status = 254
 			}
 			break
@@ -535,9 +535,9 @@ func DoCli(argc int, argv **byte, args []string) int {
 		case PHP_MODE_REFLECTION_EXTENSION:
 
 		case PHP_MODE_REFLECTION_ZEND_EXTENSION:
-			var pce *types.ClassEntry = nil
-			var arg types.Zval
-			var ref types.Zval
+			var pce *types2.ClassEntry = nil
+			var arg types2.Zval
+			var ref types2.Zval
 			var executeData zend.ZendExecuteData
 			switch behavior {
 			default:
@@ -565,9 +565,9 @@ func DoCli(argc int, argv **byte, args []string) int {
 			zend.EG__().SetCurrentExecuteData(&executeData)
 			zend.ZendCallMethodWith1Params(&ref, pce, pce.GetConstructor(), "__construct", nil, &arg)
 			if zend.EG__().GetException() != nil {
-				var tmp types.Zval
-				var msg *types.Zval
-				var rv types.Zval
+				var tmp types2.Zval
+				var msg *types2.Zval
+				var rv types2.Zval
 				tmp.SetObject(zend.EG__().GetException())
 				msg = zend.ZendReadProperty(faults.ZendCeException, &tmp, "message", 0, &rv)
 				core.PhpPrintf("Exception: %s\n", msg.String().GetVal())
