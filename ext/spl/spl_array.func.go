@@ -57,8 +57,7 @@ func SplArrayIsObject(intern *SplArrayObject) types.ZendBool {
 	return intern.IsIsSelf() || intern.GetArray().IsType(types.IS_OBJECT)
 }
 func SplArrayCreateHtIter(ht *types.Array, intern *SplArrayObject) {
-	intern.SetHtIter(types.ZendHashIteratorAdd(ht, ht.currentPosVal()))
-	types.ZendHashInternalPointerResetEx(ht, zend.EG__().GetHtIterators()[intern.GetHtIter()].GetPos())
+	intern.SetHtIter(zend.EG__().AddArrayIterator(ht))
 	SplArraySkipProtected(intern, ht)
 }
 func SplArrayGetPosPtr(ht *types.Array, intern *SplArrayObject) *uint32 {
@@ -70,7 +69,7 @@ func SplArrayGetPosPtr(ht *types.Array, intern *SplArrayObject) *uint32 {
 func SplArrayObjectFreeStorage(object *types.ZendObject) {
 	var intern *SplArrayObject = SplArrayFromObj(object)
 	if intern.GetHtIter() != uint32-1 {
-		types.ZendHashIteratorDel(intern.GetHtIter())
+		zend.EG__().DelArrayIterator(intern.GetHtIter())
 	}
 	zend.ZendObjectStdDtor(intern.GetStd())
 	// zend.ZvalPtrDtor(intern.GetArray())

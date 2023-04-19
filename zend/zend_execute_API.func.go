@@ -51,10 +51,7 @@ func InitExecutor() {
 	EG__().SetPrevException(nil)
 	EG__().SetFakeScope(nil)
 	EG__().GetTrampoline().SetFunctionName(nil)
-	EG__().SetHtIteratorsCount(b.SizeOf("EG ( ht_iterators_slots )") / b.SizeOf("HashTableIterator"))
-	EG__().SetHtIteratorsUsed(0)
-	EG__().SetHtIterators(EG__().GetHtIteratorsSlots())
-	memset(EG__().GetHtIterators(), 0, b.SizeOf("EG ( ht_iterators_slots )"))
+	EG__().ResetArrayIterators()
 	EG__().SetEachDeprecationThrown(0)
 	EG__().SetPersistentConstantsCount(uint32(EG__().ConstantTable().Len()))
 	EG__().SetPersistentFunctionsCount(uint32(EG__().FunctionTable().Len()))
@@ -263,11 +260,8 @@ func ShutdownExecutor() {
 			EG__().GetInAutoload().Destroy()
 			FREE_HASHTABLE(EG__().GetInAutoload())
 		}
-		if EG__().GetHtIterators() != EG__().GetHtIteratorsSlots() {
-			Efree(EG__().GetHtIterators())
-		}
 	}
-	EG__().SetHtIteratorsUsed(0)
+	EG__().ResetArrayIterators()
 	ZendShutdownFpu()
 }
 

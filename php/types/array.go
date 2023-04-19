@@ -91,7 +91,6 @@ type ArrayPosition = uint32
 type Array struct {
 	ZendRefcounted
 	flags           ZendUchar
-	iteratorsCount  ZendUchar
 	elementsCount   uint32
 	internalPointer uint32
 	nextFreeElement int
@@ -148,7 +147,6 @@ func (ht *Array) Init(size int, pDestructor DtorFuncT) {
 /* init */
 func (ht *Array) SetBy(arr *Array) {
 	ht.flags = arr.flags
-	ht.iteratorsCount = arr.iteratorsCount
 	ht.elementsCount = arr.elementsCount
 	ht.nextFreeElement = arr.nextFreeElement
 	ht.destructor = arr.destructor
@@ -244,12 +242,11 @@ func (ht *Array) deleteBucket(pos uint32) {
 	ht.elementsCount--
 
 	// 更新内部指针和遍历器指针
-	if ht.internalPointer == pos || ht.HasIterators() {
+	if ht.internalPointer == pos {
 		var newIdx = ht.validPosVal(pos + 1)
 		if ht.internalPointer == pos {
 			ht.internalPointer = newIdx
 		}
-		ZendHashIteratorsUpdate(ht, pos, newIdx)
 	}
 
 	// 析构函数
@@ -321,7 +318,6 @@ func (ht *Array) Rehash() {
 	}
 
 	// 移除 data 中的空位
-	var oldNumUsed = ht.GetNNumUsed()
 	ht.removeHoles()
 
 	// 重建 hash
@@ -332,16 +328,11 @@ func (ht *Array) Rehash() {
 			ht.indexMap[p.IndexKey()] = pos
 		}
 	})
-
-	/* Migrate pointer to one past the end of the array to the new one past the end, so that
-	 * newly inserted elements are picked up correctly. */
-	if ht.HasIterators() {
-		_zendHashIteratorsUpdate(ht, oldNumUsed, ht.GetNNumUsed())
-	}
 }
 
 /* misc */
-func (ht *Array) assertRc1() { assert(ht.GetRefcount() == 1) }
+func (ht *Array) assertRc1()      { assert(ht.GetRefcount() == 1) }
+func (ht *Array) assertWritable() { assert(ht.GetRefcount() == 1) }
 
 /** Array.flags */
 func (ht *Array) CopyFlags(arr *Array) { ht.flags = arr.flags }
@@ -352,11 +343,3 @@ func (ht *Array) UnmarkIsPacked()      { ht.flags &^= HASH_FLAG_PACKED }
 func (ht *Array) HasEmptyIndex() bool  { return ht.flags&HASH_FLAG_HAS_EMPTY_IND != 0 }
 func (ht *Array) MarkHasEmptyIndex()   { ht.flags |= HASH_FLAG_HAS_EMPTY_IND }
 func (ht *Array) UnmarkHasEmptyIndex() { ht.flags &^= HASH_FLAG_HAS_EMPTY_IND }
-
-/** Array.iteratorsCount */
-func (ht *Array) GetIteratorsCount() ZendUchar      { return ht.iteratorsCount }
-func (ht *Array) SetIteratorsCount(value ZendUchar) { ht.iteratorsCount = value }
-func (ht *Array) IncIteratorsCount()                { ht.iteratorsCount++ }
-func (ht *Array) DecIteratorsCount()                { ht.iteratorsCount-- }
-func (ht *Array) HasIterators() bool                { return ht.iteratorsCount != 0 }
-func (ht *Array) IsIteratorsOverflow() bool         { return ht.iteratorsCount == 0xff }

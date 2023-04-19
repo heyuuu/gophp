@@ -52,7 +52,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				result.SetFeIterIdx(uint32 - 1)
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			result.SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			result.SetFeIterIdx(EG__().AddArrayIterator(properties))
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
@@ -102,7 +102,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				// ZvalPtrDtorNogc(free_op1)
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			result.SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			result.SetFeIterIdx(EG__().AddArrayIterator(properties))
 			// ZvalPtrDtorNogc(free_op1)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
@@ -150,7 +150,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				result.SetFeIterIdx(uint32 - 1)
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			result.SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			result.SetFeIterIdx(EG__().AddArrayIterator(properties))
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 0, opline, executeData)

@@ -1,7 +1,6 @@
 package types
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"strconv"
@@ -16,6 +15,7 @@ func ArrayLazyDup(arr *Array) *Array {
 	 *  只读 reader 要求
 	 *  - 读操作时直接读取数据
 	 *  - 写操作时，复制底层数组数据后指向新数据，在新数据上操作
+	 *  - pos 对应的数据不会发生改变
 	 */
 	return arr
 }
@@ -185,11 +185,6 @@ func ZendHashInternalPointerEndEx(ht *Array, pos *ArrayPosition) {
 	*pos = ht.GetNNumUsed()
 }
 
-func ZendHashIteratorsUpdate(ht *Array, from ArrayPosition, to ArrayPosition) {
-	if ht.HasIterators() {
-		_zendHashIteratorsUpdate(ht, from, to)
-	}
-}
 func HandleNumericStr(key string, idx *zend.ZendUlong) bool {
 	if number, ok := parseNumericStr(key); ok {
 		*idx = zend.ZendUlong(number)
@@ -346,107 +341,16 @@ func ZendHashToPacked(ht *Array) {
 	// todo 此函数不应被调用
 	assert(false)
 }
-func ZendHashIteratorAdd(ht *Array, pos ArrayPosition) uint32 {
-	var iter *HashTableIterator = zend.EG__().GetHtIterators()
-	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsCount()
-	var idx uint32
-	if !(ht.IsIteratorsOverflow()) {
-		ht.IncIteratorsCount()
-	}
-
-	for iter != end {
-		if iter.GetHt() == nil {
-			iter.SetHt(ht)
-			iter.SetPos(pos)
-			idx = iter - zend.EG__().GetHtIterators()
-			if idx+1 > zend.EG__().GetHtIteratorsUsed() {
-				zend.EG__().SetHtIteratorsUsed(idx + 1)
-			}
-			return idx
-		}
-		iter++
-	}
-	if zend.EG__().GetHtIterators() == zend.EG__().GetHtIteratorsSlots() {
-		zend.EG__().SetHtIterators(zend.Emalloc(b.SizeOf("HashTableIterator") * (zend.EG__().GetHtIteratorsCount() + 8)))
-		memcpy(zend.EG__().GetHtIterators(), zend.EG__().GetHtIteratorsSlots(), b.SizeOf("HashTableIterator")*zend.EG__().GetHtIteratorsCount())
-	} else {
-		zend.EG__().SetHtIterators(zend.Erealloc(zend.EG__().GetHtIterators(), b.SizeOf("HashTableIterator")*(zend.EG__().GetHtIteratorsCount()+8)))
-	}
-	iter = zend.EG__().GetHtIterators() + zend.EG__().GetHtIteratorsCount()
-	zend.EG__().SetHtIteratorsCount(zend.EG__().GetHtIteratorsCount() + 8)
-	iter.SetHt(ht)
-	iter.SetPos(pos)
-	memset(iter+1, 0, b.SizeOf("HashTableIterator")*7)
-	idx = iter - zend.EG__().GetHtIterators()
-	zend.EG__().SetHtIteratorsUsed(idx + 1)
-	return idx
-}
 func ZendHashIteratorPos(idx uint32, ht *Array) ArrayPosition {
-	var iter *HashTableIterator = zend.EG__().GetHtIterators() + idx
-	assert(idx != uint32-1)
+	var iter *ArrayIterator = zend.EG__().GetArrayIterator(idx)
 	if iter.GetHt() != ht {
-		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(iter.GetHt().IsIteratorsOverflow()) {
-			iter.GetHt().DecIteratorsCount()
-		}
-		if !(ht.IsIteratorsOverflow()) {
-			ht.IncIteratorsCount()
-		}
-		iter.SetHt(ht)
-		iter.SetPos(ht.currentPosVal())
+		zend.EG__().SetArrayIterator(idx, ht.IteratorEx(ht.currentPosVal()))
 	}
 	return iter.GetPos()
-}
-func ZendHashIteratorPosEx(idx uint32, array *Zval) ArrayPosition {
-	var ht *Array = array.Array()
-	var iter *HashTableIterator = zend.EG__().GetHtIterators() + idx
-	assert(idx != uint32-1)
-	if iter.GetHt() != ht {
-		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(ht.IsIteratorsOverflow()) {
-			iter.GetHt().DecIteratorsCount()
-		}
-		SeparateArray(array)
-		ht = array.Array()
-		if !(ht.IsIteratorsOverflow()) {
-			ht.IncIteratorsCount()
-		}
-		iter.SetHt(ht)
-		iter.SetPos(ht.currentPosVal())
-	}
-	return iter.GetPos()
-}
-func ZendHashIteratorDel(idx uint32) {
-	var iter *HashTableIterator = zend.EG__().GetHtIterators() + idx
-	assert(idx != uint32-1)
-	if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(iter.GetHt().IsIteratorsOverflow()) {
-		assert(iter.GetHt().GetIteratorsCount() != 0)
-		iter.GetHt().DecIteratorsCount()
-	}
-	iter.SetHt(nil)
-	if idx == zend.EG__().GetHtIteratorsUsed()-1 {
-		for idx > 0 && zend.EG__().GetHtIterators()[idx-1].GetHt() == nil {
-			idx--
-		}
-		zend.EG__().SetHtIteratorsUsed(idx)
-	}
-}
-func _zendHashIteratorsRemove(ht *Array) {
-	var iter *HashTableIterator = zend.EG__().GetHtIterators()
-	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsUsed()
-	for iter != end {
-		if iter.GetHt() == ht {
-			iter.SetHt(HT_POISONED_PTR)
-		}
-		iter++
-	}
-}
-func ZendHashIteratorsRemove(ht *Array) {
-	if ht.HasIterators() {
-		_zendHashIteratorsRemove(ht)
-	}
 }
 func ZendHashIteratorsLowerPos(ht *Array, start ArrayPosition) ArrayPosition {
-	var iter *HashTableIterator = zend.EG__().GetHtIterators()
-	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsUsed()
+	var iter *ArrayIterator = zend.EG__().GetHtIterators()
+	var end *ArrayIterator = iter + zend.EG__().GetHtIteratorsUsed()
 	var res ArrayPosition = ht.GetNNumUsed()
 	for iter != end {
 		if iter.GetHt() == ht {
@@ -457,26 +361,6 @@ func ZendHashIteratorsLowerPos(ht *Array, start ArrayPosition) ArrayPosition {
 		iter++
 	}
 	return res
-}
-func _zendHashIteratorsUpdate(ht *Array, from ArrayPosition, to ArrayPosition) {
-	var iter *HashTableIterator = zend.EG__().GetHtIterators()
-	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsUsed()
-	for iter != end {
-		if iter.GetHt() == ht && iter.GetPos() == from {
-			iter.SetPos(to)
-		}
-		iter++
-	}
-}
-func ZendHashIteratorsAdvance(ht *Array, step ArrayPosition) {
-	var iter *HashTableIterator = zend.EG__().GetHtIterators()
-	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsUsed()
-	for iter != end {
-		if iter.GetHt() == ht {
-			iter.SetPos(iter.GetPos() + step)
-		}
-		iter++
-	}
 }
 
 func ZendHashAddEmptyElement(ht *Array, key string) *Zval {

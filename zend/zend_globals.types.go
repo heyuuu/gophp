@@ -243,17 +243,20 @@ type ZendExecutorGlobals struct {
 	active                    types.ZendBool
 	flags                     types.ZendUchar
 	assertions                ZendLong
-	ht_iterators_count        uint32
-	ht_iterators_used         uint32
-	ht_iterators              *types.HashTableIterator
-	ht_iterators_slots        []types.HashTableIterator
-	saved_fpu_cw_ptr          any
-	trampoline                types.IFunction
-	call_trampoline_op        ZendOp
-	each_deprecation_thrown   types.ZendBool
-	weakrefs                  types.Array
-	exception_ignore_args     types.ZendBool
-	reserved                  []any
+
+	ht_iterators_count uint32
+	ht_iterators_used  uint32
+	ht_iterators       *types.ArrayIterator
+	ht_iterators_slots []types.ArrayIterator
+	arrayIterators     []*types.ArrayIterator
+
+	saved_fpu_cw_ptr        any
+	trampoline              types.IFunction
+	call_trampoline_op      ZendOp
+	each_deprecation_thrown types.ZendBool
+	weakrefs                types.Array
+	exception_ignore_args   types.ZendBool
+	reserved                []any
 
 	lastObjectHandle uint32 // 最后一个object的handle值，初始为0
 }
@@ -268,10 +271,48 @@ func (this *ZendExecutorGlobals) DestroyTables() {
 /**
  * 辅助方法
  */
-func (this *ZendExecutorGlobals) HtIterators() []types.HashTableIterator {
-	// todo 待调整
-	return b.CastSlice(this.ht_iterators, this.ht_iterators_count)
+func (this *ZendExecutorGlobals) ArrayIterators() []*types.ArrayIterator {
+	return this.arrayIterators
 }
+func (this *ZendExecutorGlobals) ResetArrayIterators() {
+	this.arrayIterators = nil
+}
+func (this *ZendExecutorGlobals) AddArrayIterator(ht *types.Array) uint32 {
+	this.arrayIterators = append(this.arrayIterators, ht.Iterator())
+	return uint32(len(this.arrayIterators) - 1)
+}
+func (this *ZendExecutorGlobals) GetArrayIterator(idx uint32) *types.ArrayIterator {
+	len_ := uint32(len(this.arrayIterators))
+	if idx >= len_ {
+		return nil
+	}
+	return this.arrayIterators[idx]
+}
+func (this *ZendExecutorGlobals) SetArrayIterator(idx uint32, iterator *types.ArrayIterator) {
+	len_ := uint32(len(this.arrayIterators))
+	for len_ <= idx {
+		this.arrayIterators = append(this.arrayIterators, nil)
+		len_++
+	}
+	this.arrayIterators[idx] = iterator
+}
+func (this *ZendExecutorGlobals) DelArrayIterator(idx uint32) {
+	len_ := uint32(len(this.arrayIterators))
+	if idx >= len_ {
+		return
+	}
+	this.arrayIterators[idx] = nil
+	// tail
+	if idx == len_-1 {
+		for idx > 0 && this.arrayIterators[idx-1] == nil {
+			idx--
+		}
+		this.arrayIterators = this.arrayIterators[:idx]
+	}
+}
+
+func (this *ZendExecutorGlobals) GetHtIteratorsUsed() uint32           { return this.ht_iterators_used }
+func (this *ZendExecutorGlobals) GetHtIterators() *types.ArrayIterator { return this.ht_iterators }
 
 func (this *ZendExecutorGlobals) ClassTable() ClassTable     { return this.classTable }
 func (this *ZendExecutorGlobals) SetClassTable(t ClassTable) { this.classTable = t }
@@ -452,26 +493,12 @@ func (this *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry { return this.c
 func (this *ZendExecutorGlobals) SetCurrentModule(value *ModuleEntry) {
 	this.current_module = value
 }
-func (this *ZendExecutorGlobals) GetActive() types.ZendBool                { return this.active }
-func (this *ZendExecutorGlobals) SetActive(value types.ZendBool)           { this.active = value }
-func (this *ZendExecutorGlobals) GetFlags() types.ZendUchar                { return this.flags }
-func (this *ZendExecutorGlobals) SetFlags(value types.ZendUchar)           { this.flags = value }
-func (this *ZendExecutorGlobals) GetAssertions() ZendLong                  { return this.assertions }
-func (this *ZendExecutorGlobals) SetAssertions(value ZendLong)             { this.assertions = value }
-func (this *ZendExecutorGlobals) GetHtIteratorsCount() uint32              { return this.ht_iterators_count }
-func (this *ZendExecutorGlobals) SetHtIteratorsCount(value uint32)         { this.ht_iterators_count = value }
-func (this *ZendExecutorGlobals) GetHtIteratorsUsed() uint32               { return this.ht_iterators_used }
-func (this *ZendExecutorGlobals) SetHtIteratorsUsed(value uint32)          { this.ht_iterators_used = value }
-func (this *ZendExecutorGlobals) GetHtIterators() *types.HashTableIterator { return this.ht_iterators }
-func (this *ZendExecutorGlobals) SetHtIterators(value *types.HashTableIterator) {
-	this.ht_iterators = value
-}
-func (this *ZendExecutorGlobals) GetHtIteratorsSlots() []types.HashTableIterator {
-	return this.ht_iterators_slots
-}
-func (this *ZendExecutorGlobals) SetHtIteratorsSlots(value []types.HashTableIterator) {
-	this.ht_iterators_slots = value
-}
+func (this *ZendExecutorGlobals) GetActive() types.ZendBool           { return this.active }
+func (this *ZendExecutorGlobals) SetActive(value types.ZendBool)      { this.active = value }
+func (this *ZendExecutorGlobals) GetFlags() types.ZendUchar           { return this.flags }
+func (this *ZendExecutorGlobals) SetFlags(value types.ZendUchar)      { this.flags = value }
+func (this *ZendExecutorGlobals) GetAssertions() ZendLong             { return this.assertions }
+func (this *ZendExecutorGlobals) SetAssertions(value ZendLong)        { this.assertions = value }
 func (this *ZendExecutorGlobals) GetSavedFpuCwPtr() any               { return this.saved_fpu_cw_ptr }
 func (this *ZendExecutorGlobals) SetSavedFpuCwPtr(value any)          { this.saved_fpu_cw_ptr = value }
 func (this *ZendExecutorGlobals) GetTrampoline() types.IFunction      { return this.trampoline }

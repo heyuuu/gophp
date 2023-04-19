@@ -3,44 +3,38 @@ package types
 import b "github.com/heyuuu/gophp/builtin"
 
 /**
- * HashTableIterator
+ * ArrayIterator 数组迭代器
+ * 约定:
+ * - ht 指向一个不可变数组，即要求 pos 对应的数组中的位置不会发生变化
  */
-type HashTableIterator struct {
+type ArrayIterator struct {
 	ht  *Array
 	pos ArrayPosition
 }
 
-func (this *HashTableIterator) GetHt() *Array              { return this.ht }
-func (this *HashTableIterator) SetHt(value *Array)         { this.ht = value }
-func (this *HashTableIterator) GetPos() ArrayPosition      { return this.pos }
-func (this *HashTableIterator) SetPos(value ArrayPosition) { this.pos = value }
-
-/**
- * ArrayIterator 数组迭代器，HashTableIterator 的不完全兼容替代版本
- */
-type ArrayIterator struct {
-	arr *Array
-	pos int
-}
-
 var _ b.Iterator[ArrayKey, *Zval] = (*ArrayIterator)(nil)
 
-func (a ArrayIterator) Key() ArrayKey {
+func (iter *ArrayIterator) GetHt() *Array              { return iter.ht }
+func (iter *ArrayIterator) SetHt(value *Array)         { iter.ht = value }
+func (iter *ArrayIterator) GetPos() ArrayPosition      { return iter.pos }
+func (iter *ArrayIterator) SetPos(value ArrayPosition) { iter.pos = value }
+
+func (iter *ArrayIterator) Key() ArrayKey {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (a ArrayIterator) Current() *Zval {
+func (iter *ArrayIterator) Current() *Zval {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (a ArrayIterator) Valid() bool {
+func (iter *ArrayIterator) Valid() bool {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (a ArrayIterator) Next() {
+func (iter *ArrayIterator) Next() {
 	//TODO implement me
 	panic("implement me")
 }

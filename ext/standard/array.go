@@ -921,8 +921,7 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 	}
 	BG__().array_walk_fci.params = args
 	BG__().array_walk_fci.no_separation = 0
-	types.ZendHashInternalPointerResetEx(target_hash, &pos)
-	ht_iter = types.ZendHashIteratorAdd(target_hash, pos)
+	ht_iter = zend.EG__().AddArrayIterator(target_hash)
 
 	/* Iterate through hash */
 
@@ -973,7 +972,7 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 
 		/* Back up hash position, as it may change */
 
-		zend.EG__().GetHtIterators()[ht_iter].SetPos(pos)
+		zend.EG__().ArrayIterators()[ht_iter].SetPos(pos)
 		if recursive != 0 && types.Z_REFVAL_P(zv).IsType(types.IS_ARRAY) {
 			var thash *types.Array
 			var orig_array_walk_fci types.ZendFcallInfo
@@ -1035,7 +1034,7 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 		/* Reload array and position -- both may have changed */
 
 		if array.IsType(types.IS_ARRAY) {
-			pos = types.ZendHashIteratorPosEx(ht_iter, array)
+			pos = types.ZendHashIteratorPos(ht_iter, array.Array())
 			target_hash = array.Array()
 		} else if array.IsType(types.IS_OBJECT) {
 			target_hash = types.Z_OBJPROP_P(array)
@@ -1052,10 +1051,7 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 			break
 		}
 	}
-	if userdata != nil {
-		// zend.ZvalPtrDtor(&args[2])
-	}
-	types.ZendHashIteratorDel(ht_iter)
+	zend.EG__().DelArrayIterator(ht_iter)
 	return result
 }
 func ZifArrayWalk(executeData zpp.Ex, return_value zpp.Ret, input zpp.RefZval, funcname *types.Zval, _ zpp.Opt, userdata *types.Zval) {
@@ -2693,57 +2689,26 @@ func PhpArrayDataShuffle(array *types.Zval) {
 	}
 	hash = array.Array()
 	n_left = n_elems
-	if !(hash.HasIterators()) {
-		if hash.GetNNumUsed() != hash.Len() {
-			j = 0
-			idx = 0
-			for ; idx < hash.GetNNumUsed(); idx++ {
-				p = hash.Bucket(idx)
-				if p.GetVal().IsUndef() {
-					continue
-				}
-				if j != idx {
-					hash.GetArData()[j] = *p
-				}
-				j++
+	if hash.GetNNumUsed() != hash.Len() {
+		j = 0
+		idx = 0
+		for ; idx < hash.GetNNumUsed(); idx++ {
+			p = hash.Bucket(idx)
+			if p.GetVal().IsUndef() {
+				continue
 			}
+			if j != idx {
+				hash.GetArData()[j] = *p
+			}
+			j++
 		}
-		for b.PreDec(&n_left) {
-			rnd_idx = PhpMtRandRange(0, n_left)
-			if rnd_idx != n_left {
-				temp = hash.GetArData()[n_left]
-				hash.GetArData()[n_left] = hash.GetArData()[rnd_idx]
-				hash.GetArData()[rnd_idx] = temp
-			}
-		}
-	} else {
-		var iter_pos = types.ZendHashIteratorsLowerPos(hash, 0)
-		if hash.GetNNumUsed() != hash.Len() {
-			j = 0
-			idx = 0
-			for ; idx < hash.GetNNumUsed(); idx++ {
-				p = hash.Bucket(idx)
-				if p.GetVal().IsUndef() {
-					continue
-				}
-				if j != idx {
-					hash.GetArData()[j] = *p
-					if idx == iter_pos {
-						types.ZendHashIteratorsUpdate(hash, idx, j)
-						iter_pos = types.ZendHashIteratorsLowerPos(hash, iter_pos+1)
-					}
-				}
-				j++
-			}
-		}
-		for b.PreDec(&n_left) {
-			rnd_idx = PhpMtRandRange(0, n_left)
-			if rnd_idx != n_left {
-				temp = hash.GetArData()[n_left]
-				hash.GetArData()[n_left] = hash.GetArData()[rnd_idx]
-				hash.GetArData()[rnd_idx] = temp
-				types.ZendHashIteratorsUpdate(hash, uint32(rnd_idx), n_left)
-			}
+	}
+	for b.PreDec(&n_left) {
+		rnd_idx = PhpMtRandRange(0, n_left)
+		if rnd_idx != n_left {
+			temp = hash.GetArData()[n_left]
+			hash.GetArData()[n_left] = hash.GetArData()[rnd_idx]
+			hash.GetArData()[rnd_idx] = temp
 		}
 	}
 	hash.SetNNumUsed(n_elems)
@@ -2834,9 +2799,6 @@ func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong,
 			out_hash.KeyAddNew(p.GetKey().GetStr(), entry)
 		}
 		if idx == iter_pos {
-			if zend.ZendLong(idx != pos) != 0 {
-				types.ZendHashIteratorsUpdate(in_hash, idx, pos)
-			}
 			iter_pos = types.ZendHashIteratorsLowerPos(in_hash, iter_pos+1)
 		}
 		pos++
@@ -2915,9 +2877,6 @@ func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong,
 			out_hash.KeyAddNew(p.GetKey().GetStr(), entry)
 		}
 		if idx == iter_pos {
-			if zend.ZendLong(idx != pos) != 0 {
-				types.ZendHashIteratorsUpdate(in_hash, idx, pos)
-			}
 			iter_pos = types.ZendHashIteratorsLowerPos(in_hash, iter_pos+1)
 		}
 		pos++
@@ -2925,8 +2884,6 @@ func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong,
 
 	/* replace HashTable data */
 
-	out_hash.SetIteratorsCount(in_hash.GetIteratorsCount())
-	in_hash.SetIteratorsCount(0)
 	in_hash.SetPDestructor(nil)
 	in_hash.Destroy()
 
@@ -3075,41 +3032,19 @@ func ZifArrayShift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval) 
 
 	if stack.Array().IsPacked() {
 		var k uint32 = 0
-		if !(stack.Array().HasIterators()) {
-			for idx = 0; idx < stack.Array().GetNNumUsed(); idx++ {
-				p = stack.Array().Bucket(idx)
-				if p.GetVal().IsUndef() {
-					continue
-				}
-				if idx != k {
-					var q = stack.Array().Bucket(k)
-					q.SetH(k)
-					q.SetKey(nil)
-					types.ZVAL_COPY_VALUE(q.GetVal(), p.GetVal())
-					p.GetVal().SetUndef()
-				}
-				k++
+		for idx = 0; idx < stack.Array().GetNNumUsed(); idx++ {
+			p = stack.Array().Bucket(idx)
+			if p.GetVal().IsUndef() {
+				continue
 			}
-		} else {
-			var iter_pos = types.ZendHashIteratorsLowerPos(stack.Array(), 0)
-			for idx = 0; idx < stack.Array().GetNNumUsed(); idx++ {
-				p = stack.Array().Bucket(idx)
-				if p.GetVal().IsUndef() {
-					continue
-				}
-				if idx != k {
-					var q = stack.Array().Bucket(k)
-					q.SetH(k)
-					q.SetKey(nil)
-					types.ZVAL_COPY_VALUE(q.GetVal(), p.GetVal())
-					p.GetVal().SetUndef()
-					if idx == iter_pos {
-						types.ZendHashIteratorsUpdate(stack.Array(), idx, k)
-						iter_pos = types.ZendHashIteratorsLowerPos(stack.Array(), iter_pos+1)
-					}
-				}
-				k++
+			if idx != k {
+				var q = stack.Array().Bucket(k)
+				q.SetH(k)
+				q.SetKey(nil)
+				types.ZVAL_COPY_VALUE(q.GetVal(), p.GetVal())
+				p.GetVal().SetUndef()
 			}
+			k++
 		}
 		stack.Array().SetNNumUsed(k)
 		stack.Array().SetNNextFreeElement(k)
@@ -3138,30 +3073,13 @@ func ZifArrayShift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval) 
 	}
 	types.ZendHashInternalPointerReset(stack.Array())
 }
-func ZifArrayUnshift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval, _ zpp.Opt, vars []*types.Zval) {
-	var args *types.Zval
-	var stack *types.Zval
+func ZifArrayUnshift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval, vars []*types.Zval) {
+	var args []*types.Zval = vars
 	var new_hash *types.Array
 	var argc int
 	var i int
 	var key *types.String
 	var value *types.Zval
-	for {
-		var _flags = 0
-		var _min_num_args = 1
-		var _max_num_args = -1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			stack = fp.ParseArrayEx(false, true)
-			args, argc = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
 	new_hash = types.NewArray(stack.Array().Len() + argc)
 	for i = 0; i < argc; i++ {
 		args[i].TryAddRefcount()
@@ -3178,11 +3096,6 @@ func ZifArrayUnshift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval
 		} else {
 			new_hash.NextIndexInsertNew(value)
 		}
-	}
-	if stack.Array().HasIterators() {
-		types.ZendHashIteratorsAdvance(stack.Array(), argc)
-		new_hash.SetIteratorsCount(stack.Array().GetIteratorsCount())
-		stack.Array().SetIteratorsCount(0)
 	}
 
 	/* replace HashTable data */

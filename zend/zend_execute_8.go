@@ -198,7 +198,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 					// OBJ_RELEASE(obj)
 				} else if kind == ZEND_LIVE_LOOP {
 					if var_.GetType() != types.IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
-						types.ZendHashIteratorDel(var_.GetFeIterIdx())
+						EG__().DelArrayIterator(var_.GetFeIterIdx())
 					}
 					// ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_ROPE {

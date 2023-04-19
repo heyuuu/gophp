@@ -18,7 +18,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Op1()
 	array = types.ZVAL_DEREF(array)
 	if array.IsArray() {
-		pos = types.ZendHashIteratorPosEx(opline.Op1().GetFeIterIdx(), array)
+		pos = types.ZendHashIteratorPos(opline.Op1().GetFeIterIdx(), array.Array())
 		fe_ht = array.GetArr()
 		p = fe_ht.Bucket(pos)
 		for true {

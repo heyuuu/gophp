@@ -25,7 +25,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			array_ptr.SetArray(types.ZendArrayDup(array_ptr.GetArr()))
 		}
 
-		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		opline.Result().SetFeIterIdx(EG__().AddArrayIterator(array_ptr.Array()))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
@@ -60,7 +60,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.SeparateArray(array_ptr)
 		}
-		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		opline.Result().SetFeIterIdx(EG__().AddArrayIterator(array_ptr.Array()))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
@@ -85,7 +85,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				opline.Result().SetFeIterIdx(uint32 - 1)
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			opline.Result().SetFeIterIdx(EG__().AddArrayIterator(properties))
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
@@ -130,7 +130,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.SeparateArray(array_ptr)
 		}
-		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		opline.Result().SetFeIterIdx(EG__().AddArrayIterator(array_ptr.Array()))
 		{
 			if free_op1 != nil {
 				// ZvalPtrDtorNogc(free_op1)
@@ -163,7 +163,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			opline.Result().SetFeIterIdx(EG__().AddArrayIterator(properties))
 			if free_op1 != nil {
 				// ZvalPtrDtorNogc(free_op1)
 			}
@@ -222,7 +222,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.SeparateArray(array_ptr)
 		}
-		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		opline.Result().SetFeIterIdx(EG__().AddArrayIterator(array_ptr.Array()))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
@@ -247,7 +247,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				opline.Result().SetFeIterIdx(uint32 - 1)
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			opline.Result().SetFeIterIdx(EG__().AddArrayIterator(properties))
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)

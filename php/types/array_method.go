@@ -137,13 +137,12 @@ func (ht *Array) Destroy() {
 			ht.destructor(p.GetVal())
 		})
 	}
-	ZendHashIteratorsRemove(ht)
 }
 
 func (ht *Array) DestroyEx() {
 	/* break possible cycles */
 	//GC_REMOVE_FROM_BUFFER(ht)
-	ht.SetGcTypeInfo(IS_NULL)
+	//ht.SetGcTypeInfo(IS_NULL)
 	ht.Destroy()
 }
 
@@ -457,7 +456,13 @@ func (ht *Array) ForeachIndirectReserve(handler func(key ArrayKey, value *Zval))
 }
 
 func (ht *Array) Iterator() *ArrayIterator {
-	return &ArrayIterator{arr: ht, pos: 0}
+	htReader := ArrayLazyDup(ht)
+	return &ArrayIterator{ht: htReader, pos: 0}
+}
+
+func (ht *Array) IteratorEx(pos uint32) *ArrayIterator {
+	htReader := ArrayLazyDup(ht)
+	return &ArrayIterator{ht: htReader, pos: pos}
 }
 
 // todo 逐渐替换为 Foreach 或其他更高效代码
@@ -568,6 +573,11 @@ func (ht *Array) currentPos() (uint32, bool) {
 	return ht.validPosEx(ht.internalPointer, false)
 }
 
+func (ht *Array) CurrentPosVal() uint32 {
+	var pos, _ = ht.validPosEx(ht.internalPointer, false)
+	return pos
+}
+
 func (ht *Array) currentPosVal() uint32 {
 	var pos, _ = ht.validPosEx(ht.internalPointer, false)
 	return pos
@@ -602,37 +612,18 @@ func (ht *Array) copyDataAndHash(source *Array) {
 
 // 移除 this.data 数据中的 holes, 返回是否移动 bucket
 func (ht *Array) removeHoles() bool {
+	ht.assertWritable()
+
 	var newPos uint32 = 0
 
 	if ht.isWithoutHoles() {
 		return false
 	}
 
-	if ht.HasIterators() {
-		var iterPos = ZendHashIteratorsLowerPos(ht, 0)
-
-		ht.eachValidBucket(func(pos uint32, p *Bucket) {
-			// 移动 bucket 到新位置
-			ht.moveBucket(pos, newPos)
-			if pos != newPos {
-				if pos >= iterPos {
-					for {
-						ZendHashIteratorsUpdate(ht, iterPos, newPos)
-						iterPos = ZendHashIteratorsLowerPos(ht, iterPos+1)
-						if iterPos >= pos {
-							break
-						}
-					}
-				}
-			}
-			newPos++
-		})
-	} else {
-		ht.eachValidBucket(func(pos uint32, p *Bucket) {
-			ht.moveBucket(pos, newPos)
-			newPos++
-		})
-	}
+	ht.eachValidBucket(func(pos uint32, p *Bucket) {
+		ht.moveBucket(pos, newPos)
+		newPos++
+	})
 
 	// 截取数据，记录有效元素数
 	ht.data = ht.data[:newPos]
