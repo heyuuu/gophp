@@ -3362,113 +3362,77 @@ func ZifArraySlice(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, of
 	}
 }
 func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
-	var src_entry *types.Zval
-	var dest_entry *types.Zval
-	var string_key *types.String
-	var __ht = src
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
+	for iter := src.Iterator(); iter.Valid(); iter.Next() {
+		key := iter.Key()
+		value := iter.Current()
+		if !key.IsStrKey() {
+			dest.NextIndexInsert(value)
+			continue
+		}
 
-		string_key = _p.GetKey()
-		src_entry = _z
-		if string_key != nil {
-			if b.Assign(&dest_entry, dest.KeyFind(string_key.GetStr())) != nil {
-				var src_zval = src_entry
-				var dest_zval = dest_entry
-				var thash *types.Array
-				var tmp types.Zval
-				var ret int
-				src_zval = types.ZVAL_DEREF(src_zval)
-				dest_zval = types.ZVAL_DEREF(dest_zval)
-				if dest_zval.IsType(types.IS_ARRAY) {
-					thash = dest_zval.Array()
-				} else {
-					thash = nil
-				}
-				if thash != nil && thash.IsRecursive() || src_entry == dest_entry && dest_entry.IsReference() && dest_entry.GetRefcount()%2 != 0 {
-					core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
-					return 0
-				}
-				b.Assert(!(dest_entry.IsReference()) || dest_entry.GetRefcount() > 1)
-				types.SeparateZval(dest_entry)
-				dest_zval = dest_entry
-				if dest_zval.IsType(types.IS_NULL) {
-					zend.ConvertToArrayEx(dest_zval)
-					zend.AddNextIndexNull(dest_zval)
-				} else {
-					zend.ConvertToArrayEx(dest_zval)
-				}
-				tmp.SetUndef()
-				if src_zval.IsType(types.IS_OBJECT) {
-					types.ZVAL_COPY(&tmp, src_zval)
-					zend.ConvertToArray(&tmp)
-					src_zval = &tmp
-				}
-				if src_zval.IsType(types.IS_ARRAY) {
-					if thash != nil && (thash.GetGcFlags()&types.GC_IMMUTABLE) == 0 {
-						thash.ProtectRecursive()
-					}
-					ret = PhpArrayMergeRecursive(dest_zval.Array(), src_zval.Array())
-					if thash != nil && (thash.GetGcFlags()&types.GC_IMMUTABLE) == 0 {
-						thash.UnprotectRecursive()
-					}
-					if ret == 0 {
-						return 0
-					}
-				} else {
-					// src_zval.TryAddRefcount()
-					dest_zval.Array().NextIndexInsert(src_zval)
-				}
-				// zend.ZvalPtrDtor(&tmp)
-			} else {
-				var zv = dest.KeyAddNew(string_key.GetStr(), src_entry)
-				zend.ZvalAddRef(zv)
+		strKey := key.StrKey()
+		destEntry := dest.KeyFind(strKey)
+		if destEntry == nil {
+			dest.KeyAddNew(strKey, value)
+		}
+
+		var srcZval = value.DeRef()
+		var destZval = destEntry.DeRef()
+		var thash *types.Array
+		var tmp types.Zval
+		var ret int
+		if destZval.IsType(types.IS_ARRAY) {
+			thash = destZval.Array()
+		} else {
+			thash = nil
+		}
+		if thash != nil && thash.IsRecursive() || value == destEntry && destEntry.IsReference() && destEntry.GetRefcount()%2 != 0 {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
+			return 0
+		}
+		b.Assert(!(destEntry.IsReference()) || destEntry.GetRefcount() > 1)
+		types.SeparateZval(destEntry)
+		destZval = destEntry
+		if destZval.IsType(types.IS_NULL) {
+			zend.ConvertToArrayEx(destZval)
+			zend.AddNextIndexNull(destZval)
+		} else {
+			zend.ConvertToArrayEx(destZval)
+		}
+		tmp.SetUndef()
+		if srcZval.IsType(types.IS_OBJECT) {
+			types.ZVAL_COPY(&tmp, srcZval)
+			zend.ConvertToArray(&tmp)
+			srcZval = &tmp
+		}
+		if srcZval.IsType(types.IS_ARRAY) {
+			if thash != nil && (thash.GetGcFlags()&types.GC_IMMUTABLE) == 0 {
+				thash.ProtectRecursive()
+			}
+			ret = PhpArrayMergeRecursive(destZval.Array(), srcZval.Array())
+			if thash != nil && (thash.GetGcFlags()&types.GC_IMMUTABLE) == 0 {
+				thash.UnprotectRecursive()
+			}
+			if ret == 0 {
+				return 0
 			}
 		} else {
-			var zv = dest.NextIndexInsert(src_entry)
-			zend.ZvalAddRef(zv)
+			destZval.Array().NextIndexInsert(srcZval)
 		}
 	}
 	return 1
 }
 func PhpArrayMerge(dest *types.Array, src *types.Array) int {
-	var src_entry *types.Zval
-	var string_key *types.String
-	if dest.IsPacked() && src.IsPacked() {
-		dest.Extend(dest.Len() + src.Len())
-		fillScope := types.PackedFillStart(dest)
-		var __ht = src
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			src_entry = _z
-			if src_entry.IsReference() && src_entry.GetRefcount() == 1 {
-				src_entry = types.Z_REFVAL_P(src_entry)
-			}
-			// src_entry.TryAddRefcount()
-			fillScope.FillSet(src_entry)
-			fillScope.FillNext()
+	src.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		if value.IsReference() && value.GetRefcount() == 1 {
+			value = types.Z_REFVAL_P(value)
 		}
-		fillScope.FillEnd()
-	} else {
-		var __ht = src
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			string_key = _p.GetKey()
-			src_entry = _z
-			if src_entry.IsReference() && src_entry.GetRefcount() == 1 {
-				src_entry = types.Z_REFVAL_P(src_entry)
-			}
-			// src_entry.TryAddRefcount()
-			if string_key != nil {
-				dest.KeyUpdate(string_key.GetStr(), src_entry)
-			} else {
-				dest.NextIndexInsertNew(src_entry)
-			}
+		if key.IsStrKey() {
+			dest.KeyUpdate(key.StrKey(), value)
+		} else {
+			dest.NextIndexInsert(value)
 		}
-	}
-	return 1
+	})
 }
 func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) int {
 	var src_entry *types.Zval
@@ -3575,136 +3539,60 @@ func PhpArrayReplaceWrapper(executeData *zend.ZendExecuteData, return_value *typ
 		}
 	}
 }
-func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *types.Zval, recursive int) {
-	var args *types.Zval = nil
-	var arg *types.Zval
-	var argc int
-	var i int
-	var src_entry *types.Zval
-	var src *types.Array
+func arrayMergeWrapper(args []*types.Zval, recursive bool) *types.Array {
 	var dest *types.Array
-	var count uint32 = 0
-	for {
-		var _flags = 0
-		var _min_num_args = 0
-		var _max_num_args = -1
+	if len(args) == 0 {
+		return types.NewArray(0)
+	}
 
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			args, argc = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if argc == 0 {
-		return_value.SetEmptyArray()
-		return
-	}
-	for i = 0; i < argc; i++ {
-		var arg *types.Zval = args + i
-		if arg.GetType() != types.IS_ARRAY {
+	count := 0
+	for i, arg := range args {
+		if !arg.IsArray() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(arg))
-			return_value.SetNull()
-			return
+			return nil
 		}
 		count += arg.Array().Len()
 	}
-	if argc == 2 {
-		var ret *types.Zval = nil
-		if args[0].Array().Len() == 0 {
-			ret = &args[1]
-		} else if args[1].Array().Len() == 0 {
-			ret = &args[0]
+
+	arr := types.NewArray(count)
+
+	args[0].Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
+		if value.IsReference() && value.GetRefcount() == 1 {
+			value = types.Z_REFVAL_P(value)
 		}
-		if ret != nil {
-			if ret.Array().IsPacked() {
-				if ret.Array().IsWithoutHoles() {
-					types.ZVAL_COPY(return_value, ret)
-					return
-				}
-			} else {
-				var copy = 1
-				var string_key *types.String
-				var __ht = ret.Array()
-				for _, _p := range __ht.ForeachData() {
-					var _z = _p.GetVal()
-
-					string_key = _p.GetKey()
-					if string_key == nil {
-						copy = 0
-						break
-					}
-				}
-				if copy != 0 {
-					types.ZVAL_COPY(return_value, ret)
-					return
-				}
-			}
+		if key.IsStrKey() {
+			arr.KeyUpdate(key.StrKey(), value)
+		} else {
+			arr.NextIndexInsert(value)
 		}
-	}
-	arg = args
-	src = arg.Array()
+	})
 
-	/* copy first array */
-
-	zend.ArrayInitSize(return_value, count)
-	dest = return_value.Array()
-	if src.IsPacked() {
-		types.ZendHashRealInitPacked(dest)
-		fillScope := types.PackedFillStart(dest)
-		var __ht = src
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			src_entry = _z
-			if src_entry.IsReference() && src_entry.GetRefcount() == 1 {
-				src_entry = types.Z_REFVAL_P(src_entry)
-			}
-			// src_entry.TryAddRefcount()
-			fillScope.FillSet(src_entry)
-			fillScope.FillNext()
-		}
-		fillScope.FillEnd()
-	} else {
-		var string_key *types.String
-		types.ZendHashRealInitMixed(dest)
-		var __ht = src
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			string_key = _p.GetKey()
-			src_entry = _z
-			if src_entry.IsReference() && src_entry.GetRefcount() == 1 {
-				src_entry = types.Z_REFVAL_P(src_entry)
-			}
-			// src_entry.TryAddRefcount()
-			if string_key != nil {
-				zend._zendHashAppend(dest, string_key, src_entry)
-			} else {
-				dest.NextIndexInsertNew(src_entry)
-			}
-		}
-	}
-	if recursive != 0 {
-		for i = 1; i < argc; i++ {
-			arg = args + i
+	if recursive {
+		for _, arg := range args[1:] {
 			PhpArrayMergeRecursive(dest, arg.Array())
 		}
 	} else {
-		for i = 1; i < argc; i++ {
-			arg = args + i
+		for _, arg := range args[1:] {
 			PhpArrayMerge(dest, arg.Array())
 		}
 	}
+	return arr
 }
-func ZifArrayMerge(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, arrays []*types.Zval) {
-	PhpArrayMergeWrapper(executeData, return_value, 0)
+func ZifArrayMerge(returnValue zpp.Ret, _ zpp.Opt, arrays []*types.Zval) {
+	arr := arrayMergeWrapper(arrays, false)
+	if arr == nil {
+		returnValue.SetNull()
+	} else {
+		returnValue.SetArray(arr)
+	}
 }
-func ZifArrayMergeRecursive(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, arrays []*types.Zval) {
-	PhpArrayMergeWrapper(executeData, return_value, 1)
+func ZifArrayMergeRecursive(returnValue zpp.Ret, _ zpp.Opt, arrays []*types.Zval) {
+	arr := arrayMergeWrapper(arrays, true)
+	if arr == nil {
+		returnValue.SetNull()
+	} else {
+		returnValue.SetArray(arr)
+	}
 }
 func ZifArrayReplace(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, _ zpp.Opt, arrays []*types.Zval) {
 	PhpArrayReplaceWrapper(executeData, return_value, 0)

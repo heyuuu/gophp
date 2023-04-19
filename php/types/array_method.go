@@ -24,7 +24,7 @@ func (ht *Array) GetPDestructor() DtorFuncT        { return ht.destructor }
 func (ht *Array) SetPDestructor(value DtorFuncT)   { ht.destructor = value }
 func (ht *Array) GetNTableMask() uint32            { return 0 } // todo remove
 
-func (ht *Array) IsWithoutHoles() bool { return ht.GetNNumUsed() == ht.elementsCount }
+func (ht *Array) isWithoutHoles() bool { return ht.GetNNumUsed() == ht.elementsCount }
 
 func (ht *Array) Count() int {
 	var num int
@@ -116,35 +116,6 @@ func (ht *Array) SortCompatibleEx(sort_ SortFuncT) int {
 	ht.Rehash()
 
 	return SUCCESS
-}
-
-func (ht *Array) SetBucketKey(b *Bucket, key string) *Zval {
-	ht.assertRc1()
-
-	// 若已存在此key，与设置值相同则返回 val；否则返回 nil (设置失败)
-	if pos, ok := ht.keyMap[key]; ok {
-		p := &ht.data[pos]
-		if p == b {
-			return p.GetVal()
-		} else {
-			return nil
-		}
-	}
-
-	// 定义 bucket 位置；若 bucket 不在数据内，返回 nil
-	var pos, ok = ht.posBucket(b)
-	if !ok {
-		return nil
-	}
-
-	/* del from hash */
-	ht.deleteHash(b.key)
-
-	/* add to hash */
-	b.SetStrKey(key)
-	ht.addHash(b.key, pos)
-
-	return b.GetVal()
 }
 
 /**
@@ -633,7 +604,7 @@ func (ht *Array) copyDataAndHash(source *Array) {
 func (ht *Array) removeHoles() bool {
 	var newPos uint32 = 0
 
-	if ht.IsWithoutHoles() {
+	if ht.isWithoutHoles() {
 		return false
 	}
 
@@ -667,8 +638,6 @@ func (ht *Array) removeHoles() bool {
 	ht.data = ht.data[:newPos]
 	ht.elementsCount = newPos
 
-	b.Assert(ht.IsWithoutHoles())
-
 	return true
 }
 
@@ -676,7 +645,7 @@ func (ht *Array) removeHoles() bool {
 func (ht *Array) removeHolesForce() bool {
 	var newPos uint32 = 0
 
-	if ht.IsWithoutHoles() {
+	if ht.isWithoutHoles() {
 		return false
 	}
 
@@ -692,8 +661,6 @@ func (ht *Array) removeHolesForce() bool {
 	// 截取数据，记录有效元素数
 	ht.data = ht.data[:newPos]
 	ht.elementsCount = newPos
-
-	b.Assert(ht.IsWithoutHoles())
 
 	return true
 }

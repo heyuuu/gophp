@@ -102,15 +102,9 @@ type Array struct {
 	keyMap   map[string]uint32 // 字符串索引到具体位置的映射
 
 	arData *Bucket // C 源码中存储数据的地方，实际不使用
-	//u struct /* union */ {
-	//	v struct {
-	//		flags           ZendUchar
-	//		_unused         ZendUchar
-	//		nIteratorsCount ZendUchar
-	//		_unused2        ZendUchar
-	//	}
-	//	flags uint32
-	//}
+
+	keys  []ArrayKey
+	data0 map[ArrayKey]*Zval
 }
 
 var _ IRefcounted = &Array{}
@@ -201,7 +195,11 @@ func (ht *Array) appendBucket(bucket *Bucket) *Bucket {
 	ht.data = append(ht.data, *bucket)
 
 	// 更新 map
-	ht.addHash(bucket.key, idx)
+	if bucket.IsStrKey() {
+		ht.keyMap[bucket.StrKey()] = idx
+	} else {
+		ht.indexMap[bucket.IndexKey()] = idx
+	}
 
 	if !bucket.IsStrKey() {
 		var indexKey = bucket.IndexKey()
@@ -236,7 +234,11 @@ func (ht *Array) deleteBucket(pos uint32) {
 	assert(p.IsValid())
 
 	// 移除映射
-	ht.deleteHash(p.key)
+	if p.key.IsStrKey() {
+		delete(ht.keyMap, p.key.StrKey())
+	} else {
+		delete(ht.indexMap, p.key.IndexKey())
+	}
 
 	// 减少有效元素
 	ht.elementsCount--
@@ -305,41 +307,15 @@ func (ht *Array) Extend(size uint32) {
 	}
 }
 
-// todo 一般情况无需主动扩展,确认使用目前是缩减内存占用还是裁剪元素
-func (ht *Array) Discard(nNumUsed uint32) {
-	if nNumUsed < ht.DataSize() {
-		// 裁剪数据，重新映射
-		ht.data = ht.data[:nNumUsed]
-		ht.Rehash()
-		// rehash 清理了所有 holes, 此时元素数就是 ht.data 长度
-		ht.elementsCount = ht.DataSize()
-	}
-}
-
 /* hash -> Array.indexMap & Array.keyMap */
-func (ht *Array) resetHash() {
+func (ht *Array) Rehash() {
+	// reset hash
 	ht.assertRc1()
 	ht.indexMap = make(map[int]uint32)
 	ht.keyMap = make(map[string]uint32)
-}
-func (ht *Array) addHash(key ArrayKey, pos uint32) {
-	if key.IsStrKey() {
-		ht.keyMap[key.StrKey()] = pos
-	} else {
-		ht.indexMap[key.IndexKey()] = pos
-	}
-}
-func (ht *Array) deleteHash(key ArrayKey) {
-	if key.IsStrKey() {
-		delete(ht.keyMap, key.StrKey())
-	} else {
-		delete(ht.indexMap, key.IndexKey())
-	}
-}
-func (ht *Array) Rehash() {
+
 	// 空数组快速清空
 	if ht.elementsCount == 0 {
-		ht.resetHash()
 		ht.data = nil
 		return
 	}
@@ -349,9 +325,12 @@ func (ht *Array) Rehash() {
 	ht.removeHoles()
 
 	// 重建 hash
-	ht.resetHash()
 	ht.eachBucket(func(pos uint32, p *Bucket) {
-		ht.addHash(p.key, pos)
+		if p.IsStrKey() {
+			ht.keyMap[p.StrKey()] = pos
+		} else {
+			ht.indexMap[p.IndexKey()] = pos
+		}
 	})
 
 	/* Migrate pointer to one past the end of the array to the new one past the end, so that

@@ -438,7 +438,7 @@ var DefZifArrayMerge = def.DefFunc("array_merge", 0, -1, []def.ArgInfo{{Name: "a
 	if fp.HasError() {
 		return
 	}
-	ZifArrayMerge(executeData, returnValue, nil, arrays)
+	ZifArrayMerge(returnValue, nil, arrays)
 })
 
 // generate by ZifArrayMergeRecursive
@@ -449,7 +449,7 @@ var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []de
 	if fp.HasError() {
 		return
 	}
-	ZifArrayMergeRecursive(executeData, returnValue, nil, arrays)
+	ZifArrayMergeRecursive(returnValue, nil, arrays)
 })
 
 // generate by ZifArrayReplace
