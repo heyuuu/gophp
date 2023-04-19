@@ -1747,9 +1747,7 @@ func FindFirstDefinition(ce *types.ClassEntry, traits **types.ClassEntry, curren
 	}
 	return coliding_ce
 }
-func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry) {
-	var i int
-	var property_info *ZendPropertyInfo
+func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntry) {
 	var coliding_prop *ZendPropertyInfo
 	var prop_name *types.String
 	var class_name_unused *byte
@@ -1763,21 +1761,14 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 	 * - check for compatibility, if not compatible with any property in class -> fatal
 	 * - if compatible, then strict notice
 	 */
-
-	for i = 0; i < ce.GetNumTraits(); i++ {
-		if traits[i] == nil {
+	for i, trait := range traits {
+		if trait == nil {
 			continue
 		}
-		var __ht *types.Array = traits[i].GetPropertiesInfo()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			property_info = _z.Ptr()
-
+		trait.PropertyTable().Foreach(func(_ string, property_info *ZendPropertyInfo) {
 			/* first get the unmangeld name if necessary,
 			 * then check whether the property is already there
 			 */
-
 			flags = property_info.GetFlags()
 			if (flags & AccPublic) != 0 {
 				prop_name = property_info.GetName().Copy()
@@ -1810,12 +1801,12 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 						var op2_tmp types.Zval
 						if (flags & AccStatic) != 0 {
 							op1 = ce.GetDefaultStaticMembersTable()[coliding_prop.GetOffset()]
-							op2 = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
+							op2 = trait.GetDefaultStaticMembersTable()[property_info.GetOffset()]
 							op1 = types.ZVAL_DEINDIRECT(op1)
 							op2 = types.ZVAL_DEINDIRECT(op2)
 						} else {
 							op1 = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(coliding_prop.GetOffset())]
-							op2 = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
+							op2 = trait.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 						}
 
 						/* if any of the values is a constant, we try to resolve it */
@@ -1842,30 +1833,24 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).GetName().GetVal(), property_info.GetCe().GetName().GetVal(), prop_name.GetVal(), ce.GetName().GetVal())
 					}
 					// types.ZendStringReleaseEx(prop_name, 0)
-					continue
+					return
 				}
 			}
 
 			/* property not found, so lets add it */
-
 			if (flags & AccStatic) != 0 {
 				prop_value = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
 				b.Assert(prop_value.GetType() != types.IS_INDIRECT)
 			} else {
 				prop_value = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 			}
-			// prop_value.TryAddRefcount()
 			if property_info.GetDocComment() != nil {
 				doc_comment = property_info.GetDocComment().Copy()
 			} else {
 				doc_comment = nil
 			}
-			if property_info.GetType().IsName() {
-				//property_info.GetType().Name().AddRefcount()
-			}
 			ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
-			// types.ZendStringReleaseEx(prop_name, 0)
-		}
+		})
 	}
 
 	/* In the following steps the properties are inserted into the property table
@@ -2131,7 +2116,6 @@ func CheckVarianceObligation(zv *types.Zval) int {
 }
 func LoadDelayedClasses() {
 	var delayed_autoloads *types.Array = CG__().GetDelayedAutoloads()
-	var name *types.String
 	if delayed_autoloads == nil {
 		return
 	}
@@ -2139,13 +2123,10 @@ func LoadDelayedClasses() {
 	/* Take ownership of this HT, to avoid concurrent modification during autoloading. */
 
 	CG__().SetDelayedAutoloads(nil)
-	var __ht *types.Array = delayed_autoloads
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		name = _p.GetKey()
-		ZendLookupClass(name)
-	}
+	delayed_autoloads.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		name := key.StrKey()
+		ZendLookupClassString(name)
+	})
 	delayed_autoloads.Destroy()
 	FREE_HASHTABLE(delayed_autoloads)
 }
@@ -2166,16 +2147,12 @@ func ResolveDelayedVarianceObligations(ce *types.ClassEntry) {
 func ReportVarianceErrors(ce *types.ClassEntry) {
 	var all_obligations *types.Array = CG__().GetDelayedVarianceObligations()
 	var obligations *types.Array
-	var obligation *VarianceObligation
 	var num_key ZendUlong = ZendUlong(uintPtr(ce))
 	b.Assert(all_obligations != nil)
 	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
 	b.Assert(obligations != nil)
-	var __ht *types.Array = obligations
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		obligation = _z.Ptr()
+	obligations.Foreach(func(_ types.ArrayKey, value *types.Zval) {
+		var obligation *VarianceObligation = value.Ptr()
 		var status InheritanceStatus
 		var unresolved_class *types.String
 		if obligation.GetType() == OBLIGATION_COMPATIBILITY {
@@ -2190,7 +2167,7 @@ func ReportVarianceErrors(ce *types.ClassEntry) {
 		} else {
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Bug #78647")
 		}
-	}
+	})
 
 	/* Only warnings were thrown above -- that means that there are incompatibilities, but only
 	 * ones that we permit. Mark all classes with open obligations as fully linked. */

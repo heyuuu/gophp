@@ -368,16 +368,13 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 	lookup_browser_name = zend.ZendStringTolower(agent_name)
 	found_entry = types.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name.GetStr())
 	if found_entry == nil {
-		var entry *BrowscapEntry
-		var __ht *types.Array = bdata.GetHtab()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			entry = _z.Ptr()
+		bdata.GetHtab().ForeachEx(func(_ types.ArrayKey, value *types.Zval) bool {
+			var entry *BrowscapEntry = value.Ptr()
 			if BrowserRegCompare(entry, lookup_browser_name, &found_entry) != 0 {
-				break
+				return false
 			}
-		}
+			return true
+		})
 		if found_entry == nil {
 			found_entry = types.ZendHashStrFindPtr(bdata.GetHtab(), DEFAULT_SECTION_NAME)
 			if found_entry == nil {

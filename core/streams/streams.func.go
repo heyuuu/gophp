@@ -29,14 +29,9 @@ func ForgetPersistentResourceIdNumbers(el *types.Zval) int {
 	return 0
 }
 func ZmDeactivateStreams(type_ int, module_number int) int {
-	var el *types.Zval
-	var __ht *types.Array = zend.EG__().GetPersistentList()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		el = _z
-		ForgetPersistentResourceIdNumbers(el)
-	}
+	zend.EG__().GetPersistentList().Foreach(func(key types.ArrayKey, value *types.Zval) {
+		ForgetPersistentResourceIdNumbers(value)
+	})
 	return types.SUCCESS
 }
 func PhpStreamEncloses(enclosing *core.PhpStream, enclosed *core.PhpStream) *core.PhpStream {
@@ -57,18 +52,15 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 				 * regular list causes trouble (see bug #54623) */
 
 				*stream = (*core.PhpStream)(le.GetPtr())
-				var __ht *types.Array = zend.EG__().GetRegularList()
-				for _, _p := range __ht.ForeachData() {
-					var _z *types.Zval = _p.GetVal()
-
-					regentry = _z.Ptr()
+				for iter := zend.EG__().GetRegularList().Iterator(); iter.Valid(); iter.Next() {
+					value := iter.Current()
+					regentry = value.Ptr()
 					if regentry.GetPtr() == le.GetPtr() {
-						// 						regentry.AddRefcount()
 						stream.SetRes(regentry)
 						return core.PHP_STREAM_PERSISTENT_SUCCESS
 					}
 				}
-				// 				le.AddRefcount()
+
 				stream.SetRes(zend.ZendRegisterResource(*stream, LePstream))
 			}
 			return core.PHP_STREAM_PERSISTENT_SUCCESS

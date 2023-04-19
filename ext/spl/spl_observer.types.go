@@ -85,5 +85,5 @@ type spl_SplObjectStorageElement struct {
 	inf types.Zval
 }
 
-func (this *spl_SplObjectStorageElement) GetObj() types.Zval { return this.obj }
-func (this *spl_SplObjectStorageElement) GetInf() types.Zval { return this.inf }
+func (this *spl_SplObjectStorageElement) GetObj() *types.Zval { return &this.obj }
+func (this *spl_SplObjectStorageElement) GetInf() *types.Zval { return &this.inf }

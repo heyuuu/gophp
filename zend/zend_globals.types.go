@@ -378,9 +378,9 @@ func (this *ZendExecutorGlobals) GetTimedOut() types.ZendBool          { return 
 func (this *ZendExecutorGlobals) SetTimedOut(value types.ZendBool)     { this.timed_out = value }
 func (this *ZendExecutorGlobals) GetHardTimeout() ZendLong             { return this.hard_timeout }
 func (this *ZendExecutorGlobals) SetHardTimeout(value ZendLong)        { this.hard_timeout = value }
-func (this *ZendExecutorGlobals) GetRegularList() types.Array          { return this.regular_list }
+func (this *ZendExecutorGlobals) GetRegularList() *types.Array         { return &this.regular_list }
 func (this *ZendExecutorGlobals) SetRegularList(value types.Array)     { this.regular_list = value }
-func (this *ZendExecutorGlobals) GetPersistentList() types.Array       { return this.persistent_list }
+func (this *ZendExecutorGlobals) GetPersistentList() *types.Array      { return &this.persistent_list }
 func (this *ZendExecutorGlobals) SetPersistentList(value types.Array) {
 	this.persistent_list = value
 }

@@ -405,7 +405,6 @@ func zim_spl_SplFixedArray___construct(executeData *zend.ZendExecuteData, return
 func zim_spl_SplFixedArray___wakeup(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	var intern_ht *types.Array = zend.ZendStdGetProperties(zend.ZEND_THIS(executeData))
-	var data *types.Zval
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -413,23 +412,14 @@ func zim_spl_SplFixedArray___wakeup(executeData *zend.ZendExecuteData, return_va
 		var index int = 0
 		var size int = intern_ht.Len()
 		SplFixedarrayInit(intern.GetArray(), size)
-		var __ht *types.Array = intern_ht
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			data = _z
-			types.ZVAL_COPY(intern.GetArray().GetElements()[index], data)
+		intern_ht.Foreach(func(key types.ArrayKey, value *types.Zval) {
+			types.ZVAL_COPY(intern.GetArray().GetElements()[index], value)
 			index++
-		}
+		})
 
 		/* Remove the unserialised properties, since we now have the elements
 		 * within the spl_fixedarray_object structure. */
-
 		intern_ht.Clean()
-
-		/* Remove the unserialised properties, since we now have the elements
-		 * within the spl_fixedarray_object structure. */
-
 	}
 }
 func zim_spl_SplFixedArray_count(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -475,52 +465,34 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 	}
 	num = data.Array().Len()
 	if num > 0 && save_indexes != 0 {
-		var element *types.Zval
-		var str_index *types.String
-		var num_index zend.ZendUlong
-		var max_index zend.ZendUlong = 0
-		var tmp zend.ZendLong
-		var __ht *types.Array = data.Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			num_index = _p.GetH()
-			str_index = _p.GetKey()
-			if str_index != nil || zend.ZendLong(num_index < 0) != 0 {
+		var maxIndex uint = 0
+		for iter := data.Array().Iterator(); iter.Valid(); iter.Next() {
+			key := iter.Key()
+			if key.IsStrKey() || key.IndexKey() < 0 {
 				faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array must contain only positive integer keys")
 				return
 			}
-			if num_index > max_index {
-				max_index = num_index
+			numIndex := uint(key.IndexKey())
+			if numIndex > maxIndex {
+				maxIndex = numIndex
 			}
 		}
-		tmp = max_index + 1
+		tmp := int(maxIndex + 1)
 		if tmp <= 0 {
 			faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "integer overflow detected")
 			return
 		}
 		SplFixedarrayInit(&array, tmp)
-		var __ht__1 *types.Array = data.Array()
-		for _, _p := range __ht__1.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			num_index = _p.GetH()
-			str_index = _p.GetKey()
-			element = _z
-			types.ZVAL_COPY_DEREF(array.GetElements()[num_index], element)
-		}
+		data.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
+			types.ZVAL_COPY_DEREF(array.GetElements()[key.IndexKey()], value)
+		})
 	} else if num > 0 && save_indexes == 0 {
-		var element *types.Zval
 		var i zend.ZendLong = 0
 		SplFixedarrayInit(&array, num)
-		var __ht *types.Array = data.Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			element = _z
-			types.ZVAL_COPY_DEREF(array.GetElements()[i], element)
+		data.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
+			types.ZVAL_COPY_DEREF(array.GetElements()[i], value)
 			i++
-		}
+		})
 	} else {
 		SplFixedarrayInit(&array, 0)
 	}

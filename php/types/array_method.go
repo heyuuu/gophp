@@ -436,6 +436,18 @@ func (ht *Array) Foreach(handler func(key ArrayKey, value *Zval)) {
 		handler(p.GetArrayKey(), p.GetVal())
 	}
 }
+func (ht *Array) ForeachEx(handler func(key ArrayKey, value *Zval) bool) bool {
+	for i, _ := range ht.data {
+		p := &ht.data[i]
+		if p.IsValid() {
+			continue
+		}
+		if !handler(p.GetArrayKey(), p.GetVal()) {
+			return false
+		}
+	}
+	return true
+}
 func (ht *Array) ForeachReserve(handler func(key ArrayKey, value *Zval)) {
 	for i := len(ht.data) - 1; i >= 0; i-- {
 		p := &ht.data[i]

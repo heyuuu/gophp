@@ -387,7 +387,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 	var filename *byte
 	var filename_len int
 	var data *types.Zval
-	var numbytes ssize_t = 0
+	var numbytes int = 0
 	var flags zend.ZendLong = 0
 	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext = nil
@@ -474,28 +474,20 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 			}
 		}
 	case types.IS_ARRAY:
-		if data.Array().Len() {
-			var bytes_written ssize_t
-			var tmp *types.Zval
-			var __ht *types.Array = data.Array()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				tmp = _z
-				var t *types.String
-				var str *types.String = zend.ZvalGetTmpString(tmp, &t)
-				if str.GetLen() != 0 {
-					numbytes += str.GetLen()
-					bytes_written = core.PhpStreamWrite(stream, str.GetVal(), str.GetLen())
-					if bytes_written != str.GetLen() {
+		if data.Array().Len() != 0 {
+			data.Array().ForeachEx(func(key types.ArrayKey, tmp *types.Zval) bool {
+				var s string = zend.ZvalGetStrVal(tmp)
+				if s != "" {
+					numbytes += len(s)
+					bytesWritten := core.PhpStreamWriteString(stream, s)
+					if bytesWritten != len(s) {
 						core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to write %zd bytes to %s", str.GetLen(), filename)
-						// zend.ZendTmpStringRelease(t)
 						numbytes = -1
-						break
+						return false
 					}
 				}
-				// zend.ZendTmpStringRelease(t)
-			}
+				return true
+			})
 		}
 	case types.IS_OBJECT:
 		if types.Z_OBJ_HT_P(data) != nil {
@@ -1721,11 +1713,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 	var csvline zend.SmartStr = zend.MakeSmartStr(0)
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = fields.Array().Len()
-	var __ht *types.Array = fields.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		field_tmp = _z
+	fields.Array().Foreach(func(_ types.ArrayKey, field_tmp *types.Zval) {
 		var tmp_field_str *types.String
 		var field_str *types.String = zend.ZvalGetTmpString(field_tmp, &tmp_field_str)
 
@@ -1754,8 +1742,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 		if b.PreInc(&i) != count {
 			csvline.AppendString(b.CastStr(&delimiter, 1))
 		}
-		// zend.ZendTmpStringRelease(tmp_field_str)
-	}
+	})
 	csvline.AppendByte('\n')
 	csvline.ZeroTail()
 	ret = core.PhpStreamWrite(stream, csvline.GetS().GetVal(), csvline.GetS().GetLen())

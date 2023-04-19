@@ -489,14 +489,10 @@ func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 	n = array.Array().Len()
 	args = (*types.Zval)(zend.SafeEmalloc(n, b.SizeOf("zval"), 0))
 	n = 0
-	var __ht *types.Array = array.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		zv = _z
+	array.Array().Foreach(func(_ types.ArrayKey, zv *types.Zval) {
 		types.ZVAL_COPY_VALUE(&args[n], zv)
 		n++
-	}
+	})
 	*argc = n
 	return args
 }

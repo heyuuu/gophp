@@ -595,34 +595,23 @@ func PhpRegisterServerVariables() {
 	PhpRegisterVariableQuick("REQUEST_TIME", &tmp, ht)
 }
 func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {
-	var src_entry *types.Zval
 	var dest_entry *types.Zval
-	var string_key *types.String
-	var num_key zend.ZendUlong
-	var globals_check int = dest == zend.EG__().GetSymbolTable()
-	var __ht *types.Array = src
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
+	var globalsCheck = dest == zend.EG__().GetSymbolTable()
 
-		num_key = _p.GetH()
-		string_key = _p.GetKey()
-		src_entry = _z
-		if src_entry.GetType() != types.IS_ARRAY || string_key != nil && b.Assign(&dest_entry, dest.KeyFind(string_key.GetStr())) == nil || string_key == nil && b.Assign(&dest_entry, dest.IndexFind(num_key)) == nil || dest_entry.GetType() != types.IS_ARRAY {
-			//src_entry.TryAddRefcount()
-			if string_key != nil {
-				if globals_check == 0 || string_key.GetLen() != b.SizeOf("\"GLOBALS\"")-1 || memcmp(string_key.GetVal(), "GLOBALS", b.SizeOf("\"GLOBALS\"")-1) {
-					dest.KeyUpdate(string_key.GetStr(), src_entry)
-				} else {
-					//src_entry.TryDelRefcount()
+	src.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		if value.GetType() != types.IS_ARRAY || key.IsStrKey() && b.Assign(&dest_entry, dest.KeyFind(key.StrKey())) == nil || !key.IsStrKey() && b.Assign(&dest_entry, dest.IndexFind(key.IndexKey())) == nil || dest_entry.GetType() != types.IS_ARRAY {
+			if key.IsStrKey() {
+				if !globalsCheck || key.StrKey() != "GLOBALS" {
+					dest.KeyUpdate(key.StrKey(), value)
 				}
 			} else {
-				dest.IndexUpdate(num_key, src_entry)
+				dest.IndexUpdate(key.IndexKey(), value)
 			}
 		} else {
 			types.SeparateArray(dest_entry)
-			PhpAutoglobalMerge(dest_entry.Array(), src_entry.Array())
+			PhpAutoglobalMerge(dest_entry.Array(), value.Array())
 		}
-	}
+	})
 }
 func PhpHashEnvironment() int {
 	memset(PG__().http_globals, 0, b.SizeOf("PG ( http_globals )"))

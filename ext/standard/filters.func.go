@@ -141,17 +141,12 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 	if filterparams != nil {
 		if filterparams.IsType(types.IS_ARRAY) {
 			var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
-			var tmp *types.Zval
-			var __ht *types.Array = filterparams.Array()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				tmp = _z
+			filterparams.Array().Foreach(func(_ types.ArrayKey, tmp *types.Zval) {
 				zend.ConvertToStringEx(tmp)
 				tags_ss.AppendByte('<')
 				tags_ss.AppendString(tmp.String().GetStr())
 				tags_ss.AppendByte('>')
-			}
+			})
 			tags_ss.ZeroTail()
 			allowed_tags = tags_ss.GetS()
 		} else {

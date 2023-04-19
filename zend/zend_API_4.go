@@ -189,20 +189,19 @@ func AddIndexBool(arg *types.Zval, index ZendUlong, b int) int {
 	arg.Array().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
-func AddIndexResource(arg *types.Zval, index ZendUlong, r *types.ZendResource) int {
-	var tmp types.Zval
-	tmp.SetResource(r)
-	arg.Array().IndexUpdate(index, &tmp)
-	return types.SUCCESS
-}
 func AddIndexDouble(arg *types.Zval, index ZendUlong, d float64) int {
 	var tmp types.Zval
 	tmp.SetDouble(d)
 	arg.Array().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
-func AddIndexStr(arg *types.Zval, index ZendUlong, str *types.String) int {
+func AddIndexStr(arg *types.Zval, index int, str *types.String) int {
 	zv := types.NewZvalString(str.GetStr())
+	arg.Array().IndexUpdate(index, zv)
+	return types.SUCCESS
+}
+func AddIndexStrEx(arg *types.Zval, index int, str string) int {
+	zv := types.NewZvalString(str)
 	arg.Array().IndexUpdate(index, zv)
 	return types.SUCCESS
 }

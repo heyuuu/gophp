@@ -146,15 +146,12 @@ func ZendInitRsrcPlist() int {
 }
 func ZendCloseRsrcList(ht *types.Array) {
 	var res *types.ZendResource
-	var __ht *types.Array = ht
-	for _, _p := range __ht.ForeachDataReserve() {
-		var _z types.Zval = _p.GetVal()
-
-		res = _z.Ptr()
+	ht.ForeachReserve(func(_ types.ArrayKey, zv *types.Zval) {
+		res = zv.Ptr()
 		if res.GetType() >= 0 {
 			ZendResourceDtor(res)
 		}
-	}
+	})
 }
 func CleanModuleResource(zv *types.Zval, arg any) int {
 	var resource_id int = *((*int)(arg))
@@ -190,15 +187,13 @@ func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, type_nam
 }
 func ZendFetchListDtorId(type_name *byte) int {
 	var lde *ZendRsrcListDtorsEntry
-	var __ht *types.Array = &ListDestructors
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		lde = _z.Ptr()
+	ListDestructors.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		lde = value.Ptr()
 		if lde.GetTypeName() != nil && strcmp(type_name, lde.GetTypeName()) == 0 {
 			return lde.GetResourceId()
 		}
-	}
+	})
+
 	return 0
 }
 func ListDestructorsDtor(zv *types.Zval) { Free(zv.Ptr()) }

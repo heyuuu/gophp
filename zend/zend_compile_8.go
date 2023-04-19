@@ -292,31 +292,25 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	} else {
 		opline.SetResult(result.GetOp())
 	}
-	var __ht *types.Array = CG__().GetMemoizedExprs()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		node = _z.Ptr()
+	CG__().GetMemoizedExprs().ForeachEx(func(_ types.ArrayKey, value *types.Zval) bool {
+		node = value.Ptr()
 		if node.GetOpType() == IS_TMP_VAR || node.GetOpType() == IS_VAR {
 			need_frees = 1
-			break
+			return false
 		}
-	}
+		return true
+	})
 
 	/* Free DUPed expressions if there are any */
-
 	if need_frees != 0 {
 		var jump_opnum uint32 = ZendEmitJump(0)
 		ZendUpdateJumpTargetToNext(coalesce_opnum)
-		var __ht *types.Array = CG__().GetMemoizedExprs()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			node = _z.Ptr()
+		CG__().GetMemoizedExprs().Foreach(func(_ types.ArrayKey, value *types.Zval) {
+			node = value.Ptr()
 			if node.GetOpType() == IS_TMP_VAR || node.GetOpType() == IS_VAR {
 				ZendEmitOp(nil, ZEND_FREE, node, nil)
 			}
-		}
+		})
 		ZendUpdateJumpTargetToNext(jump_opnum)
 	} else {
 		ZendUpdateJumpTargetToNext(coalesce_opnum)

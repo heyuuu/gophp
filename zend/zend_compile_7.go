@@ -420,10 +420,8 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unpack array with string keys")
 					}
 					if result.Array().NextIndexInsert(val) == nil {
-						// ZvalPtrDtor(result)
 						return 0
 					}
-					// val.TryAddRefcount()
 				}
 				continue
 			} else {

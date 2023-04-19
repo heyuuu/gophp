@@ -55,12 +55,8 @@ func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 			} else {
 				PhpInfoPrintf("\nRegistered %s => ", name)
 			}
-			var __ht *types.Array = ht
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				key = _p.GetKey()
-				if key != nil {
+			ht.Foreach(func(key types.ArrayKey, _ *types.Zval) {
+				if key.IsStrKey() {
 					if first != 0 {
 						first = 0
 					} else {
@@ -69,10 +65,10 @@ func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 					if core.SM__().GetPhpinfoAsText() == 0 {
 						PhpInfoPrintHtmlEsc(key.GetVal(), key.GetLen())
 					} else {
-						PhpInfoPrint(key.GetStr())
+						PhpInfoPrint(key.StrKey())
 					}
 				}
-			}
+			})
 			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("</td></tr>\n")
 			}

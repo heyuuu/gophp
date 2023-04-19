@@ -177,38 +177,34 @@ func PhpHeadParseCookieOptionsArray(
 	var found int = 0
 	var key *types.String
 	var value *types.Zval
-	var __ht *types.Array = options.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		key = _p.GetKey()
-		value = _z
-		if key != nil {
-			if ascii.StrCaseEquals(key.GetStr(), "expires") {
+	options.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
+		if key.IsStrKey() {
+			strKey := key.StrKey()
+			if ascii.StrCaseEquals(strKey, "expires") {
 				*expires = zend.ZvalGetLong(value)
 				found++
-			} else if ascii.StrCaseEquals(key.GetStr(), "path") {
+			} else if ascii.StrCaseEquals(strKey, "path") {
 				*path = zend.ZvalGetString(value)
 				found++
-			} else if ascii.StrCaseEquals(key.GetStr(), "domain") {
+			} else if ascii.StrCaseEquals(strKey, "domain") {
 				*domain = zend.ZvalGetString(value)
 				found++
-			} else if ascii.StrCaseEquals(key.GetStr(), "secure") {
+			} else if ascii.StrCaseEquals(strKey, "secure") {
 				*secure = zend.ZvalIsTrue(value)
 				found++
-			} else if ascii.StrCaseEquals(key.GetStr(), "httponly") {
+			} else if ascii.StrCaseEquals(strKey, "httponly") {
 				*httponly = zend.ZvalIsTrue(value)
 				found++
-			} else if ascii.StrCaseEquals(key.GetStr(), "samesite") {
+			} else if ascii.StrCaseEquals(strKey, "samesite") {
 				*samesite = zend.ZvalGetString(value)
 				found++
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unrecognized key '%s' found in the options array", key.GetVal())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unrecognized key '%s' found in the options array", strKey)
 			}
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Numeric key found in the options array")
 		}
-	}
+	})
 
 	/* Array is not empty but no valid keys were found */
 

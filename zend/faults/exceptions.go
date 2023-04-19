@@ -504,14 +504,9 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 	if tmp != nil {
 		if tmp.IsArray() {
 			var last_len int = str.GetS().GetLen()
-			var arg *types.Zval
-			var __ht *types.Array = tmp.Array()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				arg = _z
+			tmp.Array().Foreach(func(_ types.ArrayKey, arg *types.Zval) {
 				_buildTraceArgs(arg, str)
-			}
+			})
 			if last_len != str.GetS().GetLen() {
 				str.GetS().GetLen() -= 2
 			}
@@ -523,9 +518,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 }
 func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var trace *types.Zval
-	var frame *types.Zval
 	var rv types.Zval
-	var index zend.ZendUlong
 	var object *types.Zval
 	var base_ce *types.ClassEntry
 	var str zend.SmartStr = MakeSmartStr(0)
@@ -540,18 +533,13 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 		return_value.SetFalse()
 		return
 	}
-	var __ht *types.Array = trace.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		index = _p.GetH()
-		frame = _z
+	trace.Array().Foreach(func(key types.ArrayKey, frame *types.Zval) {
 		if frame.GetType() != types.IS_ARRAY {
-			Error(E_WARNING, "Expected array for frame "+zend.ZEND_ULONG_FMT, index)
-			continue
+			Error(E_WARNING, "Expected array for frame "+zend.ZEND_ULONG_FMT, key.IndexKey())
+			return
 		}
 		_buildTraceString(&str, frame.Array(), b.PostInc(&num))
-	}
+	})
 	str.AppendByte('#')
 	str.AppendLong(num)
 	str.AppendString(" {main}")

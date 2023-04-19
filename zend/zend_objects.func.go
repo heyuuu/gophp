@@ -175,10 +175,6 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 
 	}
 	if old_object.GetProperties() != nil && old_object.GetProperties().Len() {
-		var prop *types.Zval
-		var new_prop types.Zval
-		var num_key ZendUlong
-		var key *types.String
 		if new_object.GetProperties() == nil {
 			new_object.SetProperties(types.NewArray(old_object.GetProperties().Len()))
 			types.ZendHashRealInitMixed(new_object.GetProperties())
@@ -188,25 +184,20 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		new_object.GetProperties().CopyFlags(old_object.GetProperties())
 		new_object.GetProperties().SetIteratorsCount(old_object.GetProperties().GetIteratorsCount())
 		new_object.GetProperties().MarkHasEmptyIndex()
-		var __ht *types.Array = old_object.GetProperties()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			num_key = _p.GetH()
-			key = _p.GetKey()
-			prop = _z
+		old_object.GetProperties().Foreach(func(key types.ArrayKey, prop *types.Zval) {
+			var new_prop types.Zval
 			if prop.IsIndirect() {
 				new_prop.SetIndirect(new_object.GetPropertiesTable() + (prop.Indirect() - old_object.GetPropertiesTable()))
 			} else {
 				types.ZVAL_COPY_VALUE(&new_prop, prop)
 				ZvalAddRef(&new_prop)
 			}
-			if key != nil {
-				types._zendHashAppend(new_object.GetProperties(), key, &new_prop)
+			if key.IsStrKey() {
+				new_object.GetProperties().KeyAddNew(key.StrKey(), &new_prop)
 			} else {
-				new_object.GetProperties().IndexAddNew(num_key, &new_prop)
+				new_object.GetProperties().IndexAddNew(key.IndexKey(), &new_prop)
 			}
-		}
+		})
 	}
 	if old_object.GetCe().GetClone() != nil {
 		var fci types.ZendFcallInfo

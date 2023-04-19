@@ -574,7 +574,7 @@ func ParseOpts(opts *byte, result **core.Opt) int {
 	}
 	return count
 }
-func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ zpp.Opt, opts *types.Zval, optind zpp.RefZval) {
+func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _ zpp.Opt, opts_ *types.Zval, optind zpp.RefZval) {
 	var options *byte = nil
 	var argv **byte = nil
 	var opt []byte = []byte{'0'}
@@ -620,7 +620,6 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 
 	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr("_SERVER") != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
 		var pos int = 0
-		var entry *types.Zval
 		if args.GetType() != types.IS_ARRAY {
 			return_value.SetFalse()
 			return
@@ -633,17 +632,11 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 		argv = (**byte)(zend.SafeEmalloc(b.SizeOf("char *"), argc+1, 0))
 
 		/* Iterate over the hash to construct the argv array. */
-
-		var __ht *types.Array = args.Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			entry = _z
+		args.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 			var tmp_arg_str *types.String
-			var arg_str *types.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			var arg_str *types.String = zend.ZvalGetTmpString(value, &tmp_arg_str)
 			argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
-			// zend.ZendTmpStringRelease(tmp_arg_str)
-		}
+		})
 
 		/* The C Standard requires argv[argc] to be NULL - this might
 		 * keep some getopt implementations happy. */
@@ -675,12 +668,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 		memset(opts, 0, count*b.SizeOf("opt_struct"))
 
 		/* Iterate over the hash to construct the argv array. */
-
-		var __ht *types.Array = p_longopts.Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			entry = _z
+		p_longopts.Array().Foreach(func(_ types.ArrayKey, entry *types.Zval) {
 			var tmp_arg_str *types.String
 			var arg_str *types.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
 			opts.SetNeedParam(0)
@@ -696,8 +684,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 			}
 			opts.SetOptChar(0)
 			opts++
-			// zend.ZendTmpStringRelease(tmp_arg_str)
-		}
+		})
 
 		/* Iterate over the hash to construct the argv array. */
 
@@ -937,34 +924,21 @@ func ZifGetCurrentUser(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetStringVal(b.CastStrAuto(core.PhpGetCurrentUser()))
 	return
 }
-func AddConfigEntry(h zend.ZendUlong, key *types.String, entry *types.Zval, retval *types.Zval) {
-	if entry.IsType(types.IS_STRING) {
-		var str = entry.String().Copy()
-		if key != nil {
-			zend.AddAssocStrEx(retval, key.GetStr(), str.GetStr())
-		} else {
-			zend.AddIndexStr(retval, h, str)
+func AddConfigEntries(hash *types.Array, retval *types.Zval) {
+	hash.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		if value.IsString() {
+			if key.IsStrKey() {
+				zend.AddAssocStrEx(retval, key.StrKey(), value.StringVal())
+			} else {
+				zend.AddIndexStrEx(retval, key.IndexKey(), value.StringVal())
+			}
+		} else if value.IsType(types.IS_ARRAY) {
+			var tmp types.Zval
+			zend.ArrayInit(&tmp)
+			AddConfigEntries(value.Array(), &tmp)
+			retval.Array().KeyUpdate(key.StrKey(), &tmp)
 		}
-	} else if entry.IsType(types.IS_ARRAY) {
-		var tmp types.Zval
-		zend.ArrayInit(&tmp)
-		AddConfigEntries(entry.Array(), &tmp)
-		retval.Array().KeyUpdate(key.GetStr(), &tmp)
-	}
-}
-func AddConfigEntries(hash *types.Array, return_value *types.Zval) {
-	var h zend.ZendUlong
-	var key *types.String
-	var zv *types.Zval
-	var __ht *types.Array = hash
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		h = _p.GetH()
-		key = _p.GetKey()
-		zv = _z
-		AddConfigEntry(h, key, zv, return_value)
-	}
+	})
 }
 func ZifGetCfgVar(executeData zpp.Ex, return_value zpp.Ret, optionName *types.Zval) {
 	var varname *byte

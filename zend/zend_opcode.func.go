@@ -898,14 +898,9 @@ func PassTwo(op_array *types.ZendOpArray) int {
 			/* absolute indexes to relative offsets */
 
 			var jumptable *types.Array = CT_CONSTANT(opline.GetOp2()).Array()
-			var zv *types.Zval
-			var __ht *types.Array = jumptable
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				zv = _z
+			jumptable.Foreach(func(_ types.ArrayKey, zv *types.Zval) {
 				zv.SetLong(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, zv.Long()))
-			}
+			})
 			opline.SetExtendedValue(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, opline.GetExtendedValue()))
 		}
 		if opline.GetOp1Type() == IS_CONST {

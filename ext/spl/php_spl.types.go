@@ -63,7 +63,7 @@ type AutoloadFuncInfo struct {
 
 func (this *AutoloadFuncInfo) GetFuncPtr() types.IFunction      { return this.func_ptr }
 func (this *AutoloadFuncInfo) SetFuncPtr(value types.IFunction) { this.func_ptr = value }
-func (this *AutoloadFuncInfo) GetObj() types.Zval               { return this.obj }
-func (this *AutoloadFuncInfo) GetClosure() types.Zval           { return this.closure }
+func (this *AutoloadFuncInfo) GetObj() *types.Zval              { return &this.obj }
+func (this *AutoloadFuncInfo) GetClosure() *types.Zval          { return &this.closure }
 func (this *AutoloadFuncInfo) GetCe() *types.ClassEntry         { return this.ce }
 func (this *AutoloadFuncInfo) SetCe(value *types.ClassEntry)    { this.ce = value }

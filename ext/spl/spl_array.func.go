@@ -1023,27 +1023,19 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 	var aht *types.Array = SplArrayGetHashTable(intern)
 	if SplArrayIsObject(intern) != 0 {
 		var count zend.ZendLong = 0
-		var key *types.String
-		var val *types.Zval
-
 		/* Count public/dynamic properties */
-
-		var __ht *types.Array = aht
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			key = _p.GetKey()
-			val = _z
-			if val.IsIndirect() {
-				if types.Z_INDIRECT_P(val).IsUndef() {
-					continue
+		aht.Foreach(func(key types.ArrayKey, value *types.Zval) {
+			if value.IsIndirect() {
+				if types.Z_INDIRECT_P(value).IsUndef() {
+					return
 				}
-				if key != nil && key.GetStr()[0] == '0' {
-					continue
+				if key.IsStrKey() && key.StrKey() == "" {
+					return
 				}
 			}
 			count++
-		}
+		})
+
 		return count
 	} else {
 		return aht.Len()

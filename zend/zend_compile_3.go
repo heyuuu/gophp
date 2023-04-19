@@ -604,11 +604,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 		var dst *types.Array = types.NewArray(src.Len())
 		tmp.SetTrue()
 		if strict != 0 {
-			var __ht *types.Array = src
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				val = _z
+			src.ForeachEx(func(_ types.ArrayKey, val *types.Zval) bool {
 				if val.IsString() {
 					dst.KeyAdd(val.String().GetStr(), &tmp)
 				} else if val.IsLong() {
@@ -616,9 +612,10 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				} else {
 					dst.DestroyEx()
 					ok = 0
-					break
+					return false
 				}
-			}
+				return true
+			})
 		} else {
 			var __ht *types.Array = src
 			for _, _p := range __ht.ForeachData() {

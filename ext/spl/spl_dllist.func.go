@@ -886,13 +886,9 @@ func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData
 		return
 	}
 	intern.SetFlags(int(flags_zv.Long()))
-	var __ht *types.Array = storage_zv.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		elem = _z
-		SplPtrLlistPush(intern.GetLlist(), elem)
-	}
+	storage_zv.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
+		SplPtrLlistPush(intern.GetLlist(), value)
+	})
 	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.Array())
 }
 func zim_spl_SplDoublyLinkedList_add(executeData *zend.ZendExecuteData, return_value *types.Zval) {
