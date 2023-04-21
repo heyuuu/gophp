@@ -123,7 +123,7 @@ func (t *Table[T]) SortByKey(less func(k1 string, k2 string) bool) {
 // todo 兼容用函数，后续会迁移
 func (t *Table[T]) SortByArrayKey(less func(k1 types.ArrayKey, k2 types.ArrayKey) bool) {
 	t.Sort(func(k1 string, v1 T, k2 string, v2 T) bool {
-		return less(types.MakeStrKey(k1), types.MakeStrKey(k2))
+		return less(types.StrKey(k1), types.StrKey(k2))
 	})
 }
 

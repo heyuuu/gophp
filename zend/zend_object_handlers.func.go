@@ -42,7 +42,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 		var flags uint32 = 0
 		zobj.SetProperties(types.NewArray(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
-			types.ZendHashRealInitMixed(zobj.GetProperties())
+			//types.ZendHashRealInitMixed(zobj.GetProperties())
 
 			ce.PropertyTable().Foreach(func(key string, prop_info *ZendPropertyInfo) {
 				if !prop_info.IsStatic() {

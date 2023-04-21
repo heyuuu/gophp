@@ -189,7 +189,7 @@ func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) (*types.
 	}
 
 	result := types.NewArray(4)
-	types.ZendHashRealInitMixed(return_value.Array())
+	//types.ZendHashRealInitMixed(return_value.Array())
 
 	/* add value elements */
 	val = types.ZVAL_DEREF(val)
@@ -1302,7 +1302,6 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		var i uint32 = 0
 		var p = call.Arg(1)
 		ArrayInitSize(arg_array, num_args)
-		types.ZendHashRealInitPacked(arg_array.Array())
 
 		fillScope := types.PackedFillStart(arg_array.Array())
 		if call.GetFunc().GetType() == ZEND_USER_FUNCTION {

@@ -516,7 +516,7 @@ func ObjectCommon(
 
 		/* Avoid reallocation due to packed -> mixed conversion. */
 
-		types.ZendHashRealInitMixed(ary.Array())
+		//types.ZendHashRealInitMixed(ary.Array())
 		if ProcessNestedData(rval, p, max, var_hash, ary.Array(), elements, nil) == 0 {
 			rval = types.ZVAL_DEREF(rval)
 			rval.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
@@ -540,7 +540,6 @@ func ObjectCommon(
 	if elements >= zend_long(types.HT_MAX_SIZE-ht.Len()) {
 		return 0
 	}
-	ht.Extend(ht.Len() + elements)
 	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.Object()) == 0 {
 		if has_wakeup != 0 {
 			rval = types.ZVAL_DEREF(rval)
@@ -968,7 +967,7 @@ yy24:
 		/* we can't convert from packed to hash during unserialization, because
 		   reference to some zvals might be keept in var_hash (to support references) */
 
-		types.ZendHashRealInitMixed(rval.Array())
+		//types.ZendHashRealInitMixed(rval.Array())
 
 		/* we can't convert from packed to hash during unserialization, because
 		   reference to some zvals might be keept in var_hash (to support references) */

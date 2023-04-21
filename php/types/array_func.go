@@ -335,8 +335,6 @@ func ZendHashGetCurrentDataPtrEx(ht *Array, pos *ArrayPosition) any {
 func ZendHashGetCurrentDataPtr(ht *Array) any {
 	return ZendHashGetCurrentDataPtrEx(ht, ht.GetNInternalPointer())
 }
-func ZendHashRealInitPacked(ht *Array) { /* ignore simplify */ ht.RealInit() }
-func ZendHashRealInitMixed(ht *Array)  { /* ignore simplify */ ht.RealInit() }
 func ZendHashToPacked(ht *Array) {
 	// todo 此函数不应被调用
 	assert(false)
@@ -428,7 +426,7 @@ func ZendHashReverseApply(ht *Array, apply_func ApplyFuncT) {
 }
 func ZendHashCopy(target *Array, source *Array, pCopyConstructor CopyCtorFuncT) {
 	target.assertRc1()
-	source.eachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
+	source.EachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
 		var newEntry = target.Update(p.key, data)
 		if pCopyConstructor != nil {
 			pCopyConstructor(newEntry)
@@ -437,7 +435,7 @@ func ZendHashCopy(target *Array, source *Array, pCopyConstructor CopyCtorFuncT) 
 }
 
 func ZendArrayDupElements(source *Array, target *Array) {
-	target.eachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
+	target.EachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
 		// 增加引用计数
 		for {
 			if data.IsRefcounted() {
@@ -447,7 +445,6 @@ func ZendArrayDupElements(source *Array, target *Array) {
 						break
 					}
 				}
-				// 				data.AddRefcount()
 			}
 			break
 		}
@@ -458,7 +455,7 @@ func ZendArrayDupElements(source *Array, target *Array) {
 
 		// 更新内部指针
 		if source.internalPointer == pos {
-			target.internalPointer = target.LastPos()
+			target.internalPointer = target.DataSize() - 1
 		}
 	})
 }
@@ -493,14 +490,14 @@ func ZendArrayDup(source *Array) *Array {
 func ZendHashMerge(target *Array, source *Array, pCopyConstructor CopyCtorFuncT, overwrite ZendBool) {
 	target.assertRc1()
 	if overwrite != 0 {
-		source.eachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
+		source.EachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
 			var t = target.UpdateIndirect(p.GetArrayKey(), data)
 			if pCopyConstructor != nil {
 				pCopyConstructor(t)
 			}
 		})
 	} else {
-		source.eachValidBucketIndirect(func(pos uint32, p *Bucket, s *Zval) {
+		source.EachValidBucketIndirect(func(pos uint32, p *Bucket, s *Zval) {
 			var t = target.AddIndirect(p.GetArrayKey(), s)
 			if t != nil && pCopyConstructor != nil {
 				pCopyConstructor(t)

@@ -28,7 +28,7 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *spl_SplObjectStorage, 
 		zend.ZendCallMethodWith1Params(this, intern.GetStd().GetCe(), intern.GetFptrGetHash(), "getHash", &rv, obj)
 		if !(rv.IsUndef()) {
 			if rv.IsType(types.IS_STRING) {
-				*key = types.MakeStrKey(rv.StringVal())
+				*key = types.StrKey(rv.StringVal())
 				return types.SUCCESS
 			} else {
 				faults.ThrowException(spl_ce_RuntimeException, "Hash needs to be a string", 0)
@@ -39,7 +39,7 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *spl_SplObjectStorage, 
 			return types.FAILURE
 		}
 	} else {
-		*key = types.MakeIndexKey(int(zend.Z_OBJ_HANDLE_P(obj)))
+		*key = types.IndexKey(int(zend.Z_OBJ_HANDLE_P(obj)))
 		return types.SUCCESS
 	}
 }

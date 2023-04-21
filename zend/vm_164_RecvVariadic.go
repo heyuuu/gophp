@@ -14,7 +14,6 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if arg_num <= arg_count {
 		var param *types.Zval
 		ArrayInitSize(params, arg_count-arg_num+1)
-		types.ZendHashRealInitPacked(params.Array())
 		for {
 			fillScope := types.PackedFillStart(params.Array())
 			param = executeData.VarNum(executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T)

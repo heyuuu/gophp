@@ -387,7 +387,7 @@ var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "st
 	if fp.HasError() {
 		return
 	}
-	ZifArrayShift(executeData, returnValue, stack)
+	ZifArrayShift(stack)
 })
 
 // generate by ZifArrayUnshift
@@ -597,7 +597,7 @@ var DefZifArrayUnique = def.DefFunc("array_unique", 1, 2, []def.ArgInfo{{Name: "
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUnique(executeData, returnValue, arg, nil, flags)
+	ZifArrayUnique(arg, nil, flags)
 })
 
 // generate by ZifArrayIntersectKey

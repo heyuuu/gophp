@@ -9,22 +9,15 @@ import (
 /**
  * Open methods
  */
-func (ht *Array) RealInit()                        { ht.clearData() } // todo remove 无需init操作
-func (ht *Array) GetArData() *Bucket               { return ht.arData }
-func (ht *Array) DataSize() uint32                 { return uint32(len(ht.data)) }
-func (ht *Array) LastPos() uint32                  { return ht.DataSize() - 1 }
-func (ht *Array) GetNNumUsed() uint32              { return ht.DataSize() }
-func (ht *Array) SetNNumUsed(value uint32)         {} // todo remove
-func (ht *Array) SetNNumOfElements(value uint32)   { ht.elementsCount = value }
-func (ht *Array) GetNInternalPointer() uint32      { return ht.internalPointer }
-func (ht *Array) SetNInternalPointer(value uint32) { ht.internalPointer = value }
-func (ht *Array) GetNNextFreeElement() int         { return ht.nextFreeElement }
-func (ht *Array) SetNNextFreeElement(value int)    { ht.nextFreeElement = value }
-func (ht *Array) GetPDestructor() DtorFuncT        { return ht.destructor }
-func (ht *Array) SetPDestructor(value DtorFuncT)   { ht.destructor = value }
-func (ht *Array) GetNTableMask() uint32            { return 0 } // todo remove
-
-func (ht *Array) isWithoutHoles() bool { return ht.GetNNumUsed() == ht.elementsCount }
+func (ht *Array) GetArData() *Bucket             { return ht.arData }
+func (ht *Array) DataSize() uint32               { return uint32(len(ht.data)) }
+func (ht *Array) GetNNumUsed() uint32            { return ht.DataSize() }
+func (ht *Array) SetNNumOfElements(value uint32) { ht.elementsCount = value }
+func (ht *Array) GetNInternalPointer() uint32    { return ht.internalPointer }
+func (ht *Array) GetNNextFreeElement() int       { return ht.nextFreeElement }
+func (ht *Array) SetNNextFreeElement(value int)  { ht.nextFreeElement = value }
+func (ht *Array) GetPDestructor() DtorFuncT      { return ht.destructor }
+func (ht *Array) SetPDestructor(value DtorFuncT) { ht.destructor = value }
 
 func (ht *Array) Count() int {
 	var num int
@@ -44,7 +37,7 @@ func (ht *Array) Count() int {
 // 重新计算有效元素个数(与 elementsCount 不同，它需要过滤 IS_INDIRECT 元素为 IS_UNDEF 的情况)
 func (ht *Array) recalcElements() int {
 	var num = 0
-	ht.eachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
+	ht.EachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
 		num++
 	})
 	return num
@@ -59,11 +52,36 @@ func (ht *Array) First() (key ArrayKey, val *Zval) {
 	return
 }
 
+func (ht *Array) FirstIndirect() (key ArrayKey, val *Zval) {
+	for _, p := range ht.data {
+		v := p.GetVal()
+		if v.IsIndirect() {
+			v = v.Indirect()
+		}
+		if v.IsUndef() {
+			continue
+		}
+		return p.GetArrayKey(), v
+	}
+	return
+}
+
 /**
  * Sort
  */
 type ArrayCompareFunc func(p1 *Bucket, p2 *Bucket) bool
 type ArrayCompareExFunc func(p1 *Bucket, p2 *Bucket) int
+type ArrayLessComparer func(p1, p2 ArrayPair) bool
+type ArrayComparer func(p1, p2 ArrayPair) int
+
+func (ht *Array) SortEx(comparer ArrayComparer, renumber bool) {
+	ht.Sort(func(b1 *Bucket, b2 *Bucket) bool {
+		p1 := MakeArrayPair(b1.GetArrayKey(), b1.GetVal())
+		p2 := MakeArrayPair(b2.GetArrayKey(), b2.GetVal())
+		ret := comparer(p1, p2)
+		return ret < 0
+	}, renumber)
+}
 
 func (ht *Array) Sort(comparer ArrayCompareFunc, renumber bool) {
 	ht.assertRc1()
@@ -72,8 +90,7 @@ func (ht *Array) Sort(comparer ArrayCompareFunc, renumber bool) {
 		return
 	}
 
-	ht.removeHolesForce()
-	ht.internalPointer = 0
+	ht.removeHolesAndCleanInternalPointer()
 
 	sort.SliceStable(ht.data, func(i, j int) bool {
 		return comparer(&ht.data[i], &ht.data[i])
@@ -108,8 +125,7 @@ func (ht *Array) SortCompatibleEx(sort_ SortFuncT) int {
 		return SUCCESS
 	}
 
-	ht.removeHolesForce()
-	ht.SetNInternalPointer(0)
+	ht.removeHolesAndCleanInternalPointer()
 
 	sortFunc(ht.data)
 
@@ -394,6 +410,14 @@ func (ht *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
 	}
 }
 
+func (ht *Array) Delete(key ArrayKey) bool {
+	if key.IsStrKey() {
+		return ht.KeyDelete(key.StrKey())
+	} else {
+		return ht.IndexDelete(key.IndexKey())
+	}
+}
+
 /**
  * each
  */
@@ -504,7 +528,7 @@ func (ht *Array) eachValidBucket(handler func(pos uint32, p *Bucket)) {
 		handler(uint32(i), p)
 	}
 }
-func (ht *Array) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
+func (ht *Array) EachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
 	for i, _ := range ht.data {
 		p := &ht.data[i]
 		data := p.GetVal()
@@ -611,40 +635,21 @@ func (ht *Array) copyDataAndHash(source *Array) {
 }
 
 // 移除 this.data 数据中的 holes, 返回是否移动 bucket
-func (ht *Array) removeHoles() bool {
+func (ht *Array) removeHoles() {
 	ht.assertWritable()
 
 	var newPos uint32 = 0
 
-	if ht.isWithoutHoles() {
-		return false
-	}
-
-	ht.eachValidBucket(func(pos uint32, p *Bucket) {
-		ht.moveBucket(pos, newPos)
-		newPos++
-	})
-
-	// 截取数据，记录有效元素数
-	ht.data = ht.data[:newPos]
-	ht.elementsCount = newPos
-
-	return true
-}
-
-// 移除 data 的 holes, 不考虑 internalPointer 和 Iterators 内的 pos 指针
-func (ht *Array) removeHolesForce() bool {
-	var newPos uint32 = 0
-
-	if ht.isWithoutHoles() {
-		return false
+	if len(ht.data) == int(ht.elementsCount) {
+		return
 	}
 
 	ht.eachValidBucket(func(pos uint32, p *Bucket) {
 		if newPos != pos {
-			// todo 考虑下实现细节的区别
-			//(&ht.data[newPos]).SetBy(&ht.data[pos])
 			ht.data[newPos] = ht.data[pos]
+			if ht.internalPointer == pos {
+				ht.internalPointer = newPos
+			}
 		}
 		newPos++
 	})
@@ -652,23 +657,11 @@ func (ht *Array) removeHolesForce() bool {
 	// 截取数据，记录有效元素数
 	ht.data = ht.data[:newPos]
 	ht.elementsCount = newPos
-
-	return true
 }
 
-// 清除 data 队尾无用数据
-func (ht *Array) removeInvalidTail() {
-	var dataSize = ht.DataSize()
-
-	// 从队尾依次判断是否为无效数据，若是则缩短
-	var newDataSize = dataSize
-	for newDataSize > 0 && !ht.data[newDataSize-1].IsValid() {
-		newDataSize--
-	}
-
-	// 若长度改变，调整 data
-	if newDataSize < dataSize {
-		ht.data = ht.data[:newDataSize]
-		ht.internalPointer = b.Min(ht.internalPointer, newDataSize)
-	}
+// 移除 data 的 holes, 不考虑 internalPointer 和 Iterators 内的 pos 指针
+func (ht *Array) removeHolesAndCleanInternalPointer() bool {
+	ht.removeHoles()
+	ht.internalPointer = 0
+	return true
 }

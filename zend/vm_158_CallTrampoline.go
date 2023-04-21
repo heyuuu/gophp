@@ -17,7 +17,6 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		var p *types.Zval = executeData.Arg(1)
 		var end *types.Zval = p + num_args
 		args = types.NewArray(num_args)
-		types.ZendHashRealInitPacked(args)
 		for {
 			fillScope := types.PackedFillStart(args)
 			for {

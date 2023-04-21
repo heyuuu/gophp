@@ -1006,14 +1006,13 @@ func ZendRebuildSymbolTable() *types.Array {
 		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
 			return symbol_table
 		}
-		symbol_table.Extend(ex.GetFunc().GetOpArray().GetLastVar())
 	} else {
 		ex.SetSymbolTable(types.NewArray(ex.GetFunc().GetOpArray().GetLastVar()))
 		symbol_table = ex.GetSymbolTable()
 		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
 			return symbol_table
 		}
-		types.ZendHashRealInitMixed(symbol_table)
+		//types.ZendHashRealInitMixed(symbol_table)
 	}
 	if ex.GetFunc().GetOpArray().GetLastVar() != 0 {
 		var str **types.String = ex.GetFunc().GetOpArray().GetVars()

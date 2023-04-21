@@ -14,8 +14,8 @@ type ArrayKey struct {
 	key   *string
 }
 
-func MakeStrKey(str string) ArrayKey  { return ArrayKey{0, &str} }
-func MakeIndexKey(index int) ArrayKey { return ArrayKey{index, nil} }
+func StrKey(str string) ArrayKey  { return ArrayKey{0, &str} }
+func IndexKey(index int) ArrayKey { return ArrayKey{index, nil} }
 
 func (this ArrayKey) IsStrKey() bool { return this.key != nil }
 func (this ArrayKey) IndexKey() int  { return this.index }
@@ -27,6 +27,20 @@ func (this ArrayKey) Keys() (index int, key string, isStrKey bool) {
 		return this.index, "", false
 	}
 }
+
+/**
+ * ArrayPair
+ */
+type ArrayPair struct {
+	key ArrayKey
+	val *Zval
+}
+
+func MakeArrayPair(key ArrayKey, val *Zval) ArrayPair {
+	return ArrayPair{key: key, val: val}
+}
+func (p ArrayPair) GetKey() ArrayKey { return p.key }
+func (p ArrayPair) GetVal() *Zval    { return p.val }
 
 /**
  * Bucket
@@ -43,12 +57,12 @@ func NewBucket(key ArrayKey, zval *Zval) *Bucket {
 }
 
 func NewStrKeyBucket(strKey string, zval *Zval) *Bucket {
-	var key = MakeStrKey(strKey)
+	var key = StrKey(strKey)
 	return NewBucket(key, zval)
 }
 
 func NewIndexBucket(indexKey int, zval *Zval) *Bucket {
-	var key = MakeIndexKey(indexKey)
+	var key = IndexKey(indexKey)
 	return NewBucket(key, zval)
 }
 
@@ -57,8 +71,8 @@ func (this *Bucket) StrKey() string            { return this.key.StrKey() }
 func (this *Bucket) IndexKey() int             { return this.key.IndexKey() }
 func (this *Bucket) Keys() (int, string, bool) { return this.key.Keys() }
 
-func (this *Bucket) SetStrKey(key string)  { this.key = MakeStrKey(key) }
-func (this *Bucket) SetIndexKey(index int) { this.key = MakeIndexKey(index) }
+func (this *Bucket) SetStrKey(key string)  { this.key = StrKey(key) }
+func (this *Bucket) SetIndexKey(index int) { this.key = IndexKey(index) }
 func (this *Bucket) GetArrayKey() ArrayKey { return this.key }
 
 func (this *Bucket) GetVal() *Zval     { return &this.val }
@@ -260,8 +274,17 @@ func (ht *Array) deleteBucket(pos uint32) {
 	p.MarkInvalid()
 
 	// 若删除队尾元素，尝试清除 data 队尾无用数据
-	if ht.DataSize()-1 == pos {
-		ht.removeInvalidTail()
+	dataSize := uint32(len(ht.data))
+	if pos == dataSize-1 {
+		newDataSize := dataSize
+		for newDataSize > 0 && !ht.data[newDataSize-1].IsValid() {
+			newDataSize--
+		}
+
+		ht.data = ht.data[:newDataSize]
+		if ht.internalPointer > newDataSize {
+			ht.internalPointer = newDataSize
+		}
 	}
 }
 
@@ -288,19 +311,6 @@ func (ht *Array) moveBucket(pos uint32, newPos uint32) {
 	(&ht.data[newPos]).CopyFrom(&ht.data[pos])
 	if ht.internalPointer == pos {
 		ht.internalPointer = newPos
-	}
-}
-
-// todo 一般情况无需主动扩展
-func (ht *Array) Extend(size uint32) {
-	ht.assertRc1()
-	if size > uint32(len(ht.data)) {
-		// 扩展数组 cap
-		newData := make([]Bucket, 0, size)
-		if len(ht.data) > 0 {
-			copy(newData, ht.data)
-		}
-		ht.data = newData
 	}
 }
 
@@ -338,8 +348,31 @@ func (ht *Array) assertWritable() { assert(ht.GetRefcount() == 1) }
 func (ht *Array) CopyFlags(arr *Array) { ht.flags = arr.flags }
 
 func (ht *Array) IsPacked() bool       { return ht.flags&HASH_FLAG_PACKED != 0 }
-func (ht *Array) MarkPacked()          { ht.flags |= HASH_FLAG_PACKED }
-func (ht *Array) UnmarkIsPacked()      { ht.flags &^= HASH_FLAG_PACKED }
 func (ht *Array) HasEmptyIndex() bool  { return ht.flags&HASH_FLAG_HAS_EMPTY_IND != 0 }
 func (ht *Array) MarkHasEmptyIndex()   { ht.flags |= HASH_FLAG_HAS_EMPTY_IND }
 func (ht *Array) UnmarkHasEmptyIndex() { ht.flags &^= HASH_FLAG_HAS_EMPTY_IND }
+
+func (ht *Array) Values() []*Zval {
+	var values = make([]*Zval, 0, ht.Len())
+	ht.Foreach(func(key ArrayKey, value *Zval) {
+		values = append(values, value)
+	})
+	return values
+}
+func (ht *Array) Pairs() []ArrayPair {
+	var pairs = make([]ArrayPair, 0, ht.Len())
+	ht.Foreach(func(key ArrayKey, value *Zval) {
+		pairs = append(pairs, MakeArrayPair(key, value))
+	})
+	return pairs
+}
+
+func (ht *Array) MapWithKey(mapper func(key ArrayKey, value *Zval) (ArrayKey, *Zval)) *Array {
+	// todo 考虑 rehash 等操作 或 对其他属性的处理
+	arr := NewArray(ht.Len())
+	ht.Foreach(func(key ArrayKey, value *Zval) {
+		newKey, newValue := mapper(key, value)
+		arr.Add(newKey, newValue)
+	})
+	return arr
+}

@@ -21,10 +21,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 	}
 
 	if result_size != 0 {
-		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().num_args
+		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().GetNumArgs()
 		ht = types.NewArray(result_size)
 		opline.Result().SetArray(ht)
-		types.ZendHashRealInitPacked(ht)
 		fillScope := types.PackedFillStart(ht)
 		var p *types.Zval
 		var q *types.Zval
@@ -91,7 +90,6 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().num_args
 		ht = types.NewArray(result_size)
 		opline.Result().SetArray(ht)
-		types.ZendHashRealInitPacked(ht)
 		fillScope := types.PackedFillStart(ht)
 		var p *types.Zval
 		var q *types.Zval
