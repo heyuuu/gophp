@@ -6,17 +6,18 @@ import (
 )
 
 type ZifInfo struct {
-	funcName   string
-	defName    string
-	name       string
-	aliasNames []string
-	minNumArgs int
-	maxNumArgs int
-	argInfos   []ArgInfo
-	returnInfo *ReturnInfo
-	quiet      bool
-	strict     bool
-	oldMode    bool
+	funcName    string
+	defName     string
+	name        string
+	aliasNames  []string
+	minNumArgs  int
+	maxNumArgs  int
+	postVarargs int
+	argInfos    []ArgInfo
+	returnInfo  *ReturnInfo
+	quiet       bool
+	strict      bool
+	oldMode     bool
 }
 
 type ArgInfo struct {
@@ -149,7 +150,12 @@ type parseMethod struct {
 
 var toZppParseMap map[ZppType]parseMethod
 
-func toZppParseMethodEx(typ ZppType) (string, []ast.Expr, bool) {
+func toZppParseMethodEx(typ ZppType, postVarargs int) (string, []ast.Expr, bool) {
+	// special case
+	if typ == ZppTypeVariadic && postVarargs > 0 {
+		return "ParseVariadicEx", []ast.Expr{f.IntLit(postVarargs)}, true
+	}
+
 	if toZppParseMap == nil {
 		toZppParseMap = make(map[ZppType]parseMethod)
 		for _, info := range zppInfos {
@@ -158,6 +164,7 @@ func toZppParseMethodEx(typ ZppType) (string, []ast.Expr, bool) {
 			}
 		}
 	}
+
 	if method, ok := toZppParseMap[typ]; ok {
 		return method.parser, method.args, true
 	}

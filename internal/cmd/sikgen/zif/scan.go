@@ -93,7 +93,7 @@ func parseZifInfo(funcDecl *ast.FuncDecl) (*ZifInfo, bool) {
 		log.Fatalf("Zif函数 %s 定义错误: %s", funcName, err.Error())
 	}
 	zifInfo.argInfos = argInfos
-	zifInfo.minNumArgs, zifInfo.maxNumArgs = calcNumArgs(argInfos)
+	zifInfo.minNumArgs, zifInfo.maxNumArgs, zifInfo.postVarargs = calcNumArgs(argInfos)
 
 	// 从返回类型获取信息
 	returnInfo, err := parseReturnInfo(funcDecl)
@@ -189,7 +189,7 @@ func parseArgInfos(funcDecl *ast.FuncDecl) ([]ArgInfo, error) {
 	hasRealParam := false
 	hasVarargs := false
 	hasOpt := false
-	for i, param := range params {
+	for _, param := range params {
 		paramName := param.Names[0].Name
 		paramTypeDesc := printNode(param.Type)
 		paramType, ok := toZppType(paramTypeDesc)
@@ -204,9 +204,6 @@ func parseArgInfos(funcDecl *ast.FuncDecl) ([]ArgInfo, error) {
 		case ZppTypeVariadic:
 			if hasVarargs {
 				return nil, errors.New("参数类型不合法, 不可有多个变长参数")
-			}
-			if i != len(params)-1 {
-				return nil, errors.New("参数类型不合法, 变长参数必须是最后一个参数")
 			}
 			hasRealParam = true
 			hasVarargs = true
@@ -257,9 +254,8 @@ func parseReturnInfo(funcDecl *ast.FuncDecl) (*ReturnInfo, error) {
 	return nil, errors.New("不支持此返回值类型组合: " + printNode(funcDecl.Type))
 }
 
-func calcNumArgs(argInfos []ArgInfo) (minNumArgs int, maxNumArgs int) {
-	minNumArgs, maxNumArgs, hasVararg := -1, 0, false
-outer:
+func calcNumArgs(argInfos []ArgInfo) (minNumArgs int, maxNumArgs int, postVarargs int) {
+	minNumArgs, maxNumArgs, postVarargs, hasVararg := -1, 0, 0, false
 	for _, info := range argInfos {
 		switch info.typ {
 		case ZppTypeEx, ZppTypeRet:
@@ -268,9 +264,11 @@ outer:
 			minNumArgs = maxNumArgs
 		case ZppTypeVariadic:
 			hasVararg = true
-			break outer
 		default:
 			maxNumArgs++
+			if hasVararg {
+				postVarargs++
+			}
 		}
 	}
 	if minNumArgs < 0 {
@@ -279,7 +277,7 @@ outer:
 	if hasVararg {
 		maxNumArgs = -1
 	}
-	return minNumArgs, maxNumArgs
+	return minNumArgs, maxNumArgs, postVarargs
 }
 
 func parseFlagInt(s string, errMsg string) int {

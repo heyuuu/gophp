@@ -145,7 +145,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 				continue
 			} else if argTyp == ZppTypeOpt {
 				stmts = append(stmts, f.ExprStmt(f.MethodCallExpr(fpIdent, "StartOptional", nil)))
-			} else if parseMethod, args, ok := toZppParseMethodEx(argTyp); ok {
+			} else if parseMethod, args, ok := toZppParseMethodEx(argTyp, zifInfo.postVarargs); ok {
 				stmts = append(stmts, f.AssignStmt(
 					f.Ident(info.name),
 					f.MethodCallExpr(fpIdent, parseMethod, args),
