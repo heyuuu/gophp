@@ -305,12 +305,12 @@ func PhpUsortEx(array *types.Zval, compareFunc types.ArrayComparer, renumber boo
 	return true
 }
 func ZifUsort(arg zpp.DerefArray, cmpFunction zpp.Callable) bool {
-	var cmp = arrayUserComparer(cmpFunction)
+	var cmp = arrayUserDataComparer(cmpFunction)
 	PhpUsortEx(arg, cmp, true)
 	return true
 }
 func ZifUasort(arg zpp.DerefArray, cmpFunction zpp.Callable) bool {
-	var cmp = arrayUserComparer(cmpFunction)
+	var cmp = arrayUserDataComparer(cmpFunction)
 	PhpUsortEx(arg, cmp, false)
 	return true
 }
@@ -4258,305 +4258,14 @@ func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 		}
 	}
 }
-func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, behavior int, data_compare_type int, key_compare_type int) {
-	var args *types.Zval = nil
-	var hash *types.Array
-	var arr_argc int
-	var i int
-	var c int
-	var idx uint32
-	var lists **types.Bucket
-	var list **types.Bucket
-	var ptrs ***types.Bucket
-	var p **types.Bucket
-	var req_args uint32
-	var param_spec *byte
-	var fci1 types.ZendFcallInfo
-	var fci2 types.ZendFcallInfo
-	var fci1_cache = zend.EmptyFcallInfoCache
-	var fci2_cache = zend.EmptyFcallInfoCache
-	var fci_key *types.ZendFcallInfo = nil
-	var fci_data *types.ZendFcallInfo
-	var fci_key_cache *types.ZendFcallInfoCache = nil
-	var fci_data_cache *types.ZendFcallInfoCache
-	var old_user_compare_fci types.ZendFcallInfo
-	var old_user_compare_fci_cache types.ZendFcallInfoCache
-	var diff_key_compare_func func(any, any) int
-	var diff_data_compare_func func(any, any) int
-	if behavior == DIFF_NORMAL {
-		diff_key_compare_func = PhpArrayKeyCompareString
-		if data_compare_type == DIFF_COMP_DATA_INTERNAL {
-
-			/* array_diff */
-
-			req_args = 2
-			param_spec = "+"
-			diff_data_compare_func = PhpArrayDataCompareString
-		} else if data_compare_type == DIFF_COMP_DATA_USER {
-
-			/* array_udiff */
-
-			req_args = 3
-			param_spec = "+f"
-			diff_data_compare_func = PhpArrayUserCompare
-		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "data_compare_type is %d. This should never happen. Please report as a bug", data_compare_type)
-			return
-		}
-		if executeData.NumArgs() < req_args {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
-			return
-		}
-		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache) == types.FAILURE {
-			return
-		}
-		fci_data = &fci1
-		fci_data_cache = &fci1_cache
-	} else if (behavior & DIFF_ASSOC) != 0 {
-
-		/* DIFF_KEY is subset of DIFF_ASSOC. When having the former
-		 * no comparison of the data is done (part of DIFF_ASSOC) */
-
-		if data_compare_type == DIFF_COMP_DATA_INTERNAL && key_compare_type == DIFF_COMP_KEY_INTERNAL {
-
-			/* array_diff_assoc() or array_diff_key() */
-
-			req_args = 2
-			param_spec = "+"
-			diff_key_compare_func = PhpArrayKeyCompareString
-			diff_data_compare_func = PhpArrayDataCompareString
-		} else if data_compare_type == DIFF_COMP_DATA_USER && key_compare_type == DIFF_COMP_KEY_INTERNAL {
-
-			/* array_udiff_assoc() */
-
-			req_args = 3
-			param_spec = "+f"
-			diff_key_compare_func = PhpArrayKeyCompareString
-			diff_data_compare_func = PhpArrayUserCompare
-			fci_data = &fci1
-			fci_data_cache = &fci1_cache
-		} else if data_compare_type == DIFF_COMP_DATA_INTERNAL && key_compare_type == DIFF_COMP_KEY_USER {
-
-			/* array_diff_uassoc() or array_diff_ukey() */
-
-			req_args = 3
-			param_spec = "+f"
-			diff_key_compare_func = PhpArrayUserKeyCompare
-			diff_data_compare_func = PhpArrayDataCompareString
-			fci_key = &fci1
-			fci_key_cache = &fci1_cache
-		} else if data_compare_type == DIFF_COMP_DATA_USER && key_compare_type == DIFF_COMP_KEY_USER {
-
-			/* array_udiff_uassoc() */
-
-			req_args = 4
-			param_spec = "+ff"
-			diff_key_compare_func = PhpArrayUserKeyCompare
-			diff_data_compare_func = PhpArrayUserCompare
-			fci_data = &fci1
-			fci_data_cache = &fci1_cache
-			fci_key = &fci2
-			fci_key_cache = &fci2_cache
-		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "data_compare_type is %d. key_compare_type is %d. This should never happen. Please report as a bug", data_compare_type, key_compare_type)
-			return
-		}
-		if executeData.NumArgs() < req_args {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
-			return
-		}
-		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache, &fci2, &fci2_cache) == types.FAILURE {
-			return
-		}
-	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "behavior is %d. This should never happen. Please report as a bug", behavior)
-		return
-	}
-	PHP_ARRAY_CMP_FUNC_BACKUP()
-
-	/* for each argument, create and sort list with pointers to the hash buckets */
-
-	lists = (**types.Bucket)(zend.SafeEmalloc(arr_argc, b.SizeOf("Bucket *"), 0))
-	ptrs = (**types.Bucket)(zend.SafeEmalloc(arr_argc, b.SizeOf("Bucket *"), 0))
-	if behavior == DIFF_NORMAL && data_compare_type == DIFF_COMP_DATA_USER {
-		BG__().user_compare_fci = *fci_data
-		BG__().user_compare_fci_cache = *fci_data_cache
-	} else if (behavior&DIFF_ASSOC) != 0 && key_compare_type == DIFF_COMP_KEY_USER {
-		BG__().user_compare_fci = *fci_key
-		BG__().user_compare_fci_cache = *fci_key_cache
-	}
-	for i = 0; i < arr_argc; i++ {
-		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-			arr_argc = i
-			goto out
-		}
-		hash = args[i].Array()
-		list = (*types.Bucket)(zend.Pemalloc((hash.Len() + 1) * b.SizeOf("Bucket")))
-		lists[i] = list
-		ptrs[i] = list
-		for idx = 0; idx < hash.GetNNumUsed(); idx++ {
-			p = hash.Bucket(idx)
-			if p.GetVal().IsUndef() {
-				continue
-			}
-			b.PostInc(&(*list)) = *p
-		}
-		list.GetVal().SetUndef()
-		if hash.Len() > 1 {
-			if behavior == DIFF_NORMAL {
-				zend.ZendSort(any(lists[i]), hash.Len(), b.SizeOf("Bucket"), diff_data_compare_func, types.SwapFuncT(types.ZendHashBucketSwap))
-			} else if (behavior & DIFF_ASSOC) != 0 {
-				zend.ZendSort(any(lists[i]), hash.Len(), b.SizeOf("Bucket"), diff_key_compare_func, types.SwapFuncT(types.ZendHashBucketSwap))
-			}
-		}
-	}
-
-	/* copy the argument array */
-
-	return_value.SetArray(types.ZendArrayDup(args[0].Array()))
-
-	/* go through the lists and look for values of ptr[0] that are not in the others */
-
-	for ptrs[0].GetVal().IsNotUndef() {
-		if (behavior&DIFF_ASSOC) != 0 && key_compare_type == DIFF_COMP_KEY_USER {
-			BG__().user_compare_fci = *fci_key
-			BG__().user_compare_fci_cache = *fci_key_cache
-		}
-		c = 1
-		for i = 1; i < arr_argc; i++ {
-			var ptr *types.Bucket = ptrs[i]
-			if behavior == DIFF_NORMAL {
-				for ptrs[i].GetVal().IsNotUndef() && 0 < b.Assign(&c, diff_data_compare_func(ptrs[0], ptrs[i])) {
-					ptrs[i]++
-				}
-			} else if (behavior & DIFF_ASSOC) != 0 {
-				for ptr.GetVal().IsNotUndef() && 0 != b.Assign(&c, diff_key_compare_func(ptrs[0], ptr)) {
-					ptr++
-				}
-			}
-			if c == 0 {
-				if behavior == DIFF_NORMAL {
-					if ptrs[i].GetVal().IsNotUndef() {
-						ptrs[i]++
-					}
-					break
-				} else if behavior == DIFF_ASSOC {
-
-					/* In this branch is execute only when DIFF_ASSOC. If behavior == DIFF_KEY
-					 * data comparison is not needed - skipped. */
-
-					if ptr.GetVal().IsNotUndef() {
-						if data_compare_type == DIFF_COMP_DATA_USER {
-							BG__().user_compare_fci = *fci_data
-							BG__().user_compare_fci_cache = *fci_data_cache
-						}
-						if diff_data_compare_func(ptrs[0], ptr) != 0 {
-
-							/* the data is not the same */
-
-							c = -1
-							if key_compare_type == DIFF_COMP_KEY_USER {
-								BG__().user_compare_fci = *fci_key
-								BG__().user_compare_fci_cache = *fci_key_cache
-							}
-						} else {
-							break
-						}
-					}
-
-					/* In this branch is execute only when DIFF_ASSOC. If behavior == DIFF_KEY
-					 * data comparison is not needed - skipped. */
-
-				} else if behavior == DIFF_KEY {
-
-					/* the behavior here differs from INTERSECT_KEY in php_intersect
-					 * since in the "diff" case we have to remove the entry from
-					 * return_value while when doing intersection the entry must not
-					 * be deleted. */
-
-					break
-
-					/* the behavior here differs from INTERSECT_KEY in php_intersect
-					 * since in the "diff" case we have to remove the entry from
-					 * return_value while when doing intersection the entry must not
-					 * be deleted. */
-
-				}
-			}
-		}
-		if c == 0 {
-
-			/* ptrs[0] in one of the other arguments */
-
-			for {
-				p = ptrs[0]
-				if p.GetKey() == nil {
-					types.ZendHashIndexDel(return_value.Array(), p.GetH())
-				} else {
-					types.ZendHashDel(return_value.Array(), p.GetKey().GetStr())
-				}
-				if b.PreInc(&ptrs[0]).val.IsUndef() {
-					goto out
-				}
-				if behavior == DIFF_NORMAL {
-					if diff_data_compare_func(ptrs[0]-1, ptrs[0]) != 0 {
-						break
-					}
-				} else if (behavior & DIFF_ASSOC) != 0 {
-
-					/* in this case no array_key_compare is needed */
-
-					break
-
-					/* in this case no array_key_compare is needed */
-
-				}
-			}
-
-			/* ptrs[0] in one of the other arguments */
-
-		} else {
-
-			/* ptrs[0] in none of the other arguments */
-
-			for {
-				if b.PreInc(&ptrs[0]).val.IsUndef() {
-					goto out
-				}
-				if behavior == DIFF_NORMAL {
-					if diff_data_compare_func(ptrs[0]-1, ptrs[0]) != 0 {
-						break
-					}
-				} else if (behavior & DIFF_ASSOC) != 0 {
-
-					/* in this case no array_key_compare is needed */
-
-					break
-
-					/* in this case no array_key_compare is needed */
-
-				}
-			}
-
-			/* ptrs[0] in none of the other arguments */
-
-		}
-	}
-out:
-	for i = 0; i < arr_argc; i++ {
-		hash = args[i].Array()
-		zend.Pefree(lists[i], hash.GetGcFlags()&types.IS_ARRAY_PERSISTENT)
-	}
-	PHP_ARRAY_CMP_FUNC_RESTORE()
-	zend.Efree(ptrs)
-	zend.Efree(lists)
-}
 func ZifArrayDiffKey(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
 	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_NONE)
 }
-func ZifArrayDiffUkey(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackKeyCompFunc *types.Zval) {
-	PhpArrayDiff(executeData, return_value, DIFF_KEY, DIFF_COMP_DATA_INTERNAL, DIFF_COMP_KEY_USER)
+
+//@zif 3,
+func ZifArrayDiffUkey(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
+	cmp := arrayUserKeyComparer(callbackKeyCompFunc),
+	return arrayDiffWrapper(arrays, cmp)
 }
 func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
 	var args []*types.Zval
@@ -4735,20 +4444,35 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 	}
 	exclude.Destroy()
 }
-func ZifArrayUdiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompFunc *types.Zval) {
-	PhpArrayDiff(executeData, return_value, DIFF_NORMAL, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_INTERNAL)
+
+//@zif -c 3,
+func ZifArrayUdiff(arrays []*types.Zval, callbackDataCompFunc zpp.Callable) (*types.Array, bool) {
+	cmp := arrayUserDataComparer(callbackDataCompFunc)
+	return arrayDiffWrapper(arrays, cmp)
 }
 func ZifArrayDiffAssoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
 	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_INTERNAL)
 }
-func ZifArrayDiffUassoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompFunc *types.Zval) {
-	PhpArrayDiff(executeData, return_value, DIFF_ASSOC, DIFF_COMP_DATA_INTERNAL, DIFF_COMP_KEY_USER)
+
+//@zif -c 3,
+func ZifArrayDiffUassoc(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
+	cmp := twiceComparer(
+		arrayUserKeyComparer(callbackKeyCompFunc),
+		valueComparer(zend.StringCompareFunction),
+	)
+	return arrayDiffWrapper(arrays, cmp)
 }
 func ZifArrayUdiffAssoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackKeyCompFunc *types.Zval) {
 	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_USER)
 }
-func ZifArrayUdiffUassoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompFunc *types.Zval, callbackKeyCompFunc *types.Zval) {
-	PhpArrayDiff(executeData, return_value, DIFF_ASSOC, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_USER)
+
+//@zif -c 4,
+func ZifArrayUdiffUassoc(arrays []*types.Zval, callbackDataCompFunc zpp.Callable, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
+	cmp := twiceComparer(
+		arrayUserKeyComparer(callbackKeyCompFunc),
+		arrayUserDataComparer(callbackDataCompFunc),
+	)
+	return arrayDiffWrapper(arrays, cmp)
 }
 
 //@zif -c 1,

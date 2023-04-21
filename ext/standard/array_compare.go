@@ -3,10 +3,13 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -24,6 +27,24 @@ func valueComparer(comparer func(v1, v2 *types.Zval) int) types.ArrayComparer {
 		return comparer(v1, v2)
 	}
 }
+
+func keyComparer(comparer func(v1, v2 types.ArrayKey) int) types.ArrayComparer {
+	return func(p1, p2 types.ArrayPair) int {
+		return comparer(p1.GetKey(), p2.GetKey())
+	}
+}
+
+func twiceComparer(compare1 types.ArrayComparer, compare2 types.ArrayComparer) types.ArrayComparer {
+	return func(p1, p2 types.ArrayPair) int {
+		c := compare1(p1, p2)
+		if c != 0 {
+			return c
+		}
+
+		return compare2(p1, p2)
+	}
+}
+
 func arrayNaturalGeneralCompare(v1, v2 *types.Zval) int {
 	str1 := zend.ZvalGetStrVal(v1)
 	str2 := zend.ZvalGetStrVal(v2)
@@ -72,12 +93,6 @@ func phpGetDataCompareFunc(sortType zend.ZendLong, reverse bool) types.ArrayComp
 		comparer = reserveComparer(comparer)
 	}
 	return comparer
-}
-
-func keyComparer(comparer func(k1, k2 types.ArrayKey) int) types.ArrayComparer {
-	return func(p1, p2 types.ArrayPair) int {
-		return comparer(p1.GetKey(), p2.GetKey())
-	}
 }
 
 func arrayKeyToDouble(k types.ArrayKey) float64 {
@@ -175,7 +190,7 @@ func PhpGetKeyCompareFunc(sortType zend.ZendLong, reverse bool) types.ArrayCompa
 	return comparer
 }
 
-func arrayUserComparer(cmpFunction zpp.Callable) types.ArrayComparer {
+func arrayUserDataComparer(cmpFunction zpp.Callable) types.ArrayComparer {
 	return func(p1, p2 types.ArrayPair) int {
 		arg1 := p1.GetVal()
 		arg2 := p2.GetVal()
@@ -199,4 +214,60 @@ func arrayUserKeyComparer(cmpFunction zpp.Callable) types.ArrayComparer {
 			return 0
 		}
 	}
+}
+
+func sortPairs(pairs []types.ArrayPair, cmp types.ArrayComparer) {
+	sort.Slice(pairs, func(i, j int) bool {
+		return cmp(pairs[i], pairs[j]) < 0
+	})
+}
+
+func arrayDiffWrapper(args []*types.Zval, cmp types.ArrayComparer) (*types.Array, bool) {
+	var arrays []*types.Array
+	for i, arg := range args {
+		if !arg.IsArray() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
+			return nil, false
+		}
+		arrays[i] = arg.Array()
+	}
+	return arrayDiff(arrays[0], arrays[1:], cmp), true
+}
+
+func arrayDiff(array *types.Array, arrays []*types.Array, cmp types.ArrayComparer) *types.Array {
+	retArr := types.ZendArrayDup(array)
+	if len(arrays) == 0 {
+		return retArr
+	}
+
+	// 获取基准键值对，并排序
+	basePairs := array.Pairs()
+	sortPairs(basePairs, cmp)
+
+	// 获取diff键值对，并排序
+	diffPairCount := 0
+	for _, array := range arrays {
+		diffPairCount += array.Len()
+	}
+	diffPairs := make([]types.ArrayPair, diffPairCount)
+	for _, array := range arrays {
+		diffPairs = append(diffPairs, array.Pairs()...)
+	}
+	sortPairs(diffPairs, cmp)
+
+	// diff
+	for len(basePairs) > 0 && len(diffPairs) > 0 {
+		c := cmp(basePairs[0], diffPairs[0])
+		if c == 0 {
+			retArr.Delete(basePairs[0].GetKey())
+		}
+		if c <= 0 {
+			basePairs = basePairs[1:]
+		}
+		if c >= 0 {
+			diffPairs = diffPairs[1:]
+		}
+	}
+
+	return retArr
 }

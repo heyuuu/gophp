@@ -760,7 +760,7 @@ var DefZifArrayUdiff = def.DefFunc("array_udiff", 3, 3, []def.ArgInfo{{Name: "ar
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUdiff(executeData, returnValue, arr1, arr2, callback_data_comp_func)
+	ZifArrayUdiff(arr1, arr2, callback_data_comp_func)
 })
 
 // generate by ZifArrayDiffAssoc
