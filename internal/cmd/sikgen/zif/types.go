@@ -64,6 +64,8 @@ const (
 	ZppTypeArrayOrObject
 	ZppTypeClass
 	ZppTypeObject
+	ZppTypeResource
+	ZppTypeCallable
 	ZppTypeZval
 	ZppTypeZvalDeref
 	ZppTypeVariadic
@@ -77,6 +79,7 @@ const (
 	// ref
 	ZppTypeRefZval
 	ZppTypeRefArray
+	ZppTypeDerefArray
 	ZppTypeRefVariadic
 )
 
@@ -103,6 +106,8 @@ var zppInfos = []struct {
 	{ZppTypeArrayOrObject, "zpp.ArrayOrObject", "ParseArrayOrObject", nil},
 	{ZppTypeClass, "zpp.Class", "ParseClass", nil},
 	{ZppTypeObject, "zpp.Object", "ParseObject", nil},
+	{ZppTypeResource, "zpp.Resource", "ParseResource", nil},
+	{ZppTypeCallable, "zpp.Callable", "ParseCallable", nil},
 	{ZppTypeZval, "*types.Zval", "ParseZval", nil},
 	{ZppTypeZvalDeref, "zpp.ZvalDeref", "ParseZvalDeref", nil},
 	{ZppTypeVariadic, "[]*types.Zval", "ParseVariadic", nil},
@@ -116,6 +121,7 @@ var zppInfos = []struct {
 	// ref type
 	{ZppTypeRefZval, "zpp.RefZval", "ParseZvalEx", []ast.Expr{f.False(), f.True()}},
 	{ZppTypeRefArray, "zpp.RefArray", "ParseArrayEx", []ast.Expr{f.False(), f.True()}},
+	{ZppTypeDerefArray, "zpp.DerefArray", "ParseArrayEx2", []ast.Expr{f.False(), f.True(), f.False()}},
 	{ZppTypeRefVariadic, "[]zpp.RefZval", "ParseVariadic", nil},
 }
 

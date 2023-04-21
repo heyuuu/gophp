@@ -23,23 +23,26 @@ func _() {
 	_ = x[ZppTypeArrayOrObject-13]
 	_ = x[ZppTypeClass-14]
 	_ = x[ZppTypeObject-15]
-	_ = x[ZppTypeZval-16]
-	_ = x[ZppTypeZvalDeref-17]
-	_ = x[ZppTypeVariadic-18]
-	_ = x[ZppTypeBoolNullable-19]
-	_ = x[ZppTypeLongNullable-20]
-	_ = x[ZppTypeStrictLongNullable-21]
-	_ = x[ZppTypeDoubleNullable-22]
-	_ = x[ZppTypeStringNullable-23]
-	_ = x[ZppTypePathNullable-24]
-	_ = x[ZppTypeRefZval-25]
-	_ = x[ZppTypeRefArray-26]
-	_ = x[ZppTypeRefVariadic-27]
+	_ = x[ZppTypeResource-16]
+	_ = x[ZppTypeCallable-17]
+	_ = x[ZppTypeZval-18]
+	_ = x[ZppTypeZvalDeref-19]
+	_ = x[ZppTypeVariadic-20]
+	_ = x[ZppTypeBoolNullable-21]
+	_ = x[ZppTypeLongNullable-22]
+	_ = x[ZppTypeStrictLongNullable-23]
+	_ = x[ZppTypeDoubleNullable-24]
+	_ = x[ZppTypeStringNullable-25]
+	_ = x[ZppTypePathNullable-26]
+	_ = x[ZppTypeRefZval-27]
+	_ = x[ZppTypeRefArray-28]
+	_ = x[ZppTypeDerefArray-29]
+	_ = x[ZppTypeRefVariadic-30]
 }
 
-const _ZppType_name = "ZppTypeExZppTypeRetZppTypeOptZppTypeBoolZppTypeLongZppTypeStrictLongZppTypeDoubleZppTypeStringZppTypePathZppTypeArrayHtZppTypeArrayOrObjectHtZppTypeArrayZppTypeArrayOrObjectZppTypeClassZppTypeObjectZppTypeZvalZppTypeZvalDerefZppTypeVariadicZppTypeBoolNullableZppTypeLongNullableZppTypeStrictLongNullableZppTypeDoubleNullableZppTypeStringNullableZppTypePathNullableZppTypeRefZvalZppTypeRefArrayZppTypeRefVariadic"
+const _ZppType_name = "ZppTypeExZppTypeRetZppTypeOptZppTypeBoolZppTypeLongZppTypeStrictLongZppTypeDoubleZppTypeStringZppTypePathZppTypeArrayHtZppTypeArrayOrObjectHtZppTypeArrayZppTypeArrayOrObjectZppTypeClassZppTypeObjectZppTypeResourceZppTypeCallableZppTypeZvalZppTypeZvalDerefZppTypeVariadicZppTypeBoolNullableZppTypeLongNullableZppTypeStrictLongNullableZppTypeDoubleNullableZppTypeStringNullableZppTypePathNullableZppTypeRefZvalZppTypeRefArrayZppTypeDerefArrayZppTypeRefVariadic"
 
-var _ZppType_index = [...]uint16{0, 9, 19, 29, 40, 51, 68, 81, 94, 105, 119, 141, 153, 173, 185, 198, 209, 225, 240, 259, 278, 303, 324, 345, 364, 378, 393, 411}
+var _ZppType_index = [...]uint16{0, 9, 19, 29, 40, 51, 68, 81, 94, 105, 119, 141, 153, 173, 185, 198, 213, 228, 239, 255, 270, 289, 308, 333, 354, 375, 394, 408, 423, 440, 458}
 
 func (i ZppType) String() string {
 	i -= 1

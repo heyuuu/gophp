@@ -6,6 +6,7 @@ import (
 	"go/ast"
 	"go/token"
 	"log"
+	"strings"
 )
 
 var (
@@ -68,7 +69,7 @@ func genDefFuncArgs(zifInfo *ZifInfo, phpFuncName string) []ast.Expr {
 		default:
 			realArgInfos = append(realArgInfos, &ast.CompositeLit{
 				Elts: []ast.Expr{
-					f.KeyValue("Name", f.StrLit(argInfo.name)),
+					f.KeyValue("Name", f.StrLit(strings.Trim(argInfo.name, "_"))),
 				},
 			})
 		}
