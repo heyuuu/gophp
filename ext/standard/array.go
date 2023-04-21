@@ -10,7 +10,6 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
 	"sort"
-	"strconv"
 )
 
 /**
@@ -26,22 +25,6 @@ const EXTR_IF_EXISTS = 6
 const EXTR_REFS = 0x100
 const CASE_LOWER = 0
 const CASE_UPPER = 1
-const DIFF_NORMAL = 1
-const DIFF_KEY = 2
-const DIFF_ASSOC = 6
-const DIFF_COMP_DATA_NONE = -1
-const DIFF_COMP_DATA_INTERNAL = 0
-const DIFF_COMP_DATA_USER = 1
-const DIFF_COMP_KEY_INTERNAL = 0
-const DIFF_COMP_KEY_USER = 1
-const INTERSECT_NORMAL = 1
-const INTERSECT_KEY = 2
-const INTERSECT_ASSOC = 6
-const INTERSECT_COMP_DATA_NONE = -1
-const INTERSECT_COMP_DATA_INTERNAL = 0
-const INTERSECT_COMP_DATA_USER = 1
-const INTERSECT_COMP_KEY_INTERNAL = 0
-const INTERSECT_COMP_KEY_USER = 1
 
 const MULTISORT_ORDER = 0
 const MULTISORT_TYPE = 1
@@ -103,41 +86,11 @@ func ZmStartupArray(type_ int, module_number int) int {
 }
 func ZmShutdownArray(type_ int, module_number int) int { return types.SUCCESS }
 
-func _bucketKeyToString(p *types.Bucket) string {
-	if p.IsStrKey() {
-		return p.StrKey()
-	} else {
-		return strconv.Itoa(p.IndexKey())
-	}
-}
-
-func PhpArrayKeyCompareString(p1 *types.Bucket, p2 *types.Bucket) int {
-	str1 := _bucketKeyToString(p1)
-	str2 := _bucketKeyToString(p2)
-	return zend.ZendBinaryStrcmp(str1, str2)
-}
-func PhpArrayDataCompare(p1 *types.Bucket, p2 *types.Bucket) int {
-	var result types.Zval
-	v1 := p1.GetVal().DeIndirect()
-	v2 := p2.GetVal().DeIndirect()
-	if zend.CompareFunction(&result, v1, v2) == types.FAILURE {
-		return 0
-	}
-	b.Assert(result.IsType(types.IS_LONG))
-	return zend.ZEND_NORMALIZE_BOOL(result.Long())
-}
-func PhpArrayDataCompareString(p1 *types.Bucket, p2 *types.Bucket) int {
-	v1 := p1.GetVal().DeIndirect()
-	v2 := p2.GetVal().DeIndirect()
-	return zend.StringCompareFunction(v1, v2)
-}
-
 func ZifKrsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := PhpGetKeyCompareFunc(sortFlags, true)
 	arg.Array().Sort(cmp, false)
 	return true
 }
-
 func ZifKsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := PhpGetKeyCompareFunc(sortFlags, false)
 	arg.Array().Sort(cmp, false)
@@ -246,43 +199,8 @@ func ZifRsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	arg.Array().Sort(cmp, true)
 	return true
 }
-func PhpArrayUserCompare(a *types.Bucket, b *types.Bucket) int {
-	var f *types.Bucket
-	var s *types.Bucket
-	var args []types.Zval
-	var retval types.Zval
-	f = (*types.Bucket)(a)
-	s = (*types.Bucket)(b)
-	types.ZVAL_COPY(&args[0], f.GetVal())
-	types.ZVAL_COPY(&args[1], s.GetVal())
-	BG__().user_compare_fci.param_count = 2
-	BG__().user_compare_fci.params = args
-	BG__().user_compare_fci.retval = &retval
-	BG__().user_compare_fci.no_separation = 0
-	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
-		var ret = zend.ZvalGetLong(&retval)
-		// zend.ZvalPtrDtor(&retval)
-		// zend.ZvalPtrDtor(&args[1])
-		// zend.ZvalPtrDtor(&args[0])
-		return zend.ZEND_NORMALIZE_BOOL(ret)
-	} else {
-		// zend.ZvalPtrDtor(&args[1])
-		// zend.ZvalPtrDtor(&args[0])
-		return 0
-	}
-}
-func PHP_ARRAY_CMP_FUNC_BACKUP() {
-	old_user_compare_fci = BG__().user_compare_fci
-	old_user_compare_fci_cache = BG__().user_compare_fci_cache
-	BG__().user_compare_fci_cache = zend.EmptyFcallInfoCache
-}
-func PHP_ARRAY_CMP_FUNC_RESTORE() {
-	zend.ZendReleaseFcallInfoCache(&(BG__().user_compare_fci_cache))
-	BG__().user_compare_fci = old_user_compare_fci
-	BG__().user_compare_fci_cache = old_user_compare_fci_cache
-}
 
-func PhpUsortEx(array *types.Zval, compareFunc types.ArrayComparer, renumber bool) bool {
+func phpUsortEx(array *types.Zval, compareFunc types.ArrayComparer, renumber bool) bool {
 	arr := array.Array()
 	if arr.Len() > 0 {
 		/* Copy array, so the in-place modifications will not be visible to the callback function */
@@ -294,49 +212,17 @@ func PhpUsortEx(array *types.Zval, compareFunc types.ArrayComparer, renumber boo
 }
 func ZifUsort(arg zpp.DerefArray, cmpFunction zpp.Callable) bool {
 	var cmp = arrayUserDataComparer(cmpFunction)
-	PhpUsortEx(arg, cmp, true)
+	phpUsortEx(arg, cmp, true)
 	return true
 }
 func ZifUasort(arg zpp.DerefArray, cmpFunction zpp.Callable) bool {
 	var cmp = arrayUserDataComparer(cmpFunction)
-	PhpUsortEx(arg, cmp, false)
+	phpUsortEx(arg, cmp, false)
 	return true
-}
-func PhpArrayUserKeyCompare(a *types.Bucket, b *types.Bucket) int {
-	var f *types.Bucket
-	var s *types.Bucket
-	var args []types.Zval
-	var retval types.Zval
-	var result zend.ZendLong
-	f = (*types.Bucket)(a)
-	s = (*types.Bucket)(b)
-	if f.GetKey() == nil {
-		args[0].SetLong(f.GetH())
-	} else {
-		args[0].SetStringCopy(f.GetKey())
-	}
-	if s.GetKey() == nil {
-		args[1].SetLong(s.GetH())
-	} else {
-		args[1].SetStringCopy(s.GetKey())
-	}
-	BG__().user_compare_fci.param_count = 2
-	BG__().user_compare_fci.params = args
-	BG__().user_compare_fci.retval = &retval
-	BG__().user_compare_fci.no_separation = 0
-	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
-		result = zend.ZvalGetLong(&retval)
-		// zend.ZvalPtrDtor(&retval)
-	} else {
-		result = 0
-	}
-	// zend.ZvalPtrDtor(&args[0])
-	// zend.ZvalPtrDtor(&args[1])
-	return zend.ZEND_NORMALIZE_BOOL(result)
 }
 func ZifUksort(arg zpp.DerefArray, cmpFunction zpp.Callable) bool {
 	var cmp = arrayUserKeyComparer(cmpFunction)
-	PhpUsortEx(arg, cmp, false)
+	phpUsortEx(arg, cmp, false)
 	return true
 }
 func ZifEnd(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval) {
@@ -471,111 +357,56 @@ func ZifKey(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
 	}
 	types.ZendHashGetCurrentKeyZval(array, return_value)
 }
-func ZifMin(executeData zpp.Ex, return_value zpp.Ret, args []*types.Zval) {
-	var argc int
-	var args *types.Zval = nil
-	for {
-		var _flags = 0
-		var _min_num_args = 1
-		var _max_num_args = -1
 
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			args, argc = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-
+func ZifMin(arg *types.Zval, args []*types.Zval) *types.Zval {
 	/* mixed min ( array $values ) */
-
-	if argc == 1 {
-		var result *types.Zval
-		if args[0].GetType() != types.IS_ARRAY {
+	if len(args) == 0 {
+		if !arg.IsArray() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "When only one parameter is given, it must be an array")
-			return_value.SetNull()
+			return types.NewZvalNull()
 		} else {
-			if b.Assign(&result, types.ZendHashMinmax(args[0].Array(), PhpArrayDataCompare, 0)) != nil {
-				types.ZVAL_COPY_DEREF(return_value, result)
+			result := arg.Array().Min(arrayDataComparer(arrayDataCompare))
+			if result != nil {
+				return result.GetVal()
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Array must contain at least one element")
-				return_value.SetFalse()
+				return types.NewZvalBool(false)
 			}
 		}
 	} else {
-
-		/* mixed min ( mixed $value1 , mixed $value2 [, mixed $value3... ] ) */
-
-		var min *types.Zval
-		var result types.Zval
-		var i int
-		min = &args[0]
-		for i = 1; i < argc; i++ {
-			zend.IsSmallerFunction(&result, &args[i], min)
-			if result.IsType(types.IS_TRUE) {
-				min = &args[i]
+		result := arg
+		for _, value := range args {
+			if arrayDataCompare(result, value) > 0 {
+				result = value
 			}
 		}
-		types.ZVAL_COPY(return_value, min)
+		return result
 	}
-
-	/* mixed min ( array $values ) */
 }
-func ZifMax(executeData zpp.Ex, return_value zpp.Ret, args []*types.Zval) {
-	var args *types.Zval = nil
-	var argc int
-	for {
-		var _flags = 0
-		var _min_num_args = 1
-		var _max_num_args = -1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			args, argc = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-
+func ZifMax(arg *types.Zval, args []*types.Zval) *types.Zval {
 	/* mixed max ( array $values ) */
-
-	if argc == 1 {
-		var result *types.Zval
-		if args[0].GetType() != types.IS_ARRAY {
+	if len(args) == 0 {
+		if !arg.IsArray() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "When only one parameter is given, it must be an array")
-			return_value.SetNull()
+			return types.NewZvalNull()
 		} else {
-			if b.Assign(&result, types.ZendHashMinmax(args[0].Array(), PhpArrayDataCompare, 1)) != nil {
-				types.ZVAL_COPY_DEREF(return_value, result)
+			result := arg.Array().Max(arrayDataComparer(arrayDataCompare))
+			if result != nil {
+				return result.GetVal()
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Array must contain at least one element")
-				return_value.SetFalse()
+				return types.NewZvalBool(false)
 			}
 		}
 	} else {
-
-		/* mixed max ( mixed $value1 , mixed $value2 [, mixed $value3... ] ) */
-
-		var max *types.Zval
-		var result types.Zval
-		var i int
-		max = &args[0]
-		for i = 1; i < argc; i++ {
-			zend.IsSmallerOrEqualFunction(&result, &args[i], max)
-			if result.IsType(types.IS_FALSE) {
-				max = &args[i]
+		result := arg
+		for _, value := range args {
+			if arrayDataCompare(result, value) < 0 {
+				result = value
 			}
 		}
-		types.ZVAL_COPY(return_value, max)
+		return result
 	}
-
-	/* mixed max ( array $values ) */
 }
 func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 	var args []types.Zval
@@ -3760,120 +3591,32 @@ func ZvalUserCompare(a *types.Zval, b *types.Zval) int {
 		return 0
 	}
 }
-func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *types.Zval, data_compare_type int) {
-	var idx uint32
-	var p *types.Bucket
-	var argc int
-	var i int
-	var args *types.Zval
-	var intersect_data_compare_func func(*types.Zval, *types.Zval) int = nil
-	var ok types.ZendBool
-	var val *types.Zval
-	var data *types.Zval
-	var req_args int
-	var param_spec *byte
 
-	/* Get the argument count */
-
-	argc = executeData.NumArgs()
-	if data_compare_type == INTERSECT_COMP_DATA_USER {
-
-		/* INTERSECT_COMP_DATA_USER - array_uintersect_assoc() */
-
-		req_args = 3
-		param_spec = "+f"
-		intersect_data_compare_func = ZvalUserCompare
-	} else {
-
-		/*     INTERSECT_COMP_DATA_NONE - array_intersect_key()
-		       INTERSECT_COMP_DATA_INTERNAL - array_intersect_assoc() */
-
-		req_args = 2
-		param_spec = "+"
-		if data_compare_type == INTERSECT_COMP_DATA_INTERNAL {
-			intersect_data_compare_func = ZvalCompare
-		}
-	}
-	if argc < req_args {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, argc)
-		return
-	}
-	if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &argc, &(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.FAILURE {
-		return
-	}
-	for i = 0; i < argc; i++ {
-		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-			return_value.SetNull()
-			return
-		}
-	}
-	zend.ArrayInit(return_value)
-	for idx = 0; idx < args[0].Array().GetNNumUsed(); idx++ {
-		p = args[0].Array().Bucket(idx)
-		val = p.GetVal()
-		if val.IsUndef() {
-			continue
-		}
-		if val.IsIndirect() {
-			val = val.Indirect()
-			if val.IsUndef() {
-				continue
-			}
-		}
-		if val.IsReference() && val.GetRefcount() == 1 {
-			val = types.Z_REFVAL_P(val)
-		}
-		if p.GetKey() == nil {
-			ok = 1
-			for i = 1; i < argc; i++ {
-				if b.Assign(&data, args[i].Array().IndexFindH(p.GetH())) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
-					ok = 0
-					break
-				}
-			}
-			if ok != 0 {
-				// val.TryAddRefcount()
-				return_value.Array().IndexUpdate(p.GetH(), val)
-			}
-		} else {
-			ok = 1
-			for i = 1; i < argc; i++ {
-				if b.Assign(&data, types.ZendHashFindInd(args[i].Array(), p.GetKey().GetStr())) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
-					ok = 0
-					break
-				}
-			}
-			if ok != 0 {
-				// val.TryAddRefcount()
-				return_value.Array().KeyUpdate(p.GetKey().GetStr(), val)
-			}
-		}
-	}
-}
-func ZifArrayIntersectKey(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
-	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_NONE)
+//@zif -c 2,
+func ZifArrayIntersectKey(arrays []*types.Zval) (*types.Array, bool) {
+	return arrayIntersectKeyWrapper(arrays, nil)
 }
 
-//@zif c=3,
+//@zif -c=3,
 func ZifArrayIntersectUkey(arrays []*types.Zval, callbackKeyCompareFunc zpp.Callable) (*types.Array, bool) {
 	cmp := arrayUserKeyComparer(callbackKeyCompareFunc)
 	return arrayIntersectWrapper(arrays, cmp)
 }
 
-//@zif c=2,
+//@zif -c=2,
 func ZifArrayIntersect(arrays []*types.Zval) (*types.Array, bool) {
 	cmp := arrayDataComparer(zend.StringCompareFunction)
 	return arrayIntersectWrapper(arrays, cmp)
 }
 
-//@zif c=3,
+//@zif -c=3,
 func ZifArrayUintersect(arrays []*types.Zval, callbackDataCompareFunc zpp.Callable) (*types.Array, bool) {
 	cmp := arrayUserDataComparer(callbackDataCompareFunc)
 	return arrayIntersectWrapper(arrays, cmp)
 }
-func ZifArrayIntersectAssoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
-	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_INTERNAL)
+func ZifArrayIntersectAssoc(arrays []*types.Zval) (*types.Array, bool) {
+	cmp := ZvalCompare
+	return arrayIntersectKeyWrapper(arrays, cmp)
 }
 func ZifArrayIntersectUassoc(arrays []*types.Zval, callbackKeyCompareFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
@@ -3882,11 +3625,12 @@ func ZifArrayIntersectUassoc(arrays []*types.Zval, callbackKeyCompareFunc zpp.Ca
 	)
 	return arrayIntersectWrapper(arrays, cmp)
 }
-func ZifArrayUintersectAssoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompareFunc *types.Zval) {
-	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_USER)
+func ZifArrayUintersectAssoc(arrays []*types.Zval, callbackDataCompareFunc zpp.Callable) (*types.Array, bool) {
+	cmp := arrayUserZvalComparer(callbackDataCompareFunc)
+	return arrayIntersectKeyWrapper(arrays, cmp)
 }
 
-//@zif c=4,
+//@zif -c=4,
 func ZifArrayUintersectUassoc(arrays []*types.Zval, callbackDataCompareFunc zpp.Callable, callbackKeyCompareFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
 		arrayUserKeyComparer(callbackKeyCompareFunc),
@@ -3894,96 +3638,13 @@ func ZifArrayUintersectUassoc(arrays []*types.Zval, callbackDataCompareFunc zpp.
 	)
 	return arrayIntersectWrapper(arrays, cmp)
 }
-func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval, data_compare_type int) {
-	var idx uint32
-	var p *types.Bucket
-	var argc int
-	var i int
-	var args *types.Zval
-	var diff_data_compare_func func(*types.Zval, *types.Zval) int = nil
-	var ok types.ZendBool
-	var val *types.Zval
-	var data *types.Zval
 
-	/* Get the argument count */
-
-	argc = executeData.NumArgs()
-	if data_compare_type == DIFF_COMP_DATA_USER {
-		if argc < 3 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "at least 3 parameters are required, %d given", executeData.NumArgs())
-			return
-		}
-		if zend.ZendParseParameters(executeData.NumArgs(), "+f", &args, &argc, &(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.FAILURE {
-			return
-		}
-		diff_data_compare_func = ZvalUserCompare
-	} else {
-		if argc < 2 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "at least 2 parameters are required, %d given", executeData.NumArgs())
-			return
-		}
-		if zend.ZendParseParameters(executeData.NumArgs(), "+", &args, &argc) == types.FAILURE {
-			return
-		}
-		if data_compare_type == DIFF_COMP_DATA_INTERNAL {
-			diff_data_compare_func = ZvalCompare
-		}
-	}
-	for i = 0; i < argc; i++ {
-		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-			return_value.SetNull()
-			return
-		}
-	}
-	zend.ArrayInit(return_value)
-	for idx = 0; idx < args[0].Array().GetNNumUsed(); idx++ {
-		p = args[0].Array().Bucket(idx)
-		val = p.GetVal()
-		if val.IsUndef() {
-			continue
-		}
-		if val.IsIndirect() {
-			val = val.Indirect()
-			if val.IsUndef() {
-				continue
-			}
-		}
-		if val.IsReference() && val.GetRefcount() == 1 {
-			val = types.Z_REFVAL_P(val)
-		}
-		if p.GetKey() == nil {
-			ok = 1
-			for i = 1; i < argc; i++ {
-				if b.Assign(&data, args[i].Array().IndexFindH(p.GetH())) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
-					ok = 0
-					break
-				}
-			}
-			if ok != 0 {
-				// val.TryAddRefcount()
-				return_value.Array().IndexUpdate(p.GetH(), val)
-			}
-		} else {
-			ok = 1
-			for i = 1; i < argc; i++ {
-				if b.Assign(&data, types.ZendHashFindInd(args[i].Array(), p.GetKey().GetStr())) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
-					ok = 0
-					break
-				}
-			}
-			if ok != 0 {
-				// val.TryAddRefcount()
-				return_value.Array().KeyUpdate(p.GetKey().GetStr(), val)
-			}
-		}
-	}
-}
-func ZifArrayDiffKey(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
-	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_NONE)
+//@zif -c=2,
+func ZifArrayDiffKey(arrays []*types.Zval) (*types.Array, bool) {
+	return arrayDiffKeyWrapper(arrays, nil)
 }
 
-//@zif 3,
+//@zif -c=3,
 func ZifArrayDiffUkey(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := arrayUserKeyComparer(callbackKeyCompFunc)
 	return arrayDiffWrapper(arrays, cmp)
@@ -4166,16 +3827,19 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 	exclude.Destroy()
 }
 
-//@zif -c 3,
+//@zif -c=3,
 func ZifArrayUdiff(arrays []*types.Zval, callbackDataCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := arrayUserDataComparer(callbackDataCompFunc)
 	return arrayDiffWrapper(arrays, cmp)
 }
-func ZifArrayDiffAssoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
-	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_INTERNAL)
+
+//@zif -c=3,
+func ZifArrayDiffAssoc(arrays []*types.Zval) (*types.Array, bool) {
+	cmp := ZvalCompare
+	return arrayDiffKeyWrapper(arrays, cmp)
 }
 
-//@zif -c 3,
+//@zif -c=3,
 func ZifArrayDiffUassoc(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
 		arrayUserKeyComparer(callbackKeyCompFunc),
@@ -4183,11 +3847,14 @@ func ZifArrayDiffUassoc(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) 
 	)
 	return arrayDiffWrapper(arrays, cmp)
 }
-func ZifArrayUdiffAssoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackKeyCompFunc *types.Zval) {
-	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_USER)
+
+//@zif -c=2,
+func ZifArrayUdiffAssoc(arrays []*types.Zval, callbackDataCompFunc zpp.Callable) (*types.Array, bool) {
+	cmp := arrayUserZvalComparer(callbackDataCompFunc)
+	return arrayDiffKeyWrapper(arrays, cmp)
 }
 
-//@zif -c 4,
+//@zif -c=4,
 func ZifArrayUdiffUassoc(arrays []*types.Zval, callbackDataCompFunc zpp.Callable, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
 		arrayUserKeyComparer(callbackKeyCompFunc),
@@ -4196,7 +3863,7 @@ func ZifArrayUdiffUassoc(arrays []*types.Zval, callbackDataCompFunc zpp.Callable
 	return arrayDiffWrapper(arrays, cmp)
 }
 
-//@zif -c 1,
+//@zif -c=1,
 func ZifArrayMultisort(args []*types.Zval) bool {
 	var parseState [2]int = [...]int{0, 0}
 

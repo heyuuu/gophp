@@ -46,6 +46,9 @@ type ArrayPair struct {
 	val *Zval
 }
 
+func NewArrayPair(key ArrayKey, val *Zval) *ArrayPair {
+	return &ArrayPair{key: key, val: val}
+}
 func MakeArrayPair(key ArrayKey, val *Zval) ArrayPair {
 	return ArrayPair{key: key, val: val}
 }
@@ -480,6 +483,35 @@ func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
 
 	ht.Rehash()
 }
+func (ht *Array) Min(comparer ArrayComparer) *ArrayPair {
+	if ht.Len() == 0 {
+		return nil
+	}
+
+	var res *ArrayPair
+	ht.Foreach(func(key ArrayKey, value *Zval) {
+		pair := MakeArrayPair(key, value)
+		if res == nil || comparer(*res, pair) > 0 {
+			res = &pair
+		}
+	})
+
+	return res
+}
+func (ht *Array) Max(comparer ArrayComparer) *ArrayPair {
+	if ht.Len() == 0 {
+		return nil
+	}
+
+	var res *ArrayPair
+	ht.Foreach(func(key ArrayKey, value *Zval) {
+		pair := MakeArrayPair(key, value)
+		if res == nil || comparer(*res, pair) < 0 {
+			res = &pair
+		}
+	})
+	return res
+}
 
 /**
  * Clean && Destroy
@@ -725,6 +757,15 @@ func (ht *Array) KeyDeleteIndirect(key string) bool {
 /**
  * Add / Update by ArrayKey
  */
+
+func (ht *Array) Find(key ArrayKey) *Zval {
+	if key.IsStrKey() {
+		return ht.KeyFind(key.StrKey())
+	} else {
+		return ht.IndexFind(key.IndexKey())
+	}
+}
+
 func (ht *Array) Add(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return ht.KeyAdd(key.StrKey(), pData)

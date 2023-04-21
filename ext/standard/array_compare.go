@@ -14,6 +14,8 @@ import (
 	"strings"
 )
 
+type zvalComparer func(v1, v2 *types.Zval) int
+
 func reserveComparer(comparer types.ArrayComparer) types.ArrayComparer {
 	return func(p1, p2 types.ArrayPair) int {
 		return comparer(p2, p1)
@@ -203,6 +205,17 @@ func arrayUserDataComparer(cmpFunction zpp.Callable) types.ArrayComparer {
 	}
 }
 
+func arrayUserZvalComparer(cmpFunction zpp.Callable) zvalComparer {
+	return func(arg1, arg2 *types.Zval) int {
+		if retval, ok := cmpFunction.Call(arg1, arg2); ok && retval.IsNotUndef() {
+			var ret = zend.ZvalGetLong(retval)
+			return zend.ZEND_NORMALIZE_BOOL(ret)
+		} else {
+			return 0
+		}
+	}
+}
+
 func arrayUserKeyComparer(cmpFunction zpp.Callable) types.ArrayComparer {
 	return func(p1, p2 types.ArrayPair) int {
 		arg1 := p1.GetKey().ToZval()
@@ -271,6 +284,40 @@ func arrayDiff(array *types.Array, arrays []*types.Array, cmp types.ArrayCompare
 
 	return retArr
 }
+
+func arrayDiffKeyWrapper(args []*types.Zval, cmp zvalComparer) (*types.Array, bool) {
+	var arrays []*types.Array
+	for i, arg := range args {
+		if !arg.IsArray() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
+			return nil, false
+		}
+		arrays[i] = arg.Array()
+	}
+	return arrayDiffKey(arrays[0], arrays[1:], cmp), true
+}
+
+func arrayDiffKey(array *types.Array, arrays []*types.Array, dataComparer zvalComparer) *types.Array {
+	retArr := types.NewArray(0)
+	array.Foreach(func(key types.ArrayKey, val *types.Zval) {
+		if val.IsReference() && val.GetRefcount() == 1 {
+			val = types.Z_REFVAL_P(val)
+		}
+		keep := true
+		for _, cmpArray := range arrays {
+			if data := cmpArray.Find(key); data != nil && (dataComparer == nil || dataComparer(val, data) == 0) {
+				keep = false
+				break
+			}
+		}
+		if keep {
+			retArr.Update(key, val)
+		}
+	})
+
+	return retArr
+}
+
 func arrayIntersectWrapper(args []*types.Zval, cmp types.ArrayComparer) (*types.Array, bool) {
 	var arrays []*types.Array
 	for i, arg := range args {
@@ -284,9 +331,8 @@ func arrayIntersectWrapper(args []*types.Zval, cmp types.ArrayComparer) (*types.
 }
 
 func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayComparer) *types.Array {
-	retArr := types.ZendArrayDup(array)
 	if len(arrays) == 0 {
-		return retArr
+		return types.NewArray(0)
 	}
 
 	// 获取基准键值对，并排序
@@ -300,6 +346,7 @@ func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayCo
 		sortPairs(cmpPairsList[i], cmp)
 	}
 
+	retArr := types.NewArray(array.Len())
 	for _, pair := range basePairs {
 		keep := true // 标识会否保留此元素
 		for cmpIdx, cmpPairs := range cmpPairsList {
@@ -323,10 +370,42 @@ func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayCo
 				break
 			}
 		}
-		if !keep {
-			retArr.Delete(pair.GetKey())
+		if keep {
+			retArr.Update(pair.GetKey(), pair.GetVal())
 		}
 	}
 
+	return retArr
+}
+
+func arrayIntersectKeyWrapper(args []*types.Zval, cmp zvalComparer) (*types.Array, bool) {
+	var arrays []*types.Array
+	for i, arg := range args {
+		if !arg.IsArray() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
+			return nil, false
+		}
+		arrays[i] = arg.Array()
+	}
+	return arrayIntersectKey(arrays[0], arrays[1:], cmp), true
+}
+
+func arrayIntersectKey(array *types.Array, arrays []*types.Array, dataComparer zvalComparer) *types.Array {
+	retArr := types.NewArray(array.Len())
+	array.Foreach(func(key types.ArrayKey, val *types.Zval) {
+		if val.IsReference() && val.GetRefcount() == 1 {
+			val = types.Z_REFVAL_P(val)
+		}
+		keep := true
+		for _, cmpArray := range arrays {
+			if data := cmpArray.Find(key); data == nil || dataComparer != nil && dataComparer(val, data) != 0 {
+				keep = false
+				break
+			}
+		}
+		if keep {
+			retArr.Update(key, val)
+		}
+	})
 	return retArr
 }
