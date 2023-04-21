@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifStreamSocketPair
-var DefZifStreamSocketPair = def.DefFunc("stream_socket_pair", 3, 3, []def.ArgInfo{{Name: "domain"}, {Name: "type_"}, {Name: "protocol"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifStreamSocketPair = def.DefFunc("stream_socket_pair", 3, 3, []def.ArgInfo{{Name: "domain"}, {Name: "type"}, {Name: "protocol"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	domain := fp.ParseZval()
 	type_ := fp.ParseZval()
@@ -89,15 +89,20 @@ var DefZifStreamSocketSendto = def.DefFunc("stream_socket_sendto", 2, 4, []def.A
 // generate by ZifStreamSocketRecvfrom
 var DefZifStreamSocketRecvfrom = def.DefFunc("stream_socket_recvfrom", 2, 4, []def.ArgInfo{{Name: "stream"}, {Name: "amount"}, {Name: "flags"}, {Name: "remote_addr"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
-	stream := fp.ParseZval()
-	amount := fp.ParseZval()
+	stream_ := fp.ParseResource()
+	amount := fp.ParseLong()
 	fp.StartOptional()
-	flags := fp.ParseZval()
+	flags := fp.ParseLong()
 	remote_addr := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
 		return
 	}
-	ZifStreamSocketRecvfrom(executeData, returnValue, stream, amount, nil, flags, remote_addr)
+	ret, ok := ZifStreamSocketRecvfrom(executeData, returnValue, stream_, amount, nil, flags, remote_addr)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStreamGetContents

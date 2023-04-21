@@ -121,7 +121,7 @@ var DefZifStrcmp = def.DefFunc("strcmp", 2, 2, []def.ArgInfo{{Name: "str1"}, {Na
 })
 
 // generate by ZifStrncmp
-var DefZifStrncmp = def.DefFunc("strncmp", 3, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "len_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifStrncmp = def.DefFunc("strncmp", 3, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "len"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	str1 := fp.ParseStringVal()
 	str2 := fp.ParseStringVal()
@@ -150,7 +150,7 @@ var DefZifStrcasecmp = def.DefFunc("strcasecmp", 2, 2, []def.ArgInfo{{Name: "str
 })
 
 // generate by ZifStrncasecmp
-var DefZifStrncasecmp = def.DefFunc("strncasecmp", 3, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "len_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifStrncasecmp = def.DefFunc("strncasecmp", 3, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "len"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	str1 := fp.ParseStringVal()
 	str2 := fp.ParseStringVal()
@@ -173,7 +173,12 @@ var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{Name: "arr"}}, func(ex
 	if fp.HasError() {
 		return
 	}
-	ZifEach(executeData, returnValue, arr)
+	ret, ok := ZifEach(executeData, returnValue, arr)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifErrorReporting
@@ -515,17 +520,6 @@ var DefZifGetDefinedVars = def.DefFunc("get_defined_vars", 0, 0, []def.ArgInfo{}
 	ZifGetDefinedVars(executeData, returnValue)
 })
 
-// generate by ZifCreateFunction
-var DefZifCreateFunction = def.DefFunc("create_function", 2, 2, []def.ArgInfo{{Name: "args"}, {Name: "code"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	args := fp.ParseZval()
-	code := fp.ParseZval()
-	if fp.HasError() {
-		return
-	}
-	ZifCreateFunction(executeData, returnValue, args, code)
-})
-
 // generate by ZifGetResourceType
 var DefZifGetResourceType = def.DefFunc("get_resource_type", 1, 1, []def.ArgInfo{{Name: "res"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -537,7 +531,7 @@ var DefZifGetResourceType = def.DefFunc("get_resource_type", 1, 1, []def.ArgInfo
 })
 
 // generate by ZifGetResources
-var DefZifGetResources = def.DefFunc("get_resources", 0, 1, []def.ArgInfo{{Name: "type_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifGetResources = def.DefFunc("get_resources", 0, 1, []def.ArgInfo{{Name: "type"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	type_ := fp.ParseZval()

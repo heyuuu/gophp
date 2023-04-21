@@ -149,13 +149,18 @@ var DefZifFeof = def.DefFunc("feof", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(exe
 // generate by ZifFgets
 var DefZifFgets = def.DefFunc("fgets", 1, 2, []def.ArgInfo{{Name: "fp"}, {Name: "length"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	fp := fp.ParseZval()
+	fp := fp.ParseResource()
 	fp.StartOptional()
-	length := fp.ParseZval()
+	length := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifFgets(fp, nil, length)
+	ret, ok := ZifFgets(fp, nil, length)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifFgetc

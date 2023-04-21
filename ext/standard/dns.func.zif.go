@@ -44,7 +44,7 @@ var DefZifGethostbynamel = def.DefFunc("gethostbynamel", 1, 1, []def.ArgInfo{{Na
 })
 
 // generate by ZifDnsCheckRecord
-var DefZifDnsCheckRecord = def.DefFunc("dns_check_record", 1, 2, []def.ArgInfo{{Name: "host"}, {Name: "type_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifDnsCheckRecord = def.DefFunc("dns_check_record", 1, 2, []def.ArgInfo{{Name: "host"}, {Name: "type"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	host := fp.ParseZval()
 	fp.StartOptional()
@@ -56,7 +56,7 @@ var DefZifDnsCheckRecord = def.DefFunc("dns_check_record", 1, 2, []def.ArgInfo{{
 })
 
 // generate by ZifDnsCheckRecord
-var DefZifCheckdnsrr = def.DefFunc("checkdnsrr", 1, 2, []def.ArgInfo{{Name: "host"}, {Name: "type_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifCheckdnsrr = def.DefFunc("checkdnsrr", 1, 2, []def.ArgInfo{{Name: "host"}, {Name: "type"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	host := fp.ParseZval()
 	fp.StartOptional()

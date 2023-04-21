@@ -51,7 +51,7 @@ var DefZifFloor = def.DefFunc("floor", 1, 1, []def.ArgInfo{{Name: "number"}}, fu
 })
 
 // generate by ZifRound
-var DefZifRound = def.DefFunc("round", 1, 3, []def.ArgInfo{{Name: "number"}, {Name: "precision"}, {Name: "mode_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifRound = def.DefFunc("round", 1, 3, []def.ArgInfo{{Name: "number"}, {Name: "precision"}, {Name: "mode"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	number := fp.ParseZval()
 	fp.StartOptional()
@@ -467,7 +467,7 @@ var DefZifBaseConvert = def.DefFunc("base_convert", 3, 3, []def.ArgInfo{{Name: "
 })
 
 // generate by ZifNumberFormat
-var DefZifNumberFormat = def.DefFunc("number_format", 1, 4, []def.ArgInfo{{Name: "number"}, {Name: "num_decimal_places"}, {Name: "dec_separator_"}, {Name: "thousands_separator"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifNumberFormat = def.DefFunc("number_format", 1, 4, []def.ArgInfo{{Name: "number"}, {Name: "num_decimal_places"}, {Name: "dec_separator"}, {Name: "thousands_separator"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
 	number := fp.ParseDouble()
 	fp.StartOptional()

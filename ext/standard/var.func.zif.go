@@ -26,7 +26,7 @@ var DefZifDebugZvalDump = def.DefFunc("debug_zval_dump", 0, -1, []def.ArgInfo{{N
 })
 
 // generate by ZifVarExport
-var DefZifVarExport = def.DefFunc("var_export", 1, 2, []def.ArgInfo{{Name: "var_"}, {Name: "return_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifVarExport = def.DefFunc("var_export", 1, 2, []def.ArgInfo{{Name: "var"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	var_ := fp.ParseZval()
 	fp.StartOptional()
@@ -38,7 +38,7 @@ var DefZifVarExport = def.DefFunc("var_export", 1, 2, []def.ArgInfo{{Name: "var_
 })
 
 // generate by ZifSerialize
-var DefZifSerialize = def.DefFunc("serialize", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifSerialize = def.DefFunc("serialize", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {

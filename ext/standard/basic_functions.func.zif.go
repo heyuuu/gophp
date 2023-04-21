@@ -80,14 +80,14 @@ var DefZifPutenv = def.DefFunc("putenv", 1, 1, []def.ArgInfo{{Name: "setting"}},
 // generate by ZifGetopt
 var DefZifGetopt = def.DefFunc("getopt", 1, 3, []def.ArgInfo{{Name: "options"}, {Name: "opts"}, {Name: "optind"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
-	options := fp.ParseZval()
+	options_ := fp.ParseZval()
 	fp.StartOptional()
-	opts := fp.ParseZval()
+	opts_ := fp.ParseZval()
 	optind := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
 		return
 	}
-	ZifGetopt(executeData, returnValue, options, nil, opts, optind)
+	ZifGetopt(executeData, returnValue, options_, nil, opts_, optind)
 })
 
 // generate by ZifFlush
@@ -262,7 +262,7 @@ var DefZifRegisterShutdownFunction = def.DefFunc("register_shutdown_function", 1
 })
 
 // generate by ZifHighlightFile
-var DefZifHighlightFile = def.DefFunc("highlight_file", 1, 2, []def.ArgInfo{{Name: "file_name"}, {Name: "return_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifHighlightFile = def.DefFunc("highlight_file", 1, 2, []def.ArgInfo{{Name: "file_name"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	file_name := fp.ParseZval()
 	fp.StartOptional()
@@ -274,7 +274,7 @@ var DefZifHighlightFile = def.DefFunc("highlight_file", 1, 2, []def.ArgInfo{{Nam
 })
 
 // generate by ZifHighlightFile
-var DefZifShowSource = def.DefFunc("show_source", 1, 2, []def.ArgInfo{{Name: "file_name"}, {Name: "return_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifShowSource = def.DefFunc("show_source", 1, 2, []def.ArgInfo{{Name: "file_name"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	file_name := fp.ParseZval()
 	fp.StartOptional()
@@ -296,7 +296,7 @@ var DefZifPhpStripWhitespace = def.DefFunc("php_strip_whitespace", 1, 1, []def.A
 })
 
 // generate by ZifHighlightString
-var DefZifHighlightString = def.DefFunc("highlight_string", 1, 2, []def.ArgInfo{{Name: "string"}, {Name: "return_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifHighlightString = def.DefFunc("highlight_string", 1, 2, []def.ArgInfo{{Name: "string"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	string := fp.ParseZval()
 	fp.StartOptional()
@@ -323,7 +323,7 @@ var DefZifIniGet = def.DefFunc("ini_get", 1, 1, []def.ArgInfo{{Name: "varname"}}
 })
 
 // generate by ZifIniGetAll
-var DefZifIniGetAll = def.DefFunc("ini_get_all", 0, 2, []def.ArgInfo{{Name: "extension"}, {Name: "details_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifIniGetAll = def.DefFunc("ini_get_all", 0, 2, []def.ArgInfo{{Name: "extension"}, {Name: "details"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	extension := fp.ParseStringValNullable()
@@ -393,7 +393,7 @@ var DefZifRestoreIncludePath = def.DefFunc("restore_include_path", 0, 0, []def.A
 })
 
 // generate by ZifPrintR
-var DefZifPrintR = def.DefFunc("print_r", 1, 2, []def.ArgInfo{{Name: "var_"}, {Name: "return_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifPrintR = def.DefFunc("print_r", 1, 2, []def.ArgInfo{{Name: "var"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	var_ := fp.ParseZval()
 	fp.StartOptional()
@@ -517,7 +517,7 @@ var DefZifMoveUploadedFile = def.DefFunc("move_uploaded_file", 2, 2, []def.ArgIn
 })
 
 // generate by ZifParseIniFile
-var DefZifParseIniFile = def.DefFunc("parse_ini_file", 1, 3, []def.ArgInfo{{Name: "filename"}, {Name: "process_sections_"}, {Name: "scanner_mode"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifParseIniFile = def.DefFunc("parse_ini_file", 1, 3, []def.ArgInfo{{Name: "filename"}, {Name: "process_sections"}, {Name: "scanner_mode"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	filename := fp.ParseStringVal()
 	fp.StartOptional()

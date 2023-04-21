@@ -238,12 +238,12 @@ func ZifNatcasesort(arg zpp.RefArray) bool {
 	arg.Array().Sort(cmp, false)
 	return true
 }
-func ZifAsort(arg zpp.RefZval, _ zpp.RefArray, sortFlags int) bool {
+func ZifAsort(arg zpp.RefZval, _ zpp.Opt, sortFlags int) bool {
 	cmp := phpGetDataCompareFunc(sortFlags, false)
 	arg.Array().Sort(cmp, false)
 	return true
 }
-func ZifArsort(arg zpp.RefZval, _ zpp.RefArray, sortFlags int) bool {
+func ZifArsort(arg zpp.RefZval, _ zpp.Opt, sortFlags int) bool {
 	cmp := phpGetDataCompareFunc(sortFlags, true)
 	arg.Array().Sort(cmp, false)
 	return true
