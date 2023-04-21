@@ -57,6 +57,9 @@ type (
 	// FAST_ZPP: Z_PARAM_RESOURCE, Type: 'r'
 	Resource = *types.Zval
 
+	// FAST_ZPP: Z_PARAM_FUNC，Type: 'f' (参数略有差异，使用封装的结构体代替 fci + fcc 双指针)
+	Callable = *types.UserCallable
+
 	// FAST_ZPP: Z_PARAM_ZVAL, Type: 'z', 直接使用 *types.Zval
 	//Zval = *types.Zval
 
@@ -67,6 +70,7 @@ type (
 	//Variadic = []*types.Zval
 
 	/* ref type */
-	RefZval  = *types.Zval //
-	RefArray = *types.Zval // fp.ParseArrayEx(false, true)
+	RefZval    = *types.Zval //
+	RefArray   = *types.Zval // fp.ParseArrayEx(false, true)
+	DerefArray = *types.Zval // fp.ParseArrayEx2(false, true, false)
 )

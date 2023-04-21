@@ -75,7 +75,7 @@ type ZendFcallInfo struct {
 	size          int
 	function_name Zval
 	retval        *Zval
-	params        *Zval
+	params        []Zval
 	object        *ZendObject
 	no_separation ZendBool
 	param_count   uint32
@@ -100,15 +100,13 @@ func MakeZendFcallInfo(
 		param_count:   param_count,
 	}
 }
-func (this *ZendFcallInfo) GetSize() int          { return this.size }
-func (this *ZendFcallInfo) SetSize(value int)     { this.size = value }
-func (this *ZendFcallInfo) GetFunctionName() Zval { return this.function_name }
-
-// func (this *ZendFcallInfo) SetFunctionName(value Zval) { this.functionName = value }
+func (this *ZendFcallInfo) GetSize() int                   { return this.size }
+func (this *ZendFcallInfo) SetSize(value int)              { this.size = value }
+func (this *ZendFcallInfo) GetFunctionName() Zval          { return this.function_name }
 func (this *ZendFcallInfo) GetRetval() *Zval               { return this.retval }
 func (this *ZendFcallInfo) SetRetval(value *Zval)          { this.retval = value }
 func (this *ZendFcallInfo) GetParams() *Zval               { return this.params }
-func (this *ZendFcallInfo) SetParams(value *Zval)          { this.params = value }
+func (this *ZendFcallInfo) SetParams(value []Zval)         { this.params = value }
 func (this *ZendFcallInfo) GetObject() *ZendObject         { return this.object }
 func (this *ZendFcallInfo) SetObject(value *ZendObject)    { this.object = value }
 func (this *ZendFcallInfo) GetNoSeparation() ZendBool      { return this.no_separation }

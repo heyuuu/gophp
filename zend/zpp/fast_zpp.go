@@ -303,6 +303,34 @@ func (p *FastParser) ParseFuncEx(fci *types.ZendFcallInfo, fcc *types.ZendFcallI
 	return
 }
 
+func (p *FastParser) ParseCallable() *types.UserCallable {
+	return p.ParseCallableEx(false, false)
+}
+func (p *FastParser) ParseCallableEx(checkNull bool, separate bool) *types.UserCallable {
+	p.parsePrologue(separate, separate)
+	if p.IsFinish() {
+		return nil
+	}
+
+	if checkNull && p.arg.IsNull() {
+		return nil
+	}
+
+	var c types.UserCallable
+	err, ok := ParseFunc(p.arg, &c.Info, &c.Cache, checkNull)
+	if !ok {
+		if err == nil {
+			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_FUNC)
+		} else {
+			p.triggerError(ZPP_ERROR_WRONG_CALLBACK, *err)
+		}
+	} else if err != nil {
+		p.triggerDeprecated(ZPP_ERROR_WRONG_CALLBACK, *err)
+	}
+
+	return &c
+}
+
 // @see Micro: Z_PARAM_ARRAY_HT，Old: 'h'
 func (p *FastParser) ParseArrayHt() (dest *types.Array) {
 	return p.ParseArrayHtEx(false, false)

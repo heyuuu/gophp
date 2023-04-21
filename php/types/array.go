@@ -11,20 +11,27 @@ import (
  */
 type ArrayKey struct {
 	index int
-	key   *string
+	str   *string
 }
 
 func StrKey(str string) ArrayKey  { return ArrayKey{0, &str} }
 func IndexKey(index int) ArrayKey { return ArrayKey{index, nil} }
 
-func (this ArrayKey) IsStrKey() bool { return this.key != nil }
-func (this ArrayKey) IndexKey() int  { return this.index }
-func (this ArrayKey) StrKey() string { return *this.key }
-func (this ArrayKey) Keys() (index int, key string, isStrKey bool) {
-	if this.IsStrKey() {
-		return 0, *this.key, true
+func (k ArrayKey) IsStrKey() bool { return k.str != nil }
+func (k ArrayKey) IndexKey() int  { return k.index }
+func (k ArrayKey) StrKey() string { return *k.str }
+func (k ArrayKey) Keys() (index int, key string, isStrKey bool) {
+	if k.IsStrKey() {
+		return 0, *k.str, true
 	} else {
-		return this.index, "", false
+		return k.index, "", false
+	}
+}
+func (k ArrayKey) ToZval() *Zval {
+	if k.IsStrKey() {
+		return NewZvalString(k.StrKey())
+	} else {
+		return NewZvalLong(k.IndexKey())
 	}
 }
 

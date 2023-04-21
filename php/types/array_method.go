@@ -69,21 +69,10 @@ func (ht *Array) FirstIndirect() (key ArrayKey, val *Zval) {
 /**
  * Sort
  */
-type ArrayCompareFunc func(p1 *Bucket, p2 *Bucket) bool
-type ArrayCompareExFunc func(p1 *Bucket, p2 *Bucket) int
 type ArrayLessComparer func(p1, p2 ArrayPair) bool
 type ArrayComparer func(p1, p2 ArrayPair) int
 
-func (ht *Array) SortEx(comparer ArrayComparer, renumber bool) {
-	ht.Sort(func(b1 *Bucket, b2 *Bucket) bool {
-		p1 := MakeArrayPair(b1.GetArrayKey(), b1.GetVal())
-		p2 := MakeArrayPair(b2.GetArrayKey(), b2.GetVal())
-		ret := comparer(p1, p2)
-		return ret < 0
-	}, renumber)
-}
-
-func (ht *Array) Sort(comparer ArrayCompareFunc, renumber bool) {
+func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
 	ht.assertRc1()
 
 	if ht.elementsCount == 0 || (ht.elementsCount == 1 && !renumber) {
@@ -93,7 +82,12 @@ func (ht *Array) Sort(comparer ArrayCompareFunc, renumber bool) {
 	ht.removeHolesAndCleanInternalPointer()
 
 	sort.SliceStable(ht.data, func(i, j int) bool {
-		return comparer(&ht.data[i], &ht.data[i])
+		b1 := &ht.data[i]
+		b2 := &ht.data[j]
+		p1 := MakeArrayPair(b1.GetArrayKey(), b1.GetVal())
+		p2 := MakeArrayPair(b2.GetArrayKey(), b2.GetVal())
+		ret := comparer(p1, p2)
+		return ret < 0
 	})
 
 	if renumber {
@@ -104,34 +98,6 @@ func (ht *Array) Sort(comparer ArrayCompareFunc, renumber bool) {
 	}
 
 	ht.Rehash()
-}
-
-func (ht *Array) SortCompatible(comparer ArrayCompareExFunc, renumber ZendBool) bool {
-	ht.Sort(func(a *Bucket, b *Bucket) bool {
-		var compareResult = comparer(a, b)
-		return compareResult > 0
-	}, renumber != 0)
-	return true
-}
-
-func (ht *Array) SortCompatibleEx(sort_ SortFuncT) int {
-	// todo sort 转 sortFunc 需要订制处理
-	var sortFunc = *b.Cast[func([]Bucket)](&sort_)
-
-	// 正常 sort 逻辑，除 sortFunc 部分外和 ht.Sort() 逻辑一致
-	ht.assertRc1()
-
-	if ht.elementsCount <= 1 {
-		return SUCCESS
-	}
-
-	ht.removeHolesAndCleanInternalPointer()
-
-	sortFunc(ht.data)
-
-	ht.Rehash()
-
-	return SUCCESS
 }
 
 /**
