@@ -3574,23 +3574,6 @@ func ZifArrayUnique(arg *types.Array, _ zpp.Opt, flags *int) *types.Array {
 func ZvalCompare(first *types.Zval, second *types.Zval) int {
 	return zend.StringCompareFunction(first, second)
 }
-func ZvalUserCompare(a *types.Zval, b *types.Zval) int {
-	var args []types.Zval
-	var retval types.Zval
-	types.ZVAL_COPY_VALUE(&args[0], a)
-	types.ZVAL_COPY_VALUE(&args[1], b)
-	BG__().user_compare_fci.param_count = 2
-	BG__().user_compare_fci.params = args
-	BG__().user_compare_fci.retval = &retval
-	BG__().user_compare_fci.no_separation = 0
-	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
-		var ret = zend.ZvalGetLong(&retval)
-		// zend.ZvalPtrDtor(&retval)
-		return zend.ZEND_NORMALIZE_BOOL(ret)
-	} else {
-		return 0
-	}
-}
 
 //@zif -c 2,
 func ZifArrayIntersectKey(arrays []*types.Zval) (*types.Array, bool) {

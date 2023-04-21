@@ -20,8 +20,6 @@ type PhpBasicGlobals struct {
 	str_ebuf                     []byte
 	array_walk_fci               types.ZendFcallInfo
 	array_walk_fci_cache         types.ZendFcallInfoCache
-	user_compare_fci             types.ZendFcallInfo
-	user_compare_fci_cache       types.ZendFcallInfoCache
 	user_tick_functions          *zend.ZendLlist
 	active_ini_file_section      types.Zval
 	page_uid                     zend.ZendLong

@@ -213,8 +213,6 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	BG__().locale_changed = 0
 	BG__().array_walk_fci = zend.EmptyFcallInfo
 	BG__().array_walk_fci_cache = zend.EmptyFcallInfoCache
-	BG__().user_compare_fci = zend.EmptyFcallInfo
-	BG__().user_compare_fci_cache = zend.EmptyFcallInfoCache
 	BG__().page_uid = -1
 	BG__().page_gid = -1
 	BG__().page_inode = -1
