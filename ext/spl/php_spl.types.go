@@ -21,7 +21,7 @@ type ZendSplGlobals struct {
 func (this *ZendSplGlobals) Reset() {
 	this.autoload_extensions = nil
 	this.autoload_functions = nil
-	this.hashMaskInit = 0
+	this.hashMaskInit = false
 }
 
 func (this *ZendSplGlobals) Deactivate() {

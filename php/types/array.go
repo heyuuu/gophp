@@ -46,9 +46,6 @@ type ArrayPair struct {
 	val *Zval
 }
 
-func NewArrayPair(key ArrayKey, val *Zval) *ArrayPair {
-	return &ArrayPair{key: key, val: val}
-}
 func MakeArrayPair(key ArrayKey, val *Zval) ArrayPair {
 	return ArrayPair{key: key, val: val}
 }
@@ -139,14 +136,14 @@ var _ IRefcounted = &Array{}
  * Constructor && Init
  */
 func NewArray(size int) *Array {
-	return NewArrayEx(size, nil)
-}
-func NewArrayEx(size int, pDestructor DtorFuncT) *Array {
 	var ht = new(Array)
-	ht.Init(size, pDestructor)
+	ht.Init(size)
 	return ht
 }
-func (ht *Array) Init(size int, pDestructor DtorFuncT) {
+func (ht *Array) Init(size int) {
+	ht.InitEx(size, nil)
+}
+func (ht *Array) InitEx(size int, pDestructor DtorFuncT) {
 	var data []Bucket
 	if size > 0 {
 		data = make([]Bucket, 0, size)

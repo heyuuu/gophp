@@ -137,11 +137,11 @@ func PlistEntryDestructor(zv *types.Zval) {
 	Free(res)
 }
 func ZendInitRsrcList() int {
-	EG__().GetRegularList().Init(8, ListEntryDestructor)
+	EG__().GetRegularList().InitEx(8, ListEntryDestructor)
 	return types.SUCCESS
 }
 func ZendInitRsrcPlist() int {
-	EG__().GetPersistentList().Init(8, PlistEntryDestructor)
+	EG__().GetPersistentList().InitEx(8, PlistEntryDestructor)
 	return types.SUCCESS
 }
 func ZendCloseRsrcList(ht *types.Array) {
@@ -196,9 +196,8 @@ func ZendFetchListDtorId(type_name *byte) int {
 
 	return 0
 }
-func ListDestructorsDtor(zv *types.Zval) { Free(zv.Ptr()) }
 func ZendInitRsrcListDtors() int {
-	ListDestructors.Init(64, ListDestructorsDtor)
+	ListDestructors.Init(64)
 	ListDestructors.SetNNextFreeElement(1)
 	return types.SUCCESS
 }

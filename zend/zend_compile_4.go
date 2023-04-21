@@ -671,7 +671,7 @@ func ZendCompileLabel(ast *ZendAst) {
 	var dest ZendLabel
 	if CG__().GetContext().GetLabels() == nil {
 		ALLOC_HASHTABLE(CG__().GetContext().GetLabels())
-		CG__().GetContext().GetLabels().Init(8, LabelPtrDtor)
+		CG__().GetContext().GetLabels().Init(8)
 	}
 	dest.SetBrkCont(CG__().GetContext().GetCurrentBrkCont())
 	dest.SetOplineNum(GetNextOpNumber())

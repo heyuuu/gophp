@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-func TagDtor(zv *types.Zval) { zend.Free(zv.Ptr()) }
 func PhpIniOnUpdateTags(
 	entry *zend.ZendIniEntry,
 	new_value *types.String,
@@ -38,7 +37,7 @@ func PhpIniOnUpdateTags(
 			return types.FAILURE
 		}
 	}
-	ctx.GetTags().Init(0, TagDtor)
+	ctx.GetTags().Init(0)
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var val *byte
 		val = strchr(key, '=')

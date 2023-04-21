@@ -43,12 +43,6 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *spl_SplObjectStorage, 
 		return types.SUCCESS
 	}
 }
-func SplObjectStorageDtor(element *types.Zval) {
-	var el *spl_SplObjectStorageElement = element.Ptr()
-	// zend.ZvalPtrDtor(el.GetObj())
-	// zend.ZvalPtrDtor(el.GetInf())
-	zend.Efree(el)
-}
 func SplObjectStorageGet(intern *spl_SplObjectStorage, key *types.ArrayKey) *spl_SplObjectStorageElement {
 	var ptr any
 	if key.IsStrKey() {
@@ -120,7 +114,7 @@ func SplObjectStorageNewEx(class_type *types.ClassEntry, orig *types.Zval) *type
 	intern.SetPos(0)
 	zend.ZendObjectStdInit(intern.GetStd(), class_type)
 	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
-	intern.GetStorage().Init(0, SplObjectStorageDtor)
+	intern.GetStorage().Init(0)
 	intern.GetStd().SetHandlers(&spl_handler_SplObjectStorage)
 	for parent != nil {
 		if parent == spl_ce_SplObjectStorage {

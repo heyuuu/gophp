@@ -37,7 +37,7 @@ func InitExecutor() {
 	ZendVmStackInit()
 	EG__().SetSymbolTable(types.NewArray(64))
 	ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionActivator))
-	EG__().GetIncludedFiles().Init(8, nil)
+	EG__().GetIncludedFiles().Init(8)
 	EG__().GetUserErrorHandler().SetUndef()
 	EG__().GetUserExceptionHandler().SetUndef()
 	EG__().SetCurrentExecuteData(nil)
@@ -664,7 +664,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	}
 	if EG__().GetInAutoload() == nil {
 		ALLOC_HASHTABLE(EG__().GetInAutoload())
-		EG__().GetInAutoload().Init(8, nil)
+		EG__().GetInAutoload().Init(8)
 	}
 	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name.GetStr()) == nil {
 		if key == nil {

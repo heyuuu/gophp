@@ -49,8 +49,8 @@ func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
 	memset(&(BG__().url_adapt_output_ex), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
 	BG__().url_adapt_session_ex.type_ = 1
 	BG__().url_adapt_output_ex.type_ = 0
-	BG__().url_adapt_session_hosts_ht.Init(0, nil)
-	BG__().url_adapt_output_hosts_ht.Init(0, nil)
+	BG__().url_adapt_session_hosts_ht.Init(0)
+	BG__().url_adapt_output_hosts_ht.Init(0)
 	BG__().incomplete_class = IncompleteClassEntry
 	BG__().page_uid = -1
 	BG__().page_gid = -1
@@ -217,7 +217,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	BG__().page_gid = -1
 	BG__().page_inode = -1
 	BG__().page_mtime = -1
-	BG__().putenv_ht.Init(1, PhpPutenvDestructor)
+	BG__().putenv_ht.InitEx(1, PhpPutenvDestructor)
 	BG__().user_shutdown_function_names = nil
 	ZmActivateFilestat(type_, module_number)
 	ZmActivateSyslog(type_, module_number)
@@ -1215,22 +1215,6 @@ func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functio
 	}
 	zend.ZendFcallInfoArgsClear(&fci, 1)
 }
-func UserShutdownFunctionDtor(zv *types.Zval) {
-	var i int
-	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
-	for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
-		// zend.ZvalPtrDtor(shutdown_function_entry.GetArguments()[i])
-	}
-	zend.Efree(shutdown_function_entry.GetArguments())
-	zend.Efree(shutdown_function_entry)
-}
-func UserTickFunctionDtor(tick_function_entry *UserTickFunctionEntry) {
-	var i int
-	for i = 0; i < tick_function_entry.GetArgCount(); i++ {
-		// zend.ZvalPtrDtor(tick_function_entry.GetArguments()[i])
-	}
-	zend.Efree(tick_function_entry.GetArguments())
-}
 func UserShutdownFunctionCall(zv *types.Zval) int {
 	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
 	var retval types.Zval
@@ -1291,7 +1275,7 @@ func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, funct
 	} else {
 		if !(BG__().user_shutdown_function_names) {
 			zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-			BG__().user_shutdown_function_names.Init(0, UserShutdownFunctionDtor)
+			BG__().user_shutdown_function_names.Init(0)
 		}
 		for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
 			shutdown_function_entry.GetArguments()[i].TryAddRefcount()

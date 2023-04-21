@@ -496,12 +496,6 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.Strin
 		}
 	}
 }
-func ZendPropertyGuardDtor(el *types.Zval) {
-	var ptr *uint32 = (*uint32)(el.Ptr())
-	if (types.ZendUintptrT(ptr) & 1) == 0 {
-		EfreeSize(ptr, b.SizeOf("uint32_t"))
-	}
-}
 func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 {
 	var guards *types.Array
 	var zv *types.Zval
@@ -518,7 +512,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 			return &(zv.GetPropertyGuard())
 		} else {
 			ALLOC_HASHTABLE(guards)
-			guards = types.NewArrayEx(8, ZendPropertyGuardDtor)
+			guards = types.NewArray(8)
 
 			/* mark pointer as "special" using low bit */
 			guards.KeyAddNew(str.GetStr(), types.NewZvalPtr(any(zend_uintptr_t&zv.GetPropertyGuard()|1)))

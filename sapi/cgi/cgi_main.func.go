@@ -13,12 +13,6 @@ import (
 	"sort"
 )
 
-func UserConfigCacheEntryDtor(el *types.Zval) {
-	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.Ptr())
-	entry.GetUserConfig().Destroy()
-	zend.Free(entry.GetUserConfig())
-	zend.Free(entry)
-}
 func CGIG(v __auto__) __auto__ { return php_cgi_globals.v }
 func FcgiLog(type_ int, format *byte, _ ...any) {
 	var ap va_list
@@ -369,7 +363,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 	if b.Assign(&entry, types.ZendHashStrFindPtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len))) == nil {
 		new_entry = zend.Pemalloc(b.SizeOf("user_config_cache_entry"))
 		new_entry.SetExpires(0)
-		new_entry.SetUserConfig(types.NewArrayEx(8, core.ConfigZvalDtor()))
+		new_entry.SetUserConfig(types.NewArray(8))
 		entry = types.ZendHashUpdatePtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len), new_entry)
 	}
 
@@ -886,7 +880,7 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 	php_cgi_globals.SetFixPathinfo(1)
 	php_cgi_globals.SetDiscardPath(0)
 	php_cgi_globals.SetFcgiLogging(1)
-	php_cgi_globals.GetUserConfigCache().Init(8, UserConfigCacheEntryDtor)
+	php_cgi_globals.GetUserConfigCache().Init(8)
 }
 func ZmStartupCgi(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)

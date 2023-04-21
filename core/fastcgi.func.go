@@ -179,7 +179,7 @@ func FcgiInit() int {
 	if IsInitialized == 0 {
 		var sa SaT
 		var len_ socklen_t = b.SizeOf("sa")
-		FcgiMgmtVars.Init(8, FcgiFreeMgmtVarCb)
+		FcgiMgmtVars.Init(8)
 		FcgiSetMgmtVar("FCGI_MPXS_CONNS", b.SizeOf("\"FCGI_MPXS_CONNS\"")-1, "0", b.SizeOf("\"0\"")-1)
 		IsInitialized = 1
 		errno = 0
@@ -928,7 +928,6 @@ func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	FcgiMgmtVars.KeyAdd(key.GetStr(), &zvalue)
 	// types.ZendStringReleaseEx(key, 1)
 }
-func FcgiFreeMgmtVarCb(zv *types.Zval) { zend.Pefree(zv.String(), 1) }
 func FcgiGetLastClientIp() *byte {
 	var str []byte
 

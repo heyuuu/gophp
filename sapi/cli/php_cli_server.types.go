@@ -276,7 +276,7 @@ type PhpCliServer struct {
 	document_root  string
 	router         string
 	socklen        socklen_t
-	clients        types.Array
+	clients        map[int]*PhpCliServerClient
 }
 
 func (this *PhpCliServer) Serve() error {
@@ -296,11 +296,24 @@ func (this *PhpCliServer) handler(writer http.ResponseWriter, request *http.Requ
 	PhpCliServerSendEvent(this, client)
 }
 
+func (this *PhpCliServer) InitClients() {
+	this.clients = make(map[int]*PhpCliServerClient)
+}
+func (this *PhpCliServer) DestroyClients() {
+	for _, client := range this.clients {
+		PhpCliServerClientDtorWrapper(client)
+	}
+}
 func (this *PhpCliServer) NewClient() *PhpCliServerClient {
 	client := NewPhpCliServerClient(this)
 	PhpCliServerClientCtor(client, this)
-	types.ZendHashIndexUpdatePtr(&this.clients, 0, client)
+	this.clients[0] = client
 	return client
+}
+func (this *PhpCliServer) DelClient(client *PhpCliServerClient) {
+	sock := client.GetSock()
+	PhpCliServerClientCtor(client, this)
+	delete(this.clients, sock)
 }
 
 func (this *PhpCliServer) SetHostStr(value string)         { this.host = value }
@@ -323,7 +336,6 @@ func (this *PhpCliServer) GetDocumentRootLen() int             { return this.doc
 func (this *PhpCliServer) GetRouter() *byte                    { return this.router }
 func (this *PhpCliServer) SetRouter(value *byte)               { this.router = value }
 func (this *PhpCliServer) GetSocklen() socklen_t               { return this.socklen }
-func (this *PhpCliServer) GetClients() types.Array             { return this.clients }
 
 /**
  * PhpCliServerDoEventForEachFdCallbackParams

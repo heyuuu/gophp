@@ -264,17 +264,9 @@ func ZifSplAutoloadExtensions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Op
 }
 func AutoloadFuncInfoDtor(element *types.Zval) {
 	var alfi *AutoloadFuncInfo = (*AutoloadFuncInfo)(element.Ptr())
-	if !(alfi.GetObj().IsUndef()) {
-		// zend.ZvalPtrDtor(alfi.GetObj())
-	}
 	if alfi.GetFuncPtr() != nil && alfi.GetFuncPtr().HasFnFlags(zend.AccCallViaTrampoline) {
-		// types.ZendStringReleaseEx(alfi.GetFuncPtr().GetFunctionName(), 0)
 		zend.ZendFreeTrampoline(alfi.GetFuncPtr())
 	}
-	if !(alfi.GetClosure().IsUndef()) {
-		// zend.ZvalPtrDtor(alfi.GetClosure())
-	}
-	zend.Efree(alfi)
 }
 func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *types.Zval) {
 	var class_name *types.Zval
@@ -486,7 +478,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		}
 		if !(SPL_G__().autoload_functions) {
 			zend.ALLOC_HASHTABLE(SPL_G__().autoload_functions)
-			SPL_G__().autoload_functions.Init(1, AutoloadFuncInfoDtor)
+			SPL_G__().autoload_functions.InitEx(1, AutoloadFuncInfoDtor)
 		}
 		spl_func_ptr = SplAutoloadFn
 		if zend.EG__().GetAutoloadFunc() == spl_func_ptr {
@@ -713,12 +705,6 @@ func buildClassListString(arr *types.Array) string {
 	return strings.Join(names, ", ")
 }
 
-func SplBuildClassListString(entry *types.Zval, list **byte) {
-	var res *byte
-	core.Spprintf(&res, 0, "%s, %s", *list, entry.String().GetVal())
-	zend.Efree(*list)
-	*list = res
-}
 func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	var list types.Zval
 	var zv *types.Zval

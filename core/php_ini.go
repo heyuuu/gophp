@@ -13,7 +13,7 @@ type Configuration struct {
 }
 
 func (this *Configuration) Init() {
-	this.hash.Init(8, ConfigZvalDtor)
+	this.hash.Init(8)
 }
 
 func (this *Configuration) Set(key string, value string) *types.Zval {

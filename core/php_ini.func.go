@@ -89,12 +89,6 @@ func DisplayIniEntries(module *zend.ModuleEntry) {
 		standard.PhpInfoPrintTableEnd()
 	}
 }
-func ConfigZvalDtor(zvalue *types.Zval) {
-	if zvalue.IsType(types.IS_ARRAY) {
-		zvalue.Array().Destroy()
-		zend.Free(zvalue.Array())
-	}
-}
 func RESET_ACTIVE_INI_HASH() {
 	ActiveIniHash = nil
 	IsSpecialSection = 0
@@ -155,7 +149,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		if b.Assign(&find_arr, active_hash.KeyFind(arg1.String().GetStr())) == nil || find_arr.GetType() != types.IS_ARRAY {
 			types.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
-			option_arr.Array().Init(8, ConfigZvalDtor)
+			option_arr.Array().Init(8)
 			find_arr = active_hash.KeyUpdate(arg1.String().GetStr(), &option_arr)
 		}
 
@@ -218,7 +212,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 			if b.Assign(&entry, target_hash.KeyFind(b.CastStr(key, key_len))) == nil {
 				var section_arr types.Zval
 				types.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
-				section_arr.Array().Init(8, ConfigZvalDtor)
+				section_arr.Array().Init(8)
 				entry = target_hash.KeyUpdate(b.CastStr(key, key_len), &section_arr)
 			}
 			if entry.IsType(types.IS_ARRAY) {

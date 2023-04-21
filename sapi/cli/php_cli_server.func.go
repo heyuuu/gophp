@@ -787,7 +787,7 @@ func PhpCliServerClientDtor(client *PhpCliServerClient) {
 }
 func PhpCliServerCloseConnection(server *PhpCliServer, client *PhpCliServerClient) {
 	PhpCliServerLogf(PHP_CLI_SERVER_LOG_MESSAGE, "%s Closing", client.GetAddrStr())
-	types.ZendHashIndexDel(server.GetClients(), client.GetSock())
+	server.DelClient(client.GetSock())
 }
 func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient, status int) int {
 	var escaped_request_uri *types.String = nil
@@ -1050,7 +1050,7 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 	return types.SUCCESS
 }
 func PhpCliServerDtor(server *PhpCliServer) {
-	server.GetClients().Destroy()
+	server.DestroyClients()
 	if zend.ZEND_VALID_SOCKET(server.GetServerSock()) {
 		core.Closesocket(server.GetServerSock())
 	}
@@ -1085,8 +1085,7 @@ func PhpCliServerDtor(server *PhpCliServer) {
 		zend.Free(PhpCliServerWorkers)
 	}
 }
-func PhpCliServerClientDtorWrapper(zv *types.Zval) {
-	var p *PhpCliServerClient = zv.Ptr()
+func PhpCliServerClientDtorWrapper(p *PhpCliServerClient) {
 	shutdown(p.GetSock(), core.SHUT_RDWR)
 	core.Closesocket(p.GetSock())
 	PhpCliServerClientDtor(p)
@@ -1157,7 +1156,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, r
 	PhpCliServerPollerAdd(server.GetPoller(), POLLIN, server_sock)
 	server.SetHostStr(host)
 	server.SetPort(port)
-	server.clients = *types.NewArrayEx(0, PhpCliServerClientDtorWrapper)
+	server.InitClients()
 	server.SetDocumentRootStr(document_root)
 	server.SetRouterStr(router)
 	server.SetIsRunning(1)

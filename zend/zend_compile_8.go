@@ -225,13 +225,6 @@ func ZendCompileCoalesce(result *Znode, ast *ZendAst) {
 	opline = CG__().GetActiveOpArray().GetOpcodes()[opnum]
 	opline.GetOp2().SetOplineNum(GetNextOpNumber())
 }
-func ZnodeDtor(zv *types.Zval) {
-	var node *Znode = zv.Ptr()
-	if node.GetOpType() == IS_CONST {
-		// ZvalPtrDtorNogc(node.GetConstant())
-	}
-	Efree(node)
-}
 func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
 	var default_ast *ZendAst = ast.GetChild()[1]
@@ -254,7 +247,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
 	ALLOC_HASHTABLE(CG__().GetMemoizedExprs())
-	CG__().GetMemoizedExprs().Init(0, ZnodeDtor)
+	CG__().GetMemoizedExprs().Init(0)
 	CG__().SetMemoizeMode(ZEND_MEMOIZE_COMPILE)
 	ZendCompileVar(&var_node_is, var_ast, BP_VAR_IS, 0)
 	coalesce_opnum = GetNextOpNumber()

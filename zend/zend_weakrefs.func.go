@@ -17,7 +17,7 @@ func ZendWeakrefUnref(zv *types.Zval) {
 	wr.SetReferent(nil)
 }
 func ZendWeakrefsInit() {
-	EG__().GetWeakrefs().Init(8, ZendWeakrefUnref)
+	EG__().GetWeakrefs().InitEx(8, ZendWeakrefUnref)
 }
 func ZendWeakrefsNotify(object *types.ZendObject) {
 	types.ZendHashIndexDel(EG__().GetWeakrefs(), ZendUlong(object))

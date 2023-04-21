@@ -593,7 +593,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 
 	/* Initialize $_FILES[] */
 
-	PG__().rfc1867_protected_variables.Init(8, nil)
+	PG__().rfc1867_protected_variables.Init(8)
 	SG__().rfc1867_uploaded_files = make(map[string]bool)
 	if PG__().http_globals[TRACK_VARS_FILES].GetType() != types.IS_ARRAY {
 
