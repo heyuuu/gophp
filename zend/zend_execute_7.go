@@ -147,9 +147,6 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 func ZendWrongCloneCall(clone types.IFunction, scope *types.ClassEntry) {
 	faults.ThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 }
-func ExecuteInternal(executeData *ZendExecuteData, return_value *types.Zval) {
-	executeData.GetFunc().GetInternalFunction().GetHandler()(executeData, return_value)
-}
 func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
 	/* Clean before putting into the cache, since clean could call dtors,
 	 * which could use the cached hash. Also do this before the check for
