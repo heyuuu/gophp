@@ -4264,7 +4264,7 @@ func ZifArrayDiffKey(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval,
 
 //@zif 3,
 func ZifArrayDiffUkey(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
-	cmp := arrayUserKeyComparer(callbackKeyCompFunc),
+	cmp := arrayUserKeyComparer(callbackKeyCompFunc)
 	return arrayDiffWrapper(arrays, cmp)
 }
 func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {

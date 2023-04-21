@@ -729,15 +729,19 @@ var DefZifArrayDiffKey = def.DefFunc("array_diff_key", 1, -1, []def.ArgInfo{{Nam
 })
 
 // generate by ZifArrayDiffUkey
-var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_key_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 3, 3, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_key_comp_func := fp.ParseZval()
+var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_key_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arrays := fp.ParseVariadicEx(1)
+	callback_key_comp_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayDiffUkey(executeData, returnValue, arr1, arr2, callback_key_comp_func)
+	ret, ok := ZifArrayDiffUkey(arrays, callback_key_comp_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayDiff
@@ -752,15 +756,19 @@ var DefZifArrayDiff = def.DefFunc("array_diff", 1, -1, []def.ArgInfo{{Name: "arr
 })
 
 // generate by ZifArrayUdiff
-var DefZifArrayUdiff = def.DefFunc("array_udiff", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 3, 3, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_data_comp_func := fp.ParseZval()
+var DefZifArrayUdiff = def.DefFunc("array_udiff", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arrays := fp.ParseVariadicEx(1)
+	callback_data_comp_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUdiff(arr1, arr2, callback_data_comp_func)
+	ret, ok := ZifArrayUdiff(arrays, callback_data_comp_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayDiffAssoc
@@ -775,15 +783,19 @@ var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", 1, -1, []def.ArgInfo{
 })
 
 // generate by ZifArrayDiffUassoc
-var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 3, 3, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_data_comp_func := fp.ParseZval()
+var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_key_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arrays := fp.ParseVariadicEx(1)
+	callback_key_comp_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayDiffUassoc(executeData, returnValue, arr1, arr2, callback_data_comp_func)
+	ret, ok := ZifArrayDiffUassoc(arrays, callback_key_comp_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayUdiffAssoc
@@ -799,16 +811,20 @@ var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 3, 3, []def.ArgInfo
 })
 
 // generate by ZifArrayUdiffUassoc
-var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 4, 4, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_comp_func"}, {Name: "callback_key_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 4, 4, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_data_comp_func := fp.ParseZval()
-	callback_key_comp_func := fp.ParseZval()
+var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 2, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_comp_func"}, {Name: "callback_key_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 2, -1, 0)
+	arrays := fp.ParseVariadicEx(2)
+	callback_data_comp_func := fp.ParseCallable()
+	callback_key_comp_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUdiffUassoc(executeData, returnValue, arr1, arr2, callback_data_comp_func, callback_key_comp_func)
+	ret, ok := ZifArrayUdiffUassoc(arrays, callback_data_comp_func, callback_key_comp_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayMultisort
