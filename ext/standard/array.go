@@ -131,18 +131,6 @@ func PhpArrayDataCompareString(p1 *types.Bucket, p2 *types.Bucket) int {
 	v2 := p2.GetVal().DeIndirect()
 	return zend.StringCompareFunction(v1, v2)
 }
-func PhpArrayNaturalGeneralCompare(p1 *types.Bucket, p2 *types.Bucket, fold_case bool) int {
-	var str1 = zend.ZvalGetStrVal(p1.GetVal())
-	var str2 = zend.ZvalGetStrVal(p2.GetVal())
-	var result = str.Strnatcmp(str1, str2, fold_case)
-	return result
-}
-func PhpArrayNaturalCompare(a *types.Bucket, b *types.Bucket) int {
-	return PhpArrayNaturalGeneralCompare(a, b, false)
-}
-func PhpArrayNaturalCaseCompare(a *types.Bucket, b *types.Bucket) int {
-	return PhpArrayNaturalGeneralCompare(a, b, true)
-}
 
 func ZifKrsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := PhpGetKeyCompareFunc(sortFlags, true)
@@ -3863,315 +3851,48 @@ func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *types
 		}
 	}
 }
-func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zval, behavior int, data_compare_type int, key_compare_type int) {
-	var args *types.Zval = nil
-	var hash *types.Array
-	var arr_argc int
-	var i int
-	var c = 0
-	var idx uint32
-	var lists **types.Bucket
-	var list **types.Bucket
-	var ptrs ***types.Bucket
-	var p **types.Bucket
-	var req_args uint32
-	var param_spec *byte
-	var fci1 types.ZendFcallInfo
-	var fci2 types.ZendFcallInfo
-	var fci1_cache = zend.EmptyFcallInfoCache
-	var fci2_cache = zend.EmptyFcallInfoCache
-	var fci_key *types.ZendFcallInfo = nil
-	var fci_data *types.ZendFcallInfo
-	var fci_key_cache *types.ZendFcallInfoCache = nil
-	var fci_data_cache *types.ZendFcallInfoCache
-	var old_user_compare_fci types.ZendFcallInfo
-	var old_user_compare_fci_cache types.ZendFcallInfoCache
-	var intersect_key_compare_func func(any, any) int
-	var intersect_data_compare_func func(any, any) int
-	if behavior == INTERSECT_NORMAL {
-		intersect_key_compare_func = PhpArrayKeyCompareString
-		if data_compare_type == INTERSECT_COMP_DATA_INTERNAL {
-
-			/* array_intersect() */
-
-			req_args = 2
-			param_spec = "+"
-			intersect_data_compare_func = PhpArrayDataCompareString
-		} else if data_compare_type == INTERSECT_COMP_DATA_USER {
-
-			/* array_uintersect() */
-
-			req_args = 3
-			param_spec = "+f"
-			intersect_data_compare_func = PhpArrayUserCompare
-		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "data_compare_type is %d. This should never happen. Please report as a bug", data_compare_type)
-			return
-		}
-		if executeData.NumArgs() < req_args {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
-			return
-		}
-		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache) == types.FAILURE {
-			return
-		}
-		fci_data = &fci1
-		fci_data_cache = &fci1_cache
-	} else if (behavior & INTERSECT_ASSOC) != 0 {
-
-		/* INTERSECT_KEY is subset of INTERSECT_ASSOC. When having the former
-		 * no comparison of the data is done (part of INTERSECT_ASSOC) */
-
-		if data_compare_type == INTERSECT_COMP_DATA_INTERNAL && key_compare_type == INTERSECT_COMP_KEY_INTERNAL {
-
-			/* array_intersect_assoc() or array_intersect_key() */
-
-			req_args = 2
-			param_spec = "+"
-			intersect_key_compare_func = PhpArrayKeyCompareString
-			intersect_data_compare_func = PhpArrayDataCompareString
-		} else if data_compare_type == INTERSECT_COMP_DATA_USER && key_compare_type == INTERSECT_COMP_KEY_INTERNAL {
-
-			/* array_uintersect_assoc() */
-
-			req_args = 3
-			param_spec = "+f"
-			intersect_key_compare_func = PhpArrayKeyCompareString
-			intersect_data_compare_func = PhpArrayUserCompare
-			fci_data = &fci1
-			fci_data_cache = &fci1_cache
-		} else if data_compare_type == INTERSECT_COMP_DATA_INTERNAL && key_compare_type == INTERSECT_COMP_KEY_USER {
-
-			/* array_intersect_uassoc() or array_intersect_ukey() */
-
-			req_args = 3
-			param_spec = "+f"
-			intersect_key_compare_func = PhpArrayUserKeyCompare
-			intersect_data_compare_func = PhpArrayDataCompareString
-			fci_key = &fci1
-			fci_key_cache = &fci1_cache
-		} else if data_compare_type == INTERSECT_COMP_DATA_USER && key_compare_type == INTERSECT_COMP_KEY_USER {
-
-			/* array_uintersect_uassoc() */
-
-			req_args = 4
-			param_spec = "+ff"
-			intersect_key_compare_func = PhpArrayUserKeyCompare
-			intersect_data_compare_func = PhpArrayUserCompare
-			fci_data = &fci1
-			fci_data_cache = &fci1_cache
-			fci_key = &fci2
-			fci_key_cache = &fci2_cache
-		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "data_compare_type is %d. key_compare_type is %d. This should never happen. Please report as a bug", data_compare_type, key_compare_type)
-			return
-		}
-		if executeData.NumArgs() < req_args {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
-			return
-		}
-		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache, &fci2, &fci2_cache) == types.FAILURE {
-			return
-		}
-	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "behavior is %d. This should never happen. Please report as a bug", behavior)
-		return
-	}
-	PHP_ARRAY_CMP_FUNC_BACKUP()
-
-	/* for each argument, create and sort list with pointers to the hash buckets */
-
-	lists = (**types.Bucket)(zend.SafeEmalloc(arr_argc, b.SizeOf("Bucket *"), 0))
-	ptrs = (**types.Bucket)(zend.SafeEmalloc(arr_argc, b.SizeOf("Bucket *"), 0))
-	if behavior == INTERSECT_NORMAL && data_compare_type == INTERSECT_COMP_DATA_USER {
-		BG__().user_compare_fci = *fci_data
-		BG__().user_compare_fci_cache = *fci_data_cache
-	} else if (behavior&INTERSECT_ASSOC) != 0 && key_compare_type == INTERSECT_COMP_KEY_USER {
-		BG__().user_compare_fci = *fci_key
-		BG__().user_compare_fci_cache = *fci_key_cache
-	}
-	for i = 0; i < arr_argc; i++ {
-		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-			arr_argc = i
-			goto out
-		}
-		hash = args[i].Array()
-		list = (*types.Bucket)(zend.Pemalloc((hash.Len() + 1) * b.SizeOf("Bucket")))
-		lists[i] = list
-		ptrs[i] = list
-		for idx = 0; idx < hash.GetNNumUsed(); idx++ {
-			p = hash.Bucket(idx)
-			if p.GetVal().IsUndef() {
-				continue
-			}
-			b.PostInc(&(*list)) = *p
-		}
-		list.GetVal().SetUndef()
-		if hash.Len() > 1 {
-			if behavior == INTERSECT_NORMAL {
-				zend.ZendSort(any(lists[i]), hash.Len(), b.SizeOf("Bucket"), intersect_data_compare_func, types.SwapFuncT(types.ZendHashBucketSwap))
-			} else if (behavior & INTERSECT_ASSOC) != 0 {
-				zend.ZendSort(any(lists[i]), hash.Len(), b.SizeOf("Bucket"), intersect_key_compare_func, types.SwapFuncT(types.ZendHashBucketSwap))
-			}
-		}
-	}
-
-	/* copy the argument array */
-
-	return_value.SetArray(types.ZendArrayDup(args[0].Array()))
-
-	/* go through the lists and look for common values */
-
-	for ptrs[0].GetVal().IsNotUndef() {
-		if (behavior&INTERSECT_ASSOC) != 0 && key_compare_type == INTERSECT_COMP_KEY_USER {
-			BG__().user_compare_fci = *fci_key
-			BG__().user_compare_fci_cache = *fci_key_cache
-		}
-		for i = 1; i < arr_argc; i++ {
-			if (behavior & INTERSECT_NORMAL) != 0 {
-				for ptrs[i].GetVal().IsNotUndef() && 0 < b.Assign(&c, intersect_data_compare_func(ptrs[0], ptrs[i])) {
-					ptrs[i]++
-				}
-			} else if (behavior & INTERSECT_ASSOC) != 0 {
-				for ptrs[i].GetVal().IsNotUndef() && 0 < b.Assign(&c, intersect_key_compare_func(ptrs[0], ptrs[i])) {
-					ptrs[i]++
-				}
-				if c == 0 && ptrs[i].GetVal().IsNotUndef() && behavior == INTERSECT_ASSOC {
-
-					/* this means that ptrs[i] is not NULL so we can compare
-					 * and "c==0" is from last operation
-					 * in this branch of code we enter only when INTERSECT_ASSOC
-					 * since when we have INTERSECT_KEY compare of data is not wanted. */
-
-					if data_compare_type == INTERSECT_COMP_DATA_USER {
-						BG__().user_compare_fci = *fci_data
-						BG__().user_compare_fci_cache = *fci_data_cache
-					}
-					if intersect_data_compare_func(ptrs[0], ptrs[i]) != 0 {
-						c = 1
-						if key_compare_type == INTERSECT_COMP_KEY_USER {
-							BG__().user_compare_fci = *fci_key
-							BG__().user_compare_fci_cache = *fci_key_cache
-						}
-					}
-				}
-			}
-			if ptrs[i].GetVal().IsUndef() {
-
-				/* delete any values corresponding to remains of ptrs[0] */
-
-				for {
-					ptrs[0]++
-					p = ptrs[0] - 1
-					if p.GetVal().IsUndef() {
-						goto out
-					}
-					if p.GetKey() == nil {
-						types.ZendHashIndexDel(return_value.Array(), p.GetH())
-					} else {
-						types.ZendHashDel(return_value.Array(), p.GetKey().GetStr())
-					}
-				}
-
-				/* delete any values corresponding to remains of ptrs[0] */
-
-			}
-			if c != 0 {
-				break
-			}
-			ptrs[i]++
-		}
-		if c != 0 {
-
-			/* Value of ptrs[0] not in all arguments, delete all entries */
-
-			for {
-				p = ptrs[0]
-				if p.GetKey() == nil {
-					types.ZendHashIndexDel(return_value.Array(), p.GetH())
-				} else {
-					types.ZendHashDel(return_value.Array(), p.GetKey().GetStr())
-				}
-				if b.PreInc(&ptrs[0]).val.IsUndef() {
-					goto out
-				}
-				if behavior == INTERSECT_NORMAL {
-					if 0 <= intersect_data_compare_func(ptrs[0], ptrs[i]) {
-						break
-					}
-				} else if (behavior & INTERSECT_ASSOC) != 0 {
-
-					/* no need of looping because indexes are unique */
-
-					break
-
-					/* no need of looping because indexes are unique */
-
-				}
-			}
-
-			/* Value of ptrs[0] not in all arguments, delete all entries */
-
-		} else {
-
-			/* ptrs[0] is present in all the arguments */
-
-			for {
-				if b.PreInc(&ptrs[0]).val.IsUndef() {
-					goto out
-				}
-				if behavior == INTERSECT_NORMAL {
-					if intersect_data_compare_func(ptrs[0]-1, ptrs[0]) != 0 {
-						break
-					}
-				} else if (behavior & INTERSECT_ASSOC) != 0 {
-
-					/* no need of looping because indexes are unique */
-
-					break
-
-					/* no need of looping because indexes are unique */
-
-				}
-			}
-
-			/* ptrs[0] is present in all the arguments */
-
-		}
-	}
-out:
-	for i = 0; i < arr_argc; i++ {
-		hash = args[i].Array()
-		zend.Pefree(lists[i], hash.GetGcFlags()&types.IS_ARRAY_PERSISTENT)
-	}
-	PHP_ARRAY_CMP_FUNC_RESTORE()
-	zend.Efree(ptrs)
-	zend.Efree(lists)
-}
 func ZifArrayIntersectKey(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
 	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_NONE)
 }
-func ZifArrayIntersectUkey(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackKeyCompareFunc *types.Zval) {
-	PhpArrayIntersect(executeData, return_value, INTERSECT_KEY, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_USER)
+
+//@zif c=3,
+func ZifArrayIntersectUkey(arrays []*types.Zval, callbackKeyCompareFunc zpp.Callable) (*types.Array, bool) {
+	cmp := arrayUserKeyComparer(callbackKeyCompareFunc)
+	return arrayIntersectWrapper(arrays, cmp)
 }
-func ZifArrayIntersect(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
-	PhpArrayIntersect(executeData, return_value, INTERSECT_NORMAL, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_INTERNAL)
+
+//@zif c=2,
+func ZifArrayIntersect(arrays []*types.Zval) (*types.Array, bool) {
+	cmp := arrayDataComparer(zend.StringCompareFunction)
+	return arrayIntersectWrapper(arrays, cmp)
 }
-func ZifArrayUintersect(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompareFunc *types.Zval) {
-	PhpArrayIntersect(executeData, return_value, INTERSECT_NORMAL, INTERSECT_COMP_DATA_USER, INTERSECT_COMP_KEY_INTERNAL)
+
+//@zif c=3,
+func ZifArrayUintersect(arrays []*types.Zval, callbackDataCompareFunc zpp.Callable) (*types.Array, bool) {
+	cmp := arrayUserDataComparer(callbackDataCompareFunc)
+	return arrayIntersectWrapper(arrays, cmp)
 }
 func ZifArrayIntersectAssoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
 	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_INTERNAL)
 }
-func ZifArrayIntersectUassoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackKeyCompareFunc *types.Zval) {
-	PhpArrayIntersect(executeData, return_value, INTERSECT_ASSOC, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_USER)
+func ZifArrayIntersectUassoc(arrays []*types.Zval, callbackKeyCompareFunc zpp.Callable) (*types.Array, bool) {
+	cmp := twiceComparer(
+		arrayUserKeyComparer(callbackKeyCompareFunc),
+		arrayDataComparer(zend.StringCompareFunction),
+	)
+	return arrayIntersectWrapper(arrays, cmp)
 }
 func ZifArrayUintersectAssoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompareFunc *types.Zval) {
 	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_USER)
 }
-func ZifArrayUintersectUassoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompareFunc *types.Zval, callbackKeyCompareFunc *types.Zval) {
-	PhpArrayIntersect(executeData, return_value, INTERSECT_ASSOC, INTERSECT_COMP_DATA_USER, INTERSECT_COMP_KEY_USER)
+
+//@zif c=4,
+func ZifArrayUintersectUassoc(arrays []*types.Zval, callbackDataCompareFunc zpp.Callable, callbackKeyCompareFunc zpp.Callable) (*types.Array, bool) {
+	cmp := twiceComparer(
+		arrayUserKeyComparer(callbackKeyCompareFunc),
+		arrayUserDataComparer(callbackDataCompareFunc),
+	)
+	return arrayIntersectWrapper(arrays, cmp)
 }
 func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval, data_compare_type int) {
 	var idx uint32
@@ -4458,7 +4179,7 @@ func ZifArrayDiffAssoc(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zva
 func ZifArrayDiffUassoc(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
 		arrayUserKeyComparer(callbackKeyCompFunc),
-		valueComparer(zend.StringCompareFunction),
+		arrayDataComparer(zend.StringCompareFunction),
 	)
 	return arrayDiffWrapper(arrays, cmp)
 }

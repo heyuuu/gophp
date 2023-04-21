@@ -20,7 +20,7 @@ func reserveComparer(comparer types.ArrayComparer) types.ArrayComparer {
 	}
 }
 
-func valueComparer(comparer func(v1, v2 *types.Zval) int) types.ArrayComparer {
+func arrayDataComparer(comparer func(v1, v2 *types.Zval) int) types.ArrayComparer {
 	return func(p1, p2 types.ArrayPair) int {
 		v1 := p1.GetVal().DeIndirect()
 		v2 := p2.GetVal().DeIndirect()
@@ -28,7 +28,7 @@ func valueComparer(comparer func(v1, v2 *types.Zval) int) types.ArrayComparer {
 	}
 }
 
-func keyComparer(comparer func(v1, v2 types.ArrayKey) int) types.ArrayComparer {
+func arrayKeyComparer(comparer func(v1, v2 types.ArrayKey) int) types.ArrayComparer {
 	return func(p1, p2 types.ArrayPair) int {
 		return comparer(p1.GetKey(), p2.GetKey())
 	}
@@ -69,25 +69,25 @@ func phpGetDataCompareFunc(sortType zend.ZendLong, reverse bool) types.ArrayComp
 	var comparer types.ArrayComparer
 	switch sortType & ^PHP_SORT_FLAG_CASE {
 	case PHP_SORT_NUMERIC:
-		comparer = valueComparer(zend.NumericCompareFunction)
+		comparer = arrayDataComparer(zend.NumericCompareFunction)
 	case PHP_SORT_STRING:
 		if (sortType & PHP_SORT_FLAG_CASE) != 0 {
-			comparer = valueComparer(zend.StringCaseCompareFunction)
+			comparer = arrayDataComparer(zend.StringCaseCompareFunction)
 		} else {
-			comparer = valueComparer(zend.StringCompareFunction)
+			comparer = arrayDataComparer(zend.StringCompareFunction)
 		}
 	case PHP_SORT_NATURAL:
 		if (sortType & PHP_SORT_FLAG_CASE) != 0 {
-			comparer = valueComparer(arrayNaturalGeneralCaseCompare)
+			comparer = arrayDataComparer(arrayNaturalGeneralCaseCompare)
 		} else {
-			comparer = valueComparer(arrayNaturalGeneralCompare)
+			comparer = arrayDataComparer(arrayNaturalGeneralCompare)
 		}
 	case PHP_SORT_LOCALE_STRING:
-		comparer = valueComparer(zend.StringLocaleCompareFunction)
+		comparer = arrayDataComparer(zend.StringLocaleCompareFunction)
 	case PHP_SORT_REGULAR:
 		fallthrough
 	default:
-		comparer = valueComparer(arrayDataCompare)
+		comparer = arrayDataComparer(arrayDataCompare)
 	}
 	if reverse {
 		comparer = reserveComparer(comparer)
@@ -164,25 +164,25 @@ func PhpGetKeyCompareFunc(sortType zend.ZendLong, reverse bool) types.ArrayCompa
 	var comparer types.ArrayComparer
 	switch sortType & ^PHP_SORT_FLAG_CASE {
 	case PHP_SORT_NUMERIC:
-		comparer = keyComparer(arrayKeyCompareNumeric)
+		comparer = arrayKeyComparer(arrayKeyCompareNumeric)
 	case PHP_SORT_STRING:
 		if (sortType & PHP_SORT_FLAG_CASE) != 0 {
-			comparer = keyComparer(arrayKeyCompareStringCase)
+			comparer = arrayKeyComparer(arrayKeyCompareStringCase)
 		} else {
-			comparer = keyComparer(arrayKeyCompareString)
+			comparer = arrayKeyComparer(arrayKeyCompareString)
 		}
 	case PHP_SORT_NATURAL:
 		if (sortType & PHP_SORT_FLAG_CASE) != 0 {
-			comparer = keyComparer(arrayKeyCompareStringNaturalCase)
+			comparer = arrayKeyComparer(arrayKeyCompareStringNaturalCase)
 		} else {
-			comparer = keyComparer(arrayKeyCompareStringNatural)
+			comparer = arrayKeyComparer(arrayKeyCompareStringNatural)
 		}
 	case PHP_SORT_LOCALE_STRING:
-		comparer = keyComparer(arrayKeyCompareStringLocale)
+		comparer = arrayKeyComparer(arrayKeyCompareStringLocale)
 	case PHP_SORT_REGULAR:
 		fallthrough
 	default:
-		comparer = keyComparer(arrayKeyCompare)
+		comparer = arrayKeyComparer(arrayKeyCompare)
 	}
 	if reverse {
 		comparer = reserveComparer(comparer)
@@ -266,6 +266,65 @@ func arrayDiff(array *types.Array, arrays []*types.Array, cmp types.ArrayCompare
 		}
 		if c >= 0 {
 			diffPairs = diffPairs[1:]
+		}
+	}
+
+	return retArr
+}
+func arrayIntersectWrapper(args []*types.Zval, cmp types.ArrayComparer) (*types.Array, bool) {
+	var arrays []*types.Array
+	for i, arg := range args {
+		if !arg.IsArray() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
+			return nil, false
+		}
+		arrays[i] = arg.Array()
+	}
+	return arrayIntersect(arrays[0], arrays[1:], cmp), true
+}
+
+func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayComparer) *types.Array {
+	retArr := types.ZendArrayDup(array)
+	if len(arrays) == 0 {
+		return retArr
+	}
+
+	// 获取基准键值对，并排序
+	basePairs := array.Pairs()
+	sortPairs(basePairs, cmp)
+
+	// 获取对比数组键值对，并各自排序
+	cmpPairsList := make([][]types.ArrayPair, len(arrays))
+	for i, cmpArray := range arrays {
+		cmpPairsList[i] = cmpArray.Pairs()
+		sortPairs(cmpPairsList[i], cmp)
+	}
+
+	for _, pair := range basePairs {
+		keep := true // 标识会否保留此元素
+		for cmpIdx, cmpPairs := range cmpPairsList {
+			// 去除小于 pair 的元素，找到第一个 >= pair 的元素或到队尾
+			for len(cmpPairs) > 0 {
+				c := cmp(pair, cmpPairs[0])
+				if c > 0 {
+					cmpPairsList[cmpIdx] = cmpPairs[1:]
+				} else {
+					if c < 0 {
+						keep = false
+					}
+					break
+				}
+			}
+			// 已到队尾说明没有上匹配任何值
+			if len(cmpPairs) == 0 {
+				keep = false
+			}
+			if !keep {
+				break
+			}
+		}
+		if !keep {
+			retArr.Delete(pair.GetKey())
 		}
 	}
 
