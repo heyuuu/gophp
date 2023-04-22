@@ -1,51 +1,33 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 )
 
 func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var arg_num uint32 = opline.GetOp1().GetNum()
-	var arg_count uint32 = executeData.NumArgs()
+	var arg_count uint32 = uint32(executeData.NumArgs())
 	var params *types.Zval
 	params = opline.Result()
 	if arg_num <= arg_count {
-		var param *types.Zval
 		ArrayInitSize(params, arg_count-arg_num+1)
-		for {
-			fillScope := types.PackedFillStart(params.Array())
-			param = executeData.VarNum(executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T)
-			if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccHasTypeHints) != 0 {
-				ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
-				for {
-					ZendVerifyVariadicArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum()))
+		paramIdx := executeData.GetFunc().GetOpArray().GetLastVar() + int(executeData.GetFunc().GetOpArray().T)
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccHasTypeHints) != 0 {
+			ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
 
-					// param.TryAddRefcount()
+			for i := 0; i < int(arg_count-arg_num); i++ {
+				param := executeData.VarNum(paramIdx + i)
 
-					fillScope.FillSet(param)
-					fillScope.FillNext()
-					param++
-					if b.PreInc(&arg_num) > arg_count {
-						break
-					}
-				}
-			} else {
-				for {
+				ZendVerifyVariadicArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum()))
 
-					// param.TryAddRefcount()
-
-					fillScope.FillSet(param)
-					fillScope.FillNext()
-					param++
-					if b.PreInc(&arg_num) > arg_count {
-						break
-					}
-				}
+				params.Array().NextIndexInsert(param)
 			}
-			fillScope.FillEnd()
-			break
+		} else {
+			for i := 0; i < int(arg_count-arg_num); i++ {
+				param := executeData.VarNum(paramIdx + i)
+				params.Array().NextIndexInsert(param)
+			}
 		}
 	} else {
 		params.SetEmptyArray()

@@ -24,7 +24,6 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().GetNumArgs()
 		ht = types.NewArray(result_size)
 		opline.Result().SetArray(ht)
-		fillScope := types.PackedFillStart(ht)
 		var p *types.Zval
 		var q *types.Zval
 		var i uint32 = skip
@@ -34,14 +33,10 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 				q = p
 				if !q.IsUndef() {
 					q = types.ZVAL_DEREF(q)
-
-					// q.TryAddRefcount()
-
-					fillScope.FillSet(q)
+					ht.NextIndexInsert(q)
 				} else {
-					fillScope.FillSetNull()
+					ht.NextIndexInsert(types.NewZvalNull())
 				}
-				fillScope.FillNext()
 				p++
 				i++
 			}
@@ -56,19 +51,13 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 			q = p
 			if !q.IsUndef() {
 				q = types.ZVAL_DEREF(q)
-
-				// q.TryAddRefcount()
-
-				fillScope.FillSet(q)
+				ht.NextIndexInsert(q)
 			} else {
-				fillScope.FillSetNull()
+				ht.NextIndexInsert(types.NewZvalNull())
 			}
-			fillScope.FillNext()
 			p++
 			i++
 		}
-		fillScope.FillEnd()
-		ht.SetNNumOfElements(result_size)
 	} else {
 		opline.Result().SetEmptyArray()
 	}
@@ -87,10 +76,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 		result_size = arg_count
 	}
 	if result_size != 0 {
-		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().num_args
+		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().GetNumArgs()
 		ht = types.NewArray(result_size)
 		opline.Result().SetArray(ht)
-		fillScope := types.PackedFillStart(ht)
 		var p *types.Zval
 		var q *types.Zval
 		var i uint32 = skip
@@ -100,14 +88,10 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 				q = p
 				if !q.IsUndef() {
 					q = types.ZVAL_DEREF(q)
-
-					// q.TryAddRefcount()
-
-					fillScope.FillSet(q)
+					ht.NextIndexInsert(q)
 				} else {
-					fillScope.FillSetNull()
+					ht.NextIndexInsert(types.NewZvalNull())
 				}
-				fillScope.FillNext()
 				p++
 				i++
 			}
@@ -122,18 +106,13 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 			q = p
 			if !q.IsUndef() {
 				q = types.ZVAL_DEREF(q)
-
-				// q.TryAddRefcount()
-
-				fillScope.FillSet(q)
+				ht.NextIndexInsert(q)
 			} else {
-				fillScope.FillSetNull()
+				ht.NextIndexInsert(types.NewZvalNull())
 			}
-			fillScope.FillNext()
 			p++
 			i++
 		}
-		fillScope.FillEnd()
 		ht.SetNNumOfElements(result_size)
 	} else {
 		opline.Result().SetEmptyArray()

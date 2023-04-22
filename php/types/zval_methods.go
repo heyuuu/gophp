@@ -54,9 +54,6 @@ func (zv *Zval) IsRefcounted() bool {
 		return false
 	}
 }
-func (zv *Zval) IsCollectable() bool {
-	return zv.typ == IS_ARRAY || zv.typ == IS_OBJECT
-}
 
 func (zv *Zval) GetRefcount() uint32 {
 	b.Assert(zv.IsRefcounted())

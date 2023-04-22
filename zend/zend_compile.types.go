@@ -156,9 +156,9 @@ type ZendOp struct {
 
 func (op *ZendOp) GetHandler() OpcodeHandlerT      { return op.handler }
 func (op *ZendOp) SetHandler(value OpcodeHandlerT) { op.handler = value }
-func (op *ZendOp) GetOp1() ZnodeOp                 { return op.op1 }
+func (op *ZendOp) GetOp1() *ZnodeOp                { return &op.op1 }
 func (op *ZendOp) SetOp1(value ZnodeOp)            { op.op1 = value }
-func (op *ZendOp) GetOp2() ZnodeOp                 { return op.op2 }
+func (op *ZendOp) GetOp2() *ZnodeOp                { return &op.op2 }
 func (op *ZendOp) SetOp2(value ZnodeOp)            { op.op2 = value }
 func (op *ZendOp) GetResult() ZnodeOp              { return op.result }
 func (op *ZendOp) SetResult(value ZnodeOp)         { op.result = value }

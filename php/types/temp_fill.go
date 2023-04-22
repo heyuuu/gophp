@@ -36,7 +36,6 @@ func (s *PackedFillScope) FillSet(arg *Zval) {
 }
 
 func (s *PackedFillScope) FillSetNull() {
-	//s.bucket.GetVal().SetNull()
 	s.zv.SetNull()
 }
 

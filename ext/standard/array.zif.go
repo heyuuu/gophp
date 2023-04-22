@@ -367,7 +367,7 @@ var DefZifRange = def.DefFunc("range", 2, 3, []def.ArgInfo{{Name: "low"}, {Name:
 	if fp.HasError() {
 		return
 	}
-	ZifRange(executeData, returnValue, low, high, nil, step)
+	ZifRange(returnValue, low, high, nil, step)
 })
 
 // generate by ZifShuffle

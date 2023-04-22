@@ -1297,70 +1297,53 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	}
 }
 func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
-	var num_args uint32 = call.NumArgs()
-	if num_args != 0 {
-		var i uint32 = 0
+	var numArgs = call.NumArgs()
+	if numArgs != 0 {
+
+		var i = 0
 		var p = call.Arg(1)
-		ArrayInitSize(arg_array, num_args)
+		ArrayInitSize(arg_array, numArgs)
 
-		fillScope := types.PackedFillStart(arg_array.Array())
+		arr := types.NewArray(numArgs)
 		if call.GetFunc().GetType() == ZEND_USER_FUNCTION {
-			var first_extra_arg = b.Min(num_args, call.GetFunc().GetOpArray().GetNumArgs())
+			var firstExtraArg = b.Min(numArgs, call.GetFunc().GetOpArray().GetNumArgs())
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
-
 				/* In case of attached symbol_table, values on stack may be invalid
 				 * and we have to access them through symbol_table
 				 * See: https://bugs.php.net/bug.php?id=73156
 				 */
-
-				var arg_name *types.String
+				var argName *types.String
 				var arg *types.Zval
-				for i < first_extra_arg {
-					arg_name = call.GetFunc().GetOpArray().GetVars()[i]
-					arg = types.ZendHashFindInd(call.GetSymbolTable(), arg_name.GetStr())
+				for ; i < firstExtraArg; i++ {
+					argName = call.GetFunc().GetOpArray().GetVars()[i]
+					arg = types.ZendHashFindInd(call.GetSymbolTable(), argName.GetStr())
 					if arg != nil {
-
-						// arg.TryAddRefcount()
-
-						fillScope.FillSet(arg)
+						arr.NextIndexInsert(arg)
 					} else {
-						fillScope.FillSetNull()
+						arr.NextIndexInsert(types.NewZvalNull())
 					}
-					fillScope.FillNext()
-					i++
 				}
 			} else {
-				for i < first_extra_arg {
+				for ; i < firstExtraArg; i++ {
 					if !p.IsUndef() {
-
-						// p.TryAddRefcount()
-
-						fillScope.FillSet(p)
+						arr.NextIndexInsert(p)
 					} else {
-						fillScope.FillSetNull()
+						arr.NextIndexInsert(types.NewZvalNull())
 					}
-					fillScope.FillNext()
 					p++
-					i++
 				}
 			}
 			p = call.VarNum(call.GetFunc().GetOpArray().GetLastVar() + call.GetFunc().GetOpArray().GetT())
 		}
-		for i < num_args {
+		for ; i < numArgs; i++ {
 			if !p.IsUndef() {
-
-				// p.TryAddRefcount()
-
-				fillScope.FillSet(p)
+				arr.NextIndexInsert(p)
 			} else {
-				fillScope.FillSetNull()
+				arr.NextIndexInsert(types.NewZvalNull())
 			}
-			fillScope.FillNext()
 			p++
-			i++
 		}
-		fillScope.FillEnd()
-		arg_array.Array().SetNNumOfElements(num_args)
+		arg_array.SetArray(arr)
 	} else {
 		arg_array.SetEmptyArray()
 	}

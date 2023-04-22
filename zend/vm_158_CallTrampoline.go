@@ -11,26 +11,8 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var fbc types.IFunction = executeData.GetFunc()
 	var ret *types.Zval = executeData.GetReturnValue()
 	var call_info uint32 = EX_CALL_INFO() & (ZEND_CALL_NESTED | ZEND_CALL_TOP | ZEND_CALL_RELEASE_THIS)
-	var num_args uint32 = executeData.NumArgs()
 	var call *ZendExecuteData
-	if num_args != 0 {
-		var p *types.Zval = executeData.Arg(1)
-		var end *types.Zval = p + num_args
-		args = types.NewArray(num_args)
-		for {
-			fillScope := types.PackedFillStart(args)
-			for {
-				fillScope.FillSet(p)
-				fillScope.FillNext()
-				p++
-				if p == end {
-					break
-				}
-			}
-			fillScope.FillEnd()
-			break
-		}
-	}
+	args = types.NewArrayOfZval(executeData.AllArgs())
 	call = executeData
 	EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 	executeData = CurrEX()

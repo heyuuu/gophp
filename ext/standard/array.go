@@ -1876,29 +1876,15 @@ func ZifArrayFillKeys(executeData zpp.Ex, return_value zpp.Ret, keys *types.Zval
 		}
 	}
 }
-func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *types.Zval, _ zpp.Opt, step *types.Zval) {
-	var zlow *types.Zval
-	var zhigh *types.Zval
-	var zstep *types.Zval = nil
+func ZifRange(return_value zpp.Ret, low_ *types.Zval, high_ *types.Zval, _ zpp.Opt, step_ *types.Zval) {
+	var zlow *types.Zval = low_
+	var zhigh *types.Zval = high_
+	var zstep *types.Zval = step_
 	var tmp types.Zval
 	var err = 0
 	var is_step_double = 0
 	var step = 1.0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			zlow = fp.ParseZval()
-			zhigh = fp.ParseZval()
-			fp.StartOptional()
-			zstep = fp.ParseZval()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
+
 	if zstep != nil {
 		if zstep.IsType(types.IS_DOUBLE) {
 			is_step_double = 1
@@ -1908,9 +1894,7 @@ func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *t
 				is_step_double = 1
 			}
 			if type_ == 0 {
-
 				/* bad number */
-
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range string - must be numeric")
 				return_value.SetFalse()
 				return
@@ -1919,17 +1903,12 @@ func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *t
 		step = zend.ZvalGetDouble(zstep)
 
 		/* We only want positive step values. */
-
 		if step < 0.0 {
 			step *= -1
 		}
-
-		/* We only want positive step values. */
-
 	}
 
 	/* If the range is given as strings, generate an array of characters. */
-
 	if zlow.IsType(types.IS_STRING) && zhigh.IsType(types.IS_STRING) && zlow.String().GetLen() >= 1 && zhigh.String().GetLen() >= 1 {
 		var type1 int
 		var type2 int
@@ -1956,15 +1935,12 @@ func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *t
 			zend.ArrayInitSize(return_value, uint32((low-high)/lstep+1))
 
 			for {
-				fillScope := types.PackedFillStart(return_value.Array())
 				for ; low >= high; low -= uint(lstep) {
-					fillScope.FillSetInternedStr(types.NewString(string(low)))
-					fillScope.FillNext()
+					return_value.Array().NextIndexInsert(types.NewZvalString(string(low)))
 					if signed__int(low-lstep) < 0 {
 						break
 					}
 				}
-				fillScope.FillEnd()
 				break
 			}
 		} else if high > low {
