@@ -3,13 +3,12 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/zend/internal"
 )
 
-type ClassTable = *internal.Table[*types.ClassEntry]
-type FunctionTable = *internal.Table[types.IFunction]
-type ConstantTable = *internal.Table[*ZendConstant]
-type IniDirectives = *internal.Table[*ZendIniEntry]
+type ClassTable = *types.Table[*types.ClassEntry]
+type FunctionTable = *types.Table[types.IFunction]
+type ConstantTable = *types.Table[*ZendConstant]
+type IniDirectives = *types.Table[*ZendIniEntry]
 
 /**
  * ZendCompilerGlobals
@@ -55,8 +54,8 @@ type ZendCompilerGlobals struct {
 }
 
 func (this *ZendCompilerGlobals) InitTables() {
-	this.functionTable = internal.NewLcTable[types.IFunction](ZendFunctionDtorEx)
-	this.classTable = internal.NewLcTable[*types.ClassEntry](DestroyZendClassEntry)
+	this.functionTable = types.NewLcTable[types.IFunction](ZendFunctionDtorEx)
+	this.classTable = types.NewLcTable[*types.ClassEntry](DestroyZendClassEntry)
 	this.auto_globals = types.NewArray(8)
 }
 
@@ -262,7 +261,7 @@ type ZendExecutorGlobals struct {
 }
 
 func (this *ZendExecutorGlobals) InitTables() {
-	this.constantTable = internal.NewTable[*ZendConstant](nil)
+	this.constantTable = types.NewTable[*ZendConstant](nil)
 }
 func (this *ZendExecutorGlobals) DestroyTables() {
 	this.constantTable.Destroy()
@@ -326,13 +325,13 @@ func (this *ZendExecutorGlobals) IniDirectives() IniDirectives {
 	return this.iniDirectives
 }
 func (this *ZendExecutorGlobals) InitIniDirectives() {
-	this.iniDirectives = internal.NewTable[*ZendIniEntry](nil)
+	this.iniDirectives = types.NewTable[*ZendIniEntry](nil)
 }
 func (this *ZendExecutorGlobals) ModifiedIniDirectives() IniDirectives {
 	return this.modifiedIniDirectives
 }
 func (this *ZendExecutorGlobals) InitModifiedIniDirectives() {
-	this.modifiedIniDirectives = internal.NewTable[*ZendIniEntry](nil)
+	this.modifiedIniDirectives = types.NewTable[*ZendIniEntry](nil)
 }
 
 func (this *ZendExecutorGlobals) NextObjectHandle() uint32 {

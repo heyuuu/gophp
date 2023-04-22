@@ -154,19 +154,16 @@ func ZifCount(return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, mode int) int {
 			zend.ZendCallMethodWith0Params(array, nil, nil, "count", &retval)
 			if retval.IsNotUndef() {
 				return_value.SetLong(zend.ZvalGetLong(&retval))
-				// zend.ZvalPtrDtor(&retval)
 			}
 			return
 		}
 
 		/* If There's no handler and it doesn't implement Countable then add a warning */
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
-		return_value.SetLong(1)
-		return
+		return 1
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
-		return_value.SetLong(1)
-		return
+		return 1
 	}
 }
 func ZifNatsort(arg zpp.RefArray) bool {
@@ -225,7 +222,7 @@ func ZifUksort(arg zpp.DerefArray, cmpFunction zpp.Callable) bool {
 	phpUsortEx(arg, cmp, false)
 	return true
 }
-func ZifEnd(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval) {
+func ZifEnd(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefArray) {
 	var array *types.Array
 	var entry *types.Zval
 	for {
@@ -240,7 +237,7 @@ func ZifEnd(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval) {
 		break
 	}
 	types.ZendHashInternalPointerEnd(array)
-	if zend.USED_RET() {
+	if zend.USED_RET(executeData) {
 		if b.Assign(&entry, types.ZendHashGetCurrentData(array)) == nil {
 			return_value.SetFalse()
 			return
@@ -3573,6 +3570,23 @@ func ZifArrayUnique(arg *types.Array, _ zpp.Opt, flags *int) *types.Array {
 }
 func ZvalCompare(first *types.Zval, second *types.Zval) int {
 	return zend.StringCompareFunction(first, second)
+}
+func ZvalUserCompare(a *types.Zval, b *types.Zval) int {
+	var args []types.Zval
+	var retval types.Zval
+	types.ZVAL_COPY_VALUE(&args[0], a)
+	types.ZVAL_COPY_VALUE(&args[1], b)
+	BG__().user_compare_fci.param_count = 2
+	BG__().user_compare_fci.params = args
+	BG__().user_compare_fci.retval = &retval
+	BG__().user_compare_fci.no_separation = 0
+	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
+		var ret = zend.ZvalGetLong(&retval)
+		// zend.ZvalPtrDtor(&retval)
+		return zend.ZEND_NORMALIZE_BOOL(ret)
+	} else {
+		return 0
+	}
 }
 
 //@zif -c 2,

@@ -13,23 +13,15 @@ func ObjectPropertiesInit(object *types.ZendObject, class_type *types.ClassEntry
 func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.Array) {
 	object.SetProperties(properties)
 	if object.GetCe().GetDefaultPropertiesCount() != 0 {
-		var prop *types.Zval
-		var key *types.String
-		var property_info *ZendPropertyInfo
-		var __ht *types.Array = properties
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			key = _p.GetKey()
-			prop = _z
-			property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
-			if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
-				var slot *types.Zval = OBJ_PROP(object, property_info.GetOffset())
-				if property_info.GetType() != 0 {
+		properties.Foreach(func(key_ types.ArrayKey, prop *types.Zval) {
+			propertyInfo := ZendGetPropertyInfo(object.GetCe(), key_.StrKey(), 1)
+			if propertyInfo != ZEND_WRONG_PROPERTY_INFO && propertyInfo != nil && !propertyInfo.IsStatic() {
+				var slot *types.Zval = OBJ_PROP(object, propertyInfo.GetOffset())
+				if propertyInfo.GetType() != 0 {
 					var tmp types.Zval
 					types.ZVAL_COPY_VALUE(&tmp, prop)
-					if ZendVerifyPropertyType(property_info, &tmp, 0) == 0 {
-						continue
+					if ZendVerifyPropertyType(propertyInfo, &tmp, 0) == 0 {
+						return
 					}
 					types.ZVAL_COPY_VALUE(slot, &tmp)
 				} else {
@@ -37,7 +29,7 @@ func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.Array) {
 				}
 				prop.SetIndirect(slot)
 			}
-		}
+		})
 	}
 }
 func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
@@ -99,47 +91,6 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 			ZvalAddRef(prop)
 		}
 	}
-}
-func _objectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.Array) int {
-	if class_type.HasCeFlags(AccInterface | AccTrait | AccImplicitAbstractClass | AccExplicitAbstractClass) {
-		if class_type.IsInterface() {
-			faults.ThrowError(nil, "Cannot instantiate interface %s", class_type.GetName().GetVal())
-		} else if class_type.IsTrait() {
-			faults.ThrowError(nil, "Cannot instantiate trait %s", class_type.GetName().GetVal())
-		} else {
-			faults.ThrowError(nil, "Cannot instantiate abstract class %s", class_type.GetName().GetVal())
-		}
-		arg.SetNull()
-		return types.FAILURE
-	}
-	if !class_type.IsConstantsUpdated() {
-		if ZendUpdateClassConstants(class_type) != types.SUCCESS {
-			arg.SetNull()
-			return types.FAILURE
-		}
-	}
-	if class_type.GetCreateObject() == nil {
-		var obj *types.ZendObject = ZendObjectsNew(class_type)
-		arg.SetObject(obj)
-		if properties != nil {
-			ObjectPropertiesInitEx(obj, properties)
-		} else {
-			_objectPropertiesInit(obj, class_type)
-		}
-	} else {
-		arg.SetObject(class_type.GetCreateObject()(class_type))
-	}
-	return types.SUCCESS
-}
-func ObjectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.Array) int {
-	return _objectAndPropertiesInit(arg, class_type, properties)
-}
-func ObjectInitEx(arg *types.Zval, class_type *types.ClassEntry) int {
-	return _objectAndPropertiesInit(arg, class_type, nil)
-}
-func ObjectInit(arg *types.Zval) int {
-	arg.SetObject(ZendObjectsNew(ZendStandardClassDef))
-	return types.SUCCESS
 }
 func AddAssocLongEx(arg *types.Zval, key string, n ZendLong) int {
 	var tmp types.Zval

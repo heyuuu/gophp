@@ -2,7 +2,6 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/zend/internal"
 )
 
 /**
@@ -64,7 +63,7 @@ func (this *ZendAstZnode) SetNode(value Znode)       { this.node = value }
 /**
  * ZendFileContext
  */
-type ImportNames = *internal.Table[string]
+type ImportNames = *types.Table[string]
 type ZendFileContext struct {
 	current_namespace        *types.String
 	in_namespace             types.ZendBool
@@ -83,19 +82,19 @@ func (this *ZendFileContext) ResetImportTables() {
 
 func (this *ZendFileContext) Imports() ImportNames {
 	if this.imports == nil {
-		this.imports = internal.NewLcTable[string](nil)
+		this.imports = types.NewLcTable[string](nil)
 	}
 	return this.imports
 }
 func (this *ZendFileContext) ImportsFunction() ImportNames {
 	if this.imports_function == nil {
-		this.imports_function = internal.NewLcTable[string](nil)
+		this.imports_function = types.NewLcTable[string](nil)
 	}
 	return this.imports_function
 }
 func (this *ZendFileContext) ImportsConst() ImportNames {
 	if this.imports_const == nil {
-		this.imports_const = internal.NewLcTable[string](nil)
+		this.imports_const = types.NewLcTable[string](nil)
 	}
 	return this.imports_const
 }

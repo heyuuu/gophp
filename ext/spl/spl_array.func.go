@@ -15,8 +15,6 @@ func SplArrayFromObj(obj *types.ZendObject) *SplArrayObject {
 }
 func Z_SPLARRAY_P(zv *types.Zval) *SplArrayObject { return SplArrayFromObj(zv.Object()) }
 func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.Array {
-	//??? TODO: Delay duplication for arrays; only duplicate for write operations
-
 	if intern.IsIsSelf() {
 		if intern.GetStd().GetProperties() == nil {
 			zend.RebuildObjectProperties(intern.GetStd())
@@ -75,10 +73,9 @@ func SplArrayObjectFreeStorage(object *types.ZendObject) {
 	// zend.ZvalPtrDtor(intern.GetArray())
 }
 func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
-	var intern *SplArrayObject
+	var intern *SplArrayObject = new(SplArrayObject)
 	var parent *types.ClassEntry = class_type
 	var inherited int = 0
-	intern = zend.ZendObjectAlloc(b.SizeOf("spl_array_object"), parent)
 	zend.ZendObjectStdInit(intern.GetStd(), class_type)
 	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
 	intern.SetArFlags(0)

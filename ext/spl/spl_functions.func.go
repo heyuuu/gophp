@@ -21,12 +21,9 @@ func SplRegisterStdClass(ppce **types.ClassEntry, class_name string, obj_ctor an
 	*ppce = zend.ZendRegisterInternalClass(&ce)
 
 	/* entries changed by initialize */
-
 	if obj_ctor {
 		ppce.SetCreateObject(obj_ctor)
 	}
-
-	/* entries changed by initialize */
 }
 func SplRegisterSubClass(ppce **types.ClassEntry, parent_ce *types.ClassEntry, class_name string, obj_ctor any, function_list *types.FunctionEntry) {
 	var ce types.ClassEntry

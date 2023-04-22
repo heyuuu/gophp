@@ -90,18 +90,18 @@ func ZendPostDeactivateModules() {
 func ZendNextFreeModule() int {
 	return globals.G().CountModules() + 1
 }
-func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32) *types.ClassEntry {
-	var class_entry = &types.ClassEntry{}
-	*class_entry = *orig_class_entry
-	class_entry.SetType(ZEND_INTERNAL_CLASS)
-	ZendInitializeClassData(class_entry, 0)
-	class_entry.SetCeFlags(ce_flags | AccConstantsUpdated | AccLinked | AccResolvedParent | AccResolvedInterfaces)
-	class_entry.SetModule(EG__().GetCurrentModule())
-	if class_entry.GetBuiltinFunctions() != nil {
-		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), class_entry.FunctionTable(), EG__().GetCurrentModule().GetType())
+func DoRegisterInternalClass(origClassEntry *types.ClassEntry, ceFlags uint32) *types.ClassEntry {
+	var classEntry = &types.ClassEntry{}
+	*classEntry = *origClassEntry
+	classEntry.SetType(ZEND_INTERNAL_CLASS)
+	ZendInitializeClassData(classEntry, 0)
+	classEntry.SetCeFlags(ceFlags | AccConstantsUpdated | AccLinked | AccResolvedParent | AccResolvedInterfaces)
+	classEntry.SetModule(EG__().GetCurrentModule())
+	if classEntry.GetBuiltinFunctions() != nil {
+		ZendRegisterFunctions(classEntry, classEntry.GetBuiltinFunctions(), classEntry.FunctionTable(), EG__().GetCurrentModule().GetType())
 	}
-	CG__().ClassTable().Update(class_entry.GetName().GetStr(), class_entry)
-	return class_entry
+	CG__().ClassTable().Update(classEntry.Name(), classEntry)
+	return classEntry
 }
 func ZendRegisterInternalClassEx(class_entry *types.ClassEntry, parent_ce *types.ClassEntry) *types.ClassEntry {
 	var register_class *types.ClassEntry
@@ -122,11 +122,11 @@ func ZendClassImplements(class_entry *types.ClassEntry, num_interfaces int, _ ..
 	}
 	va_end(interface_list)
 }
-func ZendRegisterInternalClass(orig_class_entry *types.ClassEntry) *types.ClassEntry {
-	return DoRegisterInternalClass(orig_class_entry, 0)
+func ZendRegisterInternalClass(origClassEntry *types.ClassEntry) *types.ClassEntry {
+	return DoRegisterInternalClass(origClassEntry, 0)
 }
-func ZendRegisterInternalInterface(orig_class_entry *types.ClassEntry) *types.ClassEntry {
-	return DoRegisterInternalClass(orig_class_entry, AccInterface)
+func ZendRegisterInternalInterface(origClassEntry *types.ClassEntry) *types.ClassEntry {
+	return DoRegisterInternalClass(origClassEntry, AccInterface)
 }
 func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int) int {
 	/* TODO: Move this out of here in 7.4. */

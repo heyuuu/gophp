@@ -2,12 +2,11 @@ package types
 
 import (
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/internal"
 )
 
-type FunctionTable = *internal.Table[IFunction]
-type PropertyTable = *internal.Table[*zend.ZendPropertyInfo]
-type ClassConstantTable = *internal.Table[*zend.ZendClassConstant]
+type FunctionTable = *Table[IFunction]
+type PropertyTable = *Table[*zend.ZendPropertyInfo]
+type ClassConstantTable = *Table[*zend.ZendClassConstant]
 
 /**
  * ClassEntry
