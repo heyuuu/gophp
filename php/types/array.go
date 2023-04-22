@@ -126,8 +126,7 @@ type Array struct {
 
 	arData *Bucket // C 源码中存储数据的地方，实际不使用
 
-	keys  []ArrayKey
-	data0 map[ArrayKey]*Zval
+	data0 ArrayData
 }
 
 var _ IRefcounted = &Array{}

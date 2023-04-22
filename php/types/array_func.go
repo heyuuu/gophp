@@ -56,24 +56,6 @@ func NewArrayOfZval(items []*Zval) *Array {
 	return arr
 }
 
-func bucketType(p *Bucket) int {
-	if p == nil {
-		return HASH_KEY_NON_EXISTENT
-	} else if p.IsStrKey() {
-		return HASH_KEY_IS_STRING
-	} else {
-		return HASH_KEY_IS_LONG
-	}
-}
-
-func (ht *Array) CurrentKeyType(pos uint32) int {
-	var p *Bucket
-	if validPos, ok := ht.validPos(pos); ok {
-		p = ht.Bucket(validPos)
-	}
-	return bucketType(p)
-}
-
 func ZendHashHasMoreElementsEx(ht *Array, pos *ArrayPosition) bool {
 	_, ok := ht.validPos(*pos)
 	return ok
