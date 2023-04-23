@@ -143,8 +143,8 @@ func (this *ZendRefcounted) HasGcFlags(flags uint32) bool {
 	return b.FlagMatch(gcFlags, flags)
 }
 
-func (this *ZendRefcounted) SetCollectable()     { this.AddGcFlags(GC_COLLECTABLE) }
-func (this *ZendRefcounted) DelCollectable()     { this.DelGcFlags(GC_COLLECTABLE) }
+func (this *ZendRefcounted) SetCollectable() { this.AddGcFlags(GC_COLLECTABLE) }
+func (this *ZendRefcounted) DelCollectable() { this.DelGcFlags(GC_COLLECTABLE) }
 
 func (this *ZendRefcounted) IsImmutable() bool { return this.HasGcFlags(GC_IMMUTABLE) }
 func (this *ZendRefcounted) SetImmutable()     { this.AddGcFlags(GC_IMMUTABLE) }

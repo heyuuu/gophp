@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard/array"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
@@ -156,7 +157,7 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	if ZmStartupSyslog(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupArray(type_, module_number) != types.SUCCESS {
+	if array.ZmStartupArray(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}
 	if ZmStartupAssert(type_, module_number) != types.SUCCESS {
@@ -195,7 +196,7 @@ func ZmShutdownBasic(type_ int, module_number int) int {
 	streams.PhpUnregisterUrlStreamWrapper("http")
 	streams.PhpUnregisterUrlStreamWrapper("ftp")
 	ZmShutdownBrowscap(type_, module_number)
-	ZmShutdownArray(type_, module_number)
+	array.ZmShutdownArray(type_, module_number)
 	ZmShutdownAssert(type_, module_number)
 	ZmShutdownUrlScannerEx(type_, module_number)
 	ZmShutdownFile(type_, module_number)

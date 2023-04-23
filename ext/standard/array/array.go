@@ -1,8 +1,9 @@
-package standard
+package array
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -417,14 +418,14 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 	if userdata != nil {
 		types.ZVAL_COPY(&args[2], userdata)
 	}
-	BG__().array_walk_fci.retval = &retval
+	standard.BG__().array_walk_fci.retval = &retval
 	if userdata != nil {
-		BG__().array_walk_fci.param_count = 3
+		standard.BG__().array_walk_fci.param_count = 3
 	} else {
-		BG__().array_walk_fci.param_count = 2
+		standard.BG__().array_walk_fci.param_count = 2
 	}
-	BG__().array_walk_fci.params = args
-	BG__().array_walk_fci.no_separation = 0
+	standard.BG__().array_walk_fci.params = args
+	standard.BG__().array_walk_fci.no_separation = 0
 	ht_iter = zend.EG__().AddArrayIterator(target_hash)
 
 	/* Iterate through hash */
@@ -494,8 +495,8 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 
 			/* backup the fcall info and cache */
 
-			orig_array_walk_fci = BG__().array_walk_fci
-			orig_array_walk_fci_cache = BG__().array_walk_fci_cache
+			orig_array_walk_fci = standard.BG__().array_walk_fci
+			orig_array_walk_fci_cache = standard.BG__().array_walk_fci_cache
 			// 			ref.AddRefcount()
 			thash.ProtectRecursive()
 			result = PhpArrayWalk(zv, userdata, recursive)
@@ -514,14 +515,14 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 
 			/* restore the fcall info and cache */
 
-			BG__().array_walk_fci = orig_array_walk_fci
-			BG__().array_walk_fci_cache = orig_array_walk_fci_cache
+			standard.BG__().array_walk_fci = orig_array_walk_fci
+			standard.BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 		} else {
 			types.ZVAL_COPY(&args[0], zv)
 
 			/* Call the userland function */
 
-			result = zend.ZendCallFunction(&(BG__().array_walk_fci), &(BG__().array_walk_fci_cache))
+			result = zend.ZendCallFunction(&(standard.BG__().array_walk_fci), &(standard.BG__().array_walk_fci_cache))
 			if result == types.SUCCESS {
 				// zend.ZvalPtrDtor(&retval)
 			}
@@ -563,28 +564,28 @@ func ZifArrayWalk(executeData zpp.Ex, return_value zpp.Ret, input zpp.RefZval, f
 	var userdata *types.Zval = nil
 	var orig_array_walk_fci types.ZendFcallInfo
 	var orig_array_walk_fci_cache types.ZendFcallInfoCache
-	orig_array_walk_fci = BG__().array_walk_fci
-	orig_array_walk_fci_cache = BG__().array_walk_fci_cache
+	orig_array_walk_fci = standard.BG__().array_walk_fci
+	orig_array_walk_fci_cache = standard.BG__().array_walk_fci_cache
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			array = fp.ParseArrayOrObjectEx(false, true)
-			fp.ParseFunc(&(BG__().array_walk_fci), &(BG__().array_walk_fci_cache))
+			fp.ParseFunc(&(standard.BG__().array_walk_fci), &(standard.BG__().array_walk_fci_cache))
 			fp.StartOptional()
 			userdata = fp.ParseZval()
 			break
 		}
 		if _error_code != zpp.ZPP_ERROR_OK {
-			BG__().array_walk_fci = orig_array_walk_fci
-			BG__().array_walk_fci_cache = orig_array_walk_fci_cache
+			standard.BG__().array_walk_fci = orig_array_walk_fci
+			standard.BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 			return
 		}
 		break
 	}
 	PhpArrayWalk(array, userdata, 0)
-	zend.ZendReleaseFcallInfoCache(&(BG__().array_walk_fci_cache))
-	BG__().array_walk_fci = orig_array_walk_fci
-	BG__().array_walk_fci_cache = orig_array_walk_fci_cache
+	zend.ZendReleaseFcallInfoCache(&(standard.BG__().array_walk_fci_cache))
+	standard.BG__().array_walk_fci = orig_array_walk_fci
+	standard.BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 	return_value.SetTrue()
 	return
 }
@@ -593,28 +594,28 @@ func ZifArrayWalkRecursive(executeData zpp.Ex, return_value zpp.Ret, input zpp.R
 	var userdata *types.Zval = nil
 	var orig_array_walk_fci types.ZendFcallInfo
 	var orig_array_walk_fci_cache types.ZendFcallInfoCache
-	orig_array_walk_fci = BG__().array_walk_fci
-	orig_array_walk_fci_cache = BG__().array_walk_fci_cache
+	orig_array_walk_fci = standard.BG__().array_walk_fci
+	orig_array_walk_fci_cache = standard.BG__().array_walk_fci_cache
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			array = fp.ParseArrayOrObjectEx(false, true)
-			fp.ParseFunc(&(BG__().array_walk_fci), &(BG__().array_walk_fci_cache))
+			fp.ParseFunc(&(standard.BG__().array_walk_fci), &(standard.BG__().array_walk_fci_cache))
 			fp.StartOptional()
 			userdata = fp.ParseZval()
 			break
 		}
 		if _error_code != zpp.ZPP_ERROR_OK {
-			BG__().array_walk_fci = orig_array_walk_fci
-			BG__().array_walk_fci_cache = orig_array_walk_fci_cache
+			standard.BG__().array_walk_fci = orig_array_walk_fci
+			standard.BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 			return
 		}
 		break
 	}
 	PhpArrayWalk(array, userdata, 1)
-	zend.ZendReleaseFcallInfoCache(&(BG__().array_walk_fci_cache))
-	BG__().array_walk_fci = orig_array_walk_fci
-	BG__().array_walk_fci_cache = orig_array_walk_fci_cache
+	zend.ZendReleaseFcallInfoCache(&(standard.BG__().array_walk_fci_cache))
+	standard.BG__().array_walk_fci = orig_array_walk_fci
+	standard.BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 	return_value.SetTrue()
 	return
 }
@@ -2108,7 +2109,7 @@ err:
 func arrayDataShuffle(array *types.Array) *types.Array {
 	values := array.Values()
 	for i := len(values) - 1; i >= 0; i-- {
-		j := PhpMtRandRange(0, i)
+		j := standard.PhpMtRandRange(0, i)
 		if i != j {
 			values[i], values[j] = values[j], values[i]
 		}
@@ -3549,11 +3550,11 @@ func ZvalUserCompare(a *types.Zval, b *types.Zval) int {
 	var retval types.Zval
 	types.ZVAL_COPY_VALUE(&args[0], a)
 	types.ZVAL_COPY_VALUE(&args[1], b)
-	BG__().user_compare_fci.param_count = 2
-	BG__().user_compare_fci.params = args
-	BG__().user_compare_fci.retval = &retval
-	BG__().user_compare_fci.no_separation = 0
-	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
+	standard.BG__().user_compare_fci.param_count = 2
+	standard.BG__().user_compare_fci.params = args
+	standard.BG__().user_compare_fci.retval = &retval
+	standard.BG__().user_compare_fci.no_separation = 0
+	if zend.ZendCallFunction(&(standard.BG__().user_compare_fci), &(standard.BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
 		var ret = zend.ZvalGetLong(&retval)
 		// zend.ZvalPtrDtor(&retval)
 		return zend.ZEND_NORMALIZE_BOOL(ret)
@@ -4010,7 +4011,7 @@ func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _ z
 			 * specific offset using linear scan. */
 
 			var i = 0
-			var randval = PhpMtRandRange(0, num_avail-1)
+			var randval = standard.PhpMtRandRange(0, num_avail-1)
 			var __ht = input.Array()
 			for _, _p := range __ht.ForeachData() {
 				var _z = _p.GetVal()
@@ -4036,7 +4037,7 @@ func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _ z
 		 * For N=10 this becomes smaller than 0.1%. */
 
 		for {
-			var randval = PhpMtRandRange(0, ht.GetNNumUsed()-1)
+			var randval = standard.PhpMtRandRange(0, ht.GetNNumUsed()-1)
 			var bucket *types.Bucket = ht.GetArData()[randval]
 			if !(bucket.GetVal().IsUndef()) {
 				if bucket.GetKey() != nil {
@@ -4073,7 +4074,7 @@ func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _ z
 	zend.ZendBitsetClear(bitset, bitset_len)
 	i = num_req
 	for i != 0 {
-		var randval = PhpMtRandRange(0, num_avail-1)
+		var randval = standard.PhpMtRandRange(0, num_avail-1)
 		if zend.ZendBitsetIn(bitset, randval) == 0 {
 			zend.ZendBitsetIncl(bitset, randval)
 			i--

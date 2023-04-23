@@ -3,6 +3,7 @@ package spl
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/ext/standard/array"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -333,16 +334,16 @@ func zim_spl_SplObjectStorage_contains(executeData *zend.ZendExecuteData, return
 }
 func zim_spl_SplObjectStorage_count(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
-	var mode zend.ZendLong = standard.COUNT_NORMAL
+	var mode zend.ZendLong = array.COUNT_NORMAL
 	if zend.ZendParseParameters(executeData.NumArgs(), "|l", &mode) == types.FAILURE {
 		return
 	}
-	if mode == standard.COUNT_RECURSIVE {
+	if mode == array.COUNT_RECURSIVE {
 		var ret zend.ZendLong
-		if mode != standard.COUNT_RECURSIVE {
+		if mode != array.COUNT_RECURSIVE {
 			ret = intern.GetStorage().Len()
 		} else {
-			ret = standard.PhpCountRecursive(intern.GetStorage())
+			ret = array.PhpCountRecursive(intern.GetStorage())
 		}
 		return_value.SetLong(ret)
 		return

@@ -1,4 +1,4 @@
-package standard
+package array
 
 import (
 	"github.com/heyuuu/gophp/zend/def"
@@ -170,7 +170,7 @@ var DefZifUksort = def.DefFunc("uksort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Nam
 // generate by ZifEnd
 var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZvalEx(false, true)
+	arg := fp.ParseArrayEx(false, true)
 	if fp.HasError() {
 		return
 	}
@@ -178,13 +178,14 @@ var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(exec
 })
 
 // generate by ZifPrev
-var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZvalEx(false, true)
+	array := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
 		return
 	}
-	ZifPrev(executeData, returnValue, arg)
+	ret := ZifPrev(executeData, returnValue, array)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifNext
@@ -248,23 +249,27 @@ var DefZifKey = def.DefFunc("key", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(exec
 })
 
 // generate by ZifMin
-var DefZifMin = def.DefFunc("min", 0, -1, []def.ArgInfo{{Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 0, -1, 0)
+var DefZifMin = def.DefFunc("min", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arg := fp.ParseZval()
 	args := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifMin(executeData, returnValue, args)
+	ret := ZifMin(arg, args)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifMax
-var DefZifMax = def.DefFunc("max", 0, -1, []def.ArgInfo{{Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 0, -1, 0)
+var DefZifMax = def.DefFunc("max", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arg := fp.ParseZval()
 	args := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifMax(executeData, returnValue, args)
+	ret := ZifMax(arg, args)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayWalk
@@ -360,14 +365,14 @@ var DefZifArrayFillKeys = def.DefFunc("array_fill_keys", 2, 2, []def.ArgInfo{{Na
 // generate by ZifRange
 var DefZifRange = def.DefFunc("range", 2, 3, []def.ArgInfo{{Name: "low"}, {Name: "high"}, {Name: "step"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	low := fp.ParseZval()
-	high := fp.ParseZval()
+	low_ := fp.ParseZval()
+	high_ := fp.ParseZval()
 	fp.StartOptional()
-	step := fp.ParseZval()
+	step_ := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifRange(returnValue, low, high, nil, step)
+	ZifRange(returnValue, low_, high_, nil, step_)
 })
 
 // generate by ZifShuffle
@@ -624,108 +629,144 @@ var DefZifArrayUnique = def.DefFunc("array_unique", 1, 2, []def.ArgInfo{{Name: "
 })
 
 // generate by ZifArrayIntersectKey
-var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	arr1 := fp.ParseZval()
+var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	arrays := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayIntersectKey(executeData, returnValue, arr1, arrays)
+	ret, ok := ZifArrayIntersectKey(arrays)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayIntersectUkey
-var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_key_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 3, 3, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_key_compare_func := fp.ParseZval()
+var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_key_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arrays := fp.ParseVariadicEx(1)
+	callback_key_compare_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayIntersectUkey(executeData, returnValue, arr1, arr2, callback_key_compare_func)
+	ret, ok := ZifArrayIntersectUkey(arrays, callback_key_compare_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayIntersect
-var DefZifArrayIntersect = def.DefFunc("array_intersect", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	arr1 := fp.ParseZval()
+var DefZifArrayIntersect = def.DefFunc("array_intersect", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	arrays := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayIntersect(executeData, returnValue, arr1, arrays)
+	ret, ok := ZifArrayIntersect(arrays)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayUintersect
-var DefZifArrayUintersect = def.DefFunc("array_uintersect", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 3, 3, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_data_compare_func := fp.ParseZval()
+var DefZifArrayUintersect = def.DefFunc("array_uintersect", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arrays := fp.ParseVariadicEx(1)
+	callback_data_compare_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUintersect(executeData, returnValue, arr1, arr2, callback_data_compare_func)
+	ret, ok := ZifArrayUintersect(arrays, callback_data_compare_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayIntersectAssoc
-var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	arr1 := fp.ParseZval()
+var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	arrays := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayIntersectAssoc(executeData, returnValue, arr1, arrays)
+	ret, ok := ZifArrayIntersectAssoc(arrays)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayIntersectUassoc
-var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_key_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 3, 3, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_key_compare_func := fp.ParseZval()
+var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_key_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arrays := fp.ParseVariadicEx(1)
+	callback_key_compare_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayIntersectUassoc(executeData, returnValue, arr1, arr2, callback_key_compare_func)
+	ret, ok := ZifArrayIntersectUassoc(arrays, callback_key_compare_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayUintersectAssoc
-var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 3, 3, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_data_compare_func := fp.ParseZval()
+var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arrays := fp.ParseVariadicEx(1)
+	callback_data_compare_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUintersectAssoc(executeData, returnValue, arr1, arr2, callback_data_compare_func)
+	ret, ok := ZifArrayUintersectAssoc(arrays, callback_data_compare_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayUintersectUassoc
-var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 4, 4, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_compare_func"}, {Name: "callback_key_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 4, 4, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_data_compare_func := fp.ParseZval()
-	callback_key_compare_func := fp.ParseZval()
+var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 2, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_compare_func"}, {Name: "callback_key_compare_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 2, -1, 0)
+	arrays := fp.ParseVariadicEx(2)
+	callback_data_compare_func := fp.ParseCallable()
+	callback_key_compare_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUintersectUassoc(executeData, returnValue, arr1, arr2, callback_data_compare_func, callback_key_compare_func)
+	ret, ok := ZifArrayUintersectUassoc(arrays, callback_data_compare_func, callback_key_compare_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayDiffKey
-var DefZifArrayDiffKey = def.DefFunc("array_diff_key", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	arr1 := fp.ParseZval()
+var DefZifArrayDiffKey = def.DefFunc("array_diff_key", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	arrays := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayDiffKey(executeData, returnValue, arr1, arrays)
+	ret, ok := ZifArrayDiffKey(arrays)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayDiffUkey
@@ -772,14 +813,18 @@ var DefZifArrayUdiff = def.DefFunc("array_udiff", 1, -1, []def.ArgInfo{{Name: "a
 })
 
 // generate by ZifArrayDiffAssoc
-var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	arr1 := fp.ParseZval()
+var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	arrays := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayDiffAssoc(executeData, returnValue, arr1, arrays)
+	ret, ok := ZifArrayDiffAssoc(arrays)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayDiffUassoc
@@ -799,15 +844,19 @@ var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 1, -1, []def.ArgInf
 })
 
 // generate by ZifArrayUdiffAssoc
-var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_key_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 3, 3, 0)
-	arr1 := fp.ParseZval()
-	arr2 := fp.ParseZval()
-	callback_key_comp_func := fp.ParseZval()
+var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_comp_func"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	arrays := fp.ParseVariadicEx(1)
+	callback_data_comp_func := fp.ParseCallable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUdiffAssoc(executeData, returnValue, arr1, arr2, callback_key_comp_func)
+	ret, ok := ZifArrayUdiffAssoc(arrays, callback_data_comp_func)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayUdiffUassoc

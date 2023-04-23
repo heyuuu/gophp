@@ -1,4 +1,4 @@
-package standard
+package array
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
