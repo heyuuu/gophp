@@ -928,7 +928,7 @@ func AddConfigEntries(hash *types.Array, retval *types.Zval) {
 			if key.IsStrKey() {
 				zend.AddAssocStrEx(retval, key.StrKey(), value.StringVal())
 			} else {
-				zend.AddIndexStrEx(retval, key.IndexKey(), value.StringVal())
+				zend.AddIndexStrEx(retval, key.IdxKey(), value.StringVal())
 			}
 		} else if value.IsType(types.IS_ARRAY) {
 			var tmp types.Zval

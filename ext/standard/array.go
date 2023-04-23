@@ -2387,7 +2387,7 @@ func ZifArrayShift(stack zpp.RefArray) {
 	var k = 0
 	stack.Array().MapWithKey(func(key types.ArrayKey, value *types.Zval) (types.ArrayKey, *types.Zval) {
 		if !key.IsStrKey() {
-			key = types.IndexKey(k)
+			key = types.IdxKey(k)
 			k++
 		}
 		return key, value

@@ -11,30 +11,43 @@ import (
 
 /**
  * ArrayKey
+ * 	- 可直接比较
+ *  - 零值为数字 0
+ * 为减少内存占用，省略类型标识字段，采用以下方式确认类型:
+ * - str == ""        时: int 类型，值为 idx
+ * - str[0] != '\x00' 时: string 类型，值为 str
+ * - str[0] == '\x00' 时: string 类型，值为 str[1:]
  */
 type ArrayKey struct {
-	index int
-	str   *string
+	idx int
+	str string
 }
 
-func StrKey(str string) ArrayKey  { return ArrayKey{0, &str} }
-func IndexKey(index int) ArrayKey { return ArrayKey{index, nil} }
-
-func (k ArrayKey) IsStrKey() bool { return k.str != nil }
-func (k ArrayKey) IndexKey() int  { return k.index }
-func (k ArrayKey) StrKey() string { return *k.str }
-func (k ArrayKey) Keys() (index int, key string, isStrKey bool) {
-	if k.IsStrKey() {
-		return 0, *k.str, true
-	} else {
-		return k.index, "", false
+func IdxKey(index int) ArrayKey { return ArrayKey{index, ""} }
+func StrKey(str string) ArrayKey {
+	if str == "" || str[0] == '\x00' {
+		str = "\x00" + str
 	}
+	return ArrayKey{0, str}
+}
+
+func (k ArrayKey) IsStrKey() bool { return k.str != "" }
+func (k ArrayKey) IdxKey() int    { return k.idx }
+func (k ArrayKey) StrKey() string {
+	if k.str != "" && k.str[0] == '\x00' {
+		return k.str[1:]
+	} else {
+		return k.str
+	}
+}
+func (k ArrayKey) Keys() (index int, key string, isStrKey bool) {
+	return k.IdxKey(), k.StrKey(), k.IsStrKey()
 }
 func (k ArrayKey) ToZval() *Zval {
 	if k.IsStrKey() {
 		return NewZvalString(k.StrKey())
 	} else {
-		return NewZvalLong(k.IndexKey())
+		return NewZvalLong(k.IdxKey())
 	}
 }
 
@@ -72,17 +85,17 @@ func NewStrKeyBucket(strKey string, zval *Zval) *Bucket {
 }
 
 func NewIndexBucket(indexKey int, zval *Zval) *Bucket {
-	var key = IndexKey(indexKey)
+	var key = IdxKey(indexKey)
 	return NewBucket(key, zval)
 }
 
 func (this *Bucket) IsStrKey() bool            { return this.key.IsStrKey() }
 func (this *Bucket) StrKey() string            { return this.key.StrKey() }
-func (this *Bucket) IndexKey() int             { return this.key.IndexKey() }
+func (this *Bucket) IndexKey() int             { return this.key.IdxKey() }
 func (this *Bucket) Keys() (int, string, bool) { return this.key.Keys() }
 
 func (this *Bucket) SetStrKey(key string)  { this.key = StrKey(key) }
-func (this *Bucket) SetIndexKey(index int) { this.key = IndexKey(index) }
+func (this *Bucket) SetIndexKey(index int) { this.key = IdxKey(index) }
 func (this *Bucket) GetArrayKey() ArrayKey { return this.key }
 
 func (this *Bucket) GetVal() *Zval     { return &this.val }
@@ -258,7 +271,7 @@ func (ht *Array) deleteBucket(pos uint32) {
 	if p.key.IsStrKey() {
 		delete(ht.keyMap, p.key.StrKey())
 	} else {
-		delete(ht.indexMap, p.key.IndexKey())
+		delete(ht.indexMap, p.key.IdxKey())
 	}
 
 	// 减少有效元素
@@ -758,7 +771,7 @@ func (ht *Array) Find(key ArrayKey) *Zval {
 	if key.IsStrKey() {
 		return ht.KeyFind(key.StrKey())
 	} else {
-		return ht.IndexFind(key.IndexKey())
+		return ht.IndexFind(key.IdxKey())
 	}
 }
 
@@ -766,7 +779,7 @@ func (ht *Array) Add(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return ht.KeyAdd(key.StrKey(), pData)
 	} else {
-		return ht.IndexAdd(key.IndexKey(), pData)
+		return ht.IndexAdd(key.IdxKey(), pData)
 	}
 }
 
@@ -774,7 +787,7 @@ func (ht *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return ht.KeyAddIndirect(key.StrKey(), pData)
 	} else {
-		return ht.IndexAdd(key.IndexKey(), pData)
+		return ht.IndexAdd(key.IdxKey(), pData)
 	}
 }
 
@@ -782,7 +795,7 @@ func (ht *Array) Update(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return ht.KeyUpdate(key.StrKey(), pData)
 	} else {
-		return ht.IndexUpdate(key.IndexKey(), pData)
+		return ht.IndexUpdate(key.IdxKey(), pData)
 	}
 }
 
@@ -790,7 +803,7 @@ func (ht *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return ht.KeyUpdateIndirect(key.StrKey(), pData)
 	} else {
-		return ht.IndexUpdate(key.IndexKey(), pData)
+		return ht.IndexUpdate(key.IdxKey(), pData)
 	}
 }
 
@@ -798,7 +811,7 @@ func (ht *Array) Delete(key ArrayKey) bool {
 	if key.IsStrKey() {
 		return ht.KeyDelete(key.StrKey())
 	} else {
-		return ht.IndexDelete(key.IndexKey())
+		return ht.IndexDelete(key.IdxKey())
 	}
 }
 

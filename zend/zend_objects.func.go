@@ -190,7 +190,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 			if key.IsStrKey() {
 				new_object.GetProperties().KeyAddNew(key.StrKey(), &new_prop)
 			} else {
-				new_object.GetProperties().IndexAddNew(key.IndexKey(), &new_prop)
+				new_object.GetProperties().IndexAddNew(key.IdxKey(), &new_prop)
 			}
 		})
 	}

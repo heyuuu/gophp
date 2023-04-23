@@ -201,7 +201,7 @@ func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) (*types.
 	if key.IsStrKey() {
 		tmp.SetStringVal(key.StrKey())
 	} else {
-		tmp.SetLong(key.IndexKey())
+		tmp.SetLong(key.IdxKey())
 	}
 
 	result.IndexAddNew(0, &tmp)

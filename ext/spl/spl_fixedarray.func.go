@@ -468,11 +468,11 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		var maxIndex uint = 0
 		for iter := data.Array().Iterator(); iter.Valid(); iter.Next() {
 			key := iter.Key()
-			if key.IsStrKey() || key.IndexKey() < 0 {
+			if key.IsStrKey() || key.IdxKey() < 0 {
 				faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array must contain only positive integer keys")
 				return
 			}
-			numIndex := uint(key.IndexKey())
+			numIndex := uint(key.IdxKey())
 			if numIndex > maxIndex {
 				maxIndex = numIndex
 			}
@@ -484,7 +484,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		}
 		SplFixedarrayInit(&array, tmp)
 		data.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
-			types.ZVAL_COPY_DEREF(array.GetElements()[key.IndexKey()], value)
+			types.ZVAL_COPY_DEREF(array.GetElements()[key.IdxKey()], value)
 		})
 	} else if num > 0 && save_indexes == 0 {
 		var i zend.ZendLong = 0

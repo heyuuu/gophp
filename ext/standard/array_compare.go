@@ -101,14 +101,14 @@ func arrayKeyToDouble(k types.ArrayKey) float64 {
 	if k.IsStrKey() {
 		return zend.StrToDouble(k.StrKey())
 	} else {
-		return float64(k.IndexKey())
+		return float64(k.IdxKey())
 	}
 }
 func arrayKeyToString(k types.ArrayKey) string {
 	if k.IsStrKey() {
 		return k.StrKey()
 	} else {
-		return strconv.Itoa(k.IndexKey())
+		return strconv.Itoa(k.IdxKey())
 	}
 }
 func arrayKeyCompareNumeric(k1 types.ArrayKey, k2 types.ArrayKey) int {

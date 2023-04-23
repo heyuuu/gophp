@@ -1071,7 +1071,7 @@ func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval
 		if key.IsStrKey() {
 			arr.SymtableUpdate(key.StrKey(), types.NewZvalString(ret))
 		} else {
-			arr.IndexUpdate(key.IndexKey(), types.NewZvalString(ret))
+			arr.IndexUpdate(key.IdxKey(), types.NewZvalString(ret))
 		}
 	})
 	return arr
@@ -1198,7 +1198,7 @@ func phpStrtrArray(str string, pats *types.Array) (string, bool) {
 	pats.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 		var strKey string
 		if !key.IsStrKey() {
-			strKey = strconv.Itoa(key.IndexKey())
+			strKey = strconv.Itoa(key.IdxKey())
 		} else {
 			strKey = key.StrKey()
 		}
@@ -1358,7 +1358,7 @@ func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, boo
 
 			var strKey string
 			if !key.IsStrKey() {
-				strKey = strconv.Itoa(key.IndexKey())
+				strKey = strconv.Itoa(key.IdxKey())
 			} else {
 				strKey = key.StrKey()
 			}
@@ -1540,7 +1540,7 @@ func strReplaceArray(subject *types.Array, search *types.Zval, replace *types.Zv
 		if key.IsStrKey() {
 			arr.KeyAddNew(key.StrKey(), &result)
 		} else {
-			arr.IndexAddNew(key.IndexKey(), &result)
+			arr.IndexAddNew(key.IdxKey(), &result)
 		}
 	})
 	return arr, replaceCount

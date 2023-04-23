@@ -715,7 +715,7 @@ convert:
 		if key.IsStrKey() {
 			strKey = key.StrKey()
 		} else {
-			strKey = strconv.Itoa(key.IndexKey())
+			strKey = strconv.Itoa(key.IdxKey())
 		}
 		for {
 			if zv.IsRefcounted() {

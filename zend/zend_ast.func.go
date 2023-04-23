@@ -1071,7 +1071,7 @@ func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) 
 				ZendAstExportStr(str, key.StrKey())
 				str.AppendString("' => ")
 			} else {
-				str.AppendLong(key.IndexKey())
+				str.AppendLong(key.IdxKey())
 				str.AppendString(" => ")
 			}
 			ZendAstExportZval(str, value, 0, indent)

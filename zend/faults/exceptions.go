@@ -535,7 +535,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 	}
 	trace.Array().Foreach(func(key types.ArrayKey, frame *types.Zval) {
 		if frame.GetType() != types.IS_ARRAY {
-			Error(E_WARNING, "Expected array for frame "+zend.ZEND_ULONG_FMT, key.IndexKey())
+			Error(E_WARNING, "Expected array for frame "+zend.ZEND_ULONG_FMT, key.IdxKey())
 			return
 		}
 		_buildTraceString(&str, frame.Array(), b.PostInc(&num))

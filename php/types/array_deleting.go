@@ -11,7 +11,7 @@ func (this *Bucket) GetH() uint {
 	if this.IsStrKey() {
 		return b.HashStr(this.key.StrKey())
 	} else {
-		return uint(this.key.index)
+		return uint(this.key.IdxKey())
 	}
 }
 func (this *Bucket) GetKey() *String {

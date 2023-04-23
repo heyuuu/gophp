@@ -536,7 +536,7 @@ func ZendGeneratorAddSingleChild(node *ZendGeneratorNode, child *ZendGenerator, 
 func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNode, child *ZendGenerator) {
 	b.Assert(src.GetChildren() > 1)
 	src.GetHt().Foreach(func(key types.ArrayKey, value *types.Zval) {
-		var leaf ZendUlong = key.IndexKey()
+		var leaf ZendUlong = key.IdxKey()
 		ZendGeneratorAddSingleChild(dest, child, (*ZendGenerator)(leaf))
 	})
 }

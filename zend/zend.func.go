@@ -73,7 +73,7 @@ func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object types.ZendB
 				buf.AppendString(key.StrKey())
 			}
 		} else {
-			buf.AppendLong(key.IndexKey())
+			buf.AppendLong(key.IdxKey())
 		}
 		buf.AppendString("] => ")
 		ZendPrintZvalRToBuf(buf, value, indent+PRINT_ZVAL_INDENT)

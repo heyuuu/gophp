@@ -87,7 +87,7 @@ func ZendIniSortEntries() {
 		} else if k2.IsStrKey() {
 			return true
 		} else {
-			return k1.IndexKey() < k2.IndexKey()
+			return k1.IdxKey() < k2.IdxKey()
 		}
 	})
 }

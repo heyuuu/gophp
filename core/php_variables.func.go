@@ -599,13 +599,13 @@ func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {
 	var globalsCheck = dest == zend.EG__().GetSymbolTable()
 
 	src.Foreach(func(key types.ArrayKey, value *types.Zval) {
-		if value.GetType() != types.IS_ARRAY || key.IsStrKey() && b.Assign(&dest_entry, dest.KeyFind(key.StrKey())) == nil || !key.IsStrKey() && b.Assign(&dest_entry, dest.IndexFind(key.IndexKey())) == nil || dest_entry.GetType() != types.IS_ARRAY {
+		if value.GetType() != types.IS_ARRAY || key.IsStrKey() && b.Assign(&dest_entry, dest.KeyFind(key.StrKey())) == nil || !key.IsStrKey() && b.Assign(&dest_entry, dest.IndexFind(key.IdxKey())) == nil || dest_entry.GetType() != types.IS_ARRAY {
 			if key.IsStrKey() {
 				if !globalsCheck || key.StrKey() != "GLOBALS" {
 					dest.KeyUpdate(key.StrKey(), value)
 				}
 			} else {
-				dest.IndexUpdate(key.IndexKey(), value)
+				dest.IndexUpdate(key.IdxKey(), value)
 			}
 		} else {
 			types.SeparateArray(dest_entry)
@@ -647,11 +647,9 @@ func PhpAutoGlobalsCreateCookie(name *types.String) types.ZendBool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'C') || strchr(PG__().variables_order, 'c')) {
 		SM__().GetTreatData()(PARSE_COOKIE, nil, nil)
 	} else {
-		// zend.ZvalPtrDtorNogc(&PG__().http_globals[TRACK_VARS_COOKIE])
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_COOKIE])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_COOKIE])
-	//PG__().http_globals[TRACK_VARS_COOKIE].AddRefcount()
 	return 0
 }
 func PhpAutoGlobalsCreateFiles(name *types.String) types.ZendBool {
@@ -659,7 +657,6 @@ func PhpAutoGlobalsCreateFiles(name *types.String) types.ZendBool {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_FILES])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_FILES])
-	//PG__().http_globals[TRACK_VARS_FILES].AddRefcount()
 	return 0
 }
 func CheckHttpProxy(var_table *types.Array) {
