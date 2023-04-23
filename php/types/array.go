@@ -123,7 +123,6 @@ type Array struct {
 
 	data    []Bucket            // 实际存储数据的地方
 	indexes map[ArrayKey]uint32 // 索引到具体位置的映射
-	keyMap  map[string]uint32   // 字符串索引到具体位置的映射
 
 	arData *Bucket // C 源码中存储数据的地方，实际不使用
 
@@ -228,7 +227,7 @@ func (ht *Array) resizeIfFull() {
 	if dataSize == cap(ht.data) {
 		// 若空隙率过高，重新压缩；否则，跳过扩容 (后面会由 append(ht.data) 触发自动扩容)
 		if dataSize > int(ht.elementsCount+(ht.elementsCount>>5)) {
-			ht.Rehash()
+			ht.rehash()
 		} else if dataSize >= MaxArraySize {
 			triggerError(fmt.Sprintf("Possible integer overflow in memory allocation (%d)", dataSize*2))
 		}
@@ -301,7 +300,7 @@ func (ht *Array) moveBucket(pos uint32, newPos uint32) {
 }
 
 /* hash -> Array.indexMap & Array.keyMap */
-func (ht *Array) Rehash() {
+func (ht *Array) rehash() {
 	// reset hash
 	ht.assertRc1()
 	ht.indexes = make(map[ArrayKey]uint32)
@@ -449,7 +448,7 @@ func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
 		ht.nextFreeElement = int(ht.DataSize())
 	}
 
-	ht.Rehash()
+	ht.rehash()
 }
 func (ht *Array) Min(comparer ArrayComparer) *ArrayPair {
 	if ht.Len() == 0 {
@@ -954,4 +953,11 @@ func (ht *Array) removeHolesAndCleanInternalPointer() bool {
 	ht.removeHoles()
 	ht.internalPointer = 0
 	return true
+}
+
+func (ht *Array) MoveTailToHead() {
+	var tmp Bucket = ht.data[len(ht.data)-1]
+	copy(ht.data[1:], ht.data)
+	ht.data[0] = tmp
+	ht.rehash()
 }

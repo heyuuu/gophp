@@ -354,10 +354,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 	}
 }
 func HT_MOVE_TAIL_TO_HEAD(ht *types.Array) {
-	var tmp types.Bucket = ht.GetArData()[ht.GetNNumUsed()-1]
-	memmove(ht.GetArData()+1, ht.GetArData(), b.SizeOf("Bucket")*(ht.GetNNumUsed()-1))
-	ht.GetArData()[0] = tmp
-	ht.Rehash()
+	ht.MoveTailToHead()
 }
 func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, autoloadFunction *types.Zval, throw *types.Zval, prepend *types.Zval) {
 	var func_name *types.String
@@ -488,14 +485,9 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			spl_alfi.GetClosure().SetUndef()
 			spl_alfi.SetCe(nil)
 			types.ZendHashAddMem(SPL_G__().autoload_functions, SplAutoloadFn.GetFunctionName().GetStr(), &spl_alfi, b.SizeOf("autoload_func_info"))
-			if prepend != 0 && SPL_G__().autoload_functions.nNumOfElements > 1 {
-
+			if prepend != 0 && SPL_G__().autoload_functions.Len() > 1 {
 				/* Move the newly created element to the head of the hashtable */
-
-				HT_MOVE_TAIL_TO_HEAD(SPL_G__().autoload_functions)
-
-				/* Move the newly created element to the head of the hashtable */
-
+				SPL_G__().autoload_functions.MoveTailToHead()
 			}
 		}
 		if alfi.GetFuncPtr() == zend.EG__().GetTrampoline() {
@@ -516,14 +508,9 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 				zend.ZendFreeTrampoline(alfi.GetFuncPtr())
 			}
 		}
-		if prepend != 0 && SPL_G__().autoload_functions.nNumOfElements > 1 {
-
+		if prepend != 0 && SPL_G__().autoload_functions.Len() > 1 {
 			/* Move the newly created element to the head of the hashtable */
-
-			HT_MOVE_TAIL_TO_HEAD(SPL_G__().autoload_functions)
-
-			/* Move the newly created element to the head of the hashtable */
-
+			SPL_G__().autoload_functions.MoveTailToHead()
 		}
 	skip:
 		// types.ZendStringReleaseEx(lc_name, 0)

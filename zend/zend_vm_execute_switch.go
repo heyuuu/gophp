@@ -2889,16 +2889,13 @@ func vmGetSpaceshipHandler(op *ZendOp) OpcodeHandlerT {
 	return handlers[offset]
 }
 func vmGetFuncGetArgsHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 2232 | SPEC_RULE_OP1
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
-		ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER, // IS_CONST * ---
-		nil, // IS_TMP_VAR * ---
-		nil, // IS_VAR * ---
-		ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER, // IS_UNUSED * ---
-		nil, // IS_CV * ---
+	// SPEC_RULE_OP1
+	switch op.op1Type {
+	case IS_CONST, IS_UNUSED:
+		return ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER
+	default:
+		return nil
 	}
-	return handlers[offset]
 }
 func vmGetFetchClassConstantHandler(op *ZendOp) OpcodeHandlerT {
 	spec := 2245 | SPEC_RULE_OP1
