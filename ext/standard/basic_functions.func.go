@@ -145,9 +145,6 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	if ZmStartupMtRand(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if zm_startup_nl_langinfo(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
-	}
 	if ZmStartupCrypt(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}
@@ -196,7 +193,7 @@ func ZmShutdownBasic(type_ int, module_number int) int {
 	streams.PhpUnregisterUrlStreamWrapper("http")
 	streams.PhpUnregisterUrlStreamWrapper("ftp")
 	ZmShutdownBrowscap(type_, module_number)
-	array.ZmShutdownArray(type_, module_number)
+	//array.ZmShutdownArray(type_, module_number)
 	ZmShutdownAssert(type_, module_number)
 	ZmShutdownUrlScannerEx(type_, module_number)
 	ZmShutdownFile(type_, module_number)

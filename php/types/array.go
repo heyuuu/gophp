@@ -759,10 +759,26 @@ func (ht *Array) ForeachIndirect(handler func(key ArrayKey, value *Zval)) {
 			data = data.Indirect()
 		}
 		if data.IsUndef() {
-			return
+			continue
 		}
 		handler(p.GetArrayKey(), data)
 	}
+}
+func (ht *Array) ForeachIndirectEx(handler func(key ArrayKey, value *Zval) bool) bool {
+	for i, _ := range ht.data {
+		p := &ht.data[i]
+		data := p.GetVal()
+		if data.IsIndirect() {
+			data = data.Indirect()
+		}
+		if data.IsUndef() {
+			continue
+		}
+		if !handler(p.GetArrayKey(), p.GetVal()) {
+			return false
+		}
+	}
+	return true
 }
 func (ht *Array) ForeachIndirectReserve(handler func(key ArrayKey, value *Zval)) {
 	for i := len(ht.data) - 1; i >= 0; i-- {

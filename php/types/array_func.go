@@ -317,10 +317,6 @@ func ZendHashGetCurrentDataPtrEx(ht *Array, pos *ArrayPosition) any {
 func ZendHashGetCurrentDataPtr(ht *Array) any {
 	return ZendHashGetCurrentDataPtrEx(ht, ht.GetNInternalPointer())
 }
-func ZendHashToPacked(ht *Array) {
-	// todo 此函数不应被调用
-	assert(false)
-}
 func ZendHashIteratorPos(idx uint32, ht *Array) ArrayPosition {
 	var iter *ArrayIterator = zend.EG__().GetArrayIterator(idx)
 	if iter.GetHt() != ht {

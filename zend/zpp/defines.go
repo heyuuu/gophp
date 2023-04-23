@@ -70,7 +70,10 @@ type (
 	//Variadic = []*types.Zval
 
 	/* ref type */
-	RefZval    = *types.Zval //
-	RefArray   = *types.Zval // fp.ParseArrayEx(false, true)
-	DerefArray = *types.Zval // fp.ParseArrayEx2(false, true, false)
+	RefZval          = *types.Zval //
+	RefArray         = *types.Zval // fp.ParseArrayEx(false, true)
+	DerefArray       = *types.Zval // fp.ParseArrayEx2(false, true, false)
+	RefArrayOrObject = *types.Zval // fp.ParseArrayOrObjectEx(false, true)
+
+	RefArrayHt = *types.Array // fp.ParseArrayHtEx(false, true)
 )

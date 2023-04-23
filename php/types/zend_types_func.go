@@ -71,7 +71,6 @@ func Z_REFVAL_P(zval_p *Zval) *Zval         { return zval_p.Reference().GetVal()
 func GC_AST(p *ZendAstRef) *zend.ZendAst    { return p.GcAst() }
 func Z_ASTVAL(zval Zval) *zend.ZendAst      { return GC_AST(zval.ConstantAst()) }
 func Z_ASTVAL_P(zval_p *Zval) *zend.ZendAst { return Z_ASTVAL(*zval_p) }
-func Z_INDIRECT(zval Zval) *Zval            { return zval.Indirect() }
 func Z_INDIRECT_P(zval_p *Zval) *Zval       { return zval_p.Indirect() }
 func Z_PTR(zval Zval) any                   { return zval.Ptr() }
 

@@ -40,7 +40,7 @@ var DefZifCount = def.DefFunc("count", 1, 2, []def.ArgInfo{{Name: "var"}, {Name:
 	if fp.HasError() {
 		return
 	}
-	ret := ZifCount(returnValue, var_, nil, mode)
+	ret := ZifCount(var_, nil, mode)
 	returnValue.SetLong(ret)
 })
 
@@ -53,7 +53,7 @@ var DefZifSizeof = def.DefFunc("sizeof", 1, 2, []def.ArgInfo{{Name: "var"}, {Nam
 	if fp.HasError() {
 		return
 	}
-	ret := ZifCount(returnValue, var_, nil, mode)
+	ret := ZifCount(var_, nil, mode)
 	returnValue.SetLong(ret)
 })
 
@@ -184,7 +184,7 @@ var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "array"}}, func(
 	if fp.HasError() {
 		return
 	}
-	ret := ZifPrev(executeData, returnValue, array)
+	ret := ZifPrev(array)
 	returnValue.SetBy(ret)
 })
 
@@ -195,7 +195,7 @@ var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(ex
 	if fp.HasError() {
 		return
 	}
-	ZifNext(executeData, returnValue, arg)
+	ZifNext(arg)
 })
 
 // generate by ZifReset
@@ -282,7 +282,7 @@ var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{Name: "inpu
 	if fp.HasError() {
 		return
 	}
-	ZifArrayWalk(executeData, returnValue, input, funcname, nil, userdata)
+	ZifArrayWalk(input, funcname, nil, userdata)
 })
 
 // generate by ZifArrayWalkRecursive
@@ -308,7 +308,7 @@ var DefZifInArray = def.DefFunc("in_array", 2, 3, []def.ArgInfo{{Name: "needle"}
 	if fp.HasError() {
 		return
 	}
-	ZifInArray(executeData, returnValue, needle, haystack, nil, strict)
+	ZifInArray(needle, haystack, nil, strict)
 })
 
 // generate by ZifArraySearch
