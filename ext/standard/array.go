@@ -248,7 +248,7 @@ func ZifEnd(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefArray) {
 		types.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
-func ZifPrev(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval) {
+func ZifPrev(executeData zpp.Ex, return_value zpp.Ret, array zpp.RefZval) *types.Zval {
 	var array *types.Array
 	var entry *types.Zval
 	for {
@@ -263,16 +263,13 @@ func ZifPrev(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval) {
 		break
 	}
 	types.ZendHashMoveBackwards(array)
-	if zend.USED_RET() {
-		if b.Assign(&entry, types.ZendHashGetCurrentData(array)) == nil {
-			return_value.SetFalse()
-			return
-		}
-		if entry.IsIndirect() {
-			entry = entry.Indirect()
-		}
-		types.ZVAL_COPY_DEREF(return_value, entry)
+	if b.Assign(&entry, types.ZendHashGetCurrentData(array)) == nil {
+		return types.NewZvalBool(false)
 	}
+	if entry.IsIndirect() {
+		entry = entry.Indirect()
+	}
+	return entry.DeRef()
 }
 func ZifNext(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval) {
 	var array *types.Array
