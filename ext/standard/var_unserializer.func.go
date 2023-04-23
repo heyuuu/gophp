@@ -341,7 +341,7 @@ func ProcessNestedData(
 				} else {
 					data = ht.IndexAddNew(idx, &d)
 				}
-			} else if key.IsType(types.IS_STRING) {
+			} else if key.IsString() {
 				if types.HandleNumericStr(key.String().GetStr(), &idx) {
 					goto numeric_key
 				}
@@ -359,7 +359,7 @@ func ProcessNestedData(
 				goto failure
 			}
 		} else {
-			if key.IsType(types.IS_STRING) {
+			if key.IsString() {
 			string_key:
 				if obj != nil && obj.GetCe().PropertyTable().Len() > 0 {
 					var existing_propinfo *zend.ZendPropertyInfo

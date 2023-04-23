@@ -9,7 +9,7 @@ import (
 
 func PHP_MAIL_BUILD_HEADER_CHECK(target string, s zend.SmartStr, key *types.String, val *types.Zval) {
 	for {
-		if val.IsType(types.IS_STRING) {
+		if val.IsString() {
 			PhpMailBuildHeadersElem(&s, key, val)
 		} else if val.IsType(types.IS_ARRAY) {
 			if !(strncasecmp(target, key.GetVal(), key.GetLen())) {
@@ -24,7 +24,7 @@ func PHP_MAIL_BUILD_HEADER_CHECK(target string, s zend.SmartStr, key *types.Stri
 	}
 }
 func PHP_MAIL_BUILD_HEADER_DEFAULT(s zend.SmartStr, key *types.String, val *types.Zval) {
-	if val.IsType(types.IS_STRING) {
+	if val.IsString() {
 		PhpMailBuildHeadersElem(&s, key, val)
 	} else if val.IsType(types.IS_ARRAY) {
 		PhpMailBuildHeadersElems(&s, key, val)

@@ -1433,7 +1433,7 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 		SplArraySetArray(zend.ZEND_THIS(executeData), intern, storage_zv, 0, 1)
 	}
 	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.Array())
-	if iterator_class_zv != nil && iterator_class_zv.IsType(types.IS_STRING) {
+	if iterator_class_zv != nil && iterator_class_zv.IsString() {
 		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.String())
 		if ce == nil {
 			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.String().GetVal())

@@ -1614,7 +1614,7 @@ func SplFilesystemFileReadLineEx(this_ptr *types.Zval, intern *SplFilesystemObje
 				intern.GetCurrentLineNum()++
 			}
 			SplFilesystemFileFreeLine(intern)
-			if retval.IsType(types.IS_STRING) {
+			if retval.IsString() {
 				intern.SetCurrentLine(zend.Estrndup(retval.String().GetVal(), retval.String().GetLen()))
 				intern.SetCurrentLineLen(retval.String().GetLen())
 			} else {
@@ -1647,7 +1647,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 					idx++
 				}
 				first = intern.GetCurrentZval().Array().GetArData()[idx].GetVal()
-				return first.IsType(types.IS_STRING) && first.String().GetLen() == 0
+				return first.IsString() && first.String().GetLen() == 0
 			}
 			return intern.GetCurrentZval().Array().Len() == 0
 		case types.IS_NULL:

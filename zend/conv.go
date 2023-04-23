@@ -1,13 +1,10 @@
 package zend
 
 import (
-	"flag"
-	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/ext/standard/conv"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"log"
 	"strconv"
-	"strings"
 )
 
 func StrToDouble(str string) float64 {
@@ -20,12 +17,11 @@ func StrToDouble(str string) float64 {
 
 func StrToNumberEx(str string, mode ConvertNumericMode) (num types.Number, ok bool) {
 	result := ConvertNumericStr(str, mode)
-	switch result.Type {
-	case types.IS_LONG:
-		return types.IntNumber(result.Lval), true
-	case types.IS_DOUBLE:
-		return types.FloatNumber(result.Dval), true
-	default:
+	if result.IsInt() {
+		return types.IntNumber(result.Int()), true
+	} else if result.IsFloat() {
+		return types.FloatNumber(result.Float()), true
+	} else {
 		return // fail
 	}
 }
@@ -71,97 +67,32 @@ const (
  * @param	mode 	是否允许错误，具体参看上方常量
  * @return 	NumericStrResult
  */
-func ConvertNumericStr(str string, mode ConvertNumericMode) (result NumericStrResult) {
-	if len(str) == 0 {
-		return
-	} else if str[0] > '9' {
-		// fast fail. 因为 digit | space | + | - 等都小于等于 '9'
-		flag.Parse()
-		return
-	}
-
-	/* Skip any whitespace */
-	str = strings.TrimLeft(str, " \t\n\r\v\f")
-
-	// 扫描字符串，确认字符串为 整数|小数|非法字符串
-	state := 0 // 状态机: 0 未开始, 1 整数部分; 2 小数部分; 3 指数部分
-	i := 0
-	for ; i < len(str); i++ {
-		c := str[i]
-		if ascii.IsDigit(c) {
-			if state == 0 {
-				state = 1
-			}
-			continue
-		} else if c == '.' && (state == 0 || state == 1) { // 存在小数点，进入小数部分
-			state = 2
-			continue
-		} else if (c == 'e' || c == 'E') && (state == 1 || state == 2) { // e|E + (+|-)? + 数字，进入指数部分
-			ptr := i + 1
-			// 跳过符号
-			if ptr < len(str) && (str[ptr] == '+' || str[ptr] == '-') {
-				ptr++
-			}
-			// 判断是否接数字，若是则进入指数部分
-			if ptr < len(str) && ascii.IsDigit(str[ptr]) {
-				state = 3
-				i = ptr
-				continue
-			}
-		}
-		// 未匹配任何内容
-		break
-	}
-	// 未匹配时
-	if state == 0 {
-		return
-	}
-	// 未完成匹配时
-	if i != len(str) {
-		if mode == ConvertRefuseErrors {
-			return
-		}
-		if mode == ConvertNoticeOnErrors {
+func ConvertNumericStr(str string, mode ConvertNumericMode) conv.ParseNumberResult {
+	switch mode {
+	case ConvertRefuseErrors:
+		return conv.ParseNumber(str)
+	case ConvertNoticeOnErrors:
+		result, matchLen := conv.ParseNumberPrefix(str, false)
+		if matchLen != len(str) {
+			// todo 此处可能会触发 Exception
 			faults.Error(faults.E_NOTICE, "A non well formed numeric value encountered")
-			if EG__().GetException() != nil {
-				return
-			}
 		}
+		return result
+	default:
+		fallthrough
+	case ConvertContinueOnErrors:
+		result, _ := conv.ParseNumberPrefix(str, false)
+		return result
 	}
-	// 转义匹配字符串
-	matchStr := str[:i]
-	overflow := 0
-	if state == 1 {
-		// 尝试转 int，若成功直接返回
-		if len(matchStr) < MAX_LENGTH_OF_LONG {
-			lval, err := strconv.Atoi(matchStr)
-			if err == nil {
-				return NumericStrResult{Type: types.IS_LONG, Lval: lval}
-			}
-		}
-		// 整数溢出, 记录溢出信息
-		if matchStr[0] == '-' {
-			overflow = -1
-		} else {
-			overflow = 1
-		}
-	}
-
-	dval, err := strconv.ParseFloat(matchStr, 64)
-	if err != nil {
-		log.Panicf("代码逻辑错误，预期为数字字符串，但转换失败了: s=%s ,err=%s", matchStr, err.Error())
-	}
-	return NumericStrResult{Type: types.IS_DOUBLE, Dval: dval, Overflow: overflow}
 }
 
 func ConvertNumericStrAsZval(str string, mode ConvertNumericMode) *types.Zval {
 	r := ConvertNumericStr(str, mode)
-	switch r.Type {
-	case types.IS_LONG:
-		return types.NewZvalLong(r.Lval)
-	case types.IS_DOUBLE:
-		return types.NewZvalDouble(r.Dval)
-	default:
+	if r.IsInt() {
+		return types.NewZvalLong(r.Int())
+	} else if r.IsFloat() {
+		return types.NewZvalDouble(r.Float())
+	} else {
 		return nil
 	}
 }

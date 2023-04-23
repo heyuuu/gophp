@@ -343,7 +343,7 @@ var DefZifArrayFill = def.DefFunc("array_fill", 3, 3, []def.ArgInfo{{Name: "star
 	if fp.HasError() {
 		return
 	}
-	ret, ok := ZifArrayFill(executeData, returnValue, start_key, num, val)
+	ret, ok := ZifArrayFill(start_key, num, val)
 	if ok {
 		returnValue.SetArray(ret)
 	} else {
@@ -359,7 +359,7 @@ var DefZifArrayFillKeys = def.DefFunc("array_fill_keys", 2, 2, []def.ArgInfo{{Na
 	if fp.HasError() {
 		return
 	}
-	ZifArrayFillKeys(executeData, returnValue, keys, val)
+	ZifArrayFillKeys(keys, val)
 })
 
 // generate by ZifRange

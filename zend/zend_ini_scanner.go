@@ -121,18 +121,13 @@ func ZendIniCopyValue(retval *types.Zval, str *byte, len_ int) {
 // #define RETURN_TOKEN(type,str,len) { if ( SCNG ( scanner_mode ) == ZEND_INI_SCANNER_TYPED && ( YYSTATE == STATE ( ST_VALUE ) || YYSTATE == STATE ( ST_RAW ) ) ) { zend_ini_copy_typed_value ( ini_lval , type , str , len ) ; } else { zend_ini_copy_value ( ini_lval , str , len ) ; } return type ; }
 
 func ConvertToNumber(retval *types.Zval, str *byte, str_len int) int {
-	var type_ types.ZendUchar
-	var overflow int
-	var lval ZendLong
-	var dval float64
-	if b.Assign(&type_, IsNumericStringEx(b.CastStr(str, str_len), &lval, &dval, 0, &overflow)) != 0 {
-		if type_ == types.IS_LONG {
-			retval.SetLong(lval)
-			return types.SUCCESS
-		} else if type_ == types.IS_DOUBLE && overflow == 0 {
-			retval.SetDouble(dval)
-			return types.SUCCESS
-		}
+	r := ConvertNumericStr(b.CastStr(str, str_len), 0)
+	if r.IsInt() {
+		retval.SetLong(r.Int())
+		return types.SUCCESS
+	} else if r.IsFloat() && r.Overflow() == 0 {
+		retval.SetDouble(r.Float())
+		return types.SUCCESS
 	}
 	return types.FAILURE
 }

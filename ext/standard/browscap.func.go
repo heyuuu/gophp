@@ -320,7 +320,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 func BrowscapZvalCopyCtor(p *types.Zval) {
 	if p.IsRefcounted() {
 		var str *types.String
-		b.Assert(p.IsType(types.IS_STRING))
+		b.Assert(p.IsString())
 		str = p.String().Copy()
 		p.SetString(str)
 	}

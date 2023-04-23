@@ -119,7 +119,7 @@ func PhpStreamUrlWrapHttpEx(
 		} else if resource.GetPort() == 0 {
 			resource.SetPort(80)
 		}
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) != nil && tmpzval.IsType(types.IS_STRING) && tmpzval.String().GetLen() > 0 {
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 			use_proxy = 1
 			transport_len = tmpzval.String().GetLen()
 			transport_string = zend.Estrndup(tmpzval.String().GetVal(), tmpzval.String().GetLen())
@@ -173,7 +173,7 @@ func PhpStreamUrlWrapHttpEx(
 					var _z *types.Zval = _p.GetVal()
 
 					tmpheader = _z
-					if tmpheader.IsType(types.IS_STRING) {
+					if tmpheader.IsString() {
 						s = tmpheader.String().GetVal()
 						for {
 							for (*s) == ' ' || (*s) == '\t' {
@@ -208,7 +208,7 @@ func PhpStreamUrlWrapHttpEx(
 						}
 					}
 				}
-			} else if tmpzval.IsType(types.IS_STRING) && tmpzval.String().GetLen() != 0 {
+			} else if tmpzval.IsString() && tmpzval.String().GetLen() != 0 {
 				s = tmpzval.String().GetVal()
 				for {
 					for (*s) == ' ' || (*s) == '\t' {
@@ -301,7 +301,7 @@ func PhpStreamUrlWrapHttpEx(
 	}
 	custom_request_method = 0
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "method")) != nil {
-		if tmpzval.IsType(types.IS_STRING) && tmpzval.String().GetLen() > 0 {
+		if tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 
 			if redirected == 0 || tmpzval.String().GetLen() == 3 && memcmp("GET", tmpzval.String().GetVal(), 3) == 0 || tmpzval.String().GetLen() == 4 && memcmp("HEAD", tmpzval.String().GetVal(), 4) == 0 {
 				custom_request_method = 1
@@ -374,7 +374,7 @@ func PhpStreamUrlWrapHttpEx(
 				var _z *types.Zval = _p.GetVal()
 
 				tmpheader = _z
-				if tmpheader.IsType(types.IS_STRING) {
+				if tmpheader.IsString() {
 					tmpstr.AppendString(tmpheader.String().GetStr())
 					tmpstr.AppendString("\r\n")
 				}
@@ -388,7 +388,7 @@ func PhpStreamUrlWrapHttpEx(
 				tmpstr.Free()
 			}
 			/* Remove newlines and spaces from start and end. there's at least one extra \r\n at the end that needs to go. */
-		} else if tmpzval.IsType(types.IS_STRING) && tmpzval.String().GetLen() != 0 {
+		} else if tmpzval.IsString() && tmpzval.String().GetLen() != 0 {
 			/* Remove newlines and spaces from start and end php_trim will estrndup() */
 			tmp = types.NewString(str.PhpTrimAll(tmpzval.StringVal(), nil))
 		}
@@ -531,7 +531,7 @@ func PhpStreamUrlWrapHttpEx(
 	if (have_header & HTTP_HEADER_CONNECTION) == 0 {
 		req_buf.AppendString("Connection: close\r\n")
 	}
-	if context != nil && b.Assign(&ua_zval, streams.PhpStreamContextGetOption(context, "http", "user_agent")) != nil && ua_zval.IsType(types.IS_STRING) {
+	if context != nil && b.Assign(&ua_zval, streams.PhpStreamContextGetOption(context, "http", "user_agent")) != nil && ua_zval.IsString() {
 		ua_str = ua_zval.String().GetVal()
 	} else if FG__().user_agent {
 		ua_str = FG__().user_agent
@@ -564,7 +564,7 @@ func PhpStreamUrlWrapHttpEx(
 		 * see bug #44603 for details. Since Content-Type maybe part of user's headers we need to do this check first.
 		 */
 
-		if header_init != 0 && context != nil && (have_header&HTTP_HEADER_CONTENT_LENGTH) == 0 && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsType(types.IS_STRING) && tmpzval.String().GetLen() > 0 {
+		if header_init != 0 && context != nil && (have_header&HTTP_HEADER_CONTENT_LENGTH) == 0 && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 			req_buf.AppendString("Content-Length: ")
 			req_buf.AppendUlong(tmpzval.String().GetLen())
 			req_buf.AppendString("\r\n")
@@ -577,7 +577,7 @@ func PhpStreamUrlWrapHttpEx(
 
 	/* Request content, such as for POST requests */
 
-	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsType(types.IS_STRING) && tmpzval.String().GetLen() > 0 {
+	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 		if (have_header & HTTP_HEADER_CONTENT_LENGTH) == 0 {
 			req_buf.AppendString("Content-Length: ")
 			req_buf.AppendUlong(tmpzval.String().GetLen())

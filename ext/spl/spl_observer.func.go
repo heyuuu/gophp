@@ -28,7 +28,7 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *spl_SplObjectStorage, 
 		var rv types.Zval
 		zend.ZendCallMethodWith1Params(this, intern.GetStd().GetCe(), intern.GetFptrGetHash(), "getHash", &rv, obj)
 		if !(rv.IsUndef()) {
-			if rv.IsType(types.IS_STRING) {
+			if rv.IsString() {
 				*key = types.StrKey(rv.StringVal())
 				return types.SUCCESS
 			} else {

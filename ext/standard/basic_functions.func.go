@@ -1843,7 +1843,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			// zend.ZvalPtrDtorNogc(find_hash)
 			zend.ArrayInit(find_hash)
 		}
-		if arg3 == nil || arg3.IsType(types.IS_STRING) && arg3.String().GetLen() == 0 {
+		if arg3 == nil || arg3.IsString() && arg3.String().GetLen() == 0 {
 			// arg2.TryAddRefcount()
 			zend.AddNextIndexZval(find_hash, arg2)
 		} else {

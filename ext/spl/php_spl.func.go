@@ -44,7 +44,7 @@ func ZifClassParents(executeData zpp.Ex, return_value zpp.Ret, instance *types.Z
 		return_value.SetFalse()
 		return
 	}
-	if obj.IsType(types.IS_STRING) {
+	if obj.IsString() {
 		if nil == b.Assign(&ce, SplFindCeByName(obj.String(), autoload)) {
 			return_value.SetFalse()
 			return
@@ -72,7 +72,7 @@ func ZifClassImplements(executeData zpp.Ex, return_value zpp.Ret, what *types.Zv
 		return_value.SetFalse()
 		return
 	}
-	if obj.IsType(types.IS_STRING) {
+	if obj.IsString() {
 		if nil == b.Assign(&ce, SplFindCeByName(obj.String(), autoload)) {
 			return_value.SetFalse()
 			return
@@ -96,7 +96,7 @@ func ZifClassUses(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval, _ 
 		return_value.SetFalse()
 		return
 	}
-	if obj.IsType(types.IS_STRING) {
+	if obj.IsString() {
 		if nil == b.Assign(&ce, SplFindCeByName(obj.String(), autoload)) {
 			return_value.SetFalse()
 			return
@@ -395,7 +395,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 				// types.ZendStringReleaseEx(func_name, 0)
 				return_value.SetFalse()
 				return
-			} else if zcallable.IsType(types.IS_STRING) {
+			} else if zcallable.IsString() {
 				if do_throw != 0 {
 					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", func_name.GetVal(), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error)
 				}

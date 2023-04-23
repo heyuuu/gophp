@@ -2002,7 +2002,7 @@ func zim_spl_CachingIterator___toString(executeData *zend.ZendExecuteData, retur
 		zend.ConvertToString(return_value)
 		return
 	}
-	if intern.GetZstr().IsType(types.IS_STRING) {
+	if intern.GetZstr().IsString() {
 		return_value.SetStringCopy(intern.GetZstr().String())
 		return
 	} else {

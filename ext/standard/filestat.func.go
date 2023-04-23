@@ -157,7 +157,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 			if group.IsType(types.IS_LONG) {
 				option = core.PHP_STREAM_META_GROUP
 				value = &(group.Long())
-			} else if group.IsType(types.IS_STRING) {
+			} else if group.IsString() {
 				option = core.PHP_STREAM_META_GROUP_NAME
 				value = group.String().GetVal()
 			} else {
@@ -183,7 +183,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 	}
 	if group.IsType(types.IS_LONG) {
 		gid = gid_t(group.Long())
-	} else if group.IsType(types.IS_STRING) {
+	} else if group.IsString() {
 		if PhpGetGidByName(group.String().GetVal(), &gid) != types.SUCCESS {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find gid for %s", group.String().GetVal())
 			return_value.SetFalse()
@@ -255,7 +255,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 			if user.IsType(types.IS_LONG) {
 				option = core.PHP_STREAM_META_OWNER
 				value = &(user.Long())
-			} else if user.IsType(types.IS_STRING) {
+			} else if user.IsString() {
 				option = core.PHP_STREAM_META_OWNER_NAME
 				value = user.String().GetVal()
 			} else {
@@ -281,7 +281,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 	}
 	if user.IsType(types.IS_LONG) {
 		uid = uid_t(user.Long())
-	} else if user.IsType(types.IS_STRING) {
+	} else if user.IsString() {
 		if PhpGetUidByName(user.String().GetVal(), &uid) != types.SUCCESS {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find uid for %s", user.String().GetVal())
 			return_value.SetFalse()

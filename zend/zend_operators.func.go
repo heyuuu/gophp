@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard/conv"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"math"
@@ -41,32 +42,38 @@ func DvalToLvalCap(d float64) ZendLong {
 	}
 	return ZendLong(d)
 }
-func IsNumericStringEx(
-	str string,
-	lval *ZendLong,
-	dval *float64,
-	allow_errors int,
-	oflow_info *int,
-) types.ZendUchar {
+func IsNumericStringEx(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode, oflow_info *int) types.ZendUchar {
 	r := ConvertNumericStr(str, allow_errors)
 
-	*lval = r.Lval
+	*lval = r.Int()
 	if dval != nil {
-		*dval = r.Dval
+		*dval = r.Float()
 	}
 	if oflow_info != nil {
-		*oflow_info = r.Overflow
+		*oflow_info = r.Overflow()
 	}
-	return r.Type
+	if r.IsInt() {
+		return types.IS_LONG
+	} else if r.IsFloat() {
+		return types.IS_DOUBLE
+	} else {
+		return 0
+	}
 }
-func IsNumericString(str string, lval *ZendLong, dval *float64, allow_errors int) types.ZendUchar {
+func IsNumericString(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode) types.ZendUchar {
 	r := ConvertNumericStr(str, allow_errors)
 
-	*lval = r.Lval
+	*lval = r.Int()
 	if dval != nil {
-		*dval = r.Dval
+		*dval = r.Float()
 	}
-	return r.Type
+	if r.IsInt() {
+		return types.IS_LONG
+	} else if r.IsFloat() {
+		return types.IS_DOUBLE
+	} else {
+		return 0
+	}
 }
 func ZendMemnstr(haystack *byte, needle string, needle_len int, end *byte) *byte {
 	// todo 替换 - 查找haystack中needle首次出现的位置，没出现则返回nil
@@ -464,12 +471,11 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 			mode = ConvertNoticeOnErrors
 		}
 		r := ConvertNumericStr(op.StringVal(), mode)
-		switch r.Type {
-		case types.IS_LONG:
-			holder.SetLong(r.Lval)
-		case types.IS_DOUBLE:
-			holder.SetDouble(r.Dval)
-		default:
+		if r.IsInt() {
+			holder.SetLong(r.Int())
+		} else if r.IsFloat() {
+			holder.SetDouble(r.Float())
+		} else {
 			holder.SetLong(0)
 			if silent == 0 {
 				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
@@ -2807,42 +2813,42 @@ func ZendiSmartStreq(s1 *types.String, s2 *types.String) int {
 	}
 }
 func ZendiSmartStrcmp(s1 string, s2 string) int {
-	var r1, r2 NumericStrResult
+	var r1, r2 conv.ParseNumberResult
 	r1 = ConvertNumericStr(s1, 0)
-	if r1.Type == 0 {
+	if !r1.IsSucc() {
 		goto string_cmp
 	}
 	r2 = ConvertNumericStr(s2, 0)
-	if r2.Type == 0 {
+	if !r2.IsSucc() {
 		goto string_cmp
 	}
 
-	if r1.Overflow != 0 && r1.Overflow == r2.Overflow && r1.Dval-r2.Dval == 0.0 {
+	if r1.Overflow() != 0 && r1.Overflow() == r2.Overflow() && r1.Float()-r2.Float() == 0.0 {
 		/* both values are integers overflown to the same side, and the
 		 * double comparison may have resulted in crucial accuracy lost */
 		goto string_cmp
 	}
-	if r1.Type == types.IS_DOUBLE || r2.Type == types.IS_DOUBLE {
-		dval1, dval2 := r1.Dval, r2.Dval
-		if r1.Type != types.IS_DOUBLE {
-			if r2.Overflow != 0 {
+	if r1.IsFloat() || r2.IsFloat() {
+		dval1, dval2 := r1.Float(), r2.Float()
+		if r1.IsInt() {
+			if r2.Overflow() != 0 {
 				/* 2nd operand is integer > LONG_MAX (oflow2==1) or < LONG_MIN (-1) */
-				return -1 * r2.Overflow
+				return -1 * r2.Overflow()
 			}
-			dval1 = float64(r1.Lval)
-		} else if r2.Type != types.IS_DOUBLE {
-			if r1.Overflow != 0 {
-				return r1.Overflow
+			dval1 = float64(r1.Int())
+		} else if r2.IsInt() {
+			if r1.Overflow() != 0 {
+				return r1.Overflow()
 			}
-			dval2 = float64(r2.Lval)
-		} else if r2.Dval == r2.Dval && !(core.ZendFinite(r1.Dval)) {
+			dval2 = float64(r2.Int())
+		} else if r2.Float() == r2.Float() && !(core.ZendFinite(r1.Float())) {
 			/* Both values overflowed and have the same sign,
 			 * so a numeric comparison would be inaccurate */
 			goto string_cmp
 		}
 		return b.Compare(dval1, dval2)
 	} else {
-		return b.Compare(r1.Lval, r2.Lval)
+		return b.Compare(r1.Int(), r2.Int())
 	}
 
 string_cmp:

@@ -123,7 +123,7 @@ func UserWrapperOpener(
 
 		/* if the opened path is set, copy it out */
 
-		if args[3].IsReference() && types.Z_REFVAL(args[3]).IsType(types.IS_STRING) && opened_path != nil {
+		if args[3].IsReference() && types.Z_REFVAL(args[3]).IsString() && opened_path != nil {
 			*opened_path = types.Z_REFVAL(args[3]).String().Copy()
 		}
 

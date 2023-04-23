@@ -387,7 +387,7 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		return_value.SetFalse()
 		return
 	}
-	if nil != b.Assign(&pzdata, types.ZendHashStrFindDeref(types.Z_OBJPROP_P(zobject), "data")) && pzdata.IsType(types.IS_STRING) {
+	if nil != b.Assign(&pzdata, types.ZendHashStrFindDeref(types.Z_OBJPROP_P(zobject), "data")) && pzdata.IsString() {
 		if bucket.GetOwnBuf() == 0 {
 			bucket = streams.PhpStreamBucketMakeWriteable(bucket)
 		}

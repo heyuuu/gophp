@@ -105,7 +105,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 		}
 		break
 	}
-	if assertion.IsType(types.IS_STRING) {
+	if assertion.IsString() {
 		var retval types.Zval
 		var old_error_reporting int = 0
 		if zend.ZendForbidDynamicCall("assert() with string argument") == types.FAILURE {
