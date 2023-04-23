@@ -672,7 +672,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 		types.SeparateArray(object_ptr)
 		{
-			variable_ptr = object_ptr.Array().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().Append(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -750,7 +750,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.Array().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().Append(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -833,7 +833,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.Array().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().Append(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -916,7 +916,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.Array().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().Append(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -1919,7 +1919,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 		types.SeparateArray(object_ptr)
 		{
-			variable_ptr = object_ptr.Array().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().Append(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -1992,7 +1992,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.Array().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().Append(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -2070,7 +2070,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.Array().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().Append(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -2148,7 +2148,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.Array().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().Append(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error

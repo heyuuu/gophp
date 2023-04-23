@@ -16,7 +16,7 @@ func PackedFillStart(arr *Array) *PackedFillScope {
 }
 
 func (s *PackedFillScope) FillNext() {
-	s.ht.NextIndexInsertNew(s.zv)
+	s.ht.AppendNew(s.zv)
 	s.zv = NewZvalUndef()
 	//s.bucket.SetH(s.idx)
 	//s.bucket.SetKey(nil)

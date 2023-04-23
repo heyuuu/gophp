@@ -167,14 +167,14 @@ func AddIndexStringl(arg *types.Zval, index ZendUlong, str *byte, length int) in
 	return types.SUCCESS
 }
 func AddNextIndexLong(arg *types.Zval, n ZendLong) int {
-	if arg.Array().NextIndexInsert(types.NewZvalLong(n)) != nil {
+	if arg.Array().Append(types.NewZvalLong(n)) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
 	}
 }
 func AddNextIndexNull(arg *types.Zval) int {
-	if arg.Array().NextIndexInsert(types.NewZvalNull()) != nil {
+	if arg.Array().Append(types.NewZvalNull()) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -183,7 +183,7 @@ func AddNextIndexNull(arg *types.Zval) int {
 func AddNextIndexBool(arg *types.Zval, b int) int {
 	var tmp types.Zval
 	tmp.SetBool(b != 0)
-	if arg.Array().NextIndexInsert(&tmp) != nil {
+	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -192,7 +192,7 @@ func AddNextIndexBool(arg *types.Zval, b int) int {
 func AddNextIndexResource(arg *types.Zval, r *types.ZendResource) int {
 	var tmp types.Zval
 	tmp.SetResource(r)
-	if arg.Array().NextIndexInsert(&tmp) != nil {
+	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -201,7 +201,7 @@ func AddNextIndexResource(arg *types.Zval, r *types.ZendResource) int {
 func AddNextIndexDouble(arg *types.Zval, d float64) int {
 	var tmp types.Zval
 	tmp.SetDouble(d)
-	if arg.Array().NextIndexInsert(&tmp) != nil {
+	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -210,7 +210,7 @@ func AddNextIndexDouble(arg *types.Zval, d float64) int {
 func AddNextIndexStrEx(arg *types.Zval, str string) int {
 	var tmp types.Zval
 	tmp.SetStringVal(str)
-	if arg.Array().NextIndexInsert(&tmp) != nil {
+	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -219,7 +219,7 @@ func AddNextIndexStrEx(arg *types.Zval, str string) int {
 func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 	var tmp types.Zval
 	tmp.SetString(str)
-	if arg.Array().NextIndexInsert(&tmp) != nil {
+	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -228,7 +228,7 @@ func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 func AddNextIndexString(arg *types.Zval, str string) int {
 	var tmp types.Zval
 	tmp.SetStringVal(str)
-	if arg.Array().NextIndexInsert(&tmp) != nil {
+	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -237,7 +237,7 @@ func AddNextIndexString(arg *types.Zval, str string) int {
 func AddNextIndexStringl(arg *types.Zval, str *byte, length int) int {
 	var tmp types.Zval
 	tmp.SetStringVal(b.CastStr(str, length))
-	if arg.Array().NextIndexInsert(&tmp) != nil {
+	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE

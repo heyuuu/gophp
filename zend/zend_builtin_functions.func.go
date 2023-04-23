@@ -125,13 +125,13 @@ func ZifFuncGetArgs(executeData zpp.Ex) (*types.Array, bool) {
 	arr := types.NewArray(argCount)
 	for _, zv := range values {
 		if zv.IsUndef() {
-			arr.NextIndexInsertNew(types.NewZvalNull())
+			arr.AppendNew(types.NewZvalNull())
 		} else {
 			zv = types.ZVAL_DEREF(zv)
 
 			// zv.TryAddRefcount()
 
-			arr.NextIndexInsertNew(zv)
+			arr.AppendNew(zv)
 		}
 	}
 	return arr, true
@@ -732,10 +732,10 @@ func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Z
 		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) || mptr.IsPrivate() && scope == mptr.GetScope()) {
 			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.GetOpArray().refcount > 1) && key != nil && !SameName(key, mptr.GetFunctionName()) {
 				method_name.SetStringCopy(ZendFindAliasName(mptr.GetScope(), key))
-				return_value.Array().NextIndexInsertNew(&method_name)
+				return_value.Array().AppendNew(&method_name)
 			} else {
 				method_name.SetStringCopy(mptr.GetFunctionName())
-				return_value.Array().NextIndexInsertNew(&method_name)
+				return_value.Array().AppendNew(&method_name)
 			}
 		}
 	})
@@ -1318,17 +1318,17 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 					argName = call.GetFunc().GetOpArray().GetVars()[i]
 					arg = types.ZendHashFindInd(call.GetSymbolTable(), argName.GetStr())
 					if arg != nil {
-						arr.NextIndexInsert(arg)
+						arr.Append(arg)
 					} else {
-						arr.NextIndexInsert(types.NewZvalNull())
+						arr.Append(types.NewZvalNull())
 					}
 				}
 			} else {
 				for ; i < firstExtraArg; i++ {
 					if !p.IsUndef() {
-						arr.NextIndexInsert(p)
+						arr.Append(p)
 					} else {
-						arr.NextIndexInsert(types.NewZvalNull())
+						arr.Append(types.NewZvalNull())
 					}
 					p++
 				}
@@ -1337,9 +1337,9 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		}
 		for ; i < numArgs; i++ {
 			if !p.IsUndef() {
-				arr.NextIndexInsert(p)
+				arr.Append(p)
 			} else {
-				arr.NextIndexInsert(types.NewZvalNull())
+				arr.Append(types.NewZvalNull())
 			}
 			p++
 		}
@@ -1727,13 +1727,13 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 				*/
 
 				tmp.SetStringCopy(include_filename)
-				arg_array.Array().NextIndexInsertNew(&tmp)
+				arg_array.Array().AppendNew(&tmp)
 				stack_frame.Array().KeyAddNew(types.STR_ARGS, &arg_array)
 			}
 			tmp.SetStringVal(pseudo_function_name)
 			stack_frame.Array().KeyAddNew(types.STR_FUNCTION, &tmp)
 		}
-		return_value.Array().NextIndexInsertNew(&stack_frame)
+		return_value.Array().AppendNew(&stack_frame)
 		include_filename = filename
 		call = skip
 		ptr = skip.GetPrevExecuteData()

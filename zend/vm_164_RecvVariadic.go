@@ -21,12 +21,12 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 				ZendVerifyVariadicArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum()))
 
-				params.Array().NextIndexInsert(param)
+				params.Array().Append(param)
 			}
 		} else {
 			for i := 0; i < int(arg_count-arg_num); i++ {
 				param := executeData.VarNum(paramIdx + i)
-				params.Array().NextIndexInsert(param)
+				params.Array().Append(param)
 			}
 		}
 	} else {

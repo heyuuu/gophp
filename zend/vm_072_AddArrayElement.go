@@ -127,7 +127,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 	}
 
 	{
-		if opline.Result().Array().NextIndexInsert(expr_ptr) == nil {
+		if opline.Result().Array().Append(expr_ptr) == nil {
 			ZendCannotAddElement()
 			// ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -331,7 +331,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData
 	}
 
 	{
-		if opline.Result().Array().NextIndexInsert(expr_ptr) == nil {
+		if opline.Result().Array().Append(expr_ptr) == nil {
 			ZendCannotAddElement()
 			// ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -546,7 +546,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData
 	}
 
 	{
-		if opline.Result().Array().NextIndexInsert(expr_ptr) == nil {
+		if opline.Result().Array().Append(expr_ptr) == nil {
 			ZendCannotAddElement()
 			// ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -752,7 +752,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 	}
 
 	{
-		if opline.Result().Array().NextIndexInsert(expr_ptr) == nil {
+		if opline.Result().Array().Append(expr_ptr) == nil {
 			ZendCannotAddElement()
 			// ZvalPtrDtorNogc(expr_ptr)
 		}

@@ -33,9 +33,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 				q = p
 				if !q.IsUndef() {
 					q = types.ZVAL_DEREF(q)
-					ht.NextIndexInsert(q)
+					ht.Append(q)
 				} else {
-					ht.NextIndexInsert(types.NewZvalNull())
+					ht.Append(types.NewZvalNull())
 				}
 				p++
 				i++
@@ -51,9 +51,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 			q = p
 			if !q.IsUndef() {
 				q = types.ZVAL_DEREF(q)
-				ht.NextIndexInsert(q)
+				ht.Append(q)
 			} else {
-				ht.NextIndexInsert(types.NewZvalNull())
+				ht.Append(types.NewZvalNull())
 			}
 			p++
 			i++
@@ -88,9 +88,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 				q = p
 				if !q.IsUndef() {
 					q = types.ZVAL_DEREF(q)
-					ht.NextIndexInsert(q)
+					ht.Append(q)
 				} else {
-					ht.NextIndexInsert(types.NewZvalNull())
+					ht.Append(types.NewZvalNull())
 				}
 				p++
 				i++
@@ -106,9 +106,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 			q = p
 			if !q.IsUndef() {
 				q = types.ZVAL_DEREF(q)
-				ht.NextIndexInsert(q)
+				ht.Append(q)
 			} else {
-				ht.NextIndexInsert(types.NewZvalNull())
+				ht.Append(types.NewZvalNull())
 			}
 			p++
 			i++

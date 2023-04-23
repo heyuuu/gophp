@@ -419,7 +419,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 					if key != nil {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unpack array with string keys")
 					}
-					if result.Array().NextIndexInsert(val) == nil {
+					if result.Array().Append(val) == nil {
 						return 0
 					}
 				}
@@ -449,7 +449,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal offset type")
 			}
 		} else {
-			if result.Array().NextIndexInsert(value) == nil {
+			if result.Array().Append(value) == nil {
 				// ZvalPtrDtorNogc(value)
 				// ZvalPtrDtor(result)
 				return 0

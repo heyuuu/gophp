@@ -666,7 +666,7 @@ func PhpStreamUrlWrapHttpEx(
 			}
 		}
 		http_response.SetStringVal(b.CastStr(tmp_line, tmp_line_len))
-		response_header.Array().NextIndexInsert(&http_response)
+		response_header.Array().Append(&http_response)
 	} else {
 		core.PhpStreamClose(stream)
 		stream = nil
@@ -777,7 +777,7 @@ func PhpStreamUrlWrapHttpEx(
 			}
 			var http_header types.Zval
 			http_header.SetStringVal(b.CastStr(http_header_line, http_header_line_length))
-			response_header.Array().NextIndexInsert(&http_header)
+			response_header.Array().Append(&http_header)
 		} else {
 			break
 		}

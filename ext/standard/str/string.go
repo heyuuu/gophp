@@ -2243,7 +2243,7 @@ func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*type
 	case 1:
 		arr := types.NewArray(len(spans))
 		for _, span := range spans {
-			arr.NextIndexInsert(types.NewZvalString(str[span.start:span.end]))
+			arr.Append(types.NewZvalString(str[span.start:span.end]))
 		}
 		return types.NewZvalArray(arr), true
 	case 2:

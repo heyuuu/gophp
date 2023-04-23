@@ -746,7 +746,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 				if args.GetType() != types.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
-				args.Array().NextIndexInsert(&val)
+				args.Array().Append(&val)
 			} else {
 				return_value.Array().IndexUpdate(optname_int, &val)
 			}
@@ -758,7 +758,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 				if args.GetType() != types.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
-				args.Array().NextIndexInsert(&val)
+				args.Array().Append(&val)
 			} else {
 				return_value.Array().KeyAdd(b.CastStrAuto(optname), &val)
 			}

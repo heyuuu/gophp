@@ -366,7 +366,7 @@ func ZendAstListAdd(ast *ZendAst, op *ZendAst) *ZendAst {
 func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.Zval) int {
 	switch offset.GetType() {
 	case types.IS_UNDEF:
-		if result.Array().NextIndexInsert(expr) == nil {
+		if result.Array().Append(expr) == nil {
 			faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			// ZvalPtrDtorNogc(expr)
 		}
@@ -407,7 +407,7 @@ func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 				faults.ThrowError(nil, "Cannot unpack array with string keys")
 				return types.FAILURE
 			} else {
-				if result.Array().NextIndexInsert(val) == nil {
+				if result.Array().Append(val) == nil {
 					faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 					break
 				}

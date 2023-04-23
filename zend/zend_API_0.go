@@ -58,7 +58,7 @@ func AddIndexZval(arg *types.Zval, index ZendUlong, value *types.Zval) int {
 	}
 }
 func AddNextIndexZval(arg *types.Zval, value *types.Zval) int {
-	if arg.Array().NextIndexInsert(value) != nil {
+	if arg.Array().Append(value) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE

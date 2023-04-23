@@ -158,7 +158,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 		if arg3 != nil && arg3.String().GetLen() > 0 {
 			entry = find_arr.Array().SymtableUpdate(arg3.String().GetStr(), arg2)
 		} else {
-			entry = find_arr.Array().NextIndexInsert(arg2)
+			entry = find_arr.Array().Append(arg2)
 		}
 		entry.SetStringVal(entry.StringVal())
 	case zend.ZEND_INI_PARSER_SECTION:

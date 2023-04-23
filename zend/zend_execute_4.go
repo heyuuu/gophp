@@ -362,7 +362,7 @@ func ZendFetchDimensionAddress(
 		types.SeparateArray(container)
 	fetch_from_array:
 		if dim == nil {
-			retval = container.Array().NextIndexInsert(EG__().GetUninitializedZval())
+			retval = container.Array().Append(EG__().GetUninitializedZval())
 			if retval == nil {
 				ZendCannotAddElement()
 				result.IsError()

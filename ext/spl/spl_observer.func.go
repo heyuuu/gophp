@@ -601,16 +601,16 @@ func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, ret
 	zend.ArrayInitSize(&tmp, 2*intern.GetStorage().Len())
 	intern.GetStorage().Foreach(func(key types.ArrayKey, value *types.Zval) {
 		elem = value.Ptr()
-		tmp.Array().NextIndexInsert(elem.GetObj())
-		tmp.Array().NextIndexInsert(elem.GetInf())
+		tmp.Array().Append(elem.GetObj())
+		tmp.Array().Append(elem.GetInf())
 	})
-	return_value.Array().NextIndexInsert(&tmp)
+	return_value.Array().Append(&tmp)
 
 	/* members */
 
 	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData)))
 	//tmp.TryAddRefcount()
-	return_value.Array().NextIndexInsert(&tmp)
+	return_value.Array().Append(&tmp)
 }
 func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))

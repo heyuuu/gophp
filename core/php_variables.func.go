@@ -172,7 +172,7 @@ func PhpRegisterVariableEx(var_name string, val *types.Zval, track_vars_array *t
 			}
 			if index == nil {
 				zend.ArrayInit(&gpc_element)
-				if b.Assign(&gpc_element_p, symtable1.NextIndexInsert(&gpc_element)) == nil {
+				if b.Assign(&gpc_element_p, symtable1.Append(&gpc_element)) == nil {
 					gpc_element.Array().DestroyEx()
 					// zend.ZvalPtrDtorNogc(val)
 					zend.FreeAlloca(var_orig, use_heap)
@@ -213,7 +213,7 @@ func PhpRegisterVariableEx(var_name string, val *types.Zval, track_vars_array *t
 	} else {
 	plain_var:
 		if index == nil {
-			if symtable1.NextIndexInsert(val) == nil {
+			if symtable1.Append(val) == nil {
 				// zend.ZvalPtrDtorNogc(val)
 			}
 		} else {
@@ -511,7 +511,7 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 		var i int
 		for i = 0; i < SG__().RequestInfo.argc; i++ {
 			tmp.SetStringVal(b.CastStrAuto(SG__().RequestInfo.argv[i]))
-			if arr.Array().NextIndexInsert(&tmp) == nil {
+			if arr.Array().Append(&tmp) == nil {
 				// types.ZendStringEfree(tmp.String())
 			}
 		}
@@ -527,7 +527,7 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 
 			tmp.SetStringVal(b.CastStrAuto(ss))
 			count++
-			if arr.Array().NextIndexInsert(&tmp) == nil {
+			if arr.Array().Append(&tmp) == nil {
 				// types.ZendStringEfree(tmp.String())
 			}
 			if space != nil {

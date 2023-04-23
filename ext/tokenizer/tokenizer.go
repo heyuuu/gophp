@@ -49,13 +49,13 @@ func ZmInfoTokenizer(zend_module *zend.ModuleEntry) {
 func AddToken(return_value *types.Zval, token_type int, text *uint8, leng int, lineno int) {
 	if token_type >= 256 {
 		arr := types.NewArray(0)
-		arr.NextIndexInsert(types.NewZvalLong(token_type))
-		arr.NextIndexInsert(types.NewZvalString(b.CastStr(text, leng)))
-		arr.NextIndexInsert(types.NewZvalLong(lineno))
+		arr.Append(types.NewZvalLong(token_type))
+		arr.Append(types.NewZvalString(b.CastStr(text, leng)))
+		arr.Append(types.NewZvalLong(lineno))
 
-		return_value.Array().NextIndexInsert(types.NewZvalArray(arr))
+		return_value.Array().Append(types.NewZvalArray(arr))
 	} else {
-		return_value.Array().NextIndexInsert(types.NewZvalString(b.CastStr(text, leng)))
+		return_value.Array().Append(types.NewZvalString(b.CastStr(text, leng)))
 	}
 }
 func Tokenize(return_value *types.Zval, source string) types.ZendBool {

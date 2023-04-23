@@ -180,7 +180,7 @@ func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, type_nam
 	lde.SetResourceId(ListDestructors.GetNNextFreeElement())
 	lde.SetTypeName(type_name)
 	zv.SetPtr(lde)
-	if ListDestructors.NextIndexInsert(&zv) == nil {
+	if ListDestructors.Append(&zv) == nil {
 		return types.FAILURE
 	}
 	return ListDestructors.GetNNextFreeElement() - 1

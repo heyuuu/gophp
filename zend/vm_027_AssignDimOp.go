@@ -168,7 +168,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 	assign_dim_op_new_array:
 		dim = nil
 		{
-			var_ptr = container.Array().NextIndexInsert(EG__().GetUninitializedZval())
+			var_ptr = container.Array().Append(EG__().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -442,7 +442,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	assign_dim_op_new_array:
 		dim = nil
 		{
-			var_ptr = container.Array().NextIndexInsert(EG__().GetUninitializedZval())
+			var_ptr = container.Array().Append(EG__().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null

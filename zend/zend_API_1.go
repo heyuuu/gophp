@@ -71,7 +71,7 @@ func ZendCopyParametersArray(param_count int, argument_array *types.Zval) int {
 	}
 	for b.PostDec(&param_count) > 0 {
 		// param_ptr.TryAddRefcount()
-		argument_array.Array().NextIndexInsertNew(param_ptr)
+		argument_array.Array().AppendNew(param_ptr)
 		param_ptr++
 	}
 	return types.SUCCESS

@@ -716,19 +716,19 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 
 		/* Store numeric indexes in proper order */
 
-		return_value.Array().NextIndexInsert(&stat_dev)
-		return_value.Array().NextIndexInsert(&stat_ino)
-		return_value.Array().NextIndexInsert(&stat_mode)
-		return_value.Array().NextIndexInsert(&stat_nlink)
-		return_value.Array().NextIndexInsert(&stat_uid)
-		return_value.Array().NextIndexInsert(&stat_gid)
-		return_value.Array().NextIndexInsert(&stat_rdev)
-		return_value.Array().NextIndexInsert(&stat_size)
-		return_value.Array().NextIndexInsert(&stat_atime)
-		return_value.Array().NextIndexInsert(&stat_mtime)
-		return_value.Array().NextIndexInsert(&stat_ctime)
-		return_value.Array().NextIndexInsert(&stat_blksize)
-		return_value.Array().NextIndexInsert(&stat_blocks)
+		return_value.Array().Append(&stat_dev)
+		return_value.Array().Append(&stat_ino)
+		return_value.Array().Append(&stat_mode)
+		return_value.Array().Append(&stat_nlink)
+		return_value.Array().Append(&stat_uid)
+		return_value.Array().Append(&stat_gid)
+		return_value.Array().Append(&stat_rdev)
+		return_value.Array().Append(&stat_size)
+		return_value.Array().Append(&stat_atime)
+		return_value.Array().Append(&stat_mtime)
+		return_value.Array().Append(&stat_ctime)
+		return_value.Array().Append(&stat_blksize)
+		return_value.Array().Append(&stat_blocks)
 
 		/* Store string indexes referencing the same zval*/
 

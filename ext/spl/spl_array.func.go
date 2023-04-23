@@ -352,7 +352,7 @@ func SplArrayWriteDimensionEx(check_inherited int, object *types.Zval, offset *t
 	//value.TryAddRefcount()
 	if offset == nil {
 		ht = SplArrayGetHashTable(intern)
-		ht.NextIndexInsert(value)
+		ht.Append(value)
 		return
 	}
 try_again:
@@ -381,7 +381,7 @@ try_again:
 		return
 	case types.IS_NULL:
 		ht = SplArrayGetHashTable(intern)
-		ht.NextIndexInsert(value)
+		ht.Append(value)
 		return
 	case types.IS_REFERENCE:
 		offset = types.ZVAL_DEREF(offset)
@@ -1378,7 +1378,7 @@ func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *
 	/* flags */
 
 	tmp.SetLong(intern.GetArFlags() & SPL_ARRAY_CLONE_MASK)
-	return_value.Array().NextIndexInsert(&tmp)
+	return_value.Array().Append(&tmp)
 
 	/* storage */
 
@@ -1387,13 +1387,13 @@ func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *
 	} else {
 		types.ZVAL_COPY(&tmp, intern.GetArray())
 	}
-	return_value.Array().NextIndexInsert(&tmp)
+	return_value.Array().Append(&tmp)
 
 	/* members */
 
 	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData)))
 	//tmp.TryAddRefcount()
-	return_value.Array().NextIndexInsert(&tmp)
+	return_value.Array().Append(&tmp)
 
 	/* iterator class */
 
@@ -1402,7 +1402,7 @@ func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *
 	} else {
 		tmp.SetStringCopy(intern.GetCeGetIterator().GetName())
 	}
-	return_value.Array().NextIndexInsert(&tmp)
+	return_value.Array().Append(&tmp)
 }
 func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(zend.ZEND_THIS(executeData))

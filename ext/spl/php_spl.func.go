@@ -634,7 +634,7 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 			var tmp types.Zval
 			zend.ArrayInit(return_value)
 			tmp.SetStringVal(types.STR_MAGIC_AUTOLOAD)
-			return_value.Array().NextIndexInsertNew(&tmp)
+			return_value.Array().AppendNew(&tmp)
 			return
 		}
 		return_value.SetFalse()

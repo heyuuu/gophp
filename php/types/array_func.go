@@ -35,7 +35,7 @@ func NewArrayOfInt(items []int) *Array {
 	// todo
 	arr := NewArray(0)
 	for _, item := range items {
-		arr.NextIndexInsert(NewZvalLong(item))
+		arr.Append(NewZvalLong(item))
 	}
 	return arr
 }
@@ -43,7 +43,7 @@ func NewArrayOfString(items []string) *Array {
 	// todo
 	arr := NewArray(0)
 	for _, item := range items {
-		arr.NextIndexInsert(NewZvalString(item))
+		arr.Append(NewZvalString(item))
 	}
 	return arr
 }
@@ -51,7 +51,7 @@ func NewArrayOfZval(items []*Zval) *Array {
 	// todo
 	arr := NewArray(0)
 	for _, item := range items {
-		arr.NextIndexInsert(item)
+		arr.Append(item)
 	}
 	return arr
 }
@@ -246,7 +246,7 @@ func ZendHashIndexUpdatePtr(ht *Array, index int, pData any) any {
 }
 func ZendHashNextIndexInsertPtr(ht *Array, pData any) any {
 	tmp := NewZvalPtr(pData)
-	zv := ht.NextIndexInsert(tmp)
+	zv := ht.Append(tmp)
 	if zv != nil {
 		return zv.Ptr()
 	} else {
@@ -261,7 +261,7 @@ func ZendHashIndexUpdateMem(ht *Array, index int, pData any, size int) any {
 }
 func ZendHashNextIndexInsertMem(ht *Array, pData any, size int) any {
 	tmp := NewZvalPtr(nil)
-	zv := ht.NextIndexInsert(tmp)
+	zv := ht.Append(tmp)
 	if zv != nil {
 		zv.SetPtr(zend.Pemalloc(size))
 		memcpy(zv.Ptr(), pData, size)
@@ -432,8 +432,7 @@ func ZendArrayDupElements(source *Array, target *Array) {
 		}
 
 		// 添加元素到新数组
-		var newBucket = NewBucket(p.GetArrayKey(), data)
-		target.appendBucket(newBucket)
+		target.appendBucket(p.GetArrayKey(), data)
 
 		// 更新内部指针
 		if source.internalPointer == pos {
