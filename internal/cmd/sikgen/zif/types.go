@@ -79,9 +79,11 @@ const (
 	ZppTypePathNullable
 	// ref
 	ZppTypeRefZval
+	ZppTypeRefVariadic
 	ZppTypeRefArray
 	ZppTypeDerefArray
-	ZppTypeRefVariadic
+	ZppTypeRefArrayOrObject
+	ZppTypeRefArrayHt
 )
 
 var zppInfos = []struct {
@@ -124,6 +126,8 @@ var zppInfos = []struct {
 	{ZppTypeRefArray, "zpp.RefArray", "ParseArrayEx", []ast.Expr{f.False(), f.True()}},
 	{ZppTypeDerefArray, "zpp.DerefArray", "ParseArrayEx2", []ast.Expr{f.False(), f.True(), f.False()}},
 	{ZppTypeRefVariadic, "[]zpp.RefZval", "ParseVariadic", nil},
+	{ZppTypeRefArrayOrObject, "zpp.RefArrayOrObject", "ParseArrayOrObjectEx", []ast.Expr{f.False(), f.True()}},
+	{ZppTypeRefArrayHt, "zpp.RefArrayHt", "ParseArrayHtEx", []ast.Expr{f.False(), f.True()}},
 }
 
 var toZppTypeMap map[string]ZppType

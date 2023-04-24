@@ -43,7 +43,7 @@ func DvalToLvalCap(d float64) ZendLong {
 	return ZendLong(d)
 }
 func IsNumericStringEx(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode, oflow_info *int) types.ZendUchar {
-	r := ConvertNumericStr(str, allow_errors)
+	r := StrToNumberEx(str, allow_errors)
 
 	*lval = r.Int()
 	if dval != nil {
@@ -61,7 +61,7 @@ func IsNumericStringEx(str string, lval *ZendLong, dval *float64, allow_errors C
 	}
 }
 func IsNumericString(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode) types.ZendUchar {
-	r := ConvertNumericStr(str, allow_errors)
+	r := StrToNumberEx(str, allow_errors)
 
 	*lval = r.Int()
 	if dval != nil {
@@ -470,7 +470,7 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 		} else {
 			mode = ConvertNoticeOnErrors
 		}
-		r := ConvertNumericStr(op.StringVal(), mode)
+		r := StrToNumberEx(op.StringVal(), mode)
 		if r.IsInt() {
 			holder.SetLong(r.Int())
 		} else if r.IsFloat() {
@@ -909,12 +909,11 @@ try_again:
 	case types.IS_STRING:
 		return ZendStrtod(op.String().GetVal(), nil)
 	case types.IS_ARRAY:
-		if op.Array().Len() {
+		if op.Array().Len() != 0 {
 			return 1.0
 		} else {
 			return 0.0
 		}
-		fallthrough
 	case types.IS_OBJECT:
 		var dst types.Zval
 		ConvertObjectToType(op, &dst, types.IS_DOUBLE, ConvertToDouble)
@@ -923,7 +922,6 @@ try_again:
 		} else {
 			return 1.0
 		}
-		fallthrough
 	case types.IS_REFERENCE:
 		op = types.Z_REFVAL_P(op)
 		goto try_again
@@ -2814,11 +2812,11 @@ func ZendiSmartStreq(s1 *types.String, s2 *types.String) int {
 }
 func ZendiSmartStrcmp(s1 string, s2 string) int {
 	var r1, r2 conv.ParseNumberResult
-	r1 = ConvertNumericStr(s1, 0)
+	r1 = StrToNumberEx(s1, 0)
 	if !r1.IsSucc() {
 		goto string_cmp
 	}
-	r2 = ConvertNumericStr(s2, 0)
+	r2 = StrToNumberEx(s2, 0)
 	if !r2.IsSucc() {
 		goto string_cmp
 	}

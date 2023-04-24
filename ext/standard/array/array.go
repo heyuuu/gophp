@@ -3,10 +3,13 @@ package array
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/ext/standard/conv"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"math"
 )
 
 /**
@@ -489,4 +492,185 @@ func ZifArraySearch(needle *types.Zval, haystack *types.Array, _ zpp.Opt, strict
 	} else {
 		return key.ToZval()
 	}
+}
+
+func ZifArrayFill(startKey int, num int, val *types.Zval) (*types.Array, bool) {
+	if num < 0 {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of elements can't be negative")
+		return nil, false
+	}
+	if num == 0 {
+		return types.NewArray(0), true
+	}
+	if num > math.MaxInt32 {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Too many elements")
+		return nil, false
+	} else if startKey > math.MaxInt-num+1 {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
+		return nil, false
+	}
+
+	// todo 尽量创建 packed array
+
+	/* create hash */
+	arr := types.NewArray(num)
+	for i := 0; i < num; i++ {
+		arr.IndexAdd(startKey+i, val)
+	}
+	return arr, true
+}
+func ZifArrayFillKeys(keys *types.Array, val *types.Zval) *types.Array {
+	arr := types.NewArray(keys.Len())
+	keys.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
+		entry = types.ZVAL_DEREF(entry)
+		if entry.IsLong() {
+			arr.IndexUpdate(entry.Long(), val)
+		} else {
+			key := zend.ZvalGetStrVal(entry)
+			arr.SymtableUpdate(key, val)
+		}
+	})
+	return arr
+}
+func rangeDouble(zLow *types.Zval, zHigh *types.Zval, step float64) ([]*types.Zval, bool) {
+	b.Assert(step > 0)
+	low := zend.ZvalGetDouble(zLow)
+	high := zend.ZvalGetDouble(zHigh)
+	if core.ZendIsInf(high) || core.ZendIsInf(low) {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range supplied: start=%0.0f end=%0.0f", low, high)
+		return nil, false
+	}
+	if low > high {
+		low, high = high, low
+	}
+	if high-low < step {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "step exceeds the specified range")
+		return nil, false
+	}
+
+	size := (high-low)/step + 1
+	if size >= float64(types.HT_MAX_SIZE) {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", low, high)
+		return nil, false
+	}
+
+	arr := make([]*types.Zval, int(size))
+	for i := range arr {
+		arr[i] = types.NewZvalDouble(low + float64(i)*step)
+	}
+	return arr, true
+}
+
+func rangeLong(zLow *types.Zval, zHigh *types.Zval, step int) ([]*types.Zval, bool) {
+	b.Assert(step > 0)
+	low := zend.ZvalGetLong(zLow)
+	high := zend.ZvalGetLong(zHigh)
+	if high == low {
+		return []*types.Zval{types.NewZvalLong(high)}, true
+	}
+
+	if low > high {
+		low, high = high, low
+	}
+	if high-low < step {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "step exceeds the specified range")
+		return nil, false
+	}
+
+	size := (high-low)/step + 1
+	if size >= types.HT_MAX_SIZE {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%d end=%d", low, high)
+		return nil, false
+	}
+
+	arr := make([]*types.Zval, size)
+	for i := range arr {
+		arr[i] = types.NewZvalLong(low + i*step)
+	}
+	return arr, true
+}
+
+func rangeChar(low byte, high byte, step int) ([]*types.Zval, bool) {
+	if low == high {
+		return []*types.Zval{types.NewZvalString(string(low))}, true
+	}
+	if low > high {
+		low, high = high, low
+	}
+
+	bStep := byte(step)
+	size := (high-low)/bStep + 1
+	arr := make([]*types.Zval, 0, size)
+	for i := range arr {
+		c := low + byte(i)*bStep
+		arr[i] = types.NewZvalString(string(c))
+	}
+	return arr, true
+}
+
+func ZifRange(low_ *types.Zval, high_ *types.Zval, _ zpp.Opt, step_ *types.Zval) ([]*types.Zval, bool) {
+	var zlow *types.Zval = low_
+	var zhigh *types.Zval = high_
+	var zstep *types.Zval = step_
+	var isStepDouble = false
+
+	var step = 1.0
+	if zstep != nil {
+		if zstep.IsDouble() {
+			isStepDouble = true
+		} else if zstep.IsString() {
+			r := conv.ParseNumber(zstep.StringVal())
+			if r.IsInt() {
+				// pass
+			} else if r.IsFloat() {
+				isStepDouble = true
+			} else {
+				/* bad number */
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range string - must be numeric")
+				return nil, false
+			}
+		}
+		step = zend.ZvalGetDouble(zstep)
+
+		/* We only want positive step values. */
+		if step < 0.0 {
+			step *= -1
+		}
+	}
+
+	/* If the range is given as strings, generate an array of characters. */
+	if zlow.IsString() && zhigh.IsString() && zlow.String().GetLen() >= 1 && zhigh.String().GetLen() >= 1 {
+		lowStr := zlow.StringVal()
+		highStr := zhigh.StringVal()
+
+		r1 := zend.StrToNumber(lowStr)
+		r2 := zend.StrToNumber(highStr)
+		if r1.IsFloat() || r2.IsFloat() || isStepDouble {
+			return rangeDouble(zlow, zhigh, step)
+		} else if r1.IsInt() || r2.IsInt() {
+			return rangeLong(zlow, zhigh, int(step))
+		} else {
+			return rangeChar(lowStr[0], highStr[0], int(step))
+		}
+	} else if zlow.IsDouble() || zhigh.IsDouble() || isStepDouble {
+		return rangeDouble(zlow, zhigh, step)
+	} else {
+		return rangeLong(zlow, zhigh, int(step))
+	}
+}
+func arrayDataShuffle(array *types.Array) *types.Array {
+	values := array.Values()
+	for i := len(values) - 1; i >= 0; i-- {
+		j := standard.PhpMtRandRange(0, i)
+		if i != j {
+			values[i], values[j] = values[j], values[i]
+		}
+	}
+	return types.NewArrayOfZval(values)
+}
+func ZifShuffle(arg zpp.RefArray) bool {
+	if arg.Array().Len() > 1 {
+		arg.SetArray(arrayDataShuffle(arg.Array()))
+	}
+	return true
 }

@@ -15,44 +15,9 @@ func StrToDouble(str string) float64 {
 	return d
 }
 
-func StrToNumberEx(str string, mode ConvertNumericMode) (num types.Number, ok bool) {
-	result := ConvertNumericStr(str, mode)
-	if result.IsInt() {
-		return types.IntNumber(result.Int()), true
-	} else if result.IsFloat() {
-		return types.FloatNumber(result.Float()), true
-	} else {
-		return // fail
-	}
-}
-func StrToNumberStrict(str string) (types.Number, bool) {
-	return StrToNumberEx(str, ConvertRefuseErrors)
-}
-func StrToNumberAllowErrors(str string) (types.Number, bool) {
-	return StrToNumberEx(str, ConvertContinueOnErrors)
-}
-func StrToNumberNoticeErrors(str string) (types.Number, bool) {
-	return StrToNumberEx(str, ConvertNoticeOnErrors)
-}
-
 /**
- * ConvertNumericStr 解析结果
+ * constants
  */
-type NumericStrResult struct {
-	Overflow int             // 溢出信息。1 正数溢出，-1 负数溢出，0 无溢出或本身就是浮点数格式
-	Type     types.ZendUchar // 数字类型，可能值为 0, IS_LONG, IS_DOUBLE
-	Lval     int             // 数字为整数时的值，其他情况为 0
-	Dval     float64         // 数字为浮点数时的值，默认为 0.0
-}
-
-func (r NumericStrResult) Int() (int, bool) {
-	return r.Lval, r.Type == types.IS_LONG
-}
-
-func (r NumericStrResult) Float() (float64, bool) {
-	return r.Dval, r.Type == types.IS_LONG
-}
-
 type ConvertNumericMode int
 
 const (
@@ -61,20 +26,30 @@ const (
 	ConvertNoticeOnErrors   ConvertNumericMode = -1 // 允许不完全匹配，不完全匹配时触发 Zend Notice (可能产生 ZendException)
 )
 
+func StrToNumber(str string) conv.ParseNumberResult {
+	return StrToNumberEx(str, ConvertRefuseErrors)
+}
+func StrToNumberAllowErrors(str string) conv.ParseNumberResult {
+	return StrToNumberEx(str, ConvertContinueOnErrors)
+}
+func StrToNumberNoticeErrors(str string) conv.ParseNumberResult {
+	return StrToNumberEx(str, ConvertNoticeOnErrors)
+}
+
 /**
- * ConvertNumericStr 	尝试转换字符串为数字
+ * StrToNumberEx 	尝试转换字符串为数字
  * @param	str		待转换的字符串
  * @param	mode 	是否允许错误，具体参看上方常量
- * @return 	NumericStrResult
+ * @return 	conv.ParseNumberResult
  */
-func ConvertNumericStr(str string, mode ConvertNumericMode) conv.ParseNumberResult {
+func StrToNumberEx(str string, mode ConvertNumericMode) conv.ParseNumberResult {
 	switch mode {
 	case ConvertRefuseErrors:
 		return conv.ParseNumber(str)
 	case ConvertNoticeOnErrors:
 		result, matchLen := conv.ParseNumberPrefix(str, false)
 		if matchLen != len(str) {
-			// todo 此处可能会触发 Exception
+			// notice: 此处可能会触发 Exception
 			faults.Error(faults.E_NOTICE, "A non well formed numeric value encountered")
 		}
 		return result
@@ -86,8 +61,8 @@ func ConvertNumericStr(str string, mode ConvertNumericMode) conv.ParseNumberResu
 	}
 }
 
-func ConvertNumericStrAsZval(str string, mode ConvertNumericMode) *types.Zval {
-	r := ConvertNumericStr(str, mode)
+func StrToNumberZvalEx(str string, mode ConvertNumericMode) *types.Zval {
+	r := StrToNumberEx(str, mode)
 	if r.IsInt() {
 		return types.NewZvalLong(r.Int())
 	} else if r.IsFloat() {

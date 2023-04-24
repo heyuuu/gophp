@@ -60,7 +60,7 @@ func ParseLong(arg *types.Zval, checkNull bool, cap bool, weak bool) (dest int, 
 func ParseLongWeak(arg *types.Zval, cap bool) (dest int, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
-		arg = zend.ConvertNumericStrAsZval(arg.String().GetStr(), zend.ConvertNoticeOnErrors)
+		arg = zend.StrToNumberZvalEx(arg.String().GetStr(), zend.ConvertNoticeOnErrors)
 		if arg == nil {
 			return // fail
 		}
@@ -123,7 +123,7 @@ func ParseDouble(arg *types.Zval, checkNull bool, weak bool) (dest float64, isNu
 func ParseDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
-		arg = zend.ConvertNumericStrAsZval(arg.String().GetStr(), zend.ConvertNoticeOnErrors)
+		arg = zend.StrToNumberZvalEx(arg.String().GetStr(), zend.ConvertNoticeOnErrors)
 		if arg == nil {
 			return // fail
 		}

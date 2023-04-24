@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/ext/standard/conv"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -13,297 +14,10 @@ import (
 	"sort"
 )
 
-func ZifArrayFill(startKey int, num int, val *types.Zval) (*types.Array, bool) {
-	if num < 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of elements can't be negative")
-		return nil, false
-	}
-	if num == 0 {
-		return types.NewArray(0), true
-	}
-	if num > math.MaxInt32 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Too many elements")
-		return nil, false
-	} else if startKey > math.MaxInt-num+1 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
-		return nil, false
-	}
-
-	// todo 尽量创建 packed array
-
-	/* create hash */
-	arr := types.NewArray(num)
-	for i := 0; i < num; i++ {
-		arr.IndexAdd(startKey+i, val)
-	}
-	return arr, true
-}
-func ZifArrayFillKeys(keys *types.Array, val *types.Zval) *types.Array {
-	arr := types.NewArray(keys.Len())
-	keys.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
-		entry = types.ZVAL_DEREF(entry)
-		if entry.IsLong() {
-			arr.IndexUpdate(entry.Long(), val)
-		} else {
-			key := zend.ZvalGetStrVal(entry)
-			arr.SymtableUpdate(key, val)
-		}
-	})
-	return arr
-}
-func ZifRange(return_value zpp.Ret, low_ *types.Zval, high_ *types.Zval, _ zpp.Opt, step_ *types.Zval) {
-	var zlow *types.Zval = low_
-	var zhigh *types.Zval = high_
-	var zstep *types.Zval = step_
-	var tmp types.Zval
-	var err = 0
-	var is_step_double = 0
-	var step = 1.0
-
-	if zstep != nil {
-		if zstep.IsDouble() {
-			is_step_double = 1
-		} else if zstep.IsString() {
-			num, ok := zend.StrToNumberStrict(zstep.StringVal())
-			if !ok {
-				/* bad number */
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range string - must be numeric")
-				return_value.SetFalse()
-				return
-			}
-			if ok && num.IsFloat() {
-				is_step_double = 1
-			}
-		}
-		step = zend.ZvalGetDouble(zstep)
-
-		/* We only want positive step values. */
-		if step < 0.0 {
-			step *= -1
-		}
-	}
-
-	/* If the range is given as strings, generate an array of characters. */
-	if zlow.IsString() && zhigh.IsString() && zlow.String().GetLen() >= 1 && zhigh.String().GetLen() >= 1 {
-		var type1 int
-		var type2 int
-		var low uint8
-		var high uint8
-		var lstep = zend.ZendLong(step)
-		type1 = zend.IsNumericString(zlow.String().GetStr(), nil, nil, 0)
-		type2 = zend.IsNumericString(zhigh.String().GetStr(), nil, nil, 0)
-		if type1 == types.IS_DOUBLE || type2 == types.IS_DOUBLE || is_step_double != 0 {
-			goto double_str
-		} else if type1 == types.IS_LONG || type2 == types.IS_LONG {
-			goto long_str
-		}
-		low = uint8(zlow.String().GetStr()[0])
-		high = uint8(zhigh.String().GetStr()[0])
-		if low > high {
-			if lstep <= 0 {
-				err = 1
-				goto err
-			}
-
-			/* Initialize the return_value as an array. */
-
-			zend.ArrayInitSize(return_value, uint32((low-high)/lstep+1))
-
-			for {
-				for ; low >= high; low -= uint(lstep) {
-					return_value.Array().Append(types.NewZvalString(string(low)))
-					if signed__int(low-lstep) < 0 {
-						break
-					}
-				}
-				break
-			}
-		} else if high > low {
-			if lstep <= 0 {
-				err = 1
-				goto err
-			}
-			zend.ArrayInitSize(return_value, uint32((high-low)/lstep+1))
-
-			for {
-				fillScope := types.PackedFillStart(return_value.Array())
-				for ; low <= high; low += uint(lstep) {
-					fillScope.FillSetInternedStr(types.NewString(string(low)))
-					fillScope.FillNext()
-					if signed__int(low+lstep) > 255 {
-						break
-					}
-				}
-				fillScope.FillEnd()
-				break
-			}
-		} else {
-			zend.ArrayInit(return_value)
-			tmp.SetStringVal(string(low))
-			return_value.Array().AppendNew(&tmp)
-		}
-	} else if zlow.IsDouble() || zhigh.IsDouble() || is_step_double != 0 {
-		var low float64
-		var high float64
-		var element float64
-		var i uint32
-		var size uint32
-	double_str:
-		low = zend.ZvalGetDouble(zlow)
-		high = zend.ZvalGetDouble(zhigh)
-		if core.ZendIsInf(high) || core.ZendIsInf(low) {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range supplied: start=%0.0f end=%0.0f", low, high)
-			return_value.SetFalse()
-			return
-		}
-		if low > high {
-			if low-high < step || step <= 0 {
-				err = 1
-				goto err
-			}
-			var __calc_size = (low-high)/step + 1
-			if __calc_size >= float64(types.HT_MAX_SIZE) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", high, low)
-				return_value.SetFalse()
-				return
-			}
-			size = uint32(math.Round(__calc_size))
-			zend.ArrayInitSize(return_value, size)
-
-			fillScope := types.PackedFillStart(return_value.Array())
-			i = 0
-			element = low
-			for i < size && element >= high {
-				fillScope.FillSetDouble(element)
-				fillScope.FillNext()
-				i++
-				element = low - i*step
-			}
-			fillScope.FillEnd()
-		} else if high > low {
-			if high-low < step || step <= 0 {
-				err = 1
-				goto err
-			}
-			var __calc_size = (high-low)/step + 1
-			if __calc_size >= float64(types.HT_MAX_SIZE) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", low, high)
-				return_value.SetFalse()
-				return
-			}
-			size = uint32(math.Round(__calc_size))
-			zend.ArrayInitSize(return_value, size)
-
-			fillScope := types.PackedFillStart(return_value.Array())
-			i = 0
-			element = low
-			for i < size && element <= high {
-				fillScope.FillSetDouble(element)
-				fillScope.FillNext()
-				i++
-				element = low + i*step
-			}
-			fillScope.FillEnd()
-		} else {
-			zend.ArrayInit(return_value)
-			tmp.SetDouble(low)
-			return_value.Array().AppendNew(&tmp)
-		}
-	} else {
-		var low zend.ZendLong
-		var high zend.ZendLong
-
-		/* lstep is a zend_ulong so that comparisons to it don't overflow, i.e. low - high < lstep */
-
-		var lstep zend.ZendUlong
-		var i uint32
-		var size uint32
-	long_str:
-		low = zend.ZvalGetLong(zlow)
-		high = zend.ZvalGetLong(zhigh)
-		if step <= 0 {
-			err = 1
-			goto err
-		}
-		lstep = zend.ZendUlong(step)
-		if step <= 0 {
-			err = 1
-			goto err
-		}
-		if low > high {
-			if zend.ZendUlong(low-high < lstep) != 0 {
-				err = 1
-				goto err
-			}
-			var __calc_size = zend.ZendUlong(low-high) / lstep
-			if __calc_size >= types.HT_MAX_SIZE-1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start="+zend.ZEND_LONG_FMT+" end="+zend.ZEND_LONG_FMT, high, low)
-				return_value.SetFalse()
-				return
-			}
-			size = uint32(__calc_size + 1)
-			zend.ArrayInitSize(return_value, size)
-
-			fillScope := types.PackedFillStart(return_value.Array())
-			for i = 0; i < size; i++ {
-				fillScope.FillSetLong(low - i*lstep)
-				fillScope.FillNext()
-			}
-			fillScope.FillEnd()
-		} else if high > low {
-			if zend.ZendUlong(high-low < lstep) != 0 {
-				err = 1
-				goto err
-			}
-			var __calc_size = zend.ZendUlong(high-low) / lstep
-			if __calc_size >= types.HT_MAX_SIZE-1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start="+zend.ZEND_LONG_FMT+" end="+zend.ZEND_LONG_FMT, low, high)
-				return_value.SetFalse()
-				return
-			}
-			size = uint32(__calc_size + 1)
-			zend.ArrayInitSize(return_value, size)
-
-			fillScope := types.PackedFillStart(return_value.Array())
-			for i = 0; i < size; i++ {
-				fillScope.FillSetLong(low + i*lstep)
-				fillScope.FillNext()
-			}
-			fillScope.FillEnd()
-		} else {
-			zend.ArrayInit(return_value)
-			tmp.SetLong(low)
-			return_value.Array().AppendNew(&tmp)
-		}
-	}
-err:
-	if err != 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "step exceeds the specified range")
-		return_value.SetFalse()
-		return
-	}
-}
-func arrayDataShuffle(array *types.Array) *types.Array {
-	values := array.Values()
-	for i := len(values) - 1; i >= 0; i-- {
-		j := standard.PhpMtRandRange(0, i)
-		if i != j {
-			values[i], values[j] = values[j], values[i]
-		}
-	}
-	return types.NewArrayOfZval(values)
-}
-func ZifShuffle(arg zpp.RefArray) bool {
-	if arg.Array().Len() > 1 {
-		arg.SetArray(arrayDataShuffle(arg.Array()))
-	}
-	return true
-}
 func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong, replace *types.Array, removed *types.Array) {
 	var out_hash *types.Array
 	var num_in zend.ZendLong
 	var pos zend.ZendLong
-	var idx uint32
 	var p *types.Bucket
 	var entry *types.Zval
 	var iter_pos = types.ZendHashIteratorsLowerPos(in_hash, 0)
@@ -333,9 +47,7 @@ func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong,
 	out_hash = types.NewArray(b.Cond(length > 0, num_in-length, 0) + b.CondF1(replace != nil, func() int { return replace.Len() }, 0))
 
 	/* Start at the beginning of the input hash and copy entries to output hash until offset is reached */
-
 	pos = 0
-	idx = 0
 	for ; pos < offset && idx < in_hash.GetNNumUsed(); idx++ {
 		p = in_hash.Bucket(idx)
 		if p.GetVal().IsUndef() {
@@ -609,40 +321,16 @@ func ZifArrayUnshift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval
 
 	/* Clean up and return the number of elements in the stack */
 }
-func ZifArraySplice(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval, offset *types.Zval, _ zpp.Opt, length *types.Zval, replacement *types.Zval) {
+func ZifArraySplice(return_value zpp.Ret, arg zpp.RefArray, offset int, _ zpp.Opt, length_ *int, replacement *types.Zval) {
 	var array *types.Zval
-	var repl_array *types.Zval = nil
+	var repl_array *types.Zval = replacement
 	var rem_hash *types.Array = nil
-	var offset zend.ZendLong
-	var length = 0
-	var num_in int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 4, 0)
-			array = fp.ParseArrayEx(false, true)
-			offset = fp.ParseLong()
-			fp.StartOptional()
-			length = fp.ParseLong()
-			repl_array = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	num_in = array.Array().Len()
-	if executeData.NumArgs() < 3 {
-		length = num_in
-	}
-	if executeData.NumArgs() == 4 {
+	var numIn int = arg.Array().Len()
 
+	length := b.Option(length_, numIn)
+	if replacement != nil {
 		/* Make sure the last argument, if passed, is an array */
-
 		zend.ConvertToArrayEx(repl_array)
-
-		/* Make sure the last argument, if passed, is an array */
-
 	}
 
 	/* Don't create the array of removed elements if it's not going
@@ -652,23 +340,23 @@ func ZifArraySplice(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval, o
 		var size = length
 
 		/* Clamp the offset.. */
-
-		if offset > num_in {
-			offset = num_in
-		} else if offset < 0 && b.Assign(&offset, num_in+offset) < 0 {
-			offset = 0
+		if offset < 0 {
+			offset = offset + numIn
+			if offset < 0 {
+				offset = 0
+			}
+		} else if offset > numIn {
+			offset = numIn
 		}
 
 		/* ..and the length */
-
 		if length < 0 {
-			size = num_in - offset + length
-		} else if zend.ZendUlong(offset+zend.ZendUlong(length)) > uint32(num_in) {
-			size = num_in - offset
+			size = numIn - offset + length
+		} else if offset+length > numIn {
+			size = numIn - offset
 		}
 
 		/* Initialize return value */
-
 		zend.ArrayInitSize(return_value, b.CondF1(size > 0, func() uint32 { return uint32(size) }, 0))
 		rem_hash = return_value.Array()
 	}
@@ -676,8 +364,6 @@ func ZifArraySplice(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval, o
 	/* Perform splice */
 
 	PhpSplice(array.Array(), offset, length, b.CondF1(repl_array != nil, func() *types.Array { return repl_array.Array() }, nil), rem_hash)
-
-	/* Perform splice */
 }
 func ZifArraySlice(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, offset *types.Zval, _ zpp.Opt, length *types.Zval, preserveKeys *types.Zval) {
 	var input *types.Zval
