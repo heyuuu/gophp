@@ -1836,44 +1836,29 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 
 	return true
 }
-func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _ zpp.Opt, numReq *types.Zval) {
-	var input *types.Zval
-	var num_req = 1
+func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Array, _ zpp.Opt, numReq_ *int) *types.Zval {
+	var input *types.Array = arg
+	var numReq = b.Option(numReq_, 1)
 	var string_key *types.String
 	var num_key zend.ZendUlong
 	var i int
-	var num_avail int
+	var numAvail int
 	var bitset zend.ZendBitset
 	var negative_bitset = 0
 	var bitset_len uint32
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			input = fp.ParseArray()
-			fp.StartOptional()
-			num_req = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	num_avail = input.Array().Len()
-	if num_avail == 0 {
+	numAvail = input.Len()
+	if numAvail == 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Array is empty")
-		return
+		return nil
 	}
-	if num_req == 1 {
-		var ht = input.Array()
-		if uint32(num_avail < ht.GetNNumUsed()-(ht.GetNNumUsed()>>1)) != 0 {
-
+	if numReq == 1 {
+		var ht = arg
+		if numAvail < arg.Len()/2 {
 			/* If less than 1/2 of elements are used, don't sample. Instead search for a
 			 * specific offset using linear scan. */
-
 			var i = 0
-			var randval = standard.PhpMtRandRange(0, num_avail-1)
-			var __ht = input.Array()
+			var randval = standard.PhpMtRandRange(0, numAvail-1)
+			var __ht = input
 			for _, _p := range __ht.ForeachData() {
 				var _z = _p.GetVal()
 
@@ -1898,8 +1883,8 @@ func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _ z
 		 * For N=10 this becomes smaller than 0.1%. */
 
 		for {
-			var randval = standard.PhpMtRandRange(0, ht.GetNNumUsed()-1)
-			var bucket *types.Bucket = ht.GetArData()[randval]
+			var randval = standard.PhpMtRandRange(0, arg.GetNNumUsed()-1)
+			var bucket *types.Bucket = arg.GetArData()[randval]
 			if !(bucket.GetVal().IsUndef()) {
 				if bucket.GetKey() != nil {
 					return_value.SetStringCopy(bucket.GetKey())
@@ -1918,24 +1903,24 @@ func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _ z
 		 * For N=10 this becomes smaller than 0.1%. */
 
 	}
-	if num_req <= 0 || num_req > num_avail {
+	if numReq <= 0 || numReq > numAvail {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Second argument has to be between 1 and the number of elements in the array")
 		return
 	}
 
 	/* Make the return value an array only if we need to pass back more than one result. */
 
-	zend.ArrayInitSize(return_value, uint32(num_req))
-	if num_req > num_avail>>1 {
+	zend.ArrayInitSize(return_value, uint32(numReq))
+	if numReq > numAvail>>1 {
 		negative_bitset = 1
-		num_req = num_avail - num_req
+		numReq = numAvail - numReq
 	}
-	bitset_len = zend.ZendBitsetLen(num_avail)
+	bitset_len = zend.ZendBitsetLen(numAvail)
 	bitset = zend.ZEND_BITSET_ALLOCA(bitset_len, use_heap)
 	zend.ZendBitsetClear(bitset, bitset_len)
-	i = num_req
+	i = numReq
 	for i != 0 {
-		var randval = standard.PhpMtRandRange(0, num_avail-1)
+		var randval = standard.PhpMtRandRange(0, numAvail-1)
 		if zend.ZendBitsetIn(bitset, randval) == 0 {
 			zend.ZendBitsetIncl(bitset, randval)
 			i--
@@ -1949,7 +1934,7 @@ func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _ z
 	/* We can't use zend_hash_index_find()
 	 * because the array may have string keys or gaps. */
 
-	var __ht = input.Array()
+	var __ht = input
 	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 

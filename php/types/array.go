@@ -123,10 +123,7 @@ type Array struct {
 
 	data    []Bucket            // 实际存储数据的地方
 	indexes map[ArrayKey]uint32 // 索引到具体位置的映射
-
-	arData *Bucket // C 源码中存储数据的地方，实际不使用
-
-	data0 ArrayData
+	arData  *Bucket             // C 源码中存储数据的地方，实际不使用
 }
 
 var _ IRefcounted = &Array{}

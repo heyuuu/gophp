@@ -151,11 +151,11 @@ func (this *SplFilesystemObject) SetContext(value *core.PhpStreamContext) {
 func (this *SplFilesystemObject) GetZcontext() *types.Zval { return this.u.file.zcontext }
 
 // func (this *SplFilesystemObject) SetZcontext(value *zend.Zval) { this.u.file.zcontext = value }
-func (this *SplFilesystemObject) GetOpenMode() *byte         { return this.u.file.open_mode }
-func (this *SplFilesystemObject) SetOpenMode(value *byte)    { this.u.file.open_mode = value }
-func (this *SplFilesystemObject) GetOpenModeLen() int        { return this.u.file.open_mode_len }
-func (this *SplFilesystemObject) SetOpenModeLen(value int)   { this.u.file.open_mode_len = value }
-func (this *SplFilesystemObject) GetCurrentZval() types.Zval { return this.u.file.current_zval }
+func (this *SplFilesystemObject) GetOpenMode() *byte          { return this.u.file.open_mode }
+func (this *SplFilesystemObject) SetOpenMode(value *byte)     { this.u.file.open_mode = value }
+func (this *SplFilesystemObject) GetOpenModeLen() int         { return this.u.file.open_mode_len }
+func (this *SplFilesystemObject) SetOpenModeLen(value int)    { this.u.file.open_mode_len = value }
+func (this *SplFilesystemObject) GetCurrentZval() *types.Zval { return &this.u.file.current_zval }
 
 // func (this *SplFilesystemObject) SetCurrentZval(value zend.Zval) { this.u.file.current_zval = value }
 func (this *SplFilesystemObject) GetCurrentLine() *byte       { return this.u.file.current_line }

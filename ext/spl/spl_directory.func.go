@@ -1632,7 +1632,7 @@ func SplFilesystemFileReadLineEx(this_ptr *types.Zval, intern *SplFilesystemObje
 
 	/* 1) use fgetcsv? 2) overloaded call the function, 3) do it directly */
 }
-func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
+func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) bool {
 	if intern.GetCurrentLine() != nil {
 		return intern.GetCurrentLineLen() == 0
 	} else if !(intern.GetCurrentZval().IsUndef()) {
@@ -1641,22 +1641,17 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 			return intern.GetCurrentZval().String().GetLen() == 0
 		case types.IS_ARRAY:
 			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && intern.GetCurrentZval().Array().Len() == 1 {
-				var idx uint32 = 0
-				var first *types.Zval
-				for intern.GetCurrentZval().Array().GetArData()[idx].GetVal().IsUndef() {
-					idx++
-				}
-				first = intern.GetCurrentZval().Array().GetArData()[idx].GetVal()
-				return first.IsString() && first.String().GetLen() == 0
+				_, first := intern.GetCurrentZval().Array().First()
+				return first.IsString() && first.StringVal() == ""
 			}
 			return intern.GetCurrentZval().Array().Len() == 0
 		case types.IS_NULL:
-			return 1
+			return true
 		default:
-			return 0
+			return false
 		}
 	} else {
-		return 1
+		return true
 	}
 }
 func SplFilesystemFileReadLine(this_ptr *types.Zval, intern *SplFilesystemObject, silent int) int {
