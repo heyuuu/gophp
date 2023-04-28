@@ -974,3 +974,14 @@ func (ht *Array) MoveTailToHead() {
 	ht.data[0] = tmp
 	ht.rehash()
 }
+
+func (ht *Array) RandKey() *ArrayKey {
+	b.Assert(ht.Len() != 0)
+	if ht.elementsCount == 0 {
+		return nil
+	} else if ht.elementsCount == 1 {
+		key, _ := ht.First()
+		return &key
+	}
+
+}

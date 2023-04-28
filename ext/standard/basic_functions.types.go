@@ -5,6 +5,8 @@ import (
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
+	"math/rand"
+	"time"
 )
 
 /**
@@ -55,6 +57,8 @@ type PhpBasicGlobals struct {
 	UserFilterMap              map[string]*PhpUserFilterData
 	umask                      int
 	unserialize_max_depth      zend.ZendLong
+
+	RandGenerator *rand.Rand
 }
 
 func (this *PhpBasicGlobals) GetUrlAdaptSessionEx() UrlAdaptStateExT {
@@ -72,6 +76,20 @@ func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() types.Array {
 
 func (this *PhpBasicGlobals) GetStrTokState() *str.StrTokState {
 	return &this.strTokState
+}
+
+func (this *PhpBasicGlobals) ResetRandGenerator() {
+	this.RandGenerator = nil
+}
+func (this *PhpBasicGlobals) InitRandGenerator(seed int64) {
+	this.RandGenerator = rand.New(rand.NewSource(seed))
+}
+func (this *PhpBasicGlobals) GetRandGenerator() *rand.Rand {
+	if this.RandGenerator == nil {
+		seed := time.Now().UnixNano()
+		this.InitRandGenerator(seed)
+	}
+	return this.RandGenerator
 }
 
 /**

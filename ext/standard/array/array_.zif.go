@@ -509,13 +509,14 @@ var DefZifArrayMultisort = def.DefFunc("array_multisort", 0, -1, []def.ArgInfo{{
 // generate by ZifArrayRand
 var DefZifArrayRand = def.DefFunc("array_rand", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "num_req"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	arg := fp.ParseZval()
+	arg := fp.ParseArrayHt()
 	fp.StartOptional()
-	num_req := fp.ParseZval()
+	num_req_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayRand(executeData, returnValue, arg, nil, num_req)
+	ret := ZifArrayRand(returnValue, arg, nil, num_req_)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArraySum

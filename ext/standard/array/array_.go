@@ -1836,8 +1836,7 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 
 	return true
 }
-func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Array, _ zpp.Opt, numReq_ *int) *types.Zval {
-	var input *types.Array = arg
+func ZifArrayRand(return_value zpp.Ret, arg *types.Array, _ zpp.Opt, numReq_ *int) *types.Zval {
 	var numReq = b.Option(numReq_, 1)
 	var string_key *types.String
 	var num_key zend.ZendUlong
@@ -1846,19 +1845,18 @@ func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Array, _ 
 	var bitset zend.ZendBitset
 	var negative_bitset = 0
 	var bitset_len uint32
-	numAvail = input.Len()
+	numAvail = arg.Len()
 	if numAvail == 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Array is empty")
 		return nil
 	}
 	if numReq == 1 {
-		var ht = arg
-		if numAvail < arg.Len()/2 {
+		if numAvail < arg.Cap()/2 {
 			/* If less than 1/2 of elements are used, don't sample. Instead search for a
 			 * specific offset using linear scan. */
 			var i = 0
 			var randval = standard.PhpMtRandRange(0, numAvail-1)
-			var __ht = input
+			var __ht = arg
 			for _, _p := range __ht.ForeachData() {
 				var _z = _p.GetVal()
 
@@ -1934,7 +1932,7 @@ func ZifArrayRand(executeData zpp.Ex, return_value zpp.Ret, arg *types.Array, _ 
 	/* We can't use zend_hash_index_find()
 	 * because the array may have string keys or gaps. */
 
-	var __ht = input
+	var __ht = arg
 	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 
