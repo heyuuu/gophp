@@ -13,7 +13,8 @@ import (
  * PhpBasicGlobals
  */
 type PhpBasicGlobals struct {
-	strTokState str.StrTokState
+	strTokState   str.StrTokState
+	RandGenerator *rand.Rand
 
 	user_shutdown_function_names *types.Array
 	putenv_ht                    types.Array
@@ -32,11 +33,6 @@ type PhpBasicGlobals struct {
 	CurrentLStatFile             **byte
 	ssb                          core.PhpStreamStatbuf
 	lssb                         core.PhpStreamStatbuf
-	state                        []uint32
-	next                         *uint32
-	left                         int
-	mt_rand_is_seeded            types.ZendBool
-	mt_rand_mode                 zend.ZendLong
 	syslog_device                *byte
 	incomplete_class             *types.ClassEntry
 	serialize_lock               unsigned
@@ -57,8 +53,6 @@ type PhpBasicGlobals struct {
 	UserFilterMap              map[string]*PhpUserFilterData
 	umask                      int
 	unserialize_max_depth      zend.ZendLong
-
-	RandGenerator *rand.Rand
 }
 
 func (this *PhpBasicGlobals) GetUrlAdaptSessionEx() UrlAdaptStateExT {

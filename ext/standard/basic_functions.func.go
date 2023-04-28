@@ -36,11 +36,8 @@ func PhpPutenvDestructor(zv *types.Zval) {
 	zend.Efree(pe)
 }
 func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
-	BG__().mt_rand_is_seeded = 0
-	BG__().mt_rand_mode = MT_RAND_MT19937
+	BG__().ResetRandGenerator()
 	BG__().umask = -1
-	BG__().next = nil
-	BG__().left = -1
 	BG__().user_tick_functions = nil
 	BG__().UserFilterMap = nil
 	BG__().serialize_lock = 0
@@ -237,7 +234,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	tsrm_env_lock()
 	BG__().putenv_ht.Destroy()
 	tsrm_env_unlock()
-	BG__().mt_rand_is_seeded = 0
+	BG__().ResetRandGenerator()
 	if BG__().umask != -1 {
 		umask(BG__().umask)
 	}
