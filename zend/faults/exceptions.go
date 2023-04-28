@@ -275,7 +275,7 @@ func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *type
 		zend.ZendUpdatePropertyEx(base_ce, object, types.STR_PREVIOUS, previous)
 	}
 }
-func CHECK_EXC_TYPE(object *types.Zval, id string, type_ types.ZendUchar, value *types.Zval) {
+func CHECK_EXC_TYPE(object *types.Zval, id string, type_ uint8, value *types.Zval) {
 	pvalue := zend.ZendReadProperty(GetExceptionBase(object), object, id, 1, value)
 	if pvalue.GetType() != types.IS_NULL && pvalue.GetType() != type_ {
 		zend.ZendUnsetProperty(GetExceptionBase(object), object, id)

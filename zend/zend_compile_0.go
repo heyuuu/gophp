@@ -94,7 +94,7 @@ func ZendGetUnmangledPropertyName(mangled_prop *types.String) *byte {
 	ZendUnmanglePropertyName(mangled_prop, &class_name, &prop_name)
 	return prop_name
 }
-func ZEND_USER_CODE(type_ types.ZendUchar) bool { return (type_ & 1) == 0 }
+func ZEND_USER_CODE(type_ uint8) bool { return (type_ & 1) == 0 }
 func ZendCheckArgSendType(zf types.IFunction, arg_num uint32, mask uint32) int {
 	return types.IntBool(zf.CheckArgSendType(arg_num, uint8(mask)))
 }
@@ -120,7 +120,7 @@ func QUICK_ARG_SHOULD_BE_SENT_BY_REF(zf types.IFunction, arg_num int) int {
 func QUICK_ARG_MAY_BE_SENT_BY_REF(zf types.IFunction, arg_num int) int {
 	return ZEND_CHECK_ARG_FLAG(zf, arg_num, ZEND_SEND_PREFER_REF)
 }
-func ZEND_IS_INCREMENT(opcode types.ZendUchar) bool { return (opcode & 1) == 0 }
+func ZEND_IS_INCREMENT(opcode uint8) bool { return (opcode & 1) == 0 }
 func ZendAllocCacheSlots(count unsigned) uint32 {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var ret uint32 = op_array.GetCacheSize()
@@ -185,7 +185,7 @@ func ZendAssertValidClassName(name string) {
 	}
 }
 
-func ZendLookupBuiltinTypeByName(name *types.String) types.ZendUchar {
+func ZendLookupBuiltinTypeByName(name *types.String) uint8 {
 	var info *BuiltinTypeInfo = &BuiltinTypes[0]
 	for ; info.GetName() != nil; info++ {
 		if name.GetLen() == info.GetNameLen() && ZendBinaryStrcasecmp(name.GetStr(), b.CastStr(info.GetName(), info.GetNameLen())) == 0 {
@@ -422,7 +422,7 @@ func LITERAL_STR(op ZnodeOp, str *types.String) {
 	_c.SetString(str)
 	op.SetConstant(ZendAddLiteral(&_c))
 }
-func ZendBeginLoop(free_opcode types.ZendUchar, loop_var *Znode, is_switch types.ZendBool) {
+func ZendBeginLoop(free_opcode uint8, loop_var *Znode, is_switch types.ZendBool) {
 	var brk_cont_element *ZendBrkContElement
 	var parent int = CG__().GetContext().GetCurrentBrkCont()
 	var info ZendLoopVar = MakeZendLoopVar(0)

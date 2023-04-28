@@ -11,9 +11,9 @@ type ArrayDataHt struct {
 	elementsCount   uint32
 	internalPointer uint32
 	nextFreeElement int
-	data            []Bucket          // 实际存储数据的地方
-	indexMap        map[int]uint32    // 数字索引到具体位置的映射
-	keyMap          map[string]uint32 // 字符串索引到具体位置的映射
+	destructor      DtorFuncT
+	data            []Bucket            // 实际存储数据的地方
+	indexes         map[ArrayKey]uint32 // 索引到具体位置的映射
 }
 
 func (ht *ArrayDataHt) Len() int {
@@ -108,4 +108,14 @@ func (ht *ArrayDataHt) resizeIfFull() {
 			triggerError(fmt.Sprintf("Possible integer overflow in memory allocation (%d)", dataSize*2))
 		}
 	}
+}
+
+func (ht *ArrayDataHt) Push(zval *Zval) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (ht *ArrayDataHt) Pop() *ArrayPair {
+	//TODO implement me
+	panic("implement me")
 }

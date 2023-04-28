@@ -19,7 +19,7 @@ func ZEND_REF_FIRST_SOURCE(ref *types.ZendReference) *ZendPropertyInfo {
 func ZendCopyToVariable(variable_ptr *types.Zval, value *types.Zval) {
 	variable_ptr.CopyValueFrom(value)
 }
-func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_type types.ZendUchar, strict types.ZendBool) *types.Zval {
+func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_type uint8, strict types.ZendBool) *types.Zval {
 	var ref *types.ZendRefcounted = nil
 	if value.IsReference() {
 		ref = value.RefCounted()

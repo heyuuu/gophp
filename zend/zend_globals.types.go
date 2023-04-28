@@ -240,7 +240,7 @@ type ZendExecutorGlobals struct {
 	exception_op              [3]ZendOp
 	current_module            *ModuleEntry
 	active                    types.ZendBool
-	flags                     types.ZendUchar
+	flags                     uint8
 	assertions                ZendLong
 
 	ht_iterators_count uint32
@@ -494,8 +494,8 @@ func (this *ZendExecutorGlobals) SetCurrentModule(value *ModuleEntry) {
 }
 func (this *ZendExecutorGlobals) GetActive() types.ZendBool           { return this.active }
 func (this *ZendExecutorGlobals) SetActive(value types.ZendBool)      { this.active = value }
-func (this *ZendExecutorGlobals) GetFlags() types.ZendUchar           { return this.flags }
-func (this *ZendExecutorGlobals) SetFlags(value types.ZendUchar)      { this.flags = value }
+func (this *ZendExecutorGlobals) GetFlags() uint8                     { return this.flags }
+func (this *ZendExecutorGlobals) SetFlags(value uint8)                { this.flags = value }
 func (this *ZendExecutorGlobals) GetAssertions() ZendLong             { return this.assertions }
 func (this *ZendExecutorGlobals) SetAssertions(value ZendLong)        { this.assertions = value }
 func (this *ZendExecutorGlobals) GetSavedFpuCwPtr() any               { return this.saved_fpu_cw_ptr }
@@ -522,10 +522,10 @@ func (this *ZendExecutorGlobals) GetReserved() []any      { return this.reserved
 func (this *ZendExecutorGlobals) SetReserved(value []any) { this.reserved = value }
 
 /* ZendExecutorGlobals.flags */
-func (this *ZendExecutorGlobals) AddFlags(value types.ZendUchar)      { this.flags |= value }
-func (this *ZendExecutorGlobals) SubFlags(value types.ZendUchar)      { this.flags &^= value }
-func (this *ZendExecutorGlobals) HasFlags(value types.ZendUchar) bool { return this.flags&value != 0 }
-func (this *ZendExecutorGlobals) SwitchFlags(value types.ZendUchar, cond bool) {
+func (this *ZendExecutorGlobals) AddFlags(value uint8)      { this.flags |= value }
+func (this *ZendExecutorGlobals) SubFlags(value uint8)      { this.flags &^= value }
+func (this *ZendExecutorGlobals) HasFlags(value uint8) bool { return this.flags&value != 0 }
+func (this *ZendExecutorGlobals) SwitchFlags(value uint8, cond bool) {
 	if cond {
 		this.AddFlags(value)
 	} else {

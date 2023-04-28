@@ -600,7 +600,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			}
 		} else if container.IsString() {
 			var offset ZendLong
-			var c types.ZendUchar
+			var c uint8
 			if dim.IsLong() {
 				offset = dim.Long()
 			} else if dim.GetType() != types.IS_STRING || IsNumericString(dim.String().GetStr(), &offset, nil, 1) != types.IS_LONG {
@@ -609,7 +609,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			if offset < 0 || int(offset >= container.String().GetLen()) != 0 {
 				return
 			}
-			c = types.ZendUchar(container.String().GetStr()[offset])
+			c = uint8(container.String().GetStr()[offset])
 			result.SetStringVal(string(c))
 		} else if container.GetType() <= types.IS_FALSE {
 			result.SetNull()

@@ -154,73 +154,30 @@ func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong,
 
 	in_hash.SetBy(out_hash)
 }
-func ZifArrayPush(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval, _ zpp.Opt, vars []*types.Zval) {
-	var args *types.Zval
-	var stack *types.Zval
-	var new_var types.Zval
-	var i int
-	var argc int
-	for {
-		var _flags = 0
-		var _min_num_args = 1
-		var _max_num_args = -1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			stack = fp.ParseArrayEx(false, true)
-			args, argc = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-
-	/* For each subsequent argument, make it a reference, increase refcount, and add it to the end of the array */
-
-	for i = 0; i < argc; i++ {
-		types.ZVAL_COPY(&new_var, &args[i])
-		if stack.Array().Append(&new_var) == nil {
-			//new_var.TryDelRefcount()
+func ZifArrayPush(stack zpp.RefArray, _ zpp.Opt, args []*types.Zval) (int, bool) {
+	for _, arg := range args {
+		if stack.Array().Append(arg) == nil {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
-			return_value.SetFalse()
-			return
+			return 0, false
 		}
 	}
 
-	/* Clean up and return the number of values in the stack */
-
-	return_value.SetLong(stack.Array().Len())
-
-	/* Clean up and return the number of values in the stack */
+	return stack.Array().Len(), true
 }
-func ZifArrayPop(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval) {
-	var stack *types.Zval
+func ZifArrayPop(return_value zpp.Ret, stack zpp.RefArray) *types.Zval {
+	if stack.Array().Len() == 0 {
+		return types.NewZvalNull()
+	}
+
 	var val *types.Zval
 	var idx uint32
 	var p *types.Bucket
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			stack = fp.ParseArrayEx(false, true)
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if stack.Array().Len() == 0 {
-		return
-	}
 
 	/* Get the last value and copy it into the return value */
-
 	idx = stack.Array().GetNNumUsed()
 	for true {
 		if idx == 0 {
-			return
+			return types.NewZvalNull()
 		}
 		idx--
 		p = stack.Array().Bucket(idx)

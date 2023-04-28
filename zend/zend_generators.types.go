@@ -58,7 +58,7 @@ type ZendGenerator struct {
 	values                   types.Zval
 	node                     ZendGeneratorNode
 	execute_fake             ZendExecuteData
-	flags                    types.ZendUchar
+	flags                    uint8
 	gc_buffer                *types.Zval
 	gc_buffer_size           uint32
 }
@@ -139,10 +139,10 @@ func (this *ZendGenerator) GetGcBufferSize() uint32       { return this.gc_buffe
 func (this *ZendGenerator) SetGcBufferSize(value uint32)  { this.gc_buffer_size = value }
 
 /* ZendGenerator.flags */
-func (this *ZendGenerator) AddFlags(value types.ZendUchar)      { this.flags |= value }
-func (this *ZendGenerator) SubFlags(value types.ZendUchar)      { this.flags &^= value }
-func (this *ZendGenerator) HasFlags(value types.ZendUchar) bool { return this.flags&value != 0 }
-func (this *ZendGenerator) SwitchFlags(value types.ZendUchar, cond bool) {
+func (this *ZendGenerator) AddFlags(value uint8)      { this.flags |= value }
+func (this *ZendGenerator) SubFlags(value uint8)      { this.flags &^= value }
+func (this *ZendGenerator) HasFlags(value uint8) bool { return this.flags&value != 0 }
+func (this *ZendGenerator) SwitchFlags(value uint8, cond bool) {
 	if cond {
 		this.AddFlags(value)
 	} else {

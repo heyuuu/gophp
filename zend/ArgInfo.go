@@ -9,7 +9,7 @@ type ArgInfoOpt func(*ArgInfo)
 func ArgInfoType(typ types.ZendType) ArgInfoOpt {
 	return func(info *ArgInfo) { info.typ = typ }
 }
-func ArgInfoByRef(byRef types.ZendUchar) ArgInfoOpt {
+func ArgInfoByRef(byRef uint8) ArgInfoOpt {
 	return func(info *ArgInfo) { info.byReference = byRef }
 }
 func ArgInfoVariadic() ArgInfoOpt {

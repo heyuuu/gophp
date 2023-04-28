@@ -7,10 +7,10 @@ import (
 var ZendCeGenerator *types.ClassEntry
 var zend_ce_ClosedGeneratorException *types.ClassEntry
 
-var ZEND_GENERATOR_CURRENTLY_RUNNING types.ZendUchar = 0x1
-var ZEND_GENERATOR_FORCED_CLOSE types.ZendUchar = 0x2
-var ZEND_GENERATOR_AT_FIRST_YIELD types.ZendUchar = 0x4
-var ZEND_GENERATOR_DO_INIT types.ZendUchar = 0x8
+var ZEND_GENERATOR_CURRENTLY_RUNNING uint8 = 0x1
+var ZEND_GENERATOR_FORCED_CLOSE uint8 = 0x2
+var ZEND_GENERATOR_AT_FIRST_YIELD uint8 = 0x4
+var ZEND_GENERATOR_DO_INIT uint8 = 0x8
 
 var ZendGeneratorHandlers ZendObjectHandlers
 

@@ -26,7 +26,7 @@ func ZendMakeTmpResult(result *Znode, opline *ZendOp) {
 		result.SetOp(opline.GetResult())
 	}
 }
-func ZendEmitOp(result *Znode, opcode types.ZendUchar, op1 *Znode, op2 *Znode) *ZendOp {
+func ZendEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *ZendOp {
 	var opline *ZendOp = GetNextOp()
 	opline.SetOpcode(opcode)
 	if op1 != nil {
@@ -50,7 +50,7 @@ func ZendEmitOp(result *Znode, opcode types.ZendUchar, op1 *Znode, op2 *Znode) *
 	}
 	return opline
 }
-func ZendEmitOpTmp(result *Znode, opcode types.ZendUchar, op1 *Znode, op2 *Znode) *ZendOp {
+func ZendEmitOpTmp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *ZendOp {
 	var opline *ZendOp = GetNextOp()
 	opline.SetOpcode(opcode)
 	if op1 != nil {
@@ -123,7 +123,7 @@ func ZendIsSmartBranch(opline *ZendOp) int {
 		return 0
 	}
 }
-func ZendEmitCondJump(opcode types.ZendUchar, cond *Znode, opnum_target uint32) uint32 {
+func ZendEmitCondJump(opcode uint8, cond *Znode, opnum_target uint32) uint32 {
 	var opnum uint32 = GetNextOpNumber()
 	var opline *ZendOp
 	if (cond.GetOpType()&(IS_CV|IS_CONST)) != 0 && opnum > 0 && ZendIsSmartBranch(CG__().GetActiveOpArray().GetOpcodes()+opnum-1) != 0 {
@@ -161,7 +161,7 @@ func ZendUpdateJumpTarget(opnum_jump uint32, opnum_target uint32) {
 func ZendUpdateJumpTargetToNext(opnum_jump uint32) {
 	ZendUpdateJumpTarget(opnum_jump, GetNextOpNumber())
 }
-func ZendDelayedEmitOp(result *Znode, opcode types.ZendUchar, op1 *Znode, op2 *Znode) *ZendOp {
+func ZendDelayedEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *ZendOp {
 	var tmp_opline ZendOp
 	InitOp(&tmp_opline)
 	tmp_opline.SetOpcode(opcode)

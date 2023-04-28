@@ -145,7 +145,7 @@ func ZendAbstractMethod(fbc types.IFunction) {
 	faults.ThrowError(nil, "Cannot call abstract method %s::%s()", fbc.GetScope().GetName().GetVal(), fbc.GetFunctionName().GetVal())
 }
 func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	var c types.ZendUchar
+	var c uint8
 	var string_len int
 	var offset ZendLong
 	offset = ZendCheckStringOffset(dim, BP_VAR_W, executeData)
@@ -175,11 +175,11 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 			return
 		}
 		string_len = tmp.GetLen()
-		c = types.ZendUchar(tmp.GetStr()[0])
+		c = uint8(tmp.GetStr()[0])
 		// types.ZendStringReleaseEx(tmp, 0)
 	} else {
 		string_len = value.String().GetLen()
-		c = types.ZendUchar(value.String().GetStr()[0])
+		c = uint8(value.String().GetStr()[0])
 	}
 	if string_len == 0 {
 

@@ -35,7 +35,7 @@ func ZendZvalTypeName(arg *Zval) string {
 	return ZendGetTypeByConst(arg.GetType())
 }
 
-func ZendGetTypeByConst(type_ ZendUchar) string {
+func ZendGetTypeByConst(type_ uint8) string {
 	switch type_ {
 	case IS_FALSE, IS_TRUE, IS_BOOL:
 		return "bool"

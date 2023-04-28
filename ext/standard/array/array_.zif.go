@@ -6,25 +6,31 @@ import (
 )
 
 // generate by ZifArrayPush
-var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{Name: "stack"}, {Name: "vars"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{Name: "stack"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	stack := fp.ParseZvalEx(false, true)
+	stack := fp.ParseArrayEx(false, true)
 	fp.StartOptional()
-	vars := fp.ParseVariadic()
+	args := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayPush(executeData, returnValue, stack, nil, vars)
+	ret, ok := ZifArrayPush(stack, nil, args)
+	if ok {
+		returnValue.SetLong(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayPop
 var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{Name: "stack"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	stack := fp.ParseZvalEx(false, true)
+	stack := fp.ParseArrayEx(false, true)
 	if fp.HasError() {
 		return
 	}
-	ZifArrayPop(executeData, returnValue, stack)
+	ret := ZifArrayPop(returnValue, stack)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayShift

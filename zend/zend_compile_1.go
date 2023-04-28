@@ -628,7 +628,7 @@ func ZendDirname(path string) string {
 	return path
 }
 func ZendAdjustForFetchType(opline *ZendOp, result *Znode, type_ uint32) {
-	var factor types.ZendUchar = b.Cond(opline.GetOpcode() == ZEND_FETCH_STATIC_PROP_R, 1, 3)
+	var factor uint8 = b.Cond(opline.GetOpcode() == ZEND_FETCH_STATIC_PROP_R, 1, 3)
 	switch type_ {
 	case BP_VAR_R:
 		opline.SetResultType(IS_TMP_VAR)

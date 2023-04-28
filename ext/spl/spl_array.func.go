@@ -433,7 +433,7 @@ try_again:
 							SplArraySkipProtected(intern, ht)
 						}
 					}
-				} else if ht.SymtableDel(offset.String().GetStr()) == types.FAILURE {
+				} else if ht.SymtableDel(offset.String().GetStr()) == false {
 					faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.String().GetVal())
 				}
 			} else {

@@ -3,7 +3,6 @@ package types
 import "math"
 
 type ZendBool = int
-type ZendUchar = uint8
 type ZEND_RESULT_CODE = int
 
 func IntBool(value bool) ZendBool {
@@ -33,12 +32,9 @@ type ZendUintptrT = uintptr
 
 type CompareFuncT func(any, any) int
 type SwapFuncT func(any, any)
-type SortFuncT func(any, int, int, CompareFuncT, SwapFuncT)
 type DtorFuncT func(pDest *Zval)
 type CopyCtorFuncT func(pElement *Zval)
 
-const HT_INVALID_IDX uint32 = math.MaxUint32 // uint32(-1)
-const HT_MIN_SIZE = 8
 const HT_MAX_SIZE = 0x80000000
 
 type ZvalType = uint8

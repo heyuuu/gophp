@@ -46,7 +46,7 @@ func ZEND_PROPERTY_INFO_SOURCE_TO_LIST(list uintPtr) *ZendPropertyInfoList {
 	return (*ZendPropertyInfoList)(list & ^0x1)
 }
 func ZEND_PROPERTY_INFO_SOURCE_IS_LIST(list uintPtr) int { return list & 0x1 }
-func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
+func ZEND_SAME_FAKE_TYPE(faketype int, realtype uint8) bool {
 	return faketype == realtype || faketype == IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
 }
 

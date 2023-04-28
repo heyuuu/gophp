@@ -8,7 +8,7 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) types.ZendBool {
+func ZendVerifyWeakScalarTypeHint(type_hint uint8, arg *types.Zval) types.ZendBool {
 	switch type_hint {
 	case types.IS_BOOL:
 		if val, ok := zpp.ParseBoolWeak(arg); ok {
@@ -36,7 +36,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) ty
 	}
 	return 0
 }
-func ZendVerifyScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval, strict types.ZendBool) types.ZendBool {
+func ZendVerifyScalarTypeHint(type_hint uint8, arg *types.Zval, strict types.ZendBool) types.ZendBool {
 	if strict != 0 {
 		/* SSTH Exception: IS_LONG may be accepted as IS_DOUBLE (converted) */
 		if type_hint != types.IS_DOUBLE || arg.GetType() != types.IS_LONG {

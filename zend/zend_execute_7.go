@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, value_type types.ZendUchar, strict types.ZendBool, ref *types.ZendRefcounted) *types.Zval {
+func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, value_type uint8, strict types.ZendBool, ref *types.ZendRefcounted) *types.Zval {
 	var ret types.ZendBool
 	var value types.Zval
 	types.ZVAL_COPY(&value, orig_value)

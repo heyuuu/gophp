@@ -42,7 +42,7 @@ func DvalToLvalCap(d float64) ZendLong {
 	}
 	return ZendLong(d)
 }
-func IsNumericStringEx(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode, oflow_info *int) types.ZendUchar {
+func IsNumericStringEx(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode, oflow_info *int) uint8 {
 	r := StrToNumberEx(str, allow_errors)
 
 	*lval = r.Int()
@@ -60,7 +60,7 @@ func IsNumericStringEx(str string, lval *ZendLong, dval *float64, allow_errors C
 		return 0
 	}
 }
-func IsNumericString(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode) types.ZendUchar {
+func IsNumericString(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode) uint8 {
 	r := StrToNumberEx(str, allow_errors)
 
 	*lval = r.Int()
@@ -847,7 +847,7 @@ try_again:
 	case types.IS_DOUBLE:
 		return DvalToLval(op.Double())
 	case types.IS_STRING:
-		var type_ types.ZendUchar
+		var type_ uint8
 		var lval ZendLong
 		var dval float64
 		if 0 == b.Assign(&type_, IsNumericString(op.String().GetStr(), &lval, &dval, b.Cond(silent != 0, 1, -1))) {
@@ -1011,7 +1011,7 @@ func AddFunctionArray(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	types.ZendHashMerge(result.Array(), op2.Array(), ZvalAddRef, 0)
 }
 func AddFunctionFast(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var type_pair types.ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
+	var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
 	if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
 		FastLongAddFunction(result, op1, op2)
 		return types.SUCCESS
@@ -1091,7 +1091,7 @@ func AddFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	}
 }
 func SubFunctionFast(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var type_pair types.ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
+	var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
 	if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
 		FastLongSubFunction(result, op1, op2)
 		return types.SUCCESS
@@ -1172,7 +1172,7 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var op2_copy types.Zval
 	var converted int = 0
 	for true {
-		var type_pair types.ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
+		var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
 		if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
 			var overflow ZendLong
 			ZEND_SIGNED_MULTIPLY_LONG(op1.Long(), op2.Long(), result.Long(), result.Double(), overflow)
@@ -1242,7 +1242,7 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var op2_copy types.Zval
 	var converted int = 0
 	for true {
-		var type_pair types.ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
+		var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
 		if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
 			if op2.Long() >= 0 {
 				var l1 ZendLong = 1
@@ -1369,7 +1369,7 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var op2_copy types.Zval
 	var converted int = 0
 	for true {
-		var type_pair types.ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
+		var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
 		if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
 			if op2.Long() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")

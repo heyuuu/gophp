@@ -88,14 +88,14 @@ func ZendFetchDimensionAddressRead(
 				result.SetNull()
 			}
 		} else {
-			var c types.ZendUchar
+			var c uint8
 			var real_offset ZendLong
 			if offset < 0 {
 				real_offset = ZendLong(container.String().GetLen() + offset)
 			} else {
 				real_offset = offset
 			}
-			c = types.ZendUchar(container.String().GetStr()[real_offset])
+			c = uint8(container.String().GetStr()[real_offset])
 			result.SetStringVal(string(c))
 		}
 	} else if container.IsObject() {

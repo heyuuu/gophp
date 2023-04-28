@@ -240,7 +240,7 @@ func ZendCleanupUnfinishedExecution(executeData *ZendExecuteData, op_num uint32,
 }
 func ZendSwapOperands(op *ZendOp) {
 	var tmp ZnodeOp
-	var tmp_type types.ZendUchar
+	var tmp_type uint8
 	tmp = op.GetOp1()
 	tmp_type = op.GetOp1Type()
 	op.SetOp1(op.GetOp2())

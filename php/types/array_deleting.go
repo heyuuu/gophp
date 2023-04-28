@@ -61,14 +61,14 @@ func (ht *Array) SymtableUpdateInd(key string, pData *Zval) *Zval {
 		return ht.KeyUpdateIndirect(key, pData)
 	}
 }
-func (ht *Array) SymtableDel(key string) int {
+func (ht *Array) SymtableDel(key string) bool {
 	var result bool
 	if idx, ok := parseNumericStr(key); ok {
 		result = ht.IndexDelete(idx)
 	} else {
 		result = ht.KeyDelete(key)
 	}
-	return ResultCode(result)
+	return result
 }
 func (ht *Array) SymtableFind(key string) *Zval {
 	if idx, ok := parseNumericStr(key); ok {

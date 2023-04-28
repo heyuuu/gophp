@@ -43,9 +43,9 @@ func ZendCompileIf(ast *ZendAst) {
 		Efree(jmp_opnums)
 	}
 }
-func DetermineSwitchJumptableType(cases *ZendAstList) types.ZendUchar {
+func DetermineSwitchJumptableType(cases *ZendAstList) uint8 {
 	var i uint32
-	var common_type types.ZendUchar = types.IS_UNDEF
+	var common_type uint8 = types.IS_UNDEF
 	for i = 0; i < cases.GetChildren(); i++ {
 		var case_ast *ZendAst = cases.GetChild()[i]
 		var cond_ast **ZendAst = case_ast.GetChild()[0]
@@ -102,7 +102,7 @@ func DetermineSwitchJumptableType(cases *ZendAstList) types.ZendUchar {
 	}
 	return common_type
 }
-func ShouldUseJumptable(cases *ZendAstList, jumptable_type types.ZendUchar) types.ZendBool {
+func ShouldUseJumptable(cases *ZendAstList, jumptable_type uint8) types.ZendBool {
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_NO_JUMPTABLES) != 0 {
 		return 0
 	}
@@ -131,7 +131,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 	var jmpnz_opnums *uint32
 	var opnum_default_jmp uint32
 	var opnum_switch uint32 = uint32 - 1
-	var jumptable_type types.ZendUchar
+	var jumptable_type uint8
 	var jumptable *types.Array = nil
 	ZendCompileExpr(&expr_node, expr_ast)
 	ZendBeginLoop(ZEND_FREE, &expr_node, 1)
@@ -463,7 +463,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 		return types.ZEND_TYPE_ENCODE(ast.GetAttr(), allow_null)
 	} else {
 		var class_name *types.String = ZendAstGetStr(ast)
-		var type_code types.ZendUchar = ZendLookupBuiltinTypeByName(class_name)
+		var type_code uint8 = ZendLookupBuiltinTypeByName(class_name)
 		if type_code != 0 {
 			if (ast.GetAttr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", ZendStringTolower(class_name).GetVal())
@@ -519,7 +519,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		var is_variadic types.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_VARIADIC) != 0
 		var var_node Znode
 		var default_node Znode
-		var opcode types.ZendUchar
+		var opcode uint8
 		var opline *ZendOp
 		var arg_info *ZendArgInfo
 		if ZendIsAutoGlobal(name) != 0 {

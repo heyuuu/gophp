@@ -137,7 +137,7 @@ func ZendCompileArgs(ast *ZendAst, fbc types.IFunction) uint32 {
 		var arg_num uint32 = i + 1
 		var arg_node Znode
 		var opline *ZendOp
-		var opcode types.ZendUchar
+		var opcode uint8
 		if arg.GetKind() == ZEND_AST_UNPACK {
 			uses_arg_unpack = 1
 			fbc = nil
@@ -259,7 +259,7 @@ func ZendCompileArgs(ast *ZendAst, fbc types.IFunction) uint32 {
 	}
 	return arg_count
 }
-func ZendGetCallOp(init_op *ZendOp, fbc types.IFunction) types.ZendUchar {
+func ZendGetCallOp(init_op *ZendOp, fbc types.IFunction) uint8 {
 	if fbc != nil {
 		if fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) == 0 {
 			if init_op.GetOpcode() == ZEND_INIT_FCALL && ZendExecuteInternal == nil {

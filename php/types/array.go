@@ -115,7 +115,7 @@ func (this *Bucket) CopyFrom(from *Bucket) {
 type ArrayPosition = uint32
 type Array struct {
 	ZendRefcounted
-	flags           ZendUchar
+	flags           uint8
 	elementsCount   uint32
 	internalPointer uint32
 	nextFreeElement int
@@ -402,6 +402,31 @@ func (ht *Array) First() (key ArrayKey, val *Zval) {
 
 func (ht *Array) FirstIndirect() (key ArrayKey, val *Zval) {
 	for _, p := range ht.data {
+		v := p.GetVal()
+		if v.IsIndirect() {
+			v = v.Indirect()
+		}
+		if v.IsUndef() {
+			continue
+		}
+		return p.GetArrayKey(), v
+	}
+	return
+}
+
+func (ht *Array) Last() (key ArrayKey, val *Zval) {
+	for i := len(ht.data) - 1; i >= 0; i-- {
+		p := ht.data[i]
+		if p.IsValid() {
+			return p.GetArrayKey(), p.GetVal()
+		}
+	}
+	return
+}
+
+func (ht *Array) LastIndirect() (key ArrayKey, val *Zval) {
+	for i := len(ht.data) - 1; i >= 0; i-- {
+		p := ht.data[i]
 		v := p.GetVal()
 		if v.IsIndirect() {
 			v = v.Indirect()
@@ -975,13 +1000,6 @@ func (ht *Array) MoveTailToHead() {
 	ht.rehash()
 }
 
-func (ht *Array) RandKey() *ArrayKey {
-	b.Assert(ht.Len() != 0)
-	if ht.elementsCount == 0 {
-		return nil
-	} else if ht.elementsCount == 1 {
-		key, _ := ht.First()
-		return &key
-	}
-
+func (ht *Array) Push(value *Zval) {
+	ht.Append(value)
 }

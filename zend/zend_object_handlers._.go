@@ -113,7 +113,7 @@ type ZendObjectCastT func(readobj *types.Zval, retval *types.Zval, type_ int) in
 type ZendObjectCountElementsT func(object *types.Zval, count *ZendLong) int
 type ZendObjectGetClosureT func(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr *types.IFunction, obj_ptr **types.ZendObject) int
 type ZendObjectGetGcT func(object *types.Zval, table **types.Zval, n *int) *types.Array
-type ZendObjectDoOperationT func(opcode types.ZendUchar, result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
+type ZendObjectDoOperationT func(opcode uint8, result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 
 const ZEND_PROPERTY_ISSET = 0x0
 const ZEND_PROPERTY_NOT_EMPTY = ZEND_ISEMPTY

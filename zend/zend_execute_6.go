@@ -251,8 +251,8 @@ func ZendFetchStaticPropertyAddressEx(
 	var tmp_name *types.String
 	var ce *types.ClassEntry
 	var property_info *ZendPropertyInfo
-	var op1_type types.ZendUchar = opline.GetOp1Type()
-	var op2_type types.ZendUchar = opline.GetOp2Type()
+	var op1_type uint8 = opline.GetOp1Type()
+	var op2_type uint8 = opline.GetOp2Type()
 	if op2_type == IS_CONST {
 		var class_name *types.Zval = opline.Const2()
 		b.Assert(op1_type != IS_CONST || CACHED_PTR(cache_slot) == nil)
@@ -371,8 +371,8 @@ func ZendThrowConflictingCoercionError(prop1 *ZendPropertyInfo, prop2 *ZendPrope
 }
 func IZendVerifyTypeAssignableZval(type_ptr *types.ZendType, self_ce *types.ClassEntry, zv *types.Zval, strict types.ZendBool) int {
 	var type_ types.ZendType = *type_ptr
-	var type_code types.ZendUchar
-	var zv_type types.ZendUchar = zv.GetType()
+	var type_code uint8
+	var zv_type uint8 = zv.GetType()
 	if type_.AllowNull() && zv_type == types.IS_NULL {
 		return 1
 	}
@@ -429,7 +429,7 @@ func ZendVerifyRefAssignableZval(ref *types.ZendReference, zv *types.Zval, stric
 	 * compare against it when coercion becomes necessary. */
 
 	var seen_prop *ZendPropertyInfo = nil
-	var seen_type types.ZendUchar
+	var seen_type uint8
 	var needs_coercion types.ZendBool = 0
 	b.Assert(zv.GetType() != types.IS_REFERENCE)
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())

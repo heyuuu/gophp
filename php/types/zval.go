@@ -9,8 +9,8 @@ import (
  */
 type Zval struct {
 	value     any
-	typ       ZendUchar
-	typeFlags ZendUchar
+	typ       uint8
+	typeFlags uint8
 	u2        uint32
 	//u2 struct /* union */ {
 	//	next           uint32 /* hash collision chain  用来解决哈希冲突问题，记录冲突的下一个元素位置*/
@@ -39,22 +39,22 @@ func NewZvalResource(res *ZendResource) *Zval { var tmp Zval; tmp.SetResource(re
 func NewZvalPtr(ptr any) *Zval                { var tmp Zval; tmp.SetPtr(ptr); return &tmp }
 
 /** value 的 isType/ getter / setter 判断 */
-func (zv *Zval) IsType(value ZendUchar) bool { return zv.typ == value }
-func (zv *Zval) IsUndef() bool               { return zv.typ == IS_UNDEF }
-func (zv *Zval) IsNotUndef() bool            { return zv.typ != IS_UNDEF }
-func (zv *Zval) IsNull() bool                { return zv.typ == IS_NULL }
-func (zv *Zval) IsFalse() bool               { return zv.typ == IS_FALSE }
-func (zv *Zval) IsTrue() bool                { return zv.typ == IS_TRUE }
-func (zv *Zval) IsLong() bool                { return zv.typ == IS_LONG }
-func (zv *Zval) IsDouble() bool              { return zv.typ == IS_DOUBLE }
-func (zv *Zval) IsString() bool              { return zv.typ == IS_STRING }
-func (zv *Zval) IsArray() bool               { return zv.typ == IS_ARRAY }
-func (zv *Zval) IsObject() bool              { return zv.typ == IS_OBJECT }
-func (zv *Zval) IsResource() bool            { return zv.typ == IS_RESOURCE }
-func (zv *Zval) IsReference() bool           { return zv.typ == IS_REFERENCE }
-func (zv *Zval) IsConstantAst() bool         { return zv.typ == IS_CONSTANT_AST }
-func (zv *Zval) IsIndirect() bool            { return zv.typ == IS_INDIRECT }
-func (zv *Zval) IsError() bool               { return zv.typ == IS_ERROR }
+func (zv *Zval) IsType(value uint8) bool { return zv.typ == value }
+func (zv *Zval) IsUndef() bool           { return zv.typ == IS_UNDEF }
+func (zv *Zval) IsNotUndef() bool        { return zv.typ != IS_UNDEF }
+func (zv *Zval) IsNull() bool            { return zv.typ == IS_NULL }
+func (zv *Zval) IsFalse() bool           { return zv.typ == IS_FALSE }
+func (zv *Zval) IsTrue() bool            { return zv.typ == IS_TRUE }
+func (zv *Zval) IsLong() bool            { return zv.typ == IS_LONG }
+func (zv *Zval) IsDouble() bool          { return zv.typ == IS_DOUBLE }
+func (zv *Zval) IsString() bool          { return zv.typ == IS_STRING }
+func (zv *Zval) IsArray() bool           { return zv.typ == IS_ARRAY }
+func (zv *Zval) IsObject() bool          { return zv.typ == IS_OBJECT }
+func (zv *Zval) IsResource() bool        { return zv.typ == IS_RESOURCE }
+func (zv *Zval) IsReference() bool       { return zv.typ == IS_REFERENCE }
+func (zv *Zval) IsConstantAst() bool     { return zv.typ == IS_CONSTANT_AST }
+func (zv *Zval) IsIndirect() bool        { return zv.typ == IS_INDIRECT }
+func (zv *Zval) IsError() bool           { return zv.typ == IS_ERROR }
 
 func (zv *Zval) Long() int                   { return zv.value.(int) }
 func (zv *Zval) Double() float64             { return zv.value.(float64) }
