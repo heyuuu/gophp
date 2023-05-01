@@ -87,25 +87,6 @@ func (this *PhpBasicGlobals) GetRandGenerator() *rand.Rand {
 }
 
 /**
- * PutenvEntry
- */
-type PutenvEntry struct {
-	putenv_string  *byte
-	previous_value *byte
-	key            *byte
-	key_len        int
-}
-
-func (this *PutenvEntry) GetPutenvString() *byte       { return this.putenv_string }
-func (this *PutenvEntry) SetPutenvString(value *byte)  { this.putenv_string = value }
-func (this *PutenvEntry) GetPreviousValue() *byte      { return this.previous_value }
-func (this *PutenvEntry) SetPreviousValue(value *byte) { this.previous_value = value }
-func (this *PutenvEntry) GetKey() *byte                { return this.key }
-func (this *PutenvEntry) SetKey(value *byte)           { this.key = value }
-func (this *PutenvEntry) GetKeyLen() int               { return this.key_len }
-func (this *PutenvEntry) SetKeyLen(value int)          { this.key_len = value }
-
-/**
  * PhpShutdownFunctionEntry
  */
 type PhpShutdownFunctionEntry struct {

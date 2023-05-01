@@ -168,7 +168,7 @@ func ZendHashInternalPointerEndEx(ht *Array, pos *ArrayPosition) {
 }
 
 func HandleNumericStr(key string, idx *zend.ZendUlong) bool {
-	if number, ok := parseNumericStr(key); ok {
+	if number, ok := ParseNumericStr(key); ok {
 		*idx = zend.ZendUlong(number)
 		return true
 	} else {
@@ -641,7 +641,7 @@ func ZendHashMinmax(ht *Array, compar CompareFuncT, flag uint32) *Zval {
 	return res.GetVal()
 }
 
-func parseNumericStr(str string) (int, bool) {
+func ParseNumericStr(str string) (int, bool) {
 	// 首字符非数字快速失败
 	if len(str) == 0 {
 		return 0, false

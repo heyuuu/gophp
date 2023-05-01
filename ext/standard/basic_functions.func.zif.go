@@ -64,7 +64,7 @@ var DefZifGetenv = def.DefFunc("getenv", 0, 2, []def.ArgInfo{{Name: "varname"}, 
 	if fp.HasError() {
 		return
 	}
-	ZifGetenv(executeData, returnValue, nil, varname, local_only)
+	ZifGetenv(returnValue, nil, varname, local_only)
 })
 
 // generate by ZifPutenv
@@ -74,7 +74,7 @@ var DefZifPutenv = def.DefFunc("putenv", 1, 1, []def.ArgInfo{{Name: "setting"}},
 	if fp.HasError() {
 		return
 	}
-	ZifPutenv(executeData, returnValue, setting)
+	ZifPutenv(setting)
 })
 
 // generate by ZifGetopt

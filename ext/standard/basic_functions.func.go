@@ -7,34 +7,16 @@ import (
 	"github.com/heyuuu/gophp/ext/standard/array"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
 	"os"
+	"strings"
 )
 
 func BG__() *PhpBasicGlobals { return &BasicGlobals }
-func PhpPutenvDestructor(zv *types.Zval) {
-	var pe *PutenvEntry = zv.Ptr()
-	if pe.GetPreviousValue() != nil {
-		putenv(pe.GetPreviousValue())
-	} else {
-		unsetenv(pe.GetKey())
-	}
-
-	/* don't forget to reset the various libc globals that
-	 * we might have changed by an earlier call to tzset(). */
-
-	if !(strncmp(pe.GetKey(), "TZ", pe.GetKeyLen())) {
-		tzset()
-	}
-	zend.Efree(pe.GetPutenvString())
-	zend.Efree(pe.GetKey())
-	zend.Efree(pe)
-}
 func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
 	BG__().ResetRandGenerator()
 	BG__().umask = -1
@@ -212,7 +194,6 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	BG__().page_gid = -1
 	BG__().page_inode = -1
 	BG__().page_mtime = -1
-	BG__().putenv_ht.InitEx(1, PhpPutenvDestructor)
 	BG__().user_shutdown_function_names = nil
 	ZmActivateFilestat(type_, module_number)
 	ZmActivateSyslog(type_, module_number)
@@ -231,9 +212,6 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmDeactivateBasic(type_ int, module_number int) int {
-	tsrm_env_lock()
-	BG__().putenv_ht.Destroy()
-	tsrm_env_unlock()
 	BG__().ResetRandGenerator()
 	if BG__().umask != -1 {
 		umask(BG__().umask)
@@ -407,37 +385,19 @@ func ZifLong2ip(executeData zpp.Ex, return_value zpp.Ret, properAddress *types.Z
 		return
 	}
 }
-func ZifGetenv(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, varname *types.Zval, localOnly *types.Zval) {
+func ZifGetenv(return_value zpp.Ret, _ zpp.Opt, varname_ *string, localOnly bool) *types.Zval {
+	if varname_ == nil {
+		arr := core.DupEnvVariables()
+		return types.NewZvalArray(arr)
+	}
+	env := core.Env__()
+
 	var ptr *byte
-	var str *byte = nil
-	var str_len int
-	var local_only types.ZendBool = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 0, 2, 0)
-			fp.StartOptional()
-			str, str_len = fp.ParseString()
-			local_only = fp.ParseBool()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	if str == nil {
-		zend.ArrayInit(return_value)
-		core.PhpImportEnvironmentVariables(return_value)
-		return
-	}
-	if local_only == 0 {
+	var varname = b.Option(varname_, "")
 
-		/* SAPI method returns an emalloc()'d string */
-
-		ptr = core.SapiGetenv(b.CastStr(str, str_len))
+	if localOnly {
+		ptr = core.SapiGetenv(varname)
 		if ptr != nil {
-
 			// TODO: avoid realocation ???
 
 			return_value.SetStringVal(b.CastStrAuto(ptr))
@@ -445,78 +405,42 @@ func ZifGetenv(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, varname *typ
 			return
 		}
 	}
-	tsrm_env_lock()
 
-	/* system method returns a const */
-
-	ptr = getenv(str)
-	if ptr != nil {
-		return_value.SetStringVal(b.CastStrAuto(ptr))
+	/* system method */
+	if val, ok := env.LookupEnv(varname); ok {
+		return types.NewZvalString(val)
 	}
-	tsrm_env_unlock()
-	if ptr != nil {
-		return
-	}
-	return_value.SetFalse()
-	return
+	return types.NewZvalFalse()
 }
-func ZifPutenv(executeData zpp.Ex, return_value zpp.Ret, setting *types.Zval) {
-	var setting *byte
-	var setting_len int
-	var p *byte
-	var env **byte
-	var pe PutenvEntry
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			setting, setting_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if setting_len == 0 || setting[0] == '=' {
+func ZifPutenv(setting string) bool {
+	if setting == "" || setting[0] == '=' {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid parameter syntax")
-		return_value.SetFalse()
-		return
+		return false
 	}
-	pe.SetPutenvString(zend.Estrndup(setting, setting_len))
-	pe.SetKey(zend.Estrndup(setting, setting_len))
-	if b.Assign(&p, strchr(pe.GetKey(), '=')) {
-		*p = '0'
-	}
-	pe.SetKeyLen(strlen(pe.GetKey()))
-	tsrm_env_lock()
-	types.ZendHashStrDel(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()))
 
-	/* find previous value */
+	env := core.Env__()
 
-	pe.SetPreviousValue(nil)
-	for env = cli.Environ; env != nil && (*env) != nil; env++ {
-		if !(strncmp(*env, pe.GetKey(), pe.GetKeyLen())) && (*env)[pe.GetKeyLen()] == '=' {
-			pe.SetPreviousValue(*env)
-			break
-		}
+	// parse key
+	key := setting
+	if pos := strings.IndexByte(key, '='); pos >= 0 {
+		key = key[:pos]
 	}
-	if p == nil {
-		unsetenv(pe.GetPutenvString())
-	}
-	if p == nil || putenv(pe.GetPutenvString()) == 0 {
-		types.ZendHashAddMem(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()), &pe, b.SizeOf("putenv_entry"))
-		if !(strncmp(pe.GetKey(), "TZ", pe.GetKeyLen())) {
-			tzset()
-		}
-		tsrm_env_unlock()
-		return_value.SetTrue()
-		return
+
+	// 记录环境变量
+	if key == setting {
+		// setenv 格式为 {key}，删除环境变量
+		env.UnSetEnv(setting)
 	} else {
-		zend.Efree(pe.GetPutenvString())
-		zend.Efree(pe.GetKey())
-		return_value.SetFalse()
-		return
+		// setenv 格式为 {key}={value}，设置环境变量新值
+		env.PutEnv(setting)
 	}
+
+	// todo 特殊环境变量处理
+	if strings.HasPrefix(key, "TZ") {
+		tzset()
+	}
+
+	return true
 }
 func FreeArgv(argv **byte, argc int) {
 	var i int

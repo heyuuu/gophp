@@ -31,6 +31,8 @@ type Zval struct {
 func NewZvalUndef() *Zval                     { var tmp Zval; tmp.SetUndef(); return &tmp }
 func NewZvalNull() *Zval                      { var tmp Zval; tmp.SetNull(); return &tmp }
 func NewZvalBool(b bool) *Zval                { var tmp Zval; tmp.SetBool(b); return &tmp }
+func NewZvalFalse() *Zval                     { return NewZvalBool(false) }
+func NewZvalTrue() *Zval                      { return NewZvalBool(true) }
 func NewZvalString(str string) *Zval          { var tmp Zval; tmp.SetStringVal(str); return &tmp }
 func NewZvalLong(l int) *Zval                 { var tmp Zval; tmp.SetLong(l); return &tmp }
 func NewZvalDouble(d float64) *Zval           { var tmp Zval; tmp.SetDouble(d); return &tmp }

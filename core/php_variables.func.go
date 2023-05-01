@@ -485,6 +485,10 @@ func ImportEnvironmentVariable(ht *types.Array, env *byte) {
 		PhpRegisterVariableQuick(b.CastStr(env, name_len), val, ht)
 	}
 }
+func DupEnvVariables() *types.Array {
+	return Env__().DupArray()
+}
+
 func _phpImportEnvironmentVariables(array_ptr *types.Zval) {
 	var env **byte
 	tsrm_env_lock()
