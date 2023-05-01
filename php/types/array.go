@@ -124,6 +124,8 @@ type Array struct {
 	data    []Bucket            // 实际存储数据的地方
 	indexes map[ArrayKey]uint32 // 索引到具体位置的映射
 	arData  *Bucket             // C 源码中存储数据的地方，实际不使用
+
+	data0 ArrayData
 }
 
 var _ IRefcounted = &Array{}
@@ -177,7 +179,7 @@ func (ht *Array) SetBy(arr *Array) {
 }
 
 // 实际元素个数，从使用者角度的数组大小
-func (ht *Array) Len() int                  { return int(ht.elementsCount) }
+func (ht *Array) Len() int                  { return ht.data0.Len() }
 func (ht *Array) Cap() int                  { return cap(ht.data) }
 func (ht *Array) Bucket(pos uint32) *Bucket { return &ht.data[pos] }
 
@@ -650,35 +652,21 @@ func (ht *Array) KeyDeleteIndirect(key string) bool {
  * Add / Update by ArrayKey
  */
 
-func (ht *Array) Exists(key ArrayKey) bool {
-	_, ok := ht.indexes[key]
-	return ok
-}
-
-func (ht *Array) Find(key ArrayKey) *Zval {
-	if pos, ok := ht.indexes[key]; ok {
-		return ht.data[pos].GetVal()
-	}
-	return nil
-}
-
+func (ht *Array) Exists(key ArrayKey) bool { return ht.data0.Exists(key) }
+func (ht *Array) Find(key ArrayKey) *Zval  { return ht.data0.Find(key) }
 func (ht *Array) Add(key ArrayKey, pData *Zval) *Zval {
 	ht.assertRc1()
-	if ht.Exists(key) {
+	ok := ht.data0.Add(key, pData)
+	if !ok {
 		return nil
 	}
-
-	p := ht.appendBucket(key, pData)
-	return p.GetVal()
+	return ht.Find(key)
 }
 
 func (ht *Array) AddNew(key ArrayKey, pData *Zval) *Zval {
-	ht.assertRc1()
-
 	// todo 此操作要求提前确认 key 不冲突
-
-	p := ht.appendBucket(key, pData)
-	return p.GetVal()
+	ht.assertRc1()
+	return ht.Add(key, pData)
 }
 
 func (ht *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
@@ -691,16 +679,8 @@ func (ht *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
 
 func (ht *Array) Update(key ArrayKey, pData *Zval) *Zval {
 	ht.assertRc1()
-	if data := ht.Find(key); data != nil {
-		b.Assert(data != pData)
-		if ht.destructor != nil {
-			ht.destructor(data)
-		}
-		data.CopyValueFrom(pData)
-		return data
-	}
-
-	return ht.appendBucket(key, pData).GetVal()
+	ht.data0.Update(key, pData)
+	return ht.data0.Find(key)
 }
 
 func (ht *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
@@ -713,30 +693,18 @@ func (ht *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
 
 func (ht *Array) Delete(key ArrayKey) bool {
 	ht.assertRc1()
-	if pos, ok := ht.indexes[key]; ok {
-		ht.deleteBucket(pos)
-		return true
-	}
-	return false
+	return ht.data0.Delete(key)
 }
 
 func (ht *Array) Append(pData *Zval) *Zval {
 	ht.assertRc1()
-
-	var index = ht.nextFreeElement
-	if ht.IndexExists(index) {
-		return nil
-	}
-
-	return ht.appendBucket(IdxKey(index), pData).GetVal()
+	idx := ht.data0.Push(pData)
+	return ht.IndexFind(idx)
 }
 func (ht *Array) AppendNew(pData *Zval) *Zval {
-	ht.assertRc1()
-
-	var index = ht.nextFreeElement
 	// todo 此操作要求提前确认 key 不冲突
-
-	return ht.appendBucket(IdxKey(index), pData).GetVal()
+	ht.assertRc1()
+	return ht.Append(pData)
 }
 
 /**

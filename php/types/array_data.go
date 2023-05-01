@@ -7,7 +7,6 @@ type ArrayData interface {
 	Add(key ArrayKey, data *Zval) bool
 	Update(key ArrayKey, data *Zval)
 	Delete(key ArrayKey) bool
-
-	Push(zval *Zval)
-	Pop() *ArrayPair
+	Push(data *Zval) int
+	Clean()
 }
