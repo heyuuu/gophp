@@ -784,6 +784,27 @@ func (ht *Array) ForeachIndirectReserve(handler func(key ArrayKey, value *Zval))
 	}
 }
 
+func (ht *Array) Filter(handler func(key ArrayKey, value *Zval) bool) bool {
+	var removeKeys []ArrayKey
+	for i, _ := range ht.data {
+		p := &ht.data[i]
+		if p.IsValid() {
+			continue
+		}
+		if !handler(p.GetArrayKey(), p.GetVal()) {
+			removeKeys = append(removeKeys, p.GetArrayKey())
+		}
+	}
+
+	if len(removeKeys) > 0 {
+		for _, key := range removeKeys {
+			ht.Delete(key)
+		}
+	}
+
+	return true
+}
+
 func (ht *Array) Iterator() *ArrayIterator {
 	htReader := ArrayLazyDup(ht)
 	return &ArrayIterator{ht: htReader, pos: 0}

@@ -200,3 +200,10 @@ func (t *Table[T]) Destroy() {
 	}
 	t.Clean()
 }
+
+func (t *Table[T]) DestroyReverse() {
+	if t.destructor != nil {
+		t.ForeachReserve(func(_ string, v T) { t.destructor(v) })
+	}
+	t.Clean()
+}

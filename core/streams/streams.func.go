@@ -14,24 +14,19 @@ import (
 func PhpFileLeStream() int       { return LeStream }
 func PhpFileLePstream() int      { return LePstream }
 func PhpFileLeStreamFilter() int { return LeStreamFilter }
-func ForgetPersistentResourceIdNumbers(el *types.Zval) int {
-	var stream *core.PhpStream
-	var rsrc *types.ZendResource = el.Resource()
-	if rsrc.GetType() != LePstream {
-		return 0
-	}
-	stream = (*core.PhpStream)(rsrc.GetPtr())
-	stream.SetRes(nil)
-	if stream.GetCtx() != nil {
-		zend.ZendListDelete(stream.GetCtx())
-		stream.SetCtx(nil)
-	}
-	return 0
-}
 func ZmDeactivateStreams(type_ int, module_number int) int {
-	zend.EG__().GetPersistentList().Foreach(func(key types.ArrayKey, value *types.Zval) {
-		ForgetPersistentResourceIdNumbers(value)
+	zend.EG__().PersistentList().Foreach(func(_ string, rsrc *types.ZendResource) {
+		if rsrc.GetType() != LePstream {
+			return
+		}
+		var stream *core.PhpStream = rsrc.GetPtr().(*core.PhpStream)
+		stream.SetRes(nil)
+		if stream.GetCtx() != nil {
+			zend.ZendListDelete(stream.GetCtx())
+			stream.SetCtx(nil)
+		}
 	})
+
 	return types.SUCCESS
 }
 func PhpStreamEncloses(enclosing *core.PhpStream, enclosed *core.PhpStream) *core.PhpStream {
@@ -40,9 +35,9 @@ func PhpStreamEncloses(enclosing *core.PhpStream, enclosed *core.PhpStream) *cor
 	enclosed.SetEnclosingStream(enclosing)
 	return orig
 }
-func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int {
-	var le *types.ZendResource
-	if b.Assign(&le, types.ZendHashStrFindPtr(zend.EG__().GetPersistentList(), persistent_id)) != nil {
+func PhpStreamFromPersistentId(persistent_id string, stream **core.PhpStream) int {
+	var le = zend.EG__().PersistentList().Get(persistent_id)
+	if le != nil {
 		if le.GetType() == LePstream {
 			if stream != nil {
 				var regentry *types.ZendResource = nil

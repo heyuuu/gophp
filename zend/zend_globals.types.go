@@ -9,6 +9,7 @@ type ClassTable = *types.Table[*types.ClassEntry]
 type FunctionTable = *types.Table[types.IFunction]
 type ConstantTable = *types.Table[*ZendConstant]
 type IniDirectives = *types.Table[*ZendIniEntry]
+type ResourceTable = *types.Table[*types.ZendResource]
 
 /**
  * ZendCompilerGlobals
@@ -219,6 +220,8 @@ type ZendExecutorGlobals struct {
 	hard_timeout                        ZendLong
 	regular_list                        types.Array
 	persistent_list                     types.Array
+	regularList                         ResourceTable
+	persistentList                      ResourceTable
 	user_error_handler_error_reporting  int
 	user_error_handler                  types.Zval
 	user_exception_handler              *types.Zval
@@ -341,6 +344,21 @@ func (this *ZendExecutorGlobals) NextObjectHandle() uint32 {
 
 func (this *ZendExecutorGlobals) VmStack() *VmStack { return &this.vmStack }
 
+// llist
+func (this *ZendExecutorGlobals) GetRegularList() *types.Array { return &this.regular_list }
+
+func (this *ZendExecutorGlobals) InitRegularList() {
+	this.persistentList = types.NewTable[*types.ZendResource](ListEntryDtor)
+}
+func (this *ZendExecutorGlobals) RegularList() ResourceTable { return this.regularList }
+
+func (this *ZendExecutorGlobals) InitPersistentList() {
+	this.persistentList = types.NewTable[*types.ZendResource](PlistEntryDtor)
+}
+func (this *ZendExecutorGlobals) PersistentList() ResourceTable {
+	return this.persistentList
+}
+
 /**
  * 以下是自动生成的方法
  */
@@ -418,12 +436,6 @@ func (this *ZendExecutorGlobals) GetTimedOut() types.ZendBool          { return 
 func (this *ZendExecutorGlobals) SetTimedOut(value types.ZendBool)     { this.timed_out = value }
 func (this *ZendExecutorGlobals) GetHardTimeout() ZendLong             { return this.hard_timeout }
 func (this *ZendExecutorGlobals) SetHardTimeout(value ZendLong)        { this.hard_timeout = value }
-func (this *ZendExecutorGlobals) GetRegularList() *types.Array         { return &this.regular_list }
-func (this *ZendExecutorGlobals) SetRegularList(value types.Array)     { this.regular_list = value }
-func (this *ZendExecutorGlobals) GetPersistentList() *types.Array      { return &this.persistent_list }
-func (this *ZendExecutorGlobals) SetPersistentList(value types.Array) {
-	this.persistent_list = value
-}
 func (this *ZendExecutorGlobals) GetUserErrorHandlerErrorReporting() int {
 	return this.user_error_handler_error_reporting
 }

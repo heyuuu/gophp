@@ -344,7 +344,8 @@ func ZendPostStartup() int {
 	return types.SUCCESS
 }
 func ZendShutdown() {
-	EG__().GetPersistentList().GracefulReverseDestroy()
+	EG__().PersistentList().DestroyReverse()
+
 	ZendDestroyModules()
 	VirtualCwdDeactivate()
 	VirtualCwdShutdown()
@@ -406,7 +407,7 @@ func ZendDeactivate() {
 	faults.Try(func() { ZendIniDeactivate() })
 	faults.Try(func() { ShutdownCompiler() })
 
-	EG__().GetRegularList().GracefulReverseDestroy()
+	EG__().RegularList().DestroyReverse()
 }
 func ZendMessageDispatcher(message ZendLong, data any) {
 	if ZendMessageDispatcherP != nil {

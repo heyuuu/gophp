@@ -121,8 +121,13 @@ func ListEntryDestructor(zv *types.Zval) {
 	}
 	EfreeSize(res, b.SizeOf("zend_resource"))
 }
-func PlistEntryDestructor(zv *types.Zval) {
-	var res *types.ZendResource = zv.Resource()
+func ListEntryDtor(res *types.ZendResource) {
+	if res.GetType() >= 0 {
+		ZendResourceDtor(res)
+	}
+	EfreeSize(res, b.SizeOf("zend_resource"))
+}
+func PlistEntryDtor(res *types.ZendResource) {
 	if res.GetType() >= 0 {
 		var ld *ZendRsrcListDtorsEntry
 		ld = types.ZendHashIndexFindPtr(&ListDestructors, res.GetType())
@@ -137,38 +142,28 @@ func PlistEntryDestructor(zv *types.Zval) {
 	Free(res)
 }
 func ZendInitRsrcList() int {
-	EG__().GetRegularList().InitEx(8, ListEntryDestructor)
+	EG__().InitRegularList()
 	return types.SUCCESS
 }
 func ZendInitRsrcPlist() int {
-	EG__().GetPersistentList().InitEx(8, PlistEntryDestructor)
+	EG__().InitPersistentList()
 	return types.SUCCESS
 }
-func ZendCloseRsrcList(ht *types.Array) {
-	var res *types.ZendResource
-	ht.ForeachReserve(func(_ types.ArrayKey, zv *types.Zval) {
-		res = zv.Ptr()
-		if res.GetType() >= 0 {
-			ZendResourceDtor(res)
-		}
-	})
-}
-func CleanModuleResource(zv *types.Zval, arg any) int {
-	var resource_id int = *((*int)(arg))
-	return types.Z_RES_TYPE_P(zv) == resource_id
-}
-func ZendCleanModuleRsrcDtorsCb(zv *types.Zval, arg any) int {
-	var ld *ZendRsrcListDtorsEntry = (*ZendRsrcListDtorsEntry)(zv.Ptr())
-	var module_number int = *((*int)(arg))
-	if ld.GetModuleNumber() == module_number {
-		types.ZendHashApplyWithArgument(EG__().GetPersistentList(), CleanModuleResource, any(&(ld.GetResourceId())))
-		return 1
-	} else {
-		return 0
-	}
-}
 func ZendCleanModuleRsrcDtors(module_number int) {
-	types.ZendHashApplyWithArgument(&ListDestructors, ZendCleanModuleRsrcDtorsCb, any(&module_number))
+	ListDestructors.Filter(func(_ types.ArrayKey, zv *types.Zval) bool {
+		var ld *ZendRsrcListDtorsEntry = (*ZendRsrcListDtorsEntry)(zv.Ptr())
+		if ld.GetModuleNumber() != module_number {
+			return true
+		}
+
+		// CleanModuleResource
+		resourceId := ld.GetResourceId()
+		EG__().PersistentList().Filter(func(_ string, res *types.ZendResource) bool {
+			return zv.Resource().GetType() != resourceId
+		})
+
+		return false
+	})
 }
 func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, type_name string, module_number int) int {
 	var lde *ZendRsrcListDtorsEntry
@@ -219,19 +214,4 @@ func ZendRsrcListGetRsrcTypeEx(res *types.ZendResource) *string {
 	}
 	var typeName = lde.TypeName()
 	return &typeName
-}
-func ZendRegisterPersistentResourceEx(key *types.String, rsrc_pointer any, rsrc_type int) *types.ZendResource {
-	var zv *types.Zval
-	var tmp types.Zval
-	tmp.SetResource(types.NewZendResourcePersistent(-1, rsrc_pointer, rsrc_type, true))
-	//types.GC_MAKE_PERSISTENT_LOCAL(tmp.RefCounted())
-	//types.GC_MAKE_PERSISTENT_LOCAL(key)
-	zv = EG__().GetPersistentList().KeyUpdate(key.GetStr(), &tmp)
-	return zv.Resource()
-}
-func ZendRegisterPersistentResource(key *byte, key_len int, rsrc_pointer any, rsrc_type int) *types.ZendResource {
-	var str *types.String = types.NewString(b.CastStr(key, key_len))
-	var ret *types.ZendResource = ZendRegisterPersistentResourceEx(str, rsrc_pointer, rsrc_type)
-	// types.ZendStringReleaseEx(str, 1)
-	return ret
 }

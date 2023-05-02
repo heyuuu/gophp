@@ -116,7 +116,11 @@ func ShutdownExecutor() {
 	EG__().SetIsInResourceShutdown(true)
 
 	faults.Try(func() {
-		ZendCloseRsrcList(EG__().GetRegularList())
+		EG__().RegularList().ForeachReserve(func(_ string, res *types.ZendResource) {
+			if res.GetType() >= 0 {
+				ZendResourceDtor(res)
+			}
+		})
 	})
 
 	/* No PHP callback functions should be called after this point. */

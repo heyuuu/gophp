@@ -1172,6 +1172,7 @@ func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ 
 	}
 	if type_ == nil {
 		ArrayInit(return_value)
+		
 		var __ht *types.Array = EG__().GetRegularList()
 		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()

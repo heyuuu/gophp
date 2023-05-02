@@ -2020,16 +2020,12 @@ func ZendVerifyAbstractClass(ce *types.ClassEntry) {
 
 	}
 }
-func VarianceObligationHtDtor(zv *types.Zval) {
-	zv.Ptr().Destroy()
-	FREE_HASHTABLE(zv.Ptr())
-}
 func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
 	var ht *types.Array
 	var key ZendUlong
 	if CG__().GetDelayedVarianceObligations() == nil {
 		ALLOC_HASHTABLE(CG__().GetDelayedVarianceObligations())
-		CG__().GetDelayedVarianceObligations().InitEx(0, VarianceObligationHtDtor)
+		CG__().GetDelayedVarianceObligations().Init(0)
 	}
 	key = ZendUlong(uintPtr(ce))
 	ht = types.ZendHashIndexFindPtr(CG__().GetDelayedVarianceObligations(), key)
@@ -2037,7 +2033,7 @@ func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
 		return ht
 	}
 	ALLOC_HASHTABLE(ht)
-	ht.InitEx(0)
+	ht.Init(0)
 	types.ZendHashIndexAddNewPtr(CG__().GetDelayedVarianceObligations(), key, ht)
 	ce.SetIsUnresolvedVariance(true)
 	return ht
