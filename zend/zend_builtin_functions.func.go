@@ -1162,8 +1162,7 @@ func ZifGetResourceType(executeData zpp.Ex, return_value zpp.Ret, res *types.Zva
 		return
 	}
 }
-func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ *types.Zval) {
-	var type_ *types.String = nil
+func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ *string) {
 	var key *types.String
 	var index ZendUlong
 	var val *types.Zval
@@ -1172,7 +1171,7 @@ func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ 
 	}
 	if type_ == nil {
 		ArrayInit(return_value)
-		
+
 		var __ht *types.Array = EG__().GetRegularList()
 		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()
@@ -1185,7 +1184,7 @@ func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ 
 				return_value.Array().IndexAddNew(index, val)
 			}
 		}
-	} else if type_.String() == "Unknown" {
+	} else if *type_ == "Unknown" {
 		ArrayInit(return_value)
 		var __ht *types.Array = EG__().GetRegularList()
 		for _, _p := range __ht.ForeachData() {
