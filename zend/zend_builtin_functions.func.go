@@ -1199,9 +1199,9 @@ func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ 
 			}
 		}
 	} else {
-		var id = ZendFetchListDtorId(type_.GetVal())
+		var id = ZendFetchListDtorId(*type_)
 		if id <= 0 {
-			faults.Error(faults.E_WARNING, "get_resources():  Unknown resource type '%s'", type_.GetVal())
+			faults.Error(faults.E_WARNING, "get_resources():  Unknown resource type '%s'", *type_)
 			return_value.SetFalse()
 			return
 		}
