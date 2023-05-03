@@ -475,7 +475,8 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		}
 		if !(SPL_G__().autoload_functions) {
 			zend.ALLOC_HASHTABLE(SPL_G__().autoload_functions)
-			SPL_G__().autoload_functions.InitEx(1, AutoloadFuncInfoDtor)
+			//SPL_G__().autoload_functions.InitEx(1, AutoloadFuncInfoDtor)
+			SPL_G__().autoload_functions.Init(1)
 		}
 		spl_func_ptr = SplAutoloadFn
 		if zend.EG__().GetAutoloadFunc() == spl_func_ptr {

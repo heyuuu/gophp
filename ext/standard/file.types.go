@@ -47,10 +47,10 @@ type PhpFileGlobals struct {
 	default_context              *core.PhpStreamContext
 	stream_wrappers              map[string]*core.PhpStreamWrapper
 	stream_filters               map[string]*streams.PhpStreamFilterFactory
-	wrapper_errors               *types.Array
 	pclose_wait                  int
 }
 
+//
 func (this *PhpFileGlobals) StreamWrappers() map[string]*core.PhpStreamWrapper {
 	return this.stream_wrappers
 }
@@ -98,7 +98,5 @@ func (this *PhpFileGlobals) SetStreamFilters(value map[string]*streams.PhpStream
 	this.stream_filters = value
 }
 
-func (this *PhpFileGlobals) GetWrapperErrors() *types.Array      { return this.wrapper_errors }
-func (this *PhpFileGlobals) SetWrapperErrors(value *types.Array) { this.wrapper_errors = value }
-func (this *PhpFileGlobals) GetPcloseWait() int                  { return this.pclose_wait }
-func (this *PhpFileGlobals) SetPcloseWait(value int)             { this.pclose_wait = value }
+func (this *PhpFileGlobals) GetPcloseWait() int      { return this.pclose_wait }
+func (this *PhpFileGlobals) SetPcloseWait(value int) { this.pclose_wait = value }

@@ -64,12 +64,6 @@ func PhpStreamFromPersistentId(persistent_id string, stream **core.PhpStream) in
 	}
 	return core.PHP_STREAM_PERSISTENT_NOT_EXIST
 }
-func WrapperErrorDtor(error any) { zend.Efree(*((**byte)(error))) }
-func WrapperListDtor(item *types.Zval) {
-	var list *zend.ZendLlist = (*zend.ZendLlist)(item.Ptr())
-	list.Destroy()
-	zend.Efree(list)
-}
 func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt string, _ ...any) {
 	var args va_list
 	var buffer *byte = nil
@@ -80,25 +74,21 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", buffer)
 		zend.Efree(buffer)
 	} else {
-		var list *zend.ZendLlist = nil
-		if !(standard.FG__().wrapper_errors) {
-			zend.ALLOC_HASHTABLE(standard.FG__().wrapper_errors)
-			standard.FG__().GetWrapperErrors().InitEx(8, WrapperListDtor)
-		} else {
-			list = types.ZendHashStrFindPtr(standard.FG__().wrapper_errors, b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")))
-		}
-		if list == nil {
-			var new_list zend.ZendLlist
-			new_list.Init(b.SizeOf("buffer"), WrapperErrorDtor, 0)
-			list = types.ZendHashStrUpdateMem(standard.FG__().wrapper_errors, b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")), &new_list, b.SizeOf("new_list"))
-		}
+		//var list *zend.ZendLlist = nil
+		//if !(standard.FG__().GetWrapperErrors()) {
+		//	zend.ALLOC_HASHTABLE(standard.FG__().GetWrapperErrors())
+		//	standard.FG__().GetWrapperErrors().InitEx(8, WrapperListDtor)
+		//} else {
+		//	list = types.ZendHashStrFindPtr(standard.FG__().GetWrapperErrors(), b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")))
+		//}
+		//if list == nil {
+		//	var new_list zend.ZendLlist
+		//	new_list.Init(b.SizeOf("buffer"), WrapperErrorDtor, 0)
+		//	list = types.ZendHashStrUpdateMem(standard.FG__().GetWrapperErrors(), b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")), &new_list, b.SizeOf("new_list"))
+		//}
 
 		/* append to linked list */
-
-		list.AddElement(&buffer)
-
-		/* append to linked list */
-
+		//list.AddElement(&buffer)
 	}
 }
 func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *string {

@@ -113,14 +113,6 @@ func ZendFetchResource2Ex(res *types.Zval, resource_type_name string, resource_t
 	}
 	return ZendFetchResource2(res.Resource(), resource_type_name, resource_type1, resource_type2)
 }
-func ListEntryDestructor(zv *types.Zval) {
-	var res = zv.Resource()
-	zv.SetUndef()
-	if res.GetType() >= 0 {
-		ZendResourceDtor(res)
-	}
-	EfreeSize(res, b.SizeOf("zend_resource"))
-}
 func ListEntryDtor(res *types.ZendResource) {
 	if res.GetType() >= 0 {
 		ZendResourceDtor(res)
