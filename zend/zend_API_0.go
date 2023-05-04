@@ -121,9 +121,6 @@ func ZVAL_ZVAL(z *types.Zval, zv *types.Zval, copy int, dtor int) {
 		}
 	} else {
 		types.ZVAL_COPY(__z, types.Z_REFVAL_P(__zv))
-		if dtor != 0 || copy == 0 {
-			// ZvalPtrDtor(__zv)
-		}
 	}
 }
 func HASH_OF(p *types.Zval) *types.Array {

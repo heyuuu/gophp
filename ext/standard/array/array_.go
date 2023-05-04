@@ -650,211 +650,71 @@ func ZifArrayReplace(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval,
 func ZifArrayReplaceRecursive(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, _ zpp.Opt, arrays []*types.Zval) {
 	PhpArrayReplaceWrapper(executeData, return_value, 1)
 }
-func ZifArrayKeys(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _ zpp.Opt, searchValue *types.Zval, strict *types.Zval) {
-	var input *types.Zval
-	var search_value *types.Zval = nil
-	var entry *types.Zval
-	var new_val types.Zval
-	var strict = 0
-	var num_idx zend.ZendUlong
-	var str_idx *types.String
-	var arrval *types.Array
-	var elem_count zend.ZendUlong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			input = fp.ParseArray()
-			fp.StartOptional()
-			search_value = fp.ParseZval()
-			strict = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	arrval = input.Array()
-	elem_count = arrval.Len()
+func ZifArrayKeys(array zpp.ArrayHt, _ zpp.Opt, searchValue *types.Zval, strict bool) *types.Array {
+	arrLen := array.Len()
 
 	/* Base case: empty input */
-
-	if elem_count == 0 {
-		zend.ZVAL_ZVAL(return_value, input, 1, 0)
-		return
+	if arrLen == 0 {
+		return types.NewArray(0)
 	}
 
 	/* Initialize return array */
-
-	if search_value != nil {
-		zend.ArrayInit(return_value)
-		if strict != 0 {
-			var __ht = arrval
-			for _, _p := range __ht.ForeachData() {
-				var _z = _p.GetVal()
-				if _z.IsIndirect() {
-					_z = _z.Indirect()
-					if _z.IsUndef() {
-						continue
-					}
-				}
-				num_idx = _p.GetH()
-				str_idx = _p.GetKey()
-				entry = _z
+	if searchValue != nil {
+		keys := types.NewArray(0)
+		if strict {
+			array.ForeachIndirect(func(key types.ArrayKey, entry *types.Zval) {
 				entry = types.ZVAL_DEREF(entry)
-				if zend.FastIsIdenticalFunction(search_value, entry) != 0 {
-					if str_idx != nil {
-						new_val.SetStringCopy(str_idx)
-					} else {
-						new_val.SetLong(num_idx)
-					}
-					return_value.Array().AppendNew(&new_val)
+				if zend.FastIsIdenticalFunction(searchValue, entry) != 0 {
+					keys.Append(key.ToZval())
 				}
-			}
+			})
 		} else {
-			var __ht = arrval
-			for _, _p := range __ht.ForeachData() {
-				var _z = _p.GetVal()
-				if _z.IsIndirect() {
-					_z = _z.Indirect()
-					if _z.IsUndef() {
-						continue
-					}
+			array.ForeachIndirect(func(key types.ArrayKey, entry *types.Zval) {
+				if zend.FastEqualCheckFunction(searchValue, entry) != 0 {
+					keys.Append(key.ToZval())
 				}
-				num_idx = _p.GetH()
-				str_idx = _p.GetKey()
-				entry = _z
-				if zend.FastEqualCheckFunction(search_value, entry) != 0 {
-					if str_idx != nil {
-						new_val.SetStringCopy(str_idx)
-					} else {
-						new_val.SetLong(num_idx)
-					}
-					return_value.Array().AppendNew(&new_val)
-				}
-			}
+			})
 		}
+		return keys
 	} else {
-		zend.ArrayInitSize(return_value, elem_count)
-
-		fillScope := types.PackedFillStart(return_value.Array())
-
-		/* Go through input array and add keys to the return array */
-
-		var __ht = input.Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.Indirect()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			num_idx = _p.GetH()
-			str_idx = _p.GetKey()
-			entry = _z
-			if str_idx != nil {
-				fillScope.FillSetStringCopy(str_idx)
-			} else {
-				fillScope.FillSetLong(num_idx)
-			}
-			fillScope.FillNext()
-		}
-
-		/* Go through input array and add keys to the return array */
-
-		fillScope.FillEnd()
+		keys := types.NewArray(arrLen)
+		array.ForeachIndirect(func(key types.ArrayKey, _ *types.Zval) {
+			keys.Append(key.ToZval())
+		})
+		return keys
+	}
+}
+func ZifArrayKeyFirst(array *types.Array) *types.Zval {
+	key, val := array.FirstIndirect()
+	if val == nil {
+		return types.NewZvalNull()
+	}
+	return key.ToZval()
+}
+func ZifArrayKeyLast(array *types.Array) *types.Zval {
+	key, val := array.Last()
+	if val == nil {
+		return types.NewZvalNull()
+	}
+	return key.ToZval()
+}
+func ZifArrayValues(array *types.Array) *types.Array {
+	arrLen := array.Len()
+	if arrLen == 0 {
+		return types.NewArray(0)
 	}
 
 	/* Initialize return array */
-}
-func ZifArrayKeyFirst(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
-	var stack *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			stack = fp.ParseArray()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	var target_hash = stack.Array()
-	var pos types.ArrayPosition = 0
-	types.ZendHashGetCurrentKeyZvalEx(target_hash, return_value, &pos)
-}
-func ZifArrayKeyLast(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
-	var stack *types.Zval
-	var pos types.ArrayPosition
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			stack = fp.ParseArray()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	var target_hash = stack.Array()
-	types.ZendHashInternalPointerEndEx(target_hash, &pos)
-	types.ZendHashGetCurrentKeyZvalEx(target_hash, return_value, &pos)
-}
-func ZifArrayValues(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
-	var input *types.Zval
-	var entry *types.Zval
-	var arrval *types.Array
-	var arrlen zend.ZendLong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			input = fp.ParseArray()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	arrval = input.Array()
-
-	/* Return empty input as is */
-
-	arrlen = arrval.Len()
-	if arrlen == 0 {
-		return_value.SetEmptyArray()
-		return
-	}
-
-	/* Return vector-like packed arrays as-is */
-
-	/* Initialize return array */
-
-	zend.ArrayInitSize(return_value, arrval.Len())
-
-	/* Go through input array and add values to the return array */
-
-	fillScope := types.PackedFillStart(return_value.Array())
-	var __ht = arrval
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		entry = _z
+	values := types.NewArray(array.Len())
+	array.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
 		if entry.IsReference() && entry.GetRefcount() == 1 {
 			entry = types.Z_REFVAL_P(entry)
 		}
-		// entry.TryAddRefcount()
-		fillScope.FillSet(entry)
-		fillScope.FillNext()
-	}
-	fillScope.FillEnd()
-
-	/* Go through input array and add values to the return array */
+		values.Append(entry)
+	})
+	return values
 }
-func ZifArrayCountValues(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
+func ZifArrayCountValues(executeData zpp.Ex, return_value zpp.Ret, array *types.Array) *types.Array {
 	var input *types.Zval
 	var entry *types.Zval
 	var tmp *types.Zval
@@ -876,8 +736,6 @@ func ZifArrayCountValues(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zv
 	zend.ArrayInit(return_value)
 
 	/* Go through input array and add values to the return array */
-
-	myht = input.Array()
 	var __ht = myht
 	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()

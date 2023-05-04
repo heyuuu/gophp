@@ -138,7 +138,7 @@ var DefZifArrayKeys = def.DefFunc("array_keys", 1, 3, []def.ArgInfo{{Name: "arg"
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeys(executeData, returnValue, arg, nil, search_value, strict)
+	ZifArrayKeys(arg, nil, search_value, strict)
 })
 
 // generate by ZifArrayKeyFirst
@@ -148,7 +148,7 @@ var DefZifArrayKeyFirst = def.DefFunc("array_key_first", 1, 1, []def.ArgInfo{{Na
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeyFirst(executeData, returnValue, arg)
+	ZifArrayKeyFirst(arg)
 })
 
 // generate by ZifArrayKeyLast
@@ -158,7 +158,7 @@ var DefZifArrayKeyLast = def.DefFunc("array_key_last", 1, 1, []def.ArgInfo{{Name
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeyLast(executeData, returnValue, arg)
+	ZifArrayKeyLast(arg)
 })
 
 // generate by ZifArrayValues
@@ -168,7 +168,7 @@ var DefZifArrayValues = def.DefFunc("array_values", 1, 1, []def.ArgInfo{{Name: "
 	if fp.HasError() {
 		return
 	}
-	ZifArrayValues(executeData, returnValue, arg)
+	ZifArrayValues(arg)
 })
 
 // generate by ZifArrayCountValues
