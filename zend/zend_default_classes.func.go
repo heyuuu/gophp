@@ -8,5 +8,5 @@ func ZendRegisterDefaultClasses() {
 	ZendRegisterIteratorWrapper()
 	ZendRegisterClosureCe()
 	ZendRegisterGeneratorCe()
-	ZendRegisterWeakrefCe()
+	//ZendRegisterWeakrefCe()
 }

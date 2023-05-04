@@ -55,7 +55,7 @@ func ZendObjectStdDtor(object *types.ZendObject) {
 		}
 	}
 	if (object.GetGcFlags() & types.IS_OBJ_WEAKLY_REFERENCED) != 0 {
-		ZendWeakrefsNotify(object)
+		//ZendWeakrefsNotify(object)
 	}
 }
 func ZendObjectsDestroyObject(object *types.ZendObject) {

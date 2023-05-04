@@ -56,7 +56,6 @@ func InitExecutor() {
 	EG__().SetPersistentConstantsCount(uint32(EG__().ConstantTable().Len()))
 	EG__().SetPersistentFunctionsCount(uint32(EG__().FunctionTable().Len()))
 	EG__().SetPersistentClassesCount(uint32(EG__().ClassTable().Len()))
-	ZendWeakrefsInit()
 	EG__().SetActive(1)
 }
 func ZvalCallDestructor(zv *types.Zval) int {
@@ -186,7 +185,7 @@ func ShutdownExecutor() {
 	}
 	// notice: 无需主动调用析构函数，使用自动析构代替
 	//ZendObjectsStoreFreeObjectStorage(EG__().GetObjectsStore(), fast_shutdown)
-	ZendWeakrefsShutdown()
+	//ZendWeakrefsShutdown()
 
 	faults.Try(func() {
 		ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionDeactivator))
