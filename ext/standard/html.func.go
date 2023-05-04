@@ -1001,6 +1001,15 @@ func PhpUnescapeHtmlEntities(str *types.String, all int, flags int, hint_charset
 	TraverseForEntities(str.GetVal(), str.GetLen(), ret, all, flags, inverse_map, charset)
 	return ret
 }
+
+func PhpEscapeHtmlEntities_Ex(old string, all int, flags int, hint_charset string) string {
+	zstr := PhpEscapeHtmlEntitiesEx(b.CastStrPtr(old), len(old), all, flags, hint_charset, 1)
+	if zstr == nil {
+		return ""
+	}
+	return zstr.GetStr()
+}
+
 func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_charset string) *types.String {
 	return PhpEscapeHtmlEntitiesEx(old, oldlen, all, flags, hint_charset, 1)
 }

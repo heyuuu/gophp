@@ -3,10 +3,10 @@ package core
 import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core/date"
 	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard"
-	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -27,9 +28,9 @@ func SAFE_FILENAME(f __auto__) string {
 func GetSafeCharsetHint() *byte {
 	var lastHint *byte = nil
 	var lastCodeset *byte = nil
-	var hint *byte = SG__().default_charset
+	var hint = SG__().default_charset
 	var len_ int = strlen(hint)
-	var i int = 0
+	var i = 0
 	if lastHint == SG__().default_charset {
 		return lastCodeset
 	}
@@ -218,7 +219,7 @@ func PhpBinaryInit() {
 		if binary_location != nil && !(strchr(SM__().GetExecutableLocation(), '/')) {
 			var envpath *byte
 			var path *byte
-			var found int = 0
+			var found = 0
 			if b.Assign(&envpath, getenv("PATH")) != nil {
 				var search_dir *byte
 				var search_path []*byte
@@ -538,43 +539,29 @@ func PhpLogErrWithSeverity(logMessage string, syslogTypeInt int) {
 func PhpPrintf(format string, args ...any) int {
 	return PUTS(pfmt.Sprintf(format, args))
 }
-func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any) {
-	var replace_buffer *types.String = nil
-	var replace_origin *types.String = nil
-	var buffer *byte = nil
-	var docref_buf *byte = nil
-	var target *byte = nil
-	var docref_target *byte = ""
-	var docref_root *byte = ""
+func PhpVerror(docref string, params string, type_ int, format string, args ...any) {
+	var buffer = ""
+	var docrefBuf = ""
+	var target = ""
+	var docref_target = ""
+	var docref_root = ""
 	var p *byte
-	var buffer_len int = 0
 	var space string
 	var class_name string
 	var function string
-	var origin_len int
-	var origin *byte
-	var message *byte
-	var is_function int = 0
+	var origin string
+	var message string
+	var isFunction = false
 
 	/* get error text into buffer and escape for html if necessary */
-
-	buffer_len = int(Vspprintf(&buffer, 0, format, args))
+	buffer_ := pfmt.Sprintf(format, args...)
 	if PG__().html_errors {
-		replace_buffer = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
-
+		replaceBuffer := standard.PhpEscapeHtmlEntities_Ex(buffer_, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 		/* Retry with substituting invalid chars on fail. */
-
-		if replace_buffer == nil || replace_buffer.GetLen() < 1 {
-			replace_buffer = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT|standard.ENT_HTML_SUBSTITUTE_ERRORS, GetSafeCharsetHint())
+		if replaceBuffer == "" {
+			replaceBuffer = standard.PhpEscapeHtmlEntities_Ex(buffer_, 0, standard.ENT_COMPAT|standard.ENT_HTML_SUBSTITUTE_ERRORS, GetSafeCharsetHint())
 		}
-		zend.Efree(buffer)
-		if replace_buffer != nil {
-			buffer = replace_buffer.GetVal()
-			buffer_len = int(replace_buffer.GetLen())
-		} else {
-			buffer = ""
-			buffer_len = 0
-		}
+		buffer_ = replaceBuffer
 	}
 
 	/* which function caused the problem if any at all */
@@ -587,19 +574,19 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		switch zend.CurrEX().GetOpline().GetExtendedValue() {
 		case zend.ZEND_EVAL:
 			function = "eval"
-			is_function = 1
+			isFunction = true
 		case zend.ZEND_INCLUDE:
 			function = "include"
-			is_function = 1
+			isFunction = true
 		case zend.ZEND_INCLUDE_ONCE:
 			function = "include_once"
-			is_function = 1
+			isFunction = true
 		case zend.ZEND_REQUIRE:
 			function = "require"
-			is_function = 1
+			isFunction = true
 		case zend.ZEND_REQUIRE_ONCE:
 			function = "require_once"
-			is_function = 1
+			isFunction = true
 		default:
 			function = "Unknown"
 		}
@@ -608,7 +595,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		if function == "" {
 			function = "Unknown"
 		} else {
-			is_function = 1
+			isFunction = true
 			class_name = zend.CurrEX().ClassName()
 			if class_name != "" {
 				space = "::"
@@ -617,41 +604,31 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	}
 
 	/* if we still have memory then format the origin */
-
-	if is_function != 0 {
-		origin_len = int(Spprintf(&origin, 0, "%s%s%s(%s)", class_name, space, function, params))
+	if isFunction {
+		origin = fmt.Sprintf("%s%s%s(%s)", class_name, space, function, params)
 	} else {
-		origin_len = int(Spprintf(&origin, 0, "%s", function))
+		origin = function
 	}
 	if PG__().html_errors {
-		replace_origin = standard.PhpEscapeHtmlEntities((*uint8)(origin), origin_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
-		zend.Efree(origin)
-		origin = replace_origin.GetVal()
+		origin = standard.PhpEscapeHtmlEntities_Ex(origin, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 	}
 
 	/* origin and buffer available, so lets come up with the error message */
-
-	if docref != nil && docref[0] == '#' {
-		docref_target = strchr(docref, '#')
-		docref = nil
+	if docref != "" && docref[0] == '#' {
+		docref_target = docref
+		docref = ""
 	}
 
 	/* no docref given but function is known (the default) */
-
-	if docref == nil && is_function != 0 {
-		var doclen int
-		for (*function) == '_' {
-			function++
-		}
+	if docref == "" && isFunction {
+		function = strings.TrimLeft(function, "_")
 		if space[0] == '0' {
-			doclen = int(Spprintf(&docref_buf, 0, "function.%s", function))
+			docrefBuf = fmt.Sprintf("function.%s", function)
 		} else {
-			doclen = int(Spprintf(&docref_buf, 0, "%s.%s", class_name, function))
+			docrefBuf = fmt.Sprintf("%s.%s", class_name, function)
 		}
-		for b.Assign(&p, strchr(docref_buf, '_')) != nil {
-			*p = '-'
-		}
-		docref = str.PhpStrtolower(docref_buf, doclen)
+		docrefBuf = strings.ReplaceAll(docrefBuf, "_", "-")
+		docref = ascii.StrToLower(docrefBuf)
 	}
 
 	/* we have a docref for a function AND
@@ -659,7 +636,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	 * - the user wants to see the links
 	 */
 
-	if docref != nil && is_function != 0 && PG__().html_errors && strlen(PG__().docref_root) {
+	if docref != "" && isFunction && PG__().html_errors && strlen(PG__().docref_root) {
 		if strncmp(docref, "http://", 7) {
 
 			/* We don't have 'http://' so we use docref_root */
@@ -667,10 +644,10 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 			var ref *byte
 			docref_root = PG__().docref_root
 			ref = zend.Estrdup(docref)
-			if docref_buf != nil {
-				zend.Efree(docref_buf)
+			if docrefBuf != nil {
+				zend.Efree(docrefBuf)
 			}
-			docref_buf = ref
+			docrefBuf = ref
 
 			/* strip of the target if any */
 
@@ -686,36 +663,25 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 			/* add the extension if it is set in ini */
 
 			if PG__().docref_ext && strlen(PG__().docref_ext) {
-				Spprintf(&docref_buf, 0, "%s%s", ref, PG__().docref_ext)
+				Spprintf(&docrefBuf, 0, "%s%s", ref, PG__().docref_ext)
 				zend.Efree(ref)
 			}
-			docref = docref_buf
+			docref = docrefBuf
 		}
 
 		/* display html formatted or only show the additional links */
 
 		if PG__().html_errors {
-			Spprintf(&message, 0, "%s [<a href='%s%s%s'>%s</a>]: %s", origin, docref_root, docref, docref_target, docref, buffer)
+			message = fmt.Sprintf("%s [<a href='%s%s%s'>%s</a>]: %s", origin, docref_root, docref, docref_target, docref, buffer_)
 		} else {
-			Spprintf(&message, 0, "%s [%s%s%s]: %s", origin, docref_root, docref, docref_target, buffer)
-		}
-		if target != nil {
-			zend.Efree(target)
+			message = fmt.Sprintf("%s [%s%s%s]: %s", origin, docref_root, docref, docref_target, buffer)
 		}
 	} else {
-		Spprintf(&message, 0, "%s: %s", origin, buffer)
-	}
-	if replace_origin != nil {
-		//types.ZendStringFree(replace_origin)
-	} else {
-		zend.Efree(origin)
-	}
-	if docref_buf != nil {
-		zend.Efree(docref_buf)
+		message = fmt.Sprintf("%s: %s", origin, buffer)
 	}
 	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsUndef() || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
 		var tmp types.Zval
-		tmp.SetStringVal(b.CastStr(buffer, buffer_len))
+		tmp.SetStringVal(buffer_)
 		if zend.CurrEX() != nil {
 			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types.FAILURE {
 				// zend.ZvalPtrDtor(&tmp)
@@ -724,44 +690,25 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 			zend.EG__().GetSymbolTable().KeyUpdateIndirect("php_errormsg", &tmp)
 		}
 	}
-	if replace_buffer != nil {
-		//types.ZendStringFree(replace_buffer)
-	} else {
-		zend.Efree(buffer)
-	}
-	PhpError(type_, "%s", message)
-	zend.Efree(message)
+	PhpError(type_, message)
 }
 
-func PhpErrorDocref(docref *string, type_ int, format string, _ ...any) {
-	var args va_list
-	va_start(args, format)
-	PhpVerror(docref, "", type_, format, args)
-	va_end(args)
+func PhpErrorDocref(docRef_ *string, type_ int, format string, args ...any) {
+	docRef := b.Option(docRef_, "")
+	PhpVerror(docRef, "", type_, format, args)
 }
-func PhpErrorDocref1(docref *byte, param1 *byte, type_ int, format string, _ ...any) {
-	var args va_list
-	va_start(args, format)
-	PhpVerror(docref, param1, type_, format, args)
-	va_end(args)
+func PhpErrorDocref1(docRef_ *string, param1_ *string, type_ int, format string, args ...any) {
+	docRef := b.Option(docRef_, "")
+	params := b.Option(param1_, "")
+	PhpVerror(docRef, params, type_, format, args)
 }
-func PhpErrorDocref2(
-	docref *byte,
-	param1 *byte,
-	param2 *byte,
-	type_ int,
-	format string,
-	_ ...any,
-) {
-	var params *byte
-	var args va_list
-	Spprintf(&params, 0, "%s,%s", param1, param2)
-	va_start(args, format)
-	PhpVerror(docref, b.Cond(params != nil, params, "..."), type_, format, args)
-	va_end(args)
-	if params != nil {
-		zend.Efree(params)
+func PhpErrorDocref2(docRef_ *string, param1_ *string, param2_ *string, type_ int, format string, args ...any) {
+	docRef := b.Option(docRef_, "")
+	params := pfmt.Sprintf("%s,%s", b.Option(param1_, ""), b.Option(param2_, ""))
+	if params == "" {
+		params = "..."
 	}
+	PhpVerror(docRef, params, type_, format, args)
 }
 func PhpHtmlPuts(str *byte, size int) { zend.ZendHtmlPuts(str, size) }
 func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format string, args ...any) {
@@ -838,12 +785,12 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 
 	if display != 0 {
 		if PG__().last_error_message {
-			var s *byte = PG__().last_error_message
+			var s = PG__().last_error_message
 			PG__().last_error_message = nil
 			zend.Free(s)
 		}
 		if PG__().last_error_file {
-			var s *byte = PG__().last_error_file
+			var s = PG__().last_error_file
 			PG__().last_error_file = nil
 			zend.Free(s)
 		}
@@ -912,11 +859,11 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			if PG__().xmlrpc_errors {
 				PhpPrintf("<?xml version=\"1.0\"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>"+zend.ZEND_LONG_FMT+"</int></value></member><member><name>faultString</name><value><string>%s:%s in %s on line %"+"u"+"</string></value></member></struct></value></fault></methodResponse>", PG__().xmlrpc_error_number, error_type_str, buffer, error_filename, error_lineno)
 			} else {
-				var prepend_string *byte = zend.INI_STR("error_prepend_string")
-				var append_string *byte = zend.INI_STR("error_append_string")
+				var prepend_string = zend.INI_STR("error_prepend_string")
+				var append_string = zend.INI_STR("error_append_string")
 				if PG__().html_errors {
 					if type_ == faults.E_ERROR || type_ == faults.E_PARSE {
-						var buf *types.String = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
+						var buf = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf.GetVal(), error_filename, error_lineno, STR_PRINT(append_string))
 						//types.ZendStringFree(buf)
 					} else {
@@ -965,7 +912,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 		zend.EG__().SetExitStatus(255)
 		if ModuleInitialized != 0 {
 			if !(PG__().display_errors) && !(SG__().headers_sent) && SG__().sapi_headers.http_response_code == 200 {
-				var ctr SapiHeaderLine = MakeSapiHeaderLine(0)
+				var ctr = MakeSapiHeaderLine(0)
 				ctr.SetLine("HTTP/1.0 500 Internal Server Error")
 				ctr.SetLineLen(b.SizeOf("\"HTTP/1.0 500 Internal Server Error\"") - 1)
 				SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
@@ -1051,7 +998,7 @@ func PhpStreamOpenForZendEx(filename string, mode int) *zend.FileHandle {
 
 func PhpStreamOpenForZendExEx(filename string, mode int) (*PhpStreamForZend, string) {
 	var openedPath *types.String
-	var stream *PhpStream = PhpStreamOpenWrapper(filename, "rb", mode, &openedPath)
+	var stream = PhpStreamOpenWrapper(filename, "rb", mode, &openedPath)
 	if stream != nil {
 		/* suppress warning if this stream is not explicitly closed */
 		PhpStreamAutoCleanup(stream)
@@ -1199,7 +1146,7 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 3. Flush all output buffers */
 	faults.Try(func() {
-		var send_buffer types.ZendBool = b.Cond(SG__().RequestInfo.headers_only, 0, 1)
+		var send_buffer = b.Cond(SG__().RequestInfo.headers_only, 0, 1)
 		if zend.CG__().GetUncleanShutdown() != 0 && PG__().last_error_type == faults.E_ERROR && int(PG__().memory_limit < zend.ZendMemoryUsage(1)) != 0 {
 			send_buffer = 0
 		}
@@ -1328,7 +1275,7 @@ func PhpModuleStartupEx(sf ISapiModule, additional_modules []zend.ModuleEntry) b
 }
 func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_additional_modules uint32) int {
 	var zuv zend.ZendUtilityValues
-	var module_number int = 0
+	var module_number = 0
 	var php_os = PHP_OS
 	ModuleShutdown = 0
 	ModuleStartup = 1
@@ -1517,7 +1464,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	return types.IntBool(retval)
 }
 func PhpModuleShutdown() {
-	var module_number int = 0
+	var module_number = 0
 	ModuleShutdown = 1
 	if ModuleInitialized == 0 {
 		return
@@ -1537,7 +1484,7 @@ func PhpModuleShutdown() {
 	zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown(), 1)
 	PhpOutputShutdown()
 	if zend.ZendPostShutdownCb != nil {
-		var cb func() = zend.ZendPostShutdownCb
+		var cb = zend.ZendPostShutdownCb
 		zend.ZendPostShutdownCb = nil
 		cb()
 	}
@@ -1551,7 +1498,7 @@ func PhpExecuteScript(primaryFile *zend.FileHandle) bool {
 	var prepend_file zend.FileHandle
 	var append_file zend.FileHandle
 	var old_cwd *byte
-	var retval bool = false
+	var retval = false
 	zend.EG__().SetExitStatus(0)
 	const OLD_CWD_SIZE = 4096
 	old_cwd = zend.DoAlloca(OLD_CWD_SIZE, use_heap)
@@ -1625,7 +1572,7 @@ func PhpHandleAbortedConnection() {
 	}
 }
 func PhpHandleAuthData(auth *byte) int {
-	var ret int = -1
+	var ret = -1
 	var auth_len int = b.CondF1(auth != nil, func() __auto__ { return strlen(auth) }, 0)
 	if auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Basic ", b.SizeOf("\"Basic \"")-1) == 0 {
 		var pass *byte
@@ -1659,7 +1606,7 @@ func PhpHandleAuthData(auth *byte) int {
 }
 func PhpLintScript(file *zend.FileHandle) int {
 	var op_array *types.ZendOpArray
-	var retval int = types.FAILURE
+	var retval = types.FAILURE
 
 	faults.Try(func() {
 		op_array = zend.CompileFile(file, zend.ZEND_INCLUDE)

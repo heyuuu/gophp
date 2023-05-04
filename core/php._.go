@@ -31,7 +31,9 @@ const PhpSleep = sleep
 
 var Environ **byte
 
-const PhpError = faults.Error
+func PhpError(typ int, format string, args ...any) {
+	faults.Error(typ, format, args...)
+}
 
 /* PHPAPI void php_error(int type, const char *format, ...); */
 

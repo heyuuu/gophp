@@ -1000,9 +1000,6 @@ func PhpUrlScannerAddVarImpl(
 	hvalue.Free()
 	return types.SUCCESS
 }
-func PhpUrlScannerAddSessionVar(name *byte, name_len int, value *byte, value_len int, encode int) int {
-	return PhpUrlScannerAddVarImpl(name, name_len, value, value_len, encode, 1)
-}
 func PhpUrlScannerAddVar(name *byte, name_len int, value *byte, value_len int, encode int) int {
 	return PhpUrlScannerAddVarImpl(name, name_len, value, value_len, encode, 0)
 }
@@ -1019,10 +1016,6 @@ func PhpUrlScannerResetVarsImpl(type_ int) {
 	if url_state.GetUrlApp().GetS() != nil {
 		url_state.GetUrlApp().GetS().GetLen() = 0
 	}
-}
-func PhpUrlScannerResetSessionVars() int {
-	PhpUrlScannerResetVarsImpl(1)
-	return types.SUCCESS
 }
 func PhpUrlScannerResetVars() int {
 	PhpUrlScannerResetVarsImpl(0)

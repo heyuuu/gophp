@@ -20,22 +20,22 @@ func (this *ArgSeparators) GetInput() *byte  { return this.input }
  * PhpCoreGlobals
  */
 type PhpCoreGlobals struct {
-	implicit_flush              types.ZendBool
+	implicit_flush              bool
 	output_buffering            zend.ZendLong
-	enable_dl                   types.ZendBool
+	enable_dl                   bool
 	output_handler              *byte
 	unserialize_callback_func   *byte
 	serialize_precision         zend.ZendLong
 	memory_limit                zend.ZendLong
 	max_input_time              zend.ZendLong
-	track_errors                types.ZendBool
-	display_errors              types.ZendBool
-	display_startup_errors      types.ZendBool
-	log_errors                  types.ZendBool
+	track_errors                bool
+	display_errors              bool
+	display_startup_errors      bool
+	log_errors                  bool
 	log_errors_max_len          zend.ZendLong
-	ignore_repeated_errors      types.ZendBool
-	ignore_repeated_source      types.ZendBool
-	report_memleaks             types.ZendBool
+	ignore_repeated_errors      bool
+	ignore_repeated_source      bool
+	report_memleaks             bool
 	error_log                   *byte
 	doc_root                    *byte
 	user_dir                    *byte
@@ -57,25 +57,25 @@ type PhpCoreGlobals struct {
 	variables_order             *byte
 	rfc1867_protected_variables types.Array
 	connection_status           int16
-	ignore_user_abort           types.ZendBool
+	ignore_user_abort           bool
 	header_is_being_sent        uint8
 	tick_functions              zend.ZendLlist
 	http_globals                []types.Zval
-	expose_php                  types.ZendBool
-	register_argc_argv          types.ZendBool
-	auto_globals_jit            types.ZendBool
+	expose_php                  bool
+	register_argc_argv          bool
+	auto_globals_jit            bool
 	docref_root                 *byte
 	docref_ext                  *byte
-	html_errors                 types.ZendBool
-	xmlrpc_errors               types.ZendBool
+	html_errors                 bool
+	xmlrpc_errors               bool
 	xmlrpc_error_number         zend.ZendLong
 	activated_auto_globals      []types.ZendBool
-	modules_activated           types.ZendBool
-	file_uploads                types.ZendBool
-	during_request_startup      types.ZendBool
-	allow_url_fopen             types.ZendBool
-	enable_post_data_reading    types.ZendBool
-	report_zend_debug           types.ZendBool
+	modules_activated           bool
+	file_uploads                bool
+	during_request_startup      bool
+	allow_url_fopen             bool
+	enable_post_data_reading    bool
+	report_zend_debug           bool
 	last_error_type             int
 	last_error_message          *byte
 	last_error_file             *byte
@@ -83,19 +83,19 @@ type PhpCoreGlobals struct {
 	php_sys_temp_dir            *byte
 	disable_functions           *byte
 	disable_classes             *byte
-	allow_url_include           types.ZendBool
+	allow_url_include           bool
 	max_input_nesting_level     zend.ZendLong
 	max_input_vars              zend.ZendLong
-	in_user_include             types.ZendBool
+	in_user_include             bool
 	user_ini_filename           *byte
 	user_ini_cache_ttl          zend.ZendLong
 	request_order               *byte
-	mail_x_header               types.ZendBool
+	mail_x_header               bool
 	mail_log                    *byte
-	in_error_log                types.ZendBool
+	in_error_log                bool
 	syslog_facility             zend.ZendLong
 	syslog_ident                *byte
-	have_called_openlog         types.ZendBool
+	have_called_openlog         bool
 	syslog_filter               zend.ZendLong
 }
 
