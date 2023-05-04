@@ -68,12 +68,6 @@ func ZvalCallDestructor(zv *types.Zval) int {
 		return types.ArrayApplyKeep
 	}
 }
-func ZendUncleanZvalPtrDtor(zv *types.Zval) {
-	if zv.IsIndirect() {
-		zv = zv.Indirect()
-	}
-	// IZvalPtrDtor(zv)
-}
 func ZendThrowOrError(fetch_type int, exception_ce *types.ClassEntry, format string, args ...any) {
 	message := ZendSprintf(format, args)
 	if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
@@ -83,9 +77,6 @@ func ZendThrowOrError(fetch_type int, exception_ce *types.ClassEntry, format str
 	}
 }
 func ShutdownDestructors() {
-	if CG__().GetUncleanShutdown() != 0 {
-		EG__().GetSymbolTable().SetPDestructor(ZendUncleanZvalPtrDtor)
-	}
 	faults.TryCatch(func() {
 		var symbols uint32
 		for {

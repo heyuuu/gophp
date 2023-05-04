@@ -4,7 +4,6 @@ import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
-	"runtime"
 	"sort"
 )
 
@@ -119,7 +118,6 @@ type Array struct {
 	elementsCount   uint32
 	internalPointer uint32
 	nextFreeElement int
-	destructor      DtorFuncT
 
 	data    []Bucket            // 实际存储数据的地方
 	indexes map[ArrayKey]uint32 // 索引到具体位置的映射
@@ -139,17 +137,12 @@ func NewArray(size int) *Array {
 	return ht
 }
 func (ht *Array) Init(size int) {
-	ht.InitEx(size, nil)
-}
-func (ht *Array) InitEx(size int, pDestructor DtorFuncT) {
 	var data []Bucket
 	if size > 0 {
 		data = make([]Bucket, 0, size)
 	}
 
 	*ht = Array{
-		destructor: pDestructor,
-
 		// 数据存储
 		data:    data,
 		indexes: make(map[ArrayKey]uint32), // todo 改为 nil，延迟初始化
@@ -158,11 +151,6 @@ func (ht *Array) InitEx(size int, pDestructor DtorFuncT) {
 	// GC 信息
 	ht.SetRefcount(1)
 	ht.SetGcTypeInfo(uint32(IS_ARRAY))
-
-	// 析构函数
-	if pDestructor != nil {
-		runtime.SetFinalizer(ht, ht.DestroyEx)
-	}
 }
 
 /* init */
@@ -170,7 +158,6 @@ func (ht *Array) SetBy(arr *Array) {
 	ht.flags = arr.flags
 	ht.elementsCount = arr.elementsCount
 	ht.nextFreeElement = arr.nextFreeElement
-	ht.destructor = arr.destructor
 
 	ht.data = arr.data
 	ht.indexes = arr.indexes
@@ -251,13 +238,6 @@ func (ht *Array) deleteBucket(pos uint32) {
 		if ht.internalPointer == pos {
 			ht.internalPointer = newIdx
 		}
-	}
-
-	// 析构函数
-	if ht.destructor != nil {
-		var tmp Zval
-		ZVAL_COPY_VALUE(&tmp, p.GetVal())
-		ht.destructor(&tmp)
 	}
 
 	// 设置数据不可用
@@ -366,8 +346,6 @@ func (ht *Array) SetNNumOfElements(value uint32) { ht.elementsCount = value }
 func (ht *Array) GetNInternalPointer() uint32    { return ht.internalPointer }
 func (ht *Array) GetNNextFreeElement() int       { return ht.nextFreeElement }
 func (ht *Array) SetNNextFreeElement(value int)  { ht.nextFreeElement = value }
-func (ht *Array) GetPDestructor() DtorFuncT      { return ht.destructor }
-func (ht *Array) SetPDestructor(value DtorFuncT) { ht.destructor = value }
 
 func (ht *Array) Count() int {
 	var num int
@@ -509,28 +487,11 @@ func (ht *Array) Max(comparer ArrayComparer) *ArrayPair {
  */
 func (ht *Array) Clean() {
 	ht.assertRc1()
-	if ht.elementsCount != 0 && ht.destructor != nil {
-		ht.eachValidBucket(func(pos uint32, p *Bucket) {
-			ht.destructor(p.GetVal())
-		})
-	}
 	ht.clearData()
 }
 
-func (ht *Array) Destroy() {
-	if ht.elementsCount != 0 && ht.destructor != nil {
-		ht.eachValidBucket(func(pos uint32, p *Bucket) {
-			ht.destructor(p.GetVal())
-		})
-	}
-}
-
-func (ht *Array) DestroyEx() {
-	/* break possible cycles */
-	//GC_REMOVE_FROM_BUFFER(ht)
-	//ht.SetGcTypeInfo(IS_NULL)
-	ht.Destroy()
-}
+func (ht *Array) Destroy()   { ht.Clean() }
+func (ht *Array) DestroyEx() { ht.Clean() }
 
 func (ht *Array) GracefulReverseDestroy() {
 	ht.assertRc1()
@@ -595,9 +556,6 @@ func (ht *Array) KeyAddIndirect(key string, pData *Zval) *Zval {
 		} else {
 			return nil
 		}
-		if ht.GetPDestructor() != nil {
-			ht.GetPDestructor()(data)
-		}
 		data.CopyValueFrom(pData)
 		return data
 	}
@@ -611,9 +569,6 @@ func (ht *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 		b.Assert(data != pData)
 		if data.IsType(IS_INDIRECT) {
 			data = data.Indirect()
-		}
-		if ht.GetPDestructor() != nil {
-			ht.GetPDestructor()(data)
 		}
 		data.CopyValueFrom(pData)
 		return data
@@ -630,14 +585,7 @@ func (ht *Array) KeyDeleteIndirect(key string) bool {
 			if data.IsType(IS_UNDEF) {
 				return false
 			} else {
-				if ht.GetPDestructor() != nil {
-					var tmp Zval
-					ZVAL_COPY_VALUE(&tmp, data)
-					data.SetUndef()
-					ht.GetPDestructor()(&tmp)
-				} else {
-					data.SetUndef()
-				}
+				data.SetUndef()
 				ht.MarkHasEmptyIndex()
 			}
 		} else {

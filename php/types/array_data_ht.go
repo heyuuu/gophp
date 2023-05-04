@@ -12,7 +12,6 @@ type ArrayDataHt struct {
 	elementsCount   uint32
 	internalPointer uint32
 	nextFreeElement int
-	destructor      DtorFuncT
 	data            []Bucket            // 实际存储数据的地方
 	indexes         map[ArrayKey]uint32 // 索引到具体位置的映射
 
@@ -48,9 +47,6 @@ func (ht *ArrayDataHt) Update(key ArrayKey, data *Zval) {
 		p := ht.data[pos]
 		oldData := p.GetVal()
 		b.Assert(oldData != data)
-		if ht.destructor != nil {
-			ht.destructor(oldData)
-		}
 		p.SetVal(data)
 		return
 	}
@@ -76,13 +72,6 @@ func (ht *ArrayDataHt) Push(data *Zval) int {
 }
 func (ht *ArrayDataHt) Clean() {
 	ht.assertWritable()
-
-	// destructor
-	if ht.elementsCount != 0 && ht.destructor != nil {
-		ht.eachValidBucket(func(pos uint32, p *Bucket) {
-			ht.destructor(p.GetVal())
-		})
-	}
 
 	// clear data
 	ht.elementsCount = 0
@@ -152,13 +141,6 @@ func (ht *ArrayDataHt) deleteBucket(pos uint32) {
 		if ht.internalPointer == pos {
 			ht.internalPointer = newIdx
 		}
-	}
-
-	// 析构函数
-	if ht.destructor != nil {
-		var tmp Zval
-		tmp.CopyValueFrom(p.GetVal())
-		ht.destructor(&tmp)
 	}
 
 	// 设置数据不可用

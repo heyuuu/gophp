@@ -163,7 +163,6 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 
 		/* Incrementing the refcount of obj and inf would confuse the garbage collector.
 		 * Prefer to null the destructor */
-		&tmp.Array().SetPDestructor(nil)
 		zend.AddAssocZvalEx(&tmp, "obj", element.GetObj())
 		zend.AddAssocZvalEx(&tmp, "inf", element.GetInf())
 		storage.Array().KeyUpdate(md5str, &tmp)

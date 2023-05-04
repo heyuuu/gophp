@@ -149,7 +149,6 @@ func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong,
 
 	/* replace HashTable data */
 
-	in_hash.SetPDestructor(nil)
 	in_hash.Destroy()
 
 	in_hash.SetBy(out_hash)
@@ -265,7 +264,6 @@ func ZifArrayUnshift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval
 
 	/* replace HashTable data */
 
-	stack.Array().SetPDestructor(nil)
 	stack.Array().Destroy()
 
 	stack.Array().SetBy(new_hash)

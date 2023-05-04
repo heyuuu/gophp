@@ -54,9 +54,6 @@ func ZendObjectStdDtor(object *types.ZendObject) {
 			FREE_HASHTABLE(guards)
 		}
 	}
-	if (object.GetGcFlags() & types.IS_OBJ_WEAKLY_REFERENCED) != 0 {
-		//ZendWeakrefsNotify(object)
-	}
 }
 func ZendObjectsDestroyObject(object *types.ZendObject) {
 	var destructor types.IFunction = object.GetCe().GetDestructor()
