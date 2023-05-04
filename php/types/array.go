@@ -167,7 +167,7 @@ func (ht *Array) SetBy(arr *Array) {
 
 // 实际元素个数，从使用者角度的数组大小
 func (ht *Array) Len() int                  { return ht.data0.Len() }
-func (ht *Array) Cap() int                  { return cap(ht.data) }
+func (ht *Array) Cap() int                  { return ht.data0.Cap() }
 func (ht *Array) Bucket(pos uint32) *Bucket { return &ht.data[pos] }
 
 /* data -> Array.data */

@@ -22,6 +22,7 @@ type ArrayDataHt struct {
 func (ht *ArrayDataHt) HasIndirect() bool { return ht.hasIndirect }
 
 func (ht *ArrayDataHt) Len() int { return int(ht.elementsCount) }
+func (ht *ArrayDataHt) Cap() int { return len(ht.data) }
 func (ht *ArrayDataHt) Exists(key ArrayKey) bool {
 	_, ok := ht.indexes[key]
 	return ok
