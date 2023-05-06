@@ -754,12 +754,12 @@ func (ht *Array) Filter(handler func(key ArrayKey, value *Zval) bool) bool {
 }
 
 func (ht *Array) Iterator() *ArrayIterator {
-	htReader := ArrayLazyDup(ht)
+	htReader := ht.Copy()
 	return &ArrayIterator{ht: htReader, pos: 0}
 }
 
 func (ht *Array) IteratorEx(pos uint32) *ArrayIterator {
-	htReader := ArrayLazyDup(ht)
+	htReader := ht.Copy()
 	return &ArrayIterator{ht: htReader, pos: pos}
 }
 
@@ -939,4 +939,12 @@ func (ht *Array) MoveTailToHead() {
 
 func (ht *Array) Push(value *Zval) {
 	ht.Append(value)
+}
+
+func (ht *Array) Copy() *Array {
+	return ArrayLazyDup(ht)
+}
+
+func (ht *Array) CopyEx(cap int) *Array {
+	return ArrayLazyDup(ht)
 }

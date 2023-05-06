@@ -205,37 +205,44 @@ var DefZifArrayColumn = def.DefFunc("array_column", 2, 3, []def.ArgInfo{{Name: "
 })
 
 // generate by ZifArrayReverse
-var DefZifArrayReverse = def.DefFunc("array_reverse", 1, 2, []def.ArgInfo{{Name: "input"}, {Name: "preserve_keys"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayReverse = def.DefFunc("array_reverse", 1, 2, []def.ArgInfo{{Name: "array"}, {Name: "preserve_keys"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	input := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	fp.StartOptional()
-	preserve_keys := fp.ParseZval()
+	preserve_keys := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayReverse(executeData, returnValue, input, nil, preserve_keys)
+	ret := ZifArrayReverse(array, nil, preserve_keys)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArrayPad
-var DefZifArrayPad = def.DefFunc("array_pad", 3, 3, []def.ArgInfo{{Name: "arg"}, {Name: "pad_size"}, {Name: "pad_value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayPad = def.DefFunc("array_pad", 3, 3, []def.ArgInfo{{Name: "array"}, {Name: "pad_size"}, {Name: "pad_value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
-	arg := fp.ParseZval()
-	pad_size := fp.ParseZval()
+	array := fp.ParseArrayHt()
+	pad_size := fp.ParseLong()
 	pad_value := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayPad(executeData, returnValue, arg, pad_size, pad_value)
+	ret, ok := ZifArrayPad(array, pad_size, pad_value)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayFlip
-var DefZifArrayFlip = def.DefFunc("array_flip", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayFlip = def.DefFunc("array_flip", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayFlip(executeData, returnValue, arg)
+	ret := ZifArrayFlip(array)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArrayChangeKeyCase
@@ -247,7 +254,7 @@ var DefZifArrayChangeKeyCase = def.DefFunc("array_change_key_case", 1, 2, []def.
 	if fp.HasError() {
 		return
 	}
-	ZifArrayChangeKeyCase(executeData, returnValue, input, nil, case_)
+	ZifArrayChangeKeyCase(input, nil, case_)
 })
 
 // generate by ZifArrayUnique

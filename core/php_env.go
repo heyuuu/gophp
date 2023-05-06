@@ -74,5 +74,5 @@ func (env *EnvGlobals) LookupEnv(key string) (val string, exists bool) {
 }
 
 func (env *EnvGlobals) DupArray() *types.Array {
-	return types.ArrayLazyDup(env.table)
+	return env.table.Copy()
 }

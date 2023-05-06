@@ -13,7 +13,7 @@ func (zv *Zval) CopyFrom(v *Zval) {
 	zv.CopyValueFrom(v)
 	// 除数组外，基础类型都复制了值，引用类型都复制了指针；仅数组需要做写时复制
 	if v.IsArray() {
-		zv.SetArray(ArrayLazyDup(zv.Array()))
+		zv.SetArray(zv.Array().Copy())
 	}
 }
 func (zv *Zval) CopyOrDupFrom(v *Zval) {

@@ -2,9 +2,9 @@ package array
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
-	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -877,257 +877,91 @@ func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, i
 	}
 	return retArr, true
 }
-func ZifArrayReverse(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, _ zpp.Opt, preserveKeys *types.Zval) {
-	var input *types.Zval
-	var entry *types.Zval
-	var string_key *types.String
-	var num_key zend.ZendUlong
-	var preserve_keys = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			input = fp.ParseArray()
-			fp.StartOptional()
-			preserve_keys = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
+func ZifArrayReverse(array *types.Array, _ zpp.Opt, preserveKeys bool) *types.Array {
+	retArr := types.NewArray(array.Len())
+	array.ForeachReserve(func(key types.ArrayKey, value *types.Zval) {
+		if preserveKeys || key.IsStrKey() {
+			retArr.Add(key, value)
+		} else { // !preserveKeys && !key.IsStrKey()
+			retArr.Append(value)
 		}
-		break
-	}
-
-	/* Initialize return array */
-
-	zend.ArrayInitSize(return_value, input.Array().Len())
-	if input.Array().IsPacked() && preserve_keys == 0 {
-
-		fillScope := types.PackedFillStart(return_value.Array())
-		var __ht = input.Array()
-		for _, _p := range __ht.ForeachDataReserve() {
-			var _z types.Zval = _p.GetVal()
-
-			entry = _z
-			if entry.IsReference() && entry.GetRefcount() == 1 {
-				entry = types.Z_REFVAL_P(entry)
-			}
-			// entry.TryAddRefcount()
-			fillScope.FillSet(entry)
-			fillScope.FillNext()
-		}
-		fillScope.FillEnd()
-	} else {
-		var __ht = input.Array()
-		for _, _p := range __ht.ForeachDataReserve() {
-			var _z types.Zval = _p.GetVal()
-
-			num_key = _p.GetH()
-			string_key = _p.GetKey()
-			entry = _z
-			if string_key != nil {
-				entry = return_value.Array().KeyAddNew(string_key.GetStr(), entry)
-			} else {
-				if preserve_keys != 0 {
-					entry = return_value.Array().IndexAddNew(num_key, entry)
-				} else {
-					entry = return_value.Array().AppendNew(entry)
-				}
-			}
-			zend.ZvalAddRef(entry)
-		}
-	}
+	})
+	return retArr
 }
-func ZifArrayPad(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, padSize *types.Zval, padValue *types.Zval) {
-	var input *types.Zval
-	var pad_value *types.Zval
-	var pad_size zend.ZendLong
-	var pad_size_abs zend.ZendLong
-	var input_size zend.ZendLong
-	var num_pads zend.ZendLong
-	var i zend.ZendLong
-	var key *types.String
-	var value *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 3, 3, 0)
-			input = fp.ParseArray()
-			pad_size = fp.ParseLong()
-			pad_value = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
 
+const maxPadInOneTimes = 1048576
+
+func ZifArrayPad(array *types.Array, padSize int, padValue *types.Zval) (*types.Array, bool) {
 	/* Do some initial calculations */
-
-	input_size = input.Array().Len()
-	pad_size_abs = zend.ZEND_ABS(pad_size)
-	if pad_size_abs < 0 || pad_size_abs-input_size > int64(1048576) {
+	inputSize := array.Len()
+	padSizeAbs := padSize
+	if padSizeAbs < 0 {
+		padSizeAbs = -padSizeAbs
+	}
+	if padSizeAbs < 0 || padSizeAbs-inputSize > maxPadInOneTimes {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "You may only pad up to 1048576 elements at a time")
-		return_value.SetFalse()
-		return
+		return nil, false
 	}
-	if input_size >= pad_size_abs {
 
-		/* Copy the original array */
-
-		types.ZVAL_COPY(return_value, input)
-		return
+	/**
+	 * notice: 注意此处的差别:
+	 * - 当原数组的长度 >= padSize 时，返回数组保留了原数组包括内部指针等信息；
+	 * - 当原数组的长度 < padSize 时，产生的新数组内部指针等信息未设置(等于初始值)；
+	 */
+	if inputSize >= padSizeAbs {
+		return array.Copy(), true
 	}
-	num_pads = pad_size_abs - input_size
-	//if pad_value.IsRefcounted() {
-	//	pad_value.RefCounted().AddRefcountEx(num_pads)
-	//}
-	zend.ArrayInitSize(return_value, pad_size_abs)
-	if input.Array().IsPacked() {
 
-		if pad_size < 0 {
-			fillScope := types.PackedFillStart(return_value.Array())
-			for i = 0; i < num_pads; i++ {
-				fillScope.FillSet(pad_value)
-				fillScope.FillNext()
-			}
-			fillScope.FillEnd()
-		}
-		fillScope := types.PackedFillStart(return_value.Array())
-		var __ht = input.Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			value = _z
-			// value.TryAddRefcount()
-			fillScope.FillSet(value)
-			fillScope.FillNext()
-		}
-		fillScope.FillEnd()
-		if pad_size > 0 {
-			fillScope := types.PackedFillStart(return_value.Array())
-			for i = 0; i < num_pads; i++ {
-				fillScope.FillSet(pad_value)
-				fillScope.FillNext()
-			}
-			fillScope.FillEnd()
-		}
-	} else {
-		if pad_size < 0 {
-			for i = 0; i < num_pads; i++ {
-				return_value.Array().AppendNew(pad_value)
-			}
-		}
-		var __ht = input.Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.Indirect()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			key = _p.GetKey()
-			value = _z
-			// value.TryAddRefcount()
-			if key != nil {
-				return_value.Array().KeyAddNew(key.GetStr(), value)
-			} else {
-				return_value.Array().AppendNew(value)
-			}
-		}
-		if pad_size > 0 {
-			for i = 0; i < num_pads; i++ {
-				return_value.Array().AppendNew(pad_value)
-			}
+	numPads := padSizeAbs - inputSize
+	retArr := types.NewArray(padSizeAbs)
+	if padSize < 0 {
+		for i := 0; i < numPads; i++ {
+			retArr.Append(padValue)
 		}
 	}
+	array.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+		if key.IsStrKey() {
+			retArr.KeyAdd(key.StrKey(), value)
+		} else {
+			retArr.Append(value)
+		}
+	})
+	if padSize > 0 {
+		for i := 0; i < numPads; i++ {
+			retArr.Append(padValue)
+		}
+	}
+	return retArr, true
 }
-func ZifArrayFlip(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
-	var array *types.Zval
-	var entry *types.Zval
-	var data types.Zval
-	var num_idx zend.ZendUlong
-	var str_idx *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			array = fp.ParseArray()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ArrayInitSize(return_value, array.Array().Len())
-	var __ht = array.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		num_idx = _p.GetH()
-		str_idx = _p.GetKey()
-		entry = _z
-		entry = types.ZVAL_DEREF(entry)
-		if entry.IsType(types.IS_LONG) {
-			if str_idx != nil {
-				data.SetStringCopy(str_idx)
-			} else {
-				data.SetLong(num_idx)
-			}
-			return_value.Array().IndexUpdate(entry.Long(), &data)
-		} else if entry.IsString() {
-			if str_idx != nil {
-				data.SetStringCopy(str_idx)
-			} else {
-				data.SetLong(num_idx)
-			}
-			return_value.Array().SymtableUpdate(entry.String().GetStr(), &data)
+func ZifArrayFlip(array *types.Array) *types.Array {
+	retArr := types.NewArray(array.Len())
+	array.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		value = value.DeRef()
+		if value.IsLong() {
+			retArr.IndexUpdate(value.Long(), key.ToZval())
+		} else if value.IsString() {
+			retArr.SymtableUpdate(value.StringVal(), key.ToZval())
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Can only flip STRING and INTEGER values!")
 		}
-	}
+	})
+	return retArr
 }
-func ZifArrayChangeKeyCase(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, _ zpp.Opt, case_ *types.Zval) {
-	var array *types.Zval
-	var entry *types.Zval
-	var string_key *types.String
-	var new_key *types.String
-	var num_key zend.ZendUlong
-	var change_to_upper = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			array = fp.ParseArray()
-			fp.StartOptional()
-			change_to_upper = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ArrayInitSize(return_value, array.Array().Len())
-	var __ht = array.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		num_key = _p.GetH()
-		string_key = _p.GetKey()
-		entry = _z
-		if string_key == nil {
-			entry = return_value.Array().IndexUpdate(num_key, entry)
-		} else {
-			if change_to_upper != 0 {
-				new_key = str.PhpStringToupper(string_key)
+func ZifArrayChangeKeyCase(array *types.Array, _ zpp.Opt, case_ *int) *types.Array {
+	var caseFlag = b.Option(case_, CASE_LOWER)
+	retArr := types.NewArray(array.Len())
+	array.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		if key.IsStrKey() {
+			if caseFlag == CASE_LOWER {
+				key = types.StrKey(ascii.StrToLower(key.StrKey()))
 			} else {
-				new_key = str.PhpStringTolower(string_key)
+				key = types.StrKey(ascii.StrToUpper(key.StrKey()))
 			}
-			entry = return_value.Array().KeyUpdate(new_key.GetStr(), entry)
-			// types.ZendStringReleaseEx(new_key, 0)
 		}
-		zend.ZvalAddRef(entry)
-	}
+
+		retArr.Update(key, value)
+	})
+	return retArr
 }
 func ZifArrayUnique(arg *types.Array, _ zpp.Opt, flags *int) *types.Array {
 	var sortType = b.Option(flags, PHP_SORT_STRING)
