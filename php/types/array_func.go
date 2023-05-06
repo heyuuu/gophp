@@ -349,13 +349,6 @@ func ZendHashStrAddEmptyElement(ht *Array, str string) *Zval {
 	(&dummy).SetUndef()
 	return ht.KeyAdd(str, &dummy)
 }
-func ZendHashDelBucket(ht *Array, p *Bucket) {
-	ht.assertRc1()
-	// todo 调整为传入 pos 更合适
-	if pos, ok := ht.posBucket(p); ok {
-		ht.deleteBucket(pos)
-	}
-}
 func ZendHashDel(ht *Array, key string) int {
 	if ht.KeyDelete(key) {
 		return SUCCESS
@@ -383,7 +376,6 @@ func ZendHashIndexDel(ht *Array, h zend.ZendUlong) int {
 }
 
 func ZendHashCopy(target *Array, source *Array) {
-	target.assertRc1()
 	source.ForeachIndirect(func(key ArrayKey, value *Zval) {
 		target.Update(key, value)
 	})
@@ -404,14 +396,13 @@ func ZendArrayDup(source *Array) *Array {
 	return target
 }
 func ZendHashMerge(target *Array, source *Array, overwrite bool) {
-	target.assertRc1()
 	if overwrite {
-		source.EachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
-			target.UpdateIndirect(p.GetArrayKey(), data)
+		source.ForeachIndirect(func(key ArrayKey, value *Zval) {
+			target.UpdateIndirect(key, value)
 		})
 	} else {
-		source.EachValidBucketIndirect(func(pos uint32, p *Bucket, s *Zval) {
-			target.AddIndirect(p.GetArrayKey(), s)
+		source.ForeachIndirect(func(key ArrayKey, value *Zval) {
+			target.AddIndirect(key, value)
 		})
 	}
 }

@@ -172,77 +172,7 @@ func (ht *Array) Len() int                  { return ht.data0.Len() }
 func (ht *Array) Cap() int                  { return ht.data0.Cap() }
 func (ht *Array) Bucket(pos uint32) *Bucket { return &ht.data[pos] }
 
-/* data -> Array.data */
-func (ht *Array) clearData() {
-	ht.assertRc1()
-
-	ht.elementsCount = 0
-	ht.internalPointer = 0
-	ht.nextFreeElement = 0
-	ht.data = nil
-	ht.indexes = make(map[ArrayKey]uint32)
-}
-func (ht *Array) deleteBucket(pos uint32) {
-	ht.assertRc1()
-	assert(int(pos) < len(ht.data))
-
-	var p = &ht.data[pos]
-	assert(p.IsValid())
-
-	// 移除映射
-	delete(ht.indexes, p.key)
-
-	// 减少有效元素
-	ht.elementsCount--
-
-	// 更新内部指针和遍历器指针
-	if ht.internalPointer == pos {
-		var newIdx = ht.validPosVal(pos + 1)
-		if ht.internalPointer == pos {
-			ht.internalPointer = newIdx
-		}
-	}
-
-	// 设置数据不可用
-	p.GetVal().SetUndef()
-
-	// 若删除队尾元素，尝试清除 data 队尾无用数据
-	dataSize := uint32(len(ht.data))
-	if pos == dataSize-1 {
-		newDataSize := dataSize
-		for newDataSize > 0 && !ht.data[newDataSize-1].IsValid() {
-			newDataSize--
-		}
-
-		ht.data = ht.data[:newDataSize]
-		if ht.internalPointer > newDataSize {
-			ht.internalPointer = newDataSize
-		}
-	}
-}
-
-func (ht *Array) posBucket(p *Bucket) (uint32, bool) {
-	if pos, ok := ht.indexes[p.key]; ok {
-		return pos, true
-	} else {
-		return 0, false
-	}
-}
-
-// 移动 bucket 到新位置
-func (ht *Array) moveBucket(pos uint32, newPos uint32) {
-	assert(newPos <= pos)
-	if newPos == pos {
-		return
-	}
-	(&ht.data[newPos]).CopyFrom(&ht.data[pos])
-	if ht.internalPointer == pos {
-		ht.internalPointer = newPos
-	}
-}
-
 /* misc */
-func (ht *Array) assertRc1()      { assert(ht.GetRefcount() == 1) }
 func (ht *Array) assertWritable() { assert(ht.GetRefcount() == 1) }
 
 /** Array.flags */
@@ -280,19 +210,17 @@ func (ht *Array) MapWithKey(mapper func(key ArrayKey, value *Zval) (ArrayKey, *Z
 		newKey, newValue := mapper(key, value)
 		arr.Add(newKey, newValue)
 	})
+	ht.ResetInternalPointer()
 	return arr
 }
 
 /**
  * Open methods
  */
-func (ht *Array) GetArData() *Bucket             { return ht.arData }
-func (ht *Array) DataSize() uint32               { return uint32(len(ht.data)) }
-func (ht *Array) GetNNumUsed() uint32            { return ht.DataSize() }
-func (ht *Array) SetNNumOfElements(value uint32) { ht.elementsCount = value }
-func (ht *Array) GetNInternalPointer() uint32    { return ht.internalPointer }
-func (ht *Array) GetNNextFreeElement() int       { return ht.nextFreeElement }
-func (ht *Array) SetNNextFreeElement(value int)  { ht.nextFreeElement = value }
+func (ht *Array) GetArData() *Bucket          { return ht.arData }
+func (ht *Array) GetNNumUsed() uint32         { return uint32(ht.Len()) }
+func (ht *Array) GetNInternalPointer() uint32 { return ht.internalPointer }
+func (ht *Array) GetNNextFreeElement() int    { return ht.nextFreeElement }
 
 func (ht *Array) Count() int {
 	var num int
@@ -407,7 +335,7 @@ type ArrayLessComparer func(p1, p2 ArrayPair) bool
 type ArrayComparer func(p1, p2 ArrayPair) int
 
 func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
-	ht.assertRc1()
+	ht.assertWritable()
 
 	if ht.elementsCount == 0 || (ht.elementsCount == 1 && !renumber) {
 		return
@@ -468,8 +396,13 @@ func (ht *Array) Max(comparer ArrayComparer) *ArrayPair {
  * Clean && Destroy
  */
 func (ht *Array) Clean() {
-	ht.assertRc1()
-	ht.clearData()
+	ht.assertWritable()
+
+	ht.elementsCount = 0
+	ht.internalPointer = 0
+	ht.nextFreeElement = 0
+	ht.data = nil
+	ht.indexes = make(map[ArrayKey]uint32)
 }
 
 func (ht *Array) Destroy()   { ht.Clean() }
@@ -515,56 +448,43 @@ func (ht *Array) KeyExistsIndirect(key string) bool {
 	return true
 }
 func (ht *Array) KeyAddIndirect(key string, pData *Zval) *Zval {
-	ht.assertRc1()
+	ht.assertWritable()
 
-	if data := ht.KeyFind(key); data != nil {
+	if data := ht.KeyFind(key); data != nil && data.IsIndirect() {
 		b.Assert(data != pData)
-		if data.IsIndirect() {
-			data = data.Indirect()
-			if !data.IsUndef() {
-				return nil
-			}
-		} else {
+		if !data.Indirect().IsUndef() {
 			return nil
 		}
-		data.CopyValueFrom(pData)
+		data.SetIndirect(pData)
 		return data
 	}
 
 	return ht.Add(StrKey(key), pData)
 }
 func (ht *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
-	ht.assertRc1()
+	ht.assertWritable()
 
-	if data := ht.KeyFind(key); data != nil {
+	if data := ht.KeyFind(key); data != nil && data.IsIndirect() {
 		b.Assert(data != pData)
-		if data.IsType(IS_INDIRECT) {
-			data = data.Indirect()
-		}
-		data.CopyValueFrom(pData)
+		data.SetIndirect(pData)
 		return data
 	}
 
 	return ht.Update(StrKey(key), pData)
 }
 func (ht *Array) KeyDeleteIndirect(key string) bool {
-	ht.assertRc1()
-	if pos, ok := ht.indexes[StrKey(key)]; ok {
-		var p = &ht.data[pos]
-		if p.GetVal().IsType(IS_INDIRECT) {
-			var data *Zval = p.GetVal().Indirect()
-			if data.IsType(IS_UNDEF) {
-				return false
-			} else {
-				data.SetUndef()
-				ht.MarkHasEmptyIndex()
-			}
-		} else {
-			ht.deleteBucket(pos)
+	ht.assertWritable()
+
+	if data := ht.KeyFind(key); data != nil && data.IsIndirect() {
+		if data.Indirect().IsUndef() {
+			return false
 		}
+		data.Indirect().SetUndef()
+		ht.MarkHasEmptyIndex()
 		return true
 	}
-	return false
+
+	return ht.KeyDelete(key)
 }
 
 /**
@@ -574,7 +494,7 @@ func (ht *Array) KeyDeleteIndirect(key string) bool {
 func (ht *Array) Exists(key ArrayKey) bool { return ht.data0.Exists(key) }
 func (ht *Array) Find(key ArrayKey) *Zval  { return ht.data0.Find(key) }
 func (ht *Array) Add(key ArrayKey, pData *Zval) *Zval {
-	ht.assertRc1()
+	ht.assertWritable()
 	ok := ht.data0.Add(key, pData)
 	if !ok {
 		return nil
@@ -584,7 +504,7 @@ func (ht *Array) Add(key ArrayKey, pData *Zval) *Zval {
 
 func (ht *Array) AddNew(key ArrayKey, pData *Zval) *Zval {
 	// todo 此操作要求提前确认 key 不冲突
-	ht.assertRc1()
+	ht.assertWritable()
 	return ht.Add(key, pData)
 }
 
@@ -597,7 +517,7 @@ func (ht *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
 }
 
 func (ht *Array) Update(key ArrayKey, pData *Zval) *Zval {
-	ht.assertRc1()
+	ht.assertWritable()
 	ht.data0.Update(key, pData)
 	return ht.data0.Find(key)
 }
@@ -611,18 +531,18 @@ func (ht *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
 }
 
 func (ht *Array) Delete(key ArrayKey) bool {
-	ht.assertRc1()
+	ht.assertWritable()
 	return ht.data0.Delete(key)
 }
 
 func (ht *Array) Append(pData *Zval) *Zval {
-	ht.assertRc1()
+	ht.assertWritable()
 	idx := ht.data0.Push(pData)
 	return ht.IndexFind(idx)
 }
 func (ht *Array) AppendNew(pData *Zval) *Zval {
 	// todo 此操作要求提前确认 key 不冲突
-	ht.assertRc1()
+	ht.assertWritable()
 	return ht.Append(pData)
 }
 
@@ -737,20 +657,6 @@ func (ht *Array) IteratorEx(pos uint32) *ArrayIterator {
 // todo 逐渐替换为 Foreach 或其他更高效代码
 func (ht *Array) ForeachData() []*Bucket {
 	panic("todo replace")
-}
-
-func (ht *Array) EachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
-	for i, _ := range ht.data {
-		p := &ht.data[i]
-		data := p.GetVal()
-		if data.IsIndirect() {
-			data = data.Indirect()
-		}
-		if data.IsUndef() {
-			return
-		}
-		handler(uint32(i), p, data)
-	}
 }
 
 /**

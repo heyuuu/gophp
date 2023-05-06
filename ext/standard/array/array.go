@@ -782,9 +782,6 @@ func ZifArrayShift(stack zpp.RefArray) {
 		}
 		return key, value
 	})
-
-	// reset internal pointer
-	stack.Array().ResetInternalPointer()
 }
 func ZifArrayUnshift(stack zpp.RefZval, values []*types.Zval) int {
 	newArr := types.NewArray(stack.Array().Len() + len(values))
@@ -1660,7 +1657,6 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 	/* Restructure the arrays based on sorted indirect - this is mostly taken from zend_hash_sort() function. */
 	for i, array := range arrays {
 		newHash := types.NewArray(array.Array().Len())
-		//newHash.SetNInternalPointer(0)
 		for idx := 0; idx < arraySize; idx++ {
 			pair := matrix[idx][i]
 			if pair.GetKey().IsStrKey() {
@@ -1669,7 +1665,6 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 				newHash.Append(pair.GetVal())
 			}
 		}
-		newHash.SetNNextFreeElement(arraySize)
 	}
 
 	return true
