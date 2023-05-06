@@ -247,8 +247,6 @@ func (ht *Array) assertWritable() { assert(ht.GetRefcount() == 1) }
 
 /** Array.flags */
 func (ht *Array) CopyFlags(arr *Array) { ht.flags = arr.flags }
-
-func (ht *Array) IsPacked() bool       { return ht.flags&HASH_FLAG_PACKED != 0 }
 func (ht *Array) HasEmptyIndex() bool  { return ht.flags&HASH_FLAG_HAS_EMPTY_IND != 0 }
 func (ht *Array) MarkHasEmptyIndex()   { ht.flags |= HASH_FLAG_HAS_EMPTY_IND }
 func (ht *Array) UnmarkHasEmptyIndex() { ht.flags &^= HASH_FLAG_HAS_EMPTY_IND }
@@ -752,37 +750,6 @@ func (ht *Array) EachValidBucketIndirect(handler func(pos uint32, p *Bucket, dat
 			return
 		}
 		handler(uint32(i), p, data)
-	}
-}
-
-func (ht *Array) applyValidBucket(apply_func func(p *Bucket) int) {
-	for i, _ := range ht.data {
-		p := &ht.data[i]
-		if p.IsValid() {
-			continue
-		}
-		result := apply_func(p)
-		if b.FlagMatch(result, ArrayApplyRemove) {
-			ht.deleteBucket(uint32(i))
-		}
-		if b.FlagMatch(result, ArrayApplyStop) {
-			break
-		}
-	}
-}
-func (ht *Array) applyValidBucketReserve(apply_func func(p *Bucket) int) {
-	for i := len(ht.data) - 1; i >= 0; i-- {
-		p := &ht.data[i]
-		if p.IsValid() {
-			continue
-		}
-		result := apply_func(p)
-		if b.FlagMatch(result, ArrayApplyRemove) {
-			ht.deleteBucket(uint32(i))
-		}
-		if b.FlagMatch(result, ArrayApplyStop) {
-			break
-		}
 	}
 }
 

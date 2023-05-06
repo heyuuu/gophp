@@ -382,28 +382,10 @@ func ZendHashIndexDel(ht *Array, h zend.ZendUlong) int {
 	return FAILURE
 }
 
-func ZendHashApply(ht *Array, apply_func ApplyFuncT) {
-	ht.applyValidBucket(func(p *Bucket) int {
-		return apply_func(p.GetVal())
-	})
-}
-func ZendHashApplyWithArguments(ht *Array, apply_func ApplyFuncArgsT, num_args int, args ...any) {
-	ht.applyValidBucket(func(p *Bucket) int {
-		return apply_func(p.GetVal(), num_args, args, &p.key)
-	})
-}
-func ZendHashReverseApply(ht *Array, apply_func ApplyFuncT) {
-	ht.applyValidBucketReserve(func(p *Bucket) int {
-		return apply_func(p.GetVal())
-	})
-}
-func ZendHashCopy(target *Array, source *Array, pCopyConstructor CopyCtorFuncT) {
+func ZendHashCopy(target *Array, source *Array) {
 	target.assertRc1()
-	source.EachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
-		var newEntry = target.Update(p.key, data)
-		if pCopyConstructor != nil {
-			pCopyConstructor(newEntry)
-		}
+	source.ForeachIndirect(func(key ArrayKey, value *Zval) {
+		target.Update(key, value)
 	})
 }
 
@@ -421,21 +403,15 @@ func ZendArrayDup(source *Array) *Array {
 
 	return target
 }
-func ZendHashMerge(target *Array, source *Array, pCopyConstructor CopyCtorFuncT, overwrite ZendBool) {
+func ZendHashMerge(target *Array, source *Array, overwrite bool) {
 	target.assertRc1()
-	if overwrite != 0 {
+	if overwrite {
 		source.EachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
-			var t = target.UpdateIndirect(p.GetArrayKey(), data)
-			if pCopyConstructor != nil {
-				pCopyConstructor(t)
-			}
+			target.UpdateIndirect(p.GetArrayKey(), data)
 		})
 	} else {
 		source.EachValidBucketIndirect(func(pos uint32, p *Bucket, s *Zval) {
-			var t = target.AddIndirect(p.GetArrayKey(), s)
-			if t != nil && pCopyConstructor != nil {
-				pCopyConstructor(t)
-			}
+			target.AddIndirect(p.GetArrayKey(), s)
 		})
 	}
 }

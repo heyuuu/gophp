@@ -1050,7 +1050,7 @@ func ZifArrayReplace(arrays []*types.Zval) *types.Zval {
 
 	dest := arrayHts[0].Copy()
 	for _, array := range arrayHts[1:] {
-		types.ZendHashMerge(dest, array, zend.ZvalAddRef, 1)
+		types.ZendHashMerge(dest, array, true)
 	}
 	return types.NewZvalArray(dest)
 }

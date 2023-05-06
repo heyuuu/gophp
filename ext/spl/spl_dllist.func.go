@@ -322,7 +322,7 @@ func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.Array {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
 	debug_info = types.NewArray(1)
-	types.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), types.CopyCtorFuncT(zend.ZvalAddRef))
+	types.ZendHashCopy(debug_info, intern.GetStd().GetProperties())
 	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "flags")
 	tmp.SetLong(intern.GetFlags())
 	debug_info.KeyAdd(pnstr.GetStr(), &tmp)

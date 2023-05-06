@@ -63,9 +63,8 @@ func PrintModules() {
 		core.PhpPrintf("%s\n", module.GetName())
 	}
 }
-func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
+func PrintExtensionInfo(ext *zend.ZendExtension, arg any) {
 	core.PhpPrintf("%s\n", ext.GetName())
-	return types.ArrayApplyKeep
 }
 func PrintExtensions() {
 	elements := zend.ZendExtensions.ElementsData()

@@ -96,7 +96,7 @@ func (this *PhpCliServerRequest) GetPathInfoLen() int             { return this.
 func (this *PhpCliServerRequest) SetPathInfoLen(value int)        { this.path_info_len = value }
 func (this *PhpCliServerRequest) GetQueryString() *byte           { return this.query_string }
 func (this *PhpCliServerRequest) GetQueryStringLen() int          { return this.query_string_len }
-func (this *PhpCliServerRequest) GetHeaders() types.Array         { return this.headers }
+func (this *PhpCliServerRequest) GetHeaders() *types.Array        { return &this.headers }
 func (this *PhpCliServerRequest) GetHeadersOriginalCase() types.Array {
 	return this.headers_original_case
 }
@@ -246,11 +246,11 @@ func (this *PhpCliServerClient) GetCurrentHeaderValueLen() int     { return this
 func (this *PhpCliServerClient) SetCurrentHeaderValueLen(value int) {
 	this.current_header_value_len = value
 }
-func (this *PhpCliServerClient) GetLastHeaderElement() int       { return this.last_header_element }
-func (this *PhpCliServerClient) SetLastHeaderElement(value int)  { this.last_header_element = value }
-func (this *PhpCliServerClient) GetPostReadOffset() int          { return this.post_read_offset }
-func (this *PhpCliServerClient) SetPostReadOffset(value int)     { this.post_read_offset = value }
-func (this *PhpCliServerClient) GetRequest() PhpCliServerRequest { return this.request }
+func (this *PhpCliServerClient) GetLastHeaderElement() int        { return this.last_header_element }
+func (this *PhpCliServerClient) SetLastHeaderElement(value int)   { this.last_header_element = value }
+func (this *PhpCliServerClient) GetPostReadOffset() int           { return this.post_read_offset }
+func (this *PhpCliServerClient) SetPostReadOffset(value int)      { this.post_read_offset = value }
+func (this *PhpCliServerClient) GetRequest() *PhpCliServerRequest { return &this.request }
 func (this *PhpCliServerClient) GetContentSenderInitialized() uint {
 	return this.content_sender_initialized
 }

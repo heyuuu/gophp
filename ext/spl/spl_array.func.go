@@ -650,7 +650,7 @@ func SplArrayGetDebugInfo(obj *types.Zval) *types.Array {
 	} else {
 		var debug_info *types.Array
 		debug_info = types.NewArray(intern.GetStd().GetProperties().Len() + 1)
-		types.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), types.CopyCtorFuncT(zend.ZvalAddRef))
+		types.ZendHashCopy(debug_info, intern.GetStd().GetProperties())
 		storage = intern.GetArray()
 		//storage.TryAddRefcount()
 		if types.Z_OBJ_HT_P(obj) == &spl_handler_ArrayIterator {

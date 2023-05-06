@@ -2073,7 +2073,7 @@ func AddPropertyCompatibilityObligation(ce *types.ClassEntry, child_prop *ZendPr
 	obligation.SetParentProp(parent_prop)
 	types.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
-func CheckVarianceObligation(zv *types.Zval) int {
+func CheckVarianceObligation(_ types.ArrayKey, zv *types.Zval) bool {
 	var obligation *VarianceObligation = zv.Ptr()
 	if obligation.GetType() == OBLIGATION_DEPENDENCY {
 		var dependency_ce *types.ClassEntry = obligation.GetDependencyCe()
@@ -2081,14 +2081,14 @@ func CheckVarianceObligation(zv *types.Zval) int {
 			ResolveDelayedVarianceObligations(dependency_ce)
 		}
 		if !dependency_ce.IsLinked() {
-			return types.ArrayApplyKeep
+			return true
 		}
 	} else if obligation.GetType() == OBLIGATION_COMPATIBILITY {
 		var unresolved_class *types.String
 		var status InheritanceStatus = ZendDoPerformImplementationCheck(&unresolved_class, obligation.GetChildFn(), obligation.GetParentFn())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
-				return types.ArrayApplyKeep
+				return true
 			}
 			b.Assert(status == INHERITANCE_ERROR)
 			EmitIncompatibleMethodErrorOrWarning(obligation.GetChildFn(), obligation.GetParentFn(), status, unresolved_class, obligation.GetAlwaysError())
@@ -2098,13 +2098,13 @@ func CheckVarianceObligation(zv *types.Zval) int {
 		var status InheritanceStatus = PropertyTypesCompatible(obligation.GetParentProp(), obligation.GetChildProp())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
-				return types.ArrayApplyKeep
+				return true
 			}
 			b.Assert(status == INHERITANCE_ERROR)
 			EmitIncompatiblePropertyError(obligation.GetChildProp(), obligation.GetParentProp())
 		}
 	}
-	return types.ArrayApplyRemove
+	return false
 }
 func LoadDelayedClasses() {
 	var delayed_autoloads *types.Array = CG__().GetDelayedAutoloads()
@@ -2129,7 +2129,7 @@ func ResolveDelayedVarianceObligations(ce *types.ClassEntry) {
 	b.Assert(all_obligations != nil)
 	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
 	b.Assert(obligations != nil)
-	types.ZendHashApply(obligations, CheckVarianceObligation)
+	obligations.Filter(CheckVarianceObligation)
 	if obligations.Len() == 0 {
 		ce.SetIsUnresolvedVariance(false)
 		ce.SetIsLinked(true)

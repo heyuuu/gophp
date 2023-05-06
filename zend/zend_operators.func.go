@@ -1008,7 +1008,7 @@ func AddFunctionArray(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	} else {
 		types.SeparateArray(result)
 	}
-	types.ZendHashMerge(result.Array(), op2.Array(), ZvalAddRef, 0)
+	types.ZendHashMerge(result.Array(), op2.Array(), false)
 }
 func AddFunctionFast(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())

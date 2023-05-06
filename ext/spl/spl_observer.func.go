@@ -153,7 +153,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 	var debug_info *types.Array
 	props = types.Z_OBJPROP_P(obj)
 	debug_info = types.NewArray(props.Len() + 1)
-	types.ZendHashCopy(debug_info, props, types.CopyCtorFuncT(zend.ZvalAddRef))
+	types.ZendHashCopy(debug_info, props)
 	zend.ArrayInit(&storage)
 
 	intern.GetStorage().Foreach(func(key types.ArrayKey, value *types.Zval) {

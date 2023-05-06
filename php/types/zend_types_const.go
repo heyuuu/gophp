@@ -31,9 +31,6 @@ type ZendIntptrT = uintptr
 type ZendUintptrT = uintptr
 
 type CompareFuncT func(any, any) int
-type SwapFuncT func(any, any)
-type DtorFuncT func(pDest *Zval)
-type CopyCtorFuncT func(pElement *Zval)
 
 const HT_MAX_SIZE = 0x80000000
 

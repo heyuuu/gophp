@@ -1134,24 +1134,19 @@ func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functio
 	}
 	zend.ZendFcallInfoArgsClear(&fci, 1)
 }
-func UserShutdownFunctionCall(zv *types.Zval) int {
-	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
-	var retval types.Zval
-	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var function_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
-		core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
-		// types.ZendStringReleaseEx(function_name, 0)
-		return 0
-	}
-	if zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == types.SUCCESS {
-		// zend.ZvalPtrDtor(&retval)
-	}
-	return 0
-}
 func PhpCallShutdownFunctions() {
 	if BG__().user_shutdown_function_names {
 		faults.Try(func() {
-			types.ZendHashApply(BG__().user_shutdown_function_names, UserShutdownFunctionCall)
+			BG__().user_shutdown_function_names.Foreach(func(_ types.ArrayKey, zv *types.Zval) {
+				var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
+				var retval types.Zval
+				if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
+					var function_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
+					core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
+				} else {
+					zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1)
+				}
+			})
 		})
 	}
 }

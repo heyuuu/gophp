@@ -58,16 +58,6 @@ func InitExecutor() {
 	EG__().SetPersistentClassesCount(uint32(EG__().ClassTable().Len()))
 	EG__().SetActive(1)
 }
-func ZvalCallDestructor(zv *types.Zval) int {
-	if zv.IsIndirect() {
-		zv = zv.Indirect()
-	}
-	if zv.IsObject() && zv.GetRefcount() == 1 {
-		return types.ArrayApplyRemove
-	} else {
-		return types.ArrayApplyKeep
-	}
-}
 func ZendThrowOrError(fetch_type int, exception_ce *types.ClassEntry, format string, args ...any) {
 	message := ZendSprintf(format, args)
 	if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
@@ -78,14 +68,8 @@ func ZendThrowOrError(fetch_type int, exception_ce *types.ClassEntry, format str
 }
 func ShutdownDestructors() {
 	faults.TryCatch(func() {
-		var symbols uint32
-		for {
-			symbols = EG__().GetSymbolTable().Len()
-			types.ZendHashReverseApply(EG__().GetSymbolTable(), types.ApplyFuncT(ZvalCallDestructor))
-			if symbols == EG__().GetSymbolTable().Len() {
-				break
-			}
-		}
+		// notice: 无需主动调用析构函数，使用自动析构代替
+		EG__().GetSymbolTable().Clean()
 		// notice: 无需主动调用析构函数，使用自动析构代替
 		//ZendObjectsStoreCallDestructors(EG__().GetObjectsStore())
 	}, func() {

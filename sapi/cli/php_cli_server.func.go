@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/php/types"
@@ -212,28 +213,15 @@ func SapiCliServerRegisterVariable(track_vars_array *types.Zval, key *byte, val 
 		core.PhpRegisterVariableSafe(b.CastStrAuto((*byte)(key)), b.CastStr(new_val, new_val_len), track_vars_array)
 	}
 }
-func SapiCliServerRegisterEntryCb(entry **byte, num_args int, va []any, hash_key *types.ArrayKey) int {
-	var track_vars_array *types.Zval = b.VaArg(&va).(*types.Zval)
-	if hash_key.IsStrKey() {
-		var keyBuf strings.Builder
-		for _, c := range []byte(hash_key.StrKey()) {
-			if c == '-' {
-				keyBuf.WriteByte(c)
-			} else {
-				keyBuf.WriteByte(toupper(c))
-			}
-		}
-		key := keyBuf.String()
-		real_key := fmt.Sprintf("%s_%s", "HTTP", key)
-		core.Spprintf(&real_key, 0, "%s_%s", "HTTP", key)
+func SapiCliServerRegisterEntryCb(hashKey types.ArrayKey, entry **byte, track_vars_array *types.Zval, num_args int, va []any, hash_key *types.ArrayKey) int {
+	if hashKey.IsStrKey() {
+		key := ascii.StrToUpper(hashKey.StrKey())
+		realKey := fmt.Sprintf("%s_%s", "HTTP", key)
 		if key == "CONTENT_TYPE" || key == "CONTENT_LENGTH" {
 			SapiCliServerRegisterVariable(track_vars_array, key, *entry)
 		}
-		SapiCliServerRegisterVariable(track_vars_array, real_key, *entry)
-		zend.Efree(key)
-		zend.Efree(real_key)
+		SapiCliServerRegisterVariable(track_vars_array, realKey, *entry)
 	}
-	return types.ArrayApplyKeep
 }
 func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 	var client *PhpCliServerClient = core.SG__().server_context
@@ -294,7 +282,16 @@ func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 	if client.GetRequest().GetQueryString() != nil {
 		SapiCliServerRegisterVariable(track_vars_array, "QUERY_STRING", client.GetRequest().GetQueryString())
 	}
-	types.ZendHashApplyWithArguments(client.GetRequest().GetHeaders(), types.ApplyFuncArgsT(SapiCliServerRegisterEntryCb), 1, track_vars_array)
+	client.GetRequest().GetHeaders().Foreach(func(hashKey types.ArrayKey, value *types.Zval) {
+		if hashKey.IsStrKey() {
+			key := ascii.StrToUpper(hashKey.StrKey())
+			realKey := fmt.Sprintf("%s_%s", "HTTP", key)
+			if key == "CONTENT_TYPE" || key == "CONTENT_LENGTH" {
+				SapiCliServerRegisterVariable(track_vars_array, key, value)
+			}
+			SapiCliServerRegisterVariable(track_vars_array, realKey, value)
+		}
+	})
 }
 func SapiCliServerLogWrite(type_ int, msg *byte) {
 	var buf []byte

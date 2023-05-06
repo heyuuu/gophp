@@ -397,9 +397,9 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 		}
 		agent_ht = BrowscapEntryToArray(bdata, found_entry)
 		if return_array != 0 {
-			types.ZendHashMerge(return_value.Array(), agent_ht, types.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
+			types.ZendHashMerge(return_value.Array(), agent_ht, false)
 		} else {
-			types.ZendHashMerge(types.Z_OBJPROP_P(return_value), agent_ht, types.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
+			types.ZendHashMerge(types.Z_OBJPROP_P(return_value), agent_ht, false)
 		}
 		agent_ht.Destroy()
 		zend.Efree(agent_ht)

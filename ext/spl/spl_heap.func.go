@@ -360,7 +360,7 @@ func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.Arr
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
 	debug_info = types.NewArray(intern.GetStd().GetProperties().Len() + 1)
-	types.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), types.CopyCtorFuncT(zend.ZvalAddRef))
+	types.ZendHashCopy(debug_info, intern.GetStd().GetProperties())
 	pnstr = SplGenPrivatePropName(ce, "flags")
 	tmp.SetLong(intern.GetFlags())
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
