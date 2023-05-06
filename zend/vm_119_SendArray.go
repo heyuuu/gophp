@@ -91,8 +91,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 						// arg.TryAddRefcount()
 						param.SetNewRef(arg)
 					}
-					executeData.GetCall().
-						NumArgs()++
+					executeData.GetCall().NumArgs()++
 					arg_num++
 					param++
 				}
@@ -136,8 +135,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 					// arg.TryAddRefcount()
 					param.SetNewRef(arg)
 				}
-				executeData.GetCall().
-					NumArgs()++
+				executeData.GetCall().NumArgs()++
 				arg_num++
 				param++
 			}

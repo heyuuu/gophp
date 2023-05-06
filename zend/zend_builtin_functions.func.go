@@ -255,18 +255,8 @@ func ZifErrorReporting(ret zpp.Ret, _ zpp.Opt, newErrorLevel *types.Zval) {
 }
 func ValidateConstantArray(ht *types.Array) int {
 	var ret = 1
-	var val *types.Zval
 	ht.ProtectRecursive()
-	var __ht = ht
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-		if _z.IsIndirect() {
-			_z = _z.Indirect()
-			if _z.IsUndef() {
-				continue
-			}
-		}
-		val = _z
+	ht.ForeachIndirectEx(func(_ types.ArrayKey, val *types.Zval) bool {
 		val = types.ZVAL_DEREF(val)
 		if val.IsRefcounted() {
 			if val.IsArray() {
@@ -274,57 +264,36 @@ func ValidateConstantArray(ht *types.Array) int {
 					if val.IsRecursive() {
 						faults.Error(faults.E_WARNING, "Constants cannot be recursive arrays")
 						ret = 0
-						break
+						return false
 					} else if ValidateConstantArray(val.Array()) == 0 {
 						ret = 0
-						break
+						return false
 					}
 				}
 			} else if val.GetType() != types.IS_STRING && val.GetType() != types.IS_RESOURCE {
 				faults.Error(faults.E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
 				ret = 0
-				break
+				return false
 			}
 		}
-	}
+		return true
+	})
 	ht.UnprotectRecursive()
 	return ret
 }
 func CopyConstantArray(dst *types.Zval, src *types.Zval) {
-	var key *types.String
-	var idx ZendUlong
-	var new_val *types.Zval
-	var val *types.Zval
-	ArrayInitSize(dst, src.Array().Len())
-	var __ht = src.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-		if _z.IsIndirect() {
-			_z = _z.Indirect()
-			if _z.IsUndef() {
-				continue
-			}
-		}
-		idx = _p.GetH()
-		key = _p.GetKey()
-		val = _z
-
+	dstArr := types.NewArray(src.Array().Len())
+	src.Array().Foreach(func(key types.ArrayKey, val *types.Zval) {
 		/* constant arrays can't contain references */
-
 		val = types.ZVAL_DEREF(val)
-		if key != nil {
-			new_val = dst.Array().KeyAddNew(key.GetStr(), val)
-		} else {
-			new_val = dst.Array().IndexAddNew(idx, val)
-		}
+		newVal := dstArr.Add(key, val)
 		if val.IsArray() {
 			if val.IsRefcounted() {
-				CopyConstantArray(new_val, val)
+				CopyConstantArray(newVal, val)
 			}
-		} else {
-			// val.TryAddRefcount()
 		}
-	}
+	})
+	dst.SetArray(dstArr)
 }
 
 func ZifDefine(constantName string, value *types.Zval, _ zpp.Opt, caseInsensitive bool) bool {
@@ -585,96 +554,56 @@ func ZifGetClassVars(executeData zpp.Ex, return_value zpp.Ret, className *types.
 		AddClassVars(scope, ce, 1, return_value)
 	}
 }
-func ZifGetObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval) {
-	var obj *types.Zval
-	var value *types.Zval
-	var properties *types.Array
-	var key *types.String
-	var zobj *types.ZendObject
-	var num_key ZendUlong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			obj = fp.ParseObject()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	properties = types.Z_OBJ_HT_P(obj).GetGetProperties()(obj)
+func ZifGetObjectVars(obj zpp.Object) (*types.Array, bool) {
+	properties := types.Z_OBJ_HT_P(obj).GetGetProperties()(obj)
 	if properties == nil {
-		return_value.SetFalse()
-		return
+		return nil, false
 	}
-	zobj = obj.Object()
+
+	zobj := obj.Object()
 	if zobj.GetCe().GetDefaultPropertiesCount() == 0 && properties == zobj.GetProperties() && !(properties.IsRecursive()) {
-
 		/* fast copy */
-
 		if zobj.GetHandlers() == StdObjectHandlersPtr {
-			return_value.SetArray(types.ZendProptableToSymtable(properties, 0))
-			return
+			return types.ZendProptableToSymtable(properties, 0), true
 		}
-		return_value.SetArray(types.ZendProptableToSymtable(properties, 1))
-		return
+		return types.ZendProptableToSymtable(properties, 1), true
 	} else {
-		ArrayInitSize(return_value, properties.Len())
-		var __ht = properties
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			num_key = _p.GetH()
-			key = _p.GetKey()
-			value = _z
-			var is_dynamic = 1
+		retArr := types.NewArray(properties.Len())
+		properties.Foreach(func(key types.ArrayKey, value *types.Zval) {
+			var isDynamic = true
 			if value.IsIndirect() {
 				value = value.Indirect()
 				if value.IsUndef() {
-					continue
+					return
 				}
-				is_dynamic = 0
+				isDynamic = false
 			}
-			if key != nil && ZendCheckPropertyAccess(zobj, key, is_dynamic) == types.FAILURE {
-				continue
+
+			if key.IsStrKey() && ZendCheckPropertyAccess(zobj, key.StrKey(), isDynamic) == types.FAILURE {
+				return
 			}
+
 			if value.IsReference() && value.GetRefcount() == 1 {
 				value = types.Z_REFVAL_P(value)
 			}
-			// value.TryAddRefcount()
-			if key == nil {
 
+			if !key.IsStrKey() {
 				/* This case is only possible due to loopholes, e.g. ArrayObject */
-
-				return_value.Array().IndexAdd(num_key, value)
-
-				/* This case is only possible due to loopholes, e.g. ArrayObject */
-
-			} else if is_dynamic == 0 && key.GetStr()[0] == 0 {
-				var prop_name *byte
-				var class_name *byte
-				var prop_len int
-				ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_len)
-
+				retArr.IndexAdd(key.IdxKey(), value)
+			} else if !isDynamic && key.StrKey()[0] == 0 {
 				/* We assume here that a mangled property name is never
 				 * numeric. This is probably a safe assumption, but
 				 * theoretically someone might write an extension with
 				 * private, numeric properties. Well, too bad.
 				 */
 
-				return_value.Array().KeyAddNew(b.CastStr(prop_name, prop_len), value)
-
-				/* We assume here that a mangled property name is never
-				 * numeric. This is probably a safe assumption, but
-				 * theoretically someone might write an extension with
-				 * private, numeric properties. Well, too bad.
-				 */
-
+				_, propName, _ := ZendUnmanglePropertyName_Ex(key.StrKey())
+				retArr.KeyAddNew(propName, value)
 			} else {
-				return_value.Array().SymtableAddNew(key.GetStr(), value)
+				retArr.SymtableAddNew(key.StrKey(), value)
 			}
-		}
+		})
+		return retArr, true
 	}
 }
 func ZifGetMangledObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval) {
@@ -952,21 +881,14 @@ func ZifClassAlias(executeData zpp.Ex, return_value zpp.Ret, userClassName *type
 }
 
 //@zif -alias get_required_files
-func ZifGetIncludedFiles(executeData zpp.Ex, return_value zpp.Ret) {
-	var entry *types.String
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	ArrayInit(return_value)
-	var __ht = EG__().GetIncludedFiles()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		entry = _p.GetKey()
-		if entry != nil {
-			AddNextIndexStr(return_value, entry.Copy())
+func ZifGetIncludedFiles() *types.Array {
+	retArr := types.NewArray(0)
+	EG__().GetIncludedFiles().Foreach(func(key types.ArrayKey, value *types.Zval) {
+		if key.IsStrKey() {
+			retArr.Append(types.NewZvalString(key.StrKey()))
 		}
-	}
+	})
+	return retArr
 }
 
 //@zif -alias user_error
@@ -1162,63 +1084,34 @@ func ZifGetResourceType(executeData zpp.Ex, return_value zpp.Ret, res *types.Zva
 		return
 	}
 }
-func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ *string) {
-	var key *types.String
-	var index ZendUlong
-	var val *types.Zval
-	if ZendParseParameters(executeData.NumArgs(), "|S", &type_) == types.FAILURE {
-		return
-	}
+func ZifGetResources(_ zpp.Opt, type_ *string) (*types.Array, bool) {
+	retArr := types.NewArray(0)
 	if type_ == nil {
-		ArrayInit(return_value)
-
-		var __ht *types.Array = EG__().GetRegularList()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			index = _p.GetH()
-			key = _p.GetKey()
-			val = _z
-			if key == nil {
-				// 				val.AddRefcount()
-				return_value.Array().IndexAddNew(index, val)
+		EG__().GetRegularList().Foreach(func(key types.ArrayKey, value *types.Zval) {
+			if !key.IsStrKey() {
+				retArr.IndexAdd(key.IdxKey(), value)
 			}
-		}
+		})
+
 	} else if *type_ == "Unknown" {
-		ArrayInit(return_value)
-		var __ht *types.Array = EG__().GetRegularList()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			index = _p.GetH()
-			key = _p.GetKey()
-			val = _z
-			if key == nil && types.Z_RES_TYPE_P(val) <= 0 {
-				// 				val.AddRefcount()
-				return_value.Array().IndexAddNew(index, val)
+		EG__().GetRegularList().Foreach(func(key types.ArrayKey, value *types.Zval) {
+			if !key.IsStrKey() && value.Resource().GetType() <= 0 {
+				retArr.IndexAdd(key.IdxKey(), value)
 			}
-		}
+		})
 	} else {
 		var id = ZendFetchListDtorId(*type_)
 		if id <= 0 {
 			faults.Error(faults.E_WARNING, "get_resources():  Unknown resource type '%s'", *type_)
-			return_value.SetFalse()
-			return
+			return nil, false
 		}
-		ArrayInit(return_value)
-		var __ht *types.Array = EG__().GetRegularList()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			index = _p.GetH()
-			key = _p.GetKey()
-			val = _z
-			if key == nil && types.Z_RES_TYPE_P(val) == id {
-				// 				val.AddRefcount()
-				return_value.Array().IndexAddNew(index, val)
+		EG__().GetRegularList().Foreach(func(key types.ArrayKey, value *types.Zval) {
+			if !key.IsStrKey() && value.Resource().GetType() == id {
+				retArr.IndexAdd(key.IdxKey(), value)
 			}
-		}
+		})
 	}
+	return retArr, true
 }
 func AddZendextInfo(ext *ZendExtension, arg any) int {
 	var name_array = (*types.Zval)(arg)
@@ -1348,19 +1241,15 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		arg_array.SetEmptyArray()
 	}
 }
-func DebugPrintBacktraceArgs(arg_array *types.Zval) {
-	var tmp *types.Zval
+func DebugPrintBacktraceArgs(argArray *types.Zval) {
 	var i = 0
-	var __ht = arg_array.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		tmp = _z
-		if b.PostInc(&i) {
+	argArray.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
+		if i != 0 {
 			ZEND_PUTS(", ")
 		}
-		ZendPrintFlatZvalR(tmp)
-	}
+		i++
+		ZendPrintFlatZvalR(value)
+	})
 }
 func SkipInternalHandler(skip *ZendExecuteData) types.ZendBool {
 	return !(skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetType())) && skip.GetPrevExecuteData() != nil && skip.GetPrevExecuteData().GetFunc() != nil && ZEND_USER_CODE(skip.GetPrevExecuteData().GetFunc().GetType()) && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_ICALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_UCALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL_BY_NAME && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL

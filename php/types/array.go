@@ -816,21 +816,6 @@ func (ht *Array) ForeachData() []*Bucket {
 	return data
 }
 
-// todo 逐渐替换为 ForeachReserve 或其他更高效代码
-func (ht *Array) ForeachDataReserve() []*Bucket {
-	var data = make([]*Bucket, 0)
-
-	for i := len(ht.data) - 1; i >= 0; i-- {
-		var p = &ht.data[i]
-		if p.IsValid() {
-			continue
-		}
-		data = append(data, p)
-	}
-
-	return data
-}
-
 func (ht *Array) eachBucket(handler func(pos uint32, p *Bucket)) {
 	for i, _ := range ht.data {
 		p := &ht.data[i]

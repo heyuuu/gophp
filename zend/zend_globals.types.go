@@ -132,7 +132,7 @@ func (this *ZendCompilerGlobals) GetExtraFnFlags() uint32              { return 
 func (this *ZendCompilerGlobals) SetExtraFnFlags(value uint32)         { this.extra_fn_flags = value }
 func (this *ZendCompilerGlobals) GetCompilerOptions() uint32           { return this.compiler_options }
 func (this *ZendCompilerGlobals) SetCompilerOptions(value uint32)      { this.compiler_options = value }
-func (this *ZendCompilerGlobals) GetContext() ZendOparrayContext       { return this.context }
+func (this *ZendCompilerGlobals) GetContext() *ZendOparrayContext      { return &this.context }
 func (this *ZendCompilerGlobals) SetContext(value ZendOparrayContext)  { this.context = value }
 func (this *ZendCompilerGlobals) GetFileContext() *ZendFileContext     { return &this.file_context }
 func (this *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { this.file_context = value }

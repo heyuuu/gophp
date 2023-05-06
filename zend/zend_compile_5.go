@@ -245,15 +245,12 @@ func ZendCompileTry(ast *ZendAst) {
 
 	if CG__().GetContext().GetLabels() != nil {
 		var label *ZendLabel
-		var __ht *types.Array = CG__().GetContext().GetLabels()
-		for _, _p := range __ht.ForeachDataReserve() {
-			var _z types.Zval = _p.GetVal()
-
-			label = _z.Ptr()
+		var _, labelZval = CG__().GetContext().GetLabels().Last()
+		if labelZval != nil {
+			label = labelZval.Ptr()
 			if label.GetOplineNum() == GetNextOpNumber() {
 				ZendEmitOp(nil, ZEND_NOP, nil, nil)
 			}
-			break
 		}
 	}
 	try_catch_offset = ZendAddTryElement(GetNextOpNumber())

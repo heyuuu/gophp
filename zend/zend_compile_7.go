@@ -408,21 +408,19 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 		if elem_ast.GetKind() == ZEND_AST_UNPACK {
 			if value.IsArray() {
 				var ht *types.Array = value.Array()
-				var val *types.Zval
-				var key *types.String
-				var __ht *types.Array = ht
-				for _, _p := range __ht.ForeachData() {
-					var _z *types.Zval = _p.GetVal()
-
-					key = _p.GetKey()
-					val = _z
-					if key != nil {
+				ok := ht.ForeachEx(func(key types.ArrayKey, value *types.Zval) bool {
+					if key.IsStrKey() {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unpack array with string keys")
 					}
-					if result.Array().Append(val) == nil {
-						return 0
+					if result.Array().Append(value) == nil {
+						return false
 					}
+					return true
+				})
+				if !ok {
+					return 0
 				}
+
 				continue
 			} else {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Only arrays and Traversables can be unpacked")

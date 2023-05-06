@@ -516,20 +516,16 @@ func ZendRegisterAutoGlobal(name *types.String, jit types.ZendBool, auto_global_
 	return retval
 }
 func ZendActivateAutoGlobals() {
-	var auto_global *ZendAutoGlobal
-	var __ht = CG__().GetAutoGlobals()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		auto_global = _z.Ptr()
-		if auto_global.GetJit() != 0 {
-			auto_global.SetArmed(1)
-		} else if auto_global.GetAutoGlobalCallback() != nil {
-			auto_global.SetArmed(auto_global.GetAutoGlobalCallback()(auto_global.GetName()))
+	CG__().GetAutoGlobals().Foreach(func(_ types.ArrayKey, value *types.Zval) {
+		var autoGlobal *ZendAutoGlobal = value.Ptr()
+		if autoGlobal.GetJit() != 0 {
+			autoGlobal.SetArmed(1)
+		} else if autoGlobal.GetAutoGlobalCallback() != nil {
+			autoGlobal.SetArmed(autoGlobal.GetAutoGlobalCallback()(autoGlobal.GetName()))
 		} else {
-			auto_global.SetArmed(0)
+			autoGlobal.SetArmed(0)
 		}
-	}
+	})
 }
 func Zendlex(elem *ZendParserStackElem) int {
 	var zv types.Zval

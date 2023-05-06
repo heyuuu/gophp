@@ -404,7 +404,7 @@ var DefZifGetIncludedFiles = def.DefFunc("get_included_files", 0, 0, []def.ArgIn
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetIncludedFiles(executeData, returnValue)
+	ZifGetIncludedFiles()
 })
 
 // generate by ZifGetIncludedFiles
@@ -412,7 +412,7 @@ var DefZifGetRequiredFiles = def.DefFunc("get_required_files", 0, 0, []def.ArgIn
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetIncludedFiles(executeData, returnValue)
+	ZifGetIncludedFiles()
 })
 
 // generate by ZifTriggerError
