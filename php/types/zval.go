@@ -39,6 +39,7 @@ func NewZvalDouble(d float64) *Zval           { var tmp Zval; tmp.SetDouble(d); 
 func NewZvalArray(arr *Array) *Zval           { var tmp Zval; tmp.SetArray(arr); return &tmp }
 func NewZvalResource(res *ZendResource) *Zval { var tmp Zval; tmp.SetResource(res); return &tmp }
 func NewZvalPtr(ptr any) *Zval                { var tmp Zval; tmp.SetPtr(ptr); return &tmp }
+func NewZvalObject(obj *ZendObject) *Zval     { var tmp Zval; tmp.SetObject(obj); return &tmp }
 
 /** value 的 isType/ getter / setter 判断 */
 func (zv *Zval) IsType(value uint8) bool { return zv.typ == value }
