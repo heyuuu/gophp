@@ -970,7 +970,7 @@ func ZifArrayUnique(arg *types.Array, _ zpp.Opt, flags *int) *types.Array {
 		existValues := make(map[string]bool, arg.Len())
 		retArr := types.NewArray(arg.Len())
 		arg.ForeachIndirect(func(key types.ArrayKey, val *types.Zval) {
-			var strVal string = zend.ZvalGetStrVal(val)
+			var strVal = zend.ZvalGetStrVal(val)
 			if _, exists := existValues[strVal]; !exists {
 				if val.IsReference() && val.GetRefcount() == 1 {
 					val = val.DeRef()
@@ -1005,23 +1005,6 @@ func ZifArrayUnique(arg *types.Array, _ zpp.Opt, flags *int) *types.Array {
 }
 func ZvalCompare(first *types.Zval, second *types.Zval) int {
 	return zend.StringCompareFunction(first, second)
-}
-func ZvalUserCompare(a *types.Zval, b *types.Zval) int {
-	var args []types.Zval
-	var retval types.Zval
-	types.ZVAL_COPY_VALUE(&args[0], a)
-	types.ZVAL_COPY_VALUE(&args[1], b)
-	standard.BG__().user_compare_fci.param_count = 2
-	standard.BG__().user_compare_fci.params = args
-	standard.BG__().user_compare_fci.retval = &retval
-	standard.BG__().user_compare_fci.no_separation = 0
-	if zend.ZendCallFunction(&(standard.BG__().user_compare_fci), &(standard.BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
-		var ret = zend.ZvalGetLong(&retval)
-		// zend.ZvalPtrDtor(&retval)
-		return zend.ZEND_NORMALIZE_BOOL(ret)
-	} else {
-		return 0
-	}
 }
 
 //@zif -c 2,
@@ -1081,182 +1064,42 @@ func ZifArrayDiffUkey(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) (*
 	cmp := arrayUserKeyComparer(callbackKeyCompFunc)
 	return arrayDiffWrapper(arrays, cmp)
 }
-func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, arrays []*types.Zval) {
-	var args []*types.Zval
-	var argc int
-	var i int
-	var num uint32
-	var exclude *types.Array
-	var value *types.Zval
-	var str *types.String
-	var tmp_str *types.String
-	var key *types.String
-	var idx zend.ZendLong
-	var dummy types.Zval
-	if executeData.NumArgs() < 2 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "at least 2 parameters are required, %d given", executeData.NumArgs())
-		return
-	}
-	for {
-		var _flags = 0
-		var _min_num_args = 1
-		var _max_num_args = -1
 
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			args, argc = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if args[0].GetType() != types.IS_ARRAY {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter 1 to be an array, %s given", types.ZendZvalTypeName(&args[0]))
-		return_value.SetNull()
-		return
-	}
-	num = args[0].Array().Len()
-	if num == 0 {
-		for i = 1; i < argc; i++ {
-			if args[i].GetType() != types.IS_ARRAY {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-				return_value.SetNull()
-				return
-			}
-		}
-		return_value.SetEmptyArray()
-		return
-	} else if num == 1 {
-		var found = 0
-		var search_str *types.String
-		var tmp_search_str *types.String
-		value = nil
-		var __ht *types.Array = args[0].Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.Indirect()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			value = _z
-			break
-		}
-		if value == nil {
-			for i = 1; i < argc; i++ {
-				if args[i].GetType() != types.IS_ARRAY {
-					core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-					return_value.SetNull()
-					return
-				}
-			}
-			return_value.SetEmptyArray()
-			return
-		}
-		search_str = zend.ZvalGetTmpString(value, &tmp_search_str)
-		for i = 1; i < argc; i++ {
-			if args[i].GetType() != types.IS_ARRAY {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-				return_value.SetNull()
-				return
-			}
-			if found == 0 {
-				var __ht *types.Array = args[i].Array()
-				for _, _p := range __ht.ForeachData() {
-					var _z = _p.GetVal()
-					if _z.IsIndirect() {
-						_z = _z.Indirect()
-						if _z.IsUndef() {
-							continue
-						}
-					}
-					value = _z
-					str = zend.ZvalGetTmpString(value, &tmp_str)
-					if search_str.GetStr() == str.GetStr() {
-						// zend.ZendTmpStringRelease(tmp_str)
-						found = 1
-						break
-					}
-					// zend.ZendTmpStringRelease(tmp_str)
-				}
-			}
-		}
-		// zend.ZendTmpStringRelease(tmp_search_str)
-		if found != 0 {
-			return_value.SetEmptyArray()
-		} else {
-			types.ZVAL_COPY(return_value, &args[0])
-		}
-		return
+func simpleArrayDiff(array *types.Array, arrays []*types.Array) *types.Array {
+	if array.Len() == 0 {
+		return types.NewArray(0)
 	}
 
-	/* count number of elements */
-
-	num = 0
-	for i = 1; i < argc; i++ {
-		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-			return_value.SetNull()
-			return
-		}
-		num += args[i].Array().Len()
+	// array.Len() > 1
+	exclude := make(map[string]bool)
+	for _, diffArray := range arrays {
+		diffArray.ForeachIndirect(func(_ types.ArrayKey, value *types.Zval) {
+			str := zend.ZvalGetStrVal(value)
+			exclude[str] = true
+		})
 	}
-	if num == 0 {
-		types.ZVAL_COPY(return_value, &args[0])
-		return
-	}
-	dummy.SetNull()
-
-	/* create exclude map */
-
-	exclude = types.NewArray(num)
-	for i = 1; i < argc; i++ {
-		var __ht *types.Array = args[i].Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.Indirect()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			value = _z
-			str = zend.ZvalGetTmpString(value, &tmp_str)
-			exclude.KeyAdd(str.GetStr(), &dummy)
-			// zend.ZendTmpStringRelease(tmp_str)
-		}
+	if len(exclude) == 0 {
+		return array
 	}
 
-	/* copy all elements of first array that are not in exclude set */
+	retArr := types.NewArray(array.Len())
+	array.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+		str := zend.ZvalGetStrVal(value)
+		if _, excluded := exclude[str]; !excluded {
+			retArr.Add(key, value)
+		}
+	})
+	return retArr
+}
 
-	zend.ArrayInitSize(return_value, args[0].Array().Len())
-	var __ht *types.Array = args[0].Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-		if _z.IsIndirect() {
-			_z = _z.Indirect()
-			if _z.IsUndef() {
-				continue
-			}
-		}
-		idx = _p.GetH()
-		key = _p.GetKey()
-		value = _z
-		str = zend.ZvalGetTmpString(value, &tmp_str)
-		if !exclude.KeyExists(str.GetStr()) {
-			if key != nil {
-				value = return_value.Array().KeyAddNew(key.GetStr(), value)
-			} else {
-				value = return_value.Array().IndexAddNew(idx, value)
-			}
-			zend.ZvalAddRef(value)
-		}
-		// zend.ZendTmpStringRelease(tmp_str)
+//@zif -c=2,
+func ZifArrayDiff(arrays []*types.Zval) *types.Zval {
+	arrayHts, ok := checkArrayArgs(arrays, 0)
+	if !ok {
+		return types.NewZvalNull()
 	}
-	exclude.Destroy()
+	retArr := simpleArrayDiff(arrayHts[0], arrayHts[1:])
+	return types.NewZvalArray(retArr)
 }
 
 //@zif -c=3,
@@ -1555,243 +1398,105 @@ func ZifArrayRand(return_value zpp.Ret, arg *types.Array, _ zpp.Opt, numReq_ *in
 	fillScope.FillEnd()
 	zend.FreeAlloca(bitset, use_heap)
 }
-func ZifArraySum(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
-	var input *types.Zval
-	var entry *types.Zval
-	var entry_n types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			input = fp.ParseArray()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetLong(0)
-	var __ht = input.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		entry = _z
-		if entry.IsType(types.IS_ARRAY) || entry.IsType(types.IS_OBJECT) {
-			continue
-		}
-		types.ZVAL_COPY(&entry_n, entry)
-		zend.ConvertScalarToNumber(&entry_n)
-		zend.FastAddFunction(return_value, return_value, &entry_n)
-	}
-}
-func ZifArrayProduct(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
-	var input *types.Zval
-	var entry *types.Zval
-	var entry_n types.Zval
-	var dval float64
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			input = fp.ParseArray()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetLong(1)
-	if !(input.Array().Len()) {
-		return
-	}
-	var __ht = input.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		entry = _z
-		if entry.IsType(types.IS_ARRAY) || entry.IsType(types.IS_OBJECT) {
-			continue
-		}
-		types.ZVAL_COPY(&entry_n, entry)
-		zend.ConvertScalarToNumber(&entry_n)
-		if entry_n.IsType(types.IS_LONG) && return_value.IsType(types.IS_LONG) {
-			dval = float64(return_value.Long() * float64(entry_n.Long()))
-			if float64(zend.ZEND_LONG_MIN <= dval && dval <= float64(zend.ZEND_LONG_MAX)) {
-				return_value.SetLong(return_value.Long() * entry_n.Long())
-				continue
-			}
-		}
-		zend.ConvertToDouble(return_value)
-		zend.ConvertToDouble(&entry_n)
-		return_value.SetDouble(return_value.Double() * entry_n.Double())
-	}
-}
-func ZifArrayReduce(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, callback *types.Zval, _ zpp.Opt, initial *types.Zval) {
-	var input *types.Zval
-	var args []types.Zval
-	var operand *types.Zval
-	var result types.Zval
-	var retval types.Zval
-	var fci types.ZendFcallInfo
-	var fci_cache = zend.EmptyFcallInfoCache
-	var initial *types.Zval = nil
-	var htbl *types.Array
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			input = fp.ParseArray()
-			fp.ParseFunc(&fci, &fci_cache)
-			fp.StartOptional()
-			initial = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if executeData.NumArgs() > 2 {
-		types.ZVAL_COPY(&result, initial)
-	} else {
-		result.SetNull()
-	}
-
-	/* (zval **)input points to an element of argument stack
-	 * the base pointer of which is subject to change.
-	 * thus we need to keep the pointer to the hashtable for safety */
-
-	htbl = input.Array()
-	if htbl.Len() == 0 {
-		types.ZVAL_COPY_VALUE(return_value, &result)
-		zend.ZendReleaseFcallInfoCache(&fci_cache)
-		return
-	}
-	fci.SetRetval(&retval)
-	fci.SetParamCount(2)
-	fci.SetNoSeparation(0)
-	var __ht = htbl
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		operand = _z
-		types.ZVAL_COPY_VALUE(&args[0], &result)
-		types.ZVAL_COPY(&args[1], operand)
-		fci.SetParams(args)
-		if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
-			// zend.ZvalPtrDtor(&args[1])
-			// zend.ZvalPtrDtor(&args[0])
-			types.ZVAL_COPY_VALUE(&result, &retval)
-		} else {
-			// zend.ZvalPtrDtor(&args[1])
-			// zend.ZvalPtrDtor(&args[0])
+func ZifArraySum(array *types.Array) *types.Zval {
+	var num types.Zval
+	ret := types.NewZvalLong(0)
+	array.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
+		if entry.IsArray() || entry.IsObject() {
 			return
 		}
-	}
-	zend.ZendReleaseFcallInfoCache(&fci_cache)
-	zend.ZVAL_ZVAL(return_value, &result, 1, 1)
+		types.ZVAL_COPY(&num, entry)
+		zend.ConvertScalarToNumber(&num)
+		zend.FastAddFunction(ret, ret, &num)
+	})
+	return ret
 }
-func ZifArrayFilter(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _ zpp.Opt, callback *types.Zval, useKeys *types.Zval) {
-	var array *types.Zval
-	var operand *types.Zval
-	var key *types.Zval
-	var args []types.Zval
-	var retval types.Zval
-	var have_callback = 0
-	var use_type = 0
-	var string_key *types.String
-	var fci = zend.EmptyFcallInfo
-	var fci_cache = zend.EmptyFcallInfoCache
-	var num_key zend.ZendUlong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			array = fp.ParseArray()
-			fp.StartOptional()
-			fp.ParseFunc(&fci, &fci_cache)
-			use_type = fp.ParseLong()
-			if fp.HasError() {
+func ZifArrayProduct(array *types.Array) *types.Zval {
+	var num types.Zval
+	ret := types.NewZvalLong(1)
+	array.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
+		if entry.IsArray() || entry.IsObject() {
+			return
+		}
+		types.ZVAL_COPY(&num, entry)
+		zend.ConvertScalarToNumber(&num)
+		if num.IsLong() && ret.IsLong() {
+			dval := float64(num.Long()) * float64(ret.Long())
+			if float64(zend.ZEND_LONG_MIN) <= dval && dval <= float64(zend.ZEND_LONG_MAX) {
+				ret.SetLong(ret.Long() * num.Long())
 				return
 			}
-			break
 		}
-		break
+		zend.ConvertToDouble(ret)
+		zend.ConvertToDouble(&num)
+		ret.SetDouble(ret.Double() * num.Double())
+	})
+	return ret
+}
+func ZifArrayReduce(array *types.Array, callback zpp.Callable, _ zpp.Opt, initial *types.Zval) *types.Zval {
+	var result types.Zval
+	if initial == nil {
+		result.SetNull()
+	} else {
+		result.CopyFrom(initial)
 	}
-	zend.ArrayInit(return_value)
-	if array.Array().Len() == 0 {
-		zend.ZendReleaseFcallInfoCache(&fci_cache)
-		return
+
+	array.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		newResult, ok := callback.Call(&result, value)
+		if ok && newResult.IsNotUndef() {
+			result.CopyValueFrom(newResult)
+		}
+	})
+
+	return zend.ZvalZval(&result, true, true)
+}
+func ZifArrayFilter(array_ *types.Array, _ zpp.Opt, callback zpp.Callable, mode int) *types.Array {
+	retArr := types.NewArray(0)
+	if array_.Len() == 0 {
+		return retArr
 	}
-	if executeData.NumArgs() > 1 {
-		have_callback = 1
-		fci.SetNoSeparation(0)
-		fci.SetRetval(&retval)
-		if use_type == ARRAY_FILTER_USE_BOTH {
-			fci.SetParamCount(2)
-			key = &args[1]
+
+	// parse use filter
+	var filter func(key types.ArrayKey, value *types.Zval) (keep bool, succ bool)
+	if callback != nil {
+		filter = func(key types.ArrayKey, value *types.Zval) (bool, bool) {
+			var retVal *types.Zval
+			var ok bool
+			switch mode {
+			case ARRAY_FILTER_USE_KEY:
+				retVal, ok = callback.Call(key.ToZval())
+			case ARRAY_FILTER_USE_BOTH:
+				retVal, ok = callback.Call(value, key.ToZval())
+			default: // 0
+				retVal, ok = callback.Call(value)
+			}
+			if !ok {
+				return false, false
+			}
+			return zend.ZendIsTrueEx(retVal), true
+		}
+	}
+
+	// filter
+	array_.ForeachIndirectEx(func(key types.ArrayKey, value *types.Zval) bool {
+		var keep bool
+		if filter != nil {
+			var callSucc bool
+			keep, callSucc = filter(key, value)
+			if !callSucc {
+				// 调用 user callback 失败，中断遍历
+				return false
+			}
 		} else {
-			fci.SetParamCount(1)
-			key = &args[0]
+			keep = zend.ZendIsTrueEx(value)
 		}
-	}
-	var __ht = array.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-		if _z.IsIndirect() {
-			_z = _z.Indirect()
-			if _z.IsUndef() {
-				continue
-			}
+
+		if keep {
+			retArr.Update(key, value)
 		}
-		num_key = _p.GetH()
-		string_key = _p.GetKey()
-		operand = _z
-		if have_callback != 0 {
-			if use_type != 0 {
-
-				/* Set up the key */
-
-				if string_key == nil {
-					key.SetLong(num_key)
-				} else {
-					key.SetStringCopy(string_key)
-				}
-
-				/* Set up the key */
-
-			}
-			if use_type != ARRAY_FILTER_USE_KEY {
-				types.ZVAL_COPY(&args[0], operand)
-			}
-			fci.SetParams(args)
-			if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS {
-				var retval_true int
-				// zend.ZvalPtrDtor(&args[0])
-				if use_type == ARRAY_FILTER_USE_BOTH {
-					// zend.ZvalPtrDtor(&args[1])
-				}
-				retval_true = zend.ZendIsTrue(&retval)
-				// zend.ZvalPtrDtor(&retval)
-				if retval_true == 0 {
-					continue
-				}
-			} else {
-				// zend.ZvalPtrDtor(&args[0])
-				if use_type == ARRAY_FILTER_USE_BOTH {
-					// zend.ZvalPtrDtor(&args[1])
-				}
-				return
-			}
-		} else if zend.ZendIsTrue(operand) == 0 {
-			continue
-		}
-		if string_key != nil {
-			operand = return_value.Array().KeyUpdate(string_key.GetStr(), operand)
-		} else {
-			operand = return_value.Array().IndexUpdate(num_key, operand)
-		}
-		zend.ZvalAddRef(operand)
-	}
-	zend.ZendReleaseFcallInfoCache(&fci_cache)
+		return true
+	})
+	return retArr
 }
 func ZifArrayMap(executeData zpp.Ex, return_value zpp.Ret, callback *types.Zval, arrays []*types.Zval) {
 	var arrays *types.Zval = nil

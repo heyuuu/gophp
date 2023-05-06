@@ -123,6 +123,22 @@ func ZVAL_ZVAL(z *types.Zval, zv *types.Zval, copy int, dtor int) {
 		types.ZVAL_COPY(__z, types.Z_REFVAL_P(__zv))
 	}
 }
+
+func ZvalZval(zv *types.Zval, copy bool, dtor bool) *types.Zval {
+	var z types.Zval
+	if zv.IsReference() {
+		z.CopyFrom(zv.DeRef())
+	} else {
+		if copy && !dtor {
+			z.CopyFrom(zv)
+		} else {
+			z.CopyValueFrom(zv)
+		}
+	}
+
+	return &z
+}
+
 func HASH_OF(p *types.Zval) *types.Array {
 	if p.IsArray() {
 		return p.Array()

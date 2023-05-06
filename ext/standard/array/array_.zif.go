@@ -246,15 +246,16 @@ var DefZifArrayFlip = def.DefFunc("array_flip", 1, 1, []def.ArgInfo{{Name: "arra
 })
 
 // generate by ZifArrayChangeKeyCase
-var DefZifArrayChangeKeyCase = def.DefFunc("array_change_key_case", 1, 2, []def.ArgInfo{{Name: "input"}, {Name: "case"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayChangeKeyCase = def.DefFunc("array_change_key_case", 1, 2, []def.ArgInfo{{Name: "array"}, {Name: "case"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	input := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	fp.StartOptional()
-	case_ := fp.ParseZval()
+	case_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayChangeKeyCase(input, nil, case_)
+	ret := ZifArrayChangeKeyCase(array, nil, case_)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArrayUnique
@@ -428,14 +429,14 @@ var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 1, -1, []def.ArgInfo{{N
 })
 
 // generate by ZifArrayDiff
-var DefZifArrayDiff = def.DefFunc("array_diff", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	arr1 := fp.ParseZval()
+var DefZifArrayDiff = def.DefFunc("array_diff", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	arrays := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayDiff(executeData, returnValue, arr1, arrays)
+	ret := ZifArrayDiff(arrays)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayUdiff
@@ -543,49 +544,53 @@ var DefZifArrayRand = def.DefFunc("array_rand", 1, 2, []def.ArgInfo{{Name: "arg"
 })
 
 // generate by ZifArraySum
-var DefZifArraySum = def.DefFunc("array_sum", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArraySum = def.DefFunc("array_sum", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	if fp.HasError() {
 		return
 	}
-	ZifArraySum(executeData, returnValue, arg)
+	ret := ZifArraySum(array)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayProduct
-var DefZifArrayProduct = def.DefFunc("array_product", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayProduct = def.DefFunc("array_product", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayProduct(executeData, returnValue, arg)
+	ret := ZifArrayProduct(array)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayReduce
-var DefZifArrayReduce = def.DefFunc("array_reduce", 2, 3, []def.ArgInfo{{Name: "arg"}, {Name: "callback"}, {Name: "initial"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayReduce = def.DefFunc("array_reduce", 2, 3, []def.ArgInfo{{Name: "array"}, {Name: "callback"}, {Name: "initial"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	arg := fp.ParseZval()
-	callback := fp.ParseZval()
+	array := fp.ParseArrayHt()
+	callback := fp.ParseCallable()
 	fp.StartOptional()
 	initial := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayReduce(executeData, returnValue, arg, callback, nil, initial)
+	ret := ZifArrayReduce(array, callback, nil, initial)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayFilter
-var DefZifArrayFilter = def.DefFunc("array_filter", 1, 3, []def.ArgInfo{{Name: "arg"}, {Name: "callback"}, {Name: "use_keys"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayFilter = def.DefFunc("array_filter", 1, 3, []def.ArgInfo{{Name: "array"}, {Name: "callback"}, {Name: "mode"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
-	arg := fp.ParseZval()
+	array_ := fp.ParseArrayHt()
 	fp.StartOptional()
-	callback := fp.ParseZval()
-	use_keys := fp.ParseZval()
+	callback := fp.ParseCallable()
+	mode := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayFilter(executeData, returnValue, arg, nil, callback, use_keys)
+	ret := ZifArrayFilter(array_, nil, callback, mode)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArrayMap

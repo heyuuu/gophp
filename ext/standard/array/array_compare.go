@@ -235,14 +235,22 @@ func sortPairs(pairs []types.ArrayPair, cmp types.ArrayComparer) {
 	})
 }
 
-func arrayDiffWrapper(args []*types.Zval, cmp types.ArrayComparer) (*types.Array, bool) {
-	var arrays []*types.Array
+func checkArrayArgs(args []*types.Zval, startIdx int) ([]*types.Array, bool) {
+	var arrays = make([]*types.Array, len(args))
 	for i, arg := range args {
 		if !arg.IsArray() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+startIdx+1, types.ZendZvalTypeName(args[i]))
 			return nil, false
 		}
 		arrays[i] = arg.Array()
+	}
+	return arrays, true
+}
+
+func arrayDiffWrapper(args []*types.Zval, cmp types.ArrayComparer) (*types.Array, bool) {
+	arrays, ok := checkArrayArgs(args, 0)
+	if !ok {
+		return nil, false
 	}
 	return arrayDiff(arrays[0], arrays[1:], cmp), true
 }
@@ -286,13 +294,9 @@ func arrayDiff(array *types.Array, arrays []*types.Array, cmp types.ArrayCompare
 }
 
 func arrayDiffKeyWrapper(args []*types.Zval, cmp zvalComparer) (*types.Array, bool) {
-	var arrays []*types.Array
-	for i, arg := range args {
-		if !arg.IsArray() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-			return nil, false
-		}
-		arrays[i] = arg.Array()
+	arrays, ok := checkArrayArgs(args, 0)
+	if !ok {
+		return nil, false
 	}
 	return arrayDiffKey(arrays[0], arrays[1:], cmp), true
 }
@@ -319,13 +323,9 @@ func arrayDiffKey(array *types.Array, arrays []*types.Array, dataComparer zvalCo
 }
 
 func arrayIntersectWrapper(args []*types.Zval, cmp types.ArrayComparer) (*types.Array, bool) {
-	var arrays []*types.Array
-	for i, arg := range args {
-		if !arg.IsArray() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-			return nil, false
-		}
-		arrays[i] = arg.Array()
+	arrays, ok := checkArrayArgs(args, 0)
+	if !ok {
+		return nil, false
 	}
 	return arrayIntersect(arrays[0], arrays[1:], cmp), true
 }
@@ -379,13 +379,9 @@ func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayCo
 }
 
 func arrayIntersectKeyWrapper(args []*types.Zval, cmp zvalComparer) (*types.Array, bool) {
-	var arrays []*types.Array
-	for i, arg := range args {
-		if !arg.IsArray() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(&args[i]))
-			return nil, false
-		}
-		arrays[i] = arg.Array()
+	arrays, ok := checkArrayArgs(args, 0)
+	if !ok {
+		return nil, false
 	}
 	return arrayIntersectKey(arrays[0], arrays[1:], cmp), true
 }

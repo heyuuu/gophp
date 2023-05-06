@@ -140,9 +140,6 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 }
 func ZendReleaseFcallInfoCache(fcc *types.ZendFcallInfoCache) {
 	if fcc.GetFunctionHandler() != nil && (fcc.GetFunctionHandler().IsCallViaTrampoline() || fcc.GetFunctionHandler().GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY || fcc.GetFunctionHandler().GetType() == ZEND_OVERLOADED_FUNCTION) {
-		if fcc.GetFunctionHandler().GetType() != ZEND_OVERLOADED_FUNCTION && fcc.GetFunctionHandler().GetFunctionName() != nil {
-			// types.ZendStringReleaseEx(fcc.GetFunctionHandler().GetFunctionName(), 0)
-		}
 		ZendFreeTrampoline(fcc.GetFunctionHandler())
 	}
 	fcc.SetFunctionHandler(nil)
