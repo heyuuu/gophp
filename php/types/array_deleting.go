@@ -40,6 +40,14 @@ func (ht *Array) SymtableClean() {
 	ht.Clean()
 }
 
+func NumericKey(key string) ArrayKey {
+	if idx, ok := ParseNumericStr(key); ok {
+		return IdxKey(idx)
+	} else {
+		return StrKey(key)
+	}
+}
+
 func (ht *Array) SymtableAddNew(key string, pData *Zval) *Zval {
 	if idx, ok := ParseNumericStr(key); ok {
 		return ht.IndexAddNew(idx, pData)

@@ -314,6 +314,13 @@ func (ht *Array) HasEmptyIndex() bool  { return ht.flags&HASH_FLAG_HAS_EMPTY_IND
 func (ht *Array) MarkHasEmptyIndex()   { ht.flags |= HASH_FLAG_HAS_EMPTY_IND }
 func (ht *Array) UnmarkHasEmptyIndex() { ht.flags &^= HASH_FLAG_HAS_EMPTY_IND }
 
+func (ht *Array) Keys() []ArrayKey {
+	var keys = make([]ArrayKey, 0, ht.Len())
+	ht.Foreach(func(key ArrayKey, value *Zval) {
+		keys = append(keys, key)
+	})
+	return keys
+}
 func (ht *Array) Values() []*Zval {
 	var values = make([]*Zval, 0, ht.Len())
 	ht.Foreach(func(key ArrayKey, value *Zval) {

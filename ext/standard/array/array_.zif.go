@@ -44,14 +44,15 @@ var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "st
 })
 
 // generate by ZifArrayUnshift
-var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{Name: "stack"}, {Name: "vars"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{Name: "stack"}, {Name: "values"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	stack := fp.ParseZvalEx(false, true)
-	vars := fp.ParseVariadic()
+	values := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUnshift(stack, vars)
+	ret := ZifArrayUnshift(stack, values)
+	returnValue.SetLong(ret)
 })
 
 // generate by ZifArraySplice
@@ -70,17 +71,18 @@ var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{Name: "
 })
 
 // generate by ZifArraySlice
-var DefZifArraySlice = def.DefFunc("array_slice", 2, 4, []def.ArgInfo{{Name: "arg"}, {Name: "offset"}, {Name: "length"}, {Name: "preserve_keys"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArraySlice = def.DefFunc("array_slice", 2, 4, []def.ArgInfo{{Name: "array"}, {Name: "offset"}, {Name: "length"}, {Name: "preserve_keys"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
-	arg := fp.ParseZval()
-	offset := fp.ParseZval()
+	array := fp.ParseArrayHt()
+	offset := fp.ParseLong()
 	fp.StartOptional()
-	length := fp.ParseZval()
-	preserve_keys := fp.ParseZval()
+	length_ := fp.ParseZval()
+	preserve_keys := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifArraySlice(executeData, returnValue, arg, offset, nil, length, preserve_keys)
+	ret := ZifArraySlice(array, offset, nil, length_, preserve_keys)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArrayMerge
@@ -183,7 +185,7 @@ var DefZifArrayCountValues = def.DefFunc("array_count_values", 1, 1, []def.ArgIn
 	if fp.HasError() {
 		return
 	}
-	ret := ZifArrayCountValues(executeData, returnValue, array)
+	ret := ZifArrayCountValues(array)
 	returnValue.SetArray(ret)
 })
 
@@ -540,7 +542,7 @@ var DefZifArrayRand = def.DefFunc("array_rand", 1, 2, []def.ArgInfo{{Name: "arg"
 	if fp.HasError() {
 		return
 	}
-	ret := ZifArrayRand(returnValue, arg, nil, num_req_)
+	ret := ZifArrayRand(arg, nil, num_req_)
 	returnValue.SetBy(ret)
 })
 

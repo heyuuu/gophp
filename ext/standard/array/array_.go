@@ -166,98 +166,58 @@ func ZifArraySplice(array zpp.RefArray, offset int, _ zpp.Opt, length_ *int, rep
 	array.SetArray(newArr)
 	return removedArr
 }
-func ZifArraySlice(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, offset *types.Zval, _ zpp.Opt, length *types.Zval, preserveKeys *types.Zval) {
-	var input *types.Zval
-	var z_length *types.Zval = nil
-	var entry *types.Zval
-	var offset zend.ZendLong
-	var length = 0
-	var preserve_keys = 0
-	var num_in int
-	var pos int
-	var string_key *types.String
-	var num_key zend.ZendUlong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 4, 0)
-			input = fp.ParseArray()
-			offset = fp.ParseLong()
-			fp.StartOptional()
-			z_length = fp.ParseZval()
-			preserve_keys = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-
-	/* Get number of entries in the input hash */
-
-	num_in = input.Array().Len()
+func ZifArraySlice(array *types.Array, offset int, _ zpp.Opt, length_ *types.Zval, preserveKeys bool) *types.Array {
+	numIn := array.Len()
 
 	/* We want all entries from offset to the end if length is not passed or is null */
-
-	if executeData.NumArgs() < 3 || z_length.IsType(types.IS_NULL) {
-		length = num_in
+	var length = 0
+	if length_ == nil || length_.IsNull() {
+		length = numIn
 	} else {
-		length = zend.ZvalGetLong(z_length)
+		length = zend.ZvalGetLong(length_)
 	}
 
 	/* Clamp the offset.. */
-
-	if offset > num_in {
-		return_value.SetEmptyArray()
-		return
-	} else if offset < 0 && b.Assign(&offset, num_in+offset) < 0 {
-		offset = 0
+	if offset > numIn {
+		return types.NewArray(0)
+	} else if offset < 0 && b.Assign(&offset, numIn+offset) < 0 {
+		offset += numIn
+		if offset < 0 {
+			offset = 0
+		}
 	}
 
 	/* ..and the length */
-
 	if length < 0 {
-		length = num_in - offset + length
-	} else if zend.ZendUlong(offset+zend.ZendUlong(length)) > unsigned(num_in) {
-		length = num_in - offset
+		length = numIn - offset + length
+	} else if offset+length > numIn {
+		length = numIn - offset
 	}
 	if length <= 0 {
-		return_value.SetEmptyArray()
-		return
+		return types.NewArray(0)
 	}
 
 	/* Initialize returned array */
-
-	zend.ArrayInitSize(return_value, uint32(length))
+	retArr := types.NewArray(length)
 
 	/* Start at the beginning and go until we hit offset */
-
-	pos = 0
-	var __ht = input.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		num_key = _p.GetH()
-		string_key = _p.GetKey()
-		entry = _z
-		pos++
-		if pos <= offset {
-			continue
+	count := 0
+	array.ForeachEx(func(key types.ArrayKey, value *types.Zval) bool {
+		count++
+		if count <= offset {
+			return true
 		}
-		if pos > offset+length {
-			break
+		if count > offset+length {
+			return false
 		}
-		if string_key != nil {
-			entry = return_value.Array().KeyAddNew(string_key.GetStr(), entry)
+		if key.IsStrKey() || preserveKeys {
+			retArr.Add(key, value)
 		} else {
-			if preserve_keys != 0 {
-				entry = return_value.Array().IndexAddNew(num_key, entry)
-			} else {
-				entry = return_value.Array().AppendNew(entry)
-			}
+			retArr.Append(value)
 		}
-		zend.ZvalAddRef(entry)
-	}
+		return true
+	})
+	return retArr
 }
 func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 	for iter := src.Iterator(); iter.Valid(); iter.Next() {
@@ -562,54 +522,29 @@ func ZifArrayValues(array *types.Array) *types.Array {
 	})
 	return values
 }
-func ZifArrayCountValues(executeData zpp.Ex, return_value zpp.Ret, array *types.Array) *types.Array {
-	var input *types.Zval
-	var entry *types.Zval
-	var tmp *types.Zval
-	var myht *types.Array
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			input = fp.ParseArray()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-
-	/* Initialize return array */
-
-	zend.ArrayInit(return_value)
-
-	/* Go through input array and add values to the return array */
-	var __ht = myht
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		entry = _z
+func ZifArrayCountValues(array *types.Array) *types.Array {
+	retArr := types.NewArray(0)
+	array.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
 		entry = types.ZVAL_DEREF(entry)
-		if entry.IsType(types.IS_LONG) {
-			if b.Assign(&tmp, return_value.Array().IndexFind(entry.Long())) == nil {
-				var data types.Zval
-				data.SetLong(1)
-				return_value.Array().IndexUpdate(entry.Long(), &data)
-			} else {
-				tmp.Long()++
-			}
+
+		var key types.ArrayKey
+		if entry.IsLong() {
+			key = types.IdxKey(entry.Long())
 		} else if entry.IsString() {
-			if b.Assign(&tmp, return_value.Array().SymtableFind(entry.String().GetStr())) == nil {
-				var data types.Zval
-				data.SetLong(1)
-				return_value.Array().SymtableUpdate(entry.String().GetStr(), &data)
-			} else {
-				tmp.Long()++
-			}
+			key = types.NumericKey(entry.StringVal())
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Can only count STRING and INTEGER values!")
+			return
 		}
-	}
+
+		if keyCount := retArr.Find(key); keyCount != nil {
+			retArr.Update(key, types.NewZvalLong(keyCount.Long()+1))
+		} else {
+			retArr.Update(key, types.NewZvalLong(1))
+		}
+	})
+
+	return retArr
 }
 func ArrayColumnParamHelper(param *types.Zval, name string) types.ZendBool {
 	switch param.GetType() {
@@ -1051,7 +986,7 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 				/* flag allowed here */
 				if parseState[MULTISORT_TYPE] == 1 {
 					/* Save the flag and make sure then next arg is not the current flag. */
-					sortType = int(arg.Long())
+					sortType = arg.Long()
 					parseState[MULTISORT_TYPE] = 0
 				} else {
 					core.PhpErrorDocref(nil, faults.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
@@ -1127,124 +1062,46 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 
 	return true
 }
-func ZifArrayRand(return_value zpp.Ret, arg *types.Array, _ zpp.Opt, numReq_ *int) *types.Zval {
-	var numReq = b.Option(numReq_, 1)
-	var string_key *types.String
-	var num_key zend.ZendUlong
-	var i int
-	var numAvail int
-	var bitset zend.ZendBitset
-	var negative_bitset = 0
-	var bitset_len uint32
-	numAvail = arg.Len()
+func ZifArrayRand(arg *types.Array, _ zpp.Opt, numReq_ *int) *types.Zval {
+	numReq := b.Option(numReq_, 1)
+
+	numAvail := arg.Len()
 	if numAvail == 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Array is empty")
 		return nil
 	}
-	if numReq == 1 {
-		if numAvail < arg.Cap()/2 {
-			/* If less than 1/2 of elements are used, don't sample. Instead search for a
-			 * specific offset using linear scan. */
-			var i = 0
-			var randval = standard.PhpMtRandRange(0, numAvail-1)
-			var __ht = arg
-			for _, _p := range __ht.ForeachData() {
-				var _z = _p.GetVal()
-
-				num_key = _p.GetH()
-				string_key = _p.GetKey()
-				if i == randval {
-					if string_key != nil {
-						return_value.SetStringCopy(string_key)
-						return
-					} else {
-						return_value.SetLong(num_key)
-						return
-					}
-				}
-				i++
-			}
-		}
-
-		/* Sample random buckets until we hit one that is not empty.
-		 * The worst case probability of hitting an empty element is 1-1/2. The worst case
-		 * probability of hitting N empty elements in a row is (1-1/2)**N.
-		 * For N=10 this becomes smaller than 0.1%. */
-
-		for {
-			var randval = standard.PhpMtRandRange(0, arg.GetNNumUsed()-1)
-			var bucket *types.Bucket = arg.GetArData()[randval]
-			if !(bucket.GetVal().IsUndef()) {
-				if bucket.GetKey() != nil {
-					return_value.SetStringCopy(bucket.GetKey())
-					return
-				} else {
-					return_value.SetLong(bucket.GetH())
-					return
-				}
-			}
-
-		}
-
-		/* Sample random buckets until we hit one that is not empty.
-		 * The worst case probability of hitting an empty element is 1-1/2. The worst case
-		 * probability of hitting N empty elements in a row is (1-1/2)**N.
-		 * For N=10 this becomes smaller than 0.1%. */
-
-	}
 	if numReq <= 0 || numReq > numAvail {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Second argument has to be between 1 and the number of elements in the array")
-		return
+		return nil
 	}
 
-	/* Make the return value an array only if we need to pass back more than one result. */
-
-	zend.ArrayInitSize(return_value, uint32(numReq))
-	if numReq > numAvail>>1 {
-		negative_bitset = 1
-		numReq = numAvail - numReq
-	}
-	bitset_len = zend.ZendBitsetLen(numAvail)
-	bitset = zend.ZEND_BITSET_ALLOCA(bitset_len, use_heap)
-	zend.ZendBitsetClear(bitset, bitset_len)
-	i = numReq
-	for i != 0 {
-		var randval = standard.PhpMtRandRange(0, numAvail-1)
-		if zend.ZendBitsetIn(bitset, randval) == 0 {
-			zend.ZendBitsetIncl(bitset, randval)
-			i--
+	keys := arg.Keys()
+	if numReq == 1 {
+		randIdx := standard.PhpMtRandRange(0, numAvail-1)
+		return keys[randIdx].ToZval()
+	} else {
+		randIdxSet := make(map[int]bool)
+		negative := false
+		if numReq > arg.Len()/2 {
+			negative = true
+			numReq = arg.Len() - numReq
 		}
-	}
-
-	/* i = 0; */
-
-	fillScope := types.PackedFillStart(return_value.Array())
-
-	/* We can't use zend_hash_index_find()
-	 * because the array may have string keys or gaps. */
-
-	var __ht = arg
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		num_key = _p.GetH()
-		string_key = _p.GetKey()
-		if (zend.ZendBitsetIn(bitset, i) ^ negative_bitset) != 0 {
-			if string_key != nil {
-				fillScope.FillSetStringCopy(string_key)
-			} else {
-				fillScope.FillSetLong(num_key)
+		for i := numReq - 1; i >= 0; {
+			randIdx := standard.PhpMtRandRange(0, numAvail-1)
+			if !randIdxSet[randIdx] {
+				randIdxSet[randIdx] = true
+				i--
 			}
-			fillScope.FillNext()
 		}
-		i++
+
+		retArr := types.NewArray(numReq)
+		for i, key := range keys {
+			if !negative && randIdxSet[i] || negative && !randIdxSet[i] {
+				retArr.Append(key.ToZval())
+			}
+		}
+		return types.NewZvalArray(retArr)
 	}
-
-	/* We can't use zend_hash_index_find()
-	 * because the array may have string keys or gaps. */
-
-	fillScope.FillEnd()
-	zend.FreeAlloca(bitset, use_heap)
 }
 func ZifArraySum(array *types.Array) *types.Zval {
 	var num types.Zval
