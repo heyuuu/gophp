@@ -24,9 +24,9 @@ func ZendGetFunctionRootClass(fbc types.IFunction) *types.ClassEntry {
 	}
 }
 func ZendReleaseProperties(ht *types.Array) {
-	if ht != nil && (ht.GetGcFlags()&types.GC_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-		ht.DestroyEx()
-	}
+	//if ht != nil && (ht.GetGcFlags()&types.GC_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
+	//	ht.DestroyEx()
+	//}
 }
 func ZendFreeTrampoline(func_ any) {
 	if func_ == EG__().GetTrampoline() {

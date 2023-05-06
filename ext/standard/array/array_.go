@@ -1498,364 +1498,155 @@ func ZifArrayFilter(array_ *types.Array, _ zpp.Opt, callback zpp.Callable, mode 
 	})
 	return retArr
 }
-func ZifArrayMap(executeData zpp.Ex, return_value zpp.Ret, callback *types.Zval, arrays []*types.Zval) {
-	var arrays *types.Zval = nil
-	var n_arrays = 0
-	var result types.Zval
-	var fci = zend.EmptyFcallInfo
-	var fci_cache = zend.EmptyFcallInfoCache
-	var i int
-	var k uint32
-	var maxlen uint32 = 0
-	for {
-		var _flags = 0
-		var _min_num_args = 2
-		var _max_num_args = -1
 
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			fp.ParseFuncEx(&fci, &fci_cache, true, false)
-			arrays, n_arrays = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
+func arrayMapSingle(callback zpp.Callable, array *types.Array) *types.Array {
+	retArr := types.NewArray(array.Len())
+	ok := array.ForeachEx(func(key types.ArrayKey, value *types.Zval) bool {
+		retVal, ok := callback.Call(value)
+		if !ok || retVal.IsUndef() {
+			// 调用 callback 失败，中断流程
+			return false
 		}
-		break
+
+		retArr.Add(key, retVal)
+		return true
+	})
+	if !ok {
+		return nil
 	}
-	return_value.SetNull()
-	if n_arrays == 1 {
-		var num_key zend.ZendUlong
-		var str_key *types.String
-		var zv *types.Zval
-		var arg types.Zval
-		var ret int
-		if arrays[0].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter 2 to be an array, %s given", types.ZendZvalTypeName(&arrays[0]))
-			return
+	return retArr
+}
+
+func arrayMapMulti(callback zpp.Callable, arrays []*types.Array) *types.Array {
+	len_ := arrays[0].Len()
+	for _, array := range arrays {
+		if array.Len() > len_ {
+			len_ = array.Len()
 		}
-		maxlen = arrays[0].Array().Len()
+	}
 
-		/* Short-circuit: if no callback and only one array, just return it. */
-
-		if !(zend.ZEND_FCI_INITIALIZED(fci)) || maxlen == 0 {
-			types.ZVAL_COPY(return_value, &arrays[0])
-			zend.ZendReleaseFcallInfoCache(&fci_cache)
-			return
+	argMatrix := make([][]*types.Zval, len_)
+	for _, array := range arrays {
+		count := 0
+		array.ForeachEx(func(key types.ArrayKey, value *types.Zval) bool {
+			argMatrix[count] = append(argMatrix[count], value)
+			count++
+			return count < len_
+		})
+		for i := len_; i < count; i++ {
+			argMatrix[i] = append(argMatrix[i], types.NewZvalNull())
 		}
-		zend.ArrayInitSize(return_value, maxlen)
-		var __ht = arrays[0].Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.Indirect()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			num_key = _p.GetH()
-			str_key = _p.GetKey()
-			zv = _z
-			fci.SetRetval(&result)
-			fci.SetParamCount(1)
-			fci.SetParams(&arg)
-			fci.SetNoSeparation(0)
-			types.ZVAL_COPY(&arg, zv)
-			ret = zend.ZendCallFunction(&fci, &fci_cache)
-			// zend.IZvalPtrDtor(&arg)
-			if ret != types.SUCCESS || result.IsUndef() {
-				return_value.Array().DestroyEx()
-				return_value.SetNull()
-				return
-			}
-			if str_key != nil {
-				zend._zendHashAppend(return_value.Array(), str_key, &result)
-			} else {
-				return_value.Array().IndexAddNew(num_key, &result)
-			}
-		}
-		zend.ZendReleaseFcallInfoCache(&fci_cache)
-	} else {
-		var array_pos = (*types.ArrayPosition)(zend.Ecalloc(n_arrays, b.SizeOf("ArrayPosition")))
-		for i = 0; i < n_arrays; i++ {
-			if arrays[i].GetType() != types.IS_ARRAY {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+2, types.ZendZvalTypeName(&arrays[i]))
-				zend.Efree(array_pos)
-				return
-			}
-			if arrays[i].Array().Len() > maxlen {
-				maxlen = arrays[i].Array().Len()
-			}
-		}
-		zend.ArrayInitSize(return_value, maxlen)
-		if !(zend.ZEND_FCI_INITIALIZED(fci)) {
-			var zv types.Zval
+	}
 
-			/* We iterate through all the arrays at once. */
-
-			for k = 0; k < maxlen; k++ {
-
-				/* If no callback, the result will be an array, consisting of current
-				 * entries from all arrays. */
-
-				zend.ArrayInitSize(&result, n_arrays)
-				for i = 0; i < n_arrays; i++ {
-
-					/* If this array still has elements, add the current one to the
-					 * parameter list, otherwise use null value. */
-
-					var pos uint32 = array_pos[i]
-					for true {
-						if pos >= arrays[i].Array().GetNNumUsed() {
-							zv.SetNull()
-							break
-						} else if arrays[i].Array().GetArData()[pos].GetVal().IsNotUndef() {
-							types.ZVAL_COPY(&zv, arrays[i].Array().GetArData()[pos].GetVal())
-							array_pos[i] = pos + 1
-							break
-						}
-						pos++
-					}
-					result.Array().AppendNew(&zv)
-				}
-				return_value.Array().AppendNew(&result)
-			}
-
-			/* We iterate through all the arrays at once. */
-
+	retArr := types.NewArray(len_)
+	for _, argColumns := range argMatrix {
+		if callback == nil {
+			retArr.Append(types.NewZvalArray(types.NewArrayOfZval(argColumns)))
 		} else {
-			var params = (*types.Zval)(zend.SafeEmalloc(n_arrays, b.SizeOf("zval"), 0))
-
-			/* We iterate through all the arrays at once. */
-
-			for k = 0; k < maxlen; k++ {
-				for i = 0; i < n_arrays; i++ {
-
-					/* If this array still has elements, add the current one to the
-					 * parameter list, otherwise use null value. */
-
-					var pos uint32 = array_pos[i]
-					for true {
-						if pos >= arrays[i].Array().GetNNumUsed() {
-							params[i].SetNull()
-							break
-						} else if arrays[i].Array().GetArData()[pos].GetVal().IsNotUndef() {
-							types.ZVAL_COPY(&params[i], arrays[i].Array().GetArData()[pos].GetVal())
-							array_pos[i] = pos + 1
-							break
-						}
-						pos++
-					}
-				}
-				fci.SetRetval(&result)
-				fci.SetParamCount(n_arrays)
-				fci.SetParams(params)
-				fci.SetNoSeparation(0)
-				if zend.ZendCallFunction(&fci, &fci_cache) != types.SUCCESS || result.IsUndef() {
-					zend.Efree(array_pos)
-					return_value.Array().DestroyEx()
-					for i = 0; i < n_arrays; i++ {
-						// zend.ZvalPtrDtor(&params[i])
-					}
-					zend.Efree(params)
-					return_value.SetNull()
-					return
-				} else {
-					for i = 0; i < n_arrays; i++ {
-						// zend.ZvalPtrDtor(&params[i])
-					}
-				}
-				return_value.Array().AppendNew(&result)
+			retVal, ok := callback.Call(argColumns...)
+			if !ok || retVal.IsUndef() {
+				// 调用 callback 失败，中断流程
+				return nil
 			}
-			zend.Efree(params)
-			zend.ZendReleaseFcallInfoCache(&fci_cache)
+			retArr.Append(retVal)
 		}
-		zend.Efree(array_pos)
 	}
+	return retArr
+}
+
+//@zif -c=2,
+func ZifArrayMap(callback zpp.Callable, arrays []*types.Zval) *types.Zval {
+	b.Assert(len(arrays) >= 1)
+
+	arrayHts, ok := checkArrayArgs(arrays, 1)
+	if !ok {
+		return types.NewZvalNull()
+	}
+
+	var retArr *types.Array
+	if len(arrayHts) == 1 {
+		retArr = arrayMapSingle(callback, arrayHts[0])
+	} else {
+		retArr = arrayMapMulti(callback, arrayHts)
+	}
+
+	if retArr == nil {
+		return types.NewZvalNull()
+	}
+	return types.NewZvalArray(retArr)
 }
 
 //@zif -alias key_exists
-func ZifArrayKeyExists(executeData zpp.Ex, return_value zpp.Ret, key *types.Zval, search *types.Zval) {
-	var key *types.Zval
-	var array *types.Zval
+func ZifArrayKeyExists(key *types.Zval, array zpp.ArrayOrObject) bool {
 	var ht *types.Array
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			key = fp.ParseZval()
-			array = fp.ParseArrayOrObject()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
 	if array.IsType(types.IS_ARRAY) {
 		ht = array.Array()
 	} else {
 		ht = zend.ZendGetPropertiesFor(array, zend.ZEND_PROP_PURPOSE_ARRAY_CAST)
-		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Using array_key_exists() on objects is deprecated. Use isset() or property_exists() instead")
 	}
 	switch key.GetType() {
 	case types.IS_STRING:
-		return_value.SetBool(ht.SymtableExistsInd(key.String().GetStr()))
+		return ht.SymtableExistsInd(key.StringVal())
 	case types.IS_LONG:
-		return_value.SetBool(ht.IndexExists(key.Long()))
+		return ht.IndexExists(key.Long())
 	case types.IS_NULL:
-		return_value.SetBool(ht.KeyExistsIndirect(types.NewString("").GetStr()))
+		return ht.KeyExistsIndirect("")
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The first argument should be either a string or an integer")
-		return_value.SetFalse()
-	}
-	if array.GetType() != types.IS_ARRAY {
-		zend.ZendReleaseProperties(ht)
+		return false
 	}
 }
-func ZifArrayChunk(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, size *types.Zval, _ zpp.Opt, preserveKeys *types.Zval) {
-	var num_in int
-	var size zend.ZendLong
-	var current = 0
-	var str_key *types.String
-	var num_key zend.ZendUlong
-	var preserve_keys = 0
-	var input *types.Zval = nil
-	var chunk types.Zval
-	var entry *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			input = fp.ParseArray()
-			size = fp.ParseLong()
-			fp.StartOptional()
-			preserve_keys = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-
-	/* Do bounds checking for size parameter. */
-
-	if size < 1 {
+func ZifArrayChunk(array *types.Array, length int, _ zpp.Opt, preserveKeys bool) *types.Array {
+	if length < 1 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Size parameter expected to be greater than 0")
-		return
+		return nil
 	}
-	num_in = input.Array().Len()
-	if size > num_in {
-		if num_in > 0 {
-			size = num_in
+
+	chunkCount := (array.Len()-1)/length + 1 // ceil(len/length)
+	retArr := types.NewArray(chunkCount)
+
+	var currChunk *types.Array = nil
+	itemCount := 0
+	array.Foreach(func(key types.ArrayKey, entry *types.Zval) {
+		if itemCount%length == 0 {
+			currChunk = types.NewArray(length)
+			retArr.Append(types.NewZvalArray(currChunk))
+		}
+
+		if preserveKeys {
+			currChunk.Update(key, entry)
 		} else {
-			size = 1
+			currChunk.Append(entry)
 		}
-	}
-	zend.ArrayInitSize(return_value, uint32((num_in-1)/size+1))
-	chunk.SetUndef()
-	var __ht = input.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		num_key = _p.GetH()
-		str_key = _p.GetKey()
-		entry = _z
-
-		/* If new chunk, create and initialize it. */
-
-		if chunk.IsUndef() {
-			zend.ArrayInitSize(&chunk, uint32(size))
-		}
-
-		/* Add entry to the chunk, preserving keys if necessary. */
-
-		if preserve_keys != 0 {
-			if str_key != nil {
-				entry = chunk.Array().KeyUpdate(str_key.GetStr(), entry)
-			} else {
-				entry = chunk.Array().IndexUpdate(num_key, entry)
-			}
-		} else {
-			entry = chunk.Array().Append(entry)
-		}
-		zend.ZvalAddRef(entry)
-
-		/* If reached the chunk size, add it to the result array, and reset the
-		 * pointer. */
-
-		if b.PreInc(&current)%size == 0 {
-			zend.AddNextIndexZval(return_value, &chunk)
-			chunk.SetUndef()
-		}
-
-		/* If reached the chunk size, add it to the result array, and reset the
-		 * pointer. */
-
-	}
-
-	/* Add the final chunk if there is one. */
-
-	if chunk.IsNotUndef() {
-		zend.AddNextIndexZval(return_value, &chunk)
-	}
-
-	/* Add the final chunk if there is one. */
+		itemCount++
+	})
+	return retArr
 }
-func ZifArrayCombine(executeData zpp.Ex, return_value zpp.Ret, keys *types.Zval, values *types.Zval) {
-	var values *types.Array
-	var keys *types.Array
-	var pos_values uint32 = 0
-	var entry_keys *types.Zval
-	var entry_values *types.Zval
-	var num_keys int
-	var num_values int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			keys = fp.ParseArrayHt()
-			values = fp.ParseArrayHt()
-			if fp.HasError() {
-				return
-			}
+func ZifArrayCombine(keys *types.Array, values *types.Array) (*types.Array, bool) {
+	if keys.Len() != values.Len() {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Both parameters should have an equal number of elements")
+		return nil, false
+	}
+	if keys.Len() == 0 {
+		return types.NewArray(0), true
+	}
+
+	zvKeys := keys.Values()
+	zvValues := values.Values()
+	retArr := types.NewArray(keys.Len())
+	for i, key := range zvKeys {
+		if i > len(zvValues) {
 			break
 		}
-		break
-	}
-	num_keys = keys.Len()
-	num_values = values.Len()
-	if num_keys != num_values {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Both parameters should have an equal number of elements")
-		return_value.SetFalse()
-		return
-	}
-	if num_keys == 0 {
-		return_value.SetEmptyArray()
-		return
-	}
-	zend.ArrayInitSize(return_value, num_keys)
-	var __ht = keys
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
+		value := zvValues[i]
 
-		entry_keys = _z
-		for true {
-			if pos_values >= values.GetNNumUsed() {
-				break
-			} else if values.GetArData()[pos_values].GetVal().IsNotUndef() {
-				entry_values = values.GetArData()[pos_values].GetVal()
-				if entry_keys.IsType(types.IS_LONG) {
-					entry_values = return_value.Array().IndexUpdate(entry_keys.Long(), entry_values)
-				} else {
-					var tmp_key *types.String
-					var key = zend.ZvalGetTmpString(entry_keys, &tmp_key)
-					entry_values = return_value.Array().SymtableUpdate(key.GetStr(), entry_values)
-					// zend.ZendTmpStringRelease(tmp_key)
-				}
-				zend.ZvalAddRef(entry_values)
-				pos_values++
-				break
-			}
-			pos_values++
+		if key.IsLong() {
+			retArr.IndexUpdate(key.Long(), value)
+		} else {
+			strKey := zend.ZvalGetStrVal(key)
+			retArr.KeyUpdate(strKey, value)
 		}
 	}
+	return retArr, true
 }

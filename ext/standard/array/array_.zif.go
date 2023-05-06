@@ -596,12 +596,13 @@ var DefZifArrayFilter = def.DefFunc("array_filter", 1, 3, []def.ArgInfo{{Name: "
 // generate by ZifArrayMap
 var DefZifArrayMap = def.DefFunc("array_map", 1, -1, []def.ArgInfo{{Name: "callback"}, {Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	callback := fp.ParseZval()
+	callback := fp.ParseCallable()
 	arrays := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayMap(executeData, returnValue, callback, arrays)
+	ret := ZifArrayMap(callback, arrays)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayKeyExists
@@ -612,7 +613,7 @@ var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeyExists(executeData, returnValue, key, search)
+	ZifArrayKeyExists(key, search)
 })
 
 // generate by ZifArrayKeyExists
@@ -623,7 +624,7 @@ var DefZifKeyExists = def.DefFunc("key_exists", 2, 2, []def.ArgInfo{{Name: "key"
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeyExists(executeData, returnValue, key, search)
+	ZifArrayKeyExists(key, search)
 })
 
 // generate by ZifArrayChunk
@@ -636,7 +637,7 @@ var DefZifArrayChunk = def.DefFunc("array_chunk", 2, 3, []def.ArgInfo{{Name: "ar
 	if fp.HasError() {
 		return
 	}
-	ZifArrayChunk(executeData, returnValue, arg, size, nil, preserve_keys)
+	ZifArrayChunk(arg, size, nil, preserve_keys)
 })
 
 // generate by ZifArrayCombine
@@ -647,5 +648,5 @@ var DefZifArrayCombine = def.DefFunc("array_combine", 2, 2, []def.ArgInfo{{Name:
 	if fp.HasError() {
 		return
 	}
-	ZifArrayCombine(executeData, returnValue, keys, values)
+	ZifArrayCombine(keys, values)
 })
