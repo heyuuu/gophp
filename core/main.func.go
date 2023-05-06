@@ -25,24 +25,10 @@ func SAFE_FILENAME(f __auto__) string {
 		return "-"
 	}
 }
-func GetSafeCharsetHint() *byte {
-	var lastHint *byte = nil
-	var lastCodeset *byte = nil
+func GetSafeCharsetHint() string {
 	var hint = SG__().default_charset
-	var len_ int = strlen(hint)
-	var i = 0
-	if lastHint == SG__().default_charset {
-		return lastCodeset
-	}
-	lastHint = hint
-	lastCodeset = nil
-	for i = 0; i < b.SizeOf("charset_map")/b.SizeOf("charset_map [ 0 ]"); i++ {
-		if len_ == standard.CharsetMap[i].codeset_len && zend.ZendBinaryStrcasecmp(b.CastStr(hint, len_), b.CastStr(standard.CharsetMap[i].codeset, len_)) == 0 {
-			lastCodeset = (*byte)(standard.CharsetMap[i].codeset)
-			break
-		}
-	}
-	return lastCodeset
+	codeSet, _ := standard.CheckCodeSet(hint)
+	return codeSet
 }
 func OnSetFacility(
 	entry *zend.ZendIniEntry,
@@ -540,7 +526,6 @@ func PhpPrintf(format string, args ...any) int {
 	return PUTS(pfmt.Sprintf(format, args))
 }
 func PhpVerror(docref string, params string, type_ int, format string, args ...any) {
-	var buffer = ""
 	var docrefBuf = ""
 	var target = ""
 	var docref_target = ""
@@ -554,14 +539,14 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 	var isFunction = false
 
 	/* get error text into buffer and escape for html if necessary */
-	buffer_ := pfmt.Sprintf(format, args...)
+	buffer := pfmt.Sprintf(format, args...)
 	if PG__().html_errors {
-		replaceBuffer := standard.PhpEscapeHtmlEntities_Ex(buffer_, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
+		replaceBuffer := standard.PhpEscapeHtmlEntities_Ex(buffer, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 		/* Retry with substituting invalid chars on fail. */
 		if replaceBuffer == "" {
-			replaceBuffer = standard.PhpEscapeHtmlEntities_Ex(buffer_, 0, standard.ENT_COMPAT|standard.ENT_HTML_SUBSTITUTE_ERRORS, GetSafeCharsetHint())
+			replaceBuffer = standard.PhpEscapeHtmlEntities_Ex(buffer, 0, standard.ENT_COMPAT|standard.ENT_HTML_SUBSTITUTE_ERRORS, GetSafeCharsetHint())
 		}
-		buffer_ = replaceBuffer
+		buffer = replaceBuffer
 	}
 
 	/* which function caused the problem if any at all */
@@ -672,7 +657,7 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 		/* display html formatted or only show the additional links */
 
 		if PG__().html_errors {
-			message = fmt.Sprintf("%s [<a href='%s%s%s'>%s</a>]: %s", origin, docref_root, docref, docref_target, docref, buffer_)
+			message = fmt.Sprintf("%s [<a href='%s%s%s'>%s</a>]: %s", origin, docref_root, docref, docref_target, docref, buffer)
 		} else {
 			message = fmt.Sprintf("%s [%s%s%s]: %s", origin, docref_root, docref, docref_target, buffer)
 		}
@@ -681,7 +666,7 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 	}
 	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsUndef() || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
 		var tmp types.Zval
-		tmp.SetStringVal(buffer_)
+		tmp.SetStringVal(buffer)
 		if zend.CurrEX() != nil {
 			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types.FAILURE {
 				// zend.ZvalPtrDtor(&tmp)

@@ -49,50 +49,6 @@ const (
 	CsNumelems
 )
 
-var CharsetMap []struct {
-	codeset     *byte
-	codeset_len uint32
-	charset     EntityCharset
-} = []struct {
-	codeset     *byte
-	codeset_len uint32
-	charset     EntityCharset
-}{
-	{"ISO-8859-1", b.SizeOf("\"ISO-8859-1\"") - 1, Cs88591},
-	{"ISO8859-1", b.SizeOf("\"ISO8859-1\"") - 1, Cs88591},
-	{"ISO-8859-15", b.SizeOf("\"ISO-8859-15\"") - 1, Cs885915},
-	{"ISO8859-15", b.SizeOf("\"ISO8859-15\"") - 1, Cs885915},
-	{"utf-8", b.SizeOf("\"utf-8\"") - 1, CsUtf8},
-	{"cp1252", b.SizeOf("\"cp1252\"") - 1, CsCp1252},
-	{"Windows-1252", b.SizeOf("\"Windows-1252\"") - 1, CsCp1252},
-	{"1252", b.SizeOf("\"1252\"") - 1, CsCp1252},
-	{"BIG5", b.SizeOf("\"BIG5\"") - 1, CsBig5},
-	{"950", b.SizeOf("\"950\"") - 1, CsBig5},
-	{"GB2312", b.SizeOf("\"GB2312\"") - 1, CsGb2312},
-	{"936", b.SizeOf("\"936\"") - 1, CsGb2312},
-	{"BIG5-HKSCS", b.SizeOf("\"BIG5-HKSCS\"") - 1, CsBig5hkscs},
-	{"Shift_JIS", b.SizeOf("\"Shift_JIS\"") - 1, CsSjis},
-	{"SJIS", b.SizeOf("\"SJIS\"") - 1, CsSjis},
-	{"932", b.SizeOf("\"932\"") - 1, CsSjis},
-	{"SJIS-win", b.SizeOf("\"SJIS-win\"") - 1, CsSjis},
-	{"CP932", b.SizeOf("\"CP932\"") - 1, CsSjis},
-	{"EUCJP", b.SizeOf("\"EUCJP\"") - 1, CsEucjp},
-	{"EUC-JP", b.SizeOf("\"EUC-JP\"") - 1, CsEucjp},
-	{"eucJP-win", b.SizeOf("\"eucJP-win\"") - 1, CsEucjp},
-	{"KOI8-R", b.SizeOf("\"KOI8-R\"") - 1, CsKoi8r},
-	{"koi8-ru", b.SizeOf("\"koi8-ru\"") - 1, CsKoi8r},
-	{"koi8r", b.SizeOf("\"koi8r\"") - 1, CsKoi8r},
-	{"cp1251", b.SizeOf("\"cp1251\"") - 1, CsCp1251},
-	{"Windows-1251", b.SizeOf("\"Windows-1251\"") - 1, CsCp1251},
-	{"win-1251", b.SizeOf("\"win-1251\"") - 1, CsCp1251},
-	{"iso8859-5", b.SizeOf("\"iso8859-5\"") - 1, Cs88595},
-	{"iso-8859-5", b.SizeOf("\"iso-8859-5\"") - 1, Cs88595},
-	{"cp866", b.SizeOf("\"cp866\"") - 1, CsCp866},
-	{"866", b.SizeOf("\"866\"") - 1, CsCp866},
-	{"ibm866", b.SizeOf("\"ibm866\"") - 1, CsCp866},
-	{"MacRoman", b.SizeOf("\"MacRoman\"") - 1, CsMacroman},
-}
-
 /* longest entity name length excluding & and ; */
 
 const LONGEST_ENTITY_LENGTH = 31

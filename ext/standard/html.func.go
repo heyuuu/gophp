@@ -399,18 +399,10 @@ func DetermineCharset(charset_hint *byte) EntityCharset {
 	}
 det_charset:
 	if charset_hint != nil {
-		var found int = 0
-
-		/* now walk the charset map and look for the codeset */
-
-		for i = 0; i < b.SizeOf("charset_map")/b.SizeOf("charset_map [ 0 ]"); i++ {
-			if len_ == CharsetMap[i].codeset_len && zend.ZendBinaryStrcasecmp(b.CastStr(charset_hint, len_), b.CastStr(CharsetMap[i].codeset, len_)) == 0 {
-				charset = CharsetMap[i].charset
-				found = 1
-				break
-			}
-		}
-		if found == 0 {
+		var found bool
+		/* look for the codeset */
+		charset, found = GetCharset(b.CastStr(charset_hint, len_))
+		if !found {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "charset `%s' not supported, assuming utf-8", charset_hint)
 		}
 	}
