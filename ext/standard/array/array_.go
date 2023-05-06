@@ -12,146 +12,72 @@ import (
 	"sort"
 )
 
-func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong, replace *types.Array, removed *types.Array) {
-	var out_hash *types.Array
-	var num_in zend.ZendLong
-	var pos zend.ZendLong
-	var p *types.Bucket
-	var entry *types.Zval
-	var iter_pos = types.ZendHashIteratorsLowerPos(in_hash, 0)
-
-	/* Get number of entries in the input hash */
-
-	num_in = in_hash.Len()
-
-	/* Clamp the offset.. */
-
-	if offset > num_in {
-		offset = num_in
-	} else if offset < 0 && b.Assign(&offset, num_in+offset) < 0 {
-		offset = 0
+func phpSplice(arr *types.Array, offset int, length int, replace *types.Array) (*types.Array, *types.Array) {
+	arrLen := arr.Len()
+	// check offset [0,arrLen-1]
+	if offset > arrLen {
+		offset = arrLen
+	} else if offset < 0 {
+		offset += arrLen
+		if offset < 0 {
+			offset = 0
+		}
 	}
-
-	/* ..and the length */
-
+	// check length [0, arrLen - offset]
 	if length < 0 {
-		length = num_in - offset + length
-	} else if unsigned(offset+unsigned(length)) > unsigned(num_in) {
-		length = num_in - offset
+		length = arrLen - offset + length
+	} else if offset+length > arrLen {
+		length = arrLen - offset
+	}
+	if length < 0 {
+		length = 0
 	}
 
-	/* Create and initialize output hash */
+	outHash := types.NewArray(0)
+	removed := types.NewArray(0)
+	pairs := arr.Pairs()
 
-	out_hash = types.NewArray(b.Cond(length > 0, num_in-length, 0) + b.CondF1(replace != nil, func() int { return replace.Len() }, 0))
-
-	/* Start at the beginning of the input hash and copy entries to output hash until offset is reached */
-	pos = 0
-	for ; pos < offset && idx < in_hash.GetNNumUsed(); idx++ {
-		p = in_hash.Bucket(idx)
-		if p.GetVal().IsUndef() {
-			continue
-		}
-
-		/* Get entry and increase reference count */
-
-		entry = p.GetVal()
-
-		/* Update output hash depending on key type */
-
-		if p.GetKey() == nil {
-			out_hash.AppendNew(entry)
+	// handle range [0, offset)
+	for _, pair := range pairs[:offset] {
+		key := pair.GetKey()
+		val := pair.GetVal()
+		if !key.IsStrKey() {
+			outHash.Append(val)
 		} else {
-			out_hash.KeyAddNew(p.GetKey().GetStr(), entry)
-		}
-		if idx == iter_pos {
-			iter_pos = types.ZendHashIteratorsLowerPos(in_hash, iter_pos+1)
-		}
-		pos++
-	}
-
-	/* If hash for removed entries exists, go until offset+length and copy the entries to it */
-
-	if removed != nil {
-		for ; pos < offset+length && idx < in_hash.GetNNumUsed(); idx++ {
-			p = in_hash.Bucket(idx)
-			if p.GetVal().IsUndef() {
-				continue
-			}
-			pos++
-			entry = p.GetVal()
-			// entry.TryAddRefcount()
-			if p.GetKey() == nil {
-				removed.AppendNew(entry)
-				types.ZendHashDelBucket(in_hash, p)
-			} else {
-				removed.KeyAddNew(p.GetKey().GetStr(), entry)
-				if in_hash == zend.EG__().GetSymbolTable() {
-					zend.ZendDeleteGlobalVariable(p.GetKey())
-				} else {
-					types.ZendHashDelBucket(in_hash, p)
-				}
-			}
-		}
-	} else {
-		var pos2 = pos
-		for ; pos2 < offset+length && idx < in_hash.GetNNumUsed(); idx++ {
-			p = in_hash.Bucket(idx)
-			if p.GetVal().IsUndef() {
-				continue
-			}
-			pos2++
-			if p.GetKey() != nil && in_hash == zend.EG__().GetSymbolTable() {
-				zend.ZendDeleteGlobalVariable(p.GetKey())
-			} else {
-				types.ZendHashDelBucket(in_hash, p)
-			}
+			outHash.KeyAdd(key.StrKey(), val)
 		}
 	}
-	iter_pos = types.ZendHashIteratorsLowerPos(in_hash, iter_pos)
 
-	/* If there are entries to insert.. */
+	// handle range [offset, offset+length)
+	for _, pair := range pairs[offset : offset+length] {
+		key := pair.GetKey()
+		val := pair.GetVal()
+		if !key.IsStrKey() {
+			removed.Append(val)
+		} else {
+			removed.KeyAdd(key.StrKey(), val)
+		}
+	}
 
+	// handle insert
 	if replace != nil {
-		var __ht = replace
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.Indirect()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			entry = _z
-			// entry.TryAddRefcount()
-			out_hash.AppendNew(entry)
-			pos++
-		}
+		replace.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+			outHash.Append(value)
+		})
 	}
 
-	/* Copy the remaining input hash entries to the output hash */
-
-	for ; idx < in_hash.GetNNumUsed(); idx++ {
-		p = in_hash.Bucket(idx)
-		if p.GetVal().IsUndef() {
-			continue
-		}
-		entry = p.GetVal()
-		if p.GetKey() == nil {
-			out_hash.AppendNew(entry)
+	// handle range [offset+length, len(array))
+	for _, pair := range pairs[offset+length:] {
+		key := pair.GetKey()
+		val := pair.GetVal()
+		if !key.IsStrKey() {
+			outHash.Append(val)
 		} else {
-			out_hash.KeyAddNew(p.GetKey().GetStr(), entry)
+			outHash.KeyAdd(key.StrKey(), val)
 		}
-		if idx == iter_pos {
-			iter_pos = types.ZendHashIteratorsLowerPos(in_hash, iter_pos+1)
-		}
-		pos++
 	}
 
-	/* replace HashTable data */
-
-	in_hash.Destroy()
-
-	in_hash.SetBy(out_hash)
+	return outHash, removed
 }
 func ZifArrayPush(stack zpp.RefArray, _ zpp.Opt, args []*types.Zval) (int, bool) {
 	for _, arg := range args {
@@ -163,44 +89,16 @@ func ZifArrayPush(stack zpp.RefArray, _ zpp.Opt, args []*types.Zval) (int, bool)
 
 	return stack.Array().Len(), true
 }
-func ZifArrayPop(return_value zpp.Ret, stack zpp.RefArray) *types.Zval {
-	if stack.Array().Len() == 0 {
+func ZifArrayPop(stack zpp.RefArray) *types.Zval {
+	pair := stack.Array().LastPairIndirect()
+	if pair == nil {
 		return types.NewZvalNull()
 	}
 
-	var val *types.Zval
-	var idx uint32
-	var p *types.Bucket
+	stack.Array().Delete(pair.GetKey())
+	stack.Array().ResetInternalPointer()
 
-	/* Get the last value and copy it into the return value */
-	idx = stack.Array().GetNNumUsed()
-	for true {
-		if idx == 0 {
-			return types.NewZvalNull()
-		}
-		idx--
-		p = stack.Array().Bucket(idx)
-		val = p.GetVal()
-		if val.IsIndirect() {
-			val = val.Indirect()
-		}
-		if val.IsNotUndef() {
-			break
-		}
-	}
-	types.ZVAL_COPY_DEREF(return_value, val)
-	if p.GetKey() == nil && stack.Array().GetNNextFreeElement() > 0 && p.GetH() >= zend_ulong(stack.Array().GetNNextFreeElement()-1) {
-		stack.Array().SetNNextFreeElement(stack.Array().GetNNextFreeElement() - 1)
-	}
-
-	/* Delete the last value */
-
-	if p.GetKey() != nil && stack.Array() == zend.EG__().GetSymbolTable() {
-		zend.ZendDeleteGlobalVariable(p.GetKey())
-	} else {
-		types.ZendHashDelBucket(stack.Array(), p)
-	}
-	types.ZendHashInternalPointerReset(stack.Array())
+	return pair.GetVal().DeRef()
 }
 func ZifArrayShift(stack zpp.RefArray) {
 	if stack.Array().Len() == 0 {
@@ -235,88 +133,38 @@ func ZifArrayShift(stack zpp.RefArray) {
 	})
 
 	// reset internal pointer
-	types.ZendHashInternalPointerReset(stack.Array())
+	stack.Array().ResetInternalPointer()
 }
-func ZifArrayUnshift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval, vars []*types.Zval) {
-	var args []*types.Zval = vars
-	var new_hash *types.Array
-	var argc int
-	var i int
-	var key *types.String
-	var value *types.Zval
-	new_hash = types.NewArray(stack.Array().Len() + argc)
-	for i = 0; i < argc; i++ {
-		args[i].TryAddRefcount()
-		new_hash.AppendNew(&args[i])
+func ZifArrayUnshift(stack zpp.RefZval, values []*types.Zval) int {
+	newArr := types.NewArray(stack.Array().Len() + len(values))
+	for _, value := range values {
+		newArr.Append(value)
 	}
-	var __ht = stack.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		key = _p.GetKey()
-		value = _z
-		if key != nil {
-			new_hash.KeyAddNew(key.GetStr(), value)
+	stack.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
+		if key.IsStrKey() {
+			newArr.KeyAdd(key.StrKey(), value)
 		} else {
-			new_hash.AppendNew(value)
+			newArr.Append(value)
 		}
-	}
+	})
 
-	/* replace HashTable data */
-
-	stack.Array().Destroy()
-
-	stack.Array().SetBy(new_hash)
-
-	/* Clean up and return the number of elements in the stack */
-
-	return_value.SetLong(stack.Array().Len())
-
-	/* Clean up and return the number of elements in the stack */
+	stack.SetArray(newArr)
+	return stack.Array().Len()
 }
-func ZifArraySplice(return_value zpp.Ret, arg zpp.RefArray, offset int, _ zpp.Opt, length_ *int, replacement *types.Zval) {
-	var array *types.Zval
-	var repl_array *types.Zval = replacement
-	var rem_hash *types.Array = nil
-	var numIn int = arg.Array().Len()
+func ZifArraySplice(array zpp.RefArray, offset int, _ zpp.Opt, length_ *int, replacement *types.Zval) *types.Array {
+	var numIn = array.Array().Len()
+	var length = b.Option(length_, numIn)
+	var replaceArr *types.Array = nil
 
-	length := b.Option(length_, numIn)
 	if replacement != nil {
 		/* Make sure the last argument, if passed, is an array */
-		zend.ConvertToArrayEx(repl_array)
+		zend.ConvertToArrayEx(replacement)
+		replaceArr = replacement.Array()
 	}
 
-	/* Don't create the array of removed elements if it's not going
-	 * to be used; e.g. only removing and/or replacing elements */
-
-	if zend.USED_RET() {
-		var size = length
-
-		/* Clamp the offset.. */
-		if offset < 0 {
-			offset = offset + numIn
-			if offset < 0 {
-				offset = 0
-			}
-		} else if offset > numIn {
-			offset = numIn
-		}
-
-		/* ..and the length */
-		if length < 0 {
-			size = numIn - offset + length
-		} else if offset+length > numIn {
-			size = numIn - offset
-		}
-
-		/* Initialize return value */
-		zend.ArrayInitSize(return_value, b.CondF1(size > 0, func() uint32 { return uint32(size) }, 0))
-		rem_hash = return_value.Array()
-	}
-
-	/* Perform splice */
-
-	PhpSplice(array.Array(), offset, length, b.CondF1(repl_array != nil, func() *types.Array { return repl_array.Array() }, nil), rem_hash)
+	newArr, removedArr := phpSplice(array.Array(), offset, length, replaceArr)
+	array.SetArray(newArr)
+	return removedArr
 }
 func ZifArraySlice(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, offset *types.Zval, _ zpp.Opt, length *types.Zval, preserveKeys *types.Zval) {
 	var input *types.Zval
@@ -472,7 +320,7 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 	}
 	return 1
 }
-func PhpArrayMerge(dest *types.Array, src *types.Array) int {
+func PhpArrayMerge(dest *types.Array, src *types.Array) {
 	src.Foreach(func(key types.ArrayKey, value *types.Zval) {
 		if value.IsReference() && value.GetRefcount() == 1 {
 			value = types.Z_REFVAL_P(value)
@@ -1140,7 +988,7 @@ func ZifArrayUdiffUassoc(arrays []*types.Zval, callbackDataCompFunc zpp.Callable
 
 //@zif -c=1,
 func ZifArrayMultisort(args []*types.Zval) bool {
-	var parseState [2]int = [...]int{0, 0}
+	var parseState = [...]int{0, 0}
 
 	arrays := make([]*types.Zval, 0, len(args))
 	multisortFunc := make([]types.ArrayComparer, 0, len(args))

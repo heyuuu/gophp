@@ -60,6 +60,9 @@ type ArrayPair struct {
 func MakeArrayPair(key ArrayKey, val *Zval) ArrayPair {
 	return ArrayPair{key: key, val: val}
 }
+func NewArrayPair(key ArrayKey, val *Zval) *ArrayPair {
+	return &ArrayPair{key: key, val: val}
+}
 func (p ArrayPair) GetKey() ArrayKey { return p.key }
 func (p ArrayPair) GetVal() *Zval    { return p.val }
 
@@ -371,6 +374,15 @@ func (ht *Array) recalcElements() int {
 	return num
 }
 
+func (ht *Array) FirstPair() *ArrayPair {
+	for _, p := range ht.data {
+		if p.IsValid() {
+			return NewArrayPair(p.GetArrayKey(), p.GetVal())
+		}
+	}
+	return nil
+}
+
 func (ht *Array) First() (key ArrayKey, val *Zval) {
 	for _, p := range ht.data {
 		if p.IsValid() {
@@ -392,6 +404,31 @@ func (ht *Array) FirstIndirect() (key ArrayKey, val *Zval) {
 		return p.GetArrayKey(), v
 	}
 	return
+}
+
+func (ht *Array) LastPair() *ArrayPair {
+	for i := len(ht.data) - 1; i >= 0; i-- {
+		p := ht.data[i]
+		if p.IsValid() {
+			return NewArrayPair(p.GetArrayKey(), p.GetVal())
+		}
+	}
+	return nil
+}
+
+func (ht *Array) LastPairIndirect() *ArrayPair {
+	for i := len(ht.data) - 1; i >= 0; i-- {
+		p := ht.data[i]
+		v := p.GetVal()
+		if v.IsIndirect() {
+			v = v.Indirect()
+		}
+		if v.IsUndef() {
+			continue
+		}
+		return NewArrayPair(p.GetArrayKey(), v)
+	}
+	return nil
 }
 
 func (ht *Array) Last() (key ArrayKey, val *Zval) {
@@ -947,4 +984,8 @@ func (ht *Array) Copy() *Array {
 
 func (ht *Array) CopyEx(cap int) *Array {
 	return ArrayLazyDup(ht)
+}
+
+func (ht *Array) ResetInternalPointer() {
+	ht.internalPointer = ht.validPosVal(0)
 }

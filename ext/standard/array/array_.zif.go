@@ -29,7 +29,7 @@ var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{Name: "stack"
 	if fp.HasError() {
 		return
 	}
-	ret := ZifArrayPop(returnValue, stack)
+	ret := ZifArrayPop(stack)
 	returnValue.SetBy(ret)
 })
 
@@ -51,13 +51,13 @@ var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{Name
 	if fp.HasError() {
 		return
 	}
-	ZifArrayUnshift(executeData, returnValue, stack, vars)
+	ZifArrayUnshift(stack, vars)
 })
 
 // generate by ZifArraySplice
-var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{Name: "arg"}, {Name: "offset"}, {Name: "length"}, {Name: "replacement"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{Name: "array"}, {Name: "offset"}, {Name: "length"}, {Name: "replacement"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
-	arg := fp.ParseArrayEx(false, true)
+	array := fp.ParseArrayEx(false, true)
 	offset := fp.ParseLong()
 	fp.StartOptional()
 	length_ := fp.ParseLongNullable()
@@ -65,7 +65,8 @@ var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{Name: "
 	if fp.HasError() {
 		return
 	}
-	ZifArraySplice(returnValue, arg, offset, nil, length_, replacement)
+	ret := ZifArraySplice(array, offset, nil, length_, replacement)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArraySlice
@@ -606,47 +607,55 @@ var DefZifArrayMap = def.DefFunc("array_map", 1, -1, []def.ArgInfo{{Name: "callb
 })
 
 // generate by ZifArrayKeyExists
-var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{Name: "key"}, {Name: "search"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{Name: "key"}, {Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	key := fp.ParseZval()
-	search := fp.ParseZval()
+	array := fp.ParseArrayOrObject()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeyExists(key, search)
+	ret := ZifArrayKeyExists(key, array)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifArrayKeyExists
-var DefZifKeyExists = def.DefFunc("key_exists", 2, 2, []def.ArgInfo{{Name: "key"}, {Name: "search"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifKeyExists = def.DefFunc("key_exists", 2, 2, []def.ArgInfo{{Name: "key"}, {Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	key := fp.ParseZval()
-	search := fp.ParseZval()
+	array := fp.ParseArrayOrObject()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeyExists(key, search)
+	ret := ZifArrayKeyExists(key, array)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifArrayChunk
-var DefZifArrayChunk = def.DefFunc("array_chunk", 2, 3, []def.ArgInfo{{Name: "arg"}, {Name: "size"}, {Name: "preserve_keys"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayChunk = def.DefFunc("array_chunk", 2, 3, []def.ArgInfo{{Name: "array"}, {Name: "length"}, {Name: "preserve_keys"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	arg := fp.ParseZval()
-	size := fp.ParseZval()
+	array := fp.ParseArrayHt()
+	length := fp.ParseLong()
 	fp.StartOptional()
-	preserve_keys := fp.ParseZval()
+	preserve_keys := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayChunk(arg, size, nil, preserve_keys)
+	ret := ZifArrayChunk(array, length, nil, preserve_keys)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArrayCombine
 var DefZifArrayCombine = def.DefFunc("array_combine", 2, 2, []def.ArgInfo{{Name: "keys"}, {Name: "values"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	keys := fp.ParseZval()
-	values := fp.ParseZval()
+	keys := fp.ParseArrayHt()
+	values := fp.ParseArrayHt()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayCombine(keys, values)
+	ret, ok := ZifArrayCombine(keys, values)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
