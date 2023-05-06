@@ -37,7 +37,7 @@ type (
 	Path = string
 
 	// FAST_ZPP: Z_PARAM_ARRAY_HT, Type: 'h'，直接使用	 *types.Array
-	ArrayHt = *types.Array
+	//ArrayHt = *types.Array
 
 	// FAST_ZPP: Z_PARAM_ARRAY_OR_OBJECT_HT, Type: 'H'
 	ArrayOrObjectHt = *types.Array

@@ -534,7 +534,7 @@ var DefZifGetResourceType = def.DefFunc("get_resource_type", 1, 1, []def.ArgInfo
 var DefZifGetResources = def.DefFunc("get_resources", 0, 1, []def.ArgInfo{{Name: "type"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
-	type_ := fp.ParseZval()
+	type_ := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}

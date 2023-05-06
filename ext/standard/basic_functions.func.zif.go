@@ -59,22 +59,24 @@ var DefZifLong2ip = def.DefFunc("long2ip", 1, 1, []def.ArgInfo{{Name: "proper_ad
 var DefZifGetenv = def.DefFunc("getenv", 0, 2, []def.ArgInfo{{Name: "varname"}, {Name: "local_only"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
-	varname := fp.ParseZval()
-	local_only := fp.ParseZval()
+	varname_ := fp.ParseStringValNullable()
+	local_only := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifGetenv(returnValue, nil, varname, local_only)
+	ret := ZifGetenv(returnValue, nil, varname_, local_only)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifPutenv
 var DefZifPutenv = def.DefFunc("putenv", 1, 1, []def.ArgInfo{{Name: "setting"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	setting := fp.ParseZval()
+	setting := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifPutenv(setting)
+	ret := ZifPutenv(setting)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifGetopt

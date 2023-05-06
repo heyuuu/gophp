@@ -129,69 +129,79 @@ var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 1, -1, 
 })
 
 // generate by ZifArrayKeys
-var DefZifArrayKeys = def.DefFunc("array_keys", 1, 3, []def.ArgInfo{{Name: "arg"}, {Name: "search_value"}, {Name: "strict"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayKeys = def.DefFunc("array_keys", 1, 3, []def.ArgInfo{{Name: "array"}, {Name: "search_value"}, {Name: "strict"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
-	arg := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	fp.StartOptional()
 	search_value := fp.ParseZval()
-	strict := fp.ParseZval()
+	strict := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeys(arg, nil, search_value, strict)
+	ret := ZifArrayKeys(array, nil, search_value, strict)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArrayKeyFirst
-var DefZifArrayKeyFirst = def.DefFunc("array_key_first", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayKeyFirst = def.DefFunc("array_key_first", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeyFirst(arg)
+	ret := ZifArrayKeyFirst(array)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayKeyLast
-var DefZifArrayKeyLast = def.DefFunc("array_key_last", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayKeyLast = def.DefFunc("array_key_last", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayKeyLast(arg)
+	ret := ZifArrayKeyLast(array)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayValues
-var DefZifArrayValues = def.DefFunc("array_values", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayValues = def.DefFunc("array_values", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayValues(arg)
+	ret := ZifArrayValues(array)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArrayCountValues
-var DefZifArrayCountValues = def.DefFunc("array_count_values", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayCountValues = def.DefFunc("array_count_values", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arg := fp.ParseZval()
+	array := fp.ParseArrayHt()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayCountValues(executeData, returnValue, arg)
+	ret := ZifArrayCountValues(executeData, returnValue, array)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifArrayColumn
-var DefZifArrayColumn = def.DefFunc("array_column", 2, 3, []def.ArgInfo{{Name: "arg"}, {Name: "column_key"}, {Name: "index_key"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifArrayColumn = def.DefFunc("array_column", 2, 3, []def.ArgInfo{{Name: "array"}, {Name: "column_key"}, {Name: "index_key"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	arg := fp.ParseZval()
-	column_key := fp.ParseZval()
+	array := fp.ParseArrayHt()
+	column_key := fp.ParseZvalEx(true, false)
 	fp.StartOptional()
-	index_key := fp.ParseZval()
+	index_key := fp.ParseZvalEx(true, false)
 	if fp.HasError() {
 		return
 	}
-	ZifArrayColumn(arg, column_key, nil, index_key)
+	ret, ok := ZifArrayColumn(array, column_key, nil, index_key)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifArrayReverse
