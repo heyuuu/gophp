@@ -387,11 +387,6 @@ func ZendHashApply(ht *Array, apply_func ApplyFuncT) {
 		return apply_func(p.GetVal())
 	})
 }
-func ZendHashApplyWithArgument(ht *Array, apply_func ApplyFuncArgT, argument any) {
-	ht.applyValidBucket(func(p *Bucket) int {
-		return apply_func(p.GetVal(), argument)
-	})
-}
 func ZendHashApplyWithArguments(ht *Array, apply_func ApplyFuncArgsT, num_args int, args ...any) {
 	ht.applyValidBucket(func(p *Bucket) int {
 		return apply_func(p.GetVal(), num_args, args, &p.key)
@@ -412,31 +407,6 @@ func ZendHashCopy(target *Array, source *Array, pCopyConstructor CopyCtorFuncT) 
 	})
 }
 
-func ZendArrayDupElements(source *Array, target *Array) {
-	target.EachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
-		// 增加引用计数
-		for {
-			if data.IsRefcounted() {
-				if data.IsReference() && data.GetRefcount() == 1 && (!data.Reference().GetVal().IsArray() || data.Reference().GetVal().Array() != source) {
-					data = data.Reference().GetVal()
-					if !(data.IsRefcounted()) {
-						break
-					}
-				}
-			}
-			break
-		}
-
-		// 添加元素到新数组
-		target.appendBucket(p.GetArrayKey(), data)
-
-		// 更新内部指针
-		if source.internalPointer == pos {
-			target.internalPointer = target.DataSize() - 1
-		}
-	})
-}
-
 func ZendArrayDup(source *Array) *Array {
 	// 空数组单独处理
 	if source.elementsCount == 0 {
@@ -446,22 +416,9 @@ func ZendArrayDup(source *Array) *Array {
 	}
 
 	var target *Array = NewArray(source.Cap())
-	if source.IsImmutable() {
-		target.flags = source.flags
-		target.elementsCount = source.elementsCount
-		target.internalPointer = source.internalPointer
-		target.copyDataAndHash(source)
-	} else {
-		if source.internalPointer < source.DataSize() {
-			target.internalPointer = source.internalPointer
-		}
-		ZendArrayDupElements(source, target)
+	target.flags = source.flags
+	target.dupData0(source)
 
-		//
-		target.flags = source.flags
-		target.elementsCount = source.elementsCount
-		target.nextFreeElement = source.nextFreeElement
-	}
 	return target
 }
 func ZendHashMerge(target *Array, source *Array, pCopyConstructor CopyCtorFuncT, overwrite ZendBool) {
@@ -605,26 +562,6 @@ func ZendHashCompare(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBo
 	ht1.TryUnProtectRecursive()
 
 	return result
-}
-func ZendHashMinmax(ht *Array, compar CompareFuncT, flag uint32) *Zval {
-	var res *Bucket
-	if ht.Len() == 0 {
-		return nil
-	}
-
-	ht.eachValidBucket(func(pos uint32, p *Bucket) {
-		if flag != 0 {
-			if compar(res, p) < 0 {
-				res = p
-			}
-		} else {
-			if compar(res, p) > 0 {
-				res = p
-			}
-		}
-	})
-
-	return res.GetVal()
 }
 
 func ParseNumericStr(str string) (int, bool) {

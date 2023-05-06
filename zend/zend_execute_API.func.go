@@ -117,7 +117,7 @@ func ShutdownExecutor() {
 
 	EG__().SetActive(0)
 	if fast_shutdown == 0 {
-		EG__().GetSymbolTable().GracefulReverseDestroy()
+		EG__().GetSymbolTable().Clean()
 
 		/* Release static properties and static variables prior to the final GC run,
 		 * as they may hold GC roots. */

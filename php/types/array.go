@@ -1,7 +1,6 @@
 package types
 
 import (
-	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"sort"
@@ -183,45 +182,6 @@ func (ht *Array) clearData() {
 	ht.data = nil
 	ht.indexes = make(map[ArrayKey]uint32)
 }
-func (ht *Array) appendBucket(key ArrayKey, zv *Zval) *Bucket {
-	bucket := NewBucket(key, zv)
-
-	// 尝试 resize
-	ht.resizeIfFull()
-
-	// 添加到 data
-	var idx = uint32(len(ht.data))
-	ht.elementsCount++
-	ht.data = append(ht.data, *bucket)
-
-	// 更新 map
-	ht.indexes[bucket.key] = idx
-
-	if !key.IsStrKey() {
-		var idxKey = key.IdxKey()
-		// 更新 nextFreeElement
-		if idxKey > ht.nextFreeElement {
-			if idxKey < MaxLong {
-				ht.nextFreeElement = idxKey + 1
-			} else {
-				ht.nextFreeElement = MaxLong
-			}
-		}
-	}
-
-	return &ht.data[idx]
-}
-func (ht *Array) resizeIfFull() {
-	dataSize := len(ht.data)
-	if dataSize == cap(ht.data) {
-		// 若空隙率过高，重新压缩；否则，跳过扩容 (后面会由 append(ht.data) 触发自动扩容)
-		if dataSize > int(ht.elementsCount+(ht.elementsCount>>5)) {
-			ht.rehash()
-		} else if dataSize >= MaxArraySize {
-			triggerError(fmt.Sprintf("Possible integer overflow in memory allocation (%d)", dataSize*2))
-		}
-	}
-}
 func (ht *Array) deleteBucket(pos uint32) {
 	ht.assertRc1()
 	assert(int(pos) < len(ht.data))
@@ -279,27 +239,6 @@ func (ht *Array) moveBucket(pos uint32, newPos uint32) {
 	if ht.internalPointer == pos {
 		ht.internalPointer = newPos
 	}
-}
-
-/* hash -> Array.indexMap & Array.keyMap */
-func (ht *Array) rehash() {
-	// reset hash
-	ht.assertRc1()
-	ht.indexes = make(map[ArrayKey]uint32)
-
-	// 空数组快速清空
-	if ht.elementsCount == 0 {
-		ht.data = nil
-		return
-	}
-
-	// 移除 data 中的空位
-	ht.removeHoles()
-
-	// 重建 hash
-	ht.eachBucket(func(pos uint32, p *Bucket) {
-		ht.indexes[p.key] = pos
-	})
 }
 
 /* misc */
@@ -375,7 +314,7 @@ func (ht *Array) Count() int {
 // 重新计算有效元素个数(与 elementsCount 不同，它需要过滤 IS_INDIRECT 元素为 IS_UNDEF 的情况)
 func (ht *Array) recalcElements() int {
 	var num = 0
-	ht.EachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
+	ht.ForeachIndirect(func(key ArrayKey, value *Zval) {
 		num++
 	})
 	return num
@@ -476,26 +415,27 @@ func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
 		return
 	}
 
-	ht.removeHolesAndCleanInternalPointer()
-
-	sort.SliceStable(ht.data, func(i, j int) bool {
-		b1 := &ht.data[i]
-		b2 := &ht.data[j]
-		p1 := MakeArrayPair(b1.GetArrayKey(), b1.GetVal())
-		p2 := MakeArrayPair(b2.GetArrayKey(), b2.GetVal())
-		ret := comparer(p1, p2)
+	ht.internalPointer = 0
+	pairs := ht.Pairs()
+	sort.SliceStable(pairs, func(i, j int) bool {
+		ret := comparer(pairs[i], pairs[j])
 		return ret < 0
 	})
 
 	if renumber {
-		ht.eachBucket(func(pos uint32, p *Bucket) {
-			p.SetIndexKey(int(pos))
-		})
-		ht.nextFreeElement = int(ht.DataSize())
+		// todo 考虑生成 []*Zval 直接转 ArrayData
+		for i, _ := range pairs {
+			pairs[i].key = IdxKey(i)
+		}
 	}
 
-	ht.rehash()
+	ht.data0 = ht.newDataOfPairs(pairs)
 }
+func (ht *Array) newDataOfPairs(pairs []ArrayPair) ArrayData {
+	// todo
+	panic("todo")
+}
+
 func (ht *Array) Min(comparer ArrayComparer) *ArrayPair {
 	if ht.Len() == 0 {
 		return nil
@@ -536,17 +476,6 @@ func (ht *Array) Clean() {
 
 func (ht *Array) Destroy()   { ht.Clean() }
 func (ht *Array) DestroyEx() { ht.Clean() }
-
-func (ht *Array) GracefulReverseDestroy() {
-	ht.assertRc1()
-	for idx := ht.DataSize(); idx > 0; idx-- {
-		pos := idx - 1
-		p := &ht.data[pos]
-		if p.IsValid() {
-			ht.deleteBucket(idx)
-		}
-	}
-}
 
 /**
  * Methods use index key
@@ -604,7 +533,7 @@ func (ht *Array) KeyAddIndirect(key string, pData *Zval) *Zval {
 		return data
 	}
 
-	return ht.appendBucket(StrKey(key), pData).GetVal()
+	return ht.Add(StrKey(key), pData)
 }
 func (ht *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 	ht.assertRc1()
@@ -618,7 +547,7 @@ func (ht *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 		return data
 	}
 
-	return ht.appendBucket(StrKey(key), pData).GetVal()
+	return ht.Update(StrKey(key), pData)
 }
 func (ht *Array) KeyDeleteIndirect(key string) bool {
 	ht.assertRc1()
@@ -809,28 +738,9 @@ func (ht *Array) IteratorEx(pos uint32) *ArrayIterator {
 
 // todo 逐渐替换为 Foreach 或其他更高效代码
 func (ht *Array) ForeachData() []*Bucket {
-	var data = make([]*Bucket, 0)
-	ht.eachValidBucket(func(_ uint32, p *Bucket) {
-		data = append(data, p)
-	})
-	return data
+	panic("todo replace")
 }
 
-func (ht *Array) eachBucket(handler func(pos uint32, p *Bucket)) {
-	for i, _ := range ht.data {
-		p := &ht.data[i]
-		handler(uint32(i), p)
-	}
-}
-func (ht *Array) eachValidBucket(handler func(pos uint32, p *Bucket)) {
-	for i, _ := range ht.data {
-		p := &ht.data[i]
-		if p.IsValid() {
-			continue
-		}
-		handler(uint32(i), p)
-	}
-}
 func (ht *Array) EachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
 	for i, _ := range ht.data {
 		p := &ht.data[i]
@@ -922,48 +832,35 @@ func (ht *Array) validPosVal(pos uint32) uint32 {
 /**
  * Internal methods
  */
-func (ht *Array) copyDataAndHash(source *Array) {
+func (ht *Array) copyData0(source *Array) {
+	// todo 待处理复制逻辑(参考逻辑: 建立一个reader，延迟复制，考虑内部指针)
+	ht.data0 = source.data0
 	ht.data = b.CopySlice(source.data)
 	ht.indexes = b.CopyMap(source.indexes)
 }
 
-// 移除 this.data 数据中的 holes, 返回是否移动 bucket
-func (ht *Array) removeHoles() {
-	ht.assertWritable()
-
-	var newPos uint32 = 0
-
-	if len(ht.data) == int(ht.elementsCount) {
-		return
-	}
-
-	ht.eachValidBucket(func(pos uint32, p *Bucket) {
-		if newPos != pos {
-			ht.data[newPos] = ht.data[pos]
-			if ht.internalPointer == pos {
-				ht.internalPointer = newPos
-			}
-		}
-		newPos++
+func (ht *Array) dupData0(source *Array) {
+	// todo 待处理复制逻辑(参考逻辑: 非延迟复制，考虑内部指针)
+	source.Foreach(func(key ArrayKey, value *Zval) {
+		ht.Update(key, value)
 	})
 
-	// 截取数据，记录有效元素数
-	ht.data = ht.data[:newPos]
-	ht.elementsCount = newPos
-}
-
-// 移除 data 的 holes, 不考虑 internalPointer 和 Iterators 内的 pos 指针
-func (ht *Array) removeHolesAndCleanInternalPointer() bool {
-	ht.removeHoles()
-	ht.internalPointer = 0
-	return true
+	ht.data0 = source.data0
+	ht.data = b.CopySlice(source.data)
+	ht.indexes = b.CopyMap(source.indexes)
 }
 
 func (ht *Array) MoveTailToHead() {
-	var tmp Bucket = ht.data[len(ht.data)-1]
-	copy(ht.data[1:], ht.data)
-	ht.data[0] = tmp
-	ht.rehash()
+	if ht.Len() <= 1 {
+		return
+	}
+
+	pairs := ht.Pairs()
+	tmp := pairs[len(pairs)-1]
+	copy(pairs[1:], pairs)
+	pairs[0] = tmp
+
+	ht.data0 = ht.newDataOfPairs(pairs)
 }
 
 func (ht *Array) Push(value *Zval) {
