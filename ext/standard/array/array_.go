@@ -784,7 +784,8 @@ func ArrayColumnParamHelper(param *types.Zval, name string) types.ZendBool {
 		return 0
 	}
 }
-func ArrayColumnFetchProp(data *types.Zval, name *types.Zval, rv *types.Zval) *types.Zval {
+func ArrayColumnFetchProp(data *types.Zval, name *types.Zval) *types.Zval {
+	var rv types.Zval
 	var prop *types.Zval = nil
 	if data.IsType(types.IS_OBJECT) {
 
@@ -793,12 +794,9 @@ func ArrayColumnFetchProp(data *types.Zval, name *types.Zval, rv *types.Zval) *t
 		 * implement __isset (which is not called in "exists" mode). */
 
 		if types.Z_OBJ_HT(*data).GetHasProperty()(data, name, zend.ZEND_PROPERTY_EXISTS, nil) != 0 || types.Z_OBJ_HT(*data).GetHasProperty()(data, name, zend.ZEND_PROPERTY_ISSET, nil) != 0 {
-			prop = types.Z_OBJ_HT(*data).GetReadProperty()(data, name, zend.BP_VAR_R, nil, rv)
+			prop = types.Z_OBJ_HT(*data).GetReadProperty()(data, name, zend.BP_VAR_R, nil, &rv)
 			if prop != nil {
 				prop = types.ZVAL_DEREF(prop)
-				if prop != rv {
-					// prop.TryAddRefcount()
-				}
 			}
 		}
 
@@ -814,115 +812,70 @@ func ArrayColumnFetchProp(data *types.Zval, name *types.Zval, rv *types.Zval) *t
 		}
 		if prop != nil {
 			prop = types.ZVAL_DEREF(prop)
-			// prop.TryAddRefcount()
 		}
 	}
 	return prop
 }
-func ZifArrayColumn(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, columnKey *types.Zval, _ zpp.Opt, indexKey *types.Zval) {
-	var input *types.Array
-	var colval *types.Zval
-	var data *types.Zval
-	var rv types.Zval
-	var column *types.Zval = nil
-	var index *types.Zval = nil
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			input = fp.ParseArrayHt()
-			column = fp.ParseZvalEx(true, false)
-			fp.StartOptional()
-			index = fp.ParseZvalEx(true, false)
-			if fp.HasError() {
+func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, indexKey zpp.ZvalNullable) (*types.Array, bool) {
+	if columnKey != nil && ArrayColumnParamHelper(columnKey, "column") == 0 || indexKey != nil && ArrayColumnParamHelper(indexKey, "index") == 0 {
+		return nil, false
+	}
+
+	retArr := types.NewArray(array.Len())
+	if indexKey == nil {
+		array.Foreach(func(_ types.ArrayKey, data *types.Zval) {
+			var columnVal *types.Zval
+			data = types.ZVAL_DEREF(data)
+			if columnKey == nil {
+				columnVal = data
+			} else if columnVal = ArrayColumnFetchProp(data, columnKey); columnVal == nil {
 				return
 			}
-			break
-		}
-		break
-	}
-	if column != nil && ArrayColumnParamHelper(column, "column") == 0 || index != nil && ArrayColumnParamHelper(index, "index") == 0 {
-		return_value.SetFalse()
-		return
-	}
-	zend.ArrayInitSize(return_value, input.Len())
-	if index == nil {
 
-		fillScope := types.PackedFillStart(return_value.Array())
-		var __ht = input
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			data = _z
-			data = types.ZVAL_DEREF(data)
-			if column == nil {
-				// data.TryAddRefcount()
-				colval = data
-			} else if b.Assign(&colval, ArrayColumnFetchProp(data, column, &rv)) == nil {
-				continue
-			}
-			fillScope.FillSet(colval)
-			fillScope.FillNext()
-		}
-		fillScope.FillEnd()
+			retArr.Append(columnVal)
+		})
 	} else {
-		var __ht = input
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			data = _z
+		array.Foreach(func(key types.ArrayKey, data *types.Zval) {
 			data = types.ZVAL_DEREF(data)
-			if column == nil {
-				// data.TryAddRefcount()
-				colval = data
-			} else if b.Assign(&colval, ArrayColumnFetchProp(data, column, &rv)) == nil {
-				continue
+
+			// col
+			var columnVal *types.Zval
+			if columnKey == nil {
+				columnVal = data
+			} else if columnVal = ArrayColumnFetchProp(data, columnKey); columnVal == nil {
+				return
 			}
 
-			/* Failure will leave keyval alone which will land us on the final else block below
-			 * which is to append the value as next_index
-			 */
-
-			if index != nil {
-				var rv types.Zval
-				var keyval = ArrayColumnFetchProp(data, index, &rv)
-				if keyval != nil {
-					switch keyval.GetType() {
-					case types.IS_STRING:
-						return_value.Array().SymtableUpdate(keyval.String().GetStr(), colval)
-					case types.IS_LONG:
-						return_value.Array().IndexUpdate(keyval.Long(), colval)
-					case types.IS_OBJECT:
-						var tmp_key *types.String
-						var key = zend.ZvalGetTmpString(keyval, &tmp_key)
-						return_value.Array().SymtableUpdate(key.GetStr(), colval)
-						// zend.ZendTmpStringRelease(tmp_key)
-					case types.IS_NULL:
-						return_value.Array().KeyUpdate(types.NewString("").GetStr(), colval)
-					case types.IS_DOUBLE:
-						return_value.Array().IndexUpdate(zend.DvalToLval(keyval.Double()), colval)
-					case types.IS_TRUE:
-						return_value.Array().IndexUpdate(1, colval)
-					case types.IS_FALSE:
-						return_value.Array().IndexUpdate(0, colval)
-					case types.IS_RESOURCE:
-						return_value.Array().IndexUpdate(types.Z_RES_HANDLE_P(keyval), colval)
-					default:
-						return_value.Array().Append(colval)
-					}
-					// zend.ZvalPtrDtor(keyval)
-				} else {
-					return_value.Array().Append(colval)
+			// key
+			var keyVal = ArrayColumnFetchProp(data, indexKey)
+			if keyVal != nil {
+				switch keyVal.GetType() {
+				case types.IS_STRING:
+					retArr.SymtableUpdate(keyVal.String().GetStr(), columnVal)
+				case types.IS_LONG:
+					retArr.IndexUpdate(keyVal.Long(), columnVal)
+				case types.IS_OBJECT:
+					retArr.SymtableUpdate(zend.ZvalGetStrVal(keyVal), columnVal)
+				case types.IS_NULL:
+					retArr.KeyUpdate("", columnVal)
+				case types.IS_DOUBLE:
+					retArr.IndexUpdate(zend.DvalToLval(keyVal.Double()), columnVal)
+				case types.IS_TRUE:
+					retArr.IndexUpdate(1, columnVal)
+				case types.IS_FALSE:
+					retArr.IndexUpdate(0, columnVal)
+				case types.IS_RESOURCE:
+					retArr.IndexUpdate(types.Z_RES_HANDLE_P(keyVal), columnVal)
+				default:
+					retArr.Append(columnVal)
 				}
 			} else {
-				return_value.Array().Append(colval)
+				retArr.Append(columnVal)
 			}
 
-			/* Failure will leave keyval alone which will land us on the final else block below
-			 * which is to append the value as next_index
-			 */
-
-		}
+		})
 	}
+	return retArr, true
 }
 func ZifArrayReverse(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, _ zpp.Opt, preserveKeys *types.Zval) {
 	var input *types.Zval

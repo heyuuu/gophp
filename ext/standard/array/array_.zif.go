@@ -191,7 +191,7 @@ var DefZifArrayColumn = def.DefFunc("array_column", 2, 3, []def.ArgInfo{{Name: "
 	if fp.HasError() {
 		return
 	}
-	ZifArrayColumn(executeData, returnValue, arg, column_key, nil, index_key)
+	ZifArrayColumn(arg, column_key, nil, index_key)
 })
 
 // generate by ZifArrayReverse

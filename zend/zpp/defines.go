@@ -69,6 +69,9 @@ type (
 	// FAST_ZPP: Z_PARAM_VARIADIC, Type: '*' or '+', 直接使用 []*types.Zval
 	//Variadic = []*types.Zval
 
+	/* CheckNull */
+	ZvalNullable = *types.Zval // fp.ParseZvalEx(true, false)
+
 	/* ref type */
 	RefZval          = *types.Zval //
 	RefArray         = *types.Zval // fp.ParseArrayEx(false, true)
