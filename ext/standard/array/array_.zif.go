@@ -108,27 +108,25 @@ var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []de
 })
 
 // generate by ZifArrayReplace
-var DefZifArrayReplace = def.DefFunc("array_replace", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	arr1 := fp.ParseZval()
-	fp.StartOptional()
+var DefZifArrayReplace = def.DefFunc("array_replace", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	arrays := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayReplace(executeData, returnValue, arr1, nil, arrays)
+	ret := ZifArrayReplace(arrays)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayReplaceRecursive
-var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	arr1 := fp.ParseZval()
-	fp.StartOptional()
+var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	arrays := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifArrayReplaceRecursive(executeData, returnValue, arr1, nil, arrays)
+	ret := ZifArrayReplaceRecursive(arrays)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayKeys

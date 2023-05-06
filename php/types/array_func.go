@@ -483,20 +483,6 @@ func ZendHashMerge(target *Array, source *Array, pCopyConstructor CopyCtorFuncT,
 	}
 }
 
-func ZendHashBucketSwap(p *Bucket, q *Bucket) {
-	var val Zval
-	var h zend.ZendUlong
-	var key *String
-	ZVAL_COPY_VALUE(&val, p.GetVal())
-	h = p.GetH()
-	key = p.GetKey()
-	ZVAL_COPY_VALUE(p.GetVal(), q.GetVal())
-	p.SetH(q.GetH())
-	p.SetKey(q.GetKey())
-	ZVAL_COPY_VALUE(q.GetVal(), &val)
-	q.SetH(h)
-	q.SetKey(key)
-}
 func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBool) int {
 	var idx1 uint32
 	var idx2 uint32
