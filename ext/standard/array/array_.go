@@ -650,7 +650,7 @@ func ZifArrayReplace(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval,
 func ZifArrayReplaceRecursive(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, _ zpp.Opt, arrays []*types.Zval) {
 	PhpArrayReplaceWrapper(executeData, return_value, 1)
 }
-func ZifArrayKeys(array zpp.ArrayHt, _ zpp.Opt, searchValue *types.Zval, strict bool) *types.Array {
+func ZifArrayKeys(array *types.Array, _ zpp.Opt, searchValue *types.Zval, strict bool) *types.Array {
 	arrLen := array.Len()
 
 	/* Base case: empty input */

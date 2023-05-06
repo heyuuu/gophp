@@ -77,6 +77,7 @@ const (
 	ZppTypeDoubleNullable
 	ZppTypeStringNullable
 	ZppTypePathNullable
+	ZppTypeZvalNullable
 	// ref
 	ZppTypeRefZval
 	ZppTypeRefVariadic
@@ -121,6 +122,7 @@ var zppInfos = []struct {
 	{ZppTypeDoubleNullable, "*float64", "ParseDoubleNullable", nil},
 	{ZppTypeStringNullable, "*string", "ParseStringValNullable", nil},
 	{ZppTypePathNullable, "*zpp.Path", "ParsePathValNullable", nil},
+	{ZppTypeZvalNullable, "zpp.ZvalNullable", "ParseZvalEx", []ast.Expr{f.True(), f.False()}},
 	// ref type
 	{ZppTypeRefZval, "zpp.RefZval", "ParseZvalEx", []ast.Expr{f.False(), f.True()}},
 	{ZppTypeRefArray, "zpp.RefArray", "ParseArrayEx", []ast.Expr{f.False(), f.True()}},
