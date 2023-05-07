@@ -705,13 +705,6 @@ func (ht *Array) validPosVal(pos uint32) uint32 {
 /**
  * Internal methods
  */
-func (ht *Array) copyData0(source *Array) {
-	// todo 待处理复制逻辑(参考逻辑: 建立一个reader，延迟复制，考虑内部指针)
-	ht.data0 = source.data0
-	ht.data = b.CopySlice(source.data)
-	ht.indexes = b.CopyMap(source.indexes)
-}
-
 func (ht *Array) dupData0(source *Array) {
 	// todo 待处理复制逻辑(参考逻辑: 非延迟复制，考虑内部指针)
 	source.Foreach(func(key ArrayKey, value *Zval) {
@@ -734,10 +727,6 @@ func (ht *Array) MoveTailToHead() {
 	pairs[0] = tmp
 
 	ht.data0 = ht.newDataOfPairs(pairs)
-}
-
-func (ht *Array) Push(value *Zval) {
-	ht.Append(value)
 }
 
 func (ht *Array) Copy() *Array {

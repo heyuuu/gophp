@@ -92,3 +92,7 @@ func StrCaseCompare(a string, b string) int {
 	}
 	return +1
 }
+
+func StrCaseHasPrefix(a string, b string) bool {
+	return len(a) >= len(b) && StrCaseEquals(a[:len(b)], b)
+}

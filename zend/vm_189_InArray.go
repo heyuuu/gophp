@@ -55,7 +55,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 		result = ht.KeyFind(op1.StringVal())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsLong() {
-			result = ht.IndexFind(op1.Long()())
+			result = ht.IndexFind(op1.Long())
 		} else {
 			result = nil
 		}
@@ -75,7 +75,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 			val = _z
 			key_tmp.SetString(key)
 			CompareFunction(&result_tmp, op1, &key_tmp)
-			if result_tmp.Long()() == 0 {
+			if result_tmp.Long() == 0 {
 				result = val
 				break
 			}
@@ -97,7 +97,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 		result = ht.KeyFind(op1.StringVal())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsLong() {
-			result = ht.IndexFind(op1.Long()())
+			result = ht.IndexFind(op1.Long())
 		} else {
 			result = nil
 		}
@@ -117,7 +117,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			val = _z
 			key_tmp.SetString(key)
 			CompareFunction(&result_tmp, op1, &key_tmp)
-			if result_tmp.Long()() == 0 {
+			if result_tmp.Long() == 0 {
 				result = val
 				break
 			}
@@ -138,7 +138,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		result = ht.KeyFind(op1.StringVal())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsLong() {
-			result = ht.IndexFind(op1.Long()())
+			result = ht.IndexFind(op1.Long())
 		} else {
 			result = nil
 		}
@@ -158,7 +158,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			val = _z
 			key_tmp.SetString(key)
 			CompareFunction(&result_tmp, op1, &key_tmp)
-			if result_tmp.Long()() == 0 {
+			if result_tmp.Long() == 0 {
 				result = val
 				break
 			}

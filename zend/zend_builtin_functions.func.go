@@ -41,10 +41,6 @@ func ZifGcStatus(ret zpp.Ret) {
 }
 
 func ZifFuncNumArgs(executeData zpp.Ex) int {
-	return IZifFuncNumArgs(executeData)
-}
-
-func IZifFuncNumArgs(executeData *ZendExecuteData) int {
 	var ex = executeData.GetPrevExecuteData()
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
 		faults.Error(faults.E_WARNING, "func_num_args():  Called from the global scope - no function context")
@@ -75,17 +71,17 @@ func ZifFuncGetArg(executeData zpp.Ex, returnValue zpp.Ret, argNum int) {
 		return
 	}
 
-	arg_count := ex.NumArgs()
-	if argNum >= arg_count {
+	argCount := ex.NumArgs()
+	if argNum >= argCount {
 		faults.Error(faults.E_WARNING, "func_get_arg():  Argument "+ZEND_LONG_FMT+" not passed to function", argNum)
 		returnValue.SetFalse()
 		return
 	}
 
 	var arg *types.Zval
-	first_extra_arg := int(ex.GetFunc().GetOpArray().GetNumArgs())
-	if argNum >= first_extra_arg && ex.NumArgs() > first_extra_arg {
-		arg = ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar() + int(ex.GetFunc().GetOpArray().GetT()) + (argNum - first_extra_arg))
+	firstExtraArg := int(ex.GetFunc().GetOpArray().GetNumArgs())
+	if argNum >= firstExtraArg && ex.NumArgs() > firstExtraArg {
+		arg = ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar() + int(ex.GetFunc().GetOpArray().GetT()) + (argNum - firstExtraArg))
 	} else {
 		arg = ex.Arg(argNum + 1)
 	}
@@ -109,14 +105,14 @@ func ZifFuncGetArgs(executeData zpp.Ex) (*types.Array, bool) {
 		return types.NewArray(0), true
 	}
 
-	first_extra_arg := int(ex.GetFunc().GetOpArray().GetNumArgs())
+	firstExtraArg := int(ex.GetFunc().GetOpArray().GetNumArgs())
 	var values []*types.Zval
-	if argCount <= first_extra_arg {
+	if argCount <= firstExtraArg {
 		values = executeData.Args(0, argCount)
 	} else {
-		values = executeData.Args(0, first_extra_arg)
+		values = executeData.Args(0, firstExtraArg)
 
-		for i := 0; i < argCount-first_extra_arg; i++ {
+		for i := 0; i < argCount-firstExtraArg; i++ {
 			p := ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar() + int(ex.GetFunc().GetOpArray().GetT()) + i)
 			values = append(values, p)
 		}

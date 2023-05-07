@@ -12,12 +12,12 @@ func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		var ptr *types.Zval = GetZvalPtr(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 		for {
 			if ptr.IsLong() {
-				EG__().SetExitStatus(ptr.Long()())
+				EG__().SetExitStatus(ptr.Long())
 			} else {
 				if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && ptr.IsReference() {
 					ptr = types.Z_REFVAL_P(ptr)
 					if ptr.IsLong() {
-						EG__().SetExitStatus(ptr.Long()())
+						EG__().SetExitStatus(ptr.Long())
 						break
 					}
 				}

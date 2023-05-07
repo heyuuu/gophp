@@ -2,11 +2,13 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"strings"
 )
 
 func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
@@ -162,58 +164,34 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 		}
 		entry.SetStringVal(entry.StringVal())
 	case zend.ZEND_INI_PARSER_SECTION:
-
-		/* fprintf(stdout, "ZEND_INI_PARSER_SECTION: %s\n",Z_STRVAL_P(arg1)); */
-
-		var key *byte = nil
-		var key_len int
-
+		var key string
 		/* PATH sections */
-
-		if zend.ZendBinaryStrncasecmp(arg1.String().GetStr(), "PATH", b.SizeOf("\"PATH\"")-1) == 0 {
-			key = arg1.String().GetVal()
-			key = key + b.SizeOf("\"PATH\"") - 1
-			key_len = arg1.String().GetLen() - b.SizeOf("\"PATH\"") + 1
+		lcArg1 := ascii.StrToUpper(arg1.StringVal())
+		if strings.HasPrefix(lcArg1, "path") {
+			key = arg1.StringVal()[4:]
 			IsSpecialSection = 1
 			HasPerDirConfig = 1
-
-			/* make the path lowercase on Windows, for case insensitivity. Does nothing for other platforms */
-
-			/* make the path lowercase on Windows, for case insensitivity. Does nothing for other platforms */
-
-		} else if zend.ZendBinaryStrncasecmp(arg1.String().GetStr(), "HOST", b.SizeOf("\"HOST\"")-1) == 0 {
-			key = arg1.String().GetVal()
-			key = key + b.SizeOf("\"HOST\"") - 1
-			key_len = arg1.String().GetLen() - b.SizeOf("\"HOST\"") + 1
+		} else if strings.HasPrefix(lcArg1, "host") {
+			key = lcArg1[4:]
 			IsSpecialSection = 1
 			HasPerHostConfig = 1
-			zend.ZendStrTolower(key, key_len)
 		} else {
 			IsSpecialSection = 0
 		}
-		if key != nil && key_len > 0 {
-
+		if key != "" {
 			/* Strip any trailing slashes */
-
-			for key_len > 0 && (key[key_len-1] == '/' || key[key_len-1] == '\\') {
-				key_len--
-				key[key_len] = 0
-			}
+			key = strings.TrimRight(key, "/\\")
 
 			/* Strip any leading whitespace and '=' */
-
-			for (*key) && ((*key) == '=' || (*key) == ' ' || (*key) == '\t') {
-				key++
-				key_len--
-			}
+			key = strings.TrimLeft(key, "= \t")
 
 			/* Search for existing entry and if it does not exist create one */
-
-			if b.Assign(&entry, target_hash.KeyFind(b.CastStr(key, key_len))) == nil {
+			entry = target_hash.KeyFind(key)
+			if entry == nil {
 				var section_arr types.Zval
 				types.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
 				section_arr.Array().Init(8)
-				entry = target_hash.KeyUpdate(b.CastStr(key, key_len), &section_arr)
+				entry = target_hash.KeyUpdate(key, &section_arr)
 			}
 			if entry.IsType(types.IS_ARRAY) {
 				ActiveIniHash = entry.Array()

@@ -169,44 +169,7 @@ func ConvertToString(op *types.Zval) {
 }
 func ZvalIsTrue(op *types.Zval) int { return ZendIsTrue(op) }
 func IZendIsTrue(op *types.Zval) int {
-	var result int = 0
-again:
-	switch op.GetType() {
-	case types.IS_TRUE:
-		result = 1
-	case types.IS_LONG:
-		if op.Long() != 0 {
-			result = 1
-		}
-	case types.IS_DOUBLE:
-		if op.Double() != 0 {
-			result = 1
-		}
-	case types.IS_STRING:
-		if op.String().GetLen() > 1 || op.String().GetLen() != 0 && op.String().GetStr()[0] != '0' {
-			result = 1
-		}
-	case types.IS_ARRAY:
-		if op.Array().Len() {
-			result = 1
-		}
-	case types.IS_OBJECT:
-		if types.Z_OBJ_HT_P(op).GetCastObject() == ZendStdCastObjectTostring {
-			result = 1
-		} else {
-			result = ZendObjectIsTrue(op)
-		}
-	case types.IS_RESOURCE:
-		if types.Z_RES_HANDLE_P(op) != 0 {
-			result = 1
-		}
-	case types.IS_REFERENCE:
-		op = types.Z_REFVAL_P(op)
-		goto again
-	default:
-
-	}
-	return result
+	return types.IntBool(IZendIsTrueEx(op))
 }
 func IZendIsTrueEx(op *types.Zval) bool {
 again:
@@ -323,19 +286,12 @@ func ZendFastEqualStringsEx(s1 string, s2 string) bool {
 	if s1 == s2 {
 		return true
 	} else if len(s1) > 0 && s1[0] <= '9' && len(s2) > 0 && s2[0] <= '9' {
-		return ZendiSmartStreq(s1, s2) != 0
-	}
-}
-func ZendFastEqualStrings(s1 *types.String, s2 *types.String) int {
-	if s1 == s2 {
-		return 1
-	} else if s1.GetStr()[0] > '9' || s2.GetStr()[0] > '9' {
-		return types.IntBool(s1.GetStr() == s2.GetStr())
-	} else {
 		return ZendiSmartStreq(s1, s2)
+	} else {
+		return false
 	}
 }
-func FastEqualCheckFunction(op1 *types.Zval, op2 *types.Zval) int {
+func FastEqualCheckFunction(op1 *types.Zval, op2 *types.Zval) bool {
 	var result types.Zval
 	if op1.IsLong() {
 		if op2.IsLong() {
@@ -351,7 +307,7 @@ func FastEqualCheckFunction(op1 *types.Zval, op2 *types.Zval) int {
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			return ZendFastEqualStrings(op1.String(), op2.String())
+			return ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
 		}
 	}
 	CompareFunction(&result, op1, op2)
@@ -365,10 +321,10 @@ func FastEqualCheckLong(op1 *types.Zval, op2 *types.Zval) int {
 	CompareFunction(&result, op1, op2)
 	return result.Long() == 0
 }
-func FastEqualCheckString(op1 *types.Zval, op2 *types.Zval) int {
+func FastEqualCheckString(op1 *types.Zval, op2 *types.Zval) bool {
 	var result types.Zval
 	if op2.IsString() {
-		return ZendFastEqualStrings(op1.String(), op2.String())
+		return ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
 	}
 	CompareFunction(&result, op1, op2)
 	return result.Long() == 0
@@ -2154,50 +2110,19 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	return types.SUCCESS
 }
 func StringCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
-	if op1.IsString() && op2.IsString() {
-		if op1.String() == op2.String() {
-			return 0
-		} else {
-			return ZendBinaryStrcmp(op1.String().GetStr(), op2.String().GetStr())
-		}
-	} else {
-		var tmp_str1 *types.String
-		var tmp_str2 *types.String
-		var str1 *types.String = ZvalGetTmpString(op1, &tmp_str1)
-		var str2 *types.String = ZvalGetTmpString(op2, &tmp_str2)
-		var ret int = ZendBinaryStrcmp(str1.GetStr(), str2.GetStr())
-		ZendTmpStringRelease(tmp_str1)
-		ZendTmpStringRelease(tmp_str2)
-		return ret
-	}
+	var str1 = ZvalGetStrVal(op1)
+	var str2 = ZvalGetStrVal(op2)
+	return strings.Compare(str1, str2)
 }
 func StringCaseCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
-	if op1.IsString() && op2.IsString() {
-		if op1.String() == op2.String() {
-			return 0
-		} else {
-			return ZendBinaryStrcasecmpL(op1.String().GetStr(), op2.String().GetStr())
-		}
-	} else {
-		var tmp_str1 *types.String
-		var tmp_str2 *types.String
-		var str1 *types.String = ZvalGetTmpString(op1, &tmp_str1)
-		var str2 *types.String = ZvalGetTmpString(op2, &tmp_str2)
-		var ret int = ZendBinaryStrcasecmpL(str1.GetStr(), b.CastStr(str2.GetVal(), str1.GetLen()))
-		ZendTmpStringRelease(tmp_str1)
-		ZendTmpStringRelease(tmp_str2)
-		return ret
-	}
+	var str1 = ZvalGetStrVal(op1)
+	var str2 = ZvalGetStrVal(op2)
+	return ascii.StrCaseCompare(str1, str2)
 }
 func StringLocaleCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
-	var tmp_str1 *types.String
-	var tmp_str2 *types.String
-	var str1 *types.String = ZvalGetTmpString(op1, &tmp_str1)
-	var str2 *types.String = ZvalGetTmpString(op2, &tmp_str2)
-	var ret int = strcoll(str1.GetVal(), str2.GetVal())
-	ZendTmpStringRelease(tmp_str1)
-	ZendTmpStringRelease(tmp_str2)
-	return ret
+	var str1 = ZvalGetStrVal(op1)
+	var str2 = ZvalGetStrVal(op2)
+	return b.StrColl(str1, str2)
 }
 func NumericCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
 	var d1 float64
@@ -2205,10 +2130,6 @@ func NumericCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
 	d1 = ZvalGetDouble(op1)
 	d2 = ZvalGetDouble(op2)
 	return ZEND_NORMALIZE_BOOL(d1 - d2)
-}
-func ZendFreeObjGetResult(op *types.Zval) {
-	b.Assert(!(op.IsRefcounted()) || op.GetRefcount() != 0)
-	// ZvalPtrDtor(op)
 }
 func ConvertCompareResultToLong(result *types.Zval) {
 	if result.IsDouble() {
@@ -2329,17 +2250,17 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					var rv types.Zval
 					op_free = types.Z_OBJ_HT_P(op1).GetGet()(op1, &rv)
 					ret = CompareFunction(result, op_free, op2)
-					ZendFreeObjGetResult(op_free)
+					//ZendFreeObjGetResult(op_free)
 					return ret
 				} else if op2.GetType() != types.IS_OBJECT && types.Z_OBJ_HT_P(op1).GetCastObject() != nil {
 					tmp_free.SetUndef()
 					if types.Z_OBJ_HT_P(op1).GetCastObject()(op1, &tmp_free, b.CondF2(op2.IsFalse() || op2.IsTrue(), types.IS_BOOL, func() __auto__ { return op2.GetType() })) == types.FAILURE {
 						result.SetLong(1)
-						ZendFreeObjGetResult(&tmp_free)
+						//ZendFreeObjGetResult(&tmp_free)
 						return types.SUCCESS
 					}
 					ret = CompareFunction(result, &tmp_free, op2)
-					ZendFreeObjGetResult(&tmp_free)
+					//ZendFreeObjGetResult(&tmp_free)
 					return ret
 				}
 			}
@@ -2348,17 +2269,17 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					var rv types.Zval
 					op_free = types.Z_OBJ_HT_P(op2).GetGet()(op2, &rv)
 					ret = CompareFunction(result, op1, op_free)
-					ZendFreeObjGetResult(op_free)
+					//ZendFreeObjGetResult(op_free)
 					return ret
 				} else if op1.GetType() != types.IS_OBJECT && types.Z_OBJ_HT_P(op2).GetCastObject() != nil {
 					tmp_free.SetUndef()
 					if types.Z_OBJ_HT_P(op2).GetCastObject()(op2, &tmp_free, b.CondF2(op1.IsFalse() || op1.IsTrue(), types.IS_BOOL, func() __auto__ { return op1.GetType() })) == types.FAILURE {
 						result.SetLong(-1)
-						ZendFreeObjGetResult(&tmp_free)
+						//ZendFreeObjGetResult(&tmp_free)
 						return types.SUCCESS
 					}
 					ret = CompareFunction(result, op1, &tmp_free)
-					ZendFreeObjGetResult(&tmp_free)
+					//ZendFreeObjGetResult(&tmp_free)
 					return ret
 				} else if op1.IsObject() {
 					result.SetLong(1)
@@ -2412,7 +2333,6 @@ func HashZvalIdenticalFunction(z1 *types.Zval, z2 *types.Zval) int {
 	 * whereas this comparison function is expected to return 0 on identity,
 	 * and non zero otherwise.
 	 */
-
 	z1 = types.ZVAL_DEREF(z1)
 	z2 = types.ZVAL_DEREF(z2)
 	return FastIsNotIdenticalFunction(z1, z2)
@@ -2441,11 +2361,11 @@ func ZendIsIdentical(op1 *types.Zval, op2 *types.Zval) bool {
 	}
 }
 func IsIdenticalFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	result.SetBool(ZendIsIdentical(op1, op2) != 0)
+	result.SetBool(ZendIsIdentical(op1, op2))
 	return types.SUCCESS
 }
 func IsNotIdenticalFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	result.SetBool(ZendIsIdentical(op1, op2) == 0)
+	result.SetBool(!ZendIsIdentical(op1, op2))
 	return types.SUCCESS
 }
 func IsEqualFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
@@ -2727,9 +2647,6 @@ func ZendStrTolower(str *byte, length int) {
 func ZendStringTolowerEx(str *types.String) *types.String {
 	return types.NewString(ascii.StrToLower(str.GetStr()))
 }
-func ZendBinaryStrcmp(s1 string, s2 string) int {
-	return strings.Compare(s1, s2)
-}
 func ZendBinaryStrncmp(s1 string, s2 string, length int) int {
 	if len(s1) > length {
 		s1 = s1[:length]
@@ -2749,66 +2666,46 @@ func ZendBinaryStrncasecmp(s1 string, s2 string, length int) int {
 	}
 	return ascii.StrCaseCompare(s1, s2)
 }
-func ZendBinaryStrcasecmpL(s1 string, s2 string) int {
-	return ascii.StrCaseCompare(s1, s2)
-}
-func ZendiSmartStreq(s1 *types.String, s2 *types.String) int {
-	var ret1 int
-	var ret2 int
-	var oflow1 int
-	var oflow2 int
-	var lval1 ZendLong = 0
-	var lval2 ZendLong = 0
-	var dval1 float64 = 0.0
-	var dval2 float64 = 0.0
-	if b.Assign(&ret1, IsNumericStringEx(s1.GetStr(), &lval1, &dval1, 0, &oflow1)) && b.Assign(&ret2, IsNumericStringEx(s2.GetStr(), &lval2, &dval2, 0, &oflow2)) {
-		if oflow1 != 0 && oflow1 == oflow2 && dval1-dval2 == 0.0 {
+func ZendiSmartStreq(s1 string, s2 string) bool {
+	r1 := StrToNumberEx(s1, 0)
+	r2 := StrToNumberEx(s2, 0)
 
+	if r1.IsSucc() && r2.IsSucc() {
+		if r1.Overflow() != 0 && r1.Overflow() == r2.Overflow() && r1.Float()-r2.Float() == 0.0 {
 			/* both values are integers overflown to the same side, and the
 			 * double comparison may have resulted in crucial accuracy lost */
-
-			goto string_cmp
-
-			/* both values are integers overflown to the same side, and the
-			 * double comparison may have resulted in crucial accuracy lost */
-
+			return s1 == s2
 		}
-		if ret1 == types.IS_DOUBLE || ret2 == types.IS_DOUBLE {
-			if ret1 != types.IS_DOUBLE {
-				if oflow2 != 0 {
 
-					/* 2nd operand is integer > LONG_MAX (oflow2==1) or < LONG_MIN (-1) */
+		// int vs. int
+		if r1.IsInt() && r2.IsInt() {
+			return r1.Int() == r2.Int()
+		}
 
-					return 0
-
-					/* 2nd operand is integer > LONG_MAX (oflow2==1) or < LONG_MIN (-1) */
-
-				}
-				dval1 = float64(lval1)
-			} else if ret2 != types.IS_DOUBLE {
-				if oflow1 != 0 {
-					return 0
-				}
-				dval2 = float64(lval2)
-			} else if dval1 == dval2 && !(core.ZendFinite(dval1)) {
-
-				/* Both values overflowed and have the same sign,
-				 * so a numeric comparison would be inaccurate */
-
-				goto string_cmp
-
-				/* Both values overflowed and have the same sign,
-				 * so a numeric comparison would be inaccurate */
-
+		//
+		if !r1.IsFloat() {
+			if r2.Overflow() != 0 {
+				/* 2nd operand is integer > LONG_MAX (oflow2==1) or < LONG_MIN (-1) */
+				return false
 			}
-			return dval1 == dval2
-		} else {
-			return lval1 == lval2
+		} else if !r2.IsFloat() {
+			if r1.Overflow() != 0 {
+				return false
+			}
 		}
-	} else {
-	string_cmp:
-		return IntBool(s1.GetStr() == s2.GetStr())
+
+		d1 := r1.ToFloat()
+		d2 := r2.ToFloat()
+		if d1 == d2 && !(core.ZendFinite(d1)) {
+			/* Both values overflowed and have the same sign,
+			 * so a numeric comparison would be inaccurate */
+			return s1 == s2
+		}
+
+		return d1 == d2
 	}
+
+	return s1 == s2
 }
 func ZendiSmartStrcmp(s1 string, s2 string) int {
 	var r1, r2 conv.ParseNumberResult
@@ -2850,7 +2747,7 @@ func ZendiSmartStrcmp(s1 string, s2 string) int {
 	}
 
 string_cmp:
-	return ZendBinaryStrcmp(s1, s2)
+	return strings.Compare(s1, s2)
 }
 func HashZvalCompareFunction(z1 *types.Zval, z2 *types.Zval) int {
 	var result types.Zval

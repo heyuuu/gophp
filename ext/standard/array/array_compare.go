@@ -160,7 +160,7 @@ func arrayKeyCompareStringNatural(k1 types.ArrayKey, k2 types.ArrayKey) int {
 func arrayKeyCompareStringLocale(k1 types.ArrayKey, k2 types.ArrayKey) int {
 	str1 := arrayKeyToString(k1)
 	str2 := arrayKeyToString(k2)
-	return strcoll(str1, str2)
+	return b.StrColl(str1, str2)
 }
 func PhpGetKeyCompareFunc(sortType zend.ZendLong, reverse bool) types.ArrayComparer {
 	var comparer types.ArrayComparer

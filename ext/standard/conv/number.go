@@ -27,12 +27,20 @@ func parseNumberResultInt(i int) ParseNumberResult {
 func parseNumberResultFloat(f float64, overflow int8) ParseNumberResult {
 	return ParseNumberResult{typ: 1, fVal: f, overflow: overflow}
 }
-func (r ParseNumberResult) IsSucc() bool   { return r.typ != 0 }
-func (r ParseNumberResult) IsInt() bool    { return r.typ == 1 }
-func (r ParseNumberResult) IsFloat() bool  { return r.typ == 2 }
-func (r ParseNumberResult) Int() int       { return r.iVal }
-func (r ParseNumberResult) Float() float64 { return r.fVal }
-func (r ParseNumberResult) Overflow() int  { return int(r.overflow) }
+func (r ParseNumberResult) IsSucc() bool     { return r.typ != 0 }
+func (r ParseNumberResult) IsInt() bool      { return r.typ == 1 }
+func (r ParseNumberResult) IsFloat() bool    { return r.typ == 2 }
+func (r ParseNumberResult) IsOverflow() bool { return r.overflow != 0 }
+func (r ParseNumberResult) Int() int         { return r.iVal }
+func (r ParseNumberResult) Float() float64   { return r.fVal }
+func (r ParseNumberResult) Overflow() int    { return int(r.overflow) }
+func (r ParseNumberResult) ToFloat() float64 {
+	if r.IsFloat() {
+		return r.Float()
+	} else {
+		return float64(r.Int())
+	}
+}
 
 /**
  * functions

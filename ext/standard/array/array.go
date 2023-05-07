@@ -450,7 +450,7 @@ func searchArray(value *types.Zval, array *types.Array, strict bool) *types.Arra
 		} else if value.IsString() {
 			array.ForeachIndirectEx(func(key types.ArrayKey, entry *types.Zval) bool {
 				entry = types.ZVAL_DEREF(entry)
-				if zend.FastEqualCheckString(value, entry) != 0 {
+				if zend.FastEqualCheckString(value, entry) {
 					targetKey = &key
 					return false
 				}
@@ -459,7 +459,7 @@ func searchArray(value *types.Zval, array *types.Array, strict bool) *types.Arra
 		} else {
 			array.ForeachIndirectEx(func(key types.ArrayKey, entry *types.Zval) bool {
 				entry = types.ZVAL_DEREF(entry)
-				if zend.FastEqualCheckFunction(value, entry) != 0 {
+				if zend.FastEqualCheckFunction(value, entry) {
 					targetKey = &key
 					return false
 				}
@@ -1087,7 +1087,7 @@ func ZifArrayKeys(array *types.Array, _ zpp.Opt, searchValue *types.Zval, strict
 			})
 		} else {
 			array.ForeachIndirect(func(key types.ArrayKey, entry *types.Zval) {
-				if zend.FastEqualCheckFunction(searchValue, entry) != 0 {
+				if zend.FastEqualCheckFunction(searchValue, entry) {
 					keys.Append(key.ToZval())
 				}
 			})

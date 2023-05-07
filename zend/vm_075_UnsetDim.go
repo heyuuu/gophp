@@ -30,7 +30,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
-				hval = offset.Long()()
+				hval = offset.Long()
 			num_index_dim:
 				types.ZendHashIndexDel(ht, hval)
 			} else if offset.IsDouble() {
@@ -107,7 +107,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
-				hval = offset.Long()()
+				hval = offset.Long()
 			num_index_dim:
 				types.ZendHashIndexDel(ht, hval)
 			} else if offset.IsReference() {
@@ -191,7 +191,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
-				hval = offset.Long()()
+				hval = offset.Long()
 			num_index_dim:
 				types.ZendHashIndexDel(ht, hval)
 			} else if offset.IsReference() {
@@ -268,7 +268,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
-				hval = offset.Long()()
+				hval = offset.Long()
 			num_index_dim:
 				types.ZendHashIndexDel(ht, hval)
 			} else if offset.IsDouble() {
@@ -341,7 +341,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
-				hval = offset.Long()()
+				hval = offset.Long()
 			num_index_dim:
 				types.ZendHashIndexDel(ht, hval)
 			} else if offset.IsReference() {
@@ -421,7 +421,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
-				hval = offset.Long()()
+				hval = offset.Long()
 			num_index_dim:
 				types.ZendHashIndexDel(ht, hval)
 			} else if offset.IsReference() {

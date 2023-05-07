@@ -479,9 +479,9 @@ func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte
 	wrapperhash.Array().KeyUpdate(b.CastStrAuto(optionname), optionvalue)
 	return types.SUCCESS
 }
-func PhpStreamDirentAlphasort(a **types.String, b **types.String) int {
-	return strcoll(a.GetVal(), b.GetVal())
+func PhpStreamDirentAlphasort(i **types.String, j **types.String) int {
+	return b.StrColl(i.GetVal(), j.GetVal())
 }
-func PhpStreamDirentAlphasortr(a **types.String, b **types.String) int {
-	return strcoll(b.GetVal(), a.GetVal())
+func PhpStreamDirentAlphasortr(i **types.String, j **types.String) int {
+	return b.StrColl(j.GetVal(), i.GetVal())
 }

@@ -37,7 +37,7 @@ func PhpError(typ int, format string, args ...any) {
 
 /* PHPAPI void php_error(int type, const char *format, ...); */
 
-const PhpMemnstr = zend.ZendMemnstr
+var PhpMemnstr = zend.ZendMemnstr
 
 const PHP_CONNECTION_NORMAL = 0
 const PHP_CONNECTION_ABORTED = 1
