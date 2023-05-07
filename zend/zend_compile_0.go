@@ -332,6 +332,10 @@ func ZendAddLiteral(zv *types.Zval) int {
 	ZendInsertLiteral(op_array, zv, i)
 	return i
 }
+func ZendAddLiteralStringEx(str string) int {
+	zv := types.NewZvalString(str)
+	return ZendAddLiteral(zv)
+}
 func ZendAddLiteralString(str **types.String) int {
 	var ret int
 	var zv types.Zval
@@ -377,7 +381,7 @@ func ZendAddClassNameLiteral(name *types.String) int {
 	ZendAddLiteralString(&lc_name)
 	return ret
 }
-func ZendAddConstNameLiteral(name *types.String, unqualified types.ZendBool) int {
+func ZendAddConstNameLiteral(name string, unqualified types.ZendBool) int {
 	var tmp_name *types.String
 	var ret int = ZendAddLiteralString(&name)
 	var ns_len int = 0
@@ -389,26 +393,21 @@ func ZendAddConstNameLiteral(name *types.String, unqualified types.ZendBool) int
 		after_ns_len = name.GetLen() - ns_len - 1
 
 		/* lowercased namespace name & original constant name */
-
-		tmp_name = types.NewString(name.GetStr())
-		ZendStrTolower(tmp_name.GetVal(), ns_len)
-		ZendAddLiteralString(&tmp_name)
+		ZendAddLiteralStringEx(ascii.StrToLower(name[:ns_len]))
 
 		/* lowercased namespace name & lowercased constant name */
-
-		tmp_name = ZendStringTolower(name)
-		ZendAddLiteralString(&tmp_name)
+		ZendAddLiteralStringEx(ascii.StrToLower(name))
 		if unqualified == 0 {
 			return ret
 		}
 	} else {
-		after_ns = name.GetVal()
+		after_ns = name
 	}
 
 	/* original unqualified constant name */
 
 	tmp_name = types.NewString(b.CastStr(after_ns, after_ns_len))
-	ZendAddLiteralString(&tmp_name)
+	ZendAddLiteralString(after_ns)
 
 	/* lowercased unqualified constant name */
 

@@ -601,14 +601,14 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOpTmp(result, ZEND_FETCH_CONSTANT, nil, nil)
 	opline.SetOp2Type(IS_CONST)
 	if is_fully_qualified != 0 {
-		opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name, 0))
+		opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name.GetStr(), 0))
 	} else {
 		opline.GetOp1().SetNum(IS_CONSTANT_UNQUALIFIED)
 		if FC__().GetCurrentNamespace() != nil {
 			opline.GetOp1().SetNum(opline.GetOp1().GetNum() | IS_CONSTANT_IN_NAMESPACE)
-			opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name, 1))
+			opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name.GetStr(), 1))
 		} else {
-			opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name, 0))
+			opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name.GetStr(), 0))
 		}
 	}
 	opline.SetExtendedValue(ZendAllocCacheSlot())

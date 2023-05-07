@@ -2636,14 +2636,6 @@ func ZendStrTolowerCopy(dest *byte, source *byte, length int) *byte {
 	*result = '0'
 	return dest
 }
-func ZendStrTolower(str *byte, length int) {
-	var p *uint8 = (*uint8)(str)
-	var end *uint8 = p + length
-	for p < end {
-		*p = ascii.ToLower(*p)
-		p++
-	}
-}
 func ZendStringTolowerEx(str *types.String) *types.String {
 	return types.NewString(ascii.StrToLower(str.GetStr()))
 }

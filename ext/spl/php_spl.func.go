@@ -2,6 +2,7 @@ package spl
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/php/types"
@@ -353,13 +354,19 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		// zend.ZvalPtrDtor(&retval)
 	}
 }
-func HT_MOVE_TAIL_TO_HEAD(ht *types.Array) {
-	ht.MoveTailToHead()
+func uint32ToStr(i uint32) string {
+	return string([]byte{
+		byte(i & 0xff),
+		byte(i >> 8 & 0xff),
+		byte(i >> 16 & 0xff),
+		byte(i >> 24 & 0xff),
+	})
 }
+
 func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, autoloadFunction *types.Zval, throw *types.Zval, prepend *types.Zval) {
 	var func_name *types.String
 	var error *byte = nil
-	var lc_name *types.String
+	var lc_name string = ""
 	var zcallable *types.Zval = nil
 	var do_throw types.ZendBool = 1
 	var prepend types.ZendBool = 0
@@ -435,41 +442,26 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		}
 		if zcallable.IsType(types.IS_OBJECT) {
 			types.ZVAL_COPY(alfi.GetClosure(), zcallable)
-			lc_name = types.ZendStringAlloc(func_name.GetLen()+b.SizeOf("uint32_t"), 0)
-			zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal(), func_name.GetLen())
-			memcpy(lc_name.GetVal()+func_name.GetLen(), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
-			lc_name.GetStr()[lc_name.GetLen()] = '0'
+			lc_name = ascii.StrToLower(func_name.GetStr()) + uint32ToStr(zend.Z_OBJ_HANDLE_P(zcallable))
 		} else {
 			alfi.GetClosure().SetUndef()
 
 			/* Skip leading \ */
-
 			if func_name.GetStr()[0] == '\\' {
-				lc_name = types.ZendStringAlloc(func_name.GetLen()-1, 0)
-				zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal()+1, func_name.GetLen()-1)
+				lc_name = ascii.StrToLower(func_name.GetStr()[1:])
 			} else {
-				lc_name = zend.ZendStringTolower(func_name)
+				lc_name = ascii.StrToLower(func_name.GetStr())
 			}
-
-			/* Skip leading \ */
-
 		}
 		// types.ZendStringReleaseEx(func_name, 0)
-		if SPL_G__().autoload_functions && SPL_G__().autoload_functions.KeyExists(lc_name.GetStr()) {
-			if !(alfi.GetClosure().IsUndef()) {
-				//alfi.GetClosure().DelRefcount()
-			}
+		if SPL_G__().autoload_functions != nil && SPL_G__().autoload_functions.KeyExists(lc_name) {
 			goto skip
 		}
 		if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.AccStatic) {
 
 			/* add object id to the hash to ensure uniqueness, for more reference look at bug #40091 */
-
-			lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"))
-			memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
-			lc_name.GetStr()[lc_name.GetLen()] = '0'
+			lc_name += uint32ToStr(obj_ptr.GetHandle())
 			alfi.GetObj().SetObject(obj_ptr)
-			//alfi.GetObj().AddRefcount()
 		} else {
 			alfi.GetObj().SetUndef()
 		}
@@ -497,15 +489,8 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			alfi.GetFuncPtr().SetFunctionName(nil)
 			alfi.SetFuncPtr(copy)
 		}
-		if types.ZendHashAddMem(SPL_G__().autoload_functions, lc_name.GetStr(), &alfi, b.SizeOf("autoload_func_info")) == nil {
-			//if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.AccStatic) {
-			//	alfi.GetObj().DelRefcount()
-			//}
-			//if !(alfi.GetClosure().IsUndef()) {
-			//	alfi.GetClosure().DelRefcount()
-			//}
+		if types.ZendHashAddMem(SPL_G__().autoload_functions, lc_name, &alfi, b.SizeOf("autoload_func_info")) == nil {
 			if alfi.GetFuncPtr().HasFnFlags(zend.AccCallViaTrampoline) {
-				// types.ZendStringReleaseEx(alfi.GetFuncPtr().GetFunctionName(), 0)
 				zend.ZendFreeTrampoline(alfi.GetFuncPtr())
 			}
 		}

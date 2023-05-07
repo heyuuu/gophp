@@ -2,6 +2,7 @@ package cgi
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
@@ -433,29 +434,23 @@ func SapiCgiActivate() int {
 		return types.FAILURE
 	}
 	if core.PhpIniHasPerHostConfig() != 0 {
-		var server_name *byte
+		var serverNamePtr *string
 
 		/* Activate per-host-system-configuration defined in php.ini and stored into configuration_hash during startup */
 
 		if core.FcgiIsFastcgi() != 0 {
 			var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
-			server_name = core.FCGI_GETENV(request, "SERVER_NAME")
+			serverNamePtr = core.FCGI_GETENV(request, "SERVER_NAME")
 		} else {
-			server_name = getenv("SERVER_NAME")
+			serverNamePtr = getenv("SERVER_NAME")
 		}
 
 		/* SERVER_NAME should also be defined at this stage..but better check it anyway */
-
-		if server_name != nil {
-			var server_name_len int = strlen(server_name)
-			server_name = zend.Estrndup(server_name, server_name_len)
-			zend.ZendStrTolower(server_name, server_name_len)
-			core.PhpIniActivatePerHostConfig(server_name, server_name_len)
-			zend.Efree(server_name)
+		if serverNamePtr != nil {
+			serverName := *serverNamePtr
+			serverName = ascii.StrToUpper(serverName)
+			core.PhpIniActivatePerHostConfig(serverName)
 		}
-
-		/* SERVER_NAME should also be defined at this stage..but better check it anyway */
-
 	}
 	if core.PhpIniHasPerDirConfig() != 0 || core.PG__().user_ini_filename && *core.PG__().user_ini_filename {
 		var path string

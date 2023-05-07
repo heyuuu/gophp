@@ -604,18 +604,12 @@ func PhpIniActivatePerDirConfig(path string) {
 	/* Walk through each directory in path and apply any found per-dir-system-configuration from configuration_hash */
 }
 func PhpIniHasPerHostConfig() int { return HasPerHostConfig }
-func PhpIniActivatePerHostConfig(host *byte, host_len int) {
-	var tmp *types.Zval
-	if HasPerHostConfig != 0 && host != nil && host_len != 0 {
-
+func PhpIniActivatePerHostConfig(host string) {
+	if HasPerHostConfig != 0 && host != "" {
 		/* Search for source array matching the host from configuration_hash */
-
-		if b.Assign(&tmp, Config().KeyFind(b.CastStr(host, host_len))) != nil {
+		if tmp := Config().KeyFind(host); tmp != nil {
 			PhpIniActivateConfig(tmp.Array(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 		}
-
-		/* Search for source array matching the host from configuration_hash */
-
 	}
 }
 
