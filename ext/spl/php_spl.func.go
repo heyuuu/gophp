@@ -512,7 +512,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoloadFunction *types.Zval) {
 	var func_name *types.String = nil
 	var error *byte = nil
-	var lc_name *types.String
+	var lc_name string
 	var zcallable *types.Zval
 	var success int = types.FAILURE
 	var spl_func_ptr types.IFunction
@@ -537,19 +537,15 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 		zend.Efree(error)
 	}
 	if zcallable.IsType(types.IS_OBJECT) {
-		lc_name = types.ZendStringAlloc(func_name.GetLen()+b.SizeOf("uint32_t"), 0)
-		zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal(), func_name.GetLen())
-		memcpy(lc_name.GetVal()+func_name.GetLen(), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
-		lc_name.GetStr()[lc_name.GetLen()] = '0'
+		lc_name = ascii.StrToLower(func_name.GetStr()) + uint32ToStr(zend.Z_OBJ_HANDLE_P(zcallable))
 	} else {
 
 		/* Skip leading \ */
 
 		if func_name.GetStr()[0] == '\\' {
-			lc_name = types.ZendStringAlloc(func_name.GetLen()-1, 0)
-			zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal()+1, func_name.GetLen()-1)
+			lc_name = ascii.StrToLower(func_name.GetStr()[1:])
 		} else {
-			lc_name = zend.ZendStringTolower(func_name)
+			lc_name = ascii.StrToLower(func_name.GetStr())
 		}
 
 		/* Skip leading \ */
@@ -557,10 +553,8 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 	}
 	// types.ZendStringReleaseEx(func_name, 0)
 	if SPL_G__().autoload_functions {
-		if lc_name.GetStr() == SplAutoloadCallFn.GetFunctionName().GetStr() {
-
+		if lc_name == SplAutoloadCallFn.GetFunctionName().GetStr() {
 			/* remove all */
-
 			if !(SPL_G__().autoloadRunning) {
 				SPL_G__().autoload_functions.Destroy()
 				zend.FREE_HASHTABLE(SPL_G__().autoload_functions)
@@ -573,16 +567,13 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 		} else {
 
 			/* remove specific */
-
-			success = types.ZendHashDel(SPL_G__().autoload_functions, lc_name.GetStr())
+			success = types.ZendHashDel(SPL_G__().autoload_functions, lc_name)
 			if success != types.SUCCESS && obj_ptr != nil {
-				lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"))
-				memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
-				lc_name.GetStr()[lc_name.GetLen()] = '0'
-				success = types.ZendHashDel(SPL_G__().autoload_functions, lc_name.GetStr())
+				lc_name += uint32ToStr(obj_ptr.GetHandle())
+				success = types.ZendHashDel(SPL_G__().autoload_functions, lc_name)
 			}
 		}
-	} else if lc_name.GetStr() == SplAutoloadFn.GetFunctionName().GetStr() {
+	} else if lc_name == SplAutoloadFn.GetFunctionName().GetStr() {
 
 		/* register single spl_autoload() */
 

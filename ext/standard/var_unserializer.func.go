@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -233,21 +234,16 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
 	}
 	return str.Cutoff(i)
 }
-func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserializeDataT) int {
+func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserializeDataT) bool {
 	var classes *types.Array = (**var_hashx).GetAllowedClasses()
-	var lcname *types.String
-	var res int
 	if classes == nil {
-		return 1
+		return true
 	}
-	if !(classes.Len()) {
-		return 0
+	if classes.Len() == 0 {
+		return false
 	}
-	types.ZstrAlloc(lcname, class_name.GetLen())
-	zend.ZendStrTolowerCopy(lcname.GetVal(), class_name.GetVal(), class_name.GetLen())
-	res = types.IntBool(classes.KeyExists(lcname.GetStr()))
-	//lcname.Free()
-	return res
+	lcname := ascii.StrToLower(class_name.GetStr())
+	return classes.KeyExists(lcname)
 }
 func ParseIv2(p *uint8, q **uint8) zend.ZendLong {
 	var result zend.ZendUlong = 0
@@ -805,7 +801,7 @@ yy18:
 	}
 	class_name = types.NewString(b.CastStr(str, len_))
 	for {
-		if UnserializeAllowedClass(class_name, var_hash) == 0 {
+		if !UnserializeAllowedClass(class_name, var_hash) {
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 			break

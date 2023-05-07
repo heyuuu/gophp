@@ -219,8 +219,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 	}
 
 	/* Lowercase the pattern, the agent name is already lowercase */
-	pattern_lc = types.ZendStringAlloc(entry.GetPattern().GetLen(), 0)
-	zend.ZendStrTolowerCopy(pattern_lc.GetVal(), entry.GetPattern().GetVal(), entry.GetPattern().GetLen())
+	pattern_lc = types.NewString(ascii.StrToLower(pattern_lc.GetStr()))
 
 	/* Check if the agent contains the "contains" portions */
 

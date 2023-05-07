@@ -77,6 +77,7 @@ func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFuncti
 	name_len = fptr.GetFunctionName().GetLen()
 	ZendStrTolowerCopy(lcname, fptr.GetFunctionName().GetVal(), b.Min(name_len, b.SizeOf("lcname")-1))
 	lcname[b.SizeOf("lcname")-1] = '0'
+
 	if name_len == b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_DESTRUCTOR_FUNC_NAME, b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
 		faults.Error(error_type, "Destructor %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DESTRUCTOR_FUNC_NAME)
 	} else if name_len == b.SizeOf("ZEND_CLONE_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CLONE_FUNC_NAME, b.SizeOf("ZEND_CLONE_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
