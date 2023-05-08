@@ -550,8 +550,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 
 		/* Iterate over the hash to construct the argv array. */
 		args.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
-			var tmp_arg_str *types.String
-			var arg_str *types.String = zend.ZvalGetTmpString(value, &tmp_arg_str)
+			var arg_str *types.String = zend.ZvalGetString(value)
 			argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
 		})
 

@@ -76,7 +76,7 @@ func ZendFetchDimensionAddressRead(
 			default:
 				ZendIllegalOffset()
 			}
-			offset = ZvalGetLongFunc(dim)
+			offset = ZvalGetLong(dim)
 		} else {
 			offset = dim.Long()
 		}

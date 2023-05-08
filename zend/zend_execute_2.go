@@ -391,8 +391,9 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *types.Zval, 
 	}
 }
 func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteData) ZendLong {
+	dim = dim.DeRef()
+
 	var offset ZendLong
-try_again:
 	if dim.GetType() != types.IS_LONG {
 		switch dim.GetType() {
 		case types.IS_STRING:
@@ -413,13 +414,10 @@ try_again:
 			fallthrough
 		case types.IS_TRUE:
 			faults.Error(faults.E_NOTICE, "String offset cast occurred")
-		case types.IS_REFERENCE:
-			dim = types.Z_REFVAL_P(dim)
-			goto try_again
 		default:
 			ZendIllegalOffset()
 		}
-		offset = ZvalGetLongFunc(dim)
+		offset = ZvalGetLong(dim)
 	} else {
 		offset = dim.Long()
 	}

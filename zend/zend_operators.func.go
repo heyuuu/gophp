@@ -92,41 +92,6 @@ func ZendMemrchr(s *byte, c byte, n int) *byte {
 		return nil
 	}
 }
-
-func ZvalGetLong(op *types.Zval) ZendLong {
-	if op.IsLong() {
-		return op.Long()
-	} else {
-		return ZvalGetLongFunc(op)
-	}
-}
-func ZvalGetDouble(op *types.Zval) float64 {
-	if op.IsDouble() {
-		return op.Double()
-	} else {
-		return ZvalGetDoubleFunc(op)
-	}
-}
-
-func ZvalGetStrVal(op *types.Zval) string {
-	if op.IsString() {
-		return op.StringVal()
-	} else {
-		zstr := ZvalGetStringFunc(op)
-		if zstr == nil {
-			return ""
-		}
-		return zstr.GetStr()
-	}
-}
-
-func ZvalGetString(op *types.Zval) *types.String {
-	if op.IsString() {
-		return op.String().Copy()
-	} else {
-		return ZvalGetStringFunc(op)
-	}
-}
 func ZvalGetTmpString(op *types.Zval, tmp **types.String) *types.String {
 	if op.IsString() {
 		*tmp = nil
@@ -749,107 +714,6 @@ try_again:
 		ObjectInit(op)
 		types.Z_OBJPROP_P(op).KeyAddNew(types.STR_SCALAR, &tmp)
 	}
-}
-func _zvalGetLongFuncEx(op *types.Zval, silent types.ZendBool) ZendLong {
-try_again:
-	switch op.GetType() {
-	case types.IS_UNDEF:
-		fallthrough
-	case types.IS_NULL:
-		fallthrough
-	case types.IS_FALSE:
-		return 0
-	case types.IS_TRUE:
-		return 1
-	case types.IS_RESOURCE:
-		return types.Z_RES_HANDLE_P(op)
-	case types.IS_LONG:
-		return op.Long()
-	case types.IS_DOUBLE:
-		return DvalToLval(op.Double())
-	case types.IS_STRING:
-		var type_ uint8
-		var lval ZendLong
-		var dval float64
-		if 0 == b.Assign(&type_, IsNumericString(op.String().GetStr(), &lval, &dval, b.Cond(silent != 0, 1, -1))) {
-			if silent == 0 {
-				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
-			}
-			return 0
-		} else if type_ == types.IS_LONG {
-			return lval
-		} else {
-
-			/* Previously we used strtol here, not is_numeric_string,
-			 * and strtol gives you LONG_MAX/_MIN on overflow.
-			 * We use use saturating conversion to emulate strtol()'s
-			 * behaviour.
-			 */
-
-			return DvalToLvalCap(dval)
-		}
-	case types.IS_ARRAY:
-		if op.Array().Len() != 0 {
-			return 1
-		} else {
-			return 0
-		}
-	case types.IS_OBJECT:
-		var dst types.Zval
-		ConvertObjectToType(op, &dst, types.IS_LONG, ConvertToLong)
-		if dst.IsLong() {
-			return dst.Long()
-		} else {
-			return 1
-		}
-	case types.IS_REFERENCE:
-		op = types.Z_REFVAL_P(op)
-		goto try_again
-	default:
-
-	}
-	return 0
-}
-func ZvalGetLongFunc(op *types.Zval) ZendLong       { return _zvalGetLongFuncEx(op, 1) }
-func _zvalGetLongFuncNoisy(op *types.Zval) ZendLong { return _zvalGetLongFuncEx(op, 0) }
-func ZvalGetDoubleFunc(op *types.Zval) float64 {
-try_again:
-	switch op.GetType() {
-	case types.IS_NULL:
-		fallthrough
-	case types.IS_FALSE:
-		return 0.0
-	case types.IS_TRUE:
-		return 1.0
-	case types.IS_RESOURCE:
-		return float64(types.Z_RES_HANDLE_P(op))
-	case types.IS_LONG:
-		return float64(op.Long())
-	case types.IS_DOUBLE:
-		return op.Double()
-	case types.IS_STRING:
-		return ZendStrtod(op.String().GetVal(), nil)
-	case types.IS_ARRAY:
-		if op.Array().Len() != 0 {
-			return 1.0
-		} else {
-			return 0.0
-		}
-	case types.IS_OBJECT:
-		var dst types.Zval
-		ConvertObjectToType(op, &dst, types.IS_DOUBLE, ConvertToDouble)
-		if dst.IsDouble() {
-			return dst.Double()
-		} else {
-			return 1.0
-		}
-	case types.IS_REFERENCE:
-		op = types.Z_REFVAL_P(op)
-		goto try_again
-	default:
-
-	}
-	return 0.0
 }
 func __zvalGetStringFunc(op *types.Zval, try types.ZendBool) *types.String {
 try_again:
@@ -2579,11 +2443,8 @@ func ZendObjectIsTrue(op *types.Zval) bool {
 		var rv types.Zval
 		var tmp *types.Zval = types.Z_OBJ_HT_P(op).GetGet()(op, &rv)
 		if tmp.GetType() != types.IS_OBJECT {
-
 			/* for safety - avoid loop */
-
 			result = ZvalIsTrue(tmp)
-			// ZvalPtrDtor(tmp)
 			return result
 		}
 	}
@@ -2598,9 +2459,6 @@ func ZendStrTolowerCopy(dest *byte, source *byte, length int) *byte {
 	}
 	*result = '0'
 	return dest
-}
-func ZendStringTolowerEx(str *types.String) *types.String {
-	return types.NewString(ascii.StrToLower(str.GetStr()))
 }
 func ZendBinaryStrncmp(s1 string, s2 string, length int) int {
 	if len(s1) > length {
