@@ -86,7 +86,7 @@ func getBoolNotHandler(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	} else {
-		opline.Result().SetBool(!IZendIsTrueEx(op1))
+		opline.Result().SetBool(!ZvalIsTrue(op1))
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 

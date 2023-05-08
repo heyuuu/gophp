@@ -34,14 +34,14 @@ func ZendCompileShortCircuiting(result *Znode, ast *ZendAst) {
 	b.Assert(ast.GetKind() == ZEND_AST_AND || ast.GetKind() == ZEND_AST_OR)
 	ZendCompileExpr(&left_node, left_ast)
 	if left_node.GetOpType() == IS_CONST {
-		if ast.GetKind() == ZEND_AST_AND && ZendIsTrue(left_node.GetConstant()) == 0 || ast.GetKind() == ZEND_AST_OR && ZendIsTrue(left_node.GetConstant()) != 0 {
+		if ast.GetKind() == ZEND_AST_AND && IZendIsTrue(left_node.GetConstant()) == 0 || ast.GetKind() == ZEND_AST_OR && IZendIsTrue(left_node.GetConstant()) != 0 {
 			result.SetOpType(IS_CONST)
-			result.GetConstant().SetBool(ZendIsTrue(left_node.GetConstant()) != 0)
+			result.GetConstant().SetBool(IZendIsTrue(left_node.GetConstant()) != 0)
 		} else {
 			ZendCompileExpr(&right_node, right_ast)
 			if right_node.GetOpType() == IS_CONST {
 				result.SetOpType(IS_CONST)
-				result.GetConstant().SetBool(ZendIsTrue(right_node.GetConstant()) != 0)
+				result.GetConstant().SetBool(IZendIsTrue(right_node.GetConstant()) != 0)
 				// ZvalPtrDtor(right_node.GetConstant())
 			} else {
 				ZendEmitOpTmp(result, ZEND_BOOL, &right_node, nil)

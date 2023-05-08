@@ -124,7 +124,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 				}
 			}
 			if retval.IsNotUndef() {
-				has_children = zend.ZendIsTrue(&retval)
+				has_children = zend.IZendIsTrue(&retval)
 				// zend.ZvalPtrDtor(&retval)
 				if has_children != 0 {
 					if object.GetMaxDepth() == -1 || object.GetMaxDepth() > object.GetLevel() {
@@ -1273,7 +1273,7 @@ func SplFilterItFetch(zthis *types.Zval, intern *SplDualItObject) {
 	for SplDualItFetch(intern, 1) == types.SUCCESS {
 		zend.ZendCallMethodWith0Params(zthis, intern.GetStd().GetCe(), nil, "accept", &retval)
 		if retval.IsNotUndef() {
-			if zend.ZendIsTrue(&retval) != 0 {
+			if zend.ZvalIsTrue(&retval) {
 				// zend.ZvalPtrDtor(&retval)
 				return
 			}
@@ -1873,7 +1873,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 					return
 				}
 			} else {
-				if zend.ZendIsTrue(&retval) != 0 {
+				if zend.ZvalIsTrue(&retval) {
 					zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &zchildren)
 					if zend.EG__().GetException() != nil {
 						// zend.ZvalPtrDtor(&zchildren)
@@ -2608,7 +2608,7 @@ func SplIteratorFuncApply(iter *zend.ZendObjectIterator, puser any) int {
 	var result int
 	apply_info.GetCount()++
 	zend.ZendFcallInfoCall(apply_info.GetFci(), apply_info.GetFcc(), &retval, nil)
-	if zend.ZendIsTrue(&retval) != 0 {
+	if zend.ZvalIsTrue(&retval) {
 		result = types.ArrayApplyKeep
 	} else {
 		result = types.ArrayApplyStop

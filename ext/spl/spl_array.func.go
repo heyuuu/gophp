@@ -480,7 +480,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, types.Z_OBJCE_P(object), intern.GetFptrOffsetHas(), "offsetExists", &rv, offset)
 		// zend.ZvalPtrDtor(offset)
-		if zend.ZendIsTrue(&rv) != 0 {
+		if zend.ZvalIsTrue(&rv) {
 			// zend.ZvalPtrDtor(&rv)
 			if check_empty != 1 {
 				return 1
@@ -539,7 +539,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 			value = tmp
 		}
 	}
-	var result types.ZendBool = b.CondF(check_empty != 0, func() int { return zend.ZendIsTrue(value) }, func() bool { return value.GetType() != types.IS_NULL })
+	var result types.ZendBool = b.CondF(check_empty != 0, func() int { return zend.IZendIsTrue(value) }, func() bool { return value.GetType() != types.IS_NULL })
 	if value == &rv {
 		// zend.ZvalPtrDtor(&rv)
 	}

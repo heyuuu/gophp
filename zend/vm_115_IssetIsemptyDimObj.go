@@ -47,7 +47,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else {
-			result = value == nil || IZendIsTrue(value) == 0
+			result = value == nil || !ZvalIsTrue(value)
 		}
 		goto isset_dim_obj_exit
 	} else {
@@ -119,7 +119,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else {
-			result = value == nil || IZendIsTrue(value) == 0
+			result = value == nil || !ZvalIsTrue(value)
 		}
 		goto isset_dim_obj_exit
 	} else {
@@ -186,7 +186,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteDa
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else {
-			result = value == nil || IZendIsTrue(value) == 0
+			result = value == nil || !ZvalIsTrue(value)
 		}
 		goto isset_dim_obj_exit
 	} else {
@@ -245,7 +245,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else {
-			result = value == nil || IZendIsTrue(value) == 0
+			result = value == nil || !ZvalIsTrue(value)
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
@@ -322,7 +322,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else {
-			result = value == nil || IZendIsTrue(value) == 0
+			result = value == nil || !ZvalIsTrue(value)
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
@@ -395,7 +395,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else {
-			result = value == nil || IZendIsTrue(value) == 0
+			result = value == nil || !ZvalIsTrue(value)
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
@@ -458,7 +458,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteDa
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else {
-			result = value == nil || IZendIsTrue(value) == 0
+			result = value == nil || !ZvalIsTrue(value)
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
@@ -533,7 +533,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else {
-			result = value == nil || IZendIsTrue(value) == 0
+			result = value == nil || !ZvalIsTrue(value)
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {
@@ -604,7 +604,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else {
-			result = value == nil || IZendIsTrue(value) == 0
+			result = value == nil || !ZvalIsTrue(value)
 		}
 		goto isset_dim_obj_exit
 	} else if container.IsReference() {

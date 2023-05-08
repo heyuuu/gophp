@@ -190,10 +190,10 @@ func PhpHeadParseCookieOptionsArray(
 				*domain = zend.ZvalGetString(value)
 				found++
 			} else if ascii.StrCaseEquals(strKey, "secure") {
-				*secure = zend.ZvalIsTrue(value)
+				*secure = zend.IZendIsTrue(value)
 				found++
 			} else if ascii.StrCaseEquals(strKey, "httponly") {
-				*httponly = zend.ZvalIsTrue(value)
+				*httponly = zend.IZendIsTrue(value)
 				found++
 			} else if ascii.StrCaseEquals(strKey, "samesite") {
 				*samesite = zend.ZvalGetString(value)

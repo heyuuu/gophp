@@ -10,7 +10,7 @@ func ZEND_ISSET_ISEMPTY_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) i
 	if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 		result = result == types.SUCCESS && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
 	} else {
-		result = result != types.SUCCESS || IZendIsTrue(value) == 0
+		result = result != types.SUCCESS || !ZvalIsTrue(value)
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)

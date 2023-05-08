@@ -167,39 +167,9 @@ func ConvertToString(op *types.Zval) {
 		_convertToString(op)
 	}
 }
-func ZvalIsTrue(op *types.Zval) int { return ZendIsTrue(op) }
-func IZendIsTrue(op *types.Zval) int {
-	return types.IntBool(IZendIsTrueEx(op))
+func ZendStringTolower(str *types.String) *types.String {
+	return types.NewString(ascii.StrToLower(str.GetStr()))
 }
-func IZendIsTrueEx(op *types.Zval) bool {
-again:
-	switch op.GetType() {
-	case types.IS_TRUE:
-		return true
-	case types.IS_LONG:
-		return op.Long() != 0
-	case types.IS_DOUBLE:
-		return op.Double() != 0
-	case types.IS_STRING:
-		str := op.StringVal()
-		return str != "" && str != "0"
-	case types.IS_ARRAY:
-		return op.Array().Len() != 0
-	case types.IS_OBJECT:
-		if types.Z_OBJ_HT_P(op).GetCastObject() == ZendStdCastObjectTostring {
-			return true
-		} else {
-			return ZendObjectIsTrue(op)
-		}
-	case types.IS_RESOURCE:
-		return types.Z_RES_HANDLE_P(op) != 0
-	case types.IS_REFERENCE:
-		op = types.Z_REFVAL_P(op)
-		goto again
-	}
-	return false
-}
-func ZendStringTolower(str *types.String) *types.String { return ZendStringTolowerEx(str) }
 func ConvertToStringEx(pzv *types.Zval) {
 	if pzv.GetType() != types.IS_STRING {
 		ConvertToString(pzv)
@@ -217,15 +187,10 @@ func ConvertScalarToNumberEx(pzv *types.Zval) {
 }
 func FastLongIncrementFunction(op1 *types.Zval) {
 	if op1.Long() == ZEND_LONG_MAX {
-
 		/* switch to double */
-
-		op1.SetDouble(float64(ZEND_LONG_MAX + 1.0))
-
-		/* switch to double */
-
+		op1.SetDouble(ZEND_LONG_MAX + 1.0)
 	} else {
-		op1.Long()++
+		op1.SetLong(op1.Long() + 1)
 	}
 }
 func FastLongDecrementFunction(op1 *types.Zval) {
@@ -1530,7 +1495,7 @@ func BooleanXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 					return types.SUCCESS
 				}
 			}
-			op1_val = ZvalIsTrue(op1)
+			op1_val = IZendIsTrue(op1)
 		}
 		break
 	}
@@ -1553,7 +1518,7 @@ func BooleanXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BOOL_XOR, result, op1, op2) {
 				return types.SUCCESS
 			}
-			op2_val = ZvalIsTrue(op2)
+			op2_val = IZendIsTrue(op2)
 		}
 		break
 	}
@@ -1579,7 +1544,7 @@ func BooleanNotFunction(result *types.Zval, op1 *types.Zval) int {
 		if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BOOL_NOT, result, op1, nil) {
 			return types.SUCCESS
 		}
-		result.SetBool(ZvalIsTrue(op1) == 0)
+		result.SetBool(!ZvalIsTrue(op1))
 	}
 	return types.SUCCESS
 }
@@ -2288,16 +2253,16 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			}
 			if converted == 0 {
 				if op1.GetType() < types.IS_TRUE {
-					result.SetLong(b.Cond(ZvalIsTrue(op2) != 0, -1, 0))
+					result.SetLong(b.Cond(ZvalIsTrue(op2), -1, 0))
 					return types.SUCCESS
 				} else if op1.IsTrue() {
-					result.SetLong(b.Cond(ZvalIsTrue(op2) != 0, 0, 1))
+					result.SetLong(b.Cond(ZvalIsTrue(op2), 0, 1))
 					return types.SUCCESS
 				} else if op2.GetType() < types.IS_TRUE {
-					result.SetLong(b.Cond(ZvalIsTrue(op1) != 0, 1, 0))
+					result.SetLong(b.Cond(ZvalIsTrue(op1), 1, 0))
 					return types.SUCCESS
 				} else if op2.IsTrue() {
-					result.SetLong(b.Cond(ZvalIsTrue(op1) != 0, 0, -1))
+					result.SetLong(b.Cond(ZvalIsTrue(op1), 0, -1))
 					return types.SUCCESS
 				} else {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 1)
@@ -2602,8 +2567,6 @@ try_again:
 	}
 	return types.SUCCESS
 }
-func ZendIsTrueEx(op *types.Zval) bool { return IZendIsTrue(op) != 0 }
-func ZendIsTrue(op *types.Zval) int    { return IZendIsTrue(op) }
 func ZendObjectIsTrue(op *types.Zval) bool {
 	if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
 		var tmp types.Zval
@@ -2619,7 +2582,7 @@ func ZendObjectIsTrue(op *types.Zval) bool {
 
 			/* for safety - avoid loop */
 
-			result = IZendIsTrueEx(tmp)
+			result = ZvalIsTrue(tmp)
 			// ZvalPtrDtor(tmp)
 			return result
 		}

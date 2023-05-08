@@ -1089,7 +1089,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 			return_value.SetFalse()
 			goto cleanup
 		}
-		if classes != nil && (classes.IsType(types.IS_ARRAY) || zend.ZendIsTrue(classes) == 0) {
+		if classes != nil && (classes.IsType(types.IS_ARRAY) || zend.!ZvalIsTrue(classes)) {
 			if classes.IsArray() {
 				class_hash = types.NewArray(classes.Array().Len())
 			} else {

@@ -503,13 +503,13 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ret = types.FAILURE
 			break
 		}
-		if ZendIsTrue(&op1) != 0 {
+		if ZvalIsTrue(&op1) {
 			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
 				// ZvalPtrDtorNogc(&op1)
 				ret = types.FAILURE
 				break
 			}
-			result.SetBool(ZendIsTrue(&op2) != 0)
+			result.SetBool(ZvalIsTrue(&op2))
 			// ZvalPtrDtorNogc(&op2)
 		} else {
 			result.SetFalse()
@@ -520,7 +520,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ret = types.FAILURE
 			break
 		}
-		if ZendIsTrue(&op1) != 0 {
+		if ZvalIsTrue(&op1) {
 			result.SetTrue()
 		} else {
 			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
@@ -528,7 +528,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 				ret = types.FAILURE
 				break
 			}
-			result.SetBool(ZendIsTrue(&op2) != 0)
+			result.SetBool(ZvalIsTrue(&op2))
 			// ZvalPtrDtorNogc(&op2)
 		}
 		// ZvalPtrDtorNogc(&op1)
@@ -537,7 +537,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ret = types.FAILURE
 			break
 		}
-		if ZendIsTrue(&op1) != 0 {
+		if ZvalIsTrue(&op1) {
 			if ast.GetChild()[1] == nil {
 				*result = op1
 			} else {

@@ -763,7 +763,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 }
 func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, flags int, skip_flags int) {
 	var name *types.String
-	var lcname *types.String
+	var lcname string
 	var ce *types.ClassEntry
 	var autoload = 1
 	for {
@@ -781,15 +781,12 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 	}
 	if autoload == 0 {
 		if name.GetStr()[0] == '\\' {
-
 			/* Ignore leading "\" */
-
-			lcname = types.ZendStringAlloc(name.GetLen()-1, 0)
-			ZendStrTolowerCopy(lcname.GetVal(), name.GetVal()+1, name.GetLen()-1)
+			lcname = ascii.StrToLower(name.GetStr()[1:])
 		} else {
-			lcname = ZendStringTolower(name)
+			lcname = ascii.StrToLower(name.GetStr())
 		}
-		ce = EG__().ClassTable().Get(lcname.GetStr())
+		ce = EG__().ClassTable().Get(lcname)
 	} else {
 		ce = ZendLookupClass(name)
 	}

@@ -45,9 +45,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 	var ret int = 0
 	var ce *types.ClassEntry
 	var name_len int = name.GetLen()
-	var lcname *types.String
-	types.ZstrAlloc(lcname, name_len)
-	ZendStrTolowerCopy(lcname.GetVal(), name.GetVal(), name_len)
+	var lcname *types.String = name.ToLower()
 	*strict_class = 0
 	if lcname.GetStr() == "self" {
 		if scope == nil {

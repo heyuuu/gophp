@@ -1,6 +1,9 @@
 package types
 
-import "math"
+import (
+	"github.com/heyuuu/gophp/builtin/ascii"
+	"math"
+)
 
 /**
  * String
@@ -22,6 +25,8 @@ func (zs String) Cutoff(l int) *String { tmp := zs[:l]; return &tmp }
 
 func (zs String) GetVal() []byte    { return []byte(zs) }   // todo remove
 func (zs *String) SetLen(value int) { *zs = (*zs)[:value] } // todo remove
+
+func (zs String) ToLower() *String { return NewString(ascii.StrToLower(string(zs))) }
 
 /**
  * String Constants

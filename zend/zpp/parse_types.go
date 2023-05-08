@@ -33,7 +33,7 @@ func ParseBool(arg *types.Zval, checkNull bool, weak bool) (dest bool, isNull bo
 
 func ParseBoolWeak(arg *types.Zval) (dest bool, ok bool) {
 	if arg.GetType() <= types.IS_STRING {
-		return zend.ZendIsTrueEx(arg), true
+		return zend.ZvalIsTrue(arg), true
 	}
 	return false, false
 }

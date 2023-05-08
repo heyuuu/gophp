@@ -473,7 +473,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
-		child0_is_true = ZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))
+		child0_is_true = IZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))
 		if child0_is_true == (ast.GetKind() == ZEND_AST_OR) {
 			result.SetBool(ast.GetKind() == ZEND_AST_OR)
 			break
@@ -481,7 +481,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if ast.GetChild()[1].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
-		child1_is_true = ZendIsTrue(ZendAstGetZval(ast.GetChild()[1]))
+		child1_is_true = IZendIsTrue(ZendAstGetZval(ast.GetChild()[1]))
 		if ast.GetKind() == ZEND_AST_OR {
 			result.SetBool(child0_is_true != 0 || child1_is_true != 0)
 		} else {
@@ -543,7 +543,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			ZendEvalConstExpr(ast.GetChild()[2])
 			return
 		}
-		child = ast.GetChild()[2-ZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))]
+		child = ast.GetChild()[2-IZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))]
 		if (*child) == nil {
 			child--
 		}

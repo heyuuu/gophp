@@ -321,7 +321,7 @@ func PhpStreamUrlWrapHttpEx(
 	/* Should we send the entire path in the request line, default to no. */
 
 	if request_fulluri == 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "request_fulluri")) != nil {
-		request_fulluri = zend.ZendIsTrue(tmpzval)
+		request_fulluri = zend.IZendIsTrue(tmpzval)
 	}
 	if request_fulluri != 0 {
 
@@ -612,7 +612,7 @@ func PhpStreamUrlWrapHttpEx(
 			response_code = 0
 		}
 		if context != nil && nil != b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "ignore_errors")) {
-			ignore_errors = zend.ZendIsTrue(tmpzval)
+			ignore_errors = zend.IZendIsTrue(tmpzval)
 		}
 
 		/* when we request only the header, don't fail even on error codes */
@@ -727,7 +727,7 @@ func PhpStreamUrlWrapHttpEx(
 			}
 			if !(strncasecmp(http_header_line, "Location:", b.SizeOf("\"Location:\"")-1)) {
 				if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "follow_location")) != nil {
-					follow_location = zend.ZvalIsTrue(tmpzval)
+					follow_location = zend.IZendIsTrue(tmpzval)
 				} else if !(response_code >= 300 && response_code < 304 || 307 == response_code || 308 == response_code) {
 
 					/* we shouldn't redirect automatically
@@ -756,7 +756,7 @@ func PhpStreamUrlWrapHttpEx(
 				if (options & core.STREAM_ONLY_GET_HEADERS) == 0 {
 					var decode zend.ZendLong = 1
 					if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "auto_decode")) != nil {
-						decode = zend.ZendIsTrue(tmpzval)
+						decode = zend.IZendIsTrue(tmpzval)
 					}
 					if decode != 0 {
 						transfer_encoding = streams.PhpStreamFilterCreate("dechunk", nil, stream.GetIsPersistent())

@@ -987,7 +987,7 @@ func PhpConvGetUlongPropEx(ht *types.Array, pretval *zend.ZendUlong, field_name 
 func PhpConvGetBoolPropEx(ht *types.Array, pretval *int, field_name string, field_name_len int) PhpConvErrT {
 	var tmpval *types.Zval = (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
 	if tmpval != nil {
-		*pretval = zend.ZendIsTrue(tmpval)
+		*pretval = zend.IZendIsTrue(tmpval)
 		return PHP_CONV_ERR_SUCCESS
 	} else {
 		*pretval = 0

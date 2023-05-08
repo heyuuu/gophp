@@ -336,7 +336,7 @@ func SplFixedarrayObjectHasDimensionHelper(intern *SplFixedarrayObject, offset *
 		if intern.GetArray().GetElements()[index].IsUndef() {
 			retval = 0
 		} else if check_empty != 0 {
-			if zend.ZendIsTrue(intern.GetArray().GetElements()[index]) != 0 {
+			if zend.IZendIsTrue(intern.GetArray().GetElements()[index]) != 0 {
 				retval = 1
 			} else {
 				retval = 0
@@ -356,7 +356,7 @@ func SplFixedarrayObjectHasDimension(object *types.Zval, offset *types.Zval, che
 		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetHas(), "offsetExists", &rv, offset)
 		// zend.ZvalPtrDtor(offset)
-		result = zend.ZendIsTrue(&rv)
+		result = zend.IZendIsTrue(&rv)
 		// zend.ZvalPtrDtor(&rv)
 		return result
 	}

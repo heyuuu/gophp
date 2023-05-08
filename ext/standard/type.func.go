@@ -149,7 +149,7 @@ func ZifBoolval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	return_value.SetBool(zend.ZendIsTrue(val) != 0)
+	return_value.SetBool(zend.ZvalIsTrue(val))
 	return
 }
 func ZifStrval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {

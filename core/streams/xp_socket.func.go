@@ -425,7 +425,7 @@ func PhpTcpSockopConnect(stream *core.PhpStream, sock *core.PhpNetstreamDataT, x
 		}
 		bindto = ParseIpAddressEx(tmpzval.String().GetVal(), tmpzval.String().GetLen(), &bindport, xparam.GetWantErrortext(), xparam.GetErrorText())
 	}
-	if stream.GetOps() != &PhpStreamUdpSocketOps && core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && zend.ZendIsTrue(tmpzval) != 0 {
+	if stream.GetOps() != &PhpStreamUdpSocketOps && core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && zend.ZvalIsTrue(tmpzval) {
 		sockopts |= core.STREAM_SOCKOP_TCP_NODELAY
 	}
 
@@ -462,7 +462,7 @@ func PhpTcpSockopAccept(stream *core.PhpStream, sock *core.PhpNetstreamDataT, xp
 	var nodelay types.ZendBool = 0
 	var tmpzval *types.Zval = nil
 	xparam.SetClient(nil)
-	if nil != core.PHP_STREAM_CONTEXT(stream) && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && zend.ZendIsTrue(tmpzval) != 0 {
+	if nil != core.PHP_STREAM_CONTEXT(stream) && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && zend.ZvalIsTrue(tmpzval) {
 		nodelay = 1
 	}
 	clisock = core.PhpNetworkAcceptIncoming(sock.GetSocket(), b.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil), xparam.GetTimeout(), b.CondF1(xparam.GetWantErrortext() != 0, func() *types.String { return xparam.GetErrorText() }, nil), xparam.GetErrorCode(), nodelay)

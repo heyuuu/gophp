@@ -616,7 +616,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &tmp_result)
 			*guard &= ^IN_ISSET
-			if ZendIsTrue(&tmp_result) == 0 {
+			if !ZvalIsTrue(&tmp_result) {
 				retval = EG__().GetUninitializedZval()
 				// OBJ_RELEASE(zobj)
 				// ZvalPtrDtor(&tmp_result)
@@ -821,7 +821,7 @@ func ZendStdReadDimension(object *types.Zval, offset *types.Zval, type_ int, rv 
 				// ZvalPtrDtor(&tmp_offset)
 				return nil
 			}
-			if IZendIsTrue(rv) == 0 {
+			if !ZvalIsTrue(rv) {
 				// ZvalPtrDtor(&tmp_object)
 				// ZvalPtrDtor(&tmp_offset)
 				// ZvalPtrDtor(rv)
@@ -1489,7 +1489,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 				}
 			found:
 				if has_set_exists == ZEND_PROPERTY_NOT_EMPTY {
-					result = ZendIsTrue(value)
+					result = IZendIsTrue(value)
 				} else if has_set_exists < ZEND_PROPERTY_NOT_EMPTY {
 					b.Assert(has_set_exists == ZEND_PROPERTY_ISSET)
 					value = types.ZVAL_DEREF(value)
@@ -1519,7 +1519,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 			// 			zobj.AddRefcount()
 			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &rv)
-			result = ZendIsTrue(&rv)
+			result = IZendIsTrue(&rv)
 			// ZvalPtrDtor(&rv)
 			if has_set_exists == ZEND_PROPERTY_NOT_EMPTY && result != 0 {
 				if EG__().GetException() == nil && zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {

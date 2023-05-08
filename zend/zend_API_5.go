@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
+	"strings"
 )
 
 func ZendCollectModuleHandlers() {
@@ -65,62 +66,55 @@ func ZendRegisterInternalModule(module *ModuleEntry) *ModuleEntry {
 	return ZendRegisterModuleEx(module)
 }
 func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFunction, error_type int) {
-	var lcname []byte
-	var name_len int
-	if fptr.GetFunctionName().GetStr()[0] != '_' || fptr.GetFunctionName().GetStr()[1] != '_' {
+	functionName := fptr.GetFunctionName().GetStr()
+	if !strings.HasPrefix(functionName, "__") {
 		return
 	}
 
-	/* we don't care if the function name is longer, in fact lowercasing only
-	 * the beginning of the name speeds up the check process */
-
-	name_len = fptr.GetFunctionName().GetLen()
-	ZendStrTolowerCopy(lcname, fptr.GetFunctionName().GetVal(), b.Min(name_len, b.SizeOf("lcname")-1))
-	lcname[b.SizeOf("lcname")-1] = '0'
-
-	if name_len == b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_DESTRUCTOR_FUNC_NAME, b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
+	lcname := ascii.StrToLower(functionName)
+	if lcname == ZEND_DESTRUCTOR_FUNC_NAME && fptr.GetNumArgs() != 0 {
 		faults.Error(error_type, "Destructor %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DESTRUCTOR_FUNC_NAME)
-	} else if name_len == b.SizeOf("ZEND_CLONE_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CLONE_FUNC_NAME, b.SizeOf("ZEND_CLONE_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
+	} else if lcname == ZEND_CLONE_FUNC_NAME && fptr.GetNumArgs() != 0 {
 		faults.Error(error_type, "Method %s::%s() cannot accept any arguments", ce.GetName().GetVal(), ZEND_CLONE_FUNC_NAME)
-	} else if name_len == b.SizeOf("ZEND_GET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_GET_FUNC_NAME, b.SizeOf("ZEND_GET_FUNC_NAME")-1)) {
+	} else if lcname == ZEND_GET_FUNC_NAME {
 		if fptr.GetNumArgs() != 1 {
 			faults.Error(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_GET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
 			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_GET_FUNC_NAME)
 		}
-	} else if name_len == b.SizeOf("ZEND_SET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_SET_FUNC_NAME, b.SizeOf("ZEND_SET_FUNC_NAME")-1)) {
+	} else if lcname == ZEND_SET_FUNC_NAME {
 		if fptr.GetNumArgs() != 2 {
 			faults.Error(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), ZEND_SET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
 			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_SET_FUNC_NAME)
 		}
-	} else if name_len == b.SizeOf("ZEND_UNSET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_UNSET_FUNC_NAME, b.SizeOf("ZEND_UNSET_FUNC_NAME")-1)) {
+	} else if lcname == ZEND_UNSET_FUNC_NAME {
 		if fptr.GetNumArgs() != 1 {
 			faults.Error(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_UNSET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
 			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_UNSET_FUNC_NAME)
 		}
-	} else if name_len == b.SizeOf("ZEND_ISSET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_ISSET_FUNC_NAME, b.SizeOf("ZEND_ISSET_FUNC_NAME")-1)) {
+	} else if lcname == ZEND_ISSET_FUNC_NAME {
 		if fptr.GetNumArgs() != 1 {
 			faults.Error(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_ISSET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
 			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_ISSET_FUNC_NAME)
 		}
-	} else if name_len == b.SizeOf("ZEND_CALL_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CALL_FUNC_NAME, b.SizeOf("ZEND_CALL_FUNC_NAME")-1)) {
+	} else if lcname == ZEND_CALL_FUNC_NAME {
 		if fptr.GetNumArgs() != 2 {
 			faults.Error(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), ZEND_CALL_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
 			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_CALL_FUNC_NAME)
 		}
-	} else if name_len == b.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CALLSTATIC_FUNC_NAME, b.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1)) {
+	} else if lcname == ZEND_CALLSTATIC_FUNC_NAME {
 		if fptr.GetNumArgs() != 2 {
 			faults.Error(error_type, "Method %s::__callStatic() must take exactly 2 arguments", ce.GetName().GetVal())
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
 			faults.Error(error_type, "Method %s::__callStatic() cannot take arguments by reference", ce.GetName().GetVal())
 		}
-	} else if name_len == b.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_TOSTRING_FUNC_NAME, b.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
+	} else if lcname == ZEND_TOSTRING_FUNC_NAME && fptr.GetNumArgs() != 0 {
 		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_TOSTRING_FUNC_NAME)
-	} else if name_len == b.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_DEBUGINFO_FUNC_NAME, b.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
+	} else if lcname == ZEND_DEBUGINFO_FUNC_NAME && fptr.GetNumArgs() != 0 {
 		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
@@ -264,7 +258,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 				return types.FAILURE
 			}
 		}
-		lowercase_name = ZendStringTolowerEx(internal_function.GetFunctionName())
+		lowercase_name = types.NewString(ascii.StrToLower(internal_function.GetFunctionName().GetStr()))
 		// lowercase_name = types.ZendNewInternedString(lowercase_name)
 		reg_function = types.CopyFunction(function)
 		if !targetFunctionTable.Add(lowercase_name.GetStr(), reg_function) {
@@ -374,12 +368,10 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		}
 		for ptr.GetFname() != nil {
 			fname_len = strlen(ptr.GetFname())
-			lowercase_name = types.ZendStringAlloc(fname_len, 0)
-			ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
-			if targetFunctionTable.Exists(lowercase_name.GetStr()) {
+			lowercaseName := ascii.StrToLower(b.CastStrAuto(ptr.GetFname()))
+			if targetFunctionTable.Exists(lowercaseName) {
 				faults.Error(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
-			// types.ZendStringEfree(lowercase_name)
 			ptr++
 		}
 		ZendUnregisterFunctions(functions, count, targetFunctionTable)

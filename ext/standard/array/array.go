@@ -1785,7 +1785,7 @@ func ZifArrayFilter(array_ *types.Array, _ zpp.Opt, callback zpp.Callable, mode 
 			if !ok {
 				return false, false
 			}
-			return zend.ZendIsTrueEx(retVal), true
+			return zend.ZvalIsTrue(retVal), true
 		}
 	}
 
@@ -1800,7 +1800,7 @@ func ZifArrayFilter(array_ *types.Array, _ zpp.Opt, callback zpp.Callable, mode 
 				return false
 			}
 		} else {
-			keep = zend.ZendIsTrueEx(value)
+			keep = zend.ZvalIsTrue(value)
 		}
 
 		if keep {

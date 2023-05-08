@@ -574,7 +574,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 	var opline *ZendOp
 	if args.GetChildren() == 3 {
 		if args.GetChild()[2].GetKind() == ZEND_AST_ZVAL {
-			strict = ZendIsTrue(ZendAstGetZval(args.GetChild()[2]))
+			strict = IZendIsTrue(ZendAstGetZval(args.GetChild()[2]))
 		} else if args.GetChild()[2].GetKind() == ZEND_AST_CONST {
 			var value types.Zval
 			var name_ast *ZendAst = args.GetChild()[2].GetChild()[0]
@@ -585,7 +585,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				return types.FAILURE
 			}
 			// types.ZendStringReleaseEx(resolved_name, 0)
-			strict = ZendIsTrue(&value)
+			strict = IZendIsTrue(&value)
 			// ZvalPtrDtor(&value)
 		} else {
 			return types.FAILURE

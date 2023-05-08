@@ -115,7 +115,7 @@ func UserWrapperOpener(
 		faults.Bailout()
 	})
 
-	if call_result == types.SUCCESS && zretval.IsNotUndef() && zend.ZvalIsTrue(&zretval) != 0 {
+	if call_result == types.SUCCESS && zretval.IsNotUndef() && zend.ZvalIsTrue(&zretval) {
 
 		/* the stream is now open! */
 
@@ -192,7 +192,7 @@ func UserWrapperOpendir(
 	args[1].SetLong(options)
 	zfuncname.SetStringVal(b.CastStrAuto(USERSTREAM_DIR_OPEN))
 	call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &zfuncname, &zretval, 2, args, 0)
-	if call_result == types.SUCCESS && zretval.IsNotUndef() && zend.ZvalIsTrue(&zretval) != 0 {
+	if call_result == types.SUCCESS && zretval.IsNotUndef() && zend.ZvalIsTrue(&zretval) {
 
 		/* the stream is now open! */
 
@@ -395,7 +395,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		stream.SetEof(1)
 		return -1
 	}
-	if call_result == types.SUCCESS && retval.IsNotUndef() && zend.ZvalIsTrue(&retval) != 0 {
+	if call_result == types.SUCCESS && retval.IsNotUndef() && zend.ZvalIsTrue(&retval) {
 		stream.SetEof(1)
 	} else if call_result == types.FAILURE {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_EOF+" is not implemented! Assuming EOF", us.GetWrapper().GetClassname())
@@ -426,7 +426,7 @@ func PhpUserstreamopFlush(stream *core.PhpStream) int {
 	b.Assert(us != nil)
 	func_name.SetStringVal(USERSTREAM_FLUSH)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
-	if call_result == types.SUCCESS && retval.IsNotUndef() && zend.ZvalIsTrue(&retval) != 0 {
+	if call_result == types.SUCCESS && retval.IsNotUndef() && zend.ZvalIsTrue(&retval) {
 		call_result = 0
 	} else {
 		call_result = -1
@@ -460,7 +460,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 
 		// zend.ZvalPtrDtor(&retval)
 		return -1
-	} else if call_result == types.SUCCESS && retval.IsNotUndef() && zend.ZvalIsTrue(&retval) != 0 {
+	} else if call_result == types.SUCCESS && retval.IsNotUndef() && zend.ZvalIsTrue(&retval) {
 		ret = 0
 	} else {
 		ret = -1
@@ -570,7 +570,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 		func_name.SetStringVal(USERSTREAM_EOF)
 		call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 		if call_result == types.SUCCESS && (retval.IsType(types.IS_FALSE) || retval.IsType(types.IS_TRUE)) {
-			if zend.ZvalIsTrue(&retval) != 0 {
+			if zend.ZvalIsTrue(&retval) {
 				ret = core.PHP_STREAM_OPTION_RETURN_ERR
 			} else {
 				ret = core.PHP_STREAM_OPTION_RETURN_OK
@@ -686,7 +686,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 		if call_result == types.FAILURE {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_SET_OPTION+" is not implemented!", us.GetWrapper().GetClassname())
 			ret = core.PHP_STREAM_OPTION_RETURN_ERR
-		} else if zend.ZendIsTrue(&retval) != 0 {
+		} else if zend.ZvalIsTrue(&retval) {
 			ret = core.PHP_STREAM_OPTION_RETURN_OK
 		} else {
 			ret = core.PHP_STREAM_OPTION_RETURN_ERR
@@ -1027,7 +1027,7 @@ func PhpUserstreamopCast(stream *core.PhpStream, castas int, retptr *any) int {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_CAST+" is not implemented!", us.GetWrapper().GetClassname())
 			break
 		}
-		if zend.ZendIsTrue(&retval) == 0 {
+		if zend.!ZvalIsTrue(&retval) {
 			break
 		}
 		core.PhpStreamFromZvalNoVerify(intstream, &retval)

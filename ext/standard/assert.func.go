@@ -141,7 +141,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 		zend.ConvertToBoolean(&retval)
 		val = retval.IsType(types.IS_TRUE)
 	} else {
-		val = zend.ZendIsTrue(assertion)
+		val = zend.IZendIsTrue(assertion)
 	}
 	if val != 0 {
 		return_value.SetTrue()

@@ -15,7 +15,7 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var orig_val_type uint32 = val.GetTypeInfo()
 		opline.Result().SetFalse()
 	} else {
-		opline.Result().SetBool(IZendIsTrue(val) != 0)
+		opline.Result().SetBool(ZvalIsTrue(val))
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -38,7 +38,7 @@ func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	} else {
-		opline.Result().SetBool(IZendIsTrue(val) != 0)
+		opline.Result().SetBool(ZvalIsTrue(val))
 		// ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
@@ -61,7 +61,7 @@ func ZEND_BOOL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	} else {
-		opline.Result().SetBool(IZendIsTrue(val) != 0)
+		opline.Result().SetBool(ZvalIsTrue(val))
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)

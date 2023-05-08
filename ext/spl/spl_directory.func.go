@@ -693,7 +693,7 @@ func zim_spl_DirectoryIterator_seek(executeData *zend.ZendExecuteData, return_va
 	for intern.GetIndex() < pos {
 		var valid int = 0
 		zend.ZendCallMethodWith0Params(zend.ZEND_THIS(executeData), types.Z_OBJCE_P(zend.ZEND_THIS(executeData)), intern.GetFuncValid(), "valid", &retval)
-		valid = zend.ZendIsTrue(&retval)
+		valid = zend.IZendIsTrue(&retval)
 		// zend.ZvalPtrDtor(&retval)
 		if valid == 0 {
 			faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", pos)
@@ -1235,7 +1235,7 @@ func zim_spl_RecursiveDirectoryIterator_hasChildren(executeData *zend.ZendExecut
 		SplFilesystemObjectGetFileName(intern)
 		if allow_links == 0 && !intern.IsDirFollowSymlinks() {
 			standard.PhpStat(intern.GetFileName(), intern.GetFileNameLen(), standard.FS_IS_LINK, return_value)
-			if zend.ZendIsTrue(return_value) != 0 {
+			if zend.ZvalIsTrue(return_value) {
 				return_value.SetFalse()
 				return
 			}
