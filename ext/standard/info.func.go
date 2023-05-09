@@ -157,8 +157,7 @@ func PhpPrintGpcseArray(name string) {
 					zend.ZendPrintZvalR(tmp, 0)
 				}
 			} else {
-				var tmp2 *types.String
-				var str *types.String = zend.ZvalGetTmpString(tmp, &tmp2)
+				var str *types.String = zend.ZvalGetString(tmp)
 				if core.SM__().GetPhpinfoAsText() == 0 {
 					if str.GetLen() == 0 {
 						PhpInfoPrint("<i>no value</i>")

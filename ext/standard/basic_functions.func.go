@@ -585,8 +585,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 
 		/* Iterate over the hash to construct the argv array. */
 		p_longopts.Array().Foreach(func(_ types.ArrayKey, entry *types.Zval) {
-			var tmp_arg_str *types.String
-			var arg_str *types.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			var arg_str *types.String = zend.ZvalGetString(entry)
 			opts.SetNeedParam(0)
 			opts.SetOptName(zend.Estrdup(arg_str.GetVal()))
 			len_ = strlen(opts.GetOptName())

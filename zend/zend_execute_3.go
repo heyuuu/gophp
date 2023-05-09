@@ -133,10 +133,8 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	faults.ThrowErrorEx(nil, msg)
 }
 func ZendWrongPropertyRead(property *types.Zval) {
-	var tmp_property_name *types.String
-	var property_name *types.String = ZvalGetTmpString(property, &tmp_property_name)
+	var property_name *types.String = ZvalGetString(property)
 	faults.Error(faults.E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
-	//ZendTmpStringRelease(tmp_property_name)
 }
 func ZendDeprecatedFunction(fbc types.IFunction) {
 	faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().GetName().GetVal() }, ""), b.Cond(fbc.GetScope() != nil, "::", ""), fbc.GetFunctionName().GetVal())
@@ -167,7 +165,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 
 		/* Convert to string, just the time to pick the 1st byte */
 
-		var tmp *types.String = ZvalTryGetStringFunc(value)
+		var tmp *types.String = ZvalTryGetString(value)
 		if tmp == nil {
 			if RETURN_VALUE_USED(opline) {
 				opline.Result().SetUndef()

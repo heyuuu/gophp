@@ -219,7 +219,7 @@ func ZifSplAutoload(executeData zpp.Ex, return_value zpp.Ret, className *types.Z
 		pos = file_exts.GetVal()
 		pos_len = int(file_exts.GetLen())
 	}
-	lc_name = zend.ZendStringTolower(class_name)
+	lc_name = class_name.ToLower()
 	for pos != nil && (*pos) && zend.EG__().GetException() == nil {
 		pos1 = strchr(pos, ',')
 		if pos1 != nil {

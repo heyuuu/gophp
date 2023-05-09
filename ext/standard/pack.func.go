@@ -409,8 +409,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			fallthrough
 		case 'Z':
 			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return b.Max(0, arg-1) })
-			var tmp_str *types.String
-			var str *types.String = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
+			var str *types.String = zend.ZvalGetString(&argv[b.PostInc(&currentarg)])
 			memset(&output.GetStr()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
 			memcpy(&output.GetStr()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
@@ -420,8 +419,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 		case 'H':
 			var nibbleshift int = b.Cond(code == 'h', 0, 4)
 			var first int = 1
-			var tmp_str *types.String
-			var str *types.String = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
+			var str *types.String = zend.ZvalGetString(&argv[b.PostInc(&currentarg)])
 			var v *byte = str.GetVal()
 			outputpos--
 			if int(arg > str.GetLen()) != 0 {

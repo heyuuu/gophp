@@ -427,7 +427,7 @@ try_again:
 		callable = types.Z_REFVAL_P(callable)
 		goto try_again
 	default:
-		return ZvalGetStringFunc(callable)
+		return ZvalGetString(callable)
 	}
 }
 func ZendGetCallableName(callable *types.Zval) *types.String {

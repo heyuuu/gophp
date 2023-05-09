@@ -430,10 +430,8 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 			tmp = &args[argnum]
 			switch *format {
 			case 's':
-				var t *types.String
-				var str *types.String = zend.ZvalGetTmpString(tmp, &t)
+				var str *types.String = zend.ZvalGetString(tmp)
 				PhpSprintfAppendstring(&result, &outpos, str.GetVal(), width, precision, padding, alignment, str.GetLen(), 0, expprec, 0)
-				// zend.ZendTmpStringRelease(t)
 			case 'd':
 				PhpSprintfAppendint(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, always_sign)
 			case 'u':

@@ -422,7 +422,7 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 			//name = ZvalMakeInternedString(zv)
 			name = zv.String()
 		} else {
-			name = ZvalGetStringFunc(zv)
+			name = ZvalGetString(zv)
 		}
 		if ZendIsAutoGlobal(name) != 0 {
 			return types.FAILURE

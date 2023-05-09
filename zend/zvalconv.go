@@ -147,52 +147,28 @@ func ZvalGetDoubleFunc(op *types.Zval) float64 {
 }
 
 func ZvalGetStrVal(op *types.Zval) string {
-	str, _ := ZvalGetStrValEx(op)
+	str, _ := ZvalGetStr(op)
 	return str
 }
-func ZvalGetStrValEx(op *types.Zval) (string, bool) {
-	if op.IsString() {
-		return op.StringVal(), true
-	} else {
-		zstr := ZvalGetStringFunc(op)
-		if zstr == nil {
-			return "", false
-		}
-		return zstr.GetStr(), true
-	}
+
+func ZvalGetStr(op *types.Zval) (string, bool) {
+	return __zvalGetStrFunc(op, false)
 }
 func ZvalGetString(op *types.Zval) *types.String {
-	if str, ok := ZvalGetStrValEx(op); ok {
+	if str, ok := ZvalGetStr(op); ok {
 		return types.NewString(str)
 	}
 	return nil
 }
 
-func ZvalGetTmpString(op *types.Zval, tmp **types.String) *types.String {
-	if op.IsString() {
-		*tmp = nil
-		return op.String()
-	} else {
-		*tmp = ZvalGetStringFunc(op)
-		return *tmp
-	}
+func ZvalTryGetStr(op *types.Zval) (string, bool) {
+	return __zvalGetStrFunc(op, true)
 }
 func ZvalTryGetString(op *types.Zval) *types.String {
-	if op.IsString() {
-		var ret *types.String = op.String().Copy()
-		return ret
-	} else {
-		return ZvalTryGetStringFunc(op)
+	if str, ok := ZvalTryGetStr(op); ok {
+		return types.NewString(str)
 	}
-}
-func ZvalTryGetTmpString(op *types.Zval, tmp **types.String) *types.String {
-	if op.IsString() {
-		*tmp = nil
-		return op.String()
-	} else {
-		*tmp = ZvalTryGetStringFunc(op)
-		return *tmp
-	}
+	return nil
 }
 
 /**
@@ -203,6 +179,8 @@ func ZvalTryGetTmpString(op *types.Zval, tmp **types.String) *types.String {
 func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 	op = op.DeRef()
 	switch op.GetType() {
+	case types.IS_STRING:
+		return op.StringVal(), true
 	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
 		return "", true
 	case types.IS_TRUE:
@@ -228,17 +206,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 		} else if types.Z_OBJ_HT_P(op).GetGet() != nil {
 			var z *types.Zval = types.Z_OBJ_HT_P(op).GetGet()(op, &tmp)
 			if z.GetType() != types.IS_OBJECT {
-				var str *types.String
-				if try {
-					str = ZvalTryGetString(z)
-				} else {
-					str = ZvalGetString(z)
-				}
-				if str != nil {
-					return str.GetStr(), true
-				} else {
-					return "", false
-				}
+				return __zvalGetStrFunc(z, try)
 			}
 		}
 		if EG__().GetException() == nil {
@@ -249,18 +217,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 		} else {
 			return "", true
 		}
-	case types.IS_STRING:
-		return op.StringVal(), true
 	default:
 		return "", false
 	}
 }
-
-func __zvalGetStringFunc(op *types.Zval, try types.ZendBool) *types.String {
-	if str, ok := __zvalGetStrFunc(op, try != 0); ok {
-		return types.NewString(str)
-	}
-	return nil
-}
-func ZvalGetStringFunc(op *types.Zval) *types.String    { return __zvalGetStringFunc(op, 0) }
-func ZvalTryGetStringFunc(op *types.Zval) *types.String { return __zvalGetStringFunc(op, 1) }

@@ -77,13 +77,15 @@ func ZendMemrchr(s *byte, c byte, n int) *byte {
 func TryConvertToString(op *types.Zval) types.ZendBool {
 	if op.IsString() {
 		return 1
+	} else if str, ok := ZvalTryGetStr(op); ok {
+		op.SetStringVal(str)
+		return 1
+	} else {
+		return 0
 	}
-	return _tryConvertToString(op)
 }
 func ConvertToString(op *types.Zval) {
-	if op.GetType() != types.IS_STRING {
-		_convertToString(op)
-	}
+	TryConvertToString(op)
 }
 func ZendStringTolower(str *types.String) *types.String {
 	return types.NewString(ascii.StrToLower(str.GetStr()))
@@ -572,17 +574,6 @@ try_again:
 	default:
 
 	}
-}
-func _tryConvertToString(op *types.Zval) types.ZendBool {
-	var str *types.String
-	b.Assert(op.GetType() != types.IS_STRING)
-	str = ZvalTryGetStringFunc(op)
-	if str == nil {
-		return 0
-	}
-	// ZvalPtrDtor(op)
-	op.SetString(str)
-	return 1
 }
 func ConvertScalarToArray(op *types.Zval) {
 	var ht *types.Array = types.NewArray(1)
@@ -1732,7 +1723,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
 				return types.SUCCESS
 			}
-			op1_copy.SetString(ZvalGetStringFunc(op1))
+			op1_copy.SetString(ZvalGetString(op1))
 			if EG__().GetException() != nil {
 
 				if orig_op1 != result {
@@ -1760,7 +1751,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
 				return types.SUCCESS
 			}
-			op2_copy.SetString(ZvalGetStringFunc(op2))
+			op2_copy.SetString(ZvalGetString(op2))
 			if EG__().GetException() != nil {
 
 				if orig_op1 != result {

@@ -213,16 +213,13 @@ func PhpUrlEncodeHashEx(
 				formstr.AppendString("1")
 			default:
 				var ekey *types.String
-				var tmp *types.String
-				var str *types.String = zend.ZvalGetTmpString(zdata, &tmp)
+				var str *types.String = zend.ZvalGetString(zdata)
 				if enc_type == PHP_QUERY_RFC3986 {
 					ekey = PhpRawUrlEncode(str.GetVal(), str.GetLen())
 				} else {
 					ekey = PhpUrlEncode(str.GetVal(), str.GetLen())
 				}
 				formstr.AppendString(ekey.GetStr())
-				// zend.ZendTmpStringRelease(tmp)
-				//types.ZendStringFree(ekey)
 			}
 		}
 	}

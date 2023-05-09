@@ -11,7 +11,6 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 	var varname *types.Zval
 	var retval *types.Zval
 	var name *types.String
-	var tmp_name *types.String
 	var target_symbol_table *types.Array
 	varname = opline.Op1()
 
@@ -22,7 +21,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 		if varname.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		name = ZvalTryGetTmpString(varname, &tmp_name)
+		name = ZvalTryGetString(varname)
 		if name == nil {
 			opline.Result().SetUndef()
 			return 0

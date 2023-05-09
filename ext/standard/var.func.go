@@ -682,20 +682,17 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 		}
 		name_val = _z
 		var name *types.String
-		var tmp_name *types.String
 		var priv_name *types.String
 		var prot_name *types.String
 		name_val = types.ZVAL_DEREF(name_val)
 		if name_val.GetType() != types.IS_STRING {
 			core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
 		}
-		name = zend.ZvalGetTmpString(name_val, &tmp_name)
+		name = zend.ZvalGetString(name_val)
 		if PhpVarSerializeTryAddSleepProp(ht, props, name, name, struc) == types.SUCCESS {
-			// zend.ZendTmpStringRelease(tmp_name)
 			continue
 		}
 		if zend.EG__().GetException() != nil {
-			// zend.ZendTmpStringRelease(tmp_name)
 			retval = types.FAILURE
 			break
 		}

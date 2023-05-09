@@ -165,8 +165,7 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 		} else if scope_arg.IsNull() {
 			ce = nil
 		} else {
-			var tmp_class_name *types.String
-			var class_name *types.String = ZvalGetTmpString(scope_arg, &tmp_class_name)
+			var class_name *types.String = ZvalGetString(scope_arg)
 			if class_name.GetStr() == "static" {
 				ce = closure.GetFunc().GetScope()
 			} else if b.Assign(&ce, ZendLookupClass(class_name)) == nil {

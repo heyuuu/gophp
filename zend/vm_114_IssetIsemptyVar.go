@@ -42,16 +42,11 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var result int
-	var free_op1 ZendFreeOp
 	var varname *types.Zval
 	var name *types.String
-	var tmp_name *types.String
 	var target_symbol_table *types.Array
 	varname = opline.Op1()
-
-	{
-		name = ZvalGetTmpString(varname, &tmp_name)
-	}
+	name = ZvalGetString(varname)
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	value = target_symbol_table.KeyFind(name.GetStr())
 	// ZvalPtrDtorNogc(free_op1)

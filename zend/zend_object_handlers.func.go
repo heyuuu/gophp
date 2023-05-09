@@ -553,7 +553,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 	var prop_info *ZendPropertyInfo = nil
 	var guard *uint32 = nil
 	zobj = object.Object()
-	name = ZvalTryGetTmpString(member, &tmp_name)
+	name = ZvalTryGetString(member)
 	if name == nil {
 		return EG__().GetUninitializedZval()
 	}
@@ -690,14 +690,13 @@ func PropertyUsesStrictTypes() types.ZendBool {
 func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Zval, cache_slot *any) *types.Zval {
 	var zobj *types.ZendObject
 	var name *types.String
-	var tmp_name *types.String
 	var variable_ptr *types.Zval
 	var tmp types.Zval
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	b.Assert(!(value.IsReference()))
 	zobj = object.Object()
-	name = ZvalTryGetTmpString(member, &tmp_name)
+	name = ZvalTryGetString(member)
 	if name == nil {
 		return value
 	}
@@ -892,12 +891,11 @@ func ZendStdHasDimension(object *types.Zval, offset *types.Zval, check_empty int
 func ZendStdGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int, cache_slot *any) *types.Zval {
 	var zobj *types.ZendObject
 	var name *types.String
-	var tmp_name *types.String
 	var retval *types.Zval = nil
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	zobj = object.Object()
-	name = ZvalTryGetTmpString(member, &tmp_name)
+	name = ZvalTryGetString(member)
 	if name == nil {
 		return EG__().GetErrorZval()
 	}
@@ -964,11 +962,10 @@ func ZendStdGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int,
 func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *any) {
 	var zobj *types.ZendObject
 	var name *types.String
-	var tmp_name *types.String
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	zobj = object.Object()
-	name = ZvalTryGetTmpString(member, &tmp_name)
+	name = ZvalTryGetString(member)
 	if name == nil {
 		return
 	}
@@ -1451,7 +1448,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	zobj = object.Object()
-	name = ZvalTryGetTmpString(member, &tmp_name)
+	name = ZvalTryGetString(member)
 	if name == nil {
 		return 0
 	}

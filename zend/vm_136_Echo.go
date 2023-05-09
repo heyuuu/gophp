@@ -12,7 +12,7 @@ func ZEND_ECHO_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			ZendWrite(str.GetStr())
 		}
 	} else {
-		var str *types.String = ZvalGetStringFunc(z)
+		var str *types.String = ZvalGetString(z)
 		if str.GetLen() != 0 {
 			ZendWrite(str.GetStr())
 		} else {
@@ -33,7 +33,7 @@ func ZEND_ECHO_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			ZendWrite(str.GetStr())
 		}
 	} else {
-		var str *types.String = ZvalGetStringFunc(z)
+		var str *types.String = ZvalGetString(z)
 		if str.GetLen() != 0 {
 			ZendWrite(str.GetStr())
 		} else if z.IsUndef() {
@@ -54,7 +54,7 @@ func ZEND_ECHO_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			ZendWrite(str.GetStr())
 		}
 	} else {
-		var str *types.String = ZvalGetStringFunc(z)
+		var str *types.String = ZvalGetString(z)
 		if str.GetLen() != 0 {
 			ZendWrite(str.GetStr())
 		} else if z.IsUndef() {

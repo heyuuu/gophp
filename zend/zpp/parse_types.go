@@ -194,7 +194,7 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 				if z.IsString() {
 					arg.CopyValueFrom(z)
 				} else {
-					arg.SetString(zend.ZvalGetStringFunc(z))
+					arg.SetString(zend.ZvalGetString(z))
 					// zend.ZvalPtrDtor(z)
 				}
 				return arg.String(), true

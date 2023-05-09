@@ -293,7 +293,7 @@ func ZendFetchStaticPropertyAddressEx(
 			if op1_type == IS_CV && varname.IsUndef() {
 				ZvalUndefinedCv(opline.GetOp1().GetVar(), executeData)
 			}
-			name = ZvalGetTmpString(varname, &tmp_name)
+			name = ZvalGetString(varname)
 		}
 	}
 	*retval = ZendStdGetStaticPropertyWithInfo(ce, name, fetch_type, &property_info)

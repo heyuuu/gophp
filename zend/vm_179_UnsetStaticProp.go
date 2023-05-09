@@ -41,7 +41,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		if opline.GetOp1Type() == IS_CV && varname.IsUndef() {
 			varname = ZVAL_UNDEFINED_OP1(executeData)
 		}
-		name = ZvalGetTmpString(varname, &tmp_name)
+		name = ZvalGetString(varname)
 	}
 	ZendStdUnsetStaticProperty(ce, name)
 	// 	FREE_OP(free_op1)

@@ -167,12 +167,10 @@ func ZendIniAddString(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
 
 		if ZEND_SYSTEM_INI != 0 {
-			var tmp_str *types.String
-			var str *types.String = ZvalGetTmpString(op1, &tmp_str)
+			var str *types.String = ZvalGetString(op1)
 			op1.SetStringVal(str.GetStr())
-			//ZendTmpStringRelease(tmp_str)
 		} else {
-			op1.SetString(ZvalGetStringFunc(op1))
+			op1.SetString(ZvalGetString(op1))
 		}
 
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */

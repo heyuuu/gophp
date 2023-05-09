@@ -1714,8 +1714,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = fields.Array().Len()
 	fields.Array().Foreach(func(_ types.ArrayKey, field_tmp *types.Zval) {
-		var tmp_field_str *types.String
-		var field_str *types.String = zend.ZvalGetTmpString(field_tmp, &tmp_field_str)
+		var field_str *types.String = zend.ZvalGetString(field_tmp)
 
 		/* enclose a field that contains a delimiter, an enclosure character, or a newline */
 

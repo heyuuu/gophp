@@ -119,7 +119,7 @@ func PrintZval(expr *types.Zval) string {
 	if expr.IsString() {
 		return expr.StringVal()
 	} else {
-		return ZvalGetStringFunc(expr).GetStr()
+		return ZvalGetString(expr).GetStr()
 	}
 }
 
@@ -127,7 +127,7 @@ func ZendMakePrintableZval(expr *types.Zval, expr_copy *types.Zval) int {
 	if expr.IsString() {
 		return 0
 	} else {
-		expr_copy.SetString(ZvalGetStringFunc(expr))
+		expr_copy.SetString(ZvalGetString(expr))
 		return 1
 	}
 }
@@ -222,7 +222,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		buf.AppendString(expr.String().GetStr())
 		break
 	default:
-		var str *types.String = ZvalGetStringFunc(expr)
+		var str *types.String = ZvalGetString(expr)
 		buf.AppendString(str.GetStr())
 		// types.ZendStringReleaseEx(str, 0)
 		break

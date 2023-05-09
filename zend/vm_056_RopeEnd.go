@@ -55,7 +55,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			if var_.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
 			}
-			rope[opline.GetExtendedValue()] = ZvalGetStringFunc(var_)
+			rope[opline.GetExtendedValue()] = ZvalGetString(var_)
 			// ZvalPtrDtorNogc(free_op2)
 			if EG__().GetException() != nil {
 				for i = 0; i <= opline.GetExtendedValue(); i++ {
@@ -101,7 +101,7 @@ func ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 			if var_.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
 			}
-			rope[opline.GetExtendedValue()] = ZvalGetStringFunc(var_)
+			rope[opline.GetExtendedValue()] = ZvalGetString(var_)
 			if EG__().GetException() != nil {
 				for i = 0; i <= opline.GetExtendedValue(); i++ {
 					// types.ZendStringReleaseEx(rope[i], 0)

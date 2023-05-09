@@ -30,7 +30,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 			varname = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		var ok bool
-		if name, ok = ZvalGetStrValEx(varname); !ok {
+		if name, ok = ZvalGetStr(varname); !ok {
 			return 0
 		}
 	}
@@ -52,7 +52,7 @@ func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			varname = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		var ok bool
-		if name, ok = ZvalGetStrValEx(varname); !ok {
+		if name, ok = ZvalGetStr(varname); !ok {
 			return 0
 		}
 	}

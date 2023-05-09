@@ -958,12 +958,10 @@ func PhpConvGetStringPropEx(
 	*pretval = nil
 	*pretval_len = 0
 	if b.Assign(&tmpval, (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
-		var tmp *types.String
-		var str *types.String = zend.ZvalGetTmpString(tmpval, &tmp)
+		var str *types.String = zend.ZvalGetString(tmpval)
 		*pretval = zend.Pemalloc(str.GetLen() + 1)
 		*pretval_len = str.GetLen()
 		memcpy(*pretval, str.GetVal(), str.GetLen()+1)
-		// zend.ZendTmpStringRelease(tmp)
 	} else {
 		return PHP_CONV_ERR_NOT_FOUND
 	}
