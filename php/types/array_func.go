@@ -62,36 +62,32 @@ func ZendHashHasMoreElementsEx(ht *Array, pos *ArrayPosition) bool {
 	_, ok := ht.validPos(*pos)
 	return ok
 }
-func ZendHashMoveForward(ht *Array) int {
-	return ZendHashMoveForwardEx(ht, &ht.internalPointer)
+func ZendHashMoveForward(ht *Array) {
+	ZendHashMoveForwardEx(ht, &ht.internalPointer)
 }
 
 // 查找下一个有效位置
-func ZendHashMoveForwardEx(ht *Array, pos *ArrayPosition) int {
+func ZendHashMoveForwardEx(ht *Array, pos *ArrayPosition) {
 	if idx, ok := ht.validPos(*pos); ok {
 		*pos, _ = ht.validPos(idx + 1)
-		return SUCCESS
 	}
-	return FAILURE
 }
 
-func ZendHashMoveBackwards(ht *Array) int {
-	return ZendHashMoveBackwardsEx(ht, &ht.internalPointer)
+func ZendHashMoveBackwards(ht *Array) {
+	ZendHashMoveBackwardsEx(ht, &ht.internalPointer)
 }
-func ZendHashMoveBackwardsEx(ht *Array, pos *ArrayPosition) int {
+func ZendHashMoveBackwardsEx(ht *Array, pos *ArrayPosition) {
 	var idx uint32 = *pos
 	if idx < ht.GetNNumUsed() {
 		for idx > 0 {
 			idx--
 			if ht.data[idx].GetVal().GetType() != IS_UNDEF {
 				*pos = idx
-				return SUCCESS
+				return
 			}
 		}
 		*pos = ht.GetNNumUsed()
-		return SUCCESS
 	}
-	return FAILURE
 }
 
 func (ht *Array) Current(indirect bool) (ArrayKey, *Zval, bool) {

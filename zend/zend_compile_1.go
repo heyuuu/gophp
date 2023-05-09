@@ -538,59 +538,7 @@ func Zendlex(elem *ZendParserStackElem) int {
 	b.Assert(EG__().GetException() == nil || ret == T_ERROR)
 	return ret
 }
-func ZendInitializeClassData(ce *types.ClassEntry, nullify_handlers types.ZendBool) {
-	var persistent_hashes = ce.GetType() == ZEND_INTERNAL_CLASS
-	ce.SetRefcount(1)
-	ce.SetCeFlags(AccConstantsUpdated)
-	if (CG__().GetCompilerOptions() & ZEND_COMPILE_GUARDS) != 0 {
-		ce.SetIsUseGuards(true)
-	}
-	ce.SetDefaultPropertiesTable(nil)
-	ce.SetDefaultStaticMembersTable(nil)
-	ce.InitTables(persistent_hashes)
-	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		ZEND_MAP_PTR_INIT(ce.static_members_table, nil)
-	} else {
-		ZEND_MAP_PTR_INIT(ce.static_members_table, ce.GetDefaultStaticMembersTable())
-		ce.SetDocComment(nil)
-	}
-	ce.SetDefaultPropertiesCount(0)
-	ce.SetDefaultStaticMembersCount(0)
-	ce.SetPropertiesInfoTable(nil)
-	if nullify_handlers != 0 {
-		ce.SetConstructor(nil)
-		ce.SetDestructor(nil)
-		ce.SetClone(nil)
-		ce.SetGet(nil)
-		ce.SetSet(nil)
-		ce.SetUnset(nil)
-		ce.SetIsset(nil)
-		ce.SetCall(nil)
-		ce.SetCallstatic(nil)
-		ce.SetTostring(nil)
-		ce.SetCreateObject(nil)
-		ce.SetGetIterator(nil)
-		ce.SetIteratorFuncsPtr(nil)
-		ce.SetGetStaticMethod(nil)
-		ce.SetParent(nil)
-		ce.SetParentName(nil)
-		ce.SetNumInterfaces(0)
-		ce.SetInterfaces(nil)
-		ce.SetNumTraits(0)
-		ce.SetTraitNames(nil)
-		ce.SetTraitAliases(nil)
-		ce.SetTraitPrecedences(nil)
-		ce.SetSerialize(nil)
-		ce.SetUnserialize(nil)
-		ce.SetSerializeFunc(nil)
-		ce.SetUnserializeFunc(nil)
-		ce.SetDebugInfo(nil)
-		if ce.GetType() == ZEND_INTERNAL_CLASS {
-			ce.SetModule(nil)
-			ce.SetBuiltinFunctions(nil)
-		}
-	}
-}
+
 func ZendVerifyNamespace() {
 	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() == 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "No code may exist outside of namespace {}")

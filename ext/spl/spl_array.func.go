@@ -14,7 +14,9 @@ import (
 func SplArrayFromObj(obj *types.ZendObject) *SplArrayObject {
 	return (*SplArrayObject)((*byte)(obj - zend_long((*byte)(&((*SplArrayObject)(nil).GetStd()))-(*byte)(nil))))
 }
-func Z_SPLARRAY_P(zv *types.Zval) *SplArrayObject { return SplArrayFromObj(zv.Object()) }
+func Z_SPLARRAY_P(zv *types.Zval) *SplArrayObject {
+	return SplArrayFromObj(zv.Object())
+}
 func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.Array {
 	if intern.IsIsSelf() {
 		if intern.GetStd().GetProperties() == nil {
@@ -71,14 +73,13 @@ func SplArrayObjectFreeStorage(object *types.ZendObject) {
 		zend.EG__().DelArrayIterator(intern.GetHtIter())
 	}
 	zend.ZendObjectStdDtor(intern.GetStd())
-	// zend.ZvalPtrDtor(intern.GetArray())
 }
-func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
+func SplArrayObjectNewEx(classType *types.ClassEntry, orig *types.Zval, cloneOrig int) *types.ZendObject {
 	var intern *SplArrayObject = new(SplArrayObject)
-	var parent *types.ClassEntry = class_type
+	var parent *types.ClassEntry = classType
 	var inherited int = 0
-	zend.ZendObjectStdInit(intern.GetStd(), class_type)
-	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
+	zend.ZendObjectStdInit(intern.GetStd(), classType)
+	zend.ObjectPropertiesInit(intern.GetStd(), classType)
 	intern.SetArFlags(0)
 	intern.SetCeGetIterator(spl_ce_ArrayIterator)
 	if orig != nil {
@@ -86,7 +87,7 @@ func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_o
 		intern.SetIsCloneMask(false)
 		intern.AddArFlags(other.GetArFlags() & SPL_ARRAY_CLONE_MASK)
 		intern.SetCeGetIterator(other.GetCeGetIterator())
-		if clone_orig != 0 {
+		if cloneOrig != 0 {
 			if other.IsIsSelf() {
 				intern.GetArray().SetUndef()
 			} else if types.Z_OBJ_HT_P(orig) == &spl_handler_ArrayObject {
@@ -118,23 +119,23 @@ func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_o
 		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of ArrayObject or ArrayIterator")
 	}
 	if inherited != 0 {
-		intern.SetFptrOffsetGet(class_type.FunctionTable().Get("offsetget"))
+		intern.SetFptrOffsetGet(classType.FunctionTable().Get("offsetget"))
 		if intern.GetFptrOffsetGet().GetScope() == parent {
 			intern.SetFptrOffsetGet(nil)
 		}
-		intern.SetFptrOffsetSet(class_type.FunctionTable().Get("offsetset"))
+		intern.SetFptrOffsetSet(classType.FunctionTable().Get("offsetset"))
 		if intern.GetFptrOffsetSet().GetScope() == parent {
 			intern.SetFptrOffsetSet(nil)
 		}
-		intern.SetFptrOffsetHas(class_type.FunctionTable().Get("offsetexists"))
+		intern.SetFptrOffsetHas(classType.FunctionTable().Get("offsetexists"))
 		if intern.GetFptrOffsetHas().GetScope() == parent {
 			intern.SetFptrOffsetHas(nil)
 		}
-		intern.SetFptrOffsetDel(class_type.FunctionTable().Get("offsetunset"))
+		intern.SetFptrOffsetDel(classType.FunctionTable().Get("offsetunset"))
 		if intern.GetFptrOffsetDel().GetScope() == parent {
 			intern.SetFptrOffsetDel(nil)
 		}
-		intern.SetFptrCount(class_type.FunctionTable().Get("count"))
+		intern.SetFptrCount(classType.FunctionTable().Get("count"))
 		if intern.GetFptrCount().GetScope() == parent {
 			intern.SetFptrCount(nil)
 		}
@@ -143,13 +144,13 @@ func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_o
 	/* Cache iterator functions if ArrayIterator or derived. Check current's */
 
 	if intern.GetStd().GetHandlers() == &spl_handler_ArrayIterator {
-		var funcs_ptr *zend.ZendClassIteratorFuncs = class_type.GetIteratorFuncsPtr()
+		var funcs_ptr *zend.ZendClassIteratorFuncs = classType.GetIteratorFuncsPtr()
 		if funcs_ptr.GetZfCurrent() == nil {
-			funcs_ptr.SetZfRewind(class_type.FunctionTable().Get("rewind"))
-			funcs_ptr.SetZfValid(class_type.FunctionTable().Get("valid"))
-			funcs_ptr.SetZfKey(class_type.FunctionTable().Get("key"))
-			funcs_ptr.SetZfCurrent(class_type.FunctionTable().Get("current"))
-			funcs_ptr.SetZfNext(class_type.FunctionTable().Get("next"))
+			funcs_ptr.SetZfRewind(classType.FunctionTable().Get("rewind"))
+			funcs_ptr.SetZfValid(classType.FunctionTable().Get("valid"))
+			funcs_ptr.SetZfKey(classType.FunctionTable().Get("key"))
+			funcs_ptr.SetZfCurrent(classType.FunctionTable().Get("current"))
+			funcs_ptr.SetZfNext(classType.FunctionTable().Get("next"))
 		}
 		if inherited != 0 {
 			if funcs_ptr.GetZfRewind().GetScope() != parent {

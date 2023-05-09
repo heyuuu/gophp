@@ -29,7 +29,7 @@ func ZmStartupDir(type_ int, module_number int) int {
 	var pathsep_str []byte
 	var dir_class_entry types.ClassEntry
 	memset(&dir_class_entry, 0, b.SizeOf("zend_class_entry"))
-	dir_class_entry.SetName(types.NewString("Directory"))
+	dir_class_entry.SetNameVal("Directory")
 	dir_class_entry.SetBuiltinFunctions(PhpDirClassFunctions)
 	DirClassEntryPtr = zend.ZendRegisterInternalClass(&dir_class_entry)
 	dirsep_str[0] = zend.DEFAULT_SLASH

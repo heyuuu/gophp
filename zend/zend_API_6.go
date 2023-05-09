@@ -80,21 +80,15 @@ func ZendDeactivateModules() {
 func ZendCleanupInternalClasses() {
 	var p **types.ClassEntry = ClassCleanupHandlers
 	for (*p) != nil {
-		ZendCleanupInternalClassData(*p)
+		//ZendCleanupInternalClassData(*p)
 		p++
 	}
-}
-func ZendPostDeactivateModules() {
-	// deleted
 }
 func ZendNextFreeModule() int {
 	return globals.G().CountModules() + 1
 }
 func DoRegisterInternalClass(origClassEntry *types.ClassEntry, ceFlags uint32) *types.ClassEntry {
-	var classEntry = &types.ClassEntry{}
-	*classEntry = *origClassEntry
-	classEntry.SetType(ZEND_INTERNAL_CLASS)
-	ZendInitializeClassData(classEntry, 0)
+	var classEntry = types.NewInternalClass(origClassEntry)
 	classEntry.SetCeFlags(ceFlags | AccConstantsUpdated | AccLinked | AccResolvedParent | AccResolvedInterfaces)
 	classEntry.SetModule(EG__().GetCurrentModule())
 	if classEntry.GetBuiltinFunctions() != nil {
@@ -138,9 +132,6 @@ func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int)
 	}
 	ZendAssertValidClassName(name)
 	if CG__().ClassTable().Add(name, ce) {
-		if !ce.IsImmutable() {
-			ce.GetRefcount()++
-		}
 		return types.SUCCESS
 	}
 	return types.FAILURE
@@ -152,7 +143,7 @@ func ZendDisableFunction(functionName string) int {
 	f := CG__().FunctionTable().Get(functionName)
 	if f != nil {
 		func_ := f.(*types.InternalFunction)
-		ZendFreeInternalArgInfo(func_)
+		//ZendFreeInternalArgInfo(func_)
 		func_.SubFnFlags(AccVariadic | AccHasTypeHints | AccHasReturnType)
 		func_.SetNumArgs(0)
 		func_.SetArgInfo(nil)

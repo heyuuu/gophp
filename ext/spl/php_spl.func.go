@@ -293,19 +293,17 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		fci.SetParams(class_name)
 		fci.SetNoSeparation(1)
 		fci.GetFunctionName().SetUndef()
-		types.ZendHashInternalPointerResetEx(SPL_G__().autoload_functions, &pos)
-		for {
-			key := types.ZendHashGetCurrentKeyExEx(SPL_G__().autoload_functions, pos)
-			if key == nil || !key.IsStrKey() {
-				break
+
+		SPL_G__().autoload_functions.ForeachEx(func(key types.ArrayKey, value *types.Zval) bool {
+			if !key.IsStrKey() {
+				return false
 			}
 
-			alfi = types.ZendHashGetCurrentDataPtrEx(SPL_G__().autoload_functions, &pos)
+			alfi = value.Ptr()
 			func_ = alfi.GetFuncPtr()
 			if func_.HasFnFlags(zend.AccCallViaTrampoline) {
 				func_ = zend.Emalloc(b.SizeOf("zend_op_array"))
 				memcpy(func_, alfi.GetFuncPtr(), b.SizeOf("zend_op_array"))
-				//func_.GetOpArray().GetFunctionName().AddRefcount()
 			}
 			retval.SetUndef()
 			fcic.SetFunctionHandler(func_)
@@ -323,21 +321,17 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 				fcic.SetCalledScope(types.Z_OBJCE(alfi.GetObj()))
 			}
 			zend.ZendCallFunction(&fci, &fcic)
-			// zend.ZvalPtrDtor(&retval)
 			if zend.EG__().GetException() != nil {
-				break
+				return false
 			}
-			if pos+1 == SPL_G__().autoload_functions.nNumUsed || zend.EG__().ClassTable().Exists(lc_name.GetStr()) {
-				break
+			if zend.EG__().ClassTable().Exists(lc_name.GetStr()) {
+				return false
 			}
-			types.ZendHashMoveForwardEx(SPL_G__().autoload_functions, &pos)
-		}
-		// types.ZendStringReleaseEx(lc_name, 0)
+			return true
+		})
 		SPL_G__().autoloadRunning = l_autoload_running
 	} else {
-
 		/* do not use or overwrite &EG(autoload_func) here */
-
 		var fcall_info types.ZendFcallInfo
 		var fcall_cache types.ZendFcallInfoCache
 		retval.SetUndef()
@@ -352,9 +346,9 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		fcall_cache.SetCalledScope(nil)
 		fcall_cache.SetObject(nil)
 		zend.ZendCallFunction(&fcall_info, &fcall_cache)
-		// zend.ZvalPtrDtor(&retval)
 	}
 }
+
 func uint32ToStr(i uint32) string {
 	return string([]byte{
 		byte(i & 0xff),

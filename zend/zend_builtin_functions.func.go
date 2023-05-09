@@ -1000,32 +1000,29 @@ func ZifRestoreExceptionHandler(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetTrue()
 	return
 }
-func CopyClassOrInterfaceName(array *types.Zval, key string, ce *types.ClassEntry) {
-	if ce.GetRefcount() == 1 && !ce.IsImmutable() || SameNameEx(key, ce.Name()) {
-		key = ce.Name()
-	}
-	AddNextIndexStrEx(array, key)
-}
-func GetDeclaredClassImpl(executeData *ZendExecuteData, return_value *types.Zval, flags int, skip_flags int) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	ArrayInit(return_value)
 
+func GetDeclaredClassImpl(flags uint32, skipFlags uint32) *types.Array {
+	arr := types.NewArray(EG__().ClassTable().Len())
 	EG__().ClassTable().Foreach(func(key string, ce *types.ClassEntry) {
-		if key != "" && ce.HasCeFlags(flags) && !ce.HasCeFlags(skip_flags) {
-			CopyClassOrInterfaceName(return_value, key, ce)
+		if key != "" && ce.HasCeFlags(flags) && !ce.HasCeFlags(skipFlags) {
+			// 非别名创建的 ce 使用真实类名；class_alias 别名创建的 ce 使用 key 值，此时类名为小写
+			if SameNameEx(key, ce.Name()) {
+				key = ce.Name()
+			}
+			// 添加到数组
+			arr.Append(types.NewZvalString(key))
 		}
 	})
+	return arr
 }
-func ZifGetDeclaredTraits(executeData zpp.Ex, return_value zpp.Ret) {
-	GetDeclaredClassImpl(executeData, return_value, AccTrait, 0)
+func ZifGetDeclaredTraits() *types.Array {
+	return GetDeclaredClassImpl(AccTrait, 0)
 }
-func ZifGetDeclaredClasses(executeData zpp.Ex, return_value zpp.Ret) {
-	GetDeclaredClassImpl(executeData, return_value, AccLinked, AccInterface|AccTrait)
+func ZifGetDeclaredClasses() *types.Array {
+	return GetDeclaredClassImpl(AccLinked, AccInterface|AccTrait)
 }
-func ZifGetDeclaredInterfaces(executeData zpp.Ex, return_value zpp.Ret) {
-	GetDeclaredClassImpl(executeData, return_value, AccInterface, 0)
+func ZifGetDeclaredInterfaces() *types.Array {
+	return GetDeclaredClassImpl(AccInterface, 0)
 }
 func ZifGetDefinedFunctions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, excludeDisabled *types.Zval) {
 	var internal types.Zval

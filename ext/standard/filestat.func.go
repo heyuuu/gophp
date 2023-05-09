@@ -11,10 +11,9 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func ZmActivateFilestat(type_ int, module_number int) int {
+func ZmActivateFilestat(type_ int, module_number int) {
 	BG__().CurrentStatFile = nil
 	BG__().CurrentLStatFile = nil
-	return types.SUCCESS
 }
 func ZmDeactivateFilestat(type_ int, module_number int) int {
 	if BG__().CurrentStatFile {

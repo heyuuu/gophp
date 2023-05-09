@@ -56,7 +56,7 @@ type ZendCompilerGlobals struct {
 
 func (this *ZendCompilerGlobals) InitTables() {
 	this.functionTable = types.NewLcTable[types.IFunction](ZendFunctionDtorEx)
-	this.classTable = types.NewLcTable[*types.ClassEntry](DestroyZendClassEntry)
+	this.classTable = types.NewLcTable[*types.ClassEntry](nil)
 	this.auto_globals = types.NewArray(8)
 }
 

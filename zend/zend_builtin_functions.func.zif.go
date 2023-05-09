@@ -482,7 +482,7 @@ var DefZifGetDeclaredTraits = def.DefFunc("get_declared_traits", 0, 0, []def.Arg
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetDeclaredTraits(executeData, returnValue)
+	ZifGetDeclaredTraits()
 })
 
 // generate by ZifGetDeclaredClasses
@@ -490,7 +490,7 @@ var DefZifGetDeclaredClasses = def.DefFunc("get_declared_classes", 0, 0, []def.A
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetDeclaredClasses(executeData, returnValue)
+	ZifGetDeclaredClasses()
 })
 
 // generate by ZifGetDeclaredInterfaces
@@ -498,7 +498,7 @@ var DefZifGetDeclaredInterfaces = def.DefFunc("get_declared_interfaces", 0, 0, [
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetDeclaredInterfaces(executeData, returnValue)
+	ZifGetDeclaredInterfaces()
 })
 
 // generate by ZifGetDefinedFunctions

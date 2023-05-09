@@ -12,7 +12,6 @@ func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
 	intern = ZendObjectsNew(class_type)
 
 	/* Initialize default properties */
-
 	if class_type.GetDefaultPropertiesCount() != 0 {
 		var p *types.Zval = intern.GetPropertiesTable()
 		var end *types.Zval = p + class_type.GetDefaultPropertiesCount()
@@ -24,22 +23,17 @@ func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
 			}
 		}
 	}
-	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", class_type.GetName().GetVal())
+	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", class_type.Name())
 	return intern
 }
 func ZendDisableClass(className string) int {
-	disabled_class := CG__().ClassTable().Get(className)
-	if disabled_class == nil {
+	ce := CG__().ClassTable().Get(className)
+	if ce == nil {
 		return types.FAILURE
 	}
-	disabled_class.InitMethods(DisabledClassNew)
-	disabled_class.SetCreateObject(DisplayDisabledClass)
-	disabled_class.FunctionTable().Foreach(func(_ string, fn types.IFunction) {
-		if fn.HasFnFlags(AccHasReturnType|AccHasTypeHints) && fn.GetScope() == disabled_class {
-			ZendFreeInternalArgInfo(fn.(*types.InternalFunction))
-		}
-	})
-	disabled_class.FunctionTable().Destroy()
+
+	disabledClass := types.NewDisabledClass(ce, DisplayDisabledClass)
+	CG__().ClassTable().Update(className, disabledClass)
 	return types.SUCCESS
 }
 func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *types.ZendFcallInfoCache, strict_class *int, error *string) int {

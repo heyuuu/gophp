@@ -15,6 +15,8 @@ type ZendObject struct {
 	handlers        *zend.ZendObjectHandlers
 	properties      *Array
 	propertiesTable []Zval
+	// 新增属性，用于指向内部对象
+	ptr any
 }
 
 var _ IRefcounted = &ZendObject{}

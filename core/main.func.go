@@ -1181,9 +1181,9 @@ func PhpRequestShutdown(dummy any) {
 	zend.ZendDeactivate()
 
 	/* 11. Call all extensions post-RSHUTDOWN functions */
-	faults.Try(func() {
-		zend.ZendPostDeactivateModules()
-	})
+	//faults.Try(func() {
+	//zend.ZendPostDeactivateModules()
+	//})
 
 	/* 12. SAPI related shutdown (free stuff) */
 	faults.Try(func() {

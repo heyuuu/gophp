@@ -705,7 +705,6 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	var stmt_ast *ZendAst = decl.GetChild()[2]
 	var name *types.String
 	var lcname *types.String
-	var ce *types.ClassEntry = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_class_entry"))
 	var opline *ZendOp
 	var original_ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	if !decl.IsAnonClass() {
@@ -736,10 +735,8 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 			}
 		}
 	}
-	//lcname = types.ZendNewInternedString(lcname)
-	ce.SetType(ZEND_USER_CLASS)
-	ce.SetName(name)
-	ZendInitializeClassData(ce, 1)
+
+	var ce *types.ClassEntry = types.NewUserClass(name.GetStr())
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
 		ce.SetIsPreloaded(true)
 		ZEND_MAP_PTR_NEW(ce.static_members_table)
@@ -771,7 +768,6 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		}
 		extends_name = extends_node.GetConstant().String()
 		ce.SetParentName(ZendResolveClassName(extends_name, b.CondF1(extends_ast.GetKind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.GetAttr() }, ZEND_NAME_FQ)))
-		// types.ZendStringReleaseEx(extends_name, 0)
 		ce.SetIsInherited(true)
 	}
 	CG__().SetActiveClassEntry(ce)

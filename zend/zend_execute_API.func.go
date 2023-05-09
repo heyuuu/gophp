@@ -125,7 +125,7 @@ func ShutdownExecutor() {
 
 		EG__().ClassTable().ForeachReserve(func(_ string, ce *types.ClassEntry) {
 			if ce.GetDefaultStaticMembersCount() != 0 {
-				ZendCleanupInternalClassData(ce)
+				//ZendCleanupInternalClassData(ce)
 			}
 			if ce.IsHasStaticInMethods() {
 				ce.FunctionTable().Foreach(func(_ string, f types.IFunction) {
