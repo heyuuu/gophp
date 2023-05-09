@@ -2,10 +2,11 @@ package zend
 
 import (
 	"fmt"
-	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard/conv"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"strconv"
 )
 
 func IZendIsTrue(op *types.Zval) int { return types.IntBool(ZvalIsTrue(op)) }
@@ -194,108 +195,70 @@ func ZvalTryGetTmpString(op *types.Zval, tmp **types.String) *types.String {
 	}
 }
 
-func __zvalGetStrFunc(op *types.Zval, try types.ZendBool) (string, bool) {
-try_again:
+/**
+ * 从 Zval 转字符串
+ * @return string 返回的字符串值。
+ * @return bool   是否成功。
+ */
+func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
+	op = op.DeRef()
 	switch op.GetType() {
 	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
 		return "", true
 	case types.IS_TRUE:
 		return "1", true
 	case types.IS_RESOURCE:
-		str := ZendSprintf("Resource id #"+ZEND_LONG_FMT, op.ResourceHandle())
 		return fmt.Sprintf("Resource id #%d", op.ResourceHandle()), true
 	case types.IS_LONG:
-		return ZendLongToStr(op.Long())
+		return strconv.Itoa(op.Long()), true
 	case types.IS_DOUBLE:
-		str := ZendSprintf("%.*G", EG__().GetPrecision(), op.Double())
-		return types.NewString(str)
+		return pfmt.Sprintf("%.*G", EG__().GetPrecision(), op.Double()), true
 	case types.IS_ARRAY:
 		faults.Error(faults.E_NOTICE, "Array to string conversion")
-		if try != 0 && EG__().GetException() != nil {
-			return nil
-		} else {
-			return types.NewString(types.STR_ARRAY_CAPITALIZED)
+		if try && EG__().GetException() != nil {
+			return "", false
 		}
+		return types.STR_ARRAY_CAPITALIZED, true
 	case types.IS_OBJECT:
 		var tmp types.Zval
 		if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
 			if types.Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, types.IS_STRING) == types.SUCCESS {
-				return tmp.String()
+				return tmp.StringVal(), true
 			}
 		} else if types.Z_OBJ_HT_P(op).GetGet() != nil {
 			var z *types.Zval = types.Z_OBJ_HT_P(op).GetGet()(op, &tmp)
 			if z.GetType() != types.IS_OBJECT {
-				var str *types.String = b.CondF(try != 0, func() *types.String { return ZvalTryGetString(z) }, func() *types.String { return ZvalGetString(z) })
-				return str
+				var str *types.String
+				if try {
+					str = ZvalTryGetString(z)
+				} else {
+					str = ZvalGetString(z)
+				}
+				if str != nil {
+					return str.GetStr(), true
+				} else {
+					return "", false
+				}
 			}
 		}
 		if EG__().GetException() == nil {
 			faults.ThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
 		}
-		if try != 0 {
-			return nil
+		if try {
+			return "", false
 		} else {
-			return types.NewString("")
+			return "", true
 		}
-	case types.IS_REFERENCE:
-		op = types.Z_REFVAL_P(op)
-		goto try_again
 	case types.IS_STRING:
-		return op.String().Copy()
+		return op.StringVal(), true
 	default:
+		return "", false
 	}
-	return nil
 }
 
 func __zvalGetStringFunc(op *types.Zval, try types.ZendBool) *types.String {
-try_again:
-	switch op.GetType() {
-	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
-		return types.NewString("")
-	case types.IS_TRUE:
-		return types.NewString("1")
-	case types.IS_RESOURCE:
-		str := ZendSprintf("Resource id #"+ZEND_LONG_FMT, op.ResourceHandle())
+	if str, ok := __zvalGetStrFunc(op, try != 0); ok {
 		return types.NewString(str)
-	case types.IS_LONG:
-		return ZendLongToStr(op.Long())
-	case types.IS_DOUBLE:
-		str := ZendSprintf("%.*G", EG__().GetPrecision(), op.Double())
-		return types.NewString(str)
-	case types.IS_ARRAY:
-		faults.Error(faults.E_NOTICE, "Array to string conversion")
-		if try != 0 && EG__().GetException() != nil {
-			return nil
-		} else {
-			return types.NewString(types.STR_ARRAY_CAPITALIZED)
-		}
-	case types.IS_OBJECT:
-		var tmp types.Zval
-		if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
-			if types.Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, types.IS_STRING) == types.SUCCESS {
-				return tmp.String()
-			}
-		} else if types.Z_OBJ_HT_P(op).GetGet() != nil {
-			var z *types.Zval = types.Z_OBJ_HT_P(op).GetGet()(op, &tmp)
-			if z.GetType() != types.IS_OBJECT {
-				var str *types.String = b.CondF(try != 0, func() *types.String { return ZvalTryGetString(z) }, func() *types.String { return ZvalGetString(z) })
-				return str
-			}
-		}
-		if EG__().GetException() == nil {
-			faults.ThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
-		}
-		if try != 0 {
-			return nil
-		} else {
-			return types.NewString("")
-		}
-	case types.IS_REFERENCE:
-		op = types.Z_REFVAL_P(op)
-		goto try_again
-	case types.IS_STRING:
-		return op.String().Copy()
-	default:
 	}
 	return nil
 }

@@ -2467,16 +2467,6 @@ func ZendCompareSymbolTables(ht1 *types.Array, ht2 *types.Array) int {
 func ZendCompareArrays(a1 *types.Zval, a2 *types.Zval) int {
 	return ZendCompareSymbolTables(a1.Array(), a2.Array())
 }
-func ZendCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
-	if o1.Object() == o2.Object() {
-		return 0
-	}
-	if types.Z_OBJ_HT_P(o1).GetCompareObjects() == nil {
-		return 1
-	} else {
-		return types.Z_OBJ_HT_P(o1).GetCompareObjects()(o1, o2)
-	}
-}
 func ZendLongToStr(num ZendLong) *types.String {
 	var res = strconv.Itoa(num)
 	return types.NewString(res)
