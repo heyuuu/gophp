@@ -174,7 +174,7 @@ func ZendCannotAddElement() {
 	faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 }
 func ZendUseResourceAsOffset(dim *types.Zval) {
-	faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(dim), types.Z_RES_HANDLE_P(dim))
+	faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", dim.ResourceHandle(), dim.ResourceHandle())
 }
 func ZendUseNewElementForString() {
 	faults.ThrowError(nil, "[] operator not supported for strings")
@@ -214,7 +214,7 @@ func SlowIndexConvertEx(ht *types.Array, dim *types.Zval, executeData *ZendExecu
 		return types.NewZvalLong(DvalToLval(dim.Double()))
 	case types.IS_RESOURCE:
 		ZendUseResourceAsOffset(dim)
-		return types.NewZvalLong(types.Z_RES_HANDLE_P(dim))
+		return types.NewZvalLong(dim.ResourceHandle())
 	case types.IS_FALSE:
 		return types.NewZvalLong(0)
 	case types.IS_TRUE:

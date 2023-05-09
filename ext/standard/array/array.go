@@ -1257,7 +1257,7 @@ func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, i
 				case types.IS_FALSE:
 					retArr.IndexUpdate(0, columnVal)
 				case types.IS_RESOURCE:
-					retArr.IndexUpdate(types.Z_RES_HANDLE_P(keyVal), columnVal)
+					retArr.IndexUpdate(keyVal.ResourceHandle(), columnVal)
 				default:
 					retArr.Append(columnVal)
 				}

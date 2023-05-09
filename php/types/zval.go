@@ -101,6 +101,10 @@ func (zv *Zval) SetPtr(ptr any)                  { zv.typ, zv.value = IS_PTR, pt
 func (zv *Zval) SetCe(value *ClassEntry)         { zv.typ, zv.value = IS_PTR, value }
 func (zv *Zval) SetFunc(value IFunction)         { zv.typ, zv.value = IS_PTR, value }
 
+// fast property
+func (zv *Zval) ResourceHandle() int { return zv.Resource().GetHandle() }
+func (zv *Zval) ResourceType() int   { return zv.Resource().GetType() }
+
 /** Zval.u1 -> type & typeFlags */
 func (zv *Zval) GetType() ZvalType {
 	if zv.typ == _IS_IMMUTABLE_ARRAY {

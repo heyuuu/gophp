@@ -1027,7 +1027,7 @@ func PhpUserstreamopCast(stream *core.PhpStream, castas int, retptr *any) int {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_CAST+" is not implemented!", us.GetWrapper().GetClassname())
 			break
 		}
-		if zend.!ZvalIsTrue(&retval) {
+		if !zend.ZvalIsTrue(&retval) {
 			break
 		}
 		core.PhpStreamFromZvalNoVerify(intstream, &retval)

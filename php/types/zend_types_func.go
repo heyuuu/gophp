@@ -59,13 +59,6 @@ func Z_OBJPROP(zval Zval) *Array {
 	return Z_OBJ_HT(zval).GetGetProperties()(&zval)
 }
 func Z_OBJPROP_P(zval_p *Zval) *Array       { return Z_OBJPROP(*zval_p) }
-func Z_RES(zval Zval) *ZendResource         { return zval.Resource() }
-func Z_RES_P(zval_p *Zval) *ZendResource    { return zval_p.Resource() }
-func Z_RES_HANDLE(zval Zval) int            { return Z_RES(zval).GetHandle() }
-func Z_RES_HANDLE_P(zval_p *Zval) int       { return Z_RES_HANDLE(*zval_p) }
-func Z_RES_TYPE(zval Zval) int              { return Z_RES(zval).GetType() }
-func Z_RES_TYPE_P(zval_p *Zval) int         { return Z_RES_TYPE(*zval_p) }
-func Z_REF_P(zval_p *Zval) *ZendReference   { return zval_p.Reference() }
 func Z_REFVAL(zval Zval) *Zval              { return zval.Reference().GetVal() }
 func Z_REFVAL_P(zval_p *Zval) *Zval         { return zval_p.Reference().GetVal() }
 func GC_AST(p *ZendAstRef) *zend.ZendAst    { return p.GcAst() }

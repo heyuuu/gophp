@@ -446,7 +446,7 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 		str.AppendString("true, ")
 	case types.IS_RESOURCE:
 		str.AppendString("Resource id #")
-		str.AppendLong(types.Z_RES_HANDLE_P(arg))
+		str.AppendLong(arg.ResourceHandle())
 		str.AppendString(", ")
 	case types.IS_LONG:
 		str.AppendLong(arg.Long())

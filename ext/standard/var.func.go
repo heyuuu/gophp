@@ -142,8 +142,8 @@ again:
 		core.PUTS("}\n")
 		struc.UnprotectRecursive()
 	case types.IS_RESOURCE:
-		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(types.Z_RES_P(struc)), "Unknown")
-		core.PhpPrintf("%sresource(%d) of type (%s)\n", common, types.Z_RES_P(struc).GetHandle(), typeName)
+		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(struc.Resource()), "Unknown")
+		core.PhpPrintf("%sresource(%d) of type (%s)\n", common, struc.ResourceHandle(), typeName)
 	case types.IS_REFERENCE:
 		//??? hide references with refcount==1 (for compatibility)
 		if struc.GetRefcount() > 1 {
@@ -294,8 +294,8 @@ again:
 		}
 		core.PUTS("}\n")
 	case types.IS_RESOURCE:
-		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(types.Z_RES_P(struc)), "Unknown")
-		core.PhpPrintf("%sresource(%d) of type (%s) refcount(%u)\n", COMMON, types.Z_RES_P(struc).GetHandle(), typeName, struc.GetRefcount())
+		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(struc.Resource()), "Unknown")
+		core.PhpPrintf("%sresource(%d) of type (%s) refcount(%u)\n", COMMON, struc.ResourceHandle(), typeName, struc.GetRefcount())
 	case types.IS_REFERENCE:
 
 		//??? hide references with refcount==1 (for compatibility)
@@ -1089,7 +1089,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 			return_value.SetFalse()
 			goto cleanup
 		}
-		if classes != nil && (classes.IsType(types.IS_ARRAY) || zend.!ZvalIsTrue(classes)) {
+		if classes != nil && (classes.IsType(types.IS_ARRAY) || !zend.ZvalIsTrue(classes)) {
 			if classes.IsArray() {
 				class_hash = types.NewArray(classes.Array().Len())
 			} else {

@@ -46,7 +46,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				hval = 1
 				goto num_index_dim
 			} else if offset.IsResource() {
-				hval = types.Z_RES_HANDLE_P(offset)
+				hval = offset.ResourceHandle()
 				goto num_index_dim
 			} else {
 				faults.Error(faults.E_WARNING, "Illegal offset type in unset")
@@ -126,7 +126,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				hval = 1
 				goto num_index_dim
 			} else if offset.IsResource() {
-				hval = types.Z_RES_HANDLE_P(offset)
+				hval = offset.ResourceHandle()
 				goto num_index_dim
 			} else if offset.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
@@ -210,7 +210,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				hval = 1
 				goto num_index_dim
 			} else if offset.IsResource() {
-				hval = types.Z_RES_HANDLE_P(offset)
+				hval = offset.ResourceHandle()
 				goto num_index_dim
 			} else if offset.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
@@ -284,7 +284,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				hval = 1
 				goto num_index_dim
 			} else if offset.IsResource() {
-				hval = types.Z_RES_HANDLE_P(offset)
+				hval = offset.ResourceHandle()
 				goto num_index_dim
 			} else {
 				faults.Error(faults.E_WARNING, "Illegal offset type in unset")
@@ -360,7 +360,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				hval = 1
 				goto num_index_dim
 			} else if offset.IsResource() {
-				hval = types.Z_RES_HANDLE_P(offset)
+				hval = offset.ResourceHandle()
 				goto num_index_dim
 			} else if offset.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
@@ -440,7 +440,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				hval = 1
 				goto num_index_dim
 			} else if offset.IsResource() {
-				hval = types.Z_RES_HANDLE_P(offset)
+				hval = offset.ResourceHandle()
 				goto num_index_dim
 			} else if offset.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)

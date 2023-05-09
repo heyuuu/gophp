@@ -57,7 +57,7 @@ try_again:
 		offset = types.Z_REFVAL_P(offset)
 		goto try_again
 	case types.IS_RESOURCE:
-		return types.Z_RES_HANDLE_P(offset)
+		return offset.ResourceHandle()
 	}
 	return -1
 }

@@ -74,32 +74,6 @@ func ZendMemrchr(s *byte, c byte, n int) *byte {
 		return nil
 	}
 }
-func ZvalGetTmpString(op *types.Zval, tmp **types.String) *types.String {
-	if op.IsString() {
-		*tmp = nil
-		return op.String()
-	} else {
-		*tmp = ZvalGetStringFunc(op)
-		return *tmp
-	}
-}
-func ZvalTryGetString(op *types.Zval) *types.String {
-	if op.IsString() {
-		var ret *types.String = op.String().Copy()
-		return ret
-	} else {
-		return ZvalTryGetStringFunc(op)
-	}
-}
-func ZvalTryGetTmpString(op *types.Zval, tmp **types.String) *types.String {
-	if op.IsString() {
-		*tmp = nil
-		return op.String()
-	} else {
-		*tmp = ZvalTryGetStringFunc(op)
-		return *tmp
-	}
-}
 func TryConvertToString(op *types.Zval) types.ZendBool {
 	if op.IsString() {
 		return 1
@@ -295,7 +269,7 @@ try_again:
 	case types.IS_TRUE:
 		op.SetLong(1)
 	case types.IS_RESOURCE:
-		var l ZendLong = types.Z_RES_HANDLE_P(op)
+		var l ZendLong = op.ResourceHandle()
 		// ZvalPtrDtor(op)
 		op.SetLong(l)
 	case types.IS_OBJECT:
@@ -343,7 +317,7 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 		}
 		return holder
 	case types.IS_RESOURCE:
-		holder.SetLong(types.Z_RES_HANDLE_P(op))
+		holder.SetLong(op.ResourceHandle())
 		return holder
 	case types.IS_OBJECT:
 		ConvertObjectToType(op, holder, types.IS_NUMBER, ConvertScalarToNumber)
@@ -397,7 +371,7 @@ try_again:
 	case types.IS_TRUE:
 		op.SetLong(1)
 	case types.IS_RESOURCE:
-		tmp = types.Z_RES_HANDLE_P(op)
+		tmp = op.ResourceHandle()
 		// ZvalPtrDtor(op)
 		op.SetLong(tmp)
 	case types.IS_LONG:
@@ -448,7 +422,7 @@ try_again:
 	case types.IS_TRUE:
 		op.SetDouble(1.0)
 	case types.IS_RESOURCE:
-		var d float64 = float64(types.Z_RES_HANDLE_P(op))
+		var d float64 = float64(op.ResourceHandle())
 		// ZvalPtrDtor(op)
 		op.SetDouble(d)
 	case types.IS_LONG:
@@ -498,7 +472,7 @@ try_again:
 	case types.IS_NULL:
 		op.SetFalse()
 	case types.IS_RESOURCE:
-		var l ZendLong = b.Cond(types.Z_RES_HANDLE_P(op) != 0, 1, 0)
+		var l ZendLong = b.Cond(op.ResourceHandle() != 0, 1, 0)
 		// ZvalPtrDtor(op)
 		op.SetBool(l != 0)
 	case types.IS_LONG:
@@ -552,7 +526,7 @@ try_again:
 	case types.IS_STRING:
 
 	case types.IS_RESOURCE:
-		var str = ZendSprintf("Resource id #"+ZEND_LONG_FMT, ZendLong(types.Z_RES_HANDLE_P(op)))
+		var str = ZendSprintf("Resource id #"+ZEND_LONG_FMT, ZendLong(op.ResourceHandle()))
 		// ZvalPtrDtor(op)
 		op.SetStringVal(str)
 	case types.IS_LONG:
@@ -689,69 +663,6 @@ try_again:
 		types.Z_OBJPROP_P(op).KeyAddNew(types.STR_SCALAR, &tmp)
 	}
 }
-func __zvalGetStringFunc(op *types.Zval, try types.ZendBool) *types.String {
-try_again:
-	switch op.GetType() {
-	case types.IS_UNDEF:
-		fallthrough
-	case types.IS_NULL:
-		fallthrough
-	case types.IS_FALSE:
-		return types.NewString("")
-	case types.IS_TRUE:
-		return types.NewString("1")
-	case types.IS_RESOURCE:
-		str := ZendSprintf("Resource id #"+ZEND_LONG_FMT, ZendLong(types.Z_RES_HANDLE_P(op)))
-		return types.NewString(str)
-	case types.IS_LONG:
-		return ZendLongToStr(op.Long())
-	case types.IS_DOUBLE:
-		str := ZendSprintf("%.*G", int(EG__().GetPrecision()), op.Double())
-		return types.NewString(str)
-	case types.IS_ARRAY:
-		faults.Error(faults.E_NOTICE, "Array to string conversion")
-		if try != 0 && EG__().GetException() != nil {
-			return nil
-		} else {
-			return types.NewString(types.STR_ARRAY_CAPITALIZED)
-		}
-		fallthrough
-	case types.IS_OBJECT:
-		var tmp types.Zval
-		if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
-			if types.Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, types.IS_STRING) == types.SUCCESS {
-				return tmp.String()
-			}
-		} else if types.Z_OBJ_HT_P(op).GetGet() != nil {
-			var z *types.Zval = types.Z_OBJ_HT_P(op).GetGet()(op, &tmp)
-			if z.GetType() != types.IS_OBJECT {
-				var str *types.String = b.CondF(try != 0, func() *types.String { return ZvalTryGetString(z) }, func() *types.String { return ZvalGetString(z) })
-				// ZvalPtrDtor(z)
-				return str
-			}
-			// ZvalPtrDtor(z)
-		}
-		if EG__().GetException() == nil {
-			faults.ThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
-		}
-		if try != 0 {
-			return nil
-		} else {
-			return types.NewString("")
-		}
-		fallthrough
-	case types.IS_REFERENCE:
-		op = types.Z_REFVAL_P(op)
-		goto try_again
-	case types.IS_STRING:
-		return op.String().Copy()
-	default:
-
-	}
-	return nil
-}
-func ZvalGetStringFunc(op *types.Zval) *types.String    { return __zvalGetStringFunc(op, 0) }
-func ZvalTryGetStringFunc(op *types.Zval) *types.String { return __zvalGetStringFunc(op, 1) }
 func AddFunctionArray(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	if result == op1 && op1.Array() == op2.Array() {
 

@@ -243,8 +243,8 @@ try_again:
 		}
 		return retval
 	case types.IS_RESOURCE:
-		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_P(offset).GetHandle(), types.Z_RES_P(offset).GetHandle())
-		index = types.Z_RES_P(offset).GetHandle()
+		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle())
+		index = offset.ResourceHandle()
 		goto num_index
 	case types.IS_DOUBLE:
 		index = zend.ZendLong(offset.Double())
@@ -365,7 +365,7 @@ try_again:
 		index = zend.ZendLong(offset.Double())
 		goto num_index
 	case types.IS_RESOURCE:
-		index = types.Z_RES_HANDLE_P(offset)
+		index = offset.ResourceHandle()
 		goto num_index
 	case types.IS_FALSE:
 		index = 0
@@ -444,7 +444,7 @@ try_again:
 		index = zend.ZendLong(offset.Double())
 		goto num_index
 	case types.IS_RESOURCE:
-		index = types.Z_RES_HANDLE_P(offset)
+		index = offset.ResourceHandle()
 		goto num_index
 	case types.IS_FALSE:
 		index = 0
@@ -508,7 +508,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 			index = zend.ZendLong(offset.Double())
 			goto num_index
 		case types.IS_RESOURCE:
-			index = types.Z_RES_HANDLE_P(offset)
+			index = offset.ResourceHandle()
 			goto num_index
 		case types.IS_FALSE:
 			index = 0

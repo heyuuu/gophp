@@ -164,7 +164,7 @@ func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *Zend
 		hval = 1
 		goto num_idx
 	} else if offset.IsResource() {
-		hval = types.Z_RES_HANDLE_P(offset)
+		hval = offset.ResourceHandle()
 		goto num_idx
 	} else if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)

@@ -119,7 +119,7 @@ func ZendCleanupInternalClassData(ce *types.ClassEntry) {
 				if p.IsReference() {
 					var prop_info *ZendPropertyInfo
 					for {
-						var _source_list *types.ZendPropertyInfoSourceList = &(types.Z_REF_P(p).GetSources())
+						var _source_list *types.ZendPropertyInfoSourceList = p.Reference().GetSources()
 						var _prop **ZendPropertyInfo
 						var _end ***ZendPropertyInfo
 						var _list *types.ZendPropertyInfoList
@@ -159,7 +159,7 @@ func ZendCleanupInternalClassData(ce *types.ClassEntry) {
 				if p.IsReference() {
 					var prop_info *ZendPropertyInfo
 					for {
-						var _source_list *types.ZendPropertyInfoSourceList = &(types.Z_REF_P(p).GetSources())
+						var _source_list *types.ZendPropertyInfoSourceList = p.Reference().GetSources()
 						var _prop **ZendPropertyInfo
 						var _end ***ZendPropertyInfo
 						var _list *types.ZendPropertyInfoList
@@ -269,7 +269,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 				if p.IsReference() {
 					var prop_info *ZendPropertyInfo
 					for {
-						var _source_list *types.ZendPropertyInfoSourceList = &(types.Z_REF_P(p).GetSources())
+						var _source_list *types.ZendPropertyInfoSourceList = p.Reference().GetSources()
 						var _prop **ZendPropertyInfo
 						var _end ***ZendPropertyInfo
 						var _list *types.ZendPropertyInfoList

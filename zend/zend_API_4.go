@@ -253,8 +253,8 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 		result = ht.SymtableUpdate(types.NewString("").GetStr(), value)
 		break
 	case types.IS_RESOURCE:
-		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(key), types.Z_RES_HANDLE_P(key))
-		result = ht.IndexUpdate(types.Z_RES_HANDLE_P(key), value)
+		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", key.ResourceHandle(), key.ResourceHandle())
+		result = ht.IndexUpdate(key.ResourceHandle(), value)
 		break
 	case types.IS_FALSE:
 		result = ht.IndexUpdate(0, value)
