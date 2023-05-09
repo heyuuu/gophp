@@ -442,7 +442,7 @@ func searchArray(value *types.Zval, array *types.Array, strict bool) *types.Arra
 		if value.IsLong() {
 			array.ForeachIndirectEx(func(key types.ArrayKey, entry *types.Zval) bool {
 				entry = types.ZVAL_DEREF(entry)
-				if operators.FastEqualCheckLong(value, entry) != 0 {
+				if operators.FastEqualCheckLong(value, entry) {
 					targetKey = &key
 					return false
 				}

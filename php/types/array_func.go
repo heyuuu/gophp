@@ -517,7 +517,6 @@ func ZendHashCompare(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBo
 	 * The second one may be referenced from the first and this may cause
 	 * false recursion detection.
 	 */
-
 	if ht1.IsRecursive() {
 		faults.ErrorNoreturn(faults.E_ERROR, "Nesting level too deep - recursive dependency?")
 	}
