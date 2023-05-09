@@ -17,14 +17,14 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
-	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
-	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+	switch TypePair(op1.GetType(), op2.GetType()) {
+	case TypePair(types.IS_LONG, types.IS_LONG):
 		result := opline.Result()
 		FastLongAddFunction(result, op1, op2)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		TypePair(types.IS_LONG, types.IS_DOUBLE),
+		TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -65,14 +65,14 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
-	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
-	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+	switch TypePair(op1.GetType(), op2.GetType()) {
+	case TypePair(types.IS_LONG, types.IS_LONG):
 		result := opline.Result()
 		FastLongSubFunction(result, op1, op2)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		TypePair(types.IS_LONG, types.IS_DOUBLE),
+		TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -113,8 +113,8 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
-	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
-	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+	switch TypePair(op1.GetType(), op2.GetType()) {
+	case TypePair(types.IS_LONG, types.IS_LONG):
 		var overflow ZendLong
 		result := opline.Result()
 		ZEND_SIGNED_MULTIPLY_LONG(op1.Long(), op2.Long(), result.Long(), result.Double(), overflow)
@@ -124,9 +124,9 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 			result.SetTypeInfo(types.IS_LONG)
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		TypePair(types.IS_LONG, types.IS_DOUBLE),
+		TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())

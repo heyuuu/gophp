@@ -170,7 +170,7 @@ func ZendIniAddString(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 			var tmp_str *types.String
 			var str *types.String = ZvalGetTmpString(op1, &tmp_str)
 			op1.SetStringVal(str.GetStr())
-			ZendTmpStringRelease(tmp_str)
+			//ZendTmpStringRelease(tmp_str)
 		} else {
 			op1.SetString(ZvalGetStringFunc(op1))
 		}

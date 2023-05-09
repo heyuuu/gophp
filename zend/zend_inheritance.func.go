@@ -598,7 +598,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 							var tmp_zv_str *types.String
 							var zv_str *types.String = ZvalGetTmpString(zv, &tmp_zv_str)
 							str.AppendString(zv_str.GetStr())
-							ZendTmpStringRelease(tmp_zv_str)
+							//ZendTmpStringRelease(tmp_zv_str)
 						}
 					}
 				} else {

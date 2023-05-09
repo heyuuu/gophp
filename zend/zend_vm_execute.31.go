@@ -35,7 +35,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 		fetch_this:
 			ZendFetchThisVar(type_, opline, executeData)
 			{
-				ZendTmpStringRelease(tmp_name)
+				//ZendTmpStringRelease(tmp_name)
 			}
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
@@ -74,7 +74,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 	if (opline.GetExtendedValue() & ZEND_FETCH_GLOBAL_LOCK) == 0 {
 	}
 	{
-		ZendTmpStringRelease(tmp_name)
+		//ZendTmpStringRelease(tmp_name)
 	}
 	b.Assert(retval != nil)
 	if type_ == BP_VAR_R || type_ == BP_VAR_IS {

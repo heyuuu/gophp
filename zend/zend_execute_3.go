@@ -136,7 +136,7 @@ func ZendWrongPropertyRead(property *types.Zval) {
 	var tmp_property_name *types.String
 	var property_name *types.String = ZvalGetTmpString(property, &tmp_property_name)
 	faults.Error(faults.E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
-	ZendTmpStringRelease(tmp_property_name)
+	//ZendTmpStringRelease(tmp_property_name)
 }
 func ZendDeprecatedFunction(fbc types.IFunction) {
 	faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().GetName().GetVal() }, ""), b.Cond(fbc.GetScope() != nil, "::", ""), fbc.GetFunctionName().GetVal())

@@ -42,24 +42,6 @@ func DvalToLvalCap(d float64) ZendLong {
 	}
 	return ZendLong(d)
 }
-func IsNumericStringEx(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode, oflow_info *int) uint8 {
-	r := StrToNumberEx(str, allow_errors)
-
-	*lval = r.Int()
-	if dval != nil {
-		*dval = r.Float()
-	}
-	if oflow_info != nil {
-		*oflow_info = r.Overflow()
-	}
-	if r.IsInt() {
-		return types.IS_LONG
-	} else if r.IsFloat() {
-		return types.IS_DOUBLE
-	} else {
-		return 0
-	}
-}
 func IsNumericString(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode) uint8 {
 	r := StrToNumberEx(str, allow_errors)
 
@@ -101,8 +83,6 @@ func ZvalGetTmpString(op *types.Zval, tmp **types.String) *types.String {
 		return *tmp
 	}
 }
-func ZendTmpStringRelease(tmp *types.String) {
-}
 func ZvalTryGetString(op *types.Zval) *types.String {
 	if op.IsString() {
 		var ret *types.String = op.String().Copy()
@@ -113,9 +93,8 @@ func ZvalTryGetString(op *types.Zval) *types.String {
 }
 func ZvalTryGetTmpString(op *types.Zval, tmp **types.String) *types.String {
 	if op.IsString() {
-		var ret *types.String = op.String()
 		*tmp = nil
-		return ret
+		return op.String()
 	} else {
 		*tmp = ZvalTryGetStringFunc(op)
 		return *tmp
@@ -160,15 +139,10 @@ func FastLongIncrementFunction(op1 *types.Zval) {
 }
 func FastLongDecrementFunction(op1 *types.Zval) {
 	if op1.Long() == ZEND_LONG_MIN {
-
 		/* switch to double */
-
-		op1.SetDouble(float64(ZEND_LONG_MIN - 1.0))
-
-		/* switch to double */
-
+		op1.SetDouble(ZEND_LONG_MIN - 1.0)
 	} else {
-		op1.Long()--
+		op1.SetLong(op1.Long() - 1)
 	}
 }
 func FastLongAddFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
@@ -177,10 +151,11 @@ func FastLongAddFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	 * ensure that 'result' is not updated until after we
 	 * have read the values of op1 and op2.
 	 */
-	if (op1.Long()&LONG_SIGN_MASK) == (op2.Long()&LONG_SIGN_MASK) && (op1.Long()&LONG_SIGN_MASK) != (op1.Long()+op2.Long()&LONG_SIGN_MASK) {
-		result.SetDouble(float64(op1.Long() + float64(op2.Long())))
+	l1, l2 := op1.Long(), op2.Long()
+	if l1&LONG_SIGN_MASK == l2&LONG_SIGN_MASK && l1&LONG_SIGN_MASK != l1+l2&LONG_SIGN_MASK {
+		result.SetDouble(float64(l1) + float64(l2))
 	} else {
-		result.SetLong(op1.Long() + op2.Long())
+		result.SetLong(l1 + l2)
 	}
 }
 func FastAddFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
@@ -206,7 +181,7 @@ func FastAddFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 func FastLongSubFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	result.SetLong(op1.Long() - op2.Long())
 	if (op1.Long()&LONG_SIGN_MASK) != (op2.Long()&LONG_SIGN_MASK) && (op1.Long()&LONG_SIGN_MASK) != (result.Long()&LONG_SIGN_MASK) {
-		result.SetDouble(float64(op1.Long() - float64(op2.Long())))
+		result.SetDouble(float64(op1.Long()) - float64(op2.Long()))
 	}
 }
 func FastDivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
@@ -283,7 +258,6 @@ func ZendUnwrapReference(op *types.Zval) {
 		types.ZVAL_COPY(op, types.Z_REFVAL_P(op))
 	}
 }
-func TYPE_PAIR(t1 types.ZvalType, t2 types.ZvalType) uint { return uint(t1)<<4 | uint(t2) }
 func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func func(op *types.Zval)) {
 	dst.SetUndef()
 	if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
@@ -795,98 +769,101 @@ func AddFunctionArray(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	}
 	types.ZendHashMerge(result.Array(), op2.Array(), false)
 }
-func AddFunctionFast(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
-	if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
-		FastLongAddFunction(result, op1, op2)
-		return types.SUCCESS
-	} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE) {
-		result.SetDouble(op1.Double() + op2.Double())
-		return types.SUCCESS
-	} else if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE) {
-		result.SetDouble(float64(op1.Long()) + op2.Double())
-		return types.SUCCESS
-	} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG) {
-		result.SetDouble(op1.Double() + float64(op2.Long()))
-		return types.SUCCESS
-	} else if type_pair == TYPE_PAIR(types.IS_ARRAY, types.IS_ARRAY) {
-		AddFunctionArray(result, op1, op2)
-		return types.SUCCESS
+func _zvalFastGetDouble(op *types.Zval) float64 {
+	if op.IsLong() {
+		return float64(op.Long())
+	} else if op.IsDouble() {
+		return op.Double()
 	} else {
-		return types.FAILURE
+		return 0
 	}
 }
-func AddFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var op1_copy types.Zval
-	var op2_copy types.Zval
-	var converted int = 0
-	for true {
-		if op1.IsReference() {
-			op1 = types.Z_REFVAL_P(op1)
-		} else if op2.IsReference() {
-			op2 = types.Z_REFVAL_P(op2)
-		} else if converted == 0 {
-			if op1.IsObject() && op1 == result && types.Z_OBJ_HT(*op1).GetGet() != nil && types.Z_OBJ_HT(*op1).GetSet() != nil {
-				var ret int
-				var rv types.Zval
-				var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-				// objval.TryAddRefcount()
-				ret = AddFunction(objval, objval, op2)
-				types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
-				// ZvalPtrDtor(objval)
-				return ret
-			} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_ADD, result, op1, op2) {
-					return types.SUCCESS
-				}
-			} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_ADD, result, op1, op2) {
-				return types.SUCCESS
-			}
-			if op1 != op2 {
-				op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
-				op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 0)
-			} else {
-				op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
-				op2 = op1
-			}
-			if EG__().GetException() != nil {
-				if result != op1 {
-					result.SetUndef()
-				}
-				return types.FAILURE
-			}
-			converted = 1
-		} else {
-			if result != op1 {
-				result.SetUndef()
-			}
-			faults.ThrowError(nil, "Unsupported operand types")
-			return types.FAILURE
+
+func _addFunctionFast(result *types.Zval, op1 *types.Zval, op2 *types.Zval) bool {
+	switch TypePair(op1.GetType(), op1.GetType()) {
+	case TypeLongLong:
+		FastLongAddFunction(result, op1, op2)
+		return true
+	case TypeLongDouble, TypeDoubleLong, TypeDoubleDouble:
+		result.SetDouble(_zvalFastGetDouble(op1) + _zvalFastGetDouble(op2))
+		return true
+	case TypeArrayArray:
+		AddFunctionArray(result, op1, op2)
+		return true
+	default:
+		return false
+	}
+}
+func _addFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) bool {
+	var op1Copy types.Zval
+	var op2Copy types.Zval
+
+	// convert
+	if op1.IsObject() && op1 == result && types.Z_OBJ_HT(*op1).GetGet() != nil && types.Z_OBJ_HT(*op1).GetSet() != nil {
+		var rv types.Zval
+		var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
+		ret := AddFunctionEx(objval, objval, op2)
+		types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
+		return ret
+	} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
+		if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_ADD, result, op1, op2) {
+			return true
 		}
-		if AddFunctionFast(result, op1, op2) == types.SUCCESS {
-			return types.SUCCESS
+	} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_ADD, result, op1, op2) {
+		return true
+	}
+	if op1 != op2 {
+		op1 = ZendiConvertScalarToNumber(op1, &op1Copy, result, 0)
+		op2 = ZendiConvertScalarToNumber(op2, &op2Copy, result, 0)
+	} else {
+		op1 = ZendiConvertScalarToNumber(op1, &op1Copy, result, 0)
+		op2 = op1
+	}
+	if EG__().GetException() != nil {
+		if result != op1 {
+			result.SetUndef()
 		}
+		return false
+	}
+
+	// try add
+	if _addFunctionFast(result, op1, op2) {
+		return true
+	}
+
+	// fail
+	if result != op1 {
+		result.SetUndef()
+	}
+	faults.ThrowError(nil, "Unsupported operand types")
+	return false
+}
+func AddFunctionEx(result *types.Zval, op1 *types.Zval, op2 *types.Zval) bool {
+	op1 = op1.DeRef()
+	op2 = op2.DeRef()
+	if _addFunctionFast(result, op1, op2) {
+		return true
+	} else if _addFunctionSlow(result, op1, op2) {
+		return true
+	} else {
+		return false
 	}
 }
 func AddFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	if AddFunctionFast(result, op1, op2) == types.SUCCESS {
-		return types.SUCCESS
-	} else {
-		return AddFunctionSlow(result, op1, op2)
-	}
+	return types.IntBool(AddFunctionEx(result, op1, op2))
 }
 func SubFunctionFast(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
-	if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
+	var type_pair uint8 = TypePair(op1.GetType(), op2.GetType())
+	if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
 		FastLongSubFunction(result, op1, op2)
 		return types.SUCCESS
-	} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE) {
+	} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_DOUBLE) {
 		result.SetDouble(op1.Double() - op2.Double())
 		return types.SUCCESS
-	} else if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE) {
+	} else if type_pair == TypePair(types.IS_LONG, types.IS_DOUBLE) {
 		result.SetDouble(float64(op1.Long()) - op2.Double())
 		return types.SUCCESS
-	} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG) {
+	} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_LONG) {
 		result.SetDouble(op1.Double() - float64(op2.Long()))
 		return types.SUCCESS
 	} else {
@@ -957,8 +934,8 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var op2_copy types.Zval
 	var converted int = 0
 	for true {
-		var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
-		if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
+		var type_pair uint8 = TypePair(op1.GetType(), op2.GetType())
+		if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
 			var overflow ZendLong
 			ZEND_SIGNED_MULTIPLY_LONG(op1.Long(), op2.Long(), result.Long(), result.Double(), overflow)
 			if overflow != 0 {
@@ -967,13 +944,13 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				result.SetTypeInfo(types.IS_LONG)
 			}
 			return types.SUCCESS
-		} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_DOUBLE) {
 			result.SetDouble(op1.Double() * op2.Double())
 			return types.SUCCESS
-		} else if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IS_LONG, types.IS_DOUBLE) {
 			result.SetDouble(float64(op1.Long()) * op2.Double())
 			return types.SUCCESS
-		} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG) {
+		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_LONG) {
 			result.SetDouble(op1.Double() * float64(op2.Long()))
 			return types.SUCCESS
 		} else {
@@ -1027,8 +1004,8 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var op2_copy types.Zval
 	var converted int = 0
 	for true {
-		var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
-		if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
+		var type_pair uint8 = TypePair(op1.GetType(), op2.GetType())
+		if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
 			if op2.Long() >= 0 {
 				var l1 ZendLong = 1
 				var l2 ZendLong = op1.Long()
@@ -1070,13 +1047,13 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				result.SetDouble(pow(float64(op1.Long()), float64(op2.Long())))
 			}
 			return types.SUCCESS
-		} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_DOUBLE) {
 			result.SetDouble(pow(op1.Double(), op2.Double()))
 			return types.SUCCESS
-		} else if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IS_LONG, types.IS_DOUBLE) {
 			result.SetDouble(pow(float64(op1.Long()), op2.Double()))
 			return types.SUCCESS
-		} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG) {
+		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_LONG) {
 			result.SetDouble(pow(op1.Double(), float64(op2.Long())))
 			return types.SUCCESS
 		} else {
@@ -1154,8 +1131,8 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var op2_copy types.Zval
 	var converted int = 0
 	for true {
-		var type_pair uint8 = TYPE_PAIR(op1.GetType(), op2.GetType())
-		if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
+		var type_pair uint8 = TypePair(op1.GetType(), op2.GetType())
+		if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
 			if op2.Long() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")
 				result.SetDouble(float64(op1.Long() / float64(op2.Long())))
@@ -1173,19 +1150,19 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				result.SetDouble(float64(op1.Long()) / op2.Long())
 			}
 			return types.SUCCESS
-		} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_DOUBLE) {
 			if op2.Double() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")
 			}
 			result.SetDouble(op1.Double() / op2.Double())
 			return types.SUCCESS
-		} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG) {
+		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_LONG) {
 			if op2.Long() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")
 			}
 			result.SetDouble(op1.Double() / float64(op2.Long()))
 			return types.SUCCESS
-		} else if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IS_LONG, types.IS_DOUBLE) {
 			if op2.Double() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")
 			}
@@ -1975,8 +1952,8 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var op_free *types.Zval
 	var tmp_free types.Zval
 	for true {
-		switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
-		case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+		switch TypePair(op1.GetType(), op2.GetType()) {
+		case TypePair(types.IS_LONG, types.IS_LONG):
 			result.SetLong(b.CondF2(op1.Long() > op2.Long(), 1, func() int {
 				if op1.Long() < op2.Long() {
 					return -1
@@ -1985,15 +1962,15 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				}
 			}))
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+		case TypePair(types.IS_DOUBLE, types.IS_LONG):
 			result.SetDouble(op1.Double() - float64(op2.Long()))
 			result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE):
+		case TypePair(types.IS_LONG, types.IS_DOUBLE):
 			result.SetDouble(float64(op1.Long() - op2.Double()))
 			result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE):
+		case TypePair(types.IS_DOUBLE, types.IS_DOUBLE):
 			if op1.Double() == op2.Double() {
 				result.SetLong(0)
 			} else {
@@ -2001,43 +1978,43 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
 			}
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_ARRAY, types.IS_ARRAY):
+		case TypePair(types.IS_ARRAY, types.IS_ARRAY):
 			result.SetLong(ZendCompareArrays(op1, op2))
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_NULL, types.IS_NULL):
+		case TypePair(types.IS_NULL, types.IS_NULL):
 			fallthrough
-		case TYPE_PAIR(types.IS_NULL, types.IS_FALSE):
+		case TypePair(types.IS_NULL, types.IS_FALSE):
 			fallthrough
-		case TYPE_PAIR(types.IS_FALSE, types.IS_NULL):
+		case TypePair(types.IS_FALSE, types.IS_NULL):
 			fallthrough
-		case TYPE_PAIR(types.IS_FALSE, types.IS_FALSE):
+		case TypePair(types.IS_FALSE, types.IS_FALSE):
 			fallthrough
-		case TYPE_PAIR(types.IS_TRUE, types.IS_TRUE):
+		case TypePair(types.IS_TRUE, types.IS_TRUE):
 			result.SetLong(0)
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_NULL, types.IS_TRUE):
+		case TypePair(types.IS_NULL, types.IS_TRUE):
 			result.SetLong(-1)
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_TRUE, types.IS_NULL):
+		case TypePair(types.IS_TRUE, types.IS_NULL):
 			result.SetLong(1)
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_STRING, types.IS_STRING):
+		case TypePair(types.IS_STRING, types.IS_STRING):
 			if op1.String() == op2.String() {
 				result.SetLong(0)
 				return types.SUCCESS
 			}
 			result.SetLong(ZendiSmartStrcmp(op1.StringVal(), op2.StringVal()))
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_NULL, types.IS_STRING):
+		case TypePair(types.IS_NULL, types.IS_STRING):
 			result.SetLong(b.Cond(op2.String().GetLen() == 0, 0, -1))
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_STRING, types.IS_NULL):
+		case TypePair(types.IS_STRING, types.IS_NULL):
 			result.SetLong(b.Cond(op1.String().GetLen() == 0, 0, 1))
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_OBJECT, types.IS_NULL):
+		case TypePair(types.IS_OBJECT, types.IS_NULL):
 			result.SetLong(1)
 			return types.SUCCESS
-		case TYPE_PAIR(types.IS_NULL, types.IS_OBJECT):
+		case TypePair(types.IS_NULL, types.IS_OBJECT):
 			result.SetLong(-1)
 			return types.SUCCESS
 		default:

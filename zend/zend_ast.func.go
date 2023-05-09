@@ -577,7 +577,6 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		} else {
 			op1.SetLong(0)
 			ret = AddFunction(result, &op1, &op2)
-			// ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_UNARY_MINUS:
 		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != types.SUCCESS {

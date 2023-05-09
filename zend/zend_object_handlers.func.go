@@ -680,7 +680,7 @@ uninit_error:
 	}
 	retval = EG__().GetUninitializedZval()
 exit:
-	ZendTmpStringRelease(tmp_name)
+	//ZendTmpStringRelease(tmp_name)
 	return retval
 }
 func PropertyUsesStrictTypes() types.ZendBool {
@@ -790,7 +790,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 		}
 	}
 exit:
-	ZendTmpStringRelease(tmp_name)
+	//ZendTmpStringRelease(tmp_name)
 	return variable_ptr
 }
 func ZendBadArrayAccess(ce *types.ClassEntry) {
@@ -934,7 +934,7 @@ func ZendStdGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int,
 				zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 			}
 			if b.Assign(&retval, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
-				ZendTmpStringRelease(tmp_name)
+				//ZendTmpStringRelease(tmp_name)
 				return retval
 			}
 		}
@@ -958,7 +958,7 @@ func ZendStdGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int,
 	} else if zobj.GetCe().GetGet() == nil {
 		retval = EG__().GetErrorZval()
 	}
-	ZendTmpStringRelease(tmp_name)
+	//ZendTmpStringRelease(tmp_name)
 	return retval
 }
 func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *any) {
@@ -1032,7 +1032,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 		}
 	}
 exit:
-	ZendTmpStringRelease(tmp_name)
+	//ZendTmpStringRelease(tmp_name)
 }
 func ZendStdUnsetDimension(object *types.Zval, offset *types.Zval) {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(object)
@@ -1537,7 +1537,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 		}
 	}
 exit:
-	ZendTmpStringRelease(tmp_name)
+	//ZendTmpStringRelease(tmp_name)
 	return result
 }
 func ZendStdGetClassName(zobj *types.ZendObject) *types.String {

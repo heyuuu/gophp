@@ -269,7 +269,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 			} else {
 				faults.Error(faults.E_WARNING, "Attempt to assign property '%s' of non-object", property_name.GetVal())
 			}
-			ZendTmpStringRelease(tmp_property_name)
+			//ZendTmpStringRelease(tmp_property_name)
 		}
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetNull()

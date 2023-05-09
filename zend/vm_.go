@@ -136,12 +136,12 @@ func getIsEqualHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	var result bool
-	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
-	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+	switch TypePair(op1.GetType(), op2.GetType()) {
+	case TypePair(types.IS_LONG, types.IS_LONG):
 		result = op1.Long() == op2.Long()
-	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		TypePair(types.IS_LONG, types.IS_DOUBLE),
+		TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -154,7 +154,7 @@ func getIsEqualHandler(executeData *ZendExecuteData) int {
 			d2 = op2.Double()
 		}
 		result = d1 == d2
-	case TYPE_PAIR(types.IS_STRING, types.IS_STRING):
+	case TypePair(types.IS_STRING, types.IS_STRING):
 		result = ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
 	default:
 		return zend_is_equal_helper_SPEC(op1, op2, executeData)
@@ -187,12 +187,12 @@ func getIsNotEqualHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	var result bool
-	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
-	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+	switch TypePair(op1.GetType(), op2.GetType()) {
+	case TypePair(types.IS_LONG, types.IS_LONG):
 		result = op1.Long() != op2.Long()
-	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
-		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		TypePair(types.IS_LONG, types.IS_DOUBLE),
+		TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -205,7 +205,7 @@ func getIsNotEqualHandler(executeData *ZendExecuteData) int {
 			d2 = op2.Double()
 		}
 		result = d1 != d2
-	case TYPE_PAIR(types.IS_STRING, types.IS_STRING):
+	case TypePair(types.IS_STRING, types.IS_STRING):
 		result = !ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
 	default:
 		return zend_is_not_equal_helper_SPEC(op1, op2, executeData)

@@ -298,7 +298,7 @@ func ZendFetchStaticPropertyAddressEx(
 	}
 	*retval = ZendStdGetStaticPropertyWithInfo(ce, name, fetch_type, &property_info)
 	if op1_type != IS_CONST {
-		ZendTmpStringRelease(tmp_name)
+		//ZendTmpStringRelease(tmp_name)
 		if op1_type != IS_CV {
 			// ZvalPtrDtorNogc(free_op1)
 		}
