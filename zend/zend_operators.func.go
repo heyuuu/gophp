@@ -460,7 +460,6 @@ try_again:
 	}
 }
 func ConvertToNull(op *types.Zval) {
-	// ZvalPtrDtor(op)
 	op.SetNull()
 }
 func ConvertToBoolean(op *types.Zval) {

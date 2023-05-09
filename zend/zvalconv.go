@@ -40,7 +40,7 @@ again:
 	return false
 }
 
-func ZvalGetLong(op *types.Zval) ZendLong {
+func ZvalGetLong(op *types.Zval) int {
 	if op.IsLong() {
 		return op.Long()
 	} else {
@@ -48,8 +48,8 @@ func ZvalGetLong(op *types.Zval) ZendLong {
 	}
 }
 
-func _zvalGetLongFuncNoisy(op *types.Zval) ZendLong { return _zvalGetLongFuncEx(op, false) }
-func _zvalGetLongFuncEx(op *types.Zval, silent bool) ZendLong {
+func _zvalGetLongFuncNoisy(op *types.Zval) int { return _zvalGetLongFuncEx(op, false) }
+func _zvalGetLongFuncEx(op *types.Zval, silent bool) int {
 	op = op.DeRef()
 	switch op.GetType() {
 	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
