@@ -1,9 +1,11 @@
 package types
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"strconv"
+	"strings"
 )
 
 func ArrayLazyDup(arr *Array) *Array {
@@ -407,7 +409,94 @@ func ZendHashMerge(target *Array, source *Array, overwrite bool) {
 	}
 }
 
-func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBool) int {
+func iArrayKeyCompare(k1, k2 ArrayKey) int {
+	i1, s1, isStr1 := k1.Keys()
+	i2, s2, isStr2 := k2.Keys()
+	if !isStr1 && !isStr2 {
+		return i1 - i2
+	} else if isStr1 && isStr2 {
+		return strings.Compare(s1, s2)
+	} else {
+		/* Mixed key types: A string key is considered as larger */
+		if isStr1 {
+			return 1
+		} else {
+			return -1
+		}
+	}
+}
+
+func iArrayCompareOrdered(ht1 *Array, ht2 *Array, comparer ZvalComparer) int {
+	// check len
+	if ht1.Len() != ht2.Len() {
+		return ht1.Len() - ht2.Len()
+	}
+
+	pairs1, pairs2 := ht1.Pairs(), ht2.Pairs()
+	b.Assert(len(pairs1) == len(pairs2))
+	for idx, pair1 := range pairs1 {
+		pair2 := pairs2[idx]
+
+		// compare key
+		compareKeyResult := iArrayKeyCompare(pair1.GetKey(), pair2.GetKey())
+		if compareKeyResult != 0 {
+			return compareKeyResult
+		}
+
+		// compare value
+		v1 := pair1.GetVal().DeIndirect()
+		v2 := pair2.GetVal().DeIndirect()
+
+		if v1.IsUndef() {
+			if !v2.IsUndef() {
+				return -1
+			}
+		} else if v2.IsUndef() {
+			return 1
+		} else {
+			result := comparer(v1, v2)
+			if result != 0 {
+				return result
+			}
+		}
+	}
+	return 0
+}
+
+func iArrayCompareUnordered(ht1 *Array, ht2 *Array, comparer ZvalComparer) int {
+	// check len
+	if ht1.Len() != ht2.Len() {
+		return ht1.Len() - ht2.Len()
+	}
+
+	pairs1 := ht1.Pairs()
+	for _, p1 := range pairs1 {
+		// find value in ht2
+		v2 := ht2.Find(p1.GetKey())
+		if v2 == nil {
+			return 1
+		}
+
+		// compare value
+		v1 := p1.GetVal().DeIndirect()
+		v2 = v2.DeIndirect()
+		if v1.IsUndef() {
+			if !v2.IsUndef() {
+				return -1
+			}
+		} else if v2.IsUndef() {
+			return 1
+		} else {
+			result := comparer(v1, v2)
+			if result != 0 {
+				return result
+			}
+		}
+	}
+	return 0
+}
+
+func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered bool) int {
 	var idx1 uint32
 	var idx2 uint32
 	if ht1.Len() != ht2.Len() {
@@ -428,7 +517,7 @@ func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered Ze
 		if p1.GetVal().IsUndef() {
 			continue
 		}
-		if ordered != 0 {
+		if ordered {
 			for true {
 				assert(idx2 != ht2.GetNNumUsed())
 				p2 = ht2.Bucket(idx2)
@@ -507,7 +596,7 @@ func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered Ze
 	}
 	return 0
 }
-func ZendHashCompare(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBool) int {
+func ZendHashCompare(ht1 *Array, ht2 *Array, comparer ZvalComparer, ordered ZendBool) int {
 	var result int
 	if ht1 == ht2 {
 		return 0
@@ -523,11 +612,21 @@ func ZendHashCompare(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBo
 
 	ht1.TryProtectRecursive()
 
-	result = ZendHashCompareImpl(ht1, ht2, compar, ordered)
+	if ordered != 0 {
+		result = iArrayCompareOrdered(ht1, ht2, comparer)
+	} else {
+		result = iArrayCompareUnordered(ht1, ht2, comparer)
+	}
 
 	ht1.TryUnProtectRecursive()
 
-	return result
+	if result > 0 {
+		return 1
+	} else if result < 0 {
+		return -1
+	} else {
+		return 0
+	}
 }
 
 func ParseNumericStr(str string) (int, bool) {

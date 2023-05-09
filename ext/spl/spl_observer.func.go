@@ -206,7 +206,7 @@ func SplObjectStorageCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 	if zo1.GetCe() != spl_ce_SplObjectStorage || zo2.GetCe() != spl_ce_SplObjectStorage {
 		return 1
 	}
-	return types.ZendHashCompare(Z_SPLOBJSTORAGE_P(o1).GetStorage(), Z_SPLOBJSTORAGE_P(o2).GetStorage(), types.CompareFuncT(SplObjectStorageCompareInfo), 0)
+	return types.ZendHashCompare(Z_SPLOBJSTORAGE_P(o1).GetStorage(), Z_SPLOBJSTORAGE_P(o2).GetStorage(), SplObjectStorageCompareInfo, 0)
 }
 func spl_SplObjectStorage_new(class_type *types.ClassEntry) *types.ZendObject {
 	return SplObjectStorageNewEx(class_type, nil)

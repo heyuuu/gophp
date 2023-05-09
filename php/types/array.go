@@ -37,7 +37,7 @@ func (k ArrayKey) StrKey() string {
 		return k.str
 	}
 }
-func (k ArrayKey) Keys() (index int, key string, isStrKey bool) {
+func (k ArrayKey) Keys() (idx int, key string, isStrKey bool) {
 	return k.IdxKey(), k.StrKey(), k.IsStrKey()
 }
 func (k ArrayKey) ToZval() *Zval {

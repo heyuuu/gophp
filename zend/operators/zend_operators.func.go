@@ -1845,7 +1845,7 @@ func ZendIsIdentical(op1 *types.Zval, op2 *types.Zval) bool {
 	case types.IS_STRING:
 		return op1.StringVal() == op2.StringVal()
 	case types.IS_ARRAY:
-		return op1.Array() == op2.Array() || types.ZendHashCompare(op1.Array(), op2.Array(), types.CompareFuncT(HashZvalIdenticalFunction), 1) == 0
+		return op1.Array() == op2.Array() || types.ZendHashCompare(op1.Array(), op2.Array(), HashZvalIdenticalFunction, 1) == 0
 	case types.IS_OBJECT:
 		return op1.Object() == op2.Object()
 	default:
@@ -2236,7 +2236,7 @@ func ZendCompareSymbolTables(ht1 *types.Array, ht2 *types.Array) int {
 	if ht1 == ht2 {
 		return 0
 	} else {
-		return types.ZendHashCompare(ht1, ht2, types.CompareFuncT(HashZvalCompareFunction), 0)
+		return types.ZendHashCompare(ht1, ht2, HashZvalCompareFunction, 0)
 	}
 }
 func ZendCompareArrays(a1 *types.Zval, a2 *types.Zval) int {

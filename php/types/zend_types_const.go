@@ -31,6 +31,7 @@ type ZendIntptrT = uintptr
 type ZendUintptrT = uintptr
 
 type CompareFuncT func(any, any) int
+type ZvalComparer func(*Zval, *Zval) int
 
 const HT_MAX_SIZE = 0x80000000
 
