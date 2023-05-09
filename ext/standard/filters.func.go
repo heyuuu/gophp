@@ -9,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func StrfilterRot13Filter(
@@ -142,7 +143,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 		if filterparams.IsType(types.IS_ARRAY) {
 			var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
 			filterparams.Array().Foreach(func(_ types.ArrayKey, tmp *types.Zval) {
-				zend.ConvertToStringEx(tmp)
+				operators.ConvertToStringEx(tmp)
 				tags_ss.AppendByte('<')
 				tags_ss.AppendString(tmp.String().GetStr())
 				tags_ss.AppendByte('>')
@@ -150,7 +151,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 			tags_ss.ZeroTail()
 			allowed_tags = tags_ss.GetS()
 		} else {
-			allowed_tags = zend.ZvalGetString(filterparams)
+			allowed_tags = operators.ZvalGetString(filterparams)
 		}
 
 		/* Exception during string conversion. */
@@ -958,7 +959,7 @@ func PhpConvGetStringPropEx(
 	*pretval = nil
 	*pretval_len = 0
 	if b.Assign(&tmpval, (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
-		var str *types.String = zend.ZvalGetString(tmpval)
+		var str *types.String = operators.ZvalGetString(tmpval)
 		*pretval = zend.Pemalloc(str.GetLen() + 1)
 		*pretval_len = str.GetLen()
 		memcpy(*pretval, str.GetVal(), str.GetLen()+1)
@@ -970,7 +971,7 @@ func PhpConvGetStringPropEx(
 func PhpConvGetUlongPropEx(ht *types.Array, pretval *zend.ZendUlong, field_name string, field_name_len int) PhpConvErrT {
 	var tmpval *types.Zval = (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
 	if tmpval != nil {
-		var lval zend.ZendLong = zend.ZvalGetLong(tmpval)
+		var lval zend.ZendLong = operators.ZvalGetLong(tmpval)
 		if lval < 0 {
 			*pretval = 0
 		} else {
@@ -985,7 +986,7 @@ func PhpConvGetUlongPropEx(ht *types.Array, pretval *zend.ZendUlong, field_name 
 func PhpConvGetBoolPropEx(ht *types.Array, pretval *int, field_name string, field_name_len int) PhpConvErrT {
 	var tmpval *types.Zval = (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
 	if tmpval != nil {
-		*pretval = zend.IZendIsTrue(tmpval)
+		*pretval = operators.IZendIsTrue(tmpval)
 		return PHP_CONV_ERR_SUCCESS
 	} else {
 		*pretval = 0

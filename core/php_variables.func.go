@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func PhpRegisterVariable(var_ string, strval string, track_vars_array *types.Zval) {
@@ -595,7 +596,7 @@ func PhpRegisterServerVariables() {
 
 	tmp.SetDouble(SapiGetRequestTime())
 	PhpRegisterVariableQuick("REQUEST_TIME_FLOAT", &tmp, ht)
-	tmp.SetLong(zend.DvalToLval(tmp.Double()))
+	tmp.SetLong(operators.DvalToLval(tmp.Double()))
 	PhpRegisterVariableQuick("REQUEST_TIME", &tmp, ht)
 }
 func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {

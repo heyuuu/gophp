@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
 	"strings"
@@ -226,7 +227,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 	cur = agent_name.GetVal() + entry.GetPrefixLen()
 	for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
 		if entry.GetContainsLen()[i] != 0 {
-			cur = zend.ZendMemnstr(cur, pattern_lc.GetVal()+entry.GetContainsStart()[i], entry.GetContainsLen()[i], agent_name.GetVal()+agent_name.GetLen())
+			cur = operators.ZendMemnstr(cur, pattern_lc.GetVal()+entry.GetContainsStart()[i], entry.GetContainsLen()[i], agent_name.GetVal()+agent_name.GetLen())
 			if cur == nil {
 				//pattern_lc.Free()
 				return 0
@@ -363,7 +364,7 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 		}
 		agent_name = http_user_agent.String()
 	}
-	lookup_browser_name = zend.ZendStringTolower(agent_name)
+	lookup_browser_name = operators.ZendStringTolower(agent_name)
 	found_entry = types.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name.GetStr())
 	if found_entry == nil {
 		bdata.GetHtab().ForeachEx(func(_ types.ArrayKey, value *types.Zval) bool {

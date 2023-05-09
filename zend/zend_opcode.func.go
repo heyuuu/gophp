@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendExtensionOpArrayCtorHandler(extension *ZendExtension, op_array *types.ZendOpArray) {
@@ -925,9 +926,9 @@ func PassTwo(op_array *types.ZendOpArray) int {
 func GetUnaryOp(opcode int) UnaryOpType {
 	switch opcode {
 	case ZEND_BW_NOT:
-		return UnaryOpType(BitwiseNotFunction)
+		return UnaryOpType(operators.BitwiseNotFunction)
 	case ZEND_BOOL_NOT:
-		return UnaryOpType(BooleanNotFunction)
+		return UnaryOpType(operators.BooleanNotFunction)
 	default:
 		return UnaryOpType(nil)
 	}
@@ -935,51 +936,51 @@ func GetUnaryOp(opcode int) UnaryOpType {
 func GetBinaryOp(opcode int) BinaryOpType {
 	switch opcode {
 	case ZEND_ADD:
-		return BinaryOpType(AddFunction)
+		return BinaryOpType(operators.AddFunction)
 	case ZEND_SUB:
-		return BinaryOpType(SubFunction)
+		return BinaryOpType(operators.SubFunction)
 	case ZEND_MUL:
-		return BinaryOpType(MulFunction)
+		return BinaryOpType(operators.MulFunction)
 	case ZEND_POW:
-		return BinaryOpType(PowFunction)
+		return BinaryOpType(operators.PowFunction)
 	case ZEND_DIV:
-		return BinaryOpType(DivFunction)
+		return BinaryOpType(operators.DivFunction)
 	case ZEND_MOD:
-		return BinaryOpType(ModFunction)
+		return BinaryOpType(operators.ModFunction)
 	case ZEND_SL:
-		return BinaryOpType(ShiftLeftFunction)
+		return BinaryOpType(operators.ShiftLeftFunction)
 	case ZEND_SR:
-		return BinaryOpType(ShiftRightFunction)
+		return BinaryOpType(operators.ShiftRightFunction)
 	case ZEND_PARENTHESIZED_CONCAT:
 		fallthrough
 	case ZEND_FAST_CONCAT:
 		fallthrough
 	case ZEND_CONCAT:
-		return BinaryOpType(ConcatFunction)
+		return BinaryOpType(operators.ConcatFunction)
 	case ZEND_IS_IDENTICAL:
-		return BinaryOpType(IsIdenticalFunction)
+		return BinaryOpType(operators.IsIdenticalFunction)
 	case ZEND_IS_NOT_IDENTICAL:
-		return BinaryOpType(IsNotIdenticalFunction)
+		return BinaryOpType(operators.IsNotIdenticalFunction)
 	case ZEND_IS_EQUAL:
 		fallthrough
 	case ZEND_CASE:
-		return BinaryOpType(IsEqualFunction)
+		return BinaryOpType(operators.IsEqualFunction)
 	case ZEND_IS_NOT_EQUAL:
-		return BinaryOpType(IsNotEqualFunction)
+		return BinaryOpType(operators.IsNotEqualFunction)
 	case ZEND_IS_SMALLER:
-		return BinaryOpType(IsSmallerFunction)
+		return BinaryOpType(operators.IsSmallerFunction)
 	case ZEND_IS_SMALLER_OR_EQUAL:
-		return BinaryOpType(IsSmallerOrEqualFunction)
+		return BinaryOpType(operators.IsSmallerOrEqualFunction)
 	case ZEND_SPACESHIP:
-		return BinaryOpType(CompareFunction)
+		return BinaryOpType(operators.CompareFunction)
 	case ZEND_BW_OR:
-		return BinaryOpType(BitwiseOrFunction)
+		return BinaryOpType(operators.BitwiseOrFunction)
 	case ZEND_BW_AND:
-		return BinaryOpType(BitwiseAndFunction)
+		return BinaryOpType(operators.BitwiseAndFunction)
 	case ZEND_BW_XOR:
-		return BinaryOpType(BitwiseXorFunction)
+		return BinaryOpType(operators.BitwiseXorFunction)
 	case ZEND_BOOL_XOR:
-		return BinaryOpType(BooleanXorFunction)
+		return BinaryOpType(operators.BooleanXorFunction)
 	default:
 		b.Assert(false)
 		return BinaryOpType(nil)

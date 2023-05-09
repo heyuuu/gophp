@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
@@ -41,7 +42,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		if opline.GetOp1Type() == IS_CV && varname.IsUndef() {
 			varname = ZVAL_UNDEFINED_OP1(executeData)
 		}
-		name = ZvalGetString(varname)
+		name = operators.ZvalGetString(varname)
 	}
 	ZendStdUnsetStaticProperty(ce, name)
 	// 	FREE_OP(free_op1)

@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"strings"
 )
@@ -688,7 +689,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 		if name_val.GetType() != types.IS_STRING {
 			core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
 		}
-		name = zend.ZvalGetString(name_val)
+		name = operators.ZvalGetString(name_val)
 		if PhpVarSerializeTryAddSleepProp(ht, props, name, name, struc) == types.SUCCESS {
 			continue
 		}
@@ -1086,7 +1087,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 			return_value.SetFalse()
 			goto cleanup
 		}
-		if classes != nil && (classes.IsType(types.IS_ARRAY) || !zend.ZvalIsTrue(classes)) {
+		if classes != nil && (classes.IsType(types.IS_ARRAY) || !operators.ZvalIsTrue(classes)) {
 			if classes.IsArray() {
 				class_hash = types.NewArray(classes.Array().Len())
 			} else {
@@ -1101,8 +1102,8 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 				var _z *types.Zval = _p.GetVal()
 
 				entry = _z
-				zend.ConvertToStringEx(entry)
-				lcname = zend.ZendStringTolower(entry.String())
+				operators.ConvertToStringEx(entry)
+				lcname = operators.ZendStringTolower(entry.String())
 				types.ZendHashAddEmptyElement(class_hash, lcname.GetStr())
 				// types.ZendStringReleaseEx(lcname, 0)
 			}
@@ -1178,7 +1179,7 @@ cleanup:
 	 * the value we unwrap here. This is compatible with behavior in PHP <=7.0. */
 
 	if return_value.IsReference() {
-		zend.ZendUnwrapReference(return_value)
+		operators.ZendUnwrapReference(return_value)
 	}
 
 	/* Per calling convention we must not return a reference here, so unwrap. We're doing this at

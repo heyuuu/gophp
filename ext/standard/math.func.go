@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
 	"strconv"
@@ -63,7 +64,7 @@ func ZifAbs(number *types.Zval) (*types.Zval, bool) {
 	}
 }
 func ZifCeil(number *types.Zval) (float64, bool) {
-	zend.ConvertScalarToNumberEx(number)
+	operators.ConvertScalarToNumberEx(number)
 	switch number.GetType() {
 	case types.IS_DOUBLE:
 		result := math.Ceil(number.Double())
@@ -76,7 +77,7 @@ func ZifCeil(number *types.Zval) (float64, bool) {
 	}
 }
 func ZifFloor(number *types.Zval) (float64, bool) {
-	zend.ConvertScalarToNumberEx(number)
+	operators.ConvertScalarToNumberEx(number)
 	switch number.GetType() {
 	case types.IS_DOUBLE:
 		result := math.Floor(number.Double())
@@ -93,7 +94,7 @@ func ZifRound(number *types.Zval, _ zpp.Opt, precision int, mode_ *int) (float64
 	var mode = b.Option(mode_, PHP_ROUND_HALF_UP)
 
 	precision = b.FixRange(precision, core.INT_MIN+1, core.INT_MAX)
-	zend.ConvertScalarToNumberEx(value)
+	operators.ConvertScalarToNumberEx(value)
 	if value.IsLong() && precision >= 0 {
 		/* Simple case - long that doesn't need to be rounded. */
 		return float64(value.Long()), true
@@ -155,7 +156,7 @@ func ZifIsNan(val float64) bool {
 	return math.IsNaN(val)
 }
 func ZifPow(returnValue zpp.Ret, base *types.Zval, exponent *types.Zval) {
-	zend.PowFunction(returnValue, base, exponent)
+	operators.PowFunction(returnValue, base, exponent)
 }
 func ZifExp(number float64) float64 {
 	return math.Exp(number)
@@ -263,15 +264,15 @@ func _parseStringToNumber(s string, base int) (types.Number, bool) {
 }
 
 func ZifBindec(binaryNumber *types.Zval) (*types.Zval, bool) {
-	zend.ConvertToStringEx(binaryNumber)
+	operators.ConvertToStringEx(binaryNumber)
 	return _parseStringToNumberZval(binaryNumber.StringVal(), 2)
 }
 func ZifHexdec(hexadecimalNumber *types.Zval) (*types.Zval, bool) {
-	zend.ConvertToStringEx(hexadecimalNumber)
+	operators.ConvertToStringEx(hexadecimalNumber)
 	return _parseStringToNumberZval(hexadecimalNumber.StringVal(), 16)
 }
 func ZifOctdec(octalNumber *types.Zval) (*types.Zval, bool) {
-	zend.ConvertToStringEx(octalNumber)
+	operators.ConvertToStringEx(octalNumber)
 	return _parseStringToNumberZval(octalNumber.StringVal(), 8)
 }
 func ZifDecbin(decimalNumber int) string {
@@ -284,7 +285,7 @@ func ZifDechex(decimalNumber int) string {
 	return strconv.FormatInt(int64(decimalNumber), 16)
 }
 func ZifBaseConvert(number *types.Zval, frombase int, tobase int) (string, bool) {
-	if zend.TryConvertToString(number) == 0 { // fail
+	if operators.TryConvertToString(number) == 0 { // fail
 		return "", false
 	}
 	if frombase < 2 || frombase > 36 {

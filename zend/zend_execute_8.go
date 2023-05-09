@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendVmStackExtendCallFrame(call **ZendExecuteData, passed_args uint32, additional_args uint32) {
@@ -254,7 +255,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 	var called_scope *types.ClassEntry
 	var lcname *types.String
 	var colon *byte
-	if b.Assign(&colon, ZendMemrchr(function.GetVal(), ':', function.GetLen())) != nil && colon > function.GetVal() && (*(colon - 1)) == ':' {
+	if b.Assign(&colon, operators.ZendMemrchr(function.GetVal(), ':', function.GetLen())) != nil && colon > function.GetVal() && (*(colon - 1)) == ':' {
 		var mname *types.String
 		var cname_length int = colon - function.GetVal() - 1
 		var mname_length int = function.GetLen() - cname_length - (b.SizeOf("\"::\"") - 1)
@@ -292,9 +293,9 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 	} else {
 		if function.GetStr()[0] == '\\' {
 			lcname = types.ZendStringAlloc(function.GetLen()-1, 0)
-			ZendStrTolowerCopy(lcname.GetVal(), function.GetVal()+1, function.GetLen()-1)
+			operators.ZendStrTolowerCopy(lcname.GetVal(), function.GetVal()+1, function.GetLen()-1)
 		} else {
-			lcname = ZendStringTolower(function)
+			lcname = operators.ZendStringTolower(function)
 		}
 
 		fbc = EG__().FunctionTable().Get(lcname.GetStr())

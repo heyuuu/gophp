@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -143,13 +144,13 @@ func UserfilterFilter(
 	call_result = zend.CallUserFunctionEx(obj, &func_name, &retval, 4, args, 0)
 	// zend.ZvalPtrDtor(&func_name)
 	if call_result == types.SUCCESS && retval.IsNotUndef() {
-		zend.ConvertToLong(&retval)
+		operators.ConvertToLong(&retval)
 		ret = int(retval.Long())
 	} else if call_result == types.FAILURE {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "failed to call filter function")
 	}
 	if bytes_consumed != nil {
-		*bytes_consumed = zend.ZvalGetLong(&args[2])
+		*bytes_consumed = operators.ZvalGetLong(&args[2])
 	}
 	if buckets_in.GetHead() != nil {
 		var bucket *streams.PhpStreamBucket = buckets_in.GetHead()

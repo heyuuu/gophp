@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, cache_slot *any, opline *ZendOp, executeData *ZendExecuteData) {
@@ -31,9 +32,9 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	}
 	types.ZVAL_COPY_DEREF(&z_copy, z)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		IncrementFunction(&z_copy)
+		operators.IncrementFunction(&z_copy)
 	} else {
-		DecrementFunction(&z_copy)
+		operators.DecrementFunction(&z_copy)
 	}
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), &z_copy)
@@ -211,7 +212,7 @@ func SlowIndexConvertEx(ht *types.Array, dim *types.Zval, executeData *ZendExecu
 	case types.IS_NULL:
 		return types.NewZvalString("")
 	case types.IS_DOUBLE:
-		return types.NewZvalLong(DvalToLval(dim.Double()))
+		return types.NewZvalLong(operators.DvalToLval(dim.Double()))
 	case types.IS_RESOURCE:
 		ZendUseResourceAsOffset(dim)
 		return types.NewZvalLong(dim.ResourceHandle())

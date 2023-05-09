@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -213,7 +214,7 @@ func PhpUrlEncodeHashEx(
 				formstr.AppendString("1")
 			default:
 				var ekey *types.String
-				var str *types.String = zend.ZvalGetString(zdata)
+				var str *types.String = operators.ZvalGetString(zdata)
 				if enc_type == PHP_QUERY_RFC3986 {
 					ekey = PhpRawUrlEncode(str.GetVal(), str.GetLen())
 				} else {

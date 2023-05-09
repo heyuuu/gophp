@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendWrongStringOffset(executeData *ZendExecuteData) {
@@ -133,7 +134,7 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	faults.ThrowErrorEx(nil, msg)
 }
 func ZendWrongPropertyRead(property *types.Zval) {
-	var property_name *types.String = ZvalGetString(property)
+	var property_name *types.String = operators.ZvalGetString(property)
 	faults.Error(faults.E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
 }
 func ZendDeprecatedFunction(fbc types.IFunction) {
@@ -165,7 +166,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 
 		/* Convert to string, just the time to pick the 1st byte */
 
-		var tmp *types.String = ZvalTryGetString(value)
+		var tmp *types.String = operators.ZvalTryGetString(value)
 		if tmp == nil {
 			if RETURN_VALUE_USED(opline) {
 				opline.Result().SetUndef()
@@ -271,9 +272,9 @@ func ZendIncdecTypedRef(ref *types.ZendReference, copy *types.Zval, opline *Zend
 	}
 	types.ZVAL_COPY(copy, var_ptr)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		IncrementFunction(var_ptr)
+		operators.IncrementFunction(var_ptr)
 	} else {
-		DecrementFunction(var_ptr)
+		operators.DecrementFunction(var_ptr)
 	}
 	if var_ptr.IsDouble() && copy.IsLong() {
 		var val ZendLong = ZendThrowIncdecRefError(ref, opline)
@@ -293,9 +294,9 @@ func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *types.Zval, copy 
 	}
 	types.ZVAL_COPY(copy, var_ptr)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		IncrementFunction(var_ptr)
+		operators.IncrementFunction(var_ptr)
 	} else {
-		DecrementFunction(var_ptr)
+		operators.DecrementFunction(var_ptr)
 	}
 	if var_ptr.IsDouble() && copy.IsLong() {
 		var val ZendLong = ZendThrowIncdecPropError(prop_info, opline)
@@ -311,9 +312,9 @@ func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *types.Zval, copy 
 func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
 	if prop.IsLong() {
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-			FastLongIncrementFunction(prop)
+			operators.FastLongIncrementFunction(prop)
 		} else {
-			FastLongDecrementFunction(prop)
+			operators.FastLongDecrementFunction(prop)
 		}
 		if prop.GetType() != types.IS_LONG && prop_info != nil {
 			var val ZendLong = ZendThrowIncdecPropError(prop_info, opline)
@@ -332,9 +333,9 @@ func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, op
 			if prop_info != nil {
 				ZendIncdecTypedProp(prop_info, prop, nil, opline, executeData)
 			} else if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-				IncrementFunction(prop)
+				operators.IncrementFunction(prop)
 			} else {
-				DecrementFunction(prop)
+				operators.DecrementFunction(prop)
 			}
 			break
 		}
@@ -347,9 +348,9 @@ func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, o
 	if prop.IsLong() {
 		opline.Result().SetLong(prop.Long())
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-			FastLongIncrementFunction(prop)
+			operators.FastLongIncrementFunction(prop)
 		} else {
-			FastLongDecrementFunction(prop)
+			operators.FastLongDecrementFunction(prop)
 		}
 		if prop.GetType() != types.IS_LONG && prop_info != nil {
 			var val ZendLong = ZendThrowIncdecPropError(prop_info, opline)
@@ -369,9 +370,9 @@ func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, o
 		} else {
 			types.ZVAL_COPY(opline.Result(), prop)
 			if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-				IncrementFunction(prop)
+				operators.IncrementFunction(prop)
 			} else {
-				DecrementFunction(prop)
+				operators.DecrementFunction(prop)
 			}
 		}
 	}
@@ -400,9 +401,9 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	types.ZVAL_COPY_DEREF(&z_copy, z)
 	types.ZVAL_COPY(opline.Result(), &z_copy)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		IncrementFunction(&z_copy)
+		operators.IncrementFunction(&z_copy)
 	} else {
-		DecrementFunction(&z_copy)
+		operators.DecrementFunction(&z_copy)
 	}
 	types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
 	// OBJ_RELEASE(obj.Object())

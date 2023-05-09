@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendCompileFuncGetArgs(result *Znode, args *ZendAstList) int {
@@ -135,7 +136,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var lcname *types.String
 	var fbc types.IFunction
 	var opline *ZendOp
-	lcname = ZendStringTolower(name.String())
+	lcname = operators.ZendStringTolower(name.String())
 
 	fbc = CG__().FunctionTable().Get(lcname.GetStr())
 	if fbc != nil && lcname.GetStr() == "assert" {
@@ -320,7 +321,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 	var result Znode
 	ZendCompileExpr(&name_node, name_ast)
 	if name_node.GetOpType() == IS_CONST {
-		ConvertToString(name_node.GetConstant())
+		operators.ConvertToString(name_node.GetConstant())
 	}
 	if IsThisFetch(var_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as global variable")

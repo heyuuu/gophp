@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -33,7 +34,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 			key = _p.GetKey()
 			val = _z
 			key_tmp.SetString(key)
-			CompareFunction(&result_tmp, op1, &key_tmp)
+			operators.CompareFunction(&result_tmp, op1, &key_tmp)
 			if result_tmp.Long() == 0 {
 				result = val
 				break
@@ -74,7 +75,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 			key = _p.GetKey()
 			val = _z
 			key_tmp.SetString(key)
-			CompareFunction(&result_tmp, op1, &key_tmp)
+			operators.CompareFunction(&result_tmp, op1, &key_tmp)
 			if result_tmp.Long() == 0 {
 				result = val
 				break
@@ -116,7 +117,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			key = _p.GetKey()
 			val = _z
 			key_tmp.SetString(key)
-			CompareFunction(&result_tmp, op1, &key_tmp)
+			operators.CompareFunction(&result_tmp, op1, &key_tmp)
 			if result_tmp.Long() == 0 {
 				result = val
 				break
@@ -157,7 +158,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			key = _p.GetKey()
 			val = _z
 			key_tmp.SetString(key)
-			CompareFunction(&result_tmp, op1, &key_tmp)
+			operators.CompareFunction(&result_tmp, op1, &key_tmp)
 			if result_tmp.Long() == 0 {
 				result = val
 				break

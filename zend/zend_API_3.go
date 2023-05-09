@@ -3,6 +3,7 @@ package zend
 import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -32,7 +33,7 @@ func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec str
 		object := args[0].(**types.Zval)
 		ce := args[1].(*types.ClassEntry)
 		*object = this_ptr
-		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
+		if ce != nil && operators.InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() must be derived from %s::%s", types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName(), ce.GetName().GetVal(), GetActiveFunctionName())
 		}
 		ret := zpp.ParseVaArgs(num_args, type_spec[1:], args[2:], 0)

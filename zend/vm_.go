@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 // ZEND_BW_OR
@@ -50,7 +51,7 @@ func getPowHandler(executeData *ZendExecuteData) int {
 	var op1 *types.Zval = executeData.Op1(opline, opMode2)
 	var op2 *types.Zval = executeData.Op2(opline, opMode2)
 
-	PowFunction(opline.Result(), op1, op2)
+	operators.PowFunction(opline.Result(), op1, op2)
 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -67,7 +68,7 @@ func getBwNotHandler(executeData *ZendExecuteData) int {
 	if op1.IsUndef() {
 		op1 = ZVAL_UNDEFINED_OP1(executeData)
 	}
-	BitwiseNotFunction(opline.Result(), op1)
+	operators.BitwiseNotFunction(opline.Result(), op1)
 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -86,7 +87,7 @@ func getBoolNotHandler(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	} else {
-		opline.Result().SetBool(!ZvalIsTrue(op1))
+		opline.Result().SetBool(!operators.ZvalIsTrue(op1))
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 
@@ -99,7 +100,7 @@ func getBoolXorHandler(executeData *ZendExecuteData) int {
 	var op1 *types.Zval = executeData.Op1(opline, opMode2)
 	var op2 *types.Zval = executeData.Op2(opline, opMode2)
 
-	BooleanXorFunction(opline.Result(), op1, op2)
+	operators.BooleanXorFunction(opline.Result(), op1, op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 
@@ -109,7 +110,7 @@ func getIsIdenticalHandler(executeData *ZendExecuteData) int {
 	var op1 *types.Zval = executeData.Op1(opline, opMode0)
 	var op2 *types.Zval = executeData.Op2(opline, opMode0)
 
-	result := FastIsIdenticalFunction(op1, op2)
+	result := operators.FastIsIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 
@@ -122,7 +123,7 @@ func getIsNotIdenticalHandler(executeData *ZendExecuteData) int {
 	var op1 *types.Zval = executeData.Op1(opline, opMode0)
 	var op2 *types.Zval = executeData.Op2(opline, opMode0)
 
-	result := FastIsNotIdenticalFunction(op1, op2)
+	result := operators.FastIsNotIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 
@@ -136,12 +137,12 @@ func getIsEqualHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	var result bool
-	switch TypePair(op1.GetType(), op2.GetType()) {
-	case TypePair(types.IS_LONG, types.IS_LONG):
+	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	case operators.TypePair(types.IS_LONG, types.IS_LONG):
 		result = op1.Long() == op2.Long()
-	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
-		TypePair(types.IS_LONG, types.IS_DOUBLE),
-		TypePair(types.IS_DOUBLE, types.IS_LONG):
+	case operators.TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		operators.TypePair(types.IS_LONG, types.IS_DOUBLE),
+		operators.TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -154,8 +155,8 @@ func getIsEqualHandler(executeData *ZendExecuteData) int {
 			d2 = op2.Double()
 		}
 		result = d1 == d2
-	case TypePair(types.IS_STRING, types.IS_STRING):
-		result = ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
+	case operators.TypePair(types.IS_STRING, types.IS_STRING):
+		result = operators.ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
 	default:
 		return zend_is_equal_helper_SPEC(op1, op2, executeData)
 	}
@@ -187,12 +188,12 @@ func getIsNotEqualHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	var result bool
-	switch TypePair(op1.GetType(), op2.GetType()) {
-	case TypePair(types.IS_LONG, types.IS_LONG):
+	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	case operators.TypePair(types.IS_LONG, types.IS_LONG):
 		result = op1.Long() != op2.Long()
-	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
-		TypePair(types.IS_LONG, types.IS_DOUBLE),
-		TypePair(types.IS_DOUBLE, types.IS_LONG):
+	case operators.TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		operators.TypePair(types.IS_LONG, types.IS_DOUBLE),
+		operators.TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -205,8 +206,8 @@ func getIsNotEqualHandler(executeData *ZendExecuteData) int {
 			d2 = op2.Double()
 		}
 		result = d1 != d2
-	case TypePair(types.IS_STRING, types.IS_STRING):
-		result = !ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
+	case operators.TypePair(types.IS_STRING, types.IS_STRING):
+		result = !operators.ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
 	default:
 		return zend_is_not_equal_helper_SPEC(op1, op2, executeData)
 	}

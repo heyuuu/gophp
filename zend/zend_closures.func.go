@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_CLOSURE_OBJECT(op_array types.IFunction) *types.ZendObject {
@@ -33,7 +34,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 			faults.Error(faults.E_WARNING, "Cannot bind an instance to a static closure")
 			return 0
 		}
-		if is_fake_closure != 0 && func_.GetScope() != nil && InstanceofFunction(types.Z_OBJCE_P(newthis), func_.GetScope()) == 0 {
+		if is_fake_closure != 0 && func_.GetScope() != nil && operators.InstanceofFunction(types.Z_OBJCE_P(newthis), func_.GetScope()) == 0 {
 
 			/* Binding incompatible $this to an internal method is not supported. */
 
@@ -132,7 +133,7 @@ func zim_Closure_call(executeData *ZendExecuteData, return_value *types.Zval) {
 	fci.SetNoSeparation(1)
 	if ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && closure_result.IsNotUndef() {
 		if closure_result.IsReference() {
-			ZendUnwrapReference(&closure_result)
+			operators.ZendUnwrapReference(&closure_result)
 		}
 		types.ZVAL_COPY_VALUE(return_value, &closure_result)
 	}
@@ -165,7 +166,7 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 		} else if scope_arg.IsNull() {
 			ce = nil
 		} else {
-			var class_name *types.String = ZvalGetString(scope_arg)
+			var class_name *types.String = operators.ZvalGetString(scope_arg)
 			if class_name.GetStr() == "static" {
 				ce = closure.GetFunc().GetScope()
 			} else if b.Assign(&ce, ZendLookupClass(class_name)) == nil {
@@ -264,7 +265,7 @@ func zim_Closure_fromCallable(executeData *ZendExecuteData, return_value *types.
 	if ZendParseParameters(executeData.NumArgs(), "z", &callable) == types.FAILURE {
 		return
 	}
-	if callable.IsObject() && InstanceofFunction(types.Z_OBJCE_P(callable), ZendCeClosure) != 0 {
+	if callable.IsObject() && operators.InstanceofFunction(types.Z_OBJCE_P(callable), ZendCeClosure) != 0 {
 
 		/* It's already a closure */
 

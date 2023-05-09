@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_INSTANCEOF_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -24,7 +25,7 @@ try_instanceof:
 			}
 		}
 
-		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
+		result = ce != nil && operators.InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {
 		expr = types.Z_REFVAL_P(expr)
 		goto try_instanceof
@@ -52,7 +53,7 @@ try_instanceof:
 		{
 			ce = opline.Op2().Class()
 		}
-		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
+		result = ce != nil && operators.InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {
 		expr = types.Z_REFVAL_P(expr)
 		goto try_instanceof
@@ -87,7 +88,7 @@ try_instanceof:
 			}
 		}
 
-		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
+		result = ce != nil && operators.InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {
 		expr = types.Z_REFVAL_P(expr)
 		goto try_instanceof
@@ -120,7 +121,7 @@ try_instanceof:
 			}
 		}
 
-		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
+		result = ce != nil && operators.InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {
 		expr = types.Z_REFVAL_P(expr)
 		goto try_instanceof
@@ -146,7 +147,7 @@ try_instanceof:
 		{
 			ce = opline.Op2().Class()
 		}
-		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
+		result = ce != nil && operators.InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {
 		expr = types.Z_REFVAL_P(expr)
 		goto try_instanceof
@@ -178,7 +179,7 @@ try_instanceof:
 			}
 		}
 
-		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
+		result = ce != nil && operators.InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {
 		expr = types.Z_REFVAL_P(expr)
 		goto try_instanceof

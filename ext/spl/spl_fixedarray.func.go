@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func SplFixedArrayFromObj(obj *types.ZendObject) *SplFixedarrayObject {
@@ -336,7 +337,7 @@ func SplFixedarrayObjectHasDimensionHelper(intern *SplFixedarrayObject, offset *
 		if intern.GetArray().GetElements()[index].IsUndef() {
 			retval = 0
 		} else if check_empty != 0 {
-			if zend.IZendIsTrue(intern.GetArray().GetElements()[index]) != 0 {
+			if operators.IZendIsTrue(intern.GetArray().GetElements()[index]) != 0 {
 				retval = 1
 			} else {
 				retval = 0
@@ -356,7 +357,7 @@ func SplFixedarrayObjectHasDimension(object *types.Zval, offset *types.Zval, che
 		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetHas(), "offsetExists", &rv, offset)
 		// zend.ZvalPtrDtor(offset)
-		result = zend.IZendIsTrue(&rv)
+		result = operators.IZendIsTrue(&rv)
 		// zend.ZvalPtrDtor(&rv)
 		return result
 	}
@@ -369,7 +370,7 @@ func SplFixedarrayObjectCountElements(object *types.Zval, count *zend.ZendLong) 
 		var rv types.Zval
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
 		if !(rv.IsUndef()) {
-			*count = zend.ZvalGetLong(&rv)
+			*count = operators.ZvalGetLong(&rv)
 			// zend.ZvalPtrDtor(&rv)
 		} else {
 			*count = 0

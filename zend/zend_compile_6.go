@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendCompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses_ast *ZendAst) {
@@ -198,7 +199,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	}
 	op_array.SetScope(ce)
 	op_array.SetFunctionName(name.Copy())
-	lcname = ZendStringTolower(name)
+	lcname = operators.ZendStringTolower(name)
 	//lcname = types.ZendNewInternedString(lcname)
 	if !ce.FunctionTable().Add(name.GetStr(), op_array) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::%s()", ce.GetName().GetVal(), name.GetVal())
@@ -332,7 +333,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	unqualified_name = decl.GetName()
 	name = ZendPrefixWithNs(unqualified_name)
 	op_array.SetFunctionName(name)
-	lcname = ZendStringTolower(name)
+	lcname = operators.ZendStringTolower(name)
 	if FC__().GetImportsFunction() != nil {
 		var import_name *types.String = ZendHashFindPtrLc(FC__().GetImportsFunction(), unqualified_name.GetVal(), unqualified_name.GetLen())
 		if import_name != nil && !(ascii.StrCaseEquals(lcname.GetStr(), import_name.GetStr())) {
@@ -539,7 +540,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 					if value_zv.GetType() != types.IS_DOUBLE && value_zv.GetType() != types.IS_LONG {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type float can only be float or int")
 					}
-					ConvertToDouble(&value_zv)
+					operators.ConvertToDouble(&value_zv)
 				} else if !(types.ZEND_SAME_FAKE_TYPE(type_.Code(), value_zv.GetType())) {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be %s", types.ZendGetTypeByConst(type_.Code()), types.ZendGetTypeByConst(type_.Code()))
 				}
@@ -654,7 +655,7 @@ func ZendCompileUseTrait(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as trait name "+"as it is reserved", name.GetVal())
 		}
 		ce.GetTraitNames()[ce.GetNumTraits()].SetName(ZendResolveClassNameAst(trait_ast))
-		ce.GetTraitNames()[ce.GetNumTraits()].SetLcName(ZendStringTolower(ce.GetTraitNames()[ce.GetNumTraits()].GetName()))
+		ce.GetTraitNames()[ce.GetNumTraits()].SetLcName(operators.ZendStringTolower(ce.GetTraitNames()[ce.GetNumTraits()].GetName()))
 		ce.GetNumTraits()++
 	}
 	if adaptations == nil {
@@ -686,7 +687,7 @@ func ZendCompileImplements(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as interface name as it is reserved", name.GetVal())
 		}
 		interface_names[i].SetName(ZendResolveClassNameAst(class_ast))
-		interface_names[i].SetLcName(ZendStringTolower(interface_names[i].GetName()))
+		interface_names[i].SetLcName(operators.ZendStringTolower(interface_names[i].GetName()))
 	}
 	ce.SetIsImplementInterfaces(true)
 	ce.SetNumInterfaces(list.GetChildren())
@@ -715,7 +716,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		ZendAssertValidClassName(unqualified_name.GetStr())
 		name = ZendPrefixWithNs(unqualified_name)
 		//name = types.ZendNewInternedString(name)
-		lcname = ZendStringTolower(name)
+		lcname = operators.ZendStringTolower(name)
 		if FC__().GetImports() != nil {
 			var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), unqualified_name.GetVal(), unqualified_name.GetLen())
 			if import_name != nil && !(ascii.StrCaseEquals(lcname.GetStr(), import_name.GetStr())) {
@@ -729,7 +730,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		lcname = nil
 		for {
 			name = ZendGenerateAnonClassName(decl.GetStartLineno())
-			lcname = ZendStringTolower(name)
+			lcname = operators.ZendStringTolower(name)
 			if !CG__().ClassTable().Exists(name.GetStr()) {
 				break
 			}
@@ -848,7 +849,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 
 		/* Lowercased parent name */
 
-		var lc_parent_name *types.String = ZendStringTolower(ce.GetParentName())
+		var lc_parent_name *types.String = operators.ZendStringTolower(ce.GetParentName())
 		opline.SetOp2Type(IS_CONST)
 		LITERAL_STR(opline.GetOp2(), lc_parent_name)
 	}

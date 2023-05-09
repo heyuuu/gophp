@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -299,7 +300,7 @@ func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *type
 	var colon *byte
 	if EG__().GetException() != nil {
 		return types.FAILURE
-	} else if b.Assign(&colon, (*byte)(ZendMemrchr(name.GetVal(), ':', name.GetLen()))) {
+	} else if b.Assign(&colon, (*byte)(operators.ZendMemrchr(name.GetVal(), ':', name.GetLen()))) {
 		faults.ThrowError(nil, "Undefined class constant '%s'", name.GetVal())
 		return types.FAILURE
 	} else if (attr & IS_CONSTANT_UNQUALIFIED) == 0 {
@@ -308,7 +309,7 @@ func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *type
 	} else {
 		var actual *byte = name.GetVal()
 		var actual_len int = name.GetLen()
-		var slash *byte = (*byte)(ZendMemrchr(actual, '\\', actual_len))
+		var slash *byte = (*byte)(operators.ZendMemrchr(actual, '\\', actual_len))
 		if slash != nil {
 			actual = slash + 1
 			actual_len -= actual - name.GetVal()
@@ -595,9 +596,9 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 		}
 		if name.GetStr()[0] == '\\' {
 			lc_name = types.ZendStringAlloc(name.GetLen()-1, 0)
-			ZendStrTolowerCopy(lc_name.GetVal(), name.GetVal()+1, name.GetLen()-1)
+			operators.ZendStrTolowerCopy(lc_name.GetVal(), name.GetVal()+1, name.GetLen()-1)
 		} else {
-			lc_name = ZendStringTolower(name)
+			lc_name = operators.ZendStringTolower(name)
 		}
 	}
 
@@ -942,7 +943,7 @@ func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_typ
 				exception_zv.SetObject(EG__().GetException())
 				// 				exception_zv.AddRefcount()
 				faults.ClearException()
-				exception_str = ZvalGetString(&exception_zv)
+				exception_str = operators.ZvalGetString(&exception_zv)
 				faults.ErrorNoreturn(faults.E_ERROR, "During class fetch: Uncaught %s", exception_str.GetVal())
 			}
 			return nil

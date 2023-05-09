@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
@@ -12,7 +13,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 	var tmp_inc_filename types.Zval
 	tmp_inc_filename.SetUndef()
 	if inc_filename.GetType() != types.IS_STRING {
-		var tmp *types.String = ZvalTryGetString(inc_filename)
+		var tmp *types.String = operators.ZvalTryGetString(inc_filename)
 		if tmp == nil {
 			return nil
 		}
@@ -163,7 +164,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 	if c == nil {
 		if check_defined_only == 0 {
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
-				var actual *byte = (*byte)(ZendMemrchr(opline.Const2().String().GetVal(), '\\', opline.Const2().String().GetLen()))
+				var actual *byte = (*byte)(operators.ZendMemrchr(opline.Const2().String().GetVal(), '\\', opline.Const2().String().GetLen()))
 				if actual == nil {
 					opline.Result().SetStringCopy(opline.Const2().String())
 				} else {
@@ -204,7 +205,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 
 				/* Namespaces are always case-insensitive. Only compare shortname. */
 
-				ns_sep = ZendMemrchr(c.GetName().GetVal(), '\\', c.GetName().GetLen())
+				ns_sep = operators.ZendMemrchr(c.GetName().GetVal(), '\\', c.GetName().GetLen())
 				if ns_sep != nil {
 					shortname_offset = ns_sep - c.GetName().GetVal() + 1
 					shortname_len = c.GetName().GetLen() - shortname_offset

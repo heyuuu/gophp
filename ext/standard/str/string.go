@@ -11,6 +11,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
 	"math/rand"
@@ -499,11 +500,11 @@ func ZifImplode(glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
 		pieces = arg1.Array()
 	} else {
 		if arg1.IsType(types.IS_ARRAY) {
-			glue = zend.ZvalGetStrVal(arg2)
+			glue = operators.ZvalGetStrVal(arg2)
 			pieces = arg1.Array()
 			core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
 		} else if arg2.IsType(types.IS_ARRAY) {
-			glue = zend.ZvalGetStrVal(arg1)
+			glue = operators.ZvalGetStrVal(arg1)
 			pieces = arg2.Array()
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid arguments passed")
@@ -515,7 +516,7 @@ func ZifImplode(glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
 func PhpImplode(glue string, pieces *types.Array) string {
 	var parts []string
 	pieces.ForeachIndirect(func(_ types.ArrayKey, value *types.Zval) {
-		parts = append(parts, zend.ZvalGetStrVal(value))
+		parts = append(parts, operators.ZvalGetStrVal(value))
 	})
 	return strings.Join(parts, glue)
 }
@@ -686,7 +687,7 @@ func PhpNeedleChar(needle *types.Zval) (byte, bool) {
 	case types.IS_TRUE:
 		return 1, true
 	case types.IS_DOUBLE, types.IS_OBJECT:
-		return byte(zend.ZvalGetLong(needle)), true
+		return byte(operators.ZvalGetLong(needle)), true
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "needle is not a string or an integer")
 		return 0, false
@@ -993,7 +994,7 @@ func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length
 	if replace.IsArray() {
 		_, replZval := replace.Array().First()
 		if replZval != nil {
-			replStr = zend.ZvalGetStrVal(replZval)
+			replStr = operators.ZvalGetStrVal(replZval)
 		} else {
 			replStr = ""
 		}
@@ -1011,21 +1012,21 @@ func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval
 	var replaceStr []string
 	if replace.IsArray() {
 		replace.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
-			replaceStr = append(replaceStr, zend.ZvalGetStrVal(value))
+			replaceStr = append(replaceStr, operators.ZvalGetStrVal(value))
 		})
 	}
 
 	var startPoints []int
 	if start.IsArray() {
 		start.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
-			startPoints = append(startPoints, zend.ZvalGetLong(value))
+			startPoints = append(startPoints, operators.ZvalGetLong(value))
 		})
 	}
 
 	var lengthPoints []int
 	if length != nil && length.IsArray() {
 		length.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
-			lengthPoints = append(lengthPoints, zend.ZvalGetLong(value))
+			lengthPoints = append(lengthPoints, operators.ZvalGetLong(value))
 		})
 	}
 
@@ -1033,7 +1034,7 @@ func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval
 	str.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 		idx++
 
-		origStr := zend.ZvalGetStrVal(value)
+		origStr := operators.ZvalGetStrVal(value)
 
 		// f
 		var f int = 0
@@ -1081,16 +1082,16 @@ func ZifSubstrReplace(returnValue zpp.Ret, str *types.Zval, replace *types.Zval,
 	// 限定参数类型
 	// - substr_replace(array|string $str, array|string $replace, array|int $start, array|int|null $length = null)
 	if !str.IsArray() {
-		zend.ConvertToStringEx(str)
+		operators.ConvertToStringEx(str)
 	}
 	if !replace.IsArray() {
-		zend.ConvertToStringEx(replace)
+		operators.ConvertToStringEx(replace)
 	}
 	if !start.IsArray() {
-		zend.ConvertToLong(start)
+		operators.ConvertToLong(start)
 	}
 	if length != nil && !length.IsArray() {
-		zend.ConvertToLong(length)
+		operators.ConvertToLong(length)
 	}
 	if zend.EG__().GetException() != nil {
 		return
@@ -1246,7 +1247,7 @@ func phpStrtrArray(str string, pats *types.Array) (string, bool) {
 				continue
 			}
 
-			replaceStr := zend.ZvalGetStrVal(replaceZval)
+			replaceStr := operators.ZvalGetStrVal(replaceZval)
 			result.WriteString(str[oldPos:pos])
 			result.WriteString(replaceStr)
 			oldPos = pos + len_
@@ -1367,13 +1368,13 @@ func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, boo
 				return str, true
 			}
 
-			replace := zend.ZvalGetStrVal(val)
+			replace := operators.ZvalGetStrVal(val)
 			return strings.ReplaceAll(str, strKey, replace), true
 		default:
 			return phpStrtrArray(str, pats)
 		}
 	} else {
-		if zend.TryConvertToString(from) == 0 {
+		if operators.TryConvertToString(from) == 0 {
 			// unreachable, 触发 fatal error
 			return "", false
 		}
@@ -1457,10 +1458,10 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 		if replace.IsArray() {
 			replaceStrings = make([]string, replace.Array().Len())
 			replace.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
-				replaceStrings = append(replaceStrings, zend.ZvalGetStrVal(value))
+				replaceStrings = append(replaceStrings, operators.ZvalGetStrVal(value))
 			})
 		} else {
-			replaceStr = zend.ZvalGetStrVal(replace)
+			replaceStr = operators.ZvalGetStrVal(replace)
 		}
 
 		var result = subject
@@ -1471,7 +1472,7 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 				return
 			}
 
-			searchStr := zend.ZvalGetStrVal(val)
+			searchStr := operators.ZvalGetStrVal(val)
 			if searchStr == "" {
 				return
 			}
@@ -1530,7 +1531,7 @@ func strReplaceArray(subject *types.Array, search *types.Zval, replace *types.Zv
 
 		var result types.Zval
 		if !value.IsArray() && !value.IsObject() {
-			tmpResult, count := strReplaceStr(zend.ZvalGetStrVal(value), search, replace, caseSensitivity)
+			tmpResult, count := strReplaceStr(operators.ZvalGetStrVal(value), search, replace, caseSensitivity)
 			result.SetStringVal(tmpResult)
 			replaceCount += count
 		} else {
@@ -1549,10 +1550,10 @@ func strReplace(returnValue *types.Zval, search *types.Zval, replace *types.Zval
 	// 限定参数类型
 	// - str_replace(array|string $search, array|string $replace, array|string $subject, int|null &$count == null): string|array
 	if !search.IsArray() {
-		zend.ConvertToStringEx(search)
-		zend.ConvertToStringEx(replace)
+		operators.ConvertToStringEx(search)
+		operators.ConvertToStringEx(replace)
 	} else if !replace.IsArray() {
-		zend.ConvertToStringEx(replace)
+		operators.ConvertToStringEx(replace)
 	}
 	if zend.EG__().GetException() != nil {
 		return
@@ -1566,7 +1567,7 @@ func strReplace(returnValue *types.Zval, search *types.Zval, replace *types.Zval
 		returnValue.SetArray(arr)
 	} else {
 		var str string
-		str, count = strReplaceStr(zend.ZvalGetStrVal(subject), search, replace, caseSensitivity)
+		str, count = strReplaceStr(operators.ZvalGetStrVal(subject), search, replace, caseSensitivity)
 		returnValue.SetStringVal(str)
 	}
 
@@ -2026,7 +2027,7 @@ func ZifStripTags(str string, _ zpp.Opt, allowableTags *types.Zval) string {
 		if allow.IsType(types.IS_ARRAY) {
 			var buf strings.Builder
 			allow.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
-				tag := zend.ZvalGetStrVal(value)
+				tag := operators.ZvalGetStrVal(value)
 				buf.WriteByte('<')
 				buf.WriteString(tag)
 				buf.WriteByte('>')
@@ -2034,7 +2035,7 @@ func ZifStripTags(str string, _ zpp.Opt, allowableTags *types.Zval) string {
 			allowTagsStr = buf.String()
 		} else {
 			/* To maintain a certain BC, we allow anything for the second parameter and return original string */
-			zend.ConvertToString(allow)
+			operators.ConvertToString(allow)
 			allowTagsStr = allowableTags.StringVal()
 		}
 	}

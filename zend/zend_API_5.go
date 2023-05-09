@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
+	"github.com/heyuuu/gophp/zend/operators"
 	"strings"
 )
 
@@ -157,7 +158,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 	internal_function.SetModule(EG__().GetCurrentModule())
 	if scope != nil {
 		class_name_len = scope.GetName().GetLen()
-		if b.Assign(&lc_class_name, ZendMemrchr(scope.GetName().GetVal(), '\\', class_name_len)) {
+		if b.Assign(&lc_class_name, operators.ZendMemrchr(scope.GetName().GetVal(), '\\', class_name_len)) {
 			lc_class_name++
 			class_name_len -= lc_class_name - scope.GetName().GetVal()
 			lc_class_name = ascii.StrToLower(b.CastStr(lc_class_name, class_name_len))

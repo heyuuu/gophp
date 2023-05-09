@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ObjectPropertiesInit(object *types.ZendObject, class_type *types.ClassEntry) {
@@ -266,7 +267,7 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 		result = ht.IndexUpdate(key.Long(), value)
 		break
 	case types.IS_DOUBLE:
-		result = ht.IndexUpdate(DvalToLval(key.Double()), value)
+		result = ht.IndexUpdate(operators.DvalToLval(key.Double()), value)
 		break
 	default:
 		faults.Error(faults.E_WARNING, "Illegal offset type")

@@ -4,6 +4,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 /**
@@ -236,7 +237,7 @@ func ErrorNoreturn(typ int, format string, args ...any) {
 }
 func ThrowErrorEx(exceptionCe *types.ClassEntry, message string) {
 	if exceptionCe != nil {
-		if zend.InstanceofFunction(exceptionCe, ZendCeError) == 0 {
+		if operators.InstanceofFunction(exceptionCe, ZendCeError) == 0 {
 			Error(E_NOTICE, "Error exceptions must be derived from Error")
 			exceptionCe = ZendCeError
 		}

@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func SPL_LLIST_DELREF(elem any) {
@@ -299,7 +300,7 @@ func SplDllistObjectCountElements(object *types.Zval, count *zend.ZendLong) int 
 		var rv types.Zval
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
 		if !(rv.IsUndef()) {
-			*count = zend.ZvalGetLong(&rv)
+			*count = operators.ZvalGetLong(&rv)
 			// zend.ZvalPtrDtor(&rv)
 			return types.SUCCESS
 		}

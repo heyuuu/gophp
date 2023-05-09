@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendCallMethodWith0Params(obj *types.Zval, obj_ce *types.ClassEntry, fn_proxy *types.IFunction, function_name string, retval *types.Zval) *types.Zval {
@@ -116,7 +117,7 @@ func ZendCallMethod(
 			fcic.SetCalledScope(types.Z_OBJCE_P(object))
 		} else {
 			var called_scope *types.ClassEntry = ZendGetCalledScope(CurrEX())
-			if obj_ce != nil && (called_scope == nil || InstanceofFunction(called_scope, obj_ce) == 0) {
+			if obj_ce != nil && (called_scope == nil || operators.InstanceofFunction(called_scope, obj_ce) == 0) {
 				fcic.SetCalledScope(obj_ce)
 			} else {
 				fcic.SetCalledScope(called_scope)
@@ -173,7 +174,7 @@ func ZendUserItValid(_iter *ZendObjectIterator) int {
 		var more types.Zval
 		var result int
 		ZendCallMethodWith0Params(object, iter.GetCe(), iter.GetCe().GetIteratorFuncsPtr().GetZfValid(), "valid", &more)
-		result = IZendIsTrue(&more)
+		result = operators.IZendIsTrue(&more)
 		// ZvalPtrDtor(&more)
 		if result != 0 {
 			return types.SUCCESS
@@ -439,7 +440,7 @@ func ZendClassUnserializeDeny(object *types.Zval, ce *types.ClassEntry, buf *uin
 	return types.FAILURE
 }
 func ZendImplementSerializable(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {
-	if class_type.GetParent() && (class_type.GetParent().serialize || class_type.GetParent().unserialize) && InstanceofFunctionEx(class_type.GetParent(), ZendCeSerializable, 1) == 0 {
+	if class_type.GetParent() && (class_type.GetParent().serialize || class_type.GetParent().unserialize) && operators.InstanceofFunctionEx(class_type.GetParent(), ZendCeSerializable, 1) == 0 {
 		return types.FAILURE
 	}
 	if class_type.GetSerialize() == nil {

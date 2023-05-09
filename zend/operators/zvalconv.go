@@ -1,10 +1,11 @@
-package zend
+package operators
 
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard/conv"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"strconv"
 )
@@ -26,7 +27,7 @@ again:
 	case types.IS_ARRAY:
 		return op.Array().Len() != 0
 	case types.IS_OBJECT:
-		if types.Z_OBJ_HT_P(op).GetCastObject() == ZendStdCastObjectTostring {
+		if types.Z_OBJ_HT_P(op).GetCastObject() == zend.ZendStdCastObjectTostring {
 			return true
 		} else {
 			return ZendObjectIsTrue(op)
@@ -65,9 +66,9 @@ func _zvalGetLongFuncEx(op *types.Zval, silent bool) int {
 	case types.IS_STRING:
 		var r conv.ParseNumberResult
 		if silent {
-			r = StrToNumberAllowErrors(op.StringVal())
+			r = zend.StrToNumberAllowErrors(op.StringVal())
 		} else {
-			r = StrToNumberNoticeErrors(op.StringVal())
+			r = zend.StrToNumberNoticeErrors(op.StringVal())
 		}
 		if r.IsInt() {
 			return r.Int()
@@ -126,7 +127,7 @@ func ZvalGetDoubleFunc(op *types.Zval) float64 {
 	case types.IS_DOUBLE:
 		return op.Double()
 	case types.IS_STRING:
-		return ZendStrtod(op.StringVal(), nil)
+		return zend.ZendStrtod(op.StringVal(), nil)
 	case types.IS_ARRAY:
 		if op.Array().Len() != 0 {
 			return 1.0
@@ -190,10 +191,10 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 	case types.IS_LONG:
 		return strconv.Itoa(op.Long()), true
 	case types.IS_DOUBLE:
-		return pfmt.Sprintf("%.*G", EG__().GetPrecision(), op.Double()), true
+		return pfmt.Sprintf("%.*G", zend.EG__().GetPrecision(), op.Double()), true
 	case types.IS_ARRAY:
 		faults.Error(faults.E_NOTICE, "Array to string conversion")
-		if try && EG__().GetException() != nil {
+		if try && zend.EG__().GetException() != nil {
 			return "", false
 		}
 		return types.STR_ARRAY_CAPITALIZED, true
@@ -209,7 +210,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 				return __zvalGetStrFunc(z, try)
 			}
 		}
-		if EG__().GetException() == nil {
+		if zend.EG__().GetException() == nil {
 			faults.ThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
 		}
 		if try {

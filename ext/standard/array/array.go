@@ -9,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
 	"sort"
@@ -139,10 +140,10 @@ func ZifCount(var_ *types.Zval, _ zpp.Opt, mode int) int {
 		}
 
 		/* if not and the object implements Countable we call its count() method */
-		if zend.InstanceofFunction(types.Z_OBJCE_P(array), zend.ZendCeCountable) != 0 {
+		if operators.InstanceofFunction(types.Z_OBJCE_P(array), zend.ZendCeCountable) != 0 {
 			zend.ZendCallMethodWith0Params(array, nil, nil, "count", &retval)
 			if retval.IsNotUndef() {
-				long = zend.ZvalGetLong(&retval)
+				long = operators.ZvalGetLong(&retval)
 			}
 			return long
 		}
@@ -430,7 +431,7 @@ func searchArray(value *types.Zval, array *types.Array, strict bool) *types.Arra
 		} else {
 			array.ForeachIndirectEx(func(key types.ArrayKey, entry *types.Zval) bool {
 				entry = types.ZVAL_DEREF(entry)
-				if zend.FastIsIdenticalFunction(value, entry) != 0 {
+				if operators.FastIsIdenticalFunction(value, entry) != 0 {
 					targetKey = &key
 					return false
 				}
@@ -441,7 +442,7 @@ func searchArray(value *types.Zval, array *types.Array, strict bool) *types.Arra
 		if value.IsLong() {
 			array.ForeachIndirectEx(func(key types.ArrayKey, entry *types.Zval) bool {
 				entry = types.ZVAL_DEREF(entry)
-				if zend.FastEqualCheckLong(value, entry) != 0 {
+				if operators.FastEqualCheckLong(value, entry) != 0 {
 					targetKey = &key
 					return false
 				}
@@ -450,7 +451,7 @@ func searchArray(value *types.Zval, array *types.Array, strict bool) *types.Arra
 		} else if value.IsString() {
 			array.ForeachIndirectEx(func(key types.ArrayKey, entry *types.Zval) bool {
 				entry = types.ZVAL_DEREF(entry)
-				if zend.FastEqualCheckString(value, entry) {
+				if operators.FastEqualCheckString(value, entry) {
 					targetKey = &key
 					return false
 				}
@@ -459,7 +460,7 @@ func searchArray(value *types.Zval, array *types.Array, strict bool) *types.Arra
 		} else {
 			array.ForeachIndirectEx(func(key types.ArrayKey, entry *types.Zval) bool {
 				entry = types.ZVAL_DEREF(entry)
-				if zend.FastEqualCheckFunction(value, entry) {
+				if operators.FastEqualCheckFunction(value, entry) {
 					targetKey = &key
 					return false
 				}
@@ -514,7 +515,7 @@ func ZifArrayFillKeys(keys *types.Array, val *types.Zval) *types.Array {
 		if entry.IsLong() {
 			arr.IndexUpdate(entry.Long(), val)
 		} else {
-			key := zend.ZvalGetStrVal(entry)
+			key := operators.ZvalGetStrVal(entry)
 			arr.SymtableUpdate(key, val)
 		}
 	})
@@ -522,8 +523,8 @@ func ZifArrayFillKeys(keys *types.Array, val *types.Zval) *types.Array {
 }
 func rangeDouble(zLow *types.Zval, zHigh *types.Zval, step float64) ([]*types.Zval, bool) {
 	b.Assert(step > 0)
-	low := zend.ZvalGetDouble(zLow)
-	high := zend.ZvalGetDouble(zHigh)
+	low := operators.ZvalGetDouble(zLow)
+	high := operators.ZvalGetDouble(zHigh)
 	if core.ZendIsInf(high) || core.ZendIsInf(low) {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range supplied: start=%0.0f end=%0.0f", low, high)
 		return nil, false
@@ -551,8 +552,8 @@ func rangeDouble(zLow *types.Zval, zHigh *types.Zval, step float64) ([]*types.Zv
 
 func rangeLong(zLow *types.Zval, zHigh *types.Zval, step int) ([]*types.Zval, bool) {
 	b.Assert(step > 0)
-	low := zend.ZvalGetLong(zLow)
-	high := zend.ZvalGetLong(zHigh)
+	low := operators.ZvalGetLong(zLow)
+	high := operators.ZvalGetLong(zHigh)
 	if high == low {
 		return []*types.Zval{types.NewZvalLong(high)}, true
 	}
@@ -618,7 +619,7 @@ func ZifRange(low_ *types.Zval, high_ *types.Zval, _ zpp.Opt, step_ *types.Zval)
 				return nil, false
 			}
 		}
-		step = zend.ZvalGetDouble(zstep)
+		step = operators.ZvalGetDouble(zstep)
 
 		/* We only want positive step values. */
 		if step < 0.0 {
@@ -806,7 +807,7 @@ func ZifArraySplice(array zpp.RefArray, offset int, _ zpp.Opt, length_ *int, rep
 
 	if replacement != nil {
 		/* Make sure the last argument, if passed, is an array */
-		zend.ConvertToArrayEx(replacement)
+		operators.ConvertToArrayEx(replacement)
 		replaceArr = replacement.Array()
 	}
 
@@ -822,7 +823,7 @@ func ZifArraySlice(array *types.Array, offset int, _ zpp.Opt, length_ *types.Zva
 	if length_ == nil || length_.IsNull() {
 		length = numIn
 	} else {
-		length = zend.ZvalGetLong(length_)
+		length = operators.ZvalGetLong(length_)
 	}
 
 	/* Clamp the offset.. */
@@ -900,15 +901,15 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 		types.SeparateZval(destEntry)
 		destZval = destEntry
 		if destZval.IsType(types.IS_NULL) {
-			zend.ConvertToArrayEx(destZval)
+			operators.ConvertToArrayEx(destZval)
 			zend.AddNextIndexNull(destZval)
 		} else {
-			zend.ConvertToArrayEx(destZval)
+			operators.ConvertToArrayEx(destZval)
 		}
 		tmp.SetUndef()
 		if srcZval.IsType(types.IS_OBJECT) {
 			types.ZVAL_COPY(&tmp, srcZval)
-			zend.ConvertToArray(&tmp)
+			operators.ConvertToArray(&tmp)
 			srcZval = &tmp
 		}
 		if srcZval.IsType(types.IS_ARRAY) {
@@ -1081,13 +1082,13 @@ func ZifArrayKeys(array *types.Array, _ zpp.Opt, searchValue *types.Zval, strict
 		if strict {
 			array.ForeachIndirect(func(key types.ArrayKey, entry *types.Zval) {
 				entry = types.ZVAL_DEREF(entry)
-				if zend.FastIsIdenticalFunction(searchValue, entry) != 0 {
+				if operators.FastIsIdenticalFunction(searchValue, entry) != 0 {
 					keys.Append(key.ToZval())
 				}
 			})
 		} else {
 			array.ForeachIndirect(func(key types.ArrayKey, entry *types.Zval) {
-				if zend.FastEqualCheckFunction(searchValue, entry) {
+				if operators.FastEqualCheckFunction(searchValue, entry) {
 					keys.Append(key.ToZval())
 				}
 			})
@@ -1159,13 +1160,13 @@ func ArrayColumnParamHelper(param *types.Zval, name string) types.ZendBool {
 	switch param.GetType() {
 	case types.IS_DOUBLE:
 		if param.GetType() != types.IS_LONG {
-			zend.ConvertToLong(param)
+			operators.ConvertToLong(param)
 		}
 		fallthrough
 	case types.IS_LONG:
 		return 1
 	case types.IS_OBJECT:
-		if zend.TryConvertToString(param) == 0 {
+		if operators.TryConvertToString(param) == 0 {
 			return 0
 		}
 		fallthrough
@@ -1247,11 +1248,11 @@ func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, i
 				case types.IS_LONG:
 					retArr.IndexUpdate(keyVal.Long(), columnVal)
 				case types.IS_OBJECT:
-					retArr.SymtableUpdate(zend.ZvalGetStrVal(keyVal), columnVal)
+					retArr.SymtableUpdate(operators.ZvalGetStrVal(keyVal), columnVal)
 				case types.IS_NULL:
 					retArr.KeyUpdate("", columnVal)
 				case types.IS_DOUBLE:
-					retArr.IndexUpdate(zend.DvalToLval(keyVal.Double()), columnVal)
+					retArr.IndexUpdate(operators.DvalToLval(keyVal.Double()), columnVal)
 				case types.IS_TRUE:
 					retArr.IndexUpdate(1, columnVal)
 				case types.IS_FALSE:
@@ -1362,7 +1363,7 @@ func ZifArrayUnique(arg *types.Array, _ zpp.Opt, flags *int) *types.Array {
 		existValues := make(map[string]bool, arg.Len())
 		retArr := types.NewArray(arg.Len())
 		arg.ForeachIndirect(func(key types.ArrayKey, val *types.Zval) {
-			var strVal = zend.ZvalGetStrVal(val)
+			var strVal = operators.ZvalGetStrVal(val)
 			if _, exists := existValues[strVal]; !exists {
 				if val.IsReference() && val.GetRefcount() == 1 {
 					val = val.DeRef()
@@ -1396,7 +1397,7 @@ func ZifArrayUnique(arg *types.Array, _ zpp.Opt, flags *int) *types.Array {
 	return retArr
 }
 func ZvalCompare(first *types.Zval, second *types.Zval) int {
-	return zend.StringCompareFunction(first, second)
+	return operators.StringCompareFunction(first, second)
 }
 
 //@zif -c 2,
@@ -1412,7 +1413,7 @@ func ZifArrayIntersectUkey(arrays []*types.Zval, callbackKeyCompareFunc zpp.Call
 
 //@zif -c=2,
 func ZifArrayIntersect(arrays []*types.Zval) (*types.Array, bool) {
-	cmp := arrayDataComparer(zend.StringCompareFunction)
+	cmp := arrayDataComparer(operators.StringCompareFunction)
 	return arrayIntersectWrapper(arrays, cmp)
 }
 
@@ -1428,7 +1429,7 @@ func ZifArrayIntersectAssoc(arrays []*types.Zval) (*types.Array, bool) {
 func ZifArrayIntersectUassoc(arrays []*types.Zval, callbackKeyCompareFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
 		arrayUserKeyComparer(callbackKeyCompareFunc),
-		arrayDataComparer(zend.StringCompareFunction),
+		arrayDataComparer(operators.StringCompareFunction),
 	)
 	return arrayIntersectWrapper(arrays, cmp)
 }
@@ -1466,7 +1467,7 @@ func simpleArrayDiff(array *types.Array, arrays []*types.Array) *types.Array {
 	exclude := make(map[string]bool)
 	for _, diffArray := range arrays {
 		diffArray.ForeachIndirect(func(_ types.ArrayKey, value *types.Zval) {
-			str := zend.ZvalGetStrVal(value)
+			str := operators.ZvalGetStrVal(value)
 			exclude[str] = true
 		})
 	}
@@ -1476,7 +1477,7 @@ func simpleArrayDiff(array *types.Array, arrays []*types.Array) *types.Array {
 
 	retArr := types.NewArray(array.Len())
 	array.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
-		str := zend.ZvalGetStrVal(value)
+		str := operators.ZvalGetStrVal(value)
 		if _, excluded := exclude[str]; !excluded {
 			retArr.Add(key, value)
 		}
@@ -1510,7 +1511,7 @@ func ZifArrayDiffAssoc(arrays []*types.Zval) (*types.Array, bool) {
 func ZifArrayDiffUassoc(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
 		arrayUserKeyComparer(callbackKeyCompFunc),
-		arrayDataComparer(zend.StringCompareFunction),
+		arrayDataComparer(operators.StringCompareFunction),
 	)
 	return arrayDiffWrapper(arrays, cmp)
 }
@@ -1718,8 +1719,8 @@ func ZifArraySum(array *types.Array) *types.Zval {
 			return
 		}
 		types.ZVAL_COPY(&num, entry)
-		zend.ConvertScalarToNumber(&num)
-		zend.FastAddFunction(ret, ret, &num)
+		operators.ConvertScalarToNumber(&num)
+		operators.FastAddFunction(ret, ret, &num)
 	})
 	return ret
 }
@@ -1731,7 +1732,7 @@ func ZifArrayProduct(array *types.Array) *types.Zval {
 			return
 		}
 		types.ZVAL_COPY(&num, entry)
-		zend.ConvertScalarToNumber(&num)
+		operators.ConvertScalarToNumber(&num)
 		if num.IsLong() && ret.IsLong() {
 			dval := float64(num.Long()) * float64(ret.Long())
 			if float64(zend.ZEND_LONG_MIN) <= dval && dval <= float64(zend.ZEND_LONG_MAX) {
@@ -1739,8 +1740,8 @@ func ZifArrayProduct(array *types.Array) *types.Zval {
 				return
 			}
 		}
-		zend.ConvertToDouble(ret)
-		zend.ConvertToDouble(&num)
+		operators.ConvertToDouble(ret)
+		operators.ConvertToDouble(&num)
 		ret.SetDouble(ret.Double() * num.Double())
 	})
 	return ret
@@ -1785,7 +1786,7 @@ func ZifArrayFilter(array_ *types.Array, _ zpp.Opt, callback zpp.Callable, mode 
 			if !ok {
 				return false, false
 			}
-			return zend.ZvalIsTrue(retVal), true
+			return operators.ZvalIsTrue(retVal), true
 		}
 	}
 
@@ -1800,7 +1801,7 @@ func ZifArrayFilter(array_ *types.Array, _ zpp.Opt, callback zpp.Callable, mode 
 				return false
 			}
 		} else {
-			keep = zend.ZvalIsTrue(value)
+			keep = operators.ZvalIsTrue(value)
 		}
 
 		if keep {
@@ -1956,7 +1957,7 @@ func ZifArrayCombine(keys *types.Array, values *types.Array) (*types.Array, bool
 		if key.IsLong() {
 			retArr.IndexUpdate(key.Long(), value)
 		} else {
-			strKey := zend.ZvalGetStrVal(key)
+			strKey := operators.ZvalGetStrVal(key)
 			retArr.KeyUpdate(strKey, value)
 		}
 	}

@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func zend_pre_inc_helper_SPEC_CV(executeData *ZendExecuteData) int {
@@ -27,7 +28,7 @@ func zend_pre_inc_helper_SPEC_CV(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		IncrementFunction(var_ptr)
+		operators.IncrementFunction(var_ptr)
 		break
 	}
 	if RETURN_VALUE_USED(opline) {
@@ -58,7 +59,7 @@ func zend_pre_dec_helper_SPEC_CV(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		DecrementFunction(var_ptr)
+		operators.DecrementFunction(var_ptr)
 		break
 	}
 	if RETURN_VALUE_USED(opline) {
@@ -88,7 +89,7 @@ func zend_post_inc_helper_SPEC_CV(executeData *ZendExecuteData) int {
 			}
 		}
 		types.ZVAL_COPY(opline.Result(), var_ptr)
-		IncrementFunction(var_ptr)
+		operators.IncrementFunction(var_ptr)
 		break
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -115,7 +116,7 @@ func zend_post_dec_helper_SPEC_CV(executeData *ZendExecuteData) int {
 			}
 		}
 		types.ZVAL_COPY(opline.Result(), var_ptr)
-		DecrementFunction(var_ptr)
+		operators.DecrementFunction(var_ptr)
 		break
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

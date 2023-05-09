@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"math"
 )
 
@@ -419,7 +420,7 @@ func ProcessNestedData(
 
 				/* object properties should include no integers */
 
-				zend.ConvertToString(&key)
+				operators.ConvertToString(&key)
 				goto string_key
 			} else {
 				// zend.ZvalPtrDtor(&key)

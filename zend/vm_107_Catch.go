@@ -3,6 +3,7 @@ package zend
 import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -25,7 +26,7 @@ func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ce = EG__().GetException().GetCe()
 	if ce != catch_ce {
-		if catch_ce == nil || InstanceofFunction(ce, catch_ce) == 0 {
+		if catch_ce == nil || operators.InstanceofFunction(ce, catch_ce) == 0 {
 			if (opline.GetExtendedValue() & ZEND_LAST_CATCH) != 0 {
 				faults.RethrowException(executeData)
 				return 0

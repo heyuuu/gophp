@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendTryAssignTypedRefNull(ref *types.ZendReference) int {
@@ -188,7 +189,7 @@ func ZendIsIterable(iterable *types.Zval) types.ZendBool {
 	case types.IS_ARRAY:
 		return 1
 	case types.IS_OBJECT:
-		return InstanceofFunction(types.Z_OBJCE_P(iterable), ZendCeTraversable)
+		return operators.InstanceofFunction(types.Z_OBJCE_P(iterable), ZendCeTraversable)
 	default:
 		return 0
 	}
@@ -201,7 +202,7 @@ func ZendIsCountable(countable *types.Zval) types.ZendBool {
 		if types.Z_OBJ_HT_P(countable).GetCountElements() != nil {
 			return 1
 		}
-		return InstanceofFunction(types.Z_OBJCE_P(countable), ZendCeCountable)
+		return operators.InstanceofFunction(types.Z_OBJCE_P(countable), ZendCeCountable)
 	default:
 		return 0
 	}

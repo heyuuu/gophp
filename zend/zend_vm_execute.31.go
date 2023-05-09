@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendExecuteData) int {
@@ -21,7 +22,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 		if varname.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		name = ZvalTryGetString(varname)
+		name = operators.ZvalTryGetString(varname)
 		if name == nil {
 			opline.Result().SetUndef()
 			return 0

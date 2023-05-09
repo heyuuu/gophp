@@ -11,6 +11,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
+	"github.com/heyuuu/gophp/zend/operators"
 	"log"
 	"os"
 	"strconv"
@@ -1559,7 +1560,7 @@ func PhpHandleAbortedConnection() {
 func PhpHandleAuthData(auth *byte) int {
 	var ret = -1
 	var auth_len int = b.CondF1(auth != nil, func() __auto__ { return strlen(auth) }, 0)
-	if auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Basic ", b.SizeOf("\"Basic \"")-1) == 0 {
+	if auth != nil && auth_len > 0 && operators.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Basic ", b.SizeOf("\"Basic \"")-1) == 0 {
 		var pass *byte
 		var user *types.String
 		user = types.NewString(standard.PhpBase64Decode(b.CastStr((*uint8)(auth+6), auth_len-6)))
@@ -1580,7 +1581,7 @@ func PhpHandleAuthData(auth *byte) int {
 	} else {
 		SG__().RequestInfo.auth_digest = nil
 	}
-	if ret == -1 && auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Digest ", b.SizeOf("\"Digest \"")-1) == 0 {
+	if ret == -1 && auth != nil && auth_len > 0 && operators.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Digest ", b.SizeOf("\"Digest \"")-1) == 0 {
 		SG__().RequestInfo.auth_digest = zend.Estrdup(auth + 7)
 		ret = 0
 	}

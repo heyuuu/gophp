@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -124,7 +125,7 @@ func PhpSetcookie(
 
 			/* check to make sure that the year does not exceed 4 digits in length */
 
-			p = zend.ZendMemrchr(dt.GetVal(), '-', dt.GetLen())
+			p = operators.ZendMemrchr(dt.GetVal(), '-', dt.GetLen())
 			if p == nil || (*(p + 5)) != ' ' {
 				//types.ZendStringFree(dt)
 				buf.Free()
@@ -181,22 +182,22 @@ func PhpHeadParseCookieOptionsArray(
 		if key.IsStrKey() {
 			strKey := key.StrKey()
 			if ascii.StrCaseEquals(strKey, "expires") {
-				*expires = zend.ZvalGetLong(value)
+				*expires = operators.ZvalGetLong(value)
 				found++
 			} else if ascii.StrCaseEquals(strKey, "path") {
-				*path = zend.ZvalGetString(value)
+				*path = operators.ZvalGetString(value)
 				found++
 			} else if ascii.StrCaseEquals(strKey, "domain") {
-				*domain = zend.ZvalGetString(value)
+				*domain = operators.ZvalGetString(value)
 				found++
 			} else if ascii.StrCaseEquals(strKey, "secure") {
-				*secure = zend.IZendIsTrue(value)
+				*secure = operators.IZendIsTrue(value)
 				found++
 			} else if ascii.StrCaseEquals(strKey, "httponly") {
-				*httponly = zend.IZendIsTrue(value)
+				*httponly = operators.IZendIsTrue(value)
 				found++
 			} else if ascii.StrCaseEquals(strKey, "samesite") {
-				*samesite = zend.ZvalGetString(value)
+				*samesite = operators.ZvalGetString(value)
 				found++
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unrecognized key '%s' found in the options array", strKey)
@@ -251,7 +252,7 @@ func ZifSetcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, _ 
 			}
 			PhpHeadParseCookieOptionsArray(expires_or_options, &expires, &path, &domain, &secure, &httponly, &samesite)
 		} else {
-			expires = zend.ZvalGetLong(expires_or_options)
+			expires = operators.ZvalGetLong(expires_or_options)
 		}
 	}
 	if zend.EG__().GetException() == nil {
@@ -310,7 +311,7 @@ func ZifSetrawcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval,
 			}
 			PhpHeadParseCookieOptionsArray(expires_or_options, &expires, &path, &domain, &secure, &httponly, &samesite)
 		} else {
-			expires = zend.ZvalGetLong(expires_or_options)
+			expires = operators.ZvalGetLong(expires_or_options)
 		}
 	}
 	if zend.EG__().GetException() == nil {

@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func UCHAR(x byte) __auto__ { return zend_uchar(x) }
@@ -1098,7 +1099,7 @@ func ScanSetErrorReturn(numVars int, return_value *types.Zval) {
 
 		/* convert_to_null calls destructor */
 
-		zend.ConvertToNull(return_value)
+		operators.ConvertToNull(return_value)
 
 		/* convert_to_null calls destructor */
 

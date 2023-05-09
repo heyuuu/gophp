@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendCompileAssignRef(result *Znode, ast *ZendAst) {
@@ -312,7 +313,7 @@ func ZendCompileDynamicCall(result *Znode, name_node *Znode, args_ast *ZendAst) 
 	if name_node.GetOpType() == IS_CONST && name_node.GetConstant().IsString() {
 		var colon *byte
 		var str *types.String = name_node.GetConstant().String()
-		if b.Assign(&colon, ZendMemrchr(str.GetVal(), ':', str.GetLen())) != nil && colon > str.GetVal() && (*(colon - 1)) == ':' {
+		if b.Assign(&colon, operators.ZendMemrchr(str.GetVal(), ':', str.GetLen())) != nil && colon > str.GetVal() && (*(colon - 1)) == ':' {
 			var class *types.String = types.NewString(b.CastStr(str.GetVal(), colon-str.GetVal()-1))
 			var method *types.String = types.NewString(b.CastStr(colon+1, str.GetLen()-(colon-str.GetVal())-1))
 			var opline *ZendOp = GetNextOp()
@@ -393,8 +394,8 @@ func ZendCompileFuncDefined(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() != 1 || args.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 		return types.FAILURE
 	}
-	name = ZvalGetString(ZendAstGetZval(args.GetChild()[0]))
-	if ZendMemrchr(name.GetVal(), '\\', name.GetLen()) || ZendMemrchr(name.GetVal(), ':', name.GetLen()) {
+	name = operators.ZvalGetString(ZendAstGetZval(args.GetChild()[0]))
+	if operators.ZendMemrchr(name.GetVal(), '\\', name.GetLen()) || operators.ZendMemrchr(name.GetVal(), ':', name.GetLen()) {
 		// types.ZendStringReleaseEx(name, 0)
 		return types.FAILURE
 	}
@@ -413,7 +414,7 @@ func ZendCompileFuncDefined(result *Znode, args *ZendAstList) int {
 	/* Lowercase constant name in a separate literal */
 
 	var c types.Zval
-	var lcname *types.String = ZendStringTolower(name)
+	var lcname *types.String = operators.ZendStringTolower(name)
 	c.SetString(lcname)
 	ZendAddLiteral(&c)
 	return types.SUCCESS
@@ -449,7 +450,7 @@ func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 		return types.FAILURE
 	}
 	name = ZendAstGetStr(name_ast)
-	lcname = ZendStringTolower(name)
+	lcname = operators.ZendStringTolower(name)
 	fbc = CG__().FunctionTable().Get(lcname.GetStr())
 	if fbc == nil || FbcIsFinalized(fbc) == 0 || fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_USER_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) != 0 && fbc.GetOpArray().GetFilename() != CG__().GetActiveOpArray().GetFilename() {
 		// types.ZendStringReleaseEx(lcname, 0)
@@ -574,7 +575,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 	var opline *ZendOp
 	if args.GetChildren() == 3 {
 		if args.GetChild()[2].GetKind() == ZEND_AST_ZVAL {
-			strict = IZendIsTrue(ZendAstGetZval(args.GetChild()[2]))
+			strict = operators.IZendIsTrue(ZendAstGetZval(args.GetChild()[2]))
 		} else if args.GetChild()[2].GetKind() == ZEND_AST_CONST {
 			var value types.Zval
 			var name_ast *ZendAst = args.GetChild()[2].GetChild()[0]
@@ -585,7 +586,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				return types.FAILURE
 			}
 			// types.ZendStringReleaseEx(resolved_name, 0)
-			strict = IZendIsTrue(&value)
+			strict = operators.IZendIsTrue(&value)
 			// ZvalPtrDtor(&value)
 		} else {
 			return types.FAILURE
@@ -622,7 +623,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				var _z *types.Zval = _p.GetVal()
 
 				val = _z
-				if val.GetType() != types.IS_STRING || IsNumericString(val.String().GetStr(), nil, nil, 0) != 0 {
+				if val.GetType() != types.IS_STRING || operators.IsNumericString(val.String().GetStr(), nil, nil, 0) != 0 {
 					dst.DestroyEx()
 					ok = 0
 					break

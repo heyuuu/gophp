@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendCompileIf(ast *ZendAst) {
@@ -90,7 +91,7 @@ func DetermineSwitchJumptableType(cases *ZendAstList) uint8 {
 			/* Non-uniform case types */
 
 		}
-		if cond_zv.IsString() && IsNumericString(cond_zv.String().GetStr(), nil, nil, 0) != 0 {
+		if cond_zv.IsString() && operators.IsNumericString(cond_zv.String().GetStr(), nil, nil, 0) != 0 {
 
 			/* Numeric strings cannot be compared with a simple hash lookup */
 
@@ -463,7 +464,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 		var type_code uint8 = ZendLookupBuiltinTypeByName(class_name)
 		if type_code != 0 {
 			if (ast.GetAttr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", ZendStringTolower(class_name).GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", operators.ZendStringTolower(class_name).GetVal())
 			}
 			type_ = types.ZEND_TYPE_ENCODE(type_code, allow_null)
 		} else {
@@ -589,7 +590,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 							if default_node.GetConstant().GetType() != types.IS_DOUBLE && default_node.GetConstant().GetType() != types.IS_LONG {
 								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a float type can only be float, integer, or NULL")
 							}
-							ConvertToDouble(default_node.GetConstant())
+							operators.ConvertToDouble(default_node.GetConstant())
 						case types.IS_ITERABLE:
 							if default_node.GetConstant().GetType() != types.IS_ARRAY {
 								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with iterable type can only be an array or NULL")

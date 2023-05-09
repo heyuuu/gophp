@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/operators"
 	"strings"
 )
 
@@ -170,7 +171,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	/* Check host whitelist. If it's not listed, do nothing. */
 
 	if url_parts.GetHost() != nil {
-		var tmp *types.String = zend.ZendStringTolower(url_parts.GetHost())
+		var tmp *types.String = operators.ZendStringTolower(url_parts.GetHost())
 		if !&(BG__().url_adapt_session_hosts_ht).KeyExists(tmp.GetStr()) {
 			// types.ZendStringReleaseEx(tmp, 0)
 			dest.AppendSmartStr(url)

@@ -9,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -1579,7 +1580,7 @@ func ZifStreamIsLocal(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zv
 		}
 		wrapper = stream.GetWrapper()
 	} else {
-		if zend.TryConvertToString(zstream) == 0 {
+		if operators.TryConvertToString(zstream) == 0 {
 			return
 		}
 		wrapper = streams.PhpStreamLocateUrlWrapper(zstream.String().GetVal(), nil, 0)

@@ -11,6 +11,7 @@ import (
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func SplFilesystemFromObj(obj *types.ZendObject) *SplFilesystemObject {
@@ -615,7 +616,7 @@ func SplFilesystemObjectConstruct(executeData *zend.ZendExecuteData, return_valu
 	} else {
 		SplFilesystemDirOpen(intern, path)
 	}
-	if zend.InstanceofFunction(intern.GetStd().GetCe(), spl_ce_RecursiveDirectoryIterator) != 0 {
+	if operators.InstanceofFunction(intern.GetStd().GetCe(), spl_ce_RecursiveDirectoryIterator) != 0 {
 		intern.SetIsRecursive(1)
 	} else {
 		intern.SetIsRecursive(0)
@@ -693,7 +694,7 @@ func zim_spl_DirectoryIterator_seek(executeData *zend.ZendExecuteData, return_va
 	for intern.GetIndex() < pos {
 		var valid int = 0
 		zend.ZendCallMethodWith0Params(zend.ZEND_THIS(executeData), types.Z_OBJCE_P(zend.ZEND_THIS(executeData)), intern.GetFuncValid(), "valid", &retval)
-		valid = zend.IZendIsTrue(&retval)
+		valid = operators.IZendIsTrue(&retval)
 		// zend.ZvalPtrDtor(&retval)
 		if valid == 0 {
 			faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", pos)
@@ -769,7 +770,7 @@ func zim_spl_SplFileInfo_getExtension(executeData *zend.ZendExecuteData, return_
 		flen = intern.GetFileNameLen()
 	}
 	ret = str.PhpBasenameZStr(b.CastStr(fname, flen), "")
-	p = zend.ZendMemrchr(ret.GetVal(), '.', ret.GetLen())
+	p = operators.ZendMemrchr(ret.GetVal(), '.', ret.GetLen())
 	if p != nil {
 		idx = p - ret.GetVal()
 		return_value.SetStringVal(b.CastStr(ret.GetVal()+idx+1, ret.GetLen()-idx-1))
@@ -790,7 +791,7 @@ func zim_spl_DirectoryIterator_getExtension(executeData *zend.ZendExecuteData, r
 		return
 	}
 	fname = str.PhpBasenameZStr(intern.GetEntry().GetDName(), "")
-	p = zend.ZendMemrchr(fname.GetVal(), '.', fname.GetLen())
+	p = operators.ZendMemrchr(fname.GetVal(), '.', fname.GetLen())
 	if p != nil {
 		idx = p - fname.GetVal()
 		return_value.SetStringVal(b.CastStr(fname.GetVal()+idx+1, fname.GetLen()-idx-1))
@@ -1235,7 +1236,7 @@ func zim_spl_RecursiveDirectoryIterator_hasChildren(executeData *zend.ZendExecut
 		SplFilesystemObjectGetFileName(intern)
 		if allow_links == 0 && !intern.IsDirFollowSymlinks() {
 			standard.PhpStat(intern.GetFileName(), intern.GetFileNameLen(), standard.FS_IS_LINK, return_value)
-			if zend.ZvalIsTrue(return_value) {
+			if operators.ZvalIsTrue(return_value) {
 				return_value.SetFalse()
 				return
 			}

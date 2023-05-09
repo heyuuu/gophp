@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -31,10 +32,10 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			/* if not and the object implements Countable we call its count() method */
 
-			if InstanceofFunction(types.Z_OBJCE_P(op1), ZendCeCountable) != 0 {
+			if operators.InstanceofFunction(types.Z_OBJCE_P(op1), ZendCeCountable) != 0 {
 				var retval types.Zval
 				ZendCallMethodWith0Params(op1, nil, nil, "count", &retval)
-				count = ZvalGetLong(&retval)
+				count = operators.ZvalGetLong(&retval)
 				// ZvalPtrDtor(&retval)
 				break
 			}
@@ -82,10 +83,10 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			/* if not and the object implements Countable we call its count() method */
 
-			if InstanceofFunction(types.Z_OBJCE_P(op1), ZendCeCountable) != 0 {
+			if operators.InstanceofFunction(types.Z_OBJCE_P(op1), ZendCeCountable) != 0 {
 				var retval types.Zval
 				ZendCallMethodWith0Params(op1, nil, nil, "count", &retval)
-				count = ZvalGetLong(&retval)
+				count = operators.ZvalGetLong(&retval)
 				// ZvalPtrDtor(&retval)
 				break
 			}
@@ -139,10 +140,10 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			/* if not and the object implements Countable we call its count() method */
 
-			if InstanceofFunction(types.Z_OBJCE_P(op1), ZendCeCountable) != 0 {
+			if operators.InstanceofFunction(types.Z_OBJCE_P(op1), ZendCeCountable) != 0 {
 				var retval types.Zval
 				ZendCallMethodWith0Params(op1, nil, nil, "count", &retval)
-				count = ZvalGetLong(&retval)
+				count = operators.ZvalGetLong(&retval)
 				// ZvalPtrDtor(&retval)
 				break
 			}

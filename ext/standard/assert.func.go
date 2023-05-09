@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -124,7 +125,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 			if description == nil {
 				faults.ThrowError(nil, "Failure evaluating code: %s%s", core.PHP_EOL, myeval)
 			} else {
-				var str *types.String = zend.ZvalGetString(description)
+				var str *types.String = operators.ZvalGetString(description)
 				faults.ThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, str.GetVal(), myeval)
 				// types.ZendStringReleaseEx(str, 0)
 			}
@@ -138,10 +139,10 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 		if ASSERTG(quiet_eval) {
 			zend.EG__().SetErrorReporting(old_error_reporting)
 		}
-		zend.ConvertToBoolean(&retval)
+		operators.ConvertToBoolean(&retval)
 		val = retval.IsType(types.IS_TRUE)
 	} else {
-		val = zend.IZendIsTrue(assertion)
+		val = operators.IZendIsTrue(assertion)
 	}
 	if val != 0 {
 		return_value.SetTrue()
@@ -167,7 +168,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 			// zend.ZvalPtrDtor(&args[2])
 			// zend.ZvalPtrDtor(&args[0])
 		} else {
-			args[3].SetString(zend.ZvalGetString(description))
+			args[3].SetString(operators.ZvalGetString(description))
 			zend.CallUserFunction(nil, &(ASSERTG(callback)), &retval, 4, args)
 			// zend.ZvalPtrDtor(&args[3])
 			// zend.ZvalPtrDtor(&args[2])
@@ -178,11 +179,11 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 	if ASSERTG(exception) {
 		if description == nil {
 			faults.ThrowException(AssertionErrorCe, nil, faults.E_ERROR)
-		} else if description.IsType(types.IS_OBJECT) && zend.InstanceofFunction(types.Z_OBJCE_P(description), faults.ZendCeThrowable) != 0 {
+		} else if description.IsType(types.IS_OBJECT) && operators.InstanceofFunction(types.Z_OBJCE_P(description), faults.ZendCeThrowable) != 0 {
 			// 			description.AddRefcount()
 			faults.ThrowExceptionObject(description)
 		} else {
-			var str *types.String = zend.ZvalGetString(description)
+			var str *types.String = operators.ZvalGetString(description)
 			faults.ThrowException(AssertionErrorCe, str.GetVal(), faults.E_ERROR)
 			// types.ZendStringReleaseEx(str, 0)
 		}
@@ -194,7 +195,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Assertion failed")
 			}
 		} else {
-			var str *types.String = zend.ZvalGetString(description)
+			var str *types.String = operators.ZvalGetString(description)
 			if myeval != nil {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "%s: \"%s\" failed", str.GetVal(), myeval)
 			} else {
@@ -232,7 +233,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 	case ASSERT_ACTIVE:
 		oldint = ASSERTG(active)
 		if ac == 2 {
-			var value_str *types.String = zend.ZvalTryGetString(value)
+			var value_str *types.String = operators.ZvalTryGetString(value)
 			if value_str == nil {
 				return
 			}
@@ -246,7 +247,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 	case ASSERT_BAIL:
 		oldint = ASSERTG(bail)
 		if ac == 2 {
-			var value_str *types.String = zend.ZvalTryGetString(value)
+			var value_str *types.String = operators.ZvalTryGetString(value)
 			if value_str == nil {
 				return
 			}
@@ -260,7 +261,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 	case ASSERT_QUIET_EVAL:
 		oldint = ASSERTG(quiet_eval)
 		if ac == 2 {
-			var value_str *types.String = zend.ZvalTryGetString(value)
+			var value_str *types.String = operators.ZvalTryGetString(value)
 			if value_str == nil {
 				return
 			}
@@ -274,7 +275,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 	case ASSERT_WARNING:
 		oldint = ASSERTG(warning)
 		if ac == 2 {
-			var value_str *types.String = zend.ZvalTryGetString(value)
+			var value_str *types.String = operators.ZvalTryGetString(value)
 			if value_str == nil {
 				return
 			}
@@ -301,7 +302,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 	case ASSERT_EXCEPTION:
 		oldint = ASSERTG(exception)
 		if ac == 2 {
-			var val *types.String = zend.ZvalTryGetString(value)
+			var val *types.String = operators.ZvalTryGetString(value)
 			if val == nil {
 				return
 			}

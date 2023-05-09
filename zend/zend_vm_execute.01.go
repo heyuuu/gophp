@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_VM_DISPATCH(executeData *ZendExecuteData, opcode OpCode, opline *ZendOp) int {
@@ -23,7 +24,7 @@ func zend_mod_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendE
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	ModFunction(opline.Result(), op_1, op_2)
+	operators.ModFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_1)
 	}
@@ -40,7 +41,7 @@ func zend_shift_left_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	ShiftLeftFunction(opline.Result(), op_1, op_2)
+	operators.ShiftLeftFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_1)
 	}
@@ -57,7 +58,7 @@ func zend_shift_right_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDat
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	ShiftRightFunction(opline.Result(), op_1, op_2)
+	operators.ShiftRightFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_1)
 	}
@@ -74,7 +75,7 @@ func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	CompareFunction(opline.Result(), op_1, op_2)
+	operators.CompareFunction(opline.Result(), op_1, op_2)
 	if EG__().GetException() != nil {
 		return 0
 	}
@@ -96,7 +97,7 @@ func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDa
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	CompareFunction(opline.Result(), op_1, op_2)
+	operators.CompareFunction(opline.Result(), op_1, op_2)
 	if EG__().GetException() != nil {
 		return 0
 	}
@@ -118,7 +119,7 @@ func zend_is_smaller_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	CompareFunction(opline.Result(), op_1, op_2)
+	operators.CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_1)
 	}
@@ -146,7 +147,7 @@ func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, ex
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	CompareFunction(opline.Result(), op_1, op_2)
+	operators.CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_1)
 	}
@@ -174,7 +175,7 @@ func zend_bw_or_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zen
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	BitwiseOrFunction(opline.Result(), op_1, op_2)
+	operators.BitwiseOrFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_1)
 	}
@@ -191,7 +192,7 @@ func zend_bw_and_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Ze
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	BitwiseAndFunction(opline.Result(), op_1, op_2)
+	operators.BitwiseAndFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_1)
 	}
@@ -208,7 +209,7 @@ func zend_bw_xor_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Ze
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	BitwiseXorFunction(opline.Result(), op_1, op_2)
+	operators.BitwiseXorFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_1)
 	}

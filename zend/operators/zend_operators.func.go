@@ -1,4 +1,4 @@
-package zend
+package operators
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard/conv"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"math"
 	"strconv"
@@ -20,30 +21,30 @@ func IsFinite(f float64) bool {
 }
 
 func DoubleFitsLong(d float64) bool {
-	return !(d >= ZEND_LONG_MAX || d < ZEND_LONG_MIN)
+	return !(d >= zend.ZEND_LONG_MAX || d < zend.ZEND_LONG_MIN)
 }
-func DvalToLval(d float64) ZendLong {
+func DvalToLval(d float64) zend.ZendLong {
 	if !IsFinite(d) {
 		return 0
 	} else if !(DoubleFitsLong(d)) {
 		return ZendDvalToLvalSlow(d)
 	}
-	return ZendLong(d)
+	return zend.ZendLong(d)
 }
-func DvalToLvalCap(d float64) ZendLong {
+func DvalToLvalCap(d float64) zend.ZendLong {
 	if !IsFinite(d) {
 		return 0
 	} else if !(DoubleFitsLong(d)) {
 		if d > 0 {
-			return ZEND_LONG_MAX
+			return zend.ZEND_LONG_MAX
 		} else {
-			return ZEND_LONG_MIN
+			return zend.ZEND_LONG_MIN
 		}
 	}
-	return ZendLong(d)
+	return zend.ZendLong(d)
 }
-func IsNumericString(str string, lval *ZendLong, dval *float64, allow_errors ConvertNumericMode) uint8 {
-	r := StrToNumberEx(str, allow_errors)
+func IsNumericString(str string, lval *zend.ZendLong, dval *float64, allow_errors zend.ConvertNumericMode) uint8 {
+	r := zend.StrToNumberEx(str, allow_errors)
 
 	*lval = r.Int()
 	if dval != nil {
@@ -106,17 +107,17 @@ func ConvertScalarToNumberEx(pzv *types.Zval) {
 	}
 }
 func FastLongIncrementFunction(op1 *types.Zval) {
-	if op1.Long() == ZEND_LONG_MAX {
+	if op1.Long() == zend.ZEND_LONG_MAX {
 		/* switch to double */
-		op1.SetDouble(ZEND_LONG_MAX + 1.0)
+		op1.SetDouble(zend.ZEND_LONG_MAX + 1.0)
 	} else {
 		op1.SetLong(op1.Long() + 1)
 	}
 }
 func FastLongDecrementFunction(op1 *types.Zval) {
-	if op1.Long() == ZEND_LONG_MIN {
+	if op1.Long() == zend.ZEND_LONG_MIN {
 		/* switch to double */
-		op1.SetDouble(ZEND_LONG_MIN - 1.0)
+		op1.SetDouble(zend.ZEND_LONG_MIN - 1.0)
 	} else {
 		op1.SetLong(op1.Long() - 1)
 	}
@@ -271,13 +272,13 @@ try_again:
 	case types.IS_TRUE:
 		op.SetLong(1)
 	case types.IS_RESOURCE:
-		var l ZendLong = op.ResourceHandle()
+		var l zend.ZendLong = op.ResourceHandle()
 		// ZvalPtrDtor(op)
 		op.SetLong(l)
 	case types.IS_OBJECT:
 		var dst types.Zval
 		ConvertObjectToType(op, &dst, types.IS_NUMBER, ConvertScalarToNumber)
-		if check != 0 && EG__().GetException() != nil {
+		if check != 0 && zend.EG__().GetException() != nil {
 			return
 		}
 		// ZvalPtrDtor(op)
@@ -300,13 +301,13 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 		holder.SetLong(1)
 		return holder
 	case types.IS_STRING:
-		var mode ConvertNumericMode
+		var mode zend.ConvertNumericMode
 		if silent != 0 {
-			mode = ConvertContinueOnErrors
+			mode = zend.ConvertContinueOnErrors
 		} else {
-			mode = ConvertNoticeOnErrors
+			mode = zend.ConvertNoticeOnErrors
 		}
-		r := StrToNumberEx(op.StringVal(), mode)
+		r := zend.StrToNumberEx(op.StringVal(), mode)
 		if r.IsInt() {
 			holder.SetLong(r.Int())
 		} else if r.IsFloat() {
@@ -323,7 +324,7 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 		return holder
 	case types.IS_OBJECT:
 		ConvertObjectToType(op, holder, types.IS_NUMBER, ConvertScalarToNumber)
-		if EG__().GetException() != nil || holder.GetType() != types.IS_LONG && holder.GetType() != types.IS_DOUBLE {
+		if zend.EG__().GetException() != nil || holder.GetType() != types.IS_LONG && holder.GetType() != types.IS_DOUBLE {
 			holder.SetLong(1)
 		}
 		return holder
@@ -363,7 +364,7 @@ func ConvertToLong(op *types.Zval) {
 	}
 }
 func ConvertToLongBase(op *types.Zval, base int) {
-	var tmp ZendLong
+	var tmp zend.ZendLong
 try_again:
 	switch op.GetType() {
 	case types.IS_NULL:
@@ -385,7 +386,7 @@ try_again:
 		if base == 10 {
 			op.SetLong(ZvalGetLong(op))
 		} else {
-			op.SetLong(ZEND_STRTOL(str.GetVal(), nil, base))
+			op.SetLong(zend.ZEND_STRTOL(str.GetVal(), nil, base))
 		}
 		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
@@ -433,7 +434,7 @@ try_again:
 
 	case types.IS_STRING:
 		var str *types.String = op.String()
-		op.SetDouble(ZendStrtod(str.GetVal(), nil))
+		op.SetDouble(zend.ZendStrtod(str.GetVal(), nil))
 		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
 		if op.Array().Len() {
@@ -473,7 +474,7 @@ try_again:
 	case types.IS_NULL:
 		op.SetFalse()
 	case types.IS_RESOURCE:
-		var l ZendLong = b.Cond(op.ResourceHandle() != 0, 1, 0)
+		var l zend.ZendLong = b.Cond(op.ResourceHandle() != 0, 1, 0)
 		// ZvalPtrDtor(op)
 		op.SetBool(l != 0)
 	case types.IS_LONG:
@@ -527,14 +528,14 @@ try_again:
 	case types.IS_STRING:
 
 	case types.IS_RESOURCE:
-		var str = ZendSprintf("Resource id #"+ZEND_LONG_FMT, ZendLong(op.ResourceHandle()))
+		var str = zend.ZendSprintf("Resource id #"+zend.ZEND_LONG_FMT, zend.ZendLong(op.ResourceHandle()))
 		// ZvalPtrDtor(op)
 		op.SetStringVal(str)
 	case types.IS_LONG:
 		op.SetString(ZendLongToStr(op.Long()))
 	case types.IS_DOUBLE:
 		var dval = op.Double()
-		str := ZendSprintf(0, "%.*G", int(EG__().GetPrecision()), dval)
+		str := zend.ZendSprintf(0, "%.*G", int(zend.EG__().GetPrecision()), dval)
 
 		/* %G already handles removing trailing zeros from the fractional part, yay */
 
@@ -562,7 +563,7 @@ try_again:
 			}
 			// ZvalPtrDtor(z)
 		}
-		if EG__().GetException() == nil {
+		if zend.EG__().GetException() == nil {
 			faults.ThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
 		}
 		// ZvalPtrDtor(op)
@@ -585,21 +586,21 @@ try_again:
 	case types.IS_ARRAY:
 
 	case types.IS_OBJECT:
-		if types.Z_OBJCE_P(op) == ZendCeClosure {
+		if types.Z_OBJCE_P(op) == zend.ZendCeClosure {
 			ConvertScalarToArray(op)
 		} else {
-			var obj_ht *types.Array = ZendGetPropertiesFor(op, ZEND_PROP_PURPOSE_ARRAY_CAST)
+			var obj_ht *types.Array = zend.ZendGetPropertiesFor(op, zend.ZEND_PROP_PURPOSE_ARRAY_CAST)
 			if obj_ht != nil {
-				var new_obj_ht *types.Array = types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(op).GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive())
+				var new_obj_ht *types.Array = types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(op).GetHandlers() != zend.StdObjectHandlersPtr || obj_ht.IsRecursive())
 				// ZvalPtrDtor(op)
 				op.SetArray(new_obj_ht)
-				ZendReleaseProperties(obj_ht)
+				zend.ZendReleaseProperties(obj_ht)
 			} else {
 				// ZvalPtrDtor(op)
 
 				/*ZVAL_EMPTY_ARRAY(op);*/
 
-				ArrayInit(op)
+				zend.ArrayInit(op)
 
 				/*ZVAL_EMPTY_ARRAY(op);*/
 
@@ -609,7 +610,7 @@ try_again:
 
 		/*ZVAL_EMPTY_ARRAY(op);*/
 
-		ArrayInit(op)
+		zend.ArrayInit(op)
 	case types.IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
@@ -636,20 +637,20 @@ try_again:
 		} else {
 			ht.DelRefcount()
 		}
-		obj = ZendObjectsNew(ZendStandardClassDef)
+		obj = zend.ZendObjectsNew(zend.ZendStandardClassDef)
 		obj.SetProperties(ht)
 		op.SetObject(obj)
 	case types.IS_OBJECT:
 
 	case types.IS_NULL:
-		ObjectInit(op)
+		zend.ObjectInit(op)
 	case types.IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
 	default:
 		var tmp types.Zval
 		types.ZVAL_COPY_VALUE(&tmp, op)
-		ObjectInit(op)
+		zend.ObjectInit(op)
 		types.Z_OBJPROP_P(op).KeyAddNew(types.STR_SCALAR, &tmp)
 	}
 }
@@ -707,10 +708,10 @@ func _addFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) bool
 		types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 		return ret
 	} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-		if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_ADD, result, op1, op2) {
+		if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_ADD, result, op1, op2) {
 			return true
 		}
-	} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_ADD, result, op1, op2) {
+	} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_ADD, result, op1, op2) {
 		return true
 	}
 	if op1 != op2 {
@@ -720,7 +721,7 @@ func _addFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) bool
 		op1 = ZendiConvertScalarToNumber(op1, &op1Copy, result, 0)
 		op2 = op1
 	}
-	if EG__().GetException() != nil {
+	if zend.EG__().GetException() != nil {
 		if result != op1 {
 			result.SetUndef()
 		}
@@ -791,10 +792,10 @@ func SubFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_SUB, result, op1, op2) {
+				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_SUB, result, op1, op2) {
 					return types.SUCCESS
 				}
-			} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_SUB, result, op1, op2) {
+			} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_SUB, result, op1, op2) {
 				return types.SUCCESS
 			}
 			if op1 != op2 {
@@ -804,7 +805,7 @@ func SubFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 				op2 = op1
 			}
-			if EG__().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -837,8 +838,8 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	for true {
 		var type_pair uint8 = TypePair(op1.GetType(), op2.GetType())
 		if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
-			var overflow ZendLong
-			ZEND_SIGNED_MULTIPLY_LONG(op1.Long(), op2.Long(), result.Long(), result.Double(), overflow)
+			var overflow zend.ZendLong
+			zend.ZEND_SIGNED_MULTIPLY_LONG(op1.Long(), op2.Long(), result.Long(), result.Double(), overflow)
 			if overflow != 0 {
 				result.SetTypeInfo(types.IS_DOUBLE)
 			} else {
@@ -870,10 +871,10 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					// ZvalPtrDtor(objval)
 					return ret
 				} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-					if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_MUL, result, op1, op2) {
+					if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_MUL, result, op1, op2) {
 						return types.SUCCESS
 					}
-				} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_MUL, result, op1, op2) {
+				} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_MUL, result, op1, op2) {
 					return types.SUCCESS
 				}
 				if op1 != op2 {
@@ -883,7 +884,7 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 					op2 = op1
 				}
-				if EG__().GetException() != nil {
+				if zend.EG__().GetException() != nil {
 					if result != op1 {
 						result.SetUndef()
 					}
@@ -908,9 +909,9 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 		var type_pair uint8 = TypePair(op1.GetType(), op2.GetType())
 		if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
 			if op2.Long() >= 0 {
-				var l1 ZendLong = 1
-				var l2 ZendLong = op1.Long()
-				var i ZendLong = op2.Long()
+				var l1 zend.ZendLong = 1
+				var l2 zend.ZendLong = op1.Long()
+				var i zend.ZendLong = op2.Long()
 				if i == 0 {
 					result.SetLong(1)
 					return types.SUCCESS
@@ -919,18 +920,18 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					return types.SUCCESS
 				}
 				for i >= 1 {
-					var overflow ZendLong
+					var overflow zend.ZendLong
 					var dval float64 = 0.0
 					if i%2 != 0 {
 						i--
-						ZEND_SIGNED_MULTIPLY_LONG(l1, l2, l1, dval, overflow)
+						zend.ZEND_SIGNED_MULTIPLY_LONG(l1, l2, l1, dval, overflow)
 						if overflow != 0 {
 							result.SetDouble(dval * pow(l2, i))
 							return types.SUCCESS
 						}
 					} else {
 						i /= 2
-						ZEND_SIGNED_MULTIPLY_LONG(l2, l2, l2, dval, overflow)
+						zend.ZEND_SIGNED_MULTIPLY_LONG(l2, l2, l2, dval, overflow)
 						if overflow != 0 {
 							result.SetDouble(float64(l1 * pow(dval, i)))
 							return types.SUCCESS
@@ -973,10 +974,10 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					// ZvalPtrDtor(objval)
 					return ret
 				} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-					if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_POW, result, op1, op2) {
+					if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_POW, result, op1, op2) {
 						return types.SUCCESS
 					}
-				} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_POW, result, op1, op2) {
+				} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_POW, result, op1, op2) {
 					return types.SUCCESS
 				}
 				if op1 != op2 {
@@ -1010,7 +1011,7 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					}
 					op2 = op1
 				}
-				if EG__().GetException() != nil {
+				if zend.EG__().GetException() != nil {
 					if result != op1 {
 						result.SetUndef()
 					}
@@ -1038,11 +1039,11 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				faults.Error(faults.E_WARNING, "Division by zero")
 				result.SetDouble(float64(op1.Long() / float64(op2.Long())))
 				return types.SUCCESS
-			} else if op2.Long() == -1 && op1.Long() == ZEND_LONG_MIN {
+			} else if op2.Long() == -1 && op1.Long() == zend.ZEND_LONG_MIN {
 
 				/* Prevent overflow error/crash */
 
-				result.SetDouble(float64(ZEND_LONG_MIN / -1))
+				result.SetDouble(float64(zend.ZEND_LONG_MIN / -1))
 				return types.SUCCESS
 			}
 			if op1.Long()%op2.Long() == 0 {
@@ -1085,10 +1086,10 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					// ZvalPtrDtor(objval)
 					return ret
 				} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-					if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_DIV, result, op1, op2) {
+					if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_DIV, result, op1, op2) {
 						return types.SUCCESS
 					}
-				} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_DIV, result, op1, op2) {
+				} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_DIV, result, op1, op2) {
 					return types.SUCCESS
 				}
 				if op1 != op2 {
@@ -1098,7 +1099,7 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 					op2 = op1
 				}
-				if EG__().GetException() != nil {
+				if zend.EG__().GetException() != nil {
 					if result != op1 {
 						result.SetUndef()
 					}
@@ -1116,8 +1117,8 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	}
 }
 func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var op1_lval ZendLong
-	var op2_lval ZendLong
+	var op1_lval zend.ZendLong
+	var op2_lval zend.ZendLong
 	for {
 		if op1.GetType() != types.IS_LONG {
 			if op1.IsReference() {
@@ -1137,12 +1138,12 @@ func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_MOD, result, op1, op2) {
+				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_MOD, result, op1, op2) {
 					return types.SUCCESS
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if EG__().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1162,11 +1163,11 @@ func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					break
 				}
 			}
-			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_MOD, result, op1, op2) {
+			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_MOD, result, op1, op2) {
 				return types.SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if EG__().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1181,7 +1182,7 @@ func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 
 		/* modulus by zero */
 
-		if CurrEX() != nil && CG__().GetInCompilation() == 0 {
+		if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
 			faults.ThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Modulo by zero")
 		} else {
 			faults.ErrorNoreturn(faults.E_ERROR, "Modulo by zero")
@@ -1233,7 +1234,7 @@ func BooleanXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BOOL_XOR, result, op1, op2) {
+				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_BOOL_XOR, result, op1, op2) {
 					return types.SUCCESS
 				}
 			}
@@ -1257,7 +1258,7 @@ func BooleanXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 					break
 				}
 			}
-			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BOOL_XOR, result, op1, op2) {
+			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_BOOL_XOR, result, op1, op2) {
 				return types.SUCCESS
 			}
 			op2_val = IZendIsTrue(op2)
@@ -1283,7 +1284,7 @@ func BooleanNotFunction(result *types.Zval, op1 *types.Zval) int {
 				return types.SUCCESS
 			}
 		}
-		if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BOOL_NOT, result, op1, nil) {
+		if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_BOOL_NOT, result, op1, nil) {
 			return types.SUCCESS
 		}
 		result.SetBool(!ZvalIsTrue(op1))
@@ -1310,7 +1311,7 @@ try_again:
 		op1 = types.Z_REFVAL_P(op1)
 		goto try_again
 	default:
-		if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_NOT, result, op1, nil) {
+		if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_BW_NOT, result, op1, nil) {
 			return types.SUCCESS
 		}
 		if result != op1 {
@@ -1321,8 +1322,8 @@ try_again:
 	}
 }
 func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var op1_lval ZendLong
-	var op2_lval ZendLong
+	var op1_lval zend.ZendLong
+	var op2_lval zend.ZendLong
 	if op1.IsLong() && op2.IsLong() {
 		result.SetLong(op1.Long() | op2.Long())
 		return types.SUCCESS
@@ -1349,12 +1350,12 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 			// ZvalPtrDtor(objval)
 			return ret
 		} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-			if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_OR, result, op1, op2) {
+			if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_BW_OR, result, op1, op2) {
 				return types.SUCCESS
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if EG__().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1364,11 +1365,11 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 		op1_lval = op1.Long()
 	}
 	if op2.GetType() != types.IS_LONG {
-		if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BW_OR, result, op1, op2) {
+		if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_BW_OR, result, op1, op2) {
 			return types.SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if EG__().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1384,8 +1385,8 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 	return types.SUCCESS
 }
 func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var op1_lval ZendLong
-	var op2_lval ZendLong
+	var op1_lval zend.ZendLong
+	var op2_lval zend.ZendLong
 	if op1.IsLong() && op2.IsLong() {
 		result.SetLong(op1.Long() & op2.Long())
 		return types.SUCCESS
@@ -1412,12 +1413,12 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			// ZvalPtrDtor(objval)
 			return ret
 		} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-			if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_AND, result, op1, op2) {
+			if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_BW_AND, result, op1, op2) {
 				return types.SUCCESS
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if EG__().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1427,11 +1428,11 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 		op1_lval = op1.Long()
 	}
 	if op2.GetType() != types.IS_LONG {
-		if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BW_AND, result, op1, op2) {
+		if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_BW_AND, result, op1, op2) {
 			return types.SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if EG__().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1447,8 +1448,8 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 	return types.SUCCESS
 }
 func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var op1_lval ZendLong
-	var op2_lval ZendLong
+	var op1_lval zend.ZendLong
+	var op2_lval zend.ZendLong
 	if op1.IsLong() && op2.IsLong() {
 		result.SetLong(op1.Long() ^ op2.Long())
 		return types.SUCCESS
@@ -1475,12 +1476,12 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			// ZvalPtrDtor(objval)
 			return ret
 		} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-			if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_XOR, result, op1, op2) {
+			if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_BW_XOR, result, op1, op2) {
 				return types.SUCCESS
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if EG__().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1490,11 +1491,11 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 		op1_lval = op1.Long()
 	}
 	if op2.GetType() != types.IS_LONG {
-		if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BW_XOR, result, op1, op2) {
+		if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_BW_XOR, result, op1, op2) {
 			return types.SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if EG__().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1510,8 +1511,8 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 	return types.SUCCESS
 }
 func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var op1_lval ZendLong
-	var op2_lval ZendLong
+	var op1_lval zend.ZendLong
+	var op2_lval zend.ZendLong
 	for {
 		if op1.GetType() != types.IS_LONG {
 			if op1.IsReference() {
@@ -1531,12 +1532,12 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_SL, result, op1, op2) {
+				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_SL, result, op1, op2) {
 					return types.SUCCESS
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if EG__().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1556,11 +1557,11 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 					break
 				}
 			}
-			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_SL, result, op1, op2) {
+			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_SL, result, op1, op2) {
 				return types.SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if EG__().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1574,7 +1575,7 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 
 	/* prevent wrapping quirkiness on some processors where << 64 + x == << x */
 
-	if ZendUlong(op2_lval >= SIZEOF_ZEND_LONG*8) != 0 {
+	if zend.ZendUlong(op2_lval >= zend.SIZEOF_ZEND_LONG*8) != 0 {
 		if op2_lval > 0 {
 			if op1 == result {
 				// ZvalPtrDtor(result)
@@ -1582,7 +1583,7 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 			result.SetLong(0)
 			return types.SUCCESS
 		} else {
-			if CurrEX() != nil && CG__().GetInCompilation() == 0 {
+			if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
 				faults.ThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Bit shift by negative number")
 			} else {
 				faults.ErrorNoreturn(faults.E_ERROR, "Bit shift by negative number")
@@ -1599,12 +1600,12 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 
 	/* Perform shift on unsigned numbers to get well-defined wrap behavior. */
 
-	result.SetLong(zend_long(ZendUlong(op1_lval << op2_lval)))
+	result.SetLong(zend_long(zend.ZendUlong(op1_lval << op2_lval)))
 	return types.SUCCESS
 }
 func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	var op1_lval ZendLong
-	var op2_lval ZendLong
+	var op1_lval zend.ZendLong
+	var op2_lval zend.ZendLong
 	for {
 		if op1.GetType() != types.IS_LONG {
 			if op1.IsReference() {
@@ -1624,12 +1625,12 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_SR, result, op1, op2) {
+				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_SR, result, op1, op2) {
 					return types.SUCCESS
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if EG__().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1649,11 +1650,11 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 					break
 				}
 			}
-			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_SR, result, op1, op2) {
+			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_SR, result, op1, op2) {
 				return types.SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if EG__().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1667,7 +1668,7 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 
 	/* prevent wrapping quirkiness on some processors where >> 64 + x == >> x */
 
-	if ZendUlong(op2_lval >= SIZEOF_ZEND_LONG*8) != 0 {
+	if zend.ZendUlong(op2_lval >= zend.SIZEOF_ZEND_LONG*8) != 0 {
 		if op2_lval > 0 {
 			if op1 == result {
 				// ZvalPtrDtor(result)
@@ -1675,7 +1676,7 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			result.SetLong(b.Cond(op1_lval < 0, -1, 0))
 			return types.SUCCESS
 		} else {
-			if CurrEX() != nil && CG__().GetInCompilation() == 0 {
+			if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
 				faults.ThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Bit shift by negative number")
 			} else {
 				faults.ErrorNoreturn(faults.E_ERROR, "Bit shift by negative number")
@@ -1716,14 +1717,14 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
+				if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_CONCAT, result, op1, op2) {
 					return types.SUCCESS
 				}
-			} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
+			} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_CONCAT, result, op1, op2) {
 				return types.SUCCESS
 			}
 			op1_copy.SetString(ZvalGetString(op1))
-			if EG__().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 
 				if orig_op1 != result {
 					result.SetUndef()
@@ -1747,11 +1748,11 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					break
 				}
 			}
-			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
+			if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_CONCAT, result, op1, op2) {
 				return types.SUCCESS
 			}
 			op2_copy.SetString(ZvalGetString(op2))
-			if EG__().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 
 				if orig_op1 != result {
 					result.SetUndef()
@@ -1836,11 +1837,11 @@ func NumericCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
 	var d2 float64
 	d1 = ZvalGetDouble(op1)
 	d2 = ZvalGetDouble(op2)
-	return ZEND_NORMALIZE_BOOL(d1 - d2)
+	return zend.ZEND_NORMALIZE_BOOL(d1 - d2)
 }
 func ConvertCompareResultToLong(result *types.Zval) {
 	if result.IsDouble() {
-		result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
+		result.SetLong(zend.ZEND_NORMALIZE_BOOL(result.Double()))
 	} else {
 		ConvertToLong(result)
 	}
@@ -1865,18 +1866,18 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			return types.SUCCESS
 		case TypePair(types.IS_DOUBLE, types.IS_LONG):
 			result.SetDouble(op1.Double() - float64(op2.Long()))
-			result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
+			result.SetLong(zend.ZEND_NORMALIZE_BOOL(result.Double()))
 			return types.SUCCESS
 		case TypePair(types.IS_LONG, types.IS_DOUBLE):
 			result.SetDouble(float64(op1.Long() - op2.Double()))
-			result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
+			result.SetLong(zend.ZEND_NORMALIZE_BOOL(result.Double()))
 			return types.SUCCESS
 		case TypePair(types.IS_DOUBLE, types.IS_DOUBLE):
 			if op1.Double() == op2.Double() {
 				result.SetLong(0)
 			} else {
 				result.SetDouble(op1.Double() - op2.Double())
-				result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
+				result.SetLong(zend.ZEND_NORMALIZE_BOOL(result.Double()))
 			}
 			return types.SUCCESS
 		case TypePair(types.IS_ARRAY, types.IS_ARRAY):
@@ -2009,7 +2010,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				} else {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 1)
 					op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 1)
-					if EG__().GetException() != nil {
+					if zend.EG__().GetException() != nil {
 						if result != op1 {
 							result.SetUndef()
 						}
@@ -2204,12 +2205,12 @@ try_again:
 	case types.IS_NULL:
 		op1.SetLong(1)
 	case types.IS_STRING:
-		var lval ZendLong
+		var lval zend.ZendLong
 		var dval float64
 		switch IsNumericString(op1.String().GetStr(), &lval, &dval, 0) {
 		case types.IS_LONG:
 
-			if lval == ZEND_LONG_MAX {
+			if lval == zend.ZEND_LONG_MAX {
 
 				/* switch to double */
 
@@ -2241,7 +2242,7 @@ try_again:
 			var op2 types.Zval
 			var res int
 			op2.SetLong(1)
-			res = types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_ADD, op1, op1, &op2)
+			res = types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_ADD, op1, op1, &op2)
 			return res
 		}
 		return types.FAILURE
@@ -2254,7 +2255,7 @@ try_again:
 	return types.SUCCESS
 }
 func DecrementFunction(op1 *types.Zval) int {
-	var lval ZendLong
+	var lval zend.ZendLong
 	var dval float64
 try_again:
 	switch op1.GetType() {
@@ -2271,7 +2272,7 @@ try_again:
 		switch IsNumericString(op1.String().GetStr(), &lval, &dval, 0) {
 		case types.IS_LONG:
 
-			if lval == ZEND_LONG_MIN {
+			if lval == zend.ZEND_LONG_MIN {
 				var d float64 = float64(lval)
 				op1.SetDouble(d - 1)
 			} else {
@@ -2297,7 +2298,7 @@ try_again:
 			var op2 types.Zval
 			var res int
 			op2.SetLong(1)
-			res = types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_SUB, op1, op1, &op2)
+			res = types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_SUB, op1, op1, &op2)
 			return res
 		}
 		return types.FAILURE
@@ -2358,8 +2359,8 @@ func ZendBinaryStrncasecmp(s1 string, s2 string, length int) int {
 	return ascii.StrCaseCompare(s1, s2)
 }
 func ZendiSmartStreq(s1 string, s2 string) bool {
-	r1 := StrToNumberEx(s1, 0)
-	r2 := StrToNumberEx(s2, 0)
+	r1 := zend.StrToNumberEx(s1, 0)
+	r2 := zend.StrToNumberEx(s2, 0)
 
 	if r1.IsSucc() && r2.IsSucc() {
 		if r1.Overflow() != 0 && r1.Overflow() == r2.Overflow() && r1.Float()-r2.Float() == 0.0 {
@@ -2400,11 +2401,11 @@ func ZendiSmartStreq(s1 string, s2 string) bool {
 }
 func ZendiSmartStrcmp(s1 string, s2 string) int {
 	var r1, r2 conv.ParseNumberResult
-	r1 = StrToNumberEx(s1, 0)
+	r1 = zend.StrToNumberEx(s1, 0)
 	if !r1.IsSucc() {
 		goto string_cmp
 	}
-	r2 = StrToNumberEx(s2, 0)
+	r2 = zend.StrToNumberEx(s2, 0)
 	if !r2.IsSucc() {
 		goto string_cmp
 	}
@@ -2457,7 +2458,7 @@ func ZendCompareSymbolTables(ht1 *types.Array, ht2 *types.Array) int {
 func ZendCompareArrays(a1 *types.Zval, a2 *types.Zval) int {
 	return ZendCompareSymbolTables(a1.Array(), a2.Array())
 }
-func ZendLongToStr(num ZendLong) *types.String {
+func ZendLongToStr(num zend.ZendLong) *types.String {
 	var res = strconv.Itoa(num)
 	return types.NewString(res)
 }
@@ -2504,12 +2505,12 @@ func ZendMemnrstrEx(haystack *byte, needle *byte, needle_len int, end *byte) *by
 	}
 	return nil
 }
-func ZendDvalToLvalSlow(d float64) ZendLong {
+func ZendDvalToLvalSlow(d float64) zend.ZendLong {
 	dmod := math.Mod(d, 1<<64)
 	if dmod > math.MaxInt {
 		dmod -= 1 << 64
 	} else if dmod < math.MinInt {
 		dmod += 1 << 64
 	}
-	return ZendLong(dmod)
+	return zend.ZendLong(dmod)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"strings"
 )
@@ -285,7 +286,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		var called_scope *types.ClassEntry = zend.ZendGetCalledScope(executeData)
 		var l_autoload_running int = SPL_G__().autoloadRunning
 		SPL_G__().autoloadRunning = 1
-		lc_name = zend.ZendStringTolower(class_name.String())
+		lc_name = operators.ZendStringTolower(class_name.String())
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetRetval(&retval)
 		fci.SetParamCount(1)
@@ -311,7 +312,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 			if alfi.GetObj().IsUndef() {
 				fci.SetObject(nil)
 				fcic.SetObject(nil)
-				if alfi.GetCe() != nil && (called_scope == nil || zend.InstanceofFunction(called_scope, alfi.GetCe()) == 0) {
+				if alfi.GetCe() != nil && (called_scope == nil || operators.InstanceofFunction(called_scope, alfi.GetCe()) == 0) {
 					fcic.SetCalledScope(alfi.GetCe())
 				} else {
 					fcic.SetCalledScope(called_scope)

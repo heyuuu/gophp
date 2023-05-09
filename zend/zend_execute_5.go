@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func zend_fetch_dimension_address_W(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
@@ -49,7 +50,7 @@ func ZendFetchDimensionAddressRead(
 		if dim.GetType() != types.IS_LONG {
 			switch dim.GetType() {
 			case types.IS_STRING:
-				if types.IS_LONG == IsNumericString(dim.String().GetStr(), nil, nil, -1) {
+				if types.IS_LONG == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 					break
 				}
 				if type_ == BP_VAR_IS {
@@ -76,7 +77,7 @@ func ZendFetchDimensionAddressRead(
 			default:
 				ZendIllegalOffset()
 			}
-			offset = ZvalGetLong(dim)
+			offset = operators.ZvalGetLong(dim)
 		} else {
 			offset = dim.Long()
 		}
@@ -111,7 +112,7 @@ func ZendFetchDimensionAddressRead(
 			if result != retval {
 				types.ZVAL_COPY_DEREF(result, retval)
 			} else if retval.IsReference() {
-				ZendUnwrapReference(result)
+				operators.ZendUnwrapReference(result)
 			}
 		} else {
 			result.SetNull()
@@ -151,7 +152,7 @@ func ZendFetchDimensionConst(result *types.Zval, container *types.Zval, dim *typ
 func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	var hval ZendUlong
 	if offset.IsDouble() {
-		hval = DvalToLval(offset.Double())
+		hval = operators.DvalToLval(offset.Double())
 	num_idx:
 		return ht.IndexFind(hval)
 	} else if offset.IsNull() {
@@ -201,8 +202,8 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 
 			/*}*/
 
-			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == IsNumericString(offset.String().GetStr(), nil, nil, 0) {
-				lval = ZvalGetLong(offset)
+			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}
 			return 0
@@ -238,8 +239,8 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 
 			/*}*/
 
-			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == IsNumericString(offset.String().GetStr(), nil, nil, 0) {
-				lval = ZvalGetLong(offset)
+			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}
 			return 1

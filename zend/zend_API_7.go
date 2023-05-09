@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
@@ -54,7 +55,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 			}
 		} else {
 			fcc.SetCalledScope(ZendGetCalledScope(CurrEX()))
-			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope) == 0 {
+			if fcc.GetCalledScope() == nil || operators.InstanceofFunction(fcc.GetCalledScope(), scope) == 0 {
 				fcc.SetCalledScope(scope)
 			}
 			fcc.SetCallingScope(scope)
@@ -74,7 +75,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 			}
 		} else {
 			fcc.SetCalledScope(ZendGetCalledScope(CurrEX()))
-			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope.GetParent()) == 0 {
+			if fcc.GetCalledScope() == nil || operators.InstanceofFunction(fcc.GetCalledScope(), scope.GetParent()) == 0 {
 				fcc.SetCalledScope(scope.GetParent())
 			}
 			fcc.SetCallingScope(scope.GetParent())
@@ -113,7 +114,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 		fcc.SetCallingScope(ce)
 		if scope != nil && fcc.GetObject() == nil {
 			var object *types.ZendObject = ZendGetThisObject(CurrEX())
-			if object != nil && InstanceofFunction(object.GetCe(), scope) != 0 && InstanceofFunction(scope, ce) != 0 {
+			if object != nil && operators.InstanceofFunction(object.GetCe(), scope) != 0 && operators.InstanceofFunction(scope, ce) != 0 {
 				fcc.SetObject(object)
 				fcc.SetCalledScope(object.GetCe())
 			} else {
@@ -167,7 +168,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			/* Skip leading \ */
 
 			types.ZstrAlloc(lmname, callable.String().GetLen()-1)
-			ZendStrTolowerCopy(lmname.GetVal(), callable.String().GetVal()+1, callable.String().GetLen()-1)
+			operators.ZendStrTolowerCopy(lmname.GetVal(), callable.String().GetVal()+1, callable.String().GetLen()-1)
 			func_ = ZendFetchFunction(lmname)
 			//lmname.Free()
 		} else {
@@ -175,7 +176,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			func_ = ZendFetchFunction(lmname)
 			if func_ == nil {
 				types.ZstrAlloc(lmname, callable.String().GetLen())
-				ZendStrTolowerCopy(lmname.GetVal(), callable.String().GetVal(), callable.String().GetLen())
+				operators.ZendStrTolowerCopy(lmname.GetVal(), callable.String().GetVal(), callable.String().GetLen())
 				func_ = ZendFetchFunction(lmname)
 				//lmname.Free()
 			}
@@ -188,7 +189,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 
 	/* Split name into class/namespace and method/function names */
 
-	if b.Assign(&colon, ZendMemrchr(callable.String().GetVal(), ':', callable.String().GetLen())) != nil && colon > callable.String().GetVal() && (*(colon - 1)) == ':' {
+	if b.Assign(&colon, operators.ZendMemrchr(callable.String().GetVal(), ':', callable.String().GetLen())) != nil && colon > callable.String().GetVal() && (*(colon - 1)) == ':' {
 		var mlen int
 		colon--
 		clen = colon - callable.String().GetVal()
@@ -215,7 +216,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		}
 		// types.ZendStringReleaseEx(cname, 0)
 		ftable = fcc.GetCallingScope().FunctionTable()
-		if ce_org != nil && InstanceofFunction(ce_org, fcc.GetCallingScope()) == 0 {
+		if ce_org != nil && operators.InstanceofFunction(ce_org, fcc.GetCallingScope()) == 0 {
 			if error != nil {
 				*error = ZendSprintf("class '%s' is not a subclass of '%s'", ce_org.GetName().GetVal(), fcc.GetCallingScope().GetName().GetVal())
 			}
@@ -239,7 +240,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		}
 		return 0
 	}
-	lmname = ZendStringTolower(mname)
+	lmname = operators.ZendStringTolower(mname)
 	if strict_class != 0 && fcc.GetCallingScope() != nil && lmname.GetStr() == ZEND_CONSTRUCTOR_FUNC_NAME {
 		fcc.SetFunctionHandler(fcc.GetCallingScope().GetConstructor())
 		if fcc.GetFunctionHandler() != nil {
@@ -250,7 +251,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		retval = 1
 		if fcc.GetFunctionHandler().GetOpArray().IsChanged() && strict_class == 0 {
 			scope = ZendGetExecutedScope()
-			if scope != nil && InstanceofFunction(fcc.GetFunctionHandler().GetScope(), scope) != 0 {
+			if scope != nil && operators.InstanceofFunction(fcc.GetFunctionHandler().GetScope(), scope) != 0 {
 				if priv_fbc := scope.FunctionTable().Get(lmname.GetStr()); priv_fbc != nil {
 					if priv_fbc.IsPrivate() && priv_fbc.GetScope() == scope {
 						fcc.SetFunctionHandler(priv_fbc)
@@ -278,7 +279,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			} else {
 				fcc.SetFunctionHandler(fcc.GetObject().GetHandlers().GetGetMethod()(fcc.GetObject(), mname, nil))
 				if fcc.GetFunctionHandler() != nil {
-					if strict_class != 0 && (fcc.GetFunctionHandler().GetScope() == nil || InstanceofFunction(ce_org, fcc.GetFunctionHandler().GetScope()) == 0) {
+					if strict_class != 0 && (fcc.GetFunctionHandler().GetScope() == nil || operators.InstanceofFunction(ce_org, fcc.GetFunctionHandler().GetScope()) == 0) {
 						ZendReleaseFcallInfoCache(fcc)
 					} else {
 						retval = 1
@@ -297,7 +298,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 				call_via_handler = fcc.GetFunctionHandler().IsCallViaTrampoline()
 				if call_via_handler != 0 && fcc.GetObject() == nil {
 					var object *types.ZendObject = ZendGetThisObject(CurrEX())
-					if object != nil && InstanceofFunction(object.GetCe(), fcc.GetCallingScope()) != 0 {
+					if object != nil && operators.InstanceofFunction(object.GetCe(), fcc.GetCallingScope()) != 0 {
 						fcc.SetObject(object)
 					}
 				}
@@ -422,12 +423,12 @@ try_again:
 			memcpy(callable_name.GetVal()+ce.GetName().GetLen(), "::__invoke", b.SizeOf("\"::__invoke\""))
 			return callable_name
 		}
-		return ZvalGetString(callable)
+		return operators.ZvalGetString(callable)
 	case types.IS_REFERENCE:
 		callable = types.Z_REFVAL_P(callable)
 		goto try_again
 	default:
-		return ZvalGetString(callable)
+		return operators.ZvalGetString(callable)
 	}
 }
 func ZendGetCallableName(callable *types.Zval) *types.String {

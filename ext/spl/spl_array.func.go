@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -480,7 +481,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, types.Z_OBJCE_P(object), intern.GetFptrOffsetHas(), "offsetExists", &rv, offset)
 		// zend.ZvalPtrDtor(offset)
-		if zend.ZvalIsTrue(&rv) {
+		if operators.ZvalIsTrue(&rv) {
 			// zend.ZvalPtrDtor(&rv)
 			if check_empty != 1 {
 				return 1
@@ -539,7 +540,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 			value = tmp
 		}
 	}
-	var result types.ZendBool = b.CondF(check_empty != 0, func() int { return zend.IZendIsTrue(value) }, func() bool { return value.GetType() != types.IS_NULL })
+	var result types.ZendBool = b.CondF(check_empty != 0, func() int { return operators.IZendIsTrue(value) }, func() bool { return value.GetType() != types.IS_NULL })
 	if value == &rv {
 		// zend.ZvalPtrDtor(&rv)
 	}
@@ -724,7 +725,7 @@ func SplArrayCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 	intern2 = Z_SPLARRAY_P(o2)
 	ht1 = SplArrayGetHashTable(intern1)
 	ht2 = SplArrayGetHashTable(intern2)
-	result = zend.ZendCompareSymbolTables(ht1, ht2)
+	result = operators.ZendCompareSymbolTables(ht1, ht2)
 
 	/* if we just compared std.properties, don't do it again */
 
@@ -1043,7 +1044,7 @@ func SplArrayObjectCountElements(object *types.Zval, count *zend.ZendLong) int {
 		var rv types.Zval
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
 		if rv.IsNotUndef() {
-			*count = zend.ZvalGetLong(&rv)
+			*count = operators.ZvalGetLong(&rv)
 			// zend.ZvalPtrDtor(&rv)
 			return types.SUCCESS
 		}
@@ -1213,7 +1214,7 @@ func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *
 		if intern.IsChildArraysOnly() {
 			return
 		}
-		if zend.InstanceofFunction(types.Z_OBJCE_P(entry), types.Z_OBJCE_P(zend.ZEND_THIS(executeData))) != 0 {
+		if operators.InstanceofFunction(types.Z_OBJCE_P(entry), types.Z_OBJCE_P(zend.ZEND_THIS(executeData))) != 0 {
 			return_value.SetObject(entry.Object())
 			// 			return_value.AddRefcount()
 			return
@@ -1438,7 +1439,7 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 		if ce == nil {
 			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.String().GetVal())
 			return
-		} else if zend.InstanceofFunction(ce, spl_ce_Iterator) == 0 {
+		} else if operators.InstanceofFunction(ce, spl_ce_Iterator) == 0 {
 			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", iterator_class_zv.String().GetVal())
 			return
 		} else {

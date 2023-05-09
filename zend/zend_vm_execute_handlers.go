@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 // ZEND_NOP
@@ -17,14 +18,14 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
-	switch TypePair(op1.GetType(), op2.GetType()) {
-	case TypePair(types.IS_LONG, types.IS_LONG):
+	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	case operators.TypePair(types.IS_LONG, types.IS_LONG):
 		result := opline.Result()
-		FastLongAddFunction(result, op1, op2)
+		operators.FastLongAddFunction(result, op1, op2)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
-		TypePair(types.IS_LONG, types.IS_DOUBLE),
-		TypePair(types.IS_DOUBLE, types.IS_LONG):
+	case operators.TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		operators.TypePair(types.IS_LONG, types.IS_DOUBLE),
+		operators.TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -48,7 +49,7 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 	if op2.IsUndef() {
 		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	AddFunction(opline.Result(), op1, op2)
+	operators.AddFunction(opline.Result(), op1, op2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op1)
 	}
@@ -65,14 +66,14 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
-	switch TypePair(op1.GetType(), op2.GetType()) {
-	case TypePair(types.IS_LONG, types.IS_LONG):
+	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	case operators.TypePair(types.IS_LONG, types.IS_LONG):
 		result := opline.Result()
-		FastLongSubFunction(result, op1, op2)
+		operators.FastLongSubFunction(result, op1, op2)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
-		TypePair(types.IS_LONG, types.IS_DOUBLE),
-		TypePair(types.IS_DOUBLE, types.IS_LONG):
+	case operators.TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		operators.TypePair(types.IS_LONG, types.IS_DOUBLE),
+		operators.TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -96,7 +97,7 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 	if op2.IsUndef() {
 		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	SubFunction(opline.Result(), op1, op2)
+	operators.SubFunction(opline.Result(), op1, op2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op1)
 	}
@@ -113,8 +114,8 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
-	switch TypePair(op1.GetType(), op2.GetType()) {
-	case TypePair(types.IS_LONG, types.IS_LONG):
+	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	case operators.TypePair(types.IS_LONG, types.IS_LONG):
 		var overflow ZendLong
 		result := opline.Result()
 		ZEND_SIGNED_MULTIPLY_LONG(op1.Long(), op2.Long(), result.Long(), result.Double(), overflow)
@@ -124,9 +125,9 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 			result.SetTypeInfo(types.IS_LONG)
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
-		TypePair(types.IS_LONG, types.IS_DOUBLE),
-		TypePair(types.IS_DOUBLE, types.IS_LONG):
+	case operators.TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
+		operators.TypePair(types.IS_LONG, types.IS_DOUBLE),
+		operators.TypePair(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -150,7 +151,7 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 	if op2.IsUndef() {
 		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	MulFunction(opline.Result(), op1, op2)
+	operators.MulFunction(opline.Result(), op1, op2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op2)
 	}
@@ -166,7 +167,7 @@ func vmDivHandler(executeData *ZendExecuteData) int {
 	var freeOp1, freeOp2 ZendFreeOp
 	var op1 *types.Zval = executeData.Op1(opline, opMode2)
 	var op2 *types.Zval = executeData.Op2(opline, opMode2)
-	FastDivFunction(opline.Result(), op1, op2)
+	operators.FastDivFunction(opline.Result(), op1, op2)
 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -242,7 +243,7 @@ func getConcatHandler(executeData *ZendExecuteData) int {
 	if op2.IsUndef() {
 		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	ConcatFunction(opline.Result(), op1, op2)
+	operators.ConcatFunction(opline.Result(), op1, op2)
 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

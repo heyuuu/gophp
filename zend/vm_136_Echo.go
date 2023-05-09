@@ -1,6 +1,9 @@
 package zend
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
+)
 
 func ZEND_ECHO_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -12,7 +15,7 @@ func ZEND_ECHO_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			ZendWrite(str.GetStr())
 		}
 	} else {
-		var str *types.String = ZvalGetString(z)
+		var str *types.String = operators.ZvalGetString(z)
 		if str.GetLen() != 0 {
 			ZendWrite(str.GetStr())
 		} else {
@@ -33,7 +36,7 @@ func ZEND_ECHO_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			ZendWrite(str.GetStr())
 		}
 	} else {
-		var str *types.String = ZvalGetString(z)
+		var str *types.String = operators.ZvalGetString(z)
 		if str.GetLen() != 0 {
 			ZendWrite(str.GetStr())
 		} else if z.IsUndef() {
@@ -54,7 +57,7 @@ func ZEND_ECHO_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			ZendWrite(str.GetStr())
 		}
 	} else {
-		var str *types.String = ZvalGetString(z)
+		var str *types.String = operators.ZvalGetString(z)
 		if str.GetLen() != 0 {
 			ZendWrite(str.GetStr())
 		} else if z.IsUndef() {

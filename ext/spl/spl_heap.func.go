@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func SplHeapFromObj(obj *types.ZendObject) *SplHeapObject {
@@ -41,7 +42,7 @@ func SplPtrHeapCmpCbHelper(object *types.Zval, heap_object *SplHeapObject, a *ty
 	if zend.EG__().GetException() != nil {
 		return types.FAILURE
 	}
-	*result = zend.ZvalGetLong(&zresult)
+	*result = operators.ZvalGetLong(&zresult)
 	// zend.ZvalPtrDtor(&zresult)
 	return types.SUCCESS
 }
@@ -87,7 +88,7 @@ func SplPtrHeapZvalMaxCmp(x any, y any, object *types.Zval) int {
 			return zend.ZEND_NORMALIZE_BOOL(lval)
 		}
 	}
-	zend.CompareFunction(&result, a, b)
+	operators.CompareFunction(&result, a, b)
 	return int(result.Long())
 }
 func SplPtrHeapZvalMinCmp(x any, y any, object *types.Zval) int {
@@ -113,7 +114,7 @@ func SplPtrHeapZvalMinCmp(x any, y any, object *types.Zval) int {
 			return zend.ZEND_NORMALIZE_BOOL(lval)
 		}
 	}
-	zend.CompareFunction(&result, b, a)
+	operators.CompareFunction(&result, b, a)
 	return int(result.Long())
 }
 func SplPtrPqueueElemCmp(x any, y any, object *types.Zval) int {
@@ -141,7 +142,7 @@ func SplPtrPqueueElemCmp(x any, y any, object *types.Zval) int {
 			return zend.ZEND_NORMALIZE_BOOL(lval)
 		}
 	}
-	zend.CompareFunction(&result, a_priority_p, b_priority_p)
+	operators.CompareFunction(&result, a_priority_p, b_priority_p)
 	return int(result.Long())
 }
 func SplPtrHeapInit(cmp SplPtrHeapCmpFunc, ctor SplPtrHeapCtorFunc, dtor SplPtrHeapDtorFunc, elem_size int) *SplPtrHeap {
@@ -339,7 +340,7 @@ func SplHeapObjectCountElements(object *types.Zval, count *zend.ZendLong) int {
 		var rv types.Zval
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
 		if !(rv.IsUndef()) {
-			*count = zend.ZvalGetLong(&rv)
+			*count = operators.ZvalGetLong(&rv)
 			// zend.ZvalPtrDtor(&rv)
 			return types.SUCCESS
 		}

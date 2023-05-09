@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendCompileMagicConst(result *Znode, ast *ZendAst) {
@@ -473,7 +474,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
-		child0_is_true = IZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))
+		child0_is_true = operators.IZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))
 		if child0_is_true == (ast.GetKind() == ZEND_AST_OR) {
 			result.SetBool(ast.GetKind() == ZEND_AST_OR)
 			break
@@ -481,7 +482,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if ast.GetChild()[1].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
-		child1_is_true = IZendIsTrue(ZendAstGetZval(ast.GetChild()[1]))
+		child1_is_true = operators.IZendIsTrue(ZendAstGetZval(ast.GetChild()[1]))
 		if ast.GetKind() == ZEND_AST_OR {
 			result.SetBool(child0_is_true != 0 || child1_is_true != 0)
 		} else {
@@ -543,7 +544,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			ZendEvalConstExpr(ast.GetChild()[2])
 			return
 		}
-		child = ast.GetChild()[2-IZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))]
+		child = ast.GetChild()[2-operators.IZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))]
 		if (*child) == nil {
 			child--
 		}
@@ -603,7 +604,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			var c uint8
 			if dim.IsLong() {
 				offset = dim.Long()
-			} else if dim.GetType() != types.IS_STRING || IsNumericString(dim.String().GetStr(), &offset, nil, 1) != types.IS_LONG {
+			} else if dim.GetType() != types.IS_STRING || operators.IsNumericString(dim.String().GetStr(), &offset, nil, 1) != types.IS_LONG {
 				return
 			}
 			if offset < 0 || int(offset >= container.String().GetLen()) != 0 {

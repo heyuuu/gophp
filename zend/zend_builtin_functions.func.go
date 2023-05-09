@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"strings"
 )
@@ -139,15 +140,15 @@ func ZifStrncmp(str1 string, str2 string, len_ int) (int, bool) {
 		faults.Error(faults.E_WARNING, "Length must be greater than or equal to 0")
 		return 0, false
 	}
-	return ZendBinaryStrncmp(str1, str2, len_), true
+	return operators.ZendBinaryStrncmp(str1, str2, len_), true
 }
-func ZifStrcasecmp(str1 string, str2 string) int { return ZendBinaryStrcasecmp(str1, str2) }
+func ZifStrcasecmp(str1 string, str2 string) int { return operators.ZendBinaryStrcasecmp(str1, str2) }
 func ZifStrncasecmp(str1 string, str2 string, len_ int) (int, bool) {
 	if len_ < 0 {
 		faults.Error(faults.E_WARNING, "Length must be greater than or equal to 0")
 		return 0, false
 	}
-	return ZendBinaryStrncasecmp(str1, str2, len_), true
+	return operators.ZendBinaryStrncasecmp(str1, str2, len_), true
 }
 func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) (*types.Array, bool) {
 	var array *types.Zval
@@ -211,7 +212,7 @@ func ZifErrorReporting(ret zpp.Ret, _ zpp.Opt, newErrorLevel *types.Zval) {
 	var old_error_reporting int
 	old_error_reporting = EG__().GetErrorReporting()
 	if newErrorLevel != nil {
-		var new_val = ZvalTryGetString(newErrorLevel)
+		var new_val = operators.ZvalTryGetString(newErrorLevel)
 		if new_val == nil {
 			return
 		}
@@ -474,7 +475,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 			if only_subclass != 0 && instance_ce == ce {
 				retval = 0
 			} else {
-				retval = InstanceofFunction(instance_ce, ce)
+				retval = operators.InstanceofFunction(instance_ce, ce)
 			}
 		}
 	}
@@ -827,9 +828,9 @@ func ZifFunctionExists(executeData zpp.Ex, return_value zpp.Ret, functionName *t
 		/* Ignore leading "\" */
 
 		lcname = types.ZendStringAlloc(name.GetLen()-1, 0)
-		ZendStrTolowerCopy(lcname.GetVal(), name.GetVal()+1, name.GetLen()-1)
+		operators.ZendStrTolowerCopy(lcname.GetVal(), name.GetVal()+1, name.GetLen()-1)
 	} else {
-		lcname = ZendStringTolower(name)
+		lcname = operators.ZendStringTolower(name)
 	}
 	func_ = EG__().FunctionTable().Get(lcname.GetStr())
 

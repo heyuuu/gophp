@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"math"
 )
 
@@ -33,7 +34,7 @@ func ParseBool(arg *types.Zval, checkNull bool, weak bool) (dest bool, isNull bo
 
 func ParseBoolWeak(arg *types.Zval) (dest bool, ok bool) {
 	if arg.GetType() <= types.IS_STRING {
-		return zend.ZvalIsTrue(arg), true
+		return operators.ZvalIsTrue(arg), true
 	}
 	return false, false
 }
@@ -90,12 +91,12 @@ func parseArgWeak_DvalToLval(dval float64, cap bool) (int, bool) {
 		return 0, false
 	}
 	if cap {
-		return zend.DvalToLvalCap(dval), true
+		return operators.DvalToLvalCap(dval), true
 	} else {
-		if !zend.DoubleFitsLong(dval) {
+		if !operators.DoubleFitsLong(dval) {
 			return 0, false
 		}
-		return zend.DvalToLval(dval), true
+		return operators.DvalToLval(dval), true
 	}
 }
 
@@ -173,7 +174,7 @@ func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.String, 
 
 func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 	if arg.GetType() < types.IS_STRING {
-		zend.ConvertToString(arg)
+		operators.ConvertToString(arg)
 		return arg.String(), true
 	} else if arg.IsString() {
 		return arg.String(), true
@@ -194,7 +195,7 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 				if z.IsString() {
 					arg.CopyValueFrom(z)
 				} else {
-					arg.SetString(zend.ZvalGetString(z))
+					arg.SetString(operators.ZvalGetString(z))
 					// zend.ZvalPtrDtor(z)
 				}
 				return arg.String(), true
@@ -256,7 +257,7 @@ func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool)
 }
 
 func ParseObject(arg *types.Zval, ce *types.ClassEntry, checkNull bool) (dest *types.Zval, ok bool) {
-	if arg.IsObject() && (ce == nil || zend.InstanceofFunction(types.Z_OBJCE_P(arg), ce) != 0) {
+	if arg.IsObject() && (ce == nil || operators.InstanceofFunction(types.Z_OBJCE_P(arg), ce) != 0) {
 		return arg, true
 	} else if checkNull && arg.IsNull() {
 		return nil, true
@@ -300,12 +301,12 @@ func ParseClass(arg *types.Zval, baseCe *types.ClassEntry, num int, checkNull bo
 		return nil, true
 	}
 
-	if zend.TryConvertToString(arg) == 0 {
+	if operators.TryConvertToString(arg) == 0 {
 		return nil, false
 	}
 	ce = zend.ZendLookupClass(arg.String())
 	if baseCe != nil {
-		if ce == nil || zend.InstanceofFunction(ce, baseCe) == 0 {
+		if ce == nil || operators.InstanceofFunction(ce, baseCe) == 0 {
 			faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.GetActiveCalleeName(), num, baseCe.Name(), arg.StringVal())
 			return nil, false
 		}

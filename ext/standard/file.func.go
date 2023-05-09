@@ -10,6 +10,7 @@ import (
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -463,7 +464,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 	case types.IS_FALSE:
 		fallthrough
 	case types.IS_TRUE:
-		zend.ConvertToStringEx(data)
+		operators.ConvertToStringEx(data)
 		fallthrough
 	case types.IS_STRING:
 		if data.String().GetLen() != 0 {
@@ -476,7 +477,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 	case types.IS_ARRAY:
 		if data.Array().Len() != 0 {
 			data.Array().ForeachEx(func(key types.ArrayKey, tmp *types.Zval) bool {
-				var s string = zend.ZvalGetStrVal(tmp)
+				var s string = operators.ZvalGetStrVal(tmp)
 				if s != "" {
 					numbytes += len(s)
 					bytesWritten := core.PhpStreamWriteString(stream, s)
@@ -1714,7 +1715,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = fields.Array().Len()
 	fields.Array().Foreach(func(_ types.ArrayKey, field_tmp *types.Zval) {
-		var field_str *types.String = zend.ZvalGetString(field_tmp)
+		var field_str *types.String = operators.ZvalGetString(field_tmp)
 
 		/* enclose a field that contains a delimiter, an enclosure character, or a newline */
 
@@ -1829,7 +1830,7 @@ func ZifFgetcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.
 		}
 	}
 	if len_zv != nil && len_zv.GetType() != types.IS_NULL {
-		len_ = zend.ZvalGetLong(len_zv)
+		len_ = operators.ZvalGetLong(len_zv)
 		if len_ < 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter may not be negative")
 			return_value.SetFalse()

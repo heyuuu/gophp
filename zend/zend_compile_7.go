@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"os"
 )
 
@@ -71,14 +72,14 @@ func ZendCompileUse(ast *ZendAst) {
 		if case_sensitive {
 			lookup_name = new_name.Copy()
 		} else {
-			lookup_name = ZendStringTolower(new_name)
+			lookup_name = operators.ZendStringTolower(new_name)
 		}
 		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use %s as %s because '%s' "+"is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
 		}
 		if current_ns != nil {
 			var ns_name *types.String = types.ZendStringAlloc(current_ns.GetLen()+1+new_name.GetLen(), 0)
-			ZendStrTolowerCopy(ns_name.GetVal(), current_ns.GetVal(), current_ns.GetLen())
+			operators.ZendStrTolowerCopy(ns_name.GetVal(), current_ns.GetVal(), current_ns.GetLen())
 			ns_name.GetStr()[current_ns.GetLen()] = '\\'
 			memcpy(ns_name.GetVal()+current_ns.GetLen()+1, lookup_name.GetVal(), lookup_name.GetLen()+1)
 			if ZendHaveSeenSymbol(ns_name, type_) != 0 {
@@ -304,10 +305,10 @@ func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *types.Zval, op2 
 	if (opcode == ZEND_BW_OR || opcode == ZEND_BW_AND || opcode == ZEND_BW_XOR) && op1.IsString() && op2.IsString() {
 		return 0
 	}
-	if op1.IsString() && IsNumericString(op1.String().GetStr(), nil, nil, 0) == 0 {
+	if op1.IsString() && operators.IsNumericString(op1.String().GetStr(), nil, nil, 0) == 0 {
 		return 1
 	}
-	if op2.IsString() && IsNumericString(op2.String().GetStr(), nil, nil, 0) == 0 {
+	if op2.IsString() && operators.IsNumericString(op2.String().GetStr(), nil, nil, 0) == 0 {
 		return 1
 	}
 	return 0
@@ -323,9 +324,9 @@ func ZendTryCtEvalBinaryOp(result *types.Zval, opcode uint32, op1 *types.Zval, o
 
 	/* don't evaluate division by zero at compile-time */
 
-	if (opcode == ZEND_DIV || opcode == ZEND_MOD) && ZvalGetLong(op2) == 0 {
+	if (opcode == ZEND_DIV || opcode == ZEND_MOD) && operators.ZvalGetLong(op2) == 0 {
 		return 0
-	} else if (opcode == ZEND_SL || opcode == ZEND_SR) && ZvalGetLong(op2) < 0 {
+	} else if (opcode == ZEND_SL || opcode == ZEND_SR) && operators.ZvalGetLong(op2) < 0 {
 		return 0
 	}
 
@@ -353,7 +354,7 @@ func ZendTryCtEvalUnaryPm(result *types.Zval, kind ZendAstKind, op *types.Zval) 
 	return ZendTryCtEvalBinaryOp(result, ZEND_MUL, &left, op)
 }
 func ZendCtEvalGreater(result *types.Zval, kind ZendAstKind, op1 *types.Zval, op2 *types.Zval) {
-	var fn BinaryOpType = b.Cond(kind == ZEND_AST_GREATER, IsSmallerFunction, IsSmallerOrEqualFunction)
+	var fn BinaryOpType = b.Cond(kind == ZEND_AST_GREATER, operators.IsSmallerFunction, operators.IsSmallerOrEqualFunction)
 	fn(result, op2, op1)
 }
 func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
@@ -436,7 +437,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 			case types.IS_STRING:
 				result.Array().SymtableUpdate(key.String().GetStr(), value)
 			case types.IS_DOUBLE:
-				result.Array().IndexUpdate(DvalToLval(key.Double()), value)
+				result.Array().IndexUpdate(operators.DvalToLval(key.Double()), value)
 			case types.IS_FALSE:
 				result.Array().IndexUpdate(0, value)
 			case types.IS_TRUE:
@@ -529,14 +530,14 @@ func ZendCompileBinaryOp(result *Znode, ast *ZendAst) {
 				if left_node.GetConstant().IsArray() {
 					ZendEmitOpTmp(&left_node, ZEND_CAST, &left_node, nil).SetExtendedValue(types.IS_STRING)
 				} else {
-					ConvertToString(left_node.GetConstant())
+					operators.ConvertToString(left_node.GetConstant())
 				}
 			}
 			if right_node.GetOpType() == IS_CONST {
 				if right_node.GetConstant().IsArray() {
 					ZendEmitOpTmp(&right_node, ZEND_CAST, &right_node, nil).SetExtendedValue(types.IS_STRING)
 				} else {
-					ConvertToString(right_node.GetConstant())
+					operators.ConvertToString(right_node.GetConstant())
 				}
 			}
 			if left_node.GetOpType() == IS_CONST && right_node.GetOpType() == IS_CONST {

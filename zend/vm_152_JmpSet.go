@@ -1,6 +1,9 @@
 package zend
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
+)
 
 func ZEND_JMP_SET_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -8,7 +11,7 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ref *types.Zval = nil
 	var ret int
 	value = opline.Const1()
-	ret = IZendIsTrue(value)
+	ret = operators.IZendIsTrue(value)
 	if EG__().GetException() != nil {
 		opline.Result().SetUndef()
 		return 0
@@ -39,7 +42,7 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		}
 		value = types.Z_REFVAL_P(value)
 	}
-	ret = IZendIsTrue(value)
+	ret = operators.IZendIsTrue(value)
 	if EG__().GetException() != nil {
 		// ZvalPtrDtorNogc(free_op1)
 		opline.Result().SetUndef()
@@ -73,7 +76,7 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 		value = types.Z_REFVAL_P(value)
 	}
-	ret = IZendIsTrue(value)
+	ret = operators.IZendIsTrue(value)
 	if EG__().GetException() != nil {
 		// ZvalPtrDtorNogc(free_op1)
 		opline.Result().SetUndef()
@@ -106,7 +109,7 @@ func ZEND_JMP_SET_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		value = types.Z_REFVAL_P(value)
 	}
-	ret = IZendIsTrue(value)
+	ret = operators.IZendIsTrue(value)
 	if EG__().GetException() != nil {
 		opline.Result().SetUndef()
 		return 0

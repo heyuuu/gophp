@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"strings"
 )
 
@@ -188,7 +189,7 @@ func ZendAssertValidClassName(name string) {
 func ZendLookupBuiltinTypeByName(name *types.String) uint8 {
 	var info *BuiltinTypeInfo = &BuiltinTypes[0]
 	for ; info.GetName() != nil; info++ {
-		if name.GetLen() == info.GetNameLen() && ZendBinaryStrcasecmp(name.GetStr(), b.CastStr(info.GetName(), info.GetNameLen())) == 0 {
+		if name.GetLen() == info.GetNameLen() && operators.ZendBinaryStrcasecmp(name.GetStr(), b.CastStr(info.GetName(), info.GetNameLen())) == 0 {
 			return info.GetType()
 		}
 	}
@@ -351,7 +352,7 @@ func ZendAddFuncNameLiteral(name *types.String) int {
 
 	/* Lowercased name */
 
-	var lc_name *types.String = ZendStringTolower(name)
+	var lc_name *types.String = operators.ZendStringTolower(name)
 	ZendAddLiteralString(&lc_name)
 	return ret
 }
@@ -377,7 +378,7 @@ func ZendAddClassNameLiteral(name *types.String) int {
 
 	/* Lowercased name */
 
-	var lc_name *types.String = ZendStringTolower(name)
+	var lc_name *types.String = operators.ZendStringTolower(name)
 	ZendAddLiteralString(&lc_name)
 	return ret
 }
@@ -386,7 +387,7 @@ func ZendAddConstNameLiteral(name string, unqualified types.ZendBool) int {
 	var ret int = ZendAddLiteralString(&name)
 	var ns_len int = 0
 	var after_ns_len int = name.GetLen()
-	var after_ns *byte = ZendMemrchr(name.GetVal(), '\\', name.GetLen())
+	var after_ns *byte = operators.ZendMemrchr(name.GetVal(), '\\', name.GetLen())
 	if after_ns != nil {
 		after_ns += 1
 		ns_len = after_ns - name.GetVal() - 1
@@ -412,7 +413,7 @@ func ZendAddConstNameLiteral(name string, unqualified types.ZendBool) int {
 	/* lowercased unqualified constant name */
 
 	tmp_name = types.ZendStringAlloc(after_ns_len, 0)
-	ZendStrTolowerCopy(tmp_name.GetVal(), after_ns, after_ns_len)
+	operators.ZendStrTolowerCopy(tmp_name.GetVal(), after_ns, after_ns_len)
 	ZendAddLiteralString(&tmp_name)
 	return ret
 }
@@ -541,7 +542,7 @@ func ZendHashFindPtrLc(ht *types.Array, str *byte, len_ int) any {
 	var result any
 	var lcname *types.String
 	types.ZstrAlloc(lcname, len_)
-	ZendStrTolowerCopy(lcname.GetVal(), str, len_)
+	operators.ZendStrTolowerCopy(lcname.GetVal(), str, len_)
 	result = types.ZendHashFindPtr(ht, lcname.GetStr())
 	//lcname.Free()
 	return result

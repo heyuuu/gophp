@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"strings"
 )
@@ -202,7 +203,7 @@ parse_host:
 
 	/* check for login and password */
 
-	if b.Assign(&p, zend.ZendMemrchr(s, '@', e-s)) {
+	if b.Assign(&p, operators.ZendMemrchr(s, '@', e-s)) {
 		if b.Assign(&pp, memchr(s, ':', p-s)) {
 			ret.SetUser(types.NewString(b.CastStr(s, pp-s)))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
@@ -231,7 +232,7 @@ parse_host:
 		   IPv6 embedded address */
 
 	} else {
-		p = zend.ZendMemrchr(s, ':', e-s)
+		p = operators.ZendMemrchr(s, ':', e-s)
 	}
 	if p {
 		if ret.GetPort() == 0 {
@@ -656,7 +657,7 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 				if b.Assign(&prev_val, return_value.Array().KeyFind(b.CastStr(hdr.String().GetVal(), p-hdr.String().GetVal()))) == nil {
 					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.String().GetVal(), p-hdr.String().GetVal()), b.CastStr(s, hdr.String().GetLen()-(s-hdr.String().GetVal())))
 				} else {
-					zend.ConvertToArray(prev_val)
+					operators.ConvertToArray(prev_val)
 					zend.AddNextIndexStringl(prev_val, s, hdr.String().GetLen()-(s-hdr.String().GetVal()))
 				}
 				*p = c

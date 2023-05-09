@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -14,13 +15,13 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	case types.IS_NULL:
 		result.SetNull()
 	case types.IS_BOOL:
-		result.SetBool(ZvalIsTrue(expr))
+		result.SetBool(operators.ZvalIsTrue(expr))
 	case types.IS_LONG:
-		result.SetLong(ZvalGetLong(expr))
+		result.SetLong(operators.ZvalGetLong(expr))
 	case types.IS_DOUBLE:
-		result.SetDouble(ZvalGetDouble(expr))
+		result.SetDouble(operators.ZvalGetDouble(expr))
 	case types.IS_STRING:
-		result.SetString(ZvalGetString(expr))
+		result.SetString(operators.ZvalGetString(expr))
 	default:
 		/* If value is already of correct type, return it directly */
 
@@ -92,13 +93,13 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	case types.IS_NULL:
 		result.SetNull()
 	case types.IS_BOOL:
-		result.SetBool(ZvalIsTrue(expr))
+		result.SetBool(operators.ZvalIsTrue(expr))
 	case types.IS_LONG:
-		result.SetLong(ZvalGetLong(expr))
+		result.SetLong(operators.ZvalGetLong(expr))
 	case types.IS_DOUBLE:
-		result.SetDouble(ZvalGetDouble(expr))
+		result.SetDouble(operators.ZvalGetDouble(expr))
 	case types.IS_STRING:
-		result.SetString(ZvalGetString(expr))
+		result.SetString(operators.ZvalGetString(expr))
 	default:
 		{
 			expr = types.ZVAL_DEREF(expr)
@@ -177,13 +178,13 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	case types.IS_NULL:
 		result.SetNull()
 	case types.IS_BOOL:
-		result.SetBool(ZvalIsTrue(expr))
+		result.SetBool(operators.ZvalIsTrue(expr))
 	case types.IS_LONG:
-		result.SetLong(ZvalGetLong(expr))
+		result.SetLong(operators.ZvalGetLong(expr))
 	case types.IS_DOUBLE:
-		result.SetDouble(ZvalGetDouble(expr))
+		result.SetDouble(operators.ZvalGetDouble(expr))
 	case types.IS_STRING:
-		result.SetString(ZvalGetString(expr))
+		result.SetString(operators.ZvalGetString(expr))
 	default:
 		{
 			expr = types.ZVAL_DEREF(expr)
@@ -262,13 +263,13 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	case types.IS_NULL:
 		result.SetNull()
 	case types.IS_BOOL:
-		result.SetBool(ZvalIsTrue(expr))
+		result.SetBool(operators.ZvalIsTrue(expr))
 	case types.IS_LONG:
-		result.SetLong(ZvalGetLong(expr))
+		result.SetLong(operators.ZvalGetLong(expr))
 	case types.IS_DOUBLE:
-		result.SetDouble(ZvalGetDouble(expr))
+		result.SetDouble(operators.ZvalGetDouble(expr))
 	case types.IS_STRING:
-		result.SetString(ZvalGetString(expr))
+		result.SetString(operators.ZvalGetString(expr))
 	default:
 		{
 			expr = types.ZVAL_DEREF(expr)

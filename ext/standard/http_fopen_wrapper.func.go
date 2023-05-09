@@ -9,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func StripHeader(header_bag *byte, lc_header_bag *byte, lc_header_name string) {
@@ -128,7 +129,7 @@ func PhpStreamUrlWrapHttpEx(
 		}
 	}
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "timeout")) != nil {
-		var d float64 = zend.ZvalGetDouble(tmpzval)
+		var d float64 = operators.ZvalGetDouble(tmpzval)
 		timeout.tv_sec = int64(d)
 		timeout.tv_usec = size_t((d - timeout.tv_sec) * 1000000)
 	} else {
@@ -185,7 +186,7 @@ func PhpStreamUrlWrapHttpEx(
 							}
 							if (*p) == ':' {
 								p++
-								if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && zend.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf("\"Proxy-Authorization:\"")-1), "Proxy-Authorization:") == 0 {
+								if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && operators.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf("\"Proxy-Authorization:\"")-1), "Proxy-Authorization:") == 0 {
 									for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
 										p++
 									}
@@ -220,7 +221,7 @@ func PhpStreamUrlWrapHttpEx(
 					}
 					if (*p) == ':' {
 						p++
-						if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && zend.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf("\"Proxy-Authorization:\"")-1), "Proxy-Authorization:") == 0 {
+						if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && operators.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf("\"Proxy-Authorization:\"")-1), "Proxy-Authorization:") == 0 {
 							for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
 								p++
 							}
@@ -297,7 +298,7 @@ func PhpStreamUrlWrapHttpEx(
 	streams.PhpStreamContextSet(stream, context)
 	streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_CONNECT, nil, 0)
 	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "max_redirects")) != nil {
-		redirect_max = int(zend.ZvalGetLong(tmpzval))
+		redirect_max = int(operators.ZvalGetLong(tmpzval))
 	}
 	custom_request_method = 0
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "method")) != nil {
@@ -321,7 +322,7 @@ func PhpStreamUrlWrapHttpEx(
 	/* Should we send the entire path in the request line, default to no. */
 
 	if request_fulluri == 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "request_fulluri")) != nil {
-		request_fulluri = zend.IZendIsTrue(tmpzval)
+		request_fulluri = operators.IZendIsTrue(tmpzval)
 	}
 	if request_fulluri != 0 {
 
@@ -356,7 +357,7 @@ func PhpStreamUrlWrapHttpEx(
 
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "protocol_version")) != nil {
 		var protocol_version *byte
-		core.Spprintf(&protocol_version, 0, "%.1F", zend.ZvalGetDouble(tmpzval))
+		core.Spprintf(&protocol_version, 0, "%.1F", operators.ZvalGetDouble(tmpzval))
 		req_buf.AppendString(" HTTP/")
 		req_buf.AppendString(b.CastStrAuto(protocol_version))
 		req_buf.AppendString("\r\n")
@@ -612,7 +613,7 @@ func PhpStreamUrlWrapHttpEx(
 			response_code = 0
 		}
 		if context != nil && nil != b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "ignore_errors")) {
-			ignore_errors = zend.IZendIsTrue(tmpzval)
+			ignore_errors = operators.IZendIsTrue(tmpzval)
 		}
 
 		/* when we request only the header, don't fail even on error codes */
@@ -727,7 +728,7 @@ func PhpStreamUrlWrapHttpEx(
 			}
 			if !(strncasecmp(http_header_line, "Location:", b.SizeOf("\"Location:\"")-1)) {
 				if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "follow_location")) != nil {
-					follow_location = zend.IZendIsTrue(tmpzval)
+					follow_location = operators.IZendIsTrue(tmpzval)
 				} else if !(response_code >= 300 && response_code < 304 || 307 == response_code || 308 == response_code) {
 
 					/* we shouldn't redirect automatically
@@ -756,7 +757,7 @@ func PhpStreamUrlWrapHttpEx(
 				if (options & core.STREAM_ONLY_GET_HEADERS) == 0 {
 					var decode zend.ZendLong = 1
 					if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "auto_decode")) != nil {
-						decode = zend.IZendIsTrue(tmpzval)
+						decode = operators.IZendIsTrue(tmpzval)
 					}
 					if decode != 0 {
 						transfer_encoding = streams.PhpStreamFilterCreate("dechunk", nil, stream.GetIsPersistent())

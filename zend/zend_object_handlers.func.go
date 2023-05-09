@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -553,7 +554,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 	var prop_info *ZendPropertyInfo = nil
 	var guard *uint32 = nil
 	zobj = object.Object()
-	name = ZvalTryGetString(member)
+	name = operators.ZvalTryGetString(member)
 	if name == nil {
 		return EG__().GetUninitializedZval()
 	}
@@ -616,7 +617,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &tmp_result)
 			*guard &= ^IN_ISSET
-			if !ZvalIsTrue(&tmp_result) {
+			if !operators.ZvalIsTrue(&tmp_result) {
 				retval = EG__().GetUninitializedZval()
 				// OBJ_RELEASE(zobj)
 				// ZvalPtrDtor(&tmp_result)
@@ -696,7 +697,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 	var prop_info *ZendPropertyInfo = nil
 	b.Assert(!(value.IsReference()))
 	zobj = object.Object()
-	name = ZvalTryGetString(member)
+	name = operators.ZvalTryGetString(member)
 	if name == nil {
 		return value
 	}
@@ -799,7 +800,7 @@ func ZendStdReadDimension(object *types.Zval, offset *types.Zval, type_ int, rv 
 	var ce *types.ClassEntry = types.Z_OBJCE_P(object)
 	var tmp_offset types.Zval
 	var tmp_object types.Zval
-	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
+	if operators.InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
 		if offset == nil {
 
 			/* [] construct */
@@ -820,7 +821,7 @@ func ZendStdReadDimension(object *types.Zval, offset *types.Zval, type_ int, rv 
 				// ZvalPtrDtor(&tmp_offset)
 				return nil
 			}
-			if !ZvalIsTrue(rv) {
+			if !operators.ZvalIsTrue(rv) {
 				// ZvalPtrDtor(&tmp_object)
 				// ZvalPtrDtor(&tmp_offset)
 				// ZvalPtrDtor(rv)
@@ -847,7 +848,7 @@ func ZendStdWriteDimension(object *types.Zval, offset *types.Zval, value *types.
 	var ce *types.ClassEntry = types.Z_OBJCE_P(object)
 	var tmp_offset types.Zval
 	var tmp_object types.Zval
-	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
+	if operators.InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
 		if offset == nil {
 			tmp_offset.SetNull()
 		} else {
@@ -868,16 +869,16 @@ func ZendStdHasDimension(object *types.Zval, offset *types.Zval, check_empty int
 	var tmp_offset types.Zval
 	var tmp_object types.Zval
 	var result int
-	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
+	if operators.InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
 		types.ZVAL_COPY_DEREF(&tmp_offset, offset)
 		// 		object.AddRefcount()
 		tmp_object.SetObject(object.Object())
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", &retval, &tmp_offset)
-		result = IZendIsTrue(&retval)
+		result = operators.IZendIsTrue(&retval)
 		// ZvalPtrDtor(&retval)
 		if check_empty != 0 && result != 0 && EG__().GetException() == nil {
 			ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", &retval, &tmp_offset)
-			result = IZendIsTrue(&retval)
+			result = operators.IZendIsTrue(&retval)
 			// ZvalPtrDtor(&retval)
 		}
 		// ZvalPtrDtor(&tmp_object)
@@ -895,7 +896,7 @@ func ZendStdGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int,
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	zobj = object.Object()
-	name = ZvalTryGetString(member)
+	name = operators.ZvalTryGetString(member)
 	if name == nil {
 		return EG__().GetErrorZval()
 	}
@@ -965,7 +966,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	zobj = object.Object()
-	name = ZvalTryGetString(member)
+	name = operators.ZvalTryGetString(member)
 	if name == nil {
 		return
 	}
@@ -1035,7 +1036,7 @@ func ZendStdUnsetDimension(object *types.Zval, offset *types.Zval) {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(object)
 	var tmp_offset types.Zval
 	var tmp_object types.Zval
-	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
+	if operators.InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
 		types.ZVAL_COPY_DEREF(&tmp_offset, offset)
 		// 		object.AddRefcount()
 		tmp_object.SetObject(object.Object())
@@ -1162,7 +1163,7 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 		lc_method_name = key.String()
 	} else {
 		types.ZstrAlloc(lc_method_name, method_name.GetLen())
-		ZendStrTolowerCopy(lc_method_name.GetVal(), method_name.GetVal(), method_name.GetLen())
+		operators.ZendStrTolowerCopy(lc_method_name.GetVal(), method_name.GetVal(), method_name.GetLen())
 	}
 	fbc = zobj.GetCe().FunctionTable().Get(lc_method_name.GetStr())
 	if fbc == nil {
@@ -1213,16 +1214,16 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	if key != nil {
 		lc_function_name = key.String()
 	} else {
-		lc_function_name = ZendStringTolower(function_name)
+		lc_function_name = operators.ZendStringTolower(function_name)
 	}
 
 	fbc := ce.FunctionTable().Get(lc_function_name.GetStr())
 	if fbc != nil {
 		// pass
-	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.GetName().GetVal(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetStr()[0] != '_' || ce.GetConstructor().GetFunctionName().GetStr()[1] != '_') {
+	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && operators.ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.GetName().GetVal(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetStr()[0] != '_' || ce.GetConstructor().GetFunctionName().GetStr()[1] != '_') {
 		fbc = ce.GetConstructor()
 	} else {
-		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(CurrEX())) != nil && InstanceofFunction(object.GetCe(), ce) != 0 {
+		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(CurrEX())) != nil && operators.InstanceofFunction(object.GetCe(), ce) != 0 {
 			/* Call the top-level defined __call().
 			 * see: tests/classes/__call_004.phpt  */
 
@@ -1400,7 +1401,7 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 			if p1.IsNotUndef() {
 				if p2.IsNotUndef() {
 					var result types.Zval
-					if CompareFunction(&result, p1, p2) == types.FAILURE {
+					if operators.CompareFunction(&result, p1, p2) == types.FAILURE {
 						o1.UnprotectRecursive()
 						return false
 					}
@@ -1436,7 +1437,7 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 		if zobj2.GetProperties() == nil {
 			RebuildObjectProperties(zobj2)
 		}
-		return ZendCompareSymbolTables(zobj1.GetProperties(), zobj2.GetProperties())
+		return operators.ZendCompareSymbolTables(zobj1.GetProperties(), zobj2.GetProperties())
 	}
 }
 func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists int, cache_slot *any) int {
@@ -1448,7 +1449,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	zobj = object.Object()
-	name = ZvalTryGetString(member)
+	name = operators.ZvalTryGetString(member)
 	if name == nil {
 		return 0
 	}
@@ -1486,7 +1487,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 				}
 			found:
 				if has_set_exists == ZEND_PROPERTY_NOT_EMPTY {
-					result = IZendIsTrue(value)
+					result = operators.IZendIsTrue(value)
 				} else if has_set_exists < ZEND_PROPERTY_NOT_EMPTY {
 					b.Assert(has_set_exists == ZEND_PROPERTY_ISSET)
 					value = types.ZVAL_DEREF(value)
@@ -1516,14 +1517,14 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 			// 			zobj.AddRefcount()
 			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &rv)
-			result = IZendIsTrue(&rv)
+			result = operators.IZendIsTrue(&rv)
 			// ZvalPtrDtor(&rv)
 			if has_set_exists == ZEND_PROPERTY_NOT_EMPTY && result != 0 {
 				if EG__().GetException() == nil && zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
 					*guard |= IN_GET
 					ZendStdCallGetter(zobj, name, &rv)
 					*guard &= ^IN_GET
-					result = IZendIsTrue(&rv)
+					result = operators.IZendIsTrue(&rv)
 					// ZvalPtrDtor(&rv)
 				} else {
 					result = 0

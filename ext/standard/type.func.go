@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -27,19 +28,19 @@ func ZifSettype(var_ zpp.RefZval, typ string) bool {
 	typ = ascii.StrToLower(typ)
 	switch typ {
 	case "integer", "int":
-		zend.ConvertToLong(ptr)
+		operators.ConvertToLong(ptr)
 	case "float", "double":
-		zend.ConvertToDouble(ptr)
+		operators.ConvertToDouble(ptr)
 	case "string":
-		zend.ConvertToString(ptr)
+		operators.ConvertToString(ptr)
 	case "array":
-		zend.ConvertToArray(ptr)
+		operators.ConvertToArray(ptr)
 	case "object":
-		zend.ConvertToObject(ptr)
+		operators.ConvertToObject(ptr)
 	case "bool", "boolean":
-		zend.ConvertToBoolean(ptr)
+		operators.ConvertToBoolean(ptr)
 	case "null":
-		zend.ConvertToNull(ptr)
+		operators.ConvertToNull(ptr)
 	default:
 		if ptr == &tmp {
 			// zend.ZvalPtrDtor(&tmp)
@@ -74,7 +75,7 @@ func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp
 		break
 	}
 	if num.GetType() != types.IS_STRING || base == 10 {
-		return_value.SetLong(zend.ZvalGetLong(num))
+		return_value.SetLong(operators.ZvalGetLong(num))
 		return
 	}
 	if base == 0 || base == 2 {
@@ -133,7 +134,7 @@ func ZifFloatval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	return_value.SetDouble(zend.ZvalGetDouble(num))
+	return_value.SetDouble(operators.ZvalGetDouble(num))
 	return
 }
 func ZifBoolval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
@@ -149,7 +150,7 @@ func ZifBoolval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	return_value.SetBool(zend.ZvalIsTrue(val))
+	return_value.SetBool(operators.ZvalIsTrue(val))
 	return
 }
 func ZifStrval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
@@ -165,7 +166,7 @@ func ZifStrval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	return_value.SetString(zend.ZvalGetString(num))
+	return_value.SetString(operators.ZvalGetString(num))
 }
 func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type_ int) {
 	var arg *types.Zval
@@ -258,7 +259,7 @@ func ZifIsNumeric(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
 		return_value.SetTrue()
 		return
 	case types.IS_STRING:
-		if zend.IsNumericString(arg.String().GetStr(), nil, nil, 0) != 0 {
+		if operators.IsNumericString(arg.String().GetStr(), nil, nil, 0) != 0 {
 			return_value.SetTrue()
 			return
 		} else {

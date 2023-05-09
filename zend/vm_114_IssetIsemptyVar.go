@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -31,7 +32,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 			}
 			result = value.GetType() > types.IS_NULL
 		} else {
-			result = !(IZendIsTrue(value))
+			result = !(operators.IZendIsTrue(value))
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
@@ -46,7 +47,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 	var name *types.String
 	var target_symbol_table *types.Array
 	varname = opline.Op1()
-	name = ZvalGetString(varname)
+	name = operators.ZvalGetString(varname)
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	value = target_symbol_table.KeyFind(name.GetStr())
 	// ZvalPtrDtorNogc(free_op1)
@@ -62,7 +63,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 			}
 			result = value.GetType() > types.IS_NULL
 		} else {
-			result = !(IZendIsTrue(value))
+			result = !(operators.IZendIsTrue(value))
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
@@ -92,7 +93,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 			}
 			result = value.GetType() > types.IS_NULL
 		} else {
-			result = !(IZendIsTrue(value))
+			result = !(operators.IZendIsTrue(value))
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)

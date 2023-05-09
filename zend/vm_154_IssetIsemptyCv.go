@@ -1,6 +1,9 @@
 package zend
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
+)
 
 func ZEND_ISSET_ISEMPTY_CV_SPEC_CV_UNUSED_SET_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -21,7 +24,7 @@ func ZEND_ISSET_ISEMPTY_CV_SPEC_CV_UNUSED_EMPTY_HANDLER(executeData *ZendExecute
 	var value *types.Zval
 	value = opline.Op1()
 	var result int
-	result = !(IZendIsTrue(value))
+	result = !(operators.IZendIsTrue(value))
 	if EG__().GetException() != nil {
 		opline.Result().SetUndef()
 		return 0

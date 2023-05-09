@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -13,7 +14,7 @@ func PhpPack(val *types.Zval, size int, map_ *int, output *byte) {
 	var i int
 	var v *byte
 	if val.GetType() != types.IS_LONG {
-		zend.ConvertToLong(val)
+		operators.ConvertToLong(val)
 	}
 	v = (*byte)(&(val.Long()))
 	for i = 0; i < size; i++ {
@@ -169,7 +170,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 				return
 			}
 			if arg < 0 {
-				if zend.TryConvertToString(&argv[currentarg]) == 0 {
+				if operators.TryConvertToString(&argv[currentarg]) == 0 {
 					zend.Efree(formatcodes)
 					zend.Efree(formatargs)
 					return
@@ -409,7 +410,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			fallthrough
 		case 'Z':
 			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return b.Max(0, arg-1) })
-			var str *types.String = zend.ZvalGetString(&argv[b.PostInc(&currentarg)])
+			var str *types.String = operators.ZvalGetString(&argv[b.PostInc(&currentarg)])
 			memset(&output.GetStr()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
 			memcpy(&output.GetStr()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
@@ -419,7 +420,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 		case 'H':
 			var nibbleshift int = b.Cond(code == 'h', 0, 4)
 			var first int = 1
-			var str *types.String = zend.ZvalGetString(&argv[b.PostInc(&currentarg)])
+			var str *types.String = operators.ZvalGetString(&argv[b.PostInc(&currentarg)])
 			var v *byte = str.GetVal()
 			outputpos--
 			if int(arg > str.GetLen()) != 0 {
@@ -515,7 +516,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			}
 		case 'f':
 			for b.PostDec(&arg) > 0 {
-				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
+				var v float64 = float64(operators.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
 				memcpy(&output.GetStr()[outputpos], &v, b.SizeOf("v"))
 				outputpos += b.SizeOf("v")
 			}
@@ -524,7 +525,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			/* pack little endian float */
 
 			for b.PostDec(&arg) > 0 {
-				var v float = float(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
+				var v float = float(operators.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
 				PhpPackCopyFloat(1, &output.GetStr()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
@@ -533,13 +534,13 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			/* pack big endian float */
 
 			for b.PostDec(&arg) > 0 {
-				var v float = float(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
+				var v float = float(operators.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
 				PhpPackCopyFloat(0, &output.GetStr()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
 		case 'd':
 			for b.PostDec(&arg) > 0 {
-				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
+				var v float64 = float64(operators.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
 				memcpy(&output.GetStr()[outputpos], &v, b.SizeOf("v"))
 				outputpos += b.SizeOf("v")
 			}
@@ -548,7 +549,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			/* pack little endian double */
 
 			for b.PostDec(&arg) > 0 {
-				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
+				var v float64 = float64(operators.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
 				PhpPackCopyDouble(1, &output.GetStr()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
@@ -557,7 +558,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			/* pack big endian double */
 
 			for b.PostDec(&arg) > 0 {
-				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
+				var v float64 = float64(operators.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
 				PhpPackCopyDouble(0, &output.GetStr()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}

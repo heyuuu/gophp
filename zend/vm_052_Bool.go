@@ -1,6 +1,9 @@
 package zend
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
+)
 
 func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -15,7 +18,7 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var orig_val_type uint32 = val.GetTypeInfo()
 		opline.Result().SetFalse()
 	} else {
-		opline.Result().SetBool(ZvalIsTrue(val))
+		opline.Result().SetBool(operators.ZvalIsTrue(val))
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -38,7 +41,7 @@ func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	} else {
-		opline.Result().SetBool(ZvalIsTrue(val))
+		opline.Result().SetBool(operators.ZvalIsTrue(val))
 		// ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
@@ -61,7 +64,7 @@ func ZEND_BOOL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	} else {
-		opline.Result().SetBool(ZvalIsTrue(val))
+		opline.Result().SetBool(operators.ZvalIsTrue(val))
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)

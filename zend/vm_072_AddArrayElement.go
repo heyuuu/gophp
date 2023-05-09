@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -28,7 +29,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -87,7 +88,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -172,7 +173,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -228,7 +229,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -289,7 +290,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -378,7 +379,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -437,7 +438,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -501,7 +502,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -596,7 +597,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -651,7 +652,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -711,7 +712,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -798,7 +799,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.Double())
+			hval = operators.DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0

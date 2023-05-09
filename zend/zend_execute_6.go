@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendObjectFetchPropertyTypeInfo(obj *types.ZendObject, slot *types.Zval) *ZendPropertyInfo {
@@ -293,7 +294,7 @@ func ZendFetchStaticPropertyAddressEx(
 			if op1_type == IS_CV && varname.IsUndef() {
 				ZvalUndefinedCv(opline.GetOp1().GetVar(), executeData)
 			}
-			name = ZvalGetString(varname)
+			name = operators.ZvalGetString(varname)
 		}
 	}
 	*retval = ZendStdGetStaticPropertyWithInfo(ce, name, fetch_type, &property_info)
@@ -383,7 +384,7 @@ func IZendVerifyTypeAssignableZval(type_ptr *types.ZendType, self_ce *types.Clas
 			}
 			type_ = *type_ptr
 		}
-		return zv_type == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE_P(zv), type_.Ce()) != 0
+		return zv_type == types.IS_OBJECT && operators.InstanceofFunction(types.Z_OBJCE_P(zv), type_.Ce()) != 0
 	}
 	type_code = type_.Code()
 	if type_code == zv_type || type_code == types.IS_BOOL && (zv_type == types.IS_FALSE || zv_type == types.IS_TRUE) {

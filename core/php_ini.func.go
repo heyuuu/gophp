@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"strings"
 )
 
@@ -622,6 +623,6 @@ func CfgGetLong(varname string, result *zend.ZendLong) int {
 		*result = 0
 		return types.FAILURE
 	}
-	*result = zend.ZvalGetLong(tmp)
+	*result = operators.ZvalGetLong(tmp)
 	return types.SUCCESS
 }

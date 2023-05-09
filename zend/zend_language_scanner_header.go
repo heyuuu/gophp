@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"strconv"
 	"strings"
 )
@@ -154,7 +155,7 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 	var retval int
 	var opened_path *types.String = nil
 	if filename.IsString() {
-		tmp.SetStringVal(ZvalGetStrVal(filename))
+		tmp.SetStringVal(operators.ZvalGetStrVal(filename))
 		filename = &tmp
 	}
 	fh := NewFileHandleByFilename(filename.StringVal())
@@ -202,7 +203,7 @@ func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray
 	var original_lex_state ZendLexState
 	var op_array int = nil
 	var tmp types.Zval
-	tmp.SetStringVal(ZvalGetStrVal(source_string))
+	tmp.SetStringVal(operators.ZvalGetStrVal(source_string))
 	if tmp.String().GetLen() == 0 {
 		return nil
 	}
@@ -238,7 +239,7 @@ func HighlightString(str *types.Zval, syntax_highlighter_ini *zend_syntax_highli
 	var original_lex_state ZendLexState
 	var tmp types.Zval
 	if Z_TYPE_P(str) != types.IS_STRING {
-		str = types.NewZvalString(ZvalGetStrVal(str))
+		str = types.NewZvalString(operators.ZvalGetStrVal(str))
 	}
 	ZendSaveLexicalState(&original_lex_state)
 	if ZendPrepareStringForScanning(str, str_name) == types.FAILURE {

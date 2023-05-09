@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendCompileUnaryPm(result *Znode, ast *ZendAst) {
@@ -34,14 +35,14 @@ func ZendCompileShortCircuiting(result *Znode, ast *ZendAst) {
 	b.Assert(ast.GetKind() == ZEND_AST_AND || ast.GetKind() == ZEND_AST_OR)
 	ZendCompileExpr(&left_node, left_ast)
 	if left_node.GetOpType() == IS_CONST {
-		if ast.GetKind() == ZEND_AST_AND && IZendIsTrue(left_node.GetConstant()) == 0 || ast.GetKind() == ZEND_AST_OR && IZendIsTrue(left_node.GetConstant()) != 0 {
+		if ast.GetKind() == ZEND_AST_AND && operators.IZendIsTrue(left_node.GetConstant()) == 0 || ast.GetKind() == ZEND_AST_OR && operators.IZendIsTrue(left_node.GetConstant()) != 0 {
 			result.SetOpType(IS_CONST)
-			result.GetConstant().SetBool(IZendIsTrue(left_node.GetConstant()) != 0)
+			result.GetConstant().SetBool(operators.IZendIsTrue(left_node.GetConstant()) != 0)
 		} else {
 			ZendCompileExpr(&right_node, right_ast)
 			if right_node.GetOpType() == IS_CONST {
 				result.SetOpType(IS_CONST)
-				result.GetConstant().SetBool(IZendIsTrue(right_node.GetConstant()) != 0)
+				result.GetConstant().SetBool(operators.IZendIsTrue(right_node.GetConstant()) != 0)
 				// ZvalPtrDtor(right_node.GetConstant())
 			} else {
 				ZendEmitOpTmp(result, ZEND_BOOL, &right_node, nil)
@@ -724,11 +725,11 @@ func ZendCompileEncapsList(result *Znode, ast *ZendAst) {
 	for i = 0; i < list.GetChildren(); i++ {
 		ZendCompileExpr(&elem_node, list.GetChild()[i])
 		if elem_node.GetOpType() == IS_CONST {
-			ConvertToString(elem_node.GetConstant())
+			operators.ConvertToString(elem_node.GetConstant())
 			if elem_node.GetConstant().String().GetLen() == 0 {
 				// ZvalPtrDtor(elem_node.GetConstant())
 			} else if last_const_node.GetOpType() == IS_CONST {
-				ConcatFunction(last_const_node.GetConstant(), last_const_node.GetConstant(), elem_node.GetConstant())
+				operators.ConcatFunction(last_const_node.GetConstant(), last_const_node.GetConstant(), elem_node.GetConstant())
 				// ZvalPtrDtor(elem_node.GetConstant())
 			} else {
 				last_const_node.SetOpType(IS_CONST)

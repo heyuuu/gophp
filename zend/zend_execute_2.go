@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -106,7 +107,7 @@ func IZendCheckPropertyType(info *ZendPropertyInfo, property *types.Zval, strict
 		if !(info.GetType().IsCe()) && ZendResolveClassType(info.GetType(), info.GetCe()) == 0 {
 			return 0
 		}
-		return InstanceofFunction(types.Z_OBJCE_P(property), info.GetType().Ce())
+		return operators.InstanceofFunction(types.Z_OBJCE_P(property), info.GetType().Ce())
 	}
 	b.Assert(info.GetType().Code() != types.IS_CALLABLE)
 	if info.GetType().Code() == property.GetType() {
@@ -169,7 +170,7 @@ func ZendCheckType(
 			*cache_slot = any(*ce)
 		}
 		if arg.IsObject() {
-			return InstanceofFunction(types.Z_OBJCE_P(arg), *ce)
+			return operators.InstanceofFunction(types.Z_OBJCE_P(arg), *ce)
 		}
 		return arg.IsNull() && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0)
 	} else if type_.Code() == arg.GetType() {
@@ -313,7 +314,7 @@ func ZendAssignToObjectDim(object *types.Zval, dim *types.Zval, value *types.Zva
 	}
 }
 func ZendBinaryOp(ret *types.Zval, op1 *types.Zval, op2 *types.Zval, opline *ZendOp) int {
-	var zend_binary_ops []BinaryOpType = []BinaryOpType{AddFunction, SubFunction, MulFunction, DivFunction, ModFunction, ShiftLeftFunction, ShiftRightFunction, ConcatFunction, BitwiseOrFunction, BitwiseAndFunction, BitwiseXorFunction, PowFunction}
+	var zend_binary_ops []BinaryOpType = []BinaryOpType{operators.AddFunction, operators.SubFunction, operators.MulFunction, operators.DivFunction, operators.ModFunction, operators.ShiftLeftFunction, operators.ShiftRightFunction, operators.ConcatFunction, operators.BitwiseOrFunction, operators.BitwiseAndFunction, operators.BitwiseXorFunction, operators.PowFunction}
 
 	/* size_t cast makes GCC to better optimize 64-bit PIC code */
 
@@ -360,7 +361,7 @@ func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opl
 	/* Make sure that in-place concatenation is used if the LHS is a string. */
 
 	if opline.GetExtendedValue() == ZEND_CONCAT && ref.GetVal().IsString() {
-		ConcatFunction(ref.GetVal(), ref.GetVal(), value)
+		operators.ConcatFunction(ref.GetVal(), ref.GetVal(), value)
 		b.Assert(ref.GetVal().IsString() && "Concat should return string")
 		return
 	}
@@ -378,7 +379,7 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *types.Zval, 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */
 
 	if opline.GetExtendedValue() == ZEND_CONCAT && zptr.IsString() {
-		ConcatFunction(zptr, zptr, value)
+		operators.ConcatFunction(zptr, zptr, value)
 		b.Assert(zptr.IsString() && "Concat should return string")
 		return
 	}
@@ -397,7 +398,7 @@ func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteD
 	if dim.GetType() != types.IS_LONG {
 		switch dim.GetType() {
 		case types.IS_STRING:
-			if types.IS_LONG == IsNumericString(dim.String().GetStr(), nil, nil, -1) {
+			if types.IS_LONG == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 				break
 			}
 			if type_ != BP_VAR_UNSET {
@@ -417,7 +418,7 @@ func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteD
 		default:
 			ZendIllegalOffset()
 		}
-		offset = ZvalGetLong(dim)
+		offset = operators.ZvalGetLong(dim)
 	} else {
 		offset = dim.Long()
 	}

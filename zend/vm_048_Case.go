@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func caseHandlerHelper(op1 *types.Zval, op2 *types.Zval, executeData *ZendExecuteData) int {
@@ -42,7 +43,7 @@ func caseHandlerHelper(op1 *types.Zval, op2 *types.Zval, executeData *ZendExecut
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result = ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
+			var result = operators.ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
 			if result {
 				goto caseTrue
 			} else {

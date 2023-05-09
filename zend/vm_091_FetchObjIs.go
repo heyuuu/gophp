@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_FETCH_OBJ_IS_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -35,7 +36,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	// ZvalPtrDtorNogc(free_op2)
@@ -65,7 +66,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -140,7 +141,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	// ZvalPtrDtorNogc(free_op1)
@@ -178,7 +179,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	// ZvalPtrDtorNogc(free_op2)
@@ -216,7 +217,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int 
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	// ZvalPtrDtorNogc(free_op1)
@@ -282,7 +283,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -307,7 +308,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	// ZvalPtrDtorNogc(free_op2)
@@ -332,7 +333,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int 
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -406,7 +407,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -442,7 +443,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	// ZvalPtrDtorNogc(free_op2)
@@ -478,7 +479,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	fetch_obj_is_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
-		ZendUnwrapReference(retval)
+		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendMakeVarResult(result *Znode, opline *ZendOp) {
@@ -422,7 +423,7 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 			//name = ZvalMakeInternedString(zv)
 			name = zv.String()
 		} else {
-			name = ZvalGetString(zv)
+			name = operators.ZvalGetString(zv)
 		}
 		if ZendIsAutoGlobal(name) != 0 {
 			return types.FAILURE
@@ -442,7 +443,7 @@ func ZendCompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed
 	var opline *ZendOp
 	ZendCompileExpr(&name_node, name_ast)
 	if name_node.GetOpType() == IS_CONST {
-		ConvertToString(name_node.GetConstant())
+		operators.ConvertToString(name_node.GetConstant())
 	}
 	if delayed != 0 {
 		opline = ZendDelayedEmitOp(result, ZEND_FETCH_R, &name_node, nil)
@@ -551,7 +552,7 @@ func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *ZendOp {
 	ZendCompileExpr(&prop_node, prop_ast)
 	opline = ZendDelayedEmitOp(result, ZEND_FETCH_OBJ_R, &obj_node, &prop_node)
 	if opline.GetOp2Type() == IS_CONST {
-		ConvertToString(CT_CONSTANT(opline.GetOp2()))
+		operators.ConvertToString(CT_CONSTANT(opline.GetOp2()))
 		opline.SetExtendedValue(ZendAllocCacheSlots(3))
 	}
 	ZendAdjustForFetchType(opline, result, type_)
@@ -579,7 +580,7 @@ func ZendCompileStaticProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int
 		opline = ZendEmitOp(result, ZEND_FETCH_STATIC_PROP_R, &prop_node, nil)
 	}
 	if opline.GetOp1Type() == IS_CONST {
-		ConvertToString(CT_CONSTANT(opline.GetOp1()))
+		operators.ConvertToString(CT_CONSTANT(opline.GetOp1()))
 		opline.SetExtendedValue(ZendAllocCacheSlots(3))
 	}
 	if class_node.GetOpType() == IS_CONST {
@@ -722,8 +723,8 @@ func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) types.ZendBool {
 	if var_ast.GetKind() != ZEND_AST_VAR || var_ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 		return 0
 	}
-	var name1 *types.String = ZvalGetString(ZendAstGetZval(var_ast.GetChild()[0]))
-	var name2 *types.String = ZvalGetString(ZendAstGetZval(expr_ast.GetChild()[0]))
+	var name1 *types.String = operators.ZvalGetString(ZendAstGetZval(var_ast.GetChild()[0]))
+	var name2 *types.String = operators.ZvalGetString(ZendAstGetZval(expr_ast.GetChild()[0]))
 	var result = name1.GetStr() == name2.GetStr()
 	return types.IntBool(result)
 }

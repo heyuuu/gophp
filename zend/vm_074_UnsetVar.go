@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_UNSET_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -30,7 +31,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 			varname = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		var ok bool
-		if name, ok = ZvalGetStr(varname); !ok {
+		if name, ok = operators.ZvalGetStr(varname); !ok {
 			return 0
 		}
 	}
@@ -52,7 +53,7 @@ func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			varname = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		var ok bool
-		if name, ok = ZvalGetStr(varname); !ok {
+		if name, ok = operators.ZvalGetStr(varname); !ok {
 			return 0
 		}
 	}

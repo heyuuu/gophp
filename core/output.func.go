@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"os"
 )
@@ -450,7 +451,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 
 				status = PHP_OUTPUT_HANDLER_NO_DATA
 				if retval.GetType() != types.IS_FALSE && retval.GetType() != types.IS_TRUE {
-					zend.ConvertToStringEx(&retval)
+					operators.ConvertToStringEx(&retval)
 					if retval.String().GetLen() != 0 {
 						context.GetOut().SetData(zend.Estrndup(retval.String().GetVal(), retval.String().GetLen()))
 						context.GetOut().SetUsed(retval.String().GetLen())

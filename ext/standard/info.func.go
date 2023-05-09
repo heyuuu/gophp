@@ -9,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/globals"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -157,7 +158,7 @@ func PhpPrintGpcseArray(name string) {
 					zend.ZendPrintZvalR(tmp, 0)
 				}
 			} else {
-				var str *types.String = zend.ZvalGetString(tmp)
+				var str *types.String = operators.ZvalGetString(tmp)
 				if core.SM__().GetPhpinfoAsText() == 0 {
 					if str.GetLen() == 0 {
 						PhpInfoPrint("<i>no value</i>")

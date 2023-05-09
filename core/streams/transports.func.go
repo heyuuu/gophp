@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func PhpStreamXportGetHash() *types.Array { return &XportHash }
@@ -135,7 +136,7 @@ func _phpStreamXportCreate(
 					var zbacklog *types.Zval = nil
 					var backlog int = 32
 					if core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&zbacklog, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "backlog")) != nil {
-						backlog = zend.ZvalGetLong(zbacklog)
+						backlog = operators.ZvalGetLong(zbacklog)
 					}
 					if 0 != PhpStreamXportListen(stream, backlog, &error_text) {
 						ERR_RETURN(error_string, error_text, "listen() failed: %s")

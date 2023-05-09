@@ -3,6 +3,7 @@ package zend
 import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -34,7 +35,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			num_index_dim:
 				types.ZendHashIndexDel(ht, hval)
 			} else if offset.IsDouble() {
-				hval = DvalToLval(offset.Double())
+				hval = operators.DvalToLval(offset.Double())
 				goto num_index_dim
 			} else if offset.IsNull() {
 				key = types.NewString("")
@@ -114,7 +115,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
 			} else if offset.IsDouble() {
-				hval = DvalToLval(offset.Double())
+				hval = operators.DvalToLval(offset.Double())
 				goto num_index_dim
 			} else if offset.IsNull() {
 				key = types.NewString("")
@@ -198,7 +199,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
 			} else if offset.IsDouble() {
-				hval = DvalToLval(offset.Double())
+				hval = operators.DvalToLval(offset.Double())
 				goto num_index_dim
 			} else if offset.IsNull() {
 				key = types.NewString("")
@@ -272,7 +273,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			num_index_dim:
 				types.ZendHashIndexDel(ht, hval)
 			} else if offset.IsDouble() {
-				hval = DvalToLval(offset.Double())
+				hval = operators.DvalToLval(offset.Double())
 				goto num_index_dim
 			} else if offset.IsNull() {
 				key = types.NewString("")
@@ -348,7 +349,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
 			} else if offset.IsDouble() {
-				hval = DvalToLval(offset.Double())
+				hval = operators.DvalToLval(offset.Double())
 				goto num_index_dim
 			} else if offset.IsNull() {
 				key = types.NewString("")
@@ -428,7 +429,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
 			} else if offset.IsDouble() {
-				hval = DvalToLval(offset.Double())
+				hval = operators.DvalToLval(offset.Double())
 				goto num_index_dim
 			} else if offset.IsNull() {
 				key = types.NewString("")

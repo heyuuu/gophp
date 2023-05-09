@@ -1,6 +1,9 @@
 package zend
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
+)
 
 func ZEND_JMPNZ_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -17,7 +20,7 @@ func ZEND_JMPNZ_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		}
 	}
-	ret = IZendIsTrue(val)
+	ret = operators.IZendIsTrue(val)
 	if ret != 0 {
 		opline.Result().SetTrue()
 		opline = OP_JMP_ADDR(opline, opline.GetOp2())
@@ -45,7 +48,7 @@ func ZEND_JMPNZ_EX_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		}
 	}
-	ret = IZendIsTrue(val)
+	ret = operators.IZendIsTrue(val)
 	// ZvalPtrDtorNogc(free_op1)
 	if ret != 0 {
 		opline.Result().SetTrue()
@@ -73,7 +76,7 @@ func ZEND_JMPNZ_EX_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		}
 	}
-	ret = IZendIsTrue(val)
+	ret = operators.IZendIsTrue(val)
 	if ret != 0 {
 		opline.Result().SetTrue()
 		opline = OP_JMP_ADDR(opline, opline.GetOp2())

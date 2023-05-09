@@ -1,6 +1,9 @@
 package zend
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
+)
 
 func ZEND_ROPE_INIT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -41,7 +44,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 			if var_.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
 			}
-			rope[0] = ZvalGetString(var_)
+			rope[0] = operators.ZvalGetString(var_)
 			// ZvalPtrDtorNogc(free_op2)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
@@ -68,7 +71,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 			if var_.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
 			}
-			rope[0] = ZvalGetString(var_)
+			rope[0] = operators.ZvalGetString(var_)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	}

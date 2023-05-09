@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func SplObjectStorageFromObj(obj *types.ZendObject) *spl_SplObjectStorage {
@@ -194,7 +195,7 @@ func SplObjectStorageCompareInfo(e1 *types.Zval, e2 *types.Zval) int {
 	var s1 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(e1.Ptr())
 	var s2 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(e2.Ptr())
 	var result types.Zval
-	if zend.CompareFunction(&result, s1.GetInf(), s2.GetInf()) == types.FAILURE {
+	if operators.CompareFunction(&result, s1.GetInf(), s2.GetInf()) == types.FAILURE {
 		return 1
 	}
 	return zend.ZEND_NORMALIZE_BOOL(result.Long())
@@ -695,7 +696,7 @@ func zim_spl_MultipleIterator_attachIterator(executeData *zend.ZendExecuteData, 
 		}
 		types.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
 		for b.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil {
-			if zend.FastIsIdenticalFunction(info, element.GetInf()) != 0 {
+			if operators.FastIsIdenticalFunction(info, element.GetInf()) != 0 {
 				faults.ThrowException(spl_ce_InvalidArgumentException, "Key duplication error", 0)
 				return
 			}

@@ -1,8 +1,11 @@
-package zend
+package operators
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend"
+)
 
-const LONG_SIGN_MASK = ZEND_LONG_MIN
+const LONG_SIGN_MASK = zend.ZEND_LONG_MIN
 
 const LOWER_CASE = 1
 const UPPER_CASE = 2

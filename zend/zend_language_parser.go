@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 /* A Bison parser, made by GNU Bison 3.0.2.  */
@@ -1292,7 +1293,7 @@ func ZendYytnamerr(yyres *byte, yystr *byte) YYSIZE_T {
 		str = INI_SCNG__().GetYyText()
 		end = memchr(str, '\n', INI_SCNG__().GetYyLeng())
 		yystr_len = uint(yystrlen(yystr))
-		if b.Assign(&tok1, memchr(yystr, '(', yystr_len)) != nil && b.Assign(&tok2, ZendMemrchr(yystr, ')', yystr_len)) != nil {
+		if b.Assign(&tok1, memchr(yystr, '(', yystr_len)) != nil && b.Assign(&tok2, operators.ZendMemrchr(yystr, ')', yystr_len)) != nil {
 			toklen = tok2 - tok1 + 1
 		} else {
 			tok2 = nil

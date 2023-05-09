@@ -1,6 +1,9 @@
 package zend
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
+)
 
 func ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -72,7 +75,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		if op2.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
-		op2_str = ZvalGetString(op2)
+		op2_str = operators.ZvalGetString(op2)
 	}
 	for {
 		{
@@ -142,7 +145,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 		if op2.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
-		op2_str = ZvalGetString(op2)
+		op2_str = operators.ZvalGetString(op2)
 	}
 	for {
 		{
@@ -208,7 +211,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 		if op1.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		op1_str = ZvalGetString(op1)
+		op1_str = operators.ZvalGetString(op1)
 	}
 	{
 		op2_str = op2.GetStr()
@@ -291,7 +294,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		if op1.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		op1_str = ZvalGetString(op1)
+		op1_str = operators.ZvalGetString(op1)
 	}
 
 	if op2.IsString() {
@@ -300,7 +303,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		if op2.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
-		op2_str = ZvalGetString(op2)
+		op2_str = operators.ZvalGetString(op2)
 	}
 	for {
 		{
@@ -384,7 +387,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		if op1.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		op1_str = ZvalGetString(op1)
+		op1_str = operators.ZvalGetString(op1)
 	}
 
 	if op2.IsString() {
@@ -393,7 +396,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		if op2.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
-		op2_str = ZvalGetString(op2)
+		op2_str = operators.ZvalGetString(op2)
 	}
 	for {
 		{
@@ -464,7 +467,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if op1.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		op1_str = ZvalGetString(op1)
+		op1_str = operators.ZvalGetString(op1)
 	}
 	{
 		op2_str = op2.GetStr()
@@ -545,7 +548,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if op1.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		op1_str = ZvalGetString(op1)
+		op1_str = operators.ZvalGetString(op1)
 	}
 
 	if op2.IsString() {
@@ -554,7 +557,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if op2.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
-		op2_str = ZvalGetString(op2)
+		op2_str = operators.ZvalGetString(op2)
 	}
 	for {
 		{
@@ -636,7 +639,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		if op1.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		op1_str = ZvalGetString(op1)
+		op1_str = operators.ZvalGetString(op1)
 	}
 
 	if op2.IsString() {
@@ -645,7 +648,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		if op2.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
-		op2_str = ZvalGetString(op2)
+		op2_str = operators.ZvalGetString(op2)
 	}
 	for {
 		{

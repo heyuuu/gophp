@@ -3,6 +3,7 @@ package zend
 import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
@@ -41,7 +42,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			var op2 *types.Zval = GetZvalPtr(opline.GetOp2Type(), opline.GetOp2(), &free_op2, BP_VAR_R)
 			var skip uint32 = opline.GetExtendedValue()
 			var count uint32 = ht.Len()
-			var len_ ZendLong = ZvalGetLong(op2)
+			var len_ ZendLong = operators.ZvalGetLong(op2)
 			if len_ < 0 {
 				len_ += zend_long(count - skip)
 			}

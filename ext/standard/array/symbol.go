@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"strconv"
 )
@@ -614,7 +615,7 @@ func ZifExtract(array zpp.DerefArray, _ zpp.Opt, flags int, prefix *types.Zval) 
 		return 0
 	}
 	if prefix != nil {
-		if zend.TryConvertToString(prefix) == 0 {
+		if operators.TryConvertToString(prefix) == 0 {
 			return 0
 		}
 		if prefix.StringVal() != "" && !isValidVarName(prefix.StringVal()) {

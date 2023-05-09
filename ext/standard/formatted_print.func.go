@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -300,7 +301,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 	var result *types.String
 	var always_sign int
 	var format_len int
-	if zend.TryConvertToString(z_format) == 0 {
+	if operators.TryConvertToString(z_format) == 0 {
 		return nil
 	}
 	format = z_format.String().GetVal()
@@ -430,12 +431,12 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 			tmp = &args[argnum]
 			switch *format {
 			case 's':
-				var str *types.String = zend.ZvalGetString(tmp)
+				var str *types.String = operators.ZvalGetString(tmp)
 				PhpSprintfAppendstring(&result, &outpos, str.GetVal(), width, precision, padding, alignment, str.GetLen(), 0, expprec, 0)
 			case 'd':
-				PhpSprintfAppendint(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, always_sign)
+				PhpSprintfAppendint(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, always_sign)
 			case 'u':
-				PhpSprintfAppenduint(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment)
+				PhpSprintfAppenduint(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment)
 			case 'g':
 				fallthrough
 			case 'G':
@@ -447,17 +448,17 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 			case 'f':
 				fallthrough
 			case 'F':
-				PhpSprintfAppenddouble(&result, &outpos, zend.ZvalGetDouble(tmp), width, padding, alignment, precision, adjusting, *format, always_sign)
+				PhpSprintfAppenddouble(&result, &outpos, operators.ZvalGetDouble(tmp), width, padding, alignment, precision, adjusting, *format, always_sign)
 			case 'c':
-				PhpSprintfAppendchar(&result, &outpos, byte(zend.ZvalGetLong(tmp)))
+				PhpSprintfAppendchar(&result, &outpos, byte(operators.ZvalGetLong(tmp)))
 			case 'o':
-				PhpSprintfAppend2n(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, 3, Hexchars, expprec)
+				PhpSprintfAppend2n(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 3, Hexchars, expprec)
 			case 'x':
-				PhpSprintfAppend2n(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, 4, Hexchars, expprec)
+				PhpSprintfAppend2n(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 4, Hexchars, expprec)
 			case 'X':
-				PhpSprintfAppend2n(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, 4, HEXCHARS, expprec)
+				PhpSprintfAppend2n(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 4, HEXCHARS, expprec)
 			case 'b':
-				PhpSprintfAppend2n(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, 1, Hexchars, expprec)
+				PhpSprintfAppend2n(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 1, Hexchars, expprec)
 			case '%':
 				PhpSprintfAppendchar(&result, &outpos, '%')
 			case '0':
@@ -482,7 +483,7 @@ func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 	var zv *types.Zval
 	var n int
 	if array.GetType() != types.IS_ARRAY {
-		zend.ConvertToArray(array)
+		operators.ConvertToArray(array)
 	}
 	n = array.Array().Len()
 	args = (*types.Zval)(zend.SafeEmalloc(n, b.SizeOf("zval"), 0))

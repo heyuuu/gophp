@@ -1,8 +1,8 @@
 package core
 
 import (
-	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 const PHP_API_VERSION = 20190902
@@ -37,7 +37,7 @@ func PhpError(typ int, format string, args ...any) {
 
 /* PHPAPI void php_error(int type, const char *format, ...); */
 
-var PhpMemnstr = zend.ZendMemnstr
+var PhpMemnstr = operators.ZendMemnstr
 
 const PHP_CONNECTION_NORMAL = 0
 const PHP_CONNECTION_ABORTED = 1

@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"log"
 )
 
@@ -167,10 +168,10 @@ func ZendIniAddString(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
 
 		if ZEND_SYSTEM_INI != 0 {
-			var str *types.String = ZvalGetString(op1)
+			var str *types.String = operators.ZvalGetString(op1)
 			op1.SetStringVal(str.GetStr())
 		} else {
-			op1.SetString(ZvalGetString(op1))
+			op1.SetString(operators.ZvalGetString(op1))
 		}
 
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
@@ -178,7 +179,7 @@ func ZendIniAddString(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	}
 	op1_len = int(op1.String().GetLen())
 	if op2.GetType() != types.IS_STRING {
-		ConvertToString(op2)
+		operators.ConvertToString(op2)
 	}
 	length = op1_len + int(op2.String().GetLen())
 	result.SetString(types.ZendStringExtend(op1.String(), length))
@@ -197,7 +198,7 @@ func ZendIniGetConstant(result *types.Zval, name *types.Zval) {
 			if tmp.IsConstantAst() {
 				ZvalUpdateConstantEx(&tmp, nil)
 			}
-			ConvertToString(&tmp)
+			operators.ConvertToString(&tmp)
 			c = &tmp
 		}
 		result.SetString(types.NewString(c.String().GetStr()))

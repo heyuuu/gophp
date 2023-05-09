@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -124,7 +125,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 				}
 			}
 			if retval.IsNotUndef() {
-				has_children = zend.IZendIsTrue(&retval)
+				has_children = operators.IZendIsTrue(&retval)
 				// zend.ZvalPtrDtor(&retval)
 				if has_children != 0 {
 					if object.GetMaxDepth() == -1 || object.GetMaxDepth() > object.GetLevel() {
@@ -195,7 +196,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 					goto next_step
 				}
 			}
-			if child.IsUndef() || child.GetType() != types.IS_OBJECT || !(b.Assign(&ce, types.Z_OBJCE(child)) && zend.InstanceofFunction(ce, spl_ce_RecursiveIterator) != 0) {
+			if child.IsUndef() || child.GetType() != types.IS_OBJECT || !(b.Assign(&ce, types.Z_OBJCE(child)) && operators.InstanceofFunction(ce, spl_ce_RecursiveIterator) != 0) {
 				// zend.ZvalPtrDtor(&child)
 				faults.ThrowException(spl_ce_UnexpectedValueException, "Objects returned by RecursiveIterator::getChildren() must implement RecursiveIterator", 0)
 				return
@@ -321,7 +322,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 		mode = RIT_SELF_FIRST
 		flags = RTIT_BYPASS_KEY
 		if zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "o|lzl", &iterator, &flags, &user_caching_it_flags, &mode) == types.SUCCESS {
-			if zend.InstanceofFunction(types.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
+			if operators.InstanceofFunction(types.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
 				zend.ZendCallMethodWith0Params(iterator, types.Z_OBJCE_P(iterator), types.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
 			} else {
@@ -345,7 +346,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 		mode = RIT_LEAVES_ONLY
 		flags = 0
 		if zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "o|ll", &iterator, &mode, &flags) == types.SUCCESS {
-			if zend.InstanceofFunction(types.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
+			if operators.InstanceofFunction(types.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
 				zend.ZendCallMethodWith0Params(iterator, types.Z_OBJCE_P(iterator), types.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
 			} else {
@@ -355,7 +356,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 			iterator = nil
 		}
 	}
-	if iterator == nil || zend.InstanceofFunction(types.Z_OBJCE_P(iterator), spl_ce_RecursiveIterator) == 0 {
+	if iterator == nil || operators.InstanceofFunction(types.Z_OBJCE_P(iterator), spl_ce_RecursiveIterator) == 0 {
 		if iterator != nil {
 			// zend.ZvalPtrDtor(iterator)
 		}
@@ -729,7 +730,7 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 			return_value.SetStringVal(types.STR_ARRAY_CAPITALIZED)
 		} else {
 			types.ZVAL_COPY(return_value, data)
-			zend.ConvertToString(return_value)
+			operators.ConvertToString(return_value)
 		}
 	}
 }
@@ -994,21 +995,21 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 			return nil
 		}
 		ce = types.Z_OBJCE_P(zobject)
-		if zend.InstanceofFunction(ce, zend.ZendCeIterator) == 0 {
+		if operators.InstanceofFunction(ce, zend.ZendCeIterator) == 0 {
 			if executeData.NumArgs() > 1 {
-				if !(b.Assign(&ce_cast, zend.ZendLookupClass(class_name))) || zend.InstanceofFunction(ce, ce_cast) == 0 || ce_cast.GetGetIterator() == nil {
+				if !(b.Assign(&ce_cast, zend.ZendLookupClass(class_name))) || operators.InstanceofFunction(ce, ce_cast) == 0 || ce_cast.GetGetIterator() == nil {
 					faults.ThrowException(spl_ce_LogicException, "Class to downcast to not found or not base class or does not implement Traversable", 0)
 					return nil
 				}
 				ce = ce_cast
 			}
-			if zend.InstanceofFunction(ce, zend.ZendCeAggregate) != 0 {
+			if operators.InstanceofFunction(ce, zend.ZendCeAggregate) != 0 {
 				zend.ZendCallMethodWith0Params(zobject, ce, ce.GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &retval)
 				if zend.EG__().GetException() != nil {
 					// zend.ZvalPtrDtor(&retval)
 					return nil
 				}
-				if retval.GetType() != types.IS_OBJECT || zend.InstanceofFunction(types.Z_OBJCE(retval), zend.ZendCeTraversable) == 0 {
+				if retval.GetType() != types.IS_OBJECT || operators.InstanceofFunction(types.Z_OBJCE(retval), zend.ZendCeTraversable) == 0 {
 					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "%s::getIterator() must return an object that implements Traversable", ce.GetName().GetVal())
 					return nil
 				}
@@ -1273,7 +1274,7 @@ func SplFilterItFetch(zthis *types.Zval, intern *SplDualItObject) {
 	for SplDualItFetch(intern, 1) == types.SUCCESS {
 		zend.ZendCallMethodWith0Params(zthis, intern.GetStd().GetCe(), nil, "accept", &retval)
 		if retval.IsNotUndef() {
-			if zend.ZvalIsTrue(&retval) {
+			if operators.ZvalIsTrue(&retval) {
 				// zend.ZvalPtrDtor(&retval)
 				return
 			}
@@ -1446,13 +1447,13 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 		return
 	}
 	if intern.IsUseKey() {
-		subject = zend.ZvalGetString(intern.GetKey())
+		subject = operators.ZvalGetString(intern.GetKey())
 	} else {
 		if intern.GetData().IsType(types.IS_ARRAY) {
 			return_value.SetFalse()
 			return
 		}
-		subject = zend.ZvalGetString(intern.GetData())
+		subject = operators.ZvalGetString(intern.GetData())
 	}
 
 	/* Exception during string conversion. */
@@ -1488,7 +1489,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 		return_value.SetBool(count > 1)
 	case REGIT_MODE_REPLACE:
 		var replacement *types.Zval = zend.ZendReadProperty(intern.GetStd().GetCe(), zend.ZEND_THIS(executeData), "replacement", 1, &rv)
-		var replacement_str *types.String = zend.ZvalTryGetString(replacement)
+		var replacement_str *types.String = operators.ZvalTryGetString(replacement)
 		if replacement_str == nil {
 			return
 		}
@@ -1742,7 +1743,7 @@ func SplLimitItSeek(intern *SplDualItObject, pos zend.ZendLong) {
 		faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Cannot seek to "+zend.ZEND_LONG_FMT+" which is behind offset "+zend.ZEND_LONG_FMT+" plus count "+zend.ZEND_LONG_FMT, pos, intern.GetOffset(), intern.GetCount())
 		return
 	}
-	if pos != intern.GetPos() && zend.InstanceofFunction(intern.GetCe(), spl_ce_SeekableIterator) != 0 {
+	if pos != intern.GetPos() && operators.InstanceofFunction(intern.GetCe(), spl_ce_SeekableIterator) != 0 {
 		zpos.SetLong(pos)
 		SplDualItFree(intern)
 		zend.ZendCallMethodWith1Params(intern.GetZobject(), intern.GetCe(), nil, "seek", nil, &zpos)
@@ -1873,7 +1874,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 					return
 				}
 			} else {
-				if zend.ZvalIsTrue(&retval) {
+				if operators.ZvalIsTrue(&retval) {
 					zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &zchildren)
 					if zend.EG__().GetException() != nil {
 						// zend.ZvalPtrDtor(&zchildren)
@@ -1995,11 +1996,11 @@ func zim_spl_CachingIterator___toString(executeData *zend.ZendExecuteData, retur
 	}
 	if intern.IsTostringUseKey() {
 		types.ZVAL_COPY(return_value, intern.GetKey())
-		zend.ConvertToString(return_value)
+		operators.ConvertToString(return_value)
 		return
 	} else if intern.IsTostringUseCurrent() {
 		types.ZVAL_COPY(return_value, intern.GetData())
-		zend.ConvertToString(return_value)
+		operators.ConvertToString(return_value)
 		return
 	}
 	if intern.GetZstr().IsString() {
@@ -2608,7 +2609,7 @@ func SplIteratorFuncApply(iter *zend.ZendObjectIterator, puser any) int {
 	var result int
 	apply_info.GetCount()++
 	zend.ZendFcallInfoCall(apply_info.GetFci(), apply_info.GetFcc(), &retval, nil)
-	if zend.ZvalIsTrue(&retval) {
+	if operators.ZvalIsTrue(&retval) {
 		result = types.ArrayApplyKeep
 	} else {
 		result = types.ArrayApplyStop

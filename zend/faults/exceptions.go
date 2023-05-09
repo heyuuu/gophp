@@ -5,6 +5,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -73,14 +74,14 @@ func RethrowException(executeData *zend.ZendExecuteData) {
 	}
 }
 func ZendImplementThrowable(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {
-	if zend.InstanceofFunction(class_type, ZendCeException) != 0 || zend.InstanceofFunction(class_type, ZendCeError) != 0 {
+	if operators.InstanceofFunction(class_type, ZendCeException) != 0 || operators.InstanceofFunction(class_type, ZendCeError) != 0 {
 		return types.SUCCESS
 	}
 	ErrorNoreturn(E_ERROR, "Class %s cannot implement interface %s, extend %s or %s instead", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeException.GetName().GetVal(), ZendCeError.GetName().GetVal())
 	return types.FAILURE
 }
 func GetExceptionBase(object *types.Zval) *types.ClassEntry {
-	if zend.InstanceofFunction(types.Z_OBJCE_P(object), ZendCeException) != 0 {
+	if operators.InstanceofFunction(types.Z_OBJCE_P(object), ZendCeException) != 0 {
 		return ZendCeException
 	} else {
 		return ZendCeError
@@ -102,7 +103,7 @@ func ExceptionSetPrevious(exception *types.ZendObject, add_previous *types.ZendO
 		return
 	}
 	pv.SetObject(add_previous)
-	if zend.InstanceofFunction(types.Z_OBJCE(pv), ZendCeThrowable) == 0 {
+	if operators.InstanceofFunction(types.Z_OBJCE(pv), ZendCeThrowable) == 0 {
 		ErrorNoreturn(E_CORE_ERROR, "Previous exception must implement Throwable")
 		return
 	}
@@ -292,7 +293,7 @@ func ZimExceptionWakeup(executeData *zend.ZendExecuteData, return_value *types.Z
 	CHECK_EXC_TYPE(object, types.STR_LINE, types.IS_LONG, &value)
 	CHECK_EXC_TYPE(object, types.STR_TRACE, types.IS_ARRAY, &value)
 	pvalue = zend.ZendReadProperty(GetExceptionBase(object), object, "previous", 1, &value)
-	if pvalue != nil && pvalue.GetType() != types.IS_NULL && (pvalue.GetType() != types.IS_OBJECT || zend.InstanceofFunction(types.Z_OBJCE_P(pvalue), ZendCeThrowable) == 0 || pvalue == object) {
+	if pvalue != nil && pvalue.GetType() != types.IS_NULL && (pvalue.GetType() != types.IS_OBJECT || operators.InstanceofFunction(types.Z_OBJCE_P(pvalue), ZendCeThrowable) == 0 || pvalue == object) {
 		zend.ZendUnsetProperty(GetExceptionBase(object), object, "previous")
 	}
 }
@@ -569,11 +570,11 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	str = types.NewString("")
 	exception = zend.ZEND_THIS(executeData)
 	fname = types.NewString("gettraceasstring")
-	for exception != nil && exception.IsObject() && zend.InstanceofFunction(types.Z_OBJCE_P(exception), ZendCeThrowable) != 0 {
+	for exception != nil && exception.IsObject() && operators.InstanceofFunction(types.Z_OBJCE_P(exception), ZendCeThrowable) != 0 {
 		var prev_str *types.String = str
-		var message *types.String = zend.ZvalGetString(GET_PROPERTY(exception, types.STR_MESSAGE, &rv))
-		var file *types.String = zend.ZvalGetString(GET_PROPERTY(exception, types.STR_FILE, &rv))
-		var line zend.ZendLong = zend.ZvalGetLong(GET_PROPERTY(exception, types.STR_LINE, &rv))
+		var message *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_MESSAGE, &rv))
+		var file *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_FILE, &rv))
+		var line zend.ZendLong = operators.ZvalGetLong(GET_PROPERTY(exception, types.STR_LINE, &rv))
 		fci.SetSize(b.SizeOf("fci"))
 		fci.GetFunctionName().SetString(fname)
 		fci.SetObject(exception.Object())
@@ -611,7 +612,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 
 	/* Reset apply counts */
 
-	for exception != nil && exception.IsObject() && b.Assign(&base_ce, GetExceptionBase(exception)) && zend.InstanceofFunction(types.Z_OBJCE_P(exception), base_ce) != 0 {
+	for exception != nil && exception.IsObject() && b.Assign(&base_ce, GetExceptionBase(exception)) && operators.InstanceofFunction(types.Z_OBJCE_P(exception), base_ce) != 0 {
 		if exception.IsRecursive() {
 			exception.UnprotectRecursive()
 		} else {
@@ -706,7 +707,7 @@ func ThrowException(exception_ce *types.ClassEntry, message string, code zend.Ze
 	var ex types.Zval
 	var tmp types.Zval
 	if exception_ce != nil {
-		if zend.InstanceofFunction(exception_ce, ZendCeThrowable) == 0 {
+		if operators.InstanceofFunction(exception_ce, ZendCeThrowable) == 0 {
 			Error(E_NOTICE, "Exceptions must implement Throwable")
 			exception_ce = ZendCeException
 		}
@@ -748,9 +749,9 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 	ce_exception = ex.GetCe()
 	zend.EG__().SetException(nil)
 	if ce_exception == ZendCeParseError || ce_exception == ZendCeCompileError {
-		var message *types.String = zend.ZvalGetString(GET_PROPERTY(&exception, types.STR_MESSAGE, &rv))
-		var file *types.String = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.STR_FILE, &rv))
-		var line zend.ZendLong = zend.ZvalGetLong(GET_PROPERTY_SILENT(&exception, types.STR_LINE, &rv))
+		var message *types.String = operators.ZvalGetString(GET_PROPERTY(&exception, types.STR_MESSAGE, &rv))
+		var file *types.String = operators.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.STR_FILE, &rv))
+		var line zend.ZendLong = operators.ZvalGetLong(GET_PROPERTY_SILENT(&exception, types.STR_LINE, &rv))
 		if ce_exception == ZendCeParseError {
 			errorCb(E_PARSE, file.GetStr(), uint32(line), message.GetStr())
 		} else {
@@ -758,7 +759,7 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 		}
 		// types.ZendStringReleaseEx(file, 0)
 		// types.ZendStringReleaseEx(message, 0)
-	} else if zend.InstanceofFunction(ce_exception, ZendCeThrowable) != 0 {
+	} else if operators.InstanceofFunction(ce_exception, ZendCeThrowable) != 0 {
 		var tmp types.Zval
 		var str *types.String
 		var file *types.String = nil
@@ -778,9 +779,9 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 
 			/* do the best we can to inform about the inner exception */
 
-			if zend.InstanceofFunction(ce_exception, ZendCeException) != 0 || zend.InstanceofFunction(ce_exception, ZendCeError) != 0 {
-				file = zend.ZvalGetString(GET_PROPERTY_SILENT(&zv, types.STR_FILE, &rv))
-				line = zend.ZvalGetLong(GET_PROPERTY_SILENT(&zv, types.STR_LINE, &rv))
+			if operators.InstanceofFunction(ce_exception, ZendCeException) != 0 || operators.InstanceofFunction(ce_exception, ZendCeError) != 0 {
+				file = operators.ZvalGetString(GET_PROPERTY_SILENT(&zv, types.STR_FILE, &rv))
+				line = operators.ZvalGetLong(GET_PROPERTY_SILENT(&zv, types.STR_LINE, &rv))
 			}
 			errMsg := fmt.Sprintf("Uncaught %s in exception handling during call to %s::__tostring()", types.Z_OBJCE(zv).Name(), ce_exception.Name())
 			if file == nil {
@@ -792,9 +793,9 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 				// types.ZendStringReleaseEx(file, 0)
 			}
 		}
-		str = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.STR_STRING, &rv))
-		file = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.STR_FILE, &rv))
-		line = zend.ZvalGetLong(GET_PROPERTY_SILENT(&exception, types.STR_LINE, &rv))
+		str = operators.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.STR_STRING, &rv))
+		file = operators.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.STR_FILE, &rv))
+		line = operators.ZvalGetLong(GET_PROPERTY_SILENT(&exception, types.STR_LINE, &rv))
 		if file == nil {
 			errorCb(severity, "", uint32(line), fmt.Sprintf("Uncaught %s\n  thrown", str.GetStr()))
 		} else {
@@ -813,7 +814,7 @@ func ThrowExceptionObject(exception *types.Zval) {
 		ErrorNoreturn(E_CORE_ERROR, "Need to supply an object when throwing an exception")
 	}
 	exception_ce = types.Z_OBJCE_P(exception)
-	if exception_ce == nil || zend.InstanceofFunction(exception_ce, ZendCeThrowable) == 0 {
+	if exception_ce == nil || operators.InstanceofFunction(exception_ce, ZendCeThrowable) == 0 {
 		ThrowError(nil, "Cannot throw objects that do not implement Throwable")
 		// zend.ZvalPtrDtor(exception)
 		return

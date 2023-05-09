@@ -10,6 +10,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
 	"os"
@@ -550,7 +551,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 
 		/* Iterate over the hash to construct the argv array. */
 		args.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
-			var arg_str *types.String = zend.ZvalGetString(value)
+			var arg_str *types.String = operators.ZvalGetString(value)
 			argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
 		})
 
@@ -585,7 +586,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 
 		/* Iterate over the hash to construct the argv array. */
 		p_longopts.Array().Foreach(func(_ types.ArrayKey, entry *types.Zval) {
-			var arg_str *types.String = zend.ZvalGetString(entry)
+			var arg_str *types.String = operators.ZvalGetString(entry)
 			opts.SetNeedParam(0)
 			opts.SetOptName(zend.Estrdup(arg_str.GetVal()))
 			len_ = strlen(opts.GetOptName())
@@ -654,14 +655,14 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 		/* Add this option / argument pair to the result hash. */
 
 		optname_len = strlen(optname)
-		if !(optname_len > 1 && optname[0] == '0') && zend.IsNumericString(b.CastStr(optname, optname_len), nil, nil, 0) == types.IS_LONG {
+		if !(optname_len > 1 && optname[0] == '0') && operators.IsNumericString(b.CastStr(optname, optname_len), nil, nil, 0) == types.IS_LONG {
 
 			/* numeric string */
 
 			var optname_int int = atoi(optname)
 			if b.Assign(&args, return_value.Array().IndexFind(optname_int)) != nil {
 				if args.GetType() != types.IS_ARRAY {
-					zend.ConvertToArrayEx(args)
+					operators.ConvertToArrayEx(args)
 				}
 				args.Array().Append(&val)
 			} else {
@@ -673,7 +674,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 
 			if b.Assign(&args, return_value.Array().KeyFind(b.CastStrAuto(optname))) != nil {
 				if args.GetType() != types.IS_ARRAY {
-					zend.ConvertToArrayEx(args)
+					operators.ConvertToArrayEx(args)
 				}
 				args.Array().Append(&val)
 			} else {
@@ -1022,7 +1023,7 @@ func ZifCallUserFunc(executeData zpp.Ex, return_value zpp.Ret, functionName *typ
 	fci.SetRetval(&retval)
 	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
-			zend.ZendUnwrapReference(&retval)
+			operators.ZendUnwrapReference(&retval)
 		}
 		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
@@ -1048,7 +1049,7 @@ func ZifCallUserFuncArray(executeData zpp.Ex, return_value zpp.Ret, functionName
 	fci.SetRetval(&retval)
 	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
-			zend.ZendUnwrapReference(&retval)
+			operators.ZendUnwrapReference(&retval)
 		}
 		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
@@ -1090,12 +1091,12 @@ func ZifForwardStaticCall(executeData zpp.Ex, return_value zpp.Ret, functionName
 	}
 	fci.SetRetval(&retval)
 	called_scope = zend.ZendGetCalledScope(executeData)
-	if called_scope != nil && fci_cache.GetCallingScope() != nil && zend.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
+	if called_scope != nil && fci_cache.GetCallingScope() != nil && operators.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
 		fci_cache.SetCalledScope(called_scope)
 	}
 	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
-			zend.ZendUnwrapReference(&retval)
+			operators.ZendUnwrapReference(&retval)
 		}
 		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
@@ -1121,12 +1122,12 @@ func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functio
 	zend.ZendFcallInfoArgs(&fci, params)
 	fci.SetRetval(&retval)
 	called_scope = zend.ZendGetCalledScope(executeData)
-	if called_scope != nil && fci_cache.GetCallingScope() != nil && zend.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
+	if called_scope != nil && fci_cache.GetCallingScope() != nil && operators.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
 		fci_cache.SetCalledScope(called_scope)
 	}
 	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
-			zend.ZendUnwrapReference(&retval)
+			operators.ZendUnwrapReference(&retval)
 		}
 		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
@@ -1288,7 +1289,7 @@ func ZifHighlightString(executeData zpp.Ex, return_value zpp.Ret, string *types.
 		}
 		break
 	}
-	if zend.TryConvertToString(expr) == 0 {
+	if operators.TryConvertToString(expr) == 0 {
 		return
 	}
 	if i != 0 {
@@ -1741,7 +1742,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			/* bare string - nothing to do */
 
 		}
-		if !(arg1.String().GetLen() > 1 && arg1.String().GetStr()[0] == '0') && zend.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IS_LONG {
+		if !(arg1.String().GetLen() > 1 && arg1.String().GetStr()[0] == '0') && operators.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IS_LONG {
 			var key = zend.StrToLongWithUnit(arg1.StringVal())
 			if b.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)

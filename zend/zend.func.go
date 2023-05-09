@@ -5,6 +5,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func USED_RET(executeData *ZendExecuteData) bool {
@@ -119,7 +120,7 @@ func PrintZval(expr *types.Zval) string {
 	if expr.IsString() {
 		return expr.StringVal()
 	} else {
-		return ZvalGetString(expr).GetStr()
+		return operators.ZvalGetString(expr).GetStr()
 	}
 }
 
@@ -127,12 +128,12 @@ func ZendMakePrintableZval(expr *types.Zval, expr_copy *types.Zval) int {
 	if expr.IsString() {
 		return 0
 	} else {
-		expr_copy.SetString(ZvalGetString(expr))
+		expr_copy.SetString(operators.ZvalGetString(expr))
 		return 1
 	}
 }
 func ZendPrintZval(expr *types.Zval) int {
-	var str = ZvalGetStrVal(expr)
+	var str = operators.ZvalGetStrVal(expr)
 	ZendWrite(str)
 	return len(str)
 }
@@ -222,7 +223,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		buf.AppendString(expr.String().GetStr())
 		break
 	default:
-		var str *types.String = ZvalGetString(expr)
+		var str *types.String = operators.ZvalGetString(expr)
 		buf.AppendString(str.GetStr())
 		// types.ZendStringReleaseEx(str, 0)
 		break

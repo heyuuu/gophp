@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_AST_SPEC_CALL(name __auto__) __auto__ {
@@ -382,7 +383,7 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 	case types.IS_TRUE:
 		result.Array().IndexUpdate(1, expr)
 	case types.IS_DOUBLE:
-		result.Array().IndexUpdate(DvalToLval(offset.Double()), expr)
+		result.Array().IndexUpdate(operators.DvalToLval(offset.Double()), expr)
 	case types.IS_RESOURCE:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle())
 		result.Array().IndexUpdate(offset.ResourceHandle(), expr)
@@ -451,7 +452,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 
 			/* op1 > op2 is the same as op2 < op1 */
 
-			var op BinaryOpType = b.Cond(ast.GetKind() == ZEND_AST_GREATER, IsSmallerFunction, IsSmallerOrEqualFunction)
+			var op BinaryOpType = b.Cond(ast.GetKind() == ZEND_AST_GREATER, operators.IsSmallerFunction, operators.IsSmallerOrEqualFunction)
 			ret = op(result, &op2, &op1)
 			// ZvalPtrDtorNogc(&op1)
 			// ZvalPtrDtorNogc(&op2)
@@ -503,13 +504,13 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ret = types.FAILURE
 			break
 		}
-		if ZvalIsTrue(&op1) {
+		if operators.ZvalIsTrue(&op1) {
 			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
 				// ZvalPtrDtorNogc(&op1)
 				ret = types.FAILURE
 				break
 			}
-			result.SetBool(ZvalIsTrue(&op2))
+			result.SetBool(operators.ZvalIsTrue(&op2))
 			// ZvalPtrDtorNogc(&op2)
 		} else {
 			result.SetFalse()
@@ -520,7 +521,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ret = types.FAILURE
 			break
 		}
-		if ZvalIsTrue(&op1) {
+		if operators.ZvalIsTrue(&op1) {
 			result.SetTrue()
 		} else {
 			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
@@ -528,7 +529,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 				ret = types.FAILURE
 				break
 			}
-			result.SetBool(ZvalIsTrue(&op2))
+			result.SetBool(operators.ZvalIsTrue(&op2))
 			// ZvalPtrDtorNogc(&op2)
 		}
 		// ZvalPtrDtorNogc(&op1)
@@ -537,7 +538,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ret = types.FAILURE
 			break
 		}
-		if ZvalIsTrue(&op1) {
+		if operators.ZvalIsTrue(&op1) {
 			if ast.GetChild()[1] == nil {
 				*result = op1
 			} else {
@@ -576,14 +577,14 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ret = types.FAILURE
 		} else {
 			op1.SetLong(0)
-			ret = AddFunction(result, &op1, &op2)
+			ret = operators.AddFunction(result, &op1, &op2)
 		}
 	case ZEND_AST_UNARY_MINUS:
 		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != types.SUCCESS {
 			ret = types.FAILURE
 		} else {
 			op1.SetLong(0)
-			ret = SubFunction(result, &op1, &op2)
+			ret = operators.SubFunction(result, &op1, &op2)
 			// ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_ARRAY:

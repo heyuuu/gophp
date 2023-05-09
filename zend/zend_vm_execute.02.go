@@ -3,6 +3,7 @@ package zend
 import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
@@ -23,7 +24,7 @@ func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zend
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
-	CompareFunction(opline.Result(), op_1, op_2)
+	operators.CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_2)
 	}

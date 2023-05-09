@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZendDoInheritance(ce *types.ClassEntry, parent_ce *types.ClassEntry) {
@@ -219,7 +220,7 @@ func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) types.Zend
 		return 1
 	}
 	if ce1.IsLinked() {
-		return InstanceofFunction(ce1, ce2)
+		return operators.InstanceofFunction(ce1, ce2)
 	}
 	if ce1.GetParent() {
 		var parent_ce *types.ClassEntry
@@ -595,7 +596,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 								str.AppendString("<expression>")
 							}
 						} else {
-							var zv_str *types.String = ZvalGetString(zv)
+							var zv_str *types.String = operators.ZvalGetString(zv)
 							str.AppendString(zv_str.GetStr())
 							//ZendTmpStringRelease(tmp_zv_str)
 						}
@@ -1378,7 +1379,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFu
 	} else if mname.GetStr() == ZEND_DEBUGINFO_FUNC_NAME {
 		ce.SetDebugInfo(fe)
 	} else if ce.GetName().GetLen() == mname.GetLen() {
-		var lowercase_name *types.String = ZendStringTolower(ce.GetName())
+		var lowercase_name *types.String = operators.ZendStringTolower(ce.GetName())
 		// lowercase_name = types.ZendNewInternedString(lowercase_name)
 		if !(memcmp(mname.GetVal(), lowercase_name.GetVal(), mname.GetLen())) {
 			if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
@@ -1500,7 +1501,7 @@ func ZendTraitsCopyFunctions(
 
 			/* Scope unset or equal to the function we compare to, and the alias applies to fn */
 
-			if alias.GetAlias() != nil && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetStr(), fnname.GetStr()) == 0 {
+			if alias.GetAlias() != nil && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && operators.ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetStr(), fnname.GetStr()) == 0 {
 				fn_copy = types.CopyFunction(fn)
 
 				/* if it is 0, no modifieres has been changed */
@@ -1508,7 +1509,7 @@ func ZendTraitsCopyFunctions(
 				if alias.GetModifiers() != 0 {
 					fn_copy.SetFnFlags(alias.GetModifiers() | fn.GetFnFlags() ^ fn.GetFnFlags()&AccPppMask)
 				}
-				lcname = ZendStringTolower(alias.GetAlias())
+				lcname = operators.ZendStringTolower(alias.GetAlias())
 				ZendAddTraitMethod(ce, alias.GetAlias().GetVal(), lcname, &fn_copy, overridden)
 				// types.ZendStringReleaseEx(lcname, 0)
 
@@ -1548,7 +1549,7 @@ func ZendTraitsCopyFunctions(
 
 				/* Scope unset or equal to the function we compare to, and the alias applies to fn */
 
-				if alias.GetAlias() == nil && alias.GetModifiers() != 0 && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetStr(), fnname.GetStr()) == 0 {
+				if alias.GetAlias() == nil && alias.GetModifiers() != 0 && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && operators.ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetStr(), fnname.GetStr()) == 0 {
 					fn_copy.SetFnFlags(alias.GetModifiers() | fn.GetFnFlags() ^ fn.GetFnFlags()&AccPppMask)
 
 					/** Record the trait from which this alias was resolved. */
@@ -1619,7 +1620,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 
 			/** Ensure that the preferred method is actually available. */
 
-			lcname = ZendStringTolower(cur_method_ref.GetMethodName())
+			lcname = operators.ZendStringTolower(cur_method_ref.GetMethodName())
 			if !trait.FunctionTable().Exists(lcname.GetStr()) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A precedence rule was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.GetMethodName().GetVal())
 			}
@@ -1685,7 +1686,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 
 				/** And, ensure that the referenced method is resolvable, too. */
 
-				lcname = ZendStringTolower(cur_method_ref.GetMethodName())
+				lcname = operators.ZendStringTolower(cur_method_ref.GetMethodName())
 				if !trait.FunctionTable().Exists(lcname.GetStr()) {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.GetMethodName().GetVal())
 				}
@@ -1817,7 +1818,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 							ZvalUpdateConstantEx(&op2_tmp, ce)
 							op2 = &op2_tmp
 						}
-						not_compatible = FastIsNotIdenticalFunction(op1, op2)
+						not_compatible = operators.FastIsNotIdenticalFunction(op1, op2)
 						if op1 == &op1_tmp {
 							// ZvalPtrDtorNogc(&op1_tmp)
 						}
@@ -1885,7 +1886,7 @@ func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **ty
 					  2) it is just a plain old inconsitency/typo/bug
 					     as in the case where alias is set. */
 
-					lc_method_name = ZendStringTolower(cur_alias.GetTraitMethod().GetMethodName())
+					lc_method_name = operators.ZendStringTolower(cur_alias.GetTraitMethod().GetMethodName())
 					if ce.FunctionTable().Exists(lc_method_name.GetStr()) {
 						// types.ZendStringReleaseEx(lc_method_name, 0)
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers for the trait alias %s() need to be changed in the same statement in which the alias is defined. Error", cur_alias.GetTraitMethod().GetMethodName().GetVal())
@@ -1964,7 +1965,7 @@ func ZendHasDeprecatedConstructor(ce *types.ClassEntry) types.ZendBool {
 		return 0
 	}
 	constructor_name = ce.GetConstructor().GetFunctionName()
-	return !(ZendBinaryStrcasecmp(ce.GetName().GetStr(), constructor_name.GetStr()))
+	return !(operators.ZendBinaryStrcasecmp(ce.GetName().GetStr(), constructor_name.GetStr()))
 }
 func ZendCheckDeprecatedConstructor(ce *types.ClassEntry) {
 	if ZendHasDeprecatedConstructor(ce) != 0 {
@@ -2180,7 +2181,7 @@ func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 		exception_zv.SetObject(EG__().GetException())
 		// 		exception_zv.AddRefcount()
 		faults.ClearException()
-		exception_str = ZvalGetString(&exception_zv)
+		exception_str = operators.ZvalGetString(&exception_zv)
 		faults.ErrorNoreturn(faults.E_ERROR, "During inheritance of %s with variance dependencies: Uncaught %s", ce.GetName().GetVal(), exception_str.GetVal())
 	}
 

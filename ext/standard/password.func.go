@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -92,7 +93,7 @@ func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *typ
 	case types.IS_DOUBLE:
 		fallthrough
 	case types.IS_OBJECT:
-		buffer = zend.ZvalTryGetString(option_buffer)
+		buffer = operators.ZvalTryGetString(option_buffer)
 		if buffer == nil {
 			return nil
 		}
@@ -176,7 +177,7 @@ func PhpPasswordBcryptNeedsRehash(hash *types.String, options *types.Array) type
 	}
 	sscanf(hash.GetVal(), "$2y$"+zend.ZEND_LONG_FMT+"$", &old_cost)
 	if options != nil && b.Assign(&znew_cost, options.KeyFind("cost")) != nil {
-		new_cost = zend.ZvalGetLong(znew_cost)
+		new_cost = operators.ZvalGetLong(znew_cost)
 	}
 	return old_cost != new_cost
 }
@@ -212,7 +213,7 @@ func PhpPasswordBcryptHash(password *types.String, options *types.Array) *types.
 	var zcost *types.Zval
 	var cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
 	if options != nil && b.Assign(&zcost, options.KeyFind("cost")) != nil {
-		cost = zend.ZvalGetLong(zcost)
+		cost = operators.ZvalGetLong(zcost)
 	}
 	if cost < 4 || cost > 31 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid bcrypt cost parameter specified: "+zend.ZEND_LONG_FMT, cost)
@@ -459,7 +460,7 @@ func ZifPasswordHash(executeData zpp.Ex, return_value zpp.Ret, password *types.Z
 	}
 	algo = PhpPasswordAlgoFindZval(zalgo)
 	if algo == nil {
-		var algostr *types.String = zend.ZvalGetString(zalgo)
+		var algostr *types.String = operators.ZvalGetString(zalgo)
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown password hashing algorithm: %s", algostr.GetVal())
 		// types.ZendStringRelease(algostr)
 		return_value.SetNull()

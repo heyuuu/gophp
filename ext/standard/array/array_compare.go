@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"sort"
 	"strconv"
@@ -48,19 +49,19 @@ func twiceComparer(compare1 types.ArrayComparer, compare2 types.ArrayComparer) t
 }
 
 func arrayNaturalGeneralCompare(v1, v2 *types.Zval) int {
-	str1 := zend.ZvalGetStrVal(v1)
-	str2 := zend.ZvalGetStrVal(v2)
+	str1 := operators.ZvalGetStrVal(v1)
+	str2 := operators.ZvalGetStrVal(v2)
 	return str.Strnatcmp(str1, str2, false)
 }
 
 func arrayNaturalGeneralCaseCompare(v1, v2 *types.Zval) int {
-	str1 := zend.ZvalGetStrVal(v1)
-	str2 := zend.ZvalGetStrVal(v2)
+	str1 := operators.ZvalGetStrVal(v1)
+	str2 := operators.ZvalGetStrVal(v2)
 	return str.Strnatcmp(str1, str2, true)
 }
 func arrayDataCompare(v1, v2 *types.Zval) int {
 	var result types.Zval
-	if zend.CompareFunction(&result, v1, v2) == types.FAILURE {
+	if operators.CompareFunction(&result, v1, v2) == types.FAILURE {
 		return 0
 	}
 	b.Assert(result.IsType(types.IS_LONG))
@@ -71,12 +72,12 @@ func phpGetDataCompareFunc(sortType zend.ZendLong, reverse bool) types.ArrayComp
 	var comparer types.ArrayComparer
 	switch sortType & ^PHP_SORT_FLAG_CASE {
 	case PHP_SORT_NUMERIC:
-		comparer = arrayDataComparer(zend.NumericCompareFunction)
+		comparer = arrayDataComparer(operators.NumericCompareFunction)
 	case PHP_SORT_STRING:
 		if (sortType & PHP_SORT_FLAG_CASE) != 0 {
-			comparer = arrayDataComparer(zend.StringCaseCompareFunction)
+			comparer = arrayDataComparer(operators.StringCaseCompareFunction)
 		} else {
-			comparer = arrayDataComparer(zend.StringCompareFunction)
+			comparer = arrayDataComparer(operators.StringCompareFunction)
 		}
 	case PHP_SORT_NATURAL:
 		if (sortType & PHP_SORT_FLAG_CASE) != 0 {
@@ -85,7 +86,7 @@ func phpGetDataCompareFunc(sortType zend.ZendLong, reverse bool) types.ArrayComp
 			comparer = arrayDataComparer(arrayNaturalGeneralCompare)
 		}
 	case PHP_SORT_LOCALE_STRING:
-		comparer = arrayDataComparer(zend.StringLocaleCompareFunction)
+		comparer = arrayDataComparer(operators.StringLocaleCompareFunction)
 	case PHP_SORT_REGULAR:
 		fallthrough
 	default:
@@ -126,7 +127,7 @@ func arrayKeyCompare(k1 types.ArrayKey, k2 types.ArrayKey) int {
 	l1, s1, isStr1 := k1.Keys()
 	l2, s2, isStr2 := k1.Keys()
 	if isStr1 && isStr2 {
-		return zend.ZendiSmartStrcmp(s1, s2)
+		return operators.ZendiSmartStrcmp(s1, s2)
 	} else if !isStr1 && !isStr2 {
 		return b.Cond(l1 < l2, -1, 1)
 	} else {
@@ -197,7 +198,7 @@ func arrayUserDataComparer(cmpFunction zpp.Callable) types.ArrayComparer {
 		arg1 := p1.GetVal()
 		arg2 := p2.GetVal()
 		if retval, ok := cmpFunction.Call(arg1, arg2); ok && retval.IsNotUndef() {
-			var ret = zend.ZvalGetLong(retval)
+			var ret = operators.ZvalGetLong(retval)
 			return zend.ZEND_NORMALIZE_BOOL(ret)
 		} else {
 			return 0
@@ -208,7 +209,7 @@ func arrayUserDataComparer(cmpFunction zpp.Callable) types.ArrayComparer {
 func arrayUserZvalComparer(cmpFunction zpp.Callable) zvalComparer {
 	return func(arg1, arg2 *types.Zval) int {
 		if retval, ok := cmpFunction.Call(arg1, arg2); ok && retval.IsNotUndef() {
-			var ret = zend.ZvalGetLong(retval)
+			var ret = operators.ZvalGetLong(retval)
 			return zend.ZEND_NORMALIZE_BOOL(ret)
 		} else {
 			return 0
@@ -221,7 +222,7 @@ func arrayUserKeyComparer(cmpFunction zpp.Callable) types.ArrayComparer {
 		arg1 := p1.GetKey().ToZval()
 		arg2 := p2.GetKey().ToZval()
 		if retval, ok := cmpFunction.Call(arg1, arg2); ok && retval.IsNotUndef() {
-			var ret = zend.ZvalGetLong(retval)
+			var ret = operators.ZvalGetLong(retval)
 			return zend.ZEND_NORMALIZE_BOOL(ret)
 		} else {
 			return 0

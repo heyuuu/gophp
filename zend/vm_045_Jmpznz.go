@@ -2,6 +2,7 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func ZEND_JMPZNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -14,7 +15,7 @@ func ZEND_JMPZNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
-	if ZvalIsTrue(val) {
+	if operators.ZvalIsTrue(val) {
 		opline = ZEND_OFFSET_TO_OPLINE(opline, opline.GetExtendedValue())
 	} else {
 		opline = OP_JMP_ADDR(opline, opline.GetOp2())
@@ -37,7 +38,7 @@ func ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
-	if ZvalIsTrue(val) {
+	if operators.ZvalIsTrue(val) {
 		opline = ZEND_OFFSET_TO_OPLINE(opline, opline.GetExtendedValue())
 	} else {
 		opline = OP_JMP_ADDR(opline, opline.GetOp2())
@@ -60,7 +61,7 @@ func ZEND_JMPZNZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
-	if ZvalIsTrue(val) {
+	if operators.ZvalIsTrue(val) {
 		opline = ZEND_OFFSET_TO_OPLINE(opline, opline.GetExtendedValue())
 	} else {
 		opline = OP_JMP_ADDR(opline, opline.GetOp2())
