@@ -506,7 +506,7 @@ func ObjectCommon(
 	if has_unserialize != 0 {
 		var ary types.Zval
 		var tmp *types.Zval
-		if elements >= types.HT_MAX_SIZE {
+		if elements >= types.MaxArraySize {
 			return 0
 		}
 		zend.ArrayInitSize(&ary, elements)
@@ -534,7 +534,7 @@ func ObjectCommon(
 	}
 	has_wakeup = types.Z_OBJCE_P(rval) != PHP_IC_ENTRY && types.Z_OBJCE_P(rval).FunctionTable().Exists("__wakeup")
 	ht = types.Z_OBJPROP_P(rval)
-	if elements >= zend_long(types.HT_MAX_SIZE-ht.Len()) {
+	if elements >= zend_long(types.MaxArraySize-ht.Len()) {
 		return 0
 	}
 	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.Object()) == 0 {
@@ -955,7 +955,7 @@ yy24:
 	if var_hash == nil {
 		return 0
 	}
-	if elements < 0 || elements >= types.HT_MAX_SIZE || elements > max-YYCURSOR {
+	if elements < 0 || elements >= types.MaxArraySize || elements > max-YYCURSOR {
 		return 0
 	}
 	if elements != 0 {

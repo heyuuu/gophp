@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
+	"sort"
 )
 
 func ZendExtensionOpArrayCtorHandler(extension *ZendExtension, op_array *types.ZendOpArray) {
@@ -663,16 +664,7 @@ func KeepsOp1Alive(opline *ZendOp) types.ZendBool {
 }
 func CmpLiveRange(a *ZendLiveRange, b *ZendLiveRange) int { return a.GetStart() - b.GetStart() }
 func SwapLiveRange(a *ZendLiveRange, b *ZendLiveRange) {
-	var tmp uint32
-	tmp = a.GetVar()
-	a.SetVar(b.GetVar())
-	b.SetVar(tmp)
-	tmp = a.GetStart()
-	a.SetStart(b.GetStart())
-	b.SetStart(tmp)
-	tmp = a.GetEnd()
-	a.SetEnd(b.GetEnd())
-	b.SetEnd(tmp)
+	*a, *b = *b, *a
 }
 func ZendCalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
 	var opnum uint32 = op_array.GetLast()
@@ -759,7 +751,6 @@ func ZendCalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsL
 		var r2 *ZendLiveRange = r1 + op_array.GetLastLiveRange() - 1
 
 		/* In most cases we need just revert the array */
-
 		for r1 < r2 {
 			SwapLiveRange(r1, r2)
 			r1++
@@ -769,7 +760,11 @@ func ZendCalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsL
 		r2 = r1 + op_array.GetLastLiveRange() - 1
 		for r1 < r2 {
 			if r1.GetStart() > (r1 + 1).GetStart() {
-				ZendSort(r1, r2-r1+1, b.SizeOf("zend_live_range"), types.CompareFuncT(CmpLiveRange), types.SwapFuncT(SwapLiveRange))
+				//ZendSort(r1, r2-r1+1, b.SizeOf("zend_live_range"), types.CompareFuncT(CmpLiveRange), types.SwapFuncT(SwapLiveRange))
+				var r []ZendLiveRange = r1[:r2-r1+1]
+				sort.Slice(r, func(i, j int) bool {
+					return r[i].GetStart() < r[j].GetStart()
+				})
 				break
 			}
 			r1++

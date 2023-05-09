@@ -538,7 +538,7 @@ func rangeDouble(zLow *types.Zval, zHigh *types.Zval, step float64) ([]*types.Zv
 	}
 
 	size := (high-low)/step + 1
-	if size >= float64(types.HT_MAX_SIZE) {
+	if size >= float64(types.MaxArraySize) {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", low, high)
 		return nil, false
 	}
@@ -567,7 +567,7 @@ func rangeLong(zLow *types.Zval, zHigh *types.Zval, step int) ([]*types.Zval, bo
 	}
 
 	size := (high-low)/step + 1
-	if size >= types.HT_MAX_SIZE {
+	if size >= types.MaxArraySize {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%d end=%d", low, high)
 		return nil, false
 	}
