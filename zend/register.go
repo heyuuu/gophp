@@ -22,9 +22,9 @@ func RegisterInternalClassEx(name string, builtinFunctions []types.FunctionEntry
 }
 
 func _doRegisterInternalClass(name string, builtinFunctions []types.FunctionEntry, ceFlags uint32) *types.ClassEntry {
-	var classEntry = types.NewInternalClass(name)
+	var moduleNumber = EG__().GetCurrentModule().GetModuleNumber()
+	var classEntry = types.NewInternalClass(name, moduleNumber)
 	classEntry.SetCeFlags(ceFlags | AccConstantsUpdated | AccLinked | AccResolvedParent | AccResolvedInterfaces)
-	classEntry.SetModule(EG__().GetCurrentModule())
 	if len(builtinFunctions) != 0 {
 		ZendRegisterFunctions(classEntry, builtinFunctions, classEntry.FunctionTable(), EG__().GetCurrentModule().GetType())
 	}

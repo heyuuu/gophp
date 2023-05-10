@@ -70,10 +70,9 @@ type ClassEntry struct {
 			line_end    uint32
 			doc_comment *String
 		}
-		internal struct {
-			module *zend.ModuleEntry
-		}
 	}
+	// info.internal
+	moduleNumber int
 }
 
 func NewUserClass(name string) *ClassEntry {
@@ -85,10 +84,11 @@ func NewUserClass(name string) *ClassEntry {
 	return ce
 }
 
-func NewInternalClass(name string) *ClassEntry {
+func NewInternalClass(name string, moduleNumber int) *ClassEntry {
 	var ce = &ClassEntry{
-		type_: zend.ZEND_INTERNAL_CLASS,
-		name:  name,
+		type_:        zend.ZEND_INTERNAL_CLASS,
+		name:         name,
+		moduleNumber: moduleNumber,
 	}
 	ce.initData()
 	return ce
@@ -123,7 +123,8 @@ func (ce *ClassEntry) initTables() {
 	ce.constantTable = NewTable[*zend.ZendClassConstant](nil)
 }
 
-func (ce *ClassEntry) Name() string { return ce.name }
+func (ce *ClassEntry) Name() string      { return ce.name }
+func (ce *ClassEntry) ModuleNumber() int { return ce.moduleNumber }
 
 func (ce *ClassEntry) FunctionTable() FunctionTable       { return ce.functionTable }
 func (ce *ClassEntry) PropertyTable() PropertyTable       { return ce.propertyTable }
@@ -274,8 +275,6 @@ func (ce *ClassEntry) GetDocComment() *String  { return ce.info.user.doc_comment
 func (ce *ClassEntry) SetDocComment(value *String) {
 	ce.info.user.doc_comment = value
 }
-func (ce *ClassEntry) GetModule() *zend.ModuleEntry      { return ce.info.internal.module }
-func (ce *ClassEntry) SetModule(value *zend.ModuleEntry) { ce.info.internal.module = value }
 
 /* ClassEntry.ceFlags */
 func (ce *ClassEntry) AddCeFlags(value uint32)      { ce.ceFlags |= value }
