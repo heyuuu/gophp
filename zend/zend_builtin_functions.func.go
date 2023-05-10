@@ -12,7 +12,7 @@ import (
 )
 
 func ZmStartupCore(type_ int, module_number int) int {
-	ZendStandardClassDef = RegisterInternalClass("stdClass", nil)
+	ZendStandardClassDef = RegisterClass("stdClass", nil, nil)
 	ZendRegisterDefaultClasses()
 	return types.SUCCESS
 }

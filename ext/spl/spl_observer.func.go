@@ -852,7 +852,7 @@ func zim_spl_MultipleIterator_key(executeData *zend.ZendExecuteData, return_valu
 func ZmStartupSplObserver(type_ int, module_number int) int {
 	spl_ce_SplObserver = zend.RegisterInternalInterface("SplObserver", spl_funcs_SplObserver)
 	spl_ce_SplSubject = zend.RegisterInternalInterface("SplSubject", spl_funcs_SplSubject)
-	spl_ce_SplObjectStorage = zend.SplRegisterClass("SplObjectStorage", spl_SplObjectStorage_new, spl_funcs_SplObjectStorage)
+	spl_ce_SplObjectStorage = zend.RegisterClass("SplObjectStorage", spl_SplObjectStorage_new, spl_funcs_SplObjectStorage)
 	memcpy(&spl_handler_SplObjectStorage, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	spl_handler_SplObjectStorage.SetOffset(zend_long((*byte)(&((*spl_SplObjectStorage)(nil).GetStd())) - (*byte)(nil)))
 	spl_handler_SplObjectStorage.SetCompareObjects(SplObjectStorageCompareObjects)
@@ -864,7 +864,7 @@ func ZmStartupSplObserver(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_Iterator)
 	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_Serializable)
 	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_ArrayAccess)
-	spl_ce_MultipleIterator = zend.SplRegisterClass("MultipleIterator", spl_SplObjectStorage_new, spl_funcs_MultipleIterator)
+	spl_ce_MultipleIterator = zend.RegisterClass("MultipleIterator", spl_SplObjectStorage_new, spl_funcs_MultipleIterator)
 	zend.ZendClassImplements(spl_ce_MultipleIterator, 1, zend.ZendCeIterator)
 	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ANY", zend.ZendLong(MIT_NEED_ANY))
 	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ALL", zend.ZendLong(MIT_NEED_ALL))

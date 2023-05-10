@@ -1091,7 +1091,7 @@ func ZendGeneratorGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	return iterator
 }
 func ZendRegisterGeneratorCe() {
-	ZendCeGenerator = RegisterInternalClass("Generator", GeneratorFunctions)
+	ZendCeGenerator = RegisterClass("Generator", nil, GeneratorFunctions)
 	ZendCeGenerator.SetIsFinal(true)
 	ZendCeGenerator.SetCreateObject(ZendGeneratorCreate)
 	ZendCeGenerator.SetSerialize(ZendClassSerializeDeny)
@@ -1108,5 +1108,5 @@ func ZendRegisterGeneratorCe() {
 	ZendGeneratorHandlers.SetCloneObj(nil)
 	ZendGeneratorHandlers.SetGetConstructor(ZendGeneratorGetConstructor)
 
-	zend_ce_ClosedGeneratorException = RegisterInternalClassEx("ClosedGeneratorException", nil, faults.ZendCeException)
+	zend_ce_ClosedGeneratorException = RegisterSubClass(faults.ZendCeException, "ClosedGeneratorException", nil, nil)
 }

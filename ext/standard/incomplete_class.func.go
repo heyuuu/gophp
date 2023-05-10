@@ -64,7 +64,7 @@ func PhpCreateIncompleteClass() *types.ClassEntry {
 	PhpIncompleteObjectHandlers.SetGetPropertyPtrPtr(IncompleteClassGetPropertyPtrPtr)
 	PhpIncompleteObjectHandlers.SetGetMethod(IncompleteClassGetMethod)
 
-	ce := zend.RegisterInternalClass(INCOMPLETE_CLASS, nil)
+	ce := zend.RegisterClass(INCOMPLETE_CLASS, nil, nil)
 	ce.SetCreateObject(PhpCreateIncompleteObject)
 	return ce
 }

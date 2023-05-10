@@ -1,7 +1,6 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
@@ -86,15 +85,10 @@ func ZendCleanupInternalClasses() {
 func ZendNextFreeModule() int {
 	return globals.G().CountModules() + 1
 }
-func ZendClassImplements(class_entry *types.ClassEntry, num_interfaces int, _ ...any) {
-	var interface_entry *types.ClassEntry
-	var interface_list va_list
-	va_start(interface_list, num_interfaces)
-	for b.PostDec(&num_interfaces) {
-		interface_entry = __va_arg(interface_list, (*types.ClassEntry)(_))
-		ZendDoImplementInterface(class_entry, interface_entry)
+func ZendClassImplements(classEntry *types.ClassEntry, _ int, interfaces ...*types.ClassEntry) {
+	for _, iface := range interfaces {
+		ZendDoImplementInterface(classEntry, iface)
 	}
-	va_end(interface_list)
 }
 func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int) int {
 	/* TODO: Move this out of here in 7.4. */

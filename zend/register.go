@@ -1,41 +1,59 @@
 package zend
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 )
 
 // Register Internal class
-func RegisterInternalClass(name string, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
-	return _doRegisterInternalClass(name, builtinFunctions, 0)
+type objCtorType func(*types.ClassEntry) *types.ZendObject
+type ClassDefines struct {
+	Name         string
+	Parent       *types.ClassEntry
+	Interfaces   []*types.ClassEntry
+	Functions    []types.FunctionEntry
+	CreateObject func(*types.ClassEntry) *types.ZendObject
 }
+
 func RegisterInternalInterface(name string, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
 	return _doRegisterInternalClass(name, builtinFunctions, AccInterface)
 }
-func RegisterInternalClassEx(name string, builtinFunctions []types.FunctionEntry, parentCe *types.ClassEntry) *types.ClassEntry {
-	registerClass := RegisterInternalClass(name, builtinFunctions)
-	if parentCe != nil {
-		ZendDoInheritance(registerClass, parentCe)
-		ZendBuildPropertiesInfoTable(registerClass)
-	}
-	return registerClass
+
+func RegisterClass(name string, objCtor objCtorType, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
+	return RegisterClassEx(&ClassDefines{
+		Name:         name,
+		Functions:    builtinFunctions,
+		CreateObject: objCtor,
+	})
+}
+func RegisterSubClass(parentCe *types.ClassEntry, name string, objCtor objCtorType, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
+	return RegisterClassEx(&ClassDefines{
+		Name:         name,
+		Functions:    builtinFunctions,
+		Parent:       parentCe,
+		CreateObject: objCtor,
+	})
 }
 
-type objCtorType func(*types.ClassEntry) *types.ZendObject
+func RegisterClassEx(def *ClassDefines) *types.ClassEntry {
+	b.Assert(def.Name != "")
 
-func SplRegisterClass(name string, objCtor objCtorType, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
-	ce := RegisterInternalClass(name, builtinFunctions)
-	if objCtor != nil {
-		ce.SetCreateObject(objCtor)
+	ce := _doRegisterInternalClass(def.Name, def.Functions, 0)
+
+	// handle parent
+	parent := def.Parent
+	if parent != nil {
+		ZendDoInheritance(ce, parent)
+		ZendBuildPropertiesInfoTable(ce)
 	}
-	return ce
-}
-func SplRegisterSubClass(parentCe *types.ClassEntry, name string, objCtor objCtorType, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
-	ce := RegisterInternalClassEx(name, builtinFunctions, parentCe)
-	if objCtor != nil {
-		ce.SetCreateObject(objCtor)
-	} else {
-		ce.SetCreateObject(parentCe.GetCreateObject())
+
+	// handle objCtor
+	if def.CreateObject != nil {
+		ce.SetCreateObject(def.CreateObject)
+	} else if parent != nil {
+		ce.SetCreateObject(parent.GetCreateObject())
 	}
+
 	return ce
 }
 

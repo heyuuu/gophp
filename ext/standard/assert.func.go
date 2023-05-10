@@ -62,7 +62,7 @@ func ZmStartupAssert(type_ int, module_number int) int {
 	zend.RegisterLongConstant("ASSERT_QUIET_EVAL", ASSERT_QUIET_EVAL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("ASSERT_EXCEPTION", ASSERT_EXCEPTION, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 
-	AssertionErrorCe = zend.RegisterInternalClassEx("AssertionError", nil, faults.ZendCeError)
+	AssertionErrorCe = zend.RegisterSubClass(faults.ZendCeError, "AssertionError", nil, nil)
 
 	return types.SUCCESS
 }
