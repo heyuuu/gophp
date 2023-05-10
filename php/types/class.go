@@ -18,8 +18,7 @@ type ClassEntry struct {
 		parent      *ClassEntry
 		parent_name *String
 	}
-	refcount                     int
-	ce_flags                     uint32
+	ceFlags                      uint32
 	default_properties_count     int
 	default_static_members_count int
 	default_properties_table     *Zval
@@ -158,8 +157,8 @@ func (ce *ClassEntry) GetParent() *ClassEntry         { return ce.__0.parent }
 func (ce *ClassEntry) SetParent(value *ClassEntry)    { ce.__0.parent = value }
 func (ce *ClassEntry) GetParentName() *String         { return ce.__0.parent_name }
 func (ce *ClassEntry) SetParentName(value *String)    { ce.__0.parent_name = value }
-func (ce *ClassEntry) GetCeFlags() uint32             { return ce.ce_flags }
-func (ce *ClassEntry) SetCeFlags(value uint32)        { ce.ce_flags = value }
+func (ce *ClassEntry) GetCeFlags() uint32             { return ce.ceFlags }
+func (ce *ClassEntry) SetCeFlags(value uint32)        { ce.ceFlags = value }
 func (ce *ClassEntry) GetDefaultPropertiesCount() int { return ce.default_properties_count }
 func (ce *ClassEntry) SetDefaultPropertiesCount(value int) {
 	ce.default_properties_count = value
@@ -302,15 +301,14 @@ func (ce *ClassEntry) SetBuiltinFunctions(value *FunctionEntry) {
 func (ce *ClassEntry) GetModule() *zend.ModuleEntry      { return ce.info.internal.module }
 func (ce *ClassEntry) SetModule(value *zend.ModuleEntry) { ce.info.internal.module = value }
 
-/* ClassEntry.ce_flags */
-func (ce *ClassEntry) AddCeFlags(value uint32)      { ce.ce_flags |= value }
-func (ce *ClassEntry) SubCeFlags(value uint32)      { ce.ce_flags &^= value }
-func (ce *ClassEntry) HasCeFlags(value uint32) bool { return ce.ce_flags&value != 0 }
+/* ClassEntry.ceFlags */
+func (ce *ClassEntry) AddCeFlags(value uint32)      { ce.ceFlags |= value }
+func (ce *ClassEntry) HasCeFlags(value uint32) bool { return ce.ceFlags&value != 0 }
 func (ce *ClassEntry) SwitchCeFlags(value uint32, cond bool) {
 	if cond {
-		ce.AddCeFlags(value)
+		ce.ceFlags |= value
 	} else {
-		ce.SubCeFlags(value)
+		ce.ceFlags &^= value
 	}
 }
 func (ce ClassEntry) IsConstantsUpdated() bool {

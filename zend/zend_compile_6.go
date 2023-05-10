@@ -826,7 +826,6 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 				CG__().SetZendLineno(decl.GetEndLineno())
 				if ZendTryEarlyBind(ce, parent_ce, lcname) {
 					CG__().SetZendLineno(ast.GetLineno())
-					// types.ZendStringRelease(lcname)
 					return nil
 				}
 				CG__().SetZendLineno(ast.GetLineno())

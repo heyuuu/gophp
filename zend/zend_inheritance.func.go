@@ -8,8 +8,8 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendDoInheritance(ce *types.ClassEntry, parent_ce *types.ClassEntry) {
-	ZendDoInheritanceEx(ce, parent_ce, false)
+func ZendDoInheritance(ce *types.ClassEntry, parentCe *types.ClassEntry) {
+	ZendDoInheritanceEx(ce, parentCe, false)
 }
 func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
 	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"))
@@ -898,47 +898,31 @@ func DoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 	}
 
 	/* This should be prevented by the class lookup logic. */
-
 	b.Assert(ce != iface)
-
-	/* This should be prevented by the class lookup logic. */
 }
 func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
 	/* expects interface to be contained in ce's interface list already */
-
-	var i uint32
-	var ce_num uint32
-	var if_num uint32 = iface.GetNumInterfaces()
-	var entry *types.ClassEntry
-	ce_num = ce.GetNumInterfaces()
-	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		ce.SetInterfaces((**types.ClassEntry)(realloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*(ce_num+if_num))))
-	} else {
-		ce.SetInterfaces((**types.ClassEntry)(Erealloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*(ce_num+if_num))))
-	}
-
 	/* Inherit the interfaces, only if they're not already inherited by the class */
-
-	for b.PostDec(&if_num) {
-		entry = iface.GetInterfaces()[if_num]
-		for i = 0; i < ce_num; i++ {
-			if ce.GetInterfaces()[i] == entry {
+	interfaces := ce.GetInterfaces()
+	rawNum := len(interfaces)
+	for _, newInterface := range iface.GetInterfaces() {
+		i := 0
+		for ; i < rawNum; i++ {
+			if interfaces[i] == newInterface {
 				break
 			}
 		}
-		if i == ce_num {
-			ce.GetInterfaces()[b.PostInc(&(ce.GetNumInterfaces()))] = entry
+		if i == rawNum {
+			interfaces = append(interfaces, newInterface)
 		}
 	}
+	ce.SetInterfaces(interfaces)
 	ce.SetIsResolvedInterfaces(true)
 
 	/* and now call the implementing handlers */
-
-	for ce_num < ce.GetNumInterfaces() {
-		DoImplementInterface(ce, ce.GetInterfaces()[b.PostInc(&ce_num)])
+	for _, newInterface := range interfaces[rawNum:] {
+		DoImplementInterface(ce, newInterface)
 	}
-
-	/* and now call the implementing handlers */
 }
 func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *types.ClassEntry) {
 	var c = ce.ConstantsTable().Get(name)
@@ -982,51 +966,50 @@ func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
 		}
 	})
 }
-func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, checked bool) {
+func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, checked bool) {
 	if ce.IsInterface() {
 		/* Interface can only inherit other interfaces */
-		if !parent_ce.IsInterface() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Interface %s may not inherit from class (%s)", ce.GetName().GetVal(), parent_ce.GetName().GetVal())
+		if !parentCe.IsInterface() {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Interface %s may not inherit from class (%s)", ce.GetName().GetVal(), parentCe.GetName().GetVal())
 		}
-	} else if parent_ce.HasCeFlags(AccInterface | AccTrait | AccFinal) {
+	} else if parentCe.HasCeFlags(AccInterface | AccTrait | AccFinal) {
 		/* Class declaration must not extend traits or interfaces */
-		if parent_ce.IsInterface() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from interface %s", ce.GetName().GetVal(), parent_ce.GetName().GetVal())
-		} else if parent_ce.IsTrait() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from trait %s", ce.GetName().GetVal(), parent_ce.GetName().GetVal())
+		if parentCe.IsInterface() {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from interface %s", ce.GetName().GetVal(), parentCe.GetName().GetVal())
+		} else if parentCe.IsTrait() {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from trait %s", ce.GetName().GetVal(), parentCe.GetName().GetVal())
 		}
 
 		/* Class must not extend a final class */
-		if parent_ce.IsFinal() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s may not inherit from final class (%s)", ce.GetName().GetVal(), parent_ce.GetName().GetVal())
+		if parentCe.IsFinal() {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s may not inherit from final class (%s)", ce.GetName().GetVal(), parentCe.GetName().GetVal())
 		}
 	}
-	ce.SetParent(parent_ce)
+	ce.SetParent(parentCe)
 	ce.SetIsResolvedParent(true)
 
 	/* Inherit interfaces */
-
-	if parent_ce.GetNumInterfaces() != 0 {
+	if parentCe.GetNumInterfaces() != 0 {
 		if !ce.IsImplementInterfaces() {
-			ZendDoInheritInterfaces(ce, parent_ce)
+			ZendDoInheritInterfaces(ce, parentCe)
 		} else {
 			var i uint32
-			for i = 0; i < parent_ce.GetNumInterfaces(); i++ {
-				DoImplementInterface(ce, parent_ce.GetInterfaces()[i])
+			for i = 0; i < parentCe.GetNumInterfaces(); i++ {
+				DoImplementInterface(ce, parentCe.GetInterfaces()[i])
 			}
 		}
 	}
 
 	/* Inherit properties */
 
-	if parent_ce.GetDefaultPropertiesCount() != 0 {
+	if parentCe.GetDefaultPropertiesCount() != 0 {
 		var src *types.Zval
 		var dst *types.Zval
 		var end *types.Zval
 		if ce.GetDefaultPropertiesCount() != 0 {
-			var table *types.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() + parent_ce.GetDefaultPropertiesCount()))
+			var table *types.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() + parentCe.GetDefaultPropertiesCount()))
 			src = ce.GetDefaultPropertiesTable() + ce.GetDefaultPropertiesCount()
-			end = table + parent_ce.GetDefaultPropertiesCount()
+			end = table + parentCe.GetDefaultPropertiesCount()
 			dst = end + ce.GetDefaultPropertiesCount()
 			ce.SetDefaultPropertiesTable(table)
 			for {
@@ -1040,12 +1023,12 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			Pefree(src, ce.GetType() == ZEND_INTERNAL_CLASS)
 			end = ce.GetDefaultPropertiesTable()
 		} else {
-			end = Pemalloc(b.SizeOf("zval") * parent_ce.GetDefaultPropertiesCount())
-			dst = end + parent_ce.GetDefaultPropertiesCount()
+			end = Pemalloc(b.SizeOf("zval") * parentCe.GetDefaultPropertiesCount())
+			dst = end + parentCe.GetDefaultPropertiesCount()
 			ce.SetDefaultPropertiesTable(end)
 		}
-		src = parent_ce.GetDefaultPropertiesTable() + parent_ce.GetDefaultPropertiesCount()
-		if parent_ce.GetType() != ce.GetType() {
+		src = parentCe.GetDefaultPropertiesTable() + parentCe.GetDefaultPropertiesCount()
+		if parentCe.GetType() != ce.GetType() {
 			/* User class extends internal */
 			for {
 				dst--
@@ -1073,16 +1056,16 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				}
 			}
 		}
-		ce.SetDefaultPropertiesCount(ce.GetDefaultPropertiesCount() + parent_ce.GetDefaultPropertiesCount())
+		ce.SetDefaultPropertiesCount(ce.GetDefaultPropertiesCount() + parentCe.GetDefaultPropertiesCount())
 	}
-	if parent_ce.GetDefaultStaticMembersCount() != 0 {
+	if parentCe.GetDefaultStaticMembersCount() != 0 {
 		var src *types.Zval
 		var dst *types.Zval
 		var end *types.Zval
 		if ce.GetDefaultStaticMembersCount() != 0 {
-			var table *types.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultStaticMembersCount() + parent_ce.GetDefaultStaticMembersCount()))
+			var table *types.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultStaticMembersCount() + parentCe.GetDefaultStaticMembersCount()))
 			src = ce.GetDefaultStaticMembersTable() + ce.GetDefaultStaticMembersCount()
-			end = table + parent_ce.GetDefaultStaticMembersCount()
+			end = table + parentCe.GetDefaultStaticMembersCount()
 			dst = end + ce.GetDefaultStaticMembersCount()
 			ce.SetDefaultStaticMembersTable(table)
 			for {
@@ -1096,21 +1079,21 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			Pefree(src, ce.GetType() == ZEND_INTERNAL_CLASS)
 			end = ce.GetDefaultStaticMembersTable()
 		} else {
-			end = Pemalloc(b.SizeOf("zval") * parent_ce.GetDefaultStaticMembersCount())
-			dst = end + parent_ce.GetDefaultStaticMembersCount()
+			end = Pemalloc(b.SizeOf("zval") * parentCe.GetDefaultStaticMembersCount())
+			dst = end + parentCe.GetDefaultStaticMembersCount()
 			ce.SetDefaultStaticMembersTable(end)
 		}
-		if parent_ce.GetType() != ce.GetType() {
+		if parentCe.GetType() != ce.GetType() {
 
 			/* User class extends internal */
 
-			if CE_STATIC_MEMBERS(parent_ce) == nil {
-				ZendClassInitStatics(parent_ce)
+			if CE_STATIC_MEMBERS(parentCe) == nil {
+				ZendClassInitStatics(parentCe)
 			}
-			if ZendUpdateClassConstants(parent_ce) != types.SUCCESS {
+			if ZendUpdateClassConstants(parentCe) != types.SUCCESS {
 				b.Assert(false)
 			}
-			src = CE_STATIC_MEMBERS(parent_ce) + parent_ce.GetDefaultStaticMembersCount()
+			src = CE_STATIC_MEMBERS(parentCe) + parentCe.GetDefaultStaticMembersCount()
 			for {
 				dst--
 				src--
@@ -1124,11 +1107,11 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				}
 			}
 		} else if ce.GetType() == ZEND_USER_CLASS {
-			if CE_STATIC_MEMBERS(parent_ce) == nil {
-				b.Assert(parent_ce.HasCeFlags(AccImmutable | AccPreloaded))
-				ZendClassInitStatics(parent_ce)
+			if CE_STATIC_MEMBERS(parentCe) == nil {
+				b.Assert(parentCe.HasCeFlags(AccImmutable | AccPreloaded))
+				ZendClassInitStatics(parentCe)
 			}
-			src = CE_STATIC_MEMBERS(parent_ce) + parent_ce.GetDefaultStaticMembersCount()
+			src = CE_STATIC_MEMBERS(parentCe) + parentCe.GetDefaultStaticMembersCount()
 			for {
 				dst--
 				src--
@@ -1145,7 +1128,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				}
 			}
 		} else {
-			src = parent_ce.GetDefaultStaticMembersTable() + parent_ce.GetDefaultStaticMembersCount()
+			src = parentCe.GetDefaultStaticMembersTable() + parentCe.GetDefaultStaticMembersCount()
 			for {
 				dst--
 				src--
@@ -1159,7 +1142,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				}
 			}
 		}
-		ce.SetDefaultStaticMembersCount(ce.GetDefaultStaticMembersCount() + parent_ce.GetDefaultStaticMembersCount())
+		ce.SetDefaultStaticMembersCount(ce.GetDefaultStaticMembersCount() + parentCe.GetDefaultStaticMembersCount())
 		if ce.GetStaticMembersTablePtr() == nil {
 			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
 			if CurrEX() == nil {
@@ -1179,31 +1162,31 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	ce.PropertyTable().Foreach(func(key string, property_info *ZendPropertyInfo) {
 		if property_info.GetCe() == ce {
 			if property_info.IsStatic() {
-				property_info.SetOffset(property_info.GetOffset() + uint32(parent_ce.GetDefaultStaticMembersCount()))
+				property_info.SetOffset(property_info.GetOffset() + uint32(parentCe.GetDefaultStaticMembersCount()))
 			} else {
-				property_info.SetOffset(property_info.GetOffset() + uint32(parent_ce.GetDefaultPropertiesCount()*b.SizeOf("zval")))
+				property_info.SetOffset(property_info.GetOffset() + uint32(parentCe.GetDefaultPropertiesCount()*b.SizeOf("zval")))
 			}
 		}
 	})
 
-	if parent_ce.PropertyTable().Len() != 0 {
-		parent_ce.PropertyTable().Foreach(func(key string, property_info *ZendPropertyInfo) {
+	if parentCe.PropertyTable().Len() != 0 {
+		parentCe.PropertyTable().Foreach(func(key string, property_info *ZendPropertyInfo) {
 			DoInheritProperty(property_info, key, ce)
 		})
 	}
-	if parent_ce.ConstantsTable().Len() != 0 {
-		parent_ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
+	if parentCe.ConstantsTable().Len() != 0 {
+		parentCe.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
 			DoInheritClassConstant(key, c, ce)
 		})
 
 	}
-	if parent_ce.FunctionTable().Len() != 0 {
+	if parentCe.FunctionTable().Len() != 0 {
 		if checked {
-			parent_ce.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
+			parentCe.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
 				DoInheritMethod(key, func_, ce, 0, 1)
 			})
 		} else {
-			parent_ce.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
+			parentCe.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
 				DoInheritMethod(key, func_, ce, 0, 0)
 			})
 		}
@@ -1214,7 +1197,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			ce.SetIsExplicitAbstractClass(true)
 		}
 	}
-	ce.AddCeFlags(parent_ce.GetCeFlags() & (AccHasStaticInMethods | AccHasTypeHints | AccUseGuards))
+	ce.AddCeFlags(parentCe.GetCeFlags() & (AccHasStaticInMethods | AccHasTypeHints | AccUseGuards))
 }
 func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parentConstant *ZendClassConstant, name string, iface *types.ClassEntry) types.ZendBool {
 	var oldConstant *ZendClassConstant = childConstantsTable.Get(name)
