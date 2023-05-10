@@ -71,8 +71,7 @@ type ClassEntry struct {
 			doc_comment *String
 		}
 		internal struct {
-			builtin_functions []FunctionEntry
-			module            *zend.ModuleEntry
+			module *zend.ModuleEntry
 		}
 	}
 }
@@ -95,20 +94,6 @@ func NewInternalClass(name string) *ClassEntry {
 	return ce
 }
 
-func (ce *ClassEntry) initData() {
-	// ZendInitializeClassData
-	ce.SetCeFlags(zend.AccConstantsUpdated)
-	if (zend.CG__().GetCompilerOptions() & zend.ZEND_COMPILE_GUARDS) != 0 {
-		ce.SetIsUseGuards(true)
-	}
-	ce.InitTables()
-	if ce.type_ == zend.ZEND_USER_CLASS {
-		zend.ZEND_MAP_PTR_INIT(ce.static_members_table, ce.GetDefaultStaticMembersTable())
-	} else {
-		zend.ZEND_MAP_PTR_INIT(ce.static_members_table, nil)
-	}
-}
-
 func NewDisabledClass(origCe *ClassEntry, createObject func(*ClassEntry) *ZendObject) *ClassEntry {
 	ce := &ClassEntry{
 		type_: origCe.type_,
@@ -118,18 +103,21 @@ func NewDisabledClass(origCe *ClassEntry, createObject func(*ClassEntry) *ZendOb
 	return ce
 }
 
-func (ce *ClassEntry) ClearMethods() {
-	ce.functionTable.Destroy()
+func (ce *ClassEntry) initData() {
+	// ZendInitializeClassData
+	ce.SetCeFlags(zend.AccConstantsUpdated)
+	if (zend.CG__().GetCompilerOptions() & zend.ZEND_COMPILE_GUARDS) != 0 {
+		ce.SetIsUseGuards(true)
+	}
+	ce.initTables()
+	if ce.type_ == zend.ZEND_USER_CLASS {
+		zend.ZEND_MAP_PTR_INIT(ce.static_members_table, ce.GetDefaultStaticMembersTable())
+	} else {
+		zend.ZEND_MAP_PTR_INIT(ce.static_members_table, nil)
+	}
 }
 
-func NewClassEntry(name string, functions []FunctionEntry) *ClassEntry {
-	class := &ClassEntry{
-		name: name,
-	}
-	class.info.internal.builtin_functions = functions
-	return class
-}
-func (ce *ClassEntry) InitTables() {
+func (ce *ClassEntry) initTables() {
 	ce.functionTable = NewLcTable[IFunction](nil)
 	ce.propertyTable = NewTable[*zend.ZendPropertyInfo](nil)
 	ce.constantTable = NewTable[*zend.ZendClassConstant](nil)
@@ -144,11 +132,9 @@ func (ce *ClassEntry) ConstantsTable() ClassConstantTable { return ce.constantTa
 /**
  * Getter / Setter
  */
-func (ce *ClassEntry) GetName() *String        { return NewString(ce.name) }
-func (ce *ClassEntry) SetNameVal(value string) { ce.name = value }
+func (ce *ClassEntry) GetName() *String { return NewString(ce.name) }
 
 func (ce *ClassEntry) GetType() byte                  { return ce.type_ }
-func (ce *ClassEntry) SetType(value byte)             { ce.type_ = value }
 func (ce *ClassEntry) GetParent() *ClassEntry         { return ce.__0.parent }
 func (ce *ClassEntry) SetParent(value *ClassEntry)    { ce.__0.parent = value }
 func (ce *ClassEntry) GetParentName() *String         { return ce.__0.parent_name }
@@ -287,12 +273,6 @@ func (ce *ClassEntry) SetLineEnd(value uint32) { ce.info.user.line_end = value }
 func (ce *ClassEntry) GetDocComment() *String  { return ce.info.user.doc_comment }
 func (ce *ClassEntry) SetDocComment(value *String) {
 	ce.info.user.doc_comment = value
-}
-func (ce *ClassEntry) GetBuiltinFunctions() *FunctionEntry {
-	return ce.info.internal.builtin_functions
-}
-func (ce *ClassEntry) SetBuiltinFunctions(value *FunctionEntry) {
-	ce.info.internal.builtin_functions = value
 }
 func (ce *ClassEntry) GetModule() *zend.ModuleEntry      { return ce.info.internal.module }
 func (ce *ClassEntry) SetModule(value *zend.ModuleEntry) { ce.info.internal.module = value }
