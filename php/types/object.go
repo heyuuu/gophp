@@ -15,8 +15,6 @@ type ZendObject struct {
 	handlers        *zend.ZendObjectHandlers
 	properties      *Array
 	propertiesTable []Zval
-	// 新增属性，用于指向内部对象
-	ptr any
 }
 
 var _ IRefcounted = &ZendObject{}
@@ -51,12 +49,9 @@ func (o *ZendObject) Init(ce *ClassEntry, handle uint32) {
 }
 
 func (o *ZendObject) GetHandle() uint32                          { return o.handle }
-func (o *ZendObject) SetHandle(value uint32)                     { o.handle = value }
 func (o *ZendObject) GetCe() *ClassEntry                         { return o.ce }
-func (o *ZendObject) SetCe(value *ClassEntry)                    { o.ce = value }
 func (o *ZendObject) GetHandlers() *zend.ZendObjectHandlers      { return o.handlers }
 func (o *ZendObject) SetHandlers(value *zend.ZendObjectHandlers) { o.handlers = value }
 func (o *ZendObject) GetProperties() *Array                      { return o.properties }
 func (o *ZendObject) SetProperties(value *Array)                 { o.properties = value }
 func (o *ZendObject) GetPropertiesTable() []Zval                 { return o.propertiesTable }
-func (o *ZendObject) SetPropertiesTable(value []Zval)            { o.propertiesTable = value }
