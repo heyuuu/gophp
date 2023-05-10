@@ -23,7 +23,6 @@ var ZendFuncsIterator []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("valid", AccPublic|AccAbstract, nil, nil),
 	types.MakeZendFunctionEntryEx("rewind", AccPublic|AccAbstract, nil, nil),
 }
-var ZendFuncsTraversable *types.FunctionEntry = nil
 var ZendFuncsArrayaccess []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("offsetExists", AccPublic|AccAbstract, nil, []ArgInfo{MakeReturnArgInfo(1),
 		MakeArgName("offset"),

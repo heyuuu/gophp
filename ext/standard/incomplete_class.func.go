@@ -56,11 +56,6 @@ func PhpCreateIncompleteObject(class_type *types.ClassEntry) *types.ZendObject {
 	return object
 }
 func PhpCreateIncompleteClass() *types.ClassEntry {
-	var incomplete_class types.ClassEntry
-	memset(&incomplete_class, 0, b.SizeOf("zend_class_entry"))
-	incomplete_class.SetNameVal(INCOMPLETE_CLASS)
-	incomplete_class.SetBuiltinFunctions(nil)
-	incomplete_class.SetCreateObject(PhpCreateIncompleteObject)
 	memcpy(&PhpIncompleteObjectHandlers, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	PhpIncompleteObjectHandlers.SetReadProperty(IncompleteClassGetProperty)
 	PhpIncompleteObjectHandlers.SetHasProperty(IncompleteClassHasProperty)
@@ -68,7 +63,10 @@ func PhpCreateIncompleteClass() *types.ClassEntry {
 	PhpIncompleteObjectHandlers.SetWriteProperty(IncompleteClassWriteProperty)
 	PhpIncompleteObjectHandlers.SetGetPropertyPtrPtr(IncompleteClassGetPropertyPtrPtr)
 	PhpIncompleteObjectHandlers.SetGetMethod(IncompleteClassGetMethod)
-	return zend.ZendRegisterInternalClass(&incomplete_class)
+
+	ce := zend.RegisterInternalClass(INCOMPLETE_CLASS, nil)
+	ce.SetCreateObject(PhpCreateIncompleteObject)
+	return ce
 }
 func PhpLookupClassName(object *types.Zval) *types.String {
 	var val *types.Zval

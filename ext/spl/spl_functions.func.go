@@ -6,41 +6,25 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
-func SplRegisterInterface(ppce **types.ClassEntry, class_name string, functions *types.FunctionEntry) {
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal(class_name)
-	ce.SetBuiltinFunctions(functions)
-	*ppce = zend.ZendRegisterInternalInterface(&ce)
+func SplRegisterInterface(ppce **types.ClassEntry, class_name string, functions []types.FunctionEntry) {
+	*ppce = zend.RegisterInternalInterface(class_name, functions)
 }
-func SplRegisterStdClass(ppce **types.ClassEntry, class_name string, obj_ctor any, function_list *types.FunctionEntry) {
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal(class_name)
-	ce.SetBuiltinFunctions(function_list)
-	*ppce = zend.ZendRegisterInternalClass(&ce)
+func SplRegisterStdClass(ppce **types.ClassEntry, class_name string, obj_ctor any, function_list []types.FunctionEntry) {
+	*ppce = zend.RegisterInternalClass(class_name, function_list)
 
 	/* entries changed by initialize */
 	if obj_ctor {
-		ppce.SetCreateObject(obj_ctor)
+		(*ppce).SetCreateObject(obj_ctor)
 	}
 }
-func SplRegisterSubClass(ppce **types.ClassEntry, parent_ce *types.ClassEntry, class_name string, obj_ctor any, function_list *types.FunctionEntry) {
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal(class_name)
-	ce.SetBuiltinFunctions(function_list)
-	*ppce = zend.ZendRegisterInternalClassEx(&ce, parent_ce)
-
+func SplRegisterSubClass(ppce **types.ClassEntry, parent_ce *types.ClassEntry, class_name string, obj_ctor any, function_list []types.FunctionEntry) {
+	*ppce = zend.RegisterInternalClassEx(class_name, function_list, parent_ce)
 	/* entries changed by initialize */
-
 	if obj_ctor {
-		ppce.SetCreateObject(obj_ctor)
+		(*ppce).SetCreateObject(obj_ctor)
 	} else {
-		ppce.SetCreateObject(parent_ce.GetCreateObject())
+		(*ppce).SetCreateObject(parent_ce.GetCreateObject())
 	}
-
-	/* entries changed by initialize */
 }
 func SplRegisterProperty(class_entry *types.ClassEntry, prop_name string, prop_name_len int, prop_flags int) {
 	zend.ZendDeclarePropertyNull(class_entry, prop_name, prop_name_len, prop_flags)

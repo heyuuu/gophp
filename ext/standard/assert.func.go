@@ -53,7 +53,6 @@ func PhpAssertInitGlobals(assert_globals_p *ZendAssertGlobals) {
 	assert_globals_p.SetCb(nil)
 }
 func ZmStartupAssert(type_ int, module_number int) int {
-	var ce types.ClassEntry
 	PhpAssertInitGlobals(&AssertGlobals)
 	zend.REGISTER_INI_ENTRIES(module_number)
 	zend.RegisterLongConstant("ASSERT_ACTIVE", ASSERT_ACTIVE, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
@@ -62,10 +61,9 @@ func ZmStartupAssert(type_ int, module_number int) int {
 	zend.RegisterLongConstant("ASSERT_WARNING", ASSERT_WARNING, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("ASSERT_QUIET_EVAL", ASSERT_QUIET_EVAL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("ASSERT_EXCEPTION", ASSERT_EXCEPTION, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal("AssertionError")
-	ce.SetBuiltinFunctions(nil)
-	AssertionErrorCe = zend.ZendRegisterInternalClassEx(&ce, faults.ZendCeError)
+
+	AssertionErrorCe = zend.RegisterInternalClassEx("AssertionError", nil, faults.ZendCeError)
+
 	return types.SUCCESS
 }
 func ZmShutdownAssert(type_ int, module_number int) int {

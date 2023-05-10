@@ -20,18 +20,11 @@ func PhpBucketDtor(res *types.ZendResource) {
 	}
 }
 func ZmStartupUserFilters(type_ int, module_number int) int {
-	var php_user_filter *types.ClassEntry
-
 	/* init the filter class ancestor */
 
-	memset(&UserFilterClassEntry, 0, b.SizeOf("zend_class_entry"))
-	UserFilterClassEntry.SetNameVal("php_user_filter")
-	UserFilterClassEntry.SetBuiltinFunctions(UserFilterClassFuncs)
-	if b.Assign(&php_user_filter, zend.ZendRegisterInternalClass(&UserFilterClassEntry)) == nil {
-		return types.FAILURE
-	}
-	zend.ZendDeclarePropertyString(php_user_filter, "filtername", b.SizeOf("\"filtername\"")-1, "", zend.AccPublic)
-	zend.ZendDeclarePropertyString(php_user_filter, "params", b.SizeOf("\"params\"")-1, "", zend.AccPublic)
+	var phpUserFilter = zend.RegisterInternalClass("php_user_filter", UserFilterClassFuncs)
+	zend.ZendDeclarePropertyString(phpUserFilter, "filtername", b.SizeOf("\"filtername\"")-1, "", zend.AccPublic)
+	zend.ZendDeclarePropertyString(phpUserFilter, "params", b.SizeOf("\"params\"")-1, "", zend.AccPublic)
 
 	/* init the filter resource; it has no dtor, as streams will always clean it up
 	 * at the correct time */

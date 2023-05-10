@@ -82,35 +82,31 @@ func NewUserClass(name string) *ClassEntry {
 		name:  name,
 		type_: zend.ZEND_USER_CLASS,
 	}
-	// ZendInitializeClassData
-	ce.SetCeFlags(zend.AccConstantsUpdated)
-	if (zend.CG__().GetCompilerOptions() & zend.ZEND_COMPILE_GUARDS) != 0 {
-		ce.SetIsUseGuards(true)
-	}
-	ce.InitTables()
-	zend.ZEND_MAP_PTR_INIT(ce.static_members_table, ce.GetDefaultStaticMembersTable())
+	ce.initData()
 	return ce
 }
 
-func NewInternalClass(origCe *ClassEntry) *ClassEntry {
-	var ce = new(ClassEntry)
-	*ce = *origCe
-	ce.type_ = zend.ZEND_INTERNAL_CLASS
+func NewInternalClass(name string) *ClassEntry {
+	var ce = &ClassEntry{
+		type_: zend.ZEND_INTERNAL_CLASS,
+		name:  name,
+	}
+	ce.initData()
+	return ce
+}
 
+func (ce *ClassEntry) initData() {
 	// ZendInitializeClassData
 	ce.SetCeFlags(zend.AccConstantsUpdated)
 	if (zend.CG__().GetCompilerOptions() & zend.ZEND_COMPILE_GUARDS) != 0 {
 		ce.SetIsUseGuards(true)
 	}
-	ce.SetDefaultPropertiesTable(nil)
-	ce.SetDefaultStaticMembersTable(nil)
 	ce.InitTables()
-	zend.ZEND_MAP_PTR_INIT(ce.static_members_table, nil)
-	ce.SetDefaultPropertiesCount(0)
-	ce.SetDefaultStaticMembersCount(0)
-	ce.SetPropertiesInfoTable(nil)
-
-	return ce
+	if ce.type_ == zend.ZEND_USER_CLASS {
+		zend.ZEND_MAP_PTR_INIT(ce.static_members_table, ce.GetDefaultStaticMembersTable())
+	} else {
+		zend.ZEND_MAP_PTR_INIT(ce.static_members_table, nil)
+	}
 }
 
 func NewDisabledClass(origCe *ClassEntry, createObject func(*ClassEntry) *ZendObject) *ClassEntry {

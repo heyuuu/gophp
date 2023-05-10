@@ -469,11 +469,7 @@ func zim_Closure___construct(executeData *ZendExecuteData, return_value *types.Z
 	faults.ThrowError(nil, "Instantiation of 'Closure' is not allowed")
 }
 func ZendRegisterClosureCe() {
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal("Closure")
-	ce.SetBuiltinFunctions(ClosureFunctions)
-	ZendCeClosure = ZendRegisterInternalClass(&ce)
+	ZendCeClosure = RegisterInternalClass("Closure", ClosureFunctions)
 	ZendCeClosure.SetIsFinal(true)
 	ZendCeClosure.SetCreateObject(ZendClosureNew)
 	ZendCeClosure.SetSerialize(ZendClassSerializeDeny)

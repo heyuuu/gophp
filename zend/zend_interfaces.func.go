@@ -455,42 +455,23 @@ func ZendImplementCountable(interface_ *types.ClassEntry, class_type *types.Clas
 	return types.SUCCESS
 }
 func ZendRegisterInterfaces() {
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal("Traversable")
-	ce.SetBuiltinFunctions(ZendFuncsTraversable)
-	ZendCeTraversable = ZendRegisterInternalInterface(&ce)
+	ZendCeTraversable = RegisterInternalInterface("Traversable", nil)
 	ZendCeTraversable.SetInterfaceGetsImplemented(ZendImplementTraversable)
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal("IteratorAggregate")
-	ce.SetBuiltinFunctions(ZendFuncsAggregate)
-	ZendCeAggregate = ZendRegisterInternalInterface(&ce)
+
+	ZendCeAggregate = RegisterInternalInterface("IteratorAggregate", ZendFuncsAggregate)
 	ZendCeAggregate.SetInterfaceGetsImplemented(ZendImplementAggregate)
 	ZendClassImplements(ZendCeAggregate, 1, ZendCeTraversable)
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal("Iterator")
-	ce.SetBuiltinFunctions(ZendFuncsIterator)
-	ZendCeIterator = ZendRegisterInternalInterface(&ce)
+
+	ZendCeIterator = RegisterInternalInterface("Iterator", ZendFuncsIterator)
 	ZendCeIterator.SetInterfaceGetsImplemented(ZendImplementIterator)
 	ZendClassImplements(ZendCeIterator, 1, ZendCeTraversable)
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal("ArrayAccess")
-	ce.SetBuiltinFunctions(ZendFuncsArrayaccess)
-	ZendCeArrayaccess = ZendRegisterInternalInterface(&ce)
+
+	ZendCeArrayaccess = RegisterInternalInterface("ArrayAccess", ZendFuncsArrayaccess)
 	ZendCeArrayaccess.SetInterfaceGetsImplemented(ZendImplementArrayaccess)
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal("Serializable")
-	ce.SetBuiltinFunctions(ZendFuncsSerializable)
-	ZendCeSerializable = ZendRegisterInternalInterface(&ce)
+
+	ZendCeSerializable = RegisterInternalInterface("Serializable", ZendFuncsSerializable)
 	ZendCeSerializable.SetInterfaceGetsImplemented(ZendImplementSerializable)
-	var ce types.ClassEntry
-	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetNameVal("Countable")
-	ce.SetBuiltinFunctions(ZendFuncsCountable)
-	ZendCeCountable = ZendRegisterInternalInterface(&ce)
+
+	ZendCeCountable = RegisterInternalInterface("Countable", ZendFuncsCountable)
 	ZendCeCountable.SetInterfaceGetsImplemented(ZendImplementCountable)
 }

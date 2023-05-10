@@ -27,11 +27,7 @@ func ZmActivateDir(type_ int, module_number int) int {
 func ZmStartupDir(type_ int, module_number int) int {
 	var dirsep_str []byte
 	var pathsep_str []byte
-	var dir_class_entry types.ClassEntry
-	memset(&dir_class_entry, 0, b.SizeOf("zend_class_entry"))
-	dir_class_entry.SetNameVal("Directory")
-	dir_class_entry.SetBuiltinFunctions(PhpDirClassFunctions)
-	DirClassEntryPtr = zend.ZendRegisterInternalClass(&dir_class_entry)
+	DirClassEntryPtr = zend.RegisterInternalClass("Directory", PhpDirClassFunctions)
 	dirsep_str[0] = zend.DEFAULT_SLASH
 	dirsep_str[1] = '0'
 	zend.RegisterStringConstant("DIRECTORY_SEPARATOR", dirsep_str, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)

@@ -87,25 +87,6 @@ func ZendCleanupInternalClasses() {
 func ZendNextFreeModule() int {
 	return globals.G().CountModules() + 1
 }
-func DoRegisterInternalClass(origClassEntry *types.ClassEntry, ceFlags uint32) *types.ClassEntry {
-	var classEntry = types.NewInternalClass(origClassEntry)
-	classEntry.SetCeFlags(ceFlags | AccConstantsUpdated | AccLinked | AccResolvedParent | AccResolvedInterfaces)
-	classEntry.SetModule(EG__().GetCurrentModule())
-	if classEntry.GetBuiltinFunctions() != nil {
-		ZendRegisterFunctions(classEntry, classEntry.GetBuiltinFunctions(), classEntry.FunctionTable(), EG__().GetCurrentModule().GetType())
-	}
-	CG__().ClassTable().Update(classEntry.Name(), classEntry)
-	return classEntry
-}
-func ZendRegisterInternalClassEx(class_entry *types.ClassEntry, parent_ce *types.ClassEntry) *types.ClassEntry {
-	var register_class *types.ClassEntry
-	register_class = ZendRegisterInternalClass(class_entry)
-	if parent_ce != nil {
-		ZendDoInheritance(register_class, parent_ce)
-		ZendBuildPropertiesInfoTable(register_class)
-	}
-	return register_class
-}
 func ZendClassImplements(class_entry *types.ClassEntry, num_interfaces int, _ ...any) {
 	var interface_entry *types.ClassEntry
 	var interface_list va_list
@@ -115,12 +96,6 @@ func ZendClassImplements(class_entry *types.ClassEntry, num_interfaces int, _ ..
 		ZendDoImplementInterface(class_entry, interface_entry)
 	}
 	va_end(interface_list)
-}
-func ZendRegisterInternalClass(origClassEntry *types.ClassEntry) *types.ClassEntry {
-	return DoRegisterInternalClass(origClassEntry, 0)
-}
-func ZendRegisterInternalInterface(origClassEntry *types.ClassEntry) *types.ClassEntry {
-	return DoRegisterInternalClass(origClassEntry, AccInterface)
 }
 func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int) int {
 	/* TODO: Move this out of here in 7.4. */
