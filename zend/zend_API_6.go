@@ -42,7 +42,6 @@ func ModuleDestructor(module *ModuleEntry) {
 	}
 
 	/* Deinitilaise module globals */
-
 	if module.GetGlobalsSize() != 0 {
 		if module.GetGlobalsDtor() != nil {
 			module.GetGlobalsDtor()(module.GetGlobalsPtr())

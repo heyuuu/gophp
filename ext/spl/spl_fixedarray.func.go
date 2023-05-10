@@ -689,7 +689,7 @@ func SplFixedarrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	return iterator.GetIntern().GetIt()
 }
 func ZmStartupSplFixedarray(type_ int, module_number int) int {
-	SplRegisterStdClass(&spl_ce_SplFixedArray, "SplFixedArray", SplFixedarrayNew, spl_funcs_SplFixedArray)
+	spl_ce_SplFixedArray = zend.SplRegisterClass("SplFixedArray", SplFixedarrayNew, spl_funcs_SplFixedArray)
 	memcpy(&spl_handler_SplFixedArray, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	spl_handler_SplFixedArray.SetOffset(zend_long((*byte)(&((*SplFixedarrayObject)(nil).GetStd())) - (*byte)(nil)))
 	spl_handler_SplFixedArray.SetCloneObj(SplFixedarrayObjectClone)

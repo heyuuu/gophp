@@ -58,6 +58,8 @@ func NewArrayOfZval(items []*Zval) *Array {
 	return arr
 }
 
+//
+
 func ZendHashHasMoreElementsEx(ht *Array, pos *ArrayPosition) bool {
 	_, ok := ht.validPos(*pos)
 	return ok

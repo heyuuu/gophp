@@ -975,7 +975,7 @@ func SplDllistGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 	return iterator.GetIntern().GetIt()
 }
 func ZmStartupSplDllist(type_ int, module_number int) int {
-	SplRegisterStdClass(&spl_ce_SplDoublyLinkedList, "SplDoublyLinkedList", SplDllistObjectNew, spl_funcs_SplDoublyLinkedList)
+	spl_ce_SplDoublyLinkedList = zend.SplRegisterClass("SplDoublyLinkedList", SplDllistObjectNew, spl_funcs_SplDoublyLinkedList)
 	memcpy(&spl_handler_SplDoublyLinkedList, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	spl_handler_SplDoublyLinkedList.SetOffset(zend_long((*byte)(&((*SplDllistObject)(nil).GetStd())) - (*byte)(nil)))
 	spl_handler_SplDoublyLinkedList.SetCloneObj(SplDllistObjectClone)
@@ -992,8 +992,8 @@ func ZmStartupSplDllist(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_ArrayAccess)
 	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_Serializable)
 	spl_ce_SplDoublyLinkedList.SetGetIterator(SplDllistGetIterator)
-	SplRegisterSubClass(&spl_ce_SplQueue, spl_ce_SplDoublyLinkedList, "SplQueue", SplDllistObjectNew, spl_funcs_SplQueue)
-	SplRegisterSubClass(&spl_ce_SplStack, spl_ce_SplDoublyLinkedList, "SplStack", SplDllistObjectNew, nil)
+	spl_ce_SplQueue = zend.SplRegisterSubClass(spl_ce_SplDoublyLinkedList, "SplQueue", SplDllistObjectNew, spl_funcs_SplQueue)
+	spl_ce_SplStack = zend.SplRegisterSubClass(spl_ce_SplDoublyLinkedList, "SplStack", SplDllistObjectNew, nil)
 	spl_ce_SplQueue.SetGetIterator(SplDllistGetIterator)
 	spl_ce_SplStack.SetGetIterator(SplDllistGetIterator)
 	return types.SUCCESS

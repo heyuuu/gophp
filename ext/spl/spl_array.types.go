@@ -21,7 +21,7 @@ type SplArrayObject struct {
 	std             types.ZendObject
 }
 
-func (this *SplArrayObject) GetArray() types.Zval                   { return this.array }
+func (this *SplArrayObject) GetArray() *types.Zval                  { return &this.array }
 func (this *SplArrayObject) GetHtIter() uint32                      { return this.ht_iter }
 func (this *SplArrayObject) SetHtIter(value uint32)                 { this.ht_iter = value }
 func (this *SplArrayObject) GetArFlags() int                        { return this.ar_flags }
@@ -42,8 +42,6 @@ func (this *SplArrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
 func (this *SplArrayObject) GetStd() types.ZendObject { return this.std }
-
-// func (this *SplArrayObject) SetStd(value zend.ZendObject) { this.std = value }
 
 /* SplArrayObject.ar_flags */
 func (this *SplArrayObject) AddArFlags(value int)      { this.ar_flags |= value }

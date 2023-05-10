@@ -33,9 +33,6 @@ func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.Array {
 		if obj.GetProperties() == nil {
 			zend.RebuildObjectProperties(obj)
 		} else if obj.GetProperties().GetRefcount() > 1 {
-			//if (obj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-			//	obj.GetProperties().DelRefcount()
-			//}
 			obj.SetProperties(types.ZendArrayDup(obj.GetProperties()))
 		}
 		return obj.GetProperties()
@@ -774,7 +771,6 @@ func SplArrayNext(intern *SplArrayObject) int {
 }
 func SplArrayItDtor(iter *zend.ZendObjectIterator) {
 	zend.ZendUserItInvalidateCurrent(iter)
-	// zend.ZvalPtrDtor(iter.GetData())
 }
 func SplArrayItValid(iter *zend.ZendObjectIterator) int {
 	var object *SplArrayObject = Z_SPLARRAY_P(iter.GetData())
@@ -1456,7 +1452,7 @@ func zim_spl_Array___debugInfo(executeData *zend.ZendExecuteData, return_value *
 	return
 }
 func ZmStartupSplArray(type_ int, module_number int) int {
-	SplRegisterStdClass(&spl_ce_ArrayObject, "ArrayObject", SplArrayObjectNew, spl_funcs_ArrayObject)
+	spl_ce_ArrayObject = zend.SplRegisterClass("ArrayObject", SplArrayObjectNew, spl_funcs_ArrayObject)
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_Aggregate)
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_ArrayAccess)
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_Serializable)
@@ -1479,7 +1475,8 @@ func ZmStartupSplArray(type_ int, module_number int) int {
 	spl_handler_ArrayObject.SetCompareObjects(SplArrayCompareObjects)
 	spl_handler_ArrayObject.SetDtorObj(zend.ZendObjectsDestroyObject)
 	spl_handler_ArrayObject.SetFreeObj(SplArrayObjectFreeStorage)
-	SplRegisterStdClass(&spl_ce_ArrayIterator, "ArrayIterator", SplArrayObjectNew, spl_funcs_ArrayIterator)
+
+	spl_ce_ArrayIterator = zend.SplRegisterClass("ArrayIterator", SplArrayObjectNew, spl_funcs_ArrayIterator)
 	zend.ZendClassImplements(spl_ce_ArrayIterator, 1, spl_ce_Iterator)
 	zend.ZendClassImplements(spl_ce_ArrayIterator, 1, spl_ce_ArrayAccess)
 	zend.ZendClassImplements(spl_ce_ArrayIterator, 1, spl_ce_SeekableIterator)
@@ -1492,10 +1489,12 @@ func ZmStartupSplArray(type_ int, module_number int) int {
 	zend.ZendDeclareClassConstantLong(spl_ce_ArrayObject, "ARRAY_AS_PROPS", zend.ZendLong(SPL_ARRAY_ARRAY_AS_PROPS))
 	zend.ZendDeclareClassConstantLong(spl_ce_ArrayIterator, "STD_PROP_LIST", zend.ZendLong(SPL_ARRAY_STD_PROP_LIST))
 	zend.ZendDeclareClassConstantLong(spl_ce_ArrayIterator, "ARRAY_AS_PROPS", zend.ZendLong(SPL_ARRAY_ARRAY_AS_PROPS))
-	SplRegisterSubClass(&spl_ce_RecursiveArrayIterator, spl_ce_ArrayIterator, "RecursiveArrayIterator", SplArrayObjectNew, spl_funcs_RecursiveArrayIterator)
+
+	spl_ce_RecursiveArrayIterator = zend.SplRegisterSubClass(spl_ce_ArrayIterator, "RecursiveArrayIterator", SplArrayObjectNew, spl_funcs_RecursiveArrayIterator)
 	zend.ZendClassImplements(spl_ce_RecursiveArrayIterator, 1, spl_ce_RecursiveIterator)
 	spl_ce_RecursiveArrayIterator.SetGetIterator(SplArrayGetIterator)
 	spl_ce_RecursiveArrayIterator.AddCeFlags(zend.AccReuseGetIterator)
 	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveArrayIterator, "CHILD_ARRAYS_ONLY", zend.ZendLong(SPL_ARRAY_CHILD_ARRAYS_ONLY))
+
 	return types.SUCCESS
 }

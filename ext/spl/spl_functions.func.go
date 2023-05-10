@@ -6,31 +6,11 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
-func SplRegisterInterface(ppce **types.ClassEntry, class_name string, functions []types.FunctionEntry) {
-	*ppce = zend.RegisterInternalInterface(class_name, functions)
-}
-func SplRegisterStdClass(ppce **types.ClassEntry, class_name string, obj_ctor any, function_list []types.FunctionEntry) {
-	*ppce = zend.RegisterInternalClass(class_name, function_list)
-
-	/* entries changed by initialize */
-	if obj_ctor {
-		(*ppce).SetCreateObject(obj_ctor)
-	}
-}
-func SplRegisterSubClass(ppce **types.ClassEntry, parent_ce *types.ClassEntry, class_name string, obj_ctor any, function_list []types.FunctionEntry) {
-	*ppce = zend.RegisterInternalClassEx(class_name, function_list, parent_ce)
-	/* entries changed by initialize */
-	if obj_ctor {
-		(*ppce).SetCreateObject(obj_ctor)
-	} else {
-		(*ppce).SetCreateObject(parent_ce.GetCreateObject())
-	}
-}
 func SplRegisterProperty(class_entry *types.ClassEntry, prop_name string, prop_name_len int, prop_flags int) {
 	zend.ZendDeclarePropertyNull(class_entry, prop_name, prop_name_len, prop_flags)
 }
-func SplAddClassName(list *types.Zval, pce *types.ClassEntry, allow int, ce_flags int) {
-	if allow == 0 || allow > 0 && pce.HasCeFlags(ce_flags) || allow < 0 && !pce.HasCeFlags(ce_flags) {
+func SplAddClassName(list *types.Zval, pce *types.ClassEntry, allow int, ceFlags uint32) {
+	if allow == 0 || allow > 0 && pce.HasCeFlags(ceFlags) || allow < 0 && !pce.HasCeFlags(ceFlags) {
 		var tmp *types.Zval
 		if b.Assign(&tmp, list.Array().KeyFind(pce.GetName().GetStr())) == nil {
 			var t types.Zval
