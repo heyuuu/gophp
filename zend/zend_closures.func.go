@@ -474,20 +474,22 @@ func ZendRegisterClosureCe() {
 	ZendCeClosure.SetCreateObject(ZendClosureNew)
 	ZendCeClosure.SetSerialize(ZendClassSerializeDeny)
 	ZendCeClosure.SetUnserialize(ZendClassUnserializeDeny)
-	memcpy(&ClosureHandlers, StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	ClosureHandlers.SetFreeObj(ZendClosureFreeStorage)
-	ClosureHandlers.SetGetConstructor(ZendClosureGetConstructor)
-	ClosureHandlers.SetGetMethod(ZendClosureGetMethod)
-	ClosureHandlers.SetWriteProperty(ZendClosureWriteProperty)
-	ClosureHandlers.SetReadProperty(ZendClosureReadProperty)
-	ClosureHandlers.SetGetPropertyPtrPtr(ZendClosureGetPropertyPtrPtr)
-	ClosureHandlers.SetHasProperty(ZendClosureHasProperty)
-	ClosureHandlers.SetUnsetProperty(ZendClosureUnsetProperty)
-	ClosureHandlers.SetCompareObjects(ZendClosureCompareObjects)
-	ClosureHandlers.SetCloneObj(ZendClosureClone)
-	ClosureHandlers.SetGetDebugInfo(ZendClosureGetDebugInfo)
-	ClosureHandlers.SetGetClosure(ZendClosureGetClosure)
-	ClosureHandlers.SetGetGc(ZendClosureGetGc)
+
+	ClosureHandlers = *NewObjectHandlersEx(StdObjectHandlersPtr, ObjectHandlersSetting{
+		FreeObj:           ZendClosureFreeStorage,
+		GetConstructor:    ZendClosureGetConstructor,
+		GetMethod:         ZendClosureGetMethod,
+		WriteProperty:     ZendClosureWriteProperty,
+		ReadProperty:      ZendClosureReadProperty,
+		GetPropertyPtrPtr: ZendClosureGetPropertyPtrPtr,
+		HasProperty:       ZendClosureHasProperty,
+		UnsetProperty:     ZendClosureUnsetProperty,
+		CompareObjects:    ZendClosureCompareObjects,
+		CloneObj:          ZendClosureClone,
+		GetDebugInfo:      ZendClosureGetDebugInfo,
+		GetClosure:        ZendClosureGetClosure,
+		GetGc:             ZendClosureGetGc,
+	})
 }
 func ZendClosureInternalHandler(executeData *ZendExecuteData, return_value *types.Zval) {
 	var closure *ZendClosure = (*ZendClosure)(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))

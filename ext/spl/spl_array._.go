@@ -9,8 +9,8 @@ var spl_ce_ArrayObject *types.ClassEntry
 var spl_ce_ArrayIterator *types.ClassEntry
 var spl_ce_RecursiveArrayIterator *types.ClassEntry
 
-var spl_handler_ArrayObject zend.ZendObjectHandlers
-var spl_handler_ArrayIterator zend.ZendObjectHandlers
+var spl_handler_ArrayObject zend.ObjectHandlers
+var spl_handler_ArrayIterator zend.ObjectHandlers
 
 const SPL_ARRAY_STD_PROP_LIST = 0x1
 const SPL_ARRAY_ARRAY_AS_PROPS = 0x2

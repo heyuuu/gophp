@@ -50,11 +50,11 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype uint8) bool {
 	return faketype == realtype || faketype == IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
 }
 
-func Z_OBJ_P(zval *Zval) *ZendObject                 { return zval.Object() }
-func Z_OBJ_HT(zval Zval) *zend.ZendObjectHandlers    { return zval.Object().GetHandlers() }
-func Z_OBJ_HT_P(zval *Zval) *zend.ZendObjectHandlers { return zval.Object().GetHandlers() }
-func Z_OBJCE(zval Zval) *ClassEntry                  { return zval.Object().GetCe() }
-func Z_OBJCE_P(zval *Zval) *ClassEntry               { return zval.Object().GetCe() }
+func Z_OBJ_P(zval *Zval) *ZendObject             { return zval.Object() }
+func Z_OBJ_HT(zval Zval) *zend.ObjectHandlers    { return zval.Object().GetHandlers() }
+func Z_OBJ_HT_P(zval *Zval) *zend.ObjectHandlers { return zval.Object().GetHandlers() }
+func Z_OBJCE(zval Zval) *ClassEntry              { return zval.Object().GetCe() }
+func Z_OBJCE_P(zval *Zval) *ClassEntry           { return zval.Object().GetCe() }
 func Z_OBJPROP(zval Zval) *Array {
 	return Z_OBJ_HT(zval).GetGetProperties()(&zval)
 }

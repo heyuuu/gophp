@@ -10,7 +10,7 @@ import (
  */
 var ZendIteratorClassEntry *types.ClassEntry = types.NewInternalClass("__iterator_wrapper")
 
-var IteratorObjectHandlers *ZendObjectHandlers = NewZendObjectHandlers(ObjectHandlersSetting{
+var IteratorObjectHandlers *ObjectHandlers = NewObjectHandlers(ObjectHandlersSetting{
 	FreeObj: func(object *types.ZendObject) {
 		var iter *ZendObjectIterator = (*ZendObjectIterator)(object)
 		iter.GetFuncs().GetDtor()(iter)

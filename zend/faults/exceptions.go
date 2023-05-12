@@ -23,7 +23,7 @@ var ZendCeArgumentCountError *types.ClassEntry
 var ZendCeArithmeticError *types.ClassEntry
 var ZendCeDivisionByZeroError *types.ClassEntry
 
-var DefaultExceptionHandlers zend.ZendObjectHandlers
+var DefaultExceptionHandlers zend.ObjectHandlers
 
 var ZendFuncsThrowable []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("getMessage", zend.AccPublic|zend.AccAbstract, nil, nil),
@@ -634,8 +634,10 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 func RegisterDefaultException() {
 	ZendCeThrowable = zend.RegisterInternalInterface("Throwable", ZendFuncsThrowable)
 	ZendCeThrowable.SetInterfaceGetsImplemented(ZendImplementThrowable)
-	memcpy(&DefaultExceptionHandlers, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	DefaultExceptionHandlers.SetCloneObj(nil)
+
+	DefaultExceptionHandlers = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		CloneObj: nil,
+	})
 
 	ZendCeException = zend.RegisterClass("Exception", DefaultExceptionNew, DefaultExceptionFunctions)
 	zend.ZendClassImplements(ZendCeException, 1, ZendCeThrowable)

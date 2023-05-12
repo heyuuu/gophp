@@ -24,7 +24,7 @@ var spl_funcs_SplSubject = []types.FunctionEntry{
 	}),
 	types.MakeZendFunctionEntryEx("notify", zend.AccPublic|zend.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var spl_handler_SplObjectStorage zend.ZendObjectHandlers
+var spl_handler_SplObjectStorage zend.ObjectHandlers
 
 var spl_funcs_SplObjectStorage = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("attach", 0, zim_spl_SplObjectStorage_attach, []zend.ArgInfo{zend.MakeReturnArgInfo(1),

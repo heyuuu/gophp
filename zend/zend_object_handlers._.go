@@ -152,7 +152,7 @@ const IN_ISSET = 1 << 3
   called, we cal __call handler.
 */
 
-var StdObjectHandlersPtr *ZendObjectHandlers = NewZendObjectHandlers(ObjectHandlersSetting{
+var StdObjectHandlersPtr *ObjectHandlers = NewObjectHandlers(ObjectHandlersSetting{
 	Offset:            0,
 	FreeObj:           ZendObjectStdDtor,
 	DtorObj:           ZendObjectsDestroyObject,

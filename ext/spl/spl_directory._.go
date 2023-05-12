@@ -45,11 +45,11 @@ const SPL_FILE_DIR_OTHERS_MASK = 0x3000
 
 /* declare the class handlers */
 
-var SplFilesystemObjectHandlers zend.ZendObjectHandlers
+var SplFilesystemObjectHandlers zend.ObjectHandlers
 
 /* includes handler to validate object state when retrieving methods */
 
-var SplFilesystemObjectCheckHandlers zend.ZendObjectHandlers
+var SplFilesystemObjectCheckHandlers zend.ObjectHandlers
 
 /* decalre the class entry */
 

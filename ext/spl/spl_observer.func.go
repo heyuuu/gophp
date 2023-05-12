@@ -853,22 +853,25 @@ func ZmStartupSplObserver(type_ int, module_number int) int {
 	spl_ce_SplObserver = zend.RegisterInternalInterface("SplObserver", spl_funcs_SplObserver)
 	spl_ce_SplSubject = zend.RegisterInternalInterface("SplSubject", spl_funcs_SplSubject)
 	spl_ce_SplObjectStorage = zend.RegisterClass("SplObjectStorage", spl_SplObjectStorage_new, spl_funcs_SplObjectStorage)
-	memcpy(&spl_handler_SplObjectStorage, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	spl_handler_SplObjectStorage.SetOffset(zend_long((*byte)(&((*spl_SplObjectStorage)(nil).GetStd())) - (*byte)(nil)))
-	spl_handler_SplObjectStorage.SetCompareObjects(SplObjectStorageCompareObjects)
-	spl_handler_SplObjectStorage.SetCloneObj(SplObjectStorageClone)
-	spl_handler_SplObjectStorage.SetGetGc(SplObjectStorageGetGc)
-	spl_handler_SplObjectStorage.SetDtorObj(zend.ZendObjectsDestroyObject)
-	spl_handler_SplObjectStorage.SetFreeObj(spl_SplObjectStorage_free_storage)
+
+	spl_handler_SplObjectStorage = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		Offset:         int((*byte)(&((*spl_SplObjectStorage)(nil).GetStd())) - (*byte)(nil)),
+		CompareObjects: SplObjectStorageCompareObjects,
+		CloneObj:       SplObjectStorageClone,
+		GetGc:          SplObjectStorageGetGc,
+		DtorObj:        zend.ZendObjectsDestroyObject,
+		FreeObj:        spl_SplObjectStorage_free_storage,
+	})
+
 	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_Countable)
 	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_Iterator)
 	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_Serializable)
 	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_ArrayAccess)
 	spl_ce_MultipleIterator = zend.RegisterClass("MultipleIterator", spl_SplObjectStorage_new, spl_funcs_MultipleIterator)
 	zend.ZendClassImplements(spl_ce_MultipleIterator, 1, zend.ZendCeIterator)
-	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ANY", zend.ZendLong(MIT_NEED_ANY))
-	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ALL", zend.ZendLong(MIT_NEED_ALL))
-	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_KEYS_NUMERIC", zend.ZendLong(MIT_KEYS_NUMERIC))
-	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_KEYS_ASSOC", zend.ZendLong(MIT_KEYS_ASSOC))
+	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ANY", MIT_NEED_ANY)
+	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ALL", MIT_NEED_ALL)
+	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_KEYS_NUMERIC", MIT_KEYS_NUMERIC)
+	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_KEYS_ASSOC", MIT_KEYS_ASSOC)
 	return types.SUCCESS
 }

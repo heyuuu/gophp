@@ -56,13 +56,14 @@ func PhpCreateIncompleteObject(class_type *types.ClassEntry) *types.ZendObject {
 	return object
 }
 func PhpCreateIncompleteClass() *types.ClassEntry {
-	memcpy(&PhpIncompleteObjectHandlers, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	PhpIncompleteObjectHandlers.SetReadProperty(IncompleteClassGetProperty)
-	PhpIncompleteObjectHandlers.SetHasProperty(IncompleteClassHasProperty)
-	PhpIncompleteObjectHandlers.SetUnsetProperty(IncompleteClassUnsetProperty)
-	PhpIncompleteObjectHandlers.SetWriteProperty(IncompleteClassWriteProperty)
-	PhpIncompleteObjectHandlers.SetGetPropertyPtrPtr(IncompleteClassGetPropertyPtrPtr)
-	PhpIncompleteObjectHandlers.SetGetMethod(IncompleteClassGetMethod)
+	PhpIncompleteObjectHandlers = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		ReadProperty:      IncompleteClassGetProperty,
+		HasProperty:       IncompleteClassHasProperty,
+		UnsetProperty:     IncompleteClassUnsetProperty,
+		WriteProperty:     IncompleteClassWriteProperty,
+		GetPropertyPtrPtr: IncompleteClassGetPropertyPtrPtr,
+		GetMethod:         IncompleteClassGetMethod,
+	})
 
 	ce := zend.RegisterClass(INCOMPLETE_CLASS, nil, nil)
 	ce.SetCreateObject(PhpCreateIncompleteObject)

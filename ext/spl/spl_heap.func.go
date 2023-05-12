@@ -755,12 +755,15 @@ func SplPqueueGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 func ZmStartupSplHeap(type_ int, module_number int) int {
 	spl_ce_SplHeap = zend.RegisterClass("SplHeap", SplHeapObjectNew, spl_funcs_SplHeap)
 	memcpy(&spl_handler_SplHeap, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	spl_handler_SplHeap.SetOffset(zend_long((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)))
-	spl_handler_SplHeap.SetCloneObj(SplHeapObjectClone)
-	spl_handler_SplHeap.SetCountElements(SplHeapObjectCountElements)
-	spl_handler_SplHeap.SetGetGc(SplHeapObjectGetGc)
-	spl_handler_SplHeap.SetDtorObj(zend.ZendObjectsDestroyObject)
-	spl_handler_SplHeap.SetFreeObj(SplHeapObjectFreeStorage)
+
+	spl_handler_SplHeap = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		Offset:        int((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)),
+		CloneObj:      SplHeapObjectClone,
+		CountElements: SplHeapObjectCountElements,
+		GetGc:         SplHeapObjectGetGc,
+		FreeObj:       SplHeapObjectFreeStorage,
+	})
+
 	zend.ZendClassImplements(spl_ce_SplHeap, 1, spl_ce_Iterator)
 	zend.ZendClassImplements(spl_ce_SplHeap, 1, spl_ce_Countable)
 	spl_ce_SplHeap.SetGetIterator(SplHeapGetIterator)
@@ -768,14 +771,17 @@ func ZmStartupSplHeap(type_ int, module_number int) int {
 	spl_ce_SplMaxHeap = zend.RegisterSubClass(spl_ce_SplHeap, "SplMaxHeap", SplHeapObjectNew, spl_funcs_SplMaxHeap)
 	spl_ce_SplMaxHeap.SetGetIterator(SplHeapGetIterator)
 	spl_ce_SplMinHeap.SetGetIterator(SplHeapGetIterator)
+
 	spl_ce_SplPriorityQueue = zend.RegisterClass("SplPriorityQueue", SplHeapObjectNew, spl_funcs_SplPriorityQueue)
-	memcpy(&spl_handler_SplPriorityQueue, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	spl_handler_SplPriorityQueue.SetOffset(zend_long((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)))
-	spl_handler_SplPriorityQueue.SetCloneObj(SplHeapObjectClone)
-	spl_handler_SplPriorityQueue.SetCountElements(SplHeapObjectCountElements)
-	spl_handler_SplPriorityQueue.SetGetGc(SplPqueueObjectGetGc)
-	spl_handler_SplPriorityQueue.SetDtorObj(zend.ZendObjectsDestroyObject)
-	spl_handler_SplPriorityQueue.SetFreeObj(SplHeapObjectFreeStorage)
+	spl_handler_SplPriorityQueue = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		Offset:        int((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)),
+		CloneObj:      SplHeapObjectClone,
+		CountElements: SplHeapObjectCountElements,
+		GetGc:         SplPqueueObjectGetGc,
+		DtorObj:       zend.ZendObjectsDestroyObject,
+		FreeObj:       SplHeapObjectFreeStorage,
+	})
+
 	zend.ZendClassImplements(spl_ce_SplPriorityQueue, 1, spl_ce_Iterator)
 	zend.ZendClassImplements(spl_ce_SplPriorityQueue, 1, spl_ce_Countable)
 	spl_ce_SplPriorityQueue.SetGetIterator(SplPqueueGetIterator)

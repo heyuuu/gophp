@@ -18,7 +18,7 @@ func ObjectAutoFree(object *ZendObject) {
 		object.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
 		if object.GetHandlers().GetDtorObj() != zend.ZendObjectsDestroyObject || object.GetCe().GetDestructor() != nil {
 			object.SetRefcount(1)
-			object.GetHandlers().GetDtorObj()(object)
+			object.DtorObj()
 			object.DelRefcount()
 		}
 	}
@@ -27,6 +27,6 @@ func ObjectAutoFree(object *ZendObject) {
 	if (object.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
 		object.AddGcFlags(IS_OBJ_FREE_CALLED)
 		object.SetRefcount(1)
-		object.GetHandlers().GetFreeObj()(object)
+		object.FreeObj()
 	}
 }

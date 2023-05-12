@@ -12,7 +12,7 @@ var ZEND_GENERATOR_FORCED_CLOSE uint8 = 0x2
 var ZEND_GENERATOR_AT_FIRST_YIELD uint8 = 0x4
 var ZEND_GENERATOR_DO_INIT uint8 = 0x8
 
-var ZendGeneratorHandlers ZendObjectHandlers
+var ZendGeneratorHandlers ObjectHandlers
 
 var ZendGeneratorIteratorFunctions ZendObjectIteratorFuncs = MakeZendObjectIteratorFuncs(ZendGeneratorIteratorDtor, ZendGeneratorIteratorValid, ZendGeneratorIteratorGetData, ZendGeneratorIteratorGetKey, ZendGeneratorIteratorMoveForward, ZendGeneratorIteratorRewind, nil)
 var GeneratorFunctions []types.FunctionEntry = []types.FunctionEntry{

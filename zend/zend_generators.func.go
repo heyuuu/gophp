@@ -1101,12 +1101,13 @@ func ZendRegisterGeneratorCe() {
 
 	ZendClassImplements(ZendCeGenerator, 1, ZendCeIterator)
 	ZendCeGenerator.SetGetIterator(ZendGeneratorGetIterator)
-	memcpy(&ZendGeneratorHandlers, StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	ZendGeneratorHandlers.SetFreeObj(ZendGeneratorFreeStorage)
-	ZendGeneratorHandlers.SetDtorObj(ZendGeneratorDtorStorage)
-	ZendGeneratorHandlers.SetGetGc(ZendGeneratorGetGc)
-	ZendGeneratorHandlers.SetCloneObj(nil)
-	ZendGeneratorHandlers.SetGetConstructor(ZendGeneratorGetConstructor)
+	ZendGeneratorHandlers = *NewObjectHandlersEx(StdObjectHandlersPtr, ObjectHandlersSetting{
+		FreeObj:        ZendGeneratorFreeStorage,
+		DtorObj:        ZendGeneratorDtorStorage,
+		GetGc:          ZendGeneratorGetGc,
+		CloneObj:       nil,
+		GetConstructor: ZendGeneratorGetConstructor,
+	})
 
 	zend_ce_ClosedGeneratorException = RegisterSubClass(faults.ZendCeException, "ClosedGeneratorException", nil, nil)
 }

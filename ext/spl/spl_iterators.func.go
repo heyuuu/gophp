@@ -2638,21 +2638,24 @@ func ZmStartupSplIterators(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_RecursiveIterator, 1, zend.ZendCeIterator)
 	spl_ce_RecursiveIteratorIterator = zend.RegisterClass("RecursiveIteratorIterator", spl_RecursiveIteratorIterator_new, spl_funcs_RecursiveIteratorIterator)
 	zend.ZendClassImplements(spl_ce_RecursiveIteratorIterator, 1, zend.ZendCeIterator)
-	memcpy(&SplHandlersRecItIt, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	SplHandlersRecItIt.SetOffset(zend_long((*byte)(&((*SplRecursiveItObject)(nil).GetStd())) - (*byte)(nil)))
-	SplHandlersRecItIt.SetGetMethod(SplRecursiveItGetMethod)
-	SplHandlersRecItIt.SetCloneObj(nil)
-	SplHandlersRecItIt.SetDtorObj(spl_RecursiveIteratorIterator_dtor)
-	SplHandlersRecItIt.SetFreeObj(spl_RecursiveIteratorIterator_free_storage)
-	memcpy(&SplHandlersDualIt, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	SplHandlersDualIt.SetOffset(zend_long((*byte)(&((*SplDualItObject)(nil).GetStd())) - (*byte)(nil)))
-	SplHandlersDualIt.SetGetMethod(SplDualItGetMethod)
+
+	SplHandlersRecItIt = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		Offset:    int((*byte)(&((*SplRecursiveItObject)(nil).GetStd())) - (*byte)(nil)),
+		GetMethod: SplRecursiveItGetMethod,
+		CloneObj:  nil,
+		DtorObj:   spl_RecursiveIteratorIterator_dtor,
+		FreeObj:   spl_RecursiveIteratorIterator_free_storage,
+	})
+	SplHandlersDualIt = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		Offset:    int((*byte)(&((*SplDualItObject)(nil).GetStd())) - (*byte)(nil)),
+		GetMethod: SplDualItGetMethod,
+		CloneObj:  nil,
+		DtorObj:   SplDualItDtor,
+		FreeObj:   SplDualItFreeStorage,
+	})
 
 	/*spl_handlers_dual_it.call_method = spl_dual_it_call_method;*/
 
-	SplHandlersDualIt.SetCloneObj(nil)
-	SplHandlersDualIt.SetDtorObj(SplDualItDtor)
-	SplHandlersDualIt.SetFreeObj(SplDualItFreeStorage)
 	spl_ce_RecursiveIteratorIterator.SetGetIterator(SplRecursiveItGetIterator)
 	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "LEAVES_ONLY", zend.ZendLong(RIT_LEAVES_ONLY))
 	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "SELF_FIRST", zend.ZendLong(RIT_SELF_FIRST))

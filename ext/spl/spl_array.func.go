@@ -1458,24 +1458,24 @@ func ZmStartupSplArray(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_Serializable)
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_Countable)
 
-	memcpy(&spl_handler_ArrayObject, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	spl_handler_ArrayObject.SetOffset(zend_long((*byte)(&((*SplArrayObject)(nil).GetStd())) - (*byte)(nil)))
-	spl_handler_ArrayObject.SetCloneObj(SplArrayObjectClone)
-	spl_handler_ArrayObject.SetReadDimension(SplArrayReadDimension)
-	spl_handler_ArrayObject.SetWriteDimension(SplArrayWriteDimension)
-	spl_handler_ArrayObject.SetUnsetDimension(SplArrayUnsetDimension)
-	spl_handler_ArrayObject.SetHasDimension(SplArrayHasDimension)
-	spl_handler_ArrayObject.SetCountElements(SplArrayObjectCountElements)
-	spl_handler_ArrayObject.SetGetPropertiesFor(SplArrayGetPropertiesFor)
-	spl_handler_ArrayObject.SetGetGc(SplArrayGetGc)
-	spl_handler_ArrayObject.SetReadProperty(SplArrayReadProperty)
-	spl_handler_ArrayObject.SetWriteProperty(SplArrayWriteProperty)
-	spl_handler_ArrayObject.SetGetPropertyPtrPtr(SplArrayGetPropertyPtrPtr)
-	spl_handler_ArrayObject.SetHasProperty(SplArrayHasProperty)
-	spl_handler_ArrayObject.SetUnsetProperty(SplArrayUnsetProperty)
-	spl_handler_ArrayObject.SetCompareObjects(SplArrayCompareObjects)
-	spl_handler_ArrayObject.SetDtorObj(zend.ZendObjectsDestroyObject)
-	spl_handler_ArrayObject.SetFreeObj(SplArrayObjectFreeStorage)
+	spl_handler_ArrayObject = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		Offset:            int((*byte)(&((*SplArrayObject)(nil).GetStd())) - (*byte)(nil)),
+		CloneObj:          SplArrayObjectClone,
+		ReadDimension:     SplArrayReadDimension,
+		WriteDimension:    SplArrayWriteDimension,
+		UnsetDimension:    SplArrayUnsetDimension,
+		HasDimension:      SplArrayHasDimension,
+		CountElements:     SplArrayObjectCountElements,
+		GetPropertiesFor:  SplArrayGetPropertiesFor,
+		GetGc:             SplArrayGetGc,
+		ReadProperty:      SplArrayReadProperty,
+		WriteProperty:     SplArrayWriteProperty,
+		GetPropertyPtrPtr: SplArrayGetPropertyPtrPtr,
+		HasProperty:       SplArrayHasProperty,
+		UnsetProperty:     SplArrayUnsetProperty,
+		CompareObjects:    SplArrayCompareObjects,
+		FreeObj:           SplArrayObjectFreeStorage,
+	})
 
 	spl_ce_ArrayIterator = zend.RegisterClass("ArrayIterator", SplArrayObjectNew, spl_funcs_ArrayIterator)
 	zend.ZendClassImplements(spl_ce_ArrayIterator, 1, spl_ce_Iterator)
@@ -1483,6 +1483,7 @@ func ZmStartupSplArray(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_ArrayIterator, 1, spl_ce_SeekableIterator)
 	zend.ZendClassImplements(spl_ce_ArrayIterator, 1, spl_ce_Serializable)
 	zend.ZendClassImplements(spl_ce_ArrayIterator, 1, spl_ce_Countable)
+
 	memcpy(&spl_handler_ArrayIterator, &spl_handler_ArrayObject, b.SizeOf("zend_object_handlers"))
 	spl_ce_ArrayIterator.SetGetIterator(SplArrayGetIterator)
 	spl_ce_ArrayIterator.AddCeFlags(zend.AccReuseGetIterator)

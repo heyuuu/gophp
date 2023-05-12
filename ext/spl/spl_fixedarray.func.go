@@ -690,19 +690,19 @@ func SplFixedarrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 }
 func ZmStartupSplFixedarray(type_ int, module_number int) int {
 	spl_ce_SplFixedArray = zend.RegisterClass("SplFixedArray", SplFixedarrayNew, spl_funcs_SplFixedArray)
+	spl_handler_SplFixedArray = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		Offset:         int((*byte)(&((*SplFixedarrayObject)(nil).GetStd())) - (*byte)(nil)),
+		CloneObj:       SplFixedarrayObjectClone,
+		ReadDimension:  SplFixedarrayObjectReadDimension,
+		WriteDimension: SplFixedarrayObjectWriteDimension,
+		UnsetDimension: SplFixedarrayObjectUnsetDimension,
+		HasDimension:   SplFixedarrayObjectHasDimension,
+		CountElements:  SplFixedarrayObjectCountElements,
+		GetProperties:  SplFixedarrayObjectGetProperties,
+		GetGc:          SplFixedarrayObjectGetGc,
+		FreeObj:        SplFixedarrayObjectFreeStorage,
+	})
 
-	memcpy(&spl_handler_SplFixedArray, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	spl_handler_SplFixedArray.SetOffset(zend_long((*byte)(&((*SplFixedarrayObject)(nil).GetStd())) - (*byte)(nil)))
-	spl_handler_SplFixedArray.SetCloneObj(SplFixedarrayObjectClone)
-	spl_handler_SplFixedArray.SetReadDimension(SplFixedarrayObjectReadDimension)
-	spl_handler_SplFixedArray.SetWriteDimension(SplFixedarrayObjectWriteDimension)
-	spl_handler_SplFixedArray.SetUnsetDimension(SplFixedarrayObjectUnsetDimension)
-	spl_handler_SplFixedArray.SetHasDimension(SplFixedarrayObjectHasDimension)
-	spl_handler_SplFixedArray.SetCountElements(SplFixedarrayObjectCountElements)
-	spl_handler_SplFixedArray.SetGetProperties(SplFixedarrayObjectGetProperties)
-	spl_handler_SplFixedArray.SetGetGc(SplFixedarrayObjectGetGc)
-	spl_handler_SplFixedArray.SetDtorObj(zend.ZendObjectsDestroyObject)
-	spl_handler_SplFixedArray.SetFreeObj(SplFixedarrayObjectFreeStorage)
 	zend.ZendClassImplements(spl_ce_SplFixedArray, 1, spl_ce_Iterator)
 	zend.ZendClassImplements(spl_ce_SplFixedArray, 1, spl_ce_ArrayAccess)
 	zend.ZendClassImplements(spl_ce_SplFixedArray, 1, spl_ce_Countable)

@@ -976,13 +976,14 @@ func SplDllistGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 }
 func ZmStartupSplDllist(type_ int, module_number int) int {
 	spl_ce_SplDoublyLinkedList = zend.RegisterClass("SplDoublyLinkedList", SplDllistObjectNew, spl_funcs_SplDoublyLinkedList)
-	memcpy(&spl_handler_SplDoublyLinkedList, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
-	spl_handler_SplDoublyLinkedList.SetOffset(zend_long((*byte)(&((*SplDllistObject)(nil).GetStd())) - (*byte)(nil)))
-	spl_handler_SplDoublyLinkedList.SetCloneObj(SplDllistObjectClone)
-	spl_handler_SplDoublyLinkedList.SetCountElements(SplDllistObjectCountElements)
-	spl_handler_SplDoublyLinkedList.SetGetGc(SplDllistObjectGetGc)
-	spl_handler_SplDoublyLinkedList.SetDtorObj(zend.ZendObjectsDestroyObject)
-	spl_handler_SplDoublyLinkedList.SetFreeObj(SplDllistObjectFreeStorage)
+	spl_handler_SplDoublyLinkedList = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+		Offset:        int((*byte)(&((*SplDllistObject)(nil).GetStd())) - (*byte)(nil)),
+		CloneObj:      SplDllistObjectClone,
+		CountElements: SplDllistObjectCountElements,
+		GetGc:         SplDllistObjectGetGc,
+		FreeObj:       SplDllistObjectFreeStorage,
+	})
+
 	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_LIFO", zend.ZendLong(SPL_DLLIST_IT_LIFO))
 	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_FIFO", zend.ZendLong(0))
 	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_DELETE", zend.ZendLong(SPL_DLLIST_IT_DELETE))

@@ -12,14 +12,14 @@ type ZendObject struct {
 	ZendRefcounted
 	handle          uint32
 	ce              *ClassEntry
-	handlers        *zend.ZendObjectHandlers
+	handlers        *zend.ObjectHandlers
 	properties      *Array
 	propertiesTable []Zval
 }
 
 var _ IRefcounted = &ZendObject{}
 
-func NewObject(ce *ClassEntry, handle uint32, handlers *zend.ZendObjectHandlers) *ZendObject {
+func NewObject(ce *ClassEntry, handle uint32, handlers *zend.ObjectHandlers) *ZendObject {
 	propertyCount := ce.GetDefaultPropertiesCount()
 	if ce.IsUseGuards() {
 		propertyCount++
@@ -48,10 +48,14 @@ func (o *ZendObject) Init(ce *ClassEntry, handle uint32) {
 	runtime.SetFinalizer(o, ObjectAutoFree)
 }
 
-func (o *ZendObject) GetHandle() uint32                          { return o.handle }
-func (o *ZendObject) GetCe() *ClassEntry                         { return o.ce }
-func (o *ZendObject) GetHandlers() *zend.ZendObjectHandlers      { return o.handlers }
-func (o *ZendObject) SetHandlers(value *zend.ZendObjectHandlers) { o.handlers = value }
-func (o *ZendObject) GetProperties() *Array                      { return o.properties }
-func (o *ZendObject) SetProperties(value *Array)                 { o.properties = value }
-func (o *ZendObject) GetPropertiesTable() []Zval                 { return o.propertiesTable }
+func (o *ZendObject) GetHandle() uint32                      { return o.handle }
+func (o *ZendObject) GetCe() *ClassEntry                     { return o.ce }
+func (o *ZendObject) GetHandlers() *zend.ObjectHandlers      { return o.handlers }
+func (o *ZendObject) SetHandlers(value *zend.ObjectHandlers) { o.handlers = value }
+func (o *ZendObject) GetProperties() *Array                  { return o.properties }
+func (o *ZendObject) SetProperties(value *Array)             { o.properties = value }
+func (o *ZendObject) GetPropertiesTable() []Zval             { return o.propertiesTable }
+
+// object handlers
+func (o *ZendObject) FreeObj() { o.handlers.GetFreeObj()(o) }
+func (o *ZendObject) DtorObj() { o.handlers.GetDtorObj()(o) }
