@@ -42,17 +42,17 @@ func _addFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) bool
 	var op2Copy types.Zval
 
 	// convert
-	if op1.IsObject() && op1 == result && types.Z_OBJ_HT(*op1).GetGet() != nil && types.Z_OBJ_HT(*op1).GetSet() != nil {
+	if op1.IsObject() && op1 == result && op1.Object().Handlers().GetGet() != nil && op1.Object().Handlers().GetSet() != nil {
 		var rv types.Zval
-		var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
+		var objval *types.Zval = op1.Object().Handlers().GetGet()(op1, &rv)
 		ret := AddFunctionEx(objval, objval, op2)
-		types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
+		op1.Object().Handlers().GetSet()(op1, objval)
 		return ret
-	} else if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil {
-		if types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(zend.ZEND_ADD, result, op1, op2) {
+	} else if op1.IsObject() && op1.Object().Handlers().GetDoOperation() != nil {
+		if types.SUCCESS == op1.Object().Handlers().GetDoOperation()(zend.ZEND_ADD, result, op1, op2) {
 			return true
 		}
-	} else if op2.IsObject() && types.Z_OBJ_HT(*op2).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op2).GetDoOperation()(zend.ZEND_ADD, result, op1, op2) {
+	} else if op2.IsObject() && op2.Object().Handlers().GetDoOperation() != nil && types.SUCCESS == op2.Object().Handlers().GetDoOperation()(zend.ZEND_ADD, result, op1, op2) {
 		return true
 	}
 	if op1 != op2 {

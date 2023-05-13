@@ -74,11 +74,11 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 			}
 
-			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
-				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
+			if array_ptr.Object().GetProperties() != nil && array_ptr.Object().GetProperties().GetRefcount() > 1 {
+				if (array_ptr.Object().GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					array_ptr.Object().GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				array_ptr.Object().SetProperties(types.ZendArrayDup(array_ptr.Object().GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.Len() == 0 {
@@ -149,11 +149,11 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 			}
 
-			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
-				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
+			if array_ptr.Object().GetProperties() != nil && array_ptr.Object().GetProperties().GetRefcount() > 1 {
+				if (array_ptr.Object().GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					array_ptr.Object().GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				array_ptr.Object().SetProperties(types.ZendArrayDup(array_ptr.Object().GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.Len() == 0 {
@@ -236,11 +236,11 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 			}
 
-			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
-				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
+			if array_ptr.Object().GetProperties() != nil && array_ptr.Object().GetProperties().GetRefcount() > 1 {
+				if (array_ptr.Object().GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					array_ptr.Object().GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				array_ptr.Object().SetProperties(types.ZendArrayDup(array_ptr.Object().GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.Len() == 0 {

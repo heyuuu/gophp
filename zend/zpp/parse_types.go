@@ -242,13 +242,13 @@ func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool)
 	if arg.IsArray() {
 		return arg.Array(), true
 	} else if orObject && arg.IsObject() {
-		if separate && types.Z_OBJ_P(arg).GetProperties() != nil && types.Z_OBJ_P(arg).GetProperties().GetRefcount() > 1 {
-			if (types.Z_OBJ_P(arg).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-				types.Z_OBJ_P(arg).GetProperties().DelRefcount()
+		if separate && arg.Object().GetProperties() != nil && arg.Object().GetProperties().GetRefcount() > 1 {
+			if (arg.Object().GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+				arg.Object().GetProperties().DelRefcount()
 			}
-			types.Z_OBJ_P(arg).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(arg).GetProperties()))
+			arg.Object().SetProperties(types.ZendArrayDup(arg.Object().GetProperties()))
 		}
-		return types.Z_OBJ_HT_P(arg).GetGetProperties()(arg), true
+		return arg.Object().Handlers().GetGetProperties()(arg), true
 	} else if checkNull && arg.IsNull() {
 		return nil, true
 	} else {

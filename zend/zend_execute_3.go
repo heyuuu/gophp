@@ -384,15 +384,15 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	var z_copy types.Zval
 	obj.SetObject(object.Object())
 	// 	obj.AddRefcount()
-	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
+	z = obj.Object().Handlers().GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		// OBJ_RELEASE(obj.Object())
 		opline.Result().SetUndef()
 		return
 	}
-	if z.IsObject() && types.Z_OBJ_HT_P(z).GetGet() != nil {
+	if z.IsObject() && z.Object().Handlers().GetGet() != nil {
 		var rv2 types.Zval
-		var value *types.Zval = types.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
+		var value *types.Zval = z.Object().Handlers().GetGet()(z, &rv2)
 		if z == &rv {
 			// ZvalPtrDtor(&rv)
 		}
@@ -405,7 +405,7 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	} else {
 		operators.DecrementFunction(&z_copy)
 	}
-	types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
+	obj.Object().Handlers().GetWriteProperty()(&obj, property, &z_copy, cache_slot)
 	// OBJ_RELEASE(obj.Object())
 	// ZvalPtrDtor(&z_copy)
 	// ZvalPtrDtor(z)

@@ -121,7 +121,7 @@ again:
 		}
 		struc.ProtectRecursive()
 		myht := zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
-		className := types.Z_OBJ_HT(*struc).GetGetClassName()(struc.Object())
+		className := struc.Object().Handlers().GetGetClassName()(struc.Object())
 		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", common, className.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() int { return myht.Count() }, 0))
 		if myht != nil {
 			myht.Foreach(func(key types.ArrayKey, value *types.Zval) {
@@ -272,7 +272,7 @@ again:
 			}
 			myht.ProtectRecursive()
 		}
-		class_name = types.Z_OBJ_HT(*struc).GetGetClassName()(struc.Object())
+		class_name = struc.Object().Handlers().GetGetClassName()(struc.Object())
 		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), struc.GetRefcount())
 		// types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {

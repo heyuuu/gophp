@@ -37,8 +37,8 @@ func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_typ
 					break
 				}
 			}
-			if variable_ptr.IsObject() && types.Z_OBJ_HT(*variable_ptr).GetSet() != nil {
-				types.Z_OBJ_HT(*variable_ptr).GetSet()(variable_ptr, value)
+			if variable_ptr.IsObject() && variable_ptr.Object().Handlers().GetSet() != nil {
+				variable_ptr.Object().Handlers().GetSet()(variable_ptr, value)
 				return variable_ptr
 			}
 			garbage = variable_ptr.RefCounted()

@@ -903,7 +903,7 @@ func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *ty
 	function_handler = zend.ZendStdGetMethod(object, method, key)
 	if function_handler == nil && intern.GetCe() != nil {
 		if b.Assign(&function_handler, intern.GetCe().FunctionTable().Get(method.GetStr())) == nil {
-			if types.Z_OBJ_HT(intern.GetZobject()).GetGetMethod() != nil {
+			if intern.GetZobject().Object().GetHandlers().GetGetMethod() != nil {
 				*object = intern.GetZobject().Object()
 				function_handler = object.GetHandlers().GetGetMethod()(object, method, key)
 			}

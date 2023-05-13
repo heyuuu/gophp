@@ -87,10 +87,10 @@ func SplArrayObjectNewEx(classType *types.ClassEntry, orig *types.Zval, cloneOri
 		if cloneOrig != 0 {
 			if other.IsIsSelf() {
 				intern.GetArray().SetUndef()
-			} else if types.Z_OBJ_HT_P(orig) == &spl_handler_ArrayObject {
+			} else if orig.Object().Handlers() == &spl_handler_ArrayObject {
 				intern.GetArray().SetArray(types.ZendArrayDup(SplArrayGetHashTable(other)))
 			} else {
-				b.Assert(types.Z_OBJ_HT_P(orig) == &spl_handler_ArrayIterator)
+				b.Assert(orig.Object().Handlers() == &spl_handler_ArrayIterator)
 				types.ZVAL_COPY(intern.GetArray(), orig)
 				intern.SetIsUseOther(true)
 			}
@@ -652,7 +652,7 @@ func SplArrayGetDebugInfo(obj *types.Zval) *types.Array {
 		types.ZendHashCopy(debug_info, intern.GetStd().GetProperties())
 		storage = intern.GetArray()
 		//storage.TryAddRefcount()
-		if types.Z_OBJ_HT_P(obj) == &spl_handler_ArrayIterator {
+		if obj.Object().Handlers() == &spl_handler_ArrayIterator {
 			base = spl_ce_ArrayIterator
 		} else {
 			base = spl_ce_ArrayObject
@@ -844,7 +844,7 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 			intern.GetArray().SetArray(types.ZendArrayDup(array.Array()))
 		}
 	} else {
-		if types.Z_OBJ_HT_P(array) == &spl_handler_ArrayObject || types.Z_OBJ_HT_P(array) == &spl_handler_ArrayIterator {
+		if array.Object().Handlers() == &spl_handler_ArrayObject || array.Object().Handlers() == &spl_handler_ArrayIterator {
 			// zend.ZvalPtrDtor(intern.GetArray())
 			if just_array != 0 {
 				var other *SplArrayObject = Z_SPLARRAY_P(array)
@@ -858,7 +858,7 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 				types.ZVAL_COPY(intern.GetArray(), array)
 			}
 		} else {
-			var handler zend.ZendObjectGetPropertiesT = types.Z_OBJ_HT(*array).GetGetProperties()
+			var handler zend.ZendObjectGetPropertiesT = array.Object().Handlers().GetGetProperties()
 			if handler != zend.ZendStdGetProperties {
 				faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Overloaded object of type %s is not compatible with %s", types.Z_OBJCE_P(array).GetName().GetVal(), intern.GetStd().GetCe().GetName().GetVal())
 				return

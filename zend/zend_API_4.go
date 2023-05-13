@@ -294,7 +294,7 @@ func AddPropertyStrEx(arg *types.Zval, key string, str string) int {
 }
 func AddPropertyZvalEx(arg *types.Zval, key string, value *types.Zval) int {
 	zKey := types.NewZvalString(key)
-	types.Z_OBJ_HT(*arg).GetWriteProperty()(arg, zKey, value, nil)
+	arg.Object().Handlers().GetWriteProperty()(arg, zKey, value, nil)
 	return types.SUCCESS
 }
 func ZendStartupModuleEx(module *ModuleEntry) bool {

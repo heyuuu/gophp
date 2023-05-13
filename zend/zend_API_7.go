@@ -410,7 +410,7 @@ try_again:
 		var calling_scope *types.ClassEntry
 		var fptr types.IFunction
 		var object *types.ZendObject
-		if types.Z_OBJ_HT(*callable).GetGetClosure() != nil && types.Z_OBJ_HT(*callable).GetGetClosure()(callable, &calling_scope, &fptr, &object) == types.SUCCESS {
+		if callable.Object().Handlers().GetGetClosure() != nil && callable.Object().Handlers().GetGetClosure()(callable, &calling_scope, &fptr, &object) == types.SUCCESS {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(callable)
 			var callable_name *types.String = types.ZendStringAlloc(ce.GetName().GetLen()+b.SizeOf("\"::__invoke\"")-1, 0)
 			memcpy(callable_name.GetVal(), ce.GetName().GetVal(), ce.GetName().GetLen())

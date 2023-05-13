@@ -93,8 +93,8 @@ again:
 		}
 		return 0
 	case types.IS_OBJECT:
-		if types.Z_OBJ_HT(*callable).GetGetClosure() != nil {
-			if types.Z_OBJ_HT(*callable).GetGetClosure()(callable, fcc.GetCallingScope(), fcc.GetFunctionHandler(), fcc.GetObject()) == types.SUCCESS {
+		if callable.Object().Handlers().GetGetClosure() != nil {
+			if callable.Object().Handlers().GetGetClosure()(callable, fcc.GetCallingScope(), fcc.GetFunctionHandler(), fcc.GetObject()) == types.SUCCESS {
 				fcc.SetCalledScope(fcc.GetCallingScope())
 				if fcc == &fcc_local {
 					ZendReleaseFcallInfoCache(fcc)

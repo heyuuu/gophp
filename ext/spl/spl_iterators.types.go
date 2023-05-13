@@ -74,7 +74,7 @@ type SplDualItObject struct {
 	std types.ZendObject
 }
 
-func (this *SplDualItObject) GetZobject() types.Zval { return this.inner.zobject }
+func (this *SplDualItObject) GetZobject() *types.Zval { return &this.inner.zobject }
 
 // func (this *SplDualItObject) SetZobject(value zend.Zval) { this.inner.zobject = value }
 func (this *SplDualItObject) GetCe() *types.ClassEntry      { return this.inner.ce }

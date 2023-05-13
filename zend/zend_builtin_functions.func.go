@@ -325,11 +325,11 @@ repeat:
 		}
 	case types.IS_OBJECT:
 		if val_free.IsUndef() {
-			if types.Z_OBJ_HT_P(value).GetGet() != nil {
-				value = types.Z_OBJ_HT_P(value).GetGet()(value, &val_free)
+			if value.Object().Handlers().GetGet() != nil {
+				value = value.Object().Handlers().GetGet()(value, &val_free)
 				goto repeat
-			} else if types.Z_OBJ_HT_P(value).GetCastObject() != nil {
-				if types.Z_OBJ_HT_P(value).GetCastObject()(value, &val_free, types.IS_STRING) == types.SUCCESS {
+			} else if value.Object().Handlers().GetCastObject() != nil {
+				if value.Object().Handlers().GetCastObject()(value, &val_free, types.IS_STRING) == types.SUCCESS {
 					value = &val_free
 					break
 				}
@@ -411,7 +411,7 @@ func ZifGetParentClass(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, obje
 		}
 	}
 	if arg.IsObject() {
-		ce = types.Z_OBJ_P(arg).GetCe()
+		ce = arg.Object().GetCe()
 	} else if arg.IsString() {
 		ce = ZendLookupClass(arg.String())
 	}
@@ -551,7 +551,7 @@ func ZifGetClassVars(executeData zpp.Ex, return_value zpp.Ret, className *types.
 	}
 }
 func ZifGetObjectVars(obj zpp.Object) (*types.Array, bool) {
-	properties := types.Z_OBJ_HT_P(obj).GetGetProperties()(obj)
+	properties := obj.Object().Handlers().GetGetProperties()(obj)
 	if properties == nil {
 		return nil, false
 	}
@@ -616,12 +616,12 @@ func ZifGetMangledObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *type
 		}
 		break
 	}
-	properties = types.Z_OBJ_HT_P(obj).GetGetProperties()(obj)
+	properties = obj.Object().Handlers().GetGetProperties()(obj)
 	if properties == nil {
 		return_value.SetEmptyArray()
 		return
 	}
-	properties = types.ZendProptableToSymtable(properties, types.Z_OBJCE_P(obj).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(obj).GetHandlers() != StdObjectHandlersPtr || properties.IsRecursive())
+	properties = types.ZendProptableToSymtable(properties, types.Z_OBJCE_P(obj).GetDefaultPropertiesCount() != 0 || obj.Object().GetHandlers() != StdObjectHandlersPtr || properties.IsRecursive())
 	return_value.SetArray(properties)
 	return
 }
@@ -704,7 +704,7 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 	}
 	if klass.IsObject() {
 		var obj = klass.Object()
-		func_ = types.Z_OBJ_HT_P(klass).GetGetMethod()(&obj, method_name, nil)
+		func_ = klass.Object().Handlers().GetGetMethod()(&obj, method_name, nil)
 		if func_ != nil {
 			if func_.IsCallViaTrampoline() {
 
@@ -754,7 +754,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 		return
 	}
 	property_z.SetString(property)
-	if object.IsObject() && types.Z_OBJ_HT(*object).GetHasProperty()(object, &property_z, 2, nil) != 0 {
+	if object.IsObject() && object.Object().Handlers().GetHasProperty()(object, &property_z, 2, nil) != 0 {
 		return_value.SetTrue()
 		return
 	}

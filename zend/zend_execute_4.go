@@ -14,7 +14,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	var z_copy types.Zval
 	obj.SetObject(object.Object())
 	// 	obj.AddRefcount()
-	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
+	z = obj.Object().Handlers().GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		// OBJ_RELEASE(obj.Object())
 		if RETURN_VALUE_USED(opline) {
@@ -22,9 +22,9 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 		}
 		return
 	}
-	if z.IsObject() && types.Z_OBJ_HT_P(z).GetGet() != nil {
+	if z.IsObject() && z.Object().Handlers().GetGet() != nil {
 		var rv2 types.Zval
-		var value *types.Zval = types.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
+		var value *types.Zval = z.Object().Handlers().GetGet()(z, &rv2)
 		if z == &rv {
 			// ZvalPtrDtor(&rv)
 		}
@@ -39,7 +39,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), &z_copy)
 	}
-	types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
+	obj.Object().Handlers().GetWriteProperty()(&obj, property, &z_copy, cache_slot)
 	// OBJ_RELEASE(obj.Object())
 	// ZvalPtrDtor(&z_copy)
 	// ZvalPtrDtor(z)
@@ -58,7 +58,7 @@ func ZendAssignOpOverloadedProperty(
 	var res types.Zval
 	obj.SetObject(object.Object())
 	// 	obj.AddRefcount()
-	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
+	z = obj.Object().Handlers().GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		// OBJ_RELEASE(obj.Object())
 		if RETURN_VALUE_USED(opline) {
@@ -66,16 +66,16 @@ func ZendAssignOpOverloadedProperty(
 		}
 		return
 	}
-	if z.IsObject() && types.Z_OBJ_HT_P(z).GetGet() != nil {
+	if z.IsObject() && z.Object().Handlers().GetGet() != nil {
 		var rv2 types.Zval
-		var value *types.Zval = types.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
+		var value *types.Zval = z.Object().Handlers().GetGet()(z, &rv2)
 		if z == &rv {
 			// ZvalPtrDtor(&rv)
 		}
 		z.CopyValueFrom(value)
 	}
 	if ZendBinaryOp(&res, z, value, opline) == types.SUCCESS {
-		types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &res, cache_slot)
+		obj.Object().Handlers().GetWriteProperty()(&obj, property, &res, cache_slot)
 	}
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), &res)
@@ -413,7 +413,7 @@ func ZendFetchDimensionAddress(
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
 			dim++
 		}
-		retval = types.Z_OBJ_HT_P(container).GetReadDimension()(container, dim, type_, result)
+		retval = container.Object().Handlers().GetReadDimension()(container, dim, type_, result)
 		if retval == EG__().GetUninitializedZval() {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(container)
 			result.SetNull()

@@ -66,10 +66,10 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
 				}
-				types.Z_OBJ_P(result).SetProperties(ht)
+				result.Object().SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
-				types.Z_OBJ_P(result).SetProperties(ht)
+				result.Object().SetProperties(ht)
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
 				{
 
@@ -131,7 +131,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 					/* fast copy */
 
-					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive()))
+					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || expr.Object().GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
 					result.SetEmptyArray()
@@ -150,10 +150,10 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
 				}
-				types.Z_OBJ_P(result).SetProperties(ht)
+				result.Object().SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
-				types.Z_OBJ_P(result).SetProperties(ht)
+				result.Object().SetProperties(ht)
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
 
 				{
@@ -217,7 +217,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 					/* fast copy */
 
-					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive()))
+					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || expr.Object().GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
 					result.SetEmptyArray()
@@ -236,10 +236,10 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
 				}
-				types.Z_OBJ_P(result).SetProperties(ht)
+				result.Object().SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
-				types.Z_OBJ_P(result).SetProperties(ht)
+				result.Object().SetProperties(ht)
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
 
 				{
@@ -301,7 +301,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 
 					/* fast copy */
 
-					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive()))
+					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || expr.Object().GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
 					result.SetEmptyArray()
@@ -320,10 +320,10 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
 				}
-				types.Z_OBJ_P(result).SetProperties(ht)
+				result.Object().SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
-				types.Z_OBJ_P(result).SetProperties(ht)
+				result.Object().SetProperties(ht)
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
 
 				{

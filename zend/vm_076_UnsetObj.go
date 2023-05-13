@@ -26,7 +26,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().Handlers().GetUnsetProperty()(container, offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
 	if free_op1 != nil {
@@ -56,7 +56,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().Handlers().GetUnsetProperty()(container, offset, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
 	// ZvalPtrDtorNogc(free_op2)
@@ -86,7 +86,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().Handlers().GetUnsetProperty()(container, offset, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
 	if free_op1 != nil {
@@ -104,7 +104,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int 
 	}
 	offset = opline.Const2()
 	for {
-		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().Handlers().GetUnsetProperty()(container, offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -120,7 +120,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	}
 	offset = opline.Op2()
 	for {
-		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().Handlers().GetUnsetProperty()(container, offset, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
 	// ZvalPtrDtorNogc(free_op2)
@@ -136,7 +136,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	offset = opline.Cv2OrUndef()
 	for {
-		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().Handlers().GetUnsetProperty()(container, offset, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -161,7 +161,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().Handlers().GetUnsetProperty()(container, offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -187,7 +187,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().Handlers().GetUnsetProperty()(container, offset, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
 	// ZvalPtrDtorNogc(free_op2)
@@ -213,7 +213,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().Handlers().GetUnsetProperty()(container, offset, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
