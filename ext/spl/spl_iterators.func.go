@@ -2654,8 +2654,6 @@ func ZmStartupSplIterators(type_ int, module_number int) int {
 		FreeObj:   SplDualItFreeStorage,
 	})
 
-	/*spl_handlers_dual_it.call_method = spl_dual_it_call_method;*/
-
 	spl_ce_RecursiveIteratorIterator.SetGetIterator(SplRecursiveItGetIterator)
 	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "LEAVES_ONLY", zend.ZendLong(RIT_LEAVES_ONLY))
 	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "SELF_FIRST", zend.ZendLong(RIT_SELF_FIRST))

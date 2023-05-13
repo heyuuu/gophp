@@ -61,7 +61,6 @@ type ObjectHandlers struct {
 	countElements     ZendObjectCountElementsT
 	getDebugInfo      ZendObjectGetDebugInfoT
 	getClosure        ZendObjectGetClosureT
-	getGc             ZendObjectGetGcT
 	doOperation       ZendObjectDoOperationT
 	compare           ZendObjectCompareZvalsT
 	getPropertiesFor  ZendObjectGetPropertiesForT
@@ -94,7 +93,6 @@ func NewObjectHandlers(s ObjectHandlersSetting) *ObjectHandlers {
 		countElements:     s.CountElements,
 		getDebugInfo:      s.GetDebugInfo,
 		getClosure:        s.GetClosure,
-		getGc:             s.GetGc,
 		doOperation:       s.DoOperation,
 		compare:           s.Compare,
 		getPropertiesFor:  s.GetPropertiesFor,
@@ -105,7 +103,6 @@ func NewObjectHandlersEx(base *ObjectHandlers, s ObjectHandlersSetting) *ObjectH
 	panic("todo")
 }
 
-func (this *ObjectHandlers) GetOffset() int                               { return this.offset }
 func (this *ObjectHandlers) GetFreeObj() ZendObjectFreeObjT               { return this.freeObj }
 func (this *ObjectHandlers) GetDtorObj() ZendObjectDtorObjT               { return this.dtorObj }
 func (this *ObjectHandlers) GetCloneObj() ZendObjectCloneObjT             { return this.cloneObj }
@@ -125,8 +122,6 @@ func (this *ObjectHandlers) GetUnsetDimension() ZendObjectUnsetDimensionT { retu
 func (this *ObjectHandlers) GetGetProperties() ZendObjectGetPropertiesT   { return this.getProperties }
 func (this *ObjectHandlers) GetGetMethod() ZendObjectGetMethodT           { return this.getMethod }
 func (this *ObjectHandlers) GetCallMethod() ZendObjectCallMethodT         { return this.callMethod }
-
-//func (this *ObjectHandlers) SetCallMethod(value ZendObjectCallMethodT) { this.call_method = value }
 func (this *ObjectHandlers) GetGetConstructor() ZendObjectGetConstructorT { return this.getConstructor }
 func (this *ObjectHandlers) GetGetClassName() ZendObjectGetClassNameT     { return this.getClassName }
 func (this *ObjectHandlers) GetCompareObjects() ZendObjectCompareT        { return this.compareObjects }
@@ -134,7 +129,6 @@ func (this *ObjectHandlers) GetCastObject() ZendObjectCastT               { retu
 func (this *ObjectHandlers) GetCountElements() ZendObjectCountElementsT   { return this.countElements }
 func (this *ObjectHandlers) GetGetDebugInfo() ZendObjectGetDebugInfoT     { return this.getDebugInfo }
 func (this *ObjectHandlers) GetGetClosure() ZendObjectGetClosureT         { return this.getClosure }
-func (this *ObjectHandlers) GetGetGc() ZendObjectGetGcT                   { return this.getGc }
 func (this *ObjectHandlers) GetDoOperation() ZendObjectDoOperationT       { return this.doOperation }
 func (this *ObjectHandlers) GetCompare() ZendObjectCompareZvalsT          { return this.compare }
 func (this *ObjectHandlers) GetGetPropertiesFor() ZendObjectGetPropertiesForT {

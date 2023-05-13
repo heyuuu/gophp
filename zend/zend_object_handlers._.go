@@ -174,5 +174,4 @@ var StdObjectHandlersPtr *ObjectHandlers = NewObjectHandlers(ObjectHandlersSetti
 	CastObject:        ZendStdCastObjectTostring,
 	GetDebugInfo:      ZendStdGetDebugInfo,
 	GetClosure:        ZendStdGetClosure,
-	GetGc:             ZendStdGetGc,
 })

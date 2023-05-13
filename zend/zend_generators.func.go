@@ -1104,7 +1104,6 @@ func ZendRegisterGeneratorCe() {
 	ZendGeneratorHandlers = *NewObjectHandlersEx(StdObjectHandlersPtr, ObjectHandlersSetting{
 		FreeObj:        ZendGeneratorFreeStorage,
 		DtorObj:        ZendGeneratorDtorStorage,
-		GetGc:          ZendGeneratorGetGc,
 		CloneObj:       nil,
 		GetConstructor: ZendGeneratorGetConstructor,
 	})

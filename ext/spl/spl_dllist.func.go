@@ -980,7 +980,6 @@ func ZmStartupSplDllist(type_ int, module_number int) int {
 		Offset:        int((*byte)(&((*SplDllistObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:      SplDllistObjectClone,
 		CountElements: SplDllistObjectCountElements,
-		GetGc:         SplDllistObjectGetGc,
 		FreeObj:       SplDllistObjectFreeStorage,
 	})
 

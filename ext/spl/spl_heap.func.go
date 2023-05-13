@@ -760,7 +760,6 @@ func ZmStartupSplHeap(type_ int, module_number int) int {
 		Offset:        int((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:      SplHeapObjectClone,
 		CountElements: SplHeapObjectCountElements,
-		GetGc:         SplHeapObjectGetGc,
 		FreeObj:       SplHeapObjectFreeStorage,
 	})
 
@@ -777,7 +776,6 @@ func ZmStartupSplHeap(type_ int, module_number int) int {
 		Offset:        int((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:      SplHeapObjectClone,
 		CountElements: SplHeapObjectCountElements,
-		GetGc:         SplPqueueObjectGetGc,
 		DtorObj:       zend.ZendObjectsDestroyObject,
 		FreeObj:       SplHeapObjectFreeStorage,
 	})

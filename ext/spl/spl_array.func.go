@@ -1467,7 +1467,6 @@ func ZmStartupSplArray(type_ int, module_number int) int {
 		HasDimension:      SplArrayHasDimension,
 		CountElements:     SplArrayObjectCountElements,
 		GetPropertiesFor:  SplArrayGetPropertiesFor,
-		GetGc:             SplArrayGetGc,
 		ReadProperty:      SplArrayReadProperty,
 		WriteProperty:     SplArrayWriteProperty,
 		GetPropertyPtrPtr: SplArrayGetPropertyPtrPtr,

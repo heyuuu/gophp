@@ -8,18 +8,14 @@ import (
 /**
  * constants and global variables
  */
-var ZendIteratorClassEntry *types.ClassEntry = types.NewInternalClass("__iterator_wrapper")
+var ZendIteratorClassEntry *types.ClassEntry = types.NewInternalClass("__iterator_wrapper", 0)
 
 var IteratorObjectHandlers *ObjectHandlers = NewObjectHandlers(ObjectHandlersSetting{
 	FreeObj: func(object *types.ZendObject) {
 		var iter *ZendObjectIterator = (*ZendObjectIterator)(object)
 		iter.GetFuncs().GetDtor()(iter)
 	},
-	GetGc: func(object *types.Zval, table **types.Zval, n *int) *types.Array {
-		*table = nil
-		*n = 0
-		return nil
-	},
+	DtorObj: func(object *types.ZendObject) {},
 })
 
 /**

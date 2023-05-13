@@ -122,7 +122,6 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		fcic.SetCalledScope(object.GetCe())
 		fcic.SetObject(object)
 		ZendCallFunction(&fci, &fcic)
-		// ZvalPtrDtor(&ret)
 		if old_exception != nil {
 			if EG__().GetException() != nil {
 				faults.ExceptionSetPrevious(EG__().GetException(), old_exception)

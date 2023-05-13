@@ -858,7 +858,6 @@ func ZmStartupSplObserver(type_ int, module_number int) int {
 		Offset:         int((*byte)(&((*spl_SplObjectStorage)(nil).GetStd())) - (*byte)(nil)),
 		CompareObjects: SplObjectStorageCompareObjects,
 		CloneObj:       SplObjectStorageClone,
-		GetGc:          SplObjectStorageGetGc,
 		DtorObj:        zend.ZendObjectsDestroyObject,
 		FreeObj:        spl_SplObjectStorage_free_storage,
 	})

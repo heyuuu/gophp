@@ -699,7 +699,6 @@ func ZmStartupSplFixedarray(type_ int, module_number int) int {
 		HasDimension:   SplFixedarrayObjectHasDimension,
 		CountElements:  SplFixedarrayObjectCountElements,
 		GetProperties:  SplFixedarrayObjectGetProperties,
-		GetGc:          SplFixedarrayObjectGetGc,
 		FreeObj:        SplFixedarrayObjectFreeStorage,
 	})
 

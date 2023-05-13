@@ -488,7 +488,6 @@ func ZendRegisterClosureCe() {
 		CloneObj:          ZendClosureClone,
 		GetDebugInfo:      ZendClosureGetDebugInfo,
 		GetClosure:        ZendClosureGetClosure,
-		GetGc:             ZendClosureGetGc,
 	})
 }
 func ZendClosureInternalHandler(executeData *ZendExecuteData, return_value *types.Zval) {
