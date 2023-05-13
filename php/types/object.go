@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/heyuuu/gophp/zend"
 	"runtime"
 )
 
@@ -33,7 +34,7 @@ func NewObject(ce *ClassEntry, handle uint32, handlers *ObjectHandlers) *ZendObj
 }
 
 func (o *ZendObject) Init(ce *ClassEntry, handle uint32) {
-	o.SetRefcount(1)
+	//o.SetRefcount(1)
 	o.SetGcTypeInfo(uint32(IS_OBJECT) | GC_COLLECTABLE<<GC_FLAGS_SHIFT)
 
 	o.handle = handle
@@ -56,5 +57,7 @@ func (o *ZendObject) SetProperties(value *Array)        { o.properties = value }
 func (o *ZendObject) GetPropertiesTable() []Zval        { return o.propertiesTable }
 
 // object handlers
-func (o *ZendObject) FreeObj() { o.handlers.GetFreeObj()(o) }
-func (o *ZendObject) DtorObj() { o.handlers.GetDtorObj()(o) }
+func (o *ZendObject) FreeObj() { o.handlers.freeObj(o) }
+func (o *ZendObject) DtorObj() { o.handlers.dtorObj(o) }
+
+func (o *ZendObject) GetDtorObj() zend.ZendObjectDtorObjT { return o.handlers.dtorObj }

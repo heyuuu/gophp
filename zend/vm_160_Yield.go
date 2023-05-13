@@ -35,7 +35,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
-					generator.GetValue().TryAddRefcount()
+					// generator.GetValue().TryAddRefcount()
 
 				}
 			}
@@ -57,7 +57,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
-				generator.GetValue().TryAddRefcount()
+				// generator.GetValue().TryAddRefcount()
 
 			}
 
@@ -80,7 +80,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
-			generator.GetKey().TryAddRefcount()
+			// generator.GetKey().TryAddRefcount()
 
 		}
 
@@ -142,7 +142,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
-					generator.GetValue().TryAddRefcount()
+					// generator.GetValue().TryAddRefcount()
 
 				}
 			}
@@ -164,7 +164,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 			{
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
-				generator.GetValue().TryAddRefcount()
+				// generator.GetValue().TryAddRefcount()
 
 			}
 
@@ -247,7 +247,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
-					generator.GetValue().TryAddRefcount()
+					// generator.GetValue().TryAddRefcount()
 
 				}
 			}
@@ -269,7 +269,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 			{
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
-				generator.GetValue().TryAddRefcount()
+				// generator.GetValue().TryAddRefcount()
 
 			}
 
@@ -352,7 +352,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
-					generator.GetValue().TryAddRefcount()
+					// generator.GetValue().TryAddRefcount()
 
 				}
 			}
@@ -374,7 +374,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			{
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
-				generator.GetValue().TryAddRefcount()
+				// generator.GetValue().TryAddRefcount()
 
 			}
 
@@ -449,7 +449,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
-					generator.GetValue().TryAddRefcount()
+					// generator.GetValue().TryAddRefcount()
 
 				}
 			}
@@ -471,7 +471,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			{
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 
-				generator.GetValue().TryAddRefcount()
+				// generator.GetValue().TryAddRefcount()
 
 			}
 
@@ -591,7 +591,7 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
-			generator.GetKey().TryAddRefcount()
+			// generator.GetKey().TryAddRefcount()
 
 		}
 
@@ -1071,7 +1071,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
-			generator.GetKey().TryAddRefcount()
+			// generator.GetKey().TryAddRefcount()
 
 		}
 
@@ -1527,7 +1527,7 @@ func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
-			generator.GetKey().TryAddRefcount()
+			// generator.GetKey().TryAddRefcount()
 
 		}
 
@@ -1949,7 +1949,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
 
-			generator.GetKey().TryAddRefcount()
+			// generator.GetKey().TryAddRefcount()
 
 		}
 

@@ -299,7 +299,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 		}
 		return nil
 	}
-	object.DelRefcount()
+	//object.DelRefcount()
 	return object
 }
 func ZendVerifyTypeErrorCommon(

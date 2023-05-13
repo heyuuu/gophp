@@ -220,7 +220,7 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 			ZendEmitOpTmp(&memoized_result, ZEND_COPY_TMP, result, nil)
 		} else {
 			if result.GetOpType() == IS_CONST {
-				result.GetConstant().TryAddRefcount()
+				//result.GetConstant().TryAddRefcount()
 			}
 			memoized_result = *result
 		}
@@ -229,7 +229,7 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 		var memoized_result *Znode = types.ZendHashIndexFindPtr(CG__().GetMemoizedExprs(), uintPtr(expr))
 		*result = *memoized_result
 		if result.GetOpType() == IS_CONST {
-			result.GetConstant().TryAddRefcount()
+			//result.GetConstant().TryAddRefcount()
 		}
 	} else {
 		b.Assert(false)
@@ -672,7 +672,7 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 			dim_node.GetConstant().SetLong(i)
 		}
 		if expr_node.GetOpType() == IS_CONST {
-			expr_node.GetConstant().TryAddRefcount()
+			//expr_node.GetConstant().TryAddRefcount()
 		}
 		ZendVerifyListAssignTarget(var_ast, old_style)
 		opline = ZendEmitOp(&fetch_result, b.CondF1(elem_ast.GetAttr() != 0, func() __auto__ {

@@ -202,7 +202,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 	} else if !(str.IsRefcounted()) {
 		str.SetString(types.NewString(str.String().GetStr()))
 	} else if str.GetRefcount() > 1 {
-		str.DelRefcount()
+		//str.DelRefcount()
 		str.SetString(types.NewString(str.String().GetStr()))
 	} else {
 		//types.ZendStringForgetHashVal(str.String())

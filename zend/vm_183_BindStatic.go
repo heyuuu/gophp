@@ -34,7 +34,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		}
 		if !(value.IsReference()) {
 			var ref *types.ZendReference = (*types.ZendReference)(Emalloc(b.SizeOf("zend_reference")))
-			ref.SetRefcount(2)
+			//ref.SetRefcount(2)
 			ref.GetGcTypeInfo() = types.IS_REFERENCE
 			types.ZVAL_COPY_VALUE(ref.GetVal(), value)
 			ref.GetSources().SetPtr(nil)

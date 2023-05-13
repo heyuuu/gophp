@@ -146,7 +146,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 		jumptable_op.GetConstant().SetArray(jumptable)
 		opline = ZendEmitOp(nil, b.Cond(jumptable_type == types.IS_LONG, ZEND_SWITCH_LONG, ZEND_SWITCH_STRING), &expr_node, &jumptable_op)
 		if opline.GetOp1Type() == IS_CONST {
-			CT_CONSTANT(opline.GetOp1()).TryAddRefcount()
+			//CT_CONSTANT(opline.GetOp1()).TryAddRefcount()
 		}
 		opnum_switch = opline - CG__().GetActiveOpArray().GetOpcodes()
 	}
@@ -177,7 +177,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 				opline.SetResult(case_node.GetOp())
 			}
 			if opline.GetOp1Type() == IS_CONST {
-				CT_CONSTANT(opline.GetOp1()).TryAddRefcount()
+				//CT_CONSTANT(opline.GetOp1()).TryAddRefcount()
 			}
 			jmpnz_opnums[i] = ZendEmitCondJump(ZEND_JMPNZ, &case_node, 0)
 		}

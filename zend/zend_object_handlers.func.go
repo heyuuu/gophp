@@ -685,7 +685,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 			if prop_info != nil {
 				types.ZVAL_COPY_VALUE(&tmp, value)
 				if ZendVerifyPropertyType(prop_info, &tmp, PropertyUsesStrictTypes()) == 0 {
-					value.TryDelRefcount()
+					//value.TryDelRefcount()
 					variable_ptr = EG__().GetErrorZval()
 					goto exit
 				}

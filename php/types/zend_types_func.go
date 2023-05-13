@@ -74,7 +74,7 @@ func ZVAL_NEW_PERSISTENT_ARR(z *Zval) {
 func ZVAL_NEW_REF(z *Zval, r *Zval) { z.SetNewRef(r) }
 func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 	var ref *ZendReference = NewZendReference(z)
-	ref.SetRefcount(refcount)
+	//ref.SetRefcount(refcount)
 	z.SetReference(ref)
 }
 func ZVAL_PTR(z *Zval, p any)      { z.SetPtr(p) }

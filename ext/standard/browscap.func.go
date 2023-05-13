@@ -316,14 +316,6 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 	//// types.ZendStringRelease(regex)
 	return 0
 }
-func BrowscapZvalCopyCtor(p *types.Zval) {
-	if p.IsRefcounted() {
-		var str *types.String
-		b.Assert(p.IsString())
-		str = p.String().Copy()
-		p.SetString(str)
-	}
-}
 func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserName *string, returnArray bool) {
 	var agent_name *string = browserName
 	var lookup_browser_name *types.String

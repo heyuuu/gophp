@@ -151,7 +151,7 @@ func (ht *Array) Init(size int) {
 	}
 
 	// GC 信息
-	ht.SetRefcount(1)
+	//ht.SetRefcount(1)
 	ht.SetGcTypeInfo(uint32(IS_ARRAY))
 }
 

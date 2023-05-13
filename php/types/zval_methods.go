@@ -59,28 +59,6 @@ func (zv *Zval) GetRefcount() uint32 {
 	b.Assert(zv.IsRefcounted())
 	return zv.RefCounted().GetRefcount()
 }
-func (zv *Zval) SetRefcount(rc uint32) uint32 {
-	b.Assert(zv.IsRefcounted())
-	return zv.RefCounted().SetRefcount(rc)
-}
-func (zv *Zval) AddRefcount() uint32 {
-	b.Assert(zv.IsRefcounted())
-	return zv.RefCounted().AddRefcount()
-}
-func (zv *Zval) DelRefcount() uint32 {
-	b.Assert(zv.IsRefcounted())
-	return zv.RefCounted().DelRefcount()
-}
-func (zv *Zval) TryAddRefcount() {
-	if zv.IsRefcounted() {
-		zv.RefCounted().AddRefcount()
-	}
-}
-func (zv *Zval) TryDelRefcount() {
-	if zv.IsRefcounted() {
-		zv.RefCounted().DelRefcount()
-	}
-}
 
 /**
  * GC - GC_PROTECTED

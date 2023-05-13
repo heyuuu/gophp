@@ -215,7 +215,7 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	} else {
 		zend.ArrayInit(&trace)
 	}
-	trace.SetRefcount(0)
+	//trace.SetRefcount(0)
 	base_ce = GetExceptionBase(&obj)
 	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(b.Assign(&filename, zend.ZendGetCompiledFilename())) {
 		tmp.SetStringVal(b.CastStrAuto(zend.ZendGetExecutedFilename()))

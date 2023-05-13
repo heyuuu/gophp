@@ -617,7 +617,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 				} else {
 					dest_elem = ht.KeyUpdate(key.GetStr(), elem)
 				}
-				zend.ZvalAddRef(dest_elem)
+				//zend.ZvalAddRef(dest_elem)
 				ret++
 				continue
 			}
@@ -675,7 +675,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 			} else {
 				dest_elem = ht.KeyUpdate(key.GetStr(), elem)
 			}
-			zend.ZvalAddRef(dest_elem)
+			//zend.ZvalAddRef(dest_elem)
 			ret++
 			continue
 		}
@@ -1061,10 +1061,10 @@ func ZifStreamContextGetParams(executeData zpp.Ex, return_value zpp.Ret, streamO
 	}
 	zend.ArrayInit(return_value)
 	if context.GetNotifier() != nil && context.GetNotifier().GetPtr().IsNotUndef() && context.GetNotifier().GetFunc() == UserSpaceStreamNotifier {
-		context.GetNotifier().GetPtr().TryAddRefcount()
+		//context.GetNotifier().GetPtr().TryAddRefcount()
 		zend.AddAssocZvalEx(return_value, "notification", context.GetNotifier().GetPtr())
 	}
-	context.GetOptions().TryAddRefcount()
+	//context.GetOptions().TryAddRefcount()
 	zend.AddAssocZvalEx(return_value, "options", context.GetOptions())
 }
 func ZifStreamContextGetDefault(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, options *types.Zval) {

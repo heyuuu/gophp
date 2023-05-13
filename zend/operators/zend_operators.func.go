@@ -231,7 +231,7 @@ func ZendUnwrapReference(op *types.Zval) {
 	if op.GetRefcount() == 1 {
 		types.ZVAL_UNREF(op)
 	} else {
-		op.DelRefcount()
+		//op.DelRefcount()
 		types.ZVAL_COPY(op, types.Z_REFVAL_P(op))
 	}
 }
@@ -1575,13 +1575,8 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			return types.FAILURE
 		}
 		if result == op1 && result.IsRefcounted() {
-
 			/* special case, perform operations on result */
-
 			result_str = types.ZendStringExtend(result.String(), result_len)
-
-			/* special case, perform operations on result */
-
 		} else {
 			result_str = types.ZendStringAlloc(result_len, 0)
 			memcpy(result_str.GetVal(), op1.String().GetVal(), op1_len)

@@ -14,7 +14,7 @@ func ZEND_GENERATOR_RETURN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int 
 		types.ZVAL_COPY_VALUE(generator.GetRetval(), retval)
 		{
 
-			generator.GetRetval().TryAddRefcount()
+			//generator.GetRetval().TryAddRefcount()
 
 		}
 	}

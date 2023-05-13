@@ -105,8 +105,6 @@ func NewObjectHandlersEx(base *ObjectHandlers, s ObjectHandlersSetting) *ObjectH
 	panic("todo")
 }
 
-func (this *ObjectHandlers) GetFreeObj() zend.ZendObjectFreeObjT           { return this.freeObj }
-func (this *ObjectHandlers) GetDtorObj() zend.ZendObjectDtorObjT           { return this.dtorObj }
 func (this *ObjectHandlers) GetCloneObj() zend.ZendObjectCloneObjT         { return this.cloneObj }
 func (this *ObjectHandlers) GetReadProperty() zend.ZendObjectReadPropertyT { return this.readProperty }
 func (this *ObjectHandlers) GetWriteProperty() zend.ZendObjectWritePropertyT {

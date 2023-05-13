@@ -55,7 +55,7 @@ func NewZendResourcePersistent(handle int, ptr any, type_ int, persistent bool) 
 		ptr:    ptr,
 	}
 
-	res.SetRefcount(1)
+	//res.SetRefcount(1)
 	res.SetGcTypeInfo(IS_RESOURCE)
 	if persistent {
 		res.SetPersistent()
@@ -119,7 +119,7 @@ func NewZendReference(val *Zval) *ZendReference {
 	ZVAL_COPY_VALUE(ref.GetVal(), val)
 	ref.sources.SetPtr(nil)
 
-	ref.SetRefcount(1)
+	//ref.SetRefcount(1)
 	ref.SetGcTypeInfo(uint32(IS_REFERENCE))
 
 	runtime.SetFinalizer(ref, func(ref *ZendReference) {
@@ -155,7 +155,7 @@ func NewAstRef(ast *zend.ZendAst) *ZendAstRef {
 	//tree_size = zend.ZendAstTreeSize(ast) + b.SizeOf("zend_ast_ref")
 	//ref = zend.Emalloc(tree_size)
 	zend.ZendAstTreeCopy(ast, ref.ast)
-	ref.SetRefcount(1)
+	//ref.SetRefcount(1)
 	ref.SetGcTypeInfo(uint32(IS_CONSTANT_AST))
 
 	// dtor

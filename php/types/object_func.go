@@ -1,9 +1,5 @@
 package types
 
-import (
-	"github.com/heyuuu/gophp/zend"
-)
-
 // Object 对象自动析构方法
 func ObjectAutoFree(object *ZendObject) {
 	// todo 待重构
@@ -16,17 +12,12 @@ func ObjectAutoFree(object *ZendObject) {
 	// 调用 Dtor 方法
 	if (object.GetGcFlags() & IS_OBJ_DESTRUCTOR_CALLED) == 0 {
 		object.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
-		if object.GetHandlers().GetDtorObj() != zend.ZendObjectsDestroyObject || object.GetCe().GetDestructor() != nil {
-			object.SetRefcount(1)
-			object.DtorObj()
-			object.DelRefcount()
-		}
+		object.DtorObj()
 	}
 
 	// 调用 Free 方法
 	if (object.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
 		object.AddGcFlags(IS_OBJ_FREE_CALLED)
-		object.SetRefcount(1)
 		object.FreeObj()
 	}
 }
