@@ -417,8 +417,6 @@ func ZendFetchDimensionAddress(
 					var ce *types.ClassEntry = types.Z_OBJCE_P(container)
 					faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
 				}
-			} else if retval.GetRefcount() == 1 {
-				types.ZVAL_UNREF(retval)
 			}
 			if result != retval {
 				result.SetIndirect(retval)

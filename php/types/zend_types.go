@@ -37,7 +37,6 @@ func (this ZendType) TypeName() string {
  * ZendResource
  */
 type ZendResource struct {
-	ZendRefcounted
 	handle int
 	type_  int
 	ptr    any
@@ -95,7 +94,6 @@ func (this *ZendPropertyInfoSourceList) SetList(value uintptr)               { t
  * ZendReference
  */
 type ZendReference struct {
-	ZendRefcounted
 	val     Zval
 	sources ZendPropertyInfoSourceList
 }
@@ -123,8 +121,6 @@ func (this *ZendReference) SetSources(value ZendPropertyInfoSourceList) { this.s
  * ZendAstRef
  */
 type ZendAstRef struct {
-	ZendRefcounted
-	//
 	ast *zend.ZendAst
 }
 

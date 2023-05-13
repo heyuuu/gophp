@@ -115,7 +115,6 @@ func (this *Bucket) CopyFrom(from *Bucket) {
  */
 type ArrayPosition = uint32
 type Array struct {
-	ZendRefcounted
 	flags           uint8
 	elementsCount   uint32
 	internalPointer uint32
@@ -129,6 +128,7 @@ type Array struct {
 
 	// flags todo 待合并
 	protected bool
+	writable  bool
 }
 
 /**
@@ -170,7 +170,7 @@ func (ht *Array) Cap() int                  { return ht.data0.Cap() }
 func (ht *Array) Bucket(pos uint32) *Bucket { return &ht.data[pos] }
 
 /* misc */
-func (ht *Array) assertWritable() { assert(ht.GetRefcount() == 1) }
+func (ht *Array) assertWritable() { assert(ht.writable) }
 
 /** Array.flags */
 func (ht *Array) CopyFlags(arr *Array) { ht.flags = arr.flags }

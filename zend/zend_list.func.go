@@ -29,11 +29,13 @@ func ZendListDelete(res *types.ZendResource) int {
 	return types.SUCCESS
 }
 func ZendListFree(res *types.ZendResource) int {
-	if res.GetRefcount() <= 0 {
-		return types.ZendHashIndexDel(EG__().GetRegularList(), res.GetHandle())
-	} else {
-		return types.SUCCESS
-	}
+	// todo 移除机制待处理
+	//if res.GetRefcount() <= 0 {
+	//	return types.ZendHashIndexDel(EG__().GetRegularList(), res.GetHandle())
+	//} else {
+	//	return types.SUCCESS
+	//}
+	return types.SUCCESS
 }
 func ZendResourceDtor(res *types.ZendResource) {
 	var ld *ZendRsrcListDtorsEntry
@@ -50,9 +52,13 @@ func ZendResourceDtor(res *types.ZendResource) {
 	}
 }
 func ZendListClose(res *types.ZendResource) int {
-	if res.GetRefcount() <= 0 {
-		return ZendListFree(res)
-	} else if res.GetType() >= 0 {
+	// todo 移除机制待处理
+	//if res.GetRefcount() <= 0 {
+	//	return ZendListFree(res)
+	//} else if res.GetType() >= 0 {
+	//	ZendResourceDtor(res)
+	//}
+	if res.GetType() >= 0 {
 		ZendResourceDtor(res)
 	}
 	return types.SUCCESS

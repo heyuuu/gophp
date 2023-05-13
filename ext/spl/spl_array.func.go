@@ -836,13 +836,8 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 		faults.ThrowException(spl_ce_InvalidArgumentException, "Passed variable is not an array or object", 0)
 		return
 	}
-	if array.IsType(types.IS_ARRAY) {
-		if array.GetRefcount() == 1 {
-			types.ZVAL_COPY(intern.GetArray(), array)
-		} else {
-			//??? TODO: try to avoid array duplication
-			intern.GetArray().SetArray(types.ZendArrayDup(array.Array()))
-		}
+	if array.IsArray() {
+		intern.GetArray().SetArray(array.Array().LazyDup())
 	} else {
 		if array.Object().GetHandlers() == &spl_handler_ArrayObject || array.Object().GetHandlers() == &spl_handler_ArrayIterator {
 			// zend.ZvalPtrDtor(intern.GetArray())

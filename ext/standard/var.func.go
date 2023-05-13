@@ -140,10 +140,7 @@ again:
 		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(struc.Resource()), "Unknown")
 		core.PhpPrintf("%sresource(%d) of type (%s)\n", common, struc.ResourceHandle(), typeName)
 	case types.IS_REFERENCE:
-		//??? hide references with refcount==1 (for compatibility)
-		if struc.GetRefcount() > 1 {
-			isRef = true
-		}
+		isRef = true
 		struc = types.Z_REFVAL_P(struc)
 		goto again
 	default:
@@ -214,8 +211,8 @@ again:
 		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IS_STRING:
 		core.PhpPrintf("%sstring(%zd) \"", COMMON, struc.String().GetLen())
-		core.PUTS(struc.String().GetStr())
-		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(struc.IsRefcounted(), func() uint32 { return struc.GetRefcount() }, 1))
+		core.PUTS(struc.StringVal())
+		core.PhpPrintf("\"\n")
 	case types.IS_ARRAY:
 		myht = struc.Array()
 		if level > 1 {
@@ -226,7 +223,7 @@ again:
 			myht.ProtectRecursive()
 		}
 		count = myht.Count()
-		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(struc.IsRefcounted(), func() int { return struc.GetRefcount() - 1 }, 1))
+		core.PhpPrintf("%sarray(%d){\n", COMMON, count)
 		var __ht *types.Array = myht
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -259,7 +256,7 @@ again:
 			myht.ProtectRecursive()
 		}
 		class_name := struc.Object().ClassName()
-		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name, zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), struc.GetRefcount())
+		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", COMMON, class_name, zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0))
 		// types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			myht.Foreach(func(key types.ArrayKey, value *types.Zval) {
@@ -282,14 +279,8 @@ again:
 		core.PUTS("}\n")
 	case types.IS_RESOURCE:
 		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(struc.Resource()), "Unknown")
-		core.PhpPrintf("%sresource(%d) of type (%s) refcount(%u)\n", COMMON, struc.ResourceHandle(), typeName, struc.GetRefcount())
+		core.PhpPrintf("%sresource(%d) of type (%s)\n", COMMON, struc.ResourceHandle(), typeName)
 	case types.IS_REFERENCE:
-
-		//??? hide references with refcount==1 (for compatibility)
-
-		if struc.GetRefcount() > 1 {
-			is_ref = 1
-		}
 		struc = types.Z_REFVAL_P(struc)
 		goto again
 	default:
@@ -516,45 +507,30 @@ func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ 
 	}
 }
 func PhpAddVarHash(data PhpSerializeDataT, var_ *types.Zval) zend.ZendLong {
+	data.IncN()
+
 	var zv *types.Zval
-	var key zend.ZendUlong
-	var is_ref types.ZendBool = var_.IsReference()
-	data.SetN(data.GetN() + 1)
-	if is_ref == 0 && var_.GetType() != types.IS_OBJECT {
+	var isRef = var_.IsReference()
+	if !isRef && !var_.IsObject() {
 		return 0
 	}
 
 	/* References to objects are treated as if the reference didn't exist */
-
-	if is_ref != 0 && types.Z_REFVAL_P(var_).IsType(types.IS_OBJECT) {
+	if isRef && types.Z_REFVAL_P(var_).IsType(types.IS_OBJECT) {
 		var_ = types.Z_REFVAL_P(var_)
 	}
 
 	/* Index for the variable is stored using the numeric value of the pointer to
 	 * the zend_refcounted struct */
-
-	key = zend.ZendUlong(types.ZendUintptrT(var_.RefCounted()))
-	zv = data.GetHt().IndexFindH(key)
+	zv = data.FindMark(var_)
 	if zv != nil {
-
 		/* References are only counted once, undo the data->n increment above */
-
-		if is_ref != 0 && zv.Long() != -1 {
-			data.SetN(data.GetN() - 1)
+		if isRef && zv.Long() != -1 {
+			data.DecN()
 		}
 		return zv.Long()
 	} else {
-		var zv_n types.Zval
-		zv_n.SetLong(data.GetN())
-		data.GetHt().IndexAddNewH(key, &zv_n)
-
-		/* Additionally to the index, we also store the variable, to ensure that it is
-		 * not destroyed during serialization and its pointer reused. The variable is
-		 * stored at the numeric value of the pointer + 1, which cannot be the location
-		 * of another zend_refcounted structure. */
-
-		data.GetHt().IndexAddNewH(key+1, var_)
-		// 		var_.AddRefcount()
+		data.Mark(var_)
 		return 0
 	}
 }
@@ -742,9 +718,6 @@ func PhpVarSerializeNestedData(
 			} else {
 				PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
 			}
-			if data.IsReference() && data.GetRefcount() == 1 {
-				data = types.Z_REFVAL_P(data)
-			}
 
 			/* we should still add element even if it's not OK,
 			 * since we already wrote the length of the array before */
@@ -865,14 +838,9 @@ again:
 				} else {
 					PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
 				}
-				if data.IsReference() && data.GetRefcount() == 1 {
-					data = types.Z_REFVAL_P(data)
-				}
 				PhpVarSerializeIntern(buf, data, var_hash)
 			}
 			buf.AppendByte('}')
-			// zend.ZvalPtrDtor(&obj)
-			// zend.ZvalPtrDtor(&retval)
 			return
 		}
 		if ce.GetSerialize() != nil {
@@ -894,8 +862,7 @@ again:
 			} else {
 
 				/* Mark this value in the var_hash, to avoid creating references to it. */
-
-				var var_idx *types.Zval = var_hash.GetHt().IndexFindH(zend.ZendUlong(types.ZendUintptrT(struc.RefCounted())))
+				var var_idx *types.Zval = var_hash.FindMark(struc)
 				var_idx.SetLong(-1)
 				buf.AppendString("N;")
 			}
@@ -965,9 +932,7 @@ func PhpVarSerializeInit() PhpSerializeDataT {
 	/* fprintf(stderr, "SERIALIZE_INIT      == lock: %u, level: %u\n", BG__().serialize_lock, BG__().serialize.level); */
 
 	if BG__().serialize_lock || !(BG__().serialize.level) {
-		d = zend.Emalloc(b.SizeOf("struct php_serialize_data"))
-		d.SetHt(types.NewArray(16))
-		d.SetN(0)
+		d = NewPhpSerializeData()
 		if !(BG__().serialize_lock) {
 			BG__().serialize.data = d
 			BG__().serialize.level = 1
@@ -982,7 +947,7 @@ func PhpVarSerializeDestroy(d PhpSerializeDataT) {
 	/* fprintf(stderr, "SERIALIZE_DESTROY   == lock: %u, level: %u\n", BG__().serialize_lock, BG__().serialize.level); */
 
 	if BG__().serialize_lock || BG__().serialize.level == 1 {
-		d.GetHt().Destroy()
+		d.Destroy()
 		zend.Efree(d)
 	}
 	if !(BG__().serialize_lock) && !(b.PreDec(&(BG__().serialize.level))) {

@@ -193,25 +193,25 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 	if offset < 0 {
 		offset += ZendLong(str.String().GetLen())
 	}
-	if int(offset >= str.String().GetLen()) != 0 {
 
-		var old_len ZendLong = str.String().GetLen()
-		str.SetString(types.ZendStringExtend(str.String(), offset+1))
-		memset(str.String().GetVal()+old_len, ' ', offset-old_len)
-		str.String().GetStr()[offset+1] = 0
-	} else if !(str.IsRefcounted()) {
-		str.SetString(types.NewString(str.String().GetStr()))
-	} else if str.GetRefcount() > 1 {
-		//str.DelRefcount()
-		str.SetString(types.NewString(str.String().GetStr()))
+	s := str.StringVal()
+	if offset >= len(s) {
+		newBytes := make([]byte, offset+1)
+		copy(newBytes, []byte(s))
+		for i := len(s); i < offset; i++ {
+			newBytes[i] = ' '
+		}
+		newBytes[offset] = c
+
+		str.SetStringVal(string(newBytes))
 	} else {
-		//types.ZendStringForgetHashVal(str.String())
+		newBytes := []byte(s)
+		newBytes[offset] = c
+
+		str.SetStringVal(string(newBytes))
 	}
-	str.String().GetStr()[offset] = c
-	if RETURN_VALUE_USED(opline) {
-		/* Return the new character */
-		opline.Result().SetStringVal(string(c))
-	}
+
+	opline.Result().SetStringVal(string(c))
 }
 func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *ZendPropertyInfo {
 	var prop *ZendPropertyInfo

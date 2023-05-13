@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, value_type uint8, strict types.ZendBool, ref *types.ZendRefcounted) *types.Zval {
+func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, strict types.ZendBool) *types.Zval {
 	var ret types.ZendBool
 	var value types.Zval
 	types.ZVAL_COPY(&value, orig_value)
@@ -148,14 +148,14 @@ func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
 }
 func IFreeCompiledVariables(executeData *ZendExecuteData) {
 	var cv *types.Zval = executeData.VarNum(0)
-	var count int = executeData.GetFunc().GetOpArray().last_var
+	var count int = executeData.GetFunc().GetOpArray().GetLastVar()
 	for count != 0 {
-		if cv.IsRefcounted() {
-			var r *types.ZendRefcounted = cv.RefCounted()
-			//if r.DelRefcount() == 0 {
-			//	cv.SetNull()
-			//}
-		}
+		//if cv.IsRefcounted() {
+		//	var r *types.ZendRefcounted = cv.RefCounted()
+		//if r.DelRefcount() == 0 {
+		//	cv.SetNull()
+		//}
+		//}
 		cv++
 		count--
 	}

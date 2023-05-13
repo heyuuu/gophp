@@ -74,8 +74,7 @@ func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 	//ref.SetRefcount(refcount)
 	z.SetReference(ref)
 }
-func ZVAL_PTR(z *Zval, p any)      { z.SetPtr(p) }
-func Z_REFCOUNT_P(pz *Zval) uint32 { return pz.GetRefcount() }
+func ZVAL_PTR(z *Zval, p any) { z.SetPtr(p) }
 
 func ZVAL_COPY_VALUE(z *Zval, v *Zval)  { z.CopyValueFrom(v) }
 func ZVAL_COPY(z *Zval, v *Zval)        { z.CopyFrom(v) }
@@ -88,14 +87,6 @@ func ZVAL_MAKE_REF(zv *Zval) {
 	if !(__zv.IsReference()) {
 		ZVAL_NEW_REF(__zv, __zv)
 	}
-}
-func ZVAL_UNREF(z *Zval) {
-	var _z *Zval = z
-	var ref *ZendReference
-	b.Assert(_z.IsReference())
-	ref = _z.Reference()
-	ZVAL_COPY_VALUE(_z, ref.GetVal())
-	zend.EfreeSize(ref, b.SizeOf("zend_reference"))
 }
 func ZVAL_COPY_DEREF(z *Zval, v *Zval) {
 	z.CopyFrom(v.DeRef())

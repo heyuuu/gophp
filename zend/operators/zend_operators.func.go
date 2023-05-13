@@ -228,12 +228,7 @@ func FastIsNotIdenticalFunction(op1 *types.Zval, op2 *types.Zval) types.ZendBool
 	return types.IntBool(!(ZendIsIdentical(op1, op2)))
 }
 func ZendUnwrapReference(op *types.Zval) {
-	if op.GetRefcount() == 1 {
-		types.ZVAL_UNREF(op)
-	} else {
-		//op.DelRefcount()
-		types.ZVAL_COPY(op, types.Z_REFVAL_P(op))
-	}
+	types.ZVAL_COPY(op, types.Z_REFVAL_P(op))
 }
 func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func func(op *types.Zval)) {
 	dst.SetUndef()

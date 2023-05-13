@@ -662,7 +662,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 				value = &tmp
 			}
 		found:
-			variable_ptr = ZendAssignToVariable(variable_ptr, value, IS_TMP_VAR, PropertyUsesStrictTypes())
+			variable_ptr = ZendAssignToVariable(variable_ptr, value, PropertyUsesStrictTypes())
 			goto exit
 		}
 		if variable_ptr.GetU2Extra() == types.IS_PROP_UNINIT {

@@ -145,9 +145,6 @@ func ZendFetchPropertyAddress(
 	if nil == ptr {
 		ptr = container.Object().ReadProperty(container, prop_ptr, type_, cache_slot, result)
 		if ptr == result {
-			if ptr.IsReference() && ptr.GetRefcount() == 1 {
-				types.ZVAL_UNREF(ptr)
-			}
 			return
 		}
 		if EG__().GetException() != nil {

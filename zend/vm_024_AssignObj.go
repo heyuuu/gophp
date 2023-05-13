@@ -41,7 +41,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_CONST, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -115,7 +115,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -198,7 +198,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_VAR, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -280,7 +280,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_CV, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -682,7 +682,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_CONST, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -755,7 +755,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -826,7 +826,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_VAR, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -896,7 +896,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_CV, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -1207,7 +1207,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_CONST, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -1288,7 +1288,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -1367,7 +1367,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_VAR, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}
@@ -1445,7 +1445,7 @@ assign_object:
 					goto free_and_exit_assign_obj
 				} else {
 				fast_assign_obj:
-					value = ZendAssignToVariable(property_val, value, IS_CV, executeData.IsCallUseStrictTypes())
+					value = ZendAssignToVariable(property_val, value, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
 						types.ZVAL_COPY(opline.Result(), value)
 					}

@@ -24,16 +24,10 @@ add_unpack_again:
 			val = _z
 			if key != nil {
 				faults.ThrowError(nil, "Cannot unpack array with string keys")
-				// 				FREE_OP(free_op1)
 				return 0
 			} else {
-				if val.IsReference() && val.GetRefcount() == 1 {
-					val = types.Z_REFVAL_P(val)
-				}
-				// val.TryAddRefcount()
 				if opline.Result().Array().Append(val) == nil {
 					ZendCannotAddElement()
-					// ZvalPtrDtorNogc(val)
 					break
 				}
 			}

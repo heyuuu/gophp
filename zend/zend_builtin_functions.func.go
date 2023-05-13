@@ -577,10 +577,6 @@ func ZifGetObjectVars(obj zpp.Object) (*types.Array, bool) {
 				return
 			}
 
-			if value.IsReference() && value.GetRefcount() == 1 {
-				value = types.Z_REFVAL_P(value)
-			}
-
 			if !key.IsStrKey() {
 				/* This case is only possible due to loopholes, e.g. ArrayObject */
 				retArr.IndexAdd(key.IdxKey(), value)

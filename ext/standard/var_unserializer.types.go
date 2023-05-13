@@ -56,6 +56,7 @@ func (this *VarDtorEntries) GetData() []types.Zval            { return this.data
 /**
  * PhpUnserializeData
  */
+type PhpUnserializeDataT = *PhpUnserializeData
 type PhpUnserializeData struct {
 	last            *VarEntries
 	first_dtor      *VarDtorEntries

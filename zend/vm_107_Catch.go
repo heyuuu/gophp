@@ -44,6 +44,6 @@ func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var tmp types.Zval
 	tmp.SetObject(exception)
 	EG__().SetException(nil)
-	ZendAssignToVariable(ex, &tmp, IS_TMP_VAR, 1)
+	ZendAssignToVariable(ex, &tmp, 1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

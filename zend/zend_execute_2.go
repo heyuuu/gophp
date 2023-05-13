@@ -140,7 +140,7 @@ func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *types.Zval, val
 		// ZvalPtrDtor(&tmp)
 		return EG__().GetUninitializedZval()
 	}
-	return ZendAssignToVariable(property_val, &tmp, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+	return ZendAssignToVariable(property_val, &tmp, executeData.IsCallUseStrictTypes())
 }
 func ZendCheckType(
 	type_ types.ZendType,

@@ -154,7 +154,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if opline.GetOp2Type() == IS_CV {
 		var variable_ptr *types.Zval = opline.Op2()
-		ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
+		ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 	} else {
 		var res *types.Zval = opline.Op2()
 		var gc *types.ZendRefcounted = value.GetCounted()

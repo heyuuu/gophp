@@ -1,9 +1,5 @@
 package types
 
-import (
-	b "github.com/heyuuu/gophp/builtin"
-)
-
 // ZVAL_COPY_VALUE
 func (zv *Zval) CopyValueFrom(v *Zval) {
 	// 复制除 u2 外所有数据
@@ -53,9 +49,4 @@ func (zv *Zval) IsRefcounted() bool {
 	default:
 		return false
 	}
-}
-
-func (zv *Zval) GetRefcount() uint32 {
-	b.Assert(zv.IsRefcounted())
-	return zv.RefCounted().GetRefcount()
 }

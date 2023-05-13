@@ -65,21 +65,6 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			// 			ref.AddRefcount()
 		}
 		variable_ptr = opline.Op1()
-		if variable_ptr.IsRefcounted() {
-			var ref *types.ZendRefcounted = variable_ptr.RefCounted()
-			//var refcnt uint32 = ref.DelRefcount()
-			if variable_ptr != value {
-				if refcnt == 0 {
-					//RcDtorFunc(ref)
-					if EG__().GetException() != nil {
-						variable_ptr.SetNull()
-						return 0
-					}
-				} else {
-					//GcCheckPossibleRoot(ref)
-				}
-			}
-		}
 		variable_ptr.SetReference(ref)
 		if b.PreInc(&opline).opcode != ZEND_BIND_GLOBAL {
 			break

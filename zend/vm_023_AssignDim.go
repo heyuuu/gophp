@@ -29,7 +29,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CONST, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -108,7 +108,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -191,7 +191,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -274,7 +274,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -354,7 +354,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExec
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CONST, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -434,7 +434,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -518,7 +518,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -602,7 +602,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecute
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1001,7 +1001,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteD
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CONST, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1077,7 +1077,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDat
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1157,7 +1157,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDat
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1237,7 +1237,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1312,7 +1312,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CONST, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1386,7 +1386,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1464,7 +1464,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1542,7 +1542,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1617,7 +1617,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CONST, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1693,7 +1693,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1773,7 +1773,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -1853,7 +1853,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -2228,7 +2228,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteDa
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CONST, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -2299,7 +2299,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteData
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -2374,7 +2374,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_VAR, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)
@@ -2449,7 +2449,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 			if variable_ptr == nil {
 				goto assign_dim_error
 			}
-			value = ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
+			value = ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), value)

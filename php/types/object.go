@@ -14,7 +14,6 @@ type objectGetPropertiesFunc func(object *Zval) *Array
  * ZendObject
  */
 type ZendObject struct {
-	ZendRefcounted
 	handle          uint32
 	ce              *ClassEntry
 	handlers        *ObjectHandlers

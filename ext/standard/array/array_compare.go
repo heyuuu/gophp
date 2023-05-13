@@ -305,9 +305,6 @@ func arrayDiffKeyWrapper(args []*types.Zval, cmp zvalComparer) (*types.Array, bo
 func arrayDiffKey(array *types.Array, arrays []*types.Array, dataComparer zvalComparer) *types.Array {
 	retArr := types.NewArray(0)
 	array.Foreach(func(key types.ArrayKey, val *types.Zval) {
-		if val.IsReference() && val.GetRefcount() == 1 {
-			val = types.Z_REFVAL_P(val)
-		}
 		keep := true
 		for _, cmpArray := range arrays {
 			if data := cmpArray.Find(key); data != nil && (dataComparer == nil || dataComparer(val, data) == 0) {
@@ -390,9 +387,6 @@ func arrayIntersectKeyWrapper(args []*types.Zval, cmp zvalComparer) (*types.Arra
 func arrayIntersectKey(array *types.Array, arrays []*types.Array, dataComparer zvalComparer) *types.Array {
 	retArr := types.NewArray(array.Len())
 	array.Foreach(func(key types.ArrayKey, val *types.Zval) {
-		if val.IsReference() && val.GetRefcount() == 1 {
-			val = types.Z_REFVAL_P(val)
-		}
 		keep := true
 		for _, cmpArray := range arrays {
 			if data := cmpArray.Find(key); data == nil || dataComparer != nil && dataComparer(val, data) != 0 {

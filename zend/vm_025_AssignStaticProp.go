@@ -15,7 +15,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CONST_HANDLER(executeData *ZendExecute
 	if prop_info.GetType() != 0 {
 		value = ZendAssignToTypedProp(prop_info, prop, value, executeData)
 	} else {
-		value = ZendAssignToVariable(prop, value, IS_CONST, executeData.IsCallUseStrictTypes())
+		value = ZendAssignToVariable(prop, value, executeData.IsCallUseStrictTypes())
 	}
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -42,7 +42,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDa
 		value = ZendAssignToTypedProp(prop_info, prop, value, executeData)
 		// ZvalPtrDtorNogc(free_op_data)
 	} else {
-		value = ZendAssignToVariable(prop, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+		value = ZendAssignToVariable(prop, value, executeData.IsCallUseStrictTypes())
 	}
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -69,7 +69,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDa
 		value = ZendAssignToTypedProp(prop_info, prop, value, executeData)
 		// ZvalPtrDtorNogc(free_op_data)
 	} else {
-		value = ZendAssignToVariable(prop, value, IS_VAR, executeData.IsCallUseStrictTypes())
+		value = ZendAssignToVariable(prop, value, executeData.IsCallUseStrictTypes())
 	}
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -93,7 +93,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CV_HANDLER(executeData *ZendExecuteDat
 	if prop_info.GetType() != 0 {
 		value = ZendAssignToTypedProp(prop_info, prop, value, executeData)
 	} else {
-		value = ZendAssignToVariable(prop, value, IS_CV, executeData.IsCallUseStrictTypes())
+		value = ZendAssignToVariable(prop, value, executeData.IsCallUseStrictTypes())
 	}
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)

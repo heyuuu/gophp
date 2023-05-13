@@ -219,7 +219,7 @@ func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *typ
 	/* Use IS_TMP_VAR instead of IS_VAR to avoid ISREF check */
 
 	// value_ptr.TryAddRefcount()
-	return ZendAssignToVariable(variable_ptr, value_ptr, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
+	return ZendAssignToVariable(variable_ptr, value_ptr, executeData.IsCallUseStrictTypes())
 }
 func ZendFormatType(type_ types.ZendType, part1 **byte, part2 **byte) {
 	if type_.AllowNull() {

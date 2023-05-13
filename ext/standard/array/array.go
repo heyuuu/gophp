@@ -889,11 +889,11 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 		} else {
 			thash = nil
 		}
-		if thash != nil && thash.IsRecursive() || value == destEntry && destEntry.IsReference() && destEntry.GetRefcount()%2 != 0 {
+		if thash != nil && thash.IsRecursive() || value == destEntry && destEntry.IsReference() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 			return 0
 		}
-		b.Assert(!(destEntry.IsReference()) || destEntry.GetRefcount() > 1)
+		//b.Assert(!(destEntry.IsReference()) || destEntry.GetRefcount() > 1)
 		types.SeparateZval(destEntry)
 		destZval = destEntry
 		if destZval.IsType(types.IS_NULL) {
@@ -927,9 +927,6 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 }
 func PhpArrayMerge(dest *types.Array, src *types.Array) {
 	src.Foreach(func(key types.ArrayKey, value *types.Zval) {
-		if value.IsReference() && value.GetRefcount() == 1 {
-			value = types.Z_REFVAL_P(value)
-		}
 		if key.IsStrKey() {
 			dest.KeyUpdate(key.StrKey(), value)
 		} else {
@@ -957,11 +954,10 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) bool {
 		destZval = destEntry.DeRef()
 
 		// src/dest 对应值均为 array 的情况下，递归替换
-		if destZval.Array().IsRecursive() || srcZval.Array().IsRecursive() || srcEntry.IsReference() && destEntry.IsReference() && srcEntry.Reference() == destEntry.Reference() && destEntry.GetRefcount()%2 != 0 {
+		if destZval.Array().IsRecursive() || srcZval.Array().IsRecursive() || srcEntry.IsReference() && destEntry.IsReference() && srcEntry.Reference() == destEntry.Reference() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 			return false
 		}
-		b.Assert(!(destEntry.IsReference()) || destEntry.GetRefcount() > 1)
 		types.SeparateZval(destEntry)
 		destZval = destEntry
 
@@ -996,9 +992,6 @@ func arrayMergeWrapper(args []*types.Zval, recursive bool) *types.Array {
 	arr := types.NewArray(count)
 
 	args[0].Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
-		if value.IsReference() && value.GetRefcount() == 1 {
-			value = types.Z_REFVAL_P(value)
-		}
 		if key.IsStrKey() {
 			arr.KeyUpdate(key.StrKey(), value)
 		} else {
@@ -1122,9 +1115,6 @@ func ZifArrayValues(array *types.Array) *types.Array {
 	/* Initialize return array */
 	values := types.NewArray(array.Len())
 	array.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
-		if entry.IsReference() && entry.GetRefcount() == 1 {
-			entry = types.Z_REFVAL_P(entry)
-		}
 		values.Append(entry)
 	})
 	return values
@@ -1362,9 +1352,6 @@ func ZifArrayUnique(arg *types.Array, _ zpp.Opt, flags *int) *types.Array {
 		arg.ForeachIndirect(func(key types.ArrayKey, val *types.Zval) {
 			var strVal = operators.ZvalGetStrVal(val)
 			if _, exists := existValues[strVal]; !exists {
-				if val.IsReference() && val.GetRefcount() == 1 {
-					val = val.DeRef()
-				}
 				retArr.Add(key, val)
 			}
 

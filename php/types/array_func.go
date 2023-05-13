@@ -595,18 +595,6 @@ convert:
 		} else {
 			strKey = strconv.Itoa(key.IdxKey())
 		}
-		for {
-			if zv.IsRefcounted() {
-				if zv.IsReference() && Z_REFCOUNT_P(zv) == 1 {
-					zv = Z_REFVAL_P(zv)
-					if !(zv.IsRefcounted()) {
-						break
-					}
-				}
-				//Z_ADDREF_P(zv)
-			}
-			break
-		}
 		newHt.KeyUpdate(strKey, zv)
 	})
 	return newHt
@@ -649,18 +637,6 @@ convert:
 		num_key = _p.GetH()
 		str_key = _p.GetKey()
 		zv = _z
-		for {
-			if zv.IsRefcounted() {
-				if zv.IsReference() && Z_REFCOUNT_P(zv) == 1 {
-					zv = Z_REFVAL_P(zv)
-					if !(zv.IsRefcounted()) {
-						break
-					}
-				}
-				//Z_ADDREF_P(zv)
-			}
-			break
-		}
 
 		/* Again, thank ArrayObject for `!str_key ||`. */
 

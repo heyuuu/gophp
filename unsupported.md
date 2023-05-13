@@ -42,3 +42,4 @@
 
 - 默认随机数直接使用了 golang 的 rand。影响 `lcg_value`、`mt_srand`、`srand`、`mt_rand`、`rand`
 - 因为并发性考虑，`putenv` 不再影响进程环境变量
+- `debug_zval_dump` 输出结果不再有引用计数(`refcount`)相关内容

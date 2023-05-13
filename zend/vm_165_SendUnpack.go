@@ -20,7 +20,7 @@ send_again:
 		var top *types.Zval
 		var name *types.String
 		ZendVmStackExtendCallFrame(&(executeData.GetCall()), arg_num-1, ht.Len())
-		if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && args.GetRefcount() > 1 {
+		if (opline.GetOp1Type() & (IS_VAR | IS_CV)) != 0 {
 			var i uint32
 			var separate int = 0
 
