@@ -48,6 +48,7 @@ func (zv *Zval) IsNotUndef() bool        { return zv.typ != IS_UNDEF }
 func (zv *Zval) IsNull() bool            { return zv.typ == IS_NULL }
 func (zv *Zval) IsFalse() bool           { return zv.typ == IS_FALSE }
 func (zv *Zval) IsTrue() bool            { return zv.typ == IS_TRUE }
+func (zv *Zval) IsBool() bool            { return zv.typ == IS_FALSE || zv.typ == IS_TRUE }
 func (zv *Zval) IsLong() bool            { return zv.typ == IS_LONG }
 func (zv *Zval) IsDouble() bool          { return zv.typ == IS_DOUBLE }
 func (zv *Zval) IsString() bool          { return zv.typ == IS_STRING }

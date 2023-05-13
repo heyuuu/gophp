@@ -553,7 +553,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 		if fci.GetObject() != nil {
 			call.SetPrevExecuteData(CurrEX())
 			EG__().SetCurrentExecuteData(call)
-			fci.GetObject().GetHandlers().GetCallMethod()(func_.GetFunctionName(), fci.GetObject(), call, fci.GetRetval())
+			fci.GetObject().CallMethod(func_.GetFunctionName(), fci.GetObject(), call, fci.GetRetval())
 			EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
 		} else {
 			faults.ThrowError(nil, "Cannot call overloaded function for non-object")

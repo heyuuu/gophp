@@ -106,7 +106,7 @@ func ZendFetchDimensionAddressRead(
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
 			dim++
 		}
-		retval = container.Object().GetHandlers().GetReadDimension()(container, dim, type_, result)
+		retval = container.Object().ReadDimension(container, dim, type_, result)
 		b.Assert(result != nil)
 		if retval != nil {
 			if result != retval {
@@ -180,7 +180,7 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 		offset = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	if container.IsObject() {
-		return container.Object().GetHandlers().GetHasDimension()(container, offset, 0)
+		return container.Object().HasDimension(container, offset, 0)
 	} else if container.IsString() {
 		var lval ZendLong
 		if offset.IsLong() {
@@ -217,7 +217,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 		offset = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	if container.IsObject() {
-		return !(container.Object().GetHandlers().GetHasDimension()(container, offset, 1))
+		return !(container.Object().HasDimension(container, offset, 1))
 	} else if container.IsString() {
 		var lval ZendLong
 		if offset.IsLong() {

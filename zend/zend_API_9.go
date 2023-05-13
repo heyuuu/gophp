@@ -110,14 +110,14 @@ func ZendUpdatePropertyEx(scope *types.ClassEntry, object *types.Zval, name stri
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
 	property := types.NewZvalString(name)
-	object.Object().GetHandlers().GetWriteProperty()(object, property, value, nil)
+	object.Object().WriteProperty(object, property, value, nil)
 	EG__().SetFakeScope(oldScope)
 }
 func ZendUnsetProperty(scope *types.ClassEntry, object *types.Zval, name string) {
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
 	property := types.NewZvalString(name)
-	object.Object().GetHandlers().GetUnsetProperty()(object, property, 0)
+	object.Object().UnsetProperty(object, property, 0)
 	EG__().SetFakeScope(oldScope)
 }
 func ZendReadPropertyEx(scope *types.ClassEntry, object *types.Zval, name *types.String, silent types.ZendBool, rv *types.Zval) *types.Zval {
@@ -127,7 +127,7 @@ func ZendReadProperty(scope *types.ClassEntry, object *types.Zval, name string, 
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
 	property := types.NewZvalString(name)
-	value := object.Object().GetHandlers().GetReadProperty()(object, property, b.Cond(silent != 0, BP_VAR_IS, BP_VAR_R), nil, rv)
+	value := object.Object().ReadProperty(object, property, b.Cond(silent != 0, BP_VAR_IS, BP_VAR_R), nil, rv)
 	EG__().SetFakeScope(oldScope)
 	return value
 }
@@ -199,7 +199,7 @@ func ZendIsCountable(countable *types.Zval) types.ZendBool {
 	case types.IS_ARRAY:
 		return 1
 	case types.IS_OBJECT:
-		if countable.Object().GetHandlers().GetCountElements() != nil {
+		if countable.Object().CanCountElements() {
 			return 1
 		}
 		return operators.InstanceofFunction(types.Z_OBJCE_P(countable), ZendCeCountable)

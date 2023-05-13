@@ -624,7 +624,7 @@ func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.String, k
 	if function_handler == nil {
 		if b.Assign(&function_handler, types.Z_OBJCE_P(zobj).FunctionTable().Get(method.GetStr())) == nil {
 			*zobject = zobj.Object()
-			function_handler = zobject.GetHandlers().GetGetMethod()(zobject, method, key)
+			function_handler = zobject.GetMethod(zobject, method, key)
 		} else {
 			*zobject = zobj.Object()
 		}
@@ -903,9 +903,9 @@ func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *ty
 	function_handler = zend.ZendStdGetMethod(object, method, key)
 	if function_handler == nil && intern.GetCe() != nil {
 		if b.Assign(&function_handler, intern.GetCe().FunctionTable().Get(method.GetStr())) == nil {
-			if intern.GetZobject().Object().GetHandlers().GetGetMethod() != nil {
+			if intern.GetZobject().Object().CanGetMethod() {
 				*object = intern.GetZobject().Object()
-				function_handler = object.GetHandlers().GetGetMethod()(object, method, key)
+				function_handler = object.GetMethod(object, method, key)
 			}
 		} else {
 			*object = intern.GetZobject().Object()

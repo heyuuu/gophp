@@ -156,8 +156,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 		break
 	case types.IS_OBJECT:
 		var properties *types.Array
-		var class_name *types.String = expr.Object().GetHandlers().GetGetClassName()(expr.Object())
-		ZendPrintf("%s Object (", class_name.GetVal())
+		ZendPrintf("%s Object (", expr.Object().ClassName())
 		// types.ZendStringReleaseEx(class_name, 0)
 		if expr.RefCounted().IsRecursive() {
 			ZEND_PUTS(" *RECURSION*")
@@ -197,9 +196,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		break
 	case types.IS_OBJECT:
 		var properties *types.Array
-		var class_name *types.String = expr.Object().GetHandlers().GetGetClassName()(expr.Object())
-		buf.AppendString(class_name.GetStr())
-		// types.ZendStringReleaseEx(class_name, 0)
+		buf.AppendString(expr.Object().ClassName())
 		buf.AppendString(" Object\n")
 		if expr.Object().IsRecursive() {
 			buf.AppendString(" *RECURSION*")

@@ -144,7 +144,7 @@ func HASH_OF(p *types.Zval) *types.Array {
 		return p.Array()
 	} else {
 		if p.IsObject() {
-			return p.Object().GetHandlers().GetGetProperties()(p)
+			return p.Object().GetPropertiesArray(p)
 		} else {
 			return nil
 		}

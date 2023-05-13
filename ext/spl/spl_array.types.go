@@ -41,7 +41,7 @@ func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry    { return thi
 func (this *SplArrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplArrayObject) GetStd() types.ZendObject { return this.std }
+func (this *SplArrayObject) GetStd() *types.ZendObject { return &this.std }
 
 /* SplArrayObject.ar_flags */
 func (this *SplArrayObject) AddArFlags(value int)      { this.ar_flags |= value }

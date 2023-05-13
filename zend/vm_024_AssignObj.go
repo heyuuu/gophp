@@ -79,7 +79,7 @@ assign_object:
 			}
 		}
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -166,7 +166,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -254,7 +254,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -341,7 +341,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -379,7 +379,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExec
 		}
 	}
 assign_object:
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -422,7 +422,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -466,7 +466,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -509,7 +509,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -547,7 +547,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteD
 		}
 	}
 assign_object:
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -588,7 +588,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -630,7 +630,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -671,7 +671,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -751,7 +751,7 @@ assign_object:
 			}
 		}
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -826,7 +826,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -902,7 +902,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -977,7 +977,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1003,7 +1003,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendE
 	property = opline.Op2()
 	value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 assign_object:
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1034,7 +1034,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1066,7 +1066,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1097,7 +1097,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1123,7 +1123,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 	property = opline.Cv2OrUndef()
 	value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 assign_object:
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1152,7 +1152,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1182,7 +1182,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1211,7 +1211,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1296,7 +1296,7 @@ assign_object:
 			}
 		}
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1379,7 +1379,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1463,7 +1463,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1546,7 +1546,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1580,7 +1580,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 		}
 	}
 assign_object:
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1619,7 +1619,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1659,7 +1659,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1698,7 +1698,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1732,7 +1732,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteDa
 		}
 	}
 assign_object:
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1769,7 +1769,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1807,7 +1807,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
@@ -1844,7 +1844,7 @@ assign_object:
 	{
 		value = types.ZVAL_DEREF(value)
 	}
-	value = object.Object().GetHandlers().GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+	value = object.Object().WriteProperty(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)

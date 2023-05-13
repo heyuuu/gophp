@@ -858,12 +858,10 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 				types.ZVAL_COPY(intern.GetArray(), array)
 			}
 		} else {
-			var handler zend.ZendObjectGetPropertiesT = array.Object().GetHandlers().GetGetProperties()
-			if handler != zend.ZendStdGetProperties {
-				faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Overloaded object of type %s is not compatible with %s", types.Z_OBJCE_P(array).GetName().GetVal(), intern.GetStd().GetCe().GetName().GetVal())
+			if !array.Object().IsStdGetProperties() {
+				faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Overloaded object of type %s is not compatible with %s", array.Object().GetCe().Name(), intern.GetStd().GetCe().Name())
 				return
 			}
-			// zend.ZvalPtrDtor(intern.GetArray())
 			types.ZVAL_COPY(intern.GetArray(), array)
 		}
 	}

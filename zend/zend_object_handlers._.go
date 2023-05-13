@@ -105,7 +105,7 @@ type ZendObjectCompareZvalsT func(result *types.Zval, op1 *types.Zval, op2 *type
  * readobj and retval must point to distinct zvals.
  */
 
-type ZendObjectCastT func(readobj *types.Zval, retval *types.Zval, type_ int) int
+type ZendObjectCastT func(readobj *types.Zval, retval *types.Zval, type_ types.ZvalType) int
 
 /* updates *count to hold the number of elements present and returns SUCCESS.
  * Returns FAILURE if the object does not have any sense of overloaded dimensions */
@@ -172,6 +172,5 @@ var StdObjectHandlersPtr *types.ObjectHandlers = types.NewObjectHandlers(types.O
 	GetClassName:      ZendStdGetClassName,
 	CompareObjects:    ZendStdCompareObjects,
 	CastObject:        ZendStdCastObjectTostring,
-	GetDebugInfo:      ZendStdGetDebugInfo,
 	GetClosure:        ZendStdGetClosure,
 })

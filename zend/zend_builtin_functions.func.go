@@ -325,11 +325,11 @@ repeat:
 		}
 	case types.IS_OBJECT:
 		if val_free.IsUndef() {
-			if value.Object().GetHandlers().GetGet() != nil {
-				value = value.Object().GetHandlers().GetGet()(value, &val_free)
+			if value.Object().CanGet() {
+				value = value.Object().Get(value, &val_free)
 				goto repeat
-			} else if value.Object().GetHandlers().GetCastObject() != nil {
-				if value.Object().GetHandlers().GetCastObject()(value, &val_free, types.IS_STRING) == types.SUCCESS {
+			} else if value.Object().CanCast() {
+				if value.Object().Cast(value, &val_free, types.IS_STRING) == types.SUCCESS {
 					value = &val_free
 					break
 				}
@@ -551,7 +551,7 @@ func ZifGetClassVars(executeData zpp.Ex, return_value zpp.Ret, className *types.
 	}
 }
 func ZifGetObjectVars(obj zpp.Object) (*types.Array, bool) {
-	properties := obj.Object().GetHandlers().GetGetProperties()(obj)
+	properties := obj.Object().GetPropertiesArray(obj)
 	if properties == nil {
 		return nil, false
 	}
@@ -616,7 +616,7 @@ func ZifGetMangledObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *type
 		}
 		break
 	}
-	properties = obj.Object().GetHandlers().GetGetProperties()(obj)
+	properties = obj.Object().GetPropertiesArray(obj)
 	if properties == nil {
 		return_value.SetEmptyArray()
 		return
@@ -704,7 +704,7 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 	}
 	if klass.IsObject() {
 		var obj = klass.Object()
-		func_ = klass.Object().GetHandlers().GetGetMethod()(&obj, method_name, nil)
+		func_ = klass.Object().GetMethod(&obj, method_name, nil)
 		if func_ != nil {
 			if func_.IsCallViaTrampoline() {
 
@@ -754,7 +754,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 		return
 	}
 	property_z.SetString(property)
-	if object.IsObject() && object.Object().GetHandlers().GetHasProperty()(object, &property_z, 2, nil) != 0 {
+	if object.IsObject() && object.Object().HasProperty(object, &property_z, 2, nil) != 0 {
 		return_value.SetTrue()
 		return
 	}
@@ -1254,13 +1254,11 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	var func_ types.IFunction
 	var function_name *byte
 	var filename *byte
-	var class_name *types.String = nil
-	var call_type *byte
+	var class_name string = ""
+	var call_type string = ""
 	var include_filename *byte = nil
 	var arg_array types.Zval
 	var indent = 0
-	var options = 0
-	var limit = 0
 	if ZendParseParameters(executeData.NumArgs(), "|ll", &options, &limit) == types.FAILURE {
 		return
 	}
@@ -1273,7 +1271,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	ptr = ptr.GetPrevExecuteData()
 	for ptr != nil && (limit == 0 || frameno < limit) {
 		frameno++
-		class_name = nil
+		class_name = ""
 		call_type = nil
 		arg_array.SetUndef()
 		ptr = ZendGeneratorCheckPlaceholderFrame(ptr)
@@ -1327,19 +1325,17 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		if function_name != nil {
 			if object != nil {
 				if func_.GetScope() != nil {
-					class_name = func_.GetScope().GetName()
-				} else if object.GetHandlers().GetGetClassName() == ZendStdGetClassName {
-					class_name = object.GetCe().GetName()
+					class_name = func_.GetScope().Name()
 				} else {
-					class_name = object.GetHandlers().GetGetClassName()(object)
+					class_name = object.ClassName()
 				}
 				call_type = "->"
 			} else if func_.GetScope() != nil {
-				class_name = func_.GetScope().GetName()
+				class_name = func_.GetScope().Name()
 				call_type = "::"
 			} else {
-				class_name = nil
-				call_type = nil
+				class_name = ""
+				call_type = ""
 			}
 			if func_.GetType() != ZEND_EVAL_CODE {
 				if (options & DEBUG_BACKTRACE_IGNORE_ARGS) == 0 {
@@ -1386,12 +1382,9 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			call_type = nil
 		}
 		ZendPrintf("#%-2d ", indent)
-		if class_name != nil {
-			ZEND_PUTS(class_name.GetStr())
+		if class_name != "" {
+			ZEND_PUTS(class_name)
 			ZEND_PUTS(call_type)
-			if object != nil && func_.GetScope() == nil && object.GetHandlers().GetGetClassName() != ZendStdGetClassName {
-				// types.ZendStringReleaseEx(class_name, 0)
-			}
 		}
 		ZendPrintf("%s(", function_name)
 		if arg_array.IsNotUndef() {
@@ -1540,10 +1533,8 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 			if object != nil {
 				if func_.GetScope() != nil {
 					tmp.SetStringCopy(func_.GetScope().GetName())
-				} else if object.GetHandlers().GetGetClassName() == ZendStdGetClassName {
-					tmp.SetStringCopy(object.GetCe().GetName())
 				} else {
-					tmp.SetString(object.GetHandlers().GetGetClassName()(object))
+					tmp.SetStringVal(object.ClassName())
 				}
 				stack_frame.Array().KeyAddNew(types.STR_CLASS, &tmp)
 				if (options & DEBUG_BACKTRACE_PROVIDE_OBJECT) != 0 {

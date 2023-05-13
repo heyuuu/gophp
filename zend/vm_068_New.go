@@ -29,7 +29,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		result.SetUndef()
 		return 0
 	}
-	constructor = result.Object().GetHandlers().GetGetConstructor()(result.Object())
+	constructor = result.Object().GetConstructor(result.Object())
 	if constructor == nil {
 		if EG__().GetException() != nil {
 			return 0
@@ -78,7 +78,7 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		result.SetUndef()
 		return 0
 	}
-	constructor = result.Object().GetHandlers().GetGetConstructor()(result.Object())
+	constructor = result.Object().GetConstructor(result.Object())
 	if constructor == nil {
 		if EG__().GetException() != nil {
 			return 0
@@ -133,7 +133,7 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		result.SetUndef()
 		return 0
 	}
-	constructor = result.Object().GetHandlers().GetGetConstructor()(result.Object())
+	constructor = result.Object().GetConstructor(result.Object())
 	if constructor == nil {
 		if EG__().GetException() != nil {
 			return 0

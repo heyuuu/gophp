@@ -316,7 +316,7 @@ func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecu
 	var called_scope *types.ClassEntry
 	var object *types.ZendObject
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
-	if function.Object().GetHandlers().GetGetClosure() != nil && function.Object().GetHandlers().GetGetClosure()(function, &called_scope, &fbc, &object) == types.SUCCESS {
+	if function.Object().CanGetClosure() && function.Object().GetClosure(function, &called_scope, &fbc, &object) == types.SUCCESS {
 		object_or_called_scope = called_scope
 		if fbc.IsClosure() {
 
@@ -393,7 +393,7 @@ func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecu
 			object_or_called_scope = called_scope
 		} else {
 			var object *types.ZendObject = obj.Object()
-			fbc = obj.Object().GetHandlers().GetGetMethod()(&object, method.String(), nil)
+			fbc = obj.Object().GetMethod(&object, method.String(), nil)
 			if fbc == nil {
 				if EG__().GetException() == nil {
 					ZendUndefinedMethod(object.GetCe(), method.String())

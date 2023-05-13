@@ -170,7 +170,7 @@ func UserfilterFilter(
 	 * from being destroyed properly */
 
 	zpropname.SetStringVal("stream")
-	obj.Object().GetHandlers().GetUnsetProperty()(obj, &zpropname, nil)
+	obj.Object().UnsetProperty(obj, &zpropname, nil)
 	// zend.ZvalPtrDtor(&zpropname)
 	// zend.ZvalPtrDtor(&args[3])
 	// zend.ZvalPtrDtor(&args[2])

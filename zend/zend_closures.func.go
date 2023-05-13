@@ -389,82 +389,6 @@ func ZendClosureGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr 
 	}
 	return types.SUCCESS
 }
-func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
-	var closure *ZendClosure = (*ZendClosure)(object.Object())
-	var val types.Zval
-	var arg_info *ZendArgInfo = closure.GetFunc().GetArgInfo()
-	var debug_info *types.Array
-	var zstr_args types.ZendBool = closure.GetFunc().GetType() == ZEND_USER_FUNCTION || closure.GetFunc().IsUserArgInfo()
-	*is_temp = 1
-	debug_info = types.NewArray(8)
-	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION && closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
-		var var_ *types.Zval
-		var static_variables *types.Array = closure.GetFunc().GetOpArray().GetStaticVariablesPtr()
-		val.SetArray(types.ZendArrayDup(static_variables))
-		debug_info.KeyUpdate(types.STR_STATIC, &val)
-		var __ht *types.Array = val.Array()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			var_ = _z
-			if var_.IsConstantAst() {
-				// ZvalPtrDtor(var_)
-				var_.SetStringVal("<constant ast>")
-			}
-		}
-	}
-	if closure.GetThisPtr().IsNotUndef() {
-		//closure.GetThisPtr().AddRefcount()
-		debug_info.KeyUpdate(types.STR_THIS, closure.GetThisPtr())
-	}
-	if arg_info != nil && (closure.GetFunc().GetNumArgs() != 0 || closure.GetFunc().IsVariadic()) {
-		var i uint32
-		var num_args uint32
-		var required uint32 = closure.GetFunc().GetRequiredNumArgs()
-		ArrayInit(&val)
-		num_args = closure.GetFunc().GetNumArgs()
-		if closure.GetFunc().IsVariadic() {
-			num_args++
-		}
-		for i = 0; i < num_args; i++ {
-			var name string
-			var info types.Zval
-			if arg_info.GetName() != nil {
-				if zstr_args != 0 {
-					name = ZendSprintf("%s$%s", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), arg_info.GetName().GetVal())
-				} else {
-					name = ZendSprintf("%s$%s", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), (*ArgInfo)(arg_info).Name())
-				}
-			} else {
-				name = ZendSprintf("%s$param%d", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), i+1)
-			}
-			info.SetStringVal(ZendSprintf("%s", b.Cond(i >= required, "<optional>", "<required>")))
-			val.Array().KeyUpdate(name, &info)
-			// types.ZendStringReleaseEx(name, 0)
-			arg_info++
-		}
-		debug_info.KeyUpdate("parameter", &val)
-	}
-	return debug_info
-}
-func ZendClosureGetGc(obj *types.Zval, table **types.Zval, n *int) *types.Array {
-	var closure *ZendClosure = (*ZendClosure)(obj.Object())
-	if closure.GetThisPtr().GetType() != types.IS_NULL {
-		*table = closure.GetThisPtr()
-	} else {
-		*table = nil
-	}
-	if closure.GetThisPtr().GetType() != types.IS_NULL {
-		*n = 1
-	} else {
-		*n = 0
-	}
-	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION {
-		return closure.GetFunc().GetOpArray().GetStaticVariablesPtr()
-	} else {
-		return nil
-	}
-}
 func zim_Closure___construct(executeData *ZendExecuteData, return_value *types.Zval) {
 	faults.ThrowError(nil, "Instantiation of 'Closure' is not allowed")
 }
@@ -486,7 +410,6 @@ func ZendRegisterClosureCe() {
 		UnsetProperty:     ZendClosureUnsetProperty,
 		CompareObjects:    ZendClosureCompareObjects,
 		CloneObj:          ZendClosureClone,
-		GetDebugInfo:      ZendClosureGetDebugInfo,
 		GetClosure:        ZendClosureGetClosure,
 	})
 }

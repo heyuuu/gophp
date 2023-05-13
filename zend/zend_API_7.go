@@ -271,7 +271,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 				call_via_handler = 1
 				retval = 1
 			} else {
-				fcc.SetFunctionHandler(fcc.GetObject().GetHandlers().GetGetMethod()(fcc.GetObject(), mname, nil))
+				fcc.SetFunctionHandler(fcc.GetObject().GetMethod(fcc.GetObject(), mname, nil))
 				if fcc.GetFunctionHandler() != nil {
 					if strict_class != 0 && (fcc.GetFunctionHandler().GetScope() == nil || operators.InstanceofFunction(ce_org, fcc.GetFunctionHandler().GetScope()) == 0) {
 						ZendReleaseFcallInfoCache(fcc)
@@ -410,7 +410,7 @@ try_again:
 		var calling_scope *types.ClassEntry
 		var fptr types.IFunction
 		var object *types.ZendObject
-		if callable.Object().GetHandlers().GetGetClosure() != nil && callable.Object().GetHandlers().GetGetClosure()(callable, &calling_scope, &fptr, &object) == types.SUCCESS {
+		if callable.Object().CanGetClosure() && callable.Object().GetClosure(callable, &calling_scope, &fptr, &object) == types.SUCCESS {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(callable)
 			var callable_name *types.String = types.ZendStringAlloc(ce.GetName().GetLen()+b.SizeOf("\"::__invoke\"")-1, 0)
 			memcpy(callable_name.GetVal(), ce.GetName().GetVal(), ce.GetName().GetLen())

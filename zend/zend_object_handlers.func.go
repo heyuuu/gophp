@@ -79,36 +79,6 @@ func ZendStdGetProperties(object *types.Zval) *types.Array {
 	}
 	return zobj.GetProperties()
 }
-func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
-	var ce *types.ClassEntry = types.Z_OBJCE_P(object)
-	var retval types.Zval
-	var ht *types.Array
-	if ce.GetDebugInfo() == nil {
-		*is_temp = 0
-		return object.Object().GetHandlers().GetGetProperties()(object)
-	}
-	ZendCallMethodWith0Params(object, ce, ce.GetDebugInfo(), ZEND_DEBUGINFO_FUNC_NAME, &retval)
-	if retval.IsArray() {
-		if !(retval.IsRefcounted()) {
-			*is_temp = 1
-			return types.ZendArrayDup(retval.Array())
-		} else if retval.GetRefcount() <= 1 {
-			*is_temp = 1
-			ht = retval.Array()
-			return ht
-		} else {
-			*is_temp = 0
-			// ZvalPtrDtor(&retval)
-			return retval.Array()
-		}
-	} else if retval.IsNull() {
-		*is_temp = 1
-		ht = types.NewArray(0)
-		return ht
-	}
-	faults.ErrorNoreturn(faults.E_ERROR, ZEND_DEBUGINFO_FUNC_NAME+"() must return an array")
-	return nil
-}
 func ZendStdCallGetter(zobj *types.ZendObject, prop_name *types.String, retval *types.Zval) {
 	var ce *types.ClassEntry = zobj.GetCe()
 	var orig_fake_scope *types.ClassEntry = EG__().GetFakeScope()
@@ -1517,10 +1487,10 @@ exit:
 func ZendStdGetClassName(zobj *types.ZendObject) *types.String {
 	return zobj.GetCe().GetName().Copy()
 }
-func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, type_ int) int {
+func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, typ types.ZvalType) int {
 	var retval types.Zval
 	var ce *types.ClassEntry
-	switch type_ {
+	switch typ {
 	case types.IS_STRING:
 		ce = types.Z_OBJCE_P(readobj)
 		if ce.GetTostring() != nil {
@@ -1584,14 +1554,6 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ar
 	var ht *types.Array
 	switch purpose {
 	case ZEND_PROP_PURPOSE_DEBUG:
-		if obj.Object().GetHandlers().GetGetDebugInfo() != nil {
-			var is_temp int
-			ht = obj.Object().GetHandlers().GetGetDebugInfo()(obj, &is_temp)
-			if ht != nil && is_temp == 0 && (ht.GetGcFlags()&types.GC_IMMUTABLE) == 0 {
-				// 				ht.AddRefcount()
-			}
-			return ht
-		}
 		fallthrough
 	case ZEND_PROP_PURPOSE_ARRAY_CAST:
 		fallthrough
@@ -1602,7 +1564,7 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ar
 	case ZEND_PROP_PURPOSE_JSON:
 		fallthrough
 	case _ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
-		ht = obj.Object().GetHandlers().GetGetProperties()(obj)
+		ht = obj.Object().GetPropertiesArray(obj)
 		return ht
 	default:
 		b.Assert(false)
@@ -1610,8 +1572,8 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ar
 	}
 }
 func ZendGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Array {
-	if obj.Object().GetHandlers().GetGetPropertiesFor() != nil {
-		return obj.Object().GetHandlers().GetGetPropertiesFor()(obj, purpose)
+	if obj.Object().CanGetPropertiesFor() {
+		return obj.Object().GetPropertiesFor(obj, purpose)
 	}
 	return ZendStdGetPropertiesFor(obj, purpose)
 }

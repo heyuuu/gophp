@@ -66,7 +66,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			if offset.GetU2Extra() == ZEND_EXTRA_VALUE {
 				offset++
 			}
-			container.Object().GetHandlers().GetUnsetDimension()(container, offset)
+			container.Object().UnsetDimension(container, offset)
 		} else if container.IsString() {
 			faults.ThrowError(nil, "Cannot unset string offsets")
 		}
@@ -150,7 +150,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			offset = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if container.IsObject() {
-			container.Object().GetHandlers().GetUnsetDimension()(container, offset)
+			container.Object().UnsetDimension(container, offset)
 		} else if container.IsString() {
 			faults.ThrowError(nil, "Cannot unset string offsets")
 		}
@@ -234,7 +234,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			offset = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if container.IsObject() {
-			container.Object().GetHandlers().GetUnsetDimension()(container, offset)
+			container.Object().UnsetDimension(container, offset)
 		} else if container.IsString() {
 			faults.ThrowError(nil, "Cannot unset string offsets")
 		}
@@ -304,7 +304,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			if offset.GetU2Extra() == ZEND_EXTRA_VALUE {
 				offset++
 			}
-			container.Object().GetHandlers().GetUnsetDimension()(container, offset)
+			container.Object().UnsetDimension(container, offset)
 		} else if container.IsString() {
 			faults.ThrowError(nil, "Cannot unset string offsets")
 		}
@@ -384,7 +384,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			offset = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if container.IsObject() {
-			container.Object().GetHandlers().GetUnsetDimension()(container, offset)
+			container.Object().UnsetDimension(container, offset)
 		} else if container.IsString() {
 			faults.ThrowError(nil, "Cannot unset string offsets")
 		}
@@ -464,7 +464,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			offset = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if container.IsObject() {
-			container.Object().GetHandlers().GetUnsetDimension()(container, offset)
+			container.Object().UnsetDimension(container, offset)
 		} else if container.IsString() {
 			faults.ThrowError(nil, "Cannot unset string offsets")
 		}

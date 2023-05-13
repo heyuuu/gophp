@@ -53,7 +53,7 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype uint8) bool {
 func Z_OBJCE(zval Zval) *ClassEntry    { return zval.Object().GetCe() }
 func Z_OBJCE_P(zval *Zval) *ClassEntry { return zval.Object().GetCe() }
 func Z_OBJPROP(zval Zval) *Array {
-	return zval.Object().GetHandlers().GetGetProperties()(&zval)
+	return zval.Object().GetPropertiesArray(&zval)
 }
 func Z_OBJPROP_P(zval_p *Zval) *Array       { return Z_OBJPROP(*zval_p) }
 func Z_REFVAL(zval Zval) *Zval              { return zval.Reference().GetVal() }

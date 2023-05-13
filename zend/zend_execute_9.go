@@ -97,7 +97,7 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 	object = call.GetThis().Object()
 	ret.SetNull()
 	EG__().SetCurrentExecuteData(call)
-	object.GetHandlers().GetCallMethod()(fbc.GetFunctionName(), object, call, ret)
+	object.CallMethod(fbc.GetFunctionName(), object, call, ret)
 	EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
 	ZendVmStackFreeArgs(call)
 	if fbc.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {

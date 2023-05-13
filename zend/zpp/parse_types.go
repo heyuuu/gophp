@@ -179,28 +179,23 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 	} else if arg.IsString() {
 		return arg.String(), true
 	} else if arg.IsObject() {
-		handlers := arg.Object().GetHandlers()
-		if castFunc := handlers.GetCastObject(); castFunc != nil {
+		if arg.Object().CanCast() {
 			var obj types.Zval
-			if castFunc(arg, &obj, types.IS_STRING) == types.SUCCESS {
-				// zend.ZvalPtrDtor(arg)
+			if arg.Object().Cast(arg, &obj, types.IS_STRING) == types.SUCCESS {
 				types.ZVAL_COPY_VALUE(arg, &obj)
 				return arg.String(), true
 			}
-		} else if getFunc := handlers.GetGet(); getFunc != nil {
+		} else if arg.Object().CanGet() {
 			var rv types.Zval
-			var z *types.Zval = getFunc(arg, &rv)
+			var z *types.Zval = arg.Object().Get(arg, &rv)
 			if z.GetType() != types.IS_OBJECT {
-				// zend.ZvalPtrDtor(arg)
 				if z.IsString() {
 					arg.CopyValueFrom(z)
 				} else {
 					arg.SetString(operators.ZvalGetString(z))
-					// zend.ZvalPtrDtor(z)
 				}
 				return arg.String(), true
 			}
-			// zend.ZvalPtrDtor(z)
 		}
 		return nil, false
 	} else {
@@ -248,7 +243,7 @@ func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool)
 			}
 			arg.Object().SetProperties(types.ZendArrayDup(arg.Object().GetProperties()))
 		}
-		return arg.Object().GetHandlers().GetGetProperties()(arg), true
+		return arg.Object().GetPropertiesArray(arg), true
 	} else if checkNull && arg.IsNull() {
 		return nil, true
 	} else {

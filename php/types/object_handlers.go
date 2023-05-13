@@ -61,7 +61,6 @@ type ObjectHandlers struct {
 	compareObjects    zend.ZendObjectCompareT
 	castObject        zend.ZendObjectCastT
 	countElements     zend.ZendObjectCountElementsT
-	getDebugInfo      zend.ZendObjectGetDebugInfoT
 	getClosure        zend.ZendObjectGetClosureT
 	doOperation       zend.ZendObjectDoOperationT
 	compare           zend.ZendObjectCompareZvalsT
@@ -93,7 +92,6 @@ func NewObjectHandlers(s ObjectHandlersSetting) *ObjectHandlers {
 		compareObjects:    s.CompareObjects,
 		castObject:        s.CastObject,
 		countElements:     s.CountElements,
-		getDebugInfo:      s.GetDebugInfo,
 		getClosure:        s.GetClosure,
 		doOperation:       s.DoOperation,
 		compare:           s.Compare,
@@ -103,49 +101,4 @@ func NewObjectHandlers(s ObjectHandlersSetting) *ObjectHandlers {
 func NewObjectHandlersEx(base *ObjectHandlers, s ObjectHandlersSetting) *ObjectHandlers {
 	// todo settings 覆盖 base 产生新 handlers，后续用接口替换
 	panic("todo")
-}
-
-func (this *ObjectHandlers) GetReadProperty() zend.ZendObjectReadPropertyT { return this.readProperty }
-func (this *ObjectHandlers) GetWriteProperty() zend.ZendObjectWritePropertyT {
-	return this.writeProperty
-}
-func (this *ObjectHandlers) GetReadDimension() zend.ZendObjectReadDimensionT {
-	return this.readDimension
-}
-func (this *ObjectHandlers) GetWriteDimension() zend.ZendObjectWriteDimensionT {
-	return this.writeDimension
-}
-func (this *ObjectHandlers) GetGetPropertyPtrPtr() zend.ZendObjectGetPropertyPtrPtrT {
-	return this.getPropertyPtrPtr
-}
-func (this *ObjectHandlers) GetGet() zend.ZendObjectGetT                 { return this.get }
-func (this *ObjectHandlers) GetSet() zend.ZendObjectSetT                 { return this.set }
-func (this *ObjectHandlers) GetHasProperty() zend.ZendObjectHasPropertyT { return this.hasProperty }
-func (this *ObjectHandlers) GetUnsetProperty() zend.ZendObjectUnsetPropertyT {
-	return this.unsetProperty
-}
-func (this *ObjectHandlers) GetHasDimension() zend.ZendObjectHasDimensionT { return this.hasDimension }
-func (this *ObjectHandlers) GetUnsetDimension() zend.ZendObjectUnsetDimensionT {
-	return this.unsetDimension
-}
-func (this *ObjectHandlers) GetGetProperties() zend.ZendObjectGetPropertiesT {
-	return this.getProperties
-}
-func (this *ObjectHandlers) GetGetMethod() zend.ZendObjectGetMethodT   { return this.getMethod }
-func (this *ObjectHandlers) GetCallMethod() zend.ZendObjectCallMethodT { return this.callMethod }
-func (this *ObjectHandlers) GetGetConstructor() zend.ZendObjectGetConstructorT {
-	return this.getConstructor
-}
-func (this *ObjectHandlers) GetGetClassName() zend.ZendObjectGetClassNameT { return this.getClassName }
-func (this *ObjectHandlers) GetCompareObjects() zend.ZendObjectCompareT    { return this.compareObjects }
-func (this *ObjectHandlers) GetCastObject() zend.ZendObjectCastT           { return this.castObject }
-func (this *ObjectHandlers) GetCountElements() zend.ZendObjectCountElementsT {
-	return this.countElements
-}
-func (this *ObjectHandlers) GetGetDebugInfo() zend.ZendObjectGetDebugInfoT { return this.getDebugInfo }
-func (this *ObjectHandlers) GetGetClosure() zend.ZendObjectGetClosureT     { return this.getClosure }
-func (this *ObjectHandlers) GetDoOperation() zend.ZendObjectDoOperationT   { return this.doOperation }
-func (this *ObjectHandlers) GetCompare() zend.ZendObjectCompareZvalsT      { return this.compare }
-func (this *ObjectHandlers) GetGetPropertiesFor() zend.ZendObjectGetPropertiesForT {
-	return this.getPropertiesFor
 }
