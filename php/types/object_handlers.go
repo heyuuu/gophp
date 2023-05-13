@@ -105,7 +105,6 @@ func NewObjectHandlersEx(base *ObjectHandlers, s ObjectHandlersSetting) *ObjectH
 	panic("todo")
 }
 
-func (this *ObjectHandlers) GetCloneObj() zend.ZendObjectCloneObjT         { return this.cloneObj }
 func (this *ObjectHandlers) GetReadProperty() zend.ZendObjectReadPropertyT { return this.readProperty }
 func (this *ObjectHandlers) GetWriteProperty() zend.ZendObjectWritePropertyT {
 	return this.writeProperty

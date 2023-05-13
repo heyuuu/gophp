@@ -1,7 +1,8 @@
 package types
 
 import (
-	"github.com/heyuuu/gophp/zend"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/types"
 	"runtime"
 )
 
@@ -57,7 +58,11 @@ func (o *ZendObject) SetProperties(value *Array)        { o.properties = value }
 func (o *ZendObject) GetPropertiesTable() []Zval        { return o.propertiesTable }
 
 // object handlers
-func (o *ZendObject) FreeObj() { o.handlers.freeObj(o) }
-func (o *ZendObject) DtorObj() { o.handlers.dtorObj(o) }
+func (o *ZendObject) Free() { o.handlers.freeObj(o) }
+func (o *ZendObject) Dtor() { o.handlers.dtorObj(o) }
 
-func (o *ZendObject) GetDtorObj() zend.ZendObjectDtorObjT { return o.handlers.dtorObj }
+func (o *ZendObject) CanClone() bool { return o.handlers.cloneObj != nil }
+func (o *ZendObject) Clone(zv *types.Zval) *ZendObject {
+	b.Assert(o.handlers.cloneObj != nil)
+	return o.handlers.cloneObj(zv)
+}

@@ -12,12 +12,12 @@ func ObjectAutoFree(object *ZendObject) {
 	// 调用 Dtor 方法
 	if (object.GetGcFlags() & IS_OBJ_DESTRUCTOR_CALLED) == 0 {
 		object.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
-		object.DtorObj()
+		object.Dtor()
 	}
 
 	// 调用 Free 方法
 	if (object.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
 		object.AddGcFlags(IS_OBJ_FREE_CALLED)
-		object.FreeObj()
+		object.Free()
 	}
 }
