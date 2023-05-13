@@ -854,7 +854,7 @@ func ZmStartupSplObserver(type_ int, module_number int) int {
 	spl_ce_SplSubject = zend.RegisterInternalInterface("SplSubject", spl_funcs_SplSubject)
 	spl_ce_SplObjectStorage = zend.RegisterClass("SplObjectStorage", spl_SplObjectStorage_new, spl_funcs_SplObjectStorage)
 
-	spl_handler_SplObjectStorage = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+	spl_handler_SplObjectStorage = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:         int((*byte)(&((*spl_SplObjectStorage)(nil).GetStd())) - (*byte)(nil)),
 		CompareObjects: SplObjectStorageCompareObjects,
 		CloneObj:       SplObjectStorageClone,

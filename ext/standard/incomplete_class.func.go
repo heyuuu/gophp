@@ -56,7 +56,7 @@ func PhpCreateIncompleteObject(class_type *types.ClassEntry) *types.ZendObject {
 	return object
 }
 func PhpCreateIncompleteClass() *types.ClassEntry {
-	PhpIncompleteObjectHandlers = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+	PhpIncompleteObjectHandlers = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		ReadProperty:      IncompleteClassGetProperty,
 		HasProperty:       IncompleteClassHasProperty,
 		UnsetProperty:     IncompleteClassUnsetProperty,

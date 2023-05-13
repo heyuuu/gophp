@@ -1101,7 +1101,7 @@ func ZendRegisterGeneratorCe() {
 
 	ZendClassImplements(ZendCeGenerator, 1, ZendCeIterator)
 	ZendCeGenerator.SetGetIterator(ZendGeneratorGetIterator)
-	ZendGeneratorHandlers = *NewObjectHandlersEx(StdObjectHandlersPtr, ObjectHandlersSetting{
+	ZendGeneratorHandlers = *types.NewObjectHandlersEx(StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		FreeObj:        ZendGeneratorFreeStorage,
 		DtorObj:        ZendGeneratorDtorStorage,
 		CloneObj:       nil,

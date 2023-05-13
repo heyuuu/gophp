@@ -9,7 +9,7 @@ var spl_ce_SplDoublyLinkedList *types.ClassEntry
 var spl_ce_SplQueue *types.ClassEntry
 var spl_ce_SplStack *types.ClassEntry
 
-var spl_handler_SplDoublyLinkedList zend.ObjectHandlers
+var spl_handler_SplDoublyLinkedList types.ObjectHandlers
 
 const SPL_DLLIST_IT_DELETE = 0x1
 const SPL_DLLIST_IT_LIFO = 0x2

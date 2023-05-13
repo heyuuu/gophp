@@ -475,7 +475,7 @@ func ZendRegisterClosureCe() {
 	ZendCeClosure.SetSerialize(ZendClassSerializeDeny)
 	ZendCeClosure.SetUnserialize(ZendClassUnserializeDeny)
 
-	ClosureHandlers = *NewObjectHandlersEx(StdObjectHandlersPtr, ObjectHandlersSetting{
+	ClosureHandlers = *types.NewObjectHandlersEx(StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		FreeObj:           ZendClosureFreeStorage,
 		GetConstructor:    ZendClosureGetConstructor,
 		GetMethod:         ZendClosureGetMethod,

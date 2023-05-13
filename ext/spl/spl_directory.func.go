@@ -2296,7 +2296,7 @@ func ZmStartupSplDirectory(type_ int, module_number int) int {
 	spl_ce_SplFileInfo = zend.RegisterClass("SplFileInfo", SplFilesystemObjectNew, spl_SplFileInfo_functions)
 	spl_ce_SplFileInfo.SetSerialize(zend.ZendClassSerializeDeny)
 	spl_ce_SplFileInfo.SetUnserialize(zend.ZendClassUnserializeDeny)
-	SplFilesystemObjectHandlers = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+	SplFilesystemObjectHandlers = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:     (*byte)(&((*SplFilesystemObject)(nil).GetStd())) - (*byte)(nil),
 		CloneObj:   SplFilesystemObjectClone,
 		CastObject: SplFilesystemObjectCast,
@@ -2324,7 +2324,7 @@ func ZmStartupSplDirectory(type_ int, module_number int) int {
 	spl_ce_FilesystemIterator.SetGetIterator(SplFilesystemTreeGetIterator)
 	spl_ce_RecursiveDirectoryIterator = zend.RegisterSubClass(spl_ce_FilesystemIterator, "RecursiveDirectoryIterator", SplFilesystemObjectNew, spl_RecursiveDirectoryIterator_functions)
 	zend.ZendClassImplements(spl_ce_RecursiveDirectoryIterator, 1, spl_ce_RecursiveIterator)
-	SplFilesystemObjectCheckHandlers = *zend.NewObjectHandlersEx(&SplFilesystemObjectHandlers, zend.ObjectHandlersSetting{
+	SplFilesystemObjectCheckHandlers = *types.NewObjectHandlersEx(&SplFilesystemObjectHandlers, types.ObjectHandlersSetting{
 		CloneObj:  nil,
 		GetMethod: SplFilesystemObjectGetMethodCheck,
 	})

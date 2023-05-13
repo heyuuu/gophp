@@ -7,7 +7,7 @@ import (
 
 var spl_ce_SplFixedArray *types.ClassEntry
 
-var spl_handler_SplFixedArray zend.ObjectHandlers
+var spl_handler_SplFixedArray types.ObjectHandlers
 
 const SPL_FIXEDARRAY_OVERLOADED_REWIND = 0x1
 const SPL_FIXEDARRAY_OVERLOADED_VALID = 0x2

@@ -23,7 +23,7 @@ var ZendCeArgumentCountError *types.ClassEntry
 var ZendCeArithmeticError *types.ClassEntry
 var ZendCeDivisionByZeroError *types.ClassEntry
 
-var DefaultExceptionHandlers zend.ObjectHandlers
+var DefaultExceptionHandlers types.ObjectHandlers
 
 var ZendFuncsThrowable []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("getMessage", zend.AccPublic|zend.AccAbstract, nil, nil),
@@ -635,7 +635,7 @@ func RegisterDefaultException() {
 	ZendCeThrowable = zend.RegisterInternalInterface("Throwable", ZendFuncsThrowable)
 	ZendCeThrowable.SetInterfaceGetsImplemented(ZendImplementThrowable)
 
-	DefaultExceptionHandlers = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+	DefaultExceptionHandlers = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		CloneObj: nil,
 	})
 

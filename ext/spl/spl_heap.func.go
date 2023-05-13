@@ -756,7 +756,7 @@ func ZmStartupSplHeap(type_ int, module_number int) int {
 	spl_ce_SplHeap = zend.RegisterClass("SplHeap", SplHeapObjectNew, spl_funcs_SplHeap)
 	memcpy(&spl_handler_SplHeap, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 
-	spl_handler_SplHeap = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+	spl_handler_SplHeap = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:        int((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:      SplHeapObjectClone,
 		CountElements: SplHeapObjectCountElements,
@@ -772,7 +772,7 @@ func ZmStartupSplHeap(type_ int, module_number int) int {
 	spl_ce_SplMinHeap.SetGetIterator(SplHeapGetIterator)
 
 	spl_ce_SplPriorityQueue = zend.RegisterClass("SplPriorityQueue", SplHeapObjectNew, spl_funcs_SplPriorityQueue)
-	spl_handler_SplPriorityQueue = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+	spl_handler_SplPriorityQueue = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:        int((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:      SplHeapObjectClone,
 		CountElements: SplHeapObjectCountElements,

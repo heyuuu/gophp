@@ -17,8 +17,8 @@ const SPL_PQUEUE_EXTR_BOTH = 0x3
 const SPL_PQUEUE_EXTR_DATA = 0x1
 const SPL_PQUEUE_EXTR_PRIORITY = 0x2
 
-var spl_handler_SplHeap zend.ObjectHandlers
-var spl_handler_SplPriorityQueue zend.ObjectHandlers
+var spl_handler_SplHeap types.ObjectHandlers
+var spl_handler_SplPriorityQueue types.ObjectHandlers
 
 type SplPtrHeapDtorFunc func(any)
 type SplPtrHeapCtorFunc func(any)

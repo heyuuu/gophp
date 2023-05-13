@@ -5,7 +5,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func IS_VALID_PROPERTY_OFFSET(offset uintPtr) bool   { return intptr_t(offset) > 0 }
@@ -16,7 +15,6 @@ func IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(offset uintPtr) bool {
 }
 func ZEND_DECODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ { return uintPtr(-(intptr_t(offset)) - 2) }
 func ZEND_ENCODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ { return uintPtr(-(intptr_t(offset) + 2)) }
-func ZendGetStdObjectHandlers() *ObjectHandlers           { return StdObjectHandlersPtr }
 func ZendGetFunctionRootClass(fbc types.IFunction) *types.ClassEntry {
 	if fbc.GetPrototype() != nil {
 		return fbc.GetPrototype().GetScope()
@@ -80,28 +78,6 @@ func ZendStdGetProperties(object *types.Zval) *types.Array {
 		RebuildObjectProperties(zobj)
 	}
 	return zobj.GetProperties()
-}
-func ZendStdGetGc(object *types.Zval, table **types.Zval, n *int) *types.Array {
-	if types.Z_OBJ_HT(*object).GetGetProperties() != ZendStdGetProperties {
-		*table = nil
-		*n = 0
-		return types.Z_OBJ_HT(*object).GetGetProperties()(object)
-	} else {
-		var zobj *types.ZendObject = object.Object()
-		if zobj.GetProperties() != nil {
-			*table = nil
-			*n = 0
-			if zobj.GetProperties().GetRefcount() > 1 && (zobj.GetProperties().GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 {
-				zobj.GetProperties().DelRefcount()
-				zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-			}
-			return zobj.GetProperties()
-		} else {
-			*table = zobj.GetPropertiesTable()
-			*n = zobj.GetCe().GetDefaultPropertiesCount()
-			return nil
-		}
-	}
 }
 func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(object)

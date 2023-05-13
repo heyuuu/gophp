@@ -2639,14 +2639,14 @@ func ZmStartupSplIterators(type_ int, module_number int) int {
 	spl_ce_RecursiveIteratorIterator = zend.RegisterClass("RecursiveIteratorIterator", spl_RecursiveIteratorIterator_new, spl_funcs_RecursiveIteratorIterator)
 	zend.ZendClassImplements(spl_ce_RecursiveIteratorIterator, 1, zend.ZendCeIterator)
 
-	SplHandlersRecItIt = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+	SplHandlersRecItIt = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:    int((*byte)(&((*SplRecursiveItObject)(nil).GetStd())) - (*byte)(nil)),
 		GetMethod: SplRecursiveItGetMethod,
 		CloneObj:  nil,
 		DtorObj:   spl_RecursiveIteratorIterator_dtor,
 		FreeObj:   spl_RecursiveIteratorIterator_free_storage,
 	})
-	SplHandlersDualIt = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+	SplHandlersDualIt = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:    int((*byte)(&((*SplDualItObject)(nil).GetStd())) - (*byte)(nil)),
 		GetMethod: SplDualItGetMethod,
 		CloneObj:  nil,

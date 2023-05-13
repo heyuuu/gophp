@@ -121,8 +121,8 @@ const (
 	RS_START = 4
 )
 
-var SplHandlersRecItIt zend.ObjectHandlers
-var SplHandlersDualIt zend.ObjectHandlers
+var SplHandlersRecItIt types.ObjectHandlers
+var SplHandlersDualIt types.ObjectHandlers
 var SplRecursiveItIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplRecursiveItDtor, SplRecursiveItValid, SplRecursiveItGetCurrentData, SplRecursiveItGetCurrentKey, SplRecursiveItMoveForward, SplRecursiveItRewind, nil)
 
 var spl_funcs_RecursiveIteratorIterator = []types.FunctionEntry{

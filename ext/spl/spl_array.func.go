@@ -1458,7 +1458,7 @@ func ZmStartupSplArray(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_Serializable)
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_Countable)
 
-	spl_handler_ArrayObject = *zend.NewObjectHandlersEx(zend.StdObjectHandlersPtr, zend.ObjectHandlersSetting{
+	spl_handler_ArrayObject = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:            int((*byte)(&((*SplArrayObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:          SplArrayObjectClone,
 		ReadDimension:     SplArrayReadDimension,
