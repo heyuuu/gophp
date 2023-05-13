@@ -50,12 +50,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	//zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -65,12 +60,6 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				{
-
-					// value.TryAddRefcount()
-
-				}
-
 				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
@@ -85,12 +74,7 @@ free_and_exit_assign_obj:
 		types.ZVAL_COPY(opline.Result(), value)
 	}
 exit_assign_obj:
-	if free_op1 != nil {
-		// ZvalPtrDtorNogc(free_op1)
-	}
-
 	/* assign_obj has two opcodes! */
-
 	OPLINE = executeData.GetOpline() + 2
 	return 0
 }
@@ -140,12 +124,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -228,12 +207,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -315,12 +289,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -722,12 +691,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -800,12 +764,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -876,12 +835,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -951,12 +905,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -1267,12 +1216,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -1353,12 +1297,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -1437,12 +1376,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
@@ -1520,12 +1454,7 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if zobj.GetProperties().GetRefcount() > 1 {
-					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//	zobj.GetProperties().DelRefcount()
-					//}
-					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-				}
+				zobj.DupProperties()
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj

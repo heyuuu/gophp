@@ -13,20 +13,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, valu
 	ret = ZendVerifyRefAssignableZval(variable_ptr.Reference(), &value, strict)
 	variable_ptr = types.Z_REFVAL_P(variable_ptr)
 	if ret != 0 {
-		//IZvalPtrDtorNoref(variable_ptr)
 		types.ZVAL_COPY_VALUE(variable_ptr, &value)
-	} else {
-		// ZvalPtrDtorNogc(&value)
-	}
-	if (value_type & (IS_VAR | IS_TMP_VAR)) != 0 {
-		if ref != nil {
-			if ref.DelRefcount() == 0 {
-				// ZvalPtrDtor(orig_value)
-				EfreeSize(ref, b.SizeOf("zend_reference"))
-			}
-		} else {
-			//IZvalPtrDtorNoref(orig_value)
-		}
 	}
 	return variable_ptr
 }
@@ -165,12 +152,9 @@ func IFreeCompiledVariables(executeData *ZendExecuteData) {
 	for count != 0 {
 		if cv.IsRefcounted() {
 			var r *types.ZendRefcounted = cv.RefCounted()
-			if r.DelRefcount() == 0 {
-				cv.SetNull()
-				//RcDtorFunc(r)
-			} else {
-				//GcCheckPossibleRoot(r)
-			}
+			//if r.DelRefcount() == 0 {
+			//	cv.SetNull()
+			//}
 		}
 		cv++
 		count--

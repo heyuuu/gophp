@@ -237,11 +237,8 @@ func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool)
 	if arg.IsArray() {
 		return arg.Array(), true
 	} else if orObject && arg.IsObject() {
-		if separate && arg.Object().GetProperties() != nil && arg.Object().GetProperties().GetRefcount() > 1 {
-			if (arg.Object().GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-				arg.Object().GetProperties().DelRefcount()
-			}
-			arg.Object().SetProperties(types.ZendArrayDup(arg.Object().GetProperties()))
+		if separate && arg.Object().GetProperties() != nil {
+			arg.Object().DupProperties()
 		}
 		return arg.Object().GetPropertiesArray(arg), true
 	} else if checkNull && arg.IsNull() {

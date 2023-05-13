@@ -289,17 +289,6 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 	// 	object.AddRefcount()
 	obj = object.Object()
 	faults.Error(faults.E_WARNING, "Creating default object from empty value")
-	if obj.GetRefcount() == 1 {
-
-		/* the enclosing container was deleted, obj is unreferenced */
-
-		// OBJ_RELEASE(obj)
-		if RETURN_VALUE_USED(opline) {
-			opline.Result().SetNull()
-		}
-		return nil
-	}
-	//object.DelRefcount()
 	return object
 }
 func ZendVerifyTypeErrorCommon(

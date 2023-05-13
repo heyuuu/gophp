@@ -115,9 +115,9 @@ func ShutdownExecutor() {
 			if opArray.GetStaticVariables() != nil {
 				var ht *types.Array = opArray.GetStaticVariablesPtr()
 				if ht != nil {
-					if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-						ht.Destroy()
-					}
+					//if ht.DelRefcount() == 0 {
+					//	ht.Destroy()
+					//}
 					opArray.SetStaticVariablesPtr(nil)
 				}
 			}
@@ -134,9 +134,9 @@ func ShutdownExecutor() {
 						if opArray.GetStaticVariables() != nil {
 							var ht *types.Array = opArray.GetStaticVariablesPtr()
 							if ht != nil {
-								if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-									ht.Destroy()
-								}
+								//if ht.DelRefcount() == 0 {
+								//	ht.Destroy()
+								//}
 								opArray.SetStaticVariablesPtr(nil)
 							}
 						}

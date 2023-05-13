@@ -126,6 +126,9 @@ type Array struct {
 	arData  *Bucket             // C 源码中存储数据的地方，实际不使用
 
 	data0 ArrayData
+
+	// flags todo 待合并
+	protected bool
 }
 
 /**
@@ -147,10 +150,6 @@ func (ht *Array) Init(size int) {
 		data:    data,
 		indexes: make(map[ArrayKey]uint32), // todo 改为 nil，延迟初始化
 	}
-
-	// GC 信息
-	//ht.SetRefcount(1)
-	ht.SetGcTypeInfo(uint32(IS_ARRAY))
 }
 
 /* init */
@@ -734,6 +733,21 @@ func (ht *Array) CopyEx(cap int) *Array {
 	return ArrayLazyDup(ht)
 }
 
+func (ht *Array) LazyDup() *Array {
+	// todo 处理懒复制逻辑
+	//if ht.GetRefcount() > 1 {
+	//	return ZendArrayDup(ht)
+	//}
+	//return ht
+
+	return ZendArrayDup(ht)
+}
+
 func (ht *Array) ResetInternalPointer() {
 	ht.internalPointer = ht.validPosVal(0)
 }
+
+// recursive
+func (ht *Array) IsRecursive() bool   { return ht.protected }
+func (ht *Array) ProtectRecursive()   { ht.protected = true }
+func (ht *Array) UnprotectRecursive() { ht.protected = false }

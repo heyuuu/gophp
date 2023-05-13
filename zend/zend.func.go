@@ -141,24 +141,19 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 	switch expr.GetType() {
 	case types.IS_ARRAY:
 		ZEND_PUTS("Array (")
-		if (expr.Array().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
-			if expr.Array().IsRecursive() {
-				ZEND_PUTS(" *RECURSION*")
-				return
-			}
-			expr.Array().ProtectRecursive()
+		if expr.Array().IsRecursive() {
+			ZEND_PUTS(" *RECURSION*")
+			return
 		}
+		expr.Array().ProtectRecursive()
 		PrintFlatHash(expr.Array())
 		ZEND_PUTS(")")
-		if (expr.Array().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
-			expr.Array().UnprotectRecursive()
-		}
-		break
+		expr.Array().UnprotectRecursive()
 	case types.IS_OBJECT:
 		var properties *types.Array
 		ZendPrintf("%s Object (", expr.Object().ClassName())
 		// types.ZendStringReleaseEx(class_name, 0)
-		if expr.RefCounted().IsRecursive() {
+		if expr.Object().IsRecursive() {
 			ZEND_PUTS(" *RECURSION*")
 			return
 		}
@@ -169,31 +164,23 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 			expr.Object().UnprotectRecursive()
 		}
 		ZEND_PUTS(")")
-		break
 	case types.IS_REFERENCE:
 		ZendPrintFlatZvalR(types.Z_REFVAL_P(expr))
-		break
 	default:
 		ZendPrintZval(expr)
-		break
 	}
 }
 func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 	switch expr.GetType() {
 	case types.IS_ARRAY:
 		buf.AppendString("Array\n")
-		if (expr.Array().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
-			if expr.Array().IsRecursive() {
-				buf.AppendString(" *RECURSION*")
-				return
-			}
-			expr.Array().ProtectRecursive()
+		if expr.Array().IsRecursive() {
+			buf.AppendString(" *RECURSION*")
+			return
 		}
+		expr.Array().ProtectRecursive()
 		PrintHash(buf, expr.Array(), indent, 0)
-		if (expr.Array().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
-			expr.Array().UnprotectRecursive()
-		}
-		break
+		expr.Array().UnprotectRecursive()
 	case types.IS_OBJECT:
 		var properties *types.Array
 		buf.AppendString(expr.Object().ClassName())

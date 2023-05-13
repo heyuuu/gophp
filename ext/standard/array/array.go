@@ -87,13 +87,11 @@ func ZifKsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 }
 
 func PhpCountRecursive(ht *types.Array) int {
-	if !ht.IsImmutable() {
-		if ht.IsRecursive() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
-			return 0
-		}
-		ht.ProtectRecursive()
+	if ht.IsRecursive() {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
+		return 0
 	}
+	ht.ProtectRecursive()
 
 	cnt := ht.Count()
 	ht.Foreach(func(key types.ArrayKey, value *types.Zval) {
@@ -103,9 +101,7 @@ func PhpCountRecursive(ht *types.Array) int {
 		}
 	})
 
-	if !ht.IsImmutable() {
-		ht.UnprotectRecursive()
-	}
+	ht.UnprotectRecursive()
 	return cnt
 }
 
@@ -913,11 +909,11 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 			srcZval = &tmp
 		}
 		if srcZval.IsType(types.IS_ARRAY) {
-			if thash != nil && !thash.IsImmutable() {
+			if thash != nil {
 				thash.ProtectRecursive()
 			}
 			ret = PhpArrayMergeRecursive(destZval.Array(), srcZval.Array())
-			if thash != nil && !thash.IsImmutable() {
+			if thash != nil {
 				thash.UnprotectRecursive()
 			}
 			if ret == 0 {
@@ -961,7 +957,7 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) bool {
 		destZval = destEntry.DeRef()
 
 		// src/dest 对应值均为 array 的情况下，递归替换
-		if destZval.IsRecursive() || srcZval.IsRecursive() || srcEntry.IsReference() && destEntry.IsReference() && srcEntry.Reference() == destEntry.Reference() && destEntry.GetRefcount()%2 != 0 {
+		if destZval.Array().IsRecursive() || srcZval.Array().IsRecursive() || srcEntry.IsReference() && destEntry.IsReference() && srcEntry.Reference() == destEntry.Reference() && destEntry.GetRefcount()%2 != 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 			return false
 		}
@@ -969,11 +965,12 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) bool {
 		types.SeparateZval(destEntry)
 		destZval = destEntry
 
-		srcZval.ProtectRecursive()
-		destZval.ProtectRecursive()
+		b.Assert(srcZval.IsArray() && destZval.IsArray())
+		srcZval.Array().ProtectRecursive()
+		destZval.Array().ProtectRecursive()
 		ret = PhpArrayReplaceRecursive(destZval.Array(), srcZval.Array())
-		srcZval.UnprotectRecursive()
-		destZval.UnprotectRecursive()
+		srcZval.Array().UnprotectRecursive()
+		destZval.Array().UnprotectRecursive()
 
 		if !ret {
 			return false

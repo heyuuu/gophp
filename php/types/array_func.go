@@ -508,7 +508,7 @@ func ZendHashCompare(ht1 *Array, ht2 *Array, comparer ZvalComparer, ordered Zend
 		faults.ErrorNoreturn(faults.E_ERROR, "Nesting level too deep - recursive dependency?")
 	}
 
-	ht1.TryProtectRecursive()
+	ht1.ProtectRecursive()
 
 	if ordered != 0 {
 		result = iArrayCompareOrdered(ht1, ht2, comparer)
@@ -516,7 +516,7 @@ func ZendHashCompare(ht1 *Array, ht2 *Array, comparer ZvalComparer, ordered Zend
 		result = iArrayCompareUnordered(ht1, ht2, comparer)
 	}
 
-	ht1.TryUnProtectRecursive()
+	ht1.UnprotectRecursive()
 
 	if result > 0 {
 		return 1

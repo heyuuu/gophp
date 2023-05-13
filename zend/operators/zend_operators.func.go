@@ -563,14 +563,14 @@ try_again:
 	case types.IS_ARRAY:
 		var ht = types.ZendSymtableToProptable(op.Array())
 		var obj *types.ZendObject
-		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
-			/* TODO: try not to duplicate immutable arrays as well ??? */
-			ht = types.ZendArrayDup(ht)
-		} else if ht != op.Array() {
-			// ZvalPtrDtor(op)
-		} else {
-			//ht.DelRefcount()
-		}
+		//if ht.IsImmutable() {
+		//	/* TODO: try not to duplicate immutable arrays as well ??? */
+		//	ht = types.ZendArrayDup(ht)
+		//} else if ht != op.Array() {
+		//	// ZvalPtrDtor(op)
+		//} else {
+		//	//ht.DelRefcount()
+		//}
 		obj = zend.ZendObjectsNew(zend.ZendStandardClassDef)
 		obj.SetProperties(ht)
 		op.SetObject(obj)

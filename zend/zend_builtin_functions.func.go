@@ -256,15 +256,13 @@ func ValidateConstantArray(ht *types.Array) int {
 		val = types.ZVAL_DEREF(val)
 		if val.IsRefcounted() {
 			if val.IsArray() {
-				if val.IsRefcounted() {
-					if val.IsRecursive() {
-						faults.Error(faults.E_WARNING, "Constants cannot be recursive arrays")
-						ret = 0
-						return false
-					} else if ValidateConstantArray(val.Array()) == 0 {
-						ret = 0
-						return false
-					}
+				if val.Array().IsRecursive() {
+					faults.Error(faults.E_WARNING, "Constants cannot be recursive arrays")
+					ret = 0
+					return false
+				} else if ValidateConstantArray(val.Array()) == 0 {
+					ret = 0
+					return false
 				}
 			} else if val.GetType() != types.IS_STRING && val.GetType() != types.IS_RESOURCE {
 				faults.Error(faults.E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")

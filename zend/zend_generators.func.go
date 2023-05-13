@@ -596,7 +596,7 @@ func ZendGeneratorYieldFrom(generator *ZendGenerator, from *ZendGenerator) {
 	ZendGeneratorAddChild(from, generator)
 	generator.GetNode().SetParent(from)
 	ZendGeneratorGetCurrent(generator)
-	from.GetStd().DelRefcount()
+	//from.GetStd().DelRefcount()
 	generator.SetIsDoInit(true)
 }
 func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *ZendGenerator {

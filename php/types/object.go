@@ -20,6 +20,11 @@ type ZendObject struct {
 	handlers        *ObjectHandlers
 	properties      *Array
 	propertiesTable []Zval
+
+	// flags todo 待合并
+	protected    bool
+	isDtorCalled bool
+	isFreeCalled bool
 }
 
 func NewObject(ce *ClassEntry, handle uint32, handlers *ObjectHandlers) *ZendObject {
@@ -37,8 +42,6 @@ func NewObject(ce *ClassEntry, handle uint32, handlers *ObjectHandlers) *ZendObj
 }
 
 func (o *ZendObject) Init(ce *ClassEntry, handle uint32) {
-	o.SetGcTypeInfo(uint32(IS_OBJECT) | GC_COLLECTABLE<<GC_FLAGS_SHIFT)
-
 	o.handle = handle
 	o.ce = ce
 	o.properties = nil
@@ -56,7 +59,10 @@ func (o *ZendObject) GetHandlers() *ObjectHandlers      { return o.handlers }
 func (o *ZendObject) SetHandlers(value *ObjectHandlers) { o.handlers = value }
 func (o *ZendObject) GetProperties() *Array             { return o.properties }
 func (o *ZendObject) SetProperties(value *Array)        { o.properties = value }
-func (o *ZendObject) GetPropertiesTable() []Zval        { return o.propertiesTable }
+func (o *ZendObject) DupProperties() {
+	o.properties = o.properties.LazyDup()
+}
+func (o *ZendObject) GetPropertiesTable() []Zval { return o.propertiesTable }
 
 // object handlers
 func (o *ZendObject) Free() { o.handlers.FreeObj(o) }
@@ -186,3 +192,22 @@ func (o *ZendObject) CanCompare() bool {
 func (o *ZendObject) Compare(result *Zval, op1 *Zval, op2 *Zval) int {
 	return o.handlers.Compare(result, op1, op2)
 }
+
+// object
+func (this *ZendObject) IsObjDtorCalled() bool {
+	return this.isDtorCalled
+}
+func (this *ZendObject) MarkObjDtorCalled() {
+	this.isDtorCalled = true
+}
+func (this *ZendObject) IsObjFreeCalled() bool {
+	return this.isFreeCalled
+}
+func (this *ZendObject) MarkObjFreeCalled() {
+	this.isFreeCalled = true
+}
+
+// recursive
+func (this *ZendObject) IsRecursive() bool   { return this.protected }
+func (this *ZendObject) ProtectRecursive()   { this.protected = true }
+func (this *ZendObject) UnprotectRecursive() { this.protected = false }

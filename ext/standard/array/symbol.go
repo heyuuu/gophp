@@ -685,19 +685,15 @@ func PhpCompactVar(activeSymbolTable *types.Array, resultArr *types.Array, entry
 			core.PhpErrorDocref(nil, faults.E_NOTICE, "Undefined variable: %s", entry.String().GetVal())
 		}
 	} else if entry.IsArray() {
-		if entry.IsRefcounted() {
-			if entry.IsRecursive() {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
-				return
-			}
-			entry.ProtectRecursive()
+		if entry.Array().IsRecursive() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
+			return
 		}
+		entry.Array().ProtectRecursive()
 		entry.Array().ForeachIndirect(func(key types.ArrayKey, valuePtr *types.Zval) {
 			PhpCompactVar(activeSymbolTable, resultArr, valuePtr)
 		})
-		if entry.IsRefcounted() {
-			entry.UnprotectRecursive()
-		}
+		entry.Array().UnprotectRecursive()
 	}
 }
 

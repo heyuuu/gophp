@@ -39,11 +39,8 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
 			var properties *types.Array
-			if array_ptr.Object().GetProperties() != nil && array_ptr.Object().GetProperties().GetRefcount() > 1 {
-				if (array_ptr.Object().GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//array_ptr.Object().GetProperties().DelRefcount()
-				}
-				array_ptr.Object().SetProperties(types.ZendArrayDup(array_ptr.Object().GetProperties()))
+			if array_ptr.Object().GetProperties() != nil  {
+				array_ptr.Object().DupProperties()
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = opline.Result()
@@ -88,11 +85,8 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
 			var properties *types.Array
-			if array_ptr.Object().GetProperties() != nil && array_ptr.Object().GetProperties().GetRefcount() > 1 {
-				if (array_ptr.Object().GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//array_ptr.Object().GetProperties().DelRefcount()
-				}
-				array_ptr.Object().SetProperties(types.ZendArrayDup(array_ptr.Object().GetProperties()))
+			if array_ptr.Object().GetProperties() != nil  {
+				array_ptr.Object().DupProperties()
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = opline.Result()
@@ -137,11 +131,8 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
 			var properties *types.Array
-			if array_ptr.Object().GetProperties() != nil && array_ptr.Object().GetProperties().GetRefcount() > 1 {
-				if (array_ptr.Object().GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					//array_ptr.Object().GetProperties().DelRefcount()
-				}
-				array_ptr.Object().SetProperties(types.ZendArrayDup(array_ptr.Object().GetProperties()))
+			if array_ptr.Object().GetProperties() != nil {
+				array_ptr.Object().DupProperties()
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = opline.Result()

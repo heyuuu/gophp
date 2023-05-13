@@ -50,7 +50,6 @@ func NewZendResource(handle int, ptr any, type_ int) *ZendResource {
 		ptr:    ptr,
 	}
 
-	res.SetGcTypeInfo(IS_RESOURCE)
 	runtime.SetFinalizer(res, zend.ZendListFree)
 
 	return res
@@ -107,12 +106,8 @@ func NewZendReference(val *Zval) *ZendReference {
 	ZVAL_COPY_VALUE(ref.GetVal(), val)
 	ref.sources.SetPtr(nil)
 
-	//ref.SetRefcount(1)
-	ref.SetGcTypeInfo(uint32(IS_REFERENCE))
-
 	runtime.SetFinalizer(ref, func(ref *ZendReference) {
 		b.Assert(ref.GetSources().GetPtr() != nil)
-		// IZvalPtrDtor(ref.GetVal())
 		zend.EfreeSize(ref, b.SizeOf("zend_reference"))
 	})
 
@@ -139,7 +134,6 @@ func NewAstRef(ast *zend.ZendAst) *ZendAstRef {
 	// init
 	var ref *ZendAstRef = &ZendAstRef{}
 	zend.ZendAstTreeCopy(ast, ref.ast)
-	ref.SetGcTypeInfo(uint32(IS_CONSTANT_AST))
 
 	// dtor
 	runtime.SetFinalizer(ref, zend.ZendAstRefDestroy)

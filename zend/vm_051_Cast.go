@@ -57,15 +57,10 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
 				ht = types.ZendSymtableToProptable(expr.Array())
-				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
-
-					/* TODO: try not to duplicate immutable arrays as well ??? */
-
-					ht = types.ZendArrayDup(ht)
-
-					/* TODO: try not to duplicate immutable arrays as well ??? */
-
-				}
+				//if ht.IsImmutable() {
+				//	/* TODO: try not to duplicate immutable arrays as well ??? */
+				//	ht = types.ZendArrayDup(ht)
+				//}
 				result.Object().SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
@@ -141,15 +136,10 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
 				ht = types.ZendSymtableToProptable(expr.Array())
-				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
-
-					/* TODO: try not to duplicate immutable arrays as well ??? */
-
-					ht = types.ZendArrayDup(ht)
-
-					/* TODO: try not to duplicate immutable arrays as well ??? */
-
-				}
+				//if ht.IsImmutable() {
+				//	/* TODO: try not to duplicate immutable arrays as well ??? */
+				//	ht = types.ZendArrayDup(ht)
+				//}
 				result.Object().SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
@@ -227,15 +217,10 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
 				ht = types.ZendSymtableToProptable(expr.Array())
-				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
-
-					/* TODO: try not to duplicate immutable arrays as well ??? */
-
-					ht = types.ZendArrayDup(ht)
-
-					/* TODO: try not to duplicate immutable arrays as well ??? */
-
-				}
+				//if ht.IsImmutable() {
+				//	/* TODO: try not to duplicate immutable arrays as well ??? */
+				//	ht = types.ZendArrayDup(ht)
+				//}
 				result.Object().SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
@@ -311,15 +296,10 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
 				ht = types.ZendSymtableToProptable(expr.Array())
-				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
-
-					/* TODO: try not to duplicate immutable arrays as well ??? */
-
-					ht = types.ZendArrayDup(ht)
-
-					/* TODO: try not to duplicate immutable arrays as well ??? */
-
-				}
+				//if ht.IsImmutable() {
+				//	/* TODO: try not to duplicate immutable arrays as well ??? */
+				//	ht = types.ZendArrayDup(ht)
+				//}
 				result.Object().SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)

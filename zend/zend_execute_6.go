@@ -133,12 +133,7 @@ func ZendFetchPropertyAddress(
 				return
 			}
 		} else if zobj.GetProperties() != nil {
-			if zobj.GetProperties().GetRefcount() > 1 {
-				if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					zobj.GetProperties().DelRefcount()
-				}
-				zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-			}
+			zobj.DupProperties()
 			ptr = zobj.GetProperties().KeyFind(prop_ptr.String().GetStr())
 			if ptr != nil {
 				result.SetIndirect(ptr)

@@ -59,10 +59,3 @@ func (zv *Zval) GetRefcount() uint32 {
 	b.Assert(zv.IsRefcounted())
 	return zv.RefCounted().GetRefcount()
 }
-
-/**
- * GC - GC_PROTECTED
- */
-func (zv *Zval) IsRecursive() bool   { return zv.RefCounted().IsRecursive() }
-func (zv *Zval) ProtectRecursive()   { zv.RefCounted().ProtectRecursive() }
-func (zv *Zval) UnprotectRecursive() { zv.RefCounted().UnprotectRecursive() }

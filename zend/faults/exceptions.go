@@ -122,7 +122,6 @@ func ExceptionSetPrevious(exception *types.ZendObject, add_previous *types.ZendO
 		previous = zend.ZendReadProperty(base_ce, ex, types.STR_PREVIOUS, 1, &rv)
 		if previous.IsNull() {
 			zend.ZendUpdatePropertyEx(base_ce, ex, types.STR_PREVIOUS, &pv)
-			add_previous.DelRefcount()
 			return
 		}
 		ex = previous
@@ -599,9 +598,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		// types.ZendStringReleaseEx(message, 0)
 		// types.ZendStringReleaseEx(file, 0)
 		// zend.ZvalPtrDtor(&trace)
-		exception.ProtectRecursive()
+		exception.Object().ProtectRecursive()
 		exception = GET_PROPERTY(exception, types.STR_PREVIOUS, &rv)
-		if exception != nil && exception.IsObject() && exception.IsRecursive() {
+		if exception != nil && exception.IsObject() && exception.Object().IsRecursive() {
 			break
 		}
 	}
@@ -611,8 +610,8 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	/* Reset apply counts */
 
 	for exception != nil && exception.IsObject() && b.Assign(&base_ce, GetExceptionBase(exception)) && operators.InstanceofFunction(types.Z_OBJCE_P(exception), base_ce) != 0 {
-		if exception.IsRecursive() {
-			exception.UnprotectRecursive()
+		if exception.Object().IsRecursive() {
+			exception.Object().UnprotectRecursive()
 		} else {
 			break
 		}

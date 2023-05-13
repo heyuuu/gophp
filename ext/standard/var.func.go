@@ -89,37 +89,31 @@ again:
 		core.PUTS("\"\n")
 	case types.IS_ARRAY:
 		myht := struc.Array()
-		if !myht.IsImmutable() {
-			if level > 1 {
-				if myht.IsRecursive() {
-					core.PUTS("*RECURSION*\n")
-					return
-				}
-				myht.ProtectRecursive()
+		if level > 1 {
+			if myht.IsRecursive() {
+				core.PUTS("*RECURSION*\n")
+				return
 			}
-			// 			myht.AddRefcount()
+			myht.ProtectRecursive()
 		}
 		count := myht.Count()
 		core.PhpPrintf("%sarray(%d) {\n", common, count)
 		myht.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 			PhpArrayElementDump(value, key, level)
 		})
-		if !myht.IsImmutable() {
-			if level > 1 {
-				myht.UnprotectRecursive()
-			}
-			//myht.DelRefcount()
+		if level > 1 {
+			myht.UnprotectRecursive()
 		}
 		if level > 1 {
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
 	case types.IS_OBJECT:
-		if struc.IsRecursive() {
+		if struc.Object().IsRecursive() {
 			core.PUTS("*RECURSION*\n")
 			return
 		}
-		struc.ProtectRecursive()
+		struc.Object().ProtectRecursive()
 		myht := zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
 		className := struc.Object().ClassName()
 		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", common, className, zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() int { return myht.Count() }, 0))
@@ -141,7 +135,7 @@ again:
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
-		struc.UnprotectRecursive()
+		struc.Object().UnprotectRecursive()
 	case types.IS_RESOURCE:
 		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(struc.Resource()), "Unknown")
 		core.PhpPrintf("%sresource(%d) of type (%s)\n", common, struc.ResourceHandle(), typeName)
@@ -224,15 +218,12 @@ again:
 		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(struc.IsRefcounted(), func() uint32 { return struc.GetRefcount() }, 1))
 	case types.IS_ARRAY:
 		myht = struc.Array()
-		if !myht.IsImmutable() {
-			if level > 1 {
-				if myht.IsRecursive() {
-					core.PUTS("*RECURSION*\n")
-					return
-				}
-				myht.ProtectRecursive()
+		if level > 1 {
+			if myht.IsRecursive() {
+				core.PUTS("*RECURSION*\n")
+				return
 			}
-			// 			myht.AddRefcount()
+			myht.ProtectRecursive()
 		}
 		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(struc.IsRefcounted(), func() int { return struc.GetRefcount() - 1 }, 1))
@@ -250,11 +241,8 @@ again:
 			val = _z
 			ZvalArrayElementDump(val, index, key, level)
 		}
-		if !myht.IsImmutable() {
-			if level > 1 {
-				myht.UnprotectRecursive()
-			}
-			//myht.DelRefcount()
+		if level > 1 {
+			myht.UnprotectRecursive()
 		}
 		if level > 1 {
 			core.PhpPrintf("%*c", level-1, ' ')
@@ -405,15 +393,12 @@ again:
 		//types.ZendStringFree(ztmp2)
 	case types.IS_ARRAY:
 		myht = struc.Array()
-		if !myht.IsImmutable() {
-			if myht.IsRecursive() {
-				buf.AppendString("NULL")
-				faults.Error(faults.E_WARNING, "var_export does not handle circular references")
-				return
-			}
-			// 			myht.AddRefcount()
-			myht.ProtectRecursive()
+		if myht.IsRecursive() {
+			buf.AppendString("NULL")
+			faults.Error(faults.E_WARNING, "var_export does not handle circular references")
+			return
 		}
+		myht.ProtectRecursive()
 		if level > 1 {
 			buf.AppendByte('\n')
 			BufferAppendSpaces(buf, level-1)
@@ -433,10 +418,7 @@ again:
 			val = _z
 			PhpArrayElementExport(val, index, key, level, buf)
 		}
-		if !myht.IsImmutable() {
-			myht.UnprotectRecursive()
-			//myht.DelRefcount()
-		}
+		myht.UnprotectRecursive()
 		if level > 1 {
 			BufferAppendSpaces(buf, level-1)
 		}
@@ -450,7 +432,7 @@ again:
 				zend.ZendReleaseProperties(myht)
 				return
 			} else {
-				myht.TryProtectRecursive()
+				myht.ProtectRecursive()
 			}
 		}
 		if level > 1 {
@@ -481,7 +463,7 @@ again:
 				val = _z
 				PhpObjectElementExport(val, index, key, level, buf)
 			}
-			myht.TryUnProtectRecursive()
+			myht.UnprotectRecursive()
 			zend.ZendReleaseProperties(myht)
 		}
 		if level > 1 {
@@ -767,18 +749,14 @@ func PhpVarSerializeNestedData(
 			/* we should still add element even if it's not OK,
 			 * since we already wrote the length of the array before */
 
-			if data.IsType(types.IS_ARRAY) {
-				if data.IsRecursive() || struc.IsType(types.IS_ARRAY) && data.Array() == struc.Array() {
+			if data.IsArray() {
+				if data.Array().IsRecursive() || struc.IsArray() && data.Array() == struc.Array() {
 					PhpAddVarHash(var_hash, struc)
 					buf.AppendString("N;")
 				} else {
-					if data.IsRefcounted() {
-						data.ProtectRecursive()
-					}
+					data.Array().ProtectRecursive()
 					PhpVarSerializeIntern(buf, data, var_hash)
-					if data.IsRefcounted() {
-						data.UnprotectRecursive()
-					}
+					data.Array().UnprotectRecursive()
 				}
 			} else {
 				PhpVarSerializeIntern(buf, data, var_hash)

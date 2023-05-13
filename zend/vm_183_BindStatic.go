@@ -17,25 +17,20 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & (AccImmutable | AccPreloaded)) != 0)
 		ht = types.ZendArrayDup(executeData.GetFunc().GetOpArray().static_variables)
 		executeData.GetFunc().GetOpArray().SetStaticVariablesPtr(ht)
-	} else if ht.GetRefcount() > 1 {
-		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-			//ht.DelRefcount()
-		}
-		ht = types.ZendArrayDup(ht)
+	} else {
+		ht = ht.LazyDup()
 		executeData.GetFunc().GetOpArray().SetStaticVariablesPtr(ht)
 	}
 	value = (*types.Zval)((*byte)(ht.GetArData() + (opline.GetExtendedValue() & ^(ZEND_BIND_REF | ZEND_BIND_IMPLICIT))))
 	if (opline.GetExtendedValue() & ZEND_BIND_REF) != 0 {
-		if value.IsConstant() {
+		if value.IsConstantAst() {
 			if ZvalUpdateConstantEx(value, executeData.GetFunc().GetOpArray().scope) != types.SUCCESS {
 				variable_ptr.SetNull()
 				return 0
 			}
 		}
 		if !(value.IsReference()) {
-			var ref *types.ZendReference = (*types.ZendReference)(Emalloc(b.SizeOf("zend_reference")))
-			//ref.SetRefcount(2)
-			ref.GetGcTypeInfo() = types.IS_REFERENCE
+			var ref = (*types.ZendReference)(Emalloc(b.SizeOf("zend_reference")))
 			types.ZVAL_COPY_VALUE(ref.GetVal(), value)
 			ref.GetSources().SetPtr(nil)
 			value.SetTypeReference()

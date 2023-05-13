@@ -94,7 +94,6 @@ func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *types.Array
 func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arg any) {
 	var ctx *BrowscapParserCtx = arg
 	var bdata *BrowserData = ctx.GetBdata()
-	var persistent int = bdata.GetHtab().GetGcFlags() & types.IS_ARRAY_PERSISTENT
 	if arg1 == nil {
 		return
 	}

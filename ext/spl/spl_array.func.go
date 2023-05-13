@@ -32,8 +32,8 @@ func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.Array {
 		var obj *types.ZendObject = intern.GetArray().Object()
 		if obj.GetProperties() == nil {
 			zend.RebuildObjectProperties(obj)
-		} else if obj.GetProperties().GetRefcount() > 1 {
-			obj.SetProperties(types.ZendArrayDup(obj.GetProperties()))
+		} else {
+			obj.DupProperties()
 		}
 		return obj.GetProperties()
 	}

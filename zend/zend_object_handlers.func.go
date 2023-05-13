@@ -674,14 +674,8 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
 		if zobj.GetProperties() != nil {
-			if zobj.GetProperties().GetRefcount() > 1 {
-				if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					zobj.GetProperties().DelRefcount()
-				}
-				zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-			}
+			zobj.DupProperties()
 			if b.Assign(&variable_ptr, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
-				// value.TryAddRefcount()
 				goto found
 			}
 		}
@@ -872,12 +866,7 @@ func ZendStdGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int,
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
 		if zobj.GetProperties() != nil {
-			if zobj.GetProperties().GetRefcount() > 1 {
-				if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-					zobj.GetProperties().DelRefcount()
-				}
-				zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-			}
+			zobj.DupProperties()
 			if b.Assign(&retval, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
 				//ZendTmpStringRelease(tmp_name)
 				return retval
@@ -942,12 +931,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 			goto exit
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) && zobj.GetProperties() != nil {
-		if zobj.GetProperties().GetRefcount() > 1 {
-			if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-				zobj.GetProperties().DelRefcount()
-			}
-			zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
-		}
+		zobj.DupProperties()
 		if types.ZendHashDel(zobj.GetProperties(), name.GetStr()) != types.FAILURE {
 			goto exit
 		}
@@ -1332,10 +1316,10 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 		 * false recursion detection.
 		 */
 
-		if o1.IsRecursive() {
+		if o1.Object().IsRecursive() {
 			faults.ErrorNoreturn(faults.E_ERROR, "Nesting level too deep - recursive dependency?")
 		}
-		o1.ProtectRecursive()
+		o1.Object().ProtectRecursive()
 
 		var ret int
 		zobj1.GetCe().PropertyTable().ForeachEx(func(key string, info *ZendPropertyInfo) bool {
@@ -1348,22 +1332,22 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 				if p2.IsNotUndef() {
 					var result types.Zval
 					if operators.CompareFunction(&result, p1, p2) == types.FAILURE {
-						o1.UnprotectRecursive()
+						o1.Object().UnprotectRecursive()
 						return false
 					}
 					if result.Long() != 0 {
-						o1.UnprotectRecursive()
+						o1.Object().UnprotectRecursive()
 						ret = result.Long()
 						return false
 					}
 				} else {
-					o1.UnprotectRecursive()
+					o1.Object().UnprotectRecursive()
 					ret = 1
 					return false
 				}
 			} else {
 				if p2.IsNotUndef() {
-					o1.UnprotectRecursive()
+					o1.Object().UnprotectRecursive()
 					ret = 1
 					return false
 				}
@@ -1374,7 +1358,7 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 			return ret
 		}
 
-		o1.UnprotectRecursive()
+		o1.Object().UnprotectRecursive()
 		return 0
 	} else {
 		if zobj1.GetProperties() == nil {

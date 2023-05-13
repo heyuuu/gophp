@@ -48,9 +48,6 @@ func ZendDuplicateUserFunction(func_ types.IFunction) types.IFunction {
 		/* See: Zend/tests/method_static_var.phpt */
 
 	}
-	if (new_function.GetOpArray().GetStaticVariables().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-		//new_function.GetOpArray().GetStaticVariables().AddRefcount()
-	}
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
 		b.Assert(new_function.GetOpArray().IsPreloaded())
 		ZEND_MAP_PTR_NEW(new_function.GetOpArray().static_variables_ptr)

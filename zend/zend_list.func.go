@@ -20,11 +20,13 @@ func ZendListInsert(ptr any, type_ int) *types.Zval {
 	return EG__().GetRegularList().IndexAddNew(index, &zv)
 }
 func ZendListDelete(res *types.ZendResource) int {
-	if res.DelRefcount() <= 0 {
-		return types.ZendHashIndexDel(EG__().GetRegularList(), res.GetHandle())
-	} else {
-		return types.SUCCESS
-	}
+	// todo 移除机制待处理
+	//if res.DelRefcount() <= 0 {
+	//	return types.ZendHashIndexDel(EG__().GetRegularList(), res.GetHandle())
+	//} else {
+	//	return types.SUCCESS
+	//}
+	return types.SUCCESS
 }
 func ZendListFree(res *types.ZendResource) int {
 	if res.GetRefcount() <= 0 {

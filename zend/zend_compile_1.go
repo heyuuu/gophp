@@ -89,11 +89,6 @@ func FunctionAddRef(function types.IFunction) {
 		if op_array.GetRefcount() != nil {
 			op_array.refcount++
 		}
-		if op_array.GetStaticVariables() != nil {
-			if (op_array.GetStaticVariables().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-				//op_array.GetStaticVariables().AddRefcount()
-			}
-		}
 		if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
 			b.Assert(op_array.IsPreloaded())
 			ZEND_MAP_PTR_NEW(op_array.run_time_cache)
