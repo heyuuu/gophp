@@ -172,11 +172,10 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		return 0
 	}
 	if (value_type & types.Z_TYPE_MASK) != types.IS_REFERENCE {
-		var gc *types.ZendRefcounted = value.GetCounted()
 		var ref *types.Zval
 		value.SetNewEmptyRef()
 		ref = types.Z_REFVAL_P(value)
-		types.ZVAL_COPY_VALUE_EX(ref, value, gc, value_type)
+		ref.CopyValueFrom(value)
 	}
 	if opline.GetOp2Type() == IS_CV {
 		var variable_ptr *types.Zval = opline.Op2()

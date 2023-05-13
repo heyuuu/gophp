@@ -157,11 +157,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		ZendAssignToVariable(variable_ptr, value, executeData.IsCallUseStrictTypes())
 	} else {
 		var res *types.Zval = opline.Op2()
-		var gc *types.ZendRefcounted = value.GetCounted()
-		types.ZVAL_COPY_VALUE_EX(res, value, gc, value_type)
-		if types.Z_TYPE_INFO_REFCOUNTED(value_type) {
-			// 			gc.AddRefcount()
-		}
+		res.CopyValueFrom(value)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

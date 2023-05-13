@@ -509,7 +509,6 @@ func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ 
 func PhpAddVarHash(data PhpSerializeDataT, var_ *types.Zval) zend.ZendLong {
 	data.IncN()
 
-	var zv *types.Zval
 	var isRef = var_.IsReference()
 	if !isRef && !var_.IsObject() {
 		return 0
@@ -522,13 +521,12 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *types.Zval) zend.ZendLong {
 
 	/* Index for the variable is stored using the numeric value of the pointer to
 	 * the zend_refcounted struct */
-	zv = data.FindMark(var_)
-	if zv != nil {
+	if n, exists := data.FindMark(var_); exists {
 		/* References are only counted once, undo the data->n increment above */
-		if isRef && zv.Long() != -1 {
+		if isRef && n != -1 {
 			data.DecN()
 		}
-		return zv.Long()
+		return n
 	} else {
 		data.Mark(var_)
 		return 0
@@ -860,10 +858,8 @@ again:
 				buf.AppendString(b.CastStr((*byte)(serialized_data), serialized_length))
 				buf.AppendByte('}')
 			} else {
-
 				/* Mark this value in the var_hash, to avoid creating references to it. */
-				var var_idx *types.Zval = var_hash.FindMark(struc)
-				var_idx.SetLong(-1)
+				var_hash.MarkUsed(struc)
 				buf.AppendString("N;")
 			}
 			if serialized_data != nil {

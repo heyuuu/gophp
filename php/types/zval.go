@@ -60,20 +60,19 @@ func (zv *Zval) IsConstantAst() bool     { return zv.typ == IS_CONSTANT_AST }
 func (zv *Zval) IsIndirect() bool        { return zv.typ == IS_INDIRECT }
 func (zv *Zval) IsError() bool           { return zv.typ == IS_ERROR }
 
-func (zv *Zval) Long() int                   { return zv.value.(int) }
-func (zv *Zval) Double() float64             { return zv.value.(float64) }
-func (zv *Zval) String() *String             { return zv.value.(*String) }
-func (zv *Zval) StringVal() string           { return zv.value.(*String).GetStr() }
-func (zv *Zval) Array() *Array               { return zv.value.(*Array) }
-func (zv *Zval) Object() *ZendObject         { return zv.value.(*ZendObject) }
-func (zv *Zval) Resource() *ZendResource     { return zv.value.(*ZendResource) }
-func (zv *Zval) Reference() *ZendReference   { return zv.value.(*ZendReference) }
-func (zv *Zval) RefCounted() *ZendRefcounted { return zv.value.(*ZendRefcounted) }
-func (zv *Zval) ConstantAst() *ZendAstRef    { return zv.value.(*ZendAstRef) }
-func (zv *Zval) Indirect() *Zval             { return zv.value.(*Zval) }
-func (zv *Zval) Ptr() any                    { return zv.value }
-func (zv *Zval) Class() *ClassEntry          { return zv.value.(*ClassEntry) }
-func (zv *Zval) Func() IFunction             { return zv.value.(IFunction) }
+func (zv *Zval) Long() int                 { return zv.value.(int) }
+func (zv *Zval) Double() float64           { return zv.value.(float64) }
+func (zv *Zval) String() *String           { return zv.value.(*String) }
+func (zv *Zval) StringVal() string         { return zv.value.(*String).GetStr() }
+func (zv *Zval) Array() *Array             { return zv.value.(*Array) }
+func (zv *Zval) Object() *ZendObject       { return zv.value.(*ZendObject) }
+func (zv *Zval) Resource() *ZendResource   { return zv.value.(*ZendResource) }
+func (zv *Zval) Reference() *ZendReference { return zv.value.(*ZendReference) }
+func (zv *Zval) ConstantAst() *ZendAstRef  { return zv.value.(*ZendAstRef) }
+func (zv *Zval) Indirect() *Zval           { return zv.value.(*Zval) }
+func (zv *Zval) Ptr() any                  { return zv.value }
+func (zv *Zval) Class() *ClassEntry        { return zv.value.(*ClassEntry) }
+func (zv *Zval) Func() IFunction           { return zv.value.(IFunction) }
 
 func (zv *Zval) SetUndef()                       { zv.typ, zv.value = IS_UNDEF, nil }
 func (zv *Zval) SetNull()                        { zv.typ, zv.value = IS_NULL, nil }
