@@ -1820,7 +1820,7 @@ func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename string, 
 	fh := zend.NewFileHandleByFilename(filename)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniFile(fh, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
-		return_value.Array().DestroyEx()
+		return_value.Array().Destroy()
 		return_value.SetFalse()
 		return
 	}
@@ -1867,7 +1867,7 @@ func ZifParseIniString(executeData zpp.Ex, return_value zpp.Ret, iniString *type
 	memset(string+str_len, 0, zend.ZEND_MMAP_AHEAD)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
-		return_value.Array().DestroyEx()
+		return_value.Array().Destroy()
 		return_value.SetFalse()
 	}
 	zend.Efree(string)

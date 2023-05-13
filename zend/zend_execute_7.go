@@ -154,7 +154,7 @@ func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
 
 	symbol_table.SymtableClean()
 	if EG__().GetSymtableCachePtr() >= EG__().GetSymtableCacheLimit() {
-		symbol_table.DestroyEx()
+		symbol_table.Destroy()
 	} else {
 		*(b.PostInc(&(EG__().GetSymtableCachePtr()))) = symbol_table
 	}

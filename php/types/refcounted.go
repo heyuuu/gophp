@@ -23,52 +23,15 @@ func (this *ZendRefcountedH) SetTypeInfo(value uint32) { this.u.type_info = valu
  * ZendRefcounted
  */
 type IRefcounted interface {
-	GetGc() *ZendRefcountedH
-	SetGc(value ZendRefcountedH)
-
-	// refcount
-	GetRefcount() uint32
-	SetRefcount(rc uint32) uint32
-	AddRefcount() uint32
-	DelRefcount() uint32
-	AddRefcountEx(rc uint32) uint32
-	DelRefcountEx(rc uint32) uint32
-
-	// type_info
-	GetGcTypeInfo() uint32
-	SetGcTypeInfo(typeInfo uint32)
-
-	GetGcType() uint8
-	GetGcFlags() uint32
-
-	AddGcFlags(flags uint32)
-	DelGcFlags(flags uint32)
-	HasGcFlags(flags uint32) bool
-
 	// flags
-	SetCollectable()
-	DelCollectable()
-
 	IsImmutable() bool
-	SetImmutable()
-	DelImmutable()
-
 	IsPersistent() bool
-	SetPersistent()
-	DelPersistent()
-
 	IsRecursive() bool
-	ProtectRecursive()
-	UnprotectRecursive()
-	TryProtectRecursive()
-	TryUnProtectRecursive()
 }
 
 type ZendRefcounted struct {
 	gc ZendRefcountedH
 }
-
-var _ IRefcounted = &ZendRefcounted{}
 
 func (this *ZendRefcounted) GetGc() *ZendRefcountedH     { return &this.gc }
 func (this *ZendRefcounted) SetGc(value ZendRefcountedH) { this.gc = value }
@@ -76,15 +39,6 @@ func (this *ZendRefcounted) SetGc(value ZendRefcountedH) { this.gc = value }
 // Refcount
 
 func (this *ZendRefcounted) GetRefcount() uint32 {
-	return this.gc.refcount
-}
-func (this *ZendRefcounted) SetRefcount(rc uint32) uint32 {
-	this.gc.refcount = rc
-	return this.gc.refcount
-}
-
-func (this *ZendRefcounted) AddRefcount() uint32 {
-	this.gc.refcount++
 	return this.gc.refcount
 }
 
@@ -166,4 +120,18 @@ func (this *ZendRefcounted) TryUnProtectRecursive() {
 	if !this.HasGcFlags(GC_IMMUTABLE) {
 		this.DelGcFlags(GC_PROTECTED)
 	}
+}
+
+// object
+func (this *ZendRefcounted) IsObjDtorCalled() bool {
+	return this.HasGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
+}
+func (this *ZendRefcounted) MarkObjDtorCalled() {
+	this.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
+}
+func (this *ZendRefcounted) IsObjFreeCalled() bool {
+	return this.HasGcFlags(IS_OBJ_FREE_CALLED)
+}
+func (this *ZendRefcounted) MarkObjFreeCalled() {
+	this.AddGcFlags(IS_OBJ_FREE_CALLED)
 }

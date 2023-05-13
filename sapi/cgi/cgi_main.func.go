@@ -255,7 +255,7 @@ func CgiPhpImportEnvironmentVariables(array_ptr *types.Zval) {
 			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
 		}
 		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() == types.IS_ARRAY && array_ptr.Array() != core.PG__().http_globals[core.TRACK_VARS_ENV].Array() {
-			array_ptr.Array().DestroyEx()
+			array_ptr.Array().Destroy()
 			array_ptr.SetArray(types.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].Array()))
 			return
 		}

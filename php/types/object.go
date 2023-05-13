@@ -18,8 +18,6 @@ type ZendObject struct {
 	propertiesTable []Zval
 }
 
-var _ IRefcounted = &ZendObject{}
-
 func NewObject(ce *ClassEntry, handle uint32, handlers *ObjectHandlers) *ZendObject {
 	propertyCount := ce.GetDefaultPropertiesCount()
 	if ce.IsUseGuards() {

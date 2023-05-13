@@ -20,7 +20,7 @@ func ZendObjectStdDtor(object *types.ZendObject) {
 	if object.GetProperties() != nil {
 		if (object.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 			if object.GetProperties().DelRefcount() == 0 && object.GetProperties().GetGcType() != types.IS_NULL {
-				object.GetProperties().DestroyEx()
+				object.GetProperties().Destroy()
 			}
 		}
 	}
@@ -157,7 +157,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 
 		if old_object.GetHandlers() == StdObjectHandlersPtr {
 			if (old_object.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-				old_object.GetProperties().AddRefcount()
+				//old_object.GetProperties().AddRefcount()
 			}
 			new_object.SetProperties(old_object.GetProperties())
 			return

@@ -45,7 +45,7 @@ func SplArrayGetHashTable(intern *SplArrayObject) *types.Array {
 }
 func SplArrayReplaceHashTable(intern *SplArrayObject, ht *types.Array) {
 	var ht_ptr **types.Array = SplArrayGetHashTablePtr(intern)
-	ht_ptr.DestroyEx()
+	ht_ptr.Destroy()
 	*ht_ptr = ht
 }
 func SplArrayIsObject(intern *SplArrayObject) types.ZendBool {

@@ -128,8 +128,6 @@ type Array struct {
 	data0 ArrayData
 }
 
-var _ IRefcounted = &Array{}
-
 /**
  * Constructor && Init
  */
@@ -405,8 +403,7 @@ func (ht *Array) Clean() {
 	ht.indexes = make(map[ArrayKey]uint32)
 }
 
-func (ht *Array) Destroy()   { ht.Clean() }
-func (ht *Array) DestroyEx() { ht.Clean() }
+func (ht *Array) Destroy() { ht.Clean() }
 
 /**
  * Methods use index key

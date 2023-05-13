@@ -1,7 +1,6 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -16,14 +15,14 @@ func ZEND_SEND_FUNC_ARG_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	varptr = opline.Op1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	if varptr.IsReference() {
-		var ref *types.ZendRefcounted = varptr.RefCounted()
+		//var ref *types.ZendRefcounted = varptr.RefCounted()
 		varptr = types.Z_REFVAL_P(varptr)
 		arg.CopyValueFrom(varptr)
-		if ref.DelRefcount() == 0 {
-			EfreeSize(ref, b.SizeOf("zend_reference"))
-		} else {
-			// arg.TryAddRefcount()
-		}
+		//if ref.DelRefcount() == 0 {
+		//EfreeSize(ref, b.SizeOf("zend_reference"))
+		//} else {
+		// arg.TryAddRefcount()
+		//}
 
 	} else {
 		arg.CopyValueFrom(varptr)

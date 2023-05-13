@@ -569,7 +569,7 @@ try_again:
 		} else if ht != op.Array() {
 			// ZvalPtrDtor(op)
 		} else {
-			ht.DelRefcount()
+			//ht.DelRefcount()
 		}
 		obj = zend.ZendObjectsNew(zend.ZendStandardClassDef)
 		obj.SetProperties(ht)

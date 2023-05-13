@@ -32,7 +32,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 
 			/* Delay closure destruction until its invocation */
 
-			ZEND_CLOSURE_OBJECT(func_).AddRefcount()
+			//ZEND_CLOSURE_OBJECT(func_).AddRefcount()
 			call_info |= ZEND_CALL_CLOSURE
 			if func_.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
@@ -42,7 +42,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 				call_info |= ZEND_CALL_HAS_THIS
 			}
 		} else if fcc.GetObject() != nil {
-			fcc.GetObject().AddRefcount()
+			//fcc.GetObject().AddRefcount()
 			object_or_called_scope = fcc.GetObject()
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}
@@ -92,7 +92,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 
 			/* Delay closure destruction until its invocation */
 
-			ZEND_CLOSURE_OBJECT(func_).AddRefcount()
+			//ZEND_CLOSURE_OBJECT(func_).AddRefcount()
 			call_info |= ZEND_CALL_CLOSURE
 			if func_.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
@@ -102,7 +102,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 				call_info |= ZEND_CALL_HAS_THIS
 			}
 		} else if fcc.GetObject() != nil {
-			fcc.GetObject().AddRefcount()
+			//fcc.GetObject().AddRefcount()
 			object_or_called_scope = fcc.GetObject()
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}
@@ -160,7 +160,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 
 			/* Delay closure destruction until its invocation */
 
-			ZEND_CLOSURE_OBJECT(func_).AddRefcount()
+			//ZEND_CLOSURE_OBJECT(func_).AddRefcount()
 			call_info |= ZEND_CALL_CLOSURE
 			if func_.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
@@ -170,7 +170,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 				call_info |= ZEND_CALL_HAS_THIS
 			}
 		} else if fcc.GetObject() != nil {
-			fcc.GetObject().AddRefcount()
+			//fcc.GetObject().AddRefcount()
 			object_or_called_scope = fcc.GetObject()
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}

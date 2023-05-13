@@ -188,14 +188,14 @@ func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zv
 	ref = value_ptr.Reference()
 	// 	ref.AddRefcount()
 	if variable_ptr.IsRefcounted() {
-		var garbage *types.ZendRefcounted = variable_ptr.RefCounted()
-		if garbage.DelRefcount() == 0 {
-			variable_ptr.SetReference(ref)
-			//RcDtorFunc(garbage)
-			return
-		} else {
-			//GcCheckPossibleRoot(garbage)
-		}
+		//var garbage *types.ZendRefcounted = variable_ptr.RefCounted()
+		//if garbage.DelRefcount() == 0 {
+		//	variable_ptr.SetReference(ref)
+		//	//RcDtorFunc(garbage)
+		//	return
+		//} else {
+		//	//GcCheckPossibleRoot(garbage)
+		//}
 	}
 	variable_ptr.SetReference(ref)
 }

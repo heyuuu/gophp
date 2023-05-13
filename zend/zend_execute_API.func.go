@@ -116,7 +116,7 @@ func ShutdownExecutor() {
 				var ht *types.Array = opArray.GetStaticVariablesPtr()
 				if ht != nil {
 					if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-						ht.DestroyEx()
+						ht.Destroy()
 					}
 					opArray.SetStaticVariablesPtr(nil)
 				}
@@ -135,7 +135,7 @@ func ShutdownExecutor() {
 							var ht *types.Array = opArray.GetStaticVariablesPtr()
 							if ht != nil {
 								if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-									ht.DestroyEx()
+									ht.Destroy()
 								}
 								opArray.SetStaticVariablesPtr(nil)
 							}
@@ -492,7 +492,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 	}
 	if func_.GetOpArray().IsClosure() {
 		var call_info uint32
-		ZEND_CLOSURE_OBJECT(func_).AddRefcount()
+		//ZEND_CLOSURE_OBJECT(func_).AddRefcount()
 		call_info = ZEND_CALL_CLOSURE
 		if func_.IsFakeClosure() {
 			call_info |= ZEND_CALL_FAKE_CLOSURE

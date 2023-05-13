@@ -426,7 +426,7 @@ func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, _ zp
 	}
 	globfree(&globbuf)
 	if basedir_limit != 0 && !(return_value.Array().Len()) {
-		return_value.Array().DestroyEx()
+		return_value.Array().Destroy()
 		return_value.SetFalse()
 		return
 	}

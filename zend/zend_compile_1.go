@@ -91,7 +91,7 @@ func FunctionAddRef(function types.IFunction) {
 		}
 		if op_array.GetStaticVariables() != nil {
 			if (op_array.GetStaticVariables().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-				op_array.GetStaticVariables().AddRefcount()
+				//op_array.GetStaticVariables().AddRefcount()
 			}
 		}
 		if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {

@@ -322,7 +322,7 @@ func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecu
 
 			/* Delay closure destruction until its invocation */
 
-			ZEND_CLOSURE_OBJECT(fbc).AddRefcount()
+			//ZEND_CLOSURE_OBJECT(fbc).AddRefcount()
 			call_info |= ZEND_CALL_CLOSURE
 			if fbc.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE

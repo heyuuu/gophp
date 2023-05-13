@@ -687,7 +687,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 		// zend.ZvalPtrDtor(stream_array)
 		stream_array.SetArray(ht)
 	} else {
-		ht.DestroyEx()
+		ht.Destroy()
 	}
 	return ret
 }
@@ -1218,7 +1218,7 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 	}
 	if filter != nil {
 		filter.SetRes(zend.ZendRegisterResource(filter, streams.PhpFileLeStreamFilter()))
-		filter.GetRes().AddRefcount()
+		//filter.GetRes().AddRefcount()
 		return_value.SetResource(filter.GetRes())
 		return
 	} else {

@@ -122,12 +122,9 @@ func ZendUndefinedOffsetWrite(ht *types.Array, lval ZendLong) int {
 	/* The array may be destroyed while throwing the notice.
 	 * Temporarily increase the refcount to detect this situation. */
 
-	if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-		// 		ht.AddRefcount()
-	}
 	ZendUndefinedOffset(lval)
 	if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-		ht.DestroyEx()
+		ht.Destroy()
 		return types.FAILURE
 	}
 	if EG__().GetException() != nil {
@@ -144,7 +141,7 @@ func ZendUndefinedIndexWrite(ht *types.Array, offset *types.String) int {
 	}
 	ZendUndefinedIndex(offset)
 	if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-		ht.DestroyEx()
+		ht.Destroy()
 		return types.FAILURE
 	}
 	if EG__().GetException() != nil {
@@ -202,7 +199,7 @@ func SlowIndexConvertEx(ht *types.Array, dim *types.Zval, executeData *ZendExecu
 		}
 		ZVAL_UNDEFINED_OP2(executeData)
 		if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-			ht.DestroyEx()
+			ht.Destroy()
 			return types.NewZvalNull()
 		}
 		if EG__().GetException() != nil {

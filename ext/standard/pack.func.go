@@ -747,13 +747,13 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 			size = b.SizeOf("double")
 		default:
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid format type %c", type_)
-			return_value.Array().DestroyEx()
+			return_value.Array().Destroy()
 			return_value.SetFalse()
 			return
 		}
 		if size != 0 && size != -1 && size < 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow", type_)
-			return_value.Array().DestroyEx()
+			return_value.Array().Destroy()
 			return_value.SetFalse()
 			return
 		}
@@ -784,7 +784,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 			}
 			if size != 0 && size != -1 && core.INT_MAX-size+1 < inputpos {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow", type_)
-				return_value.Array().DestroyEx()
+				return_value.Array().Destroy()
 				return_value.SetFalse()
 				return
 			}
@@ -1047,7 +1047,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: not enough input, need %d, have "+zend.ZEND_LONG_FMT, type_, size, inputlen-inputpos)
-				return_value.Array().DestroyEx()
+				return_value.Array().Destroy()
 				return_value.SetFalse()
 				return
 			}

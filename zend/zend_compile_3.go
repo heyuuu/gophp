@@ -611,7 +611,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				} else if val.IsLong() {
 					dst.IndexAdd(val.Long(), &tmp)
 				} else {
-					dst.DestroyEx()
+					dst.Destroy()
 					ok = 0
 					return false
 				}
@@ -624,14 +624,14 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 
 				val = _z
 				if val.GetType() != types.IS_STRING || operators.IsNumericString(val.String().GetStr(), nil, nil, 0) != 0 {
-					dst.DestroyEx()
+					dst.Destroy()
 					ok = 0
 					break
 				}
 				dst.KeyAdd(val.String().GetStr(), &tmp)
 			}
 		}
-		src.DestroyEx()
+		src.Destroy()
 		if ok == 0 {
 			return types.FAILURE
 		}

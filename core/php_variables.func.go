@@ -174,7 +174,7 @@ func PhpRegisterVariableEx(var_name string, val *types.Zval, track_vars_array *t
 			if index == nil {
 				zend.ArrayInit(&gpc_element)
 				if b.Assign(&gpc_element_p, symtable1.Append(&gpc_element)) == nil {
-					gpc_element.Array().DestroyEx()
+					gpc_element.Array().Destroy()
 					// zend.ZvalPtrDtorNogc(val)
 					zend.FreeAlloca(var_orig, use_heap)
 					return

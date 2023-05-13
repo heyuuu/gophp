@@ -149,12 +149,12 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					BG__().serialize_lock++
 					if zend.CallUserFunction(zv, &wakeup_name, &retval, 0, 0) == types.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
-						zv.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
+						zv.Object().MarkObjDtorCalled()
 					}
 					BG__().serialize_lock--
 					// zend.ZvalPtrDtor(&retval)
 				} else {
-					zv.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
+					zv.Object().MarkObjDtorCalled()
 				}
 
 				/* Perform delayed __wakeup calls */
@@ -173,13 +173,13 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					BG__().serialize_lock++
 					if zend.CallUserFunction(zv, &unserialize_name, &retval, 1, &param) == types.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
-						zv.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
+						zv.Object().MarkObjDtorCalled()
 					}
 					BG__().serialize_lock--
 					// zend.ZvalPtrDtor(&param)
 					// zend.ZvalPtrDtor(&retval)
 				} else {
-					zv.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
+					zv.Object().MarkObjDtorCalled()
 				}
 
 				/* Perform delayed __unserialize calls */
@@ -516,7 +516,7 @@ func ObjectCommon(
 		//types.ZendHashRealInitMixed(ary.Array())
 		if ProcessNestedData(rval, p, max, var_hash, ary.Array(), elements, nil) == 0 {
 			rval = types.ZVAL_DEREF(rval)
-			rval.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
+			rval.Object().MarkObjDtorCalled()
 			// zend.ZvalPtrDtor(&ary)
 			return 0
 		}
@@ -540,7 +540,7 @@ func ObjectCommon(
 	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.Object()) == 0 {
 		if has_wakeup != 0 {
 			rval = types.ZVAL_DEREF(rval)
-			rval.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
+			rval.Object().MarkObjDtorCalled()
 		}
 		return 0
 	}

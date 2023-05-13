@@ -728,7 +728,7 @@ func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, 1, zend.AccInterface)
 
 	standard.PhpInfoPrintTableRow(2, "Interfaces", buildClassListString(list.Array()))
-	list.Array().DestroyEx()
+	list.Array().Destroy()
 
 	zend.ArrayInit(&list)
 	SplAddClasses(spl_ce_AppendIterator, &list, 0, -1, zend.AccInterface)
@@ -788,7 +788,7 @@ func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, -1, zend.AccInterface)
 
 	standard.PhpInfoPrintTableRow(2, "Classes", buildClassListString(list.Array()))
-	list.Array().DestroyEx()
+	list.Array().Destroy()
 
 	standard.PhpInfoPrintTableEnd()
 }

@@ -56,13 +56,13 @@ func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 		var p *types.Zval = call.VarNum(call.GetFunc().GetOpArray().GetLastVar() + call.GetFunc().GetOpArray().GetT())
 		for {
 			if p.IsRefcounted() {
-				var r *types.ZendRefcounted = p.RefCounted()
-				if r.DelRefcount() == 0 {
-					p.SetNull()
-					//RcDtorFunc(r)
-				} else {
-					//GcCheckPossibleRoot(r)
-				}
+				//var r *types.ZendRefcounted = p.RefCounted()
+				//if r.DelRefcount() == 0 {
+				//	p.SetNull()
+				//	//RcDtorFunc(r)
+				//} else {
+				//	//GcCheckPossibleRoot(r)
+				//}
 			}
 			p++
 			if !(b.PreDec(&count)) {
@@ -77,11 +77,11 @@ func ZendVmStackFreeExtraArgs(call *ZendExecuteData) {
 func ZendVmStackFreeArgs(call *ZendExecuteData) {
 	for _, p := range call.AllArgs() {
 		if p.IsRefcounted() {
-			r := p.RefCounted()
-			if r.DelRefcount() == 0 {
-				p.SetNull()
-				//RcDtorFunc(r)
-			}
+			//r := p.RefCounted()
+			//if r.DelRefcount() == 0 {
+			p.SetNull()
+			//RcDtorFunc(r)
+			//}
 		}
 	}
 }
@@ -151,14 +151,14 @@ func ZifPass(executeData *ZendExecuteData, return_value *types.Zval) {}
 func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *types.Zval, result *types.Zval) {
 	var __container_to_free *types.Zval = free_op
 	if __container_to_free != nil && __container_to_free.IsRefcounted() {
-		var __ref *types.ZendRefcounted = __container_to_free.RefCounted()
-		if __ref.DelRefcount() == 0 {
-			var __zv *types.Zval = result
-			if __zv.IsIndirect() {
-				types.ZVAL_COPY(__zv, __zv.Indirect())
-			}
-			//RcDtorFunc(__ref)
-		}
+		//var __ref *types.ZendRefcounted = __container_to_free.RefCounted()
+		//if __ref.DelRefcount() == 0 {
+		//	var __zv *types.Zval = result
+		//	if __zv.IsIndirect() {
+		//		types.ZVAL_COPY(__zv, __zv.Indirect())
+		//	}
+		//	//RcDtorFunc(__ref)
+		//}
 	}
 }
 func CV_DEF_OF(i __auto__) __auto__ { return executeData.GetFunc().GetOpArray().vars[i] }

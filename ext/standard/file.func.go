@@ -1978,7 +1978,7 @@ func PhpFgetcsv(
 							if int(temp_len > size_t(limit-buf)) != 0 {
 								goto quit_loop_2
 							}
-							return_value.Array().DestroyEx()
+							return_value.Array().Destroy()
 							return_value.SetFalse()
 							goto out
 						}

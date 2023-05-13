@@ -43,24 +43,14 @@ type ZendResource struct {
 	ptr    any
 }
 
-var _ IRefcounted = &ZendResource{}
-
 func NewZendResource(handle int, ptr any, type_ int) *ZendResource {
-	return NewZendResourcePersistent(handle, ptr, type_, false)
-}
-func NewZendResourcePersistent(handle int, ptr any, type_ int, persistent bool) *ZendResource {
 	var res = &ZendResource{
 		handle: handle,
 		type_:  type_,
 		ptr:    ptr,
 	}
 
-	//res.SetRefcount(1)
 	res.SetGcTypeInfo(IS_RESOURCE)
-	if persistent {
-		res.SetPersistent()
-	}
-
 	runtime.SetFinalizer(res, zend.ZendListFree)
 
 	return res
@@ -111,8 +101,6 @@ type ZendReference struct {
 	sources ZendPropertyInfoSourceList
 }
 
-var _ IRefcounted = &ZendReference{}
-
 func NewZendReference(val *Zval) *ZendReference {
 	var ref = &ZendReference{}
 
@@ -145,17 +133,12 @@ type ZendAstRef struct {
 	ast *zend.ZendAst
 }
 
-var _ IRefcounted = &ZendAstRef{}
-
 func NewAstRef(ast *zend.ZendAst) *ZendAstRef {
 	b.Assert(ast != nil)
 
 	// init
 	var ref *ZendAstRef = &ZendAstRef{}
-	//tree_size = zend.ZendAstTreeSize(ast) + b.SizeOf("zend_ast_ref")
-	//ref = zend.Emalloc(tree_size)
 	zend.ZendAstTreeCopy(ast, ref.ast)
-	//ref.SetRefcount(1)
 	ref.SetGcTypeInfo(uint32(IS_CONSTANT_AST))
 
 	// dtor

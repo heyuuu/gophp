@@ -6,7 +6,7 @@ import (
 )
 
 func ZendObjectStoreCtorFailed(obj *types.ZendObject) {
-	obj.AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
+	obj.MarkObjDtorCalled()
 }
 func ZendObjectPropertiesSize(ce *types.ClassEntry) int {
 	return b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() - b.Cond(ce.IsUseGuards(), 0, 1))

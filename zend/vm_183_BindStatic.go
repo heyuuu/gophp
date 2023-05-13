@@ -19,7 +19,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		executeData.GetFunc().GetOpArray().SetStaticVariablesPtr(ht)
 	} else if ht.GetRefcount() > 1 {
 		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-			ht.DelRefcount()
+			//ht.DelRefcount()
 		}
 		ht = types.ZendArrayDup(ht)
 		executeData.GetFunc().GetOpArray().SetStaticVariablesPtr(ht)
