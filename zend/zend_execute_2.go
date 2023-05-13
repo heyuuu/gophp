@@ -308,7 +308,7 @@ func ZendIllegalOffset() {
 	faults.Error(faults.E_WARNING, "Illegal offset type")
 }
 func ZendAssignToObjectDim(object *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	object.Object().Handlers().GetWriteDimension()(object, dim, value)
+	object.Object().GetHandlers().GetWriteDimension()(object, dim, value)
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
@@ -328,17 +328,17 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 	var rv types.Zval
 	var res types.Zval
 	value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data1)
-	if b.Assign(&z, object.Object().Handlers().GetReadDimension()(object, property, BP_VAR_R, &rv)) != nil {
-		if z.IsObject() && z.Object().Handlers().GetGet() != nil {
+	if b.Assign(&z, object.Object().GetHandlers().GetReadDimension()(object, property, BP_VAR_R, &rv)) != nil {
+		if z.IsObject() && z.Object().GetHandlers().GetGet() != nil {
 			var rv2 types.Zval
-			var value *types.Zval = z.Object().Handlers().GetGet()(z, &rv2)
+			var value *types.Zval = z.Object().GetHandlers().GetGet()(z, &rv2)
 			if z == &rv {
 				// ZvalPtrDtor(&rv)
 			}
 			z.CopyValueFrom(value)
 		}
 		if ZendBinaryOp(&res, z, value, opline) == types.SUCCESS {
-			object.Object().Handlers().GetWriteDimension()(object, property, &res)
+			object.Object().GetHandlers().GetWriteDimension()(object, property, &res)
 		}
 		if z == &rv {
 			// ZvalPtrDtor(&rv)

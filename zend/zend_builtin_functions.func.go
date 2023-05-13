@@ -325,11 +325,11 @@ repeat:
 		}
 	case types.IS_OBJECT:
 		if val_free.IsUndef() {
-			if value.Object().Handlers().GetGet() != nil {
-				value = value.Object().Handlers().GetGet()(value, &val_free)
+			if value.Object().GetHandlers().GetGet() != nil {
+				value = value.Object().GetHandlers().GetGet()(value, &val_free)
 				goto repeat
-			} else if value.Object().Handlers().GetCastObject() != nil {
-				if value.Object().Handlers().GetCastObject()(value, &val_free, types.IS_STRING) == types.SUCCESS {
+			} else if value.Object().GetHandlers().GetCastObject() != nil {
+				if value.Object().GetHandlers().GetCastObject()(value, &val_free, types.IS_STRING) == types.SUCCESS {
 					value = &val_free
 					break
 				}
@@ -551,7 +551,7 @@ func ZifGetClassVars(executeData zpp.Ex, return_value zpp.Ret, className *types.
 	}
 }
 func ZifGetObjectVars(obj zpp.Object) (*types.Array, bool) {
-	properties := obj.Object().Handlers().GetGetProperties()(obj)
+	properties := obj.Object().GetHandlers().GetGetProperties()(obj)
 	if properties == nil {
 		return nil, false
 	}
@@ -616,7 +616,7 @@ func ZifGetMangledObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *type
 		}
 		break
 	}
-	properties = obj.Object().Handlers().GetGetProperties()(obj)
+	properties = obj.Object().GetHandlers().GetGetProperties()(obj)
 	if properties == nil {
 		return_value.SetEmptyArray()
 		return
@@ -704,7 +704,7 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 	}
 	if klass.IsObject() {
 		var obj = klass.Object()
-		func_ = klass.Object().Handlers().GetGetMethod()(&obj, method_name, nil)
+		func_ = klass.Object().GetHandlers().GetGetMethod()(&obj, method_name, nil)
 		if func_ != nil {
 			if func_.IsCallViaTrampoline() {
 
@@ -754,7 +754,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 		return
 	}
 	property_z.SetString(property)
-	if object.IsObject() && object.Object().Handlers().GetHasProperty()(object, &property_z, 2, nil) != 0 {
+	if object.IsObject() && object.Object().GetHandlers().GetHasProperty()(object, &property_z, 2, nil) != 0 {
 		return_value.SetTrue()
 		return
 	}

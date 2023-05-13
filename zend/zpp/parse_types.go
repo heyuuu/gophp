@@ -248,7 +248,7 @@ func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool)
 			}
 			arg.Object().SetProperties(types.ZendArrayDup(arg.Object().GetProperties()))
 		}
-		return arg.Object().Handlers().GetGetProperties()(arg), true
+		return arg.Object().GetHandlers().GetGetProperties()(arg), true
 	} else if checkNull && arg.IsNull() {
 		return nil, true
 	} else {

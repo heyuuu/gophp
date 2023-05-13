@@ -35,7 +35,6 @@ func NewObject(ce *ClassEntry, handle uint32, handlers *ObjectHandlers) *ZendObj
 }
 
 func (o *ZendObject) Init(ce *ClassEntry, handle uint32) {
-	//o.SetRefcount(1)
 	o.SetGcTypeInfo(uint32(IS_OBJECT) | GC_COLLECTABLE<<GC_FLAGS_SHIFT)
 
 	o.handle = handle

@@ -148,11 +148,11 @@ func PhpUrlEncodeHashEx(
 				*(b.PostInc(&p)) = 'B'
 				*p = '0'
 			}
-			if (ht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+			if !ht.IsImmutable() {
 				ht.ProtectRecursive()
 			}
 			PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, b.Cond(zdata.IsType(types.IS_OBJECT), zdata, nil), arg_sep, enc_type)
-			if (ht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+			if !ht.IsImmutable() {
 				ht.UnprotectRecursive()
 			}
 			zend.Efree(newprefix)

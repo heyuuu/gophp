@@ -85,7 +85,7 @@ func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 	var ht *types.Array
 	if ce.GetDebugInfo() == nil {
 		*is_temp = 0
-		return object.Object().Handlers().GetGetProperties()(object)
+		return object.Object().GetHandlers().GetGetProperties()(object)
 	}
 	ZendCallMethodWith0Params(object, ce, ce.GetDebugInfo(), ZEND_DEBUGINFO_FUNC_NAME, &retval)
 	if retval.IsArray() {
@@ -1584,9 +1584,9 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ar
 	var ht *types.Array
 	switch purpose {
 	case ZEND_PROP_PURPOSE_DEBUG:
-		if obj.Object().Handlers().GetGetDebugInfo() != nil {
+		if obj.Object().GetHandlers().GetGetDebugInfo() != nil {
 			var is_temp int
-			ht = obj.Object().Handlers().GetGetDebugInfo()(obj, &is_temp)
+			ht = obj.Object().GetHandlers().GetGetDebugInfo()(obj, &is_temp)
 			if ht != nil && is_temp == 0 && (ht.GetGcFlags()&types.GC_IMMUTABLE) == 0 {
 				// 				ht.AddRefcount()
 			}
@@ -1602,10 +1602,7 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ar
 	case ZEND_PROP_PURPOSE_JSON:
 		fallthrough
 	case _ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
-		ht = obj.Object().Handlers().GetGetProperties()(obj)
-		if ht != nil && (ht.GetGcFlags()&types.GC_IMMUTABLE) == 0 {
-			// 			ht.AddRefcount()
-		}
+		ht = obj.Object().GetHandlers().GetGetProperties()(obj)
 		return ht
 	default:
 		b.Assert(false)
@@ -1613,8 +1610,8 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ar
 	}
 }
 func ZendGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Array {
-	if obj.Object().Handlers().GetGetPropertiesFor() != nil {
-		return obj.Object().Handlers().GetGetPropertiesFor()(obj, purpose)
+	if obj.Object().GetHandlers().GetGetPropertiesFor() != nil {
+		return obj.Object().GetHandlers().GetGetPropertiesFor()(obj, purpose)
 	}
 	return ZendStdGetPropertiesFor(obj, purpose)
 }

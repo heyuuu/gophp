@@ -585,9 +585,6 @@ func ZendSymtableToProptable(ht *Array) *Array {
 			goto convert
 		}
 	}
-	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
-		// 		ht.AddRefcount()
-	}
 	return ht
 convert:
 	var newHt *Array = NewArray(ht.Len())
@@ -636,9 +633,6 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 	}
 	if always_duplicate != 0 {
 		return ZendArrayDup(ht)
-	}
-	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
-		// 		ht.AddRefcount()
 	}
 	return ht
 convert:

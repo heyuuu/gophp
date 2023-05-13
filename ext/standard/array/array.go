@@ -129,9 +129,9 @@ func ZifCount(var_ *types.Zval, _ zpp.Opt, mode int) int {
 		var long int
 
 		/* first, we check if the handler is defined */
-		if array.Object().Handlers().GetCountElements() != nil {
+		if array.Object().GetHandlers().GetCountElements() != nil {
 			long = 1
-			if types.SUCCESS == array.Object().Handlers().GetCountElements()(array, &long) {
+			if types.SUCCESS == array.Object().GetHandlers().GetCountElements()(array, &long) {
 				return long
 			}
 			if zend.EG__().GetException() != nil {
@@ -913,11 +913,11 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 			srcZval = &tmp
 		}
 		if srcZval.IsType(types.IS_ARRAY) {
-			if thash != nil && (thash.GetGcFlags()&types.GC_IMMUTABLE) == 0 {
+			if thash != nil && !thash.IsImmutable() {
 				thash.ProtectRecursive()
 			}
 			ret = PhpArrayMergeRecursive(destZval.Array(), srcZval.Array())
-			if thash != nil && (thash.GetGcFlags()&types.GC_IMMUTABLE) == 0 {
+			if thash != nil && !thash.IsImmutable() {
 				thash.UnprotectRecursive()
 			}
 			if ret == 0 {
@@ -1186,8 +1186,8 @@ func ArrayColumnFetchProp(data *types.Zval, name *types.Zval) *types.Zval {
 		 * properties that are null but exist) and then in "has" mode to handle objects that
 		 * implement __isset (which is not called in "exists" mode). */
 
-		if data.Object().Handlers().GetHasProperty()(data, name, zend.ZEND_PROPERTY_EXISTS, nil) != 0 || data.Object().Handlers().GetHasProperty()(data, name, zend.ZEND_PROPERTY_ISSET, nil) != 0 {
-			prop = data.Object().Handlers().GetReadProperty()(data, name, zend.BP_VAR_R, nil, &rv)
+		if data.Object().GetHandlers().GetHasProperty()(data, name, zend.ZEND_PROPERTY_EXISTS, nil) != 0 || data.Object().GetHandlers().GetHasProperty()(data, name, zend.ZEND_PROPERTY_ISSET, nil) != 0 {
+			prop = data.Object().GetHandlers().GetReadProperty()(data, name, zend.BP_VAR_R, nil, &rv)
 			if prop != nil {
 				prop = types.ZVAL_DEREF(prop)
 			}

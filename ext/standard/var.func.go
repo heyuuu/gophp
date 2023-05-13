@@ -89,7 +89,7 @@ again:
 		core.PUTS("\"\n")
 	case types.IS_ARRAY:
 		myht := struc.Array()
-		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+		if !myht.IsImmutable() {
 			if level > 1 {
 				if myht.IsRecursive() {
 					core.PUTS("*RECURSION*\n")
@@ -104,7 +104,7 @@ again:
 		myht.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 			PhpArrayElementDump(value, key, level)
 		})
-		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+		if !myht.IsImmutable() {
 			if level > 1 {
 				myht.UnprotectRecursive()
 			}
@@ -121,7 +121,7 @@ again:
 		}
 		struc.ProtectRecursive()
 		myht := zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
-		className := struc.Object().Handlers().GetGetClassName()(struc.Object())
+		className := struc.Object().GetHandlers().GetGetClassName()(struc.Object())
 		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", common, className.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() int { return myht.Count() }, 0))
 		if myht != nil {
 			myht.Foreach(func(key types.ArrayKey, value *types.Zval) {
@@ -226,7 +226,7 @@ again:
 		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(struc.IsRefcounted(), func() uint32 { return struc.GetRefcount() }, 1))
 	case types.IS_ARRAY:
 		myht = struc.Array()
-		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+		if !myht.IsImmutable() {
 			if level > 1 {
 				if myht.IsRecursive() {
 					core.PUTS("*RECURSION*\n")
@@ -252,7 +252,7 @@ again:
 			val = _z
 			ZvalArrayElementDump(val, index, key, level)
 		}
-		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+		if !myht.IsImmutable() {
 			if level > 1 {
 				myht.UnprotectRecursive()
 			}
@@ -272,7 +272,7 @@ again:
 			}
 			myht.ProtectRecursive()
 		}
-		class_name = struc.Object().Handlers().GetGetClassName()(struc.Object())
+		class_name = struc.Object().GetHandlers().GetGetClassName()(struc.Object())
 		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), struc.GetRefcount())
 		// types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
@@ -407,7 +407,7 @@ again:
 		//types.ZendStringFree(ztmp2)
 	case types.IS_ARRAY:
 		myht = struc.Array()
-		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+		if !myht.IsImmutable() {
 			if myht.IsRecursive() {
 				buf.AppendString("NULL")
 				faults.Error(faults.E_WARNING, "var_export does not handle circular references")
@@ -435,7 +435,7 @@ again:
 			val = _z
 			PhpArrayElementExport(val, index, key, level, buf)
 		}
-		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+		if !myht.IsImmutable() {
 			myht.UnprotectRecursive()
 			//myht.DelRefcount()
 		}

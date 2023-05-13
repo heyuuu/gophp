@@ -491,7 +491,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 			})
 		}
 	case types.IS_OBJECT:
-		if data.Object().Handlers() != nil {
+		if data.Object().GetHandlers() != nil {
 			var out types.Zval
 			if zend.ZendStdCastObjectTostring(data, &out, types.IS_STRING) == types.SUCCESS {
 				numbytes = core.PhpStreamWrite(stream, out.String().GetVal(), out.String().GetLen())

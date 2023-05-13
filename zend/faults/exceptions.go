@@ -458,7 +458,7 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 	case types.IS_ARRAY:
 		str.AppendString("Array, ")
 	case types.IS_OBJECT:
-		var class_name *types.String = arg.Object().Handlers().GetGetClassName()(arg.Object())
+		var class_name *types.String = arg.Object().GetHandlers().GetGetClassName()(arg.Object())
 		str.AppendString("Object(")
 		str.AppendString(b.CastStrAuto(class_name.GetVal()))
 		str.AppendString("), ")

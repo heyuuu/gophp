@@ -27,7 +27,7 @@ again:
 	case types.IS_ARRAY:
 		return op.Array().Len() != 0
 	case types.IS_OBJECT:
-		if op.Object().Handlers().GetCastObject() == zend.ZendStdCastObjectTostring {
+		if op.Object().GetHandlers().GetCastObject() == zend.ZendStdCastObjectTostring {
 			return true
 		} else {
 			return ZendObjectIsTrue(op)
@@ -200,12 +200,12 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 		return types.STR_ARRAY_CAPITALIZED, true
 	case types.IS_OBJECT:
 		var tmp types.Zval
-		if op.Object().Handlers().GetCastObject() != nil {
-			if op.Object().Handlers().GetCastObject()(op, &tmp, types.IS_STRING) == types.SUCCESS {
+		if op.Object().GetHandlers().GetCastObject() != nil {
+			if op.Object().GetHandlers().GetCastObject()(op, &tmp, types.IS_STRING) == types.SUCCESS {
 				return tmp.StringVal(), true
 			}
-		} else if op.Object().Handlers().GetGet() != nil {
-			var z *types.Zval = op.Object().Handlers().GetGet()(op, &tmp)
+		} else if op.Object().GetHandlers().GetGet() != nil {
+			var z *types.Zval = op.Object().GetHandlers().GetGet()(op, &tmp)
 			if z.GetType() != types.IS_OBJECT {
 				return __zvalGetStrFunc(z, try)
 			}
