@@ -67,28 +67,28 @@ func (this *ZendResource) SetPtr(value any)    { this.ptr = value }
 type ZendPropertyInfoList struct {
 	num           int
 	num_allocated int
-	ptr           []*zend.ZendPropertyInfo
+	ptr           []*PropertyInfo
 }
 
-func (this *ZendPropertyInfoList) GetNum() int                           { return this.num }
-func (this *ZendPropertyInfoList) SetNum(value int)                      { this.num = value }
-func (this *ZendPropertyInfoList) GetNumAllocated() int                  { return this.num_allocated }
-func (this *ZendPropertyInfoList) SetNumAllocated(value int)             { this.num_allocated = value }
-func (this *ZendPropertyInfoList) GetPtr() []*zend.ZendPropertyInfo      { return this.ptr }
-func (this *ZendPropertyInfoList) SetPtr(value []*zend.ZendPropertyInfo) { this.ptr = value }
+func (this *ZendPropertyInfoList) GetNum() int                  { return this.num }
+func (this *ZendPropertyInfoList) SetNum(value int)             { this.num = value }
+func (this *ZendPropertyInfoList) GetNumAllocated() int         { return this.num_allocated }
+func (this *ZendPropertyInfoList) SetNumAllocated(value int)    { this.num_allocated = value }
+func (this *ZendPropertyInfoList) GetPtr() []*PropertyInfo      { return this.ptr }
+func (this *ZendPropertyInfoList) SetPtr(value []*PropertyInfo) { this.ptr = value }
 
 /**
  * ZendPropertyInfoSourceList
  */
 type ZendPropertyInfoSourceList struct /* union */ {
-	ptr  *zend.ZendPropertyInfo
+	ptr  *PropertyInfo
 	list uintptr
 }
 
-func (this *ZendPropertyInfoSourceList) GetPtr() *zend.ZendPropertyInfo      { return this.ptr }
-func (this *ZendPropertyInfoSourceList) SetPtr(value *zend.ZendPropertyInfo) { this.ptr = value }
-func (this *ZendPropertyInfoSourceList) GetList() uintptr                    { return this.list }
-func (this *ZendPropertyInfoSourceList) SetList(value uintptr)               { this.list = value }
+func (this *ZendPropertyInfoSourceList) GetPtr() *PropertyInfo      { return this.ptr }
+func (this *ZendPropertyInfoSourceList) SetPtr(value *PropertyInfo) { this.ptr = value }
+func (this *ZendPropertyInfoSourceList) GetList() uintptr           { return this.list }
+func (this *ZendPropertyInfoSourceList) SetList(value uintptr)      { this.list = value }
 
 /**
  * ZendReference

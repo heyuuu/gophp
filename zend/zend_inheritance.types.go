@@ -31,8 +31,8 @@ type VarianceObligation struct {
 			always_error types.ZendBool
 		}
 		__1 struct {
-			parent_prop *ZendPropertyInfo
-			child_prop  *ZendPropertyInfo
+			parent_prop *types.PropertyInfo
+			child_prop  *types.PropertyInfo
 		}
 	}
 }
@@ -49,11 +49,15 @@ func (this *VarianceObligation) GetAlwaysError() types.ZendBool { return this.__
 func (this *VarianceObligation) SetAlwaysError(value types.ZendBool) {
 	this.__0.__0.always_error = value
 }
-func (this *VarianceObligation) GetParentProp() *ZendPropertyInfo { return this.__0.__1.parent_prop }
-func (this *VarianceObligation) SetParentProp(value *ZendPropertyInfo) {
+func (this *VarianceObligation) GetParentProp() *types.PropertyInfo {
+	return this.__0.__1.parent_prop
+}
+func (this *VarianceObligation) SetParentProp(value *types.PropertyInfo) {
 	this.__0.__1.parent_prop = value
 }
-func (this *VarianceObligation) GetChildProp() *ZendPropertyInfo { return this.__0.__1.child_prop }
-func (this *VarianceObligation) SetChildProp(value *ZendPropertyInfo) {
+func (this *VarianceObligation) GetChildProp() *types.PropertyInfo {
+	return this.__0.__1.child_prop
+}
+func (this *VarianceObligation) SetChildProp(value *types.PropertyInfo) {
 	this.__0.__1.child_prop = value
 }

@@ -97,7 +97,7 @@ func ZendGetSpecialConstant(name string) *ZendConstant {
 		return nil
 	}
 }
-func ZendVerifyConstAccess(c *ZendClassConstant, scope *types.ClassEntry) bool {
+func ZendVerifyConstAccess(c *types.ClassConstant, scope *types.ClassEntry) bool {
 	if (c.GetValue().GetAccessFlags() & AccPublic) != 0 {
 		return 1
 	} else if (c.GetValue().GetAccessFlags() & AccPrivate) != 0 {

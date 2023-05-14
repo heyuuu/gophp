@@ -49,7 +49,7 @@ func ZendVerifyScalarTypeHint(type_hint uint8, arg *types.Zval, strict types.Zen
 	}
 	return ZendVerifyWeakScalarTypeHint(type_hint, arg)
 }
-func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *types.Zval) {
+func ZendVerifyPropertyTypeError(info *types.PropertyInfo, property *types.Zval) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 
@@ -98,7 +98,7 @@ func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) type
 	*type_ = types.ZEND_TYPE_ENCODE_CE(ce, type_.AllowNull())
 	return 1
 }
-func IZendCheckPropertyType(info *ZendPropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
+func IZendCheckPropertyType(info *types.PropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
 	b.Assert(!(property.IsReference()))
 	if info.GetType().IsClass() {
 		if property.GetType() != types.IS_OBJECT {
@@ -122,17 +122,17 @@ func IZendCheckPropertyType(info *ZendPropertyInfo, property *types.Zval, strict
 		return ZendVerifyScalarTypeHint(info.GetType().Code(), property, strict)
 	}
 }
-func IZendVerifyPropertyType(info *ZendPropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
+func IZendVerifyPropertyType(info *types.PropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
 	if IZendCheckPropertyType(info, property, strict) != 0 {
 		return 1
 	}
 	ZendVerifyPropertyTypeError(info, property)
 	return 0
 }
-func ZendVerifyPropertyType(info *ZendPropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
+func ZendVerifyPropertyType(info *types.PropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
 	return IZendVerifyPropertyType(info, property, strict)
 }
-func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *types.Zval, value *types.Zval, executeData *ZendExecuteData) *types.Zval {
+func ZendAssignToTypedProp(info *types.PropertyInfo, property_val *types.Zval, value *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	var tmp types.Zval
 	value = types.ZVAL_DEREF(value)
 	types.ZVAL_COPY(&tmp, value)
@@ -373,7 +373,7 @@ func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opl
 		// ZvalPtrDtor(&z_copy)
 	}
 }
-func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendBinaryAssignOpTypedProp(prop_info *types.PropertyInfo, zptr *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	var z_copy types.Zval
 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */

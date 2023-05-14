@@ -155,7 +155,7 @@ func GetNextBrkContElement() *ZendBrkContElement {
 	return CG__().GetContext().GetBrkContArray()[CG__().GetContext().GetLastBrkCont()-1]
 }
 func ZendDestroyPropertyInfoInternal(zv *types.Zval) {
-	var property_info *ZendPropertyInfo = zv.Ptr()
+	var property_info *types.PropertyInfo = zv.Ptr()
 	// types.ZendStringRelease(property_info.GetName())
 	Free(property_info)
 }

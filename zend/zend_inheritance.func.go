@@ -11,8 +11,8 @@ import (
 func ZendDoInheritance(ce *types.ClassEntry, parentCe *types.ClassEntry) {
 	ZendDoInheritanceEx(ce, parentCe, false)
 }
-func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
-	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"))
+func ZendDuplicatePropertyInfoInternal(property_info *types.PropertyInfo) *types.PropertyInfo {
+	var new_property_info *types.PropertyInfo = Pemalloc(b.SizeOf("zend_property_info"))
 	memcpy(new_property_info, property_info, b.SizeOf("zend_property_info"))
 	return new_property_info
 }
@@ -790,7 +790,7 @@ func DoInheritMethod(key string, parent types.IFunction, ce *types.ClassEntry, i
 		//}
 	}
 }
-func PropertyTypesCompatible(parent_info *ZendPropertyInfo, child_info *ZendPropertyInfo) InheritanceStatus {
+func PropertyTypesCompatible(parent_info *types.PropertyInfo, child_info *types.PropertyInfo) InheritanceStatus {
 	var parent_name *types.String
 	var child_name *types.String
 	var parent_type_ce *types.ClassEntry
@@ -836,13 +836,13 @@ func PropertyTypesCompatible(parent_info *ZendPropertyInfo, child_info *ZendProp
 		return INHERITANCE_ERROR
 	}
 }
-func EmitIncompatiblePropertyError(child *ZendPropertyInfo, parent *ZendPropertyInfo) {
+func EmitIncompatiblePropertyError(child *types.PropertyInfo, parent *types.PropertyInfo) {
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must be %s%s (as in class %s)", child.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(child.GetName()), b.Cond(parent.GetType().AllowNull(), "?", ""), b.CondF(parent.GetType().IsClass(), func() []byte {
 		return b.CondF(parent.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(parent.GetType()).GetName() }, func() *types.String { return ResolveClassName(parent.GetCe(), parent.GetType().Name()) }).GetVal()
 	}, func() *byte { return types.ZendGetTypeByConst(parent.GetType().Code()) }), parent.GetCe().GetName().GetVal())
 }
-func DoInheritProperty(parent_info *ZendPropertyInfo, key string, ce *types.ClassEntry) {
-	var child_info *ZendPropertyInfo = ce.PropertyTable().Get(key)
+func DoInheritProperty(parent_info *types.PropertyInfo, key string, ce *types.ClassEntry) {
+	var child_info *types.PropertyInfo = ce.PropertyTable().Get(key)
 	if child_info != nil {
 		if parent_info.HasFlags(AccPrivate | AccChanged) {
 			child_info.SetIsChanged(true)
@@ -917,7 +917,7 @@ func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
 		DoImplementInterface(ce, newInterface)
 	}
 }
-func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *types.ClassEntry) {
+func DoInheritClassConstant(name string, parentConst *types.ClassConstant, ce *types.ClassEntry) {
 	var c = ce.ConstantsTable().Get(name)
 	if c != nil {
 		if (c.GetValue().GetAccessFlags() & AccPppMask) > (parentConst.GetValue().GetAccessFlags() & AccPppMask) {
@@ -928,7 +928,7 @@ func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *typ
 			ce.SetIsConstantsUpdated(false)
 		}
 		if ce.IsInternalClass() {
-			parentConst = CopyClassConstant(parentConst)
+			parentConst = types.CopyClassConstant(parentConst)
 		}
 		ce.ConstantsTable().Add(name, parentConst)
 	}
@@ -939,12 +939,12 @@ func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
 	}
 	b.Assert(ce.GetPropertiesInfoTable() == nil)
 
-	var table []*ZendPropertyInfo = make([]*ZendPropertyInfo, ce.GetDefaultPropertiesCount())
+	var table []*types.PropertyInfo = make([]*types.PropertyInfo, ce.GetDefaultPropertiesCount())
 	ce.SetPropertiesInfoTable(table)
 
 	/* Dead slots may be left behind during inheritance. Make sure these are NULLed out. */
 	if ce.GetParent() != nil && ce.GetParent().GetDefaultPropertiesCount() != 0 {
-		var parentTable []*ZendPropertyInfo = ce.GetParent().GetPropertiesInfoTable()
+		var parentTable []*types.PropertyInfo = ce.GetParent().GetPropertiesInfoTable()
 		copy(table, parentTable[:ce.GetParent().GetDefaultPropertiesCount()])
 
 		/* Child did not add any new properties, we are done */
@@ -953,7 +953,7 @@ func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
 		}
 	}
 
-	ce.PropertyTable().Foreach(func(key string, propInfo *ZendPropertyInfo) {
+	ce.PropertyTable().Foreach(func(key string, propInfo *types.PropertyInfo) {
 		if propInfo.GetCe() == ce && !propInfo.IsStatic() {
 			table[OBJ_PROP_TO_NUM(propInfo.GetOffset())] = propInfo
 		}
@@ -1152,7 +1152,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 		}
 	}
 
-	ce.PropertyTable().Foreach(func(key string, property_info *ZendPropertyInfo) {
+	ce.PropertyTable().Foreach(func(key string, property_info *types.PropertyInfo) {
 		if property_info.GetCe() == ce {
 			if property_info.IsStatic() {
 				property_info.SetOffset(property_info.GetOffset() + uint32(parentCe.GetDefaultStaticMembersCount()))
@@ -1163,12 +1163,12 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 	})
 
 	if parentCe.PropertyTable().Len() != 0 {
-		parentCe.PropertyTable().Foreach(func(key string, property_info *ZendPropertyInfo) {
+		parentCe.PropertyTable().Foreach(func(key string, property_info *types.PropertyInfo) {
 			DoInheritProperty(property_info, key, ce)
 		})
 	}
 	if parentCe.ConstantsTable().Len() != 0 {
-		parentCe.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
+		parentCe.ConstantsTable().Foreach(func(key string, c *types.ClassConstant) {
 			DoInheritClassConstant(key, c, ce)
 		})
 
@@ -1192,8 +1192,8 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 	}
 	ce.AddCeFlags(parentCe.GetCeFlags() & (AccHasStaticInMethods | AccHasTypeHints | AccUseGuards))
 }
-func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parentConstant *ZendClassConstant, name string, iface *types.ClassEntry) types.ZendBool {
-	var oldConstant *ZendClassConstant = childConstantsTable.Get(name)
+func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parentConstant *types.ClassConstant, name string, iface *types.ClassEntry) types.ZendBool {
+	var oldConstant *types.ClassConstant = childConstantsTable.Get(name)
 	if oldConstant != nil {
 		if oldConstant.GetCe() != parentConstant.GetCe() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot inherit previously-inherited or override constant %s from interface %s", name, iface.Name())
@@ -1202,9 +1202,9 @@ func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parent
 	}
 	return 1
 }
-func DoInheritIfaceConstant(name string, c *ZendClassConstant, ce *types.ClassEntry, iface *types.ClassEntry) {
+func DoInheritIfaceConstant(name string, c *types.ClassConstant, ce *types.ClassEntry, iface *types.ClassEntry) {
 	if DoInheritConstantCheck(ce.ConstantsTable(), c, name, iface) != 0 {
-		var ct *ZendClassConstant
+		var ct *types.ClassConstant
 		if c.GetValue().IsConstantAst() {
 			ce.SetIsConstantsUpdated(false)
 		}
@@ -1217,7 +1217,7 @@ func DoInheritIfaceConstant(name string, c *ZendClassConstant, ce *types.ClassEn
 	}
 }
 func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
-	iface.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
+	iface.ConstantsTable().Foreach(func(key string, c *types.ClassConstant) {
 		DoInheritIfaceConstant(key, c, ce, iface)
 	})
 	iface.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
@@ -1234,7 +1234,7 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 	var current_iface_num uint32 = ce.GetNumInterfaces()
 	var parent_iface_num uint32 = b.CondF1(ce.GetParent(), func() __auto__ { return ce.GetParent().num_interfaces }, 0)
 	var key *types.String
-	var c *ZendClassConstant
+	var c *types.ClassConstant
 	b.Assert(ce.IsLinked())
 	for i = 0; i < ce.GetNumInterfaces(); i++ {
 		if ce.GetInterfaces()[i] == nil {
@@ -1250,7 +1250,7 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 	}
 	if ignore != 0 {
 		/* Check for attempt to redeclare interface constants */
-		ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
+		ce.ConstantsTable().Foreach(func(key string, c *types.ClassConstant) {
 			DoInheritConstantCheck(iface.ConstantsTable(), c, key, iface)
 		})
 	} else {
@@ -1270,7 +1270,7 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 	var num_parent_interfaces uint32 = b.CondF1(ce.GetParent(), func() __auto__ { return ce.GetParent().num_interfaces }, 0)
 	var num_interfaces uint32 = num_parent_interfaces
 	var key *types.String
-	var c *ZendClassConstant
+	var c *types.ClassConstant
 	var i uint32
 	var j uint32
 	for i = 0; i < ce.GetNumInterfaces(); i++ {
@@ -1292,7 +1292,7 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 				}
 
 				/* skip duplications */
-				ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
+				ce.ConstantsTable().Foreach(func(key string, c *types.ClassConstant) {
 					DoInheritConstantCheck(iface.ConstantsTable(), c, key, iface)
 				})
 
@@ -1721,7 +1721,7 @@ func FindFirstDefinition(ce *types.ClassEntry, traits **types.ClassEntry, curren
 	return coliding_ce
 }
 func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntry) {
-	var coliding_prop *ZendPropertyInfo
+	var coliding_prop *types.PropertyInfo
 	var prop_name *types.String
 	var class_name_unused *byte
 	var not_compatible types.ZendBool
@@ -1738,7 +1738,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 		if trait == nil {
 			continue
 		}
-		trait.PropertyTable().Foreach(func(_ string, property_info *ZendPropertyInfo) {
+		trait.PropertyTable().Foreach(func(_ string, property_info *types.PropertyInfo) {
 			/* first get the unmangeld name if necessary,
 			 * then check whether the property is already there
 			 */
@@ -2041,7 +2041,7 @@ func AddCompatibilityObligation(ce *types.ClassEntry, child_fn types.IFunction, 
 	obligation.SetAlwaysError(always_error)
 	types.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
-func AddPropertyCompatibilityObligation(ce *types.ClassEntry, child_prop *ZendPropertyInfo, parent_prop *ZendPropertyInfo) {
+func AddPropertyCompatibilityObligation(ce *types.ClassEntry, child_prop *types.PropertyInfo, parent_prop *types.PropertyInfo) {
 	var obligations *types.Array = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_PROPERTY_COMPATIBILITY)
@@ -2233,7 +2233,7 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) InheritanceStatus {
 	var ret InheritanceStatus = INHERITANCE_SUCCESS
 	var key *types.String
-	var parent_info *ZendPropertyInfo
+	var parent_info *types.PropertyInfo
 
 	parent_ce.FunctionTable().ForeachEx(func(key string, parent_func types.IFunction) bool {
 		var child_func types.IFunction = ce.FunctionTable().Get(key)
@@ -2253,11 +2253,11 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 		return ret
 	}
 
-	parent_ce.PropertyTable().ForeachEx(func(key string, parent_info *ZendPropertyInfo) bool {
+	parent_ce.PropertyTable().ForeachEx(func(key string, parent_info *types.PropertyInfo) bool {
 		if parent_info.IsPrivate() || !(parent_info.GetType().IsSet()) {
 			return true
 		}
-		var childInfo *ZendPropertyInfo = ce.PropertyTable().Get(key)
+		var childInfo *types.PropertyInfo = ce.PropertyTable().Get(key)
 		if childInfo != nil {
 			if childInfo.GetType().IsSet() {
 				var status InheritanceStatus = PropertyTypesCompatible(parent_info, childInfo)

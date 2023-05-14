@@ -12,7 +12,7 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 	var tmp types.Zval
 	var key *types.String
 	var h ZendLong
-	var property_info *ZendPropertyInfo
+	var property_info *types.PropertyInfo
 	var __ht *types.Array = properties
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()

@@ -49,7 +49,7 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 				return types.FAILURE
 			}
 		}
-		ret := class_type.ConstantsTable().ForeachEx(func(_ string, c *ZendClassConstant) bool {
+		ret := class_type.ConstantsTable().ForeachEx(func(_ string, c *types.ClassConstant) bool {
 			val := c.GetValue()
 			if val.IsConstantAst() {
 				if ZvalUpdateConstantEx(val, c.GetCe()) != types.SUCCESS {
@@ -69,7 +69,7 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 		}
 		ce = class_type
 		for ce != nil {
-			foreachRet := ce.PropertyTable().ForeachEx(func(key string, prop_info *ZendPropertyInfo) bool {
+			foreachRet := ce.PropertyTable().ForeachEx(func(key string, prop_info *types.PropertyInfo) bool {
 				if prop_info.GetCe() == ce {
 					if prop_info.IsStatic() {
 						val = CE_STATIC_MEMBERS(class_type) + prop_info.GetOffset()

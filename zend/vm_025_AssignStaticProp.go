@@ -6,7 +6,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CONST_HANDLER(executeData *ZendExecute
 	var opline *ZendOp = executeData.GetOpline()
 	var prop *types.Zval
 	var value *types.Zval
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	if ZendFetchStaticPropertyAddress(&prop, &prop_info, opline.GetExtendedValue(), BP_VAR_W, 0, opline, executeData) != types.SUCCESS {
 		UNDEF_RESULT()
 		return 0
@@ -31,7 +31,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDa
 	var free_op_data ZendFreeOp
 	var prop *types.Zval
 	var value *types.Zval
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	if ZendFetchStaticPropertyAddress(&prop, &prop_info, opline.GetExtendedValue(), BP_VAR_W, 0, opline, executeData) != types.SUCCESS {
 		// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 		UNDEF_RESULT()
@@ -58,7 +58,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDa
 	var free_op_data ZendFreeOp
 	var prop *types.Zval
 	var value *types.Zval
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	if ZendFetchStaticPropertyAddress(&prop, &prop_info, opline.GetExtendedValue(), BP_VAR_W, 0, opline, executeData) != types.SUCCESS {
 		// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 		UNDEF_RESULT()
@@ -84,7 +84,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CV_HANDLER(executeData *ZendExecuteDat
 	var opline *ZendOp = executeData.GetOpline()
 	var prop *types.Zval
 	var value *types.Zval
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	if ZendFetchStaticPropertyAddress(&prop, &prop_info, opline.GetExtendedValue(), BP_VAR_W, 0, opline, executeData) != types.SUCCESS {
 		UNDEF_RESULT()
 		return 0

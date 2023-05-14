@@ -317,7 +317,7 @@ func ProcessNestedData(
 		var d types.Zval
 		var old_data *types.Zval
 		var idx zend.ZendUlong
-		var info *zend.ZendPropertyInfo = nil
+		var info *types.PropertyInfo = nil
 		key.SetUndef()
 		if PhpVarUnserializeInternal(&key, p, max, nil, 1) == 0 {
 			// zend.ZvalPtrDtor(&key)
@@ -359,7 +359,7 @@ func ProcessNestedData(
 			if key.IsString() {
 			string_key:
 				if obj != nil && obj.GetCe().PropertyTable().Len() > 0 {
-					var existing_propinfo *zend.ZendPropertyInfo
+					var existing_propinfo *types.PropertyInfo
 					var new_key *types.String
 					var unmangled_class *byte = nil
 					var unmangled_prop *byte
@@ -1497,7 +1497,7 @@ yy85:
 		return 0
 	}
 	if !(rval_ref.IsReference()) {
-		var info *zend.ZendPropertyInfo = nil
+		var info *types.PropertyInfo = nil
 		if var_hash.GetRefProps() != nil {
 			info = types.ZendHashIndexFindPtr(var_hash.GetRefProps(), types.ZendUintptrT(rval_ref))
 		}

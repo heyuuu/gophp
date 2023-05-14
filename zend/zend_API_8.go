@@ -288,8 +288,8 @@ func ZendDeclareTypedProperty(
 	doc_comment *types.String,
 	type_ types.ZendType,
 ) int {
-	var property_info *ZendPropertyInfo
-	var property_info_ptr *ZendPropertyInfo
+	var property_info *types.PropertyInfo
+	var property_info_ptr *types.PropertyInfo
 	if type_.IsSet() {
 		ce.SetIsHasTypeHints(true)
 	}

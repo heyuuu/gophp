@@ -86,7 +86,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 		faults.ErrorNoreturn(b.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
 
-	var c *ZendClassConstant = NewClassConstant(ce, value, doc_comment)
+	var c *types.ClassConstant = types.NewClassConstant(ce, value, doc_comment)
 	c.GetValue().SetAccessFlags(uint32(access_type))
 	if value.IsConstantAst() {
 		ce.SetIsConstantsUpdated(false)

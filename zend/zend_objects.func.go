@@ -122,7 +122,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 			types.ZVAL_COPY_VALUE_PROP(dst, src)
 			//ZvalAddRef(dst)
 			if dst.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(dst.Reference()) {
-				var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(new_object, dst)
+				var prop_info *types.PropertyInfo = ZendGetPropertyInfoForSlot(new_object, dst)
 				if prop_info.GetType() != 0 {
 					ZEND_REF_ADD_TYPE_SOURCE(dst.Reference(), prop_info)
 				}

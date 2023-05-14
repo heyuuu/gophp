@@ -304,7 +304,7 @@ func ZendResolvePropertyTypes() {
 			return
 		}
 		if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
-			ce.PropertyTable().Foreach(func(key string, prop_info *ZendPropertyInfo) {
+			ce.PropertyTable().Foreach(func(key string, prop_info *types.PropertyInfo) {
 				if prop_info.GetType().IsName() {
 					var type_name = prop_info.GetType().Name().GetStr()
 					var prop_ce *types.ClassEntry = CG__().ClassTable().Get(type_name)

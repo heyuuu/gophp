@@ -35,7 +35,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -109,7 +109,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -192,7 +192,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -274,7 +274,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -676,7 +676,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -749,7 +749,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -820,7 +820,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -890,7 +890,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -1201,7 +1201,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -1282,7 +1282,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -1361,7 +1361,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj
@@ -1439,7 +1439,7 @@ assign_object:
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
 			if property_val.IsNotUndef() {
-				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+				var prop_info *types.PropertyInfo = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
 					goto free_and_exit_assign_obj

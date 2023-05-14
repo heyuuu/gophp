@@ -9,7 +9,7 @@ import (
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ce *types.ClassEntry
 	var scope *types.ClassEntry
-	var c *ZendClassConstant
+	var c *types.ClassConstant
 	var value *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 	for {
@@ -59,7 +59,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ce *types.ClassEntry
 	var scope *types.ClassEntry
-	var c *ZendClassConstant
+	var c *types.ClassConstant
 	var value *types.Zval
 	var zv *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
@@ -105,7 +105,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ce *types.ClassEntry
 	var scope *types.ClassEntry
-	var c *ZendClassConstant
+	var c *types.ClassConstant
 	var value *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 	for {

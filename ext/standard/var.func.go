@@ -22,7 +22,7 @@ func PhpArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
 	}
 	PhpVarDump(zv, level+2)
 }
-func PhpObjectPropertyDump(propInfo *zend.ZendPropertyInfo, zv *types.Zval, key_ types.ArrayKey, level int) {
+func PhpObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key_ types.ArrayKey, level int) {
 	if !key_.IsStrKey() {
 		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key_.IdxKey())
 	} else {
@@ -119,7 +119,7 @@ again:
 		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", common, className, struc.Object().GetHandle(), b.CondF1(myht != nil, func() int { return myht.Count() }, 0))
 		if myht != nil {
 			myht.Foreach(func(key types.ArrayKey, value *types.Zval) {
-				var prop_info *zend.ZendPropertyInfo = nil
+				var prop_info *types.PropertyInfo = nil
 				if value.IsIndirect() {
 					value = value.Indirect()
 					if key.IsStrKey() {
@@ -162,7 +162,7 @@ func ZvalArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
 	}
 	PhpDebugZvalDump(zv, level+2)
 }
-func ZvalObjectPropertyDump(propInfo *zend.ZendPropertyInfo, zv *types.Zval, key types.ArrayKey, level int) {
+func ZvalObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key types.ArrayKey, level int) {
 	if !key.IsStrKey() {
 		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key.IdxKey())
 	} else {
@@ -251,7 +251,7 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 		// types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			myht.Foreach(func(key types.ArrayKey, value *types.Zval) {
-				var propInfo *zend.ZendPropertyInfo = nil
+				var propInfo *types.PropertyInfo = nil
 				if value.IsIndirect() {
 					value = value.Indirect()
 					if key.IsStrKey() {
@@ -590,7 +590,7 @@ func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *t
 	if val.IsIndirect() {
 		val = val.Indirect()
 		if val.IsUndef() {
-			var info *zend.ZendPropertyInfo = zend.ZendGetTypedPropertyInfoForSlot(struc.Object(), val)
+			var info *types.PropertyInfo = zend.ZendGetTypedPropertyInfoForSlot(struc.Object(), val)
 			if info != nil {
 				return types.SUCCESS
 			}

@@ -332,11 +332,11 @@ func check_type_stdClass_assignable(type_ types.ZendType) types.ZendBool {
 	}
 }
 func ZendVerifyRefArrayAssignable(ref *types.ZendReference) types.ZendBool {
-	var prop *ZendPropertyInfo
+	var prop *types.PropertyInfo
 	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
-	var _prop **ZendPropertyInfo
-	var _end ***ZendPropertyInfo
+	var _prop **types.PropertyInfo
+	var _end ***types.PropertyInfo
 	var _list *types.ZendPropertyInfoList
 	if _source_list.GetPtr() != nil {
 		if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {
@@ -358,11 +358,11 @@ func ZendVerifyRefArrayAssignable(ref *types.ZendReference) types.ZendBool {
 	return 1
 }
 func zend_verify_ref_stdClass_assignable(ref *types.ZendReference) types.ZendBool {
-	var prop *ZendPropertyInfo
+	var prop *types.PropertyInfo
 	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
-	var _prop **ZendPropertyInfo
-	var _end ***ZendPropertyInfo
+	var _prop **types.PropertyInfo
+	var _end ***types.PropertyInfo
 	var _list *types.ZendPropertyInfoList
 	if _source_list.GetPtr() != nil {
 		if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {

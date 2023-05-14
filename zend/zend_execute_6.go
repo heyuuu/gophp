@@ -7,7 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendObjectFetchPropertyTypeInfo(obj *types.ZendObject, slot *types.Zval) *ZendPropertyInfo {
+func ZendObjectFetchPropertyTypeInfo(obj *types.ZendObject, slot *types.Zval) *types.PropertyInfo {
 	if !(ZEND_CLASS_HAS_TYPE_HINTS(obj.GetCe())) {
 		return nil
 	}
@@ -19,7 +19,7 @@ func ZendObjectFetchPropertyTypeInfo(obj *types.ZendObject, slot *types.Zval) *Z
 	}
 	return ZendGetTypedPropertyInfoForSlot(obj, slot)
 }
-func ZendHandleFetchObjFlags(result *types.Zval, ptr *types.Zval, obj *types.ZendObject, prop_info *ZendPropertyInfo, flags uint32) types.ZendBool {
+func ZendHandleFetchObjFlags(result *types.Zval, ptr *types.Zval, obj *types.ZendObject, prop_info *types.PropertyInfo, flags uint32) types.ZendBool {
 	switch flags {
 	case ZEND_FETCH_DIM_WRITE:
 		if PromotesToArray(ptr) != 0 {
@@ -125,7 +125,7 @@ func ZendFetchPropertyAddress(
 			if ptr.IsNotUndef() {
 				result.SetIndirect(ptr)
 				if flags != 0 {
-					var prop_info *ZendPropertyInfo = CACHED_PTR_EX(cache_slot + 2)
+					var prop_info *types.PropertyInfo = CACHED_PTR_EX(cache_slot + 2)
 					if prop_info != nil {
 						ZendHandleFetchObjFlags(result, ptr, nil, prop_info, flags)
 					}
@@ -157,7 +157,7 @@ func ZendFetchPropertyAddress(
 	}
 	result.SetIndirect(ptr)
 	if flags != 0 {
-		var prop_info *ZendPropertyInfo
+		var prop_info *types.PropertyInfo
 		if prop_op_type == IS_CONST {
 			prop_info = CACHED_PTR_EX(cache_slot + 2)
 			if prop_info != nil {
@@ -202,9 +202,9 @@ func ZendAssignToPropertyReference(
 	} else if (opline.GetExtendedValue()&ZEND_RETURNS_FUNCTION) != 0 && !(value_ptr.IsReference()) {
 		variable_ptr = ZendWrongAssignToVariableReference(variable_ptr, value_ptr, opline, executeData)
 	} else {
-		var prop_info *ZendPropertyInfo = nil
+		var prop_info *types.PropertyInfo = nil
 		if prop_op_type == IS_CONST {
-			prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_addr + 2))
+			prop_info = (*types.PropertyInfo)(CACHED_PTR_EX(cache_addr + 2))
 		} else {
 			container = types.ZVAL_DEREF(container)
 			prop_info = ZendObjectFetchPropertyTypeInfo(container.Object(), variable_ptr)
@@ -233,7 +233,7 @@ func ZendAssignToPropertyReferenceVarVar(container *types.Zval, prop_ptr *types.
 }
 func ZendFetchStaticPropertyAddressEx(
 	retval **types.Zval,
-	prop_info **ZendPropertyInfo,
+	prop_info **types.PropertyInfo,
 	cache_slot uint32,
 	fetch_type int,
 	opline *ZendOp,
@@ -243,7 +243,7 @@ func ZendFetchStaticPropertyAddressEx(
 	var name *types.String
 	var tmp_name *types.String
 	var ce *types.ClassEntry
-	var property_info *ZendPropertyInfo
+	var property_info *types.PropertyInfo
 	var op1_type uint8 = opline.GetOp1Type()
 	var op2_type uint8 = opline.GetOp2Type()
 	if op2_type == IS_CONST {
@@ -308,7 +308,7 @@ func ZendFetchStaticPropertyAddressEx(
 }
 func ZendFetchStaticPropertyAddress(
 	retval **types.Zval,
-	prop_info **ZendPropertyInfo,
+	prop_info **types.PropertyInfo,
 	cache_slot uint32,
 	fetch_type int,
 	flags int,
@@ -316,7 +316,7 @@ func ZendFetchStaticPropertyAddress(
 	executeData *ZendExecuteData,
 ) int {
 	var success int
-	var property_info *ZendPropertyInfo
+	var property_info *types.PropertyInfo
 	if opline.GetOp1Type() == IS_CONST && (opline.GetOp2Type() == IS_CONST || opline.GetOp2Type() == IS_UNUSED && (opline.GetOp2().GetNum() == ZEND_FETCH_CLASS_SELF || opline.GetOp2().GetNum() == ZEND_FETCH_CLASS_PARENT)) && CACHED_PTR(cache_slot) != nil {
 		*retval = CACHED_PTR(cache_slot + b.SizeOf("void *"))
 		property_info = CACHED_PTR(cache_slot + b.SizeOf("void *")*2)
@@ -338,7 +338,7 @@ func ZendFetchStaticPropertyAddress(
 	}
 	return types.SUCCESS
 }
-func ZendThrowRefTypeErrorType(prop1 *ZendPropertyInfo, prop2 *ZendPropertyInfo, zv *types.Zval) {
+func ZendThrowRefTypeErrorType(prop1 *types.PropertyInfo, prop2 *types.PropertyInfo, zv *types.Zval) {
 	var prop1_type1 *byte
 	var prop1_type2 *byte
 	var prop2_type1 *byte
@@ -347,13 +347,13 @@ func ZendThrowRefTypeErrorType(prop1 *ZendPropertyInfo, prop2 *ZendPropertyInfo,
 	ZendFormatType(prop2.GetType(), &prop2_type1, &prop2_type2)
 	faults.TypeError("Reference with value of type %s held by property %s::$%s of type %s%s is not compatible with property %s::$%s of type %s%s", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop2.GetName()), prop2_type1, prop2_type2)
 }
-func ZendThrowRefTypeErrorZval(prop *ZendPropertyInfo, zv *types.Zval) {
+func ZendThrowRefTypeErrorZval(prop *types.PropertyInfo, zv *types.Zval) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
 	faults.TypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
 }
-func ZendThrowConflictingCoercionError(prop1 *ZendPropertyInfo, prop2 *ZendPropertyInfo, zv *types.Zval) {
+func ZendThrowConflictingCoercionError(prop1 *types.PropertyInfo, prop2 *types.PropertyInfo, zv *types.Zval) {
 	var prop1_type1 *byte
 	var prop1_type2 *byte
 	var prop2_type1 *byte
@@ -414,20 +414,20 @@ func IZendVerifyTypeAssignableZval(type_ptr *types.ZendType, self_ce *types.Clas
 	/* Coercion may be necessary, check separately */
 }
 func ZendVerifyRefAssignableZval(ref *types.ZendReference, zv *types.Zval, strict types.ZendBool) types.ZendBool {
-	var prop *ZendPropertyInfo
+	var prop *types.PropertyInfo
 
 	/* The value must satisfy each property type, and coerce to the same value for each property
 	 * type. Right now, the latter rule means that *if* coercion is necessary, then all types
 	 * must be the same (modulo nullability). To handle this, remember the first type we see and
 	 * compare against it when coercion becomes necessary. */
 
-	var seen_prop *ZendPropertyInfo = nil
+	var seen_prop *types.PropertyInfo = nil
 	var seen_type uint8
 	var needs_coercion types.ZendBool = 0
 	b.Assert(zv.GetType() != types.IS_REFERENCE)
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
-	var _prop **ZendPropertyInfo
-	var _end ***ZendPropertyInfo
+	var _prop **types.PropertyInfo
+	var _end ***types.PropertyInfo
 	var _list *types.ZendPropertyInfoList
 	if _source_list.GetPtr() != nil {
 		if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {

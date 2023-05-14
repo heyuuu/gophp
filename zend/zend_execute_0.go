@@ -9,7 +9,7 @@ import (
 func ZEND_REF_HAS_TYPE_SOURCES(ref *types.ZendReference) bool {
 	return ref.GetSources().GetPtr() != nil
 }
-func ZEND_REF_FIRST_SOURCE(ref *types.ZendReference) *ZendPropertyInfo {
+func ZEND_REF_FIRST_SOURCE(ref *types.ZendReference) *types.PropertyInfo {
 	if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(ref.GetSources().GetList()) != 0 {
 		return types.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(ref.GetSources().GetList()).GetPtr()[0]
 	} else {
@@ -120,10 +120,10 @@ func DECODE_SPECIAL_CACHE_NUM(ptr *ZendConstant) int { return uintPtr(ptr) >> 1 
 func ZEND_CLASS_HAS_TYPE_HINTS(ce *types.ClassEntry) bool {
 	return (ce.GetCeFlags() & AccHasTypeHints) == AccHasTypeHints
 }
-func ZEND_REF_ADD_TYPE_SOURCE(ref *types.ZendReference, source *ZendPropertyInfo) {
+func ZEND_REF_ADD_TYPE_SOURCE(ref *types.ZendReference, source *types.PropertyInfo) {
 	ZendRefAddTypeSource(&(ref.GetSources()), source)
 }
-func ZEND_REF_DEL_TYPE_SOURCE(ref *types.ZendReference, source *ZendPropertyInfo) {
+func ZEND_REF_DEL_TYPE_SOURCE(ref *types.ZendReference, source *types.PropertyInfo) {
 	ZendRefDelTypeSource(&(ref.GetSources()), source)
 }
 func GetZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {

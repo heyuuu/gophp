@@ -31,14 +31,14 @@ func ZendFreeTrampoline(func_ any) {
 }
 func RebuildObjectProperties(zobj *types.ZendObject) {
 	if zobj.GetProperties() == nil {
-		var prop_info *ZendPropertyInfo
+		var prop_info *types.PropertyInfo
 		var ce *types.ClassEntry = zobj.GetCe()
 		var flags uint32 = 0
 		zobj.SetProperties(types.NewArray(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
 			//types.ZendHashRealInitMixed(zobj.GetProperties())
 
-			ce.PropertyTable().Foreach(func(key string, prop_info *ZendPropertyInfo) {
+			ce.PropertyTable().Foreach(func(key string, prop_info *types.PropertyInfo) {
 				if !prop_info.IsStatic() {
 					flags |= prop_info.GetFlags()
 					if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
@@ -51,7 +51,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 			if (flags & AccChanged) != 0 {
 				for ce.GetParent() && ce.GetParent().default_properties_count {
 					ce = ce.GetParent()
-					ce.PropertyTable().Foreach(func(key string, prop_info *ZendPropertyInfo) {
+					ce.PropertyTable().Foreach(func(key string, prop_info *types.PropertyInfo) {
 						if prop_info.GetCe() == ce && !prop_info.IsStatic() && prop_info.IsPrivate() {
 							var zv types.Zval
 							if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
@@ -203,8 +203,8 @@ func IsDerivedClass(child_class *types.ClassEntry, parent_class *types.ClassEntr
 func IsProtectedCompatibleScope(ce *types.ClassEntry, scope *types.ClassEntry) int {
 	return scope != nil && (IsDerivedClass(ce, scope) != 0 || IsDerivedClass(scope, ce) != 0)
 }
-func ZendGetParentPrivateProperty(scope *types.ClassEntry, ce *types.ClassEntry, member string) *ZendPropertyInfo {
-	var prop_info *ZendPropertyInfo
+func ZendGetParentPrivateProperty(scope *types.ClassEntry, ce *types.ClassEntry, member string) *types.PropertyInfo {
+	var prop_info *types.PropertyInfo
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
 		prop_info = scope.PropertyTable().Get(member)
 		if prop_info != nil {
@@ -216,14 +216,14 @@ func ZendGetParentPrivateProperty(scope *types.ClassEntry, ce *types.ClassEntry,
 	return nil
 }
 
-func ZendBadPropertyAccess(propInfo *ZendPropertyInfo, ce *types.ClassEntry, member string) {
+func ZendBadPropertyAccess(propInfo *types.PropertyInfo, ce *types.ClassEntry, member string) {
 	faults.ThrowError(nil, "Cannot access %s property %s::$%s", ZendVisibilityString(propInfo.GetFlags()), ce.GetName().GetVal(), member)
 }
 func ZendBadPropertyName() {
 	faults.ThrowError(nil, "Cannot access property started with '\\0'")
 }
-func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent int, cache_slot *any, info_ptr **ZendPropertyInfo) uintPtr {
-	var property_info *ZendPropertyInfo
+func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent int, cache_slot *any, info_ptr **types.PropertyInfo) uintPtr {
+	var property_info *types.PropertyInfo
 	var flags uint32
 	var scope *types.ClassEntry
 	var offset uintPtr
@@ -254,7 +254,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 		}
 		if property_info.GetCe() != scope {
 			if (flags & AccChanged) != 0 {
-				var p *ZendPropertyInfo = ZendGetParentPrivateProperty(scope, ce, member.GetStr())
+				var p *types.PropertyInfo = ZendGetParentPrivateProperty(scope, ce, member.GetStr())
 
 				/* If there is a public/protected instance property on ce, don't try to use a
 				 * private static property on scope. If both are static, prefer the static
@@ -316,18 +316,18 @@ found:
 	return offset
 }
 func ZendWrongOffset(ce *types.ClassEntry, member *types.String) {
-	var dummy *ZendPropertyInfo
+	var dummy *types.PropertyInfo
 
 	/* Trigger the correct error */
 	ZendGetPropertyOffset(ce, member, 0, nil, &dummy)
 }
 
-func ZendGetPropertyInfo(ce *types.ClassEntry, member string) *ZendPropertyInfo {
+func ZendGetPropertyInfo(ce *types.ClassEntry, member string) *types.PropertyInfo {
 	propInfo, _ := ZendGetPropertyInfoEx(ce, member)
 	return propInfo
 }
 
-func ZendGetPropertyInfoEx(ce *types.ClassEntry, member string) (_ *ZendPropertyInfo, forbidden bool) {
+func ZendGetPropertyInfoEx(ce *types.ClassEntry, member string) (_ *types.PropertyInfo, forbidden bool) {
 	propInfo := ce.PropertyTable().Get(member)
 	if propInfo == nil {
 		if member != "" && member[0] == '\x00' {
@@ -371,7 +371,7 @@ func ZendGetPropertyInfoEx(ce *types.ClassEntry, member string) (_ *ZendProperty
 	return propInfo, false
 }
 func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.String, is_dynamic types.ZendBool) int {
-	var property_info *ZendPropertyInfo
+	var property_info *types.PropertyInfo
 	var class_name *byte = nil
 	var prop_name *byte
 	var member *types.String
@@ -477,7 +477,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 	var tmp_name *types.String
 	var retval *types.Zval
 	var property_offset uintPtr
-	var prop_info *ZendPropertyInfo = nil
+	var prop_info *types.PropertyInfo = nil
 	var guard *uint32 = nil
 	zobj = object.Object()
 	name = operators.ZvalTryGetString(member)
@@ -620,7 +620,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 	var variable_ptr *types.Zval
 	var tmp types.Zval
 	var property_offset uintPtr
-	var prop_info *ZendPropertyInfo = nil
+	var prop_info *types.PropertyInfo = nil
 	b.Assert(!(value.IsReference()))
 	zobj = object.Object()
 	name = operators.ZvalTryGetString(member)
@@ -814,7 +814,7 @@ func ZendStdGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int,
 	var name *types.String
 	var retval *types.Zval = nil
 	var property_offset uintPtr
-	var prop_info *ZendPropertyInfo = nil
+	var prop_info *types.PropertyInfo = nil
 	zobj = object.Object()
 	name = operators.ZvalTryGetString(member)
 	if name == nil {
@@ -879,7 +879,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 	var zobj *types.ZendObject
 	var name *types.String
 	var property_offset uintPtr
-	var prop_info *ZendPropertyInfo = nil
+	var prop_info *types.PropertyInfo = nil
 	zobj = object.Object()
 	name = operators.ZvalTryGetString(member)
 	if name == nil {
@@ -1186,10 +1186,10 @@ func ZendClassInitStatics(class_type *types.ClassEntry) {
 		}
 	}
 }
-func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types.String, type_ int, property_info_ptr **ZendPropertyInfo) *types.Zval {
+func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types.String, type_ int, property_info_ptr **types.PropertyInfo) *types.Zval {
 	var ret *types.Zval
 	var scope *types.ClassEntry
-	var property_info *ZendPropertyInfo = ce.PropertyTable().Get(property_name.GetStr())
+	var property_info *types.PropertyInfo = ce.PropertyTable().Get(property_name.GetStr())
 	*property_info_ptr = property_info
 	if property_info == nil {
 		goto undeclared_property
@@ -1240,7 +1240,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 	return ret
 }
 func ZendStdGetStaticProperty(ce *types.ClassEntry, property_name *types.String, type_ int) *types.Zval {
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	return ZendStdGetStaticPropertyWithInfo(ce, property_name, type_, &prop_info)
 }
 func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name *types.String) types.ZendBool {
@@ -1286,7 +1286,7 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 		return 1
 	}
 	if zobj1.GetProperties() == nil && zobj2.GetProperties() == nil {
-		var info *ZendPropertyInfo
+		var info *types.PropertyInfo
 		if zobj1.GetCe().GetDefaultPropertiesCount() == 0 {
 			return 0
 		}
@@ -1302,7 +1302,7 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 		o1.Object().ProtectRecursive()
 
 		var ret int
-		zobj1.GetCe().PropertyTable().ForeachEx(func(key string, info *ZendPropertyInfo) bool {
+		zobj1.GetCe().PropertyTable().ForeachEx(func(key string, info *types.PropertyInfo) bool {
 			var p1 *types.Zval = OBJ_PROP(zobj1, info.GetOffset())
 			var p2 *types.Zval = OBJ_PROP(zobj2, info.GetOffset())
 			if info.IsStatic() {
@@ -1357,7 +1357,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 	var name *types.String
 	var tmp_name *types.String
 	var property_offset uintPtr
-	var prop_info *ZendPropertyInfo = nil
+	var prop_info *types.PropertyInfo = nil
 	zobj = object.Object()
 	name = operators.ZvalTryGetString(member)
 	if name == nil {

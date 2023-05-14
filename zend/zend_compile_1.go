@@ -376,7 +376,7 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 
 	}
 }
-func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *types.ClassEntry) types.ZendBool {
+func ZendVerifyCtConstAccess(c *types.ClassConstant, scope *types.ClassEntry) types.ZendBool {
 	if (c.GetValue().GetAccessFlags() & AccPublic) != 0 {
 		return 1
 	} else if (c.GetValue().GetAccessFlags() & AccPrivate) != 0 {
@@ -410,7 +410,7 @@ func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *types.ClassEntry) type
 }
 func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *types.String) types.ZendBool {
 	var fetch_type = ZendGetClassFetchType(class_name.GetStr())
-	var cc *ZendClassConstant
+	var cc *types.ClassConstant
 	var c *types.Zval
 	if ClassNameRefersToActiveCe(class_name, fetch_type) {
 		cc = CG__().GetActiveClassEntry().ConstantsTable().Get(name.GetStr())

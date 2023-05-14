@@ -314,29 +314,6 @@ type ZendOparrayContext struct {
 	labels           *types.Array
 }
 
-//             func MakeZendOparrayContext(
-// opcodes_size uint32,
-// vars_size int,
-// literals_size int,
-// fast_call_var uint32,
-// try_catch_offset uint32,
-// current_brk_cont int,
-// last_brk_cont int,
-// brk_cont_array *ZendBrkContElement,
-// labels *HashTable,
-// ) ZendOparrayContext {
-//                 return ZendOparrayContext{
-//                     opcodes_size:opcodes_size,
-//                     vars_size:vars_size,
-//                     literals_size:literals_size,
-//                     fast_call_var:fast_call_var,
-//                     try_catch_offset:try_catch_offset,
-//                     current_brk_cont:current_brk_cont,
-//                     last_brk_cont:last_brk_cont,
-//                     brk_cont_array:brk_cont_array,
-//                     labels:labels,
-//                 }
-//             }
 func (this *ZendOparrayContext) GetOpcodesSize() uint32               { return this.opcodes_size }
 func (this *ZendOparrayContext) SetOpcodesSize(value uint32)          { this.opcodes_size = value }
 func (this *ZendOparrayContext) GetVarsSize() int                     { return this.vars_size }
@@ -358,91 +335,6 @@ func (this *ZendOparrayContext) SetBrkContArray(value *ZendBrkContElement) {
 func (this *ZendOparrayContext) GetLabels() *types.Array      { return this.labels }
 func (this *ZendOparrayContext) SetLabels(value *types.Array) { this.labels = value }
 
-/**
- * ZendPropertyInfo
- */
-type ZendPropertyInfo struct {
-	offset      uint32
-	flags       uint32
-	name        *types.String
-	doc_comment *types.String
-	ce          *types.ClassEntry
-	type_       types.ZendType
-}
-
-func (this *ZendPropertyInfo) GetOffset() uint32                 { return this.offset }
-func (this *ZendPropertyInfo) SetOffset(value uint32)            { this.offset = value }
-func (this *ZendPropertyInfo) GetFlags() uint32                  { return this.flags }
-func (this *ZendPropertyInfo) SetFlags(value uint32)             { this.flags = value }
-func (this *ZendPropertyInfo) GetName() *types.String            { return this.name }
-func (this *ZendPropertyInfo) SetName(value *types.String)       { this.name = value }
-func (this *ZendPropertyInfo) GetDocComment() *types.String      { return this.doc_comment }
-func (this *ZendPropertyInfo) SetDocComment(value *types.String) { this.doc_comment = value }
-func (this *ZendPropertyInfo) GetCe() *types.ClassEntry          { return this.ce }
-func (this *ZendPropertyInfo) SetCe(value *types.ClassEntry)     { this.ce = value }
-func (this *ZendPropertyInfo) GetType() types.ZendType           { return this.type_ }
-func (this *ZendPropertyInfo) SetType(value types.ZendType)      { this.type_ = value }
-
-/* ZendPropertyInfo.flags */
-func (this *ZendPropertyInfo) AddFlags(value uint32)      { this.flags |= value }
-func (this *ZendPropertyInfo) SubFlags(value uint32)      { this.flags &^= value }
-func (this *ZendPropertyInfo) HasFlags(value uint32) bool { return this.flags&value != 0 }
-func (this *ZendPropertyInfo) SwitchFlags(value uint32, cond bool) {
-	if cond {
-		this.AddFlags(value)
-	} else {
-		this.SubFlags(value)
-	}
-}
-func (this ZendPropertyInfo) IsStatic() bool            { return this.HasFlags(AccStatic) }
-func (this ZendPropertyInfo) IsProtected() bool         { return this.HasFlags(AccProtected) }
-func (this ZendPropertyInfo) IsPrivate() bool           { return this.HasFlags(AccPrivate) }
-func (this ZendPropertyInfo) IsPublic() bool            { return this.HasFlags(AccPublic) }
-func (this ZendPropertyInfo) IsChanged() bool           { return this.HasFlags(AccChanged) }
-func (this *ZendPropertyInfo) SetIsStatic(cond bool)    { this.SwitchFlags(AccStatic, cond) }
-func (this *ZendPropertyInfo) SetIsProtected(cond bool) { this.SwitchFlags(AccProtected, cond) }
-func (this *ZendPropertyInfo) SetIsPrivate(cond bool)   { this.SwitchFlags(AccPrivate, cond) }
-func (this *ZendPropertyInfo) SetIsPublic(cond bool)    { this.SwitchFlags(AccPublic, cond) }
-func (this *ZendPropertyInfo) SetIsChanged(cond bool)   { this.SwitchFlags(AccChanged, cond) }
-
-/**
- * ZendClassConstant
- */
-type ZendClassConstant struct {
-	value      types.Zval
-	docComment *types.String
-	ce         *types.ClassEntry
-}
-
-func NewClassConstant(ce *types.ClassEntry, value *types.Zval, docComment *types.String) *ZendClassConstant {
-	c := &ZendClassConstant{
-		ce:         ce,
-		docComment: docComment,
-	}
-	types.ZVAL_COPY_VALUE(&c.value, value)
-	return c
-}
-
-func CopyClassConstant(c *ZendClassConstant) *ZendClassConstant {
-	return &ZendClassConstant{
-		ce:         c.ce,
-		value:      c.value,
-		docComment: c.docComment,
-	}
-}
-
-func (c *ZendClassConstant) GetCe() *types.ClassEntry     { return c.ce }
-func (c *ZendClassConstant) GetValue() *types.Zval        { return &c.value }
-func (c *ZendClassConstant) GetDocComment() *types.String { return c.docComment }
-func (c *ZendClassConstant) IsVisited() bool {
-	return c.value.GetAccessFlags()&IS_CONSTANT_VISITED_MARK != 0
-}
-func (c *ZendClassConstant) MarkVisited() {
-	c.value.AddAccessFlags(IS_CONSTANT_VISITED_MARK)
-}
-func (c *ZendClassConstant) ResetVisited() {
-	c.value.SubAccessFlags(IS_CONSTANT_VISITED_MARK)
-}
 
 /**
  * ZendArgInfo

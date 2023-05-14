@@ -12,7 +12,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 	var property *types.Zval
 	var zptr *types.Zval
 	var cache_slot *any
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	property = opline.Const2()
 	for {
@@ -42,7 +42,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 				opline.Result().SetNull()
 			} else {
 				{
-					prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+					prop_info = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				}
 
 				ZendPostIncdecPropertyZval(zptr, prop_info, opline, executeData)
@@ -65,7 +65,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	var property *types.Zval
 	var zptr *types.Zval
 	var cache_slot *any
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	property = opline.Op2()
 	for {
@@ -117,7 +117,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var property *types.Zval
 	var zptr *types.Zval
 	var cache_slot *any
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	property = opline.Cv2OrUndef()
 	for {
@@ -167,7 +167,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 	var property *types.Zval
 	var zptr *types.Zval
 	var cache_slot *any
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	object = &(executeData.GetThis())
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
@@ -187,7 +187,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 				opline.Result().SetNull()
 			} else {
 				{
-					prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+					prop_info = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				}
 
 				ZendPostIncdecPropertyZval(zptr, prop_info, opline, executeData)
@@ -206,7 +206,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var property *types.Zval
 	var zptr *types.Zval
 	var cache_slot *any
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	object = &(executeData.GetThis())
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
@@ -244,7 +244,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int 
 	var property *types.Zval
 	var zptr *types.Zval
 	var cache_slot *any
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	object = &(executeData.GetThis())
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
@@ -281,7 +281,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var property *types.Zval
 	var zptr *types.Zval
 	var cache_slot *any
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	object = opline.Op1()
 	property = opline.Const2()
 	for {
@@ -311,7 +311,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				opline.Result().SetNull()
 			} else {
 				{
-					prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
+					prop_info = (*types.PropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				}
 
 				ZendPostIncdecPropertyZval(zptr, prop_info, opline, executeData)
@@ -330,7 +330,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var property *types.Zval
 	var zptr *types.Zval
 	var cache_slot *any
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	object = opline.Op1()
 	property = opline.Op2()
 	for {
@@ -378,7 +378,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var property *types.Zval
 	var zptr *types.Zval
 	var cache_slot *any
-	var prop_info *ZendPropertyInfo
+	var prop_info *types.PropertyInfo
 	object = opline.Op1()
 	property = opline.Cv2OrUndef()
 	for {

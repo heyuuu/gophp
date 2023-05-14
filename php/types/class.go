@@ -11,8 +11,8 @@ const (
 )
 
 type FunctionTable = *Table[IFunction]
-type PropertyTable = *Table[*zend.ZendPropertyInfo]
-type ClassConstantTable = *Table[*zend.ZendClassConstant]
+type PropertyTable = *Table[*PropertyInfo]
+type ClassConstantTable = *Table[*ClassConstant]
 
 /**
  * ClassEntry
@@ -35,7 +35,7 @@ type ClassEntry struct {
 	propertyTable PropertyTable
 	constantTable ClassConstantTable
 
-	properties_info_table []*zend.ZendPropertyInfo
+	properties_info_table []*PropertyInfo
 
 	constructor      IFunction
 	destructor       IFunction
@@ -125,8 +125,8 @@ func (ce *ClassEntry) initData() {
 
 func (ce *ClassEntry) initTables() {
 	ce.functionTable = NewLcTable[IFunction](nil)
-	ce.propertyTable = NewTable[*zend.ZendPropertyInfo](nil)
-	ce.constantTable = NewTable[*zend.ZendClassConstant](nil)
+	ce.propertyTable = NewTable[*PropertyInfo](nil)
+	ce.constantTable = NewTable[*ClassConstant](nil)
 }
 
 func (ce *ClassEntry) Name() string      { return ce.name }
@@ -137,7 +137,7 @@ func (ce *ClassEntry) PropertyTable() PropertyTable       { return ce.propertyTa
 func (ce *ClassEntry) ConstantsTable() ClassConstantTable { return ce.constantTable }
 
 // methods
-func (ce *ClassEntry) GetPropertyInfo(propNum int) *zend.ZendPropertyInfo {
+func (ce *ClassEntry) GetPropertyInfo(propNum int) *PropertyInfo {
 	b.Assert(0 <= propNum && propNum < ce.GetDefaultPropertiesCount())
 	return ce.GetPropertiesInfoTable()[propNum]
 }
@@ -181,10 +181,10 @@ func (ce *ClassEntry) SetDefaultStaticMembersTable(value *Zval) {
 func (ce *ClassEntry) GetStaticMembersTablePtr() **Zval {
 	return ce.static_members_table__ptr
 }
-func (ce *ClassEntry) GetPropertiesInfoTable() []*zend.ZendPropertyInfo {
+func (ce *ClassEntry) GetPropertiesInfoTable() []*PropertyInfo {
 	return ce.properties_info_table
 }
-func (ce *ClassEntry) SetPropertiesInfoTable(value []*zend.ZendPropertyInfo) {
+func (ce *ClassEntry) SetPropertiesInfoTable(value []*PropertyInfo) {
 	ce.properties_info_table = value
 }
 func (ce *ClassEntry) GetConstructor() IFunction        { return ce.constructor }

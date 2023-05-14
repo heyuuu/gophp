@@ -199,7 +199,7 @@ func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zv
 	}
 	variable_ptr.SetReference(ref)
 }
-func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *types.Zval, value_ptr *types.Zval, executeData *ZendExecuteData) *types.Zval {
+func ZendAssignToTypedPropertyReference(prop_info *types.PropertyInfo, prop *types.Zval, value_ptr *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	if ZendVerifyPropAssignableByRef(prop_info, value_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		return EG__().GetUninitializedZval()
 	}
@@ -237,19 +237,19 @@ func ZendFormatType(type_ types.ZendType, part1 **byte, part2 **byte) {
 		*part2 = types.ZendGetTypeByConst(type_.Code())
 	}
 }
-func ZendThrowAutoInitInPropError(prop *ZendPropertyInfo, type_ string) {
+func ZendThrowAutoInitInPropError(prop *types.PropertyInfo, type_ string) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
 	faults.TypeError("Cannot auto-initialize an %s inside property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
 }
-func ZendThrowAutoInitInRefError(prop *ZendPropertyInfo, type_ string) {
+func ZendThrowAutoInitInRefError(prop *types.PropertyInfo, type_ string) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
 	faults.TypeError("Cannot auto-initialize an %s inside a reference held by property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
 }
-func ZendThrowAccessUninitPropByRefError(prop *ZendPropertyInfo) {
+func ZendThrowAccessUninitPropByRefError(prop *types.PropertyInfo) {
 	faults.ThrowError(nil, "Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()))
 }
 func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, executeData *ZendExecuteData) *types.Zval {

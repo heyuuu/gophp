@@ -17,7 +17,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, stri
 	}
 	return variable_ptr
 }
-func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *types.Zval, strict types.ZendBool) types.ZendBool {
+func ZendVerifyPropAssignableByRef(prop_info *types.PropertyInfo, orig_val *types.Zval, strict types.ZendBool) types.ZendBool {
 	var val *types.Zval = orig_val
 	if val.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(val.Reference()) {
 		var result int
@@ -27,7 +27,7 @@ func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *types.
 			return 1
 		}
 		if result < 0 {
-			var ref_prop *ZendPropertyInfo = ZEND_REF_FIRST_SOURCE(orig_val.Reference())
+			var ref_prop *types.PropertyInfo = ZEND_REF_FIRST_SOURCE(orig_val.Reference())
 			if prop_info.GetType().Code() != ref_prop.GetType().Code() {
 
 				/* Invalid due to conflicting coercion */
@@ -48,7 +48,7 @@ func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *types.
 	ZendVerifyPropertyTypeError(prop_info, val)
 	return 0
 }
-func ZendRefAddTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *ZendPropertyInfo) {
+func ZendRefAddTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *types.PropertyInfo) {
 	var list *types.ZendPropertyInfoList
 	if source_list.GetPtr() == nil {
 		source_list.SetPtr(prop)
@@ -67,10 +67,10 @@ func ZendRefAddTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *Z
 	list.GetPtr()[b.PostInc(&(list.GetNum()))] = prop
 	source_list.SetList(types.ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list))
 }
-func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *ZendPropertyInfo) {
+func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *types.PropertyInfo) {
 	var list *types.ZendPropertyInfoList = types.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(source_list.GetList())
-	var ptr **ZendPropertyInfo
-	var end ***ZendPropertyInfo
+	var ptr **types.PropertyInfo
+	var end ***types.PropertyInfo
 	if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(source_list.GetList()) == 0 {
 		b.Assert(source_list.GetPtr() == prop)
 		source_list.SetPtr(nil)

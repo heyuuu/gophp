@@ -493,7 +493,7 @@ func ZifIsA(executeData zpp.Ex, return_value zpp.Ret, object *types.Zval, classN
 }
 func AddClassVars(scope *types.ClassEntry, ce *types.ClassEntry, statics int, return_value *types.Zval) {
 
-	ce.PropertyTable().ForeachEx(func(key string, prop_info *ZendPropertyInfo) bool {
+	ce.PropertyTable().ForeachEx(func(key string, prop_info *types.PropertyInfo) bool {
 		if prop_info.IsProtected() && !ZendCheckProtected(prop_info.GetCe(), scope) || prop_info.IsPrivate() && prop_info.GetCe() != scope {
 			return true
 		}
@@ -726,7 +726,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 	var object *types.Zval
 	var property *types.String
 	var ce *types.ClassEntry
-	var property_info *ZendPropertyInfo
+	var property_info *types.PropertyInfo
 	var property_z types.Zval
 	if ZendParseParameters(executeData.NumArgs(), "zS", &object, &property) == types.FAILURE {
 		return

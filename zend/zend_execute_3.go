@@ -213,11 +213,11 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 
 	opline.Result().SetStringVal(string(c))
 }
-func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *ZendPropertyInfo {
-	var prop *ZendPropertyInfo
+func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *types.PropertyInfo {
+	var prop *types.PropertyInfo
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
-	var _prop **ZendPropertyInfo
-	var _end ***ZendPropertyInfo
+	var _prop **types.PropertyInfo
+	var _end ***types.PropertyInfo
 	var _list *types.ZendPropertyInfoList
 	if _source_list.GetPtr() != nil {
 		if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {
@@ -238,7 +238,7 @@ func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *ZendPropertyInfo {
 	return nil
 }
 func ZendThrowIncdecRefError(ref *types.ZendReference, opline *ZendOp) ZendLong {
-	var error_prop *ZendPropertyInfo = ZendGetPropNotAcceptingDouble(ref)
+	var error_prop *types.PropertyInfo = ZendGetPropNotAcceptingDouble(ref)
 
 	/* Currently there should be no way for a typed reference to accept both int and double.
 	 * Generalize this and the related property code once this becomes possible. */
@@ -252,7 +252,7 @@ func ZendThrowIncdecRefError(ref *types.ZendReference, opline *ZendOp) ZendLong 
 		return ZEND_LONG_MIN
 	}
 }
-func ZendThrowIncdecPropError(prop *ZendPropertyInfo, opline *ZendOp) ZendLong {
+func ZendThrowIncdecPropError(prop *types.PropertyInfo, opline *ZendOp) ZendLong {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
@@ -287,7 +287,7 @@ func ZendIncdecTypedRef(ref *types.ZendReference, copy *types.Zval, opline *Zend
 		// ZvalPtrDtor(&tmp)
 	}
 }
-func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *types.Zval, copy *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendIncdecTypedProp(prop_info *types.PropertyInfo, var_ptr *types.Zval, copy *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	var tmp types.Zval
 	if copy == nil {
 		copy = &tmp
@@ -309,7 +309,7 @@ func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *types.Zval, copy 
 		// ZvalPtrDtor(&tmp)
 	}
 }
-func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
 	if prop.IsLong() {
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 			operators.FastLongIncrementFunction(prop)
@@ -344,7 +344,7 @@ func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, op
 		types.ZVAL_COPY(opline.Result(), prop)
 	}
 }
-func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
 	if prop.IsLong() {
 		opline.Result().SetLong(prop.Long())
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {

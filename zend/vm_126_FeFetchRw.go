@@ -82,7 +82,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 						value_type = value.GetTypeInfo()
 						if value_type != types.IS_UNDEF && ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 0) == types.SUCCESS {
 							if (value_type & types.Z_TYPE_MASK) != types.IS_REFERENCE {
-								var prop_info *ZendPropertyInfo = ZendGetTypedPropertyInfoForSlot(array.GetObj(), value)
+								var prop_info *types.PropertyInfo = ZendGetTypedPropertyInfoForSlot(array.GetObj(), value)
 								if prop_info != nil {
 									value.SetNewRef(value)
 									ZEND_REF_ADD_TYPE_SOURCE(value.Reference(), prop_info)
