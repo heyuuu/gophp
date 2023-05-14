@@ -201,14 +201,12 @@ func ClearException() {
 func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *types.ZendObject {
 	var obj types.Zval
 	var tmp types.Zval
-	var object *types.ZendObject
 	var trace types.Zval
 	var base_ce *types.ClassEntry
 	var filename *types.String
-	object = zend.ZendObjectsNew(class_type)
-	object.SetHandlers(&DefaultExceptionHandlers)
+
+	object := types.NewObjectEx(class_type, &DefaultExceptionHandlers)
 	obj.SetObject(object)
-	zend.ObjectPropertiesInit(object, class_type)
 	if zend.CurrEX() != nil {
 		zend.ZendFetchDebugBacktrace(&trace, skip_top_traces, b.Cond(zend.EG__().GetExceptionIgnoreArgs() != 0, zend.DEBUG_BACKTRACE_IGNORE_ARGS, 0), 0)
 	} else {

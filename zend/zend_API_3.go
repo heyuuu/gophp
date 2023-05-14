@@ -107,29 +107,3 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 	}
 	return types.SUCCESS
 }
-func _objectPropertiesInit(object *types.ZendObject, classType *types.ClassEntry) {
-	if classType.GetDefaultPropertiesCount() != 0 {
-		var src *types.Zval = classType.GetDefaultPropertiesTable()
-		var dst *types.Zval = object.GetPropertiesTable()
-		var end *types.Zval = src + classType.GetDefaultPropertiesCount()
-		if classType.GetType() == ZEND_INTERNAL_CLASS {
-			for {
-				types.ZVAL_COPY_OR_DUP_PROP(dst, src)
-				src++
-				dst++
-				if src == end {
-					break
-				}
-			}
-		} else {
-			for {
-				types.ZVAL_COPY_PROP(dst, src)
-				src++
-				dst++
-				if src == end {
-					break
-				}
-			}
-		}
-	}
-}

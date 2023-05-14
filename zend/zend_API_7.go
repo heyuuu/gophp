@@ -9,7 +9,7 @@ import (
 
 func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
 	var intern *types.ZendObject
-	intern = ZendObjectsNew(class_type)
+	intern = types.NewStdObject(class_type)
 
 	/* Initialize default properties */
 	if class_type.GetDefaultPropertiesCount() != 0 {

@@ -365,11 +365,7 @@ func ZendClosureFreeStorage(object *types.ZendObject) {
 	}
 }
 func ZendClosureNew(class_type *types.ClassEntry) *types.ZendObject {
-	var closure *ZendClosure
-	closure = Emalloc(b.SizeOf("zend_closure"))
-	memset(closure, 0, b.SizeOf("zend_closure"))
-	ZendObjectStdInit(closure.GetStd(), class_type)
-	closure.GetStd().SetHandlers(&ClosureHandlers)
+	var closure = NewZendClosure(class_type)
 	return (*types.ZendObject)(closure)
 }
 func ZendClosureClone(zobject *types.Zval) *types.ZendObject {

@@ -566,7 +566,7 @@ try_again:
 		//} else {
 		//	//ht.DelRefcount()
 		//}
-		obj = zend.ZendObjectsNew(zend.ZendStandardClassDef)
+		obj = types.NewStdObject(zend.ZendStandardClassDef)
 		obj.SetProperties(ht)
 		op.SetObject(obj)
 	case types.IS_OBJECT:

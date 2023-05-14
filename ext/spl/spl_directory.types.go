@@ -97,7 +97,17 @@ type SplFilesystemObject struct {
 			escape           int
 		}
 	}
-	std types.ZendObject
+	std *types.ZendObject
+}
+
+func NewSplFilesystemObject(ce *types.ClassEntry) *SplFilesystemObject {
+	return &SplFilesystemObject{
+		std: types.NewObjectEx(ce, &SplFilesystemObjectHandlers),
+
+		/* intern->type = SPL_FS_INFO; done by set 0 */
+		file_class: spl_ce_SplFileObject,
+		info_class: spl_ce_SplFileInfo,
+	}
 }
 
 func (this *SplFilesystemObject) FileName() string {

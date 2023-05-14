@@ -7,32 +7,6 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ObjectPropertiesInit(object *types.ZendObject, class_type *types.ClassEntry) {
-	object.SetProperties(nil)
-	_objectPropertiesInit(object, class_type)
-}
-func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.Array) {
-	object.SetProperties(properties)
-	if object.GetCe().GetDefaultPropertiesCount() != 0 {
-		properties.Foreach(func(key_ types.ArrayKey, prop *types.Zval) {
-			propertyInfo := ZendGetPropertyInfo(object.GetCe(), key_.StrKey(), 1)
-			if propertyInfo != ZEND_WRONG_PROPERTY_INFO && propertyInfo != nil && !propertyInfo.IsStatic() {
-				var slot *types.Zval = OBJ_PROP(object, propertyInfo.GetOffset())
-				if propertyInfo.GetType() != 0 {
-					var tmp types.Zval
-					types.ZVAL_COPY_VALUE(&tmp, prop)
-					if ZendVerifyPropertyType(propertyInfo, &tmp, 0) == 0 {
-						return
-					}
-					types.ZVAL_COPY_VALUE(slot, &tmp)
-				} else {
-					slot.CopyValueFrom(prop)
-				}
-				prop.SetIndirect(slot)
-			}
-		})
-	}
-}
 func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 	var prop *types.Zval
 	var tmp types.Zval
@@ -135,21 +109,10 @@ func AddIndexLong(arg *types.Zval, index ZendUlong, n ZendLong) int {
 	arg.Array().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
-func AddIndexBool(arg *types.Zval, index ZendUlong, b int) int {
-	var tmp types.Zval
-	tmp.SetBool(b != 0)
-	arg.Array().IndexUpdate(index, &tmp)
-	return types.SUCCESS
-}
 func AddIndexDouble(arg *types.Zval, index ZendUlong, d float64) int {
 	var tmp types.Zval
 	tmp.SetDouble(d)
 	arg.Array().IndexUpdate(index, &tmp)
-	return types.SUCCESS
-}
-func AddIndexStr(arg *types.Zval, index int, str *types.String) int {
-	zv := types.NewZvalString(str.GetStr())
-	arg.Array().IndexUpdate(index, zv)
 	return types.SUCCESS
 }
 func AddIndexStrEx(arg *types.Zval, index int, str string) int {
@@ -181,27 +144,9 @@ func AddNextIndexNull(arg *types.Zval) int {
 		return types.FAILURE
 	}
 }
-func AddNextIndexBool(arg *types.Zval, b int) int {
-	var tmp types.Zval
-	tmp.SetBool(b != 0)
-	if arg.Array().Append(&tmp) != nil {
-		return types.SUCCESS
-	} else {
-		return types.FAILURE
-	}
-}
 func AddNextIndexResource(arg *types.Zval, r *types.ZendResource) int {
 	var tmp types.Zval
 	tmp.SetResource(r)
-	if arg.Array().Append(&tmp) != nil {
-		return types.SUCCESS
-	} else {
-		return types.FAILURE
-	}
-}
-func AddNextIndexDouble(arg *types.Zval, d float64) int {
-	var tmp types.Zval
-	tmp.SetDouble(d)
 	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {

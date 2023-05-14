@@ -75,31 +75,21 @@ func (this *SplPtrHeap) SetIsHeapCorrupted(cond bool) { this.SwitchFlags(SPL_HEA
  * SplHeapObject
  */
 type SplHeapObject struct {
+	std *types.ZendObject
+
 	heap            *SplPtrHeap
 	flags           int
 	ce_get_iterator *types.ClassEntry
 	fptr_cmp        types.IFunction
 	fptr_count      types.IFunction
-	std             types.ZendObject
 }
 
-//             func MakeSplHeapObject(
-// heap *SplPtrHeap,
-// flags int,
-// ce_get_iterator *zend.ClassEntry,
-// fptr_cmp *zend.ZendFunction,
-// fptr_count *zend.ZendFunction,
-// std zend.ZendObject,
-// ) SplHeapObject {
-//                 return SplHeapObject{
-//                     heap:heap,
-//                     flags:flags,
-//                     ce_get_iterator:ce_get_iterator,
-//                     fptr_cmp:fptr_cmp,
-//                     fptr_count:fptr_count,
-//                     std:std,
-//                 }
-//             }
+func NewSplHeapObject(ce *types.ClassEntry, handlers *types.ObjectHandlers) *SplHeapObject {
+	return &SplHeapObject{
+		std: types.NewObjectEx(ce, handlers),
+	}
+}
+
 func (this *SplHeapObject) GetHeap() *SplPtrHeap                     { return this.heap }
 func (this *SplHeapObject) SetHeap(value *SplPtrHeap)                { this.heap = value }
 func (this *SplHeapObject) GetFlags() int                            { return this.flags }
@@ -110,7 +100,7 @@ func (this *SplHeapObject) GetFptrCmp() types.IFunction              { return th
 func (this *SplHeapObject) SetFptrCmp(value types.IFunction)         { this.fptr_cmp = value }
 func (this *SplHeapObject) GetFptrCount() types.IFunction            { return this.fptr_count }
 func (this *SplHeapObject) SetFptrCount(value types.IFunction)       { this.fptr_count = value }
-func (this *SplHeapObject) GetStd() types.ZendObject                 { return this.std }
+func (this *SplHeapObject) GetStd() *types.ZendObject                { return &this.std }
 
 // func (this *SplHeapObject) SetStd(value zend.ZendObject) { this.std = value }
 

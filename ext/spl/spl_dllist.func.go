@@ -214,14 +214,9 @@ func SplDllistObjectFreeStorage(object *types.ZendObject) {
 	SPL_LLIST_CHECK_DELREF(intern.GetTraversePointer())
 }
 func SplDllistObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
-	var intern *SplDllistObject
+	var intern *SplDllistObject = NewSplDllistObject()
 	var parent *types.ClassEntry = class_type
 	var inherited int = 0
-	intern = zend.ZendObjectAlloc(b.SizeOf("spl_dllist_object"), parent)
-	zend.ZendObjectStdInit(intern.GetStd(), class_type)
-	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
-	intern.SetFlags(0)
-	intern.SetTraversePosition(0)
 	if orig != nil {
 		var other *SplDllistObject = Z_SPLDLLIST_P(orig)
 		intern.SetCeGetIterator(other.GetCeGetIterator())
@@ -244,13 +239,13 @@ func SplDllistObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_
 	for parent != nil {
 		if parent == spl_ce_SplStack {
 			intern.AddFlags(SPL_DLLIST_IT_FIX | SPL_DLLIST_IT_LIFO)
-			intern.GetStd().SetHandlers(&spl_handler_SplDoublyLinkedList)
+			intern.InitStd(class_type, &spl_handler_SplDoublyLinkedList)
 		} else if parent == spl_ce_SplQueue {
 			intern.SetIsItFix(true)
-			intern.GetStd().SetHandlers(&spl_handler_SplDoublyLinkedList)
+			intern.InitStd(class_type, &spl_handler_SplDoublyLinkedList)
 		}
 		if parent == spl_ce_SplDoublyLinkedList {
-			intern.GetStd().SetHandlers(&spl_handler_SplDoublyLinkedList)
+			intern.InitStd(class_type, &spl_handler_SplDoublyLinkedList)
 			break
 		}
 		parent = parent.GetParent()

@@ -22,8 +22,7 @@ var IteratorObjectHandlers *types.ObjectHandlers = types.NewObjectHandlers(types
  * functions
  */
 func ZendIteratorInit(iter *ZendObjectIterator) {
-	ZendObjectStdInit(&iter.std, ZendIteratorClassEntry)
-	iter.std.SetHandlers(IteratorObjectHandlers)
+	iter.Init()
 }
 func ZendIteratorUnwrap(arrayPtr *types.Zval) *ZendObjectIterator {
 	b.Assert(arrayPtr.IsObject())
@@ -89,13 +88,17 @@ func (this *ZendObjectIteratorFuncs) GetInvalidateCurrent() func(iter *ZendObjec
  * ZendObjectIterator
  */
 type ZendObjectIterator struct {
-	std   types.ZendObject
+	std   *types.ZendObject
 	data  types.Zval
 	funcs *ZendObjectIteratorFuncs
 	index ZendUlong
 }
 
-func (this *ZendObjectIterator) GetStd() types.ZendObject                { return this.std }
+func (this *ZendObjectIterator) Init() {
+	this.std = types.NewObject(ZendIteratorClassEntry, IteratorObjectHandlers)
+}
+
+func (this *ZendObjectIterator) GetStd() *types.ZendObject               { return this.std }
 func (this *ZendObjectIterator) GetData() types.Zval                     { return this.data }
 func (this *ZendObjectIterator) GetFuncs() *ZendObjectIteratorFuncs      { return this.funcs }
 func (this *ZendObjectIterator) SetFuncs(value *ZendObjectIteratorFuncs) { this.funcs = value }

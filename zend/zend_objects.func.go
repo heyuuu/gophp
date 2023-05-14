@@ -6,9 +6,6 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendObjectsNew(ce *types.ClassEntry) *types.ZendObject            { return types.NewStdObject(ce) }
-func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) { object.Init(ce) }
-
 func ZendObjectStdDtorEx(properties []types.Zval, ce *types.ClassEntry) {
 	defaultPropertiesCount := ce.GetDefaultPropertiesCount()
 	if defaultPropertiesCount != 0 {
@@ -198,7 +195,7 @@ func ZendObjectsCloneObj(zobject *types.Zval) *types.ZendObject {
 	 * overwritten one then it must itself be overwritten */
 
 	old_object = zobject.Object()
-	new_object = ZendObjectsNew(old_object.GetCe())
+	new_object = types.NewStdObject(old_object.GetCe())
 
 	/* zend_objects_clone_members() expect the properties to be initialized. */
 	if new_object.GetCe().GetDefaultPropertiesCount() != 0 {

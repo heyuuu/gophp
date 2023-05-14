@@ -8,6 +8,8 @@ import (
  * SplArrayObject
  */
 type SplArrayObject struct {
+	std *types.ZendObject
+
 	array           types.Zval
 	ht_iter         uint32
 	ar_flags        int
@@ -18,8 +20,20 @@ type SplArrayObject struct {
 	fptr_offset_del types.IFunction
 	fptr_count      types.IFunction
 	ce_get_iterator *types.ClassEntry
-	std             types.ZendObject
 }
+
+func NewSplArrayObject() *SplArrayObject {
+	return &SplArrayObject{
+		ar_flags:        0,
+		ce_get_iterator: spl_ce_ArrayIterator,
+	}
+}
+
+func (this *SplArrayObject) InitStd(ce *types.ClassEntry, handlers *types.ObjectHandlers) {
+	this.std = types.NewObjectEx(ce, handlers)
+}
+
+func (this *SplArrayObject) GetStd() *types.ZendObject { return this.std }
 
 func (this *SplArrayObject) GetArray() *types.Zval                  { return &this.array }
 func (this *SplArrayObject) GetHtIter() uint32                      { return this.ht_iter }
@@ -41,7 +55,6 @@ func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry    { return thi
 func (this *SplArrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplArrayObject) GetStd() *types.ZendObject { return &this.std }
 
 /* SplArrayObject.ar_flags */
 func (this *SplArrayObject) AddArFlags(value int)      { this.ar_flags |= value }

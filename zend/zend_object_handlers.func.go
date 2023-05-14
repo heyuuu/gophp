@@ -323,10 +323,7 @@ func ZendWrongOffset(ce *types.ClassEntry, member *types.String) {
 	var dummy *ZendPropertyInfo
 
 	/* Trigger the correct error */
-
 	ZendGetPropertyOffset(ce, member, 0, nil, &dummy)
-
-	/* Trigger the correct error */
 }
 func ZendGetPropertyInfo(ce *types.ClassEntry, member *types.String, silent int) *ZendPropertyInfo {
 	var property_info *ZendPropertyInfo

@@ -22,7 +22,7 @@ type ClassEntry struct {
 	ceFlags                      uint32
 	default_properties_count     int
 	default_static_members_count int
-	default_properties_table     *Zval
+	default_properties_table     []Zval
 	default_static_members_table *Zval
 	static_members_table__ptr    **Zval
 
@@ -159,10 +159,10 @@ func (ce *ClassEntry) GetDefaultStaticMembersCount() int {
 func (ce *ClassEntry) SetDefaultStaticMembersCount(value int) {
 	ce.default_static_members_count = value
 }
-func (ce *ClassEntry) GetDefaultPropertiesTable() *Zval {
+func (ce *ClassEntry) GetDefaultPropertiesTable() []Zval {
 	return ce.default_properties_table
 }
-func (ce *ClassEntry) SetDefaultPropertiesTable(value *Zval) {
+func (ce *ClassEntry) SetDefaultPropertiesTable(value []Zval) {
 	ce.default_properties_table = value
 }
 func (ce *ClassEntry) GetDefaultStaticMembersTable() *Zval {

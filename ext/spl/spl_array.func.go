@@ -72,13 +72,9 @@ func SplArrayObjectFreeStorage(object *types.ZendObject) {
 	zend.ZendObjectStdDtor(intern.GetStd())
 }
 func SplArrayObjectNewEx(classType *types.ClassEntry, orig *types.Zval, cloneOrig int) *types.ZendObject {
-	var intern *SplArrayObject = new(SplArrayObject)
+	var intern *SplArrayObject = NewSplArrayObject()
 	var parent *types.ClassEntry = classType
 	var inherited int = 0
-	zend.ZendObjectStdInit(intern.GetStd(), classType)
-	zend.ObjectPropertiesInit(intern.GetStd(), classType)
-	intern.SetArFlags(0)
-	intern.SetCeGetIterator(spl_ce_ArrayIterator)
 	if orig != nil {
 		var other *SplArrayObject = Z_SPLARRAY_P(orig)
 		intern.SetIsCloneMask(false)
@@ -103,10 +99,10 @@ func SplArrayObjectNewEx(classType *types.ClassEntry, orig *types.Zval, cloneOri
 	}
 	for parent != nil {
 		if parent == spl_ce_ArrayIterator || parent == spl_ce_RecursiveArrayIterator {
-			intern.GetStd().SetHandlers(&spl_handler_ArrayIterator)
+			intern.InitStd(classType, &spl_handler_ArrayIterator)
 			break
 		} else if parent == spl_ce_ArrayObject {
-			intern.GetStd().SetHandlers(&spl_handler_ArrayObject)
+			intern.InitStd(classType, &spl_handler_ArrayObject)
 			break
 		}
 		parent = parent.GetParent()

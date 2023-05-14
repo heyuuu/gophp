@@ -31,30 +31,83 @@ func NewStdObject(ce *ClassEntry) *ZendObject {
 	return NewObject(ce, zend.StdObjectHandlersPtr)
 }
 
+func NewStdObjectEx(ce *ClassEntry) *ZendObject {
+	return NewObjectEx(ce, zend.StdObjectHandlersPtr)
+}
+
+func NewStdObjectExEx(ce *ClassEntry, properties *Array) *ZendObject {
+	o := NewObject(ce, zend.StdObjectHandlersPtr)
+	o.PropertiesInitEx(properties)
+	return o
+}
+
 func NewObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
 	propertyCount := ce.GetDefaultPropertiesCount()
 	if ce.IsUseGuards() {
 		propertyCount++
 	}
 
-	o := &ZendObject{}
-	o.handlers = handlers
-	o.propertiesTable = make([]Zval, propertyCount)
+	o := &ZendObject{
+		ce:              ce,
+		handlers:        handlers,
+		properties:      nil,
+		propertiesTable: make([]Zval, propertyCount),
+	}
 
-	o.Init(ce)
-	return o
-}
-
-func (o *ZendObject) Init(ce *ClassEntry) {
 	o.handle = uint(uintptr(unsafe.Pointer(o)))
-	o.ce = ce
-	o.properties = nil
 
 	if ce.IsUseGuards() {
 		o.propertiesTable[ce.GetDefaultPropertiesCount()].SetUndef()
 	}
 
 	runtime.SetFinalizer(o, ObjectAutoFree)
+	return o
+}
+
+func NewObjectEx(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
+	o := NewObject(ce, handlers)
+
+	// init properties
+	defaultPropertiesCount := ce.GetDefaultPropertiesCount()
+	if defaultPropertiesCount != 0 {
+		src := ce.GetDefaultPropertiesTable()
+		dst := o.propertiesTable
+		if ce.GetType() == zend.ZEND_INTERNAL_CLASS {
+			for i := 0; i < defaultPropertiesCount; i++ {
+				ZVAL_COPY_OR_DUP_PROP(&dst[i], &src[i])
+			}
+		} else {
+			for i := 0; i < defaultPropertiesCount; i++ {
+				ZVAL_COPY_PROP(&dst[i], &src[i])
+			}
+		}
+	}
+
+	return o
+}
+
+func (o *ZendObject) PropertiesInitEx(properties *Array) {
+	o.properties = properties
+	defaultPropertiesCount := o.ce.GetDefaultPropertiesCount()
+	if defaultPropertiesCount != 0 {
+		properties.Foreach(func(key_ ArrayKey, prop *Zval) {
+			propertyInfo := zend.ZendGetPropertyInfo(o.GetCe(), key_.StrKey(), 1)
+			if propertyInfo != zend.ZEND_WRONG_PROPERTY_INFO && propertyInfo != nil && !propertyInfo.IsStatic() {
+				var slot *Zval = zend.OBJ_PROP(o, propertyInfo.GetOffset())
+				if propertyInfo.GetType() != 0 {
+					var tmp Zval
+					ZVAL_COPY_VALUE(&tmp, prop)
+					if zend.ZendVerifyPropertyType(propertyInfo, &tmp, 0) == 0 {
+						return
+					}
+					ZVAL_COPY_VALUE(slot, &tmp)
+				} else {
+					slot.CopyValueFrom(prop)
+				}
+				prop.SetIndirect(slot)
+			}
+		})
+	}
 }
 
 func (o *ZendObject) GetHandle() uint                   { return o.handle }
@@ -198,20 +251,20 @@ func (o *ZendObject) Compare(result *Zval, op1 *Zval, op2 *Zval) int {
 }
 
 // object
-func (this *ZendObject) IsObjDtorCalled() bool {
-	return this.isDtorCalled
+func (o *ZendObject) IsObjDtorCalled() bool {
+	return o.isDtorCalled
 }
-func (this *ZendObject) MarkObjDtorCalled() {
-	this.isDtorCalled = true
+func (o *ZendObject) MarkObjDtorCalled() {
+	o.isDtorCalled = true
 }
-func (this *ZendObject) IsObjFreeCalled() bool {
-	return this.isFreeCalled
+func (o *ZendObject) IsObjFreeCalled() bool {
+	return o.isFreeCalled
 }
-func (this *ZendObject) MarkObjFreeCalled() {
-	this.isFreeCalled = true
+func (o *ZendObject) MarkObjFreeCalled() {
+	o.isFreeCalled = true
 }
 
 // recursive
-func (this *ZendObject) IsRecursive() bool   { return this.protected }
-func (this *ZendObject) ProtectRecursive()   { this.protected = true }
-func (this *ZendObject) UnprotectRecursive() { this.protected = false }
+func (o *ZendObject) IsRecursive() bool   { return o.protected }
+func (o *ZendObject) ProtectRecursive()   { o.protected = true }
+func (o *ZendObject) UnprotectRecursive() { o.protected = false }

@@ -12,7 +12,7 @@ func ObjectInitEx(arg *types.Zval, class_type *types.ClassEntry) int {
 	return _objectAndPropertiesInit(arg, class_type, nil)
 }
 func ObjectInit(arg *types.Zval) int {
-	arg.SetObject(ZendObjectsNew(ZendStandardClassDef))
+	arg.SetObject(types.NewStdObject(ZendStandardClassDef))
 	return types.SUCCESS
 }
 func _objectAndPropertiesInit(arg *types.Zval, classType *types.ClassEntry, properties *types.Array) int {
@@ -34,13 +34,13 @@ func _objectAndPropertiesInit(arg *types.Zval, classType *types.ClassEntry, prop
 		}
 	}
 	if classType.GetCreateObject() == nil {
-		var obj *types.ZendObject = ZendObjectsNew(classType)
-		arg.SetObject(obj)
+		var obj *types.ZendObject
 		if properties != nil {
-			ObjectPropertiesInitEx(obj, properties)
+			obj = types.NewStdObjectExEx(classType, properties)
 		} else {
-			_objectPropertiesInit(obj, classType)
+			obj = types.NewStdObjectEx(classType)
 		}
+		arg.SetObject(obj)
 	} else {
 		arg.SetObject(classType.GetCreateObject()(classType))
 	}

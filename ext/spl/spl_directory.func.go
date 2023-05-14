@@ -111,16 +111,7 @@ func SplFilesystemObjectFreeStorage(object *types.ZendObject) {
 	}
 }
 func SplFilesystemObjectNewEx(class_type *types.ClassEntry) *types.ZendObject {
-	var intern *SplFilesystemObject
-	intern = zend.ZendObjectAlloc(b.SizeOf("spl_filesystem_object"), class_type)
-
-	/* intern->type = SPL_FS_INFO; done by set 0 */
-
-	intern.SetFileClass(spl_ce_SplFileObject)
-	intern.SetInfoClass(spl_ce_SplFileInfo)
-	zend.ZendObjectStdInit(intern.GetStd(), class_type)
-	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
-	intern.GetStd().SetHandlers(&SplFilesystemObjectHandlers)
+	var intern *SplFilesystemObject = NewSplFilesystemObject(class_type)
 	return intern.GetStd()
 }
 func SplFilesystemObjectNew(class_type *types.ClassEntry) *types.ZendObject {

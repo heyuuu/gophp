@@ -665,8 +665,7 @@ func spl_RecursiveIteratorIterator_free_storage(_object *types.ZendObject) {
 	object.GetPostfix()[0].Free()
 }
 func spl_RecursiveIteratorIterator_new_ex(class_type *types.ClassEntry, init_prefix int) *types.ZendObject {
-	var intern *SplRecursiveItObject
-	intern = zend.ZendObjectAlloc(b.SizeOf("spl_recursive_it_object"), class_type)
+	var intern = NewSplRecursiveItObject(class_type)
 	if init_prefix != 0 {
 		intern.GetPrefix()[0].AppendString("")
 		intern.GetPrefix()[1].AppendString("| ")
@@ -676,9 +675,6 @@ func spl_RecursiveIteratorIterator_new_ex(class_type *types.ClassEntry, init_pre
 		intern.GetPrefix()[5].AppendString("")
 		intern.GetPostfix()[0].AppendString("")
 	}
-	zend.ZendObjectStdInit(intern.GetStd(), class_type)
-	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
-	intern.GetStd().SetHandlers(&SplHandlersRecItIt)
 	return intern.GetStd()
 }
 func spl_RecursiveIteratorIterator_new(class_type *types.ClassEntry) *types.ZendObject {
@@ -1713,12 +1709,7 @@ func SplDualItFreeStorage(_object *types.ZendObject) {
 	zend.ZendObjectStdDtor(object.GetStd())
 }
 func SplDualItNew(class_type *types.ClassEntry) *types.ZendObject {
-	var intern *SplDualItObject
-	intern = zend.ZendObjectAlloc(b.SizeOf("spl_dual_it_object"), class_type)
-	intern.SetDitType(DIT_Unknown)
-	zend.ZendObjectStdInit(intern.GetStd(), class_type)
-	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
-	intern.GetStd().SetHandlers(&SplHandlersDualIt)
+	var intern *SplDualItObject = NewSplDualItObject(class_type)
 	return intern.GetStd()
 }
 func SplLimitItValid(intern *SplDualItObject) int {
@@ -1729,8 +1720,6 @@ func SplLimitItValid(intern *SplDualItObject) int {
 	} else {
 		return SplDualItValid(intern)
 	}
-
-	/* FAILURE / SUCCESS */
 }
 func SplLimitItSeek(intern *SplDualItObject, pos zend.ZendLong) {
 	var zpos types.Zval

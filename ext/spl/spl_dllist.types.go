@@ -68,6 +68,8 @@ func (this *SplPtrLlist) SetCount(value int)                { this.count = value
  * SplDllistObject
  */
 type SplDllistObject struct {
+	std *types.ZendObject
+
 	llist             *SplPtrLlist
 	traverse_position int
 	traverse_pointer  *SplPtrLlistElement
@@ -80,40 +82,19 @@ type SplDllistObject struct {
 	ce_get_iterator   *types.ClassEntry
 	gc_data           *types.Zval
 	gc_data_count     int
-	std               types.ZendObject
 }
 
-//             func MakeSplDllistObject(
-// llist *SplPtrLlist,
-// traverse_position int,
-// traverse_pointer *SplPtrLlistElement,
-// flags int,
-// fptr_offset_get *zend.ZendFunction,
-// fptr_offset_set *zend.ZendFunction,
-// fptr_offset_has *zend.ZendFunction,
-// fptr_offset_del *zend.ZendFunction,
-// fptr_count *zend.ZendFunction,
-// ce_get_iterator *zend.ClassEntry,
-// gc_data *zend.Zval,
-// gc_data_count int,
-// std zend.ZendObject,
-// ) SplDllistObject {
-//                 return SplDllistObject{
-//                     llist:llist,
-//                     traverse_position:traverse_position,
-//                     traverse_pointer:traverse_pointer,
-//                     flags:flags,
-//                     fptr_offset_get:fptr_offset_get,
-//                     fptr_offset_set:fptr_offset_set,
-//                     fptr_offset_has:fptr_offset_has,
-//                     fptr_offset_del:fptr_offset_del,
-//                     fptr_count:fptr_count,
-//                     ce_get_iterator:ce_get_iterator,
-//                     gc_data:gc_data,
-//                     gc_data_count:gc_data_count,
-//                     std:std,
-//                 }
-//             }
+func NewSplDllistObject() *SplDllistObject {
+	return &SplDllistObject{
+		flags:             0,
+		traverse_position: 0,
+	}
+}
+func (this *SplDllistObject) InitStd(ce *types.ClassEntry, handlers *types.ObjectHandlers) {
+	this.std = types.NewObjectEx(ce, handlers)
+}
+func (this *SplDllistObject) GetStd() *types.ZendObject { return this.std }
+
 func (this *SplDllistObject) GetLlist() *SplPtrLlist                  { return this.llist }
 func (this *SplDllistObject) SetLlist(value *SplPtrLlist)             { this.llist = value }
 func (this *SplDllistObject) GetTraversePosition() int                { return this.traverse_position }
@@ -150,7 +131,6 @@ func (this *SplDllistObject) GetGcData() *types.Zval      { return this.gc_data 
 func (this *SplDllistObject) SetGcData(value *types.Zval) { this.gc_data = value }
 func (this *SplDllistObject) GetGcDataCount() int         { return this.gc_data_count }
 func (this *SplDllistObject) SetGcDataCount(value int)    { this.gc_data_count = value }
-func (this *SplDllistObject) GetStd() types.ZendObject    { return this.std }
 
 // func (this *SplDllistObject) SetStd(value zend.ZendObject) { this.std = value }
 

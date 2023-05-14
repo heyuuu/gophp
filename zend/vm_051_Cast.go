@@ -38,7 +38,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				result.SetEmptyArray()
 			}
 		} else {
-			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
+			result.SetObject(types.NewStdObject(ZendStandardClassDef))
 			if expr.IsArray() {
 				ht = types.ZendSymtableToProptable(expr.Array())
 				//if ht.IsImmutable() {
@@ -111,7 +111,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 		} else {
-			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
+			result.SetObject(types.NewStdObject(ZendStandardClassDef))
 			if expr.IsArray() {
 				ht = types.ZendSymtableToProptable(expr.Array())
 				//if ht.IsImmutable() {
@@ -192,7 +192,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 		} else {
-			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
+			result.SetObject(types.NewStdObject(ZendStandardClassDef))
 			if expr.IsArray() {
 				ht = types.ZendSymtableToProptable(expr.Array())
 				//if ht.IsImmutable() {
@@ -271,7 +271,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 		} else {
-			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
+			result.SetObject(types.NewStdObject(ZendStandardClassDef))
 			if expr.IsArray() {
 				ht = types.ZendSymtableToProptable(expr.Array())
 				//if ht.IsImmutable() {

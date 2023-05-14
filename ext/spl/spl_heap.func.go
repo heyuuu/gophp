@@ -266,22 +266,15 @@ func SplPtrHeapDestroy(heap *SplPtrHeap) {
 	zend.Efree(heap.GetElements())
 	zend.Efree(heap)
 }
-func SplPtrHeapCount(heap *SplPtrHeap) int { return heap.GetCount() }
 func SplHeapObjectFreeStorage(object *types.ZendObject) {
 	var intern *SplHeapObject = SplHeapFromObj(object)
 	zend.ZendObjectStdDtor(intern.GetStd())
 	SplPtrHeapDestroy(intern.GetHeap())
 }
 func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
-	var intern *SplHeapObject
-	var parent *types.ClassEntry = class_type
-	var inherited int = 0
-	intern = zend.ZendObjectAlloc(b.SizeOf("spl_heap_object"), parent)
-	zend.ZendObjectStdInit(intern.GetStd(), class_type)
-	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
 	if orig != nil {
 		var other *SplHeapObject = Z_SPLHEAP_P(orig)
-		intern.GetStd().SetHandlers(other.GetStd().GetHandlers())
+		intern := NewSplHeapObject(class_type, other.GetStd().GetHandlers())
 		intern.SetCeGetIterator(other.GetCeGetIterator())
 		if clone_orig != 0 {
 			intern.SetHeap(SplPtrHeapClone(other.GetHeap()))
@@ -293,16 +286,20 @@ func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_or
 		intern.SetFptrCount(other.GetFptrCount())
 		return intern.GetStd()
 	}
+
+	var intern *SplHeapObject
+	var inherited int = 0
+	parent := class_type
 	for parent != nil {
 		if parent == spl_ce_SplPriorityQueue {
+			intern = NewSplHeapObject(class_type, &spl_handler_SplPriorityQueue)
 			intern.SetHeap(SplPtrHeapInit(SplPtrPqueueElemCmp, SplPtrHeapPqueueElemCtor, SplPtrHeapPqueueElemDtor, b.SizeOf("spl_pqueue_elem")))
-			intern.GetStd().SetHandlers(&spl_handler_SplPriorityQueue)
 			intern.SetFlags(SPL_PQUEUE_EXTR_DATA)
 			break
 		}
 		if parent == spl_ce_SplMinHeap || parent == spl_ce_SplMaxHeap || parent == spl_ce_SplHeap {
+			intern = NewSplHeapObject(class_type, &spl_handler_SplHeap)
 			intern.SetHeap(SplPtrHeapInit(b.Cond(parent == spl_ce_SplMinHeap, SplPtrHeapZvalMinCmp, SplPtrHeapZvalMaxCmp), SplPtrHeapZvalCtor, SplPtrHeapZvalDtor, b.SizeOf("zval")))
-			intern.GetStd().SetHandlers(&spl_handler_SplHeap)
 			break
 		}
 		parent = parent.GetParent()

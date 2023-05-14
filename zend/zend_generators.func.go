@@ -432,23 +432,7 @@ func ZendGeneratorGetGc(object *types.Zval, table **types.Zval, n *int) *types.A
 	}
 }
 func ZendGeneratorCreate(class_type *types.ClassEntry) *types.ZendObject {
-	var generator *ZendGenerator
-	generator = Emalloc(b.SizeOf("zend_generator"))
-	memset(generator, 0, b.SizeOf("zend_generator"))
-
-	/* The key will be incremented on first use, so it'll start at 0 */
-
-	generator.SetLargestUsedIntegerKey(-1)
-	generator.GetRetval().SetUndef()
-	generator.GetValues().SetUndef()
-
-	/* By default we have a tree of only one node */
-
-	generator.GetNode().SetParent(nil)
-	generator.GetNode().SetChildren(0)
-	generator.GetNode().SetRoot(generator)
-	ZendObjectStdInit(generator.GetStd(), class_type)
-	generator.GetStd().SetHandlers(&ZendGeneratorHandlers)
+	var generator = NewZendGenerator(class_type)
 	return (*types.ZendObject)(generator)
 }
 func ZendGeneratorGetConstructor(object *types.ZendObject) types.IFunction {
