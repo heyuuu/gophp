@@ -291,7 +291,7 @@ func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *ZendOp
 		faults.Error(faults.E_DEPRECATED, "array_key_exists(): "+"Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
 		var ht *types.Array = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
 		var result uint32 = ZendArrayKeyExistsFast(ht, key, opline, executeData)
-		ZendReleaseProperties(ht)
+		//ZendReleaseProperties(ht)
 		return result
 	} else {
 		if key.IsUndef() {

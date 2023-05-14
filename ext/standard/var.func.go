@@ -241,7 +241,7 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 		if myht != nil {
 			if myht.IsRecursive() {
 				core.PUTS("*RECURSION*\n")
-				zend.ZendReleaseProperties(myht)
+				//zend.ZendReleaseProperties(myht)
 				return
 			}
 			myht.ProtectRecursive()
@@ -408,7 +408,7 @@ again:
 			if myht.IsRecursive() {
 				buf.AppendString("NULL")
 				faults.Error(faults.E_WARNING, "var_export does not handle circular references")
-				zend.ZendReleaseProperties(myht)
+				//zend.ZendReleaseProperties(myht)
 				return
 			} else {
 				myht.ProtectRecursive()
@@ -443,7 +443,7 @@ again:
 				PhpObjectElementExport(val, index, key, level, buf)
 			}
 			myht.UnprotectRecursive()
-			zend.ZendReleaseProperties(myht)
+			//zend.ZendReleaseProperties(myht)
 		}
 		if level > 1 {
 			BufferAppendSpaces(buf, level-1)
@@ -667,7 +667,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 		ht.KeyAdd(name.GetStr(), zend.EG__().GetUninitializedZval())
 		// zend.ZendTmpStringRelease(tmp_name)
 	}
-	zend.ZendReleaseProperties(props)
+	//zend.ZendReleaseProperties(props)
 	return retval
 }
 func PhpVarSerializeNestedData(
@@ -891,7 +891,7 @@ again:
 			count--
 		}
 		PhpVarSerializeNestedData(buf, struc, myht, count, incomplete_class, var_hash)
-		zend.ZendReleaseProperties(myht)
+		//zend.ZendReleaseProperties(myht)
 		return
 	case types.IS_ARRAY:
 		buf.AppendString("a:")

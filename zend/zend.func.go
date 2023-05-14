@@ -195,7 +195,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		expr.Object().ProtectRecursive()
 		PrintHash(buf, properties, indent, 1)
 		expr.Object().UnprotectRecursive()
-		ZendReleaseProperties(properties)
+		//ZendReleaseProperties(properties)
 		break
 	case types.IS_LONG:
 		buf.AppendLong(expr.Long())

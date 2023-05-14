@@ -22,11 +22,6 @@ func ZendGetFunctionRootClass(fbc types.IFunction) *types.ClassEntry {
 		return fbc.GetScope()
 	}
 }
-func ZendReleaseProperties(ht *types.Array) {
-	//if ht != nil && (ht.GetGcFlags()&types.GC_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-	//	ht.DestroyEx()
-	//}
-}
 func ZendFreeTrampoline(func_ any) {
 	if func_ == EG__().GetTrampoline() {
 		EG__().GetTrampoline().SetFunctionName(nil)

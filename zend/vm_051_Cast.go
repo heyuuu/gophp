@@ -105,7 +105,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 					/* fast copy */
 
 					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || expr.Object().GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive()))
-					ZendReleaseProperties(obj_ht)
+					//ZendReleaseProperties(obj_ht)
 				} else {
 					result.SetEmptyArray()
 				}
@@ -186,7 +186,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					/* fast copy */
 
 					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || expr.Object().GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive()))
-					ZendReleaseProperties(obj_ht)
+					//ZendReleaseProperties(obj_ht)
 				} else {
 					result.SetEmptyArray()
 				}
@@ -265,7 +265,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 					/* fast copy */
 
 					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || expr.Object().GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive()))
-					ZendReleaseProperties(obj_ht)
+					//ZendReleaseProperties(obj_ht)
 				} else {
 					result.SetEmptyArray()
 				}

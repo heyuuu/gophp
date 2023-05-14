@@ -528,7 +528,7 @@ try_again:
 				var new_obj_ht *types.Array = types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || op.Object().GetHandlers() != zend.StdObjectHandlersPtr || obj_ht.IsRecursive())
 				// ZvalPtrDtor(op)
 				op.SetArray(new_obj_ht)
-				zend.ZendReleaseProperties(obj_ht)
+				//zend.ZendReleaseProperties(obj_ht)
 			} else {
 				// ZvalPtrDtor(op)
 
