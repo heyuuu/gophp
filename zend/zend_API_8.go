@@ -293,7 +293,7 @@ func ZendDeclareTypedProperty(
 	if type_.IsSet() {
 		ce.SetIsHasTypeHints(true)
 	}
-	if ce.GetType() == ZEND_INTERNAL_CLASS {
+	if ce.IsInternalClass() {
 		property_info = Pemalloc(b.SizeOf("zend_property_info"))
 	} else {
 		property_info = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_property_info"))
@@ -320,7 +320,7 @@ func ZendDeclareTypedProperty(
 		}
 		types.ZVAL_COPY_VALUE(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()], property)
 		if ce.GetStaticMembersTablePtr() == nil {
-			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
+			b.Assert(ce.IsInternalClass())
 			if CurrEX() == nil {
 				ZEND_MAP_PTR_NEW(ce.static_members_table)
 			} else {
@@ -340,7 +340,7 @@ func ZendDeclareTypedProperty(
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			// ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
 			ce.PropertyTable().Del(name.GetStr())
-			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
+			b.Assert(ce.IsInternalClass())
 			b.Assert(ce.GetPropertiesInfoTable() != nil)
 			ce.GetPropertiesInfoTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())] = property_info
 		} else {
@@ -350,7 +350,7 @@ func ZendDeclareTypedProperty(
 
 			/* For user classes this is handled during linking */
 
-			if ce.GetType() == ZEND_INTERNAL_CLASS {
+			if ce.IsInternalClass() {
 				ce.SetPropertiesInfoTable(Perealloc(ce.GetPropertiesInfoTable(), b.SizeOf("zend_property_info *")*ce.GetDefaultPropertiesCount()))
 				ce.GetPropertiesInfoTable()[ce.GetDefaultPropertiesCount()-1] = property_info
 			}
@@ -366,7 +366,7 @@ func ZendDeclareTypedProperty(
 			property_default_ptr.SetU2Extra(0)
 		}
 	}
-	if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
+	if ce.IsInternalClass() {
 		switch property.GetType() {
 		case types.IS_ARRAY:
 

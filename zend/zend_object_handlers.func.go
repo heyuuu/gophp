@@ -1238,7 +1238,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 	/* check if static properties were destroyed */
 
 	if CE_STATIC_MEMBERS(ce) == nil {
-		if ce.GetType() == ZEND_INTERNAL_CLASS || ce.HasCeFlags(AccImmutable|AccPreloaded) {
+		if ce.IsInternalClass() || ce.HasCeFlags(AccImmutable|AccPreloaded) {
 			ZendClassInitStatics(ce)
 		} else {
 		undeclared_property:

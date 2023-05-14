@@ -57,7 +57,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 		// TODO: Only deprecate if it had $this *originally*?
 
 	}
-	if scope != nil && scope != func_.GetScope() && scope.GetType() == ZEND_INTERNAL_CLASS {
+	if scope != nil && scope != func_.GetScope() && scope.IsInternalClass() {
 
 		/* rebinding to internal class is not allowed */
 

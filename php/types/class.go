@@ -5,6 +5,11 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
+const (
+	typeInternalClass = 1
+	typeUserClass     = 2
+)
+
 type FunctionTable = *Table[IFunction]
 type PropertyTable = *Table[*zend.ZendPropertyInfo]
 type ClassConstantTable = *Table[*zend.ZendClassConstant]
@@ -13,9 +18,9 @@ type ClassConstantTable = *Table[*zend.ZendClassConstant]
  * ClassEntry
  */
 type ClassEntry struct {
-	type_ byte
-	name  string // *String
-	__0   struct /* union */ {
+	typ  byte
+	name string // *String
+	__0  struct /* union */ {
 		parent      *ClassEntry
 		parent_name *String
 	}
@@ -78,8 +83,8 @@ type ClassEntry struct {
 
 func NewUserClass(name string) *ClassEntry {
 	ce := &ClassEntry{
-		name:  name,
-		type_: zend.ZEND_USER_CLASS,
+		typ:  typeUserClass,
+		name: name,
 	}
 	ce.initData()
 	return ce
@@ -87,7 +92,7 @@ func NewUserClass(name string) *ClassEntry {
 
 func NewInternalClass(name string, moduleNumber int) *ClassEntry {
 	var ce = &ClassEntry{
-		type_:        zend.ZEND_INTERNAL_CLASS,
+		typ:          typeInternalClass,
 		name:         name,
 		moduleNumber: moduleNumber,
 	}
@@ -97,8 +102,8 @@ func NewInternalClass(name string, moduleNumber int) *ClassEntry {
 
 func NewDisabledClass(origCe *ClassEntry, createObject func(*ClassEntry) *ZendObject) *ClassEntry {
 	ce := &ClassEntry{
-		type_: origCe.type_,
-		name:  origCe.name,
+		typ:  origCe.typ,
+		name: origCe.name,
 	}
 	ce.SetCreateObject(createObject)
 	return ce
@@ -111,7 +116,7 @@ func (ce *ClassEntry) initData() {
 		ce.SetIsUseGuards(true)
 	}
 	ce.initTables()
-	if ce.type_ == zend.ZEND_USER_CLASS {
+	if ce.typ == typeUserClass {
 		zend.ZEND_MAP_PTR_INIT(ce.static_members_table, ce.GetDefaultStaticMembersTable())
 	} else {
 		zend.ZEND_MAP_PTR_INIT(ce.static_members_table, nil)
@@ -140,9 +145,11 @@ func (ce *ClassEntry) GetPropertyInfo(propNum int) *zend.ZendPropertyInfo {
 /**
  * Getter / Setter
  */
-func (ce *ClassEntry) GetName() *String { return NewString(ce.name) }
+func (ce *ClassEntry) GetName() *String      { return NewString(ce.name) }
+func (ce *ClassEntry) IsInternalClass() bool { return ce.typ == typeInternalClass }
+func (ce *ClassEntry) IsUserClass() bool     { return ce.typ == typeUserClass }
 
-func (ce *ClassEntry) GetType() byte                  { return ce.type_ }
+func (ce *ClassEntry) GetType() byte                  { return ce.typ }
 func (ce *ClassEntry) GetParent() *ClassEntry         { return ce.__0.parent }
 func (ce *ClassEntry) SetParent(value *ClassEntry)    { ce.__0.parent = value }
 func (ce *ClassEntry) GetParentName() *String         { return ce.__0.parent_name }

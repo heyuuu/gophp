@@ -63,7 +63,7 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 		}
 
 		if class_type.GetDefaultStaticMembersCount() != 0 && CE_STATIC_MEMBERS(class_type) == nil {
-			if class_type.GetType() == ZEND_INTERNAL_CLASS || class_type.HasCeFlags(AccImmutable|AccPreloaded) {
+			if class_type.IsInternalClass() || class_type.HasCeFlags(AccImmutable|AccPreloaded) {
 				ZendClassInitStatics(class_type)
 			}
 		}

@@ -83,7 +83,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 		}
 	}
 	if ascii.StrCaseEquals(name.GetStr(), "class") {
-		faults.ErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
+		faults.ErrorNoreturn(b.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
 
 	var c *ZendClassConstant = NewClassConstant(ce, value, doc_comment)
@@ -92,7 +92,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 		ce.SetIsConstantsUpdated(false)
 	}
 	if !ce.ConstantsTable().Add(name.GetStr(), c) {
-		faults.ErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.GetName().GetVal(), name.GetVal())
+		faults.ErrorNoreturn(b.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.GetName().GetVal(), name.GetVal())
 	}
 	return types.SUCCESS
 }

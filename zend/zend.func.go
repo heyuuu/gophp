@@ -300,7 +300,7 @@ func ZendRegisterStandardIniEntries() {
 }
 func ZendResolvePropertyTypes() {
 	CG__().ClassTable().Foreach(func(_ string, ce *types.ClassEntry) {
-		if ce.GetType() != ZEND_INTERNAL_CLASS {
+		if !ce.IsInternalClass() {
 			return
 		}
 		if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
@@ -308,7 +308,7 @@ func ZendResolvePropertyTypes() {
 				if prop_info.GetType().IsName() {
 					var type_name = prop_info.GetType().Name().GetStr()
 					var prop_ce *types.ClassEntry = CG__().ClassTable().Get(type_name)
-					b.Assert(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
+					b.Assert(prop_ce != nil && prop_ce.IsInternalClass())
 					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
 				}
 			})

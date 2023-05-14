@@ -182,7 +182,7 @@ func ShutdownExecutor() {
 			return f.GetType() == ZEND_INTERNAL_FUNCTION
 		})
 		EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
-			return ce.GetType() == ZEND_INTERNAL_CLASS
+			return ce.IsInternalClass()
 		})
 		ZendCleanupInternalClasses()
 	} else {
@@ -195,7 +195,7 @@ func ShutdownExecutor() {
 				return f.GetType() == ZEND_INTERNAL_FUNCTION
 			})
 			EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
-				return ce.GetType() == ZEND_INTERNAL_CLASS
+				return ce.IsInternalClass()
 			})
 		} else {
 			EG__().ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
@@ -217,7 +217,7 @@ func ShutdownExecutor() {
 			})
 
 			EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
-				if ce.GetType() == ZEND_INTERNAL_CLASS {
+				if ce.IsInternalClass() {
 					return true
 				}
 

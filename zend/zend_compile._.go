@@ -255,8 +255,6 @@ const ZEND_OVERLOADED_FUNCTION_TEMPORARY = 5
 
 /* A quick check (type == ZEND_USER_FUNCTION || type == ZEND_EVAL_CODE) */
 
-const ZEND_INTERNAL_CLASS = 1
-const ZEND_USER_CLASS = 2
 const ZEND_EVAL = 1 << 0
 const ZEND_INCLUDE = 1 << 1
 const ZEND_INCLUDE_ONCE = 1 << 2

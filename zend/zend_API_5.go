@@ -15,7 +15,7 @@ func ZendCollectModuleHandlers() {
 
 	/* Collect internal classes with static members */
 	CG__().ClassTable().Foreach(func(_ string, ce *types.ClassEntry) {
-		if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
+		if ce.IsInternalClass() && ce.GetDefaultStaticMembersCount() > 0 {
 			class_count++
 		}
 	})
@@ -23,7 +23,7 @@ func ZendCollectModuleHandlers() {
 	ClassCleanupHandlers = (**types.ClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
 	ClassCleanupHandlers[class_count] = nil
 	CG__().ClassTable().Foreach(func(_ string, ce *types.ClassEntry) {
-		if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
+		if ce.IsInternalClass() && ce.GetDefaultStaticMembersCount() > 0 {
 			ClassCleanupHandlers[b.PreDec(&class_count)] = ce
 		}
 	})

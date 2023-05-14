@@ -14,15 +14,11 @@ func ZendDoInheritance(ce *types.ClassEntry, parentCe *types.ClassEntry) {
 func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
 	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"))
 	memcpy(new_property_info, property_info, b.SizeOf("zend_property_info"))
-	//new_property_info.GetName().AddRefcount()
-	if new_property_info.GetType().IsName() {
-		//new_property_info.GetType().Name().AddRefcount()
-	}
 	return new_property_info
 }
 func ZendDuplicateInternalFunction(func_ types.IFunction, ce *types.ClassEntry) types.IFunction {
 	var new_function types.IFunction
-	if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
+	if ce.IsInternalClass() {
 		new_function = Pemalloc(b.SizeOf("zend_internal_function"))
 		memcpy(new_function, func_, b.SizeOf("zend_internal_function"))
 	} else {
@@ -172,10 +168,10 @@ func ResolveClassName(scope *types.ClassEntry, name *types.String) *types.String
 	}
 }
 func ClassVisible(ce *types.ClassEntry) types.ZendBool {
-	if ce.GetType() == ZEND_INTERNAL_CLASS {
+	if ce.IsInternalClass() {
 		return !(CG__().GetCompilerOptions() & ZEND_COMPILE_IGNORE_INTERNAL_CLASSES)
 	} else {
-		b.Assert(ce.GetType() == ZEND_USER_CLASS)
+		b.Assert(ce.IsUserClass())
 		return (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || ce.GetFilename() == CG__().GetCompiledFilename()
 	}
 }
@@ -881,7 +877,7 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key string, ce *types.Clas
 			}
 		}
 	} else {
-		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
+		if ce.IsInternalClass() {
 			child_info = ZendDuplicatePropertyInfoInternal(parent_info)
 		} else {
 			child_info = parent_info
@@ -931,7 +927,7 @@ func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *typ
 		if parentConst.GetValue().IsConstantAst() {
 			ce.SetIsConstantsUpdated(false)
 		}
-		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
+		if ce.IsInternalClass() {
 			parentConst = CopyClassConstant(parentConst)
 		}
 		ce.ConstantsTable().Add(name, parentConst)
@@ -1017,7 +1013,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 					break
 				}
 			}
-			Pefree(src, ce.GetType() == ZEND_INTERNAL_CLASS)
+			Pefree(src, ce.IsInternalClass())
 			end = ce.GetDefaultPropertiesTable()
 		} else {
 			end = Pemalloc(b.SizeOf("zval") * parentCe.GetDefaultPropertiesCount())
@@ -1073,7 +1069,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 					break
 				}
 			}
-			Pefree(src, ce.GetType() == ZEND_INTERNAL_CLASS)
+			Pefree(src, ce.IsInternalClass())
 			end = ce.GetDefaultStaticMembersTable()
 		} else {
 			end = Pemalloc(b.SizeOf("zval") * parentCe.GetDefaultStaticMembersCount())
@@ -1103,7 +1099,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 					break
 				}
 			}
-		} else if ce.GetType() == ZEND_USER_CLASS {
+		} else if ce.IsUserClass() {
 			if CE_STATIC_MEMBERS(parentCe) == nil {
 				b.Assert(parentCe.HasCeFlags(AccImmutable | AccPreloaded))
 				ZendClassInitStatics(parentCe)
@@ -1141,7 +1137,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 		}
 		ce.SetDefaultStaticMembersCount(ce.GetDefaultStaticMembersCount() + parentCe.GetDefaultStaticMembersCount())
 		if ce.GetStaticMembersTablePtr() == nil {
-			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
+			b.Assert(ce.IsInternalClass())
 			if CurrEX() == nil {
 				ZEND_MAP_PTR_NEW(ce.static_members_table)
 			} else {
@@ -1189,7 +1185,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 		}
 	}
 	DoInheritParentConstructor(ce)
-	if ce.GetType() == ZEND_INTERNAL_CLASS {
+	if ce.IsInternalClass() {
 		if ce.IsImplicitAbstractClass() {
 			ce.SetIsExplicitAbstractClass(true)
 		}
@@ -1212,7 +1208,7 @@ func DoInheritIfaceConstant(name string, c *ZendClassConstant, ce *types.ClassEn
 		if c.GetValue().IsConstantAst() {
 			ce.SetIsConstantsUpdated(false)
 		}
-		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
+		if ce.IsInternalClass() {
 			ct = Pemalloc(b.SizeOf("zend_class_constant"))
 			memcpy(ct, c, b.SizeOf("zend_class_constant"))
 			c = ct
@@ -1259,7 +1255,7 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 		})
 	} else {
 		if ce.GetNumInterfaces() >= current_iface_num {
-			if ce.GetType() == ZEND_INTERNAL_CLASS {
+			if ce.IsInternalClass() {
 				ce.SetInterfaces((**types.ClassEntry)(realloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))
 			} else {
 				ce.SetInterfaces((**types.ClassEntry)(Erealloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))

@@ -70,7 +70,7 @@ func (o *ZendObject) propertiesInit() {
 	if defaultPropertiesCount != 0 {
 		src := o.ce.GetDefaultPropertiesTable()
 		dst := o.propertiesTable
-		if o.ce.GetType() == zend.ZEND_INTERNAL_CLASS {
+		if o.ce.IsInternalClass() {
 			for i := 0; i < defaultPropertiesCount; i++ {
 				ZVAL_COPY_OR_DUP_PROP(&dst[i], &src[i])
 			}

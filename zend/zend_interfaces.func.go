@@ -277,7 +277,7 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 	var t int = -1
 	var funcs_ptr *ZendClassIteratorFuncs
 	if class_type.GetGetIterator() != nil {
-		if class_type.GetType() == ZEND_INTERNAL_CLASS {
+		if class_type.IsInternalClass() {
 
 			/* inheritance ensures the class has necessary userland methods */
 
@@ -313,7 +313,7 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 		class_type.SetGetIterator(ZendUserItGetNewIterator)
 	}
 	funcs_ptr = class_type.GetIteratorFuncsPtr()
-	if class_type.GetType() == ZEND_INTERNAL_CLASS {
+	if class_type.IsInternalClass() {
 		if funcs_ptr == nil {
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
@@ -333,7 +333,7 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {
 	var funcs_ptr *ZendClassIteratorFuncs
 	if class_type.GetGetIterator() != nil && class_type.GetGetIterator() != ZendUserItGetIterator {
-		if class_type.GetType() == ZEND_INTERNAL_CLASS {
+		if class_type.IsInternalClass() {
 
 			/* inheritance ensures the class has the necessary userland methods */
 
@@ -358,7 +358,7 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 		class_type.SetGetIterator(ZendUserItGetIterator)
 	}
 	funcs_ptr = class_type.GetIteratorFuncsPtr()
-	if class_type.GetType() == ZEND_INTERNAL_CLASS {
+	if class_type.IsInternalClass() {
 		if funcs_ptr == nil {
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
