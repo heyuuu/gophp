@@ -69,10 +69,10 @@ func ZendVerifyPropertyTypeError(info *types.PropertyInfo, property *types.Zval)
 		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
 	}
 }
-func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) types.ZendBool {
+func ZendResolveClassType(type_ *types.TypeHint, self_ce *types.ClassEntry) types.ZendBool {
 	var ce *types.ClassEntry
-	var name *types.String = type_.Name()
-	if ascii.StrCaseEquals(name.GetStr(), "self") {
+	var name = type_.Name()
+	if ascii.StrCaseEquals(name, "self") {
 
 		/* We need to explicitly check for this here, to avoid updating the type in the trait and
 		 * later using the wrong "self" when the trait is used in a class. */
@@ -82,7 +82,7 @@ func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) type
 			return 0
 		}
 		ce = self_ce
-	} else if ascii.StrCaseEquals(name.GetStr(), "parent") {
+	} else if ascii.StrCaseEquals(name, "parent") {
 		if !(self_ce.GetParent()) {
 			faults.ThrowError(nil, "Cannot access parent:: when current class scope has no parent")
 			return 0
@@ -94,8 +94,7 @@ func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) type
 			return 0
 		}
 	}
-	// types.ZendStringRelease(name)
-	*type_ = types.ZEND_TYPE_ENCODE_CE(ce, type_.AllowNull())
+	*type_ = types.TypeHintCe(ce, type_.AllowNull())
 	return 1
 }
 func IZendCheckPropertyType(info *types.PropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
@@ -143,7 +142,7 @@ func ZendAssignToTypedProp(info *types.PropertyInfo, property_val *types.Zval, v
 	return ZendAssignToVariable(property_val, &tmp, executeData.IsCallUseStrictTypes())
 }
 func ZendCheckType(
-	type_ types.ZendType,
+	type_ types.TypeHint,
 	arg *types.Zval,
 	ce **types.ClassEntry,
 	cache_slot *any,
@@ -163,7 +162,7 @@ func ZendCheckType(
 		if *cache_slot {
 			*ce = (*types.ClassEntry)(*cache_slot)
 		} else {
-			*ce = ZendFetchClass(type_.Name().GetStr(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			*ce = ZendFetchClass(type_.Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if (*ce) == nil {
 				return arg.IsNull() && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0)
 			}
@@ -275,13 +274,6 @@ func ZendVerifyReturnError(zf types.IFunction, ce *types.ClassEntry, value *type
 	ZendVerifyTypeErrorCommon(zf, arg_info, ce, value, &fname, &fsep, &fclass, &need_msg, &need_kind, &need_or_null, &given_msg, &given_kind)
 	faults.TypeError("Return value of %s%s%s() must %s%s%s, %s%s returned", fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
 }
-func ZendVerifyReturnType(zf types.IFunction, ret *types.Zval, cache_slot *any) {
-	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
-	var ce *types.ClassEntry = nil
-	if ZendCheckType(ret_info.GetType(), ret, &ce, cache_slot, nil, nil, 1) == 0 {
-		ZendVerifyReturnError(zf, ce, ret)
-	}
-}
 func ZendVerifyMissingReturnType(zf types.IFunction, cache_slot *any) int {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
 	if ret_info.GetType().IsSet() && ret_info.GetType().Code() != types.IS_VOID {
@@ -290,7 +282,7 @@ func ZendVerifyMissingReturnType(zf types.IFunction, cache_slot *any) int {
 			if *cache_slot {
 				ce = (*types.ClassEntry)(*cache_slot)
 			} else {
-				ce = ZendFetchClass(ret_info.GetType().Name().GetStr(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				ce = ZendFetchClass(ret_info.GetType().Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil {
 					*cache_slot = any(ce)
 				}

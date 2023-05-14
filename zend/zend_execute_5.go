@@ -311,13 +311,13 @@ func PromotesToObject(val *types.Zval) types.ZendBool {
 	val = types.ZVAL_DEREF(val)
 	return val.GetType() <= types.IS_FALSE || val.IsString() && val.String().GetLen() == 0
 }
-func CheckTypeArrayAssignable(type_ types.ZendType) types.ZendBool {
+func CheckTypeArrayAssignable(type_ types.TypeHint) types.ZendBool {
 	if type_ == 0 {
 		return 1
 	}
 	return type_.IsCode() && (type_.Code() == types.IS_ARRAY || type_.Code() == types.IS_ITERABLE)
 }
-func check_type_stdClass_assignable(type_ types.ZendType) types.ZendBool {
+func check_type_stdClass_assignable(type_ types.TypeHint) types.ZendBool {
 	if type_ == 0 {
 		return 1
 	}
@@ -325,7 +325,7 @@ func check_type_stdClass_assignable(type_ types.ZendType) types.ZendBool {
 		if type_.IsCe() {
 			return type_.Ce() == ZendStandardClassDef
 		} else {
-			return ascii.StrCaseEquals(type_.Name().GetStr(), "stdclass")
+			return ascii.StrCaseEquals(type_.Name(), "stdclass")
 		}
 	} else {
 		return type_.Code() == types.IS_OBJECT

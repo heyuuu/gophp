@@ -221,7 +221,7 @@ func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *typ
 	// value_ptr.TryAddRefcount()
 	return ZendAssignToVariable(variable_ptr, value_ptr, executeData.IsCallUseStrictTypes())
 }
-func ZendFormatType(type_ types.ZendType, part1 **byte, part2 **byte) {
+func ZendFormatType(type_ types.TypeHint, part1 **byte, part2 **byte) {
 	if type_.AllowNull() {
 		*part1 = "?"
 	} else {
@@ -229,9 +229,9 @@ func ZendFormatType(type_ types.ZendType, part1 **byte, part2 **byte) {
 	}
 	if type_.IsClass() {
 		if type_.IsCe() {
-			*part2 = types.ZEND_TYPE_CE(type_).GetName().GetVal()
+			*part2 = type_.Ce().GetName().GetVal()
 		} else {
-			*part2 = types.ZEND_TYPE_NAME(type_).GetVal()
+			*part2 = type_.Name()
 		}
 	} else {
 		*part2 = types.ZendGetTypeByConst(type_.Code())
@@ -322,13 +322,13 @@ func ZendVerifyTypeErrorCommon(
 			} else {
 				*need_msg = "be an instance of "
 			}
-			*need_kind = ce.GetName().GetVal()
+			*need_kind = ce.Name()
 		} else {
 
 			/* We don't know whether it's a class or interface, assume it's a class */
 
 			*need_msg = "be an instance of "
-			*need_kind = types.ZEND_TYPE_NAME(arg_info.GetType()).GetVal()
+			*need_kind = arg_info.GetType().Name()
 		}
 	} else {
 		switch arg_info.GetType().Code() {

@@ -1,8 +1,5 @@
 package builtin
 
-func FlagMatch[T integer](flags T, flag T) bool { return flags&flag != 0 }
-func FlagMatchNum[T integer](flags T, flag T) T { return flags & flag }
-
 func HashStr(str string) uint {
 	return HashBytes([]byte(str))
 }

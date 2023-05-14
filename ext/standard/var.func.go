@@ -42,22 +42,10 @@ func PhpObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key_ ty
 		zend.ZEND_PUTS("]=>\n")
 	}
 	if zv.IsUndef() {
-		b.Assert(propInfo.GetType() != 0)
-		var typ string
-		if propInfo.GetType().IsClass() {
-			if propInfo.GetType().IsCe() {
-				typ = types.ZEND_TYPE_CE(propInfo.GetType()).Name()
-			} else {
-				typ = propInfo.GetType().Name().GetStr()
-			}
-		} else {
-			typ = types.ZendGetTypeByConst(propInfo.GetType().Code())
-		}
-		if propInfo.GetType().AllowNull() {
-			typ = "?" + typ
-		}
+		b.Assert(propInfo.GetType() != nil)
 
-		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', typ)
+		typ := propInfo.GetType().FormatType()
+		core.PhpPrintf("%*cuninitialized(%s)\n", level+1, ' ', typ)
 	} else {
 		PhpVarDump(zv, level+2)
 	}
@@ -180,10 +168,10 @@ func ZvalObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key ty
 		zend.ZEND_PUTS("]=>\n")
 	}
 	if propInfo != nil && zv.IsUndef() {
-		b.Assert(propInfo.GetType() != 0)
-		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(propInfo.GetType().AllowNull(), "?", ""), b.CondF(propInfo.GetType().IsClass(), func() []byte {
-			return b.CondF(propInfo.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(propInfo.GetType()).GetName() }, func() *types.String { return propInfo.GetType().Name() }).GetVal()
-		}, func() *byte { return types.ZendGetTypeByConst(propInfo.GetType().Code()) }))
+		b.Assert(propInfo.GetType() != nil)
+
+		typ := propInfo.GetType().FormatType()
+		core.PhpPrintf("%*cuninitialized(%s)\n", level+1, ' ', typ)
 	} else {
 		PhpDebugZvalDump(zv, level+2)
 	}
@@ -293,7 +281,7 @@ func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Stri
 		buf.AppendLong(zend.ZendLong(index))
 		buf.AppendString(" => ")
 	} else {
-		var ckey *types.String = types.NewString(str.PhpAddcslashes(key.GetStr(), "'\\"))
+		var ckey = types.NewString(str.PhpAddcslashes(key.GetStr(), "'\\"))
 		tmp_str := strings.ReplaceAll(ckey.GetStr(), "0", "' . \"\\0\" . '")
 		BufferAppendSpaces(buf, level+1)
 		buf.AppendByte('\'')
@@ -383,9 +371,9 @@ again:
 			BufferAppendSpaces(buf, level-1)
 		}
 		buf.AppendString("array (\n")
-		var __ht *types.Array = myht
+		var __ht = myht
 		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
+			var _z = _p.GetVal()
 			if _z.IsIndirect() {
 				_z = _z.Indirect()
 				if _z.IsUndef() {
@@ -428,9 +416,9 @@ again:
 			buf.AppendString("::__set_state(array(\n")
 		}
 		if myht != nil {
-			var __ht *types.Array = myht
+			var __ht = myht
 			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
+				var _z = _p.GetVal()
 				if _z.IsIndirect() {
 					_z = _z.Indirect()
 					if _z.IsUndef() {
@@ -469,7 +457,7 @@ func PhpVarExport(struc *types.Zval, level int) {
 }
 func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
 	var var_ *types.Zval
-	var return_output types.ZendBool = 0
+	var return_output = 0
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	for {
 		for {
@@ -534,7 +522,7 @@ func PhpVarSerializeString(buf *zend.SmartStr, str *byte, len_ int) {
 }
 func PhpVarSerializeClassName(buf *zend.SmartStr, struc *types.Zval) types.ZendBool {
 	var class_name *types.String
-	var incomplete_class types.ZendBool = 0
+	var incomplete_class = 0
 	PHP_SET_CLASS_ATTRIBUTES(struc)
 	buf.AppendString("O:")
 	buf.AppendUlong(class_name.GetLen())
@@ -583,14 +571,14 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	return types.SUCCESS
 }
 func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *types.String, error_name *types.String, struc *types.Zval) int {
-	var val *types.Zval = props.KeyFind(name.GetStr())
+	var val = props.KeyFind(name.GetStr())
 	if val == nil {
 		return types.FAILURE
 	}
 	if val.IsIndirect() {
 		val = val.Indirect()
 		if val.IsUndef() {
-			var info *types.PropertyInfo = zend.ZendGetTypedPropertyInfoForSlot(struc.Object(), val)
+			var info = zend.ZendGetTypedPropertyInfoForSlot(struc.Object(), val)
 			if info != nil {
 				return types.SUCCESS
 			}
@@ -605,18 +593,18 @@ func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *t
 	return types.SUCCESS
 }
 func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retval *types.Array) int {
-	var ce *types.ClassEntry = types.Z_OBJCE_P(struc)
-	var props *types.Array = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
+	var ce = types.Z_OBJCE_P(struc)
+	var props = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
 	var name_val *types.Zval
-	var retval int = types.SUCCESS
+	var retval = types.SUCCESS
 	*ht = *types.NewArray(sleep_retval.Len())
 
 	/* TODO: Rewrite this by fetching the property info instead of trying out different
 	 * name manglings? */
 
-	var __ht *types.Array = sleep_retval
+	var __ht = sleep_retval
 	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
+		var _z = _p.GetVal()
 		if _z.IsIndirect() {
 			_z = _z.Indirect()
 			if _z.IsUndef() {
@@ -684,9 +672,9 @@ func PhpVarSerializeNestedData(
 		var key *types.String
 		var data *types.Zval
 		var index zend.ZendUlong
-		var __ht *types.Array = ht
+		var __ht = ht
 		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
+			var _z = _p.GetVal()
 			if _z.IsIndirect() {
 				_z = _z.Indirect()
 				if _z.IsUndef() {
@@ -786,7 +774,7 @@ again:
 		PhpVarSerializeString(buf, struc.String().GetVal(), struc.String().GetLen())
 		return
 	case types.IS_OBJECT:
-		var ce *types.ClassEntry = types.Z_OBJCE_P(struc)
+		var ce = types.Z_OBJCE_P(struc)
 		var incomplete_class types.ZendBool
 		var count uint32
 		if ce.FunctionTable().Exists("__serialize") {
@@ -807,9 +795,9 @@ again:
 			PhpVarSerializeClassName(buf, &obj)
 			buf.AppendUlong(retval.Array().Count())
 			buf.AppendString(":{")
-			var __ht *types.Array = retval.Array()
+			var __ht = retval.Array()
 			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
+				var _z = _p.GetVal()
 				if _z.IsIndirect() {
 					_z = _z.Indirect()
 					if _z.IsUndef() {
@@ -1022,9 +1010,9 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 		if class_hash != nil && classes.IsType(types.IS_ARRAY) {
 			var entry *types.Zval
 			var lcname *types.String
-			var __ht *types.Array = classes.Array()
+			var __ht = classes.Array()
 			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
+				var _z = _p.GetVal()
 
 				entry = _z
 				operators.ConvertToStringEx(entry)
@@ -1112,7 +1100,7 @@ cleanup:
 	 * the value we unwrap here. This is compatible with behavior in PHP <=7.0. */
 }
 func ZifMemoryGetUsage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, realUsage *types.Zval) {
-	var real_usage types.ZendBool = 0
+	var real_usage = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 0, 1, 0)
@@ -1130,7 +1118,7 @@ func ZifMemoryGetUsage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, real
 	return
 }
 func ZifMemoryGetPeakUsage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, realUsage *types.Zval) {
-	var real_usage types.ZendBool = 0
+	var real_usage = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 0, 1, 0)

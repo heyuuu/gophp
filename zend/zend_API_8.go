@@ -286,7 +286,7 @@ func ZendDeclareTypedProperty(
 	property *types.Zval,
 	accessType uint32,
 	docComment *string,
-	typ types.ZendType,
+	typ types.TypeHint,
 ) int {
 	// calc prop name
 	var propName string

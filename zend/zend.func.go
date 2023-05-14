@@ -306,10 +306,10 @@ func ZendResolvePropertyTypes() {
 		if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
 			ce.PropertyTable().Foreach(func(key string, prop_info *types.PropertyInfo) {
 				if prop_info.GetType().IsName() {
-					var type_name = prop_info.GetType().Name().GetStr()
+					var type_name = prop_info.GetType().Name()
 					var prop_ce *types.ClassEntry = CG__().ClassTable().Get(type_name)
 					b.Assert(prop_ce != nil && prop_ce.IsInternalClass())
-					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
+					prop_info.SetType(types.TypeHintCe(prop_ce, prop_info.GetType().AllowNull()))
 				}
 			})
 		}

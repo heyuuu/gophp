@@ -6,32 +6,6 @@ import (
 	"runtime"
 )
 
-/**
- * ZendType
- */
-type ZendType uintptr
-
-func (this ZendType) IsSet() bool   { return this > 0x3 }
-func (this ZendType) IsCode() bool  { return this > 0x3 && this <= 0x3ff }
-func (this ZendType) IsClass() bool { return this > 0x3ff }
-func (this ZendType) IsCe() bool    { return b.FlagMatch(this, 0x2) }
-func (this ZendType) IsName() bool  { return this.IsClass() && !(this.IsCe()) }
-func (this ZendType) Name() *String {
-	var ptr = this &^ 0x3
-	return b.CastPtr[String](ptr)
-}
-func (this ZendType) Ce() *ClassEntry {
-	var ptr = this &^ 0x3
-	return b.CastPtr[ClassEntry](ptr)
-}
-func (this ZendType) Code() uint8     { return this >> int64(2) }
-func (this ZendType) AllowNull() bool { return b.FlagMatch(this, 0x1) }
-
-// todo 不明确作用
-func (this ZendType) TypeName() string {
-	//return (*byte)(this)
-	return b.CastStrAuto(b.CastPtr[byte](this))
-}
 
 /**
  * ZendResource

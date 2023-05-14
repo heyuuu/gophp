@@ -12,15 +12,15 @@ var spl_ce_MultipleIterator *types.ClassEntry
 
 var spl_funcs_SplObserver = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("update", types.AccPublic|types.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("subject", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
+		zend.MakeArgInfo("subject", zend.ArgInfoType(types.TypeHintClassName("SplSubject", false))),
 	}),
 }
 var spl_funcs_SplSubject = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("attach", types.AccPublic|types.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("observer", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
+		zend.MakeArgInfo("observer", zend.ArgInfoType(types.TypeHintClassName("SplObserver", false))),
 	}),
 	types.MakeZendFunctionEntryEx("detach", types.AccPublic|types.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("observer", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
+		zend.MakeArgInfo("observer", zend.ArgInfoType(types.TypeHintClassName("SplObserver", false))),
 	}),
 	types.MakeZendFunctionEntryEx("notify", types.AccPublic|types.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
@@ -103,14 +103,14 @@ var spl_funcs_MultipleIterator = []types.FunctionEntry{
 		zend.MakeArgName("flags"),
 	}),
 	types.MakeZendFunctionEntryEx("attachIterator", 0, zim_spl_MultipleIterator_attachIterator, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 		zend.MakeArgName("infos"),
 	}),
 	types.MakeZendFunctionEntryEx("detachIterator", 0, zim_spl_SplObjectStorage_detach, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 	}),
 	types.MakeZendFunctionEntryEx("containsIterator", 0, zim_spl_SplObjectStorage_contains, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 	}),
 	types.MakeZendFunctionEntryEx("countIterators", 0, zim_spl_SplObjectStorage_count, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("__debugInfo", 0, zim_spl_SplObjectStorage___debugInfo, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),

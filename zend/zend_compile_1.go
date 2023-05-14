@@ -188,12 +188,12 @@ func ZendMarkFunctionAsGenerator() {
 	if CG__().GetActiveOpArray().IsHasReturnType() {
 		var return_info ZendArgInfo = CG__().GetActiveOpArray().GetArgInfo()[-1]
 		if return_info.GetType().Code() != types.IS_ITERABLE {
-			var msg *byte = "Generators may only declare a return type of Generator, Iterator, Traversable, or iterable, %s is not permitted"
+			var msg = "Generators may only declare a return type of Generator, Iterator, Traversable, or iterable, %s is not permitted"
 			if !(return_info.GetType().IsClass()) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, types.ZendGetTypeByConst(return_info.GetType().Code()))
 			}
-			if !(ascii.StrCaseEquals(return_info.GetType().Name().GetStr(), "Traversable")) && !(ascii.StrCaseEquals(return_info.GetType().Name().GetStr(), "Iterator")) && !(ascii.StrCaseEquals(return_info.GetType().Name().GetStr(), "Generator")) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, types.ZEND_TYPE_NAME(return_info.GetType()).GetVal())
+			if !(ascii.StrCaseEquals(return_info.GetType().Name(), "Traversable")) && !(ascii.StrCaseEquals(return_info.GetType().Name(), "Iterator")) && !(ascii.StrCaseEquals(return_info.GetType().Name(), "Generator")) {
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, return_info.GetType().Name())
 			}
 		}
 	}

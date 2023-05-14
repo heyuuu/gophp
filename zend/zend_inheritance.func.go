@@ -143,7 +143,7 @@ func DoInheritParentConstructor(ce *types.ClassEntry) {
 	}
 	ce.SetConstructor(parent.GetConstructor())
 }
-func ZendVisibilityString(fn_flags uint32) *byte {
+func ZendVisibilityString(fn_flags uint32) string {
 	if (fn_flags & types.AccPublic) != 0 {
 		return "public"
 	} else if (fn_flags & types.AccPrivate) != 0 {
@@ -153,16 +153,18 @@ func ZendVisibilityString(fn_flags uint32) *byte {
 		return "protected"
 	}
 }
-func ResolveClassName(scope *types.ClassEntry, name *types.String) *types.String {
+func ResolveClassName(scope *types.ClassEntry, name string) string {
 	b.Assert(scope != nil)
-	if ascii.StrCaseEquals(name.GetStr(), "parent") && scope.GetParent() {
+
+	lcName := ascii.StrToLower(name)
+	if lcName == "parent" && scope.GetParent() != nil {
 		if scope.IsResolvedParent() {
-			return scope.GetParent().name
+			return scope.GetParent().Name()
 		} else {
-			return scope.GetParentName()
+			return scope.GetParentName().GetStr()
 		}
-	} else if ascii.StrCaseEquals(name.GetStr(), "self") {
-		return scope.GetName()
+	} else if lcName == "self" {
+		return scope.Name()
 	} else {
 		return name
 	}
@@ -262,8 +264,8 @@ func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) types.Zend
 	return 0
 }
 func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFunction, fe_arg_info *ZendArgInfo, proto types.IFunction, proto_arg_info *ZendArgInfo) InheritanceStatus {
-	var fe_type types.ZendType = fe_arg_info.GetType()
-	var proto_type types.ZendType = proto_arg_info.GetType()
+	var fe_type types.TypeHint = fe_arg_info.GetType()
+	var proto_type types.TypeHint = proto_arg_info.GetType()
 	b.Assert(fe_type.IsSet() && proto_type.IsSet())
 	if fe_type.AllowNull() && !(proto_type.AllowNull()) {
 		return INHERITANCE_ERROR
@@ -484,24 +486,21 @@ func ZendAppendTypeHint(str *SmartStr, fptr types.IFunction, arg_info *ZendArgIn
 		str.AppendByte('?')
 	}
 	if arg_info.GetType().IsClass() {
-		var class_name *byte
-		var class_name_len int
-		class_name = types.ZEND_TYPE_NAME(arg_info.GetType()).GetVal()
-		class_name_len = types.ZEND_TYPE_NAME(arg_info.GetType()).GetLen()
-		if !(strcasecmp(class_name, "self")) && fptr.GetScope() != nil {
-			class_name = fptr.GetScope().GetName().GetVal()
-			class_name_len = fptr.GetScope().GetName().GetLen()
-		} else if !(strcasecmp(class_name, "parent")) && fptr.GetScope() != nil && fptr.GetScope().GetParent() {
-			class_name = fptr.GetScope().GetParent().name.GetVal()
-			class_name_len = fptr.GetScope().GetParent().name.GetLen()
+		className := arg_info.GetType().Name()
+		lcClassName := ascii.StrToLower(className)
+
+		if lcClassName == "self" && fptr.GetScope() != nil {
+			className = fptr.GetScope().Name()
+		} else if lcClassName == "parent" && fptr.GetScope() != nil && fptr.GetScope().GetParent() != nil {
+			className = fptr.GetScope().GetParent().Name()
 		}
-		str.AppendString(b.CastStr(class_name, class_name_len))
+		str.AppendString(className)
 		if return_hint == 0 {
 			str.AppendByte(' ')
 		}
 	} else if arg_info.GetType().IsCode() {
-		var type_name *byte = types.ZendGetTypeByConst(arg_info.GetType().Code())
-		str.AppendString(b.CastStrAuto(type_name))
+		var typeName = types.ZendGetTypeByConst(arg_info.GetType().Code())
+		str.AppendString(typeName)
 		if return_hint == 0 {
 			str.AppendByte(' ')
 		}
@@ -802,12 +801,12 @@ func PropertyTypesCompatible(parent_info *types.PropertyInfo, child_info *types.
 		return INHERITANCE_ERROR
 	}
 	if parent_info.GetType().IsCe() {
-		parent_name = types.ZEND_TYPE_CE(parent_info.GetType()).GetName()
+		parent_name = parent_info.GetType().Ce().GetName()
 	} else {
 		parent_name = ResolveClassName(parent_info.GetCe(), parent_info.GetType().Name())
 	}
 	if child_info.GetType().IsCe() {
-		child_name = types.ZEND_TYPE_CE(child_info.GetType()).GetName()
+		child_name = child_info.GetType().Name()
 	} else {
 		child_name = ResolveClassName(child_info.GetCe(), child_info.GetType().Name())
 	}
@@ -837,9 +836,21 @@ func PropertyTypesCompatible(parent_info *types.PropertyInfo, child_info *types.
 	}
 }
 func EmitIncompatiblePropertyError(child *types.PropertyInfo, parent *types.PropertyInfo) {
-	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must be %s%s (as in class %s)", child.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(child.GetName()), b.Cond(parent.GetType().AllowNull(), "?", ""), b.CondF(parent.GetType().IsClass(), func() []byte {
-		return b.CondF(parent.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(parent.GetType()).GetName() }, func() *types.String { return ResolveClassName(parent.GetCe(), parent.GetType().Name()) }).GetVal()
-	}, func() *byte { return types.ZendGetTypeByConst(parent.GetType().Code()) }), parent.GetCe().GetName().GetVal())
+	var typ string
+	if parent.GetType().IsClass() {
+		if parent.GetType().IsCe() {
+			typ = parent.GetType().Name()
+		} else {
+			typ = ResolveClassName(parent.GetCe(), parent.GetType().Name())
+		}
+	} else {
+		typ = types.ZendGetTypeByConst(parent.GetType().Code())
+	}
+	if parent.GetType().AllowNull() {
+		typ = "?" + typ
+	}
+
+	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must be %s (as in class %s)", child.GetCe().Name(), ZendGetUnmangledPropertyNameEx(child.GetName()), typ, parent.GetCe().Name())
 }
 func DoInheritProperty(parent_info *types.PropertyInfo, key string, ce *types.ClassEntry) {
 	var child_info *types.PropertyInfo = ce.PropertyTable().Get(key)

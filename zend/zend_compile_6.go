@@ -503,7 +503,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		var name *types.String = ZendAstGetZval(name_ast).String()
 		var doc_comment *types.String = nil
 		var value_zv types.Zval
-		var type_ types.ZendType = 0
+		var type_ types.TypeHint = 0
 		if type_ast != nil {
 			type_ = ZendCompileTypename(type_ast, 0)
 			if type_.Code() == types.IS_VOID || type_.Code() == types.IS_CALLABLE {
@@ -527,14 +527,14 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 			if type_.IsSet() && !(value_zv.IsConstantAst()) {
 				if value_zv.IsNull() {
 					if !(type_.AllowNull()) {
-						var name *byte = b.CondF(type_.IsClass(), func() []byte { return types.ZEND_TYPE_NAME(type_).GetVal() }, func() *byte { return types.ZendGetTypeByConst(type_.Code()) })
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s may not be null. "+"Use the nullable type ?%s to allow null default value", name, name)
+						name := type_.FormatName()
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s may not be null. Use the nullable type ?%s to allow null default value", name, name)
 					}
 				} else if type_.IsClass() {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property of type %s may not have default value", types.ZEND_TYPE_NAME(type_).GetVal())
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property of type %s may not have default value", type_.FormatName())
 				} else if type_.Code() == types.IS_ARRAY || type_.Code() == types.IS_ITERABLE {
 					if value_zv.GetType() != types.IS_ARRAY {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be an array", types.ZendGetTypeByConst(type_.Code()))
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be an array", type_.FormatName())
 					}
 				} else if type_.Code() == types.IS_DOUBLE {
 					if value_zv.GetType() != types.IS_DOUBLE && value_zv.GetType() != types.IS_LONG {
@@ -542,7 +542,8 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 					}
 					operators.ConvertToDouble(&value_zv)
 				} else if !(types.ZEND_SAME_FAKE_TYPE(type_.Code(), value_zv.GetType())) {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be %s", types.ZendGetTypeByConst(type_.Code()), types.ZendGetTypeByConst(type_.Code()))
+					typeName := type_.FormatName()
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be %s", typeName, typeName)
 				}
 			}
 		} else if !(type_.IsSet()) {

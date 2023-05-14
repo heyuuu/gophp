@@ -449,16 +449,16 @@ func ZendCompileStmtList(ast *ZendAst) {
 		ZendCompileStmt(list.GetChild()[i])
 	}
 }
-func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.ZendType {
+func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.TypeHint {
 	var allow_null types.ZendBool = force_allow_null
 	var orig_ast_attr ZendAstAttr = ast.GetAttr()
-	var type_ types.ZendType
+	var type_ types.TypeHint
 	if (ast.GetAttr() & ZEND_TYPE_NULLABLE) != 0 {
 		allow_null = 1
 		ast.SetAttr(ast.GetAttr() &^ ZEND_TYPE_NULLABLE)
 	}
 	if ast.GetKind() == ZEND_AST_TYPE {
-		return types.ZEND_TYPE_ENCODE(ast.GetAttr(), allow_null)
+		return types.TypeHintCode(ast.GetAttr(), allow_null)
 	} else {
 		var class_name *types.String = ZendAstGetStr(ast)
 		var type_code uint8 = ZendLookupBuiltinTypeByName(class_name)
@@ -466,7 +466,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 			if (ast.GetAttr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", operators.ZendStringTolower(class_name).GetVal())
 			}
-			type_ = types.ZEND_TYPE_ENCODE(type_code, allow_null)
+			type_ = types.TypeHintCode(type_code, allow_null != 0)
 		} else {
 			var fetch_type uint32 = ZendGetClassFetchTypeAst(ast)
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
@@ -476,7 +476,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 				ZendEnsureValidClassFetchType(fetch_type)
 				//class_name.AddRefcount()
 			}
-			type_ = types.ZEND_TYPE_ENCODE_CLASS(class_name, allow_null)
+			type_ = types.TypeHintClassName(class_name, allow_null != 0)
 		}
 	}
 	ast.SetAttr(orig_ast_attr)
@@ -559,7 +559,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		*arg_info = MakeZendArgInfo(
 			name.Copy(),
 			/* TODO: Keep compatibility, but may be better reset "allow_null" ??? */
-			types.ZEND_TYPE_ENCODE(0, 1),
+			types.TypeHintCode(0, 1),
 			is_ref,
 			is_variadic,
 		)

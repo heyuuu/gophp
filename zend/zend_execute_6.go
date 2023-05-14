@@ -362,8 +362,8 @@ func ZendThrowConflictingCoercionError(prop1 *types.PropertyInfo, prop2 *types.P
 	ZendFormatType(prop2.GetType(), &prop2_type1, &prop2_type2)
 	faults.TypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s and property %s::$%s of type %s%s, as this would result in an inconsistent type conversion", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop2.GetName()), prop2_type1, prop2_type2)
 }
-func IZendVerifyTypeAssignableZval(type_ptr *types.ZendType, self_ce *types.ClassEntry, zv *types.Zval, strict types.ZendBool) int {
-	var type_ types.ZendType = *type_ptr
+func IZendVerifyTypeAssignableZval(type_ptr *types.TypeHint, self_ce *types.ClassEntry, zv *types.Zval, strict types.ZendBool) int {
+	var type_ types.TypeHint = *type_ptr
 	var type_code uint8
 	var zv_type uint8 = zv.GetType()
 	if type_.AllowNull() && zv_type == types.IS_NULL {

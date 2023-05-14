@@ -335,18 +335,17 @@ func (this *ZendOparrayContext) SetBrkContArray(value *ZendBrkContElement) {
 func (this *ZendOparrayContext) GetLabels() *types.Array      { return this.labels }
 func (this *ZendOparrayContext) SetLabels(value *types.Array) { this.labels = value }
 
-
 /**
  * ZendArgInfo
  */
 type ZendArgInfo struct {
 	name              *types.String
-	type_             types.ZendType
+	type_             types.TypeHint
 	pass_by_reference uint8
 	is_variadic       types.ZendBool
 }
 
-func MakeZendReturnArgInfo(type_ types.ZendType, pass_by_reference bool) ZendArgInfo {
+func MakeZendReturnArgInfo(type_ types.TypeHint, pass_by_reference bool) ZendArgInfo {
 	return ZendArgInfo{
 		name:              nil,
 		type_:             type_,
@@ -357,7 +356,7 @@ func MakeZendReturnArgInfo(type_ types.ZendType, pass_by_reference bool) ZendArg
 
 func MakeZendArgInfo(
 	name *types.String,
-	type_ types.ZendType,
+	type_ types.TypeHint,
 	pass_by_reference uint8,
 	is_variadic types.ZendBool,
 ) ZendArgInfo {
@@ -369,10 +368,10 @@ func MakeZendArgInfo(
 	}
 }
 
-func (this *ZendArgInfo) SetType(value types.ZendType) { this.type_ = value }
+func (this *ZendArgInfo) SetType(value types.TypeHint) { this.type_ = value }
 
 func (this *ZendArgInfo) GetName() *types.String        { return this.name }
-func (this *ZendArgInfo) GetType() types.ZendType       { return this.type_ }
+func (this *ZendArgInfo) GetType() types.TypeHint       { return this.type_ }
 func (this *ZendArgInfo) GetPassByReference() uint8     { return this.pass_by_reference }
 func (this *ZendArgInfo) GetIsVariadic() types.ZendBool { return this.is_variadic }
 
@@ -381,7 +380,7 @@ func (this *ZendArgInfo) GetIsVariadic() types.ZendBool { return this.is_variadi
  */
 type ZendInternalFunctionInfo struct {
 	required_num_args types.ZendUintptrT
-	type_             types.ZendType
+	type_             types.TypeHint
 	return_reference  types.ZendBool
 	_is_variadic      types.ZendBool
 }
@@ -389,7 +388,7 @@ type ZendInternalFunctionInfo struct {
 func (this *ZendInternalFunctionInfo) GetRequiredNumArgs() types.ZendUintptrT {
 	return this.required_num_args
 }
-func (this *ZendInternalFunctionInfo) GetType() types.ZendType { return this.type_ }
+func (this *ZendInternalFunctionInfo) GetType() types.TypeHint { return this.type_ }
 func (this *ZendInternalFunctionInfo) GetReturnReference() types.ZendBool {
 	return this.return_reference
 }

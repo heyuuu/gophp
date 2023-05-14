@@ -5,48 +5,12 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
-func ZEND_TYPE_NAME(t ZendType) *String   { return t.Name() }
-func ZEND_TYPE_CE(t ZendType) *ClassEntry { return t.Ce() }
-
-func ZEND_TYPE_ENCODE(code uint32, allow_null int) ZendType {
-	if allow_null != 0 {
-		return ZendType(code<<2 | 0x1)
-	} else {
-		return ZendType(code<<2 | 0x0)
-	}
-}
-func ZEND_TYPE_ENCODE_CE(ce *ClassEntry, allow_null bool) ZendType {
-	var ptr = b.CastUintptr(ce)
-	if allow_null {
-		return ZendType(ptr | 0x3)
-	} else {
-		return ZendType(ptr | 0x2)
-	}
-}
-func ZEND_TYPE_ENCODE_CLASS(class_name *String, allow_null ZendBool) ZendType {
-	var ptr = b.CastUintptr(class_name)
-	if allow_null != 0 {
-		return ZendType(ptr | 0x1)
-	} else {
-		return ZendType(ptr | 0x0)
-	}
-}
-func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) ZendType {
-	var fullClassName string
-	if allow_null != 0 {
-		fullClassName = "?" + class_name
-	} else {
-		fullClassName = class_name
-	}
-	var ptr = b.CastUintptr(&fullClassName)
-	return ZendType(ptr)
-}
 func ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list *ZendPropertyInfoList) int { return 0x1 | uintPtr(list) }
 func ZEND_PROPERTY_INFO_SOURCE_TO_LIST(list uintPtr) *ZendPropertyInfoList {
 	return (*ZendPropertyInfoList)(list & ^0x1)
 }
 func ZEND_PROPERTY_INFO_SOURCE_IS_LIST(list uintPtr) int { return list & 0x1 }
-func ZEND_SAME_FAKE_TYPE(faketype int, realtype uint8) bool {
+func ZEND_SAME_FAKE_TYPE(faketype uint8, realtype uint8) bool {
 	return faketype == realtype || faketype == IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
 }
 

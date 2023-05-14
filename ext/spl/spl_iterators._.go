@@ -127,7 +127,7 @@ var SplRecursiveItIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplRecursiveI
 
 var spl_funcs_RecursiveIteratorIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_RecursiveIteratorIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Traversable", false))),
 		zend.MakeArgName("mode"),
 		zend.MakeArgName("flags"),
 	}),
@@ -156,7 +156,7 @@ var spl_funcs_RecursiveIteratorIterator = []types.FunctionEntry{
 
 var spl_funcs_RecursiveTreeIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_RecursiveTreeIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Traversable", false))),
 		zend.MakeArgName("flags"),
 		zend.MakeArgName("caching_it_flags"),
 		zend.MakeArgName("mode"),
@@ -187,7 +187,7 @@ var spl_funcs_RecursiveTreeIterator = []types.FunctionEntry{
 
 var spl_funcs_FilterIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_FilterIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 	}),
 	types.MakeZendFunctionEntryEx("rewind", types.AccPublic, zim_spl_FilterIterator_rewind, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("valid", types.AccPublic, ZimSplDualItValid, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
@@ -199,14 +199,14 @@ var spl_funcs_FilterIterator = []types.FunctionEntry{
 }
 var spl_funcs_CallbackFilterIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_CallbackFilterIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 		zend.MakeArgName("callback"),
 	}),
 	types.MakeZendFunctionEntryEx("accept", types.AccPublic, zim_spl_CallbackFilterIterator_accept, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
 var spl_funcs_RecursiveCallbackFilterIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_RecursiveCallbackFilterIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("RecursiveIterator", false))),
 		zend.MakeArgName("callback"),
 	}),
 	types.MakeZendFunctionEntryEx("hasChildren", types.AccPublic, zim_spl_RecursiveFilterIterator_hasChildren, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
@@ -214,20 +214,20 @@ var spl_funcs_RecursiveCallbackFilterIterator = []types.FunctionEntry{
 }
 var spl_funcs_RecursiveFilterIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_RecursiveFilterIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("RecursiveIterator", false))),
 	}),
 	types.MakeZendFunctionEntryEx("hasChildren", types.AccPublic, zim_spl_RecursiveFilterIterator_hasChildren, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("getChildren", types.AccPublic, zim_spl_RecursiveFilterIterator_getChildren, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
 var spl_funcs_ParentIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_ParentIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("RecursiveIterator", false))),
 	}),
 	types.MakeZendFunctionEntryEx("accept", types.AccPublic, zim_spl_RecursiveFilterIterator_hasChildren, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
 var spl_funcs_RegexIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_RegexIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 		zend.MakeArgName("regex"),
 		zend.MakeArgName("mode"),
 		zend.MakeArgName("flags"),
@@ -250,7 +250,7 @@ var spl_funcs_RegexIterator = []types.FunctionEntry{
 }
 var spl_funcs_RecursiveRegexIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_RecursiveRegexIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("RecursiveIterator", false))),
 		zend.MakeArgName("regex"),
 		zend.MakeArgName("mode"),
 		zend.MakeArgName("flags"),
@@ -263,12 +263,12 @@ var spl_funcs_RecursiveRegexIterator = []types.FunctionEntry{
 
 var spl_funcs_SeekableIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("seek", types.AccPublic|types.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("position", zend.ArgInfoType(types.ZEND_TYPE_ENCODE(types.IS_LONG, 0))),
+		zend.MakeArgInfo("position", zend.ArgInfoType(types.TypeHintCode(types.IS_LONG, 0))),
 	}),
 }
 var spl_funcs_LimitIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_LimitIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 		zend.MakeArgName("offset"),
 		zend.MakeArgName("count"),
 	}),
@@ -286,7 +286,7 @@ var spl_funcs_LimitIterator = []types.FunctionEntry{
 
 var spl_funcs_CachingIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_CachingIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 		zend.MakeArgName("flags"),
 	}),
 	types.MakeZendFunctionEntryEx("rewind", types.AccPublic, zim_spl_CachingIterator_rewind, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
@@ -320,7 +320,7 @@ var spl_funcs_CachingIterator = []types.FunctionEntry{
 
 var spl_funcs_RecursiveCachingIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_RecursiveCachingIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 		zend.MakeArgName("flags"),
 	}),
 	types.MakeZendFunctionEntryEx("hasChildren", types.AccPublic, zim_spl_RecursiveCachingIterator_hasChildren, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
@@ -329,7 +329,7 @@ var spl_funcs_RecursiveCachingIterator = []types.FunctionEntry{
 
 var spl_funcs_IteratorIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_IteratorIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Traversable", false))),
 	}),
 	types.MakeZendFunctionEntryEx("rewind", types.AccPublic, ZimSplDualItRewind, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("valid", types.AccPublic, ZimSplDualItValid, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
@@ -341,7 +341,7 @@ var spl_funcs_IteratorIterator = []types.FunctionEntry{
 
 var spl_funcs_NoRewindIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_NoRewindIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 	}),
 	types.MakeZendFunctionEntryEx("rewind", types.AccPublic, zim_spl_NoRewindIterator_rewind, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("valid", types.AccPublic, zim_spl_NoRewindIterator_valid, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
@@ -353,7 +353,7 @@ var spl_funcs_NoRewindIterator = []types.FunctionEntry{
 
 var spl_funcs_InfiniteIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_InfiniteIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 	}),
 	types.MakeZendFunctionEntryEx("next", types.AccPublic, zim_spl_InfiniteIterator_next, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
@@ -369,7 +369,7 @@ var spl_funcs_EmptyIterator = []types.FunctionEntry{
 var spl_funcs_AppendIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", types.AccPublic, zim_spl_AppendIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("append", types.AccPublic, zim_spl_AppendIterator_append, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Iterator", false))),
 	}),
 	types.MakeZendFunctionEntryEx("rewind", types.AccPublic, zim_spl_AppendIterator_rewind, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("valid", types.AccPublic, zim_spl_AppendIterator_valid, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
