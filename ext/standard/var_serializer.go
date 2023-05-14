@@ -6,8 +6,6 @@ import (
 	"unsafe"
 )
 
-var COMMON = b.Cond(is_ref, "&", "")
-
 /**
  * types
  */
