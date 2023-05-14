@@ -17,8 +17,8 @@ type ZendObject struct {
 	handle          uint32
 	ce              *ClassEntry
 	handlers        *ObjectHandlers
-	properties      *Array
-	propertiesTable []Zval
+	properties      *Array // 动态属性
+	propertiesTable []Zval // 静态属性
 
 	// flags todo 待合并
 	protected    bool

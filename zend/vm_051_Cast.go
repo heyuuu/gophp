@@ -27,32 +27,16 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 		if expr.IsType(opline.GetExtendedValue()) {
 			result.CopyValueFrom(expr)
-			{
-
-				// result.TryAddRefcount()
-
-			}
-
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 		if opline.GetExtendedValue() == types.IS_ARRAY {
-			{
-				if expr.GetType() != types.IS_NULL {
-					result.SetArray(types.NewArray(1))
-					expr = result.Array().IndexAddNew(0, expr)
-					{
-
-						// expr.TryAddRefcount()
-
-					}
-
-				} else {
-					result.SetEmptyArray()
-				}
-			}
-
 			/* fast copy */
-
+			if expr.GetType() != types.IS_NULL {
+				result.SetArray(types.NewArray(1))
+				expr = result.Array().IndexAddNew(0, expr)
+			} else {
+				result.SetEmptyArray()
+			}
 		} else {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
@@ -66,12 +50,6 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				ht = types.NewArray(1)
 				result.Object().SetProperties(ht)
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
-				{
-
-					// expr.TryAddRefcount()
-
-				}
-
 			}
 		}
 	}
