@@ -39,7 +39,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
 			var properties *types.Array
-			if array_ptr.Object().GetProperties() != nil  {
+			if array_ptr.Object().GetProperties() != nil {
 				array_ptr.Object().DupProperties()
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
@@ -85,7 +85,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
 			var properties *types.Array
-			if array_ptr.Object().GetProperties() != nil  {
+			if array_ptr.Object().GetProperties() != nil {
 				array_ptr.Object().DupProperties()
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)

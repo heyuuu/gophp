@@ -6,14 +6,8 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendObjectsNew(ce *types.ClassEntry) *types.ZendObject {
-	handle := EG__().NextObjectHandle()
-	return types.NewObject(ce, handle, StdObjectHandlersPtr)
-}
-func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
-	handle := EG__().NextObjectHandle()
-	object.Init(ce, handle)
-}
+func ZendObjectsNew(ce *types.ClassEntry) *types.ZendObject            { return types.NewStdObject(ce) }
+func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) { object.Init(ce) }
 
 func ZendObjectStdDtorEx(properties []types.Zval, ce *types.ClassEntry) {
 	defaultPropertiesCount := ce.GetDefaultPropertiesCount()

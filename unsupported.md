@@ -43,3 +43,4 @@
 - 默认随机数直接使用了 golang 的 rand。影响 `lcg_value`、`mt_srand`、`srand`、`mt_rand`、`rand`
 - 因为并发性考虑，`putenv` 不再影响进程环境变量
 - `debug_zval_dump` 输出结果不再有引用计数(`refcount`)相关内容
+- Object.handle 使用指针地址代替全局发号器作为对应标识。影响函数 `spl_object_id`/`spl_object_hash` 的值，不影响值的唯一性。

@@ -259,8 +259,6 @@ type ZendExecutorGlobals struct {
 	weakrefs                types.Array
 	exception_ignore_args   types.ZendBool
 	reserved                []any
-
-	lastObjectHandle uint32 // 最后一个object的handle值，初始为0
 }
 
 func (this *ZendExecutorGlobals) InitTables() {
@@ -335,11 +333,6 @@ func (this *ZendExecutorGlobals) ModifiedIniDirectives() IniDirectives {
 }
 func (this *ZendExecutorGlobals) InitModifiedIniDirectives() {
 	this.modifiedIniDirectives = types.NewTable[*ZendIniEntry](nil)
-}
-
-func (this *ZendExecutorGlobals) NextObjectHandle() uint32 {
-	this.lastObjectHandle++
-	return this.lastObjectHandle
 }
 
 func (this *ZendExecutorGlobals) VmStack() *VmStack { return &this.vmStack }

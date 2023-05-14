@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"runtime"
+	"unsafe"
 )
 
 type objectCompareFunc func(object1 *Zval, object2 *Zval) int
@@ -14,7 +15,7 @@ type objectGetPropertiesFunc func(object *Zval) *Array
  * ZendObject
  */
 type ZendObject struct {
-	handle          uint32
+	handle          uint
 	ce              *ClassEntry
 	handlers        *ObjectHandlers
 	properties      *Array // 动态属性
@@ -26,7 +27,11 @@ type ZendObject struct {
 	isFreeCalled bool
 }
 
-func NewObject(ce *ClassEntry, handle uint32, handlers *ObjectHandlers) *ZendObject {
+func NewStdObject(ce *ClassEntry) *ZendObject {
+	return NewObject(ce, zend.StdObjectHandlersPtr)
+}
+
+func NewObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
 	propertyCount := ce.GetDefaultPropertiesCount()
 	if ce.IsUseGuards() {
 		propertyCount++
@@ -36,12 +41,12 @@ func NewObject(ce *ClassEntry, handle uint32, handlers *ObjectHandlers) *ZendObj
 	o.handlers = handlers
 	o.propertiesTable = make([]Zval, propertyCount)
 
-	o.Init(ce, handle)
+	o.Init(ce)
 	return o
 }
 
-func (o *ZendObject) Init(ce *ClassEntry, handle uint32) {
-	o.handle = handle
+func (o *ZendObject) Init(ce *ClassEntry) {
+	o.handle = uint(uintptr(unsafe.Pointer(o)))
 	o.ce = ce
 	o.properties = nil
 
@@ -52,7 +57,7 @@ func (o *ZendObject) Init(ce *ClassEntry, handle uint32) {
 	runtime.SetFinalizer(o, ObjectAutoFree)
 }
 
-func (o *ZendObject) GetHandle() uint32                 { return o.handle }
+func (o *ZendObject) GetHandle() uint                   { return o.handle }
 func (o *ZendObject) GetCe() *ClassEntry                { return o.ce }
 func (o *ZendObject) GetHandlers() *ObjectHandlers      { return o.handlers }
 func (o *ZendObject) SetHandlers(value *ObjectHandlers) { o.handlers = value }

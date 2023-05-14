@@ -120,15 +120,16 @@ var DefZifSplObjectHash = def.DefFunc("spl_object_hash", 1, 1, []def.ArgInfo{{Na
 	if fp.HasError() {
 		return
 	}
-	ZifSplObjectHash(executeData, returnValue, obj)
+	ZifSplObjectHash(obj)
 })
 
 // generate by ZifSplObjectId
 var DefZifSplObjectId = def.DefFunc("spl_object_id", 1, 1, []def.ArgInfo{{Name: "obj"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	obj := fp.ParseZval()
+	obj := fp.ParseObject()
 	if fp.HasError() {
 		return
 	}
-	ZifSplObjectId(executeData, returnValue, obj)
+	ret := ZifSplObjectId(obj)
+	returnValue.SetLong(ret)
 })

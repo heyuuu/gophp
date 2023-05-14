@@ -41,7 +41,7 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *spl_SplObjectStorage, 
 			return types.FAILURE
 		}
 	} else {
-		*key = types.IdxKey(int(zend.Z_OBJ_HANDLE_P(obj)))
+		*key = types.IdxKey(int(obj.Object().GetHandle()))
 		return types.SUCCESS
 	}
 }
