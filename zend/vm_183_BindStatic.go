@@ -14,7 +14,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	// IZvalPtrDtor(variable_ptr)
 	ht = executeData.GetFunc().GetOpArray().GetStaticVariablesPtr()
 	if ht == nil {
-		b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & (AccImmutable | AccPreloaded)) != 0)
+		b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & (types.AccImmutable | types.AccPreloaded)) != 0)
 		ht = types.ZendArrayDup(executeData.GetFunc().GetOpArray().static_variables)
 		executeData.GetFunc().GetOpArray().SetStaticVariablesPtr(ht)
 	} else {

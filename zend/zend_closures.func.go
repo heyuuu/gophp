@@ -196,7 +196,7 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *types.Zval
 	memset(&fcc, 0, b.SizeOf("zend_fcall_info_cache"))
 	fci.SetSize(b.SizeOf("zend_fcall_info"))
 	fci.SetRetval(return_value)
-	if (executeData.GetFunc().internal_function.fn_flags & AccStatic) != 0 {
+	if (executeData.GetFunc().internal_function.fn_flags & types.AccStatic) != 0 {
 		fcc.SetFunctionHandler(executeData.GetFunc().internal_function.scope.__callstatic)
 	} else {
 		fcc.SetFunctionHandler(executeData.GetFunc().internal_function.scope.__call)
@@ -245,7 +245,7 @@ func ZendCreateClosureFromCallable(return_value *types.Zval, callable *types.Zva
 			}
 		}
 		call := types.NewInternalFunctionEx(mptr.GetFunctionName().GetStr(), ZendClosureCallMagic)
-		call.SetFnFlags(mptr.GetFnFlags() & AccStatic)
+		call.SetFnFlags(mptr.GetFnFlags() & types.AccStatic)
 		call.SetScope(mptr.GetScope())
 		ZendFreeTrampoline(mptr)
 		mptr = call
@@ -297,7 +297,7 @@ func ZendClosureCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 func ZendGetClosureInvokeMethod(object *types.ZendObject) types.IFunction {
 	var closure *ZendClosure = (*ZendClosure)(object)
 	var invoke types.IFunction = (types.IFunction)(Emalloc(b.SizeOf("zend_function")))
-	var keep_flags uint32 = AccReturnReference | AccVariadic | AccHasReturnType
+	var keep_flags uint32 = types.AccReturnReference | types.AccVariadic | types.AccHasReturnType
 	invoke.SetCommon(closure.GetFunc().GetCommon())
 
 	/* We return ZEND_INTERNAL_FUNCTION, but arg_info representation is the
@@ -307,7 +307,7 @@ func ZendGetClosureInvokeMethod(object *types.ZendObject) types.IFunction {
 	 * ZEND_ACC_USER_ARG_INFO flag to prevent invalid usage by Reflection */
 
 	invoke.SetType(ZEND_INTERNAL_FUNCTION)
-	invoke.GetInternalFunction().SetFnFlags(AccPublic | AccCallViaHandler | closure.GetFunc().GetFnFlags()&keep_flags)
+	invoke.GetInternalFunction().SetFnFlags(types.AccPublic | types.AccCallViaHandler | closure.GetFunc().GetFnFlags()&keep_flags)
 	if closure.GetFunc().GetType() != ZEND_INTERNAL_FUNCTION || closure.GetFunc().IsUserArgInfo() {
 		invoke.GetInternalFunction().SetIsUserArgInfo(true)
 	}

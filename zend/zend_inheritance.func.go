@@ -144,12 +144,12 @@ func DoInheritParentConstructor(ce *types.ClassEntry) {
 	ce.SetConstructor(parent.GetConstructor())
 }
 func ZendVisibilityString(fn_flags uint32) *byte {
-	if (fn_flags & AccPublic) != 0 {
+	if (fn_flags & types.AccPublic) != 0 {
 		return "public"
-	} else if (fn_flags & AccPrivate) != 0 {
+	} else if (fn_flags & types.AccPrivate) != 0 {
 		return "private"
 	} else {
-		b.Assert((fn_flags & AccProtected) != 0)
+		b.Assert((fn_flags & types.AccProtected) != 0)
 		return "protected"
 	}
 }
@@ -676,7 +676,7 @@ func DoInheritanceCheckOnMethodEx(
 	var child_flags uint32
 	var parent_flags uint32 = parent.GetFnFlags()
 	var proto types.IFunction
-	if checked == 0 && (parent_flags&AccFinal) != 0 {
+	if checked == 0 && (parent_flags&types.AccFinal) != 0 {
 		if check_only != 0 {
 			return INHERITANCE_ERROR
 		}
@@ -687,11 +687,11 @@ func DoInheritanceCheckOnMethodEx(
 	/* You cannot change from static to non static and vice versa.
 	 */
 
-	if checked == 0 && (child_flags&AccStatic) != (parent_flags&AccStatic) {
+	if checked == 0 && (child_flags&types.AccStatic) != (parent_flags&types.AccStatic) {
 		if check_only != 0 {
 			return INHERITANCE_ERROR
 		}
-		if (child_flags & AccStatic) != 0 {
+		if (child_flags & types.AccStatic) != 0 {
 			faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot make non static method %s::%s() static in class %s", ZEND_FN_SCOPE_NAME(parent), child.GetFunctionName().GetVal(), ZEND_FN_SCOPE_NAME(child))
 		} else {
 			faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot make static method %s::%s() non static in class %s", ZEND_FN_SCOPE_NAME(parent), child.GetFunctionName().GetVal(), ZEND_FN_SCOPE_NAME(child))
@@ -700,16 +700,16 @@ func DoInheritanceCheckOnMethodEx(
 
 	/* Disallow making an inherited method abstract. */
 
-	if checked == 0 && (child_flags&AccAbstract) > (parent_flags&AccAbstract) {
+	if checked == 0 && (child_flags&types.AccAbstract) > (parent_flags&types.AccAbstract) {
 		if check_only != 0 {
 			return INHERITANCE_ERROR
 		}
 		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot make non abstract method %s::%s() abstract in class %s", ZEND_FN_SCOPE_NAME(parent), child.GetFunctionName().GetVal(), ZEND_FN_SCOPE_NAME(child))
 	}
-	if check_only == 0 && (parent_flags&(AccPrivate|AccChanged)) != 0 {
+	if check_only == 0 && (parent_flags&(types.AccPrivate|types.AccChanged)) != 0 {
 		child.SetIsChanged(true)
 	}
-	if (parent_flags & AccPrivate) != 0 {
+	if (parent_flags & types.AccPrivate) != 0 {
 		return INHERITANCE_SUCCESS
 	}
 	if parent.GetPrototype() != nil {
@@ -717,7 +717,7 @@ func DoInheritanceCheckOnMethodEx(
 	} else {
 		proto = parent
 	}
-	if (parent_flags & AccCtor) != 0 {
+	if (parent_flags & types.AccCtor) != 0 {
 
 		/* ctors only have a prototype if is abstract (or comes from an interface) */
 
@@ -748,11 +748,11 @@ func DoInheritanceCheckOnMethodEx(
 
 	/* Prevent derived classes from restricting access that was available in parent classes (except deriving from non-abstract ctors) */
 
-	if checked == 0 && (child_flags&AccPppMask) > (parent_flags&AccPppMask) {
+	if checked == 0 && (child_flags&types.AccPppMask) > (parent_flags&types.AccPppMask) {
 		if check_only != 0 {
 			return INHERITANCE_ERROR
 		}
-		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Access level to %s::%s() must be %s (as in class %s)%s", ZEND_FN_SCOPE_NAME(child), child.GetFunctionName().GetVal(), ZendVisibilityString(parent_flags), ZEND_FN_SCOPE_NAME(parent), b.Cond((parent_flags&AccPublic) != 0, "", " or weaker"))
+		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Access level to %s::%s() must be %s (as in class %s)%s", ZEND_FN_SCOPE_NAME(child), child.GetFunctionName().GetVal(), ZendVisibilityString(parent_flags), ZEND_FN_SCOPE_NAME(parent), b.Cond((parent_flags&types.AccPublic) != 0, "", " or weaker"))
 	}
 	if checked == 0 {
 		if check_only != 0 {
@@ -844,14 +844,14 @@ func EmitIncompatiblePropertyError(child *types.PropertyInfo, parent *types.Prop
 func DoInheritProperty(parent_info *types.PropertyInfo, key string, ce *types.ClassEntry) {
 	var child_info *types.PropertyInfo = ce.PropertyTable().Get(key)
 	if child_info != nil {
-		if parent_info.HasFlags(AccPrivate | AccChanged) {
+		if parent_info.HasFlags(types.AccPrivate | types.AccChanged) {
 			child_info.SetIsChanged(true)
 		}
 		if !parent_info.IsPrivate() {
-			if (parent_info.GetFlags() & AccStatic) != (child_info.GetFlags() & AccStatic) {
+			if (parent_info.GetFlags() & types.AccStatic) != (child_info.GetFlags() & types.AccStatic) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s%s::$%s as %s%s::$%s", b.Cond(parent_info.IsStatic(), "static ", "non static "), ce.GetParent().Name(), key, b.Cond(child_info.IsStatic(), "static ", "non static "), ce.GetName().GetVal(), key)
 			}
-			if (child_info.GetFlags() & AccPppMask) > (parent_info.GetFlags() & AccPppMask) {
+			if (child_info.GetFlags() & types.AccPppMask) > (parent_info.GetFlags() & types.AccPppMask) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::$%s must be %s (as in class %s)%s", ce.GetName().GetVal(), key, ZendVisibilityString(parent_info.GetFlags()), ce.GetParent().Name(), b.Cond(parent_info.IsPublic(), "", " or weaker"))
 			} else if !child_info.IsStatic() {
 				var parent_num int = OBJ_PROP_TO_NUM(parent_info.GetOffset())
@@ -920,10 +920,10 @@ func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
 func DoInheritClassConstant(name string, parentConst *types.ClassConstant, ce *types.ClassEntry) {
 	var c = ce.ConstantsTable().Get(name)
 	if c != nil {
-		if (c.GetValue().GetAccessFlags() & AccPppMask) > (parentConst.GetValue().GetAccessFlags() & AccPppMask) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name, ZendVisibilityString(parentConst.GetValue().GetAccessFlags()), ce.GetParent().Name(), b.Cond((parentConst.GetValue().GetAccessFlags()&AccPublic) != 0, "", " or weaker"))
+		if (c.GetValue().GetAccessFlags() & types.AccPppMask) > (parentConst.GetValue().GetAccessFlags() & types.AccPppMask) {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name, ZendVisibilityString(parentConst.GetValue().GetAccessFlags()), ce.GetParent().Name(), b.Cond((parentConst.GetValue().GetAccessFlags()&types.AccPublic) != 0, "", " or weaker"))
 		}
-	} else if (parentConst.GetValue().GetAccessFlags() & AccPrivate) == 0 {
+	} else if (parentConst.GetValue().GetAccessFlags() & types.AccPrivate) == 0 {
 		if parentConst.GetValue().IsConstantAst() {
 			ce.SetIsConstantsUpdated(false)
 		}
@@ -965,7 +965,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 		if !parentCe.IsInterface() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Interface %s may not inherit from class (%s)", ce.GetName().GetVal(), parentCe.GetName().GetVal())
 		}
-	} else if parentCe.HasCeFlags(AccInterface | AccTrait | AccFinal) {
+	} else if parentCe.HasCeFlags(types.AccInterface | types.AccTrait | types.AccFinal) {
 		/* Class declaration must not extend traits or interfaces */
 		if parentCe.IsInterface() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from interface %s", ce.GetName().GetVal(), parentCe.GetName().GetVal())
@@ -1101,7 +1101,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 			}
 		} else if ce.IsUserClass() {
 			if CE_STATIC_MEMBERS(parentCe) == nil {
-				b.Assert(parentCe.HasCeFlags(AccImmutable | AccPreloaded))
+				b.Assert(parentCe.HasCeFlags(types.AccImmutable | types.AccPreloaded))
 				ZendClassInitStatics(parentCe)
 			}
 			src = CE_STATIC_MEMBERS(parentCe) + parentCe.GetDefaultStaticMembersCount()
@@ -1190,7 +1190,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 			ce.SetIsExplicitAbstractClass(true)
 		}
 	}
-	ce.AddCeFlags(parentCe.GetCeFlags() & (AccHasStaticInMethods | AccHasTypeHints | AccUseGuards))
+	ce.AddCeFlags(parentCe.GetCeFlags() & (types.AccHasStaticInMethods | types.AccHasTypeHints | types.AccUseGuards))
 }
 func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parentConstant *types.ClassConstant, name string, iface *types.ClassEntry) types.ZendBool {
 	var oldConstant *types.ClassConstant = childConstantsTable.Get(name)
@@ -1375,7 +1375,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 		/* if it is the same function with the same visibility and has not been assigned a class scope yet, regardless
 		 * of where it is coming from there is no conflict and we do not need to add it again */
 
-		if existing_fn.GetOpArray().GetOpcodes() == fn.GetOpArray().GetOpcodes() && (existing_fn.GetFnFlags()&AccPppMask) == (fn.GetFnFlags()&AccPppMask) && (existing_fn.GetScope().GetCeFlags()&AccTrait) == AccTrait {
+		if existing_fn.GetOpArray().GetOpcodes() == fn.GetOpArray().GetOpcodes() && (existing_fn.GetFnFlags()&types.AccPppMask) == (fn.GetFnFlags()&types.AccPppMask) && (existing_fn.GetScope().GetCeFlags()&types.AccTrait) == types.AccTrait {
 			return
 		}
 		if existing_fn.GetScope() == ce {
@@ -1443,7 +1443,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 	ZendAddMagicMethods(ce, key, new_fn)
 }
 func ZendFixupTraitMethod(fn types.IFunction, ce *types.ClassEntry) {
-	if (fn.GetScope().GetCeFlags() & AccTrait) == AccTrait {
+	if (fn.GetScope().GetCeFlags() & types.AccTrait) == types.AccTrait {
 		fn.SetScope(ce)
 		if fn.IsAbstract() {
 			ce.SetIsImplicitAbstractClass(true)
@@ -1483,7 +1483,7 @@ func ZendTraitsCopyFunctions(
 				/* if it is 0, no modifieres has been changed */
 
 				if alias.GetModifiers() != 0 {
-					fn_copy.SetFnFlags(alias.GetModifiers() | fn.GetFnFlags() ^ fn.GetFnFlags()&AccPppMask)
+					fn_copy.SetFnFlags(alias.GetModifiers() | fn.GetFnFlags() ^ fn.GetFnFlags()&types.AccPppMask)
 				}
 				lcname = operators.ZendStringTolower(alias.GetAlias())
 				ZendAddTraitMethod(ce, alias.GetAlias().GetVal(), lcname, &fn_copy, overridden)
@@ -1526,7 +1526,7 @@ func ZendTraitsCopyFunctions(
 				/* Scope unset or equal to the function we compare to, and the alias applies to fn */
 
 				if alias.GetAlias() == nil && alias.GetModifiers() != 0 && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && operators.ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetStr(), fnname.GetStr()) == 0 {
-					fn_copy.SetFnFlags(alias.GetModifiers() | fn.GetFnFlags() ^ fn.GetFnFlags()&AccPppMask)
+					fn_copy.SetFnFlags(alias.GetModifiers() | fn.GetFnFlags() ^ fn.GetFnFlags()&types.AccPppMask)
 
 					/** Record the trait from which this alias was resolved. */
 
@@ -1553,7 +1553,7 @@ func ZendTraitsCopyFunctions(
 }
 func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits **types.ClassEntry) uint32 {
 	var i uint32
-	if (trait.GetCeFlags() & AccTrait) != AccTrait {
+	if (trait.GetCeFlags() & types.AccTrait) != types.AccTrait {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s is not a trait, Only traits may be used in 'as' and 'insteadof' statements", trait.GetName().GetVal())
 		return 0
 	}
@@ -1743,7 +1743,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 			 * then check whether the property is already there
 			 */
 			flags = property_info.GetFlags()
-			if (flags & AccPublic) != 0 {
+			if (flags & types.AccPublic) != 0 {
 				prop_name = types.NewString(property_info.GetName())
 			} else {
 				/* for private and protected we need to unmangle the names */
@@ -1757,10 +1757,10 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 			if coliding_prop != nil {
 				if coliding_prop.IsPrivate() && coliding_prop.GetCe() != ce {
 					ce.PropertyTable().Del(prop_name.GetStr())
-					flags |= AccChanged
+					flags |= types.AccChanged
 				} else {
 					not_compatible = 1
-					if (coliding_prop.GetFlags()&(AccPppMask|AccStatic)) == (flags&(AccPppMask|AccStatic)) && PropertyTypesCompatible(property_info, coliding_prop) == INHERITANCE_SUCCESS {
+					if (coliding_prop.GetFlags()&(types.AccPppMask|types.AccStatic)) == (flags&(types.AccPppMask|types.AccStatic)) && PropertyTypesCompatible(property_info, coliding_prop) == INHERITANCE_SUCCESS {
 
 						/* the flags are identical, thus, the properties may be compatible */
 
@@ -1768,7 +1768,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 						var op2 *types.Zval
 						var op1_tmp types.Zval
 						var op2_tmp types.Zval
-						if (flags & AccStatic) != 0 {
+						if (flags & types.AccStatic) != 0 {
 							op1 = ce.GetDefaultStaticMembersTable()[coliding_prop.GetOffset()]
 							op2 = trait.GetDefaultStaticMembersTable()[property_info.GetOffset()]
 							op1 = types.ZVAL_DEINDIRECT(op1)
@@ -1807,7 +1807,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 			}
 
 			/* property not found, so lets add it */
-			if (flags & AccStatic) != 0 {
+			if (flags & types.AccStatic) != 0 {
 				prop_value = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
 				b.Assert(prop_value.GetType() != types.IS_INDIRECT)
 			} else {
@@ -1971,7 +1971,7 @@ func ZendVerifyAbstractClassFunction(fn types.IFunction, ai *ZendAbstractInfo) {
 }
 func ZendVerifyAbstractClass(ce *types.ClassEntry) {
 	var ai ZendAbstractInfo
-	b.Assert((ce.GetCeFlags() & (AccImplicitAbstractClass | AccInterface | AccTrait | AccExplicitAbstractClass)) == AccImplicitAbstractClass)
+	b.Assert((ce.GetCeFlags() & (types.AccImplicitAbstractClass | types.AccInterface | types.AccTrait | types.AccExplicitAbstractClass)) == types.AccImplicitAbstractClass)
 	memset(&ai, 0, b.SizeOf("ai"))
 	ce.FunctionTable().Foreach(func(_ string, func_ types.IFunction) {
 		ZendVerifyAbstractClassFunction(func_, &ai)
@@ -2204,7 +2204,7 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 	if ce.IsImplementInterfaces() {
 		ZendDoImplementInterfaces(ce, interfaces)
 	}
-	if (ce.GetCeFlags() & (AccImplicitAbstractClass | AccInterface | AccTrait | AccExplicitAbstractClass)) == AccImplicitAbstractClass {
+	if (ce.GetCeFlags() & (types.AccImplicitAbstractClass | types.AccInterface | types.AccTrait | types.AccExplicitAbstractClass)) == types.AccImplicitAbstractClass {
 		ZendVerifyAbstractClass(ce)
 	}
 	ZendBuildPropertiesInfoTable(ce)
@@ -2275,7 +2275,7 @@ func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname 
 		}
 		ZendDoInheritanceEx(ce, parent_ce, status == INHERITANCE_SUCCESS)
 		ZendBuildPropertiesInfoTable(ce)
-		if (ce.GetCeFlags() & (AccImplicitAbstractClass | AccInterface | AccTrait | AccExplicitAbstractClass)) == AccImplicitAbstractClass {
+		if (ce.GetCeFlags() & (types.AccImplicitAbstractClass | types.AccInterface | types.AccTrait | types.AccExplicitAbstractClass)) == types.AccImplicitAbstractClass {
 			ZendVerifyAbstractClass(ce)
 		}
 		b.Assert(!ce.IsUnresolvedVariance())

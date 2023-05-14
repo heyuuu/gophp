@@ -198,7 +198,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	if opline.GetOp1Type() == IS_UNUSED && opline.GetOp2Type() == IS_CONST && CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
 		var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
 		fbc = CG__().GetActiveClassEntry().FunctionTable().Get(lcname.GetStr())
-		if fbc != nil && !fbc.HasFnFlags(AccPrivate|AccFinal) {
+		if fbc != nil && !fbc.HasFnFlags(types.AccPrivate|types.AccFinal) {
 			fbc = nil
 		}
 

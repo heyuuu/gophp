@@ -118,7 +118,7 @@ func ENCODE_SPECIAL_CACHE_NUM(num __auto__) any {
 }
 func DECODE_SPECIAL_CACHE_NUM(ptr *ZendConstant) int { return uintPtr(ptr) >> 1 }
 func ZEND_CLASS_HAS_TYPE_HINTS(ce *types.ClassEntry) bool {
-	return (ce.GetCeFlags() & AccHasTypeHints) == AccHasTypeHints
+	return (ce.GetCeFlags() & types.AccHasTypeHints) == types.AccHasTypeHints
 }
 func ZEND_REF_ADD_TYPE_SOURCE(ref *types.ZendReference, source *types.PropertyInfo) {
 	ZendRefAddTypeSource(&(ref.GetSources()), source)

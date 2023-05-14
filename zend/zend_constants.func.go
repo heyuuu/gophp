@@ -98,12 +98,12 @@ func ZendGetSpecialConstant(name string) *ZendConstant {
 	}
 }
 func ZendVerifyConstAccess(c *types.ClassConstant, scope *types.ClassEntry) bool {
-	if (c.GetValue().GetAccessFlags() & AccPublic) != 0 {
+	if (c.GetValue().GetAccessFlags() & types.AccPublic) != 0 {
 		return 1
-	} else if (c.GetValue().GetAccessFlags() & AccPrivate) != 0 {
+	} else if (c.GetValue().GetAccessFlags() & types.AccPrivate) != 0 {
 		return c.GetCe() == scope
 	} else {
-		b.Assert((c.GetValue().GetAccessFlags() & AccProtected) != 0)
+		b.Assert((c.GetValue().GetAccessFlags() & types.AccProtected) != 0)
 		return ZendCheckProtected(c.GetCe(), scope)
 	}
 }

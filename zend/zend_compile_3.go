@@ -264,7 +264,7 @@ func ZendGetCallOp(init_op *ZendOp, fbc types.IFunction) uint8 {
 	if fbc != nil {
 		if fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) == 0 {
 			if init_op.GetOpcode() == ZEND_INIT_FCALL && ZendExecuteInternal == nil {
-				if !fbc.HasFnFlags(AccAbstract | AccDeprecated | AccHasTypeHints | AccReturnReference) {
+				if !fbc.HasFnFlags(types.AccAbstract | types.AccDeprecated | types.AccHasTypeHints | types.AccReturnReference) {
 					return ZEND_DO_ICALL
 				} else {
 					return ZEND_DO_FCALL_BY_NAME

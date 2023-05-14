@@ -799,13 +799,13 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 	}
 }
 func ZifClassExists(executeData zpp.Ex, return_value zpp.Ret, classname *types.Zval, _ zpp.Opt, autoload *types.Zval) {
-	ClassExistsImpl(executeData, return_value, AccLinked, AccInterface|AccTrait)
+	ClassExistsImpl(executeData, return_value, types.AccLinked, types.AccInterface|types.AccTrait)
 }
 func ZifInterfaceExists(executeData zpp.Ex, return_value zpp.Ret, classname *types.Zval, _ zpp.Opt, autoload *types.Zval) {
-	ClassExistsImpl(executeData, return_value, AccLinked|AccInterface, 0)
+	ClassExistsImpl(executeData, return_value, types.AccLinked|types.AccInterface, 0)
 }
 func ZifTraitExists(executeData zpp.Ex, return_value zpp.Ret, traitname *types.Zval, _ zpp.Opt, autoload *types.Zval) {
-	ClassExistsImpl(executeData, return_value, AccTrait, 0)
+	ClassExistsImpl(executeData, return_value, types.AccTrait, 0)
 }
 func ZifFunctionExists(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval) {
 	var name *types.String
@@ -1015,13 +1015,13 @@ func GetDeclaredClassImpl(flags uint32, skipFlags uint32) *types.Array {
 	return arr
 }
 func ZifGetDeclaredTraits() *types.Array {
-	return GetDeclaredClassImpl(AccTrait, 0)
+	return GetDeclaredClassImpl(types.AccTrait, 0)
 }
 func ZifGetDeclaredClasses() *types.Array {
-	return GetDeclaredClassImpl(AccLinked, AccInterface|AccTrait)
+	return GetDeclaredClassImpl(types.AccLinked, types.AccInterface|types.AccTrait)
 }
 func ZifGetDeclaredInterfaces() *types.Array {
-	return GetDeclaredClassImpl(AccInterface, 0)
+	return GetDeclaredClassImpl(types.AccInterface, 0)
 }
 func ZifGetDefinedFunctions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, excludeDisabled *types.Zval) {
 	var internal types.Zval

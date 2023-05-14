@@ -23,8 +23,8 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 	/* init the filter class ancestor */
 
 	var phpUserFilter = zend.RegisterClass("php_user_filter", nil, UserFilterClassFuncs)
-	zend.ZendDeclarePropertyString(phpUserFilter, "filtername", b.SizeOf("\"filtername\"")-1, "", zend.AccPublic)
-	zend.ZendDeclarePropertyString(phpUserFilter, "params", b.SizeOf("\"params\"")-1, "", zend.AccPublic)
+	zend.ZendDeclarePropertyString(phpUserFilter, "filtername", b.SizeOf("\"filtername\"")-1, "", types.AccPublic)
+	zend.ZendDeclarePropertyString(phpUserFilter, "params", b.SizeOf("\"params\"")-1, "", types.AccPublic)
 
 	/* init the filter resource; it has no dtor, as streams will always clean it up
 	 * at the correct time */

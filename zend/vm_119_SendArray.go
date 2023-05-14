@@ -76,7 +76,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 							}
 						}
 					} else {
-						if arg.IsReference() && (executeData.GetCall().func_.common.fn_flags&AccCallViaTrampoline) == 0 {
+						if arg.IsReference() && (executeData.GetCall().func_.common.fn_flags&types.AccCallViaTrampoline) == 0 {
 
 							/* don't separate references for __call */
 
@@ -120,7 +120,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 						}
 					}
 				} else {
-					if arg.IsReference() && (executeData.GetCall().func_.common.fn_flags&AccCallViaTrampoline) == 0 {
+					if arg.IsReference() && (executeData.GetCall().func_.common.fn_flags&types.AccCallViaTrampoline) == 0 {
 
 						/* don't separate references for __call */
 

@@ -161,31 +161,31 @@ func (this *ZendAstDecl) SwitchFlags(value uint32, cond bool) {
 		this.SubFlags(value)
 	}
 }
-func (this ZendAstDecl) IsPublic() bool          { return this.HasFlags(AccPublic) }
-func (this ZendAstDecl) IsProtected() bool       { return this.HasFlags(AccProtected) }
-func (this ZendAstDecl) IsPrivate() bool         { return this.HasFlags(AccPrivate) }
-func (this ZendAstDecl) IsStatic() bool          { return this.HasFlags(AccStatic) }
-func (this ZendAstDecl) IsAbstract() bool        { return this.HasFlags(AccAbstract) }
-func (this ZendAstDecl) IsFinal() bool           { return this.HasFlags(AccFinal) }
-func (this ZendAstDecl) IsReturnReference() bool { return this.HasFlags(AccReturnReference) }
-func (this ZendAstDecl) IsInterface() bool       { return this.HasFlags(AccInterface) }
-func (this ZendAstDecl) IsTrait() bool           { return this.HasFlags(AccTrait) }
+func (this ZendAstDecl) IsPublic() bool          { return this.HasFlags(types.AccPublic) }
+func (this ZendAstDecl) IsProtected() bool       { return this.HasFlags(types.AccProtected) }
+func (this ZendAstDecl) IsPrivate() bool         { return this.HasFlags(types.AccPrivate) }
+func (this ZendAstDecl) IsStatic() bool          { return this.HasFlags(types.AccStatic) }
+func (this ZendAstDecl) IsAbstract() bool        { return this.HasFlags(types.AccAbstract) }
+func (this ZendAstDecl) IsFinal() bool           { return this.HasFlags(types.AccFinal) }
+func (this ZendAstDecl) IsReturnReference() bool { return this.HasFlags(types.AccReturnReference) }
+func (this ZendAstDecl) IsInterface() bool       { return this.HasFlags(types.AccInterface) }
+func (this ZendAstDecl) IsTrait() bool           { return this.HasFlags(types.AccTrait) }
 func (this ZendAstDecl) IsExplicitAbstractClass() bool {
-	return this.HasFlags(AccExplicitAbstractClass)
+	return this.HasFlags(types.AccExplicitAbstractClass)
 }
-func (this ZendAstDecl) IsAnonClass() bool         { return this.HasFlags(AccAnonClass) }
-func (this *ZendAstDecl) SetIsPublic(cond bool)    { this.SwitchFlags(AccPublic, cond) }
-func (this *ZendAstDecl) SetIsProtected(cond bool) { this.SwitchFlags(AccProtected, cond) }
-func (this *ZendAstDecl) SetIsPrivate(cond bool)   { this.SwitchFlags(AccPrivate, cond) }
-func (this *ZendAstDecl) SetIsStatic(cond bool)    { this.SwitchFlags(AccStatic, cond) }
-func (this *ZendAstDecl) SetIsAbstract(cond bool)  { this.SwitchFlags(AccAbstract, cond) }
-func (this *ZendAstDecl) SetIsFinal(cond bool)     { this.SwitchFlags(AccFinal, cond) }
+func (this ZendAstDecl) IsAnonClass() bool         { return this.HasFlags(types.AccAnonClass) }
+func (this *ZendAstDecl) SetIsPublic(cond bool)    { this.SwitchFlags(types.AccPublic, cond) }
+func (this *ZendAstDecl) SetIsProtected(cond bool) { this.SwitchFlags(types.AccProtected, cond) }
+func (this *ZendAstDecl) SetIsPrivate(cond bool)   { this.SwitchFlags(types.AccPrivate, cond) }
+func (this *ZendAstDecl) SetIsStatic(cond bool)    { this.SwitchFlags(types.AccStatic, cond) }
+func (this *ZendAstDecl) SetIsAbstract(cond bool)  { this.SwitchFlags(types.AccAbstract, cond) }
+func (this *ZendAstDecl) SetIsFinal(cond bool)     { this.SwitchFlags(types.AccFinal, cond) }
 func (this *ZendAstDecl) SetIsReturnReference(cond bool) {
-	this.SwitchFlags(AccReturnReference, cond)
+	this.SwitchFlags(types.AccReturnReference, cond)
 }
-func (this *ZendAstDecl) SetIsInterface(cond bool) { this.SwitchFlags(AccInterface, cond) }
-func (this *ZendAstDecl) SetIsTrait(cond bool)     { this.SwitchFlags(AccTrait, cond) }
+func (this *ZendAstDecl) SetIsInterface(cond bool) { this.SwitchFlags(types.AccInterface, cond) }
+func (this *ZendAstDecl) SetIsTrait(cond bool)     { this.SwitchFlags(types.AccTrait, cond) }
 func (this *ZendAstDecl) SetIsExplicitAbstractClass(cond bool) {
-	this.SwitchFlags(AccExplicitAbstractClass, cond)
+	this.SwitchFlags(types.AccExplicitAbstractClass, cond)
 }
-func (this *ZendAstDecl) SetIsAnonClass(cond bool) { this.SwitchFlags(AccAnonClass, cond) }
+func (this *ZendAstDecl) SetIsAnonClass(cond bool) { this.SwitchFlags(types.AccAnonClass, cond) }

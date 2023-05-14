@@ -19,7 +19,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 	}
 	if executeData.GetThis().IsObject() {
 		called_scope = types.Z_OBJCE(executeData.GetThis())
-		if func_.IsStatic() || (executeData.GetFunc().GetFnFlags()&AccStatic) != 0 {
+		if func_.IsStatic() || (executeData.GetFunc().GetFnFlags()&types.AccStatic) != 0 {
 			object = nil
 		} else {
 			object = &(executeData.GetThis())

@@ -181,7 +181,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	var is_static types.ZendBool = op_array.IsStatic()
 	var lcname *types.String
 	if in_interface != 0 {
-		if is_public == 0 || op_array.HasFnFlags(AccFinal|AccAbstract) {
+		if is_public == 0 || op_array.HasFnFlags(types.AccFinal|types.AccAbstract) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface method "+"%s::%s() must be omitted", ce.GetName().GetVal(), name.GetVal())
 		}
 		op_array.SetIsAbstract(true)
@@ -409,7 +409,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 		ZEND_MAP_PTR_INIT(op_array.run_time_cache, ZendArenaAlloc(CG__().GetArena(), b.SizeOf("void *")))
 		ZEND_MAP_PTR_SET(op_array.run_time_cache, nil)
 	}
-	op_array.AddFnFlags(orig_op_array.GetFnFlags() & AccStrictTypes)
+	op_array.AddFnFlags(orig_op_array.GetFnFlags() & types.AccStrictTypes)
 	op_array.AddFnFlags(decl.GetFlags())
 	op_array.SetLineStart(decl.GetStartLineno())
 	op_array.SetLineEnd(decl.GetEndLineno())
@@ -492,7 +492,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 	if ce.IsInterface() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Interfaces may not include member variables")
 	}
-	if (flags & AccAbstract) != 0 {
+	if (flags & types.AccAbstract) != 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Properties cannot be declared abstract")
 	}
 	for i = 0; i < children; i++ {
@@ -516,7 +516,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		if doc_comment_ast != nil {
 			doc_comment = ZendAstGetStr(doc_comment_ast).Copy()
 		}
-		if (flags & AccFinal) != 0 {
+		if (flags & types.AccFinal) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare property %s::$%s final, "+"the final modifier is allowed only for methods and classes", ce.GetName().GetVal(), name.GetVal())
 		}
 		if ce.PropertyTable().Exists(name.GetStr()) {
@@ -574,12 +574,12 @@ func ZendCompileClassConstDecl(ast *ZendAst) {
 		var name *types.String = ZendAstGetZval(name_ast).String()
 		var doc_comment *types.String = b.CondF1(doc_comment_ast != nil, func() *types.String { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
 		var value_zv types.Zval
-		if (ast.GetAttr() & (AccStatic | AccAbstract | AccFinal)) != 0 {
-			if (ast.GetAttr() & AccStatic) != 0 {
+		if (ast.GetAttr() & (types.AccStatic | types.AccAbstract | types.AccFinal)) != 0 {
+			if (ast.GetAttr() & types.AccStatic) != 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'static' as constant modifier")
-			} else if (ast.GetAttr() & AccAbstract) != 0 {
+			} else if (ast.GetAttr() & types.AccAbstract) != 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'abstract' as constant modifier")
-			} else if (ast.GetAttr() & AccFinal) != 0 {
+			} else if (ast.GetAttr() & types.AccFinal) != 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'final' as constant modifier")
 			}
 		}
@@ -616,11 +616,11 @@ func ZendCompileTraitAlias(ast *ZendAst) {
 	var alias_ast *ZendAst = ast.GetChild()[1]
 	var modifiers uint32 = ast.GetAttr()
 	var alias *ZendTraitAlias
-	if modifiers == AccStatic {
+	if modifiers == types.AccStatic {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'static' as method modifier")
-	} else if modifiers == AccAbstract {
+	} else if modifiers == types.AccAbstract {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'abstract' as method modifier")
-	} else if modifiers == AccFinal {
+	} else if modifiers == types.AccFinal {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'final' as method modifier")
 	}
 	alias = Emalloc(b.SizeOf("zend_trait_alias"))
@@ -812,14 +812,14 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	if implements_ast != nil {
 		ZendCompileImplements(implements_ast)
 	}
-	if (ce.GetCeFlags() & (AccImplicitAbstractClass | AccInterface | AccTrait | AccExplicitAbstractClass)) == AccImplicitAbstractClass {
+	if (ce.GetCeFlags() & (types.AccImplicitAbstractClass | types.AccInterface | types.AccTrait | types.AccExplicitAbstractClass)) == types.AccImplicitAbstractClass {
 		ZendVerifyAbstractClass(ce)
 	}
 	CG__().SetActiveClassEntry(original_ce)
 	if toplevel != 0 {
 		ce.SetIsTopLevel(true)
 	}
-	if toplevel != 0 && !ce.HasCeFlags(AccImplementInterfaces|AccImplementTraits) && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
+	if toplevel != 0 && !ce.HasCeFlags(types.AccImplementInterfaces|types.AccImplementTraits) && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
 		if extends_ast != nil {
 			var parent_ce *types.ClassEntry = ZendLookupClassEx(ce.GetParentName(), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if parent_ce != nil && (!parent_ce.IsInternalClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_CLASSES) == 0) && (!parent_ce.IsUserClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || parent_ce.GetFilename() == ce.GetFilename()) {
@@ -875,7 +875,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 
 		ZendAddLiteralString(&key)
 		opline.SetOpcode(ZEND_DECLARE_CLASS)
-		if extends_ast != nil && toplevel != 0 && (CG__().GetCompilerOptions()&ZEND_COMPILE_DELAYED_BINDING) != 0 && !ce.HasCeFlags(AccImplementInterfaces|AccImplementTraits) {
+		if extends_ast != nil && toplevel != 0 && (CG__().GetCompilerOptions()&ZEND_COMPILE_DELAYED_BINDING) != 0 && !ce.HasCeFlags(types.AccImplementInterfaces|types.AccImplementTraits) {
 			CG__().GetActiveOpArray().SetIsEarlyBinding(true)
 			opline.SetOpcode(ZEND_DECLARE_CLASS_DELAYED)
 			opline.SetExtendedValue(ZendAllocCacheSlot())

@@ -112,7 +112,7 @@ func ZendDisableFunction(functionName string) int {
 	if f != nil {
 		func_ := f.(*types.InternalFunction)
 		//ZendFreeInternalArgInfo(func_)
-		func_.SubFnFlags(AccVariadic | AccHasTypeHints | AccHasReturnType)
+		func_.SubFnFlags(types.AccVariadic | types.AccHasTypeHints | types.AccHasReturnType)
 		func_.SetNumArgs(0)
 		func_.SetArgInfo(nil)
 		func_.SetHandler(ZifDisplayDisabledFunction)

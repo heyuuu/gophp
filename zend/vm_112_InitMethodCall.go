@@ -39,7 +39,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 			}
 			return 0
 		}
-		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) && obj == orig_obj {
+		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(types.AccCallViaTrampoline|types.AccNeverCache) && obj == orig_obj {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), called_scope, fbc)
 		}
 		/* Reset "object" to trigger reference counting */
@@ -292,7 +292,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 			// ZvalPtrDtorNogc(free_op1)
 			return 0
 		}
-		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) && obj == orig_obj {
+		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(types.AccCallViaTrampoline|types.AccNeverCache) && obj == orig_obj {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), called_scope, fbc)
 		}
 		if obj != orig_obj {
@@ -603,7 +603,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 			}
 			return 0
 		}
-		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) && obj == orig_obj {
+		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(types.AccCallViaTrampoline|types.AccNeverCache) && obj == orig_obj {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), called_scope, fbc)
 		}
 		/* Reset "object" to trigger reference counting */
@@ -842,7 +842,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 			}
 			return 0
 		}
-		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) && obj == orig_obj {
+		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(types.AccCallViaTrampoline|types.AccNeverCache) && obj == orig_obj {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), called_scope, fbc)
 		}
 		if obj != orig_obj {

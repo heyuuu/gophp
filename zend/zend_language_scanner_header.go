@@ -129,7 +129,7 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 
 		/* Use heap to not waste arena memory */
 
-		op_array.fn_flags |= AccHeapRtCache
+		op_array.fn_flags |= types.AccHeapRtCache
 		if zend_ast_process {
 			zend_ast_process(CG__().ast)
 		}

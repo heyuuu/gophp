@@ -64,9 +64,9 @@ func (this *FunctionEntry) GetFlags() uint32   { return this.flags }
 
 /* FunctionEntry.flags */
 func (this *FunctionEntry) HasFlags(value uint32) bool { return this.flags&value != 0 }
-func (this FunctionEntry) IsPppMask() bool             { return this.HasFlags(zend.AccPppMask) }
-func (this FunctionEntry) IsAbstract() bool            { return this.HasFlags(zend.AccAbstract) }
-func (this FunctionEntry) IsStatic() bool              { return this.HasFlags(zend.AccStatic) }
+func (this FunctionEntry) IsPppMask() bool             { return this.HasFlags(AccPppMask) }
+func (this FunctionEntry) IsAbstract() bool            { return this.HasFlags(AccAbstract) }
+func (this FunctionEntry) IsStatic() bool              { return this.HasFlags(AccStatic) }
 
 /**
  * ZendFcallInfo

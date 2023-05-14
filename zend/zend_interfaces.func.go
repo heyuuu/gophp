@@ -306,7 +306,7 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 			}
 		}
 	}
-	if class_type.GetParent() && (class_type.GetParent().ce_flags&AccReuseGetIterator) != 0 {
+	if class_type.GetParent() && (class_type.GetParent().ce_flags&types.AccReuseGetIterator) != 0 {
 		class_type.SetGetIterator(class_type.GetParent().get_iterator)
 		class_type.SetIsReuseGetIterator(true)
 	} else {
@@ -351,7 +351,7 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 			return types.FAILURE
 		}
 	}
-	if class_type.GetParent() && (class_type.GetParent().ce_flags&AccReuseGetIterator) != 0 {
+	if class_type.GetParent() && (class_type.GetParent().ce_flags&types.AccReuseGetIterator) != 0 {
 		class_type.SetGetIterator(class_type.GetParent().get_iterator)
 		class_type.SetIsReuseGetIterator(true)
 	} else {

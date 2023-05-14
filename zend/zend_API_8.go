@@ -290,13 +290,13 @@ func ZendDeclareTypedProperty(
 ) int {
 	// calc prop name
 	var propName string
-	if (accessType & AccPublic) != 0 {
-		propName = name.GetStr()
-	} else if (accessType & AccPrivate) != 0 {
+	if accessType&types.AccPrivate != 0 {
 		propName = ZendManglePropertyName_Ex(ce.GetName().GetStr(), name.GetStr())
-	} else {
-		b.Assert((accessType & AccProtected) != 0)
+	} else if accessType&types.AccProtected != 0 {
 		propName = ZendManglePropertyName_Ex("*", name.GetStr())
+	} else { // public
+		//b.Assert(accessType&types.AccPublic != 0 || accessType&types.AccPppMask == 0)
+		propName = name.GetStr()
 	}
 
 	//
@@ -310,10 +310,7 @@ func ZendDeclareTypedProperty(
 	if ce.IsUserClass() && property.IsConstantAst() {
 		ce.SetIsConstantsUpdated(false)
 	}
-	if (accessType & AccPppMask) == 0 {
-		accessType |= AccPublic
-	}
-	if (accessType & AccStatic) != 0 {
+	if propInfo.IsStatic() {
 		propInfoPtr = ce.PropertyTable().Get(name.GetStr())
 		if propInfoPtr != nil && propInfoPtr.IsStatic() {
 			propOffset = propInfoPtr.GetOffset()

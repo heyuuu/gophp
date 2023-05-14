@@ -22,7 +22,7 @@ func SplAddClassName(list *types.Zval, pce *types.ClassEntry, allow int, ceFlags
 func SplAddInterfaces(list *types.Zval, pce *types.ClassEntry, allow int, ce_flags int) {
 	var num_interfaces uint32
 	if pce.GetNumInterfaces() != 0 {
-		b.Assert(pce.HasCeFlags(zend.AccLinked))
+		b.Assert(pce.HasCeFlags(types.AccLinked))
 		for num_interfaces = 0; num_interfaces < pce.GetNumInterfaces(); num_interfaces++ {
 			SplAddClassName(list, pce.GetInterfaces()[num_interfaces], allow, ce_flags)
 		}

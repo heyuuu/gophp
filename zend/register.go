@@ -16,7 +16,7 @@ type ClassDefines struct {
 }
 
 func RegisterInternalInterface(name string, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
-	return _doRegisterInternalClass(name, builtinFunctions, AccInterface)
+	return _doRegisterInternalClass(name, builtinFunctions, types.AccInterface)
 }
 
 func RegisterClass(name string, objCtor objCtorType, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
@@ -60,7 +60,7 @@ func RegisterClassEx(def *ClassDefines) *types.ClassEntry {
 func _doRegisterInternalClass(name string, builtinFunctions []types.FunctionEntry, ceFlags uint32) *types.ClassEntry {
 	var moduleNumber = EG__().GetCurrentModule().GetModuleNumber()
 	var classEntry = types.NewInternalClass(name, moduleNumber)
-	classEntry.SetCeFlags(ceFlags | AccConstantsUpdated | AccLinked | AccResolvedParent | AccResolvedInterfaces)
+	classEntry.SetCeFlags(ceFlags | types.AccConstantsUpdated | types.AccLinked | types.AccResolvedParent | types.AccResolvedInterfaces)
 	if len(builtinFunctions) != 0 {
 		ZendRegisterFunctions(classEntry, builtinFunctions, classEntry.FunctionTable(), EG__().GetCurrentModule().GetType())
 	}

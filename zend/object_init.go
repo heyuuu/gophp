@@ -16,7 +16,7 @@ func ObjectInit(arg *types.Zval) int {
 	return types.SUCCESS
 }
 func _objectAndPropertiesInit(arg *types.Zval, classType *types.ClassEntry, properties *types.Array) int {
-	if classType.HasCeFlags(AccInterface | AccTrait | AccImplicitAbstractClass | AccExplicitAbstractClass) {
+	if classType.HasCeFlags(types.AccInterface | types.AccTrait | types.AccImplicitAbstractClass | types.AccExplicitAbstractClass) {
 		if classType.IsInterface() {
 			faults.ThrowError(nil, "Cannot instantiate interface %s", classType.GetName().GetVal())
 		} else if classType.IsTrait() {

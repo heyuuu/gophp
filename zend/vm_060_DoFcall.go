@@ -12,7 +12,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	var ret *types.Zval
 	var retval types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
-	if fbc.HasFnFlags(AccAbstract | AccDeprecated) {
+	if fbc.HasFnFlags(types.AccAbstract | types.AccDeprecated) {
 		if fbc.IsAbstract() {
 			ZendAbstractMethod(fbc)
 		fcall_except:
@@ -91,7 +91,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var ret *types.Zval
 	var retval types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
-	if fbc.HasFnFlags(AccAbstract | AccDeprecated) {
+	if fbc.HasFnFlags(types.AccAbstract | types.AccDeprecated) {
 		if fbc.IsAbstract() {
 			ZendAbstractMethod(fbc)
 		fcall_except:

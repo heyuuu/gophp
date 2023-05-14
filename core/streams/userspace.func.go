@@ -19,7 +19,7 @@ func StreamWrapperDtor(rsrc *types.ZendResource) {
 	zend.Efree(uwrap)
 }
 func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStreamContext, object *types.Zval) {
-	if uwrap.GetCe().HasCeFlags(zend.AccInterface | zend.AccTrait | zend.AccImplicitAbstractClass | zend.AccExplicitAbstractClass) {
+	if uwrap.GetCe().HasCeFlags(types.AccInterface | types.AccTrait | types.AccImplicitAbstractClass | types.AccExplicitAbstractClass) {
 		object.SetUndef()
 		return
 	}

@@ -48,7 +48,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 				}
 			})
 
-			if (flags & AccChanged) != 0 {
+			if (flags & types.AccChanged) != 0 {
 				for ce.GetParent() && ce.GetParent().default_properties_count {
 					ce = ce.GetParent()
 					ce.PropertyTable().Foreach(func(key string, prop_info *types.PropertyInfo) {
@@ -246,14 +246,14 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 		return ZEND_DYNAMIC_PROPERTY_OFFSET
 	}
 	flags = property_info.GetFlags()
-	if (flags & (AccChanged | AccPrivate | AccProtected)) != 0 {
+	if (flags & (types.AccChanged | types.AccPrivate | types.AccProtected)) != 0 {
 		if EG__().GetFakeScope() != nil {
 			scope = EG__().GetFakeScope()
 		} else {
 			scope = ZendGetExecutedScope()
 		}
 		if property_info.GetCe() != scope {
-			if (flags & AccChanged) != 0 {
+			if (flags & types.AccChanged) != 0 {
 				var p *types.PropertyInfo = ZendGetParentPrivateProperty(scope, ce, member.GetStr())
 
 				/* If there is a public/protected instance property on ce, don't try to use a
@@ -261,11 +261,11 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 				 * property on scope. This will throw a static property notice, rather than
 				 * a visibility error. */
 
-				if p != nil && (!p.IsStatic() || (flags&AccStatic) != 0) {
+				if p != nil && (!p.IsStatic() || (flags&types.AccStatic) != 0) {
 					property_info = p
 					flags = property_info.GetFlags()
 					goto found
-				} else if (flags & AccPublic) != 0 {
+				} else if (flags & types.AccPublic) != 0 {
 					goto found
 				}
 
@@ -275,7 +275,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 				 * a visibility error. */
 
 			}
-			if (flags & AccPrivate) != 0 {
+			if (flags & types.AccPrivate) != 0 {
 				if property_info.GetCe() != ce {
 					goto dynamic
 				} else {
@@ -289,7 +289,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 					return ZEND_WRONG_PROPERTY_OFFSET
 				}
 			} else {
-				b.Assert((flags & AccProtected) != 0)
+				b.Assert((flags & types.AccProtected) != 0)
 				if IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
 					goto wrong
 				}
@@ -297,7 +297,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 		}
 	}
 found:
-	if (flags & AccStatic) != 0 {
+	if (flags & types.AccStatic) != 0 {
 		if silent == 0 {
 			faults.Error(faults.E_NOTICE, "Accessing static property %s::$%s as non static", ce.GetName().GetVal(), member.GetVal())
 		}
@@ -337,7 +337,7 @@ func ZendGetPropertyInfoEx(ce *types.ClassEntry, member string) (_ *types.Proper
 	}
 
 	flags := propInfo.GetFlags()
-	if (flags & (AccChanged | AccPrivate | AccProtected)) != 0 {
+	if (flags & (types.AccChanged | types.AccPrivate | types.AccProtected)) != 0 {
 		var scope *types.ClassEntry
 		if EG__().GetFakeScope() != nil {
 			scope = EG__().GetFakeScope()
@@ -345,22 +345,22 @@ func ZendGetPropertyInfoEx(ce *types.ClassEntry, member string) (_ *types.Proper
 			scope = ZendGetExecutedScope()
 		}
 		if propInfo.GetCe() != scope {
-			if (flags & AccChanged) != 0 {
+			if (flags & types.AccChanged) != 0 {
 				var p = ZendGetParentPrivateProperty(scope, ce, member)
 				if p != nil {
 					return p, false
-				} else if (flags & AccPublic) != 0 {
+				} else if (flags & types.AccPublic) != 0 {
 					return propInfo, false
 				}
 			}
-			if (flags & AccPrivate) != 0 {
+			if (flags & types.AccPrivate) != 0 {
 				if propInfo.GetCe() != ce {
 					return nil, false
 				} else {
 					return nil, true
 				}
 			} else {
-				b.Assert((flags & AccProtected) != 0)
+				b.Assert((flags & types.AccProtected) != 0)
 				if IsProtectedCompatibleScope(propInfo.GetCe(), scope) == 0 {
 					return nil, true
 				}
@@ -1003,7 +1003,7 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 		func_ = Ecalloc(1, b.SizeOf("zend_op_array"))
 	}
 	func_.init()
-	func_.SetFnFlags(AccCallViaTrampoline | AccPublic)
+	func_.SetFnFlags(types.AccCallViaTrampoline | types.AccPublic)
 	if is_static != 0 {
 		func_.SetIsStatic(true)
 	}
@@ -1076,7 +1076,7 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 
 	/* Check access level */
 
-	if fbc.GetOpArray().HasFnFlags(AccChanged | AccPrivate | AccProtected) {
+	if fbc.GetOpArray().HasFnFlags(types.AccChanged | types.AccPrivate | types.AccProtected) {
 		scope = ZendGetExecutedScope()
 		if fbc.GetScope() != scope {
 			if fbc.GetOpArray().IsChanged() {
@@ -1211,7 +1211,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 	/* check if static properties were destroyed */
 
 	if CE_STATIC_MEMBERS(ce) == nil {
-		if ce.IsInternalClass() || ce.HasCeFlags(AccImmutable|AccPreloaded) {
+		if ce.IsInternalClass() || ce.HasCeFlags(types.AccImmutable|types.AccPreloaded) {
 			ZendClassInitStatics(ce)
 		} else {
 		undeclared_property:

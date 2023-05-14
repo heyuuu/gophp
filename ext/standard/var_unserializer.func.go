@@ -371,11 +371,11 @@ func ProcessNestedData(
 					}
 					unmangled = types.NewString(b.CastStr(unmangled_prop, unmangled_prop_len))
 					existing_propinfo = obj.GetCe().PropertyTable().Get(unmangled.GetStr())
-					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(zend.AccPppMask) {
-						if existing_propinfo.HasFlags(zend.AccProtected) {
+					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(types.AccPppMask) {
+						if existing_propinfo.HasFlags(types.AccProtected) {
 							new_key = zend.ZendManglePropertyName_ZStr("*", unmangled.GetStr())
 							// types.ZendStringReleaseEx(unmangled, 0)
-						} else if existing_propinfo.HasFlags(zend.AccPrivate) {
+						} else if existing_propinfo.HasFlags(types.AccPrivate) {
 							if unmangled_class != nil && strcmp(unmangled_class, "*") != 0 {
 								new_key = zend.ZendManglePropertyName_ZStr(unmangled_class, unmangled.GetStr())
 							} else {
@@ -383,7 +383,7 @@ func ProcessNestedData(
 							}
 							// types.ZendStringReleaseEx(unmangled, 0)
 						} else {
-							b.Assert(existing_propinfo.HasFlags(zend.AccPublic))
+							b.Assert(existing_propinfo.HasFlags(types.AccPublic))
 							new_key = unmangled
 						}
 

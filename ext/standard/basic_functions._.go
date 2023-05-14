@@ -315,7 +315,7 @@ var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	DefZifIsInteger,
 	DefZifIsLong,
 	DefZifIsDouble,
-	types.MakeZendFunctionEntryEx("is_real", zend.AccDeprecated, ZifIsFloat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+	types.MakeZendFunctionEntryEx("is_real", types.AccDeprecated, ZifIsFloat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("var"),
 	}),
 	DefZifIsNumeric,

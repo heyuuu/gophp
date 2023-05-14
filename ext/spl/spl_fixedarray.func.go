@@ -700,6 +700,6 @@ func ZmStartupSplFixedarray(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_SplFixedArray, 1, spl_ce_ArrayAccess)
 	zend.ZendClassImplements(spl_ce_SplFixedArray, 1, spl_ce_Countable)
 	spl_ce_SplFixedArray.SetGetIterator(SplFixedarrayGetIterator)
-	spl_ce_SplFixedArray.AddCeFlags(zend.AccReuseGetIterator)
+	spl_ce_SplFixedArray.AddCeFlags(types.AccReuseGetIterator)
 	return types.SUCCESS
 }

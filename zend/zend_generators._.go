@@ -16,16 +16,16 @@ var ZendGeneratorHandlers types.ObjectHandlers
 
 var ZendGeneratorIteratorFunctions ZendObjectIteratorFuncs = MakeZendObjectIteratorFuncs(ZendGeneratorIteratorDtor, ZendGeneratorIteratorValid, ZendGeneratorIteratorGetData, ZendGeneratorIteratorGetKey, ZendGeneratorIteratorMoveForward, ZendGeneratorIteratorRewind, nil)
 var GeneratorFunctions []types.FunctionEntry = []types.FunctionEntry{
-	types.MakeZendFunctionEntryEx("rewind", AccPublic, zim_Generator_rewind, []ArgInfo{MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("valid", AccPublic, zim_Generator_valid, []ArgInfo{MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("current", AccPublic, zim_Generator_current, []ArgInfo{MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("key", AccPublic, zim_Generator_key, []ArgInfo{MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("next", AccPublic, zim_Generator_next, []ArgInfo{MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("send", AccPublic, zim_Generator_send, []ArgInfo{MakeReturnArgInfo(1),
+	types.MakeZendFunctionEntryEx("rewind", types.AccPublic, zim_Generator_rewind, []ArgInfo{MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("valid", types.AccPublic, zim_Generator_valid, []ArgInfo{MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("current", types.AccPublic, zim_Generator_current, []ArgInfo{MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("key", types.AccPublic, zim_Generator_key, []ArgInfo{MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("next", types.AccPublic, zim_Generator_next, []ArgInfo{MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("send", types.AccPublic, zim_Generator_send, []ArgInfo{MakeReturnArgInfo(1),
 		MakeArgName("value"),
 	}),
-	types.MakeZendFunctionEntryEx("throw", AccPublic, zim_Generator_throw, []ArgInfo{MakeReturnArgInfo(1),
+	types.MakeZendFunctionEntryEx("throw", types.AccPublic, zim_Generator_throw, []ArgInfo{MakeReturnArgInfo(1),
 		MakeArgName("exception"),
 	}),
-	types.MakeZendFunctionEntryEx("getReturn", AccPublic, zim_Generator_getReturn, []ArgInfo{MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("getReturn", types.AccPublic, zim_Generator_getReturn, []ArgInfo{MakeReturnArgInfo(-1)}),
 }

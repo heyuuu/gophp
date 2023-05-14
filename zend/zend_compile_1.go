@@ -377,9 +377,9 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	}
 }
 func ZendVerifyCtConstAccess(c *types.ClassConstant, scope *types.ClassEntry) types.ZendBool {
-	if (c.GetValue().GetAccessFlags() & AccPublic) != 0 {
+	if (c.GetValue().GetAccessFlags() & types.AccPublic) != 0 {
 		return 1
-	} else if (c.GetValue().GetAccessFlags() & AccPrivate) != 0 {
+	} else if (c.GetValue().GetAccessFlags() & types.AccPrivate) != 0 {
 		return c.GetCe() == scope
 	} else {
 		var ce = c.GetCe()

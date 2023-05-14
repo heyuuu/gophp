@@ -23,7 +23,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -130,7 +130,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -235,7 +235,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -340,7 +340,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -437,7 +437,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -542,7 +542,7 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -642,7 +642,7 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -740,7 +740,7 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -838,7 +838,7 @@ func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -928,7 +928,7 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -1025,7 +1025,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -1122,7 +1122,7 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -1217,7 +1217,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -1312,7 +1312,7 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -1399,7 +1399,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op1 ZendFreeOp
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -1900,7 +1900,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -1999,7 +1999,7 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -2096,7 +2096,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -2193,7 +2193,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -2282,7 +2282,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccReturnReference) != 0 {
+		if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */

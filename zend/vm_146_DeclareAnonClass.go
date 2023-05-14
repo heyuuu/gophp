@@ -16,7 +16,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		ce = EG__().ClassTable().Get(rtd_key)
 		if ce == nil {
 			for {
-				b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & AccPreloaded) != 0)
+				b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccPreloaded) != 0)
 				if ZendPreloadAutoload != nil && ZendPreloadAutoload(executeData.GetFunc().GetOpArray().GetFilename()) == types.SUCCESS {
 					ce = EG__().ClassTable().Get(rtd_key)
 					if ce != nil {

@@ -1474,7 +1474,7 @@ func ZmStartupSplArray(type_ int, module_number int) int {
 
 	memcpy(&spl_handler_ArrayIterator, &spl_handler_ArrayObject, b.SizeOf("zend_object_handlers"))
 	spl_ce_ArrayIterator.SetGetIterator(SplArrayGetIterator)
-	spl_ce_ArrayIterator.AddCeFlags(zend.AccReuseGetIterator)
+	spl_ce_ArrayIterator.AddCeFlags(types.AccReuseGetIterator)
 	zend.ZendDeclareClassConstantLong(spl_ce_ArrayObject, "STD_PROP_LIST", zend.ZendLong(SPL_ARRAY_STD_PROP_LIST))
 	zend.ZendDeclareClassConstantLong(spl_ce_ArrayObject, "ARRAY_AS_PROPS", zend.ZendLong(SPL_ARRAY_ARRAY_AS_PROPS))
 	zend.ZendDeclareClassConstantLong(spl_ce_ArrayIterator, "STD_PROP_LIST", zend.ZendLong(SPL_ARRAY_STD_PROP_LIST))
@@ -1483,7 +1483,7 @@ func ZmStartupSplArray(type_ int, module_number int) int {
 	spl_ce_RecursiveArrayIterator = zend.RegisterSubClass(spl_ce_ArrayIterator, "RecursiveArrayIterator", SplArrayObjectNew, spl_funcs_RecursiveArrayIterator)
 	zend.ZendClassImplements(spl_ce_RecursiveArrayIterator, 1, spl_ce_RecursiveIterator)
 	spl_ce_RecursiveArrayIterator.SetGetIterator(SplArrayGetIterator)
-	spl_ce_RecursiveArrayIterator.AddCeFlags(zend.AccReuseGetIterator)
+	spl_ce_RecursiveArrayIterator.AddCeFlags(types.AccReuseGetIterator)
 	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveArrayIterator, "CHILD_ARRAYS_ONLY", zend.ZendLong(SPL_ARRAY_CHILD_ARRAYS_ONLY))
 
 	return types.SUCCESS

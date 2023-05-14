@@ -2654,7 +2654,7 @@ func ZmStartupSplIterators(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_IteratorIterator, 1, zend.ZendCeIterator)
 	zend.ZendClassImplements(spl_ce_IteratorIterator, 1, spl_ce_OuterIterator)
 	spl_ce_FilterIterator = zend.RegisterSubClass(spl_ce_IteratorIterator, "FilterIterator", SplDualItNew, spl_funcs_FilterIterator)
-	spl_ce_FilterIterator.AddCeFlags(zend.AccExplicitAbstractClass)
+	spl_ce_FilterIterator.AddCeFlags(types.AccExplicitAbstractClass)
 	spl_ce_RecursiveFilterIterator = zend.RegisterSubClass(spl_ce_FilterIterator, "RecursiveFilterIterator", SplDualItNew, spl_funcs_RecursiveFilterIterator)
 	zend.ZendClassImplements(spl_ce_RecursiveFilterIterator, 1, spl_ce_RecursiveIterator)
 	spl_ce_CallbackFilterIterator = zend.RegisterSubClass(spl_ce_FilterIterator, "CallbackFilterIterator", SplDualItNew, spl_funcs_CallbackFilterIterator)

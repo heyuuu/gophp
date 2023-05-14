@@ -38,7 +38,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 		} else {
 		recv_init_check_type:
-			if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccHasTypeHints) != 0 {
+			if (executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccHasTypeHints) != 0 {
 				var default_value *types.Zval = opline.Const2()
 				if ZendVerifyRecvArgType(executeData.GetFunc(), arg_num, param, default_value, CACHE_ADDR(opline.GetExtendedValue())) == 0 {
 					return 0
