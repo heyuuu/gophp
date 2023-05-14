@@ -20,16 +20,17 @@ func ZendObjectAlloc(obj_size int, ce *types.ClassEntry) any {
 	memset(obj, 0, obj_size-b.SizeOf("zval"))
 	return obj
 }
+
 func ZendGetPropertyInfoForSlot(obj *types.ZendObject, slot *types.Zval) *ZendPropertyInfo {
-	var table **ZendPropertyInfo = obj.GetCe().GetPropertiesInfoTable()
-	var prop_num intPtr = slot - obj.GetPropertiesTable()
-	b.Assert(prop_num >= 0 && prop_num < obj.GetCe().GetDefaultPropertiesCount())
-	return table[prop_num]
+	ce := obj.GetCe()
+	propNum := slot - obj.GetPropertiesTable()
+	return ce.GetPropertyInfo(propNum)
 }
+
 func ZendGetTypedPropertyInfoForSlot(obj *types.ZendObject, slot *types.Zval) *ZendPropertyInfo {
-	var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(obj, slot)
-	if prop_info != nil && prop_info.GetType() != 0 {
-		return prop_info
+	var propInfo *ZendPropertyInfo = ZendGetPropertyInfoForSlot(obj, slot)
+	if propInfo != nil && propInfo.GetType() != 0 {
+		return propInfo
 	}
 	return nil
 }

@@ -1465,7 +1465,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 		}
 	}
 exit:
-	//ZendTmpStringRelease(tmp_name)
+	//ZendTmpStringRelease(tmp_namo *
 	return result
 }
 func ZendStdGetClassName(zobj *types.ZendObject) *types.String {

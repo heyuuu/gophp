@@ -1,6 +1,7 @@
 package types
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -129,6 +130,12 @@ func (ce *ClassEntry) ModuleNumber() int { return ce.moduleNumber }
 func (ce *ClassEntry) FunctionTable() FunctionTable       { return ce.functionTable }
 func (ce *ClassEntry) PropertyTable() PropertyTable       { return ce.propertyTable }
 func (ce *ClassEntry) ConstantsTable() ClassConstantTable { return ce.constantTable }
+
+// methods
+func (ce *ClassEntry) GetPropertyInfo(propNum int) *zend.ZendPropertyInfo {
+	b.Assert(0 <= propNum && propNum < ce.GetDefaultPropertiesCount())
+	return ce.GetPropertiesInfoTable()[propNum]
+}
 
 /**
  * Getter / Setter

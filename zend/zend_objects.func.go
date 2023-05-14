@@ -14,36 +14,34 @@ func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
 	handle := EG__().NextObjectHandle()
 	object.Init(ce, handle)
 }
-func ZendObjectStdDtor(object *types.ZendObject) {
-	var p *types.Zval
-	var end *types.Zval
-	p = object.GetPropertiesTable()
-	if object.GetCe().GetDefaultPropertiesCount() != 0 {
-		end = p + object.GetCe().GetDefaultPropertiesCount()
-		for {
-			if p.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(p.Reference()) {
-				var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(object, p)
-				if prop_info.GetType() != 0 {
-					ZEND_REF_DEL_TYPE_SOURCE(p.Reference(), prop_info)
+
+func ZendObjectStdDtorEx(properties []types.Zval, ce *types.ClassEntry) {
+	defaultPropertiesCount := ce.GetDefaultPropertiesCount()
+	if defaultPropertiesCount != 0 {
+		for propNum := range properties[:defaultPropertiesCount] {
+			prop := &properties[propNum]
+			if prop.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(prop.Reference()) {
+				var propInfo = ce.GetPropertyInfo(propNum)
+				if propInfo.GetType() != 0 {
+					ZEND_REF_DEL_TYPE_SOURCE(prop.Reference(), propInfo)
 				}
-			}
-			p++
-			if p == end {
-				break
 			}
 		}
 	}
-	if object.GetCe().IsUseGuards() {
-		if p.IsString() {
 
-		} else if p.IsArray() {
-			var guards *types.Array
-			guards = p.Array()
+	if ce.IsUseGuards() {
+		p := &properties[defaultPropertiesCount]
+		if p.IsArray() {
+			guards := p.Array()
 			b.Assert(guards != nil)
 			guards.Destroy()
 			FREE_HASHTABLE(guards)
 		}
 	}
+}
+
+func ZendObjectStdDtor(object *types.ZendObject) {
+	ZendObjectStdDtorEx(object.GetPropertiesTable(), object.GetCe())
 }
 func ZendObjectsDestroyObject(object *types.ZendObject) {
 	var destructor types.IFunction = object.GetCe().GetDestructor()
@@ -209,7 +207,6 @@ func ZendObjectsCloneObj(zobject *types.Zval) *types.ZendObject {
 	new_object = ZendObjectsNew(old_object.GetCe())
 
 	/* zend_objects_clone_members() expect the properties to be initialized. */
-
 	if new_object.GetCe().GetDefaultPropertiesCount() != 0 {
 		var p *types.Zval = new_object.GetPropertiesTable()
 		var end *types.Zval = p + new_object.GetCe().GetDefaultPropertiesCount()
