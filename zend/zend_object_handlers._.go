@@ -4,7 +4,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 )
 
-const ZEND_WRONG_PROPERTY_INFO *ZendPropertyInfo = (*ZendPropertyInfo)(intptr_t - 1)
 const ZEND_DYNAMIC_PROPERTY_OFFSET = uintPtr(intptr_t)(-1)
 
 /* Used to get hash of the properties of the object, as hash of zval's */

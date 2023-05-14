@@ -31,22 +31,18 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 					if class_name != nil && class_name[0] != '*' {
 						var cname *types.String = types.NewString(class_name)
 						EG__().SetFakeScope(ZendLookupClass(cname))
-						// types.ZendStringReleaseEx(cname, 0)
 					}
-					property_info = ZendGetPropertyInfo(object.GetCe(), pname, 1)
-					// types.ZendStringReleaseEx(pname, 0)
+					property_info = ZendGetPropertyInfo(object.GetCe(), pname.GetStr())
 					EG__().SetFakeScope(prev_scope)
 				} else {
-					property_info = ZEND_WRONG_PROPERTY_INFO
+					property_info = nil
 				}
 			} else {
-				property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
+				property_info = ZendGetPropertyInfo(object.GetCe(), key.GetStr())
 			}
-			if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
+			if property_info != nil && !property_info.IsStatic() {
 				var slot *types.Zval = OBJ_PROP(object, property_info.GetOffset())
-				// ZvalPtrDtor(slot)
 				slot.CopyValueFrom(prop)
-				//ZvalAddRef(slot)
 				if object.GetProperties() != nil {
 					tmp.SetIndirect(slot)
 					object.GetProperties().KeyUpdate(key.GetStr(), &tmp)
@@ -56,7 +52,6 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 					RebuildObjectProperties(object)
 				}
 				prop = object.GetProperties().KeyUpdate(key.GetStr(), prop)
-				//ZvalAddRef(prop)
 			}
 		} else {
 			if object.GetProperties() == nil {

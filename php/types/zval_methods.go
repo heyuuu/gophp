@@ -20,6 +20,18 @@ func (zv *Zval) CopyOrDupFrom(v *Zval) {
 	}
 }
 
+// ZVAL_COPY_PROP
+func (zv *Zval) CopyPropFrom(v *Zval) {
+	zv.CopyFrom(v)
+	zv.u2 = v.u2
+}
+
+// ZVAL_COPY_OR_DUP_PROP
+func (zv *Zval) CopyOrDupPropFrom(v *Zval) {
+	zv.CopyOrDupFrom(v)
+	zv.u2 = v.u2
+}
+
 // ZVAL_DEREF(zv)
 func (zv *Zval) DeRef() *Zval {
 	if zv.IsReference() {

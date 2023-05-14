@@ -72,11 +72,11 @@ func (o *ZendObject) propertiesInit() {
 		dst := o.propertiesTable
 		if o.ce.IsInternalClass() {
 			for i := 0; i < defaultPropertiesCount; i++ {
-				ZVAL_COPY_OR_DUP_PROP(&dst[i], &src[i])
+				dst[i].CopyOrDupPropFrom(&src[i])
 			}
 		} else {
 			for i := 0; i < defaultPropertiesCount; i++ {
-				ZVAL_COPY_PROP(&dst[i], &src[i])
+				dst[i].CopyPropFrom(&src[i])
 			}
 		}
 	}
@@ -87,8 +87,8 @@ func (o *ZendObject) propertiesInitEx(properties *Array) {
 	defaultPropertiesCount := o.ce.GetDefaultPropertiesCount()
 	if defaultPropertiesCount != 0 {
 		properties.Foreach(func(key_ ArrayKey, prop *Zval) {
-			propertyInfo := zend.ZendGetPropertyInfo(o.GetCe(), key_.StrKey(), 1)
-			if propertyInfo != zend.ZEND_WRONG_PROPERTY_INFO && propertyInfo != nil && !propertyInfo.IsStatic() {
+			propertyInfo := zend.ZendGetPropertyInfo(o.GetCe(), key_.StrKey())
+			if propertyInfo != nil && !propertyInfo.IsStatic() {
 				var slot *Zval = zend.OBJ_PROP(o, propertyInfo.GetOffset())
 				if propertyInfo.GetType() != 0 {
 					var tmp Zval

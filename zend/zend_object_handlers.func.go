@@ -208,10 +208,10 @@ func IsDerivedClass(child_class *types.ClassEntry, parent_class *types.ClassEntr
 func IsProtectedCompatibleScope(ce *types.ClassEntry, scope *types.ClassEntry) int {
 	return scope != nil && (IsDerivedClass(ce, scope) != 0 || IsDerivedClass(scope, ce) != 0)
 }
-func ZendGetParentPrivateProperty(scope *types.ClassEntry, ce *types.ClassEntry, member *types.String) *ZendPropertyInfo {
+func ZendGetParentPrivateProperty(scope *types.ClassEntry, ce *types.ClassEntry, member string) *ZendPropertyInfo {
 	var prop_info *ZendPropertyInfo
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
-		prop_info = scope.PropertyTable().Get(member.GetStr())
+		prop_info = scope.PropertyTable().Get(member)
 		if prop_info != nil {
 			if prop_info.IsPrivate() && prop_info.GetCe() == scope {
 				return prop_info
@@ -220,8 +220,9 @@ func ZendGetParentPrivateProperty(scope *types.ClassEntry, ce *types.ClassEntry,
 	}
 	return nil
 }
-func ZendBadPropertyAccess(property_info *ZendPropertyInfo, ce *types.ClassEntry, member *types.String) {
-	faults.ThrowError(nil, "Cannot access %s property %s::$%s", ZendVisibilityString(property_info.GetFlags()), ce.GetName().GetVal(), member.GetVal())
+
+func ZendBadPropertyAccess(propInfo *ZendPropertyInfo, ce *types.ClassEntry, member string) {
+	faults.ThrowError(nil, "Cannot access %s property %s::$%s", ZendVisibilityString(propInfo.GetFlags()), ce.GetName().GetVal(), member)
 }
 func ZendBadPropertyName() {
 	faults.ThrowError(nil, "Cannot access property started with '\\0'")
@@ -258,7 +259,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 		}
 		if property_info.GetCe() != scope {
 			if (flags & AccChanged) != 0 {
-				var p *ZendPropertyInfo = ZendGetParentPrivateProperty(scope, ce, member)
+				var p *ZendPropertyInfo = ZendGetParentPrivateProperty(scope, ce, member.GetStr())
 
 				/* If there is a public/protected instance property on ce, don't try to use a
 				 * private static property on scope. If both are static, prefer the static
@@ -288,7 +289,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 					/* Information was available, but we were denied access.  Error out. */
 
 					if silent == 0 {
-						ZendBadPropertyAccess(property_info, ce, member)
+						ZendBadPropertyAccess(property_info, ce, member.GetStr())
 					}
 					return ZEND_WRONG_PROPERTY_OFFSET
 				}
@@ -325,66 +326,54 @@ func ZendWrongOffset(ce *types.ClassEntry, member *types.String) {
 	/* Trigger the correct error */
 	ZendGetPropertyOffset(ce, member, 0, nil, &dummy)
 }
-func ZendGetPropertyInfo(ce *types.ClassEntry, member *types.String, silent int) *ZendPropertyInfo {
-	var property_info *ZendPropertyInfo
-	var flags uint32
-	var scope *types.ClassEntry
-	if ce.PropertyTable().Len() == 0 || b.Assign(&property_info, ce.PropertyTable().Get(member.GetStr())) == nil {
-		if member.GetStr()[0] == '0' && member.GetLen() != 0 {
-			if silent == 0 {
-				ZendBadPropertyName()
-			}
-			return ZEND_WRONG_PROPERTY_INFO
+
+func ZendGetPropertyInfo(ce *types.ClassEntry, member string) *ZendPropertyInfo {
+	propInfo, _ := ZendGetPropertyInfoEx(ce, member)
+	return propInfo
+}
+
+func ZendGetPropertyInfoEx(ce *types.ClassEntry, member string) (_ *ZendPropertyInfo, forbidden bool) {
+	propInfo := ce.PropertyTable().Get(member)
+	if propInfo == nil {
+		if member != "" && member[0] == '\x00' {
+			return nil, true
 		}
-	dynamic:
-		return nil
+		return nil, false
 	}
-	flags = property_info.GetFlags()
+
+	flags := propInfo.GetFlags()
 	if (flags & (AccChanged | AccPrivate | AccProtected)) != 0 {
+		var scope *types.ClassEntry
 		if EG__().GetFakeScope() != nil {
 			scope = EG__().GetFakeScope()
 		} else {
 			scope = ZendGetExecutedScope()
 		}
-		if property_info.GetCe() != scope {
+		if propInfo.GetCe() != scope {
 			if (flags & AccChanged) != 0 {
-				var p *ZendPropertyInfo = ZendGetParentPrivateProperty(scope, ce, member)
+				var p = ZendGetParentPrivateProperty(scope, ce, member)
 				if p != nil {
-					property_info = p
-					flags = property_info.GetFlags()
-					goto found
+					return p, false
 				} else if (flags & AccPublic) != 0 {
-					goto found
+					return propInfo, false
 				}
 			}
 			if (flags & AccPrivate) != 0 {
-				if property_info.GetCe() != ce {
-					goto dynamic
+				if propInfo.GetCe() != ce {
+					return nil, false
 				} else {
-				wrong:
-
-					/* Information was available, but we were denied access.  Error out. */
-
-					if silent == 0 {
-						ZendBadPropertyAccess(property_info, ce, member)
-					}
-					return ZEND_WRONG_PROPERTY_INFO
+					return nil, true
 				}
 			} else {
 				b.Assert((flags & AccProtected) != 0)
-				if IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
-					goto wrong
+				if IsProtectedCompatibleScope(propInfo.GetCe(), scope) == 0 {
+					return nil, true
 				}
 			}
 		}
 	}
-found:
-	if (flags & AccStatic) != 0 {
-		if silent == 0 {
-			faults.Error(faults.E_NOTICE, "Accessing static property %s::$%s as non static", ce.GetName().GetVal(), member.GetVal())
-		}
-	}
-	return property_info
+
+	return propInfo, false
 }
 func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.String, is_dynamic types.ZendBool) int {
 	var property_info *ZendPropertyInfo
@@ -398,9 +387,8 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.Strin
 		}
 		ZendUnmanglePropertyNameEx(prop_info_name, &class_name, &prop_name, &prop_name_len)
 		member = types.NewString(b.CastStr(prop_name, prop_name_len))
-		property_info = ZendGetPropertyInfo(zobj.GetCe(), member, 1)
-		// types.ZendStringReleaseEx(member, 0)
-		if property_info == nil || property_info == ZEND_WRONG_PROPERTY_INFO {
+		property_info = ZendGetPropertyInfo(zobj.GetCe(), member.GetStr())
+		if property_info == nil {
 			return types.FAILURE
 		}
 		if class_name[0] != '*' {
@@ -426,14 +414,14 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.Strin
 		}
 		return types.SUCCESS
 	} else {
-		property_info = ZendGetPropertyInfo(zobj.GetCe(), prop_info_name, 1)
-		if property_info == nil {
+		propertyInfo, forbidden := ZendGetPropertyInfoEx(zobj.GetCe(), prop_info_name.GetStr())
+		if forbidden {
+			return types.FAILURE
+		} else if propertyInfo == nil {
 			b.Assert(is_dynamic != 0)
 			return types.SUCCESS
-		} else if property_info == ZEND_WRONG_PROPERTY_INFO {
-			return types.FAILURE
 		}
-		if property_info.IsPublic() {
+		if propertyInfo.IsPublic() {
 			return types.SUCCESS
 		} else {
 			return types.FAILURE
@@ -1220,7 +1208,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 		if property_info.GetCe() != scope {
 			if property_info.IsPrivate() || IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
 				if type_ != BP_VAR_IS {
-					ZendBadPropertyAccess(property_info, ce, property_name)
+					ZendBadPropertyAccess(property_info, ce, property_name.GetStr())
 				}
 				return nil
 			}
