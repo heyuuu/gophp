@@ -111,16 +111,15 @@ func SplFilesystemObjectFreeStorage(object *types.ZendObject) {
 	}
 }
 func SplFilesystemObjectNewEx(class_type *types.ClassEntry) *types.ZendObject {
-	var intern *SplFilesystemObject = NewSplFilesystemObject(class_type)
+	var intern = NewSplFilesystemObject(class_type, &SplFilesystemObjectHandlers)
 	return intern.GetStd()
 }
 func SplFilesystemObjectNew(class_type *types.ClassEntry) *types.ZendObject {
 	return SplFilesystemObjectNewEx(class_type)
 }
 func SplFilesystemObjectNewCheck(class_type *types.ClassEntry) *types.ZendObject {
-	var ret *SplFilesystemObject = SplFilesystemFromObj(SplFilesystemObjectNewEx(class_type))
-	ret.GetStd().SetHandlers(&SplFilesystemObjectCheckHandlers)
-	return ret.GetStd()
+	var intern = NewSplFilesystemObject(class_type, &SplFilesystemObjectCheckHandlers)
+	return intern.GetStd()
 }
 func SplFilesystemObjectGetPath(intern *SplFilesystemObject, len_ *int) *byte {
 	if intern.GetType() == SPL_FS_DIR {

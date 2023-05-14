@@ -106,12 +106,11 @@ func (o *ZendObject) propertiesInitEx(properties *Array) {
 	}
 }
 
-func (o *ZendObject) GetHandle() uint                   { return o.handle }
-func (o *ZendObject) GetCe() *ClassEntry                { return o.ce }
-func (o *ZendObject) GetHandlers() *ObjectHandlers      { return o.handlers }
-func (o *ZendObject) SetHandlers(value *ObjectHandlers) { o.handlers = value }
-func (o *ZendObject) GetProperties() *Array             { return o.properties }
-func (o *ZendObject) SetProperties(value *Array)        { o.properties = value }
+func (o *ZendObject) GetHandle() uint              { return o.handle }
+func (o *ZendObject) GetCe() *ClassEntry           { return o.ce }
+func (o *ZendObject) GetHandlers() *ObjectHandlers { return o.handlers }
+func (o *ZendObject) GetProperties() *Array        { return o.properties }
+func (o *ZendObject) SetProperties(value *Array)   { o.properties = value }
 func (o *ZendObject) DupProperties() {
 	o.properties = o.properties.LazyDup()
 }

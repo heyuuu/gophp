@@ -100,7 +100,7 @@ type SplFilesystemObject struct {
 	std *types.ZendObject
 }
 
-func NewSplFilesystemObject(ce *types.ClassEntry) *SplFilesystemObject {
+func NewSplFilesystemObject(ce *types.ClassEntry, handlers *types.ObjectHandlers) *SplFilesystemObject {
 	return &SplFilesystemObject{
 		std: types.NewObject(ce, &SplFilesystemObjectHandlers),
 
