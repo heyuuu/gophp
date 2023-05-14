@@ -58,7 +58,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 								zobj.GetProperties().MarkHasEmptyIndex()
 							}
 							zv.SetIndirect(OBJ_PROP(zobj, prop_info.GetOffset()))
-							zobj.GetProperties().KeyAdd(prop_info.GetName().GetStr(), &zv)
+							zobj.GetProperties().KeyAdd(prop_info.GetName(), &zv)
 						}
 					})
 				}
@@ -388,21 +388,11 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.Strin
 		}
 		if class_name[0] != '*' {
 			if !property_info.IsPrivate() {
-
 				/* we we're looking for a private prop but found a non private one of the same name */
-
 				return types.FAILURE
-
-				/* we we're looking for a private prop but found a non private one of the same name */
-
-			} else if strcmp(prop_info_name.GetVal()+1, property_info.GetName().GetVal()+1) {
-
+			} else if prop_info_name.GetStr()[1:] != property_info.GetName()[1:] {
 				/* we we're looking for a private prop but found a private one of the same name but another class */
-
 				return types.FAILURE
-
-				/* we we're looking for a private prop but found a private one of the same name but another class */
-
 			}
 		} else {
 			b.Assert(property_info.IsProtected())

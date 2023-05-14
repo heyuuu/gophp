@@ -284,67 +284,67 @@ func ZendDeclareTypedProperty(
 	ce *types.ClassEntry,
 	name *types.String,
 	property *types.Zval,
-	access_type int,
-	doc_comment *types.String,
-	type_ types.ZendType,
+	accessType uint32,
+	docComment *string,
+	typ types.ZendType,
 ) int {
-	var property_info *types.PropertyInfo
-	var property_info_ptr *types.PropertyInfo
-	if type_.IsSet() {
+	// calc prop name
+	var propName string
+	if (accessType & AccPublic) != 0 {
+		propName = name.GetStr()
+	} else if (accessType & AccPrivate) != 0 {
+		propName = ZendManglePropertyName_Ex(ce.GetName().GetStr(), name.GetStr())
+	} else {
+		b.Assert((accessType & AccProtected) != 0)
+		propName = ZendManglePropertyName_Ex("*", name.GetStr())
+	}
+
+	//
+	var propInfo = types.NewPropertyInfo(0, accessType, propName, docComment, ce, typ)
+	var propInfoPtr *types.PropertyInfo
+	var propOffset uint32 = 0
+
+	if typ.IsSet() {
 		ce.SetIsHasTypeHints(true)
 	}
-	if ce.IsInternalClass() {
-		property_info = Pemalloc(b.SizeOf("zend_property_info"))
-	} else {
-		property_info = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_property_info"))
-		if property.IsConstantAst() {
-			ce.SetIsConstantsUpdated(false)
-		}
+	if ce.IsUserClass() && property.IsConstantAst() {
+		ce.SetIsConstantsUpdated(false)
 	}
-	//if property.IsString() {
-	//	ZvalMakeInternedString(property)
-	//}
-	if (access_type & AccPppMask) == 0 {
-		access_type |= AccPublic
+	if (accessType & AccPppMask) == 0 {
+		accessType |= AccPublic
 	}
-	if (access_type & AccStatic) != 0 {
-		property_info_ptr = ce.PropertyTable().Get(name.GetStr())
-		if property_info_ptr != nil && property_info_ptr.IsStatic() {
-			property_info.SetOffset(property_info_ptr.GetOffset())
-			// ZvalPtrDtor(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()])
+	if (accessType & AccStatic) != 0 {
+		propInfoPtr = ce.PropertyTable().Get(name.GetStr())
+		if propInfoPtr != nil && propInfoPtr.IsStatic() {
+			propOffset = propInfoPtr.GetOffset()
 			ce.PropertyTable().Del(name.GetStr())
 		} else {
 			ce.GetDefaultStaticMembersCount()++
-			property_info.SetOffset(ce.GetDefaultStaticMembersCount() - 1)
+			propOffset = ce.GetDefaultStaticMembersCount() - 1
 			ce.SetDefaultStaticMembersTable(Perealloc(ce.GetDefaultStaticMembersTable(), b.SizeOf("zval")*ce.GetDefaultStaticMembersCount()))
 		}
-		types.ZVAL_COPY_VALUE(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()], property)
+		types.ZVAL_COPY_VALUE(ce.GetDefaultStaticMembersTable()[propOffset], property)
 		if ce.GetStaticMembersTablePtr() == nil {
 			b.Assert(ce.IsInternalClass())
 			if CurrEX() == nil {
 				ZEND_MAP_PTR_NEW(ce.static_members_table)
 			} else {
-
 				/* internal class loaded by dl() */
-
 				ZEND_MAP_PTR_INIT(ce.static_members_table, ce.GetDefaultStaticMembersTable())
-
-				/* internal class loaded by dl() */
-
 			}
 		}
 	} else {
 		var property_default_ptr *types.Zval
-		property_info_ptr = ce.PropertyTable().Get(name.GetStr())
-		if property_info_ptr != nil && !property_info_ptr.IsStatic() {
-			property_info.SetOffset(property_info_ptr.GetOffset())
+		propInfoPtr = ce.PropertyTable().Get(name.GetStr())
+		if propInfoPtr != nil && !propInfoPtr.IsStatic() {
+			propOffset = propInfoPtr.GetOffset()
 			// ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
 			ce.PropertyTable().Del(name.GetStr())
 			b.Assert(ce.IsInternalClass())
 			b.Assert(ce.GetPropertiesInfoTable() != nil)
-			ce.GetPropertiesInfoTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())] = property_info
+			ce.GetPropertiesInfoTable()[OBJ_PROP_TO_NUM(propOffset)] = propInfo
 		} else {
-			property_info.SetOffset(OBJ_PROP_TO_OFFSET(ce.GetDefaultPropertiesCount()))
+			propOffset = OBJ_PROP_TO_OFFSET(ce.GetDefaultPropertiesCount())
 			ce.GetDefaultPropertiesCount()++
 			ce.SetDefaultPropertiesTable(Perealloc(ce.GetDefaultPropertiesTable(), b.SizeOf("zval")*ce.GetDefaultPropertiesCount()))
 
@@ -352,13 +352,10 @@ func ZendDeclareTypedProperty(
 
 			if ce.IsInternalClass() {
 				ce.SetPropertiesInfoTable(Perealloc(ce.GetPropertiesInfoTable(), b.SizeOf("zend_property_info *")*ce.GetDefaultPropertiesCount()))
-				ce.GetPropertiesInfoTable()[ce.GetDefaultPropertiesCount()-1] = property_info
+				ce.GetPropertiesInfoTable()[ce.GetDefaultPropertiesCount()-1] = propInfo
 			}
-
-			/* For user classes this is handled during linking */
-
 		}
-		property_default_ptr = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
+		property_default_ptr = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(propOffset)]
 		property_default_ptr.CopyValueFrom(property)
 		if property.IsUndef() {
 			property_default_ptr.SetU2Extra(types.IS_PROP_UNINIT)
@@ -368,40 +365,13 @@ func ZendDeclareTypedProperty(
 	}
 	if ce.IsInternalClass() {
 		switch property.GetType() {
-		case types.IS_ARRAY:
-
-		case types.IS_OBJECT:
-
-		case types.IS_RESOURCE:
+		case types.IS_ARRAY, types.IS_OBJECT, types.IS_RESOURCE:
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Internal zval's can't be arrays, objects or resources")
-			break
-		default:
-			break
 		}
-
-		/* Must be interned to avoid ZTS data races */
-
-		//if IsPersistentClass(ce) != 0 {
-		//	name = types.ZendNewInternedString(name.Copy())
-		//}
-
-		/* Must be interned to avoid ZTS data races */
-
 	}
-	if (access_type & AccPublic) != 0 {
-		property_info.SetName(name.Copy())
-	} else if (access_type & AccPrivate) != 0 {
-		property_info.SetName(ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr()))
-	} else {
-		b.Assert((access_type & AccProtected) != 0)
-		property_info.SetName(ZendManglePropertyName_ZStr("*", name.GetStr()))
-	}
-	//property_info.SetName(types.ZendNewInternedString(property_info.GetName()))
-	property_info.SetFlags(access_type)
-	property_info.SetDocComment(doc_comment)
-	property_info.SetCe(ce)
-	property_info.SetType(type_)
-	ce.PropertyTable().Update(name.GetStr(), property_info)
+
+	propInfo.SetOffset(propOffset)
+	ce.PropertyTable().Update(name.GetStr(), propInfo)
 	return types.SUCCESS
 }
 func ZendTryAssignTypedRefEx(ref *types.ZendReference, val *types.Zval, strict types.ZendBool) int {

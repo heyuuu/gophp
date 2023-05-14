@@ -8,24 +8,32 @@ import "github.com/heyuuu/gophp/zend"
 type PropertyInfo struct {
 	offset     uint32
 	flags      uint32
-	name       *String
-	docComment *String
+	name       string
+	docComment *string
 	ce         *ClassEntry
-	type_      ZendType
+	typ        ZendType
 }
 
-func (this *PropertyInfo) GetOffset() uint32           { return this.offset }
-func (this *PropertyInfo) SetOffset(value uint32)      { this.offset = value }
-func (this *PropertyInfo) GetFlags() uint32            { return this.flags }
-func (this *PropertyInfo) SetFlags(value uint32)       { this.flags = value }
-func (this *PropertyInfo) GetName() *String            { return this.name }
-func (this *PropertyInfo) SetName(value *String)       { this.name = value }
-func (this *PropertyInfo) GetDocComment() *String      { return this.docComment }
-func (this *PropertyInfo) SetDocComment(value *String) { this.docComment = value }
-func (this *PropertyInfo) GetCe() *ClassEntry          { return this.ce }
-func (this *PropertyInfo) SetCe(value *ClassEntry)     { this.ce = value }
-func (this *PropertyInfo) GetType() ZendType           { return this.type_ }
-func (this *PropertyInfo) SetType(value ZendType)      { this.type_ = value }
+func NewPropertyInfo(offset uint32, flags uint32, name string, docComment *string, ce *ClassEntry, typ ZendType) *PropertyInfo {
+	return &PropertyInfo{
+		offset:     offset,
+		flags:      flags,
+		name:       name,
+		docComment: docComment,
+		ce:         ce,
+		typ:        typ,
+	}
+}
+
+func (this *PropertyInfo) SetOffset(value uint32) { this.offset = value }
+func (this *PropertyInfo) SetType(value ZendType) { this.typ = value }
+
+func (this *PropertyInfo) GetOffset() uint32      { return this.offset }
+func (this *PropertyInfo) GetFlags() uint32       { return this.flags }
+func (this *PropertyInfo) GetName() string        { return this.name }
+func (this *PropertyInfo) GetDocComment() *string { return this.docComment }
+func (this *PropertyInfo) GetCe() *ClassEntry     { return this.ce }
+func (this *PropertyInfo) GetType() ZendType      { return this.typ }
 
 /* PropertyInfo.flags */
 func (this *PropertyInfo) AddFlags(value uint32)      { this.flags |= value }

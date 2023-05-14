@@ -241,16 +241,16 @@ func ZendThrowAutoInitInPropError(prop *types.PropertyInfo, type_ string) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
-	faults.TypeError("Cannot auto-initialize an %s inside property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
+	faults.TypeError("Cannot auto-initialize an %s inside property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
 }
 func ZendThrowAutoInitInRefError(prop *types.PropertyInfo, type_ string) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
-	faults.TypeError("Cannot auto-initialize an %s inside a reference held by property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
+	faults.TypeError("Cannot auto-initialize an %s inside a reference held by property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
 }
 func ZendThrowAccessUninitPropByRefError(prop *types.PropertyInfo) {
-	faults.ThrowError(nil, "Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()))
+	faults.ThrowError(nil, "Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop.GetName()))
 }
 func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, executeData *ZendExecuteData) *types.Zval {
 	var obj *types.ZendObject

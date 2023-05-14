@@ -86,14 +86,13 @@ func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *types.ZendOpArray, opline *ZendOp, 
 func RUN_TIME_CACHE(op_array __auto__) any {
 	return ZEND_MAP_PTR_GET(op_array.run_time_cache)
 }
-func ZendUnmanglePropertyName(mangled_property *types.String, class_name **byte, prop_name **byte) int {
-	return ZendUnmanglePropertyNameEx(mangled_property, class_name, prop_name, nil)
-}
 func ZendGetUnmangledPropertyName(mangled_prop *types.String) *byte {
-	var class_name *byte
-	var prop_name *byte
-	ZendUnmanglePropertyName(mangled_prop, &class_name, &prop_name)
-	return prop_name
+	_, propName, _ := ZendUnmanglePropertyName_Ex(mangled_prop.GetStr())
+	return propName
+}
+func ZendGetUnmangledPropertyNameEx(mangledProp string) string {
+	_, propName, _ := ZendUnmanglePropertyName_Ex(mangledProp)
+	return propName
 }
 func ZEND_USER_CODE(type_ uint8) bool { return (type_ & 1) == 0 }
 func ZendCheckArgSendType(zf types.IFunction, arg_num uint32, mask uint32) int {

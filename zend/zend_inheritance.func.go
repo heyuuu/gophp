@@ -837,7 +837,7 @@ func PropertyTypesCompatible(parent_info *types.PropertyInfo, child_info *types.
 	}
 }
 func EmitIncompatiblePropertyError(child *types.PropertyInfo, parent *types.PropertyInfo) {
-	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must be %s%s (as in class %s)", child.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(child.GetName()), b.Cond(parent.GetType().AllowNull(), "?", ""), b.CondF(parent.GetType().IsClass(), func() []byte {
+	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must be %s%s (as in class %s)", child.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(child.GetName()), b.Cond(parent.GetType().AllowNull(), "?", ""), b.CondF(parent.GetType().IsClass(), func() []byte {
 		return b.CondF(parent.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(parent.GetType()).GetName() }, func() *types.String { return ResolveClassName(parent.GetCe(), parent.GetType().Name()) }).GetVal()
 	}, func() *byte { return types.ZendGetTypeByConst(parent.GetType().Code()) }), parent.GetCe().GetName().GetVal())
 }
@@ -1727,7 +1727,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 	var not_compatible types.ZendBool
 	var prop_value *types.Zval
 	var flags uint32
-	var doc_comment *types.String
+	var doc_comment *string
 
 	/* In the following steps the properties are inserted into the property table
 	 * for that, a very strict approach is applied:
@@ -1744,15 +1744,11 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 			 */
 			flags = property_info.GetFlags()
 			if (flags & AccPublic) != 0 {
-				prop_name = property_info.GetName().Copy()
+				prop_name = types.NewString(property_info.GetName())
 			} else {
-				var pname *byte
-				var pname_len int
-
 				/* for private and protected we need to unmangle the names */
-
-				ZendUnmanglePropertyNameEx(property_info.GetName(), &class_name_unused, &pname, &pname_len)
-				prop_name = types.NewString(b.CastStr(pname, pname_len))
+				_, propNameStr, _ := ZendUnmanglePropertyName_Ex(property_info.GetName())
+				prop_name = types.NewString(propNameStr)
 			}
 
 			/* next: check for conflicts with current class */
@@ -1817,11 +1813,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 			} else {
 				prop_value = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 			}
-			if property_info.GetDocComment() != nil {
-				doc_comment = property_info.GetDocComment().Copy()
-			} else {
-				doc_comment = nil
-			}
+			doc_comment = property_info.GetDocComment()
 			ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
 		})
 	}
