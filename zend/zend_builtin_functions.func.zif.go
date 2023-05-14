@@ -291,11 +291,16 @@ var DefZifGetClassVars = def.DefFunc("get_class_vars", 1, 1, []def.ArgInfo{{Name
 // generate by ZifGetObjectVars
 var DefZifGetObjectVars = def.DefFunc("get_object_vars", 1, 1, []def.ArgInfo{{Name: "obj"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	obj := fp.ParseZval()
+	obj := fp.ParseObject()
 	if fp.HasError() {
 		return
 	}
-	ZifGetObjectVars(executeData, returnValue, obj)
+	ret, ok := ZifGetObjectVars(obj)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifGetMangledObjectVars
@@ -404,7 +409,8 @@ var DefZifGetIncludedFiles = def.DefFunc("get_included_files", 0, 0, []def.ArgIn
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetIncludedFiles()
+	ret := ZifGetIncludedFiles()
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifGetIncludedFiles
@@ -412,7 +418,8 @@ var DefZifGetRequiredFiles = def.DefFunc("get_required_files", 0, 0, []def.ArgIn
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetIncludedFiles()
+	ret := ZifGetIncludedFiles()
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifTriggerError
@@ -482,7 +489,8 @@ var DefZifGetDeclaredTraits = def.DefFunc("get_declared_traits", 0, 0, []def.Arg
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetDeclaredTraits()
+	ret := ZifGetDeclaredTraits()
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifGetDeclaredClasses
@@ -490,7 +498,8 @@ var DefZifGetDeclaredClasses = def.DefFunc("get_declared_classes", 0, 0, []def.A
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetDeclaredClasses()
+	ret := ZifGetDeclaredClasses()
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifGetDeclaredInterfaces
@@ -498,7 +507,8 @@ var DefZifGetDeclaredInterfaces = def.DefFunc("get_declared_interfaces", 0, 0, [
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetDeclaredInterfaces()
+	ret := ZifGetDeclaredInterfaces()
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifGetDefinedFunctions
@@ -538,7 +548,12 @@ var DefZifGetResources = def.DefFunc("get_resources", 0, 1, []def.ArgInfo{{Name:
 	if fp.HasError() {
 		return
 	}
-	ZifGetResources(executeData, returnValue, nil, type_)
+	ret, ok := ZifGetResources(nil, type_)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifGetLoadedExtensions

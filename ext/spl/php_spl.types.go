@@ -31,7 +31,7 @@ func (this *ZendSplGlobals) Deactivate() {
 	this.Reset()
 }
 
-func (this *ZendSplGlobals) SplObjectHash(handle uint32) string {
+func (this *ZendSplGlobals) SplObjectHash(handle uint) string {
 	if !this.hashMaskInit {
 		this.hashMaskHandle = uint64(standard.PhpMtRand() >> 1)
 		this.hashMaskHandlers = uint64(standard.PhpMtRand() >> 1)

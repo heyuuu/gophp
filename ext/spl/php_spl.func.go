@@ -349,12 +349,16 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 	}
 }
 
-func uint32ToStr(i uint32) string {
+func uintToStr(i uint) string {
 	return string([]byte{
 		byte(i & 0xff),
 		byte(i >> 8 & 0xff),
 		byte(i >> 16 & 0xff),
 		byte(i >> 24 & 0xff),
+		byte(i >> 32 & 0xff),
+		byte(i >> 40 & 0xff),
+		byte(i >> 48 & 0xff),
+		byte(i >> 56 & 0xff),
 	})
 }
 
@@ -437,7 +441,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		}
 		if zcallable.IsType(types.IS_OBJECT) {
 			types.ZVAL_COPY(alfi.GetClosure(), zcallable)
-			lc_name = ascii.StrToLower(func_name.GetStr()) + uint32ToStr(zend.Z_OBJ_HANDLE_P(zcallable))
+			lc_name = ascii.StrToLower(func_name.GetStr()) + uintToStr(zcallable.Object().GetHandle())
 		} else {
 			alfi.GetClosure().SetUndef()
 
@@ -455,7 +459,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.AccStatic) {
 
 			/* add object id to the hash to ensure uniqueness, for more reference look at bug #40091 */
-			lc_name += uint32ToStr(obj_ptr.GetHandle())
+			lc_name += uintToStr(obj_ptr.GetHandle())
 			alfi.GetObj().SetObject(obj_ptr)
 		} else {
 			alfi.GetObj().SetUndef()
@@ -532,7 +536,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 		zend.Efree(error)
 	}
 	if zcallable.IsType(types.IS_OBJECT) {
-		lc_name = ascii.StrToLower(func_name.GetStr()) + uint32ToStr(zend.Z_OBJ_HANDLE_P(zcallable))
+		lc_name = ascii.StrToLower(func_name.GetStr()) + uintToStr(zcallable.Object().GetHandle())
 	} else {
 
 		/* Skip leading \ */
@@ -560,11 +564,10 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 			}
 			success = types.SUCCESS
 		} else {
-
 			/* remove specific */
 			success = types.ZendHashDel(SPL_G__().autoload_functions, lc_name)
 			if success != types.SUCCESS && obj_ptr != nil {
-				lc_name += uint32ToStr(obj_ptr.GetHandle())
+				lc_name += uintToStr(obj_ptr.GetHandle())
 				success = types.ZendHashDel(SPL_G__().autoload_functions, lc_name)
 			}
 		}
@@ -629,29 +632,13 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 	zend.ArrayInit(return_value)
 	zend.AddNextIndexStr(return_value, zend.EG__().GetAutoloadFunc().GetFunctionName().Copy())
 }
-func ZifSplObjectHash(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval) {
-	var obj *types.Zval
-	if zend.ZendParseParameters(executeData.NumArgs(), "o", &obj) == types.FAILURE {
-		return
-	}
-	return_value.SetStringVal(PhpSplObjectHash(obj))
-	return
+
+//@zif -old
+func ZifSplObjectHash(obj zpp.Object) string {
+	return PhpSplObjectHash(obj)
 }
-func ZifSplObjectId(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval) {
-	var obj *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			obj = fp.ParseObject()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetLong(zend.ZendLong(zend.Z_OBJ_HANDLE_P(obj)))
-	return
+func ZifSplObjectId(obj zpp.Object) int {
+	return int(obj.Object().GetHandle())
 }
 func PhpSplObjectHash(obj *types.Zval) string {
 	return SPL_G__().SplObjectHash(obj.Object().GetHandle())
