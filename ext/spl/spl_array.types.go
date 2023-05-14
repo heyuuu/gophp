@@ -30,7 +30,7 @@ func NewSplArrayObject() *SplArrayObject {
 }
 
 func (this *SplArrayObject) InitStd(ce *types.ClassEntry, handlers *types.ObjectHandlers) {
-	this.std = types.NewObjectEx(ce, handlers)
+	this.std = types.NewObject(ce, handlers)
 }
 
 func (this *SplArrayObject) GetStd() *types.ZendObject { return this.std }

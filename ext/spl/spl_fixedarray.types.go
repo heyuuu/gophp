@@ -37,7 +37,7 @@ type SplFixedArrayObject struct {
 
 func NewSplFixedArrayObject(ce *types.ClassEntry) *SplFixedArrayObject {
 	return &SplFixedArrayObject{
-		std:     types.NewObjectEx(ce, &spl_handler_SplFixedArray),
+		std:     types.NewObject(ce, &spl_handler_SplFixedArray),
 		current: 0,
 		flags:   0,
 	}

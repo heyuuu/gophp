@@ -31,17 +31,23 @@ func NewStdObject(ce *ClassEntry) *ZendObject {
 	return NewObject(ce, zend.StdObjectHandlersPtr)
 }
 
-func NewStdObjectEx(ce *ClassEntry) *ZendObject {
-	return NewObjectEx(ce, zend.StdObjectHandlersPtr)
+func NewStdObjectSkipPropertiesInit(ce *ClassEntry) *ZendObject {
+	return _newObject(ce, zend.StdObjectHandlersPtr)
 }
 
 func NewStdObjectExEx(ce *ClassEntry, properties *Array) *ZendObject {
-	o := NewObject(ce, zend.StdObjectHandlersPtr)
-	o.PropertiesInitEx(properties)
+	o := _newObject(ce, zend.StdObjectHandlersPtr)
+	o.propertiesInitEx(properties)
 	return o
 }
 
 func NewObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
+	o := _newObject(ce, handlers)
+	o.propertiesInit()
+	return o
+}
+
+func _newObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
 	propertyCount := ce.GetDefaultPropertiesCount()
 	if ce.IsUseGuards() {
 		propertyCount++
@@ -53,26 +59,18 @@ func NewObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
 		properties:      nil,
 		propertiesTable: make([]Zval, propertyCount),
 	}
-
 	o.handle = uint(uintptr(unsafe.Pointer(o)))
-
-	if ce.IsUseGuards() {
-		o.propertiesTable[ce.GetDefaultPropertiesCount()].SetUndef()
-	}
 
 	runtime.SetFinalizer(o, ObjectAutoFree)
 	return o
 }
 
-func NewObjectEx(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
-	o := NewObject(ce, handlers)
-
-	// init properties
-	defaultPropertiesCount := ce.GetDefaultPropertiesCount()
+func (o *ZendObject) propertiesInit() {
+	defaultPropertiesCount := o.ce.GetDefaultPropertiesCount()
 	if defaultPropertiesCount != 0 {
-		src := ce.GetDefaultPropertiesTable()
+		src := o.ce.GetDefaultPropertiesTable()
 		dst := o.propertiesTable
-		if ce.GetType() == zend.ZEND_INTERNAL_CLASS {
+		if o.ce.GetType() == zend.ZEND_INTERNAL_CLASS {
 			for i := 0; i < defaultPropertiesCount; i++ {
 				ZVAL_COPY_OR_DUP_PROP(&dst[i], &src[i])
 			}
@@ -82,11 +80,9 @@ func NewObjectEx(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
 			}
 		}
 	}
-
-	return o
 }
 
-func (o *ZendObject) PropertiesInitEx(properties *Array) {
+func (o *ZendObject) propertiesInitEx(properties *Array) {
 	o.properties = properties
 	defaultPropertiesCount := o.ce.GetDefaultPropertiesCount()
 	if defaultPropertiesCount != 0 {

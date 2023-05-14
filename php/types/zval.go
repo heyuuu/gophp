@@ -6,6 +6,9 @@ import (
 
 /**
  * Zval
+ *
+ * tips:
+ * - 零值为合法的 Undef 类型，无需 SetUndef() 初始化
  */
 type Zval struct {
 	value     any

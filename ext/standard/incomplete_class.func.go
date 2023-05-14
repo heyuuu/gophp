@@ -49,7 +49,7 @@ func IncompleteClassGetMethod(object **types.ZendObject, method *types.String, k
 	return nil
 }
 func PhpCreateIncompleteObject(ce *types.ClassEntry) *types.ZendObject {
-	return types.NewObjectEx(ce, &PhpIncompleteObjectHandlers)
+	return types.NewObject(ce, &PhpIncompleteObjectHandlers)
 }
 func PhpCreateIncompleteClass() *types.ClassEntry {
 	PhpIncompleteObjectHandlers = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{

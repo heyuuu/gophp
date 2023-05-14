@@ -7,23 +7,10 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
+func DisplayDisabledClass(classType *types.ClassEntry) *types.ZendObject {
 	var intern *types.ZendObject
-	intern = types.NewStdObject(class_type)
-
-	/* Initialize default properties */
-	if class_type.GetDefaultPropertiesCount() != 0 {
-		var p *types.Zval = intern.GetPropertiesTable()
-		var end *types.Zval = p + class_type.GetDefaultPropertiesCount()
-		for {
-			p.SetUndef()
-			p++
-			if p == end {
-				break
-			}
-		}
-	}
-	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", class_type.Name())
+	intern = types.NewStdObjectSkipPropertiesInit(classType)
+	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", classType.Name())
 	return intern
 }
 func ZendDisableClass(className string) int {

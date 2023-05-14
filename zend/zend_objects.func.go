@@ -195,20 +195,8 @@ func ZendObjectsCloneObj(zobject *types.Zval) *types.ZendObject {
 	 * overwritten one then it must itself be overwritten */
 
 	old_object = zobject.Object()
-	new_object = types.NewStdObject(old_object.GetCe())
+	new_object = types.NewStdObjectSkipPropertiesInit(old_object.GetCe())
 
-	/* zend_objects_clone_members() expect the properties to be initialized. */
-	if new_object.GetCe().GetDefaultPropertiesCount() != 0 {
-		var p *types.Zval = new_object.GetPropertiesTable()
-		var end *types.Zval = p + new_object.GetCe().GetDefaultPropertiesCount()
-		for {
-			p.SetUndef()
-			p++
-			if p == end {
-				break
-			}
-		}
-	}
 	ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
 }

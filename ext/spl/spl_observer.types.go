@@ -21,7 +21,7 @@ type SplObjectStorage struct {
 
 func NewSplObjectStorage(ce *types.ClassEntry) *SplObjectStorage {
 	storage := &SplObjectStorage{
-		std:     types.NewObjectEx(ce, &spl_handler_SplObjectStorage),
+		std:     types.NewObject(ce, &spl_handler_SplObjectStorage),
 		storage: types.NewArray(0),
 		pos:     0,
 	}

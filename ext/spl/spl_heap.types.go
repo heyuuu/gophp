@@ -86,7 +86,7 @@ type SplHeapObject struct {
 
 func NewSplHeapObject(ce *types.ClassEntry, handlers *types.ObjectHandlers) *SplHeapObject {
 	return &SplHeapObject{
-		std: types.NewObjectEx(ce, handlers),
+		std: types.NewObject(ce, handlers),
 	}
 }
 

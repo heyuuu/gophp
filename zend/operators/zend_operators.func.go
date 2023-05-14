@@ -557,7 +557,6 @@ try_again:
 	switch op.GetType() {
 	case types.IS_ARRAY:
 		var ht = types.ZendSymtableToProptable(op.Array())
-		var obj *types.ZendObject
 		//if ht.IsImmutable() {
 		//	/* TODO: try not to duplicate immutable arrays as well ??? */
 		//	ht = types.ZendArrayDup(ht)
@@ -566,9 +565,7 @@ try_again:
 		//} else {
 		//	//ht.DelRefcount()
 		//}
-		obj = types.NewStdObject(zend.ZendStandardClassDef)
-		obj.SetProperties(ht)
-		op.SetObject(obj)
+		op.SetObject(zend.NewStdClassObject(ht))
 	case types.IS_OBJECT:
 
 	case types.IS_NULL:

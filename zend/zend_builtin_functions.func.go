@@ -16,6 +16,12 @@ func ZmStartupCore(type_ int, module_number int) int {
 	ZendRegisterDefaultClasses()
 	return types.SUCCESS
 }
+func NewStdClassObject(properties *types.Array) *types.ZendObject {
+	obj := types.NewStdObject(ZendStandardClassDef)
+	obj.SetProperties(properties)
+	return obj
+}
+
 func ZendStartupBuiltinFunctions() {
 	module := ZendRegisterModuleEx(&ZendBuiltinModule)
 	EG__().SetCurrentModule(module)

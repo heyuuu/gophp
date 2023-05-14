@@ -77,7 +77,7 @@ type SplDualItObject struct {
 func NewSplDualItObject(ce *types.ClassEntry) *SplDualItObject {
 	return &SplDualItObject{
 		dit_type: DIT_Unknown,
-		std:      types.NewObjectEx(ce, &SplHandlersDualIt),
+		std:      types.NewObject(ce, &SplHandlersDualIt),
 	}
 }
 
@@ -273,7 +273,7 @@ type SplRecursiveItObject struct {
 
 func NewSplRecursiveItObject(ce *types.ClassEntry) *SplRecursiveItObject {
 	return &SplRecursiveItObject{
-		std: types.NewObjectEx(ce, &SplHandlersRecItIt),
+		std: types.NewObject(ce, &SplHandlersRecItIt),
 	}
 }
 

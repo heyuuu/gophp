@@ -102,7 +102,7 @@ type SplFilesystemObject struct {
 
 func NewSplFilesystemObject(ce *types.ClassEntry) *SplFilesystemObject {
 	return &SplFilesystemObject{
-		std: types.NewObjectEx(ce, &SplFilesystemObjectHandlers),
+		std: types.NewObject(ce, &SplFilesystemObjectHandlers),
 
 		/* intern->type = SPL_FS_INFO; done by set 0 */
 		file_class: spl_ce_SplFileObject,
