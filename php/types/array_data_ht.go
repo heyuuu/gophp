@@ -401,10 +401,6 @@ func (ht *ArrayDataHt) validPosVal(pos uint32) uint32 {
 /**
  * Internal methods
  */
-func (ht *ArrayDataHt) copyDataAndHash(source *Array) {
-	ht.data = b.CopySlice(source.data)
-	ht.indexes = b.CopyMap(source.indexes)
-}
 
 // 移除 this.data 数据中的 holes, 返回是否移动 bucket
 func (ht *ArrayDataHt) removeHoles() {

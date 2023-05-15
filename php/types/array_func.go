@@ -389,11 +389,19 @@ func ZendArrayDup(source *Array) *Array {
 		return target
 	}
 
-	var target *Array = NewArray(source.Cap())
-	target.flags = source.flags
-	target.dupData0(source)
+	var ht *Array = NewArray(source.Cap())
+	ht.flags = source.flags
 
-	return target
+	// todo 待处理复制逻辑(参考逻辑: 非延迟复制，考虑内部指针)
+	source.Foreach(func(key ArrayKey, value *Zval) {
+		ht.Update(key, value)
+	})
+
+	ht.data0 = source.data0
+	//ht.data = b.CopySlice(source.data)
+	//ht.indexes = b.CopyMap(source.indexes)
+
+	return ht
 }
 func ZendHashMerge(target *Array, source *Array, overwrite bool) {
 	if overwrite {

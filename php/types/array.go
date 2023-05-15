@@ -120,9 +120,8 @@ type Array struct {
 	internalPointer uint32
 	nextFreeElement int
 
-	data    []Bucket            // 实际存储数据的地方
-	indexes map[ArrayKey]uint32 // 索引到具体位置的映射
-	arData  *Bucket             // C 源码中存储数据的地方，实际不使用
+	data   []Bucket // 实际存储数据的地方
+	arData *Bucket  // C 源码中存储数据的地方，实际不使用
 
 	data0 ArrayData
 
@@ -142,23 +141,10 @@ func NewArray(size int) *Array {
 
 	var ht = &Array{
 		// 数据存储
-		data:    data,
-		indexes: make(map[ArrayKey]uint32), // todo 改为 nil，延迟初始化
+		data: data,
 	}
 
 	return ht
-}
-
-/* init */
-func (ht *Array) SetBy(arr *Array) {
-	ht.flags = arr.flags
-	ht.elementsCount = arr.elementsCount
-	ht.nextFreeElement = arr.nextFreeElement
-
-	ht.data = arr.data
-	ht.indexes = arr.indexes
-
-	ZendHashInternalPointerReset(ht)
 }
 
 // 实际元素个数，从使用者角度的数组大小
@@ -395,8 +381,8 @@ func (ht *Array) Clean() {
 	ht.elementsCount = 0
 	ht.internalPointer = 0
 	ht.nextFreeElement = 0
-	ht.data = nil
-	ht.indexes = make(map[ArrayKey]uint32)
+
+	// todo 确认 clean 逻辑
 }
 
 func (ht *Array) Destroy() { ht.Clean() }
@@ -698,17 +684,6 @@ func (ht *Array) validPosVal(pos uint32) uint32 {
 /**
  * Internal methods
  */
-func (ht *Array) dupData0(source *Array) {
-	// todo 待处理复制逻辑(参考逻辑: 非延迟复制，考虑内部指针)
-	source.Foreach(func(key ArrayKey, value *Zval) {
-		ht.Update(key, value)
-	})
-
-	ht.data0 = source.data0
-	ht.data = b.CopySlice(source.data)
-	ht.indexes = b.CopyMap(source.indexes)
-}
-
 func (ht *Array) MoveTailToHead() {
 	if ht.Len() <= 1 {
 		return
