@@ -197,50 +197,34 @@ func (ht *Array) MapWithKey(mapper func(key ArrayKey, value *Zval) (ArrayKey, *Z
 /**
  * Open methods
  */
-const invalidPos uint32 = math.MaxUint32
+const invalidArrayPosition uint32 = math.MaxUint32
 
-func (ht *Array) KeyFindValAndPos(key string) (*Zval, uint32) {
-	retval := ht.KeyFind(key)
-	if retval == nil {
-		return nil, invalidPos
-	}
-
-	offset := uint32((*byte)(item) - ht.data)
-	return retval, offset
+func (ht *Array) KeyFindValAndPos(strKey string) (*Zval, uint32) {
+	key := StrKey(strKey)
+	return ht.data0.FindEx(key)
 }
-func (ht *Array) KeyAddValAndPos(key string, pData *Zval) (*Zval, uint32) {
-	retval := ht.KeyAdd(key, pData)
-	if retval == nil {
-		return nil, invalidPos
+func (ht *Array) KeyAddValAndPos(strKey string, pData *Zval) (*Zval, uint32) {
+	key := StrKey(strKey)
+	ok := ht.data0.Add(key, pData)
+	if !ok {
+		return nil, invalidArrayPosition
 	}
-
-	offset := uint32((*byte)(item) - ht.data)
-	return retval, offset
+	return ht.data0.FindEx(key)
 }
-func (ht *Array) KeyUpdateValAndPos(key string, pData *Zval) (*Zval, uint32) {
-	retval := ht.KeyUpdate(key, pData)
-	if retval == nil {
-		return nil, invalidPos
+func (ht *Array) KeyUpdateValAndPos(strKey string, pData *Zval) (*Zval, uint32) {
+	key := StrKey(strKey)
+	ht.data0.Update(key, pData)
+	return ht.data0.FindEx(key)
+}
+func (ht *Array) PosValue(pos uint32) *Zval {
+	p := ht.data0.Pos(pos)
+	if p != nil {
+		return p.GetVal()
 	}
-
-	offset := uint32((*byte)(item) - ht.data)
-	return retval, offset
-}
-func (ht *Array) GetItemByPos(pos uint32) *Zval {
-	return ht.data + pos
+	return nil
 }
 func (ht *Array) Next(pos uint32) (pair *ArrayPair, newPos uint32) {
-	size := uint32(len(ht.data))
-	for i := pos; i < size; i++ {
-		p := &ht.data[i]
-		v := p.GetVal().DeIndirect()
-		if !v.IsUndef() {
-			return NewArrayPair(p.GetArrayKey(), v), i + 1
-		}
-	}
-
-	// 没有合法元素时，返回 -1
-	return nil, size
+	return ht.data0.Next(pos)
 }
 
 func (ht *Array) GetNNumUsed() uint32         { return uint32(ht.Len()) }

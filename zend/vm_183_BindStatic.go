@@ -21,7 +21,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		executeData.GetFunc().GetOpArray().SetStaticVariablesPtr(ht)
 	}
 	itemPos := opline.GetExtendedValue() &^ (ZEND_BIND_REF | ZEND_BIND_IMPLICIT)
-	value = ht.GetItemByPos(itemPos)
+	value = ht.PosValue(itemPos)
 	if (opline.GetExtendedValue() & ZEND_BIND_REF) != 0 {
 		if value.IsConstantAst() {
 			if ZvalUpdateConstantEx(value, executeData.GetFunc().GetOpArray().scope) != types.SUCCESS {
