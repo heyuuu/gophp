@@ -29,7 +29,9 @@ func ZendCompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses
 		if ZendIsAutoGlobal(var_name) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use auto-global as lexical variable")
 		}
-		value = op_array.GetStaticVariables().KeyAdd(var_name.GetStr(), EG__().GetUninitializedZval())
+
+		var offset uint32
+		value, offset = op_array.GetStaticVariables().KeyAddValAndPos(var_name.GetStr(), EG__().GetUninitializedZval())
 		if value == nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use variable $%s twice", var_name.GetVal())
 		}
@@ -37,7 +39,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses
 		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
 		opline.SetOp2Type(IS_CV)
 		opline.GetOp2().SetVar(LookupCv(var_name))
-		opline.SetExtendedValue(op_array.GetStaticVariables().CalcItemPos(value) | mode)
+		opline.SetExtendedValue(offset | mode)
 	}
 }
 func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
@@ -118,29 +120,23 @@ func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst
 	}
 }
 func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *types.ZendOpArray) {
-	var var_name *types.String
 	var opline *ZendOp
 
 	/* TODO We might want to use a special binding mode if varvars_used is set. */
-
 	if info.GetUses().Len() == 0 {
 		return
 	}
 	if op_array.GetStaticVariables() == nil {
 		op_array.SetStaticVariables(types.NewArray(8))
 	}
-	var __ht *types.Array = info.GetUses()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		var_name = _p.GetKey()
-		var value *types.Zval = op_array.GetStaticVariables().KeyAdd(var_name.GetStr(), EG__().GetUninitializedZval())
-		var offset uint32 = op_array.GetStaticVariables().CalcItemPos(value)
+	info.GetUses().Foreach(func(key types.ArrayKey, _ *types.Zval) {
+		var_name := key.StrKey()
+		_, offset := op_array.GetStaticVariables().KeyAddValAndPos(var_name, EG__().GetUninitializedZval())
 		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
 		opline.SetOp2Type(IS_CV)
 		opline.GetOp2().SetVar(LookupCv(var_name))
 		opline.SetExtendedValue(offset | ZEND_BIND_IMPLICIT)
-	}
+	})
 }
 func ZendCompileClosureUses(ast *ZendAst) {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()

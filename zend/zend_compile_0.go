@@ -290,11 +290,11 @@ func ZendIsCompiling() types.ZendBool        { return CG__().GetInCompilation() 
 func GetTemporaryVariable() uint32 {
 	return b.PostInc(&(CG__().GetActiveOpArray().GetT()))
 }
-func LookupCv(name *types.String) int {
+func LookupCv(name string) int {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 
 	for i := 0; i < op_array.GetLastVar(); i++ {
-		if op_array.GetVars()[i].GetStr() == name.GetStr() {
+		if op_array.GetVars()[i].GetStr() == name {
 			return int(types.ZendIntptrT(nil.VarNum(i)))
 		}
 	}
@@ -305,14 +305,11 @@ func LookupCv(name *types.String) int {
 		CG__().GetContext().SetVarsSize(CG__().GetContext().GetVarsSize() + 16)
 		op_array.SetVars(Erealloc(op_array.GetVars(), CG__().GetContext().GetVarsSize()*b.SizeOf("zend_string *")))
 	}
-	op_array.GetVars()[i] = name.Copy()
+	op_array.GetVars()[i] = types.NewString(name)
 	return int(types.ZendIntptrT(nil.VarNum(i)))
 }
 func ZendInsertLiteral(op_array *types.ZendOpArray, zv *types.Zval, literal_position int) {
 	var lit *types.Zval = CT_CONSTANT_EX(op_array, literal_position)
-	//if zv.IsString() {
-	//	ZvalMakeInternedString(zv)
-	//}
 	lit.CopyValueFrom(zv)
 	lit.SetU2Extra(0)
 }

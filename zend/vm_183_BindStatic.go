@@ -11,7 +11,6 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var variable_ptr *types.Zval
 	variable_ptr = opline.Op1()
-	// IZvalPtrDtor(variable_ptr)
 	ht = executeData.GetFunc().GetOpArray().GetStaticVariablesPtr()
 	if ht == nil {
 		b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & (types.AccImmutable | types.AccPreloaded)) != 0)
@@ -37,7 +36,6 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			value.SetTypeReference()
 			variable_ptr.SetReference(ref)
 		} else {
-			// 			value.AddRefcount()
 			variable_ptr.SetReference(value.Reference())
 			variable_ptr.SetReference(value.Reference())
 		}

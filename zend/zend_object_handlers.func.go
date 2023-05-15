@@ -8,19 +8,16 @@ import (
 )
 
 func PropFindAndCache(zobj *types.ZendObject, key string, cacheSlot []any) *types.Zval {
-	retval := zobj.GetProperties().KeyFind(key)
+	retval, idx := zobj.GetProperties().KeyFindValAndPos(key)
 	if retval != nil {
-		idx := zobj.GetProperties().CalcItemPos(retval)
 		CACHE_PTR_EX(cacheSlot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
 	}
-
 	return retval
 }
 
 func SymbolFindAndCache(symbolTable *types.Array, key string, executeData *ZendExecuteData) *types.Zval {
-	retval := symbolTable.KeyFind(key)
+	retval, idx := symbolTable.KeyFindValAndPos(key)
 	if retval != nil {
-		idx := symbolTable.CalcItemPos(retval)
 		/* Store "hash slot index" + 1 (NULL is a mark of uninitialized cache slot) */
 		CACHE_PTR(executeData.GetOpline().GetExtendedValue(), any(idx+1))
 	}

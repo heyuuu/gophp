@@ -3,6 +3,7 @@ package types
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
+	"math"
 	"sort"
 )
 
@@ -196,8 +197,34 @@ func (ht *Array) MapWithKey(mapper func(key ArrayKey, value *Zval) (ArrayKey, *Z
 /**
  * Open methods
  */
-func (ht *Array) CalcItemPos(item *Zval) uint32 {
-	return uint32((*byte)(item - ht.data))
+const invalidPos uint32 = math.MaxUint32
+
+func (ht *Array) KeyFindValAndPos(key string) (*Zval, uint32) {
+	retval := ht.KeyFind(key)
+	if retval == nil {
+		return nil, invalidPos
+	}
+
+	offset := uint32((*byte)(item) - ht.data)
+	return retval, offset
+}
+func (ht *Array) KeyAddValAndPos(key string, pData *Zval) (*Zval, uint32) {
+	retval := ht.KeyAdd(key, pData)
+	if retval == nil {
+		return nil, invalidPos
+	}
+
+	offset := uint32((*byte)(item) - ht.data)
+	return retval, offset
+}
+func (ht *Array) KeyUpdateValAndPos(key string, pData *Zval) (*Zval, uint32) {
+	retval := ht.KeyUpdate(key, pData)
+	if retval == nil {
+		return nil, invalidPos
+	}
+
+	offset := uint32((*byte)(item) - ht.data)
+	return retval, offset
 }
 func (ht *Array) GetItemByPos(pos uint32) *Zval {
 	return ht.data + pos

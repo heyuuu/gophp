@@ -350,16 +350,15 @@ func ZendCompileStaticVarCommon(var_name *types.String, value *types.Zval, mode 
 		}
 		CG__().GetActiveOpArray().SetStaticVariables(types.NewArray(8))
 	}
-	value = CG__().GetActiveOpArray().GetStaticVariables().KeyUpdate(var_name.GetStr(), value)
+
+	_, offset := CG__().GetActiveOpArray().GetStaticVariables().KeyUpdateValAndPos(var_name.GetStr(), value)
 	if var_name.GetStr() == "this" {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as static variable")
 	}
 	opline = ZendEmitOp(nil, ZEND_BIND_STATIC, nil, nil)
 	opline.SetOp1Type(IS_CV)
 	opline.GetOp1().SetVar(LookupCv(var_name))
-	opline.SetExtendedValue(
-		CG__().GetActiveOpArray().GetStaticVariables().CalcItemPos(value) | mode,
-	)
+	opline.SetExtendedValue(offset | mode)
 }
 func ZendCompileStaticVar(ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
