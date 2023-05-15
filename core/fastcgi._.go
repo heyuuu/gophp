@@ -62,7 +62,7 @@ const INADDR_NONE = uint64(-1)
 
 var FcgiLog FcgiLogger
 
-var FcgiMgmtVars types.Array
+var FcgiMgmtVars *types.Array
 var IsInitialized int = 0
 var IsFastcgi int = 0
 var InShutdown int = 0

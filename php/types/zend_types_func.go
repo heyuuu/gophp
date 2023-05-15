@@ -26,12 +26,7 @@ func GC_AST(p *ZendAstRef) *zend.ZendAst    { return p.GcAst() }
 func Z_ASTVAL(zval Zval) *zend.ZendAst      { return GC_AST(zval.ConstantAst()) }
 func Z_ASTVAL_P(zval_p *Zval) *zend.ZendAst { return Z_ASTVAL(*zval_p) }
 func Z_INDIRECT_P(zval_p *Zval) *Zval       { return zval_p.Indirect() }
-func Z_PTR(zval Zval) any                   { return zval.Ptr() }
 
-func ZVAL_NEW_PERSISTENT_ARR(z *Zval) {
-	var arr = NewArray(0)
-	z.SetArray(arr)
-}
 func ZVAL_NEW_REF(z *Zval, r *Zval) { z.SetNewRef(r) }
 func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 	var ref *ZendReference = NewZendReference(z)

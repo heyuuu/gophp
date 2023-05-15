@@ -45,9 +45,9 @@ type PhpBasicGlobals struct {
 		level unsigned
 	}
 	url_adapt_session_ex       UrlAdaptStateExT
-	url_adapt_session_hosts_ht types.Array
+	url_adapt_session_hosts_ht *types.Array
 	url_adapt_output_ex        UrlAdaptStateExT
-	url_adapt_output_hosts_ht  types.Array
+	url_adapt_output_hosts_ht  *types.Array
 	mmap_file                  any
 	mmap_len                   int
 	UserFilterMap              map[string]*PhpUserFilterData
@@ -59,12 +59,12 @@ func (this *PhpBasicGlobals) GetUrlAdaptSessionEx() UrlAdaptStateExT {
 	return this.url_adapt_session_ex
 }
 
-func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() types.Array {
+func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() *types.Array {
 	return this.url_adapt_session_hosts_ht
 }
 
 func (this *PhpBasicGlobals) GetUrlAdaptOutputEx() UrlAdaptStateExT { return this.url_adapt_output_ex }
-func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() types.Array {
+func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() *types.Array {
 	return this.url_adapt_output_hosts_ht
 }
 

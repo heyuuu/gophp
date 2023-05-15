@@ -195,7 +195,6 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 	// zend.ZvalPtrDtorNogc(&unserialize_name)
 	if var_hashx.GetRefProps() != nil {
 		var_hashx.GetRefProps().Destroy()
-		zend.FREE_HASHTABLE(var_hashx.GetRefProps())
 	}
 }
 func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
@@ -404,8 +403,7 @@ func ProcessNestedData(
 							 * type source if it is turned into a reference lateron. */
 
 							if (**var_hash).GetRefProps() == nil {
-								(**var_hash).SetRefProps(zend.Emalloc(b.SizeOf("HashTable")))
-								(**var_hash).GetRefProps().Init(8)
+								(**var_hash).SetRefProps(types.NewArray(8))
 							}
 							types.ZendHashIndexUpdatePtr((**var_hash).GetRefProps(), types.ZendUintptrT(data), info)
 						}

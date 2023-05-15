@@ -38,7 +38,7 @@ func InitExecutor() {
 	ZendVmStackInit()
 	EG__().SetSymbolTable(types.NewArray(64))
 	ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionActivator))
-	EG__().GetIncludedFiles().Init(8)
+	EG__().SetIncludedFiles(types.NewArray(8))
 	EG__().GetUserErrorHandler().SetUndef()
 	EG__().GetUserExceptionHandler().SetUndef()
 	EG__().SetCurrentExecuteData(nil)
@@ -227,8 +227,7 @@ func ShutdownExecutor() {
 		}
 		for EG__().GetSymtableCachePtr() > EG__().GetSymtableCache() {
 			EG__().GetSymtableCachePtr()--
-			(*EG__)().symtable_cache_ptr.Destroy()
-			FREE_HASHTABLE((*EG__)().symtable_cache_ptr)
+			(*EG__().GetSymtableCachePtr()).Destroy()
 		}
 		EG__().GetIncludedFiles().Destroy()
 		EG__().GetUserErrorHandlersErrorReporting().Destroy()
@@ -237,7 +236,6 @@ func ShutdownExecutor() {
 		//EG__().GetObjectsStore().Destroy()
 		if EG__().GetInAutoload() != nil {
 			EG__().GetInAutoload().Destroy()
-			FREE_HASHTABLE(EG__().GetInAutoload())
 		}
 	}
 	EG__().ResetArrayIterators()
@@ -642,8 +640,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 		return nil
 	}
 	if EG__().GetInAutoload() == nil {
-		ALLOC_HASHTABLE(EG__().GetInAutoload())
-		EG__().GetInAutoload().Init(8)
+		EG__().SetInAutoload(types.NewArray(0))
 	}
 	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name.GetStr()) == nil {
 		if key == nil {

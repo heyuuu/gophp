@@ -67,7 +67,7 @@ func ZendFunctionDtor(zv *types.Zval) {
 			//ZendFreeInternalArgInfo(function.GetInternalFunction())
 		}
 		if !function.IsArenaAllocated() {
-			Pefree(function, 1)
+			Pefree(function)
 		}
 	}
 }

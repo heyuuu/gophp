@@ -213,7 +213,6 @@ func ZendOparrayContextEnd(prev_context *ZendOparrayContext) {
 	}
 	if CG__().GetContext().GetLabels() != nil {
 		CG__().GetContext().GetLabels().Destroy()
-		FREE_HASHTABLE(CG__().GetContext().GetLabels())
 		CG__().GetContext().SetLabels(nil)
 	}
 	CG__().SetContext(*prev_context)
@@ -270,12 +269,10 @@ func ShutdownCompiler() {
 	CG__().filenamesTable = nil
 	if CG__().GetDelayedVarianceObligations() != nil {
 		CG__().GetDelayedVarianceObligations().Destroy()
-		FREE_HASHTABLE(CG__().GetDelayedVarianceObligations())
 		CG__().SetDelayedVarianceObligations(nil)
 	}
 	if CG__().GetDelayedAutoloads() != nil {
 		CG__().GetDelayedAutoloads().Destroy()
-		FREE_HASHTABLE(CG__().GetDelayedAutoloads())
 		CG__().SetDelayedAutoloads(nil)
 	}
 }

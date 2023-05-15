@@ -291,7 +291,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 		data.SetFile(nil)
 		data.SetFd(-1)
 	}
-	zend.Pefree(data, stream.GetIsPersistent())
+	zend.Pefree(data)
 	return ret
 }
 func PhpStdiopFlush(stream *core.PhpStream) int {

@@ -428,7 +428,6 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 			zv.SetStringCopy(member)
 			return &(zv.GetPropertyGuard())
 		} else {
-			ALLOC_HASHTABLE(guards)
 			guards = types.NewArray(8)
 
 			/* mark pointer as "special" using low bit */

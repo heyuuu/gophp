@@ -247,8 +247,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	if IsThisFetch(var_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
-	ALLOC_HASHTABLE(CG__().GetMemoizedExprs())
-	CG__().GetMemoizedExprs().Init(0)
+	CG__().SetMemoizedExprs(types.NewArray(0))
 	CG__().SetMemoizeMode(ZEND_MEMOIZE_COMPILE)
 	ZendCompileVar(&var_node_is, var_ast, BP_VAR_IS, 0)
 	coalesce_opnum = GetNextOpNumber()
@@ -310,8 +309,6 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 		ZendUpdateJumpTargetToNext(coalesce_opnum)
 	}
 	CG__().GetMemoizedExprs().Destroy()
-	FREE_HASHTABLE(CG__().GetMemoizedExprs())
-	CG__().SetMemoizedExprs(orig_memoized_exprs)
 	CG__().SetMemoizeMode(orig_memoize_mode)
 }
 func ZendCompilePrint(result *Znode, ast *ZendAst) {

@@ -189,8 +189,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 		/* We'll autoload this class and process delayed variance obligations later. */
 
 		if CG__().GetDelayedAutoloads() == nil {
-			ALLOC_HASHTABLE(CG__().GetDelayedAutoloads())
-			CG__().GetDelayedAutoloads().Init(0)
+			CG__().SetDelayedAutoloads(types.NewArray(0))
 		}
 		types.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name.GetStr())
 	} else {
@@ -1024,7 +1023,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 					break
 				}
 			}
-			Pefree(src, ce.IsInternalClass())
+			Pefree(src)
 			end = ce.GetDefaultPropertiesTable()
 		} else {
 			end = Pemalloc(b.SizeOf("zval") * parentCe.GetDefaultPropertiesCount())
@@ -1080,7 +1079,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 					break
 				}
 			}
-			Pefree(src, ce.IsInternalClass())
+			Pefree(src)
 			end = ce.GetDefaultStaticMembersTable()
 		} else {
 			end = Pemalloc(b.SizeOf("zval") * parentCe.GetDefaultStaticMembersCount())
@@ -1628,8 +1627,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				}
 				trait_num = ZendCheckTraitUsage(ce, exclude_ce, traits)
 				if exclude_tables[trait_num] == nil {
-					ALLOC_HASHTABLE(exclude_tables[trait_num])
-					exclude_tables[trait_num].Init(0)
+					exclude_tables[trait_num] = types.NewArray(0)
 				}
 				if types.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname.GetStr()) == nil {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", precedences[i].GetTraitMethod().GetMethodName().GetVal(), exclude_ce.GetName().GetVal())
@@ -1698,7 +1696,6 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry,
 				})
 				if exclude_tables[i] != nil {
 					exclude_tables[i].Destroy()
-					FREE_HASHTABLE(exclude_tables[i])
 					exclude_tables[i] = nil
 				}
 			}
@@ -1717,7 +1714,6 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry,
 	})
 	if overridden != nil {
 		overridden.Destroy()
-		FREE_HASHTABLE(overridden)
 	}
 }
 func FindFirstDefinition(ce *types.ClassEntry, traits **types.ClassEntry, current_trait int, prop_name *types.String, coliding_ce *types.ClassEntry) *types.ClassEntry {
@@ -2003,16 +1999,14 @@ func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
 	var ht *types.Array
 	var key ZendUlong
 	if CG__().GetDelayedVarianceObligations() == nil {
-		ALLOC_HASHTABLE(CG__().GetDelayedVarianceObligations())
-		CG__().GetDelayedVarianceObligations().Init(0)
+		CG__().SetDelayedVarianceObligations(types.NewArray(0))
 	}
 	key = ZendUlong(uintPtr(ce))
 	ht = types.ZendHashIndexFindPtr(CG__().GetDelayedVarianceObligations(), key)
 	if ht != nil {
 		return ht
 	}
-	ALLOC_HASHTABLE(ht)
-	ht.Init(0)
+	ht = types.NewArray(0)
 	types.ZendHashIndexAddNewPtr(CG__().GetDelayedVarianceObligations(), key, ht)
 	ce.SetIsUnresolvedVariance(true)
 	return ht
@@ -2099,7 +2093,6 @@ func LoadDelayedClasses() {
 		ZendLookupClassString(name)
 	})
 	delayed_autoloads.Destroy()
-	FREE_HASHTABLE(delayed_autoloads)
 }
 func ResolveDelayedVarianceObligations(ce *types.ClassEntry) {
 	var all_obligations *types.Array = CG__().GetDelayedVarianceObligations()

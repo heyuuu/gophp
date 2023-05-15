@@ -179,7 +179,7 @@ func FcgiInit() int {
 	if IsInitialized == 0 {
 		var sa SaT
 		var len_ socklen_t = b.SizeOf("sa")
-		FcgiMgmtVars.Init(8)
+		FcgiMgmtVars = types.NewArray(0)
 		FcgiSetMgmtVar("FCGI_MPXS_CONNS", b.SizeOf("\"FCGI_MPXS_CONNS\"")-1, "0", b.SizeOf("\"0\"")-1)
 		IsInitialized = 1
 		errno = 0
@@ -204,6 +204,7 @@ func FcgiIsFastcgi() int {
 func FcgiShutdown() {
 	if IsInitialized != 0 {
 		FcgiMgmtVars.Destroy()
+		FcgiMgmtVars = nil
 	}
 	IsFastcgi = 0
 	if AllowedClients != nil {

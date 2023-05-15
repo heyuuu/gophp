@@ -139,7 +139,7 @@ func PhpSockopClose(stream *core.PhpStream, close_handle int) int {
 			sock.SetSocket(core.SOCK_ERR)
 		}
 	}
-	zend.Pefree(sock, stream.GetIsPersistent())
+	zend.Pefree(sock)
 	return 0
 }
 func PhpSockopFlush(stream *core.PhpStream) int { return 0 }

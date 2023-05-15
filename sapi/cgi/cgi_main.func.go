@@ -875,7 +875,7 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 	php_cgi_globals.SetFixPathinfo(1)
 	php_cgi_globals.SetDiscardPath(0)
 	php_cgi_globals.SetFcgiLogging(1)
-	php_cgi_globals.GetUserConfigCache().Init(8)
+	php_cgi_globals.SetUserConfigCache(types.NewArray(8))
 }
 func ZmStartupCgi(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)

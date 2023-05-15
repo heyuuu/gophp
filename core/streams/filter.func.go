@@ -84,9 +84,9 @@ func PhpStreamBucketMakeWriteable(bucket *PhpStreamBucket) *PhpStreamBucket {
 func PhpStreamBucketDelref(bucket *PhpStreamBucket) {
 	if b.PreDec(&(bucket.GetRefcount())) == 0 {
 		if bucket.GetOwnBuf() != 0 {
-			zend.Pefree(bucket.GetBuf(), bucket.GetIsPersistent())
+			zend.Pefree(bucket.GetBuf())
 		}
-		zend.Pefree(bucket, bucket.GetIsPersistent())
+		zend.Pefree(bucket)
 	}
 }
 func PhpStreamBucketPrepend(brigade *PhpStreamBucketBrigade, bucket *PhpStreamBucket) {
@@ -189,7 +189,7 @@ func PhpStreamFilterFree(filter *core.PhpStreamFilter) {
 	if filter.GetFops().GetDtor() != nil {
 		filter.GetFops().GetDtor()(filter)
 	}
-	zend.Pefree(filter, filter.GetIsPersistent())
+	zend.Pefree(filter)
 }
 func PhpStreamFilterPrependEx(chain *PhpStreamFilterChain, filter *core.PhpStreamFilter) int {
 	filter.SetNext(chain.GetHead())

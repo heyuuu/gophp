@@ -135,21 +135,18 @@ type Array struct {
  * Constructor && Init
  */
 func NewArray(size int) *Array {
-	var ht = new(Array)
-	ht.Init(size)
-	return ht
-}
-func (ht *Array) Init(size int) {
 	var data []Bucket
 	if size > 0 {
 		data = make([]Bucket, 0, size)
 	}
 
-	*ht = Array{
+	var ht = &Array{
 		// 数据存储
 		data:    data,
 		indexes: make(map[ArrayKey]uint32), // todo 改为 nil，延迟初始化
 	}
+
+	return ht
 }
 
 /* init */

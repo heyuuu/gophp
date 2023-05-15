@@ -274,7 +274,7 @@ func PhpPrintInfo(flag int) {
 		PhpInfoPrintTableRow(2, "Debug Build", "no")
 		PhpInfoPrintTableRow(2, "Thread Safety", "disabled")
 		PhpInfoPrintTableRow(2, "Zend Signal Handling", "enabled")
-		PhpInfoPrintTableRow(2, "Zend Memory Manager", b.Cond(zend.IsZendMm() != 0, "enabled", "disabled"))
+		PhpInfoPrintTableRow(2, "Zend Memory Manager", "disabled")
 		PhpInfoPrintTableRow(2, "Zend Multibyte Support", "disabled")
 		zend.Efree(descr)
 		PhpInfoPrintTableRow(2, "IPv6 Support", "enabled")

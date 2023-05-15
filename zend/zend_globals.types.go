@@ -198,7 +198,7 @@ type ZendExecutorGlobals struct {
 	symtable_cache_limit **types.Array
 	symtable_cache_ptr   **types.Array
 	symbol_table         *types.Array
-	included_files       types.Array
+	included_files       *types.Array
 	error_reporting      int
 	exit_status          int
 	functionTable        FunctionTable
@@ -378,14 +378,14 @@ func (this *ZendExecutorGlobals) GetSymtableCachePtr() **types.Array {
 func (this *ZendExecutorGlobals) SetSymtableCachePtr(value **types.Array) {
 	this.symtable_cache_ptr = value
 }
-func (this *ZendExecutorGlobals) GetSymbolTable() *types.Array       { return this.symbol_table }
-func (this *ZendExecutorGlobals) SetSymbolTable(value *types.Array)  { this.symbol_table = value }
-func (this *ZendExecutorGlobals) GetIncludedFiles() *types.Array     { return &this.included_files }
-func (this *ZendExecutorGlobals) SetIncludedFiles(value types.Array) { this.included_files = value }
-func (this *ZendExecutorGlobals) GetErrorReporting() int             { return this.error_reporting }
-func (this *ZendExecutorGlobals) SetErrorReporting(value int)        { this.error_reporting = value }
-func (this *ZendExecutorGlobals) GetExitStatus() int                 { return this.exit_status }
-func (this *ZendExecutorGlobals) SetExitStatus(value int)            { this.exit_status = value }
+func (this *ZendExecutorGlobals) GetSymbolTable() *types.Array        { return this.symbol_table }
+func (this *ZendExecutorGlobals) SetSymbolTable(value *types.Array)   { this.symbol_table = value }
+func (this *ZendExecutorGlobals) GetIncludedFiles() *types.Array      { return this.included_files }
+func (this *ZendExecutorGlobals) SetIncludedFiles(value *types.Array) { this.included_files = value }
+func (this *ZendExecutorGlobals) GetErrorReporting() int              { return this.error_reporting }
+func (this *ZendExecutorGlobals) SetErrorReporting(value int)         { this.error_reporting = value }
+func (this *ZendExecutorGlobals) GetExitStatus() int                  { return this.exit_status }
+func (this *ZendExecutorGlobals) SetExitStatus(value int)             { this.exit_status = value }
 func (this *ZendExecutorGlobals) GetCurrentExecuteData() *ZendExecuteData {
 	return this.current_execute_data
 }

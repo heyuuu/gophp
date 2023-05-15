@@ -31,14 +31,8 @@ func PhpIniOnUpdateTags(
 	tmp = zend.Estrndup(new_value.GetVal(), new_value.GetLen())
 	if ctx.GetTags() != nil {
 		ctx.GetTags().Destroy()
-	} else {
-		ctx.SetTags(zend.Malloc(b.SizeOf("HashTable")))
-		if ctx.GetTags() == nil {
-			zend.Efree(tmp)
-			return types.FAILURE
-		}
 	}
-	ctx.GetTags().Init(0)
+	ctx.SetTags(types.NewArray(0))
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var val *byte
 		val = strchr(key, '=')
@@ -94,9 +88,9 @@ func PhpIniOnUpdateHosts(
 	var tmp *byte
 	var lasts *byte = nil
 	if type_ != 0 {
-		hosts = &(BG__().url_adapt_session_hosts_ht)
+		hosts = BG__().url_adapt_session_hosts_ht
 	} else {
-		hosts = &(BG__().url_adapt_output_hosts_ht)
+		hosts = BG__().url_adapt_output_hosts_ht
 	}
 	hosts.Clean()
 
@@ -172,7 +166,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	if url_parts.GetHost() != nil {
 		var tmp *types.String = operators.ZendStringTolower(url_parts.GetHost())
-		if !&(BG__().url_adapt_session_hosts_ht).KeyExists(tmp.GetStr()) {
+		if !BG__().url_adapt_session_hosts_ht.KeyExists(tmp.GetStr()) {
 			// types.ZendStringReleaseEx(tmp, 0)
 			dest.AppendSmartStr(url)
 			PhpUrlFree(url_parts)
@@ -281,7 +275,7 @@ func CheckHttpHost(target string) int {
 }
 func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var url_parts *PhpUrl = nil
-	var allowed_hosts *types.Array = b.CondF(ctx.GetType() != 0, func() *__auto__ { return &(BG__().url_adapt_session_hosts_ht) }, func() *__auto__ { return &(BG__().url_adapt_output_hosts_ht) })
+	var allowed_hosts *types.Array = b.CondF(ctx.GetType() != 0, func() *types.Array { return BG__().url_adapt_session_hosts_ht }, func() *types.Array { return BG__().url_adapt_output_hosts_ht })
 	b.Assert(ctx.GetTagType() == TAG_FORM)
 	if ctx.GetAttrVal().GetS() != nil && ctx.GetAttrVal().GetS().GetLen() != 0 {
 		url_parts = PhpUrlParseEx(ctx.GetAttrVal().GetS().GetVal(), ctx.GetAttrVal().GetS().GetLen())

@@ -9,14 +9,14 @@ func Config() *Configuration {
 }
 
 type Configuration struct {
-	hash types.Array
+	hash *types.Array
 }
 
 func (this *Configuration) Init() {
-	this.hash.Init(8)
+	this.hash = types.NewArray(0)
 }
 
-func (this *Configuration) Set(key string, value string) *types.Zval {
+func (this *Configuration) Set(key string, value string) {
 	var zv types.Zval
 	zv.SetStringVal(value)
 	this.hash.KeyUpdate(key, &zv)
@@ -27,7 +27,7 @@ func (this *Configuration) KeyFind(key string) *types.Zval {
 }
 
 func (this *Configuration) GetHash() *types.Array {
-	return &this.hash
+	return this.hash
 }
 
 func (this *Configuration) Destroy() {

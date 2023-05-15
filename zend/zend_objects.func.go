@@ -26,7 +26,6 @@ func ZendObjectStdDtorEx(properties []types.Zval, ce *types.ClassEntry) {
 			guards := p.Array()
 			b.Assert(guards != nil)
 			guards.Destroy()
-			FREE_HASHTABLE(guards)
 		}
 	}
 }

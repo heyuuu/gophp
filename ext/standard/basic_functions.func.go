@@ -30,8 +30,8 @@ func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
 	memset(&(BG__().url_adapt_output_ex), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
 	BG__().url_adapt_session_ex.type_ = 1
 	BG__().url_adapt_output_ex.type_ = 0
-	BG__().url_adapt_session_hosts_ht.Init(0)
-	BG__().url_adapt_output_hosts_ht.Init(0)
+	BG__().url_adapt_session_hosts_ht = types.NewArray(0)
+	BG__().url_adapt_output_hosts_ht = types.NewArray(0)
 	BG__().incomplete_class = IncompleteClassEntry
 	BG__().page_uid = -1
 	BG__().page_gid = -1
@@ -1153,11 +1153,9 @@ func PhpFreeShutdownFunctions() {
 	if BG__().user_shutdown_function_names {
 		faults.TryCatch(func() {
 			BG__().user_shutdown_function_names.Destroy()
-			zend.FREE_HASHTABLE(BG__().user_shutdown_function_names)
 			BG__().user_shutdown_function_names = nil
 		}, func() {
 			/* maybe shutdown method call exit, we just ignore it */
-			zend.FREE_HASHTABLE(BG__().user_shutdown_function_names)
 			BG__().user_shutdown_function_names = nil
 		})
 	}
@@ -1186,9 +1184,8 @@ func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, funct
 		// types.ZendStringReleaseEx(callback_name, 0)
 		return_value.SetFalse()
 	} else {
-		if !(BG__().user_shutdown_function_names) {
-			zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-			BG__().user_shutdown_function_names.Init(0)
+		if BG__().user_shutdown_function_names == nil {
+			BG__().user_shutdown_function_names = types.NewArray(0)
 		}
 		for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
 			shutdown_function_entry.GetArguments()[i].TryAddRefcount()

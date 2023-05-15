@@ -55,7 +55,7 @@ type PhpCoreGlobals struct {
 	output_encoding             *byte
 	arg_separator               ArgSeparators
 	variables_order             *byte
-	rfc1867_protected_variables types.Array
+	rfc1867_protected_variables *types.Array
 	connection_status           int16
 	ignore_user_abort           bool
 	header_is_being_sent        uint8

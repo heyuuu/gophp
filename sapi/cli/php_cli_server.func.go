@@ -344,7 +344,7 @@ func PhpCliServerChunkDtor(chunk *PhpCliServerChunk) {
 	switch chunk.GetType() {
 	case PHP_CLI_SERVER_CHUNK_HEAP:
 		if chunk.GetBlock() != chunk {
-			zend.Pefree(chunk.GetBlock(), 1)
+			zend.Pefree(chunk.GetBlock())
 		}
 		break
 	case PHP_CLI_SERVER_CHUNK_IMMORTAL:
@@ -357,7 +357,7 @@ func PhpCliServerBufferDtor(buffer *PhpCliServerBuffer) {
 	for chunk = buffer.GetFirst(); chunk != nil; chunk = next {
 		next = chunk.GetNext()
 		PhpCliServerChunkDtor(chunk)
-		zend.Pefree(chunk, 1)
+		zend.Pefree(chunk)
 	}
 }
 func PhpCliServerBufferCtor(buffer *PhpCliServerBuffer) {
@@ -434,7 +434,7 @@ func PhpCliServerContentSenderSend(sender *PhpCliServerContentSender, fd core.Ph
 				return core.PhpSocketErrno()
 			} else if nbytes_sent == ssize_t(chunk.GetDataHeapLen()) {
 				PhpCliServerChunkDtor(chunk)
-				zend.Pefree(chunk, 1)
+				zend.Pefree(chunk)
 				sender.GetBuffer().SetFirst(next)
 				if next == nil {
 					sender.GetBuffer().SetLast(nil)
@@ -452,7 +452,7 @@ func PhpCliServerContentSenderSend(sender *PhpCliServerContentSender, fd core.Ph
 				return core.PhpSocketErrno()
 			} else if nbytes_sent == ssize_t(chunk.GetDataImmortalLen()) {
 				PhpCliServerChunkDtor(chunk)
-				zend.Pefree(chunk, 1)
+				zend.Pefree(chunk)
 				sender.GetBuffer().SetFirst(next)
 				if next == nil {
 					sender.GetBuffer().SetLast(nil)
@@ -476,10 +476,10 @@ func PhpCliServerContentSenderPull(sender *PhpCliServerContentSender, fd int, nb
 		if PhpCliServerLogLevel >= PHP_CLI_SERVER_LOG_ERROR {
 			var errstr *byte = GetLastError()
 			PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "%s", errstr)
-			zend.Pefree(errstr, 1)
+			zend.Pefree(errstr)
 		}
 		PhpCliServerChunkDtor(chunk)
-		zend.Pefree(chunk, 1)
+		zend.Pefree(chunk)
 		return 1
 	}
 	chunk.SetDataHeapLen(_nbytes_read)
@@ -588,7 +588,7 @@ func PhpNetworkListenSocket(host *byte, port *int, socktype int, af *int, sockle
 	}
 	for p = sal; (*p) != nil; p++ {
 		if sa != nil {
-			zend.Pefree(sa, 1)
+			zend.Pefree(sa)
 			sa = nil
 		}
 		retval = socket(p.sa_family, socktype, 0)
@@ -652,7 +652,7 @@ func PhpNetworkListenSocket(host *byte, port *int, socktype int, af *int, sockle
 	}
 out:
 	if sa != nil {
-		zend.Pefree(sa, 1)
+		zend.Pefree(sa)
 	}
 	if sal != nil {
 		core.PhpNetworkFreeaddresses(sal)
@@ -670,24 +670,24 @@ out:
 }
 func PhpCliServerRequestDtor(req *PhpCliServerRequest) {
 	if req.GetRequestUri() != nil {
-		zend.Pefree(req.GetRequestUri(), 1)
+		zend.Pefree(req.GetRequestUri())
 	}
 	if req.GetVpath() != nil {
-		zend.Pefree(req.GetVpath(), 1)
+		zend.Pefree(req.GetVpath())
 	}
 	if req.GetPathTranslated() != nil {
-		zend.Pefree(req.GetPathTranslated(), 1)
+		zend.Pefree(req.GetPathTranslated())
 	}
 	if req.GetPathInfo() != nil {
-		zend.Pefree(req.GetPathInfo(), 1)
+		zend.Pefree(req.GetPathInfo())
 	}
 	if req.GetQueryString() != nil {
-		zend.Pefree(req.GetQueryString(), 1)
+		zend.Pefree(req.GetQueryString())
 	}
 	req.GetHeaders().Destroy()
 	req.GetHeadersOriginalCase().Destroy()
 	if req.GetContent() != nil {
-		zend.Pefree(req.GetContent(), 1)
+		zend.Pefree(req.GetContent())
 	}
 }
 func PhpCliServerClientReadRequest(client *PhpCliServerClient, request *http.Request) int {
@@ -776,8 +776,8 @@ func PhpCliServerClientDtor(client *PhpCliServerClient) {
 		close(client.GetFileFd())
 		client.SetFileFd(-1)
 	}
-	zend.Pefree(client.GetAddr(), 1)
-	zend.Pefree(client.GetAddrStr(), 1)
+	zend.Pefree(client.GetAddr())
+	zend.Pefree(client.GetAddrStr())
 	if client.GetContentSenderInitialized() != 0 {
 		PhpCliServerContentSenderDtor(client.GetContentSender())
 	}
@@ -854,13 +854,13 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 	PhpCliServerLogResponse(client, status, b.Cond(errstr != nil, errstr, "?"))
 	PhpCliServerPollerAdd(server.GetPoller(), POLLOUT, client.GetSock())
 	if errstr != nil {
-		zend.Pefree(errstr, 1)
+		zend.Pefree(errstr)
 	}
 	//types.ZendStringFree(escaped_request_uri)
 	return types.SUCCESS
 fail:
 	if errstr != nil {
-		zend.Pefree(errstr, 1)
+		zend.Pefree(errstr)
 	}
 	//types.ZendStringFree(escaped_request_uri)
 	return types.FAILURE
@@ -1052,13 +1052,13 @@ func PhpCliServerDtor(server *PhpCliServer) {
 		core.Closesocket(server.GetServerSock())
 	}
 	if server.GetHost() != nil {
-		zend.Pefree(server.GetHost(), 1)
+		zend.Pefree(server.GetHost())
 	}
 	if server.GetDocumentRoot() != nil {
-		zend.Pefree(server.GetDocumentRoot(), 1)
+		zend.Pefree(server.GetDocumentRoot())
 	}
 	if server.GetRouter() != nil {
-		zend.Pefree(server.GetRouter(), 1)
+		zend.Pefree(server.GetRouter())
 	}
 	if PhpCliServerWorkersMax > 1 && PhpCliServerWorkers != nil && getpid() == PhpCliServerMaster {
 		var php_cli_server_worker zend.ZendLong
@@ -1086,7 +1086,7 @@ func PhpCliServerClientDtorWrapper(p *PhpCliServerClient) {
 	shutdown(p.GetSock(), core.SHUT_RDWR)
 	core.Closesocket(p.GetSock())
 	PhpCliServerClientDtor(p)
-	zend.Pefree(p, 1)
+	zend.Pefree(p)
 }
 
 // 解析域名地址为 host + port

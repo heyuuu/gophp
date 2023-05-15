@@ -100,7 +100,7 @@ func PhpStripTagsFilterCtor(inst *PhpStripTagsFilter, allowed_tags *types.String
 }
 func PhpStripTagsFilterDtor(inst *PhpStripTagsFilter) {
 	if inst.GetAllowedTags() != nil {
-		zend.Pefree(any(inst.GetAllowedTags()), inst.GetPersistent())
+		zend.Pefree(any(inst.GetAllowedTags()))
 	}
 }
 func StrfilterStripTagsFilter(
@@ -132,7 +132,7 @@ func StrfilterStripTagsFilter(
 func StrfilterStripTagsDtor(thisfilter *core.PhpStreamFilter) {
 	b.Assert(thisfilter.GetAbstract().Ptr() != nil)
 	PhpStripTagsFilterDtor((*PhpStripTagsFilter)(thisfilter.GetAbstract().Ptr()))
-	zend.Pefree(thisfilter.GetAbstract().Ptr(), (*PhpStripTagsFilter)(types.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
+	zend.Pefree(thisfilter.GetAbstract().Ptr())
 }
 func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
 	var inst *PhpStripTagsFilter
@@ -170,7 +170,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 	if PhpStripTagsFilterCtor(inst, allowed_tags, persistent) == types.SUCCESS {
 		filter = streams.PhpStreamFilterAlloc(&StrfilterStripTagsOps, inst, persistent)
 	} else {
-		zend.Pefree(inst, persistent)
+		zend.Pefree(inst)
 	}
 	if allowed_tags != nil {
 		// types.ZendStringRelease(allowed_tags)
@@ -211,7 +211,7 @@ func PhpConvBase64EncodeCtor(
 func PhpConvBase64EncodeDtor(inst *PhpConvBase64Encode) {
 	b.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
-		zend.Pefree(any(inst.GetLbchars()), inst.GetPersistent())
+		zend.Pefree(any(inst.GetLbchars()))
 	}
 }
 func PhpConvBase64EncodeFlush(inst *PhpConvBase64Encode, in_pp **byte, in_left_p *int, out_pp **byte, out_left_p *int) PhpConvErrT {
@@ -496,7 +496,7 @@ func PhpConvBase64DecodeConvert(inst *PhpConvBase64Decode, in_pp **byte, in_left
 func PhpConvQprintEncodeDtor(inst *PhpConvQprintEncode) {
 	b.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
-		zend.Pefree(any(inst.GetLbchars()), inst.GetPersistent())
+		zend.Pefree(any(inst.GetLbchars()))
 	}
 }
 func PhpConvQprintEncodeConvert(inst *PhpConvQprintEncode, in_pp **byte, in_left_p *int, out_pp **byte, out_left_p *int) PhpConvErrT {
@@ -746,7 +746,7 @@ func PhpConvQprintEncodeCtor(
 func PhpConvQprintDecodeDtor(inst *PhpConvQprintDecode) {
 	b.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
-		zend.Pefree(any(inst.GetLbchars()), inst.GetPersistent())
+		zend.Pefree(any(inst.GetLbchars()))
 	}
 }
 func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left_p *int, out_pp **byte, out_left_p *int) PhpConvErrT {
@@ -1017,7 +1017,7 @@ func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 			PhpConvGetUintPropEx(options, &line_len, "line-length", b.SizeOf("\"line-length\""))
 			if line_len < 4 {
 				if lbchars != nil {
-					zend.Pefree(lbchars, 0)
+					zend.Pefree(lbchars)
 				}
 				lbchars = nil
 			} else {
@@ -1031,11 +1031,11 @@ func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 		if lbchars != nil {
 			if PhpConvBase64EncodeCtor((*PhpConvBase64Encode)(retval), line_len, lbchars, lbchars_len, 1, persistent) != 0 {
 				if lbchars != nil {
-					zend.Pefree(lbchars, 0)
+					zend.Pefree(lbchars)
 				}
 				goto out_failure
 			}
-			zend.Pefree(lbchars, 0)
+			zend.Pefree(lbchars)
 		} else {
 			if PhpConvBase64EncodeCtor((*PhpConvBase64Encode)(retval), 0, nil, 0, 0, persistent) != 0 {
 				goto out_failure
@@ -1060,7 +1060,7 @@ func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 			PhpConvGetBoolPropEx(options, &opt_force_encode_first, "force-encode-first", b.SizeOf("\"force-encode-first\""))
 			if line_len < 4 {
 				if lbchars != nil {
-					zend.Pefree(lbchars, 0)
+					zend.Pefree(lbchars)
 				}
 				lbchars = nil
 			} else {
@@ -1083,10 +1083,10 @@ func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 		retval = zend.Pemalloc(b.SizeOf("php_conv_qprint_encode"))
 		if lbchars != nil {
 			if PhpConvQprintEncodeCtor((*PhpConvQprintEncode)(retval), line_len, lbchars, lbchars_len, 1, opts, persistent) != 0 {
-				zend.Pefree(lbchars, 0)
+				zend.Pefree(lbchars)
 				goto out_failure
 			}
-			zend.Pefree(lbchars, 0)
+			zend.Pefree(lbchars)
 		} else {
 			if PhpConvQprintEncodeCtor((*PhpConvQprintEncode)(retval), 0, nil, 0, 0, opts, persistent) != 0 {
 				goto out_failure
@@ -1107,10 +1107,10 @@ func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 		retval = zend.Pemalloc(b.SizeOf("php_conv_qprint_decode"))
 		if lbchars != nil {
 			if PhpConvQprintDecodeCtor((*PhpConvQprintDecode)(retval), lbchars, lbchars_len, 1, persistent) != 0 {
-				zend.Pefree(lbchars, 0)
+				zend.Pefree(lbchars)
 				goto out_failure
 			}
-			zend.Pefree(lbchars, 0)
+			zend.Pefree(lbchars)
 		} else {
 			if PhpConvQprintDecodeCtor((*PhpConvQprintDecode)(retval), nil, 0, 0, persistent) != 0 {
 				goto out_failure
@@ -1122,7 +1122,7 @@ func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 	return retval
 out_failure:
 	if retval != nil {
-		zend.Pefree(retval, persistent)
+		zend.Pefree(retval)
 	}
 	return nil
 }
@@ -1137,20 +1137,20 @@ func PhpConvertFilterCtor(inst *PhpConvertFilter, conv_mode int, conv_opts *type
 out_failure:
 	if inst.GetCd() != nil {
 		PhpConvDtor(inst.GetCd())
-		zend.Pefree(inst.GetCd(), persistent)
+		zend.Pefree(inst.GetCd())
 	}
 	if inst.GetFiltername() != nil {
-		zend.Pefree(inst.GetFiltername(), persistent)
+		zend.Pefree(inst.GetFiltername())
 	}
 	return types.FAILURE
 }
 func PhpConvertFilterDtor(inst *PhpConvertFilter) {
 	if inst.GetCd() != nil {
 		PhpConvDtor(inst.GetCd())
-		zend.Pefree(inst.GetCd(), inst.GetPersistent())
+		zend.Pefree(inst.GetCd())
 	}
 	if inst.GetFiltername() != nil {
-		zend.Pefree(inst.GetFiltername(), inst.GetPersistent())
+		zend.Pefree(inst.GetFiltername())
 	}
 }
 func StrfilterConvertAppendBucket(
@@ -1307,12 +1307,12 @@ func StrfilterConvertAppendBucket(
 		}
 		streams.PhpStreamBucketAppend(buckets_out, new_bucket)
 	} else {
-		zend.Pefree(out_buf, persistent)
+		zend.Pefree(out_buf)
 	}
 	*consumed += buf_len - icnt
 	return types.SUCCESS
 out_failure:
-	zend.Pefree(out_buf, persistent)
+	zend.Pefree(out_buf)
 	return types.FAILURE
 }
 func StrfilterConvertFilter(
@@ -1352,7 +1352,7 @@ out_failure:
 func StrfilterConvertDtor(thisfilter *core.PhpStreamFilter) {
 	b.Assert(thisfilter.GetAbstract().Ptr() != nil)
 	PhpConvertFilterDtor((*PhpConvertFilter)(thisfilter.GetAbstract().Ptr()))
-	zend.Pefree(thisfilter.GetAbstract().Ptr(), (*PhpConvertFilter)(types.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
+	zend.Pefree(thisfilter.GetAbstract().Ptr())
 }
 func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
 	var inst *PhpConvertFilter
@@ -1383,7 +1383,7 @@ func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persiste
 	retval = streams.PhpStreamFilterAlloc(&StrfilterConvertOps, inst, persistent)
 out:
 	if retval == nil {
-		zend.Pefree(inst, persistent)
+		zend.Pefree(inst)
 	}
 	return retval
 }
@@ -1418,7 +1418,7 @@ func ConsumedFilterFilter(
 func ConsumedFilterDtor(thisfilter *core.PhpStreamFilter) {
 	if thisfilter != nil && thisfilter.GetAbstract().Ptr() {
 		var data *PhpConsumedFilterData = (*PhpConsumedFilterData)(thisfilter.GetAbstract().Ptr())
-		zend.Pefree(data, data.GetPersistent())
+		zend.Pefree(data)
 	}
 }
 func ConsumedFilterCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
@@ -1591,7 +1591,7 @@ func PhpChunkedFilter(
 func PhpChunkedDtor(thisfilter *core.PhpStreamFilter) {
 	if thisfilter != nil && thisfilter.GetAbstract().Ptr() {
 		var data *PhpChunkedFilterData = (*PhpChunkedFilterData)(thisfilter.GetAbstract().Ptr())
-		zend.Pefree(data, data.GetPersistent())
+		zend.Pefree(data)
 	}
 }
 func ChunkedFilterCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {

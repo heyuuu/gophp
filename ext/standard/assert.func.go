@@ -36,7 +36,7 @@ func OnChangeCallback(
 		}
 	} else {
 		if ASSERTG(cb) {
-			zend.Pefree(ASSERTG(cb), 1)
+			zend.Pefree(ASSERTG(cb))
 		}
 		if new_value != nil && new_value.GetLen() != 0 {
 			ASSERTG(cb) = zend.Pemalloc(new_value.GetLen() + 1)
@@ -68,7 +68,7 @@ func ZmStartupAssert(type_ int, module_number int) int {
 }
 func ZmShutdownAssert(type_ int, module_number int) int {
 	if ASSERTG(cb) {
-		zend.Pefree(ASSERTG(cb), 1)
+		zend.Pefree(ASSERTG(cb))
 		ASSERTG(cb) = nil
 	}
 	return types.SUCCESS

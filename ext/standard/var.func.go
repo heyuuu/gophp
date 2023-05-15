@@ -1077,7 +1077,6 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 cleanup:
 	if class_hash != nil {
 		class_hash.Destroy()
-		zend.FREE_HASHTABLE(class_hash)
 	}
 
 	/* Reset to previous options in case this is a nested call */
