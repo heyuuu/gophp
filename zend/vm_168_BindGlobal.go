@@ -29,20 +29,10 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		value = EG__().GetSymbolTable().KeyFind(varname.GetStr())
 		if value == nil {
 			value = EG__().GetSymbolTable().KeyAddNew(varname.GetStr(), EG__().GetUninitializedZval())
-			idx = (*byte)(value - (*byte)(EG__().GetSymbolTable().GetArData()))
 
-			/* Store "hash slot index" + 1 (NULL is a mark of uninitialized cache slot) */
-
-			CACHE_PTR(opline.GetExtendedValue(), any(idx+1))
-
-			/* Store "hash slot index" + 1 (NULL is a mark of uninitialized cache slot) */
-
+			SymbolFindAndCache(EG__().GetSymbolTable(), varname.GetStr(), executeData)
 		} else {
-			idx = (*byte)(value - (*byte)(EG__().GetSymbolTable().GetArData()))
-
-			/* Store "hash slot index" + 1 (NULL is a mark of uninitialized cache slot) */
-
-			CACHE_PTR(opline.GetExtendedValue(), any(idx+1))
+			SymbolFindAndCache(EG__().GetSymbolTable(), varname.GetStr(), executeData)
 		check_indirect:
 
 			/* GLOBAL variable may be an INDIRECT pointer to CV */

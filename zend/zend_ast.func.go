@@ -85,8 +85,8 @@ func ZendAstGetNumChildren(ast *ZendAst) uint32 {
 }
 func ZendAstGetLineno(ast *ZendAst) uint32 {
 	if ast.GetKind() == ZEND_AST_ZVAL {
-		var zv *types.Zval = ZendAstGetZval(ast)
-		return zv.GetLineno()
+		astZval := (*ZendAstZval)(ast)
+		return astZval.GetLineno()
 	} else {
 		return ast.GetLineno()
 	}
@@ -131,12 +131,7 @@ func ZendAstCreateZnode(node *Znode) *ZendAst {
 	return (*ZendAst)(ast)
 }
 func ZendAstCreateZvalInt(zv *types.Zval, attr uint32, lineno uint32) *ZendAst {
-	var ast *ZendAstZval
-	ast = ZendAstAlloc(b.SizeOf("zend_ast_zval"))
-	ast.SetKind(ZEND_AST_ZVAL)
-	ast.SetAttr(attr)
-	types.ZVAL_COPY_VALUE(ast.GetVal(), zv)
-	ast.GetVal().GetLineno() = lineno
+	var ast *ZendAstZval = NewZendAstZval(ZEND_AST_ZVAL, attr, zv, lineno)
 	return (*ZendAst)(ast)
 }
 func ZendAstCreateZvalWithLineno(zv *types.Zval, lineno uint32) *ZendAst {
@@ -159,12 +154,9 @@ func ZendAstCreateZvalFromLong(lval ZendLong) *ZendAst {
 	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
 }
 func ZendAstCreateConstant(name *types.String, attr ZendAstAttr) *ZendAst {
-	var ast *ZendAstZval
-	ast = ZendAstAlloc(b.SizeOf("zend_ast_zval"))
-	ast.SetKind(ZEND_AST_CONSTANT)
-	ast.SetAttr(attr)
-	ast.GetVal().SetString(name)
-	ast.GetVal().GetLineno() = CG__().GetZendLineno()
+	zv := types.NewZvalString(name.GetStr())
+	lineno := CG__().GetZendLineno()
+	var ast *ZendAstZval = NewZendAstZval(ZEND_AST_CONSTANT, attr, zv, lineno)
 	return (*ZendAst)(ast)
 }
 func ZendAstCreateClassConstOrName(class_name *ZendAst, name *ZendAst) *ZendAst {

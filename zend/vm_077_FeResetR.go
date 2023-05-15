@@ -13,9 +13,6 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if array_ptr.IsArray() {
 		result = opline.Result()
 		result.CopyValueFrom(array_ptr)
-		if result.IsRefcounted() {
-			// 			array_ptr.AddRefcount()
-		}
 		result.SetFePos(0)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {

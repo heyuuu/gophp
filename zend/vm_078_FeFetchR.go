@@ -16,7 +16,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var p *types.Bucket
 	array = opline.Op1()
 	if array.IsArray() {
-		fe_ht = array.GetArr()
+		fe_ht = array.Array()
 		pos = array.GetFePos()
 		p = fe_ht.Bucket(pos)
 		for true {

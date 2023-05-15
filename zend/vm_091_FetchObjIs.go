@@ -124,14 +124,9 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().KeyFind(offset.String().GetStr())
+				retval = PropFindAndCache(zobj, offset.StringVal(), cache_slot)
 				if retval != nil {
-					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
-					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
-					{
-						goto fetch_obj_is_copy
-					}
-
+					goto fetch_obj_is_copy
 				}
 			}
 		}
@@ -266,14 +261,9 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().KeyFind(offset.String().GetStr())
+				retval = PropFindAndCache(zobj, offset.StringVal(), cache_slot)
 				if retval != nil {
-					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
-					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
-
-					{
-						goto fetch_obj_is_fast_copy
-					}
+					goto fetch_obj_is_fast_copy
 				}
 			}
 		}
@@ -390,14 +380,9 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().KeyFind(offset.String().GetStr())
+				retval = PropFindAndCache(zobj, offset.StringVal(), cache_slot)
 				if retval != nil {
-					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
-					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
-					{
-						goto fetch_obj_is_copy
-					}
-
+					goto fetch_obj_is_copy
 				}
 			}
 		}

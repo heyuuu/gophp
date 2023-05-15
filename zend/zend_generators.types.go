@@ -87,8 +87,8 @@ func (this *ZendGenerator) GetExecuteData() *ZendExecuteData          { return t
 func (this *ZendGenerator) SetExecuteData(value *ZendExecuteData)     { this.executeData = value }
 func (this *ZendGenerator) GetFrozenCallStack() *ZendExecuteData      { return this.frozen_call_stack }
 func (this *ZendGenerator) SetFrozenCallStack(value *ZendExecuteData) { this.frozen_call_stack = value }
-func (this *ZendGenerator) GetValue() types.Zval                      { return this.value }
-func (this *ZendGenerator) GetKey() types.Zval                        { return this.key }
+func (this *ZendGenerator) GetValue() *types.Zval                     { return &this.value }
+func (this *ZendGenerator) GetKey() *types.Zval                       { return &this.key }
 func (this *ZendGenerator) GetRetval() types.Zval                     { return this.retval }
 func (this *ZendGenerator) GetSendTarget() *types.Zval                { return this.send_target }
 func (this *ZendGenerator) SetSendTarget(value *types.Zval)           { this.send_target = value }
@@ -96,7 +96,7 @@ func (this *ZendGenerator) GetLargestUsedIntegerKey() ZendLong        { return t
 func (this *ZendGenerator) SetLargestUsedIntegerKey(value ZendLong) {
 	this.largest_used_integer_key = value
 }
-func (this *ZendGenerator) GetValues() types.Zval            { return this.values }
+func (this *ZendGenerator) GetValues() *types.Zval           { return &this.values }
 func (this *ZendGenerator) GetNode() ZendGeneratorNode       { return this.node }
 func (this *ZendGenerator) GetExecuteFake() *ZendExecuteData { return &this.execute_fake }
 func (this *ZendGenerator) GetGcBuffer() *types.Zval         { return this.gc_buffer }

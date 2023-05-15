@@ -17,9 +17,6 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if val.IsArray() {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
-
-		// val.TryAddRefcount()
-
 		generator.GetValues().GetFePos() = 0
 	} else {
 		faults.ThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")

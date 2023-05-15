@@ -7,14 +7,34 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
+func PropFindAndCache(zobj *types.ZendObject, key string, cacheSlot []any) *types.Zval {
+	retval := zobj.GetProperties().KeyFind(key)
+	if retval != nil {
+		idx := zobj.GetProperties().CalcItemPos(retval)
+		CACHE_PTR_EX(cacheSlot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
+	}
+
+	return retval
+}
+
+func SymbolFindAndCache(symbolTable *types.Array, key string, executeData *ZendExecuteData) *types.Zval {
+	retval := symbolTable.KeyFind(key)
+	if retval != nil {
+		idx := symbolTable.CalcItemPos(retval)
+		/* Store "hash slot index" + 1 (NULL is a mark of uninitialized cache slot) */
+		CACHE_PTR(executeData.GetOpline().GetExtendedValue(), any(idx+1))
+	}
+	return retval
+}
+
 func IS_VALID_PROPERTY_OFFSET(offset uintPtr) bool   { return intptr_t(offset) > 0 }
 func IS_WRONG_PROPERTY_OFFSET(offset uintPtr) bool   { return intptr_t(offset) == 0 }
 func IS_DYNAMIC_PROPERTY_OFFSET(offset uintPtr) bool { return intptr_t(offset) < 0 }
 func IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(offset uintPtr) bool {
 	return offset == ZEND_DYNAMIC_PROPERTY_OFFSET
 }
-func ZEND_DECODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ { return uintPtr(-(intptr_t(offset)) - 2) }
-func ZEND_ENCODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ { return uintPtr(-(intptr_t(offset) + 2)) }
+func ZEND_DECODE_DYN_PROP_OFFSET(offset int) uintptr { return uintptr(-offset - 2) }
+func ZEND_ENCODE_DYN_PROP_OFFSET(offset int) uintptr { return uintptr(-(offset + 2)) }
 func ZendGetFunctionRootClass(fbc types.IFunction) *types.ClassEntry {
 	if fbc.GetPrototype() != nil {
 		return fbc.GetPrototype().GetScope()
@@ -507,8 +527,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			retval = zobj.GetProperties().KeyFind(name.GetStr())
 			if retval != nil {
 				if cache_slot != nil {
-					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
-					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
+					PropFindAndCache(zobj, name.GetStr(), cache_slot)
 				}
 				goto exit
 			}
@@ -1381,8 +1400,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 			value = zobj.GetProperties().KeyFind(name.GetStr())
 			if value != nil {
 				if cache_slot != nil {
-					var idx uintPtr = (*byte)(value - (*byte)(zobj.GetProperties().GetArData()))
-					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
+					PropFindAndCache(zobj, name.GetStr(), cache_slot)
 				}
 			found:
 				if has_set_exists == ZEND_PROPERTY_NOT_EMPTY {

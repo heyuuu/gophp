@@ -49,14 +49,9 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().KeyFind(offset.String().GetStr())
+				retval = PropFindAndCache(zobj, offset.StringVal(), cache_slot)
 				if retval != nil {
-					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
-					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
-
-					{
-						goto fetch_obj_r_fast_copy
-					}
+					goto fetch_obj_r_fast_copy
 				}
 			}
 		}

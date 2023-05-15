@@ -357,7 +357,9 @@ func ZendCompileStaticVarCommon(var_name *types.String, value *types.Zval, mode 
 	opline = ZendEmitOp(nil, ZEND_BIND_STATIC, nil, nil)
 	opline.SetOp1Type(IS_CV)
 	opline.GetOp1().SetVar(LookupCv(var_name))
-	opline.SetExtendedValue(uint32((*byte)(value-(*byte)(CG__().GetActiveOpArray().GetStaticVariables().GetArData()))) | mode)
+	opline.SetExtendedValue(
+		CG__().GetActiveOpArray().GetStaticVariables().CalcItemPos(value) | mode,
+	)
 }
 func ZendCompileStaticVar(ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]

@@ -101,13 +101,6 @@ func CACHE_POLYMORPHIC_PTR(num uint32, ce any, ptr any) {
 }
 func CACHED_PTR_EX(slot *any) any     { return slot[0] }
 func CACHE_PTR_EX(slot *any, ptr any) { slot[0] = ptr }
-func CACHED_POLYMORPHIC_PTR_EX(slot __auto__, ce __auto__) __auto__ {
-	if slot[0] == ce {
-		return slot[1]
-	} else {
-		return nil
-	}
-}
 func CACHE_POLYMORPHIC_PTR_EX(slot *any, ce *types.ClassEntry, ptr any) {
 	slot[0] = ce
 	slot[1] = ptr

@@ -658,36 +658,22 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 	if generator.GetValues().IsArray() {
 		var ht *types.Array = generator.GetValues().Array()
 		var pos types.ArrayPosition = generator.GetValues().GetFePos()
-		var p *types.Bucket
-		for {
-			if pos >= ht.GetNNumUsed() {
 
-				/* Reached end of array */
-
-				goto failure
-
-				/* Reached end of array */
-
-			}
-			p = ht.GetArData()[pos]
-			value = p.GetVal()
-			if value.IsIndirect() {
-				value = value.Indirect()
-			}
-			pos++
-			if !(value.IsUndef()) {
-				break
-			}
+		p, newPos := ht.Next(pos)
+		if p == nil {
+			/* Reached end of array */
+			goto failure
 		}
-		// ZvalPtrDtor(generator.GetValue())
-		types.ZVAL_COPY(generator.GetValue(), value)
-		// ZvalPtrDtor(generator.GetKey())
-		if p.GetKey() != nil {
-			generator.GetKey().SetStringCopy(p.GetKey())
+
+		generator.GetValue().CopyFrom(p.GetVal())
+
+		key := p.GetKey()
+		if key.IsStrKey() {
+			generator.GetKey().SetStringVal(key.StrKey())
 		} else {
-			generator.GetKey().SetLong(p.GetH())
+			generator.GetKey().SetLong(key.IdxKey())
 		}
-		generator.GetValues().GetFePos() = pos
+		generator.GetValues().SetFePos(newPos)
 	} else {
 		var iter *ZendObjectIterator = (*ZendObjectIterator)(generator.GetValues().Object())
 		if b.PostInc(&(iter.GetIndex())) > 0 {

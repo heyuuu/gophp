@@ -37,7 +37,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses
 		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
 		opline.SetOp2Type(IS_CV)
 		opline.GetOp2().SetVar(LookupCv(var_name))
-		opline.SetExtendedValue(uint32((*byte)(value-(*byte)(op_array.GetStaticVariables().GetArData()))) | mode)
+		opline.SetExtendedValue(op_array.GetStaticVariables().CalcItemPos(value) | mode)
 	}
 }
 func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
@@ -135,7 +135,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *ty
 
 		var_name = _p.GetKey()
 		var value *types.Zval = op_array.GetStaticVariables().KeyAdd(var_name.GetStr(), EG__().GetUninitializedZval())
-		var offset uint32 = uint32((*byte)(value - (*byte)(op_array.GetStaticVariables().GetArData())))
+		var offset uint32 = op_array.GetStaticVariables().CalcItemPos(value)
 		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
 		opline.SetOp2Type(IS_CV)
 		opline.GetOp2().SetVar(LookupCv(var_name))

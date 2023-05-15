@@ -120,8 +120,7 @@ type Array struct {
 	internalPointer uint32
 	nextFreeElement int
 
-	data   []Bucket // 实际存储数据的地方
-	arData *Bucket  // C 源码中存储数据的地方，实际不使用
+	data []Bucket // 实际存储数据的地方
 
 	data0 ArrayData
 
@@ -197,7 +196,26 @@ func (ht *Array) MapWithKey(mapper func(key ArrayKey, value *Zval) (ArrayKey, *Z
 /**
  * Open methods
  */
-func (ht *Array) GetArData() *Bucket          { return ht.arData }
+func (ht *Array) CalcItemPos(item *Zval) uint32 {
+	return uint32((*byte)(item - ht.data))
+}
+func (ht *Array) GetItemByPos(pos uint32) *Zval {
+	return ht.data + pos
+}
+func (ht *Array) Next(pos uint32) (pair *ArrayPair, newPos uint32) {
+	size := uint32(len(ht.data))
+	for i := pos; i < size; i++ {
+		p := &ht.data[i]
+		v := p.GetVal().DeIndirect()
+		if !v.IsUndef() {
+			return NewArrayPair(p.GetArrayKey(), v), i + 1
+		}
+	}
+
+	// 没有合法元素时，返回 -1
+	return nil, size
+}
+
 func (ht *Array) GetNNumUsed() uint32         { return uint32(ht.Len()) }
 func (ht *Array) GetNInternalPointer() uint32 { return ht.internalPointer }
 func (ht *Array) GetNNextFreeElement() int    { return ht.nextFreeElement }

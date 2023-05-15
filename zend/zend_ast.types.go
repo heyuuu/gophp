@@ -14,14 +14,6 @@ type ZendAst struct {
 	child  []*ZendAst
 }
 
-// func MakeZendAst(kind ZendAstKind, attr ZendAstAttr, lineno uint32, child []*ZendAst) ZendAst {
-//     return ZendAst{
-//         kind:kind,
-//         attr:attr,
-//         lineno:lineno,
-//         child:child,
-//     }
-// }
 func (this *ZendAst) GetKind() ZendAstKind      { return this.kind }
 func (this *ZendAst) SetKind(value ZendAstKind) { this.kind = value }
 func (this *ZendAst) GetAttr() ZendAstAttr      { return this.attr }
@@ -72,21 +64,22 @@ type ZendAstZval struct {
 	kind ZendAstKind
 	attr ZendAstAttr
 	val  types.Zval
+	// 新增 lineno，从 val.u2 中提出来
+	lineno uint32
 }
 
-// func MakeZendAstZval(kind ZendAstKind, attr ZendAstAttr, val Zval) ZendAstZval {
-//     return ZendAstZval{
-//         kind:kind,
-//         attr:attr,
-//         val:val,
-//     }
-// }
-// func (this *ZendAstZval)  GetKind() ZendAstKind      { return this.kind }
-func (this *ZendAstZval) SetKind(value ZendAstKind) { this.kind = value }
+func NewZendAstZval(kind ZendAstKind, attr ZendAstAttr, zv *types.Zval, lineno uint32) *ZendAstZval {
+	ast := &ZendAstZval{kind: kind, attr: attr, lineno: lineno}
+	ast.val.CopyValueFrom(zv)
+	return ast
+}
 
-// func (this *ZendAstZval)  GetAttr() ZendAstAttr      { return this.attr }
+func (this *ZendAstZval) GetKind() ZendAstKind      { return this.kind }
+func (this *ZendAstZval) SetKind(value ZendAstKind) { this.kind = value }
+func (this *ZendAstZval) GetAttr() ZendAstAttr      { return this.attr }
 func (this *ZendAstZval) SetAttr(value ZendAstAttr) { this.attr = value }
 func (this *ZendAstZval) GetVal() types.Zval        { return this.val }
+func (this *ZendAstZval) GetLineno() uint32         { return this.lineno }
 
 // func (this *ZendAstZval) SetVal(value Zval) { this.val = value }
 

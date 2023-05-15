@@ -152,8 +152,6 @@ func (zv *Zval) GetCacheSlot() uint32          { return zv.u2 }
 func (zv *Zval) SetCacheSlot(value uint32)     { zv.u2 = value }
 func (zv *Zval) GetOplineNum() uint32          { return zv.u2 }
 func (zv *Zval) SetOplineNum(value uint32)     { zv.u2 = value }
-func (zv *Zval) GetLineno() uint32             { return zv.u2 }
-func (zv *Zval) SetLineno(value uint32)        { zv.u2 = value }
 func (zv *Zval) GetNumArgs() uint32            { return zv.u2 }
 func (zv *Zval) SetNumArgs(value uint32)       { zv.u2 = value }
 func (zv *Zval) GetFePos() uint32              { return zv.u2 }
