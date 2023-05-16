@@ -536,7 +536,7 @@ func ZendGeneratorAddChild(generator *ZendGenerator, child *ZendGenerator) {
 		for next != nil {
 			if next.GetNode().GetChildren() > 1 {
 				var child *ZendGenerator = types.ZendHashIndexFindPtr(next.GetNode().GetHt(), ZendUlong(generator))
-				types.ZendHashIndexDel(next.GetNode().GetHt(), ZendUlong(generator))
+				next.GetNode().GetHt().IndexDelete(ZendUlong(generator))
 				types.ZendHashIndexAddPtr(next.GetNode().GetHt(), ZendUlong(leaf), child)
 			}
 			next.GetNode().SetPtrLeaf(leaf)

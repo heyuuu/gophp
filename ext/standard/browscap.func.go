@@ -141,7 +141,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry")))
 		entry = ctx.GetCurrentEntry()
-		types.ZendHashUpdatePtr(bdata.GetHtab(), pattern.GetStr(), entry)
+		bdata.GetHtab().KeyUpdate(pattern.GetStr(), types.NewZvalPtr(entry))
 		ctx.SetCurrentSectionName(pattern.Copy())
 		entry.SetPattern(pattern.Copy())
 		entry.SetKvStart(bdata.GetKvUsed())

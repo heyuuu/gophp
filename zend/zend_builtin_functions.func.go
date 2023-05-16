@@ -155,37 +155,20 @@ func ZifStrncasecmp(str1 string, str2 string, len_ int) (int, bool) {
 	}
 	return operators.ZendBinaryStrncasecmp(str1, str2, len_), true
 }
-func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) (*types.Array, bool) {
-	var array *types.Zval
-	var entry *types.Zval
-	var target_hash *types.Array
-	if ZendParseParameters(executeData.NumArgs(), "z/", &array) == types.FAILURE {
-		return
-	}
+
+//@zif -old="z/"
+func ZifEach(array zpp.RefZval) (*types.Array, bool) {
 	if EG__().GetEachDeprecationThrown() == 0 {
 		faults.Error(faults.E_DEPRECATED, "The each() function is deprecated. This message will be suppressed on further calls")
 		EG__().SetEachDeprecationThrown(1)
 	}
-	target_hash = HASH_OF(array)
-	if target_hash == nil {
+	targetHash := HASH_OF(array)
+	if targetHash == nil {
 		faults.Error(faults.E_WARNING, "Variable passed to each() is not an array or object")
 		return nil, false
 	}
-	for {
-		entry = types.ZendHashGetCurrentData(target_hash)
-		if entry == nil {
-			return nil, false
-		} else if entry.IsIndirect() {
-			entry = entry.Indirect()
-			if entry.IsUndef() {
-				types.ZendHashMoveForward(target_hash)
-				continue
-			}
-		}
-		break
-	}
 
-	pair := target_hash.Current()
+	pair := targetHash.Current()
 	if pair == nil {
 		return nil, false
 	}
@@ -209,7 +192,7 @@ func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) (*types.
 	result.IndexAddNew(0, &tmp)
 	result.KeyAddNew(types.STR_KEY, &tmp)
 
-	types.ZendHashMoveForward(target_hash)
+	result.MoveNext()
 
 	return result, true
 }

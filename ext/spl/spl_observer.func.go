@@ -34,7 +34,6 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *SplObjectStorage, this
 				return types.SUCCESS
 			} else {
 				faults.ThrowException(spl_ce_RuntimeException, "Hash needs to be a string", 0)
-				// zend.ZvalPtrDtor(&rv)
 				return types.FAILURE
 			}
 		} else {
@@ -88,17 +87,12 @@ func SplObjectStorageAttach(intern *SplObjectStorage, this *types.Zval, obj *typ
 	return pelement
 }
 func SplObjectStorageDetach(intern *SplObjectStorage, this *types.Zval, obj *types.Zval) int {
-	var ret int = types.FAILURE
 	var key types.ArrayKey
 	if SplObjectStorageGetHash(&key, intern, this, obj) == types.FAILURE {
-		return ret
+		return types.IntBool(false)
 	}
-	if key.IsStrKey() {
-		ret = types.ZendHashDel(intern.GetStorage(), key.StrKey())
-	} else {
-		ret = types.ZendHashIndexDel(intern.GetStorage(), key.IdxKey())
-	}
-	return ret
+	ret := intern.GetStorage().Delete(key)
+	return types.IntBool(ret)
 }
 func SplObjectStorageAddall(intern *SplObjectStorage, this *types.Zval, other *SplObjectStorage) {
 	other.GetStorage().Foreach(func(key types.ArrayKey, value *types.Zval) {
@@ -285,13 +279,18 @@ func zim_spl_SplObjectStorage_removeAll(executeData *zend.ZendExecuteData, retur
 	}
 	other = Z_SPLOBJSTORAGE_P(obj)
 
-	types.ZendHashInternalPointerReset(other.GetStorage())
-	for b.Assign(&element, types.ZendHashGetCurrentDataPtr(other.GetStorage())) != nil {
+	other.GetStorage().ResetInternalPointer()
+	for {
+		pair := other.GetStorage().Current()
+		if pair == nil {
+			break
+		}
+		var element *SplObjectStorageElement = pair.GetVal().Ptr()
 		if SplObjectStorageDetach(intern, zend.ZEND_THIS(executeData), element.GetObj()) == types.FAILURE {
-			types.ZendHashMoveForward(other.GetStorage())
+			other.GetStorage().MoveNext()
 		}
 	}
-	types.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
+	intern.SetPos(other.GetStorage().FirstPos())
 	intern.SetIndex(0)
 	return_value.SetLong(intern.GetStorage().Len())
 	return

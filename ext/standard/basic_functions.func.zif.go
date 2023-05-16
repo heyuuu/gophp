@@ -504,7 +504,7 @@ var DefZifIsUploadedFile = def.DefFunc("is_uploaded_file", 1, 1, []def.ArgInfo{{
 	if fp.HasError() {
 		return
 	}
-	ZifIsUploadedFile(executeData, returnValue, path)
+	ZifIsUploadedFile(path)
 })
 
 // generate by ZifMoveUploadedFile

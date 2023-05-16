@@ -109,6 +109,24 @@ func (this *SapiGlobals) Destroy() {
 	this.known_post_content_types.Destroy()
 }
 
+func (this *SapiGlobals) ResetUploadFiles() {
+	this.rfc1867_uploaded_files = nil
+}
+
+func (this *SapiGlobals) AddUploadFile(path string) {
+	if this.rfc1867_uploaded_files == nil {
+		this.rfc1867_uploaded_files = make(map[string]bool)
+	}
+	this.rfc1867_uploaded_files[path] = true
+}
+func (this *SapiGlobals) ExistUploadFile(path string) bool {
+	return this.rfc1867_uploaded_files[path]
+}
+
+func (this *SapiGlobals) DeleteUploadFile(path string) {
+	delete(this.rfc1867_uploaded_files, path)
+}
+
 /**
  * generate
  */

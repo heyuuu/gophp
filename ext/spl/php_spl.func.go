@@ -511,7 +511,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 	var error *byte = nil
 	var lc_name string
 	var zcallable *types.Zval
-	var success int = types.FAILURE
+	var success bool = false
 	var spl_func_ptr types.IFunction
 	var obj_ptr *types.ZendObject
 	var fcc types.ZendFcallInfoCache
@@ -559,13 +559,13 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 			} else {
 				SPL_G__().autoload_functions.Clean()
 			}
-			success = types.SUCCESS
+			success = true
 		} else {
 			/* remove specific */
-			success = types.ZendHashDel(SPL_G__().autoload_functions, lc_name)
-			if success != types.SUCCESS && obj_ptr != nil {
+			success = SPL_G__().autoload_functions.KeyDelete(lc_name)
+			if !success && obj_ptr != nil {
 				lc_name += uintToStr(obj_ptr.GetHandle())
-				success = types.ZendHashDel(SPL_G__().autoload_functions, lc_name)
+				success = SPL_G__().autoload_functions.KeyDelete(lc_name)
 			}
 		}
 	} else if lc_name == SplAutoloadFn.GetFunctionName().GetStr() {
@@ -574,12 +574,12 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 
 		spl_func_ptr = SplAutoloadFn
 		if zend.EG__().GetAutoloadFunc() == spl_func_ptr {
-			success = types.SUCCESS
+			success = true
 			zend.EG__().SetAutoloadFunc(nil)
 		}
 	}
 	// types.ZendStringReleaseEx(lc_name, 0)
-	return_value.SetBool(success == types.SUCCESS)
+	return_value.SetBool(success)
 	return
 }
 func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {

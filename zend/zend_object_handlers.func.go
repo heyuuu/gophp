@@ -917,7 +917,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) && zobj.GetProperties() != nil {
 		zobj.DupProperties()
-		if types.ZendHashDel(zobj.GetProperties(), name.GetStr()) != types.FAILURE {
+		if !zobj.GetProperties().KeyDelete(name.GetStr()) {
 			goto exit
 		}
 	} else if EG__().GetException() != nil {

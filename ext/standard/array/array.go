@@ -208,53 +208,39 @@ func ZifUksort(arg zpp.DerefArray, cmpFunction zpp.Callable) bool {
 	phpUsortEx(arg, cmp, false)
 	return true
 }
-func ZifEnd(return_value zpp.Ret, array zpp.RefArrayHt) {
-	var entry *types.Zval
-	types.ZendHashInternalPointerEnd(array)
-	if b.Assign(&entry, types.ZendHashGetCurrentData(array)) == nil {
-		return_value.SetFalse()
-		return
+func ZifEnd(array zpp.RefArrayHt) *types.Zval {
+	array.MoveEnd()
+	pair := array.Current()
+	if pair == nil {
+		return types.NewZvalBool(false)
 	}
-	if entry.IsIndirect() {
-		entry = entry.Indirect()
-	}
-	types.ZVAL_COPY_DEREF(return_value, entry)
+	return pair.GetVal().DeIndirect().DeRef()
 }
 
 func ZifPrev(array zpp.RefArrayHt) *types.Zval {
-	pair := array.MovePrev()
-	types.ZendHashMoveBackwards(array)
-	entry := types.ZendHashGetCurrentData(array)
-	if entry == nil {
+	array.MovePrev()
+	pair := array.Current()
+	if pair == nil {
 		return types.NewZvalBool(false)
 	}
-	if entry.IsIndirect() {
-		entry = entry.Indirect()
-	}
-	return entry.DeRef()
+	return pair.GetVal().DeIndirect().DeRef()
 }
 func ZifNext(array zpp.RefArrayHt) *types.Zval {
-	types.ZendHashMoveForward(array)
-	entry := types.ZendHashGetCurrentData(array)
-	if entry == nil {
+	array.MoveNext()
+	pair := array.Current()
+	if pair == nil {
 		return types.NewZvalBool(false)
 	}
-	if entry.IsIndirect() {
-		entry = entry.Indirect()
-	}
-	return entry.DeRef()
+	return pair.GetVal().DeIndirect().DeRef()
 }
 
 func ZifReset(array zpp.RefArrayHt) *types.Zval {
-	types.ZendHashInternalPointerReset(array)
-	entry := types.ZendHashGetCurrentData(array)
-	if entry == nil {
+	array.ResetInternalPointer()
+	pair := array.Current()
+	if pair == nil {
 		return types.NewZvalBool(false)
 	}
-	if entry.IsIndirect() {
-		entry = entry.Indirect()
-	}
-	return entry.DeRef()
+	return pair.GetVal().DeIndirect().DeRef()
 }
 
 //@zif -alias pos

@@ -97,7 +97,7 @@ func (this *ZendGenerator) SetLargestUsedIntegerKey(value ZendLong) {
 	this.largest_used_integer_key = value
 }
 func (this *ZendGenerator) GetValues() *types.Zval           { return &this.values }
-func (this *ZendGenerator) GetNode() ZendGeneratorNode       { return this.node }
+func (this *ZendGenerator) GetNode() *ZendGeneratorNode      { return &this.node }
 func (this *ZendGenerator) GetExecuteFake() *ZendExecuteData { return &this.execute_fake }
 func (this *ZendGenerator) GetGcBuffer() *types.Zval         { return this.gc_buffer }
 func (this *ZendGenerator) SetGcBuffer(value *types.Zval)    { this.gc_buffer = value }

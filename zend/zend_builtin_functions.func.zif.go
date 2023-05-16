@@ -173,7 +173,7 @@ var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{Name: "arr"}}, func(ex
 	if fp.HasError() {
 		return
 	}
-	ret, ok := ZifEach(executeData, returnValue, arr)
+	ret, ok := ZifEach(arr)
 	if ok {
 		returnValue.SetArray(ret)
 	} else {

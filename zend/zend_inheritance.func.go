@@ -2105,7 +2105,7 @@ func ResolveDelayedVarianceObligations(ce *types.ClassEntry) {
 	if obligations.Len() == 0 {
 		ce.SetIsUnresolvedVariance(false)
 		ce.SetIsLinked(true)
-		types.ZendHashIndexDel(all_obligations, num_key)
+		all_obligations.IndexDelete(num_key)
 	}
 }
 func ReportVarianceErrors(ce *types.ClassEntry) {
@@ -2138,7 +2138,7 @@ func ReportVarianceErrors(ce *types.ClassEntry) {
 
 	ce.SetIsUnresolvedVariance(false)
 	ce.SetIsLinked(true)
-	types.ZendHashIndexDel(all_obligations, num_key)
+	all_obligations.IndexDelete(num_key)
 }
 func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 	/* If this class has been used while unlinked through a variance obligation, it is not legal

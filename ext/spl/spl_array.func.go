@@ -409,7 +409,7 @@ try_again:
 	case types.IS_STRING:
 		ht = SplArrayGetHashTable(intern)
 		if ht == zend.EG__().GetSymbolTable() {
-			if zend.ZendDeleteGlobalVariable(offset.String()) != 0 {
+			if !zend.ZendDeleteGlobalVariable(offset.String()) {
 				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.String().GetVal())
 			}
 		} else {
@@ -451,7 +451,7 @@ try_again:
 		index = offset.Long()
 	num_index:
 		ht = SplArrayGetHashTable(intern)
-		if types.ZendHashIndexDel(ht, index) == types.FAILURE {
+		if !ht.IndexDelete(index) {
 			faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
 		}
 	case types.IS_REFERENCE:

@@ -675,9 +675,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 
 	faults.ExceptionRestore()
 	EG__().SetFakeScope(orig_fake_scope)
-	// ZvalPtrDtor(&args[0])
-	types.ZendHashDel(EG__().GetInAutoload(), lc_name.GetStr())
-	// ZvalPtrDtor(&local_retval)
+	EG__().GetInAutoload().KeyDelete(lc_name.GetStr())
 	return ce
 }
 func ZendLookupClass(name *types.String) *types.ClassEntry {
@@ -956,8 +954,8 @@ func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_typ
 	}
 	return ce
 }
-func ZendDeleteGlobalVariable(name *types.String) int {
-	return types.ZendHashDelInd(EG__().GetSymbolTable(), name.GetStr())
+func ZendDeleteGlobalVariable(name *types.String) bool {
+	return EG__().GetSymbolTable().KeyDeleteIndirect(name.GetStr())
 }
 func ZendRebuildSymbolTable() *types.Array {
 	var ex *ZendExecuteData
@@ -1053,7 +1051,7 @@ func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 		var var_ *types.Zval = executeData.VarNum(0)
 		for {
 			if var_.IsUndef() {
-				types.ZendHashDel(ht, (*str).GetStr())
+				ht.KeyDelete((*str).GetStr())
 			} else {
 				ht.KeyUpdate(str.GetStr(), var_)
 				var_.SetUndef()

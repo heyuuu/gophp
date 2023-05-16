@@ -14,7 +14,7 @@ func ZEND_UNSET_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	name = varname.String()
 
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	types.ZendHashDelInd(target_symbol_table, name.GetStr())
+	target_symbol_table.KeyDeleteIndirect(name.GetStr())
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -36,7 +36,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	types.ZendHashDelInd(target_symbol_table, *name)
+	target_symbol_table.KeyDeleteIndirect(name)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -58,6 +58,6 @@ func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	types.ZendHashDelInd(target_symbol_table, name)
+	target_symbol_table.KeyDelete(name)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

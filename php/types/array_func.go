@@ -63,35 +63,12 @@ func ZendHashHasMoreElementsEx(ht *Array, pos *ArrayPosition) bool {
 	_, ok := ht.validPos(*pos)
 	return ok
 }
-func ZendHashMoveForward(ht *Array) {
-	ZendHashMoveForwardEx(ht, &ht.internalPointer)
-}
 
 // 查找下一个有效位置
 func ZendHashMoveForwardEx(ht *Array, pos *ArrayPosition) {
 	_, *pos = ht.NextEx(*pos)
 }
 
-func ZendHashMoveBackwards(ht *Array) {
-	ZendHashMoveBackwardsEx(ht, &ht.internalPointer)
-}
-func ZendHashMoveBackwardsEx(ht *Array, pos *ArrayPosition) {
-	var idx uint32 = *pos
-	if idx < ht.GetNNumUsed() {
-		for idx > 0 {
-			idx--
-			if ht.data[idx].GetVal().GetType() != IS_UNDEF {
-				*pos = idx
-				return
-			}
-		}
-		*pos = ht.GetNNumUsed()
-	}
-}
-
-func ZendHashGetCurrentData(ht *Array) *Zval {
-	return ZendHashGetCurrentDataEx(ht, ht.GetNInternalPointer())
-}
 func ZendHashGetCurrentDataEx(ht *Array, pos *ArrayPosition) *Zval {
 	pair, _ := ht.findPos(*pos)
 	if pair == nil {
@@ -100,27 +77,8 @@ func ZendHashGetCurrentDataEx(ht *Array, pos *ArrayPosition) *Zval {
 	return pair.GetVal()
 }
 
-func ZendHashInternalPointerReset(ht *Array) {
-	ZendHashInternalPointerResetEx(ht, ht.GetNInternalPointer())
-}
 func ZendHashInternalPointerResetEx(ht *Array, pos *ArrayPosition) {
 	*pos = ht.validPosVal(0)
-}
-
-func ZendHashInternalPointerEnd(ht *Array) {
-	ZendHashInternalPointerEndEx(ht, ht.GetNInternalPointer())
-}
-func ZendHashInternalPointerEndEx(ht *Array, pos *ArrayPosition) {
-	var idx uint32
-	idx = ht.GetNNumUsed()
-	for idx > 0 {
-		idx--
-		if ht.data[idx].GetVal().GetType() != IS_UNDEF {
-			*pos = idx
-			return
-		}
-	}
-	*pos = ht.GetNNumUsed()
 }
 
 func HandleNumericStr(key string, idx *zend.ZendUlong) bool {
@@ -164,12 +122,6 @@ func ZendHashUpdateMem(ht *Array, key string, pData any, size int) any {
 	p = zend.Pemalloc(size)
 	memcpy(p, pData, size)
 	return ZendHashUpdatePtr(ht, key, p)
-}
-func ZendHashStrUpdateMem(ht *Array, str string, pData any, size int) any {
-	var p any
-	p = zend.Pemalloc(size)
-	memcpy(p, pData, size)
-	return ZendHashUpdatePtr(ht, str, p)
 }
 func ZendHashIndexAddPtr(ht *Array, index int, pData any) any {
 	var tmp Zval
@@ -270,9 +222,6 @@ func ZendHashGetCurrentDataPtrEx(ht *Array, pos *ArrayPosition) any {
 		return nil
 	}
 }
-func ZendHashGetCurrentDataPtr(ht *Array) any {
-	return ZendHashGetCurrentDataPtrEx(ht, ht.GetNInternalPointer())
-}
 func ZendHashIteratorPos(idx uint32, ht *Array) ArrayPosition {
 	var iter *ArrayIterator = zend.EG__().GetArrayIterator(idx)
 	if iter.GetHt() != ht {
@@ -290,31 +239,6 @@ func ZendHashStrAddEmptyElement(ht *Array, str string) *Zval {
 	var dummy Zval
 	(&dummy).SetUndef()
 	return ht.KeyAdd(str, &dummy)
-}
-func ZendHashDel(ht *Array, key string) int {
-	if ht.KeyDelete(key) {
-		return SUCCESS
-	}
-	return FAILURE
-}
-func ZendHashDelInd(ht *Array, key string) int {
-	if ht.KeyDeleteIndirect(key) {
-		return SUCCESS
-	}
-	return FAILURE
-}
-func ZendHashStrDel(ht *Array, key string) int {
-	if ht.KeyDelete(key) {
-		return SUCCESS
-	}
-	return FAILURE
-}
-func ZendHashIndexDel(ht *Array, h zend.ZendUlong) int {
-	var index = int(h)
-	if ht.IndexDelete(index) {
-		return SUCCESS
-	}
-	return FAILURE
 }
 
 func ZendHashCopy(target *Array, source *Array) {

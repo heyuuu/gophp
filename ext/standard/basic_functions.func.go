@@ -1635,83 +1635,38 @@ func ZifRegisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionN
 func ZifUnregisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval) {
 	// todo 触发 warning
 }
-func ZifIsUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval) {
-	var path *byte
-	var path_len int
-	if !(core.SG__().rfc1867_uploaded_files) {
-		return_value.SetFalse()
-		return
-	}
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			path, path_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if core.SG__().rfc1867_uploaded_files.KeyExists(b.CastStr(path, path_len)) {
-		return_value.SetTrue()
-		return
-	} else {
-		return_value.SetFalse()
-		return
-	}
+func ZifIsUploadedFile(path string) bool {
+	return core.SG__().ExistUploadFile(path)
 }
-func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, newPath *types.Zval) {
-	var path *byte
-	var new_path *byte
-	var path_len int
-	var new_path_len int
+func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path string, newPath zpp.Path) bool {
 	var successful types.ZendBool = 0
 	var oldmask int
 	var ret int
-	if !(core.SG__().rfc1867_uploaded_files) {
+	if !core.SG__().ExistUploadFile(path) {
+		return false
+	}
+	if core.PhpCheckOpenBasedir(newPath) != 0 {
 		return_value.SetFalse()
 		return
 	}
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			path, path_len = fp.ParseString()
-			new_path, new_path_len = fp.ParsePath()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if !core.SG__().rfc1867_uploaded_files.KeyExists(b.CastStr(path, path_len)) {
-		return_value.SetFalse()
-		return
-	}
-	if core.PhpCheckOpenBasedir(new_path) != 0 {
-		return_value.SetFalse()
-		return
-	}
-	if err := os.Rename(path, new_path); err == nil {
+	if err := os.Rename(path, newPath); err == nil {
 		successful = 1
 		oldmask = umask(077)
 		umask(oldmask)
-		ret = zend.VCWD_CHMOD(new_path, 0666 & ^oldmask)
+		ret = zend.VCWD_CHMOD(newPath, 0666 & ^oldmask)
 		if ret == -1 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 		}
-	} else if PhpCopyFileEx(path, new_path, core.STREAM_DISABLE_OPEN_BASEDIR) == types.SUCCESS {
+	} else if PhpCopyFileEx(path, newPath, core.STREAM_DISABLE_OPEN_BASEDIR) == types.SUCCESS {
 		zend.VCWD_UNLINK(path)
 		successful = 1
 	}
 	if successful != 0 {
-		types.ZendHashStrDel(core.SG__().rfc1867_uploaded_files, b.CastStr(path, path_len))
+		core.SG__().DeleteUploadFile(path)
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}
-	return_value.SetBool(successful != 0)
-	return
+	return successful != 0
 }
 func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arr *types.Zval) {
 	switch callback_type {

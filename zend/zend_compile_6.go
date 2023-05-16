@@ -116,7 +116,7 @@ func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst
 
 	for i = 0; i < param_list.GetChildren(); i++ {
 		var param_ast *ZendAst = param_list.GetChild()[i]
-		types.ZendHashDel(info.GetUses(), ZendAstGetStr(param_ast.GetChild()[1]).GetStr())
+		info.GetUses().KeyDelete(ZendAstGetStr(param_ast.GetChild()[1]).GetStr())
 	}
 }
 func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *types.ZendOpArray) {

@@ -76,13 +76,6 @@ func SplFixedarrayCopy(to *SplFixedarray, from *SplFixedarray) {
 		types.ZVAL_COPY(to.GetElements()[i], from.GetElements()[i])
 	}
 }
-func SplFixedarrayObjectGetGc(obj *types.Zval, table **types.Zval, n *int) *types.Array {
-	var intern *SplFixedArrayObject = Z_SPLFIXEDARRAY_P(obj)
-	var ht *types.Array = zend.ZendStdGetProperties(obj)
-	*table = intern.GetArray().GetElements()
-	*n = int(intern.GetArray().GetSize())
-	return ht
-}
 func SplFixedarrayObjectGetProperties(obj *types.Zval) *types.Array {
 	var intern *SplFixedArrayObject = Z_SPLFIXEDARRAY_P(obj)
 	var ht *types.Array = zend.ZendStdGetProperties(obj)
@@ -99,7 +92,7 @@ func SplFixedarrayObjectGetProperties(obj *types.Zval) *types.Array {
 		}
 		if j > intern.GetArray().GetSize() {
 			for i = intern.GetArray().GetSize(); i < j; i++ {
-				types.ZendHashIndexDel(ht, i)
+				ht.IndexDelete(i)
 			}
 		}
 	}

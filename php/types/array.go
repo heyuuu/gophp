@@ -297,17 +297,23 @@ func (ht *Array) Current() *ArrayPair {
 	p, _ = ht.findPosIndirect(ht.internalPointer)
 	return p
 }
-func (ht *Array) MoveNext() *ArrayPair {
-	var p *ArrayPair
-	p, ht.internalPointer = ht.NextEx(ht.internalPointer)
-	return p
+func (ht *Array) MoveNext() {
+	_, ht.internalPointer = ht.NextEx(ht.internalPointer)
 }
-func (ht *Array) MovePrev() *ArrayPair {
-	var p *ArrayPair
-	p, ht.internalPointer = ht.PrevEx(ht.internalPointer)
-	return p
+func (ht *Array) MovePrev() {
+	_, ht.internalPointer = ht.PrevEx(ht.internalPointer - 1)
+}
+func (ht *Array) MoveFirst() {
+	ht.internalPointer = ht.FirstPos()
+}
+func (ht *Array) MoveEnd() {
+	ht.internalPointer = ht.LastPos()
 }
 
+func (ht *Array) FirstPos() ArrayPosition {
+	_, pos := ht.findPos(0)
+	return pos
+}
 func (ht *Array) First() *ArrayPair {
 	pair, _ := ht.findPos(0)
 	return pair
@@ -317,6 +323,10 @@ func (ht *Array) FirstIndirect() *ArrayPair {
 	return pair
 }
 
+func (ht *Array) LastPos() ArrayPosition {
+	_, pos := ht.findPosReserve(ht.data0.MaxPos())
+	return pos
+}
 func (ht *Array) Last() *ArrayPair {
 	pair, _ := ht.findPosReserve(ht.data0.MaxPos())
 	return pair

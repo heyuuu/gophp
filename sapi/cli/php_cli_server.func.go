@@ -962,7 +962,7 @@ func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClien
 	PhpCliServerCloseConnection(server, client)
 	DestroyRequestInfo(&(core.SG__().RequestInfo))
 	core.SG__().server_context = nil
-	core.SG__().rfc1867_uploaded_files = nil
+	core.SG__().ResetUploadFiles()
 	return types.SUCCESS
 }
 func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient) int {
@@ -1034,7 +1034,7 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 			core.PhpRequestShutdown(0)
 			core.SM__().SetSendHeaders(send_header_func)
 			core.SG__().sapi_headers.send_default_content_type = 1
-			core.SG__().rfc1867_uploaded_files = nil
+			core.SG__().ResetUploadFiles()
 		}
 		if types.SUCCESS != PhpCliServerBeginSendStatic(server, client) {
 			PhpCliServerCloseConnection(server, client)
