@@ -324,20 +324,6 @@ func ZendHashIteratorPos(idx uint32, ht *Array) ArrayPosition {
 	}
 	return iter.GetPos()
 }
-func ZendHashIteratorsLowerPos(ht *Array, start ArrayPosition) ArrayPosition {
-	var iter *ArrayIterator = zend.EG__().GetHtIterators()
-	var end *ArrayIterator = iter + zend.EG__().GetHtIteratorsUsed()
-	var res ArrayPosition = ht.GetNNumUsed()
-	for iter != end {
-		if iter.GetHt() == ht {
-			if iter.GetPos() >= start && iter.GetPos() < res {
-				res = iter.GetPos()
-			}
-		}
-		iter++
-	}
-	return res
-}
 
 func ZendHashAddEmptyElement(ht *Array, key string) *Zval {
 	var dummy Zval

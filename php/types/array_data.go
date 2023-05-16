@@ -10,9 +10,6 @@ type ArrayData interface {
 	Find(key ArrayKey) *Zval
 	FindEx(key ArrayKey) (value *Zval, pos ArrayPosition)
 
-	// 获取 Pos 对应位置的数据，必须用 FindEx() 返回的精确 Pos 值，不可用 Next/Prev 返回的 newPos
-	Pos(pos ArrayPosition) *ArrayPair
-
 	/**
 	 * 写操作
 	 */
@@ -23,10 +20,15 @@ type ArrayData interface {
 	Clean()
 
 	/**
-	 * 获取指定 Pos 对应的数据和下一个指针位置
-	 * pos 具体值由具体实现确定，需要满足如下条件
-	 * - 未进行写操作时，pos 对应数据不会发生改变
+	 * Pos 操作相关
+	 * pos 表示数据在内部的具体位置，具体值由具体 ArrayData 实现确定，需要满足如下条件
+	 * - 每个 pos 对应 0~1 具体合法值，在无写操作的情况下对应值不变
+	 * - 取值范围在 [0, Cap() - 1] 之间
 	 */
-	Next(pos ArrayPosition) (pair *ArrayPair, newPos ArrayPosition)
-	Prev(pos ArrayPosition) (pair *ArrayPair, newPos ArrayPosition)
+	// 获取 Pos 对应位置的数据，必须用 FindEx() 返回的精确 Pos 值。
+	Pos(pos ArrayPosition) *ArrayPair
+	// 从传入 Pos 开始向后查找合法 Pos 位置。
+	FindPos(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition)
+	// 从传入 Pos 开始向前查找合法 Pos 位置。
+	FindPosReserve(pos ArrayPosition) (pair *ArrayPair, newPos ArrayPosition)
 }

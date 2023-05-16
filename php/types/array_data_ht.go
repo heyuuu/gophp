@@ -39,20 +39,6 @@ func (ht *ArrayDataHt) FindEx(key ArrayKey) (*Zval, ArrayPosition) {
 	}
 	return nil, invalidArrayPosition
 }
-func (ht *ArrayDataHt) Pos(pos ArrayPosition) *ArrayPair {
-	size := uint32(len(ht.data))
-	if pos >= size {
-		return nil
-	}
-
-	p := ht.data[pos]
-	v := p.GetVal().DeRef()
-	if v.IsUndef() {
-		return nil
-	}
-
-	return NewArrayPair(p.GetArrayKey(), v)
-}
 
 func (ht *ArrayDataHt) Add(key ArrayKey, data *Zval) bool {
 	ht.assertWritable()
@@ -103,23 +89,46 @@ func (ht *ArrayDataHt) Clean() {
 	ht.indexes = make(map[ArrayKey]uint32)
 }
 
-func (ht *ArrayDataHt) Next(pos ArrayPosition) (pair *ArrayPair, newPos ArrayPosition) {
+func (ht *ArrayDataHt) Pos(pos ArrayPosition) *ArrayPair {
 	size := uint32(len(ht.data))
+	if pos >= size {
+		return nil
+	}
+
+	p := ht.data[pos]
+	v := p.GetVal().DeRef()
+	if v.IsUndef() {
+		return nil
+	}
+
+	return NewArrayPair(p.GetArrayKey(), v)
+}
+func (ht *ArrayDataHt) FindPos(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition) {
+	size := uint32(len(ht.data))
+	if pos >= size {
+		return nil, size
+	}
+
 	for i := pos; i < size; i++ {
 		p := &ht.data[i]
-		v := p.GetVal().DeIndirect()
+		v := p.GetVal()
 		if !v.IsUndef() {
-			return NewArrayPair(p.key, v), i + 1
+			return NewArrayPair(p.key, v), i
 		}
 	}
 
 	return nil, size
 }
-func (ht *ArrayDataHt) Prev(pos ArrayPosition) (pair *ArrayPair, newPos ArrayPosition) {
+func (ht *ArrayDataHt) FindPosPrev(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition) {
+	size := uint32(len(ht.data))
+	if pos >= size {
+		return nil, size
+	}
+
 	// prev 需要用 0 表示已搜索全表，所以 pos = 实际索引 + 1
 	for i := pos; i > 0; i-- {
 		p := &ht.data[i-1]
-		v := p.GetVal().DeIndirect()
+		v := p.GetVal()
 		if !v.IsUndef() {
 			return NewArrayPair(p.key, v), i - 1
 		}

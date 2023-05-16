@@ -197,6 +197,7 @@ func (ht *Array) MapWithKey(mapper func(key ArrayKey, value *Zval) (ArrayKey, *Z
 /**
  * Open methods
  */
+const maxArrayPosition uint32 = math.MaxUint32
 const invalidArrayPosition uint32 = math.MaxUint32
 
 func (ht *Array) KeyFindValAndPos(strKey string) (*Zval, uint32) {
@@ -256,85 +257,77 @@ func (ht *Array) recalcElements() int {
 }
 
 func (ht *Array) FirstPair() *ArrayPair {
-	for _, p := range ht.data {
-		if p.IsValid() {
-			return NewArrayPair(p.GetArrayKey(), p.GetVal())
-		}
-	}
-	return nil
+	pair, _ := ht.data0.FindPos(0)
+	return pair
 }
 
 func (ht *Array) First() (key ArrayKey, val *Zval) {
-	for _, p := range ht.data {
-		if p.IsValid() {
-			return p.GetArrayKey(), p.GetVal()
-		}
+	pair, _ := ht.data0.FindPos(0)
+	if pair == nil {
+		return
 	}
-	return
+	return pair.GetKey(), pair.GetVal()
 }
 
 func (ht *Array) FirstIndirect() (key ArrayKey, val *Zval) {
-	for _, p := range ht.data {
-		v := p.GetVal()
-		if v.IsIndirect() {
-			v = v.Indirect()
+	var pair *ArrayPair
+	var pos ArrayPosition = 0
+	for {
+		pair, pos = ht.data0.FindPos(pos)
+		if pair == nil {
+			return
 		}
-		if v.IsUndef() {
+		data := pair.GetVal().DeIndirect()
+		if data.IsUndef() {
 			continue
 		}
-		return p.GetArrayKey(), v
+		return pair.GetKey(), data
 	}
-	return
 }
 
 func (ht *Array) LastPair() *ArrayPair {
-	for i := len(ht.data) - 1; i >= 0; i-- {
-		p := ht.data[i]
-		if p.IsValid() {
-			return NewArrayPair(p.GetArrayKey(), p.GetVal())
-		}
-	}
-	return nil
+	pair, _ := ht.data0.FindPosReserve(maxArrayPosition)
+	return pair
 }
 
 func (ht *Array) LastPairIndirect() *ArrayPair {
-	for i := len(ht.data) - 1; i >= 0; i-- {
-		p := ht.data[i]
-		v := p.GetVal()
-		if v.IsIndirect() {
-			v = v.Indirect()
+	var pair *ArrayPair
+	var pos = maxArrayPosition
+	for {
+		pair, pos = ht.data0.FindPosReserve(pos)
+		if pair == nil {
+			return nil
 		}
-		if v.IsUndef() {
+		data := pair.GetVal().DeIndirect()
+		if data.IsUndef() {
 			continue
 		}
-		return NewArrayPair(p.GetArrayKey(), v)
+		return NewArrayPair(pair.GetKey(), data)
 	}
-	return nil
 }
 
 func (ht *Array) Last() (key ArrayKey, val *Zval) {
-	for i := len(ht.data) - 1; i >= 0; i-- {
-		p := ht.data[i]
-		if p.IsValid() {
-			return p.GetArrayKey(), p.GetVal()
-		}
+	pair, _ := ht.data0.FindPosReserve(maxArrayPosition)
+	if pair == nil {
+		return
 	}
-	return
+	return pair.GetKey(), pair.GetVal()
 }
 
 func (ht *Array) LastIndirect() (key ArrayKey, val *Zval) {
-	for i := len(ht.data) - 1; i >= 0; i-- {
-		p := ht.data[i]
-		v := p.GetVal()
-		if v.IsIndirect() {
-			v = v.Indirect()
+	var pair *ArrayPair
+	var pos = maxArrayPosition
+	for {
+		pair, pos = ht.data0.FindPosReserve(pos)
+		if pair == nil {
+			return
 		}
-		if v.IsUndef() {
+		data := pair.GetVal().DeIndirect()
+		if data.IsUndef() {
 			continue
 		}
-		return p.GetArrayKey(), v
+		return pair.GetKey(), data
 	}
-	return
 }
 
 /**
@@ -558,90 +551,100 @@ func (ht *Array) AppendNew(pData *Zval) *Zval {
  * each
  */
 func (ht *Array) Foreach(handler func(key ArrayKey, value *Zval)) {
-	for i, _ := range ht.data {
-		p := &ht.data[i]
-		if p.IsValid() {
-			continue
+	var pair *ArrayPair
+	var pos ArrayPosition = 0
+	for {
+		pair, pos = ht.data0.FindPos(pos)
+		if pair == nil {
+			break
 		}
-		handler(p.GetArrayKey(), p.GetVal())
+		handler(pair.GetKey(), pair.GetVal())
 	}
 }
 func (ht *Array) ForeachEx(handler func(key ArrayKey, value *Zval) bool) bool {
-	for i, _ := range ht.data {
-		p := &ht.data[i]
-		if p.IsValid() {
-			continue
+	var pair *ArrayPair
+	var pos ArrayPosition = 0
+	for {
+		pair, pos = ht.data0.FindPos(pos)
+		if pair == nil {
+			break
 		}
-		if !handler(p.GetArrayKey(), p.GetVal()) {
+		ret := handler(pair.GetKey(), pair.GetVal())
+		if !ret {
 			return false
 		}
 	}
 	return true
 }
 func (ht *Array) ForeachReserve(handler func(key ArrayKey, value *Zval)) {
-	for i := len(ht.data) - 1; i >= 0; i-- {
-		p := &ht.data[i]
-		if p.IsValid() {
-			continue
+	var pair *ArrayPair
+	var pos ArrayPosition = ArrayPosition(ht.data0.Cap())
+	for {
+		pair, pos = ht.data0.FindPosReserve(pos)
+		if pair == nil {
+			break
 		}
-		handler(p.GetArrayKey(), p.GetVal())
+		handler(pair.GetKey(), pair.GetVal())
 	}
 }
 
 func (ht *Array) ForeachIndirect(handler func(key ArrayKey, value *Zval)) {
-	for i, _ := range ht.data {
-		p := &ht.data[i]
-		data := p.GetVal()
-		if data.IsIndirect() {
-			data = data.Indirect()
+	var pair *ArrayPair
+	var pos ArrayPosition = 0
+	for {
+		pair, pos = ht.data0.FindPos(pos)
+		if pair == nil {
+			break
 		}
+		data := pair.GetVal().Indirect()
 		if data.IsUndef() {
 			continue
 		}
-		handler(p.GetArrayKey(), data)
+		handler(pair.GetKey(), data)
 	}
 }
 func (ht *Array) ForeachIndirectEx(handler func(key ArrayKey, value *Zval) bool) bool {
-	for i, _ := range ht.data {
-		p := &ht.data[i]
-		data := p.GetVal()
-		if data.IsIndirect() {
-			data = data.Indirect()
+	var pair *ArrayPair
+	var pos ArrayPosition = 0
+	for {
+		pair, pos = ht.data0.FindPos(pos)
+		if pair == nil {
+			break
 		}
+		data := pair.GetVal().Indirect()
 		if data.IsUndef() {
 			continue
 		}
-		if !handler(p.GetArrayKey(), p.GetVal()) {
+		ret := handler(pair.GetKey(), data)
+		if !ret {
 			return false
 		}
 	}
 	return true
 }
 func (ht *Array) ForeachIndirectReserve(handler func(key ArrayKey, value *Zval)) {
-	for i := len(ht.data) - 1; i >= 0; i-- {
-		p := &ht.data[i]
-		data := p.GetVal()
-		if data.IsIndirect() {
-			data = data.Indirect()
+	var pair *ArrayPair
+	var pos ArrayPosition = ArrayPosition(ht.data0.Cap())
+	for {
+		pair, pos = ht.data0.FindPosReserve(pos)
+		if pair == nil {
+			break
 		}
+		data := pair.GetVal().Indirect()
 		if data.IsUndef() {
-			return
+			continue
 		}
-		handler(p.GetArrayKey(), data)
+		handler(pair.GetKey(), data)
 	}
 }
 
 func (ht *Array) Filter(handler func(key ArrayKey, value *Zval) bool) bool {
 	var removeKeys []ArrayKey
-	for i, _ := range ht.data {
-		p := &ht.data[i]
-		if p.IsValid() {
-			continue
+	ht.Foreach(func(key ArrayKey, value *Zval) {
+		if !handler(key, value) {
+			removeKeys = append(removeKeys, key)
 		}
-		if !handler(p.GetArrayKey(), p.GetVal()) {
-			removeKeys = append(removeKeys, p.GetArrayKey())
-		}
-	}
+	})
 
 	if len(removeKeys) > 0 {
 		for _, key := range removeKeys {
@@ -685,15 +688,6 @@ func (ht *Array) validPosEx(pos uint32, indirect bool) (uint32, bool) {
 	}
 	// 没有有效pos，此时 pos == ht.DataSize()
 	return pos, false
-}
-
-func (ht *Array) currentPos() (uint32, bool) {
-	return ht.validPosEx(ht.internalPointer, false)
-}
-
-func (ht *Array) CurrentPosVal() uint32 {
-	var pos, _ = ht.validPosEx(ht.internalPointer, false)
-	return pos
 }
 
 func (ht *Array) currentPosVal() uint32 {
