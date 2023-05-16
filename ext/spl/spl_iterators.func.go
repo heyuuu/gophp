@@ -2473,7 +2473,7 @@ func zim_spl_AppendIterator_getIteratorIndex(executeData *zend.ZendExecuteData, 
 	}
 	intern = it
 	APPENDIT_CHECK_CTOR(intern)
-	SplArrayIteratorKey(intern.GetZarrayit(), return_value)
+	*return_value = *SplArrayIteratorKey(intern.GetZarrayit())
 }
 func zim_spl_AppendIterator_getArrayIterator(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject

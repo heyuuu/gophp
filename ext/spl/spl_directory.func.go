@@ -1630,7 +1630,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) bool {
 			return intern.GetCurrentZval().String().GetLen() == 0
 		case types.IS_ARRAY:
 			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && intern.GetCurrentZval().Array().Len() == 1 {
-				_, first := intern.GetCurrentZval().Array().First()
+				first := intern.GetCurrentZval().Array().First().GetVal()
 				return first.IsString() && first.StringVal() == ""
 			}
 			return intern.GetCurrentZval().Array().Len() == 0

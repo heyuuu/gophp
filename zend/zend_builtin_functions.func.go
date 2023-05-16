@@ -185,16 +185,16 @@ func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) (*types.
 		break
 	}
 
-	key, val, ok := target_hash.Current(false)
-	if !ok {
+	pair := target_hash.Current()
+	if pair == nil {
 		return nil, false
 	}
+	key := pair.GetKey()
+	val := pair.GetVal().DeRef()
 
 	result := types.NewArray(4)
-	//types.ZendHashRealInitMixed(return_value.Array())
 
 	/* add value elements */
-	val = types.ZVAL_DEREF(val)
 	result.IndexAddNew(1, val)
 	result.KeyAddNew(types.STR_VALUE, val)
 

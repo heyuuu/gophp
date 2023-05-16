@@ -284,6 +284,7 @@ func zim_spl_SplObjectStorage_removeAll(executeData *zend.ZendExecuteData, retur
 		return
 	}
 	other = Z_SPLOBJSTORAGE_P(obj)
+
 	types.ZendHashInternalPointerReset(other.GetStorage())
 	for b.Assign(&element, types.ZendHashGetCurrentDataPtr(other.GetStorage())) != nil {
 		if SplObjectStorageDetach(intern, zend.ZEND_THIS(executeData), element.GetObj()) == types.FAILURE {

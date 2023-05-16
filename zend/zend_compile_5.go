@@ -246,9 +246,9 @@ func ZendCompileTry(ast *ZendAst) {
 
 	if CG__().GetContext().GetLabels() != nil {
 		var label *ZendLabel
-		var _, labelZval = CG__().GetContext().GetLabels().Last()
-		if labelZval != nil {
-			label = labelZval.Ptr()
+		var labelPair = CG__().GetContext().GetLabels().Last()
+		if labelPair != nil {
+			label = labelPair.GetVal().Ptr()
 			if label.GetOplineNum() == GetNextOpNumber() {
 				ZendEmitOp(nil, ZEND_NOP, nil, nil)
 			}

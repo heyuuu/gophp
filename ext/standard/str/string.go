@@ -647,9 +647,9 @@ func ZifPathinfo(path string, _ zpp.Opt, options *int) *types.Zval {
 	if opt == PHP_PATHINFO_ALL {
 		return types.NewZvalArray(arr)
 	} else {
-		_, element := arr.First()
-		if element != nil {
-			return element
+		p := arr.First()
+		if p != nil {
+			return p.GetVal()
 		} else {
 			return types.NewZvalString("")
 		}
@@ -992,9 +992,9 @@ func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length
 	//
 	var replStr string
 	if replace.IsArray() {
-		_, replZval := replace.Array().First()
-		if replZval != nil {
-			replStr = operators.ZvalGetStrVal(replZval)
+		replPair := replace.Array().First()
+		if replPair != nil {
+			replStr = operators.ZvalGetStrVal(replPair.GetVal())
 		} else {
 			replStr = ""
 		}
@@ -1355,7 +1355,7 @@ func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, boo
 		case 0:
 			return str, true
 		case 1:
-			key, val := pats.First()
+			key, val := pats.First().Pair()
 
 			var strKey string
 			if !key.IsStrKey() {

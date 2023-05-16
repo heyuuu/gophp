@@ -729,36 +729,30 @@ func SplArrayCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 	return result
 }
 func SplArraySkipProtected(intern *SplArrayObject, aht *types.Array) int {
-	var data *types.Zval
 	if SplArrayIsObject(intern) != 0 {
-		var pos_ptr *uint32 = SplArrayGetPosPtr(aht, intern)
+		var posPtr *uint32 = SplArrayGetPosPtr(aht, intern)
 		for {
-			if key := types.ZendHashGetCurrentKeyExEx(aht, *pos_ptr); key != nil && key.IsStrKey() {
-				data = types.ZendHashGetCurrentDataEx(aht, pos_ptr)
-				if data != nil && data.IsIndirect() && b.Assign(&data, data.Indirect()).GetType() == types.IS_UNDEF {
-
-				} else if key.StrKey() == "" {
-					return types.SUCCESS
-				}
-			} else {
+			pair, nextPos := aht.NextEx(*posPtr)
+			if pair == nil || !pair.GetKey().IsStrKey() {
 				return types.SUCCESS
 			}
-			if !types.ZendHashHasMoreElementsEx(aht, pos_ptr) {
-				return types.FAILURE
+			strKey := pair.GetKey().StrKey()
+			if strKey == "" {
+				return types.SUCCESS
 			}
-			types.ZendHashMoveForwardEx(aht, pos_ptr)
 
+			*posPtr = nextPos
 		}
 	}
 	return types.FAILURE
 }
 func SplArrayNextEx(intern *SplArrayObject, aht *types.Array) int {
-	var pos_ptr *uint32 = SplArrayGetPosPtr(aht, intern)
-	types.ZendHashMoveForwardEx(aht, pos_ptr)
+	var posPtr *uint32 = SplArrayGetPosPtr(aht, intern)
+	_, *posPtr = aht.NextEx(*posPtr)
 	if SplArrayIsObject(intern) != 0 {
 		return SplArraySkipProtected(intern, aht)
 	} else {
-		return types.ResultCode(types.ZendHashHasMoreElementsEx(aht, pos_ptr))
+		return types.ResultCode(types.ZendHashHasMoreElementsEx(aht, posPtr))
 	}
 }
 func SplArrayNext(intern *SplArrayObject) int {
@@ -790,13 +784,22 @@ func SplArrayItGetCurrentData(iter *zend.ZendObjectIterator) *types.Zval {
 		return data
 	}
 }
+
 func SplArrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *types.Zval) {
 	var object *SplArrayObject = Z_SPLARRAY_P(iter.GetData())
 	var aht *types.Array = SplArrayGetHashTable(object)
 	if object.IsOverloadedKey() {
 		zend.ZendUserItGetCurrentKey(iter, key)
 	} else {
-		types.ZendHashGetCurrentKeyZvalEx(aht, key, SplArrayGetPosPtr(aht, object))
+		posPtr := SplArrayGetPosPtr(aht, object)
+		pair, _ := aht.CurrentEx(*posPtr)
+		if pair == nil {
+			key.SetNull()
+		} else if pair.GetKey().IsStrKey() {
+			key.SetStringVal(pair.GetKey().StrKey())
+		} else {
+			key.SetLong(pair.GetKey().IdxKey())
+		}
 	}
 }
 func SplArrayItMoveForward(iter *zend.ZendObjectIterator) {
@@ -1135,12 +1138,18 @@ func zim_spl_Array_key(executeData *zend.ZendExecuteData, return_value *types.Zv
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	SplArrayIteratorKey(zend.ZEND_THIS(executeData), return_value)
+	*return_value = *SplArrayIteratorKey(zend.ZEND_THIS(executeData))
 }
-func SplArrayIteratorKey(object *types.Zval, return_value *types.Zval) {
+func SplArrayIteratorKey(object *types.Zval) *types.Zval {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var aht *types.Array = SplArrayGetHashTable(intern)
-	types.ZendHashGetCurrentKeyZvalEx(aht, return_value, SplArrayGetPosPtr(aht, intern))
+	var pos = *SplArrayGetPosPtr(aht, intern)
+	pair, _ := aht.CurrentEx(pos)
+	if pair == nil {
+		return types.NewZvalNull()
+	} else {
+		return pair.GetKey().ToZval()
+	}
 }
 func zim_spl_Array_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)

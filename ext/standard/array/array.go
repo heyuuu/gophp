@@ -222,6 +222,7 @@ func ZifEnd(return_value zpp.Ret, array zpp.RefArrayHt) {
 }
 
 func ZifPrev(array zpp.RefArrayHt) *types.Zval {
+	pair := array.MovePrev()
 	types.ZendHashMoveBackwards(array)
 	entry := types.ZendHashGetCurrentData(array)
 	if entry == nil {
@@ -258,18 +259,20 @@ func ZifReset(array zpp.RefArrayHt) *types.Zval {
 
 //@zif -alias pos
 func ZifCurrent(array zpp.ArrayOrObjectHt) (*types.Zval, bool) {
-	_, val, ok := array.Current(false)
-	if !ok {
+	pair := array.Current()
+	if pair == nil {
 		return nil, false
 	}
 
-	if val.IsIndirect() {
-		val = val.Indirect()
-	}
-	return val.DeRef(), true
+	return pair.GetVal().DeIndirect().DeRef(), true
 }
-func ZifKey(return_value zpp.Ret, array zpp.ArrayOrObjectHt) {
-	types.ZendHashGetCurrentKeyZval(array, return_value)
+func ZifKey(array zpp.ArrayOrObjectHt) *types.Zval {
+	pair := array.Current()
+	if pair == nil {
+		return types.NewZvalNull()
+	} else {
+		return pair.GetKey().ToZval()
+	}
 }
 
 func ZifMin(arg *types.Zval, args []*types.Zval) *types.Zval {
@@ -738,7 +741,7 @@ func ZifArrayPush(stack zpp.RefArray, _ zpp.Opt, args []*types.Zval) (int, bool)
 	return stack.Array().Len(), true
 }
 func ZifArrayPop(stack zpp.RefArray) *types.Zval {
-	pair := stack.Array().LastPairIndirect()
+	pair := stack.Array().LastIndirect()
 	if pair == nil {
 		return types.NewZvalNull()
 	}
@@ -748,20 +751,21 @@ func ZifArrayPop(stack zpp.RefArray) *types.Zval {
 
 	return pair.GetVal().DeRef()
 }
-func ZifArrayShift(stack zpp.RefArray) {
+func ZifArrayShift(stack zpp.RefArray) *types.Zval {
 	if stack.Array().Len() == 0 {
-		return
+		return nil
 	}
 
 	var p *types.Bucket
 
 	/* Get the first value and copy it into the return value */
-	key, val := stack.Array().FirstIndirect()
-	if val == nil {
-		return
+	pair := stack.Array().FirstIndirect()
+	if pair == nil {
+		return nil
 	}
 
-	val = val.DeRef()
+	key := pair.GetKey()
+	val := pair.GetVal().DeRef()
 
 	/* Delete the first value */
 	if key.IsStrKey() && stack.Array() == zend.EG__().GetSymbolTable() {
@@ -779,6 +783,8 @@ func ZifArrayShift(stack zpp.RefArray) {
 		}
 		return key, value
 	})
+
+	return val
 }
 func ZifArrayUnshift(stack zpp.RefZval, values []*types.Zval) int {
 	newArr := types.NewArray(stack.Array().Len() + len(values))
@@ -1093,18 +1099,18 @@ func ZifArrayKeys(array *types.Array, _ zpp.Opt, searchValue *types.Zval, strict
 	}
 }
 func ZifArrayKeyFirst(array *types.Array) *types.Zval {
-	key, val := array.FirstIndirect()
-	if val == nil {
+	pair := array.FirstIndirect()
+	if pair == nil {
 		return types.NewZvalNull()
 	}
-	return key.ToZval()
+	return pair.GetKey().ToZval()
 }
 func ZifArrayKeyLast(array *types.Array) *types.Zval {
-	key, val := array.Last()
-	if val == nil {
+	pair := array.Last()
+	if pair == nil {
 		return types.NewZvalNull()
 	}
-	return key.ToZval()
+	return pair.GetKey().ToZval()
 }
 func ZifArrayValues(array *types.Array) *types.Array {
 	arrLen := array.Len()

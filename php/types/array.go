@@ -63,8 +63,9 @@ func MakeArrayPair(key ArrayKey, val *Zval) ArrayPair {
 func NewArrayPair(key ArrayKey, val *Zval) *ArrayPair {
 	return &ArrayPair{key: key, val: val}
 }
-func (p ArrayPair) GetKey() ArrayKey { return p.key }
-func (p ArrayPair) GetVal() *Zval    { return p.val }
+func (p ArrayPair) GetKey() ArrayKey        { return p.key }
+func (p ArrayPair) GetVal() *Zval           { return p.val }
+func (p ArrayPair) Pair() (ArrayKey, *Zval) { return p.key, p.val }
 
 /**
  * Bucket
@@ -223,9 +224,6 @@ func (ht *Array) PosValue(pos uint32) *Zval {
 	}
 	return nil
 }
-func (ht *Array) Next(pos uint32) (pair *ArrayPair, newPos uint32) {
-	return ht.data0.Next(pos)
-}
 
 func (ht *Array) GetNNumUsed() uint32         { return uint32(ht.Len()) }
 func (ht *Array) GetNInternalPointer() uint32 { return ht.internalPointer }
@@ -255,78 +253,78 @@ func (ht *Array) recalcElements() int {
 	return num
 }
 
-func (ht *Array) FirstPair() *ArrayPair {
-	pair, _ := ht.data0.FindPos(0)
+// Pos 相关
+func (ht *Array) NextPos(pos ArrayPosition) ArrayPosition {
+	if pos == maxArrayPosition {
+		return maxArrayPosition
+	}
+	return pos + 1
+}
+func (ht *Array) PrevPos(pos ArrayPosition) ArrayPosition {
+	if pos == 0 {
+		return 0
+	}
+	return pos - 1
+}
+
+func (ht *Array) findPos(pos ArrayPosition) (*ArrayPair, ArrayPosition) {
+	return ht.data0.FindPos(pos)
+}
+func (ht *Array) findPosIndirect(pos ArrayPosition) (*ArrayPair, ArrayPosition) {
+	return ht.data0.FindPosIndirect(pos)
+}
+func (ht *Array) findPosReserve(pos ArrayPosition) (*ArrayPair, ArrayPosition) {
+	return ht.data0.FindPosReserve(pos)
+}
+func (ht *Array) findPosReserveIndirect(pos ArrayPosition) (*ArrayPair, ArrayPosition) {
+	return ht.data0.FindPosReserveIndirect(pos)
+}
+
+func (ht *Array) CurrentEx(pos ArrayPosition) (*ArrayPair, ArrayPosition) {
+	return ht.findPos(pos)
+}
+func (ht *Array) NextEx(pos ArrayPosition) (*ArrayPair, ArrayPosition) {
+	p, pos := ht.findPos(pos)
+	return p, ht.NextPos(pos)
+}
+func (ht *Array) PrevEx(pos ArrayPosition) (*ArrayPair, ArrayPosition) {
+	p, pos := ht.findPosReserve(pos)
+	return p, ht.PrevPos(pos)
+}
+
+func (ht *Array) Current() *ArrayPair {
+	var p *ArrayPair
+	p, _ = ht.findPosIndirect(ht.internalPointer)
+	return p
+}
+func (ht *Array) MoveNext() *ArrayPair {
+	var p *ArrayPair
+	p, ht.internalPointer = ht.NextEx(ht.internalPointer)
+	return p
+}
+func (ht *Array) MovePrev() *ArrayPair {
+	var p *ArrayPair
+	p, ht.internalPointer = ht.PrevEx(ht.internalPointer)
+	return p
+}
+
+func (ht *Array) First() *ArrayPair {
+	pair, _ := ht.findPos(0)
+	return pair
+}
+func (ht *Array) FirstIndirect() *ArrayPair {
+	pair, _ := ht.findPosIndirect(0)
 	return pair
 }
 
-func (ht *Array) First() (key ArrayKey, val *Zval) {
-	pair, _ := ht.data0.FindPos(0)
-	if pair == nil {
-		return
-	}
-	return pair.GetKey(), pair.GetVal()
-}
-
-func (ht *Array) FirstIndirect() (key ArrayKey, val *Zval) {
-	var pair *ArrayPair
-	var pos ArrayPosition = 0
-	for {
-		pair, pos = ht.data0.FindPos(pos)
-		if pair == nil {
-			return
-		}
-		data := pair.GetVal().DeIndirect()
-		if data.IsUndef() {
-			continue
-		}
-		return pair.GetKey(), data
-	}
-}
-
-func (ht *Array) LastPair() *ArrayPair {
-	pair, _ := ht.data0.FindPosReserve(maxArrayPosition)
+func (ht *Array) Last() *ArrayPair {
+	pair, _ := ht.findPosReserve(ht.data0.MaxPos())
 	return pair
 }
 
-func (ht *Array) LastPairIndirect() *ArrayPair {
-	var pair *ArrayPair
-	var pos = maxArrayPosition
-	for {
-		pair, pos = ht.data0.FindPosReserve(pos)
-		if pair == nil {
-			return nil
-		}
-		data := pair.GetVal().DeIndirect()
-		if data.IsUndef() {
-			continue
-		}
-		return NewArrayPair(pair.GetKey(), data)
-	}
-}
-
-func (ht *Array) Last() (key ArrayKey, val *Zval) {
-	pair, _ := ht.data0.FindPosReserve(maxArrayPosition)
-	if pair == nil {
-		return
-	}
-	return pair.GetKey(), pair.GetVal()
-}
-
-func (ht *Array) LastIndirect() (key ArrayKey, val *Zval) {
-	var pair *ArrayPair
-	var pos = maxArrayPosition
-	for {
-		pair, pos = ht.data0.FindPosReserve(pos)
-		if pair == nil {
-			return
-		}
-		data := pair.GetVal().DeIndirect()
-		if data.IsUndef() {
-			continue
-		}
-		return pair.GetKey(), data
-	}
+func (ht *Array) LastIndirect() *ArrayPair {
+	pair, _ := ht.findPosReserveIndirect(ht.data0.MaxPos())
+	return pair
 }
 
 /**
@@ -553,7 +551,7 @@ func (ht *Array) Foreach(handler func(key ArrayKey, value *Zval)) {
 	var pair *ArrayPair
 	var pos ArrayPosition = 0
 	for {
-		pair, pos = ht.data0.FindPos(pos)
+		pair, pos = ht.findPos(pos)
 		if pair == nil {
 			break
 		}
@@ -564,7 +562,7 @@ func (ht *Array) ForeachEx(handler func(key ArrayKey, value *Zval) bool) bool {
 	var pair *ArrayPair
 	var pos ArrayPosition = 0
 	for {
-		pair, pos = ht.data0.FindPos(pos)
+		pair, pos = ht.findPos(pos)
 		if pair == nil {
 			break
 		}
@@ -579,7 +577,7 @@ func (ht *Array) ForeachReserve(handler func(key ArrayKey, value *Zval)) {
 	var pair *ArrayPair
 	var pos ArrayPosition = ArrayPosition(ht.data0.Cap())
 	for {
-		pair, pos = ht.data0.FindPosReserve(pos)
+		pair, pos = ht.findPosReserve(pos)
 		if pair == nil {
 			break
 		}
@@ -591,7 +589,7 @@ func (ht *Array) ForeachIndirect(handler func(key ArrayKey, value *Zval)) {
 	var pair *ArrayPair
 	var pos ArrayPosition = 0
 	for {
-		pair, pos = ht.data0.FindPos(pos)
+		pair, pos = ht.findPos(pos)
 		if pair == nil {
 			break
 		}
@@ -606,7 +604,7 @@ func (ht *Array) ForeachIndirectEx(handler func(key ArrayKey, value *Zval) bool)
 	var pair *ArrayPair
 	var pos ArrayPosition = 0
 	for {
-		pair, pos = ht.data0.FindPos(pos)
+		pair, pos = ht.findPos(pos)
 		if pair == nil {
 			break
 		}
@@ -625,7 +623,7 @@ func (ht *Array) ForeachIndirectReserve(handler func(key ArrayKey, value *Zval))
 	var pair *ArrayPair
 	var pos ArrayPosition = ArrayPosition(ht.data0.Cap())
 	for {
-		pair, pos = ht.data0.FindPosReserve(pos)
+		pair, pos = ht.findPosReserve(pos)
 		if pair == nil {
 			break
 		}
@@ -672,35 +670,19 @@ func (ht *Array) ForeachData() []*Bucket {
 /**
  * Iterator & Pos
  */
-// 查找从当前 pos 开始第一个有效 pos(含当前pos)
-func (ht *Array) validPosEx(pos uint32, indirect bool) (uint32, bool) {
-	dataSize := uint32(len(ht.data))
-	for i := pos; i < dataSize; i++ {
-		val := ht.data[i].GetVal()
-		if indirect && val.IsIndirect() {
-			val = val.Indirect()
-		}
-		if val.IsUndef() {
-			continue
-		}
-		return i, true
-	}
-	// 没有有效pos，此时 pos == ht.DataSize()
-	return pos, false
-}
-
 func (ht *Array) currentPosVal() uint32 {
-	var pos, _ = ht.validPosEx(ht.internalPointer, false)
-	return pos
+	_, realPos := ht.findPos(ht.internalPointer)
+	return realPos
 }
 
 func (ht *Array) validPos(pos uint32) (uint32, bool) {
-	return ht.validPosEx(pos, false)
+	pair, realPos := ht.findPos(pos)
+	return realPos, pair != nil
 }
 
 func (ht *Array) validPosVal(pos uint32) uint32 {
-	pos, _ = ht.validPosEx(pos, false)
-	return pos
+	_, realPos := ht.findPos(pos)
+	return realPos
 }
 
 /**

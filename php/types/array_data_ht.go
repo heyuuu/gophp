@@ -89,6 +89,10 @@ func (ht *ArrayDataHt) Clean() {
 	ht.indexes = make(map[ArrayKey]uint32)
 }
 
+func (ht *ArrayDataHt) MaxPos() ArrayPosition {
+	return uint32(len(ht.data)) - 1
+}
+
 func (ht *ArrayDataHt) Pos(pos ArrayPosition) *ArrayPair {
 	size := uint32(len(ht.data))
 	if pos >= size {
@@ -119,6 +123,22 @@ func (ht *ArrayDataHt) FindPos(pos ArrayPosition) (pair *ArrayPair, realPos Arra
 
 	return nil, size
 }
+func (ht *ArrayDataHt) FindPosIndirect(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition) {
+	size := uint32(len(ht.data))
+	if pos >= size {
+		return nil, size
+	}
+
+	for i := pos; i < size; i++ {
+		p := &ht.data[i]
+		v := p.GetVal().DeIndirect()
+		if !v.IsUndef() {
+			return NewArrayPair(p.key, v), i
+		}
+	}
+
+	return nil, size
+}
 func (ht *ArrayDataHt) FindPosReserve(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition) {
 	size := uint32(len(ht.data))
 	if pos >= size {
@@ -129,6 +149,22 @@ func (ht *ArrayDataHt) FindPosReserve(pos ArrayPosition) (pair *ArrayPair, realP
 	for i := pos; i > 0; i-- {
 		p := &ht.data[i-1]
 		v := p.GetVal()
+		if !v.IsUndef() {
+			return NewArrayPair(p.key, v), i - 1
+		}
+	}
+	return nil, 0
+}
+func (ht *ArrayDataHt) FindPosReserveIndirect(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition) {
+	size := uint32(len(ht.data))
+	if pos >= size {
+		return nil, size
+	}
+
+	// prev 需要用 0 表示已搜索全表，所以 pos = 实际索引 + 1
+	for i := pos; i > 0; i-- {
+		p := &ht.data[i-1]
+		v := p.GetVal().DeIndirect()
 		if !v.IsUndef() {
 			return NewArrayPair(p.key, v), i - 1
 		}

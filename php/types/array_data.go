@@ -23,12 +23,16 @@ type ArrayData interface {
 	 * Pos 操作相关
 	 * pos 表示数据在内部的具体位置，具体值由具体 ArrayData 实现确定，需要满足如下条件
 	 * - 每个 pos 对应 0~1 具体合法值，在无写操作的情况下对应值不变
-	 * - 取值范围在 [0, Cap() - 1] 之间
+	 * - 在 [0, MaxPos()] 之间可能有对应值，[MaxPos()，+Inf) 肯定无对应值
 	 */
 	// 获取 Pos 对应位置的数据，必须用 FindEx() 返回的精确 Pos 值。
 	Pos(pos ArrayPosition) *ArrayPair
 	// 从传入 Pos 开始向后查找合法 Pos 位置。
 	FindPos(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition)
+	FindPosIndirect(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition)
 	// 从传入 Pos 开始向前查找合法 Pos 位置。
 	FindPosReserve(pos ArrayPosition) (pair *ArrayPair, newPos ArrayPosition)
+	FindPosReserveIndirect(pos ArrayPosition) (pair *ArrayPair, newPos ArrayPosition)
+	// 返回最大 pos，用于反向遍历的初始值
+	MaxPos() ArrayPosition
 }

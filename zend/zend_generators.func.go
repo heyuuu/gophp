@@ -659,7 +659,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		var ht *types.Array = generator.GetValues().Array()
 		var pos types.ArrayPosition = generator.GetValues().GetFePos()
 
-		p, newPos := ht.Next(pos)
+		p, newPos := ht.NextEx(pos)
 		if p == nil {
 			/* Reached end of array */
 			goto failure
