@@ -37,7 +37,7 @@ func (ht *ArrayDataHt) FindEx(key ArrayKey) (*Zval, ArrayPosition) {
 	if pos, ok := ht.indexes[key]; ok {
 		return ht.data[pos].GetVal(), pos
 	}
-	return nil, invalidArrayPosition
+	return nil, maxArrayPosition
 }
 
 func (ht *ArrayDataHt) Add(key ArrayKey, data *Zval) bool {
@@ -119,7 +119,7 @@ func (ht *ArrayDataHt) FindPos(pos ArrayPosition) (pair *ArrayPair, realPos Arra
 
 	return nil, size
 }
-func (ht *ArrayDataHt) FindPosPrev(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition) {
+func (ht *ArrayDataHt) FindPosReserve(pos ArrayPosition) (pair *ArrayPair, realPos ArrayPosition) {
 	size := uint32(len(ht.data))
 	if pos >= size {
 		return nil, size

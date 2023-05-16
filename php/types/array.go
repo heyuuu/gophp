@@ -198,7 +198,6 @@ func (ht *Array) MapWithKey(mapper func(key ArrayKey, value *Zval) (ArrayKey, *Z
  * Open methods
  */
 const maxArrayPosition uint32 = math.MaxUint32
-const invalidArrayPosition uint32 = math.MaxUint32
 
 func (ht *Array) KeyFindValAndPos(strKey string) (*Zval, uint32) {
 	key := StrKey(strKey)
@@ -208,7 +207,7 @@ func (ht *Array) KeyAddValAndPos(strKey string, pData *Zval) (*Zval, uint32) {
 	key := StrKey(strKey)
 	ok := ht.data0.Add(key, pData)
 	if !ok {
-		return nil, invalidArrayPosition
+		return nil, maxArrayPosition
 	}
 	return ht.data0.FindEx(key)
 }
