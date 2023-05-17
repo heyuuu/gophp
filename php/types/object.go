@@ -8,7 +8,6 @@ import (
 )
 
 type objectCompareFunc func(object1 *Zval, object2 *Zval) int
-type objectCastFunc func(readobj *Zval, retval *Zval, type_ ZvalType) int
 type objectGetPropertiesFunc func(object *Zval) *Array
 
 /**
@@ -204,10 +203,6 @@ func (o *ZendObject) GetConstructor(object *ZendObject) IFunction {
 
 // cast
 func (o *ZendObject) CanCast() bool { return o.handlers.CastObject != nil }
-func (o *ZendObject) IsStdCast() bool {
-	std := zend.ZendStdCastObjectTostring
-	return objectCastFunc(o.handlers.CastObject) == objectCastFunc(std)
-}
 func (o *ZendObject) Cast(readobj *Zval, retval *Zval, type_ ZvalType) int {
 	return o.handlers.CastObject(readobj, retval, type_)
 }

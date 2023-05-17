@@ -482,7 +482,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 					numbytes += len(s)
 					bytesWritten := core.PhpStreamWriteString(stream, s)
 					if bytesWritten != len(s) {
-						core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to write %zd bytes to %s", str.GetLen(), filename)
+						core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to write %zd bytes to %s", len(s), filename)
 						numbytes = -1
 						return false
 					}
@@ -492,11 +492,10 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		}
 	case types.IS_OBJECT:
 		if data.Object().GetHandlers() != nil {
-			var out types.Zval
-			if zend.ZendStdCastObjectTostring(data, &out, types.IS_STRING) == types.SUCCESS {
-				numbytes = core.PhpStreamWrite(stream, out.String().GetVal(), out.String().GetLen())
-				if numbytes != out.String().GetLen() {
-					core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, out.String().GetLen())
+			if s, ok := zend.StdCastObjectToString(data); ok {
+				numbytes = core.PhpStreamWriteString(stream, s)
+				if numbytes != len(s) {
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, len(s))
 					numbytes = -1
 				}
 

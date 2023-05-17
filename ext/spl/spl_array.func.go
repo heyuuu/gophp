@@ -839,7 +839,6 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 		intern.GetArray().SetArray(array.Array().LazyDup())
 	} else {
 		if array.Object().GetHandlers() == &spl_handler_ArrayObject || array.Object().GetHandlers() == &spl_handler_ArrayIterator {
-			// zend.ZvalPtrDtor(intern.GetArray())
 			if just_array != 0 {
 				var other *SplArrayObject = Z_SPLARRAY_P(array)
 				ar_flags = other.GetArFlags() & ^SPL_ARRAY_INT_MASK

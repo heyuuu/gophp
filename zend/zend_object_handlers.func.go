@@ -1455,49 +1455,57 @@ exit:
 func ZendStdGetClassName(zobj *types.ZendObject) *types.String {
 	return zobj.GetCe().GetName().Copy()
 }
+
+func StdCastObjectToString(obj *types.Zval) (string, bool) {
+	ce := obj.Object().GetCe()
+	if ce.GetTostring() != nil {
+		var fakeScope = EG__().GetFakeScope()
+		EG__().SetFakeScope(nil)
+
+		var retval types.Zval
+		var fun = ce.GetTostring()
+		ZendCallMethodWith0Params(obj, ce, &fun, "__tostring", &retval)
+		EG__().SetFakeScope(fakeScope)
+		if retval.IsString() {
+			return retval.StringVal(), true
+		}
+		if EG__().GetException() == nil {
+			faults.ThrowError(nil, "Method %s::__toString() must return a string value", ce.GetName().GetVal())
+		}
+	}
+	return "", false
+}
+
 func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, typ types.ZvalType) int {
-	var retval types.Zval
-	var ce *types.ClassEntry
 	switch typ {
 	case types.IS_STRING:
-		ce = types.Z_OBJCE_P(readobj)
-		if ce.GetTostring() != nil {
-			var fake_scope *types.ClassEntry = EG__().GetFakeScope()
-			EG__().SetFakeScope(nil)
-			ZendCallMethodWith0Params(readobj, ce, ce.GetTostring(), "__tostring", &retval)
-			EG__().SetFakeScope(fake_scope)
-			if retval.IsString() {
-				types.ZVAL_COPY_VALUE(writeobj, &retval)
-				return types.SUCCESS
-			}
-			// ZvalPtrDtor(&retval)
-			if EG__().GetException() == nil {
-				faults.ThrowError(nil, "Method %s::__toString() must return a string value", ce.GetName().GetVal())
-			}
+		if str, ok := StdCastObjectToString(readobj); ok {
+			writeobj.SetStringVal(str)
+			return types.SUCCESS
 		}
 		return types.FAILURE
 	case types.IS_BOOL:
 		writeobj.SetTrue()
 		return types.SUCCESS
 	case types.IS_LONG:
-		ce = types.Z_OBJCE_P(readobj)
-		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to int", ce.GetName().GetVal())
+		className := readobj.Object().GetCe().Name()
+		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to int", className)
 		writeobj.SetLong(1)
 		return types.SUCCESS
 	case types.IS_DOUBLE:
-		ce = types.Z_OBJCE_P(readobj)
-		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to float", ce.GetName().GetVal())
+		className := readobj.Object().GetCe().Name()
+		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to float", className)
 		writeobj.SetDouble(1)
 		return types.SUCCESS
 	case types.IS_NUMBER:
-		ce = types.Z_OBJCE_P(readobj)
-		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to number", ce.GetName().GetVal())
+		className := readobj.Object().GetCe().Name()
+		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to number", className)
 		writeobj.SetLong(1)
 		return types.SUCCESS
 	default:
 		writeobj.SetNull()
+		return types.FAILURE
 	}
-	return types.FAILURE
 }
 func ZendStdGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr *types.IFunction, obj_ptr **types.ZendObject) int {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(obj)

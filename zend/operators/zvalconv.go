@@ -27,11 +27,7 @@ again:
 	case types.IS_ARRAY:
 		return op.Array().Len() != 0
 	case types.IS_OBJECT:
-		if op.Object().IsStdCast() {
-			return true
-		} else {
-			return ZendObjectIsTrue(op)
-		}
+		return ZendObjectIsTrue(op)
 	case types.IS_RESOURCE:
 		return op.ResourceHandle() != 0
 	case types.IS_REFERENCE:
