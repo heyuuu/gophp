@@ -1713,7 +1713,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					return types.SUCCESS
 				}
 				if op1.Object().CanCompareObjectsTo(op2.Object()) {
-					result.SetLong(op1.Object().CompareObjects(op1, op2))
+					result.SetLong(op1.Object().CompareObjectsTo(op2.Object()))
 					return types.SUCCESS
 				}
 			}

@@ -230,8 +230,8 @@ func (o *ZendObject) DoOperation(opcode uint8, result *Zval, op1 *Zval, op2 *Zva
 func (o *ZendObject) CanCompareObjectsTo(obj2 *ZendObject) bool {
 	return objectCompareFunc(o.handlers.CompareObjects) == objectCompareFunc(obj2.handlers.CompareObjects)
 }
-func (o *ZendObject) CompareObjects(obj1, obj2 *Zval) int {
-	return o.handlers.CompareObjects(obj1, obj2)
+func (o *ZendObject) CompareObjectsTo(another *ZendObject) int {
+	return o.handlers.CompareObjectsEx(o, another)
 }
 
 func (o *ZendObject) CanCompare() bool {
