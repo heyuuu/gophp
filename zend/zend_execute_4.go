@@ -14,7 +14,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	var z_copy types.Zval
 	obj.SetObject(object.Object())
 	// 	obj.AddRefcount()
-	z = obj.Object().ReadProperty(&obj, property, BP_VAR_R, cache_slot, &rv)
+	z = obj.Object().ReadProperty(property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		// OBJ_RELEASE(obj.Object())
 		if RETURN_VALUE_USED(opline) {
@@ -39,10 +39,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), &z_copy)
 	}
-	obj.Object().WriteProperty(&obj, property, &z_copy, cache_slot)
-	// OBJ_RELEASE(obj.Object())
-	// ZvalPtrDtor(&z_copy)
-	// ZvalPtrDtor(z)
+	obj.Object().WriteProperty(property, &z_copy, cache_slot)
 }
 func ZendAssignOpOverloadedProperty(
 	object *types.Zval,
@@ -58,7 +55,7 @@ func ZendAssignOpOverloadedProperty(
 	var res types.Zval
 	obj.SetObject(object.Object())
 	// 	obj.AddRefcount()
-	z = obj.Object().ReadProperty(&obj, property, BP_VAR_R, cache_slot, &rv)
+	z = obj.Object().ReadProperty(property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		// OBJ_RELEASE(obj.Object())
 		if RETURN_VALUE_USED(opline) {
@@ -75,7 +72,7 @@ func ZendAssignOpOverloadedProperty(
 		z.CopyValueFrom(value)
 	}
 	if ZendBinaryOp(&res, z, value, opline) == types.SUCCESS {
-		obj.Object().WriteProperty(&obj, property, &res, cache_slot)
+		obj.Object().WriteProperty(property, &res, cache_slot)
 	}
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), &res)

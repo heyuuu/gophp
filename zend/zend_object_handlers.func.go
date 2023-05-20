@@ -1526,7 +1526,7 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ar
 	case ZEND_PROP_PURPOSE_JSON:
 		fallthrough
 	case _ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
-		ht = obj.Object().GetPropertiesArray(obj)
+		ht = obj.Object().GetPropertiesArrayEx()
 		return ht
 	default:
 		b.Assert(false)
@@ -1535,7 +1535,7 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ar
 }
 func ZendGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Array {
 	if obj.Object().CanGetPropertiesFor() {
-		return obj.Object().GetPropertiesFor(obj, purpose)
+		return obj.Object().GetPropertiesFor(purpose)
 	}
 	return ZendStdGetPropertiesFor(obj, purpose)
 }

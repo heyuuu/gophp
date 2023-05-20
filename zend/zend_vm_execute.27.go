@@ -70,7 +70,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 		}
 	}
 
-	retval = zobj.ReadProperty(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)

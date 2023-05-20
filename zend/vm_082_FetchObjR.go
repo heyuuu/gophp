@@ -96,7 +96,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 		}
 	}
 
-	retval = zobj.ReadProperty(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 		goto fetch_obj_r_copy
 	} else if retval.IsReference() {
@@ -146,7 +146,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
 	}
-	retval = zobj.ReadProperty(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
@@ -193,7 +193,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
 	}
-	retval = zobj.ReadProperty(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
@@ -226,7 +226,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
 	}
-	retval = zobj.ReadProperty(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
@@ -255,7 +255,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
 	}
-	retval = zobj.ReadProperty(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
@@ -305,7 +305,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
 	}
-	retval = zobj.ReadProperty(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
@@ -352,7 +352,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2(executeData)
 	}
-	retval = zobj.ReadProperty(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)

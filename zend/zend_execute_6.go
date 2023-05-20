@@ -141,9 +141,9 @@ func ZendFetchPropertyAddress(
 			}
 		}
 	}
-	ptr = container.Object().GetPropertyPtr(container, prop_ptr, type_, cache_slot)
+	ptr = container.Object().GetPropertyPtr(prop_ptr, type_, cache_slot)
 	if nil == ptr {
-		ptr = container.Object().ReadProperty(container, prop_ptr, type_, cache_slot, result)
+		ptr = container.Object().ReadProperty(prop_ptr, type_, cache_slot, result)
 		if ptr == result {
 			return
 		}

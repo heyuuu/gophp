@@ -1165,8 +1165,8 @@ func ArrayColumnFetchProp(data *types.Zval, name *types.Zval) *types.Zval {
 		 * properties that are null but exist) and then in "has" mode to handle objects that
 		 * implement __isset (which is not called in "exists" mode). */
 
-		if data.Object().HasProperty(data, name, zend.ZEND_PROPERTY_EXISTS, nil) != 0 || data.Object().HasProperty(data, name, zend.ZEND_PROPERTY_ISSET, nil) != 0 {
-			prop = data.Object().ReadProperty(data, name, zend.BP_VAR_R, nil, &rv)
+		if data.Object().HasProperty(name, zend.ZEND_PROPERTY_EXISTS, nil) != 0 || data.Object().HasProperty(name, zend.ZEND_PROPERTY_ISSET, nil) != 0 {
+			prop = data.Object().ReadProperty(name, zend.BP_VAR_R, nil, &rv)
 			if prop != nil {
 				prop = types.ZVAL_DEREF(prop)
 			}

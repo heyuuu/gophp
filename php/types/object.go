@@ -126,35 +126,39 @@ func (o *ZendObject) Clone(zv *Zval) *ZendObject {
 }
 
 // property
-func (o *ZendObject) ReadProperty(object *Zval, member *Zval, typ int, cacheSlot *any, rv *Zval) *Zval {
-	return o.handlers.ReadPropertyEx(object.Object(), member, typ, cacheSlot, rv)
+func (o *ZendObject) ReadProperty(member *Zval, typ int, cacheSlot *any, rv *Zval) *Zval {
+	return o.handlers.ReadPropertyEx(o, member, typ, cacheSlot, rv)
 }
-func (o *ZendObject) WriteProperty(object *Zval, member *Zval, value *Zval, cacheSlot *any) *Zval {
-	return o.handlers.WriteProperty(object, member, value, cacheSlot)
+func (o *ZendObject) WriteProperty(member *Zval, value *Zval, cacheSlot *any) *Zval {
+	return o.handlers.WritePropertyEx(o, member, value, cacheSlot)
 }
-func (o *ZendObject) HasProperty(object *Zval, member *Zval, hasSetExists int, cacheSlot *any) int {
-	return o.handlers.HasProperty(object, member, hasSetExists, cacheSlot)
+func (o *ZendObject) HasProperty(member *Zval, hasSetExists int, cacheSlot *any) int {
+	return o.handlers.HasPropertyEx(o, member, hasSetExists, cacheSlot)
 }
-func (o *ZendObject) UnsetProperty(object *Zval, member *Zval, cacheSlot *any) {
-	o.handlers.UnsetProperty(object, member, cacheSlot)
+func (o *ZendObject) UnsetPropertyEx(member *Zval, cacheSlot *any) {
+	o.handlers.UnsetPropertyEx(o, member, cacheSlot)
 }
-func (o *ZendObject) GetPropertyPtr(object *Zval, member *Zval, typ int, cacheSlot *any) *Zval {
-	return o.handlers.GetPropertyPtrPtr(object, member, typ, cacheSlot)
+func (o *ZendObject) GetPropertyPtr(member *Zval, typ int, cacheSlot *any) *Zval {
+	return o.handlers.GetPropertyPtrPtrEx(o, member, typ, cacheSlot)
 }
 
 // properties
 func (o *ZendObject) IsStdGetProperties() bool {
+	// todo
 	std := zend.ZendStdGetProperties
 	return objectGetPropertiesFunc(o.handlers.GetProperties) == objectGetPropertiesFunc(std)
 }
 func (o *ZendObject) GetPropertiesArray(object *Zval) *Array {
 	return o.handlers.GetProperties(object)
 }
-func (o *ZendObject) CanGetPropertiesFor() bool {
-	return o.handlers.GetPropertiesFor != nil
+func (o *ZendObject) GetPropertiesArrayEx() *Array {
+	return o.handlers.GetPropertiesEx(o)
 }
-func (o *ZendObject) GetPropertiesFor(object *Zval, purpose zend.ZendPropPurpose) *Array {
-	return o.handlers.GetPropertiesFor(object, purpose)
+func (o *ZendObject) CanGetPropertiesFor() bool {
+	return o.handlers.GetPropertiesForEx != nil
+}
+func (o *ZendObject) GetPropertiesFor(purpose zend.ZendPropPurpose) *Array {
+	return o.handlers.GetPropertiesForEx(o, purpose)
 }
 
 // get & set
