@@ -120,9 +120,9 @@ func (o *ZendObject) Free() { o.handlers.FreeObj(o) }
 func (o *ZendObject) Dtor() { o.handlers.DtorObj(o) }
 
 func (o *ZendObject) CanClone() bool { return o.handlers.CloneObjEx != nil }
-func (o *ZendObject) Clone(zv *Zval) *ZendObject {
+func (o *ZendObject) Clone() *ZendObject {
 	b.Assert(o.handlers.CloneObjEx != nil)
-	return o.handlers.CloneObjEx(zv.Object())
+	return o.handlers.CloneObjEx(o)
 }
 
 // property

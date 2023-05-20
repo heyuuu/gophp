@@ -25,7 +25,7 @@ func cloneHandlerHelper(executeData *ZendExecuteData, obj *types.Zval) int {
 			}
 		}
 	}
-	opline.Result().SetObject(obj.Object().Clone(obj))
+	opline.Result().SetObject(obj.Object().Clone())
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 
