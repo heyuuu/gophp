@@ -24,7 +24,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	}
 	if z.IsObject() && z.Object().CanGet() {
 		var rv2 types.Zval
-		var value *types.Zval = z.Object().Get(z, &rv2)
+		var value *types.Zval = z.Object().Get(&rv2)
 		if z == &rv {
 			// ZvalPtrDtor(&rv)
 		}
@@ -65,7 +65,7 @@ func ZendAssignOpOverloadedProperty(
 	}
 	if z.IsObject() && z.Object().CanGet() {
 		var rv2 types.Zval
-		var value *types.Zval = z.Object().Get(z, &rv2)
+		var value *types.Zval = z.Object().Get(&rv2)
 		if z == &rv {
 			// ZvalPtrDtor(&rv)
 		}
@@ -399,7 +399,7 @@ func ZendFetchDimensionAddress(
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
 			dim++
 		}
-		retval = container.Object().ReadDimension(container, dim, type_, result)
+		retval = container.Object().ReadDimension(dim, type_, result)
 		if retval == EG__().GetUninitializedZval() {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(container)
 			result.SetNull()

@@ -237,7 +237,7 @@ func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func f
 			faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).GetName().GetVal(), types.ZendGetTypeByConst(ctype))
 		}
 	} else if op.Object().CanGet() {
-		var newop *types.Zval = op.Object().Get(op, dst)
+		var newop *types.Zval = op.Object().Get(dst)
 		if newop.GetType() != types.IS_OBJECT {
 			dst.CopyValueFrom(newop)
 			conv_func(dst)
@@ -635,10 +635,10 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 					var ret int
 					var rv types.Zval
-					var objval *types.Zval = op1.Object().Get(op1, &rv)
+					var objval *types.Zval = op1.Object().Get(&rv)
 					// objval.TryAddRefcount()
 					ret = MulFunction(objval, objval, op2)
-					op1.Object().Set(op1, objval)
+					op1.Object().Set(objval)
 					// ZvalPtrDtor(objval)
 					return ret
 				} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -738,10 +738,10 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 					var ret int
 					var rv types.Zval
-					var objval *types.Zval = op1.Object().Get(op1, &rv)
+					var objval *types.Zval = op1.Object().Get(&rv)
 					// objval.TryAddRefcount()
 					ret = PowFunction(objval, objval, op2)
-					op1.Object().Set(op1, objval)
+					op1.Object().Set(objval)
 					// ZvalPtrDtor(objval)
 					return ret
 				} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -850,10 +850,10 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 					var ret int
 					var rv types.Zval
-					var objval *types.Zval = op1.Object().Get(op1, &rv)
+					var objval *types.Zval = op1.Object().Get(&rv)
 					// objval.TryAddRefcount()
 					ret = DivFunction(objval, objval, op2)
-					op1.Object().Set(op1, objval)
+					op1.Object().Set(objval)
 					// ZvalPtrDtor(objval)
 					return ret
 				} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -902,10 +902,10 @@ func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 				var ret int
 				var rv types.Zval
-				var objval *types.Zval = op1.Object().Get(op1, &rv)
+				var objval *types.Zval = op1.Object().Get(&rv)
 				// objval.TryAddRefcount()
 				ret = ModFunction(objval, objval, op2)
-				op1.Object().Set(op1, objval)
+				op1.Object().Set(objval)
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -998,10 +998,10 @@ func BooleanXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 				var ret int
 				var rv types.Zval
-				var objval *types.Zval = op1.Object().Get(op1, &rv)
+				var objval *types.Zval = op1.Object().Get(&rv)
 				// objval.TryAddRefcount()
 				ret = BooleanXorFunction(objval, objval, op2)
-				op1.Object().Set(op1, objval)
+				op1.Object().Set(objval)
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -1114,10 +1114,10 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 		if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 			var ret int
 			var rv types.Zval
-			var objval *types.Zval = op1.Object().Get(op1, &rv)
+			var objval *types.Zval = op1.Object().Get(&rv)
 			// objval.TryAddRefcount()
 			ret = BitwiseOrFunction(objval, objval, op2)
-			op1.Object().Set(op1, objval)
+			op1.Object().Set(objval)
 			// ZvalPtrDtor(objval)
 			return ret
 		} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -1177,10 +1177,10 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 		if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 			var ret int
 			var rv types.Zval
-			var objval *types.Zval = op1.Object().Get(op1, &rv)
+			var objval *types.Zval = op1.Object().Get(&rv)
 			// objval.TryAddRefcount()
 			ret = BitwiseAndFunction(objval, objval, op2)
-			op1.Object().Set(op1, objval)
+			op1.Object().Set(objval)
 			// ZvalPtrDtor(objval)
 			return ret
 		} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -1240,10 +1240,10 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 		if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 			var ret int
 			var rv types.Zval
-			var objval *types.Zval = op1.Object().Get(op1, &rv)
+			var objval *types.Zval = op1.Object().Get(&rv)
 			// objval.TryAddRefcount()
 			ret = BitwiseXorFunction(objval, objval, op2)
-			op1.Object().Set(op1, objval)
+			op1.Object().Set(objval)
 			// ZvalPtrDtor(objval)
 			return ret
 		} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -1296,10 +1296,10 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 			if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 				var ret int
 				var rv types.Zval
-				var objval *types.Zval = op1.Object().Get(op1, &rv)
+				var objval *types.Zval = op1.Object().Get(&rv)
 				// objval.TryAddRefcount()
 				ret = ShiftLeftFunction(objval, objval, op2)
-				op1.Object().Set(op1, objval)
+				op1.Object().Set(objval)
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -1389,10 +1389,10 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 				var ret int
 				var rv types.Zval
-				var objval *types.Zval = op1.Object().Get(op1, &rv)
+				var objval *types.Zval = op1.Object().Get(&rv)
 				// objval.TryAddRefcount()
 				ret = ShiftRightFunction(objval, objval, op2)
-				op1.Object().Set(op1, objval)
+				op1.Object().Set(objval)
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -1481,10 +1481,10 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 				var ret int
 				var rv types.Zval
-				var objval *types.Zval = op1.Object().Get(op1, &rv)
+				var objval *types.Zval = op1.Object().Get(&rv)
 				// objval.TryAddRefcount()
 				ret = ConcatFunction(objval, objval, op2)
-				op1.Object().Set(op1, objval)
+				op1.Object().Set(objval)
 				// ZvalPtrDtor(objval)
 				return ret
 			} else if op1.IsObject() && op1.Object().CanDoOperation() {
@@ -1720,7 +1720,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			if op1.IsObject() {
 				if op1.Object().CanGet() {
 					var rv types.Zval
-					op_free = op1.Object().Get(op1, &rv)
+					op_free = op1.Object().Get(&rv)
 					ret = CompareFunction(result, op_free, op2)
 					//ZendFreeObjGetResult(op_free)
 					return ret
@@ -1739,7 +1739,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			if op2.IsObject() {
 				if op2.Object().CanGet() {
 					var rv types.Zval
-					op_free = op2.Object().Get(op2, &rv)
+					op_free = op2.Object().Get(&rv)
 					ret = CompareFunction(result, op1, op_free)
 					//ZendFreeObjGetResult(op_free)
 					return ret
@@ -2001,10 +2001,10 @@ try_again:
 
 			var rv types.Zval
 			var val *types.Zval
-			val = op1.Object().Get(op1, &rv)
+			val = op1.Object().Get(&rv)
 			// val.TryAddRefcount()
 			IncrementFunction(val)
-			op1.Object().Set(op1, val)
+			op1.Object().Set(val)
 			// ZvalPtrDtor(val)
 		} else if op1.Object().CanDoOperation() {
 			var op2 types.Zval
@@ -2057,10 +2057,10 @@ try_again:
 
 			var rv types.Zval
 			var val *types.Zval
-			val = op1.Object().Get(op1, &rv)
+			val = op1.Object().Get(&rv)
 			// val.TryAddRefcount()
 			DecrementFunction(val)
-			op1.Object().Set(op1, val)
+			op1.Object().Set(val)
 			// ZvalPtrDtor(val)
 		} else if op1.Object().CanDoOperation() {
 			var op2 types.Zval
@@ -2088,7 +2088,7 @@ func ZendObjectIsTrue(op *types.Zval) bool {
 	} else if op.Object().CanGet() {
 		var result bool
 		var rv types.Zval
-		var tmp *types.Zval = op.Object().Get(op, &rv)
+		var tmp *types.Zval = op.Object().Get(&rv)
 		if tmp.GetType() != types.IS_OBJECT {
 			/* for safety - avoid loop */
 			result = ZvalIsTrue(tmp)

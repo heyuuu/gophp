@@ -187,7 +187,7 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 			}
 		} else if arg.Object().CanGet() {
 			var rv types.Zval
-			var z *types.Zval = arg.Object().Get(arg, &rv)
+			var z *types.Zval = arg.Object().Get(&rv)
 			if z.GetType() != types.IS_OBJECT {
 				if z.IsString() {
 					arg.CopyValueFrom(z)
@@ -240,7 +240,7 @@ func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool)
 		if separate && arg.Object().GetProperties() != nil {
 			arg.Object().DupProperties()
 		}
-		return arg.Object().GetPropertiesArray(arg), true
+		return arg.Object().GetPropertiesArray(), true
 	} else if checkNull && arg.IsNull() {
 		return nil, true
 	} else {

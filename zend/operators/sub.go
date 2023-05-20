@@ -34,9 +34,9 @@ func _subFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int 
 	if op1.IsObject() && op1 == result && op1.Object().CanGet() && op1.Object().CanSet() {
 		var ret int
 		var rv types.Zval
-		var objval *types.Zval = op1.Object().Get(op1, &rv)
+		var objval *types.Zval = op1.Object().Get(&rv)
 		ret = SubFunction(objval, objval, op2)
-		op1.Object().Set(op1, objval)
+		op1.Object().Set(objval)
 		return ret
 	} else if op1.IsObject() && op1.Object().CanDoOperation() {
 		if types.SUCCESS == op1.Object().DoOperation(zend.ZEND_SUB, result, op1, op2) {

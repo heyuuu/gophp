@@ -33,7 +33,7 @@ func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, strict ty
 				}
 			}
 			if variable_ptr.IsObject() && variable_ptr.Object().CanSet() {
-				variable_ptr.Object().Set(variable_ptr, value)
+				variable_ptr.Object().Set(value)
 				return variable_ptr
 			}
 			ZendCopyToVariable(variable_ptr, value)

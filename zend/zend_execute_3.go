@@ -392,7 +392,7 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	}
 	if z.IsObject() && z.Object().CanGet() {
 		var rv2 types.Zval
-		var value *types.Zval = z.Object().Get(z, &rv2)
+		var value *types.Zval = z.Object().Get(&rv2)
 		if z == &rv {
 			// ZvalPtrDtor(&rv)
 		}

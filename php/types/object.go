@@ -148,10 +148,7 @@ func (o *ZendObject) IsStdGetProperties() bool {
 	std := zend.ZendStdGetProperties
 	return objectGetPropertiesFunc(o.handlers.GetProperties) == objectGetPropertiesFunc(std)
 }
-func (o *ZendObject) GetPropertiesArray(object *Zval) *Array {
-	return o.handlers.GetProperties(object)
-}
-func (o *ZendObject) GetPropertiesArrayEx() *Array {
+func (o *ZendObject) GetPropertiesArray() *Array {
 	return o.handlers.GetPropertiesEx(o)
 }
 func (o *ZendObject) CanGetPropertiesFor() bool {
@@ -162,27 +159,27 @@ func (o *ZendObject) GetPropertiesFor(purpose zend.ZendPropPurpose) *Array {
 }
 
 // get & set
-func (o *ZendObject) CanGet() bool { return o.handlers.Get != nil }
-func (o *ZendObject) Get(object *Zval, rv *Zval) *Zval {
-	return o.handlers.Get(object, rv)
+func (o *ZendObject) CanGet() bool { return o.handlers.GetEx != nil }
+func (o *ZendObject) Get(rv *Zval) *Zval {
+	return o.handlers.GetEx(o, rv)
 }
-func (o *ZendObject) CanSet() bool { return o.handlers.Set != nil }
-func (o *ZendObject) Set(object *Zval, value *Zval) {
-	o.handlers.Set(object, value)
+func (o *ZendObject) CanSet() bool { return o.handlers.SetEx != nil }
+func (o *ZendObject) Set(value *Zval) {
+	o.handlers.SetEx(o, value)
 }
 
 // dimension
-func (o *ZendObject) ReadDimension(object *Zval, offset *Zval, typ int, rv *Zval) *Zval {
-	return o.handlers.ReadDimension(object, offset, typ, rv)
+func (o *ZendObject) ReadDimension(offset *Zval, typ int, rv *Zval) *Zval {
+	return o.handlers.ReadDimensionEx(o, offset, typ, rv)
 }
-func (o *ZendObject) WriteDimension(object *Zval, offset *Zval, value *Zval) {
-	o.handlers.WriteDimension(object, offset, value)
+func (o *ZendObject) WriteDimension(offset *Zval, value *Zval) {
+	o.handlers.WriteDimensionEx(o, offset, value)
 }
-func (o *ZendObject) HasDimension(object *Zval, offset *Zval, checkEmpty int) int {
-	return o.handlers.HasDimension(object, offset, checkEmpty)
+func (o *ZendObject) HasDimension(offset *Zval, checkEmpty int) int {
+	return o.handlers.HasDimensionEx(o, offset, checkEmpty)
 }
-func (o *ZendObject) UnsetDimension(object *Zval, offset *Zval) {
-	o.handlers.UnsetDimension(object, offset)
+func (o *ZendObject) UnsetDimension(offset *Zval) {
+	o.handlers.UnsetDimensionEx(o, offset)
 }
 
 // elements

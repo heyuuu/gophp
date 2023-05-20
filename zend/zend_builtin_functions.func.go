@@ -313,7 +313,7 @@ repeat:
 	case types.IS_OBJECT:
 		if val_free.IsUndef() {
 			if value.Object().CanGet() {
-				value = value.Object().Get(value, &val_free)
+				value = value.Object().Get(&val_free)
 				goto repeat
 			} else if value.Object().CanCast() {
 				if value.Object().Cast(value, &val_free, types.IS_STRING) == types.SUCCESS {
@@ -538,7 +538,7 @@ func ZifGetClassVars(executeData zpp.Ex, return_value zpp.Ret, className *types.
 	}
 }
 func ZifGetObjectVars(obj zpp.Object) (*types.Array, bool) {
-	properties := obj.Object().GetPropertiesArray(obj)
+	properties := obj.Object().GetPropertiesArray()
 	if properties == nil {
 		return nil, false
 	}
@@ -599,7 +599,7 @@ func ZifGetMangledObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *type
 		}
 		break
 	}
-	properties = obj.Object().GetPropertiesArray(obj)
+	properties = obj.Object().GetPropertiesArray()
 	if properties == nil {
 		return_value.SetEmptyArray()
 		return

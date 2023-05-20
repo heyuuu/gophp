@@ -201,7 +201,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 				return tmp.StringVal(), true
 			}
 		} else if op.Object().CanGet() {
-			var z *types.Zval = op.Object().Get(op, &tmp)
+			var z *types.Zval = op.Object().Get(&tmp)
 			if z.GetType() != types.IS_OBJECT {
 				return __zvalGetStrFunc(z, try)
 			}
