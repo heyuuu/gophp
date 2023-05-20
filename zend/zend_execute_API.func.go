@@ -21,8 +21,7 @@ func ZendExtensionDeactivator(extension *ZendExtension) {
 }
 func InitExecutor() {
 	ZendInitFpu()
-	EG__().GetUninitializedZval().SetNull()
-	EG__().GetErrorZval().IsError()
+	EG__().GetErrorZval().SetIsError()
 
 	/* destroys stack frame, therefore makes core dumps worthless */
 

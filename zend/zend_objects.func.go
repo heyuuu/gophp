@@ -187,15 +187,12 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 	}
 }
 func ZendObjectsCloneObj(zobject *types.Zval) *types.ZendObject {
-	var old_object *types.ZendObject
-	var new_object *types.ZendObject
-
+	return ZendObjectsCloneObjEx(zobject.Object())
+}
+func ZendObjectsCloneObjEx(oldObject *types.ZendObject) *types.ZendObject {
 	/* assume that create isn't overwritten, so when clone depends on the
 	 * overwritten one then it must itself be overwritten */
-
-	old_object = zobject.Object()
-	new_object = types.NewStdObjectSkipPropertiesInit(old_object.GetCe())
-
-	ZendObjectsCloneMembers(new_object, old_object)
-	return new_object
+	newObject := types.NewStdObjectSkipPropertiesInit(oldObject.GetCe())
+	ZendObjectsCloneMembers(newObject, oldObject)
+	return newObject
 }

@@ -103,6 +103,7 @@ func (zv *Zval) SetIndirect(v *Zval)             { zv.typ, zv.value = IS_INDIREC
 func (zv *Zval) SetPtr(ptr any)                  { zv.typ, zv.value = IS_PTR, ptr }
 func (zv *Zval) SetCe(value *ClassEntry)         { zv.typ, zv.value = IS_PTR, value }
 func (zv *Zval) SetFunc(value IFunction)         { zv.typ, zv.value = IS_PTR, value }
+func (zv *Zval) SetIsError()                     { zv.typ, zv.value = IS_ERROR, nil }
 
 // fast property
 func (zv *Zval) ResourceHandle() int { return zv.Resource().GetHandle() }

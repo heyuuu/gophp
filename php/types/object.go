@@ -119,15 +119,15 @@ func (o *ZendObject) GetPropertiesTable() []Zval { return o.propertiesTable }
 func (o *ZendObject) Free() { o.handlers.FreeObj(o) }
 func (o *ZendObject) Dtor() { o.handlers.DtorObj(o) }
 
-func (o *ZendObject) CanClone() bool { return o.handlers.CloneObj != nil }
+func (o *ZendObject) CanClone() bool { return o.handlers.CloneObjEx != nil }
 func (o *ZendObject) Clone(zv *Zval) *ZendObject {
-	b.Assert(o.handlers.CloneObj != nil)
-	return o.handlers.CloneObj(zv)
+	b.Assert(o.handlers.CloneObjEx != nil)
+	return o.handlers.CloneObjEx(zv.Object())
 }
 
 // property
 func (o *ZendObject) ReadProperty(object *Zval, member *Zval, typ int, cacheSlot *any, rv *Zval) *Zval {
-	return o.handlers.ReadProperty(object, member, typ, cacheSlot, rv)
+	return o.handlers.ReadPropertyEx(object.Object(), member, typ, cacheSlot, rv)
 }
 func (o *ZendObject) WriteProperty(object *Zval, member *Zval, value *Zval, cacheSlot *any) *Zval {
 	return o.handlers.WriteProperty(object, member, value, cacheSlot)
@@ -209,7 +209,7 @@ func (o *ZendObject) Cast(readobj *Zval, retval *Zval, type_ ZvalType) int {
 
 // mixed
 func (o *ZendObject) ClassName() string {
-	return o.handlers.GetClassName(o).GetStr()
+	return o.ce.Name()
 }
 
 func (o *ZendObject) CanGetClosure() bool {
