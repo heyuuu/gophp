@@ -184,10 +184,10 @@ func (o *ZendObject) UnsetDimension(offset *Zval) {
 
 // elements
 func (o *ZendObject) CanCountElements() bool {
-	return o.handlers.CountElements != nil
+	return o.handlers.CountElementsEx != nil
 }
-func (o *ZendObject) CountElements(object *Zval, count *int) int {
-	return o.handlers.CountElements(object, count)
+func (o *ZendObject) CountElements(count *int) int {
+	return o.handlers.CountElementsEx(o, count)
 }
 
 // method
@@ -203,9 +203,9 @@ func (o *ZendObject) GetConstructor(object *ZendObject) IFunction {
 }
 
 // cast
-func (o *ZendObject) CanCast() bool { return o.handlers.CastObject != nil }
-func (o *ZendObject) Cast(readobj *Zval, retval *Zval, type_ ZvalType) int {
-	return o.handlers.CastObject(readobj, retval, type_)
+func (o *ZendObject) CanCast() bool { return o.handlers.CastObjectEx != nil }
+func (o *ZendObject) Cast(retval *Zval, type_ ZvalType) int {
+	return o.handlers.CastObjectEx(o, retval, type_)
 }
 
 // mixed

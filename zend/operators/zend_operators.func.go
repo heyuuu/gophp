@@ -233,7 +233,7 @@ func ZendUnwrapReference(op *types.Zval) {
 func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func func(op *types.Zval)) {
 	dst.SetUndef()
 	if op.Object().CanCast() {
-		if op.Object().Cast(op, dst, ctype) == types.FAILURE {
+		if op.Object().Cast(dst, ctype) == types.FAILURE {
 			faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).GetName().GetVal(), types.ZendGetTypeByConst(ctype))
 		}
 	} else if op.Object().CanGet() {
@@ -1726,7 +1726,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					return ret
 				} else if op2.GetType() != types.IS_OBJECT && op1.Object().CanCast() {
 					tmp_free.SetUndef()
-					if op1.Object().Cast(op1, &tmp_free, b.CondF2(op2.IsFalse() || op2.IsTrue(), types.IS_BOOL, func() __auto__ { return op2.GetType() })) == types.FAILURE {
+					if op1.Object().Cast(&tmp_free, b.CondF2(op2.IsFalse() || op2.IsTrue(), types.IS_BOOL, func() __auto__ { return op2.GetType() })) == types.FAILURE {
 						result.SetLong(1)
 						//ZendFreeObjGetResult(&tmp_free)
 						return types.SUCCESS
@@ -1751,7 +1751,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 						castType = types.IS_BOOL
 					}
 
-					if op2.Object().Cast(op2, &tmp_free, castType) == types.FAILURE {
+					if op2.Object().Cast(&tmp_free, castType) == types.FAILURE {
 						result.SetLong(-1)
 						return types.SUCCESS
 					}
@@ -2081,7 +2081,7 @@ try_again:
 func ZendObjectIsTrue(op *types.Zval) bool {
 	if op.Object().CanCast() {
 		var tmp types.Zval
-		if op.Object().Cast(op, &tmp, types.IS_BOOL) == types.SUCCESS {
+		if op.Object().Cast(&tmp, types.IS_BOOL) == types.SUCCESS {
 			return tmp.IsTrue()
 		}
 		faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", op.Object().GetCe().GetName().GetVal())

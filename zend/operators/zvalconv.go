@@ -197,7 +197,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 	case types.IS_OBJECT:
 		var tmp types.Zval
 		if op.Object().CanCast() {
-			if op.Object().Cast(op, &tmp, types.IS_STRING) == types.SUCCESS {
+			if op.Object().Cast(&tmp, types.IS_STRING) == types.SUCCESS {
 				return tmp.StringVal(), true
 			}
 		} else if op.Object().CanGet() {

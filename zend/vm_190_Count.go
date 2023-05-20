@@ -21,7 +21,7 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			/* first, we check if the handler is defined */
 
 			if op1.Object().CanCountElements() {
-				if types.SUCCESS == op1.Object().CountElements(op1, &count) {
+				if types.SUCCESS == op1.Object().CountElements(&count) {
 					break
 				}
 				if EG__().GetException() != nil {
@@ -72,7 +72,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			/* first, we check if the handler is defined */
 
 			if op1.Object().CanCountElements() {
-				if types.SUCCESS == op1.Object().CountElements(op1, &count) {
+				if types.SUCCESS == op1.Object().CountElements(&count) {
 					break
 				}
 				if EG__().GetException() != nil {
@@ -129,7 +129,7 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			/* first, we check if the handler is defined */
 
 			if op1.Object().CanCountElements() {
-				if types.SUCCESS == op1.Object().CountElements(op1, &count) {
+				if types.SUCCESS == op1.Object().CountElements(&count) {
 					break
 				}
 				if EG__().GetException() != nil {

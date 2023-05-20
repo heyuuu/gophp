@@ -181,7 +181,7 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 	} else if arg.IsObject() {
 		if arg.Object().CanCast() {
 			var obj types.Zval
-			if arg.Object().Cast(arg, &obj, types.IS_STRING) == types.SUCCESS {
+			if arg.Object().Cast(&obj, types.IS_STRING) == types.SUCCESS {
 				types.ZVAL_COPY_VALUE(arg, &obj)
 				return arg.String(), true
 			}

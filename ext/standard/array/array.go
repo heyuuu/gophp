@@ -127,7 +127,7 @@ func ZifCount(var_ *types.Zval, _ zpp.Opt, mode int) int {
 		/* first, we check if the handler is defined */
 		if array.Object().CanCountElements() {
 			long = 1
-			if types.SUCCESS == array.Object().CountElements(array, &long) {
+			if types.SUCCESS == array.Object().CountElements(&long) {
 				return long
 			}
 			if zend.EG__().GetException() != nil {

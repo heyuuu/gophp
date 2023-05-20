@@ -316,7 +316,7 @@ repeat:
 				value = value.Object().Get(&val_free)
 				goto repeat
 			} else if value.Object().CanCast() {
-				if value.Object().Cast(value, &val_free, types.IS_STRING) == types.SUCCESS {
+				if value.Object().Cast(&val_free, types.IS_STRING) == types.SUCCESS {
 					value = &val_free
 					break
 				}
