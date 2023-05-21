@@ -370,7 +370,7 @@ func ProcessNestedData(
 					}
 					unmangled = types.NewString(b.CastStr(unmangled_prop, unmangled_prop_len))
 					existing_propinfo = obj.GetCe().PropertyTable().Get(unmangled.GetStr())
-					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(types.AccPppMask) {
+					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().Name()))) && existing_propinfo != nil && existing_propinfo.HasFlags(types.AccPppMask) {
 						if existing_propinfo.HasFlags(types.AccProtected) {
 							new_key = zend.ZendManglePropertyName_ZStr("*", unmangled.GetStr())
 							// types.ZendStringReleaseEx(unmangled, 0)
@@ -483,7 +483,7 @@ func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserial
 		return 0
 	}
 	if ce.GetUnserialize() == nil {
-		faults.Error(faults.E_WARNING, "Class %s has no unserializer", ce.GetName().GetVal())
+		faults.Error(faults.E_WARNING, "Class %s has no unserializer", ce.Name())
 		zend.ObjectInitEx(rval, ce)
 	} else if ce.GetUnserialize()(rval, ce, (*uint8)(*p), datalen, (*zend.ZendUnserializeData)(var_hash)) != types.SUCCESS {
 		return 0
@@ -904,7 +904,7 @@ yy18:
 	 * depending on the serialization format. */
 
 	if ce.GetSerialize() != nil && has_unserialize == 0 {
-		faults.Error(faults.E_WARNING, "Erroneous data format for unserializing '%s'", ce.GetName().GetVal())
+		faults.Error(faults.E_WARNING, "Erroneous data format for unserializing '%s'", ce.Name())
 		// types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}

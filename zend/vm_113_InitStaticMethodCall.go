@@ -193,7 +193,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 			return 0
 		}
 		if executeData.GetThis().IsObject() && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.Name())
 			return 0
 		}
 		fbc = ce.GetConstructor()
@@ -466,7 +466,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 			return 0
 		}
 		if executeData.GetThis().IsObject() && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.Name())
 			return 0
 		}
 		fbc = ce.GetConstructor()
@@ -757,8 +757,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 			faults.ThrowError(nil, "Cannot call constructor")
 			return 0
 		}
-		if executeData.GetThis().IsObject() && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+		if executeData.GetThis().IsObject() && executeData.GetThis().Object().GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
+			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.Name())
 			return 0
 		}
 		fbc = ce.GetConstructor()
@@ -767,7 +767,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 		}
 	}
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
+		if executeData.GetThis().IsObject() && operators.InstanceofFunction(executeData.GetThis().Object().GetCe(), ce) != 0 {
 			ce = (*types.ClassEntry)(executeData.GetThis().Object())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {

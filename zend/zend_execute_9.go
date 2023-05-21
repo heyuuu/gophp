@@ -115,7 +115,7 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 			// OBJ_RELEASE(iter.GetStd())
 		}
 		if EG__().GetException() == nil {
-			faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+			faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.Name())
 		}
 		opline.Result().SetUndef()
 		return 1

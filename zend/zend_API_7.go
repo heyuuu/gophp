@@ -400,7 +400,7 @@ try_again:
 		if callable.Object().CanGetClosure() && callable.Object().GetClosure(callable, &calling_scope, &fptr, &object) == types.SUCCESS {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(callable)
 			var callable_name *types.String = types.ZendStringAlloc(ce.GetName().GetLen()+b.SizeOf("\"::__invoke\"")-1, 0)
-			memcpy(callable_name.GetVal(), ce.GetName().GetVal(), ce.GetName().GetLen())
+			memcpy(callable_name.GetVal(), ce.Name(), ce.GetName().GetLen())
 			memcpy(callable_name.GetVal()+ce.GetName().GetLen(), "::__invoke", b.SizeOf("\"::__invoke\""))
 			return callable_name
 		}

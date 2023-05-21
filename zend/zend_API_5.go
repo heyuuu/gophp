@@ -74,49 +74,49 @@ func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFuncti
 
 	lcname := ascii.StrToLower(functionName)
 	if lcname == ZEND_DESTRUCTOR_FUNC_NAME && fptr.GetNumArgs() != 0 {
-		faults.Error(error_type, "Destructor %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DESTRUCTOR_FUNC_NAME)
+		faults.Error(error_type, "Destructor %s::%s() cannot take arguments", ce.Name(), ZEND_DESTRUCTOR_FUNC_NAME)
 	} else if lcname == ZEND_CLONE_FUNC_NAME && fptr.GetNumArgs() != 0 {
-		faults.Error(error_type, "Method %s::%s() cannot accept any arguments", ce.GetName().GetVal(), ZEND_CLONE_FUNC_NAME)
+		faults.Error(error_type, "Method %s::%s() cannot accept any arguments", ce.Name(), ZEND_CLONE_FUNC_NAME)
 	} else if lcname == ZEND_GET_FUNC_NAME {
 		if fptr.GetNumArgs() != 1 {
-			faults.Error(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_GET_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() must take exactly 1 argument", ce.Name(), ZEND_GET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
-			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_GET_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.Name(), ZEND_GET_FUNC_NAME)
 		}
 	} else if lcname == ZEND_SET_FUNC_NAME {
 		if fptr.GetNumArgs() != 2 {
-			faults.Error(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), ZEND_SET_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() must take exactly 2 arguments", ce.Name(), ZEND_SET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
-			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_SET_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.Name(), ZEND_SET_FUNC_NAME)
 		}
 	} else if lcname == ZEND_UNSET_FUNC_NAME {
 		if fptr.GetNumArgs() != 1 {
-			faults.Error(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_UNSET_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() must take exactly 1 argument", ce.Name(), ZEND_UNSET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
-			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_UNSET_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.Name(), ZEND_UNSET_FUNC_NAME)
 		}
 	} else if lcname == ZEND_ISSET_FUNC_NAME {
 		if fptr.GetNumArgs() != 1 {
-			faults.Error(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_ISSET_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() must take exactly 1 argument", ce.Name(), ZEND_ISSET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
-			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_ISSET_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.Name(), ZEND_ISSET_FUNC_NAME)
 		}
 	} else if lcname == ZEND_CALL_FUNC_NAME {
 		if fptr.GetNumArgs() != 2 {
-			faults.Error(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), ZEND_CALL_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() must take exactly 2 arguments", ce.Name(), ZEND_CALL_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
-			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_CALL_FUNC_NAME)
+			faults.Error(error_type, "Method %s::%s() cannot take arguments by reference", ce.Name(), ZEND_CALL_FUNC_NAME)
 		}
 	} else if lcname == ZEND_CALLSTATIC_FUNC_NAME {
 		if fptr.GetNumArgs() != 2 {
-			faults.Error(error_type, "Method %s::__callStatic() must take exactly 2 arguments", ce.GetName().GetVal())
+			faults.Error(error_type, "Method %s::__callStatic() must take exactly 2 arguments", ce.Name())
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
-			faults.Error(error_type, "Method %s::__callStatic() cannot take arguments by reference", ce.GetName().GetVal())
+			faults.Error(error_type, "Method %s::__callStatic() cannot take arguments by reference", ce.Name())
 		}
 	} else if lcname == ZEND_TOSTRING_FUNC_NAME && fptr.GetNumArgs() != 0 {
-		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_TOSTRING_FUNC_NAME)
+		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.Name(), ZEND_TOSTRING_FUNC_NAME)
 	} else if lcname == ZEND_DEBUGINFO_FUNC_NAME && fptr.GetNumArgs() != 0 {
-		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
+		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.Name(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
 func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEntry, functionTable FunctionTable, type_ int) int {

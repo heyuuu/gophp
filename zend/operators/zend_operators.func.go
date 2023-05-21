@@ -2084,7 +2084,7 @@ func ZendObjectIsTrue(op *types.Zval) bool {
 		if op.Object().Cast(&tmp, types.IS_BOOL) == types.SUCCESS {
 			return tmp.IsTrue()
 		}
-		faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", op.Object().GetCe().GetName().GetVal())
+		faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", op.Object().GetCe().Name())
 	} else if op.Object().CanGet() {
 		var result bool
 		var rv types.Zval

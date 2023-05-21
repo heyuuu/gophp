@@ -42,7 +42,7 @@ add_unpack_again:
 			if iter == nil {
 				// 				FREE_OP(free_op1)
 				if EG__().GetException() == nil {
-					faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.Name())
 				}
 				return 0
 			}

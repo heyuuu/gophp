@@ -144,7 +144,7 @@ func ZendUndefinedIndexWrite(ht *types.Array, offset *types.String) int {
 	return types.SUCCESS
 }
 func ZendUndefinedMethod(ce *types.ClassEntry, method *types.String) {
-	faults.ThrowError(nil, "Call to undefined method %s::%s()", ce.GetName().GetVal(), method.GetVal())
+	faults.ThrowError(nil, "Call to undefined method %s::%s()", ce.Name(), method.GetVal())
 }
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
 	faults.ThrowError(nil, "Call to a member function %s() on %s", function_name.String().GetVal(), types.ZendGetTypeByConst(object.GetType()))
@@ -403,7 +403,7 @@ func ZendFetchDimensionAddress(
 		if retval == EG__().GetUninitializedZval() {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(container)
 			result.SetNull()
-			faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
+			faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.Name())
 		} else if retval != nil && retval.IsNotUndef() {
 			if !(retval.IsReference()) {
 				if result != retval {
@@ -412,7 +412,7 @@ func ZendFetchDimensionAddress(
 				}
 				if retval.GetType() != types.IS_OBJECT {
 					var ce *types.ClassEntry = types.Z_OBJCE_P(container)
-					faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
+					faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.Name())
 				}
 			}
 			if result != retval {

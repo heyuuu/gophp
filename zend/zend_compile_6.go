@@ -178,27 +178,27 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	var lcname *types.String
 	if in_interface != 0 {
 		if is_public == 0 || op_array.HasFnFlags(types.AccFinal|types.AccAbstract) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface method "+"%s::%s() must be omitted", ce.GetName().GetVal(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface method "+"%s::%s() must be omitted", ce.Name(), name.GetVal())
 		}
 		op_array.SetIsAbstract(true)
 	}
 	if op_array.IsAbstract() {
 		if op_array.IsPrivate() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s function %s::%s() cannot be declared private", b.Cond(in_interface != 0, "Interface", "Abstract"), ce.GetName().GetVal(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s function %s::%s() cannot be declared private", b.Cond(in_interface != 0, "Interface", "Abstract"), ce.Name(), name.GetVal())
 		}
 		if has_body != 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s function %s::%s() cannot contain body", b.Cond(in_interface != 0, "Interface", "Abstract"), ce.GetName().GetVal(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s function %s::%s() cannot contain body", b.Cond(in_interface != 0, "Interface", "Abstract"), ce.Name(), name.GetVal())
 		}
 		ce.SetIsImplicitAbstractClass(true)
 	} else if has_body == 0 {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Non-abstract method %s::%s() must contain body", ce.GetName().GetVal(), name.GetVal())
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Non-abstract method %s::%s() must contain body", ce.Name(), name.GetVal())
 	}
 	op_array.SetScope(ce)
 	op_array.SetFunctionName(name.Copy())
 	lcname = operators.ZendStringTolower(name)
 	//lcname = types.ZendNewInternedString(lcname)
 	if !ce.FunctionTable().Add(name.GetStr(), op_array) {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::%s()", ce.GetName().GetVal(), name.GetVal())
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::%s()", ce.Name(), name.GetVal())
 	}
 	if in_interface != 0 {
 		if lcname.GetStr()[0] != '_' || lcname.GetStr()[1] != '_' {
@@ -503,7 +503,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		if type_ast != nil {
 			type_ = ZendCompileTypename(type_ast, 0)
 			if type_.Code() == types.IS_VOID || type_.Code() == types.IS_CALLABLE {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property %s::$%s cannot have type %s", ce.GetName().GetVal(), name.GetVal(), types.ZendGetTypeByConst(type_.Code()))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property %s::$%s cannot have type %s", ce.Name(), name.GetVal(), types.ZendGetTypeByConst(type_.Code()))
 			}
 		}
 
@@ -513,10 +513,10 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 			doc_comment = ZendAstGetStr(doc_comment_ast).Copy()
 		}
 		if (flags & types.AccFinal) != 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare property %s::$%s final, "+"the final modifier is allowed only for methods and classes", ce.GetName().GetVal(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare property %s::$%s final, "+"the final modifier is allowed only for methods and classes", ce.Name(), name.GetVal())
 		}
 		if ce.PropertyTable().Exists(name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::$%s", ce.GetName().GetVal(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::$%s", ce.Name(), name.GetVal())
 		}
 		if value_ast != nil {
 			ZendConstExprToZval(&value_zv, value_ast)
@@ -641,7 +641,7 @@ func ZendCompileUseTrait(ast *ZendAst) {
 		var trait_ast *ZendAst = traits.GetChild()[i]
 		var name *types.String = ZendAstGetStr(trait_ast)
 		if ce.IsInterface() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use traits inside of interfaces. "+"%s is used in %s", name.GetVal(), ce.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use traits inside of interfaces. "+"%s is used in %s", name.GetVal(), ce.Name())
 		}
 		switch ZendGetClassFetchType(name.GetStr()) {
 		case ZEND_FETCH_CLASS_SELF:
@@ -785,25 +785,25 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	if ce.GetConstructor() != nil {
 		ce.GetConstructor().SetIsCtor(true)
 		if ce.GetConstructor().IsStatic() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Constructor %s::%s() cannot be static", ce.GetName().GetVal(), ce.GetConstructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Constructor %s::%s() cannot be static", ce.Name(), ce.GetConstructor().GetFunctionName().GetVal())
 		}
 		if ce.GetConstructor().IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Constructor %s::%s() cannot declare a return type", ce.GetName().GetVal(), ce.GetConstructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Constructor %s::%s() cannot declare a return type", ce.Name(), ce.GetConstructor().GetFunctionName().GetVal())
 		}
 	}
 	if ce.GetDestructor() != nil {
 		ce.GetDestructor().SetIsDtor(true)
 		if ce.GetDestructor().IsStatic() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Destructor %s::%s() cannot be static", ce.GetName().GetVal(), ce.GetDestructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Destructor %s::%s() cannot be static", ce.Name(), ce.GetDestructor().GetFunctionName().GetVal())
 		} else if ce.GetDestructor().IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Destructor %s::%s() cannot declare a return type", ce.GetName().GetVal(), ce.GetDestructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Destructor %s::%s() cannot declare a return type", ce.Name(), ce.GetDestructor().GetFunctionName().GetVal())
 		}
 	}
 	if ce.GetClone() != nil {
 		if ce.GetClone().IsStatic() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Clone method %s::%s() cannot be static", ce.GetName().GetVal(), ce.GetClone().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Clone method %s::%s() cannot be static", ce.Name(), ce.GetClone().GetFunctionName().GetVal())
 		} else if ce.GetClone().IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Clone method %s::%s() cannot declare a return type", ce.GetName().GetVal(), ce.GetClone().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Clone method %s::%s() cannot declare a return type", ce.Name(), ce.GetClone().GetFunctionName().GetVal())
 		}
 	}
 	if implements_ast != nil {

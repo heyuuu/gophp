@@ -245,10 +245,10 @@ func ZendThrowIncdecRefError(ref *types.ZendReference, opline *ZendOp) ZendLong 
 
 	b.Assert(error_prop != nil)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		faults.TypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
+		faults.TypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
 		return ZEND_LONG_MAX
 	} else {
-		faults.TypeError("Cannot decrement a reference held by property %s::$%s of type %sint past its minimal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
+		faults.TypeError("Cannot decrement a reference held by property %s::$%s of type %sint past its minimal value", error_prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
 		return ZEND_LONG_MIN
 	}
 }
@@ -257,10 +257,10 @@ func ZendThrowIncdecPropError(prop *types.PropertyInfo, opline *ZendOp) ZendLong
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		faults.TypeError("Cannot increment property %s::$%s of type %s%s past its maximal value", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
+		faults.TypeError("Cannot increment property %s::$%s of type %s%s past its maximal value", prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
 		return ZEND_LONG_MAX
 	} else {
-		faults.TypeError("Cannot decrement property %s::$%s of type %s%s past its minimal value", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
+		faults.TypeError("Cannot decrement property %s::$%s of type %s%s past its minimal value", prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
 		return ZEND_LONG_MIN
 	}
 }

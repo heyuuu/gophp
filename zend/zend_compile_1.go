@@ -151,7 +151,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
 	ce := EG__().ClassTable().Get(rtd_key.StringVal())
 	if ce == nil {
 		if EG__().ClassTable().Exists(lcname.StringVal()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.Name())
 			return types.FAILURE
 		} else {
 			b.Assert(CurrEX().GetFunc().GetOpArray().IsPreloaded())
@@ -168,7 +168,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
 afterGetCe:
 
 	if EG__().ClassTable().Exists(lcname.StringVal()) {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.Name())
 		return types.FAILURE
 	}
 

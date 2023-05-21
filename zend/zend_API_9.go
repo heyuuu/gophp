@@ -79,7 +79,7 @@ func ZendDeclarePropertyString(ce *types.ClassEntry, name string, name_length in
 func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, access_type int, doc_comment *types.String) int {
 	if ce.IsInterface() {
 		if access_type != types.AccPublic {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ce.GetName().GetVal(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ce.Name(), name.GetVal())
 		}
 	}
 	if ascii.StrCaseEquals(name.GetStr(), "class") {
@@ -92,7 +92,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 		ce.SetIsConstantsUpdated(false)
 	}
 	if !ce.ConstantsTable().Add(name.GetStr(), c) {
-		faults.ErrorNoreturn(b.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.GetName().GetVal(), name.GetVal())
+		faults.ErrorNoreturn(b.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.Name(), name.GetVal())
 	}
 	return types.SUCCESS
 }

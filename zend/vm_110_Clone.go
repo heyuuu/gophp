@@ -11,7 +11,7 @@ func cloneHandlerHelper(executeData *ZendExecuteData, obj *types.Zval) int {
 	ce := types.Z_OBJCE_P(obj)
 	clone := ce.GetClone()
 	if !obj.Object().CanClone() {
-		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
+		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.Name())
 		opline.Result().SetUndef()
 		return 0
 	}

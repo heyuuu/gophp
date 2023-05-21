@@ -14,8 +14,8 @@ func SplAddClassName(list *types.Zval, pce *types.ClassEntry, allow int, ceFlags
 		var tmp *types.Zval
 		if b.Assign(&tmp, list.Array().KeyFind(pce.GetName().GetStr())) == nil {
 			var t types.Zval
-			t.SetStringCopy(pce.GetName())
-			list.Array().KeyAdd(pce.GetName().GetStr(), &t)
+			t.SetStringVal(pce.Name())
+			list.Array().KeyAdd(pce.Name(), &t)
 		}
 	}
 }

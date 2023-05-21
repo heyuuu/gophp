@@ -48,11 +48,11 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 				if CurrEX() != nil {
 					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
-						faults.ThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
+						faults.ThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().Name(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
 					}
 				} else {
-					faults.Error(faults.E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
+					faults.Error(faults.E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", object.GetCe().Name())
 					return
 				}
 			} else {
@@ -61,11 +61,11 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 				if CurrEX() != nil {
 					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if !ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) {
-						faults.ThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
+						faults.ThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().Name(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
 					}
 				} else {
-					faults.Error(faults.E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
+					faults.Error(faults.E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", object.GetCe().Name())
 					return
 				}
 			}

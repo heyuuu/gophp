@@ -262,7 +262,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 			if op_array.GetScope() != nil {
 				zv.SetString(ZendConcat3(op_array.GetScope().GetName().GetVal(), op_array.GetScope().GetName().GetLen(), "::", 2, op_array.GetFunctionName().GetVal(), op_array.GetFunctionName().GetLen()))
 			} else {
-				zv.SetStringCopy(op_array.GetFunctionName())
+				zv.SetStringVal(op_array.GetFunctionName().GetStr())
 			}
 		} else {
 			zv.SetStringVal("")
@@ -272,20 +272,20 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 			if ce.IsTrait() {
 				return 0
 			} else {
-				zv.SetStringCopy(ce.GetName())
+				zv.SetStringVal(ce.Name())
 			}
 		} else {
 			zv.SetStringVal("")
 		}
 	case T_TRAIT_C:
 		if ce != nil && ce.IsTrait() {
-			zv.SetStringCopy(ce.GetName())
+			zv.SetStringVal(ce.Name())
 		} else {
 			zv.SetStringVal("")
 		}
 	case T_NS_C:
 		if FC__().GetCurrentNamespace() != nil {
-			zv.SetStringCopy(FC__().GetCurrentNamespace())
+			zv.SetStringVal(FC__().GetCurrentNamespace().GetStr())
 		} else {
 			zv.SetStringVal("")
 		}

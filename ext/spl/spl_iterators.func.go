@@ -617,7 +617,7 @@ func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.String, k
 	var level zend.ZendLong = object.GetLevel()
 	var zobj *types.Zval
 	if object.GetIterators() == nil {
-		core.PhpErrorDocref(nil, faults.E_ERROR, "The %s instance wasn't initialized properly", zobject.GetCe().GetName().GetVal())
+		core.PhpErrorDocref(nil, faults.E_ERROR, "The %s instance wasn't initialized properly", zobject.GetCe().Name())
 	}
 	zobj = object.GetIterators()[level].GetZobject()
 	function_handler = zend.ZendStdGetMethod(zobject, method, key)
@@ -1006,7 +1006,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 					return nil
 				}
 				if retval.GetType() != types.IS_OBJECT || operators.InstanceofFunction(types.Z_OBJCE(retval), zend.ZendCeTraversable) == 0 {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "%s::getIterator() must return an object that implements Traversable", ce.GetName().GetVal())
+					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "%s::getIterator() must return an object that implements Traversable", ce.Name())
 					return nil
 				}
 				zobject = &retval

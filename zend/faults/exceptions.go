@@ -258,7 +258,7 @@ func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *type
 		} else {
 			ce = base_ce
 		}
-		ThrowError(nil, "Wrong parameters for %s([string $message [, long $code [, Throwable $previous = NULL]]])", ce.GetName().GetVal())
+		ThrowError(nil, "Wrong parameters for %s([string $message [, long $code [, Throwable $previous = NULL]]])", ce.Name())
 		return
 	}
 	if message != nil {
@@ -313,7 +313,7 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 		} else {
 			ce = ZendCeErrorException
 		}
-		ThrowError(nil, "Wrong parameters for %s([string $message [, long $code, [ long $severity, [ string $filename, [ long $lineno  [, Throwable $previous = NULL]]]]]])", ce.GetName().GetVal())
+		ThrowError(nil, "Wrong parameters for %s([string $message [, long $code, [ long $severity, [ string $filename, [ long $lineno  [, Throwable $previous = NULL]]]]]])", ce.Name())
 		return
 	}
 	object = zend.ZEND_THIS(executeData)

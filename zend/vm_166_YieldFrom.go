@@ -89,7 +89,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			// ZvalPtrDtorNogc(free_op1)
 			if iter == nil || EG__().GetException() != nil {
 				if EG__().GetException() == nil {
-					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.Name())
 				}
 				UNDEF_RESULT()
 				return 0
@@ -179,7 +179,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			// ZvalPtrDtorNogc(free_op1)
 			if iter == nil || EG__().GetException() != nil {
 				if EG__().GetException() == nil {
-					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.Name())
 				}
 				UNDEF_RESULT()
 				return 0
@@ -264,7 +264,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			var iter *ZendObjectIterator = ce.GetGetIterator()(ce, val, 0)
 			if iter == nil || EG__().GetException() != nil {
 				if EG__().GetException() == nil {
-					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.Name())
 				}
 				UNDEF_RESULT()
 				return 0

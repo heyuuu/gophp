@@ -321,7 +321,7 @@ func ZendFetchStaticPropertyAddress(
 		*retval = CACHED_PTR(cache_slot + b.SizeOf("void *"))
 		property_info = CACHED_PTR(cache_slot + b.SizeOf("void *")*2)
 		if (fetch_type == BP_VAR_R || fetch_type == BP_VAR_RW) && retval.IsUndef() && property_info.GetType() != 0 {
-			faults.ThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(property_info.GetName()))
+			faults.ThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(property_info.GetName()))
 			return types.FAILURE
 		}
 	} else {
@@ -345,13 +345,13 @@ func ZendThrowRefTypeErrorType(prop1 *types.PropertyInfo, prop2 *types.PropertyI
 	var prop2_type2 *byte
 	ZendFormatType(prop1.GetType(), &prop1_type1, &prop1_type2)
 	ZendFormatType(prop2.GetType(), &prop2_type1, &prop2_type2)
-	faults.TypeError("Reference with value of type %s held by property %s::$%s of type %s%s is not compatible with property %s::$%s of type %s%s", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop2.GetName()), prop2_type1, prop2_type2)
+	faults.TypeError("Reference with value of type %s held by property %s::$%s of type %s%s is not compatible with property %s::$%s of type %s%s", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop2.GetName()), prop2_type1, prop2_type2)
 }
 func ZendThrowRefTypeErrorZval(prop *types.PropertyInfo, zv *types.Zval) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
-	faults.TypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
+	faults.TypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
 }
 func ZendThrowConflictingCoercionError(prop1 *types.PropertyInfo, prop2 *types.PropertyInfo, zv *types.Zval) {
 	var prop1_type1 *byte
@@ -360,7 +360,7 @@ func ZendThrowConflictingCoercionError(prop1 *types.PropertyInfo, prop2 *types.P
 	var prop2_type2 *byte
 	ZendFormatType(prop1.GetType(), &prop1_type1, &prop1_type2)
 	ZendFormatType(prop2.GetType(), &prop2_type1, &prop2_type2)
-	faults.TypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s and property %s::$%s of type %s%s, as this would result in an inconsistent type conversion", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyNameEx(prop2.GetName()), prop2_type1, prop2_type2)
+	faults.TypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s and property %s::$%s of type %s%s, as this would result in an inconsistent type conversion", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop2.GetName()), prop2_type1, prop2_type2)
 }
 func IZendVerifyTypeAssignableZval(type_ptr *types.TypeHint, self_ce *types.ClassEntry, zv *types.Zval, strict types.ZendBool) int {
 	var type_ types.TypeHint = *type_ptr

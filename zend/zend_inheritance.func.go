@@ -137,7 +137,7 @@ func DoInheritParentConstructor(ce *types.ClassEntry) {
 	}
 	if ce.GetConstructor() != nil {
 		if parent.GetConstructor() != nil && parent.GetConstructor().IsFinal() {
-			faults.ErrorNoreturn(faults.E_ERROR, "Cannot override final %s::%s() with %s::%s()", parent.GetName().GetVal(), parent.GetConstructor().GetFunctionName().GetVal(), ce.GetName().GetVal(), ce.GetConstructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_ERROR, "Cannot override final %s::%s() with %s::%s()", parent.GetName().GetVal(), parent.GetConstructor().GetFunctionName().GetVal(), ce.Name(), ce.GetConstructor().GetFunctionName().GetVal())
 		}
 		return
 	}
@@ -859,10 +859,10 @@ func DoInheritProperty(parent_info *types.PropertyInfo, key string, ce *types.Cl
 		}
 		if !parent_info.IsPrivate() {
 			if (parent_info.GetFlags() & types.AccStatic) != (child_info.GetFlags() & types.AccStatic) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s%s::$%s as %s%s::$%s", b.Cond(parent_info.IsStatic(), "static ", "non static "), ce.GetParent().Name(), key, b.Cond(child_info.IsStatic(), "static ", "non static "), ce.GetName().GetVal(), key)
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s%s::$%s as %s%s::$%s", b.Cond(parent_info.IsStatic(), "static ", "non static "), ce.GetParent().Name(), key, b.Cond(child_info.IsStatic(), "static ", "non static "), ce.Name(), key)
 			}
 			if (child_info.GetFlags() & types.AccPppMask) > (parent_info.GetFlags() & types.AccPppMask) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::$%s must be %s (as in class %s)%s", ce.GetName().GetVal(), key, ZendVisibilityString(parent_info.GetFlags()), ce.GetParent().Name(), b.Cond(parent_info.IsPublic(), "", " or weaker"))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::$%s must be %s (as in class %s)%s", ce.Name(), key, ZendVisibilityString(parent_info.GetFlags()), ce.GetParent().Name(), b.Cond(parent_info.IsPublic(), "", " or weaker"))
 			} else if !child_info.IsStatic() {
 				var parent_num int = OBJ_PROP_TO_NUM(parent_info.GetOffset())
 				var child_num int = OBJ_PROP_TO_NUM(child_info.GetOffset())
@@ -883,7 +883,7 @@ func DoInheritProperty(parent_info *types.PropertyInfo, key string, ce *types.Cl
 					AddPropertyCompatibilityObligation(ce, child_info, parent_info)
 				}
 			} else if child_info.GetType().IsSet() && !(parent_info.GetType().IsSet()) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must not be defined (as in class %s)", ce.GetName().GetVal(), key, ce.GetParent().Name())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must not be defined (as in class %s)", ce.Name(), key, ce.GetParent().Name())
 			}
 		}
 	} else {
@@ -897,7 +897,7 @@ func DoInheritProperty(parent_info *types.PropertyInfo, key string, ce *types.Cl
 }
 func DoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 	if !ce.IsInterface() && iface.GetInterfaceGetsImplemented() && iface.GetInterfaceGetsImplemented()(iface, ce) == types.FAILURE {
-		faults.ErrorNoreturn(faults.E_CORE_ERROR, "Class %s could not implement interface %s", ce.GetName().GetVal(), iface.GetName().GetVal())
+		faults.ErrorNoreturn(faults.E_CORE_ERROR, "Class %s could not implement interface %s", ce.Name(), iface.Name())
 	}
 
 	/* This should be prevented by the class lookup logic. */
@@ -973,19 +973,19 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 	if ce.IsInterface() {
 		/* Interface can only inherit other interfaces */
 		if !parentCe.IsInterface() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Interface %s may not inherit from class (%s)", ce.GetName().GetVal(), parentCe.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Interface %s may not inherit from class (%s)", ce.Name(), parentCe.Name())
 		}
 	} else if parentCe.HasCeFlags(types.AccInterface | types.AccTrait | types.AccFinal) {
 		/* Class declaration must not extend traits or interfaces */
 		if parentCe.IsInterface() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from interface %s", ce.GetName().GetVal(), parentCe.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from interface %s", ce.Name(), parentCe.Name())
 		} else if parentCe.IsTrait() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from trait %s", ce.GetName().GetVal(), parentCe.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from trait %s", ce.Name(), parentCe.Name())
 		}
 
 		/* Class must not extend a final class */
 		if parentCe.IsFinal() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s may not inherit from final class (%s)", ce.GetName().GetVal(), parentCe.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s may not inherit from final class (%s)", ce.Name(), parentCe.Name())
 		}
 	}
 	ce.SetParent(parentCe)
@@ -1254,7 +1254,7 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 			if i < parent_iface_num {
 				ignore = 1
 			} else {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot implement previously implemented interface %s", ce.GetName().GetVal(), iface.GetName().GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot implement previously implemented interface %s", ce.Name(), iface.Name())
 			}
 		}
 	}
@@ -1290,14 +1290,14 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 		}
 		if !iface.IsInterface() {
 			Efree(interfaces)
-			faults.ErrorNoreturn(faults.E_ERROR, "%s cannot implement %s - it is not an interface", ce.GetName().GetVal(), iface.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_ERROR, "%s cannot implement %s - it is not an interface", ce.Name(), iface.Name())
 			return
 		}
 		for j = 0; j < num_interfaces; j++ {
 			if interfaces[j] == iface {
 				if j >= num_parent_interfaces {
 					Efree(interfaces)
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot implement previously implemented interface %s", ce.GetName().GetVal(), iface.GetName().GetVal())
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot implement previously implemented interface %s", ce.Name(), iface.Name())
 					return
 				}
 
@@ -1339,7 +1339,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFu
 		ce.SetClone(fe)
 	} else if mname.GetStr() == ZEND_CONSTRUCTOR_FUNC_NAME {
 		if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.Name())
 		}
 		ce.SetConstructor(fe)
 	} else if mname.GetStr() == ZEND_DESTRUCTOR_FUNC_NAME {
@@ -1369,7 +1369,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFu
 		// lowercase_name = types.ZendNewInternedString(lowercase_name)
 		if !(memcmp(mname.GetVal(), lowercase_name.GetVal(), mname.GetLen())) {
 			if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.GetName().GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.Name())
 			}
 			ce.SetConstructor(fe)
 			fe.SetIsCtor(true)
@@ -1426,7 +1426,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 
 			/* two traits can't define the __special__  same non-abstract method */
 
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Trait method %s has not been applied, because there are collisions with other trait methods on %s", name, ce.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Trait method %s has not been applied, because there are collisions with other trait methods on %s", name, ce.Name())
 
 			/* two traits can't define the __special__  same non-abstract method */
 
@@ -1572,7 +1572,7 @@ func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits *
 			return i
 		}
 	}
-	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Required Trait %s wasn't added to %s", trait.GetName().GetVal(), ce.GetName().GetVal())
+	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Required Trait %s wasn't added to %s", trait.GetName().GetVal(), ce.Name())
 	return 0
 }
 func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEntry, exclude_tables_ptr ***types.Array, aliases_ptr ***types.ClassEntry) {
@@ -1630,7 +1630,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 					exclude_tables[trait_num] = types.NewArray(0)
 				}
 				if types.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname.GetStr()) == nil {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", precedences[i].GetTraitMethod().GetMethodName().GetVal(), exclude_ce.GetName().GetVal())
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", precedences[i].GetTraitMethod().GetMethodName().GetVal(), exclude_ce.Name())
 				}
 
 				/* make sure that the trait method is not from a class mentioned in
@@ -1806,7 +1806,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 						}
 					}
 					if not_compatible != 0 {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).GetName().GetVal(), property_info.GetCe().GetName().GetVal(), prop_name.GetVal(), ce.GetName().GetVal())
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).GetName().GetVal(), property_info.GetCe().Name(), prop_name.GetVal(), ce.Name())
 					}
 					// types.ZendStringReleaseEx(prop_name, 0)
 					return
@@ -1890,7 +1890,7 @@ func ZendDoBindTraits(ce *types.ClassEntry) {
 			return
 		}
 		if !trait.IsTrait() {
-			faults.ErrorNoreturn(faults.E_ERROR, "%s cannot use %s - it is not a trait", ce.GetName().GetVal(), trait.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_ERROR, "%s cannot use %s - it is not a trait", ce.Name(), trait.GetName().GetVal())
 			return
 		}
 		for j = 0; j < i; j++ {
@@ -1944,7 +1944,7 @@ func ZendHasDeprecatedConstructor(ce *types.ClassEntry) types.ZendBool {
 }
 func ZendCheckDeprecatedConstructor(ce *types.ClassEntry) {
 	if ZendHasDeprecatedConstructor(ce) != 0 {
-		faults.Error(faults.E_DEPRECATED, "Methods with the same name as their class will not be constructors in a future version of PHP; %s has a deprecated constructor", ce.GetName().GetVal())
+		faults.Error(faults.E_DEPRECATED, "Methods with the same name as their class will not be constructors in a future version of PHP; %s has a deprecated constructor", ce.Name())
 	}
 }
 func DISPLAY_ABSTRACT_FN(idx int) {
@@ -1984,7 +1984,7 @@ func ZendVerifyAbstractClass(ce *types.ClassEntry) {
 		ZendVerifyAbstractClassFunction(func_, &ai)
 	})
 	if ai.GetCnt() != 0 {
-		faults.ErrorNoreturn(faults.E_ERROR, "Class %s contains %d abstract method%s and must therefore be declared abstract or implement the remaining methods ("+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+")", ce.GetName().GetVal(), ai.GetCnt(), b.Cond(ai.GetCnt() > 1, "s", ""), DISPLAY_ABSTRACT_FN(0), DISPLAY_ABSTRACT_FN(1), DISPLAY_ABSTRACT_FN(2))
+		faults.ErrorNoreturn(faults.E_ERROR, "Class %s contains %d abstract method%s and must therefore be declared abstract or implement the remaining methods ("+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+")", ce.Name(), ai.GetCnt(), b.Cond(ai.GetCnt() > 1, "s", ""), DISPLAY_ABSTRACT_FN(0), DISPLAY_ABSTRACT_FN(1), DISPLAY_ABSTRACT_FN(2))
 	} else {
 
 		/* now everything should be fine and an added ZEND_ACC_IMPLICIT_ABSTRACT_CLASS should be removed */
@@ -2154,7 +2154,7 @@ func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 		// 		exception_zv.AddRefcount()
 		faults.ClearException()
 		exception_str = operators.ZvalGetString(&exception_zv)
-		faults.ErrorNoreturn(faults.E_ERROR, "During inheritance of %s with variance dependencies: Uncaught %s", ce.GetName().GetVal(), exception_str.GetVal())
+		faults.ErrorNoreturn(faults.E_ERROR, "During inheritance of %s with variance dependencies: Uncaught %s", ce.Name(), exception_str.GetVal())
 	}
 
 	/* If this class has been used while unlinked through a variance obligation, it is not legal
