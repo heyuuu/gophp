@@ -186,9 +186,6 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		// OBJ_RELEASE(new_object)
 	}
 }
-func ZendObjectsCloneObj(zobject *types.Zval) *types.ZendObject {
-	return ZendObjectsCloneObjEx(zobject.Object())
-}
 func ZendObjectsCloneObjEx(oldObject *types.ZendObject) *types.ZendObject {
 	/* assume that create isn't overwritten, so when clone depends on the
 	 * overwritten one then it must itself be overwritten */
