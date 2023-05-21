@@ -48,6 +48,13 @@ func NewObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
 	return o
 }
 
+func NewObjectEx(data IObject) *ZendObject {
+	// todo 冗余细节待调整
+	o := _newObject(data.GetCe(), nil)
+	o.data = data
+	return o
+}
+
 func _newObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
 	propertyCount := ce.GetDefaultPropertiesCount()
 	if ce.IsUseGuards() {
