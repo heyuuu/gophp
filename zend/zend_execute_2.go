@@ -64,9 +64,9 @@ func ZendVerifyPropertyTypeError(info *types.PropertyInfo, property *types.Zval)
 	ZendFormatType(info.GetType(), &prop_type1, &prop_type2)
 	void(prop_type1)
 	if info.GetType().IsClass() {
-		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
+		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).Name() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
 	} else {
-		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
+		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).Name() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
 	}
 }
 func ZendResolveClassType(type_ *types.TypeHint, self_ce *types.ClassEntry) types.ZendBool {

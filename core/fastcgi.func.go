@@ -923,11 +923,8 @@ func FcgiLoadenv(req *FcgiRequest, func_ FcgiApplyFunc, array *types.Zval) {
 func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	var zvalue types.Zval
 	var key *types.String = types.NewString(b.CastStr(name, name_len))
-	zvalue.SetString(types.NewString(b.CastStr(value, value_len)))
-	//types.GC_MAKE_PERSISTENT_LOCAL(key)
-	//types.GC_MAKE_PERSISTENT_LOCAL(zvalue.String())
+	zvalue.SetStringVal(b.CastStr(value, value_len))
 	FcgiMgmtVars.KeyAdd(key.GetStr(), &zvalue)
-	// types.ZendStringReleaseEx(key, 1)
 }
 func FcgiGetLastClientIp() *byte {
 	var str []byte

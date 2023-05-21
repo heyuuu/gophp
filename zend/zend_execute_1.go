@@ -229,7 +229,7 @@ func ZendFormatType(type_ types.TypeHint, part1 **byte, part2 **byte) {
 	}
 	if type_.IsClass() {
 		if type_.IsCe() {
-			*part2 = type_.Ce().GetName().GetVal()
+			*part2 = type_.Ce().Name()
 		} else {
 			*part2 = type_.Name()
 		}
@@ -309,7 +309,7 @@ func ZendVerifyTypeErrorCommon(
 	*fname = zf.GetFunctionName().GetVal()
 	if zf.GetScope() != nil {
 		*fsep = "::"
-		*fclass = zf.GetScope().GetName().GetVal()
+		*fclass = zf.GetScope().Name()
 	} else {
 		*fsep = ""
 		*fclass = ""
@@ -358,7 +358,7 @@ func ZendVerifyTypeErrorCommon(
 	if value != nil {
 		if arg_info.GetType().IsClass() && value.IsObject() {
 			*given_msg = "instance of "
-			*given_kind = types.Z_OBJCE_P(value).GetName().GetVal()
+			*given_kind = types.Z_OBJCE_P(value).Name()
 		} else {
 			*given_msg = types.ZendZvalTypeName(value)
 			*given_kind = ""

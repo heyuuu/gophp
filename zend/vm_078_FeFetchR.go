@@ -49,7 +49,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			if p.GetKey() == nil {
 				opline.Result().SetLong(p.GetH())
 			} else {
-				opline.Result().SetStringCopy(p.GetKey())
+				opline.Result().SetStringVal(p.GetKey().GetStr())
 			}
 		}
 	} else {
@@ -92,7 +92,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				if p.GetKey() == nil {
 					opline.Result().SetLong(p.GetH())
 				} else if p.GetKey().GetStr()[0] {
-					opline.Result().SetStringCopy(p.GetKey())
+					opline.Result().SetStringVal(p.GetKey().GetStr())
 				} else {
 					var class_name *byte
 					var prop_name *byte

@@ -77,7 +77,7 @@ func ZendImplementThrowable(interface_ *types.ClassEntry, class_type *types.Clas
 	if operators.InstanceofFunction(class_type, ZendCeException) != 0 || operators.InstanceofFunction(class_type, ZendCeError) != 0 {
 		return types.SUCCESS
 	}
-	ErrorNoreturn(E_ERROR, "Class %s cannot implement interface %s, extend %s or %s instead", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeException.GetName().GetVal(), ZendCeError.GetName().GetVal())
+	ErrorNoreturn(E_ERROR, "Class %s cannot implement interface %s, extend %s or %s instead", class_type.Name(), interface_.Name(), ZendCeException.Name(), ZendCeError.Name())
 	return types.FAILURE
 }
 func GetExceptionBase(object *types.Zval) *types.ClassEntry {
@@ -318,7 +318,7 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 	}
 	object = zend.ZEND_THIS(executeData)
 	if message != nil {
-		tmp.SetStringCopy(message)
+		tmp.SetStringVal(message.GetStr())
 		zend.ZendUpdatePropertyEx(ZendCeException, object, types.STR_MESSAGE, &tmp)
 		// zend.ZvalPtrDtor(&tmp)
 	}
@@ -332,7 +332,7 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 	tmp.SetLong(severity)
 	zend.ZendUpdatePropertyEx(ZendCeException, object, types.STR_SEVERITY, &tmp)
 	if argc >= 4 {
-		tmp.SetStringCopy(filename)
+		tmp.SetStringVal(filename.GetStr())
 		zend.ZendUpdatePropertyEx(ZendCeException, object, types.STR_FILE, &tmp)
 		// zend.ZvalPtrDtor(&tmp)
 		if argc < 5 {

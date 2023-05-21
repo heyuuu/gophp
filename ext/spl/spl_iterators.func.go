@@ -911,7 +911,7 @@ func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *ty
 }
 func APPENDIT_CHECK_CTOR(intern *SplDualItObject) {
 	if intern.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "Classes derived from %s must call %s::__construct()", spl_ce_AppendIterator.GetName().GetVal(), spl_ce_AppendIterator.GetName().GetVal())
+		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "Classes derived from %s must call %s::__construct()", spl_ce_AppendIterator.Name(), spl_ce_AppendIterator.Name())
 		return
 	}
 }
@@ -952,7 +952,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 	var error_handling zend.ZendErrorHandling
 	intern = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
 	if intern.GetDitType() != DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s::getIterator() must be called exactly once per instance", ce_base.GetName().GetVal())
+		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s::getIterator() must be called exactly once per instance", ce_base.Name())
 		return nil
 	}
 	intern.SetDitType(dit_type)
@@ -1516,7 +1516,7 @@ func zim_spl_RegexIterator_getRegex(executeData *zend.ZendExecuteData, return_va
 		return
 	}
 	intern = it
-	return_value.SetStringCopy(intern.GetURegexRegex())
+	return_value.SetStringVal(intern.GetURegexRegex().GetStr())
 	return
 }
 func zim_spl_RegexIterator_getMode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1632,7 +1632,7 @@ func zim_spl_RecursiveRegexIterator_getChildren(executeData *zend.ZendExecuteDat
 	if zend.EG__().GetException() == nil {
 		var args []types.Zval
 		types.ZVAL_COPY(&args[0], &retval)
-		args[1].SetStringCopy(intern.GetURegexRegex())
+		args[1].SetStringVal(intern.GetURegexRegex().GetStr())
 		args[2].SetLong(intern.GetMode())
 		args[3].SetLong(intern.GetURegexFlags())
 		args[4].SetLong(intern.GetPregFlags())
@@ -1980,7 +1980,7 @@ func zim_spl_CachingIterator___toString(executeData *zend.ZendExecuteData, retur
 	}
 	intern = it
 	if !intern.HasUCachingFlags(CIT_CALL_TOSTRING | CIT_TOSTRING_USE_KEY | CIT_TOSTRING_USE_CURRENT | CIT_TOSTRING_USE_INNER) {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not fetch string value (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
+		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not fetch string value (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).Name())
 		return
 	}
 	if intern.IsTostringUseKey() {
@@ -1993,7 +1993,7 @@ func zim_spl_CachingIterator___toString(executeData *zend.ZendExecuteData, retur
 		return
 	}
 	if intern.GetZstr().IsString() {
-		return_value.SetStringCopy(intern.GetZstr().String())
+		return_value.SetStringVal(intern.GetZstr().String().GetStr())
 		return
 	} else {
 		return_value.SetStringVal("")
@@ -2011,7 +2011,7 @@ func zim_spl_CachingIterator_offsetSet(executeData *zend.ZendExecuteData, return
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
+		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).Name())
 		return
 	}
 	if zend.ZendParseParameters(executeData.NumArgs(), "Sz", &key, &value) == types.FAILURE {
@@ -2031,7 +2031,7 @@ func zim_spl_CachingIterator_offsetGet(executeData *zend.ZendExecuteData, return
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
+		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).Name())
 		return
 	}
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == types.FAILURE {
@@ -2053,7 +2053,7 @@ func zim_spl_CachingIterator_offsetUnset(executeData *zend.ZendExecuteData, retu
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
+		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).Name())
 		return
 	}
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == types.FAILURE {
@@ -2071,7 +2071,7 @@ func zim_spl_CachingIterator_offsetExists(executeData *zend.ZendExecuteData, ret
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
+		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).Name())
 		return
 	}
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == types.FAILURE {
@@ -2092,7 +2092,7 @@ func zim_spl_CachingIterator_getCache(executeData *zend.ZendExecuteData, return_
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
+		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).Name())
 		return
 	}
 	types.ZVAL_COPY(return_value, intern.GetZcache())
@@ -2158,7 +2158,7 @@ func zim_spl_CachingIterator_count(executeData *zend.ZendExecuteData, return_val
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
+		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).Name())
 		return
 	}
 	return_value.SetLong(intern.GetZcache().Array().Len())

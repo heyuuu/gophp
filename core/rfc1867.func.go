@@ -986,7 +986,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 
 			if is_anonymous == 0 {
 				if temp_filename != nil {
-					zfilename.SetStringCopy(temp_filename)
+					zfilename.SetStringVal(temp_filename.GetStr())
 				} else {
 					zfilename.SetStringVal("")
 				}
@@ -1002,7 +1002,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			}
 			AddProtectedVariable(lbuf)
 			if temp_filename != nil {
-				zfilename.SetStringCopy(temp_filename)
+				zfilename.SetStringVal(temp_filename.GetStr())
 			} else {
 				zfilename.SetStringVal("")
 			}

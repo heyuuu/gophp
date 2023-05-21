@@ -443,7 +443,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 			return &(zv.GetPropertyGuard())
 		} else if zv.GetPropertyGuard() == 0 {
 
-			zv.SetStringCopy(member)
+			zv.SetStringVal(member.GetStr())
 			return &(zv.GetPropertyGuard())
 		} else {
 			guards = types.NewArray(8)
@@ -462,7 +462,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 		}
 	} else {
 		b.Assert(zv.IsUndef())
-		zv.SetStringCopy(member)
+		zv.SetStringVal(member.GetStr())
 		zv.SetPropertyGuard(0)
 		return &(zv.GetPropertyGuard())
 	}
@@ -1059,7 +1059,7 @@ func ZendGetUserCallFunction(ce *types.ClassEntry, method_name *types.String) ty
 	return ZendGetCallTrampolineFunc(ce, method_name, 0)
 }
 func ZendBadMethodCall(fbc types.IFunction, method_name *types.String, scope *types.ClassEntry) {
-	faults.ThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
+	faults.ThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), b.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
 }
 func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key *types.Zval) types.IFunction {
 	var zobj *types.ZendObject = *obj_ptr
@@ -1240,9 +1240,9 @@ func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name *types.Strin
 }
 func ZendBadConstructorCall(constructor types.IFunction, scope *types.ClassEntry) {
 	if scope != nil {
-		faults.ThrowError(nil, "Call to %s %s::%s() from context '%s'", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().GetName().GetVal(), constructor.GetFunctionName().GetVal(), scope.GetName().GetVal())
+		faults.ThrowError(nil, "Call to %s %s::%s() from context '%s'", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.GetFunctionName().GetVal(), scope.Name())
 	} else {
-		faults.ThrowError(nil, "Call to %s %s::%s() from invalid context", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().GetName().GetVal(), constructor.GetFunctionName().GetVal())
+		faults.ThrowError(nil, "Call to %s %s::%s() from invalid context", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.GetFunctionName().GetVal())
 	}
 }
 func ZendStdGetConstructor(zobj *types.ZendObject) types.IFunction {

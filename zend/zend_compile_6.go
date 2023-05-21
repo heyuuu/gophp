@@ -241,7 +241,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 			}
 		}
 	} else {
-		if in_trait == 0 && ascii.StrCaseEquals(lcname.GetStr(), ce.GetName().GetStr()) {
+		if in_trait == 0 && ascii.StrCaseEquals(lcname.GetStr(), ce.Name()) {
 			if ce.GetConstructor() == nil {
 				ce.SetConstructor((types.IFunction)(op_array))
 			}

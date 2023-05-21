@@ -12,7 +12,7 @@ func SplRegisterProperty(class_entry *types.ClassEntry, prop_name string, prop_n
 func SplAddClassName(list *types.Zval, pce *types.ClassEntry, allow int, ceFlags uint32) {
 	if allow == 0 || allow > 0 && pce.HasCeFlags(ceFlags) || allow < 0 && !pce.HasCeFlags(ceFlags) {
 		var tmp *types.Zval
-		if b.Assign(&tmp, list.Array().KeyFind(pce.GetName().GetStr())) == nil {
+		if b.Assign(&tmp, list.Array().KeyFind(pce.Name())) == nil {
 			var t types.Zval
 			t.SetStringVal(pce.Name())
 			list.Array().KeyAdd(pce.Name(), &t)
@@ -52,6 +52,6 @@ func SplAddClasses(pce *types.ClassEntry, list *types.Zval, sub int, allow int, 
 	return 0
 }
 func SplGenPrivatePropName(ce *types.ClassEntry, prop_name string) *types.String {
-	str := zend.ZendManglePropertyName_Ex(ce.GetName().GetStr(), prop_name)
+	str := zend.ZendManglePropertyName_Ex(ce.Name(), prop_name)
 	return types.NewString(str)
 }

@@ -254,7 +254,7 @@ func ZendGetConstantEx(name string, scope *types.ClassEntry, flags uint32) *type
 	}
 	if (flags & ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) == 0 {
 		if !c.IsCaseSensitive() && !c.IsCtSubst() && IsAccessDeprecated(c, name) {
-			faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
+			faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.Name())
 		}
 	}
 	return c.Value()

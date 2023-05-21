@@ -660,7 +660,7 @@ func PhpOutputStackPop(flags int) int {
 		return 0
 	} else if (flags&PHP_OUTPUT_POP_FORCE) == 0 && !orphan.HasFlags(PHP_OUTPUT_HANDLER_REMOVABLE) {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
-			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer of %s (%d)", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.GetName().GetVal(), orphan.GetLevel())
+			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer of %s (%d)", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.Name(), orphan.GetLevel())
 		}
 		return 0
 	} else {

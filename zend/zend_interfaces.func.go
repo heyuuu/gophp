@@ -245,7 +245,7 @@ func ZendUserItGetNewIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	}
 	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.Object() == object.Object() {
 		if EG__().GetException() == nil {
-			faults.ThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.Name() }, func() []byte { return types.Z_OBJCE_P(object).GetName().GetVal() }))
+			faults.ThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.Name() }, func() []byte { return types.Z_OBJCE_P(object).Name() }))
 		}
 		// ZvalPtrDtor(&iterator)
 		return nil
@@ -269,7 +269,7 @@ func ZendImplementTraversable(interface_ *types.ClassEntry, class_type *types.Cl
 			}
 		}
 	}
-	faults.ErrorNoreturn(faults.E_CORE_ERROR, "Class %s must implement interface %s as part of either %s or %s", class_type.GetName().GetVal(), ZendCeTraversable.GetName().GetVal(), ZendCeIterator.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
+	faults.ErrorNoreturn(faults.E_CORE_ERROR, "Class %s must implement interface %s as part of either %s or %s", class_type.Name(), ZendCeTraversable.Name(), ZendCeIterator.Name(), ZendCeAggregate.Name())
 	return types.FAILURE
 }
 func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {
@@ -293,7 +293,7 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 				b.Assert(class_type.IsResolvedInterfaces())
 				for i = 0; i < class_type.GetNumInterfaces(); i++ {
 					if class_type.GetInterfaces()[i] == ZendCeIterator {
-						faults.ErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeIterator.GetName().GetVal())
+						faults.ErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.Name(), interface_.Name(), ZendCeIterator.Name())
 						return types.FAILURE
 					}
 					if class_type.GetInterfaces()[i] == ZendCeTraversable {
@@ -346,7 +346,7 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 			/* c-level get_iterator cannot be changed */
 
 			if class_type.GetGetIterator() == ZendUserItGetNewIterator {
-				faults.ErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
+				faults.ErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.Name(), interface_.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
 			}
 			return types.FAILURE
 		}

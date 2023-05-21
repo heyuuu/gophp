@@ -32,7 +32,7 @@ func OnChangeCallback(
 			ASSERTG(callback).SetUndef()
 		}
 		if new_value != nil && (ASSERTG(callback).IsNotUndef() || new_value.GetLen() != 0) {
-			ASSERTG(callback).SetStringCopy(new_value)
+			ASSERTG(callback).SetStringVal(new_value.GetStr())
 		}
 	} else {
 		if ASSERTG(cb) {

@@ -234,7 +234,7 @@ func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func f
 	dst.SetUndef()
 	if op.Object().CanCast() {
 		if op.Object().Cast(dst, ctype) == types.FAILURE {
-			faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).GetName().GetVal(), types.ZendGetTypeByConst(ctype))
+			faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).Name(), types.ZendGetTypeByConst(ctype))
 		}
 	} else if op.Object().CanGet() {
 		var newop *types.Zval = op.Object().Get(dst)

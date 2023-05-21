@@ -137,7 +137,7 @@ func DoInheritParentConstructor(ce *types.ClassEntry) {
 	}
 	if ce.GetConstructor() != nil {
 		if parent.GetConstructor() != nil && parent.GetConstructor().IsFinal() {
-			faults.ErrorNoreturn(faults.E_ERROR, "Cannot override final %s::%s() with %s::%s()", parent.GetName().GetVal(), parent.GetConstructor().GetFunctionName().GetVal(), ce.Name(), ce.GetConstructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_ERROR, "Cannot override final %s::%s() with %s::%s()", parent.Name(), parent.GetConstructor().GetFunctionName().GetVal(), ce.Name(), ce.GetConstructor().GetFunctionName().GetVal())
 		}
 		return
 	}
@@ -200,7 +200,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 
 		/* The current class may not be registered yet, so check for it explicitly. */
 
-		if ascii.StrCaseEquals(scope.GetName().GetStr(), name.GetStr()) {
+		if ascii.StrCaseEquals(scope.Name(), name.GetStr()) {
 			return scope
 		}
 
@@ -514,7 +514,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 
 		/* cut off on NULL byte ... class@anonymous */
 
-		str.AppendString(b.CastStr(fptr.GetScope().GetName().GetVal(), strlen(fptr.GetScope().GetName().GetVal())))
+		str.AppendString(b.CastStr(fptr.GetScope().Name(), strlen(fptr.GetScope().Name())))
 		str.AppendString("::")
 	}
 	str.AppendString(fptr.GetFunctionName().GetStr())
@@ -1564,7 +1564,7 @@ func ZendTraitsCopyFunctions(
 func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits **types.ClassEntry) uint32 {
 	var i uint32
 	if (trait.GetCeFlags() & types.AccTrait) != types.AccTrait {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s is not a trait, Only traits may be used in 'as' and 'insteadof' statements", trait.GetName().GetVal())
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s is not a trait, Only traits may be used in 'as' and 'insteadof' statements", trait.Name())
 		return 0
 	}
 	for i = 0; i < ce.GetNumTraits(); i++ {
@@ -1572,7 +1572,7 @@ func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits *
 			return i
 		}
 	}
-	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Required Trait %s wasn't added to %s", trait.GetName().GetVal(), ce.Name())
+	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Required Trait %s wasn't added to %s", trait.Name(), ce.Name())
 	return 0
 }
 func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEntry, exclude_tables_ptr ***types.Array, aliases_ptr ***types.ClassEntry) {
@@ -1940,7 +1940,7 @@ func ZendHasDeprecatedConstructor(ce *types.ClassEntry) types.ZendBool {
 		return 0
 	}
 	constructor_name = ce.GetConstructor().GetFunctionName()
-	return !(operators.ZendBinaryStrcasecmp(ce.GetName().GetStr(), constructor_name.GetStr()))
+	return !(operators.ZendBinaryStrcasecmp(ce.Name(), constructor_name.GetStr()))
 }
 func ZendCheckDeprecatedConstructor(ce *types.ClassEntry) {
 	if ZendHasDeprecatedConstructor(ce) != 0 {

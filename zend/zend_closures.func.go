@@ -38,7 +38,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 
 			/* Binding incompatible $this to an internal method is not supported. */
 
-			faults.Error(faults.E_WARNING, "Cannot bind method %s::%s() to object of class %s", func_.GetScope().GetName().GetVal(), func_.GetFunctionName().GetVal(), types.Z_OBJCE_P(newthis).GetName().GetVal())
+			faults.Error(faults.E_WARNING, "Cannot bind method %s::%s() to object of class %s", func_.GetScope().Name(), func_.GetFunctionName().GetVal(), types.Z_OBJCE_P(newthis).Name())
 			return 0
 		}
 	} else if is_fake_closure != 0 && func_.GetScope() != nil && !func_.IsStatic() {
@@ -61,7 +61,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 
 		/* rebinding to internal class is not allowed */
 
-		faults.Error(faults.E_WARNING, "Cannot bind closure to scope of internal class %s", scope.GetName().GetVal())
+		faults.Error(faults.E_WARNING, "Cannot bind closure to scope of internal class %s", scope.Name())
 		return 0
 	}
 	if is_fake_closure != 0 && scope != func_.GetScope() {

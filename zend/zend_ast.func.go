@@ -471,7 +471,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		types.ZVAL_COPY_OR_DUP(result, zv)
 	case ZEND_AST_CONSTANT_CLASS:
 		if scope != nil {
-			result.SetStringCopy(scope.GetName())
+			result.SetStringVal(scope.Name())
 		} else {
 			result.SetStringVal("")
 		}
@@ -481,13 +481,13 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			return types.FAILURE
 		}
 		if ast.GetAttr() == ZEND_FETCH_CLASS_SELF {
-			result.SetStringCopy(scope.GetName())
+			result.SetStringVal(scope.Name())
 		} else if ast.GetAttr() == ZEND_FETCH_CLASS_PARENT {
 			if !(scope.GetParent()) {
 				faults.ThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
 				return types.FAILURE
 			}
-			result.SetStringCopy(scope.GetParent().name)
+			result.SetStringVal(scope.GetParent().name.GetStr())
 		} else {
 			b.Assert(false)
 		}
@@ -678,7 +678,7 @@ func ZendAstTreeCopy(ast *ZendAst, buf any) any {
 		var new_ *ZendAstZval = (*ZendAstZval)(buf)
 		new_.SetKind(ZEND_AST_CONSTANT)
 		new_.SetAttr(ast.GetAttr())
-		new_.GetVal().SetStringCopy(ZendAstGetConstantName(ast))
+		new_.GetVal().SetStringVal(ZendAstGetConstantName(ast).GetStr())
 		buf = any((*byte)(buf + b.SizeOf("zend_ast_zval")))
 	} else if ZendAstIsList(ast) != 0 {
 		var list *ZendAstList = ZendAstGetList(ast)

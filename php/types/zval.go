@@ -86,7 +86,6 @@ func (zv *Zval) SetLong(l int)                   { zv.typ, zv.value = IS_LONG, l
 func (zv *Zval) SetDouble(d float64)             { zv.typ, zv.value = IS_DOUBLE, d }
 func (zv *Zval) SetStringVal(s string)           { zv.typ, zv.value = IS_STRING, NewString(s) }
 func (zv *Zval) SetString(s *String)             { zv.typ, zv.value = IS_STRING, s }
-func (zv *Zval) SetStringCopy(s *String)         { zv.typ, zv.value = IS_STRING, NewString(s.GetStr()) }
 func (zv *Zval) SetEmptyArray()                  { zv.typ, zv.value = IS_ARRAY, NewArray(0) }
 func (zv *Zval) SetArray(arr *Array)             { zv.typ, zv.value = IS_ARRAY, arr }
 func (zv *Zval) SetImmutableArray(arr *Array)    { zv.typ, zv.value = _IS_IMMUTABLE_ARRAY, arr }

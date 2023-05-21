@@ -357,13 +357,13 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
 		if CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
-			zv.SetStringCopy(CG__().GetActiveClassEntry().GetName())
+			zv.SetStringVal(CG__().GetActiveClassEntry().GetName().GetStr())
 			return 1
 		}
 		return 0
 	case ZEND_FETCH_CLASS_PARENT:
 		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().GetParentName() && ZendIsScopeKnown() != 0 {
-			zv.SetStringCopy(CG__().GetActiveClassEntry().GetParentName())
+			zv.SetStringVal(CG__().GetActiveClassEntry().GetParentName().GetStr())
 			return 1
 		}
 		return 0

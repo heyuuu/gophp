@@ -534,7 +534,7 @@ func ZendCompileAssert(result *Znode, args *ZendAstList, name *types.String, fbc
 		ZendEmitOp(nil, ZEND_ASSERT_CHECK, nil, nil)
 		if fbc != nil && FbcIsFinalized(fbc) != 0 {
 			name_node.SetOpType(IS_CONST)
-			name_node.GetConstant().SetStringCopy(name)
+			name_node.GetConstant().SetStringVal(name.GetStr())
 			opline = ZendEmitOp(nil, ZEND_INIT_FCALL, nil, &name_node)
 		} else {
 			opline = ZendEmitOp(nil, ZEND_INIT_NS_FCALL_BY_NAME, nil, nil)

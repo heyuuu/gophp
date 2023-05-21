@@ -565,7 +565,7 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	}
 	if retval.GetType() != types.IS_ARRAY {
 		// zend.ZvalPtrDtor(retval)
-		faults.TypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).GetName().GetVal())
+		faults.TypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).Name())
 		return types.FAILURE
 	}
 	return types.SUCCESS
@@ -627,7 +627,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 			retval = types.FAILURE
 			break
 		}
-		priv_name = zend.ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr())
+		priv_name = zend.ZendManglePropertyName_ZStr(ce.Name(), name.GetStr())
 		if PhpVarSerializeTryAddSleepProp(ht, props, priv_name, name, struc) == types.SUCCESS {
 			// zend.ZendTmpStringRelease(tmp_name)
 			// types.ZendStringRelease(priv_name)

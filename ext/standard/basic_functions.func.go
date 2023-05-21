@@ -1357,7 +1357,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 			} else {
 				if iniEntry.GetValue() != nil {
 					var zv types.Zval
-					zv.SetStringCopy(iniEntry.GetValue())
+					zv.SetStringVal(iniEntry.GetValue().GetStr())
 					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), &zv)
 				} else {
 					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), zend.EG__().GetUninitializedZval())

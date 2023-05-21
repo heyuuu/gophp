@@ -78,7 +78,7 @@ func (this *ZendAstZval) GetKind() ZendAstKind      { return this.kind }
 func (this *ZendAstZval) SetKind(value ZendAstKind) { this.kind = value }
 func (this *ZendAstZval) GetAttr() ZendAstAttr      { return this.attr }
 func (this *ZendAstZval) SetAttr(value ZendAstAttr) { this.attr = value }
-func (this *ZendAstZval) GetVal() types.Zval        { return this.val }
+func (this *ZendAstZval) GetVal() *types.Zval       { return &this.val }
 func (this *ZendAstZval) GetLineno() uint32         { return this.lineno }
 
 // func (this *ZendAstZval) SetVal(value Zval) { this.val = value }

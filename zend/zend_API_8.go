@@ -291,7 +291,7 @@ func ZendDeclareTypedProperty(
 	// calc prop name
 	var propName string
 	if accessType&types.AccPrivate != 0 {
-		propName = ZendManglePropertyName_Ex(ce.GetName().GetStr(), name.GetStr())
+		propName = ZendManglePropertyName_Ex(ce.Name(), name.GetStr())
 	} else if accessType&types.AccProtected != 0 {
 		propName = ZendManglePropertyName_Ex("*", name.GetStr())
 	} else { // public

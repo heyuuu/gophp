@@ -330,11 +330,11 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zp
 		switch key {
 		case PHP_URL_SCHEME:
 			if resource.GetScheme() != nil {
-				return_value.SetStringCopy(resource.GetScheme())
+				return_value.SetStringVal(resource.GetScheme().GetStr())
 			}
 		case PHP_URL_HOST:
 			if resource.GetHost() != nil {
-				return_value.SetStringCopy(resource.GetHost())
+				return_value.SetStringVal(resource.GetHost().GetStr())
 			}
 		case PHP_URL_PORT:
 			if has_port != 0 {
@@ -342,23 +342,23 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zp
 			}
 		case PHP_URL_USER:
 			if resource.GetUser() != nil {
-				return_value.SetStringCopy(resource.GetUser())
+				return_value.SetStringVal(resource.GetUser().GetStr())
 			}
 		case PHP_URL_PASS:
 			if resource.GetPass() != nil {
-				return_value.SetStringCopy(resource.GetPass())
+				return_value.SetStringVal(resource.GetPass().GetStr())
 			}
 		case PHP_URL_PATH:
 			if resource.GetPath() != nil {
-				return_value.SetStringCopy(resource.GetPath())
+				return_value.SetStringVal(resource.GetPath().GetStr())
 			}
 		case PHP_URL_QUERY:
 			if resource.GetQuery() != nil {
-				return_value.SetStringCopy(resource.GetQuery())
+				return_value.SetStringVal(resource.GetQuery().GetStr())
 			}
 		case PHP_URL_FRAGMENT:
 			if resource.GetFragment() != nil {
-				return_value.SetStringCopy(resource.GetFragment())
+				return_value.SetStringVal(resource.GetFragment().GetStr())
 			}
 		default:
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid URL component identifier "+zend.ZEND_LONG_FMT, key)
@@ -374,11 +374,11 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zp
 	/* add the various elements to the array */
 
 	if resource.GetScheme() != nil {
-		tmp.SetStringCopy(resource.GetScheme())
+		tmp.SetStringVal(resource.GetScheme().GetStr())
 		return_value.Array().KeyAddNew(types.STR_SCHEME, &tmp)
 	}
 	if resource.GetHost() != nil {
-		tmp.SetStringCopy(resource.GetHost())
+		tmp.SetStringVal(resource.GetHost().GetStr())
 		return_value.Array().KeyAddNew(types.STR_HOST, &tmp)
 	}
 	if has_port != 0 {
@@ -386,23 +386,23 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zp
 		return_value.Array().KeyAddNew(types.STR_PORT, &tmp)
 	}
 	if resource.GetUser() != nil {
-		tmp.SetStringCopy(resource.GetUser())
+		tmp.SetStringVal(resource.GetUser().GetStr())
 		return_value.Array().KeyAddNew(types.STR_USER, &tmp)
 	}
 	if resource.GetPass() != nil {
-		tmp.SetStringCopy(resource.GetPass())
+		tmp.SetStringVal(resource.GetPass().GetStr())
 		return_value.Array().KeyAddNew(types.STR_PASS, &tmp)
 	}
 	if resource.GetPath() != nil {
-		tmp.SetStringCopy(resource.GetPath())
+		tmp.SetStringVal(resource.GetPath().GetStr())
 		return_value.Array().KeyAddNew(types.STR_PATH, &tmp)
 	}
 	if resource.GetQuery() != nil {
-		tmp.SetStringCopy(resource.GetQuery())
+		tmp.SetStringVal(resource.GetQuery().GetStr())
 		return_value.Array().KeyAddNew(types.STR_QUERY, &tmp)
 	}
 	if resource.GetFragment() != nil {
-		tmp.SetStringCopy(resource.GetFragment())
+		tmp.SetStringVal(resource.GetFragment().GetStr())
 		return_value.Array().KeyAddNew(types.STR_FRAGMENT, &tmp)
 	}
 done:

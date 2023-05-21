@@ -166,7 +166,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
 				var actual *byte = (*byte)(operators.ZendMemrchr(opline.Const2().String().GetVal(), '\\', opline.Const2().String().GetLen()))
 				if actual == nil {
-					opline.Result().SetStringCopy(opline.Const2().String())
+					opline.Result().SetStringVal(opline.Const2().String().GetStr())
 				} else {
 					actual++
 					opline.Result().SetStringVal(b.CastStr(actual, opline.Const2().String().GetLen()-(actual-opline.Const2().String().GetVal())))
@@ -205,18 +205,18 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 
 				/* Namespaces are always case-insensitive. Only compare shortname. */
 
-				ns_sep = operators.ZendMemrchr(c.GetName().GetVal(), '\\', c.GetName().GetLen())
+				ns_sep = operators.ZendMemrchr(c.Name(), '\\', c.GetName().GetLen())
 				if ns_sep != nil {
-					shortname_offset = ns_sep - c.GetName().GetVal() + 1
+					shortname_offset = ns_sep - c.Name() + 1
 					shortname_len = c.GetName().GetLen() - shortname_offset
 				} else {
 					shortname_offset = 0
 					shortname_len = c.GetName().GetLen()
 				}
-				is_deprecated = memcmp(c.GetName().GetVal()+shortname_offset, (orig_key-1).GetStr().GetVal()+shortname_offset, shortname_len) != 0
+				is_deprecated = memcmp(c.Name()+shortname_offset, (orig_key-1).GetStr().GetVal()+shortname_offset, shortname_len) != 0
 			}
 			if is_deprecated != 0 {
-				faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
+				faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.Name())
 				return types.SUCCESS
 			}
 		}

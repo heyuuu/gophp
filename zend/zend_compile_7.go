@@ -236,7 +236,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 	case T_LINE:
 		zv.SetLong(ast.GetLineno())
 	case T_FILE:
-		zv.SetStringCopy(CG__().GetCompiledFilename())
+		zv.SetStringVal(CG__().GetCompiledFilename().GetStr())
 	case T_DIR:
 		var filename = CG__().GetCompiledFilename().GetStr()
 		var dirname = ZendDirname(filename)
@@ -246,7 +246,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 		zv.SetStringVal(dirname)
 	case T_FUNC_C:
 		if op_array != nil && op_array.GetFunctionName() != nil {
-			zv.SetStringCopy(op_array.GetFunctionName())
+			zv.SetStringVal(op_array.GetFunctionName().GetStr())
 		} else {
 			zv.SetStringVal("")
 		}
@@ -260,7 +260,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 		}
 		if op_array != nil && op_array.GetFunctionName() != nil {
 			if op_array.GetScope() != nil {
-				zv.SetString(ZendConcat3(op_array.GetScope().GetName().GetVal(), op_array.GetScope().GetName().GetLen(), "::", 2, op_array.GetFunctionName().GetVal(), op_array.GetFunctionName().GetLen()))
+				zv.SetString(ZendConcat3(op_array.GetScope().Name(), op_array.GetScope().GetName().GetLen(), "::", 2, op_array.GetFunctionName().GetVal(), op_array.GetFunctionName().GetLen()))
 			} else {
 				zv.SetStringVal(op_array.GetFunctionName().GetStr())
 			}
