@@ -15,7 +15,7 @@ type IObject interface {
 	ReadProperty(member *Zval, typ int, cacheSlot *any, rv *Zval) *Zval
 	WriteProperty(member *Zval, value *Zval, cacheSlot *any) *Zval
 	HasProperty(member *Zval, hasSetExists int, cacheSlot *any) int
-	UnsetPropertyEx(member *Zval, cacheSlot *any)
+	UnsetProperty(member *Zval, cacheSlot *any)
 	GetPropertyPtr(member *Zval, typ int, cacheSlot *any) *Zval
 
 	// properties

@@ -20,6 +20,8 @@ type ZendObject struct {
 	properties      *Array // 动态属性
 	propertiesTable []Zval // 静态属性
 
+	data IObject // 封装 Object 数据，便于扩展
+
 	// flags todo 待合并
 	protected    bool
 	isDtorCalled bool
@@ -89,7 +91,7 @@ func (o *ZendObject) propertiesInitEx(properties *Array) {
 			propertyInfo := zend.ZendGetPropertyInfo(o.GetCe(), key_.StrKey())
 			if propertyInfo != nil && !propertyInfo.IsStatic() {
 				var slot *Zval = zend.OBJ_PROP(o, propertyInfo.GetOffset())
-				if propertyInfo.GetType() != 0 {
+				if propertyInfo.GetType() != nil {
 					var tmp Zval
 					ZVAL_COPY_VALUE(&tmp, prop)
 					if zend.ZendVerifyPropertyType(propertyInfo, &tmp, 0) == 0 {
@@ -106,7 +108,8 @@ func (o *ZendObject) propertiesInitEx(properties *Array) {
 }
 
 func (o *ZendObject) GetHandle() uint              { return o.handle }
-func (o *ZendObject) GetCe() *ClassEntry           { return o.ce }
+func (o *ZendObject) ClassName() string            { return o.data.ClassName() }
+func (o *ZendObject) GetCe() *ClassEntry           { return o.data.GetCe() }
 func (o *ZendObject) GetHandlers() *ObjectHandlers { return o.handlers }
 func (o *ZendObject) GetProperties() *Array        { return o.properties }
 func (o *ZendObject) SetProperties(value *Array)   { o.properties = value }
@@ -116,129 +119,122 @@ func (o *ZendObject) DupProperties() {
 func (o *ZendObject) GetPropertiesTable() []Zval { return o.propertiesTable }
 
 // object handlers
-func (o *ZendObject) Free() { o.handlers.FreeObj(o) }
-func (o *ZendObject) Dtor() { o.handlers.DtorObj(o) }
-
-func (o *ZendObject) CanClone() bool { return o.handlers.CloneObjEx != nil }
+func (o *ZendObject) Free()          { o.data.Free() }
+func (o *ZendObject) Dtor()          { o.data.Dtor() }
+func (o *ZendObject) CanClone() bool { return o.data.CanClone() }
 func (o *ZendObject) Clone() *ZendObject {
-	b.Assert(o.handlers.CloneObjEx != nil)
-	return o.handlers.CloneObjEx(o)
+	b.Assert(o.data.CanClone())
+	return o.data.Clone()
 }
 
 // property
 func (o *ZendObject) ReadProperty(member *Zval, typ int, cacheSlot *any, rv *Zval) *Zval {
-	return o.handlers.ReadPropertyEx(o, member, typ, cacheSlot, rv)
+	return o.data.ReadProperty(member, typ, cacheSlot, rv)
 }
 func (o *ZendObject) WriteProperty(member *Zval, value *Zval, cacheSlot *any) *Zval {
-	return o.handlers.WritePropertyEx(o, member, value, cacheSlot)
+	return o.data.WriteProperty(member, value, cacheSlot)
 }
 func (o *ZendObject) HasProperty(member *Zval, hasSetExists int, cacheSlot *any) int {
-	return o.handlers.HasPropertyEx(o, member, hasSetExists, cacheSlot)
+	return o.data.HasProperty(member, hasSetExists, cacheSlot)
 }
 func (o *ZendObject) UnsetPropertyEx(member *Zval, cacheSlot *any) {
-	o.handlers.UnsetPropertyEx(o, member, cacheSlot)
+	o.data.UnsetProperty(member, cacheSlot)
 }
 func (o *ZendObject) GetPropertyPtr(member *Zval, typ int, cacheSlot *any) *Zval {
-	return o.handlers.GetPropertyPtrPtrEx(o, member, typ, cacheSlot)
+	return o.data.GetPropertyPtr(member, typ, cacheSlot)
 }
 
 // properties
 func (o *ZendObject) IsStdGetProperties() bool {
-	// todo
-	std := zend.ZendStdGetProperties
-	return objectGetPropertiesFunc(o.handlers.GetProperties) == objectGetPropertiesFunc(std)
+	return o.data.IsStdGetProperties()
 }
 func (o *ZendObject) GetPropertiesArray() *Array {
-	return o.handlers.GetPropertiesEx(o)
+	return o.data.GetPropertiesArray()
 }
 func (o *ZendObject) CanGetPropertiesFor() bool {
-	return o.handlers.GetPropertiesForEx != nil
+	return o.data.CanGetPropertiesFor()
 }
 func (o *ZendObject) GetPropertiesFor(purpose zend.ZendPropPurpose) *Array {
-	return o.handlers.GetPropertiesForEx(o, purpose)
+	return o.data.GetPropertiesFor(purpose)
 }
 
 // get & set
-func (o *ZendObject) CanGet() bool { return o.handlers.GetEx != nil }
-func (o *ZendObject) Get(rv *Zval) *Zval {
-	return o.handlers.GetEx(o, rv)
+func (o *ZendObject) CanGet() bool {
+	return o.data.CanGet()
 }
-func (o *ZendObject) CanSet() bool { return o.handlers.SetEx != nil }
+func (o *ZendObject) Get(rv *Zval) *Zval {
+	return o.data.Get(rv)
+}
+func (o *ZendObject) CanSet() bool {
+	return o.data.CanSet()
+}
 func (o *ZendObject) Set(value *Zval) {
-	o.handlers.SetEx(o, value)
+	o.data.Set(value)
 }
 
 // dimension
 func (o *ZendObject) ReadDimension(offset *Zval, typ int, rv *Zval) *Zval {
-	return o.handlers.ReadDimensionEx(o, offset, typ, rv)
+	return o.data.ReadDimension(offset, typ, rv)
 }
 func (o *ZendObject) WriteDimension(offset *Zval, value *Zval) {
-	o.handlers.WriteDimensionEx(o, offset, value)
+	o.data.WriteDimension(offset, value)
 }
 func (o *ZendObject) HasDimension(offset *Zval, checkEmpty int) int {
-	return o.handlers.HasDimensionEx(o, offset, checkEmpty)
+	return o.data.HasDimension(offset, checkEmpty)
 }
 func (o *ZendObject) UnsetDimension(offset *Zval) {
-	o.handlers.UnsetDimensionEx(o, offset)
+	o.data.UnsetDimension(offset)
 }
 
 // elements
 func (o *ZendObject) CanCountElements() bool {
-	return o.handlers.CountElementsEx != nil
+	return o.data.CanCountElements()
 }
 func (o *ZendObject) CountElements(count *int) int {
-	return o.handlers.CountElementsEx(o, count)
+	return o.data.CountElements(count)
 }
 
 // method
-func (o *ZendObject) CanGetMethod() bool { return o.handlers.GetMethod != nil }
+func (o *ZendObject) CanGetMethod() bool {
+	return o.CanGetMethod()
+}
 func (o *ZendObject) GetMethod(object **ZendObject, method *String, key *Zval) IFunction {
-	return o.handlers.GetMethod(object, method, key)
+	return o.data.GetMethod(object, method, key)
 }
 func (o *ZendObject) CallMethod(method *String, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
-	return o.handlers.CallMethod(method, object, executeData, returnValue)
+	return o.data.CallMethod(method, object, executeData, returnValue)
 }
 func (o *ZendObject) GetConstructor(object *ZendObject) IFunction {
-	return o.handlers.GetConstructor(object)
+	return o.data.GetConstructor(object)
 }
 
 // cast
-func (o *ZendObject) CanCast() bool { return o.handlers.CastObjectEx != nil }
+func (o *ZendObject) CanCast() bool { return o.data.CanCast() }
 func (o *ZendObject) Cast(retval *Zval, type_ ZvalType) int {
-	return o.handlers.CastObjectEx(o, retval, type_)
+	return o.data.Cast(retval, type_)
 }
 
 // mixed
-func (o *ZendObject) ClassName() string {
-	return o.ce.Name()
-}
-
-func (o *ZendObject) CanGetClosure() bool {
-	return o.handlers.GetClosure != nil
-}
+func (o *ZendObject) CanGetClosure() bool { return o.data.CanGetClosure() }
 func (o *ZendObject) GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **ZendObject) int {
-	return o.handlers.GetClosure(obj, cePtr, fptrPtr, objPtr)
+	return o.data.GetClosure(obj, cePtr, fptrPtr, objPtr)
 }
 
-func (o *ZendObject) CanDoOperation() bool {
-	return o.handlers.DoOperation != nil
-}
+func (o *ZendObject) CanDoOperation() bool { return o.data.CanDoOperation() }
 func (o *ZendObject) DoOperation(opcode uint8, result *Zval, op1 *Zval, op2 *Zval) int {
-	return o.handlers.DoOperation(opcode, result, op1, op2)
+	return o.data.DoOperation(opcode, result, op1, op2)
 }
 
 func (o *ZendObject) CanCompareObjectsTo(obj2 *ZendObject) bool {
-	return objectCompareFunc(o.handlers.CompareObjects) == objectCompareFunc(obj2.handlers.CompareObjects)
+	return o.data.CanCompareObjectsTo(obj2)
 }
 func (o *ZendObject) CompareObjectsTo(another *ZendObject) int {
-	return o.handlers.CompareObjectsEx(o, another)
+	return o.data.CompareObjectsTo(another)
 }
 
-func (o *ZendObject) CanCompare() bool {
-	return o.handlers.Compare != nil
-}
+func (o *ZendObject) CanCompare() bool { return o.data.CanCompare() }
 func (o *ZendObject) Compare(result *Zval, op1 *Zval, op2 *Zval) int {
-	return o.handlers.Compare(result, op1, op2)
+	return o.data.Compare(result, op1, op2)
 }
 
 // object

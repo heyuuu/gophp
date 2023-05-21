@@ -13,7 +13,7 @@ func ZendObjectStdDtorEx(properties []types.Zval, ce *types.ClassEntry) {
 			prop := &properties[propNum]
 			if prop.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(prop.Reference()) {
 				var propInfo = ce.GetPropertyInfo(propNum)
-				if propInfo.GetType() != 0 {
+				if propInfo.GetType() != nil {
 					ZEND_REF_DEL_TYPE_SOURCE(prop.Reference(), propInfo)
 				}
 			}
