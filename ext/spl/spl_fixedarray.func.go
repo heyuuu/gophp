@@ -676,7 +676,19 @@ func SplFixedarrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	return iterator.GetIntern().GetIt()
 }
 func ZmStartupSplFixedarray(type_ int, module_number int) int {
-	spl_ce_SplFixedArray = zend.RegisterClass("SplFixedArray", SplFixedarrayNew, spl_funcs_SplFixedArray)
+	spl_ce_SplFixedArray = zend.RegisterClassEx(&zend.ClassDefines{
+		Name:         "SplFixedArray",
+		CreateObject: SplFixedarrayNew,
+		Functions:    spl_funcs_SplFixedArray,
+		Interfaces: []*types.ClassEntry{
+			spl_ce_Iterator,
+			spl_ce_ArrayAccess,
+			spl_ce_Countable,
+		},
+		GetIterator: SplFixedarrayGetIterator,
+		AddCeFlags:  types.AccReuseGetIterator,
+	})
+
 	spl_handler_SplFixedArray = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:         int((*byte)(&((*SplFixedArrayObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:       SplFixedarrayObjectClone,
@@ -689,10 +701,5 @@ func ZmStartupSplFixedarray(type_ int, module_number int) int {
 		FreeObj:        SplFixedarrayObjectFreeStorage,
 	})
 
-	zend.ZendClassImplements(spl_ce_SplFixedArray, 1, spl_ce_Iterator)
-	zend.ZendClassImplements(spl_ce_SplFixedArray, 1, spl_ce_ArrayAccess)
-	zend.ZendClassImplements(spl_ce_SplFixedArray, 1, spl_ce_Countable)
-	spl_ce_SplFixedArray.SetGetIterator(SplFixedarrayGetIterator)
-	spl_ce_SplFixedArray.AddCeFlags(types.AccReuseGetIterator)
 	return types.SUCCESS
 }

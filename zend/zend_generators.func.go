@@ -1061,9 +1061,8 @@ func ZendGeneratorGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	return iterator
 }
 func ZendRegisterGeneratorCe() {
-	ZendCeGenerator = RegisterClass("Generator", nil, GeneratorFunctions)
+	ZendCeGenerator = RegisterClass("Generator", ZendGeneratorCreate, GeneratorFunctions)
 	ZendCeGenerator.SetIsFinal(true)
-	ZendCeGenerator.SetCreateObject(ZendGeneratorCreate)
 	ZendCeGenerator.SetSerialize(ZendClassSerializeDeny)
 	ZendCeGenerator.SetUnserialize(ZendClassUnserializeDeny)
 

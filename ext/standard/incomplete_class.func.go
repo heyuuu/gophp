@@ -61,9 +61,7 @@ func PhpCreateIncompleteClass() *types.ClassEntry {
 		GetMethod:         IncompleteClassGetMethod,
 	})
 
-	ce := zend.RegisterClass(INCOMPLETE_CLASS, nil, nil)
-	ce.SetCreateObject(PhpCreateIncompleteObject)
-	return ce
+	return zend.RegisterClass(INCOMPLETE_CLASS, PhpCreateIncompleteObject, nil)
 }
 func PhpLookupClassName(object *types.Zval) *types.String {
 	var val *types.Zval

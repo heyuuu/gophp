@@ -7,12 +7,15 @@ import (
 
 // Register Internal class
 type objCtorType func(*types.ClassEntry) *types.ZendObject
+type objGetIteratorType func(ce *types.ClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator
 type ClassDefines struct {
 	Name         string
+	CreateObject objCtorType
+	Functions    []types.FunctionEntry
 	Parent       *types.ClassEntry
 	Interfaces   []*types.ClassEntry
-	Functions    []types.FunctionEntry
-	CreateObject func(*types.ClassEntry) *types.ZendObject
+	GetIterator  objGetIteratorType
+	AddCeFlags   uint32
 }
 
 func RegisterInternalInterface(name string, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
@@ -47,11 +50,22 @@ func RegisterClassEx(def *ClassDefines) *types.ClassEntry {
 		ZendBuildPropertiesInfoTable(ce)
 	}
 
+	// handle interfaces
+	ZendClassImplements(ce, 1, def.Interfaces...)
+
 	// handle objCtor
 	if def.CreateObject != nil {
 		ce.SetCreateObject(def.CreateObject)
 	} else if parent != nil {
 		ce.SetCreateObject(parent.GetCreateObject())
+	}
+
+	// others
+	if def.GetIterator != nil {
+		ce.SetGetIterator(def.GetIterator)
+	}
+	if def.AddCeFlags != 0 {
+		ce.AddCeFlags(def.AddCeFlags)
 	}
 
 	return ce
