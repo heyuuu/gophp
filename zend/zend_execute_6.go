@@ -192,13 +192,13 @@ func ZendAssignToPropertyReference(
 		variable_ptr = variable_ptr.Indirect()
 	}
 	if variable_ptr.IsError() {
-		variable_ptr = EG__().GetUninitializedZval()
+		variable_ptr = UninitializedZval()
 	} else if variable.GetType() != types.IS_INDIRECT {
 		faults.ThrowError(nil, "Cannot assign by reference to overloaded object")
 		// ZvalPtrDtor(&variable)
-		variable_ptr = EG__().GetUninitializedZval()
+		variable_ptr = UninitializedZval()
 	} else if value_ptr.IsError() {
-		variable_ptr = EG__().GetUninitializedZval()
+		variable_ptr = UninitializedZval()
 	} else if (opline.GetExtendedValue()&ZEND_RETURNS_FUNCTION) != 0 && !(value_ptr.IsReference()) {
 		variable_ptr = ZendWrongAssignToVariableReference(variable_ptr, value_ptr, opline, executeData)
 	} else {

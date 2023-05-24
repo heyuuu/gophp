@@ -652,7 +652,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 			break
 		}
 		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
-		ht.KeyAdd(name.GetStr(), zend.EG__().GetUninitializedZval())
+		ht.KeyAdd(name.GetStr(), zend.UninitializedZval())
 		// zend.ZendTmpStringRelease(tmp_name)
 	}
 	//zend.ZendReleaseProperties(props)

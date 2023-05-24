@@ -106,7 +106,7 @@ func UserWrapperOpener(
 	args[0].SetStringVal(b.CastStrAuto(filename))
 	args[1].SetStringVal(b.CastStrAuto(mode))
 	args[2].SetLong(options)
-	args[3].SetNewRef(zend.EG__().GetUninitializedZval())
+	args[3].SetNewRef(zend.UninitializedZval())
 	zfuncname.SetStringVal(b.CastStrAuto(USERSTREAM_OPEN))
 
 	faults.TryCatch(func() {

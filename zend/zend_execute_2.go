@@ -137,7 +137,7 @@ func ZendAssignToTypedProp(info *types.PropertyInfo, property_val *types.Zval, v
 	types.ZVAL_COPY(&tmp, value)
 	if IZendVerifyPropertyType(info, &tmp, executeData.IsCallUseStrictTypes()) == 0 {
 		// ZvalPtrDtor(&tmp)
-		return EG__().GetUninitializedZval()
+		return UninitializedZval()
 	}
 	return ZendAssignToVariable(property_val, &tmp, executeData.IsCallUseStrictTypes())
 }

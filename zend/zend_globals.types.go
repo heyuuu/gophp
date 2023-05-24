@@ -355,9 +355,8 @@ func (this *ZendExecutorGlobals) PersistentList() ResourceTable {
  * 以下是自动生成的方法
  */
 
-func (this *ZendExecutorGlobals) GetUninitializedZval() *types.Zval { return types.NewZvalNull() }
-func (this *ZendExecutorGlobals) GetErrorZval() *types.Zval         { return &this.error_zval }
-func (this *ZendExecutorGlobals) GetSymtableCache() []*types.Array  { return this.symtable_cache }
+func (this *ZendExecutorGlobals) GetErrorZval() *types.Zval        { return &this.error_zval }
+func (this *ZendExecutorGlobals) GetSymtableCache() []*types.Array { return this.symtable_cache }
 func (this *ZendExecutorGlobals) SetSymtableCache(value []*types.Array) {
 	this.symtable_cache = value
 }

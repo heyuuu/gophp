@@ -491,7 +491,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, type_ int
 	var guard *uint32 = nil
 	name = operators.ZvalTryGetString(member)
 	if name == nil {
-		return EG__().GetUninitializedZval()
+		return UninitializedZval()
 	}
 
 	/* make zend_get_property_info silent if we have getter - we may want to use it */
@@ -533,7 +533,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, type_ int
 			}
 		}
 	} else if EG__().GetException() != nil {
-		retval = EG__().GetUninitializedZval()
+		retval = UninitializedZval()
 		goto exit
 	}
 
@@ -552,7 +552,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, type_ int
 			ZendStdCallIssetter(zobj, name, &tmp_result)
 			*guard &= ^IN_ISSET
 			if !operators.ZvalIsTrue(&tmp_result) {
-				retval = EG__().GetUninitializedZval()
+				retval = UninitializedZval()
 				// OBJ_RELEASE(zobj)
 				// ZvalPtrDtor(&tmp_result)
 				goto exit
@@ -588,7 +588,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, type_ int
 					}
 				}
 			} else {
-				retval = EG__().GetUninitializedZval()
+				retval = UninitializedZval()
 			}
 			if prop_info != nil {
 				ZendVerifyPropAssignableByRef(prop_info, retval, zobj.GetCe().GetGet().IsStrictTypes())
@@ -601,7 +601,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, type_ int
 
 			ZendGetPropertyOffset(zobj.GetCe(), name, 0, nil, &prop_info)
 			b.Assert(EG__().GetException() != nil)
-			retval = EG__().GetUninitializedZval()
+			retval = UninitializedZval()
 			goto exit
 		}
 	}
@@ -613,7 +613,7 @@ uninit_error:
 			faults.Error(faults.E_NOTICE, "Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal())
 		}
 	}
-	retval = EG__().GetUninitializedZval()
+	retval = UninitializedZval()
 exit:
 	//ZendTmpStringRelease(tmp_name)
 	return retval
@@ -746,7 +746,7 @@ func ZendStdReadDimensionEx(object *types.ZendObject, offset *types.Zval, type_ 
 				return nil
 			}
 			if !operators.ZvalIsTrue(rv) {
-				return EG__().GetUninitializedZval()
+				return UninitializedZval()
 			}
 		}
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", rv, &tmp_offset)
@@ -853,7 +853,7 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.ZendObject, member *types.Zval, type
 			if zobj.GetProperties() == nil {
 				RebuildObjectProperties(zobj)
 			}
-			retval = zobj.GetProperties().KeyUpdate(name.GetStr(), EG__().GetUninitializedZval())
+			retval = zobj.GetProperties().KeyUpdate(name.GetStr(), UninitializedZval())
 
 			/* Notice is thrown after creation of the property, to avoid EG(std_property_info)
 			 * being overwritten in an error handler. */

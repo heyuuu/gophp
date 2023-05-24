@@ -201,7 +201,7 @@ func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zv
 }
 func ZendAssignToTypedPropertyReference(prop_info *types.PropertyInfo, prop *types.Zval, value_ptr *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	if ZendVerifyPropAssignableByRef(prop_info, value_ptr, executeData.IsCallUseStrictTypes()) == 0 {
-		return EG__().GetUninitializedZval()
+		return UninitializedZval()
 	}
 	if prop.IsReference() {
 		ZEND_REF_DEL_TYPE_SOURCE(prop.Reference(), prop_info)
@@ -213,7 +213,7 @@ func ZendAssignToTypedPropertyReference(prop_info *types.PropertyInfo, prop *typ
 func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zval, opline *ZendOp, executeData *ZendExecuteData) *types.Zval {
 	faults.Error(faults.E_NOTICE, "Only variables should be assigned by reference")
 	if EG__().GetException() != nil {
-		return EG__().GetUninitializedZval()
+		return UninitializedZval()
 	}
 
 	/* Use IS_TMP_VAR instead of IS_VAR to avoid ISREF check */

@@ -240,7 +240,7 @@ func zend_fetch_static_prop_helper_SPEC(type_ int, executeData *ZendExecuteData)
 	var prop *types.Zval
 	if ZendFetchStaticPropertyAddress(&prop, nil, opline.GetExtendedValue() & ^ZEND_FETCH_OBJ_FLAGS, type_, opline.GetExtendedValue()&ZEND_FETCH_OBJ_FLAGS, opline, executeData) != types.SUCCESS {
 		b.Assert(EG__().GetException() != nil || type_ == BP_VAR_IS)
-		prop = EG__().GetUninitializedZval()
+		prop = UninitializedZval()
 	}
 	if type_ == BP_VAR_R || type_ == BP_VAR_IS {
 		types.ZVAL_COPY_DEREF(opline.Result(), prop)

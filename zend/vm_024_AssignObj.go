@@ -22,7 +22,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -96,7 +96,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -179,7 +179,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -261,7 +261,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -343,7 +343,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExec
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -383,7 +383,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -427,7 +427,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -470,7 +470,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecute
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -511,7 +511,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteD
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -549,7 +549,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDat
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -591,7 +591,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDat
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -632,7 +632,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1188,7 +1188,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1269,7 +1269,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1348,7 +1348,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1426,7 +1426,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1504,7 +1504,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1540,7 +1540,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1580,7 +1580,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1619,7 +1619,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1656,7 +1656,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteDa
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1690,7 +1690,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteData
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1728,7 +1728,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}
@@ -1765,7 +1765,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 		}
 		object = MakeRealObject(object, property, opline, executeData)
 		if object == nil {
-			value = EG__().GetUninitializedZval()
+			value = UninitializedZval()
 			goto free_and_exit_assign_obj
 		}
 	}

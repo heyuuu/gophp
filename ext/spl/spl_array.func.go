@@ -41,7 +41,8 @@ func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.Array {
 	//??? TODO: Delay duplication for arrays; only duplicate for write operations
 }
 func SplArrayGetHashTable(intern *SplArrayObject) *types.Array {
-	return (*SplArrayGetHashTablePtr)(intern)
+	//return (*SplArrayGetHashTablePtr)(intern)
+	return intern.array.Array()
 }
 func SplArrayReplaceHashTable(intern *SplArrayObject, ht *types.Array) {
 	var ht_ptr **types.Array = SplArrayGetHashTablePtr(intern)
@@ -183,7 +184,7 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 	var offset_key *types.String
 	var ht *types.Array = SplArrayGetHashTable(intern)
 	if offset == nil || offset.IsUndef() || ht == nil {
-		return zend.EG__().GetUninitializedZval()
+		return zend.UninitializedZval()
 	}
 	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW) && intern.GetNApplyCount() > 0 {
 		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
@@ -209,7 +210,7 @@ try_again:
 					case zend.BP_VAR_UNSET:
 						fallthrough
 					case zend.BP_VAR_IS:
-						retval = zend.EG__().GetUninitializedZval()
+						retval = zend.UninitializedZval()
 					case zend.BP_VAR_RW:
 						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 						fallthrough
@@ -226,7 +227,7 @@ try_again:
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
-				retval = zend.EG__().GetUninitializedZval()
+				retval = zend.UninitializedZval()
 			case zend.BP_VAR_RW:
 				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 				fallthrough
@@ -261,7 +262,7 @@ try_again:
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
-				retval = zend.EG__().GetUninitializedZval()
+				retval = zend.UninitializedZval()
 			case zend.BP_VAR_RW:
 				faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
 				fallthrough
@@ -280,7 +281,7 @@ try_again:
 		if type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW {
 			return zend.EG__().GetErrorZval()
 		} else {
-			return zend.EG__().GetUninitializedZval()
+			return zend.UninitializedZval()
 		}
 	}
 }
@@ -290,7 +291,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *types.Zval, offset *ty
 	if check_inherited != 0 && (intern.GetFptrOffsetGet() != nil || type_ == zend.BP_VAR_IS && intern.GetFptrOffsetHas() != nil) {
 		if type_ == zend.BP_VAR_IS {
 			if SplArrayHasDimension(object, offset, 0) == 0 {
-				return zend.EG__().GetUninitializedZval()
+				return zend.UninitializedZval()
 			}
 		}
 		if intern.GetFptrOffsetGet() != nil {
@@ -306,7 +307,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *types.Zval, offset *ty
 			if !(rv.IsUndef()) {
 				return rv
 			}
-			return zend.EG__().GetUninitializedZval()
+			return zend.UninitializedZval()
 		}
 	}
 	ret = SplArrayGetDimensionPtr(check_inherited, intern, offset, type_)
@@ -316,7 +317,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *types.Zval, offset *ty
 	 * by separating (if necessary) and returning as IS_REFERENCE (with refcount == 1)
 	 */
 
-	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW || type_ == zend.BP_VAR_UNSET) && !(ret.IsReference()) && ret != zend.EG__().GetUninitializedZval() {
+	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW || type_ == zend.BP_VAR_UNSET) && !(ret.IsReference()) && ret != zend.UninitializedZval() {
 		ret.SetNewRef(ret)
 	}
 	return ret
@@ -337,7 +338,6 @@ func SplArrayWriteDimensionEx(check_inherited int, object *types.Zval, offset *t
 			offset = types.SEPARATE_ARG_IF_REF(offset)
 		}
 		zend.ZendCallMethodWith2Params(object, types.Z_OBJCE_P(object), intern.GetFptrOffsetSet(), "offsetSet", nil, offset, value)
-		// zend.ZvalPtrDtor(offset)
 		return
 	}
 	if intern.GetNApplyCount() > 0 {
@@ -658,12 +658,6 @@ func SplArrayGetDebugInfo(obj *types.Zval) *types.Array {
 		// types.ZendStringReleaseEx(zname, 0)
 		return debug_info
 	}
-}
-func SplArrayGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.Array {
-	var intern *SplArrayObject = Z_SPLARRAY_P(obj)
-	*gc_data = intern.GetArray()
-	*gc_data_count = 1
-	return zend.ZendStdGetProperties(obj)
 }
 func SplArrayReadProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)

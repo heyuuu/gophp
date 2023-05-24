@@ -178,7 +178,7 @@ func ZvalUndefinedCv(var_ uint32, executeData *ZendExecuteData) *types.Zval {
 		var cv *types.String = CV_DEF_OF(EX_VAR_TO_NUM(var_))
 		faults.Error(faults.E_NOTICE, "Undefined variable: %s", cv.GetVal())
 	}
-	return EG__().GetUninitializedZval()
+	return UninitializedZval()
 }
 func _zvalUndefinedOp1(executeData *ZendExecuteData) *types.Zval {
 	return ZvalUndefinedCv(executeData.GetOpline().op1.var_, executeData)
@@ -199,7 +199,7 @@ func _getZvalCvLookup(ptr *types.Zval, var_ uint32, type_ int, executeData *Zend
 	case BP_VAR_UNSET:
 		ptr = ZvalUndefinedCv(var_, executeData)
 	case BP_VAR_IS:
-		ptr = EG__().GetUninitializedZval()
+		ptr = UninitializedZval()
 	case BP_VAR_RW:
 		ZvalUndefinedCv(var_, executeData)
 		fallthrough

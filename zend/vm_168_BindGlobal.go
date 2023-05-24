@@ -28,7 +28,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 		value = EG__().GetSymbolTable().KeyFind(varname.GetStr())
 		if value == nil {
-			value = EG__().GetSymbolTable().KeyAddNew(varname.GetStr(), EG__().GetUninitializedZval())
+			value = EG__().GetSymbolTable().KeyAddNew(varname.GetStr(), UninitializedZval())
 
 			SymbolFindAndCache(EG__().GetSymbolTable(), varname.GetStr(), executeData)
 		} else {

@@ -24,7 +24,7 @@ func IncompleteClassGetProperty(object *types.Zval, member *types.Zval, type_ in
 		rv.IsError()
 		return rv
 	} else {
-		return zend.EG__().GetUninitializedZval()
+		return zend.UninitializedZval()
 	}
 }
 func IncompleteClassWriteProperty(object *types.Zval, member *types.Zval, value *types.Zval, cache_slot *any) *types.Zval {

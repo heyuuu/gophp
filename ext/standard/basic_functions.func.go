@@ -1360,7 +1360,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 					zv.SetStringVal(iniEntry.GetValue().GetStr())
 					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), &zv)
 				} else {
-					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), zend.EG__().GetUninitializedZval())
+					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), zend.UninitializedZval())
 				}
 			}
 		}

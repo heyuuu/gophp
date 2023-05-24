@@ -31,7 +31,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses
 		}
 
 		var offset uint32
-		value, offset = op_array.GetStaticVariables().KeyAddValAndPos(var_name.GetStr(), EG__().GetUninitializedZval())
+		value, offset = op_array.GetStaticVariables().KeyAddValAndPos(var_name.GetStr(), UninitializedZval())
 		if value == nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use variable $%s twice", var_name.GetVal())
 		}
@@ -131,7 +131,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *ty
 	}
 	info.GetUses().Foreach(func(key types.ArrayKey, _ *types.Zval) {
 		var_name := key.StrKey()
-		_, offset := op_array.GetStaticVariables().KeyAddValAndPos(var_name, EG__().GetUninitializedZval())
+		_, offset := op_array.GetStaticVariables().KeyAddValAndPos(var_name, UninitializedZval())
 		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
 		opline.SetOp2Type(IS_CV)
 		opline.GetOp2().SetVar(LookupCv(var_name))

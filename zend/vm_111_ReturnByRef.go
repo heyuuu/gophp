@@ -65,7 +65,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		}
 		retval_ptr = nil
 		{
-			b.Assert(retval_ptr != EG__().GetUninitializedZval())
+			b.Assert(retval_ptr != UninitializedZval())
 			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
 				faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {
@@ -113,7 +113,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 		retval_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		{
-			b.Assert(retval_ptr != EG__().GetUninitializedZval())
+			b.Assert(retval_ptr != UninitializedZval())
 			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
 				faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {
@@ -166,7 +166,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		retval_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		{
-			b.Assert(retval_ptr != EG__().GetUninitializedZval())
+			b.Assert(retval_ptr != UninitializedZval())
 			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
 				faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {

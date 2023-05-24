@@ -38,7 +38,7 @@ func (o *ObjectBase) HasProperty(member *Zval, hasSetExists int, cacheSlot *any)
 	panic("implement me")
 }
 
-func (o *ObjectBase) UnsetPropertyEx(member *Zval, cacheSlot *any) {
+func (o *ObjectBase) UnsetProperty(member *Zval, cacheSlot *any) {
 	//TODO implement me
 	panic("implement me")
 }

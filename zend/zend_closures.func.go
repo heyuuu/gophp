@@ -333,7 +333,7 @@ func ZendClosureGetMethod(object **types.ZendObject, method *types.String, key *
 }
 func ZendClosureReadProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {
 	ZEND_CLOSURE_PROPERTY_ERROR()
-	return EG__().GetUninitializedZval()
+	return UninitializedZval()
 }
 func ZendClosureWriteProperty(object *types.Zval, member *types.Zval, value *types.Zval, cache_slot *any) *types.Zval {
 	ZEND_CLOSURE_PROPERTY_ERROR()

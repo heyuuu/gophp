@@ -232,14 +232,14 @@ try_again:
 		case BP_VAR_UNSET:
 			fallthrough
 		case BP_VAR_IS:
-			retval = EG__().GetUninitializedZval()
+			retval = UninitializedZval()
 		case BP_VAR_RW:
 			if ZendUndefinedOffsetWrite(ht, hval) == types.FAILURE {
 				return nil
 			}
 			fallthrough
 		case BP_VAR_W:
-			retval = ht.IndexAddNew(hval, EG__().GetUninitializedZval())
+			retval = ht.IndexAddNew(hval, UninitializedZval())
 		}
 	} else if dim.IsString() {
 		offset_key = dim.String()
@@ -264,7 +264,7 @@ try_again:
 					case BP_VAR_UNSET:
 						fallthrough
 					case BP_VAR_IS:
-						retval = EG__().GetUninitializedZval()
+						retval = UninitializedZval()
 					case BP_VAR_RW:
 						if ZendUndefinedIndexWrite(ht, offset_key) != 0 {
 							return nil
@@ -286,7 +286,7 @@ try_again:
 			case BP_VAR_UNSET:
 				fallthrough
 			case BP_VAR_IS:
-				retval = EG__().GetUninitializedZval()
+				retval = UninitializedZval()
 			case BP_VAR_RW:
 
 				/* Key may be released while throwing the undefined index warning. */
@@ -296,10 +296,10 @@ try_again:
 					// types.ZendStringRelease(offset_key)
 					return nil
 				}
-				retval = ht.KeyAddNew(offset_key.GetStr(), EG__().GetUninitializedZval())
+				retval = ht.KeyAddNew(offset_key.GetStr(), UninitializedZval())
 				// types.ZendStringRelease(offset_key)
 			case BP_VAR_W:
-				retval = ht.KeyAddNew(offset_key.GetStr(), EG__().GetUninitializedZval())
+				retval = ht.KeyAddNew(offset_key.GetStr(), UninitializedZval())
 			}
 		}
 	} else if dim.IsReference() {
@@ -317,7 +317,7 @@ try_again:
 			if type_ == BP_VAR_W || type_ == BP_VAR_RW {
 				retval = nil
 			} else {
-				retval = EG__().GetUninitializedZval()
+				retval = UninitializedZval()
 			}
 		}
 	}
@@ -349,7 +349,7 @@ func ZendFetchDimensionAddress(
 		types.SeparateArray(container)
 	fetch_from_array:
 		if dim == nil {
-			retval = container.Array().Append(EG__().GetUninitializedZval())
+			retval = container.Array().Append(UninitializedZval())
 			if retval == nil {
 				ZendCannotAddElement()
 				result.IsError()
@@ -400,7 +400,7 @@ func ZendFetchDimensionAddress(
 			dim++
 		}
 		retval = container.Object().ReadDimension(dim, type_, result)
-		if retval == EG__().GetUninitializedZval() {
+		if retval == UninitializedZval() {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(container)
 			result.SetNull()
 			faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.Name())

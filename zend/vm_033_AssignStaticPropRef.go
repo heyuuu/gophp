@@ -17,10 +17,10 @@ func ZEND_ASSIGN_STATIC_PROP_REF_SPEC_HANDLER(executeData *ZendExecuteData) int 
 	}
 	value_ptr = GetZvalPtrPtr((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data, BP_VAR_W)
 	if (opline+1).GetOp1Type() == IS_VAR && value_ptr.IsError() {
-		prop = EG__().GetUninitializedZval()
+		prop = UninitializedZval()
 	} else if (opline+1).GetOp1Type() == IS_VAR && (opline.GetExtendedValue()&ZEND_RETURNS_FUNCTION) != 0 && !(value_ptr.IsReference()) {
 		if ZendWrongAssignToVariableReference(prop, value_ptr, opline, executeData) == nil {
-			prop = EG__().GetUninitializedZval()
+			prop = UninitializedZval()
 		}
 	} else if prop_info.GetType() != 0 {
 		prop = ZendAssignToTypedPropertyReference(prop_info, prop, value_ptr, executeData)

@@ -27,15 +27,15 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 		if type_ == BP_VAR_W {
-			retval = target_symbol_table.KeyAddNew(name.GetStr(), EG__().GetUninitializedZval())
+			retval = target_symbol_table.KeyAddNew(name.GetStr(), UninitializedZval())
 		} else if type_ == BP_VAR_IS {
-			retval = EG__().GetUninitializedZval()
+			retval = UninitializedZval()
 		} else {
 			faults.Error(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
 			if type_ == BP_VAR_RW {
-				retval = target_symbol_table.KeyUpdate(name.GetStr(), EG__().GetUninitializedZval())
+				retval = target_symbol_table.KeyUpdate(name.GetStr(), UninitializedZval())
 			} else {
-				retval = EG__().GetUninitializedZval()
+				retval = UninitializedZval()
 			}
 		}
 	} else if retval.IsIndirect() {
@@ -47,13 +47,13 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 			if type_ == BP_VAR_W {
 				retval.SetNull()
 			} else if type_ == BP_VAR_IS {
-				retval = EG__().GetUninitializedZval()
+				retval = UninitializedZval()
 			} else {
 				faults.Error(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
 				if type_ == BP_VAR_RW {
 					retval.SetNull()
 				} else {
-					retval = EG__().GetUninitializedZval()
+					retval = UninitializedZval()
 				}
 			}
 		}

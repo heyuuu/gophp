@@ -956,6 +956,9 @@ func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_typ
 func ZendDeleteGlobalVariable(name *types.String) bool {
 	return EG__().GetSymbolTable().KeyDeleteIndirect(name.GetStr())
 }
+func ZendDeleteGlobalVariableEx(name string) bool {
+	return EG__().GetSymbolTable().KeyDeleteIndirect(name)
+}
 func ZendRebuildSymbolTable() *types.Array {
 	var ex *ZendExecuteData
 	var symbol_table *types.Array
