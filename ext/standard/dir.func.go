@@ -13,7 +13,7 @@ import (
 func DIRG(v __auto__) __auto__ { return DirGlobals.v }
 func PhpSetDefaultDir(res *types.ZendResource) {
 	if DIRG(default_dir) {
-		zend.ZendListDelete(DIRG(default_dir))
+		//zend.ZendListDelete(DIRG(default_dir))
 	}
 	if res != nil {
 		// 		res.AddRefcount()

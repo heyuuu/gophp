@@ -14,6 +14,7 @@
 - `phpinfo`
 - `eval`
 - `create_function`
+- `get_resources` (注: 在 go 无弱引用情况下，记录全局resource影响自动 GC。在有 Weak Reference 方案后再支持)
 
 # 部分功能不支持的函数
 

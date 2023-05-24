@@ -421,7 +421,7 @@ func PhpStreamFilterRemove(filter *core.PhpStreamFilter, call_dtor int) *core.Ph
 		filter.GetChain().SetTail(filter.GetPrev())
 	}
 	if filter.GetRes() != nil {
-		zend.ZendListDelete(filter.GetRes())
+		//zend.ZendListDelete(filter.GetRes())
 	}
 	if call_dtor != 0 {
 		PhpStreamFilterFree(filter)

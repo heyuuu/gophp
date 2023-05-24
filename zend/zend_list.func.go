@@ -2,41 +2,10 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendListInsert(ptr any, type_ int) *types.Zval {
-	var index int
-	var zv types.Zval
-	index = EG__().GetRegularList().GetNNextFreeElement()
-	if index == 0 {
-		index = 1
-	} else if index == core.INT_MAX {
-		faults.ErrorNoreturn(faults.E_ERROR, "Resource ID space overflow")
-	}
-	zv.SetResource(types.NewZendResource(index, ptr, type_))
-	return EG__().GetRegularList().IndexAddNew(index, &zv)
-}
-func ZendListDelete(res *types.ZendResource) int {
-	// todo 移除机制待处理
-	//if res.DelRefcount() <= 0 {
-	//	return types.ZendHashIndexDel(EG__().GetRegularList(), res.GetHandle())
-	//} else {
-	//	return types.SUCCESS
-	//}
-	return types.SUCCESS
-}
-func ZendListFree(res *types.ZendResource) int {
-	// todo 移除机制待处理
-	//if res.GetRefcount() <= 0 {
-	//	return types.ZendHashIndexDel(EG__().GetRegularList(), res.GetHandle())
-	//} else {
-	//	return types.SUCCESS
-	//}
-	return types.SUCCESS
-}
 func ZendResourceDtor(res *types.ZendResource) {
 	var ld *ZendRsrcListDtorsEntry
 	var r = *res
@@ -64,9 +33,9 @@ func ZendListClose(res *types.ZendResource) int {
 	return types.SUCCESS
 }
 func ZendRegisterResource(rsrc_pointer any, rsrc_type int) *types.ZendResource {
-	var zv *types.Zval
-	zv = ZendListInsert(rsrc_pointer, rsrc_type)
-	return zv.Resource()
+	// resource 计数
+	handle := 0
+	return types.NewZendResource(handle, rsrc_pointer, rsrc_type)
 }
 func ZendFetchResource2(res *types.ZendResource, resource_type_name string, resource_type1 int, resource_type2 int) any {
 	if res != nil {

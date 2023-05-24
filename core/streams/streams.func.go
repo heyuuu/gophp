@@ -22,7 +22,7 @@ func ZmDeactivateStreams(type_ int, module_number int) int {
 		var stream *core.PhpStream = rsrc.GetPtr().(*core.PhpStream)
 		stream.SetRes(nil)
 		if stream.GetCtx() != nil {
-			zend.ZendListDelete(stream.GetCtx())
+			//zend.ZendListDelete(stream.GetCtx())
 			stream.SetCtx(nil)
 		}
 	})
@@ -411,7 +411,7 @@ func PhpStreamContextSet(stream *core.PhpStream, context *core.PhpStreamContext)
 		stream.SetCtx(nil)
 	}
 	if oldcontext != nil {
-		zend.ZendListDelete(oldcontext.GetRes())
+		//zend.ZendListDelete(oldcontext.GetRes())
 	}
 	return oldcontext
 }

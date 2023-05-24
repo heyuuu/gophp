@@ -268,7 +268,7 @@ func ZifStreamWrapperRegister(executeData zpp.Ex, return_value zpp.Ret, protocol
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "class '%s' is undefined", classname.GetVal())
 	}
-	zend.ZendListDelete(rsrc)
+	//zend.ZendListDelete(rsrc)
 	return_value.SetFalse()
 	return
 }

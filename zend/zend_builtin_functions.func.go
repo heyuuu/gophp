@@ -1060,29 +1060,16 @@ func ZifGetResourceType(executeData zpp.Ex, return_value zpp.Ret, res *types.Zva
 func ZifGetResources(_ zpp.Opt, type_ *string) (*types.Array, bool) {
 	retArr := types.NewArray(0)
 	if type_ == nil {
-		EG__().GetRegularList().Foreach(func(key types.ArrayKey, value *types.Zval) {
-			if !key.IsStrKey() {
-				retArr.IndexAdd(key.IdxKey(), value)
-			}
-		})
-
+		// skip 跳过获取全局resouce的逻辑
 	} else if *type_ == "Unknown" {
-		EG__().GetRegularList().Foreach(func(key types.ArrayKey, value *types.Zval) {
-			if !key.IsStrKey() && value.Resource().GetType() <= 0 {
-				retArr.IndexAdd(key.IdxKey(), value)
-			}
-		})
+		// pass
 	} else {
 		var id = ZendFetchListDtorId(*type_)
 		if id <= 0 {
 			faults.Error(faults.E_WARNING, "get_resources():  Unknown resource type '%s'", *type_)
 			return nil, false
 		}
-		EG__().GetRegularList().Foreach(func(key types.ArrayKey, value *types.Zval) {
-			if !key.IsStrKey() && value.Resource().GetType() == id {
-				retArr.IndexAdd(key.IdxKey(), value)
-			}
-		})
+		// pass
 	}
 	return retArr, true
 }

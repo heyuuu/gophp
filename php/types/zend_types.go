@@ -6,7 +6,6 @@ import (
 	"runtime"
 )
 
-
 /**
  * ZendResource
  */
@@ -22,8 +21,6 @@ func NewZendResource(handle int, ptr any, type_ int) *ZendResource {
 		type_:  type_,
 		ptr:    ptr,
 	}
-
-	runtime.SetFinalizer(res, zend.ZendListFree)
 
 	return res
 }
