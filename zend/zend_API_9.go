@@ -117,7 +117,7 @@ func ZendUnsetProperty(scope *types.ClassEntry, object *types.Zval, name string)
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
 	property := types.NewZvalString(name)
-	object.Object().UnsetPropertyEx(property, 0)
+	object.Object().UnsetProperty(property, 0)
 	EG__().SetFakeScope(oldScope)
 }
 func ZendReadPropertyEx(scope *types.ClassEntry, object *types.Zval, name *types.String, silent types.ZendBool, rv *types.Zval) *types.Zval {

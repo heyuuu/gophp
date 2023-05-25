@@ -97,7 +97,7 @@ func (o *ObjectBase) CanCountElements() bool {
 	panic("implement me")
 }
 
-func (o *ObjectBase) CountElements(count *int) int {
+func (o *ObjectBase) CountElements() (int, bool) {
 	//TODO implement me
 	panic("implement me")
 }

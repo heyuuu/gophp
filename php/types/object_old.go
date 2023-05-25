@@ -83,8 +83,12 @@ func (o *ObjectOld) HasDimension(offset *Zval, checkEmpty int) int {
 
 func (o *ObjectOld) UnsetDimension(offset *Zval) { o.handlers.UnsetDimensionEx(o.obj(), offset) }
 
-func (o *ObjectOld) CanCountElements() bool       { return o.handlers.CountElementsEx != nil }
-func (o *ObjectOld) CountElements(count *int) int { return o.handlers.CountElementsEx(o.obj(), count) }
+func (o *ObjectOld) CanCountElements() bool { return o.handlers.CountElementsEx != nil }
+func (o *ObjectOld) CountElements() (int, bool) {
+	var count int
+	ret := o.handlers.CountElementsEx(o.obj(), &count)
+	return count, ret != 0
+}
 
 func (o *ObjectOld) CanGetMethod() bool { return o.handlers.GetMethod != nil }
 func (o *ObjectOld) GetMethod(object **ZendObject, method *String, key *Zval) IFunction {

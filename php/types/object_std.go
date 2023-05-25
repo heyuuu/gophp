@@ -74,8 +74,8 @@ func (o *ObjectStd) UnsetDimension(offset *Zval) {
 	zend.ZendStdUnsetDimensionEx(o.obj(), offset)
 }
 
-func (o *ObjectStd) CanCountElements() bool       { return false }
-func (o *ObjectStd) CountElements(count *int) int { panic("implement me") }
+func (o *ObjectStd) CanCountElements() bool     { return false }
+func (o *ObjectStd) CountElements() (int, bool) { panic("implement me") }
 
 func (o *ObjectStd) CanGetMethod() bool { return true }
 func (o *ObjectStd) GetMethod(object **ZendObject, method *String, key *Zval) IFunction {

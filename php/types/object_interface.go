@@ -38,7 +38,7 @@ type IObject interface {
 
 	// elements
 	CanCountElements() bool
-	CountElements(count *int) int
+	CountElements() (int, bool)
 
 	// method
 	CanGetMethod() bool

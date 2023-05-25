@@ -347,10 +347,41 @@ func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, offset *types.Zva
 }
 
 func (o *ZicArrayObject) CanCountElements() bool { return true }
-func (o *ZicArrayObject) CountElements(count *int) int {
-	// todo
+func (o *ZicArrayObject) CountElements() (int, bool) {
 	// SplArrayObjectCountElements
-	panic("implement me")
+	if o.GetFptrCount() != nil {
+		var rv types.Zval
+		zend.ZendCallMethodWith0Params(o.zv(), o.GetCe(), o.GetFptrCount(), "count", &rv)
+		if rv.IsNotUndef() {
+			return operators.ZvalGetLong(&rv), true
+		}
+		return 0, false
+	}
+	return o.countElementsHelper(), true
+}
+
+func (o *ZicArrayObject) countElementsHelper() int {
+	// SplArrayObjectCountElementsHelper
+	var aht = o.array.Array()
+	if o.isObject() {
+		var count = 0
+		/* Count public/dynamic properties */
+		aht.Foreach(func(key types.ArrayKey, value *types.Zval) {
+			if value.IsIndirect() {
+				if types.Z_INDIRECT_P(value).IsUndef() {
+					return
+				}
+				if key.IsStrKey() && key.StrKey() == "" {
+					return
+				}
+			}
+			count++
+		})
+
+		return count
+	} else {
+		return aht.Len()
+	}
 }
 
 func (o *ZicArrayObject) CanCompareObjectsTo(obj2 *types.ZendObject) bool {
@@ -366,7 +397,7 @@ func (o *ZicArrayObject) CompareObjectsTo(another *types.ZendObject) int {
 
 func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zval {
 	var retval *types.Zval
-	var ht *types.Array = o.array.Array()
+	var ht = o.array.Array()
 	if offset == nil || offset.IsUndef() || ht == nil {
 		return zend.UninitializedZval()
 	}
@@ -480,7 +511,7 @@ func (o *ZicArrayObject) isObject() bool {
 func (o *ZicArrayObject) skipProtected(aht *types.Array) int {
 	// SplArraySkipProtected
 	if o.isObject() {
-		var posPtr *uint32 = o.getPosPtr(aht)
+		var posPtr = o.getPosPtr(aht)
 		for {
 			pair, nextPos := aht.NextEx(*posPtr)
 			if pair == nil || !pair.GetKey().IsStrKey() {

@@ -13,6 +13,8 @@ type objectGetPropertiesFunc func(object *Zval) *Array
 /**
  * ZendObject
  */
+var _ IObject = (*ZendObject)(nil)
+
 type ZendObject struct {
 	handle          uint
 	ce              *ClassEntry
@@ -144,7 +146,7 @@ func (o *ZendObject) WriteProperty(member *Zval, value *Zval, cacheSlot *any) *Z
 func (o *ZendObject) HasProperty(member *Zval, hasSetExists int, cacheSlot *any) int {
 	return o.data.HasProperty(member, hasSetExists, cacheSlot)
 }
-func (o *ZendObject) UnsetPropertyEx(member *Zval, cacheSlot *any) {
+func (o *ZendObject) UnsetProperty(member *Zval, cacheSlot *any) {
 	o.data.UnsetProperty(member, cacheSlot)
 }
 func (o *ZendObject) GetPropertyPtr(member *Zval, typ int, cacheSlot *any) *Zval {
@@ -197,8 +199,8 @@ func (o *ZendObject) UnsetDimension(offset *Zval) {
 func (o *ZendObject) CanCountElements() bool {
 	return o.data.CanCountElements()
 }
-func (o *ZendObject) CountElements(count *int) int {
-	return o.data.CountElements(count)
+func (o *ZendObject) CountElements() (int, bool) {
+	return o.data.CountElements()
 }
 
 // method
