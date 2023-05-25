@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 var _ types.IObject = (*ZicArrayObject)(nil)
@@ -13,6 +14,7 @@ type ZicArrayObject struct {
 	types.ObjectStd
 
 	array           types.Zval
+	htIter          *types.ArrayIterator
 	ht_iter         uint32
 	ar_flags        int
 	nApplyCount     uint8
@@ -34,14 +36,6 @@ func (o *ZicArrayObject) obj() *types.ZendObject {
 }
 func (o *ZicArrayObject) zv() *types.Zval {
 	// todo
-}
-
-func (o *ZicArrayObject) Free() {
-	if o.ht_iter != -1 {
-		zend.EG__().DelArrayIterator(o.ht_iter)
-	}
-	// parent::Free()
-	o.ObjectStd.Free()
 }
 
 func (o *ZicArrayObject) CanClone() bool { return true }
@@ -102,41 +96,6 @@ func (o *ZicArrayObject) ReadDimension(offset *types.Zval, typ int, rv *types.Zv
 	return o.readDimensionEx(true, offset, typ, rv)
 }
 
-func (o *ZicArrayObject) WriteDimension(offset *types.Zval, value *types.Zval) {
-	// SplArrayWriteDimension
-	o.writeDimensionEx(true, offset, value)
-}
-
-func (o *ZicArrayObject) HasDimension(offset *types.Zval, checkEmpty int) int {
-	// todo
-	// SplArrayHasDimension
-	panic("implement me")
-}
-
-func (o *ZicArrayObject) UnsetDimension(offset *types.Zval) {
-	// todo
-	// SplArrayUnsetDimension
-	panic("implement me")
-}
-
-func (o *ZicArrayObject) CanCountElements() bool { return true }
-func (o *ZicArrayObject) CountElements(count *int) int {
-	// todo
-	// SplArrayObjectCountElements
-	panic("implement me")
-}
-
-func (o *ZicArrayObject) CanCompareObjectsTo(obj2 *types.ZendObject) bool {
-	// todo
-	panic("implement me")
-}
-
-func (o *ZicArrayObject) CompareObjectsTo(another *types.ZendObject) int {
-	// todo
-	// SplArrayCompareObjects
-	panic("implement me")
-}
-
 func (o *ZicArrayObject) readDimensionEx(checkInherited bool, offset *types.Zval, typ int, rv *types.Zval) *types.Zval {
 	// SplArrayReadDimensionEx
 	if checkInherited && (o.fptr_offset_get != nil || typ == zend.BP_VAR_IS && o.fptr_offset_has != nil) {
@@ -168,6 +127,241 @@ func (o *ZicArrayObject) readDimensionEx(checkInherited bool, offset *types.Zval
 		ret.SetNewRef(ret)
 	}
 	return ret
+}
+
+func (o *ZicArrayObject) WriteDimension(offset *types.Zval, value *types.Zval) {
+	// SplArrayWriteDimension
+	o.writeDimensionEx(true, offset, value)
+}
+
+func (o *ZicArrayObject) writeDimensionEx(checkInherited bool, offset *types.Zval, value *types.Zval) {
+	var index zend.ZendLong
+	var ht *types.Array
+	if checkInherited && o.GetFptrOffsetSet() != nil {
+		var tmp types.Zval
+		if offset == nil {
+			tmp.SetNull()
+			offset = &tmp
+		} else {
+			offset = types.SEPARATE_ARG_IF_REF(offset)
+		}
+		zend.ZendCallMethodWith2Params(o.zv(), o.GetCe(), o.GetFptrOffsetSet(), "offsetSet", nil, offset, value)
+		return
+	}
+	if o.GetNApplyCount() > 0 {
+		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
+		return
+	}
+	if offset == nil {
+		ht = o.array.Array()
+		ht.Append(value)
+		return
+	}
+
+	// 解析 offset 为 string or int
+	isStrKey, isAppend, index, strKey := false, false, 0, ""
+	offset = offset.DeRef()
+	switch offset.GetType() {
+	case types.IS_STRING:
+		isStrKey = true
+		strKey = offset.StringVal()
+	case types.IS_DOUBLE:
+		index = zend.ZendLong(offset.Double())
+	case types.IS_RESOURCE:
+		index = offset.ResourceHandle()
+	case types.IS_FALSE:
+		index = 0
+	case types.IS_TRUE:
+		index = 1
+	case types.IS_LONG:
+		index = offset.Long()
+	case types.IS_NULL:
+		isAppend = true
+	default:
+		faults.Error(faults.E_WARNING, "Illegal offset type")
+		// zend.ZvalPtrDtor(value)
+		return
+	}
+
+	// 更新
+	ht = o.array.Array()
+	if isAppend {
+		ht.Append(value)
+	} else if isStrKey {
+		ht.SymtableUpdateInd(strKey, value)
+	} else {
+		ht.IndexUpdate(index, value)
+	}
+}
+
+func (o *ZicArrayObject) HasDimension(offset *types.Zval, checkEmpty int) int {
+	// SplArrayHasDimension
+	return o.hasDimensionEx(true, offset, checkEmpty)
+}
+
+func (o *ZicArrayObject) hasDimensionEx(checkInherited bool, offset *types.Zval, checkEmpty int) int {
+	// SplArrayHasDimensionEx
+	var rv types.Zval
+	var value *types.Zval = nil
+	if checkInherited && o.GetFptrOffsetHas() != nil {
+		offset = types.SEPARATE_ARG_IF_REF(offset)
+		zend.ZendCallMethodWith1Params(o.zv(), o.GetCe(), o.GetFptrOffsetHas(), "offsetExists", &rv, offset)
+		if operators.ZvalIsTrue(&rv) {
+			if checkEmpty != 1 {
+				return 1
+			} else if o.GetFptrOffsetGet() != nil {
+				value = o.readDimensionEx(true, offset, zend.BP_VAR_R, &rv)
+			}
+		} else {
+			return 0
+		}
+	}
+	if value == nil {
+		// 解析 offset 为 string or int
+		isStrKey, index, strKey := false, 0, ""
+
+		offset = offset.DeRef()
+		switch offset.GetType() {
+		case types.IS_STRING:
+			isStrKey = true
+			strKey = offset.StringVal()
+		case types.IS_DOUBLE:
+			index = zend.ZendLong(offset.Double())
+		case types.IS_RESOURCE:
+			index = offset.ResourceHandle()
+		case types.IS_FALSE:
+			index = 0
+		case types.IS_TRUE:
+			index = 1
+		case types.IS_LONG:
+			index = offset.Long()
+		default:
+			faults.Error(faults.E_WARNING, "Illegal offset type")
+			return 0
+		}
+
+		var ht = o.array.Array()
+		var tmp *types.Zval
+		if isStrKey {
+			tmp = ht.SymtableFind(strKey)
+		} else {
+			tmp = ht.IndexFind(index)
+		}
+
+		if tmp != nil {
+			if checkEmpty == 2 {
+				return 1
+			}
+		} else {
+			return 0
+		}
+
+		if checkEmpty != 0 && checkInherited && o.GetFptrOffsetGet() != nil {
+			value = o.readDimensionEx(true, offset, zend.BP_VAR_R, &rv)
+		} else {
+			value = tmp
+		}
+	}
+
+	var result bool
+	if checkEmpty != 0 {
+		result = operators.ZvalIsTrue(value)
+	} else {
+		result = value.IsNull()
+	}
+	return types.IntBool(result)
+}
+
+func (o *ZicArrayObject) UnsetDimension(offset *types.Zval) {
+	// SplArrayUnsetDimension
+	o.unsetDimensionEx(true, offset)
+}
+
+func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, offset *types.Zval) {
+	if checkInherited && o.GetFptrOffsetDel() != nil {
+		offset = types.SEPARATE_ARG_IF_REF(offset)
+		zend.ZendCallMethodWith1Params(o.zv(), o.GetCe(), o.GetFptrOffsetDel(), "offsetUnset", nil, offset)
+		return
+	}
+	if o.GetNApplyCount() > 0 {
+		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
+		return
+	}
+
+	// 解析 offset 为 string or int
+	isStrKey, index, strKey := false, 0, ""
+	offset = offset.DeRef()
+	switch offset.GetType() {
+	case types.IS_STRING:
+		isStrKey = true
+		strKey = offset.StringVal()
+	case types.IS_DOUBLE:
+		index = zend.ZendLong(offset.Double())
+	case types.IS_RESOURCE:
+		index = offset.ResourceHandle()
+	case types.IS_FALSE:
+		index = 0
+	case types.IS_TRUE:
+		index = 1
+	case types.IS_LONG:
+		index = offset.Long()
+	default:
+		faults.Error(faults.E_WARNING, "Illegal offset type")
+		return
+	}
+
+	ht := o.array.Array()
+	if isStrKey {
+		if ht == zend.EG__().GetSymbolTable() {
+			if !zend.ZendDeleteGlobalVariableEx(strKey) {
+				faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+			}
+		} else {
+			numericKey := types.NumericKey(strKey)
+			var data = ht.Find(numericKey)
+			if data != nil {
+				if data.IsIndirect() {
+					data = data.Indirect()
+					if data.IsUndef() {
+						faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+					} else {
+						data.SetUndef()
+						ht.MarkHasEmptyIndex()
+						types.ZendHashMoveForwardEx(ht, o.getPosPtr(ht))
+						if o.isObject() {
+							o.skipProtected(ht)
+						}
+					}
+				} else if ht.SymtableDel(strKey) == false {
+					faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+				}
+			} else {
+				faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+			}
+		}
+	} else {
+		if !ht.IndexDelete(index) {
+			faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+		}
+	}
+}
+
+func (o *ZicArrayObject) CanCountElements() bool { return true }
+func (o *ZicArrayObject) CountElements(count *int) int {
+	// todo
+	// SplArrayObjectCountElements
+	panic("implement me")
+}
+
+func (o *ZicArrayObject) CanCompareObjectsTo(obj2 *types.ZendObject) bool {
+	// todo
+	panic("implement me")
+}
+
+func (o *ZicArrayObject) CompareObjectsTo(another *types.ZendObject) int {
+	// todo
+	// SplArrayCompareObjects
+	panic("implement me")
 }
 
 func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zval {
@@ -275,142 +469,46 @@ func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zva
 	}
 }
 
-func (o *ZicArrayObject) writeDimensionEx(checkInherited bool, offset *types.Zval, value *types.Zval) {
-	var index zend.ZendLong
-	var ht *types.Array
-	if checkInherited && o.GetFptrOffsetSet() != nil {
-		var tmp types.Zval
-		if offset == nil {
-			tmp.SetNull()
-			offset = &tmp
-		} else {
-			offset = types.SEPARATE_ARG_IF_REF(offset)
-		}
-		zend.ZendCallMethodWith2Params(o.zv(), o.GetCe(), o.GetFptrOffsetSet(), "offsetSet", nil, offset, value)
-		return
-	}
-	if o.GetNApplyCount() > 0 {
-		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
-		return
-	}
-	if offset == nil {
-		ht = o.array.Array()
-		ht.Append(value)
-		return
-	}
-
-	// 解析 offset 为 string or int
-	isStrKey, isAppend, index, strKey := false, false, 0, ""
-	offset = offset.DeRef()
-	switch offset.GetType() {
-	case types.IS_STRING:
-		isStrKey = true
-		strKey = offset.StringVal()
-	case types.IS_DOUBLE:
-		index = zend.ZendLong(offset.Double())
-	case types.IS_RESOURCE:
-		index = offset.ResourceHandle()
-	case types.IS_FALSE:
-		index = 0
-	case types.IS_TRUE:
-		index = 1
-	case types.IS_LONG:
-		index = offset.Long()
-	case types.IS_NULL:
-		isAppend = true
-	default:
-		faults.Error(faults.E_WARNING, "Illegal offset type")
-		// zend.ZvalPtrDtor(value)
-		return
-	}
-
-	// 更新
-	ht = o.array.Array()
-	if isAppend {
-		ht.Append(value)
-	} else if isStrKey {
-		ht.SymtableUpdateInd(strKey, value)
-	} else {
-		ht.IndexUpdate(index, value)
-	}
-}
-
-func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, object *types.Zval, offset *types.Zval) {
-	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	if checkInherited && o.GetFptrOffsetDel() != nil {
-		offset = types.SEPARATE_ARG_IF_REF(offset)
-		zend.ZendCallMethodWith1Params(o.zv(), o.GetCe(), o.GetFptrOffsetDel(), "offsetUnset", nil, offset)
-		return
-	}
-	if o.GetNApplyCount() > 0 {
-		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
-		return
-	}
-
-	// 解析 offset 为 string or int
-	isStrKey, index, strKey := false, 0, ""
-	offset = offset.DeRef()
-	switch offset.GetType() {
-	case types.IS_STRING:
-		isStrKey = true
-		strKey = offset.StringVal()
-	case types.IS_DOUBLE:
-		index = zend.ZendLong(offset.Double())
-	case types.IS_RESOURCE:
-		index = offset.ResourceHandle()
-	case types.IS_FALSE:
-		index = 0
-	case types.IS_TRUE:
-		index = 1
-	case types.IS_LONG:
-		index = offset.Long()
-	default:
-		faults.Error(faults.E_WARNING, "Illegal offset type")
-		return
-	}
-
-	ht := o.array.Array()
-	if isStrKey {
-		if ht == zend.EG__().GetSymbolTable() {
-			if !zend.ZendDeleteGlobalVariableEx(strKey) {
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
-			}
-		} else {
-			numericKey := types.NumericKey(strKey)
-			var data = ht.Find(numericKey)
-			if data != nil {
-				if data.IsIndirect() {
-					data = data.Indirect()
-					if data.IsUndef() {
-						faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
-					} else {
-						data.SetUndef()
-						ht.MarkHasEmptyIndex()
-						types.ZendHashMoveForwardEx(ht, SplArrayGetPosPtr(ht, intern))
-						if o.isObject() {
-							SplArraySkipProtected(intern, ht)
-						}
-					}
-				} else if ht.SymtableDel(strKey) == false {
-					faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
-				}
-			} else {
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
-			}
-		}
-	} else {
-		if !ht.IndexDelete(index) {
-			faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
-		}
-	}
-}
-
 func (o *ZicArrayObject) isObject() bool {
 	// SplArrayIsObject
 	for o.IsUseOther() {
 		o = Z_SPLARRAY_P(o.array) // ??
 	}
 	return o.IsIsSelf() || o.array.IsObject()
+}
+
+func (o *ZicArrayObject) skipProtected(aht *types.Array) int {
+	// SplArraySkipProtected
+	if o.isObject() {
+		var posPtr *uint32 = o.getPosPtr(aht)
+		for {
+			pair, nextPos := aht.NextEx(*posPtr)
+			if pair == nil || !pair.GetKey().IsStrKey() {
+				return types.SUCCESS
+			}
+			strKey := pair.GetKey().StrKey()
+			if strKey == "" {
+				return types.SUCCESS
+			}
+
+			*posPtr = nextPos
+		}
+	}
+	return types.FAILURE
+}
+
+func (o *ZicArrayObject) getPosPtr(ht *types.Array) *uint32 {
+	// SplArrayGetPosPtr
+	if o.htIter == nil {
+		o.createHtIter(ht)
+	}
+	return o.htIter.GetPos()
+}
+
+func (o *ZicArrayObject) createHtIter(ht *types.Array) {
+	// SplArrayCreateHtIter
+	o.htIter = ht.Iterator()
+	o.skipProtected(ht)
 }
 
 //
