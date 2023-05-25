@@ -13,8 +13,10 @@ type ObjectStd struct {
 
 func (o *ObjectStd) obj() *ZendObject { return o }
 
-func (o *ObjectStd) ClassName() string  { return o.ce.Name() }
-func (o *ObjectStd) GetCe() *ClassEntry { return o.ce }
+func (o *ObjectStd) ClassName() string          { return o.ce.Name() }
+func (o *ObjectStd) GetCe() *ClassEntry         { return o.ce }
+func (o *ObjectStd) GetProperties() *Array      { return o.properties }
+func (o *ObjectStd) GetPropertiesTable() []Zval { return o.propertiesTable }
 
 func (o *ObjectStd) Free() { zend.ZendObjectStdDtor(o.obj()) }
 func (o *ObjectStd) Dtor() { zend.ZendObjectsDestroyObject(o.obj()) }

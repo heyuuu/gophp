@@ -1525,7 +1525,7 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ar
 		fallthrough
 	case ZEND_PROP_PURPOSE_JSON:
 		fallthrough
-	case _ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
+	case ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
 		ht = obj.Object().GetPropertiesArray()
 		return ht
 	default:

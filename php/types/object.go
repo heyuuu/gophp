@@ -127,6 +127,8 @@ func (o *ZendObject) DupProperties() {
 }
 func (o *ZendObject) GetPropertiesTable() []Zval { return o.propertiesTable }
 
+func (o *ZendObject) GetData() IObject { return o.data }
+
 // object handlers
 func (o *ZendObject) Free()          { o.data.Free() }
 func (o *ZendObject) Dtor()          { o.data.Dtor() }

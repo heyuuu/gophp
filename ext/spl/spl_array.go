@@ -80,16 +80,50 @@ func (o *ZicArrayObject) UnsetProperty(member *types.Zval, cacheSlot *any) {
 }
 
 func (o *ZicArrayObject) GetPropertyPtr(member *types.Zval, typ int, cacheSlot *any) *types.Zval {
-	// todo
 	// SplArrayGetPropertyPtrPtr
-	panic("implement me")
+
+	if o.IsArrayAsProps() && o.HasProperty(member, zend.ZEND_PROPERTY_EXISTS, nil) == 0 {
+		/* If object has offsetGet() overridden, then fallback to read_property,
+		 * which will call offsetGet(). */
+		if o.GetFptrOffsetGet() != nil {
+			return nil
+		}
+		return o.getDimensionPtr(member, typ)
+	}
+	// parent::GetPropertyPtr
+	return o.ObjectStd.GetPropertyPtr(member, typ, cacheSlot)
 }
 
 func (o *ZicArrayObject) CanGetPropertiesFor() bool { return true }
 func (o *ZicArrayObject) GetPropertiesFor(purpose zend.ZendPropPurpose) *types.Array {
-	// todo
 	// SplArrayGetPropertiesFor
-	panic("implement me")
+	if o.IsStdPropList() {
+		//return zend.ZendStdGetPropertiesFor(object, purpose)
+		return o.ObjectStd.GetPropertiesArray()
+	}
+
+	/* We are supposed to be the only owner of the internal hashtable.
+	 * The "dup" flag decides whether this is a "long-term" use where
+	 * we need to duplicate, or a "temporary" one, where we can expect
+	 * that no operations on the ArrayObject will be performed in the
+	 * meantime. */
+	var dup bool
+	switch purpose {
+	case zend.ZEND_PROP_PURPOSE_ARRAY_CAST:
+		dup = true
+	case zend.ZEND_PROP_PURPOSE_VAR_EXPORT,
+		zend.ZEND_PROP_PURPOSE_JSON,
+		zend.ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
+		dup = false
+	default:
+		//return zend.ZendStdGetPropertiesFor(object, purpose)
+		return o.ObjectStd.GetPropertiesArray()
+	}
+	ht := o.array.Array()
+	if dup {
+		ht = types.ZendArrayDup(ht)
+	}
+	return ht
 }
 
 func (o *ZicArrayObject) ReadDimension(offset *types.Zval, typ int, rv *types.Zval) *types.Zval {
@@ -384,15 +418,26 @@ func (o *ZicArrayObject) countElementsHelper() int {
 	}
 }
 
-func (o *ZicArrayObject) CanCompareObjectsTo(obj2 *types.ZendObject) bool {
-	// todo
-	panic("implement me")
+func (o *ZicArrayObject) CanCompareObjectsTo(another *types.ZendObject) bool {
+	_, ok := another.GetData().(*ZicArrayObject)
+	return ok
 }
 
 func (o *ZicArrayObject) CompareObjectsTo(another *types.ZendObject) int {
-	// todo
 	// SplArrayCompareObjects
-	panic("implement me")
+	anotherData, ok := another.GetData().(*ZicArrayObject)
+	if !ok {
+		return 0
+	}
+	ht1 := o.array.Array()
+	ht2 := anotherData.array.Array()
+	result := operators.ZendCompareSymbolTables(ht1, ht2)
+
+	if result == 0 && !(ht1 == o.ObjectStd.GetProperties() && ht2 == anotherData.ObjectStd.GetProperties()) {
+		// parent::CompareObjectsTo()
+		result = o.ObjectStd.CompareObjectsTo(another)
+	}
+	return result
 }
 
 func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zval {

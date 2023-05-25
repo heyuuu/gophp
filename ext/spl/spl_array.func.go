@@ -619,7 +619,7 @@ func SplArrayGetPropertiesFor(object *types.Zval, purpose zend.ZendPropPurpose) 
 		fallthrough
 	case zend.ZEND_PROP_PURPOSE_JSON:
 		fallthrough
-	case zend._ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
+	case zend.ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
 		dup = 0
 	default:
 		return zend.ZendStdGetPropertiesFor(object, purpose)
