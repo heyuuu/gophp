@@ -246,7 +246,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 		zv.SetStringVal(dirname)
 	case T_FUNC_C:
 		if op_array != nil && op_array.GetFunctionName() != nil {
-			zv.SetStringVal(op_array.GetFunctionName().GetStr())
+			zv.SetStringVal(op_array.FunctionName())
 		} else {
 			zv.SetStringVal("")
 		}
@@ -260,9 +260,9 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 		}
 		if op_array != nil && op_array.GetFunctionName() != nil {
 			if op_array.GetScope() != nil {
-				zv.SetString(ZendConcat3(op_array.GetScope().Name(), op_array.GetScope().GetName().GetLen(), "::", 2, op_array.GetFunctionName().GetVal(), op_array.GetFunctionName().GetLen()))
+				zv.SetString(ZendConcat3(op_array.GetScope().Name(), op_array.GetScope().GetName().GetLen(), "::", 2, op_array.FunctionName(), op_array.GetFunctionName().GetLen()))
 			} else {
-				zv.SetStringVal(op_array.GetFunctionName().GetStr())
+				zv.SetStringVal(op_array.FunctionName())
 			}
 		} else {
 			zv.SetStringVal("")

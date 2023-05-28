@@ -52,9 +52,9 @@ func (ex *ZendExecuteData) FunctionName() string {
 	}
 	switch activeFunc.GetType() {
 	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
-		funcName := activeFunc.GetFunctionName()
-		if funcName != nil {
-			return funcName.GetStr()
+		funcName := activeFunc.FunctionName()
+		if funcName != "" {
+			return funcName
 		} else {
 			return "main"
 		}
@@ -102,9 +102,9 @@ func (ex *ZendExecuteData) CalleeName() string {
 		}
 
 		// func name
-		funcName := activeFunc.GetFunctionName()
-		if funcName != nil {
-			return scopePrefix + funcName.GetStr()
+		funcName := activeFunc.FunctionName()
+		if funcName != "" {
+			return scopePrefix + funcName
 		} else {
 			return "main"
 		}

@@ -95,8 +95,8 @@ func (o *ObjectOld) GetMethod(object **ZendObject, method *String, key *Zval) IF
 	return o.handlers.GetMethod(object, method, key)
 }
 
-func (o *ObjectOld) CallMethod(method *String, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
-	return o.handlers.CallMethod(method, object, executeData, returnValue)
+func (o *ObjectOld) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
+	return o.handlers.CallMethod(NewString(method), object, executeData, returnValue)
 }
 
 func (o *ObjectOld) GetConstructor(object *ZendObject) IFunction {

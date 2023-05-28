@@ -50,7 +50,7 @@ func InitExecutor() {
 	EG__().SetException(nil)
 	EG__().SetPrevException(nil)
 	EG__().SetFakeScope(nil)
-	EG__().GetTrampoline().SetFunctionName(nil)
+	EG__().GetTrampoline().SetFunctionName("")
 	EG__().ResetArrayIterators()
 	EG__().SetEachDeprecationThrown(0)
 	EG__().SetPersistentConstantsCount(uint32(EG__().ConstantTable().Len()))
@@ -426,7 +426,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 	}
 	call = ZendVmStackPushCallFrame(call_info, func_, fci.GetParamCount(), object_or_called_scope)
 	if func_.IsDeprecated() {
-		faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
+		faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
 		if EG__().GetException() != nil {
 			ZendVmStackFreeCallFrame(call)
 			if CurrEX() == &dummy_execute_data {
@@ -455,7 +455,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 					/* By-value send is not allowed -- emit a warning,
 					 * and perform the call with the value wrapped in a reference. */
 
-					faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
+					faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
 					must_wrap = 1
 					if EG__().GetException() != nil {
 						call.NumArgs() = i
@@ -550,7 +550,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 		if fci.GetObject() != nil {
 			call.SetPrevExecuteData(CurrEX())
 			EG__().SetCurrentExecuteData(call)
-			fci.GetObject().CallMethod(func_.GetFunctionName(), fci.GetObject(), call, fci.GetRetval())
+			fci.GetObject().CallMethod(func_.FunctionName(), fci.GetObject(), call, fci.GetRetval())
 			EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
 		} else {
 			faults.ThrowError(nil, "Cannot call overloaded function for non-object")
@@ -654,7 +654,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 		args[0].SetStringVal(name.GetStr())
 	}
 	fcall_info.SetSize(b.SizeOf("fcall_info"))
-	fcall_info.GetFunctionName().SetStringVal(EG__().GetAutoloadFunc().GetFunctionName().GetStr())
+	fcall_info.GetFunctionName().SetStringVal(EG__().GetAutoloadFunc().FunctionName())
 	fcall_info.SetRetval(&local_retval)
 	fcall_info.SetParamCount(1)
 	fcall_info.SetParams(args)

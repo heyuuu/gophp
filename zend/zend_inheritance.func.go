@@ -26,9 +26,9 @@ func ZendDuplicateInternalFunction(func_ types.IFunction, ce *types.ClassEntry) 
 		memcpy(new_function, func_, b.SizeOf("zend_internal_function"))
 		new_function.SetIsArenaAllocated(true)
 	}
-	if new_function.GetFunctionName() != nil {
-		//new_function.GetFunctionName().AddRefcount()
-	}
+	//if new_function.GetFunctionName() != nil {
+	//new_function.GetFunctionName().AddRefcount()
+	//}
 	return new_function
 }
 func ZendDuplicateUserFunction(func_ types.IFunction) types.IFunction {
@@ -125,7 +125,7 @@ func DoInheritParentConstructor(ce *types.ClassEntry) {
 	}
 	if ce.GetConstructor() != nil {
 		if parent.GetConstructor() != nil && parent.GetConstructor().IsFinal() {
-			faults.ErrorNoreturn(faults.E_ERROR, "Cannot override final %s::%s() with %s::%s()", parent.Name(), parent.GetConstructor().GetFunctionName().GetVal(), ce.Name(), ce.GetConstructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_ERROR, "Cannot override final %s::%s() with %s::%s()", parent.Name(), parent.GetConstructor().FunctionName(), ce.Name(), ce.GetConstructor().FunctionName())
 		}
 		return
 	}
@@ -505,7 +505,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 		str.AppendString(b.CastStr(fptr.GetScope().Name(), strlen(fptr.GetScope().Name())))
 		str.AppendString("::")
 	}
-	str.AppendString(fptr.GetFunctionName().GetStr())
+	str.AppendString(fptr.FunctionName())
 	str.AppendByte('(')
 	if fptr.GetArgInfo() != nil {
 		var i uint32
@@ -666,7 +666,7 @@ func DoInheritanceCheckOnMethodEx(
 		if check_only != 0 {
 			return INHERITANCE_ERROR
 		}
-		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot override final method %s::%s()", ZEND_FN_SCOPE_NAME(parent), child.GetFunctionName().GetVal())
+		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot override final method %s::%s()", ZEND_FN_SCOPE_NAME(parent), child.FunctionName())
 	}
 	child_flags = child.GetFnFlags()
 
@@ -678,9 +678,9 @@ func DoInheritanceCheckOnMethodEx(
 			return INHERITANCE_ERROR
 		}
 		if (child_flags & types.AccStatic) != 0 {
-			faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot make non static method %s::%s() static in class %s", ZEND_FN_SCOPE_NAME(parent), child.GetFunctionName().GetVal(), ZEND_FN_SCOPE_NAME(child))
+			faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot make non static method %s::%s() static in class %s", ZEND_FN_SCOPE_NAME(parent), child.FunctionName(), ZEND_FN_SCOPE_NAME(child))
 		} else {
-			faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot make static method %s::%s() non static in class %s", ZEND_FN_SCOPE_NAME(parent), child.GetFunctionName().GetVal(), ZEND_FN_SCOPE_NAME(child))
+			faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot make static method %s::%s() non static in class %s", ZEND_FN_SCOPE_NAME(parent), child.FunctionName(), ZEND_FN_SCOPE_NAME(child))
 		}
 	}
 
@@ -690,7 +690,7 @@ func DoInheritanceCheckOnMethodEx(
 		if check_only != 0 {
 			return INHERITANCE_ERROR
 		}
-		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot make non abstract method %s::%s() abstract in class %s", ZEND_FN_SCOPE_NAME(parent), child.GetFunctionName().GetVal(), ZEND_FN_SCOPE_NAME(child))
+		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Cannot make non abstract method %s::%s() abstract in class %s", ZEND_FN_SCOPE_NAME(parent), child.FunctionName(), ZEND_FN_SCOPE_NAME(child))
 	}
 	if check_only == 0 && (parent_flags&(types.AccPrivate|types.AccChanged)) != 0 {
 		child.SetIsChanged(true)
@@ -738,7 +738,7 @@ func DoInheritanceCheckOnMethodEx(
 		if check_only != 0 {
 			return INHERITANCE_ERROR
 		}
-		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Access level to %s::%s() must be %s (as in class %s)%s", ZEND_FN_SCOPE_NAME(child), child.GetFunctionName().GetVal(), ZendVisibilityString(parent_flags), ZEND_FN_SCOPE_NAME(parent), b.Cond((parent_flags&types.AccPublic) != 0, "", " or weaker"))
+		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Access level to %s::%s() must be %s (as in class %s)%s", ZEND_FN_SCOPE_NAME(child), child.FunctionName(), ZendVisibilityString(parent_flags), ZEND_FN_SCOPE_NAME(parent), b.Cond((parent_flags&types.AccPublic) != 0, "", " or weaker"))
 	}
 	if checked == 0 {
 		if check_only != 0 {
@@ -1546,7 +1546,7 @@ func ZendTraitsCopyFunctions(
 				i++
 			}
 		}
-		ZendAddTraitMethod(ce, fn.GetFunctionName().GetVal(), fnname, &fn_copy, overridden)
+		ZendAddTraitMethod(ce, fn.FunctionName(), fnname, &fn_copy, overridden)
 	}
 }
 func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits **types.ClassEntry) uint32 {
@@ -1922,16 +1922,14 @@ func ZendDoBindTraits(ce *types.ClassEntry) {
 
 	/* Emit E_DEPRECATED for PHP 4 constructors */
 }
-func ZendHasDeprecatedConstructor(ce *types.ClassEntry) types.ZendBool {
-	var constructor_name *types.String
+func ZendHasDeprecatedConstructor(ce *types.ClassEntry) bool {
 	if ce.GetConstructor() == nil {
-		return 0
+		return false
 	}
-	constructor_name = ce.GetConstructor().GetFunctionName()
-	return !(operators.ZendBinaryStrcasecmp(ce.Name(), constructor_name.GetStr()))
+	return ascii.StrCaseEquals(ce.Name(), ce.GetConstructor().FunctionName())
 }
 func ZendCheckDeprecatedConstructor(ce *types.ClassEntry) {
-	if ZendHasDeprecatedConstructor(ce) != 0 {
+	if ZendHasDeprecatedConstructor(ce) {
 		faults.Error(faults.E_DEPRECATED, "Methods with the same name as their class will not be constructors in a future version of PHP; %s has a deprecated constructor", ce.Name())
 	}
 }

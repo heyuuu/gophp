@@ -51,7 +51,7 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 		fcc.SetCalledScope(types.Z_OBJCE_P(object))
 		fcc.SetObject(object.Object())
 		if zend.ZendCallFunction(&fci, &fcc) == types.FAILURE {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Could not execute %s::%s()", uwrap.GetCe().Name(), uwrap.GetCe().GetConstructor().GetFunctionName().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Could not execute %s::%s()", uwrap.GetCe().Name(), uwrap.GetCe().GetConstructor().FunctionName())
 			// zend.ZvalPtrDtor(object)
 			object.SetUndef()
 		} else {

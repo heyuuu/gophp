@@ -38,7 +38,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 
 			/* Binding incompatible $this to an internal method is not supported. */
 
-			faults.Error(faults.E_WARNING, "Cannot bind method %s::%s() to object of class %s", func_.GetScope().Name(), func_.GetFunctionName().GetVal(), types.Z_OBJCE_P(newthis).Name())
+			faults.Error(faults.E_WARNING, "Cannot bind method %s::%s() to object of class %s", func_.GetScope().Name(), func_.FunctionName(), types.Z_OBJCE_P(newthis).Name())
 			return 0
 		}
 	} else if is_fake_closure != 0 && func_.GetScope() != nil && !func_.IsStatic() {
@@ -210,7 +210,7 @@ func ZendCreateClosureFromCallable(return_value *types.Zval, callable *types.Zva
 	mptr = fcc.GetFunctionHandler()
 	if mptr.IsCallViaTrampoline() {
 		/* For Closure::fromCallable([$closure, "__invoke"]) return $closure. */
-		if fcc.GetObject() != nil && fcc.GetObject().GetCe() == ZendCeClosure && mptr.GetFunctionName().GetStr() == "__invoke" {
+		if fcc.GetObject() != nil && fcc.GetObject().GetCe() == ZendCeClosure && mptr.FunctionName() == "__invoke" {
 			return_value.SetObject(fcc.GetObject())
 			//fcc.GetObject().AddRefcount()
 			ZendFreeTrampoline(mptr)
@@ -228,7 +228,7 @@ func ZendCreateClosureFromCallable(return_value *types.Zval, callable *types.Zva
 				return types.FAILURE
 			}
 		}
-		call := types.NewInternalFunctionEx(mptr.GetFunctionName().GetStr(), ZendClosureCallMagic)
+		call := types.NewInternalFunctionEx(mptr.FunctionName(), ZendClosureCallMagic)
 		call.SetFnFlags(mptr.GetFnFlags() & types.AccStatic)
 		call.SetScope(mptr.GetScope())
 		ZendFreeTrampoline(mptr)
@@ -296,18 +296,10 @@ func ZendGetClosureInvokeMethod(object *types.ZendObject) types.IFunction {
 		invoke.GetInternalFunction().SetIsUserArgInfo(true)
 	}
 	invoke.GetInternalFunction().SetHandler(zim_Closure___invoke)
-	invoke.GetInternalFunction().SetModule(0)
+	invoke.GetInternalFunction().SetModule(nil)
 	invoke.GetInternalFunction().SetScope(ZendCeClosure)
-	invoke.GetInternalFunction().SetFunctionName(types.NewString(types.STR_MAGIC_INVOKE))
+	invoke.GetInternalFunction().SetFunctionName(types.STR_MAGIC_INVOKE)
 	return invoke
-}
-func ZendGetClosureMethodDef(obj *types.Zval) types.IFunction {
-	var closure *ZendClosure = (*ZendClosure)(obj.Object())
-	return closure.GetFunc()
-}
-func ZendGetClosureThisPtr(obj *types.Zval) *types.Zval {
-	var closure *ZendClosure = (*ZendClosure)(obj.Object())
-	return closure.GetThisPtr()
 }
 func ZendClosureGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) types.IFunction {
 	if ascii.StrCaseEquals(method.GetStr(), ZEND_INVOKE_FUNC_NAME) {

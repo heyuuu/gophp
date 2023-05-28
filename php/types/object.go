@@ -212,7 +212,7 @@ func (o *ZendObject) CanGetMethod() bool {
 func (o *ZendObject) GetMethod(object **ZendObject, method *String, key *Zval) IFunction {
 	return o.data.GetMethod(object, method, key)
 }
-func (o *ZendObject) CallMethod(method *String, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
+func (o *ZendObject) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
 	return o.data.CallMethod(method, object, executeData, returnValue)
 }
 func (o *ZendObject) GetConstructor(object *ZendObject) IFunction {

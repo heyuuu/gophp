@@ -112,7 +112,7 @@ func (o *ObjectBase) GetMethod(object **ZendObject, method *String, key *Zval) I
 	panic("implement me")
 }
 
-func (o *ObjectBase) CallMethod(method *String, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
+func (o *ObjectBase) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
 	//TODO implement me
 	panic("implement me")
 }

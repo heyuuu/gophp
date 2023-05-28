@@ -306,7 +306,7 @@ func ZendVerifyTypeErrorCommon(
 	given_kind **byte,
 ) {
 	var is_interface types.ZendBool = 0
-	*fname = zf.GetFunctionName().GetVal()
+	*fname = zf.FunctionName()
 	if zf.GetScope() != nil {
 		*fsep = "::"
 		*fclass = zf.GetScope().Name()

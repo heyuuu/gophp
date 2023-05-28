@@ -291,7 +291,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			if fcc.GetFunctionHandler().IsAbstract() {
 				retval = 0
 				if error != nil {
-					*error = ZendSprintf("cannot call abstract method %s::%s()", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().GetFunctionName().GetVal())
+					*error = ZendSprintf("cannot call abstract method %s::%s()", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().FunctionName())
 				}
 			} else if fcc.GetObject() == nil && !fcc.GetFunctionHandler().IsStatic() {
 				var severity int
@@ -310,15 +310,15 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 					retval = 0
 				}
 				if error != nil {
-					*error = ZendSprintf("non-static method %s::%s() %s be called statically", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+					*error = ZendSprintf("non-static method %s::%s() %s be called statically", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().FunctionName(), verb)
 					if severity != faults.E_DEPRECATED {
 						retval = 0
 					}
 				} else if retval != 0 {
 					if severity == faults.E_ERROR {
-						faults.ThrowError(nil, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+						faults.ThrowError(nil, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().FunctionName(), verb)
 					} else {
-						faults.Error(severity, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+						faults.Error(severity, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().FunctionName(), verb)
 					}
 				}
 			}
@@ -330,7 +330,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 							if (*error) != nil {
 								Efree(*error)
 							}
-							*error = ZendSprintf("cannot access %s method %s::%s()", ZendVisibilityString(fcc.GetFunctionHandler().GetFnFlags()), fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().GetFunctionName().GetVal())
+							*error = ZendSprintf("cannot access %s method %s::%s()", ZendVisibilityString(fcc.GetFunctionHandler().GetFnFlags()), fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().FunctionName())
 						}
 						retval = 0
 					}

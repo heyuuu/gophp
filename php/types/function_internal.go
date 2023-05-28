@@ -27,7 +27,7 @@ func NewInternalFunction() *InternalFunction {
 
 func NewInternalFunctionEx(funcName string, handler zend.ZifHandler) *InternalFunction {
 	f := &InternalFunction{}
-	f.functionName = NewString(funcName)
+	f.functionName = funcName
 	f.handler = handler
 	return f
 }
@@ -38,7 +38,7 @@ func MakeInternalFunctionSimplify(handler zend.ZifHandler) InternalFunction {
 
 func (f *InternalFunction) InitByEntry(entry *FunctionEntry) {
 	f.handler = entry.Handler()
-	f.functionName = NewString(entry.FuncName())
+	f.functionName = entry.FuncName()
 	f.prototype = nil
 }
 

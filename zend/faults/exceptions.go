@@ -558,20 +558,20 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	var fci types.ZendFcallInfo
 	var rv types.Zval
 	var tmp types.Zval
-	var fname *types.String
+	var fname string
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	str = types.NewString("")
 	exception = zend.ZEND_THIS(executeData)
-	fname = types.NewString("gettraceasstring")
+	fname = "gettraceasstring"
 	for exception != nil && exception.IsObject() && operators.InstanceofFunction(types.Z_OBJCE_P(exception), ZendCeThrowable) != 0 {
 		var prev_str *types.String = str
 		var message *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_MESSAGE, &rv))
 		var file *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_FILE, &rv))
 		var line zend.ZendLong = operators.ZvalGetLong(GET_PROPERTY(exception, types.STR_LINE, &rv))
 		fci.SetSize(b.SizeOf("fci"))
-		fci.GetFunctionName().SetString(fname)
+		fci.GetFunctionName().SetStringVal(fname)
 		fci.SetObject(exception.Object())
 		fci.SetRetval(&trace)
 		fci.SetParamCount(0)

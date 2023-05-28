@@ -151,13 +151,13 @@ func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
 }
 func ZendNonStaticMethodCall(fbc types.IFunction) {
 	if fbc.IsAllowStatic() {
-		faults.Error(faults.E_DEPRECATED, "Non-static method %s::%s() should not be called statically", fbc.GetScope().Name(), fbc.GetFunctionName().GetVal())
+		faults.Error(faults.E_DEPRECATED, "Non-static method %s::%s() should not be called statically", fbc.GetScope().Name(), fbc.FunctionName())
 	} else {
-		faults.ThrowError(faults.ZendCeError, "Non-static method %s::%s() cannot be called statically", fbc.GetScope().Name(), fbc.GetFunctionName().GetVal())
+		faults.ThrowError(faults.ZendCeError, "Non-static method %s::%s() cannot be called statically", fbc.GetScope().Name(), fbc.FunctionName())
 	}
 }
 func ZendParamMustBeRef(func_ types.IFunction, arg_num uint32) {
-	faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", arg_num, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
+	faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", arg_num, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
 }
 func ZendUseScalarAsArray() {
 	faults.Error(faults.E_WARNING, "Cannot use a scalar value as an array")

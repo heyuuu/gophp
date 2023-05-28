@@ -102,7 +102,7 @@ func MakeZendFcallInfo(
 }
 func (this *ZendFcallInfo) GetSize() int                   { return this.size }
 func (this *ZendFcallInfo) SetSize(value int)              { this.size = value }
-func (this *ZendFcallInfo) GetFunctionName() Zval          { return this.function_name }
+func (this *ZendFcallInfo) GetFunctionName() *Zval          { return &this.function_name }
 func (this *ZendFcallInfo) GetRetval() *Zval               { return this.retval }
 func (this *ZendFcallInfo) SetRetval(value *Zval)          { this.retval = value }
 func (this *ZendFcallInfo) GetParams() *Zval               { return this.params }

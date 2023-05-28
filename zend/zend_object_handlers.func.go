@@ -41,7 +41,7 @@ func ZendGetFunctionRootClass(fbc types.IFunction) *types.ClassEntry {
 }
 func ZendFreeTrampoline(func_ any) {
 	if func_ == EG__().GetTrampoline() {
-		EG__().GetTrampoline().SetFunctionName(nil)
+		EG__().GetTrampoline().SetFunctionName("")
 	} else {
 		Efree(func_)
 	}
@@ -1005,7 +1005,7 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 
 	var dummy any = any(intPtr(2))
 	b.Assert(fbc != nil)
-	if EG__().GetTrampoline().GetFunctionName() == nil {
+	if EG__().GetTrampoline().FunctionName() == "" {
 		func_ = EG__().GetTrampoline().GetOpArray()
 	} else {
 		func_ = Ecalloc(1, b.SizeOf("zend_op_array"))
@@ -1045,9 +1045,9 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 	//??? keep compatibility for "\0" characters
 
 	if b.Assign(&mname_len, strlen(method_name.GetVal())) != method_name.GetLen() {
-		func_.SetFunctionName(types.NewString(b.CastStr(method_name.GetVal(), mname_len)))
+		func_.SetFunctionName(method_name.GetStr()[:mname_len])
 	} else {
-		func_.SetFunctionName(method_name.Copy())
+		func_.SetFunctionName(method_name.GetStr())
 	}
 	func_.SetPrototype(nil)
 	func_.SetNumArgs(0)
@@ -1121,7 +1121,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	fbc := ce.FunctionTable().Get(lc_function_name.GetStr())
 	if fbc != nil {
 		// pass
-	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && operators.ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.Name(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetStr()[0] != '_' || ce.GetConstructor().GetFunctionName().GetStr()[1] != '_') {
+	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && operators.ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.Name(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().FunctionName()[0] != '_' || ce.GetConstructor().FunctionName()[1] != '_') {
 		fbc = ce.GetConstructor()
 	} else {
 		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(CurrEX())) != nil && operators.InstanceofFunction(object.GetCe(), ce) != 0 {
@@ -1240,9 +1240,9 @@ func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name *types.Strin
 }
 func ZendBadConstructorCall(constructor types.IFunction, scope *types.ClassEntry) {
 	if scope != nil {
-		faults.ThrowError(nil, "Call to %s %s::%s() from context '%s'", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.GetFunctionName().GetVal(), scope.Name())
+		faults.ThrowError(nil, "Call to %s %s::%s() from context '%s'", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.FunctionName(), scope.Name())
 	} else {
-		faults.ThrowError(nil, "Call to %s %s::%s() from invalid context", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.GetFunctionName().GetVal())
+		faults.ThrowError(nil, "Call to %s %s::%s() from invalid context", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.FunctionName())
 	}
 }
 func ZendStdGetConstructor(zobj *types.ZendObject) types.IFunction {

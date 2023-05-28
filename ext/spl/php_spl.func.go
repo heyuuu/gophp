@@ -474,7 +474,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			spl_alfi.GetObj().SetUndef()
 			spl_alfi.GetClosure().SetUndef()
 			spl_alfi.SetCe(nil)
-			types.ZendHashAddMem(SPL_G__().autoload_functions, SplAutoloadFn.GetFunctionName().GetStr(), &spl_alfi, b.SizeOf("autoload_func_info"))
+			types.ZendHashAddMem(SPL_G__().autoload_functions, SplAutoloadFn.FunctionName(), &spl_alfi, b.SizeOf("autoload_func_info"))
 			if prepend != 0 && SPL_G__().autoload_functions.Len() > 1 {
 				/* Move the newly created element to the head of the hashtable */
 				SPL_G__().autoload_functions.MoveTailToHead()
@@ -483,7 +483,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		if alfi.GetFuncPtr() == zend.EG__().GetTrampoline() {
 			var copy types.IFunction = zend.Emalloc(b.SizeOf("zend_op_array"))
 			memcpy(copy, alfi.GetFuncPtr(), b.SizeOf("zend_op_array"))
-			alfi.GetFuncPtr().SetFunctionName(nil)
+			alfi.GetFuncPtr().SetFunctionName("")
 			alfi.SetFuncPtr(copy)
 		}
 		if types.ZendHashAddMem(SPL_G__().autoload_functions, lc_name, &alfi, b.SizeOf("autoload_func_info")) == nil {
@@ -550,7 +550,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 	}
 	// types.ZendStringReleaseEx(func_name, 0)
 	if SPL_G__().autoload_functions {
-		if lc_name == SplAutoloadCallFn.GetFunctionName().GetStr() {
+		if lc_name == SplAutoloadCallFn.FunctionName() {
 			/* remove all */
 			if !(SPL_G__().autoloadRunning) {
 				SPL_G__().autoload_functions.Destroy()
@@ -568,7 +568,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 				success = SPL_G__().autoload_functions.KeyDelete(lc_name)
 			}
 		}
-	} else if lc_name == SplAutoloadFn.GetFunctionName().GetStr() {
+	} else if lc_name == SplAutoloadFn.FunctionName() {
 
 		/* register single spl_autoload() */
 
@@ -607,18 +607,18 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 			if !(alfi.GetClosure().IsUndef()) {
 				zend.AddNextIndexZval(return_value, alfi.GetClosure())
 			} else if alfi.GetFuncPtr().GetScope() != nil {
-				var tmp types.Zval
-				zend.ArrayInit(&tmp)
+				tmpArr := types.NewArray(0)
 				if !(alfi.GetObj().IsUndef()) {
-					zend.AddNextIndexZval(&tmp, alfi.GetObj())
+					tmpArr.Append(alfi.GetObj())
 				} else {
-					zend.AddNextIndexStr(&tmp, alfi.GetCe().GetName().Copy())
+					tmpArr.Append(types.NewZvalString(alfi.GetCe().Name()))
 				}
-				zend.AddNextIndexStr(&tmp, alfi.GetFuncPtr().GetFunctionName().Copy())
-				zend.AddNextIndexZval(return_value, &tmp)
+				tmpArr.Append(types.NewZvalString(alfi.GetFuncPtr().FunctionName()))
+
+				return_value.Array().Append(types.NewZvalArray(tmpArr))
 			} else {
-				if alfi.GetFuncPtr().GetFunctionName().GetStr() != "__lambda_func" {
-					zend.AddNextIndexStrEx(return_value, alfi.GetFuncPtr().GetFunctionName().GetStr())
+				if alfi.GetFuncPtr().FunctionName() != "__lambda_func" {
+					zend.AddNextIndexStrEx(return_value, alfi.GetFuncPtr().FunctionName())
 				} else {
 					zend.AddNextIndexStrEx(return_value, key_.StrKey())
 				}
@@ -627,7 +627,7 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	zend.ArrayInit(return_value)
-	zend.AddNextIndexStr(return_value, zend.EG__().GetAutoloadFunc().GetFunctionName().Copy())
+	return_value.Array().Append(types.NewZvalString(zend.EG__().GetAutoloadFunc().FunctionName()))
 }
 
 //@zif -old

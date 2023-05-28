@@ -90,9 +90,9 @@ func FunctionAddRef(function types.IFunction) {
 		preload := CG__().IsCompilePreload()
 		op_array.InitPtr2(preload)
 	} else if function.GetType() == ZEND_INTERNAL_FUNCTION {
-		if function.GetFunctionName() != nil {
-			//function.GetFunctionName().AddRefcount()
-		}
+		//if function.GetFunctionName() != nil {
+		//function.GetFunctionName().AddRefcount()
+		//}
 	}
 }
 func DoBindFunctionError(lcname *types.String, op_array *types.ZendOpArray, compile_time types.ZendBool) {
@@ -108,9 +108,9 @@ func DoBindFunctionError(lcname *types.String, op_array *types.ZendOpArray, comp
 
 	b.Assert(oldFunction != nil)
 	if oldFunction.GetType() == ZEND_USER_FUNCTION && oldFunction.GetOpArray().GetLast() > 0 {
-		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return oldFunction.GetFunctionName().GetVal() }), oldFunction.GetOpArray().GetFilename().GetVal(), oldFunction.GetOpArray().GetOpcodes()[0].GetLineno())
+		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.FunctionName() }, func() []byte { return oldFunction.FunctionName() }), oldFunction.GetOpArray().GetFilename().GetVal(), oldFunction.GetOpArray().GetOpcodes()[0].GetLineno())
 	} else {
-		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s()", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return oldFunction.GetFunctionName().GetVal() }))
+		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s()", b.CondF(op_array != nil, func() []byte { return op_array.FunctionName() }, func() []byte { return oldFunction.FunctionName() }))
 	}
 }
 func DoBindFunction(lcname *types.Zval) int {

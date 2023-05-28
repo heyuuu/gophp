@@ -67,7 +67,7 @@ func ZendRegisterInternalModule(module *ModuleEntry) *ModuleEntry {
 	return ZendRegisterModuleEx(module)
 }
 func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFunction, error_type int) {
-	functionName := fptr.GetFunctionName().GetStr()
+	functionName := fptr.FunctionName()
 	if !strings.HasPrefix(functionName, "__") {
 		return
 	}
@@ -259,7 +259,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 				return types.FAILURE
 			}
 		}
-		lowercase_name = types.NewString(ascii.StrToLower(internal_function.GetFunctionName().GetStr()))
+		lowercase_name = types.NewString(ascii.StrToLower(internal_function.FunctionName()))
 		// lowercase_name = types.ZendNewInternedString(lowercase_name)
 		reg_function = types.CopyFunction(function)
 		if !targetFunctionTable.Add(lowercase_name.GetStr(), reg_function) {
@@ -395,78 +395,78 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		if ctor != nil {
 			ctor.SetIsCtor(true)
 			if ctor.IsStatic() {
-				faults.Error(error_type, "Constructor %s::%s() cannot be static", scope.Name(), ctor.GetFunctionName().GetVal())
+				faults.Error(error_type, "Constructor %s::%s() cannot be static", scope.Name(), ctor.FunctionName())
 			}
 			ctor.SetIsAllowStatic(false)
 		}
 		if dtor != nil {
 			dtor.SetIsDtor(true)
 			if dtor.IsStatic() {
-				faults.Error(error_type, "Destructor %s::%s() cannot be static", scope.Name(), dtor.GetFunctionName().GetVal())
+				faults.Error(error_type, "Destructor %s::%s() cannot be static", scope.Name(), dtor.FunctionName())
 			}
 			dtor.SetIsAllowStatic(false)
 		}
 		if clone != nil {
 			if clone.IsStatic() {
-				faults.Error(error_type, "%s::%s() cannot be static", scope.Name(), clone.GetFunctionName().GetVal())
+				faults.Error(error_type, "%s::%s() cannot be static", scope.Name(), clone.FunctionName())
 			}
 			clone.SetIsAllowStatic(false)
 		}
 		if __call != nil {
 			if __call.IsStatic() {
-				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __call.GetFunctionName().GetVal())
+				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __call.FunctionName())
 			}
 			__call.SetIsAllowStatic(false)
 		}
 		if __callstatic != nil {
 			if !__callstatic.IsStatic() {
-				faults.Error(error_type, "Method %s::%s() must be static", scope.Name(), __callstatic.GetFunctionName().GetVal())
+				faults.Error(error_type, "Method %s::%s() must be static", scope.Name(), __callstatic.FunctionName())
 			}
 			__callstatic.SetIsStatic(true)
 		}
 		if __tostring != nil {
 			if __tostring.IsStatic() {
-				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __tostring.GetFunctionName().GetVal())
+				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __tostring.FunctionName())
 			}
 			__tostring.SetIsAllowStatic(false)
 		}
 		if __get != nil {
 			if __get.IsStatic() {
-				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __get.GetFunctionName().GetVal())
+				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __get.FunctionName())
 			}
 			__get.SetIsAllowStatic(false)
 		}
 		if __set != nil {
 			if __set.IsStatic() {
-				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __set.GetFunctionName().GetVal())
+				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __set.FunctionName())
 			}
 			__set.SetIsAllowStatic(false)
 		}
 		if __unset != nil {
 			if __unset.IsStatic() {
-				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __unset.GetFunctionName().GetVal())
+				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __unset.FunctionName())
 			}
 			__unset.SetIsAllowStatic(false)
 		}
 		if __isset != nil {
 			if __isset.IsStatic() {
-				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __isset.GetFunctionName().GetVal())
+				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __isset.FunctionName())
 			}
 			__isset.SetIsAllowStatic(false)
 		}
 		if __debugInfo != nil {
 			if __debugInfo.IsStatic() {
-				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __debugInfo.GetFunctionName().GetVal())
+				faults.Error(error_type, "Method %s::%s() cannot be static", scope.Name(), __debugInfo.FunctionName())
 			}
 		}
 		if ctor != nil && ctor.IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Constructor %s::%s() cannot declare a return type", scope.Name(), ctor.GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Constructor %s::%s() cannot declare a return type", scope.Name(), ctor.FunctionName())
 		}
 		if dtor != nil && dtor.IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Destructor %s::%s() cannot declare a return type", scope.Name(), dtor.GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Destructor %s::%s() cannot declare a return type", scope.Name(), dtor.FunctionName())
 		}
 		if clone != nil && clone.IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() cannot declare a return type", scope.Name(), clone.GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() cannot declare a return type", scope.Name(), clone.FunctionName())
 		}
 		Efree((*byte)(lc_class_name))
 	}

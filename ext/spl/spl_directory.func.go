@@ -1543,7 +1543,7 @@ func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr types.IFunction
 	fci.SetParamCount(num_args)
 	fci.SetParams(params)
 	fci.SetNoSeparation(1)
-	fci.GetFunctionName().SetString(func_ptr.GetFunctionName())
+	fci.GetFunctionName().SetStringVal(func_ptr.FunctionName())
 	fcic.SetFunctionHandler(func_ptr)
 	fcic.SetCalledScope(nil)
 	fcic.SetObject(nil)

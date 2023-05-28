@@ -84,7 +84,7 @@ func (o *ObjectStd) GetMethod(object **ZendObject, method *String, key *Zval) IF
 	return zend.ZendStdGetMethod(object, method, key)
 }
 
-func (o *ObjectStd) CallMethod(method *String, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
+func (o *ObjectStd) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
 	panic("implement me")
 }
 

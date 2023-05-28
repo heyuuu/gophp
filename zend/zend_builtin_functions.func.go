@@ -638,11 +638,11 @@ func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Z
 	scope = ZendGetExecutedScope()
 	ce.FunctionTable().Foreach(func(key string, mptr types.IFunction) {
 		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) || mptr.IsPrivate() && scope == mptr.GetScope()) {
-			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.GetOpArray().refcount > 1) && key != nil && !SameName(key, mptr.GetFunctionName()) {
-				method_name.SetStringVal(ZendFindAliasName(mptr.GetScope(), key).GetStr())
+			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.GetOpArray().refcount > 1) && key != "" && !SameNameEx(key, mptr.FunctionName()) {
+				method_name.SetStringVal(ZendFindAliasName(mptr.GetScope(), key))
 				return_value.Array().AppendNew(&method_name)
 			} else {
-				method_name.SetStringVal(mptr.GetFunctionName().GetStr())
+				method_name.SetStringVal(mptr.FunctionName())
 				return_value.Array().AppendNew(&method_name)
 			}
 		}
@@ -1222,7 +1222,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	var lineno int
 	var frameno = 0
 	var func_ types.IFunction
-	var function_name *byte
+	var functionName string
 	var filename *byte
 	var class_name string = ""
 	var call_type string = ""
@@ -1276,23 +1276,21 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			object = nil
 		}
 		if call.GetFunc() != nil {
-			var zend_function_name *types.String
 			func_ = call.GetFunc()
 			if func_.GetScope() != nil && func_.GetScope().GetTraitAliases() != nil {
-				zend_function_name = ZendResolveMethodName(b.CondF(object != nil, func() *types.ClassEntry { return object.GetCe() }, func() *types.ClassEntry { return func_.GetScope() }), func_)
+				if object != nil {
+					functionName = ZendResolveMethodName(object.GetCe(), func_)
+				} else {
+					functionName = ZendResolveMethodName(func_.GetScope(), func_)
+				}
 			} else {
-				zend_function_name = func_.GetFunctionName()
-			}
-			if zend_function_name != nil {
-				function_name = zend_function_name.GetVal()
-			} else {
-				function_name = nil
+				functionName = func_.FunctionName()
 			}
 		} else {
 			func_ = nil
-			function_name = nil
+			functionName = ""
 		}
-		if function_name != nil {
+		if functionName != "" {
 			if object != nil {
 				if func_.GetScope() != nil {
 					class_name = func_.GetScope().Name()
@@ -1321,27 +1319,27 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 
 				/* can happen when calling eval from a custom sapi */
 
-				function_name = "unknown"
+				functionName = "unknown"
 				build_filename_arg = 0
 			} else {
 				switch ptr.GetOpline().GetExtendedValue() {
 				case ZEND_EVAL:
-					function_name = "eval"
+					functionName = "eval"
 					build_filename_arg = 0
 				case ZEND_INCLUDE:
-					function_name = "include"
+					functionName = "include"
 				case ZEND_REQUIRE:
-					function_name = "require"
+					functionName = "require"
 				case ZEND_INCLUDE_ONCE:
-					function_name = "include_once"
+					functionName = "include_once"
 				case ZEND_REQUIRE_ONCE:
-					function_name = "require_once"
+					functionName = "require_once"
 				default:
 
 					/* this can actually happen if you use debug_backtrace() in your error_handler and
 					 * you're in the top-scope */
 
-					function_name = "unknown"
+					functionName = "unknown"
 					build_filename_arg = 0
 				}
 			}
@@ -1356,7 +1354,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			ZEND_PUTS(class_name)
 			ZEND_PUTS(call_type)
 		}
-		ZendPrintf("%s(", function_name)
+		ZendPrintf("%s(", functionName)
 		if arg_array.IsNotUndef() {
 			DebugPrintBacktraceArgs(&arg_array)
 			// ZvalPtrDtor(&arg_array)
@@ -1396,7 +1394,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 	var lineno int
 	var frameno = 0
 	var func_ types.IFunction
-	var function_name *types.String
+	var functionName string
 	var filename *types.String
 	var include_filename *types.String = nil
 	var stack_frame types.Zval
@@ -1489,16 +1487,20 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 		if call != nil && call.GetFunc() != nil {
 			func_ = call.GetFunc()
 			if func_.GetScope() != nil && func_.GetScope().GetTraitAliases() != nil {
-				function_name = ZendResolveMethodName(b.CondF(object != nil, func() *types.ClassEntry { return object.GetCe() }, func() *types.ClassEntry { return func_.GetScope() }), func_)
+				if object != nil {
+					functionName = ZendResolveMethodName(object.GetCe(), func_)
+				} else {
+					functionName = ZendResolveMethodName(func_.GetScope(), func_)
+				}
 			} else {
-				function_name = func_.GetFunctionName()
+				functionName = func_.FunctionName()
 			}
 		} else {
 			func_ = nil
-			function_name = nil
+			functionName = ""
 		}
-		if function_name != nil {
-			tmp.SetStringVal(function_name.GetStr())
+		if functionName != "" {
+			tmp.SetStringVal(functionName)
 			stack_frame.Array().KeyAddNew(types.STR_FUNCTION, &tmp)
 			if object != nil {
 				if func_.GetScope() != nil {
@@ -1525,15 +1527,11 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 				stack_frame.Array().KeyAddNew(types.STR_ARGS, &tmp)
 			}
 		} else {
-
 			/* i know this is kinda ugly, but i'm trying to avoid extra cycles in the main execution loop */
-
 			var build_filename_arg = 1
 			var pseudo_function_name string
 			if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetType())) || ptr.GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL {
-
 				/* can happen when calling eval from a custom sapi */
-
 				pseudo_function_name = types.STR_UNKNOWN
 				build_filename_arg = 0
 			} else {
@@ -1622,7 +1620,7 @@ func ZifGetExtensionFuncs(executeData zpp.Ex, return_value zpp.Ret, extensionNam
 				ArrayInit(return_value)
 				array = 1
 			}
-			AddNextIndexStr(return_value, f.GetFunctionName().Copy())
+			return_value.Array().Append(types.NewZvalString(f.FunctionName()))
 		}
 	})
 	if array == 0 {

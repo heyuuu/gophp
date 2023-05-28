@@ -12,8 +12,8 @@ type IFunction interface {
 	SetType(typ uint8)
 	GetFnFlags() uint32
 	SetFnFlags(flags uint32)
-	GetFunctionName() *String
-	SetFunctionName(value *String)
+	FunctionName() string
+	SetFunctionName(value string)
 	GetScope() *ClassEntry
 	SetScope(value *ClassEntry)
 	GetPrototype() IFunction
@@ -103,7 +103,7 @@ type functionHeader struct {
 	// type(8) + argFlags(24) 的组合数据
 	typ             uint8
 	fnFlags         uint32
-	functionName    *String
+	functionName    string
 	scope           *ClassEntry
 	prototype       IFunction
 	numArgs         uint32
@@ -120,12 +120,13 @@ func (f *functionHeader) GetInternalFunction() *InternalFunction {
 	panic("*functionHeader is not *InternalFunction")
 }
 
+func (f *functionHeader) FunctionName() string         { return f.functionName }
+func (f *functionHeader) SetFunctionName(value string) { f.functionName = value }
+
 func (f *functionHeader) GetType() uint8                  { return f.typ }
 func (f *functionHeader) SetType(typ uint8)               { f.typ = typ }
 func (f *functionHeader) GetFnFlags() uint32              { return f.fnFlags }
 func (f *functionHeader) SetFnFlags(flags uint32)         { f.fnFlags = flags }
-func (f *functionHeader) GetFunctionName() *String        { return f.functionName }
-func (f *functionHeader) SetFunctionName(value *String)   { f.functionName = value }
 func (f *functionHeader) GetScope() *ClassEntry           { return f.scope }
 func (f *functionHeader) SetScope(value *ClassEntry)      { f.scope = value }
 func (f *functionHeader) GetPrototype() IFunction         { return f.prototype }

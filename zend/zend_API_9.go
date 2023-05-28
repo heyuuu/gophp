@@ -148,26 +148,27 @@ func ZendRestoreErrorHandling(saved *ZendErrorHandling) {
 	EG__().SetErrorHandling(saved.GetHandling())
 	EG__().SetExceptionClass(saved.GetException())
 }
-func ZendFindAliasName(ce *types.ClassEntry, name string) *types.String {
+func ZendFindAliasName(ce *types.ClassEntry, name string) string {
 	for _, alias := range ce.GetTraitAliases() {
 		if alias.GetAlias() != nil && ascii.StrCaseEquals(alias.GetAlias().GetStr(), name) {
-			return alias.GetAlias()
+			return alias.GetAlias().GetStr()
 		}
 	}
-	return types.NewString(name)
+	return name
 }
-func ZendResolveMethodName(ce *types.ClassEntry, f types.IFunction) *types.String {
+
+func ZendResolveMethodName(ce *types.ClassEntry, f types.IFunction) string {
 	if f.GetType() != ZEND_USER_FUNCTION || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {
-		return f.GetFunctionName()
+		return f.FunctionName()
 	}
 
-	var ret = f.GetFunctionName()
+	var ret = f.FunctionName()
 	ce.FunctionTable().ForeachEx(func(name string, func_ types.IFunction) bool {
 		if func_ != f {
 			return true
 		}
 
-		if name != "" && !ascii.StrCaseEquals(name, f.GetFunctionName().GetStr()) {
+		if name != "" && !ascii.StrCaseEquals(name, f.FunctionName()) {
 			ret = ZendFindAliasName(f.GetScope(), name)
 		}
 		return false
@@ -175,7 +176,7 @@ func ZendResolveMethodName(ce *types.ClassEntry, f types.IFunction) *types.Strin
 
 	return ret
 }
-func ZendGetObjectType(ce *types.ClassEntry) *byte {
+func ZendGetObjectType(ce *types.ClassEntry) string {
 	if ce.IsTrait() {
 		return "trait"
 	} else if ce.IsInterface() {

@@ -9,13 +9,13 @@ import (
 func SplInstantiateArgEx1(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval) int {
 	var func_ types.IFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
-	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetStr(), nil, 1, arg1, nil)
+	zend.ZendCallMethod(retval, pce, &func_, func_.FunctionName(), nil, 1, arg1, nil)
 	return 0
 }
 func SplInstantiateArgEx2(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval, arg2 *types.Zval) int {
 	var func_ types.IFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
-	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetStr(), nil, 2, arg1, arg2)
+	zend.ZendCallMethod(retval, pce, &func_, func_.FunctionName(), nil, 2, arg1, arg2)
 	return 0
 }
 func SplInstantiateArgN(pce *types.ClassEntry, retval *types.Zval, argc int, argv *types.Zval) {
@@ -25,7 +25,7 @@ func SplInstantiateArgN(pce *types.ClassEntry, retval *types.Zval, argc int, arg
 	var dummy types.Zval
 	SplInstantiate(pce, retval)
 	fci.SetSize(b.SizeOf("zend_fcall_info"))
-	fci.GetFunctionName().SetString(func_.GetFunctionName())
+	fci.GetFunctionName().SetStringVal(func_.FunctionName())
 	fci.SetObject(retval.Object())
 	fci.SetRetval(&dummy)
 	fci.SetParamCount(argc)

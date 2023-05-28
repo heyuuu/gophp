@@ -184,7 +184,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Non-abstract method %s::%s() must contain body", ce.Name(), name.GetVal())
 	}
 	op_array.SetScope(ce)
-	op_array.SetFunctionName(name.Copy())
+	op_array.SetFunctionName(name.GetStr())
 	lcname = operators.ZendStringTolower(name)
 	//lcname = types.ZendNewInternedString(lcname)
 	if !ce.FunctionTable().Add(name.GetStr(), op_array) {
@@ -318,7 +318,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	var opline *ZendOp
 	unqualified_name = decl.GetName()
 	name = ZendPrefixWithNs(unqualified_name)
-	op_array.SetFunctionName(name)
+	op_array.SetFunctionName(name.GetStr())
 	lcname = operators.ZendStringTolower(name)
 	if FC__().GetImportsFunction() != nil {
 		var import_name *types.String = ZendHashFindPtrLc(FC__().GetImportsFunction(), unqualified_name.GetVal(), unqualified_name.GetLen())
@@ -770,25 +770,25 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	if ce.GetConstructor() != nil {
 		ce.GetConstructor().SetIsCtor(true)
 		if ce.GetConstructor().IsStatic() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Constructor %s::%s() cannot be static", ce.Name(), ce.GetConstructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Constructor %s::%s() cannot be static", ce.Name(), ce.GetConstructor().FunctionName())
 		}
 		if ce.GetConstructor().IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Constructor %s::%s() cannot declare a return type", ce.Name(), ce.GetConstructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Constructor %s::%s() cannot declare a return type", ce.Name(), ce.GetConstructor().FunctionName())
 		}
 	}
 	if ce.GetDestructor() != nil {
 		ce.GetDestructor().SetIsDtor(true)
 		if ce.GetDestructor().IsStatic() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Destructor %s::%s() cannot be static", ce.Name(), ce.GetDestructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Destructor %s::%s() cannot be static", ce.Name(), ce.GetDestructor().FunctionName())
 		} else if ce.GetDestructor().IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Destructor %s::%s() cannot declare a return type", ce.Name(), ce.GetDestructor().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Destructor %s::%s() cannot declare a return type", ce.Name(), ce.GetDestructor().FunctionName())
 		}
 	}
 	if ce.GetClone() != nil {
 		if ce.GetClone().IsStatic() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Clone method %s::%s() cannot be static", ce.Name(), ce.GetClone().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Clone method %s::%s() cannot be static", ce.Name(), ce.GetClone().FunctionName())
 		} else if ce.GetClone().IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Clone method %s::%s() cannot declare a return type", ce.Name(), ce.GetClone().GetFunctionName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Clone method %s::%s() cannot declare a return type", ce.Name(), ce.GetClone().FunctionName())
 		}
 	}
 	if implements_ast != nil {
