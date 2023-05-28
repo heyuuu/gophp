@@ -282,9 +282,7 @@ func ZendStartup() int {
 	ZendSetDefaultCompileTimeValues()
 
 	/* Map region is going to be created and resized at run-time. */
-	CG__().SetMapPtrBase(nil)
-	CG__().SetMapPtrSize(0)
-	CG__().SetMapPtrLast(0)
+	ZendMapPtrStartup()
 	EG__().SetErrorReporting(faults.E_ALL & ^faults.E_NOTICE)
 	ZendStartupBuiltinFunctions()
 	ZendRegisterStandardConstants()
@@ -325,7 +323,7 @@ func ZendPostStartup() int {
 			return types.FAILURE
 		}
 	}
-	GlobalMapPtrLast = CG__().GetMapPtrLast()
+	ZendMapPtrPostStartup()
 	return types.SUCCESS
 }
 func ZendShutdown() {
@@ -340,11 +338,7 @@ func ZendShutdown() {
 
 	ZendShutdownExtensions()
 
-	if CG__().GetMapPtrBase() {
-		Free(CG__().GetMapPtrBase())
-		CG__().SetMapPtrBase(nil)
-		CG__().SetMapPtrSize(0)
-	}
+	ZendMapPtrShutdown()
 	ZendDestroyRsrcListDtors()
 }
 func ZendSetUtilityValues(utility_values *ZendUtilityValues) { ZendUv = *utility_values }
@@ -371,9 +365,7 @@ func ZendActivate() {
 	InitCompiler()
 	InitExecutor()
 	StartupScanner()
-	if CG__().GetMapPtrLast() != 0 {
-		memset(CG__().GetMapPtrBase(), 0, CG__().GetMapPtrLast()*b.SizeOf("void *"))
-	}
+	ZendMapPtrActivate()
 }
 func ZendCallDestructors() {
 	faults.Try(func() {
@@ -487,17 +479,3 @@ func ZendMakeCompiledStringDescription(name string) string {
 	return ZendSprintf(COMPILED_STRING_DESCRIPTION_FORMAT, cur_filename, cur_lineno, name)
 }
 func FreeEstring(str_p **byte) { Efree(*str_p) }
-func ZendMapPtrNew() any {
-	var ptr *any
-	if CG__().GetMapPtrLast() >= CG__().GetMapPtrSize() {
-
-		/* Grow map_ptr table */
-
-		CG__().SetMapPtrSize(ZEND_MM_ALIGNED_SIZE_EX(CG__().GetMapPtrLast()+1, 4096))
-		CG__().SetMapPtrBase(Perealloc(CG__().GetMapPtrBase(), CG__().GetMapPtrSize()*b.SizeOf("void *")))
-	}
-	ptr = (*any)(CG__().GetMapPtrBase() + CG__().GetMapPtrLast())
-	*ptr = nil
-	CG__().GetMapPtrLast()++
-	return ZEND_MAP_PTR_PTR2OFFSET(ptr)
-}

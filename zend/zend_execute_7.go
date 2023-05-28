@@ -286,15 +286,7 @@ func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpAr
 	executeData.GetCall() = nil
 	executeData.GetReturnValue() = return_value
 	ZendAttachSymbolTable(executeData)
-	if op_array.GetRunTimeCachePtr() == nil {
-		var ptr any
-		b.Assert(op_array.IsHeapRtCache())
-		ptr = Emalloc(op_array.GetCacheSize() + b.SizeOf("void *"))
-		ZEND_MAP_PTR_INIT(op_array.run_time_cache, ptr)
-		ptr = (*byte)(ptr + b.SizeOf("void *"))
-		ZEND_MAP_PTR_SET(op_array.run_time_cache, ptr)
-		memset(ptr, 0, op_array.GetCacheSize())
-	}
+	op_array.InitRunTimeCache()
 	executeData.GetRuntimeCache() = RUN_TIME_CACHE(op_array)
 	EG__().SetCurrentExecuteData(executeData)
 }

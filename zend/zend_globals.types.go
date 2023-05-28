@@ -73,6 +73,13 @@ func (this *ZendCompilerGlobals) ClassTable() ClassTable {
 
 func (this *ZendCompilerGlobals) FunctionTable() FunctionTable { return this.functionTable }
 
+// compiler_options
+func (this *ZendCompilerGlobals) GetCompilerOptions() uint32      { return this.compiler_options }
+func (this *ZendCompilerGlobals) SetCompilerOptions(value uint32) { this.compiler_options = value }
+func (this *ZendCompilerGlobals) IsCompilePreload() bool {
+	return this.compiler_options&ZEND_COMPILE_PRELOAD != 0
+}
+
 // getter/setter
 func (this *ZendCompilerGlobals) GetLoopVarStack() ZendStack      { return this.loop_var_stack }
 func (this *ZendCompilerGlobals) SetLoopVarStack(value ZendStack) { this.loop_var_stack = value }
@@ -130,8 +137,6 @@ func (this *ZendCompilerGlobals) GetDocComment() *types.String         { return 
 func (this *ZendCompilerGlobals) SetDocComment(value *types.String)    { this.doc_comment = value }
 func (this *ZendCompilerGlobals) GetExtraFnFlags() uint32              { return this.extra_fn_flags }
 func (this *ZendCompilerGlobals) SetExtraFnFlags(value uint32)         { this.extra_fn_flags = value }
-func (this *ZendCompilerGlobals) GetCompilerOptions() uint32           { return this.compiler_options }
-func (this *ZendCompilerGlobals) SetCompilerOptions(value uint32)      { this.compiler_options = value }
 func (this *ZendCompilerGlobals) GetContext() *ZendOparrayContext      { return &this.context }
 func (this *ZendCompilerGlobals) SetContext(value ZendOparrayContext)  { this.context = value }
 func (this *ZendCompilerGlobals) GetFileContext() *ZendFileContext     { return &this.file_context }
@@ -153,12 +158,14 @@ func (this *ZendCompilerGlobals) SetMemoizedExprs(value *types.Array) {
 }
 func (this *ZendCompilerGlobals) GetMemoizeMode() int      { return this.memoize_mode }
 func (this *ZendCompilerGlobals) SetMemoizeMode(value int) { this.memoize_mode = value }
-func (this *ZendCompilerGlobals) GetMapPtrBase() any       { return this.map_ptr_base }
-func (this *ZendCompilerGlobals) SetMapPtrBase(value any)  { this.map_ptr_base = value }
-func (this *ZendCompilerGlobals) GetMapPtrSize() int       { return this.map_ptr_size }
-func (this *ZendCompilerGlobals) SetMapPtrSize(value int)  { this.map_ptr_size = value }
-func (this *ZendCompilerGlobals) GetMapPtrLast() int       { return this.map_ptr_last }
-func (this *ZendCompilerGlobals) SetMapPtrLast(value int)  { this.map_ptr_last = value }
+
+func (this *ZendCompilerGlobals) GetMapPtrBase() any      { return this.map_ptr_base }
+func (this *ZendCompilerGlobals) SetMapPtrBase(value any) { this.map_ptr_base = value }
+func (this *ZendCompilerGlobals) GetMapPtrSize() int      { return this.map_ptr_size }
+func (this *ZendCompilerGlobals) SetMapPtrSize(value int) { this.map_ptr_size = value }
+func (this *ZendCompilerGlobals) GetMapPtrLast() int      { return this.map_ptr_last }
+func (this *ZendCompilerGlobals) SetMapPtrLast(value int) { this.map_ptr_last = value }
+
 func (this *ZendCompilerGlobals) GetDelayedVarianceObligations() *types.Array {
 	return this.delayed_variance_obligations
 }

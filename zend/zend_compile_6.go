@@ -386,14 +386,10 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	var orig_oparray_context ZendOparrayContext
 	var info ClosureInfo
 	memset(&info, 0, b.SizeOf("closure_info"))
-	if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
-		op_array.SetIsPreloaded(true)
-		ZEND_MAP_PTR_NEW(op_array.run_time_cache)
-		ZEND_MAP_PTR_NEW(op_array.static_variables_ptr)
-	} else {
-		ZEND_MAP_PTR_INIT(op_array.run_time_cache, ZendArenaAlloc(CG__().GetArena(), b.SizeOf("void *")))
-		ZEND_MAP_PTR_SET(op_array.run_time_cache, nil)
-	}
+
+	preload := CG__().IsCompilePreload()
+	op_array.InitPtr(preload)
+
 	op_array.AddFnFlags(orig_op_array.GetFnFlags() & types.AccStrictTypes)
 	op_array.AddFnFlags(decl.GetFlags())
 	op_array.SetLineStart(decl.GetStartLineno())
@@ -723,7 +719,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	}
 
 	var ce *types.ClassEntry = types.NewUserClass(name.GetStr())
-	if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
+	if CG__().IsCompilePreload() {
 		ce.SetIsPreloaded(true)
 		ZEND_MAP_PTR_NEW(ce.static_members_table)
 	}
@@ -805,7 +801,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	if toplevel != 0 {
 		ce.SetIsTopLevel(true)
 	}
-	if toplevel != 0 && !ce.HasCeFlags(types.AccImplementInterfaces|types.AccImplementTraits) && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
+	if toplevel != 0 && !ce.HasCeFlags(types.AccImplementInterfaces|types.AccImplementTraits) && !CG__().IsCompilePreload() {
 		if extends_ast != nil {
 			var parent_ce *types.ClassEntry = ZendLookupClassEx(ce.GetParentName(), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if parent_ce != nil && (!parent_ce.IsInternalClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_CLASSES) == 0) && (!parent_ce.IsUserClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || parent_ce.GetFilename() == ce.GetFilename()) {

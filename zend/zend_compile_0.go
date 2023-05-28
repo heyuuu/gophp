@@ -83,8 +83,8 @@ func RT_CONSTANT(opline *ZendOp, node ZnodeOp) *types.Zval {
 func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *types.ZendOpArray, opline *ZendOp, node ZnodeOp) {
 	node.SetConstant((*byte)(CT_CONSTANT_EX(op_array, node.GetConstant())) - (*byte)(opline))
 }
-func RUN_TIME_CACHE(op_array __auto__) any {
-	return ZEND_MAP_PTR_GET(op_array.run_time_cache)
+func RUN_TIME_CACHE(op_array *types.ZendOpArray) []any {
+	return op_array.GetRunTimeCache()
 }
 func ZendGetUnmangledPropertyName(mangled_prop *types.String) *byte {
 	_, propName, _ := ZendUnmanglePropertyName_Ex(mangled_prop.GetStr())

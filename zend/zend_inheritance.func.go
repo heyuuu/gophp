@@ -36,15 +36,10 @@ func ZendDuplicateUserFunction(func_ types.IFunction) types.IFunction {
 	new_function = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
 	memcpy(new_function, func_, b.SizeOf("zend_op_array"))
 	if func_.GetOpArray().GetStaticVariablesPtr() {
-
 		/* See: Zend/tests/method_static_var.phpt */
-
 		new_function.GetOpArray().SetStaticVariables(func_.GetOpArray().GetStaticVariablesPtr())
-
-		/* See: Zend/tests/method_static_var.phpt */
-
 	}
-	if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
+	if CG__().IsCompilePreload() {
 		b.Assert(new_function.GetOpArray().IsPreloaded())
 		ZEND_MAP_PTR_NEW(new_function.GetOpArray().static_variables_ptr)
 	} else {
@@ -56,17 +51,10 @@ func ZendDuplicateFunction(func_ types.IFunction, ce *types.ClassEntry, is_inter
 	if func_.GetType() == ZEND_INTERNAL_FUNCTION {
 		return ZendDuplicateInternalFunction(func_, ce)
 	} else {
-		if func_.GetOpArray().GetRefcount() != nil {
-			func_.GetOpArray().refcount++
-		}
+		func_.GetOpArray().TryIncRefCount()
 		if is_interface != 0 || func_.GetOpArray().GetStaticVariables() == nil {
-
 			/* reuse the same op_array structure */
-
 			return func_
-
-			/* reuse the same op_array structure */
-
 		}
 		return ZendDuplicateUserFunction(func_)
 	}

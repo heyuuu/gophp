@@ -1,6 +1,9 @@
 package types
 
-import "github.com/heyuuu/gophp/zend"
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
+)
 
 const initialOpArraySize = 64
 
@@ -15,7 +18,7 @@ type ZendOpArray struct {
 	T                         uint32
 	last                      uint32
 	opcodes                   []zend.ZendOp
-	run_time_cache__ptr       **any
+	run_time_cache__ptr       *[]any
 	static_variables_ptr__ptr **Array
 	static_variables          *Array
 	vars                      []*String
@@ -70,29 +73,89 @@ func (f *ZendOpArray) SetStaticVariablesPtr(ht *Array) {
 		*f.static_variables_ptr__ptr = ht
 	}
 }
-
 func (f *ZendOpArray) GetOpArray() *ZendOpArray { return f }
 func (f *ZendOpArray) GetInternalFunction() *InternalFunction {
 	panic("*ZendOpArray is not *InternalFunction")
 }
 
-func (f *ZendOpArray) GetCacheSize() int                           { return f.cache_size }
-func (f *ZendOpArray) SetCacheSize(value int)                      { f.cache_size = value }
-func (f *ZendOpArray) GetLastVar() int                             { return f.last_var }
-func (f *ZendOpArray) SetLastVar(value int)                        { f.last_var = value }
-func (f *ZendOpArray) GetT() uint32                                { return f.T }
-func (f *ZendOpArray) SetT(value uint32)                           { f.T = value }
-func (f *ZendOpArray) GetLast() uint32                             { return f.last }
-func (f *ZendOpArray) SetLast(value uint32)                        { f.last = value }
-func (f *ZendOpArray) GetOpcodes() []zend.ZendOp                   { return f.opcodes }
-func (f *ZendOpArray) SetOpcodes(value []zend.ZendOp)              { f.opcodes = value }
-func (f *ZendOpArray) GetRunTimeCachePtr() **any                   { return f.run_time_cache__ptr }
+// run_time_cache__ptr
+func (f *ZendOpArray) GetRunTimeCache() []any    { return *f.run_time_cache__ptr }
+func (f *ZendOpArray) HasInitRunTimeCache() bool { return f.run_time_cache__ptr != nil }
+func (f *ZendOpArray) InitRunTimeCache() {
+	if f.run_time_cache__ptr != nil {
+		return
+	}
+
+	b.Assert(f.IsHeapRtCache())
+
+	f.InitRunTimeCacheEx(true)
+}
+func (f *ZendOpArray) InitRunTimeCacheEx(heapRtCache bool) {
+	if f.run_time_cache__ptr != nil {
+		return
+	}
+
+	f.SetIsHeapRtCache(heapRtCache)
+
+	var ptr []any
+	if heapRtCache {
+		// todo 注意此处多留了1个 void* 位置，ptr 不指向数组开端
+		ptr = make([]any, 1+f.GetCacheSize())
+		ptr = ptr[1:]
+	} else {
+		ptr = make([]any, f.GetCacheSize())
+	}
+
+	f.run_time_cache__ptr = ptr
+}
+
+func (f *ZendOpArray) InitPtr(preload bool) {
+	if preload {
+		f.SetIsPreloaded(true)
+		zend.ZEND_MAP_PTR_NEW(f.run_time_cache)
+		zend.ZEND_MAP_PTR_NEW(f.static_variables_ptr)
+	} else {
+		zend.ZEND_MAP_PTR_INIT(f.run_time_cache, zend.ZendArenaAlloc(zend.CG__().GetArena(), b.SizeOf("void *")))
+		zend.ZEND_MAP_PTR_SET(f.run_time_cache, nil)
+	}
+}
+
+func (f *ZendOpArray) InitPtr2(preload bool) {
+	if preload {
+		b.Assert(f.IsPreloaded())
+		zend.ZEND_MAP_PTR_NEW(f.run_time_cache)
+		zend.ZEND_MAP_PTR_NEW(f.static_variables_ptr)
+	} else {
+		zend.ZEND_MAP_PTR_INIT(f.run_time_cache, zend.ZendArenaAlloc(zend.CG__().GetArena(), b.SizeOf("void *")))
+		zend.ZEND_MAP_PTR_SET(f.run_time_cache, nil)
+
+		zend.ZEND_MAP_PTR_INIT(f.static_variables_ptr, f.GetStaticVariables())
+	}
+}
+
+func (f *ZendOpArray) GetRefcount() *uint32 { return f.refcount }
+func (f *ZendOpArray) TryIncRefCount() {
+	if f.refcount != nil {
+		*f.refcount++
+	}
+}
+
+// fields
+func (f *ZendOpArray) GetCacheSize() int              { return f.cache_size }
+func (f *ZendOpArray) SetCacheSize(value int)         { f.cache_size = value }
+func (f *ZendOpArray) GetLastVar() int                { return f.last_var }
+func (f *ZendOpArray) SetLastVar(value int)           { f.last_var = value }
+func (f *ZendOpArray) GetT() uint32                   { return f.T }
+func (f *ZendOpArray) SetT(value uint32)              { f.T = value }
+func (f *ZendOpArray) GetLast() uint32                { return f.last }
+func (f *ZendOpArray) SetLast(value uint32)           { f.last = value }
+func (f *ZendOpArray) GetOpcodes() []zend.ZendOp      { return f.opcodes }
+func (f *ZendOpArray) SetOpcodes(value []zend.ZendOp) { f.opcodes = value }
+
 func (f *ZendOpArray) GetStaticVariables() *Array                  { return f.static_variables }
 func (f *ZendOpArray) SetStaticVariables(value *Array)             { f.static_variables = value }
 func (f *ZendOpArray) GetVars() []*String                          { return f.vars }
 func (f *ZendOpArray) SetVars(value []*String)                     { f.vars = value }
-func (f *ZendOpArray) GetRefcount() *uint32                        { return f.refcount }
-func (f *ZendOpArray) SetRefcount(value *uint32)                   { f.refcount = value }
 func (f *ZendOpArray) GetLastLiveRange() int                       { return f.last_live_range }
 func (f *ZendOpArray) SetLastLiveRange(value int)                  { f.last_live_range = value }
 func (f *ZendOpArray) GetLastTryCatch() int                        { return f.last_try_catch }

@@ -86,18 +86,9 @@ func ZendAddTryElement(try_op uint32) uint32 {
 func FunctionAddRef(function types.IFunction) {
 	if function.GetType() == ZEND_USER_FUNCTION {
 		var op_array = function.GetOpArray()
-		if op_array.GetRefcount() != nil {
-			op_array.refcount++
-		}
-		if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
-			b.Assert(op_array.IsPreloaded())
-			ZEND_MAP_PTR_NEW(op_array.run_time_cache)
-			ZEND_MAP_PTR_NEW(op_array.static_variables_ptr)
-		} else {
-			ZEND_MAP_PTR_INIT(op_array.static_variables_ptr, op_array.GetStaticVariables())
-			ZEND_MAP_PTR_INIT(op_array.run_time_cache, ZendArenaAlloc(CG__().GetArena(), b.SizeOf("void *")))
-			ZEND_MAP_PTR_SET(op_array.run_time_cache, nil)
-		}
+		op_array.TryIncRefCount()
+		preload := CG__().IsCompilePreload()
+		op_array.InitPtr2(preload)
 	} else if function.GetType() == ZEND_INTERNAL_FUNCTION {
 		if function.GetFunctionName() != nil {
 			//function.GetFunctionName().AddRefcount()
@@ -137,7 +128,7 @@ func DoBindFunction(lcname *types.Zval) int {
 		return types.FAILURE
 	}
 
-	if function.IsPreloaded() && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
+	if function.IsPreloaded() && !CG__().IsCompilePreload() {
 		EG__().FunctionTable().Add(lcname.StringVal(), function)
 	} else {
 		EG__().FunctionTable().Del(rtd_key.StringVal())

@@ -112,13 +112,8 @@ func zim_Closure_call(executeData *ZendExecuteData, return_value *types.Zval) {
 		/* Runtime cache relies on bound scope to be immutable, hence we need a separate rt cache in case scope changed */
 
 		if ZEND_USER_CODE(my_function.GetType()) && (closure.GetFunc().GetScope() != types.Z_OBJCE_P(newthis) || closure.GetFunc().IsHeapRtCache()) {
-			var ptr any
 			my_function.GetOpArray().SetIsHeapRtCache(true)
-			ptr = Emalloc(b.SizeOf("void *") + my_function.GetOpArray().GetCacheSize())
-			ZEND_MAP_PTR_INIT(my_function.GetOpArray().run_time_cache, ptr)
-			ptr = (*byte)(ptr + b.SizeOf("void *"))
-			ZEND_MAP_PTR_SET(my_function.GetOpArray().run_time_cache, ptr)
-			memset(ptr, 0, my_function.GetOpArray().GetCacheSize())
+			my_function.GetOpArray().InitRunTimeCache()
 		}
 
 		/* Runtime cache relies on bound scope to be immutable, hence we need a separate rt cache in case scope changed */
@@ -136,17 +131,6 @@ func zim_Closure_call(executeData *ZendExecuteData, return_value *types.Zval) {
 			operators.ZendUnwrapReference(&closure_result)
 		}
 		types.ZVAL_COPY_VALUE(return_value, &closure_result)
-	}
-	if fci_cache.GetFunctionHandler().IsGenerator() {
-
-		/* copied upon generator creation */
-
-		//closure.GetStd().DelRefcount()
-
-		/* copied upon generator creation */
-
-	} else if ZEND_USER_CODE(my_function.GetType()) && fci_cache.GetFunctionHandler().IsHeapRtCache() {
-		Efree(my_function.GetOpArray().GetRunTimeCachePtr())
 	}
 }
 func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
@@ -438,9 +422,8 @@ func ZendCreateClosure(res *types.Zval, func_ types.IFunction, scope *types.Clas
 
 		/* Runtime cache is scope-dependent, so we cannot reuse it if the scope changed */
 
-		if !(ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().run_time_cache)) || func_.GetScope() != scope || func_.IsHeapRtCache() {
-			var ptr any
-			if !(ZEND_MAP_PTR_GET(func_.GetOpArray().run_time_cache)) && func_.IsClosure() && (func_.GetScope() == scope || !func_.IsImmutable()) {
+		if !closure.GetFunc().GetOpArray().HasInitRunTimeCache() || func_.GetScope() != scope || func_.IsHeapRtCache() {
+			if func_.GetOpArray().HasInitRunTimeCache() && func_.IsClosure() && (func_.GetScope() == scope || !func_.IsImmutable()) {
 
 				/* If a real closure is used for the first time, we create a shared runtime cache
 				 * and remember which scope it is for. */
@@ -448,25 +431,13 @@ func ZendCreateClosure(res *types.Zval, func_ types.IFunction, scope *types.Clas
 				if func_.GetScope() != scope {
 					func_.SetScope(scope)
 				}
-				closure.GetFunc().GetOpArray().SetIsHeapRtCache(false)
-				ptr = ZendArenaAlloc(CG__().GetArena(), func_.GetOpArray().GetCacheSize())
-				ZEND_MAP_PTR_SET(func_.GetOpArray().run_time_cache, ptr)
-				ZEND_MAP_PTR_SET(closure.GetFunc().GetOpArray().run_time_cache, ptr)
+				closure.GetFunc().GetOpArray().InitRunTimeCacheEx(false)
 			} else {
-
 				/* Otherwise, we use a non-shared runtime cache */
-
-				closure.GetFunc().GetOpArray().SetIsHeapRtCache(true)
-				ptr = Emalloc(b.SizeOf("void *") + func_.GetOpArray().GetCacheSize())
-				ZEND_MAP_PTR_INIT(closure.GetFunc().GetOpArray().run_time_cache, ptr)
-				ptr = (*byte)(ptr + b.SizeOf("void *"))
-				ZEND_MAP_PTR_SET(closure.GetFunc().GetOpArray().run_time_cache, ptr)
+				closure.GetFunc().GetOpArray().InitRunTimeCacheEx(true)
 			}
-			memset(ptr, 0, func_.GetOpArray().GetCacheSize())
 		}
-		if closure.GetFunc().GetOpArray().GetRefcount() != nil {
-			closure.func_.GetOpArray().refcount++
-		}
+		closure.GetFunc().GetOpArray().TryIncRefCount()
 	} else {
 		memcpy(closure.GetFunc(), func_, b.SizeOf("zend_internal_function"))
 		closure.GetFunc().SetIsClosure(true)
