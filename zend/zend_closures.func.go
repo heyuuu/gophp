@@ -356,7 +356,7 @@ func ZendClosureFreeStorage(object *types.ZendObject) {
 	var closure *ZendClosure = (*ZendClosure)(object)
 	ZendObjectStdDtor(closure.GetStd())
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION {
-		DestroyOpArray(closure.GetFunc().GetOpArray())
+		//DestroyOpArray(closure.GetFunc().GetOpArray())
 	} else if closure.GetOrigInternalHandler() == ZendClosureCallMagic {
 		// types.ZendStringRelease(closure.GetFunc().GetFunctionName())
 	}

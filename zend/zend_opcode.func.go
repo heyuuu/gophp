@@ -8,86 +8,12 @@ import (
 	"sort"
 )
 
-func ZendExtensionOpArrayCtorHandler(extension *ZendExtension, op_array *types.ZendOpArray) {
-	if extension.GetOpArrayCtor() != nil {
-		extension.GetOpArrayCtor()(op_array)
-	}
-}
-func ZendExtensionOpArrayDtorHandler(extension *ZendExtension, op_array *types.ZendOpArray) {
-	if extension.GetOpArrayDtor() != nil {
-		extension.GetOpArrayDtor()(op_array)
-	}
-}
-func InitOpArray(op_array *types.ZendOpArray, initial_ops_size int) {
-	op_array.Init()
-	op_array.SetRefcount((*uint32)(Emalloc(b.SizeOf("uint32_t"))))
-	op_array.refcount = 1
-	op_array.SetLast(0)
-	op_array.SetOpcodes(Emalloc(initial_ops_size * b.SizeOf("zend_op")))
-	op_array.SetLastVar(0)
-	op_array.SetVars(nil)
-	op_array.SetT(0)
-	op_array.SetFunctionName(nil)
-	op_array.SetFilename(ZendGetCompiledFilename())
-	op_array.SetDocComment(nil)
-	op_array.SetArgInfo(nil)
-	op_array.SetNumArgs(0)
-	op_array.SetRequiredNumArgs(0)
-	op_array.SetScope(nil)
-	op_array.SetPrototype(nil)
-	op_array.SetLiveRange(nil)
-	op_array.SetTryCatchArray(nil)
-	op_array.SetLastLiveRange(0)
-	op_array.SetStaticVariables(nil)
-	ZEND_MAP_PTR_INIT(op_array.static_variables_ptr, op_array.GetStaticVariables())
-	op_array.SetLastTryCatch(0)
-	op_array.SetFnFlags(0)
-	op_array.SetLastLiteral(0)
-	op_array.SetLiterals(nil)
-	ZEND_MAP_PTR_INIT(op_array.run_time_cache, nil)
-	op_array.SetCacheSize(ZendOpArrayExtensionHandles * b.SizeOf("void *"))
-	memset(op_array.GetReserved(), 0, types.ZEND_MAX_RESERVED_RESOURCES*b.SizeOf("void *"))
-	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_CTOR) != 0 {
-		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayCtorHandler), op_array)
-	}
-}
-func ZendFunctionDtor(zv *types.Zval) {
-	var function types.IFunction = zv.Ptr()
-	if function.GetType() == ZEND_USER_FUNCTION {
-		b.Assert(function.GetFunctionName() != nil)
-		DestroyOpArray(function.GetOpArray())
-	} else {
-		b.Assert(function.GetType() == ZEND_INTERNAL_FUNCTION)
-		b.Assert(function.GetFunctionName() != nil)
-		// types.ZendStringReleaseEx(function.GetFunctionName(), 1)
-
-		/* For methods this will be called explicitly. */
-
-		if function.GetScope() == nil {
-			//ZendFreeInternalArgInfo(function.GetInternalFunction())
-		}
-		if !function.IsArenaAllocated() {
-			Pefree(function)
-		}
-	}
-}
-func ZendFunctionDtorEx(function types.IFunction) {
-	//if function.GetType() == ZEND_USER_FUNCTION {
-	//	b.Assert(function.GetFunctionName() != nil)
-	//	DestroyOpArray(function.GetOpArray())
-	//} else {
-	//	b.Assert(function.GetType() == ZEND_INTERNAL_FUNCTION)
-	//	b.Assert(function.GetFunctionName() != nil)
-	//}
-}
-func DestroyZendClass(zv *types.Zval) {
-	DestroyZendClassEntry(zv.Ptr().(*types.ClassEntry))
-}
-func DestroyZendClassEntry(ce *types.ClassEntry) {
-	Efree(ce)
-}
-func DestroyOpArray(op_array *types.ZendOpArray) {
-	Efree(op_array)
+func InitOpArrayEx() *types.ZendOpArray {
+	opArray := types.NewOpArray()
+	opArray.SetFilename(ZendGetCompiledFilename())
+	ZEND_MAP_PTR_INIT(opArray.static_variables_ptr, opArray.GetStaticVariables())
+	ZEND_MAP_PTR_INIT(opArray.run_time_cache, nil)
+	return opArray
 }
 func ZendUpdateExtendedStmts(op_array *types.ZendOpArray) {
 	var opline *ZendOp = op_array.GetOpcodes()
@@ -108,11 +34,6 @@ func ZendUpdateExtendedStmts(op_array *types.ZendOpArray) {
 			}
 		}
 		opline++
-	}
-}
-func ZendExtensionOpArrayHandler(extension *ZendExtension, op_array *types.ZendOpArray) {
-	if extension.GetOpArrayHandler() != nil {
-		extension.GetOpArrayHandler()(op_array)
 	}
 }
 func ZendCheckFinallyBreakout(op_array *types.ZendOpArray, op_num uint32, dst_num uint32) {
@@ -293,24 +214,19 @@ func EmitLiveRange(op_array *types.ZendOpArray, var_num uint32, start uint32, en
 	}
 	EmitLiveRangeRaw(op_array, var_num, kind, start, end)
 }
-func IsFakeDef(opline *ZendOp) types.ZendBool {
+func IsFakeDef(opline *ZendOp) bool {
 	/* These opcodes only modify the result, not create it. */
-
 	return opline.GetOpcode() == ZEND_ROPE_ADD || opline.GetOpcode() == ZEND_ADD_ARRAY_ELEMENT || opline.GetOpcode() == ZEND_ADD_ARRAY_UNPACK
-
-	/* These opcodes only modify the result, not create it. */
 }
 func KeepsOp1Alive(opline *ZendOp) types.ZendBool {
 	/* These opcodes don't consume their OP1 operand,
 	 * it is later freed by something else. */
-
 	if opline.GetOpcode() == ZEND_CASE || opline.GetOpcode() == ZEND_SWITCH_LONG || opline.GetOpcode() == ZEND_FETCH_LIST_R || opline.GetOpcode() == ZEND_COPY_TMP {
 		return 1
 	}
 	b.Assert(opline.GetOpcode() != ZEND_SWITCH_STRING && opline.GetOpcode() != ZEND_FE_FETCH_R && opline.GetOpcode() != ZEND_FE_FETCH_RW && opline.GetOpcode() != ZEND_FETCH_LIST_W && opline.GetOpcode() != ZEND_VERIFY_RETURN_TYPE && opline.GetOpcode() != ZEND_BIND_LEXICAL && opline.GetOpcode() != ZEND_ROPE_ADD)
 	return 0
 }
-func CmpLiveRange(a *ZendLiveRange, b *ZendLiveRange) int { return a.GetStart() - b.GetStart() }
 func SwapLiveRange(a *ZendLiveRange, b *ZendLiveRange) {
 	*a, *b = *b, *a
 }
@@ -324,7 +240,7 @@ func ZendCalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsL
 	for opnum > 0 {
 		opnum--
 		opline--
-		if (opline.GetResultType()&(IS_TMP_VAR|IS_VAR)) != 0 && IsFakeDef(opline) == 0 {
+		if (opline.GetResultType()&(IS_TMP_VAR|IS_VAR)) != 0 && !IsFakeDef(opline) {
 			var var_num uint32 = EX_VAR_TO_NUM(opline.GetResult().GetVar()) - var_offset
 
 			/* Defs without uses can occur for two reasons: Either because the result is
@@ -428,11 +344,6 @@ func PassTwo(op_array *types.ZendOpArray) int {
 	}
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_STMT) != 0 {
 		ZendUpdateExtendedStmts(op_array)
-	}
-	if (CG__().GetCompilerOptions() & ZEND_COMPILE_HANDLE_OP_ARRAY) != 0 {
-		if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_HANDLER) != 0 {
-			ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayHandler), op_array)
-		}
 	}
 	if CG__().GetContext().GetVarsSize() != op_array.GetLastVar() {
 		op_array.SetVars((**types.String)(Erealloc(op_array.GetVars(), b.SizeOf("zend_string *")*op_array.GetLastVar())))

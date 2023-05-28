@@ -2,6 +2,8 @@ package types
 
 import "github.com/heyuuu/gophp/zend"
 
+const initialOpArraySize = 64
+
 /**
  * ZendOpArray
  */
@@ -34,15 +36,20 @@ type ZendOpArray struct {
 var _ IFunction = (*ZendOpArray)(nil)
 
 func NewOpArray() *ZendOpArray {
-	return &ZendOpArray{}
+	var refcount uint32 = 1
+	return &ZendOpArray{
+		functionHeader: functionHeader{
+			typ: zend.ZEND_USER_FUNCTION,
+		},
+		opcodes:  make([]zend.ZendOp, initialOpArraySize),
+		refcount: &refcount,
+		// memset(op_array.GetReserved(), 0, types.ZEND_MAX_RESERVED_RESOURCES*b.SizeOf("void *"))
+		reserved: make([]any, ZEND_MAX_RESERVED_RESOURCES),
+	}
 }
 func CopyOpArray(array *ZendOpArray) *ZendOpArray {
 	// todo 处理 copy 逻辑
 	return NewOpArray()
-}
-
-func (f *ZendOpArray) Init() {
-	f.typ = zend.ZEND_USER_FUNCTION
 }
 
 //  ZEND_MAP_PTR_GET(f.static_variables_ptr)

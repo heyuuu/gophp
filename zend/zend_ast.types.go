@@ -35,27 +35,14 @@ type ZendAstList struct {
 	child    []*ZendAst
 }
 
-// func MakeZendAstList(kind ZendAstKind, attr ZendAstAttr, lineno uint32, children uint32, child []*ZendAst) ZendAstList {
-//     return ZendAstList{
-//         kind:kind,
-//         attr:attr,
-//         lineno:lineno,
-//         children:children,
-//         child:child,
-//     }
-// }
 func (this *ZendAstList) GetKind() ZendAstKind      { return this.kind }
 func (this *ZendAstList) SetKind(value ZendAstKind) { this.kind = value }
 func (this *ZendAstList) GetAttr() ZendAstAttr      { return this.attr }
 func (this *ZendAstList) SetAttr(value ZendAstAttr) { this.attr = value }
-
-// func (this *ZendAstList)  GetLineno() uint32      { return this.lineno }
-func (this *ZendAstList) SetLineno(value uint32)   { this.lineno = value }
-func (this *ZendAstList) GetChildren() uint32      { return this.children }
-func (this *ZendAstList) SetChildren(value uint32) { this.children = value }
-func (this *ZendAstList) GetChild() []*ZendAst     { return this.child }
-
-// func (this *ZendAstList) SetChild(value []*ZendAst) { this.child = value }
+func (this *ZendAstList) SetLineno(value uint32)    { this.lineno = value }
+func (this *ZendAstList) GetChildren() uint32       { return this.children }
+func (this *ZendAstList) SetChildren(value uint32)  { this.children = value }
+func (this *ZendAstList) GetChild() []*ZendAst      { return this.child }
 
 /**
  * ZendAstZval
@@ -98,29 +85,6 @@ type ZendAstDecl struct {
 	child        []*ZendAst
 }
 
-//             func MakeZendAstDecl(
-// kind ZendAstKind,
-// attr ZendAstAttr,
-// start_lineno uint32,
-// end_lineno uint32,
-// flags uint32,
-// lex_pos *uint8,
-// doc_comment *String,
-// name *String,
-// child []*ZendAst,
-// ) ZendAstDecl {
-//                 return ZendAstDecl{
-//                     kind:kind,
-//                     attr:attr,
-//                     start_lineno:start_lineno,
-//                     end_lineno:end_lineno,
-//                     flags:flags,
-//                     lex_pos:lex_pos,
-//                     doc_comment:doc_comment,
-//                     name:name,
-//                     child:child,
-//                 }
-//             }
 func (this *ZendAstDecl) GetKind() ZendAstKind      { return this.kind }
 func (this *ZendAstDecl) SetKind(value ZendAstKind) { this.kind = value }
 

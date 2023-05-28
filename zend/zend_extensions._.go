@@ -45,12 +45,3 @@ const ZEND_EXTMSG_NEW_EXTENSION = 1
 
 var ZendExtensions ZendLlist
 
-const ZEND_EXTENSIONS_HAVE_OP_ARRAY_CTOR = 1 << 0
-const ZEND_EXTENSIONS_HAVE_OP_ARRAY_DTOR = 1 << 1
-const ZEND_EXTENSIONS_HAVE_OP_ARRAY_HANDLER = 1 << 2
-const ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST_CALC = 1 << 3
-const ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST = 1 << 4
-
-var ZendExtensionFlags uint32 = 0
-var ZendOpArrayExtensionHandles int = 0
-var LastResourceNumber int

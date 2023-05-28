@@ -51,22 +51,12 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 		if name_ast.GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(name_ast).IsString() {
 			var name *types.String = ZendAstGetStr(name_ast)
 			if ZendIsAutoGlobal(name) != 0 {
-
 				/* These is no need to explicitly import auto-globals. */
-
 				return
-
-				/* These is no need to explicitly import auto-globals. */
-
 			}
 			if name.GetStr() == "this" {
-
 				/* $this does not need to be explicitly imported. */
-
 				return
-
-				/* $this does not need to be explicitly imported. */
-
 			}
 			types.ZendHashAddEmptyElement(info.GetUses(), name.GetStr())
 		} else {
@@ -392,11 +382,10 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	var is_method types.ZendBool = decl.GetKind() == ZEND_AST_METHOD
 	var orig_class_entry *types.ClassEntry = CG__().GetActiveClassEntry()
 	var orig_op_array *types.ZendOpArray = CG__().GetActiveOpArray()
-	var op_array *types.ZendOpArray = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
+	var op_array *types.ZendOpArray = InitOpArrayEx()
 	var orig_oparray_context ZendOparrayContext
 	var info ClosureInfo
 	memset(&info, 0, b.SizeOf("closure_info"))
-	InitOpArray(op_array, INITIAL_OP_ARRAY_SIZE)
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
 		op_array.SetIsPreloaded(true)
 		ZEND_MAP_PTR_NEW(op_array.run_time_cache)

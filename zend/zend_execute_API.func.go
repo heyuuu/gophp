@@ -211,7 +211,7 @@ func ShutdownExecutor() {
 					return true
 				}
 
-				DestroyOpArray(f.GetOpArray())
+				//DestroyOpArray(f.GetOpArray())
 				return false
 			})
 
@@ -220,7 +220,7 @@ func ShutdownExecutor() {
 					return true
 				}
 
-				DestroyZendClass(zv)
+				//DestroyZendClass(zv)
 				return false
 			})
 		}
@@ -740,8 +740,8 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 			local_retval.SetUndef()
 			ZendExecute(new_op_array, &local_retval)
 		}, func() {
-			DestroyOpArray(new_op_array)
-			EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
+			//DestroyOpArray(new_op_array)
+			//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 			faults.Bailout()
 		})
 
@@ -757,8 +757,8 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 			}
 		}
 		EG__().SetNoExtensions(0)
-		DestroyOpArray(new_op_array)
-		EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
+		//DestroyOpArray(new_op_array)
+		//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		retval = types.SUCCESS
 	} else {
 		retval = types.FAILURE

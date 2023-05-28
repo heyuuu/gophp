@@ -14,8 +14,8 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	new_op_array = ZendIncludeOrEval(inc_filename, opline.GetExtendedValue())
 	if EG__().GetException() != nil {
 		if new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nil {
-			DestroyOpArray(new_op_array)
-			EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
+			//DestroyOpArray(new_op_array)
+			//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		}
 		UNDEF_RESULT()
 		return 0
@@ -45,8 +45,8 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			ZendExecuteEx(call)
 			ZendVmStackFreeCallFrame(call)
 		}
-		DestroyOpArray(new_op_array)
-		EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
+		//DestroyOpArray(new_op_array)
+		//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		if EG__().GetException() != nil {
 			faults.RethrowException(executeData)
 			UNDEF_RESULT()
@@ -67,8 +67,8 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	// ZvalPtrDtorNogc(free_op1)
 	if EG__().GetException() != nil {
 		if new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nil {
-			DestroyOpArray(new_op_array)
-			EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
+			//DestroyOpArray(new_op_array)
+			//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		}
 		UNDEF_RESULT()
 		return 0
@@ -98,8 +98,8 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 			ZendExecuteEx(call)
 			ZendVmStackFreeCallFrame(call)
 		}
-		DestroyOpArray(new_op_array)
-		EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
+		//DestroyOpArray(new_op_array)
+		//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		if EG__().GetException() != nil {
 			faults.RethrowException(executeData)
 			UNDEF_RESULT()
@@ -118,8 +118,8 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	new_op_array = ZendIncludeOrEval(inc_filename, opline.GetExtendedValue())
 	if EG__().GetException() != nil {
 		if new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nil {
-			DestroyOpArray(new_op_array)
-			EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
+			//DestroyOpArray(new_op_array)
+			//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		}
 		UNDEF_RESULT()
 		return 0
@@ -149,8 +149,8 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			ZendExecuteEx(call)
 			ZendVmStackFreeCallFrame(call)
 		}
-		DestroyOpArray(new_op_array)
-		EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
+		//DestroyOpArray(new_op_array)
+		//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		if EG__().GetException() != nil {
 			faults.RethrowException(executeData)
 			UNDEF_RESULT()

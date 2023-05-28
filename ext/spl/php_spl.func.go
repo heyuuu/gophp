@@ -194,8 +194,8 @@ func SplAutoload(className string, lcName string, ext *byte, ext_len int) int {
 		if opArray != nil {
 			result.SetUndef()
 			zend.ZendExecute(opArray, &result)
-			zend.DestroyOpArray(opArray)
-			zend.Efree(opArray)
+			//zend.DestroyOpArray(opArray)
+			//zend.Efree(opArray)
 			return types.IntBool(zend.EG__().ClassTable().Exists(lcName.GetStr()))
 		}
 	}

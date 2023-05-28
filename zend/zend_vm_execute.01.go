@@ -312,8 +312,8 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		return 2
 	} else if (call_info & ZEND_CALL_TOP) == 0 {
 		ZendDetachSymbolTable(executeData)
-		DestroyOpArray(executeData.GetFunc().GetOpArray())
-		EfreeSize(executeData.GetFunc(), b.SizeOf("zend_op_array"))
+		//DestroyOpArray(executeData.GetFunc().GetOpArray())
+		//EfreeSize(executeData.GetFunc(), b.SizeOf("zend_op_array"))
 		old_execute_data = executeData
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 		executeData = CurrEX()

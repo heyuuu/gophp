@@ -463,7 +463,7 @@ func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*FileHandle) boo
 					faults.ExceptionError(EG__().GetException(), faults.E_ERROR)
 				}
 			}
-			DestroyOpArray(opArray)
+			//DestroyOpArray(opArray)
 		} else if typ == ZEND_REQUIRE {
 			return false
 		}

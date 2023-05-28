@@ -123,8 +123,7 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 		var original_file_context ZendFileContext
 		var original_oparray_context ZendOparrayContext
 		var original_active_op_array int = CG__().GetActiveOpArray()
-		op_array = emalloc(b.SizeOf("zend_op_array"))
-		InitOpArray(op_array, type_, INITIAL_OP_ARRAY_SIZE)
+		op_array = InitOpArrayEx()
 		CG__().active_op_array = op_array
 
 		/* Use heap to not waste arena memory */

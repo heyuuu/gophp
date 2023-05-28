@@ -1598,8 +1598,8 @@ func PhpLintScript(file *zend.FileHandle) int {
 		op_array = zend.CompileFile(file, zend.ZEND_INCLUDE)
 		zend.ZendDestroyFileHandle(file)
 		if op_array != nil {
-			zend.DestroyOpArray(op_array)
-			zend.Efree(op_array)
+			//zend.DestroyOpArray(op_array)
+			//zend.Efree(op_array)
 			retval = types.SUCCESS
 		}
 	})

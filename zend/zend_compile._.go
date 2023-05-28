@@ -14,7 +14,6 @@ const ZEND_LIVE_ROPE = 3
 const ZEND_LIVE_NEW = 4
 const ZEND_LIVE_MASK = 7
 
-
 /* zend_internal_function_handler */
 
 type ZifHandler func(executeData *ZendExecuteData, return_value *types.Zval)
@@ -77,8 +76,6 @@ type BinaryOpType func(*types.Zval, *types.Zval, *types.Zval) int
 const INITIAL_OP_ARRAY_SIZE = 64
 
 /* helper functions in zend_language_scanner.l */
-
-const ZEND_FUNCTION_DTOR types.DtorFuncT = ZendFunctionDtor
 
 type ZendNeedsLiveRangeCb func(op_array *types.ZendOpArray, opline *ZendOp) types.ZendBool
 type ZendAutoGlobalCallback func(name *types.String) types.ZendBool

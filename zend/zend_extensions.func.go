@@ -76,27 +76,7 @@ func ZendRegisterExtension(new_extension *ZendExtension, handle any) int {
 	extension.SetHandle(handle)
 	ZendExtensionDispatchMessage(ZEND_EXTMSG_NEW_EXTENSION, &extension)
 	ZendExtensions.AddElement(&extension)
-	if extension.GetOpArrayCtor() != nil {
-		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_CTOR
-	}
-	if extension.GetOpArrayDtor() != nil {
-		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_DTOR
-	}
-	if extension.GetOpArrayHandler() != nil {
-		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_HANDLER
-	}
-	if extension.GetOpArrayPersistCalc() != nil {
-		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST_CALC
-	}
-	if extension.GetOpArrayPersist() != nil {
-		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST
-	}
-
-	/*fprintf(stderr, "Loaded %s, version %s\n", extension.name, extension.version);*/
-
 	return types.SUCCESS
-
-	/*fprintf(stderr, "Loaded %s, version %s\n", extension.name, extension.version);*/
 }
 func ZendExtensionShutdown(extension *ZendExtension) {
 	if extension.GetShutdown() != nil {
@@ -116,8 +96,6 @@ func ZendStartupExtensionsMechanism() int {
 	/* Startup extensions mechanism */
 
 	ZendExtensions.Init(b.SizeOf("zend_extension"), (func(any))(ZendExtensionDtor), 1)
-	ZendOpArrayExtensionHandles = 0
-	LastResourceNumber = 0
 	return types.SUCCESS
 }
 func ZendStartupExtensions() int {
@@ -146,19 +124,6 @@ func ZendExtensionMessageDispatcher(extension *ZendExtension, num_args int, args
 func ZendExtensionDispatchMessage(message int, arg any) {
 	ZendLlistApplyWithArguments(&ZendExtensions, LlistApplyWithArgsFuncT(ZendExtensionMessageDispatcher), 2, message, arg)
 }
-func ZendGetResourceHandle(extension *ZendExtension) int {
-	if LastResourceNumber < types.ZEND_MAX_RESERVED_RESOURCES {
-		extension.SetResourceNumber(LastResourceNumber)
-		LastResourceNumber++
-		return LastResourceNumber - 1
-	} else {
-		return -1
-	}
-}
-func ZendGetOpArrayExtensionHandle() int {
-	ZendOpArrayExtensionHandles++
-	return ZendOpArrayExtensionHandles - 1
-}
 func ZendGetExtension(extension_name *byte) *ZendExtension {
 	var element *ZendLlistElement
 	for element = ZendExtensions.GetHead(); element != nil; element = element.GetNext() {
@@ -168,40 +133,4 @@ func ZendGetExtension(extension_name *byte) *ZendExtension {
 		}
 	}
 	return nil
-}
-func ZendExtensionOpArrayPersistCalcHandler(extension *ZendExtension, data *ZendExtensionPersistData) {
-	if extension.GetOpArrayPersistCalc() != nil {
-		data.SetSize(data.GetSize() + extension.GetOpArrayPersistCalc()(data.GetOpArray()))
-	}
-}
-func ZendExtensionOpArrayPersistHandler(extension *ZendExtension, data *ZendExtensionPersistData) {
-	if extension.GetOpArrayPersist() != nil {
-		var size int = extension.GetOpArrayPersist()(data.GetOpArray(), data.GetMem())
-		if size != 0 {
-			data.SetMem(any((*byte)(data.GetMem() + size)))
-			data.SetSize(data.GetSize() + size)
-		}
-	}
-}
-func ZendExtensionsOpArrayPersistCalc(op_array *types.ZendOpArray) int {
-	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST_CALC) != 0 {
-		var data ZendExtensionPersistData
-		data.SetOpArray(op_array)
-		data.SetSize(0)
-		data.SetMem(nil)
-		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayPersistCalcHandler), &data)
-		return data.GetSize()
-	}
-	return 0
-}
-func ZendExtensionsOpArrayPersist(op_array *types.ZendOpArray, mem any) int {
-	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST) != 0 {
-		var data ZendExtensionPersistData
-		data.SetOpArray(op_array)
-		data.SetSize(0)
-		data.SetMem(mem)
-		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayPersistHandler), &data)
-		return data.GetSize()
-	}
-	return 0
 }
