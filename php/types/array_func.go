@@ -89,18 +89,13 @@ func HandleNumericStr(key string, idx *zend.ZendUlong) bool {
 		return false
 	}
 }
+func ZendHashAppendInd(ht *Array, key string, value *Zval) {
+	savedZval := NewZvalIndirect(value)
+	ht.KeyAdd(key, savedZval)
+}
+
 func ZendHashFindInd(ht *Array, key string) *Zval {
-	var zv *Zval
-	zv = ht.KeyFind(key)
-	if zv != nil && zv.IsType(IS_INDIRECT) {
-		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
-			return zv.Indirect()
-		} else {
-			return nil
-		}
-	} else {
-		return zv
-	}
+	return ht.KeyFindIndirect(key)
 }
 
 func ZendHashUpdatePtr(ht *Array, key string, pData any) any {

@@ -304,7 +304,6 @@ func (this *ZendLiveRange) SetEnd(value uint32)   { this.end = value }
  */
 type ZendOparrayContext struct {
 	opcodes_size     uint32
-	vars_size        int
 	literals_size    int
 	fast_call_var    uint32
 	try_catch_offset uint32
@@ -316,8 +315,6 @@ type ZendOparrayContext struct {
 
 func (this *ZendOparrayContext) GetOpcodesSize() uint32               { return this.opcodes_size }
 func (this *ZendOparrayContext) SetOpcodesSize(value uint32)          { this.opcodes_size = value }
-func (this *ZendOparrayContext) GetVarsSize() int                     { return this.vars_size }
-func (this *ZendOparrayContext) SetVarsSize(value int)                { this.vars_size = value }
 func (this *ZendOparrayContext) GetLiteralsSize() int                 { return this.literals_size }
 func (this *ZendOparrayContext) SetLiteralsSize(value int)            { this.literals_size = value }
 func (this *ZendOparrayContext) GetFastCallVar() uint32               { return this.fast_call_var }

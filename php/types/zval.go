@@ -43,6 +43,7 @@ func NewZvalArray(arr *Array) *Zval           { var tmp Zval; tmp.SetArray(arr);
 func NewZvalResource(res *ZendResource) *Zval { var tmp Zval; tmp.SetResource(res); return &tmp }
 func NewZvalPtr(ptr any) *Zval                { var tmp Zval; tmp.SetPtr(ptr); return &tmp }
 func NewZvalObject(obj *ZendObject) *Zval     { var tmp Zval; tmp.SetObject(obj); return &tmp }
+func NewZvalIndirect(zv *Zval) *Zval          { var tmp Zval; tmp.SetIndirect(zv); return &tmp }
 
 /** value 的 isType/ getter / setter 判断 */
 func (zv *Zval) IsType(value uint8) bool { return zv.typ == value }

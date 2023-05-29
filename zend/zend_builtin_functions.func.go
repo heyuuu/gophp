@@ -1165,11 +1165,10 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 				 * and we have to access them through symbol_table
 				 * See: https://bugs.php.net/bug.php?id=73156
 				 */
-				var argName *types.String
 				var arg *types.Zval
 				for ; i < firstExtraArg; i++ {
-					argName = call.GetFunc().GetOpArray().GetVars()[i]
-					arg = types.ZendHashFindInd(call.GetSymbolTable(), argName.GetStr())
+					argName := call.GetFunc().GetOpArray().GetVar(i)
+					arg = types.ZendHashFindInd(call.GetSymbolTable(), argName)
 					if arg != nil {
 						arr.Append(arg)
 					} else {

@@ -345,10 +345,6 @@ func PassTwo(op_array *types.ZendOpArray) int {
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_STMT) != 0 {
 		ZendUpdateExtendedStmts(op_array)
 	}
-	if CG__().GetContext().GetVarsSize() != op_array.GetLastVar() {
-		op_array.SetVars((**types.String)(Erealloc(op_array.GetVars(), b.SizeOf("zend_string *")*op_array.GetLastVar())))
-		CG__().GetContext().SetVarsSize(op_array.GetLastVar())
-	}
 	op_array.SetOpcodes((*ZendOp)(Erealloc(op_array.GetOpcodes(), ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)+b.SizeOf("zval")*op_array.GetLastLiteral())))
 	if op_array.GetLiterals() != nil {
 		memcpy((*byte)(op_array.GetOpcodes())+ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16), op_array.GetLiterals(), b.SizeOf("zval")*op_array.GetLastLiteral())

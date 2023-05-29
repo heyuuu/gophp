@@ -14,14 +14,13 @@ type UserFunction = ZendOpArray
 type ZendOpArray struct {
 	functionHeader
 	cache_size                int
-	last_var                  int
 	T                         uint32
 	last                      uint32
 	opcodes                   []zend.ZendOp
 	run_time_cache__ptr       *[]any
 	static_variables_ptr__ptr **Array
 	static_variables          *Array
-	vars                      []*String
+	vars                      []string
 	refcount                  *uint32
 	last_live_range           int
 	last_try_catch            int
@@ -140,11 +139,27 @@ func (f *ZendOpArray) TryIncRefCount() {
 	}
 }
 
+// vars
+func (f *ZendOpArray) GetLastVar() int     { return len(f.vars) }
+func (f *ZendOpArray) Vars() []string      { return f.vars }
+func (f *ZendOpArray) GetVar(i int) string { return f.vars[i] }
+func (f *ZendOpArray) AppendVar(name string) int {
+	i := len(f.vars)
+	f.vars = append(f.vars, name)
+	return i
+}
+func (f *ZendOpArray) FindVar(name string) int {
+	for i, varName := range f.vars {
+		if varName == name {
+			return i
+		}
+	}
+	return -1
+}
+
 // fields
 func (f *ZendOpArray) GetCacheSize() int              { return f.cache_size }
 func (f *ZendOpArray) SetCacheSize(value int)         { f.cache_size = value }
-func (f *ZendOpArray) GetLastVar() int                { return f.last_var }
-func (f *ZendOpArray) SetLastVar(value int)           { f.last_var = value }
 func (f *ZendOpArray) GetT() uint32                   { return f.T }
 func (f *ZendOpArray) SetT(value uint32)              { f.T = value }
 func (f *ZendOpArray) GetLast() uint32                { return f.last }
@@ -154,8 +169,6 @@ func (f *ZendOpArray) SetOpcodes(value []zend.ZendOp) { f.opcodes = value }
 
 func (f *ZendOpArray) GetStaticVariables() *Array                  { return f.static_variables }
 func (f *ZendOpArray) SetStaticVariables(value *Array)             { f.static_variables = value }
-func (f *ZendOpArray) GetVars() []*String                          { return f.vars }
-func (f *ZendOpArray) SetVars(value []*String)                     { f.vars = value }
 func (f *ZendOpArray) GetLastLiveRange() int                       { return f.last_live_range }
 func (f *ZendOpArray) SetLastLiveRange(value int)                  { f.last_live_range = value }
 func (f *ZendOpArray) GetLastTryCatch() int                        { return f.last_try_catch }

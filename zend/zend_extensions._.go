@@ -1,9 +1,5 @@
 package zend
 
-import (
-	"github.com/heyuuu/gophp/php/types"
-)
-
 /*
 The constants below are derived from ext/opcache/ZendAccelerator.h
 
@@ -32,16 +28,10 @@ type ShutdownFuncT func(extension *ZendExtension)
 type ActivateFuncT func()
 type DeactivateFuncT func()
 type MessageHandlerFuncT func(message int, arg any)
-type OpArrayHandlerFuncT func(op_array *types.ZendOpArray)
 type StatementHandlerFuncT func(frame *ZendExecuteData)
 type FcallBeginHandlerFuncT func(frame *ZendExecuteData)
 type FcallEndHandlerFuncT func(frame *ZendExecuteData)
-type OpArrayCtorFuncT func(op_array *types.ZendOpArray)
-type OpArrayDtorFuncT func(op_array *types.ZendOpArray)
-type OpArrayPersistCalcFuncT func(op_array *types.ZendOpArray) int
-type OpArrayPersistFuncT func(op_array *types.ZendOpArray, mem any) int
 
 const ZEND_EXTMSG_NEW_EXTENSION = 1
 
 var ZendExtensions ZendLlist
-

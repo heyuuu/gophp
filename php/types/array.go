@@ -455,6 +455,20 @@ func (ht *Array) KeyExistsIndirect(key string) bool {
 
 	return true
 }
+
+func (ht *Array) KeyFindIndirect(key string) *Zval {
+	var zv = ht.KeyFind(key)
+	if zv != nil && zv.IsIndirect() {
+		if zv.Indirect().IsNotUndef() {
+			return zv.Indirect()
+		} else {
+			return nil
+		}
+	} else {
+		return zv
+	}
+}
+
 func (ht *Array) KeyAddIndirect(key string, pData *Zval) *Zval {
 	ht.assertWritable()
 

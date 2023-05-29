@@ -61,7 +61,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 					if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
 						zobj.GetProperties().MarkHasEmptyIndex()
 					}
-					types._zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
+					types.ZendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
 				}
 			})
 

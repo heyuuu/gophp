@@ -991,17 +991,12 @@ func ZendRebuildSymbolTable() *types.Array {
 		//types.ZendHashRealInitMixed(symbol_table)
 	}
 	if ex.GetFunc().GetOpArray().GetLastVar() != 0 {
-		var str **types.String = ex.GetFunc().GetOpArray().GetVars()
-		var end **types.String = str + ex.GetFunc().GetOpArray().GetLastVar()
-		var var_ *types.Zval = ex.VarNum(0)
-		for {
-			types._zendHashAppendInd(symbol_table, *str, var_)
-			str++
-			var_++
-			if str == end {
-				break
-			}
+		vars := ex.GetFunc().GetOpArray().Vars()
+		for i, varName := range vars {
+			var_ := ex.VarNum(i)
+			types.ZendHashAppendInd(symbol_table, varName, var_)
 		}
+
 	}
 	return symbol_table
 }
@@ -1013,11 +1008,10 @@ func ZendAttachSymbolTable(executeData *ZendExecuteData) {
 	   INDIRECT references to CV in symbol table  */
 
 	if op_array.GetLastVar() != 0 {
-		var str **types.String = op_array.GetVars()
-		var end **types.String = str + op_array.GetLastVar()
-		var var_ *types.Zval = executeData.VarNum(0)
-		for {
-			var zv *types.Zval = ht.KeyFind(str.GetStr())
+		vars := op_array.Vars()
+		for i, varname := range vars {
+			var_ := executeData.VarNum(i)
+			var zv *types.Zval = ht.KeyFind(varname)
 			if zv != nil {
 				if zv.IsIndirect() {
 					var val *types.Zval = zv.Indirect()
@@ -1027,14 +1021,9 @@ func ZendAttachSymbolTable(executeData *ZendExecuteData) {
 				}
 			} else {
 				var_.SetUndef()
-				zv = ht.KeyAddNew(str.GetStr(), var_)
+				zv = ht.KeyAddNew(varname, var_)
 			}
 			zv.SetIndirect(var_)
-			str++
-			var_++
-			if str == end {
-				break
-			}
 		}
 	}
 
@@ -1047,21 +1036,15 @@ func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 
 	/* copy real values from CV slots into symbol table */
 
-	if op_array.GetLastVar() != 0 {
-		var str **types.String = op_array.GetVars()
-		var end **types.String = str + op_array.GetLastVar()
-		var var_ *types.Zval = executeData.VarNum(0)
-		for {
+	vars := op_array.Vars()
+	if len(vars) != 0 {
+		for i, varname := range vars {
+			var_ := executeData.VarNum(i)
 			if var_.IsUndef() {
-				ht.KeyDelete((*str).GetStr())
+				ht.KeyDelete(varname)
 			} else {
-				ht.KeyUpdate(str.GetStr(), var_)
+				ht.KeyUpdate(varname, var_)
 				var_.SetUndef()
-			}
-			str++
-			var_++
-			if str == end {
-				break
 			}
 		}
 	}
@@ -1075,24 +1058,14 @@ func ZendSetLocalVarStr(name string, value *types.Zval, force int) int {
 	}
 	if executeData != nil {
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
-			var h ZendUlong = b.HashStr(name)
 			var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
-			if op_array.GetLastVar() != 0 {
-				var str **types.String = op_array.GetVars()
-				var end **types.String = str + op_array.GetLastVar()
-				for {
-					if (*str).GetStr() == name {
-						var var_ *types.Zval = executeData.VarNum(str - op_array.GetVars())
-						// ZvalPtrDtor(var_)
-						var_.CopyValueFrom(value)
-						return types.SUCCESS
-					}
-					str++
-					if str == end {
-						break
-					}
-				}
+
+			if i := op_array.FindVar(name); i >= 0 {
+				var var_ = executeData.VarNum(i)
+				var_.CopyValueFrom(value)
+				return types.SUCCESS
 			}
+
 			if force != 0 {
 				var symbol_table *types.Array = ZendRebuildSymbolTable()
 				if symbol_table != nil {
