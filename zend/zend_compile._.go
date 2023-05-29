@@ -284,30 +284,30 @@ const ZEND_COMPILE_DEFAULT_FOR_EVAL = 0
 
 var CompilerGlobals ZendCompilerGlobals
 var ExecutorGlobals ZendExecutorGlobals
-var ReservedClassNames = []ReservedClassName{
-	MakeReservedClassName("bool"),
-	MakeReservedClassName("false"),
-	MakeReservedClassName("float"),
-	MakeReservedClassName("int"),
-	MakeReservedClassName("null"),
-	MakeReservedClassName("parent"),
-	MakeReservedClassName("self"),
-	MakeReservedClassName("static"),
-	MakeReservedClassName("string"),
-	MakeReservedClassName("true"),
-	MakeReservedClassName("void"),
-	MakeReservedClassName("iterable"),
-	MakeReservedClassName("object"),
+var reservedClassNames = map[string]bool{
+	"bool":     true,
+	"false":    true,
+	"float":    true,
+	"int":      true,
+	"null":     true,
+	"parent":   true,
+	"self":     true,
+	"static":   true,
+	"string":   true,
+	"true":     true,
+	"void":     true,
+	"iterable": true,
+	"object":   true,
 }
 
-var BuiltinTypes = []BuiltinTypeInfo{
-	MakeBuiltinTypeInfo("int", types.IS_LONG),
-	MakeBuiltinTypeInfo("float", types.IS_DOUBLE),
-	MakeBuiltinTypeInfo("string", types.IS_STRING),
-	MakeBuiltinTypeInfo("bool", types.IS_BOOL),
-	MakeBuiltinTypeInfo("void", types.IS_VOID),
-	MakeBuiltinTypeInfo("iterable", types.IS_ITERABLE),
-	MakeBuiltinTypeInfo("object", types.IS_OBJECT),
+var builtinTypes = map[string]types.ZvalType{
+	"int":      types.IS_LONG,
+	"float":    types.IS_DOUBLE,
+	"string":   types.IS_STRING,
+	"bool":     types.IS_BOOL,
+	"void":     types.IS_VOID,
+	"iterable": types.IS_ITERABLE,
+	"object":   types.IS_OBJECT,
 }
 
 /* Common part of zend_add_literal and zend_append_individual_literal */

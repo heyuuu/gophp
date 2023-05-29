@@ -313,6 +313,19 @@ type ZendOparrayContext struct {
 	labels           *types.Array
 }
 
+func NewOpArrayContext() *ZendOparrayContext {
+	return &ZendOparrayContext{
+		opcodes_size:     INITIAL_OP_ARRAY_SIZE,
+		literals_size:    0,
+		fast_call_var:    -1,
+		try_catch_offset: -1,
+		current_brk_cont: -1,
+		last_brk_cont:    0,
+		brk_cont_array:   nil,
+		labels:           nil,
+	}
+}
+
 func (this *ZendOparrayContext) GetOpcodesSize() uint32               { return this.opcodes_size }
 func (this *ZendOparrayContext) SetOpcodesSize(value uint32)          { this.opcodes_size = value }
 func (this *ZendOparrayContext) GetLiteralsSize() int                 { return this.literals_size }
@@ -400,14 +413,6 @@ type ZendAutoGlobal struct {
 	armed                types.ZendBool
 }
 
-// func MakeZendAutoGlobal(name *String, auto_global_callback ZendAutoGlobalCallback, jit ZendBool, armed ZendBool) ZendAutoGlobal {
-//     return ZendAutoGlobal{
-//         name:name,
-//         auto_global_callback:auto_global_callback,
-//         jit:jit,
-//         armed:armed,
-//     }
-// }
 func (this *ZendAutoGlobal) GetName() *types.String      { return this.name }
 func (this *ZendAutoGlobal) SetName(value *types.String) { this.name = value }
 func (this *ZendAutoGlobal) GetAutoGlobalCallback() ZendAutoGlobalCallback {
@@ -447,42 +452,6 @@ func (this *ZendLoopVar) GetVarNum() uint32              { return this.var_num }
 func (this *ZendLoopVar) SetVarNum(value uint32)         { this.var_num = value }
 func (this *ZendLoopVar) GetTryCatchOffset() uint32      { return this.try_catch_offset }
 func (this *ZendLoopVar) SetTryCatchOffset(value uint32) { this.try_catch_offset = value }
-
-/**
- * ReservedClassName
- */
-type ReservedClassName struct {
-	name string
-	len_ int
-}
-
-func MakeReservedClassName(name string) ReservedClassName {
-	return ReservedClassName{name: name}
-}
-func (this *ReservedClassName) Name() string { return this.name }
-
-func (this *ReservedClassName) GetName() *byte { return this.name }
-func (this *ReservedClassName) GetLen() int    { return len(this.name) }
-
-/**
- * BuiltinTypeInfo
- */
-type BuiltinTypeInfo struct {
-	name     *byte
-	name_len int
-	type_    uint8
-}
-
-func MakeBuiltinTypeInfo(name string, type_ uint8) BuiltinTypeInfo {
-	return BuiltinTypeInfo{
-		name:     name,
-		name_len: name_len,
-		type_:    type_,
-	}
-}
-func (this *BuiltinTypeInfo) GetName() *byte  { return this.name }
-func (this *BuiltinTypeInfo) GetNameLen() int { return this.name_len }
-func (this *BuiltinTypeInfo) GetType() uint8  { return this.type_ }
 
 /**
  * ClosureInfo

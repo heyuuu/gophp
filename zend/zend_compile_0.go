@@ -167,12 +167,9 @@ func ZendGetUnqualifiedNameEx(name string) (string, bool) {
 }
 func ZendIsReservedClassName(name string) bool {
 	name, _ = ZendGetUnqualifiedNameEx(name)
-	for _, reserved := range ReservedClassNames {
-		if ascii.StrCaseEquals(name, reserved.Name()) {
-			return true
-		}
-	}
-	return false
+	lcName := ascii.StrToLower(name)
+	_, reserved := reservedClassNames[lcName]
+	return reserved
 }
 func ZendAssertValidClassName(name string) {
 	if ZendIsReservedClassName(name) {
@@ -180,25 +177,16 @@ func ZendAssertValidClassName(name string) {
 	}
 }
 
-func ZendLookupBuiltinTypeByName(name *types.String) uint8 {
-	var info *BuiltinTypeInfo = &BuiltinTypes[0]
-	for ; info.GetName() != nil; info++ {
-		if name.GetLen() == info.GetNameLen() && operators.ZendBinaryStrcasecmp(name.GetStr(), b.CastStr(info.GetName(), info.GetNameLen())) == 0 {
-			return info.GetType()
-		}
+func ZendLookupBuiltinTypeByName(name string) uint8 {
+	lcName := ascii.StrToLower(name)
+	if typ, ok := builtinTypes[lcName]; ok {
+		return typ
 	}
 	return 0
 }
 func ZendOparrayContextBegin(prev_context *ZendOparrayContext) {
-	*prev_context = CG__().GetContext()
-	CG__().GetContext().SetOpcodesSize(INITIAL_OP_ARRAY_SIZE)
-	CG__().GetContext().SetLiteralsSize(0)
-	CG__().GetContext().SetFastCallVar(-1)
-	CG__().GetContext().SetTryCatchOffset(-1)
-	CG__().GetContext().SetCurrentBrkCont(-1)
-	CG__().GetContext().SetLastBrkCont(0)
-	CG__().GetContext().SetBrkContArray(nil)
-	CG__().GetContext().SetLabels(nil)
+	*prev_context = *CG__().GetContext()
+	*CG__().GetContext() = *NewOpArrayContext()
 }
 func ZendOparrayContextEnd(prev_context *ZendOparrayContext) {
 	if CG__().GetContext().GetBrkContArray() != nil {

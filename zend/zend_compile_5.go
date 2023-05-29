@@ -461,7 +461,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ty
 		return types.TypeHintCode(ast.GetAttr(), allow_null)
 	} else {
 		var class_name *types.String = ZendAstGetStr(ast)
-		var type_code uint8 = ZendLookupBuiltinTypeByName(class_name)
+		var type_code uint8 = ZendLookupBuiltinTypeByName(class_name.GetStr())
 		if type_code != 0 {
 			if (ast.GetAttr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", operators.ZendStringTolower(class_name).GetVal())
