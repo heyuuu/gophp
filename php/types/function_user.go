@@ -30,7 +30,7 @@ type ZendOpArray struct {
 	filename                  *String
 	line_start                uint32
 	line_end                  uint32
-	doc_comment               *String
+	docComment                string // 块注释，默认值空字符表示注释不存在
 	last_literal              int
 	literals                  *Zval
 	reserved                  []any
@@ -166,16 +166,16 @@ func (f *ZendOpArray) GetTryCatchArray() *zend.ZendTryCatchElement { return f.tr
 func (f *ZendOpArray) SetTryCatchArray(value *zend.ZendTryCatchElement) {
 	f.try_catch_array = value
 }
-func (f *ZendOpArray) GetFilename() *String        { return f.filename }
-func (f *ZendOpArray) SetFilename(value *String)   { f.filename = value }
-func (f *ZendOpArray) GetLineStart() uint32        { return f.line_start }
-func (f *ZendOpArray) SetLineStart(value uint32)   { f.line_start = value }
-func (f *ZendOpArray) GetLineEnd() uint32          { return f.line_end }
-func (f *ZendOpArray) SetLineEnd(value uint32)     { f.line_end = value }
-func (f *ZendOpArray) GetDocComment() *String      { return f.doc_comment }
-func (f *ZendOpArray) SetDocComment(value *String) { f.doc_comment = value }
-func (f *ZendOpArray) GetLastLiteral() int         { return f.last_literal }
-func (f *ZendOpArray) SetLastLiteral(value int)    { f.last_literal = value }
-func (f *ZendOpArray) GetLiterals() *Zval          { return f.literals }
-func (f *ZendOpArray) SetLiterals(value *Zval)     { f.literals = value }
-func (f *ZendOpArray) GetReserved() []any          { return f.reserved }
+func (f *ZendOpArray) GetFilename() *String       { return f.filename }
+func (f *ZendOpArray) SetFilename(value *String)  { f.filename = value }
+func (f *ZendOpArray) GetLineStart() uint32       { return f.line_start }
+func (f *ZendOpArray) SetLineStart(value uint32)  { f.line_start = value }
+func (f *ZendOpArray) GetLineEnd() uint32         { return f.line_end }
+func (f *ZendOpArray) SetLineEnd(value uint32)    { f.line_end = value }
+func (f *ZendOpArray) GetDocComment() string      { return f.docComment }
+func (f *ZendOpArray) SetDocComment(value string) { f.docComment = value }
+func (f *ZendOpArray) GetLastLiteral() int        { return f.last_literal }
+func (f *ZendOpArray) SetLastLiteral(value int)   { f.last_literal = value }
+func (f *ZendOpArray) GetLiterals() *Zval         { return f.literals }
+func (f *ZendOpArray) SetLiterals(value *Zval)    { f.literals = value }
+func (f *ZendOpArray) GetReserved() []any         { return f.reserved }

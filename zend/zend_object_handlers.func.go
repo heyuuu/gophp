@@ -1008,9 +1008,8 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 	if EG__().GetTrampoline().FunctionName() == "" {
 		func_ = EG__().GetTrampoline().GetOpArray()
 	} else {
-		func_ = Ecalloc(1, b.SizeOf("zend_op_array"))
+		func_ = types.NewOpArray()
 	}
-	func_.init()
 	func_.SetFnFlags(types.AccCallViaTrampoline | types.AccPublic)
 	if is_static != 0 {
 		func_.SetIsStatic(true)

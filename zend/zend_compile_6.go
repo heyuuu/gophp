@@ -395,7 +395,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	op_array.SetLineStart(decl.GetStartLineno())
 	op_array.SetLineEnd(decl.GetEndLineno())
 	if decl.GetDocComment() != nil {
-		op_array.SetDocComment(decl.GetDocComment().Copy())
+		op_array.SetDocComment(decl.GetDocComment().GetStr())
 	}
 	if decl.GetKind() == ZEND_AST_CLOSURE || decl.GetKind() == ZEND_AST_ARROW_FUNC {
 		op_array.SetIsClosure(true)
