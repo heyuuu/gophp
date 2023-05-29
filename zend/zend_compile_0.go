@@ -153,14 +153,9 @@ func GetNextBrkContElement() *ZendBrkContElement {
 	CG__().GetContext().SetBrkContArray(Erealloc(CG__().GetContext().GetBrkContArray(), b.SizeOf("zend_brk_cont_element")*CG__().GetContext().GetLastBrkCont()))
 	return CG__().GetContext().GetBrkContArray()[CG__().GetContext().GetLastBrkCont()-1]
 }
-func ZendDestroyPropertyInfoInternal(zv *types.Zval) {
-	var property_info *types.PropertyInfo = zv.Ptr()
-	// types.ZendStringRelease(property_info.GetName())
-	Free(property_info)
-}
 func ZendBuildRuntimeDefinitionKey(name *types.String, start_lineno uint32) *types.String {
-	var filename *types.String = CG__().GetActiveOpArray().GetFilename()
-	var result = ZendSprintf("%c%s%s:%"+"u"+"$%"+PRIx32, '0', name.GetVal(), filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
+	var filename = CG__().GetActiveOpArray().GetFilename()
+	var result = ZendSprintf("%c%s%s:%u$%d", '\000', name.GetStr(), filename, start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.NewString(result)
 }
 
@@ -283,6 +278,7 @@ func ZendSetCompiledFilename(new_compiled_filename string) {
 func ZendRestoreCompiledFilename(original_compiled_filename *types.String) {
 	CG__().SetCompiledFilename(original_compiled_filename)
 }
+func ZendGetCompiledFilenameEx() string      { return CG__().GetCompiledFilename().GetStr() }
 func ZendGetCompiledFilename() *types.String { return CG__().GetCompiledFilename() }
 func ZendGetCompiledLineno() int             { return CG__().GetZendLineno() }
 func ZendIsCompiling() types.ZendBool        { return CG__().GetInCompilation() }

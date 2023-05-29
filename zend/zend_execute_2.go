@@ -254,11 +254,21 @@ func ZendVerifyInternalArgTypes(fbc types.IFunction, call *ZendExecuteData) int 
 	return 1
 }
 func ZendMissingArgError(executeData *ZendExecuteData) {
-	var ptr *ZendExecuteData = executeData.GetPrevExecuteData()
+	scope := executeData.GetFunc().GetScope()
+	functionName := executeData.GetFunc().FunctionName()
+	calleeName := functionName
+	if scope != nil {
+		calleeName = scope.Name() + "::" + functionName
+	}
+
+	requiredNumArgs := executeData.GetFunc().GetRequiredNumArgs()
+	numArgs := executeData.GetFunc().GetNumArgs()
+
+	var ptr = executeData.GetPrevExecuteData()
 	if ptr != nil && ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetType()) {
-		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed in %s on line %d and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), ptr.GetFunc().GetOpArray().GetFilename().GetVal(), ptr.GetOpline().GetLineno(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
+		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s(), %d passed in %s on line %d and %s %d expected", calleeName, executeData.NumArgs(), ptr.GetFunc().GetOpArray().GetFilename(), ptr.GetOpline().GetLineno(), b.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs)
 	} else {
-		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
+		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s(), %d passed and %s %d expected", calleeName, executeData.NumArgs(), b.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs)
 	}
 }
 func ZendVerifyReturnError(zf types.IFunction, ce *types.ClassEntry, value *types.Zval) {

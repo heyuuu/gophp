@@ -179,8 +179,9 @@ func (f *ZendOpArray) GetTryCatchArray() *zend.ZendTryCatchElement { return f.tr
 func (f *ZendOpArray) SetTryCatchArray(value *zend.ZendTryCatchElement) {
 	f.try_catch_array = value
 }
-func (f *ZendOpArray) GetFilename() *String       { return f.filename }
-func (f *ZendOpArray) SetFilename(value *String)  { f.filename = value }
+
+func (f *ZendOpArray) GetFilename() string        { return f.filename.GetStr() }
+func (f *ZendOpArray) SetFilename(value string)   { f.filename = NewString(value) }
 func (f *ZendOpArray) GetLineStart() uint32       { return f.line_start }
 func (f *ZendOpArray) SetLineStart(value uint32)  { f.line_start = value }
 func (f *ZendOpArray) GetLineEnd() uint32         { return f.line_end }

@@ -316,13 +316,6 @@ func ZendResolvePropertyTypes() {
 }
 func ZendPostStartup() int {
 	ZendResolvePropertyTypes()
-	if ZendPostStartupCb != nil {
-		var cb func() int = ZendPostStartupCb
-		ZendPostStartupCb = nil
-		if cb() != types.SUCCESS {
-			return types.FAILURE
-		}
-	}
 	ZendMapPtrPostStartup()
 	return types.SUCCESS
 }

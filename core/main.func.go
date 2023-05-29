@@ -1469,11 +1469,6 @@ func PhpModuleShutdown() {
 	zend.ZendIniShutdown()
 	zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown(), 1)
 	PhpOutputShutdown()
-	if zend.ZendPostShutdownCb != nil {
-		var cb = zend.ZendPostShutdownCb
-		zend.ZendPostShutdownCb = nil
-		cb()
-	}
 	ModuleInitialized = 0
 	CoreGlobalsDtor(&CoreGlobals)
 	//zend.GcGlobalsDtor()

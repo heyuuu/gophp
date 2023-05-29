@@ -1222,10 +1222,10 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	var frameno = 0
 	var func_ types.IFunction
 	var functionName string
-	var filename *byte
+	var filename string = ""
 	var class_name string = ""
 	var call_type string = ""
-	var include_filename *byte = nil
+	var include_filename string = ""
 	var arg_array types.Zval
 	var indent = 0
 	if ZendParseParameters(executeData.NumArgs(), "|ll", &options, &limit) == types.FAILURE {
@@ -1252,7 +1252,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			skip = skip.GetPrevExecuteData()
 		}
 		if skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetType()) {
-			filename = skip.GetFunc().GetOpArray().GetFilename().GetVal()
+			filename = skip.GetFunc().GetOpArray().GetFilename()
 			if skip.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION {
 				if EG__().GetOplineBeforeException() != nil {
 					lineno = EG__().GetOplineBeforeException().GetLineno()
@@ -1263,7 +1263,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 				lineno = skip.GetOpline().GetLineno()
 			}
 		} else {
-			filename = nil
+			filename = ""
 			lineno = 0
 		}
 
@@ -1342,9 +1342,9 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 					build_filename_arg = 0
 				}
 			}
-			if build_filename_arg != 0 && include_filename != nil {
+			if build_filename_arg != 0 && include_filename != "" {
 				ArrayInit(&arg_array)
-				AddNextIndexString(&arg_array, (*byte)(include_filename))
+				arg_array.Array().Append(types.NewZvalString(include_filename))
 			}
 			call_type = nil
 		}
@@ -1358,7 +1358,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			DebugPrintBacktraceArgs(&arg_array)
 			// ZvalPtrDtor(&arg_array)
 		}
-		if filename != nil {
+		if filename != "" {
 			ZendPrintf(") called at [%s:%d]\n", filename, lineno)
 		} else {
 			var prev_call = skip
@@ -1369,7 +1369,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 					break
 				}
 				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetType()) {
-					ZendPrintf(") called at [%s:%d]\n", prev.GetFunc().GetOpArray().GetFilename().GetVal(), prev.GetOpline().GetLineno())
+					ZendPrintf(") called at [%s:%d]\n", prev.GetFunc().GetOpArray().GetFilename(), prev.GetOpline().GetLineno())
 					break
 				}
 				prev_call = prev
@@ -1394,8 +1394,8 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 	var frameno = 0
 	var func_ types.IFunction
 	var functionName string
-	var filename *types.String
-	var include_filename *types.String = nil
+	var filename string
+	var include_filename string = ""
 	var stack_frame types.Zval
 	var tmp types.Zval
 	ArrayInit(return_value)
@@ -1452,7 +1452,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 			} else {
 				lineno = skip.GetOpline().GetLineno()
 			}
-			tmp.SetStringVal(filename.GetStr())
+			tmp.SetStringVal(filename)
 			stack_frame.Array().KeyAddNew(types.STR_FILE, &tmp)
 			tmp.SetLong(lineno)
 			stack_frame.Array().KeyAddNew(types.STR_LINE, &tmp)
@@ -1464,7 +1464,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 					break
 				}
 				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetType()) {
-					tmp.SetStringVal(prev.GetFunc().GetOpArray().GetFilename().GetStr())
+					tmp.SetStringVal(prev.GetFunc().GetOpArray().GetFilename())
 					stack_frame.Array().KeyAddNew(types.STR_FILE, &tmp)
 					tmp.SetLong(prev.GetOpline().GetLineno())
 					stack_frame.Array().KeyAddNew(types.STR_LINE, &tmp)
@@ -1473,7 +1473,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 				prev_call = prev
 				prev = prev.GetPrevExecuteData()
 			}
-			filename = nil
+			filename = ""
 		}
 
 		/* $this may be passed into regular internal functions */

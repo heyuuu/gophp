@@ -249,7 +249,7 @@ func ZendGetExecutedFilename() string {
 		ex = ex.GetPrevExecuteData()
 	}
 	if ex != nil {
-		return ex.GetFunc().GetOpArray().GetFilename().GetStr()
+		return ex.GetFunc().GetOpArray().GetFilename()
 	} else {
 		return "[no active file]"
 	}
@@ -260,7 +260,8 @@ func ZendGetExecutedFilenameEx() *types.String {
 		ex = ex.GetPrevExecuteData()
 	}
 	if ex != nil {
-		return ex.GetFunc().GetOpArray().GetFilename()
+		filename := ex.GetFunc().GetOpArray().GetFilename()
+		return types.NewString(filename)
 	} else {
 		return nil
 	}

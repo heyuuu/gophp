@@ -107,10 +107,17 @@ func DoBindFunctionError(lcname *types.String, op_array *types.ZendOpArray, comp
 	}
 
 	b.Assert(oldFunction != nil)
-	if oldFunction.GetType() == ZEND_USER_FUNCTION && oldFunction.GetOpArray().GetLast() > 0 {
-		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.FunctionName() }, func() []byte { return oldFunction.FunctionName() }), oldFunction.GetOpArray().GetFilename().GetVal(), oldFunction.GetOpArray().GetOpcodes()[0].GetLineno())
+	var functionName string
+	if op_array != nil {
+		functionName = op_array.FunctionName()
 	} else {
-		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s()", b.CondF(op_array != nil, func() []byte { return op_array.FunctionName() }, func() []byte { return oldFunction.FunctionName() }))
+		functionName = oldFunction.FunctionName()
+	}
+
+	if oldFunction.GetType() == ZEND_USER_FUNCTION && oldFunction.GetOpArray().GetLast() > 0 {
+		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s() (previously declared in %s:%d)", functionName, oldFunction.GetOpArray().GetFilename(), oldFunction.GetOpArray().GetOpcodes()[0].GetLineno())
+	} else {
+		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s()", functionName)
 	}
 }
 func DoBindFunction(lcname *types.Zval) int {
@@ -146,17 +153,10 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
 			return types.FAILURE
 		} else {
 			b.Assert(CurrEX().GetFunc().GetOpArray().IsPreloaded())
-			if ZendPreloadAutoload != nil && ZendPreloadAutoload(CurrEX().GetFunc().GetOpArray().GetFilename()) == types.SUCCESS {
-				ce = EG__().ClassTable().Get(rtd_key.StringVal())
-				if ce != nil {
-					goto afterGetCe
-				}
-			}
 			faults.ErrorNoreturn(faults.E_ERROR, "Class %s wasn't preloaded", lcname.String().GetVal())
 			return types.FAILURE
 		}
 	}
-afterGetCe:
 
 	if EG__().ClassTable().Exists(lcname.StringVal()) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.Name())

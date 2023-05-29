@@ -15,20 +15,10 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 
 		ce = EG__().ClassTable().Get(rtd_key)
 		if ce == nil {
-			for {
-				b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccPreloaded) != 0)
-				if ZendPreloadAutoload != nil && ZendPreloadAutoload(executeData.GetFunc().GetOpArray().GetFilename()) == types.SUCCESS {
-					ce = EG__().ClassTable().Get(rtd_key)
-					if ce != nil {
-						goto afterGetCe
-					}
-				}
-				faults.ErrorNoreturn(faults.E_ERROR, "Anonymous class wasn't preloaded")
-				break
-			}
+			b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & types.AccPreloaded) != 0)
+			faults.ErrorNoreturn(faults.E_ERROR, "Anonymous class wasn't preloaded")
 		}
 
-	afterGetCe:
 		b.Assert(ce != nil)
 		if !ce.IsLinked() {
 			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return opline.Const2().String() }, nil)) == types.FAILURE {

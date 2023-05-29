@@ -10,7 +10,7 @@ import (
 
 func InitOpArrayEx() *types.ZendOpArray {
 	opArray := types.NewOpArray()
-	opArray.SetFilename(ZendGetCompiledFilename())
+	opArray.SetFilename(ZendGetCompiledFilenameEx())
 	ZEND_MAP_PTR_INIT(opArray.static_variables_ptr, opArray.GetStaticVariables())
 	ZEND_MAP_PTR_INIT(opArray.run_time_cache, nil)
 	return opArray
