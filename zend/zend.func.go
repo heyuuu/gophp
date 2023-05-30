@@ -233,7 +233,7 @@ func ZendSetDefaultCompileTimeValues() {
 }
 func ZendInitExceptionOp() {
 	exceptionOps := EG__().GetExceptionOp()
-	*exceptionOps = [3]ZendOp{}
+	*exceptionOps = [3]types.ZendOp{}
 	exceptionOps[0].SetOpcode(ZEND_HANDLE_EXCEPTION)
 	ZendVmSetOpcodeHandler(&exceptionOps[0])
 	exceptionOps[1].SetOpcode(ZEND_HANDLE_EXCEPTION)

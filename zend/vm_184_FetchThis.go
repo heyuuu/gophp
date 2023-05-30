@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_FETCH_THIS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	if executeData.GetThis().IsObject() {
 		var result *types.Zval = opline.Result()
 		result.SetObject(executeData.GetThis().Object())

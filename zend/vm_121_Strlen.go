@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	value = opline.Const1()
 	if value.IsString() {
@@ -38,7 +38,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var free_op1 ZendFreeOp
 	value = opline.Op1()
@@ -83,7 +83,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	value = opline.Op1()
 	if value.IsString() {

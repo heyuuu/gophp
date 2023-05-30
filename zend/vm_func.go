@@ -16,7 +16,7 @@ const (
 	opMode2 = opModeCvCheckUndef
 )
 
-func (ex *ZendExecuteData) getOp(opline *ZendOp, typ uint8, node ZnodeOp, mode opMode) *types.Zval {
+func (ex *ZendExecuteData) getOp(opline *types.ZendOp, typ uint8, node types.ZnodeOp, mode opMode) *types.Zval {
 	switch typ {
 	case IS_CONST:
 		return RT_CONSTANT(opline, node)
@@ -43,28 +43,28 @@ func (ex *ZendExecuteData) getOp(opline *ZendOp, typ uint8, node ZnodeOp, mode o
 	return nil
 }
 
-func (ex *ZendExecuteData) Op1(opline *ZendOp, mode opMode) *types.Zval {
+func (ex *ZendExecuteData) Op1(opline *types.ZendOp, mode opMode) *types.Zval {
 	return ex.getOp(opline, opline.op1Type, opline.op1, mode)
 }
-func (ex *ZendExecuteData) Op2(opline *ZendOp, mode opMode) *types.Zval {
+func (ex *ZendExecuteData) Op2(opline *types.ZendOp, mode opMode) *types.Zval {
 	return ex.getOp(opline, opline.op2Type, opline.op2, mode)
 }
 
-func (ex *ZendExecuteData) GetOp1(opline *ZendOp) *types.Zval { return ex.Op1(opline, opMode0) }
-func (ex *ZendExecuteData) GetOp2(opline *ZendOp) *types.Zval { return ex.Op2(opline, opMode0) }
+func (ex *ZendExecuteData) GetOp1(opline *types.ZendOp) *types.Zval { return ex.Op1(opline, opMode0) }
+func (ex *ZendExecuteData) GetOp2(opline *types.ZendOp) *types.Zval { return ex.Op2(opline, opMode0) }
 
-func (ex *ZendExecuteData) GetVarOp1(opline *ZendOp) *types.Zval {
+func (ex *ZendExecuteData) GetVarOp1(opline *types.ZendOp) *types.Zval {
 	return ex.getOp(opline, IS_TMP_VAR, opline.op1, opMode0)
 }
 
-func (ex *ZendExecuteData) GetVarOp2(opline *ZendOp) *types.Zval {
+func (ex *ZendExecuteData) GetVarOp2(opline *types.ZendOp) *types.Zval {
 	return ex.getOp(opline, IS_TMP_VAR, opline.op2, opMode0)
 }
 
-func (ex *ZendExecuteData) GetCvOp1(opline *ZendOp) *types.Zval {
+func (ex *ZendExecuteData) GetCvOp1(opline *types.ZendOp) *types.Zval {
 	return ex.getOp(opline, IS_CV, opline.op1, opMode0)
 }
 
-func (ex *ZendExecuteData) GetCvOp2(opline *ZendOp) *types.Zval {
+func (ex *ZendExecuteData) GetCvOp2(opline *types.ZendOp) *types.Zval {
 	return ex.getOp(opline, IS_CV, opline.op2, opMode0)
 }

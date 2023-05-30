@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_ISSET_ISEMPTY_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var result int
 	result = ZendFetchStaticPropertyAddress(&value, nil, opline.GetExtendedValue() & ^ZEND_ISEMPTY, BP_VAR_IS, 0, opline, executeData)

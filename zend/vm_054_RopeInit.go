@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_ROPE_INIT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var rope **types.String
 	var var_ *types.Zval
 
@@ -24,7 +24,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int 
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_ROPE_INIT_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp
 	var rope **types.String
 	var var_ *types.Zval
@@ -52,7 +52,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_ROPE_INIT_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var rope **types.String
 	var var_ *types.Zval
 

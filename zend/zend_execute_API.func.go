@@ -499,7 +499,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 	}
 	if func_.GetType() == ZEND_USER_FUNCTION {
 		var call_via_handler int = func_.IsCallViaTrampoline()
-		var current_opline_before_exception *ZendOp = EG__().GetOplineBeforeException()
+		var current_opline_before_exception *types.ZendOp = EG__().GetOplineBeforeException()
 		ZendInitFuncExecuteData(call, func_.GetOpArray(), fci.GetRetval())
 		ZendExecuteEx(call)
 		EG__().SetOplineBeforeException(current_opline_before_exception)

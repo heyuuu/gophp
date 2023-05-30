@@ -10,7 +10,7 @@ import (
  * ZendExecuteData
  */
 type ZendExecuteData struct {
-	opline          *ZendOp
+	opline          *types.ZendOp
 	call            *ZendExecuteData
 	returnValue     *types.Zval
 	func_           types.IFunction
@@ -159,8 +159,8 @@ func (ex *ZendExecuteData) CallInfo() uint32 {
 /**
  * Getter/Setter
  */
-func (ex *ZendExecuteData) GetOpline() *ZendOp                   { return ex.opline }
-func (ex *ZendExecuteData) SetOpline(value *ZendOp)              { ex.opline = value }
+func (ex *ZendExecuteData) GetOpline() *types.ZendOp             { return ex.opline }
+func (ex *ZendExecuteData) SetOpline(value *types.ZendOp)        { ex.opline = value }
 func (ex *ZendExecuteData) GetCall() *ZendExecuteData            { return ex.call }
 func (ex *ZendExecuteData) SetCall(value *ZendExecuteData)       { ex.call = value }
 func (ex *ZendExecuteData) GetReturnValue() *types.Zval          { return ex.returnValue }

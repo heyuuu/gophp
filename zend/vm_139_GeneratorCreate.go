@@ -8,7 +8,7 @@ import (
 func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var return_value *types.Zval = executeData.GetReturnValue()
 	if return_value != nil {
-		var opline *ZendOp = executeData.GetOpline()
+		var opline *types.ZendOp = executeData.GetOpline()
 		var generator *ZendGenerator
 		var gen_execute_data *ZendExecuteData
 		var num_args uint32

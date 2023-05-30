@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_INIT_DYNAMIC_CALL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var call *ZendExecuteData
 	function_name = opline.Const2()
@@ -26,7 +26,7 @@ try_function_name:
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INIT_DYNAMIC_CALL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp
 	var function_name *types.Zval
 	var call *ZendExecuteData
@@ -72,7 +72,7 @@ try_function_name:
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INIT_DYNAMIC_CALL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var call *ZendExecuteData
 	function_name = opline.Op2()

@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = opline.Const1()
 	if val.IsTrue() {
@@ -24,7 +24,7 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	var free_op1 ZendFreeOp
 	val = opline.Op1()
@@ -48,7 +48,7 @@ func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_BOOL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = opline.Op1()
 	if val.IsTrue() {

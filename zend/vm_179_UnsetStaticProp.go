@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var varname *types.Zval
 	var name *types.String
 	var tmp_name *types.String = nil

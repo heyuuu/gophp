@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_SEND_VAR_NO_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var varptr *types.Zval
 	var arg *types.Zval

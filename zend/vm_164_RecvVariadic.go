@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var arg_num uint32 = opline.GetOp1().GetNum()
 	var arg_count uint32 = uint32(executeData.NumArgs())
 	var params *types.Zval

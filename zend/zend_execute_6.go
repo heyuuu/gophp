@@ -89,7 +89,7 @@ func ZendFetchPropertyAddress(
 	type_ int,
 	flags uint32,
 	init_undef types.ZendBool,
-	opline *ZendOp,
+	opline *types.ZendOp,
 	executeData *ZendExecuteData,
 ) {
 	var ptr *types.Zval
@@ -181,7 +181,7 @@ func ZendAssignToPropertyReference(
 	prop_ptr *types.Zval,
 	prop_op_type uint32,
 	value_ptr *types.Zval,
-	opline *ZendOp,
+	opline *types.ZendOp,
 	executeData *ZendExecuteData,
 ) {
 	var variable types.Zval
@@ -219,16 +219,16 @@ func ZendAssignToPropertyReference(
 		types.ZVAL_COPY(opline.Result(), variable_ptr)
 	}
 }
-func ZendAssignToPropertyReferenceThisConst(container *types.Zval, prop_ptr *types.Zval, value_ptr *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendAssignToPropertyReferenceThisConst(container *types.Zval, prop_ptr *types.Zval, value_ptr *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	ZendAssignToPropertyReference(container, IS_UNUSED, prop_ptr, IS_CONST, value_ptr, opline, executeData)
 }
-func ZendAssignToPropertyReferenceVarConst(container *types.Zval, prop_ptr *types.Zval, value_ptr *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendAssignToPropertyReferenceVarConst(container *types.Zval, prop_ptr *types.Zval, value_ptr *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	ZendAssignToPropertyReference(container, IS_VAR, prop_ptr, IS_CONST, value_ptr, opline, executeData)
 }
-func ZendAssignToPropertyReferenceThisVar(container *types.Zval, prop_ptr *types.Zval, value_ptr *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendAssignToPropertyReferenceThisVar(container *types.Zval, prop_ptr *types.Zval, value_ptr *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	ZendAssignToPropertyReference(container, IS_UNUSED, prop_ptr, IS_VAR, value_ptr, opline, executeData)
 }
-func ZendAssignToPropertyReferenceVarVar(container *types.Zval, prop_ptr *types.Zval, value_ptr *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendAssignToPropertyReferenceVarVar(container *types.Zval, prop_ptr *types.Zval, value_ptr *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	ZendAssignToPropertyReference(container, IS_VAR, prop_ptr, IS_VAR, value_ptr, opline, executeData)
 }
 func ZendFetchStaticPropertyAddressEx(
@@ -236,7 +236,7 @@ func ZendFetchStaticPropertyAddressEx(
 	prop_info **types.PropertyInfo,
 	cache_slot uint32,
 	fetch_type int,
-	opline *ZendOp,
+	opline *types.ZendOp,
 	executeData *ZendExecuteData,
 ) int {
 	var free_op1 ZendFreeOp
@@ -312,7 +312,7 @@ func ZendFetchStaticPropertyAddress(
 	cache_slot uint32,
 	fetch_type int,
 	flags int,
-	opline *ZendOp,
+	opline *types.ZendOp,
 	executeData *ZendExecuteData,
 ) int {
 	var success int

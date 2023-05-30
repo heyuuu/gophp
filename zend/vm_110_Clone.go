@@ -6,7 +6,7 @@ import (
 )
 
 func cloneHandlerHelper(executeData *ZendExecuteData, obj *types.Zval) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 
 	ce := types.Z_OBJCE_P(obj)
 	clone := ce.GetClone()
@@ -30,13 +30,13 @@ func cloneHandlerHelper(executeData *ZendExecuteData, obj *types.Zval) int {
 }
 
 func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	opline.Result().SetUndef()
 	faults.ThrowError(nil, "__clone method called on non-object")
 	return 0
 }
 func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var obj *types.Zval
 	obj = opline.Op1()
 	for {
@@ -71,7 +71,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	return cloneHandlerHelper(executeData, obj)
 }
 func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var obj *types.Zval
 	obj = opline.Op1()
 	for {

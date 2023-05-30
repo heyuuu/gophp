@@ -1,7 +1,9 @@
 package zend
 
-func vmGetHandler(opcode OpCode, op *ZendOp) OpcodeHandlerT {
-	var handler OpcodeHandlerT
+import "github.com/heyuuu/gophp/php/types"
+
+func vmGetHandler(opcode OpCode, op *types.ZendOp) types.OpcodeHandlerT {
+	var handler types.OpcodeHandlerT
 	switch opcode {
 	case ZEND_NOP:
 		handler = vmNopHandler
@@ -404,7 +406,7 @@ func vmOpcodeIsCommutative(opcode OpCode) bool {
 	}
 	return false
 }
-func vmGetAddHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAddHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -413,7 +415,7 @@ func vmGetAddHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return vmAddHandler
 }
-func vmGetSubHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSubHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -422,7 +424,7 @@ func vmGetSubHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return vmSubHandler
 }
-func vmGetMulHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetMulHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -431,7 +433,7 @@ func vmGetMulHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return vmMulHandler
 }
-func vmGetDivHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetDivHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -440,7 +442,7 @@ func vmGetDivHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return vmDivHandler
 }
-func vmGetModHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetModHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -449,7 +451,7 @@ func vmGetModHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return vmModHandler
 }
-func vmGetSlHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSlHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -458,7 +460,7 @@ func vmGetSlHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return vmSlHandler
 }
-func vmGetSrHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSrHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -467,7 +469,7 @@ func vmGetSrHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getSrHandler
 }
-func vmGetConcatHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetConcatHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -479,7 +481,7 @@ func vmGetConcatHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getConcatHandler
 }
-func vmGetBwOrHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetBwOrHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -488,7 +490,7 @@ func vmGetBwOrHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getBwOrHandler
 }
-func vmGetBwAndHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetBwAndHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -497,7 +499,7 @@ func vmGetBwAndHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getBwAndHandler
 }
-func vmGetBwXorHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetBwXorHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -506,7 +508,7 @@ func vmGetBwXorHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getBwXorHandler
 }
-func vmGetPowHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetPowHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -515,7 +517,7 @@ func vmGetPowHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getPowHandler
 }
-func vmGetBwNotHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetBwNotHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1
 	opType1 := op.GetOp1Type()
 	if opType1 == IS_UNUSED {
@@ -523,7 +525,7 @@ func vmGetBwNotHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getBwNotHandler
 }
-func vmGetBoolNotHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetBoolNotHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1
 	opType1 := op.GetOp1Type()
 	if opType1 == IS_UNUSED {
@@ -531,7 +533,7 @@ func vmGetBoolNotHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getBoolNotHandler
 }
-func vmGetBoolXorHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetBoolXorHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -540,7 +542,7 @@ func vmGetBoolXorHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getBoolXorHandler
 }
-func vmGetIsIdenticalHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIsIdenticalHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -549,7 +551,7 @@ func vmGetIsIdenticalHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getIsIdenticalHandler
 }
-func vmGetIsNotIdenticalHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIsNotIdenticalHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -558,7 +560,7 @@ func vmGetIsNotIdenticalHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getIsNotIdenticalHandler
 }
-func vmGetIsEqualHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIsEqualHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH | SPEC_RULE_COMMUTATIVE
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -567,7 +569,7 @@ func vmGetIsEqualHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getIsEqualHandler
 }
-func vmGetIsNotEqualHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIsNotEqualHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH | SPEC_RULE_COMMUTATIVE
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -576,10 +578,10 @@ func vmGetIsNotEqualHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return getIsNotEqualHandler
 }
-func vmGetIsSmallerHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIsSmallerHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 536 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [75]OpcodeHandlerT{
+	handlers := [75]types.OpcodeHandlerT{
 		ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER,          // IS_CONST * IS_CONST | SmartBranch=0
 		ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER,          // IS_CONST * IS_CONST | SmartBranch=1
 		ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER,          // IS_CONST * IS_CONST | SmartBranch=2
@@ -658,10 +660,10 @@ func vmGetIsSmallerHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetIsSmallerOrEqualHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIsSmallerOrEqualHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 611 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [75]OpcodeHandlerT{
+	handlers := [75]types.OpcodeHandlerT{
 		ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER,          // IS_CONST * IS_CONST | SmartBranch=0
 		ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER,          // IS_CONST * IS_CONST | SmartBranch=1
 		ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER,          // IS_CONST * IS_CONST | SmartBranch=2
@@ -740,10 +742,10 @@ func vmGetIsSmallerOrEqualHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAssignHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAssignHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 686 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_RETVAL
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [50]OpcodeHandlerT{
+	handlers := [50]types.OpcodeHandlerT{
 		nil, // IS_CONST * IS_CONST | RetVal=0
 		nil, // IS_CONST * IS_CONST | RetVal=1
 		nil, // IS_CONST * IS_TMP_VAR | RetVal=0
@@ -797,10 +799,10 @@ func vmGetAssignHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAssignDimHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAssignDimHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 736 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_OP_DATA
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [125]OpcodeHandlerT{
+	handlers := [125]types.OpcodeHandlerT{
 		nil, // IS_CONST * IS_CONST | OpData=IS_CONST
 		nil, // IS_CONST * IS_CONST | OpData=IS_TMP_VAR
 		nil, // IS_CONST * IS_CONST | OpData=IS_VAR
@@ -929,7 +931,7 @@ func vmGetAssignDimHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAssignObjHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAssignObjHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_OP_DATA
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
@@ -942,7 +944,7 @@ func vmGetAssignObjHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	spec := 861 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_OP_DATA
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [125]OpcodeHandlerT{
+	handlers := [125]types.OpcodeHandlerT{
 		ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER,     // IS_VAR * IS_CONST | OpData=IS_CONST
 		ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER,       // IS_VAR * IS_CONST | OpData=IS_TMP_VAR
 		ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER,       // IS_VAR * IS_CONST | OpData=IS_VAR
@@ -993,10 +995,10 @@ func vmGetAssignObjHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAssignStaticPropHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAssignStaticPropHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 986 | SPEC_RULE_OP_DATA
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CONST_HANDLER, // --- * --- | OpData=IS_CONST
 		ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_TMP_HANDLER,   // --- * --- | OpData=IS_TMP_VAR
 		ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_VAR_HANDLER,   // --- * --- | OpData=IS_VAR
@@ -1005,10 +1007,10 @@ func vmGetAssignStaticPropHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAssignOpHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAssignOpHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 991 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                    // IS_CONST * IS_CONST
 		nil,                                    // IS_CONST * IS_TMP_VAR
 		nil,                                    // IS_CONST * IS_VAR
@@ -1037,10 +1039,10 @@ func vmGetAssignOpHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAssignDimOpHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAssignDimOpHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1016 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil, // IS_CONST * IS_CONST
 		nil, // IS_CONST * IS_TMP_VAR
 		nil, // IS_CONST * IS_VAR
@@ -1069,10 +1071,10 @@ func vmGetAssignDimOpHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAssignObjOpHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAssignObjOpHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1041 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil, // IS_CONST * IS_CONST
 		nil, // IS_CONST * IS_TMP_VAR
 		nil, // IS_CONST * IS_VAR
@@ -1101,10 +1103,10 @@ func vmGetAssignObjOpHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAssignRefHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAssignRefHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1067 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                  // IS_CONST * IS_CONST
 		nil,                                  // IS_CONST * IS_TMP_VAR
 		nil,                                  // IS_CONST * IS_VAR
@@ -1133,10 +1135,10 @@ func vmGetAssignRefHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetQmAssignHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetQmAssignHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1092 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_QM_ASSIGN_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_QM_ASSIGN_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_QM_ASSIGN_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -1145,10 +1147,10 @@ func vmGetQmAssignHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAssignObjRefHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAssignObjRefHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1097 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_OP_DATA
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [125]OpcodeHandlerT{
+	handlers := [125]types.OpcodeHandlerT{
 		nil, // IS_CONST * IS_CONST | OpData=IS_CONST
 		nil, // IS_CONST * IS_CONST | OpData=IS_TMP_VAR
 		nil, // IS_CONST * IS_CONST | OpData=IS_VAR
@@ -1277,10 +1279,10 @@ func vmGetAssignObjRefHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetPreIncHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetPreIncHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1223 | SPEC_RULE_OP1 | SPEC_RULE_RETVAL
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [10]OpcodeHandlerT{
+	handlers := [10]types.OpcodeHandlerT{
 		nil, // IS_CONST * --- | RetVal=0
 		nil, // IS_CONST * --- | RetVal=1
 		nil, // IS_TMP_VAR * --- | RetVal=0
@@ -1294,10 +1296,10 @@ func vmGetPreIncHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetPreDecHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetPreDecHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1233 | SPEC_RULE_OP1 | SPEC_RULE_RETVAL
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [10]OpcodeHandlerT{
+	handlers := [10]types.OpcodeHandlerT{
 		nil, // IS_CONST * --- | RetVal=0
 		nil, // IS_CONST * --- | RetVal=1
 		nil, // IS_TMP_VAR * --- | RetVal=0
@@ -1311,10 +1313,10 @@ func vmGetPreDecHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetPostIncHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetPostIncHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1243 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		nil,                            // IS_CONST * ---
 		nil,                            // IS_TMP_VAR * ---
 		ZEND_POST_INC_SPEC_VAR_HANDLER, // IS_VAR * ---
@@ -1323,10 +1325,10 @@ func vmGetPostIncHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetPostDecHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetPostDecHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1248 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		nil,                            // IS_CONST * ---
 		nil,                            // IS_TMP_VAR * ---
 		ZEND_POST_DEC_SPEC_VAR_HANDLER, // IS_VAR * ---
@@ -1335,10 +1337,10 @@ func vmGetPostDecHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetJmpzHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetJmpzHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1256 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_JMPZ_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_JMPZ_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_JMPZ_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -1347,10 +1349,10 @@ func vmGetJmpzHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetJmpnzHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetJmpnzHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1261 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_JMPNZ_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_JMPNZ_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_JMPNZ_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -1359,10 +1361,10 @@ func vmGetJmpnzHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetJmpznzHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetJmpznzHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1266 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_JMPZNZ_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -1371,10 +1373,10 @@ func vmGetJmpznzHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetJmpzExHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetJmpzExHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1271 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_JMPZ_EX_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_JMPZ_EX_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_JMPZ_EX_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -1383,10 +1385,10 @@ func vmGetJmpzExHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetJmpnzExHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetJmpnzExHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1276 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_JMPNZ_EX_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_JMPNZ_EX_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_JMPNZ_EX_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -1395,10 +1397,10 @@ func vmGetJmpnzExHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetCaseHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetCaseHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1281 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_CASE_SPEC_TMPVAR_CONST_HANDLER,  // --- * IS_CONST
 		ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER, // --- * IS_TMP_VAR
 		ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER, // --- * IS_VAR
@@ -1407,19 +1409,19 @@ func vmGetCaseHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSendVarNoRefExHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSendVarNoRefExHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1287 | SPEC_RULE_QUICK_ARG
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [2]OpcodeHandlerT{
+	handlers := [2]types.OpcodeHandlerT{
 		ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_HANDLER,       // --- * --- | QuickArg=0
 		ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_QUICK_HANDLER, // --- * --- | QuickArg=1
 	}
 	return handlers[offset]
 }
-func vmGetCastHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetCastHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1289 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_CAST_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_CAST_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_CAST_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -1428,10 +1430,10 @@ func vmGetCastHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetBoolHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetBoolHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1294 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_BOOL_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_BOOL_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_BOOL_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -1440,10 +1442,10 @@ func vmGetBoolHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFastConcatHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFastConcatHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1299 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -1472,10 +1474,10 @@ func vmGetFastConcatHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetRopeInitHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetRopeInitHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1324 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_ROPE_INIT_SPEC_UNUSED_CONST_HANDLER,  // --- * IS_CONST
 		ZEND_ROPE_INIT_SPEC_UNUSED_TMPVAR_HANDLER, // --- * IS_TMP_VAR
 		ZEND_ROPE_INIT_SPEC_UNUSED_TMPVAR_HANDLER, // --- * IS_VAR
@@ -1484,10 +1486,10 @@ func vmGetRopeInitHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetRopeAddHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetRopeAddHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1329 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_ROPE_ADD_SPEC_TMP_CONST_HANDLER,  // --- * IS_CONST
 		ZEND_ROPE_ADD_SPEC_TMP_TMPVAR_HANDLER, // --- * IS_TMP_VAR
 		ZEND_ROPE_ADD_SPEC_TMP_TMPVAR_HANDLER, // --- * IS_VAR
@@ -1496,10 +1498,10 @@ func vmGetRopeAddHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetRopeEndHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetRopeEndHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1334 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER,  // --- * IS_CONST
 		ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER, // --- * IS_TMP_VAR
 		ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER, // --- * IS_VAR
@@ -1508,19 +1510,19 @@ func vmGetRopeEndHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetDoFcallHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetDoFcallHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1342 | SPEC_RULE_RETVAL
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [2]OpcodeHandlerT{
+	handlers := [2]types.OpcodeHandlerT{
 		ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER, // --- * --- | RetVal=0
 		ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER,   // --- * --- | RetVal=1
 	}
 	return handlers[offset]
 }
-func vmGetReturnHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetReturnHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1345 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_RETURN_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_RETURN_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_RETURN_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -1529,10 +1531,10 @@ func vmGetReturnHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSendValHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSendValHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1352 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_SEND_VAL_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_SEND_VAL_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_SEND_VAL_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -1541,10 +1543,10 @@ func vmGetSendValHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSendVarExHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSendVarExHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1357 | SPEC_RULE_OP1 | SPEC_RULE_QUICK_ARG
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [10]OpcodeHandlerT{
+	handlers := [10]types.OpcodeHandlerT{
 		nil,                                     // IS_CONST * --- | QuickArg=0
 		nil,                                     // IS_CONST * --- | QuickArg=1
 		nil,                                     // IS_TMP_VAR * --- | QuickArg=0
@@ -1558,10 +1560,10 @@ func vmGetSendVarExHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSendRefHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSendRefHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1367 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		nil,                            // IS_CONST * ---
 		nil,                            // IS_TMP_VAR * ---
 		ZEND_SEND_REF_SPEC_VAR_HANDLER, // IS_VAR * ---
@@ -1570,10 +1572,10 @@ func vmGetSendRefHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetNewHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetNewHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1372 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_NEW_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		nil,                                 // IS_TMP_VAR * ---
 		ZEND_NEW_SPEC_VAR_UNUSED_HANDLER,    // IS_VAR * ---
@@ -1582,10 +1584,10 @@ func vmGetNewHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetInitArrayHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetInitArrayHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1379 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_INIT_ARRAY_SPEC_CONST_CONST_HANDLER,   // IS_CONST * IS_CONST
 		ZEND_INIT_ARRAY_SPEC_CONST_TMPVAR_HANDLER,  // IS_CONST * IS_TMP_VAR
 		ZEND_INIT_ARRAY_SPEC_CONST_TMPVAR_HANDLER,  // IS_CONST * IS_VAR
@@ -1614,10 +1616,10 @@ func vmGetInitArrayHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetAddArrayElementHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetAddArrayElementHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1404 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -1646,10 +1648,10 @@ func vmGetAddArrayElementHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetIncludeOrEvalHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIncludeOrEvalHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1429 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -1658,10 +1660,10 @@ func vmGetIncludeOrEvalHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetUnsetVarHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetUnsetVarHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1434 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_UNSET_VAR_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -1670,10 +1672,10 @@ func vmGetUnsetVarHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetUnsetDimHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetUnsetDimHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1439 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                    // IS_CONST * IS_CONST
 		nil,                                    // IS_CONST * IS_TMP_VAR
 		nil,                                    // IS_CONST * IS_VAR
@@ -1702,10 +1704,10 @@ func vmGetUnsetDimHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetUnsetObjHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetUnsetObjHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1464 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                      // IS_CONST * IS_CONST
 		nil,                                      // IS_CONST * IS_TMP_VAR
 		nil,                                      // IS_CONST * IS_VAR
@@ -1734,10 +1736,10 @@ func vmGetUnsetObjHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFeResetRHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFeResetRHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1489 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FE_RESET_R_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_FE_RESET_R_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_FE_RESET_R_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -1746,10 +1748,10 @@ func vmGetFeResetRHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchRHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchRHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1496 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FETCH_R_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_FETCH_R_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_FETCH_R_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -1758,10 +1760,10 @@ func vmGetFetchRHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchDimRHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchDimRHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1501 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_FETCH_DIM_R_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_FETCH_DIM_R_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_FETCH_DIM_R_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -1790,10 +1792,10 @@ func vmGetFetchDimRHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchObjRHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchObjRHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1526 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_FETCH_OBJ_R_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -1822,10 +1824,10 @@ func vmGetFetchObjRHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchWHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchWHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1551 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FETCH_W_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_FETCH_W_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_FETCH_W_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -1834,10 +1836,10 @@ func vmGetFetchWHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchDimWHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchDimWHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1556 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                      // IS_CONST * IS_CONST
 		nil,                                      // IS_CONST * IS_TMP_VAR
 		nil,                                      // IS_CONST * IS_VAR
@@ -1866,10 +1868,10 @@ func vmGetFetchDimWHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchObjWHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchObjWHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1581 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                      // IS_CONST * IS_CONST
 		nil,                                      // IS_CONST * IS_TMP_VAR
 		nil,                                      // IS_CONST * IS_VAR
@@ -1898,10 +1900,10 @@ func vmGetFetchObjWHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchRwHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchRwHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1606 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FETCH_RW_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_FETCH_RW_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_FETCH_RW_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -1910,10 +1912,10 @@ func vmGetFetchRwHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchDimRwHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchDimRwHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1611 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                      // IS_CONST * IS_CONST
 		nil,                                      // IS_CONST * IS_TMP_VAR
 		nil,                                      // IS_CONST * IS_VAR
@@ -1942,10 +1944,10 @@ func vmGetFetchDimRwHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchObjRwHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchObjRwHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1636 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                      // IS_CONST * IS_CONST
 		nil,                                      // IS_CONST * IS_TMP_VAR
 		nil,                                      // IS_CONST * IS_VAR
@@ -1974,10 +1976,10 @@ func vmGetFetchObjRwHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchIsHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchIsHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1661 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FETCH_IS_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_FETCH_IS_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_FETCH_IS_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -1986,10 +1988,10 @@ func vmGetFetchIsHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchDimIsHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchDimIsHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1666 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_FETCH_DIM_IS_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_FETCH_DIM_IS_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_FETCH_DIM_IS_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -2018,10 +2020,10 @@ func vmGetFetchDimIsHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchObjIsHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchObjIsHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1691 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_FETCH_OBJ_IS_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -2050,10 +2052,10 @@ func vmGetFetchObjIsHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchFuncArgHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchFuncArgHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1716 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FETCH_FUNC_ARG_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_FETCH_FUNC_ARG_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_FETCH_FUNC_ARG_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -2062,10 +2064,10 @@ func vmGetFetchFuncArgHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchDimFuncArgHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchDimFuncArgHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1721 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_FETCH_DIM_FUNC_ARG_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_FETCH_DIM_FUNC_ARG_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_FETCH_DIM_FUNC_ARG_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -2094,10 +2096,10 @@ func vmGetFetchDimFuncArgHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchObjFuncArgHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchObjFuncArgHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1746 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_FETCH_OBJ_FUNC_ARG_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_FETCH_OBJ_FUNC_ARG_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_FETCH_OBJ_FUNC_ARG_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -2126,10 +2128,10 @@ func vmGetFetchObjFuncArgHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchUnsetHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchUnsetHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1771 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FETCH_UNSET_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_FETCH_UNSET_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_FETCH_UNSET_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -2138,10 +2140,10 @@ func vmGetFetchUnsetHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchDimUnsetHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchDimUnsetHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1776 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil, // IS_CONST * IS_CONST
 		nil, // IS_CONST * IS_TMP_VAR
 		nil, // IS_CONST * IS_VAR
@@ -2170,10 +2172,10 @@ func vmGetFetchDimUnsetHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchObjUnsetHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchObjUnsetHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1801 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil, // IS_CONST * IS_CONST
 		nil, // IS_CONST * IS_TMP_VAR
 		nil, // IS_CONST * IS_VAR
@@ -2202,10 +2204,10 @@ func vmGetFetchObjUnsetHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchListRHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchListRHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1826 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_FETCH_LIST_R_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_FETCH_LIST_R_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_FETCH_LIST_R_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -2234,19 +2236,19 @@ func vmGetFetchListRHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetCheckFuncArgHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetCheckFuncArgHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1852 | SPEC_RULE_QUICK_ARG
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [2]OpcodeHandlerT{
+	handlers := [2]types.OpcodeHandlerT{
 		ZEND_CHECK_FUNC_ARG_SPEC_UNUSED_HANDLER,       // --- * --- | QuickArg=0
 		ZEND_CHECK_FUNC_ARG_SPEC_UNUSED_QUICK_HANDLER, // --- * --- | QuickArg=1
 	}
 	return handlers[offset]
 }
-func vmGetThrowHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetThrowHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1861 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_THROW_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_THROW_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_THROW_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -2255,10 +2257,10 @@ func vmGetThrowHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFetchClassHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchClassHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1866 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FETCH_CLASS_SPEC_UNUSED_CONST_HANDLER,  // --- * IS_CONST
 		ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER, // --- * IS_TMP_VAR
 		ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER, // --- * IS_VAR
@@ -2267,10 +2269,10 @@ func vmGetFetchClassHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetCloneHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetCloneHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1871 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_CLONE_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_CLONE_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_CLONE_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -2279,10 +2281,10 @@ func vmGetCloneHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetReturnByRefHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetReturnByRefHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1876 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -2291,10 +2293,10 @@ func vmGetReturnByRefHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetInitMethodCallHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetInitMethodCallHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1881 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -2323,10 +2325,10 @@ func vmGetInitMethodCallHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetInitStaticMethodCallHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetInitStaticMethodCallHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1906 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -2355,10 +2357,10 @@ func vmGetInitStaticMethodCallHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetIssetIsemptyVarHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIssetIsemptyVarHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1931 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -2367,10 +2369,10 @@ func vmGetIssetIsemptyVarHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetIssetIsemptyDimObjHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIssetIsemptyDimObjHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1936 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -2399,10 +2401,10 @@ func vmGetIssetIsemptyDimObjHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSendValExHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSendValExHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1961 | SPEC_RULE_OP1 | SPEC_RULE_QUICK_ARG
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [10]OpcodeHandlerT{
+	handlers := [10]types.OpcodeHandlerT{
 		ZEND_SEND_VAL_EX_SPEC_CONST_HANDLER,       // IS_CONST * --- | QuickArg=0
 		ZEND_SEND_VAL_EX_SPEC_CONST_QUICK_HANDLER, // IS_CONST * --- | QuickArg=1
 		ZEND_SEND_VAL_EX_SPEC_TMP_HANDLER,         // IS_TMP_VAR * --- | QuickArg=0
@@ -2416,10 +2418,10 @@ func vmGetSendValExHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSendVarHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSendVarHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1971 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		nil,                            // IS_CONST * ---
 		nil,                            // IS_TMP_VAR * ---
 		ZEND_SEND_VAR_SPEC_VAR_HANDLER, // IS_VAR * ---
@@ -2428,10 +2430,10 @@ func vmGetSendVarHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetInitUserCallHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetInitUserCallHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1976 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER,  // --- * IS_CONST
 		ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER, // --- * IS_TMP_VAR
 		ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER, // --- * IS_VAR
@@ -2440,10 +2442,10 @@ func vmGetInitUserCallHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSendUserHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSendUserHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1982 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_SEND_USER_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_SEND_USER_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_SEND_USER_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -2452,10 +2454,10 @@ func vmGetSendUserHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetStrlenHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetStrlenHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1987 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_STRLEN_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_STRLEN_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_STRLEN_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -2464,10 +2466,10 @@ func vmGetStrlenHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetTypeCheckHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetTypeCheckHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1993 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_TYPE_CHECK_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_TYPE_CHECK_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_TYPE_CHECK_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -2476,10 +2478,10 @@ func vmGetTypeCheckHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetVerifyReturnTypeHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetVerifyReturnTypeHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1998 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_VERIFY_RETURN_TYPE_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_VERIFY_RETURN_TYPE_SPEC_TMP_UNUSED_HANDLER,    // IS_TMP_VAR * ---
 		ZEND_VERIFY_RETURN_TYPE_SPEC_VAR_UNUSED_HANDLER,    // IS_VAR * ---
@@ -2488,10 +2490,10 @@ func vmGetVerifyReturnTypeHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFeResetRwHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFeResetRwHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2003 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FE_RESET_RW_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_FE_RESET_RW_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_FE_RESET_RW_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -2500,10 +2502,10 @@ func vmGetFeResetRwHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetInitDynamicCallHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetInitDynamicCallHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2010 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_INIT_DYNAMIC_CALL_SPEC_CONST_HANDLER,  // --- * IS_CONST
 		ZEND_INIT_DYNAMIC_CALL_SPEC_TMPVAR_HANDLER, // --- * IS_TMP_VAR
 		ZEND_INIT_DYNAMIC_CALL_SPEC_TMPVAR_HANDLER, // --- * IS_VAR
@@ -2512,37 +2514,37 @@ func vmGetInitDynamicCallHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetDoIcallHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetDoIcallHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2015 | SPEC_RULE_RETVAL
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [2]OpcodeHandlerT{
+	handlers := [2]types.OpcodeHandlerT{
 		ZEND_DO_ICALL_SPEC_RETVAL_UNUSED_HANDLER, // --- * --- | RetVal=0
 		ZEND_DO_ICALL_SPEC_RETVAL_USED_HANDLER,   // --- * --- | RetVal=1
 	}
 	return handlers[offset]
 }
-func vmGetDoUcallHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetDoUcallHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2017 | SPEC_RULE_RETVAL
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [2]OpcodeHandlerT{
+	handlers := [2]types.OpcodeHandlerT{
 		ZEND_DO_UCALL_SPEC_RETVAL_UNUSED_HANDLER, // --- * --- | RetVal=0
 		ZEND_DO_UCALL_SPEC_RETVAL_USED_HANDLER,   // --- * --- | RetVal=1
 	}
 	return handlers[offset]
 }
-func vmGetDoFcallByNameHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetDoFcallByNameHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2019 | SPEC_RULE_RETVAL
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [2]OpcodeHandlerT{
+	handlers := [2]types.OpcodeHandlerT{
 		ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER, // --- * --- | RetVal=0
 		ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER,   // --- * --- | RetVal=1
 	}
 	return handlers[offset]
 }
-func vmGetPreIncObjHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetPreIncObjHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2021 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                      // IS_CONST * IS_CONST
 		nil,                                      // IS_CONST * IS_TMP_VAR
 		nil,                                      // IS_CONST * IS_VAR
@@ -2571,10 +2573,10 @@ func vmGetPreIncObjHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetPreDecObjHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetPreDecObjHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2021 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                      // IS_CONST * IS_CONST
 		nil,                                      // IS_CONST * IS_TMP_VAR
 		nil,                                      // IS_CONST * IS_VAR
@@ -2603,10 +2605,10 @@ func vmGetPreDecObjHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetPostIncObjHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetPostIncObjHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2046 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                      // IS_CONST * IS_CONST
 		nil,                                      // IS_CONST * IS_TMP_VAR
 		nil,                                      // IS_CONST * IS_VAR
@@ -2635,10 +2637,10 @@ func vmGetPostIncObjHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetPostDecObjHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetPostDecObjHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2046 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil,                                      // IS_CONST * IS_CONST
 		nil,                                      // IS_CONST * IS_TMP_VAR
 		nil,                                      // IS_CONST * IS_VAR
@@ -2667,10 +2669,10 @@ func vmGetPostDecObjHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetEchoHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetEchoHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2071 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_ECHO_SPEC_CONST_HANDLER,  // IS_CONST * ---
 		ZEND_ECHO_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
 		ZEND_ECHO_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
@@ -2679,10 +2681,10 @@ func vmGetEchoHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetInstanceofHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetInstanceofHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2077 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		nil, // IS_CONST * IS_CONST
 		nil, // IS_CONST * IS_TMP_VAR
 		nil, // IS_CONST * IS_VAR
@@ -2711,10 +2713,10 @@ func vmGetInstanceofHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetMakeRefHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetMakeRefHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2103 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		nil,                                   // IS_CONST * ---
 		nil,                                   // IS_TMP_VAR * ---
 		ZEND_MAKE_REF_SPEC_VAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -2723,10 +2725,10 @@ func vmGetMakeRefHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetIssetIsemptyPropObjHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIssetIsemptyPropObjHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2115 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
@@ -2755,10 +2757,10 @@ func vmGetIssetIsemptyPropObjHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetJmpSetHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetJmpSetHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2143 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_JMP_SET_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_JMP_SET_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_JMP_SET_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -2767,19 +2769,19 @@ func vmGetJmpSetHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetIssetIsemptyCvHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetIssetIsemptyCvHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2149 | SPEC_RULE_ISSET
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [2]OpcodeHandlerT{
+	handlers := [2]types.OpcodeHandlerT{
 		ZEND_ISSET_ISEMPTY_CV_SPEC_CV_UNUSED_SET_HANDLER,   // --- * --- | Isset=0
 		ZEND_ISSET_ISEMPTY_CV_SPEC_CV_UNUSED_EMPTY_HANDLER, // --- * --- | Isset=1
 	}
 	return handlers[offset]
 }
-func vmGetFetchListWHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchListWHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2151 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FETCH_LIST_W_SPEC_VAR_CONST_HANDLER,  // --- * IS_CONST
 		ZEND_FETCH_LIST_W_SPEC_VAR_TMPVAR_HANDLER, // --- * IS_TMP_VAR
 		ZEND_FETCH_LIST_W_SPEC_VAR_TMPVAR_HANDLER, // --- * IS_VAR
@@ -2788,10 +2790,10 @@ func vmGetFetchListWHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetYieldHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetYieldHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2160 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_YIELD_SPEC_CONST_CONST_HANDLER,   // IS_CONST * IS_CONST
 		ZEND_YIELD_SPEC_CONST_TMP_HANDLER,     // IS_CONST * IS_TMP_VAR
 		ZEND_YIELD_SPEC_CONST_VAR_HANDLER,     // IS_CONST * IS_VAR
@@ -2820,10 +2822,10 @@ func vmGetYieldHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetGeneratorReturnHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetGeneratorReturnHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2185 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_GENERATOR_RETURN_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_GENERATOR_RETURN_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_GENERATOR_RETURN_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -2832,10 +2834,10 @@ func vmGetGeneratorReturnHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetYieldFromHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetYieldFromHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2194 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_YIELD_FROM_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_YIELD_FROM_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_YIELD_FROM_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -2844,10 +2846,10 @@ func vmGetYieldFromHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetCoalesceHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetCoalesceHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2201 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_COALESCE_SPEC_CONST_HANDLER, // IS_CONST * ---
 		ZEND_COALESCE_SPEC_TMP_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_COALESCE_SPEC_VAR_HANDLER,   // IS_VAR * ---
@@ -2856,10 +2858,10 @@ func vmGetCoalesceHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSpaceshipHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSpaceshipHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2206 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_SPACESHIP_SPEC_CONST_CONST_HANDLER,   // IS_CONST * IS_CONST
 		ZEND_SPACESHIP_SPEC_CONST_TMPVAR_HANDLER,  // IS_CONST * IS_TMP_VAR
 		ZEND_SPACESHIP_SPEC_CONST_TMPVAR_HANDLER,  // IS_CONST * IS_VAR
@@ -2888,7 +2890,7 @@ func vmGetSpaceshipHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetFuncGetArgsHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFuncGetArgsHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1
 	switch op.op1Type {
 	case IS_CONST, IS_UNUSED:
@@ -2897,10 +2899,10 @@ func vmGetFuncGetArgsHandler(op *ZendOp) OpcodeHandlerT {
 		return nil
 	}
 }
-func vmGetFetchClassConstantHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetFetchClassConstantHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2245 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER, // IS_CONST * ---
 		nil, // IS_TMP_VAR * ---
 		ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER,    // IS_VAR * ---
@@ -2909,10 +2911,10 @@ func vmGetFetchClassConstantHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSwitchLongHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSwitchLongHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2255 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_SWITCH_LONG_SPEC_CONST_CONST_HANDLER,    // IS_CONST * ---
 		ZEND_SWITCH_LONG_SPEC_TMPVARCV_CONST_HANDLER, // IS_TMP_VAR * ---
 		ZEND_SWITCH_LONG_SPEC_TMPVARCV_CONST_HANDLER, // IS_VAR * ---
@@ -2921,10 +2923,10 @@ func vmGetSwitchLongHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetSwitchStringHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetSwitchStringHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2260 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER,    // IS_CONST * ---
 		ZEND_SWITCH_STRING_SPEC_TMPVARCV_CONST_HANDLER, // IS_TMP_VAR * ---
 		ZEND_SWITCH_STRING_SPEC_TMPVARCV_CONST_HANDLER, // IS_VAR * ---
@@ -2933,10 +2935,10 @@ func vmGetSwitchStringHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetInArrayHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetInArrayHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2265 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER, // IS_CONST * ---
 		ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER,   // IS_VAR * ---
@@ -2945,10 +2947,10 @@ func vmGetInArrayHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetCountHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetCountHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2270 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -2957,10 +2959,10 @@ func vmGetCountHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetGetClassHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetGetClassHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2275 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_GET_CLASS_SPEC_CONST_UNUSED_HANDLER,  // IS_CONST * ---
 		ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER, // IS_TMP_VAR * ---
 		ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER, // IS_VAR * ---
@@ -2969,10 +2971,10 @@ func vmGetGetClassHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetGetTypeHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetGetTypeHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2281 | SPEC_RULE_OP1
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
+	handlers := [5]types.OpcodeHandlerT{
 		ZEND_GET_TYPE_SPEC_CONST_UNUSED_HANDLER, // IS_CONST * ---
 		ZEND_GET_TYPE_SPEC_TMP_UNUSED_HANDLER,   // IS_TMP_VAR * ---
 		ZEND_GET_TYPE_SPEC_VAR_UNUSED_HANDLER,   // IS_VAR * ---
@@ -2981,10 +2983,10 @@ func vmGetGetTypeHandler(op *ZendOp) OpcodeHandlerT {
 	}
 	return handlers[offset]
 }
-func vmGetArrayKeyExistsHandler(op *ZendOp) OpcodeHandlerT {
+func vmGetArrayKeyExistsHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2286 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
+	handlers := [25]types.OpcodeHandlerT{
 		ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
 		ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
 		ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR

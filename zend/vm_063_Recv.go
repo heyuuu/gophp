@@ -3,7 +3,7 @@ package zend
 import "github.com/heyuuu/gophp/php/types"
 
 func ZEND_RECV_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var arg_num uint32 = opline.GetOp1().GetNum()
 	if arg_num > executeData.NumArgs() {
 		ZendMissingArgError(executeData)

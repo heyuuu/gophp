@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_SEND_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var varptr *types.Zval
 	var arg *types.Zval
@@ -28,7 +28,7 @@ func ZEND_SEND_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_SEND_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var varptr *types.Zval
 	var arg *types.Zval
 	varptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)

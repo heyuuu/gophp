@@ -6,7 +6,7 @@ import (
 )
 
 func caseHandlerHelper(op1 *types.Zval, op2 *types.Zval, executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.Long() == op2.Long() {
@@ -63,7 +63,7 @@ caseFalse:
 }
 
 func ZEND_CASE_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	op1 = opline.Op1()
@@ -73,7 +73,7 @@ func ZEND_CASE_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 }
 
 func ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	op1 = opline.Op1()
@@ -82,7 +82,7 @@ func ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	return caseHandlerHelper(op1, op2, executeData)
 }
 func ZEND_CASE_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	op1 = opline.Op1()

@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	if opline.GetOp1Type() != IS_UNUSED {
 		var free_op1 ZendFreeOp
 		var ptr *types.Zval = GetZvalPtr(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)

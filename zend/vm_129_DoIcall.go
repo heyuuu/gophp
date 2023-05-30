@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_DO_ICALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
 	var fbc types.IFunction = call.GetFunc()
 	var ret *types.Zval
@@ -30,7 +30,7 @@ func ZEND_DO_ICALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	return 0
 }
 func ZEND_DO_ICALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
 	var fbc types.IFunction = call.GetFunc()
 	var ret *types.Zval

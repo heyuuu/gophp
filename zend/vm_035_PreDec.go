@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_PRE_DEC_SPEC_VAR_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var var_ptr *types.Zval
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
@@ -18,7 +18,7 @@ func ZEND_PRE_DEC_SPEC_VAR_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) i
 	return zend_pre_dec_helper_SPEC_VAR(executeData)
 }
 func ZEND_PRE_DEC_SPEC_VAR_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var var_ptr *types.Zval
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
@@ -30,7 +30,7 @@ func ZEND_PRE_DEC_SPEC_VAR_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int
 	return zend_pre_dec_helper_SPEC_VAR(executeData)
 }
 func ZEND_PRE_DEC_SPEC_CV_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var var_ptr *types.Zval
 	var_ptr = opline.Op1()
 	if var_ptr.IsLong() {
@@ -41,7 +41,7 @@ func ZEND_PRE_DEC_SPEC_CV_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) in
 	return zend_pre_dec_helper_SPEC_CV(executeData)
 }
 func ZEND_PRE_DEC_SPEC_CV_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var var_ptr *types.Zval
 	var_ptr = opline.Op1()
 	if var_ptr.IsLong() {

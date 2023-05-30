@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_UNSET_CV_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var var_ *types.Zval = opline.Op1()
 	if var_.IsRefcounted() {
 		var_.SetUndef()

@@ -1,13 +1,12 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var new_op_array *types.ZendOpArray
 	var inc_filename *types.Zval
 	inc_filename = opline.Const1()
@@ -58,7 +57,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var new_op_array *types.ZendOpArray
 	var free_op1 ZendFreeOp
 	var inc_filename *types.Zval
@@ -111,7 +110,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INCLUDE_OR_EVAL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var new_op_array *types.ZendOpArray
 	var inc_filename *types.Zval
 	inc_filename = opline.Cv1OrUndef()

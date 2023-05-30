@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var array *types.Zval
 	var value *types.Zval
 	var value_type uint32

@@ -7,7 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, cache_slot *any, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, cache_slot *any, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var rv types.Zval
 	var z *types.Zval
 	var obj types.Zval
@@ -46,7 +46,7 @@ func ZendAssignOpOverloadedProperty(
 	property *types.Zval,
 	cache_slot *any,
 	value *types.Zval,
-	opline *ZendOp,
+	opline *types.ZendOp,
 	executeData *ZendExecuteData,
 ) {
 	var z *types.Zval
@@ -171,7 +171,7 @@ func ZendUseResourceAsOffset(dim *types.Zval) {
 func ZendUseNewElementForString() {
 	faults.ThrowError(nil, "[] operator not supported for strings")
 }
-func ZendBinaryAssignOpDimSlow(container *types.Zval, dim *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendBinaryAssignOpDimSlow(container *types.Zval, dim *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	if container.IsString() {
 		if opline.GetOp2Type() == IS_UNUSED {
 			ZendUseNewElementForString()

@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_POST_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var property *types.Zval
@@ -58,7 +58,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
 	var object *types.Zval
@@ -111,7 +111,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var property *types.Zval
@@ -162,7 +162,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var object *types.Zval
 	var property *types.Zval
 	var zptr *types.Zval
@@ -200,7 +200,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp
 	var object *types.Zval
 	var property *types.Zval
@@ -239,7 +239,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var object *types.Zval
 	var property *types.Zval
 	var zptr *types.Zval
@@ -276,7 +276,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var object *types.Zval
 	var property *types.Zval
 	var zptr *types.Zval
@@ -324,7 +324,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp
 	var object *types.Zval
 	var property *types.Zval
@@ -373,7 +373,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var object *types.Zval
 	var property *types.Zval
 	var zptr *types.Zval

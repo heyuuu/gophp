@@ -16,8 +16,8 @@ func InitOpArrayEx() *types.ZendOpArray {
 	return opArray
 }
 func ZendUpdateExtendedStmts(op_array *types.ZendOpArray) {
-	var opline *ZendOp = op_array.GetOpcodes()
-	var end *ZendOp = opline + op_array.GetLast()
+	var opline *types.ZendOp = op_array.GetOpcodes()
+	var end *types.ZendOp = opline + op_array.GetLast()
 	for opline < end {
 		if opline.GetOpcode() == ZEND_EXT_STMT {
 			if opline+1 < end {
@@ -52,7 +52,7 @@ func ZendCheckFinallyBreakout(op_array *types.ZendOpArray, op_num uint32, dst_nu
 		}
 	}
 }
-func ZendGetBrkContTarget(op_array *types.ZendOpArray, opline *ZendOp) uint32 {
+func ZendGetBrkContTarget(op_array *types.ZendOpArray, opline *types.ZendOp) uint32 {
 	var nest_levels int = opline.GetOp2().GetNum()
 	var array_offset int = opline.GetOp1().GetNum()
 	var jmp_to *ZendBrkContElement
@@ -83,9 +83,9 @@ func EmitLiveRangeRaw(op_array *types.ZendOpArray, var_num uint32, kind uint32, 
 	range_.SetEnd(end)
 }
 func EmitLiveRange(op_array *types.ZendOpArray, var_num uint32, start uint32, end uint32, needs_live_range ZendNeedsLiveRangeCb) {
-	var def_opline *ZendOp = op_array.GetOpcodes()[start]
-	var orig_def_opline *ZendOp = def_opline
-	var use_opline *ZendOp = op_array.GetOpcodes()[end]
+	var def_opline *types.ZendOp = op_array.GetOpcodes()[start]
+	var orig_def_opline *types.ZendOp = def_opline
+	var use_opline *types.ZendOp = op_array.GetOpcodes()[end]
 	var kind uint32
 	switch def_opline.GetOpcode() {
 	case ZEND_ADD_ARRAY_ELEMENT:
@@ -189,7 +189,7 @@ func EmitLiveRange(op_array *types.ZendOpArray, var_num uint32, start uint32, en
 		 * FREE opcode. */
 
 		var rt_var_num uint32 = uint32(intPtr(nil.VarNum(op_array.GetLastVar() + var_num)))
-		var block_start_op *ZendOp = use_opline
+		var block_start_op *types.ZendOp = use_opline
 		if needs_live_range != nil && needs_live_range(op_array, orig_def_opline) == 0 {
 			return
 		}
@@ -214,11 +214,11 @@ func EmitLiveRange(op_array *types.ZendOpArray, var_num uint32, start uint32, en
 	}
 	EmitLiveRangeRaw(op_array, var_num, kind, start, end)
 }
-func IsFakeDef(opline *ZendOp) bool {
+func IsFakeDef(opline *types.ZendOp) bool {
 	/* These opcodes only modify the result, not create it. */
 	return opline.GetOpcode() == ZEND_ROPE_ADD || opline.GetOpcode() == ZEND_ADD_ARRAY_ELEMENT || opline.GetOpcode() == ZEND_ADD_ARRAY_UNPACK
 }
-func KeepsOp1Alive(opline *ZendOp) types.ZendBool {
+func KeepsOp1Alive(opline *types.ZendOp) types.ZendBool {
 	/* These opcodes don't consume their OP1 operand,
 	 * it is later freed by something else. */
 	if opline.GetOpcode() == ZEND_CASE || opline.GetOpcode() == ZEND_SWITCH_LONG || opline.GetOpcode() == ZEND_FETCH_LIST_R || opline.GetOpcode() == ZEND_COPY_TMP {
@@ -232,7 +232,7 @@ func SwapLiveRange(a *ZendLiveRange, b *ZendLiveRange) {
 }
 func ZendCalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
 	var opnum uint32 = op_array.GetLast()
-	var opline *ZendOp = op_array.GetOpcodes()[opnum]
+	var opline *types.ZendOp = op_array.GetOpcodes()[opnum]
 	var var_offset uint32 = op_array.GetLastVar()
 	var last_use *uint32 = DoAlloca(b.SizeOf("uint32_t")*op_array.GetT(), use_heap)
 	memset(last_use, -1, b.SizeOf("uint32_t")*op_array.GetT())
@@ -337,15 +337,15 @@ func ZendCalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsL
 	FreeAlloca(last_use, use_heap)
 }
 func PassTwo(op_array *types.ZendOpArray) int {
-	var opline *ZendOp
-	var end *ZendOp
+	var opline *types.ZendOp
+	var end *types.ZendOp
 	if !(ZEND_USER_CODE(op_array.GetType())) {
 		return 0
 	}
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_STMT) != 0 {
 		ZendUpdateExtendedStmts(op_array)
 	}
-	op_array.SetOpcodes((*ZendOp)(Erealloc(op_array.GetOpcodes(), ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)+b.SizeOf("zval")*op_array.GetLastLiteral())))
+	op_array.SetOpcodes((*types.ZendOp)(Erealloc(op_array.GetOpcodes(), ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)+b.SizeOf("zval")*op_array.GetLastLiteral())))
 	if op_array.GetLiterals() != nil {
 		memcpy((*byte)(op_array.GetOpcodes())+ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16), op_array.GetLiterals(), b.SizeOf("zval")*op_array.GetLastLiteral())
 		Efree(op_array.GetLiterals())
@@ -417,7 +417,7 @@ func PassTwo(op_array *types.ZendOpArray) int {
 
 			/* If result of assert is unused, result of check is unused as well */
 
-			var call *ZendOp = op_array.GetOpcodes()[opline.GetOp2().GetOplineNum()-1]
+			var call *types.ZendOp = op_array.GetOpcodes()[opline.GetOp2().GetOplineNum()-1]
 			if call.GetOpcode() == ZEND_EXT_FCALL_END {
 				call--
 			}

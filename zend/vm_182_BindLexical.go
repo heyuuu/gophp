@@ -3,7 +3,7 @@ package zend
 import "github.com/heyuuu/gophp/php/types"
 
 func ZEND_BIND_LEXICAL_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var closure *types.Zval
 	var var_ *types.Zval

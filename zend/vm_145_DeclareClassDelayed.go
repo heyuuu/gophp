@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var lcname *types.Zval
 	var ce *types.ClassEntry
 	ce = CACHED_PTR(opline.GetExtendedValue())

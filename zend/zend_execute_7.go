@@ -101,7 +101,7 @@ func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *t
 		source_list.SetList(types.ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(Erealloc(list, b.SizeOf("zend_property_info_list")+(list.GetNumAllocated()-1)*b.SizeOf("zend_property_info *"))))
 	}
 }
-func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendFetchThisVar(type_ int, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var result *types.Zval = opline.Result()
 	switch type_ {
 	case BP_VAR_R:

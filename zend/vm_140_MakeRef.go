@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_MAKE_REF_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = opline.Op1()
 	{
 		if op1.IsUndef() {
@@ -26,7 +26,7 @@ func ZEND_MAKE_REF_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_MAKE_REF_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = opline.Op1()
 	{
 		if op1.IsUndef() {

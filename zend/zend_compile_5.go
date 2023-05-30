@@ -128,7 +128,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 	var has_default_case types.ZendBool = 0
 	var expr_node Znode
 	var case_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var jmpnz_opnums *uint32
 	var opnum_default_jmp uint32
 	var opnum_switch uint32 = uint32 - 1
@@ -233,7 +233,7 @@ func ZendCompileTry(ast *ZendAst) {
 	var finally_ast *ZendAst = ast.GetChild()[2]
 	var i uint32
 	var j uint32
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var try_catch_offset uint32
 	var jmp_opnums *uint32 = SafeEmalloc(b.SizeOf("uint32_t"), catches.GetChildren(), 0)
 	var orig_fast_call_var uint32 = CG__().GetContext().GetFastCallVar()
@@ -518,7 +518,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		var var_node Znode
 		var default_node Znode
 		var opcode uint8
-		var opline *ZendOp
+		var opline *types.ZendOp
 		var arg_info *ZendArgInfo
 		if ZendIsAutoGlobal(name) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign auto-global variable %s", name.GetVal())

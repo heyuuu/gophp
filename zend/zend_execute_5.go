@@ -8,15 +8,15 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func zend_fetch_dimension_address_W(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+func zend_fetch_dimension_address_W(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_W, executeData)
 }
-func zend_fetch_dimension_address_RW(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+func zend_fetch_dimension_address_RW(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_RW, executeData)
 }
-func zend_fetch_dimension_address_UNSET(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+func zend_fetch_dimension_address_UNSET(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_UNSET, executeData)
 }
@@ -130,19 +130,19 @@ func ZendFetchDimensionAddressRead(
 		result.SetNull()
 	}
 }
-func zend_fetch_dimension_address_read_R(container *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+func zend_fetch_dimension_address_read_R(container *types.Zval, dim *types.Zval, dim_type int, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 0, 0, executeData)
 }
-func zend_fetch_dimension_address_read_R_slow(container *types.Zval, dim *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func zend_fetch_dimension_address_read_R_slow(container *types.Zval, dim *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, IS_CV, BP_VAR_R, 0, 1, executeData)
 }
-func zend_fetch_dimension_address_read_IS(container *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+func zend_fetch_dimension_address_read_IS(container *types.Zval, dim *types.Zval, dim_type int, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_IS, 0, 0, executeData)
 }
-func zend_fetch_dimension_address_LIST_r(container *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
+func zend_fetch_dimension_address_LIST_r(container *types.Zval, dim *types.Zval, dim_type int, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 1, 0, executeData)
 }
@@ -249,7 +249,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 		return 1
 	}
 }
-func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
+func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) uint32 {
 	var str *types.String
 	var hval ZendUlong
 try_again:
@@ -286,7 +286,7 @@ try_again:
 		return types.IS_FALSE
 	}
 }
-func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
+func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) uint32 {
 	if subject.IsObject() {
 		faults.Error(faults.E_DEPRECATED, "array_key_exists(): "+"Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
 		var ht *types.Array = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)

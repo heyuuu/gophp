@@ -4,7 +4,7 @@ import "github.com/heyuuu/gophp/php/types"
 
 func ZEND_FE_FREE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var var_ *types.Zval
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var_ = opline.Op1()
 	if var_.GetType() != types.IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
 		EG__().DelArrayIterator(var_.GetFeIterIdx())

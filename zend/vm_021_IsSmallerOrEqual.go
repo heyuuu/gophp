@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64
@@ -15,7 +15,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteD
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64
@@ -58,7 +58,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecu
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64
@@ -103,7 +103,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(executeData *Zend
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64
@@ -148,7 +148,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(executeData *Zen
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64
@@ -191,7 +191,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecu
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64
@@ -236,7 +236,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(executeData *Zend
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64
@@ -281,7 +281,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(executeData *Zen
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64
@@ -324,7 +324,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_TMPVARCV_HANDLER(executeData *ZendEx
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64
@@ -369,7 +369,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(executeData *Z
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var d1 float64

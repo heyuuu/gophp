@@ -7,7 +7,7 @@ import (
 
 func ZEND_FETCH_CLASS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var class_name *types.Zval
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 
 	{
 		var ce *types.ClassEntry = CACHED_PTR(opline.GetExtendedValue())
@@ -24,7 +24,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op2 ZendFreeOp
 	var class_name *types.Zval
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 
 	{
 		class_name = opline.Op2()
@@ -51,7 +51,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 }
 func ZEND_FETCH_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var class_name *types.Zval
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	{
 		opline.Result().SetCe(ZendFetchClass(nil, opline.GetOp1().GetNum()))
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -61,7 +61,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) i
 }
 func ZEND_FETCH_CLASS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	var class_name *types.Zval
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 
 	{
 		class_name = opline.Op2()

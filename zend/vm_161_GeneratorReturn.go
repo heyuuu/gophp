@@ -3,7 +3,7 @@ package zend
 import "github.com/heyuuu/gophp/php/types"
 
 func ZEND_GENERATOR_RETURN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var retval *types.Zval
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	retval = opline.Const1()
@@ -30,7 +30,7 @@ func ZEND_GENERATOR_RETURN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int 
 	/* Pass execution back to handling code */
 }
 func ZEND_GENERATOR_RETURN_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var retval *types.Zval
 	var free_op1 ZendFreeOp
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
@@ -53,7 +53,7 @@ func ZEND_GENERATOR_RETURN_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	/* Pass execution back to handling code */
 }
 func ZEND_GENERATOR_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var retval *types.Zval
 	var free_op1 ZendFreeOp
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
@@ -76,7 +76,7 @@ func ZEND_GENERATOR_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	/* Pass execution back to handling code */
 }
 func ZEND_GENERATOR_RETURN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var retval *types.Zval
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	retval = opline.Cv1OrUndef()

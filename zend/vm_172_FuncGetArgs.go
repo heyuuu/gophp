@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var ht *types.Array
 	var arg_count uint32
 	var result_size uint32

@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	opline.Result().SetLong(EG__().GetErrorReporting())
 	if EG__().GetErrorReporting() != 0 {
 		for {

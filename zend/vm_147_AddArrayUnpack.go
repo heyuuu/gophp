@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_ADD_ARRAY_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
 	op1 = GetZvalPtr(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)

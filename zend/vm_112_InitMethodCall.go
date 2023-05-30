@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
@@ -68,7 +68,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
@@ -156,7 +156,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
@@ -237,7 +237,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
@@ -337,7 +337,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
@@ -459,7 +459,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
@@ -571,7 +571,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
@@ -633,7 +633,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
@@ -714,7 +714,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
@@ -789,7 +789,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
@@ -886,7 +886,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
@@ -1003,7 +1003,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval

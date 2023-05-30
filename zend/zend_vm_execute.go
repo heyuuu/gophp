@@ -1,9 +1,11 @@
 package zend
 
-func ZendVmGetOpcodeHandler(opcode OpCode, op *ZendOp) OpcodeHandlerT {
+import "github.com/heyuuu/gophp/php/types"
+
+func ZendVmGetOpcodeHandler(opcode OpCode, op *types.ZendOp) types.OpcodeHandlerT {
 	return vmGetHandler(opcode, op)
 }
-func ZendVmSetOpcodeHandler(op *ZendOp) {
+func ZendVmSetOpcodeHandler(op *types.ZendOp) {
 	var opcode = op.GetOpcode()
 	if vmOpcodeIsCommutative(opcode) {
 		if op.GetOp1Type() < op.GetOp2Type() {
@@ -12,8 +14,8 @@ func ZendVmSetOpcodeHandler(op *ZendOp) {
 	}
 	op.SetHandler(ZendVmGetOpcodeHandler(opcode, op))
 }
-func vmOffsetBySpec(spec int, op *ZendOp) int {
-	var nextOp *ZendOp = op + 1
+func vmOffsetBySpec(spec int, op *types.ZendOp) int {
+	var nextOp *types.ZendOp = op + 1
 
 	var zendVmDecodeEx = map[uint8]int{
 		IS_UNUSED:  _UNUSED_CODE, // 0    : 3

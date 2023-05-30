@@ -13,7 +13,7 @@ func ZendCompileAssignRef(result *Znode, ast *ZendAst) {
 	var source_ast *ZendAst = ast.GetChild()[1]
 	var target_node Znode
 	var source_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var offset uint32
 	var flags uint32
 	if IsThisFetch(target_ast) {
@@ -80,7 +80,7 @@ func ZendCompileCompoundAssign(result *Znode, ast *ZendAst) {
 	var opcode uint32 = ast.GetAttr()
 	var var_node Znode
 	var expr_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var offset uint32
 	var cache_slot uint32
 	ZendEnsureWritableVariable(var_ast)
@@ -137,7 +137,7 @@ func ZendCompileArgs(ast *ZendAst, fbc types.IFunction) uint32 {
 		var arg *ZendAst = args.GetChild()[i]
 		var arg_num uint32 = i + 1
 		var arg_node Znode
-		var opline *ZendOp
+		var opline *types.ZendOp
 		var opcode uint8
 		if arg.GetKind() == ZEND_AST_UNPACK {
 			uses_arg_unpack = 1
@@ -260,7 +260,7 @@ func ZendCompileArgs(ast *ZendAst, fbc types.IFunction) uint32 {
 	}
 	return arg_count
 }
-func ZendGetCallOp(init_op *ZendOp, fbc types.IFunction) uint8 {
+func ZendGetCallOp(init_op *types.ZendOp, fbc types.IFunction) uint8 {
 	if fbc != nil {
 		if fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) == 0 {
 			if init_op.GetOpcode() == ZEND_INIT_FCALL && ZendExecuteInternal == nil {
@@ -281,7 +281,7 @@ func ZendGetCallOp(init_op *ZendOp, fbc types.IFunction) uint8 {
 	return ZEND_DO_FCALL
 }
 func ZendCompileCallCommon(result *Znode, args_ast *ZendAst, fbc types.IFunction) {
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var opnum_init uint32 = GetNextOpNumber() - 1
 	var arg_count uint32
 	arg_count = ZendCompileArgs(args_ast, fbc)
@@ -302,7 +302,7 @@ func ZendCompileFunctionName(name_node *Znode, name_ast *ZendAst) types.ZendBool
 	return is_fully_qualified == 0 && FC__().GetCurrentNamespace() != nil
 }
 func ZendCompileNsCall(result *Znode, name_node *Znode, args_ast *ZendAst) {
-	var opline *ZendOp = GetNextOp()
+	var opline *types.ZendOp = GetNextOp()
 	opline.SetOpcode(ZEND_INIT_NS_FCALL_BY_NAME)
 	opline.SetOp2Type(IS_CONST)
 	opline.GetOp2().SetConstant(ZendAddNsFuncNameLiteral(name_node.GetConstant().String()))
@@ -316,7 +316,7 @@ func ZendCompileDynamicCall(result *Znode, name_node *Znode, args_ast *ZendAst) 
 		if b.Assign(&colon, operators.ZendMemrchr(str.GetVal(), ':', str.GetLen())) != nil && colon > str.GetVal() && (*(colon - 1)) == ':' {
 			var class *types.String = types.NewString(b.CastStr(str.GetVal(), colon-str.GetVal()-1))
 			var method *types.String = types.NewString(b.CastStr(colon+1, str.GetLen()-(colon-str.GetVal())-1))
-			var opline *ZendOp = GetNextOp()
+			var opline *types.ZendOp = GetNextOp()
 			opline.SetOpcode(ZEND_INIT_STATIC_METHOD_CALL)
 			opline.SetOp1Type(IS_CONST)
 			opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class))
@@ -328,7 +328,7 @@ func ZendCompileDynamicCall(result *Znode, name_node *Znode, args_ast *ZendAst) 
 			opline.GetResult().SetNum(ZendAllocCacheSlots(2))
 			// ZvalPtrDtor(name_node.GetConstant())
 		} else {
-			var opline *ZendOp = GetNextOp()
+			var opline *types.ZendOp = GetNextOp()
 			opline.SetOpcode(ZEND_INIT_FCALL_BY_NAME)
 			opline.SetOp2Type(IS_CONST)
 			opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(str))
@@ -364,7 +364,7 @@ func ZendCompileFuncStrlen(result *Znode, args *ZendAstList) int {
 }
 func ZendCompileFuncTypecheck(result *Znode, args *ZendAstList, type_ uint32) int {
 	var arg_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if args.GetChildren() != 1 {
 		return types.FAILURE
 	}
@@ -379,7 +379,7 @@ func ZendCompileFuncTypecheck(result *Znode, args *ZendAstList, type_ uint32) in
 }
 func ZendCompileFuncCast(result *Znode, args *ZendAstList, type_ uint32) int {
 	var arg_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if args.GetChildren() != 1 {
 		return types.FAILURE
 	}
@@ -390,7 +390,7 @@ func ZendCompileFuncCast(result *Znode, args *ZendAstList, type_ uint32) int {
 }
 func ZendCompileFuncDefined(result *Znode, args *ZendAstList) int {
 	var name *types.String
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if args.GetChildren() != 1 || args.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 		return types.FAILURE
 	}
@@ -445,7 +445,7 @@ func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 	var name *types.String
 	var lcname *types.String
 	var fbc types.IFunction
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if name_ast.GetKind() != ZEND_AST_ZVAL || ZendAstGetZval(name_ast).GetType() != types.IS_STRING {
 		return types.FAILURE
 	}
@@ -464,7 +464,7 @@ func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 	return types.SUCCESS
 }
 func ZendCompileInitUserFunc(name_ast *ZendAst, num_args uint32, orig_func_name *types.String) {
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var name_node Znode
 	if ZendTryCompileCtBoundInitUserFunc(name_ast, num_args) == types.SUCCESS {
 		return
@@ -489,7 +489,7 @@ func ZendCompileFuncCufa(result *Znode, args *ZendAstList, lcname *types.String)
 		if ascii.StrCaseEquals(name.GetStr(), "array_slice") && list.GetChildren() == 3 && list.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
 			var zv *types.Zval = ZendAstGetZval(list.GetChild()[1])
 			if zv.IsLong() && zv.Long() >= 0 && zv.Long() <= 0x7fffffff {
-				var opline *ZendOp
+				var opline *types.ZendOp
 				var len_node Znode
 				ZendCompileExpr(&arg_node, list.GetChild()[0])
 				ZendCompileExpr(&len_node, list.GetChild()[2])
@@ -516,7 +516,7 @@ func ZendCompileFuncCuf(result *Znode, args *ZendAstList, lcname *types.String) 
 	for i = 1; i < args.GetChildren(); i++ {
 		var arg_ast *ZendAst = args.GetChild()[i]
 		var arg_node Znode
-		var opline *ZendOp
+		var opline *types.ZendOp
 		ZendCompileExpr(&arg_node, arg_ast)
 		opline = ZendEmitOp(nil, ZEND_SEND_USER, &arg_node, nil)
 		opline.GetOp2().SetNum(i)
@@ -528,7 +528,7 @@ func ZendCompileFuncCuf(result *Znode, args *ZendAstList, lcname *types.String) 
 func ZendCompileAssert(result *Znode, args *ZendAstList, name *types.String, fbc types.IFunction) {
 	if EG__().GetAssertions() >= 0 {
 		var name_node Znode
-		var opline *ZendOp
+		var opline *types.ZendOp
 		var check_op_number uint32 = GetNextOpNumber()
 		ZendEmitOp(nil, ZEND_ASSERT_CHECK, nil, nil)
 		if fbc != nil && FbcIsFinalized(fbc) != 0 {
@@ -571,7 +571,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 	var strict types.ZendBool = 0
 	var array Znode
 	var needly Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if args.GetChildren() == 3 {
 		if args.GetChild()[2].GetKind() == ZEND_AST_ZVAL {
 			strict = operators.IZendIsTrue(ZendAstGetZval(args.GetChild()[2]))
@@ -644,7 +644,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 }
 func ZendCompileFuncCount(result *Znode, args *ZendAstList, lcname *types.String) int {
 	var arg_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if args.GetChildren() != 1 {
 		return types.FAILURE
 	}

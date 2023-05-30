@@ -21,7 +21,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses
 		var var_name_ast *ZendAst = list.GetChild()[i]
 		var var_name *types.String = ZendAstGetZval(var_name_ast).String()
 		var mode uint32 = var_name_ast.GetAttr()
-		var opline *ZendOp
+		var opline *types.ZendOp
 		var value *types.Zval
 		if var_name.GetStr() == "this" {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as lexical variable")
@@ -110,7 +110,7 @@ func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst
 	}
 }
 func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *types.ZendOpArray) {
-	var opline *ZendOp
+	var opline *types.ZendOp
 
 	/* TODO We might want to use a special binding mode if varvars_used is set. */
 	if info.GetUses().Len() == 0 {
@@ -312,7 +312,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	var name *types.String
 	var lcname *types.String
 	var key *types.String
-	var opline *ZendOp
+	var opline *types.ZendOp
 	unqualified_name = decl.GetName()
 	name = ZendPrefixWithNs(unqualified_name)
 	op_array.SetFunctionName(name.GetStr())
@@ -423,7 +423,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	}
 	ZendOparrayContextBegin(&orig_oparray_context)
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_STMT) != 0 {
-		var opline_ext *ZendOp = ZendEmitOp(nil, ZEND_EXT_NOP, nil, nil)
+		var opline_ext *types.ZendOp = ZendEmitOp(nil, ZEND_EXT_NOP, nil, nil)
 		opline_ext.SetLineno(decl.GetStartLineno())
 	}
 
@@ -677,14 +677,14 @@ func ZendGenerateAnonClassName(start_lineno uint32) *types.String {
 	var result = ZendSprintf("class@anonymous%c%s:%u$%d", '\000', filename, start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.NewString(result)
 }
-func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
+func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *types.ZendOp {
 	var decl *ZendAstDecl = (*ZendAstDecl)(ast)
 	var extends_ast *ZendAst = decl.GetChild()[0]
 	var implements_ast *ZendAst = decl.GetChild()[1]
 	var stmt_ast *ZendAst = decl.GetChild()[2]
 	var name *types.String
 	var lcname *types.String
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var original_ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	if !decl.IsAnonClass() {
 		var unqualified_name *types.String = decl.GetName()

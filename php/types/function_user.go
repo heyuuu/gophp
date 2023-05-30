@@ -16,7 +16,7 @@ type ZendOpArray struct {
 	cache_size                int
 	T                         uint32
 	last                      uint32
-	opcodes                   []zend.ZendOp
+	opcodes                   []ZendOp
 	run_time_cache__ptr       *[]any
 	static_variables_ptr__ptr **Array
 	static_variables          *Array
@@ -43,7 +43,7 @@ func NewOpArray() *ZendOpArray {
 		functionHeader: functionHeader{
 			typ: zend.ZEND_USER_FUNCTION,
 		},
-		opcodes:  make([]zend.ZendOp, initialOpArraySize),
+		opcodes:  make([]ZendOp, initialOpArraySize),
 		refcount: &refcount,
 		// memset(op_array.GetReserved(), 0, types.ZEND_MAX_RESERVED_RESOURCES*b.SizeOf("void *"))
 		reserved: make([]any, ZEND_MAX_RESERVED_RESOURCES),
@@ -157,15 +157,17 @@ func (f *ZendOpArray) FindVar(name string) int {
 	return -1
 }
 
+// opcode
+func (f *ZendOpArray) GetOpcodes() []ZendOp      { return f.opcodes }
+func (f *ZendOpArray) SetOpcodes(value []ZendOp) { f.opcodes = value }
+
 // fields
-func (f *ZendOpArray) GetCacheSize() int              { return f.cache_size }
-func (f *ZendOpArray) SetCacheSize(value int)         { f.cache_size = value }
-func (f *ZendOpArray) GetT() uint32                   { return f.T }
-func (f *ZendOpArray) SetT(value uint32)              { f.T = value }
-func (f *ZendOpArray) GetLast() uint32                { return f.last }
-func (f *ZendOpArray) SetLast(value uint32)           { f.last = value }
-func (f *ZendOpArray) GetOpcodes() []zend.ZendOp      { return f.opcodes }
-func (f *ZendOpArray) SetOpcodes(value []zend.ZendOp) { f.opcodes = value }
+func (f *ZendOpArray) GetCacheSize() int      { return f.cache_size }
+func (f *ZendOpArray) SetCacheSize(value int) { f.cache_size = value }
+func (f *ZendOpArray) GetT() uint32           { return f.T }
+func (f *ZendOpArray) SetT(value uint32)      { f.T = value }
+func (f *ZendOpArray) GetLast() uint32        { return f.last }
+func (f *ZendOpArray) SetLast(value uint32)   { f.last = value }
 
 func (f *ZendOpArray) GetStaticVariables() *Array                  { return f.static_variables }
 func (f *ZendOpArray) SetStaticVariables(value *Array)             { f.static_variables = value }

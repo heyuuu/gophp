@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var ht *types.Array
 	var value *types.Zval
 	var variable_ptr *types.Zval

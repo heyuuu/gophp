@@ -5,44 +5,22 @@ import (
 )
 
 /**
- * ZnodeOp
- */
-type ZnodeOp struct /* union */ {
-	constant  uint32
-	var_      uint32
-	num       uint32
-	oplineNum uint32
-	jmpOffset uint32
-}
-
-func (this *ZnodeOp) GetConstant() uint32       { return this.constant }
-func (this *ZnodeOp) SetConstant(value uint32)  { this.constant = value }
-func (this *ZnodeOp) GetVar() uint32            { return this.var_ }
-func (this *ZnodeOp) SetVar(value uint32)       { this.var_ = value }
-func (this *ZnodeOp) GetNum() uint32            { return this.num }
-func (this *ZnodeOp) SetNum(value uint32)       { this.num = value }
-func (this *ZnodeOp) GetOplineNum() uint32      { return this.oplineNum }
-func (this *ZnodeOp) SetOplineNum(value uint32) { this.oplineNum = value }
-func (this *ZnodeOp) GetJmpOffset() uint32      { return this.jmpOffset }
-func (this *ZnodeOp) SetJmpOffset(value uint32) { this.jmpOffset = value }
-
-/**
  * Znode
  */
 type Znode struct {
 	op_type uint8
 	flag    uint8
 	u       struct /* union */ {
-		op       ZnodeOp
+		op       types.ZnodeOp
 		constant types.Zval
 	}
 }
 
-func (this *Znode) GetOpType() uint8         { return this.op_type }
-func (this *Znode) SetOpType(value uint8)    { this.op_type = value }
-func (this *Znode) GetOp() ZnodeOp           { return this.u.op }
-func (this *Znode) SetOp(value ZnodeOp)      { this.u.op = value }
-func (this *Znode) GetConstant() *types.Zval { return &this.u.constant }
+func (this *Znode) GetOpType() uint8          { return this.op_type }
+func (this *Znode) SetOpType(value uint8)     { this.op_type = value }
+func (this *Znode) GetOp() types.ZnodeOp      { return this.u.op }
+func (this *Znode) SetOp(value types.ZnodeOp) { this.u.op = value }
+func (this *Znode) GetConstant() *types.Zval  { return &this.u.constant }
 
 /**
  * ZendAstZnode
@@ -137,97 +115,6 @@ type ZendParserStackElem struct /* union */ {
 func (this *ZendParserStackElem) GetAst() *ZendAst      { return this.ast }
 func (this *ZendParserStackElem) SetAst(value *ZendAst) { this.ast = value }
 func (this *ZendParserStackElem) GetStr() *types.String { return this.str }
-
-/**
- * ZendOp
- */
-type ZendOp struct {
-	handler       OpcodeHandlerT // 指令执行 handler
-	op1           ZnodeOp
-	op2           ZnodeOp
-	result        ZnodeOp
-	extendedValue uint32
-	lineno        uint32
-	opcode        OpCode
-	op1Type       uint8
-	op2Type       uint8
-	resultType    uint8
-}
-
-func (op *ZendOp) GetHandler() OpcodeHandlerT      { return op.handler }
-func (op *ZendOp) SetHandler(value OpcodeHandlerT) { op.handler = value }
-func (op *ZendOp) GetOp1() *ZnodeOp                { return &op.op1 }
-func (op *ZendOp) SetOp1(value ZnodeOp)            { op.op1 = value }
-func (op *ZendOp) GetOp2() *ZnodeOp                { return &op.op2 }
-func (op *ZendOp) SetOp2(value ZnodeOp)            { op.op2 = value }
-func (op *ZendOp) GetResult() ZnodeOp              { return op.result }
-func (op *ZendOp) SetResult(value ZnodeOp)         { op.result = value }
-func (op *ZendOp) GetExtendedValue() uint32        { return op.extendedValue }
-func (op *ZendOp) SetExtendedValue(value uint32)   { op.extendedValue = value }
-func (op *ZendOp) GetLineno() uint32               { return op.lineno }
-func (op *ZendOp) SetLineno(value uint32)          { op.lineno = value }
-func (op *ZendOp) GetOpcode() OpCode               { return op.opcode }
-func (op *ZendOp) SetOpcode(value OpCode)          { op.opcode = value }
-func (op *ZendOp) GetOp1Type() uint8               { return op.op1Type }
-func (op *ZendOp) SetOp1Type(value uint8)          { op.op1Type = value }
-func (op *ZendOp) GetOp2Type() uint8               { return op.op2Type }
-func (op *ZendOp) SetOp2Type(value uint8)          { op.op2Type = value }
-func (op *ZendOp) GetResultType() uint8            { return op.resultType }
-func (op *ZendOp) SetResultType(value uint8)       { op.resultType = value }
-
-func (op *ZendOp) Offset(offset int) *ZendOp { return op + offset }
-
-func (op *ZendOp) currEx() *ZendExecuteData {
-	return CurrEX()
-}
-
-/**
- * opGetter
- */
-type opGetter func(node ZnodeOp) *types.Zval
-type opExGetter func(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval
-
-func (op *ZendOp) _complexOp(opType uint8, node ZnodeOp, constGetter opGetter, varGetter opGetter, cvGetter opGetter) *types.Zval {
-	switch opType {
-	case IS_CONST:
-		return constGetter(node)
-	case IS_TMP_VAR, IS_VAR:
-		return varGetter(node)
-	case IS_CV:
-		return cvGetter(node)
-	}
-	panic("unreachable")
-}
-func (op *ZendOp) _complexOpEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp, constGetter opGetter, varGetter opExGetter, cvGetter opGetter) *types.Zval {
-	switch opType {
-	case IS_CONST:
-		return constGetter(node)
-	case IS_TMP_VAR, IS_VAR:
-		return varGetter(node, shouldFree)
-	case IS_CV:
-		return cvGetter(node)
-	}
-	panic("unreachable")
-}
-
-//
-func (op *ZendOp) _const(node ZnodeOp) *types.Zval { return RT_CONSTANT(op, node) }
-func (op *ZendOp) _op(node ZnodeOp) *types.Zval    { return EX_VAR(node.GetVar()) }
-func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
-	ret := op._op(node)
-	if ret.IsUndef() {
-		return ZvalUndefinedCv(node.var_, op.currEx())
-	}
-	return ret
-}
-
-func (op *ZendOp) Const1() *types.Zval     { return op._const(op.op1) }
-func (op *ZendOp) Const2() *types.Zval     { return op._const(op.op2) }
-func (op *ZendOp) Op1() *types.Zval        { return op._op(op.op1) }
-func (op *ZendOp) Op2() *types.Zval        { return op._op(op.op2) }
-func (op *ZendOp) Result() *types.Zval     { return op._op(op.result) }
-func (op *ZendOp) Cv1OrUndef() *types.Zval { return op._cvOrUndef(op.op1) }
-func (op *ZendOp) Cv2OrUndef() *types.Zval { return op._cvOrUndef(op.op2) }
 
 /**
  * ZendBrkContElement

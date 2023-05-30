@@ -6,7 +6,7 @@ import (
 )
 
 func zend_pre_inc_helper_SPEC_CV(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var var_ptr *types.Zval
 	var_ptr = opline.Op1()
 	if var_ptr.IsError() {
@@ -37,7 +37,7 @@ func zend_pre_inc_helper_SPEC_CV(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_pre_dec_helper_SPEC_CV(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var var_ptr *types.Zval
 	var_ptr = opline.Op1()
 	if var_ptr.IsError() {
@@ -68,7 +68,7 @@ func zend_pre_dec_helper_SPEC_CV(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_post_inc_helper_SPEC_CV(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var var_ptr *types.Zval
 	var_ptr = opline.Op1()
 	if var_ptr.IsError() {
@@ -95,7 +95,7 @@ func zend_post_inc_helper_SPEC_CV(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_post_dec_helper_SPEC_CV(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var var_ptr *types.Zval
 	var_ptr = opline.Op1()
 	if var_ptr.IsError() {
@@ -122,7 +122,7 @@ func zend_post_dec_helper_SPEC_CV(executeData *ZendExecuteData) int {
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_SEND_VAR_SPEC_CV_INLINE_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var varptr *types.Zval
 	var arg *types.Zval
 	varptr = opline.Op1()

@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	var val *types.Zval
 	val = opline.Const1()
@@ -46,7 +46,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	var val *types.Zval
 	var free_op1 ZendFreeOp
@@ -134,7 +134,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	var val *types.Zval
 	var free_op1 ZendFreeOp
@@ -224,7 +224,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	var val *types.Zval
 	val = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)

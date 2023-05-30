@@ -135,7 +135,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var name *types.Zval = name_node.GetConstant()
 	var lcname *types.String
 	var fbc types.IFunction
-	var opline *ZendOp
+	var opline *types.ZendOp
 	lcname = operators.ZendStringTolower(name.String())
 
 	fbc = CG__().FunctionTable().Get(lcname.GetStr())
@@ -167,7 +167,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var args_ast *ZendAst = ast.GetChild()[2]
 	var obj_node Znode
 	var method_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var fbc types.IFunction = nil
 	if IsThisFetch(obj_ast) {
 		obj_node.SetOpType(IS_UNUSED)
@@ -217,7 +217,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var args_ast *ZendAst = ast.GetChild()[2]
 	var class_node Znode
 	var method_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var fbc types.IFunction = nil
 	ZendCompileClassRef(&class_node, class_ast, ZEND_FETCH_CLASS_EXCEPTION)
 	ZendCompileExpr(&method_node, method_ast)
@@ -281,7 +281,7 @@ func ZendCompileNew(result *Znode, ast *ZendAst) {
 	var args_ast *ZendAst = ast.GetChild()[1]
 	var class_node Znode
 	var ctor_result Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if class_ast.GetKind() == ZEND_AST_CLASS {
 
 		/* anon class declaration */
@@ -326,7 +326,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 	if IsThisFetch(var_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as global variable")
 	} else if ZendTryCompileCv(&result, var_ast) == types.SUCCESS {
-		var opline *ZendOp = ZendEmitOp(nil, ZEND_BIND_GLOBAL, &result, &name_node)
+		var opline *types.ZendOp = ZendEmitOp(nil, ZEND_BIND_GLOBAL, &result, &name_node)
 		opline.SetExtendedValue(ZendAllocCacheSlot())
 	} else {
 
@@ -334,7 +334,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 		 * to not free the name_node operand, so it can be reused in the following
 		 * ASSIGN_REF, which then frees it. */
 
-		var opline *ZendOp = ZendEmitOp(&result, ZEND_FETCH_W, &name_node, nil)
+		var opline *types.ZendOp = ZendEmitOp(&result, ZEND_FETCH_W, &name_node, nil)
 		opline.SetExtendedValue(ZEND_FETCH_GLOBAL_LOCK)
 		if name_node.GetOpType() == IS_CONST {
 			//name_node.GetConstant().String().AddRefcount()
@@ -343,7 +343,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 	}
 }
 func ZendCompileStaticVarCommon(var_name *types.String, value *types.Zval, mode uint32) {
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if CG__().GetActiveOpArray().GetStaticVariables() == nil {
 		if CG__().GetActiveOpArray().GetScope() != nil {
 			CG__().GetActiveOpArray().GetScope().SetIsHasStaticInMethods(true)
@@ -374,7 +374,7 @@ func ZendCompileStaticVar(ast *ZendAst) {
 func ZendCompileUnset(ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
 	var var_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	ZendEnsureWritableVariable(var_ast)
 	switch var_ast.GetKind() {
 	case ZEND_AST_VAR:
@@ -412,7 +412,7 @@ func ZendHandleLoopsAndFinallyEx(depth ZendLong, return_value *Znode) int {
 	base = CG__().GetLoopVarStack().GetElements()
 	for ; loop_var >= base; loop_var-- {
 		if loop_var.GetOpcode() == ZEND_FAST_CALL {
-			var opline *ZendOp = GetNextOp()
+			var opline *types.ZendOp = GetNextOp()
 			opline.SetOpcode(ZEND_FAST_CALL)
 			opline.SetResultType(IS_TMP_VAR)
 			opline.GetResult().SetVar(loop_var.GetVarNum())
@@ -426,7 +426,7 @@ func ZendHandleLoopsAndFinallyEx(depth ZendLong, return_value *Znode) int {
 			}
 			opline.GetOp1().SetNum(loop_var.GetTryCatchOffset())
 		} else if loop_var.GetOpcode() == ZEND_DISCARD_EXCEPTION {
-			var opline *ZendOp = GetNextOp()
+			var opline *types.ZendOp = GetNextOp()
 			opline.SetOpcode(ZEND_DISCARD_EXCEPTION)
 			opline.SetOp1Type(IS_TMP_VAR)
 			opline.GetOp1().SetVar(loop_var.GetVarNum())
@@ -449,7 +449,7 @@ func ZendHandleLoopsAndFinallyEx(depth ZendLong, return_value *Znode) int {
 			/* Loop doesn't have freeable variable */
 
 		} else {
-			var opline *ZendOp
+			var opline *types.ZendOp
 			b.Assert((loop_var.GetVarType() & (IS_VAR | IS_TMP_VAR)) != 0)
 			opline = GetNextOp()
 			opline.SetOpcode(loop_var.GetOpcode())
@@ -500,7 +500,7 @@ func ZendCompileReturn(ast *ZendAst) {
 	var is_generator types.ZendBool = CG__().GetActiveOpArray().IsGenerator()
 	var by_ref types.ZendBool = CG__().GetActiveOpArray().IsReturnReference()
 	var expr_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if is_generator != 0 {
 
 		/* For generators the by-ref flag refers to yields, not returns */
@@ -548,7 +548,7 @@ func ZendCompileReturn(ast *ZendAst) {
 	}
 }
 func ZendCompileEcho(ast *ZendAst) {
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var expr_ast *ZendAst = ast.GetChild()[0]
 	var expr_node Znode
 	ZendCompileExpr(&expr_node, expr_ast)
@@ -563,7 +563,7 @@ func ZendCompileThrow(ast *ZendAst) {
 }
 func ZendCompileBreakContinue(ast *ZendAst) {
 	var depth_ast *ZendAst = ast.GetChild()[0]
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var depth ZendLong
 	b.Assert(ast.GetKind() == ZEND_AST_BREAK || ast.GetKind() == ZEND_AST_CONTINUE)
 	if depth_ast != nil {
@@ -605,7 +605,7 @@ func ZendCompileBreakContinue(ast *ZendAst) {
 	opline.GetOp1().SetNum(CG__().GetContext().GetCurrentBrkCont())
 	opline.GetOp2().SetNum(depth)
 }
-func ZendResolveGotoLabel(op_array *types.ZendOpArray, opline *ZendOp) {
+func ZendResolveGotoLabel(op_array *types.ZendOpArray, opline *types.ZendOp) {
 	var dest *ZendLabel
 	var current int
 	var remove_oplines int = opline.GetOp1().GetNum()
@@ -650,14 +650,14 @@ func ZendResolveGotoLabel(op_array *types.ZendOpArray, opline *ZendOp) {
 	b.Assert(remove_oplines >= 0)
 	for b.PostDec(&remove_oplines) {
 		opline--
-		MAKE_NOP(opline)
+		opline.SetNop()
 		ZendVmSetOpcodeHandler(opline)
 	}
 }
 func ZendCompileGoto(ast *ZendAst) {
 	var label_ast *ZendAst = ast.GetChild()[0]
 	var label_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var opnum_start uint32 = GetNextOpNumber()
 	ZendCompileExpr(&label_node, label_ast)
 
@@ -761,7 +761,7 @@ func ZendCompileForeach(ast *ZendAst) {
 	var reset_node Znode
 	var value_node Znode
 	var key_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var opnum_reset uint32
 	var opnum_fetch uint32
 	if key_ast != nil {

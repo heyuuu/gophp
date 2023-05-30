@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_JMPZNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = opline.Const1()
 	if val.IsTrue() {
@@ -23,7 +23,7 @@ func ZEND_JMPZNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_JMP(executeData, opline)
 }
 func ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = opline.Op1()
 	if val.IsTrue() {
@@ -46,7 +46,7 @@ func ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_VM_JMP(executeData, opline)
 }
 func ZEND_JMPZNZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = opline.Op1()
 	if val.IsTrue() {

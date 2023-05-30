@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var retval_ptr *types.Zval
 	for {
 		{
@@ -41,7 +41,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return zend_leave_helper_SPEC(executeData)
 }
 func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var retval_ptr *types.Zval
 	var free_op1 ZendFreeOp
 	for {
@@ -89,7 +89,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	return zend_leave_helper_SPEC(executeData)
 }
 func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var retval_ptr *types.Zval
 	var free_op1 ZendFreeOp
 	for {
@@ -144,7 +144,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	return zend_leave_helper_SPEC(executeData)
 }
 func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var retval_ptr *types.Zval
 	for {
 		{

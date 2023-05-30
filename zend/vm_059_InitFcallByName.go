@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_INIT_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var fbc types.IFunction
 	var function_name *types.Zval
 	var call *ZendExecuteData

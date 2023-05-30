@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_DEFINED_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var c *ZendConstant
 	c = CACHED_PTR(opline.GetExtendedValue())
 	if c != nil {

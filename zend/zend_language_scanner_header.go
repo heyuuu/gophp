@@ -195,7 +195,7 @@ func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
 	zend_string_release_ex(new_compiled_filename, 0)
 	CG__().zend_lineno = 1
 	CG__().increment_lineno = 0
-	RESET_DOC_COMMENT()
+	CG__().doc_comment = nil
 	return types.SUCCESS
 }
 func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray {

@@ -67,7 +67,7 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 			E_COMPILE_ERROR,
 			E_USER_ERROR:
 			var ex *zend.ZendExecuteData = zend.CurrEX()
-			var opline *zend.ZendOp = nil
+			var opline *types.ZendOp = nil
 			for ex != nil && (ex.GetFunc() == nil || !(zend.ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 				ex = ex.GetPrevExecuteData()
 			}

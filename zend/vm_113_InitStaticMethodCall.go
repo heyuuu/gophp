@@ -8,7 +8,7 @@ import (
 )
 
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -73,7 +73,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -164,7 +164,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -224,7 +224,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -308,7 +308,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -367,7 +367,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -447,7 +447,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -497,7 +497,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -571,7 +571,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -642,7 +642,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -735,7 +735,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
@@ -797,7 +797,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32

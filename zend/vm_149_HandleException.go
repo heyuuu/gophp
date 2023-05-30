@@ -1,7 +1,9 @@
 package zend
 
+import "github.com/heyuuu/gophp/php/types"
+
 func ZEND_HANDLE_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var throw_op *ZendOp = EG__().GetOplineBeforeException()
+	var throw_op *types.ZendOp = EG__().GetOplineBeforeException()
 	var throw_op_num uint32 = throw_op - executeData.GetFunc().GetOpArray().opcodes
 	var i int
 	var current_try_catch_offset int = -1

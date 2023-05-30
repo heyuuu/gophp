@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var varname *types.String
 	var value *types.Zval
 	var variable_ptr *types.Zval

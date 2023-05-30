@@ -240,7 +240,7 @@ func ZendGeneratorDtorStorage(object *types.ZendObject) {
 			/* Clean up incomplete return statement */
 
 			if fast_call.GetOplineNum() != uint32-1 {
-				var retval_op *ZendOp = ex.GetFunc().GetOpArray().GetOpcodes()[fast_call.GetOplineNum()]
+				var retval_op *types.ZendOp = ex.GetFunc().GetOpArray().GetOpcodes()[fast_call.GetOplineNum()]
 				if (retval_op.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 					// ZvalPtrDtor(ZEND_CALL_VAR(ex, retval_op.GetOp2().GetVar()))
 				}
@@ -603,7 +603,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 	if root.GetNode().GetParent() != nil {
 		if root.GetNode().GetParent().GetExecuteData() == nil {
 			if EG__().GetException() == nil {
-				var yield_from *ZendOp = (*ZendOp)(root.GetExecuteData().GetOpline() - 1)
+				var yield_from *types.ZendOp = (*types.ZendOp)(root.GetExecuteData().GetOpline() - 1)
 				if yield_from.GetOpcode() == ZEND_YIELD_FROM {
 					if root.GetNode().GetParent().GetRetval().IsUndef() {
 

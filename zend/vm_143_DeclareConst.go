@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_DECLARE_CONST_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var name *types.Zval
 	var val *types.Zval
 	var c ZendConstant

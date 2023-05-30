@@ -7,13 +7,13 @@ import (
 
 // ZEND_NOP
 func vmNopHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 
 // ZEND_ADD
 func vmAddHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -61,7 +61,7 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SUB
 func vmSubHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -109,7 +109,7 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 
 // ZEND_MUL
 func vmMulHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -163,7 +163,7 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DIV
 func vmDivHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var freeOp1, freeOp2 ZendFreeOp
 	var op1 *types.Zval = executeData.Op1(opline, opMode2)
 	var op2 *types.Zval = executeData.Op2(opline, opMode2)
@@ -174,7 +174,7 @@ func vmDivHandler(executeData *ZendExecuteData) int {
 
 // ZEND_MOD
 func vmModHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -197,7 +197,7 @@ func vmModHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SL
 func vmSlHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -211,7 +211,7 @@ func vmSlHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SR
 func getSrHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -225,7 +225,7 @@ func getSrHandler(executeData *ZendExecuteData) int {
 
 // ZEND_CONCAT
 func getConcatHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var freeOp1, freeOp2 ZendFreeOp
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)

@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var ce *types.ClassEntry
 	var catch_ce *types.ClassEntry
 	var exception *types.ZendObject

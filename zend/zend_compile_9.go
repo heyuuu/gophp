@@ -8,7 +8,7 @@ import (
 )
 
 func ZendCompileMagicConst(result *Znode, ast *ZendAst) {
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if ZendTryCtEvalMagicConst(result.GetConstant(), ast) != 0 {
 		result.SetOpType(IS_CONST)
 		return
@@ -390,7 +390,7 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 		b.Assert(false)
 	}
 }
-func ZendCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *ZendOp {
+func ZendCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
 	CG__().SetZendLineno(ZendAstGetLineno(ast))
 	switch ast.GetKind() {
 	case ZEND_AST_VAR:
@@ -421,14 +421,14 @@ func ZendCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *Zend
 		return nil
 	}
 }
-func ZendDelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref types.ZendBool) *ZendOp {
+func ZendDelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref types.ZendBool) *types.ZendOp {
 	switch ast.GetKind() {
 	case ZEND_AST_VAR:
 		return ZendCompileSimpleVar(result, ast, type_, 1)
 	case ZEND_AST_DIM:
 		return ZendDelayedCompileDim(result, ast, type_)
 	case ZEND_AST_PROP:
-		var opline *ZendOp = ZendDelayedCompileProp(result, ast, type_)
+		var opline *types.ZendOp = ZendDelayedCompileProp(result, ast, type_)
 		if by_ref != 0 {
 			opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_FETCH_REF)
 		}

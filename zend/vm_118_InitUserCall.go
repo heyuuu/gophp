@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var fcc types.ZendFcallInfoCache
 	var error *byte = nil
@@ -64,7 +64,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp
 	var function_name *types.Zval
 	var fcc types.ZendFcallInfoCache
@@ -134,7 +134,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var fcc types.ZendFcallInfoCache
 	var error *byte = nil

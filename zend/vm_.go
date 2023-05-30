@@ -7,7 +7,7 @@ import (
 
 // ZEND_BW_OR
 func getBwOrHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -21,7 +21,7 @@ func getBwOrHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BW_AND
 func getBwAndHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -34,7 +34,7 @@ func getBwAndHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BW_XOR
 func getBwXorHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -47,7 +47,7 @@ func getBwXorHandler(executeData *ZendExecuteData) int {
 
 // ZEND_POW
 func getPowHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode2)
 	var op2 *types.Zval = executeData.Op2(opline, opMode2)
 
@@ -58,7 +58,7 @@ func getPowHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BW_NOT
 func getBwNotHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 
 	if op1.IsLong() {
@@ -75,7 +75,7 @@ func getBwNotHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BOOL_NOT
 func getBoolNotHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 
 	if op1.IsTrue() {
@@ -96,7 +96,7 @@ func getBoolNotHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BOOL_XOR
 func getBoolXorHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode2)
 	var op2 *types.Zval = executeData.Op2(opline, opMode2)
 
@@ -106,7 +106,7 @@ func getBoolXorHandler(executeData *ZendExecuteData) int {
 
 // ZEND_IS_IDENTICAL
 func getIsIdenticalHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode0)
 	var op2 *types.Zval = executeData.Op2(opline, opMode0)
 
@@ -119,7 +119,7 @@ func getIsIdenticalHandler(executeData *ZendExecuteData) int {
 
 // ZEND_IS_NOT_IDENTICAL
 func getIsNotIdenticalHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode0)
 	var op2 *types.Zval = executeData.Op2(opline, opMode0)
 
@@ -132,7 +132,7 @@ func getIsNotIdenticalHandler(executeData *ZendExecuteData) int {
 
 // ZEND_IS_EQUAL
 func getIsEqualHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -183,7 +183,7 @@ func getIsEqualHandler(executeData *ZendExecuteData) int {
 
 // ZEND_IS_NOT_EQUAL
 func getIsNotEqualHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
@@ -234,7 +234,7 @@ func getIsNotEqualHandler(executeData *ZendExecuteData) int {
 
 // ZEND_IS_SMALLER
 func getIsSmallerHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -242,7 +242,7 @@ func getIsSmallerHandler(executeData *ZendExecuteData) int {
 
 // ZEND_IS_SMALLER_OR_EQUAL
 func getIsSmallerOrEqualHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -250,7 +250,7 @@ func getIsSmallerOrEqualHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN
 func getAssignHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -258,7 +258,7 @@ func getAssignHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_DIM
 func getAssignDimHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -266,7 +266,7 @@ func getAssignDimHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_OBJ
 func getAssignObjHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -274,7 +274,7 @@ func getAssignObjHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_STATIC_PROP
 func getAssignStaticPropHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -282,7 +282,7 @@ func getAssignStaticPropHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_OP
 func getAssignOpHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -290,7 +290,7 @@ func getAssignOpHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_DIM_OP
 func getAssignDimOpHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -298,7 +298,7 @@ func getAssignDimOpHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_OBJ_OP
 func getAssignObjOpHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -306,7 +306,7 @@ func getAssignObjOpHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_STATIC_PROP_OP
 func getAssignStaticPropOpHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -314,7 +314,7 @@ func getAssignStaticPropOpHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_REF
 func getAssignRefHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -322,7 +322,7 @@ func getAssignRefHandler(executeData *ZendExecuteData) int {
 
 // ZEND_QM_ASSIGN
 func getQmAssignHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -330,7 +330,7 @@ func getQmAssignHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_OBJ_REF
 func getAssignObjRefHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -338,7 +338,7 @@ func getAssignObjRefHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSIGN_STATIC_PROP_REF
 func getAssignStaticPropRefHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -346,7 +346,7 @@ func getAssignStaticPropRefHandler(executeData *ZendExecuteData) int {
 
 // ZEND_PRE_INC
 func getPreIncHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -354,7 +354,7 @@ func getPreIncHandler(executeData *ZendExecuteData) int {
 
 // ZEND_PRE_DEC
 func getPreDecHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -362,7 +362,7 @@ func getPreDecHandler(executeData *ZendExecuteData) int {
 
 // ZEND_POST_INC
 func getPostIncHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -370,7 +370,7 @@ func getPostIncHandler(executeData *ZendExecuteData) int {
 
 // ZEND_POST_DEC
 func getPostDecHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -378,7 +378,7 @@ func getPostDecHandler(executeData *ZendExecuteData) int {
 
 // ZEND_PRE_INC_STATIC_PROP
 func getPreIncStaticPropHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -386,7 +386,7 @@ func getPreIncStaticPropHandler(executeData *ZendExecuteData) int {
 
 // ZEND_PRE_DEC_STATIC_PROP
 func getPreDecStaticPropHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -394,7 +394,7 @@ func getPreDecStaticPropHandler(executeData *ZendExecuteData) int {
 
 // ZEND_POST_INC_STATIC_PROP
 func getPostIncStaticPropHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -402,7 +402,7 @@ func getPostIncStaticPropHandler(executeData *ZendExecuteData) int {
 
 // ZEND_POST_DEC_STATIC_PROP
 func getPostDecStaticPropHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -410,7 +410,7 @@ func getPostDecStaticPropHandler(executeData *ZendExecuteData) int {
 
 // ZEND_JMP
 func getJmpHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -418,7 +418,7 @@ func getJmpHandler(executeData *ZendExecuteData) int {
 
 // ZEND_JMPZ
 func getJmpzHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -426,7 +426,7 @@ func getJmpzHandler(executeData *ZendExecuteData) int {
 
 // ZEND_JMPNZ
 func getJmpnzHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -434,7 +434,7 @@ func getJmpnzHandler(executeData *ZendExecuteData) int {
 
 // ZEND_JMPZNZ
 func getJmpznzHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -442,7 +442,7 @@ func getJmpznzHandler(executeData *ZendExecuteData) int {
 
 // ZEND_JMPZ_EX
 func getJmpzExHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -450,7 +450,7 @@ func getJmpzExHandler(executeData *ZendExecuteData) int {
 
 // ZEND_JMPNZ_EX
 func getJmpnzExHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -458,7 +458,7 @@ func getJmpnzExHandler(executeData *ZendExecuteData) int {
 
 // ZEND_CASE
 func getCaseHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -466,7 +466,7 @@ func getCaseHandler(executeData *ZendExecuteData) int {
 
 // ZEND_CHECK_VAR
 func getCheckVarHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -474,7 +474,7 @@ func getCheckVarHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_VAR_NO_REF_EX
 func getSendVarNoRefExHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -482,7 +482,7 @@ func getSendVarNoRefExHandler(executeData *ZendExecuteData) int {
 
 // ZEND_CAST
 func getCastHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -490,7 +490,7 @@ func getCastHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BOOL
 func getBoolHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -498,7 +498,7 @@ func getBoolHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FAST_CONCAT
 func getFastConcatHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -506,7 +506,7 @@ func getFastConcatHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ROPE_INIT
 func getRopeInitHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -514,7 +514,7 @@ func getRopeInitHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ROPE_ADD
 func getRopeAddHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -522,7 +522,7 @@ func getRopeAddHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ROPE_END
 func getRopeEndHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -530,7 +530,7 @@ func getRopeEndHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BEGIN_SILENCE
 func getBeginSilenceHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -538,7 +538,7 @@ func getBeginSilenceHandler(executeData *ZendExecuteData) int {
 
 // ZEND_END_SILENCE
 func getEndSilenceHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -546,7 +546,7 @@ func getEndSilenceHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INIT_FCALL_BY_NAME
 func getInitFcallByNameHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -554,7 +554,7 @@ func getInitFcallByNameHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DO_FCALL
 func getDoFcallHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -562,7 +562,7 @@ func getDoFcallHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INIT_FCALL
 func getInitFcallHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -570,7 +570,7 @@ func getInitFcallHandler(executeData *ZendExecuteData) int {
 
 // ZEND_RETURN
 func getReturnHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -578,7 +578,7 @@ func getReturnHandler(executeData *ZendExecuteData) int {
 
 // ZEND_RECV
 func getRecvHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -586,7 +586,7 @@ func getRecvHandler(executeData *ZendExecuteData) int {
 
 // ZEND_RECV_INIT
 func getRecvInitHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -594,7 +594,7 @@ func getRecvInitHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_VAL
 func getSendValHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -602,7 +602,7 @@ func getSendValHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_VAR_EX
 func getSendVarExHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -610,7 +610,7 @@ func getSendVarExHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_REF
 func getSendRefHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -618,7 +618,7 @@ func getSendRefHandler(executeData *ZendExecuteData) int {
 
 // ZEND_NEW
 func getNewHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -626,7 +626,7 @@ func getNewHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INIT_NS_FCALL_BY_NAME
 func getInitNsFcallByNameHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -634,7 +634,7 @@ func getInitNsFcallByNameHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FREE
 func getFreeHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -642,7 +642,7 @@ func getFreeHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INIT_ARRAY
 func getInitArrayHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -650,7 +650,7 @@ func getInitArrayHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ADD_ARRAY_ELEMENT
 func getAddArrayElementHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -658,7 +658,7 @@ func getAddArrayElementHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INCLUDE_OR_EVAL
 func getIncludeOrEvalHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -666,7 +666,7 @@ func getIncludeOrEvalHandler(executeData *ZendExecuteData) int {
 
 // ZEND_UNSET_VAR
 func getUnsetVarHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -674,7 +674,7 @@ func getUnsetVarHandler(executeData *ZendExecuteData) int {
 
 // ZEND_UNSET_DIM
 func getUnsetDimHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -682,7 +682,7 @@ func getUnsetDimHandler(executeData *ZendExecuteData) int {
 
 // ZEND_UNSET_OBJ
 func getUnsetObjHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -690,7 +690,7 @@ func getUnsetObjHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FE_RESET_R
 func getFeResetRHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -698,7 +698,7 @@ func getFeResetRHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FE_FETCH_R
 func getFeFetchRHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -706,7 +706,7 @@ func getFeFetchRHandler(executeData *ZendExecuteData) int {
 
 // ZEND_EXIT
 func getExitHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -714,7 +714,7 @@ func getExitHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_R
 func getFetchRHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -722,7 +722,7 @@ func getFetchRHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_DIM_R
 func getFetchDimRHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -730,7 +730,7 @@ func getFetchDimRHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_OBJ_R
 func getFetchObjRHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -738,7 +738,7 @@ func getFetchObjRHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_W
 func getFetchWHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -746,7 +746,7 @@ func getFetchWHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_DIM_W
 func getFetchDimWHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -754,7 +754,7 @@ func getFetchDimWHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_OBJ_W
 func getFetchObjWHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -762,7 +762,7 @@ func getFetchObjWHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_RW
 func getFetchRwHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -770,7 +770,7 @@ func getFetchRwHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_DIM_RW
 func getFetchDimRwHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -778,7 +778,7 @@ func getFetchDimRwHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_OBJ_RW
 func getFetchObjRwHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -786,7 +786,7 @@ func getFetchObjRwHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_IS
 func getFetchIsHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -794,7 +794,7 @@ func getFetchIsHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_DIM_IS
 func getFetchDimIsHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -802,7 +802,7 @@ func getFetchDimIsHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_OBJ_IS
 func getFetchObjIsHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -810,7 +810,7 @@ func getFetchObjIsHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_FUNC_ARG
 func getFetchFuncArgHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -818,7 +818,7 @@ func getFetchFuncArgHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_DIM_FUNC_ARG
 func getFetchDimFuncArgHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -826,7 +826,7 @@ func getFetchDimFuncArgHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_OBJ_FUNC_ARG
 func getFetchObjFuncArgHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -834,7 +834,7 @@ func getFetchObjFuncArgHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_UNSET
 func getFetchUnsetHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -842,7 +842,7 @@ func getFetchUnsetHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_DIM_UNSET
 func getFetchDimUnsetHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -850,7 +850,7 @@ func getFetchDimUnsetHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_OBJ_UNSET
 func getFetchObjUnsetHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -858,7 +858,7 @@ func getFetchObjUnsetHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_LIST_R
 func getFetchListRHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -866,7 +866,7 @@ func getFetchListRHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_CONSTANT
 func getFetchConstantHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -874,7 +874,7 @@ func getFetchConstantHandler(executeData *ZendExecuteData) int {
 
 // ZEND_CHECK_FUNC_ARG
 func getCheckFuncArgHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -882,7 +882,7 @@ func getCheckFuncArgHandler(executeData *ZendExecuteData) int {
 
 // ZEND_EXT_STMT
 func getExtStmtHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -890,7 +890,7 @@ func getExtStmtHandler(executeData *ZendExecuteData) int {
 
 // ZEND_EXT_FCALL_BEGIN
 func getExtFcallBeginHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -898,7 +898,7 @@ func getExtFcallBeginHandler(executeData *ZendExecuteData) int {
 
 // ZEND_EXT_FCALL_END
 func getExtFcallEndHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -906,7 +906,7 @@ func getExtFcallEndHandler(executeData *ZendExecuteData) int {
 
 // ZEND_EXT_NOP
 func getExtNopHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -914,7 +914,7 @@ func getExtNopHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_VAR_NO_REF
 func getSendVarNoRefHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -922,7 +922,7 @@ func getSendVarNoRefHandler(executeData *ZendExecuteData) int {
 
 // ZEND_CATCH
 func getCatchHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -930,7 +930,7 @@ func getCatchHandler(executeData *ZendExecuteData) int {
 
 // ZEND_THROW
 func getThrowHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -938,7 +938,7 @@ func getThrowHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_CLASS
 func getFetchClassHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -946,7 +946,7 @@ func getFetchClassHandler(executeData *ZendExecuteData) int {
 
 // ZEND_CLONE
 func getCloneHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -954,7 +954,7 @@ func getCloneHandler(executeData *ZendExecuteData) int {
 
 // ZEND_RETURN_BY_REF
 func getReturnByRefHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -962,7 +962,7 @@ func getReturnByRefHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INIT_METHOD_CALL
 func getInitMethodCallHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -970,7 +970,7 @@ func getInitMethodCallHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INIT_STATIC_METHOD_CALL
 func getInitStaticMethodCallHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -978,7 +978,7 @@ func getInitStaticMethodCallHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ISSET_ISEMPTY_VAR
 func getIssetIsemptyVarHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -986,7 +986,7 @@ func getIssetIsemptyVarHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ISSET_ISEMPTY_DIM_OBJ
 func getIssetIsemptyDimObjHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -994,7 +994,7 @@ func getIssetIsemptyDimObjHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_VAL_EX
 func getSendValExHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1002,7 +1002,7 @@ func getSendValExHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_VAR
 func getSendVarHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1010,7 +1010,7 @@ func getSendVarHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INIT_USER_CALL
 func getInitUserCallHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1018,7 +1018,7 @@ func getInitUserCallHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_ARRAY
 func getSendArrayHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1026,7 +1026,7 @@ func getSendArrayHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_USER
 func getSendUserHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1034,7 +1034,7 @@ func getSendUserHandler(executeData *ZendExecuteData) int {
 
 // ZEND_STRLEN
 func getStrlenHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1042,7 +1042,7 @@ func getStrlenHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DEFINED
 func getDefinedHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1050,7 +1050,7 @@ func getDefinedHandler(executeData *ZendExecuteData) int {
 
 // ZEND_TYPE_CHECK
 func getTypeCheckHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1058,7 +1058,7 @@ func getTypeCheckHandler(executeData *ZendExecuteData) int {
 
 // ZEND_VERIFY_RETURN_TYPE
 func getVerifyReturnTypeHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1066,7 +1066,7 @@ func getVerifyReturnTypeHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FE_RESET_RW
 func getFeResetRwHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1074,7 +1074,7 @@ func getFeResetRwHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FE_FETCH_RW
 func getFeFetchRwHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1082,7 +1082,7 @@ func getFeFetchRwHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FE_FREE
 func getFeFreeHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1090,7 +1090,7 @@ func getFeFreeHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INIT_DYNAMIC_CALL
 func getInitDynamicCallHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1098,7 +1098,7 @@ func getInitDynamicCallHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DO_ICALL
 func getDoIcallHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1106,7 +1106,7 @@ func getDoIcallHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DO_UCALL
 func getDoUcallHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1114,7 +1114,7 @@ func getDoUcallHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DO_FCALL_BY_NAME
 func getDoFcallByNameHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1122,7 +1122,7 @@ func getDoFcallByNameHandler(executeData *ZendExecuteData) int {
 
 // ZEND_PRE_INC_OBJ
 func getPreIncObjHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1130,7 +1130,7 @@ func getPreIncObjHandler(executeData *ZendExecuteData) int {
 
 // ZEND_PRE_DEC_OBJ
 func getPreDecObjHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1138,7 +1138,7 @@ func getPreDecObjHandler(executeData *ZendExecuteData) int {
 
 // ZEND_POST_INC_OBJ
 func getPostIncObjHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1146,7 +1146,7 @@ func getPostIncObjHandler(executeData *ZendExecuteData) int {
 
 // ZEND_POST_DEC_OBJ
 func getPostDecObjHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1154,7 +1154,7 @@ func getPostDecObjHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ECHO
 func getEchoHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1162,7 +1162,7 @@ func getEchoHandler(executeData *ZendExecuteData) int {
 
 // ZEND_OP_DATA
 func getOpDataHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1170,7 +1170,7 @@ func getOpDataHandler(executeData *ZendExecuteData) int {
 
 // ZEND_INSTANCEOF
 func getInstanceofHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1178,7 +1178,7 @@ func getInstanceofHandler(executeData *ZendExecuteData) int {
 
 // ZEND_GENERATOR_CREATE
 func getGeneratorCreateHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1186,7 +1186,7 @@ func getGeneratorCreateHandler(executeData *ZendExecuteData) int {
 
 // ZEND_MAKE_REF
 func getMakeRefHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1194,7 +1194,7 @@ func getMakeRefHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DECLARE_FUNCTION
 func getDeclareFunctionHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1202,7 +1202,7 @@ func getDeclareFunctionHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DECLARE_LAMBDA_FUNCTION
 func getDeclareLambdaFunctionHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1210,7 +1210,7 @@ func getDeclareLambdaFunctionHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DECLARE_CONST
 func getDeclareConstHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1218,7 +1218,7 @@ func getDeclareConstHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DECLARE_CLASS
 func getDeclareClassHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1226,7 +1226,7 @@ func getDeclareClassHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DECLARE_CLASS_DELAYED
 func getDeclareClassDelayedHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1234,7 +1234,7 @@ func getDeclareClassDelayedHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DECLARE_ANON_CLASS
 func getDeclareAnonClassHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1242,7 +1242,7 @@ func getDeclareAnonClassHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ADD_ARRAY_UNPACK
 func getAddArrayUnpackHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1250,7 +1250,7 @@ func getAddArrayUnpackHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ISSET_ISEMPTY_PROP_OBJ
 func getIssetIsemptyPropObjHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1258,7 +1258,7 @@ func getIssetIsemptyPropObjHandler(executeData *ZendExecuteData) int {
 
 // ZEND_HANDLE_EXCEPTION
 func getHandleExceptionHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1266,7 +1266,7 @@ func getHandleExceptionHandler(executeData *ZendExecuteData) int {
 
 // ZEND_USER_OPCODE
 func getUserOpcodeHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1274,7 +1274,7 @@ func getUserOpcodeHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ASSERT_CHECK
 func getAssertCheckHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1282,7 +1282,7 @@ func getAssertCheckHandler(executeData *ZendExecuteData) int {
 
 // ZEND_JMP_SET
 func getJmpSetHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1290,7 +1290,7 @@ func getJmpSetHandler(executeData *ZendExecuteData) int {
 
 // ZEND_UNSET_CV
 func getUnsetCvHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1298,7 +1298,7 @@ func getUnsetCvHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ISSET_ISEMPTY_CV
 func getIssetIsemptyCvHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1306,7 +1306,7 @@ func getIssetIsemptyCvHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_LIST_W
 func getFetchListWHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1314,7 +1314,7 @@ func getFetchListWHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEPARATE
 func getSeparateHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1322,7 +1322,7 @@ func getSeparateHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_CLASS_NAME
 func getFetchClassNameHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1330,7 +1330,7 @@ func getFetchClassNameHandler(executeData *ZendExecuteData) int {
 
 // ZEND_CALL_TRAMPOLINE
 func getCallTrampolineHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1338,7 +1338,7 @@ func getCallTrampolineHandler(executeData *ZendExecuteData) int {
 
 // ZEND_DISCARD_EXCEPTION
 func getDiscardExceptionHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1346,7 +1346,7 @@ func getDiscardExceptionHandler(executeData *ZendExecuteData) int {
 
 // ZEND_YIELD
 func getYieldHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1354,7 +1354,7 @@ func getYieldHandler(executeData *ZendExecuteData) int {
 
 // ZEND_GENERATOR_RETURN
 func getGeneratorReturnHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1362,7 +1362,7 @@ func getGeneratorReturnHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FAST_CALL
 func getFastCallHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1370,7 +1370,7 @@ func getFastCallHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FAST_RET
 func getFastRetHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1378,7 +1378,7 @@ func getFastRetHandler(executeData *ZendExecuteData) int {
 
 // ZEND_RECV_VARIADIC
 func getRecvVariadicHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1386,7 +1386,7 @@ func getRecvVariadicHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_UNPACK
 func getSendUnpackHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1394,7 +1394,7 @@ func getSendUnpackHandler(executeData *ZendExecuteData) int {
 
 // ZEND_YIELD_FROM
 func getYieldFromHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1402,7 +1402,7 @@ func getYieldFromHandler(executeData *ZendExecuteData) int {
 
 // ZEND_COPY_TMP
 func getCopyTmpHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1410,7 +1410,7 @@ func getCopyTmpHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BIND_GLOBAL
 func getBindGlobalHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1418,7 +1418,7 @@ func getBindGlobalHandler(executeData *ZendExecuteData) int {
 
 // ZEND_COALESCE
 func getCoalesceHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1426,7 +1426,7 @@ func getCoalesceHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SPACESHIP
 func getSpaceshipHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1434,7 +1434,7 @@ func getSpaceshipHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FUNC_NUM_ARGS
 func getFuncNumArgsHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1442,7 +1442,7 @@ func getFuncNumArgsHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FUNC_GET_ARGS
 func getFuncGetArgsHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1450,7 +1450,7 @@ func getFuncGetArgsHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_STATIC_PROP_R
 func getFetchStaticPropRHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1458,7 +1458,7 @@ func getFetchStaticPropRHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_STATIC_PROP_W
 func getFetchStaticPropWHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1466,7 +1466,7 @@ func getFetchStaticPropWHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_STATIC_PROP_RW
 func getFetchStaticPropRwHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1474,7 +1474,7 @@ func getFetchStaticPropRwHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_STATIC_PROP_IS
 func getFetchStaticPropIsHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1482,7 +1482,7 @@ func getFetchStaticPropIsHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_STATIC_PROP_FUNC_ARG
 func getFetchStaticPropFuncArgHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1490,7 +1490,7 @@ func getFetchStaticPropFuncArgHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_STATIC_PROP_UNSET
 func getFetchStaticPropUnsetHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1498,7 +1498,7 @@ func getFetchStaticPropUnsetHandler(executeData *ZendExecuteData) int {
 
 // ZEND_UNSET_STATIC_PROP
 func getUnsetStaticPropHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1506,7 +1506,7 @@ func getUnsetStaticPropHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ISSET_ISEMPTY_STATIC_PROP
 func getIssetIsemptyStaticPropHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1514,7 +1514,7 @@ func getIssetIsemptyStaticPropHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_CLASS_CONSTANT
 func getFetchClassConstantHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1522,7 +1522,7 @@ func getFetchClassConstantHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BIND_LEXICAL
 func getBindLexicalHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1530,7 +1530,7 @@ func getBindLexicalHandler(executeData *ZendExecuteData) int {
 
 // ZEND_BIND_STATIC
 func getBindStaticHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1538,7 +1538,7 @@ func getBindStaticHandler(executeData *ZendExecuteData) int {
 
 // ZEND_FETCH_THIS
 func getFetchThisHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1546,7 +1546,7 @@ func getFetchThisHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SEND_FUNC_ARG
 func getSendFuncArgHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1554,7 +1554,7 @@ func getSendFuncArgHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ISSET_ISEMPTY_THIS
 func getIssetIsemptyThisHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1562,7 +1562,7 @@ func getIssetIsemptyThisHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SWITCH_LONG
 func getSwitchLongHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1570,7 +1570,7 @@ func getSwitchLongHandler(executeData *ZendExecuteData) int {
 
 // ZEND_SWITCH_STRING
 func getSwitchStringHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1578,7 +1578,7 @@ func getSwitchStringHandler(executeData *ZendExecuteData) int {
 
 // ZEND_IN_ARRAY
 func getInArrayHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1586,7 +1586,7 @@ func getInArrayHandler(executeData *ZendExecuteData) int {
 
 // ZEND_COUNT
 func getCountHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1594,7 +1594,7 @@ func getCountHandler(executeData *ZendExecuteData) int {
 
 // ZEND_GET_CLASS
 func getGetClassHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1602,7 +1602,7 @@ func getGetClassHandler(executeData *ZendExecuteData) int {
 
 // ZEND_GET_CALLED_CLASS
 func getGetCalledClassHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1610,7 +1610,7 @@ func getGetCalledClassHandler(executeData *ZendExecuteData) int {
 
 // ZEND_GET_TYPE
 func getGetTypeHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo
@@ -1618,7 +1618,7 @@ func getGetTypeHandler(executeData *ZendExecuteData) int {
 
 // ZEND_ARRAY_KEY_EXISTS
 func getArrayKeyExistsHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 	//todo

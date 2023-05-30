@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_SEND_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var args *types.Zval
 	var arg_num int

@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_THROW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	value = opline.Const1()
 	for {
@@ -25,7 +25,7 @@ func ZEND_THROW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return 0
 }
 func ZEND_THROW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var free_op1 ZendFreeOp
 	value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
@@ -55,7 +55,7 @@ func ZEND_THROW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	return 0
 }
 func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var free_op1 ZendFreeOp
 	value = opline.Op1()
@@ -86,7 +86,7 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	return 0
 }
 func ZEND_THROW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	value = opline.Op1()
 	for {

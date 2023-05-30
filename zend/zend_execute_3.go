@@ -9,8 +9,8 @@ import (
 
 func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	var msg string
-	var opline *ZendOp = executeData.GetOpline()
-	var end *ZendOp
+	var opline *types.ZendOp = executeData.GetOpline()
+	var end *types.ZendOp
 	var var_ uint32
 	if EG__().GetException() != nil {
 		return
@@ -143,7 +143,7 @@ func ZendDeprecatedFunction(fbc types.IFunction) {
 func ZendAbstractMethod(fbc types.IFunction) {
 	faults.ThrowError(nil, "Cannot call abstract method %s::%s()", fbc.GetScope().Name(), fbc.FunctionName())
 }
-func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var c uint8
 	var string_len int
 	var offset ZendLong
@@ -237,7 +237,7 @@ func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *types.PropertyInfo
 	}
 	return nil
 }
-func ZendThrowIncdecRefError(ref *types.ZendReference, opline *ZendOp) ZendLong {
+func ZendThrowIncdecRefError(ref *types.ZendReference, opline *types.ZendOp) ZendLong {
 	var error_prop *types.PropertyInfo = ZendGetPropNotAcceptingDouble(ref)
 
 	/* Currently there should be no way for a typed reference to accept both int and double.
@@ -252,7 +252,7 @@ func ZendThrowIncdecRefError(ref *types.ZendReference, opline *ZendOp) ZendLong 
 		return ZEND_LONG_MIN
 	}
 }
-func ZendThrowIncdecPropError(prop *types.PropertyInfo, opline *ZendOp) ZendLong {
+func ZendThrowIncdecPropError(prop *types.PropertyInfo, opline *types.ZendOp) ZendLong {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
@@ -264,7 +264,7 @@ func ZendThrowIncdecPropError(prop *types.PropertyInfo, opline *ZendOp) ZendLong
 		return ZEND_LONG_MIN
 	}
 }
-func ZendIncdecTypedRef(ref *types.ZendReference, copy *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendIncdecTypedRef(ref *types.ZendReference, copy *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var tmp types.Zval
 	var var_ptr *types.Zval = ref.GetVal()
 	if copy == nil {
@@ -287,7 +287,7 @@ func ZendIncdecTypedRef(ref *types.ZendReference, copy *types.Zval, opline *Zend
 		// ZvalPtrDtor(&tmp)
 	}
 }
-func ZendIncdecTypedProp(prop_info *types.PropertyInfo, var_ptr *types.Zval, copy *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendIncdecTypedProp(prop_info *types.PropertyInfo, var_ptr *types.Zval, copy *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var tmp types.Zval
 	if copy == nil {
 		copy = &tmp
@@ -309,7 +309,7 @@ func ZendIncdecTypedProp(prop_info *types.PropertyInfo, var_ptr *types.Zval, cop
 		// ZvalPtrDtor(&tmp)
 	}
 }
-func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, opline *types.ZendOp, executeData *ZendExecuteData) {
 	if prop.IsLong() {
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 			operators.FastLongIncrementFunction(prop)
@@ -344,7 +344,7 @@ func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, 
 		types.ZVAL_COPY(opline.Result(), prop)
 	}
 }
-func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, opline *types.ZendOp, executeData *ZendExecuteData) {
 	if prop.IsLong() {
 		opline.Result().SetLong(prop.Long())
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
@@ -377,7 +377,7 @@ func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo,
 		}
 	}
 }
-func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, cache_slot *any, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, cache_slot *any, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var rv types.Zval
 	var obj types.Zval
 	var z *types.Zval

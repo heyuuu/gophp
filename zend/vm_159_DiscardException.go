@@ -5,13 +5,13 @@ import (
 )
 
 func ZEND_DISCARD_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var fast_call *types.Zval = opline.Op1()
 
 	/* cleanup incomplete RETURN statement */
 
 	if fast_call.GetOplineNum() != uint32-1 && (executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].GetOp2Type()&(IS_TMP_VAR|IS_VAR)) != 0 {
-		var return_value *types.Zval = EX_VAR(executeData, executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2.var_)
+		var return_value *types.Zval = EX_VAR(executeData, executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2.GetVar())
 	}
 
 	/* cleanup delayed exception */

@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var func_ types.IFunction
 	var object *types.Zval
 	var called_scope *types.ClassEntry

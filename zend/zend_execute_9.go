@@ -106,7 +106,7 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 	Efree(fbc)
 	return 1
 }
-func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, executeData *ZendExecuteData) types.ZendBool {
+func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *types.ZendOp, executeData *ZendExecuteData) types.ZendBool {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(array_ptr)
 	var iter *ZendObjectIterator = ce.GetGetIterator()(ce, array_ptr, by_ref)
 	var is_empty types.ZendBool
@@ -140,7 +140,7 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 	opline.Result().SetFeIterIdx(uint32 - 1)
 	return is_empty
 }
-func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int, opline *ZendOp, executeData *ZendExecuteData) int {
+func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int, opline *types.ZendOp, executeData *ZendExecuteData) int {
 	var orig_key *types.Zval = key
 	var c *ZendConstant = nil
 	c = EG__().ConstantTable().Get(key.String().GetStr())
@@ -224,26 +224,26 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 	CACHE_PTR(opline.GetExtendedValue(), c)
 	return types.SUCCESS
 }
-func ZendQuickGetConstant(key *types.Zval, flags uint32, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendQuickGetConstant(key *types.Zval, flags uint32, opline *types.ZendOp, executeData *ZendExecuteData) {
 	_zendQuickGetConstant(key, flags, 0, opline, executeData)
 }
-func ZendQuickCheckConstant(key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) int {
+func ZendQuickCheckConstant(key *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) int {
 	return _zendQuickGetConstant(key, 0, 1, opline, executeData)
 }
 func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData *ZendExecuteData) int {
 	OPLINE = executeData.GetOpline() + 1
 	return 0
 }
-func ZEND_VM_NEXT_OPCODE(executeData *ZendExecuteData, opline *ZendOp) int {
+func ZEND_VM_NEXT_OPCODE(executeData *ZendExecuteData, opline *types.ZendOp) int {
 	b.Assert(EG__().GetException() == nil)
 	OPLINE = opline + 1
 	return 0
 }
-func ZEND_VM_SET_RELATIVE_OPCODE(executeData *ZendExecuteData, opline *ZendOp, offset uint32) {
+func ZEND_VM_SET_RELATIVE_OPCODE(executeData *ZendExecuteData, opline *types.ZendOp, offset uint32) {
 	OPLINE = ZEND_OFFSET_TO_OPLINE(opline, offset)
 	ZEND_VM_INTERRUPT_CHECK(executeData)
 }
-func ZEND_VM_JMP_EX(executeData *ZendExecuteData, new_op *ZendOp, check_exception int) int {
+func ZEND_VM_JMP_EX(executeData *ZendExecuteData, new_op *types.ZendOp, check_exception int) int {
 	if check_exception != 0 && EG__().GetException() != nil {
 		return 0
 	}
@@ -251,7 +251,7 @@ func ZEND_VM_JMP_EX(executeData *ZendExecuteData, new_op *ZendOp, check_exceptio
 	ZEND_VM_INTERRUPT_CHECK(executeData)
 	return 0
 }
-func ZEND_VM_JMP(executeData *ZendExecuteData, new_op *ZendOp) {
+func ZEND_VM_JMP(executeData *ZendExecuteData, new_op *types.ZendOp) {
 	ZEND_VM_JMP_EX(executeData, new_op, 1)
 }
 func ZEND_VM_INC_OPCODE(executeData *ZendExecuteData) int {

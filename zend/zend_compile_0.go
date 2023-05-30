@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func MAKE_NOP(opline *ZendOp) {
+func MAKE_NOP(opline *types.ZendOp) {
 	opline.GetOp1().SetNum(0)
 	opline.GetOp2().SetNum(0)
 	opline.GetResult().SetNum(0)
@@ -17,11 +17,6 @@ func MAKE_NOP(opline *ZendOp) {
 	opline.SetOp1Type(IS_UNUSED)
 	opline.SetOp2Type(IS_UNUSED)
 	opline.SetResultType(IS_UNUSED)
-}
-func RESET_DOC_COMMENT() {
-	if CG__().GetDocComment() != nil {
-		CG__().SetDocComment(nil)
-	}
 }
 func ZendAstGetZnode(ast *ZendAst) *Znode { return (*ZendAstZnode)(ast).GetNode() }
 func OBJ_PROP(obj *types.ZendObject, offset *types.ZendObject) *types.Zval {
@@ -59,28 +54,28 @@ func EX_VAR(executeData *ZendExecuteData, n uint32) *types.Zval {
 func EX_VAR_TO_NUM(n uint32) __auto__ {
 	return uint32(ZEND_CALL_VAR(nil, n) - nil.VarNum(0))
 }
-func ZEND_OPLINE_NUM_TO_OFFSET(op_array *types.ZendOpArray, opline *ZendOp, opline_num uint32) *byte {
+func ZEND_OPLINE_NUM_TO_OFFSET(op_array *types.ZendOpArray, opline *types.ZendOp, opline_num uint32) *byte {
 	return (*byte)(op_array.GetOpcodes()[opline_num] - (*byte)(opline))
 }
-func ZEND_OFFSET_TO_OPLINE(base *ZendOp, offset uint32) *ZendOp {
-	return (*ZendOp)((*byte)(base) + int(offset))
+func ZEND_OFFSET_TO_OPLINE(base *types.ZendOp, offset uint32) *types.ZendOp {
+	return (*types.ZendOp)((*byte)(base) + int(offset))
 }
-func OP_JMP_ADDR(opline *ZendOp, node ZnodeOp) *ZendOp {
+func OP_JMP_ADDR(opline *types.ZendOp, node types.ZnodeOp) *types.ZendOp {
 	return ZEND_OFFSET_TO_OPLINE(opline, node.GetJmpOffset())
 }
-func ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array *types.ZendOpArray, opline *ZendOp, node ZnodeOp) {
+func ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array *types.ZendOpArray, opline *types.ZendOp, node types.ZnodeOp) {
 	node.SetJmpOffset(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, node.GetOplineNum()))
 }
 func CT_CONSTANT_EX(op_array *types.ZendOpArray, num *types.Zval) *types.Zval {
 	return op_array.GetLiterals() + num
 }
-func CT_CONSTANT(node ZnodeOp) *types.Zval {
+func CT_CONSTANT(node types.ZnodeOp) *types.Zval {
 	return CT_CONSTANT_EX(CG__().GetActiveOpArray(), node.GetConstant())
 }
-func RT_CONSTANT(opline *ZendOp, node ZnodeOp) *types.Zval {
-	return (*types.Zval)((*byte)(opline) + int32(node.constant))
+func RT_CONSTANT(opline *types.ZendOp, node types.ZnodeOp) *types.Zval {
+	return (*types.Zval)((*byte)(opline) + int32(node.GetConstant()))
 }
-func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *types.ZendOpArray, opline *ZendOp, node ZnodeOp) {
+func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *types.ZendOpArray, opline *types.ZendOp, node types.ZnodeOp) {
 	node.SetConstant((*byte)(CT_CONSTANT_EX(op_array, node.GetConstant())) - (*byte)(opline))
 }
 func RUN_TIME_CACHE(op_array *types.ZendOpArray) []any {
@@ -128,18 +123,23 @@ func ZendAllocCacheSlots(count unsigned) uint32 {
 	return ret
 }
 func ZendAllocCacheSlot() uint32 { return ZendAllocCacheSlots(1) }
-func InitOp(op *ZendOp) {
-	MAKE_NOP(op)
+func InitOp(op *types.ZendOp) {
+	op.SetNop()
 	op.SetExtendedValue(0)
 	op.SetLineno(CG__().GetZendLineno())
 }
+func InitOpEx() *types.ZendOp {
+	lineno := uint32(CG__().GetZendLineno())
+	return types.NewOp(lineno)
+}
+
 func GetNextOpNumber() uint32 {
 	return CG__().GetActiveOpArray().GetLast()
 }
-func GetNextOp() *ZendOp {
+func GetNextOp() *types.ZendOp {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var next_op_num uint32 = b.PostInc(&(op_array.GetLast()))
-	var next_op *ZendOp
+	var next_op *types.ZendOp
 	if next_op_num >= CG__().GetContext().GetOpcodesSize() {
 		CG__().GetContext().SetOpcodesSize(CG__().GetContext().GetOpcodesSize() * 4)
 		op_array.SetOpcodes(Erealloc(op_array.GetOpcodes(), CG__().GetContext().GetOpcodesSize()*b.SizeOf("zend_op")))
@@ -386,7 +386,7 @@ func ZendAddConstNameLiteral(name string, unqualified types.ZendBool) int {
 	ZendAddLiteralString(&tmp_name)
 	return ret
 }
-func LITERAL_STR(op ZnodeOp, str *types.String) {
+func LITERAL_STR(op types.ZnodeOp, str *types.String) {
 	var _c types.Zval
 	_c.SetString(str)
 	op.SetConstant(ZendAddLiteral(&_c))
@@ -429,7 +429,7 @@ func ZendEndLoop(cont_addr int, var_node *Znode) {
 }
 func ZendDoFree(op1 *Znode) {
 	if op1.GetOpType() == IS_TMP_VAR {
-		var opline *ZendOp = CG__().GetActiveOpArray().GetOpcodes()[CG__().GetActiveOpArray().GetLast()-1]
+		var opline *types.ZendOp = CG__().GetActiveOpArray().GetOpcodes()[CG__().GetActiveOpArray().GetLast()-1]
 		for opline.GetOpcode() == ZEND_END_SILENCE {
 			opline--
 		}
@@ -440,7 +440,7 @@ func ZendDoFree(op1 *Znode) {
 		}
 		ZendEmitOp(nil, ZEND_FREE, op1, nil)
 	} else if op1.GetOpType() == IS_VAR {
-		var opline *ZendOp = CG__().GetActiveOpArray().GetOpcodes()[CG__().GetActiveOpArray().GetLast()-1]
+		var opline *types.ZendOp = CG__().GetActiveOpArray().GetOpcodes()[CG__().GetActiveOpArray().GetLast()-1]
 		for opline.GetOpcode() == ZEND_END_SILENCE || opline.GetOpcode() == ZEND_EXT_FCALL_END || opline.GetOpcode() == ZEND_OP_DATA {
 			opline--
 		}

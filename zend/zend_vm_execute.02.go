@@ -7,7 +7,7 @@ import (
 )
 
 func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var arg *types.Zval
 	var arg_num uint32 = opline.GetOp2().GetNum()
 	faults.ThrowError(nil, "Cannot pass parameter %d by reference", arg_num)
@@ -17,7 +17,7 @@ func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
 	return 0
 }
 func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1(executeData)
 	}
@@ -60,19 +60,19 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 
 			/* Go to finally block */
 
-			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.var_)
+			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.GetVar())
 			CleanupLiveVars(executeData, op_num, try_catch.GetFinallyOp())
 			fast_call.SetObject(EG__().GetException())
 			EG__().SetException(nil)
 			fast_call.SetOplineNum(uint32 - 1)
 			return ZEND_VM_JMP_EX(executeData, executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyOp()], 0)
 		} else if op_num < try_catch.GetFinallyEnd() {
-			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.var_)
+			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.GetVar())
 
 			/* cleanup incomplete RETURN statement */
 
 			if fast_call.GetOplineNum() != uint32-1 && (executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2_type&(IS_TMP_VAR|IS_VAR)) != 0 {
-				var return_value *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2.var_)
+				var return_value *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2.GetVar())
 				// ZvalPtrDtor(return_value)
 			}
 
@@ -112,7 +112,7 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 	}
 }
 func zend_yield_in_closed_generator_helper_SPEC(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	faults.ThrowError(nil, "Cannot yield from finally in a force-closed generator")
 	FREE_UNFETCHED_OP(opline.GetOp2Type(), opline.GetOp2().GetVar())
 	FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())

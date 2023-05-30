@@ -3,7 +3,7 @@ package zend
 import "github.com/heyuuu/gophp/php/types"
 
 func ZEND_FETCH_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var c *ZendConstant
 	c = CACHED_PTR(opline.GetExtendedValue())
 	if c != nil && IS_SPECIAL_CACHE_VAL(c) == 0 {

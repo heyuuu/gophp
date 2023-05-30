@@ -5,12 +5,12 @@ import (
 )
 
 func ZEND_FAST_RET_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var fast_call *types.Zval = opline.Op1()
 	var current_try_catch_offset uint32
 	var current_op_num uint32
 	if fast_call.GetOplineNum() != uint32-1 {
-		var fast_ret *ZendOp = executeData.GetFunc().GetOpArray().opcodes + fast_call.GetOplineNum()
+		var fast_ret *types.ZendOp = executeData.GetFunc().GetOpArray().opcodes + fast_call.GetOplineNum()
 		return ZEND_VM_JMP_EX(executeData, fast_ret+1, 0)
 	}
 

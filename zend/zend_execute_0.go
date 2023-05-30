@@ -119,19 +119,19 @@ func ZEND_REF_ADD_TYPE_SOURCE(ref *types.ZendReference, source *types.PropertyIn
 func ZEND_REF_DEL_TYPE_SOURCE(ref *types.ZendReference, source *types.PropertyInfo) {
 	ZendRefDelTypeSource(&(ref.GetSources()), source)
 }
-func GetZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
+func GetZvalPtr(op_type int, node types.ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtr(op_type, node, should_free, type_, executeData, opline)
 }
-func GetZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
+func GetZvalPtrUndef(op_type int, node types.ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtrUndef(op_type, node, should_free, type_, executeData, opline)
 }
-func GetOpDataZvalPtrR(op_type int, node ZnodeOp, should_free *ZendFreeOp) *types.Zval {
+func GetOpDataZvalPtrR(op_type int, node types.ZnodeOp, should_free *ZendFreeOp) *types.Zval {
 	return _getOpDataZvalPtrR(op_type, node, should_free, executeData, opline)
 }
-func GetZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
+func GetZvalPtrPtr(op_type int, node types.ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtrPtr(op_type, node, should_free, type_, executeData)
 }
-func RETURN_VALUE_USED(opline *ZendOp) bool {
+func RETURN_VALUE_USED(opline *types.ZendOp) bool {
 	return opline.GetResultType() != IS_UNUSED
 }
 func ZifPass(executeData *ZendExecuteData, return_value *types.Zval) {}
@@ -181,10 +181,10 @@ func ZvalUndefinedCv(var_ uint32, executeData *ZendExecuteData) *types.Zval {
 	return UninitializedZval()
 }
 func _zvalUndefinedOp1(executeData *ZendExecuteData) *types.Zval {
-	return ZvalUndefinedCv(executeData.GetOpline().op1.var_, executeData)
+	return ZvalUndefinedCv(executeData.GetOpline().op1.GetVar(), executeData)
 }
 func _zvalUndefinedOp2(executeData *ZendExecuteData) *types.Zval {
-	return ZvalUndefinedCv(executeData.GetOpline().op2.var_, executeData)
+	return ZvalUndefinedCv(executeData.GetOpline().op2.GetVar(), executeData)
 }
 func ZVAL_UNDEFINED_OP1(executeData *ZendExecuteData) *types.Zval {
 	return _zvalUndefinedOp1(executeData)

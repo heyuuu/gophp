@@ -11,7 +11,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 	var scope *types.ClassEntry
 	var c *types.ClassConstant
 	var value *types.Zval
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	for {
 		{
 			if CACHED_PTR(opline.GetExtendedValue() + b.SizeOf("void *")) {
@@ -62,7 +62,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 	var c *types.ClassConstant
 	var value *types.Zval
 	var zv *types.Zval
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	for {
 
 		{
@@ -107,7 +107,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 	var scope *types.ClassEntry
 	var c *types.ClassConstant
 	var value *types.Zval
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	for {
 
 		{

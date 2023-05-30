@@ -445,7 +445,7 @@ func ZendAddToList(result any, item any) {
 	*((*any)(result)) = list
 }
 func ZendDoExtendedStmt() {
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_STMT) == 0 {
 		return
 	}
@@ -453,7 +453,7 @@ func ZendDoExtendedStmt() {
 	opline.SetOpcode(ZEND_EXT_STMT)
 }
 func ZendDoExtendedFcallBegin() {
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_FCALL) == 0 {
 		return
 	}
@@ -461,7 +461,7 @@ func ZendDoExtendedFcallBegin() {
 	opline.SetOpcode(ZEND_EXT_FCALL_BEGIN)
 }
 func ZendDoExtendedFcallEnd() {
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_FCALL) == 0 {
 		return
 	}
@@ -557,7 +557,7 @@ func ZendDirname(path string) string {
 	}
 	return path
 }
-func ZendAdjustForFetchType(opline *ZendOp, result *Znode, type_ uint32) {
+func ZendAdjustForFetchType(opline *types.ZendOp, result *Znode, type_ uint32) {
 	var factor uint8 = b.Cond(opline.GetOpcode() == ZEND_FETCH_STATIC_PROP_R, 1, 3)
 	switch type_ {
 	case BP_VAR_R:

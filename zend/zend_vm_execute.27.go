@@ -7,7 +7,7 @@ import (
 )
 
 func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil

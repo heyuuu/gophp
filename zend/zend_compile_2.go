@@ -7,7 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendMakeVarResult(result *Znode, opline *ZendOp) {
+func ZendMakeVarResult(result *Znode, opline *types.ZendOp) {
 	opline.SetResultType(IS_VAR)
 	opline.GetResult().SetVar(GetTemporaryVariable())
 	result.SetOpType(opline.GetResultType())
@@ -17,7 +17,7 @@ func ZendMakeVarResult(result *Znode, opline *ZendOp) {
 		result.SetOp(opline.GetResult())
 	}
 }
-func ZendMakeTmpResult(result *Znode, opline *ZendOp) {
+func ZendMakeTmpResult(result *Znode, opline *types.ZendOp) {
 	opline.SetResultType(IS_TMP_VAR)
 	opline.GetResult().SetVar(GetTemporaryVariable())
 	result.SetOpType(opline.GetResultType())
@@ -27,8 +27,8 @@ func ZendMakeTmpResult(result *Znode, opline *ZendOp) {
 		result.SetOp(opline.GetResult())
 	}
 }
-func ZendEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *ZendOp {
-	var opline *ZendOp = GetNextOp()
+func ZendEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *types.ZendOp {
+	var opline *types.ZendOp = GetNextOp()
 	opline.SetOpcode(opcode)
 	if op1 != nil {
 		opline.SetOp1Type(op1.GetOpType())
@@ -51,8 +51,8 @@ func ZendEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *ZendOp {
 	}
 	return opline
 }
-func ZendEmitOpTmp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *ZendOp {
-	var opline *ZendOp = GetNextOp()
+func ZendEmitOpTmp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *types.ZendOp {
+	var opline *types.ZendOp = GetNextOp()
 	opline.SetOpcode(opcode)
 	if op1 != nil {
 		opline.SetOp1Type(op1.GetOpType())
@@ -75,16 +75,16 @@ func ZendEmitOpTmp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *ZendOp 
 	}
 	return opline
 }
-func ZendEmitOpData(value *Znode) *ZendOp {
+func ZendEmitOpData(value *Znode) *types.ZendOp {
 	return ZendEmitOp(nil, ZEND_OP_DATA, value, nil)
 }
 func ZendEmitJump(opnum_target uint32) uint32 {
 	var opnum uint32 = GetNextOpNumber()
-	var opline *ZendOp = ZendEmitOp(nil, ZEND_JMP, nil, nil)
+	var opline *types.ZendOp = ZendEmitOp(nil, ZEND_JMP, nil, nil)
 	opline.GetOp1().SetOplineNum(opnum_target)
 	return opnum
 }
-func ZendIsSmartBranch(opline *ZendOp) int {
+func ZendIsSmartBranch(opline *types.ZendOp) int {
 	switch opline.GetOpcode() {
 	case ZEND_IS_IDENTICAL:
 		fallthrough
@@ -126,7 +126,7 @@ func ZendIsSmartBranch(opline *ZendOp) int {
 }
 func ZendEmitCondJump(opcode uint8, cond *Znode, opnum_target uint32) uint32 {
 	var opnum uint32 = GetNextOpNumber()
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if (cond.GetOpType()&(IS_CV|IS_CONST)) != 0 && opnum > 0 && ZendIsSmartBranch(CG__().GetActiveOpArray().GetOpcodes()+opnum-1) != 0 {
 
 		/* emit extra NOP to avoid incorrect SMART_BRANCH in very rare cases */
@@ -139,7 +139,7 @@ func ZendEmitCondJump(opcode uint8, cond *Znode, opnum_target uint32) uint32 {
 	return opnum
 }
 func ZendUpdateJumpTarget(opnum_jump uint32, opnum_target uint32) {
-	var opline *ZendOp = CG__().GetActiveOpArray().GetOpcodes()[opnum_jump]
+	var opline *types.ZendOp = CG__().GetActiveOpArray().GetOpcodes()[opnum_jump]
 	switch opline.GetOpcode() {
 	case ZEND_JMP:
 		opline.GetOp1().SetOplineNum(opnum_target)
@@ -162,8 +162,8 @@ func ZendUpdateJumpTarget(opnum_jump uint32, opnum_target uint32) {
 func ZendUpdateJumpTargetToNext(opnum_jump uint32) {
 	ZendUpdateJumpTarget(opnum_jump, GetNextOpNumber())
 }
-func ZendDelayedEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *ZendOp {
-	var tmp_opline ZendOp
+func ZendDelayedEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *types.ZendOp {
+	var tmp_opline types.ZendOp
 	InitOp(&tmp_opline)
 	tmp_opline.SetOpcode(opcode)
 	if op1 != nil {
@@ -191,9 +191,9 @@ func ZendDelayedEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *Zen
 func ZendDelayedCompileBegin() uint32 {
 	return CG__().GetDelayedOplinesStack().GetTop()
 }
-func ZendDelayedCompileEnd(offset uint32) *ZendOp {
-	var opline *ZendOp = nil
-	var oplines *ZendOp = CG__().GetDelayedOplinesStack().GetElements()
+func ZendDelayedCompileEnd(offset uint32) *types.ZendOp {
+	var opline *types.ZendOp = nil
+	var oplines *types.ZendOp = CG__().GetDelayedOplinesStack().GetElements()
 	var i uint32
 	var count uint32 = CG__().GetDelayedOplinesStack().GetTop()
 	b.Assert(count >= offset)
@@ -237,7 +237,7 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 }
 func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit types.ZendBool) {
 	if return_info.GetType().IsSet() {
-		var opline *ZendOp
+		var opline *types.ZendOp
 
 		/* `return ...;` is illegal in a void function (but `return;` isn't) */
 
@@ -292,7 +292,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit typ
 }
 func ZendEmitFinalReturn(return_one int) {
 	var zn Znode
-	var ret *ZendOp
+	var ret *types.ZendOp
 	var returns_reference types.ZendBool = CG__().GetActiveOpArray().IsReturnReference()
 	if CG__().GetActiveOpArray().IsHasReturnType() && !CG__().GetActiveOpArray().IsGenerator() {
 		ZendEmitReturnTypeCheck(nil, CG__().GetActiveOpArray().GetArgInfo()-1, 1)
@@ -339,7 +339,7 @@ func ZendHandleNumericOp(node *Znode) {
 		}
 	}
 }
-func ZendHandleNumericDim(opline *ZendOp, dim_node *Znode) {
+func ZendHandleNumericDim(opline *types.ZendOp, dim_node *Znode) {
 	if dim_node.GetConstant().IsString() {
 		var index ZendUlong
 		if types.HandleNumericStr(dim_node.GetConstant().String().GetStr(), &index) {
@@ -356,7 +356,7 @@ func ZendHandleNumericDim(opline *ZendOp, dim_node *Znode) {
 		}
 	}
 }
-func ZendSetClassNameOp1(opline *ZendOp, class_node *Znode) {
+func ZendSetClassNameOp1(opline *types.ZendOp, class_node *Znode) {
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp1Type(IS_CONST)
 		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
@@ -391,7 +391,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 			}
 			// types.ZendStringReleaseEx(name, 0)
 		} else {
-			var opline *ZendOp = ZendEmitOp(result, ZEND_FETCH_CLASS, nil, &name_node)
+			var opline *types.ZendOp = ZendEmitOp(result, ZEND_FETCH_CLASS, nil, &name_node)
 			opline.GetOp1().SetNum(ZEND_FETCH_CLASS_DEFAULT | fetch_flags)
 		}
 		return
@@ -437,10 +437,10 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 	}
 	return types.FAILURE
 }
-func ZendCompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed int) *ZendOp {
+func ZendCompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed int) *types.ZendOp {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	var name_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	ZendCompileExpr(&name_node, name_ast)
 	if name_node.GetOpType() == IS_CONST {
 		operators.ConvertToString(name_node.GetConstant())
@@ -465,9 +465,9 @@ func IsThisFetch(ast *ZendAst) bool {
 	}
 	return false
 }
-func ZendCompileSimpleVar(result *Znode, ast *ZendAst, type_ uint32, delayed int) *ZendOp {
+func ZendCompileSimpleVar(result *Znode, ast *ZendAst, type_ uint32, delayed int) *types.ZendOp {
 	if IsThisFetch(ast) {
-		var opline *ZendOp = ZendEmitOp(result, ZEND_FETCH_THIS, nil, nil)
+		var opline *types.ZendOp = ZendEmitOp(result, ZEND_FETCH_THIS, nil, nil)
 		if type_ == BP_VAR_R || type_ == BP_VAR_IS {
 			opline.SetResultType(IS_TMP_VAR)
 			result.SetOpType(IS_TMP_VAR)
@@ -482,7 +482,7 @@ func ZendCompileSimpleVar(result *Znode, ast *ZendAst, type_ uint32, delayed int
 func ZendSeparateIfCallAndWrite(node *Znode, ast *ZendAst, type_ uint32) {
 	if type_ != BP_VAR_R && type_ != BP_VAR_IS && ZendIsCall(ast) != 0 {
 		if node.GetOpType() == IS_VAR {
-			var opline *ZendOp = ZendEmitOp(nil, ZEND_SEPARATE, node, nil)
+			var opline *types.ZendOp = ZendEmitOp(nil, ZEND_SEPARATE, node, nil)
 			opline.SetResultType(IS_VAR)
 			opline.GetResult().SetVar(opline.GetOp1().GetVar())
 		} else {
@@ -496,13 +496,13 @@ func ZendEmitAssignZnode(var_ast *ZendAst, value_node *Znode) {
 	ZendCompileAssign(&dummy_node, assign_ast)
 	ZendDoFree(&dummy_node)
 }
-func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *ZendOp {
+func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
 	if ast.GetAttr() == ZEND_DIM_ALTERNATIVE_SYNTAX {
 		faults.Error(faults.E_DEPRECATED, "Array and string offset access syntax with curly braces is deprecated")
 	}
 	var var_ast *ZendAst = ast.GetChild()[0]
 	var dim_ast *ZendAst = ast.GetChild()[1]
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var var_node Znode
 	var dim_node Znode
 	opline = ZendDelayedCompileVar(&var_node, var_ast, type_, 0)
@@ -528,17 +528,17 @@ func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *ZendOp {
 	}
 	return opline
 }
-func ZendCompileDim(result *Znode, ast *ZendAst, type_ uint32) *ZendOp {
+func ZendCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
 	var offset uint32 = ZendDelayedCompileBegin()
 	ZendDelayedCompileDim(result, ast, type_)
 	return ZendDelayedCompileEnd(offset)
 }
-func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *ZendOp {
+func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
 	var obj_ast *ZendAst = ast.GetChild()[0]
 	var prop_ast *ZendAst = ast.GetChild()[1]
 	var obj_node Znode
 	var prop_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	if IsThisFetch(obj_ast) {
 		obj_node.SetOpType(IS_UNUSED)
 		CG__().GetActiveOpArray().SetIsUsesThis(true)
@@ -558,20 +558,20 @@ func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *ZendOp {
 	ZendAdjustForFetchType(opline, result, type_)
 	return opline
 }
-func ZendCompileProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *ZendOp {
+func ZendCompileProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
 	var offset uint32 = ZendDelayedCompileBegin()
-	var opline *ZendOp = ZendDelayedCompileProp(result, ast, type_)
+	var opline *types.ZendOp = ZendDelayedCompileProp(result, ast, type_)
 	if by_ref != 0 {
 		opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_FETCH_REF)
 	}
 	return ZendDelayedCompileEnd(offset)
 }
-func ZendCompileStaticProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int, delayed int) *ZendOp {
+func ZendCompileStaticProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int, delayed int) *types.ZendOp {
 	var class_ast *ZendAst = ast.GetChild()[0]
 	var prop_ast *ZendAst = ast.GetChild()[1]
 	var class_node Znode
 	var prop_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	ZendCompileClassRef(&class_node, class_ast, ZEND_FETCH_CLASS_EXCEPTION)
 	ZendCompileExpr(&prop_node, prop_ast)
 	if delayed != 0 {
@@ -645,7 +645,7 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 		var key_ast *ZendAst
 		var fetch_result Znode
 		var dim_node Znode
-		var opline *ZendOp
+		var opline *types.ZendOp
 		if elem_ast == nil {
 			if is_keyed != 0 {
 				faults.Error(faults.E_COMPILE_ERROR, "Cannot use empty array entries in keyed array assignment")
@@ -733,7 +733,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[1]
 	var var_node Znode
 	var expr_node Znode
-	var opline *ZendOp
+	var opline *types.ZendOp
 	var offset uint32
 	if IsThisFetch(var_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")

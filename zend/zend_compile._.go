@@ -77,7 +77,7 @@ const INITIAL_OP_ARRAY_SIZE = 64
 
 /* helper functions in zend_language_scanner.l */
 
-type ZendNeedsLiveRangeCb func(op_array *types.ZendOpArray, opline *ZendOp) types.ZendBool
+type ZendNeedsLiveRangeCb func(op_array *types.ZendOpArray, opline *types.ZendOp) types.ZendBool
 type ZendAutoGlobalCallback func(name *types.String) types.ZendBool
 
 /* BEGIN: OPCODES */

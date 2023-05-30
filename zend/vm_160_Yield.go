@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -113,7 +113,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -218,7 +218,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -323,7 +323,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -420,7 +420,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -524,7 +524,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -624,7 +624,7 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -722,7 +722,7 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -820,7 +820,7 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -910,7 +910,7 @@ func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1007,7 +1007,7 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1104,7 +1104,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1199,7 +1199,7 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1294,7 +1294,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1381,7 +1381,7 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1475,7 +1475,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1560,7 +1560,7 @@ func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1643,7 +1643,7 @@ func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1726,7 +1726,7 @@ func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1801,7 +1801,7 @@ func ZEND_YIELD_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1883,7 +1883,7 @@ func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -1982,7 +1982,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -2079,7 +2079,7 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -2176,7 +2176,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)
@@ -2265,7 +2265,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	return -1
 }
 func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	if generator.IsForcedClose() {
 		return zend_yield_in_closed_generator_helper_SPEC(executeData)

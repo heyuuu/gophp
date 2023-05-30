@@ -3,7 +3,7 @@ package zend
 import "github.com/heyuuu/gophp/php/types"
 
 func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var prop *types.Zval
 	var value *types.Zval
 	var prop_info *types.PropertyInfo
@@ -27,7 +27,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CONST_HANDLER(executeData *ZendExecute
 	return 0
 }
 func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_TMP_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op_data ZendFreeOp
 	var prop *types.Zval
 	var value *types.Zval
@@ -54,7 +54,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDa
 	return 0
 }
 func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op_data ZendFreeOp
 	var prop *types.Zval
 	var value *types.Zval
@@ -81,7 +81,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDa
 	return 0
 }
 func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var prop *types.Zval
 	var value *types.Zval
 	var prop_info *types.PropertyInfo

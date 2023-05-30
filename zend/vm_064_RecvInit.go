@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var arg_num uint32
 	var param *types.Zval
 	for {

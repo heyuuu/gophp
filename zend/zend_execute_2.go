@@ -309,13 +309,13 @@ func ZendUseObjectAsArray() {
 func ZendIllegalOffset() {
 	faults.Error(faults.E_WARNING, "Illegal offset type")
 }
-func ZendAssignToObjectDim(object *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendAssignToObjectDim(object *types.Zval, dim *types.Zval, value *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	object.Object().WriteDimension(dim, value)
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
 }
-func ZendBinaryOp(ret *types.Zval, op1 *types.Zval, op2 *types.Zval, opline *ZendOp) int {
+func ZendBinaryOp(ret *types.Zval, op1 *types.Zval, op2 *types.Zval, opline *types.ZendOp) int {
 	var zend_binary_ops []BinaryOpType = []BinaryOpType{operators.AddFunction, operators.SubFunction, operators.MulFunction, operators.DivFunction, operators.ModFunction, operators.ShiftLeftFunction, operators.ShiftRightFunction, operators.ConcatFunction, operators.BitwiseOrFunction, operators.BitwiseAndFunction, operators.BitwiseXorFunction, operators.PowFunction}
 
 	/* size_t cast makes GCC to better optimize 64-bit PIC code */
@@ -323,7 +323,7 @@ func ZendBinaryOp(ret *types.Zval, op1 *types.Zval, op2 *types.Zval, opline *Zen
 	var opcode int = int(opline.GetExtendedValue())
 	return zend_binary_ops[opcode-ZEND_ADD](ret, op1, op2)
 }
-func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var free_op_data1 ZendFreeOp
 	var value *types.Zval
 	var z *types.Zval
@@ -357,7 +357,7 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 	}
 	// 	FREE_OP(free_op_data1)
 }
-func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var z_copy types.Zval
 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */
@@ -375,7 +375,7 @@ func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opl
 		// ZvalPtrDtor(&z_copy)
 	}
 }
-func ZendBinaryAssignOpTypedProp(prop_info *types.PropertyInfo, zptr *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendBinaryAssignOpTypedProp(prop_info *types.PropertyInfo, zptr *types.Zval, value *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var z_copy types.Zval
 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */

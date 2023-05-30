@@ -5,7 +5,7 @@ import (
 )
 
 func ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op *types.Zval
 	var jump_zv *types.Zval
 	var jumptable *types.Array
@@ -40,7 +40,7 @@ func ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) i
 	}
 }
 func ZEND_SWITCH_STRING_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var op *types.Zval
 	var jump_zv *types.Zval
 	var jumptable *types.Array

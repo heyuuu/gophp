@@ -7,7 +7,7 @@ import (
 )
 
 func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var varname *types.Zval
 	var retval *types.Zval
 	var name *types.String

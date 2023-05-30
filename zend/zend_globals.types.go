@@ -245,8 +245,8 @@ type ZendExecutorGlobals struct {
 	error_reporting_ini_entry *ZendIniEntry
 	exception                 *types.ZendObject
 	prev_exception            **types.ZendObject
-	opline_before_exception   *ZendOp
-	exception_op              [3]ZendOp
+	opline_before_exception   *types.ZendOp
+	exception_op              [3]types.ZendOp
 	current_module            *ModuleEntry
 	active                    types.ZendBool
 	flags                     uint8
@@ -260,7 +260,7 @@ type ZendExecutorGlobals struct {
 
 	saved_fpu_cw_ptr        any
 	trampoline              types.IFunction
-	call_trampoline_op      ZendOp
+	call_trampoline_op      types.ZendOp
 	each_deprecation_thrown types.ZendBool
 	weakrefs                types.Array
 	exception_ignore_args   types.ZendBool
@@ -487,14 +487,14 @@ func (this *ZendExecutorGlobals) GetPrevException() **types.ZendObject { return 
 func (this *ZendExecutorGlobals) SetPrevException(value **types.ZendObject) {
 	this.prev_exception = value
 }
-func (this *ZendExecutorGlobals) GetOplineBeforeException() *ZendOp {
+func (this *ZendExecutorGlobals) GetOplineBeforeException() *types.ZendOp {
 	return this.opline_before_exception
 }
-func (this *ZendExecutorGlobals) SetOplineBeforeException(value *ZendOp) {
+func (this *ZendExecutorGlobals) SetOplineBeforeException(value *types.ZendOp) {
 	this.opline_before_exception = value
 }
-func (this *ZendExecutorGlobals) GetExceptionOp() *[3]ZendOp     { return &this.exception_op }
-func (this *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry { return this.current_module }
+func (this *ZendExecutorGlobals) GetExceptionOp() *[3]types.ZendOp { return &this.exception_op }
+func (this *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry   { return this.current_module }
 func (this *ZendExecutorGlobals) SetCurrentModule(value *ModuleEntry) {
 	this.current_module = value
 }
@@ -508,8 +508,10 @@ func (this *ZendExecutorGlobals) GetSavedFpuCwPtr() any               { return t
 func (this *ZendExecutorGlobals) SetSavedFpuCwPtr(value any)          { this.saved_fpu_cw_ptr = value }
 func (this *ZendExecutorGlobals) GetTrampoline() types.IFunction      { return this.trampoline }
 func (this *ZendExecutorGlobals) SetTrampoline(value types.IFunction) { this.trampoline = value }
-func (this *ZendExecutorGlobals) GetCallTrampolineOp() ZendOp         { return this.call_trampoline_op }
-func (this *ZendExecutorGlobals) SetCallTrampolineOp(value ZendOp)    { this.call_trampoline_op = value }
+func (this *ZendExecutorGlobals) GetCallTrampolineOp() types.ZendOp   { return this.call_trampoline_op }
+func (this *ZendExecutorGlobals) SetCallTrampolineOp(value types.ZendOp) {
+	this.call_trampoline_op = value
+}
 func (this *ZendExecutorGlobals) GetEachDeprecationThrown() types.ZendBool {
 	return this.each_deprecation_thrown
 }

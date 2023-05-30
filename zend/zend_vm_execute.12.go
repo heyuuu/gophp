@@ -8,7 +8,7 @@ import (
 )
 
 func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var varname *types.Zval
 	var retval *types.Zval

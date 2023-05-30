@@ -8,7 +8,7 @@ import (
 
 func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var ce *types.ClassEntry
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
 		var rtd_key string = opline.Const1().StringVal()

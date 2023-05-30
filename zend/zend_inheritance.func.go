@@ -539,10 +539,10 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 			if i >= required && arg_info.GetIsVariadic() == 0 {
 				str.AppendString(" = ")
 				if fptr.GetType() == ZEND_USER_FUNCTION {
-					var precv *ZendOp = nil
+					var precv *types.ZendOp = nil
 					var idx uint32 = i
-					var op *ZendOp = fptr.GetOpArray().GetOpcodes()
-					var end *ZendOp = op + fptr.GetOpArray().GetLast()
+					var op *types.ZendOp = fptr.GetOpArray().GetOpcodes()
+					var end *types.ZendOp = op + fptr.GetOpArray().GetLast()
 					idx++
 					for op < end {
 						if (op.GetOpcode() == ZEND_RECV || op.GetOpcode() == ZEND_RECV_INIT) && op.GetOp1().GetNum() == ZendUlong(idx) {

@@ -10,7 +10,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	var fetch_type uint32
 	var called_scope *types.ClassEntry
 	var scope *types.ClassEntry
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	fetch_type = opline.GetOp1().GetNum()
 	scope = executeData.GetFunc().GetOpArray().scope
 	if scope == nil {

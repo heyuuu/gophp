@@ -6,7 +6,7 @@ import (
 )
 
 func ZEND_POST_INC_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
+	var opline *types.ZendOp = executeData.GetOpline()
 	var prop *types.Zval
 	var prop_info *types.PropertyInfo
 	if ZendFetchStaticPropertyAddress(&prop, &prop_info, opline.GetExtendedValue(), BP_VAR_RW, 0, opline, executeData) != types.SUCCESS {
