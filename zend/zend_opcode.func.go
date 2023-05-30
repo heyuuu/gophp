@@ -348,11 +348,11 @@ func PassTwo(op_array *types.ZendOpArray) int {
 	op_array.SetOpcodes((*types.ZendOp)(Erealloc(op_array.GetOpcodes(), ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)+b.SizeOf("zval")*op_array.GetLastLiteral())))
 	if op_array.GetLiterals() != nil {
 		memcpy((*byte)(op_array.GetOpcodes())+ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16), op_array.GetLiterals(), b.SizeOf("zval")*op_array.GetLastLiteral())
-		Efree(op_array.GetLiterals())
+		op_array.CleanLiterals()
 		op_array.SetLiterals((*types.Zval)((*byte)(op_array.GetOpcodes()) + ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)))
 	}
 	CG__().GetContext().SetOpcodesSize(op_array.GetLast())
-	CG__().GetContext().SetLiteralsSize(op_array.GetLastLiteral())
+	//CG__().GetContext().SetLiteralsSize(op_array.GetLastLiteral())
 
 	/* Needs to be set directly after the opcode/literal reallocation, to ensure destruction
 	 * happens correctly if any of the following fixups generate a fatal error. */

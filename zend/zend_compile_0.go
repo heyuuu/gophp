@@ -57,8 +57,8 @@ func OP_JMP_ADDR(opline *types.ZendOp, node types.ZnodeOp) *types.ZendOp {
 func ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array *types.ZendOpArray, opline *types.ZendOp, node types.ZnodeOp) {
 	node.SetJmpOffset(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, node.GetOplineNum()))
 }
-func CT_CONSTANT_EX(op_array *types.ZendOpArray, num *types.Zval) *types.Zval {
-	return op_array.GetLiterals() + num
+func CT_CONSTANT_EX(op_array *types.ZendOpArray, num uint32) *types.Zval {
+	return op_array.GetLiteral(num)
 }
 func CT_CONSTANT(node types.ZnodeOp) *types.Zval {
 	return CT_CONSTANT_EX(CG__().GetActiveOpArray(), node.GetConstant())
@@ -268,23 +268,9 @@ func LookupCv(name string) int {
 	var ex *ZendExecuteData = nil
 	return int(types.ZendIntptrT(ex.VarNum(i)))
 }
-func ZendInsertLiteral(op_array *types.ZendOpArray, zv *types.Zval, literal_position int) {
-	var lit *types.Zval = CT_CONSTANT_EX(op_array, literal_position)
-	lit.CopyValueFrom(zv)
-	lit.SetU2Extra(0)
-}
 func ZendAddLiteral(zv *types.Zval) int {
-	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
-	var i int = op_array.GetLastLiteral()
-	op_array.GetLastLiteral()++
-	if i >= CG__().GetContext().GetLiteralsSize() {
-		for i >= CG__().GetContext().GetLiteralsSize() {
-			CG__().GetContext().SetLiteralsSize(CG__().GetContext().GetLiteralsSize() + 16)
-		}
-		op_array.SetLiterals((*types.Zval)(Erealloc(op_array.GetLiterals(), CG__().GetContext().GetLiteralsSize()*b.SizeOf("zval"))))
-	}
-	ZendInsertLiteral(op_array, zv, i)
-	return i
+	var opArray = CG__().GetActiveOpArray()
+	return opArray.AddLiteral(zv)
 }
 func ZendAddLiteralStringEx(str string) int {
 	zv := types.NewZvalString(str)

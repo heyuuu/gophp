@@ -2,6 +2,7 @@ package types
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -31,7 +32,7 @@ type ZendOpArray struct {
 	line_end                  uint32
 	docComment                string // 块注释，默认值空字符表示注释不存在
 	last_literal              int
-	literals                  *Zval
+	literals                  []Zval
 	reserved                  []any
 }
 
@@ -167,6 +168,24 @@ func (f *ZendOpArray) FindOrAddVarName(name string) int {
 func (f *ZendOpArray) GetOpcodes() []ZendOp      { return f.opcodes }
 func (f *ZendOpArray) SetOpcodes(value []ZendOp) { f.opcodes = value }
 
+// literals
+func (f *ZendOpArray) GetLastLiteral() int      { return f.last_literal }
+func (f *ZendOpArray) GetLiterals() []Zval      { return f.literals }
+func (f *ZendOpArray) GetLiteral(i int) *Zval   { return &f.literals[i] }
+func (f *ZendOpArray) SetLiterals(value []Zval) { f.literals = value }
+func (f *ZendOpArray) CleanLiterals()           { f.literals = nil }
+func (f *ZendOpArray) AddLiteral(zv *types.Zval) int {
+	// copy
+	var tmp Zval
+	tmp.CopyValueFrom(zv)
+	tmp.SetU2Extra(0)
+
+	// append
+	i := len(f.literals)
+	f.literals = append(f.literals, tmp)
+	return i
+}
+
 // fields
 func (f *ZendOpArray) GetCacheSize() int      { return f.cache_size }
 func (f *ZendOpArray) SetCacheSize(value int) { f.cache_size = value }
@@ -196,8 +215,4 @@ func (f *ZendOpArray) GetLineEnd() uint32         { return f.line_end }
 func (f *ZendOpArray) SetLineEnd(value uint32)    { f.line_end = value }
 func (f *ZendOpArray) GetDocComment() string      { return f.docComment }
 func (f *ZendOpArray) SetDocComment(value string) { f.docComment = value }
-func (f *ZendOpArray) GetLastLiteral() int        { return f.last_literal }
-func (f *ZendOpArray) SetLastLiteral(value int)   { f.last_literal = value }
-func (f *ZendOpArray) GetLiterals() *Zval         { return f.literals }
-func (f *ZendOpArray) SetLiterals(value *Zval)    { f.literals = value }
 func (f *ZendOpArray) GetReserved() []any         { return f.reserved }
