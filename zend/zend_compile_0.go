@@ -9,15 +9,6 @@ import (
 	"strings"
 )
 
-func MAKE_NOP(opline *types.ZendOp) {
-	opline.GetOp1().SetNum(0)
-	opline.GetOp2().SetNum(0)
-	opline.GetResult().SetNum(0)
-	opline.SetOpcode(ZEND_NOP)
-	opline.SetOp1Type(IS_UNUSED)
-	opline.SetOp2Type(IS_UNUSED)
-	opline.SetResultType(IS_UNUSED)
-}
 func ZendAstGetZnode(ast *ZendAst) *Znode { return (*ZendAstZnode)(ast).GetNode() }
 func OBJ_PROP(obj *types.ZendObject, offset *types.ZendObject) *types.Zval {
 	return (*types.Zval)((*byte)(obj + offset))
@@ -30,7 +21,7 @@ func OBJ_PROP_TO_NUM(offset uint32) int {
 }
 func ZEND_FN_SCOPE_NAME(function types.IFunction) string {
 	if function != nil && function.GetScope() != nil {
-		return function.GetScope().GetName().GetStr()
+		return function.GetScope().Name()
 	} else {
 		return ""
 	}
@@ -80,10 +71,6 @@ func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *types.ZendOpArray, opline *types.Ze
 }
 func RUN_TIME_CACHE(op_array *types.ZendOpArray) []any {
 	return op_array.GetRunTimeCache()
-}
-func ZendGetUnmangledPropertyName(mangled_prop *types.String) *byte {
-	_, propName, _ := ZendUnmanglePropertyName_Ex(mangled_prop.GetStr())
-	return propName
 }
 func ZendGetUnmangledPropertyNameEx(mangledProp string) string {
 	_, propName, _ := ZendUnmanglePropertyName_Ex(mangledProp)

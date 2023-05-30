@@ -1224,7 +1224,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 	ret = CE_STATIC_MEMBERS(ce) + property_info.GetOffset()
 	ret = types.ZVAL_DEINDIRECT(ret)
 	if (type_ == BP_VAR_R || type_ == BP_VAR_RW) && ret.IsUndef() && property_info.GetType() != 0 {
-		faults.ThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().Name(), ZendGetUnmangledPropertyName(property_name))
+		faults.ThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(property_name.GetStr()))
 		return nil
 	}
 	return ret
