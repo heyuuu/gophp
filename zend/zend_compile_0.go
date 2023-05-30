@@ -263,12 +263,9 @@ func GetTemporaryVariable() uint32 {
 func LookupCv(name string) int {
 	var opArray *types.ZendOpArray = CG__().GetActiveOpArray()
 
-	var ex *ZendExecuteData = nil
-	if i := opArray.FindVar(name); i >= 0 {
-		return int(types.ZendIntptrT(ex.VarNum(i)))
-	}
+	i := opArray.FindOrAddVarName(name)
 
-	i := opArray.AppendVar(name)
+	var ex *ZendExecuteData = nil
 	return int(types.ZendIntptrT(ex.VarNum(i)))
 }
 func ZendInsertLiteral(op_array *types.ZendOpArray, zv *types.Zval, literal_position int) {

@@ -1167,7 +1167,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 				 */
 				var arg *types.Zval
 				for ; i < firstExtraArg; i++ {
-					argName := call.GetFunc().GetOpArray().GetVar(i)
+					argName := call.GetFunc().GetOpArray().VarName(i)
 					arg = types.ZendHashFindInd(call.GetSymbolTable(), argName)
 					if arg != nil {
 						arr.Append(arg)

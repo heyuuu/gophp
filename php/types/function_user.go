@@ -140,21 +140,27 @@ func (f *ZendOpArray) TryIncRefCount() {
 }
 
 // vars
-func (f *ZendOpArray) GetLastVar() int     { return len(f.vars) }
-func (f *ZendOpArray) Vars() []string      { return f.vars }
-func (f *ZendOpArray) GetVar(i int) string { return f.vars[i] }
-func (f *ZendOpArray) AppendVar(name string) int {
-	i := len(f.vars)
-	f.vars = append(f.vars, name)
-	return i
-}
-func (f *ZendOpArray) FindVar(name string) int {
+func (f *ZendOpArray) GetLastVar() int      { return len(f.vars) }
+func (f *ZendOpArray) VarNames() []string   { return f.vars }
+func (f *ZendOpArray) VarName(i int) string { return f.vars[i] }
+func (f *ZendOpArray) FindVarName(name string) int {
 	for i, varName := range f.vars {
 		if varName == name {
 			return i
 		}
 	}
 	return -1
+}
+func (f *ZendOpArray) FindOrAddVarName(name string) int {
+	// find
+	if i := f.FindVarName(name); i >= 0 {
+		return i
+	}
+
+	// append
+	i := len(f.vars)
+	f.vars = append(f.vars, name)
+	return i
 }
 
 // opcode

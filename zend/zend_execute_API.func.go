@@ -992,7 +992,7 @@ func ZendRebuildSymbolTable() *types.Array {
 		//types.ZendHashRealInitMixed(symbol_table)
 	}
 	if ex.GetFunc().GetOpArray().GetLastVar() != 0 {
-		vars := ex.GetFunc().GetOpArray().Vars()
+		vars := ex.GetFunc().GetOpArray().VarNames()
 		for i, varName := range vars {
 			var_ := ex.VarNum(i)
 			types.ZendHashAppendInd(symbol_table, varName, var_)
@@ -1009,7 +1009,7 @@ func ZendAttachSymbolTable(executeData *ZendExecuteData) {
 	   INDIRECT references to CV in symbol table  */
 
 	if op_array.GetLastVar() != 0 {
-		vars := op_array.Vars()
+		vars := op_array.VarNames()
 		for i, varname := range vars {
 			var_ := executeData.VarNum(i)
 			var zv *types.Zval = ht.KeyFind(varname)
@@ -1037,7 +1037,7 @@ func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 
 	/* copy real values from CV slots into symbol table */
 
-	vars := op_array.Vars()
+	vars := op_array.VarNames()
 	if len(vars) != 0 {
 		for i, varname := range vars {
 			var_ := executeData.VarNum(i)
@@ -1061,7 +1061,7 @@ func ZendSetLocalVarStr(name string, value *types.Zval, force int) int {
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
 			var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
 
-			if i := op_array.FindVar(name); i >= 0 {
+			if i := op_array.FindVarName(name); i >= 0 {
 				var var_ = executeData.VarNum(i)
 				var_.CopyValueFrom(value)
 				return types.SUCCESS

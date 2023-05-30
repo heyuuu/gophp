@@ -137,7 +137,7 @@ func ZendCompileClosureUses(ast *ZendAst) {
 		var var_name *types.String = ZendAstGetStr(var_ast)
 		var zv types.Zval
 		zv.SetNull()
-		if j := op_array.FindVar(var_name.GetStr()); j >= 0 {
+		if j := op_array.FindVarName(var_name.GetStr()); j >= 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use lexical variable $%s as a parameter name", var_name.GetVal())
 		}
 		CG__().SetZendLineno(ZendAstGetLineno(var_ast))
