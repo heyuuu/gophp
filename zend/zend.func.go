@@ -338,13 +338,8 @@ func ZendSetUtilityValues(utility_values *ZendUtilityValues) { ZendUv = *utility
 func Zenderror(error *byte) {
 	CG__().SetParseError(0)
 	if EG__().GetException() != nil {
-
 		/* An exception was thrown in the lexer, don't throw another in the parser. */
-
 		return
-
-		/* An exception was thrown in the lexer, don't throw another in the parser. */
-
 	}
 	faults.ThrowException(faults.ZendCeParseError, error, 0)
 }
@@ -457,12 +452,12 @@ func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*FileHandle) boo
 }
 
 func ZendMakeCompiledStringDescription(name string) string {
-	var cur_filename *byte
+	var cur_filename string
 	var cur_lineno int
 	if ZendIsCompiling() != 0 {
-		cur_filename = ZendGetCompiledFilename().GetVal()
+		cur_filename = ZendGetCompiledFilename()
 		cur_lineno = ZendGetCompiledLineno()
-	} else if ZendIsExecuting() != 0 {
+	} else if ZendIsExecuting() {
 		cur_filename = ZendGetExecutedFilename()
 		cur_lineno = ZendGetExecutedLineno()
 	} else {

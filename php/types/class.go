@@ -71,10 +71,10 @@ type ClassEntry struct {
 	trait_precedences []*zend.ZendTraitPrecedence
 	info              struct /* union */ {
 		user struct {
-			filename    *String
-			line_start  uint32
-			line_end    uint32
-			doc_comment *String
+			filename   string
+			lineStart  uint32
+			lineEnd    uint32
+			docComment string
 		}
 	}
 	// info.internal
@@ -277,17 +277,13 @@ func (ce *ClassEntry) GetTraitPrecedences() []*zend.ZendTraitPrecedence {
 func (ce *ClassEntry) SetTraitPrecedences(value []*zend.ZendTraitPrecedence) {
 	ce.trait_precedences = value
 }
-func (ce *ClassEntry) GetFilename() *String      { return ce.info.user.filename }
-func (ce *ClassEntry) SetFilename(value *String) { ce.info.user.filename = value }
-
-// func (this *ClassEntry)  GetLineStart() uint32      { return this.info.user.line_start }
-func (ce *ClassEntry) SetLineStart(value uint32) { ce.info.user.line_start = value }
-
-// func (this *ClassEntry)  GetLineEnd() uint32      { return this.info.user.line_end }
-func (ce *ClassEntry) SetLineEnd(value uint32) { ce.info.user.line_end = value }
-func (ce *ClassEntry) GetDocComment() *String  { return ce.info.user.doc_comment }
-func (ce *ClassEntry) SetDocComment(value *String) {
-	ce.info.user.doc_comment = value
+func (ce *ClassEntry) GetFilename() string       { return ce.info.user.filename }
+func (ce *ClassEntry) SetFilename(value string)  { ce.info.user.filename = value }
+func (ce *ClassEntry) SetLineStart(value uint32) { ce.info.user.lineStart = value }
+func (ce *ClassEntry) SetLineEnd(value uint32)   { ce.info.user.lineEnd = value }
+func (ce *ClassEntry) GetDocComment() string     { return ce.info.user.docComment }
+func (ce *ClassEntry) SetDocComment(value string) {
+	ce.info.user.docComment = value
 }
 
 /* ClassEntry.ceFlags */

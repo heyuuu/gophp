@@ -42,7 +42,7 @@ type ZendLexState struct {
 
 	in                   *FileHandle
 	lineno               uint32
-	filename             *types.String
+	filename             string
 	script_org           *uint8
 	script_org_size      int
 	script_filtered      *uint8

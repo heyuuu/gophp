@@ -203,7 +203,7 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	var tmp types.Zval
 	var trace types.Zval
 	var base_ce *types.ClassEntry
-	var filename *types.String
+	var filename string
 
 	object := types.NewObject(class_type, &DefaultExceptionHandlers)
 	obj.SetObject(object)
@@ -221,7 +221,7 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 		tmp.SetLong(zend.ZendGetExecutedLineno())
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_LINE, &tmp)
 	} else {
-		tmp.SetString(filename)
+		tmp.SetStringVal(filename)
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_FILE, &tmp)
 		tmp.SetLong(zend.ZendGetCompiledLineno())
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_LINE, &tmp)

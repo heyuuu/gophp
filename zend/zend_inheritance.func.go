@@ -157,9 +157,9 @@ func ResolveClassName(scope *types.ClassEntry, name string) string {
 		return name
 	}
 }
-func ClassVisible(ce *types.ClassEntry) types.ZendBool {
+func ClassVisible(ce *types.ClassEntry) bool {
 	if ce.IsInternalClass() {
-		return !(CG__().GetCompilerOptions() & ZEND_COMPILE_IGNORE_INTERNAL_CLASSES)
+		return (CG__().GetCompilerOptions() & ZEND_COMPILE_IGNORE_INTERNAL_CLASSES) != 0
 	} else {
 		b.Assert(ce.IsUserClass())
 		return (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || ce.GetFilename() == CG__().GetCompiledFilename()
@@ -182,7 +182,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 		types.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name.GetStr())
 	} else {
 		ce = ZendLookupClassEx(name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
-		if ce != nil && ClassVisible(ce) != 0 {
+		if ce != nil && ClassVisible(ce) {
 			return ce
 		}
 

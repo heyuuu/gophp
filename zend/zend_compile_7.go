@@ -218,14 +218,13 @@ func ZendCompileNamespace(ast *ZendAst) {
 func ZendCompileHaltCompiler(ast *ZendAst) {
 	var offset_ast *ZendAst = ast.GetChild()[0]
 	var offset ZendLong = ZendAstGetZval(offset_ast).Long()
-	var filename *types.String
 	var name *types.String
 	var const_name = "__COMPILER_HALT_OFFSET__"
 	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() != 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "__HALT_COMPILER() can only be used from the outermost scope")
 	}
-	filename = ZendGetCompiledFilename()
-	name = ZendManglePropertyName_ZStr(const_name, filename.GetStr())
+	filename := ZendGetCompiledFilename()
+	name = ZendManglePropertyName_ZStr(const_name, filename)
 	RegisterLongConstant(name.GetVal(), name.GetLen(), offset, CONST_CS, 0)
 	// types.ZendStringReleaseEx(name, 0)
 }
@@ -236,16 +235,16 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 	case T_LINE:
 		zv.SetLong(ast.GetLineno())
 	case T_FILE:
-		zv.SetStringVal(CG__().GetCompiledFilename().GetStr())
+		zv.SetStringVal(CG__().GetCompiledFilename())
 	case T_DIR:
-		var filename = CG__().GetCompiledFilename().GetStr()
+		var filename = CG__().GetCompiledFilename()
 		var dirname = ZendDirname(filename)
 		if dirname == "." {
 			dirname, _ = os.Getwd()
 		}
 		zv.SetStringVal(dirname)
 	case T_FUNC_C:
-		if op_array != nil && op_array.GetFunctionName() != nil {
+		if op_array != nil && op_array.FunctionName() != "" {
 			zv.SetStringVal(op_array.FunctionName())
 		} else {
 			zv.SetStringVal("")

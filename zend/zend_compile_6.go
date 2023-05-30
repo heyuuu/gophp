@@ -725,7 +725,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *types.ZendOp {
 	ce.SetLineStart(decl.GetStartLineno())
 	ce.SetLineEnd(decl.GetEndLineno())
 	if decl.GetDocComment() != nil {
-		ce.SetDocComment(decl.GetDocComment().Copy())
+		ce.SetDocComment(decl.GetDocComment().GetStr())
 	}
 	if decl.IsAnonClass() {
 

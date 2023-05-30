@@ -333,10 +333,10 @@ func ZifSetrawcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval,
 		}
 	}
 }
-func ZifHeadersSent(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, file zpp.RefZval, line zpp.RefZval) {
+func ZifHeadersSent(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, file_ zpp.RefZval, line_ zpp.RefZval) {
 	var arg1 *types.Zval = nil
 	var arg2 *types.Zval = nil
-	var file *byte = ""
+	var file string = ""
 	var line int = 0
 	for {
 		for {
@@ -360,7 +360,7 @@ func ZifHeadersSent(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, file zp
 		zend.ZEND_TRY_ASSIGN_REF_LONG(arg2, line)
 		fallthrough
 	case 1:
-		if file != nil {
+		if file != "" {
 			zend.ZEND_TRY_ASSIGN_REF_STRING(arg1, file)
 		} else {
 			zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(arg1)

@@ -17,7 +17,7 @@ type ResourceTable = *types.Table[*types.ZendResource]
 type ZendCompilerGlobals struct {
 	loop_var_stack     ZendStack
 	active_class_entry *types.ClassEntry
-	compiled_filename  *types.String
+	compiled_filename  string
 	zend_lineno        int
 	active_op_array    *types.ZendOpArray
 	functionTable      FunctionTable
@@ -89,10 +89,10 @@ func (this *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
 func (this *ZendCompilerGlobals) SetActiveClassEntry(value *types.ClassEntry) {
 	this.active_class_entry = value
 }
-func (this *ZendCompilerGlobals) GetCompiledFilename() *types.String {
+func (this *ZendCompilerGlobals) GetCompiledFilename() string {
 	return this.compiled_filename
 }
-func (this *ZendCompilerGlobals) SetCompiledFilename(value *types.String) {
+func (this *ZendCompilerGlobals) SetCompiledFilename(value string) {
 	this.compiled_filename = value
 }
 func (this *ZendCompilerGlobals) GetZendLineno() int                   { return this.zend_lineno }

@@ -183,7 +183,7 @@ func getFilenameLineno(typ int) (string, uint32) {
 	case E_PARSE, E_COMPILE_ERROR, E_COMPILE_WARNING, E_ERROR, E_NOTICE, E_STRICT, E_DEPRECATED,
 		E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_USER_DEPRECATED, E_RECOVERABLE_ERROR:
 		if zend.ZendIsCompiling() != 0 {
-			return zend.ZendGetCompiledFilename().GetStr(), uint32(zend.ZendGetCompiledLineno())
+			return zend.ZendGetCompiledFilename(), uint32(zend.ZendGetCompiledLineno())
 		} else if zend.ZendIsExecuting() {
 			filename := zend.ZendGetExecutedFilename()
 			if filename != "" && filename[0] == '[' {

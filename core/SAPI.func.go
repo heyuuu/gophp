@@ -445,9 +445,9 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 	var header_line_len int
 	var http_response_code int
 	if SG__().headers_sent && !(SG__().RequestInfo.no_headers) {
-		var output_start_filename *byte = PhpOutputGetStartFilename()
-		var output_start_lineno int = PhpOutputGetStartLineno()
-		if output_start_filename != nil {
+		var output_start_filename = PhpOutputGetStartFilename()
+		var output_start_lineno = PhpOutputGetStartLineno()
+		if output_start_filename != "" {
 			SM__().SapiError(faults.E_WARNING, "Cannot modify header information - headers already sent by (output started at %s:%d)", output_start_filename, output_start_lineno)
 		} else {
 			SM__().SapiError(faults.E_WARNING, "Cannot modify header information - headers already sent")

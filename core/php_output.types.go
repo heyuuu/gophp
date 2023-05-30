@@ -124,7 +124,7 @@ type ZendOutputGlobals struct {
 	handlers              zend.ZendStack
 	active                *PhpOutputHandler
 	running               *PhpOutputHandler
-	output_start_filename *byte
+	output_start_filename string
 	output_start_lineno   int
 	flags                 int
 }

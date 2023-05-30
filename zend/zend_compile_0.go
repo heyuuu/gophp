@@ -250,13 +250,12 @@ func ZendSetCompiledFilename(new_compiled_filename string) {
 		CG__().filenamesTable[new_compiled_filename] = new_compiled_filename
 	}
 }
-func ZendRestoreCompiledFilename(original_compiled_filename *types.String) {
+func ZendRestoreCompiledFilename(original_compiled_filename string) {
 	CG__().SetCompiledFilename(original_compiled_filename)
 }
-func ZendGetCompiledFilenameEx() string      { return CG__().GetCompiledFilename().GetStr() }
-func ZendGetCompiledFilename() *types.String { return CG__().GetCompiledFilename() }
-func ZendGetCompiledLineno() int             { return CG__().GetZendLineno() }
-func ZendIsCompiling() types.ZendBool        { return CG__().GetInCompilation() }
+func ZendGetCompiledFilename() string { return CG__().GetCompiledFilename() }
+func ZendGetCompiledLineno() int      { return CG__().GetZendLineno() }
+func ZendIsCompiling() types.ZendBool { return CG__().GetInCompilation() }
 func GetTemporaryVariable() uint32 {
 	return b.PostInc(&(CG__().GetActiveOpArray().GetT()))
 }

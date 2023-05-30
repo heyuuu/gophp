@@ -22,11 +22,11 @@ func PhpOutputStderr(str string) int {
 }
 func PhpOutputHeader() {
 	if !(SG__().headers_sent) {
-		if !(OG__().output_start_filename) {
+		if OG__().output_start_filename == "" {
 			if zend.ZendIsCompiling() != 0 {
-				OG__().output_start_filename = zend.ZendGetCompiledFilename().GetVal()
+				OG__().output_start_filename = zend.ZendGetCompiledFilename()
 				OG__().output_start_lineno = zend.ZendGetCompiledLineno()
-			} else if zend.ZendIsExecuting() != 0 {
+			} else if zend.ZendIsExecuting() {
 				OG__().output_start_filename = zend.ZendGetExecutedFilename()
 				OG__().output_start_lineno = zend.ZendGetExecutedLineno()
 			}
@@ -294,8 +294,8 @@ func PhpOutputSetImplicitFlush(flush int) {
 		OG__().flags &= ^PHP_OUTPUT_IMPLICITFLUSH
 	}
 }
-func PhpOutputGetStartFilename() *byte { return OG__().output_start_filename }
-func PhpOutputGetStartLineno() int     { return OG__().output_start_lineno }
+func PhpOutputGetStartFilename() string { return OG__().output_start_filename }
+func PhpOutputGetStartLineno() int      { return OG__().output_start_lineno }
 func PhpOutputLockError(op int) int {
 	/* if there's no ob active, ob has been stopped */
 

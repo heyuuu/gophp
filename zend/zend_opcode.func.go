@@ -10,7 +10,7 @@ import (
 
 func InitOpArrayEx() *types.ZendOpArray {
 	opArray := types.NewOpArray()
-	opArray.SetFilename(ZendGetCompiledFilenameEx())
+	opArray.SetFilename(ZendGetCompiledFilename())
 	ZEND_MAP_PTR_INIT(opArray.static_variables_ptr, opArray.GetStaticVariables())
 	ZEND_MAP_PTR_INIT(opArray.run_time_cache, nil)
 	return opArray
@@ -347,9 +347,10 @@ func PassTwo(op_array *types.ZendOpArray) int {
 	}
 	op_array.SetOpcodes((*types.ZendOp)(Erealloc(op_array.GetOpcodes(), ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)+b.SizeOf("zval")*op_array.GetLastLiteral())))
 	if op_array.GetLiterals() != nil {
-		memcpy((*byte)(op_array.GetOpcodes())+ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16), op_array.GetLiterals(), b.SizeOf("zval")*op_array.GetLastLiteral())
-		op_array.CleanLiterals()
-		op_array.SetLiterals((*types.Zval)((*byte)(op_array.GetOpcodes()) + ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)))
+		ptr := (*byte)(op_array.GetOpcodes()) + ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)
+		memcpy(ptr, op_array.GetLiterals(), b.SizeOf("zval")*op_array.GetLastLiteral())
+		Efree(op_array.GetLiterals())
+		op_array.SetLiterals(ptr)
 	}
 	CG__().GetContext().SetOpcodesSize(op_array.GetLast())
 	//CG__().GetContext().SetLiteralsSize(op_array.GetLastLiteral())

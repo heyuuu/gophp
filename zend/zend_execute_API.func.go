@@ -792,14 +792,14 @@ func ZendTimeoutHandler(dummy int) {
 
 		/* Die on hard timeout */
 
-		var error_filename *byte = nil
+		var error_filename string = ""
 		var error_lineno uint32 = 0
 		var log_buffer []byte
 		var output_len int = 0
 		if ZendIsCompiling() != 0 {
-			error_filename = ZendGetCompiledFilename().GetVal()
+			error_filename = ZendGetCompiledFilename()
 			error_lineno = ZendGetCompiledLineno()
-		} else if ZendIsExecuting() != 0 {
+		} else if ZendIsExecuting() {
 			error_filename = ZendGetExecutedFilename()
 			if error_filename[0] == '[' {
 				error_filename = nil
@@ -808,7 +808,7 @@ func ZendTimeoutHandler(dummy int) {
 				error_lineno = ZendGetExecutedLineno()
 			}
 		}
-		if error_filename == nil {
+		if error_filename == "" {
 			error_filename = "Unknown"
 		}
 		output_len = core.Snprintf(log_buffer, b.SizeOf("log_buffer"), "\nFatal error: Maximum execution time of "+ZEND_LONG_FMT+"+"+ZEND_LONG_FMT+" seconds exceeded (terminated) in %s on line %d\n", EG__().GetTimeoutSeconds(), EG__().GetHardTimeout(), error_filename, error_lineno)
