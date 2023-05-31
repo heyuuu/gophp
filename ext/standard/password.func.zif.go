@@ -12,7 +12,7 @@ var DefZifPasswordGetInfo = def.DefFunc("password_get_info", 1, 1, []def.ArgInfo
 	if fp.HasError() {
 		return
 	}
-	ZifPasswordGetInfo(executeData, returnValue, hash)
+	ZifPasswordGetInfo(hash)
 })
 
 // generate by ZifPasswordNeedsRehash
@@ -25,7 +25,7 @@ var DefZifPasswordNeedsRehash = def.DefFunc("password_needs_rehash", 2, 3, []def
 	if fp.HasError() {
 		return
 	}
-	ZifPasswordNeedsRehash(executeData, returnValue, hash, algo, nil, options)
+	ZifPasswordNeedsRehash(hash, algo, nil, options)
 })
 
 // generate by ZifPasswordVerify
@@ -36,7 +36,7 @@ var DefZifPasswordVerify = def.DefFunc("password_verify", 2, 2, []def.ArgInfo{{N
 	if fp.HasError() {
 		return
 	}
-	ZifPasswordVerify(executeData, returnValue, password, hash)
+	ZifPasswordVerify(password, hash)
 })
 
 // generate by ZifPasswordHash
@@ -49,7 +49,7 @@ var DefZifPasswordHash = def.DefFunc("password_hash", 2, 3, []def.ArgInfo{{Name:
 	if fp.HasError() {
 		return
 	}
-	ZifPasswordHash(executeData, returnValue, password, algo, nil, options)
+	ZifPasswordHash(password, algo, nil, options)
 })
 
 // generate by ZifPasswordAlgos
@@ -57,5 +57,5 @@ var DefZifPasswordAlgos = def.DefFunc("password_algos", 0, 0, []def.ArgInfo{}, f
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifPasswordAlgos(executeData, returnValue)
+	ZifPasswordAlgos()
 })

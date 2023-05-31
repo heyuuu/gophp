@@ -40,6 +40,7 @@ func NewZvalString(str string) *Zval          { var tmp Zval; tmp.SetStringVal(s
 func NewZvalLong(l int) *Zval                 { var tmp Zval; tmp.SetLong(l); return &tmp }
 func NewZvalDouble(d float64) *Zval           { var tmp Zval; tmp.SetDouble(d); return &tmp }
 func NewZvalArray(arr *Array) *Zval           { var tmp Zval; tmp.SetArray(arr); return &tmp }
+func NewZvalEmptyArray() *Zval                { var tmp Zval; tmp.SetEmptyArray(); return &tmp }
 func NewZvalResource(res *ZendResource) *Zval { var tmp Zval; tmp.SetResource(res); return &tmp }
 func NewZvalPtr(ptr any) *Zval                { var tmp Zval; tmp.SetPtr(ptr); return &tmp }
 func NewZvalObject(obj *ZendObject) *Zval     { var tmp Zval; tmp.SetObject(obj); return &tmp }

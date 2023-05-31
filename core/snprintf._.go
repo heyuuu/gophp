@@ -8,8 +8,8 @@ const (
 	YES = 1
 )
 
-const Slprintf = ApPhpSlprintf
-const Snprintf = ApPhpSnprintf
+var Slprintf = ApPhpSlprintf
+var Snprintf = ApPhpSnprintf
 
 type LengthModifierE = int
 
