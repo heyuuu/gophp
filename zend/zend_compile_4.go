@@ -125,7 +125,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	}
 	var runtime_resolution types.ZendBool = ZendCompileFunctionName(&name_node, name_ast)
 	if runtime_resolution != 0 {
-		if ascii.StrCaseEquals(ZendAstGetStr(name_ast).GetStr(), "assert") {
+		if ascii.StrCaseEquals(ZendAstGetStrVal(name_ast), "assert") {
 			ZendCompileAssert(result, ZendAstGetList(args_ast), name_node.GetConstant().String(), nil)
 		} else {
 			ZendCompileNsCall(result, &name_node, args_ast)

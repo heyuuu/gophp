@@ -45,7 +45,7 @@ func ZendResolveClassName(name *types.String, type_ uint32) *types.String {
 			var len_ int = compound - name.GetVal()
 			var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), len_)
 			if import_name != nil {
-				return ZendConcatNames(import_name.GetVal(), import_name.GetLen(), name.GetVal()+len_+1, name.GetLen()-len_-1)
+				return types.NewString(ZendConcatNames(import_name.GetStr(), name.GetStr()[len_+1:]))
 			}
 		} else {
 
@@ -321,7 +321,7 @@ func ZendGetClassFetchTypeAst(name_ast *ZendAst) uint32 {
 	if name_ast.GetAttr() == ZEND_NAME_FQ {
 		return ZEND_FETCH_CLASS_DEFAULT
 	}
-	return ZendGetClassFetchType(ZendAstGetStr(name_ast).GetStr())
+	return ZendGetClassFetchType(ZendAstGetStrVal(name_ast))
 }
 func ZendEnsureValidClassFetchType(fetch_type uint32) {
 	if fetch_type != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() != 0 {

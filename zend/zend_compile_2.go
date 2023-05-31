@@ -404,7 +404,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))
 		return
 	}
-	fetch_type = ZendGetClassFetchType(ZendAstGetStr(name_ast).GetStr())
+	fetch_type = ZendGetClassFetchType(ZendAstGetStrVal(name_ast))
 	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
 		result.SetOpType(IS_CONST)
 		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))

@@ -102,9 +102,9 @@ func ZendCompileGroupUse(ast *ZendAst) {
 		var use *ZendAst = list.GetChild()[i]
 		var name_zval *types.Zval = ZendAstGetZval(use.GetChild()[0])
 		var name *types.String = name_zval.String()
-		var compound_ns *types.String = ZendConcatNames(ns.GetVal(), ns.GetLen(), name.GetVal(), name.GetLen())
+		var compound_ns string = ZendConcatNames(ns.GetStr(), name.GetStr())
 		// types.ZendStringReleaseEx(name, 0)
-		name_zval.SetString(compound_ns)
+		name_zval.SetStringVal(compound_ns)
 		inline_use = ZendAstCreateList(1, ZEND_AST_USE, use)
 		if ast.GetAttr() != 0 {
 			inline_use.SetAttr(ast.GetAttr())
@@ -256,7 +256,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 		}
 		if op_array != nil && op_array.GetFunctionName() != nil {
 			if op_array.GetScope() != nil {
-				zv.SetString(ZendConcat3(op_array.GetScope().Name(), op_array.GetScope().GetName().GetLen(), "::", 2, op_array.FunctionName(), op_array.GetFunctionName().GetLen()))
+				zv.SetStringVal(op_array.GetScope().Name() + "::" + op_array.FunctionName())
 			} else {
 				zv.SetStringVal(op_array.FunctionName())
 			}

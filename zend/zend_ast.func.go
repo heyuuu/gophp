@@ -74,6 +74,11 @@ func ZendAstGetStr(ast *ZendAst) *types.String {
 	b.Assert(zv.IsString())
 	return zv.String()
 }
+func ZendAstGetStrVal(ast *ZendAst) string {
+	var zv *types.Zval = ZendAstGetZval(ast)
+	b.Assert(zv.IsString())
+	return zv.StringVal()
+}
 func ZendAstGetConstantName(ast *ZendAst) *types.String {
 	b.Assert(ast.GetKind() == ZEND_AST_CONSTANT)
 	b.Assert((*ZendAstZval)(ast).GetVal().IsString())

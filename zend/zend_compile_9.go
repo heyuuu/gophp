@@ -26,7 +26,6 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	var const_ast *ZendAst = ast.GetChild()[1]
 	var class_name *types.String
 	var const_name *types.String = ZendAstGetStr(const_ast)
-	var name *types.String
 	var fetch_type int
 	if class_ast.GetKind() != ZEND_AST_ZVAL {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Dynamic class names are not allowed in compile-time class constant references")
@@ -41,10 +40,9 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	} else {
 		//class_name.AddRefcount()
 	}
-	name = ZendConcat3(class_name.GetVal(), class_name.GetLen(), "::", 2, const_name.GetVal(), const_name.GetLen())
+	name := class_name.GetStr() + "::" + const_name.GetStr()
 	ZendAstDestroy(ast)
-	// types.ZendStringReleaseEx(class_name, 0)
-	*ast_ptr = ZendAstCreateConstant(name, fetch_type|ZEND_FETCH_CLASS_EXCEPTION)
+	*ast_ptr = ZendAstCreateConstant(types.NewString(name), fetch_type|ZEND_FETCH_CLASS_EXCEPTION)
 }
 func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr

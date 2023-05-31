@@ -645,7 +645,7 @@ func ZendCompileClassName(result *Znode, ast *ZendAst) {
 		return
 	}
 	opline = ZendEmitOpTmp(result, ZEND_FETCH_CLASS_NAME, nil, nil)
-	opline.GetOp1().SetNum(ZendGetClassFetchType(ZendAstGetStr(class_ast).GetStr()))
+	opline.GetOp1().SetNum(ZendGetClassFetchType(ZendAstGetStrVal(class_ast)))
 }
 func ZendCompileRopeAddEx(opline *types.ZendOp, result *Znode, num uint32, elem_node *Znode) *types.ZendOp {
 	if num == 0 {
