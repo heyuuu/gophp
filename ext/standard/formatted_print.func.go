@@ -9,30 +9,11 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
-func PhpSprintfAppendchar(buffer **types.String, pos *int, add byte) {
-	if (*pos)+1 >= buffer.GetLen() {
-		*buffer = types.ZendStringExtend(*buffer, buffer.GetLen()<<1)
-	}
-	buffer.GetStr()[b.PostInc(&(*pos))] = add
-}
-func PhpSprintfAppendchars(buffer **types.String, pos *int, add *byte, len_ int) {
-	if (*pos)+len_ >= buffer.GetLen() {
-		var nlen int = buffer.GetLen()
-		for {
-			nlen = nlen << 1
-			if (*pos)+len_ < nlen {
-				break
-			}
-		}
-		*buffer = types.ZendStringExtend(*buffer, nlen)
-	}
-	memcpy(buffer.GetVal()+(*pos), add, len_)
-	*pos += len_
-}
 func PhpSprintfAppendstring(
-	buffer **types.String,
+	buf *strings.Builder,
 	pos *int,
 	add *byte,
 	min_width int,
@@ -63,41 +44,35 @@ func PhpSprintfAppendstring(
 		faults.ErrorNoreturn(faults.E_ERROR, "Field width %zd is too long", m_width)
 	}
 	req_size = (*pos) + m_width + 1
-	if req_size > buffer.GetLen() {
-		var size int = buffer.GetLen()
-		for req_size > size {
-			if size > types.ZEND_SIZE_MAX/2 {
-				faults.ErrorNoreturn(faults.E_ERROR, "Field width %zd is too long", req_size)
-			}
-			size <<= 1
-		}
-		*buffer = types.ZendStringExtend(*buffer, size)
-	}
 	if alignment == ALIGN_RIGHT {
 		if (neg != 0 || always_sign != 0) && padding == '0' {
 			if neg != 0 {
-				buffer.GetStr()[b.PostInc(&(*pos))] = '-'
+				*pos++
+				buf.WriteByte('-')
 			} else {
-				buffer.GetStr()[b.PostInc(&(*pos))] = '+'
+				*pos++
+				buf.WriteByte('+')
 			}
 			add++
 			len_--
 			copy_len--
 		}
 		for b.PostDec(&npad) > 0 {
-			buffer.GetStr()[b.PostInc(&(*pos))] = padding
+			*pos++
+			buf.WriteByte(padding)
 		}
 	}
-	memcpy(&buffer.GetStr()[*pos], add, copy_len+1)
+	buf.WriteString(add[:copy_len])
 	*pos += copy_len
 	if alignment == ALIGN_LEFT {
-		for b.PostDec(&npad) {
-			buffer.GetStr()[b.PostInc(&(*pos))] = padding
+		for b.PostDec(&npad) != 0 {
+			*pos++
+			buf.WriteByte(padding)
 		}
 	}
 }
 func PhpSprintfAppendint(
-	buffer **types.String,
+	buf *strings.Builder,
 	pos *int,
 	number zend.ZendLong,
 	width int,
@@ -136,10 +111,10 @@ func PhpSprintfAppendint(
 	} else if always_sign != 0 {
 		numbuf[b.PreDec(&i)] = '+'
 	}
-	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, neg, 0, always_sign)
+	PhpSprintfAppendstring(buf, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, neg, 0, always_sign)
 }
 func PhpSprintfAppenduint(
-	buffer **types.String,
+	buf *strings.Builder,
 	pos *int,
 	number zend.ZendUlong,
 	width int,
@@ -166,10 +141,10 @@ func PhpSprintfAppenduint(
 			break
 		}
 	}
-	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, 0, 0, 0)
+	PhpSprintfAppendstring(buf, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, 0, 0, 0)
 }
 func PhpSprintfAppenddouble(
-	buffer **types.String,
+	buf *strings.Builder,
 	pos *int,
 	number float64,
 	width int,
@@ -193,12 +168,12 @@ func PhpSprintfAppenddouble(
 	}
 	if core.ZendIsNaN(number) {
 		is_negative = number < 0
-		PhpSprintfAppendstring(buffer, pos, "NaN", 3, 0, padding, alignment, 3, is_negative, 0, always_sign)
+		PhpSprintfAppendstring(buf, pos, "NaN", 3, 0, padding, alignment, 3, is_negative, 0, always_sign)
 		return
 	}
 	if core.ZendIsInf(number) {
 		is_negative = number < 0
-		PhpSprintfAppendstring(buffer, pos, "INF", 3, 0, padding, alignment, 3, is_negative, 0, always_sign)
+		PhpSprintfAppendstring(buf, pos, "INF", 3, 0, padding, alignment, 3, is_negative, 0, always_sign)
 		return
 	}
 	switch fmt {
@@ -243,10 +218,10 @@ func PhpSprintfAppenddouble(
 		}
 		s_len = strlen(s)
 	}
-	PhpSprintfAppendstring(buffer, pos, s, width, 0, padding, alignment, s_len, is_negative, 0, always_sign)
+	PhpSprintfAppendstring(buf, pos, s, width, 0, padding, alignment, s_len, is_negative, 0, always_sign)
 }
 func PhpSprintfAppend2n(
-	buffer **types.String,
+	buf *strings.Builder,
 	pos *int,
 	number zend.ZendLong,
 	width int,
@@ -269,7 +244,7 @@ func PhpSprintfAppend2n(
 			break
 		}
 	}
-	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, 0, expprec, 0)
+	PhpSprintfAppendstring(buf, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, 0, expprec, 0)
 }
 func PhpSprintfGetnumber(buffer **byte, len_ *int) int {
 	var endptr *byte
@@ -287,7 +262,6 @@ func PhpSprintfGetnumber(buffer **byte, len_ *int) int {
 	}
 }
 func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.String {
-	var size int = 240
 	var outpos int = 0
 	var alignment int
 	var currarg int
@@ -304,26 +278,26 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 	if operators.TryConvertToString(z_format) == 0 {
 		return nil
 	}
+	var buf strings.Builder
 	format = z_format.String().GetVal()
 	format_len = z_format.String().GetLen()
-	result = types.ZendStringAlloc(size, 0)
 	currarg = 0
 	for format_len != 0 {
 		var expprec int
 		var tmp *types.Zval
 		temppos = memchr(format, '%', format_len)
 		if temppos == nil {
-			PhpSprintfAppendchars(&result, &outpos, format, format_len)
+			buf.WriteString(b.CastStr(format, format_len))
 			break
 		} else if temppos != format {
-			PhpSprintfAppendchars(&result, &outpos, format, temppos-format)
+			buf.WriteString(b.CastStr(format, temppos-format))
 			format_len -= temppos - format
 			format = temppos
 		}
 		format++
 		format_len--
 		if (*format) == '%' {
-			PhpSprintfAppendchar(&result, &outpos, '%')
+			buf.WriteByte('%')
 			format++
 			format_len--
 		} else {
@@ -351,7 +325,6 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 				if (*temppos) == '$' {
 					argnum = PhpSprintfGetnumber(&format, &format_len)
 					if argnum <= 0 {
-						// types.ZendStringEfree(result)
 						core.PhpErrorDocref(nil, faults.E_WARNING, "Argument number must be greater than zero")
 						return nil
 					}
@@ -387,7 +360,6 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 
 				if isdigit(int(*format)) {
 					if b.Assign(&width, PhpSprintfGetnumber(&format, &format_len)) < 0 {
-						zend.Efree(result)
 						core.PhpErrorDocref(nil, faults.E_WARNING, "Width must be greater than zero and less than %d", core.INT_MAX)
 						return nil
 					}
@@ -403,7 +375,6 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 					format_len--
 					if isdigit(int(*format)) {
 						if b.Assign(&precision, PhpSprintfGetnumber(&format, &format_len)) < 0 {
-							zend.Efree(result)
 							core.PhpErrorDocref(nil, faults.E_WARNING, "Precision must be greater than zero and less than %d", core.INT_MAX)
 							return nil
 						}
@@ -417,7 +388,6 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 				}
 			}
 			if argnum >= argc {
-				zend.Efree(result)
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Too few arguments")
 				return nil
 			}
@@ -432,11 +402,11 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 			switch *format {
 			case 's':
 				var str *types.String = operators.ZvalGetString(tmp)
-				PhpSprintfAppendstring(&result, &outpos, str.GetVal(), width, precision, padding, alignment, str.GetLen(), 0, expprec, 0)
+				PhpSprintfAppendstring(&buf, &outpos, str.GetVal(), width, precision, padding, alignment, str.GetLen(), 0, expprec, 0)
 			case 'd':
-				PhpSprintfAppendint(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, always_sign)
+				PhpSprintfAppendint(&buf, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, always_sign)
 			case 'u':
-				PhpSprintfAppenduint(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment)
+				PhpSprintfAppenduint(&buf, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment)
 			case 'g':
 				fallthrough
 			case 'G':
@@ -448,19 +418,19 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 			case 'f':
 				fallthrough
 			case 'F':
-				PhpSprintfAppenddouble(&result, &outpos, operators.ZvalGetDouble(tmp), width, padding, alignment, precision, adjusting, *format, always_sign)
+				PhpSprintfAppenddouble(&buf, &outpos, operators.ZvalGetDouble(tmp), width, padding, alignment, precision, adjusting, *format, always_sign)
 			case 'c':
-				PhpSprintfAppendchar(&result, &outpos, byte(operators.ZvalGetLong(tmp)))
+				buf.WriteByte(byte(operators.ZvalGetLong(tmp)))
 			case 'o':
-				PhpSprintfAppend2n(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 3, Hexchars, expprec)
+				PhpSprintfAppend2n(&buf, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 3, Hexchars, expprec)
 			case 'x':
-				PhpSprintfAppend2n(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 4, Hexchars, expprec)
+				PhpSprintfAppend2n(&buf, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 4, Hexchars, expprec)
 			case 'X':
-				PhpSprintfAppend2n(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 4, HEXCHARS, expprec)
+				PhpSprintfAppend2n(&buf, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 4, HEXCHARS, expprec)
 			case 'b':
-				PhpSprintfAppend2n(&result, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 1, Hexchars, expprec)
+				PhpSprintfAppend2n(&buf, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, 1, Hexchars, expprec)
 			case '%':
-				PhpSprintfAppendchar(&result, &outpos, '%')
+				buf.WriteByte('%')
 			case '0':
 				if format_len == 0 {
 					goto exit
@@ -476,7 +446,7 @@ exit:
 
 	/* possibly, we have to make sure we have room for the terminating null? */
 
-	return result.Cutoff(outpos)
+	return types.NewString(buf.String())
 }
 func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 	var args *types.Zval

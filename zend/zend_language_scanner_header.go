@@ -175,24 +175,13 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 	return retval
 }
 func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
-	var buf *byte
-	var size int
-	var old_len int
-	var new_compiled_filename *types.String
-
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
+	buf := str.StringVal() + strings.Repeat("\x00", ZEND_MMAP_AHEAD)
+	size := str.String().GetLen()
 
-	old_len = str.String().GetLen()
-	str.SetString(types.ZendStringExtend(str.String(), old_len+ZEND_MMAP_AHEAD))
-	memset(str.String().GetVal()+old_len, 0, ZEND_MMAP_AHEAD+1)
-	//LANG_SCNG__().yy_in = nil
 	LANG_SCNG__().yy_start = nil
-	buf = str.String().GetVal()
-	size = old_len
 	YyScanBuffer(buf, size)
-	new_compiled_filename = zend_string_init(filename, strlen(filename), 0)
-	zend_set_compiled_filename(new_compiled_filename)
-	zend_string_release_ex(new_compiled_filename, 0)
+	ZendSetCompiledFilename(filename)
 	CG__().zend_lineno = 1
 	CG__().increment_lineno = 0
 	CG__().doc_comment = nil

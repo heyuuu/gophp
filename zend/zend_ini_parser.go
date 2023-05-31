@@ -4,7 +4,6 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/operators"
 	"log"
 )
 
@@ -150,67 +149,6 @@ func ZendIniDoOp(type_ byte, result *types.Zval, op1 *types.Zval, op2 *types.Zva
 	}
 	str_len = sprintf(str_result, "%d", i_result)
 	result.SetString(types.NewString(b.CastStr(str_result, str_len)))
-}
-
-/* }}} */
-
-func ZendIniInitString(result *types.Zval) {
-	result.SetStringVal("")
-}
-
-/* }}} */
-
-func ZendIniAddString(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
-	var length int
-	var op1_len int
-	if op1.GetType() != types.IS_STRING {
-
-		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
-
-		if ZEND_SYSTEM_INI != 0 {
-			var str *types.String = operators.ZvalGetString(op1)
-			op1.SetStringVal(str.GetStr())
-		} else {
-			op1.SetString(operators.ZvalGetString(op1))
-		}
-
-		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
-
-	}
-	op1_len = int(op1.String().GetLen())
-	if op2.GetType() != types.IS_STRING {
-		operators.ConvertToString(op2)
-	}
-	length = op1_len + int(op2.String().GetLen())
-	result.SetString(types.ZendStringExtend(op1.String(), length))
-	memcpy(result.String().GetVal()+op1_len, op2.String().GetVal(), op2.String().GetLen()+1)
-}
-
-func ZendIniGetConstant(result *types.Zval, name *types.Zval) {
-	var c *types.Zval
-	var tmp types.Zval
-
-	/* If name contains ':' it is not a constant. Bug #26893. */
-
-	if !(memchr(name.String().GetVal(), ':', name.String().GetLen())) && b.Assign(&c, ZendGetConstant(name.StringVal())) != 0 {
-		if c.GetType() != types.IS_STRING {
-			types.ZVAL_COPY_OR_DUP(&tmp, c)
-			if tmp.IsConstantAst() {
-				ZvalUpdateConstantEx(&tmp, nil)
-			}
-			operators.ConvertToString(&tmp)
-			c = &tmp
-		}
-		result.SetString(types.NewString(c.String().GetStr()))
-		if c == &tmp {
-			// types.ZendStringRelease(tmp.String())
-		}
-		//types.ZendStringFree(name.String())
-	} else {
-		*result = *name
-	}
-
-	/* If name contains ':' it is not a constant. Bug #26893. */
 }
 
 func IniError(msg *byte) {
