@@ -167,13 +167,13 @@ var DefZifStrncasecmp = def.DefFunc("strncasecmp", 3, 3, []def.ArgInfo{{Name: "s
 })
 
 // generate by ZifEach
-var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{Name: "arr"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	arr := fp.ParseZvalEx(false, true)
+var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, zpp.FlagOldMode)
+	array := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
 		return
 	}
-	ret, ok := ZifEach(arr)
+	ret, ok := ZifEach(array)
 	if ok {
 		returnValue.SetArray(ret)
 	} else {
@@ -384,11 +384,12 @@ var DefZifTraitExists = def.DefFunc("trait_exists", 1, 2, []def.ArgInfo{{Name: "
 // generate by ZifFunctionExists
 var DefZifFunctionExists = def.DefFunc("function_exists", 1, 1, []def.ArgInfo{{Name: "function_name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	function_name := fp.ParseZval()
+	function_name := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifFunctionExists(function_name)
+	ret := ZifFunctionExists(function_name)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifClassAlias

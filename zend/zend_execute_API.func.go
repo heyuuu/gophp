@@ -670,7 +670,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 
 	var ce *types.ClassEntry = nil
 	if ZendCallFunction(&fcall_info, &fcall_cache) == types.SUCCESS && EG__().GetException() == nil {
-		ce = EG__().ClassTable().Get(lc_name))
+		ce = EG__().ClassTable().Get(lc_name)
 	}
 
 	faults.ExceptionRestore()

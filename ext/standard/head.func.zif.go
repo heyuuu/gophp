@@ -67,12 +67,12 @@ var DefZifSetrawcookie = def.DefFunc("setrawcookie", 1, 7, []def.ArgInfo{{Name: 
 var DefZifHeadersSent = def.DefFunc("headers_sent", 0, 2, []def.ArgInfo{{Name: "file"}, {Name: "line"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
-	file := fp.ParseZvalEx(false, true)
-	line := fp.ParseZvalEx(false, true)
+	file_ := fp.ParseZvalEx(false, true)
+	line_ := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
 		return
 	}
-	ZifHeadersSent(executeData, returnValue, nil, file, line)
+	ZifHeadersSent(executeData, returnValue, nil, file_, line_)
 })
 
 // generate by ZifHeadersList

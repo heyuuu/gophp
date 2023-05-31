@@ -156,7 +156,7 @@ func ZifStrncasecmp(str1 string, str2 string, len_ int) (int, bool) {
 	return operators.ZendBinaryStrncasecmp(str1, str2, len_), true
 }
 
-//@zif -old="z/"
+//@zif -old "z/"
 func ZifEach(array zpp.RefZval) (*types.Array, bool) {
 	if EG__().GetEachDeprecationThrown() == 0 {
 		faults.Error(faults.E_DEPRECATED, "The each() function is deprecated. This message will be suppressed on further calls")

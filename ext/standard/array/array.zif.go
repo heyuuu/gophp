@@ -174,7 +174,8 @@ var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "array"}}, func(ex
 	if fp.HasError() {
 		return
 	}
-	ZifEnd(returnValue, array)
+	ret := ZifEnd(array)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifPrev
@@ -247,7 +248,8 @@ var DefZifKey = def.DefFunc("key", 1, 1, []def.ArgInfo{{Name: "array"}}, func(ex
 	if fp.HasError() {
 		return
 	}
-	ZifKey(returnValue, array)
+	ret := ZifKey(array)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifMin
@@ -423,7 +425,8 @@ var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "st
 	if fp.HasError() {
 		return
 	}
-	ZifArrayShift(stack)
+	ret := ZifArrayShift(stack)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayUnshift

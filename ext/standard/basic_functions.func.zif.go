@@ -500,22 +500,24 @@ var DefZifUnregisterTickFunction = def.DefFunc("unregister_tick_function", 1, 1,
 // generate by ZifIsUploadedFile
 var DefZifIsUploadedFile = def.DefFunc("is_uploaded_file", 1, 1, []def.ArgInfo{{Name: "path"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	path := fp.ParseZval()
+	path := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifIsUploadedFile(path)
+	ret := ZifIsUploadedFile(path)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifMoveUploadedFile
 var DefZifMoveUploadedFile = def.DefFunc("move_uploaded_file", 2, 2, []def.ArgInfo{{Name: "path"}, {Name: "new_path"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	path := fp.ParseZval()
-	new_path := fp.ParseZval()
+	path := fp.ParseStringVal()
+	new_path := fp.ParsePathVal()
 	if fp.HasError() {
 		return
 	}
-	ZifMoveUploadedFile(executeData, returnValue, path, new_path)
+	ret := ZifMoveUploadedFile(executeData, returnValue, path, new_path)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifParseIniFile

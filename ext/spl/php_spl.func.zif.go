@@ -115,12 +115,13 @@ var DefZifSplAutoloadFunctions = def.DefFunc("spl_autoload_functions", 0, 0, []d
 
 // generate by ZifSplObjectHash
 var DefZifSplObjectHash = def.DefFunc("spl_object_hash", 1, 1, []def.ArgInfo{{Name: "obj"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	obj := fp.ParseZval()
+	fp := zpp.FastParseStart(executeData, 1, 1, zpp.FlagOldMode)
+	obj := fp.ParseObject()
 	if fp.HasError() {
 		return
 	}
-	ZifSplObjectHash(obj)
+	ret := ZifSplObjectHash(obj)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifSplObjectId

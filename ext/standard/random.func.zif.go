@@ -8,20 +8,22 @@ import (
 // generate by ZifRandomBytes
 var DefZifRandomBytes = def.DefFunc("random_bytes", 1, 1, []def.ArgInfo{{Name: "length"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	length := fp.ParseZval()
+	length := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifRandomBytes(length)
+	ret := ZifRandomBytes(length)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifRandomInt
 var DefZifRandomInt = def.DefFunc("random_int", 2, 2, []def.ArgInfo{{Name: "min"}, {Name: "max"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	min := fp.ParseZval()
-	max := fp.ParseZval()
+	min := fp.ParseLong()
+	max := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifRandomInt(min, max)
+	ret := ZifRandomInt(min, max)
+	returnValue.SetLong(ret)
 })

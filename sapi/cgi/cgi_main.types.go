@@ -22,7 +22,7 @@ type php_cgi_globals_struct struct {
 func (this *php_cgi_globals_struct) GetUserConfigCache() *types.Array {
 	return this.user_config_cache
 }
-func (this *php_cgi_globals_struct) SetUserConfigCache(value *types.Array)  {
+func (this *php_cgi_globals_struct) SetUserConfigCache(value *types.Array) {
 	this.user_config_cache = value
 }
 func (this *php_cgi_globals_struct) GetRedirectStatusEnv() *byte { return this.redirect_status_env }
