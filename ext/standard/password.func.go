@@ -41,18 +41,17 @@ func PhpPasswordSaltTo64(str string, outLen int) (string, bool) {
 	return ret, true
 }
 func PhpPasswordMakeSalt(length int) *types.String {
-	var buffer *types.String
 	if length > core.INT_MAX/3 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Length is too large to safely generate")
 		return nil
 	}
-	buffer = types.ZendStringAlloc(length*3/4+1, 0)
-	if types.FAILURE == PhpRandomBytesSilent(buffer.GetVal(), buffer.GetLen()) {
+	buffer, ok := PhpRandomStringSafe(length*3/4 + 1)
+	if !ok {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to generate salt")
 		return nil
 	}
 
-	salt, ok := PhpPasswordSaltTo64(buffer.GetStr(), length)
+	salt, ok := PhpPasswordSaltTo64(buffer, length)
 	if !ok {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Generated salt too short")
 		return nil
