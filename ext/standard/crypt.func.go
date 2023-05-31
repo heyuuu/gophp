@@ -4,10 +4,10 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
 func IS_VALID_SALT_CHARACTER(c byte) bool {
@@ -33,6 +33,14 @@ func PhpTo64(s *byte, n int) {
 		*s = Itoa64[(*s)&0x3f]
 		s++
 	}
+}
+
+func PhpTo64Ex(s string) string {
+	var bytes = []byte(s)
+	for i, c := range bytes {
+		bytes[i] = Itoa64[c&0x3f]
+	}
+	return string(bytes)
 }
 
 func PhpCrypt(password string, salt string, quiet bool) *types.String {
@@ -113,62 +121,32 @@ func PhpCrypt(password string, salt string, quiet bool) *types.String {
 			return result
 		}
 	}
-	if crypt_res == nil || salt[0] == '*' && salt[1] == '0' {
-		return nil
-	} else {
-		result = types.NewString(crypt_res)
-		return result
-	}
 }
-func ZifCrypt(executeData zpp.Ex, return_value zpp.Ret, str_ string, _ zpp.Opt, salt_ string) string {
-	var salt []byte
-	var str *byte
-	var salt_in *byte = nil
-	var str_len int
-	var salt_in_len int = 0
+func ZifCrypt(str_ string, _ zpp.Opt, salt_ string) string {
 	var result *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			str, str_len = fp.ParseString()
-			fp.StartOptional()
-			salt_in, salt_in_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	salt[PHP_MAX_SALT_LEN] = '\000'
-	salt[0] = '\000'
 
+	if len(salt_) > PHP_MAX_SALT_LEN {
+		salt_ = salt_[:PHP_MAX_SALT_LEN]
+	}
+
+	var realSalt string
 	/* This will produce suitable results if people depend on DES-encryption
 	 * available (passing always 2-character salt). At least for glibc6.1 */
-
-	memset(&salt[1], '$', PHP_MAX_SALT_LEN-1)
-	if salt_in != nil {
-		memcpy(salt, salt_in, cli.MIN(PHP_MAX_SALT_LEN, salt_in_len))
+	if salt_ != "" {
+		realSalt = salt_ + strings.Repeat("$", PHP_MAX_SALT_LEN-len(salt_))
 	} else {
 		core.PhpErrorDocref(nil, faults.E_NOTICE, "No salt parameter was specified. You must use a randomly generated salt and a strong hash function to produce a secure hash.")
 	}
 
 	/* The automatic salt generation covers standard DES, md5-crypt and Blowfish (simple) */
-
-	if !(*salt) {
-		memcpy(salt, "$1$", 3)
-		PhpRandomBytesThrow(&salt[3], 8)
-		PhpTo64(&salt[3], 8)
-		strncpy(&salt[11], "$", PHP_MAX_SALT_LEN-11)
-		salt_in_len = strlen(salt)
-	} else {
-		salt_in_len = cli.MIN(PHP_MAX_SALT_LEN, salt_in_len)
+	if realSalt == "" || realSalt[0] == '\000' {
+		randStr, _ := PhpRandomStringSafe(8)
+		realSalt = "$1$" + PhpTo64Ex(randStr) + strings.Repeat("$", PHP_MAX_SALT_LEN-11)
 	}
-	salt[salt_in_len] = '0'
 
-	result = PhpCrypt(b.CastStr(str, str_len), b.CastStr(salt, salt_in_len), false)
+	result = PhpCrypt(str_, salt_, false)
 	if result == nil {
-		if salt[0] == '*' && salt[1] == '0' {
+		if realSalt[:2] == "*0" {
 			return "*1"
 		} else {
 			return "*0"

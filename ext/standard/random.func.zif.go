@@ -12,7 +12,7 @@ var DefZifRandomBytes = def.DefFunc("random_bytes", 1, 1, []def.ArgInfo{{Name: "
 	if fp.HasError() {
 		return
 	}
-	ZifRandomBytes(executeData, returnValue, length)
+	ZifRandomBytes(length)
 })
 
 // generate by ZifRandomInt
@@ -23,5 +23,5 @@ var DefZifRandomInt = def.DefFunc("random_int", 2, 2, []def.ArgInfo{{Name: "min"
 	if fp.HasError() {
 		return
 	}
-	ZifRandomInt(executeData, returnValue, min, max)
+	ZifRandomInt(min, max)
 })

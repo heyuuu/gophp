@@ -158,9 +158,6 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	if ZmStartupDns(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupRandom(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
-	}
 	if ZmStartupHrtime(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}
@@ -179,7 +176,6 @@ func ZmShutdownBasic(type_ int, module_number int) int {
 	ZmShutdownFile(type_, module_number)
 	ZmShutdownStandardFilters(type_, module_number)
 	ZmShutdownCrypt(type_, module_number)
-	ZmShutdownRandom(type_, module_number)
 	ZmShutdownPassword(type_, module_number)
 	return types.SUCCESS
 }
