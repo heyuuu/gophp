@@ -388,7 +388,7 @@ var DefZifFunctionExists = def.DefFunc("function_exists", 1, 1, []def.ArgInfo{{N
 	if fp.HasError() {
 		return
 	}
-	ZifFunctionExists(executeData, returnValue, function_name)
+	ZifFunctionExists(function_name)
 })
 
 // generate by ZifClassAlias

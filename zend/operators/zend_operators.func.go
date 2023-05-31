@@ -1536,49 +1536,27 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	}
 	if op1.String().GetLen() == 0 {
 		if result != op2 {
-			if result == orig_op1 {
-				// IZvalPtrDtor(result)
-			}
 			types.ZVAL_COPY(result, op2)
 		}
 	} else if op2.String().GetLen() == 0 {
 		if result != op1 {
-			if result == orig_op1 {
-				// IZvalPtrDtor(result)
-			}
 			types.ZVAL_COPY(result, op1)
 		}
 	} else {
 		var op1_len int = op1.String().GetLen()
 		var op2_len int = op2.String().GetLen()
-		var result_len int = op1_len + op2_len
-		var result_str *types.String
 		if op1_len > types.STR_MAX_LEN-op2_len {
 			faults.ThrowError(nil, "String size overflow")
-
 			if orig_op1 != result {
 				result.SetUndef()
 			}
 			return types.FAILURE
 		}
-		if result == op1 && result.IsRefcounted() {
-			/* special case, perform operations on result */
-			result_str = types.ZendStringExtend(result.String(), result_len)
-		} else {
-			result_str = types.ZendStringAlloc(result_len, 0)
-			memcpy(result_str.GetVal(), op1.String().GetVal(), op1_len)
-			if result == orig_op1 {
-				// IZvalPtrDtor(result)
-			}
-		}
 
 		/* This has to happen first to account for the cases where result == op1 == op2 and
 		 * the realloc is done. In this case this line will also update Z_STRVAL_P(op2) to
 		 * point to the new string. The first op2_len bytes of result will still be the same. */
-
-		result.SetString(result_str)
-		memcpy(result_str.GetVal()+op1_len, op2.String().GetVal(), op2_len)
-		result_str.GetStr()[result_len] = '0'
+		result.SetStringVal(op1.StringVal() + op2.StringVal())
 	}
 
 	return types.SUCCESS

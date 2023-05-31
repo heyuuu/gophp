@@ -351,24 +351,21 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 	}
 	return retval
 }
-func ZendCreateMethodString(class_name *types.String, method_name *types.String) *types.String {
-	var callable_name *types.String = types.ZendStringAlloc(class_name.GetLen()+method_name.GetLen()+b.SizeOf("\"::\"")-1, 0)
-	var ptr *byte = callable_name.GetVal()
-	memcpy(ptr, class_name.GetVal(), class_name.GetLen())
-	ptr += class_name.GetLen()
-	memcpy(ptr, "::", b.SizeOf("\"::\"")-1)
-	ptr += b.SizeOf("\"::\"") - 1
-	memcpy(ptr, method_name.GetVal(), method_name.GetLen()+1)
-	return callable_name
+func ZendCreateMethodString(className string, methodName string) string {
+	return className + "::" + methodName
 }
 func ZendGetCallableNameEx(callable *types.Zval, object *types.ZendObject) *types.String {
-try_again:
+	name := ZendGetCallableNameEx_Ex(callable, object)
+	return types.NewString(name)
+}
+func ZendGetCallableNameEx_Ex(callable *types.Zval, object *types.ZendObject) string {
+	callable = callable.DeRef()
 	switch callable.GetType() {
 	case types.IS_STRING:
 		if object != nil {
-			return ZendCreateMethodString(object.GetCe().GetName(), callable.String())
+			return ZendCreateMethodString(object.GetCe().Name(), callable.StringVal())
 		}
-		return callable.String().Copy()
+		return callable.StringVal()
 	case types.IS_ARRAY:
 		var method *types.Zval = nil
 		var obj *types.Zval = nil
@@ -377,32 +374,26 @@ try_again:
 			method = types.ZendHashIndexFindDeref(callable.Array(), 1)
 		}
 		if obj == nil || method == nil || method.GetType() != types.IS_STRING {
-			return types.NewString(types.STR_ARRAY_CAPITALIZED)
+			return types.STR_ARRAY_CAPITALIZED
 		}
 		if obj.IsString() {
-			return ZendCreateMethodString(obj.String(), method.String())
+			return ZendCreateMethodString(obj.StringVal(), method.StringVal())
 		} else if obj.IsObject() {
-			return ZendCreateMethodString(types.Z_OBJCE_P(obj).GetName(), method.String())
+			return ZendCreateMethodString(obj.Object().GetCe().Name(), method.StringVal())
 		} else {
-			return types.NewString(types.STR_ARRAY_CAPITALIZED)
+			return types.STR_ARRAY_CAPITALIZED
 		}
 	case types.IS_OBJECT:
 		var calling_scope *types.ClassEntry
 		var fptr types.IFunction
 		var object *types.ZendObject
 		if callable.Object().CanGetClosure() && callable.Object().GetClosure(callable, &calling_scope, &fptr, &object) == types.SUCCESS {
-			var ce *types.ClassEntry = types.Z_OBJCE_P(callable)
-			var callable_name *types.String = types.ZendStringAlloc(ce.GetName().GetLen()+b.SizeOf("\"::__invoke\"")-1, 0)
-			memcpy(callable_name.GetVal(), ce.Name(), ce.GetName().GetLen())
-			memcpy(callable_name.GetVal()+ce.GetName().GetLen(), "::__invoke", b.SizeOf("\"::__invoke\""))
-			return callable_name
+			var ce *types.ClassEntry = callable.Object().GetCe()
+			return ce.Name() + "::__invoke"
 		}
-		return operators.ZvalGetString(callable)
-	case types.IS_REFERENCE:
-		callable = types.Z_REFVAL_P(callable)
-		goto try_again
+		return operators.ZvalGetStrVal(callable)
 	default:
-		return operators.ZvalGetString(callable)
+		return operators.ZvalGetStrVal(callable)
 	}
 }
 func ZendGetCallableName(callable *types.Zval) *types.String {

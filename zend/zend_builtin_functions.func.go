@@ -790,39 +790,22 @@ func ZifInterfaceExists(executeData zpp.Ex, return_value zpp.Ret, classname *typ
 func ZifTraitExists(executeData zpp.Ex, return_value zpp.Ret, traitname *types.Zval, _ zpp.Opt, autoload *types.Zval) {
 	ClassExistsImpl(executeData, return_value, types.AccTrait, 0)
 }
-func ZifFunctionExists(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval) {
-	var name *types.String
+func ZifFunctionExists(functionName string) bool {
 	var func_ types.IFunction
-	var lcname *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			name = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if name.GetStr()[0] == '\\' {
-
-		/* Ignore leading "\" */
-
-		lcname = types.ZendStringAlloc(name.GetLen()-1, 0)
-		operators.ZendStrTolowerCopy(lcname.GetVal(), name.GetVal()+1, name.GetLen()-1)
+	var lcname string
+	if functionName[0] == '\\' {
+		lcname = ascii.StrToLower(functionName[1:])
 	} else {
-		lcname = operators.ZendStringTolower(name)
+		lcname = ascii.StrToLower(functionName)
 	}
-	func_ = EG__().FunctionTable().Get(lcname.GetStr())
+
+	func_ = EG__().FunctionTable().Get(lcname)
 
 	/*
 	 * A bit of a hack, but not a bad one: we see if the handler of the function
 	 * is actually one that displays "function is disabled" message.
 	 */
-
-	return_value.SetBool(func_ != nil && (func_.GetType() != ZEND_INTERNAL_FUNCTION || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction))
-	return
+	return func_ != nil && (func_.GetType() != ZEND_INTERNAL_FUNCTION || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction)
 }
 func ZifClassAlias(executeData zpp.Ex, return_value zpp.Ret, userClassName *types.Zval, aliasName *types.Zval, _ zpp.Opt, autoload *types.Zval) {
 	var class_name *types.String
