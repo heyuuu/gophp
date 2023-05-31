@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -582,25 +583,24 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *types.ClassEntry {
 	var args []types.Zval
 	var local_retval types.Zval
-	var lc_name *types.String
+	var lc_name string
 	var fcall_info types.ZendFcallInfo
 	var fcall_cache types.ZendFcallInfoCache
 	var orig_fake_scope *types.ClassEntry
 	if key != nil {
-		lc_name = key
+		lc_name = key.GetStr()
 	} else {
 		if name == nil || name.GetLen() == 0 {
 			return nil
 		}
 		if name.GetStr()[0] == '\\' {
-			lc_name = types.ZendStringAlloc(name.GetLen()-1, 0)
-			operators.ZendStrTolowerCopy(lc_name.GetVal(), name.GetVal()+1, name.GetLen()-1)
+			lc_name = ascii.StrToLower(name.GetStr()[1:])
 		} else {
-			lc_name = operators.ZendStringTolower(name)
+			lc_name = ascii.StrToLower(name.GetStr())
 		}
 	}
 
-	if ce := EG__().ClassTable().Get(lc_name.GetStr()); ce != nil {
+	if ce := EG__().ClassTable().Get(lc_name); ce != nil {
 		if !ce.IsLinked() {
 			if (flags&ZEND_FETCH_CLASS_ALLOW_UNLINKED) != 0 || (flags&ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED) != 0 && ce.IsNearlyLinked() {
 				ce.SetIsHasUnlinkedUses(true)
@@ -642,7 +642,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	if EG__().GetInAutoload() == nil {
 		EG__().SetInAutoload(types.NewArray(0))
 	}
-	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name.GetStr()) == nil {
+	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name) == nil {
 		if key == nil {
 			// types.ZendStringReleaseEx(lc_name, 0)
 		}
@@ -670,12 +670,12 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 
 	var ce *types.ClassEntry = nil
 	if ZendCallFunction(&fcall_info, &fcall_cache) == types.SUCCESS && EG__().GetException() == nil {
-		ce = EG__().ClassTable().Get(lc_name.GetStr())
+		ce = EG__().ClassTable().Get(lc_name))
 	}
 
 	faults.ExceptionRestore()
 	EG__().SetFakeScope(orig_fake_scope)
-	EG__().GetInAutoload().KeyDelete(lc_name.GetStr())
+	EG__().GetInAutoload().KeyDelete(lc_name)
 	return ce
 }
 func ZendLookupClass(name *types.String) *types.ClassEntry {
@@ -712,20 +712,16 @@ func ZendGetThisObject(ex *ZendExecuteData) *types.ZendObject {
 	}
 	return nil
 }
-func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name *byte) int {
+
+func ZendEvalStringl(str string, retval_ptr *types.Zval, string_name *byte) int {
 	var pv types.Zval
 	var new_op_array *types.ZendOpArray
 	var original_compiler_options uint32
 	var retval int
 	if retval_ptr != nil {
-		pv.SetString(types.ZendStringAlloc(str_len+b.SizeOf("\"return ;\"")-1, 0))
-		memcpy(pv.String().GetVal(), "return ", b.SizeOf("\"return \"")-1)
-		memcpy(pv.String().GetVal()+b.SizeOf("\"return \"")-1, str, str_len)
-		pv.String().GetStr()[pv.String().GetLen()-1] = ';'
-		pv.String().GetStr()[pv.String().GetLen()] = '0'
+		pv.SetStringVal("return " + str + ";")
 	} else {
-		/*printf("Evaluating '%s'\n", pv.value.str.val);*/
-		pv.SetStringVal(b.CastStr(str, str_len))
+		pv.SetStringVal(str)
 	}
 
 	original_compiler_options = CG__().GetCompilerOptions()
@@ -741,16 +737,12 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 			local_retval.SetUndef()
 			ZendExecute(new_op_array, &local_retval)
 		}, func() {
-			//DestroyOpArray(new_op_array)
-			//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 			faults.Bailout()
 		})
 
 		if local_retval.IsNotUndef() {
 			if retval_ptr != nil {
 				types.ZVAL_COPY_VALUE(retval_ptr, &local_retval)
-			} else {
-				// ZvalPtrDtor(&local_retval)
 			}
 		} else {
 			if retval_ptr != nil {
@@ -758,8 +750,6 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 			}
 		}
 		EG__().SetNoExtensions(0)
-		//DestroyOpArray(new_op_array)
-		//EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		retval = types.SUCCESS
 	} else {
 		retval = types.FAILURE
@@ -767,20 +757,17 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 
 	return retval
 }
-func ZendEvalString(str *byte, retval_ptr *types.Zval, string_name *byte) int {
-	return ZendEvalStringl(str, strlen(str), retval_ptr, string_name)
-}
-func ZendEvalStringlEx(str *byte, str_len int, retval_ptr *types.Zval, string_name *byte, handle_exceptions int) int {
+func ZendEvalStringlEx(str string, retval_ptr *types.Zval, string_name *byte, handle_exceptions int) int {
 	var result int
-	result = ZendEvalStringl(str, str_len, retval_ptr, string_name)
+	result = ZendEvalStringl(str, retval_ptr, string_name)
 	if handle_exceptions != 0 && EG__().GetException() != nil {
 		faults.ExceptionError(EG__().GetException(), faults.E_ERROR)
 		result = types.FAILURE
 	}
 	return result
 }
-func ZendEvalStringEx(str *byte, retval_ptr *types.Zval, string_name string, handle_exceptions int) int {
-	return ZendEvalStringlEx(str, strlen(str), retval_ptr, string_name, handle_exceptions)
+func ZendEvalStringEx(str string, retval_ptr *types.Zval, string_name string, handle_exceptions int) int {
+	return ZendEvalStringlEx(str, retval_ptr, string_name, handle_exceptions)
 }
 func ZendTimeout(dummy int) {
 	EG__().SetTimedOut(0)

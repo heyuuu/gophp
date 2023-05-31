@@ -216,8 +216,8 @@ func ZendRegisterSeenSymbol(name *types.String, kind uint32) {
 		FC__().GetSeenSymbols().KeyAddNew(name.GetStr(), &tmp)
 	}
 }
-func ZendHaveSeenSymbol(name *types.String, kind uint32) types.ZendBool {
-	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
+func ZendHaveSeenSymbol(name string, kind uint32) bool {
+	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name)
 	return zv != nil && (zv.Long()&kind) != 0
 }
 func FileHandleDtor(fh *FileHandle) { fh.Destroy() }
@@ -477,13 +477,9 @@ func ZendPrefixWithNs(name *types.String) *types.String {
 	}
 }
 func ZendHashFindPtrLc(ht *types.Array, str *byte, len_ int) any {
-	var result any
-	var lcname *types.String
-	types.ZstrAlloc(lcname, len_)
-	operators.ZendStrTolowerCopy(lcname.GetVal(), str, len_)
-	result = types.ZendHashFindPtr(ht, lcname.GetStr())
-	//lcname.Free()
-	return result
+	name := b.CastStr(str, len_)
+	lcName := ascii.StrToLower(name)
+	return types.ZendHashFindPtr(ht, lcName)
 }
 func ZendResolveNonClassName(name *types.String, type_ uint32, is_fully_qualified *types.ZendBool, case_sensitive types.ZendBool, current_import_sub *types.Array) *types.String {
 	var compound *byte

@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -129,37 +130,28 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 	var retval int = 0
 	var mname *types.String
 	var cname *types.String
-	var lmname *types.String
 	var colon *byte
 	var clen int
 	var ftable FunctionTable
 	var call_via_handler int = 0
 	var scope *types.ClassEntry
-	var zv *types.Zval
 	fcc.SetCallingScope(nil)
 	if ce_org == nil {
 		var func_ types.IFunction
-		var lmname *types.String
 
 		/* Check if function with given name exists.
 		 * This may be a compound name that includes namespace name */
 
 		if callable.String().GetStr()[0] == '\\' {
-
 			/* Skip leading \ */
-
-			types.ZstrAlloc(lmname, callable.String().GetLen()-1)
-			operators.ZendStrTolowerCopy(lmname.GetVal(), callable.String().GetVal()+1, callable.String().GetLen()-1)
-			func_ = ZendFetchFunction(lmname)
-			//lmname.Free()
+			lmname := ascii.StrToLower(callable.StringVal()[1:])
+			func_ = ZendFetchFunctionStr(lmname)
 		} else {
-			lmname = callable.String()
-			func_ = ZendFetchFunction(lmname)
+			lmname := callable.StringVal()
+			func_ = ZendFetchFunctionStr(lmname)
 			if func_ == nil {
-				types.ZstrAlloc(lmname, callable.String().GetLen())
-				operators.ZendStrTolowerCopy(lmname.GetVal(), callable.String().GetVal(), callable.String().GetLen())
-				func_ = ZendFetchFunction(lmname)
-				//lmname.Free()
+				lmname = ascii.StrToLower(lmname)
+				func_ = ZendFetchFunctionStr(lmname)
 			}
 		}
 		if func_ != nil {
@@ -221,7 +213,8 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		}
 		return 0
 	}
-	lmname = operators.ZendStringTolower(mname)
+
+	lmname := operators.ZendStringTolower(mname)
 	if strict_class != 0 && fcc.GetCallingScope() != nil && lmname.GetStr() == ZEND_CONSTRUCTOR_FUNC_NAME {
 		fcc.SetFunctionHandler(fcc.GetCallingScope().GetConstructor())
 		if fcc.GetFunctionHandler() != nil {

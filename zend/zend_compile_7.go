@@ -33,8 +33,8 @@ func ZendGetUseTypeStr(type_ uint32) string {
 	}
 	return " unknown"
 }
-func ZendCheckAlreadyInUse(type_ uint32, old_name *types.String, new_name *types.String, check_name *types.String) {
-	if ascii.StrCaseEquals(old_name.GetStr(), check_name.GetStr()) {
+func ZendCheckAlreadyInUse(type_ uint32, old_name *types.String, new_name *types.String, check_name string) {
+	if ascii.StrCaseEquals(old_name.GetStr(), check_name) {
 		return
 	}
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
@@ -52,7 +52,7 @@ func ZendCompileUse(ast *ZendAst) {
 		var new_name_ast *ZendAst = use_ast.GetChild()[1]
 		var old_name *types.String = ZendAstGetStr(old_name_ast)
 		var new_name *types.String
-		var lookup_name *types.String
+		var lookup_name string
 		if new_name_ast != nil {
 			new_name = ZendAstGetStr(new_name_ast).Copy()
 		} else {
@@ -70,27 +70,24 @@ func ZendCompileUse(ast *ZendAst) {
 			}
 		}
 		if case_sensitive {
-			lookup_name = new_name.Copy()
+			lookup_name = new_name.GetStr()
 		} else {
-			lookup_name = operators.ZendStringTolower(new_name)
+			lookup_name = ascii.StrToLower(new_name.GetStr())
 		}
 		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use %s as %s because '%s' "+"is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
 		}
 		if current_ns != nil {
-			var ns_name *types.String = types.ZendStringAlloc(current_ns.GetLen()+1+new_name.GetLen(), 0)
-			operators.ZendStrTolowerCopy(ns_name.GetVal(), current_ns.GetVal(), current_ns.GetLen())
-			ns_name.GetStr()[current_ns.GetLen()] = '\\'
-			memcpy(ns_name.GetVal()+current_ns.GetLen()+1, lookup_name.GetVal(), lookup_name.GetLen()+1)
-			if ZendHaveSeenSymbol(ns_name, type_) != 0 {
-				ZendCheckAlreadyInUse(type_, old_name, new_name, ns_name)
+			nsName := ascii.StrToLower(current_ns.GetStr()) + "\\" + lookup_name
+			if ZendHaveSeenSymbol(nsName, type_) {
+				ZendCheckAlreadyInUse(type_, old_name, new_name, nsName)
 			}
 		} else {
-			if ZendHaveSeenSymbol(lookup_name, type_) != 0 {
+			if ZendHaveSeenSymbol(lookup_name, type_) {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, lookup_name)
 			}
 		}
-		if !current_import.Add(lookup_name.GetStr(), old_name) {
+		if !current_import.Add(lookup_name, old_name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
 	}

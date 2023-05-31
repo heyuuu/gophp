@@ -105,40 +105,13 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 		break
 	}
 	if assertion.IsString() {
-		var retval types.Zval
-		var old_error_reporting int = 0
 		if zend.ZendForbidDynamicCall("assert() with string argument") == types.FAILURE {
 			return_value.SetFalse()
 			return
 		}
 		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Calling assert() with a string argument is deprecated")
-		myeval = assertion.String().GetVal()
-		if ASSERTG(quiet_eval) {
-			old_error_reporting = zend.EG__().GetErrorReporting()
-			zend.EG__().SetErrorReporting(0)
-		}
-		compiled_string_description = zend.ZendMakeCompiledStringDescription("assert code")
-		if zend.ZendEvalStringl(myeval, assertion.String().GetLen(), &retval, compiled_string_description) == types.FAILURE {
-			zend.Efree(compiled_string_description)
-			if description == nil {
-				faults.ThrowError(nil, "Failure evaluating code: %s%s", core.PHP_EOL, myeval)
-			} else {
-				var str *types.String = operators.ZvalGetString(description)
-				faults.ThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, str.GetVal(), myeval)
-				// types.ZendStringReleaseEx(str, 0)
-			}
-			if ASSERTG(bail) {
-				faults.Bailout()
-			}
-			return_value.SetFalse()
-			return
-		}
-		zend.Efree(compiled_string_description)
-		if ASSERTG(quiet_eval) {
-			zend.EG__().SetErrorReporting(old_error_reporting)
-		}
-		operators.ConvertToBoolean(&retval)
-		val = retval.IsType(types.IS_TRUE)
+		return_value.SetFalse()
+		return
 	} else {
 		val = operators.IZendIsTrue(assertion)
 	}

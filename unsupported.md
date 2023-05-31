@@ -18,7 +18,7 @@
 
 # 部分功能不支持的函数
 
-- `assert(mixed $assertion, Throwable $exception = ?)` 不再支持 `$assertion` 为 string 类型的情况
+- `assert(mixed $assertion, Throwable $exception = ?)` 不再支持 `$assertion` 为 string 类型的情况 (此功能在 PHP 中本已是废弃功能: `自 PHP 7.2.0 起弃用 string 作为 assertion，自 PHP 8.0.0 起删除。`)
 
 进程控制函数
 

@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -955,11 +956,10 @@ func ZendStdUnsetDimensionEx(object *types.ZendObject, offset *types.Zval) {
 		ZendBadArrayAccess(ce)
 	}
 }
-func ZendGetParentPrivateMethod(scope *types.ClassEntry, ce *types.ClassEntry, function_name *types.String) types.IFunction {
-	var func_ *types.Zval
+func ZendGetParentPrivateMethod(scope *types.ClassEntry, ce *types.ClassEntry, functionName string) types.IFunction {
 	var fbc types.IFunction
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
-		fbc = scope.FunctionTable().Get(function_name.GetStr())
+		fbc = scope.FunctionTable().Get(functionName)
 		if fbc != nil {
 			if fbc.IsPrivate() && fbc.GetScope() == scope {
 				return fbc
@@ -1063,15 +1063,14 @@ func ZendBadMethodCall(fbc types.IFunction, method_name *types.String, scope *ty
 func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key *types.Zval) types.IFunction {
 	var zobj *types.ZendObject = *obj_ptr
 	var fbc types.IFunction
-	var lc_method_name *types.String
+	var lc_method_name string
 	var scope *types.ClassEntry
 	if key != nil {
-		lc_method_name = key.String()
+		lc_method_name = key.StringVal()
 	} else {
-		types.ZstrAlloc(lc_method_name, method_name.GetLen())
-		operators.ZendStrTolowerCopy(lc_method_name.GetVal(), method_name.GetVal(), method_name.GetLen())
+		lc_method_name = ascii.StrToLower(method_name.GetStr())
 	}
-	fbc = zobj.GetCe().FunctionTable().Get(lc_method_name.GetStr())
+	fbc = zobj.GetCe().FunctionTable().Get(lc_method_name)
 	if fbc == nil {
 		if zobj.GetCe().GetCall() != nil {
 			return ZendGetUserCallFunction(zobj.GetCe(), method_name)

@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -251,16 +252,15 @@ func ZendSwapOperands(op *types.ZendOp) {
 }
 func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExecuteData {
 	var fbc types.IFunction
-	var func_ *types.Zval
 	var called_scope *types.ClassEntry
-	var lcname *types.String
+	var lcname string
 	var colon *byte
 	if b.Assign(&colon, operators.ZendMemrchr(function.GetVal(), ':', function.GetLen())) != nil && colon > function.GetVal() && (*(colon - 1)) == ':' {
 		var mname *types.String
 		var cname_length int = colon - function.GetVal() - 1
 		var mname_length int = function.GetLen() - cname_length - (b.SizeOf("\"::\"") - 1)
-		lcname = types.NewString(b.CastStr(function.GetVal(), cname_length))
-		called_scope = ZendFetchClassByName(lcname, nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+		lcname = function.GetStr()[:cname_length]
+		called_scope = ZendFetchClassByName(types.NewString(lcname), nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 		if called_scope == nil {
 			// types.ZendStringReleaseEx(lcname, 0)
 			return nil
@@ -292,13 +292,12 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 		}
 	} else {
 		if function.GetStr()[0] == '\\' {
-			lcname = types.ZendStringAlloc(function.GetLen()-1, 0)
-			operators.ZendStrTolowerCopy(lcname.GetVal(), function.GetVal()+1, function.GetLen()-1)
+			lcname = ascii.StrToLower(function.GetStr()[1:])
 		} else {
-			lcname = operators.ZendStringTolower(function)
+			lcname = ascii.StrToLower(function.GetStr())
 		}
 
-		fbc = EG__().FunctionTable().Get(lcname.GetStr())
+		fbc = EG__().FunctionTable().Get(lcname)
 		if fbc == nil {
 			faults.ThrowError(nil, "Call to undefined function %s()", function.GetVal())
 			return nil

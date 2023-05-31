@@ -801,7 +801,6 @@ func zim_spl_RecursiveTreeIterator_current(executeData *zend.ZendExecuteData, re
 	var entry types.Zval
 	var postfix types.Zval
 	var ptr *byte
-	var str *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -833,19 +832,9 @@ func zim_spl_RecursiveTreeIterator_current(executeData *zend.ZendExecuteData, re
 		return
 	}
 	SplRecursiveTreeIteratorGetPostfix(object, &postfix)
-	str = types.ZendStringAlloc(prefix.String().GetLen()+entry.String().GetLen()+postfix.String().GetLen(), 0)
-	ptr = str.GetVal()
-	memcpy(ptr, prefix.String().GetVal(), prefix.String().GetLen())
-	ptr += prefix.String().GetLen()
-	memcpy(ptr, entry.String().GetVal(), entry.String().GetLen())
-	ptr += entry.String().GetLen()
-	memcpy(ptr, postfix.String().GetVal(), postfix.String().GetLen())
-	ptr += postfix.String().GetLen()
-	*ptr = 0
-	// zend.ZvalPtrDtor(&prefix)
-	// zend.ZvalPtrDtor(&entry)
-	// zend.ZvalPtrDtor(&postfix)
-	return_value.SetString(str)
+
+	str := prefix.StringVal() + entry.StringVal() + postfix.StringVal()
+	return_value.SetStringVal(str)
 	return
 }
 func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -856,7 +845,6 @@ func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return
 	var postfix types.Zval
 	var key_copy types.Zval
 	var ptr *byte
-	var str *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -877,19 +865,9 @@ func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return
 	}
 	SplRecursiveTreeIteratorGetPrefix(object, &prefix)
 	SplRecursiveTreeIteratorGetPostfix(object, &postfix)
-	str = types.ZendStringAlloc(prefix.String().GetLen()+key.String().GetLen()+postfix.String().GetLen(), 0)
-	ptr = str.GetVal()
-	memcpy(ptr, prefix.String().GetVal(), prefix.String().GetLen())
-	ptr += prefix.String().GetLen()
-	memcpy(ptr, key.String().GetVal(), key.String().GetLen())
-	ptr += key.String().GetLen()
-	memcpy(ptr, postfix.String().GetVal(), postfix.String().GetLen())
-	ptr += postfix.String().GetLen()
-	*ptr = 0
-	// zend.ZvalPtrDtor(&prefix)
-	// zend.ZvalPtrDtor(&key)
-	// zend.ZvalPtrDtor(&postfix)
-	return_value.SetString(str)
+
+	str := prefix.StringVal() + key.StringVal() + postfix.StringVal()
+	return_value.SetStringVal(str)
 	return
 }
 func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) types.IFunction {

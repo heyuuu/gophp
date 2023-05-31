@@ -98,7 +98,7 @@ func (this *ZendFileContext) GetHasBracketedNamespaces() types.ZendBool {
 func (this *ZendFileContext) SetHasBracketedNamespaces(value types.ZendBool) {
 	this.has_bracketed_namespaces = value
 }
-func (this *ZendFileContext) GetSeenSymbols() types.Array { return this.seen_symbols }
+func (this *ZendFileContext) GetSeenSymbols() *types.Array { return &this.seen_symbols }
 
 // func (this *ZendFileContext) SetSeenSymbols(value HashTable) { this.seen_symbols = value }
 
