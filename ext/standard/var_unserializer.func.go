@@ -200,7 +200,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
 	var i int
 	var j int
-	var str *types.String = types.ZendStringSafeAlloc(1, len_, 0, 0)
+	var str *types.String = types.ZendStringAlloc(len_, 0)
 	var end *uint8 = *((**uint8)(p + maxlen))
 	if end < (*p) {
 		// types.ZendStringEfree(str)

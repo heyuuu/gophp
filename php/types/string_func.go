@@ -8,26 +8,14 @@ func ZendStringAlloc(len_ int, persistent int) *String {
 	var str_ = string(make([]byte, len_))
 	return NewString(str_)
 }
-func ZendStringSafeAlloc(n int, m int, l int, persistent int) *String {
-	// todo 不太明白参数作用，仅从纯代码功能重构
-	var len_ = n*m + l
-	return ZendStringAlloc(len_, persistent)
-}
-func ZendStringExtend(s *String, len_ int) *String {
-	b.Assert(len_ >= s.GetLen())
-	var oldStr = s.GetStr()
-	var newStr = oldStr + string(make([]byte, len_))
-	return NewString(newStr)
+func ZendStringRealloc(s *String, size int) *String {
+	ret := ZendStringAlloc(size, 0)
+	memcpy(ret.GetVal(), s.GetVal(), b.Min(size, s.GetLen())+1)
+	return ret
 }
 func ZendStringTruncate(s *String, len_ int) *String {
 	b.Assert(len_ <= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr[:len_]
 	return NewString(newStr)
-}
-func ZendStringSafeRealloc(s *String, n int, m int, l int, persistent int) *String {
-	var ret *String
-	ret = ZendStringSafeAlloc(n, m, l, persistent)
-	memcpy(ret.GetVal(), s.GetVal(), b.Min(n*m+l, s.GetLen())+1)
-	return ret
 }

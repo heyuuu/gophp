@@ -462,7 +462,7 @@ func PhpUrlEncode(s *byte, len_ int) *types.String {
 	var start *types.String
 	from = (*uint8)(s)
 	end = (*uint8)(s + len_)
-	start = types.ZendStringSafeAlloc(3, len_, 0, 0)
+	start = types.ZendStringAlloc(3*len_, 0)
 	to = (*uint8)(start.GetVal())
 	for from < end {
 		*from++
@@ -529,7 +529,7 @@ func PhpRawUrlEncode(s *byte, len_ int) *types.String {
 	var y int
 	var str *types.String
 	var ret *byte
-	str = types.ZendStringSafeAlloc(3, len_, 0, 0)
+	str = types.ZendStringAlloc(3*len_, 0)
 	ret = str.GetVal()
 	x = 0
 	y = 0

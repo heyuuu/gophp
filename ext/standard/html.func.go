@@ -1148,7 +1148,7 @@ func PhpEscapeHtmlEntitiesEx(
 		 * In HTML5, entities may take up to 33 bytes */
 
 		if len_ > maxlen-40 {
-			replaced = types.ZendStringSafeRealloc(replaced, maxlen, 1, 128, 0)
+			replaced = types.ZendStringRealloc(replaced, maxlen+128)
 			maxlen += 128
 		}
 		if status == types.FAILURE {
@@ -1316,7 +1316,7 @@ func PhpEscapeHtmlEntitiesEx(
 
 					/* ent_len < oldlen, which is certainly <= SIZE_MAX/2 */
 
-					replaced = types.ZendStringSafeRealloc(replaced, maxlen, 1, ent_len+128, 0)
+					replaced = types.ZendStringRealloc(replaced, maxlen+ent_len+128)
 					maxlen += ent_len + 128
 				}
 				replaced.GetStr()[b.PostInc(&len_)] = '&'

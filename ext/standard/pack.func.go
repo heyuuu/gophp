@@ -84,7 +84,7 @@ func PhpPackParseDouble(is_little_endian int, src any) float64 {
 	}
 	return m.d
 }
-func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp.Opt, args []*types.Zval) {
+func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format_ *types.Zval, _ zpp.Opt, args []*types.Zval) {
 	var argv *types.Zval = nil
 	var num_args int = 0
 	var i int
@@ -115,7 +115,6 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 	}
 
 	/* We have a maximum of <formatlen> format codes to deal with */
-
 	formatcodes = zend.SafeEmalloc(formatlen, b.SizeOf("* formatcodes"), 0)
 	formatargs = zend.SafeEmalloc(formatlen, b.SizeOf("* formatargs"), 0)
 	currentarg = 0

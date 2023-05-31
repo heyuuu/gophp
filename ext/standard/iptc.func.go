@@ -137,7 +137,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 			return_value.SetFalse()
 			return
 		}
-		spoolbuf = types.ZendStringSafeAlloc(1, iptcdata_len+b.SizeOf("psheader")+1024+1, sb.st_size, 0)
+		spoolbuf = types.ZendStringAlloc(iptcdata_len+b.SizeOf("psheader")+1024+1+sb.st_size, 0)
 		poi = (*uint8)(spoolbuf.GetVal())
 		memset(poi, 0, iptcdata_len+b.SizeOf("psheader")+sb.st_size+1024+1)
 	}

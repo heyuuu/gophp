@@ -34,7 +34,7 @@ func PhpUuencode(src *byte, src_len int) *types.String {
 	   Use 1.5 for easier calculation.
 	*/
 
-	dest = types.ZendStringSafeAlloc(src_len/2, 3, 46, 0)
+	dest = types.ZendStringAlloc(src_len/2*3+46, 0)
 	p = (*uint8)(dest.GetVal())
 	s = (*uint8)(src)
 	e = s + src_len

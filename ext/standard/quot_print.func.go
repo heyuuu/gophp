@@ -109,7 +109,7 @@ func PhpQuotPrintEncode(str *uint8, length int) *types.String {
 	var d *uint8
 	var hex *byte = "0123456789ABCDEF"
 	var ret *types.String
-	ret = types.ZendStringSafeAlloc(3, length+(3*length/(PHP_QPRINT_MAXL-9)+1), 0, 0)
+	ret = types.ZendStringAlloc(3*(length+(3*length/(PHP_QPRINT_MAXL-9)+1)), 0)
 	d = (*uint8)(ret.GetVal())
 	for b.PostDec(&length) {
 		if b.Assign(&c, b.PostInc(&(*str))) == '0' && (*str) == '0' && length > 0 {
