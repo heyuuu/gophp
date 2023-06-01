@@ -96,9 +96,9 @@ func PhpUrlEncodeHashEx(
 			if key != nil {
 				var ekey *types.String
 				if enc_type == PHP_QUERY_RFC3986 {
-					ekey = PhpRawUrlEncode(prop_name, prop_len)
+					ekey = types.NewString(PhpRawUrlEncode(b.CastStr(prop_name, prop_len)))
 				} else {
-					ekey = PhpUrlEncode(prop_name, prop_len)
+					ekey = types.NewString(PhpUrlEncode(b.CastStr(prop_name, prop_len)))
 				}
 				newprefix_len = key_suffix_len + ekey.GetLen() + key_prefix_len + 3
 				newprefix = zend.Emalloc(newprefix_len + 1)
@@ -171,14 +171,13 @@ func PhpUrlEncodeHashEx(
 				formstr.AppendString(b.CastStr(key_prefix, key_prefix_len))
 			}
 			if key != nil {
-				var ekey *types.String
+				var ekey string
 				if enc_type == PHP_QUERY_RFC3986 {
-					ekey = PhpRawUrlEncode(prop_name, prop_len)
+					ekey = PhpRawUrlEncode(b.CastStr(prop_name, prop_len))
 				} else {
-					ekey = PhpUrlEncode(prop_name, prop_len)
+					ekey = PhpUrlEncode(b.CastStr(prop_name, prop_len))
 				}
-				formstr.AppendString(ekey.GetStr())
-				//types.ZendStringFree(ekey)
+				formstr.AppendString(ekey)
 			} else {
 
 				/* Numeric key */
@@ -194,14 +193,13 @@ func PhpUrlEncodeHashEx(
 			formstr.AppendString("=")
 			switch zdata.GetType() {
 			case types.IS_STRING:
-				var ekey *types.String
+				var ekey string
 				if enc_type == PHP_QUERY_RFC3986 {
-					ekey = PhpRawUrlEncode(zdata.String().GetVal(), zdata.String().GetLen())
+					ekey = PhpRawUrlEncode(zdata.StringVal())
 				} else {
-					ekey = PhpUrlEncode(zdata.String().GetVal(), zdata.String().GetLen())
+					ekey = PhpUrlEncode(zdata.StringVal())
 				}
-				formstr.AppendString(ekey.GetStr())
-				//types.ZendStringFree(ekey)
+				formstr.AppendString(ekey)
 			case types.IS_LONG:
 				formstr.AppendLong(zdata.Long())
 			case types.IS_FALSE:
@@ -209,14 +207,14 @@ func PhpUrlEncodeHashEx(
 			case types.IS_TRUE:
 				formstr.AppendString("1")
 			default:
-				var ekey *types.String
-				var str *types.String = operators.ZvalGetString(zdata)
+				var ekey string
+				var str = operators.ZvalGetStrVal(zdata)
 				if enc_type == PHP_QUERY_RFC3986 {
-					ekey = PhpRawUrlEncode(str.GetVal(), str.GetLen())
+					ekey = PhpRawUrlEncode(str)
 				} else {
-					ekey = PhpUrlEncode(str.GetVal(), str.GetLen())
+					ekey = PhpUrlEncode(str)
 				}
-				formstr.AppendString(ekey.GetStr())
+				formstr.AppendString(ekey)
 			}
 		}
 	}

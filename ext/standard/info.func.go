@@ -2,9 +2,9 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
-	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -85,10 +85,9 @@ func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 func PhpInfoPrintModule(zend_module *zend.ModuleEntry) {
 	if zend_module.GetInfoFunc() != nil {
 		if core.SM__().GetPhpinfoAsText() == 0 {
-			var url_name *types.String = PhpUrlEncode(zend_module.GetName(), strlen(zend_module.GetName()))
-			str.PhpStrtolower(url_name.GetVal(), url_name.GetLen())
-			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", url_name.GetVal(), zend_module.GetName())
-			zend.Efree(url_name)
+			var urlName = PhpUrlEncode(zend_module.GetName())
+			urlName = ascii.StrToLower(urlName)
+			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", urlName, zend_module.GetName())
 		} else {
 			PhpInfoPrintTableStart()
 			PhpInfoPrintTableHeader(1, zend_module.GetName())

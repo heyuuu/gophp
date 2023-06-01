@@ -111,9 +111,8 @@ func PhpSetcookie(
 		buf.AppendString(name.GetStr())
 		buf.AppendByte('=')
 		if url_encode != 0 {
-			var encoded_value *types.String = PhpRawUrlEncode(value.GetVal(), value.GetLen())
-			buf.AppendString(encoded_value.GetStr())
-			// types.ZendStringReleaseEx(encoded_value, 0)
+			var encodedValue = PhpRawUrlEncode(value.GetStr())
+			buf.AppendString(encodedValue)
 		} else {
 			buf.AppendString(value.GetStr())
 		}

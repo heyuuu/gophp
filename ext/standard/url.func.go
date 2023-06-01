@@ -454,34 +454,22 @@ func PhpUrlEncodeEx(s string) string {
 	}
 	return buf.String()
 }
-func PhpUrlEncode(s *byte, len_ int) *types.String {
-	var c uint8
-	var to *uint8
-	var from *uint8
-	var end uint8
-	var start *types.String
-	from = (*uint8)(s)
-	end = (*uint8)(s + len_)
-	start = types.ZendStringAlloc(3*len_, 0)
-	to = (*uint8)(start.GetVal())
-	for from < end {
-		*from++
-		c = (*from) - 1
+func PhpUrlEncode(str string) string {
+	var buf strings.Builder
+	for _, c := range []byte(str) {
 		if c == ' ' {
-			b.PostInc(&(*to)) = '+'
+			buf.WriteByte('+')
 		} else if c < '0' && c != '-' && c != '.' || c < 'A' && c > '9' || c > 'Z' && c < 'a' && c != '_' || c > 'z' {
-			to[0] = '%'
-			to[1] = Hexchars[c>>4]
-			to[2] = Hexchars[c&15]
-			to += 3
+			buf.WriteByte('%')
+			buf.WriteByte(Hexchars[c>>4])
+			buf.WriteByte(Hexchars[c&15])
 		} else {
-			b.PostInc(&(*to)) = c
+			buf.WriteByte(c)
 		}
 	}
-	*to = '0'
-	start = types.ZendStringTruncate(start, to-(*uint8)(start.GetVal()))
-	return start
+	return buf.String()
 }
+
 func ZifUrlencode(str string) string {
 	return PhpUrlEncodeEx(str)
 }
@@ -524,29 +512,19 @@ func PhpUrlDecode(str *byte, len_ int) int {
 	*dest = '0'
 	return dest - str
 }
-func PhpRawUrlEncode(s *byte, len_ int) *types.String {
-	var x int
-	var y int
-	var str *types.String
-	var ret *byte
-	str = types.ZendStringAlloc(3*len_, 0)
-	ret = str.GetVal()
-	x = 0
-	y = 0
-	for b.PostDec(&len_) {
-		var c byte = s[x]
-		ret[y] = c
+
+func PhpRawUrlEncode(str string) string {
+	var buf strings.Builder
+	for _, c := range []byte(str) {
 		if c < '0' && c != '-' && c != '.' || c < 'A' && c > '9' || c > 'Z' && c < 'a' && c != '_' || c > 'z' && c != '~' {
-			ret[b.PostInc(&y)] = '%'
-			ret[b.PostInc(&y)] = Hexchars[uint8(c>>4)]
-			ret[y] = Hexchars[uint8(c&15)]
+			buf.WriteByte('%')
+			buf.WriteByte(Hexchars[c>>4])
+			buf.WriteByte(Hexchars[c&15])
+		} else {
+			buf.WriteByte(c)
 		}
-		x++
-		y++
 	}
-	ret[y] = '0'
-	str = types.ZendStringTruncate(str, y)
-	return str
+	return buf.String()
 }
 func ZifRawurlencode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var in_str *types.String
@@ -561,7 +539,7 @@ func ZifRawurlencode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) 
 		}
 		break
 	}
-	return_value.SetString(PhpRawUrlEncode(in_str.GetVal(), in_str.GetLen()))
+	return_value.SetStringVal(PhpRawUrlEncode(in_str.GetStr()))
 	return
 }
 func ZifRawurldecode(str string) string {
