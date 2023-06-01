@@ -8,13 +8,18 @@ import (
 // generate by ZifPack
 var DefZifPack = def.DefFunc("pack", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	format := fp.ParseZval()
+	format_ := fp.ParseStringVal()
 	fp.StartOptional()
 	args := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifPack(executeData, returnValue, format, nil, args)
+	ret, ok := ZifPack(format_, nil, args)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifUnpack
