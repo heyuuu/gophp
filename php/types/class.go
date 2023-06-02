@@ -37,13 +37,18 @@ func (n ClassName) GetLcName() string { return n.lcName }
  * ClassEntry
  */
 type ClassEntry struct {
-	typ  byte
-	name string // *String
-	__0  struct /* union */ {
-		parent      *ClassEntry
-		parent_name *String
-	}
-	ceFlags                      uint32
+	typ     byte
+	name    string // *String
+	ceFlags uint32
+
+	// 继承父类，在 link 前只有 parentName 可能有值，在 link 后只有 parent 可能有值(union)。
+	parentName *String
+	parent     *ClassEntry
+
+	// 继承接口列表，在 link 前只有 interfaceNames 可能有值，在 link 后只有 interfaces 可能有值(union)。
+	interfaceNames []ClassName
+	interfaces     []*ClassEntry
+
 	default_properties_count     int
 	default_static_members_count int
 	default_properties_table     []Zval
@@ -80,10 +85,6 @@ type ClassEntry struct {
 	serialize         func(object *Zval, buffer **uint8, buf_len *int, data *zend.ZendSerializeData) int
 	unserialize       func(object *Zval, ce *ClassEntry, buf *uint8, buf_len int, data *zend.ZendUnserializeData) int
 	num_traits        uint32
-
-	// 继承接口列表，在 link 前只有 interfaceNames 可能有值，在 link 后只有 interfaces 可能有值。
-	interfaceNames []ClassName
-	interfaces     []*ClassEntry
 
 	trait_names       *ClassName
 	trait_aliases     []*zend.ZendTraitAlias
@@ -209,10 +210,10 @@ func (ce *ClassEntry) IsInternalClass() bool { return ce.typ == typeInternalClas
 func (ce *ClassEntry) IsUserClass() bool     { return ce.typ == typeUserClass }
 
 func (ce *ClassEntry) GetType() byte                  { return ce.typ }
-func (ce *ClassEntry) GetParent() *ClassEntry         { return ce.__0.parent }
-func (ce *ClassEntry) SetParent(value *ClassEntry)    { ce.__0.parent = value }
-func (ce *ClassEntry) GetParentName() *String         { return ce.__0.parent_name }
-func (ce *ClassEntry) SetParentName(value *String)    { ce.__0.parent_name = value }
+func (ce *ClassEntry) GetParent() *ClassEntry         { return ce.parent }
+func (ce *ClassEntry) SetParent(value *ClassEntry)    { ce.parent = value }
+func (ce *ClassEntry) GetParentName() *String         { return ce.parentName }
+func (ce *ClassEntry) SetParentName(value *String)    { ce.parentName = value }
 func (ce *ClassEntry) GetCeFlags() uint32             { return ce.ceFlags }
 func (ce *ClassEntry) SetCeFlags(value uint32)        { ce.ceFlags = value }
 func (ce *ClassEntry) GetDefaultPropertiesCount() int { return ce.default_properties_count }
