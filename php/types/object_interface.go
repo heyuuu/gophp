@@ -42,7 +42,7 @@ type IObject interface {
 
 	// method
 	CanGetMethod() bool
-	GetMethod(object **ZendObject, method *String, key *Zval) IFunction
+	GetMethod(method string, key *Zval) IFunction
 	CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int
 	GetConstructor(object *ZendObject) IFunction
 	// cast

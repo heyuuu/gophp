@@ -80,8 +80,9 @@ func (o *ObjectStd) CanCountElements() bool     { return false }
 func (o *ObjectStd) CountElements() (int, bool) { panic("implement me") }
 
 func (o *ObjectStd) CanGetMethod() bool { return true }
-func (o *ObjectStd) GetMethod(object **ZendObject, method *String, key *Zval) IFunction {
-	return zend.ZendStdGetMethod(object, method, key)
+
+func (o *ObjectStd) GetMethod(method string, key *Zval) IFunction {
+	return zend.ZendStdGetMethod_Ex(o.obj(), method, key)
 }
 
 func (o *ObjectStd) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {

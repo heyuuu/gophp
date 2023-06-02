@@ -1060,20 +1060,23 @@ func ZendGetUserCallFunction(ce *types.ClassEntry, method_name *types.String) ty
 func ZendBadMethodCall(fbc types.IFunction, method_name *types.String, scope *types.ClassEntry) {
 	faults.ThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), b.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
 }
+
 func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key *types.Zval) types.IFunction {
-	var zobj *types.ZendObject = *obj_ptr
+	return ZendStdGetMethod_Ex(*obj_ptr, method_name.GetStr(), key)
+}
+func ZendStdGetMethod_Ex(zobj *types.ZendObject, methodName string, key *types.Zval) types.IFunction {
 	var fbc types.IFunction
 	var lc_method_name string
 	var scope *types.ClassEntry
 	if key != nil {
 		lc_method_name = key.StringVal()
 	} else {
-		lc_method_name = ascii.StrToLower(method_name.GetStr())
+		lc_method_name = ascii.StrToLower(methodName)
 	}
 	fbc = zobj.GetCe().FunctionTable().Get(lc_method_name)
 	if fbc == nil {
 		if zobj.GetCe().GetCall() != nil {
-			return ZendGetUserCallFunction(zobj.GetCe(), method_name)
+			return ZendGetUserCallFunction(zobj.GetCe(), types.NewString(methodName))
 		} else {
 			return nil
 		}
@@ -1093,9 +1096,9 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 			}
 			if fbc.GetOpArray().IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) {
 				if zobj.GetCe().GetCall() != nil {
-					return ZendGetUserCallFunction(zobj.GetCe(), method_name)
+					return ZendGetUserCallFunction(zobj.GetCe(), types.NewString(methodName))
 				} else {
-					ZendBadMethodCall(fbc, method_name, scope)
+					ZendBadMethodCall(fbc, types.NewString(methodName), scope)
 					return nil
 				}
 			}

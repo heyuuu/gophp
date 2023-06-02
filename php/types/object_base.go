@@ -107,7 +107,7 @@ func (o *ObjectBase) CanGetMethod() bool {
 	panic("implement me")
 }
 
-func (o *ObjectBase) GetMethod(object **ZendObject, method *String, key *Zval) IFunction {
+func (o *ObjectBase) GetMethod(method string, key *Zval) IFunction {
 	//TODO implement me
 	panic("implement me")
 }

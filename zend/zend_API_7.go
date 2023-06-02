@@ -251,7 +251,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 				call_via_handler = 1
 				retval = 1
 			} else {
-				fcc.SetFunctionHandler(fcc.GetObject().GetMethod(fcc.GetObject(), mname, nil))
+				fcc.SetFunctionHandler(fcc.GetObject().GetMethod(mname.GetStr(), nil))
 				if fcc.GetFunctionHandler() != nil {
 					if strict_class != 0 && (fcc.GetFunctionHandler().GetScope() == nil || operators.InstanceofFunction(ce_org, fcc.GetFunctionHandler().GetScope()) == 0) {
 						ZendReleaseFcallInfoCache(fcc)

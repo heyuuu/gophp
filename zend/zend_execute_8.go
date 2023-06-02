@@ -391,20 +391,18 @@ func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecu
 			}
 			object_or_called_scope = called_scope
 		} else {
-			var object *types.ZendObject = obj.Object()
-			fbc = obj.Object().GetMethod(&object, method.String(), nil)
+			fbc = obj.Object().GetMethod(method.StringVal(), nil)
 			if fbc == nil {
 				if EG__().GetException() == nil {
-					ZendUndefinedMethod(object.GetCe(), method.String())
+					ZendUndefinedMethod(obj.Object().GetCe(), method.String())
 				}
 				return nil
 			}
 			if fbc.IsStatic() {
-				object_or_called_scope = object.GetCe()
+				object_or_called_scope = obj.Object().GetCe()
 			} else {
 				call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
-				// 				object.AddRefcount()
-				object_or_called_scope = object
+				object_or_called_scope = obj.Object()
 			}
 		}
 	} else {

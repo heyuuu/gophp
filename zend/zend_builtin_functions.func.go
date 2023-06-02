@@ -642,8 +642,7 @@ func ZifMethodExists(object *types.Zval, method string) bool {
 		return object.IsObject() || !func_.IsPrivate() || func_.GetScope() == ce
 	}
 	if object.IsObject() {
-		var obj = object.Object()
-		func_ = object.Object().GetMethod(&obj, types.NewString(method), nil)
+		func_ = object.Object().GetMethod(method, nil)
 		if func_ != nil {
 			if func_.IsCallViaTrampoline() {
 				/* Returns true to the fake Closure's __invoke */

@@ -91,8 +91,9 @@ func (o *ObjectOld) CountElements() (int, bool) {
 }
 
 func (o *ObjectOld) CanGetMethod() bool { return o.handlers.GetMethod != nil }
-func (o *ObjectOld) GetMethod(object **ZendObject, method *String, key *Zval) IFunction {
-	return o.handlers.GetMethod(object, method, key)
+func (o *ObjectOld) GetMethod(method string, key *Zval) IFunction {
+	obj := o.obj()
+	return o.handlers.GetMethod(&obj, NewString(method), key)
 }
 
 func (o *ObjectOld) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
