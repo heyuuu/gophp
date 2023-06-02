@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
@@ -493,8 +494,8 @@ func ZendAppendTypeHint(str *SmartStr, fptr types.IFunction, arg_info *ZendArgIn
 		}
 	}
 }
-func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
-	var str SmartStr = MakeSmartStr(0)
+func ZendGetFunctionDeclaration(fptr types.IFunction) string {
+	var str SmartStr
 	if fptr.GetOpArray().IsReturnReference() {
 		str.AppendString("& ")
 	}
@@ -596,7 +597,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 		ZendAppendTypeHint(&str, fptr, fptr.GetArgInfo()-1, 1)
 	}
 	str.ZeroTail()
-	return str.GetS()
+	return str.GetStr()
 }
 func FuncLineno(fn types.IFunction) uint32 {
 	if fn.GetType() == ZEND_USER_FUNCTION {
@@ -613,15 +614,15 @@ func EmitIncompatibleMethodError(
 	status InheritanceStatus,
 	unresolved_class *types.String,
 ) {
-	var parent_prototype *types.String = ZendGetFunctionDeclaration(parent)
-	var child_prototype *types.String = ZendGetFunctionDeclaration(child)
+	var parentPrototype = ZendGetFunctionDeclaration(parent)
+	var childPrototype = ZendGetFunctionDeclaration(child)
+	var errorMsg string
 	if status == INHERITANCE_UNRESOLVED {
-		faults.ErrorAt(error_level, nil, FuncLineno(child), "Could not check compatibility between %s and %s, because class %s is not available", child_prototype.GetVal(), parent_prototype.GetVal(), unresolved_class.GetVal())
+		errorMsg = fmt.Sprintf("Could not check compatibility between %s and %s, because class %s is not available", childPrototype, parentPrototype, unresolved_class.GetVal())
 	} else {
-		faults.ErrorAt(error_level, nil, FuncLineno(child), "Declaration of %s %s be compatible with %s", child_prototype.GetVal(), error_verb, parent_prototype.GetVal())
+		errorMsg = fmt.Sprintf("Declaration of %s %s be compatible with %s", childPrototype, error_verb, parentPrototype)
 	}
-	// types.ZendStringEfree(child_prototype)
-	// types.ZendStringEfree(parent_prototype)
+	faults.ErrorAt(error_level, nil, FuncLineno(child), errorMsg)
 }
 func EmitIncompatibleMethodErrorOrWarning(child types.IFunction, parent types.IFunction, status InheritanceStatus, unresolved_class *types.String, always_error types.ZendBool) {
 	var error_level int

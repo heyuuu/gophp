@@ -320,7 +320,7 @@ var DefZifGetClassMethods = def.DefFunc("get_class_methods", 1, 1, []def.ArgInfo
 	if fp.HasError() {
 		return
 	}
-	ZifGetClassMethods(executeData, returnValue, class)
+	ZifGetClassMethods(class)
 })
 
 // generate by ZifMethodExists
@@ -331,7 +331,7 @@ var DefZifMethodExists = def.DefFunc("method_exists", 2, 2, []def.ArgInfo{{Name:
 	if fp.HasError() {
 		return
 	}
-	ZifMethodExists(executeData, returnValue, object, method)
+	ZifMethodExists(object, method)
 })
 
 // generate by ZifPropertyExists

@@ -381,33 +381,22 @@ func ZifGetCalledClass(ex zpp.Ex) (string, bool) {
 	}
 	return "", false
 }
-func ZifGetParentClass(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, object *types.Zval) {
-	var arg *types.Zval
+func ZifGetParentClass(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, object *types.Zval) (string, bool) {
 	var ce *types.ClassEntry = nil
-	if ZendParseParameters(executeData.NumArgs(), "|z", &arg) == types.FAILURE {
-		return
-	}
 	if executeData.NumArgs() == 0 {
 		ce = ZendGetExecutedScope()
-		if ce != nil && ce.GetParent() {
-			return_value.SetStringVal(ce.GetParent().name.GetStr())
-			return
-		} else {
-			return_value.SetFalse()
-			return
+	} else {
+		if object.IsObject() {
+			ce = object.Object().GetCe()
+		} else if object.IsString() {
+			ce = ZendLookupClassString(object.StringVal())
 		}
 	}
-	if arg.IsObject() {
-		ce = arg.Object().GetCe()
-	} else if arg.IsString() {
-		ce = ZendLookupClass(arg.String())
-	}
-	if ce != nil && ce.GetParent() {
-		return_value.SetStringVal(ce.GetParent().name.GetStr())
-		return
+	if ce != nil && ce.GetParent() != nil {
+		return ce.GetParent().Name(), true
 	} else {
 		return_value.SetFalse()
-		return
+		return "", false
 	}
 }
 func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subclass types.ZendBool) {
@@ -475,17 +464,16 @@ func ZifIsA(executeData zpp.Ex, return_value zpp.Ret, object *types.Zval, classN
 	IsAImpl(executeData, return_value, 0)
 }
 func AddClassVars(scope *types.ClassEntry, ce *types.ClassEntry, statics int, return_value *types.Zval) {
-
-	ce.PropertyTable().ForeachEx(func(key string, prop_info *types.PropertyInfo) bool {
-		if prop_info.IsProtected() && !ZendCheckProtected(prop_info.GetCe(), scope) || prop_info.IsPrivate() && prop_info.GetCe() != scope {
+	ce.PropertyTable().ForeachEx(func(key string, propInfo *types.PropertyInfo) bool {
+		if propInfo.IsProtected() && !ZendCheckProtected(propInfo.GetCe(), scope) || propInfo.IsPrivate() && propInfo.GetCe() != scope {
 			return true
 		}
 		var prop *types.Zval = nil
-		if statics != 0 && prop_info.IsStatic() {
-			prop = ce.GetDefaultStaticMembersTable()[prop_info.GetOffset()]
+		if statics != 0 && propInfo.IsStatic() {
+			prop = ce.GetDefaultStaticMembersTable()[propInfo.GetOffset()]
 			prop = types.ZVAL_DEINDIRECT(prop)
-		} else if statics == 0 && !prop_info.IsStatic() {
-			prop = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(prop_info.GetOffset())]
+		} else if statics == 0 && !propInfo.IsStatic() {
+			prop = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(propInfo.GetOffset())]
 		}
 		if prop == nil {
 			return true
@@ -608,102 +596,65 @@ func ZifGetMangledObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *type
 	return_value.SetArray(properties)
 	return
 }
-func SameName(key *types.String, name *types.String) bool {
-	if key == name {
-		return true
-	}
-	return key.GetStr() == ascii.StrToLower(name.GetStr())
-}
 func SameNameEx(key string, name string) bool {
 	return key == ascii.StrToLower(name)
 }
-func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Zval) {
-	var klass *types.Zval
-	var method_name types.Zval
+func ZifGetClassMethods(class *types.Zval) *types.Zval {
 	var ce *types.ClassEntry = nil
-	var scope *types.ClassEntry
-	if ZendParseParameters(executeData.NumArgs(), "z", &klass) == types.FAILURE {
-		return
-	}
-	if klass.IsObject() {
-		ce = types.Z_OBJCE_P(klass)
-	} else if klass.IsString() {
-		ce = ZendLookupClass(klass.String())
+	if class.IsObject() {
+		ce = class.Object().GetCe()
+	} else if class.IsString() {
+		ce = ZendLookupClass(class.String())
 	}
 	if ce == nil {
-		return_value.SetNull()
-		return
+		return types.NewZvalNull()
 	}
-	ArrayInit(return_value)
-	scope = ZendGetExecutedScope()
+
+	var names []string
+	scope := ZendGetExecutedScope()
 	ce.FunctionTable().Foreach(func(key string, mptr types.IFunction) {
 		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) || mptr.IsPrivate() && scope == mptr.GetScope()) {
 			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.GetOpArray().refcount > 1) && key != "" && !SameNameEx(key, mptr.FunctionName()) {
-				method_name.SetStringVal(ZendFindAliasName(mptr.GetScope(), key))
-				return_value.Array().AppendNew(&method_name)
+				names = append(names, ZendFindAliasName(mptr.GetScope(), key))
 			} else {
-				method_name.SetStringVal(mptr.FunctionName())
-				return_value.Array().AppendNew(&method_name)
+				names = append(names, mptr.FunctionName())
 			}
 		}
 	})
+	return types.NewZvalArray(types.NewArrayOfString(names))
 }
-func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zval, method *types.Zval) {
-	var klass *types.Zval
-	var method_name *types.String
+func ZifMethodExists(object *types.Zval, method string) bool {
 	var ce *types.ClassEntry
-	var func_ types.IFunction
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			klass = fp.ParseZval()
-			method_name = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+	if object.IsObject() {
+		ce = object.Object().GetCe()
+	} else if object.IsString() {
+		ce = ZendLookupClassString(object.StringVal())
 	}
-	if klass.IsObject() {
-		ce = types.Z_OBJCE_P(klass)
-	} else if klass.IsString() {
-		if b.Assign(&ce, ZendLookupClass(klass.String())) == nil {
-			return_value.SetFalse()
-			return
-		}
-	} else {
-		return_value.SetFalse()
-		return
+	if ce == nil {
+		return false
 	}
-	func_ = ce.FunctionTable().Get(method_name.GetStr())
+
+	func_ := ce.FunctionTable().Get(method)
 	if func_ != nil {
 		/* Exclude shadow properties when checking a method on a specific class. Include
 		 * them when checking an object, as method_exists() generally ignores visibility.
 		 * TODO: Should we use EG(scope) for the object case instead? */
-
-		return_value.SetBool(klass.IsObject() || !func_.IsPrivate() || func_.GetScope() == ce)
-		return
+		return object.IsObject() || !func_.IsPrivate() || func_.GetScope() == ce
 	}
-	if klass.IsObject() {
-		var obj = klass.Object()
-		func_ = klass.Object().GetMethod(&obj, method_name, nil)
+	if object.IsObject() {
+		var obj = object.Object()
+		func_ = object.Object().GetMethod(&obj, types.NewString(method), nil)
 		if func_ != nil {
 			if func_.IsCallViaTrampoline() {
-
 				/* Returns true to the fake Closure's __invoke */
-
-				return_value.SetBool(func_.GetScope() == ZendCeClosure && method_name.GetStr() == ZEND_INVOKE_FUNC_NAME)
-				// types.ZendStringReleaseEx(func_.GetFunctionName(), 0)
+				ret := func_.GetScope() == ZendCeClosure && method == ZEND_INVOKE_FUNC_NAME
 				ZendFreeTrampoline(func_)
-				return
+				return ret
 			}
-			return_value.SetTrue()
-			return
+			return true
 		}
 	}
-	return_value.SetFalse()
-	return
+	return false
 }
 func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *types.Zval, propertyName *types.Zval) {
 	var object *types.Zval
