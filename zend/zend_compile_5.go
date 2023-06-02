@@ -243,17 +243,13 @@ func ZendCompileTry(ast *ZendAst) {
 	}
 
 	/* label: try { } must not be equal to try { label: } */
-
-	if CG__().GetContext().GetLabels() != nil {
-		var label *ZendLabel
-		var labelPair = CG__().GetContext().GetLabels().Last()
-		if labelPair != nil {
-			label = labelPair.GetVal().Ptr()
-			if label.GetOplineNum() == GetNextOpNumber() {
-				ZendEmitOp(nil, ZEND_NOP, nil, nil)
-			}
+	var label = CG__().GetContext().LastLabel()
+	if label != nil {
+		if label.GetOplineNum() == GetNextOpNumber() {
+			ZendEmitOp(nil, ZEND_NOP, nil, nil)
 		}
 	}
+
 	try_catch_offset = ZendAddTryElement(GetNextOpNumber())
 	if finally_ast != nil {
 		var fast_call ZendLoopVar

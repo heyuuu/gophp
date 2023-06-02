@@ -574,8 +574,8 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 	var opline *types.ZendOp
 	var is_fully_qualified types.ZendBool
 	var orig_name *types.String = ZendAstGetStr(name_ast)
-	var resolved_name *types.String = ZendResolveConstName(orig_name, name_ast.GetAttr(), &is_fully_qualified)
-	if resolved_name.GetStr() == "__COMPILER_HALT_OFFSET__" || name_ast.GetAttr() != ZEND_NAME_RELATIVE && orig_name.GetStr() == "__COMPILER_HALT_OFFSET__" {
+	var resolved_name, isFullyQualified = ZendResolveConstName(orig_name, name_ast.GetAttr())
+	if resolved_name == "__COMPILER_HALT_OFFSET__" || name_ast.GetAttr() != ZEND_NAME_RELATIVE && orig_name.GetStr() == "__COMPILER_HALT_OFFSET__" {
 		var last *ZendAst = CG__().GetAst()
 		for last != nil && last.GetKind() == ZEND_AST_STMT_LIST {
 			var list *ZendAstList = ZendAstGetList(last)
@@ -591,15 +591,15 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 			return
 		}
 	}
-	if ZendTryCtEvalConst(result.GetConstant(), resolved_name.GetStr(), is_fully_qualified) != 0 {
+	if ZendTryCtEvalConst(result.GetConstant(), resolved_name, isFullyQualified) != 0 {
 		result.SetOpType(IS_CONST)
 		// types.ZendStringReleaseEx(resolved_name, 0)
 		return
 	}
 	opline = ZendEmitOpTmp(result, ZEND_FETCH_CONSTANT, nil, nil)
 	opline.SetOp2Type(IS_CONST)
-	if is_fully_qualified != 0 {
-		opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name.GetStr(), 0))
+	if isFullyQualified {
+		opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name, 0))
 	} else {
 		opline.GetOp1().SetNum(IS_CONSTANT_UNQUALIFIED)
 		if FC__().GetCurrentNamespace() != nil {

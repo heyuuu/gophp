@@ -8,12 +8,55 @@ import (
 	"strings"
 )
 
-func ZendResolveFunctionName(name *types.String, type_ uint32, is_fully_qualified *types.ZendBool) *types.String {
-	return ZendResolveNonClassName(name, type_, is_fully_qualified, 0, FC__().GetImportsFunction())
+func ZendResolveNonClassName(name string, typ uint32, caseSensitive bool, currentImportSub ImportNames) (string, bool) {
+	isFullyQualified := false
+	if name[0] == '\\' {
+		/* Remove \ prefix (only relevant if this is a string rather than a label) */
+		return name[1:], true
+	}
+	if typ == ZEND_NAME_FQ {
+		return name, true
+	}
+	if typ == ZEND_NAME_RELATIVE {
+		return ZendPrefixWithNsEx(name), true
+	}
+	if currentImportSub != nil {
+
+		/* If an unqualified name is a function/const alias, replace it. */
+
+		var importName string
+		if caseSensitive {
+			importName = currentImportSub.Get(name)
+		} else {
+			importName = currentImportSub.Get(ascii.StrToLower(name))
+		}
+		if importName != "" {
+			return importName, true
+		}
+	}
+
+	compoundPos := strings.IndexByte(name, '\\')
+	if compoundPos >= 0 {
+		isFullyQualified = true
+	}
+
+	if compoundPos >= 0 && FC__().GetImports() != nil {
+		/* If the first part of a qualified name is an alias, substitute it. */
+		var importName = FC__().GetImports().Get(ascii.StrToLower(name[:compoundPos]))
+		if importName != "" {
+			return ZendConcatNames(importName, name[compoundPos+1:]), isFullyQualified
+		}
+	}
+	return ZendPrefixWithNsEx(name), isFullyQualified
 }
-func ZendResolveConstName(name *types.String, type_ uint32, is_fully_qualified *types.ZendBool) *types.String {
-	return ZendResolveNonClassName(name, type_, is_fully_qualified, 1, FC__().GetImportsConst())
+
+func ZendResolveFunctionName(name string, typ uint32) (resolveName string, isFullyQualified bool) {
+	return ZendResolveNonClassName(name, typ, false, FC__().ImportsFunction())
 }
+func ZendResolveConstName(name string, typ uint32) (resolveName string, isFullyQualified bool) {
+	return ZendResolveNonClassName(name, typ, true, FC__().ImportsConst())
+}
+
 func ZendResolveClassName(name *types.String, type_ uint32) *types.String {
 	var compound *byte
 	if type_ == ZEND_NAME_RELATIVE {
@@ -247,7 +290,7 @@ func ZendLookupReservedConst(name string) *ZendConstant {
 	}
 	return nil
 }
-func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified types.ZendBool) types.ZendBool {
+func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified bool) types.ZendBool {
 	var c *ZendConstant = EG__().ConstantTable().Get(name)
 
 	/* Substitute case-sensitive (or lowercase) constants */
@@ -257,7 +300,7 @@ func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified types.Ze
 	}
 
 	/* Substitute true, false and null (including unqualified usage in namespaces) */
-	if is_fully_qualified == 0 {
+	if is_fully_qualified {
 		name, _ = ZendGetUnqualifiedNameEx(name)
 	}
 	c = ZendLookupReservedConst(name)

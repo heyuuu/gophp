@@ -70,19 +70,17 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 func ZendCompileConstExprConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var name_ast *ZendAst = ast.GetChild()[0]
-	var orig_name *types.String = ZendAstGetStr(name_ast)
-	var is_fully_qualified types.ZendBool
+	var orig_name = ZendAstGetStr(name_ast).GetStr()
 	var result types.Zval
-	var resolved_name *types.String
-	resolved_name = ZendResolveConstName(orig_name, name_ast.GetAttr(), &is_fully_qualified)
-	if ZendTryCtEvalConst(&result, resolved_name.GetStr(), is_fully_qualified) != 0 {
+	resolved_name, isFullyQualified := ZendResolveConstName(orig_name, name_ast.GetAttr())
+	if ZendTryCtEvalConst(&result, resolved_name, isFullyQualified) != 0 {
 		// types.ZendStringReleaseEx(resolved_name, 0)
 		ZendAstDestroy(ast)
 		*ast_ptr = ZendAstCreateZval(&result)
 		return
 	}
 	ZendAstDestroy(ast)
-	*ast_ptr = ZendAstCreateConstant(resolved_name, b.Cond(is_fully_qualified == 0, IS_CONSTANT_UNQUALIFIED, 0))
+	*ast_ptr = ZendAstCreateConstant(resolved_name, b.Cond(!isFullyQualified, IS_CONSTANT_UNQUALIFIED, 0))
 }
 func ZendCompileConstExprMagicConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
@@ -625,13 +623,10 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		}
 	case ZEND_AST_CONST:
 		var name_ast *ZendAst = ast.GetChild()[0]
-		var is_fully_qualified types.ZendBool
-		var resolved_name *types.String = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr(), &is_fully_qualified)
-		if ZendTryCtEvalConst(&result, resolved_name.GetStr(), is_fully_qualified) == 0 {
-			// types.ZendStringReleaseEx(resolved_name, 0)
+		var resolved_name, isFullyQualified = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr())
+		if ZendTryCtEvalConst(&result, resolved_name, isFullyQualified) == 0 {
 			return
 		}
-		// types.ZendStringReleaseEx(resolved_name, 0)
 	case ZEND_AST_CLASS_CONST:
 		var class_ast *ZendAst
 		var name_ast *ZendAst

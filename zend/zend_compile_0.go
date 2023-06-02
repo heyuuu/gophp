@@ -136,9 +136,7 @@ func GetNextOp() *types.ZendOp {
 	return next_op
 }
 func GetNextBrkContElement() *ZendBrkContElement {
-	CG__().GetContext().GetLastBrkCont()++
-	CG__().GetContext().SetBrkContArray(Erealloc(CG__().GetContext().GetBrkContArray(), b.SizeOf("zend_brk_cont_element")*CG__().GetContext().GetLastBrkCont()))
-	return CG__().GetContext().GetBrkContArray()[CG__().GetContext().GetLastBrkCont()-1]
+	return CG__().GetContext().AddBrkCont()
 }
 func ZendBuildRuntimeDefinitionKey(name *types.String, start_lineno uint32) *types.String {
 	var filename = CG__().GetActiveOpArray().GetFilename()
@@ -176,14 +174,7 @@ func ZendOparrayContextBegin(prev_context *ZendOparrayContext) {
 	*CG__().GetContext() = *NewOpArrayContext()
 }
 func ZendOparrayContextEnd(prev_context *ZendOparrayContext) {
-	if CG__().GetContext().GetBrkContArray() != nil {
-		Efree(CG__().GetContext().GetBrkContArray())
-		CG__().GetContext().SetBrkContArray(nil)
-	}
-	if CG__().GetContext().GetLabels() != nil {
-		CG__().GetContext().GetLabels().Destroy()
-		CG__().GetContext().SetLabels(nil)
-	}
+	//CG__().GetContext().End()
 	CG__().SetContext(*prev_context)
 }
 func ZendResetImportTables() {
@@ -460,53 +451,4 @@ func ZendHashFindPtrLc(ht *types.Array, str *byte, len_ int) any {
 	name := b.CastStr(str, len_)
 	lcName := ascii.StrToLower(name)
 	return types.ZendHashFindPtr(ht, lcName)
-}
-func ZendResolveNonClassName(name *types.String, type_ uint32, is_fully_qualified *types.ZendBool, case_sensitive types.ZendBool, current_import_sub *types.Array) string {
-	var compound *byte
-	*is_fully_qualified = 0
-	if name.GetStr()[0] == '\\' {
-
-		/* Remove \ prefix (only relevant if this is a string rather than a label) */
-
-		*is_fully_qualified = 1
-		return name.GetStr()[1:]
-	}
-	if type_ == ZEND_NAME_FQ {
-		*is_fully_qualified = 1
-		return name.GetStr()
-	}
-	if type_ == ZEND_NAME_RELATIVE {
-		*is_fully_qualified = 1
-		return ZendPrefixWithNsEx(name.GetStr())
-	}
-	if current_import_sub != nil {
-
-		/* If an unqualified name is a function/const alias, replace it. */
-
-		var import_name *types.String
-		if case_sensitive != 0 {
-			import_name = types.ZendHashFindPtr(current_import_sub, name.GetStr())
-		} else {
-			import_name = ZendHashFindPtrLc(current_import_sub, name.GetVal(), name.GetLen())
-		}
-		if import_name != nil {
-			*is_fully_qualified = 1
-			return import_name.GetStr()
-		}
-	}
-	compound = memchr(name.GetVal(), '\\', name.GetLen())
-	if compound != nil {
-		*is_fully_qualified = 1
-	}
-	if compound != nil && FC__().GetImports() != nil {
-
-		/* If the first part of a qualified name is an alias, substitute it. */
-
-		var len_ int = compound - name.GetVal()
-		var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), len_)
-		if import_name != nil {
-			return ZendConcatNames(import_name.GetStr(), name.GetStr()[len_+1:])
-		}
-	}
-	return ZendPrefixWithNsEx(name.GetStr())
 }

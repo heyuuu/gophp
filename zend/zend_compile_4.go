@@ -30,12 +30,11 @@ func ZendCompileFuncArrayKeyExists(result *Znode, args *ZendAstList) int {
 func ZendCompileFuncArraySlice(result *Znode, args *ZendAstList) int {
 	if CG__().GetActiveOpArray().GetFunctionName() != nil && args.GetChildren() == 2 && args.GetChild()[0].GetKind() == ZEND_AST_CALL && args.GetChild()[0].GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0].GetChild()[0]).IsString() && args.GetChild()[0].GetChild()[1].GetKind() == ZEND_AST_ARG_LIST && args.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
 		var orig_name *types.String = ZendAstGetStr(args.GetChild()[0].GetChild()[0])
-		var is_fully_qualified types.ZendBool
-		var name *types.String = ZendResolveFunctionName(orig_name, args.GetChild()[0].GetChild()[0].GetAttr(), &is_fully_qualified)
+		name, _ := ZendResolveFunctionName(orig_name.GetStr(), args.GetChild()[0].GetChild()[0].GetAttr())
 		var list *ZendAstList = ZendAstGetList(args.GetChild()[0].GetChild()[1])
 		var zv *types.Zval = ZendAstGetZval(args.GetChild()[1])
 		var first Znode
-		if ascii.StrCaseEquals(name.GetStr(), "func_get_args") && list.GetChildren() == 0 && zv.IsLong() && zv.Long() >= 0 {
+		if ascii.StrCaseEquals(name, "func_get_args") && list.GetChildren() == 0 && zv.IsLong() && zv.Long() >= 0 {
 			first.SetOpType(IS_CONST)
 			first.GetConstant().SetLong(zv.Long())
 			ZendEmitOpTmp(result, ZEND_FUNC_GET_ARGS, &first, nil)
@@ -123,8 +122,8 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 		ZendCompileDynamicCall(result, &name_node, args_ast)
 		return
 	}
-	var runtime_resolution types.ZendBool = ZendCompileFunctionName(&name_node, name_ast)
-	if runtime_resolution != 0 {
+	var runtime_resolution = ZendCompileFunctionName(&name_node, name_ast)
+	if runtime_resolution {
 		if ascii.StrCaseEquals(ZendAstGetStrVal(name_ast), "assert") {
 			ZendCompileAssert(result, ZendAstGetList(args_ast), name_node.GetConstant().String(), nil)
 		} else {
@@ -612,7 +611,7 @@ func ZendResolveGotoLabel(op_array *types.ZendOpArray, opline *types.ZendOp) {
 	var label *types.Zval
 	var opnum uint32 = opline - op_array.GetOpcodes()
 	label = CT_CONSTANT_EX(op_array, opline.GetOp2().GetConstant())
-	if CG__().GetContext().GetLabels() == nil || b.Assign(&dest, types.ZendHashFindPtr(CG__().GetContext().GetLabels(), label.String().GetStr())) == nil {
+	if dest = CG__().GetContext().GetLabel(label.StringVal()); dest == nil {
 		CG__().SetInCompilation(1)
 		CG__().SetActiveOpArray(op_array)
 		CG__().SetZendLineno(opline.GetLineno())
@@ -669,15 +668,10 @@ func ZendCompileGoto(ast *ZendAst) {
 	opline.SetExtendedValue(CG__().GetContext().GetCurrentBrkCont())
 }
 func ZendCompileLabel(ast *ZendAst) {
-	var label *types.String = ZendAstGetStr(ast.GetChild()[0])
-	var dest ZendLabel
-	if CG__().GetContext().GetLabels() == nil {
-		CG__().GetContext().SetLabels(types.NewArray(0))
-	}
-	dest.SetBrkCont(CG__().GetContext().GetCurrentBrkCont())
-	dest.SetOplineNum(GetNextOpNumber())
-	if !(types.ZendHashAddMem(CG__().GetContext().GetLabels(), label.GetStr(), &dest, b.SizeOf("zend_label"))) {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Label '%s' already defined", label.GetVal())
+	var label = ZendAstGetStr(ast.GetChild()[0]).GetStr()
+	dest := NewZendLabel(label, CG__().GetContext().GetCurrentBrkCont(), GetNextOpNumber())
+	if !CG__().GetContext().AddLabel(dest) {
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Label '%s' already defined", label)
 	}
 }
 func ZendCompileWhile(ast *ZendAst) {

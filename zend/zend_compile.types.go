@@ -142,14 +142,19 @@ func (this *ZendBrkContElement) SetIsSwitch(value types.ZendBool) { this.is_swit
  * ZendLabel
  */
 type ZendLabel struct {
-	brk_cont   int
-	opline_num uint32
+	name      string
+	brkCont   int
+	oplineNum uint32
 }
 
-func (this *ZendLabel) GetBrkCont() int           { return this.brk_cont }
-func (this *ZendLabel) SetBrkCont(value int)      { this.brk_cont = value }
-func (this *ZendLabel) GetOplineNum() uint32      { return this.opline_num }
-func (this *ZendLabel) SetOplineNum(value uint32) { this.opline_num = value }
+func NewZendLabel(name string, brkCount int, oplineNum uint32) *ZendLabel {
+	return &ZendLabel{name: name, brkCont: brkCount, oplineNum: oplineNum}
+}
+
+func (this *ZendLabel) GetBrkCont() int           { return this.brkCont }
+func (this *ZendLabel) SetBrkCont(value int)      { this.brkCont = value }
+func (this *ZendLabel) GetOplineNum() uint32      { return this.oplineNum }
+func (this *ZendLabel) SetOplineNum(value uint32) { this.oplineNum = value }
 
 /**
  * ZendTryCatchElement
@@ -195,8 +200,8 @@ type ZendOparrayContext struct {
 	try_catch_offset uint32
 	current_brk_cont int
 	last_brk_cont    int
-	brk_cont_array   *ZendBrkContElement
-	labels           *types.Array
+	brk_cont_array   []ZendBrkContElement
+	labels           []*ZendLabel
 }
 
 func NewOpArrayContext() *ZendOparrayContext {
@@ -211,22 +216,45 @@ func NewOpArrayContext() *ZendOparrayContext {
 	}
 }
 
-func (this *ZendOparrayContext) GetOpcodesSize() uint32               { return this.opcodes_size }
-func (this *ZendOparrayContext) SetOpcodesSize(value uint32)          { this.opcodes_size = value }
-func (this *ZendOparrayContext) GetFastCallVar() uint32               { return this.fast_call_var }
-func (this *ZendOparrayContext) SetFastCallVar(value uint32)          { this.fast_call_var = value }
-func (this *ZendOparrayContext) GetTryCatchOffset() uint32            { return this.try_catch_offset }
-func (this *ZendOparrayContext) SetTryCatchOffset(value uint32)       { this.try_catch_offset = value }
-func (this *ZendOparrayContext) GetCurrentBrkCont() int               { return this.current_brk_cont }
-func (this *ZendOparrayContext) SetCurrentBrkCont(value int)          { this.current_brk_cont = value }
-func (this *ZendOparrayContext) GetLastBrkCont() int                  { return this.last_brk_cont }
-func (this *ZendOparrayContext) SetLastBrkCont(value int)             { this.last_brk_cont = value }
-func (this *ZendOparrayContext) GetBrkContArray() *ZendBrkContElement { return this.brk_cont_array }
-func (this *ZendOparrayContext) SetBrkContArray(value *ZendBrkContElement) {
-	this.brk_cont_array = value
+func (ctx *ZendOparrayContext) GetOpcodesSize() uint32         { return ctx.opcodes_size }
+func (ctx *ZendOparrayContext) SetOpcodesSize(value uint32)    { ctx.opcodes_size = value }
+func (ctx *ZendOparrayContext) GetFastCallVar() uint32         { return ctx.fast_call_var }
+func (ctx *ZendOparrayContext) SetFastCallVar(value uint32)    { ctx.fast_call_var = value }
+func (ctx *ZendOparrayContext) GetTryCatchOffset() uint32      { return ctx.try_catch_offset }
+func (ctx *ZendOparrayContext) SetTryCatchOffset(value uint32) { ctx.try_catch_offset = value }
+func (ctx *ZendOparrayContext) GetCurrentBrkCont() int         { return ctx.current_brk_cont }
+func (ctx *ZendOparrayContext) SetCurrentBrkCont(value int)    { ctx.current_brk_cont = value }
+
+// brkCont
+func (ctx *ZendOparrayContext) GetLastBrkCont() int                   { return len(ctx.brk_cont_array) }
+func (ctx *ZendOparrayContext) GetBrkContArray() []ZendBrkContElement { return ctx.brk_cont_array }
+func (ctx *ZendOparrayContext) AddBrkCont() *ZendBrkContElement {
+	ctx.brk_cont_array = append(ctx.brk_cont_array, ZendBrkContElement{})
+	return &ctx.brk_cont_array[len(ctx.brk_cont_array)-1]
 }
-func (this *ZendOparrayContext) GetLabels() *types.Array      { return this.labels }
-func (this *ZendOparrayContext) SetLabels(value *types.Array) { this.labels = value }
+
+// labels
+func (ctx *ZendOparrayContext) AddLabel(label *ZendLabel) bool {
+	if ctx.GetLabel(label.name) != nil {
+		return false
+	}
+
+	ctx.labels = append(ctx.labels, label)
+}
+func (ctx *ZendOparrayContext) GetLabel(name string) *ZendLabel {
+	for _, label := range ctx.labels {
+		if label.name == name {
+			return label
+		}
+	}
+	return nil
+}
+func (ctx *ZendOparrayContext) LastLabel() *ZendLabel {
+	if len(ctx.labels) == 0 {
+		return nil
+	}
+	return ctx.labels[len(ctx.labels)-1]
+}
 
 /**
  * ZendArgInfo

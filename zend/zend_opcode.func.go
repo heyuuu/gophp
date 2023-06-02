@@ -55,7 +55,7 @@ func ZendCheckFinallyBreakout(op_array *types.ZendOpArray, op_num uint32, dst_nu
 func ZendGetBrkContTarget(op_array *types.ZendOpArray, opline *types.ZendOp) uint32 {
 	var nest_levels int = opline.GetOp2().GetNum()
 	var array_offset int = opline.GetOp1().GetNum()
-	var jmp_to *ZendBrkContElement
+	var jmp_to ZendBrkContElement
 	for {
 		jmp_to = CG__().GetContext().GetBrkContArray()[array_offset]
 		if nest_levels > 1 {
