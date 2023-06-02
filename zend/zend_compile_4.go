@@ -194,7 +194,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 
 	/* Check if this calls a known method on $this */
 
-	if opline.GetOp1Type() == IS_UNUSED && opline.GetOp2Type() == IS_CONST && CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
+	if opline.GetOp1Type() == IS_UNUSED && opline.GetOp2Type() == IS_CONST && CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() {
 		var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
 		fbc = CG__().GetActiveClassEntry().FunctionTable().Get(lcname.GetStr())
 		if fbc != nil && !fbc.HasFnFlags(types.AccPrivate|types.AccFinal) {
@@ -259,7 +259,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 			if ce == nil && CG__().GetActiveClassEntry() != nil && ascii.StrCaseEquals(CG__().GetActiveClassEntry().GetName().GetStr(), lcname.GetStr()) {
 				ce = CG__().GetActiveClassEntry()
 			}
-		} else if opline.GetOp1Type() == IS_UNUSED && (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF && ZendIsScopeKnown() != 0 {
+		} else if opline.GetOp1Type() == IS_UNUSED && (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF && ZendIsScopeKnown() {
 			ce = CG__().GetActiveClassEntry()
 		}
 		if ce != nil {

@@ -213,7 +213,7 @@ func (ce *ClassEntry) GetType() byte                  { return ce.typ }
 func (ce *ClassEntry) GetParent() *ClassEntry         { return ce.parent }
 func (ce *ClassEntry) SetParent(value *ClassEntry)    { ce.parent = value }
 func (ce *ClassEntry) GetParentName() *String         { return ce.parentName }
-func (ce *ClassEntry) SetParentName(value *String)    { ce.parentName = value }
+func (ce *ClassEntry) SetParentName(value string)     { ce.parentName = NewString(value) }
 func (ce *ClassEntry) GetCeFlags() uint32             { return ce.ceFlags }
 func (ce *ClassEntry) SetCeFlags(value uint32)        { ce.ceFlags = value }
 func (ce *ClassEntry) GetDefaultPropertiesCount() int { return ce.default_properties_count }

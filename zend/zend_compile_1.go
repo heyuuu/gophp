@@ -57,62 +57,49 @@ func ZendResolveConstName(name string, typ uint32) (resolveName string, isFullyQ
 	return ZendResolveNonClassName(name, typ, true, FC__().ImportsConst())
 }
 
-func ZendResolveClassName(name *types.String, type_ uint32) *types.String {
-	var compound *byte
-	if type_ == ZEND_NAME_RELATIVE {
-		return ZendPrefixWithNs(name)
+func ZendResolveClassName(name string, typ uint32) string {
+	if typ == ZEND_NAME_RELATIVE {
+		return ZendPrefixWithNsEx(name)
 	}
-	if type_ == ZEND_NAME_FQ || name.GetStr()[0] == '\\' {
-
+	if typ == ZEND_NAME_FQ || (name != "" && name[0] == '\\') {
 		/* Remove \ prefix (only relevant if this is a string rather than a label) */
-
-		if name.GetStr()[0] == '\\' {
-			name = types.NewString(b.CastStr(name.GetVal()+1, name.GetLen()-1))
-		} else {
-			//name.AddRefcount()
+		if name != "" && name[0] == '\\' {
+			name = name[1:]
 		}
 
 		/* Ensure that \self, \parent and \static are not used */
-
-		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'\\%s' is an invalid class name", name.GetVal())
+		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'\\%s' is an invalid class name", name)
 		}
 		return name
 	}
 	if FC__().GetImports().Len() != 0 {
-		compound = memchr(name.GetVal(), '\\', name.GetLen())
-		if compound != nil {
-
+		pos := strings.IndexByte(name, '\\')
+		if pos >= 0 {
 			/* If the first part of a qualified name is an alias, substitute it. */
-
-			var len_ int = compound - name.GetVal()
-			var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), len_)
-			if import_name != nil {
-				return types.NewString(ZendConcatNames(import_name.GetStr(), name.GetStr()[len_+1:]))
+			var importName = FC__().Imports().Get(name[:pos])
+			if importName != "" {
+				return ZendConcatNames(importName, name[pos+1:])
 			}
 		} else {
-
 			/* If an unqualified name is an alias, replace it. */
-
-			var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), name.GetLen())
-			if import_name != nil {
-				return import_name.Copy()
+			var importName = FC__().Imports().Get(name)
+			if importName != "" {
+				return importName
 			}
 		}
 	}
 
 	/* If not fully qualified and not an alias, prepend the current namespace */
-
-	return ZendPrefixWithNs(name)
-
-	/* If not fully qualified and not an alias, prepend the current namespace */
+	return ZendPrefixWithNsEx(name)
 }
 func ZendResolveClassNameAst(ast *ZendAst) *types.String {
 	var class_name = ZendAstGetZval(ast)
 	if class_name.GetType() != types.IS_STRING {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
-	return ZendResolveClassName(class_name.String(), ast.GetAttr())
+	resolveName := ZendResolveClassName(class_name.StringVal(), ast.GetAttr())
+	return types.NewString(resolveName)
 }
 func ZendAddTryElement(try_op uint32) uint32 {
 	var op_array = CG__().GetActiveOpArray()
@@ -310,39 +297,25 @@ func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified bool) ty
 	}
 	return 0
 }
-func ZendIsScopeKnown() types.ZendBool {
+func ZendIsScopeKnown() bool {
 	if CG__().GetActiveOpArray().IsClosure() {
-
 		/* Closures can be rebound to a different scope */
-
-		return 0
-
-		/* Closures can be rebound to a different scope */
-
+		return false
 	}
 	if CG__().GetActiveClassEntry() == nil {
-
 		/* The scope is known if we're in a free function (no scope), but not if we're in
 		 * a file/eval (which inherits including/eval'ing scope). */
-
-		return CG__().GetActiveOpArray().GetFunctionName() != nil
-
-		/* The scope is known if we're in a free function (no scope), but not if we're in
-		 * a file/eval (which inherits including/eval'ing scope). */
-
+		return CG__().GetActiveOpArray().FunctionName() != ""
 	}
 
 	/* For traits self etc refers to the using class, not the trait itself */
-
 	return !CG__().GetActiveClassEntry().IsTrait()
-
-	/* For traits self etc refers to the using class, not the trait itself */
 }
 func ClassNameRefersToActiveCe(class_name *types.String, fetch_type uint32) bool {
 	if CG__().GetActiveClassEntry() == nil {
 		return false
 	}
-	if fetch_type == ZEND_FETCH_CLASS_SELF && ZendIsScopeKnown() != 0 {
+	if fetch_type == ZEND_FETCH_CLASS_SELF && ZendIsScopeKnown() {
 		return true
 	}
 	return fetch_type == ZEND_FETCH_CLASS_DEFAULT && ascii.StrCaseEquals(class_name.GetStr(), CG__().GetActiveClassEntry().Name())
@@ -360,18 +333,17 @@ func ZendGetClassFetchType(name string) uint32 {
 }
 func ZendGetClassFetchTypeAst(name_ast *ZendAst) uint32 {
 	/* Fully qualified names are always default refs */
-
 	if name_ast.GetAttr() == ZEND_NAME_FQ {
 		return ZEND_FETCH_CLASS_DEFAULT
 	}
 	return ZendGetClassFetchType(ZendAstGetStrVal(name_ast))
 }
 func ZendEnsureValidClassFetchType(fetch_type uint32) {
-	if fetch_type != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() != 0 {
+	if fetch_type != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() {
 		var ce = CG__().GetActiveClassEntry()
 		if ce == nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
-		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && !(ce.GetParentName()) {
+		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && ce.GetParentName() == nil {
 			faults.Error(faults.E_DEPRECATED, "Cannot use \"parent\" when current class scope has no parent")
 		}
 	}
@@ -390,13 +362,13 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	ZendEnsureValidClassFetchType(fetch_type)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
-		if CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
+		if CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() {
 			zv.SetStringVal(CG__().GetActiveClassEntry().GetName().GetStr())
 			return 1
 		}
 		return 0
 	case ZEND_FETCH_CLASS_PARENT:
-		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().GetParentName() && ZendIsScopeKnown() != 0 {
+		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().GetParentName() != nil && ZendIsScopeKnown() {
 			zv.SetStringVal(CG__().GetActiveClassEntry().GetParentName().GetStr())
 			return 1
 		}

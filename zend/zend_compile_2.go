@@ -383,7 +383,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 			fetch_type = ZendGetClassFetchType(name.GetStr())
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
 				result.SetOpType(IS_CONST)
-				result.GetConstant().SetString(ZendResolveClassName(name, ZEND_NAME_FQ))
+				result.GetConstant().SetStringVal(ZendResolveClassName(name.GetStr(), ZEND_NAME_FQ))
 			} else {
 				ZendEnsureValidClassFetchType(fetch_type)
 				result.SetOpType(IS_UNUSED)

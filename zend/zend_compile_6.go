@@ -743,7 +743,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *types.ZendOp {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 		}
 		extends_name = extends_node.GetConstant().String()
-		ce.SetParentName(ZendResolveClassName(extends_name, b.CondF1(extends_ast.GetKind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.GetAttr() }, ZEND_NAME_FQ)))
+		ce.SetParentName(ZendResolveClassName(extends_name.GetStr(), b.CondF1(extends_ast.GetKind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.GetAttr() }, ZEND_NAME_FQ)))
 		ce.SetIsInherited(true)
 	}
 	CG__().SetActiveClassEntry(ce)
