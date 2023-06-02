@@ -270,9 +270,6 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit typ
 				/* we don't need run-time check */
 
 				return
-
-				/* we don't need run-time check */
-
 			}
 		}
 		opline = ZendEmitOp(nil, ZEND_VERIFY_RETURN_TYPE, expr, nil)
@@ -334,7 +331,6 @@ func ZendHandleNumericOp(node *Znode) {
 	if node.GetOpType() == IS_CONST && node.GetConstant().IsString() {
 		var index ZendUlong
 		if types.HandleNumericStr(node.GetConstant().String().GetStr(), &index) {
-			// ZvalPtrDtor(node.GetConstant())
 			node.GetConstant().SetLong(index)
 		}
 	}
