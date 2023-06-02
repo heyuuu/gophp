@@ -907,8 +907,7 @@ func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
 			interfaces = append(interfaces, newInterface)
 		}
 	}
-	ce.SetInterfaces(interfaces)
-	ce.SetIsResolvedInterfaces(true)
+	ce.ResolvedInterfaces(interfaces)
 
 	/* and now call the implementing handlers */
 	for _, newInterface := range interfaces[rawNum:] {
@@ -984,9 +983,8 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 		if !ce.IsImplementInterfaces() {
 			ZendDoInheritInterfaces(ce, parentCe)
 		} else {
-			var i uint32
-			for i = 0; i < parentCe.GetNumInterfaces(); i++ {
-				DoImplementInterface(ce, parentCe.GetInterfaces()[i])
+			for _, iface := range parentCe.GetInterfaces() {
+				DoImplementInterface(ce, iface)
 			}
 		}
 	}
@@ -1227,19 +1225,20 @@ func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
 	}
 }
 func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
-	var i uint32
-	var ignore uint32 = 0
-	var current_iface_num uint32 = ce.GetNumInterfaces()
-	var parent_iface_num uint32 = b.CondF1(ce.GetParent(), func() __auto__ { return ce.GetParent().num_interfaces }, 0)
-	var key *types.String
-	var c *types.ClassConstant
 	b.Assert(ce.IsLinked())
-	for i = 0; i < ce.GetNumInterfaces(); i++ {
+
+	var ignore uint32 = 0
+	var currentIfaceNum = ce.GetNumInterfaces()
+	var parentIfaceNum = 0
+	if ce.GetParent() != nil {
+		parentIfaceNum = ce.GetParent().GetNumInterfaces()
+	}
+	for i := 0; i < ce.GetNumInterfaces(); i++ {
 		if ce.GetInterfaces()[i] == nil {
 			memmove(ce.GetInterfaces()+i, ce.GetInterfaces()+i+1, b.SizeOf("zend_class_entry *")*(b.PreDec(&(ce.GetNumInterfaces()))-i))
 			i--
 		} else if ce.GetInterfaces()[i] == iface {
-			if i < parent_iface_num {
+			if i < parentIfaceNum {
 				ignore = 1
 			} else {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot implement previously implemented interface %s", ce.Name(), iface.Name())
@@ -1252,39 +1251,27 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 			DoInheritConstantCheck(iface.ConstantsTable(), c, key, iface)
 		})
 	} else {
-		if ce.GetNumInterfaces() >= current_iface_num {
-			if ce.IsInternalClass() {
-				ce.SetInterfaces((**types.ClassEntry)(realloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))
-			} else {
-				ce.SetInterfaces((**types.ClassEntry)(Erealloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))
-			}
-		}
-		ce.GetInterfaces()[b.PostInc(&(ce.GetNumInterfaces()))] = iface
+		ce.AppendResolvedInterfaces(iface)
 		DoInterfaceImplementation(ce, iface)
 	}
 }
-func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEntry) {
-	var iface *types.ClassEntry
-	var num_parent_interfaces uint32 = b.CondF1(ce.GetParent(), func() __auto__ { return ce.GetParent().num_interfaces }, 0)
-	var num_interfaces uint32 = num_parent_interfaces
-	var key *types.String
-	var c *types.ClassConstant
-	var i uint32
-	var j uint32
-	for i = 0; i < ce.GetNumInterfaces(); i++ {
-		iface = interfaces[num_parent_interfaces+i]
+func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces []*types.ClassEntry) {
+	var numParentInterfaces = 0
+	if ce.GetParent() != nil {
+		numParentInterfaces = ce.GetParent().GetNumInterfaces()
+	}
+	for i := 0; i < ce.GetNumInterfaces(); i++ {
+		iface := interfaces[numParentInterfaces+i]
 		if !iface.IsLinked() {
 			AddDependencyObligation(ce, iface)
 		}
 		if !iface.IsInterface() {
-			Efree(interfaces)
 			faults.ErrorNoreturn(faults.E_ERROR, "%s cannot implement %s - it is not an interface", ce.Name(), iface.Name())
 			return
 		}
-		for j = 0; j < num_interfaces; j++ {
+		for j := range interfaces {
 			if interfaces[j] == iface {
-				if j >= num_parent_interfaces {
-					Efree(interfaces)
+				if j >= numParentInterfaces {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot implement previously implemented interface %s", ce.Name(), iface.Name())
 					return
 				}
@@ -1299,20 +1286,12 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 			}
 		}
 		if iface != nil {
-			interfaces[num_interfaces] = iface
-			num_interfaces++
+			interfaces = append(interfaces, iface)
 		}
 	}
-	for i = 0; i < ce.GetNumInterfaces(); i++ {
-		// types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].name, 0)
-		// types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].lc_name, 0)
-	}
-	//Efree(ce.GetInterfaceNames())
-	ce.SetNumInterfaces(num_interfaces)
-	ce.SetInterfaces(interfaces)
-	ce.SetIsResolvedInterfaces(true)
-	i = num_parent_interfaces
-	for ; i < ce.GetNumInterfaces(); i++ {
+	ce.ResolvedInterfaces(interfaces)
+
+	for i := numParentInterfaces; i < ce.GetNumInterfaces(); i++ {
 		DoInterfaceImplementation(ce, ce.GetInterfaces()[i])
 	}
 }

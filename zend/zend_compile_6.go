@@ -656,7 +656,7 @@ func ZendCompileImplements(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 
-	interfaceNames := make([]types.ClassName, list.GetChildren())
+	interfaceNames := make([]string, list.GetChildren())
 	for i := uint32(0); i < list.GetChildren(); i++ {
 		var class_ast *ZendAst = list.GetChild()[i]
 		var name *types.String = ZendAstGetStr(class_ast)
@@ -665,11 +665,9 @@ func ZendCompileImplements(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as interface name as it is reserved", name.GetVal())
 		}
 		interfaceName := ZendResolveClassNameAst(class_ast).GetStr()
-		interfaceNames = append(interfaceNames, types.MakeClassName(interfaceName))
+		interfaceNames = append(interfaceNames, interfaceName)
 	}
-	ce.SetIsImplementInterfaces(true)
-	ce.SetNumInterfaces(list.GetChildren())
-	ce.SetInterfaceNames(interfaceNames)
+	ce.ImplementInterfaceNames(interfaceNames)
 }
 func ZendGenerateAnonClassName(start_lineno uint32) *types.String {
 	var filename = CG__().GetActiveOpArray().GetFilename()

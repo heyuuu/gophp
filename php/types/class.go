@@ -79,12 +79,12 @@ type ClassEntry struct {
 	get_static_method func(ce *ClassEntry, method *String) IFunction
 	serialize         func(object *Zval, buffer **uint8, buf_len *int, data *zend.ZendSerializeData) int
 	unserialize       func(object *Zval, ce *ClassEntry, buf *uint8, buf_len int, data *zend.ZendUnserializeData) int
-	num_interfaces    uint32
 	num_traits        uint32
-	__2               struct /* union */ {
-		interfaces      []*ClassEntry
-		interface_names []ClassName
-	}
+
+	// 继承接口列表，在 link 前只有 interfaceNames 可能有值，在 link 后只有 interfaces 可能有值。
+	interfaceNames []ClassName
+	interfaces     []*ClassEntry
+
 	trait_names       *ClassName
 	trait_aliases     []*zend.ZendTraitAlias
 	trait_precedences []*zend.ZendTraitPrecedence
@@ -159,6 +159,46 @@ func (ce *ClassEntry) ConstantsTable() ClassConstantTable { return ce.constantTa
 func (ce *ClassEntry) GetPropertyInfo(propNum int) *PropertyInfo {
 	b.Assert(0 <= propNum && propNum < ce.GetDefaultPropertiesCount())
 	return ce.GetPropertiesInfoTable()[propNum]
+}
+
+// interfaces
+func (ce *ClassEntry) GetNumInterfaces() int {
+	if ce.IsResolvedInterfaces() {
+		return len(ce.interfaces)
+	} else {
+		return len(ce.interfaceNames)
+	}
+}
+
+func (ce *ClassEntry) GetInterfaceNames() []ClassName { return ce.interfaceNames }
+func (ce *ClassEntry) ImplementInterfaceNames(names []string) {
+	b.Assert(!ce.IsResolvedInterfaces())
+
+	// string to ClassName
+	var interfaceNames []ClassName
+	if len(names) > 0 {
+		interfaceNames = make([]ClassName, len(names))
+		for i, name := range names {
+			interfaceNames[i] = MakeClassName(name)
+		}
+	}
+
+	// set field
+	if len(interfaceNames) > 0 {
+		ce.SetIsImplementInterfaces(true)
+	}
+	ce.interfaceNames = interfaceNames
+}
+
+func (ce *ClassEntry) GetInterfaces() []*ClassEntry { return ce.interfaces }
+func (ce *ClassEntry) ResolvedInterfaces(interfaces []*ClassEntry) {
+	ce.SetIsResolvedInterfaces(true)
+	ce.interfaces = interfaces
+	ce.interfaceNames = nil
+}
+func (ce *ClassEntry) AppendResolvedInterfaces(iface *ClassEntry) {
+	b.Assert(ce.IsResolvedInterfaces())
+	ce.interfaces = append(ce.interfaces, iface)
 }
 
 /**
@@ -276,16 +316,9 @@ func (ce *ClassEntry) GetUnserialize() func(object *Zval, ce *ClassEntry, buf *u
 func (ce *ClassEntry) SetUnserialize(value func(object *Zval, ce *ClassEntry, buf *uint8, buf_len int, data *zend.ZendUnserializeData) int) {
 	ce.unserialize = value
 }
-func (ce *ClassEntry) GetNumInterfaces() uint32          { return ce.num_interfaces }
-func (ce *ClassEntry) SetNumInterfaces(value uint32)     { ce.num_interfaces = value }
-func (ce *ClassEntry) GetNumTraits() uint32              { return ce.num_traits }
-func (ce *ClassEntry) SetNumTraits(value uint32)         { ce.num_traits = value }
-func (ce *ClassEntry) GetInterfaces() []*ClassEntry      { return ce.__2.interfaces }
-func (ce *ClassEntry) SetInterfaces(value []*ClassEntry) { ce.__2.interfaces = value }
-func (ce *ClassEntry) GetInterfaceNames() []ClassName    { return ce.__2.interface_names }
-func (ce *ClassEntry) SetInterfaceNames(value []ClassName) {
-	ce.__2.interface_names = value
-}
+func (ce *ClassEntry) GetNumTraits() uint32      { return ce.num_traits }
+func (ce *ClassEntry) SetNumTraits(value uint32) { ce.num_traits = value }
+
 func (ce *ClassEntry) GetTraitNames() *ClassName                    { return ce.trait_names }
 func (ce *ClassEntry) SetTraitNames(value *ClassName)               { ce.trait_names = value }
 func (ce *ClassEntry) GetTraitAliases() []*zend.ZendTraitAlias      { return ce.trait_aliases }
