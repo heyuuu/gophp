@@ -2,6 +2,7 @@ package types
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -13,6 +14,24 @@ const (
 type FunctionTable = *Table[IFunction]
 type PropertyTable = *Table[*PropertyInfo]
 type ClassConstantTable = *Table[*ClassConstant]
+
+/**
+ * ClassName
+ */
+type ClassName struct {
+	name   string
+	lcName string
+}
+
+func MakeClassName(name string) ClassName {
+	return ClassName{
+		name:   name,
+		lcName: ascii.StrToLower(name),
+	}
+}
+
+func (n ClassName) GetName() string   { return n.name }
+func (n ClassName) GetLcName() string { return n.lcName }
 
 /**
  * ClassEntry
@@ -64,9 +83,9 @@ type ClassEntry struct {
 	num_traits        uint32
 	__2               struct /* union */ {
 		interfaces      []*ClassEntry
-		interface_names []zend.ZendClassName
+		interface_names []ClassName
 	}
-	trait_names       *zend.ZendClassName
+	trait_names       *ClassName
 	trait_aliases     []*zend.ZendTraitAlias
 	trait_precedences []*zend.ZendTraitPrecedence
 	info              struct /* union */ {
@@ -257,18 +276,18 @@ func (ce *ClassEntry) GetUnserialize() func(object *Zval, ce *ClassEntry, buf *u
 func (ce *ClassEntry) SetUnserialize(value func(object *Zval, ce *ClassEntry, buf *uint8, buf_len int, data *zend.ZendUnserializeData) int) {
 	ce.unserialize = value
 }
-func (ce *ClassEntry) GetNumInterfaces() uint32                { return ce.num_interfaces }
-func (ce *ClassEntry) SetNumInterfaces(value uint32)           { ce.num_interfaces = value }
-func (ce *ClassEntry) GetNumTraits() uint32                    { return ce.num_traits }
-func (ce *ClassEntry) SetNumTraits(value uint32)               { ce.num_traits = value }
-func (ce *ClassEntry) GetInterfaces() []*ClassEntry            { return ce.__2.interfaces }
-func (ce *ClassEntry) SetInterfaces(value []*ClassEntry)       { ce.__2.interfaces = value }
-func (ce *ClassEntry) GetInterfaceNames() []zend.ZendClassName { return ce.__2.interface_names }
-func (ce *ClassEntry) SetInterfaceNames(value []zend.ZendClassName) {
+func (ce *ClassEntry) GetNumInterfaces() uint32          { return ce.num_interfaces }
+func (ce *ClassEntry) SetNumInterfaces(value uint32)     { ce.num_interfaces = value }
+func (ce *ClassEntry) GetNumTraits() uint32              { return ce.num_traits }
+func (ce *ClassEntry) SetNumTraits(value uint32)         { ce.num_traits = value }
+func (ce *ClassEntry) GetInterfaces() []*ClassEntry      { return ce.__2.interfaces }
+func (ce *ClassEntry) SetInterfaces(value []*ClassEntry) { ce.__2.interfaces = value }
+func (ce *ClassEntry) GetInterfaceNames() []ClassName    { return ce.__2.interface_names }
+func (ce *ClassEntry) SetInterfaceNames(value []ClassName) {
 	ce.__2.interface_names = value
 }
-func (ce *ClassEntry) GetTraitNames() *zend.ZendClassName           { return ce.trait_names }
-func (ce *ClassEntry) SetTraitNames(value *zend.ZendClassName)      { ce.trait_names = value }
+func (ce *ClassEntry) GetTraitNames() *ClassName                    { return ce.trait_names }
+func (ce *ClassEntry) SetTraitNames(value *ClassName)               { ce.trait_names = value }
 func (ce *ClassEntry) GetTraitAliases() []*zend.ZendTraitAlias      { return ce.trait_aliases }
 func (ce *ClassEntry) SetTraitAliases(value []*zend.ZendTraitAlias) { ce.trait_aliases = value }
 func (ce *ClassEntry) GetTraitPrecedences() []*zend.ZendTraitPrecedence {

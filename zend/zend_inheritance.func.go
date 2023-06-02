@@ -241,7 +241,7 @@ func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) types.Zend
 
 		} else {
 			for i = 0; i < ce1.GetNumInterfaces(); i++ {
-				var ce *types.ClassEntry = ZendLookupClassEx(ce1.GetInterfaceNames()[i].name, ce1.GetInterfaceNames()[i].lcName, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				var ce *types.ClassEntry = ZendLookupClassEx_Ex(ce1.GetInterfaceNames()[i].GetName(), ce1.GetInterfaceNames()[i].GetLcName(), ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil && UnlinkedInstanceof(ce, ce2) != 0 {
 					return 1
 				}
@@ -1307,7 +1307,7 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 		// types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].name, 0)
 		// types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].lc_name, 0)
 	}
-	Efree(ce.GetInterfaceNames())
+	//Efree(ce.GetInterfaceNames())
 	ce.SetNumInterfaces(num_interfaces)
 	ce.SetInterfaces(interfaces)
 	ce.SetIsResolvedInterfaces(true)
@@ -2173,7 +2173,7 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 			memcpy(interfaces, parent.GetInterfaces(), b.SizeOf("zend_class_entry *")*num_parent_interfaces)
 		}
 		for i = 0; i < ce.GetNumInterfaces(); i++ {
-			var iface *types.ClassEntry = ZendFetchClassByName(ce.GetInterfaceNames()[i].name, ce.GetInterfaceNames()[i].lcName, ZEND_FETCH_CLASS_INTERFACE|ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
+			var iface *types.ClassEntry = ZendFetchClassByName_Ex(ce.GetInterfaceNames()[i].GetName(), ce.GetInterfaceNames()[i].GetLcName(), ZEND_FETCH_CLASS_INTERFACE|ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
 			if iface == nil {
 				CheckUnrecoverableLoadFailure(ce)
 				Efree(interfaces)

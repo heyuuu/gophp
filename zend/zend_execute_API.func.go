@@ -580,6 +580,14 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 	}
 	return types.SUCCESS
 }
+func ZendLookupClassEx_Ex(name string, key string, flags uint32) *types.ClassEntry {
+	var nameZStr *types.String = types.NewString(name)
+	var keyZStr *types.String = nil
+	if key != "" {
+		keyZStr = types.NewString(key)
+	}
+	return ZendLookupClassEx(nameZStr, keyZStr, flags)
+}
 func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *types.ClassEntry {
 	var args []types.Zval
 	var local_retval types.Zval
@@ -634,18 +642,13 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	}
 
 	/* Verify class name before passing it to __autoload() */
-
 	if key == nil && strspn(name.GetVal(), "0123456789_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ200201202203204205206207210211212213214215216217220221222223224225226227230231232233234235236237240241242243244245246247250251252253254255256257260261262263264265266267270271272273274275276277300301302303304305306307310311312313314315316317320321322323324325326327330331332333334335336337340341342343344345346347350351352353354355356357360361362363364365366367370371372373374375376377\\") != name.GetLen() {
-		// types.ZendStringReleaseEx(lc_name, 0)
 		return nil
 	}
 	if EG__().GetInAutoload() == nil {
 		EG__().SetInAutoload(types.NewArray(0))
 	}
 	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name) == nil {
-		if key == nil {
-			// types.ZendStringReleaseEx(lc_name, 0)
-		}
 		return nil
 	}
 	local_retval.SetUndef()
@@ -909,6 +912,9 @@ check_fetch_type:
 		return nil
 	}
 	return ce
+}
+func ZendFetchClassByName_Ex(class_name string, key string, fetch_type int) *types.ClassEntry {
+	return ZendFetchClassByName(types.NewString(class_name), types.NewString(key), fetch_type)
 }
 func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_type int) *types.ClassEntry {
 	var ce *types.ClassEntry

@@ -5,19 +5,6 @@ import (
 )
 
 /**
- * ZendClassName
- */
-type ZendClassName struct {
-	name   *types.String
-	lcName *types.String
-}
-
-func (this *ZendClassName) GetName() *types.String        { return this.name }
-func (this *ZendClassName) SetName(value *types.String)   { this.name = value }
-func (this *ZendClassName) GetLcName() *types.String      { return this.lcName }
-func (this *ZendClassName) SetLcName(value *types.String) { this.lcName = value }
-
-/**
  * ZendTraitMethodReference
  */
 type ZendTraitMethodReference struct {

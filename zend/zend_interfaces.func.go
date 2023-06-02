@@ -258,7 +258,7 @@ func ZendImplementTraversable(interface_ *types.ClassEntry, class_type *types.Cl
 	/* check that class_type is traversable at c-level or implements at least one of 'aggregate' and 'Iterator' */
 
 	var i uint32
-	if class_type.GetGetIterator() != nil || class_type.GetParent() && class_type.GetParent().get_iterator {
+	if class_type.GetGetIterator() != nil || class_type.GetParent() != nil && class_type.GetParent().GetGetIterator() != nil {
 		return types.SUCCESS
 	}
 	if class_type.GetNumInterfaces() != 0 {
