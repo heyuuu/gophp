@@ -89,16 +89,16 @@ type ClassEntry struct {
 	trait_names       *ClassName
 	trait_aliases     []*zend.ZendTraitAlias
 	trait_precedences []*zend.ZendTraitPrecedence
-	info              struct /* union */ {
-		user struct {
-			filename   string
-			lineStart  uint32
-			lineEnd    uint32
-			docComment string
-		}
-	}
+
 	// info.internal
 	moduleNumber int
+	// info.user
+	infoUser struct {
+		filename   string
+		lineStart  uint32
+		lineEnd    uint32
+		docComment string
+	}
 }
 
 func NewUserClass(name string) *ClassEntry {
@@ -330,13 +330,13 @@ func (ce *ClassEntry) GetTraitPrecedences() []*zend.ZendTraitPrecedence {
 func (ce *ClassEntry) SetTraitPrecedences(value []*zend.ZendTraitPrecedence) {
 	ce.trait_precedences = value
 }
-func (ce *ClassEntry) GetFilename() string       { return ce.info.user.filename }
-func (ce *ClassEntry) SetFilename(value string)  { ce.info.user.filename = value }
-func (ce *ClassEntry) SetLineStart(value uint32) { ce.info.user.lineStart = value }
-func (ce *ClassEntry) SetLineEnd(value uint32)   { ce.info.user.lineEnd = value }
-func (ce *ClassEntry) GetDocComment() string     { return ce.info.user.docComment }
+func (ce *ClassEntry) GetFilename() string       { return ce.infoUser.filename }
+func (ce *ClassEntry) SetFilename(value string)  { ce.infoUser.filename = value }
+func (ce *ClassEntry) SetLineStart(value uint32) { ce.infoUser.lineStart = value }
+func (ce *ClassEntry) SetLineEnd(value uint32)   { ce.infoUser.lineEnd = value }
+func (ce *ClassEntry) GetDocComment() string     { return ce.infoUser.docComment }
 func (ce *ClassEntry) SetDocComment(value string) {
-	ce.info.user.docComment = value
+	ce.infoUser.docComment = value
 }
 
 /* ClassEntry.ceFlags */
