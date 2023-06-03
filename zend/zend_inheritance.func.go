@@ -1017,8 +1017,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 			types.ZVAL_COPY_VALUE_PROP(dst, src)
 		}
 
-		ce.SetDefaultPropertiesTable(newTable)
-		ce.SetDefaultPropertiesCount(len(newTable))
+		ce.SetDefaultPropertiesTableAndCount(newTable)
 	}
 
 	if parentCe.GetDefaultStaticMembersCount() != 0 {
@@ -1117,12 +1116,12 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 		}
 	}
 
-	ce.PropertyTable().Foreach(func(key string, property_info *types.PropertyInfo) {
-		if property_info.GetCe() == ce {
-			if property_info.IsStatic() {
-				property_info.SetOffset(property_info.GetOffset() + uint32(parentCe.GetDefaultStaticMembersCount()))
+	ce.PropertyTable().Foreach(func(key string, propertyInfo *types.PropertyInfo) {
+		if propertyInfo.GetCe() == ce {
+			if propertyInfo.IsStatic() {
+				propertyInfo.SetOffset(propertyInfo.GetOffset() + uint32(parentCe.GetDefaultStaticMembersCount()))
 			} else {
-				property_info.SetOffset(property_info.GetOffset() + uint32(parentCe.GetDefaultPropertiesCount()*b.SizeOf("zval")))
+				propertyInfo.SetOffset(propertyInfo.GetOffset() + uint32(parentCe.GetDefaultPropertiesCount()*b.SizeOf("zval")))
 			}
 		}
 	})

@@ -331,33 +331,32 @@ func ZendDeclareTypedProperty(
 			}
 		}
 	} else {
-		var property_default_ptr *types.Zval
+		var propertyDefaultPtr *types.Zval
 		propInfoPtr = ce.PropertyTable().Get(name.GetStr())
 		if propInfoPtr != nil && !propInfoPtr.IsStatic() {
 			propOffset = propInfoPtr.GetOffset()
-			// ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
 			ce.PropertyTable().Del(name.GetStr())
 			b.Assert(ce.IsInternalClass())
 			b.Assert(ce.GetPropertiesInfoTable() != nil)
+
 			ce.GetPropertiesInfoTable()[OBJ_PROP_TO_NUM(propOffset)] = propInfo
+			propertyDefaultPtr = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(propOffset)]
+			propertyDefaultPtr.CopyValueFrom(property)
+
+			if property.IsUndef() {
+				propertyDefaultPtr.SetU2Extra(types.IS_PROP_UNINIT)
+			} else {
+				propertyDefaultPtr.SetU2Extra(0)
+			}
 		} else {
 			propOffset = OBJ_PROP_TO_OFFSET(ce.GetDefaultPropertiesCount())
-			ce.GetDefaultPropertiesCount()++
-			ce.SetDefaultPropertiesTable(Perealloc(ce.GetDefaultPropertiesTable(), b.SizeOf("zval")*ce.GetDefaultPropertiesCount()))
+
+			ce.AddDefaultProperty(property)
 
 			/* For user classes this is handled during linking */
-
 			if ce.IsInternalClass() {
-				ce.SetPropertiesInfoTable(Perealloc(ce.GetPropertiesInfoTable(), b.SizeOf("zend_property_info *")*ce.GetDefaultPropertiesCount()))
-				ce.GetPropertiesInfoTable()[ce.GetDefaultPropertiesCount()-1] = propInfo
+				ce.AddPropertiesInfo(propInfo)
 			}
-		}
-		property_default_ptr = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(propOffset)]
-		property_default_ptr.CopyValueFrom(property)
-		if property.IsUndef() {
-			property_default_ptr.SetU2Extra(types.IS_PROP_UNINIT)
-		} else {
-			property_default_ptr.SetU2Extra(0)
 		}
 	}
 	if ce.IsInternalClass() {

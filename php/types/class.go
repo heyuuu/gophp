@@ -61,7 +61,7 @@ type ClassEntry struct {
 	propertyTable PropertyTable
 	constantTable ClassConstantTable
 
-	properties_info_table []*PropertyInfo
+	propertiesInfoTable []*PropertyInfo
 
 	constructor      IFunction
 	destructor       IFunction
@@ -204,6 +204,43 @@ func (ce *ClassEntry) AppendResolvedInterfaces(iface *ClassEntry) {
 	ce.interfaces = append(ce.interfaces, iface)
 }
 
+// defaultProperties
+func (ce *ClassEntry) GetDefaultPropertiesCount() int { return ce.defaultPropertiesCount }
+func (ce *ClassEntry) SetDefaultPropertiesCount(value int) {
+	ce.defaultPropertiesCount = value
+}
+func (ce *ClassEntry) GetDefaultPropertiesTable() []Zval {
+	return ce.defaultPropertiesTable
+}
+func (ce *ClassEntry) SetDefaultPropertiesTable(value []Zval) {
+	ce.defaultPropertiesTable = value
+}
+func (ce *ClassEntry) AddDefaultProperty(property *Zval) {
+	ce.defaultPropertiesCount++
+	ce.defaultPropertiesTable = append(ce.defaultPropertiesTable, Zval{})
+
+	ptr := &ce.defaultPropertiesTable[len(ce.defaultPropertiesTable)-1]
+	ptr.CopyValueFrom(property)
+	if property.IsUndef() {
+		ptr.SetU2Extra(IS_PROP_UNINIT)
+	}
+}
+func (ce *ClassEntry) SetDefaultPropertiesTableAndCount(value []Zval) {
+	ce.defaultPropertiesTable = value
+	ce.defaultPropertiesCount = len(value)
+}
+
+// propertiesInfoTable
+func (ce *ClassEntry) AddPropertiesInfo(propInfo *PropertyInfo) {
+	ce.propertiesInfoTable = append(ce.propertiesInfoTable, propInfo)
+}
+func (ce *ClassEntry) GetPropertiesInfoTable() []*PropertyInfo {
+	return ce.propertiesInfoTable
+}
+func (ce *ClassEntry) SetPropertiesInfoTable(value []*PropertyInfo) {
+	ce.propertiesInfoTable = value
+}
+
 /**
  * Getter / Setter
  */
@@ -211,28 +248,18 @@ func (ce *ClassEntry) GetName() *String      { return NewString(ce.name) }
 func (ce *ClassEntry) IsInternalClass() bool { return ce.typ == typeInternalClass }
 func (ce *ClassEntry) IsUserClass() bool     { return ce.typ == typeUserClass }
 
-func (ce *ClassEntry) GetType() byte                  { return ce.typ }
-func (ce *ClassEntry) GetParent() *ClassEntry         { return ce.parent }
-func (ce *ClassEntry) SetParent(value *ClassEntry)    { ce.parent = value }
-func (ce *ClassEntry) GetParentName() *String         { return ce.parentName }
-func (ce *ClassEntry) SetParentName(value string)     { ce.parentName = NewString(value) }
-func (ce *ClassEntry) GetCeFlags() uint32             { return ce.ceFlags }
-func (ce *ClassEntry) SetCeFlags(value uint32)        { ce.ceFlags = value }
-func (ce *ClassEntry) GetDefaultPropertiesCount() int { return ce.defaultPropertiesCount }
-func (ce *ClassEntry) SetDefaultPropertiesCount(value int) {
-	ce.defaultPropertiesCount = value
-}
+func (ce *ClassEntry) GetType() byte               { return ce.typ }
+func (ce *ClassEntry) GetParent() *ClassEntry      { return ce.parent }
+func (ce *ClassEntry) SetParent(value *ClassEntry) { ce.parent = value }
+func (ce *ClassEntry) GetParentName() *String      { return ce.parentName }
+func (ce *ClassEntry) SetParentName(value string)  { ce.parentName = NewString(value) }
+func (ce *ClassEntry) GetCeFlags() uint32          { return ce.ceFlags }
+func (ce *ClassEntry) SetCeFlags(value uint32)     { ce.ceFlags = value }
 func (ce *ClassEntry) GetDefaultStaticMembersCount() int {
 	return ce.defaultStaticMembersCount
 }
 func (ce *ClassEntry) SetDefaultStaticMembersCount(value int) {
 	ce.defaultStaticMembersCount = value
-}
-func (ce *ClassEntry) GetDefaultPropertiesTable() []Zval {
-	return ce.defaultPropertiesTable
-}
-func (ce *ClassEntry) SetDefaultPropertiesTable(value []Zval) {
-	ce.defaultPropertiesTable = value
 }
 func (ce *ClassEntry) GetDefaultStaticMembersTable() *Zval {
 	return ce.defaultStaticMembersTable
@@ -242,12 +269,6 @@ func (ce *ClassEntry) SetDefaultStaticMembersTable(value *Zval) {
 }
 func (ce *ClassEntry) GetStaticMembersTablePtr() **Zval {
 	return ce.static_members_table__ptr
-}
-func (ce *ClassEntry) GetPropertiesInfoTable() []*PropertyInfo {
-	return ce.properties_info_table
-}
-func (ce *ClassEntry) SetPropertiesInfoTable(value []*PropertyInfo) {
-	ce.properties_info_table = value
 }
 func (ce *ClassEntry) GetConstructor() IFunction        { return ce.constructor }
 func (ce *ClassEntry) SetConstructor(value IFunction)   { ce.constructor = value }

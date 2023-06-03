@@ -8,17 +8,6 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func USED_RET(executeData *ZendExecuteData) bool {
-	prev := executeData.GetPrevExecuteData()
-	if prev == nil {
-		return true
-	}
-	if !(ZEND_USER_CODE(prev.func_.GetType())) {
-		return true
-	}
-
-	return prev.opline.GetResultType() != IS_UNUSED
-}
 func ZEND_PUTS(str string) int { return ZendWrite(str) }
 func ZEND_PUTC(c byte) int     { return ZendWrite(string([]byte{c})) }
 

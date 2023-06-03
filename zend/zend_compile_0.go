@@ -7,14 +7,17 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
 	"strings"
+	"unsafe"
 )
 
 func ZendAstGetZnode(ast *ZendAst) *Znode { return (*ZendAstZnode)(ast).GetNode() }
 func OBJ_PROP(obj *types.ZendObject, offset *types.ZendObject) *types.Zval {
 	return (*types.Zval)((*byte)(obj + offset))
 }
-func OBJ_PROP_TO_OFFSET(num int) __auto__ {
-	return uint32(zend_long((*byte)(&((*types.ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil)) + b.SizeOf("zval")*num)
+func OBJ_PROP_TO_OFFSET(num int) int {
+	var tmp *types.ZendObject = nil
+
+	return uintptr(unsafe.Pointer(tmp.GetPropertiesTable())) - uintptr(unsafe.Pointer(tmp)) + b.SizeOf("zval")*num
 }
 func OBJ_PROP_TO_NUM(offset uint32) int {
 	return (offset - OBJ_PROP_TO_OFFSET(0)) / b.SizeOf("zval")

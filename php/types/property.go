@@ -29,7 +29,7 @@ func NewPropertyInfo(offset uint32, flags uint32, name string, docComment *strin
 }
 
 func (this *PropertyInfo) SetOffset(value uint32) { this.offset = value }
-func (this *PropertyInfo) SetType(value TypeHint) { this.typ = value }
+func (this *PropertyInfo) SetType(value TypeHint) { this.typ = &value }
 
 func (this *PropertyInfo) GetOffset() uint32      { return this.offset }
 func (this *PropertyInfo) GetFlags() uint32       { return this.flags }
