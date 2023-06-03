@@ -976,6 +976,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s may not inherit from final class (%s)", ce.Name(), parentCe.Name())
 		}
 	}
+
 	ce.SetParent(parentCe)
 	ce.SetIsResolvedParent(true)
 
@@ -991,63 +992,35 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 	}
 
 	/* Inherit properties */
-
 	if parentCe.GetDefaultPropertiesCount() != 0 {
-		var src *types.Zval
-		var dst *types.Zval
-		var end *types.Zval
-		if ce.GetDefaultPropertiesCount() != 0 {
-			var table *types.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() + parentCe.GetDefaultPropertiesCount()))
-			src = ce.GetDefaultPropertiesTable() + ce.GetDefaultPropertiesCount()
-			end = table + parentCe.GetDefaultPropertiesCount()
-			dst = end + ce.GetDefaultPropertiesCount()
-			ce.SetDefaultPropertiesTable(table)
-			for {
-				dst--
-				src--
-				types.ZVAL_COPY_VALUE_PROP(dst, src)
-				if dst == end {
-					break
-				}
-			}
-			Pefree(src)
-			end = ce.GetDefaultPropertiesTable()
-		} else {
-			end = Pemalloc(b.SizeOf("zval") * parentCe.GetDefaultPropertiesCount())
-			dst = end + parentCe.GetDefaultPropertiesCount()
-			ce.SetDefaultPropertiesTable(end)
-		}
-		src = parentCe.GetDefaultPropertiesTable() + parentCe.GetDefaultPropertiesCount()
-		if parentCe.GetType() != ce.GetType() {
-			/* User class extends internal */
-			for {
-				dst--
-				src--
+		parentTable := parentCe.GetDefaultPropertiesTable()
+		oldTable := ce.GetDefaultPropertiesTable()
+		newTable := make([]types.Zval, len(parentTable)+len(oldTable))
+		// 复制 parent 默认属性表
+		extendsInternal := parentCe.GetType() == ce.GetType() /* User class extends internal */
+		for i := range parentTable {
+			src := &parentTable[i]
+			dst := &newTable[i]
+			if extendsInternal {
 				types.ZVAL_COPY_OR_DUP_PROP(dst, src)
-				if dst.IsConstantAst() {
-					ce.SetIsConstantsUpdated(false)
-				}
-				continue
-				if dst == end {
-					break
-				}
-			}
-		} else {
-			for {
-				dst--
-				src--
+			} else {
 				types.ZVAL_COPY_PROP(dst, src)
-				if dst.IsConstantAst() {
-					ce.SetIsConstantsUpdated(false)
-				}
-				continue
-				if dst == end {
-					break
-				}
+			}
+			if dst.IsConstantAst() {
+				ce.SetIsConstantsUpdated(false)
 			}
 		}
-		ce.SetDefaultPropertiesCount(ce.GetDefaultPropertiesCount() + parentCe.GetDefaultPropertiesCount())
+		// 保留 oldTable 默认属性表
+		for i := range oldTable {
+			src := &oldTable[i]
+			dst := &newTable[len(parentTable)+i]
+			types.ZVAL_COPY_VALUE_PROP(dst, src)
+		}
+
+		ce.SetDefaultPropertiesTable(newTable)
+		ce.SetDefaultPropertiesCount(len(newTable))
 	}
+
 	if parentCe.GetDefaultStaticMembersCount() != 0 {
 		var src *types.Zval
 		var dst *types.Zval
@@ -1138,13 +1111,8 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 			if CurrEX() == nil {
 				ZEND_MAP_PTR_NEW(ce.static_members_table)
 			} else {
-
 				/* internal class loaded by dl() */
-
 				ZEND_MAP_PTR_INIT(ce.static_members_table, ce.GetDefaultStaticMembersTable())
-
-				/* internal class loaded by dl() */
-
 			}
 		}
 	}

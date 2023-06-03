@@ -49,11 +49,13 @@ type ClassEntry struct {
 	interfaceNames []ClassName
 	interfaces     []*ClassEntry
 
-	default_properties_count     int
-	default_static_members_count int
-	default_properties_table     []Zval
-	default_static_members_table *Zval
-	static_members_table__ptr    **Zval
+	// 默认属性表
+	defaultPropertiesCount int
+	defaultPropertiesTable []Zval
+
+	defaultStaticMembersCount int
+	defaultStaticMembersTable *Zval
+	static_members_table__ptr **Zval
 
 	functionTable FunctionTable
 	propertyTable PropertyTable
@@ -216,27 +218,27 @@ func (ce *ClassEntry) GetParentName() *String         { return ce.parentName }
 func (ce *ClassEntry) SetParentName(value string)     { ce.parentName = NewString(value) }
 func (ce *ClassEntry) GetCeFlags() uint32             { return ce.ceFlags }
 func (ce *ClassEntry) SetCeFlags(value uint32)        { ce.ceFlags = value }
-func (ce *ClassEntry) GetDefaultPropertiesCount() int { return ce.default_properties_count }
+func (ce *ClassEntry) GetDefaultPropertiesCount() int { return ce.defaultPropertiesCount }
 func (ce *ClassEntry) SetDefaultPropertiesCount(value int) {
-	ce.default_properties_count = value
+	ce.defaultPropertiesCount = value
 }
 func (ce *ClassEntry) GetDefaultStaticMembersCount() int {
-	return ce.default_static_members_count
+	return ce.defaultStaticMembersCount
 }
 func (ce *ClassEntry) SetDefaultStaticMembersCount(value int) {
-	ce.default_static_members_count = value
+	ce.defaultStaticMembersCount = value
 }
 func (ce *ClassEntry) GetDefaultPropertiesTable() []Zval {
-	return ce.default_properties_table
+	return ce.defaultPropertiesTable
 }
 func (ce *ClassEntry) SetDefaultPropertiesTable(value []Zval) {
-	ce.default_properties_table = value
+	ce.defaultPropertiesTable = value
 }
 func (ce *ClassEntry) GetDefaultStaticMembersTable() *Zval {
-	return ce.default_static_members_table
+	return ce.defaultStaticMembersTable
 }
 func (ce *ClassEntry) SetDefaultStaticMembersTable(value *Zval) {
-	ce.default_static_members_table = value
+	ce.defaultStaticMembersTable = value
 }
 func (ce *ClassEntry) GetStaticMembersTablePtr() **Zval {
 	return ce.static_members_table__ptr
