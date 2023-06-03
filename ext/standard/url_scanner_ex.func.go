@@ -185,47 +185,47 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 		/* URL is http://php.net or like */
 
 		dest.AppendSmartStr(url)
-		dest.AppendByte('/')
-		dest.AppendByte('?')
+		dest.WriteByte('/')
+		dest.WriteByte('?')
 		dest.AppendSmartStr(url_app)
 		PhpUrlFree(url_parts)
 		return
 	}
 	if url_parts.GetScheme() != nil {
-		dest.AppendString(b.CastStrAuto(url_parts.GetScheme().GetVal()))
-		dest.AppendString("://")
+		dest.WriteString(b.CastStrAuto(url_parts.GetScheme().GetVal()))
+		dest.WriteString("://")
 	} else if (*(url.GetS().GetVal())) == '/' && (*(url.GetS().GetVal() + 1)) == '/' {
-		dest.AppendString("//")
+		dest.WriteString("//")
 	}
 	if url_parts.GetUser() != nil {
-		dest.AppendString(b.CastStrAuto(url_parts.GetUser().GetVal()))
+		dest.WriteString(b.CastStrAuto(url_parts.GetUser().GetVal()))
 		if url_parts.GetPass() != nil {
-			dest.AppendString(b.CastStrAuto(url_parts.GetPass().GetVal()))
-			dest.AppendByte(':')
+			dest.WriteString(b.CastStrAuto(url_parts.GetPass().GetVal()))
+			dest.WriteByte(':')
 		}
-		dest.AppendByte('@')
+		dest.WriteByte('@')
 	}
 	if url_parts.GetHost() != nil {
-		dest.AppendString(b.CastStrAuto(url_parts.GetHost().GetVal()))
+		dest.WriteString(b.CastStrAuto(url_parts.GetHost().GetVal()))
 	}
 	if url_parts.GetPort() != 0 {
-		dest.AppendByte(':')
+		dest.WriteByte(':')
 		dest.AppendUlong(long(url_parts.GetPort()))
 	}
 	if url_parts.GetPath() != nil {
-		dest.AppendString(b.CastStrAuto(url_parts.GetPath().GetVal()))
+		dest.WriteString(b.CastStrAuto(url_parts.GetPath().GetVal()))
 	}
-	dest.AppendByte('?')
+	dest.WriteByte('?')
 	if url_parts.GetQuery() != nil {
-		dest.AppendString(b.CastStrAuto(url_parts.GetQuery().GetVal()))
-		dest.AppendString(b.CastStrAuto(separator))
+		dest.WriteString(b.CastStrAuto(url_parts.GetQuery().GetVal()))
+		dest.WriteString(b.CastStrAuto(separator))
 		dest.AppendSmartStr(url_app)
 	} else {
 		dest.AppendSmartStr(url_app)
 	}
 	if url_parts.GetFragment() != nil {
-		dest.AppendByte('#')
-		dest.AppendString(b.CastStrAuto(url_parts.GetFragment().GetVal()))
+		dest.WriteByte('#')
+		dest.WriteString(b.CastStrAuto(url_parts.GetFragment().GetVal()))
 	}
 	PhpUrlFree(url_parts)
 }
@@ -240,7 +240,7 @@ func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 		f = 1
 	}
 	if quotes {
-		ctx.GetResult().AppendByte(type_)
+		ctx.GetResult().WriteByte(type_)
 	}
 	if f {
 		AppendModifiedUrl(ctx.GetVal(), ctx.GetResult(), ctx.GetUrlApp(), core.PG__().arg_separator.output)
@@ -248,11 +248,11 @@ func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 		ctx.GetResult().AppendSmartStr(ctx.GetVal())
 	}
 	if quotes {
-		ctx.GetResult().AppendByte(type_)
+		ctx.GetResult().WriteByte(type_)
 	}
 }
 func Passthru(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
-	ctx.GetResult().AppendString(b.CastStr(start, YYCURSOR-start))
+	ctx.GetResult().WriteString(b.CastStr(start, YYCURSOR-start))
 }
 func CheckHttpHost(target string) int {
 	tmp := zend.EG__().GetSymbolTable().KeyFind("_SERVER")
@@ -334,7 +334,7 @@ func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	if ctx.GetTag().GetS() != nil {
 		ctx.GetTag().GetS().GetLen() = 0
 	}
-	ctx.GetTag().AppendString(b.CastStr(start, YYCURSOR-start))
+	ctx.GetTag().WriteString(b.CastStr(start, YYCURSOR-start))
 	for i = 0; i < ctx.GetTag().GetS().GetLen(); i++ {
 		ctx.GetTag().GetS().GetStr()[i] = tolower(int(uint8(ctx.GetTag().GetS().GetStr()[i])))
 	}
@@ -359,7 +359,7 @@ func HandleArg(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	if ctx.GetArg().GetS() != nil {
 		ctx.GetArg().GetS().GetLen() = 0
 	}
-	ctx.GetArg().AppendString(b.CastStr(start, YYCURSOR-start))
+	ctx.GetArg().WriteString(b.CastStr(start, YYCURSOR-start))
 	if ctx.GetTagType() == TAG_FORM && strncasecmp(ctx.GetArg().GetS().GetVal(), "action", ctx.GetArg().GetS().GetLen()) == 0 {
 		ctx.SetAttrType(ATTR_ACTION)
 	} else {
@@ -379,7 +379,7 @@ func XxMainloop(ctx *UrlAdaptStateExT, newdata *byte, newlen int) {
 	var xp *byte
 	var start *byte
 	var rest int
-	ctx.GetBuf().AppendString(b.CastStr(newdata, newlen))
+	ctx.GetBuf().WriteString(b.CastStr(newdata, newlen))
 	YYCURSOR = ctx.GetBuf().GetS().GetVal()
 	YYLIMIT = ctx.GetBuf().GetS().GetVal() + ctx.GetBuf().GetS().GetLen()
 	switch ctx.GetState() {
@@ -816,19 +816,19 @@ func PhpUrlScannerAdaptSingleUrl(
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	var url_app zend.SmartStr = zend.MakeSmartStr(0)
 	var encoded string
-	surl.AppendString(b.CastStr(url, urllen))
+	surl.WriteString(b.CastStr(url, urllen))
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name)
-		url_app.AppendString(encoded)
+		url_app.WriteString(encoded)
 	} else {
-		url_app.AppendString(b.CastStrAuto(name))
+		url_app.WriteString(b.CastStrAuto(name))
 	}
-	url_app.AppendByte('=')
+	url_app.WriteByte('=')
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(value)
-		url_app.AppendString(encoded)
+		url_app.WriteString(encoded)
 	} else {
-		url_app.AppendString(b.CastStrAuto(value))
+		url_app.WriteString(b.CastStrAuto(value))
 	}
 	AppendModifiedUrl(&surl, &buf, &url_app, core.PG__().arg_separator.output)
 	buf.ZeroTail()
@@ -844,14 +844,14 @@ func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush types.ZendBool, ct
 	var retval *byte
 	XxMainloop(ctx, src, srclen)
 	if ctx.GetResult().GetS() == nil {
-		ctx.GetResult().AppendString("")
+		ctx.GetResult().WriteString("")
 		*newlen = 0
 	} else {
 		*newlen = ctx.GetResult().GetS().GetLen()
 	}
 	ctx.GetResult().ZeroTail()
 	if do_flush != 0 {
-		ctx.GetResult().AppendString(ctx.GetBuf().GetS().GetStr())
+		ctx.GetResult().WriteString(ctx.GetBuf().GetS().GetStr())
 		*newlen += ctx.GetBuf().GetS().GetLen()
 		ctx.GetBuf().Free()
 		ctx.GetVal().Free()
@@ -911,8 +911,8 @@ func PhpUrlScannerSessionHandlerImpl(
 	} else if url_state.GetUrlApp().GetS().GetLen() == 0 {
 		var ctx *UrlAdaptStateExT = url_state
 		if ctx.GetBuf().GetS() != nil && ctx.GetBuf().GetS().GetLen() != 0 {
-			ctx.GetResult().AppendString(ctx.GetBuf().GetS().GetStr())
-			ctx.GetResult().AppendString(b.CastStr(output, output_len))
+			ctx.GetResult().WriteString(ctx.GetBuf().GetS().GetStr())
+			ctx.GetResult().WriteString(b.CastStr(output, output_len))
 			*handled_output = zend.Estrndup(ctx.GetResult().GetS().GetVal(), ctx.GetResult().GetS().GetLen())
 			*handled_output_len = ctx.GetBuf().GetS().GetLen() + output_len
 			ctx.GetBuf().Free()
@@ -957,35 +957,35 @@ func PhpUrlScannerAddVarImpl(
 		url_state.SetActive(1)
 	}
 	if url_state.GetUrlApp().GetS() != nil && url_state.GetUrlApp().GetS().GetLen() != 0 {
-		url_state.GetUrlApp().AppendString(b.CastStrAuto(core.PG__().arg_separator.output))
+		url_state.GetUrlApp().WriteString(b.CastStrAuto(core.PG__().arg_separator.output))
 	}
 	if encode != 0 {
 		encoded := PhpRawUrlEncode(b.CastStr(name, name_len))
-		sname.AppendString(encoded)
+		sname.WriteString(encoded)
 		//types.ZendStringFree(encoded)
 		encoded = PhpRawUrlEncode(b.CastStr(value, value_len))
-		svalue.AppendString(encoded)
+		svalue.WriteString(encoded)
 		//types.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name), name_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0).GetStr()
-		hname.AppendString(encoded)
+		hname.WriteString(encoded)
 		//types.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(value), value_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0).GetStr()
-		hvalue.AppendString(encoded)
+		hvalue.WriteString(encoded)
 		//types.ZendStringFree(encoded)
 	} else {
-		sname.AppendString(b.CastStr(name, name_len))
-		svalue.AppendString(b.CastStr(value, value_len))
-		hname.AppendString(b.CastStr(name, name_len))
-		hvalue.AppendString(b.CastStr(value, value_len))
+		sname.WriteString(b.CastStr(name, name_len))
+		svalue.WriteString(b.CastStr(value, value_len))
+		hname.WriteString(b.CastStr(name, name_len))
+		hvalue.WriteString(b.CastStr(value, value_len))
 	}
 	url_state.GetUrlApp().AppendSmartStr(&sname)
-	url_state.GetUrlApp().AppendByte('=')
+	url_state.GetUrlApp().WriteByte('=')
 	url_state.GetUrlApp().AppendSmartStr(&svalue)
-	url_state.GetFormApp().AppendString("<input type=\"hidden\" name=\"")
+	url_state.GetFormApp().WriteString("<input type=\"hidden\" name=\"")
 	url_state.GetFormApp().AppendSmartStr(&hname)
-	url_state.GetFormApp().AppendString("\" value=\"")
+	url_state.GetFormApp().WriteString("\" value=\"")
 	url_state.GetFormApp().AppendSmartStr(&hvalue)
-	url_state.GetFormApp().AppendString("\" />")
+	url_state.GetFormApp().WriteString("\" />")
 	sname.Free()
 	svalue.Free()
 	hname.Free()
@@ -1038,21 +1038,21 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 	}
 	if encode != 0 {
 		encoded := PhpRawUrlEncode(name.GetStr())
-		sname.AppendString(encoded)
+		sname.WriteString(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name.GetVal()), name.GetLen(), 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0).GetStr()
-		hname.AppendString(encoded)
+		hname.WriteString(encoded)
 	} else {
-		sname.AppendString(name.GetStr())
-		hname.AppendString(name.GetStr())
+		sname.WriteString(name.GetStr())
+		hname.WriteString(name.GetStr())
 	}
 	sname.ZeroTail()
 	hname.ZeroTail()
 	url_app.AppendSmartStr(&sname)
-	url_app.AppendByte('=')
+	url_app.WriteByte('=')
 	url_app.ZeroTail()
-	form_app.AppendString("<input type=\"hidden\" name=\"")
+	form_app.WriteString("<input type=\"hidden\" name=\"")
 	form_app.AppendSmartStr(&hname)
-	form_app.AppendString("\" value=\"")
+	form_app.WriteString("\" value=\"")
 	form_app.ZeroTail()
 
 	/* Short circuit check. Only check url_app. */

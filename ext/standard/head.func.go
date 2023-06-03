@@ -100,26 +100,26 @@ func PhpSetcookie(
 		 */
 
 		dt = php_format_date("D, d-M-Y H:i:s T", b.SizeOf("\"D, d-M-Y H:i:s T\"")-1, 1, 0)
-		buf.AppendString("Set-Cookie: ")
-		buf.AppendString(name.GetStr())
-		buf.AppendString("=deleted; expires=")
-		buf.AppendString(dt.GetStr())
-		buf.AppendString("; Max-Age=0")
+		buf.WriteString("Set-Cookie: ")
+		buf.WriteString(name.GetStr())
+		buf.WriteString("=deleted; expires=")
+		buf.WriteString(dt.GetStr())
+		buf.WriteString("; Max-Age=0")
 		//types.ZendStringFree(dt)
 	} else {
-		buf.AppendString("Set-Cookie: ")
-		buf.AppendString(name.GetStr())
-		buf.AppendByte('=')
+		buf.WriteString("Set-Cookie: ")
+		buf.WriteString(name.GetStr())
+		buf.WriteByte('=')
 		if url_encode != 0 {
 			var encodedValue = PhpRawUrlEncode(value.GetStr())
-			buf.AppendString(encodedValue)
+			buf.WriteString(encodedValue)
 		} else {
-			buf.AppendString(value.GetStr())
+			buf.WriteString(value.GetStr())
 		}
 		if expires > 0 {
 			var p *byte
 			var diff float64
-			buf.AppendString(b.CastStrAuto(COOKIE_EXPIRES))
+			buf.WriteString(b.CastStrAuto(COOKIE_EXPIRES))
 			dt = php_format_date("D, d-M-Y H:i:s T", b.SizeOf("\"D, d-M-Y H:i:s T\"")-1, expires, 0)
 
 			/* check to make sure that the year does not exceed 4 digits in length */
@@ -131,33 +131,33 @@ func PhpSetcookie(
 				faults.Error(faults.E_WARNING, "Expiry date cannot have a year greater than 9999")
 				return types.FAILURE
 			}
-			buf.AppendString(dt.GetStr())
+			buf.WriteString(dt.GetStr())
 			//types.ZendStringFree(dt)
 			diff = difftime(expires, php_time())
 			if diff < 0 {
 				diff = 0
 			}
-			buf.AppendString(b.CastStrAuto(COOKIE_MAX_AGE))
+			buf.WriteString(b.CastStrAuto(COOKIE_MAX_AGE))
 			buf.AppendLong(zend.ZendLong(diff))
 		}
 	}
 	if path != nil && path.GetLen() != 0 {
-		buf.AppendString(b.CastStrAuto(COOKIE_PATH))
-		buf.AppendString(path.GetStr())
+		buf.WriteString(b.CastStrAuto(COOKIE_PATH))
+		buf.WriteString(path.GetStr())
 	}
 	if domain != nil && domain.GetLen() != 0 {
-		buf.AppendString(b.CastStrAuto(COOKIE_DOMAIN))
-		buf.AppendString(domain.GetStr())
+		buf.WriteString(b.CastStrAuto(COOKIE_DOMAIN))
+		buf.WriteString(domain.GetStr())
 	}
 	if secure != 0 {
-		buf.AppendString(b.CastStrAuto(COOKIE_SECURE))
+		buf.WriteString(b.CastStrAuto(COOKIE_SECURE))
 	}
 	if httponly != 0 {
-		buf.AppendString(b.CastStrAuto(COOKIE_HTTPONLY))
+		buf.WriteString(b.CastStrAuto(COOKIE_HTTPONLY))
 	}
 	if samesite != nil && samesite.GetLen() != 0 {
-		buf.AppendString(b.CastStrAuto(COOKIE_SAMESITE))
-		buf.AppendString(samesite.GetStr())
+		buf.WriteString(b.CastStrAuto(COOKIE_SAMESITE))
+		buf.WriteString(samesite.GetStr())
 	}
 	ctr.SetLine(buf.GetS().GetVal())
 	ctr.SetLineLen(uint32(buf.GetS().GetLen()))

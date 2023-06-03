@@ -144,9 +144,9 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 			var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
 			filterparams.Array().Foreach(func(_ types.ArrayKey, tmp *types.Zval) {
 				operators.ConvertToStringEx(tmp)
-				tags_ss.AppendByte('<')
-				tags_ss.AppendString(tmp.String().GetStr())
-				tags_ss.AppendByte('>')
+				tags_ss.WriteByte('<')
+				tags_ss.WriteString(tmp.String().GetStr())
+				tags_ss.WriteByte('>')
 			})
 			tags_ss.ZeroTail()
 			allowed_tags = tags_ss.GetS()

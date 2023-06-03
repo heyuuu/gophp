@@ -50,33 +50,33 @@ func AppendHttpStatusLine(buffer *zend.SmartStr, protocol_version int, response_
 	if response_code == 0 {
 		response_code = 200
 	}
-	buffer.AppendString("HTTP")
-	buffer.AppendByte('/')
+	buffer.WriteString("HTTP")
+	buffer.WriteByte('/')
 	buffer.AppendLong(protocol_version / 100)
-	buffer.AppendByte('.')
+	buffer.WriteByte('.')
 	buffer.AppendLong(protocol_version % 100)
-	buffer.AppendByte(' ')
+	buffer.WriteByte(' ')
 	buffer.AppendLong(response_code)
-	buffer.AppendByte(' ')
-	buffer.AppendString(b.CastStrAuto(GetStatusString(response_code)))
-	buffer.AppendString("\r\n")
+	buffer.WriteByte(' ')
+	buffer.WriteString(b.CastStrAuto(GetStatusString(response_code)))
+	buffer.WriteString("\r\n")
 }
 func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, persistent int) {
 	var val *byte
 	var tv __struct__timeval = __struct__timeval{0}
 	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host")) {
-		buffer.AppendString("Host: ")
-		buffer.AppendString(b.CastStrAuto(val))
-		buffer.AppendString("\r\n")
+		buffer.WriteString("Host: ")
+		buffer.WriteString(b.CastStrAuto(val))
+		buffer.WriteString("\r\n")
 	}
 	if !(gettimeofday(&tv, nil)) {
 		var dt *types.String = php_format_date("D, d M Y H:i:s", b.SizeOf("\"D, d M Y H:i:s\"")-1, tv.tv_sec, 0)
-		buffer.AppendString("Date: ")
-		buffer.AppendString(b.CastStrAuto(dt.GetVal()))
-		buffer.AppendString(" GMT\r\n")
+		buffer.WriteString("Date: ")
+		buffer.WriteString(b.CastStrAuto(dt.GetVal()))
+		buffer.WriteString(" GMT\r\n")
 		// types.ZendStringReleaseEx(dt, 0)
 	}
-	buffer.AppendString("Connection: close\r\n")
+	buffer.WriteString("Connection: close\r\n")
 }
 func GetMimeType(server *PhpCliServer, ext *byte, ext_len int) *byte {
 	var s = b.CastStr(ext, ext_len)
@@ -165,8 +165,8 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
 	if core.SG__().sapi_headers.http_status_line {
-		buffer.AppendString(b.CastStrAuto(core.SG__().sapi_headers.http_status_line))
-		buffer.AppendString("\r\n")
+		buffer.WriteString(b.CastStrAuto(core.SG__().sapi_headers.http_status_line))
+		buffer.WriteString("\r\n")
 	} else {
 		AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), core.SG__().sapi_headers.http_response_code, 0)
 	}
@@ -174,12 +174,12 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 	h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(sapi_headers.GetHeaders(), &pos))
 	for h != nil {
 		if h.GetHeaderLen() != 0 {
-			buffer.AppendString(b.CastStr(h.GetHeader(), h.GetHeaderLen()))
-			buffer.AppendString("\r\n")
+			buffer.WriteString(b.CastStr(h.GetHeader(), h.GetHeaderLen()))
+			buffer.WriteString("\r\n")
 		}
 		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
 	}
-	buffer.AppendString("\r\n")
+	buffer.WriteString("\r\n")
 	PhpCliServerClientSendThrough(client, buffer.GetS().GetVal(), buffer.GetS().GetLen())
 	buffer.Free()
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
@@ -840,11 +840,11 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 
 	}
 	AppendEssentialHeaders(&buffer, client, 1)
-	buffer.AppendString("Content-Type: text/html; charset=UTF-8\r\n")
-	buffer.AppendString("Content-Length: ")
+	buffer.WriteString("Content-Type: text/html; charset=UTF-8\r\n")
+	buffer.WriteString("Content-Length: ")
 	buffer.AppendUlong(PhpCliServerBufferSize(client.GetContentSender().GetBuffer()))
-	buffer.AppendString("\r\n")
-	buffer.AppendString("\r\n")
+	buffer.WriteString("\r\n")
+	buffer.WriteString("\r\n")
 	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetVal(), buffer.GetS().GetLen())
 	if chunk == nil {
 		buffer.Free()
@@ -918,17 +918,17 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 	}
 	AppendEssentialHeaders(&buffer, client, 1)
 	if mime_type != nil {
-		buffer.AppendString("Content-Type: ")
-		buffer.AppendString(b.CastStrAuto(mime_type))
+		buffer.WriteString("Content-Type: ")
+		buffer.WriteString(b.CastStrAuto(mime_type))
 		if strncmp(mime_type, "text/", 5) == 0 {
-			buffer.AppendString("; charset=UTF-8")
+			buffer.WriteString("; charset=UTF-8")
 		}
-		buffer.AppendString("\r\n")
+		buffer.WriteString("\r\n")
 	}
-	buffer.AppendString("Content-Length: ")
+	buffer.WriteString("Content-Length: ")
 	buffer.AppendUlong(client.GetRequest().GetSb().st_size)
-	buffer.AppendString("\r\n")
-	buffer.AppendString("\r\n")
+	buffer.WriteString("\r\n")
+	buffer.WriteString("\r\n")
 	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetVal(), buffer.GetS().GetLen())
 	if chunk == nil {
 		buffer.Free()

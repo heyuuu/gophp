@@ -471,7 +471,7 @@ func ZendDoPerformImplementationCheck(unresolved_class **types.String, fe types.
 }
 func ZendAppendTypeHint(str *SmartStr, fptr types.IFunction, arg_info *ZendArgInfo, return_hint int) {
 	if arg_info.GetType().IsSet() && arg_info.GetType().AllowNull() {
-		str.AppendByte('?')
+		str.WriteByte('?')
 	}
 	if arg_info.GetType().IsClass() {
 		className := arg_info.GetType().Name()
@@ -482,32 +482,32 @@ func ZendAppendTypeHint(str *SmartStr, fptr types.IFunction, arg_info *ZendArgIn
 		} else if lcClassName == "parent" && fptr.GetScope() != nil && fptr.GetScope().GetParent() != nil {
 			className = fptr.GetScope().GetParent().Name()
 		}
-		str.AppendString(className)
+		str.WriteString(className)
 		if return_hint == 0 {
-			str.AppendByte(' ')
+			str.WriteByte(' ')
 		}
 	} else if arg_info.GetType().IsCode() {
 		var typeName = types.ZendGetTypeByConst(arg_info.GetType().Code())
-		str.AppendString(typeName)
+		str.WriteString(typeName)
 		if return_hint == 0 {
-			str.AppendByte(' ')
+			str.WriteByte(' ')
 		}
 	}
 }
 func ZendGetFunctionDeclaration(fptr types.IFunction) string {
 	var str SmartStr
 	if fptr.GetOpArray().IsReturnReference() {
-		str.AppendString("& ")
+		str.WriteString("& ")
 	}
 	if fptr.GetScope() != nil {
 
 		/* cut off on NULL byte ... class@anonymous */
 
-		str.AppendString(b.CastStr(fptr.GetScope().Name(), strlen(fptr.GetScope().Name())))
-		str.AppendString("::")
+		str.WriteString(b.CastStr(fptr.GetScope().Name(), strlen(fptr.GetScope().Name())))
+		str.WriteString("::")
 	}
-	str.AppendString(fptr.FunctionName())
-	str.AppendByte('(')
+	str.WriteString(fptr.FunctionName())
+	str.WriteByte('(')
 	if fptr.GetArgInfo() != nil {
 		var i uint32
 		var num_args uint32
@@ -521,24 +521,24 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) string {
 		for i = 0; i < num_args; {
 			ZendAppendTypeHint(&str, fptr, arg_info, 0)
 			if arg_info.GetPassByReference() != 0 {
-				str.AppendByte('&')
+				str.WriteByte('&')
 			}
 			if arg_info.GetIsVariadic() != 0 {
-				str.AppendString("...")
+				str.WriteString("...")
 			}
-			str.AppendByte('$')
+			str.WriteByte('$')
 			if arg_info.GetName() != nil {
 				if fptr.GetType() == ZEND_INTERNAL_FUNCTION {
-					str.AppendString((*ArgInfo)(arg_info).Name())
+					str.WriteString((*ArgInfo)(arg_info).Name())
 				} else {
-					str.AppendString(arg_info.GetName().GetStr())
+					str.WriteString(arg_info.GetName().GetStr())
 				}
 			} else {
-				str.AppendString("param")
+				str.WriteString("param")
 				str.AppendUlong(i)
 			}
 			if i >= required && arg_info.GetIsVariadic() == 0 {
-				str.AppendString(" = ")
+				str.WriteString(" = ")
 				if fptr.GetType() == ZEND_USER_FUNCTION {
 					var precv *types.ZendOp = nil
 					var idx uint32 = i
@@ -554,46 +554,46 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) string {
 					if precv != nil && precv.GetOpcode() == ZEND_RECV_INIT && precv.GetOp2Type() != IS_UNUSED {
 						var zv *types.Zval = RT_CONSTANT(precv, precv.GetOp2())
 						if zv.IsFalse() {
-							str.AppendString("false")
+							str.WriteString("false")
 						} else if zv.IsTrue() {
-							str.AppendString("true")
+							str.WriteString("true")
 						} else if zv.IsNull() {
-							str.AppendString("NULL")
+							str.WriteString("NULL")
 						} else if zv.IsString() {
-							str.AppendByte('\'')
-							str.AppendString(b.CastStr(zv.String().GetVal(), b.Min(zv.String().GetLen(), 10)))
+							str.WriteByte('\'')
+							str.WriteString(b.CastStr(zv.String().GetVal(), b.Min(zv.String().GetLen(), 10)))
 							if zv.String().GetLen() > 10 {
-								str.AppendString("...")
+								str.WriteString("...")
 							}
-							str.AppendByte('\'')
+							str.WriteByte('\'')
 						} else if zv.IsArray() {
-							str.AppendString("Array")
+							str.WriteString("Array")
 						} else if zv.IsConstantAst() {
 							var ast *ZendAst = types.Z_ASTVAL_P(zv)
 							if ast.GetKind() == ZEND_AST_CONSTANT {
-								str.AppendString(ZendAstGetConstantName(ast).GetStr())
+								str.WriteString(ZendAstGetConstantName(ast).GetStr())
 							} else {
-								str.AppendString("<expression>")
+								str.WriteString("<expression>")
 							}
 						} else {
 							var zv_str *types.String = operators.ZvalGetString(zv)
-							str.AppendString(zv_str.GetStr())
+							str.WriteString(zv_str.GetStr())
 							//ZendTmpStringRelease(tmp_zv_str)
 						}
 					}
 				} else {
-					str.AppendString("NULL")
+					str.WriteString("NULL")
 				}
 			}
 			if b.PreInc(&i) < num_args {
-				str.AppendString(", ")
+				str.WriteString(", ")
 			}
 			arg_info++
 		}
 	}
-	str.AppendByte(')')
+	str.WriteByte(')')
 	if fptr.IsHasReturnType() {
-		str.AppendString(": ")
+		str.WriteString(": ")
 		ZendAppendTypeHint(&str, fptr, fptr.GetArgInfo()-1, 1)
 	}
 	str.ZeroTail()

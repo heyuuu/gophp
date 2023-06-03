@@ -1,13 +1,15 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"strconv"
 	"strings"
 )
 
-const SMART_STR_START_SIZE = 256
+const smartStrStartSize = 256
+
+// VK_ESCAPE, Ascii(27 | 0x1B)，在 PHP 中的转义符为 '\e'
+const VkEscape = '\x1b'
 
 /**
  * SmartStr
@@ -17,96 +19,115 @@ type SmartStr struct {
 	buffer strings.Builder
 }
 
-func (this *SmartStr) Write(p []byte) (n int, err error) {
-	return this.buffer.Write(p)
+func (s *SmartStr) Write(p []byte) (n int, err error) {
+	return s.buffer.Write(p)
 }
 
-func (this *SmartStr) GetLen() int    { return this.buffer.Len() }
-func (this *SmartStr) GetStr() string { return this.buffer.String() }
+func (s *SmartStr) GetLen() int    { return s.buffer.Len() }
+func (s *SmartStr) GetStr() string { return s.buffer.String() }
 
 // 分配内存，确认至少有 len_ 的未使用内存
-func (this *SmartStr) Alloc(len_ int) int {
-	if this.buffer.Cap() == 0 && len_ < SMART_STR_START_SIZE {
+func (s *SmartStr) Alloc(len_ int) int {
+	if s.buffer.Cap() == 0 && len_ < smartStrStartSize {
 		// 初始化时，最小尺寸为 SMART_STR_START_SIZE，避免小尺寸重复扩展
-		this.buffer.Grow(SMART_STR_START_SIZE)
+		s.buffer.Grow(smartStrStartSize)
 	} else {
-		this.buffer.Grow(len_)
+		s.buffer.Grow(len_)
 	}
-	return this.buffer.Len() + len_
+	return s.buffer.Len() + len_
 }
 
-func (this *SmartStr) AppendString(str string) {
-	this.buffer.WriteString(str)
+func (s *SmartStr) WriteString(str string) {
+	s.buffer.WriteString(str)
 }
 
-func (this *SmartStr) AppendByte(c byte) {
-	this.buffer.WriteByte(c)
+func (s *SmartStr) WriteByte(c byte) {
+	s.buffer.WriteByte(c)
 }
 
-func (this *SmartStr) AppendSmartStr(str *SmartStr) {
-	this.buffer.WriteString(str.GetStr())
+func (s *SmartStr) AppendSmartStr(str *SmartStr) {
+	s.buffer.WriteString(str.GetStr())
 }
 
-func (this *SmartStr) SetString(str string) {
-	this.Reset()
-	this.buffer.WriteString(str)
+func (s *SmartStr) SetString(str string) {
+	s.Reset()
+	s.buffer.WriteString(str)
 }
 
-func (this *SmartStr) Reset() {
-	this.buffer.Reset()
+func (s *SmartStr) Reset() {
+	s.buffer.Reset()
 }
 
-func (this *SmartStr) Free() {
-	this.Reset()
+func (s *SmartStr) Free() {
+	s.Reset()
 }
 
-func (this *SmartStr) ZeroTail() {
+func (s *SmartStr) ZeroTail() {
 	// c 字符串尾部设置0
 }
 
 /**
  * 快捷方法
  */
-func (this *SmartStr) AppendLong(num ZendLong) {
+func (s *SmartStr) AppendLong(num ZendLong) {
 	var str = strconv.FormatInt(int64(num), 10)
-	this.AppendString(str)
+	s.WriteString(str)
 }
 
-func (this *SmartStr) AppendUlong(num ZendUlong) {
+func (s *SmartStr) AppendUlong(num ZendUlong) {
 	var str = strconv.FormatUint(uint64(num), 10)
-	this.AppendString(str)
+	s.WriteString(str)
+}
+
+func (s *SmartStr) AppendEscaped(str string) {
+	for _, c := range []byte(str) {
+		if c < 32 || c == '\\' || c > 126 {
+			s.WriteByte('\\')
+			switch c {
+			case '\n':
+				s.WriteByte('n')
+			case '\r':
+				s.WriteByte('r')
+			case '\t':
+				s.WriteByte('t')
+			case '\f':
+				s.WriteByte('f')
+			case '\v':
+				s.WriteByte('v')
+			case '\\':
+				s.WriteByte('\\')
+			case VkEscape:
+				s.WriteByte('e')
+			default:
+				s.WriteByte('x')
+				if c>>4 < 10 {
+					s.WriteByte(c>>4 + '0')
+				} else {
+					s.WriteByte(c>>4 + 'A' - 10)
+				}
+				if (c & 0xf) < 10 {
+					s.WriteByte(c&0xf + '0')
+				} else {
+					s.WriteByte(c&0xf + 'A' - 10)
+				}
+			}
+		} else {
+			s.WriteByte(c)
+		}
+	}
 }
 
 /**
  * todo 待移除方法
  */
 
-func (this *SmartStr) GetS() *types.String {
+func (s *SmartStr) GetS() *types.String {
 	// todo 需要确认是否兼容 ZendStringAlloc() 但未使用时的空 []byte
-	return types.NewString(this.GetStr())
+	return types.NewString(s.GetStr())
 }
-func (this *SmartStr) GetC() *byte {
+func (s *SmartStr) GetC() *byte {
 	// todo 仅占位，实际使用需替换
-	var str = this.GetStr()
+	var str = s.GetStr()
 	var char = str[0]
 	return &char
-}
-func (this *SmartStr) SetC(value *byte) {
-	/* todo delete */
-	if value == nil {
-		this.Reset()
-	} else {
-		b.Assert(false)
-	}
-}
-func (this *SmartStr) SetLen(value int) {
-	/* todo delete */
-	if value == 0 {
-		this.Reset()
-	} else if value < this.buffer.Len() {
-		this.SetString(this.GetStr()[:value])
-	} else if value > this.buffer.Len() {
-		var appendBytes = make([]byte, value-this.buffer.Len())
-		this.buffer.Write(appendBytes)
-	}
 }

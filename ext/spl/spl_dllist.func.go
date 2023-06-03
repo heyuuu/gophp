@@ -763,7 +763,7 @@ func zim_spl_SplDoublyLinkedList_serialize(executeData *zend.ZendExecuteData, re
 	/* elements */
 
 	for current != nil {
-		buf.AppendByte(':')
+		buf.WriteByte(':')
 		next = current.GetNext()
 		standard.PhpVarSerialize(&buf, current.GetData(), &var_hash)
 		current = next
@@ -774,7 +774,7 @@ func zim_spl_SplDoublyLinkedList_serialize(executeData *zend.ZendExecuteData, re
 
 	standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)
 	if buf.GetS() != nil {
-		return_value.SetString(buf.GetS())
+		return_value.SetStringVal(buf.GetStr())
 		return
 	} else {
 		return_value.SetNull()

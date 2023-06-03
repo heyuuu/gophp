@@ -321,7 +321,7 @@ func PhpStdPostHandler(content_type_dup *byte, arg any) {
 			var buf []byte = []byte{0}
 			var len_ ssize_t = PhpStreamRead(s, buf, r.BUFSIZ)
 			if len_ > 0 {
-				post_data.GetStr().AppendString(b.CastStr(buf, len_))
+				post_data.GetStr().WriteString(b.CastStr(buf, len_))
 				if types.SUCCESS != AddPostVars(arr, &post_data, 0) {
 					post_data.GetStr().Free()
 					return

@@ -156,11 +156,11 @@ func PhpStreamUrlWrapHttpEx(
 			streams.PhpStreamContextSetOption(core.PHP_STREAM_CONTEXT(stream), "ssl", "peer_name", &ssl_proxy_peer_name)
 			// zend.ZvalPtrDtor(&ssl_proxy_peer_name)
 		}
-		header.AppendString("CONNECT ")
-		header.AppendString(b.CastStrAuto(resource.GetHost().GetVal()))
-		header.AppendByte(':')
+		header.WriteString("CONNECT ")
+		header.WriteString(b.CastStrAuto(resource.GetHost().GetVal()))
+		header.WriteByte(':')
 		header.AppendUlong(resource.GetPort())
-		header.AppendString(" HTTP/1.0\r\n")
+		header.WriteString(" HTTP/1.0\r\n")
 
 		/* check if we have Proxy-Authorization header */
 
@@ -190,8 +190,8 @@ func PhpStreamUrlWrapHttpEx(
 									for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
 										p++
 									}
-									header.AppendString(b.CastStr(s, p-s))
-									header.AppendString("\r\n")
+									header.WriteString(b.CastStr(s, p-s))
+									header.WriteString("\r\n")
 									goto finish
 								} else {
 									for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
@@ -225,8 +225,8 @@ func PhpStreamUrlWrapHttpEx(
 							for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
 								p++
 							}
-							header.AppendString(b.CastStr(s, p-s))
-							header.AppendString("\r\n")
+							header.WriteString(b.CastStr(s, p-s))
+							header.WriteString("\r\n")
 							goto finish
 						} else {
 							for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
@@ -245,7 +245,7 @@ func PhpStreamUrlWrapHttpEx(
 			}
 		}
 	finish:
-		header.AppendString("\r\n")
+		header.WriteString("\r\n")
 		if core.PhpStreamWrite(stream, header.GetS().GetVal(), header.GetS().GetLen()) != header.GetS().GetLen() {
 			streams.PhpStreamWrapperLogError(wrapper, options, "Cannot connect to HTTPS server through proxy")
 			core.PhpStreamClose(stream)
@@ -306,8 +306,8 @@ func PhpStreamUrlWrapHttpEx(
 
 			if redirected == 0 || tmpzval.String().GetLen() == 3 && memcmp("GET", tmpzval.String().GetVal(), 3) == 0 || tmpzval.String().GetLen() == 4 && memcmp("HEAD", tmpzval.String().GetVal(), 4) == 0 {
 				custom_request_method = 1
-				req_buf.AppendString(tmpzval.String().GetStr())
-				req_buf.AppendByte(' ')
+				req_buf.WriteString(tmpzval.String().GetStr())
+				req_buf.WriteByte(' ')
 			}
 
 			/* As per the RFC, automatically redirected requests MUST NOT use other methods than
@@ -316,7 +316,7 @@ func PhpStreamUrlWrapHttpEx(
 		}
 	}
 	if custom_request_method == 0 {
-		req_buf.AppendString("GET ")
+		req_buf.WriteString("GET ")
 	}
 
 	/* Should we send the entire path in the request line, default to no. */
@@ -328,7 +328,7 @@ func PhpStreamUrlWrapHttpEx(
 
 		/* Ask for everything */
 
-		req_buf.AppendString(b.CastStrAuto(path))
+		req_buf.WriteString(b.CastStrAuto(path))
 
 		/* Ask for everything */
 
@@ -337,16 +337,16 @@ func PhpStreamUrlWrapHttpEx(
 		/* Send the traditional /path/to/file?query_string */
 
 		if resource.GetPath() != nil && resource.GetPath().GetLen() != 0 {
-			req_buf.AppendString(b.CastStrAuto(resource.GetPath().GetVal()))
+			req_buf.WriteString(b.CastStrAuto(resource.GetPath().GetVal()))
 		} else {
-			req_buf.AppendByte('/')
+			req_buf.WriteByte('/')
 		}
 
 		/* query string */
 
 		if resource.GetQuery() != nil {
-			req_buf.AppendByte('?')
-			req_buf.AppendString(b.CastStrAuto(resource.GetQuery().GetVal()))
+			req_buf.WriteByte('?')
+			req_buf.WriteString(b.CastStrAuto(resource.GetQuery().GetVal()))
 		}
 
 		/* query string */
@@ -358,12 +358,12 @@ func PhpStreamUrlWrapHttpEx(
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "protocol_version")) != nil {
 		var protocol_version *byte
 		core.Spprintf(&protocol_version, 0, "%.1F", operators.ZvalGetDouble(tmpzval))
-		req_buf.AppendString(" HTTP/")
-		req_buf.AppendString(b.CastStrAuto(protocol_version))
-		req_buf.AppendString("\r\n")
+		req_buf.WriteString(" HTTP/")
+		req_buf.WriteString(b.CastStrAuto(protocol_version))
+		req_buf.WriteString("\r\n")
 		zend.Efree(protocol_version)
 	} else {
-		req_buf.AppendString(" HTTP/1.0\r\n")
+		req_buf.WriteString(" HTTP/1.0\r\n")
 	}
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "header")) != nil {
 		tmp = nil
@@ -376,8 +376,8 @@ func PhpStreamUrlWrapHttpEx(
 
 				tmpheader = _z
 				if tmpheader.IsString() {
-					tmpstr.AppendString(tmpheader.String().GetStr())
-					tmpstr.AppendString("\r\n")
+					tmpstr.WriteString(tmpheader.String().GetStr())
+					tmpstr.WriteString("\r\n")
 				}
 			}
 			tmpstr.ZeroTail()
@@ -494,9 +494,9 @@ func PhpStreamUrlWrapHttpEx(
 			strcat(scratch, resource.GetPass().GetVal())
 		}
 		stmp = types.NewString(PhpBase64Encode(b.CastStrAuto(scratch)))
-		req_buf.AppendString("Authorization: Basic ")
-		req_buf.AppendString(b.CastStrAuto(stmp.GetVal()))
-		req_buf.AppendString("\r\n")
+		req_buf.WriteString("Authorization: Basic ")
+		req_buf.WriteString(b.CastStrAuto(stmp.GetVal()))
+		req_buf.WriteString("\r\n")
 		streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_AUTH_REQUIRED, nil, 0)
 		//types.ZendStringFree(stmp)
 		zend.Efree(scratch)
@@ -505,21 +505,21 @@ func PhpStreamUrlWrapHttpEx(
 	/* if the user has configured who they are, send a From: line */
 
 	if (have_header&HTTP_HEADER_FROM) == 0 && FG__().from_address {
-		req_buf.AppendString("From: ")
-		req_buf.AppendString(b.CastStrAuto(FG__().from_address))
-		req_buf.AppendString("\r\n")
+		req_buf.WriteString("From: ")
+		req_buf.WriteString(b.CastStrAuto(FG__().from_address))
+		req_buf.WriteString("\r\n")
 	}
 
 	/* Send Host: header so name-based virtual hosts work */
 
 	if (have_header & HTTP_HEADER_HOST) == 0 {
-		req_buf.AppendString("Host: ")
-		req_buf.AppendString(b.CastStrAuto(resource.GetHost().GetVal()))
+		req_buf.WriteString("Host: ")
+		req_buf.WriteString(b.CastStrAuto(resource.GetHost().GetVal()))
 		if use_ssl != 0 && resource.GetPort() != 443 && resource.GetPort() != 0 || use_ssl == 0 && resource.GetPort() != 80 && resource.GetPort() != 0 {
-			req_buf.AppendByte(':')
+			req_buf.WriteByte(':')
 			req_buf.AppendUlong(resource.GetPort())
 		}
-		req_buf.AppendString("\r\n")
+		req_buf.WriteString("\r\n")
 	}
 
 	/* Send a Connection: close header to avoid hanging when the server
@@ -530,7 +530,7 @@ func PhpStreamUrlWrapHttpEx(
 	 * keep-alive response, which is the preferred response type. */
 
 	if (have_header & HTTP_HEADER_CONNECTION) == 0 {
-		req_buf.AppendString("Connection: close\r\n")
+		req_buf.WriteString("Connection: close\r\n")
 	}
 	if context != nil && b.Assign(&ua_zval, streams.PhpStreamContextGetOption(context, "http", "user_agent")) != nil && ua_zval.IsString() {
 		ua_str = ua_zval.String().GetVal()
@@ -549,7 +549,7 @@ func PhpStreamUrlWrapHttpEx(
 			ua = zend.Emalloc(ua_len + 1)
 			if b.Assign(&ua_len, core.Slprintf(ua, ua_len, _UA_HEADER, ua_str)) > 0 {
 				ua[ua_len] = 0
-				req_buf.AppendString(b.CastStr(ua, ua_len))
+				req_buf.WriteString(b.CastStr(ua, ua_len))
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot construct User-agent header")
 			}
@@ -566,13 +566,13 @@ func PhpStreamUrlWrapHttpEx(
 		 */
 
 		if header_init != 0 && context != nil && (have_header&HTTP_HEADER_CONTENT_LENGTH) == 0 && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
-			req_buf.AppendString("Content-Length: ")
+			req_buf.WriteString("Content-Length: ")
 			req_buf.AppendUlong(tmpzval.String().GetLen())
-			req_buf.AppendString("\r\n")
+			req_buf.WriteString("\r\n")
 			have_header |= HTTP_HEADER_CONTENT_LENGTH
 		}
-		req_buf.AppendString(b.CastStrAuto(user_headers))
-		req_buf.AppendString("\r\n")
+		req_buf.WriteString(b.CastStrAuto(user_headers))
+		req_buf.WriteString("\r\n")
 		zend.Efree(user_headers)
 	}
 
@@ -580,18 +580,18 @@ func PhpStreamUrlWrapHttpEx(
 
 	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 		if (have_header & HTTP_HEADER_CONTENT_LENGTH) == 0 {
-			req_buf.AppendString("Content-Length: ")
+			req_buf.WriteString("Content-Length: ")
 			req_buf.AppendUlong(tmpzval.String().GetLen())
-			req_buf.AppendString("\r\n")
+			req_buf.WriteString("\r\n")
 		}
 		if (have_header & HTTP_HEADER_TYPE) == 0 {
-			req_buf.AppendString("Content-Type: application/x-www-form-urlencoded\r\n")
+			req_buf.WriteString("Content-Type: application/x-www-form-urlencoded\r\n")
 			core.PhpErrorDocref(nil, faults.E_NOTICE, "Content-type not specified assuming application/x-www-form-urlencoded")
 		}
-		req_buf.AppendString("\r\n")
-		req_buf.AppendString(tmpzval.String().GetStr())
+		req_buf.WriteString("\r\n")
+		req_buf.WriteString(tmpzval.String().GetStr())
 	} else {
-		req_buf.AppendString("\r\n")
+		req_buf.WriteString("\r\n")
 	}
 
 	/* send it */

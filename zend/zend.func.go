@@ -37,43 +37,43 @@ func OnUpdateAssertionsEx(entry *ZendIniEntry, new_value *string, stage int) boo
 
 func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object types.ZendBool) {
 	for i := 0; i < indent; i++ {
-		buf.AppendByte(' ')
+		buf.WriteByte(' ')
 	}
-	buf.AppendString("(\n")
+	buf.WriteString("(\n")
 	indent += PRINT_ZVAL_INDENT
 	ht.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 		for i := 0; i < indent; i++ {
-			buf.AppendByte(' ')
+			buf.WriteByte(' ')
 		}
-		buf.AppendByte('[')
+		buf.WriteByte('[')
 		if key.IsStrKey() {
 			if is_object != 0 {
 				className, propName, mangled := ZendUnmanglePropertyName_Ex(key.StrKey())
-				buf.AppendString(propName)
+				buf.WriteString(propName)
 				if className != "" && mangled {
 					if className[0] == '*' {
-						buf.AppendString(":protected")
+						buf.WriteString(":protected")
 					} else {
-						buf.AppendString(":")
-						buf.AppendString(className)
-						buf.AppendString(":private")
+						buf.WriteString(":")
+						buf.WriteString(className)
+						buf.WriteString(":private")
 					}
 				}
 			} else {
-				buf.AppendString(key.StrKey())
+				buf.WriteString(key.StrKey())
 			}
 		} else {
 			buf.AppendLong(key.IdxKey())
 		}
-		buf.AppendString("] => ")
+		buf.WriteString("] => ")
 		ZendPrintZvalRToBuf(buf, value, indent+PRINT_ZVAL_INDENT)
-		buf.AppendString("\n")
+		buf.WriteString("\n")
 	})
 	indent -= PRINT_ZVAL_INDENT
 	for i := 0; i < indent; i++ {
-		buf.AppendByte(' ')
+		buf.WriteByte(' ')
 	}
-	buf.AppendString(")\n")
+	buf.WriteString(")\n")
 }
 func PrintFlatHash(ht *types.Array) {
 	var tmp *types.Zval
@@ -162,9 +162,9 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 	switch expr.GetType() {
 	case types.IS_ARRAY:
-		buf.AppendString("Array\n")
+		buf.WriteString("Array\n")
 		if expr.Array().IsRecursive() {
-			buf.AppendString(" *RECURSION*")
+			buf.WriteString(" *RECURSION*")
 			return
 		}
 		expr.Array().ProtectRecursive()
@@ -172,10 +172,10 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		expr.Array().UnprotectRecursive()
 	case types.IS_OBJECT:
 		var properties *types.Array
-		buf.AppendString(expr.Object().ClassName())
-		buf.AppendString(" Object\n")
+		buf.WriteString(expr.Object().ClassName())
+		buf.WriteString(" Object\n")
 		if expr.Object().IsRecursive() {
-			buf.AppendString(" *RECURSION*")
+			buf.WriteString(" *RECURSION*")
 			return
 		}
 		if b.Assign(&properties, ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_DEBUG)) == nil {
@@ -193,11 +193,11 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		ZendPrintZvalRToBuf(buf, types.Z_REFVAL_P(expr), indent)
 		break
 	case types.IS_STRING:
-		buf.AppendString(expr.String().GetStr())
+		buf.WriteString(expr.String().GetStr())
 		break
 	default:
 		var str *types.String = operators.ZvalGetString(expr)
-		buf.AppendString(str.GetStr())
+		buf.WriteString(str.GetStr())
 		// types.ZendStringReleaseEx(str, 0)
 		break
 	}

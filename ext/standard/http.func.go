@@ -162,13 +162,13 @@ func PhpUrlEncodeHashEx(
 
 		} else {
 			if formstr.GetS() != nil {
-				formstr.AppendString(b.CastStr(arg_sep, arg_sep_len))
+				formstr.WriteString(b.CastStr(arg_sep, arg_sep_len))
 			}
 
 			/* Simple key=value */
 
 			if key_prefix != nil {
-				formstr.AppendString(b.CastStr(key_prefix, key_prefix_len))
+				formstr.WriteString(b.CastStr(key_prefix, key_prefix_len))
 			}
 			if key != nil {
 				var ekey string
@@ -177,20 +177,20 @@ func PhpUrlEncodeHashEx(
 				} else {
 					ekey = PhpUrlEncode(b.CastStr(prop_name, prop_len))
 				}
-				formstr.AppendString(ekey)
+				formstr.WriteString(ekey)
 			} else {
 
 				/* Numeric key */
 
 				if num_prefix != nil {
-					formstr.AppendString(b.CastStr(num_prefix, num_prefix_len))
+					formstr.WriteString(b.CastStr(num_prefix, num_prefix_len))
 				}
 				formstr.AppendLong(idx)
 			}
 			if key_suffix {
-				formstr.AppendString(b.CastStr(key_suffix, key_suffix_len))
+				formstr.WriteString(b.CastStr(key_suffix, key_suffix_len))
 			}
-			formstr.AppendString("=")
+			formstr.WriteString("=")
 			switch zdata.GetType() {
 			case types.IS_STRING:
 				var ekey string
@@ -199,13 +199,13 @@ func PhpUrlEncodeHashEx(
 				} else {
 					ekey = PhpUrlEncode(zdata.StringVal())
 				}
-				formstr.AppendString(ekey)
+				formstr.WriteString(ekey)
 			case types.IS_LONG:
 				formstr.AppendLong(zdata.Long())
 			case types.IS_FALSE:
-				formstr.AppendString("0")
+				formstr.WriteString("0")
 			case types.IS_TRUE:
-				formstr.AppendString("1")
+				formstr.WriteString("1")
 			default:
 				var ekey string
 				var str = operators.ZvalGetStrVal(zdata)
@@ -214,7 +214,7 @@ func PhpUrlEncodeHashEx(
 				} else {
 					ekey = PhpUrlEncode(str)
 				}
-				formstr.AppendString(ekey)
+				formstr.WriteString(ekey)
 			}
 		}
 	}

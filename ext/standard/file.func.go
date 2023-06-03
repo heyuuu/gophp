@@ -1722,27 +1722,27 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 			var ch *byte = field_str.GetVal()
 			var end *byte = ch + field_str.GetLen()
 			var escaped int = 0
-			csvline.AppendByte(enclosure)
+			csvline.WriteByte(enclosure)
 			for ch < end {
 				if escape_char != PHP_CSV_NO_ESCAPE && (*ch) == escape_char {
 					escaped = 1
 				} else if escaped == 0 && (*ch) == enclosure {
-					csvline.AppendByte(enclosure)
+					csvline.WriteByte(enclosure)
 				} else {
 					escaped = 0
 				}
-				csvline.AppendByte(*ch)
+				csvline.WriteByte(*ch)
 				ch++
 			}
-			csvline.AppendByte(enclosure)
+			csvline.WriteByte(enclosure)
 		} else {
-			csvline.AppendString(field_str.GetStr())
+			csvline.WriteString(field_str.GetStr())
 		}
 		if b.PreInc(&i) != count {
-			csvline.AppendString(b.CastStr(&delimiter, 1))
+			csvline.WriteString(b.CastStr(&delimiter, 1))
 		}
 	})
-	csvline.AppendByte('\n')
+	csvline.WriteByte('\n')
 	csvline.ZeroTail()
 	ret = core.PhpStreamWrite(stream, csvline.GetS().GetVal(), csvline.GetS().GetLen())
 	csvline.Free()

@@ -427,7 +427,7 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 
 	/* storage */
 
-	buf.AppendString("x:")
+	buf.WriteString("x:")
 	flags.SetLong(intern.GetStorage().Len())
 	standard.PhpVarSerialize(&buf, &flags, &var_hash)
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), &pos)
@@ -439,15 +439,15 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 			return
 		}
 		standard.PhpVarSerialize(&buf, element.GetObj(), &var_hash)
-		buf.AppendByte(',')
+		buf.WriteByte(',')
 		standard.PhpVarSerialize(&buf, element.GetInf(), &var_hash)
-		buf.AppendByte(';')
+		buf.WriteByte(';')
 		types.ZendHashMoveForwardEx(intern.GetStorage(), &pos)
 	}
 
 	/* members */
 
-	buf.AppendString("m:")
+	buf.WriteString("m:")
 	members.SetArray(types.ZendArrayDup(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData))))
 	standard.PhpVarSerialize(&buf, &members, &var_hash)
 	// zend.ZvalPtrDtor(&members)
@@ -456,7 +456,7 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 
 	standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)
 	if buf.GetS() != nil {
-		return_value.SetString(buf.GetS())
+		return_value.SetStringVal(buf.GetStr())
 		return
 	} else {
 		return_value.SetNull()

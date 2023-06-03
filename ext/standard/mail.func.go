@@ -96,10 +96,10 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.String, val *types.Zva
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), val.String().GetVal())
 			return
 		}
-		s.AppendString(key.GetStr())
-		s.AppendString(": ")
-		s.AppendString(b.CastStrAuto(val.String().GetVal()))
-		s.AppendString("\r\n")
+		s.WriteString(key.GetStr())
+		s.WriteString(": ")
+		s.WriteString(b.CastStrAuto(val.String().GetVal()))
+		s.WriteString("\r\n")
 	case types.IS_ARRAY:
 		PhpMailBuildHeadersElems(s, key, val)
 	default:

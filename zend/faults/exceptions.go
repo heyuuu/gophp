@@ -3,6 +3,7 @@ package faults
 import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -429,48 +430,51 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 	arg = types.ZVAL_DEREF(arg)
 	switch arg.GetType() {
 	case types.IS_NULL:
-		str.AppendString("NULL, ")
+		str.WriteString("NULL, ")
 	case types.IS_STRING:
-		str.AppendByte('\'')
-		zend.SmartStrAppendEscaped(str, arg.String().GetVal(), b.Min(arg.String().GetLen(), 15))
-		if arg.String().GetLen() > 15 {
-			str.AppendString("...', ")
+		argStr := arg.StringVal()
+		if len(argStr) > 15 {
+			str.WriteByte('\'')
+			str.AppendEscaped(argStr[:15])
+			str.WriteString("...', ")
 		} else {
-			str.AppendString("', ")
+			str.WriteByte('\'')
+			str.AppendEscaped(argStr)
+			str.WriteString("', ")
 		}
 	case types.IS_FALSE:
-		str.AppendString("false, ")
+		str.WriteString("false, ")
 	case types.IS_TRUE:
-		str.AppendString("true, ")
+		str.WriteString("true, ")
 	case types.IS_RESOURCE:
-		str.AppendString("Resource id #")
+		str.WriteString("Resource id #")
 		str.AppendLong(arg.ResourceHandle())
-		str.AppendString(", ")
+		str.WriteString(", ")
 	case types.IS_LONG:
 		str.AppendLong(arg.Long())
-		str.AppendString(", ")
+		str.WriteString(", ")
 	case types.IS_DOUBLE:
-		zend.SmartStrAppendPrintf(str, "%.*G", int(zend.EG__().GetPrecision()), arg.Double())
-		str.AppendString(", ")
+		str.WriteString(pfmt.Sprintf("%.*G", int(zend.EG__().GetPrecision()), arg.Double()))
+		str.WriteString(", ")
 	case types.IS_ARRAY:
-		str.AppendString("Array, ")
+		str.WriteString("Array, ")
 	case types.IS_OBJECT:
-		str.AppendString("Object(")
-		str.AppendString(arg.Object().ClassName())
-		str.AppendString("), ")
+		str.WriteString("Object(")
+		str.WriteString(arg.Object().ClassName())
+		str.WriteString("), ")
 	}
 }
 func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 	var file *types.Zval
 	var tmp *types.Zval
-	str.AppendByte('#')
+	str.WriteByte('#')
 	str.AppendLong(num)
-	str.AppendByte(' ')
+	str.WriteByte(' ')
 	file = ht.KeyFind(types.STR_FILE)
 	if file != nil {
 		if file.GetType() != types.IS_STRING {
 			Error(E_WARNING, "Function name is no string")
-			str.AppendString("[unknown function]")
+			str.WriteString("[unknown function]")
 		} else {
 			var line zend.ZendLong
 			tmp = ht.KeyFind(types.STR_LINE)
@@ -484,18 +488,18 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 			} else {
 				line = 0
 			}
-			str.AppendString(file.String().GetStr())
-			str.AppendByte('(')
+			str.WriteString(file.String().GetStr())
+			str.WriteByte('(')
 			str.AppendLong(line)
-			str.AppendString("): ")
+			str.WriteString("): ")
 		}
 	} else {
-		str.AppendString("[internal function]: ")
+		str.WriteString("[internal function]: ")
 	}
-	str.AppendString(traceAppendKey(ht, types.STR_CLASS))
-	str.AppendString(traceAppendKey(ht, types.STR_TYPE))
-	str.AppendString(traceAppendKey(ht, types.STR_FUNCTION))
-	str.AppendByte('(')
+	str.WriteString(traceAppendKey(ht, types.STR_CLASS))
+	str.WriteString(traceAppendKey(ht, types.STR_TYPE))
+	str.WriteString(traceAppendKey(ht, types.STR_FUNCTION))
+	str.WriteByte('(')
 	tmp = ht.KeyFind(types.STR_ARGS)
 	if tmp != nil {
 		if tmp.IsArray() {
@@ -510,7 +514,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 			Error(E_WARNING, "args element is no array")
 		}
 	}
-	str.AppendString(")\n")
+	str.WriteString(")\n")
 }
 func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var trace *types.Zval
@@ -536,9 +540,9 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 		}
 		_buildTraceString(&str, frame.Array(), b.PostInc(&num))
 	})
-	str.AppendByte('#')
+	str.WriteByte('#')
 	str.AppendLong(num)
-	str.AppendString(" {main}")
+	str.WriteString(" {main}")
 	str.ZeroTail()
 	return_value.SetString(str.GetS())
 	return
