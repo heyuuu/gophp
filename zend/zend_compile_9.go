@@ -7,7 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendCompileMagicConst(result *Znode, ast *ZendAst) {
+func (compiler *Compiler) CompileMagicConst(result *Znode, ast *ZendAst) {
 	var opline *types.ZendOp
 	if ZendTryCtEvalMagicConst(result.GetConstant(), ast) != 0 {
 		result.SetOpType(IS_CONST)
@@ -20,7 +20,7 @@ func ZendCompileMagicConst(result *Znode, ast *ZendAst) {
 func ZendIsAllowedInConstExpr(kind ZendAstKind) types.ZendBool {
 	return kind == ZEND_AST_ZVAL || kind == ZEND_AST_BINARY_OP || kind == ZEND_AST_GREATER || kind == ZEND_AST_GREATER_EQUAL || kind == ZEND_AST_AND || kind == ZEND_AST_OR || kind == ZEND_AST_UNARY_OP || kind == ZEND_AST_UNARY_PLUS || kind == ZEND_AST_UNARY_MINUS || kind == ZEND_AST_CONDITIONAL || kind == ZEND_AST_DIM || kind == ZEND_AST_ARRAY || kind == ZEND_AST_ARRAY_ELEM || kind == ZEND_AST_UNPACK || kind == ZEND_AST_CONST || kind == ZEND_AST_CLASS_CONST || kind == ZEND_AST_CLASS_NAME || kind == ZEND_AST_MAGIC_CONST || kind == ZEND_AST_COALESCE
 }
-func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
+func (compiler *Compiler) CompileConstExprClassConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var class_ast *ZendAst = ast.GetChild()[0]
 	var const_ast *ZendAst = ast.GetChild()[1]
@@ -44,7 +44,7 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	ZendAstDestroy(ast)
 	*ast_ptr = ZendAstCreateConstant(types.NewString(name), fetch_type|ZEND_FETCH_CLASS_EXCEPTION)
 }
-func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
+func (compiler *Compiler) CompileConstExprClassName(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var class_ast *ZendAst = ast.GetChild()[0]
 	var class_name *types.String = ZendAstGetStr(class_ast)
@@ -67,7 +67,7 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 
 	}
 }
-func ZendCompileConstExprConst(ast_ptr **ZendAst) {
+func (compiler *Compiler) CompileConstExprConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var name_ast *ZendAst = ast.GetChild()[0]
 	var orig_name = ZendAstGetStr(name_ast).GetStr()
@@ -82,7 +82,7 @@ func ZendCompileConstExprConst(ast_ptr **ZendAst) {
 	ZendAstDestroy(ast)
 	*ast_ptr = ZendAstCreateConstant(resolved_name, b.Cond(!isFullyQualified, IS_CONSTANT_UNQUALIFIED, 0))
 }
-func ZendCompileConstExprMagicConst(ast_ptr **ZendAst) {
+func (compiler *Compiler) CompileConstExprMagicConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 
 	/* Other cases already resolved by constant folding */
@@ -91,7 +91,7 @@ func ZendCompileConstExprMagicConst(ast_ptr **ZendAst) {
 	ZendAstDestroy(ast)
 	*ast_ptr = ZendAstCreate(ZEND_AST_CONSTANT_CLASS)
 }
-func ZendCompileConstExpr(ast_ptr **ZendAst) {
+func (compiler *Compiler) CompileConstExpr(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	if ast == nil || ast.GetKind() == ZEND_AST_ZVAL {
 		return
@@ -101,13 +101,13 @@ func ZendCompileConstExpr(ast_ptr **ZendAst) {
 	}
 	switch ast.GetKind() {
 	case ZEND_AST_CLASS_CONST:
-		ZendCompileConstExprClassConst(ast_ptr)
+		compiler.CompileConstExprClassConst(ast_ptr)
 	case ZEND_AST_CLASS_NAME:
-		ZendCompileConstExprClassName(ast_ptr)
+		compiler.CompileConstExprClassName(ast_ptr)
 	case ZEND_AST_CONST:
-		ZendCompileConstExprConst(ast_ptr)
+		compiler.CompileConstExprConst(ast_ptr)
 	case ZEND_AST_MAGIC_CONST:
-		ZendCompileConstExprMagicConst(ast_ptr)
+		compiler.CompileConstExprMagicConst(ast_ptr)
 	default:
 		ZendAstApply(ast, ZendCompileConstExpr)
 	}
@@ -115,7 +115,7 @@ func ZendCompileConstExpr(ast_ptr **ZendAst) {
 func ZendConstExprToZval(result *types.Zval, ast *ZendAst) {
 	var orig_ast *ZendAst = ast
 	ZendEvalConstExpr(&ast)
-	ZendCompileConstExpr(&ast)
+	compiler.CompileConstExpr(&ast)
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		types.ZVAL_COPY_VALUE(result, ZendAstGetZval(ast))
 	} else {
@@ -139,7 +139,7 @@ func ZendConstExprToZval(result *types.Zval, ast *ZendAst) {
 	 * It would be nice to find a better solution to this problem in the
 	 * future. */
 }
-func ZendCompileTopStmt(ast *ZendAst) {
+func (compiler *Compiler) CompileTopStmt(ast *ZendAst) {
 	if ast == nil {
 		return
 	}
@@ -147,26 +147,27 @@ func ZendCompileTopStmt(ast *ZendAst) {
 		var list *ZendAstList = ZendAstGetList(ast)
 		var i uint32
 		for i = 0; i < list.GetChildren(); i++ {
-			ZendCompileTopStmt(list.GetChild()[i])
+			compiler.CompileTopStmt(list.GetChild()[i])
 		}
 		return
 	}
 	if ast.GetKind() == ZEND_AST_FUNC_DECL {
 		CG__().SetZendLineno(ast.GetLineno())
-		ZendCompileFuncDecl(nil, ast, 1)
+		compiler.CompileFuncDecl(nil, ast, 1)
 		CG__().SetZendLineno((*ZendAstDecl)(ast).GetEndLineno())
 	} else if ast.GetKind() == ZEND_AST_CLASS {
 		CG__().SetZendLineno(ast.GetLineno())
-		ZendCompileClassDecl(ast, 1)
+		compiler.CompileClassDecl(ast, 1)
 		CG__().SetZendLineno((*ZendAstDecl)(ast).GetEndLineno())
 	} else {
-		ZendCompileStmt(ast)
+		compiler.CompileStmt(ast)
 	}
 	if ast.GetKind() != ZEND_AST_NAMESPACE && ast.GetKind() != ZEND_AST_HALT_COMPILER {
 		ZendVerifyNamespace()
 	}
+
 }
-func ZendCompileStmt(ast *ZendAst) {
+func (compiler *Compiler) CompileStmt(ast *ZendAst) {
 	if ast == nil {
 		return
 	}
@@ -176,77 +177,78 @@ func ZendCompileStmt(ast *ZendAst) {
 	}
 	switch ast.GetKind() {
 	case ZEND_AST_STMT_LIST:
-		ZendCompileStmtList(ast)
+		compiler.CompileStmtList(ast)
 	case ZEND_AST_GLOBAL:
-		ZendCompileGlobalVar(ast)
+		compiler.CompileGlobalVar(ast)
 	case ZEND_AST_STATIC:
-		ZendCompileStaticVar(ast)
+		compiler.CompileStaticVar(ast)
 	case ZEND_AST_UNSET:
-		ZendCompileUnset(ast)
+		compiler.CompileUnset(ast)
 	case ZEND_AST_RETURN:
-		ZendCompileReturn(ast)
+		compiler.CompileReturn(ast)
 	case ZEND_AST_ECHO:
-		ZendCompileEcho(ast)
+		compiler.CompileEcho(ast)
 	case ZEND_AST_THROW:
-		ZendCompileThrow(ast)
+		compiler.CompileThrow(ast)
 	case ZEND_AST_BREAK:
 		fallthrough
 	case ZEND_AST_CONTINUE:
-		ZendCompileBreakContinue(ast)
+		compiler.CompileBreakContinue(ast)
 	case ZEND_AST_GOTO:
-		ZendCompileGoto(ast)
+		compiler.CompileGoto(ast)
 	case ZEND_AST_LABEL:
-		ZendCompileLabel(ast)
+		compiler.CompileLabel(ast)
 	case ZEND_AST_WHILE:
-		ZendCompileWhile(ast)
+		compiler.CompileWhile(ast)
 	case ZEND_AST_DO_WHILE:
-		ZendCompileDoWhile(ast)
+		compiler.CompileDoWhile(ast)
 	case ZEND_AST_FOR:
-		ZendCompileFor(ast)
+		compiler.CompileFor(ast)
 	case ZEND_AST_FOREACH:
-		ZendCompileForeach(ast)
+		compiler.CompileForeach(ast)
 	case ZEND_AST_IF:
-		ZendCompileIf(ast)
+		compiler.CompileIf(ast)
 	case ZEND_AST_SWITCH:
-		ZendCompileSwitch(ast)
+		compiler.CompileSwitch(ast)
 	case ZEND_AST_TRY:
-		ZendCompileTry(ast)
+		compiler.CompileTry(ast)
 	case ZEND_AST_DECLARE:
-		ZendCompileDeclare(ast)
+		compiler.CompileDeclare(ast)
 	case ZEND_AST_FUNC_DECL:
 		fallthrough
 	case ZEND_AST_METHOD:
-		ZendCompileFuncDecl(nil, ast, 0)
+		compiler.CompileFuncDecl(nil, ast, 0)
 	case ZEND_AST_PROP_GROUP:
-		ZendCompilePropGroup(ast)
+		compiler.CompilePropGroup(ast)
 	case ZEND_AST_CLASS_CONST_DECL:
-		ZendCompileClassConstDecl(ast)
+		compiler.CompileClassConstDecl(ast)
 	case ZEND_AST_USE_TRAIT:
-		ZendCompileUseTrait(ast)
+		compiler.CompileUseTrait(ast)
 	case ZEND_AST_CLASS:
-		ZendCompileClassDecl(ast, 0)
+		compiler.CompileClassDecl(ast, 0)
 	case ZEND_AST_GROUP_USE:
-		ZendCompileGroupUse(ast)
+		compiler.CompileGroupUse(ast)
 	case ZEND_AST_USE:
-		ZendCompileUse(ast)
+		compiler.CompileUse(ast)
 	case ZEND_AST_CONST_DECL:
-		ZendCompileConstDecl(ast)
+		compiler.CompileConstDecl(ast)
 	case ZEND_AST_NAMESPACE:
-		ZendCompileNamespace(ast)
+		compiler.CompileNamespace(ast)
 	case ZEND_AST_HALT_COMPILER:
-		ZendCompileHaltCompiler(ast)
+		compiler.CompileHaltCompiler(ast)
 	default:
 		var result Znode
-		ZendCompileExpr(&result, ast)
+		compiler.CompileExpr(&result, ast)
 		ZendDoFree(&result)
 	}
 }
-func ZendCompileExpr(result *Znode, ast *ZendAst) {
+
+func (compiler *Compiler) CompileExpr(result *Znode, ast *ZendAst) {
 	/* CG(zend_lineno) = ast->lineno; */
 
 	CG__().SetZendLineno(ZendAstGetLineno(ast))
 	if CG__().GetMemoizeMode() != ZEND_MEMOIZE_NONE {
-		ZendCompileMemoizedExpr(result, ast)
+		compiler.CompileMemoizedExpr(result, ast)
 		return
 	}
 	switch ast.GetKind() {
@@ -270,141 +272,141 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 	case ZEND_AST_METHOD_CALL:
 		fallthrough
 	case ZEND_AST_STATIC_CALL:
-		ZendCompileVar(result, ast, BP_VAR_R, 0)
+		compiler.CompileVar(result, ast, BP_VAR_R, 0)
 		return
 	case ZEND_AST_ASSIGN:
-		ZendCompileAssign(result, ast)
+		compiler.CompileAssign(result, ast)
 		return
 	case ZEND_AST_ASSIGN_REF:
-		ZendCompileAssignRef(result, ast)
+		compiler.CompileAssignRef(result, ast)
 		return
 	case ZEND_AST_NEW:
-		ZendCompileNew(result, ast)
+		compiler.CompileNew(result, ast)
 		return
 	case ZEND_AST_CLONE:
-		ZendCompileClone(result, ast)
+		compiler.CompileClone(result, ast)
 		return
 	case ZEND_AST_ASSIGN_OP:
-		ZendCompileCompoundAssign(result, ast)
+		compiler.CompileCompoundAssign(result, ast)
 		return
 	case ZEND_AST_BINARY_OP:
-		ZendCompileBinaryOp(result, ast)
+		compiler.CompileBinaryOp(result, ast)
 		return
 	case ZEND_AST_GREATER:
 		fallthrough
 	case ZEND_AST_GREATER_EQUAL:
-		ZendCompileGreater(result, ast)
+		compiler.CompileGreater(result, ast)
 		return
 	case ZEND_AST_UNARY_OP:
-		ZendCompileUnaryOp(result, ast)
+		compiler.CompileUnaryOp(result, ast)
 		return
 	case ZEND_AST_UNARY_PLUS:
 		fallthrough
 	case ZEND_AST_UNARY_MINUS:
-		ZendCompileUnaryPm(result, ast)
+		compiler.CompileUnaryPm(result, ast)
 		return
 	case ZEND_AST_AND:
 		fallthrough
 	case ZEND_AST_OR:
-		ZendCompileShortCircuiting(result, ast)
+		compiler.CompileShortCircuiting(result, ast)
 		return
 	case ZEND_AST_POST_INC:
 		fallthrough
 	case ZEND_AST_POST_DEC:
-		ZendCompilePostIncdec(result, ast)
+		compiler.CompilePostIncdec(result, ast)
 		return
 	case ZEND_AST_PRE_INC:
 		fallthrough
 	case ZEND_AST_PRE_DEC:
-		ZendCompilePreIncdec(result, ast)
+		compiler.CompilePreIncdec(result, ast)
 		return
 	case ZEND_AST_CAST:
-		ZendCompileCast(result, ast)
+		compiler.CompileCast(result, ast)
 		return
 	case ZEND_AST_CONDITIONAL:
-		ZendCompileConditional(result, ast)
+		compiler.CompileConditional(result, ast)
 		return
 	case ZEND_AST_COALESCE:
-		ZendCompileCoalesce(result, ast)
+		compiler.CompileCoalesce(result, ast)
 		return
 	case ZEND_AST_ASSIGN_COALESCE:
-		ZendCompileAssignCoalesce(result, ast)
+		compiler.CompileAssignCoalesce(result, ast)
 		return
 	case ZEND_AST_PRINT:
-		ZendCompilePrint(result, ast)
+		compiler.CompilePrint(result, ast)
 		return
 	case ZEND_AST_EXIT:
-		ZendCompileExit(result, ast)
+		compiler.CompileExit(result, ast)
 		return
 	case ZEND_AST_YIELD:
-		ZendCompileYield(result, ast)
+		compiler.CompileYield(result, ast)
 		return
 	case ZEND_AST_YIELD_FROM:
-		ZendCompileYieldFrom(result, ast)
+		compiler.CompileYieldFrom(result, ast)
 		return
 	case ZEND_AST_INSTANCEOF:
-		ZendCompileInstanceof(result, ast)
+		compiler.CompileInstanceof(result, ast)
 		return
 	case ZEND_AST_INCLUDE_OR_EVAL:
-		ZendCompileIncludeOrEval(result, ast)
+		compiler.CompileIncludeOrEval(result, ast)
 		return
 	case ZEND_AST_ISSET:
 		fallthrough
 	case ZEND_AST_EMPTY:
-		ZendCompileIssetOrEmpty(result, ast)
+		compiler.CompileIssetOrEmpty(result, ast)
 		return
 	case ZEND_AST_SILENCE:
-		ZendCompileSilence(result, ast)
+		compiler.CompileSilence(result, ast)
 		return
 	case ZEND_AST_SHELL_EXEC:
-		ZendCompileShellExec(result, ast)
+		compiler.CompileShellExec(result, ast)
 		return
 	case ZEND_AST_ARRAY:
-		ZendCompileArray(result, ast)
+		compiler.CompileArray(result, ast)
 		return
 	case ZEND_AST_CONST:
-		ZendCompileConst(result, ast)
+		compiler.CompileConst(result, ast)
 		return
 	case ZEND_AST_CLASS_CONST:
-		ZendCompileClassConst(result, ast)
+		compiler.CompileClassConst(result, ast)
 		return
 	case ZEND_AST_CLASS_NAME:
-		ZendCompileClassName(result, ast)
+		compiler.CompileClassName(result, ast)
 		return
 	case ZEND_AST_ENCAPS_LIST:
-		ZendCompileEncapsList(result, ast)
+		compiler.CompileEncapsList(result, ast)
 		return
 	case ZEND_AST_MAGIC_CONST:
-		ZendCompileMagicConst(result, ast)
+		compiler.CompileMagicConst(result, ast)
 		return
 	case ZEND_AST_CLOSURE:
 		fallthrough
 	case ZEND_AST_ARROW_FUNC:
-		ZendCompileFuncDecl(result, ast, 0)
+		compiler.CompileFuncDecl(result, ast, 0)
 		return
 	default:
 		b.Assert(false)
 	}
 }
-func ZendCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
+func (compiler *Compiler) CompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
 	CG__().SetZendLineno(ZendAstGetLineno(ast))
 	switch ast.GetKind() {
 	case ZEND_AST_VAR:
-		return ZendCompileSimpleVar(result, ast, type_, 0)
+		return compiler.CompileSimpleVar(result, ast, type_, 0)
 	case ZEND_AST_DIM:
-		return ZendCompileDim(result, ast, type_)
+		return compiler.CompileDim(result, ast, type_)
 	case ZEND_AST_PROP:
-		return ZendCompileProp(result, ast, type_, by_ref)
+		return compiler.CompileProp(result, ast, type_, by_ref)
 	case ZEND_AST_STATIC_PROP:
-		return ZendCompileStaticProp(result, ast, type_, by_ref, 0)
+		return compiler.CompileStaticProp(result, ast, type_, by_ref, 0)
 	case ZEND_AST_CALL:
-		ZendCompileCall(result, ast, type_)
+		compiler.CompileCall(result, ast, type_)
 		return nil
 	case ZEND_AST_METHOD_CALL:
-		ZendCompileMethodCall(result, ast, type_)
+		compiler.CompileMethodCall(result, ast, type_)
 		return nil
 	case ZEND_AST_STATIC_CALL:
-		ZendCompileStaticCall(result, ast, type_)
+		compiler.CompileStaticCall(result, ast, type_)
 		return nil
 	case ZEND_AST_ZNODE:
 		*result = (*ZendAstGetZnode)(ast)
@@ -413,14 +415,14 @@ func ZendCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *type
 		if type_ == BP_VAR_W || type_ == BP_VAR_RW || type_ == BP_VAR_UNSET {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use temporary expression in write context")
 		}
-		ZendCompileExpr(result, ast)
+		compiler.CompileExpr(result, ast)
 		return nil
 	}
 }
 func ZendDelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref types.ZendBool) *types.ZendOp {
 	switch ast.GetKind() {
 	case ZEND_AST_VAR:
-		return ZendCompileSimpleVar(result, ast, type_, 1)
+		return compiler.CompileSimpleVar(result, ast, type_, 1)
 	case ZEND_AST_DIM:
 		return ZendDelayedCompileDim(result, ast, type_)
 	case ZEND_AST_PROP:
@@ -430,9 +432,9 @@ func ZendDelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref typ
 		}
 		return opline
 	case ZEND_AST_STATIC_PROP:
-		return ZendCompileStaticProp(result, ast, type_, by_ref, 1)
+		return compiler.CompileStaticProp(result, ast, type_, by_ref, 1)
 	default:
-		return ZendCompileVar(result, ast, type_, 0)
+		return compiler.CompileVar(result, ast, type_, 0)
 	}
 }
 func ZendEvalConstExpr(ast_ptr **ZendAst) {

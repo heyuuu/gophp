@@ -8,7 +8,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendCompileIf(ast *ZendAst) {
+func (compiler *Compiler) CompileIf(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
 	var jmp_opnums *uint32 = nil
@@ -22,9 +22,9 @@ func ZendCompileIf(ast *ZendAst) {
 		if cond_ast != nil {
 			var cond_node Znode
 			var opnum_jmpz uint32
-			ZendCompileExpr(&cond_node, cond_ast)
+			compiler.CompileExpr(&cond_node, cond_ast)
 			opnum_jmpz = ZendEmitCondJump(ZEND_JMPZ, &cond_node, 0)
-			ZendCompileStmt(stmt_ast)
+			compiler.CompileStmt(stmt_ast)
 			if i != list.GetChildren()-1 {
 				jmp_opnums[i] = ZendEmitJump(0)
 			}
@@ -34,7 +34,7 @@ func ZendCompileIf(ast *ZendAst) {
 			/* "else" can only occur as last element. */
 
 			b.Assert(i == list.GetChildren()-1)
-			ZendCompileStmt(stmt_ast)
+			compiler.CompileStmt(stmt_ast)
 		}
 	}
 	if list.GetChildren() > 1 {
@@ -121,7 +121,7 @@ func ShouldUseJumptable(cases *ZendAstList, jumptable_type uint8) types.ZendBool
 	/* Thresholds are chosen based on when the average switch time for equidistributed
 	 * input becomes smaller when using the jumptable optimization. */
 }
-func ZendCompileSwitch(ast *ZendAst) {
+func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
 	var cases *ZendAstList = ZendAstGetList(ast.GetChild()[1])
 	var i uint32
@@ -134,7 +134,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 	var opnum_switch uint32 = uint32 - 1
 	var jumptable_type uint8
 	var jumptable *types.Array = nil
-	ZendCompileExpr(&expr_node, expr_ast)
+	compiler.CompileExpr(&expr_node, expr_ast)
 	ZendBeginLoop(ZEND_FREE, &expr_node, 1)
 	case_node.SetOpType(IS_TMP_VAR)
 	case_node.GetOp().SetVar(GetTemporaryVariable())
@@ -163,7 +163,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 			has_default_case = 1
 			continue
 		}
-		ZendCompileExpr(&cond_node, cond_ast)
+		compiler.CompileExpr(&cond_node, cond_ast)
 		if expr_node.GetOpType() == IS_CONST && expr_node.GetConstant().IsFalse() {
 			jmpnz_opnums[i] = ZendEmitCondJump(ZEND_JMPZ, &cond_node, 0)
 		} else if expr_node.GetOpType() == IS_CONST && expr_node.GetConstant().IsTrue() {
@@ -209,7 +209,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 				opline.SetExtendedValue(GetNextOpNumber())
 			}
 		}
-		ZendCompileStmt(stmt_ast)
+		compiler.CompileStmt(stmt_ast)
 	}
 	if has_default_case == 0 {
 		ZendUpdateJumpTargetToNext(opnum_default_jmp)
@@ -227,7 +227,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 	}
 	Efree(jmpnz_opnums)
 }
-func ZendCompileTry(ast *ZendAst) {
+func (compiler *Compiler) CompileTry(ast *ZendAst) {
 	var try_ast *ZendAst = ast.GetChild()[0]
 	var catches *ZendAstList = ZendAstGetList(ast.GetChild()[1])
 	var finally_ast *ZendAst = ast.GetChild()[2]
@@ -267,7 +267,7 @@ func ZendCompileTry(ast *ZendAst) {
 		CG__().GetLoopVarStack().Push(&fast_call)
 	}
 	CG__().GetContext().SetTryCatchOffset(try_catch_offset)
-	ZendCompileStmt(try_ast)
+	compiler.CompileStmt(try_ast)
 	if catches.GetChildren() != 0 {
 		jmp_opnums[0] = ZendEmitJump(0)
 	}
@@ -314,7 +314,7 @@ func ZendCompileTry(ast *ZendAst) {
 			ZendUpdateJumpTargetToNext(jmp_multicatch[j])
 		}
 		Efree(jmp_multicatch)
-		ZendCompileStmt(stmt_ast)
+		compiler.CompileStmt(stmt_ast)
 		if is_last_catch == 0 {
 			jmp_opnums[i+1] = ZendEmitJump(0)
 		}
@@ -347,7 +347,7 @@ func ZendCompileTry(ast *ZendAst) {
 		opline.SetResultType(IS_TMP_VAR)
 		opline.GetResult().SetVar(CG__().GetContext().GetFastCallVar())
 		ZendEmitOp(nil, ZEND_JMP, nil, nil)
-		ZendCompileStmt(finally_ast)
+		compiler.CompileStmt(finally_ast)
 		CG__().GetActiveOpArray().GetTryCatchArray()[try_catch_offset].SetFinallyOp(opnum_jmp + 1)
 		CG__().GetActiveOpArray().GetTryCatchArray()[try_catch_offset].SetFinallyEnd(GetNextOpNumber())
 		opline = ZendEmitOp(nil, ZEND_FAST_RET, nil, nil)
@@ -397,7 +397,7 @@ func ZendDeclareIsFirstStatement(ast *ZendAst) int {
 	}
 	return types.FAILURE
 }
-func ZendCompileDeclare(ast *ZendAst) {
+func (compiler *Compiler) CompileDeclare(ast *ZendAst) {
 	var declares *ZendAstList = ZendAstGetList(ast.GetChild()[0])
 	var stmt_ast *ZendAst = ast.GetChild()[1]
 	var i uint32
@@ -435,17 +435,17 @@ func ZendCompileDeclare(ast *ZendAst) {
 		}
 	}
 	if stmt_ast != nil {
-		ZendCompileStmt(stmt_ast)
+		compiler.CompileStmt(stmt_ast)
 	}
 }
-func ZendCompileStmtList(ast *ZendAst) {
+func (compiler *Compiler) CompileStmtList(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
-		ZendCompileStmt(list.GetChild()[i])
+		compiler.CompileStmt(list.GetChild()[i])
 	}
 }
-func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.TypeHint {
+func (compiler *Compiler) CompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.TypeHint {
 	var allow_null types.ZendBool = force_allow_null
 	var orig_ast_attr ZendAstAttr = ast.GetAttr()
 	var type_ types.TypeHint
@@ -478,7 +478,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ty
 	ast.SetAttr(orig_ast_attr)
 	return type_
 }
-func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
+func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
@@ -489,7 +489,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 
 		arg_infos = SafeEmalloc(b.SizeOf("zend_arg_info"), list.GetChildren()+1, 0)
 		*arg_infos = MakeZendReturnArgInfo(
-			ZendCompileTypename(return_type_ast, 0),
+			compiler.CompileTypename(return_type_ast, 0),
 			op_array.IsReturnReference(),
 		)
 		if arg_infos.GetType().Code() == types.IS_VOID && arg_infos.GetType().AllowNull() {
@@ -562,7 +562,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		if type_ast != nil {
 			var has_null_default types.ZendBool = default_ast != nil && (default_node.GetConstant().IsNull() || default_node.GetConstant().IsConstantAst() && types.Z_ASTVAL(default_node.GetConstant()).GetKind() == ZEND_AST_CONSTANT && strcasecmp(ZendAstGetConstantName(types.Z_ASTVAL(default_node.GetConstant())).GetVal(), "NULL") == 0)
 			op_array.SetIsHasTypeHints(true)
-			arg_info.SetType(ZendCompileTypename(type_ast, has_null_default))
+			arg_info.SetType(compiler.CompileTypename(type_ast, has_null_default))
 			if arg_info.GetType().Code() == types.IS_VOID {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "void cannot be used as a parameter type")
 			}

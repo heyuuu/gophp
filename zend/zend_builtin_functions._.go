@@ -47,7 +47,6 @@ var BuiltinFunctions = []types.FunctionEntry{
 	DefZifGetDeclaredInterfaces,
 	DefZifGetDefinedFunctions,
 	DefZifGetDefinedVars,
-	DefZifCreateFunction,
 	DefZifGetResourceType,
 	DefZifGetResources,
 	DefZifGetLoadedExtensions,
@@ -77,5 +76,3 @@ var ZendBuiltinModule = MakeZendModuleEntry(
 	nil,
 	nil,
 )
-
-const LAMBDA_TEMP_FUNCNAME = "__lambda_func"

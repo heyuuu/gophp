@@ -39,7 +39,7 @@ func ZendCheckAlreadyInUse(type_ uint32, old_name *types.String, new_name *types
 	}
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 }
-func ZendCompileUse(ast *ZendAst) {
+func (compiler *Compiler) CompileUse(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
 	var current_ns *types.String = FC__().GetCurrentNamespace()
@@ -93,7 +93,7 @@ func ZendCompileUse(ast *ZendAst) {
 	}
 }
 
-func ZendCompileGroupUse(ast *ZendAst) {
+func (compiler *Compiler) CompileGroupUse(ast *ZendAst) {
 	var i uint32
 	var ns *types.String = ZendAstGetStr(ast.GetChild()[0])
 	var list *ZendAstList = ZendAstGetList(ast.GetChild()[1])
@@ -111,10 +111,10 @@ func ZendCompileGroupUse(ast *ZendAst) {
 		} else {
 			inline_use.SetAttr(use.GetAttr())
 		}
-		ZendCompileUse(inline_use)
+		compiler.CompileUse(inline_use)
 	}
 }
-func ZendCompileConstDecl(ast *ZendAst) {
+func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
@@ -145,7 +145,7 @@ func ZendCompileConstDecl(ast *ZendAst) {
 		ZendRegisterSeenSymbol(name, ZEND_SYMBOL_CONST)
 	}
 }
-func ZendCompileNamespace(ast *ZendAst) {
+func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	var stmt_ast *ZendAst = ast.GetChild()[1]
 	var name *types.String
@@ -190,9 +190,6 @@ func ZendCompileNamespace(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declaration statement has to be "+"the very first statement or after any declare call in the script")
 		}
 	}
-	if FC__().GetCurrentNamespace() != nil {
-		// types.ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
-	}
 	if name_ast != nil {
 		name = ZendAstGetStr(name_ast)
 		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name.GetStr()) {
@@ -208,11 +205,11 @@ func ZendCompileNamespace(ast *ZendAst) {
 		FC__().SetHasBracketedNamespaces(1)
 	}
 	if stmt_ast != nil {
-		ZendCompileTopStmt(stmt_ast)
+		compiler.CompileTopStmt(stmt_ast)
 		ZendEndNamespace()
 	}
 }
-func ZendCompileHaltCompiler(ast *ZendAst) {
+func (compiler *Compiler) CompileHaltCompiler(ast *ZendAst) {
 	var offset_ast *ZendAst = ast.GetChild()[0]
 	var offset ZendLong = ZendAstGetZval(offset_ast).Long()
 	var name *types.String
@@ -453,7 +450,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 	}
 	return 1
 }
-func ZendCompileBinaryOp(result *Znode, ast *ZendAst) {
+func (compiler *Compiler) CompileBinaryOp(result *Znode, ast *ZendAst) {
 	var left_ast *ZendAst = ast.GetChild()[0]
 	var right_ast *ZendAst = ast.GetChild()[1]
 	var opcode uint32 = ast.GetAttr()
@@ -468,8 +465,8 @@ func ZendCompileBinaryOp(result *Znode, ast *ZendAst) {
 	}
 	var left_node Znode
 	var right_node Znode
-	ZendCompileExpr(&left_node, left_ast)
-	ZendCompileExpr(&right_node, right_ast)
+	compiler.CompileExpr(&left_node, left_ast)
+	compiler.CompileExpr(&right_node, right_ast)
 	if left_node.GetOpType() == IS_CONST && right_node.GetOpType() == IS_CONST {
 		if ZendTryCtEvalBinaryOp(result.GetConstant(), opcode, left_node.GetConstant(), right_node.GetConstant()) != 0 {
 			result.SetOpType(IS_CONST)
@@ -544,14 +541,14 @@ func ZendCompileBinaryOp(result *Znode, ast *ZendAst) {
 		break
 	}
 }
-func ZendCompileGreater(result *Znode, ast *ZendAst) {
+func (compiler *Compiler) CompileGreater(result *Znode, ast *ZendAst) {
 	var left_ast *ZendAst = ast.GetChild()[0]
 	var right_ast *ZendAst = ast.GetChild()[1]
 	var left_node Znode
 	var right_node Znode
 	b.Assert(ast.GetKind() == ZEND_AST_GREATER || ast.GetKind() == ZEND_AST_GREATER_EQUAL)
-	ZendCompileExpr(&left_node, left_ast)
-	ZendCompileExpr(&right_node, right_ast)
+	compiler.CompileExpr(&left_node, left_ast)
+	compiler.CompileExpr(&right_node, right_ast)
 	if left_node.GetOpType() == IS_CONST && right_node.GetOpType() == IS_CONST {
 		result.SetOpType(IS_CONST)
 		ZendCtEvalGreater(result.GetConstant(), ast.GetKind(), left_node.GetConstant(), right_node.GetConstant())
@@ -561,11 +558,11 @@ func ZendCompileGreater(result *Znode, ast *ZendAst) {
 	}
 	ZendEmitOpTmp(result, b.Cond(ast.GetKind() == ZEND_AST_GREATER, ZEND_IS_SMALLER, ZEND_IS_SMALLER_OR_EQUAL), &right_node, &left_node)
 }
-func ZendCompileUnaryOp(result *Znode, ast *ZendAst) {
+func (compiler *Compiler) CompileUnaryOp(result *Znode, ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
 	var opcode uint32 = ast.GetAttr()
 	var expr_node Znode
-	ZendCompileExpr(&expr_node, expr_ast)
+	compiler.CompileExpr(&expr_node, expr_ast)
 	if expr_node.GetOpType() == IS_CONST {
 		result.SetOpType(IS_CONST)
 		ZendCtEvalUnaryOp(result.GetConstant(), opcode, expr_node.GetConstant())

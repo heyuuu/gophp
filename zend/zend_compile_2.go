@@ -204,7 +204,7 @@ func ZendDelayedCompileEnd(offset uint32) *types.ZendOp {
 	CG__().GetDelayedOplinesStack().SetTop(offset)
 	return opline
 }
-func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
+func (compiler *Compiler) CompileMemoizedExpr(result *Znode, expr *ZendAst) {
 	var memoize_mode int = CG__().GetMemoizeMode()
 	if memoize_mode == ZEND_MEMOIZE_COMPILE {
 		var memoized_result Znode
@@ -212,7 +212,7 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 		/* Go through normal compilation */
 
 		CG__().SetMemoizeMode(ZEND_MEMOIZE_NONE)
-		ZendCompileExpr(result, expr)
+		compiler.CompileExpr(result, expr)
 		CG__().SetMemoizeMode(ZEND_MEMOIZE_COMPILE)
 		if result.GetOpType() == IS_VAR {
 			ZendEmitOp(&memoized_result, ZEND_COPY_TMP, result, nil)
@@ -365,11 +365,11 @@ func ZendSetClassNameOp1(opline *types.ZendOp, class_node *Znode) {
 		}
 	}
 }
-func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
+func (compiler *Compiler) CompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 	var fetch_type uint32
 	if name_ast.GetKind() != ZEND_AST_ZVAL {
 		var name_node Znode
-		ZendCompileExpr(&name_node, name_ast)
+		compiler.CompileExpr(&name_node, name_ast)
 		if name_node.GetOpType() == IS_CONST {
 			var name *types.String
 			if name_node.GetConstant().GetType() != types.IS_STRING {
@@ -433,11 +433,11 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 	}
 	return types.FAILURE
 }
-func ZendCompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed int) *types.ZendOp {
+func (compiler *Compiler) CompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed int) *types.ZendOp {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	var name_node Znode
 	var opline *types.ZendOp
-	ZendCompileExpr(&name_node, name_ast)
+	compiler.CompileExpr(&name_node, name_ast)
 	if name_node.GetOpType() == IS_CONST {
 		operators.ConvertToString(name_node.GetConstant())
 	}
@@ -461,7 +461,7 @@ func IsThisFetch(ast *ZendAst) bool {
 	}
 	return false
 }
-func ZendCompileSimpleVar(result *Znode, ast *ZendAst, type_ uint32, delayed int) *types.ZendOp {
+func (compiler *Compiler) CompileSimpleVar(result *Znode, ast *ZendAst, type_ uint32, delayed int) *types.ZendOp {
 	if IsThisFetch(ast) {
 		var opline *types.ZendOp = ZendEmitOp(result, ZEND_FETCH_THIS, nil, nil)
 		if type_ == BP_VAR_R || type_ == BP_VAR_IS {
@@ -471,7 +471,7 @@ func ZendCompileSimpleVar(result *Znode, ast *ZendAst, type_ uint32, delayed int
 		CG__().GetActiveOpArray().SetIsUsesThis(true)
 		return opline
 	} else if ZendTryCompileCv(result, ast) == types.FAILURE {
-		return ZendCompileSimpleVarNoCv(result, ast, type_, delayed)
+		return compiler.CompileSimpleVarNoCv(result, ast, type_, delayed)
 	}
 	return nil
 }
@@ -489,7 +489,7 @@ func ZendSeparateIfCallAndWrite(node *Znode, ast *ZendAst, type_ uint32) {
 func ZendEmitAssignZnode(var_ast *ZendAst, value_node *Znode) {
 	var dummy_node Znode
 	var assign_ast *ZendAst = ZendAstCreate(ZEND_AST_ASSIGN, var_ast, ZendAstCreateZnode(value_node))
-	ZendCompileAssign(&dummy_node, assign_ast)
+	compiler.CompileAssign(&dummy_node, assign_ast)
 	ZendDoFree(&dummy_node)
 }
 func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
@@ -515,7 +515,7 @@ func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.Zen
 		}
 		dim_node.SetOpType(IS_UNUSED)
 	} else {
-		ZendCompileExpr(&dim_node, dim_ast)
+		compiler.CompileExpr(&dim_node, dim_ast)
 	}
 	opline = ZendDelayedEmitOp(result, ZEND_FETCH_DIM_R, &var_node, &dim_node)
 	ZendAdjustForFetchType(opline, result, type_)
@@ -524,7 +524,7 @@ func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.Zen
 	}
 	return opline
 }
-func ZendCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
+func (compiler *Compiler) CompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
 	var offset uint32 = ZendDelayedCompileBegin()
 	ZendDelayedCompileDim(result, ast, type_)
 	return ZendDelayedCompileEnd(offset)
@@ -545,7 +545,7 @@ func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *types.Ze
 		}
 		ZendSeparateIfCallAndWrite(&obj_node, obj_ast, type_)
 	}
-	ZendCompileExpr(&prop_node, prop_ast)
+	compiler.CompileExpr(&prop_node, prop_ast)
 	opline = ZendDelayedEmitOp(result, ZEND_FETCH_OBJ_R, &obj_node, &prop_node)
 	if opline.GetOp2Type() == IS_CONST {
 		operators.ConvertToString(CT_CONSTANT(opline.GetOp2()))
@@ -554,7 +554,7 @@ func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *types.Ze
 	ZendAdjustForFetchType(opline, result, type_)
 	return opline
 }
-func ZendCompileProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
+func (compiler *Compiler) CompileProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
 	var offset uint32 = ZendDelayedCompileBegin()
 	var opline *types.ZendOp = ZendDelayedCompileProp(result, ast, type_)
 	if by_ref != 0 {
@@ -562,14 +562,14 @@ func ZendCompileProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *typ
 	}
 	return ZendDelayedCompileEnd(offset)
 }
-func ZendCompileStaticProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int, delayed int) *types.ZendOp {
+func (compiler *Compiler) CompileStaticProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int, delayed int) *types.ZendOp {
 	var class_ast *ZendAst = ast.GetChild()[0]
 	var prop_ast *ZendAst = ast.GetChild()[1]
 	var class_node Znode
 	var prop_node Znode
 	var opline *types.ZendOp
-	ZendCompileClassRef(&class_node, class_ast, ZEND_FETCH_CLASS_EXCEPTION)
-	ZendCompileExpr(&prop_node, prop_ast)
+	compiler.CompileClassRef(&class_node, class_ast, ZEND_FETCH_CLASS_EXCEPTION)
+	compiler.CompileExpr(&prop_node, prop_ast)
 	if delayed != 0 {
 		opline = ZendDelayedEmitOp(result, ZEND_FETCH_STATIC_PROP_R, &prop_node, nil)
 	} else {
@@ -627,7 +627,7 @@ func ZendPropagateListRefs(ast *ZendAst) types.ZendBool {
 	}
 	return has_refs
 }
-func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_style types.ZendBool) {
+func (compiler *Compiler) CompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_style types.ZendBool) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
 	var has_elems types.ZendBool = 0
@@ -659,7 +659,7 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 			if key_ast == nil {
 				faults.Error(faults.E_COMPILE_ERROR, "Cannot mix keyed and unkeyed array entries in assignments")
 			}
-			ZendCompileExpr(&dim_node, key_ast)
+			compiler.CompileExpr(&dim_node, key_ast)
 		} else {
 			if key_ast != nil {
 				faults.Error(faults.E_COMPILE_ERROR, "Cannot mix keyed and unkeyed array entries in assignments")
@@ -685,7 +685,7 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 			if elem_ast.GetAttr() != 0 {
 				ZendEmitOp(&fetch_result, ZEND_MAKE_REF, &fetch_result, nil)
 			}
-			ZendCompileListAssign(nil, var_ast, &fetch_result, var_ast.GetAttr())
+			compiler.CompileListAssign(nil, var_ast, &fetch_result, var_ast.GetAttr())
 		} else if elem_ast.GetAttr() != 0 {
 			ZendEmitAssignRefZnode(var_ast, &fetch_result)
 		} else {
@@ -724,7 +724,7 @@ func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) types.ZendBool {
 	var result = name1.GetStr() == name2.GetStr()
 	return types.IntBool(result)
 }
-func ZendCompileAssign(result *Znode, ast *ZendAst) {
+func (compiler *Compiler) CompileAssign(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
 	var expr_ast *ZendAst = ast.GetChild()[1]
 	var var_node Znode
@@ -739,14 +739,14 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 	case ZEND_AST_VAR:
 		offset = ZendDelayedCompileBegin()
 		ZendDelayedCompileVar(&var_node, var_ast, BP_VAR_W, 0)
-		ZendCompileExpr(&expr_node, expr_ast)
+		compiler.CompileExpr(&expr_node, expr_ast)
 		ZendDelayedCompileEnd(offset)
 		ZendEmitOp(result, ZEND_ASSIGN, &var_node, &expr_node)
 		return
 	case ZEND_AST_STATIC_PROP:
 		offset = ZendDelayedCompileBegin()
 		ZendDelayedCompileVar(result, var_ast, BP_VAR_W, 0)
-		ZendCompileExpr(&expr_node, expr_ast)
+		compiler.CompileExpr(&expr_node, expr_ast)
 		opline = ZendDelayedCompileEnd(offset)
 		opline.SetOpcode(ZEND_ASSIGN_STATIC_PROP)
 		ZendEmitOpData(&expr_node)
@@ -760,12 +760,12 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 
 			var cv_node Znode
 			if ZendTryCompileCv(&cv_node, expr_ast) == types.FAILURE {
-				ZendCompileSimpleVarNoCv(&expr_node, expr_ast, BP_VAR_R, 0)
+				compiler.CompileSimpleVarNoCv(&expr_node, expr_ast, BP_VAR_R, 0)
 			} else {
 				ZendEmitOpTmp(&expr_node, ZEND_QM_ASSIGN, &cv_node, nil)
 			}
 		} else {
-			ZendCompileExpr(&expr_node, expr_ast)
+			compiler.CompileExpr(&expr_node, expr_ast)
 		}
 		opline = ZendDelayedCompileEnd(offset)
 		opline.SetOpcode(ZEND_ASSIGN_DIM)
@@ -774,7 +774,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 	case ZEND_AST_PROP:
 		offset = ZendDelayedCompileBegin()
 		ZendDelayedCompileProp(result, var_ast, BP_VAR_W)
-		ZendCompileExpr(&expr_node, expr_ast)
+		compiler.CompileExpr(&expr_node, expr_ast)
 		opline = ZendDelayedCompileEnd(offset)
 		opline.SetOpcode(ZEND_ASSIGN_OBJ)
 		ZendEmitOpData(&expr_node)
@@ -784,7 +784,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 			if ZendIsVariableOrCall(expr_ast) == 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot assign reference to non referencable value")
 			}
-			ZendCompileVar(&expr_node, expr_ast, BP_VAR_W, 1)
+			compiler.CompileVar(&expr_node, expr_ast, BP_VAR_W, 1)
 
 			/* MAKE_REF is usually not necessary for CVs. However, if there are
 			 * self-assignments, this forces the RHS to evaluate first. */
@@ -801,15 +801,15 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 
 				var cv_node Znode
 				if ZendTryCompileCv(&cv_node, expr_ast) == types.FAILURE {
-					ZendCompileSimpleVarNoCv(&expr_node, expr_ast, BP_VAR_R, 0)
+					compiler.CompileSimpleVarNoCv(&expr_node, expr_ast, BP_VAR_R, 0)
 				} else {
 					ZendEmitOpTmp(&expr_node, ZEND_QM_ASSIGN, &cv_node, nil)
 				}
 			} else {
-				ZendCompileExpr(&expr_node, expr_ast)
+				compiler.CompileExpr(&expr_node, expr_ast)
 			}
 		}
-		ZendCompileListAssign(result, var_ast, &expr_node, var_ast.GetAttr())
+		compiler.CompileListAssign(result, var_ast, &expr_node, var_ast.GetAttr())
 		return
 	default:
 

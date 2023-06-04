@@ -8,7 +8,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendCompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses_ast *ZendAst) {
+func (compiler *Compiler) CompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses_ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(uses_ast)
 	var i uint32
 	if list.GetChildren() == 0 {
@@ -128,7 +128,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *ty
 		opline.SetExtendedValue(offset | ZEND_BIND_IMPLICIT)
 	})
 }
-func ZendCompileClosureUses(ast *ZendAst) {
+func (compiler *Compiler) CompileClosureUses(ast *ZendAst) {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
@@ -141,10 +141,10 @@ func ZendCompileClosureUses(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use lexical variable $%s as a parameter name", var_name.GetVal())
 		}
 		CG__().SetZendLineno(ZendAstGetLineno(var_ast))
-		ZendCompileStaticVarCommon(var_name, &zv, b.Cond(var_ast.GetAttr() != 0, ZEND_BIND_REF, 0))
+		compiler.CompileStaticVarCommon(var_name, &zv, b.Cond(var_ast.GetAttr() != 0, ZEND_BIND_REF, 0))
 	}
 }
-func ZendCompileImplicitClosureUses(info *ClosureInfo) {
+func (compiler *Compiler) CompileImplicitClosureUses(info *ClosureInfo) {
 	var var_name *types.String
 	var __ht *types.Array = info.GetUses()
 	for _, _p := range __ht.ForeachData() {
@@ -153,7 +153,7 @@ func ZendCompileImplicitClosureUses(info *ClosureInfo) {
 		var_name = _p.GetKey()
 		var zv types.Zval
 		zv.SetNull()
-		ZendCompileStaticVarCommon(var_name, &zv, ZEND_BIND_IMPLICIT)
+		compiler.CompileStaticVarCommon(var_name, &zv, ZEND_BIND_IMPLICIT)
 	}
 }
 func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_body types.ZendBool) {
@@ -370,7 +370,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	}
 	// types.ZendStringReleaseEx(lcname, 0)
 }
-func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
+func (compiler *Compiler) CompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	var decl *ZendAstDecl = (*ZendAstDecl)(ast)
 	var params_ast *ZendAst = decl.GetChild()[0]
 	var uses_ast *ZendAst = decl.GetChild()[1]
@@ -406,7 +406,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 			FindImplicitBinds(&info, params_ast, stmt_ast)
 			CompileImplicitLexicalBinds(&info, result, op_array)
 		} else if uses_ast != nil {
-			ZendCompileClosureBinding(result, op_array, uses_ast)
+			compiler.CompileClosureBinding(result, op_array, uses_ast)
 		}
 	}
 	CG__().SetActiveOpArray(op_array)
@@ -432,18 +432,18 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	var dummy_var ZendLoopVar
 	dummy_var.SetOpcode(ZEND_RETURN)
 	CG__().GetLoopVarStack().Push(any(&dummy_var))
-	ZendCompileParams(params_ast, return_type_ast)
+	compiler.CompileParams(params_ast, return_type_ast)
 	if CG__().GetActiveOpArray().IsGenerator() {
 		ZendMarkFunctionAsGenerator()
 		ZendEmitOp(nil, ZEND_GENERATOR_CREATE, nil, nil)
 	}
 	if decl.GetKind() == ZEND_AST_ARROW_FUNC {
-		ZendCompileImplicitClosureUses(&info)
+		compiler.CompileImplicitClosureUses(&info)
 		info.GetUses().Destroy()
 	} else if uses_ast != nil {
-		ZendCompileClosureUses(uses_ast)
+		compiler.CompileClosureUses(uses_ast)
 	}
-	ZendCompileStmt(stmt_ast)
+	compiler.CompileStmt(stmt_ast)
 	if is_method != 0 {
 		ZendCheckMagicMethodImplementation(CG__().GetActiveClassEntry(), (types.IFunction)(op_array), faults.E_COMPILE_ERROR)
 	}
@@ -462,7 +462,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	CG__().SetActiveOpArray(orig_op_array)
 	CG__().SetActiveClassEntry(orig_class_entry)
 }
-func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
+func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
@@ -483,7 +483,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		var value_zv types.Zval
 		var type_ types.TypeHint = 0
 		if type_ast != nil {
-			type_ = ZendCompileTypename(type_ast, 0)
+			type_ = compiler.CompileTypename(type_ast, 0)
 			if type_.Code() == types.IS_VOID || type_.Code() == types.IS_CALLABLE {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property %s::$%s cannot have type %s", ce.Name(), name.GetVal(), types.ZendGetTypeByConst(type_.Code()))
 			}
@@ -532,12 +532,12 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		ZendDeclareTypedProperty(ce, name, &value_zv, flags, doc_comment, type_)
 	}
 }
-func ZendCompilePropGroup(list *ZendAst) {
+func (compiler *Compiler) CompilePropGroup(list *ZendAst) {
 	var type_ast *ZendAst = list.GetChild()[0]
 	var prop_ast *ZendAst = list.GetChild()[1]
-	ZendCompilePropDecl(prop_ast, type_ast, list.GetAttr())
+	compiler.CompilePropDecl(prop_ast, type_ast, list.GetAttr())
 }
-func ZendCompileClassConstDecl(ast *ZendAst) {
+func (compiler *Compiler) CompileClassConstDecl(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
@@ -566,7 +566,7 @@ func ZendCompileClassConstDecl(ast *ZendAst) {
 		ZendDeclareClassConstantEx(ce, name, &value_zv, ast.GetAttr(), doc_comment)
 	}
 }
-func ZendCompileMethodRef(ast *ZendAst, method_ref *ZendTraitMethodReference) {
+func (compiler *Compiler) CompileMethodRef(ast *ZendAst, method_ref *ZendTraitMethodReference) {
 	var class_ast *ZendAst = ast.GetChild()[0]
 	var method_ast *ZendAst = ast.GetChild()[1]
 	method_ref.SetMethodName(ZendAstGetStr(method_ast).Copy())
@@ -576,13 +576,13 @@ func ZendCompileMethodRef(ast *ZendAst, method_ref *ZendTraitMethodReference) {
 		method_ref.SetClassName(nil)
 	}
 }
-func ZendCompileTraitPrecedence(ast *ZendAst) {
+func (compiler *Compiler) CompileTraitPrecedence(ast *ZendAst) {
 	var method_ref_ast *ZendAst = ast.GetChild()[0]
 	var insteadof_ast *ZendAst = ast.GetChild()[1]
 	var insteadof_list *ZendAstList = ZendAstGetList(insteadof_ast)
 	var i uint32
 	var precedence *ZendTraitPrecedence = Emalloc(b.SizeOf("zend_trait_precedence") + (insteadof_list.GetChildren()-1)*b.SizeOf("zend_string *"))
-	ZendCompileMethodRef(method_ref_ast, precedence.GetTraitMethod())
+	compiler.CompileMethodRef(method_ref_ast, precedence.GetTraitMethod())
 	precedence.SetNumExcludes(insteadof_list.GetChildren())
 	for i = 0; i < insteadof_list.GetChildren(); i++ {
 		var name_ast *ZendAst = insteadof_list.GetChild()[i]
@@ -590,7 +590,7 @@ func ZendCompileTraitPrecedence(ast *ZendAst) {
 	}
 	ZendAddToList(CG__().GetActiveClassEntry().GetTraitPrecedences(), precedence)
 }
-func ZendCompileTraitAlias(ast *ZendAst) {
+func (compiler *Compiler) CompileTraitAlias(ast *ZendAst) {
 	var method_ref_ast *ZendAst = ast.GetChild()[0]
 	var alias_ast *ZendAst = ast.GetChild()[1]
 	var modifiers uint32 = ast.GetAttr()
@@ -603,7 +603,7 @@ func ZendCompileTraitAlias(ast *ZendAst) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'final' as method modifier")
 	}
 	alias = Emalloc(b.SizeOf("zend_trait_alias"))
-	ZendCompileMethodRef(method_ref_ast, alias.GetTraitMethod())
+	compiler.CompileMethodRef(method_ref_ast, alias.GetTraitMethod())
 	alias.SetModifiers(modifiers)
 	if alias_ast != nil {
 		alias.SetAlias(ZendAstGetStr(alias_ast).Copy())
@@ -612,7 +612,7 @@ func ZendCompileTraitAlias(ast *ZendAst) {
 	}
 	ZendAddToList(CG__().GetActiveClassEntry().GetTraitAliases(), alias)
 }
-func ZendCompileUseTrait(ast *ZendAst) {
+func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 	var traits *ZendAstList = ZendAstGetList(ast.GetChild()[0])
 	var adaptations *ZendAstList = b.CondF1(ast.GetChild()[1] != nil, func() *ZendAstList { return ZendAstGetList(ast.GetChild()[1]) }, nil)
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
@@ -644,15 +644,15 @@ func ZendCompileUseTrait(ast *ZendAst) {
 		var adaptation_ast *ZendAst = adaptations.GetChild()[i]
 		switch adaptation_ast.GetKind() {
 		case ZEND_AST_TRAIT_PRECEDENCE:
-			ZendCompileTraitPrecedence(adaptation_ast)
+			compiler.CompileTraitPrecedence(adaptation_ast)
 		case ZEND_AST_TRAIT_ALIAS:
-			ZendCompileTraitAlias(adaptation_ast)
+			compiler.CompileTraitAlias(adaptation_ast)
 		default:
 
 		}
 	}
 }
-func ZendCompileImplements(ast *ZendAst) {
+func (compiler *Compiler) CompileImplements(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 
@@ -674,7 +674,7 @@ func ZendGenerateAnonClassName(start_lineno uint32) *types.String {
 	var result = ZendSprintf("class@anonymous%c%s:%u$%d", '\000', filename, start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.NewString(result)
 }
-func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *types.ZendOp {
+func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *types.ZendOp {
 	var decl *ZendAstDecl = (*ZendAstDecl)(ast)
 	var extends_ast *ZendAst = decl.GetChild()[0]
 	var implements_ast *ZendAst = decl.GetChild()[1]
@@ -738,7 +738,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *types.ZendOp {
 			extends_name = ZendAstGetStr(extends_ast)
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", extends_name.GetVal())
 		}
-		ZendCompileExpr(&extends_node, extends_ast)
+		compiler.CompileExpr(&extends_node, extends_ast)
 		if extends_node.GetOpType() != IS_CONST || extends_node.GetConstant().GetType() != types.IS_STRING {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 		}
@@ -747,7 +747,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *types.ZendOp {
 		ce.SetIsInherited(true)
 	}
 	CG__().SetActiveClassEntry(ce)
-	ZendCompileStmt(stmt_ast)
+	compiler.CompileStmt(stmt_ast)
 
 	/* Reset lineno for final opcodes and errors */
 
@@ -786,7 +786,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *types.ZendOp {
 		}
 	}
 	if implements_ast != nil {
-		ZendCompileImplements(implements_ast)
+		compiler.CompileImplements(implements_ast)
 	}
 	if (ce.GetCeFlags() & (types.AccImplicitAbstractClass | types.AccInterface | types.AccTrait | types.AccExplicitAbstractClass)) == types.AccImplicitAbstractClass {
 		ZendVerifyAbstractClass(ce)
