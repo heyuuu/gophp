@@ -113,41 +113,46 @@ func OpenFileForScanning(fileHandle *FileHandle) int {
 	return types.SUCCESS
 }
 func ZendCompile(type_ int) *types.ZendOpArray {
-	var op_array *types.ZendOpArray = nil
-	var original_in_compilation zend_bool = CG__().in_compilation
+	// backup
+	var originalInCompilation = CG__().in_compilation
+
+	// reset
 	CG__().in_compilation = 1
 	CG__().ast = nil
-	CG__().ast_arena = zend_arena_create(1024 * 32)
+	CG__().ast_arena = ZendArenaCreate(1024 * 32)
+
+	var opArray *types.ZendOpArray = nil
 	if !(Zendparse()) {
 		var last_lineno int = CG__().zend_lineno
-		var original_file_context ZendFileContext
-		var original_oparray_context ZendOparrayContext
-		var original_active_op_array int = CG__().GetActiveOpArray()
-		op_array = InitOpArrayEx()
-		CG__().active_op_array = op_array
+		var originalFileContext ZendFileContext
+		var originalOparrayContext ZendOparrayContext
+		var originalActiveOpArray = CG__().GetActiveOpArray()
+		opArray = InitOpArrayEx()
+		CG__().active_op_array = opArray
+
+		compiler := CurrCompiler()
 
 		/* Use heap to not waste arena memory */
-
-		op_array.fn_flags |= types.AccHeapRtCache
-		if zend_ast_process {
-			zend_ast_process(CG__().ast)
-		}
-		zend_file_context_begin(&original_file_context)
-		zend_oparray_context_begin(&original_oparray_context)
-		zend_compile_top_stmt(CG__().ast)
+		opArray.AddFnFlags(types.AccHeapRtCache)
+		ZendFileContextBegin(&originalFileContext)
+		ZendOparrayContextBegin(&originalOparrayContext)
+		compiler.CompileTopStmt(CG__().ast)
 		CG__().zend_lineno = last_lineno
-		zend_emit_final_return(type_ == ZEND_USER_FUNCTION)
-		op_array.line_start = 1
-		op_array.line_end = last_lineno
-		pass_two(op_array)
-		zend_oparray_context_end(&original_oparray_context)
-		zend_file_context_end(&original_file_context)
-		CG__().active_op_array = original_active_op_array
+		ZendEmitFinalReturn(type_ == ZEND_USER_FUNCTION)
+		opArray.line_start = 1
+		opArray.line_end = last_lineno
+		compiler.PassTwo(opArray)
+		ZendOparrayContextEnd(&originalOparrayContext)
+		ZendFileContextEnd(&originalFileContext)
+		CG__().active_op_array = originalActiveOpArray
 	}
-	zend_ast_destroy(CG__().ast)
-	zend_arena_destroy(CG__().ast_arena)
-	CG__().in_compilation = original_in_compilation
-	return op_array
+	ZendAstDestroy(CG__().ast)
+	ZendArenaDestroy(CG__().ast_arena)
+
+	// restore
+	CG__().in_compilation = originalInCompilation
+
+	return opArray
 }
 func CompileFilename(type_ int, filename *types.Zval) int {
 	var tmp types.Zval

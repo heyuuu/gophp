@@ -452,7 +452,7 @@ func (compiler *Compiler) CompileFuncDecl(result *Znode, ast *ZendAst, toplevel 
 
 	compiler.setLinenoByDeclEnd(decl)
 	ZendDoExtendedStmt()
-	ZendEmitFinalReturn(0)
+	ZendEmitFinalReturn(false)
 	compiler.PassTwo(CG__().GetActiveOpArray())
 	ZendOparrayContextEnd(&orig_oparray_context)
 

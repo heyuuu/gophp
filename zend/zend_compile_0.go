@@ -181,6 +181,22 @@ func ZendEndNamespace() {
 		FC__().SetCurrentNamespace(nil)
 	}
 }
+func ZendFileContextBegin(prevContext *ZendFileContext) {
+	*prevContext = *CG__().GetFileContext()
+	FC__().SetImports(nil)
+	FC__().SetImportsFunction(nil)
+	FC__().SetImportsConst(nil)
+	FC__().SetCurrentNamespace(nil)
+	FC__().SetInNamespace(0)
+	FC__().SetHasBracketedNamespaces(0)
+	FC__().InitSeenSymbols()
+}
+func ZendFileContextEnd(prevContext *ZendFileContext) {
+	ZendEndNamespace()
+	FC__().GetSeenSymbols().Destroy()
+	CG__().SetFileContext(*prevContext)
+}
+
 func ZendInitCompilerDataStructures() {
 	CG__().GetLoopVarStack().Init()
 	CG__().GetDelayedOplinesStack().Init()

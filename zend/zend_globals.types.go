@@ -145,7 +145,6 @@ func (this *ZendCompilerGlobals) GetArena() *ZendArena                 { return 
 func (this *ZendCompilerGlobals) GetAst() *ZendAst                     { return this.ast }
 func (this *ZendCompilerGlobals) SetAst(value *ZendAst)                { this.ast = value }
 func (this *ZendCompilerGlobals) GetAstArena() *ZendArena              { return this.ast_arena }
-func (this *ZendCompilerGlobals) SetAstArena(value *ZendArena)         { this.ast_arena = value }
 func (this *ZendCompilerGlobals) GetDelayedOplinesStack() ZendStack {
 	return this.delayed_oplines_stack
 }

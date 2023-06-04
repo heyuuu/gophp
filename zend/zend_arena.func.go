@@ -10,7 +10,14 @@ import (
 
 type ZendArena struct{}
 
-func ZendArenaAlloc(arena_ptr **ZendArena, size int) any {
+func ZendArenaCreate(size int) *ZendArena {
+	return &ZendArena{}
+}
+
+func ZendArenaAlloc(arena_ptr *ZendArena, size int) any {
 	// 直接申请一块内存
 	return b.Malloc(size)
+}
+
+func ZendArenaDestroy(arena_ptr *ZendArena) {
 }

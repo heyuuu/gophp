@@ -49,7 +49,7 @@ type ZendFileContext struct {
 	imports                  ImportNames
 	imports_function         ImportNames
 	imports_const            ImportNames
-	seen_symbols             types.Array
+	seen_symbols             *types.Array
 }
 
 func (this *ZendFileContext) ResetImportTables() {
@@ -98,9 +98,10 @@ func (this *ZendFileContext) GetHasBracketedNamespaces() types.ZendBool {
 func (this *ZendFileContext) SetHasBracketedNamespaces(value types.ZendBool) {
 	this.has_bracketed_namespaces = value
 }
-func (this *ZendFileContext) GetSeenSymbols() *types.Array { return &this.seen_symbols }
-
-// func (this *ZendFileContext) SetSeenSymbols(value HashTable) { this.seen_symbols = value }
+func (this *ZendFileContext) InitSeenSymbols() {
+	this.seen_symbols = types.NewArray(0)
+}
+func (this *ZendFileContext) GetSeenSymbols() *types.Array { return this.seen_symbols }
 
 /**
  * ZendParserStackElem

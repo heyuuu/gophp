@@ -27,7 +27,7 @@ func ZendMakeTmpResult(result *Znode, opline *types.ZendOp) {
 		result.SetOp(opline.GetResult())
 	}
 }
-func ZendEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *types.ZendOp {
+func ZendEmitOp(result *Znode, opcode OpCode, op1 *Znode, op2 *Znode) *types.ZendOp {
 	var opline *types.ZendOp = GetNextOp()
 	opline.SetOpcode(opcode)
 	if op1 != nil {
@@ -51,7 +51,7 @@ func ZendEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *types.Zend
 	}
 	return opline
 }
-func ZendEmitOpTmp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *types.ZendOp {
+func ZendEmitOpTmp(result *Znode, opcode OpCode, op1 *Znode, op2 *Znode) *types.ZendOp {
 	var opline *types.ZendOp = GetNextOp()
 	opline.SetOpcode(opcode)
 	if op1 != nil {
@@ -286,20 +286,20 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit typ
 		}
 	}
 }
-func ZendEmitFinalReturn(return_one int) {
+func ZendEmitFinalReturn(returnOne bool) {
 	var zn Znode
 	var ret *types.ZendOp
-	var returns_reference types.ZendBool = CG__().GetActiveOpArray().IsReturnReference()
+	var returnsReference = CG__().GetActiveOpArray().IsReturnReference()
 	if CG__().GetActiveOpArray().IsHasReturnType() && !CG__().GetActiveOpArray().IsGenerator() {
 		ZendEmitReturnTypeCheck(nil, CG__().GetActiveOpArray().GetArgInfo()-1, 1)
 	}
 	zn.SetOpType(IS_CONST)
-	if return_one != 0 {
+	if returnOne {
 		zn.GetConstant().SetLong(1)
 	} else {
 		zn.GetConstant().SetNull()
 	}
-	ret = ZendEmitOp(nil, b.Cond(returns_reference != 0, ZEND_RETURN_BY_REF, ZEND_RETURN), &zn, nil)
+	ret = ZendEmitOp(nil, b.Cond(returnsReference, ZEND_RETURN_BY_REF, ZEND_RETURN), &zn, nil)
 	ret.SetExtendedValue(-1)
 }
 func ZendIsVariable(ast *ZendAst) types.ZendBool {
