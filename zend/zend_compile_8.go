@@ -492,7 +492,7 @@ func (compiler *Compiler) CompileArray(result *Znode, ast *ZendAst) {
 	var i uint32
 	var opnum_init uint32 = -1
 	var packed types.ZendBool = 1
-	if ZendTryCtEvalArray(result.GetConstant(), ast) != 0 {
+	if compiler.TryCtEvalArray(result.GetConstant(), ast) != 0 {
 		result.SetOpType(IS_CONST)
 		return
 	}
@@ -617,8 +617,8 @@ func (compiler *Compiler) CompileClassConst(result *Znode, ast *ZendAst) {
 	var class_node Znode
 	var const_node Znode
 	var opline *types.ZendOp
-	ZendEvalConstExpr(ast.GetChild()[0])
-	ZendEvalConstExpr(ast.GetChild()[1])
+	compiler.EvalConstExpr(ast.GetChild()[0])
+	compiler.EvalConstExpr(ast.GetChild()[1])
 	class_ast = ast.GetChild()[0]
 	const_ast = ast.GetChild()[1]
 	if class_ast.GetKind() == ZEND_AST_ZVAL {

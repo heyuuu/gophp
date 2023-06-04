@@ -35,7 +35,7 @@ func (compiler *Compiler) CompileClosureBinding(closure *Znode, op_array *types.
 		if value == nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use variable $%s twice", var_name.GetVal())
 		}
-		CG__().SetZendLineno(ZendAstGetLineno(var_name_ast))
+		compiler.setLinenoByAstEx(var_name_ast)
 		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
 		opline.SetOp2Type(IS_CV)
 		opline.GetOp2().SetVar(LookupCv(var_name))
@@ -140,7 +140,7 @@ func (compiler *Compiler) CompileClosureUses(ast *ZendAst) {
 		if j := op_array.FindVarName(var_name.GetStr()); j >= 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use lexical variable $%s as a parameter name", var_name.GetVal())
 		}
-		CG__().SetZendLineno(ZendAstGetLineno(var_ast))
+		compiler.setLinenoByAstEx(var_ast)
 		compiler.CompileStaticVarCommon(var_name, &zv, b.Cond(var_ast.GetAttr() != 0, ZEND_BIND_REF, 0))
 	}
 }
@@ -450,10 +450,10 @@ func (compiler *Compiler) CompileFuncDecl(result *Znode, ast *ZendAst, toplevel 
 
 	/* put the implicit return on the really last line */
 
-	CG__().SetZendLineno(decl.GetEndLineno())
+	compiler.setLinenoByDeclEnd(decl)
 	ZendDoExtendedStmt()
 	ZendEmitFinalReturn(0)
-	PassTwo(CG__().GetActiveOpArray())
+	compiler.PassTwo(CG__().GetActiveOpArray())
 	ZendOparrayContextEnd(&orig_oparray_context)
 
 	/* Pop the loop variable stack separator */
@@ -501,7 +501,7 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::$%s", ce.Name(), name.GetVal())
 		}
 		if value_ast != nil {
-			ZendConstExprToZval(&value_zv, value_ast)
+			compiler.ConstExprToZval(&value_zv, value_ast)
 			if type_.IsSet() && !(value_zv.IsConstantAst()) {
 				if value_zv.IsNull() {
 					if !(type_.AllowNull()) {
@@ -562,7 +562,7 @@ func (compiler *Compiler) CompileClassConstDecl(ast *ZendAst) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'final' as constant modifier")
 			}
 		}
-		ZendConstExprToZval(&value_zv, value_ast)
+		compiler.ConstExprToZval(&value_zv, value_ast)
 		ZendDeclareClassConstantEx(ce, name, &value_zv, ast.GetAttr(), doc_comment)
 	}
 }
@@ -751,7 +751,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel types.ZendBool
 
 	/* Reset lineno for final opcodes and errors */
 
-	CG__().SetZendLineno(ast.GetLineno())
+	compiler.setLinenoByAst(ast)
 	if !ce.IsImplementTraits() {
 
 		/* For traits this check is delayed until after trait binding */
@@ -799,12 +799,12 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel types.ZendBool
 		if extends_ast != nil {
 			var parent_ce *types.ClassEntry = ZendLookupClassEx(ce.GetParentName(), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if parent_ce != nil && (!parent_ce.IsInternalClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_CLASSES) == 0) && (!parent_ce.IsUserClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || parent_ce.GetFilename() == ce.GetFilename()) {
-				CG__().SetZendLineno(decl.GetEndLineno())
+				compiler.setLinenoByDeclEnd(decl)
 				if ZendTryEarlyBind(ce, parent_ce, lcname) {
-					CG__().SetZendLineno(ast.GetLineno())
+					compiler.setLinenoByAst(ast)
 					return nil
 				}
-				CG__().SetZendLineno(ast.GetLineno())
+				compiler.setLinenoByAst(ast)
 			}
 		} else {
 			if CG__().ClassTable().Add(lcname.GetStr(), ce) {

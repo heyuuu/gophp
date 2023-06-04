@@ -364,7 +364,7 @@ func (compiler *Compiler) CompileStaticVar(ast *ZendAst) {
 	var value_ast *ZendAst = ast.GetChild()[1]
 	var value_zv types.Zval
 	if value_ast != nil {
-		ZendConstExprToZval(&value_zv, value_ast)
+		compiler.ConstExprToZval(&value_zv, value_ast)
 	} else {
 		value_zv.SetNull()
 	}
@@ -604,7 +604,7 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 	opline.GetOp1().SetNum(CG__().GetContext().GetCurrentBrkCont())
 	opline.GetOp2().SetNum(depth)
 }
-func ZendResolveGotoLabel(op_array *types.ZendOpArray, opline *types.ZendOp) {
+func (compiler *Compiler) ResolveGotoLabel(op_array *types.ZendOpArray, opline *types.ZendOp) {
 	var dest *ZendLabel
 	var current int
 	var remove_oplines int = opline.GetOp1().GetNum()
@@ -614,7 +614,7 @@ func ZendResolveGotoLabel(op_array *types.ZendOpArray, opline *types.ZendOp) {
 	if dest = CG__().GetContext().GetLabel(label.StringVal()); dest == nil {
 		CG__().SetInCompilation(1)
 		CG__().SetActiveOpArray(op_array)
-		CG__().SetZendLineno(opline.GetLineno())
+		compiler.setLinenoByOpline(opline)
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'goto' to undefined label '%s'", label.String().GetVal())
 	}
 
@@ -624,7 +624,7 @@ func ZendResolveGotoLabel(op_array *types.ZendOpArray, opline *types.ZendOp) {
 		if current == -1 {
 			CG__().SetInCompilation(1)
 			CG__().SetActiveOpArray(op_array)
-			CG__().SetZendLineno(opline.GetLineno())
+			compiler.setLinenoByOpline(opline)
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'goto' into loop or switch statement is disallowed")
 		}
 		if CG__().GetContext().GetBrkContArray()[current].GetStart() >= 0 {
@@ -822,7 +822,7 @@ func (compiler *Compiler) CompileForeach(ast *ZendAst) {
 	 * better to use the end line, but this information is not available
 	 * currently. */
 
-	CG__().SetZendLineno(ast.GetLineno())
+	compiler.setLinenoByAst(ast)
 	ZendEmitJump(opnum_fetch)
 	opline = CG__().GetActiveOpArray().GetOpcodes()[opnum_reset]
 	opline.GetOp2().SetOplineNum(GetNextOpNumber())

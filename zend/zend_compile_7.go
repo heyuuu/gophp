@@ -127,7 +127,7 @@ func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
 		var value_node Znode
 		var value_zv *types.Zval = value_node.GetConstant()
 		value_node.SetOpType(IS_CONST)
-		ZendConstExprToZval(value_zv, value_ast)
+		compiler.ConstExprToZval(value_zv, value_ast)
 		if ZendLookupReservedConst(unqualified_name.GetStr()) != nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare constant '%s'", unqualified_name.GetVal())
 		}
@@ -350,7 +350,8 @@ func ZendCtEvalGreater(result *types.Zval, kind ZendAstKind, op1 *types.Zval, op
 	var fn BinaryOpType = b.Cond(kind == ZEND_AST_GREATER, operators.IsSmallerFunction, operators.IsSmallerOrEqualFunction)
 	fn(result, op2, op1)
 }
-func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
+
+func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var last_elem_ast *ZendAst = nil
 	var i uint32
@@ -368,18 +369,18 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 			/* Report error at line of last non-empty element */
 
 			if last_elem_ast != nil {
-				CG__().SetZendLineno(ZendAstGetLineno(last_elem_ast))
+				compiler.setLinenoByAstEx(last_elem_ast)
 			}
 			faults.Error(faults.E_COMPILE_ERROR, "Cannot use empty array elements in arrays")
 		}
 		if elem_ast.GetKind() != ZEND_AST_UNPACK {
-			ZendEvalConstExpr(elem_ast.GetChild()[0])
-			ZendEvalConstExpr(elem_ast.GetChild()[1])
+			compiler.EvalConstExpr(elem_ast.GetChild()[0])
+			compiler.EvalConstExpr(elem_ast.GetChild()[1])
 			if elem_ast.GetAttr() != 0 || elem_ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL || elem_ast.GetChild()[1] != nil && elem_ast.GetChild()[1].GetKind() != ZEND_AST_ZVAL {
 				is_constant = 0
 			}
 		} else {
-			ZendEvalConstExpr(elem_ast.GetChild()[0])
+			compiler.EvalConstExpr(elem_ast.GetChild()[0])
 			if elem_ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 				is_constant = 0
 			}

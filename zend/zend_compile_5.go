@@ -44,7 +44,7 @@ func (compiler *Compiler) CompileIf(ast *ZendAst) {
 		Efree(jmp_opnums)
 	}
 }
-func DetermineSwitchJumptableType(cases *ZendAstList) uint8 {
+func (compiler *Compiler) DetermineSwitchJumptableType(cases *ZendAstList) uint8 {
 	var i uint32
 	var common_type uint8 = types.IS_UNDEF
 	for i = 0; i < cases.GetChildren(); i++ {
@@ -60,7 +60,7 @@ func DetermineSwitchJumptableType(cases *ZendAstList) uint8 {
 			/* Skip default clause */
 
 		}
-		ZendEvalConstExpr(cond_ast)
+		compiler.EvalConstExpr(cond_ast)
 		if cond_ast.GetKind() != ZEND_AST_ZVAL {
 
 			/* Non-constant case */
@@ -138,7 +138,7 @@ func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 	ZendBeginLoop(ZEND_FREE, &expr_node, 1)
 	case_node.SetOpType(IS_TMP_VAR)
 	case_node.GetOp().SetVar(GetTemporaryVariable())
-	jumptable_type = DetermineSwitchJumptableType(cases)
+	jumptable_type = compiler.DetermineSwitchJumptableType(cases)
 	if jumptable_type != types.IS_UNDEF && ShouldUseJumptable(cases, jumptable_type) != 0 {
 		var jumptable_op Znode
 		jumptable = types.NewArray(cases.GetChildren())
@@ -157,7 +157,7 @@ func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 		var cond_node Znode
 		if cond_ast == nil {
 			if has_default_case != 0 {
-				CG__().SetZendLineno(case_ast.GetLineno())
+				compiler.setLinenoByAst(case_ast)
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Switch statements may only contain one default clause")
 			}
 			has_default_case = 1
@@ -280,7 +280,7 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 		var is_last_catch types.ZendBool = i+1 == catches.GetChildren()
 		var jmp_multicatch *uint32 = SafeEmalloc(b.SizeOf("uint32_t"), classes.GetChildren()-1, 0)
 		var opnum_catch uint32 = uint32 - 1
-		CG__().SetZendLineno(catch_ast.GetLineno())
+		compiler.setLinenoByAst(catch_ast)
 		for j = 0; j < classes.GetChildren(); j++ {
 			var class_ast *ZendAst = classes.GetChild()[j]
 			var is_last_class types.ZendBool = j+1 == classes.GetChildren()
@@ -341,7 +341,7 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 		discard_exception.SetVarType(IS_TMP_VAR)
 		discard_exception.SetVarNum(CG__().GetContext().GetFastCallVar())
 		CG__().GetLoopVarStack().Push(&discard_exception)
-		CG__().SetZendLineno(finally_ast.GetLineno())
+		compiler.setLinenoByAst(finally_ast)
 		opline = ZendEmitOp(nil, ZEND_FAST_CALL, nil, nil)
 		opline.GetOp1().SetNum(try_catch_offset)
 		opline.SetResultType(IS_TMP_VAR)
@@ -423,7 +423,7 @@ func (compiler *Compiler) CompileDeclare(ast *ZendAst) {
 			if ast.GetChild()[1] != nil {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must not "+"use block mode")
 			}
-			ZendConstExprToZval(&value_zv, value_ast)
+			compiler.ConstExprToZval(&value_zv, value_ast)
 			if value_zv.GetType() != types.IS_LONG || value_zv.Long() != 0 && value_zv.Long() != 1 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must have 0 or 1 as its value")
 			}
@@ -544,7 +544,7 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 			CG__().SetCompilerOptions(CG__().GetCompilerOptions() | ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION | ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION)
 			opcode = ZEND_RECV_INIT
 			default_node.SetOpType(IS_CONST)
-			ZendConstExprToZval(default_node.GetConstant(), default_ast)
+			compiler.ConstExprToZval(default_node.GetConstant(), default_ast)
 			CG__().SetCompilerOptions(cops)
 		} else {
 			opcode = ZEND_RECV

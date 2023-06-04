@@ -109,12 +109,12 @@ func (compiler *Compiler) CompileConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_MAGIC_CONST:
 		compiler.CompileConstExprMagicConst(ast_ptr)
 	default:
-		ZendAstApply(ast, ZendCompileConstExpr)
+		ZendAstApply(ast, compiler.CompileConstExpr)
 	}
 }
-func ZendConstExprToZval(result *types.Zval, ast *ZendAst) {
+func (compiler *Compiler) ConstExprToZval(result *types.Zval, ast *ZendAst) {
 	var orig_ast *ZendAst = ast
-	ZendEvalConstExpr(&ast)
+	compiler.EvalConstExpr(&ast)
 	compiler.CompileConstExpr(&ast)
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		types.ZVAL_COPY_VALUE(result, ZendAstGetZval(ast))
@@ -152,13 +152,13 @@ func (compiler *Compiler) CompileTopStmt(ast *ZendAst) {
 		return
 	}
 	if ast.GetKind() == ZEND_AST_FUNC_DECL {
-		CG__().SetZendLineno(ast.GetLineno())
+		compiler.setLinenoByAst(ast)
 		compiler.CompileFuncDecl(nil, ast, 1)
-		CG__().SetZendLineno((*ZendAstDecl)(ast).GetEndLineno())
+		compiler.setLinenoByDeclEnd((*ZendAstDecl)(ast))
 	} else if ast.GetKind() == ZEND_AST_CLASS {
-		CG__().SetZendLineno(ast.GetLineno())
+		compiler.setLinenoByAst(ast)
 		compiler.CompileClassDecl(ast, 1)
-		CG__().SetZendLineno((*ZendAstDecl)(ast).GetEndLineno())
+		compiler.setLinenoByDeclEnd((*ZendAstDecl)(ast))
 	} else {
 		compiler.CompileStmt(ast)
 	}
@@ -171,7 +171,7 @@ func (compiler *Compiler) CompileStmt(ast *ZendAst) {
 	if ast == nil {
 		return
 	}
-	CG__().SetZendLineno(ast.GetLineno())
+	compiler.setLinenoByAst(ast)
 	if (CG__().GetCompilerOptions()&ZEND_COMPILE_EXTENDED_STMT) != 0 && ZendIsUntickedStmt(ast) == 0 {
 		ZendDoExtendedStmt()
 	}
@@ -246,7 +246,7 @@ func (compiler *Compiler) CompileStmt(ast *ZendAst) {
 func (compiler *Compiler) CompileExpr(result *Znode, ast *ZendAst) {
 	/* CG(zend_lineno) = ast->lineno; */
 
-	CG__().SetZendLineno(ZendAstGetLineno(ast))
+	compiler.setLinenoByAstEx(ast)
 	if CG__().GetMemoizeMode() != ZEND_MEMOIZE_NONE {
 		compiler.CompileMemoizedExpr(result, ast)
 		return
@@ -389,7 +389,7 @@ func (compiler *Compiler) CompileExpr(result *Znode, ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
-	CG__().SetZendLineno(ZendAstGetLineno(ast))
+	compiler.setLinenoByAstEx(ast)
 	switch ast.GetKind() {
 	case ZEND_AST_VAR:
 		return compiler.CompileSimpleVar(result, ast, type_, 0)
@@ -437,7 +437,8 @@ func ZendDelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref typ
 		return compiler.CompileVar(result, ast, type_, 0)
 	}
 }
-func ZendEvalConstExpr(ast_ptr **ZendAst) {
+
+func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var result types.Zval
 	if ast == nil {
@@ -445,8 +446,8 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	}
 	switch ast.GetKind() {
 	case ZEND_AST_BINARY_OP:
-		ZendEvalConstExpr(ast.GetChild()[0])
-		ZendEvalConstExpr(ast.GetChild()[1])
+		compiler.EvalConstExpr(ast.GetChild()[0])
+		compiler.EvalConstExpr(ast.GetChild()[1])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL || ast.GetChild()[1].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
@@ -456,8 +457,8 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_GREATER:
 		fallthrough
 	case ZEND_AST_GREATER_EQUAL:
-		ZendEvalConstExpr(ast.GetChild()[0])
-		ZendEvalConstExpr(ast.GetChild()[1])
+		compiler.EvalConstExpr(ast.GetChild()[0])
+		compiler.EvalConstExpr(ast.GetChild()[1])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL || ast.GetChild()[1].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
@@ -467,8 +468,8 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_OR:
 		var child0_is_true types.ZendBool
 		var child1_is_true types.ZendBool
-		ZendEvalConstExpr(ast.GetChild()[0])
-		ZendEvalConstExpr(ast.GetChild()[1])
+		compiler.EvalConstExpr(ast.GetChild()[0])
+		compiler.EvalConstExpr(ast.GetChild()[1])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
@@ -487,7 +488,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			result.SetBool(child0_is_true != 0 && child1_is_true != 0)
 		}
 	case ZEND_AST_UNARY_OP:
-		ZendEvalConstExpr(ast.GetChild()[0])
+		compiler.EvalConstExpr(ast.GetChild()[0])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
@@ -495,7 +496,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_UNARY_PLUS:
 		fallthrough
 	case ZEND_AST_UNARY_MINUS:
-		ZendEvalConstExpr(ast.GetChild()[0])
+		compiler.EvalConstExpr(ast.GetChild()[0])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
@@ -509,16 +510,16 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if ast.GetChild()[0].GetKind() == ZEND_AST_DIM {
 			ast.GetChild()[0].SetAttr(ast.GetChild()[0].GetAttr() | ZEND_DIM_IS)
 		}
-		ZendEvalConstExpr(ast.GetChild()[0])
+		compiler.EvalConstExpr(ast.GetChild()[0])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 
 			/* ensure everything was compile-time evaluated at least once */
 
-			ZendEvalConstExpr(ast.GetChild()[1])
+			compiler.EvalConstExpr(ast.GetChild()[1])
 			return
 		}
 		if ZendAstGetZval(ast.GetChild()[0]).IsNull() {
-			ZendEvalConstExpr(ast.GetChild()[1])
+			compiler.EvalConstExpr(ast.GetChild()[1])
 			*ast_ptr = ast.GetChild()[1]
 			ast.GetChild()[1] = nil
 			ZendAstDestroy(ast)
@@ -531,15 +532,15 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_CONDITIONAL:
 		var child **ZendAst
 		var child_ast **ZendAst
-		ZendEvalConstExpr(ast.GetChild()[0])
+		compiler.EvalConstExpr(ast.GetChild()[0])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 
 			/* ensure everything was compile-time evaluated at least once */
 
 			if ast.GetChild()[1] != nil {
-				ZendEvalConstExpr(ast.GetChild()[1])
+				compiler.EvalConstExpr(ast.GetChild()[1])
 			}
-			ZendEvalConstExpr(ast.GetChild()[2])
+			compiler.EvalConstExpr(ast.GetChild()[2])
 			return
 		}
 		child = ast.GetChild()[2-operators.IZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))]
@@ -550,7 +551,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		*child = nil
 		ZendAstDestroy(ast)
 		*ast_ptr = child_ast
-		ZendEvalConstExpr(ast_ptr)
+		compiler.EvalConstExpr(ast_ptr)
 		return
 	case ZEND_AST_DIM:
 
@@ -571,8 +572,8 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if (ast.GetAttr()&ZEND_DIM_IS) != 0 && ast.GetChild()[0].GetKind() == ZEND_AST_DIM {
 			ast.GetChild()[0].SetAttr(ast.GetChild()[0].GetAttr() | ZEND_DIM_IS)
 		}
-		ZendEvalConstExpr(ast.GetChild()[0])
-		ZendEvalConstExpr(ast.GetChild()[1])
+		compiler.EvalConstExpr(ast.GetChild()[0])
+		compiler.EvalConstExpr(ast.GetChild()[1])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL || ast.GetChild()[1].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
@@ -616,7 +617,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			return
 		}
 	case ZEND_AST_ARRAY:
-		if ZendTryCtEvalArray(&result, ast) == 0 {
+		if compiler.TryCtEvalArray(&result, ast) == 0 {
 			return
 		}
 	case ZEND_AST_MAGIC_CONST:
@@ -633,8 +634,8 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		var class_ast *ZendAst
 		var name_ast *ZendAst
 		var resolved_name *types.String
-		ZendEvalConstExpr(ast.GetChild()[0])
-		ZendEvalConstExpr(ast.GetChild()[1])
+		compiler.EvalConstExpr(ast.GetChild()[0])
+		compiler.EvalConstExpr(ast.GetChild()[1])
 		class_ast = ast.GetChild()[0]
 		name_ast = ast.GetChild()[1]
 		if class_ast.GetKind() != ZEND_AST_ZVAL || name_ast.GetKind() != ZEND_AST_ZVAL {

@@ -1,4 +1,45 @@
 package zend
 
+import "github.com/heyuuu/gophp/php/types"
+
+var currCompiler = &Compiler{}
+
+func CurrCompiler() *Compiler {
+	return currCompiler
+}
+
 type Compiler struct {
+	lineno uint32 // 从 CG__.zend_lineno 中剥离，专用于 OpCode 生成过程
+}
+
+func (compiler *Compiler) initOp(op *types.ZendOp) *types.ZendOp {
+	if op == nil {
+		op = types.NewOp(compiler.lineno)
+	} else {
+		op.SetNop()
+		op.SetExtendedValue(0)
+		op.SetLineno(compiler.lineno)
+	}
+	return op
+}
+
+func (compiler *Compiler) setLineno(lineno uint32) {
+	compiler.lineno = lineno
+}
+
+func (compiler *Compiler) setLinenoByAst(ast *ZendAst) {
+	compiler.setLineno(ast.GetLineno())
+}
+
+func (compiler *Compiler) setLinenoByAstEx(ast *ZendAst) {
+	lineno := ZendAstGetLineno(ast)
+	compiler.setLineno(lineno)
+}
+
+func (compiler *Compiler) setLinenoByOpline(opline *types.ZendOp) {
+	compiler.setLineno(opline.GetLineno())
+}
+
+func (compiler *Compiler) setLinenoByDeclEnd(decl *ZendAstDecl) {
+	compiler.setLineno(decl.GetEndLineno())
 }

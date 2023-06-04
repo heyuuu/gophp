@@ -162,9 +162,8 @@ func ZendUpdateJumpTarget(opnum_jump uint32, opnum_target uint32) {
 func ZendUpdateJumpTargetToNext(opnum_jump uint32) {
 	ZendUpdateJumpTarget(opnum_jump, GetNextOpNumber())
 }
-func ZendDelayedEmitOp(result *Znode, opcode uint8, op1 *Znode, op2 *Znode) *types.ZendOp {
-	var tmp_opline types.ZendOp
-	InitOp(&tmp_opline)
+func ZendDelayedEmitOp(result *Znode, opcode OpCode, op1 *Znode, op2 *Znode) *types.ZendOp {
+	var tmp_opline *types.ZendOp = CurrCompiler().initOp(nil)
 	tmp_opline.SetOpcode(opcode)
 	if op1 != nil {
 		tmp_opline.SetOp1Type(op1.GetOpType())

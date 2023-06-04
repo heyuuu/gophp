@@ -195,7 +195,7 @@ func (compiler *Compiler) CompileArgs(ast *ZendAst, fbc types.IFunction) uint32 
 			} else {
 				for {
 					if arg.GetKind() == ZEND_AST_VAR {
-						CG__().SetZendLineno(ZendAstGetLineno(ast))
+						compiler.setLinenoByAstEx(ast)
 						if IsThisFetch(arg) {
 							ZendEmitOp(&arg_node, ZEND_FETCH_THIS, nil, nil)
 							opcode = ZEND_SEND_VAR_EX
@@ -589,7 +589,7 @@ func (compiler *Compiler) CompileFuncInArray(result *Znode, args *ZendAstList) i
 	} else if args.GetChildren() != 2 {
 		return types.FAILURE
 	}
-	if args.GetChild()[1].GetKind() != ZEND_AST_ARRAY || ZendTryCtEvalArray(array.GetConstant(), args.GetChild()[1]) == 0 {
+	if args.GetChild()[1].GetKind() != ZEND_AST_ARRAY || compiler.TryCtEvalArray(array.GetConstant(), args.GetChild()[1]) == 0 {
 		return types.FAILURE
 	}
 	if array.GetConstant().Array().Len() > 0 {

@@ -36,18 +36,18 @@ func ZendUpdateExtendedStmts(op_array *types.ZendOpArray) {
 		opline++
 	}
 }
-func ZendCheckFinallyBreakout(op_array *types.ZendOpArray, op_num uint32, dst_num uint32) {
+func (compiler *Compiler) CheckFinallyBreakout(op_array *types.ZendOpArray, op_num uint32, dst_num uint32) {
 	var i int
 	for i = 0; i < op_array.GetLastTryCatch(); i++ {
 		if (op_num < op_array.GetTryCatchArray()[i].GetFinallyOp() || op_num >= op_array.GetTryCatchArray()[i].GetFinallyEnd()) && (dst_num >= op_array.GetTryCatchArray()[i].GetFinallyOp() && dst_num <= op_array.GetTryCatchArray()[i].GetFinallyEnd()) {
 			CG__().SetInCompilation(1)
 			CG__().SetActiveOpArray(op_array)
-			CG__().SetZendLineno(op_array.GetOpcodes()[op_num].GetLineno())
+			compiler.setLinenoByOpline(op_array.GetOpcode(op_num))
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "jump into a finally block is disallowed")
 		} else if op_num >= op_array.GetTryCatchArray()[i].GetFinallyOp() && op_num <= op_array.GetTryCatchArray()[i].GetFinallyEnd() && (dst_num > op_array.GetTryCatchArray()[i].GetFinallyEnd() || dst_num < op_array.GetTryCatchArray()[i].GetFinallyOp()) {
 			CG__().SetInCompilation(1)
 			CG__().SetActiveOpArray(op_array)
-			CG__().SetZendLineno(op_array.GetOpcodes()[op_num].GetLineno())
+			compiler.setLinenoByOpline(op_array.GetOpcode(op_num))
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "jump out of a finally block is disallowed")
 		}
 	}
@@ -336,7 +336,7 @@ func ZendCalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsL
 	}
 	FreeAlloca(last_use, use_heap)
 }
-func PassTwo(op_array *types.ZendOpArray) int {
+func (compiler *Compiler) PassTwo(op_array *types.ZendOpArray) int {
 	var opline *types.ZendOp
 	var end *types.ZendOp
 	if !(ZEND_USER_CODE(op_array.GetType())) {
@@ -378,16 +378,16 @@ func PassTwo(op_array *types.ZendOpArray) int {
 		case ZEND_CONT:
 			var jmp_target uint32 = ZendGetBrkContTarget(op_array, opline)
 			if op_array.IsHasFinallyBlock() {
-				ZendCheckFinallyBreakout(op_array, opline-op_array.GetOpcodes(), jmp_target)
+				compiler.CheckFinallyBreakout(op_array, opline-op_array.GetOpcodes(), jmp_target)
 			}
 			opline.SetOpcode(ZEND_JMP)
 			opline.GetOp1().SetOplineNum(jmp_target)
 			opline.GetOp2().SetNum(0)
 			ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array, opline, opline.GetOp1())
 		case ZEND_GOTO:
-			ZendResolveGotoLabel(op_array, opline)
+			compiler.ResolveGotoLabel(op_array, opline)
 			if op_array.IsHasFinallyBlock() {
-				ZendCheckFinallyBreakout(op_array, opline-op_array.GetOpcodes(), opline.GetOp1().GetOplineNum())
+				compiler.CheckFinallyBreakout(op_array, opline-op_array.GetOpcodes(), opline.GetOp1().GetOplineNum())
 			}
 			fallthrough
 		case ZEND_JMP:

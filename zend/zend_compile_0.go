@@ -113,15 +113,6 @@ func ZendAllocCacheSlots(count unsigned) uint32 {
 	return ret
 }
 func ZendAllocCacheSlot() uint32 { return ZendAllocCacheSlots(1) }
-func InitOp(op *types.ZendOp) {
-	op.SetNop()
-	op.SetExtendedValue(0)
-	op.SetLineno(CG__().GetZendLineno())
-}
-func InitOpEx() *types.ZendOp {
-	lineno := uint32(CG__().GetZendLineno())
-	return types.NewOp(lineno)
-}
 
 func GetNextOpNumber() uint32 {
 	return CG__().GetActiveOpArray().GetLast()
@@ -135,8 +126,7 @@ func GetNextOp() *types.ZendOp {
 		op_array.SetOpcodes(Erealloc(op_array.GetOpcodes(), CG__().GetContext().GetOpcodesSize()*b.SizeOf("zend_op")))
 	}
 	next_op = &op_array.GetOpcodes()[next_op_num]
-	InitOp(next_op)
-	return next_op
+	return CurrCompiler().initOp(next_op)
 }
 func GetNextBrkContElement() *ZendBrkContElement {
 	return CG__().GetContext().AddBrkCont()

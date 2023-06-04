@@ -165,8 +165,9 @@ func (f *ZendOpArray) FindOrAddVarName(name string) int {
 }
 
 // opcode
-func (f *ZendOpArray) GetOpcodes() []ZendOp      { return f.opcodes }
-func (f *ZendOpArray) SetOpcodes(value []ZendOp) { f.opcodes = value }
+func (f *ZendOpArray) GetOpcode(num uint32) *ZendOp { return &f.opcodes[num] }
+func (f *ZendOpArray) GetOpcodes() []ZendOp         { return f.opcodes }
+func (f *ZendOpArray) SetOpcodes(value []ZendOp)    { f.opcodes = value }
 
 // literals
 func (f *ZendOpArray) GetLastLiteral() int      { return f.last_literal }
