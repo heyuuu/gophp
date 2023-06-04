@@ -8,8 +8,6 @@ func ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int 
 	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var op2 *types.Zval
-	var d1 float64
-	var d2 float64
 	op1 = executeData.GetOp1(opline)
 	op2 = executeData.GetOp2(opline)
 	return zend_is_smaller_helper_SPEC(op1, op2, executeData)

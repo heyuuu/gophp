@@ -37,8 +37,6 @@ func (compiler *Compiler) CompileConstExprClassConst(ast_ptr **ZendAst) {
 	}
 	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
 		class_name = ZendResolveClassNameAst(class_ast)
-	} else {
-		//class_name.AddRefcount()
 	}
 	name := class_name.GetStr() + "::" + const_name.GetStr()
 	ZendAstDestroy(ast)
@@ -165,7 +163,6 @@ func (compiler *Compiler) CompileTopStmt(ast *ZendAst) {
 	if ast.GetKind() != ZEND_AST_NAMESPACE && ast.GetKind() != ZEND_AST_HALT_COMPILER {
 		ZendVerifyNamespace()
 	}
-
 }
 func (compiler *Compiler) CompileStmt(ast *ZendAst) {
 	if ast == nil {

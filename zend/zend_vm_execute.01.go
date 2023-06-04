@@ -25,12 +25,6 @@ func zend_mod_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendE
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.ModFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_shift_left_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
@@ -42,12 +36,6 @@ func zend_shift_left_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.ShiftLeftFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_shift_right_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
@@ -59,12 +47,6 @@ func zend_shift_right_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDat
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.ShiftRightFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
@@ -120,12 +102,6 @@ func zend_is_smaller_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.CompareFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	if EG__().GetException() != nil {
 		return 0
 	}
@@ -148,12 +124,6 @@ func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, ex
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.CompareFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	if EG__().GetException() != nil {
 		return 0
 	}
@@ -176,12 +146,6 @@ func zend_bw_or_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zen
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.BitwiseOrFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_bw_and_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
@@ -193,12 +157,6 @@ func zend_bw_and_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Ze
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.BitwiseAndFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_bw_xor_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
@@ -210,12 +168,6 @@ func zend_bw_xor_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Ze
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.BitwiseXorFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_this_not_in_object_context_helper_SPEC(executeData *ZendExecuteData) int {
@@ -271,11 +223,6 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 	if (call_info & (ZEND_CALL_CODE | ZEND_CALL_TOP | ZEND_CALL_HAS_SYMBOL_TABLE | ZEND_CALL_FREE_EXTRA_ARGS | ZEND_CALL_ALLOCATED)) == 0 {
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 		IFreeCompiledVariables(executeData)
-		//if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-		//	// OBJ_RELEASE(executeData.GetThis().Object())
-		//} else if (call_info & ZEND_CALL_CLOSURE) != 0 {
-		//	// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
-		//}
 
 		EG__().VmStack().PopCheck(executeData)
 

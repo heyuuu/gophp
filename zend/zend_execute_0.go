@@ -181,10 +181,10 @@ func ZvalUndefinedCv(var_ uint32, executeData *ZendExecuteData) *types.Zval {
 	return UninitializedZval()
 }
 func _zvalUndefinedOp1(executeData *ZendExecuteData) *types.Zval {
-	return ZvalUndefinedCv(executeData.GetOpline().op1.GetVar(), executeData)
+	return ZvalUndefinedCv(executeData.GetOpline().GetOp1().GetVar(), executeData)
 }
 func _zvalUndefinedOp2(executeData *ZendExecuteData) *types.Zval {
-	return ZvalUndefinedCv(executeData.GetOpline().op2.GetVar(), executeData)
+	return ZvalUndefinedCv(executeData.GetOpline().GetOp1().GetVar(), executeData)
 }
 func ZVAL_UNDEFINED_OP1(executeData *ZendExecuteData) *types.Zval {
 	return _zvalUndefinedOp1(executeData)
