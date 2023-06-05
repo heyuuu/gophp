@@ -50,7 +50,13 @@ type PhpFileGlobals struct {
 	pclose_wait                  int
 }
 
-//
+func NewPhpFileGlobals(chunkSize int) *PhpFileGlobals {
+	return &PhpFileGlobals{
+		def_chunk_size: chunkSize,
+	}
+}
+
+// Fields
 func (this *PhpFileGlobals) StreamWrappers() map[string]*core.PhpStreamWrapper {
 	return this.stream_wrappers
 }

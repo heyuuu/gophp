@@ -14,7 +14,7 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func FG__() *PhpFileGlobals { return &FileGlobals }
+func FG__() *PhpFileGlobals { return FileGlobals }
 func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *types.Zval) {
 	b.Assert(arg.IsType(types.IS_RESOURCE))
 	core.PhpStreamFromRes(stream, arg.Resource())
@@ -28,14 +28,9 @@ func FileContextDtor(res *types.ZendResource) {
 	}
 	streams.PhpStreamContextFree(context)
 }
-func FileGlobalsCtor(file_globals_p *PhpFileGlobals) {
-	memset(file_globals_p, 0, b.SizeOf("php_file_globals"))
-	file_globals_p.SetDefChunkSize(core.PHP_SOCK_CHUNK_SIZE)
-}
-func FileGlobalsDtor(file_globals_p *PhpFileGlobals) {}
 func ZmStartupFile(type_ int, module_number int) int {
 	LeStreamContext = zend.ZendRegisterListDestructorsEx(FileContextDtor, nil, "stream-context", module_number)
-	FileGlobalsCtor(&FileGlobals)
+	FileGlobals = NewPhpFileGlobals(core.PHP_SOCK_CHUNK_SIZE)
 	zend.REGISTER_INI_ENTRIES(module_number)
 	zend.RegisterLongConstant("SEEK_SET", r.SEEK_SET, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("SEEK_CUR", r.SEEK_CUR, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
@@ -108,7 +103,7 @@ func ZmStartupFile(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmShutdownFile(type_ int, module_number int) int {
-	FileGlobalsDtor(&FileGlobals)
+	FileGlobals = nil
 	return types.SUCCESS
 }
 func ZifFlock(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, operation *types.Zval, _ zpp.Opt, wouldblock zpp.RefZval) {

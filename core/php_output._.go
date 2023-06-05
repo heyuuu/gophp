@@ -45,22 +45,6 @@ const PHP_OUTPUT_POP_FORCE = 0x1
 const PHP_OUTPUT_POP_DISCARD = 0x10
 const PHP_OUTPUT_POP_SILENT = 0x100
 
-/* real global flags */
-
-const PHP_OUTPUT_IMPLICITFLUSH = 0x1
-const PHP_OUTPUT_DISABLED = 0x2
-const PHP_OUTPUT_WRITTEN = 0x4
-const PHP_OUTPUT_SENT = 0x8
-
-/* supplementary flags for php_output_get_status() */
-
-const PHP_OUTPUT_ACTIVE = 0x10
-const PHP_OUTPUT_LOCKED = 0x20
-
-/* output layer is ready to use */
-
-const PHP_OUTPUT_ACTIVATED = 0x100000
-
 /* handler hooks */
 
 type PhpOutputHandlerHookT = int

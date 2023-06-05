@@ -29,7 +29,7 @@ const (
 	TOK_OTHER
 )
 
-var FileGlobals PhpFileGlobals
+var FileGlobals *PhpFileGlobals
 
 var LeStreamContext int = types.FAILURE
 var FlockValues []int = []int{LOCK_SH, LOCK_EX, LOCK_UN}

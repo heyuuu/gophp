@@ -679,9 +679,9 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 	PhpError(type_, message)
 }
 
-func PhpErrorDocref(docRef_ *string, type_ int, format string, args ...any) {
+func PhpErrorDocref(docRef_ *string, typ int, format string, args ...any) {
 	docRef := b.Option(docRef_, "")
-	PhpVerror(docRef, "", type_, format, args)
+	PhpVerror(docRef, "", typ, format, args)
 }
 func PhpErrorDocref1(docRef_ *string, param1_ *string, type_ int, format string, args ...any) {
 	docRef := b.Option(docRef_, "")
@@ -1547,7 +1547,7 @@ func PhpExecuteScript(primaryFile *zend.FileHandle) bool {
 }
 func PhpHandleAbortedConnection() {
 	PG__().connection_status = PHP_CONNECTION_ABORTED
-	PhpOutputSetStatus(PHP_OUTPUT_DISABLED)
+	OG__().SetStatusDisabled()
 	if !(PG__().ignore_user_abort) {
 		faults.Bailout()
 	}
