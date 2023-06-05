@@ -189,7 +189,7 @@ func PhpRegisterVariableEx(var_name string, val *types.Zval, track_vars_array *t
 					if gpc_element_p.IsIndirect() {
 						gpc_element_p = gpc_element_p.Indirect()
 					}
-					if gpc_element_p.GetType() != types.IS_ARRAY {
+					if !gpc_element_p.IsArray() {
 						// zend.ZvalPtrDtorNogc(gpc_element_p)
 						zend.ArrayInit(gpc_element_p)
 					} else {
@@ -604,7 +604,7 @@ func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {
 	var globalsCheck = dest == zend.EG__().GetSymbolTable()
 
 	src.Foreach(func(key types.ArrayKey, value *types.Zval) {
-		if value.GetType() != types.IS_ARRAY || key.IsStrKey() && b.Assign(&dest_entry, dest.KeyFind(key.StrKey())) == nil || !key.IsStrKey() && b.Assign(&dest_entry, dest.IndexFind(key.IdxKey())) == nil || dest_entry.GetType() != types.IS_ARRAY {
+		if !value.IsArray() || key.IsStrKey() && b.Assign(&dest_entry, dest.KeyFind(key.StrKey())) == nil || !key.IsStrKey() && b.Assign(&dest_entry, dest.IndexFind(key.IdxKey())) == nil || !dest_entry.IsArray() {
 			if key.IsStrKey() {
 				if !globalsCheck || key.StrKey() != "GLOBALS" {
 					dest.KeyUpdate(key.StrKey(), value)

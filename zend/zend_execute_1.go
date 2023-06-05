@@ -259,7 +259,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *types.Zend
 		ref = object
 		object = types.Z_REFVAL_P(object)
 	}
-	if object.GetType() > types.IS_FALSE && (object.GetType() != types.IS_STRING || object.String().GetLen() != 0) {
+	if object.GetType() > types.IS_FALSE && (!object.IsString() || object.String().GetLen() != 0) {
 		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
 			var property_name *types.String = operators.ZvalGetString(property)
 			if opline.GetOpcode() == ZEND_PRE_INC_OBJ || opline.GetOpcode() == ZEND_PRE_DEC_OBJ || opline.GetOpcode() == ZEND_POST_INC_OBJ || opline.GetOpcode() == ZEND_POST_DEC_OBJ {

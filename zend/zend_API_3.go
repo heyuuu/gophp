@@ -26,7 +26,7 @@ func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec str
 	 * wrong branch here. */
 
 	var is_method = CurrEX().GetFunc().GetScope() != nil
-	if !is_method || this_ptr == nil || this_ptr.GetType() != types.IS_OBJECT {
+	if !is_method || this_ptr == nil || !this_ptr.IsObject() {
 		ret := zpp.ParseVaArgs(num_args, type_spec, args, 0)
 		return types.IntBool(ret)
 	} else {

@@ -338,7 +338,7 @@ func arrayWalk(array *types.Zval, recursive bool, handler func(value *types.Zval
 			}
 
 			/* Add type source for property references. */
-			if zv.GetType() != types.IS_REFERENCE && array.IsType(types.IS_OBJECT) {
+			if !zv.IsReference() && array.IsType(types.IS_OBJECT) {
 				var prop_info = zend.ZendGetTypedPropertyInfoForSlot(array.Object(), zv)
 				if prop_info != nil {
 					zv.SetNewRef(zv)
@@ -1138,7 +1138,7 @@ func ZifArrayCountValues(array *types.Array) *types.Array {
 func ArrayColumnParamHelper(param *types.Zval, name string) types.ZendBool {
 	switch param.GetType() {
 	case types.IS_DOUBLE:
-		if param.GetType() != types.IS_LONG {
+		if !param.IsLong() {
 			operators.ConvertToLong(param)
 		}
 		fallthrough

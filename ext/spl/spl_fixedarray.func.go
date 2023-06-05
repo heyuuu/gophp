@@ -200,7 +200,7 @@ func SplFixedarrayObjectReadDimensionHelper(intern *SplFixedArrayObject, offset 
 		faults.ThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return nil
 	}
-	if offset.GetType() != types.IS_LONG {
+	if !offset.IsLong() {
 		index = SplOffsetConvertToLong(offset)
 	} else {
 		index = offset.Long()
@@ -246,7 +246,7 @@ func SplFixedarrayObjectWriteDimensionHelper(intern *SplFixedArrayObject, offset
 		faults.ThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return
 	}
-	if offset.GetType() != types.IS_LONG {
+	if !offset.IsLong() {
 		index = SplOffsetConvertToLong(offset)
 	} else {
 		index = offset.Long()
@@ -286,7 +286,7 @@ func SplFixedarrayObjectWriteDimension(object *types.Zval, offset *types.Zval, v
 }
 func SplFixedarrayObjectUnsetDimensionHelper(intern *SplFixedArrayObject, offset *types.Zval) {
 	var index zend.ZendLong
-	if offset.GetType() != types.IS_LONG {
+	if !offset.IsLong() {
 		index = SplOffsetConvertToLong(offset)
 	} else {
 		index = offset.Long()
@@ -313,7 +313,7 @@ func SplFixedarrayObjectUnsetDimension(object *types.Zval, offset *types.Zval) {
 func SplFixedarrayObjectHasDimensionHelper(intern *SplFixedArrayObject, offset *types.Zval, check_empty int) int {
 	var index zend.ZendLong
 	var retval int
-	if offset.GetType() != types.IS_LONG {
+	if !offset.IsLong() {
 		index = SplOffsetConvertToLong(offset)
 	} else {
 		index = offset.Long()

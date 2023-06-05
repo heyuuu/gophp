@@ -159,7 +159,7 @@ func ZendVmStackDestroy() {
 func _getZvalPtrTmp(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
 	var ret *types.Zval = EX_VAR(executeData, var_)
 	*should_free = ret
-	b.Assert(ret.GetType() != types.IS_REFERENCE)
+	b.Assert(!ret.IsReference())
 	return ret
 }
 func _getZvalPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {

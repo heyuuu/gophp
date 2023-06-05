@@ -41,7 +41,7 @@ func ZifClassParents(executeData zpp.Ex, return_value zpp.Ret, instance *types.Z
 		return_value.SetFalse()
 		return
 	}
-	if obj.GetType() != types.IS_OBJECT && obj.GetType() != types.IS_STRING {
+	if !obj.IsObject() && !obj.IsString() {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "object or string expected")
 		return_value.SetFalse()
 		return
@@ -69,7 +69,7 @@ func ZifClassImplements(executeData zpp.Ex, return_value zpp.Ret, what *types.Zv
 		return_value.SetFalse()
 		return
 	}
-	if obj.GetType() != types.IS_OBJECT && obj.GetType() != types.IS_STRING {
+	if !obj.IsObject() && !obj.IsString() {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "object or string expected")
 		return_value.SetFalse()
 		return
@@ -93,7 +93,7 @@ func ZifClassUses(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval, _ 
 		return_value.SetFalse()
 		return
 	}
-	if obj.GetType() != types.IS_OBJECT && obj.GetType() != types.IS_STRING {
+	if !obj.IsObject() && !obj.IsString() {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "object or string expected")
 		return_value.SetFalse()
 		return
@@ -275,7 +275,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 	var retval types.Zval
 	var lc_name *types.String
 	var alfi *AutoloadFuncInfo
-	if zend.ZendParseParameters(executeData.NumArgs(), "z", &class_name) == types.FAILURE || class_name.GetType() != types.IS_STRING {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z", &class_name) == types.FAILURE || !class_name.IsString() {
 		return
 	}
 	if SPL_G__().autoload_functions != nil {

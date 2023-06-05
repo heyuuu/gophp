@@ -80,7 +80,7 @@ func getBoolNotHandler(executeData *ZendExecuteData) int {
 
 	if op1.IsTrue() {
 		opline.Result().SetFalse()
-	} else if op1.GetType() <= types.IS_TRUE {
+	} else if op1.IsSignType() {
 		opline.Result().SetTrue()
 		if op1.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)

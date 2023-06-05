@@ -534,7 +534,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 
 	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr("_SERVER") != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
 		var pos int = 0
-		if args.GetType() != types.IS_ARRAY {
+		if !args.IsArray() {
 			return_value.SetFalse()
 			return
 		}
@@ -657,7 +657,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 
 			var optname_int int = atoi(optname)
 			if b.Assign(&args, return_value.Array().IndexFind(optname_int)) != nil {
-				if args.GetType() != types.IS_ARRAY {
+				if !args.IsArray() {
 					operators.ConvertToArrayEx(args)
 				}
 				args.Array().Append(&val)
@@ -669,7 +669,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 			/* other strings */
 
 			if b.Assign(&args, return_value.Array().KeyFind(b.CastStrAuto(optname))) != nil {
-				if args.GetType() != types.IS_ARRAY {
+				if !args.IsArray() {
 					operators.ConvertToArrayEx(args)
 				}
 				args.Array().Append(&val)
@@ -1702,7 +1702,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 				find_hash = arr.Array().KeyAddNew(arg1.String().GetStr(), &hash)
 			}
 		}
-		if find_hash.GetType() != types.IS_ARRAY {
+		if !find_hash.IsArray() {
 			// zend.ZvalPtrDtorNogc(find_hash)
 			zend.ArrayInit(find_hash)
 		}

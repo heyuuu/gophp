@@ -71,7 +71,7 @@ func (compiler *Compiler) DetermineSwitchJumptableType(cases *ZendAstList) uint8
 
 		}
 		cond_zv = ZendAstGetZval(case_ast.GetChild()[0])
-		if cond_zv.GetType() != types.IS_LONG && cond_zv.GetType() != types.IS_STRING {
+		if !cond_zv.IsLong() && !cond_zv.IsString() {
 
 			/* We only optimize switched on integers and strings */
 
@@ -424,7 +424,7 @@ func (compiler *Compiler) CompileDeclare(ast *ZendAst) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must not "+"use block mode")
 			}
 			compiler.ConstExprToZval(&value_zv, value_ast)
-			if value_zv.GetType() != types.IS_LONG || value_zv.Long() != 0 && value_zv.Long() != 1 {
+			if !value_zv.IsLong() || value_zv.Long() != 0 && value_zv.Long() != 1 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must have 0 or 1 as its value")
 			}
 			if value_zv.Long() == 1 {

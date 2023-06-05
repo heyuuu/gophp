@@ -11,7 +11,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var args *types.Zval
 	args = GetZvalPtr(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
-	if args.GetType() != types.IS_ARRAY {
+	if !args.IsArray() {
 		if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && args.IsReference() {
 			args = types.Z_REFVAL_P(args)
 			if args.IsArray() {

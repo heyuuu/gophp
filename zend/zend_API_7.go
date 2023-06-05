@@ -373,7 +373,7 @@ func ZendGetCallableNameEx_Ex(callable *types.Zval, object *types.ZendObject) st
 			obj = types.ZendHashIndexFindDeref(callable.Array(), 0)
 			method = types.ZendHashIndexFindDeref(callable.Array(), 1)
 		}
-		if obj == nil || method == nil || method.GetType() != types.IS_STRING {
+		if obj == nil || method == nil || !method.IsString() {
 			return types.STR_ARRAY_CAPITALIZED
 		}
 		if obj.IsString() {

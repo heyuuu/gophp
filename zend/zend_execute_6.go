@@ -54,7 +54,7 @@ func ZendHandleFetchObjFlags(result *types.Zval, ptr *types.Zval, obj *types.Zen
 			}
 		}
 	case ZEND_FETCH_REF:
-		if ptr.GetType() != types.IS_REFERENCE {
+		if !ptr.IsReference() {
 			if prop_info == nil {
 				prop_info = ZendObjectFetchPropertyTypeInfo(obj, ptr)
 				if prop_info == nil {
@@ -93,7 +93,7 @@ func ZendFetchPropertyAddress(
 	executeData *ZendExecuteData,
 ) {
 	var ptr *types.Zval
-	if container_op_type != IS_UNUSED && container.GetType() != types.IS_OBJECT {
+	if container_op_type != IS_UNUSED && !container.IsObject() {
 		for {
 			if container.IsReference() && types.Z_REFVAL_P(container).IsObject() {
 				container = types.Z_REFVAL_P(container)
@@ -193,7 +193,7 @@ func ZendAssignToPropertyReference(
 	}
 	if variable_ptr.IsError() {
 		variable_ptr = UninitializedZval()
-	} else if variable.GetType() != types.IS_INDIRECT {
+	} else if !variable.IsIndirect() {
 		faults.ThrowError(nil, "Cannot assign by reference to overloaded object")
 		// ZvalPtrDtor(&variable)
 		variable_ptr = UninitializedZval()
@@ -424,7 +424,7 @@ func ZendVerifyRefAssignableZval(ref *types.ZendReference, zv *types.Zval, stric
 	var seen_prop *types.PropertyInfo = nil
 	var seen_type uint8
 	var needs_coercion types.ZendBool = 0
-	b.Assert(zv.GetType() != types.IS_REFERENCE)
+	b.Assert(!zv.IsReference())
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **types.PropertyInfo
 	var _end ***types.PropertyInfo

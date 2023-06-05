@@ -1751,7 +1751,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 			/* property not found, so lets add it */
 			if (flags & types.AccStatic) != 0 {
 				prop_value = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
-				b.Assert(prop_value.GetType() != types.IS_INDIRECT)
+				b.Assert(!prop_value.IsIndirect())
 			} else {
 				prop_value = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 			}

@@ -12,7 +12,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 	var new_op_array *types.ZendOpArray = nil
 	var tmp_inc_filename types.Zval
 	tmp_inc_filename.SetUndef()
-	if inc_filename.GetType() != types.IS_STRING {
+	if !inc_filename.IsString() {
 		var tmp *types.String = operators.ZvalTryGetString(inc_filename)
 		if tmp == nil {
 			return nil

@@ -615,7 +615,7 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 		var _z *types.Zval = _p.GetVal()
 
 		hdr = _z
-		if hdr.GetType() != types.IS_STRING {
+		if !hdr.IsString() {
 			continue
 		}
 		if format == 0 {

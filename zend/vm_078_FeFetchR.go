@@ -30,6 +30,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			value = p.GetVal()
 			value_type = value.GetTypeInfo()
+
 			if value_type != types.IS_UNDEF {
 				if value_type == types.IS_INDIRECT {
 					value = value.GetZv()

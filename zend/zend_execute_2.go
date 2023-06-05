@@ -40,7 +40,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint uint8, arg *types.Zval) types.ZendBo
 func ZendVerifyScalarTypeHint(type_hint uint8, arg *types.Zval, strict types.ZendBool) types.ZendBool {
 	if strict != 0 {
 		/* SSTH Exception: IS_LONG may be accepted as IS_DOUBLE (converted) */
-		if type_hint != types.IS_DOUBLE || arg.GetType() != types.IS_LONG {
+		if type_hint != types.IS_DOUBLE || !arg.IsLong() {
 			return 0
 		}
 	} else if arg.IsNull() {
@@ -100,7 +100,7 @@ func ZendResolveClassType(type_ *types.TypeHint, self_ce *types.ClassEntry) type
 func IZendCheckPropertyType(info *types.PropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
 	b.Assert(!(property.IsReference()))
 	if info.GetType().IsClass() {
-		if property.GetType() != types.IS_OBJECT {
+		if !property.IsObject() {
 			return property.IsNull() && info.GetType().AllowNull()
 		}
 		if !(info.GetType().IsCe()) && ZendResolveClassType(info.GetType(), info.GetCe()) == 0 {
@@ -397,7 +397,7 @@ func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteD
 	dim = dim.DeRef()
 
 	var offset ZendLong
-	if dim.GetType() != types.IS_LONG {
+	if !dim.IsLong() {
 		switch dim.GetType() {
 		case types.IS_STRING:
 			if types.IS_LONG == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {

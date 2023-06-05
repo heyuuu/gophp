@@ -30,7 +30,7 @@ func ZEND_THROW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	for {
-		if value.GetType() != types.IS_OBJECT {
+		if !value.IsObject() {
 			if value.IsReference() {
 				value = types.Z_REFVAL_P(value)
 				if value.IsObject() {
@@ -60,7 +60,7 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	value = opline.Op1()
 	for {
-		if value.GetType() != types.IS_OBJECT {
+		if !value.IsObject() {
 			if value.IsReference() {
 				value = types.Z_REFVAL_P(value)
 				if value.IsObject() {
@@ -90,7 +90,7 @@ func ZEND_THROW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	value = opline.Op1()
 	for {
-		if value.GetType() != types.IS_OBJECT {
+		if !value.IsObject() {
 			if value.IsReference() {
 				value = types.Z_REFVAL_P(value)
 				if value.IsObject() {

@@ -369,7 +369,7 @@ func ZendFetchDimensionAddress(
 		container = types.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto try_array
-		} else if container.GetType() <= types.IS_FALSE {
+		} else if container.IsSignFalse() {
 			if type_ != BP_VAR_UNSET {
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					if ZendVerifyRefArrayAssignable(ref) == 0 {
@@ -410,7 +410,7 @@ func ZendFetchDimensionAddress(
 					types.ZVAL_COPY(result, retval)
 					retval = result
 				}
-				if retval.GetType() != types.IS_OBJECT {
+				if !retval.IsObject() {
 					var ce *types.ClassEntry = types.Z_OBJCE_P(container)
 					faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.Name())
 				}
@@ -422,7 +422,7 @@ func ZendFetchDimensionAddress(
 			result.IsError()
 		}
 	} else {
-		if container.GetType() <= types.IS_FALSE {
+		if container.IsSignFalse() {
 			if type_ != BP_VAR_W && container.IsUndef() {
 				ZVAL_UNDEFINED_OP1(executeData)
 			}

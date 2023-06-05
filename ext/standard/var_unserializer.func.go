@@ -1453,7 +1453,7 @@ yy80:
 		return 0
 	}
 	rval_ref = types.ZVAL_DEREF(rval_ref)
-	if rval_ref.GetType() != types.IS_OBJECT {
+	if !rval_ref.IsObject() {
 		return 0
 	}
 	types.ZVAL_COPY(rval, rval_ref)

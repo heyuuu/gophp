@@ -19,7 +19,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			result = nil
 		}
-	} else if op1.GetType() <= types.IS_FALSE {
+	} else if op1.IsSignFalse() {
 		result = ht.KeyFind(types.NewString("").GetStr())
 	} else {
 		var key *types.String
@@ -60,7 +60,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			result = nil
 		}
-	} else if op1.GetType() <= types.IS_FALSE {
+	} else if op1.IsSignFalse() {
 		result = ht.KeyFind(types.NewString("").GetStr())
 	} else {
 		var key *types.String
@@ -102,7 +102,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			result = nil
 		}
-	} else if op1.GetType() <= types.IS_FALSE {
+	} else if op1.IsSignFalse() {
 		result = ht.KeyFind(types.NewString("").GetStr())
 	} else {
 		var key *types.String
@@ -143,7 +143,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			result = nil
 		}
-	} else if op1.GetType() <= types.IS_FALSE {
+	} else if op1.IsSignFalse() {
 		result = ht.KeyFind(types.NewString("").GetStr())
 	} else {
 		var key *types.String

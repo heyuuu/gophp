@@ -563,7 +563,7 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 		// zend.ZvalPtrDtor(retval)
 		return types.FAILURE
 	}
-	if retval.GetType() != types.IS_ARRAY {
+	if !retval.IsArray() {
 		// zend.ZvalPtrDtor(retval)
 		faults.TypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).Name())
 		return types.FAILURE
@@ -616,7 +616,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 		var priv_name *types.String
 		var prot_name *types.String
 		name_val = types.ZVAL_DEREF(name_val)
-		if name_val.GetType() != types.IS_STRING {
+		if !name_val.IsString() {
 			core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
 		}
 		name = operators.ZvalGetString(name_val)
@@ -995,7 +995,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 		var classes *types.Zval
 		var max_depth *types.Zval
 		classes = types.ZendHashStrFindDeref(options.Array(), "allowed_classes")
-		if classes != nil && classes.GetType() != types.IS_ARRAY && classes.GetType() != types.IS_TRUE && classes.GetType() != types.IS_FALSE {
+		if classes != nil && !classes.IsArray() && !classes.IsTrue() && !classes.IsFalse() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "allowed_classes option should be array or boolean")
 			return_value.SetFalse()
 			goto cleanup
@@ -1033,7 +1033,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 		var_hash.SetAllowedClasses(class_hash)
 		max_depth = types.ZendHashStrFindDeref(options.Array(), "max_depth")
 		if max_depth != nil {
-			if max_depth.GetType() != types.IS_LONG {
+			if !max_depth.IsLong() {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "max_depth should be int")
 				return_value.SetFalse()
 				goto cleanup

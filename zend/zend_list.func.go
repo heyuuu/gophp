@@ -67,7 +67,7 @@ func ZendFetchResourceEx(res *types.Zval, resource_type_name string, resource_ty
 		}
 		return nil
 	}
-	if res.GetType() != types.IS_RESOURCE {
+	if !res.IsResource() {
 		if resource_type_name {
 			faults.Error(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
 		}
@@ -82,7 +82,7 @@ func ZendFetchResource2Ex(res *types.Zval, resource_type_name string, resource_t
 		}
 		return nil
 	}
-	if res.GetType() != types.IS_RESOURCE {
+	if !res.IsResource() {
 		if resource_type_name {
 			faults.Error(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
 		}

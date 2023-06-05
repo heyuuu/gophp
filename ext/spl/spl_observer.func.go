@@ -493,7 +493,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 	}
 	p++
 	pcount = standard.VarTmpVar(&var_hash)
-	if standard.PhpVarUnserialize(pcount, &p, s+buf_len, &var_hash) == 0 || pcount.GetType() != types.IS_LONG {
+	if standard.PhpVarUnserialize(pcount, &p, s+buf_len, &var_hash) == 0 || !pcount.IsLong() {
 		goto outexcept
 	}
 	p--
@@ -528,7 +528,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 				goto outexcept
 			}
 		}
-		if entry.GetType() != types.IS_OBJECT {
+		if !entry.IsObject() {
 			// zend.ZvalPtrDtor(&entry)
 			// zend.ZvalPtrDtor(&inf)
 			goto outexcept
@@ -567,7 +567,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 	}
 	p++
 	pmembers = standard.VarTmpVar(&var_hash)
-	if standard.PhpVarUnserialize(pmembers, &p, s+buf_len, &var_hash) == 0 || pmembers.GetType() != types.IS_ARRAY {
+	if standard.PhpVarUnserialize(pmembers, &p, s+buf_len, &var_hash) == 0 || !pmembers.IsArray() {
 		goto outexcept
 	}
 
@@ -618,7 +618,7 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 	}
 	storage_zv = data.IndexFind(0)
 	members_zv = data.IndexFind(1)
-	if storage_zv == nil || members_zv == nil || storage_zv.GetType() != types.IS_ARRAY || members_zv.GetType() != types.IS_ARRAY {
+	if storage_zv == nil || members_zv == nil || !storage_zv.IsArray() || !members_zv.IsArray() {
 		faults.ThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
@@ -629,7 +629,7 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 	key = nil
 	storage_zv.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
 		if key != nil {
-			if key.GetType() != types.IS_OBJECT {
+			if !key.IsObject() {
 				faults.ThrowException(spl_ce_UnexpectedValueException, "Non-object key", 0)
 				return
 			}
@@ -683,7 +683,7 @@ func zim_spl_MultipleIterator_attachIterator(executeData *zend.ZendExecuteData, 
 	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if info != nil {
 		var element *SplObjectStorageElement
-		if info.GetType() != types.IS_LONG && info.GetType() != types.IS_STRING {
+		if !info.IsLong() && !info.IsString() {
 			faults.ThrowException(spl_ce_InvalidArgumentException, "Info must be NULL, integer or string", 0)
 			return
 		}

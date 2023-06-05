@@ -21,7 +21,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	var object *types.Zval
 	object = opline.Const1()
 	function_name = opline.Op2()
-	if function_name.GetType() != types.IS_STRING {
+	if !function_name.IsString() {
 		for {
 			if function_name.IsReference() {
 				function_name = types.Z_REFVAL_P(function_name)
@@ -47,7 +47,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 	var object *types.Zval
 	object = opline.Const1()
 	function_name = opline.Op2()
-	if function_name.GetType() != types.IS_STRING {
+	if !function_name.IsString() {
 		for {
 			if function_name.IsReference() {
 				function_name = types.Z_REFVAL_P(function_name)
@@ -79,7 +79,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	object = opline.Op1()
 	{
 		for {
-			if object.GetType() != types.IS_OBJECT {
+			if !object.IsObject() {
 				if object.IsReference() {
 					object = types.Z_REFVAL_P(object)
 					if object.IsObject() {
@@ -165,7 +165,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	{
 		function_name = opline.Op2()
 	}
-	if function_name.GetType() != types.IS_STRING {
+	if !function_name.IsString() {
 		for {
 			if function_name.IsReference() {
 				function_name = types.Z_REFVAL_P(function_name)
@@ -184,7 +184,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	}
 	{
 		for {
-			if object.GetType() != types.IS_OBJECT {
+			if !object.IsObject() {
 				if object.IsReference() {
 					object = types.Z_REFVAL_P(object)
 					if object.IsObject() {
@@ -258,7 +258,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	{
 		function_name = opline.Op2()
 	}
-	if function_name.GetType() != types.IS_STRING {
+	if !function_name.IsString() {
 		for {
 			if function_name.IsReference() {
 				function_name = types.Z_REFVAL_P(function_name)
@@ -277,7 +277,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	}
 	{
 		for {
-			if object.GetType() != types.IS_OBJECT {
+			if !object.IsObject() {
 				if object.IsReference() {
 					object = types.Z_REFVAL_P(object)
 					if object.IsObject() {
@@ -415,7 +415,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	{
 		function_name = opline.Op2()
 	}
-	if function_name.GetType() != types.IS_STRING {
+	if !function_name.IsString() {
 		for {
 			if function_name.IsReference() {
 				function_name = types.Z_REFVAL_P(function_name)
@@ -484,7 +484,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 	{
 		function_name = opline.Op2()
 	}
-	if function_name.GetType() != types.IS_STRING {
+	if !function_name.IsString() {
 		for {
 			if function_name.IsReference() {
 				function_name = types.Z_REFVAL_P(function_name)
@@ -552,7 +552,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	object = opline.Op1()
 	{
 		for {
-			if object.GetType() != types.IS_OBJECT {
+			if !object.IsObject() {
 				if object.IsReference() {
 					object = types.Z_REFVAL_P(object)
 					if object.IsObject() {
@@ -649,7 +649,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	{
 		function_name = opline.Op2()
 	}
-	if function_name.GetType() != types.IS_STRING {
+	if !function_name.IsString() {
 		for {
 			if function_name.IsReference() {
 				function_name = types.Z_REFVAL_P(function_name)
@@ -668,7 +668,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	}
 	{
 		for {
-			if object.GetType() != types.IS_OBJECT {
+			if !object.IsObject() {
 				if object.IsReference() {
 					object = types.Z_REFVAL_P(object)
 					if object.IsObject() {
@@ -739,7 +739,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	{
 		function_name = opline.Op2()
 	}
-	if function_name.GetType() != types.IS_STRING {
+	if !function_name.IsString() {
 		for {
 			if function_name.IsReference() {
 				function_name = types.Z_REFVAL_P(function_name)
@@ -759,7 +759,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	}
 	{
 		for {
-			if object.GetType() != types.IS_OBJECT {
+			if !object.IsObject() {
 				if object.IsReference() {
 					object = types.Z_REFVAL_P(object)
 					if object.IsObject() {

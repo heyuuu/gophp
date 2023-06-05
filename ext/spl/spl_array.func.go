@@ -534,7 +534,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 			value = tmp
 		}
 	}
-	var result types.ZendBool = b.CondF(check_empty != 0, func() int { return operators.IZendIsTrue(value) }, func() bool { return value.GetType() != types.IS_NULL })
+	var result types.ZendBool = b.CondF(check_empty != 0, func() int { return operators.IZendIsTrue(value) }, func() bool { return !value.IsNull() })
 	if value == &rv {
 		// zend.ZvalPtrDtor(&rv)
 	}
@@ -825,7 +825,7 @@ func SplArrayItRewind(iter *zend.ZendObjectIterator) {
 	}
 }
 func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Zval, ar_flags zend.ZendLong, just_array int) {
-	if array.GetType() != types.IS_OBJECT && array.GetType() != types.IS_ARRAY {
+	if !array.IsObject() && !array.IsArray() {
 		faults.ThrowException(spl_ce_InvalidArgumentException, "Passed variable is not an array or object", 0)
 		return
 	}
@@ -1285,7 +1285,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 	}
 	p++
 	zflags = standard.VarTmpVar(&var_hash)
-	if standard.PhpVarUnserialize(zflags, &p, s+buf_len, &var_hash) == 0 || zflags.GetType() != types.IS_LONG {
+	if standard.PhpVarUnserialize(zflags, &p, s+buf_len, &var_hash) == 0 || !zflags.IsLong() {
 		goto outexcept
 	}
 	p--
@@ -1313,7 +1313,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 			goto outexcept
 		}
 		array = standard.VarTmpVar(&var_hash)
-		if standard.PhpVarUnserialize(array, &p, s+buf_len, &var_hash) == 0 || array.GetType() != types.IS_ARRAY && array.GetType() != types.IS_OBJECT {
+		if standard.PhpVarUnserialize(array, &p, s+buf_len, &var_hash) == 0 || !array.IsArray() && !array.IsObject() {
 			goto outexcept
 		}
 		intern.SetIsCloneMask(false)
@@ -1339,7 +1339,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 	}
 	p++
 	members = standard.VarTmpVar(&var_hash)
-	if standard.PhpVarUnserialize(members, &p, s+buf_len, &var_hash) == 0 || members.GetType() != types.IS_ARRAY {
+	if standard.PhpVarUnserialize(members, &p, s+buf_len, &var_hash) == 0 || !members.IsArray() {
 		goto outexcept
 	}
 
@@ -1408,7 +1408,7 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	storage_zv = data.IndexFind(1)
 	members_zv = data.IndexFind(2)
 	iterator_class_zv = data.IndexFind(3)
-	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != types.IS_LONG || members_zv.GetType() != types.IS_ARRAY || iterator_class_zv != nil && (iterator_class_zv.GetType() != types.IS_NULL && iterator_class_zv.GetType() != types.IS_STRING) {
+	if flags_zv == nil || storage_zv == nil || members_zv == nil || !flags_zv.IsLong() || !members_zv.IsArray() || iterator_class_zv != nil && (!iterator_class_zv.IsNull() && !iterator_class_zv.IsString()) {
 		faults.ThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}

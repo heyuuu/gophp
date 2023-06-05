@@ -150,7 +150,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if b.Assign(&find_arr, active_hash.KeyFind(arg1.String().GetStr())) == nil || find_arr.GetType() != types.IS_ARRAY {
+		if b.Assign(&find_arr, active_hash.KeyFind(arg1.String().GetStr())) == nil || !find_arr.IsArray() {
 			option_arr.SetArray(types.NewArray(8))
 			find_arr = active_hash.KeyUpdate(arg1.String().GetStr(), &option_arr)
 		}

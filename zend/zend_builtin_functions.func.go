@@ -253,7 +253,7 @@ func ValidateConstantArray(ht *types.Array) int {
 					ret = 0
 					return false
 				}
-			} else if val.GetType() != types.IS_STRING && val.GetType() != types.IS_RESOURCE {
+			} else if !val.IsString() && !val.IsResource() {
 				faults.Error(faults.E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
 				ret = 0
 				return false
@@ -832,7 +832,7 @@ func ZifSetErrorHandler(executeData zpp.Ex, return_value zpp.Ret, errorHandler *
 	if ZendParseParameters(executeData.NumArgs(), "z|l", &error_handler, &error_type) == types.FAILURE {
 		return
 	}
-	if error_handler.GetType() != types.IS_NULL {
+	if !error_handler.IsNull() {
 		if ZendIsCallable(error_handler, 0, nil) == 0 {
 			var error_handler_name = ZendGetCallableName(error_handler)
 			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(error_handler_name != nil, func() []byte { return error_handler_name.GetVal() }, "unknown"))
@@ -880,7 +880,7 @@ func ZifSetExceptionHandler(executeData zpp.Ex, return_value zpp.Ret, exceptionH
 	if ZendParseParameters(executeData.NumArgs(), "z", &exception_handler) == types.FAILURE {
 		return
 	}
-	if exception_handler.GetType() != types.IS_NULL {
+	if !exception_handler.IsNull() {
 		if ZendIsCallable(exception_handler, 0, nil) == 0 {
 			var exception_handler_name = ZendGetCallableName(exception_handler)
 			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(exception_handler_name != nil, func() []byte { return exception_handler_name.GetVal() }, "unknown"))

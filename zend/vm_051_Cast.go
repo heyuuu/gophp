@@ -31,7 +31,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 		if opline.GetExtendedValue() == types.IS_ARRAY {
 			/* fast copy */
-			if expr.GetType() != types.IS_NULL {
+			if !expr.IsNull() {
 				result.SetArray(types.NewArray(1))
 				expr = result.Array().IndexAddNew(0, expr)
 			} else {
@@ -46,7 +46,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				//	ht = types.ZendArrayDup(ht)
 				//}
 				result.Object().SetProperties(ht)
-			} else if expr.GetType() != types.IS_NULL {
+			} else if !expr.IsNull() {
 				ht = types.NewArray(1)
 				result.Object().SetProperties(ht)
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
@@ -85,8 +85,8 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 		if opline.GetExtendedValue() == types.IS_ARRAY {
-			if expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
-				if expr.GetType() != types.IS_NULL {
+			if !expr.IsObject() || types.Z_OBJCE_P(expr) == ZendCeClosure {
+				if !expr.IsNull() {
 					result.SetArray(types.NewArray(1))
 					expr = result.Array().IndexAddNew(0, expr)
 
@@ -119,7 +119,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				//	ht = types.ZendArrayDup(ht)
 				//}
 				result.Object().SetProperties(ht)
-			} else if expr.GetType() != types.IS_NULL {
+			} else if !expr.IsNull() {
 				ht = types.NewArray(1)
 				result.Object().SetProperties(ht)
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
@@ -166,8 +166,8 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 		if opline.GetExtendedValue() == types.IS_ARRAY {
-			if expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
-				if expr.GetType() != types.IS_NULL {
+			if !expr.IsObject() || types.Z_OBJCE_P(expr) == ZendCeClosure {
+				if !expr.IsNull() {
 					result.SetArray(types.NewArray(1))
 					expr = result.Array().IndexAddNew(0, expr)
 
@@ -200,7 +200,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				//	ht = types.ZendArrayDup(ht)
 				//}
 				result.Object().SetProperties(ht)
-			} else if expr.GetType() != types.IS_NULL {
+			} else if !expr.IsNull() {
 				ht = types.NewArray(1)
 				result.Object().SetProperties(ht)
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
@@ -245,8 +245,8 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 		if opline.GetExtendedValue() == types.IS_ARRAY {
-			if expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
-				if expr.GetType() != types.IS_NULL {
+			if !expr.IsObject() || types.Z_OBJCE_P(expr) == ZendCeClosure {
+				if !expr.IsNull() {
 					result.SetArray(types.NewArray(1))
 					expr = result.Array().IndexAddNew(0, expr)
 
@@ -279,7 +279,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				//	ht = types.ZendArrayDup(ht)
 				//}
 				result.Object().SetProperties(ht)
-			} else if expr.GetType() != types.IS_NULL {
+			} else if !expr.IsNull() {
 				ht = types.NewArray(1)
 				result.Object().SetProperties(ht)
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)

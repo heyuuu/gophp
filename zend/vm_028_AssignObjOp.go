@@ -19,7 +19,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 	property = opline.Const2()
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
@@ -108,7 +108,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	property = opline.Op2()
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
@@ -196,7 +196,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	property = opline.Cv2OrUndef()
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
@@ -504,7 +504,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 	property = opline.Const2()
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
@@ -589,7 +589,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	property = opline.Op2()
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
@@ -673,7 +673,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	property = opline.Cv2OrUndef()
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object

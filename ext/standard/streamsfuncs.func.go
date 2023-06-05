@@ -531,7 +531,7 @@ func StreamArrayToFdSet(stream_array *types.Zval, fds *fd_set, max_fd *core.PhpS
 	var elem *types.Zval
 	var stream *core.PhpStream
 	var cnt int = 0
-	if stream_array.GetType() != types.IS_ARRAY {
+	if !stream_array.IsArray() {
 		return 0
 	}
 	var __ht *types.Array = stream_array.Array()
@@ -586,7 +586,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 	var ret int = 0
 	var key *types.String
 	var num_ind zend.ZendUlong
-	if stream_array.GetType() != types.IS_ARRAY {
+	if !stream_array.IsArray() {
 		return 0
 	}
 	ht = types.NewArray(stream_array.Array().Len())
@@ -645,7 +645,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 	var ret int = 0
 	var num_ind zend.ZendUlong
 	var key *types.String
-	if stream_array.GetType() != types.IS_ARRAY {
+	if !stream_array.IsArray() {
 		return 0
 	}
 	ht = types.NewArray(stream_array.Array().Len())

@@ -196,7 +196,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 					goto next_step
 				}
 			}
-			if child.IsUndef() || child.GetType() != types.IS_OBJECT || !(b.Assign(&ce, types.Z_OBJCE(child)) && operators.InstanceofFunction(ce, spl_ce_RecursiveIterator) != 0) {
+			if child.IsUndef() || !child.IsObject() || !(b.Assign(&ce, types.Z_OBJCE(child)) && operators.InstanceofFunction(ce, spl_ce_RecursiveIterator) != 0) {
 				// zend.ZvalPtrDtor(&child)
 				faults.ThrowException(spl_ce_UnexpectedValueException, "Objects returned by RecursiveIterator::getChildren() must implement RecursiveIterator", 0)
 				return
@@ -825,7 +825,7 @@ func zim_spl_RecursiveTreeIterator_current(executeData *zend.ZendExecuteData, re
 	entry.SetNull()
 	SplRecursiveTreeIteratorGetPrefix(object, &prefix)
 	SplRecursiveTreeIteratorGetEntry(object, &entry)
-	if entry.GetType() != types.IS_STRING {
+	if !entry.IsString() {
 		// zend.ZvalPtrDtor(&prefix)
 		// zend.ZvalPtrDtor(&entry)
 		return_value.SetNull()
@@ -858,7 +858,7 @@ func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return
 		zend.ZVAL_ZVAL(return_value, &key, 1, 1)
 		return
 	}
-	if key.GetType() != types.IS_STRING {
+	if !key.IsString() {
 		if zend.ZendMakePrintableZval(&key, &key_copy) != 0 {
 			key = key_copy
 		}
@@ -983,7 +983,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 					// zend.ZvalPtrDtor(&retval)
 					return nil
 				}
-				if retval.GetType() != types.IS_OBJECT || operators.InstanceofFunction(types.Z_OBJCE(retval), zend.ZendCeTraversable) == 0 {
+				if !retval.IsObject() || operators.InstanceofFunction(types.Z_OBJCE(retval), zend.ZendCeTraversable) == 0 {
 					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "%s::getIterator() must return an object that implements Traversable", ce.Name())
 					return nil
 				}
@@ -1479,7 +1479,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 		return_value.SetBool(count > 0)
 	}
 	if intern.IsInverted() {
-		return_value.SetBool(return_value.GetType() != types.IS_TRUE)
+		return_value.SetBool(!return_value.IsTrue())
 	}
 	// types.ZendStringReleaseEx(subject, 0)
 }

@@ -972,7 +972,7 @@ func PhpUserstreamopReaddir(stream *core.PhpStream, buf *byte, count int) ssize_
 	}
 	func_name.SetStringVal(USERSTREAM_DIR_READ)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
-	if call_result == types.SUCCESS && retval.GetType() != types.IS_FALSE && retval.GetType() != types.IS_TRUE {
+	if call_result == types.SUCCESS && !retval.IsFalse() && !retval.IsTrue() {
 		operators.ConvertToString(&retval)
 		core.PHP_STRLCPY(ent.GetDName(), retval.String().GetVal(), b.SizeOf("ent -> d_name"), retval.String().GetLen())
 		didread = b.SizeOf("php_stream_dirent")

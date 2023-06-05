@@ -417,7 +417,7 @@ func PhpTcpSockopConnect(stream *core.PhpStream, sock *core.PhpNetstreamDataT, x
 		return -1
 	}
 	if core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "bindto")) != nil {
-		if tmpzval.GetType() != types.IS_STRING {
+		if !tmpzval.IsString() {
 			if xparam.GetWantErrortext() != 0 {
 				xparam.SetErrorText(zend.ZendSprintfZStr("local_addr context option is not a string."))
 			}

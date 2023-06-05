@@ -425,7 +425,7 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 		}
 		result.SetOpType(IS_CV)
 		result.GetOp().SetVar(LookupCv(name))
-		if zv.GetType() != types.IS_STRING {
+		if !zv.IsString() {
 			// types.ZendStringReleaseEx(name, 0)
 		}
 		return types.SUCCESS

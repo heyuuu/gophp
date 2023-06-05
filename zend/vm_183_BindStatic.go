@@ -30,13 +30,10 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if !(value.IsReference()) {
-			var ref = (*types.ZendReference)(Emalloc(b.SizeOf("zend_reference")))
-			types.ZVAL_COPY_VALUE(ref.GetVal(), value)
-			ref.GetSources().SetPtr(nil)
-			value.SetTypeReference()
+			var ref = types.NewZendReference(value)
+			value.SetReference(ref)
 			variable_ptr.SetReference(ref)
 		} else {
-			variable_ptr.SetReference(value.Reference())
 			variable_ptr.SetReference(value.Reference())
 		}
 	} else {

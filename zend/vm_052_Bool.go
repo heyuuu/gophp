@@ -11,7 +11,7 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	val = opline.Const1()
 	if val.IsTrue() {
 		opline.Result().SetTrue()
-	} else if val.GetTypeInfo() <= types.IS_TRUE {
+	} else if val.IsSignType() {
 
 		/* The result and op1 can be the same cv zval */
 
@@ -30,7 +30,7 @@ func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	val = opline.Op1()
 	if val.IsTrue() {
 		opline.Result().SetTrue()
-	} else if val.GetTypeInfo() <= types.IS_TRUE {
+	} else if val.IsSignType() {
 
 		/* The result and op1 can be the same cv zval */
 
@@ -53,7 +53,7 @@ func ZEND_BOOL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	val = opline.Op1()
 	if val.IsTrue() {
 		opline.Result().SetTrue()
-	} else if val.GetTypeInfo() <= types.IS_TRUE {
+	} else if val.IsSignType() {
 
 		/* The result and op1 can be the same cv zval */
 

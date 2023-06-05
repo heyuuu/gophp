@@ -11,7 +11,7 @@ func ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) i
 	var jumptable *types.Array
 	op = opline.Const1()
 	jumptable = opline.Const2().Array()
-	if op.GetType() != types.IS_STRING {
+	if !op.IsString() {
 		{
 
 			/* Wrong type, fall back to ZEND_CASE chain */
@@ -46,7 +46,7 @@ func ZEND_SWITCH_STRING_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData
 	var jumptable *types.Array
 	op = opline.Op1()
 	jumptable = opline.Const2().Array()
-	if op.GetType() != types.IS_STRING {
+	if !op.IsString() {
 
 		/* Wrong type, fall back to ZEND_CASE chain */
 
@@ -54,7 +54,7 @@ func ZEND_SWITCH_STRING_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData
 
 		{
 			op = types.ZVAL_DEREF(op)
-			if op.GetType() != types.IS_STRING {
+			if !op.IsString() {
 
 				/* Wrong type, fall back to ZEND_CASE chain */
 

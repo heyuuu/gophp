@@ -443,14 +443,14 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
 			// zend.ZvalPtrDtor(&ob_data)
 			var PHP_OUTPUT_USER_SUCCESS func(retval types.Zval) bool = func(retval types.Zval) bool {
-				return retval.IsNotUndef() && retval.GetType() != types.IS_FALSE
+				return retval.IsNotUndef() && !retval.IsFalse()
 			}
 			if types.SUCCESS == zend.ZendFcallInfoCall(handler.GetUser().GetFci(), handler.GetUser().GetFcc(), &retval, nil) && PHP_OUTPUT_USER_SUCCESS(retval) {
 
 				/* user handler may have returned TRUE */
 
 				status = PHP_OUTPUT_HANDLER_NO_DATA
-				if retval.GetType() != types.IS_FALSE && retval.GetType() != types.IS_TRUE {
+				if !retval.IsFalse() && !retval.IsTrue() {
 					operators.ConvertToStringEx(&retval)
 					if retval.String().GetLen() != 0 {
 						context.GetOut().SetData(zend.Estrndup(retval.String().GetVal(), retval.String().GetLen()))

@@ -6,7 +6,7 @@ func ZEND_FE_FREE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var var_ *types.Zval
 	var opline *types.ZendOp = executeData.GetOpline()
 	var_ = opline.Op1()
-	if var_.GetType() != types.IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
+	if !var_.IsArray() && var_.GetFeIterIdx() != uint32-1 {
 		EG__().DelArrayIterator(var_.GetFeIterIdx())
 	}
 	// ZvalPtrDtorNogc(var_)

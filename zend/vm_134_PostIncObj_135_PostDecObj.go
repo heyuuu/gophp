@@ -16,7 +16,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	property = opline.Const2()
 	for {
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto post_incdec_object
@@ -69,7 +69,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	property = opline.Op2()
 	for {
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto post_incdec_object
@@ -121,7 +121,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	property = opline.Cv2OrUndef()
 	for {
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto post_incdec_object
@@ -285,7 +285,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	object = opline.Op1()
 	property = opline.Const2()
 	for {
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto post_incdec_object
@@ -334,7 +334,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	object = opline.Op1()
 	property = opline.Op2()
 	for {
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto post_incdec_object
@@ -382,7 +382,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	object = opline.Op1()
 	property = opline.Cv2OrUndef()
 	for {
-		if object.GetType() != types.IS_OBJECT {
+		if !object.IsObject() {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto post_incdec_object

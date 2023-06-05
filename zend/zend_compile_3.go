@@ -618,7 +618,7 @@ func (compiler *Compiler) CompileFuncInArray(result *Znode, args *ZendAstList) i
 				var _z *types.Zval = _p.GetVal()
 
 				val = _z
-				if val.GetType() != types.IS_STRING || operators.IsNumericString(val.String().GetStr(), nil, nil, 0) != 0 {
+				if !val.IsString() || operators.IsNumericString(val.String().GetStr(), nil, nil, 0) != 0 {
 					dst.Destroy()
 					ok = 0
 					break

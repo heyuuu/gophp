@@ -222,7 +222,7 @@ func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ u
 	compiler.CompileExpr(&method_node, method_ast)
 	if method_node.GetOpType() == IS_CONST {
 		var name *types.Zval = method_node.GetConstant()
-		if name.GetType() != types.IS_STRING {
+		if !name.IsString() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
 		if ZendIsConstructor(name.String()) != 0 {
@@ -571,7 +571,7 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator with non-integer operand "+"is no longer supported", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth_zv = ZendAstGetZval(depth_ast)
-		if depth_zv.GetType() != types.IS_LONG || depth_zv.Long() < 1 {
+		if !depth_zv.IsLong() || depth_zv.Long() < 1 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator accepts only positive integers", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth = depth_zv.Long()

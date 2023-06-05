@@ -74,7 +74,7 @@ func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp
 		}
 		break
 	}
-	if num.GetType() != types.IS_STRING || base == 10 {
+	if !num.IsString() || base == 10 {
 		return_value.SetLong(operators.ZvalGetLong(num))
 		return
 	}

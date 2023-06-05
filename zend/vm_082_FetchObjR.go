@@ -43,7 +43,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Const2()
-	if container.GetType() != types.IS_OBJECT {
+	if !container.IsObject() {
 		for {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
@@ -117,7 +117,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Op2()
-	if container.GetType() != types.IS_OBJECT {
+	if !container.IsObject() {
 		for {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
@@ -164,7 +164,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Op2()
-	if container.GetType() != types.IS_OBJECT {
+	if !container.IsObject() {
 		for {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
@@ -276,7 +276,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Op2()
-	if container.GetType() != types.IS_OBJECT {
+	if !container.IsObject() {
 		for {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
@@ -323,7 +323,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Op2()
-	if container.GetType() != types.IS_OBJECT {
+	if !container.IsObject() {
 		for {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)

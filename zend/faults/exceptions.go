@@ -276,7 +276,7 @@ func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *type
 }
 func CHECK_EXC_TYPE(object *types.Zval, id string, type_ uint8, value *types.Zval) {
 	pvalue := zend.ZendReadProperty(GetExceptionBase(object), object, id, 1, value)
-	if pvalue.GetType() != types.IS_NULL && pvalue.GetType() != type_ {
+	if !pvalue.IsNull() && pvalue.GetType() != type_ {
 		zend.ZendUnsetProperty(GetExceptionBase(object), object, id)
 	}
 }
@@ -291,7 +291,7 @@ func ZimExceptionWakeup(executeData *zend.ZendExecuteData, return_value *types.Z
 	CHECK_EXC_TYPE(object, types.STR_LINE, types.IS_LONG, &value)
 	CHECK_EXC_TYPE(object, types.STR_TRACE, types.IS_ARRAY, &value)
 	pvalue = zend.ZendReadProperty(GetExceptionBase(object), object, "previous", 1, &value)
-	if pvalue != nil && pvalue.GetType() != types.IS_NULL && (pvalue.GetType() != types.IS_OBJECT || operators.InstanceofFunction(types.Z_OBJCE_P(pvalue), ZendCeThrowable) == 0 || pvalue == object) {
+	if pvalue != nil && !pvalue.IsNull() && (!pvalue.IsObject() || operators.InstanceofFunction(types.Z_OBJCE_P(pvalue), ZendCeThrowable) == 0 || pvalue == object) {
 		zend.ZendUnsetProperty(GetExceptionBase(object), object, "previous")
 	}
 }
@@ -472,7 +472,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 	str.WriteByte(' ')
 	file = ht.KeyFind(types.STR_FILE)
 	if file != nil {
-		if file.GetType() != types.IS_STRING {
+		if !file.IsString() {
 			Error(E_WARNING, "Function name is no string")
 			str.WriteString("[unknown function]")
 		} else {
@@ -529,12 +529,12 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 	object = zend.ZEND_THIS(executeData)
 	base_ce = GetExceptionBase(object)
 	trace = zend.ZendReadProperty(base_ce, object, types.STR_TRACE, 1, &rv)
-	if trace.GetType() != types.IS_ARRAY {
+	if !trace.IsArray() {
 		return_value.SetFalse()
 		return
 	}
 	trace.Array().Foreach(func(key types.ArrayKey, frame *types.Zval) {
-		if frame.GetType() != types.IS_ARRAY {
+		if !frame.IsArray() {
 			Error(E_WARNING, "Expected array for frame "+zend.ZEND_ULONG_FMT, key.IdxKey())
 			return
 		}
@@ -582,7 +582,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		fci.SetParams(nil)
 		fci.SetNoSeparation(1)
 		zend.ZendCallFunction(&fci, nil)
-		if trace.GetType() != types.IS_STRING {
+		if !trace.IsString() {
 			// zend.ZvalPtrDtor(&trace)
 			trace.SetUndef()
 		}
@@ -731,7 +731,7 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 		var line zend.ZendLong = 0
 		zend.ZendCallMethodWith0Params(&exception, ce_exception, ex.GetCe().GetTostring(), "__tostring", &tmp)
 		if zend.EG__().GetException() == nil {
-			if tmp.GetType() != types.IS_STRING {
+			if !tmp.IsString() {
 				Error(E_WARNING, "%s::__toString() must return a string", ce_exception.GetName().GetVal())
 			} else {
 				zend.ZendUpdatePropertyEx(GetExceptionBase(&exception), &exception, types.STR_STRING, &tmp)
@@ -775,7 +775,7 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 }
 func ThrowExceptionObject(exception *types.Zval) {
 	var exception_ce *types.ClassEntry
-	if exception == nil || exception.GetType() != types.IS_OBJECT {
+	if exception == nil || !exception.IsObject() {
 		ErrorNoreturn(E_CORE_ERROR, "Need to supply an object when throwing an exception")
 	}
 	exception_ce = types.Z_OBJCE_P(exception)

@@ -57,13 +57,19 @@ func (zv *Zval) IsBool() bool            { return zv.typ == IS_FALSE || zv.typ =
 func (zv *Zval) IsLong() bool            { return zv.typ == IS_LONG }
 func (zv *Zval) IsDouble() bool          { return zv.typ == IS_DOUBLE }
 func (zv *Zval) IsString() bool          { return zv.typ == IS_STRING }
-func (zv *Zval) IsArray() bool           { return zv.typ == IS_ARRAY }
+func (zv *Zval) IsArray() bool           { return zv.typ == IS_ARRAY || zv.typ == _IS_IMMUTABLE_ARRAY }
 func (zv *Zval) IsObject() bool          { return zv.typ == IS_OBJECT }
 func (zv *Zval) IsResource() bool        { return zv.typ == IS_RESOURCE }
 func (zv *Zval) IsReference() bool       { return zv.typ == IS_REFERENCE }
 func (zv *Zval) IsConstantAst() bool     { return zv.typ == IS_CONSTANT_AST }
 func (zv *Zval) IsIndirect() bool        { return zv.typ == IS_INDIRECT }
 func (zv *Zval) IsError() bool           { return zv.typ == IS_ERROR }
+
+// 返回是否为 undef、null、false，用于快速类型判断
+func (zv *Zval) IsSignFalse() bool { return zv.typ <= IS_FALSE }
+
+// 返回是否为 undef、null、false 或 true，用于快速类型判断
+func (zv *Zval) IsSignType() bool { return zv.typ <= IS_TRUE }
 
 func (zv *Zval) Long() int                 { return zv.value.(int) }
 func (zv *Zval) Double() float64           { return zv.value.(float64) }
@@ -126,28 +132,6 @@ func (zv *Zval) SetTypeInfo(value uint32) {
 	zv.typ = uint8(value & Z_TYPE_MASK)
 	zv.typeFlags = uint8((value & Z_TYPE_FLAGS_MASK) >> Z_TYPE_FLAGS_SHIFT)
 }
-
-// 所有对类型的设置操作都集中到这里
-func (zv *Zval) SetTypeUndef()  { zv.typ, zv.typeFlags = IS_UNDEF, 0 }
-func (zv *Zval) SetTypeNull()   { zv.typ, zv.typeFlags = IS_NULL, 0 }
-func (zv *Zval) SetTypeFalse()  { zv.typ, zv.typeFlags = IS_FALSE, 0 }
-func (zv *Zval) SetTypeTrue()   { zv.typ, zv.typeFlags = IS_TRUE, 0 }
-func (zv *Zval) SetTypeLong()   { zv.typ, zv.typeFlags = IS_LONG, 0 }
-func (zv *Zval) SetTypeDouble() { zv.typ, zv.typeFlags = IS_DOUBLE, 0 }
-func (zv *Zval) SetTypeString() { zv.typ, zv.typeFlags = IS_STRING, 0 }
-func (zv *Zval) SetTypeArray() {
-	zv.typ, zv.typeFlags = IS_ARRAY, IS_TYPE_REFCOUNTED|IS_TYPE_COLLECTABLE
-}
-func (zv *Zval) SetTypeImmutableArray() {
-	zv.typ, zv.typeFlags = IS_ARRAY, 0
-}
-
-func (zv *Zval) SetTypeObject() {
-	zv.typ, zv.typeFlags = IS_OBJECT, IS_TYPE_REFCOUNTED|IS_TYPE_COLLECTABLE
-}
-func (zv *Zval) SetTypeResource()  { zv.typ, zv.typeFlags = IS_RESOURCE, IS_TYPE_REFCOUNTED }
-func (zv *Zval) SetTypeReference() { zv.typ, zv.typeFlags = IS_REFERENCE, IS_TYPE_REFCOUNTED }
-func (zv *Zval) SetTypeConstant()  { zv.typ, zv.typeFlags = IS_CONSTANT_AST, IS_TYPE_REFCOUNTED }
 
 /** Zval.u2 */
 func (zv *Zval) GetCacheSlot() uint32          { return zv.u2 }

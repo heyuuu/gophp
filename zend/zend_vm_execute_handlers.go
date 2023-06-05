@@ -116,13 +116,11 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 	// fast
 	switch operators.TypePair(op1.GetType(), op2.GetType()) {
 	case operators.TypePair(types.IS_LONG, types.IS_LONG):
-		var overflow ZendLong
 		result := opline.Result()
-		ZEND_SIGNED_MULTIPLY_LONG(op1.Long(), op2.Long(), result.Long(), result.Double(), overflow)
-		if overflow != 0 {
-			result.SetTypeInfo(types.IS_DOUBLE)
+		if iVal, dVal, overflow := SignedMultiplyLong(op1.Long(), op2.Long()); overflow {
+			result.SetDouble(dVal)
 		} else {
-			result.SetTypeInfo(types.IS_LONG)
+			result.SetLong(iVal)
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	case operators.TypePair(types.IS_DOUBLE, types.IS_DOUBLE),

@@ -584,7 +584,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, type_ int
 			if rv.IsNotUndef() {
 				retval = rv
 				if !(rv.IsReference()) && (type_ == BP_VAR_W || type_ == BP_VAR_RW || type_ == BP_VAR_UNSET) {
-					if rv.GetType() != types.IS_OBJECT {
+					if !rv.IsObject() {
 						faults.Error(faults.E_NOTICE, "Indirect modification of overloaded property %s::$%s has no effect", zobj.GetCe().Name(), name.GetVal())
 					}
 				}
@@ -1391,7 +1391,7 @@ func ZendStdHasPropertyEx(zobj *types.ZendObject, member *types.Zval, has_set_ex
 				} else if has_set_exists < ZEND_PROPERTY_NOT_EMPTY {
 					b.Assert(has_set_exists == ZEND_PROPERTY_ISSET)
 					value = types.ZVAL_DEREF(value)
-					result = value.GetType() != types.IS_NULL
+					result = !value.IsNull()
 				} else {
 					b.Assert(has_set_exists == ZEND_PROPERTY_EXISTS)
 					result = 1

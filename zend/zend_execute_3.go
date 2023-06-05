@@ -162,7 +162,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		}
 		return
 	}
-	if value.GetType() != types.IS_STRING {
+	if !value.IsString() {
 
 		/* Convert to string, just the time to pick the 1st byte */
 
@@ -316,7 +316,7 @@ func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, 
 		} else {
 			operators.FastLongDecrementFunction(prop)
 		}
-		if prop.GetType() != types.IS_LONG && prop_info != nil {
+		if !prop.IsLong() && prop_info != nil {
 			var val ZendLong = ZendThrowIncdecPropError(prop_info, opline)
 			prop.SetLong(val)
 		}
@@ -352,7 +352,7 @@ func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo,
 		} else {
 			operators.FastLongDecrementFunction(prop)
 		}
-		if prop.GetType() != types.IS_LONG && prop_info != nil {
+		if !prop.IsLong() && prop_info != nil {
 			var val ZendLong = ZendThrowIncdecPropError(prop_info, opline)
 			prop.SetLong(val)
 		}

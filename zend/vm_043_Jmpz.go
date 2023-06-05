@@ -11,7 +11,7 @@ func ZEND_JMPZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	val = opline.Const1()
 	if val.IsTrue() {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	} else if val.GetTypeInfo() <= types.IS_TRUE {
+	} else if val.IsSignType() {
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
 	if operators.ZvalIsTrue(val) {
@@ -28,7 +28,7 @@ func ZEND_JMPZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	val = opline.Op1()
 	if val.IsTrue() {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	} else if val.GetTypeInfo() <= types.IS_TRUE {
+	} else if val.IsSignType() {
 		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 			if EG__().GetException() != nil {
@@ -51,7 +51,7 @@ func ZEND_JMPZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	val = opline.Op1()
 	if val.IsTrue() {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	} else if val.GetTypeInfo() <= types.IS_TRUE {
+	} else if val.IsSignType() {
 		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 			if EG__().GetException() != nil {

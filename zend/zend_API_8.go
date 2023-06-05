@@ -49,7 +49,7 @@ again:
 				break
 			}
 			method = types.ZVAL_DEREF(method)
-			if method.GetType() != types.IS_STRING {
+			if !method.IsString() {
 				break
 			}
 			obj = types.ZVAL_DEREF(obj)
@@ -75,7 +75,7 @@ again:
 			break
 		}
 		if callable.Array().Len() == 2 {
-			if obj == nil || b.CondF(!(obj.IsReference()), func() bool { return obj.GetType() != types.IS_STRING && obj.GetType() != types.IS_OBJECT }, func() bool {
+			if obj == nil || b.CondF(!(obj.IsReference()), func() bool { return !obj.IsString() && !obj.IsObject() }, func() bool {
 				return types.Z_REFVAL_P(obj).GetType() != types.IS_STRING && types.Z_REFVAL_P(obj).GetType() != types.IS_OBJECT
 			}) {
 				if error != nil {
@@ -192,7 +192,7 @@ func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ types.IFunction, args *
 	if args == nil {
 		return types.SUCCESS
 	}
-	if args.GetType() != types.IS_ARRAY {
+	if !args.IsArray() {
 		return types.FAILURE
 	}
 	fci.SetParamCount(args.Array().Len())

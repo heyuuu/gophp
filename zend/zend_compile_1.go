@@ -95,7 +95,7 @@ func ZendResolveClassName(name string, typ uint32) string {
 }
 func ZendResolveClassNameAst(ast *ZendAst) *types.String {
 	var class_name = ZendAstGetZval(ast)
-	if class_name.GetType() != types.IS_STRING {
+	if !class_name.IsString() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
 	resolveName := ZendResolveClassName(class_name.StringVal(), ast.GetAttr())
@@ -355,7 +355,7 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use ::class with dynamic class name")
 	}
 	class_name = ZendAstGetZval(class_ast)
-	if class_name.GetType() != types.IS_STRING {
+	if !class_name.IsString() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
 	fetch_type = ZendGetClassFetchType(class_name.String().GetStr())

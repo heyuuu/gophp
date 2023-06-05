@@ -119,7 +119,7 @@ func PhpMailBuildHeadersElems(s *zend.SmartStr, key *types.String, val *types.Zv
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple header key must be numeric index (%s)", tmp_key.GetVal())
 			continue
 		}
-		if tmp_val.GetType() != types.IS_STRING {
+		if !tmp_val.IsString() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple header values must be string (%s)", key.GetVal())
 			continue
 		}

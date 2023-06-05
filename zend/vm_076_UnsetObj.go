@@ -13,10 +13,10 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	offset = opline.Const2()
 	for {
-		if container.GetType() != types.IS_OBJECT {
+		if !container.IsObject() {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
-				if container.GetType() != types.IS_OBJECT {
+				if !container.IsObject() {
 					if container.IsUndef() {
 						ZVAL_UNDEFINED_OP1(executeData)
 					}
@@ -43,10 +43,10 @@ func ZEND_UNSET_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	offset = opline.Op2()
 	for {
-		if container.GetType() != types.IS_OBJECT {
+		if !container.IsObject() {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
-				if container.GetType() != types.IS_OBJECT {
+				if !container.IsObject() {
 					if container.IsUndef() {
 						ZVAL_UNDEFINED_OP1(executeData)
 					}
@@ -73,10 +73,10 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	offset = opline.Cv2OrUndef()
 	for {
-		if container.GetType() != types.IS_OBJECT {
+		if !container.IsObject() {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
-				if container.GetType() != types.IS_OBJECT {
+				if !container.IsObject() {
 					if container.IsUndef() {
 						ZVAL_UNDEFINED_OP1(executeData)
 					}
@@ -148,10 +148,10 @@ func ZEND_UNSET_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	container = opline.Op1()
 	offset = opline.Const2()
 	for {
-		if container.GetType() != types.IS_OBJECT {
+		if !container.IsObject() {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
-				if container.GetType() != types.IS_OBJECT {
+				if !container.IsObject() {
 					if container.IsUndef() {
 						ZVAL_UNDEFINED_OP1(executeData)
 					}
@@ -174,10 +174,10 @@ func ZEND_UNSET_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	container = opline.Op1()
 	offset = opline.Op2()
 	for {
-		if container.GetType() != types.IS_OBJECT {
+		if !container.IsObject() {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
-				if container.GetType() != types.IS_OBJECT {
+				if !container.IsObject() {
 					if container.IsUndef() {
 						ZVAL_UNDEFINED_OP1(executeData)
 					}
@@ -200,10 +200,10 @@ func ZEND_UNSET_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	container = opline.Op1()
 	offset = opline.Cv2OrUndef()
 	for {
-		if container.GetType() != types.IS_OBJECT {
+		if !container.IsObject() {
 			if container.IsReference() {
 				container = types.Z_REFVAL_P(container)
-				if container.GetType() != types.IS_OBJECT {
+				if !container.IsObject() {
 					if container.IsUndef() {
 						ZVAL_UNDEFINED_OP1(executeData)
 					}

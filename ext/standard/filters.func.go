@@ -1359,7 +1359,7 @@ func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persiste
 	var retval *core.PhpStreamFilter = nil
 	var dot *byte
 	var conv_mode int = 0
-	if filterparams != nil && filterparams.GetType() != types.IS_ARRAY {
+	if filterparams != nil && !filterparams.IsArray() {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): invalid filter parameter", filtername)
 		return nil
 	}

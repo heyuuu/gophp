@@ -452,7 +452,7 @@ func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 	var args *types.Zval
 	var zv *types.Zval
 	var n int
-	if array.GetType() != types.IS_ARRAY {
+	if !array.IsArray() {
 		operators.ConvertToArray(array)
 	}
 	n = array.Array().Len()

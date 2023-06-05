@@ -808,7 +808,7 @@ func zim_spl_SplDoublyLinkedList_unserialize(executeData *zend.ZendExecuteData, 
 	/* flags */
 
 	flags = standard.VarTmpVar(&var_hash)
-	if standard.PhpVarUnserialize(flags, &p, s+buf_len, &var_hash) == 0 || flags.GetType() != types.IS_LONG {
+	if standard.PhpVarUnserialize(flags, &p, s+buf_len, &var_hash) == 0 || !flags.IsLong() {
 		goto error
 	}
 	intern.SetFlags(int(flags.Long()))
@@ -877,7 +877,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData
 	flags_zv = data.IndexFind(0)
 	storage_zv = data.IndexFind(1)
 	members_zv = data.IndexFind(2)
-	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != types.IS_LONG || storage_zv.GetType() != types.IS_ARRAY || members_zv.GetType() != types.IS_ARRAY {
+	if flags_zv == nil || storage_zv == nil || members_zv == nil || !flags_zv.IsLong() || !storage_zv.IsArray() || !members_zv.IsArray() {
 		faults.ThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}

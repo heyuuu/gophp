@@ -103,7 +103,7 @@ send_again:
 					if EG__().GetException() != nil {
 						break
 					}
-					if key.GetType() != types.IS_LONG {
+					if !key.IsLong() {
 						faults.ThrowError(nil, b.Cond(key.IsString(), "Cannot unpack Traversable with string keys", "Cannot unpack Traversable with non-integer keys"))
 						// ZvalPtrDtor(&key)
 						break

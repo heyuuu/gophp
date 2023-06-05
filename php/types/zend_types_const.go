@@ -1,7 +1,5 @@
 package types
 
-import "math"
-
 type ZendBool = int
 type ZEND_RESULT_CODE = int
 
@@ -25,7 +23,6 @@ const (
 	SUCCESS                  = 0
 	FAILURE ZEND_RESULT_CODE = -1
 )
-const ZEND_SIZE_MAX = math.MaxUint
 
 type ZendIntptrT = uintptr
 type ZendUintptrT = uintptr
@@ -76,12 +73,6 @@ const Z_TYPE_MASK = 0xff
 const Z_TYPE_FLAGS_MASK = 0xff00
 const Z_TYPE_FLAGS_SHIFT = 8
 
-/* zval_gc_flags(zval.value->gc.u.type_info) (common flags) */
-
-const GC_COLLECTABLE = 1 << 4
-const GC_PROTECTED = 1 << 5
-const GC_IMMUTABLE = 1 << 6
-
 /* zval.u1.v.type_flags */
 
 const IS_TYPE_REFCOUNTED = 1 << 0
@@ -95,9 +86,5 @@ const IS_OBJECT_EX uint32 = IS_OBJECT | IS_TYPE_REFCOUNTED<<Z_TYPE_FLAGS_SHIFT |
 const IS_REFERENCE_EX uint32 = IS_REFERENCE | IS_TYPE_REFCOUNTED<<Z_TYPE_FLAGS_SHIFT
 
 /* object flags (zval.value->gc.u.flags) */
-
-//const IS_OBJ_WEAKLY_REFERENCED = GC_PERSISTENT
-const IS_OBJ_DESTRUCTOR_CALLED = 1 << 8
-const IS_OBJ_FREE_CALLED = 1 << 9
 
 const IS_PROP_UNINIT = 1

@@ -511,11 +511,11 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 				} else if type_.IsClass() {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property of type %s may not have default value", type_.FormatName())
 				} else if type_.Code() == types.IS_ARRAY || type_.Code() == types.IS_ITERABLE {
-					if value_zv.GetType() != types.IS_ARRAY {
+					if !value_zv.IsArray() {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be an array", type_.FormatName())
 					}
 				} else if type_.Code() == types.IS_DOUBLE {
-					if value_zv.GetType() != types.IS_DOUBLE && value_zv.GetType() != types.IS_LONG {
+					if !value_zv.IsDouble() && !value_zv.IsLong() {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type float can only be float or int")
 					}
 					operators.ConvertToDouble(&value_zv)

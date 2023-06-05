@@ -101,7 +101,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 		var free_op2 ZendFreeOp
 		function_name = opline.Op2()
 		{
-			if function_name.GetType() != types.IS_STRING {
+			if !function_name.IsString() {
 				for {
 					if function_name.IsReference() {
 						function_name = types.Z_REFVAL_P(function_name)
@@ -250,7 +250,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 	{
 		function_name = opline.Op2()
 		{
-			if function_name.GetType() != types.IS_STRING {
+			if !function_name.IsString() {
 				for {
 					if function_name.IsReference() {
 						function_name = types.Z_REFVAL_P(function_name)
@@ -384,7 +384,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 		var free_op2 ZendFreeOp
 		function_name = opline.Op2()
 		{
-			if function_name.GetType() != types.IS_STRING {
+			if !function_name.IsString() {
 				for {
 					if function_name.IsReference() {
 						function_name = types.Z_REFVAL_P(function_name)
@@ -513,7 +513,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 	{
 		function_name = opline.Op2()
 		{
-			if function_name.GetType() != types.IS_STRING {
+			if !function_name.IsString() {
 				for {
 					if function_name.IsReference() {
 						function_name = types.Z_REFVAL_P(function_name)
@@ -664,7 +664,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 		var free_op2 ZendFreeOp
 		function_name = opline.Op2()
 		{
-			if function_name.GetType() != types.IS_STRING {
+			if !function_name.IsString() {
 				for {
 					if function_name.IsReference() {
 						function_name = types.Z_REFVAL_P(function_name)
@@ -817,7 +817,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 	{
 		function_name = opline.Op2()
 		{
-			if function_name.GetType() != types.IS_STRING {
+			if !function_name.IsString() {
 				for {
 					if function_name.IsReference() {
 						function_name = types.Z_REFVAL_P(function_name)

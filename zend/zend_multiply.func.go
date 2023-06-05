@@ -4,16 +4,18 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZEND_SIGNED_MULTIPLY_LONG(a ZendLong, b ZendLong, lval long, dval long__double, usedval ZendLong) {
-	var __lres long = a * b
-	var __dres long__double = long__double(a * long__double(b))
-	var __delta long__double = long__double(__lres - __dres)
-	if b.Assign(&usedval, __dres+__delta != __dres) {
-		dval = __dres
+func SignedMultiplyLong(a int, b int) (iVal int, dVal float64, overflow bool) {
+	// ZEND_SIGNED_MULTIPLY_LONG
+	iVal = a * b
+	dVal = float64(a) * float64(b)
+	delta := dVal - float64(iVal)
+	if dVal+delta != dVal {
+		return 0, dVal, true
 	} else {
-		lval = __lres
+		return iVal, 0, false
 	}
 }
+
 func ZendSafeAddress(nmemb int, size int, offset int, overflow *int) int {
 	var res int = nmemb*size + offset
 	var _d float64 = float64(nmemb)*float64(size) + float64(offset)

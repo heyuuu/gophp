@@ -1828,7 +1828,7 @@ func ZifFgetcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.
 			escape = uint8(escape_str[0])
 		}
 	}
-	if len_zv != nil && len_zv.GetType() != types.IS_NULL {
+	if len_zv != nil && !len_zv.IsNull() {
 		len_ = operators.ZvalGetLong(len_zv)
 		if len_ < 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter may not be negative")

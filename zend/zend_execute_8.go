@@ -199,7 +199,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 					ZendObjectStoreCtorFailed(obj)
 					// OBJ_RELEASE(obj)
 				} else if kind == ZEND_LIVE_LOOP {
-					if var_.GetType() != types.IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
+					if !var_.IsArray() && var_.GetFeIterIdx() != uint32-1 {
 						EG__().DelArrayIterator(var_.GetFeIterIdx())
 					}
 					// ZvalPtrDtorNogc(var_)
@@ -358,12 +358,12 @@ func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecu
 			return nil
 		}
 		obj = types.ZVAL_DEREF(obj)
-		if obj.GetType() != types.IS_STRING && obj.GetType() != types.IS_OBJECT {
+		if !obj.IsString() && !obj.IsObject() {
 			faults.ThrowError(nil, "First array member is not a valid class name or object")
 			return nil
 		}
 		method = types.ZVAL_DEREF(method)
-		if method.GetType() != types.IS_STRING {
+		if !method.IsString() {
 			faults.ThrowError(nil, "Second array member is not a valid method")
 			return nil
 		}

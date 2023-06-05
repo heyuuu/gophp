@@ -47,7 +47,7 @@ func ZendFetchDimensionAddressRead(
 	if is_list == 0 && container.IsString() {
 		var offset ZendLong
 	try_string_offset:
-		if dim.GetType() != types.IS_LONG {
+		if !dim.IsLong() {
 			switch dim.GetType() {
 			case types.IS_STRING:
 				if types.IS_LONG == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
@@ -305,11 +305,11 @@ func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *types.
 	}
 }
 func PromotesToArray(val *types.Zval) types.ZendBool {
-	return val.GetType() <= types.IS_FALSE || val.IsReference() && types.Z_REFVAL_P(val).GetType() <= types.IS_FALSE
+	return val.IsSignFalse() || val.IsReference() && types.Z_REFVAL_P(val).IsSignFalse()
 }
 func PromotesToObject(val *types.Zval) types.ZendBool {
 	val = types.ZVAL_DEREF(val)
-	return val.GetType() <= types.IS_FALSE || val.IsString() && val.String().GetLen() == 0
+	return val.IsSignFalse() || val.IsString() && val.String().GetLen() == 0
 }
 func CheckTypeArrayAssignable(type_ types.TypeHint) types.ZendBool {
 	if type_ == 0 {

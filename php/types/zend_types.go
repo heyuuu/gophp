@@ -75,11 +75,6 @@ func NewZendReference(val *Zval) *ZendReference {
 	ZVAL_COPY_VALUE(ref.GetVal(), val)
 	ref.sources.SetPtr(nil)
 
-	runtime.SetFinalizer(ref, func(ref *ZendReference) {
-		b.Assert(ref.GetSources().GetPtr() != nil)
-		zend.EfreeSize(ref, b.SizeOf("zend_reference"))
-	})
-
 	return ref
 }
 
