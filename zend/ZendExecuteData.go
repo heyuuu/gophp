@@ -25,6 +25,10 @@ type ZendExecuteData struct {
 func NewExecuteData(callInfo uint32, fun types.IFunction, numArgs uint32, objectOrCalledScope any, runtimeCacheSize uint32) *ZendExecuteData {
 	ex := &ZendExecuteData{}
 
+	if callInfo&ZEND_CALL_HAS_THIS != 0 {
+		b.Assert(objectOrCalledScope != nil)
+	}
+
 	ex.func_ = fun
 	ex.This.SetPtr(objectOrCalledScope)
 	ex.This.SetTypeInfo(callInfo)
@@ -168,7 +172,6 @@ func (ex *ZendExecuteData) SetReturnValue(value *types.Zval)     { ex.returnValu
 func (ex *ZendExecuteData) GetFunc() types.IFunction             { return ex.func_ }
 func (ex *ZendExecuteData) SetFunc(value types.IFunction)        { ex.func_ = value }
 func (ex *ZendExecuteData) GetThis() *types.Zval                 { return &ex.This }
-func (ex *ZendExecuteData) SetThis(zv *types.Zval)               { ex.This = *zv }
 func (ex *ZendExecuteData) GetPrevExecuteData() *ZendExecuteData { return ex.prevExecuteData }
 func (ex *ZendExecuteData) SetPrevExecuteData(value *ZendExecuteData) {
 	ex.prevExecuteData = value

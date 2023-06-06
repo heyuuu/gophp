@@ -18,7 +18,7 @@ const ZEND_LIVE_MASK = 7
 
 type ZifHandler func(executeData *ZendExecuteData, return_value *types.Zval)
 
-const ZEND_CALL_HAS_THIS = types.IS_OBJECT_EX
+const ZEND_CALL_HAS_THIS = uint32(types.IS_OBJECT)
 
 /* Top 16 bits of Z_TYPE_INFO(EX(This)) are used as call_info flags */
 

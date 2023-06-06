@@ -280,7 +280,9 @@ func ZendClosureCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 }
 func ZendGetClosureInvokeMethod(object *types.ZendObject) types.IFunction {
 	var closure *ZendClosure = (*ZendClosure)(object)
-	var invoke types.IFunction = (types.IFunction)(Emalloc(b.SizeOf("zend_function")))
+	var invoke types.IFunction = types.NewInternalFunction()
+
+	(types.IFunction)(Emalloc(b.SizeOf("zend_function")))
 	var keep_flags uint32 = types.AccReturnReference | types.AccVariadic | types.AccHasReturnType
 	invoke.SetCommon(closure.GetFunc().GetCommon())
 

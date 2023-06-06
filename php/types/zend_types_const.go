@@ -73,18 +73,6 @@ const Z_TYPE_MASK = 0xff
 const Z_TYPE_FLAGS_MASK = 0xff00
 const Z_TYPE_FLAGS_SHIFT = 8
 
-/* zval.u1.v.type_flags */
-
-const IS_TYPE_REFCOUNTED = 1 << 0
-const IS_TYPE_COLLECTABLE = 1 << 1
-
-/* This optimized version assumes that we have a single "type_flag" */
-
-/* extended types */
-
-const IS_OBJECT_EX uint32 = IS_OBJECT | IS_TYPE_REFCOUNTED<<Z_TYPE_FLAGS_SHIFT | IS_TYPE_COLLECTABLE<<Z_TYPE_FLAGS_SHIFT
-const IS_REFERENCE_EX uint32 = IS_REFERENCE | IS_TYPE_REFCOUNTED<<Z_TYPE_FLAGS_SHIFT
-
 /* object flags (zval.value->gc.u.flags) */
 
 const IS_PROP_UNINIT = 1

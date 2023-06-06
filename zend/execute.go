@@ -12,14 +12,14 @@ func ZendVmStackPushCallFrame(callInfo uint32, func_ types.IFunction, numArgs ui
 
 func ZendVmCalcUsedStack(numArgs uint32, func_ types.IFunction) uint32 {
 	var usedStack = numArgs
-	if ZEND_USER_CODE(func_.GetType()) {
-		usedStack += func_.GetOpArray().GetLastVar() + func_.GetOpArray().GetT() - b.Min(func_.GetOpArray().GetNumArgs(), numArgs)
+	if opArray, ok := func_.(*types.ZendOpArray); ok {
+		usedStack += uint32(opArray.GetLastVar()) + opArray.GetT() - b.Min(opArray.GetNumArgs(), numArgs)
 	}
 	return usedStack
 }
 
 func ZendVmStackPushCallFrameEx(runtimeCacheSize uint32, callInfo uint32, func_ types.IFunction, numArgs uint32, objectOrCalledScope any) *ZendExecuteData {
-	var call *ZendExecuteData = NewExecuteData(callInfo, func_, numArgs, objectOrCalledScope, runtimeCacheSize)
+	var call = NewExecuteData(callInfo, func_, numArgs, objectOrCalledScope, runtimeCacheSize)
 	EG__().VmStack().Push(call)
 	return call
 }

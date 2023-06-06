@@ -22,11 +22,15 @@ func (f *InternalFunction) GetOpArray() *ZendOpArray {
 func (f *InternalFunction) GetInternalFunction() *InternalFunction { return f }
 
 func NewInternalFunction() *InternalFunction {
-	return &InternalFunction{}
+	return &InternalFunction{
+		functionHeader: functionHeader{
+			typ: zend.ZEND_INTERNAL_FUNCTION,
+		},
+	}
 }
 
 func NewInternalFunctionEx(funcName string, handler zend.ZifHandler) *InternalFunction {
-	f := &InternalFunction{}
+	f := NewInternalFunction()
 	f.functionName = funcName
 	f.handler = handler
 	return f

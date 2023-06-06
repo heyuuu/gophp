@@ -4,7 +4,6 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -86,7 +85,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 								if prop_info != nil {
 									value.SetNewRef(value)
 									ZEND_REF_ADD_TYPE_SOURCE(value.Reference(), prop_info)
-									value_type = types.IS_REFERENCE_EX
+									value_type = types.IS_REFERENCE
 								}
 							}
 							break

@@ -278,7 +278,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) 
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *types.PropertyInfo
-	object = &(executeData.GetThis())
+	object = executeData.GetThis()
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}

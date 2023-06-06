@@ -55,9 +55,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		}
 
 		/* We are not handling overloaded classes right now */
-
 		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.Object())
-		// 		result.AddRefcount()
 	}
 	call.SetPrevExecuteData(executeData.GetCall())
 	executeData.GetCall() = call

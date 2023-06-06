@@ -330,7 +330,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		/* CV may be changed indirectly (e.g. when it's a reference) */
-
 		call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS | ZEND_CALL_RELEASE_THIS
 	}
 	call = ZendVmStackPushCallFrame(call_info, fbc, opline.GetExtendedValue(), obj)
@@ -816,16 +815,8 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 		obj = (*types.ZendObject)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
-		{
-			// 			obj.AddRefcount()
-		}
-
 		/* CV may be changed indirectly (e.g. when it's a reference) */
-
 		call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS | ZEND_CALL_RELEASE_THIS
-
-		/* CV may be changed indirectly (e.g. when it's a reference) */
-
 	}
 	call = ZendVmStackPushCallFrame(call_info, fbc, opline.GetExtendedValue(), obj)
 	call.SetPrevExecuteData(executeData.GetCall())
