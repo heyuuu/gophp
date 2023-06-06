@@ -7,7 +7,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZendExtensionActivator(extension *ZendExtension) {
@@ -37,7 +36,10 @@ func InitExecutor() {
 	EG__().SetFlags(EG_FLAGS_INITIAL)
 	ZendVmStackInit()
 	EG__().SetSymbolTable(types.NewArray(64))
-	ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionActivator))
+	ZendExtensions.Apply(func(ext *ZendExtension) {
+		ZendExtensionActivator(ext)
+	})
+
 	EG__().SetIncludedFiles(types.NewArray(8))
 	EG__().GetUserErrorHandler().SetUndef()
 	EG__().GetUserExceptionHandler().SetUndef()
@@ -164,7 +166,10 @@ func ShutdownExecutor() {
 	//ZendWeakrefsShutdown()
 
 	faults.Try(func() {
-		ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionDeactivator))
+		ZendExtensions.Apply(func(ext *ZendExtension) {
+			ZendExtensionDeactivator(ext)
+		})
+
 	})
 
 	if fast_shutdown != 0 {
@@ -369,7 +374,6 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 		 * It shouldn't be strictly necessary to NULL executeData out,
 		 * but it may make bugs easier to spot
 		 */
-
 		memset(&dummy_execute_data, 0, b.SizeOf("zend_execute_data"))
 		EG__().SetCurrentExecuteData(&dummy_execute_data)
 	} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetType()) && CurrEX().GetOpline().GetOpcode() != ZEND_DO_FCALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_ICALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_UCALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_FCALL_BY_NAME {

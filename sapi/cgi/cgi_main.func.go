@@ -32,15 +32,14 @@ func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	return 0
 }
 func PrintExtensions() {
-	elements := zend.ZendExtensions.ElementsData()
-	sort.Slice(elements, func(i, j int) bool {
-		ext1 := elements[i].(*zend.ZendExtension)
-		ext2 := elements[j].(*zend.ZendExtension)
-		return ext1.GetName() < ext2.GetName()
+	extensions := zend.ZendExtensions.Elements()
+	sort.Slice(extensions, func(i, j int) bool {
+		ext1 := extensions[i]
+		ext2 := extensions[j]
+		return ext1.GetNameStr() < ext2.GetNameStr()
 	})
 
-	for _, element := range elements {
-		ext := element.(*zend.ZendExtension)
+	for _, ext := range extensions {
 		PrintExtensionInfo(ext, nil)
 	}
 }

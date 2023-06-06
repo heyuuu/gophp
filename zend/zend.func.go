@@ -258,7 +258,8 @@ func ZendStartup() int {
 	StartMemoryManager()
 	VirtualCwdStartup()
 	//ZendStartupStrtod()
-	ZendStartupExtensionsMechanism()
+
+	ZendExtensions.Init()
 
 	ZendVersionInfo = ZEND_CORE_VERSION_INFO
 
@@ -318,7 +319,7 @@ func ZendShutdown() {
 	CG__().DestroyTables()
 	EG__().DestroyTables()
 
-	ZendShutdownExtensions()
+	ZendExtensions.Shutdown()
 
 	ZendMapPtrShutdown()
 	ZendDestroyRsrcListDtors()

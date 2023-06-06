@@ -1107,7 +1107,7 @@ func PhpRequestStartup() int {
 	SG__().sapi_started = 1
 	return types.IntBool(retVal)
 }
-func PhpRequestShutdown(dummy any) {
+func PhpRequestShutdown() {
 	var report_memleaks types.ZendBool
 	zend.EG__().AddFlags(zend.EG_FLAGS_IN_SHUTDOWN)
 	report_memleaks = PG__().report_memleaks
@@ -1383,8 +1383,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	zend.ZendStartupModules()
 
 	/* start Zend extensions */
-
-	zend.ZendStartupExtensions()
+	zend.ZendExtensions.Startup()
 	zend.ZendCollectModuleHandlers()
 
 	/* register additional functions */

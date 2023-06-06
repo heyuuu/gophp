@@ -77,9 +77,6 @@ func ZendAssignOpOverloadedProperty(
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), &res)
 	}
-	// ZvalPtrDtor(z)
-	// ZvalPtrDtor(&res)
-	// OBJ_RELEASE(obj.Object())
 }
 func ZendExtensionStatementHandler(extension *ZendExtension, frame *ZendExecuteData) {
 	if extension.GetStatementHandler() != nil {

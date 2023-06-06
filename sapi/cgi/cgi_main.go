@@ -384,7 +384,7 @@ func main(argc int, argv []*byte) int {
 							core.SG__().RequestInfo.no_headers = 1
 						}
 						standard.PhpPrintInfo(0xffffffff)
-						core.PhpRequestShutdown(any(0))
+						core.PhpRequestShutdown()
 						core.FcgiShutdown()
 						exit_status = 0
 						goto out
@@ -423,7 +423,7 @@ func main(argc int, argv []*byte) int {
 						core.SG__().headers_sent = 1
 						core.SG__().RequestInfo.no_headers = 1
 						core.PhpPrintf("PHP %s (%s) (built: %s %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, core.SM__().Name(), __DATE__, __TIME__, zend.GetZendVersion())
-						core.PhpRequestShutdown(any(0))
+						core.PhpRequestShutdown()
 						core.FcgiShutdown()
 						exit_status = 0
 						goto out
@@ -577,7 +577,7 @@ func main(argc int, argv []*byte) int {
 						zend.Free(core.SG__().RequestInfo.query_string)
 						core.SG__().RequestInfo.query_string = nil
 					}
-					core.PhpRequestShutdown(any(0))
+					core.PhpRequestShutdown()
 					core.SG__().server_context = nil
 					core.PhpModuleShutdown()
 					app.SapiShutdown()
@@ -624,7 +624,7 @@ func main(argc int, argv []*byte) int {
 				zend.Efree(core.SG__().RequestInfo.path_translated)
 				core.SG__().RequestInfo.path_translated = nil
 			}
-			core.PhpRequestShutdown(any(0))
+			core.PhpRequestShutdown()
 			if exit_status == 0 {
 				exit_status = zend.EG__().GetExitStatus()
 			}

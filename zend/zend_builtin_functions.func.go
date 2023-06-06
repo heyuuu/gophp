@@ -1018,7 +1018,10 @@ func ZifGetLoadedExtensions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	}
 	ArrayInit(return_value)
 	if zendext != 0 {
-		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(AddZendextInfo), return_value)
+		ZendExtensions.Apply(func(ext *ZendExtension) {
+			AddZendextInfo(ext, return_value)
+		})
+
 	} else {
 		globals.G().EachModule(func(module *ModuleEntry) {
 			AddNextIndexString(return_value, module.GetName())

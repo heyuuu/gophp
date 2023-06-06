@@ -958,7 +958,7 @@ func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient
 	return types.SUCCESS
 }
 func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClient) int {
-	core.PhpRequestShutdown(0)
+	core.PhpRequestShutdown()
 	PhpCliServerCloseConnection(server, client)
 	DestroyRequestInfo(&(core.SG__().RequestInfo))
 	core.SG__().server_context = nil
@@ -1031,7 +1031,7 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 			/* we don't want headers to be sent */
 
 			core.SM__().SetSendHeaders(SapiCliServerDiscardHeaders)
-			core.PhpRequestShutdown(0)
+			core.PhpRequestShutdown()
 			core.SM__().SetSendHeaders(send_header_func)
 			core.SG__().sapi_headers.send_default_content_type = 1
 			core.SG__().ResetUploadFiles()
