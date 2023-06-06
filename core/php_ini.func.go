@@ -559,9 +559,6 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.A
 					/* FIXME: Add parsed file to the list of user files read? */
 
 					return types.SUCCESS
-
-					/* FIXME: Add parsed file to the list of user files read? */
-
 				}
 				return types.FAILURE
 			}

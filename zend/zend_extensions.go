@@ -69,11 +69,16 @@ func (extensions *ZendExtensionsT) Elements() []*ZendExtension {
 	return result
 }
 
-func (extensions *ZendExtensionsT) Register(newExt *ZendExtension, handle any) {
+func (extensions *ZendExtensionsT) Register(newExt *ZendExtension, handle any) bool {
+	if extensions.Get(newExt.GetNameStr()) != nil {
+		return false
+	}
+
 	var ext ZendExtension = *newExt
 	ext.SetHandle(handle)
 	extensions.DispatchMessage(ZEND_EXTMSG_NEW_EXTENSION, &ext)
 	extensions.data = append(extensions.data, &ext)
+	return true
 }
 
 func (extensions *ZendExtensionsT) Get(name string) *ZendExtension {

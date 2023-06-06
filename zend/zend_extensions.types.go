@@ -12,9 +12,6 @@ type ZendExtensionVersionInfo struct {
 	build_id              *byte
 }
 
-func (this *ZendExtensionVersionInfo) GetZendExtensionApiNo() int { return this.zend_extension_api_no }
-func (this *ZendExtensionVersionInfo) GetBuildId() *byte          { return this.build_id }
-
 /**
  * ZendExtension
  */
