@@ -211,11 +211,9 @@ func ZendPrintZvalRToStr(expr *types.Zval, indent int) *types.String {
 func ZendPrintZvalR(expr *types.Zval, indent int) {
 	var str *types.String = ZendPrintZvalRToStr(expr, indent)
 	ZendWrite(str.GetStr())
-	// types.ZendStringReleaseEx(str, 0)
 }
 func ZendSetDefaultCompileTimeValues() {
 	/* default compile-time values */
-
 	CG__().SetShortTags(ShortTagsDefault)
 	CG__().SetCompilerOptions(CompilerOptionsDefault)
 	CG__().SetRtdKeyCounter(0)
@@ -231,9 +229,10 @@ func ZendInitExceptionOp() {
 	ZendVmSetOpcodeHandler(&exceptionOps[2])
 }
 func ZendInitCallTrampolineOp() {
-	memset(EG__().GetCallTrampolineOp(), 0, b.SizeOf("EG ( call_trampoline_op )"))
-	EG__().GetCallTrampolineOp().SetOpcode(ZEND_CALL_TRAMPOLINE)
-	ZendVmSetOpcodeHandler(EG__().GetCallTrampolineOp())
+	op := types.NewOp(ZEND_CALL_TRAMPOLINE, 0)
+	ZendVmSetOpcodeHandler(op)
+
+	EG__().SetCallTrampolineOp(op)
 }
 func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))

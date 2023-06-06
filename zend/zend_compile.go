@@ -18,7 +18,7 @@ type Compiler struct {
 // helpers
 func (compiler *Compiler) initOp(op *types.ZendOp) *types.ZendOp {
 	if op == nil {
-		op = types.NewOp(compiler.lineno)
+		op = types.NewOp(ZEND_NOP, compiler.lineno)
 	} else {
 		op.SetNop()
 		op.SetExtendedValue(0)

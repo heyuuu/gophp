@@ -338,7 +338,7 @@ func (compiler *Compiler) CompileGlobalVar(ast *ZendAst) {
 		if name_node.GetOpType() == IS_CONST {
 			//name_node.GetConstant().String().AddRefcount()
 		}
-		ZendEmitAssignRefZnode(ZendAstCreate(ZEND_AST_VAR, ZendAstCreateZnode(&name_node)), &result)
+		compiler.EmitAssignRefZnode(ZendAstCreate(ZEND_AST_VAR, ZendAstCreateZnode(&name_node)), &result)
 	}
 }
 func (compiler *Compiler) CompileStaticVarCommon(var_name *types.String, value *types.Zval, mode uint32) {
@@ -806,15 +806,15 @@ func (compiler *Compiler) CompileForeach(ast *ZendAst) {
 		if value_ast.GetKind() == ZEND_AST_ARRAY {
 			compiler.CompileListAssign(nil, value_ast, &value_node, value_ast.GetAttr())
 		} else if by_ref != 0 {
-			ZendEmitAssignRefZnode(value_ast, &value_node)
+			compiler.EmitAssignRefZnode(value_ast, &value_node)
 		} else {
-			ZendEmitAssignZnode(value_ast, &value_node)
+			compiler.EmitAssignZnode(value_ast, &value_node)
 		}
 	}
 	if key_ast != nil {
 		opline = CG__().GetActiveOpArray().GetOpcodes()[opnum_fetch]
 		ZendMakeTmpResult(&key_node, opline)
-		ZendEmitAssignZnode(key_ast, &key_node)
+		compiler.EmitAssignZnode(key_ast, &key_node)
 	}
 	compiler.CompileStmt(stmt_ast)
 

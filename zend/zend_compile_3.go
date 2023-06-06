@@ -68,7 +68,7 @@ func (compiler *Compiler) CompileAssignRef(result *Znode, ast *ZendAst) {
 		opline.SetExtendedValue(flags)
 	}
 }
-func ZendEmitAssignRefZnode(var_ast *ZendAst, value_node *Znode) {
+func (compiler *Compiler) EmitAssignRefZnode(var_ast *ZendAst, value_node *Znode) {
 	var dummy_node Znode
 	var assign_ast *ZendAst = ZendAstCreate(ZEND_AST_ASSIGN_REF, var_ast, ZendAstCreateZnode(value_node))
 	compiler.CompileAssignRef(&dummy_node, assign_ast)

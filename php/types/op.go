@@ -43,14 +43,14 @@ type ZendOp struct {
 	resultType    uint8
 }
 
-func NewOp(lineno uint32) *ZendOp {
+func NewOp(opcode zend.OpCode, lineno uint32) *ZendOp {
 	return &ZendOp{
 		op1:           ZnodeOp{value: 0},
 		op2:           ZnodeOp{value: 0},
 		result:        ZnodeOp{value: 0},
 		extendedValue: 0,
 		lineno:        lineno,
-		opcode:        zend.ZEND_NOP,
+		opcode:        opcode,
 		op1Type:       zend.IS_UNUSED,
 		op2Type:       zend.IS_UNUSED,
 		resultType:    zend.IS_UNUSED,

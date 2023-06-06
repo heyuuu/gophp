@@ -485,7 +485,7 @@ func ZendSeparateIfCallAndWrite(node *Znode, ast *ZendAst, type_ uint32) {
 		}
 	}
 }
-func ZendEmitAssignZnode(var_ast *ZendAst, value_node *Znode) {
+func (compiler *Compiler) EmitAssignZnode(var_ast *ZendAst, value_node *Znode) {
 	var dummy_node Znode
 	var assign_ast *ZendAst = ZendAstCreate(ZEND_AST_ASSIGN, var_ast, ZendAstCreateZnode(value_node))
 	compiler.CompileAssign(&dummy_node, assign_ast)
@@ -686,9 +686,9 @@ func (compiler *Compiler) CompileListAssign(result *Znode, ast *ZendAst, expr_no
 			}
 			compiler.CompileListAssign(nil, var_ast, &fetch_result, var_ast.GetAttr())
 		} else if elem_ast.GetAttr() != 0 {
-			ZendEmitAssignRefZnode(var_ast, &fetch_result)
+			compiler.EmitAssignRefZnode(var_ast, &fetch_result)
 		} else {
-			ZendEmitAssignZnode(var_ast, &fetch_result)
+			compiler.EmitAssignZnode(var_ast, &fetch_result)
 		}
 	}
 	if has_elems == 0 {
