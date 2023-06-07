@@ -416,14 +416,14 @@ func (compiler *Compiler) CompileVar(result *Znode, ast *ZendAst, type_ uint32, 
 		return nil
 	}
 }
-func ZendDelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref types.ZendBool) *types.ZendOp {
+func (compiler *Compiler) DelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref types.ZendBool) *types.ZendOp {
 	switch ast.GetKind() {
 	case ZEND_AST_VAR:
 		return compiler.CompileSimpleVar(result, ast, type_, 1)
 	case ZEND_AST_DIM:
-		return ZendDelayedCompileDim(result, ast, type_)
+		return compiler.DelayedCompileDim(result, ast, type_)
 	case ZEND_AST_PROP:
-		var opline *types.ZendOp = ZendDelayedCompileProp(result, ast, type_)
+		var opline *types.ZendOp = compiler.DelayedCompileProp(result, ast, type_)
 		if by_ref != 0 {
 			opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_FETCH_REF)
 		}

@@ -491,7 +491,7 @@ func (compiler *Compiler) EmitAssignZnode(var_ast *ZendAst, value_node *Znode) {
 	compiler.CompileAssign(&dummy_node, assign_ast)
 	ZendDoFree(&dummy_node)
 }
-func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
+func (compiler *Compiler) DelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
 	if ast.GetAttr() == ZEND_DIM_ALTERNATIVE_SYNTAX {
 		faults.Error(faults.E_DEPRECATED, "Array and string offset access syntax with curly braces is deprecated")
 	}
@@ -500,7 +500,7 @@ func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.Zen
 	var opline *types.ZendOp
 	var var_node Znode
 	var dim_node Znode
-	opline = ZendDelayedCompileVar(&var_node, var_ast, type_, 0)
+	opline = compiler.DelayedCompileVar(&var_node, var_ast, type_, 0)
 	if opline != nil && type_ == BP_VAR_W && (opline.GetOpcode() == ZEND_FETCH_STATIC_PROP_W || opline.GetOpcode() == ZEND_FETCH_OBJ_W) {
 		opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_FETCH_DIM_WRITE)
 	}
@@ -525,10 +525,10 @@ func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.Zen
 }
 func (compiler *Compiler) CompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
 	var offset uint32 = ZendDelayedCompileBegin()
-	ZendDelayedCompileDim(result, ast, type_)
+	compiler.DelayedCompileDim(result, ast, type_)
 	return ZendDelayedCompileEnd(offset)
 }
-func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
+func (compiler *Compiler) DelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
 	var obj_ast *ZendAst = ast.GetChild()[0]
 	var prop_ast *ZendAst = ast.GetChild()[1]
 	var obj_node Znode
@@ -538,7 +538,7 @@ func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *types.Ze
 		obj_node.SetOpType(IS_UNUSED)
 		CG__().GetActiveOpArray().SetIsUsesThis(true)
 	} else {
-		opline = ZendDelayedCompileVar(&obj_node, obj_ast, type_, 0)
+		opline = compiler.DelayedCompileVar(&obj_node, obj_ast, type_, 0)
 		if opline != nil && type_ == BP_VAR_W && (opline.GetOpcode() == ZEND_FETCH_STATIC_PROP_W || opline.GetOpcode() == ZEND_FETCH_OBJ_W) {
 			opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_FETCH_OBJ_WRITE)
 		}
@@ -555,7 +555,7 @@ func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *types.Ze
 }
 func (compiler *Compiler) CompileProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
 	var offset uint32 = ZendDelayedCompileBegin()
-	var opline *types.ZendOp = ZendDelayedCompileProp(result, ast, type_)
+	var opline *types.ZendOp = compiler.DelayedCompileProp(result, ast, type_)
 	if by_ref != 0 {
 		opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_FETCH_REF)
 	}
@@ -737,14 +737,14 @@ func (compiler *Compiler) CompileAssign(result *Znode, ast *ZendAst) {
 	switch var_ast.GetKind() {
 	case ZEND_AST_VAR:
 		offset = ZendDelayedCompileBegin()
-		ZendDelayedCompileVar(&var_node, var_ast, BP_VAR_W, 0)
+		compiler.DelayedCompileVar(&var_node, var_ast, BP_VAR_W, 0)
 		compiler.CompileExpr(&expr_node, expr_ast)
 		ZendDelayedCompileEnd(offset)
 		ZendEmitOp(result, ZEND_ASSIGN, &var_node, &expr_node)
 		return
 	case ZEND_AST_STATIC_PROP:
 		offset = ZendDelayedCompileBegin()
-		ZendDelayedCompileVar(result, var_ast, BP_VAR_W, 0)
+		compiler.DelayedCompileVar(result, var_ast, BP_VAR_W, 0)
 		compiler.CompileExpr(&expr_node, expr_ast)
 		opline = ZendDelayedCompileEnd(offset)
 		opline.SetOpcode(ZEND_ASSIGN_STATIC_PROP)
@@ -752,7 +752,7 @@ func (compiler *Compiler) CompileAssign(result *Znode, ast *ZendAst) {
 		return
 	case ZEND_AST_DIM:
 		offset = ZendDelayedCompileBegin()
-		ZendDelayedCompileDim(result, var_ast, BP_VAR_W)
+		compiler.DelayedCompileDim(result, var_ast, BP_VAR_W)
 		if ZendIsAssignToSelf(var_ast, expr_ast) != 0 && !IsThisFetch(expr_ast) {
 
 			/* $a[0] = $a should evaluate the right $a first */
@@ -772,7 +772,7 @@ func (compiler *Compiler) CompileAssign(result *Znode, ast *ZendAst) {
 		return
 	case ZEND_AST_PROP:
 		offset = ZendDelayedCompileBegin()
-		ZendDelayedCompileProp(result, var_ast, BP_VAR_W)
+		compiler.DelayedCompileProp(result, var_ast, BP_VAR_W)
 		compiler.CompileExpr(&expr_node, expr_ast)
 		opline = ZendDelayedCompileEnd(offset)
 		opline.SetOpcode(ZEND_ASSIGN_OBJ)

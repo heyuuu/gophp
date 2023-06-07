@@ -45,7 +45,7 @@ func (compiler *Compiler) CompileFuncArraySlice(result *Znode, args *ZendAstList
 	}
 	return types.FAILURE
 }
-func ZendTryCompileSpecialFunc(result *Znode, lcname *types.String, args *ZendAstList, fbc types.IFunction, type_ uint32) int {
+func (compiler *Compiler) TryCompileSpecialFunc(result *Znode, lcname *types.String, args *ZendAstList, fbc types.IFunction, type_ uint32) int {
 	if fbc.GetInternalFunction().GetHandler() == ZifDisplayDisabledFunction {
 		return types.FAILURE
 	}
@@ -149,7 +149,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 		compiler.CompileDynamicCall(result, &name_node, args_ast)
 		return
 	}
-	if ZendTryCompileSpecialFunc(result, lcname, ZendAstGetList(args_ast), fbc, type_) == types.SUCCESS {
+	if compiler.TryCompileSpecialFunc(result, lcname, ZendAstGetList(args_ast), fbc, type_) == types.SUCCESS {
 		// types.ZendStringReleaseEx(lcname, 0)
 		// ZvalPtrDtor(name_node.GetConstant())
 		return

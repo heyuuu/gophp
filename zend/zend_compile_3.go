@@ -21,7 +21,7 @@ func (compiler *Compiler) CompileAssignRef(result *Znode, ast *ZendAst) {
 	}
 	ZendEnsureWritableVariable(target_ast)
 	offset = ZendDelayedCompileBegin()
-	ZendDelayedCompileVar(&target_node, target_ast, BP_VAR_W, 1)
+	compiler.DelayedCompileVar(&target_node, target_ast, BP_VAR_W, 1)
 	compiler.CompileVar(&source_node, source_ast, BP_VAR_W, 1)
 	if (target_ast.GetKind() != ZEND_AST_VAR || target_ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL) && source_node.GetOpType() != IS_CV {
 
@@ -87,7 +87,7 @@ func (compiler *Compiler) CompileCompoundAssign(result *Znode, ast *ZendAst) {
 	switch var_ast.GetKind() {
 	case ZEND_AST_VAR:
 		offset = ZendDelayedCompileBegin()
-		ZendDelayedCompileVar(&var_node, var_ast, BP_VAR_RW, 0)
+		compiler.DelayedCompileVar(&var_node, var_ast, BP_VAR_RW, 0)
 		compiler.CompileExpr(&expr_node, expr_ast)
 		ZendDelayedCompileEnd(offset)
 		opline = ZendEmitOp(result, ZEND_ASSIGN_OP, &var_node, &expr_node)
@@ -95,7 +95,7 @@ func (compiler *Compiler) CompileCompoundAssign(result *Znode, ast *ZendAst) {
 		return
 	case ZEND_AST_STATIC_PROP:
 		offset = ZendDelayedCompileBegin()
-		ZendDelayedCompileVar(result, var_ast, BP_VAR_RW, 0)
+		compiler.DelayedCompileVar(result, var_ast, BP_VAR_RW, 0)
 		compiler.CompileExpr(&expr_node, expr_ast)
 		opline = ZendDelayedCompileEnd(offset)
 		cache_slot = opline.GetExtendedValue()
@@ -106,7 +106,7 @@ func (compiler *Compiler) CompileCompoundAssign(result *Znode, ast *ZendAst) {
 		return
 	case ZEND_AST_DIM:
 		offset = ZendDelayedCompileBegin()
-		ZendDelayedCompileDim(result, var_ast, BP_VAR_RW)
+		compiler.DelayedCompileDim(result, var_ast, BP_VAR_RW)
 		compiler.CompileExpr(&expr_node, expr_ast)
 		opline = ZendDelayedCompileEnd(offset)
 		opline.SetOpcode(ZEND_ASSIGN_DIM_OP)
@@ -115,7 +115,7 @@ func (compiler *Compiler) CompileCompoundAssign(result *Znode, ast *ZendAst) {
 		return
 	case ZEND_AST_PROP:
 		offset = ZendDelayedCompileBegin()
-		ZendDelayedCompileProp(result, var_ast, BP_VAR_RW)
+		compiler.DelayedCompileProp(result, var_ast, BP_VAR_RW)
 		compiler.CompileExpr(&expr_node, expr_ast)
 		opline = ZendDelayedCompileEnd(offset)
 		cache_slot = opline.GetExtendedValue()
@@ -138,14 +138,14 @@ func (compiler *Compiler) CompileArgs(ast *ZendAst, fbc types.IFunction) uint32 
 		var arg_num uint32 = i + 1
 		var arg_node Znode
 		var opline *types.ZendOp
-		var opcode uint8
+		var opcode OpCode
 		if arg.GetKind() == ZEND_AST_UNPACK {
 			uses_arg_unpack = 1
 			fbc = nil
 			compiler.CompileExpr(&arg_node, arg.GetChild()[0])
 			opline = ZendEmitOp(nil, ZEND_SEND_UNPACK, &arg_node, nil)
 			opline.GetOp2().SetNum(arg_count)
-			opline.GetResult().SetVar(uint32(types.ZendIntptrT(nil.Arg(arg_count))))
+			opline.GetResult().SetVar(uint32(types.ZendIntptrT((*ZendExecuteData)(nil).Arg(arg_count))))
 			continue
 		}
 		if uses_arg_unpack != 0 {
@@ -679,7 +679,7 @@ func (compiler *Compiler) CompileFuncGettype(result *Znode, args *ZendAstList) i
 	return types.SUCCESS
 }
 func (compiler *Compiler) CompileFuncNumArgs(result *Znode, args *ZendAstList) int {
-	if CG__().GetActiveOpArray().GetFunctionName() != nil && args.GetChildren() == 0 {
+	if CG__().GetActiveOpArray().FunctionName() != "" && args.GetChildren() == 0 {
 		ZendEmitOpTmp(result, ZEND_FUNC_NUM_ARGS, nil, nil)
 		return types.SUCCESS
 	} else {
