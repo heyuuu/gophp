@@ -21,9 +21,7 @@ func ZendResolveNonClassName(name string, typ uint32, caseSensitive bool, curren
 		return ZendPrefixWithNsEx(name), true
 	}
 	if currentImportSub != nil {
-
 		/* If an unqualified name is a function/const alias, replace it. */
-
 		var importName string
 		if caseSensitive {
 			importName = currentImportSub.Get(name)

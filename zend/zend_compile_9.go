@@ -17,30 +17,30 @@ func (compiler *Compiler) CompileMagicConst(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOpTmp(result, ZEND_FETCH_CLASS_NAME, nil, nil)
 	opline.GetOp1().SetNum(ZEND_FETCH_CLASS_SELF)
 }
-func ZendIsAllowedInConstExpr(kind ZendAstKind) types.ZendBool {
+func ZendIsAllowedInConstExpr(kind ZendAstKind) bool {
 	return kind == ZEND_AST_ZVAL || kind == ZEND_AST_BINARY_OP || kind == ZEND_AST_GREATER || kind == ZEND_AST_GREATER_EQUAL || kind == ZEND_AST_AND || kind == ZEND_AST_OR || kind == ZEND_AST_UNARY_OP || kind == ZEND_AST_UNARY_PLUS || kind == ZEND_AST_UNARY_MINUS || kind == ZEND_AST_CONDITIONAL || kind == ZEND_AST_DIM || kind == ZEND_AST_ARRAY || kind == ZEND_AST_ARRAY_ELEM || kind == ZEND_AST_UNPACK || kind == ZEND_AST_CONST || kind == ZEND_AST_CLASS_CONST || kind == ZEND_AST_CLASS_NAME || kind == ZEND_AST_MAGIC_CONST || kind == ZEND_AST_COALESCE
 }
-func (compiler *Compiler) CompileConstExprClassConst(ast_ptr **ZendAst) {
-	var ast *ZendAst = *ast_ptr
-	var class_ast *ZendAst = ast.GetChild()[0]
-	var const_ast *ZendAst = ast.GetChild()[1]
-	var class_name *types.String
-	var const_name *types.String = ZendAstGetStr(const_ast)
-	var fetch_type int
-	if class_ast.GetKind() != ZEND_AST_ZVAL {
+func (compiler *Compiler) CompileConstExprClassConst(astPtr **ZendAst) {
+	var ast *ZendAst = *astPtr
+	var classAst *ZendAst = ast.GetChild()[0]
+	var constAst *ZendAst = ast.GetChild()[1]
+	var className *types.String
+	var constName *types.String = ZendAstGetStr(constAst)
+	var fetchType int
+	if classAst.GetKind() != ZEND_AST_ZVAL {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Dynamic class names are not allowed in compile-time class constant references")
 	}
-	class_name = ZendAstGetStr(class_ast)
-	fetch_type = ZendGetClassFetchType(class_name.GetStr())
-	if ZEND_FETCH_CLASS_STATIC == fetch_type {
+	className = ZendAstGetStr(classAst)
+	fetchType = ZendGetClassFetchType(className.GetStr())
+	if ZEND_FETCH_CLASS_STATIC == fetchType {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "\"static::\" is not allowed in compile-time constants")
 	}
-	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
-		class_name = ZendResolveClassNameAst(class_ast)
+	if ZEND_FETCH_CLASS_DEFAULT == fetchType {
+		className = ZendResolveClassNameAst(classAst)
 	}
-	name := class_name.GetStr() + "::" + const_name.GetStr()
+	name := className.GetStr() + "::" + constName.GetStr()
 	ZendAstDestroy(ast)
-	*ast_ptr = ZendAstCreateConstant(types.NewString(name), fetch_type|ZEND_FETCH_CLASS_EXCEPTION)
+	*astPtr = ZendAstCreateConstant(types.NewString(name), fetchType|ZEND_FETCH_CLASS_EXCEPTION)
 }
 func (compiler *Compiler) CompileConstExprClassName(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
@@ -94,7 +94,7 @@ func (compiler *Compiler) CompileConstExpr(ast_ptr **ZendAst) {
 	if ast == nil || ast.GetKind() == ZEND_AST_ZVAL {
 		return
 	}
-	if ZendIsAllowedInConstExpr(ast.GetKind()) == 0 {
+	if !ZendIsAllowedInConstExpr(ast.GetKind()) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Constant expression contains invalid operations")
 	}
 	switch ast.GetKind() {
@@ -120,11 +120,7 @@ func (compiler *Compiler) ConstExprToZval(result *types.Zval, ast *ZendAst) {
 		result.SetConstantAst(types.NewAstRef(ast))
 
 		/* destroy the ast here, it might have been replaced */
-
 		ZendAstDestroy(ast)
-
-		/* destroy the ast here, it might have been replaced */
-
 	}
 
 	/* Kill this branch of the original AST, as it was already destroyed.
@@ -132,10 +128,6 @@ func (compiler *Compiler) ConstExprToZval(result *types.Zval, ast *ZendAst) {
 	 * future. */
 
 	orig_ast.SetKind(0)
-
-	/* Kill this branch of the original AST, as it was already destroyed.
-	 * It would be nice to find a better solution to this problem in the
-	 * future. */
 }
 func (compiler *Compiler) CompileTopStmt(ast *ZendAst) {
 	if ast == nil {
