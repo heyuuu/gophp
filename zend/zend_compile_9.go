@@ -68,7 +68,7 @@ func (compiler *Compiler) CompileConstExprClassName(ast_ptr **ZendAst) {
 func (compiler *Compiler) CompileConstExprConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var name_ast *ZendAst = ast.GetChild()[0]
-	var orig_name = ZendAstGetStr(name_ast).GetStr()
+	var orig_name = ZendAstGetStrVal(name_ast)
 	var result types.Zval
 	resolved_name, isFullyQualified := ZendResolveConstName(orig_name, name_ast.GetAttr())
 	if ZendTryCtEvalConst(&result, resolved_name, isFullyQualified) != 0 {

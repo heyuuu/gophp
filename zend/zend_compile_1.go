@@ -112,32 +112,28 @@ func ZendAddTryElement(try_op uint32) uint32 {
 	return try_catch_offset
 }
 func FunctionAddRef(function types.IFunction) {
-	if function.GetType() == ZEND_USER_FUNCTION {
-		var op_array = function.GetOpArray()
-		op_array.TryIncRefCount()
+	if function.IsUserFunction() {
+		var opArray = function.GetOpArray()
+		opArray.TryIncRefCount()
 		preload := CG__().IsCompilePreload()
-		op_array.InitPtr2(preload)
-	} else if function.GetType() == ZEND_INTERNAL_FUNCTION {
-		//if function.GetFunctionName() != nil {
-		//function.GetFunctionName().AddRefcount()
-		//}
+		opArray.InitPtr2(preload)
 	}
 }
-func DoBindFunctionError(lcname *types.String, op_array *types.ZendOpArray, compile_time types.ZendBool) {
+func DoBindFunctionError(lcname string, opArray *types.ZendOpArray, compileTime bool) {
 	var oldFunction types.IFunction
 	var errorLevel int
-	if compile_time != 0 {
+	if compileTime {
 		errorLevel = faults.E_COMPILE_ERROR
-		oldFunction = CG__().FunctionTable().Get(lcname.GetStr())
+		oldFunction = CG__().FunctionTable().Get(lcname)
 	} else {
 		errorLevel = faults.E_ERROR
-		oldFunction = EG__().FunctionTable().Get(lcname.GetStr())
+		oldFunction = EG__().FunctionTable().Get(lcname)
 	}
 
 	b.Assert(oldFunction != nil)
 	var functionName string
-	if op_array != nil {
-		functionName = op_array.FunctionName()
+	if opArray != nil {
+		functionName = opArray.FunctionName()
 	} else {
 		functionName = oldFunction.FunctionName()
 	}
@@ -152,14 +148,14 @@ func DoBindFunction(lcname *types.Zval) int {
 	var function types.IFunction
 	var rtd_key *types.Zval
 	rtd_key = lcname + 1
-	function = EG__().FunctionTable().Get(rtd_key.String().GetStr())
+	function = EG__().FunctionTable().Get(rtd_key.StringVal())
 	if function == nil {
-		DoBindFunctionError(lcname.String(), nil, 0)
+		DoBindFunctionError(lcname.StringVal(), nil, false)
 		return types.FAILURE
 	}
 
 	if EG__().FunctionTable().Exists(lcname.StringVal()) {
-		DoBindFunctionError(lcname.String(), function.GetOpArray(), 0)
+		DoBindFunctionError(lcname.StringVal(), function.GetOpArray(), false)
 		return types.FAILURE
 	}
 
@@ -171,37 +167,8 @@ func DoBindFunction(lcname *types.Zval) int {
 	}
 	return types.SUCCESS
 }
-func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
-	var rtd_key *types.Zval = lcname + 1
-
-	ce := EG__().ClassTable().Get(rtd_key.StringVal())
-	if ce == nil {
-		if EG__().ClassTable().Exists(lcname.StringVal()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.Name())
-			return types.FAILURE
-		} else {
-			b.Assert(CurrEX().GetFunc().GetOpArray().IsPreloaded())
-			faults.ErrorNoreturn(faults.E_ERROR, "Class %s wasn't preloaded", lcname.String().GetVal())
-			return types.FAILURE
-		}
-	}
-
-	if EG__().ClassTable().Exists(lcname.StringVal()) {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.Name())
-		return types.FAILURE
-	}
-
-	if ZendDoLinkClass(ce, lc_parent_name) == types.FAILURE {
-		return types.FAILURE
-	}
-
-	EG__().ClassTable().Del(rtd_key.StringVal())
-	EG__().ClassTable().Add(lcname.StringVal(), ce)
-
-	return types.SUCCESS
-}
 func ZendMarkFunctionAsGenerator() {
-	if CG__().GetActiveOpArray().GetFunctionName() == nil {
+	if CG__().GetActiveOpArray().FunctionName() == "" {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The \"yield\" expression can only be used inside a function")
 	}
 	if CG__().GetActiveOpArray().IsHasReturnType() {

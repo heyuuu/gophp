@@ -614,7 +614,7 @@ func ZifGetClassMethods(class *types.Zval) *types.Zval {
 	scope := ZendGetExecutedScope()
 	ce.FunctionTable().Foreach(func(key string, mptr types.IFunction) {
 		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) || mptr.IsPrivate() && scope == mptr.GetScope()) {
-			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.GetOpArray().refcount > 1) && key != "" && !SameNameEx(key, mptr.FunctionName()) {
+			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || *mptr.GetOpArray().GetRefcount() > 1) && key != "" && !SameNameEx(key, mptr.FunctionName()) {
 				names = append(names, ZendFindAliasName(mptr.GetScope(), key))
 			} else {
 				names = append(names, mptr.FunctionName())

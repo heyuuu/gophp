@@ -150,15 +150,14 @@ func ZendRestoreErrorHandling(saved *ZendErrorHandling) {
 }
 func ZendFindAliasName(ce *types.ClassEntry, name string) string {
 	for _, alias := range ce.GetTraitAliases() {
-		if alias.GetAlias() != nil && ascii.StrCaseEquals(alias.GetAlias().GetStr(), name) {
-			return alias.GetAlias().GetStr()
+		if alias.GetAlias() != "" && ascii.StrCaseEquals(alias.GetAlias(), name) {
+			return alias.GetAlias()
 		}
 	}
 	return name
 }
 
 func ZendResolveMethodName(ce *types.ClassEntry, f types.IFunction) string {
-
 	if f.GetType() != ZEND_USER_FUNCTION || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {
 		return f.FunctionName()
 	}

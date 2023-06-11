@@ -4,6 +4,8 @@ import "github.com/heyuuu/gophp/zend"
 
 type IFunction interface {
 	// type cast
+	IsUserFunction() bool
+	IsInternalFunction() bool
 	GetOpArray() *ZendOpArray
 	GetInternalFunction() *InternalFunction
 
@@ -118,6 +120,13 @@ func (f *functionHeader) GetOpArray() *ZendOpArray {
 }
 func (f *functionHeader) GetInternalFunction() *InternalFunction {
 	panic("*functionHeader is not *InternalFunction")
+}
+
+func (f *functionHeader) IsUserFunction() bool {
+	return f.typ == zend.ZEND_USER_FUNCTION
+}
+func (f *functionHeader) IsInternalFunction() bool {
+	return f.typ == zend.ZEND_INTERNAL_FUNCTION
 }
 
 func (f *functionHeader) FunctionName() string         { return f.functionName }

@@ -335,7 +335,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	ZendRegisterSeenSymbol(lcname, ZEND_SYMBOL_FUNCTION)
 	if toplevel != 0 {
 		if !CG__().FunctionTable().Add(lcname.GetStr(), op_array) {
-			DoBindFunctionError(lcname, op_array, 1)
+			DoBindFunctionError(lcname.GetStr(), op_array, true)
 		}
 		// types.ZendStringReleaseEx(lcname, 0)
 		return
@@ -566,35 +566,53 @@ func (compiler *Compiler) CompileClassConstDecl(ast *ZendAst) {
 		ZendDeclareClassConstantEx(ce, name, &value_zv, ast.GetAttr(), doc_comment)
 	}
 }
-func (compiler *Compiler) CompileMethodRef(ast *ZendAst, method_ref *ZendTraitMethodReference) {
-	var class_ast *ZendAst = ast.GetChild()[0]
-	var method_ast *ZendAst = ast.GetChild()[1]
-	method_ref.SetMethodName(ZendAstGetStr(method_ast).Copy())
-	if class_ast != nil {
-		method_ref.SetClassName(ZendResolveClassNameAst(class_ast))
-	} else {
-		method_ref.SetClassName(nil)
+
+func (compiler *Compiler) CompileMethodRefEx(ast *ZendAst) *ZendTraitMethodReference {
+	var classAst *ZendAst = ast.GetChild()[0]
+	var methodAst *ZendAst = ast.GetChild()[1]
+
+	methodName := ZendAstGetStrVal(methodAst)
+	className := ""
+	if classAst != nil {
+		className = ZendResolveClassNameAst(classAst).GetStr()
 	}
+	return NewTraitMethodRef(methodName, className)
+}
+
+func (compiler *Compiler) CompileMethodRef(ast *ZendAst, methodRef *ZendTraitMethodReference) {
+	var classAst *ZendAst = ast.GetChild()[0]
+	var methodAst *ZendAst = ast.GetChild()[1]
+
+	methodName := ZendAstGetStrVal(methodAst)
+	className := ""
+	if classAst != nil {
+		className = ZendResolveClassNameAst(classAst).GetStr()
+	}
+	methodRef.Init(methodName, className)
 }
 func (compiler *Compiler) CompileTraitPrecedence(ast *ZendAst) {
-	var method_ref_ast *ZendAst = ast.GetChild()[0]
-	var insteadof_ast *ZendAst = ast.GetChild()[1]
-	var insteadof_list *ZendAstList = ZendAstGetList(insteadof_ast)
+	var methodRefAst *ZendAst = ast.GetChild()[0]
+	var insteadofAst *ZendAst = ast.GetChild()[1]
+	var insteadofList *ZendAstList = ZendAstGetList(insteadofAst)
 	var i uint32
-	var precedence *ZendTraitPrecedence = Emalloc(b.SizeOf("zend_trait_precedence") + (insteadof_list.GetChildren()-1)*b.SizeOf("zend_string *"))
-	compiler.CompileMethodRef(method_ref_ast, precedence.GetTraitMethod())
-	precedence.SetNumExcludes(insteadof_list.GetChildren())
-	for i = 0; i < insteadof_list.GetChildren(); i++ {
-		var name_ast *ZendAst = insteadof_list.GetChild()[i]
-		precedence.GetExcludeClassNames()[i] = ZendResolveClassNameAst(name_ast)
+
+	var excludeClassNames = make([]string, insteadofList.GetChildren())
+	for i = 0; i < insteadofList.GetChildren(); i++ {
+		var nameAst *ZendAst = insteadofList.GetChild()[i]
+		excludeClassNames[i] = ZendResolveClassNameAst(nameAst).GetStr()
 	}
+
+	precedence := NewTraitPrecedence(
+		compiler.CompileMethodRefEx(methodRefAst),
+		excludeClassNames,
+	)
+
 	ZendAddToList(CG__().GetActiveClassEntry().GetTraitPrecedences(), precedence)
 }
 func (compiler *Compiler) CompileTraitAlias(ast *ZendAst) {
 	var method_ref_ast *ZendAst = ast.GetChild()[0]
 	var alias_ast *ZendAst = ast.GetChild()[1]
 	var modifiers uint32 = ast.GetAttr()
-	var alias *ZendTraitAlias
 	if modifiers == types.AccStatic {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'static' as method modifier")
 	} else if modifiers == types.AccAbstract {
@@ -602,14 +620,17 @@ func (compiler *Compiler) CompileTraitAlias(ast *ZendAst) {
 	} else if modifiers == types.AccFinal {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'final' as method modifier")
 	}
-	alias = Emalloc(b.SizeOf("zend_trait_alias"))
-	compiler.CompileMethodRef(method_ref_ast, alias.GetTraitMethod())
-	alias.SetModifiers(modifiers)
+
+	aliasName := ""
 	if alias_ast != nil {
-		alias.SetAlias(ZendAstGetStr(alias_ast).Copy())
-	} else {
-		alias.SetAlias(nil)
+		aliasName = ZendAstGetStrVal(alias_ast)
 	}
+	alias := NewTraitAlias(
+		compiler.CompileMethodRefEx(method_ref_ast),
+		aliasName,
+		modifiers,
+	)
+
 	ZendAddToList(CG__().GetActiveClassEntry().GetTraitAliases(), alias)
 }
 func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {

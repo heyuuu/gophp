@@ -295,7 +295,7 @@ func (compiler *Compiler) CompileCallCommon(result *Znode, args_ast *ZendAst, fb
 	ZendDoExtendedFcallEnd()
 }
 func (compiler *Compiler) CompileFunctionName(name_node *Znode, name_ast *ZendAst) bool {
-	orig_name := ZendAstGetStr(name_ast).GetStr()
+	orig_name := ZendAstGetStrVal(name_ast)
 	resolveName, isFullyQualified := ZendResolveFunctionName(orig_name, name_ast.GetAttr())
 
 	name_node.SetOpType(IS_CONST)
