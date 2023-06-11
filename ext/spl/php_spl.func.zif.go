@@ -61,7 +61,8 @@ var DefZifSplClasses = def.DefFunc("spl_classes", 0, 0, []def.ArgInfo{}, func(ex
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifSplClasses(executeData, returnValue)
+	ret := ZifSplClasses()
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifSplAutoload

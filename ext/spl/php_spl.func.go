@@ -49,7 +49,7 @@ func ZifClassParents(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*types.A
 	retArr := types.NewArray(0)
 	parentClass := ce.GetParent()
 	for parentClass != nil {
-		SplAddClassNameEx(retArr, parentClass, 0, 0)
+		SplAddClassName(retArr, parentClass, 0, 0)
 		parentClass = parentClass.GetParent()
 	}
 	return retArr, true
@@ -71,7 +71,7 @@ func ZifClassImplements(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*type
 	}
 
 	retArr := types.NewArray(0)
-	SplAddInterfacesEx(retArr, ce, 1, types.AccInterface)
+	SplAddInterfaces(retArr, ce, 1, types.AccInterface)
 	return retArr, true
 }
 func ZifClassUses(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*types.Array, bool) {
@@ -91,69 +91,79 @@ func ZifClassUses(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*types.Arra
 	}
 
 	retArr := types.NewArray(0)
-	SplAddTraitsEx(retArr, ce, 1, types.AccTrait)
+	SplAddTraits(retArr, ce, 1, types.AccTrait)
 	return retArr, true
 }
-func ZifSplClasses(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
+func splClasses() []*types.ClassEntry {
+	return []*types.ClassEntry{
+		spl_ce_AppendIterator,
+		spl_ce_ArrayIterator,
+		spl_ce_ArrayObject,
+		spl_ce_BadFunctionCallException,
+		spl_ce_BadMethodCallException,
+		spl_ce_CachingIterator,
+		spl_ce_CallbackFilterIterator,
+		spl_ce_DirectoryIterator,
+		spl_ce_DomainException,
+		spl_ce_EmptyIterator,
+		spl_ce_FilesystemIterator,
+		spl_ce_FilterIterator,
+		spl_ce_GlobIterator,
+		spl_ce_InfiniteIterator,
+		spl_ce_InvalidArgumentException,
+		spl_ce_IteratorIterator,
+		spl_ce_LengthException,
+		spl_ce_LimitIterator,
+		spl_ce_LogicException,
+		spl_ce_MultipleIterator,
+		spl_ce_NoRewindIterator,
+		spl_ce_OuterIterator,
+		spl_ce_OutOfBoundsException,
+		spl_ce_OutOfRangeException,
+		spl_ce_OverflowException,
+		spl_ce_ParentIterator,
+		spl_ce_RangeException,
+		spl_ce_RecursiveArrayIterator,
+		spl_ce_RecursiveCachingIterator,
+		spl_ce_RecursiveCallbackFilterIterator,
+		spl_ce_RecursiveDirectoryIterator,
+		spl_ce_RecursiveFilterIterator,
+		spl_ce_RecursiveIterator,
+		spl_ce_RecursiveIteratorIterator,
+		spl_ce_RecursiveRegexIterator,
+		spl_ce_RecursiveTreeIterator,
+		spl_ce_RegexIterator,
+		spl_ce_RuntimeException,
+		spl_ce_SeekableIterator,
+		spl_ce_SplDoublyLinkedList,
+		spl_ce_SplFileInfo,
+		spl_ce_SplFileObject,
+		spl_ce_SplFixedArray,
+		spl_ce_SplHeap,
+		spl_ce_SplMinHeap,
+		spl_ce_SplMaxHeap,
+		spl_ce_SplObjectStorage,
+		spl_ce_SplObserver,
+		spl_ce_SplPriorityQueue,
+		spl_ce_SplQueue,
+		spl_ce_SplStack,
+		spl_ce_SplSubject,
+		spl_ce_SplTempFileObject,
+		spl_ce_UnderflowException,
+		spl_ce_UnexpectedValueException,
 	}
-	zend.ArrayInit(return_value)
-	SplAddClasses(spl_ce_AppendIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_ArrayIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_ArrayObject, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_BadFunctionCallException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_BadMethodCallException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_CachingIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_CallbackFilterIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_DirectoryIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_DomainException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_EmptyIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_FilesystemIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_FilterIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_GlobIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_InfiniteIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_InvalidArgumentException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_IteratorIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_LengthException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_LimitIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_LogicException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_MultipleIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_NoRewindIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_OuterIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_OutOfBoundsException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_OutOfRangeException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_OverflowException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_ParentIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RangeException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RecursiveArrayIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RecursiveCachingIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RecursiveCallbackFilterIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RecursiveDirectoryIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RecursiveFilterIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RecursiveIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RecursiveIteratorIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RecursiveRegexIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RecursiveTreeIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RegexIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_RuntimeException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SeekableIterator, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplDoublyLinkedList, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplFileInfo, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplFileObject, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplFixedArray, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplHeap, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplMinHeap, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplMaxHeap, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplObjectStorage, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplObserver, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplPriorityQueue, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplQueue, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplStack, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplSubject, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_SplTempFileObject, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_UnderflowException, return_value, 0, 0, 0)
-	SplAddClasses(spl_ce_UnexpectedValueException, return_value, 0, 0, 0)
+}
+
+func ZifSplClasses() *types.Array {
+	classes := splClasses()
+
+	list := types.NewArray(0)
+	for _, ce := range classes {
+		if ce != nil {
+			SplAddClassName(list, ce, 0, 0)
+		}
+	}
+	return list
 }
 func SplAutoload(className string, lcName string, ext string) int {
 	var dummy types.Zval
@@ -217,7 +227,6 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		return
 	}
 	if SPL_G__().autoloadFunctions != nil {
-		var pos types.ArrayPosition
 		var func_ types.IFunction
 		var fci types.ZendFcallInfo
 		var fcic types.ZendFcallInfoCache
@@ -482,9 +491,6 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 		} else {
 			lc_name = ascii.StrToLower(func_name.GetStr())
 		}
-
-		/* Skip leading \ */
-
 	}
 	// types.ZendStringReleaseEx(func_name, 0)
 	if SPL_G__().autoloadFunctions {
@@ -587,130 +593,28 @@ func buildClassListString(arr *types.Array) string {
 }
 
 func ZmInfoSpl(zend_module *zend.ModuleEntry) {
-	var list types.Zval
-	var zv *types.Zval
-	var strg *byte
+	classes := splClasses()
+
 	standard.PhpInfoPrintTableStart()
 	standard.PhpInfoPrintTableHeader(2, "SPL support", "enabled")
-	zend.ArrayInit(&list)
-	SplAddClasses(spl_ce_AppendIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_ArrayIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_ArrayObject, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_BadFunctionCallException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_BadMethodCallException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_CachingIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_CallbackFilterIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_DirectoryIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_DomainException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_EmptyIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_FilesystemIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_FilterIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_GlobIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_InfiniteIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_InvalidArgumentException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_IteratorIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_LengthException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_LimitIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_LogicException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_MultipleIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_NoRewindIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_OuterIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_OutOfBoundsException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_OutOfRangeException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_OverflowException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_ParentIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RangeException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveArrayIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveCachingIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveCallbackFilterIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveDirectoryIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveFilterIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveIteratorIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveRegexIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveTreeIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RegexIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_RuntimeException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SeekableIterator, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplDoublyLinkedList, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplFileInfo, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplFileObject, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplFixedArray, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplHeap, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplMinHeap, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplMaxHeap, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplObjectStorage, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplObserver, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplPriorityQueue, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplQueue, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplStack, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplSubject, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_SplTempFileObject, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_UnderflowException, &list, 0, 1, types.AccInterface)
-	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, 1, types.AccInterface)
 
-	standard.PhpInfoPrintTableRow(2, "Interfaces", buildClassListString(list.Array()))
-	list.Array().Destroy()
-
-	zend.ArrayInit(&list)
-	SplAddClasses(spl_ce_AppendIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_ArrayIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_ArrayObject, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_BadFunctionCallException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_BadMethodCallException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_CachingIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_CallbackFilterIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_DirectoryIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_DomainException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_EmptyIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_FilesystemIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_FilterIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_GlobIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_InfiniteIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_InvalidArgumentException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_IteratorIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_LengthException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_LimitIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_LogicException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_MultipleIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_NoRewindIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_OuterIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_OutOfBoundsException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_OutOfRangeException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_OverflowException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_ParentIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RangeException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveArrayIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveCachingIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveCallbackFilterIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveDirectoryIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveFilterIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveIteratorIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveRegexIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RecursiveTreeIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RegexIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_RuntimeException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SeekableIterator, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplDoublyLinkedList, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplFileInfo, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplFileObject, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplFixedArray, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplHeap, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplMinHeap, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplMaxHeap, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplObjectStorage, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplObserver, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplPriorityQueue, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplQueue, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplStack, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplSubject, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_SplTempFileObject, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_UnderflowException, &list, 0, -1, types.AccInterface)
-	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, -1, types.AccInterface)
-
-	standard.PhpInfoPrintTableRow(2, "Classes", buildClassListString(list.Array()))
-	list.Array().Destroy()
+	var interfaceNames strings.Builder
+	var classNames strings.Builder
+	for _, ce := range classes {
+		if ce.HasCeFlags(types.AccInterface) {
+			if interfaceNames.Len() > 0 {
+				interfaceNames.WriteString(", ")
+			}
+			interfaceNames.WriteString(ce.Name())
+		} else {
+			if classNames.Len() > 0 {
+				classNames.WriteString(", ")
+			}
+			classNames.WriteString(ce.Name())
+		}
+	}
+	standard.PhpInfoPrintTableRow(2, "Interfaces", interfaceNames.String())
+	standard.PhpInfoPrintTableRow(2, "Classes", classNames.String())
 
 	standard.PhpInfoPrintTableEnd()
 }
