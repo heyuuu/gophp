@@ -371,7 +371,7 @@ func IZendVerifyTypeAssignableZval(type_ptr *types.TypeHint, self_ce *types.Clas
 	}
 	if type_.IsClass() {
 		if !(type_.IsCe()) {
-			if ZendResolveClassType(type_ptr, self_ce) == 0 {
+			if !ZendResolveClassType(type_ptr, self_ce) {
 				return 0
 			}
 			type_ = *type_ptr

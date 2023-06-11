@@ -220,7 +220,6 @@ func (compiler *Compiler) CompileHaltCompiler(ast *ZendAst) {
 	filename := ZendGetCompiledFilename()
 	name = ZendManglePropertyName_ZStr(const_name, filename)
 	RegisterLongConstant(name.GetVal(), name.GetLen(), offset, CONST_CS, 0)
-	// types.ZendStringReleaseEx(name, 0)
 }
 func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()

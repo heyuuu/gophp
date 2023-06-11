@@ -9,67 +9,71 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func ZendVerifyWeakScalarTypeHint(type_hint uint8, arg *types.Zval) types.ZendBool {
+func ZendVerifyWeakScalarTypeHint(type_hint uint8, arg *types.Zval) bool {
 	switch type_hint {
 	case types.IS_BOOL:
 		if val, ok := zpp.ParseBoolWeak(arg); ok {
-			// ZvalPtrDtor(arg)
 			arg.SetBool(val)
-			return 1
+			return true
 		}
 	case types.IS_LONG:
 		if val, ok := zpp.ParseLongWeak(arg, false); ok {
-			// ZvalPtrDtor(arg)
 			arg.SetLong(val)
-			return 1
+			return true
 		}
 	case types.IS_DOUBLE:
 		if val, ok := zpp.ParseDoubleWeak(arg); ok {
-			// ZvalPtrDtor(arg)
 			arg.SetDouble(val)
-			return 1
+			return true
 		}
 	case types.IS_STRING:
 		if val, ok := zpp.ParseZStrWeak(arg); ok {
 			arg.SetString(val)
-			return 1
+			return true
 		}
 	}
-	return 0
+	return false
 }
-func ZendVerifyScalarTypeHint(type_hint uint8, arg *types.Zval, strict types.ZendBool) types.ZendBool {
-	if strict != 0 {
+func ZendVerifyScalarTypeHint(type_hint uint8, arg *types.Zval, strict bool) bool {
+	if strict {
 		/* SSTH Exception: IS_LONG may be accepted as IS_DOUBLE (converted) */
 		if type_hint != types.IS_DOUBLE || !arg.IsLong() {
-			return 0
+			return false
 		}
 	} else if arg.IsNull() {
 		/* NULL may be accepted only by nullable hints (this is already checked) */
-		return 0
+		return false
 	}
 	return ZendVerifyWeakScalarTypeHint(type_hint, arg)
 }
 func ZendVerifyPropertyTypeError(info *types.PropertyInfo, property *types.Zval) {
-	var prop_type1 *byte
-	var prop_type2 *byte
-
 	/* we _may_ land here in case reading already errored and runtime cache thus has not been updated (i.e. it contains a valid but unrelated info) */
-
 	if EG__().GetException() != nil {
 		return
 	}
 
-	// TODO Switch to a more standard error message?
+	ceName := info.GetCe().Name()
+	propName := ZendGetUnmangledPropertyNameEx(info.GetName())
+	_, propType2 := ZendFormatTypeEx(*info.GetType())
+	orNullTips := ""
+	if info.GetType().AllowNull() {
+		orNullTips = " or null"
+	}
 
-	ZendFormatType(info.GetType(), &prop_type1, &prop_type2)
-	void(prop_type1)
-	if info.GetType().IsClass() {
-		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).Name() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
+	var propTypeName string
+	if property.IsObject() {
+		propTypeName = property.Object().GetCe().Name()
 	} else {
-		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).Name() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
+		propTypeName = types.ZendGetTypeByConst(property.GetType())
+	}
+
+	if info.GetType().IsClass() {
+		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", ceName, propName, propType2, orNullTips, propTypeName)
+	} else {
+		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", ceName, propName, propType2, orNullTips, propTypeName)
 	}
 }
-func ZendResolveClassType(type_ *types.TypeHint, self_ce *types.ClassEntry) types.ZendBool {
+func ZendResolveClassType(type_ *types.TypeHint, selfCe *types.ClassEntry) bool {
 	var ce *types.ClassEntry
 	var name = type_.Name()
 	if ascii.StrCaseEquals(name, "self") {
@@ -77,126 +81,112 @@ func ZendResolveClassType(type_ *types.TypeHint, self_ce *types.ClassEntry) type
 		/* We need to explicitly check for this here, to avoid updating the type in the trait and
 		 * later using the wrong "self" when the trait is used in a class. */
 
-		if self_ce.IsTrait() {
+		if selfCe.IsTrait() {
 			faults.ThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", b.Cond(type_.AllowNull(), " non-null", ""))
-			return 0
+			return false
 		}
-		ce = self_ce
+		ce = selfCe
 	} else if ascii.StrCaseEquals(name, "parent") {
-		if !(self_ce.GetParent()) {
+		if selfCe.GetParent() == nil {
 			faults.ThrowError(nil, "Cannot access parent:: when current class scope has no parent")
-			return 0
+			return false
 		}
-		ce = self_ce.GetParent()
+		ce = selfCe.GetParent()
 	} else {
-		ce = ZendLookupClassEx(name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
+		ce = ZendLookupClassEx_Ex(name, "", ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		if ce == nil {
-			return 0
+			return false
 		}
 	}
 	*type_ = types.TypeHintCe(ce, type_.AllowNull())
-	return 1
+	return true
 }
-func IZendCheckPropertyType(info *types.PropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
+func IZendCheckPropertyType(info *types.PropertyInfo, property *types.Zval, strict bool) bool {
 	b.Assert(!(property.IsReference()))
 	if info.GetType().IsClass() {
 		if !property.IsObject() {
 			return property.IsNull() && info.GetType().AllowNull()
 		}
-		if !(info.GetType().IsCe()) && ZendResolveClassType(info.GetType(), info.GetCe()) == 0 {
-			return 0
+		if !(info.GetType().IsCe()) && !ZendResolveClassType(info.GetType(), info.GetCe()) {
+			return false
 		}
 		return operators.InstanceofFunction(types.Z_OBJCE_P(property), info.GetType().Ce())
 	}
 	b.Assert(info.GetType().Code() != types.IS_CALLABLE)
 	if info.GetType().Code() == property.GetType() {
-		return 1
+		return true
 	} else if property.IsNull() {
 		return info.GetType().AllowNull()
 	} else if info.GetType().Code() == types.IS_BOOL && property.IsFalse() || property.IsTrue() {
-		return 1
+		return true
 	} else if info.GetType().Code() == types.IS_ITERABLE {
 		return ZendIsIterable(property)
 	} else {
 		return ZendVerifyScalarTypeHint(info.GetType().Code(), property, strict)
 	}
 }
-func IZendVerifyPropertyType(info *types.PropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
-	if IZendCheckPropertyType(info, property, strict) != 0 {
-		return 1
+func IZendVerifyPropertyType(info *types.PropertyInfo, property *types.Zval, strict bool) bool {
+	if IZendCheckPropertyType(info, property, strict) {
+		return true
 	}
 	ZendVerifyPropertyTypeError(info, property)
-	return 0
+	return false
 }
-func ZendVerifyPropertyType(info *types.PropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
+func ZendVerifyPropertyType(info *types.PropertyInfo, property *types.Zval, strict bool) bool {
 	return IZendVerifyPropertyType(info, property, strict)
 }
 func ZendAssignToTypedProp(info *types.PropertyInfo, property_val *types.Zval, value *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	var tmp types.Zval
 	value = types.ZVAL_DEREF(value)
 	types.ZVAL_COPY(&tmp, value)
-	if IZendVerifyPropertyType(info, &tmp, executeData.IsCallUseStrictTypes()) == 0 {
-		// ZvalPtrDtor(&tmp)
+	if !IZendVerifyPropertyType(info, &tmp, executeData.IsCallUseStrictTypes()) {
 		return UninitializedZval()
 	}
 	return ZendAssignToVariable(property_val, &tmp, executeData.IsCallUseStrictTypes())
 }
-func ZendCheckType(
-	type_ types.TypeHint,
-	arg *types.Zval,
-	ce **types.ClassEntry,
-	cache_slot *any,
-	default_value *types.Zval,
-	scope *types.ClassEntry,
-	is_return_type types.ZendBool,
-) types.ZendBool {
+func ZendCheckType(typ types.TypeHint, arg *types.Zval, ce **types.ClassEntry, cacheSlot *any, defaultValue *types.Zval, scope *types.ClassEntry) bool {
 	var ref *types.ZendReference = nil
-	if !(type_.IsSet()) {
-		return 1
+	if !(typ.IsSet()) {
+		return true
 	}
 	if arg.IsReference() {
 		ref = arg.Reference()
 		arg = types.Z_REFVAL_P(arg)
 	}
-	if type_.IsClass() {
-		if *cache_slot {
-			*ce = (*types.ClassEntry)(*cache_slot)
+	if typ.IsClass() {
+		if *cacheSlot != nil {
+			*ce = (*types.ClassEntry)(*cacheSlot)
 		} else {
-			*ce = ZendFetchClass(type_.Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			*ce = ZendFetchClass(typ.Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if (*ce) == nil {
-				return arg.IsNull() && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0)
+				return arg.IsNull() && (typ.AllowNull() || defaultValue != nil && IsNullConstant(scope, defaultValue) != 0)
 			}
-			*cache_slot = any(*ce)
+			*cacheSlot = any(*ce)
 		}
 		if arg.IsObject() {
 			return operators.InstanceofFunction(types.Z_OBJCE_P(arg), *ce)
 		}
-		return arg.IsNull() && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0)
-	} else if type_.Code() == arg.GetType() {
-		return 1
+		return arg.IsNull() && (typ.AllowNull() || defaultValue != nil && IsNullConstant(scope, defaultValue) != 0)
+	} else if typ.Code() == arg.GetType() {
+		return true
 	}
-	if arg.IsNull() && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0) {
-
+	if arg.IsNull() && (typ.AllowNull() || defaultValue != nil && IsNullConstant(scope, defaultValue) != 0) {
 		/* Null passed to nullable type */
-
-		return 1
-
-		/* Null passed to nullable type */
-
+		return true
 	}
-	if type_.Code() == types.IS_CALLABLE {
+	if typ.Code() == types.IS_CALLABLE {
 		return ZendIsCallable(arg, IS_CALLABLE_CHECK_SILENT, nil)
-	} else if type_.Code() == types.IS_ITERABLE {
+	} else if typ.Code() == types.IS_ITERABLE {
 		return ZendIsIterable(arg)
-	} else if type_.Code() == types.IS_BOOL && arg.IsFalse() || arg.IsTrue() {
-		return 1
+	} else if typ.Code() == types.IS_BOOL && arg.IsFalse() || arg.IsTrue() {
+		return true
 	} else if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref) {
-		return 0
+		return false
 	} else {
-		return ZendVerifyScalarTypeHint(type_.Code(), arg, b.CondF(is_return_type != 0, func() bool { return CurrEX().IsCallUseStrictTypes() }, func() bool { return CurrEX().IsArgUseStrictTypes() }))
+		return ZendVerifyScalarTypeHint(typ.Code(), arg, CurrEX().IsArgUseStrictTypes())
 	}
 }
-func ZendVerifyArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
+func ZendVerifyArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) bool {
 	var cur_arg_info *ZendArgInfo
 	var ce *types.ClassEntry
 	if arg_num <= zf.GetNumArgs() {
@@ -204,14 +194,14 @@ func ZendVerifyArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, defa
 	} else if zf.IsVariadic() {
 		cur_arg_info = zf.GetArgInfo()[zf.GetNumArgs()]
 	} else {
-		return 1
+		return true
 	}
 	ce = nil
-	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope(), 0) == 0 {
+	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope()) == 0 {
 		ZendVerifyArgError(zf, cur_arg_info, arg_num, ce, arg)
-		return 0
+		return false
 	}
-	return 1
+	return true
 }
 func ZendVerifyRecvArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo = zf.GetArgInfo()[arg_num-1]
@@ -219,7 +209,7 @@ func ZendVerifyRecvArgType(zf types.IFunction, arg_num uint32, arg *types.Zval, 
 	b.Assert(arg_num <= zf.GetNumArgs())
 	cur_arg_info = zf.GetArgInfo()[arg_num-1]
 	ce = nil
-	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope(), 0) == 0 {
+	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope()) == 0 {
 		ZendVerifyArgError(zf, cur_arg_info, arg_num, ce, arg)
 		return 0
 	}
@@ -232,7 +222,7 @@ func ZendVerifyVariadicArgType(zf types.IFunction, arg_num uint32, arg *types.Zv
 	b.Assert(zf.IsVariadic())
 	cur_arg_info = zf.GetArgInfo()[zf.GetNumArgs()]
 	ce = nil
-	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope(), 0) == 0 {
+	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope()) == 0 {
 		ZendVerifyArgError(zf, cur_arg_info, arg_num, ce, arg)
 		return 0
 	}
@@ -245,7 +235,7 @@ func ZendVerifyInternalArgTypes(fbc types.IFunction, call *ZendExecuteData) int 
 	var dummy_cache_slot any
 	for i = 0; i < num_args; i++ {
 		dummy_cache_slot = nil
-		if ZendVerifyArgType(fbc, i+1, p, nil, &dummy_cache_slot) == 0 {
+		if !ZendVerifyArgType(fbc, i+1, p, nil, &dummy_cache_slot) {
 			EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
 			return 0
 		}

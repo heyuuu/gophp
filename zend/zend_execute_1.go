@@ -58,51 +58,6 @@ func _getOpDataZvalPtrR(op_type int, node types.ZnodeOp, should_free *ZendFreeOp
 		}
 	}
 }
-func _getZvalPtrDeref(
-	op_type int,
-	node types.ZnodeOp,
-	should_free *ZendFreeOp,
-	type_ int,
-	executeData *ZendExecuteData,
-	opline *types.ZendOp,
-) *types.Zval {
-	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
-		if op_type == IS_TMP_VAR {
-			return _getZvalPtrTmp(node.GetVar(), should_free, executeData)
-		} else {
-			b.Assert(op_type == IS_VAR)
-			return _getZvalPtrVarDeref(node.GetVar(), should_free, executeData)
-		}
-	} else {
-		*should_free = nil
-		if op_type == IS_CONST {
-			return RT_CONSTANT(opline, node)
-		} else if op_type == IS_CV {
-			return _getZvalPtrCvDeref(node.GetVar(), type_, executeData)
-		} else {
-			return nil
-		}
-	}
-}
-func _getOpDataZvalPtrDerefR(op_type int, node types.ZnodeOp, should_free *ZendFreeOp, executeData *ZendExecuteData, opline *types.ZendOp) *types.Zval {
-	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
-		if op_type == IS_TMP_VAR {
-			return _getZvalPtrTmp(node.GetVar(), should_free, executeData)
-		} else {
-			b.Assert(op_type == IS_VAR)
-			return _getZvalPtrVarDeref(node.GetVar(), should_free, executeData)
-		}
-	} else {
-		*should_free = nil
-		if op_type == IS_CONST {
-			return RT_CONSTANT(opline+1, node)
-		} else if op_type == IS_CV {
-			return _get_zval_ptr_cv_deref_BP_VAR_R(node.GetVar(), executeData)
-		} else {
-			return nil
-		}
-	}
-}
 func _getZvalPtrUndef(
 	op_type int,
 	node types.ZnodeOp,
@@ -143,41 +98,6 @@ func _getZvalPtrPtr(op_type int, node types.ZnodeOp, should_free *ZendFreeOp, ty
 		return _getZvalPtrPtrVar(node.GetVar(), should_free, executeData)
 	}
 }
-func _getObjZvalPtr(
-	op_type int,
-	op types.ZnodeOp,
-	should_free *ZendFreeOp,
-	type_ int,
-	executeData *ZendExecuteData,
-	opline *types.ZendOp,
-) *types.Zval {
-	if op_type == IS_UNUSED {
-		*should_free = nil
-		return &(executeData.GetThis())
-	}
-	return GetZvalPtr(op_type, op, should_free, type_)
-}
-func _getObjZvalPtrUndef(
-	op_type int,
-	op types.ZnodeOp,
-	should_free *ZendFreeOp,
-	type_ int,
-	executeData *ZendExecuteData,
-	opline *types.ZendOp,
-) *types.Zval {
-	if op_type == IS_UNUSED {
-		*should_free = nil
-		return &(executeData.GetThis())
-	}
-	return GetZvalPtrUndef(op_type, op, should_free, type_)
-}
-func _getObjZvalPtrPtr(op_type int, node types.ZnodeOp, should_free *ZendFreeOp, type_ int, executeData *ZendExecuteData) *types.Zval {
-	if op_type == IS_UNUSED {
-		*should_free = nil
-		return &(executeData.GetThis())
-	}
-	return GetZvalPtrPtr(op_type, node, should_free, type_)
-}
 func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zval) {
 	var ref *types.ZendReference
 	if !(value_ptr.IsReference()) {
@@ -186,17 +106,6 @@ func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zv
 		return
 	}
 	ref = value_ptr.Reference()
-	// 	ref.AddRefcount()
-	if variable_ptr.IsRefcounted() {
-		//var garbage *types.ZendRefcounted = variable_ptr.RefCounted()
-		//if garbage.DelRefcount() == 0 {
-		//	variable_ptr.SetReference(ref)
-		//	//RcDtorFunc(garbage)
-		//	return
-		//} else {
-		//	//GcCheckPossibleRoot(garbage)
-		//}
-	}
 	variable_ptr.SetReference(ref)
 }
 func ZendAssignToTypedPropertyReference(prop_info *types.PropertyInfo, prop *types.Zval, value_ptr *types.Zval, executeData *ZendExecuteData) *types.Zval {
@@ -216,11 +125,24 @@ func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *typ
 		return UninitializedZval()
 	}
 
-	/* Use IS_TMP_VAR instead of IS_VAR to avoid ISREF check */
-
-	// value_ptr.TryAddRefcount()
 	return ZendAssignToVariable(variable_ptr, value_ptr, executeData.IsCallUseStrictTypes())
 }
+func ZendFormatTypeEx(typ types.TypeHint) (part1 string, part2 string) {
+	if typ.AllowNull() {
+		part1 = "?"
+	}
+	if typ.IsClass() {
+		if typ.IsCe() {
+			part2 = typ.Ce().Name()
+		} else {
+			part2 = typ.Name()
+		}
+	} else {
+		part2 = types.ZendGetTypeByConst(typ.Code())
+	}
+	return part1, part2
+}
+
 func ZendFormatType(type_ types.TypeHint, part1 **byte, part2 **byte) {
 	if type_.AllowNull() {
 		*part1 = "?"
@@ -284,9 +206,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *types.Zend
 			return nil
 		}
 	}
-	// ZvalPtrDtorNogc(object)
 	ObjectInit(object)
-	// 	object.AddRefcount()
 	obj = object.Object()
 	faults.Error(faults.E_WARNING, "Creating default object from empty value")
 	return object

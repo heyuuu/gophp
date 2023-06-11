@@ -74,14 +74,14 @@ func ZendMemrchr(s *byte, c byte, n int) *byte {
 		return nil
 	}
 }
-func TryConvertToString(op *types.Zval) types.ZendBool {
+func TryConvertToString(op *types.Zval) bool {
 	if op.IsString() {
-		return 1
+		return true
 	} else if str, ok := ZvalTryGetStr(op); ok {
 		op.SetStringVal(str)
-		return 1
+		return true
 	} else {
-		return 0
+		return false
 	}
 }
 func ConvertToString(op *types.Zval) {
@@ -211,26 +211,26 @@ func FastEqualCheckString(op1 *types.Zval, op2 *types.Zval) bool {
 	CompareFunction(&result, op1, op2)
 	return result.Long() == 0
 }
-func FastIsIdenticalFunction(op1 *types.Zval, op2 *types.Zval) types.ZendBool {
+func FastIsIdenticalFunction(op1 *types.Zval, op2 *types.Zval) bool {
 	if op1.GetType() != op2.GetType() {
-		return 0
+		return false
 	} else if op1.IsSignType() {
-		return 1
+		return true
 	}
-	return types.IntBool(ZendIsIdentical(op1, op2))
+	return ZendIsIdentical(op1, op2)
 }
-func FastIsNotIdenticalFunction(op1 *types.Zval, op2 *types.Zval) types.ZendBool {
+func FastIsNotIdenticalFunction(op1 *types.Zval, op2 *types.Zval) bool {
 	if op1.GetType() != op2.GetType() {
-		return 1
+		return true
 	} else if op1.IsSignType() {
-		return 0
+		return false
 	}
-	return types.IntBool(!(ZendIsIdentical(op1, op2)))
+	return !ZendIsIdentical(op1, op2)
 }
 func ZendUnwrapReference(op *types.Zval) {
 	types.ZVAL_COPY(op, types.Z_REFVAL_P(op))
 }
-func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func func(op *types.Zval)) {
+func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype types.ZvalType, convFunc func(op *types.Zval)) {
 	dst.SetUndef()
 	if op.Object().CanCast() {
 		if op.Object().Cast(dst, ctype) == types.FAILURE {
@@ -240,26 +240,22 @@ func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func f
 		var newop *types.Zval = op.Object().Get(dst)
 		if !newop.IsObject() {
 			dst.CopyValueFrom(newop)
-			conv_func(dst)
+			convFunc(dst)
 		}
 	}
 }
-func _convertScalarToNumber(op *types.Zval, silent types.ZendBool, check types.ZendBool) {
-try_again:
+func _convertScalarToNumber(op *types.Zval, silent bool, check bool) {
+	op = op.DeRef()
 	switch op.GetType() {
-	case types.IS_REFERENCE:
-		ZendUnwrapReference(op)
-		goto try_again
 	case types.IS_STRING:
 		var str *types.String
 		str = op.String()
 		if b.Assign(&(op.GetTypeInfo()), IsNumericString(str.GetStr(), &(op.Long()), &(op.Double()), b.Cond(silent != 0, 1, -1))) == 0 {
 			op.SetLong(0)
-			if silent == 0 {
+			if !silent {
 				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
 			}
 		}
-		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_NULL:
 		fallthrough
 	case types.IS_FALSE:
@@ -268,15 +264,13 @@ try_again:
 		op.SetLong(1)
 	case types.IS_RESOURCE:
 		var l zend.ZendLong = op.ResourceHandle()
-		// ZvalPtrDtor(op)
 		op.SetLong(l)
 	case types.IS_OBJECT:
 		var dst types.Zval
 		ConvertObjectToType(op, &dst, types.IS_NUMBER, ConvertScalarToNumber)
-		if check != 0 && zend.EG__().GetException() != nil {
+		if check && zend.EG__().GetException() != nil {
 			return
 		}
-		// ZvalPtrDtor(op)
 		if dst.IsLong() || dst.IsDouble() {
 			types.ZVAL_COPY_VALUE(op, &dst)
 		} else {
@@ -284,8 +278,8 @@ try_again:
 		}
 	}
 }
-func ConvertScalarToNumber(op *types.Zval) { _convertScalarToNumber(op, 1, 0) }
-func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent types.ZendBool) *types.Zval {
+func ConvertScalarToNumber(op *types.Zval) { _convertScalarToNumber(op, true, false) }
+func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent bool) *types.Zval {
 	switch op.GetType() {
 	case types.IS_NULL:
 		fallthrough
@@ -297,7 +291,7 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 		return holder
 	case types.IS_STRING:
 		var mode zend.ConvertNumericMode
-		if silent != 0 {
+		if silent {
 			mode = zend.ConvertContinueOnErrors
 		} else {
 			mode = zend.ConvertNoticeOnErrors
@@ -309,7 +303,7 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 			holder.SetDouble(r.Float())
 		} else {
 			holder.SetLong(0)
-			if silent == 0 {
+			if !silent {
 				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
 			}
 		}
@@ -332,20 +326,20 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 	}
 }
 func _zendiConvertScalarToNumber(op *types.Zval, holder *types.Zval) *types.Zval {
-	return _zendiConvertScalarToNumberEx(op, holder, 1)
+	return _zendiConvertScalarToNumberEx(op, holder, true)
 }
 func _zendiConvertScalarToNumberNoisy(op *types.Zval, holder *types.Zval) *types.Zval {
-	return _zendiConvertScalarToNumberEx(op, holder, 0)
+	return _zendiConvertScalarToNumberEx(op, holder, false)
 }
-func ZendiConvertScalarToNumber(op *types.Zval, holder *types.Zval, result *types.Zval, silent types.ZendBool) *types.Zval {
+func ZendiConvertScalarToNumber(op *types.Zval, holder *types.Zval, result *types.Zval, silent bool) *types.Zval {
 	if op.IsLong() || op.IsDouble() {
 		return op
 	} else {
 		if op == result {
-			_convertScalarToNumber(op, silent, 1)
+			_convertScalarToNumber(op, silent, true)
 			return op
 		} else {
-			if silent != 0 {
+			if silent {
 				return _zendiConvertScalarToNumber(op, holder)
 			} else {
 				return _zendiConvertScalarToNumberNoisy(op, holder)
@@ -383,19 +377,16 @@ try_again:
 		} else {
 			op.SetLong(zend.ZEND_STRTOL(str.GetVal(), nil, base))
 		}
-		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
-		if op.Array().Len() {
+		if op.Array().Len() != 0 {
 			tmp = 1
 		} else {
 			tmp = 0
 		}
-		// ZvalPtrDtor(op)
 		op.SetLong(tmp)
 	case types.IS_OBJECT:
 		var dst types.Zval
 		ConvertObjectToType(op, &dst, types.IS_LONG, ConvertToLong)
-		// ZvalPtrDtor(op)
 		if dst.IsLong() {
 			op.SetLong(dst.Long())
 		} else {
@@ -429,10 +420,9 @@ try_again:
 
 	case types.IS_STRING:
 		var str *types.String = op.String()
-		op.SetDouble(zend.ZendStrtod(str.GetVal(), nil))
-		// types.ZendStringReleaseEx(str, 0)
+		op.SetDouble(zend.ZendStrtod(str.GetStr(), nil))
 	case types.IS_ARRAY:
-		if op.Array().Len() {
+		if op.Array().Len() != 0 {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -516,37 +506,26 @@ func ConvertScalarToArray(op *types.Zval) {
 func ConvertToArray(op *types.Zval) {
 try_again:
 	switch op.GetType() {
+	case types.IS_REFERENCE:
+		ZendUnwrapReference(op)
+		goto try_again
 	case types.IS_ARRAY:
-
+		// pass
 	case types.IS_OBJECT:
 		if types.Z_OBJCE_P(op) == zend.ZendCeClosure {
 			ConvertScalarToArray(op)
 		} else {
-			var obj_ht *types.Array = zend.ZendGetPropertiesFor(op, zend.ZEND_PROP_PURPOSE_ARRAY_CAST)
-			if obj_ht != nil {
-				var new_obj_ht *types.Array = types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || op.Object().GetHandlers() != zend.StdObjectHandlersPtr || obj_ht.IsRecursive())
-				// ZvalPtrDtor(op)
-				op.SetArray(new_obj_ht)
-				//zend.ZendReleaseProperties(obj_ht)
+			var objHt *types.Array = zend.ZendGetPropertiesFor(op, zend.ZEND_PROP_PURPOSE_ARRAY_CAST)
+			if objHt != nil {
+				var newObjHt *types.Array = types.ZendProptableToSymtable(objHt, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || op.Object().GetHandlers() != zend.StdObjectHandlersPtr || objHt.IsRecursive())
+				op.SetArray(newObjHt)
 			} else {
-				// ZvalPtrDtor(op)
-
-				/*ZVAL_EMPTY_ARRAY(op);*/
-
 				zend.ArrayInit(op)
-
-				/*ZVAL_EMPTY_ARRAY(op);*/
-
 			}
 		}
 	case types.IS_NULL:
-
 		/*ZVAL_EMPTY_ARRAY(op);*/
-
 		zend.ArrayInit(op)
-	case types.IS_REFERENCE:
-		ZendUnwrapReference(op)
-		goto try_again
 	default:
 		ConvertScalarToArray(op)
 	}
@@ -554,6 +533,9 @@ try_again:
 func ConvertToObject(op *types.Zval) {
 try_again:
 	switch op.GetType() {
+	case types.IS_REFERENCE:
+		ZendUnwrapReference(op)
+		goto try_again
 	case types.IS_ARRAY:
 		var ht = types.ZendSymtableToProptable(op.Array())
 		//if ht.IsImmutable() {
@@ -569,9 +551,6 @@ try_again:
 
 	case types.IS_NULL:
 		zend.ObjectInit(op)
-	case types.IS_REFERENCE:
-		ZendUnwrapReference(op)
-		goto try_again
 	default:
 		var tmp types.Zval
 		types.ZVAL_COPY_VALUE(&tmp, op)
@@ -646,10 +625,10 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					return types.SUCCESS
 				}
 				if op1 != op2 {
-					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
-					op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 0)
+					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, false)
+					op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, false)
 				} else {
-					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
+					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, false)
 					op2 = op1
 				}
 				if zend.EG__().GetException() != nil {
@@ -756,7 +735,7 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 						result.SetLong(0)
 						return types.SUCCESS
 					} else {
-						op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
+						op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, false)
 					}
 					if op2.IsArray() {
 						if op1 == result {
@@ -765,7 +744,7 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 						result.SetLong(1)
 						return types.SUCCESS
 					} else {
-						op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 0)
+						op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, false)
 					}
 				} else {
 					if op1.IsArray() {
@@ -775,7 +754,7 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 						result.SetLong(0)
 						return types.SUCCESS
 					} else {
-						op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
+						op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, false)
 					}
 					op2 = op1
 				}
@@ -801,7 +780,7 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var op2_copy types.Zval
 	var converted int = 0
 	for true {
-		var type_pair uint8 = TypePair(op1.GetType(), op2.GetType())
+		var type_pair uint = TypePair(op1.GetType(), op2.GetType())
 		if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
 			if op2.Long() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")
@@ -1847,32 +1826,31 @@ func IsSmallerOrEqualFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zv
 	result.SetBool(result.Long() <= 0)
 	return types.SUCCESS
 }
-func InstanceofClass(instance_ce *types.ClassEntry, ce *types.ClassEntry) types.ZendBool {
+func InstanceofClass(instance_ce *types.ClassEntry, ce *types.ClassEntry) bool {
 	for {
 		if instance_ce == ce {
-			return 1
+			return true
 		}
 		instance_ce = instance_ce.GetParent()
 		if instance_ce == nil {
 			break
 		}
 	}
-	return 0
+	return false
 }
-func InstanceofInterface(instance_ce *types.ClassEntry, ce *types.ClassEntry) types.ZendBool {
-	var i uint32
+func InstanceofInterface(instance_ce *types.ClassEntry, ce *types.ClassEntry) bool {
 	if instance_ce.GetNumInterfaces() != 0 {
 		b.Assert(instance_ce.IsResolvedInterfaces())
-		for i = 0; i < instance_ce.GetNumInterfaces(); i++ {
+		for i := 0; i < instance_ce.GetNumInterfaces(); i++ {
 			if instance_ce.GetInterfaces()[i] == ce {
-				return 1
+				return true
 			}
 		}
 	}
 	return instance_ce == ce
 }
-func InstanceofFunctionEx(instance_ce *types.ClassEntry, ce *types.ClassEntry, is_interface types.ZendBool) types.ZendBool {
-	if is_interface != 0 {
+func InstanceofFunctionEx(instance_ce *types.ClassEntry, ce *types.ClassEntry, isInterface bool) bool {
+	if isInterface {
 		b.Assert(ce.IsInterface())
 		return InstanceofInterface(instance_ce, ce)
 	} else {
@@ -1880,7 +1858,7 @@ func InstanceofFunctionEx(instance_ce *types.ClassEntry, ce *types.ClassEntry, i
 		return InstanceofClass(instance_ce, ce)
 	}
 }
-func InstanceofFunction(instance_ce *types.ClassEntry, ce *types.ClassEntry) types.ZendBool {
+func InstanceofFunction(instance_ce *types.ClassEntry, ce *types.ClassEntry) bool {
 	if ce.IsInterface() {
 		return InstanceofInterface(instance_ce, ce)
 	} else {

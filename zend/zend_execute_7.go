@@ -41,7 +41,7 @@ func ZendVerifyPropAssignableByRef(prop_info *types.PropertyInfo, orig_val *type
 		}
 	} else {
 		val = types.ZVAL_DEREF(val)
-		if IZendCheckPropertyType(prop_info, val, strict) != 0 {
+		if IZendCheckPropertyType(prop_info, val, strict) {
 			return 1
 		}
 	}
