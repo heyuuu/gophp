@@ -101,15 +101,16 @@ var DefZifSplAutoloadCall = def.DefFunc("spl_autoload_call", 1, 1, []def.ArgInfo
 
 // generate by ZifSplAutoloadRegister
 var DefZifSplAutoloadRegister = def.DefFunc("spl_autoload_register", 0, 3, []def.ArgInfo{{Name: "autoload_function"}, {Name: "throw"}, {Name: "prepend"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 0, 3, 0)
+	fp := zpp.FastParseStart(executeData, 0, 3, zpp.FlagOldMode)
 	fp.StartOptional()
 	autoload_function := fp.ParseZval()
-	throw := fp.ParseZval()
-	prepend := fp.ParseZval()
+	throw_ := fp.ParseBoolValNullable()
+	prepend := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifSplAutoloadRegister(executeData, returnValue, nil, autoload_function, throw, prepend)
+	ret := ZifSplAutoloadRegister(executeData, nil, autoload_function, throw_, prepend)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifSplAutoloadUnregister
@@ -119,7 +120,7 @@ var DefZifSplAutoloadUnregister = def.DefFunc("spl_autoload_unregister", 1, 1, [
 	if fp.HasError() {
 		return
 	}
-	ZifSplAutoloadUnregister(executeData, returnValue, autoload_function)
+	ZifSplAutoloadUnregister(autoload_function)
 })
 
 // generate by ZifSplAutoloadFunctions

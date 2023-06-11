@@ -218,14 +218,12 @@ func ZifSplAutoloadExtensions(_ zpp.Opt, fileExtensions *string) string {
 	}
 	return SPL_G__().GetAutoloadExtensions()
 }
-func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *types.Zval) {
-	var class_name *types.Zval
+
+//@zif -old "z"
+func ZifSplAutoloadCall(executeData zpp.Ex, className string) {
 	var retval types.Zval
-	var lc_name *types.String
 	var alfi *AutoloadFuncInfo
-	if zend.ZendParseParameters(executeData.NumArgs(), "z", &class_name) == types.FAILURE || !class_name.IsString() {
-		return
-	}
+
 	if SPL_G__().autoloadFunctions != nil {
 		var func_ types.IFunction
 		var fci types.ZendFcallInfo
@@ -233,11 +231,11 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		var called_scope *types.ClassEntry = zend.ZendGetCalledScope(executeData)
 		var l_autoload_running int = SPL_G__().autoloadRunning
 		SPL_G__().SetAutoloadRunning(1)
-		lc_name = operators.ZendStringTolower(class_name.String())
+		lc_name := ascii.StrToLower(className)
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetRetval(&retval)
 		fci.SetParamCount(1)
-		fci.SetParams(class_name)
+		fci.SetParams(className)
 		fci.SetNoSeparation(1)
 		fci.GetFunctionName().SetUndef()
 
@@ -271,7 +269,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 			if zend.EG__().GetException() != nil {
 				return false
 			}
-			if zend.EG__().ClassTable().Exists(lc_name.GetStr()) {
+			if zend.EG__().ClassTable().Exists(lc_name) {
 				return false
 			}
 			return true
@@ -286,7 +284,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		fcall_info.GetFunctionName().SetUndef()
 		fcall_info.SetRetval(&retval)
 		fcall_info.SetParamCount(1)
-		fcall_info.SetParams(class_name)
+		fcall_info.SetParams(className)
 		fcall_info.SetObject(nil)
 		fcall_info.SetNoSeparation(1)
 		fcall_cache.SetFunctionHandler(SplAutoloadFn)
@@ -309,136 +307,104 @@ func uintToStr(i uint) string {
 	})
 }
 
-func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, autoloadFunction *types.Zval, throw *types.Zval, prepend *types.Zval) {
-	var func_name *types.String
-	var error *byte = nil
-	var lc_name string = ""
-	var zcallable *types.Zval = nil
-	var do_throw types.ZendBool = 1
-	var prepend types.ZendBool = 0
-	var spl_func_ptr types.IFunction
+//@zif -old "|zbb"
+func ZifSplAutoloadRegister(executeData zpp.Ex, _ zpp.Opt, autoloadFunction *types.Zval, throw_ *bool, prepend bool) bool {
+	var zcallable *types.Zval = autoloadFunction
+	var throw = b.Option(throw_, true)
+
+	var funcName *types.String
+	var error_ *byte = nil
+	var lcName string = ""
+	var splFuncPtr types.IFunction
 	var alfi AutoloadFuncInfo
-	var obj_ptr *types.ZendObject
+	var objPtr *types.ZendObject
 	var fcc types.ZendFcallInfoCache
-	if zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "|zbb", &zcallable, &do_throw, &prepend) == types.FAILURE {
-		return
-	}
 	if executeData.NumArgs() != 0 {
-		if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_STRICT, &func_name, &fcc, &error) == 0 {
+		if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_STRICT, &funcName, &fcc, &error_) == 0 {
 			alfi.SetCe(fcc.GetCallingScope())
 			alfi.SetFuncPtr(fcc.GetFunctionHandler())
-			obj_ptr = fcc.GetObject()
+			objPtr = fcc.GetObject()
 			if zcallable.IsType(types.IS_ARRAY) {
-				if obj_ptr == nil && alfi.GetFuncPtr() != nil && !alfi.GetFuncPtr().HasFnFlags(types.AccStatic) {
-					if do_throw != 0 {
-						faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array specifies a non static method but no object (%s)", error)
+				if objPtr == nil && alfi.GetFuncPtr() != nil && !alfi.GetFuncPtr().HasFnFlags(types.AccStatic) {
+					if throw {
+						faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array specifies a non static method but no object (%s)", error_)
 					}
-					if error != nil {
-						zend.Efree(error)
-					}
-					// types.ZendStringReleaseEx(func_name, 0)
-					return_value.SetFalse()
-					return
-				} else if do_throw != 0 {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", b.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), b.Cond(obj_ptr == nil, "static ", ""), error)
+					return false
+				} else if throw {
+					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", b.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), b.Cond(objPtr == nil, "static ", ""), error_)
 				}
-				if error != nil {
-					zend.Efree(error)
-				}
-				// types.ZendStringReleaseEx(func_name, 0)
-				return_value.SetFalse()
-				return
+				return false
 			} else if zcallable.IsString() {
-				if do_throw != 0 {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", func_name.GetVal(), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error)
+				if throw {
+					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", funcName.GetVal(), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error_)
 				}
-				if error != nil {
-					zend.Efree(error)
-				}
-				// types.ZendStringReleaseEx(func_name, 0)
-				return_value.SetFalse()
-				return
+				return false
 			} else {
-				if do_throw != 0 {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Illegal value passed (%s)", error)
+				if throw {
+					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Illegal value passed (%s)", error_)
 				}
-				if error != nil {
-					zend.Efree(error)
-				}
-				// types.ZendStringReleaseEx(func_name, 0)
-				return_value.SetFalse()
-				return
+				return false
 			}
 		} else if interFunc, ok := fcc.GetFunctionHandler().(*types.InternalFunction); ok && interFunc.GetHandler() == ZifSplAutoloadCall {
-			if do_throw != 0 {
+			if throw {
 				faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function spl_autoload_call() cannot be registered")
 			}
-			if error != nil {
-				zend.Efree(error)
-			}
-			// types.ZendStringReleaseEx(func_name, 0)
-			return_value.SetFalse()
-			return
+			return false
 		}
 		alfi.SetCe(fcc.GetCallingScope())
 		alfi.SetFuncPtr(fcc.GetFunctionHandler())
-		obj_ptr = fcc.GetObject()
-		if error != nil {
-			zend.Efree(error)
-		}
+		objPtr = fcc.GetObject()
 		if zcallable.IsType(types.IS_OBJECT) {
 			types.ZVAL_COPY(alfi.GetClosure(), zcallable)
-			lc_name = ascii.StrToLower(func_name.GetStr()) + uintToStr(zcallable.Object().GetHandle())
+			lcName = ascii.StrToLower(funcName.GetStr()) + uintToStr(zcallable.Object().GetHandle())
 		} else {
 			alfi.GetClosure().SetUndef()
 
 			/* Skip leading \ */
-			if func_name.GetStr()[0] == '\\' {
-				lc_name = ascii.StrToLower(func_name.GetStr()[1:])
+			if funcName.GetStr()[0] == '\\' {
+				lcName = ascii.StrToLower(funcName.GetStr()[1:])
 			} else {
-				lc_name = ascii.StrToLower(func_name.GetStr())
+				lcName = ascii.StrToLower(funcName.GetStr())
 			}
 		}
-		// types.ZendStringReleaseEx(func_name, 0)
-		if SPL_G__().autoloadFunctions != nil && SPL_G__().autoloadFunctions.KeyExists(lc_name) {
+		if SPL_G__().autoloadFunctions != nil && SPL_G__().autoloadFunctions.KeyExists(lcName) {
 			goto skip
 		}
-		if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(types.AccStatic) {
-
+		if objPtr != nil && !alfi.GetFuncPtr().HasFnFlags(types.AccStatic) {
 			/* add object id to the hash to ensure uniqueness, for more reference look at bug #40091 */
-			lc_name += uintToStr(obj_ptr.GetHandle())
-			alfi.GetObj().SetObject(obj_ptr)
+			lcName += uintToStr(objPtr.GetHandle())
+			alfi.GetObj().SetObject(objPtr)
 		} else {
 			alfi.GetObj().SetUndef()
 		}
 		if SPL_G__().autoloadFunctions == nil {
 			SPL_G__().autoloadFunctions = types.NewArray(1)
 		}
-		spl_func_ptr = SplAutoloadFn
-		if zend.EG__().GetAutoloadFunc() == spl_func_ptr {
+		splFuncPtr = SplAutoloadFn
+		if zend.EG__().GetAutoloadFunc() == splFuncPtr {
 			var spl_alfi AutoloadFuncInfo
-			spl_alfi.SetFuncPtr(spl_func_ptr)
+			spl_alfi.SetFuncPtr(splFuncPtr)
 			spl_alfi.GetObj().SetUndef()
 			spl_alfi.GetClosure().SetUndef()
 			spl_alfi.SetCe(nil)
 			types.ZendHashAddMem(SPL_G__().autoloadFunctions, SplAutoloadFn.FunctionName(), &spl_alfi, b.SizeOf("autoload_func_info"))
-			if prepend != 0 && SPL_G__().autoloadFunctions.Len() > 1 {
+			if prepend && SPL_G__().autoloadFunctions.Len() > 1 {
 				/* Move the newly created element to the head of the hashtable */
 				SPL_G__().autoloadFunctions.MoveTailToHead()
 			}
 		}
 		if alfi.GetFuncPtr() == zend.EG__().GetTrampoline() {
-			var copy types.IFunction = zend.Emalloc(b.SizeOf("zend_op_array"))
-			memcpy(copy, alfi.GetFuncPtr(), b.SizeOf("zend_op_array"))
+			var copy_ types.IFunction = zend.Emalloc(b.SizeOf("zend_op_array"))
+			memcpy(copy_, alfi.GetFuncPtr(), b.SizeOf("zend_op_array"))
 			alfi.GetFuncPtr().SetFunctionName("")
-			alfi.SetFuncPtr(copy)
+			alfi.SetFuncPtr(copy_)
 		}
-		if types.ZendHashAddMem(SPL_G__().autoloadFunctions, lc_name, &alfi, b.SizeOf("autoload_func_info")) == nil {
+		if types.ZendHashAddMem(SPL_G__().autoloadFunctions, lcName, &alfi, b.SizeOf("autoload_func_info")) == nil {
 			if alfi.GetFuncPtr().HasFnFlags(types.AccCallViaTrampoline) {
 				zend.ZendFreeTrampoline(alfi.GetFuncPtr())
 			}
 		}
-		if prepend != 0 && SPL_G__().autoloadFunctions.Len() > 1 {
+		if prepend && SPL_G__().autoloadFunctions.Len() > 1 {
 			/* Move the newly created element to the head of the hashtable */
 			SPL_G__().autoloadFunctions.MoveTailToHead()
 		}
@@ -450,53 +416,40 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	} else {
 		zend.EG__().SetAutoloadFunc(SplAutoloadFn)
 	}
-	return_value.SetTrue()
-	return
+	return true
 }
-func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoloadFunction *types.Zval) {
-	var func_name *types.String = nil
-	var error *byte = nil
-	var lc_name string
-	var zcallable *types.Zval
+
+//@zif -old "z"
+func ZifSplAutoloadUnregister(autoloadFunction *types.Zval) bool {
+	var zcallable *types.Zval = autoloadFunction
+
+	var funcName *types.String = nil
+	var error_ *byte = nil
+	var lcName string
 	var success bool = false
-	var spl_func_ptr types.IFunction
-	var obj_ptr *types.ZendObject
+	var splFuncPtr types.IFunction
+	var objPtr *types.ZendObject
 	var fcc types.ZendFcallInfoCache
-	if zend.ZendParseParameters(executeData.NumArgs(), "z", &zcallable) == types.FAILURE {
-		return
+
+	if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_CHECK_SYNTAX_ONLY, &funcName, &fcc, &error_) == 0 {
+		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Unable to unregister invalid function (%s)", error_)
+		return false
 	}
-	if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_CHECK_SYNTAX_ONLY, &func_name, &fcc, &error) == 0 {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Unable to unregister invalid function (%s)", error)
-		if error != nil {
-			zend.Efree(error)
-		}
-		if func_name != nil {
-			// types.ZendStringReleaseEx(func_name, 0)
-		}
-		return_value.SetFalse()
-		return
-	}
-	obj_ptr = fcc.GetObject()
-	if error != nil {
-		zend.Efree(error)
-	}
+	objPtr = fcc.GetObject()
 	if zcallable.IsType(types.IS_OBJECT) {
-		lc_name = ascii.StrToLower(func_name.GetStr()) + uintToStr(zcallable.Object().GetHandle())
+		lcName = ascii.StrToLower(funcName.GetStr()) + uintToStr(zcallable.Object().GetHandle())
 	} else {
-
 		/* Skip leading \ */
-
-		if func_name.GetStr()[0] == '\\' {
-			lc_name = ascii.StrToLower(func_name.GetStr()[1:])
+		if funcName.GetStr()[0] == '\\' {
+			lcName = ascii.StrToLower(funcName.GetStr()[1:])
 		} else {
-			lc_name = ascii.StrToLower(func_name.GetStr())
+			lcName = ascii.StrToLower(funcName.GetStr())
 		}
 	}
-	// types.ZendStringReleaseEx(func_name, 0)
-	if SPL_G__().autoloadFunctions {
-		if lc_name == SplAutoloadCallFn.FunctionName() {
+	if SPL_G__().autoloadFunctions != nil {
+		if lcName == SplAutoloadCallFn.FunctionName() {
 			/* remove all */
-			if !(SPL_G__().autoloadRunning) {
+			if SPL_G__().autoloadRunning == 0 {
 				SPL_G__().autoloadFunctions.Destroy()
 				SPL_G__().autoloadFunctions = nil
 				zend.EG__().SetAutoloadFunc(nil)
@@ -506,25 +459,21 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 			success = true
 		} else {
 			/* remove specific */
-			success = SPL_G__().autoloadFunctions.KeyDelete(lc_name)
-			if !success && obj_ptr != nil {
-				lc_name += uintToStr(obj_ptr.GetHandle())
-				success = SPL_G__().autoloadFunctions.KeyDelete(lc_name)
+			success = SPL_G__().autoloadFunctions.KeyDelete(lcName)
+			if !success && objPtr != nil {
+				lcName += uintToStr(objPtr.GetHandle())
+				success = SPL_G__().autoloadFunctions.KeyDelete(lcName)
 			}
 		}
-	} else if lc_name == SplAutoloadFn.FunctionName() {
-
+	} else if lcName == SplAutoloadFn.FunctionName() {
 		/* register single spl_autoload() */
-
-		spl_func_ptr = SplAutoloadFn
-		if zend.EG__().GetAutoloadFunc() == spl_func_ptr {
+		splFuncPtr = SplAutoloadFn
+		if zend.EG__().GetAutoloadFunc() == splFuncPtr {
 			success = true
 			zend.EG__().SetAutoloadFunc(nil)
 		}
 	}
-	// types.ZendStringReleaseEx(lc_name, 0)
-	return_value.SetBool(success)
-	return
+	return success
 }
 func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 	var fptr types.IFunction
