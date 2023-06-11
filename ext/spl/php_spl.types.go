@@ -2,6 +2,7 @@ package spl
 
 import (
 	"fmt"
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/php/types"
 )
@@ -10,46 +11,57 @@ import (
  * ZendSplGlobals
  */
 type ZendSplGlobals struct {
-	autoload_extensions *types.String
-	autoload_functions  *types.Array
-	hashMaskHandle      uint64
-	hashMaskHandlers    uint64
-	hashMaskInit        bool
-	autoloadRunning     int
+	autoloadExtensions *string
+	autoloadFunctions  *types.Array
+	hashMaskHandle     uint64
+	hashMaskHandlers   uint64
+	hashMaskInit       bool
+	autoloadRunning    int
 }
 
-func (this *ZendSplGlobals) Reset() {
-	this.autoload_extensions = nil
-	this.autoload_functions = nil
-	this.hashMaskInit = false
+func (g *ZendSplGlobals) Ctor() {
+	g.autoloadExtensions = nil
+	g.autoloadFunctions = nil
+	g.autoloadRunning = 0
+}
+func (g *ZendSplGlobals) Reset() {
+	g.autoloadExtensions = nil
+	g.autoloadFunctions = nil
+	g.hashMaskInit = false
 }
 
-func (this *ZendSplGlobals) Deactivate() {
-	if this.autoload_functions != nil {
-		this.autoload_functions.Destroy()
+func (g *ZendSplGlobals) Deactivate() {
+	if g.autoloadFunctions != nil {
+		g.autoloadFunctions.Destroy()
 	}
-	this.Reset()
+	g.Reset()
 }
 
-func (this *ZendSplGlobals) SplObjectHash(handle uint) string {
-	if !this.hashMaskInit {
-		this.hashMaskHandle = uint64(standard.PhpMtRand() >> 1)
-		this.hashMaskHandlers = uint64(standard.PhpMtRand() >> 1)
-		this.hashMaskInit = true
+func (g *ZendSplGlobals) SplObjectHash(handle uint) string {
+	if !g.hashMaskInit {
+		g.hashMaskHandle = uint64(standard.PhpMtRand() >> 1)
+		g.hashMaskHandlers = uint64(standard.PhpMtRand() >> 1)
+		g.hashMaskInit = true
 	}
-	hashHandle := this.hashMaskHandle ^ uint64(handle)
-	hashHandles := this.hashMaskHandlers
+	hashHandle := g.hashMaskHandle ^ uint64(handle)
+	hashHandles := g.hashMaskHandlers
 	return fmt.Sprintf("%016x%016x", hashHandle, hashHandles)
 }
 
-func (this *ZendSplGlobals) SetAutoloadExtensions(value *types.String) {
-	this.autoload_extensions = value
+func (g *ZendSplGlobals) GetAutoloadExtensions() string {
+	return b.Option(g.autoloadExtensions, SPL_DEFAULT_FILE_EXTENSIONS)
+}
+func (g *ZendSplGlobals) SetAutoloadExtensions(value string) {
+	g.autoloadExtensions = &value
 }
 
-func (this *ZendSplGlobals) SetAutoloadFunctions(value *types.Array) {
-	this.autoload_functions = value
+func (g *ZendSplGlobals) GetAutoloadFunctions() *types.Array {
+
 }
-func (this *ZendSplGlobals) SetAutoloadRunning(value int) { this.autoloadRunning = value }
+func (g *ZendSplGlobals) SetAutoloadFunctions(value *types.Array) {
+	g.autoloadFunctions = value
+}
+func (g *ZendSplGlobals) SetAutoloadRunning(value int) { g.autoloadRunning = value }
 
 /**
  * AutoloadFuncInfo

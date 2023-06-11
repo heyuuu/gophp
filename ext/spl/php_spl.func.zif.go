@@ -10,35 +10,50 @@ var DefZifClassParents = def.DefFunc("class_parents", 1, 2, []def.ArgInfo{{Name:
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	instance := fp.ParseZval()
 	fp.StartOptional()
-	autoload := fp.ParseZval()
+	autoload_ := fp.ParseBoolValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifClassParents(executeData, returnValue, instance, nil, autoload)
+	ret, ok := ZifClassParents(instance, nil, autoload_)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifClassImplements
-var DefZifClassImplements = def.DefFunc("class_implements", 1, 2, []def.ArgInfo{{Name: "what"}, {Name: "autoload"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifClassImplements = def.DefFunc("class_implements", 1, 2, []def.ArgInfo{{Name: "instance"}, {Name: "autoload"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	what := fp.ParseZval()
+	instance := fp.ParseZval()
 	fp.StartOptional()
-	autoload := fp.ParseZval()
+	autoload_ := fp.ParseBoolValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifClassImplements(executeData, returnValue, what, nil, autoload)
+	ret, ok := ZifClassImplements(instance, nil, autoload_)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifClassUses
-var DefZifClassUses = def.DefFunc("class_uses", 1, 2, []def.ArgInfo{{Name: "what"}, {Name: "autoload"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifClassUses = def.DefFunc("class_uses", 1, 2, []def.ArgInfo{{Name: "instance"}, {Name: "autoload"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	what := fp.ParseZval()
+	instance := fp.ParseZval()
 	fp.StartOptional()
-	autoload := fp.ParseZval()
+	autoload_ := fp.ParseBoolValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifClassUses(executeData, returnValue, what, nil, autoload)
+	ret, ok := ZifClassUses(instance, nil, autoload_)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifSplClasses
@@ -52,24 +67,25 @@ var DefZifSplClasses = def.DefFunc("spl_classes", 0, 0, []def.ArgInfo{}, func(ex
 // generate by ZifSplAutoload
 var DefZifSplAutoload = def.DefFunc("spl_autoload", 1, 2, []def.ArgInfo{{Name: "class_name"}, {Name: "file_extensions"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	class_name := fp.ParseZval()
+	class_name := fp.ParseStringVal()
 	fp.StartOptional()
-	file_extensions := fp.ParseZval()
+	file_extensions := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifSplAutoload(executeData, returnValue, class_name, nil, file_extensions)
+	ZifSplAutoload(class_name, nil, file_extensions)
 })
 
 // generate by ZifSplAutoloadExtensions
 var DefZifSplAutoloadExtensions = def.DefFunc("spl_autoload_extensions", 0, 1, []def.ArgInfo{{Name: "file_extensions"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
-	file_extensions := fp.ParseZval()
+	file_extensions := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifSplAutoloadExtensions(executeData, returnValue, nil, file_extensions)
+	ret := ZifSplAutoloadExtensions(nil, file_extensions)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifSplAutoloadCall

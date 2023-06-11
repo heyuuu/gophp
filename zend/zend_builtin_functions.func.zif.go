@@ -249,7 +249,12 @@ var DefZifGetParentClass = def.DefFunc("get_parent_class", 0, 1, []def.ArgInfo{{
 	if fp.HasError() {
 		return
 	}
-	ZifGetParentClass(executeData, returnValue, nil, object)
+	ret, ok := ZifGetParentClass(executeData, returnValue, nil, object)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifIsSubclassOf
@@ -320,18 +325,20 @@ var DefZifGetClassMethods = def.DefFunc("get_class_methods", 1, 1, []def.ArgInfo
 	if fp.HasError() {
 		return
 	}
-	ZifGetClassMethods(class)
+	ret := ZifGetClassMethods(class)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifMethodExists
 var DefZifMethodExists = def.DefFunc("method_exists", 2, 2, []def.ArgInfo{{Name: "object"}, {Name: "method"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	object := fp.ParseZval()
-	method := fp.ParseZval()
+	method := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifMethodExists(object, method)
+	ret := ZifMethodExists(object, method)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifPropertyExists
