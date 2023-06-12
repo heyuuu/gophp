@@ -63,11 +63,11 @@ func (this *ZendTraitAlias) GetModifiers() uint32                      { return 
  * ZendUtilityValues
  */
 type ZendUtilityValues struct {
-	html_errors types.ZendBool
+	html_errors bool
 }
 
-func (this *ZendUtilityValues) GetHtmlErrors() types.ZendBool      { return this.html_errors }
-func (this *ZendUtilityValues) SetHtmlErrors(value types.ZendBool) { this.html_errors = value }
+func (this *ZendUtilityValues) GetHtmlErrors() bool      { return this.html_errors }
+func (this *ZendUtilityValues) SetHtmlErrors(value bool) { this.html_errors = value }
 
 /**
  * ZendErrorHandling

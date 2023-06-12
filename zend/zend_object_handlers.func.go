@@ -209,7 +209,7 @@ func ZendStdCallIssetter(zobj *types.ZendObject, prop_name *types.String, retval
 	ZendCallFunction(&fci, &fcic)
 	EG__().SetFakeScope(orig_fake_scope)
 }
-func IsDerivedClass(child_class *types.ClassEntry, parent_class *types.ClassEntry) types.ZendBool {
+func IsDerivedClass(child_class *types.ClassEntry, parent_class *types.ClassEntry) bool {
 	child_class = child_class.GetParent()
 	for child_class != nil {
 		if child_class == parent_class {
@@ -389,7 +389,7 @@ func ZendGetPropertyInfoEx(ce *types.ClassEntry, member string) (_ *types.Proper
 
 	return propInfo, false
 }
-func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.String, is_dynamic types.ZendBool) int {
+func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.String, is_dynamic bool) int {
 	var property_info *types.PropertyInfo
 	var class_name *byte = nil
 	var prop_name *byte
@@ -619,7 +619,7 @@ exit:
 	//ZendTmpStringRelease(tmp_name)
 	return retval
 }
-func PropertyUsesStrictTypes() types.ZendBool {
+func PropertyUsesStrictTypes() bool {
 	var executeData *ZendExecuteData = CurrEX()
 	return executeData != nil && executeData.GetFunc() != nil && CurrEX().IsCallUseStrictTypes()
 }
@@ -1235,7 +1235,7 @@ func ZendStdGetStaticProperty(ce *types.ClassEntry, property_name *types.String,
 	var prop_info *types.PropertyInfo
 	return ZendStdGetStaticPropertyWithInfo(ce, property_name, type_, &prop_info)
 }
-func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name *types.String) types.ZendBool {
+func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name *types.String) bool {
 	faults.ThrowError(nil, "Attempt to unset static property %s::$%s", ce.Name(), property_name.GetVal())
 	return 0
 }

@@ -304,20 +304,20 @@ func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *types.
 		return types.IS_NULL
 	}
 }
-func PromotesToArray(val *types.Zval) types.ZendBool {
+func PromotesToArray(val *types.Zval) bool {
 	return val.IsSignFalse() || val.IsReference() && types.Z_REFVAL_P(val).IsSignFalse()
 }
-func PromotesToObject(val *types.Zval) types.ZendBool {
+func PromotesToObject(val *types.Zval) bool {
 	val = types.ZVAL_DEREF(val)
 	return val.IsSignFalse() || val.IsString() && val.String().GetLen() == 0
 }
-func CheckTypeArrayAssignable(type_ types.TypeHint) types.ZendBool {
+func CheckTypeArrayAssignable(type_ types.TypeHint) bool {
 	if type_ == 0 {
 		return 1
 	}
 	return type_.IsCode() && (type_.Code() == types.IS_ARRAY || type_.Code() == types.IS_ITERABLE)
 }
-func check_type_stdClass_assignable(type_ types.TypeHint) types.ZendBool {
+func check_type_stdClass_assignable(type_ types.TypeHint) bool {
 	if type_ == 0 {
 		return 1
 	}
@@ -331,7 +331,7 @@ func check_type_stdClass_assignable(type_ types.TypeHint) types.ZendBool {
 		return type_.Code() == types.IS_OBJECT
 	}
 }
-func ZendVerifyRefArrayAssignable(ref *types.ZendReference) types.ZendBool {
+func ZendVerifyRefArrayAssignable(ref *types.ZendReference) bool {
 	var prop *types.PropertyInfo
 	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
@@ -357,7 +357,7 @@ func ZendVerifyRefArrayAssignable(ref *types.ZendReference) types.ZendBool {
 	}
 	return 1
 }
-func zend_verify_ref_stdClass_assignable(ref *types.ZendReference) types.ZendBool {
+func zend_verify_ref_stdClass_assignable(ref *types.ZendReference) bool {
 	var prop *types.PropertyInfo
 	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())

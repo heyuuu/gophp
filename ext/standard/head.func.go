@@ -12,7 +12,7 @@ import (
 )
 
 func ZifHeader(executeData zpp.Ex, return_value zpp.Ret, header *types.Zval, _ zpp.Opt, replace *types.Zval, httpResponseCode *types.Zval) {
-	var rep types.ZendBool = 1
+	var rep bool = 1
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var len_ int
 	for {
@@ -170,8 +170,8 @@ func PhpHeadParseCookieOptionsArray(
 	expires *zend.ZendLong,
 	path **types.String,
 	domain **types.String,
-	secure *types.ZendBool,
-	httponly *types.ZendBool,
+	secure *bool,
+	httponly *bool,
 	samesite **types.String,
 ) {
 	var found int = 0
@@ -222,8 +222,8 @@ func ZifSetcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, _ 
 	var domain *types.String = nil
 	var samesite *types.String = nil
 	var expires zend.ZendLong = 0
-	var secure types.ZendBool = 0
-	var httponly types.ZendBool = 0
+	var secure bool = 0
+	var httponly bool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 7, 0)
@@ -281,8 +281,8 @@ func ZifSetrawcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval,
 	var domain *types.String = nil
 	var samesite *types.String = nil
 	var expires zend.ZendLong = 0
-	var secure types.ZendBool = 0
-	var httponly types.ZendBool = 0
+	var secure bool = 0
+	var httponly bool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 7, 0)

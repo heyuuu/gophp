@@ -258,7 +258,7 @@ type SplRecursiveItObject struct {
 	mode            RecursiveIteratorMode
 	flags           int
 	max_depth       int
-	in_iteration    types.ZendBool
+	in_iteration    bool
 	beginIteration  types.IFunction
 	endIteration    types.IFunction
 	callHasChildren types.IFunction
@@ -288,8 +288,8 @@ func (this *SplRecursiveItObject) SetMode(value RecursiveIteratorMode) { this.mo
 func (this *SplRecursiveItObject) SetFlags(value int)                  { this.flags = value }
 func (this *SplRecursiveItObject) GetMaxDepth() int                    { return this.max_depth }
 func (this *SplRecursiveItObject) SetMaxDepth(value int)               { this.max_depth = value }
-func (this *SplRecursiveItObject) GetInIteration() types.ZendBool      { return this.in_iteration }
-func (this *SplRecursiveItObject) SetInIteration(value types.ZendBool) { this.in_iteration = value }
+func (this *SplRecursiveItObject) GetInIteration() bool                { return this.in_iteration }
+func (this *SplRecursiveItObject) SetInIteration(value bool)           { this.in_iteration = value }
 func (this *SplRecursiveItObject) GetBeginIteration() types.IFunction  { return this.beginIteration }
 func (this *SplRecursiveItObject) SetBeginIteration(value types.IFunction) {
 	this.beginIteration = value

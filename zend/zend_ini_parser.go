@@ -173,7 +173,7 @@ func IniError(msg *byte) {
 
 /* }}} */
 
-func ZendParseIniFile(fh *FileHandle, unbuffered_errors types.ZendBool, scanner_mode int, ini_parser_cb ZendIniParserCbT, arg any) int {
+func ZendParseIniFile(fh *FileHandle, unbuffered_errors bool, scanner_mode int, ini_parser_cb ZendIniParserCbT, arg any) int {
 	var retval int
 	var ini_parser_param ZendIniParserParam
 	ini_parser_param.SetIniParserCb(ini_parser_cb)
@@ -195,7 +195,7 @@ func ZendParseIniFile(fh *FileHandle, unbuffered_errors types.ZendBool, scanner_
 
 /* }}} */
 
-func ZendParseIniString(str *byte, unbuffered_errors types.ZendBool, scanner_mode int, ini_parser_cb ZendIniParserCbT, arg any) int {
+func ZendParseIniString(str *byte, unbuffered_errors bool, scanner_mode int, ini_parser_cb ZendIniParserCbT, arg any) int {
 	var retval int
 	var ini_parser_param ZendIniParserParam
 	ini_parser_param.SetIniParserCb(ini_parser_cb)

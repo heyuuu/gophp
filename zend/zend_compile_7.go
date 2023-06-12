@@ -149,7 +149,7 @@ func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	var stmt_ast *ZendAst = ast.GetChild()[1]
 	var name *types.String
-	var with_bracket types.ZendBool = stmt_ast != nil
+	var with_bracket bool = stmt_ast != nil
 
 	/* handle mixed syntax declaration or nested namespaces */
 
@@ -220,7 +220,7 @@ func (compiler *Compiler) CompileHaltCompiler(ast *ZendAst) {
 	name := ZendManglePropertyName_Ex(constName, filename)
 	RegisterLongConstant(name, offset, CONST_CS, 0)
 }
-func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
+func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) bool {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	switch ast.GetAttr() {
@@ -285,7 +285,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 	}
 	return 1
 }
-func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *types.Zval, op2 *types.Zval) types.ZendBool {
+func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *types.Zval, op2 *types.Zval) bool {
 	if !(opcode == ZEND_ADD || opcode == ZEND_SUB || opcode == ZEND_MUL || opcode == ZEND_DIV || opcode == ZEND_POW || opcode == ZEND_MOD || opcode == ZEND_SL || opcode == ZEND_SR || opcode == ZEND_BW_OR || opcode == ZEND_BW_AND || opcode == ZEND_BW_XOR) {
 		return 0
 	}
@@ -304,13 +304,13 @@ func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *types.Zval, op2 
 	}
 	return 0
 }
-func ZendBinaryOpProducesArrayConversionError(opcode uint32, op1 *types.Zval, op2 *types.Zval) types.ZendBool {
+func ZendBinaryOpProducesArrayConversionError(opcode uint32, op1 *types.Zval, op2 *types.Zval) bool {
 	if opcode == ZEND_CONCAT && (op1.IsArray() || op2.IsArray()) {
 		return 1
 	}
 	return 0
 }
-func ZendTryCtEvalBinaryOp(result *types.Zval, opcode uint32, op1 *types.Zval, op2 *types.Zval) types.ZendBool {
+func ZendTryCtEvalBinaryOp(result *types.Zval, opcode uint32, op1 *types.Zval, op2 *types.Zval) bool {
 	var fn BinaryOpType = GetBinaryOp(opcode)
 
 	/* don't evaluate division by zero at compile-time */
@@ -339,7 +339,7 @@ func ZendCtEvalUnaryOp(result *types.Zval, opcode uint32, op *types.Zval) {
 	var fn UnaryOpType = GetUnaryOp(opcode)
 	fn(result, op)
 }
-func ZendTryCtEvalUnaryPm(result *types.Zval, kind ZendAstKind, op *types.Zval) types.ZendBool {
+func ZendTryCtEvalUnaryPm(result *types.Zval, kind ZendAstKind, op *types.Zval) bool {
 	var left types.Zval
 	left.SetLong(b.Cond(kind == ZEND_AST_UNARY_PLUS, 1, -1))
 	return ZendTryCtEvalBinaryOp(result, ZEND_MUL, &left, op)
@@ -349,11 +349,11 @@ func ZendCtEvalGreater(result *types.Zval, kind ZendAstKind, op1 *types.Zval, op
 	fn(result, op2, op1)
 }
 
-func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
+func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var last_elem_ast *ZendAst = nil
 	var i uint32
-	var is_constant types.ZendBool = 1
+	var is_constant bool = 1
 	if ast.GetAttr() == ZEND_ARRAY_SYNTAX_LIST {
 		faults.Error(faults.E_COMPILE_ERROR, "Cannot use list() as standalone expression")
 	}

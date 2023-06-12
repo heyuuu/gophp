@@ -887,7 +887,7 @@ func ZifImageTypeToMimeType(executeData zpp.Ex, return_value zpp.Ret, imagetype 
 }
 func ZifImageTypeToExtension(executeData zpp.Ex, return_value zpp.Ret, imagetype *types.Zval, _ zpp.Opt, includeDot *types.Zval) {
 	var image_type zend.ZendLong
-	var inc_dot types.ZendBool = 1
+	var inc_dot bool = 1
 	var imgext *byte = nil
 	for {
 		for {

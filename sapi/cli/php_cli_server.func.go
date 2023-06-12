@@ -493,7 +493,7 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 	var basic_buf *byte
 	var message_buf *byte = ""
 	var error_buf *byte = ""
-	var append_error_message types.ZendBool = 0
+	var append_error_message bool = 0
 	if core.PG__().last_error_message {
 		switch core.PG__().last_error_type {
 		case faults.E_ERROR:

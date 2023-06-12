@@ -207,7 +207,7 @@ func (compiler *Compiler) CompileMethodCall(result *Znode, ast *ZendAst, type_ u
 	}
 	compiler.CompileCallCommon(result, args_ast, fbc)
 }
-func ZendIsConstructor(name *types.String) types.ZendBool {
+func ZendIsConstructor(name *types.String) bool {
 	return ascii.StrCaseEquals(name.GetStr(), ZEND_CONSTRUCTOR_FUNC_NAME)
 }
 func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
@@ -496,8 +496,8 @@ func ZendHasFinally() int {
 }
 func (compiler *Compiler) CompileReturn(ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
-	var is_generator types.ZendBool = CG__().GetActiveOpArray().IsGenerator()
-	var by_ref types.ZendBool = CG__().GetActiveOpArray().IsReturnReference()
+	var is_generator bool = CG__().GetActiveOpArray().IsGenerator()
+	var by_ref bool = CG__().GetActiveOpArray().IsReturnReference()
 	var expr_node Znode
 	var opline *types.ZendOp
 	if is_generator != 0 {
@@ -749,8 +749,8 @@ func (compiler *Compiler) CompileForeach(ast *ZendAst) {
 	var value_ast *ZendAst = ast.GetChild()[1]
 	var key_ast *ZendAst = ast.GetChild()[2]
 	var stmt_ast *ZendAst = ast.GetChild()[3]
-	var by_ref types.ZendBool = value_ast.GetKind() == ZEND_AST_REF
-	var is_variable types.ZendBool = ZendIsVariable(expr_ast) != 0 && ZendCanWriteToVariable(expr_ast) != 0
+	var by_ref bool = value_ast.GetKind() == ZEND_AST_REF
+	var is_variable bool = ZendIsVariable(expr_ast) != 0 && ZendCanWriteToVariable(expr_ast) != 0
 	var expr_node Znode
 	var reset_node Znode
 	var value_node Znode

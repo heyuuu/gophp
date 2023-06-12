@@ -340,7 +340,7 @@ func SplFixedarrayObjectHasDimension(object *types.Zval, offset *types.Zval, che
 	intern = Z_SPLFIXEDARRAY_P(object)
 	if intern.GetFptrOffsetHas() != nil {
 		var rv types.Zval
-		var result types.ZendBool
+		var result bool
 		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetHas(), "offsetExists", &rv, offset)
 		// zend.ZvalPtrDtor(offset)
@@ -447,7 +447,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 	var array SplFixedarray
 	var intern *SplFixedArrayObject
 	var num int
-	var save_indexes types.ZendBool = 1
+	var save_indexes bool = 1
 	if zend.ZendParseParameters(executeData.NumArgs(), "a|b", &data, &save_indexes) == types.FAILURE {
 		return
 	}

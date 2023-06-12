@@ -58,7 +58,7 @@ func AddToken(return_value *types.Zval, token_type int, text *uint8, leng int, l
 		return_value.Array().Append(types.NewZvalString(b.CastStr(text, leng)))
 	}
 }
-func Tokenize(return_value *types.Zval, source string) types.ZendBool {
+func Tokenize(return_value *types.Zval, source string) bool {
 	var source_zval types.Zval
 	var original_lex_state zend.ZendLexState
 	var token types.Zval
@@ -139,11 +139,11 @@ func OnEvent(event zend.ZendPhpScannerEvent, token int, line int, context any) {
 		}
 	}
 }
-func TokenizeParse(return_value *types.Zval, source string) types.ZendBool {
+func TokenizeParse(return_value *types.Zval, source string) bool {
 	var source_zval types.Zval
 	var original_lex_state zend.ZendLexState
-	var original_in_compilation types.ZendBool
-	var success types.ZendBool
+	var original_in_compilation bool
+	var success bool
 	source_zval.SetStringVal(source)
 	original_in_compilation = zend.CG__().GetInCompilation()
 	zend.CG__().SetInCompilation(1)
@@ -172,7 +172,7 @@ func TokenizeParse(return_value *types.Zval, source string) types.ZendBool {
 }
 
 func ZifTokenGetAll(return_value zpp.Ret, source string, _ zpp.Opt, flags int) {
-	var success types.ZendBool
+	var success bool
 	if (flags & 1) != 0 {
 		success = TokenizeParse(return_value, source)
 	} else {

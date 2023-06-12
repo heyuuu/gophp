@@ -3,7 +3,6 @@ package standard
 import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
-	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -39,7 +38,7 @@ func (this *PhpMetaTagsData) SetInMeta(value int)             { this.in_meta = v
 type PhpFileGlobals struct {
 	pclose_ret                   int
 	def_chunk_size               int
-	auto_detect_line_endings     types.ZendBool
+	auto_detect_line_endings     bool
 	default_socket_timeout       zend.ZendLong
 	user_agent                   *byte
 	from_address                 *byte
@@ -70,10 +69,10 @@ func (this *PhpFileGlobals) SetStreamWrappers(value map[string]*core.PhpStreamWr
 //
 func (this *PhpFileGlobals) SetDefChunkSize(value int) { this.def_chunk_size = value }
 
-func (this *PhpFileGlobals) GetAutoDetectLineEndings() types.ZendBool {
+func (this *PhpFileGlobals) GetAutoDetectLineEndings() bool {
 	return this.auto_detect_line_endings
 }
-func (this *PhpFileGlobals) SetAutoDetectLineEndings(value types.ZendBool) {
+func (this *PhpFileGlobals) SetAutoDetectLineEndings(value bool) {
 	this.auto_detect_line_endings = value
 }
 func (this *PhpFileGlobals) GetDefaultSocketTimeout() zend.ZendLong {

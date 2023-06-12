@@ -8,7 +8,7 @@ import (
 )
 
 func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types.Zval, mode int) {
-	var get_as_float types.ZendBool = 0
+	var get_as_float bool = 0
 	var tp __struct__timeval = __struct__timeval{0}
 	for {
 		for {

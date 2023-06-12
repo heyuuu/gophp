@@ -47,7 +47,7 @@ func ZendTryAssignTypedRefArr(ref *types.ZendReference, arr *types.Array) int {
 	tmp.SetArray(arr)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefZvalEx(ref *types.ZendReference, zv *types.Zval, strict types.ZendBool) int {
+func ZendTryAssignTypedRefZvalEx(ref *types.ZendReference, zv *types.Zval, strict bool) int {
 	var tmp types.Zval
 	types.ZVAL_COPY_VALUE(&tmp, zv)
 	return ZendTryAssignTypedRefEx(ref, &tmp, strict)
@@ -120,10 +120,10 @@ func ZendUnsetProperty(scope *types.ClassEntry, object *types.Zval, name string)
 	object.Object().UnsetProperty(property, 0)
 	EG__().SetFakeScope(oldScope)
 }
-func ZendReadPropertyEx(scope *types.ClassEntry, object *types.Zval, name *types.String, silent types.ZendBool, rv *types.Zval) *types.Zval {
+func ZendReadPropertyEx(scope *types.ClassEntry, object *types.Zval, name *types.String, silent bool, rv *types.Zval) *types.Zval {
 	return ZendReadProperty(scope, object, name.GetStr(), silent, rv)
 }
-func ZendReadProperty(scope *types.ClassEntry, object *types.Zval, name string, silent types.ZendBool, rv *types.Zval) *types.Zval {
+func ZendReadProperty(scope *types.ClassEntry, object *types.Zval, name string, silent bool, rv *types.Zval) *types.Zval {
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
 	property := types.NewZvalString(name)
@@ -185,7 +185,7 @@ func ZendGetObjectType(ce *types.ClassEntry) string {
 		return "class"
 	}
 }
-func ZendIsIterable(iterable *types.Zval) types.ZendBool {
+func ZendIsIterable(iterable *types.Zval) bool {
 	switch iterable.GetType() {
 	case types.IS_ARRAY:
 		return 1
@@ -195,7 +195,7 @@ func ZendIsIterable(iterable *types.Zval) types.ZendBool {
 		return 0
 	}
 }
-func ZendIsCountable(countable *types.Zval) types.ZendBool {
+func ZendIsCountable(countable *types.Zval) bool {
 	switch countable.GetType() {
 	case types.IS_ARRAY:
 		return 1

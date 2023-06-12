@@ -652,7 +652,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var type_ int
 	var first_query int = 1
 	var store_results int = 1
-	var raw types.ZendBool = 0
+	var raw bool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 5, 0)

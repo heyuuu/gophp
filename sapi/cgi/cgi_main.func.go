@@ -97,14 +97,14 @@ func SapiFcgiFlush(server_context any) {
 func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 	var h *core.SapiHeader
 	var pos zend.ZendLlistPosition
-	var ignore_status types.ZendBool = 0
+	var ignore_status bool = 0
 	var response_status int = core.SG__().sapi_headers.http_response_code
 	if core.SG__().RequestInfo.no_headers == 1 {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
 	if CGIG(nph) || core.SG__().sapi_headers.http_response_code != 200 {
 		var len_ int
-		var has_status types.ZendBool = 0
+		var has_status bool = 0
 		var buf []byte
 		if CGIG(rfc2616_headers) && core.SG__().sapi_headers.http_status_line {
 			var s *byte

@@ -6,8 +6,8 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, strict types.ZendBool) *types.Zval {
-	var ret types.ZendBool
+func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, strict bool) *types.Zval {
+	var ret bool
 	var value types.Zval
 	types.ZVAL_COPY(&value, orig_value)
 	ret = ZendVerifyRefAssignableZval(variable_ptr.Reference(), &value, strict)
@@ -17,7 +17,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, stri
 	}
 	return variable_ptr
 }
-func ZendVerifyPropAssignableByRef(prop_info *types.PropertyInfo, orig_val *types.Zval, strict types.ZendBool) types.ZendBool {
+func ZendVerifyPropAssignableByRef(prop_info *types.PropertyInfo, orig_val *types.Zval, strict bool) bool {
 	var val *types.Zval = orig_val
 	if val.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(val.Reference()) {
 		var result int
@@ -229,7 +229,7 @@ func ZendInitCvs(first uint32, last uint32, executeData *ZendExecuteData) {
 		}
 	}
 }
-func IInitFuncExecuteData(op_array *types.ZendOpArray, return_value *types.Zval, may_be_trampoline types.ZendBool, executeData *ZendExecuteData) {
+func IInitFuncExecuteData(op_array *types.ZendOpArray, return_value *types.Zval, may_be_trampoline bool, executeData *ZendExecuteData) {
 	var first_extra_arg uint32
 	var num_args uint32
 	b.Assert(executeData.GetFunc() == (types.IFunction)(op_array))

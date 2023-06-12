@@ -35,7 +35,7 @@ func OnUpdateAssertionsEx(entry *ZendIniEntry, new_value *string, stage int) boo
 	return true
 }
 
-func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object types.ZendBool) {
+func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object bool) {
 	for i := 0; i < indent; i++ {
 		buf.WriteByte(' ')
 	}
@@ -240,7 +240,7 @@ func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
 func PhpScannerGlobalsCtor(scanner_globals_p *ZendPhpScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
 }
-func PhpAutoGlobalsCreateGlobals(name *types.String) types.ZendBool {
+func PhpAutoGlobalsCreateGlobals(name *types.String) bool {
 	var globals types.Zval
 
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */

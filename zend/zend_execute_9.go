@@ -106,10 +106,10 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 	Efree(fbc)
 	return 1
 }
-func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *types.ZendOp, executeData *ZendExecuteData) types.ZendBool {
+func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *types.ZendOp, executeData *ZendExecuteData) bool {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(array_ptr)
 	var iter *ZendObjectIterator = ce.GetGetIterator()(ce, array_ptr, by_ref)
-	var is_empty types.ZendBool
+	var is_empty bool
 	if iter == nil || EG__().GetException() != nil {
 		if iter != nil {
 			// OBJ_RELEASE(iter.GetStd())
@@ -187,7 +187,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 			var ns_sep *byte
 			var shortname_offset int
 			var shortname_len int
-			var is_deprecated types.ZendBool
+			var is_deprecated bool
 			if (flags & IS_CONSTANT_UNQUALIFIED) != 0 {
 				var access_key *types.Zval
 				if (flags & IS_CONSTANT_IN_NAMESPACE) == 0 {

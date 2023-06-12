@@ -2545,7 +2545,7 @@ func SplIteratorToValuesApply(iter *zend.ZendObjectIterator, puser any) int {
 }
 func ZifIteratorToArray(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var obj *types.Zval
-	var use_keys types.ZendBool = 1
+	var use_keys bool = 1
 	if zend.ZendParseParameters(executeData.NumArgs(), "O|b", &obj, zend.ZendCeTraversable, &use_keys) == types.FAILURE {
 		return_value.SetFalse()
 		return

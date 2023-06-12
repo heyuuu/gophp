@@ -255,7 +255,7 @@ func ZendRestoreCompiledFilename(original_compiled_filename string) {
 }
 func ZendGetCompiledFilename() string { return CG__().GetCompiledFilename() }
 func ZendGetCompiledLineno() int      { return CG__().GetZendLineno() }
-func ZendIsCompiling() types.ZendBool { return CG__().GetInCompilation() }
+func ZendIsCompiling() bool           { return CG__().GetInCompilation() }
 func GetTemporaryVariable() uint32 {
 	return b.PostInc(&(CG__().GetActiveOpArray().GetT()))
 }
@@ -319,7 +319,7 @@ func ZendAddClassNameLiteral(name *types.String) int {
 	ZendAddLiteralString(&lc_name)
 	return ret
 }
-func ZendAddConstNameLiteral(name string, unqualified types.ZendBool) int {
+func ZendAddConstNameLiteral(name string, unqualified bool) int {
 	var ret int = ZendAddLiteralStringEx(name)
 
 	var afterNs string
@@ -352,7 +352,7 @@ func LITERAL_STR(op types.ZnodeOp, str *types.String) {
 	_c.SetString(str)
 	op.SetConstant(ZendAddLiteral(&_c))
 }
-func ZendBeginLoop(free_opcode uint8, loop_var *Znode, is_switch types.ZendBool) {
+func ZendBeginLoop(free_opcode uint8, loop_var *Znode, is_switch bool) {
 	var brk_cont_element *ZendBrkContElement
 	var parent int = CG__().GetContext().GetCurrentBrkCont()
 	var info ZendLoopVar = MakeZendLoopVar(0)

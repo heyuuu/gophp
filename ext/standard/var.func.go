@@ -520,7 +520,7 @@ func PhpVarSerializeString(buf *zend.SmartStr, str *byte, len_ int) {
 	buf.WriteString(b.CastStr(str, len_))
 	buf.WriteString("\";")
 }
-func PhpVarSerializeClassName(buf *zend.SmartStr, struc *types.Zval) types.ZendBool {
+func PhpVarSerializeClassName(buf *zend.SmartStr, struc *types.Zval) bool {
 	var class_name *types.String
 	var incomplete_class = 0
 	PHP_SET_CLASS_ATTRIBUTES(struc)
@@ -653,7 +653,7 @@ func PhpVarSerializeNestedData(
 	struc *types.Zval,
 	ht *types.Array,
 	count uint32,
-	incomplete_class types.ZendBool,
+	incomplete_class bool,
 	var_hash PhpSerializeDataT,
 ) {
 	buf.AppendUlong(count)
@@ -765,7 +765,7 @@ again:
 		return
 	case types.IS_OBJECT:
 		var ce = types.Z_OBJCE_P(struc)
-		var incomplete_class types.ZendBool
+		var incomplete_class bool
 		var count uint32
 		if ce.FunctionTable().Exists("__serialize") {
 			var retval types.Zval

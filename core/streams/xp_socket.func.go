@@ -460,11 +460,11 @@ func PhpTcpSockopConnect(stream *core.PhpStream, sock *core.PhpNetstreamDataT, x
 }
 func PhpTcpSockopAccept(stream *core.PhpStream, sock *core.PhpNetstreamDataT, xparam *PhpStreamXportParam) int {
 	var clisock int
-	var nodelay types.ZendBool = 0
+	var nodelay bool = false
 	var tmpzval *types.Zval = nil
 	xparam.SetClient(nil)
 	if nil != core.PHP_STREAM_CONTEXT(stream) && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && operators.ZvalIsTrue(tmpzval) {
-		nodelay = 1
+		nodelay = true
 	}
 	clisock = core.PhpNetworkAcceptIncoming(sock.GetSocket(), b.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil), xparam.GetTimeout(), b.CondF1(xparam.GetWantErrortext() != 0, func() *types.String { return xparam.GetErrorText() }, nil), xparam.GetErrorCode(), nodelay)
 	if clisock >= 0 {

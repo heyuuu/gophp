@@ -26,9 +26,9 @@ func zim_Closure___invoke(executeData *ZendExecuteData, return_value *types.Zval
 	// types.ZendStringReleaseEx(func_.GetInternalFunction().GetFunctionName(), 0)
 	Efree(func_)
 }
-func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *types.ClassEntry) types.ZendBool {
+func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *types.ClassEntry) bool {
 	var func_ types.IFunction = closure.GetFunc()
-	var is_fake_closure types.ZendBool = func_.IsFakeClosure()
+	var is_fake_closure bool = func_.IsFakeClosure()
 	if newthis != nil {
 		if func_.IsStatic() {
 			faults.Error(faults.E_WARNING, "Cannot bind an instance to a static closure")

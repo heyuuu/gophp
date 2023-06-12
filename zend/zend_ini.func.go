@@ -122,7 +122,7 @@ func ZendAlterIniEntryChars(name string, value string, modify_type int, stage in
 func ZendAlterIniEntryEx(name string, new_value *types.String, modify_type int, stage int, force_change int) bool {
 	var duplicate *types.String
 	var modifiable uint8
-	var modified types.ZendBool
+	var modified bool
 
 	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
 	if ini_entry == nil {
@@ -200,7 +200,7 @@ func ZendIniLong(name string, orig int) ZendLong {
 	}
 	return 0
 }
-func ZendIniStringEx(name string, orig int, exists *types.ZendBool) *byte {
+func ZendIniStringEx(name string, orig int, exists *bool) *byte {
 	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
 	if ini_entry != nil {
 		if exists != nil {
@@ -227,7 +227,7 @@ func ZendIniStringEx(name string, orig int, exists *types.ZendBool) *byte {
 	}
 }
 func ZendIniString(name string, orig int) *byte {
-	var exists types.ZendBool = 1
+	var exists bool = 1
 	var return_value *byte
 	return_value = ZendIniStringEx(name, orig, &exists)
 	if exists == 0 {
@@ -268,7 +268,7 @@ func ZendIniStringParseBool(str string) bool {
 		return b.Atoi(str) != 0
 	}
 }
-func ZendIniParseBool(str *types.String) types.ZendBool {
+func ZendIniParseBool(str *types.String) bool {
 	if str.GetLen() == 4 && strcasecmp(str.GetVal(), "true") == 0 || str.GetLen() == 3 && strcasecmp(str.GetVal(), "yes") == 0 || str.GetLen() == 2 && strcasecmp(str.GetVal(), "on") == 0 {
 		return 1
 	} else {
@@ -331,9 +331,9 @@ func OnUpdateBool(
 	mh_arg3 any,
 	stage int,
 ) int {
-	var p *types.ZendBool
+	var p *bool
 	var base *byte = (*byte)(mh_arg2)
-	p = (*types.ZendBool)(base + int(mh_arg1))
+	p = (*bool)(base + int(mh_arg1))
 	*p = ZendIniParseBool(new_value)
 	return types.SUCCESS
 }

@@ -55,10 +55,10 @@ func ZendAstCreateEx() __auto__ {
 func ZendAstCreateList(init_children int) __auto__ {
 	return ZEND_AST_SPEC_CALL(ZendAstCreateList, __VA_ARGS__)
 }
-func ZendAstIsSpecial(ast *ZendAst) types.ZendBool {
+func ZendAstIsSpecial(ast *ZendAst) bool {
 	return ast.GetKind() >> ZEND_AST_SPECIAL_SHIFT & 1
 }
-func ZendAstIsList(ast *ZendAst) types.ZendBool {
+func ZendAstIsList(ast *ZendAst) bool {
 	return ast.GetKind() >> ZEND_AST_IS_LIST_SHIFT & 1
 }
 func ZendAstGetList(ast *ZendAst) *ZendAstList {
@@ -352,7 +352,7 @@ func ZendAstCreateList2(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst) *Zen
 	list.SetLineno(lineno)
 	return ast
 }
-func IsPowerOfTwo(n uint32) types.ZendBool { return n != 0 && n == (n & ^n + 1) }
+func IsPowerOfTwo(n uint32) bool { return n != 0 && n == (n & ^n + 1) }
 func ZendAstListAdd(ast *ZendAst, op *ZendAst) *ZendAst {
 	var list *ZendAstList = ZendAstGetList(ast)
 	if list.GetChildren() >= 4 && IsPowerOfTwo(list.GetChildren()) != 0 {

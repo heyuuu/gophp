@@ -19,7 +19,7 @@ type PhpBasicGlobals struct {
 	user_shutdown_function_names *types.Array
 	putenv_ht                    types.Array
 	locale_string                *types.String
-	locale_changed               types.ZendBool
+	locale_changed               bool
 	str_ebuf                     []byte
 	array_walk_fci               types.ZendFcallInfo
 	array_walk_fci_cache         types.ZendFcallInfoCache

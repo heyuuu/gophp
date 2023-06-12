@@ -345,7 +345,7 @@ func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, _ zp
 	var globbuf glob_t
 	var n int
 	var ret int
-	var basedir_limit types.ZendBool = 0
+	var basedir_limit bool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)

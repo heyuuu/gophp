@@ -51,7 +51,7 @@ func ZifEzmlmHash(executeData zpp.Ex, return_value zpp.Ret, addr *types.Zval) {
 	return_value.SetLong(zend.ZendLong(h))
 	return
 }
-func PhpMailBuildHeadersCheckFieldValue(val *types.Zval) types.ZendBool {
+func PhpMailBuildHeadersCheckFieldValue(val *types.Zval) bool {
 	var len_ int = 0
 	var value *types.String = val.String()
 
@@ -72,7 +72,7 @@ func PhpMailBuildHeadersCheckFieldValue(val *types.Zval) types.ZendBool {
 	}
 	return types.SUCCESS
 }
-func PhpMailBuildHeadersCheckFieldName(key *types.String) types.ZendBool {
+func PhpMailBuildHeadersCheckFieldName(key *types.String) bool {
 	var len_ int = 0
 
 	/* https://tools.ietf.org/html/rfc2822#section-2.2 */

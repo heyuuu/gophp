@@ -115,7 +115,7 @@ func ZendGeneratorCleanupUnfinishedExecution(generator *ZendGenerator, executeDa
 		ZendCleanupUnfinishedExecution(executeData, op_num, catch_op_num)
 	}
 }
-func ZendGeneratorClose(generator *ZendGenerator, finished_execution types.ZendBool) {
+func ZendGeneratorClose(generator *ZendGenerator, finished_execution bool) {
 	if generator.GetExecuteData() != nil {
 		var executeData *ZendExecuteData = generator.GetExecuteData()
 
@@ -527,7 +527,7 @@ func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNod
 func ZendGeneratorAddChild(generator *ZendGenerator, child *ZendGenerator) {
 	var leaf *ZendGenerator = b.CondF1(child.GetNode().GetChildren() != 0, func() *ZendGenerator { return child.GetNode().GetPtrLeaf() }, child)
 	var multi_children_node *ZendGeneratorNode
-	var was_leaf types.ZendBool = generator.GetNode().GetChildren() == 0
+	var was_leaf bool = generator.GetNode().GetChildren() == 0
 	if was_leaf != 0 {
 		var next *ZendGenerator = generator.GetNode().GetParent()
 		leaf.GetNode().SetRoot(generator.GetNode().GetRoot())

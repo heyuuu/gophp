@@ -14,7 +14,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		opline.Result().SetLong(value.String().GetLen())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
-		var strict types.ZendBool
+		var strict bool
 		strict = executeData.IsCallUseStrictTypes()
 		for {
 			if strict == 0 {
@@ -47,7 +47,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		// ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
-		var strict types.ZendBool
+		var strict bool
 		if value.IsReference() {
 			value = types.Z_REFVAL_P(value)
 			if value.IsString() {
@@ -90,7 +90,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		opline.Result().SetLong(value.String().GetLen())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
-		var strict types.ZendBool
+		var strict bool
 		if value.IsReference() {
 			value = types.Z_REFVAL_P(value)
 			if value.IsString() {

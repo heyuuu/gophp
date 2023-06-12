@@ -103,7 +103,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 	var spoolbuf *types.String = nil
 	var poi *uint8 = nil
 	var sb zend.ZendStatT
-	var written types.ZendBool = 0
+	var written bool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 3, 0)

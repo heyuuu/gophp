@@ -318,7 +318,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserName *string, returnArray bool) {
 	var agent_name *string = browserName
 	var lookup_browser_name *types.String
-	var return_array types.ZendBool = 0
+	var return_array bool = 0
 	var bdata *BrowserData
 	var found_entry *BrowscapEntry = nil
 	var agent_ht *types.Array

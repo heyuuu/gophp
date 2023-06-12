@@ -97,7 +97,7 @@ func CallUserFunctionEx(object *types.Zval, function_name *types.Zval, retval_pt
 	fci.SetRetval(retval_ptr)
 	fci.SetParamCount(param_count)
 	fci.SetParams(params)
-	fci.SetNoSeparation(types.ZendBool(no_separation))
+	fci.SetNoSeparation(bool(no_separation))
 	return ZendCallFunction(&fci, nil)
 }
 func ZendForbidDynamicCall(func_name string) int {

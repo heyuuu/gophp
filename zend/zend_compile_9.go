@@ -408,7 +408,7 @@ func (compiler *Compiler) CompileVar(result *Znode, ast *ZendAst, type_ uint32, 
 		return nil
 	}
 }
-func (compiler *Compiler) DelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref types.ZendBool) *types.ZendOp {
+func (compiler *Compiler) DelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref bool) *types.ZendOp {
 	switch ast.GetKind() {
 	case ZEND_AST_VAR:
 		return compiler.CompileSimpleVar(result, ast, type_, 1)
@@ -455,8 +455,8 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_AND:
 		fallthrough
 	case ZEND_AST_OR:
-		var child0_is_true types.ZendBool
-		var child1_is_true types.ZendBool
+		var child0_is_true bool
+		var child1_is_true bool
 		compiler.EvalConstExpr(ast.GetChild()[0])
 		compiler.EvalConstExpr(ast.GetChild()[1])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {

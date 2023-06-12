@@ -218,7 +218,7 @@ func IsFakeDef(opline *types.ZendOp) bool {
 	/* These opcodes only modify the result, not create it. */
 	return opline.GetOpcode() == ZEND_ROPE_ADD || opline.GetOpcode() == ZEND_ADD_ARRAY_ELEMENT || opline.GetOpcode() == ZEND_ADD_ARRAY_UNPACK
 }
-func KeepsOp1Alive(opline *types.ZendOp) types.ZendBool {
+func KeepsOp1Alive(opline *types.ZendOp) bool {
 	/* These opcodes don't consume their OP1 operand,
 	 * it is later freed by something else. */
 	if opline.GetOpcode() == ZEND_CASE || opline.GetOpcode() == ZEND_SWITCH_LONG || opline.GetOpcode() == ZEND_FETCH_LIST_R || opline.GetOpcode() == ZEND_COPY_TMP {

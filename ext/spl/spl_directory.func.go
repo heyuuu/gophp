@@ -361,7 +361,7 @@ func SplFilesystemObjectCreateInfo(
 }
 func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ int, ce *types.ClassEntry, return_value *types.Zval) *SplFilesystemObject {
 	var intern *SplFilesystemObject
-	var use_include_path types.ZendBool = 0
+	var use_include_path bool = 0
 	var arg1 types.Zval
 	var arg2 types.Zval
 	var error_handling zend.ZendErrorHandling
@@ -1212,7 +1212,7 @@ func zim_spl_FilesystemIterator_setFlags(executeData *zend.ZendExecuteData, retu
 	intern.AddFlags((SPL_FILE_DIR_KEY_MODE_MASK | SPL_FILE_DIR_CURRENT_MODE_MASK | SPL_FILE_DIR_OTHERS_MASK) & flags)
 }
 func zim_spl_RecursiveDirectoryIterator_hasChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var allow_links types.ZendBool = 0
+	var allow_links bool = 0
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParameters(executeData.NumArgs(), "|b", &allow_links) == types.FAILURE {
 		return
@@ -1668,7 +1668,7 @@ func SplFilesystemFileRewind(this_ptr *types.Zval, intern *SplFilesystemObject) 
 }
 func zim_spl_SplFileObject___construct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
-	var use_include_path types.ZendBool = 0
+	var use_include_path bool = 0
 	var p1 *byte
 	var p2 *byte
 	var tmp_path *byte

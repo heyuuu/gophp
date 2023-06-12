@@ -51,5 +51,5 @@ func ZendMemoryPeakUsage(real_usage int) int {
 	// notice 获取 memory 使用情况失效
 	return 0
 }
-func ShutdownMemoryManager(silent int, full_shutdown int) {}
-func StartMemoryManager()                                 {}
+func ShutdownMemoryManager(silent bool, full_shutdown bool) {}
+func StartMemoryManager()                                   {}

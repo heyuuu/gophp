@@ -271,11 +271,11 @@ func PhpOutputLockError(op int) int {
 	}
 	return 0
 }
-func PhpOutputContextFeed(context *PhpOutputContext, data *byte, size int, used int, free types.ZendBool) {
+func PhpOutputContextFeed(context *PhpOutputContext, data *byte, size int, used int, free bool) {
 	if context.GetIn().IsFree() && context.GetIn().GetData() != nil {
 		zend.Efree(context.GetIn().GetData())
 	}
-	context.SetIn(NewOutputBuffer(data, size, used, free != 0))
+	context.SetIn(NewOutputBuffer(data, size, used, free))
 }
 func PhpOutputContextSwap(context *PhpOutputContext) {
 	if context.GetIn().IsFree() && context.GetIn().GetData() != nil {
@@ -777,16 +777,14 @@ func ZifObListHandlers(executeData zpp.Ex, return_value zpp.Ret) {
 	}
 	zend.ZendStackApplyWithArgument(&(OG__().handlers), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyList, return_value)
 }
-func ZifObGetStatus(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, fullStatus *types.Zval) {
-	var full_status types.ZendBool = 0
-	if zend.ZendParseParameters(executeData.NumArgs(), "|b", &full_status) == types.FAILURE {
-		return
-	}
-	if !(OG__().active) {
+
+//zif -old "|b"
+func ZifObGetStatus(return_value zpp.Ret, _ zpp.Opt, fullStatus bool) {
+	if OG__().active == nil {
 		zend.ArrayInit(return_value)
 		return
 	}
-	if full_status != 0 {
+	if fullStatus {
 		zend.ArrayInit(return_value)
 		zend.ZendStackApplyWithArgument(&(OG__().handlers), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyStatus, return_value)
 	} else {

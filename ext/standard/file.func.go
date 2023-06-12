@@ -153,7 +153,7 @@ func ZifFlock(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, operatio
 func ZifGetMetaTags(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, useIncludePath *types.Zval) {
 	var filename *byte
 	var filename_len int
-	var use_include_path types.ZendBool = 0
+	var use_include_path bool = 0
 	var in_tag int = 0
 	var done int = 0
 	var looking_for_val int = 0
@@ -328,7 +328,7 @@ func ZifGetMetaTags(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zv
 func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, flags *types.Zval, context *types.Zval, offset *types.Zval, maxlen *types.Zval) {
 	var filename *byte
 	var filename_len int
-	var use_include_path types.ZendBool = 0
+	var use_include_path bool = 0
 	var stream *core.PhpStream
 	var offset zend.ZendLong = 0
 	var maxlen zend.ZendLong = ssize_t(core.PHP_STREAM_COPY_ALL)
@@ -518,9 +518,9 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 	var i int = 0
 	var eol_marker byte = '\n'
 	var flags zend.ZendLong = 0
-	var use_include_path types.ZendBool
-	var include_new_line types.ZendBool
-	var skip_blank_lines types.ZendBool
+	var use_include_path bool
+	var include_new_line bool
+	var skip_blank_lines bool
 	var stream *core.PhpStream
 	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext = nil
@@ -668,7 +668,7 @@ func ZifOpen(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, mod
 	var mode *byte
 	var filename_len int
 	var mode_len int
-	var use_include_path types.ZendBool = 0
+	var use_include_path bool = 0
 	var zcontext *types.Zval = nil
 	var stream *core.PhpStream
 	var context *core.PhpStreamContext = nil
@@ -1102,7 +1102,7 @@ func ZifMkdir(executeData zpp.Ex, return_value zpp.Ret, pathname *types.Zval, _ 
 	var dir_len int
 	var zcontext *types.Zval = nil
 	var mode zend.ZendLong = 0777
-	var recursive types.ZendBool = 0
+	var recursive bool = 0
 	var context *core.PhpStreamContext
 	for {
 		for {
@@ -1151,7 +1151,7 @@ func ZifReadfile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval,
 	var filename *byte
 	var filename_len int
 	var size int = 0
-	var use_include_path types.ZendBool = 0
+	var use_include_path bool = 0
 	var zcontext *types.Zval = nil
 	var stream *core.PhpStream
 	var context *core.PhpStreamContext = nil
@@ -1869,7 +1869,7 @@ func PhpFgetcsv(
 	var temp_len int
 	var line_end_len int
 	var inc_len int
-	var first_field types.ZendBool = 1
+	var first_field bool = 1
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 
 	/* initialize internal state */

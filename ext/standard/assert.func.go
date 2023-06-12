@@ -184,7 +184,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval, _ zpp.Opt, value *types.Zval) {
 	var value *types.Zval = nil
 	var what zend.ZendLong
-	var oldint types.ZendBool
+	var oldint bool
 	var ac int = executeData.NumArgs()
 	var key *types.String
 	for {

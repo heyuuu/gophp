@@ -397,7 +397,7 @@ func PhpStreamUrlWrapFtp(
 	var reuseid *core.PhpStream = nil
 	var file_size int = 0
 	var tmpzval *types.Zval
-	var allow_overwrite types.ZendBool = 0
+	var allow_overwrite bool = 0
 	var read_write int8_t = 0
 	var transport *byte
 	var transport_len int

@@ -273,22 +273,18 @@ func OnUpdateTimeout(
 	}
 	return types.SUCCESS
 }
-func PhpGetDisplayErrorsMode(value *byte, value_length int) int {
+func PhpGetDisplayErrorsMode(value string) int {
 	var mode int
-	if value == nil {
+	if value == "" {
 		return PHP_DISPLAY_ERRORS_STDOUT
 	}
-	if value_length == 2 && !(strcasecmp("on", value)) {
+	lcValue := ascii.StrToLower(value)
+	switch lcValue {
+	case "on", "yes", "true", "stdout":
 		mode = PHP_DISPLAY_ERRORS_STDOUT
-	} else if value_length == 3 && !(strcasecmp("yes", value)) {
-		mode = PHP_DISPLAY_ERRORS_STDOUT
-	} else if value_length == 4 && !(strcasecmp("true", value)) {
-		mode = PHP_DISPLAY_ERRORS_STDOUT
-	} else if value_length == 6 && !(strcasecmp(value, "stderr")) {
+	case "stderr":
 		mode = PHP_DISPLAY_ERRORS_STDERR
-	} else if value_length == 6 && !(strcasecmp(value, "stdout")) {
-		mode = PHP_DISPLAY_ERRORS_STDOUT
-	} else {
+	default:
 		zend.ZEND_ATOL(mode, value)
 		if mode != 0 && mode != PHP_DISPLAY_ERRORS_STDOUT && mode != PHP_DISPLAY_ERRORS_STDERR {
 			mode = PHP_DISPLAY_ERRORS_STDOUT
@@ -304,48 +300,31 @@ func OnUpdateDisplayErrors(
 	mh_arg3 any,
 	stage int,
 ) int {
-	PG__().display_errors = types.ZendBool(PhpGetDisplayErrorsMode(new_value.GetVal(), new_value.GetLen()))
+	PG__().display_errors = PhpGetDisplayErrorsMode(new_value.GetStr()) != 0
 	return types.SUCCESS
 }
-func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
+func DisplayErrorsMode(iniEntry *zend.ZendIniEntry, typ int) {
 	var mode int
-	var cgi_or_cli bool
-	var tmp_value_length int
-	var tmp_value *byte
-	if type_ == zend.ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
-		if ini_entry.GetOrigValue() != nil {
-			tmp_value = ini_entry.GetOrigValue().GetVal()
+	var tmpValue string
+	if typ == zend.ZEND_INI_DISPLAY_ORIG && iniEntry.GetModified() != 0 {
+		if iniEntry.GetOrigValue() != nil {
+			tmpValue = iniEntry.GetOrigValue().GetStr()
 		} else {
-			tmp_value = nil
+			tmpValue = ""
 		}
-		if ini_entry.GetOrigValue() != nil {
-			tmp_value_length = ini_entry.GetOrigValue().GetLen()
-		} else {
-			tmp_value_length = 0
-		}
-	} else if ini_entry.GetValue() != nil {
-		tmp_value = ini_entry.GetValue().GetVal()
-		tmp_value_length = ini_entry.GetValue().GetLen()
+	} else if iniEntry.GetValue() != nil {
+		tmpValue = iniEntry.GetValue().GetStr()
 	} else {
-		tmp_value = nil
-		tmp_value_length = 0
+		tmpValue = ""
 	}
-	mode = PhpGetDisplayErrorsMode(tmp_value, tmp_value_length)
+	mode = PhpGetDisplayErrorsMode(tmpValue)
 
 	/* Display 'On' for other SAPIs instead of STDOUT or STDERR */
-
-	cgi_or_cli = SM__().Name() == "cli" || SM__().Name() == "cgi" || SM__().Name() == "phpdbg"
 	switch mode {
 	case PHP_DISPLAY_ERRORS_STDERR:
-		{
-			PUTS("STDERR")
-		}
-
+		PUTS("STDERR")
 	case PHP_DISPLAY_ERRORS_STDOUT:
-		{
-			PUTS("STDOUT")
-		}
-
+		PUTS("STDOUT")
 	default:
 		PUTS("Off")
 	}
@@ -1108,7 +1087,7 @@ func PhpRequestStartup() int {
 	return types.IntBool(retVal)
 }
 func PhpRequestShutdown() {
-	var report_memleaks types.ZendBool
+	var report_memleaks bool
 	zend.EG__().AddFlags(zend.EG_FLAGS_IN_SHUTDOWN)
 	report_memleaks = PG__().report_memleaks
 
@@ -1133,7 +1112,7 @@ func PhpRequestShutdown() {
 	/* 3. Flush all output buffers */
 	faults.Try(func() {
 		var send_buffer = b.Cond(SG__().RequestInfo.headers_only, 0, 1)
-		if zend.CG__().GetUncleanShutdown() != 0 && PG__().last_error_type == faults.E_ERROR && int(PG__().memory_limit < zend.ZendMemoryUsage(1)) != 0 {
+		if zend.CG__().GetUncleanShutdown() && PG__().last_error_type == faults.E_ERROR && PG__().memory_limit < zend.ZendMemoryUsage(1) {
 			send_buffer = 0
 		}
 		if send_buffer == 0 {
@@ -1201,7 +1180,7 @@ func PhpRequestShutdown() {
 
 	/* 15. Free Willy (here be crashes) */
 	faults.Try(func() {
-		zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown() != 0 || report_memleaks == 0, 0)
+		zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown() || !report_memleaks, false)
 	})
 
 	/* Reset memory limit, as the reset during INI_STAGE_DEACTIVATE may have failed.
@@ -1442,7 +1421,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	zend.VirtualCwdDeactivate()
 	SapiDeactivate()
 	ModuleStartup = 0
-	zend.ShutdownMemoryManager(1, 0)
+	zend.ShutdownMemoryManager(true, false)
 	zend.VirtualCwdActivate()
 
 	/* we're done */
@@ -1466,7 +1445,7 @@ func PhpModuleShutdown() {
 
 	PhpShutdownConfig()
 	zend.ZendIniShutdown()
-	zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown(), 1)
+	zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown(), true)
 	PhpOutputShutdown()
 	ModuleInitialized = 0
 	CoreGlobalsDtor(&CoreGlobals)

@@ -225,7 +225,7 @@ func ZendVerifyTypeErrorCommon(
 	given_msg **byte,
 	given_kind **byte,
 ) {
-	var is_interface types.ZendBool = 0
+	var is_interface bool = 0
 	*fname = zf.FunctionName()
 	if zf.GetScope() != nil {
 		*fsep = "::"

@@ -55,7 +55,7 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 }
 func DisplayIniEntries(module *zend.ModuleEntry) {
 	var module_number int
-	var first types.ZendBool = 1
+	var first bool = true
 	if module != nil {
 		module_number = module.GetModuleNumber()
 	} else {
@@ -65,10 +65,10 @@ func DisplayIniEntries(module *zend.ModuleEntry) {
 		if ini_entry.GetModuleNumber() != module_number {
 			return
 		}
-		if first != 0 {
+		if first {
 			standard.PhpInfoPrintTableStart()
 			standard.PhpInfoPrintTableHeader(3, "Directive", "Local Value", "Master Value")
-			first = 0
+			first = false
 		}
 		if SM__().GetPhpinfoAsText() == 0 {
 			PUTS("<tr>")
@@ -88,7 +88,7 @@ func DisplayIniEntries(module *zend.ModuleEntry) {
 			PUTS("\n")
 		}
 	})
-	if first == 0 {
+	if !first {
 		standard.PhpInfoPrintTableEnd()
 	}
 }

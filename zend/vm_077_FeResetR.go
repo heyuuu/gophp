@@ -49,7 +49,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			result.SetFeIterIdx(EG__().AddArrayIterator(properties))
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
-			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
+			var is_empty bool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
 			// ZvalPtrDtorNogc(free_op1)
 			if EG__().GetException() != nil {
 				return 0
@@ -97,7 +97,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			// ZvalPtrDtorNogc(free_op1)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
-			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
+			var is_empty bool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
 			// ZvalPtrDtorNogc(free_op1)
 			if EG__().GetException() != nil {
 				return 0
@@ -141,7 +141,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			result.SetFeIterIdx(EG__().AddArrayIterator(properties))
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
-			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
+			var is_empty bool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
 			if EG__().GetException() != nil {
 				return 0
 			} else if is_empty != 0 {

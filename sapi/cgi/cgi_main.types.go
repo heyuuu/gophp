@@ -10,13 +10,13 @@ import (
 type php_cgi_globals_struct struct {
 	user_config_cache   *types.Array
 	redirect_status_env *byte
-	rfc2616_headers     types.ZendBool
-	nph                 types.ZendBool
-	check_shebang_line  types.ZendBool
-	fix_pathinfo        types.ZendBool
-	force_redirect      types.ZendBool
-	discard_path        types.ZendBool
-	fcgi_logging        types.ZendBool
+	rfc2616_headers     bool
+	nph                 bool
+	check_shebang_line  bool
+	fix_pathinfo        bool
+	force_redirect      bool
+	discard_path        bool
+	fcgi_logging        bool
 }
 
 func (this *php_cgi_globals_struct) GetUserConfigCache() *types.Array {
@@ -29,28 +29,28 @@ func (this *php_cgi_globals_struct) GetRedirectStatusEnv() *byte { return this.r
 func (this *php_cgi_globals_struct) SetRedirectStatusEnv(value *byte) {
 	this.redirect_status_env = value
 }
-func (this *php_cgi_globals_struct) GetRfc2616Headers() types.ZendBool { return this.rfc2616_headers }
-func (this *php_cgi_globals_struct) SetRfc2616Headers(value types.ZendBool) {
+func (this *php_cgi_globals_struct) GetRfc2616Headers() bool { return this.rfc2616_headers }
+func (this *php_cgi_globals_struct) SetRfc2616Headers(value bool) {
 	this.rfc2616_headers = value
 }
-func (this *php_cgi_globals_struct) GetNph() types.ZendBool      { return this.nph }
-func (this *php_cgi_globals_struct) SetNph(value types.ZendBool) { this.nph = value }
-func (this *php_cgi_globals_struct) GetCheckShebangLine() types.ZendBool {
+func (this *php_cgi_globals_struct) GetNph() bool      { return this.nph }
+func (this *php_cgi_globals_struct) SetNph(value bool) { this.nph = value }
+func (this *php_cgi_globals_struct) GetCheckShebangLine() bool {
 	return this.check_shebang_line
 }
-func (this *php_cgi_globals_struct) SetCheckShebangLine(value types.ZendBool) {
+func (this *php_cgi_globals_struct) SetCheckShebangLine(value bool) {
 	this.check_shebang_line = value
 }
-func (this *php_cgi_globals_struct) GetFixPathinfo() types.ZendBool      { return this.fix_pathinfo }
-func (this *php_cgi_globals_struct) SetFixPathinfo(value types.ZendBool) { this.fix_pathinfo = value }
-func (this *php_cgi_globals_struct) GetForceRedirect() types.ZendBool    { return this.force_redirect }
-func (this *php_cgi_globals_struct) SetForceRedirect(value types.ZendBool) {
+func (this *php_cgi_globals_struct) GetFixPathinfo() bool      { return this.fix_pathinfo }
+func (this *php_cgi_globals_struct) SetFixPathinfo(value bool) { this.fix_pathinfo = value }
+func (this *php_cgi_globals_struct) GetForceRedirect() bool    { return this.force_redirect }
+func (this *php_cgi_globals_struct) SetForceRedirect(value bool) {
 	this.force_redirect = value
 }
-func (this *php_cgi_globals_struct) GetDiscardPath() types.ZendBool      { return this.discard_path }
-func (this *php_cgi_globals_struct) SetDiscardPath(value types.ZendBool) { this.discard_path = value }
-func (this *php_cgi_globals_struct) GetFcgiLogging() types.ZendBool      { return this.fcgi_logging }
-func (this *php_cgi_globals_struct) SetFcgiLogging(value types.ZendBool) { this.fcgi_logging = value }
+func (this *php_cgi_globals_struct) GetDiscardPath() bool      { return this.discard_path }
+func (this *php_cgi_globals_struct) SetDiscardPath(value bool) { this.discard_path = value }
+func (this *php_cgi_globals_struct) GetFcgiLogging() bool      { return this.fcgi_logging }
+func (this *php_cgi_globals_struct) SetFcgiLogging(value bool) { this.fcgi_logging = value }
 
 /**
  * UserConfigCacheEntry

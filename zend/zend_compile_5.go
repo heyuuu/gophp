@@ -103,7 +103,7 @@ func (compiler *Compiler) DetermineSwitchJumptableType(cases *ZendAstList) uint8
 	}
 	return common_type
 }
-func ShouldUseJumptable(cases *ZendAstList, jumptable_type uint8) types.ZendBool {
+func ShouldUseJumptable(cases *ZendAstList, jumptable_type uint8) bool {
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_NO_JUMPTABLES) != 0 {
 		return 0
 	}
@@ -125,7 +125,7 @@ func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
 	var cases *ZendAstList = ZendAstGetList(ast.GetChild()[1])
 	var i uint32
-	var has_default_case types.ZendBool = 0
+	var has_default_case bool = 0
 	var expr_node Znode
 	var case_node Znode
 	var opline *types.ZendOp
@@ -277,13 +277,13 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 		var var_ast *ZendAst = catch_ast.GetChild()[1]
 		var stmt_ast *ZendAst = catch_ast.GetChild()[2]
 		var var_name *types.String = ZendAstGetZval(var_ast).String()
-		var is_last_catch types.ZendBool = i+1 == catches.GetChildren()
+		var is_last_catch bool = i+1 == catches.GetChildren()
 		var jmp_multicatch *uint32 = SafeEmalloc(b.SizeOf("uint32_t"), classes.GetChildren()-1, 0)
 		var opnum_catch uint32 = uint32 - 1
 		compiler.setLinenoByAst(catch_ast)
 		for j = 0; j < classes.GetChildren(); j++ {
 			var class_ast *ZendAst = classes.GetChild()[j]
-			var is_last_class types.ZendBool = j+1 == classes.GetChildren()
+			var is_last_class bool = j+1 == classes.GetChildren()
 			if ZendIsConstDefaultClassRef(class_ast) == 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Bad class name in the catch statement")
 			}
@@ -445,8 +445,8 @@ func (compiler *Compiler) CompileStmtList(ast *ZendAst) {
 		compiler.CompileStmt(list.GetChild()[i])
 	}
 }
-func (compiler *Compiler) CompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.TypeHint {
-	var allow_null types.ZendBool = force_allow_null
+func (compiler *Compiler) CompileTypename(ast *ZendAst, force_allow_null bool) types.TypeHint {
+	var allow_null bool = force_allow_null
 	var orig_ast_attr ZendAstAttr = ast.GetAttr()
 	var type_ types.TypeHint
 	if (ast.GetAttr() & ZEND_TYPE_NULLABLE) != 0 {
@@ -509,8 +509,8 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 		var var_ast *ZendAst = param_ast.GetChild()[1]
 		var default_ast *ZendAst = param_ast.GetChild()[2]
 		var name *types.String = ZendAstGetZval(var_ast).String()
-		var is_ref types.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_REF) != 0
-		var is_variadic types.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_VARIADIC) != 0
+		var is_ref bool = (param_ast.GetAttr() & ZEND_PARAM_REF) != 0
+		var is_variadic bool = (param_ast.GetAttr() & ZEND_PARAM_VARIADIC) != 0
 		var var_node Znode
 		var default_node Znode
 		var opcode uint8
@@ -560,7 +560,7 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 			is_variadic,
 		)
 		if type_ast != nil {
-			var has_null_default types.ZendBool = default_ast != nil && (default_node.GetConstant().IsNull() || default_node.GetConstant().IsConstantAst() && types.Z_ASTVAL(default_node.GetConstant()).GetKind() == ZEND_AST_CONSTANT && strcasecmp(ZendAstGetConstantName(types.Z_ASTVAL(default_node.GetConstant())).GetVal(), "NULL") == 0)
+			var has_null_default bool = default_ast != nil && (default_node.GetConstant().IsNull() || default_node.GetConstant().IsConstantAst() && types.Z_ASTVAL(default_node.GetConstant()).GetKind() == ZEND_AST_CONSTANT && strcasecmp(ZendAstGetConstantName(types.Z_ASTVAL(default_node.GetConstant())).GetVal(), "NULL") == 0)
 			op_array.SetIsHasTypeHints(true)
 			arg_info.SetType(compiler.CompileTypename(type_ast, has_null_default))
 			if arg_info.GetType().Code() == types.IS_VOID {

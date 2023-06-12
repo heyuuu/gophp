@@ -28,7 +28,7 @@ func StripHeader(header_bag *byte, lc_header_bag *byte, lc_header_name string) {
 		}
 	}
 }
-func CheckHasHeader(headers *byte, header string) types.ZendBool {
+func CheckHasHeader(headers *byte, header string) bool {
 	var s *byte = headers
 	for b.Assign(&s, strstr(s, header)) {
 		if s == headers || (*(s - 1)) == '\n' {
@@ -69,17 +69,17 @@ func PhpStreamUrlWrapHttpEx(
 	var errstr *types.String = nil
 	var transport_len int
 	var have_header int = 0
-	var request_fulluri types.ZendBool = 0
-	var ignore_errors types.ZendBool = 0
+	var request_fulluri bool = 0
+	var ignore_errors bool = 0
 	var timeout __struct__timeval
 	var user_headers *byte = nil
 	var header_init int = (flags & HTTP_WRAPPER_HEADER_INIT) != 0
 	var redirected int = (flags & HTTP_WRAPPER_REDIRECTED) != 0
-	var follow_location types.ZendBool = 1
+	var follow_location bool = 1
 	var transfer_encoding *core.PhpStreamFilter = nil
 	var response_code int
 	var req_buf zend.SmartStr = zend.MakeSmartStr(0)
-	var custom_request_method types.ZendBool
+	var custom_request_method bool
 	tmp_line[0] = '0'
 	if redirect_max < 1 {
 		streams.PhpStreamWrapperLogError(wrapper, options, "Redirection limit reached, aborting")

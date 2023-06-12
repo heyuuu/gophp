@@ -84,7 +84,7 @@ func ShutdownDestructors() {
 func ShutdownExecutor() {
 	var key *types.String
 	var zv *types.Zval
-	var fast_shutdown types.ZendBool = IsZendMm() != 0 && EG__().GetFullTablesCleanup() == 0
+	var fast_shutdown bool = IsZendMm() != 0 && EG__().GetFullTablesCleanup() == 0
 
 	faults.Try(func() {
 		CG__().GetOpenFiles().Destroy()
@@ -445,7 +445,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 	for i = 0; i < fci.GetParamCount(); i++ {
 		var param *types.Zval
 		var arg *types.Zval = fci.GetParams()[i]
-		var must_wrap types.ZendBool = 0
+		var must_wrap bool = 0
 		if ARG_SHOULD_BE_SENT_BY_REF(func_, i+1) != 0 {
 			if !(arg.IsReference()) {
 				if fci.GetNoSeparation() == 0 {

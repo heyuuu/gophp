@@ -297,7 +297,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 			for i = 0; i < num_args; i++ {
 				if new_arg_info[i].GetType().IsClass() {
 					var class_name *byte = (*byte)(new_arg_info[i].GetType())
-					var allow_null types.ZendBool = 0
+					var allow_null bool = 0
 					var str *types.String
 					if class_name[0] == '?' {
 						class_name++

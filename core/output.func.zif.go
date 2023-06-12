@@ -106,7 +106,7 @@ var DefZifObGetStatus = def.DefFunc("ob_get_status", 0, 1, []def.ArgInfo{{Name: 
 	if fp.HasError() {
 		return
 	}
-	ZifObGetStatus(executeData, returnValue, nil, full_status)
+	ZifObGetStatus(returnValue, nil, full_status)
 })
 
 // generate by ZifObImplicitFlush

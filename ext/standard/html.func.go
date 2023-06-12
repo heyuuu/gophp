@@ -1080,7 +1080,7 @@ func PhpEscapeHtmlEntitiesEx(
 	all int,
 	flags int,
 	hint_charset string,
-	double_encode types.ZendBool,
+	double_encode bool,
 ) *types.String {
 	var cursor int
 	var maxlen int
@@ -1335,7 +1335,7 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var default_charset *byte
 	var flags zend.ZendLong = ENT_COMPAT
 	var replaced *types.String
-	var double_encode types.ZendBool = 1
+	var double_encode bool = 1
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 4, 0)

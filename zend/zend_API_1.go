@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func _ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict types.ZendBool, is_ref int) {
+func _ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict bool, is_ref int) {
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsReference() {
@@ -22,10 +22,10 @@ func _ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict type
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict types.ZendBool) {
+func ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict bool) {
 	_ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict, 0)
 }
-func ZEND_TRY_ASSIGN_COPY_EX(zv *types.Zval, other_zv *types.Zval, strict types.ZendBool) {
+func ZEND_TRY_ASSIGN_COPY_EX(zv *types.Zval, other_zv *types.Zval, strict bool) {
 	// other_zv.TryAddRefcount()
 	ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict)
 }

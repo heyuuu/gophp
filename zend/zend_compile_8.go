@@ -236,7 +236,7 @@ func (compiler *Compiler) CompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	var node *Znode
 	var opline *types.ZendOp
 	var coalesce_opnum uint32
-	var need_frees types.ZendBool = 0
+	var need_frees bool = 0
 
 	/* Remember expressions compiled during the initial BP_VAR_IS lookup,
 	 * to avoid double-evaluation when we compile again with BP_VAR_W. */
@@ -341,7 +341,7 @@ func (compiler *Compiler) CompileYield(result *Znode, ast *ZendAst) {
 	var value_node_ptr *Znode = nil
 	var key_node_ptr *Znode = nil
 	var opline *types.ZendOp
-	var returns_by_ref types.ZendBool = CG__().GetActiveOpArray().IsReturnReference()
+	var returns_by_ref bool = CG__().GetActiveOpArray().IsReturnReference()
 	ZendMarkFunctionAsGenerator()
 	if key_ast != nil {
 		compiler.CompileExpr(&key_node, key_ast)
@@ -491,7 +491,7 @@ func (compiler *Compiler) CompileArray(result *Znode, ast *ZendAst) {
 	var opline *types.ZendOp
 	var i uint32
 	var opnum_init uint32 = -1
-	var packed types.ZendBool = 1
+	var packed bool = 1
 	if compiler.TryCtEvalArray(result.GetConstant(), ast) != 0 {
 		result.SetOpType(IS_CONST)
 		return
@@ -504,7 +504,7 @@ func (compiler *Compiler) CompileArray(result *Znode, ast *ZendAst) {
 		var elem_ast *ZendAst = list.GetChild()[i]
 		var value_ast *ZendAst
 		var key_ast *ZendAst
-		var by_ref types.ZendBool
+		var by_ref bool
 		var value_node Znode
 		var key_node Znode
 		var key_node_ptr *Znode = nil
@@ -572,7 +572,7 @@ func (compiler *Compiler) CompileArray(result *Znode, ast *ZendAst) {
 func (compiler *Compiler) CompileConst(result *Znode, ast *ZendAst) {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	var opline *types.ZendOp
-	var is_fully_qualified types.ZendBool
+	var is_fully_qualified bool
 	var orig_name *types.String = ZendAstGetStr(name_ast)
 	var resolved_name, isFullyQualified = ZendResolveConstName(orig_name, name_ast.GetAttr())
 	if resolved_name == "__COMPILER_HALT_OFFSET__" || name_ast.GetAttr() != ZEND_NAME_RELATIVE && orig_name.GetStr() == "__COMPILER_HALT_OFFSET__" {

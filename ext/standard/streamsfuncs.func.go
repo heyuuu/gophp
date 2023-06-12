@@ -247,7 +247,7 @@ func ZifStreamSocketAccept(executeData zpp.Ex, return_value zpp.Ret, serverstrea
 func ZifStreamSocketGetName(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, wantPeer *types.Zval) {
 	var stream *core.PhpStream
 	var zstream *types.Zval
-	var want_peer types.ZendBool
+	var want_peer bool
 	var name *types.String = nil
 	for {
 		for {
@@ -705,7 +705,7 @@ func ZifStreamSelect(executeData zpp.Ex, return_value zpp.Ret, readStreams zpp.R
 	var sets int = 0
 	var sec zend.ZendLong
 	var usec zend.ZendLong = 0
-	var secnull types.ZendBool
+	var secnull bool
 	var set_count int
 	var max_set_count int = 0
 	for {
@@ -1311,7 +1311,7 @@ func ZifStreamGetLine(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zv
 //@zif -alias socket_set_blocking
 func ZifStreamSetBlocking(executeData zpp.Ex, return_value zpp.Ret, socket *types.Zval, mode *types.Zval) {
 	var zstream *types.Zval
-	var block types.ZendBool
+	var block bool
 	var stream *core.PhpStream
 	for {
 		for {
@@ -1482,8 +1482,8 @@ func ZifStreamSocketEnableCrypto(executeData zpp.Ex, return_value zpp.Ret, strea
 	var zsessstream *types.Zval = nil
 	var stream *core.PhpStream
 	var sessstream *core.PhpStream = nil
-	var enable types.ZendBool
-	var cryptokindnull types.ZendBool = 1
+	var enable bool
+	var cryptokindnull bool = 1
 	var ret int
 	for {
 		for {

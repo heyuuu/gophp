@@ -49,7 +49,7 @@ func SplArrayReplaceHashTable(intern *SplArrayObject, ht *types.Array) {
 	ht_ptr.Destroy()
 	*ht_ptr = ht
 }
-func SplArrayIsObject(intern *SplArrayObject) types.ZendBool {
+func SplArrayIsObject(intern *SplArrayObject) bool {
 	for intern.IsUseOther() {
 		intern = Z_SPLARRAY_P(intern.GetArray())
 	}
@@ -534,7 +534,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 			value = tmp
 		}
 	}
-	var result types.ZendBool = b.CondF(check_empty != 0, func() int { return operators.IZendIsTrue(value) }, func() bool { return !value.IsNull() })
+	var result bool = b.CondF(check_empty != 0, func() int { return operators.IZendIsTrue(value) }, func() bool { return !value.IsNull() })
 	if value == &rv {
 		// zend.ZvalPtrDtor(&rv)
 	}
@@ -601,7 +601,7 @@ func zim_spl_Array_getArrayCopy(executeData *zend.ZendExecuteData, return_value 
 func SplArrayGetPropertiesFor(object *types.Zval, purpose zend.ZendPropPurpose) *types.Array {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var ht *types.Array
-	var dup types.ZendBool
+	var dup bool
 	if intern.IsStdPropList() {
 		return zend.ZendStdGetPropertiesFor(object, purpose)
 	}

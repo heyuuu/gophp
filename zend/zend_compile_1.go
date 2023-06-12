@@ -242,7 +242,7 @@ func ZendLookupReservedConst(name string) *ZendConstant {
 	}
 	return nil
 }
-func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified bool) types.ZendBool {
+func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified bool) bool {
 	var c *ZendConstant = EG__().ConstantTable().Get(name)
 
 	/* Substitute case-sensitive (or lowercase) constants */
@@ -313,7 +313,7 @@ func ZendEnsureValidClassFetchType(fetch_type uint32) {
 		}
 	}
 }
-func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst) types.ZendBool {
+func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst) bool {
 	var fetch_type uint32
 	var class_name *types.Zval
 	if class_ast.GetKind() != ZEND_AST_ZVAL {
@@ -347,7 +347,7 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 
 	}
 }
-func ZendVerifyCtConstAccess(c *types.ClassConstant, scope *types.ClassEntry) types.ZendBool {
+func ZendVerifyCtConstAccess(c *types.ClassConstant, scope *types.ClassEntry) bool {
 	if (c.GetValue().GetAccessFlags() & types.AccPublic) != 0 {
 		return 1
 	} else if (c.GetValue().GetAccessFlags() & types.AccPrivate) != 0 {
@@ -379,7 +379,7 @@ func ZendVerifyCtConstAccess(c *types.ClassConstant, scope *types.ClassEntry) ty
 
 	}
 }
-func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *types.String) types.ZendBool {
+func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *types.String) bool {
 	var fetch_type = ZendGetClassFetchType(class_name.GetStr())
 	var cc *types.ClassConstant
 	var c *types.Zval
@@ -448,7 +448,7 @@ func ZendDoExtendedFcallEnd() {
 	opline = GetNextOp()
 	opline.SetOpcode(ZEND_EXT_FCALL_END)
 }
-func ZendIsAutoGlobalStr(name string) types.ZendBool {
+func ZendIsAutoGlobalStr(name string) bool {
 	var autoGlobal = types.ZendHashStrFindPtr(CG__().GetAutoGlobals(), name).(*ZendAutoGlobal)
 	if autoGlobal != nil {
 		if autoGlobal.GetArmed() != 0 {
@@ -458,7 +458,7 @@ func ZendIsAutoGlobalStr(name string) types.ZendBool {
 	}
 	return 0
 }
-func ZendIsAutoGlobal(name *types.String) types.ZendBool {
+func ZendIsAutoGlobal(name *types.String) bool {
 	var autoGlobal = types.ZendHashFindPtr(CG__().GetAutoGlobals(), name.GetStr()).(*ZendAutoGlobal)
 	if autoGlobal != nil {
 		if autoGlobal.GetArmed() != 0 {
@@ -468,7 +468,7 @@ func ZendIsAutoGlobal(name *types.String) types.ZendBool {
 	}
 	return 0
 }
-func ZendRegisterAutoGlobal(name *types.String, jit types.ZendBool, auto_global_callback ZendAutoGlobalCallback) int {
+func ZendRegisterAutoGlobal(name *types.String, jit bool, auto_global_callback ZendAutoGlobalCallback) int {
 	var auto_global ZendAutoGlobal
 	var retval int
 	auto_global.SetName(name)

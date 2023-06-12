@@ -156,12 +156,12 @@ func (compiler *Compiler) CompileImplicitClosureUses(info *ClosureInfo) {
 		compiler.CompileStaticVarCommon(var_name, &zv, ZEND_BIND_IMPLICIT)
 	}
 }
-func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_body types.ZendBool) {
+func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_body bool) {
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
-	var in_interface types.ZendBool = ce.IsInterface()
-	var in_trait types.ZendBool = ce.IsTrait()
-	var is_public types.ZendBool = op_array.IsPublic()
-	var is_static types.ZendBool = op_array.IsStatic()
+	var in_interface bool = ce.IsInterface()
+	var in_trait bool = ce.IsTrait()
+	var is_public bool = op_array.IsPublic()
+	var is_static bool = op_array.IsStatic()
 	var lcname *types.String
 	if in_interface != 0 {
 		if is_public == 0 || op_array.HasFnFlags(types.AccFinal|types.AccAbstract) {
@@ -306,7 +306,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	}
 	// types.ZendStringReleaseEx(lcname, 0)
 }
-func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAstDecl, toplevel types.ZendBool) {
+func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAstDecl, toplevel bool) {
 	var params_ast *ZendAst = decl.GetChild()[0]
 	var unqualified_name *types.String
 	var name *types.String
@@ -370,13 +370,13 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	}
 	// types.ZendStringReleaseEx(lcname, 0)
 }
-func (compiler *Compiler) CompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
+func (compiler *Compiler) CompileFuncDecl(result *Znode, ast *ZendAst, toplevel bool) {
 	var decl *ZendAstDecl = (*ZendAstDecl)(ast)
 	var params_ast *ZendAst = decl.GetChild()[0]
 	var uses_ast *ZendAst = decl.GetChild()[1]
 	var stmt_ast *ZendAst = decl.GetChild()[2]
 	var return_type_ast *ZendAst = decl.GetChild()[3]
-	var is_method types.ZendBool = decl.GetKind() == ZEND_AST_METHOD
+	var is_method bool = decl.GetKind() == ZEND_AST_METHOD
 	var orig_class_entry *types.ClassEntry = CG__().GetActiveClassEntry()
 	var orig_op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var op_array *types.ZendOpArray = InitOpArrayEx()
@@ -398,7 +398,7 @@ func (compiler *Compiler) CompileFuncDecl(result *Znode, ast *ZendAst, toplevel 
 		op_array.SetIsClosure(true)
 	}
 	if is_method != 0 {
-		var has_body types.ZendBool = stmt_ast != nil
+		var has_body bool = stmt_ast != nil
 		ZendBeginMethodDecl(op_array, decl.GetName(), has_body)
 	} else {
 		ZendBeginFuncDecl(result, op_array, decl, toplevel)
@@ -695,7 +695,7 @@ func ZendGenerateAnonClassName(start_lineno uint32) *types.String {
 	var result = ZendSprintf("class@anonymous%c%s:%u$%d", '\000', filename, start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.NewString(result)
 }
-func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *types.ZendOp {
+func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.ZendOp {
 	var decl *ZendAstDecl = (*ZendAstDecl)(ast)
 	var extends_ast *ZendAst = decl.GetChild()[0]
 	var implements_ast *ZendAst = decl.GetChild()[1]

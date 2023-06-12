@@ -91,7 +91,7 @@ type ZendSignalGlobalsT struct {
 	running  int
 	active   int
 	check    bool
-	reset    types.ZendBool
+	reset    bool
 	handlers []ZendSignalEntryT
 	pstorage []ZendSignalQueueT
 	phead    *ZendSignalQueueT
@@ -99,8 +99,8 @@ type ZendSignalGlobalsT struct {
 	pavail   *ZendSignalQueueT
 }
 
-func (this *ZendSignalGlobalsT) GetCheck() types.ZendBool          { return types.IntBool(this.check) }
-func (this *ZendSignalGlobalsT) SetReset(value types.ZendBool)     { this.reset = value }
+func (this *ZendSignalGlobalsT) GetCheck() bool                    { return types.IntBool(this.check) }
+func (this *ZendSignalGlobalsT) SetReset(value bool)               { this.reset = value }
 func (this *ZendSignalGlobalsT) GetPstorage() []ZendSignalQueueT   { return this.pstorage }
 func (this *ZendSignalGlobalsT) GetPavail() *ZendSignalQueueT      { return this.pavail }
 func (this *ZendSignalGlobalsT) SetPavail(value *ZendSignalQueueT) { this.pavail = value }

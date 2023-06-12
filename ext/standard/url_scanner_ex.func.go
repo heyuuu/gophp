@@ -840,7 +840,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	buf.Free()
 	return result
 }
-func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush types.ZendBool, ctx *UrlAdaptStateExT) *byte {
+func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush bool, ctx *UrlAdaptStateExT) *byte {
 	var retval *byte
 	XxMainloop(ctx, src, srclen)
 	if ctx.GetResult().GetS() == nil {
@@ -1023,7 +1023,7 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 	var url_app zend.SmartStr = zend.MakeSmartStr(0)
 	var form_app zend.SmartStr = zend.MakeSmartStr(0)
 	var ret int = types.SUCCESS
-	var sep_removed types.ZendBool = 0
+	var sep_removed bool = 0
 	var url_state *UrlAdaptStateExT
 	if type_ != 0 {
 		url_state = &(BG__().url_adapt_session_ex)

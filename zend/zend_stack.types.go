@@ -2,7 +2,6 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/php/types"
 )
 
 /**
@@ -88,7 +87,7 @@ func (this *ZendStack[T]) ApplyWithArgument(type_ int, apply_function func(eleme
 	}
 }
 
-func (this *ZendStack[T]) Clean(func_ func(any), free_elements types.ZendBool) {
+func (this *ZendStack[T]) Clean(func_ func(any), free_elements bool) {
 	if func_ != nil {
 		for _, element := range this.elements {
 			func_(element)

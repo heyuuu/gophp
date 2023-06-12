@@ -19,7 +19,7 @@ func ZendObjectFetchPropertyTypeInfo(obj *types.ZendObject, slot *types.Zval) *t
 	}
 	return ZendGetTypedPropertyInfoForSlot(obj, slot)
 }
-func ZendHandleFetchObjFlags(result *types.Zval, ptr *types.Zval, obj *types.ZendObject, prop_info *types.PropertyInfo, flags uint32) types.ZendBool {
+func ZendHandleFetchObjFlags(result *types.Zval, ptr *types.Zval, obj *types.ZendObject, prop_info *types.PropertyInfo, flags uint32) bool {
 	switch flags {
 	case ZEND_FETCH_DIM_WRITE:
 		if PromotesToArray(ptr) != 0 {
@@ -88,7 +88,7 @@ func ZendFetchPropertyAddress(
 	cache_slot *any,
 	type_ int,
 	flags uint32,
-	init_undef types.ZendBool,
+	init_undef bool,
 	opline *types.ZendOp,
 	executeData *ZendExecuteData,
 ) {
@@ -362,7 +362,7 @@ func ZendThrowConflictingCoercionError(prop1 *types.PropertyInfo, prop2 *types.P
 	ZendFormatType(prop2.GetType(), &prop2_type1, &prop2_type2)
 	faults.TypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s and property %s::$%s of type %s%s, as this would result in an inconsistent type conversion", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).Name() }, func() *byte { return types.ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop2.GetName()), prop2_type1, prop2_type2)
 }
-func IZendVerifyTypeAssignableZval(type_ptr *types.TypeHint, self_ce *types.ClassEntry, zv *types.Zval, strict types.ZendBool) int {
+func IZendVerifyTypeAssignableZval(type_ptr *types.TypeHint, self_ce *types.ClassEntry, zv *types.Zval, strict bool) int {
 	var type_ types.TypeHint = *type_ptr
 	var type_code uint8
 	var zv_type uint8 = zv.GetType()
@@ -413,7 +413,7 @@ func IZendVerifyTypeAssignableZval(type_ptr *types.TypeHint, self_ce *types.Clas
 
 	/* Coercion may be necessary, check separately */
 }
-func ZendVerifyRefAssignableZval(ref *types.ZendReference, zv *types.Zval, strict types.ZendBool) types.ZendBool {
+func ZendVerifyRefAssignableZval(ref *types.ZendReference, zv *types.Zval, strict bool) bool {
 	var prop *types.PropertyInfo
 
 	/* The value must satisfy each property type, and coerce to the same value for each property
@@ -423,7 +423,7 @@ func ZendVerifyRefAssignableZval(ref *types.ZendReference, zv *types.Zval, stric
 
 	var seen_prop *types.PropertyInfo = nil
 	var seen_type uint8
-	var needs_coercion types.ZendBool = 0
+	var needs_coercion bool = 0
 	b.Assert(!zv.IsReference())
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **types.PropertyInfo

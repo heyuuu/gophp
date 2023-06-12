@@ -131,7 +131,7 @@ func (compiler *Compiler) CompileCompoundAssign(result *Znode, ast *ZendAst) {
 func (compiler *Compiler) CompileArgs(ast *ZendAst, fbc types.IFunction) uint32 {
 	var args *ZendAstList = ZendAstGetList(ast)
 	var i uint32
-	var uses_arg_unpack types.ZendBool = 0
+	var uses_arg_unpack bool = 0
 	var arg_count uint32 = 0
 	for i = 0; i < args.GetChildren(); i++ {
 		var arg *ZendAst = args.GetChild()[i]
@@ -340,7 +340,7 @@ func (compiler *Compiler) CompileDynamicCall(result *Znode, name_node *Znode, ar
 	}
 	compiler.CompileCallCommon(result, args_ast, nil)
 }
-func ZendArgsContainUnpack(args *ZendAstList) types.ZendBool {
+func ZendArgsContainUnpack(args *ZendAstList) bool {
 	var i uint32
 	for i = 0; i < args.GetChildren(); i++ {
 		if args.GetChild()[i].GetKind() == ZEND_AST_UNPACK {
@@ -439,7 +439,7 @@ func (compiler *Compiler) CompileFuncOrd(result *Znode, args *ZendAstList) int {
 		return types.FAILURE
 	}
 }
-func FbcIsFinalized(fbc types.IFunction) types.ZendBool {
+func FbcIsFinalized(fbc types.IFunction) bool {
 	return !(ZEND_USER_CODE(fbc.GetType())) || fbc.IsDonePassTwo()
 }
 func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
@@ -568,7 +568,7 @@ func (compiler *Compiler) CompileAssert(result *Znode, args *ZendAstList, name *
 	}
 }
 func (compiler *Compiler) CompileFuncInArray(result *Znode, args *ZendAstList) int {
-	var strict types.ZendBool = 0
+	var strict bool = 0
 	var array Znode
 	var needly Znode
 	var opline *types.ZendOp
@@ -593,7 +593,7 @@ func (compiler *Compiler) CompileFuncInArray(result *Znode, args *ZendAstList) i
 		return types.FAILURE
 	}
 	if array.GetConstant().Array().Len() > 0 {
-		var ok types.ZendBool = 1
+		var ok bool = 1
 		var val *types.Zval
 		var tmp types.Zval
 		var src *types.Array = array.GetConstant().Array()

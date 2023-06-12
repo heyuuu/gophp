@@ -6,8 +6,8 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendIsCallableImpl(callable *types.Zval, object *types.ZendObject, check_flags uint32, fcc *types.ZendFcallInfoCache, error **byte) types.ZendBool {
-	var ret types.ZendBool
+func ZendIsCallableImpl(callable *types.Zval, object *types.ZendObject, check_flags uint32, fcc *types.ZendFcallInfoCache, error **byte) bool {
+	var ret bool
 	var fcc_local types.ZendFcallInfoCache
 	var strict_class int = 0
 	if fcc == nil {
@@ -128,14 +128,14 @@ func ZendIsCallableEx(
 	callable_name **types.String,
 	fcc *types.ZendFcallInfoCache,
 	error **byte,
-) types.ZendBool {
-	var ret types.ZendBool = ZendIsCallableImpl(callable, object, check_flags, fcc, error)
+) bool {
+	var ret bool = ZendIsCallableImpl(callable, object, check_flags, fcc, error)
 	if callable_name != nil {
 		*callable_name = ZendGetCallableNameEx(callable, object)
 	}
 	return ret
 }
-func ZendIsCallable(callable *types.Zval, check_flags uint32, callable_name **types.String) types.ZendBool {
+func ZendIsCallable(callable *types.Zval, check_flags uint32, callable_name **types.String) bool {
 	return ZendIsCallableEx(callable, nil, check_flags, callable_name, nil, nil)
 }
 func ZendFcallInfoInit(
@@ -370,7 +370,7 @@ func ZendDeclareTypedProperty(
 	ce.PropertyTable().Update(name.GetStr(), propInfo)
 	return types.SUCCESS
 }
-func ZendTryAssignTypedRefEx(ref *types.ZendReference, val *types.Zval, strict types.ZendBool) int {
+func ZendTryAssignTypedRefEx(ref *types.ZendReference, val *types.Zval, strict bool) int {
 	if ZendVerifyRefAssignableZval(ref, val, strict) == 0 {
 		// ZvalPtrDtor(val)
 		return types.FAILURE

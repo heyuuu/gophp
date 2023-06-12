@@ -399,13 +399,13 @@ func ZifGetParentClass(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, obje
 		return "", false
 	}
 }
-func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subclass types.ZendBool) {
+func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subclass bool) {
 	var obj *types.Zval
 	var class_name *types.String
 	var instance_ce *types.ClassEntry
 	var ce *types.ClassEntry
 	var allow_string = only_subclass
-	var retval types.ZendBool
+	var retval bool
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 3, 0)
@@ -1146,7 +1146,7 @@ func DebugPrintBacktraceArgs(argArray *types.Zval) {
 		ZendPrintFlatZvalR(value)
 	})
 }
-func SkipInternalHandler(skip *ZendExecuteData) types.ZendBool {
+func SkipInternalHandler(skip *ZendExecuteData) bool {
 	return !(skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetType())) && skip.GetPrevExecuteData() != nil && skip.GetPrevExecuteData().GetFunc() != nil && ZEND_USER_CODE(skip.GetPrevExecuteData().GetFunc().GetType()) && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_ICALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_UCALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL_BY_NAME && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL
 }
 func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, options *types.Zval, limit *types.Zval) {

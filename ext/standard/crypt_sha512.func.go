@@ -3,7 +3,6 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 )
@@ -251,7 +250,7 @@ func PhpSha512CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 	/* Default number of rounds.  */
 
 	var rounds int = ROUNDS_DEFAULT
-	var rounds_custom types.ZendBool = 0
+	var rounds_custom bool = 0
 
 	/* Find beginning of salt string.  The prefix should normally always
 	   be present.  Just in case it is not.  */

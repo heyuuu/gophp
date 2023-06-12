@@ -471,7 +471,7 @@ func ZifTouch(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ 
 	return_value.SetTrue()
 	return
 }
-func PhpClearStatCache(clear_realpath_cache types.ZendBool, filename *byte, filename_len int) {
+func PhpClearStatCache(clear_realpath_cache bool, filename *byte, filename_len int) {
 	/* always clear CurrentStatFile and CurrentLStatFile even if filename is not NULL
 	 * as it may contain outdated data (e.g. "nlink" for a directory when deleting a file
 	 * in this directory, as shown by lstat_stat_variation9.phpt) */
@@ -493,7 +493,7 @@ func PhpClearStatCache(clear_realpath_cache types.ZendBool, filename *byte, file
 	}
 }
 func ZifClearstatcache(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, clearRealpathCache *types.Zval, filename *types.Zval) {
-	var clear_realpath_cache types.ZendBool = 0
+	var clear_realpath_cache bool = 0
 	var filename *byte = nil
 	var filename_len int = 0
 	for {

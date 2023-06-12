@@ -1135,7 +1135,7 @@ func ZifArrayCountValues(array *types.Array) *types.Array {
 
 	return retArr
 }
-func ArrayColumnParamHelper(param *types.Zval, name string) types.ZendBool {
+func ArrayColumnParamHelper(param *types.Zval, name string) bool {
 	switch param.GetType() {
 	case types.IS_DOUBLE:
 		if !param.IsLong() {

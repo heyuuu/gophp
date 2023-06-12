@@ -124,7 +124,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 	var i zend.ZendLong
 	var var_hash *VarEntries = var_hashx.GetEntries().GetNext()
 	var var_dtor_hash *VarDtorEntries = var_hashx.GetFirstDtor()
-	var delayed_call_failed types.ZendBool = 0
+	var delayed_call_failed bool = 0
 	var wakeup_name types.Zval
 	var unserialize_name types.Zval
 	wakeup_name.SetUndef()
@@ -497,10 +497,10 @@ func ObjectCommon(
 	max *uint8,
 	var_hash *PhpUnserializeDataT,
 	elements zend.ZendLong,
-	has_unserialize types.ZendBool,
+	has_unserialize bool,
 ) int {
 	var ht *types.Array
-	var has_wakeup types.ZendBool
+	var has_wakeup bool
 	if has_unserialize != 0 {
 		var ary types.Zval
 		var tmp *types.Zval
@@ -764,9 +764,9 @@ yy18:
 	var str *byte
 	var class_name *types.String
 	var ce *types.ClassEntry
-	var incomplete_class types.ZendBool = 0
-	var custom_object types.ZendBool = 0
-	var has_unserialize types.ZendBool = 0
+	var incomplete_class bool = 0
+	var custom_object bool = 0
+	var has_unserialize bool = 0
 	var user_func types.Zval
 	var retval types.Zval
 	var args []types.Zval

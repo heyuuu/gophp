@@ -1205,7 +1205,7 @@ func ZifHighlightFile(executeData zpp.Ex, return_value zpp.Ret, fileName *types.
 	var filename_len int
 	var ret int
 	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-	var i types.ZendBool = 0
+	var i bool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -1266,7 +1266,7 @@ func ZifHighlightString(executeData zpp.Ex, return_value zpp.Ret, string *types.
 	var expr *types.Zval
 	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
 	var hicompiled_string_description *byte
-	var i types.ZendBool = 0
+	var i bool = 0
 	var old_error_reporting int = zend.EG__().GetErrorReporting()
 	for {
 		for {
@@ -1469,7 +1469,7 @@ func ZifRestoreIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
 }
 func ZifPrintR(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
 	var var_ *types.Zval
-	var do_return types.ZendBool = 0
+	var do_return bool = 0
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -1502,7 +1502,7 @@ func ZifConnectionStatus(executeData zpp.Ex, return_value zpp.Ret) {
 	return
 }
 func ZifIgnoreUserAbort(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, value *types.Zval) {
-	var arg types.ZendBool = 0
+	var arg bool = 0
 	var old_setting int
 	for {
 		for {
@@ -1635,7 +1635,7 @@ func ZifIsUploadedFile(path string) bool {
 	return core.SG__().ExistUploadFile(path)
 }
 func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path string, newPath zpp.Path) bool {
-	var successful types.ZendBool = 0
+	var successful bool = 0
 	var oldmask int
 	var ret int
 	if !core.SG__().ExistUploadFile(path) {
@@ -1731,7 +1731,7 @@ func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.
 	}
 }
 func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename string, _ zpp.Opt, processSections_ *types.Zval, scannerMode *types.Zval) {
-	var processSections types.ZendBool = 0
+	var processSections bool = 0
 	var scanner_mode zend.ZendLong = zend.ZEND_INI_SCANNER_NORMAL
 	var ini_parser_cb zend.ZendIniParserCbT
 	for {
@@ -1777,7 +1777,7 @@ func ZifParseIniString(executeData zpp.Ex, return_value zpp.Ret, iniString *type
 	var string *byte = nil
 	var str *byte = nil
 	var str_len int = 0
-	var process_sections types.ZendBool = 0
+	var process_sections bool = 0
 	var scanner_mode zend.ZendLong = zend.ZEND_INI_SCANNER_NORMAL
 	var ini_parser_cb zend.ZendIniParserCbT
 	for {

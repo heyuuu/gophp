@@ -44,9 +44,9 @@ type SapiRequestInfo struct {
 	request_uri         *byte
 	request_body        *PhpStream
 	content_type        *byte
-	headers_only        types.ZendBool
-	no_headers          types.ZendBool
-	headers_read        types.ZendBool
+	headers_only        bool
+	no_headers          bool
+	headers_read        bool
 	post_entry          *SapiPostEntry
 	content_type_dup    *byte
 	auth_user           *byte
@@ -93,7 +93,7 @@ type SapiGlobals struct {
 	rfc1867_uploaded_files   map[string]bool
 	post_max_size            zend.ZendLong
 	options                  int
-	sapi_started             types.ZendBool
+	sapi_started             bool
 	global_request_time      float64
 	known_post_content_types types.Array
 	callback_func            types.Zval

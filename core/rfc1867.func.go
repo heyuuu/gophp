@@ -86,24 +86,24 @@ func AddProtectedVariable(varname *byte) {
 	NormalizeProtectedVariable(varname)
 	types.ZendHashStrAddEmptyElement(PG__().rfc1867_protected_variables, varname)
 }
-func IsProtectedVariable(varname *byte) types.ZendBool {
+func IsProtectedVariable(varname *byte) bool {
 	NormalizeProtectedVariable(varname)
 	return types.IntBool(PG__().rfc1867_protected_variables.KeyExists(varname))
 }
-func SafePhpRegisterVariable(var_ *byte, strval *byte, val_len int, track_vars_array *types.Zval, override_protection types.ZendBool) {
+func SafePhpRegisterVariable(var_ *byte, strval *byte, val_len int, track_vars_array *types.Zval, override_protection bool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {
 		PhpRegisterVariableSafe(b.CastStrAuto(var_), b.CastStr(strval, val_len), track_vars_array)
 	}
 }
-func SafePhpRegisterVariableEx(var_ *byte, val *types.Zval, track_vars_array *types.Zval, override_protection types.ZendBool) {
+func SafePhpRegisterVariableEx(var_ *byte, val *types.Zval, track_vars_array *types.Zval, override_protection bool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {
 		PhpRegisterVariableEx(b.CastStrAuto(var_), val, track_vars_array)
 	}
 }
-func RegisterHttpPostFilesVariable(strvar *byte, val *byte, http_post_files *types.Zval, override_protection types.ZendBool) {
+func RegisterHttpPostFilesVariable(strvar *byte, val *byte, http_post_files *types.Zval, override_protection bool) {
 	SafePhpRegisterVariable(strvar, val, strlen(val), http_post_files, override_protection)
 }
-func RegisterHttpPostFilesVariableEx(var_ *byte, val *types.Zval, http_post_files *types.Zval, override_protection types.ZendBool) {
+func RegisterHttpPostFilesVariableEx(var_ *byte, val *types.Zval, http_post_files *types.Zval, override_protection bool) {
 	SafePhpRegisterVariableEx(var_, val, http_post_files, override_protection)
 }
 func DestroyUploadedFilesHash() {

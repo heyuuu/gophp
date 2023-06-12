@@ -74,7 +74,7 @@ func UserWrapperOpener(
 	var args []types.Zval
 	var call_result int
 	var stream *core.PhpStream = nil
-	var old_in_user_include types.ZendBool
+	var old_in_user_include bool
 
 	/* Try to catch bad usage without preventing flexibility */
 

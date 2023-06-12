@@ -66,10 +66,10 @@ func BinaryStrcspn(s *byte, e *byte, chars string) *byte {
 	return e
 }
 func PhpUrlParseEx(str *byte, length int) *PhpUrl {
-	var has_port types.ZendBool
+	var has_port bool
 	return PhpUrlParseEx2(str, length, &has_port)
 }
-func PhpUrlParseEx2(str *byte, length int, has_port *types.ZendBool) *PhpUrl {
+func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
 	var port_buf []byte
 	var ret *PhpUrl = zend.Ecalloc(1, b.SizeOf("php_url"))
 	var s *byte
@@ -304,7 +304,7 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zp
 	var resource *PhpUrl
 	var key zend.ZendLong = -1
 	var tmp types.Zval
-	var has_port types.ZendBool
+	var has_port bool
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)

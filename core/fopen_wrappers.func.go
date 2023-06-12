@@ -298,7 +298,7 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 	var filename *byte = nil
 	var resolved_path *string = nil
 	var length int
-	var orig_display_errors types.ZendBool
+	var orig_display_errors bool
 	path_info = SG__().RequestInfo.request_uri
 	if PG__().user_dir && *PG__().user_dir && path_info != nil && '/' == path_info[0] && '~' == path_info[1] {
 		var s *byte = strchr(path_info+2, '/')

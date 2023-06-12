@@ -234,7 +234,7 @@ func (compiler *Compiler) CompileMemoizedExpr(result *Znode, expr *ZendAst) {
 		b.Assert(false)
 	}
 }
-func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit types.ZendBool) {
+func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit bool) {
 	if return_info.GetType().IsSet() {
 		var opline *types.ZendOp
 
@@ -302,25 +302,25 @@ func ZendEmitFinalReturn(returnOne bool) {
 	ret = ZendEmitOp(nil, b.Cond(returnsReference, ZEND_RETURN_BY_REF, ZEND_RETURN), &zn, nil)
 	ret.SetExtendedValue(-1)
 }
-func ZendIsVariable(ast *ZendAst) types.ZendBool {
+func ZendIsVariable(ast *ZendAst) bool {
 	return ast.GetKind() == ZEND_AST_VAR || ast.GetKind() == ZEND_AST_DIM || ast.GetKind() == ZEND_AST_PROP || ast.GetKind() == ZEND_AST_STATIC_PROP
 }
-func ZendIsCall(ast *ZendAst) types.ZendBool {
+func ZendIsCall(ast *ZendAst) bool {
 	return ast.GetKind() == ZEND_AST_CALL || ast.GetKind() == ZEND_AST_METHOD_CALL || ast.GetKind() == ZEND_AST_STATIC_CALL
 }
-func ZendIsVariableOrCall(ast *ZendAst) types.ZendBool {
+func ZendIsVariableOrCall(ast *ZendAst) bool {
 	return ZendIsVariable(ast) != 0 || ZendIsCall(ast) != 0
 }
-func ZendIsUntickedStmt(ast *ZendAst) types.ZendBool {
+func ZendIsUntickedStmt(ast *ZendAst) bool {
 	return ast.GetKind() == ZEND_AST_STMT_LIST || ast.GetKind() == ZEND_AST_LABEL || ast.GetKind() == ZEND_AST_PROP_DECL || ast.GetKind() == ZEND_AST_CLASS_CONST_DECL || ast.GetKind() == ZEND_AST_USE_TRAIT || ast.GetKind() == ZEND_AST_METHOD
 }
-func ZendCanWriteToVariable(ast *ZendAst) types.ZendBool {
+func ZendCanWriteToVariable(ast *ZendAst) bool {
 	for ast.GetKind() == ZEND_AST_DIM || ast.GetKind() == ZEND_AST_PROP {
 		ast = ast.GetChild()[0]
 	}
 	return ZendIsVariableOrCall(ast)
 }
-func ZendIsConstDefaultClassRef(name_ast *ZendAst) types.ZendBool {
+func ZendIsConstDefaultClassRef(name_ast *ZendAst) bool {
 	if name_ast.GetKind() != ZEND_AST_ZVAL {
 		return 0
 	}
@@ -598,7 +598,7 @@ func (compiler *Compiler) CompileStaticProp(result *Znode, ast *ZendAst, type_ u
 	ZendAdjustForFetchType(opline, result, type_)
 	return opline
 }
-func ZendVerifyListAssignTarget(var_ast *ZendAst, old_style types.ZendBool) {
+func ZendVerifyListAssignTarget(var_ast *ZendAst, old_style bool) {
 	if var_ast.GetKind() == ZEND_AST_ARRAY {
 		if var_ast.GetAttr() == ZEND_ARRAY_SYNTAX_LONG {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot assign to array(), use [] instead")
@@ -610,9 +610,9 @@ func ZendVerifyListAssignTarget(var_ast *ZendAst, old_style types.ZendBool) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Assignments can only happen to writable values")
 	}
 }
-func ZendPropagateListRefs(ast *ZendAst) types.ZendBool {
+func ZendPropagateListRefs(ast *ZendAst) bool {
 	var list *ZendAstList = ZendAstGetList(ast)
-	var has_refs types.ZendBool = 0
+	var has_refs bool = 0
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
 		var elem_ast *ZendAst = list.GetChild()[i]
@@ -626,11 +626,11 @@ func ZendPropagateListRefs(ast *ZendAst) types.ZendBool {
 	}
 	return has_refs
 }
-func (compiler *Compiler) CompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_style types.ZendBool) {
+func (compiler *Compiler) CompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_style bool) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
-	var has_elems types.ZendBool = 0
-	var is_keyed types.ZendBool = list.GetChildren() > 0 && list.GetChild()[0] != nil && list.GetChild()[0].GetChild()[1] != nil
+	var has_elems bool = 0
+	var is_keyed bool = list.GetChildren() > 0 && list.GetChild()[0] != nil && list.GetChild()[0].GetChild()[1] != nil
 	//if list.GetChildren() != 0 && expr_node.GetOpType() == IS_CONST && expr_node.GetConstant().IsString() {
 	//	ZvalMakeInternedString(expr_node.GetConstant())
 	//}
@@ -708,7 +708,7 @@ func ZendEnsureWritableVariable(ast *ZendAst) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Can't use method return value in write context")
 	}
 }
-func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) types.ZendBool {
+func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) bool {
 	if expr_ast.GetKind() != ZEND_AST_VAR || expr_ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 		return 0
 	}

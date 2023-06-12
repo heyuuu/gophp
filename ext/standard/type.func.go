@@ -306,8 +306,8 @@ func ZifIsCallable(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _
 	var callable_name *types.Zval = nil
 	var name *types.String
 	var error *byte
-	var retval types.ZendBool
-	var syntax_only types.ZendBool = 0
+	var retval bool
+	var syntax_only bool = 0
 	var check_flags int = 0
 	for {
 		for {

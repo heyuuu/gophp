@@ -58,7 +58,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 					var _z *types.Zval = _p.GetVal()
 
 					arg = _z
-					var must_wrap types.ZendBool = 0
+					var must_wrap bool = 0
 					if skip > 0 {
 						skip--
 						continue
@@ -107,7 +107,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 				var _z *types.Zval = _p.GetVal()
 
 				arg = _z
-				var must_wrap types.ZendBool = 0
+				var must_wrap bool = 0
 				if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
 					if !(arg.IsReference()) {
 						if ARG_MAY_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) == 0 {

@@ -57,7 +57,7 @@ func PhpUrlEncodeHashEx(
 		idx = _p.GetH()
 		key = _p.GetKey()
 		zdata = _z
-		var is_dynamic types.ZendBool = 1
+		var is_dynamic bool = 1
 		if zdata.IsIndirect() {
 			zdata = zdata.Indirect()
 			if zdata.IsUndef() {

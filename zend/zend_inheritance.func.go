@@ -48,7 +48,7 @@ func ZendDuplicateUserFunction(func_ types.IFunction) types.IFunction {
 	}
 	return new_function
 }
-func ZendDuplicateFunction(func_ types.IFunction, ce *types.ClassEntry, is_interface types.ZendBool) types.IFunction {
+func ZendDuplicateFunction(func_ types.IFunction, ce *types.ClassEntry, is_interface bool) types.IFunction {
 	if func_.GetType() == ZEND_INTERNAL_FUNCTION {
 		return ZendDuplicateInternalFunction(func_, ce)
 	} else {
@@ -198,7 +198,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 	}
 	return nil
 }
-func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) types.ZendBool {
+func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) bool {
 	if ce1 == ce2 {
 		return 1
 	}
@@ -624,7 +624,7 @@ func EmitIncompatibleMethodError(
 	}
 	faults.ErrorAt(error_level, nil, FuncLineno(child), errorMsg)
 }
-func EmitIncompatibleMethodErrorOrWarning(child types.IFunction, parent types.IFunction, status InheritanceStatus, unresolved_class *types.String, always_error types.ZendBool) {
+func EmitIncompatibleMethodErrorOrWarning(child types.IFunction, parent types.IFunction, status InheritanceStatus, unresolved_class *types.String, always_error bool) {
 	var error_level int
 	var error_verb *byte
 	if always_error != 0 || child.GetPrototype() != nil && child.GetPrototype().IsAbstract() || parent.IsHasReturnType() && (!child.IsHasReturnType() || ZendPerformCovariantTypeCheck(&unresolved_class, child, child.GetArgInfo()-1, parent, parent.GetArgInfo()-1) != INHERITANCE_SUCCESS) {
@@ -636,7 +636,7 @@ func EmitIncompatibleMethodErrorOrWarning(child types.IFunction, parent types.IF
 	}
 	EmitIncompatibleMethodError(error_level, error_verb, child, parent, status, unresolved_class)
 }
-func PerformDelayableImplementationCheck(ce *types.ClassEntry, fe types.IFunction, proto types.IFunction, always_error types.ZendBool) {
+func PerformDelayableImplementationCheck(ce *types.ClassEntry, fe types.IFunction, proto types.IFunction, always_error bool) {
 	var unresolved_class *types.String
 	var status InheritanceStatus = ZendDoPerformImplementationCheck(&unresolved_class, fe, proto)
 	if status != INHERITANCE_SUCCESS {
@@ -657,8 +657,8 @@ func DoInheritanceCheckOnMethodEx(
 	parent types.IFunction,
 	ce *types.ClassEntry,
 	child_dup_callback func(types.IFunction),
-	check_only types.ZendBool,
-	checked types.ZendBool,
+	check_only bool,
+	checked bool,
 ) InheritanceStatus {
 	var child_flags uint32
 	var parent_flags uint32 = parent.GetFnFlags()
@@ -750,7 +750,7 @@ func DoInheritanceCheckOnMethodEx(
 	}
 	return INHERITANCE_SUCCESS
 }
-func DoInheritMethod(key string, parent types.IFunction, ce *types.ClassEntry, is_interface types.ZendBool, checked types.ZendBool) {
+func DoInheritMethod(key string, parent types.IFunction, ce *types.ClassEntry, is_interface bool, checked bool) {
 	var func_ = ce.FunctionTable().Get(key)
 	if func_ != nil {
 		if is_interface != 0 && func_ == parent {
@@ -1156,7 +1156,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 	}
 	ce.AddCeFlags(parentCe.GetCeFlags() & (types.AccHasStaticInMethods | types.AccHasTypeHints | types.AccUseGuards))
 }
-func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parentConstant *types.ClassConstant, name string, iface *types.ClassEntry) types.ZendBool {
+func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parentConstant *types.ClassConstant, name string, iface *types.ClassEntry) bool {
 	var oldConstant *types.ClassConstant = childConstantsTable.Get(name)
 	if oldConstant != nil {
 		if oldConstant.GetCe() != parentConstant.GetCe() {
@@ -1634,7 +1634,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 	var coliding_prop *types.PropertyInfo
 	var prop_name *types.String
 	var class_name_unused *byte
-	var not_compatible types.ZendBool
+	var not_compatible bool
 	var prop_value *types.Zval
 	var flags uint32
 	var doc_comment *string
@@ -1911,7 +1911,7 @@ func AddDependencyObligation(ce *types.ClassEntry, dependency_ce *types.ClassEnt
 	obligation.SetDependencyCe(dependency_ce)
 	types.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
-func AddCompatibilityObligation(ce *types.ClassEntry, child_fn types.IFunction, parent_fn types.IFunction, always_error types.ZendBool) {
+func AddCompatibilityObligation(ce *types.ClassEntry, child_fn types.IFunction, parent_fn types.IFunction, always_error bool) {
 	var obligations *types.Array = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_COMPATIBILITY)
