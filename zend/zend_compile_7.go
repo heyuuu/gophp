@@ -210,16 +210,15 @@ func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileHaltCompiler(ast *ZendAst) {
-	var offset_ast *ZendAst = ast.GetChild()[0]
-	var offset ZendLong = ZendAstGetZval(offset_ast).Long()
-	var name *types.String
-	var const_name = "__COMPILER_HALT_OFFSET__"
+	var offsetAst *ZendAst = ast.GetChild()[0]
+	var offset ZendLong = ZendAstGetZval(offsetAst).Long()
+	var constName = "__COMPILER_HALT_OFFSET__"
 	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() != 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "__HALT_COMPILER() can only be used from the outermost scope")
 	}
 	filename := ZendGetCompiledFilename()
-	name = ZendManglePropertyName_ZStr(const_name, filename)
-	RegisterLongConstant(name.GetVal(), name.GetLen(), offset, CONST_CS, 0)
+	name := ZendManglePropertyName_Ex(constName, filename)
+	RegisterLongConstant(name, offset, CONST_CS, 0)
 }
 func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
@@ -250,7 +249,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 		if op_array != nil && ce != nil && op_array.GetScope() == nil && !op_array.IsClosure() {
 			op_array = nil
 		}
-		if op_array != nil && op_array.GetFunctionName() != nil {
+		if op_array != nil && op_array.FunctionName() != "" {
 			if op_array.GetScope() != nil {
 				zv.SetStringVal(op_array.GetScope().Name() + "::" + op_array.FunctionName())
 			} else {
