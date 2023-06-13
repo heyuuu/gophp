@@ -23,8 +23,8 @@ type ZendCompilerGlobals struct {
 	functionTable      FunctionTable
 	classTable         ClassTable
 	filenamesTable     map[string]string //filenames_table              HashTable
+	autoGlobals        map[string]*ZendAutoGlobal
 
-	auto_globals                 *types.Array
 	parse_error                  bool
 	in_compilation               bool
 	short_tags                   bool
@@ -51,141 +51,158 @@ type ZendCompilerGlobals struct {
 	rtd_key_counter              uint32
 }
 
-func (this *ZendCompilerGlobals) InitTables() {
-	this.functionTable = types.NewLcTable[types.IFunction](nil)
-	this.classTable = types.NewLcTable[*types.ClassEntry](nil)
-	this.auto_globals = types.NewArray(8)
+func (cg *ZendCompilerGlobals) InitTables() {
+	cg.functionTable = types.NewLcTable[types.IFunction](nil)
+	cg.classTable = types.NewLcTable[*types.ClassEntry](nil)
+	cg.autoGlobals = make(map[string]*ZendAutoGlobal)
 }
 
-func (this *ZendCompilerGlobals) DestroyTables() {
-	this.functionTable.Destroy()
-	this.classTable.Destroy()
-	this.auto_globals.Destroy()
+func (cg *ZendCompilerGlobals) DestroyTables() {
+	cg.functionTable.Destroy()
+	cg.classTable.Destroy()
+	cg.autoGlobals = nil
 }
 
 // class table
-func (this *ZendCompilerGlobals) ClassTable() ClassTable {
-	return this.classTable
+func (cg *ZendCompilerGlobals) ClassTable() ClassTable {
+	return cg.classTable
 }
 
-func (this *ZendCompilerGlobals) FunctionTable() FunctionTable { return this.functionTable }
+func (cg *ZendCompilerGlobals) FunctionTable() FunctionTable { return cg.functionTable }
 
 // compiler_options
-func (this *ZendCompilerGlobals) GetCompilerOptions() uint32      { return this.compiler_options }
-func (this *ZendCompilerGlobals) SetCompilerOptions(value uint32) { this.compiler_options = value }
-func (this *ZendCompilerGlobals) IsCompilePreload() bool {
-	return this.compiler_options&ZEND_COMPILE_PRELOAD != 0
+func (cg *ZendCompilerGlobals) GetCompilerOptions() uint32      { return cg.compiler_options }
+func (cg *ZendCompilerGlobals) SetCompilerOptions(value uint32) { cg.compiler_options = value }
+func (cg *ZendCompilerGlobals) IsCompilePreload() bool {
+	return cg.compiler_options&ZEND_COMPILE_PRELOAD != 0
+}
+
+// auto globals
+func (cg *ZendCompilerGlobals) FindAutoGlobal(name string) *ZendAutoGlobal {
+	return cg.autoGlobals[name]
+}
+func (cg *ZendCompilerGlobals) AddAutoGlobal(autoGlobal ZendAutoGlobal) bool {
+	name := autoGlobal.Name()
+	if _, exists := cg.autoGlobals[name]; exists {
+		return false
+	}
+
+	cg.autoGlobals[name] = &autoGlobal
+	return true
+}
+func (cg *ZendCompilerGlobals) EachAutoGlobal(fn func(*ZendAutoGlobal)) {
+	for _, autoGlobal := range cg.autoGlobals {
+		fn(autoGlobal)
+	}
 }
 
 // getter/setter
-func (this *ZendCompilerGlobals) GetLoopVarStack() ZendStack      { return this.loop_var_stack }
-func (this *ZendCompilerGlobals) SetLoopVarStack(value ZendStack) { this.loop_var_stack = value }
-func (this *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
-	return this.active_class_entry
+func (cg *ZendCompilerGlobals) GetLoopVarStack() ZendStack      { return cg.loop_var_stack }
+func (cg *ZendCompilerGlobals) SetLoopVarStack(value ZendStack) { cg.loop_var_stack = value }
+func (cg *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
+	return cg.active_class_entry
 }
-func (this *ZendCompilerGlobals) SetActiveClassEntry(value *types.ClassEntry) {
-	this.active_class_entry = value
+func (cg *ZendCompilerGlobals) SetActiveClassEntry(value *types.ClassEntry) {
+	cg.active_class_entry = value
 }
-func (this *ZendCompilerGlobals) GetCompiledFilename() string {
-	return this.compiled_filename
+func (cg *ZendCompilerGlobals) GetCompiledFilename() string {
+	return cg.compiled_filename
 }
-func (this *ZendCompilerGlobals) SetCompiledFilename(value string) {
-	this.compiled_filename = value
+func (cg *ZendCompilerGlobals) SetCompiledFilename(value string) {
+	cg.compiled_filename = value
 }
-func (this *ZendCompilerGlobals) GetZendLineno() int                   { return this.zend_lineno }
-func (this *ZendCompilerGlobals) SetZendLineno(value int)              { this.zend_lineno = value }
-func (this *ZendCompilerGlobals) GetActiveOpArray() *types.ZendOpArray { return this.active_op_array }
-func (this *ZendCompilerGlobals) SetActiveOpArray(value *types.ZendOpArray) {
-	this.active_op_array = value
+func (cg *ZendCompilerGlobals) GetZendLineno() int                   { return cg.zend_lineno }
+func (cg *ZendCompilerGlobals) SetZendLineno(value int)              { cg.zend_lineno = value }
+func (cg *ZendCompilerGlobals) GetActiveOpArray() *types.ZendOpArray { return cg.active_op_array }
+func (cg *ZendCompilerGlobals) SetActiveOpArray(value *types.ZendOpArray) {
+	cg.active_op_array = value
 }
-func (this *ZendCompilerGlobals) GetAutoGlobals() *types.Array      { return this.auto_globals }
-func (this *ZendCompilerGlobals) SetAutoGlobals(value *types.Array) { this.auto_globals = value }
-func (this *ZendCompilerGlobals) GetParseError() bool               { return this.parse_error }
-func (this *ZendCompilerGlobals) SetParseError(value bool)          { this.parse_error = value }
-func (this *ZendCompilerGlobals) GetInCompilation() bool            { return this.in_compilation }
-func (this *ZendCompilerGlobals) SetInCompilation(value bool)       { this.in_compilation = value }
-func (this *ZendCompilerGlobals) GetShortTags() bool                { return this.short_tags }
-func (this *ZendCompilerGlobals) SetShortTags(value bool)           { this.short_tags = value }
-func (this *ZendCompilerGlobals) GetUncleanShutdown() bool          { return this.unclean_shutdown }
-func (this *ZendCompilerGlobals) SetUncleanShutdown(value bool) {
-	this.unclean_shutdown = value
+func (cg *ZendCompilerGlobals) GetParseError() bool         { return cg.parse_error }
+func (cg *ZendCompilerGlobals) SetParseError(value bool)    { cg.parse_error = value }
+func (cg *ZendCompilerGlobals) GetInCompilation() bool      { return cg.in_compilation }
+func (cg *ZendCompilerGlobals) SetInCompilation(value bool) { cg.in_compilation = value }
+func (cg *ZendCompilerGlobals) GetShortTags() bool          { return cg.short_tags }
+func (cg *ZendCompilerGlobals) SetShortTags(value bool)     { cg.short_tags = value }
+func (cg *ZendCompilerGlobals) GetUncleanShutdown() bool    { return cg.unclean_shutdown }
+func (cg *ZendCompilerGlobals) SetUncleanShutdown(value bool) {
+	cg.unclean_shutdown = value
 }
-func (this *ZendCompilerGlobals) GetIniParserUnbufferedErrors() bool {
-	return this.ini_parser_unbuffered_errors
+func (cg *ZendCompilerGlobals) GetIniParserUnbufferedErrors() bool {
+	return cg.ini_parser_unbuffered_errors
 }
-func (this *ZendCompilerGlobals) SetIniParserUnbufferedErrors(value bool) {
-	this.ini_parser_unbuffered_errors = value
+func (cg *ZendCompilerGlobals) SetIniParserUnbufferedErrors(value bool) {
+	cg.ini_parser_unbuffered_errors = value
 }
-func (this *ZendCompilerGlobals) GetOpenFiles() ZendLlist      { return this.open_files }
-func (this *ZendCompilerGlobals) SetOpenFiles(value ZendLlist) { this.open_files = value }
-func (this *ZendCompilerGlobals) GetIniParserParam() *ZendIniParserParam {
-	return this.ini_parser_param
+func (cg *ZendCompilerGlobals) GetOpenFiles() ZendLlist      { return cg.open_files }
+func (cg *ZendCompilerGlobals) SetOpenFiles(value ZendLlist) { cg.open_files = value }
+func (cg *ZendCompilerGlobals) GetIniParserParam() *ZendIniParserParam {
+	return cg.ini_parser_param
 }
-func (this *ZendCompilerGlobals) SetIniParserParam(value *ZendIniParserParam) {
-	this.ini_parser_param = value
+func (cg *ZendCompilerGlobals) SetIniParserParam(value *ZendIniParserParam) {
+	cg.ini_parser_param = value
 }
-func (this *ZendCompilerGlobals) GetSkipShebang() bool      { return this.skip_shebang }
-func (this *ZendCompilerGlobals) SetSkipShebang(value bool) { this.skip_shebang = value }
-func (this *ZendCompilerGlobals) GetIncrementLineno() bool  { return this.increment_lineno }
-func (this *ZendCompilerGlobals) SetIncrementLineno(value bool) {
-	this.increment_lineno = value
+func (cg *ZendCompilerGlobals) GetSkipShebang() bool      { return cg.skip_shebang }
+func (cg *ZendCompilerGlobals) SetSkipShebang(value bool) { cg.skip_shebang = value }
+func (cg *ZendCompilerGlobals) GetIncrementLineno() bool  { return cg.increment_lineno }
+func (cg *ZendCompilerGlobals) SetIncrementLineno(value bool) {
+	cg.increment_lineno = value
 }
-func (this *ZendCompilerGlobals) GetDocComment() *types.String         { return this.doc_comment }
-func (this *ZendCompilerGlobals) SetDocComment(value *types.String)    { this.doc_comment = value }
-func (this *ZendCompilerGlobals) GetExtraFnFlags() uint32              { return this.extra_fn_flags }
-func (this *ZendCompilerGlobals) SetExtraFnFlags(value uint32)         { this.extra_fn_flags = value }
-func (this *ZendCompilerGlobals) GetContext() *ZendOparrayContext      { return &this.context }
-func (this *ZendCompilerGlobals) SetContext(value ZendOparrayContext)  { this.context = value }
-func (this *ZendCompilerGlobals) GetFileContext() *ZendFileContext     { return &this.file_context }
-func (this *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { this.file_context = value }
-func (this *ZendCompilerGlobals) GetAst() *ZendAst                     { return this.ast }
-func (this *ZendCompilerGlobals) SetAst(value *ZendAst)                { this.ast = value }
-func (this *ZendCompilerGlobals) GetDelayedOplinesStack() ZendStack {
-	return this.delayed_oplines_stack
+func (cg *ZendCompilerGlobals) GetDocComment() *types.String         { return cg.doc_comment }
+func (cg *ZendCompilerGlobals) SetDocComment(value *types.String)    { cg.doc_comment = value }
+func (cg *ZendCompilerGlobals) GetExtraFnFlags() uint32              { return cg.extra_fn_flags }
+func (cg *ZendCompilerGlobals) SetExtraFnFlags(value uint32)         { cg.extra_fn_flags = value }
+func (cg *ZendCompilerGlobals) GetContext() *ZendOparrayContext      { return &cg.context }
+func (cg *ZendCompilerGlobals) SetContext(value ZendOparrayContext)  { cg.context = value }
+func (cg *ZendCompilerGlobals) GetFileContext() *ZendFileContext     { return &cg.file_context }
+func (cg *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { cg.file_context = value }
+func (cg *ZendCompilerGlobals) GetAst() *ZendAst                     { return cg.ast }
+func (cg *ZendCompilerGlobals) SetAst(value *ZendAst)                { cg.ast = value }
+func (cg *ZendCompilerGlobals) GetDelayedOplinesStack() ZendStack {
+	return cg.delayed_oplines_stack
 }
-func (this *ZendCompilerGlobals) SetDelayedOplinesStack(value ZendStack) {
-	this.delayed_oplines_stack = value
+func (cg *ZendCompilerGlobals) SetDelayedOplinesStack(value ZendStack) {
+	cg.delayed_oplines_stack = value
 }
-func (this *ZendCompilerGlobals) GetMemoizedExprs() *types.Array { return this.memoized_exprs }
-func (this *ZendCompilerGlobals) SetMemoizedExprs(value *types.Array) {
-	this.memoized_exprs = value
+func (cg *ZendCompilerGlobals) GetMemoizedExprs() *types.Array { return cg.memoized_exprs }
+func (cg *ZendCompilerGlobals) SetMemoizedExprs(value *types.Array) {
+	cg.memoized_exprs = value
 }
-func (this *ZendCompilerGlobals) GetMemoizeMode() int      { return this.memoize_mode }
-func (this *ZendCompilerGlobals) SetMemoizeMode(value int) { this.memoize_mode = value }
+func (cg *ZendCompilerGlobals) GetMemoizeMode() int      { return cg.memoize_mode }
+func (cg *ZendCompilerGlobals) SetMemoizeMode(value int) { cg.memoize_mode = value }
 
-func (this *ZendCompilerGlobals) GetMapPtrBase() any      { return this.map_ptr_base }
-func (this *ZendCompilerGlobals) SetMapPtrBase(value any) { this.map_ptr_base = value }
-func (this *ZendCompilerGlobals) GetMapPtrSize() int      { return this.map_ptr_size }
-func (this *ZendCompilerGlobals) SetMapPtrSize(value int) { this.map_ptr_size = value }
-func (this *ZendCompilerGlobals) GetMapPtrLast() int      { return this.map_ptr_last }
-func (this *ZendCompilerGlobals) SetMapPtrLast(value int) { this.map_ptr_last = value }
+func (cg *ZendCompilerGlobals) GetMapPtrBase() any      { return cg.map_ptr_base }
+func (cg *ZendCompilerGlobals) SetMapPtrBase(value any) { cg.map_ptr_base = value }
+func (cg *ZendCompilerGlobals) GetMapPtrSize() int      { return cg.map_ptr_size }
+func (cg *ZendCompilerGlobals) SetMapPtrSize(value int) { cg.map_ptr_size = value }
+func (cg *ZendCompilerGlobals) GetMapPtrLast() int      { return cg.map_ptr_last }
+func (cg *ZendCompilerGlobals) SetMapPtrLast(value int) { cg.map_ptr_last = value }
 
-func (this *ZendCompilerGlobals) GetDelayedVarianceObligations() *types.Array {
-	return this.delayed_variance_obligations
+func (cg *ZendCompilerGlobals) GetDelayedVarianceObligations() *types.Array {
+	return cg.delayed_variance_obligations
 }
-func (this *ZendCompilerGlobals) SetDelayedVarianceObligations(value *types.Array) {
-	this.delayed_variance_obligations = value
+func (cg *ZendCompilerGlobals) SetDelayedVarianceObligations(value *types.Array) {
+	cg.delayed_variance_obligations = value
 }
-func (this *ZendCompilerGlobals) GetDelayedAutoloads() *types.Array {
-	return this.delayed_autoloads
+func (cg *ZendCompilerGlobals) GetDelayedAutoloads() *types.Array {
+	return cg.delayed_autoloads
 }
-func (this *ZendCompilerGlobals) SetDelayedAutoloads(value *types.Array) {
-	this.delayed_autoloads = value
+func (cg *ZendCompilerGlobals) SetDelayedAutoloads(value *types.Array) {
+	cg.delayed_autoloads = value
 }
-func (this *ZendCompilerGlobals) GetRtdKeyCounter() uint32      { return this.rtd_key_counter }
-func (this *ZendCompilerGlobals) SetRtdKeyCounter(value uint32) { this.rtd_key_counter = value }
+func (cg *ZendCompilerGlobals) GetRtdKeyCounter() uint32      { return cg.rtd_key_counter }
+func (cg *ZendCompilerGlobals) SetRtdKeyCounter(value uint32) { cg.rtd_key_counter = value }
 
 /* ZendCompilerGlobals.extra_fn_flags */
-func (this *ZendCompilerGlobals) AddExtraFnFlags(value uint32) { this.extra_fn_flags |= value }
-func (this *ZendCompilerGlobals) SubExtraFnFlags(value uint32) { this.extra_fn_flags &^= value }
-func (this *ZendCompilerGlobals) HasExtraFnFlags(value uint32) bool {
-	return this.extra_fn_flags&value != 0
+func (cg *ZendCompilerGlobals) AddExtraFnFlags(value uint32) { cg.extra_fn_flags |= value }
+func (cg *ZendCompilerGlobals) SubExtraFnFlags(value uint32) { cg.extra_fn_flags &^= value }
+func (cg *ZendCompilerGlobals) HasExtraFnFlags(value uint32) bool {
+	return cg.extra_fn_flags&value != 0
 }
-func (this *ZendCompilerGlobals) SwitchExtraFnFlags(value uint32, cond bool) {
+func (cg *ZendCompilerGlobals) SwitchExtraFnFlags(value uint32, cond bool) {
 	if cond {
-		this.AddExtraFnFlags(value)
+		cg.AddExtraFnFlags(value)
 	} else {
-		this.SubExtraFnFlags(value)
+		cg.SubExtraFnFlags(value)
 	}
 }
 

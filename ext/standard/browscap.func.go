@@ -345,7 +345,7 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 	}
 	if agent_name == nil {
 		var http_user_agent *types.Zval = nil
-		if core.PG__().http_globals[core.TRACK_VARS_SERVER].IsArray() || zend.ZendIsAutoGlobalStr("_SERVER") != 0 {
+		if core.PG__().http_globals[core.TRACK_VARS_SERVER].IsArray() || zend.ZendIsAutoGlobal("_SERVER") {
 			http_user_agent = core.PG__().http_globals[core.TRACK_VARS_SERVER].Array().KeyFind("HTTP_USER_AGENT")
 		}
 		if http_user_agent == nil {

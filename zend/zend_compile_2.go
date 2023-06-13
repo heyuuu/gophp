@@ -410,24 +410,20 @@ func (compiler *Compiler) CompileClassRef(result *Znode, name_ast *ZendAst, fetc
 	}
 }
 func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
-	var name_ast *ZendAst = ast.Child(0)
-	if name_ast.Kind() == ZEND_AST_ZVAL {
-		var zv *types.Zval = name_ast.Val()
-		var name *types.String
+	var nameAst *ZendAst = ast.Child(0)
+	if nameAst.Kind() == ZEND_AST_ZVAL {
+		var zv *types.Zval = nameAst.Val()
+		var name string
 		if zv.IsString() {
-			//name = ZvalMakeInternedString(zv)
-			name = zv.String()
+			name = zv.StringVal()
 		} else {
-			name = operators.ZvalGetString(zv)
+			name = operators.ZvalGetStrVal(zv)
 		}
-		if ZendIsAutoGlobal(name) != 0 {
+		if ZendIsAutoGlobal(name) {
 			return types.FAILURE
 		}
 		result.SetOpType(IS_CV)
 		result.GetOp().SetVar(LookupCv(name))
-		if !zv.IsString() {
-			// types.ZendStringReleaseEx(name, 0)
-		}
 		return types.SUCCESS
 	}
 	return types.FAILURE
@@ -445,7 +441,7 @@ func (compiler *Compiler) CompileSimpleVarNoCv(result *Znode, ast *ZendAst, type
 	} else {
 		opline = ZendEmitOp(result, ZEND_FETCH_R, &name_node, nil)
 	}
-	if name_node.GetOpType() == IS_CONST && ZendIsAutoGlobal(name_node.GetConstant().String()) != 0 {
+	if name_node.GetOpType() == IS_CONST && ZendIsAutoGlobal(name_node.GetConstant().StringVal()) {
 		opline.SetExtendedValue(ZEND_FETCH_GLOBAL)
 	} else {
 		opline.SetExtendedValue(ZEND_FETCH_LOCAL)
@@ -460,17 +456,17 @@ func IsThisFetch(ast *ZendAst) bool {
 	}
 	return false
 }
-func (compiler *Compiler) CompileSimpleVar(result *Znode, ast *ZendAst, type_ uint32, delayed int) *types.ZendOp {
+func (compiler *Compiler) CompileSimpleVar(result *Znode, ast *ZendAst, typ uint32, delayed int) *types.ZendOp {
 	if IsThisFetch(ast) {
 		var opline *types.ZendOp = ZendEmitOp(result, ZEND_FETCH_THIS, nil, nil)
-		if type_ == BP_VAR_R || type_ == BP_VAR_IS {
+		if typ == BP_VAR_R || typ == BP_VAR_IS {
 			opline.SetResultType(IS_TMP_VAR)
 			result.SetOpType(IS_TMP_VAR)
 		}
 		CG__().GetActiveOpArray().SetIsUsesThis(true)
 		return opline
 	} else if ZendTryCompileCv(result, ast) == types.FAILURE {
-		return compiler.CompileSimpleVarNoCv(result, ast, type_, delayed)
+		return compiler.CompileSimpleVarNoCv(result, ast, typ, delayed)
 	}
 	return nil
 }

@@ -247,19 +247,13 @@ func (compiler *Compiler) CompileExpr(result *Znode, ast *ZendAst) {
 	case ZEND_AST_ZNODE:
 		*result = ast.Node()
 		return
-	case ZEND_AST_VAR:
-		fallthrough
-	case ZEND_AST_DIM:
-		fallthrough
-	case ZEND_AST_PROP:
-		fallthrough
-	case ZEND_AST_STATIC_PROP:
-		fallthrough
-	case ZEND_AST_CALL:
-		fallthrough
-	case ZEND_AST_METHOD_CALL:
-		fallthrough
-	case ZEND_AST_STATIC_CALL:
+	case ZEND_AST_VAR,
+		ZEND_AST_DIM,
+		ZEND_AST_PROP,
+		ZEND_AST_STATIC_PROP,
+		ZEND_AST_CALL,
+		ZEND_AST_METHOD_CALL,
+		ZEND_AST_STATIC_CALL:
 		compiler.CompileVar(result, ast, BP_VAR_R, 0)
 		return
 	case ZEND_AST_ASSIGN:
@@ -376,31 +370,31 @@ func (compiler *Compiler) CompileExpr(result *Znode, ast *ZendAst) {
 		b.Assert(false)
 	}
 }
-func (compiler *Compiler) CompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
+func (compiler *Compiler) CompileVar(result *Znode, ast *ZendAst, typ uint32, byRef int) *types.ZendOp {
 	compiler.setLinenoByAst(ast)
 	switch ast.Kind() {
 	case ZEND_AST_VAR:
-		return compiler.CompileSimpleVar(result, ast, type_, 0)
+		return compiler.CompileSimpleVar(result, ast, typ, 0)
 	case ZEND_AST_DIM:
-		return compiler.CompileDim(result, ast, type_)
+		return compiler.CompileDim(result, ast, typ)
 	case ZEND_AST_PROP:
-		return compiler.CompileProp(result, ast, type_, by_ref)
+		return compiler.CompileProp(result, ast, typ, byRef)
 	case ZEND_AST_STATIC_PROP:
-		return compiler.CompileStaticProp(result, ast, type_, by_ref, 0)
+		return compiler.CompileStaticProp(result, ast, typ, byRef, 0)
 	case ZEND_AST_CALL:
-		compiler.CompileCall(result, ast, type_)
+		compiler.CompileCall(result, ast, typ)
 		return nil
 	case ZEND_AST_METHOD_CALL:
-		compiler.CompileMethodCall(result, ast, type_)
+		compiler.CompileMethodCall(result, ast, typ)
 		return nil
 	case ZEND_AST_STATIC_CALL:
-		compiler.CompileStaticCall(result, ast, type_)
+		compiler.CompileStaticCall(result, ast, typ)
 		return nil
 	case ZEND_AST_ZNODE:
 		*result = ast.Node()
 		return nil
 	default:
-		if type_ == BP_VAR_W || type_ == BP_VAR_RW || type_ == BP_VAR_UNSET {
+		if typ == BP_VAR_W || typ == BP_VAR_RW || typ == BP_VAR_UNSET {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use temporary expression in write context")
 		}
 		compiler.CompileExpr(result, ast)

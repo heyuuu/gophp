@@ -448,49 +448,26 @@ func ZendDoExtendedFcallEnd() {
 	opline = GetNextOp()
 	opline.SetOpcode(ZEND_EXT_FCALL_END)
 }
-func ZendIsAutoGlobalStr(name string) bool {
-	var autoGlobal = types.ZendHashStrFindPtr(CG__().GetAutoGlobals(), name).(*ZendAutoGlobal)
+func ZendIsAutoGlobal(name string) bool {
+	var autoGlobal = CG__().FindAutoGlobal(name)
 	if autoGlobal != nil {
-		if autoGlobal.GetArmed() != 0 {
-			autoGlobal.SetArmed(autoGlobal.GetAutoGlobalCallback()(autoGlobal.GetName()))
-		}
-		return 1
+		autoGlobal.UpdateArmed()
+		return true
 	}
-	return 0
+	return false
 }
-func ZendIsAutoGlobal(name *types.String) bool {
-	var autoGlobal = types.ZendHashFindPtr(CG__().GetAutoGlobals(), name.GetStr()).(*ZendAutoGlobal)
-	if autoGlobal != nil {
-		if autoGlobal.GetArmed() != 0 {
-			autoGlobal.SetArmed(autoGlobal.GetAutoGlobalCallback()(autoGlobal.GetName()))
-		}
-		return 1
-	}
-	return 0
-}
-func ZendRegisterAutoGlobal(name *types.String, jit bool, auto_global_callback ZendAutoGlobalCallback) int {
-	var auto_global ZendAutoGlobal
-	var retval int
-	auto_global.SetName(name)
-	auto_global.SetAutoGlobalCallback(auto_global_callback)
-	auto_global.SetJit(jit)
-	if types.ZendHashAddMem(CG__().GetAutoGlobals(), auto_global.GetName().GetStr(), &auto_global, b.SizeOf("zend_auto_global")) != nil {
-		retval = types.SUCCESS
+func ZendRegisterAutoGlobal(name *types.String, jit bool, autoGlobalCallback ZendAutoGlobalCallback) int {
+	var autoGlobal = MakeAutoGlobal(name.GetStr(), autoGlobalCallback, jit)
+	ret := CG__().AddAutoGlobal(autoGlobal)
+	if ret {
+		return types.SUCCESS
 	} else {
-		retval = types.FAILURE
+		return types.FAILURE
 	}
-	return retval
 }
 func ZendActivateAutoGlobals() {
-	CG__().GetAutoGlobals().Foreach(func(_ types.ArrayKey, value *types.Zval) {
-		var autoGlobal *ZendAutoGlobal = value.Ptr()
-		if autoGlobal.GetJit() != 0 {
-			autoGlobal.SetArmed(1)
-		} else if autoGlobal.GetAutoGlobalCallback() != nil {
-			autoGlobal.SetArmed(autoGlobal.GetAutoGlobalCallback()(autoGlobal.GetName()))
-		} else {
-			autoGlobal.SetArmed(0)
-		}
+	CG__().EachAutoGlobal(func(autoGlobal *ZendAutoGlobal) {
+		autoGlobal.Activate()
 	})
 }
 func Zendlex(elem *ZendParserStackElem) int {

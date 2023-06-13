@@ -447,7 +447,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				memset(argv[i], 0, strlen(argv[i]))
 			}
 		}
-		zend.ZendIsAutoGlobalStr("_SERVER")
+		zend.ZendIsAutoGlobal("_SERVER")
 		core.PG__().during_request_startup = 0
 		switch behavior {
 		case PHP_MODE_STANDARD:

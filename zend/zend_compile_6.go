@@ -26,7 +26,7 @@ func (compiler *Compiler) CompileClosureBinding(closure *Znode, op_array *types.
 		if var_name.GetStr() == "this" {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as lexical variable")
 		}
-		if ZendIsAutoGlobal(var_name) != 0 {
+		if ZendIsAutoGlobal(var_name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use auto-global as lexical variable")
 		}
 
@@ -50,7 +50,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 		var name_ast *ZendAst = ast.Child(0)
 		if name_ast.Kind() == ZEND_AST_ZVAL && name_ast.Val().IsString() {
 			var name *types.String = ZendAstGetStr(name_ast)
-			if ZendIsAutoGlobal(name) != 0 {
+			if ZendIsAutoGlobal(name.GetStr()) {
 				/* These is no need to explicitly import auto-globals. */
 				return
 			}

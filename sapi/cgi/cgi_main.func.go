@@ -251,7 +251,7 @@ func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any
 func CgiPhpImportEnvironmentVariables(array_ptr *types.Zval) {
 	if core.PG__().variables_order && (strchr(core.PG__().variables_order, 'E') || strchr(core.PG__().variables_order, 'e')) {
 		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() != types.IS_ARRAY {
-			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
+			zend.ZendIsAutoGlobal("_ENV")
 		}
 		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() == types.IS_ARRAY && array_ptr.Array() != core.PG__().http_globals[core.TRACK_VARS_ENV].Array() {
 			array_ptr.Array().Destroy()

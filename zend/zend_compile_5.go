@@ -516,11 +516,11 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 		var opcode uint8
 		var opline *types.ZendOp
 		var arg_info *ZendArgInfo
-		if ZendIsAutoGlobal(name) != 0 {
+		if ZendIsAutoGlobal(name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign auto-global variable %s", name.GetVal())
 		}
 		var_node.SetOpType(IS_CV)
-		var_node.GetOp().SetVar(LookupCv(name))
+		var_node.GetOp().SetVar(LookupCv(name.GetStr()))
 		if EX_VAR_TO_NUM(var_node.GetOp().GetVar()) != i {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Redefinition of parameter $%s", name.GetVal())
 		} else if name.GetStr() == "this" {

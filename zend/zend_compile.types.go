@@ -303,24 +303,38 @@ func (this *ZendInternalFunctionInfo) GetReturnReference() bool {
  * ZendAutoGlobal
  */
 type ZendAutoGlobal struct {
-	name                 *types.String
-	auto_global_callback ZendAutoGlobalCallback
-	jit                  bool
-	armed                bool
+	name     string
+	callback func(name string) bool
+	jit      bool
+	armed    bool
 }
 
-func (this *ZendAutoGlobal) GetName() *types.String      { return this.name }
-func (this *ZendAutoGlobal) SetName(value *types.String) { this.name = value }
-func (this *ZendAutoGlobal) GetAutoGlobalCallback() ZendAutoGlobalCallback {
-	return this.auto_global_callback
+func MakeAutoGlobal(name string, callback ZendAutoGlobalCallback, jit bool) ZendAutoGlobal {
+	return ZendAutoGlobal{
+		name: name,
+		callback: func(name string) bool {
+			return callback(types.NewString(name))
+		},
+		jit:   jit,
+		armed: false,
+	}
 }
-func (this *ZendAutoGlobal) SetAutoGlobalCallback(value ZendAutoGlobalCallback) {
-	this.auto_global_callback = value
+
+func (ag *ZendAutoGlobal) Name() string { return ag.name }
+func (ag *ZendAutoGlobal) Activate() {
+	if ag.jit {
+		ag.armed = true
+	} else if ag.callback != nil {
+		ag.armed = ag.callback(ag.name)
+	} else {
+		ag.armed = false
+	}
 }
-func (this *ZendAutoGlobal) GetJit() bool        { return this.jit }
-func (this *ZendAutoGlobal) SetJit(value bool)   { this.jit = value }
-func (this *ZendAutoGlobal) GetArmed() bool      { return this.armed }
-func (this *ZendAutoGlobal) SetArmed(value bool) { this.armed = value }
+func (ag *ZendAutoGlobal) UpdateArmed() {
+	if ag.armed {
+		ag.armed = ag.callback(ag.name)
+	}
+}
 
 /**
  * ZendLoopVar
