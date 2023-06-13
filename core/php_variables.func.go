@@ -308,8 +308,7 @@ func AddPostVars(arr *types.Zval, vars *PostVarDataT, eof bool) int {
 	}
 	return types.SUCCESS
 }
-func PhpStdPostHandler(content_type_dup *byte, arg any) {
-	var arr *types.Zval = (*types.Zval)(arg)
+func PhpStdPostHandler(contentTypeDup string, arr *types.Zval) {
 	var s *PhpStream = SG__().RequestInfo.requestBody
 	var post_data PostVarDataT
 	if s != nil && types.SUCCESS == PhpStreamRewind(s) {

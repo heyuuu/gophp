@@ -57,7 +57,7 @@ func SapiRunHeaderCallback(callback *types.Zval) {
 }
 func SapiHandlePost(arg any) {
 	if SG__().RequestInfo.postEntry != nil && SG__().RequestInfo.ContentTypeDup() != "" {
-		SG__().RequestInfo.postEntry.post_handler(SG__().RequestInfo.ContentTypeDup(), arg)
+		SG__().RequestInfo.postEntry.PostHandler(SG__().RequestInfo.ContentTypeDup(), arg)
 		zend.Efree(SG__().RequestInfo.contentTypeDup)
 		SG__().RequestInfo.SetContentTypeDup("")
 	}
@@ -97,7 +97,7 @@ func SapiReadPostData() {
 		/* found one, register it for use */
 
 		SG__().RequestInfo.postEntry = post_entry
-		post_reader_func = post_entry.GetPostReader()
+		post_reader_func = post_entry.PostReader
 	} else {
 
 		/* fallback */
@@ -660,7 +660,7 @@ func SapiRegisterPostEntry(postEntry *SapiPostEntry) int {
 	if SG__().sapiStarted == types.SUCCESS && zend.CurrEX() != nil {
 		return types.FAILURE
 	}
-	if types.ZendHashAddMem(&(SG__().knownPostContentTypes), postEntry.GetContentType(), any(postEntry), b.SizeOf("sapi_post_entry")) {
+	if types.ZendHashAddMem(&(SG__().knownPostContentTypes), postEntry.ContentType(), any(postEntry), b.SizeOf("sapi_post_entry")) {
 		ret = types.SUCCESS
 	} else {
 		ret = types.FAILURE

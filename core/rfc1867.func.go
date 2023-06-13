@@ -500,7 +500,7 @@ func MultipartBufferReadBody(self *MultipartBuffer, len_ *int) *byte {
 	*len_ = total_bytes
 	return out
 }
-func Rfc1867PostHandler(content_type_dup *byte, arg any) {
+func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 	var boundary *byte
 	var s *byte = nil
 	var boundary_end *byte = nil
@@ -546,14 +546,14 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 
 	/* Get the boundary */
 
-	boundary = strstr(content_type_dup, "boundary")
+	boundary = strstr(contentTypeDup, "boundary")
 	if boundary == nil {
-		var content_type_len int = int(strlen(content_type_dup))
-		var content_type_lcase *byte = zend.Estrndup(content_type_dup, content_type_len)
+		var content_type_len int = int(strlen(contentTypeDup))
+		var content_type_lcase *byte = zend.Estrndup(contentTypeDup, content_type_len)
 		str.PhpStrtolower(content_type_lcase, content_type_len)
 		boundary = strstr(content_type_lcase, "boundary")
 		if boundary != nil {
-			boundary = content_type_dup + (boundary - content_type_lcase)
+			boundary = contentTypeDup + (boundary - content_type_lcase)
 		}
 		zend.Efree(content_type_lcase)
 	}
