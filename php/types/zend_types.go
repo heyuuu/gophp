@@ -92,12 +92,9 @@ type ZendAstRef struct {
 func NewAstRef(ast *zend.ZendAst) *ZendAstRef {
 	b.Assert(ast != nil)
 
-	// init
-	var ref *ZendAstRef = &ZendAstRef{
-		ast: zend.AstTreeCopy(ast),
+	return &ZendAstRef{
+		ast: ast.TreeCopy(),
 	}
-
-	return ref
 }
 
 func (this ZendAstRef) GcAst() *zend.ZendAst {

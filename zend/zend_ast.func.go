@@ -30,7 +30,7 @@ func ZendAstCreateZnode(node *Znode) *ZendAst {
 	return NewAstZnode(lineno, node)
 }
 func ZendAstCreateZvalInt(zv *types.Zval, attr uint16, lineno uint32) *ZendAst {
-	return NewAstZval(ZEND_AST_ZVAL, attr, lineno, zv)
+	return NewAstZval(0, lineno, zv)
 }
 func ZendAstCreateZvalWithLineno(zv *types.Zval, lineno uint32) *ZendAst {
 	return ZendAstCreateZvalInt(zv, 0, lineno)
@@ -39,14 +39,12 @@ func ZendAstCreateZval(zv *types.Zval) *ZendAst {
 	return ZendAstCreateZvalInt(zv, 0, CG__().GetZendLineno())
 }
 func ZendAstCreateZvalFromStr(str *types.String) *ZendAst {
-	var zv types.Zval
-	zv.SetString(str)
-	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
+	return ZendAstCreateZvalInt(types.NewZvalString(str.GetStr()), 0, CG__().GetZendLineno())
 }
 func ZendAstCreateConstant(name *types.String, attr ZendAstAttr) *ZendAst {
 	zv := types.NewZvalString(name.GetStr())
 	lineno := uint32(CG__().GetZendLineno())
-	return NewAstZval(ZEND_AST_CONSTANT, attr, lineno, zv)
+	return NewAstConstant(attr, lineno, zv)
 }
 
 func AstCreateEx(kind ZendAstKind, attr ZendAstAttr, children ...*ZendAst) *ZendAst {
@@ -297,15 +295,8 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			// ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_ARRAY:
-		var i uint32
-		var list *ZendAstList = ast.AsAstList()
-		if list.GetChildren() == 0 {
-			result.SetEmptyArray()
-			break
-		}
 		ArrayInit(result)
-		for i = 0; i < list.GetChildren(); i++ {
-			var elem *ZendAst = list.Children()[i]
+		for _, elem := range ast.Children() {
 			if elem.Kind() == ZEND_AST_UNPACK {
 				if ZendAstEvaluate(&op1, elem.Children()[0], scope) != types.SUCCESS {
 					return types.FAILURE
@@ -315,23 +306,17 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 				}
 				continue
 			}
-			if elem.Children()[1] != nil {
+			if elem.Child(1) != nil {
 				if ZendAstEvaluate(&op1, elem.Children()[1], scope) != types.SUCCESS {
-					// ZvalPtrDtorNogc(result)
 					return types.FAILURE
 				}
 			} else {
 				op1.SetUndef()
 			}
 			if ZendAstEvaluate(&op2, elem.Children()[0], scope) != types.SUCCESS {
-				// ZvalPtrDtorNogc(&op1)
-				// ZvalPtrDtorNogc(result)
 				return types.FAILURE
 			}
 			if ZendAstAddArrayElement(result, &op1, &op2) != types.SUCCESS {
-				// ZvalPtrDtorNogc(&op1)
-				// ZvalPtrDtorNogc(&op2)
-				// ZvalPtrDtorNogc(result)
 				return types.FAILURE
 			}
 		}
@@ -353,34 +338,6 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 	return ret
 }
 
-func AstTreeCopy(ast *ZendAst) *ZendAst {
-	if ast.Kind() == ZEND_AST_ZVAL {
-		return NewAstZval(ZEND_AST_ZVAL, ast.Attr(), 0, ast.Val().Copy())
-	} else if ast.Kind() == ZEND_AST_CONSTANT {
-		constantName := ZendAstGetConstantName(ast).GetStr()
-		return NewAstZval(ZEND_AST_CONSTANT, ast.Attr(), 0, types.NewZvalString(constantName))
-	} else {
-		return CopyAst(ast, func(child *ZendAst) *ZendAst {
-			return AstTreeCopy(child)
-		})
-	}
-}
-
-func ZendAstApply(ast *ZendAst, fn ZendAstApplyFunc) {
-	if ast.IsList() {
-		var list *ZendAstList = ast.AsAstList()
-		var i uint32
-		for i = 0; i < list.GetChildren(); i++ {
-			fn(list.Children()[i])
-		}
-	} else {
-		var i uint32
-		var children uint32 = ast.GetChildren()
-		for i = 0; i < children; i++ {
-			fn(ast.Children()[i])
-		}
-	}
-}
 func ZendAstExportStr(str *SmartStr, s string) {
 	for _, c := range []byte(s) {
 		if c == '\'' || c == '\\' {
@@ -560,12 +517,8 @@ func ZendAstExportStmt(str *SmartStr, ast *ZendAst, indent int) {
 		return
 	}
 	if ast.Kind() == ZEND_AST_STMT_LIST || ast.Kind() == ZEND_AST_TRAIT_ADAPTATIONS {
-		var list *ZendAstList = (*ZendAstList)(ast)
-		var i uint32 = 0
-		for i < list.GetChildren() {
-			ast = list.Children()[i]
-			ZendAstExportStmt(str, ast, indent)
-			i++
+		for _, child := range ast.Children() {
+			ZendAstExportStmt(str, child, indent)
 		}
 	} else {
 		ZendAstExportIndent(str, indent)

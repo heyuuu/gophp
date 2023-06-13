@@ -107,7 +107,7 @@ func (compiler *Compiler) CompileConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_MAGIC_CONST:
 		compiler.CompileConstExprMagicConst(ast_ptr)
 	default:
-		ZendAstApply(ast, compiler.CompileConstExpr)
+		ast.ApplyPtr(compiler.CompileConstExpr)
 	}
 }
 func (compiler *Compiler) ConstExprToZval(result *types.Zval, ast *ZendAst) {
@@ -126,7 +126,6 @@ func (compiler *Compiler) ConstExprToZval(result *types.Zval, ast *ZendAst) {
 	/* Kill this branch of the original AST, as it was already destroyed.
 	 * It would be nice to find a better solution to this problem in the
 	 * future. */
-
 	orig_ast.SetKind(0)
 }
 func (compiler *Compiler) CompileTopStmt(ast *ZendAst) {

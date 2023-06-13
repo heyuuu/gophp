@@ -33,10 +33,13 @@ func NewAstList(kind ZendAstKind, attr ZendAstAttr, lineno uint32, children []*Z
 	b.Assert(kind>>ZEND_AST_IS_LIST_SHIFT&1 != 0)
 	return iNewAst(kind, attr, lineno, children, nil)
 }
-func NewAstZval(kind ZendAstKind, attr ZendAstAttr, lineno uint32, zv *types.Zval) *ZendAst {
-	b.Assert(kind == ZEND_AST_ZVAL || kind == ZEND_AST_CONSTANT)
-	return iNewAst(kind, attr, lineno, nil, zv.CopyValue())
+func NewAstZval(attr ZendAstAttr, lineno uint32, zv *types.Zval) *ZendAst {
+	return iNewAst(ZEND_AST_ZVAL, attr, lineno, nil, zv.CopyValue())
 }
+func NewAstConstant(attr ZendAstAttr, lineno uint32, zv *types.Zval) *ZendAst {
+	return iNewAst(ZEND_AST_CONSTANT, attr, lineno, nil, zv.CopyValue())
+}
+
 func NewAstZnode(lineno uint32, node *Znode) *ZendAst {
 	return iNewAst(ZEND_AST_ZNODE, 0, lineno, nil, *node)
 }
@@ -54,10 +57,36 @@ func (ast *ZendAst) AsAstList() *ZendAstList {
 	return ast
 }
 
+// tree copy
+func (ast *ZendAst) TreeCopy() *ZendAst {
+	var children []*ZendAst
+	var extra any
+
+	// children、extra 有且仅有一个不为nil
+	if ast.children != nil {
+		children = slices.Map(ast.children, func(child *ZendAst) *ZendAst {
+			return child.TreeCopy()
+		})
+	} else if zv, ok := ast.extra.(*types.Zval); ok {
+		extra = zv.Copy()
+	} else {
+		extra = ast.extra
+	}
+
+	return iNewAst(ast.kind, ast.attr, 0, children, extra)
+}
+
 // methods for List type
 func (ast *ZendAst) AddChild(child *ZendAst) {
 	b.Assert(ast.IsList())
 	ast.children = append(ast.children, child)
+}
+
+// methods for children
+func (ast *ZendAst) ApplyPtr(fn func(**ZendAst)) {
+	for i := range ast.children {
+		fn(&ast.children[i])
+	}
 }
 
 // fields
