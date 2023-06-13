@@ -27,7 +27,7 @@ func SAFE_FILENAME(f __auto__) string {
 	}
 }
 func GetSafeCharsetHint() string {
-	var hint = SG__().default_charset
+	var hint = SG__().defaultCharset
 	codeSet, _ := standard.CheckCodeSet(hint)
 	return codeSet
 }
@@ -876,7 +876,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	case faults.E_USER_ERROR:
 		zend.EG__().SetExitStatus(255)
 		if ModuleInitialized != 0 {
-			if !(PG__().display_errors) && !(SG__().headers_sent) && SG__().sapi_headers.http_response_code == 200 {
+			if !PG__().display_errors && !SG__().headersSent && SG__().sapiHeaders.httpResponseCode == 200 {
 				var ctr = MakeSapiHeaderLine(0)
 				ctr.SetLine("HTTP/1.0 500 Internal Server Error")
 				ctr.SetLineLen(b.SizeOf("\"HTTP/1.0 500 Internal Server Error\"") - 1)
@@ -922,8 +922,8 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 }
 func PhpGetCurrentUser() *byte {
 	var pstat *zend.ZendStatT
-	if SG__().RequestInfo.current_user {
-		return SG__().RequestInfo.current_user
+	if SG__().RequestInfo.currentUser {
+		return SG__().RequestInfo.currentUser
 	}
 
 	/* FIXME: I need to have this somehow handled if
@@ -938,9 +938,9 @@ func PhpGetCurrentUser() *byte {
 		if b.Assign(&pwd, getpwuid(pstat.st_uid)) == nil {
 			return ""
 		}
-		SG__().RequestInfo.current_user_length = strlen(pwd.pw_name)
-		SG__().RequestInfo.current_user = zend.Estrndup(pwd.pw_name, SG__().RequestInfo.current_user_length)
-		return SG__().RequestInfo.current_user
+		SG__().RequestInfo.currentUserLength = strlen(pwd.pw_name)
+		SG__().RequestInfo.currentUser = zend.Estrndup(pwd.pw_name, SG__().RequestInfo.currentUserLength)
+		return SG__().RequestInfo.currentUser
 	}
 }
 
@@ -1026,9 +1026,9 @@ func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 		datetime_str = PhpAsctimeR(ta, asctimebuf)
 		if datetime_str != nil {
 			datetime_str[strlen(datetime_str)-1] = 0
-			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[%s]  Script:  '%s'\n", datetime_str, SAFE_FILENAME(SG__().RequestInfo.path_translated))
+			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[%s]  Script:  '%s'\n", datetime_str, SAFE_FILENAME(SG__().RequestInfo.pathTranslated))
 		} else {
-			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[null]  Script:  '%s'\n", SAFE_FILENAME(SG__().RequestInfo.path_translated))
+			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[null]  Script:  '%s'\n", SAFE_FILENAME(SG__().RequestInfo.pathTranslated))
 		}
 		log.Printf("%s", memory_leak_buf)
 	}
@@ -1083,7 +1083,7 @@ func PhpRequestStartup() int {
 		PG__().modules_activated = 1
 	})
 
-	SG__().sapi_started = 1
+	SG__().sapiStarted = 1
 	return types.IntBool(retVal)
 }
 func PhpRequestShutdown() {
@@ -1111,7 +1111,7 @@ func PhpRequestShutdown() {
 
 	/* 3. Flush all output buffers */
 	faults.Try(func() {
-		var send_buffer = b.Cond(SG__().RequestInfo.headers_only, 0, 1)
+		var send_buffer = b.Cond(SG__().RequestInfo.headersOnly, 0, 1)
 		if zend.CG__().GetUncleanShutdown() && PG__().last_error_type == faults.E_ERROR && PG__().memory_limit < zend.ZendMemoryUsage(1) {
 			send_buffer = 0
 		}
@@ -1541,25 +1541,25 @@ func PhpHandleAuthData(auth *byte) int {
 			pass = strchr(user.GetVal(), ':')
 			if pass != nil {
 				b.PostInc(&(*pass)) = '0'
-				SG__().RequestInfo.auth_user = zend.Estrndup(user.GetVal(), user.GetLen())
-				SG__().RequestInfo.auth_password = zend.Estrdup(pass)
+				SG__().RequestInfo.authUser = zend.Estrndup(user.GetVal(), user.GetLen())
+				SG__().RequestInfo.authPassword = zend.Estrdup(pass)
 				ret = 0
 			}
 			//types.ZendStringFree(user)
 		}
 	}
 	if ret == -1 {
-		SG__().RequestInfo.auth_password = nil
-		SG__().RequestInfo.auth_user = SG__().RequestInfo.auth_password
+		SG__().RequestInfo.authPassword = nil
+		SG__().RequestInfo.authUser = SG__().RequestInfo.authPassword
 	} else {
-		SG__().RequestInfo.auth_digest = nil
+		SG__().RequestInfo.authDigest = nil
 	}
 	if ret == -1 && auth != nil && auth_len > 0 && operators.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Digest ", b.SizeOf("\"Digest \"")-1) == 0 {
-		SG__().RequestInfo.auth_digest = zend.Estrdup(auth + 7)
+		SG__().RequestInfo.authDigest = zend.Estrdup(auth + 7)
 		ret = 0
 	}
 	if ret == -1 {
-		SG__().RequestInfo.auth_digest = nil
+		SG__().RequestInfo.authDigest = nil
 	}
 	return ret
 }

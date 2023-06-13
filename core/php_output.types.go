@@ -178,46 +178,50 @@ const (
 	outputSent          = 0x8
 )
 
-// fields
-func (this *ZendOutputGlobals) Handlers() zend.ZendStack            { return this.handlers }
-func (this *ZendOutputGlobals) SetHandlers(handlers zend.ZendStack) { this.handlers = handlers }
-
-func (this *ZendOutputGlobals) Active() *PhpOutputHandler          { return this.active }
-func (this *ZendOutputGlobals) SetActive(active *PhpOutputHandler) { this.active = active }
-
-func (this *ZendOutputGlobals) Running() *PhpOutputHandler           { return this.running }
-func (this *ZendOutputGlobals) SetRunning(running *PhpOutputHandler) { this.running = running }
-
-func (this *ZendOutputGlobals) OutputStartFilename() string { return this.outputStartFilename }
-func (this *ZendOutputGlobals) SetOutputStartFilename(outputStartFilename string) {
-	this.outputStartFilename = outputStartFilename
+func (g *ZendOutputGlobals) Init() {
+	*g = ZendOutputGlobals{}
 }
 
-func (this *ZendOutputGlobals) OutputStartLineno() int { return this.outputStartLineno }
-func (this *ZendOutputGlobals) SetOutputStartLineno(outputStartLineno int) {
-	this.outputStartLineno = outputStartLineno
+// fields
+func (g *ZendOutputGlobals) Handlers() zend.ZendStack            { return g.handlers }
+func (g *ZendOutputGlobals) SetHandlers(handlers zend.ZendStack) { g.handlers = handlers }
+
+func (g *ZendOutputGlobals) Active() *PhpOutputHandler          { return g.active }
+func (g *ZendOutputGlobals) SetActive(active *PhpOutputHandler) { g.active = active }
+
+func (g *ZendOutputGlobals) Running() *PhpOutputHandler           { return g.running }
+func (g *ZendOutputGlobals) SetRunning(running *PhpOutputHandler) { g.running = running }
+
+func (g *ZendOutputGlobals) OutputStartFilename() string { return g.outputStartFilename }
+func (g *ZendOutputGlobals) SetOutputStartFilename(outputStartFilename string) {
+	g.outputStartFilename = outputStartFilename
+}
+
+func (g *ZendOutputGlobals) OutputStartLineno() int { return g.outputStartLineno }
+func (g *ZendOutputGlobals) SetOutputStartLineno(outputStartLineno int) {
+	g.outputStartLineno = outputStartLineno
 }
 
 // activated
-func (this *ZendOutputGlobals) IsActivated() bool   { return this.activated }
-func (this *ZendOutputGlobals) SetActivated(v bool) { this.activated = v }
+func (g *ZendOutputGlobals) IsActivated() bool   { return g.activated }
+func (g *ZendOutputGlobals) SetActivated(v bool) { g.activated = v }
 
 // flags
-func (this *ZendOutputGlobals) IsImplicitFlush() bool { return this.flags&outputImplicitFlush != 0 }
-func (this *ZendOutputGlobals) MarkImplicitFlush(v bool) {
+func (g *ZendOutputGlobals) IsImplicitFlush() bool { return g.flags&outputImplicitFlush != 0 }
+func (g *ZendOutputGlobals) MarkImplicitFlush(v bool) {
 	if v {
-		this.flags |= outputImplicitFlush
+		g.flags |= outputImplicitFlush
 	} else {
-		this.flags &^= outputImplicitFlush
+		g.flags &^= outputImplicitFlush
 	}
 }
 
-func (this *ZendOutputGlobals) IsDisabled() bool   { return this.flags&OutputDisabled != 0 }
-func (this *ZendOutputGlobals) MarkDisabled()      { this.flags |= OutputDisabled }
-func (this *ZendOutputGlobals) SetStatusDisabled() { this.flags = OutputDisabled }
+func (g *ZendOutputGlobals) IsDisabled() bool   { return g.flags&OutputDisabled != 0 }
+func (g *ZendOutputGlobals) MarkDisabled()      { g.flags |= OutputDisabled }
+func (g *ZendOutputGlobals) SetStatusDisabled() { g.flags = OutputDisabled }
 
-func (this *ZendOutputGlobals) IsWritten() bool { return this.flags&outputWritten != 0 }
-func (this *ZendOutputGlobals) MarkWritten()    { this.flags |= outputWritten }
+func (g *ZendOutputGlobals) IsWritten() bool { return g.flags&outputWritten != 0 }
+func (g *ZendOutputGlobals) MarkWritten()    { g.flags |= outputWritten }
 
-func (this *ZendOutputGlobals) IsSend() bool { return this.flags&outputSent != 0 }
-func (this *ZendOutputGlobals) MarkSent()    { this.flags |= outputSent }
+func (g *ZendOutputGlobals) IsSend() bool { return g.flags&outputSent != 0 }
+func (g *ZendOutputGlobals) MarkSent()    { g.flags |= outputSent }

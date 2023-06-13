@@ -5,8 +5,8 @@ import (
 )
 
 func PhpDefaultPostReader() {
-	if SG__().RequestInfo.request_method == "POST" {
-		if nil == SG__().RequestInfo.post_entry {
+	if SG__().RequestInfo.IsRequestMethod("POST") {
+		if nil == SG__().RequestInfo.postEntry {
 			/* no post handler registered, so we just swallow the data */
 			SapiReadStandardFormData()
 		}

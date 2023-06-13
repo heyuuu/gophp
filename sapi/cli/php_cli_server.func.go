@@ -739,9 +739,9 @@ func PhpCliServerClientPopulateRequestInfo(client *PhpCliServerClient, request_i
 	request_info.SetPathTranslated(client.GetRequest().GetPathTranslated())
 	request_info.SetQueryString(client.GetRequest().GetQueryString())
 	request_info.SetContentLength(client.GetRequest().GetContentLen())
-	request_info.SetAuthDigest(nil)
-	request_info.SetAuthPassword(request_info.GetAuthDigest())
-	request_info.SetAuthUser(request_info.GetAuthPassword())
+	request_info.SetAuthDigest("")
+	request_info.SetAuthPassword("")
+	request_info.SetAuthUser("")
 	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "content-type")) {
 		request_info.SetContentType(val)
 	}

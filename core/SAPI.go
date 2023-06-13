@@ -24,6 +24,7 @@ type ISapiModule interface {
 	RegisterServerVariables(trackVarsArray []types.Zval)
 	LogMessage(message string, syslogType int)
 	InputFilter(arg int, name string, value string) string
+	InputFilterInit()
 
 	// getter/setter
 	GetSendHeaders() func(sapi_headers *SapiHeaders) int
@@ -56,7 +57,6 @@ type ISapiModule interface {
 	SetIniEntries(value *byte)
 	GetAdditionalFunctions() *types.FunctionEntry
 	SetAdditionalFunctions(value *types.FunctionEntry)
-	GetInputFilterInit() func() uint
 	SetInputFilterInit(value func() uint)
 }
 

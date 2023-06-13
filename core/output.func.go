@@ -11,7 +11,6 @@ import (
 	"os"
 )
 
-func PhpOutputInitGlobals(G *ZendOutputGlobals) { memset(G, 0, b.SizeOf("* G")) }
 func PhpOutputStdout(str string) int {
 	os.Stdout.WriteString(str)
 	return len(str)
@@ -21,7 +20,7 @@ func PhpOutputStderr(str string) int {
 	return len(str)
 }
 func PhpOutputHeader() {
-	if !(SG__().headers_sent) {
+	if !SG__().headersSent {
 		if OG__().OutputStartFilename() == "" {
 			if zend.ZendIsCompiling() != 0 {
 				OG__().SetOutputStartFilename(zend.ZendGetCompiledFilename())
@@ -37,7 +36,7 @@ func PhpOutputHeader() {
 	}
 }
 func PhpOutputStartup() {
-	PhpOutputInitGlobals(&OutputGlobals)
+	OutputGlobals.Init()
 	PhpOutputDirect = PhpOutputStdout
 }
 func PhpOutputShutdown() {

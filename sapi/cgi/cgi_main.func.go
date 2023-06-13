@@ -455,7 +455,7 @@ func SapiCgiActivate() int {
 		var path string
 
 		/* Make sure we have trailing slash! */
-		pathTranslated := core.SG__().RequestInfo.GetPathTranslated()
+		pathTranslated := core.SG__().RequestInfo.PathTranslated()
 		if pathTranslated[len(pathTranslated)-1] != '/' {
 			path = zend.ZendDirname(pathTranslated) + "/"
 		} else {

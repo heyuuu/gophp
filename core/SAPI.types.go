@@ -2,6 +2,7 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
@@ -23,118 +24,172 @@ func (this *SapiHeader) SetHeaderLen(value int) { this.header_len = value }
  * SapiHeaders
  */
 type SapiHeaders struct {
-	headers                   zend.ZendLlist
-	http_response_code        int
-	send_default_content_type uint8
-	mimetype                  *byte
-	http_status_line          *byte
+	headers                zend.ZendLlist
+	httpResponseCode       int
+	sendDefaultContentType uint8
+	mimetype               *byte
+	httpStatusLine         *byte
 }
 
-func (this *SapiHeaders) GetHeaders() zend.ZendLlist { return this.headers }
+func (sh *SapiHeaders) Init() {
+	sh.headers.Init(b.SizeOf("sapi_header_struct"), (func(any))(SapiFreeHeader), 0)
+	sh.sendDefaultContentType = 1
+	//sh.httpResponseCode = 200
+	sh.httpStatusLine = nil
+	sh.mimetype = nil
+}
+
+func (sh *SapiHeaders) GetHeaders() zend.ZendLlist { return sh.headers }
 
 /**
  * SapiRequestInfo
  */
 type SapiRequestInfo struct {
-	request_method      *byte
-	query_string        *byte
-	cookie_data         *byte
-	content_length      zend.ZendLong
-	path_translated     *byte
-	request_uri         *byte
-	request_body        *PhpStream
-	content_type        *byte
-	headers_only        bool
-	no_headers          bool
-	headers_read        bool
-	post_entry          *SapiPostEntry
-	content_type_dup    *byte
-	auth_user           *byte
-	auth_password       *byte
-	auth_digest         *byte
-	argv0               *byte
-	current_user        *byte
-	current_user_length int
-	argc                int
-	argv                **byte
-	proto_num           int
+	requestMethod     string
+	queryString       string
+	cookieData        string
+	contentLength     int
+	pathTranslated    string
+	requestUri        string
+	requestBody       *PhpStream
+	contentType       string
+	headersOnly       bool
+	noHeaders         bool
+	headersRead       bool
+	postEntry         *SapiPostEntry
+	contentTypeDup    string
+	authUser          string
+	authPassword      string
+	authDigest        string
+	argv0             string
+	currentUser       string
+	currentUserLength int
+	protoNum          int
+	args              []string
 }
 
-func (this *SapiRequestInfo) GetPathTranslated() string {
-	return b.CastStrAuto(this.path_translated)
+func (info *SapiRequestInfo) InitEmpty() {
+	info.requestMethod = ""
+	info.authPassword = ""
+	info.authUser = ""
+	info.authDigest = ""
+	info.contentTypeDup = ""
 }
 
-func (this *SapiRequestInfo) SetRequestMethod(value *byte)         { this.request_method = value }
-func (this *SapiRequestInfo) SetQueryString(value *byte)           { this.query_string = value }
-func (this *SapiRequestInfo) SetContentLength(value zend.ZendLong) { this.content_length = value }
-func (this *SapiRequestInfo) SetPathTranslated(value *byte)        { this.path_translated = value }
-func (this *SapiRequestInfo) SetRequestUri(value *byte)            { this.request_uri = value }
-func (this *SapiRequestInfo) SetContentType(value *byte)           { this.content_type = value }
-func (this *SapiRequestInfo) SetAuthUser(value *byte)              { this.auth_user = value }
-func (this *SapiRequestInfo) GetAuthPassword() *byte               { return this.auth_password }
-func (this *SapiRequestInfo) SetAuthPassword(value *byte)          { this.auth_password = value }
-func (this *SapiRequestInfo) GetAuthDigest() *byte                 { return this.auth_digest }
-func (this *SapiRequestInfo) SetAuthDigest(value *byte)            { this.auth_digest = value }
-func (this *SapiRequestInfo) SetProtoNum(value int)                { this.proto_num = value }
+func (info *SapiRequestInfo) IsRequestMethod(method string) bool {
+	return ascii.StrCaseEquals(info.requestMethod, method)
+}
+
+func (info *SapiRequestInfo) RequestMethod() string  { return info.requestMethod }
+func (info *SapiRequestInfo) QueryString() string    { return info.queryString }
+func (info *SapiRequestInfo) CookieData() string     { return info.cookieData }
+func (info *SapiRequestInfo) ContentLength() int     { return info.contentLength }
+func (info *SapiRequestInfo) PathTranslated() string { return info.pathTranslated }
+func (info *SapiRequestInfo) RequestUri() string     { return info.requestUri }
+func (info *SapiRequestInfo) ContentType() string    { return info.contentType }
+func (info *SapiRequestInfo) ContentTypeDup() string { return info.contentTypeDup }
+func (info *SapiRequestInfo) AuthUser() string       { return info.authUser }
+func (info *SapiRequestInfo) AuthPassword() string   { return info.authPassword }
+func (info *SapiRequestInfo) AuthDigest() string     { return info.authDigest }
+func (info *SapiRequestInfo) Argv0() string          { return info.argv0 }
+func (info *SapiRequestInfo) CurrentUser() string    { return info.currentUser }
+func (info *SapiRequestInfo) Args() []string         { return info.args }
+func (info *SapiRequestInfo) Argc() int              { return len(info.args) }
+
+func (info *SapiRequestInfo) SetRequestMethod(value string)  { info.requestMethod = value }
+func (info *SapiRequestInfo) SetQueryString(value string)    { info.queryString = value }
+func (info *SapiRequestInfo) SetCookieData(value string)     { info.cookieData = value }
+func (info *SapiRequestInfo) SetContentLength(value int)     { info.contentLength = value }
+func (info *SapiRequestInfo) SetPathTranslated(value string) { info.pathTranslated = value }
+func (info *SapiRequestInfo) SetRequestUri(value string)     { info.requestUri = value }
+func (info *SapiRequestInfo) SetContentType(value string)    { info.contentType = value }
+func (info *SapiRequestInfo) SetContentTypeDup(value string) { info.contentType = value }
+func (info *SapiRequestInfo) SetAuthUser(value string)       { info.authUser = value }
+func (info *SapiRequestInfo) GetAuthPassword() string        { return info.authPassword }
+func (info *SapiRequestInfo) SetAuthPassword(value string)   { info.authPassword = value }
+func (info *SapiRequestInfo) SetAuthDigest(value string)     { info.authDigest = value }
+func (info *SapiRequestInfo) SetProtoNum(value int)          { info.protoNum = value }
+
+func (info *SapiRequestInfo) SetArgs(args []string) { info.args = args }
 
 /**
  * SapiGlobals
  */
 type SapiGlobals struct {
-	server_context           any
-	RequestInfo              SapiRequestInfo
-	sapi_headers             SapiHeaders
-	read_post_bytes          int64
-	post_read                uint8
-	headers_sent             uint8
-	global_stat              zend.ZendStatT
-	default_mimetype         *byte
-	default_charset          *byte
-	rfc1867_uploaded_files   map[string]bool
-	post_max_size            zend.ZendLong
-	options                  int
-	sapi_started             bool
-	global_request_time      float64
-	known_post_content_types types.Array
-	callback_func            types.Zval
-	fci_cache                types.ZendFcallInfoCache
+	serverContext         any
+	RequestInfo           SapiRequestInfo
+	sapiHeaders           SapiHeaders
+	readPostBytes         int64
+	postRead              uint8
+	headersSent           bool
+	globalStat            zend.ZendStatT
+	defaultMimetype       *byte
+	defaultCharset        *byte
+	rfc1867UploadedFiles  map[string]bool
+	postMaxSize           zend.ZendLong
+	options               int
+	sapiStarted           bool
+	globalRequestTime     float64
+	knownPostContentTypes types.Array
+	callbackFunc          types.Zval
+	fciCache              types.ZendFcallInfoCache
 }
 
-func (this *SapiGlobals) Init() {
-	this.known_post_content_types = *types.NewArray(8)
+func (sg *SapiGlobals) Activate() {
+	sg.sapiHeaders.Init()
+	sg.headersSent = false
+	sg.callbackFunc.SetUndef()
+	sg.readPostBytes = 0
+	sg.globalRequestTime = 0
+	sg.postRead = 0
+	sg.rfc1867UploadedFiles = nil
+
+	sg.RequestInfo.requestBody = nil
+	sg.RequestInfo.currentUser = nil
+	sg.RequestInfo.currentUserLength = 0
+	sg.RequestInfo.noHeaders = false
+	sg.RequestInfo.postEntry = nil
+	sg.RequestInfo.protoNum = 1000
+
+	/* It's possible to override this general case in the activate() callback, if necessary. */
+	sg.RequestInfo.headersOnly = ascii.StrCaseEquals(sg.RequestInfo.requestMethod, "HEAD")
+}
+
+func (sg *SapiGlobals) Init() {
+	sg.knownPostContentTypes = *types.NewArray(8)
 	PhpSetupSapiContentTypes()
 }
 
-func (this *SapiGlobals) Destroy() {
-	this.known_post_content_types.Destroy()
+func (sg *SapiGlobals) Destroy() {
+	sg.knownPostContentTypes.Destroy()
 }
 
-func (this *SapiGlobals) ResetUploadFiles() {
-	this.rfc1867_uploaded_files = nil
+func (sg *SapiGlobals) ResetUploadFiles() {
+	sg.rfc1867UploadedFiles = nil
 }
 
-func (this *SapiGlobals) AddUploadFile(path string) {
-	if this.rfc1867_uploaded_files == nil {
-		this.rfc1867_uploaded_files = make(map[string]bool)
+func (sg *SapiGlobals) AddUploadFile(path string) {
+	if sg.rfc1867UploadedFiles == nil {
+		sg.rfc1867UploadedFiles = make(map[string]bool)
 	}
-	this.rfc1867_uploaded_files[path] = true
+	sg.rfc1867UploadedFiles[path] = true
 }
-func (this *SapiGlobals) ExistUploadFile(path string) bool {
-	return this.rfc1867_uploaded_files[path]
+func (sg *SapiGlobals) ExistUploadFile(path string) bool {
+	return sg.rfc1867UploadedFiles[path]
 }
 
-func (this *SapiGlobals) DeleteUploadFile(path string) {
-	delete(this.rfc1867_uploaded_files, path)
+func (sg *SapiGlobals) DeleteUploadFile(path string) {
+	delete(sg.rfc1867UploadedFiles, path)
 }
 
 /**
  * generate
  */
-func (this *SapiGlobals) GetDefaultMimetype() *byte     { return this.default_mimetype }
-func (this *SapiGlobals) GetDefaultCharset() *byte      { return this.default_charset }
-func (this *SapiGlobals) GetPostMaxSize() zend.ZendLong { return this.post_max_size }
-func (this *SapiGlobals) GetKnownPostContentTypes() types.Array {
-	return this.known_post_content_types
+func (sg *SapiGlobals) GetDefaultMimetype() *byte     { return sg.defaultMimetype }
+func (sg *SapiGlobals) GetDefaultCharset() *byte      { return sg.defaultCharset }
+func (sg *SapiGlobals) GetPostMaxSize() zend.ZendLong { return sg.postMaxSize }
+func (sg *SapiGlobals) GetKnownPostContentTypes() types.Array {
+	return sg.knownPostContentTypes
 }
 
 /**

@@ -455,9 +455,6 @@ func main(argc int, argv []*byte) int {
 
 					/* file is on command line, but not in -f opt */
 
-					if core.SG__().RequestInfo.path_translated {
-						zend.Efree(core.SG__().RequestInfo.path_translated)
-					}
 					core.SG__().RequestInfo.path_translated = zend.Estrdup(argv[PhpOptind])
 
 					/* arguments after the file are considered script args */

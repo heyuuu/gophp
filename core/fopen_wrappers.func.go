@@ -299,7 +299,7 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 	var resolved_path *string = nil
 	var length int
 	var orig_display_errors bool
-	path_info = SG__().RequestInfo.request_uri
+	path_info = SG__().RequestInfo.requestUri
 	if PG__().user_dir && *PG__().user_dir && path_info != nil && '/' == path_info[0] && '~' == path_info[1] {
 		var s *byte = strchr(path_info+2, '/')
 		if s != nil {
@@ -315,7 +315,7 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 			if pw != nil && pw.pw_dir {
 				Spprintf(&filename, 0, "%s%c%s%c%s", pw.pw_dir, PHP_DIR_SEPARATOR, PG__().user_dir, PHP_DIR_SEPARATOR, s+1)
 			} else {
-				filename = SG__().RequestInfo.path_translated
+				filename = SG__().RequestInfo.pathTranslated
 			}
 		}
 	} else if PG__().doc_root && path_info != nil && b.Assign(&length, strlen(PG__().doc_root)) && zend.IS_ABSOLUTE_PATH(PG__().doc_root, length) {
@@ -330,13 +330,13 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 		}
 		strncpy(filename+length, path_info, path_len+1)
 	} else {
-		filename = SG__().RequestInfo.path_translated
+		filename = SG__().RequestInfo.pathTranslated
 	}
 	if filename != nil {
 		resolved_path = PhpResolvePathForZend(filename)
 	}
 	if resolved_path == nil {
-		if SG__().RequestInfo.path_translated != filename {
+		if SG__().RequestInfo.pathTranslated != filename {
 			if filename != nil {
 				zend.Efree(filename)
 			}
@@ -347,9 +347,9 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 		 * freed when the include_names hash is emptied, but
 		 * we're not adding it in this case */
 
-		if SG__().RequestInfo.path_translated {
-			zend.Efree(SG__().RequestInfo.path_translated)
-			SG__().RequestInfo.path_translated = nil
+		if SG__().RequestInfo.pathTranslated {
+			zend.Efree(SG__().RequestInfo.pathTranslated)
+			SG__().RequestInfo.pathTranslated = nil
 		}
 		return types.FAILURE
 	}
@@ -358,23 +358,23 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 	fileHandle := zend.NewFileHandleByOpenStream(filename)
 	if fileHandle == nil {
 		PG__().display_errors = orig_display_errors
-		if SG__().RequestInfo.path_translated != filename {
+		if SG__().RequestInfo.pathTranslated != filename {
 			if filename != nil {
 				zend.Efree(filename)
 			}
 		}
-		if SG__().RequestInfo.path_translated {
-			zend.Efree(SG__().RequestInfo.path_translated)
-			SG__().RequestInfo.path_translated = nil
+		if SG__().RequestInfo.pathTranslated {
+			zend.Efree(SG__().RequestInfo.pathTranslated)
+			SG__().RequestInfo.pathTranslated = nil
 		}
 		return nil
 	}
 	PG__().display_errors = orig_display_errors
-	if SG__().RequestInfo.path_translated != filename {
-		if SG__().RequestInfo.path_translated {
-			zend.Efree(SG__().RequestInfo.path_translated)
+	if SG__().RequestInfo.pathTranslated != filename {
+		if SG__().RequestInfo.pathTranslated {
+			zend.Efree(SG__().RequestInfo.pathTranslated)
 		}
-		SG__().RequestInfo.path_translated = filename
+		SG__().RequestInfo.pathTranslated = filename
 	}
 	return fileHandle
 }
@@ -640,7 +640,7 @@ func ExpandFilepathWithMode(filepath *byte, real_path *byte, relative_to *byte, 
 	if zend.IS_ABSOLUTE_PATH(filepath, path_len) {
 		cwd[0] = '0'
 	} else {
-		var iam *byte = SG__().RequestInfo.path_translated
+		var iam *byte = SG__().RequestInfo.pathTranslated
 		var result *byte
 		if relative_to != nil {
 			if relative_to_len > MAXPATHLEN-1 {

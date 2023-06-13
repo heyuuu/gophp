@@ -421,16 +421,16 @@ func DoCli(argc int, argv **byte, args []string) int {
 
 		/* before registering argv to module exchange the *new* argv[0] */
 
-		core.SG__().RequestInfo.argc = argc - php_optind + 1
 		arg_excp = argv + php_optind - 1
 		arg_free = argv[php_optind-1]
 		if translated_path != nil {
-			core.SG__().RequestInfo.path_translated = translated_path
+			core.SG__().RequestInfo.SetPathTranslated(b.CastStrAuto(translated_path))
 		} else {
-			core.SG__().RequestInfo.path_translated = (*byte)(file_handle.GetFilename())
+			core.SG__().RequestInfo.SetPathTranslated(file_handle.GetFilename())
 		}
 		argv[php_optind-1] = (*byte)(file_handle.GetFilename())
-		core.SG__().RequestInfo.argv = argv + php_optind - 1
+
+		core.SG__().RequestInfo.SetArgv(argv[php_optind-1:])
 		if core.PhpRequestStartup() == types.FAILURE {
 			*arg_excp = arg_free
 			file_handle.Close()
