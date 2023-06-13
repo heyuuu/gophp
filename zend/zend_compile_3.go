@@ -543,7 +543,7 @@ func (compiler *Compiler) CompileAssert(result *Znode, args *ZendAstList, name *
 		if args.GetChildren() == 1 && (args.Children()[0].Kind() != ZEND_AST_ZVAL || ZendAstGetZval(args.Children()[0]).GetType() != types.IS_STRING) {
 
 			/* add "assert(condition) as assertion message */
-			args.AddChild(ZendAstCreateZvalFromStr(ZendAstExport("assert(", args.Children()[0], ")")))
+			args.AddChild(ZendAstCreateZvalFromStr("assert()"))
 		}
 		compiler.CompileCallCommon(result, (*ZendAst)(args), fbc)
 		opline = CG__().GetActiveOpArray().GetOpcodes()[check_op_number]
