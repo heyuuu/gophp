@@ -309,14 +309,12 @@ type ZendAutoGlobal struct {
 	armed    bool
 }
 
-func MakeAutoGlobal(name string, callback ZendAutoGlobalCallback, jit bool) ZendAutoGlobal {
+func MakeAutoGlobal(name string, jit bool, callback func(name string) bool) ZendAutoGlobal {
 	return ZendAutoGlobal{
-		name: name,
-		callback: func(name string) bool {
-			return callback(types.NewString(name))
-		},
-		jit:   jit,
-		armed: false,
+		name:     name,
+		callback: callback,
+		jit:      jit,
+		armed:    false,
 	}
 }
 

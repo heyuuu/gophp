@@ -582,41 +582,39 @@ func PhpHashEnvironment() int {
 	}
 	return types.SUCCESS
 }
-func PhpAutoGlobalsCreateGet(name *types.String) bool {
+func PhpAutoGlobalsCreateGet(name string) bool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'G') || strchr(PG__().variables_order, 'g')) {
 		SM__().GetTreatData()(PARSE_GET, nil, nil)
 	} else {
-		// zend.ZvalPtrDtorNogc(&PG__().http_globals[TRACK_VARS_GET])
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_GET])
 	}
-	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_GET])
-	//PG__().http_globals[TRACK_VARS_GET].AddRefcount()
-	return 0
+	zend.EG__().GetSymbolTable().KeyUpdate(name, &PG__().http_globals[TRACK_VARS_GET])
+	return false /* don't rearm */
 }
-func PhpAutoGlobalsCreatePost(name *types.String) bool {
+func PhpAutoGlobalsCreatePost(name string) bool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'P') || strchr(PG__().variables_order, 'p')) && !SG__().headersSent && SG__().RequestInfo.IsRequestMethod("POST") {
 		SM__().GetTreatData()(PARSE_POST, nil, nil)
 	} else {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_POST])
 	}
-	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_POST])
-	return false
+	zend.EG__().GetSymbolTable().KeyUpdate(name, &PG__().http_globals[TRACK_VARS_POST])
+	return false /* don't rearm */
 }
-func PhpAutoGlobalsCreateCookie(name *types.String) bool {
+func PhpAutoGlobalsCreateCookie(name string) bool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'C') || strchr(PG__().variables_order, 'c')) {
 		SM__().GetTreatData()(PARSE_COOKIE, nil, nil)
 	} else {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_COOKIE])
 	}
-	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_COOKIE])
-	return 0
+	zend.EG__().GetSymbolTable().KeyUpdate(name, &PG__().http_globals[TRACK_VARS_COOKIE])
+	return false /* don't rearm */
 }
-func PhpAutoGlobalsCreateFiles(name *types.String) bool {
+func PhpAutoGlobalsCreateFiles(name string) bool {
 	if PG__().http_globals[TRACK_VARS_FILES].IsUndef() {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_FILES])
 	}
-	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_FILES])
-	return 0
+	zend.EG__().GetSymbolTable().KeyUpdate(name, &PG__().http_globals[TRACK_VARS_FILES])
+	return false /* don't rearm */
 }
 func CheckHttpProxy(var_table *types.Array) {
 	if var_table.KeyExists("HTTP_PROXY") {
@@ -630,7 +628,7 @@ func CheckHttpProxy(var_table *types.Array) {
 		}
 	}
 }
-func PhpAutoGlobalsCreateServer(name *types.String) bool {
+func PhpAutoGlobalsCreateServer(name string) bool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'S') || strchr(PG__().variables_order, 's')) {
 		PhpRegisterServerVariables()
 		if PG__().register_argc_argv {
@@ -651,27 +649,26 @@ func PhpAutoGlobalsCreateServer(name *types.String) bool {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_SERVER])
 	}
 	CheckHttpProxy(PG__().http_globals[TRACK_VARS_SERVER].Array())
-	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_SERVER])
-	//PG__().http_globals[TRACK_VARS_SERVER].AddRefcount()
+	zend.EG__().GetSymbolTable().KeyUpdate(name, &PG__().http_globals[TRACK_VARS_SERVER])
 
 	/* TODO: TRACK_VARS_SERVER is modified in a number of places (e.g. phar) past this point,
 	 * where rc>1 due to the $_SERVER global. Ideally this shouldn't happen, but for now we
 	 * ignore this issue, as it would probably require larger changes. */
 
-	return 0
+	return false
 }
-func PhpAutoGlobalsCreateEnv(name *types.String) bool {
+func PhpAutoGlobalsCreateEnv(name string) bool {
 	// zend.ZvalPtrDtorNogc(&PG__().http_globals[TRACK_VARS_ENV])
 	zend.ArrayInit(&PG__().http_globals[TRACK_VARS_ENV])
 	if PG__().variables_order && (strchr(PG__().variables_order, 'E') || strchr(PG__().variables_order, 'e')) {
 		PhpImportEnvironmentVariables(&PG__().http_globals[TRACK_VARS_ENV])
 	}
 	CheckHttpProxy(PG__().http_globals[TRACK_VARS_ENV].Array())
-	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_ENV])
+	zend.EG__().GetSymbolTable().KeyUpdate(name, &PG__().http_globals[TRACK_VARS_ENV])
 	//PG__().http_globals[TRACK_VARS_ENV].AddRefcount()
-	return 0
+	return false /* don't rearm */
 }
-func PhpAutoGlobalsCreateRequest(name *types.String) bool {
+func PhpAutoGlobalsCreateRequest(name string) bool {
 	var form_variables types.Zval
 	var _gpc_flags []uint8 = []uint8{0, 0, 0}
 	var p *byte
@@ -706,15 +703,16 @@ func PhpAutoGlobalsCreateRequest(name *types.String) bool {
 			}
 		}
 	}
-	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &form_variables)
-	return 0
+	zend.EG__().GetSymbolTable().KeyUpdate(name, &form_variables)
+
+	return false /* don't rearm */
 }
 func PhpStartupAutoGlobals() {
-	zend.ZendRegisterAutoGlobal(types.NewString("_GET"), 0, PhpAutoGlobalsCreateGet)
-	zend.ZendRegisterAutoGlobal(types.NewString("_POST"), 0, PhpAutoGlobalsCreatePost)
-	zend.ZendRegisterAutoGlobal(types.NewString("_COOKIE"), 0, PhpAutoGlobalsCreateCookie)
-	zend.ZendRegisterAutoGlobal(types.NewString("_SERVER"), PG__().auto_globals_jit, PhpAutoGlobalsCreateServer)
-	zend.ZendRegisterAutoGlobal(types.NewString("_ENV"), PG__().auto_globals_jit, PhpAutoGlobalsCreateEnv)
-	zend.ZendRegisterAutoGlobal(types.NewString("_REQUEST"), PG__().auto_globals_jit, PhpAutoGlobalsCreateRequest)
-	zend.ZendRegisterAutoGlobal(types.NewString("_FILES"), 0, PhpAutoGlobalsCreateFiles)
+	zend.ZendRegisterAutoGlobal("_GET", false, PhpAutoGlobalsCreateGet)
+	zend.ZendRegisterAutoGlobal("_POST", false, PhpAutoGlobalsCreatePost)
+	zend.ZendRegisterAutoGlobal("_COOKIE", false, PhpAutoGlobalsCreateCookie)
+	zend.ZendRegisterAutoGlobal("_SERVER", PG__().auto_globals_jit, PhpAutoGlobalsCreateServer)
+	zend.ZendRegisterAutoGlobal("_ENV", PG__().auto_globals_jit, PhpAutoGlobalsCreateEnv)
+	zend.ZendRegisterAutoGlobal("_REQUEST", PG__().auto_globals_jit, PhpAutoGlobalsCreateRequest)
+	zend.ZendRegisterAutoGlobal("_FILES", false, PhpAutoGlobalsCreateFiles)
 }

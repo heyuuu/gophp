@@ -1205,7 +1205,7 @@ func ZifHighlightFile(executeData zpp.Ex, return_value zpp.Ret, fileName *types.
 	var filename_len int
 	var ret int
 	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-	var i bool = 0
+	var i bool = false
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)

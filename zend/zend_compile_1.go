@@ -456,32 +456,14 @@ func ZendIsAutoGlobal(name string) bool {
 	}
 	return false
 }
-func ZendRegisterAutoGlobal(name *types.String, jit bool, autoGlobalCallback ZendAutoGlobalCallback) int {
-	var autoGlobal = MakeAutoGlobal(name.GetStr(), autoGlobalCallback, jit)
-	ret := CG__().AddAutoGlobal(autoGlobal)
-	if ret {
-		return types.SUCCESS
-	} else {
-		return types.FAILURE
-	}
+func ZendRegisterAutoGlobal(name string, jit bool, autoGlobalCallback func(name string) bool) {
+	CG__().AddAutoGlobal(MakeAutoGlobal(name, jit, autoGlobalCallback))
 }
 func ZendActivateAutoGlobals() {
 	CG__().EachAutoGlobal(func(autoGlobal *ZendAutoGlobal) {
 		autoGlobal.Activate()
 	})
 }
-func Zendlex(elem *ZendParserStackElem) int {
-	var zv types.Zval
-	var ret int
-	if CG__().GetIncrementLineno() != 0 {
-		CG__().GetZendLineno()++
-		CG__().SetIncrementLineno(0)
-	}
-	ret = LexScan(&zv, elem)
-	b.Assert(EG__().GetException() == nil || ret == T_ERROR)
-	return ret
-}
-
 func ZendVerifyNamespace() {
 	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() == 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "No code may exist outside of namespace {}")

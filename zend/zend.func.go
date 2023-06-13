@@ -240,15 +240,15 @@ func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
 func PhpScannerGlobalsCtor(scanner_globals_p *ZendPhpScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
 }
-func PhpAutoGlobalsCreateGlobals(name *types.String) bool {
+func PhpAutoGlobalsCreateGlobals(name string) bool {
 	var globals types.Zval
 
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */
 
 	globals.SetImmutableArray(EG__().GetSymbolTable())
 	globals.SetNewRef(&globals)
-	EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &globals)
-	return 0
+	EG__().GetSymbolTable().KeyUpdate(name, &globals)
+	return false /* don't rearm */
 }
 func ZendStartup() int {
 	var ini_scanner_globals ZendIniScannerGlobals
@@ -275,7 +275,7 @@ func ZendStartup() int {
 	EG__().SetErrorReporting(faults.E_ALL & ^faults.E_NOTICE)
 	ZendStartupBuiltinFunctions()
 	ZendRegisterStandardConstants()
-	ZendRegisterAutoGlobal(types.NewString("GLOBALS"), 1, PhpAutoGlobalsCreateGlobals)
+	ZendRegisterAutoGlobal("GLOBALS", true, PhpAutoGlobalsCreateGlobals)
 	ZendInitRsrcPlist()
 	ZendInitExceptionOp()
 	ZendInitCallTrampolineOp()
