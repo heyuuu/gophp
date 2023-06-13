@@ -486,10 +486,10 @@ func ZendSeparateIfCallAndWrite(node *Znode, ast *ZendAst, type_ uint32) {
 	}
 }
 func (compiler *Compiler) EmitAssignZnode(var_ast *ZendAst, value_node *Znode) {
-	var dummy_node Znode
-	var assign_ast *ZendAst = ZendAstCreate(ZEND_AST_ASSIGN, var_ast, ZendAstCreateZnode(value_node))
-	compiler.CompileAssign(&dummy_node, assign_ast)
-	ZendDoFree(&dummy_node)
+	var dummyNode Znode
+	var assignAst *ZendAst = AstCreate(ZEND_AST_ASSIGN, var_ast, ZendAstCreateZnode(value_node))
+	compiler.CompileAssign(&dummyNode, assignAst)
+	ZendDoFree(&dummyNode)
 }
 func (compiler *Compiler) DelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
 	if ast.GetAttr() == ZEND_DIM_ALTERNATIVE_SYNTAX {
@@ -611,7 +611,7 @@ func ZendVerifyListAssignTarget(var_ast *ZendAst, old_style bool) {
 	}
 }
 func ZendPropagateListRefs(ast *ZendAst) bool {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var has_refs bool = 0
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
@@ -627,7 +627,7 @@ func ZendPropagateListRefs(ast *ZendAst) bool {
 	return has_refs
 }
 func (compiler *Compiler) CompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_style bool) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var i uint32
 	var has_elems bool = 0
 	var is_keyed bool = list.GetChildren() > 0 && list.GetChild()[0] != nil && list.GetChild()[0].GetChild()[1] != nil

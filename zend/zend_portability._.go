@@ -10,7 +10,6 @@ const ZEND_PATHS_SEPARATOR = ':'
 
 /* all HAVE_XXX test have to be after the include of zend_config above */
 
-const RTLD_LAZY = 1
 const DL_UNLOAD = dlclose
 const DL_FETCH_SYMBOL = dlsym
 const DL_ERROR = dlerror

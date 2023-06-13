@@ -9,7 +9,7 @@ import (
 )
 
 func (compiler *Compiler) CompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses_ast *ZendAst) {
-	var list *ZendAstList = ZendAstGetList(uses_ast)
+	var list *ZendAstList = uses_ast.AsAstList()
 	var i uint32
 	if list.GetChildren() == 0 {
 		return
@@ -63,8 +63,8 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 			info.SetVarvarsUsed(1)
 			FindImplicitBindsRecursively(info, name_ast)
 		}
-	} else if ZendAstIsList(ast) != 0 {
-		var list *ZendAstList = ZendAstGetList(ast)
+	} else if ast.IsList() {
+		var list *ZendAstList = ast.AsAstList()
 		var i uint32
 		for i = 0; i < list.GetChildren(); i++ {
 			FindImplicitBindsRecursively(info, list.GetChild()[i])
@@ -76,7 +76,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 		var closure_ast *ZendAstDecl = (*ZendAstDecl)(ast)
 		var uses_ast *ZendAst = closure_ast.GetChild()[1]
 		if uses_ast != nil {
-			var uses_list *ZendAstList = ZendAstGetList(uses_ast)
+			var uses_list *ZendAstList = uses_ast.AsAstList()
 			var i uint32
 			for i = 0; i < uses_list.GetChildren(); i++ {
 				types.ZendHashAddEmptyElement(info.GetUses(), ZendAstGetStr(uses_list.GetChild()[i]).GetStr())
@@ -88,7 +88,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 
 		var closure_ast *ZendAstDecl = (*ZendAstDecl)(ast)
 		FindImplicitBindsRecursively(info, closure_ast.GetChild()[2])
-	} else if ZendAstIsSpecial(ast) == 0 {
+	} else if !ast.IsSpecial() {
 		var i uint32
 		var children uint32 = ZendAstGetNumChildren(ast)
 		for i = 0; i < children; i++ {
@@ -97,7 +97,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 	}
 }
 func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst) {
-	var param_list *ZendAstList = ZendAstGetList(params_ast)
+	var param_list *ZendAstList = params_ast.AsAstList()
 	var i uint32
 	info.SetUses(types.NewArray(param_list.GetChildren()))
 	FindImplicitBindsRecursively(info, stmt_ast)
@@ -130,7 +130,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *ty
 }
 func (compiler *Compiler) CompileClosureUses(ast *ZendAst) {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_ast *ZendAst = list.GetChild()[i]
@@ -324,7 +324,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 		}
 	}
 	if lcname.GetStr() == ZEND_AUTOLOAD_FUNC_NAME {
-		if ZendAstGetList(params_ast).GetChildren() != 1 {
+		if params_ast.AsAstList().GetChildren() != 1 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s() must take exactly 1 argument", ZEND_AUTOLOAD_FUNC_NAME)
 		}
 		faults.Error(faults.E_DEPRECATED, "__autoload() is deprecated, use spl_autoload_register() instead")
@@ -463,7 +463,7 @@ func (compiler *Compiler) CompileFuncDecl(result *Znode, ast *ZendAst, toplevel 
 	CG__().SetActiveClassEntry(orig_class_entry)
 }
 func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
 	var children uint32 = list.GetChildren()
@@ -538,7 +538,7 @@ func (compiler *Compiler) CompilePropGroup(list *ZendAst) {
 	compiler.CompilePropDecl(prop_ast, type_ast, list.GetAttr())
 }
 func (compiler *Compiler) CompileClassConstDecl(ast *ZendAst) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
 	if ce.IsTrait() {
@@ -593,7 +593,7 @@ func (compiler *Compiler) CompileMethodRef(ast *ZendAst, methodRef *ZendTraitMet
 func (compiler *Compiler) CompileTraitPrecedence(ast *ZendAst) {
 	var methodRefAst *ZendAst = ast.GetChild()[0]
 	var insteadofAst *ZendAst = ast.GetChild()[1]
-	var insteadofList *ZendAstList = ZendAstGetList(insteadofAst)
+	var insteadofList *ZendAstList = insteadofAst.AsAstList()
 	var i uint32
 
 	var excludeClassNames = make([]string, insteadofList.GetChildren())
@@ -634,8 +634,8 @@ func (compiler *Compiler) CompileTraitAlias(ast *ZendAst) {
 	ZendAddToList(CG__().GetActiveClassEntry().GetTraitAliases(), alias)
 }
 func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
-	var traits *ZendAstList = ZendAstGetList(ast.GetChild()[0])
-	var adaptations *ZendAstList = b.CondF1(ast.GetChild()[1] != nil, func() *ZendAstList { return ZendAstGetList(ast.GetChild()[1]) }, nil)
+	var traits *ZendAstList = ast.GetChild()[0].AsAstList()
+	var adaptations *ZendAstList = b.CondF1(ast.GetChild()[1] != nil, func() *ZendAstList { return ast.GetChild()[1].AsAstList() }, nil)
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
 	ce.SetIsImplementTraits(true)
@@ -674,7 +674,7 @@ func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileImplements(ast *ZendAst) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 
 	interfaceNames := make([]string, list.GetChildren())

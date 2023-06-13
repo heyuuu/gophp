@@ -2,72 +2,14 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/utils/slices"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZEND_AST_SPEC_CALL(name __auto__) __auto__ {
-	return ZEND_EXPAND_VA(ZEND_AST_SPEC_CALL_(name, __VA_ARGS__, _4, _3, _2, _1, _0)(__VA_ARGS__))
-}
-func ZEND_AST_SPEC_CALL_EX(name func() __auto__) __auto__ {
-	return ZEND_EXPAND_VA(ZEND_AST_SPEC_CALL_EX_(name, __VA_ARGS__, _4, _3, _2, _1, _0)(__VA_ARGS__))
-}
-func ZendAstCreateEx0(kind ZendAstKind, attr ZendAstAttr) *ZendAst {
-	var ast *ZendAst = ZendAstCreate0(kind)
-	ast.SetAttr(attr)
-	return ast
-}
-func ZendAstCreateEx1(kind ZendAstKind, attr ZendAstAttr, child *ZendAst) *ZendAst {
-	var ast *ZendAst = ZendAstCreate1(kind, child)
-	ast.SetAttr(attr)
-	return ast
-}
-func ZendAstCreateEx2(kind ZendAstKind, attr ZendAstAttr, child1 *ZendAst, child2 *ZendAst) *ZendAst {
-	var ast *ZendAst = ZendAstCreate2(kind, child1, child2)
-	ast.SetAttr(attr)
-	return ast
-}
-func ZendAstCreateEx3(kind ZendAstKind, attr ZendAstAttr, child1 *ZendAst, child2 *ZendAst, child3 *ZendAst) *ZendAst {
-	var ast *ZendAst = ZendAstCreate3(kind, child1, child2, child3)
-	ast.SetAttr(attr)
-	return ast
-}
-func ZendAstCreateEx4(
-	kind ZendAstKind,
-	attr ZendAstAttr,
-	child1 *ZendAst,
-	child2 *ZendAst,
-	child3 *ZendAst,
-	child4 *ZendAst,
-) *ZendAst {
-	var ast *ZendAst = ZendAstCreate4(kind, child1, child2, child3, child4)
-	ast.SetAttr(attr)
-	return ast
-}
-func ZendAstCreate() __auto__ {
-	return ZEND_AST_SPEC_CALL(ZendAstCreate, __VA_ARGS__)
-}
-func ZendAstCreateEx() __auto__ {
-	return ZEND_AST_SPEC_CALL_EX(ZendAstCreateEx, __VA_ARGS__)
-}
-func ZendAstCreateList(init_children int) __auto__ {
-	return ZEND_AST_SPEC_CALL(ZendAstCreateList, __VA_ARGS__)
-}
-func ZendAstIsSpecial(ast *ZendAst) bool {
-	return ast.GetKind() >> ZEND_AST_SPECIAL_SHIFT & 1
-}
-func ZendAstIsList(ast *ZendAst) bool {
-	return ast.GetKind() >> ZEND_AST_IS_LIST_SHIFT & 1
-}
-func ZendAstGetList(ast *ZendAst) *ZendAstList {
-	b.Assert(ZendAstIsList(ast) != 0)
-	return (*ZendAstList)(ast)
-}
 func ZendAstGetZval(ast *ZendAst) *types.Zval {
-	b.Assert(ast.GetKind() == ZEND_AST_ZVAL)
-	return (*ZendAstZval)(ast).GetVal()
+	return ast.AsAstZval().GetVal()
 }
 func ZendAstGetStr(ast *ZendAst) *types.String {
 	var zv *types.Zval = ZendAstGetZval(ast)
@@ -85,7 +27,7 @@ func ZendAstGetConstantName(ast *ZendAst) *types.String {
 	return (*ZendAstZval)(ast).GetVal().String()
 }
 func ZendAstGetNumChildren(ast *ZendAst) uint32 {
-	b.Assert(ZendAstIsList(ast) == 0)
+	b.Assert(!ast.IsList())
 	return ast.GetKind() >> ZEND_AST_NUM_CHILDREN_SHIFT
 }
 func ZendAstGetLineno(ast *ZendAst) uint32 {
@@ -120,7 +62,7 @@ func ZendAstCreateZnode(node *Znode) *ZendAst {
 	return (*ZendAst)(ast)
 }
 func ZendAstCreateZvalInt(zv *types.Zval, attr uint32, lineno uint32) *ZendAst {
-	var ast *ZendAstZval = NewZendAstZval(ZEND_AST_ZVAL, attr, zv, lineno)
+	var ast *ZendAstZval = NewAstZval(ZEND_AST_ZVAL, attr, zv, lineno)
 	return (*ZendAst)(ast)
 }
 func ZendAstCreateZvalWithLineno(zv *types.Zval, lineno uint32) *ZendAst {
@@ -137,208 +79,57 @@ func ZendAstCreateZvalFromStr(str *types.String) *ZendAst {
 	zv.SetString(str)
 	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
 }
-func ZendAstCreateZvalFromLong(lval ZendLong) *ZendAst {
-	var zv types.Zval
-	zv.SetLong(lval)
-	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
-}
 func ZendAstCreateConstant(name *types.String, attr ZendAstAttr) *ZendAst {
 	zv := types.NewZvalString(name.GetStr())
 	lineno := CG__().GetZendLineno()
-	var ast *ZendAstZval = NewZendAstZval(ZEND_AST_CONSTANT, attr, zv, lineno)
+	var ast *ZendAstZval = NewAstZval(ZEND_AST_CONSTANT, attr, zv, lineno)
 	return (*ZendAst)(ast)
 }
-func ZendAstCreateClassConstOrName(class_name *ZendAst, name *ZendAst) *ZendAst {
-	var name_str *types.String = ZendAstGetStr(name)
-	if ascii.StrCaseEquals(name_str.GetStr(), "class") {
-		// types.ZendStringRelease(name_str)
-		return ZendAstCreate(ZEND_AST_CLASS_NAME, class_name)
-	} else {
-		return ZendAstCreate(ZEND_AST_CLASS_CONST, class_name, name)
-	}
-}
-func ZendAstCreateDecl(
-	kind ZendAstKind,
-	flags uint32,
-	start_lineno uint32,
-	doc_comment *types.String,
-	name *types.String,
-	child0 *ZendAst,
-	child1 *ZendAst,
-	child2 *ZendAst,
-	child3 *ZendAst,
-) *ZendAst {
-	var ast *ZendAstDecl
-	ast = ZendAstAlloc(b.SizeOf("zend_ast_decl"))
-	ast.SetKind(kind)
-	ast.SetAttr(0)
-	ast.SetStartLineno(start_lineno)
-	ast.SetEndLineno(CG__().GetZendLineno())
-	ast.SetFlags(flags)
-	ast.SetLexPos(INI_SCNG__().GetYyText())
-	ast.SetDocComment(doc_comment)
-	ast.SetName(name)
-	ast.GetChild()[0] = child0
-	ast.GetChild()[1] = child1
-	ast.GetChild()[2] = child2
-	ast.GetChild()[3] = child3
-	return (*ZendAst)(ast)
-}
-func ZendAstCreate0(kind ZendAstKind) *ZendAst {
-	var ast *ZendAst
-	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 0)
-	ast = ZendAstAlloc(ZendAstSize(0))
-	ast.SetKind(kind)
-	ast.SetAttr(0)
-	ast.SetLineno(CG__().GetZendLineno())
-	return ast
-}
-func ZendAstCreate1(kind ZendAstKind, child *ZendAst) *ZendAst {
-	var ast *ZendAst
-	var lineno uint32
-	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 1)
-	ast = ZendAstAlloc(ZendAstSize(1))
-	ast.SetKind(kind)
-	ast.SetAttr(0)
-	ast.GetChild()[0] = child
-	if child != nil {
-		lineno = ZendAstGetLineno(child)
-	} else {
-		lineno = CG__().GetZendLineno()
-	}
-	ast.SetLineno(lineno)
-	ast.SetLineno(lineno)
-	return ast
-}
-func ZendAstCreate2(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst) *ZendAst {
-	var ast *ZendAst
-	var lineno uint32
-	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 2)
-	ast = ZendAstAlloc(ZendAstSize(2))
-	ast.SetKind(kind)
-	ast.SetAttr(0)
-	ast.GetChild()[0] = child1
-	ast.GetChild()[1] = child2
-	if child1 != nil {
-		lineno = ZendAstGetLineno(child1)
-	} else if child2 != nil {
-		lineno = ZendAstGetLineno(child2)
-	} else {
-		lineno = CG__().GetZendLineno()
-	}
-	ast.SetLineno(lineno)
-	return ast
-}
-func ZendAstCreate3(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst, child3 *ZendAst) *ZendAst {
-	var ast *ZendAst
-	var lineno uint32
-	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 3)
-	ast = ZendAstAlloc(ZendAstSize(3))
-	ast.SetKind(kind)
-	ast.SetAttr(0)
-	ast.GetChild()[0] = child1
-	ast.GetChild()[1] = child2
-	ast.GetChild()[2] = child3
-	if child1 != nil {
-		lineno = ZendAstGetLineno(child1)
-	} else if child2 != nil {
-		lineno = ZendAstGetLineno(child2)
-	} else if child3 != nil {
-		lineno = ZendAstGetLineno(child3)
-	} else {
-		lineno = CG__().GetZendLineno()
-	}
-	ast.SetLineno(lineno)
-	return ast
-}
-func ZendAstCreate4(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst, child3 *ZendAst, child4 *ZendAst) *ZendAst {
-	var ast *ZendAst
-	var lineno uint32
-	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 4)
-	ast = ZendAstAlloc(ZendAstSize(4))
-	ast.SetKind(kind)
-	ast.SetAttr(0)
-	ast.GetChild()[0] = child1
-	ast.GetChild()[1] = child2
-	ast.GetChild()[2] = child3
-	ast.GetChild()[3] = child4
-	if child1 != nil {
-		lineno = ZendAstGetLineno(child1)
-	} else if child2 != nil {
-		lineno = ZendAstGetLineno(child2)
-	} else if child3 != nil {
-		lineno = ZendAstGetLineno(child3)
-	} else if child4 != nil {
-		lineno = ZendAstGetLineno(child4)
-	} else {
-		lineno = CG__().GetZendLineno()
-	}
-	ast.SetLineno(lineno)
-	return ast
-}
-func ZendAstCreateList0(kind ZendAstKind) *ZendAst {
-	var ast *ZendAst
-	var list *ZendAstList
-	ast = ZendAstAlloc(ZendAstListSize(4))
-	list = (*ZendAstList)(ast)
-	list.SetKind(kind)
-	list.SetAttr(0)
-	list.SetLineno(CG__().GetZendLineno())
-	list.SetChildren(0)
-	return ast
-}
-func ZendAstCreateList1(kind ZendAstKind, child *ZendAst) *ZendAst {
-	var ast *ZendAst
-	var list *ZendAstList
-	var lineno uint32
-	ast = ZendAstAlloc(ZendAstListSize(4))
-	list = (*ZendAstList)(ast)
-	list.SetKind(kind)
-	list.SetAttr(0)
-	list.SetChildren(1)
-	list.GetChild()[0] = child
-	if child != nil {
-		lineno = ZendAstGetLineno(child)
-		if lineno > CG__().GetZendLineno() {
-			lineno = CG__().GetZendLineno()
+
+func astLinenoByChildrenEx(children []*ZendAst) uint32 {
+	lineno := uint32(CG__().GetZendLineno())
+	for _, child := range children {
+		if child != nil {
+			childLineno := ZendAstGetLineno(child)
+			if childLineno < lineno {
+				lineno = childLineno
+			}
+			return lineno
 		}
-	} else {
-		lineno = CG__().GetZendLineno()
 	}
-	list.SetLineno(lineno)
-	return ast
+	return lineno
 }
-func ZendAstCreateList2(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst) *ZendAst {
-	var ast *ZendAst
-	var list *ZendAstList
-	var lineno uint32
-	ast = ZendAstAlloc(ZendAstListSize(4))
-	list = (*ZendAstList)(ast)
-	list.SetKind(kind)
-	list.SetAttr(0)
-	list.SetChildren(2)
-	list.GetChild()[0] = child1
-	list.GetChild()[1] = child2
-	if child1 != nil {
-		lineno = ZendAstGetLineno(child1)
-		if lineno > CG__().GetZendLineno() {
-			lineno = CG__().GetZendLineno()
+
+func AstCreateEx(kind ZendAstKind, attr ZendAstAttr, children ...*ZendAst) *ZendAst {
+	lineno := uint32(CG__().GetZendLineno())
+	for _, child := range children {
+		if child != nil {
+			lineno = ZendAstGetLineno(child)
+			break
 		}
-	} else if child2 != nil {
-		lineno = ZendAstGetLineno(child2)
-		if lineno > CG__().GetZendLineno() {
-			lineno = CG__().GetZendLineno()
-		}
-	} else {
-		list.SetChildren(0)
-		lineno = CG__().GetZendLineno()
 	}
-	list.SetLineno(lineno)
-	return ast
+
+	return NewAst(kind, attr, lineno, children)
 }
+func AstCreate(kind ZendAstKind, children ...*ZendAst) *ZendAst {
+	return AstCreateEx(kind, 0, children...)
+}
+func AstCreateList(kind ZendAstKind, children ...*ZendAst) *ZendAst {
+	lineno := uint32(CG__().GetZendLineno())
+	for _, child := range children {
+		if child != nil {
+			lineno = b.Min(lineno, ZendAstGetLineno(child))
+			break
+		}
+	}
+
+	list := NewAstList(kind, 0, lineno, children)
+	return (*ZendAst)(list)
+}
+
 func IsPowerOfTwo(n uint32) bool { return n != 0 && n == (n & ^n + 1) }
 func ZendAstListAdd(ast *ZendAst, op *ZendAst) *ZendAst {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	if list.GetChildren() >= 4 && IsPowerOfTwo(list.GetChildren()) != 0 {
 		list = ZendAstRealloc(list, ZendAstListSize(list.GetChildren()), ZendAstListSize(list.GetChildren()*2))
 	}
@@ -570,7 +361,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		}
 	case ZEND_AST_ARRAY:
 		var i uint32
-		var list *ZendAstList = ZendAstGetList(ast)
+		var list *ZendAstList = ast.AsAstList()
 		if list.GetChildren() == 0 {
 			result.SetEmptyArray()
 			break
@@ -588,7 +379,6 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 					// ZvalPtrDtorNogc(result)
 					return types.FAILURE
 				}
-				// ZvalPtrDtorNogc(&op1)
 				continue
 			}
 			if elem.GetChild()[1] != nil {
@@ -618,12 +408,9 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
 			ret = types.FAILURE
 		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
-			// ZvalPtrDtorNogc(&op1)
 			ret = types.FAILURE
 		} else {
 			ZendFetchDimensionConst(result, &op1, &op2, b.Cond((ast.GetAttr()&ZEND_DIM_IS) != 0, BP_VAR_IS, BP_VAR_R))
-			// ZvalPtrDtorNogc(&op1)
-			// ZvalPtrDtorNogc(&op2)
 		}
 	default:
 		faults.ThrowError(nil, "Unsupported constant expression")
@@ -631,31 +418,28 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 	}
 	return ret
 }
-func ZendAstTreeSize(ast *ZendAst) int {
-	var size int
-	if ast.GetKind() == ZEND_AST_ZVAL || ast.GetKind() == ZEND_AST_CONSTANT {
-		size = b.SizeOf("zend_ast_zval")
-	} else if ZendAstIsList(ast) != 0 {
-		var i uint32
-		var list *ZendAstList = ZendAstGetList(ast)
-		size = ZendAstListSize(list.GetChildren())
-		for i = 0; i < list.GetChildren(); i++ {
-			if list.GetChild()[i] != nil {
-				size += ZendAstTreeSize(list.GetChild()[i])
+
+func AstTreeCopy(ast *ZendAst) *ZendAst {
+	if ast.GetKind() == ZEND_AST_ZVAL {
+		newAst := CopyAstZval(ast.AsAstZval())
+		return (*ZendAst)(newAst)
+	} else if ast.GetKind() == ZEND_AST_CONSTANT {
+
+	} else if ast.IsList() {
+		var list = ast.AsAstList()
+		var newChild []*ZendAst = slices.Map(list.GetChild(), func() {
+
+		})
+		if list.GetNumChild() > 0 {
+			newChild = make([]*ZendAst, list.GetNumChild())
+			for i, child := range list.GetChild() {
+				newChild[i] = AstTreeCopy(child)
 			}
 		}
-	} else {
-		var i uint32
-		var children uint32 = ZendAstGetNumChildren(ast)
-		size = ZendAstSize(children)
-		for i = 0; i < children; i++ {
-			if ast.GetChild()[i] != nil {
-				size += ZendAstTreeSize(ast.GetChild()[i])
-			}
-		}
+
 	}
-	return size
 }
+
 func ZendAstTreeCopy(ast *ZendAst, buf any) any {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		var new_ *ZendAstZval = (*ZendAstZval)(buf)
@@ -669,13 +453,12 @@ func ZendAstTreeCopy(ast *ZendAst, buf any) any {
 		new_.SetAttr(ast.GetAttr())
 		new_.GetVal().SetStringVal(ZendAstGetConstantName(ast).GetStr())
 		buf = any((*byte)(buf + b.SizeOf("zend_ast_zval")))
-	} else if ZendAstIsList(ast) != 0 {
-		var list *ZendAstList = ZendAstGetList(ast)
+	} else if ast.IsList() {
+		var list *ZendAstList = ast.AsAstList()
 		var new_ *ZendAstList = (*ZendAstList)(buf)
 		var i uint32
-		new_.SetKind(list.GetKind())
-		new_.SetAttr(list.GetAttr())
-		new_.SetChildren(list.GetChildren())
+		CopyAstList(new_, list)
+
 		buf = any((*byte)(buf + ZendAstListSize(list.GetChildren())))
 		for i = 0; i < list.GetChildren(); i++ {
 			if list.GetChild()[i] != nil {
@@ -687,7 +470,7 @@ func ZendAstTreeCopy(ast *ZendAst, buf any) any {
 		}
 	} else {
 		var i uint32
-		var children uint32 = ZendAstGetNumChildren(ast)
+		var children uint32 = ast.GetNumChild()
 		var new_ *ZendAst = (*ZendAst)(buf)
 		new_.SetKind(ast.GetKind())
 		new_.SetAttr(ast.GetAttr())
@@ -718,8 +501,8 @@ tail_call:
 		goto tail_call
 	} else if ast.GetKind() == ZEND_AST_ZVAL {
 		// ZvalPtrDtorNogc(ZendAstGetZval(ast))
-	} else if ZendAstIsList(ast) != 0 {
-		var list *ZendAstList = ZendAstGetList(ast)
+	} else if ast.IsList() {
+		var list *ZendAstList = ast.AsAstList()
 		if list.GetChildren() != 0 {
 			var i uint32
 			for i = 1; i < list.GetChildren(); i++ {
@@ -750,8 +533,8 @@ func ZendAstRefDestroy(ast *types.ZendAstRef) {
 	Efree(ast)
 }
 func ZendAstApply(ast *ZendAst, fn ZendAstApplyFunc) {
-	if ZendAstIsList(ast) != 0 {
-		var list *ZendAstList = ZendAstGetList(ast)
+	if ast.IsList() {
+		var list *ZendAstList = ast.AsAstList()
 		var i uint32
 		for i = 0; i < list.GetChildren(); i++ {
 			fn(list.GetChild()[i])
@@ -1508,7 +1291,7 @@ tail_call:
 		BINARY_OP(" =& ", 90, 91, 90)
 		fallthrough
 	case ZEND_AST_ASSIGN_OP:
-		switch ast.GetAttr() {
+		switch OpCode(ast.GetAttr()) {
 		case ZEND_ADD:
 			BINARY_OP(" += ", 90, 91, 90)
 			fallthrough
@@ -1643,7 +1426,7 @@ tail_call:
 		str.WriteString("new ")
 		if ast.GetChild()[0].GetKind() == ZEND_AST_CLASS {
 			str.WriteString("class")
-			if ZendAstGetList(ast.GetChild()[1]).GetChildren() != 0 {
+			if ast.GetChild()[1].AsAstList().GetChildren() != 0 {
 				str.WriteByte('(')
 				ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
 				str.WriteByte(')')
@@ -1843,7 +1626,7 @@ tail_call:
 		str.WriteByte('}')
 	case ZEND_AST_CATCH:
 		str.WriteString("} catch (")
-		ZendAstExportCatchNameList(str, ZendAstGetList(ast.GetChild()[0]), indent)
+		ZendAstExportCatchNameList(str, ast.GetChild()[0].AsAstList(), indent)
 		str.WriteString(" $")
 		ZendAstExportVar(str, ast.GetChild()[1], 0, indent)
 		str.WriteString(") {\n")

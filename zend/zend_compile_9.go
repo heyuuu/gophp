@@ -87,7 +87,7 @@ func (compiler *Compiler) CompileConstExprMagicConst(ast_ptr **ZendAst) {
 
 	b.Assert(ast.GetAttr() == T_CLASS_C)
 	ZendAstDestroy(ast)
-	*ast_ptr = ZendAstCreate(ZEND_AST_CONSTANT_CLASS)
+	*ast_ptr = AstCreate(ZEND_AST_CONSTANT_CLASS)
 }
 func (compiler *Compiler) CompileConstExpr(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
@@ -134,7 +134,7 @@ func (compiler *Compiler) CompileTopStmt(ast *ZendAst) {
 		return
 	}
 	if ast.GetKind() == ZEND_AST_STMT_LIST {
-		var list *ZendAstList = ZendAstGetList(ast)
+		var list *ZendAstList = ast.AsAstList()
 		var i uint32
 		for i = 0; i < list.GetChildren(); i++ {
 			compiler.CompileTopStmt(list.GetChild()[i])

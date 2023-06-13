@@ -415,10 +415,8 @@ func (compiler *Compiler) CompileIssetOrEmpty(result *Znode, ast *ZendAst) {
 	b.Assert(ast.GetKind() == ZEND_AST_ISSET || ast.GetKind() == ZEND_AST_EMPTY)
 	if ZendIsVariable(var_ast) == 0 {
 		if ast.GetKind() == ZEND_AST_EMPTY {
-
 			/* empty(expr) can be transformed to !expr */
-
-			var not_ast *ZendAst = ZendAstCreateEx(ZEND_AST_UNARY_OP, ZEND_BOOL_NOT, var_ast)
+			var not_ast *ZendAst = AstCreateEx(ZEND_AST_UNARY_OP, ZEND_BOOL_NOT, var_ast)
 			compiler.CompileExpr(result, not_ast)
 			return
 		} else {
@@ -481,13 +479,12 @@ func (compiler *Compiler) CompileShellExec(result *Znode, ast *ZendAst) {
 	var call_ast *ZendAst
 	fn_name.SetStringVal("shell_exec")
 	name_ast = ZendAstCreateZval(&fn_name)
-	args_ast = ZendAstCreateList(1, ZEND_AST_ARG_LIST, expr_ast)
-	call_ast = ZendAstCreate(ZEND_AST_CALL, name_ast, args_ast)
+	args_ast = AstCreateList(ZEND_AST_ARG_LIST, expr_ast)
+	call_ast = AstCreate(ZEND_AST_CALL, name_ast, args_ast)
 	compiler.CompileExpr(result, call_ast)
-	// ZvalPtrDtor(&fn_name)
 }
 func (compiler *Compiler) CompileArray(result *Znode, ast *ZendAst) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var opline *types.ZendOp
 	var i uint32
 	var opnum_init uint32 = -1
@@ -578,7 +575,7 @@ func (compiler *Compiler) CompileConst(result *Znode, ast *ZendAst) {
 	if resolved_name == "__COMPILER_HALT_OFFSET__" || name_ast.GetAttr() != ZEND_NAME_RELATIVE && orig_name.GetStr() == "__COMPILER_HALT_OFFSET__" {
 		var last *ZendAst = CG__().GetAst()
 		for last != nil && last.GetKind() == ZEND_AST_STMT_LIST {
-			var list *ZendAstList = ZendAstGetList(last)
+			var list *ZendAstList = last.AsAstList()
 			if list.GetChildren() == 0 {
 				break
 			}
@@ -714,7 +711,7 @@ func (compiler *Compiler) CompileEncapsList(result *Znode, ast *ZendAst) {
 	var init_opline *types.ZendOp
 	var elem_node Znode
 	var last_const_node Znode
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var reserved_op_number uint32 = -1
 	b.Assert(list.GetChildren() > 0)
 	j = 0

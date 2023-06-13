@@ -69,10 +69,10 @@ func (compiler *Compiler) CompileAssignRef(result *Znode, ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) EmitAssignRefZnode(var_ast *ZendAst, value_node *Znode) {
-	var dummy_node Znode
-	var assign_ast *ZendAst = ZendAstCreate(ZEND_AST_ASSIGN_REF, var_ast, ZendAstCreateZnode(value_node))
-	compiler.CompileAssignRef(&dummy_node, assign_ast)
-	ZendDoFree(&dummy_node)
+	var dummyNode Znode
+	var assignAst *ZendAst = AstCreate(ZEND_AST_ASSIGN_REF, var_ast, ZendAstCreateZnode(value_node))
+	compiler.CompileAssignRef(&dummyNode, assignAst)
+	ZendDoFree(&dummyNode)
 }
 func (compiler *Compiler) CompileCompoundAssign(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
@@ -129,7 +129,7 @@ func (compiler *Compiler) CompileCompoundAssign(result *Znode, ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileArgs(ast *ZendAst, fbc types.IFunction) uint32 {
-	var args *ZendAstList = ZendAstGetList(ast)
+	var args *ZendAstList = ast.AsAstList()
 	var i uint32
 	var uses_arg_unpack bool = 0
 	var arg_count uint32 = 0
@@ -484,7 +484,7 @@ func (compiler *Compiler) CompileFuncCufa(result *Znode, args *ZendAstList, lcna
 	compiler.CompileInitUserFunc(args.GetChild()[0], 0, lcname)
 	if args.GetChild()[1].GetKind() == ZEND_AST_CALL && args.GetChild()[1].GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[1].GetChild()[0]).IsString() && args.GetChild()[1].GetChild()[1].GetKind() == ZEND_AST_ARG_LIST {
 		var orig_name *types.String = ZendAstGetStr(args.GetChild()[1].GetChild()[0])
-		var list *ZendAstList = ZendAstGetList(args.GetChild()[1].GetChild()[1])
+		var list *ZendAstList = args.GetChild()[1].GetChild()[1].AsAstList()
 		name, _ := ZendResolveFunctionName(orig_name.GetStr(), args.GetChild()[1].GetChild()[0].GetAttr())
 		if ascii.StrCaseEquals(name, "array_slice") && list.GetChildren() == 3 && list.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
 			var zv *types.Zval = ZendAstGetZval(list.GetChild()[1])

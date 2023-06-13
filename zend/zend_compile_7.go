@@ -40,7 +40,7 @@ func ZendCheckAlreadyInUse(type_ uint32, old_name *types.String, new_name *types
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 }
 func (compiler *Compiler) CompileUse(ast *ZendAst) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var i uint32
 	var current_ns *types.String = FC__().GetCurrentNamespace()
 	var type_ uint32 = ast.GetAttr()
@@ -96,7 +96,7 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 func (compiler *Compiler) CompileGroupUse(ast *ZendAst) {
 	var i uint32
 	var ns *types.String = ZendAstGetStr(ast.GetChild()[0])
-	var list *ZendAstList = ZendAstGetList(ast.GetChild()[1])
+	var list *ZendAstList = ast.GetChild()[1].AsAstList()
 	for i = 0; i < list.GetChildren(); i++ {
 		var inline_use *ZendAst
 		var use *ZendAst = list.GetChild()[i]
@@ -105,7 +105,7 @@ func (compiler *Compiler) CompileGroupUse(ast *ZendAst) {
 		var compound_ns string = ZendConcatNames(ns.GetStr(), name.GetStr())
 		// types.ZendStringReleaseEx(name, 0)
 		name_zval.SetStringVal(compound_ns)
-		inline_use = ZendAstCreateList(1, ZEND_AST_USE, use)
+		inline_use = AstCreateList(ZEND_AST_USE, use)
 		if ast.GetAttr() != 0 {
 			inline_use.SetAttr(ast.GetAttr())
 		} else {
@@ -115,7 +115,7 @@ func (compiler *Compiler) CompileGroupUse(ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
 		var const_ast *ZendAst = list.GetChild()[i]
@@ -350,7 +350,7 @@ func ZendCtEvalGreater(result *types.Zval, kind ZendAstKind, op1 *types.Zval, op
 }
 
 func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var last_elem_ast *ZendAst = nil
 	var i uint32
 	var is_constant bool = 1

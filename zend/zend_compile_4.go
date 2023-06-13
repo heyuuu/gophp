@@ -31,7 +31,7 @@ func (compiler *Compiler) CompileFuncArraySlice(result *Znode, args *ZendAstList
 	if CG__().GetActiveOpArray().GetFunctionName() != nil && args.GetChildren() == 2 && args.GetChild()[0].GetKind() == ZEND_AST_CALL && args.GetChild()[0].GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0].GetChild()[0]).IsString() && args.GetChild()[0].GetChild()[1].GetKind() == ZEND_AST_ARG_LIST && args.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
 		var orig_name *types.String = ZendAstGetStr(args.GetChild()[0].GetChild()[0])
 		name, _ := ZendResolveFunctionName(orig_name.GetStr(), args.GetChild()[0].GetChild()[0].GetAttr())
-		var list *ZendAstList = ZendAstGetList(args.GetChild()[0].GetChild()[1])
+		var list *ZendAstList = args.GetChild()[0].GetChild()[1].AsAstList()
 		var zv *types.Zval = ZendAstGetZval(args.GetChild()[1])
 		var first Znode
 		if ascii.StrCaseEquals(name, "func_get_args") && list.GetChildren() == 0 && zv.IsLong() && zv.Long() >= 0 {
@@ -125,7 +125,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 	var runtime_resolution = compiler.CompileFunctionName(&name_node, name_ast)
 	if runtime_resolution {
 		if ascii.StrCaseEquals(ZendAstGetStrVal(name_ast), "assert") {
-			compiler.CompileAssert(result, ZendAstGetList(args_ast), name_node.GetConstant().String(), nil)
+			compiler.CompileAssert(result, args_ast.AsAstList(), name_node.GetConstant().String(), nil)
 		} else {
 			compiler.CompileNsCall(result, &name_node, args_ast)
 		}
@@ -139,7 +139,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 
 	fbc = CG__().FunctionTable().Get(lcname.GetStr())
 	if fbc != nil && lcname.GetStr() == "assert" {
-		compiler.CompileAssert(result, ZendAstGetList(args_ast), lcname, fbc)
+		compiler.CompileAssert(result, args_ast.AsAstList(), lcname, fbc)
 		// types.ZendStringRelease(lcname)
 		// ZvalPtrDtor(name_node.GetConstant())
 		return
@@ -149,7 +149,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 		compiler.CompileDynamicCall(result, &name_node, args_ast)
 		return
 	}
-	if compiler.TryCompileSpecialFunc(result, lcname, ZendAstGetList(args_ast), fbc, type_) == types.SUCCESS {
+	if compiler.TryCompileSpecialFunc(result, lcname, args_ast.AsAstList(), fbc, type_) == types.SUCCESS {
 		// types.ZendStringReleaseEx(lcname, 0)
 		// ZvalPtrDtor(name_node.GetConstant())
 		return
@@ -338,7 +338,7 @@ func (compiler *Compiler) CompileGlobalVar(ast *ZendAst) {
 		if name_node.GetOpType() == IS_CONST {
 			//name_node.GetConstant().String().AddRefcount()
 		}
-		compiler.EmitAssignRefZnode(ZendAstCreate(ZEND_AST_VAR, ZendAstCreateZnode(&name_node)), &result)
+		compiler.EmitAssignRefZnode(AstCreate(ZEND_AST_VAR, ZendAstCreateZnode(&name_node)), &result)
 	}
 }
 func (compiler *Compiler) CompileStaticVarCommon(var_name *types.String, value *types.Zval, mode uint32) {
@@ -713,7 +713,7 @@ func (compiler *Compiler) CompileExprList(result *Znode, ast *ZendAst) {
 	if ast == nil {
 		return
 	}
-	list = ZendAstGetList(ast)
+	list = ast.AsAstList()
 	for i = 0; i < list.GetChildren(); i++ {
 		var expr_ast *ZendAst = list.GetChild()[i]
 		ZendDoFree(result)

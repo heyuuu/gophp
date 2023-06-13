@@ -9,7 +9,7 @@ import (
 )
 
 func (compiler *Compiler) CompileIf(ast *ZendAst) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var i uint32
 	var jmp_opnums *uint32 = nil
 	if list.GetChildren() > 1 {
@@ -123,15 +123,15 @@ func ShouldUseJumptable(cases *ZendAstList, jumptable_type uint8) bool {
 }
 func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
-	var cases *ZendAstList = ZendAstGetList(ast.GetChild()[1])
+	var cases *ZendAstList = ast.GetChild()[1].AsAstList()
 	var i uint32
-	var has_default_case bool = 0
+	var has_default_case bool = false
 	var expr_node Znode
 	var case_node Znode
 	var opline *types.ZendOp
 	var jmpnz_opnums *uint32
 	var opnum_default_jmp uint32
-	var opnum_switch uint32 = uint32 - 1
+	var opnum_switch uint32 = uint32(-1)
 	var jumptable_type uint8
 	var jumptable *types.Array = nil
 	compiler.CompileExpr(&expr_node, expr_ast)
@@ -229,7 +229,7 @@ func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 }
 func (compiler *Compiler) CompileTry(ast *ZendAst) {
 	var try_ast *ZendAst = ast.GetChild()[0]
-	var catches *ZendAstList = ZendAstGetList(ast.GetChild()[1])
+	var catches *ZendAstList = ast.GetChild()[1].AsAstList()
 	var finally_ast *ZendAst = ast.GetChild()[2]
 	var i uint32
 	var j uint32
@@ -273,7 +273,7 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 	}
 	for i = 0; i < catches.GetChildren(); i++ {
 		var catch_ast *ZendAst = catches.GetChild()[i]
-		var classes *ZendAstList = ZendAstGetList(catch_ast.GetChild()[0])
+		var classes *ZendAstList = catch_ast.GetChild()[0].AsAstList()
 		var var_ast *ZendAst = catch_ast.GetChild()[1]
 		var stmt_ast *ZendAst = catch_ast.GetChild()[2]
 		var var_name *types.String = ZendAstGetZval(var_ast).String()
@@ -369,7 +369,7 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 }
 func ZendDeclareIsFirstStatement(ast *ZendAst) int {
 	var i uint32 = 0
-	var file_ast *ZendAstList = ZendAstGetList(CG__().GetAst())
+	var file_ast *ZendAstList = CG__().GetAst().AsAstList()
 
 	/* Check to see if this declare is preceded only by declare statements */
 
@@ -398,7 +398,7 @@ func ZendDeclareIsFirstStatement(ast *ZendAst) int {
 	return types.FAILURE
 }
 func (compiler *Compiler) CompileDeclare(ast *ZendAst) {
-	var declares *ZendAstList = ZendAstGetList(ast.GetChild()[0])
+	var declares *ZendAstList = ast.GetChild()[0].AsAstList()
 	var stmt_ast *ZendAst = ast.GetChild()[1]
 	var i uint32
 	for i = 0; i < declares.GetChildren(); i++ {
@@ -439,7 +439,7 @@ func (compiler *Compiler) CompileDeclare(ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileStmtList(ast *ZendAst) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
 		compiler.CompileStmt(list.GetChild()[i])
@@ -479,7 +479,7 @@ func (compiler *Compiler) CompileTypename(ast *ZendAst, force_allow_null bool) t
 	return type_
 }
 func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) {
-	var list *ZendAstList = ZendAstGetList(ast)
+	var list *ZendAstList = ast.AsAstList()
 	var i uint32
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var arg_infos *ZendArgInfo
