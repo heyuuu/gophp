@@ -18,9 +18,9 @@ func (compiler *Compiler) CompileClosureBinding(closure *Znode, op_array *types.
 		op_array.SetStaticVariables(types.NewArray(8))
 	}
 	for i = 0; i < list.GetChildren(); i++ {
-		var var_name_ast *ZendAst = list.GetChild()[i]
-		var var_name *types.String = ZendAstGetZval(var_name_ast).String()
-		var mode uint32 = var_name_ast.GetAttr()
+		var var_name_ast *ZendAst = list.Children()[i]
+		var var_name *types.String = var_name_ast.Val().String()
+		var mode uint32 = var_name_ast.Attr()
 		var opline *types.ZendOp
 		var value *types.Zval
 		if var_name.GetStr() == "this" {
@@ -35,7 +35,7 @@ func (compiler *Compiler) CompileClosureBinding(closure *Znode, op_array *types.
 		if value == nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use variable $%s twice", var_name.GetVal())
 		}
-		compiler.setLinenoByAstEx(var_name_ast)
+		compiler.setLinenoByAst(var_name_ast)
 		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
 		opline.SetOp2Type(IS_CV)
 		opline.GetOp2().SetVar(LookupCv(var_name))
@@ -46,9 +46,9 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 	if ast == nil {
 		return
 	}
-	if ast.GetKind() == ZEND_AST_VAR {
-		var name_ast *ZendAst = ast.GetChild()[0]
-		if name_ast.GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(name_ast).IsString() {
+	if ast.Kind() == ZEND_AST_VAR {
+		var name_ast *ZendAst = ast.Child(0)
+		if name_ast.Kind() == ZEND_AST_ZVAL && name_ast.Val().IsString() {
 			var name *types.String = ZendAstGetStr(name_ast)
 			if ZendIsAutoGlobal(name) != 0 {
 				/* These is no need to explicitly import auto-globals. */
@@ -67,9 +67,9 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 		var list *ZendAstList = ast.AsAstList()
 		var i uint32
 		for i = 0; i < list.GetChildren(); i++ {
-			FindImplicitBindsRecursively(info, list.GetChild()[i])
+			FindImplicitBindsRecursively(info, list.Children()[i])
 		}
-	} else if ast.GetKind() == ZEND_AST_CLOSURE {
+	} else if ast.Kind() == ZEND_AST_CLOSURE {
 
 		/* For normal closures add the use() list. */
 
@@ -79,17 +79,17 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 			var uses_list *ZendAstList = uses_ast.AsAstList()
 			var i uint32
 			for i = 0; i < uses_list.GetChildren(); i++ {
-				types.ZendHashAddEmptyElement(info.GetUses(), ZendAstGetStr(uses_list.GetChild()[i]).GetStr())
+				types.ZendHashAddEmptyElement(info.GetUses(), ZendAstGetStr(uses_list.Children()[i]).GetStr())
 			}
 		}
-	} else if ast.GetKind() == ZEND_AST_ARROW_FUNC {
+	} else if ast.Kind() == ZEND_AST_ARROW_FUNC {
 
 		/* For arrow functions recursively check the expression. */
 
 		var closure_ast *ZendAstDecl = (*ZendAstDecl)(ast)
 		FindImplicitBindsRecursively(info, closure_ast.GetChild()[2])
 	} else if !ast.IsSpecial() {
-		for _, child := range ast.GetChild() {
+		for _, child := range ast.Children() {
 			FindImplicitBindsRecursively(info, child)
 		}
 	}
@@ -103,8 +103,8 @@ func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst
 	/* Remove variables that are parameters */
 
 	for i = 0; i < param_list.GetChildren(); i++ {
-		var param_ast *ZendAst = param_list.GetChild()[i]
-		info.GetUses().KeyDelete(ZendAstGetStrVal(param_ast.GetChild()[1]))
+		var param_ast *ZendAst = param_list.Children()[i]
+		info.GetUses().KeyDelete(ZendAstGetStrVal(param_ast.Child(1)))
 	}
 }
 func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *types.ZendOpArray) {
@@ -131,15 +131,15 @@ func (compiler *Compiler) CompileClosureUses(ast *ZendAst) {
 	var list *ZendAstList = ast.AsAstList()
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
-		var var_ast *ZendAst = list.GetChild()[i]
+		var var_ast *ZendAst = list.Children()[i]
 		var var_name *types.String = ZendAstGetStr(var_ast)
 		var zv types.Zval
 		zv.SetNull()
 		if j := op_array.FindVarName(var_name.GetStr()); j >= 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use lexical variable $%s as a parameter name", var_name.GetVal())
 		}
-		compiler.setLinenoByAstEx(var_ast)
-		compiler.CompileStaticVarCommon(var_name, &zv, b.Cond(var_ast.GetAttr() != 0, ZEND_BIND_REF, 0))
+		compiler.setLinenoByAst(var_ast)
+		compiler.CompileStaticVarCommon(var_name, &zv, b.Cond(var_ast.Attr() != 0, ZEND_BIND_REF, 0))
 	}
 }
 func (compiler *Compiler) CompileImplicitClosureUses(info *ClosureInfo) {
@@ -472,11 +472,11 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Properties cannot be declared abstract")
 	}
 	for i = 0; i < children; i++ {
-		var prop_ast *ZendAst = list.GetChild()[i]
-		var name_ast *ZendAst = prop_ast.GetChild()[0]
-		var value_ast *ZendAst = prop_ast.GetChild()[1]
-		var doc_comment_ast *ZendAst = prop_ast.GetChild()[2]
-		var name *types.String = ZendAstGetZval(name_ast).String()
+		var prop_ast *ZendAst = list.Children()[i]
+		var name_ast *ZendAst = prop_ast.Child(0)
+		var value_ast *ZendAst = prop_ast.Child(1)
+		var doc_comment_ast *ZendAst = prop_ast.Children()[2]
+		var name *types.String = name_ast.Val().String()
 		var doc_comment *types.String = nil
 		var value_zv types.Zval
 		var type_ types.TypeHint = 0
@@ -531,9 +531,9 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 	}
 }
 func (compiler *Compiler) CompilePropGroup(list *ZendAst) {
-	var type_ast *ZendAst = list.GetChild()[0]
-	var prop_ast *ZendAst = list.GetChild()[1]
-	compiler.CompilePropDecl(prop_ast, type_ast, list.GetAttr())
+	var type_ast *ZendAst = list.Children()[0]
+	var prop_ast *ZendAst = list.Children()[1]
+	compiler.CompilePropDecl(prop_ast, type_ast, list.Attr())
 }
 func (compiler *Compiler) CompileClassConstDecl(ast *ZendAst) {
 	var list *ZendAstList = ast.AsAstList()
@@ -544,30 +544,30 @@ func (compiler *Compiler) CompileClassConstDecl(ast *ZendAst) {
 		return
 	}
 	for i = 0; i < list.GetChildren(); i++ {
-		var const_ast *ZendAst = list.GetChild()[i]
-		var name_ast *ZendAst = const_ast.GetChild()[0]
-		var value_ast *ZendAst = const_ast.GetChild()[1]
-		var doc_comment_ast *ZendAst = const_ast.GetChild()[2]
-		var name *types.String = ZendAstGetZval(name_ast).String()
+		var const_ast *ZendAst = list.Children()[i]
+		var name_ast *ZendAst = const_ast.Child(0)
+		var value_ast *ZendAst = const_ast.Child(1)
+		var doc_comment_ast *ZendAst = const_ast.Children()[2]
+		var name *types.String = name_ast.Val().String()
 		var doc_comment *types.String = b.CondF1(doc_comment_ast != nil, func() *types.String { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
 		var value_zv types.Zval
-		if (ast.GetAttr() & (types.AccStatic | types.AccAbstract | types.AccFinal)) != 0 {
-			if (ast.GetAttr() & types.AccStatic) != 0 {
+		if (ast.Attr() & (types.AccStatic | types.AccAbstract | types.AccFinal)) != 0 {
+			if (ast.Attr() & types.AccStatic) != 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'static' as constant modifier")
-			} else if (ast.GetAttr() & types.AccAbstract) != 0 {
+			} else if (ast.Attr() & types.AccAbstract) != 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'abstract' as constant modifier")
-			} else if (ast.GetAttr() & types.AccFinal) != 0 {
+			} else if (ast.Attr() & types.AccFinal) != 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'final' as constant modifier")
 			}
 		}
 		compiler.ConstExprToZval(&value_zv, value_ast)
-		ZendDeclareClassConstantEx(ce, name, &value_zv, ast.GetAttr(), doc_comment)
+		ZendDeclareClassConstantEx(ce, name, &value_zv, ast.Attr(), doc_comment)
 	}
 }
 
 func (compiler *Compiler) CompileMethodRefEx(ast *ZendAst) *ZendTraitMethodReference {
-	var classAst *ZendAst = ast.GetChild()[0]
-	var methodAst *ZendAst = ast.GetChild()[1]
+	var classAst *ZendAst = ast.Child(0)
+	var methodAst *ZendAst = ast.Child(1)
 
 	methodName := ZendAstGetStrVal(methodAst)
 	className := ""
@@ -578,8 +578,8 @@ func (compiler *Compiler) CompileMethodRefEx(ast *ZendAst) *ZendTraitMethodRefer
 }
 
 func (compiler *Compiler) CompileMethodRef(ast *ZendAst, methodRef *ZendTraitMethodReference) {
-	var classAst *ZendAst = ast.GetChild()[0]
-	var methodAst *ZendAst = ast.GetChild()[1]
+	var classAst *ZendAst = ast.Child(0)
+	var methodAst *ZendAst = ast.Child(1)
 
 	methodName := ZendAstGetStrVal(methodAst)
 	className := ""
@@ -589,14 +589,14 @@ func (compiler *Compiler) CompileMethodRef(ast *ZendAst, methodRef *ZendTraitMet
 	methodRef.Init(methodName, className)
 }
 func (compiler *Compiler) CompileTraitPrecedence(ast *ZendAst) {
-	var methodRefAst *ZendAst = ast.GetChild()[0]
-	var insteadofAst *ZendAst = ast.GetChild()[1]
+	var methodRefAst *ZendAst = ast.Children()[0]
+	var insteadofAst *ZendAst = ast.Child(1)
 	var insteadofList *ZendAstList = insteadofAst.AsAstList()
 	var i uint32
 
 	var excludeClassNames = make([]string, insteadofList.GetChildren())
 	for i = 0; i < insteadofList.GetChildren(); i++ {
-		var nameAst *ZendAst = insteadofList.GetChild()[i]
+		var nameAst *ZendAst = insteadofList.Children()[i]
 		excludeClassNames[i] = ZendResolveClassNameAst(nameAst).GetStr()
 	}
 
@@ -608,9 +608,9 @@ func (compiler *Compiler) CompileTraitPrecedence(ast *ZendAst) {
 	ZendAddToList(CG__().GetActiveClassEntry().GetTraitPrecedences(), precedence)
 }
 func (compiler *Compiler) CompileTraitAlias(ast *ZendAst) {
-	var method_ref_ast *ZendAst = ast.GetChild()[0]
-	var alias_ast *ZendAst = ast.GetChild()[1]
-	var modifiers uint32 = ast.GetAttr()
+	var method_ref_ast *ZendAst = ast.Children()[0]
+	var alias_ast *ZendAst = ast.Child(1)
+	var modifiers uint32 = ast.Attr()
 	if modifiers == types.AccStatic {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'static' as method modifier")
 	} else if modifiers == types.AccAbstract {
@@ -632,14 +632,14 @@ func (compiler *Compiler) CompileTraitAlias(ast *ZendAst) {
 	ZendAddToList(CG__().GetActiveClassEntry().GetTraitAliases(), alias)
 }
 func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
-	var traits *ZendAstList = ast.GetChild()[0].AsAstList()
-	var adaptations *ZendAstList = b.CondF1(ast.GetChild()[1] != nil, func() *ZendAstList { return ast.GetChild()[1].AsAstList() }, nil)
+	var traits *ZendAstList = ast.Children()[0].AsAstList()
+	var adaptations *ZendAstList = b.CondF1(ast.Child(1) != nil, func() *ZendAstList { return ast.Child(1).AsAstList() }, nil)
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
 	ce.SetIsImplementTraits(true)
 	ce.SetTraitNames(Erealloc(ce.GetTraitNames(), b.SizeOf("zend_class_name")*(ce.GetNumTraits()+traits.GetChildren())))
 	for i = 0; i < traits.GetChildren(); i++ {
-		var trait_ast *ZendAst = traits.GetChild()[i]
+		var trait_ast *ZendAst = traits.Children()[i]
 		var name *types.String = ZendAstGetStr(trait_ast)
 		if ce.IsInterface() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use traits inside of interfaces. "+"%s is used in %s", name.GetVal(), ce.Name())
@@ -660,8 +660,8 @@ func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 		return
 	}
 	for i = 0; i < adaptations.GetChildren(); i++ {
-		var adaptation_ast *ZendAst = adaptations.GetChild()[i]
-		switch adaptation_ast.GetKind() {
+		var adaptation_ast *ZendAst = adaptations.Children()[i]
+		switch adaptation_ast.Kind() {
 		case ZEND_AST_TRAIT_PRECEDENCE:
 			compiler.CompileTraitPrecedence(adaptation_ast)
 		case ZEND_AST_TRAIT_ALIAS:
@@ -677,7 +677,7 @@ func (compiler *Compiler) CompileImplements(ast *ZendAst) {
 
 	interfaceNames := make([]string, list.GetChildren())
 	for i := uint32(0); i < list.GetChildren(); i++ {
-		var class_ast *ZendAst = list.GetChild()[i]
+		var class_ast *ZendAst = list.Children()[i]
 		var name *types.String = ZendAstGetStr(class_ast)
 		if ZendIsConstDefaultClassRef(class_ast) == 0 {
 			Efree(interfaceNames)
@@ -762,7 +762,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 		}
 		extends_name = extends_node.GetConstant().String()
-		ce.SetParentName(ZendResolveClassName(extends_name.GetStr(), b.CondF1(extends_ast.GetKind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.GetAttr() }, ZEND_NAME_FQ)))
+		ce.SetParentName(ZendResolveClassName(extends_name.GetStr(), b.CondF1(extends_ast.Kind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.Attr() }, ZEND_NAME_FQ)))
 		ce.SetIsInherited(true)
 	}
 	CG__().SetActiveClassEntry(ce)

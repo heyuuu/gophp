@@ -23,22 +23,6 @@ func (this *Znode) SetOp(value types.ZnodeOp) { this.u.op = value }
 func (this *Znode) GetConstant() *types.Zval  { return &this.u.constant }
 
 /**
- * ZendAstZnode
- */
-type ZendAstZnode struct {
-	kind   ZendAstKind
-	attr   ZendAstAttr
-	lineno uint32
-	node   Znode
-}
-
-func (this *ZendAstZnode) SetKind(value ZendAstKind) { this.kind = value }
-func (this *ZendAstZnode) SetAttr(value ZendAstAttr) { this.attr = value }
-func (this *ZendAstZnode) SetLineno(value uint32)    { this.lineno = value }
-func (this *ZendAstZnode) GetNode() Znode            { return this.node }
-func (this *ZendAstZnode) SetNode(value Znode)       { this.node = value }
-
-/**
  * ZendFileContext
  */
 type ImportNames = *types.Table[string]

@@ -5,6 +5,12 @@ func (zv *Zval) CopyValueFrom(v *Zval) {
 	// 复制除 u2 外所有数据
 	zv.typ, zv.value = v.typ, v.value
 }
+func (zv *Zval) CopyValue() *Zval {
+	var tmp Zval
+	tmp.CopyValueFrom(zv)
+	return &tmp
+}
+
 func (zv *Zval) CopyFrom(v *Zval) {
 	zv.CopyValueFrom(v)
 	// 除数组外，基础类型都复制了值，引用类型都复制了指针；仅数组需要做写时复制
@@ -12,6 +18,12 @@ func (zv *Zval) CopyFrom(v *Zval) {
 		zv.SetArray(zv.Array().Copy())
 	}
 }
+func (zv *Zval) Copy() *Zval {
+	var tmp Zval
+	tmp.CopyFrom(zv)
+	return &tmp
+}
+
 func (zv *Zval) CopyOrDupFrom(v *Zval) {
 	zv.CopyValueFrom(v)
 	// 除数组外，基础类型都复制了值，引用类型都复制了指针；仅数组需要做写时复制

@@ -92,11 +92,11 @@ func ZendResolveClassName(name string, typ uint32) string {
 	return ZendPrefixWithNsEx(name)
 }
 func ZendResolveClassNameAst(ast *ZendAst) *types.String {
-	var class_name = ZendAstGetZval(ast)
+	var class_name = ast.Val()
 	if !class_name.IsString() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
-	resolveName := ZendResolveClassName(class_name.StringVal(), ast.GetAttr())
+	resolveName := ZendResolveClassName(class_name.StringVal(), ast.Attr())
 	return types.NewString(resolveName)
 }
 func ZendAddTryElement(try_op uint32) uint32 {
@@ -298,7 +298,7 @@ func ZendGetClassFetchType(name string) uint32 {
 }
 func ZendGetClassFetchTypeAst(name_ast *ZendAst) uint32 {
 	/* Fully qualified names are always default refs */
-	if name_ast.GetAttr() == ZEND_NAME_FQ {
+	if name_ast.Attr() == ZEND_NAME_FQ {
 		return ZEND_FETCH_CLASS_DEFAULT
 	}
 	return ZendGetClassFetchType(ZendAstGetStrVal(name_ast))
@@ -316,10 +316,10 @@ func ZendEnsureValidClassFetchType(fetch_type uint32) {
 func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst) bool {
 	var fetch_type uint32
 	var class_name *types.Zval
-	if class_ast.GetKind() != ZEND_AST_ZVAL {
+	if class_ast.Kind() != ZEND_AST_ZVAL {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use ::class with dynamic class name")
 	}
-	class_name = ZendAstGetZval(class_ast)
+	class_name = class_ast.Val()
 	if !class_name.IsString() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}

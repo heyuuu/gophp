@@ -563,7 +563,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) string {
 							str.WriteString("Array")
 						} else if zv.IsConstantAst() {
 							var ast *ZendAst = types.Z_ASTVAL_P(zv)
-							if ast.GetKind() == ZEND_AST_CONSTANT {
+							if ast.Kind() == ZEND_AST_CONSTANT {
 								str.WriteString(ZendAstGetConstantName(ast).GetStr())
 							} else {
 								str.WriteString("<expression>")

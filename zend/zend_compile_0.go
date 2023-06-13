@@ -10,7 +10,6 @@ import (
 	"unsafe"
 )
 
-func ZendAstGetZnode(ast *ZendAst) *Znode { return (*ZendAstZnode)(ast).GetNode() }
 func OBJ_PROP(obj *types.ZendObject, offset *types.ZendObject) *types.Zval {
 	return (*types.Zval)((*byte)(obj + offset))
 }

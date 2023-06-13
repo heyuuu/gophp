@@ -22,17 +22,17 @@ func (compiler *Compiler) CompileFuncArrayKeyExists(result *Znode, args *ZendAst
 	if args.GetChildren() != 2 {
 		return types.FAILURE
 	}
-	compiler.CompileExpr(&needle, args.GetChild()[0])
-	compiler.CompileExpr(&subject, args.GetChild()[1])
+	compiler.CompileExpr(&needle, args.Children()[0])
+	compiler.CompileExpr(&subject, args.Children()[1])
 	ZendEmitOpTmp(result, ZEND_ARRAY_KEY_EXISTS, &needle, &subject)
 	return types.SUCCESS
 }
 func (compiler *Compiler) CompileFuncArraySlice(result *Znode, args *ZendAstList) int {
-	if CG__().GetActiveOpArray().GetFunctionName() != nil && args.GetChildren() == 2 && args.GetChild()[0].GetKind() == ZEND_AST_CALL && args.GetChild()[0].GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0].GetChild()[0]).IsString() && args.GetChild()[0].GetChild()[1].GetKind() == ZEND_AST_ARG_LIST && args.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
-		var orig_name *types.String = ZendAstGetStr(args.GetChild()[0].GetChild()[0])
-		name, _ := ZendResolveFunctionName(orig_name.GetStr(), args.GetChild()[0].GetChild()[0].GetAttr())
-		var list *ZendAstList = args.GetChild()[0].GetChild()[1].AsAstList()
-		var zv *types.Zval = ZendAstGetZval(args.GetChild()[1])
+	if CG__().GetActiveOpArray().GetFunctionName() != nil && args.GetChildren() == 2 && args.Children()[0].Kind() == ZEND_AST_CALL && args.Children()[0].Children()[0].Kind() == ZEND_AST_ZVAL && ZendAstGetZval(args.Children()[0].Children()[0]).IsString() && args.Children()[0].Children()[1].Kind() == ZEND_AST_ARG_LIST && args.Children()[1].Kind() == ZEND_AST_ZVAL {
+		var orig_name *types.String = ZendAstGetStr(args.Children()[0].Children()[0])
+		name, _ := ZendResolveFunctionName(orig_name.GetStr(), args.Children()[0].Children()[0].Attr())
+		var list *ZendAstList = args.Children()[0].Children()[1].AsAstList()
+		var zv *types.Zval = ZendAstGetZval(args.Children()[1])
 		var first Znode
 		if ascii.StrCaseEquals(name, "func_get_args") && list.GetChildren() == 0 && zv.IsLong() && zv.Long() >= 0 {
 			first.SetOpType(IS_CONST)
@@ -114,10 +114,10 @@ func (compiler *Compiler) TryCompileSpecialFunc(result *Znode, lcname *types.Str
 	}
 }
 func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32) {
-	var name_ast *ZendAst = ast.GetChild()[0]
-	var args_ast *ZendAst = ast.GetChild()[1]
+	var name_ast *ZendAst = ast.Child(0)
+	var args_ast *ZendAst = ast.Child(1)
 	var name_node Znode
-	if name_ast.GetKind() != ZEND_AST_ZVAL || ZendAstGetZval(name_ast).GetType() != types.IS_STRING {
+	if name_ast.Kind() != ZEND_AST_ZVAL || name_ast.Val().GetType() != types.IS_STRING {
 		compiler.CompileExpr(&name_node, name_ast)
 		compiler.CompileDynamicCall(result, &name_node, args_ast)
 		return
@@ -161,9 +161,9 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 	compiler.CompileCallCommon(result, args_ast, fbc)
 }
 func (compiler *Compiler) CompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
-	var obj_ast *ZendAst = ast.GetChild()[0]
-	var method_ast *ZendAst = ast.GetChild()[1]
-	var args_ast *ZendAst = ast.GetChild()[2]
+	var obj_ast *ZendAst = ast.Child(0)
+	var method_ast *ZendAst = ast.Child(1)
+	var args_ast *ZendAst = ast.Children()[2]
 	var obj_node Znode
 	var method_node Znode
 	var opline *types.ZendOp
@@ -211,9 +211,9 @@ func ZendIsConstructor(name *types.String) bool {
 	return ascii.StrCaseEquals(name.GetStr(), ZEND_CONSTRUCTOR_FUNC_NAME)
 }
 func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
-	var class_ast *ZendAst = ast.GetChild()[0]
-	var method_ast *ZendAst = ast.GetChild()[1]
-	var args_ast *ZendAst = ast.GetChild()[2]
+	var class_ast *ZendAst = ast.Child(0)
+	var method_ast *ZendAst = ast.Child(1)
+	var args_ast *ZendAst = ast.Children()[2]
 	var class_node Znode
 	var method_node Znode
 	var opline *types.ZendOp
@@ -276,12 +276,12 @@ func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ u
 	compiler.CompileCallCommon(result, args_ast, fbc)
 }
 func (compiler *Compiler) CompileNew(result *Znode, ast *ZendAst) {
-	var class_ast *ZendAst = ast.GetChild()[0]
-	var args_ast *ZendAst = ast.GetChild()[1]
+	var class_ast *ZendAst = ast.Child(0)
+	var args_ast *ZendAst = ast.Child(1)
 	var class_node Znode
 	var ctor_result Znode
 	var opline *types.ZendOp
-	if class_ast.GetKind() == ZEND_AST_CLASS {
+	if class_ast.Kind() == ZEND_AST_CLASS {
 
 		/* anon class declaration */
 
@@ -308,14 +308,14 @@ func (compiler *Compiler) CompileNew(result *Znode, ast *ZendAst) {
 	ZendDoFree(&ctor_result)
 }
 func (compiler *Compiler) CompileClone(result *Znode, ast *ZendAst) {
-	var obj_ast *ZendAst = ast.GetChild()[0]
+	var obj_ast *ZendAst = ast.Child(0)
 	var obj_node Znode
 	compiler.CompileExpr(&obj_node, obj_ast)
 	ZendEmitOpTmp(result, ZEND_CLONE, &obj_node, nil)
 }
 func (compiler *Compiler) CompileGlobalVar(ast *ZendAst) {
-	var var_ast *ZendAst = ast.GetChild()[0]
-	var name_ast *ZendAst = var_ast.GetChild()[0]
+	var var_ast *ZendAst = ast.Child(0)
+	var name_ast *ZendAst = var_ast.Child(0)
 	var name_node Znode
 	var result Znode
 	compiler.CompileExpr(&name_node, name_ast)
@@ -360,8 +360,8 @@ func (compiler *Compiler) CompileStaticVarCommon(var_name *types.String, value *
 	opline.SetExtendedValue(offset | mode)
 }
 func (compiler *Compiler) CompileStaticVar(ast *ZendAst) {
-	var var_ast *ZendAst = ast.GetChild()[0]
-	var value_ast *ZendAst = ast.GetChild()[1]
+	var var_ast *ZendAst = ast.Child(0)
+	var value_ast *ZendAst = ast.Child(1)
 	var value_zv types.Zval
 	if value_ast != nil {
 		compiler.ConstExprToZval(&value_zv, value_ast)
@@ -371,11 +371,11 @@ func (compiler *Compiler) CompileStaticVar(ast *ZendAst) {
 	compiler.CompileStaticVarCommon(ZendAstGetStr(var_ast), &value_zv, ZEND_BIND_REF)
 }
 func (compiler *Compiler) CompileUnset(ast *ZendAst) {
-	var var_ast *ZendAst = ast.GetChild()[0]
+	var var_ast *ZendAst = ast.Child(0)
 	var var_node Znode
 	var opline *types.ZendOp
 	ZendEnsureWritableVariable(var_ast)
-	switch var_ast.GetKind() {
+	switch var_ast.Kind() {
 	case ZEND_AST_VAR:
 		if IsThisFetch(var_ast) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unset $this")
@@ -495,7 +495,7 @@ func ZendHasFinally() int {
 	return ZendHasFinallyEx(CG__().GetLoopVarStack().GetTop() + 1)
 }
 func (compiler *Compiler) CompileReturn(ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Child(0)
 	var is_generator bool = CG__().GetActiveOpArray().IsGenerator()
 	var by_ref bool = CG__().GetActiveOpArray().IsReturnReference()
 	var expr_node Znode
@@ -548,44 +548,44 @@ func (compiler *Compiler) CompileReturn(ast *ZendAst) {
 }
 func (compiler *Compiler) CompileEcho(ast *ZendAst) {
 	var opline *types.ZendOp
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Child(0)
 	var expr_node Znode
 	compiler.CompileExpr(&expr_node, expr_ast)
 	opline = ZendEmitOp(nil, ZEND_ECHO, &expr_node, nil)
 	opline.SetExtendedValue(0)
 }
 func (compiler *Compiler) CompileThrow(ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Child(0)
 	var expr_node Znode
 	compiler.CompileExpr(&expr_node, expr_ast)
 	ZendEmitOp(nil, ZEND_THROW, &expr_node, nil)
 }
 func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
-	var depth_ast *ZendAst = ast.GetChild()[0]
+	var depth_ast *ZendAst = ast.Child(0)
 	var opline *types.ZendOp
 	var depth ZendLong
-	b.Assert(ast.GetKind() == ZEND_AST_BREAK || ast.GetKind() == ZEND_AST_CONTINUE)
+	b.Assert(ast.Kind() == ZEND_AST_BREAK || ast.Kind() == ZEND_AST_CONTINUE)
 	if depth_ast != nil {
 		var depth_zv *types.Zval
-		if depth_ast.GetKind() != ZEND_AST_ZVAL {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator with non-integer operand "+"is no longer supported", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
+		if depth_ast.Kind() != ZEND_AST_ZVAL {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator with non-integer operand "+"is no longer supported", b.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
 		}
-		depth_zv = ZendAstGetZval(depth_ast)
+		depth_zv = depth_ast.Val()
 		if !depth_zv.IsLong() || depth_zv.Long() < 1 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator accepts only positive integers", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator accepts only positive integers", b.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth = depth_zv.Long()
 	} else {
 		depth = 1
 	}
 	if CG__().GetContext().GetCurrentBrkCont() == -1 {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' not in the 'loop' or 'switch' context", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' not in the 'loop' or 'switch' context", b.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
 	} else {
 		if ZendHandleLoopsAndFinallyEx(depth, nil) == 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot '%s' "+ZEND_LONG_FMT+" level%s", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"), depth, b.Cond(depth == 1, "", "s"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot '%s' "+ZEND_LONG_FMT+" level%s", b.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"), depth, b.Cond(depth == 1, "", "s"))
 		}
 	}
-	if ast.GetKind() == ZEND_AST_CONTINUE {
+	if ast.Kind() == ZEND_AST_CONTINUE {
 		var d int
 		var cur int = CG__().GetContext().GetCurrentBrkCont()
 		for d = depth - 1; d > 0; d-- {
@@ -600,7 +600,7 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 			}
 		}
 	}
-	opline = ZendEmitOp(nil, b.Cond(ast.GetKind() == ZEND_AST_BREAK, ZEND_BRK, ZEND_CONT), nil, nil)
+	opline = ZendEmitOp(nil, b.Cond(ast.Kind() == ZEND_AST_BREAK, ZEND_BRK, ZEND_CONT), nil, nil)
 	opline.GetOp1().SetNum(CG__().GetContext().GetCurrentBrkCont())
 	opline.GetOp2().SetNum(depth)
 }
@@ -654,7 +654,7 @@ func (compiler *Compiler) ResolveGotoLabel(op_array *types.ZendOpArray, opline *
 	}
 }
 func (compiler *Compiler) CompileGoto(ast *ZendAst) {
-	var label_ast *ZendAst = ast.GetChild()[0]
+	var label_ast *ZendAst = ast.Child(0)
 	var label_node Znode
 	var opline *types.ZendOp
 	var opnum_start uint32 = GetNextOpNumber()
@@ -668,15 +668,15 @@ func (compiler *Compiler) CompileGoto(ast *ZendAst) {
 	opline.SetExtendedValue(CG__().GetContext().GetCurrentBrkCont())
 }
 func (compiler *Compiler) CompileLabel(ast *ZendAst) {
-	var label = ZendAstGetStr(ast.GetChild()[0]).GetStr()
+	var label = ZendAstGetStr(ast.Child(0)).GetStr()
 	dest := NewZendLabel(label, CG__().GetContext().GetCurrentBrkCont(), GetNextOpNumber())
 	if !CG__().GetContext().AddLabel(dest) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Label '%s' already defined", label)
 	}
 }
 func (compiler *Compiler) CompileWhile(ast *ZendAst) {
-	var cond_ast *ZendAst = ast.GetChild()[0]
-	var stmt_ast *ZendAst = ast.GetChild()[1]
+	var cond_ast *ZendAst = ast.Child(0)
+	var stmt_ast *ZendAst = ast.Child(1)
 	var cond_node Znode
 	var opnum_start uint32
 	var opnum_jmp uint32
@@ -692,8 +692,8 @@ func (compiler *Compiler) CompileWhile(ast *ZendAst) {
 	ZendEndLoop(opnum_cond, nil)
 }
 func (compiler *Compiler) CompileDoWhile(ast *ZendAst) {
-	var stmt_ast *ZendAst = ast.GetChild()[0]
-	var cond_ast *ZendAst = ast.GetChild()[1]
+	var stmt_ast *ZendAst = ast.Child(0)
+	var cond_ast *ZendAst = ast.Child(1)
 	var cond_node Znode
 	var opnum_start uint32
 	var opnum_cond uint32
@@ -715,16 +715,16 @@ func (compiler *Compiler) CompileExprList(result *Znode, ast *ZendAst) {
 	}
 	list = ast.AsAstList()
 	for i = 0; i < list.GetChildren(); i++ {
-		var expr_ast *ZendAst = list.GetChild()[i]
+		var expr_ast *ZendAst = list.Children()[i]
 		ZendDoFree(result)
 		compiler.CompileExpr(result, expr_ast)
 	}
 }
 func (compiler *Compiler) CompileFor(ast *ZendAst) {
-	var init_ast *ZendAst = ast.GetChild()[0]
-	var cond_ast *ZendAst = ast.GetChild()[1]
-	var loop_ast *ZendAst = ast.GetChild()[2]
-	var stmt_ast *ZendAst = ast.GetChild()[3]
+	var init_ast *ZendAst = ast.Children()[0]
+	var cond_ast *ZendAst = ast.Child(1)
+	var loop_ast *ZendAst = ast.Children()[2]
+	var stmt_ast *ZendAst = ast.Children()[3]
 	var result Znode
 	var opnum_start uint32
 	var opnum_jmp uint32
@@ -745,11 +745,11 @@ func (compiler *Compiler) CompileFor(ast *ZendAst) {
 	ZendEndLoop(opnum_loop, nil)
 }
 func (compiler *Compiler) CompileForeach(ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
-	var value_ast *ZendAst = ast.GetChild()[1]
-	var key_ast *ZendAst = ast.GetChild()[2]
-	var stmt_ast *ZendAst = ast.GetChild()[3]
-	var by_ref bool = value_ast.GetKind() == ZEND_AST_REF
+	var expr_ast *ZendAst = ast.Children()[0]
+	var value_ast *ZendAst = ast.Child(1)
+	var key_ast *ZendAst = ast.Children()[2]
+	var stmt_ast *ZendAst = ast.Children()[3]
+	var by_ref bool = value_ast.Kind() == ZEND_AST_REF
 	var is_variable bool = ZendIsVariable(expr_ast) != 0 && ZendCanWriteToVariable(expr_ast) != 0
 	var expr_node Znode
 	var reset_node Znode
@@ -759,17 +759,17 @@ func (compiler *Compiler) CompileForeach(ast *ZendAst) {
 	var opnum_reset uint32
 	var opnum_fetch uint32
 	if key_ast != nil {
-		if key_ast.GetKind() == ZEND_AST_REF {
+		if key_ast.Kind() == ZEND_AST_REF {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Key element cannot be a reference")
 		}
-		if key_ast.GetKind() == ZEND_AST_ARRAY {
+		if key_ast.Kind() == ZEND_AST_ARRAY {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use list as key element")
 		}
 	}
 	if by_ref != 0 {
-		value_ast = value_ast.GetChild()[0]
+		value_ast = value_ast.Children()[0]
 	}
-	if value_ast.GetKind() == ZEND_AST_ARRAY && ZendPropagateListRefs(value_ast) != 0 {
+	if value_ast.Kind() == ZEND_AST_ARRAY && ZendPropagateListRefs(value_ast) != 0 {
 		by_ref = 1
 	}
 	if by_ref != 0 && is_variable != 0 {
@@ -787,7 +787,7 @@ func (compiler *Compiler) CompileForeach(ast *ZendAst) {
 	opline = ZendEmitOp(nil, b.Cond(by_ref != 0, ZEND_FE_FETCH_RW, ZEND_FE_FETCH_R), &reset_node, nil)
 	if IsThisFetch(value_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
-	} else if value_ast.GetKind() == ZEND_AST_VAR && ZendTryCompileCv(&value_node, value_ast) == types.SUCCESS {
+	} else if value_ast.Kind() == ZEND_AST_VAR && ZendTryCompileCv(&value_node, value_ast) == types.SUCCESS {
 		opline.SetOp2Type(value_node.GetOpType())
 		if value_node.GetOpType() == IS_CONST {
 			opline.GetOp2().SetConstant(ZendAddLiteral(value_node.GetConstant()))
@@ -803,8 +803,8 @@ func (compiler *Compiler) CompileForeach(ast *ZendAst) {
 		} else {
 			value_node.SetOp(opline.GetOp2())
 		}
-		if value_ast.GetKind() == ZEND_AST_ARRAY {
-			compiler.CompileListAssign(nil, value_ast, &value_node, value_ast.GetAttr())
+		if value_ast.Kind() == ZEND_AST_ARRAY {
+			compiler.CompileListAssign(nil, value_ast, &value_node, value_ast.Attr())
 		} else if by_ref != 0 {
 			compiler.EmitAssignRefZnode(value_ast, &value_node)
 		} else {

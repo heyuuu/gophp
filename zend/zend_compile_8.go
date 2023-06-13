@@ -8,34 +8,34 @@ import (
 )
 
 func (compiler *Compiler) CompileUnaryPm(result *Znode, ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Child(0)
 	var expr_node Znode
 	var lefthand_node Znode
-	b.Assert(ast.GetKind() == ZEND_AST_UNARY_PLUS || ast.GetKind() == ZEND_AST_UNARY_MINUS)
+	b.Assert(ast.Kind() == ZEND_AST_UNARY_PLUS || ast.Kind() == ZEND_AST_UNARY_MINUS)
 	compiler.CompileExpr(&expr_node, expr_ast)
 	if expr_node.GetOpType() == IS_CONST {
-		if ZendTryCtEvalUnaryPm(result.GetConstant(), ast.GetKind(), expr_node.GetConstant()) != 0 {
+		if ZendTryCtEvalUnaryPm(result.GetConstant(), ast.Kind(), expr_node.GetConstant()) != 0 {
 			result.SetOpType(IS_CONST)
 			// ZvalPtrDtor(expr_node.GetConstant())
 			return
 		}
 	}
 	lefthand_node.SetOpType(IS_CONST)
-	lefthand_node.GetConstant().SetLong(b.Cond(ast.GetKind() == ZEND_AST_UNARY_PLUS, 1, -1))
+	lefthand_node.GetConstant().SetLong(b.Cond(ast.Kind() == ZEND_AST_UNARY_PLUS, 1, -1))
 	ZendEmitOpTmp(result, ZEND_MUL, &lefthand_node, &expr_node)
 }
 func (compiler *Compiler) CompileShortCircuiting(result *Znode, ast *ZendAst) {
-	var left_ast *ZendAst = ast.GetChild()[0]
-	var right_ast *ZendAst = ast.GetChild()[1]
+	var left_ast *ZendAst = ast.Child(0)
+	var right_ast *ZendAst = ast.Child(1)
 	var left_node Znode
 	var right_node Znode
 	var opline_jmpz *types.ZendOp
 	var opline_bool *types.ZendOp
 	var opnum_jmpz uint32
-	b.Assert(ast.GetKind() == ZEND_AST_AND || ast.GetKind() == ZEND_AST_OR)
+	b.Assert(ast.Kind() == ZEND_AST_AND || ast.Kind() == ZEND_AST_OR)
 	compiler.CompileExpr(&left_node, left_ast)
 	if left_node.GetOpType() == IS_CONST {
-		if ast.GetKind() == ZEND_AST_AND && operators.IZendIsTrue(left_node.GetConstant()) == 0 || ast.GetKind() == ZEND_AST_OR && operators.IZendIsTrue(left_node.GetConstant()) != 0 {
+		if ast.Kind() == ZEND_AST_AND && operators.IZendIsTrue(left_node.GetConstant()) == 0 || ast.Kind() == ZEND_AST_OR && operators.IZendIsTrue(left_node.GetConstant()) != 0 {
 			result.SetOpType(IS_CONST)
 			result.GetConstant().SetBool(operators.IZendIsTrue(left_node.GetConstant()) != 0)
 		} else {
@@ -52,7 +52,7 @@ func (compiler *Compiler) CompileShortCircuiting(result *Znode, ast *ZendAst) {
 		return
 	}
 	opnum_jmpz = GetNextOpNumber()
-	opline_jmpz = ZendEmitOp(nil, b.Cond(ast.GetKind() == ZEND_AST_AND, ZEND_JMPZ_EX, ZEND_JMPNZ_EX), &left_node, nil)
+	opline_jmpz = ZendEmitOp(nil, b.Cond(ast.Kind() == ZEND_AST_AND, ZEND_JMPZ_EX, ZEND_JMPNZ_EX), &left_node, nil)
 	if left_node.GetOpType() == IS_TMP_VAR {
 		opline_jmpz.SetResultType(left_node.GetOpType())
 		if left_node.GetOpType() == IS_CONST {
@@ -81,20 +81,20 @@ func (compiler *Compiler) CompileShortCircuiting(result *Znode, ast *ZendAst) {
 	ZendUpdateJumpTargetToNext(opnum_jmpz)
 }
 func (compiler *Compiler) CompilePostIncdec(result *Znode, ast *ZendAst) {
-	var var_ast *ZendAst = ast.GetChild()[0]
-	b.Assert(ast.GetKind() == ZEND_AST_POST_INC || ast.GetKind() == ZEND_AST_POST_DEC)
+	var var_ast *ZendAst = ast.Child(0)
+	b.Assert(ast.Kind() == ZEND_AST_POST_INC || ast.Kind() == ZEND_AST_POST_DEC)
 	ZendEnsureWritableVariable(var_ast)
-	if var_ast.GetKind() == ZEND_AST_PROP {
+	if var_ast.Kind() == ZEND_AST_PROP {
 		var opline *types.ZendOp = compiler.CompileProp(nil, var_ast, BP_VAR_RW, 0)
-		if ast.GetKind() == ZEND_AST_POST_INC {
+		if ast.Kind() == ZEND_AST_POST_INC {
 			opline.SetOpcode(ZEND_POST_INC_OBJ)
 		} else {
 			opline.SetOpcode(ZEND_POST_DEC_OBJ)
 		}
 		ZendMakeTmpResult(result, opline)
-	} else if var_ast.GetKind() == ZEND_AST_STATIC_PROP {
+	} else if var_ast.Kind() == ZEND_AST_STATIC_PROP {
 		var opline *types.ZendOp = compiler.CompileStaticProp(nil, var_ast, BP_VAR_RW, 0, 0)
-		if ast.GetKind() == ZEND_AST_POST_INC {
+		if ast.Kind() == ZEND_AST_POST_INC {
 			opline.SetOpcode(ZEND_POST_INC_STATIC_PROP)
 		} else {
 			opline.SetOpcode(ZEND_POST_DEC_STATIC_PROP)
@@ -103,23 +103,23 @@ func (compiler *Compiler) CompilePostIncdec(result *Znode, ast *ZendAst) {
 	} else {
 		var var_node Znode
 		compiler.CompileVar(&var_node, var_ast, BP_VAR_RW, 0)
-		ZendEmitOpTmp(result, b.Cond(ast.GetKind() == ZEND_AST_POST_INC, ZEND_POST_INC, ZEND_POST_DEC), &var_node, nil)
+		ZendEmitOpTmp(result, b.Cond(ast.Kind() == ZEND_AST_POST_INC, ZEND_POST_INC, ZEND_POST_DEC), &var_node, nil)
 	}
 }
 func (compiler *Compiler) CompilePreIncdec(result *Znode, ast *ZendAst) {
-	var var_ast *ZendAst = ast.GetChild()[0]
-	b.Assert(ast.GetKind() == ZEND_AST_PRE_INC || ast.GetKind() == ZEND_AST_PRE_DEC)
+	var var_ast *ZendAst = ast.Child(0)
+	b.Assert(ast.Kind() == ZEND_AST_PRE_INC || ast.Kind() == ZEND_AST_PRE_DEC)
 	ZendEnsureWritableVariable(var_ast)
-	if var_ast.GetKind() == ZEND_AST_PROP {
+	if var_ast.Kind() == ZEND_AST_PROP {
 		var opline *types.ZendOp = compiler.CompileProp(result, var_ast, BP_VAR_RW, 0)
-		if ast.GetKind() == ZEND_AST_PRE_INC {
+		if ast.Kind() == ZEND_AST_PRE_INC {
 			opline.SetOpcode(ZEND_PRE_INC_OBJ)
 		} else {
 			opline.SetOpcode(ZEND_PRE_DEC_OBJ)
 		}
-	} else if var_ast.GetKind() == ZEND_AST_STATIC_PROP {
+	} else if var_ast.Kind() == ZEND_AST_STATIC_PROP {
 		var opline *types.ZendOp = compiler.CompileStaticProp(result, var_ast, BP_VAR_RW, 0, 0)
-		if ast.GetKind() == ZEND_AST_PRE_INC {
+		if ast.Kind() == ZEND_AST_PRE_INC {
 			opline.SetOpcode(ZEND_PRE_INC_STATIC_PROP)
 		} else {
 			opline.SetOpcode(ZEND_PRE_DEC_STATIC_PROP)
@@ -127,28 +127,28 @@ func (compiler *Compiler) CompilePreIncdec(result *Znode, ast *ZendAst) {
 	} else {
 		var var_node Znode
 		compiler.CompileVar(&var_node, var_ast, BP_VAR_RW, 0)
-		ZendEmitOp(result, b.Cond(ast.GetKind() == ZEND_AST_PRE_INC, ZEND_PRE_INC, ZEND_PRE_DEC), &var_node, nil)
+		ZendEmitOp(result, b.Cond(ast.Kind() == ZEND_AST_PRE_INC, ZEND_PRE_INC, ZEND_PRE_DEC), &var_node, nil)
 	}
 }
 func (compiler *Compiler) CompileCast(result *Znode, ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Child(0)
 	var expr_node Znode
 	var opline *types.ZendOp
 	compiler.CompileExpr(&expr_node, expr_ast)
 	opline = ZendEmitOpTmp(result, ZEND_CAST, &expr_node, nil)
-	opline.SetExtendedValue(ast.GetAttr())
-	if ast.GetAttr() == types.IS_NULL {
+	opline.SetExtendedValue(ast.Attr())
+	if ast.Attr() == types.IS_NULL {
 		faults.Error(faults.E_DEPRECATED, "The (unset) cast is deprecated")
 	}
 }
 func (compiler *Compiler) CompileShorthandConditional(result *Znode, ast *ZendAst) {
-	var cond_ast *ZendAst = ast.GetChild()[0]
-	var false_ast *ZendAst = ast.GetChild()[2]
+	var cond_ast *ZendAst = ast.Child(0)
+	var false_ast *ZendAst = ast.Children()[2]
 	var cond_node Znode
 	var false_node Znode
 	var opline_qm_assign *types.ZendOp
 	var opnum_jmp_set uint32
-	b.Assert(ast.GetChild()[1] == nil)
+	b.Assert(ast.Child(1) == nil)
 	compiler.CompileExpr(&cond_node, cond_ast)
 	opnum_jmp_set = GetNextOpNumber()
 	ZendEmitOpTmp(result, ZEND_JMP_SET, &cond_node, nil)
@@ -163,17 +163,17 @@ func (compiler *Compiler) CompileShorthandConditional(result *Znode, ast *ZendAs
 	ZendUpdateJumpTargetToNext(opnum_jmp_set)
 }
 func (compiler *Compiler) CompileConditional(result *Znode, ast *ZendAst) {
-	var cond_ast *ZendAst = ast.GetChild()[0]
-	var true_ast *ZendAst = ast.GetChild()[1]
-	var false_ast *ZendAst = ast.GetChild()[2]
+	var cond_ast *ZendAst = ast.Child(0)
+	var true_ast *ZendAst = ast.Child(1)
+	var false_ast *ZendAst = ast.Children()[2]
 	var cond_node Znode
 	var true_node Znode
 	var false_node Znode
 	var opline_qm_assign2 *types.ZendOp
 	var opnum_jmpz uint32
 	var opnum_jmp uint32
-	if cond_ast.GetKind() == ZEND_AST_CONDITIONAL && cond_ast.GetAttr() != ZEND_PARENTHESIZED_CONDITIONAL {
-		if cond_ast.GetChild()[1] != nil {
+	if cond_ast.Kind() == ZEND_AST_CONDITIONAL && cond_ast.Attr() != ZEND_PARENTHESIZED_CONDITIONAL {
+		if cond_ast.Child(1) != nil {
 			if true_ast != nil {
 				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ? b : c ? d : e` is deprecated. "+"Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)`")
 			} else {
@@ -206,8 +206,8 @@ func (compiler *Compiler) CompileConditional(result *Znode, ast *ZendAst) {
 	ZendUpdateJumpTargetToNext(opnum_jmp)
 }
 func (compiler *Compiler) CompileCoalesce(result *Znode, ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
-	var default_ast *ZendAst = ast.GetChild()[1]
+	var expr_ast *ZendAst = ast.Children()[0]
+	var default_ast *ZendAst = ast.Child(1)
 	var expr_node Znode
 	var default_node Znode
 	var opline *types.ZendOp
@@ -227,8 +227,8 @@ func (compiler *Compiler) CompileCoalesce(result *Znode, ast *ZendAst) {
 	opline.GetOp2().SetOplineNum(GetNextOpNumber())
 }
 func (compiler *Compiler) CompileAssignCoalesce(result *Znode, ast *ZendAst) {
-	var var_ast *ZendAst = ast.GetChild()[0]
-	var default_ast *ZendAst = ast.GetChild()[1]
+	var var_ast *ZendAst = ast.Children()[0]
+	var default_ast *ZendAst = ast.Child(1)
 	var var_node_is Znode
 	var var_node_w Znode
 	var default_node Znode
@@ -260,7 +260,7 @@ func (compiler *Compiler) CompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	/* Reproduce some of the zend_compile_assign() opcode fixup logic here. */
 
 	opline = CG__().GetActiveOpArray().GetOpcodes()[CG__().GetActiveOpArray().GetLast()-1]
-	switch var_ast.GetKind() {
+	switch var_ast.Kind() {
 	case ZEND_AST_VAR:
 		ZendEmitOp(&assign_node, ZEND_ASSIGN, &var_node_w, &default_node)
 	case ZEND_AST_STATIC_PROP:
@@ -313,7 +313,7 @@ func (compiler *Compiler) CompileAssignCoalesce(result *Znode, ast *ZendAst) {
 }
 func (compiler *Compiler) CompilePrint(result *Znode, ast *ZendAst) {
 	var opline *types.ZendOp
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Children()[0]
 	var expr_node Znode
 	compiler.CompileExpr(&expr_node, expr_ast)
 	opline = ZendEmitOp(nil, ZEND_ECHO, &expr_node, nil)
@@ -322,7 +322,7 @@ func (compiler *Compiler) CompilePrint(result *Znode, ast *ZendAst) {
 	result.GetConstant().SetLong(1)
 }
 func (compiler *Compiler) CompileExit(result *Znode, ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Children()[0]
 	if expr_ast != nil {
 		var expr_node Znode
 		compiler.CompileExpr(&expr_node, expr_ast)
@@ -334,8 +334,8 @@ func (compiler *Compiler) CompileExit(result *Znode, ast *ZendAst) {
 	result.GetConstant().SetBool(true)
 }
 func (compiler *Compiler) CompileYield(result *Znode, ast *ZendAst) {
-	var value_ast *ZendAst = ast.GetChild()[0]
-	var key_ast *ZendAst = ast.GetChild()[1]
+	var value_ast *ZendAst = ast.Children()[0]
+	var key_ast *ZendAst = ast.Child(1)
 	var value_node Znode
 	var key_node Znode
 	var value_node_ptr *Znode = nil
@@ -361,7 +361,7 @@ func (compiler *Compiler) CompileYield(result *Znode, ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileYieldFrom(result *Znode, ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Children()[0]
 	var expr_node Znode
 	ZendMarkFunctionAsGenerator()
 	if CG__().GetActiveOpArray().IsReturnReference() {
@@ -371,8 +371,8 @@ func (compiler *Compiler) CompileYieldFrom(result *Znode, ast *ZendAst) {
 	ZendEmitOpTmp(result, ZEND_YIELD_FROM, &expr_node, nil)
 }
 func (compiler *Compiler) CompileInstanceof(result *Znode, ast *ZendAst) {
-	var obj_ast *ZendAst = ast.GetChild()[0]
-	var class_ast *ZendAst = ast.GetChild()[1]
+	var obj_ast *ZendAst = ast.Children()[0]
+	var class_ast *ZendAst = ast.Child(1)
 	var obj_node Znode
 	var class_node Znode
 	var opline *types.ZendOp
@@ -399,22 +399,22 @@ func (compiler *Compiler) CompileInstanceof(result *Znode, ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileIncludeOrEval(result *Znode, ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Children()[0]
 	var expr_node Znode
 	var opline *types.ZendOp
 	ZendDoExtendedFcallBegin()
 	compiler.CompileExpr(&expr_node, expr_ast)
 	opline = ZendEmitOp(result, ZEND_INCLUDE_OR_EVAL, &expr_node, nil)
-	opline.SetExtendedValue(ast.GetAttr())
+	opline.SetExtendedValue(ast.Attr())
 	ZendDoExtendedFcallEnd()
 }
 func (compiler *Compiler) CompileIssetOrEmpty(result *Znode, ast *ZendAst) {
-	var var_ast *ZendAst = ast.GetChild()[0]
+	var var_ast *ZendAst = ast.Children()[0]
 	var var_node Znode
 	var opline *types.ZendOp = nil
-	b.Assert(ast.GetKind() == ZEND_AST_ISSET || ast.GetKind() == ZEND_AST_EMPTY)
+	b.Assert(ast.Kind() == ZEND_AST_ISSET || ast.Kind() == ZEND_AST_EMPTY)
 	if ZendIsVariable(var_ast) == 0 {
-		if ast.GetKind() == ZEND_AST_EMPTY {
+		if ast.Kind() == ZEND_AST_EMPTY {
 			/* empty(expr) can be transformed to !expr */
 			var not_ast *ZendAst = AstCreateEx(ZEND_AST_UNARY_OP, ZEND_BOOL_NOT, var_ast)
 			compiler.CompileExpr(result, not_ast)
@@ -423,7 +423,7 @@ func (compiler *Compiler) CompileIssetOrEmpty(result *Znode, ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use isset() on the result of an expression "+"(you can use \"null !== expression\" instead)")
 		}
 	}
-	switch var_ast.GetKind() {
+	switch var_ast.Kind() {
 	case ZEND_AST_VAR:
 		if IsThisFetch(var_ast) {
 			opline = ZendEmitOp(result, ZEND_ISSET_ISEMPTY_THIS, nil, nil)
@@ -448,15 +448,15 @@ func (compiler *Compiler) CompileIssetOrEmpty(result *Znode, ast *ZendAst) {
 	}
 	opline.SetResultType(IS_TMP_VAR)
 	result.SetOpType(opline.GetResultType())
-	if ast.GetKind() != ZEND_AST_ISSET {
+	if ast.Kind() != ZEND_AST_ISSET {
 		opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_ISEMPTY)
 	}
 }
 func (compiler *Compiler) CompileSilence(result *Znode, ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Children()[0]
 	var silence_node Znode
 	ZendEmitOpTmp(&silence_node, ZEND_BEGIN_SILENCE, nil, nil)
-	if expr_ast.GetKind() == ZEND_AST_VAR {
+	if expr_ast.Kind() == ZEND_AST_VAR {
 
 		/* For @$var we need to force a FETCH instruction, otherwise the CV access will
 		 * happen outside the silenced section. */
@@ -472,7 +472,7 @@ func (compiler *Compiler) CompileSilence(result *Znode, ast *ZendAst) {
 	ZendEmitOp(nil, ZEND_END_SILENCE, &silence_node, nil)
 }
 func (compiler *Compiler) CompileShellExec(result *Znode, ast *ZendAst) {
-	var expr_ast *ZendAst = ast.GetChild()[0]
+	var expr_ast *ZendAst = ast.Children()[0]
 	var fn_name types.Zval
 	var name_ast *ZendAst
 	var args_ast *ZendAst
@@ -498,7 +498,7 @@ func (compiler *Compiler) CompileArray(result *Znode, ast *ZendAst) {
 
 	b.Assert(list.GetChildren() > 0)
 	for i = 0; i < list.GetChildren(); i++ {
-		var elem_ast *ZendAst = list.GetChild()[i]
+		var elem_ast *ZendAst = list.Children()[i]
 		var value_ast *ZendAst
 		var key_ast *ZendAst
 		var by_ref bool
@@ -508,8 +508,8 @@ func (compiler *Compiler) CompileArray(result *Znode, ast *ZendAst) {
 		if elem_ast == nil {
 			faults.Error(faults.E_COMPILE_ERROR, "Cannot use empty array elements in arrays")
 		}
-		value_ast = elem_ast.GetChild()[0]
-		if elem_ast.GetKind() == ZEND_AST_UNPACK {
+		value_ast = elem_ast.Children()[0]
+		if elem_ast.Kind() == ZEND_AST_UNPACK {
 			compiler.CompileExpr(&value_node, value_ast)
 			if i == 0 {
 				opnum_init = GetNextOpNumber()
@@ -524,8 +524,8 @@ func (compiler *Compiler) CompileArray(result *Znode, ast *ZendAst) {
 			}
 			continue
 		}
-		key_ast = elem_ast.GetChild()[1]
-		by_ref = elem_ast.GetAttr()
+		key_ast = elem_ast.Child(1)
+		by_ref = elem_ast.Attr()
 		if key_ast != nil {
 			compiler.CompileExpr(&key_node, key_ast)
 			ZendHandleNumericOp(&key_node)
@@ -567,23 +567,23 @@ func (compiler *Compiler) CompileArray(result *Znode, ast *ZendAst) {
 	/* Add a flag to INIT_ARRAY if we know this array cannot be packed */
 }
 func (compiler *Compiler) CompileConst(result *Znode, ast *ZendAst) {
-	var name_ast *ZendAst = ast.GetChild()[0]
+	var name_ast *ZendAst = ast.Children()[0]
 	var opline *types.ZendOp
 	var is_fully_qualified bool
 	var orig_name *types.String = ZendAstGetStr(name_ast)
-	var resolved_name, isFullyQualified = ZendResolveConstName(orig_name, name_ast.GetAttr())
-	if resolved_name == "__COMPILER_HALT_OFFSET__" || name_ast.GetAttr() != ZEND_NAME_RELATIVE && orig_name.GetStr() == "__COMPILER_HALT_OFFSET__" {
+	var resolved_name, isFullyQualified = ZendResolveConstName(orig_name, name_ast.Attr())
+	if resolved_name == "__COMPILER_HALT_OFFSET__" || name_ast.Attr() != ZEND_NAME_RELATIVE && orig_name.GetStr() == "__COMPILER_HALT_OFFSET__" {
 		var last *ZendAst = CG__().GetAst()
-		for last != nil && last.GetKind() == ZEND_AST_STMT_LIST {
+		for last != nil && last.Kind() == ZEND_AST_STMT_LIST {
 			var list *ZendAstList = last.AsAstList()
 			if list.GetChildren() == 0 {
 				break
 			}
-			last = list.GetChild()[list.GetChildren()-1]
+			last = list.Children()[list.GetChildren()-1]
 		}
-		if last != nil && last.GetKind() == ZEND_AST_HALT_COMPILER {
+		if last != nil && last.Kind() == ZEND_AST_HALT_COMPILER {
 			result.SetOpType(IS_CONST)
-			result.GetConstant().SetLong(ZendAstGetZval(last.GetChild()[0]).Long())
+			result.GetConstant().SetLong(ZendAstGetZval(last.Children()[0]).Long())
 			// types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
@@ -609,19 +609,19 @@ func (compiler *Compiler) CompileConst(result *Znode, ast *ZendAst) {
 	opline.SetExtendedValue(ZendAllocCacheSlot())
 }
 func (compiler *Compiler) CompileClassConst(result *Znode, ast *ZendAst) {
-	var class_ast *ZendAst = ast.GetChild()[0]
-	var const_ast *ZendAst = ast.GetChild()[1]
+	var class_ast *ZendAst = ast.Children()[0]
+	var const_ast *ZendAst = ast.Child(1)
 	var class_node Znode
 	var const_node Znode
 	var opline *types.ZendOp
-	compiler.EvalConstExpr(ast.GetChild()[0])
-	compiler.EvalConstExpr(ast.GetChild()[1])
-	class_ast = ast.GetChild()[0]
-	const_ast = ast.GetChild()[1]
-	if class_ast.GetKind() == ZEND_AST_ZVAL {
+	compiler.EvalConstExpr(ast.Children()[0])
+	compiler.EvalConstExpr(ast.Child(1))
+	class_ast = ast.Children()[0]
+	const_ast = ast.Child(1)
+	if class_ast.Kind() == ZEND_AST_ZVAL {
 		var resolved_name *types.String
 		resolved_name = ZendResolveClassNameAst(class_ast)
-		if const_ast.GetKind() == ZEND_AST_ZVAL && ZendTryCtEvalClassConst(result.GetConstant(), resolved_name, ZendAstGetStr(const_ast)) != 0 {
+		if const_ast.Kind() == ZEND_AST_ZVAL && ZendTryCtEvalClassConst(result.GetConstant(), resolved_name, ZendAstGetStr(const_ast)) != 0 {
 			result.SetOpType(IS_CONST)
 			// types.ZendStringReleaseEx(resolved_name, 0)
 			return
@@ -635,7 +635,7 @@ func (compiler *Compiler) CompileClassConst(result *Znode, ast *ZendAst) {
 	opline.SetExtendedValue(ZendAllocCacheSlots(2))
 }
 func (compiler *Compiler) CompileClassName(result *Znode, ast *ZendAst) {
-	var class_ast *ZendAst = ast.GetChild()[0]
+	var class_ast *ZendAst = ast.Children()[0]
 	var opline *types.ZendOp
 	if ZendTryCompileConstExprResolveClassName(result.GetConstant(), class_ast) != 0 {
 		result.SetOpType(IS_CONST)
@@ -717,7 +717,7 @@ func (compiler *Compiler) CompileEncapsList(result *Znode, ast *ZendAst) {
 	j = 0
 	last_const_node.SetOpType(IS_UNUSED)
 	for i = 0; i < list.GetChildren(); i++ {
-		compiler.CompileExpr(&elem_node, list.GetChild()[i])
+		compiler.CompileExpr(&elem_node, list.Children()[i])
 		if elem_node.GetOpType() == IS_CONST {
 			operators.ConvertToString(elem_node.GetConstant())
 			if elem_node.GetConstant().String().GetLen() == 0 {

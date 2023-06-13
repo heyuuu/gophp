@@ -32,12 +32,7 @@ func (compiler *Compiler) setLineno(lineno uint32) {
 }
 
 func (compiler *Compiler) setLinenoByAst(ast *ZendAst) {
-	compiler.setLineno(ast.GetLineno())
-}
-
-func (compiler *Compiler) setLinenoByAstEx(ast *ZendAst) {
-	lineno := ZendAstGetLineno(ast)
-	compiler.setLineno(lineno)
+	compiler.setLineno(ast.Lineno())
 }
 
 func (compiler *Compiler) setLinenoByOpline(opline *types.ZendOp) {

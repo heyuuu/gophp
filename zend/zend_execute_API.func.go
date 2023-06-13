@@ -332,11 +332,11 @@ func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *type
 func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) int {
 	if p.IsConstantAst() {
 		var ast *ZendAst = types.Z_ASTVAL_P(p)
-		if ast.GetKind() == ZEND_AST_CONSTANT {
+		if ast.Kind() == ZEND_AST_CONSTANT {
 			var name *types.String = ZendAstGetConstantName(ast)
-			var zv *types.Zval = ZendGetConstantEx(name.GetStr(), scope, ast.GetAttr())
+			var zv *types.Zval = ZendGetConstantEx(name.GetStr(), scope, ast.Attr())
 			if zv == nil {
-				return ZendUseUndefinedConstant(name, ast.GetAttr(), p)
+				return ZendUseUndefinedConstant(name, ast.Attr(), p)
 			}
 			types.ZVAL_COPY_OR_DUP(p, zv)
 		} else {
