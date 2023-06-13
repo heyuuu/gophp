@@ -12,38 +12,33 @@ import (
 /**
  * PhpBasicGlobals
  */
+type serializeType struct {
+	data  *PhpSerializeData
+	level uint
+}
+type unserializeType struct {
+	data  *PhpUnserializeData
+	level uint
+}
 type PhpBasicGlobals struct {
 	strTokState   str.StrTokState
 	RandGenerator *rand.Rand
 
-	user_shutdown_function_names *types.Array
-	putenv_ht                    types.Array
-	locale_string                *types.String
-	locale_changed               bool
-	str_ebuf                     []byte
-	array_walk_fci               types.ZendFcallInfo
-	array_walk_fci_cache         types.ZendFcallInfoCache
-	user_tick_functions          *zend.ZendLlist
-	active_ini_file_section      types.Zval
-	page_uid                     zend.ZendLong
-	page_gid                     zend.ZendLong
-	page_inode                   zend.ZendLong
-	page_mtime                   int64
-	CurrentStatFile              *byte
-	CurrentLStatFile             **byte
-	ssb                          core.PhpStreamStatbuf
-	lssb                         core.PhpStreamStatbuf
-	syslog_device                *byte
-	incomplete_class             *types.ClassEntry
-	serialize_lock               unsigned
-	serialize                    struct {
-		data  *PhpSerializeData
-		level unsigned
-	}
-	unserialize struct {
-		data  *PhpUnserializeData
-		level unsigned
-	}
+	userShutdownFunctions      []PhpShutdownFunction
+	putenv_ht                  types.Array
+	localeString               *types.String
+	localeChanged              bool
+	str_ebuf                   []byte
+	active_ini_file_section    types.Zval
+	CurrentStatFile            *byte
+	CurrentLStatFile           **byte
+	ssb                        core.PhpStreamStatbuf
+	lssb                       core.PhpStreamStatbuf
+	syslog_device              *byte
+	incomplete_class           *types.ClassEntry
+	serialize_lock             uint
+	serialize                  serializeType
+	unserialize                unserializeType
 	url_adapt_session_ex       UrlAdaptStateExT
 	url_adapt_session_hosts_ht *types.Array
 	url_adapt_output_ex        UrlAdaptStateExT
@@ -55,49 +50,104 @@ type PhpBasicGlobals struct {
 	unserialize_max_depth      zend.ZendLong
 }
 
-func (this *PhpBasicGlobals) GetUrlAdaptSessionEx() UrlAdaptStateExT {
-	return this.url_adapt_session_ex
+func (bg *PhpBasicGlobals) Ctor() {
+	bg.ResetRandGenerator()
+	bg.umask = -1
+	bg.UserFilterMap = nil
+	bg.serialize_lock = 0
+	bg.serialize = serializeType{}
+	bg.unserialize = unserializeType{}
+	bg.url_adapt_session_ex = UrlAdaptStateExT{type_: 1}
+	bg.url_adapt_output_ex = UrlAdaptStateExT{type_: 0}
+	bg.url_adapt_session_hosts_ht = types.NewArray(0)
+	bg.url_adapt_output_hosts_ht = types.NewArray(0)
+	bg.incomplete_class = IncompleteClassEntry
 }
-
-func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() *types.Array {
-	return this.url_adapt_session_hosts_ht
+func (bg *PhpBasicGlobals) Activate() {
+	bg.serialize_lock = 0
+	bg.serialize = serializeType{}
+	bg.unserialize = unserializeType{}
+	bg.localeString = nil
+	bg.localeChanged = false
+	bg.CurrentStatFile = nil
+	bg.CurrentLStatFile = nil
+	bg.syslog_device = nil
 }
-
-func (this *PhpBasicGlobals) GetUrlAdaptOutputEx() UrlAdaptStateExT { return this.url_adapt_output_ex }
-func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() *types.Array {
-	return this.url_adapt_output_hosts_ht
+func (bg *PhpBasicGlobals) Deactivate() {
+	bg.ResetRandGenerator()
 }
-
-func (this *PhpBasicGlobals) GetStrTokState() *str.StrTokState {
-	return &this.strTokState
-}
-
-func (this *PhpBasicGlobals) ResetRandGenerator() {
-	this.RandGenerator = nil
-}
-func (this *PhpBasicGlobals) InitRandGenerator(seed int64) {
-	this.RandGenerator = rand.New(rand.NewSource(seed))
-}
-func (this *PhpBasicGlobals) GetRandGenerator() *rand.Rand {
-	if this.RandGenerator == nil {
-		seed := time.Now().UnixNano()
-		this.InitRandGenerator(seed)
+func (bg *PhpBasicGlobals) Dtor() {
+	if bg.url_adapt_session_ex.tags != nil {
+		bg.url_adapt_session_ex.tags.Destroy()
 	}
-	return this.RandGenerator
+	if bg.url_adapt_output_ex.tags != nil {
+		bg.url_adapt_output_ex.tags.Destroy()
+	}
+	bg.url_adapt_session_hosts_ht.Destroy()
+	bg.url_adapt_output_hosts_ht.Destroy()
+}
+
+func (bg *PhpBasicGlobals) GetUrlAdaptSessionEx() UrlAdaptStateExT {
+	return bg.url_adapt_session_ex
+}
+
+func (bg *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() *types.Array {
+	return bg.url_adapt_session_hosts_ht
+}
+
+func (bg *PhpBasicGlobals) GetUrlAdaptOutputEx() UrlAdaptStateExT { return bg.url_adapt_output_ex }
+func (bg *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() *types.Array {
+	return bg.url_adapt_output_hosts_ht
+}
+
+func (bg *PhpBasicGlobals) GetStrTokState() *str.StrTokState {
+	return &bg.strTokState
+}
+
+func (bg *PhpBasicGlobals) ResetRandGenerator() {
+	bg.RandGenerator = nil
+}
+func (bg *PhpBasicGlobals) InitRandGenerator(seed int64) {
+	bg.RandGenerator = rand.New(rand.NewSource(seed))
+}
+func (bg *PhpBasicGlobals) GetRandGenerator() *rand.Rand {
+	if bg.RandGenerator == nil {
+		seed := time.Now().UnixNano()
+		bg.InitRandGenerator(seed)
+	}
+	return bg.RandGenerator
+}
+
+func (bg *PhpBasicGlobals) ResetUserShutdownFunctions() {
+	bg.userShutdownFunctions = nil
+}
+func (bg *PhpBasicGlobals) HasUserShutdownFunctions() bool {
+	return len(bg.userShutdownFunctions) != 0
+}
+func (bg *PhpBasicGlobals) AddUserShutdownFunction(entry PhpShutdownFunction) {
+	bg.userShutdownFunctions = append(bg.userShutdownFunctions, entry)
+}
+func (bg *PhpBasicGlobals) EachUserShutdownFunction(fn func(*PhpShutdownFunction)) {
+	for i := range bg.userShutdownFunctions {
+		entry := &bg.userShutdownFunctions[i]
+		fn(entry)
+	}
 }
 
 /**
- * PhpShutdownFunctionEntry
+ * PhpShutdownFunction
  */
-type PhpShutdownFunctionEntry struct {
-	arguments *types.Zval
-	arg_count int
+type PhpShutdownFunction struct {
+	fn   *types.Zval
+	args []types.Zval
 }
 
-func (this *PhpShutdownFunctionEntry) GetArguments() *types.Zval      { return this.arguments }
-func (this *PhpShutdownFunctionEntry) SetArguments(value *types.Zval) { this.arguments = value }
-func (this *PhpShutdownFunctionEntry) GetArgCount() int               { return this.arg_count }
-func (this *PhpShutdownFunctionEntry) SetArgCount(value int)          { this.arg_count = value }
+func NewShutdownFunction(fn *types.Zval, args []types.Zval) *PhpShutdownFunction {
+	return &PhpShutdownFunction{fn: fn, args: args}
+}
+
+func (sfe *PhpShutdownFunction) Fn() *types.Zval    { return sfe.fn }
+func (sfe *PhpShutdownFunction) Args() []types.Zval { return sfe.args }
 
 /**
  * UserTickFunctionEntry

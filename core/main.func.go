@@ -920,29 +920,6 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	}
 	zend.Efree(buffer)
 }
-func PhpGetCurrentUser() *byte {
-	var pstat *zend.ZendStatT
-	if SG__().RequestInfo.currentUser {
-		return SG__().RequestInfo.currentUser
-	}
-
-	/* FIXME: I need to have this somehow handled if
-	   USE_SAPI is defined, because cgi will also be
-	   interfaced in USE_SAPI */
-
-	pstat = SapiGetStat()
-	if pstat == nil {
-		return ""
-	} else {
-		var pwd *__struct__passwd
-		if b.Assign(&pwd, getpwuid(pstat.st_uid)) == nil {
-			return ""
-		}
-		SG__().RequestInfo.currentUserLength = strlen(pwd.pw_name)
-		SG__().RequestInfo.currentUser = zend.Estrndup(pwd.pw_name, SG__().RequestInfo.currentUserLength)
-		return SG__().RequestInfo.currentUser
-	}
-}
 
 //@alias -old
 func ZifSetTimeLimit(seconds int) bool {
@@ -1138,7 +1115,6 @@ func PhpRequestShutdown() {
 	})
 
 	/* 7. Free shutdown functions */
-
 	if PG__().modules_activated {
 		standard.PhpFreeShutdownFunctions()
 	}

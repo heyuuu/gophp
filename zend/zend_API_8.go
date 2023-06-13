@@ -131,7 +131,7 @@ func ZendIsCallableEx(
 ) bool {
 	var ret bool = ZendIsCallableImpl(callable, object, checkFlags, fcc, error)
 	if callableName != nil {
-		*callableName = ZendGetCallableNameEx(callable, object)
+		*callableName = types.NewString(ZendGetCallableNameEx(callable, object))
 	}
 	return ret
 }

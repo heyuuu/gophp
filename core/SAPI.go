@@ -14,7 +14,6 @@ type ISapiModule interface {
 	Deactivate()
 	UbWrite(str string) (int, error)
 	Flush(serverContext any)
-	GetStat() bool
 	GetEnv(name string) (string, bool)
 	HeaderHandler(header *SapiHeader, op SapiHeaderOpEnum, headers *SapiHeaders) int
 	SendHeaders(headers *SapiHeaders) int
@@ -102,7 +101,6 @@ func (this *BaseSapiModule) Activate()                         { panic("implemen
 func (this *BaseSapiModule) Deactivate()                       { panic("implement me") }
 func (this *BaseSapiModule) UbWrite(str string) (int, error)   { panic("implement me") }
 func (this *BaseSapiModule) Flush(serverContext any)           {}
-func (this *BaseSapiModule) GetStat() bool                     { return false }
 func (this *BaseSapiModule) GetEnv(name string) (string, bool) { return "", false }
 func (this *BaseSapiModule) HeaderHandler(header *SapiHeader, op SapiHeaderOpEnum, headers *SapiHeaders) int {
 	return 0

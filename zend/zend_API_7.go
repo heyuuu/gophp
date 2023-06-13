@@ -354,11 +354,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 func ZendCreateMethodString(className string, methodName string) string {
 	return className + "::" + methodName
 }
-func ZendGetCallableNameEx(callable *types.Zval, object *types.ZendObject) *types.String {
-	name := ZendGetCallableNameEx_Ex(callable, object)
-	return types.NewString(name)
-}
-func ZendGetCallableNameEx_Ex(callable *types.Zval, object *types.ZendObject) string {
+func ZendGetCallableNameEx(callable *types.Zval, object *types.ZendObject) string {
 	callable = callable.DeRef()
 	switch callable.GetType() {
 	case types.IS_STRING:
@@ -396,6 +392,6 @@ func ZendGetCallableNameEx_Ex(callable *types.Zval, object *types.ZendObject) st
 		return operators.ZvalGetStrVal(callable)
 	}
 }
-func ZendGetCallableName(callable *types.Zval) *types.String {
+func ZendGetCallableName(callable *types.Zval) string {
 	return ZendGetCallableNameEx(callable, nil)
 }

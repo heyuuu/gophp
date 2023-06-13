@@ -146,7 +146,7 @@ var DefZifGetCurrentUser = def.DefFunc("get_current_user", 0, 0, []def.ArgInfo{}
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetCurrentUser(executeData, returnValue)
+	ZifGetCurrentUser()
 })
 
 // generate by ZifGetCfgVar
@@ -260,7 +260,7 @@ var DefZifRegisterShutdownFunction = def.DefFunc("register_shutdown_function", 1
 	if fp.HasError() {
 		return
 	}
-	ZifRegisterShutdownFunction(executeData, returnValue, function_name, nil, parameters)
+	ZifRegisterShutdownFunction(function_name, nil, parameters)
 })
 
 // generate by ZifHighlightFile

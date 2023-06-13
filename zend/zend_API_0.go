@@ -13,9 +13,6 @@ func CE_STATIC_MEMBERS(ce *types.ClassEntry) *types.Zval {
 func ZendGetParametersArray(ht uint32, param_count int, argument_array *types.Zval) int {
 	return _zendGetParametersArrayEx(param_count, argument_array)
 }
-func ZendGetParametersArrayEx(param_count int, argument_array *types.Zval) int {
-	return _zendGetParametersArrayEx(param_count, argument_array)
-}
 func getThis(executeData *ZendExecuteData) *types.Zval {
 	if ZEND_THIS(executeData).IsObject() {
 		return ZEND_THIS(executeData)
@@ -84,17 +81,19 @@ func AddPropertyZval(arg *types.Zval, key string, __value *types.Zval) int {
 func CallUserFunction(object *types.Zval, functionName *types.Zval, retvalPtr *types.Zval, paramCount uint32, params []types.Zval) int {
 	return CallUserFunctionEx(object, functionName, retvalPtr, paramCount, params, 1)
 }
+func CallUserFunction_Ex(object *types.Zval, functionName *types.Zval, retvalPtr *types.Zval, params []types.Zval) int {
+	return CallUserFunctionEx(object, functionName, retvalPtr, uint32(len(params)), params, 1)
+}
 func CallUserFunctionEx(object *types.Zval, functionName *types.Zval, retvalPtr *types.Zval, paramCount uint32, params []types.Zval, no_separation int) int {
+	b.Assert(int(paramCount) == len(params))
+
 	var objPtr *types.ZendObject
 	if objPtr != nil {
 		objPtr = object.Object()
 	}
 
-	b.Assert(int(paramCount) == len(params))
-
 	var fci = types.InitFCallInfo(objPtr, retvalPtr, params...)
-	types.ZVAL_COPY_VALUE(fci.GetFunctionName(), functionName)
-	fci.SetFunctionName(functionName)
+	fci.SetFunctionNameZval(functionName)
 	fci.SetNoSeparation(no_separation != 0)
 
 	return ZendCallFunction(fci, nil)

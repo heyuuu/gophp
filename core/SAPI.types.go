@@ -45,27 +45,25 @@ func (sh *SapiHeaders) GetHeaders() zend.ZendLlist { return sh.headers }
  * SapiRequestInfo
  */
 type SapiRequestInfo struct {
-	requestMethod     string
-	queryString       string
-	cookieData        string
-	contentLength     int
-	pathTranslated    string
-	requestUri        string
-	requestBody       *PhpStream
-	contentType       string
-	headersOnly       bool
-	noHeaders         bool
-	headersRead       bool
-	postEntry         *SapiPostEntry
-	contentTypeDup    string
-	authUser          string
-	authPassword      string
-	authDigest        string
-	argv0             string
-	currentUser       string
-	currentUserLength int
-	protoNum          int
-	args              []string
+	requestMethod  string
+	queryString    string
+	cookieData     string
+	contentLength  int
+	pathTranslated string
+	requestUri     string
+	requestBody    *PhpStream
+	contentType    string
+	headersOnly    bool
+	noHeaders      bool
+	headersRead    bool
+	postEntry      *SapiPostEntry
+	contentTypeDup string
+	authUser       string
+	authPassword   string
+	authDigest     string
+	argv0          string
+	protoNum       int
+	args           []string
 }
 
 func (info *SapiRequestInfo) InitEmpty() {
@@ -92,7 +90,6 @@ func (info *SapiRequestInfo) AuthUser() string       { return info.authUser }
 func (info *SapiRequestInfo) AuthPassword() string   { return info.authPassword }
 func (info *SapiRequestInfo) AuthDigest() string     { return info.authDigest }
 func (info *SapiRequestInfo) Argv0() string          { return info.argv0 }
-func (info *SapiRequestInfo) CurrentUser() string    { return info.currentUser }
 func (info *SapiRequestInfo) Args() []string         { return info.args }
 func (info *SapiRequestInfo) Argc() int              { return len(info.args) }
 
@@ -145,8 +142,6 @@ func (sg *SapiGlobals) Activate() {
 	sg.rfc1867UploadedFiles = nil
 
 	sg.RequestInfo.requestBody = nil
-	sg.RequestInfo.currentUser = nil
-	sg.RequestInfo.currentUserLength = 0
 	sg.RequestInfo.noHeaders = false
 	sg.RequestInfo.postEntry = nil
 	sg.RequestInfo.protoNum = 1000

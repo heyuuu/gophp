@@ -834,9 +834,8 @@ func ZifSetErrorHandler(executeData zpp.Ex, return_value zpp.Ret, errorHandler *
 	}
 	if !error_handler.IsNull() {
 		if ZendIsCallable(error_handler, 0, nil) == 0 {
-			var error_handler_name = ZendGetCallableName(error_handler)
-			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(error_handler_name != nil, func() []byte { return error_handler_name.GetVal() }, "unknown"))
-			// types.ZendStringReleaseEx(error_handler_name, 0)
+			var errorHandlerName = ZendGetCallableName(error_handler)
+			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(errorHandlerName != "", func() string { return errorHandlerName }, "unknown"))
 			return
 		}
 	}
@@ -881,10 +880,9 @@ func ZifSetExceptionHandler(executeData zpp.Ex, return_value zpp.Ret, exceptionH
 		return
 	}
 	if !exception_handler.IsNull() {
-		if ZendIsCallable(exception_handler, 0, nil) == 0 {
-			var exception_handler_name = ZendGetCallableName(exception_handler)
-			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(exception_handler_name != nil, func() []byte { return exception_handler_name.GetVal() }, "unknown"))
-			// types.ZendStringReleaseEx(exception_handler_name, 0)
+		if !ZendIsCallable(exception_handler, 0, nil) {
+			var exceptionHandlerName = ZendGetCallableName(exception_handler)
+			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(exceptionHandlerName != "", func() string { return exceptionHandlerName }, "unknown"))
 			return
 		}
 	}

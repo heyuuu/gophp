@@ -15,8 +15,6 @@ const BasicFunctionsModulePtr = &BasicFunctionsModule
 
 /* Left for BC (not binary safe!) */
 
-const MT_N = 624
-
 var BasicGlobals PhpBasicGlobals
 
 var IncompleteClassEntry *types.ClassEntry = nil

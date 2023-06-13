@@ -19,34 +19,10 @@ import (
 
 func BG__() *PhpBasicGlobals { return &BasicGlobals }
 func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
-	BG__().ResetRandGenerator()
-	BG__().umask = -1
-	BG__().user_tick_functions = nil
-	BG__().UserFilterMap = nil
-	BG__().serialize_lock = 0
-	memset(&(BG__().serialize), 0, b.SizeOf("BG ( serialize )"))
-	memset(&(BG__().unserialize), 0, b.SizeOf("BG ( unserialize )"))
-	memset(&(BG__().url_adapt_session_ex), 0, b.SizeOf("BG ( url_adapt_session_ex )"))
-	memset(&(BG__().url_adapt_output_ex), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
-	BG__().url_adapt_session_ex.type_ = 1
-	BG__().url_adapt_output_ex.type_ = 0
-	BG__().url_adapt_session_hosts_ht = types.NewArray(0)
-	BG__().url_adapt_output_hosts_ht = types.NewArray(0)
-	BG__().incomplete_class = IncompleteClassEntry
-	BG__().page_uid = -1
-	BG__().page_gid = -1
+	BG__().Ctor()
 }
 func BasicGlobalsDtor(basic_globals_p *PhpBasicGlobals) {
-	if basic_globals_p.GetUrlAdaptSessionEx().GetTags() != nil {
-		basic_globals_p.GetUrlAdaptSessionEx().GetTags().Destroy()
-		zend.Free(basic_globals_p.GetUrlAdaptSessionEx().GetTags())
-	}
-	if basic_globals_p.GetUrlAdaptOutputEx().GetTags() != nil {
-		basic_globals_p.GetUrlAdaptOutputEx().GetTags().Destroy()
-		zend.Free(basic_globals_p.GetUrlAdaptOutputEx().GetTags())
-	}
-	basic_globals_p.GetUrlAdaptSessionHostsHt().Destroy()
-	basic_globals_p.GetUrlAdaptOutputHostsHt().Destroy()
+	basic_globals_p.Dtor()
 }
 func ZmStartupBasic(type_ int, module_number int) int {
 	BasicGlobalsCtor(&BasicGlobals)
@@ -180,25 +156,11 @@ func ZmShutdownBasic(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmActivateBasic(type_ int, module_number int) int {
-	BG__().serialize_lock = 0
-	memset(&(BG__().serialize), 0, b.SizeOf("BG ( serialize )"))
-	memset(&(BG__().unserialize), 0, b.SizeOf("BG ( unserialize )"))
-	BG__().locale_string = nil
-	BG__().locale_changed = false
-	BG__().array_walk_fci = types.EmptyFCallInfo()
-	BG__().array_walk_fci_cache = types.EmptyFcallInfoCache()
-	BG__().page_uid = -1
-	BG__().page_gid = -1
-	BG__().page_inode = -1
-	BG__().page_mtime = -1
-	BG__().user_shutdown_function_names = nil
-	ZmActivateFilestat(type_, module_number)
-	ZmActivateSyslog(type_, module_number)
+	BG__().Activate()
 	ZmActivateDir(type_, module_number)
 	ZmActivateUrlScannerEx(type_, module_number)
 
 	/* Setup default context */
-
 	FG__().default_context = nil
 
 	/* Default to global wrappers only */
@@ -217,13 +179,10 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	/* Check if locale was changed and change it back
 	 * to the value in startup environment */
 
-	if BG__().locale_changed {
+	if BG__().localeChanged {
 		setlocale(LC_ALL, "C")
 		setlocale(LC_CTYPE, "")
-		if BG__().locale_string {
-			// types.ZendStringReleaseEx(BG__().locale_string, 0)
-			BG__().locale_string = nil
-		}
+		BG__().localeString = nil
 	}
 
 	/* FG__().stream_wrappers and FG__().stream_filters are destroyed
@@ -233,14 +192,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	ZmDeactivateAssert(type_, module_number)
 	ZmDeactivateUrlScannerEx(type_, module_number)
 	streams.ZmDeactivateStreams(type_, module_number)
-	if BG__().user_tick_functions {
-		BG__().user_tick_functions.Destroy()
-		zend.Efree(BG__().user_tick_functions)
-		BG__().user_tick_functions = nil
-	}
 	ZmDeactivateUserFilters(type_, module_number)
-	BG__().page_uid = -1
-	BG__().page_gid = -1
 	return types.SUCCESS
 }
 func ZmInfoBasic(zend_module *zend.ModuleEntry) {
@@ -829,12 +781,8 @@ func ZifTimeSleepUntil(executeData zpp.Ex, return_value zpp.Ret, timestamp *type
 	return_value.SetTrue()
 	return
 }
-func ZifGetCurrentUser(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	return_value.SetStringVal(b.CastStrAuto(core.PhpGetCurrentUser()))
-	return
+func ZifGetCurrentUser() string {
+	return zend.CurrEntrance().UserName()
 }
 func AddConfigEntries(hash *types.Array, retval *types.Zval) {
 	hash.Foreach(func(key types.ArrayKey, value *types.Zval) {
@@ -1130,73 +1078,44 @@ func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functio
 	zend.ZendFcallInfoArgsClear(&fci, 1)
 }
 func PhpCallShutdownFunctions() {
-	if BG__().user_shutdown_function_names {
+	if BG__().HasUserShutdownFunctions() {
 		faults.Try(func() {
-			BG__().user_shutdown_function_names.Foreach(func(_ types.ArrayKey, zv *types.Zval) {
-				var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
+			BG__().EachUserShutdownFunction(func(shutdownFunctionEntry *PhpShutdownFunction) {
 				var retval types.Zval
-				if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-					var function_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
-					core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
+				if !zend.ZendIsCallable(shutdownFunctionEntry.Fn(), 0, nil) {
+					var functionName = zend.ZendGetCallableName(shutdownFunctionEntry.Fn())
+					core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", functionName)
 				} else {
-					zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1)
+					zend.CallUserFunction_Ex(nil, shutdownFunctionEntry.Fn(), &retval, shutdownFunctionEntry.Args())
 				}
 			})
 		})
 	}
 }
 func PhpFreeShutdownFunctions() {
-	if BG__().user_shutdown_function_names {
-		faults.TryCatch(func() {
-			BG__().user_shutdown_function_names.Destroy()
-			BG__().user_shutdown_function_names = nil
-		}, func() {
-			/* maybe shutdown method call exit, we just ignore it */
-			BG__().user_shutdown_function_names = nil
-		})
-	}
+	BG__().ResetUserShutdownFunctions()
 }
-func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
-	var shutdown_function_entry PhpShutdownFunctionEntry
-	var i int
-	shutdown_function_entry.SetArgCount(executeData.NumArgs())
-	if shutdown_function_entry.GetArgCount() < 1 {
-		zend.ZendWrongParamCount()
-		return
-	}
-	shutdown_function_entry.SetArguments((*types.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), shutdown_function_entry.GetArgCount(), 0)))
-	if zend.ZendGetParametersArray(executeData.NumArgs(), shutdown_function_entry.GetArgCount(), shutdown_function_entry.GetArguments()) == types.FAILURE {
-		zend.Efree(shutdown_function_entry.GetArguments())
-		return_value.SetFalse()
+func ZifRegisterShutdownFunction(functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
+	/* Prevent entering of anything but valid callback (syntax check only!) */
+	if !zend.ZendIsCallable(functionName, 0, nil) {
+		var callbackName = zend.ZendGetCallableName(functionName)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid shutdown callback '%s' passed", callbackName)
 		return
 	}
 
-	/* Prevent entering of anything but valid callback (syntax check only!) */
-
-	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var callback_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid shutdown callback '%s' passed", callback_name.GetVal())
-		zend.Efree(shutdown_function_entry.GetArguments())
-		// types.ZendStringReleaseEx(callback_name, 0)
-		return_value.SetFalse()
-	} else {
-		if BG__().user_shutdown_function_names == nil {
-			BG__().user_shutdown_function_names = types.NewArray(0)
-		}
-		for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
-			shutdown_function_entry.GetArguments()[i].TryAddRefcount()
-		}
-		types.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
+	var fn = functionName.CopyValue()
+	var args = make([]types.Zval, len(parameters))
+	for i, parameter := range parameters {
+		args[i].CopyValueFrom(parameter)
 	}
-
-	/* Prevent entering of anything but valid callback (syntax check only!) */
+	BG__().AddUserShutdownFunction(*NewShutdownFunction(fn, args))
 }
-func PhpGetHighlight(syntax_highlighter_ini *zend.ZendSyntaxHighlighterIni) {
-	syntax_highlighter_ini.SetHighlightComment(zend.INI_STR("highlight.comment"))
-	syntax_highlighter_ini.SetHighlightDefault(zend.INI_STR("highlight.default"))
-	syntax_highlighter_ini.SetHighlightHtml(zend.INI_STR("highlight.html"))
-	syntax_highlighter_ini.SetHighlightKeyword(zend.INI_STR("highlight.keyword"))
-	syntax_highlighter_ini.SetHighlightString(zend.INI_STR("highlight.string"))
+func PhpGetHighlight(syntaxHighlighterIni *zend.ZendSyntaxHighlighterIni) {
+	syntaxHighlighterIni.SetHighlightComment(zend.INI_STR("highlight.comment"))
+	syntaxHighlighterIni.SetHighlightDefault(zend.INI_STR("highlight.default"))
+	syntaxHighlighterIni.SetHighlightHtml(zend.INI_STR("highlight.html"))
+	syntaxHighlighterIni.SetHighlightKeyword(zend.INI_STR("highlight.keyword"))
+	syntaxHighlighterIni.SetHighlightString(zend.INI_STR("highlight.string"))
 }
 
 //@zif -alias show_source

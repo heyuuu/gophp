@@ -46,10 +46,6 @@ func ZmStartupSyslog(type_ int, module_number int) int {
 	BG__().syslog_device = nil
 	return types.SUCCESS
 }
-func ZmActivateSyslog(type_ int, module_number int) int {
-	BG__().syslog_device = nil
-	return types.SUCCESS
-}
 func ZmShutdownSyslog(type_ int, module_number int) int {
 	if BG__().syslog_device {
 		zend.Free(BG__().syslog_device)

@@ -1,104 +1,37 @@
 package standard
 
 import (
-	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"os"
 )
 
-func PhpStatpage() {
-	var pstat *zend.ZendStatT
-	pstat = core.SapiGetStat()
-	if BG__().page_uid == -1 || BG__().page_gid == -1 {
-		if pstat != nil {
-			BG__().page_uid = pstat.st_uid
-			BG__().page_gid = pstat.st_gid
-			BG__().page_inode = pstat.st_ino
-			BG__().page_mtime = pstat.st_mtime
-		} else {
-			BG__().page_uid = getuid()
-			BG__().page_gid = getgid()
-		}
+func PhpGetuid() int { return zend.CurrEntrance().Uid() }
+func PhpGetgid() int { return zend.CurrEntrance().Gid() }
+func ZifGetmyuid() (int, bool) {
+	if uid := PhpGetuid(); uid >= 0 {
+		return uid, true
 	}
+	return 0, false
 }
-func PhpGetuid() zend.ZendLong {
-	PhpStatpage()
-	return BG__().page_uid
+func ZifGetmygid() (int, bool) {
+	if gid := PhpGetgid(); gid >= 0 {
+		return gid, true
+	}
+	return 0, false
 }
-func PhpGetgid() zend.ZendLong {
-	PhpStatpage()
-	return BG__().page_gid
+func ZifGetmypid() int {
+	return os.Getpid()
 }
-func ZifGetmyuid(executeData zpp.Ex, return_value zpp.Ret) {
-	var uid zend.ZendLong
-	if !executeData.CheckNumArgsNone(false) {
-		return
+func ZifGetmyinode() (int, bool) {
+	if inode := zend.CurrEntrance().Inode(); inode >= 0 {
+		return inode, true
 	}
-	uid = PhpGetuid()
-	if uid < 0 {
-		return_value.SetFalse()
-		return
-	} else {
-		return_value.SetLong(uid)
-		return
-	}
+	return 0, false
 }
-func ZifGetmygid(executeData zpp.Ex, return_value zpp.Ret) {
-	var gid zend.ZendLong
-	if !executeData.CheckNumArgsNone(false) {
-		return
+func ZifGetlastmod(executeData zpp.Ex, return_value zpp.Ret) (int, bool) {
+	if mtime := zend.CurrEntrance().Mtime(); mtime >= 0 {
+		return mtime, true
 	}
-	gid = PhpGetgid()
-	if gid < 0 {
-		return_value.SetFalse()
-		return
-	} else {
-		return_value.SetLong(gid)
-		return
-	}
-}
-func ZifGetmypid(executeData zpp.Ex, return_value zpp.Ret) {
-	var pid zend.ZendLong
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	pid = getpid()
-	if pid < 0 {
-		return_value.SetFalse()
-		return
-	} else {
-		return_value.SetLong(pid)
-		return
-	}
-}
-func ZifGetmyinode(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	PhpStatpage()
-	if BG__().page_inode < 0 {
-		return_value.SetFalse()
-		return
-	} else {
-		return_value.SetLong(BG__().page_inode)
-		return
-	}
-}
-func PhpGetlastmod() int64 {
-	PhpStatpage()
-	return BG__().page_mtime
-}
-func ZifGetlastmod(executeData zpp.Ex, return_value zpp.Ret) {
-	var lm zend.ZendLong
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	lm = PhpGetlastmod()
-	if lm < 0 {
-		return_value.SetFalse()
-		return
-	} else {
-		return_value.SetLong(lm)
-		return
-	}
+	return 0, false
 }

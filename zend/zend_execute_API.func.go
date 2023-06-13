@@ -394,10 +394,9 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 		}
 		if ZendIsCallableEx(fci.GetFunctionName(), fci.GetObject(), IS_CALLABLE_CHECK_SILENT, nil, fciCache, &error) == 0 {
 			if error != nil {
-				var callable_name *types.String = ZendGetCallableNameEx(fci.GetFunctionName(), fci.GetObject())
-				faults.Error(faults.E_WARNING, "Invalid callback %s, %s", callable_name.GetVal(), error)
+				var callableName = ZendGetCallableNameEx(fci.GetFunctionName(), fci.GetObject())
+				faults.Error(faults.E_WARNING, "Invalid callback %s, %s", callableName, error)
 				Efree(error)
-				// types.ZendStringReleaseEx(callable_name, 0)
 			}
 			if CurrEX() == &dummy_execute_data {
 				EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())

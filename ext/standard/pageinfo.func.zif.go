@@ -10,7 +10,7 @@ var DefZifGetmyuid = def.DefFunc("getmyuid", 0, 0, []def.ArgInfo{}, func(execute
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetmyuid(executeData, returnValue)
+	ZifGetmyuid()
 })
 
 // generate by ZifGetmygid
@@ -18,7 +18,7 @@ var DefZifGetmygid = def.DefFunc("getmygid", 0, 0, []def.ArgInfo{}, func(execute
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetmygid(executeData, returnValue)
+	ZifGetmygid()
 })
 
 // generate by ZifGetmypid
@@ -26,7 +26,7 @@ var DefZifGetmypid = def.DefFunc("getmypid", 0, 0, []def.ArgInfo{}, func(execute
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetmypid(executeData, returnValue)
+	ZifGetmypid()
 })
 
 // generate by ZifGetmyinode
@@ -34,7 +34,7 @@ var DefZifGetmyinode = def.DefFunc("getmyinode", 0, 0, []def.ArgInfo{}, func(exe
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetmyinode(executeData, returnValue)
+	ZifGetmyinode()
 })
 
 // generate by ZifGetlastmod

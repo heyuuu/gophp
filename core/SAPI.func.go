@@ -20,12 +20,11 @@ func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader(
 
 //@alias -old
 func ZifHeaderRegisterCallback(callback *types.Zval) bool {
-	if zend.ZendIsCallable(callback, 0, nil) == 0 {
+	if !zend.ZendIsCallable(callback, 0, nil) {
 		return false
 	}
 
 	if SG__().callbackFunc.IsNotUndef() {
-		// zend.ZvalPtrDtor(&SG__().callback_func)
 		SG__().fciCache = types.EmptyFcallInfoCache()
 	}
 
@@ -95,7 +94,6 @@ func SapiReadPostData() {
 	if b.Assign(&post_entry, types.ZendHashStrFindPtr(&(SG__().knownPostContentTypes), b.CastStr(content_type, content_type_length))) != nil {
 
 		/* found one, register it for use */
-
 		SG__().RequestInfo.postEntry = post_entry
 		post_reader_func = post_entry.PostReader
 	} else {
@@ -308,9 +306,6 @@ func SapiDeactivate() {
 	}
 	if SG__().RequestInfo.contentTypeDup {
 		zend.Efree(SG__().RequestInfo.contentTypeDup)
-	}
-	if SG__().RequestInfo.currentUser {
-		zend.Efree(SG__().RequestInfo.currentUser)
 	}
 	SM__().Deactivate()
 	if SG__().rfc1867UploadedFiles != nil {
@@ -691,16 +686,6 @@ func SapiRegisterInputFilter(input_filter func(arg int, var_ *byte, val **byte, 
 }
 func SapiFlush() {
 	SM__().Flush(SG__().serverContext)
-}
-func SapiGetStat() *zend.ZendStatT {
-	if SM__().GetStat() {
-		return
-	} else {
-		if !(SG__().RequestInfo.pathTranslated) || zend.VCWD_STAT(SG__().RequestInfo.pathTranslated, &(SG__().globalStat)) == -1 {
-			return nil
-		}
-		return &(SG__().globalStat)
-	}
 }
 func SapiGetenv(name string) *string {
 	if strings.EqualFold(name, "HTTP_PROXY") {
