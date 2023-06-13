@@ -261,7 +261,7 @@ func IInitFuncExecuteData(op_array *types.ZendOpArray, return_value *types.Zval,
 func InitFuncRunTimeCacheI(op_array *types.ZendOpArray) {
 	var run_time_cache *any
 	b.Assert(RUN_TIME_CACHE(op_array) == nil)
-	run_time_cache = ZendArenaAlloc(CG__().GetArena(), op_array.GetCacheSize())
+	run_time_cache = b.Malloc(op_array.GetCacheSize())
 	memset(run_time_cache, 0, op_array.GetCacheSize())
 	ZEND_MAP_PTR_SET(op_array.run_time_cache, run_time_cache)
 }

@@ -17,47 +17,40 @@ func ZendDuplicatePropertyInfoInternal(property_info *types.PropertyInfo) *types
 	memcpy(new_property_info, property_info, b.SizeOf("zend_property_info"))
 	return new_property_info
 }
-func ZendDuplicateInternalFunction(func_ types.IFunction, ce *types.ClassEntry) types.IFunction {
-	var new_function types.IFunction
+func ZendDuplicateInternalFunction(func_ *types.InternalFunction, ce *types.ClassEntry) *types.InternalFunction {
+	var newFunction *types.InternalFunction
 	if ce.IsInternalClass() {
-		new_function = Pemalloc(b.SizeOf("zend_internal_function"))
-		memcpy(new_function, func_, b.SizeOf("zend_internal_function"))
+		newFunction = types.CopyInternalFunction(func_)
 	} else {
-		new_function = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_internal_function"))
-		memcpy(new_function, func_, b.SizeOf("zend_internal_function"))
-		new_function.SetIsArenaAllocated(true)
+		newFunction = types.CopyInternalFunction(func_)
+		newFunction.SetIsArenaAllocated(true)
 	}
-	//if new_function.GetFunctionName() != nil {
-	//new_function.GetFunctionName().AddRefcount()
-	//}
-	return new_function
+	return newFunction
 }
-func ZendDuplicateUserFunction(func_ types.IFunction) types.IFunction {
-	var new_function types.IFunction
-	new_function = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
-	memcpy(new_function, func_, b.SizeOf("zend_op_array"))
-	if func_.GetOpArray().GetStaticVariablesPtr() {
+func ZendDuplicateUserFunction(func_ *types.UserFunction) *types.UserFunction {
+	var newFunction = types.CopyOpArray(func_)
+	if func_.GetOpArray().GetStaticVariablesPtr() != nil {
 		/* See: Zend/tests/method_static_var.phpt */
-		new_function.GetOpArray().SetStaticVariables(func_.GetOpArray().GetStaticVariablesPtr())
+		newFunction.GetOpArray().SetStaticVariables(func_.GetOpArray().GetStaticVariablesPtr())
 	}
 	if CG__().IsCompilePreload() {
-		b.Assert(new_function.GetOpArray().IsPreloaded())
-		ZEND_MAP_PTR_NEW(new_function.GetOpArray().static_variables_ptr)
+		b.Assert(newFunction.GetOpArray().IsPreloaded())
+		ZEND_MAP_PTR_NEW(newFunction.GetOpArray().static_variables_ptr)
 	} else {
-		ZEND_MAP_PTR_INIT(new_function.GetOpArray().static_variables_ptr, new_function.GetOpArray().GetStaticVariables())
+		ZEND_MAP_PTR_INIT(newFunction.GetOpArray().static_variables_ptr, newFunction.GetOpArray().GetStaticVariables())
 	}
-	return new_function
+	return newFunction
 }
-func ZendDuplicateFunction(func_ types.IFunction, ce *types.ClassEntry, is_interface bool) types.IFunction {
+func ZendDuplicateFunction(func_ types.IFunction, ce *types.ClassEntry, isInterface bool) types.IFunction {
 	if func_.GetType() == ZEND_INTERNAL_FUNCTION {
-		return ZendDuplicateInternalFunction(func_, ce)
+		return ZendDuplicateInternalFunction(func_.GetInternalFunction(), ce)
 	} else {
 		func_.GetOpArray().TryIncRefCount()
-		if is_interface != 0 || func_.GetOpArray().GetStaticVariables() == nil {
+		if isInterface || func_.GetOpArray().GetStaticVariables() == nil {
 			/* reuse the same op_array structure */
 			return func_
 		}
-		return ZendDuplicateUserFunction(func_)
+		return ZendDuplicateUserFunction(func_.GetOpArray())
 	}
 }
 func DoInheritParentConstructor(ce *types.ClassEntry) {
@@ -1357,13 +1350,11 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name string, key string, fn types.
 			fn.SetPrototype(nil)
 		}
 	}
-	if fn.GetType() == ZEND_INTERNAL_FUNCTION {
-		new_fn = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_internal_function"))
-		memcpy(new_fn, fn, b.SizeOf("zend_internal_function"))
+	if fn.IsInternalFunction() {
+		new_fn = types.CopyInternalFunction(fn.GetInternalFunction())
 		new_fn.SetIsArenaAllocated(true)
 	} else {
-		new_fn = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
-		memcpy(new_fn, fn, b.SizeOf("zend_op_array"))
+		new_fn = types.CopyOpArray(fn.GetOpArray())
 		new_fn.GetOpArray().SetIsTraitClone(true)
 		new_fn.GetOpArray().SetIsImmutable(false)
 	}

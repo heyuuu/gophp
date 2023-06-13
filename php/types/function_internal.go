@@ -29,6 +29,11 @@ func NewInternalFunction() *InternalFunction {
 	}
 }
 
+func CopyInternalFunction(fn *InternalFunction) *InternalFunction {
+	// todo 处理 copy 逻辑
+	return NewInternalFunction()
+}
+
 func NewInternalFunctionEx(funcName string, handler zend.ZifHandler) *InternalFunction {
 	f := NewInternalFunction()
 	f.functionName = funcName

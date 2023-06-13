@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendIsCallableImpl(callable *types.Zval, object *types.ZendObject, check_flags uint32, fcc *types.ZendFcallInfoCache, error **byte) bool {
+func ZendIsCallableImpl(callable *types.Zval, object *types.ZendObject, checkFlags uint32, fcc *types.ZendFcallInfoCache, error **byte) bool {
 	var ret bool
 	var fcc_local types.ZendFcallInfoCache
 	var strict_class int = 0
@@ -27,12 +27,12 @@ again:
 			fcc.SetObject(object)
 			fcc.SetCallingScope(object.GetCe())
 		}
-		if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
+		if (checkFlags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 			fcc.SetCalledScope(fcc.GetCallingScope())
 			return 1
 		}
 	check_func:
-		ret = ZendIsCallableCheckFunc(check_flags, callable, fcc, strict_class, error)
+		ret = ZendIsCallableCheckFunc(checkFlags, callable, fcc, strict_class, error)
 		if fcc == &fcc_local {
 			ZendReleaseFcallInfoCache(fcc)
 		}
@@ -54,7 +54,7 @@ again:
 			}
 			obj = types.ZVAL_DEREF(obj)
 			if obj.IsString() {
-				if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
+				if (checkFlags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 					return 1
 				}
 				if ZendIsCallableCheckClass(obj.String(), ZendGetExecutedScope(), fcc, &strict_class, error) == 0 {
@@ -63,7 +63,7 @@ again:
 			} else if obj.IsObject() {
 				fcc.SetCallingScope(types.Z_OBJCE_P(obj))
 				fcc.SetObject(obj.Object())
-				if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
+				if (checkFlags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 					fcc.SetCalledScope(fcc.GetCallingScope())
 					return 1
 				}
@@ -124,14 +124,14 @@ again:
 func ZendIsCallableEx(
 	callable *types.Zval,
 	object *types.ZendObject,
-	check_flags uint32,
-	callable_name **types.String,
+	checkFlags uint32,
+	callableName **types.String,
 	fcc *types.ZendFcallInfoCache,
 	error **byte,
 ) bool {
-	var ret bool = ZendIsCallableImpl(callable, object, check_flags, fcc, error)
-	if callable_name != nil {
-		*callable_name = ZendGetCallableNameEx(callable, object)
+	var ret bool = ZendIsCallableImpl(callable, object, checkFlags, fcc, error)
+	if callableName != nil {
+		*callableName = ZendGetCallableNameEx(callable, object)
 	}
 	return ret
 }
@@ -140,13 +140,13 @@ func ZendIsCallable(callable *types.Zval, check_flags uint32, callable_name **ty
 }
 func ZendFcallInfoInit(
 	callable *types.Zval,
-	check_flags uint32,
+	checkFlags uint32,
 	fci *types.ZendFcallInfo,
 	fcc *types.ZendFcallInfoCache,
-	callable_name **types.String,
+	callableName **types.String,
 	error **byte,
 ) int {
-	if ZendIsCallableEx(callable, nil, check_flags, callable_name, fcc, error) == 0 {
+	if !ZendIsCallableEx(callable, nil, checkFlags, callableName, fcc, error) {
 		return types.FAILURE
 	}
 	*fci = *types.InitFCallInfo(fcc.GetObject(), nil)

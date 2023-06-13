@@ -119,7 +119,6 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 	// reset
 	CG__().in_compilation = 1
 	CG__().ast = nil
-	CG__().ast_arena = ZendArenaCreate(1024 * 32)
 
 	var opArray *types.ZendOpArray = nil
 	if !(Zendparse()) {
@@ -147,7 +146,6 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 		CG__().active_op_array = originalActiveOpArray
 	}
 	ZendAstDestroy(CG__().ast)
-	ZendArenaDestroy(CG__().ast_arena)
 
 	// restore
 	CG__().in_compilation = originalInCompilation

@@ -323,7 +323,6 @@ func (sc *LangScanner) saveLexState() *ZendLexState {
 	lexState.script_filtered = LANG_SCNG__().script_filtered
 	lexState.script_filtered_size = LANG_SCNG__().script_filtered_size
 	lexState.ast = CG__().ast
-	lexState.ast_arena = CG__().ast_arena
 
 	sc.stateStack.Clean()
 	sc.heredocLabelStack.Clean()
@@ -362,7 +361,6 @@ func (sc *LangScanner) restoreLexState(lexState *ZendLexState) {
 	LANG_SCNG__().script_filtered = lexState.script_filtered
 	LANG_SCNG__().script_filtered_size = lexState.script_filtered_size
 	CG__().ast = lexState.ast
-	CG__().ast_arena = lexState.ast_arena
 	sc.resetDocComment()
 }
 

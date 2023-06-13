@@ -96,24 +96,8 @@ func ZendAstGetLineno(ast *ZendAst) uint32 {
 		return ast.GetLineno()
 	}
 }
-func ZendAstCreateBinaryOp(opcode uint32, op0 *ZendAst, op1 *ZendAst) *ZendAst {
-	return ZendAstCreateEx(ZEND_AST_BINARY_OP, opcode, op0, op1)
-}
-func ZendAstCreateAssignOp(opcode uint32, op0 *ZendAst, op1 *ZendAst) *ZendAst {
-	return ZendAstCreateEx(ZEND_AST_ASSIGN_OP, opcode, op0, op1)
-}
-func ZendAstCreateCast(type_ uint32, op0 *ZendAst) *ZendAst {
-	return ZendAstCreateEx(ZEND_AST_CAST, type_, op0)
-}
-func ZendAstListRtrim(ast *ZendAst) *ZendAst {
-	var list *ZendAstList = ZendAstGetList(ast)
-	if list.GetChildren() != 0 && list.GetChild()[list.GetChildren()-1] == nil {
-		list.GetChildren()--
-	}
-	return ast
-}
 func ZendAstAlloc(size int) any {
-	return ZendArenaAlloc(CG__().GetAstArena(), size)
+	return b.Malloc(size)
 }
 func ZendAstRealloc(old any, old_size int, new_size int) any {
 	var new_ any = ZendAstAlloc(new_size)

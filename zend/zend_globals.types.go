@@ -39,10 +39,7 @@ type ZendCompilerGlobals struct {
 	compiler_options             uint32
 	context                      ZendOparrayContext
 	file_context                 ZendFileContext
-	arena                        *ZendArena
-
 	ast                          *ZendAst
-	ast_arena                    *ZendArena
 	delayed_oplines_stack        ZendStack
 	memoized_exprs               *types.Array
 	memoize_mode                 int
@@ -141,10 +138,8 @@ func (this *ZendCompilerGlobals) GetContext() *ZendOparrayContext      { return 
 func (this *ZendCompilerGlobals) SetContext(value ZendOparrayContext)  { this.context = value }
 func (this *ZendCompilerGlobals) GetFileContext() *ZendFileContext     { return &this.file_context }
 func (this *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { this.file_context = value }
-func (this *ZendCompilerGlobals) GetArena() *ZendArena                 { return this.arena }
 func (this *ZendCompilerGlobals) GetAst() *ZendAst                     { return this.ast }
 func (this *ZendCompilerGlobals) SetAst(value *ZendAst)                { this.ast = value }
-func (this *ZendCompilerGlobals) GetAstArena() *ZendArena              { return this.ast_arena }
 func (this *ZendCompilerGlobals) GetDelayedOplinesStack() ZendStack {
 	return this.delayed_oplines_stack
 }

@@ -250,8 +250,8 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 			}
 		}
 	}
-	if class_type.GetParent() && (class_type.GetParent().ce_flags&types.AccReuseGetIterator) != 0 {
-		class_type.SetGetIterator(class_type.GetParent().get_iterator)
+	if class_type.GetParent() != nil && (class_type.GetParent().GetCeFlags()&types.AccReuseGetIterator) != 0 {
+		class_type.SetGetIterator(class_type.GetParent().GetGetIterator())
 		class_type.SetIsReuseGetIterator(true)
 	} else {
 		class_type.SetGetIterator(ZendUserItGetNewIterator)
@@ -259,15 +259,14 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 	funcs_ptr = class_type.GetIteratorFuncsPtr()
 	if class_type.IsInternalClass() {
 		if funcs_ptr == nil {
-			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
+			funcs_ptr = NewClassIteratorFuncs()
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 		}
 		funcs_ptr.SetZfNewIterator(class_type.FunctionTable().Get("getiterator"))
 	} else {
 		if funcs_ptr == nil {
-			funcs_ptr = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_class_iterator_funcs"))
+			funcs_ptr = NewClassIteratorFuncs()
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
-			memset(funcs_ptr, 0, b.SizeOf("zend_class_iterator_funcs"))
 		} else {
 			funcs_ptr.SetZfNewIterator(nil)
 		}
@@ -295,7 +294,7 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 			return types.FAILURE
 		}
 	}
-	if class_type.GetParent() && (class_type.GetParent().ce_flags&types.AccReuseGetIterator) != 0 {
+	if class_type.GetParent() && (class_type.GetParent().GetCeFlags()&types.AccReuseGetIterator) != 0 {
 		class_type.SetGetIterator(class_type.GetParent().get_iterator)
 		class_type.SetIsReuseGetIterator(true)
 	} else {
@@ -304,8 +303,7 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 	funcs_ptr = class_type.GetIteratorFuncsPtr()
 	if class_type.IsInternalClass() {
 		if funcs_ptr == nil {
-			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
-			class_type.SetIteratorFuncsPtr(funcs_ptr)
+			class_type.SetIteratorFuncsPtr(NewClassIteratorFuncs())
 		} else {
 			funcs_ptr.SetZfRewind(class_type.FunctionTable().Get("rewind"))
 			funcs_ptr.SetZfValid(class_type.FunctionTable().Get("valid"))
@@ -315,9 +313,7 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 		}
 	} else {
 		if funcs_ptr == nil {
-			funcs_ptr = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_class_iterator_funcs"))
-			class_type.SetIteratorFuncsPtr(funcs_ptr)
-			memset(funcs_ptr, 0, b.SizeOf("zend_class_iterator_funcs"))
+			class_type.SetIteratorFuncsPtr(NewClassIteratorFuncs())
 		} else {
 			funcs_ptr.SetZfValid(nil)
 			funcs_ptr.SetZfCurrent(nil)

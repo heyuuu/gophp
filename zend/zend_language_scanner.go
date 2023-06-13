@@ -53,7 +53,6 @@ type ZendLexState struct {
 	on_event             func(event ZendPhpScannerEvent, token int, line int, context any)
 	on_event_context     any
 	ast                  *ZendAst
-	ast_arena            *ZendArena
 }
 
 /**

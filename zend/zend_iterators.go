@@ -117,6 +117,10 @@ type ZendClassIteratorFuncs struct {
 	zf_rewind       types.IFunction
 }
 
+func NewClassIteratorFuncs() *ZendClassIteratorFuncs {
+	return &ZendClassIteratorFuncs{}
+}
+
 func (this *ZendClassIteratorFuncs) GetZfNewIterator() types.IFunction {
 	return this.zf_new_iterator
 }

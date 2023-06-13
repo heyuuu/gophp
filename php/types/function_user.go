@@ -50,7 +50,7 @@ func NewOpArray() *ZendOpArray {
 		reserved: make([]any, ZEND_MAX_RESERVED_RESOURCES),
 	}
 }
-func CopyOpArray(array *ZendOpArray) *ZendOpArray {
+func CopyOpArray(fn *ZendOpArray) *ZendOpArray {
 	// todo 处理 copy 逻辑
 	return NewOpArray()
 }
@@ -115,7 +115,7 @@ func (f *ZendOpArray) InitPtr(preload bool) {
 		zend.ZEND_MAP_PTR_NEW(f.run_time_cache)
 		zend.ZEND_MAP_PTR_NEW(f.static_variables_ptr)
 	} else {
-		zend.ZEND_MAP_PTR_INIT(f.run_time_cache, zend.ZendArenaAlloc(zend.CG__().GetArena(), b.SizeOf("void *")))
+		zend.ZEND_MAP_PTR_INIT(f.run_time_cache, b.Malloc(b.SizeOf("void *")))
 		zend.ZEND_MAP_PTR_SET(f.run_time_cache, nil)
 	}
 }
@@ -126,7 +126,7 @@ func (f *ZendOpArray) InitPtr2(preload bool) {
 		zend.ZEND_MAP_PTR_NEW(f.run_time_cache)
 		zend.ZEND_MAP_PTR_NEW(f.static_variables_ptr)
 	} else {
-		zend.ZEND_MAP_PTR_INIT(f.run_time_cache, zend.ZendArenaAlloc(zend.CG__().GetArena(), b.SizeOf("void *")))
+		zend.ZEND_MAP_PTR_INIT(f.run_time_cache, b.Malloc(b.SizeOf("void *")))
 		zend.ZEND_MAP_PTR_SET(f.run_time_cache, nil)
 
 		zend.ZEND_MAP_PTR_INIT(f.static_variables_ptr, f.GetStaticVariables())
