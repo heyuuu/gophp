@@ -475,117 +475,7 @@ func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var__ *types.Zval, _
 		buf.Free()
 	}
 }
-func PhpVarSerializeCallSleep(retval *types.Zval, struc *types.Zval) int {
-	var fname types.Zval
-	var res int
-	fname.SetStringVal("__sleep")
-	BG__().serialize_lock++
-	res = zend.CallUserFunction(nil, struc, &fname, retval, 0, 0)
-	BG__().serialize_lock--
 
-	if res == types.FAILURE || retval.IsUndef() {
-		return types.FAILURE
-	}
-	if !(zend.HASH_OF(retval)) {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize")
-		return types.FAILURE
-	}
-	return types.SUCCESS
-}
-func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int {
-	var fname types.Zval
-	var res int
-	fname.SetStringVal("__serialize")
-	BG__().serialize_lock++
-	res = zend.CallUserFunction(obj, &fname, retval, 0, 0)
-	BG__().serialize_lock--
-
-	if res == types.FAILURE || retval.IsUndef() {
-		return types.FAILURE
-	}
-	if !retval.IsArray() {
-		faults.TypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).Name())
-		return types.FAILURE
-	}
-	return types.SUCCESS
-}
-func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *types.String, errorName *types.String, struc *types.Zval) int {
-	var val = props.KeyFind(name.GetStr())
-	if val == nil {
-		return types.FAILURE
-	}
-	if val.IsIndirect() {
-		val = val.Indirect()
-		if val.IsUndef() {
-			var info = zend.ZendGetTypedPropertyInfoForSlot(struc.Object(), val)
-			if info != nil {
-				return types.SUCCESS
-			}
-			return types.FAILURE
-		}
-	}
-	if ht.KeyAdd(name.GetStr(), val) == nil {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" is returned from __sleep multiple times", errorName.GetVal())
-		return types.SUCCESS
-	}
-	return types.SUCCESS
-}
-func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retval *types.Array) int {
-	var ce = types.Z_OBJCE_P(struc)
-	var props = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
-	var name_val *types.Zval
-	var retval = types.SUCCESS
-	*ht = *types.NewArray(sleep_retval.Len())
-
-	/* TODO: Rewrite this by fetching the property info instead of trying out different
-	 * name manglings? */
-
-	var __ht = sleep_retval
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-		if _z.IsIndirect() {
-			_z = _z.Indirect()
-			if _z.IsUndef() {
-				continue
-			}
-		}
-		name_val = _z
-		var name *types.String
-		var priv_name *types.String
-		var prot_name *types.String
-		name_val = types.ZVAL_DEREF(name_val)
-		if !name_val.IsString() {
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
-		}
-		name = operators.ZvalGetString(name_val)
-		if PhpVarSerializeTryAddSleepProp(ht, props, name, name, struc) == types.SUCCESS {
-			continue
-		}
-		if zend.EG__().GetException() != nil {
-			retval = types.FAILURE
-			break
-		}
-		priv_name = zend.ZendManglePropertyName_ZStr(ce.Name(), name.GetStr())
-		if PhpVarSerializeTryAddSleepProp(ht, props, priv_name, name, struc) == types.SUCCESS {
-			continue
-		}
-		if zend.EG__().GetException() != nil {
-			retval = types.FAILURE
-			break
-		}
-		prot_name = zend.ZendManglePropertyName_ZStr("*", name.GetStr())
-		if PhpVarSerializeTryAddSleepProp(ht, props, prot_name, name, struc) == types.SUCCESS {
-			continue
-		}
-		if zend.EG__().GetException() != nil {
-			retval = types.FAILURE
-			break
-		}
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
-		ht.KeyAdd(name.GetStr(), zend.UninitializedZval())
-	}
-	return retval
-}
 func PhpVarSerializeInit() PhpSerializeDataT {
 	var d *PhpSerializeData
 
@@ -697,9 +587,6 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 			if zend.EG__().GetException() != nil {
 				goto cleanup
 			}
-
-			/* Exception during string conversion. */
-
 		}
 		var_hash.SetAllowedClasses(class_hash)
 		max_depth = types.ZendHashStrFindDeref(options.Array(), "max_depth")
@@ -769,43 +656,13 @@ cleanup:
 	 * the very end, because __wakeup() calls performed during UNSERIALIZE_DESTROY might affect
 	 * the value we unwrap here. This is compatible with behavior in PHP <=7.0. */
 }
-func ZifMemoryGetUsage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, realUsage *types.Zval) {
-	var real_usage = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 0, 1, 0)
-			fp.StartOptional()
-			real_usage = fp.ParseBool()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetLong(zend.ZendMemoryUsage(real_usage))
-	return
+func ZifMemoryGetUsage(_ zpp.Opt, realUsage bool) int {
+	return zend.ZendMemoryUsage(realUsage)
 }
-func ZifMemoryGetPeakUsage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, realUsage *types.Zval) {
-	var real_usage = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 0, 1, 0)
-			fp.StartOptional()
-			real_usage = fp.ParseBool()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetLong(zend.ZendMemoryPeakUsage(real_usage))
-	return
+func ZifMemoryGetPeakUsage(_ zpp.Opt, realUsage bool) int {
+	return zend.ZendMemoryPeakUsage(realUsage)
 }
-func ZmStartupVar(type_ int, module_number int) int {
-	zend.REGISTER_INI_ENTRIES(module_number)
+func ZmStartupVar(type_ int, moduleNumber int) int {
+	zend.REGISTER_INI_ENTRIES(moduleNumber)
 	return types.SUCCESS
 }

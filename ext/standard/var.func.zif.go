@@ -67,7 +67,7 @@ var DefZifMemoryGetUsage = def.DefFunc("memory_get_usage", 0, 1, []def.ArgInfo{{
 	if fp.HasError() {
 		return
 	}
-	ZifMemoryGetUsage(executeData, returnValue, nil, real_usage)
+	ZifMemoryGetUsage(nil, real_usage)
 })
 
 // generate by ZifMemoryGetPeakUsage
@@ -78,5 +78,5 @@ var DefZifMemoryGetPeakUsage = def.DefFunc("memory_get_peak_usage", 0, 1, []def.
 	if fp.HasError() {
 		return
 	}
-	ZifMemoryGetPeakUsage(executeData, returnValue, nil, real_usage)
+	ZifMemoryGetPeakUsage(nil, real_usage)
 })

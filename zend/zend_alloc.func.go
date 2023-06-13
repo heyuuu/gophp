@@ -39,15 +39,15 @@ func ZendStrndup(s *byte, length int) *byte {
 	var str = b.CastStr(s, length)
 	return b.CastStrPtr(str)
 }
-func ZendSetMemoryLimit(memory_limit int) int {
+func ZendSetMemoryLimit(memoryLimit int) int {
 	// notice memory 限制失效
 	return types.SUCCESS
 }
-func ZendMemoryUsage(real_usage int) int {
+func ZendMemoryUsage(realUsage bool) int {
 	// notice 获取 memory 使用情况失效
 	return 0
 }
-func ZendMemoryPeakUsage(real_usage int) int {
+func ZendMemoryPeakUsage(realUsage bool) int {
 	// notice 获取 memory 使用情况失效
 	return 0
 }

@@ -14,7 +14,8 @@ func INI_STR(name string) *byte {
 	return ZendIniStringEx(name, 0, nil)
 }
 func INI_STRING(name string) string {
-	return ZendIniStringEx(name, 0, nil)
+	value, _ := ZendIniStringExEx(name, false)
+	return value
 }
 func REGISTER_INI_ENTRIES(module_number int) int {
 	return ZendRegisterIniEntries(IniEntries, module_number)
@@ -190,7 +191,25 @@ func ZendIniLong(name string, orig int) ZendLong {
 	return 0
 }
 func ZendIniStringExEx(name string, orig bool) (value string, exists bool) {
-
+	var iniEntry = EG__().IniDirectives().Get(name)
+	if iniEntry != nil {
+		exists = true
+		if orig && iniEntry.GetModified() != 0 {
+			if iniEntry.GetOrigValue() != nil {
+				value = iniEntry.GetOrigValue().GetStr()
+			} else {
+				value = ""
+			}
+		} else {
+			if iniEntry.GetValue() != nil {
+				value = iniEntry.GetValue().GetStr()
+			} else {
+				value = ""
+			}
+		}
+		return value, exists
+	}
+	return "", false
 }
 func ZendIniStringEx(name string, orig int, exists *bool) *byte {
 	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
