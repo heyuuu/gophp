@@ -745,41 +745,31 @@ func zim_spl_SplDoublyLinkedList_current(executeData *zend.ZendExecuteData, retu
 }
 func zim_spl_SplDoublyLinkedList_serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
-	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var next *SplPtrLlistElement
 	var flags types.Zval
-	var var_hash standard.PhpSerializeDataT
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	standard.PHP_VAR_SERIALIZE_INIT(var_hash)
+
+	serializer := standard.InitSerializer()
 
 	/* flags */
-
 	flags.SetLong(intern.GetFlags())
-	standard.PhpVarSerialize(&buf, &flags, &var_hash)
+	serializer.Serialize(&flags)
 
 	/* elements */
-
 	for current != nil {
-		buf.WriteByte(':')
+		serializer.WriteByte(':')
 		next = current.GetNext()
-		standard.PhpVarSerialize(&buf, current.GetData(), &var_hash)
+		serializer.Serialize(current.GetData())
 		current = next
 	}
-	buf.ZeroTail()
 
 	/* done */
+	serializer.DestroyData()
 
-	standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)
-	if buf.GetS() != nil {
-		return_value.SetStringVal(buf.GetStr())
-		return
-	} else {
-		return_value.SetNull()
-		return
-	}
+	return_value.SetStringVal(serializer.String())
 }
 func zim_spl_SplDoublyLinkedList_unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))

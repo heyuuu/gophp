@@ -21,17 +21,6 @@ func REGISTER_INI_ENTRIES(module_number int) int {
 }
 func UNREGISTER_INI_ENTRIES(module_number int)     { ZendUnregisterIniEntries(module_number) }
 func DISPLAY_INI_ENTRIES(zend_module *ModuleEntry) { DisplayIniEntries(zend_module) }
-func REGISTER_INI_DISPLAYER(name *byte, displayer func(ini_entry *ZendIniEntry, type_ int)) int {
-	return ZendIniRegisterDisplayer(name, b.SizeOf("name")-1, displayer)
-}
-func REGISTER_INI_BOOLEAN(name *byte) int {
-	return REGISTER_INI_DISPLAYER(name, ZendIniBooleanDisplayerCb)
-}
-func ZendRemoveIniEntries(el *types.Zval, arg any) int {
-	var ini_entry *ZendIniEntry = (*ZendIniEntry)(el.Ptr())
-	var module_number int = *((*int)(arg))
-	return ini_entry.GetModuleNumber() == module_number
-}
 func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 	var result = false
 	if ini_entry.GetModified() != 0 {
@@ -199,6 +188,9 @@ func ZendIniLong(name string, orig int) ZendLong {
 		}
 	}
 	return 0
+}
+func ZendIniStringExEx(name string, orig bool) (value string, exists bool) {
+
 }
 func ZendIniStringEx(name string, orig int, exists *bool) *byte {
 	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)

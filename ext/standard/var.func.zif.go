@@ -44,7 +44,7 @@ var DefZifSerialize = def.DefFunc("serialize", 1, 1, []def.ArgInfo{{Name: "var"}
 	if fp.HasError() {
 		return
 	}
-	ZifSerialize(executeData, returnValue, var_)
+	ZifSerialize(var_)
 })
 
 // generate by ZifUnserialize

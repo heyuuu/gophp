@@ -418,50 +418,40 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 	var members types.Zval
 	var flags types.Zval
 	var pos types.ArrayPosition
-	var var_hash standard.PhpSerializeDataT
-	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	standard.PHP_VAR_SERIALIZE_INIT(var_hash)
+
+	serializer := standard.InitSerializer()
 
 	/* storage */
-
-	buf.WriteString("x:")
+	serializer.WriteString("x:")
 	flags.SetLong(intern.GetStorage().Len())
-	standard.PhpVarSerialize(&buf, &flags, &var_hash)
+	serializer.Serialize(&flags)
+
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), &pos)
 	for types.ZendHashHasMoreElementsEx(intern.GetStorage(), &pos) {
 		if b.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), &pos)) == nil {
-			buf.Free()
-			standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)
+			serializer.DestroyData()
 			return_value.SetNull()
 			return
 		}
-		standard.PhpVarSerialize(&buf, element.GetObj(), &var_hash)
-		buf.WriteByte(',')
-		standard.PhpVarSerialize(&buf, element.GetInf(), &var_hash)
-		buf.WriteByte(';')
+		serializer.Serialize(element.GetObj())
+		serializer.WriteByte(',')
+		serializer.Serialize(element.GetInf())
+		serializer.WriteByte(';')
 		types.ZendHashMoveForwardEx(intern.GetStorage(), &pos)
 	}
 
 	/* members */
-
-	buf.WriteString("m:")
+	serializer.WriteString("m:")
 	members.SetArray(types.ZendArrayDup(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData))))
-	standard.PhpVarSerialize(&buf, &members, &var_hash)
-	// zend.ZvalPtrDtor(&members)
+	serializer.Serialize(&members)
 
 	/* done */
+	serializer.DestroyData()
 
-	standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)
-	if buf.GetS() != nil {
-		return_value.SetStringVal(buf.GetStr())
-		return
-	} else {
-		return_value.SetNull()
-		return
-	}
+	return_value.SetStringVal(serializer.String())
 }
 func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))

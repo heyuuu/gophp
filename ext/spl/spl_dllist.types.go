@@ -15,21 +15,13 @@ type SplPtrLlistElement struct {
 	data types.Zval
 }
 
-// func MakeSplPtrLlistElement(prev *SplPtrLlistElement, next *SplPtrLlistElement, rc int, data zend.Zval) SplPtrLlistElement {
-//     return SplPtrLlistElement{
-//         prev:prev,
-//         next:next,
-//         rc:rc,
-//         data:data,
-//     }
-// }
 func (this *SplPtrLlistElement) GetPrev() *SplPtrLlistElement      { return this.prev }
 func (this *SplPtrLlistElement) SetPrev(value *SplPtrLlistElement) { this.prev = value }
 func (this *SplPtrLlistElement) GetNext() *SplPtrLlistElement      { return this.next }
 func (this *SplPtrLlistElement) SetNext(value *SplPtrLlistElement) { this.next = value }
 func (this *SplPtrLlistElement) GetRc() int                        { return this.rc }
 func (this *SplPtrLlistElement) SetRc(value int)                   { this.rc = value }
-func (this *SplPtrLlistElement) GetData() types.Zval               { return this.data }
+func (this *SplPtrLlistElement) GetData() *types.Zval              { return &this.data }
 
 // func (this *SplPtrLlistElement) SetData(value zend.Zval) { this.data = value }
 

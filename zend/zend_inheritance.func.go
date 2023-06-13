@@ -528,7 +528,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) string {
 				}
 			} else {
 				str.WriteString("param")
-				str.AppendUlong(i)
+				str.WriteUlong(i)
 			}
 			if i >= required && arg_info.GetIsVariadic() == 0 {
 				str.WriteString(" = ")

@@ -435,11 +435,11 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 		argStr := arg.StringVal()
 		if len(argStr) > 15 {
 			str.WriteByte('\'')
-			str.AppendEscaped(argStr[:15])
+			str.WriteEscaped(argStr[:15])
 			str.WriteString("...', ")
 		} else {
 			str.WriteByte('\'')
-			str.AppendEscaped(argStr)
+			str.WriteEscaped(argStr)
 			str.WriteString("', ")
 		}
 	case types.IS_FALSE:
@@ -448,10 +448,10 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 		str.WriteString("true, ")
 	case types.IS_RESOURCE:
 		str.WriteString("Resource id #")
-		str.AppendLong(arg.ResourceHandle())
+		str.WriteLong(arg.ResourceHandle())
 		str.WriteString(", ")
 	case types.IS_LONG:
-		str.AppendLong(arg.Long())
+		str.WriteLong(arg.Long())
 		str.WriteString(", ")
 	case types.IS_DOUBLE:
 		str.WriteString(pfmt.Sprintf("%.*G", int(zend.EG__().GetPrecision()), arg.Double()))
@@ -468,7 +468,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 	var file *types.Zval
 	var tmp *types.Zval
 	str.WriteByte('#')
-	str.AppendLong(num)
+	str.WriteLong(num)
 	str.WriteByte(' ')
 	file = ht.KeyFind(types.STR_FILE)
 	if file != nil {
@@ -490,7 +490,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 			}
 			str.WriteString(file.String().GetStr())
 			str.WriteByte('(')
-			str.AppendLong(line)
+			str.WriteLong(line)
 			str.WriteString("): ")
 		}
 	} else {
@@ -541,7 +541,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 		_buildTraceString(&str, frame.Array(), b.PostInc(&num))
 	})
 	str.WriteByte('#')
-	str.AppendLong(num)
+	str.WriteLong(num)
 	str.WriteString(" {main}")
 	str.ZeroTail()
 	return_value.SetString(str.GetS())

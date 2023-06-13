@@ -1212,45 +1212,37 @@ func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *
 	SplInstantiateArgEx2(types.Z_OBJCE_P(zend.ZEND_THIS(executeData)), return_value, entry, &flags)
 }
 func zim_spl_Array_serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if !executeData.CheckNumArgsNone(false) {
+		return
+	}
+
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var members types.Zval
 	var flags types.Zval
-	var var_hash standard.PhpSerializeDataT
-	var buf zend.SmartStr = zend.MakeSmartStr(0)
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	standard.PHP_VAR_SERIALIZE_INIT(var_hash)
 	flags.SetLong(intern.GetArFlags() & SPL_ARRAY_CLONE_MASK)
 
 	/* storage */
-
+	buf := standard.InitSerializer()
 	buf.WriteString("x:")
-	standard.PhpVarSerialize(&buf, &flags, &var_hash)
+	buf.Serialize(&flags)
 	if !intern.IsIsSelf() {
-		standard.PhpVarSerialize(&buf, intern.GetArray(), &var_hash)
+		buf.Serialize(intern.GetArray())
 		buf.WriteByte(';')
 	}
 
 	/* members */
-
 	buf.WriteString("m:")
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
 	members.SetArray(intern.GetStd().GetProperties())
-	standard.PhpVarSerialize(&buf, &members, &var_hash)
+	buf.Serialize(&members)
 
 	/* done */
+	buf.DestroyData()
 
-	standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)
-	if buf.GetS() != nil {
-		return_value.SetString(buf.GetS())
-		return
-	}
-	return_value.SetNull()
-	return
+	return_value.SetStringVal(buf.String())
 }
 func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)

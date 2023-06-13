@@ -278,7 +278,7 @@ func BufferAppendSpaces(buf *zend.SmartStr, num_spaces int) {
 func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.String, level int, buf *zend.SmartStr) {
 	if key == nil {
 		BufferAppendSpaces(buf, level+1)
-		buf.AppendLong(zend.ZendLong(index))
+		buf.WriteLong(zend.ZendLong(index))
 		buf.WriteString(" => ")
 	} else {
 		var ckey = types.NewString(str.PhpAddcslashes(key.GetStr(), "'\\"))
@@ -304,7 +304,7 @@ func PhpObjectElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Str
 		buf.WriteString(propNameEscaped)
 		buf.WriteByte('\'')
 	} else {
-		buf.AppendLong(zend.ZendLong(index))
+		buf.WriteLong(zend.ZendLong(index))
 	}
 	buf.WriteString(" => ")
 	PhpVarExportEx(zv, level+2, buf)
@@ -331,11 +331,11 @@ again:
 		 * -9223372036854775807-1 to avoid this. */
 
 		if struc.Long() == zend.ZEND_LONG_MIN {
-			buf.AppendLong(zend.ZEND_LONG_MIN + 1)
+			buf.WriteLong(zend.ZEND_LONG_MIN + 1)
 			buf.WriteString("-1")
 			break
 		}
-		buf.AppendLong(struc.Long())
+		buf.WriteLong(struc.Long())
 	case types.IS_DOUBLE:
 		core.PhpGcvt(struc.Double(), int(core.PG__().serialize_precision), '.', 'E', tmp_str)
 		buf.WriteString(b.CastStrAuto(tmp_str))
@@ -448,14 +448,7 @@ again:
 		buf.WriteString("NULL")
 	}
 }
-func PhpVarExport(struc *types.Zval, level int) {
-	var buf zend.SmartStr = zend.MakeSmartStr(0)
-	PhpVarExportEx(struc, level, &buf)
-	buf.ZeroTail()
-	core.PUTS(buf.GetS().GetStr())
-	buf.Free()
-}
-func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
+func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var__ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
 	var var_ *types.Zval
 	var return_output = 0
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
@@ -482,56 +475,6 @@ func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ 
 		buf.Free()
 	}
 }
-func PhpAddVarHash(data PhpSerializeDataT, var_ *types.Zval) zend.ZendLong {
-	data.IncN()
-
-	var isRef = var_.IsReference()
-	if !isRef && !var_.IsObject() {
-		return 0
-	}
-
-	/* References to objects are treated as if the reference didn't exist */
-	if isRef && types.Z_REFVAL_P(var_).IsType(types.IS_OBJECT) {
-		var_ = types.Z_REFVAL_P(var_)
-	}
-
-	/* Index for the variable is stored using the numeric value of the pointer to
-	 * the zend_refcounted struct */
-	if n, exists := data.FindMark(var_); exists {
-		/* References are only counted once, undo the data->n increment above */
-		if isRef && n != -1 {
-			data.DecN()
-		}
-		return n
-	} else {
-		data.Mark(var_)
-		return 0
-	}
-}
-func PhpVarSerializeLong(buf *zend.SmartStr, val zend.ZendLong) {
-	buf.WriteString("i:")
-	buf.AppendLong(val)
-	buf.WriteByte(';')
-}
-func PhpVarSerializeString(buf *zend.SmartStr, str *byte, len_ int) {
-	buf.WriteString("s:")
-	buf.AppendUlong(len_)
-	buf.WriteString(":\"")
-	buf.WriteString(b.CastStr(str, len_))
-	buf.WriteString("\";")
-}
-func PhpVarSerializeClassName(buf *zend.SmartStr, struc *types.Zval) bool {
-	var class_name *types.String
-	var incomplete_class = 0
-	PHP_SET_CLASS_ATTRIBUTES(struc)
-	buf.WriteString("O:")
-	buf.AppendUlong(class_name.GetLen())
-	buf.WriteString(":\"")
-	buf.WriteString(class_name.GetStr())
-	buf.WriteString("\":")
-	PHP_CLEANUP_CLASS_ATTRIBUTES()
-	return incomplete_class
-}
 func PhpVarSerializeCallSleep(retval *types.Zval, struc *types.Zval) int {
 	var fname types.Zval
 	var res int
@@ -541,11 +484,9 @@ func PhpVarSerializeCallSleep(retval *types.Zval, struc *types.Zval) int {
 	BG__().serialize_lock--
 
 	if res == types.FAILURE || retval.IsUndef() {
-		// zend.ZvalPtrDtor(retval)
 		return types.FAILURE
 	}
 	if !(zend.HASH_OF(retval)) {
-		// zend.ZvalPtrDtor(retval)
 		core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize")
 		return types.FAILURE
 	}
@@ -560,17 +501,15 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	BG__().serialize_lock--
 
 	if res == types.FAILURE || retval.IsUndef() {
-		// zend.ZvalPtrDtor(retval)
 		return types.FAILURE
 	}
 	if !retval.IsArray() {
-		// zend.ZvalPtrDtor(retval)
 		faults.TypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).Name())
 		return types.FAILURE
 	}
 	return types.SUCCESS
 }
-func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *types.String, error_name *types.String, struc *types.Zval) int {
+func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *types.String, errorName *types.String, struc *types.Zval) int {
 	var val = props.KeyFind(name.GetStr())
 	if val == nil {
 		return types.FAILURE
@@ -586,10 +525,9 @@ func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *t
 		}
 	}
 	if ht.KeyAdd(name.GetStr(), val) == nil {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" is returned from __sleep multiple times", error_name.GetVal())
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" is returned from __sleep multiple times", errorName.GetVal())
 		return types.SUCCESS
 	}
-	// val.TryAddRefcount()
 	return types.SUCCESS
 }
 func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retval *types.Array) int {
@@ -648,257 +586,15 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 	}
 	return retval
 }
-func PhpVarSerializeNestedData(
-	buf *zend.SmartStr,
-	struc *types.Zval,
-	ht *types.Array,
-	count uint32,
-	incomplete_class bool,
-	var_hash PhpSerializeDataT,
-) {
-	buf.AppendUlong(count)
-	buf.WriteString(":{")
-	if count > 0 {
-		var key *types.String
-		var data *types.Zval
-		var index zend.ZendUlong
-		var __ht = ht
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.Indirect()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			index = _p.GetH()
-			key = _p.GetKey()
-			data = _z
-			if incomplete_class != 0 && strcmp(key.GetVal(), MAGIC_MEMBER) == 0 {
-				continue
-			}
-			if key == nil {
-				PhpVarSerializeLong(buf, index)
-			} else {
-				PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
-			}
-
-			/* we should still add element even if it's not OK,
-			 * since we already wrote the length of the array before */
-
-			if data.IsArray() {
-				if data.Array().IsRecursive() || struc.IsArray() && data.Array() == struc.Array() {
-					PhpAddVarHash(var_hash, struc)
-					buf.WriteString("N;")
-				} else {
-					data.Array().ProtectRecursive()
-					PhpVarSerializeIntern(buf, data, var_hash)
-					data.Array().UnprotectRecursive()
-				}
-			} else {
-				PhpVarSerializeIntern(buf, data, var_hash)
-			}
-
-			/* we should still add element even if it's not OK,
-			 * since we already wrote the length of the array before */
-
-		}
-	}
-	buf.WriteByte('}')
-}
-func PhpVarSerializeClass(buf *zend.SmartStr, struc *types.Zval, retval_ptr *types.Zval, var_hash PhpSerializeDataT) {
-	var props types.Array
-	if PhpVarSerializeGetSleepProps(&props, struc, zend.HASH_OF(retval_ptr)) == types.SUCCESS {
-		PhpVarSerializeClassName(buf, struc)
-		PhpVarSerializeNestedData(buf, struc, &props, props.Len(), 0, var_hash)
-	}
-	props.Destroy()
-}
-func PhpVarSerializeIntern(buf *zend.SmartStr, struc *types.Zval, var_hash PhpSerializeDataT) {
-	var var_already zend.ZendLong
-	var myht *types.Array
-	if zend.EG__().GetException() != nil {
-		return
-	}
-	if var_hash != nil && b.Assign(&var_already, PhpAddVarHash(var_hash, struc)) {
-		if var_already == -1 {
-
-			/* Reference to an object that failed to serialize, replace with null. */
-
-			buf.WriteString("N;")
-			return
-		} else if struc.IsReference() {
-			buf.WriteString("R:")
-			buf.AppendLong(var_already)
-			buf.WriteByte(';')
-			return
-		} else if struc.IsType(types.IS_OBJECT) {
-			buf.WriteString("r:")
-			buf.AppendLong(var_already)
-			buf.WriteByte(';')
-			return
-		}
-	}
-again:
-	switch struc.GetType() {
-	case types.IS_FALSE:
-		buf.WriteString("b:0;")
-		return
-	case types.IS_TRUE:
-		buf.WriteString("b:1;")
-		return
-	case types.IS_NULL:
-		buf.WriteString("N;")
-		return
-	case types.IS_LONG:
-		PhpVarSerializeLong(buf, struc.Long())
-		return
-	case types.IS_DOUBLE:
-		var tmp_str []byte
-		buf.WriteString("d:")
-		core.PhpGcvt(struc.Double(), int(core.PG__().serialize_precision), '.', 'E', tmp_str)
-		buf.WriteString(b.CastStrAuto(tmp_str))
-		buf.WriteByte(';')
-		return
-	case types.IS_STRING:
-		PhpVarSerializeString(buf, struc.String().GetVal(), struc.String().GetLen())
-		return
-	case types.IS_OBJECT:
-		var ce = types.Z_OBJCE_P(struc)
-		var incomplete_class bool
-		var count uint32
-		if ce.FunctionTable().Exists("__serialize") {
-			var retval types.Zval
-			var obj types.Zval
-			var key *types.String
-			var data *types.Zval
-			var index zend.ZendUlong
-			// 			struc.AddRefcount()
-			obj.SetObject(struc.Object())
-			if PhpVarSerializeCallMagicSerialize(&retval, &obj) == types.FAILURE {
-				if zend.EG__().GetException() == nil {
-					buf.WriteString("N;")
-				}
-				// zend.ZvalPtrDtor(&obj)
-				return
-			}
-			PhpVarSerializeClassName(buf, &obj)
-			buf.AppendUlong(retval.Array().Count())
-			buf.WriteString(":{")
-			var __ht = retval.Array()
-			for _, _p := range __ht.ForeachData() {
-				var _z = _p.GetVal()
-				if _z.IsIndirect() {
-					_z = _z.Indirect()
-					if _z.IsUndef() {
-						continue
-					}
-				}
-				index = _p.GetH()
-				key = _p.GetKey()
-				data = _z
-				if key == nil {
-					PhpVarSerializeLong(buf, index)
-				} else {
-					PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
-				}
-				PhpVarSerializeIntern(buf, data, var_hash)
-			}
-			buf.WriteByte('}')
-			return
-		}
-		if ce.GetSerialize() != nil {
-
-			/* has custom handler */
-
-			var serialized_data *uint8 = nil
-			var serialized_length int
-			if ce.GetSerialize()(struc, &serialized_data, &serialized_length, (*zend.ZendSerializeData)(var_hash)) == types.SUCCESS {
-				buf.WriteString("C:")
-				buf.AppendUlong(types.Z_OBJCE_P(struc).GetName().GetLen())
-				buf.WriteString(":\"")
-				buf.WriteString(types.Z_OBJCE_P(struc).GetName().GetStr())
-				buf.WriteString("\":")
-				buf.AppendUlong(serialized_length)
-				buf.WriteString(":{")
-				buf.WriteString(b.CastStr((*byte)(serialized_data), serialized_length))
-				buf.WriteByte('}')
-			} else {
-				/* Mark this value in the var_hash, to avoid creating references to it. */
-				var_hash.MarkUsed(struc)
-				buf.WriteString("N;")
-			}
-			if serialized_data != nil {
-				zend.Efree(serialized_data)
-			}
-			return
-		}
-		if ce != PHP_IC_ENTRY && ce.FunctionTable().Exists("__sleep") {
-			var retval types.Zval
-			var tmp types.Zval
-			// 			struc.AddRefcount()
-			tmp.SetObject(struc.Object())
-			if PhpVarSerializeCallSleep(&retval, &tmp) == types.FAILURE {
-				if zend.EG__().GetException() == nil {
-
-					/* we should still add element even if it's not OK,
-					 * since we already wrote the length of the array before */
-
-					buf.WriteString("N;")
-
-					/* we should still add element even if it's not OK,
-					 * since we already wrote the length of the array before */
-
-				}
-				// zend.ZvalPtrDtor(&tmp)
-				return
-			}
-			PhpVarSerializeClass(buf, &tmp, &retval, var_hash)
-			// zend.ZvalPtrDtor(&retval)
-			// zend.ZvalPtrDtor(&tmp)
-			return
-		}
-		incomplete_class = PhpVarSerializeClassName(buf, struc)
-		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
-
-		/* count after serializing name, since php_var_serialize_class_name
-		 * changes the count if the variable is incomplete class */
-
-		count = myht.Count()
-		if count > 0 && incomplete_class != 0 {
-			count--
-		}
-		PhpVarSerializeNestedData(buf, struc, myht, count, incomplete_class, var_hash)
-		//zend.ZendReleaseProperties(myht)
-		return
-	case types.IS_ARRAY:
-		buf.WriteString("a:")
-		myht = struc.Array()
-		PhpVarSerializeNestedData(buf, struc, myht, myht.Count(), 0, var_hash)
-		return
-	case types.IS_REFERENCE:
-		struc = types.Z_REFVAL_P(struc)
-		goto again
-	default:
-		buf.WriteString("i:0;")
-		return
-	}
-}
-func PhpVarSerialize(buf *zend.SmartStr, struc *types.Zval, data *PhpSerializeDataT) {
-	PhpVarSerializeIntern(buf, struc, *data)
-	buf.ZeroTail()
-}
 func PhpVarSerializeInit() PhpSerializeDataT {
 	var d *PhpSerializeData
 
-	/* fprintf(stderr, "SERIALIZE_INIT      == lock: %u, level: %u\n", BG__().serialize_lock, BG__().serialize.level); */
-
-	if BG__().serialize_lock || !(BG__().serialize.level) {
+	if BG__().serialize_lock != 0 {
 		d = NewPhpSerializeData()
-		if !(BG__().serialize_lock) {
-			BG__().serialize.data = d
-			BG__().serialize.level = 1
-		}
+	} else if BG__().serialize.level == 0 {
+		d = NewPhpSerializeData()
+		BG__().serialize.data = d
+		BG__().serialize.level = 1
 	} else {
 		d = BG__().serialize.data
 		BG__().serialize.level++
@@ -906,45 +602,30 @@ func PhpVarSerializeInit() PhpSerializeDataT {
 	return d
 }
 func PhpVarSerializeDestroy(d PhpSerializeDataT) {
-	/* fprintf(stderr, "SERIALIZE_DESTROY   == lock: %u, level: %u\n", BG__().serialize_lock, BG__().serialize.level); */
-
-	if BG__().serialize_lock || BG__().serialize.level == 1 {
+	if BG__().serialize_lock != 0 || BG__().serialize.level == 1 {
 		d.Destroy()
-		zend.Efree(d)
 	}
-	if !(BG__().serialize_lock) && !(b.PreDec(&(BG__().serialize.level))) {
-		BG__().serialize.data = nil
+	if BG__().serialize_lock == 0 {
+		BG__().serialize.level--
+		if BG__().serialize.level == 0 {
+			BG__().serialize.data = nil
+		}
 	}
 }
-func ZifSerialize(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	var struc *types.Zval
-	var var_hash PhpSerializeDataT
-	var buf zend.SmartStr = zend.MakeSmartStr(0)
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			struc = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	PHP_VAR_SERIALIZE_INIT(var_hash)
-	PhpVarSerialize(&buf, struc, &var_hash)
-	PHP_VAR_SERIALIZE_DESTROY(var_hash)
+func ZifSerialize(var_ *types.Zval) *types.Zval {
+	serializer := InitSerializer()
+	serializer.Serialize(var_)
+	serializer.DestroyData()
+
 	if zend.EG__().GetException() != nil {
-		buf.Free()
-		return_value.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
-	if buf.GetS() != nil {
-		return_value.SetString(buf.GetS())
-		return
+
+	serializerStr := serializer.String()
+	if serializerStr != "" {
+		return types.NewZvalString(serializerStr)
 	} else {
-		return_value.SetNull()
-		return
+		return types.NewZvalNull()
 	}
 }
 func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresentation *types.Zval, _ zpp.Opt, allowedClasses *types.Zval) {

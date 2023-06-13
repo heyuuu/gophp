@@ -38,8 +38,6 @@ func PhpVarUnserializeInit() PhpUnserializeDataT {
 	return d
 }
 func PhpVarUnserializeDestroy(d PhpUnserializeDataT) {
-	/* fprintf(stderr, "UNSERIALIZE_DESTROY == lock: %u, level: %u\n", BG__().serialize_lock, BG__().unserialize.level); */
-
 	if BG__().serialize_lock || BG__().unserialize.level == 1 {
 		VarDestroy(&d)
 		zend.Efree(d)
@@ -152,7 +150,6 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 						zv.Object().MarkObjDtorCalled()
 					}
 					BG__().serialize_lock--
-					// zend.ZvalPtrDtor(&retval)
 				} else {
 					zv.Object().MarkObjDtorCalled()
 				}

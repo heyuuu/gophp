@@ -159,7 +159,7 @@ func PhpStreamUrlWrapHttpEx(
 		header.WriteString("CONNECT ")
 		header.WriteString(b.CastStrAuto(resource.GetHost().GetVal()))
 		header.WriteByte(':')
-		header.AppendUlong(resource.GetPort())
+		header.WriteUlong(resource.GetPort())
 		header.WriteString(" HTTP/1.0\r\n")
 
 		/* check if we have Proxy-Authorization header */
@@ -517,7 +517,7 @@ func PhpStreamUrlWrapHttpEx(
 		req_buf.WriteString(b.CastStrAuto(resource.GetHost().GetVal()))
 		if use_ssl != 0 && resource.GetPort() != 443 && resource.GetPort() != 0 || use_ssl == 0 && resource.GetPort() != 80 && resource.GetPort() != 0 {
 			req_buf.WriteByte(':')
-			req_buf.AppendUlong(resource.GetPort())
+			req_buf.WriteUlong(resource.GetPort())
 		}
 		req_buf.WriteString("\r\n")
 	}
@@ -567,7 +567,7 @@ func PhpStreamUrlWrapHttpEx(
 
 		if header_init != 0 && context != nil && (have_header&HTTP_HEADER_CONTENT_LENGTH) == 0 && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 			req_buf.WriteString("Content-Length: ")
-			req_buf.AppendUlong(tmpzval.String().GetLen())
+			req_buf.WriteUlong(tmpzval.String().GetLen())
 			req_buf.WriteString("\r\n")
 			have_header |= HTTP_HEADER_CONTENT_LENGTH
 		}
@@ -581,7 +581,7 @@ func PhpStreamUrlWrapHttpEx(
 	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 		if (have_header & HTTP_HEADER_CONTENT_LENGTH) == 0 {
 			req_buf.WriteString("Content-Length: ")
-			req_buf.AppendUlong(tmpzval.String().GetLen())
+			req_buf.WriteUlong(tmpzval.String().GetLen())
 			req_buf.WriteString("\r\n")
 		}
 		if (have_header & HTTP_HEADER_TYPE) == 0 {

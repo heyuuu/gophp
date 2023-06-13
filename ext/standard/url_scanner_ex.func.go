@@ -210,7 +210,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	}
 	if url_parts.GetPort() != 0 {
 		dest.WriteByte(':')
-		dest.AppendUlong(long(url_parts.GetPort()))
+		dest.WriteUlong(long(url_parts.GetPort()))
 	}
 	if url_parts.GetPath() != nil {
 		dest.WriteString(b.CastStrAuto(url_parts.GetPath().GetVal()))

@@ -185,7 +185,7 @@ func PhpUrlEncodeHashEx(
 				if num_prefix != nil {
 					formstr.WriteString(b.CastStr(num_prefix, num_prefix_len))
 				}
-				formstr.AppendLong(idx)
+				formstr.WriteLong(idx)
 			}
 			if key_suffix {
 				formstr.WriteString(b.CastStr(key_suffix, key_suffix_len))
@@ -201,7 +201,7 @@ func PhpUrlEncodeHashEx(
 				}
 				formstr.WriteString(ekey)
 			case types.IS_LONG:
-				formstr.AppendLong(zdata.Long())
+				formstr.WriteLong(zdata.Long())
 			case types.IS_FALSE:
 				formstr.WriteString("0")
 			case types.IS_TRUE:

@@ -69,17 +69,17 @@ func (s *SmartStr) ZeroTail() {
 /**
  * 快捷方法
  */
-func (s *SmartStr) AppendLong(num ZendLong) {
+func (s *SmartStr) WriteLong(num ZendLong) {
 	var str = strconv.FormatInt(int64(num), 10)
 	s.WriteString(str)
 }
 
-func (s *SmartStr) AppendUlong(num ZendUlong) {
+func (s *SmartStr) WriteUlong(num ZendUlong) {
 	var str = strconv.FormatUint(uint64(num), 10)
 	s.WriteString(str)
 }
 
-func (s *SmartStr) AppendEscaped(str string) {
+func (s *SmartStr) WriteEscaped(str string) {
 	for _, c := range []byte(str) {
 		if c < 32 || c == '\\' || c > 126 {
 			s.WriteByte('\\')

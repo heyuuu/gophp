@@ -138,7 +138,7 @@ func PhpSetcookie(
 				diff = 0
 			}
 			buf.WriteString(b.CastStrAuto(COOKIE_MAX_AGE))
-			buf.AppendLong(zend.ZendLong(diff))
+			buf.WriteLong(zend.ZendLong(diff))
 		}
 	}
 	if path != nil && path.GetLen() != 0 {
