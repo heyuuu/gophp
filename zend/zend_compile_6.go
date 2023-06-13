@@ -89,10 +89,8 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 		var closure_ast *ZendAstDecl = (*ZendAstDecl)(ast)
 		FindImplicitBindsRecursively(info, closure_ast.GetChild()[2])
 	} else if !ast.IsSpecial() {
-		var i uint32
-		var children uint32 = ZendAstGetNumChildren(ast)
-		for i = 0; i < children; i++ {
-			FindImplicitBindsRecursively(info, ast.GetChild()[i])
+		for _, child := range ast.GetChild() {
+			FindImplicitBindsRecursively(info, child)
 		}
 	}
 }
@@ -106,7 +104,7 @@ func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst
 
 	for i = 0; i < param_list.GetChildren(); i++ {
 		var param_ast *ZendAst = param_list.GetChild()[i]
-		info.GetUses().KeyDelete(ZendAstGetStr(param_ast.GetChild()[1]).GetStr())
+		info.GetUses().KeyDelete(ZendAstGetStrVal(param_ast.GetChild()[1]))
 	}
 }
 func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *types.ZendOpArray) {

@@ -1000,249 +1000,249 @@ func LangYydestruct(yymsg *byte, yytype int, yyvaluep *ZendParserStackElem) {
 	}
 	switch yytype {
 	case 71:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 72:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 73:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 74:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 75:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 76:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 77:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 78:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 79:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 174:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 175:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 176:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 177:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 178:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 182:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 183:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 185:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 186:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 187:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 188:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 189:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 190:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 191:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 192:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 193:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 194:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 196:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 197:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 198:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 199:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 200:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 201:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 204:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 209:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 211:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 213:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 214:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 215:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 216:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 217:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 218:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 219:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 220:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 221:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 223:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 224:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 225:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 226:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 227:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 228:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 229:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 230:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 231:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 232:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 233:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 234:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 235:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 236:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 237:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 238:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 239:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 240:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 241:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 242:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 243:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 244:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 245:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 246:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 247:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 248:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 249:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 250:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 251:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 252:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 257:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 258:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 259:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 260:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 261:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 262:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 263:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 264:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 265:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 266:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 268:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 269:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 270:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 273:
 		if yyvaluep.GetStr() != nil {
 			// types.ZendStringReleaseEx(yyvaluep.String(), 0)
 		}
 	case 277:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 278:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 279:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 280:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 281:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 282:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 283:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 284:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 285:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 286:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 287:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 288:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 289:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 290:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 291:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 292:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 293:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 294:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 295:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 296:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 297:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 298:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 299:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 300:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 301:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 302:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 303:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 304:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 305:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 306:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 307:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 308:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	case 309:
-		ZendAstDestroy(yyvaluep.GetAst())
+	// ZendAstDestroy(yyvaluep.GetAst())
 	default:
 
 	}

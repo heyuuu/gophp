@@ -3,26 +3,19 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/utils/slices"
 )
 
 /**
  * ZendAst
  */
+type ZendAstList = ZendAst
 type ZendAst struct {
 	kind   ZendAstKind
 	attr   ZendAstAttr
 	lineno uint32
 	child  []*ZendAst
 }
-
-func (ast *ZendAst) GetKind() ZendAstKind      { return ast.kind }
-func (ast *ZendAst) SetKind(value ZendAstKind) { ast.kind = value }
-func (ast *ZendAst) GetAttr() ZendAstAttr      { return ast.attr }
-func (ast *ZendAst) SetAttr(value ZendAstAttr) { ast.attr = value }
-func (ast *ZendAst) GetLineno() uint32         { return ast.lineno }
-func (ast *ZendAst) SetLineno(value uint32)    { ast.lineno = value }
-func (ast *ZendAst) GetChild() []*ZendAst      { return ast.child }
-func (ast *ZendAst) GetNumChild() uint32       { return uint32(len(ast.child)) }
 
 func NewAst(kind ZendAstKind, attr ZendAstAttr, lineno uint32, children []*ZendAst) *ZendAst {
 	b.Assert(int(kind)>>ZEND_AST_NUM_CHILDREN_SHIFT == len(children))
@@ -33,56 +26,39 @@ func NewAst(kind ZendAstKind, attr ZendAstAttr, lineno uint32, children []*ZendA
 		child:  children,
 	}
 }
+func CopyAst(old *ZendAst, childCopy func(child *ZendAst) *ZendAst) *ZendAst {
+	child := slices.Map(old.child, childCopy)
+	return NewAst(old.kind, old.attr, 0, child)
+}
+
 func (ast *ZendAst) IsSpecial() bool { return ast.kind>>ZEND_AST_SPECIAL_SHIFT&1 != 0 }
 func (ast *ZendAst) IsList() bool    { return ast.kind>>ZEND_AST_IS_LIST_SHIFT&1 != 0 }
 func (ast *ZendAst) IsZval() bool    { return ast.kind == ZEND_AST_ZVAL }
 
 func (ast *ZendAst) AsAstList() *ZendAstList {
 	b.Assert(ast.IsList())
-	return (*ZendAstList)(ast)
+	return ast
 }
 func (ast *ZendAst) AsAstZval() *ZendAstZval {
 	b.Assert(ast.kind == ZEND_AST_ZVAL)
 	return (*ZendAstZval)(ast)
 }
 
-/**
- * ZendAstList
- */
-type ZendAstList struct {
-	kind     ZendAstKind
-	attr     ZendAstAttr
-	lineno   uint32
-	children uint32
-	child    []*ZendAst
+// methods for List type
+func (ast *ZendAst) AddChild(child *ZendAst) {
+	b.Assert(ast.IsList())
+	ast.child = append(ast.child, child)
 }
 
-func NewAstList(kind ZendAstKind, attr ZendAstAttr, lineno uint32, children []*ZendAst) *ZendAstList {
-	return &ZendAstList{
-		kind:     kind,
-		attr:     attr,
-		lineno:   lineno,
-		children: uint32(len(children)),
-		child:    children,
-	}
-}
-
-func CopyAstList(newList *ZendAstList, list *ZendAstList) {
-	newList.kind = list.kind
-	newList.attr = list.attr
-	//newList.lineno = 0
-	newList.children = list.children
-	// todo
-}
-
-func (this *ZendAstList) GetKind() ZendAstKind      { return this.kind }
-func (this *ZendAstList) SetKind(value ZendAstKind) { this.kind = value }
-func (this *ZendAstList) GetAttr() ZendAstAttr      { return this.attr }
-func (this *ZendAstList) SetAttr(value ZendAstAttr) { this.attr = value }
-func (this *ZendAstList) SetLineno(value uint32)    { this.lineno = value }
-func (this *ZendAstList) GetChildren() uint32       { return this.children }
-func (this *ZendAstList) GetNumChild() uint32       { return this.children }
-func (this *ZendAstList) GetChild() []*ZendAst      { return this.child }
+// fields
+func (ast *ZendAst) GetKind() ZendAstKind      { return ast.kind }
+func (ast *ZendAst) SetKind(value ZendAstKind) { ast.kind = value }
+func (ast *ZendAst) GetAttr() ZendAstAttr      { return ast.attr }
+func (ast *ZendAst) SetAttr(value ZendAstAttr) { ast.attr = value }
+func (ast *ZendAst) GetLineno() uint32         { return ast.lineno }
+func (ast *ZendAst) SetLineno(value uint32)    { ast.lineno = value }
+func (ast *ZendAst) GetChild() []*ZendAst      { return ast.child }
+func (ast *ZendAst) GetChildren() uint32       { return uint32(len(ast.child)) }
 
 /**
  * ZendAstZval
@@ -90,9 +66,9 @@ func (this *ZendAstList) GetChild() []*ZendAst      { return this.child }
 type ZendAstZval struct {
 	kind ZendAstKind
 	attr ZendAstAttr
-	val  types.Zval
 	// 新增 lineno，从 val.u2 中提出来
 	lineno uint32
+	val    types.Zval
 }
 
 func NewAstZval(kind ZendAstKind, attr ZendAstAttr, zv *types.Zval, lineno uint32) *ZendAstZval {
@@ -117,44 +93,36 @@ func (this *ZendAstZval) SetAttr(value ZendAstAttr) { this.attr = value }
 func (this *ZendAstZval) GetVal() *types.Zval       { return &this.val }
 func (this *ZendAstZval) GetLineno() uint32         { return this.lineno }
 
-// func (this *ZendAstZval) SetVal(value Zval) { this.val = value }
-
 /**
  * ZendAstDecl
  */
 type ZendAstDecl struct {
-	kind         ZendAstKind
-	attr         ZendAstAttr
-	start_lineno uint32
-	end_lineno   uint32
-	flags        uint32
-	lex_pos      *uint8
-	doc_comment  *types.String
-	name         *types.String
-	child        []*ZendAst
+	kind        ZendAstKind
+	attr        ZendAstAttr
+	startLineno uint32
+	endLineno   uint32
+	flags       uint32
+	lexPos      *uint8
+	docComment  *types.String
+	name        *types.String
+	child       []*ZendAst
 }
 
-func (this *ZendAstDecl) GetKind() ZendAstKind      { return this.kind }
-func (this *ZendAstDecl) SetKind(value ZendAstKind) { this.kind = value }
-
-// func (this *ZendAstDecl)  GetAttr() ZendAstAttr      { return this.attr }
-func (this *ZendAstDecl) SetAttr(value ZendAstAttr)   { this.attr = value }
-func (this *ZendAstDecl) GetStartLineno() uint32      { return this.start_lineno }
-func (this *ZendAstDecl) SetStartLineno(value uint32) { this.start_lineno = value }
-func (this *ZendAstDecl) GetEndLineno() uint32        { return this.end_lineno }
-func (this *ZendAstDecl) SetEndLineno(value uint32)   { this.end_lineno = value }
-func (this *ZendAstDecl) GetFlags() uint32            { return this.flags }
-func (this *ZendAstDecl) SetFlags(value uint32)       { this.flags = value }
-
-// func (this *ZendAstDecl)  GetLexPos() *uint8      { return this.lex_pos }
-func (this *ZendAstDecl) SetLexPos(value *uint8)            { this.lex_pos = value }
-func (this *ZendAstDecl) GetDocComment() *types.String      { return this.doc_comment }
-func (this *ZendAstDecl) SetDocComment(value *types.String) { this.doc_comment = value }
+func (this *ZendAstDecl) GetKind() ZendAstKind              { return this.kind }
+func (this *ZendAstDecl) SetKind(value ZendAstKind)         { this.kind = value }
+func (this *ZendAstDecl) SetAttr(value ZendAstAttr)         { this.attr = value }
+func (this *ZendAstDecl) GetStartLineno() uint32            { return this.startLineno }
+func (this *ZendAstDecl) SetStartLineno(value uint32)       { this.startLineno = value }
+func (this *ZendAstDecl) GetEndLineno() uint32              { return this.endLineno }
+func (this *ZendAstDecl) SetEndLineno(value uint32)         { this.endLineno = value }
+func (this *ZendAstDecl) GetFlags() uint32                  { return this.flags }
+func (this *ZendAstDecl) SetFlags(value uint32)             { this.flags = value }
+func (this *ZendAstDecl) SetLexPos(value *uint8)            { this.lexPos = value }
+func (this *ZendAstDecl) GetDocComment() *types.String      { return this.docComment }
+func (this *ZendAstDecl) SetDocComment(value *types.String) { this.docComment = value }
 func (this *ZendAstDecl) GetName() *types.String            { return this.name }
 func (this *ZendAstDecl) SetName(value *types.String)       { this.name = value }
 func (this *ZendAstDecl) GetChild() []*ZendAst              { return this.child }
-
-// func (this *ZendAstDecl) SetChild(value []*ZendAst) { this.child = value }
 
 /* ZendAstDecl.flags */
 func (this *ZendAstDecl) AddFlags(value uint32)      { this.flags |= value }

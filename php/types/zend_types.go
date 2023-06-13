@@ -3,7 +3,6 @@ package types
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
-	"runtime"
 )
 
 /**
@@ -94,11 +93,9 @@ func NewAstRef(ast *zend.ZendAst) *ZendAstRef {
 	b.Assert(ast != nil)
 
 	// init
-	var ref *ZendAstRef = &ZendAstRef{}
-	zend.ZendAstTreeCopy(ast, ref.ast)
-
-	// dtor
-	runtime.SetFinalizer(ref, zend.ZendAstRefDestroy)
+	var ref *ZendAstRef = &ZendAstRef{
+		ast: zend.AstTreeCopy(ast),
+	}
 
 	return ref
 }

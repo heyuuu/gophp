@@ -544,11 +544,7 @@ func (compiler *Compiler) CompileAssert(result *Znode, args *ZendAstList, name *
 		if args.GetChildren() == 1 && (args.GetChild()[0].GetKind() != ZEND_AST_ZVAL || ZendAstGetZval(args.GetChild()[0]).GetType() != types.IS_STRING) {
 
 			/* add "assert(condition) as assertion message */
-
-			ZendAstListAdd((*ZendAst)(args), ZendAstCreateZvalFromStr(ZendAstExport("assert(", args.GetChild()[0], ")")))
-
-			/* add "assert(condition) as assertion message */
-
+			args.AddChild(ZendAstCreateZvalFromStr(ZendAstExport("assert(", args.GetChild()[0], ")")))
 		}
 		compiler.CompileCallCommon(result, (*ZendAst)(args), fbc)
 		opline = CG__().GetActiveOpArray().GetOpcodes()[check_op_number]
@@ -560,9 +556,6 @@ func (compiler *Compiler) CompileAssert(result *Znode, args *ZendAstList, name *
 			opline.SetResult(result.GetOp())
 		}
 	} else {
-		if fbc == nil {
-			// types.ZendStringReleaseEx(name, 0)
-		}
 		result.SetOpType(IS_CONST)
 		result.GetConstant().SetTrue()
 	}

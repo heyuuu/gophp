@@ -145,7 +145,7 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 		ZendFileContextEnd(&originalFileContext)
 		CG__().active_op_array = originalActiveOpArray
 	}
-	ZendAstDestroy(CG__().ast)
+	// ZendAstDestroy(CG__().ast)
 
 	// restore
 	CG__().in_compilation = originalInCompilation

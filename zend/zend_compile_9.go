@@ -39,7 +39,7 @@ func (compiler *Compiler) CompileConstExprClassConst(astPtr **ZendAst) {
 		className = ZendResolveClassNameAst(classAst)
 	}
 	name := className.GetStr() + "::" + constName.GetStr()
-	ZendAstDestroy(ast)
+	// ZendAstDestroy(ast)
 	*astPtr = ZendAstCreateConstant(types.NewString(name), fetchType|ZEND_FETCH_CLASS_EXCEPTION)
 }
 func (compiler *Compiler) CompileConstExprClassName(ast_ptr **ZendAst) {
@@ -73,11 +73,11 @@ func (compiler *Compiler) CompileConstExprConst(ast_ptr **ZendAst) {
 	resolved_name, isFullyQualified := ZendResolveConstName(orig_name, name_ast.GetAttr())
 	if ZendTryCtEvalConst(&result, resolved_name, isFullyQualified) != 0 {
 		// types.ZendStringReleaseEx(resolved_name, 0)
-		ZendAstDestroy(ast)
+		// ZendAstDestroy(ast)
 		*ast_ptr = ZendAstCreateZval(&result)
 		return
 	}
-	ZendAstDestroy(ast)
+	// ZendAstDestroy(ast)
 	*ast_ptr = ZendAstCreateConstant(resolved_name, b.Cond(!isFullyQualified, IS_CONSTANT_UNQUALIFIED, 0))
 }
 func (compiler *Compiler) CompileConstExprMagicConst(ast_ptr **ZendAst) {
@@ -86,7 +86,7 @@ func (compiler *Compiler) CompileConstExprMagicConst(ast_ptr **ZendAst) {
 	/* Other cases already resolved by constant folding */
 
 	b.Assert(ast.GetAttr() == T_CLASS_C)
-	ZendAstDestroy(ast)
+	// ZendAstDestroy(ast)
 	*ast_ptr = AstCreate(ZEND_AST_CONSTANT_CLASS)
 }
 func (compiler *Compiler) CompileConstExpr(ast_ptr **ZendAst) {
@@ -120,7 +120,7 @@ func (compiler *Compiler) ConstExprToZval(result *types.Zval, ast *ZendAst) {
 		result.SetConstantAst(types.NewAstRef(ast))
 
 		/* destroy the ast here, it might have been replaced */
-		ZendAstDestroy(ast)
+		// ZendAstDestroy(ast)
 	}
 
 	/* Kill this branch of the original AST, as it was already destroyed.
@@ -511,11 +511,11 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 			compiler.EvalConstExpr(ast.GetChild()[1])
 			*ast_ptr = ast.GetChild()[1]
 			ast.GetChild()[1] = nil
-			ZendAstDestroy(ast)
+			// ZendAstDestroy(ast)
 		} else {
 			*ast_ptr = ast.GetChild()[0]
 			ast.GetChild()[0] = nil
-			ZendAstDestroy(ast)
+			// ZendAstDestroy(ast)
 		}
 		return
 	case ZEND_AST_CONDITIONAL:
@@ -538,7 +538,7 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 		}
 		child_ast = *child
 		*child = nil
-		ZendAstDestroy(ast)
+		// ZendAstDestroy(ast)
 		*ast_ptr = child_ast
 		compiler.EvalConstExpr(ast_ptr)
 		return
@@ -644,6 +644,6 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 	default:
 		return
 	}
-	ZendAstDestroy(ast)
+	// ZendAstDestroy(ast)
 	*ast_ptr = ZendAstCreateZval(&result)
 }

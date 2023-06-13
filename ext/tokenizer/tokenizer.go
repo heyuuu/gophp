@@ -160,7 +160,7 @@ func TokenizeParse(return_value *types.Zval, source string) bool {
 		} else {
 			types.ZvalPtrDtor(&token_stream)
 		}
-		zend.ZendAstDestroy(zend.CG__().GetAst())
+		//zend.ZendAstDestroy(zend.CG__().GetAst())
 	}
 
 	/* restore compiler and scanner global states */
