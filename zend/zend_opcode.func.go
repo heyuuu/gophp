@@ -474,7 +474,7 @@ func (compiler *Compiler) PassTwo(op_array *types.ZendOpArray) int {
 	ZendCalcLiveRanges(op_array, nil)
 	return 0
 }
-func GetUnaryOp(opcode int) UnaryOpType {
+func GetUnaryOp(opcode OpCode) UnaryOpType {
 	switch opcode {
 	case ZEND_BW_NOT:
 		return UnaryOpType(operators.BitwiseNotFunction)
@@ -484,7 +484,7 @@ func GetUnaryOp(opcode int) UnaryOpType {
 		return UnaryOpType(nil)
 	}
 }
-func GetBinaryOp(opcode int) BinaryOpType {
+func GetBinaryOp(opcode OpCode) BinaryOpType {
 	switch opcode {
 	case ZEND_ADD:
 		return BinaryOpType(operators.AddFunction)

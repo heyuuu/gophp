@@ -76,11 +76,9 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 	case types.IS_UNDEF:
 		if result.Array().Append(expr) == nil {
 			faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
-			// ZvalPtrDtorNogc(expr)
 		}
 	case types.IS_STRING:
 		result.Array().SymtableUpdate(offset.String().GetStr(), expr)
-
 	case types.IS_NULL:
 		result.Array().SymtableUpdate(types.NewString("").GetStr(), expr)
 	case types.IS_LONG:
@@ -139,13 +137,10 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		if ZendAstEvaluate(&op1, ast.Child(0), scope) != types.SUCCESS {
 			ret = types.FAILURE
 		} else if ZendAstEvaluate(&op2, ast.Child(1), scope) != types.SUCCESS {
-			// ZvalPtrDtorNogc(&op1)
 			ret = types.FAILURE
 		} else {
-			var op BinaryOpType = GetBinaryOp(ast.Attr())
+			var op BinaryOpType = GetBinaryOp(OpCode(ast.Attr()))
 			ret = op(result, &op1, &op2)
-			// ZvalPtrDtorNogc(&op1)
-			// ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_GREATER:
 		fallthrough

@@ -409,39 +409,39 @@ func (compiler *Compiler) CompileIncludeOrEval(result *Znode, ast *ZendAst) {
 	ZendDoExtendedFcallEnd()
 }
 func (compiler *Compiler) CompileIssetOrEmpty(result *Znode, ast *ZendAst) {
-	var var_ast *ZendAst = ast.Children()[0]
-	var var_node Znode
+	var varAst *ZendAst = ast.Children()[0]
+	var varNode Znode
 	var opline *types.ZendOp = nil
 	b.Assert(ast.Kind() == ZEND_AST_ISSET || ast.Kind() == ZEND_AST_EMPTY)
-	if ZendIsVariable(var_ast) == 0 {
+	if !ZendIsVariable(varAst) {
 		if ast.Kind() == ZEND_AST_EMPTY {
 			/* empty(expr) can be transformed to !expr */
-			var not_ast *ZendAst = AstCreateEx(ZEND_AST_UNARY_OP, ZEND_BOOL_NOT, var_ast)
-			compiler.CompileExpr(result, not_ast)
+			var notAst = AstCreateEx(ZEND_AST_UNARY_OP, ZendAstAttr(ZEND_BOOL_NOT), varAst)
+			compiler.CompileExpr(result, notAst)
 			return
 		} else {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use isset() on the result of an expression "+"(you can use \"null !== expression\" instead)")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, `Cannot use isset() on the result of an expression (you can use "null !== expression" instead)`)
 		}
 	}
-	switch var_ast.Kind() {
+	switch varAst.Kind() {
 	case ZEND_AST_VAR:
-		if IsThisFetch(var_ast) {
+		if IsThisFetch(varAst) {
 			opline = ZendEmitOp(result, ZEND_ISSET_ISEMPTY_THIS, nil, nil)
 			CG__().GetActiveOpArray().SetIsUsesThis(true)
-		} else if ZendTryCompileCv(&var_node, var_ast) == types.SUCCESS {
-			opline = ZendEmitOp(result, ZEND_ISSET_ISEMPTY_CV, &var_node, nil)
+		} else if ZendTryCompileCv(&varNode, varAst) == types.SUCCESS {
+			opline = ZendEmitOp(result, ZEND_ISSET_ISEMPTY_CV, &varNode, nil)
 		} else {
-			opline = compiler.CompileSimpleVarNoCv(result, var_ast, BP_VAR_IS, 0)
+			opline = compiler.CompileSimpleVarNoCv(result, varAst, BP_VAR_IS, 0)
 			opline.SetOpcode(ZEND_ISSET_ISEMPTY_VAR)
 		}
 	case ZEND_AST_DIM:
-		opline = compiler.CompileDim(result, var_ast, BP_VAR_IS)
+		opline = compiler.CompileDim(result, varAst, BP_VAR_IS)
 		opline.SetOpcode(ZEND_ISSET_ISEMPTY_DIM_OBJ)
 	case ZEND_AST_PROP:
-		opline = compiler.CompileProp(result, var_ast, BP_VAR_IS, 0)
+		opline = compiler.CompileProp(result, varAst, BP_VAR_IS, 0)
 		opline.SetOpcode(ZEND_ISSET_ISEMPTY_PROP_OBJ)
 	case ZEND_AST_STATIC_PROP:
-		opline = compiler.CompileStaticProp(result, var_ast, BP_VAR_IS, 0, 0)
+		opline = compiler.CompileStaticProp(result, varAst, BP_VAR_IS, 0, 0)
 		opline.SetOpcode(ZEND_ISSET_ISEMPTY_STATIC_PROP)
 	default:
 
