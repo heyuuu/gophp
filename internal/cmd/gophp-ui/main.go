@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/heyuuu/gophp/php/ast"
+	"github.com/heyuuu/gophp/php/ir"
 	"github.com/heyuuu/gophp/php/parser"
 	"github.com/heyuuu/gophp/php/printer"
 	"log"
@@ -80,7 +81,7 @@ func apiHandler(request *http.Request) (content []byte, err error) {
 	input := request.FormValue("input")
 	mode := request.FormValue("mode")
 
-	astDump, printDump, parseErr := parseCode(input, mode)
+	astDump, printDump, irDump, parseErr := parseCode(input, mode)
 	var parseErrStr string
 	if parseErr != nil {
 		parseErrStr = parseErr.Error()
@@ -91,19 +92,21 @@ func apiHandler(request *http.Request) (content []byte, err error) {
 		Input string
 		Ast   string
 		Print string
+		Ir    string
 		Error string
 	}{
 		"api",
 		input,
 		astDump,
 		printDump,
+		irDump,
 		parseErrStr,
 	})
 
 	return
 }
 
-func parseCode(code string, mode string) (astDump string, printDump string, err error) {
+func parseCode(code string, mode string) (astDump string, printDump string, irDump string, err error) {
 	nodes, err := parser.ParseCode(code)
 	if err != nil {
 		return
@@ -115,6 +118,12 @@ func parseCode(code string, mode string) (astDump string, printDump string, err 
 	}
 
 	printDump, err = printer.SprintFile(nodes)
+	if err != nil {
+		return
+	}
+
+	irNodes := ir.ParseAst(nodes)
+	irDump, err = ir.Sprint(irNodes)
 	if err != nil {
 		return
 	}
