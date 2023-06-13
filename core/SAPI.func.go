@@ -26,7 +26,7 @@ func ZifHeaderRegisterCallback(callback *types.Zval) bool {
 
 	if SG__().callbackFunc.IsNotUndef() {
 		// zend.ZvalPtrDtor(&SG__().callback_func)
-		SG__().fciCache = zend.EmptyFcallInfoCache
+		SG__().fciCache = types.EmptyFcallInfoCache()
 	}
 
 	types.ZVAL_COPY(&SG__().callbackFunc, callback)

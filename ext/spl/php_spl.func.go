@@ -226,18 +226,12 @@ func ZifSplAutoloadCall(executeData zpp.Ex, className string) {
 
 	if SPL_G__().autoloadFunctions != nil {
 		var func_ types.IFunction
-		var fci types.ZendFcallInfo
+		var fci *types.ZendFcallInfo = types.InitFCallInfo(nil, &retval, types.NewZvalString(className))
 		var fcic types.ZendFcallInfoCache
 		var called_scope *types.ClassEntry = zend.ZendGetCalledScope(executeData)
 		var l_autoload_running int = SPL_G__().autoloadRunning
 		SPL_G__().SetAutoloadRunning(1)
 		lc_name := ascii.StrToLower(className)
-		fci.SetSize(b.SizeOf("fci"))
-		fci.SetRetval(&retval)
-		fci.SetParamCount(1)
-		fci.SetParams(className)
-		fci.SetNoSeparation(1)
-		fci.GetFunctionName().SetUndef()
 
 		SPL_G__().autoloadFunctions.ForeachEx(func(key types.ArrayKey, value *types.Zval) bool {
 			if !key.IsStrKey() {
@@ -265,7 +259,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, className string) {
 				fcic.SetObject(alfi.GetObj().Object())
 				fcic.SetCalledScope(types.Z_OBJCE(alfi.GetObj()))
 			}
-			zend.ZendCallFunction(&fci, &fcic)
+			zend.ZendCallFunction(fci, &fcic)
 			if zend.EG__().GetException() != nil {
 				return false
 			}
@@ -277,20 +271,16 @@ func ZifSplAutoloadCall(executeData zpp.Ex, className string) {
 		SPL_G__().autoloadRunning = l_autoload_running
 	} else {
 		/* do not use or overwrite &EG(autoload_func) here */
-		var fcall_info types.ZendFcallInfo
-		var fcall_cache types.ZendFcallInfoCache
 		retval.SetUndef()
-		fcall_info.SetSize(b.SizeOf("fcall_info"))
-		fcall_info.GetFunctionName().SetUndef()
-		fcall_info.SetRetval(&retval)
-		fcall_info.SetParamCount(1)
-		fcall_info.SetParams(className)
-		fcall_info.SetObject(nil)
-		fcall_info.SetNoSeparation(1)
-		fcall_cache.SetFunctionHandler(SplAutoloadFn)
-		fcall_cache.SetCalledScope(nil)
-		fcall_cache.SetObject(nil)
-		zend.ZendCallFunction(&fcall_info, &fcall_cache)
+
+		var fcallInfo = types.InitFCallInfo(nil, &retval, types.NewZvalString(className))
+
+		var fcallCache types.ZendFcallInfoCache
+		fcallCache.SetFunctionHandler(SplAutoloadFn)
+		fcallCache.SetCalledScope(nil)
+		fcallCache.SetObject(nil)
+
+		zend.ZendCallFunction(fcallInfo, &fcallCache)
 	}
 }
 

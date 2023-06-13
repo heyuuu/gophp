@@ -7,120 +7,68 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendCallMethodWith0Params(obj *types.Zval, obj_ce *types.ClassEntry, fn_proxy *types.IFunction, function_name string, retval *types.Zval) *types.Zval {
-	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, retval, 0, nil, nil)
+func ZendCallMethodWith0Params(obj *types.Zval, objCe *types.ClassEntry, fnProxy *types.IFunction, functionName string, retval *types.Zval) *types.Zval {
+	return ZendCallMethod(obj, objCe, fnProxy, functionName, retval)
 }
-func ZendCallMethodWith1Params(
-	obj *types.Zval,
-	obj_ce *types.ClassEntry,
-	fn_proxy *types.IFunction,
-	function_name string,
-	retval *types.Zval,
-	arg1 *types.Zval,
-) *types.Zval {
-	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, retval, 1, arg1, nil)
+func ZendCallMethodWith1Params(obj *types.Zval, objCe *types.ClassEntry, fnProxy *types.IFunction, functionName string, retval *types.Zval, arg1 *types.Zval) *types.Zval {
+	return ZendCallMethod(obj, objCe, fnProxy, functionName, retval, arg1)
 }
-func ZendCallMethodWith2Params(
-	obj *types.Zval,
-	obj_ce *types.ClassEntry,
-	fn_proxy *types.IFunction,
-	function_name string,
-	retval *types.Zval,
-	arg1 *types.Zval,
-	arg2 *types.Zval,
-) *types.Zval {
-	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, retval, 2, arg1, arg2)
+func ZendCallMethodWith2Params(obj *types.Zval, objCe *types.ClassEntry, fnProxy *types.IFunction, functionName string, retval *types.Zval, arg1 *types.Zval, arg2 *types.Zval) *types.Zval {
+	return ZendCallMethod(obj, objCe, fnProxy, functionName, retval, arg1, arg2)
 }
-func ZendCallMethod(
-	object *types.Zval,
-	obj_ce *types.ClassEntry,
-	fn_proxy *types.IFunction,
-	function_name string,
-	retval_ptr *types.Zval,
-	param_count int,
-	arg1 *types.Zval,
-	arg2 *types.Zval,
-) *types.Zval {
-	var result int
-	var fci types.ZendFcallInfo
-	var retval types.Zval
-	var params []types.Zval
-	if param_count > 0 {
-		types.ZVAL_COPY_VALUE(&params[0], arg1)
-	}
-	if param_count > 1 {
-		types.ZVAL_COPY_VALUE(&params[1], arg2)
-	}
-	fci.SetSize(b.SizeOf("fci"))
-	if object != nil {
-		fci.SetObject(object.Object())
-	} else {
-		fci.SetObject(nil)
-	}
-	if retval_ptr != nil {
-		fci.SetRetval(retval_ptr)
-	} else {
-		fci.SetRetval(&retval)
-	}
-	fci.SetParamCount(param_count)
-	fci.SetParams(params)
-	fci.SetNoSeparation(1)
-	if fn_proxy == nil && obj_ce == nil {
 
+func ZendCallMethod(object *types.Zval, objCe *types.ClassEntry, fnProxy *types.IFunction, functionName string, retvalPtr *types.Zval, args ...*types.Zval) *types.Zval {
+	var objPtr *types.ZendObject = nil
+	if object != nil {
+		objPtr = object.Object()
+	}
+
+	var fci = types.InitFCallInfo(objPtr, retvalPtr, args...)
+
+	var result int
+	if fnProxy == nil && objCe == nil {
 		/* no interest in caching and no information already present that is
 		 * needed later inside zend_call_function. */
-
-		fci.GetFunctionName().SetStringVal(function_name)
-		result = ZendCallFunction(&fci, nil)
-		// ZvalPtrDtor(fci.GetFunctionName())
+		fci.SetFunctionName(functionName)
+		result = ZendCallFunction(fci, nil)
 	} else {
 		var fcic types.ZendFcallInfoCache
-		fci.GetFunctionName().SetUndef()
-		if obj_ce == nil {
+		fci.ClearFunctionName()
+		if objCe == nil {
 			if object != nil {
-				obj_ce = types.Z_OBJCE_P(object)
+				objCe = types.Z_OBJCE_P(object)
 			} else {
-				obj_ce = nil
+				objCe = nil
 			}
 		}
-		if fn_proxy == nil || (*fn_proxy) == nil {
-			if obj_ce != nil {
-				fcic.SetFunctionHandler(obj_ce.FunctionTable().Get(function_name))
+		if fnProxy == nil || (*fnProxy) == nil {
+			if objCe != nil {
+				fcic.SetFunctionHandler(objCe.FunctionTable().Get(functionName))
 				if fcic.GetFunctionHandler() == nil {
-
 					/* error at c-level */
-
-					faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't find implementation for method %s::%s", obj_ce.Name(), function_name)
-
-					/* error at c-level */
-
+					faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't find implementation for method %s::%s", objCe.Name(), functionName)
 				}
 			} else {
-				fcic.SetFunctionHandler(ZendFetchFunctionStr(function_name))
+				fcic.SetFunctionHandler(ZendFetchFunctionStr(functionName))
 				if fcic.GetFunctionHandler() == nil {
-
 					/* error at c-level */
-
-					faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't find implementation for function %s", function_name)
-
-					/* error at c-level */
-
+					faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't find implementation for function %s", functionName)
 				}
 			}
-			if fn_proxy != nil {
-				*fn_proxy = fcic.GetFunctionHandler()
+			if fnProxy != nil {
+				*fnProxy = fcic.GetFunctionHandler()
 			}
 		} else {
-			fcic.SetFunctionHandler(*fn_proxy)
+			fcic.SetFunctionHandler(*fnProxy)
 		}
 		if object != nil {
 			fcic.SetCalledScope(types.Z_OBJCE_P(object))
 		} else {
-			var called_scope *types.ClassEntry = ZendGetCalledScope(CurrEX())
-			if obj_ce != nil && (called_scope == nil || operators.InstanceofFunction(called_scope, obj_ce) == 0) {
-				fcic.SetCalledScope(obj_ce)
+			var calledScope *types.ClassEntry = ZendGetCalledScope(CurrEX())
+			if objCe != nil && (calledScope == nil || operators.InstanceofFunction(calledScope, objCe) == 0) {
+				fcic.SetCalledScope(objCe)
 			} else {
-				fcic.SetCalledScope(called_scope)
+				fcic.SetCalledScope(calledScope)
 			}
 		}
 		if object != nil {
@@ -128,28 +76,24 @@ func ZendCallMethod(
 		} else {
 			fcic.SetObject(nil)
 		}
-		result = ZendCallFunction(&fci, &fcic)
+		result = ZendCallFunction(fci, &fcic)
 	}
 	if result == types.FAILURE {
 
 		/* error at c-level */
 
-		if obj_ce == nil {
+		if objCe == nil {
 			if object != nil {
-				obj_ce = types.Z_OBJCE_P(object)
+				objCe = types.Z_OBJCE_P(object)
 			} else {
-				obj_ce = nil
+				objCe = nil
 			}
 		}
 		if EG__().GetException() == nil {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't execute method %s%s%s", b.CondF1(obj_ce != nil, func() []byte { return obj_ce.Name() }, ""), b.Cond(obj_ce != nil, "::", ""), function_name)
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't execute method %s%s%s", b.CondF1(objCe != nil, func() []byte { return objCe.Name() }, ""), b.Cond(objCe != nil, "::", ""), functionName)
 		}
 	}
-	if retval_ptr == nil {
-		// ZvalPtrDtor(&retval)
-		return nil
-	}
-	return retval_ptr
+	return retvalPtr
 }
 func ZendUserItNewIterator(ce *types.ClassEntry, object *types.Zval, retval *types.Zval) {
 	ZendCallMethodWith0Params(object, ce, ce.GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", retval)
@@ -388,7 +332,7 @@ func ZendImplementArrayaccess(interface_ *types.ClassEntry, class_type *types.Cl
 	return types.SUCCESS
 }
 func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int {
-	var ce *types.ClassEntry = types.Z_OBJCE_P(object)
+	var ce = object.Object().GetCe()
 	var retval types.Zval
 	var result int
 	ZendCallMethodWith0Params(object, ce, ce.GetSerializeFunc(), "serialize", &retval)

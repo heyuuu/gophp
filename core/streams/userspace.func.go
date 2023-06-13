@@ -37,25 +37,16 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 		zend.AddPropertyNull(object, "context")
 	}
 	if uwrap.GetCe().GetConstructor() != nil {
-		var fci types.ZendFcallInfo
+		var fci = types.InitFCallInfo(object.Object(), nil)
+
 		var fcc types.ZendFcallInfoCache
-		var retval types.Zval
-		fci.SetSize(b.SizeOf("fci"))
-		fci.GetFunctionName().SetUndef()
-		fci.SetObject(object.Object())
-		fci.SetRetval(&retval)
-		fci.SetParamCount(0)
-		fci.SetParams(nil)
-		fci.SetNoSeparation(1)
 		fcc.SetFunctionHandler(uwrap.GetCe().GetConstructor())
 		fcc.SetCalledScope(types.Z_OBJCE_P(object))
 		fcc.SetObject(object.Object())
-		if zend.ZendCallFunction(&fci, &fcc) == types.FAILURE {
+		if zend.ZendCallFunction(fci, &fcc) == types.FAILURE {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Could not execute %s::%s()", uwrap.GetCe().Name(), uwrap.GetCe().GetConstructor().FunctionName())
-			// zend.ZvalPtrDtor(object)
 			object.SetUndef()
 		} else {
-			// zend.ZvalPtrDtor(&retval)
 		}
 	}
 }

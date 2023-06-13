@@ -1,7 +1,6 @@
 package spl
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
@@ -9,32 +8,27 @@ import (
 func SplInstantiateArgEx1(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval) int {
 	var func_ types.IFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
-	zend.ZendCallMethod(retval, pce, &func_, func_.FunctionName(), nil, 1, arg1, nil)
+	zend.ZendCallMethod(retval, pce, &func_, func_.FunctionName(), nil, arg1)
 	return 0
 }
 func SplInstantiateArgEx2(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval, arg2 *types.Zval) int {
 	var func_ types.IFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
-	zend.ZendCallMethod(retval, pce, &func_, func_.FunctionName(), nil, 2, arg1, arg2)
+	zend.ZendCallMethod(retval, pce, &func_, func_.FunctionName(), nil, arg1, arg2)
 	return 0
 }
-func SplInstantiateArgN(pce *types.ClassEntry, retval *types.Zval, argc int, argv *types.Zval) {
-	var func_ types.IFunction = pce.GetConstructor()
-	var fci types.ZendFcallInfo
-	var fcc types.ZendFcallInfoCache
-	var dummy types.Zval
+func SplInstantiateArgN(pce *types.ClassEntry, retval *types.Zval, args []*types.Zval) {
 	SplInstantiate(pce, retval)
-	fci.SetSize(b.SizeOf("zend_fcall_info"))
-	fci.GetFunctionName().SetStringVal(func_.FunctionName())
-	fci.SetObject(retval.Object())
-	fci.SetRetval(&dummy)
-	fci.SetParamCount(argc)
-	fci.SetParams(argv)
-	fci.SetNoSeparation(1)
+
+	var func_ types.IFunction = pce.GetConstructor()
+	var fci *types.ZendFcallInfo = types.InitFCallInfo(retval.Object(), nil, args...)
+	fci.SetFunctionName(func_.FunctionName())
+
+	var fcc types.ZendFcallInfoCache
 	fcc.SetFunctionHandler(func_)
 	fcc.SetCalledScope(pce)
 	fcc.SetObject(retval.Object())
-	zend.ZendCallFunction(&fci, &fcc)
+	zend.ZendCallFunction(fci, &fcc)
 }
 func SplInstantiate(pce *types.ClassEntry, object *types.Zval) { zend.ObjectInitEx(object, pce) }
 func SplOffsetConvertToLong(offset *types.Zval) zend.ZendLong {

@@ -38,9 +38,6 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 	if destructor != nil {
 		var old_exception *types.ZendObject
 		var orig_fake_scope *types.ClassEntry
-		var fci types.ZendFcallInfo
-		var fcic types.ZendFcallInfoCache
-		var ret types.Zval
 		if destructor.GetOpArray().HasFnFlags(types.AccPrivate | types.AccProtected) {
 			if destructor.GetOpArray().IsPrivate() {
 				/* Ensure that if we're calling a private function, we're allowed to do so.
@@ -88,18 +85,14 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		}
 		orig_fake_scope = EG__().GetFakeScope()
 		EG__().SetFakeScope(nil)
-		ret.SetUndef()
-		fci.SetSize(b.SizeOf("fci"))
-		fci.SetObject(object)
-		fci.SetRetval(&ret)
-		fci.SetParamCount(0)
-		fci.SetParams(nil)
-		fci.SetNoSeparation(1)
-		fci.GetFunctionName().SetUndef()
+
+		var fci = types.InitFCallInfo(object, nil)
+		var fcic types.ZendFcallInfoCache
 		fcic.SetFunctionHandler(destructor)
 		fcic.SetCalledScope(object.GetCe())
 		fcic.SetObject(object)
-		ZendCallFunction(&fci, &fcic)
+
+		ZendCallFunction(fci, &fcic)
 		if old_exception != nil {
 			if EG__().GetException() != nil {
 				faults.ExceptionSetPrevious(EG__().GetException(), old_exception)
@@ -107,7 +100,6 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 				EG__().SetException(old_exception)
 			}
 		}
-		// OBJ_RELEASE(object)
 		EG__().SetFakeScope(orig_fake_scope)
 	}
 }
@@ -166,24 +158,14 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		})
 	}
 	if old_object.GetCe().GetClone() != nil {
-		var fci types.ZendFcallInfo
+		var fci *types.ZendFcallInfo = types.InitFCallInfo(new_object, nil)
+
 		var fcic types.ZendFcallInfoCache
-		var ret types.Zval
-		// 		new_object.AddRefcount()
-		ret.SetUndef()
-		fci.SetSize(b.SizeOf("fci"))
-		fci.SetObject(new_object)
-		fci.SetRetval(&ret)
-		fci.SetParamCount(0)
-		fci.SetParams(nil)
-		fci.SetNoSeparation(1)
-		fci.GetFunctionName().SetUndef()
 		fcic.SetFunctionHandler(new_object.GetCe().GetClone())
 		fcic.SetCalledScope(new_object.GetCe())
 		fcic.SetObject(new_object)
-		ZendCallFunction(&fci, &fcic)
-		// ZvalPtrDtor(&ret)
-		// OBJ_RELEASE(new_object)
+
+		ZendCallFunction(fci, &fcic)
 	}
 }
 func ZendObjectsCloneObjEx(oldObject *types.ZendObject) *types.ZendObject {

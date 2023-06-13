@@ -559,7 +559,6 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	var exception *types.Zval
 	var base_ce *types.ClassEntry
 	var str *types.String
-	var fci types.ZendFcallInfo
 	var rv types.Zval
 	var tmp types.Zval
 	var fname string
@@ -574,14 +573,10 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		var message *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_MESSAGE, &rv))
 		var file *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_FILE, &rv))
 		var line zend.ZendLong = operators.ZvalGetLong(GET_PROPERTY(exception, types.STR_LINE, &rv))
-		fci.SetSize(b.SizeOf("fci"))
-		fci.GetFunctionName().SetStringVal(fname)
-		fci.SetObject(exception.Object())
-		fci.SetRetval(&trace)
-		fci.SetParamCount(0)
-		fci.SetParams(nil)
-		fci.SetNoSeparation(1)
-		zend.ZendCallFunction(&fci, nil)
+
+		fci := types.InitFCallInfo(exception.Object(), &trace)
+		fci.SetFunctionName(fname)
+		zend.ZendCallFunction(fci, nil)
 		if !trace.IsString() {
 			// zend.ZvalPtrDtor(&trace)
 			trace.SetUndef()

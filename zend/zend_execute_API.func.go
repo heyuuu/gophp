@@ -349,7 +349,7 @@ func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) int {
 	}
 	return types.SUCCESS
 }
-func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCache) int {
+func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCache) int {
 	var i uint32
 	var call *ZendExecuteData
 	var dummy_execute_data ZendExecuteData
@@ -364,7 +364,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 	if EG__().GetException() != nil {
 		return types.FAILURE
 	}
-	b.Assert(fci.GetSize() == b.SizeOf("zend_fcall_info"))
+	b.Assert(fci.IsInit())
 
 	/* Initialize executeData */
 
@@ -387,12 +387,12 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 		dummy_execute_data.SetFunc(nil)
 		EG__().SetCurrentExecuteData(&dummy_execute_data)
 	}
-	if fci_cache == nil || fci_cache.GetFunctionHandler() == nil {
+	if fciCache == nil || fciCache.GetFunctionHandler() == nil {
 		var error *byte = nil
-		if fci_cache == nil {
-			fci_cache = &fci_cache_local
+		if fciCache == nil {
+			fciCache = &fci_cache_local
 		}
-		if ZendIsCallableEx(fci.GetFunctionName(), fci.GetObject(), IS_CALLABLE_CHECK_SILENT, nil, fci_cache, &error) == 0 {
+		if ZendIsCallableEx(fci.GetFunctionName(), fci.GetObject(), IS_CALLABLE_CHECK_SILENT, nil, fciCache, &error) == 0 {
 			if error != nil {
 				var callable_name *types.String = ZendGetCallableNameEx(fci.GetFunctionName(), fci.GetObject())
 				faults.Error(faults.E_WARNING, "Invalid callback %s, %s", callable_name.GetVal(), error)
@@ -420,13 +420,13 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 			}
 		}
 	}
-	func_ = fci_cache.GetFunctionHandler()
-	if func_.IsStatic() || fci_cache.GetObject() == nil {
+	func_ = fciCache.GetFunctionHandler()
+	if func_.IsStatic() || fciCache.GetObject() == nil {
 		fci.SetObject(nil)
-		object_or_called_scope = fci_cache.GetCalledScope()
+		object_or_called_scope = fciCache.GetCalledScope()
 		call_info = ZEND_CALL_TOP_FUNCTION | ZEND_CALL_DYNAMIC
 	} else {
-		fci.SetObject(fci_cache.GetObject())
+		fci.SetObject(fciCache.GetObject())
 		object_or_called_scope = fci.GetObject()
 		call_info = ZEND_CALL_TOP_FUNCTION | ZEND_CALL_DYNAMIC | ZEND_CALL_HAS_THIS
 	}
@@ -449,18 +449,12 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 		if ARG_SHOULD_BE_SENT_BY_REF(func_, i+1) != 0 {
 			if !(arg.IsReference()) {
 				if fci.GetNoSeparation() == 0 {
-
 					/* Separation is enabled -- create a ref */
-
 					arg.SetNewRef(arg)
-
-					/* Separation is enabled -- create a ref */
-
 				} else if ARG_MAY_BE_SENT_BY_REF(func_, i+1) == 0 {
 
 					/* By-value send is not allowed -- emit a warning,
 					 * and perform the call with the value wrapped in a reference. */
-
 					faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
 					must_wrap = 1
 					if EG__().GetException() != nil {
@@ -512,7 +506,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 
 			/* We must re-initialize function again */
 
-			fci_cache.SetFunctionHandler(nil)
+			fciCache.SetFunctionHandler(nil)
 
 			/* We must re-initialize function again */
 
@@ -543,7 +537,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 
 			/* We must re-initialize function again */
 
-			fci_cache.SetFunctionHandler(nil)
+			fciCache.SetFunctionHandler(nil)
 
 			/* We must re-initialize function again */
 
@@ -593,11 +587,7 @@ func ZendLookupClassEx_Ex(name string, key string, flags uint32) *types.ClassEnt
 	return ZendLookupClassEx(nameZStr, keyZStr, flags)
 }
 func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *types.ClassEntry {
-	var args []types.Zval
-	var local_retval types.Zval
 	var lc_name string
-	var fcall_info types.ZendFcallInfo
-	var fcall_cache types.ZendFcallInfoCache
 	var orig_fake_scope *types.ClassEntry
 	if key != nil {
 		lc_name = key.GetStr()
@@ -655,28 +645,27 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name) == nil {
 		return nil
 	}
-	local_retval.SetUndef()
-	if name.GetStr()[0] == '\\' {
-		args[0].SetStringVal(b.CastStr(name.GetVal()+1, name.GetLen()-1))
-	} else {
-		args[0].SetStringVal(name.GetStr())
+
+	// init fci
+	var arg0 = name.GetStr()
+	if arg0 != "" && arg0[0] == '\\' {
+		arg0 = arg0[1:]
 	}
-	fcall_info.SetSize(b.SizeOf("fcall_info"))
-	fcall_info.GetFunctionName().SetStringVal(EG__().GetAutoloadFunc().FunctionName())
-	fcall_info.SetRetval(&local_retval)
-	fcall_info.SetParamCount(1)
-	fcall_info.SetParams(args)
-	fcall_info.SetObject(nil)
-	fcall_info.SetNoSeparation(1)
-	fcall_cache.SetFunctionHandler(EG__().GetAutoloadFunc())
-	fcall_cache.SetCalledScope(nil)
-	fcall_cache.SetObject(nil)
+	var fci = types.InitFCallInfo(nil, nil, types.NewZvalString(arg0))
+	fci.SetFunctionName(EG__().GetAutoloadFunc().FunctionName())
+
+	// init fcc
+	var fcc types.ZendFcallInfoCache
+	fcc.SetFunctionHandler(EG__().GetAutoloadFunc())
+	fcc.SetCalledScope(nil)
+	fcc.SetObject(nil)
+
 	orig_fake_scope = EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
 	faults.ExceptionSave()
 
 	var ce *types.ClassEntry = nil
-	if ZendCallFunction(&fcall_info, &fcall_cache) == types.SUCCESS && EG__().GetException() == nil {
+	if ZendCallFunction(fci, &fcc) == types.SUCCESS && EG__().GetException() == nil {
 		ce = EG__().ClassTable().Get(lc_name)
 	}
 

@@ -1382,7 +1382,7 @@ func zim_spl_CallbackFilterIterator_accept(executeData *zend.ZendExecuteData, re
 	fci.SetRetval(return_value)
 	fci.SetParamCount(3)
 	fci.SetParams(params)
-	fci.SetNoSeparation(0)
+	fci.SetNoSeparation(false)
 	if zend.ZendCallFunction(fci, fcc) != types.SUCCESS || return_value.IsUndef() {
 		return_value.SetFalse()
 		return
@@ -1608,17 +1608,15 @@ func zim_spl_RecursiveRegexIterator_getChildren(executeData *zend.ZendExecuteDat
 	intern = it
 	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
 	if zend.EG__().GetException() == nil {
-		var args []types.Zval
-		types.ZVAL_COPY(&args[0], &retval)
-		args[1].SetStringVal(intern.GetURegexRegex().GetStr())
-		args[2].SetLong(intern.GetMode())
-		args[3].SetLong(intern.GetURegexFlags())
-		args[4].SetLong(intern.GetPregFlags())
-		SplInstantiateArgN(types.Z_OBJCE_P(zend.ZEND_THIS(executeData)), return_value, 5, args)
-		// zend.ZvalPtrDtor(&args[0])
-		// zend.ZvalPtrDtor(&args[1])
+		var args = []*types.Zval{
+			&retval,
+			types.NewZvalString(intern.GetURegexRegex().GetStr()),
+			types.NewZvalLong(intern.GetMode()),
+			types.NewZvalLong(intern.GetURegexFlags()),
+			types.NewZvalLong(intern.GetPregFlags()),
+		}
+		SplInstantiateArgN(types.Z_OBJCE_P(zend.ZEND_THIS(executeData)), return_value, args)
 	}
-	// zend.ZvalPtrDtor(&retval)
 }
 func zim_spl_RecursiveRegexIterator_accept(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject

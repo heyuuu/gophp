@@ -149,13 +149,8 @@ func ZendFcallInfoInit(
 	if ZendIsCallableEx(callable, nil, check_flags, callable_name, fcc, error) == 0 {
 		return types.FAILURE
 	}
-	fci.SetSize(b.SizeOf("* fci"))
-	fci.SetObject(fcc.GetObject())
-	types.ZVAL_COPY_VALUE(fci.GetFunctionName(), callable)
-	fci.SetRetval(nil)
-	fci.SetParamCount(0)
-	fci.SetParams(nil)
-	fci.SetNoSeparation(1)
+	*fci = *types.InitFCallInfo(fcc.GetObject(), nil)
+	fci.SetFunctionNameZval(callable)
 	return types.SUCCESS
 }
 func ZendFcallInfoArgsClear(fci *types.ZendFcallInfo, free_mem int) {

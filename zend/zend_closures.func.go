@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func ZEND_CLOSURE_OBJECT(op_array types.IFunction) *types.ZendObject {
@@ -74,19 +75,23 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 	}
 	return 1
 }
-func zim_Closure_call(executeData *ZendExecuteData, return_value *types.Zval) {
-	var newthis *types.Zval
+
+//zif -old "o*"
+func zim_Closure_call(executeData *ZendExecuteData, returnValue *types.Zval) {
+	// zpp parse start
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	newthis := fp.ParseObject()
+	args := fp.ParseVariadic()
+	if fp.HasError() {
+		return
+	}
+	// zpp parse finish
+
 	var closure_result types.Zval
 	var closure *ZendClosure
-	var fci types.ZendFcallInfo
 	var fci_cache types.ZendFcallInfoCache
 	var my_function types.IFunction
 	var newobj *types.ZendObject
-	fci.SetParamCount(0)
-	fci.SetParams(nil)
-	if ZendParseParameters(executeData.NumArgs(), "o*", &newthis, fci.GetParams(), fci.GetParamCount()) == types.FAILURE {
-		return
-	}
 	closure = (*ZendClosure)(ZEND_THIS(executeData).Object())
 	newobj = newthis.Object()
 	if ZendValidClosureBinding(closure, newthis, types.Z_OBJCE_P(newthis)) == 0 {
@@ -119,18 +124,16 @@ func zim_Closure_call(executeData *ZendExecuteData, return_value *types.Zval) {
 		/* Runtime cache relies on bound scope to be immutable, hence we need a separate rt cache in case scope changed */
 
 	}
-	fci_cache.SetCalledScope(newobj.GetCe())
-	fci.SetObject(newobj)
-	fci_cache.SetObject(fci.GetObject())
-	fci.SetSize(b.SizeOf("fci"))
+	var fci *types.ZendFcallInfo = types.InitFCallInfo(newobj, &closure_result, args...)
 	fci.GetFunctionName().SetObject(closure.GetStd())
-	fci.SetRetval(&closure_result)
-	fci.SetNoSeparation(1)
-	if ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && closure_result.IsNotUndef() {
+
+	fci_cache.SetCalledScope(newobj.GetCe())
+	fci_cache.SetObject(fci.GetObject())
+	if ZendCallFunction(fci, &fci_cache) == types.SUCCESS && closure_result.IsNotUndef() {
 		if closure_result.IsReference() {
 			operators.ZendUnwrapReference(&closure_result)
 		}
-		types.ZVAL_COPY_VALUE(return_value, &closure_result)
+		types.ZVAL_COPY_VALUE(returnValue, &closure_result)
 	}
 }
 func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
@@ -172,33 +175,30 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 	}
 	ZendCreateClosure(return_value, closure.GetFunc(), ce, called_scope, newthis)
 }
-func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *types.Zval) {
-	var fci types.ZendFcallInfo
-	var fcc types.ZendFcallInfoCache
-	var params []types.Zval
-	memset(&fci, 0, b.SizeOf("zend_fcall_info"))
-	memset(&fcc, 0, b.SizeOf("zend_fcall_info_cache"))
-	fci.SetSize(b.SizeOf("zend_fcall_info"))
-	fci.SetRetval(return_value)
-	if (executeData.GetFunc().internal_function.fn_flags & types.AccStatic) != 0 {
-		fcc.SetFunctionHandler(executeData.GetFunc().internal_function.scope.__callstatic)
-	} else {
-		fcc.SetFunctionHandler(executeData.GetFunc().internal_function.scope.__call)
-	}
-	fci.SetParams(params)
-	fci.SetParamCount(2)
-	fci.GetParams()[0].SetString(executeData.GetFunc().common.function_name)
+func ZendClosureCallMagic(executeData *ZendExecuteData, returnValue *types.Zval) {
+	// init fci
+	obj := executeData.GetThis().Object()
+	param1 := types.NewZvalString(executeData.GetFunc().FunctionName())
+	var param2 *types.Zval
 	if executeData.NumArgs() != 0 {
-		ArrayInitSize(fci.GetParams()[1], executeData.NumArgs())
-		ZendCopyParametersArray(executeData.NumArgs(), fci.GetParams()[1])
+		param2 = types.NewZvalArray(types.NewArray(executeData.NumArgs()))
+		ZendCopyParametersArray(executeData.NumArgs(), param2)
 	} else {
-		fci.GetParams()[1].SetEmptyArray()
+		param2 = types.NewZvalEmptyArray()
 	}
-	fci.SetObject(ZEND_THIS(executeData).Object())
+	fci := types.InitFCallInfo(obj, returnValue, param1, param2)
+
+	// init fcc
+	var fcc types.ZendFcallInfoCache
 	fcc.SetObject(fci.GetObject())
 	fcc.SetCalledScope(ZendGetCalledScope(CurrEX()))
-	ZendCallFunction(&fci, &fcc)
-	// ZvalPtrDtor(fci.GetParams()[1])
+	if (executeData.GetFunc().GetInternalFunction().GetFnFlags() & types.AccStatic) != 0 {
+		fcc.SetFunctionHandler(executeData.GetFunc().GetInternalFunction().GetScope().GetCallstatic())
+	} else {
+		fcc.SetFunctionHandler(executeData.GetFunc().GetInternalFunction().GetScope().GetCall())
+	}
+
+	ZendCallFunction(fci, &fcc)
 }
 func ZendCreateClosureFromCallable(return_value *types.Zval, callable *types.Zval, error **byte) int {
 	var fcc types.ZendFcallInfoCache

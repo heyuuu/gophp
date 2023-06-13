@@ -93,12 +93,9 @@ func ZendStdGetPropertiesEx(zobj *types.ZendObject) *types.Array {
 	}
 	return zobj.GetProperties()
 }
-func ZendStdCallGetter(zobj *types.ZendObject, prop_name *types.String, retval *types.Zval) {
+func ZendStdCallGetter(zobj *types.ZendObject, propName string, retval *types.Zval) {
 	var ce *types.ClassEntry = zobj.GetCe()
-	var orig_fake_scope *types.ClassEntry = EG__().GetFakeScope()
-	var fci types.ZendFcallInfo
-	var fcic types.ZendFcallInfoCache
-	var member types.Zval
+	var origFakeScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
 
 	/* __get handler is called with one argument:
@@ -106,28 +103,20 @@ func ZendStdCallGetter(zobj *types.ZendObject, prop_name *types.String, retval *
 
 	   it should return whether the call was successful or not
 	*/
+	var fci = types.InitFCallInfo(zobj, retval, types.NewZvalString(propName))
 
-	member.SetString(prop_name)
-	fci.SetSize(b.SizeOf("fci"))
-	fci.SetObject(zobj)
-	fci.SetRetval(retval)
-	fci.SetParamCount(1)
-	fci.SetParams(&member)
-	fci.SetNoSeparation(1)
-	fci.GetFunctionName().SetUndef()
+	var fcic types.ZendFcallInfoCache
 	fcic.SetFunctionHandler(ce.GetGet())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
-	ZendCallFunction(&fci, &fcic)
-	EG__().SetFakeScope(orig_fake_scope)
+
+	ZendCallFunction(fci, &fcic)
+
+	EG__().SetFakeScope(origFakeScope)
 }
-func ZendStdCallSetter(zobj *types.ZendObject, prop_name *types.String, value *types.Zval) {
+func ZendStdCallSetter(zobj *types.ZendObject, propName string, value *types.Zval) {
 	var ce *types.ClassEntry = zobj.GetCe()
-	var orig_fake_scope *types.ClassEntry = EG__().GetFakeScope()
-	var fci types.ZendFcallInfo
-	var fcic types.ZendFcallInfoCache
-	var args []types.Zval
-	var ret types.Zval
+	var origFakeScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
 
 	/* __set handler is called with two arguments:
@@ -135,58 +124,38 @@ func ZendStdCallSetter(zobj *types.ZendObject, prop_name *types.String, value *t
 	   value to be set
 	*/
 
-	args[0].SetString(prop_name)
-	types.ZVAL_COPY_VALUE(&args[1], value)
-	ret.SetUndef()
-	fci.SetSize(b.SizeOf("fci"))
-	fci.SetObject(zobj)
-	fci.SetRetval(&ret)
-	fci.SetParamCount(2)
-	fci.SetParams(args)
-	fci.SetNoSeparation(1)
-	fci.GetFunctionName().SetUndef()
+	var fci = types.InitFCallInfo(zobj, nil, types.NewZvalString(propName), value)
+
+	var fcic types.ZendFcallInfoCache
 	fcic.SetFunctionHandler(ce.GetSet())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
-	ZendCallFunction(&fci, &fcic)
-	// ZvalPtrDtor(&ret)
-	EG__().SetFakeScope(orig_fake_scope)
+
+	ZendCallFunction(fci, &fcic)
+
+	EG__().SetFakeScope(origFakeScope)
 }
-func ZendStdCallUnsetter(zobj *types.ZendObject, prop_name *types.String) {
+func ZendStdCallUnsetter(zobj *types.ZendObject, propName string) {
 	var ce *types.ClassEntry = zobj.GetCe()
-	var orig_fake_scope *types.ClassEntry = EG__().GetFakeScope()
-	var fci types.ZendFcallInfo
-	var fcic types.ZendFcallInfoCache
-	var ret types.Zval
-	var member types.Zval
+	var origFakeScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
 
 	/* __unset handler is called with one argument:
 	   property name
 	*/
+	var fci = types.InitFCallInfo(zobj, nil, types.NewZvalString(propName))
 
-	member.SetString(prop_name)
-	ret.SetUndef()
-	fci.SetSize(b.SizeOf("fci"))
-	fci.SetObject(zobj)
-	fci.SetRetval(&ret)
-	fci.SetParamCount(1)
-	fci.SetParams(&member)
-	fci.SetNoSeparation(1)
-	fci.GetFunctionName().SetUndef()
+	var fcic types.ZendFcallInfoCache
 	fcic.SetFunctionHandler(ce.GetUnset())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
-	ZendCallFunction(&fci, &fcic)
-	// ZvalPtrDtor(&ret)
-	EG__().SetFakeScope(orig_fake_scope)
+	ZendCallFunction(fci, &fcic)
+
+	EG__().SetFakeScope(origFakeScope)
 }
-func ZendStdCallIssetter(zobj *types.ZendObject, prop_name *types.String, retval *types.Zval) {
+func ZendStdCallIssetter(zobj *types.ZendObject, propName *types.String, retval *types.Zval) {
 	var ce *types.ClassEntry = zobj.GetCe()
-	var orig_fake_scope *types.ClassEntry = EG__().GetFakeScope()
-	var fci types.ZendFcallInfo
-	var fcic types.ZendFcallInfoCache
-	var member types.Zval
+	var origFakeScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
 
 	/* __isset handler is called with one argument:
@@ -194,20 +163,15 @@ func ZendStdCallIssetter(zobj *types.ZendObject, prop_name *types.String, retval
 
 	   it should return whether the property is set or not
 	*/
+	var fci = types.InitFCallInfo(zobj, retval, types.NewZvalString(propName.GetStr()))
 
-	member.SetString(prop_name)
-	fci.SetSize(b.SizeOf("fci"))
-	fci.SetObject(zobj)
-	fci.SetRetval(retval)
-	fci.SetParamCount(1)
-	fci.SetParams(&member)
-	fci.SetNoSeparation(1)
-	fci.GetFunctionName().SetUndef()
+	var fcic types.ZendFcallInfoCache
 	fcic.SetFunctionHandler(ce.GetIsset())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
-	ZendCallFunction(&fci, &fcic)
-	EG__().SetFakeScope(orig_fake_scope)
+
+	ZendCallFunction(fci, &fcic)
+	EG__().SetFakeScope(origFakeScope)
 }
 func IsDerivedClass(child_class *types.ClassEntry, parent_class *types.ClassEntry) bool {
 	child_class = child_class.GetParent()
@@ -579,7 +543,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, type_ int
 			// 			zobj.AddRefcount()
 		call_getter:
 			*guard |= IN_GET
-			ZendStdCallGetter(zobj, name, rv)
+			ZendStdCallGetter(zobj, name.GetStr(), rv)
 			*guard &= ^IN_GET
 			if rv.IsNotUndef() {
 				retval = rv
@@ -681,7 +645,7 @@ func ZendStdWritePropertyEx(zobj *types.ZendObject, member *types.Zval, value *t
 		if ((*guard) & IN_SET) == 0 {
 			// 			zobj.AddRefcount()
 			*guard |= IN_SET
-			ZendStdCallSetter(zobj, name, value)
+			ZendStdCallSetter(zobj, name.GetStr(), value)
 			*guard &= ^IN_SET
 			// OBJ_RELEASE(zobj)
 			variable_ptr = value
@@ -927,7 +891,7 @@ func ZendStdUnsetPropertyEx(zobj *types.ZendObject, member *types.Zval, cache_sl
 			/* have unseter - try with it! */
 
 			*guard |= IN_UNSET
-			ZendStdCallUnsetter(zobj, name)
+			ZendStdCallUnsetter(zobj, name.GetStr())
 			*guard &= ^IN_UNSET
 		} else if IS_WRONG_PROPERTY_OFFSET(property_offset) {
 
@@ -1422,7 +1386,7 @@ func ZendStdHasPropertyEx(zobj *types.ZendObject, member *types.Zval, has_set_ex
 			if has_set_exists == ZEND_PROPERTY_NOT_EMPTY && result != 0 {
 				if EG__().GetException() == nil && zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
 					*guard |= IN_GET
-					ZendStdCallGetter(zobj, name, &rv)
+					ZendStdCallGetter(zobj, name.GetStr(), &rv)
 					*guard &= ^IN_GET
 					result = operators.IZendIsTrue(&rv)
 					// ZvalPtrDtor(&rv)

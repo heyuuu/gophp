@@ -10,7 +10,6 @@ func CE_STATIC_MEMBERS(ce *types.ClassEntry) *types.Zval {
 	// todo
 	return (ZEND_MAP_PTR_GET(ce.static_members_table__ptr)).(*types.Zval)
 }
-func ZEND_FCI_INITIALIZED(fci types.ZendFcallInfo) bool { return fci.GetSize() != 0 }
 func ZendGetParametersArray(ht uint32, param_count int, argument_array *types.Zval) int {
 	return _zendGetParametersArrayEx(param_count, argument_array)
 }
@@ -82,23 +81,23 @@ func AddPropertyStringl(arg *types.Zval, key string, __str string) int {
 func AddPropertyZval(arg *types.Zval, key string, __value *types.Zval) int {
 	return AddPropertyZvalEx(arg, key, __value)
 }
-func CallUserFunction(object *types.Zval, function_name *types.Zval, retval_ptr *types.Zval, param_count uint32, params []types.Zval) int {
-	return CallUserFunctionEx(object, function_name, retval_ptr, param_count, params, 1)
+func CallUserFunction(object *types.Zval, functionName *types.Zval, retvalPtr *types.Zval, paramCount uint32, params []types.Zval) int {
+	return CallUserFunctionEx(object, functionName, retvalPtr, paramCount, params, 1)
 }
-func CallUserFunctionEx(object *types.Zval, function_name *types.Zval, retval_ptr *types.Zval, param_count uint32, params []types.Zval, no_separation int) int {
-	var fci types.ZendFcallInfo
-	fci.SetSize(b.SizeOf("fci"))
-	if object != nil {
-		fci.SetObject(object.Object())
-	} else {
-		fci.SetObject(nil)
+func CallUserFunctionEx(object *types.Zval, functionName *types.Zval, retvalPtr *types.Zval, paramCount uint32, params []types.Zval, no_separation int) int {
+	var objPtr *types.ZendObject
+	if objPtr != nil {
+		objPtr = object.Object()
 	}
-	types.ZVAL_COPY_VALUE(fci.GetFunctionName(), function_name)
-	fci.SetRetval(retval_ptr)
-	fci.SetParamCount(param_count)
-	fci.SetParams(params)
-	fci.SetNoSeparation(bool(no_separation))
-	return ZendCallFunction(&fci, nil)
+
+	b.Assert(int(paramCount) == len(params))
+
+	var fci = types.InitFCallInfo(objPtr, retvalPtr, params...)
+	types.ZVAL_COPY_VALUE(fci.GetFunctionName(), functionName)
+	fci.SetFunctionName(functionName)
+	fci.SetNoSeparation(no_separation != 0)
+
+	return ZendCallFunction(fci, nil)
 }
 func ZendForbidDynamicCall(func_name string) int {
 	var ex *ZendExecuteData = CurrEX()

@@ -180,7 +180,7 @@ func (this *SplFilesystemObject) GetCurrentLineNum() zend.ZendLong {
 func (this *SplFilesystemObject) SetCurrentLineNum(value zend.ZendLong) {
 	this.u.file.current_line_num = value
 }
-func (this *SplFilesystemObject) GetZresource() types.Zval { return this.u.file.zresource }
+func (this *SplFilesystemObject) GetZresource() *types.Zval { return &this.u.file.zresource }
 
 // func (this *SplFilesystemObject) SetZresource(value zend.Zval) { this.u.file.zresource = value }
 func (this *SplFilesystemObject) GetFuncGetCurr() types.IFunction {

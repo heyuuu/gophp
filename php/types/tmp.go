@@ -19,7 +19,7 @@ func (c *UserCallable) Call(args ...*Zval) (*Zval, bool) {
 	c.Info.SetParamCount(uint32(len(args)))
 	c.Info.SetParams(realArgs)
 	c.Info.SetRetval(&retval)
-	c.Info.SetNoSeparation(0)
+	c.Info.SetNoSeparation(false)
 
 	// call
 	ret := zend.ZendCallFunction(&c.Info, &c.Cache)

@@ -184,9 +184,9 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	memset(&(BG__().serialize), 0, b.SizeOf("BG ( serialize )"))
 	memset(&(BG__().unserialize), 0, b.SizeOf("BG ( unserialize )"))
 	BG__().locale_string = nil
-	BG__().locale_changed = 0
-	BG__().array_walk_fci = zend.EmptyFcallInfo
-	BG__().array_walk_fci_cache = zend.EmptyFcallInfoCache
+	BG__().locale_changed = false
+	BG__().array_walk_fci = types.EmptyFCallInfo()
+	BG__().array_walk_fci_cache = types.EmptyFcallInfoCache()
 	BG__().page_uid = -1
 	BG__().page_gid = -1
 	BG__().page_inode = -1

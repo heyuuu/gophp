@@ -1514,46 +1514,49 @@ func SplFilesystemFileRead(intern *SplFilesystemObject, silent int) int {
 	intern.SetCurrentLineNum(intern.GetCurrentLineNum() + line_add)
 	return types.SUCCESS
 }
-func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr types.IFunction, pass_num_args int, return_value *types.Zval, arg2 *types.Zval) int {
-	var fci types.ZendFcallInfo
+func SplFilesystemFileCall(intern *SplFilesystemObject, funcPtr types.IFunction, passNumArgs int, returnValue *types.Zval, arg2 *types.Zval) int {
+	var fci *types.ZendFcallInfo
 	var fcic types.ZendFcallInfoCache
-	var zresource_ptr *types.Zval = intern.GetZresource()
-	var params *types.Zval
+	var zresourcePtr = intern.GetZresource()
 	var retval types.Zval
 	var result int
-	var num_args int = pass_num_args + b.Cond(arg2 != nil, 2, 1)
-	if zresource_ptr.IsUndef() {
+	if zresourcePtr.IsUndef() {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return types.FAILURE
 	}
-	params = (*types.Zval)(zend.SafeEmalloc(num_args, b.SizeOf("zval"), 0))
-	params[0] = *zresource_ptr
+
+	// 拼装 params
+	var numArgs int = passNumArgs + b.Cond(arg2 != nil, 2, 1)
+	var params []*types.Zval = make([]*types.Zval, 0, numArgs)
+	params = append(params, zresourcePtr)
 	if arg2 != nil {
-		params[1] = *arg2
+		params = append(params, arg2)
 	}
-	if zend.ZendGetParametersArrayEx(pass_num_args, params+b.Cond(arg2 != nil, 2, 1)) != types.SUCCESS {
-		zend.Efree(params)
+	if passNumArgs > zend.CurrEX().NumArgs() {
 		zend.ZendWrongParamCount()
 		return types.FAILURE
 	}
+	for i := 1; i <= passNumArgs; i++ {
+		param := zend.CurrEX().Arg(i)
+		params = append(params, param)
+	}
+
+	// init fci
 	retval.SetUndef()
-	fci.SetSize(b.SizeOf("fci"))
-	fci.SetObject(nil)
-	fci.SetRetval(&retval)
-	fci.SetParamCount(num_args)
-	fci.SetParams(params)
-	fci.SetNoSeparation(1)
-	fci.GetFunctionName().SetStringVal(func_ptr.FunctionName())
-	fcic.SetFunctionHandler(func_ptr)
+	fci = types.InitFCallInfo(nil, &retval, params...)
+	fci.SetFunctionName(funcPtr.FunctionName())
+
+	// init fcc
+	fcic.SetFunctionHandler(funcPtr)
 	fcic.SetCalledScope(nil)
 	fcic.SetObject(nil)
-	result = zend.ZendCallFunction(&fci, &fcic)
+
+	result = zend.ZendCallFunction(fci, &fcic)
 	if result == types.FAILURE || retval.IsUndef() {
-		return_value.SetFalse()
+		returnValue.SetFalse()
 	} else {
-		zend.ZVAL_ZVAL(return_value, &retval, 0, 0)
+		zend.ZVAL_ZVAL(returnValue, &retval, 0, 0)
 	}
-	zend.Efree(params)
 	return result
 }
 func SplFilesystemFileReadCsv(intern *SplFilesystemObject, delimiter byte, enclosure byte, escape int, return_value *types.Zval) int {

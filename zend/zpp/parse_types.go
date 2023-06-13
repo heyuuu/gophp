@@ -270,7 +270,7 @@ func ParseResource(arg *types.Zval, checkNull bool) (dest *types.Zval, ok bool) 
 
 func ParseFunc(arg *types.Zval, dest_fci *types.ZendFcallInfo, dest_fcc *types.ZendFcallInfoCache, checkNull bool) (error *string, ok bool) {
 	if checkNull && arg.IsNull() {
-		dest_fci.SetSize(0)
+		dest_fci.UnInit()
 		dest_fcc.SetFunctionHandler(nil)
 		return nil, true
 	}
