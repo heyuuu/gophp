@@ -15,10 +15,19 @@ type ZendAst struct {
 	attr   ZendAstAttr
 	lineno uint32
 	child  []*ZendAst
+	val    *types.Zval
 }
 
 func NewAst(kind ZendAstKind, attr ZendAstAttr, lineno uint32, children []*ZendAst) *ZendAst {
 	b.Assert(int(kind)>>ZEND_AST_NUM_CHILDREN_SHIFT == len(children))
+	return &ZendAst{
+		kind:   kind,
+		attr:   attr,
+		lineno: lineno,
+		child:  children,
+	}
+}
+func NewAstList(kind ZendAstKind, attr ZendAstAttr, lineno uint32, children []*ZendAst) *ZendAst {
 	return &ZendAst{
 		kind:   kind,
 		attr:   attr,

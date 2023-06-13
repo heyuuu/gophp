@@ -36,17 +36,6 @@ func ZendAstGetLineno(ast *ZendAst) uint32 {
 func ZendAstAlloc(size int) any {
 	return b.Malloc(size)
 }
-func ZendAstRealloc(old any, old_size int, new_size int) any {
-	var new_ any = ZendAstAlloc(new_size)
-	memcpy(new_, old, old_size)
-	return new_
-}
-func ZendAstSize(children uint32) int {
-	return b.SizeOf("zend_ast") - b.SizeOf("zend_ast *") + b.SizeOf("zend_ast *")*children
-}
-func ZendAstListSize(children uint32) int {
-	return b.SizeOf("zend_ast_list") - b.SizeOf("zend_ast *") + b.SizeOf("zend_ast *")*children
-}
 func ZendAstCreateZnode(node *Znode) *ZendAst {
 	var ast *ZendAstZnode
 	ast = ZendAstAlloc(b.SizeOf("zend_ast_znode"))
@@ -63,9 +52,6 @@ func ZendAstCreateZvalInt(zv *types.Zval, attr uint32, lineno uint32) *ZendAst {
 func ZendAstCreateZvalWithLineno(zv *types.Zval, lineno uint32) *ZendAst {
 	return ZendAstCreateZvalInt(zv, 0, lineno)
 }
-func ZendAstCreateZvalEx(zv *types.Zval, attr ZendAstAttr) *ZendAst {
-	return ZendAstCreateZvalInt(zv, attr, CG__().GetZendLineno())
-}
 func ZendAstCreateZval(zv *types.Zval) *ZendAst {
 	return ZendAstCreateZvalInt(zv, 0, CG__().GetZendLineno())
 }
@@ -79,20 +65,6 @@ func ZendAstCreateConstant(name *types.String, attr ZendAstAttr) *ZendAst {
 	lineno := CG__().GetZendLineno()
 	var ast *ZendAstZval = NewAstZval(ZEND_AST_CONSTANT, attr, zv, lineno)
 	return (*ZendAst)(ast)
-}
-
-func astLinenoByChildrenEx(children []*ZendAst) uint32 {
-	lineno := uint32(CG__().GetZendLineno())
-	for _, child := range children {
-		if child != nil {
-			childLineno := ZendAstGetLineno(child)
-			if childLineno < lineno {
-				lineno = childLineno
-			}
-			return lineno
-		}
-	}
-	return lineno
 }
 
 func AstCreateEx(kind ZendAstKind, attr ZendAstAttr, children ...*ZendAst) *ZendAst {
@@ -117,7 +89,7 @@ func AstCreateList(kind ZendAstKind, children ...*ZendAst) *ZendAst {
 			break
 		}
 	}
-	return NewAst(kind, 0, lineno, children)
+	return NewAstList(kind, 0, lineno, children)
 }
 
 func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.Zval) int {
