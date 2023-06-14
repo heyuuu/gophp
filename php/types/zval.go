@@ -11,10 +11,9 @@ import (
  * - 零值为合法的 Undef 类型，无需 SetUndef() 初始化
  */
 type Zval struct {
-	value     any
-	typ       uint8
-	typeFlags uint8
-	u2        uint32
+	value any
+	typ   uint8
+	u2    uint32
 	//u2 struct /* union */ {
 	//	next           uint32 /* hash collision chain  用来解决哈希冲突问题，记录冲突的下一个元素位置*/
 	//	cache_slot     uint32 /* literal cache slot  运行时缓存。在执行函数时会优先去缓存中查找，若缓存中没有，会在全局的function表中查找*/
@@ -128,22 +127,11 @@ func (zv *Zval) SetType(typ ZvalType) {
 	zv.typ, zv.value = typ, nil
 }
 
-// todo delete，暂时还有些其他语义的用法(如 ExecuteData.This.callInfo)，待处理后移除
-func (zv *Zval) GetTypeInfo() uint32 {
-	return uint32(zv.typ) | uint32(zv.typeFlags)<<Z_TYPE_FLAGS_SHIFT
-}
-func (zv *Zval) SetTypeInfo(value uint32) {
-	zv.typ = uint8(value & Z_TYPE_MASK)
-	zv.typeFlags = uint8((value & Z_TYPE_FLAGS_MASK) >> Z_TYPE_FLAGS_SHIFT)
-}
-
 /** Zval.u2 */
 func (zv *Zval) GetCacheSlot() uint32          { return zv.u2 }
 func (zv *Zval) SetCacheSlot(value uint32)     { zv.u2 = value }
 func (zv *Zval) GetOplineNum() uint32          { return zv.u2 }
 func (zv *Zval) SetOplineNum(value uint32)     { zv.u2 = value }
-func (zv *Zval) GetNumArgs() uint32            { return zv.u2 }
-func (zv *Zval) SetNumArgs(value uint32)       { zv.u2 = value }
 func (zv *Zval) GetFePos() uint32              { return zv.u2 }
 func (zv *Zval) SetFePos(value uint32)         { zv.u2 = value }
 func (zv *Zval) GetFeIterIdx() uint32          { return zv.u2 }
