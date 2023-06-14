@@ -296,25 +296,27 @@ var DefZifRegisterShutdownFunction = def.DefFunc("register_shutdown_function", 1
 // generate by ZifHighlightFile
 var DefZifHighlightFile = def.DefFunc("highlight_file", 1, 2, []def.ArgInfo{{Name: "file_name"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	file_name := fp.ParseZval()
+	file_name := fp.ParsePathVal()
 	fp.StartOptional()
-	return_ := fp.ParseZval()
+	return_ := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifHighlightFile(executeData, returnValue, file_name, nil, return_)
+	ret := ZifHighlightFile(returnValue, file_name, nil, return_)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifHighlightFile
 var DefZifShowSource = def.DefFunc("show_source", 1, 2, []def.ArgInfo{{Name: "file_name"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	file_name := fp.ParseZval()
+	file_name := fp.ParsePathVal()
 	fp.StartOptional()
-	return_ := fp.ParseZval()
+	return_ := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifHighlightFile(executeData, returnValue, file_name, nil, return_)
+	ret := ZifHighlightFile(returnValue, file_name, nil, return_)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifPhpStripWhitespace
@@ -330,13 +332,13 @@ var DefZifPhpStripWhitespace = def.DefFunc("php_strip_whitespace", 1, 1, []def.A
 // generate by ZifHighlightString
 var DefZifHighlightString = def.DefFunc("highlight_string", 1, 2, []def.ArgInfo{{Name: "string"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	string := fp.ParseZval()
+	string_ := fp.ParseZval()
 	fp.StartOptional()
-	return_ := fp.ParseZval()
+	return_ := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifHighlightString(executeData, returnValue, string, nil, return_)
+	ZifHighlightString(returnValue, string_, nil, return_)
 })
 
 // generate by ZifIniGet
@@ -374,7 +376,12 @@ var DefZifIniSet = def.DefFunc("ini_set", 2, 2, []def.ArgInfo{{Name: "varname"},
 	if fp.HasError() {
 		return
 	}
-	ZifIniSet(returnValue, varname, newvalue)
+	ret, ok := ZifIniSet(returnValue, varname, newvalue)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifIniSet
@@ -385,27 +392,37 @@ var DefZifIniAlter = def.DefFunc("ini_alter", 2, 2, []def.ArgInfo{{Name: "varnam
 	if fp.HasError() {
 		return
 	}
-	ZifIniSet(returnValue, varname, newvalue)
+	ret, ok := ZifIniSet(returnValue, varname, newvalue)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifIniRestore
-var DefZifIniRestore = def.DefFunc("ini_restore", 1, 1, []def.ArgInfo{{Name: "varname"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifIniRestore = def.DefFunc("ini_restore", 1, 1, []def.ArgInfo{{Name: "var_name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	varname := fp.ParseZval()
+	var_name := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifIniRestore(executeData, returnValue, varname)
+	ZifIniRestore(var_name)
 })
 
 // generate by ZifSetIncludePath
 var DefZifSetIncludePath = def.DefFunc("set_include_path", 1, 1, []def.ArgInfo{{Name: "new_include_path"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	new_include_path := fp.ParseZval()
+	new_include_path := fp.ParsePathVal()
 	if fp.HasError() {
 		return
 	}
-	ZifSetIncludePath(executeData, returnValue, new_include_path)
+	ret, ok := ZifSetIncludePath(new_include_path)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifGetIncludePath
@@ -413,7 +430,12 @@ var DefZifGetIncludePath = def.DefFunc("get_include_path", 0, 0, []def.ArgInfo{}
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetIncludePath(executeData, returnValue)
+	ret, ok := ZifGetIncludePath()
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifRestoreIncludePath
@@ -421,7 +443,7 @@ var DefZifRestoreIncludePath = def.DefFunc("restore_include_path", 0, 0, []def.A
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifRestoreIncludePath(executeData, returnValue)
+	ZifRestoreIncludePath()
 })
 
 // generate by ZifPrintR
@@ -433,7 +455,7 @@ var DefZifPrintR = def.DefFunc("print_r", 1, 2, []def.ArgInfo{{Name: "var"}, {Na
 	if fp.HasError() {
 		return
 	}
-	ZifPrintR(executeData, returnValue, var_, nil, return_)
+	ZifPrintR(var_, nil, return_)
 })
 
 // generate by ZifConnectionAborted
@@ -441,7 +463,7 @@ var DefZifConnectionAborted = def.DefFunc("connection_aborted", 0, 0, []def.ArgI
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifConnectionAborted(executeData, returnValue)
+	ZifConnectionAborted()
 })
 
 // generate by ZifConnectionStatus
@@ -449,7 +471,7 @@ var DefZifConnectionStatus = def.DefFunc("connection_status", 0, 0, []def.ArgInf
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifConnectionStatus(executeData, returnValue)
+	ZifConnectionStatus()
 })
 
 // generate by ZifIgnoreUserAbort

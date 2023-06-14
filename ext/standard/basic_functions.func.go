@@ -833,51 +833,31 @@ func PhpGetHighlight(syntaxHighlighterIni *zend.ZendSyntaxHighlighterIni) {
 }
 
 //@zif -alias show_source
-func ZifHighlightFile(executeData zpp.Ex, return_value zpp.Ret, fileName *types.Zval, _ zpp.Opt, return_ *types.Zval) {
-	var filename *byte
-	var filename_len int
+func ZifHighlightFile(return_value zpp.Ret, fileName zpp.Path, _ zpp.Opt, return_ bool) *types.Zval {
 	var ret int
-	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-	var i bool = false
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			filename, filename_len = fp.ParsePath()
-			fp.StartOptional()
-			i = fp.ParseBool()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
+	var syntaxHighlighterIni zend.ZendSyntaxHighlighterIni
+	if core.PhpCheckOpenBasedir(fileName) != 0 {
+		return types.NewZvalFalse()
 	}
-	if core.PhpCheckOpenBasedir(filename) != 0 {
-		return_value.SetFalse()
-		return
-	}
-	if i != 0 {
+	if return_ {
 		core.PhpOutputStartDefault()
 	}
-	PhpGetHighlight(&syntax_highlighter_ini)
-	ret = zend.HighlightFile(filename, &syntax_highlighter_ini)
+	PhpGetHighlight(&syntaxHighlighterIni)
+	ret = zend.HighlightFile(fileName, &syntaxHighlighterIni)
 	if ret == types.FAILURE {
-		if i != 0 {
+		if return_ {
 			core.PhpOutputEnd()
 		}
-		return_value.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
-	if i != 0 {
+	if return_ {
 		core.PhpOutputGetContents(return_value)
 		core.PhpOutputDiscard()
 	} else {
-		return_value.SetTrue()
-		return
+		return types.NewZvalTrue()
 	}
 }
-func ZifPhpStripWhitespace(return_value zpp.Ret, fileName string) {
+func ZifPhpStripWhitespace(returnValue zpp.Ret, fileName string) {
 	var originalLexState zend.ZendLexState
 	core.PhpOutputStartDefault()
 
@@ -886,60 +866,45 @@ func ZifPhpStripWhitespace(return_value zpp.Ret, fileName string) {
 	if zend.OpenFileForScanning(fh) == types.FAILURE {
 		zend.ZendRestoreLexicalState(&originalLexState)
 		core.PhpOutputEnd()
-		return_value.SetStringVal("")
+		returnValue.SetStringVal("")
 		return
 	}
 	zend.ZendStrip()
 	zend.ZendDestroyFileHandle(fh)
 	zend.ZendRestoreLexicalState(&originalLexState)
-	core.PhpOutputGetContents(return_value)
+	core.PhpOutputGetContents(returnValue)
 	core.PhpOutputDiscard()
 }
-func ZifHighlightString(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, return_ *types.Zval) {
+func ZifHighlightString(returnValue zpp.Ret, string_ *types.Zval, _ zpp.Opt, return_ bool) {
 	var expr *types.Zval
-	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-	var hicompiled_string_description *byte
-	var i bool = 0
-	var old_error_reporting int = zend.EG__().GetErrorReporting()
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			expr = fp.ParseZval()
-			fp.StartOptional()
-			i = fp.ParseBool()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	if operators.TryConvertToString(expr) == 0 {
+	var syntaxHighlighterIni zend.ZendSyntaxHighlighterIni
+	var hicompiledStringDescription *byte
+	var oldErrorReporting int = zend.EG__().GetErrorReporting()
+	if !operators.TryConvertToString(string_) {
 		return
 	}
-	if i != 0 {
+	if return_ {
 		core.PhpOutputStartDefault()
 	}
 	zend.EG__().SetErrorReporting(faults.E_ERROR)
-	PhpGetHighlight(&syntax_highlighter_ini)
-	hicompiled_string_description = zend.ZendMakeCompiledStringDescription("highlighted code")
-	if zend.HighlightString(expr, &syntax_highlighter_ini, hicompiled_string_description) == types.FAILURE {
-		zend.Efree(hicompiled_string_description)
-		zend.EG__().SetErrorReporting(old_error_reporting)
-		if i != 0 {
+	PhpGetHighlight(&syntaxHighlighterIni)
+	hicompiledStringDescription = zend.ZendMakeCompiledStringDescription("highlighted code")
+	if zend.HighlightString(expr, &syntaxHighlighterIni, hicompiledStringDescription) == types.FAILURE {
+		zend.Efree(hicompiledStringDescription)
+		zend.EG__().SetErrorReporting(oldErrorReporting)
+		if return_ {
 			core.PhpOutputEnd()
 		}
-		return_value.SetFalse()
+		returnValue.SetFalse()
 		return
 	}
-	zend.Efree(hicompiled_string_description)
-	zend.EG__().SetErrorReporting(old_error_reporting)
-	if i != 0 {
-		core.PhpOutputGetContents(return_value)
+	zend.Efree(hicompiledStringDescription)
+	zend.EG__().SetErrorReporting(oldErrorReporting)
+	if return_ {
+		core.PhpOutputGetContents(returnValue)
 		core.PhpOutputDiscard()
 	} else {
-		return_value.SetTrue()
+		returnValue.SetTrue()
 		return
 	}
 }
@@ -966,7 +931,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 		if moduleNumber != 0 && iniEntry.GetModuleNumber() != moduleNumber {
 			return
 		}
-		if key == nil || key != "" {
+		if key != "" {
 			if details {
 				zend.ArrayInit(&option)
 				if iniEntry.GetOrigValue() != nil {
@@ -995,6 +960,12 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 		}
 	})
 }
+func PhpIniCheckPathEx(option string, newOption string) bool {
+	if len(option)+1 != len(newOption) {
+		return false
+	}
+	return option == newOption[:len(option)]
+}
 func PhpIniCheckPath(option_name *byte, option_len int, new_option_name string, new_option_len int) int {
 	if option_len+1 != new_option_len {
 		return 0
@@ -1003,160 +974,72 @@ func PhpIniCheckPath(option_name *byte, option_len int, new_option_name string, 
 }
 
 //@zif -alias ini_alter
-func ZifIniSet(return_value zpp.Ret, varname string, newvalue string) {
+func ZifIniSet(return_value zpp.Ret, varname string, newvalue string) (string, bool) {
 	val := zend.ZendIniGetValue(varname)
 
-	/* copy to return here, because alter might free it! */
-	if val != nil {
-		return_value.SetStringVal(val.GetStr())
-	} else {
-		return_value.SetFalse()
-	}
-
-	// #define _CHECK_PATH(var,var_len,ini) php_ini_check_path ( var , var_len , ini , sizeof ( ini ) )
-
 	/* open basedir check */
-
-	if core.PG__().open_basedir {
-		if PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "error_log", b.SizeOf("\"error_log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.class.path", b.SizeOf("\"java.class.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.home", b.SizeOf("\"java.home\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "mail.log", b.SizeOf("\"mail.log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.library.path", b.SizeOf("\"java.library.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "vpopmail.directory", b.SizeOf("\"vpopmail.directory\"")) != 0 {
+	if core.PG__().GetOpenBasedir() != nil {
+		if varname == "error_log" || varname == "java.class.path" || varname == "java.home" || varname == "mail.log" || varname == "java.library.path" || varname == "vpopmail.directory" {
 			if core.PhpCheckOpenBasedir(newvalue) != 0 {
 				return_value.SetFalse()
-				return
+				return "", false
 			}
 		}
 	}
-	if !zend.ZendAlterIniEntryEx(varname.GetStr(), newvalue, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
+	if !zend.ZendAlterIniEntryEx(varname, newvalue, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
 		return_value.SetFalse()
-		return
+		return "", false
 	}
-}
-func ZifIniRestore(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval) {
-	var varname *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			varname = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ZendRestoreIniEntry(varname, core.PHP_INI_STAGE_RUNTIME)
-}
-func ZifSetIncludePath(executeData zpp.Ex, return_value zpp.Ret, newIncludePath *types.Zval) {
-	var new_value *types.String
-	var old_value *byte
-	var key *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			new_value = fp.ParsePathStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	old_value = zend.ZendIniString("include_path", 0)
 
-	/* copy to return here, because alter might free it! */
+	if val != nil {
+		return val.GetStr(), true
+	}
+	return "", false
+}
+func ZifIniRestore(varName string) {
+	zend.ZendRestoreIniEntry(varName, core.PHP_INI_STAGE_RUNTIME)
+}
+func ZifSetIncludePath(newIncludePath zpp.Path) (string, bool) {
+	oldValue := zend.ZendIniGetValue("include_path")
 
-	if old_value != nil {
-		return_value.SetStringVal(b.CastStrAuto(old_value))
+	if !zend.ZendAlterIniEntryEx("include_path", newIncludePath, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
+		return "", false
+	}
+
+	if oldValue != nil {
+		return oldValue.GetStr(), true
 	} else {
-		return_value.SetFalse()
+		return "", false
 	}
-	key = types.NewString("include_path")
-	if !zend.ZendAlterIniEntryEx(key.GetStr(), new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
-		// types.ZendStringReleaseEx(key, 0)
-
-		return_value.SetFalse()
-		return
-	}
-	// types.ZendStringReleaseEx(key, 0)
 }
-func ZifGetIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
-	var str *byte
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	str = zend.ZendIniString("include_path", 0)
-	if str == nil {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetStringVal(b.CastStrAuto(str))
-	return
+func ZifGetIncludePath() (string, bool) {
+	return zend.ZendIniGetValueEx("include_path")
 }
-func ZifRestoreIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
-	var key *types.String
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	key = types.NewString("include_path")
+func ZifRestoreIncludePath() {
+	key := "include_path"
 	zend.ZendRestoreIniEntry(key, core.PHP_INI_STAGE_RUNTIME)
-	// types.ZendStringEfree(key)
 }
-func ZifPrintR(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
-	var var_ *types.Zval
-	var do_return bool = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			var_ = fp.ParseZval()
-			fp.StartOptional()
-			do_return = fp.ParseBool()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	if do_return != 0 {
-		return_value.SetString(zend.ZendPrintZvalRToStr(var_, 0))
-		return
+func ZifPrintR(var_ *types.Zval, _ zpp.Opt, return_ bool) *types.Zval {
+	if return_ {
+		s := zend.ZendPrintZvalRToStr(var_, 0).GetStr()
+		return types.NewZvalString(s)
 	} else {
 		zend.ZendPrintZvalR(var_, 0)
-		return_value.SetTrue()
-		return
+		return types.NewZvalTrue()
 	}
 }
-func ZifConnectionAborted(executeData zpp.Ex, return_value zpp.Ret) {
-	return_value.SetLong(core.PG__().connection_status & core.PHP_CONNECTION_ABORTED)
-	return
+func ZifConnectionAborted() int {
+	return int(core.PG__().GetConnectionStatus()) & core.PHP_CONNECTION_ABORTED
 }
-func ZifConnectionStatus(executeData zpp.Ex, return_value zpp.Ret) {
-	return_value.SetLong(core.PG__().connection_status)
-	return
+func ZifConnectionStatus() int {
+	return int(core.PG__().GetConnectionStatus())
 }
-func ZifIgnoreUserAbort(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, value *types.Zval) {
-	var arg bool = 0
-	var old_setting int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 0, 1, 0)
-			fp.StartOptional()
-			arg = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifIgnoreUserAbort(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, enable *bool) int {
+	oldSetting := core.PG__().GetIgnoreUserAbort()
+	if enable != nil {
+		zend.ZendAlterIniEntryChars("ignore_user_abort", b.Cond(*enable, "1", "0"), core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
 	}
-	old_setting = uint16(core.PG__().ignore_user_abort)
-	if executeData.NumArgs() != 0 {
-		var key *types.String = types.NewString("ignore_user_abort")
-		zend.ZendAlterIniEntryChars(key.GetStr(), b.CastStr(b.Cond(arg != 0, "1", "0"), 1), core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
-		// types.ZendStringReleaseEx(key, 0)
-	}
-	return_value.SetLong(old_setting)
-	return
+	return b.Cond(oldSetting, 1, 0)
 }
 func ZifGetservbyname(executeData zpp.Ex, return_value zpp.Ret, service *types.Zval, protocol *types.Zval) {
 	var name *byte

@@ -150,6 +150,7 @@ func (pg *PhpCoreGlobals) GetInternalEncoding() *byte          { return pg.inter
 func (pg *PhpCoreGlobals) GetOutputEncoding() *byte            { return pg.output_encoding }
 func (pg *PhpCoreGlobals) GetArgSeparator() ArgSeparators      { return pg.arg_separator }
 func (pg *PhpCoreGlobals) GetVariablesOrder() *byte            { return pg.variables_order }
+func (pg *PhpCoreGlobals) GetConnectionStatus() int16          { return pg.connection_status }
 func (pg *PhpCoreGlobals) GetIgnoreUserAbort() bool            { return pg.ignore_user_abort }
 func (pg *PhpCoreGlobals) GetExposePhp() bool                  { return pg.expose_php }
 func (pg *PhpCoreGlobals) GetRegisterArgcArgv() bool           { return pg.register_argc_argv }

@@ -149,26 +149,18 @@ func ZendAlterIniEntryEx(name string, new_value *types.String, modify_type int, 
 	}
 	return true
 }
-func ZendRestoreIniEntry(name *types.String, stage int) int {
-	var ini_entry = EG__().IniDirectives().Get(name.GetStr())
-	if ini_entry == nil || stage == ZEND_INI_STAGE_RUNTIME && (ini_entry.GetModifiable()&ZEND_INI_USER) == 0 {
+func ZendRestoreIniEntry(name string, stage int) int {
+	var iniEntry = EG__().IniDirectives().Get(name)
+	if iniEntry == nil || stage == ZEND_INI_STAGE_RUNTIME && (iniEntry.GetModifiable()&ZEND_INI_USER) == 0 {
 		return types.FAILURE
 	}
 	if EG__().ModifiedIniDirectives() != nil {
-		if ZendRestoreIniEntryCb(ini_entry, stage) == 0 {
-			EG__().ModifiedIniDirectives().Del(name.GetStr())
+		if ZendRestoreIniEntryCb(iniEntry, stage) == 0 {
+			EG__().ModifiedIniDirectives().Del(name)
 		} else {
 			return types.FAILURE
 		}
 	}
-	return types.SUCCESS
-}
-func ZendIniRegisterDisplayer(name *byte, name_length uint32, displayer func(ini_entry *ZendIniEntry, type_ int)) int {
-	var ini_entry *ZendIniEntry = RegisteredZendIniDirectives.Get(b.CastStr(name, name_length))
-	if ini_entry == nil {
-		return types.FAILURE
-	}
-	ini_entry.SetDisplayer(displayer)
 	return types.SUCCESS
 }
 func ZendIniLong(name string, orig int) ZendLong {
@@ -211,66 +203,52 @@ func ZendIniStringExEx(name string, orig bool) (value string, exists bool) {
 	}
 	return "", false
 }
-func ZendIniStringEx(name string, orig int, exists *bool) *byte {
-	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
-	if ini_entry != nil {
-		if exists != nil {
-			*exists = 1
-		}
-		if orig != 0 && ini_entry.GetModified() != 0 {
-			if ini_entry.GetOrigValue() != nil {
-				return ini_entry.GetOrigValue().GetVal()
+
+func getIniString(name string, orig bool) (value string, exists bool) {
+	var iniEntry = EG__().IniDirectives().Get(name)
+	if iniEntry != nil {
+		if orig && iniEntry.GetModified() != 0 {
+			if iniEntry.GetOrigValue() != nil {
+				value = iniEntry.GetOrigValue().GetStr()
 			} else {
-				return nil
+				value = ""
 			}
 		} else {
-			if ini_entry.GetValue() != nil {
-				return ini_entry.GetValue().GetVal()
+			if iniEntry.GetValue() != nil {
+				value = iniEntry.GetValue().GetStr()
 			} else {
-				return nil
+				value = ""
 			}
 		}
-	} else {
-		if exists != nil {
-			*exists = 0
-		}
-		return nil
+		return value, true
 	}
+	return "", false
+}
+
+func ZendIniStringEx(name string, orig int, exists *bool) *byte {
+	value, exists_ := getIniString(name, orig != 0)
+	if exists != nil {
+		*exists = exists_
+	}
+	return b.CastStrPtr(value)
 }
 func ZendIniString(name string, orig int) *byte {
-	var exists bool = 1
-	var return_value *byte
-	return_value = ZendIniStringEx(name, orig, &exists)
-	if exists == 0 {
+	value, exists_ := getIniString(name, orig != 0)
+	if exists_ {
+		return b.CastStrPtr(value)
+	} else {
 		return nil
-	} else if return_value == nil {
-		return_value = ""
 	}
-	return return_value
 }
 func ZendIniGetValueEx(name string) (string, bool) {
-	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
-	if ini_entry != nil {
-		if ini_entry.GetValue() != nil {
-			return ini_entry.GetValue().GetStr(), true
-		} else {
-			return "", true
-		}
-	} else {
-		return "", false
-	}
+	return getIniString(name, false)
 }
 func ZendIniGetValue(name string) *types.String {
-	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
-	if ini_entry != nil {
-		if ini_entry.GetValue() != nil {
-			return ini_entry.GetValue()
-		} else {
-			return types.NewString("")
-		}
-	} else {
-		return nil
+	value, exists := getIniString(name, false)
+	if exists {
+		return types.NewString(value)
 	}
+	return nil
 }
 func ZendIniStringParseBool(str string) bool {
 	if str == "true" || str == "yes" || str == "on" {
