@@ -16,13 +16,18 @@ var DefZifConstant = def.DefFunc("constant", 1, 1, []def.ArgInfo{{Name: "const_n
 })
 
 // generate by ZifInetNtop
-var DefZifInetNtop = def.DefFunc("inet_ntop", 1, 1, []def.ArgInfo{{Name: "in_addr"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifInetNtop = def.DefFunc("inet_ntop", 1, 1, []def.ArgInfo{{Name: "ip"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	in_addr := fp.ParseZval()
+	ip := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifInetNtop(executeData, returnValue, in_addr)
+	ret, ok := ZifInetNtop(ip)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifInetPton
@@ -32,27 +37,38 @@ var DefZifInetPton = def.DefFunc("inet_pton", 1, 1, []def.ArgInfo{{Name: "ip_add
 	if fp.HasError() {
 		return
 	}
-	ZifInetPton(executeData, returnValue, ip_address)
+	ret, ok := ZifInetPton(ip_address)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifIp2long
 var DefZifIp2long = def.DefFunc("ip2long", 1, 1, []def.ArgInfo{{Name: "ip_address"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	ip_address := fp.ParseZval()
+	ip_address := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifIp2long(executeData, returnValue, ip_address)
+	ret, ok := ZifIp2long(ip_address)
+	if ok {
+		returnValue.SetLong(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifLong2ip
-var DefZifLong2ip = def.DefFunc("long2ip", 1, 1, []def.ArgInfo{{Name: "proper_address"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifLong2ip = def.DefFunc("long2ip", 1, 1, []def.ArgInfo{{Name: "ip_address"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	proper_address := fp.ParseZval()
+	ip_address := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifLong2ip(executeData, returnValue, proper_address)
+	ret := ZifLong2ip(ip_address)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifGetenv
@@ -64,7 +80,7 @@ var DefZifGetenv = def.DefFunc("getenv", 0, 2, []def.ArgInfo{{Name: "varname"}, 
 	if fp.HasError() {
 		return
 	}
-	ret := ZifGetenv(returnValue, nil, varname_, local_only)
+	ret := ZifGetenv(nil, varname_, local_only)
 	returnValue.SetBy(ret)
 })
 
@@ -80,16 +96,16 @@ var DefZifPutenv = def.DefFunc("putenv", 1, 1, []def.ArgInfo{{Name: "setting"}},
 })
 
 // generate by ZifGetopt
-var DefZifGetopt = def.DefFunc("getopt", 1, 3, []def.ArgInfo{{Name: "options"}, {Name: "opts"}, {Name: "optind"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifGetopt = def.DefFunc("getopt", 1, 3, []def.ArgInfo{{Name: "short_options"}, {Name: "long_options"}, {Name: "optind"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
-	options_ := fp.ParseZval()
+	short_options := fp.ParseStringVal()
 	fp.StartOptional()
-	opts_ := fp.ParseZval()
+	long_options := fp.ParseArrayHt()
 	optind := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
 		return
 	}
-	ZifGetopt(executeData, returnValue, options_, nil, opts_, optind)
+	ZifGetopt(executeData, returnValue, short_options, nil, long_options, optind)
 })
 
 // generate by ZifFlush
@@ -97,48 +113,56 @@ var DefZifFlush = def.DefFunc("flush", 0, 0, []def.ArgInfo{}, func(executeData z
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifFlush(executeData, returnValue)
+	ZifFlush()
 })
 
 // generate by ZifSleep
 var DefZifSleep = def.DefFunc("sleep", 1, 1, []def.ArgInfo{{Name: "seconds"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	seconds := fp.ParseZval()
+	seconds := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifSleep(executeData, returnValue, seconds)
+	ret, ok := ZifSleep(seconds)
+	if ok {
+		returnValue.SetLong(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifUsleep
 var DefZifUsleep = def.DefFunc("usleep", 1, 1, []def.ArgInfo{{Name: "micro_seconds"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	micro_seconds := fp.ParseZval()
+	micro_seconds := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifUsleep(executeData, returnValue, micro_seconds)
+	ret := ZifUsleep(micro_seconds)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifTimeNanosleep
 var DefZifTimeNanosleep = def.DefFunc("time_nanosleep", 2, 2, []def.ArgInfo{{Name: "seconds"}, {Name: "nanoseconds"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	seconds := fp.ParseZval()
-	nanoseconds := fp.ParseZval()
+	seconds := fp.ParseLong()
+	nanoseconds := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifTimeNanosleep(executeData, returnValue, seconds, nanoseconds)
+	ret := ZifTimeNanosleep(seconds, nanoseconds)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifTimeSleepUntil
 var DefZifTimeSleepUntil = def.DefFunc("time_sleep_until", 1, 1, []def.ArgInfo{{Name: "timestamp"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	timestamp := fp.ParseZval()
+	timestamp := fp.ParseDouble()
 	if fp.HasError() {
 		return
 	}
-	ZifTimeSleepUntil(executeData, returnValue, timestamp)
+	ret := ZifTimeSleepUntil(timestamp)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifGetCurrentUser
@@ -146,7 +170,8 @@ var DefZifGetCurrentUser = def.DefFunc("get_current_user", 0, 0, []def.ArgInfo{}
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetCurrentUser()
+	ret := ZifGetCurrentUser()
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifGetCfgVar

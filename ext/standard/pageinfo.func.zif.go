@@ -10,7 +10,12 @@ var DefZifGetmyuid = def.DefFunc("getmyuid", 0, 0, []def.ArgInfo{}, func(execute
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetmyuid()
+	ret, ok := ZifGetmyuid()
+	if ok {
+		returnValue.SetLong(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifGetmygid
@@ -18,7 +23,12 @@ var DefZifGetmygid = def.DefFunc("getmygid", 0, 0, []def.ArgInfo{}, func(execute
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetmygid()
+	ret, ok := ZifGetmygid()
+	if ok {
+		returnValue.SetLong(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifGetmypid
@@ -26,7 +36,8 @@ var DefZifGetmypid = def.DefFunc("getmypid", 0, 0, []def.ArgInfo{}, func(execute
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetmypid()
+	ret := ZifGetmypid()
+	returnValue.SetLong(ret)
 })
 
 // generate by ZifGetmyinode
@@ -34,7 +45,12 @@ var DefZifGetmyinode = def.DefFunc("getmyinode", 0, 0, []def.ArgInfo{}, func(exe
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetmyinode()
+	ret, ok := ZifGetmyinode()
+	if ok {
+		returnValue.SetLong(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifGetlastmod
@@ -42,5 +58,10 @@ var DefZifGetlastmod = def.DefFunc("getlastmod", 0, 0, []def.ArgInfo{}, func(exe
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGetlastmod(executeData, returnValue)
+	ret, ok := ZifGetlastmod(executeData, returnValue)
+	if ok {
+		returnValue.SetLong(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })

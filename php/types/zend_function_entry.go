@@ -67,5 +67,3 @@ func (this *FunctionEntry) HasFlags(value uint32) bool { return this.flags&value
 func (this FunctionEntry) IsPppMask() bool             { return this.HasFlags(AccPppMask) }
 func (this FunctionEntry) IsAbstract() bool            { return this.HasFlags(AccAbstract) }
 func (this FunctionEntry) IsStatic() bool              { return this.HasFlags(AccStatic) }
-
-

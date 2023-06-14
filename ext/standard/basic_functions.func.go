@@ -13,8 +13,10 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
+	"net"
 	"os"
 	"strings"
+	"time"
 )
 
 func BG__() *PhpBasicGlobals { return &BasicGlobals }
@@ -220,143 +222,74 @@ func ZifConstant(returnValue zpp.Ret, constName string) {
 		return
 	}
 }
-func ZifInetNtop(executeData zpp.Ex, return_value zpp.Ret, inAddr *types.Zval) {
-	var address *byte
-	var address_len int
-	var af int = AF_INET
-	var buffer []byte
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			address, address_len = fp.ParseString()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	if address_len == 16 {
-		af = AF_INET6
-	} else if address_len != 4 {
-		return_value.SetFalse()
-		return
-	}
-	if !(inet_ntop(af, address, buffer, b.SizeOf("buffer"))) {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetStringVal(b.CastStrAuto(buffer))
-	return
-}
-func ZifInetPton(executeData zpp.Ex, return_value zpp.Ret, ipAddress string) {
-	var ret int
-	var af int = AF_INET
-	var address *byte
-	var address_len int
-	var buffer []byte
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			address, address_len = fp.ParseString()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	memset(buffer, 0, b.SizeOf("buffer"))
-	if strchr(address, ':') {
-		af = AF_INET6
-	} else if !(strchr(address, '.')) {
-		return_value.SetFalse()
-		return
-	}
-	ret = inet_pton(af, address, buffer)
-	if ret <= 0 {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetStringVal(b.CastStr(buffer, b.Cond(af == AF_INET, 4, 16)))
-	return
-}
-func ZifIp2long(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types.Zval) {
-	var addr *byte
-	var addr_len int
-	var ip __struct__in_addr
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			addr, addr_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if addr_len == 0 || inet_pton(AF_INET, addr, &ip) != 1 {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetLong(ntohl(ip.s_addr))
-	return
-}
-func ZifLong2ip(executeData zpp.Ex, return_value zpp.Ret, properAddress *types.Zval) {
-	var ip zend.ZendUlong
-	var sip zend.ZendLong
-	var myaddr __struct__in_addr
-	var str []byte
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			sip = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
 
-	/* autoboxes on 32bit platforms, but that's expected */
-
-	ip = zend.ZendUlong(sip)
-	myaddr.s_addr = htonl(ip)
-	if inet_ntop(AF_INET, &myaddr, str, b.SizeOf("str")) {
-		return_value.SetStringVal(b.CastStrAuto(str))
-		return
+/**
+ * 压缩IP转人类可读IP.
+ * e.g.
+ *     inet_ntop("\x7f\x00\x00\x01") == "127.0.0.1"
+ * 	   inet_ntop("\x7f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01") == "7f00::1"
+ */
+func ZifInetNtop(ip string) (string, bool) {
+	if len(ip) == 4 || len(ip) == 16 {
+		return net.IP(ip).String(), true
 	} else {
-		return_value.SetFalse()
-		return
+		return "", false
 	}
 }
-func ZifGetenv(return_value zpp.Ret, _ zpp.Opt, varname_ *string, localOnly bool) *types.Zval {
+
+/**
+ * 人类可读IP转压缩IP，inet_ntop 的逆操作
+ */
+func ZifInetPton(ipAddress string) (string, bool) {
+	ip := net.ParseIP(ipAddress)
+	if ip == nil {
+		return "", false
+	}
+	if ipV4 := ip.To4(); ipV4 != nil {
+		return string(ipV4), true
+	} else {
+		return string(ip), true
+	}
+}
+func ZifIp2long(ipAddress string) (int, bool) {
+	ipV4 := net.ParseIP(ipAddress).To4()
+	if ipV4 == nil {
+		return 0, false
+	}
+
+	bytes := []byte(ipV4)
+	num := int(bytes[0])<<24 + int(bytes[1])<<16 + int(bytes[2])<<8 + int(bytes[3])
+	//return_value.SetLong(ntohl(ip.s_addr))
+	return num, true
+}
+func ZifLong2ip(ipAddress int) string {
+	/* autoboxes on 32bit platforms, but that's expected */
+	ip := net.IPv4(
+		byte(ipAddress>>24),
+		byte(ipAddress>>16),
+		byte(ipAddress>>8),
+		byte(ipAddress),
+	)
+	return ip.String()
+}
+func ZifGetenv(_ zpp.Opt, varname_ *string, localOnly bool) *types.Zval {
 	if varname_ == nil {
 		arr := core.DupEnvVariables()
 		return types.NewZvalArray(arr)
 	}
+
 	env := core.Env__()
 
-	var ptr *byte
-	var varname = b.Option(varname_, "")
-
+	var varName = b.Option(varname_, "")
 	if localOnly {
-		ptr = core.SapiGetenv(varname)
+		ptr := core.SapiGetenv(varName)
 		if ptr != nil {
-			// TODO: avoid realocation ???
-
-			return_value.SetStringVal(b.CastStrAuto(ptr))
-			zend.Efree(ptr)
-			return
+			return types.NewZvalString(*ptr)
 		}
 	}
 
 	/* system method */
-	if val, ok := env.LookupEnv(varname); ok {
+	if val, ok := env.LookupEnv(varName); ok {
 		return types.NewZvalString(val)
 	}
 	return types.NewZvalFalse()
@@ -391,27 +324,6 @@ func ZifPutenv(setting string) bool {
 
 	return true
 }
-func FreeArgv(argv **byte, argc int) {
-	var i int
-	if argv != nil {
-		for i = 0; i < argc; i++ {
-			if argv[i] != nil {
-				zend.Efree(argv[i])
-			}
-		}
-		zend.Efree(argv)
-	}
-}
-func FreeLongopts(longopts *core.Opt) {
-	var p *core.Opt
-	if longopts != nil {
-		for p = longopts; p != nil && p.GetOptChar() != '-'; p++ {
-			if p.GetOptName() != nil {
-				zend.Efree((*byte)(p.GetOptName()))
-			}
-		}
-	}
-}
 func ParseOpts(opts *byte, result **core.Opt) int {
 	var paras *core.Opt = nil
 	var i uint
@@ -440,42 +352,27 @@ func ParseOpts(opts *byte, result **core.Opt) int {
 	}
 	return count
 }
-func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _ zpp.Opt, opts_ *types.Zval, optind zpp.RefZval) {
-	var options *byte = nil
+func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ zpp.Opt, longOptions *types.Array, optind zpp.RefZval) {
+	var options *byte = shortOptions
+	var options_len int = len(shortOptions)
+	var p_longopts *types.Zval = longOptions
+	var zoptind *types.Zval = optind
+
 	var argv **byte = nil
 	var opt []byte = []byte{'0'}
 	var optname *byte
 	var argc int = 0
 	var o int
-	var options_len int = 0
 	var len_ int
 	var php_optarg *byte = nil
 	var php_optind int = 1
 	var val types.Zval
 	var args *types.Zval = nil
-	var p_longopts *types.Zval = nil
-	var zoptind *types.Zval = nil
 	var optname_len int = 0
 	var opts *core.Opt
 	var orig_opts *core.Opt
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			options, options_len = fp.ParseString()
-			fp.StartOptional()
-			p_longopts = fp.ParseArray()
-			zoptind = fp.ParseZval()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
 
 	/* Init zoptind to 1 */
-
 	if zoptind != nil {
 		zend.ZEND_TRY_ASSIGN_REF_LONG(zoptind, 1)
 	}
@@ -483,7 +380,6 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 	/* Get argv from the global symbol table. We calculate argc ourselves
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
-
 	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobal("_SERVER")) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
 		var pos int = 0
 		if !args.IsArray() {
@@ -640,146 +536,62 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options_ *types.Zval, _
 	if zoptind != nil {
 		zend.ZEND_TRY_ASSIGN_REF_LONG(zoptind, php_optind)
 	}
-	FreeLongopts(orig_opts)
 	zend.Efree(orig_opts)
-	FreeArgv(argv, argc)
 }
-func ZifFlush(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
+func ZifFlush() {
 	core.SapiFlush()
 }
-func ZifSleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types.Zval) {
-	var num zend.ZendLong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseLong()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	if num < 0 {
+func ZifSleep(seconds int) (int, bool) {
+	if seconds < 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of seconds must be greater than or equal to 0")
-		return_value.SetFalse()
-		return
+		return 0, false
 	}
-	return_value.SetLong(core.PhpSleep(uint(num)))
-	return
+	rest := zend.Sleep(time.Duration(seconds) * time.Second)
+	return int(rest.Seconds()), true
 }
-func ZifUsleep(executeData zpp.Ex, return_value zpp.Ret, microSeconds *types.Zval) {
-	var num zend.ZendLong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			num = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if num < 0 {
+func ZifUsleep(microSeconds int) *types.Zval {
+	if microSeconds < 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of microseconds must be greater than or equal to 0")
-		return_value.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
-	usleep(uint(num))
+	zend.Sleep(time.Duration(microSeconds) * time.Microsecond)
+	return types.NewZvalNull()
 }
-func ZifTimeNanosleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types.Zval, nanoseconds *types.Zval) {
-	var tv_sec zend.ZendLong
-	var tv_nsec zend.ZendLong
-	var php_req __struct__timespec
-	var php_rem __struct__timespec
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			tv_sec = fp.ParseLong()
-			tv_nsec = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if tv_sec < 0 {
+func ZifTimeNanosleep(seconds int, nanoseconds int) *types.Zval {
+	if seconds < 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The seconds value must be greater than 0")
-		return_value.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
-	if tv_nsec < 0 {
+	if nanoseconds < 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The nanoseconds value must be greater than 0")
-		return_value.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
-	php_req.tv_sec = int64(tv_sec)
-	php_req.tv_nsec = long(tv_nsec)
-	if !(nanosleep(&php_req, &php_rem)) {
-		return_value.SetTrue()
-		return
-	} else if errno == EINTR {
-		zend.ArrayInit(return_value)
-		zend.AddAssocLongEx(return_value, "seconds", php_rem.tv_sec)
-		zend.AddAssocLongEx(return_value, "nanoseconds", php_rem.tv_nsec)
-		return
-	} else if errno == EINVAL {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "nanoseconds was not in the range 0 to 999 999 999 or seconds was negative")
+
+	duration := time.Duration(seconds)*time.Second + time.Duration(nanoseconds)*time.Nanosecond
+	rest := zend.Sleep(duration)
+	if rest == 0 {
+		return types.NewZvalTrue()
+	} else {
+		arr := types.NewArray(2)
+		arr.KeyAdd("seconds", types.NewZvalLong(int(rest.Seconds())))
+		arr.KeyAdd("nanoseconds", types.NewZvalLong(int(rest.Nanoseconds())%int(time.Second)))
+		return types.NewZvalArray(arr)
 	}
-	return_value.SetFalse()
-	return
 }
-func ZifTimeSleepUntil(executeData zpp.Ex, return_value zpp.Ret, timestamp *types.Zval) {
-	var target_secs float64
-	var tm __struct__timeval
-	var php_req __struct__timespec
-	var php_rem __struct__timespec
-	var current_ns uint64
-	var target_ns uint64
-	var diff_ns uint64
-	var ns_per_sec uint64 = 1000000000
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			target_secs = fp.ParseDouble()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if gettimeofday((*__struct__timeval)(&tm), nil) != 0 {
-		return_value.SetFalse()
-		return
-	}
-	target_ns = uint64(target_secs * ns_per_sec)
-	current_ns = uint64(tm.tv_sec)*ns_per_sec + uint64(tm.tv_usec)*1000
-	if target_ns < current_ns {
+func ZifTimeSleepUntil(timestamp float64) *types.Zval {
+	targetTime := time.UnixMilli(int64(timestamp * float64(time.Second)))
+
+	if targetTime.Before(time.Now()) {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Sleep until to time is less than current time")
-		return_value.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
-	diff_ns = target_ns - current_ns
-	php_req.tv_sec = time_t(diff_ns / ns_per_sec)
-	php_req.tv_nsec = long(diff_ns % ns_per_sec)
-	for nanosleep(&php_req, &php_rem) {
-		if errno == EINTR {
-			php_req.tv_sec = php_rem.tv_sec
-			php_req.tv_nsec = php_rem.tv_nsec
-		} else {
-			return_value.SetFalse()
-			return
-		}
+
+	rest := zend.SleepUtil(targetTime)
+	if rest == 0 {
+		return types.NewZvalTrue()
+	} else {
+		return types.NewZvalFalse()
 	}
-	return_value.SetTrue()
-	return
 }
 func ZifGetCurrentUser() string {
 	return zend.CurrEntrance().UserName()

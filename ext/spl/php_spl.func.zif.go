@@ -91,12 +91,12 @@ var DefZifSplAutoloadExtensions = def.DefFunc("spl_autoload_extensions", 0, 1, [
 
 // generate by ZifSplAutoloadCall
 var DefZifSplAutoloadCall = def.DefFunc("spl_autoload_call", 1, 1, []def.ArgInfo{{Name: "class_name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	class_name := fp.ParseZval()
+	fp := zpp.FastParseStart(executeData, 1, 1, zpp.FlagOldMode)
+	class_name := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifSplAutoloadCall(executeData, returnValue, class_name)
+	ZifSplAutoloadCall(executeData, class_name)
 })
 
 // generate by ZifSplAutoloadRegister
@@ -115,12 +115,13 @@ var DefZifSplAutoloadRegister = def.DefFunc("spl_autoload_register", 0, 3, []def
 
 // generate by ZifSplAutoloadUnregister
 var DefZifSplAutoloadUnregister = def.DefFunc("spl_autoload_unregister", 1, 1, []def.ArgInfo{{Name: "autoload_function"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	fp := zpp.FastParseStart(executeData, 1, 1, zpp.FlagOldMode)
 	autoload_function := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifSplAutoloadUnregister(autoload_function)
+	ret := ZifSplAutoloadUnregister(autoload_function)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifSplAutoloadFunctions

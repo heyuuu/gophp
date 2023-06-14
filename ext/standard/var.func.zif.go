@@ -28,13 +28,13 @@ var DefZifDebugZvalDump = def.DefFunc("debug_zval_dump", 0, -1, []def.ArgInfo{{N
 // generate by ZifVarExport
 var DefZifVarExport = def.DefFunc("var_export", 1, 2, []def.ArgInfo{{Name: "var"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	var_ := fp.ParseZval()
+	var__ := fp.ParseZval()
 	fp.StartOptional()
 	return_ := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifVarExport(executeData, returnValue, var_, nil, return_)
+	ZifVarExport(executeData, returnValue, var__, nil, return_)
 })
 
 // generate by ZifSerialize
@@ -44,7 +44,8 @@ var DefZifSerialize = def.DefFunc("serialize", 1, 1, []def.ArgInfo{{Name: "var"}
 	if fp.HasError() {
 		return
 	}
-	ZifSerialize(var_)
+	ret := ZifSerialize(var_)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifUnserialize
@@ -63,20 +64,22 @@ var DefZifUnserialize = def.DefFunc("unserialize", 1, 2, []def.ArgInfo{{Name: "v
 var DefZifMemoryGetUsage = def.DefFunc("memory_get_usage", 0, 1, []def.ArgInfo{{Name: "real_usage"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
-	real_usage := fp.ParseZval()
+	real_usage := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifMemoryGetUsage(nil, real_usage)
+	ret := ZifMemoryGetUsage(nil, real_usage)
+	returnValue.SetLong(ret)
 })
 
 // generate by ZifMemoryGetPeakUsage
 var DefZifMemoryGetPeakUsage = def.DefFunc("memory_get_peak_usage", 0, 1, []def.ArgInfo{{Name: "real_usage"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
-	real_usage := fp.ParseZval()
+	real_usage := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifMemoryGetPeakUsage(nil, real_usage)
+	ret := ZifMemoryGetPeakUsage(nil, real_usage)
+	returnValue.SetLong(ret)
 })

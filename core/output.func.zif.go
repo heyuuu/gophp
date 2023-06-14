@@ -102,7 +102,7 @@ var DefZifObListHandlers = def.DefFunc("ob_list_handlers", 0, 0, []def.ArgInfo{}
 var DefZifObGetStatus = def.DefFunc("ob_get_status", 0, 1, []def.ArgInfo{{Name: "full_status"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
-	full_status := fp.ParseZval()
+	full_status := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
