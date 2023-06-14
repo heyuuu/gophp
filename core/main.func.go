@@ -684,20 +684,15 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 
 	/* check for repeated errors to be ignored */
 
-	if PG__().ignore_repeated_errors && PG__().last_error_message {
-
+	lastError := PG__().LastError()
+	if PG__().ignore_repeated_errors && lastError != nil {
 		/* no check for PG__().last_error_file is needed since it cannot
 		 * be NULL if PG__().last_error_message is not NULL */
-
-		if strcmp(PG__().last_error_message, buffer) || !(PG__().ignore_repeated_source) && (PG__().last_error_lineno != int(error_lineno) || strcmp(PG__().last_error_file, error_filename)) {
+		if lastError.Message != buffer || (!PG__().ignore_repeated_source && lastError.Lineno != int(error_lineno)) || lastError.File != error_filename {
 			display = 1
 		} else {
 			display = 0
 		}
-
-		/* no check for PG__().last_error_file is needed since it cannot
-		 * be NULL if PG__().last_error_message is not NULL */
-
 	} else {
 		display = 1
 	}
@@ -749,23 +744,10 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	/* store the error if it has changed */
 
 	if display != 0 {
-		if PG__().last_error_message {
-			var s = PG__().last_error_message
-			PG__().last_error_message = nil
-			zend.Free(s)
-		}
-		if PG__().last_error_file {
-			var s = PG__().last_error_file
-			PG__().last_error_file = nil
-			zend.Free(s)
-		}
 		if error_filename == nil {
 			error_filename = "Unknown"
 		}
-		PG__().last_error_type = type_
-		PG__().last_error_message = strdup(buffer)
-		PG__().last_error_file = strdup(error_filename)
-		PG__().last_error_lineno = error_lineno
+		PG__().AddLastError(type_, strdup(buffer), strdup(error_filename), error_lineno)
 	}
 
 	/* display/log the error if necessary */
@@ -964,14 +946,7 @@ func PhpResolvePathForZend(filename string) *string {
 	return &result
 }
 func PhpFreeRequestGlobals() {
-	if PG__().last_error_message {
-		zend.Free(PG__().last_error_message)
-		PG__().last_error_message = nil
-	}
-	if PG__().last_error_file {
-		zend.Free(PG__().last_error_file)
-		PG__().last_error_file = nil
-	}
+	PG__().ClearLastError()
 	if PG__().php_sys_temp_dir {
 		zend.Efree(PG__().php_sys_temp_dir)
 		PG__().php_sys_temp_dir = nil
@@ -1088,11 +1063,11 @@ func PhpRequestShutdown() {
 
 	/* 3. Flush all output buffers */
 	faults.Try(func() {
-		var send_buffer = b.Cond(SG__().RequestInfo.headersOnly, 0, 1)
-		if zend.CG__().GetUncleanShutdown() && PG__().last_error_type == faults.E_ERROR && PG__().memory_limit < zend.ZendMemoryUsage(1) {
-			send_buffer = 0
+		var sendBuffer = b.Cond(SG__().RequestInfo.headersOnly, 0, 1)
+		if zend.CG__().GetUncleanShutdown() && PG__().LastError() != nil && PG__().LastError().Type == faults.E_ERROR && PG__().memory_limit < zend.ZendMemoryUsage(true) {
+			sendBuffer = 0
 		}
-		if send_buffer == 0 {
+		if sendBuffer == 0 {
 			PhpOutputDiscardAll()
 		} else {
 			PhpOutputEndAll()
@@ -1171,12 +1146,7 @@ func PhpRequestShutdown() {
 	/* 16. Deactivate Zend signals */
 }
 func CoreGlobalsDtor(core_globals *PhpCoreGlobals) {
-	if core_globals.GetLastErrorMessage() != nil {
-		zend.Free(core_globals.GetLastErrorMessage())
-	}
-	if core_globals.GetLastErrorFile() != nil {
-		zend.Free(core_globals.GetLastErrorFile())
-	}
+	core_globals.ClearLastError()
 	if core_globals.GetDisableFunctions() != nil {
 		zend.Free(core_globals.GetDisableFunctions())
 	}

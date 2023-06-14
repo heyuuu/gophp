@@ -596,50 +596,35 @@ func ZifTimeSleepUntil(timestamp float64) *types.Zval {
 func ZifGetCurrentUser() string {
 	return zend.CurrEntrance().UserName()
 }
-func AddConfigEntries(hash *types.Array, retval *types.Zval) {
+
+func parseConfigArray(hash *types.Array) *types.Array {
+	arr := types.NewArray(0)
 	hash.Foreach(func(key types.ArrayKey, value *types.Zval) {
 		if value.IsString() {
 			if key.IsStrKey() {
-				zend.AddAssocStrEx(retval, key.StrKey(), value.StringVal())
+				arr.SymtableUpdate(key.StrKey(), types.NewZvalString(value.StringVal()))
 			} else {
-				zend.AddIndexStrEx(retval, key.IdxKey(), value.StringVal())
+				arr.IndexUpdate(key.IdxKey(), types.NewZvalString(value.StringVal()))
 			}
-		} else if value.IsType(types.IS_ARRAY) {
-			var tmp types.Zval
-			zend.ArrayInit(&tmp)
-			AddConfigEntries(value.Array(), &tmp)
-			retval.Array().KeyUpdate(key.StrKey(), &tmp)
+		} else if value.IsArray() {
+			tmp := parseConfigArray(value.Array())
+			arr.KeyAdd(key.StrKey(), types.NewZvalArray(tmp))
 		}
 	})
+	return arr
 }
-func ZifGetCfgVar(executeData zpp.Ex, return_value zpp.Ret, optionName *types.Zval) {
-	var varname *byte
-	var varname_len int
-	var retval *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			varname, varname_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	retval = core.CfgGetEntry(b.CastStr(varname, varname_len))
+
+func ZifGetCfgVar(optionName string) *types.Zval {
+	retval := core.CfgGetEntry(optionName)
 	if retval != nil {
 		if retval.IsType(types.IS_ARRAY) {
-			zend.ArrayInit(return_value)
-			AddConfigEntries(retval.Array(), return_value)
-			return
+			arr := parseConfigArray(retval.Array())
+			return types.NewZvalArray(arr)
 		} else {
-			return_value.SetStringVal(b.CastStrAuto(retval.String().GetVal()))
-			return
+			return types.NewZvalString(retval.StringVal())
 		}
 	} else {
-		return_value.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
 }
 func ZifGetMagicQuotesRuntime(executeData zpp.Ex, return_value zpp.Ret) {
@@ -656,103 +641,56 @@ func ZifGetMagicQuotesGpc(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetFalse()
 	return
 }
-func ZifErrorLog(executeData zpp.Ex, return_value zpp.Ret, message *types.Zval, _ zpp.Opt, messageType *types.Zval, destination *types.Zval, extraHeaders *types.Zval) {
-	var message *byte
-	var opt *byte = nil
-	var headers *byte = nil
-	var message_len int
-	var opt_len int = 0
-	var headers_len int = 0
-	var opt_err int = 0
-	var argc int = executeData.NumArgs()
-	var erropt zend.ZendLong = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 4, 0)
-			message, message_len = fp.ParseString()
-			fp.StartOptional()
-			erropt = fp.ParseLong()
-			opt, opt_len = fp.ParsePath()
-			headers, headers_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if argc > 1 {
-		opt_err = int(erropt)
-	}
-	if _phpErrorLogEx(opt_err, message, message_len, opt, headers) == types.FAILURE {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetTrue()
-	return
-}
-func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, headers *byte) int {
+func ZifErrorLog(message string, _ zpp.Opt, messageType int, destination *zpp.Path, extraHeaders *string) bool {
 	var stream *core.PhpStream = nil
 	var nbytes int
-	switch opt_err {
-	case 1:
-		if PhpMail(opt, "PHP error_log message", message, headers, nil) == 0 {
-			return types.FAILURE
+	switch messageType {
+	case 1: /*send an email */
+		if PhpMail(destination, "PHP error_log message", message, extraHeaders, nil) == 0 {
+			return false
 		}
-	case 2:
+	case 2: /*send to an address */
 		core.PhpErrorDocref(nil, faults.E_WARNING, "TCP/IP option not available!")
-		return types.FAILURE
-	case 3:
-		stream = core.PhpStreamOpenWrapper(opt, "a", core.IGNORE_URL_WIN|core.REPORT_ERRORS, nil)
+		return false
+	case 3: /*save to a file */
+		stream = core.PhpStreamOpenWrapper(destination, "a", core.IGNORE_URL_WIN|core.REPORT_ERRORS, nil)
 		if stream == nil {
-			return types.FAILURE
+			return false
 		}
-		nbytes = core.PhpStreamWrite(stream, message, message_len)
+		nbytes = core.PhpStreamWriteString(stream, message)
 		core.PhpStreamClose(stream)
-		if nbytes != message_len {
-			return types.FAILURE
+		if nbytes != len(message) {
+			return false
 		}
-	case 4:
+	case 4: /* send to SAPI */
 		if core.SM__().GetLogMessage() != nil {
 			core.SM__().GetLogMessage()(message, -1)
 		} else {
-			return types.FAILURE
+			return false
 		}
 	default:
 		core.PhpLogErrWithSeverity(message, LOG_NOTICE)
 	}
-	return types.SUCCESS
+	return true
 }
-func ZifErrorGetLast(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	if core.PG__().last_error_message {
-		zend.ArrayInit(return_value)
-		zend.AddAssocLongEx(return_value, "type", core.PG__().last_error_type)
-		zend.AddAssocStr(return_value, "message", b.CastStrAuto(core.PG__().last_error_message))
-		if core.PG__().last_error_file {
-			zend.AddAssocStr(return_value, "file", b.CastStrAuto(core.PG__().last_error_file))
+func ZifErrorGetLast() *types.Zval {
+	lastError := core.PG__().LastError()
+	if lastError != nil {
+		arr := types.NewArray(4)
+		arr.KeyAdd("type", types.NewZvalLong(lastError.Type))
+		arr.KeyAdd("message", types.NewZvalString(lastError.Message))
+		if lastError.File != "" {
+			arr.KeyAdd("file", types.NewZvalString(lastError.File))
 		} else {
-			zend.AddAssocStr(return_value, "file", "-")
+			arr.KeyAdd("file", types.NewZvalString("-"))
 		}
-		zend.AddAssocLongEx(return_value, "line", core.PG__().last_error_lineno)
+		arr.KeyAdd("line", types.NewZvalLong(lastError.Lineno))
+		return types.NewZvalArray(arr)
 	}
+	return types.NewZvalNull()
 }
-func ZifErrorClearLast(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	if core.PG__().last_error_message {
-		core.PG__().last_error_type = 0
-		core.PG__().last_error_lineno = 0
-		zend.Free(core.PG__().last_error_message)
-		core.PG__().last_error_message = nil
-		if core.PG__().last_error_file {
-			zend.Free(core.PG__().last_error_file)
-			core.PG__().last_error_file = nil
-		}
-	}
+func ZifErrorClearLast() {
+	core.PG__().ClearLastError()
 }
 func ZifCallUserFunc(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
 	var retval types.Zval

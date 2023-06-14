@@ -181,7 +181,7 @@ var DefZifGetCfgVar = def.DefFunc("get_cfg_var", 1, 1, []def.ArgInfo{{Name: "opt
 	if fp.HasError() {
 		return
 	}
-	ZifGetCfgVar(executeData, returnValue, option_name)
+	ZifGetCfgVar(option_name)
 })
 
 // generate by ZifGetMagicQuotesRuntime
@@ -211,7 +211,7 @@ var DefZifErrorLog = def.DefFunc("error_log", 1, 4, []def.ArgInfo{{Name: "messag
 	if fp.HasError() {
 		return
 	}
-	ZifErrorLog(executeData, returnValue, message, nil, message_type, destination, extra_headers)
+	ZifErrorLog(message, nil, message_type, destination, extra_headers)
 })
 
 // generate by ZifErrorGetLast
@@ -219,7 +219,7 @@ var DefZifErrorGetLast = def.DefFunc("error_get_last", 0, 0, []def.ArgInfo{}, fu
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifErrorGetLast(executeData, returnValue)
+	ZifErrorGetLast()
 })
 
 // generate by ZifErrorClearLast
@@ -227,7 +227,7 @@ var DefZifErrorClearLast = def.DefFunc("error_clear_last", 0, 0, []def.ArgInfo{}
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifErrorClearLast(executeData, returnValue)
+	ZifErrorClearLast()
 })
 
 // generate by ZifCallUserFunc
