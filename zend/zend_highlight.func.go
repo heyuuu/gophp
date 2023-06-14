@@ -25,29 +25,30 @@ func ZendHtmlPutc(c byte) {
 	}
 }
 func ZendHtmlPuts(s *byte, len_ int) {
-	var ptr *uint8 = (*uint8)(s)
-	var end *uint8 = ptr + len_
-	var filtered *uint8 = nil
-	var filtered_len int
-	if INI_SCNG__().output_filter {
-		INI_SCNG__().output_filter(&filtered, &filtered_len, ptr, len_)
-		ptr = filtered
-		end = filtered + filtered_len
+	ZendHtmlPutsEx(b.CastStr(s, len_))
+}
+func ZendHtmlPutsEx(s string) {
+	//outputFilter := INI_SCNG__().output_filter
+	outputFilter := getOutputFilter()
+	if outputFilter != nil {
+		s = outputFilter(s)
 	}
-	for ptr < end {
-		if (*ptr) == ' ' {
-			for {
-				ZendHtmlPutc(*ptr)
-				if !(b.PreInc(&ptr) < end && (*ptr) == ' ') {
+
+	// 输出第一个空格前的内容及其后的连续空格
+	for i, c := range []byte(s) {
+		if c == ' ' {
+			for _, c0 := range []byte(s[i:]) {
+				if c0 == ' ' {
+					ZendHtmlPutc(c0)
+				} else {
 					break
 				}
 			}
+
+			break
 		} else {
-			ZendHtmlPutc(b.PostInc(&(*ptr)))
+			ZendHtmlPutc(c)
 		}
-	}
-	if INI_SCNG__().output_filter {
-		Efree(filtered)
 	}
 }
 func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {

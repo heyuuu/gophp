@@ -76,40 +76,28 @@ func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object bool) {
 	buf.WriteString(")\n")
 }
 func PrintFlatHash(ht *types.Array) {
-	var tmp *types.Zval
-	var string_key *types.String
-	var num_key ZendUlong
-	var i int = 0
-	var __ht *types.Array = ht
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-		if _z.IsIndirect() {
-			_z = _z.Indirect()
-			if _z.IsUndef() {
-				continue
-			}
-		}
-		num_key = _p.GetH()
-		string_key = _p.GetKey()
-		tmp = _z
-		if b.PostInc(&i) > 0 {
+	var i = 0
+	ht.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+		if i > 0 {
 			ZEND_PUTS(",")
 		}
+		i++
+
 		ZEND_PUTS("[")
-		if string_key != nil {
-			ZendWrite(string_key.GetStr())
+		if key.IsStrKey() {
+			ZendWrite(key.StrKey())
 		} else {
-			ZendPrintf(ZEND_ULONG_FMT, num_key)
+			ZendPrintf(ZEND_ULONG_FMT, key.IdxKey())
 		}
 		ZEND_PUTS("] => ")
-		ZendPrintFlatZvalR(tmp)
-	}
+		ZendPrintFlatZvalR(value)
+	})
 }
 func PrintZval(expr *types.Zval) string {
 	if expr.IsString() {
 		return expr.StringVal()
 	} else {
-		return operators.ZvalGetString(expr).GetStr()
+		return operators.ZvalGetStrVal(expr)
 	}
 }
 
