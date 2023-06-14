@@ -12,10 +12,7 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if val.IsTrue() {
 		opline.Result().SetTrue()
 	} else if val.IsSignType() {
-
 		/* The result and op1 can be the same cv zval */
-
-		var orig_val_type uint32 = val.GetTypeInfo()
 		opline.Result().SetFalse()
 	} else {
 		opline.Result().SetBool(operators.ZvalIsTrue(val))
@@ -26,17 +23,15 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var val *types.Zval
-	var free_op1 ZendFreeOp
 	val = opline.Op1()
 	if val.IsTrue() {
 		opline.Result().SetTrue()
 	} else if val.IsSignType() {
 
 		/* The result and op1 can be the same cv zval */
-
-		var orig_val_type uint32 = val.GetTypeInfo()
+		var origValType = val.GetType()
 		opline.Result().SetFalse()
-		if orig_val_type == types.IS_UNDEF {
+		if origValType == types.IS_UNDEF {
 			ZVAL_UNDEFINED_OP1(executeData)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
@@ -56,10 +51,9 @@ func ZEND_BOOL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else if val.IsSignType() {
 
 		/* The result and op1 can be the same cv zval */
-
-		var orig_val_type uint32 = val.GetTypeInfo()
+		var origValType = val.GetType()
 		opline.Result().SetFalse()
-		if orig_val_type == types.IS_UNDEF {
+		if origValType == types.IS_UNDEF {
 			ZVAL_UNDEFINED_OP1(executeData)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}

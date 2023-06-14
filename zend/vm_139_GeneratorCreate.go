@@ -50,15 +50,15 @@ func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		/* EX(return_value) keeps pointer to zend_object (not a real zval) */
 		gen_execute_data.SetReturnValue((*types.Zval)(generator))
 
-		call_info = executeData.GetThis().GetTypeInfo()
+		call_info = executeData.CallInfo()
 		if (call_info&types.Z_TYPE_MASK) == types.IS_OBJECT && ((call_info&(ZEND_CALL_CLOSURE|ZEND_CALL_RELEASE_THIS)) == 0 || ZendExecuteEx != ExecuteEx) {
 			ZEND_ADD_CALL_FLAG_EX(call_info, ZEND_CALL_RELEASE_THIS)
 		}
 		ZEND_ADD_CALL_FLAG_EX(call_info, ZEND_CALL_TOP_FUNCTION|ZEND_CALL_ALLOCATED|ZEND_CALL_GENERATOR)
-		gen_execute_data.GetThis().GetTypeInfo() = call_info
+		gen_execute_data.SetCallInfo(call_info)
 		gen_execute_data.SetPrevExecuteData(nil)
 
-		call_info = EX_CALL_INFO()
+		call_info = executeData.CallInfo()
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 
 		if (call_info & (ZEND_CALL_TOP | ZEND_CALL_ALLOCATED)) == 0 {

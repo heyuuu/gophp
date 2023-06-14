@@ -28,14 +28,14 @@ func ZEND_FN_SCOPE_NAME(function types.IFunction) string {
 		return ""
 	}
 }
-func ZEND_CALL_INFO(call *ZendExecuteData) uint32         { return call.GetThis().GetTypeInfo() }
+func ZEND_CALL_INFO(call *ZendExecuteData) uint32         { return call.CallInfo() }
 func ZEND_ADD_CALL_FLAG_EX(call_info uint32, flag uint32) { call_info |= flag }
 func ZEND_DEL_CALL_FLAG_EX(call_info uint32, flag uint32) { call_info &= ^flag }
 func ZEND_ADD_CALL_FLAG(call *ZendExecuteData, flag uint32) {
-	ZEND_ADD_CALL_FLAG_EX(call.GetThis().GetTypeInfo(), flag)
+	ZEND_ADD_CALL_FLAG_EX(call.CallInfo(), flag)
 }
 func ZEND_DEL_CALL_FLAG(call *ZendExecuteData, flag uint32) {
-	ZEND_DEL_CALL_FLAG_EX(call.This.GetTypeInfo(), flag)
+	ZEND_DEL_CALL_FLAG_EX(call.CallInfo(), flag)
 }
 func ZEND_CALL_VAR(call *ZendExecuteData, n uint32) *types.Zval {
 	return (*types.Zval)((*byte)(call) + int(n))

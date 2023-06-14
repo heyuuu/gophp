@@ -30,8 +30,8 @@ func NewExecuteData(callInfo uint32, fun types.IFunction, numArgs uint32, object
 	}
 
 	ex.func_ = fun
+	ex.SetCallInfo(callInfo)
 	ex.This.SetPtr(objectOrCalledScope)
-	ex.This.SetTypeInfo(callInfo)
 	ex.This.SetNumArgs(numArgs)
 
 	ex.runtimeCache = make([]types.Zval, runtimeCacheSize)
@@ -159,6 +159,9 @@ func (ex *ZendExecuteData) CheckNumArgsNone(forceStrict bool) bool {
 func (ex *ZendExecuteData) CallInfo() uint32 {
 	return ex.This.GetTypeInfo()
 }
+func (ex *ZendExecuteData) SetCallInfo(callInfo uint32) {
+	ex.This.SetTypeInfo(callInfo)
+}
 
 /**
  * Getter/Setter
@@ -179,5 +182,6 @@ func (ex *ZendExecuteData) SetPrevExecuteData(value *ZendExecuteData) {
 func (ex *ZendExecuteData) GetSymbolTable() *types.Array      { return ex.symbolTable }
 func (ex *ZendExecuteData) SetSymbolTable(value *types.Array) { ex.symbolTable = value }
 
-func (ex *ZendExecuteData) GetRuntimeCache() any { return ex.runtimeCache }
-func (ex *ZendExecuteData) RuntimeCacheLen() int { return len(ex.runtimeCache) }
+func (ex *ZendExecuteData) RuntimeCache() []types.Zval { return ex.runtimeCache }
+func (ex *ZendExecuteData) GetRuntimeCache() any       { return ex.runtimeCache }
+func (ex *ZendExecuteData) RuntimeCacheLen() int       { return len(ex.runtimeCache) }

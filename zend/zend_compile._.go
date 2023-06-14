@@ -22,19 +22,19 @@ const ZEND_CALL_HAS_THIS = uint32(types.IS_OBJECT)
 
 /* Top 16 bits of Z_TYPE_INFO(EX(This)) are used as call_info flags */
 
-const ZEND_CALL_FUNCTION uint32 = 0 << 16
+const ZEND_CALL_FUNCTION = 0 << 16
 const ZEND_CALL_CODE = 1 << 16
 const ZEND_CALL_NESTED = 0 << 17
-const ZEND_CALL_TOP uint32 = 1 << 17
-const ZEND_CALL_ALLOCATED uint32 = 1 << 18
-const ZEND_CALL_FREE_EXTRA_ARGS uint32 = 1 << 19
-const ZEND_CALL_HAS_SYMBOL_TABLE uint32 = 1 << 20
+const ZEND_CALL_TOP = 1 << 17
+const ZEND_CALL_ALLOCATED = 1 << 18
+const ZEND_CALL_FREE_EXTRA_ARGS = 1 << 19
+const ZEND_CALL_HAS_SYMBOL_TABLE = 1 << 20
 const ZEND_CALL_RELEASE_THIS = 1 << 21
-const ZEND_CALL_CLOSURE uint32 = 1 << 22
+const ZEND_CALL_CLOSURE = 1 << 22
 const ZEND_CALL_FAKE_CLOSURE = 1 << 23
 const ZEND_CALL_GENERATOR = 1 << 24
 const ZEND_CALL_DYNAMIC = 1 << 25
-const ZEND_CALL_SEND_ARG_BY_REF uint32 = 1 << 31
+const ZEND_CALL_SEND_ARG_BY_REF = 1 << 31
 const ZEND_CALL_NESTED_FUNCTION = ZEND_CALL_FUNCTION | ZEND_CALL_NESTED
 const ZEND_CALL_NESTED_CODE = ZEND_CALL_CODE | ZEND_CALL_NESTED
 const ZEND_CALL_TOP_FUNCTION = ZEND_CALL_TOP | ZEND_CALL_FUNCTION
@@ -42,20 +42,6 @@ const ZEND_CALL_TOP_CODE = ZEND_CALL_CODE | ZEND_CALL_TOP
 
 // math.ceil(sizeof(*ZendExecuteData)/sizeof(Zval))
 const ZEND_CALL_FRAME_SLOT = int((ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_execute_data")) + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")) - 1) / ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")))
-
-/* run-time jump target */
-
-/* convert jump target from compile-time to run-time */
-
-/* convert jump target back from run-time to compile-time */
-
-/* constant-time constant */
-
-/* At run-time, constants are allocated together with op_array->opcodes
- * and addressed relatively to current opline.
- */
-
-/* convert constant from compile-time to run-time */
 
 /* convert constant back from run-time to compile-time */
 

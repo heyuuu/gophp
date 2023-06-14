@@ -249,32 +249,21 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 		return 1
 	}
 }
-func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) uint32 {
+func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, executeData *ZendExecuteData) types.ZvalType {
 	var str *types.String
-	var hval ZendUlong
-try_again:
+	var hval int
+
+	key = key.DeRef()
+
 	if key.IsString() {
 		str = key.String()
 		if types.HandleNumericStr(str.GetStr(), &hval) {
 			goto num_key
 		}
-	str_key:
-		if types.ZendHashFindInd(ht, str.GetStr()) != nil {
-			return types.IS_TRUE
-		} else {
-			return types.IS_FALSE
-		}
+		goto str_key
 	} else if key.IsLong() {
 		hval = key.Long()
-	num_key:
-		if ht.IndexFind(hval) != nil {
-			return types.IS_TRUE
-		} else {
-			return types.IS_FALSE
-		}
-	} else if key.IsReference() {
-		key = types.Z_REFVAL_P(key)
-		goto try_again
+		goto num_key
 	} else if key.GetType() <= types.IS_NULL {
 		if key.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
@@ -285,14 +274,26 @@ try_again:
 		faults.Error(faults.E_WARNING, "array_key_exists(): The first argument should be either a string or an integer")
 		return types.IS_FALSE
 	}
+
+num_key:
+	if ht.IndexFind(hval) != nil {
+		return types.IS_TRUE
+	} else {
+		return types.IS_FALSE
+	}
+
+str_key:
+	if types.ZendHashFindInd(ht, str.GetStr()) != nil {
+		return types.IS_TRUE
+	} else {
+		return types.IS_FALSE
+	}
 }
-func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) uint32 {
+func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, executeData *ZendExecuteData) types.ZvalType {
 	if subject.IsObject() {
-		faults.Error(faults.E_DEPRECATED, "array_key_exists(): "+"Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
-		var ht *types.Array = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
-		var result uint32 = ZendArrayKeyExistsFast(ht, key, opline, executeData)
-		//ZendReleaseProperties(ht)
-		return result
+		faults.Error(faults.E_DEPRECATED, "array_key_exists(): Using array_key_exists() on objects is deprecated. Use isset() or property_exists() instead")
+		var ht = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
+		return ZendArrayKeyExistsFast(ht, key, executeData)
 	} else {
 		if key.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)

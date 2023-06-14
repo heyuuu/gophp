@@ -248,17 +248,24 @@ func _convertScalarToNumber(op *types.Zval, silent bool, check bool) {
 	op = op.DeRef()
 	switch op.GetType() {
 	case types.IS_STRING:
-		var str *types.String
-		str = op.String()
-		if b.Assign(&(op.GetTypeInfo()), IsNumericString(str.GetStr(), &(op.Long()), &(op.Double()), b.Cond(silent != 0, 1, -1))) == 0 {
+		var r conv.ParseNumberResult
+		if silent {
+			r = zend.StrToNumberAllowErrors(op.StringVal())
+		} else {
+			r = zend.StrToNumberNoticeErrors(op.StringVal())
+		}
+		if r.IsInt() {
+			op.SetLong(r.Int())
+		} else if r.IsFloat() {
+			op.SetDouble(r.Float())
+		} else { // fail
 			op.SetLong(0)
 			if !silent {
 				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
 			}
 		}
-	case types.IS_NULL:
-		fallthrough
-	case types.IS_FALSE:
+	case types.IS_NULL,
+		types.IS_FALSE:
 		op.SetLong(0)
 	case types.IS_TRUE:
 		op.SetLong(1)
@@ -485,9 +492,9 @@ try_again:
 	case types.IS_OBJECT:
 		var dst types.Zval
 		ConvertObjectToType(op, &dst, types.IS_BOOL, ConvertToBoolean)
-		if dst.IsFalse() || dst.IsTrue() {
-			op.SetTypeInfo(dst.GetTypeInfo())
-		} else {
+		if dst.IsFalse() {
+			op.SetFalse()
+		} else { // dst.IsTrue() or others
 			op.SetTrue()
 		}
 	case types.IS_REFERENCE:

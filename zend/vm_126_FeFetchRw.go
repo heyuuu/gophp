@@ -10,7 +10,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var array *types.Zval
 	var value *types.Zval
-	var value_type uint32
+	var value_type types.ZvalType
 	var fe_ht *types.Array
 	var pos types.ArrayPosition
 	var p *types.Bucket
@@ -31,18 +31,19 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			}
 			value = p.GetVal()
-			value_type = value.GetTypeInfo()
-			if value_type != types.IS_UNDEF {
-				if value_type == types.IS_INDIRECT {
-					value = value.GetZv()
-					value_type = value.GetTypeInfo()
-					if value_type != types.IS_UNDEF {
+			value_type = value.GetType()
+			if value.IsNotUndef() {
+				if value.IsIndirect() {
+					value = value.Indirect()
+					value_type = value.GetType()
+					if value.IsNotUndef() {
 						break
 					}
 				} else {
 					break
 				}
 			}
+
 			pos++
 			p++
 		}
@@ -74,14 +75,14 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 				}
 				value = p.GetVal()
-				value_type = value.GetTypeInfo()
-				if value_type != types.IS_UNDEF {
-					if value_type == types.IS_INDIRECT {
-						value = value.GetZv()
-						value_type = value.GetTypeInfo()
-						if value_type != types.IS_UNDEF && ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 0) == types.SUCCESS {
-							if (value_type & types.Z_TYPE_MASK) != types.IS_REFERENCE {
-								var prop_info *types.PropertyInfo = ZendGetTypedPropertyInfoForSlot(array.GetObj(), value)
+				value_type = value.GetType()
+				if value.IsNotUndef() {
+					if value.IsIndirect() {
+						value = value.Indirect()
+						value_type = value.GetType()
+						if value.IsNotUndef() && ZendCheckPropertyAccess(array.Object(), p.GetKey(), false) == types.SUCCESS {
+							if value.IsReference() {
+								var prop_info *types.PropertyInfo = ZendGetTypedPropertyInfoForSlot(array.Object(), value)
 								if prop_info != nil {
 									value.SetNewRef(value)
 									ZEND_REF_ADD_TYPE_SOURCE(value.Reference(), prop_info)
@@ -90,7 +91,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 							}
 							break
 						}
-					} else if types.Z_OBJCE_P(array).GetDefaultPropertiesCount() == 0 || p.GetKey() == nil || ZendCheckPropertyAccess(array.GetObj(), p.GetKey(), 1) == types.SUCCESS {
+					} else if types.Z_OBJCE_P(array).GetDefaultPropertiesCount() == 0 || p.GetKey() == nil || ZendCheckPropertyAccess(array.Object(), p.GetKey(), true) == types.SUCCESS {
 						break
 					}
 				}
@@ -158,7 +159,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					opline.Result().SetLong(iter.GetIndex())
 				}
 			}
-			value_type = value.GetTypeInfo()
+			value_type = value.GetType()
 		}
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
@@ -170,7 +171,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, opline.GetExtendedValue())
 		return 0
 	}
-	if (value_type & types.Z_TYPE_MASK) != types.IS_REFERENCE {
+	if value_type != types.IS_REFERENCE {
 		var ref *types.Zval
 		value.SetNewEmptyRef()
 		ref = types.Z_REFVAL_P(value)
@@ -181,12 +182,9 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		if variable_ptr != value {
 			var ref *types.ZendReference
 			ref = value.Reference()
-			// 			ref.AddRefcount()
-			// IZvalPtrDtor(variable_ptr)
 			variable_ptr.SetReference(ref)
 		}
 	} else {
-		// 		value.AddRefcount()
 		opline.Op2().SetReference(value.Reference())
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

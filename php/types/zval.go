@@ -123,6 +123,10 @@ func (zv *Zval) GetType() ZvalType {
 	}
 	return zv.typ
 }
+func (zv *Zval) SetType(typ ZvalType) {
+	b.Assert(typ <= IS_TRUE)
+	zv.typ, zv.value = typ, nil
+}
 
 // todo delete，暂时还有些其他语义的用法(如 ExecuteData.This.callInfo)，待处理后移除
 func (zv *Zval) GetTypeInfo() uint32 {

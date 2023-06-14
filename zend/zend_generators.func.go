@@ -38,20 +38,20 @@ func ZendGeneratorGetCurrent(generator *ZendGenerator) *ZendGenerator {
 }
 func ZendGeneratorRestoreCallStack(generator *ZendGenerator) {
 	var call *ZendExecuteData
-	var new_call *ZendExecuteData
-	var prev_call *ZendExecuteData = nil
+	var newCall *ZendExecuteData
+	var prevCall *ZendExecuteData = nil
+
 	call = generator.GetFrozenCallStack()
-	for {
-		new_call = ZendVmStackPushCallFrame(ZEND_CALL_INFO(call) & ^ZEND_CALL_ALLOCATED, call.GetFunc(), call.NumArgs(), call.GetThis().Ptr())
-		memcpy((*types.Zval)(new_call)+ZEND_CALL_FRAME_SLOT, (*types.Zval)(call)+ZEND_CALL_FRAME_SLOT, call.NumArgs()*b.SizeOf("zval"))
-		new_call.SetPrevExecuteData(prev_call)
-		prev_call = new_call
+	for call != nil {
+		newCallInfo := call.CallInfo() &^ ZEND_CALL_ALLOCATED
+		newCall = ZendVmStackPushCallFrame(newCallInfo, call.GetFunc(), call.NumArgs(), call.GetThis().Ptr())
+		copy(newCall.RuntimeCache(), call.RuntimeCache()[:call.NumArgs()])
+		newCall.SetPrevExecuteData(prevCall)
+
+		prevCall = newCall
 		call = call.GetPrevExecuteData()
-		if call == nil {
-			break
-		}
 	}
-	generator.GetExecuteData().SetCall(prev_call)
+	generator.GetExecuteData().SetCall(prevCall)
 	Efree(generator.GetFrozenCallStack())
 	generator.SetFrozenCallStack(nil)
 }
@@ -96,12 +96,10 @@ func ZendGeneratorFreezeCallStack(executeData *ZendExecuteData) *ZendExecuteData
 	b.Assert(prev_call == (*ZendExecuteData)(stack))
 	return prev_call
 }
-func ZendGeneratorCleanupUnfinishedExecution(generator *ZendGenerator, executeData *ZendExecuteData, catch_op_num uint32) {
+func ZendGeneratorCleanupUnfinishedExecution(generator *ZendGenerator, executeData *ZendExecuteData, catchOpNum uint32) {
 	var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
 	if executeData.GetOpline() != op_array.GetOpcodes() {
-
 		/* -1 required because we want the last run opcode, not the next to-be-run one. */
-
 		var op_num uint32 = executeData.GetOpline() - op_array.GetOpcodes() - 1
 		if generator.GetFrozenCallStack() != nil {
 
@@ -112,7 +110,7 @@ func ZendGeneratorCleanupUnfinishedExecution(generator *ZendGenerator, executeDa
 			ZendGeneratorRestoreCallStack(generator)
 			generator.SetExecuteData(save_ex)
 		}
-		ZendCleanupUnfinishedExecution(executeData, op_num, catch_op_num)
+		ZendCleanupUnfinishedExecution(executeData, op_num, catchOpNum)
 	}
 }
 func ZendGeneratorClose(generator *ZendGenerator, finished_execution bool) {
