@@ -692,62 +692,26 @@ func ZifErrorGetLast() *types.Zval {
 func ZifErrorClearLast() {
 	core.PG__().ClearLastError()
 }
-func ZifCallUserFunc(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
-	var retval types.Zval
-	var fci types.ZendFcallInfo
-	var fci_cache types.ZendFcallInfoCache
-	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = -1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			fp.ParseFunc(&fci, &fci_cache)
-			__arg, __arg_len := fp.ParseVariadic0()
-			fci.SetParams(__arg)
-			fci.SetParamCount(uint32(__arg_len))
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	fci.SetRetval(&retval)
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
+func ZifCallUserFunc(callback zpp.Callable, _ zpp.Opt, args []*types.Zval) *types.Zval {
+	retval, ok := callback.Call(args...)
+	if ok && retval.IsNotUndef() {
 		if retval.IsReference() {
-			operators.ZendUnwrapReference(&retval)
+			retval = retval.DeRef().Copy()
 		}
-		types.ZVAL_COPY_VALUE(return_value, &retval)
+		return retval
 	}
+	return types.NewZvalUndef()
 }
-func ZifCallUserFuncArray(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, parameters *types.Zval) {
-	var params *types.Zval
-	var retval types.Zval
-	var fci types.ZendFcallInfo
-	var fci_cache types.ZendFcallInfoCache
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			fp.ParseFunc(&fci, &fci_cache)
-			params = fp.ParseArray()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	zend.ZendFcallInfoArgs(&fci, params)
-	fci.SetRetval(&retval)
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
+func ZifCallUserFuncArray(callback zpp.Callable, parameters *types.Array) *types.Zval {
+	args := parameters.Values()
+	retval, ok := callback.Call(args...)
+	if ok && retval.IsNotUndef() {
 		if retval.IsReference() {
-			operators.ZendUnwrapReference(&retval)
+			retval = retval.DeRef().Copy()
 		}
-		types.ZVAL_COPY_VALUE(return_value, &retval)
+		return retval
 	}
-	zend.ZendFcallInfoArgsClear(&fci, 1)
+	return types.NewZvalUndef()
 }
 func ZifForwardStaticCall(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
 	var retval types.Zval

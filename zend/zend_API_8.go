@@ -209,23 +209,9 @@ func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ types.IFunction, args *
 	}
 	return types.SUCCESS
 }
+
 func ZendFcallInfoArgs(fci *types.ZendFcallInfo, args *types.Zval) int {
 	return ZendFcallInfoArgsEx(fci, nil, args)
-}
-func ZendFcallInfoArgp(fci *types.ZendFcallInfo, argc int, argv *types.Zval) int {
-	var i int
-	if argc < 0 {
-		return types.FAILURE
-	}
-	ZendFcallInfoArgsClear(fci, !argc)
-	if argc != 0 {
-		fci.SetParamCount(argc)
-		fci.SetParams((*types.Zval)(Erealloc(fci.GetParams(), fci.GetParamCount()*b.SizeOf("zval"))))
-		for i = 0; i < argc; i++ {
-			types.ZVAL_COPY(fci.GetParams()[i], &argv[i])
-		}
-	}
-	return types.SUCCESS
 }
 func ZendFcallInfoArgv(fci *types.ZendFcallInfo, argc int, argv *va_list) int {
 	var i int

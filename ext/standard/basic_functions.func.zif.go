@@ -177,11 +177,12 @@ var DefZifGetCurrentUser = def.DefFunc("get_current_user", 0, 0, []def.ArgInfo{}
 // generate by ZifGetCfgVar
 var DefZifGetCfgVar = def.DefFunc("get_cfg_var", 1, 1, []def.ArgInfo{{Name: "option_name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	option_name := fp.ParseZval()
+	option_name := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifGetCfgVar(option_name)
+	ret := ZifGetCfgVar(option_name)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifGetMagicQuotesRuntime
@@ -203,15 +204,16 @@ var DefZifGetMagicQuotesGpc = def.DefFunc("get_magic_quotes_gpc", 0, 0, []def.Ar
 // generate by ZifErrorLog
 var DefZifErrorLog = def.DefFunc("error_log", 1, 4, []def.ArgInfo{{Name: "message"}, {Name: "message_type"}, {Name: "destination"}, {Name: "extra_headers"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
-	message := fp.ParseZval()
+	message := fp.ParseStringVal()
 	fp.StartOptional()
-	message_type := fp.ParseZval()
-	destination := fp.ParseZval()
-	extra_headers := fp.ParseZval()
+	message_type := fp.ParseLong()
+	destination := fp.ParsePathValNullable()
+	extra_headers := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifErrorLog(message, nil, message_type, destination, extra_headers)
+	ret := ZifErrorLog(message, nil, message_type, destination, extra_headers)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifErrorGetLast
@@ -219,7 +221,8 @@ var DefZifErrorGetLast = def.DefFunc("error_get_last", 0, 0, []def.ArgInfo{}, fu
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifErrorGetLast()
+	ret := ZifErrorGetLast()
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifErrorClearLast
@@ -231,26 +234,28 @@ var DefZifErrorClearLast = def.DefFunc("error_clear_last", 0, 0, []def.ArgInfo{}
 })
 
 // generate by ZifCallUserFunc
-var DefZifCallUserFunc = def.DefFunc("call_user_func", 1, -1, []def.ArgInfo{{Name: "function_name"}, {Name: "parameters"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifCallUserFunc = def.DefFunc("call_user_func", 1, -1, []def.ArgInfo{{Name: "callback"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	function_name := fp.ParseZval()
+	callback := fp.ParseCallable()
 	fp.StartOptional()
-	parameters := fp.ParseVariadic()
+	args := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifCallUserFunc(executeData, returnValue, function_name, nil, parameters)
+	ret := ZifCallUserFunc(callback, nil, args)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifCallUserFuncArray
-var DefZifCallUserFuncArray = def.DefFunc("call_user_func_array", 2, 2, []def.ArgInfo{{Name: "function_name"}, {Name: "parameters"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifCallUserFuncArray = def.DefFunc("call_user_func_array", 2, 2, []def.ArgInfo{{Name: "callback"}, {Name: "parameters"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	function_name := fp.ParseZval()
-	parameters := fp.ParseZval()
+	callback := fp.ParseCallable()
+	parameters := fp.ParseArrayHt()
 	if fp.HasError() {
 		return
 	}
-	ZifCallUserFuncArray(executeData, returnValue, function_name, parameters)
+	ret := ZifCallUserFuncArray(callback, parameters)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifForwardStaticCall
