@@ -278,8 +278,8 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) 
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *types.PropertyInfo
-	object = executeData.GetThis()
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Const2()
@@ -353,8 +353,8 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *types.PropertyInfo
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Op2()
@@ -427,8 +427,8 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *types.PropertyInfo
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Cv2OrUndef()

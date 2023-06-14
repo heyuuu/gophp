@@ -54,12 +54,11 @@ func ZEND_FETCH_OBJ_RW_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
-	var free_op1 ZendFreeOp
 	var property *types.Zval
 	var container *types.Zval
 	var result *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Const2()
@@ -69,13 +68,11 @@ func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 }
 func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
-	var free_op1 ZendFreeOp
-	var free_op2 ZendFreeOp
 	var property *types.Zval
 	var container *types.Zval
 	var result *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Op2()
@@ -86,12 +83,11 @@ func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 }
 func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
-	var free_op1 ZendFreeOp
 	var property *types.Zval
 	var container *types.Zval
 	var result *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Cv2OrUndef()

@@ -7,10 +7,8 @@ import (
 
 func ZEND_GET_CALLED_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
-	if executeData.GetThis().IsObject() {
-		opline.Result().SetStringVal(executeData.GetThis().Object().GetCe().Name())
-	} else if executeData.GetThis().Class() != nil {
-		opline.Result().SetStringVal(executeData.GetThis().Object().GetCe().Name())
+	if executeData.InScope() {
+		opline.Result().SetStringVal(executeData.ThisClass().Name())
 	} else {
 		opline.Result().SetFalse()
 		if executeData.GetFunc().GetScope() == nil {

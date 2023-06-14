@@ -44,7 +44,7 @@ func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		generator.GetExecuteFake().SetOpline(nil)
 		generator.GetExecuteFake().SetFunc(nil)
 		generator.GetExecuteFake().SetPrevExecuteData(nil)
-		generator.GetExecuteFake().GetThis().SetObject((*types.ZendObject)(generator))
+		generator.GetExecuteFake().SetScope((*types.ZendObject)(generator))
 		gen_execute_data.SetOpline(opline + 1)
 
 		/* EX(return_value) keeps pointer to zend_object (not a real zval) */

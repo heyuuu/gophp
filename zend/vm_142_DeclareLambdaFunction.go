@@ -8,7 +8,7 @@ import (
 func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var func_ types.IFunction
-	var object *types.Zval
+	var object *types.ZendObject
 	var called_scope *types.ClassEntry
 	func_ = CACHED_PTR(opline.GetExtendedValue())
 	if func_ == nil {
@@ -17,17 +17,17 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 		b.Assert(func_.GetType() == ZEND_USER_FUNCTION)
 		CACHE_PTR(opline.GetExtendedValue(), func_)
 	}
-	if executeData.GetThis().IsObject() {
-		called_scope = types.Z_OBJCE(executeData.GetThis())
+	if executeData.InScope() {
+		called_scope = executeData.ThisClass()
 		if func_.IsStatic() || (executeData.GetFunc().GetFnFlags()&types.AccStatic) != 0 {
 			object = nil
 		} else {
-			object = &(executeData.GetThis())
+			object = executeData.ThisObject()
 		}
 	} else {
-		called_scope = executeData.GetThis().Class()
+		called_scope = executeData.ThisClass()
 		object = nil
 	}
-	ZendCreateClosure(opline.Result(), func_, executeData.GetFunc().GetOpArray().GetScope(), called_scope, object)
+	ZendCreateClosureEx(opline.Result(), func_, executeData.GetFunc().GetOpArray().GetScope(), called_scope, object)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

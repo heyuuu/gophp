@@ -58,8 +58,8 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData
 	var container *types.Zval
 	var property *types.Zval
 	var result *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Const2()
@@ -74,8 +74,8 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	var container *types.Zval
 	var property *types.Zval
 	var result *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Op2()
@@ -90,8 +90,8 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) i
 	var container *types.Zval
 	var property *types.Zval
 	var result *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Cv2OrUndef()

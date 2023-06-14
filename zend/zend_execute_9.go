@@ -84,17 +84,13 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 
 	/* Not sure what should be done here if it's a static method */
 
-	if call.GetThis().GetType() != types.IS_OBJECT {
+	if call.ThisObject() == nil {
 		ZendVmStackFreeArgs(call)
-		if fbc.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {
-			// types.ZendStringReleaseEx(fbc.GetFunctionName(), 0)
-		}
-		Efree(fbc)
 		ZendVmStackFreeCallFrame(call)
 		faults.ThrowError(nil, "Cannot call overloaded function for non-object")
 		return 0
 	}
-	object = call.GetThis().Object()
+	object = call.ThisObject()
 	ret.SetNull()
 	EG__().SetCurrentExecuteData(call)
 	object.CallMethod(fbc.FunctionName(), object, call, ret)

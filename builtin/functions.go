@@ -79,3 +79,8 @@ func Option[T any](ptr *T, defaultValue T) T {
 		return defaultValue
 	}
 }
+
+// 异或操作
+func Xor(a, b bool) bool {
+	return (a || b) && !(a && b)
+}

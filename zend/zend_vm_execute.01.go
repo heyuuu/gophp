@@ -244,7 +244,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
 		if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-			// OBJ_RELEASE(executeData.GetThis().Object())
+			// OBJ_RELEASE(executeData.ThisObject())
 		} else if (call_info & ZEND_CALL_CLOSURE) != 0 {
 			// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 		}

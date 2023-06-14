@@ -10,16 +10,6 @@ func CE_STATIC_MEMBERS(ce *types.ClassEntry) *types.Zval {
 	// todo
 	return (ZEND_MAP_PTR_GET(ce.static_members_table__ptr)).(*types.Zval)
 }
-func ZendGetParametersArray(ht uint32, param_count int, argument_array *types.Zval) int {
-	return _zendGetParametersArrayEx(param_count, argument_array)
-}
-func getThis(executeData *ZendExecuteData) *types.Zval {
-	if ZEND_THIS(executeData).IsObject() {
-		return ZEND_THIS(executeData)
-	} else {
-		return nil
-	}
-}
 func ArrayInit(arg *types.Zval)                  { arg.SetArray(types.NewArray(0)) }
 func ArrayInitSize(arg *types.Zval, size uint32) { arg.SetArray(types.NewArray(size)) }
 func AddAssocLong(arg *types.Zval, key string, n ZendLong) int {

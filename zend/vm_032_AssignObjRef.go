@@ -156,8 +156,8 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CONST_OP_DATA_VAR_HANDLER(executeData *Zend
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Const2()
@@ -180,8 +180,8 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CONST_OP_DATA_CV_HANDLER(executeData *ZendE
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Const2()
@@ -203,8 +203,8 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_TMPVAR_OP_DATA_VAR_HANDLER(executeData *Zen
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Op2()
@@ -229,8 +229,8 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_TMPVAR_OP_DATA_CV_HANDLER(executeData *Zend
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Op2()
@@ -252,22 +252,14 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CV_OP_DATA_VAR_HANDLER(executeData *ZendExe
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Cv2OrUndef()
 	value_ptr = _getZvalPtrPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-	{
+	ZendAssignToPropertyReferenceThisVar(container, property, value_ptr, opline, executeData)
 
-		{
-			ZendAssignToPropertyReferenceThisVar(container, property, value_ptr, opline, executeData)
-		}
-	}
-
-	if free_op_data != nil {
-		// ZvalPtrDtorNogc(free_op_data)
-	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
 }
@@ -276,8 +268,8 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CV_OP_DATA_CV_HANDLER(executeData *ZendExec
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Cv2OrUndef()

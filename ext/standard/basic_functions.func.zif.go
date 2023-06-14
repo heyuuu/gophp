@@ -451,11 +451,12 @@ var DefZifPrintR = def.DefFunc("print_r", 1, 2, []def.ArgInfo{{Name: "var"}, {Na
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	var_ := fp.ParseZval()
 	fp.StartOptional()
-	return_ := fp.ParseZval()
+	return_ := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifPrintR(var_, nil, return_)
+	ret := ZifPrintR(var_, nil, return_)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifConnectionAborted
@@ -463,7 +464,8 @@ var DefZifConnectionAborted = def.DefFunc("connection_aborted", 0, 0, []def.ArgI
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifConnectionAborted()
+	ret := ZifConnectionAborted()
+	returnValue.SetLong(ret)
 })
 
 // generate by ZifConnectionStatus
@@ -471,18 +473,20 @@ var DefZifConnectionStatus = def.DefFunc("connection_status", 0, 0, []def.ArgInf
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifConnectionStatus()
+	ret := ZifConnectionStatus()
+	returnValue.SetLong(ret)
 })
 
 // generate by ZifIgnoreUserAbort
-var DefZifIgnoreUserAbort = def.DefFunc("ignore_user_abort", 0, 1, []def.ArgInfo{{Name: "value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifIgnoreUserAbort = def.DefFunc("ignore_user_abort", 0, 1, []def.ArgInfo{{Name: "enable"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
-	value := fp.ParseZval()
+	enable := fp.ParseBoolValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifIgnoreUserAbort(executeData, returnValue, nil, value)
+	ret := ZifIgnoreUserAbort(executeData, returnValue, nil, enable)
+	returnValue.SetLong(ret)
 })
 
 // generate by ZifGetservbyname

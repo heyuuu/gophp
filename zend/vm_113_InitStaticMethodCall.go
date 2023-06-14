@@ -51,8 +51,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -142,8 +142,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -192,7 +192,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 			faults.ThrowError(nil, "Cannot call constructor")
 			return 0
 		}
-		if executeData.GetThis().IsObject() && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
+		if executeData.InScope() && executeData.ThisClass() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.Name())
 			return 0
 		}
@@ -202,8 +202,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 		}
 	}
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -286,8 +286,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -345,8 +345,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -425,8 +425,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -465,18 +465,18 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 			faults.ThrowError(nil, "Cannot call constructor")
 			return 0
 		}
-		if executeData.GetThis().IsObject() && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
+		if executeData.InScope() && executeData.ThisClass() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.Name())
 			return 0
 		}
 		fbc = ce.GetConstructor()
-		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
+		if fbc.IsUserFunction() && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 	}
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -549,8 +549,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -612,8 +612,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -628,11 +628,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		if (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_PARENT || (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF {
-			if executeData.GetThis().IsObject() {
-				ce = types.Z_OBJCE(executeData.GetThis())
-			} else {
-				ce = executeData.GetThis().Class()
-			}
+			ce = executeData.ThisClass()
 		}
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	}
@@ -680,7 +676,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 					faults.ThrowError(nil, "Function name must be a string")
 					// ZvalPtrDtorNogc(free_op2)
 					return 0
-					break
 				}
 			}
 		}
@@ -705,8 +700,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -721,11 +716,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		if (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_PARENT || (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF {
-			if executeData.GetThis().IsObject() {
-				ce = types.Z_OBJCE(executeData.GetThis())
-			} else {
-				ce = executeData.GetThis().Class()
-			}
+			ce = executeData.ThisClass()
 		}
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	}
@@ -757,7 +748,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 			faults.ThrowError(nil, "Cannot call constructor")
 			return 0
 		}
-		if executeData.GetThis().IsObject() && executeData.GetThis().Object().GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
+		if executeData.InScope() && executeData.ThisClass() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.Name())
 			return 0
 		}
@@ -767,8 +758,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 		}
 	}
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(executeData.GetThis().Object().GetCe(), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -781,13 +772,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 	check_parent_and_self:
 
 		/* previous opcode is ZEND_FETCH_CLASS */
-
 		if (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_PARENT || (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF {
-			if executeData.GetThis().IsObject() {
-				ce = types.Z_OBJCE(executeData.GetThis())
-			} else {
-				ce = executeData.GetThis().Class()
-			}
+			ce = executeData.ThisClass()
 		}
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	}
@@ -853,8 +839,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().IsObject() && operators.InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*types.ClassEntry)(executeData.GetThis().Object())
+		if executeData.InScope() && operators.InstanceofFunction(executeData.ThisClass(), ce) {
+			ce = executeData.ThisClass()
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -869,11 +855,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		if (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_PARENT || (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF {
-			if executeData.GetThis().IsObject() {
-				ce = types.Z_OBJCE(executeData.GetThis())
-			} else {
-				ce = executeData.GetThis().Class()
-			}
+			ce = executeData.ThisClass()
 		}
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	}

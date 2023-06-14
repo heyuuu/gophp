@@ -80,12 +80,8 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	executeData = CurrEX()
-	if !(executeData.GetFunc()) || !(ZEND_USER_CODE(executeData.GetFunc().type_)) || (call_info&ZEND_CALL_TOP) != 0 {
+	if !(executeData.GetFunc()) || !(ZEND_USER_CODE(executeData.GetFunc().GetType())) || (call_info&ZEND_CALL_TOP) != 0 {
 		return -1
-	}
-	if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-		var object *types.ZendObject = call.GetThis().Object()
-		// OBJ_RELEASE(object)
 	}
 	ZendVmStackFreeCallFrame(call)
 	if EG__().GetException() != nil {

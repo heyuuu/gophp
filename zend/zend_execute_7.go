@@ -105,17 +105,15 @@ func ZendFetchThisVar(type_ int, opline *types.ZendOp, executeData *ZendExecuteD
 	var result *types.Zval = opline.Result()
 	switch type_ {
 	case BP_VAR_R:
-		if executeData.GetThis().IsObject() {
-			result.SetObject(executeData.GetThis().Object())
-			// 			result.AddRefcount()
+		if executeData.InScope() {
+			result.SetObject(executeData.ThisObject())
 		} else {
 			result.SetNull()
 			faults.Error(faults.E_NOTICE, "Undefined variable: this")
 		}
 	case BP_VAR_IS:
-		if executeData.GetThis().IsObject() {
-			result.SetObject(executeData.GetThis().Object())
-			// 			result.AddRefcount()
+		if executeData.InScope() {
+			result.SetObject(executeData.ThisObject())
 		} else {
 			result.SetNull()
 		}

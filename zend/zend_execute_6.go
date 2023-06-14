@@ -195,7 +195,6 @@ func ZendAssignToPropertyReference(
 		variable_ptr = UninitializedZval()
 	} else if !variable.IsIndirect() {
 		faults.ThrowError(nil, "Cannot assign by reference to overloaded object")
-		// ZvalPtrDtor(&variable)
 		variable_ptr = UninitializedZval()
 	} else if value_ptr.IsError() {
 		variable_ptr = UninitializedZval()

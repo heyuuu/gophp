@@ -1203,11 +1203,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 
 		/* $this may be passed into regular internal functions */
 
-		if call.GetThis().IsObject() {
-			object = call.GetThis().Object()
-		} else {
-			object = nil
-		}
+		object = call.ThisObject()
 		if call.GetFunc() != nil {
 			func_ = call.GetFunc()
 			if func_.GetScope() != nil && func_.GetScope().GetTraitAliases() != nil {
@@ -1412,8 +1408,8 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 
 		/* $this may be passed into regular internal functions */
 
-		if call != nil && call.GetThis().IsObject() {
-			object = call.GetThis().Object()
+		if call != nil {
+			object = call.ThisObject()
 		} else {
 			object = nil
 		}

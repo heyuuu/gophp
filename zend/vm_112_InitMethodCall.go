@@ -346,11 +346,11 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	obj = object.GetObj()
+	obj = object.Object()
 	called_scope = obj.GetCe()
 	if CACHED_PTR(opline.GetResult().GetNum()) == called_scope {
 		fbc = CACHED_PTR(opline.GetResult().GetNum() + b.SizeOf("void *"))
@@ -407,8 +407,8 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	{
@@ -431,7 +431,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			return 0
 		}
 	}
-	obj = object.GetObj()
+	obj = object.Object()
 	called_scope = obj.GetCe()
 
 	{
@@ -476,13 +476,11 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	{
-		function_name = opline.Op2()
-	}
+	function_name = opline.Op2()
 	if !function_name.IsString() {
 		for {
 			if function_name.IsReference() {

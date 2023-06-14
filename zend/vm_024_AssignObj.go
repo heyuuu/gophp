@@ -660,9 +660,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_CONST_HANDLER(executeData *ZendEx
 	var object *types.Zval
 	var property *types.Zval
 	var value *types.Zval
-	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Const2()
@@ -734,8 +733,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExec
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Const2()
@@ -805,8 +804,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExec
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Const2()
@@ -875,8 +874,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecu
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Const2()
@@ -945,8 +944,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendE
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Op2()
@@ -973,8 +972,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExe
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Op2()
@@ -1005,8 +1004,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExe
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Op2()
@@ -1036,8 +1035,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExec
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Op2()
@@ -1065,8 +1064,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Cv2OrUndef()
@@ -1091,8 +1090,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Cv2OrUndef()
@@ -1121,8 +1120,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Cv2OrUndef()
@@ -1150,8 +1149,8 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 	var property *types.Zval
 	var value *types.Zval
 	var tmp types.Zval
-	object = &(executeData.GetThis())
-	if object.IsUndef() {
+	object = executeData.ThisObjectZval()
+	if object == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = opline.Cv2OrUndef()

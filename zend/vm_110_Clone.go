@@ -64,8 +64,8 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var obj *types.Zval
-	obj = executeData.GetThis()
-	if obj.IsUndef() {
+	obj = executeData.ThisObjectZval()
+	if obj == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	return cloneHandlerHelper(executeData, obj)

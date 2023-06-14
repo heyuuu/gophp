@@ -24,10 +24,8 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		} else if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_RELEASE_THIS) != 0 {
 			// OBJ_RELEASE(executeData.GetCall().This.Object())
 		}
-		executeData.GetCall().
-			func_ = (types.IFunction)(&ZendPassFunction)
-		executeData.GetCall().
-			This.Object() = nil
+		executeData.GetCall().func_ = (types.IFunction)(&ZendPassFunction)
+		executeData.GetCall().SetScope(nil)
 		ZEND_CALL_INFO(executeData.GetCall()) &= ^(ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS)
 		FREE_UNFETCHED_OP(opline.GetOp2Type(), opline.GetOp2().GetVar())
 	} else {

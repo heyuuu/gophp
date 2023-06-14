@@ -681,10 +681,8 @@ func ZendLookupClassString(name string) *types.ClassEntry {
 }
 func ZendGetCalledScope(ex *ZendExecuteData) *types.ClassEntry {
 	for ex != nil {
-		if ex.GetThis().IsObject() {
-			return types.Z_OBJCE(ex.GetThis())
-		} else if ex.GetThis().Class() != nil {
-			return ex.GetThis().Class()
+		if ce := ex.ThisClass(); ce != nil {
+			return ce
 		} else if ex.GetFunc() != nil {
 			if ex.GetFunc().GetType() != ZEND_INTERNAL_FUNCTION || ex.GetFunc().GetScope() != nil {
 				return nil
@@ -696,10 +694,10 @@ func ZendGetCalledScope(ex *ZendExecuteData) *types.ClassEntry {
 }
 func ZendGetThisObject(ex *ZendExecuteData) *types.ZendObject {
 	for ex != nil {
-		if ex.GetThis().IsObject() {
-			return ex.GetThis().Object()
+		if obj := ex.ThisObject(); obj != nil {
+			return obj
 		} else if ex.GetFunc() != nil {
-			if ex.GetFunc().GetType() != ZEND_INTERNAL_FUNCTION || ex.GetFunc().GetScope() != nil {
+			if !ex.GetFunc().IsInternalFunction() || ex.GetFunc().GetScope() != nil {
 				return nil
 			}
 		}

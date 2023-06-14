@@ -402,7 +402,7 @@ func SplPqueueObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *
 }
 func zim_spl_SplHeap_count(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var count zend.ZendLong
-	var intern *SplHeapObject = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	var intern *SplHeapObject = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -411,7 +411,7 @@ func zim_spl_SplHeap_count(executeData *zend.ZendExecuteData, return_value *type
 	return
 }
 func zim_spl_SplHeap_isEmpty(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var intern *SplHeapObject = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	var intern *SplHeapObject = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -424,13 +424,13 @@ func zim_spl_SplHeap_insert(executeData *zend.ZendExecuteData, return_value *typ
 	if zend.ZendParseParameters(executeData.NumArgs(), "z", &value) == types.FAILURE {
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if intern.GetHeap().IsHeapCorrupted() {
 		faults.ThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
 	//value.TryAddRefcount()
-	SplPtrHeapInsert(intern.GetHeap(), value, zend.ZEND_THIS(executeData))
+	SplPtrHeapInsert(intern.GetHeap(), value, executeData.ThisObjectZval())
 	return_value.SetTrue()
 	return
 }
@@ -439,12 +439,12 @@ func zim_spl_SplHeap_extract(executeData *zend.ZendExecuteData, return_value *ty
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if intern.GetHeap().IsHeapCorrupted() {
 		faults.ThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
-	if SplPtrHeapDeleteTop(intern.GetHeap(), return_value, zend.ZEND_THIS(executeData)) == types.FAILURE {
+	if SplPtrHeapDeleteTop(intern.GetHeap(), return_value, executeData.ThisObjectZval()) == types.FAILURE {
 		faults.ThrowException(spl_ce_RuntimeException, "Can't extract from an empty heap", 0)
 		return
 	}
@@ -457,14 +457,14 @@ func zim_spl_SplPriorityQueue_insert(executeData *zend.ZendExecuteData, return_v
 	if zend.ZendParseParameters(executeData.NumArgs(), "zz", &data, &priority) == types.FAILURE {
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if intern.GetHeap().IsHeapCorrupted() {
 		faults.ThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
 	types.ZVAL_COPY(elem.GetData(), data)
 	types.ZVAL_COPY(elem.GetPriority(), priority)
-	SplPtrHeapInsert(intern.GetHeap(), &elem, zend.ZEND_THIS(executeData))
+	SplPtrHeapInsert(intern.GetHeap(), &elem, executeData.ThisObjectZval())
 	return_value.SetTrue()
 	return
 }
@@ -474,12 +474,12 @@ func zim_spl_SplPriorityQueue_extract(executeData *zend.ZendExecuteData, return_
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if intern.GetHeap().IsHeapCorrupted() {
 		faults.ThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
-	if SplPtrHeapDeleteTop(intern.GetHeap(), &elem, zend.ZEND_THIS(executeData)) == types.FAILURE {
+	if SplPtrHeapDeleteTop(intern.GetHeap(), &elem, executeData.ThisObjectZval()) == types.FAILURE {
 		faults.ThrowException(spl_ce_RuntimeException, "Can't extract from an empty heap", 0)
 		return
 	}
@@ -492,7 +492,7 @@ func zim_spl_SplPriorityQueue_top(executeData *zend.ZendExecuteData, return_valu
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if intern.GetHeap().IsHeapCorrupted() {
 		faults.ThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
@@ -515,7 +515,7 @@ func zim_spl_SplPriorityQueue_setExtractFlags(executeData *zend.ZendExecuteData,
 		faults.ThrowException(spl_ce_RuntimeException, "Must specify at least one extract flag", 0)
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	intern.SetFlags(value)
 	return_value.SetLong(intern.GetFlags())
 	return
@@ -525,7 +525,7 @@ func zim_spl_SplPriorityQueue_getExtractFlags(executeData *zend.ZendExecuteData,
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	return_value.SetLong(intern.GetFlags())
 	return
 }
@@ -534,7 +534,7 @@ func zim_spl_SplHeap_recoverFromCorruption(executeData *zend.ZendExecuteData, re
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	intern.GetHeap().SetFlags(intern.GetHeap().GetFlags() & ^SPL_HEAP_CORRUPTED)
 	return_value.SetTrue()
 	return
@@ -544,7 +544,7 @@ func zim_spl_SplHeap_isCorrupted(executeData *zend.ZendExecuteData, return_value
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	return_value.SetBool(intern.GetHeap().IsHeapCorrupted())
 	return
 }
@@ -563,7 +563,7 @@ func zim_spl_SplHeap_top(executeData *zend.ZendExecuteData, return_value *types.
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	intern = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if intern.GetHeap().IsHeapCorrupted() {
 		faults.ThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
@@ -648,7 +648,7 @@ func SplHeapItMoveForward(iter *zend.ZendObjectIterator) {
 	zend.ZendUserItInvalidateCurrent(iter)
 }
 func zim_spl_SplHeap_key(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var intern *SplHeapObject = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	var intern *SplHeapObject = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -656,14 +656,14 @@ func zim_spl_SplHeap_key(executeData *zend.ZendExecuteData, return_value *types.
 	return
 }
 func zim_spl_SplHeap_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var intern *SplHeapObject = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	var intern *SplHeapObject = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	SplPtrHeapDeleteTop(intern.GetHeap(), nil, zend.ZEND_THIS(executeData))
+	SplPtrHeapDeleteTop(intern.GetHeap(), nil, executeData.ThisObjectZval())
 }
 func zim_spl_SplHeap_valid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var intern *SplHeapObject = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	var intern *SplHeapObject = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -676,7 +676,7 @@ func zim_spl_SplHeap_rewind(executeData *zend.ZendExecuteData, return_value *typ
 	}
 }
 func zim_spl_SplHeap_current(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var intern *SplHeapObject = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	var intern *SplHeapObject = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -689,7 +689,7 @@ func zim_spl_SplHeap_current(executeData *zend.ZendExecuteData, return_value *ty
 	}
 }
 func zim_spl_SplPriorityQueue_current(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var intern *SplHeapObject = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
+	var intern *SplHeapObject = Z_SPLHEAP_P(executeData.ThisObjectZval())
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

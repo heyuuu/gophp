@@ -11,8 +11,8 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = &(executeData.GetThis())
-	if container.IsUndef() {
+	container = executeData.ThisObjectZval()
+	if container == nil {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	offset = opline.Const2()
