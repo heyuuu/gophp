@@ -1,6 +1,9 @@
 package types
 
-import "github.com/heyuuu/gophp/zend"
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
+)
 
 /**
  * ClassConstant
@@ -13,6 +16,7 @@ type ClassConstant struct {
 }
 
 func NewClassConstant(ce *ClassEntry, value *Zval, docComment *String, accessType uint32) *ClassConstant {
+	b.Assert(accessType == AccPublic || accessType == AccProtected || accessType == AccPrivate)
 	c := &ClassConstant{
 		ce:          ce,
 		docComment:  docComment,

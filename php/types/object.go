@@ -20,7 +20,7 @@ const (
 /**
  * PropertyGuard
  */
-type PropertyGuard uint32
+type PropertyGuard uint8
 
 func (guard PropertyGuard) InGet() bool         { return guard&guardInGet != 0 }
 func (guard PropertyGuard) InSet() bool         { return guard&guardInSet != 0 }
