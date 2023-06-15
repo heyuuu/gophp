@@ -17,7 +17,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if val.IsArray() {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
-		generator.GetValues().GetFePos() = 0
+		generator.SetValuesFePos(0)
 	} else {
 		faults.ThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
 		UNDEF_RESULT()
@@ -53,13 +53,12 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	val = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if generator.IsForcedClose() {
 		faults.ThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
-		// ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		return 0
 	}
 	if val.IsArray() {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
-		generator.GetValues().GetFePos() = 0
+		generator.SetValuesFePos(0)
 	} else if val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
 		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
 		if ce == ZendCeGenerator {
@@ -147,7 +146,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if val.IsArray() {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
-		generator.GetValues().GetFePos() = 0
+		generator.SetValuesFePos(0)
 		// ZvalPtrDtorNogc(free_op1)
 	} else if val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
 		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
@@ -235,7 +234,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if val.IsArray() {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
-		generator.GetValues().GetFePos() = 0
+		generator.SetValuesFePos(0)
 	} else if val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
 		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
 		if ce == ZendCeGenerator {

@@ -254,7 +254,7 @@ func ZEND_VM_INC_OPCODE(executeData *ZendExecuteData) int {
 	OPLINE++
 	return OPLINE - 1
 }
-func ZEND_VM_SMART_BRANCH(_result __auto__, _check int) {
+func ZEND_VM_SMART_BRANCH(_result bool, _check int) {
 	for {
 		if _check != 0 && EG__().GetException() != nil {
 			break
@@ -277,37 +277,6 @@ func ZEND_VM_SMART_BRANCH(_result __auto__, _check int) {
 			break
 		}
 		return 0
-		break
-	}
-}
-func ZEND_VM_SMART_BRANCH_JMPZ(_result int, _check int) {
-	for {
-		if _check != 0 && EG__().GetException() != nil {
-			break
-		}
-		if _result != 0 {
-			OPLINE = opline + 2
-		} else {
-			OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-			ZEND_VM_INTERRUPT_CHECK(executeData)
-		}
-		return 0
-		break
-	}
-}
-func ZEND_VM_SMART_BRANCH_JMPNZ(_result int, _check int) {
-	for {
-		if _check != 0 && EG__().GetException() != nil {
-			break
-		}
-		if _result == 0 {
-			OPLINE = opline + 2
-		} else {
-			OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-			ZEND_VM_INTERRUPT_CHECK(executeData)
-		}
-		return 0
-		break
 	}
 }
 func ZEND_VM_SMART_BRANCH_TRUE() {

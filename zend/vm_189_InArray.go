@@ -165,7 +165,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	}
-	ZEND_VM_SMART_BRANCH(result, 1)
+	ZEND_VM_SMART_BRANCH(result != nil, 1)
 	opline.Result().SetBool(result != nil)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
