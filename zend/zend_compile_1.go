@@ -348,17 +348,17 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	}
 }
 func ZendVerifyCtConstAccess(c *types.ClassConstant, scope *types.ClassEntry) bool {
-	if (c.GetValue().GetAccessFlags() & types.AccPublic) != 0 {
-		return 1
-	} else if (c.GetValue().GetAccessFlags() & types.AccPrivate) != 0 {
+	if (c.GetAccessFlags() & types.AccPublic) != 0 {
+		return true
+	} else if (c.GetAccessFlags() & types.AccPrivate) != 0 {
 		return c.GetCe() == scope
 	} else {
 		var ce = c.GetCe()
 		for true {
 			if ce == scope {
-				return 1
+				return true
 			}
-			if !(ce.GetParent()) {
+			if ce.GetParent() == nil {
 				break
 			}
 			if ce.IsResolvedParent() {
@@ -372,11 +372,7 @@ func ZendVerifyCtConstAccess(c *types.ClassConstant, scope *types.ClassEntry) bo
 		}
 
 		/* Reverse case cannot be true during compilation */
-
-		return 0
-
-		/* Reverse case cannot be true during compilation */
-
+		return false
 	}
 }
 func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *types.String) bool {

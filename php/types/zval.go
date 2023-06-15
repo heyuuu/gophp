@@ -136,24 +136,10 @@ func (zv *Zval) GetFePos() uint32              { return zv.u2 }
 func (zv *Zval) SetFePos(value uint32)         { zv.u2 = value }
 func (zv *Zval) GetFeIterIdx() uint32          { return zv.u2 }
 func (zv *Zval) SetFeIterIdx(value uint32)     { zv.u2 = value }
-func (zv *Zval) GetAccessFlags() uint32        { return zv.u2 }
-func (zv *Zval) SetAccessFlags(value uint32)   { zv.u2 = value }
 func (zv *Zval) GetPropertyGuard() uint32      { return zv.u2 }
 func (zv *Zval) SetPropertyGuard(value uint32) { zv.u2 = value }
 func (zv *Zval) GetU2Extra() uint32            { return zv.u2 }
 func (zv *Zval) SetU2Extra(value uint32)       { zv.u2 = value }
-
-/* Zval.u2.access_flags */
-func (zv *Zval) AddAccessFlags(value uint32)      { zv.u2 |= value }
-func (zv *Zval) SubAccessFlags(value uint32)      { zv.u2 &^= value }
-func (zv *Zval) HasAccessFlags(value uint32) bool { return zv.u2&value != 0 }
-func (zv *Zval) SwitchAccessFlags(value uint32, cond bool) {
-	if cond {
-		zv.AddAccessFlags(value)
-	} else {
-		zv.SubAccessFlags(value)
-	}
-}
 
 /* Zval.u2.constant_flags */
 func (zv *Zval) AddConstantFlags(value uint32)      { zv.u2 |= value }

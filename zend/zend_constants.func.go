@@ -98,12 +98,12 @@ func ZendGetSpecialConstant(name string) *ZendConstant {
 	}
 }
 func ZendVerifyConstAccess(c *types.ClassConstant, scope *types.ClassEntry) bool {
-	if (c.GetValue().GetAccessFlags() & types.AccPublic) != 0 {
-		return 1
-	} else if (c.GetValue().GetAccessFlags() & types.AccPrivate) != 0 {
+	if c.IsPublic() {
+		return true
+	} else if c.IsPrivate() {
 		return c.GetCe() == scope
 	} else {
-		b.Assert((c.GetValue().GetAccessFlags() & types.AccProtected) != 0)
+		b.Assert(c.IsProtected())
 		return ZendCheckProtected(c.GetCe(), scope)
 	}
 }
@@ -192,7 +192,7 @@ func ZendGetConstantEx(name string, scope *types.ClassEntry, flags uint32) *type
 		}
 		if !ZendVerifyConstAccess(c, scope) {
 			if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), className, constantName)
+				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), className, constantName)
 			}
 			return nil
 		}

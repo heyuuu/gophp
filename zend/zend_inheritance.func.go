@@ -837,7 +837,7 @@ func DoInheritProperty(parent_info *types.PropertyInfo, key string, ce *types.Cl
 	var child_info *types.PropertyInfo = ce.PropertyTable().Get(key)
 	if child_info != nil {
 		if parent_info.HasFlags(types.AccPrivate | types.AccChanged) {
-			child_info.SetIsChanged(true)
+			child_info.MarkIsChanged()
 		}
 		if !parent_info.IsPrivate() {
 			if (parent_info.GetFlags() & types.AccStatic) != (child_info.GetFlags() & types.AccStatic) {
@@ -911,10 +911,10 @@ func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
 func DoInheritClassConstant(name string, parentConst *types.ClassConstant, ce *types.ClassEntry) {
 	var c = ce.ConstantsTable().Get(name)
 	if c != nil {
-		if (c.GetValue().GetAccessFlags() & types.AccPppMask) > (parentConst.GetValue().GetAccessFlags() & types.AccPppMask) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name, ZendVisibilityString(parentConst.GetValue().GetAccessFlags()), ce.GetParent().Name(), b.Cond((parentConst.GetValue().GetAccessFlags()&types.AccPublic) != 0, "", " or weaker"))
+		if c.PriorLevel() > parentConst.PriorLevel() {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name, ZendVisibilityString(parentConst.GetAccessFlags()), ce.GetParent().Name(), b.Cond(parentConst.IsPublic(), "", " or weaker"))
 		}
-	} else if (parentConst.GetValue().GetAccessFlags() & types.AccPrivate) == 0 {
+	} else if !parentConst.IsPrivate() {
 		if parentConst.GetValue().IsConstantAst() {
 			ce.SetIsConstantsUpdated(false)
 		}

@@ -42,16 +42,10 @@ func (this *PropertyInfo) GetType() *TypeHint     { return this.typ }
 func (this *PropertyInfo) AddFlags(value uint32)      { this.flags |= value }
 func (this *PropertyInfo) SubFlags(value uint32)      { this.flags &^= value }
 func (this *PropertyInfo) HasFlags(value uint32) bool { return this.flags&value != 0 }
-func (this *PropertyInfo) SwitchFlags(value uint32, cond bool) {
-	if cond {
-		this.AddFlags(value)
-	} else {
-		this.SubFlags(value)
-	}
-}
-func (this PropertyInfo) IsStatic() bool          { return this.HasFlags(AccStatic) }
-func (this PropertyInfo) IsProtected() bool       { return this.HasFlags(AccProtected) }
-func (this PropertyInfo) IsPrivate() bool         { return this.HasFlags(AccPrivate) }
-func (this PropertyInfo) IsPublic() bool          { return this.HasFlags(AccPublic) }
-func (this PropertyInfo) IsChanged() bool         { return this.HasFlags(AccChanged) }
-func (this *PropertyInfo) SetIsChanged(cond bool) { this.SwitchFlags(AccChanged, cond) }
+
+func (this PropertyInfo) IsStatic() bool    { return this.HasFlags(AccStatic) }
+func (this PropertyInfo) IsProtected() bool { return this.HasFlags(AccProtected) }
+func (this PropertyInfo) IsPrivate() bool   { return this.HasFlags(AccPrivate) }
+func (this PropertyInfo) IsPublic() bool    { return this.HasFlags(AccPublic) }
+func (this PropertyInfo) IsChanged() bool   { return this.HasFlags(AccChanged) }
+func (this *PropertyInfo) MarkIsChanged()   { this.AddFlags(AccChanged) }
