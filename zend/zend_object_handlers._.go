@@ -26,13 +26,6 @@ const ZEND_PROPERTY_EXISTS = 0x2
 
 const ZEND_WRONG_PROPERTY_OFFSET = 0
 
-/* guard flags */
-
-const IN_GET = 1 << 0
-const IN_SET = 1 << 1
-const IN_UNSET = 1 << 2
-const IN_ISSET = 1 << 3
-
 /*
   __X accessors explanation:
 

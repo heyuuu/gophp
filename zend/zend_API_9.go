@@ -76,7 +76,7 @@ func ZendDeclarePropertyString(ce *types.ClassEntry, name string, name_length in
 	property.SetString(types.NewString(value))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
-func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, accessType int, docComment *types.String) int {
+func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, accessType uint32, docComment *types.String) int {
 	if ce.IsInterface() {
 		if accessType != types.AccPublic {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ce.Name(), name.GetVal())
@@ -86,8 +86,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 		faults.ErrorNoreturn(b.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
 
-	var c = types.NewClassConstant(ce, value, docComment)
-	c.SetAccessFlags(uint32(accessType))
+	var c = types.NewClassConstant(ce, value, docComment, accessType)
 	if value.IsConstantAst() {
 		ce.SetIsConstantsUpdated(false)
 	}

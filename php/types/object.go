@@ -10,17 +10,26 @@ import (
 type objectCompareFunc func(object1 *Zval, object2 *Zval) int
 type objectGetPropertiesFunc func(object *Zval) *Array
 
-// PropertyGuard
+const (
+	guardInGet = 1 << iota
+	guardInSet
+	guardInUnset
+	guardInIsset
+)
+
+/**
+ * PropertyGuard
+ */
 type PropertyGuard uint32
 
-func (guard PropertyGuard) InGet() bool         { return guard&zend.IN_GET != 0 }
-func (guard PropertyGuard) InSet() bool         { return guard&zend.IN_SET != 0 }
-func (guard PropertyGuard) InIsset() bool       { return guard&zend.IN_ISSET != 0 }
-func (guard PropertyGuard) InUnset() bool       { return guard&zend.IN_UNSET != 0 }
-func (guard *PropertyGuard) MarkInGet(v bool)   { guard.mark(zend.IN_GET, v) }
-func (guard *PropertyGuard) MarkInSet(v bool)   { guard.mark(zend.IN_SET, v) }
-func (guard *PropertyGuard) MarkInIsset(v bool) { guard.mark(zend.IN_ISSET, v) }
-func (guard *PropertyGuard) MarkInUnset(v bool) { guard.mark(zend.IN_UNSET, v) }
+func (guard PropertyGuard) InGet() bool         { return guard&guardInGet != 0 }
+func (guard PropertyGuard) InSet() bool         { return guard&guardInSet != 0 }
+func (guard PropertyGuard) InIsset() bool       { return guard&guardInIsset != 0 }
+func (guard PropertyGuard) InUnset() bool       { return guard&guardInUnset != 0 }
+func (guard *PropertyGuard) MarkInGet(v bool)   { guard.mark(guardInGet, v) }
+func (guard *PropertyGuard) MarkInSet(v bool)   { guard.mark(guardInSet, v) }
+func (guard *PropertyGuard) MarkInIsset(v bool) { guard.mark(guardInIsset, v) }
+func (guard *PropertyGuard) MarkInUnset(v bool) { guard.mark(guardInUnset, v) }
 func (guard *PropertyGuard) mark(sign PropertyGuard, v bool) {
 	if v {
 		*guard |= sign

@@ -12,10 +12,11 @@ type ClassConstant struct {
 	accessFlags uint32
 }
 
-func NewClassConstant(ce *ClassEntry, value *Zval, docComment *String) *ClassConstant {
+func NewClassConstant(ce *ClassEntry, value *Zval, docComment *String, accessType uint32) *ClassConstant {
 	c := &ClassConstant{
-		ce:         ce,
-		docComment: docComment,
+		ce:          ce,
+		docComment:  docComment,
+		accessFlags: accessType,
 	}
 	ZVAL_COPY_VALUE(&c.value, value)
 	return c

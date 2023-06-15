@@ -1309,7 +1309,7 @@ func ZendStdHasPropertyEx(zobj *types.ZendObject, member *types.Zval, has_set_ex
 			ZendStdCallIssetter(zobj, name, &rv)
 			result = operators.IZendIsTrue(&rv)
 			if has_set_exists == ZEND_PROPERTY_NOT_EMPTY && result != 0 {
-				if EG__().GetException() == nil && zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
+				if EG__().GetException() == nil && zobj.GetCe().GetGet() != nil && !guard.InGet() {
 					guard.MarkInGet(true)
 					ZendStdCallGetter(zobj, name.GetStr(), &rv)
 					guard.MarkInGet(false)
