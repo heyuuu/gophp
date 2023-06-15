@@ -232,8 +232,7 @@ func PhpAutoGlobalsCreateGlobals(name string) bool {
 	var globals types.Zval
 
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */
-
-	globals.SetImmutableArray(EG__().GetSymbolTable())
+	globals.SetArray(EG__().GetSymbolTable())
 	globals.SetNewRef(&globals)
 	EG__().GetSymbolTable().KeyUpdate(name, &globals)
 	return false /* don't rearm */

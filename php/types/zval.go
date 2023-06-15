@@ -56,7 +56,7 @@ func (zv *Zval) IsBool() bool            { return zv.typ == IS_FALSE || zv.typ =
 func (zv *Zval) IsLong() bool            { return zv.typ == IS_LONG }
 func (zv *Zval) IsDouble() bool          { return zv.typ == IS_DOUBLE }
 func (zv *Zval) IsString() bool          { return zv.typ == IS_STRING }
-func (zv *Zval) IsArray() bool           { return zv.typ == IS_ARRAY || zv.typ == _IS_IMMUTABLE_ARRAY }
+func (zv *Zval) IsArray() bool           { return zv.typ == IS_ARRAY }
 func (zv *Zval) IsObject() bool          { return zv.typ == IS_OBJECT }
 func (zv *Zval) IsResource() bool        { return zv.typ == IS_RESOURCE }
 func (zv *Zval) IsReference() bool       { return zv.typ == IS_REFERENCE }
@@ -95,7 +95,6 @@ func (zv *Zval) SetStringVal(s string)           { zv.typ, zv.value = IS_STRING,
 func (zv *Zval) SetString(s *String)             { zv.typ, zv.value = IS_STRING, s }
 func (zv *Zval) SetEmptyArray()                  { zv.typ, zv.value = IS_ARRAY, NewArray(0) }
 func (zv *Zval) SetArray(arr *Array)             { zv.typ, zv.value = IS_ARRAY, arr }
-func (zv *Zval) SetImmutableArray(arr *Array)    { zv.typ, zv.value = _IS_IMMUTABLE_ARRAY, arr }
 func (zv *Zval) SetArrayOfInt(arr []int)         { zv.SetArray(NewArrayOfInt(arr)) }
 func (zv *Zval) SetArrayOfString(arr []string)   { zv.SetArray(NewArrayOfString(arr)) }
 func (zv *Zval) SetArrayOfZval(arr []*Zval)      { zv.SetArray(NewArrayOfZval(arr)) }
@@ -110,18 +109,14 @@ func (zv *Zval) SetPtr(ptr any)                  { zv.typ, zv.value = IS_PTR, pt
 func (zv *Zval) SetCe(value *ClassEntry)         { zv.typ, zv.value = IS_PTR, value }
 func (zv *Zval) SetFunc(value IFunction)         { zv.typ, zv.value = IS_PTR, value }
 func (zv *Zval) SetIsError()                     { zv.typ, zv.value = IS_ERROR, nil }
+func (zv *Zval) SetBy(val *Zval)                 { zv.CopyValueFrom(val) }
 
 // fast property
 func (zv *Zval) ResourceHandle() int { return zv.Resource().GetHandle() }
 func (zv *Zval) ResourceType() int   { return zv.Resource().GetType() }
 
 /** Zval.u1 -> type & typeFlags */
-func (zv *Zval) GetType() ZvalType {
-	if zv.typ == _IS_IMMUTABLE_ARRAY {
-		return IS_ARRAY
-	}
-	return zv.typ
-}
+func (zv *Zval) GetType() ZvalType { return zv.typ }
 func (zv *Zval) SetType(typ ZvalType) {
 	b.Assert(typ <= IS_TRUE)
 	zv.typ, zv.value = typ, nil
@@ -140,22 +135,3 @@ func (zv *Zval) GetPropertyGuard() uint32      { return zv.u2 }
 func (zv *Zval) SetPropertyGuard(value uint32) { zv.u2 = value }
 func (zv *Zval) GetU2Extra() uint32            { return zv.u2 }
 func (zv *Zval) SetU2Extra(value uint32)       { zv.u2 = value }
-
-/* Zval.u2.constant_flags */
-func (zv *Zval) AddConstantFlags(value uint32)      { zv.u2 |= value }
-func (zv *Zval) SubConstantFlags(value uint32)      { zv.u2 &^= value }
-func (zv *Zval) HasConstantFlags(value uint32) bool { return zv.u2&value != 0 }
-func (zv *Zval) SwitchConstantFlags(value uint32, cond bool) {
-	if cond {
-		zv.AddConstantFlags(value)
-	} else {
-		zv.SubConstantFlags(value)
-	}
-}
-
-/**
- * init
- */
-func (zv *Zval) SetBy(val *Zval) {
-	zv.CopyValueFrom(val)
-}

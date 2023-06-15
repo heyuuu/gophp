@@ -51,10 +51,9 @@ const (
 
 	/* internal types */
 
-	IS_INDIRECT  ZvalType = 13
-	IS_PTR       ZvalType = 14
-	IS_ALIAS_PTR ZvalType = 15
-	IS_ERROR     ZvalType = 15 // _IS_ERROR
+	IS_INDIRECT ZvalType = 13
+	IS_PTR      ZvalType = 14
+	IS_ERROR    ZvalType = 15 // _IS_ERROR
 
 	/* fake types used only for type hinting (Z_TYPE(zv) can not use them) */
 
@@ -63,8 +62,6 @@ const (
 	IS_ITERABLE ZvalType = 18
 	IS_VOID     ZvalType = 19
 	IS_NUMBER   ZvalType = 20 // _IS_NUMBER
-
-	_IS_IMMUTABLE_ARRAY ZvalType = 30
 )
 
 /* we should never set just Z_TYPE, we should set Z_TYPE_INFO */
