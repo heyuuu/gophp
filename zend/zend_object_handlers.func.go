@@ -396,53 +396,6 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.Strin
 		}
 	}
 }
-func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 {
-	var guards *types.Array
-	var zv *types.Zval
-	var ptr *uint32
-	b.Assert(zobj.GetCe().IsUseGuards())
-	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
-	if zv.IsString() {
-		var str *types.String = zv.String()
-		if str.GetStr() == member.GetStr() {
-			return &(zv.GetPropertyGuard())
-		} else if zv.GetPropertyGuard() == 0 {
-
-			zv.SetStringVal(member.GetStr())
-			return &(zv.GetPropertyGuard())
-		} else {
-			guards = types.NewArray(8)
-
-			/* mark pointer as "special" using low bit */
-			guards.KeyAddNew(str.GetStr(), types.NewZvalPtr(any(zend_uintptr_t&zv.GetPropertyGuard()|1)))
-
-			zv.SetArray(guards)
-		}
-	} else if zv.IsArray() {
-		guards = zv.Array()
-		b.Assert(guards != nil)
-		zv = guards.KeyFind(member.GetStr())
-		if zv != nil {
-			return (*uint32)(types.ZendUintptrT(zv.Ptr()) & ^1)
-		}
-	} else {
-		b.Assert(zv.IsUndef())
-		zv.SetStringVal(member.GetStr())
-		zv.SetPropertyGuard(0)
-		return &(zv.GetPropertyGuard())
-	}
-
-	/* we have to allocate uint32_t separately because ht->arData may be reallocated */
-
-	ptr = (*uint32)(Emalloc(b.SizeOf("uint32_t")))
-	*ptr = 0
-
-	if guards.KeyExists(member.GetStr()) {
-		return nil
-	}
-	guards.KeyAddNew(member.GetStr(), types.NewZvalPtr(ptr))
-	return ptr
-}
 
 func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {
 	return ZendStdReadPropertyEx(object.Object(), member, type_, cache_slot, rv)
@@ -453,7 +406,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, type_ int
 	var retval *types.Zval
 	var property_offset uintPtr
 	var prop_info *types.PropertyInfo = nil
-	var guard *uint32 = nil
+	var guard *types.PropertyGuard = nil
 	name = operators.ZvalTryGetString(member)
 	if name == nil {
 		return UninitializedZval()
@@ -506,45 +459,35 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, type_ int
 
 	if type_ == BP_VAR_IS && zobj.GetCe().GetIsset() != nil {
 		var tmp_result types.Zval
-		guard = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & IN_ISSET) == 0 {
+		guard = zobj.Guard(name.GetStr())
+		if !guard.InIsset() {
 			if tmp_name == nil {
 				tmp_name = name.Copy()
 			}
-			// 			zobj.AddRefcount()
 			tmp_result.SetUndef()
-			*guard |= IN_ISSET
+			guard.MarkInIsset(true)
 			ZendStdCallIssetter(zobj, name, &tmp_result)
-			*guard &= ^IN_ISSET
+			guard.MarkInIsset(false)
 			if !operators.ZvalIsTrue(&tmp_result) {
 				retval = UninitializedZval()
-				// OBJ_RELEASE(zobj)
-				// ZvalPtrDtor(&tmp_result)
 				goto exit
 			}
-			// ZvalPtrDtor(&tmp_result)
-			if zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
+			if zobj.GetCe().GetGet() != nil && !guard.InGet() {
 				goto call_getter
 			}
-			// OBJ_RELEASE(zobj)
-		} else if zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
+		} else if zobj.GetCe().GetGet() != nil && !guard.InGet() {
 			goto call_getter_addref
 		}
 	} else if zobj.GetCe().GetGet() != nil {
 
 		/* magic get */
-
-		guard = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & IN_GET) == 0 {
-
-			/* have getter - try with it! */
-
+		guard = zobj.Guard(name.GetStr())
+		if !guard.InGet() {
 		call_getter_addref:
-			// 			zobj.AddRefcount()
 		call_getter:
-			*guard |= IN_GET
+			guard.MarkInGet(true)
 			ZendStdCallGetter(zobj, name.GetStr(), rv)
-			*guard &= ^IN_GET
+			guard.MarkInGet(false)
 			if rv.IsNotUndef() {
 				retval = rv
 				if !(rv.IsReference()) && (type_ == BP_VAR_W || type_ == BP_VAR_RW || type_ == BP_VAR_UNSET) {
@@ -580,7 +523,6 @@ uninit_error:
 	}
 	retval = UninitializedZval()
 exit:
-	//ZendTmpStringRelease(tmp_name)
 	return retval
 }
 func PropertyUsesStrictTypes() bool {
@@ -641,13 +583,11 @@ func ZendStdWritePropertyEx(zobj *types.ZendObject, member *types.Zval, value *t
 	/* magic set */
 
 	if zobj.GetCe().GetSet() != nil {
-		var guard *uint32 = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & IN_SET) == 0 {
-			// 			zobj.AddRefcount()
-			*guard |= IN_SET
+		var guard = zobj.Guard(name.GetStr())
+		if !guard.InGet() {
+			guard.MarkInSet(true)
 			ZendStdCallSetter(zobj, name.GetStr(), value)
-			*guard &= ^IN_SET
-			// OBJ_RELEASE(zobj)
+			guard.MarkInSet(false)
 			variable_ptr = value
 		} else if !(IS_WRONG_PROPERTY_OFFSET(property_offset)) {
 			goto write_std_property
@@ -786,7 +726,7 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.ZendObject, member *types.Zval, type
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		retval = OBJ_PROP(zobj, property_offset)
 		if retval.IsUndef() {
-			if zobj.GetCe().GetGet() == nil || ((*ZendGetPropertyGuard)(zobj, name)&IN_GET) != 0 || prop_info != nil && retval.GetU2Extra() == types.IS_PROP_UNINIT {
+			if zobj.GetCe().GetGet() == nil || zobj.Guard(name.GetStr()).InGet() || prop_info != nil && retval.GetU2Extra() == types.IS_PROP_UNINIT {
 				if type_ == BP_VAR_RW || type_ == BP_VAR_R {
 					if prop_info != nil {
 						faults.ThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name.GetVal())
@@ -797,13 +737,8 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.ZendObject, member *types.Zval, type
 					}
 				}
 			} else {
-
 				/* we do have getter - fail and let it try again with usual get/set */
-
 				retval = nil
-
-				/* we do have getter - fail and let it try again with usual get/set */
-
 			}
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
@@ -814,7 +749,7 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.ZendObject, member *types.Zval, type
 				return retval
 			}
 		}
-		if zobj.GetCe().GetGet() == nil || ((*ZendGetPropertyGuard)(zobj, name)&IN_GET) != 0 {
+		if zobj.GetCe().GetGet() == nil || zobj.Guard(name.GetStr()).InGet() {
 			if zobj.GetProperties() == nil {
 				RebuildObjectProperties(zobj)
 			}
@@ -885,18 +820,14 @@ func ZendStdUnsetPropertyEx(zobj *types.ZendObject, member *types.Zval, cache_sl
 	/* magic unset */
 
 	if zobj.GetCe().GetUnset() != nil {
-		var guard *uint32 = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & IN_UNSET) == 0 {
-
+		var guard = zobj.Guard(name.GetStr())
+		if !guard.InUnset() {
 			/* have unseter - try with it! */
-
-			*guard |= IN_UNSET
+			guard.MarkInUnset(true)
 			ZendStdCallUnsetter(zobj, name.GetStr())
-			*guard &= ^IN_UNSET
+			guard.MarkInUnset(false)
 		} else if IS_WRONG_PROPERTY_OFFSET(property_offset) {
-
 			/* Trigger the correct error */
-
 			ZendWrongOffset(zobj.GetCe(), name)
 			b.Assert(EG__().GetException() != nil)
 			goto exit
@@ -904,9 +835,6 @@ func ZendStdUnsetPropertyEx(zobj *types.ZendObject, member *types.Zval, cache_sl
 	}
 exit:
 	//ZendTmpStringRelease(tmp_name)
-}
-func ZendStdUnsetDimension(object *types.Zval, offset *types.Zval) {
-	ZendStdUnsetDimensionEx(object.Object(), offset)
 }
 func ZendStdUnsetDimensionEx(object *types.ZendObject, offset *types.Zval) {
 	var ce *types.ClassEntry = object.GetCe()
@@ -1369,37 +1297,31 @@ func ZendStdHasPropertyEx(zobj *types.ZendObject, member *types.Zval, has_set_ex
 	}
 	result = 0
 	if has_set_exists != ZEND_PROPERTY_EXISTS && zobj.GetCe().GetIsset() != nil {
-		var guard *uint32 = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & IN_ISSET) == 0 {
+		var guard = zobj.Guard(name.GetStr())
+		if !guard.InIsset() {
 			var rv types.Zval
 
 			/* have issetter - try with it! */
-
 			if tmp_name == nil {
 				tmp_name = name.Copy()
 			}
-			// 			zobj.AddRefcount()
-			*guard |= IN_ISSET
+			guard.MarkInIsset(true)
 			ZendStdCallIssetter(zobj, name, &rv)
 			result = operators.IZendIsTrue(&rv)
-			// ZvalPtrDtor(&rv)
 			if has_set_exists == ZEND_PROPERTY_NOT_EMPTY && result != 0 {
 				if EG__().GetException() == nil && zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
-					*guard |= IN_GET
+					guard.MarkInGet(true)
 					ZendStdCallGetter(zobj, name.GetStr(), &rv)
-					*guard &= ^IN_GET
+					guard.MarkInGet(false)
 					result = operators.IZendIsTrue(&rv)
-					// ZvalPtrDtor(&rv)
 				} else {
 					result = 0
 				}
 			}
-			*guard &= ^IN_ISSET
-			// OBJ_RELEASE(zobj)
+			guard.MarkInIsset(false)
 		}
 	}
 exit:
-	//ZendTmpStringRelease(tmp_namo *
 	return result
 }
 

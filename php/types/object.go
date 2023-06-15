@@ -10,6 +10,25 @@ import (
 type objectCompareFunc func(object1 *Zval, object2 *Zval) int
 type objectGetPropertiesFunc func(object *Zval) *Array
 
+// PropertyGuard
+type PropertyGuard uint32
+
+func (guard PropertyGuard) InGet() bool         { return guard&zend.IN_GET != 0 }
+func (guard PropertyGuard) InSet() bool         { return guard&zend.IN_SET != 0 }
+func (guard PropertyGuard) InIsset() bool       { return guard&zend.IN_ISSET != 0 }
+func (guard PropertyGuard) InUnset() bool       { return guard&zend.IN_UNSET != 0 }
+func (guard *PropertyGuard) MarkInGet(v bool)   { guard.mark(zend.IN_GET, v) }
+func (guard *PropertyGuard) MarkInSet(v bool)   { guard.mark(zend.IN_SET, v) }
+func (guard *PropertyGuard) MarkInIsset(v bool) { guard.mark(zend.IN_ISSET, v) }
+func (guard *PropertyGuard) MarkInUnset(v bool) { guard.mark(zend.IN_UNSET, v) }
+func (guard *PropertyGuard) mark(sign PropertyGuard, v bool) {
+	if v {
+		*guard |= sign
+	} else {
+		*guard &^= sign
+	}
+}
+
 /**
  * ZendObject
  */
@@ -19,8 +38,9 @@ type ZendObject struct {
 	handle          uint
 	ce              *ClassEntry
 	handlers        *ObjectHandlers
-	properties      *Array // 动态属性
-	propertiesTable []Zval // 静态属性
+	properties      *Array                    // 动态属性
+	propertiesTable []Zval                    // 静态属性
+	propertyGuards  map[string]*PropertyGuard // 属性 guard
 
 	data IObject // 封装 Object 数据，便于扩展
 
@@ -30,6 +50,29 @@ type ZendObject struct {
 	isFreeCalled bool
 }
 
+// guard
+func (o *ZendObject) Guard(member string) *PropertyGuard {
+	b.Assert(o.ce.IsUseGuards())
+	// php 原版设计，将 guard 附加在 propertiesTable 最后一位; gophp 中，将其抽出作为单独 map
+
+	if o.propertyGuards == nil {
+		var tmp PropertyGuard
+		o.propertyGuards = map[string]*PropertyGuard{
+			member: &tmp,
+		}
+		return &tmp
+	}
+
+	if guard := o.propertyGuards[member]; guard != nil {
+		return guard
+	}
+
+	var tmp PropertyGuard
+	o.propertyGuards[member] = &tmp
+	return &tmp
+}
+
+//
 func NewStdObject(ce *ClassEntry) *ZendObject {
 	return NewObject(ce, zend.StdObjectHandlersPtr)
 }
