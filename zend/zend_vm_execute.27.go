@@ -1,7 +1,6 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/operators"
 )
@@ -10,7 +9,6 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 	var opline *types.ZendOp = executeData.GetOpline()
 	var container *types.Zval
 	var offset *types.Zval
-	var cache_slot *any = nil
 	container = opline.Op1()
 	offset = opline.Const2()
 	if !container.IsObject() {
@@ -26,8 +24,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 			}
 			ZendWrongPropertyRead(offset)
 			opline.Result().SetNull()
-			goto fetch_obj_r_finish
-			break
+			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	}
 
@@ -35,48 +32,12 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 
 	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
-	{
-		cache_slot = CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_FETCH_REF)
-		if zobj.GetCe() == CACHED_PTR_EX(cache_slot) {
-			var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-			if IS_VALID_PROPERTY_OFFSET(prop_offset) {
-				retval = OBJ_PROP(zobj, prop_offset)
-				if !retval.IsUndef() {
-					{
-						goto fetch_obj_r_copy
-					}
 
-				}
-			} else if zobj.GetProperties() != nil {
-				if !(IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(prop_offset)) {
-					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
-					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
-						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.StringVal())) {
-							retval = p.GetVal()
-							{
-								goto fetch_obj_r_copy
-							}
-
-						}
-					}
-					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
-				}
-				retval = PropFindAndCache(zobj, offset.StringVal(), cache_slot)
-				if retval != nil {
-					goto fetch_obj_r_copy
-				}
-			}
-		}
-	}
-
-	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadPropertyEx(offset, BP_VAR_R, opline.Result())
 	if retval != opline.Result() {
-	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		operators.ZendUnwrapReference(retval)
 	}
-fetch_obj_r_finish:
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

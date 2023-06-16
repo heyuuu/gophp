@@ -2024,11 +2024,11 @@ func vmGetFetchObjIsHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 1691 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 	offset := vmOffsetBySpec(spec, op)
 	handlers := [25]types.OpcodeHandlerT{
-		ZEND_FETCH_OBJ_IS_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST
-		ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_TMP_VAR
-		ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER, // IS_CONST * IS_VAR
-		nil,                                     // IS_CONST * IS_UNUSED
-		ZEND_FETCH_OBJ_IS_SPEC_CONST_CV_HANDLER, // IS_CONST * IS_CV
+		fetchObjIsHandler0, // IS_CONST * IS_CONST
+		fetchObjIsHandler0, // IS_CONST * IS_TMP_VAR
+		fetchObjIsHandler0, // IS_CONST * IS_VAR
+		nil,                // IS_CONST * IS_UNUSED
+		fetchObjIsHandler0, // IS_CONST * IS_CV
 		ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER,  // IS_TMP_VAR * IS_CONST
 		ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_TMP_VAR * IS_TMP_VAR
 		ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_TMP_VAR * IS_VAR

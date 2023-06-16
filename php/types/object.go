@@ -191,20 +191,20 @@ func (o *ZendObject) Clone() *ZendObject {
 }
 
 // property
-func (o *ZendObject) ReadProperty(member *Zval, typ int, cacheSlot *any, rv *Zval) *Zval {
-	return o.data.ReadProperty(member, typ, cacheSlot, rv)
+func (o *ZendObject) ReadPropertyEx(member *Zval, typ int, rv *Zval) *Zval {
+	return o.data.ReadProperty(member, typ, nil, rv)
 }
-func (o *ZendObject) WriteProperty(member *Zval, value *Zval, cacheSlot *any) *Zval {
-	return o.data.WriteProperty(member, value, cacheSlot)
+func (o *ZendObject) WritePropertyEx(member *Zval, value *Zval) *Zval {
+	return o.data.WriteProperty(member, value, nil)
 }
-func (o *ZendObject) HasProperty(member *Zval, hasSetExists int, cacheSlot *any) int {
-	return o.data.HasProperty(member, hasSetExists, cacheSlot)
+func (o *ZendObject) HasPropertyEx(member *Zval, hasSetExists int) bool {
+	return o.data.HasProperty(member, hasSetExists, nil) != 0
 }
-func (o *ZendObject) UnsetProperty(member *Zval, cacheSlot *any) {
-	o.data.UnsetProperty(member, cacheSlot)
+func (o *ZendObject) UnsetPropertyEx(member *Zval) {
+	o.data.UnsetProperty(member, nil)
 }
-func (o *ZendObject) GetPropertyPtr(member *Zval, typ int, cacheSlot *any) *Zval {
-	return o.data.GetPropertyPtr(member, typ, cacheSlot)
+func (o *ZendObject) GetPropertyPtrEx(member *Zval, typ int) *Zval {
+	return o.data.GetPropertyPtr(member, typ, nil)
 }
 
 // properties

@@ -13,10 +13,8 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	var obj types.Zval
 	var z_copy types.Zval
 	obj.SetObject(object.Object())
-	// 	obj.AddRefcount()
-	z = obj.Object().ReadProperty(property, BP_VAR_R, cache_slot, &rv)
+	z = obj.Object().ReadPropertyEx(property, BP_VAR_R, &rv)
 	if EG__().GetException() != nil {
-		// OBJ_RELEASE(obj.Object())
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetNull()
 		}
@@ -25,9 +23,6 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	if z.IsObject() && z.Object().CanGet() {
 		var rv2 types.Zval
 		var value *types.Zval = z.Object().Get(&rv2)
-		if z == &rv {
-			// ZvalPtrDtor(&rv)
-		}
 		z.CopyValueFrom(value)
 	}
 	types.ZVAL_COPY_DEREF(&z_copy, z)
@@ -39,7 +34,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), &z_copy)
 	}
-	obj.Object().WriteProperty(property, &z_copy, cache_slot)
+	obj.Object().WritePropertyEx(property, &z_copy)
 }
 func ZendAssignOpOverloadedProperty(
 	object *types.Zval,
@@ -54,10 +49,8 @@ func ZendAssignOpOverloadedProperty(
 	var obj types.Zval
 	var res types.Zval
 	obj.SetObject(object.Object())
-	// 	obj.AddRefcount()
-	z = obj.Object().ReadProperty(property, BP_VAR_R, cache_slot, &rv)
+	z = obj.Object().ReadPropertyEx(property, BP_VAR_R, &rv)
 	if EG__().GetException() != nil {
-		// OBJ_RELEASE(obj.Object())
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetUndef()
 		}
@@ -66,13 +59,10 @@ func ZendAssignOpOverloadedProperty(
 	if z.IsObject() && z.Object().CanGet() {
 		var rv2 types.Zval
 		var value *types.Zval = z.Object().Get(&rv2)
-		if z == &rv {
-			// ZvalPtrDtor(&rv)
-		}
 		z.CopyValueFrom(value)
 	}
 	if ZendBinaryOp(&res, z, value, opline) == types.SUCCESS {
-		obj.Object().WriteProperty(property, &res, cache_slot)
+		obj.Object().WritePropertyEx(property, &res)
 	}
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), &res)

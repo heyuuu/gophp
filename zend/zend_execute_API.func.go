@@ -288,7 +288,7 @@ func ZendGetExecutedLineno() uint32 {
 }
 func ZendGetExecutedScope() *types.ClassEntry {
 	var ex *ZendExecuteData = CurrEX()
-	for true {
+	for {
 		if ex == nil {
 			return nil
 		} else if ex.GetFunc() != nil && (ZEND_USER_CODE(ex.GetFunc().GetType()) || ex.GetFunc().GetScope() != nil) {

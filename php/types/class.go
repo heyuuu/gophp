@@ -164,6 +164,10 @@ func (ce *ClassEntry) GetPropertyInfo(propNum int) *PropertyInfo {
 	return ce.GetPropertiesInfoTable()[propNum]
 }
 
+func (ce *ClassEntry) GetProperty(name string) *PropertyInfo {
+	return ce.propertyTable.Get(name)
+}
+
 // interfaces
 func (ce *ClassEntry) GetNumInterfaces() int {
 	if ce.IsResolvedInterfaces() {

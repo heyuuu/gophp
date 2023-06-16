@@ -109,21 +109,20 @@ func ZendUpdatePropertyEx(scope *types.ClassEntry, object *types.Zval, name stri
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
 	property := types.NewZvalString(name)
-	object.Object().WriteProperty(property, value, nil)
+	object.Object().WritePropertyEx(property, value)
 	EG__().SetFakeScope(oldScope)
 }
 func ZendUnsetProperty(scope *types.ClassEntry, object *types.Zval, name string) {
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
 	property := types.NewZvalString(name)
-	object.Object().UnsetProperty(property, 0)
+	object.Object().UnsetPropertyEx(property)
 	EG__().SetFakeScope(oldScope)
 }
 func ZendReadProperty(scope *types.ClassEntry, object *types.Zval, name string, silent bool, rv *types.Zval) *types.Zval {
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
-	property := types.NewZvalString(name)
-	value := object.Object().ReadProperty(property, b.Cond(silent != 0, BP_VAR_IS, BP_VAR_R), nil, rv)
+	value := object.Object().ReadPropertyEx(types.NewZvalString(name), b.Cond(silent, BP_VAR_IS, BP_VAR_R), rv)
 	EG__().SetFakeScope(oldScope)
 	return value
 }

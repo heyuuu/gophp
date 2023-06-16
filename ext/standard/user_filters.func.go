@@ -170,7 +170,7 @@ func UserfilterFilter(
 	 * from being destroyed properly */
 
 	zpropname.SetStringVal("stream")
-	obj.Object().UnsetProperty(&zpropname, nil)
+	obj.Object().UnsetPropertyEx(&zpropname)
 	stream.SubFlags(core.PHP_STREAM_FLAG_NO_FCLOSE)
 	stream.AddFlags(orig_no_fclose)
 	return ret

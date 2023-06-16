@@ -1,7 +1,6 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -26,7 +25,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		container.Object().UnsetProperty(offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().UnsetPropertyEx(offset)
 		break
 	}
 	if free_op1 != nil {
@@ -56,7 +55,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		container.Object().UnsetProperty(offset, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().UnsetPropertyEx(offset)
 		break
 	}
 	// ZvalPtrDtorNogc(free_op2)
@@ -86,7 +85,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		container.Object().UnsetProperty(offset, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().UnsetPropertyEx(offset)
 		break
 	}
 	if free_op1 != nil {
@@ -103,15 +102,11 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int 
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	offset = opline.Const2()
-	for {
-		container.Object().UnsetProperty(offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
-		break
-	}
+	container.Object().UnsetPropertyEx(offset)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_UNSET_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
-	var free_op2 ZendFreeOp
 	var container *types.Zval
 	var offset *types.Zval
 	container = executeData.ThisObjectZval()
@@ -119,7 +114,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	offset = opline.Op2()
-	container.Object().UnsetProperty(offset, nil)
+	container.Object().UnsetPropertyEx(offset)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_UNSET_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -131,7 +126,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	offset = opline.Cv2OrUndef()
-	container.Object().UnsetProperty(offset, nil)
+	container.Object().UnsetPropertyEx(offset)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_UNSET_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -154,7 +149,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		container.Object().UnsetProperty(offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().UnsetPropertyEx(offset)
 		break
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -180,7 +175,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		container.Object().UnsetProperty(offset, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().UnsetPropertyEx(offset)
 		break
 	}
 	// ZvalPtrDtorNogc(free_op2)
@@ -206,7 +201,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		container.Object().UnsetProperty(offset, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
+		container.Object().UnsetPropertyEx(offset)
 		break
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

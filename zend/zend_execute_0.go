@@ -91,20 +91,24 @@ func CACHED_PTR(num __auto__) any {
 func CACHE_PTR(num __auto__, ptr any) {
 	(*any)((*byte)(executeData.GetRunTimeCache() + num))[0] = ptr
 }
-func CACHED_POLYMORPHIC_PTR(num __auto__, ce __auto__) bool {
-	return (*any)((*byte)(executeData.GetRunTimeCache() + num))[0] == any(b.CondF1(ce, func() any { return (*any)((*byte)(executeData.GetRunTimeCache() + num))[1] }, nil))
-}
 func CACHE_POLYMORPHIC_PTR(num uint32, ce any, ptr any) {
 	var slot *any = (*any)((*byte)(executeData.GetRunTimeCache() + num))
 	slot[0] = ce
 	slot[1] = ptr
 }
-func CACHED_PTR_EX(slot *any) any     { return slot[0] }
-func CACHE_PTR_EX(slot *any, ptr any) { slot[0] = ptr }
-func CACHE_POLYMORPHIC_PTR_EX(slot *any, ce *types.ClassEntry, ptr any) {
-	slot[0] = ce
-	slot[1] = ptr
+
+/**
+ * cache_slot 结构:
+ * 		slot[0] *ClassEntry 	具体类 or ZEND_DYNAMIC_PROPERTY_OFFSET
+ * 		slot[1] ptr 		    offset值
+ * 		slot[2] *PropertyInfo 	属性信息 or nil
+ */
+func _setCacheSlot(slot *any, ce *types.ClassEntry, ptr any, propertyInfo *types.PropertyInfo) {
+	slot[0], slot[1], slot[2] = ce, ptr, propertyInfo
 }
+
+func CACHED_PTR_EX(slot *any) any                { return slot[0] }
+func CACHE_PTR_EX(slot *any, ptr any)            { slot[0] = ptr }
 func IS_SPECIAL_CACHE_VAL(ptr *ZendConstant) int { return uintPtr(ptr) & CACHE_SPECIAL }
 func ENCODE_SPECIAL_CACHE_NUM(num __auto__) any {
 	return any(uintPtr(num)<<1 | CACHE_SPECIAL)

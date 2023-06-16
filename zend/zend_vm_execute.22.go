@@ -49,7 +49,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = PropFindAndCache(zobj, offset.StringVal(), cache_slot)
+				retval = PropFindAndCache(zobj, offset.StringVal())
 				if retval != nil {
 					goto fetch_obj_r_fast_copy
 				}
@@ -57,7 +57,8 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 		}
 	}
 
-	retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
+	//retval = zobj.ReadProperty(offset, BP_VAR_R, cache_slot, opline.Result())
+	retval = zobj.ReadPropertyEx(offset, BP_VAR_R, opline.Result())
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)

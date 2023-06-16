@@ -687,7 +687,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 		return
 	}
 	property_z.SetString(property)
-	if object.IsObject() && object.Object().HasProperty(&property_z, 2, nil) != 0 {
+	if object.IsObject() && object.Object().HasPropertyEx(&property_z, 2) {
 		return_value.SetTrue()
 		return
 	}

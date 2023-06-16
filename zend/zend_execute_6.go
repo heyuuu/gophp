@@ -141,9 +141,9 @@ func ZendFetchPropertyAddress(
 			}
 		}
 	}
-	ptr = container.Object().GetPropertyPtr(prop_ptr, type_, cache_slot)
+	ptr = container.Object().GetPropertyPtrEx(prop_ptr, type_)
 	if nil == ptr {
-		ptr = container.Object().ReadProperty(prop_ptr, type_, cache_slot, result)
+		ptr = container.Object().ReadPropertyEx(prop_ptr, type_, result)
 		if ptr == result {
 			return
 		}
@@ -157,21 +157,25 @@ func ZendFetchPropertyAddress(
 	}
 	result.SetIndirect(ptr)
 	if flags != 0 {
-		var prop_info *types.PropertyInfo
-		if prop_op_type == IS_CONST {
-			prop_info = CACHED_PTR_EX(cache_slot + 2)
-			if prop_info != nil {
-				if ZendHandleFetchObjFlags(result, ptr, nil, prop_info, flags) == 0 {
-					return
-				}
-			}
-		} else {
-			if ZendHandleFetchObjFlags(result, ptr, container.Object(), nil, flags) == 0 {
-				return
-			}
+		// todo check
+		//var prop_info *types.PropertyInfo
+		//if prop_op_type == IS_CONST {
+		//	prop_info = CACHED_PTR_EX(cache_slot + 2)
+		//	if prop_info != nil {
+		//		if !ZendHandleFetchObjFlags(result, ptr, nil, prop_info, flags) {
+		//			return
+		//		}
+		//	}
+		//} else {
+		//	if !ZendHandleFetchObjFlags(result, ptr, container.Object(), nil, flags) {
+		//		return
+		//	}
+		//}
+		if !ZendHandleFetchObjFlags(result, ptr, container.Object(), nil, flags) {
+			return
 		}
 	}
-	if init_undef != 0 && ptr.IsUndef() {
+	if init_undef && ptr.IsUndef() {
 		ptr.SetNull()
 	}
 }

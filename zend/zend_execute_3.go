@@ -377,14 +377,14 @@ func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo,
 		}
 	}
 }
-func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, cache_slot *any, opline *types.ZendOp, executeData *ZendExecuteData) {
+func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var rv types.Zval
 	var obj types.Zval
 	var z *types.Zval
 	var z_copy types.Zval
 	obj.SetObject(object.Object())
 	// 	obj.AddRefcount()
-	z = obj.Object().ReadProperty(property, BP_VAR_R, cache_slot, &rv)
+	z = obj.Object().ReadPropertyEx(property, BP_VAR_R, &rv)
 	if EG__().GetException() != nil {
 		// OBJ_RELEASE(obj.Object())
 		opline.Result().SetUndef()
@@ -393,9 +393,6 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	if z.IsObject() && z.Object().CanGet() {
 		var rv2 types.Zval
 		var value *types.Zval = z.Object().Get(&rv2)
-		if z == &rv {
-			// ZvalPtrDtor(&rv)
-		}
 		z.CopyValueFrom(value)
 	}
 	types.ZVAL_COPY_DEREF(&z_copy, z)
@@ -405,8 +402,5 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	} else {
 		operators.DecrementFunction(&z_copy)
 	}
-	obj.Object().WriteProperty(property, &z_copy, cache_slot)
-	// OBJ_RELEASE(obj.Object())
-	// ZvalPtrDtor(&z_copy)
-	// ZvalPtrDtor(z)
+	obj.Object().WritePropertyEx(property, &z_copy)
 }
