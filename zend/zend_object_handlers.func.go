@@ -149,9 +149,9 @@ func ZendStdCallUnsetter(zobj *types.ZendObject, propName string) {
 
 	EG__().SetFakeScope(origFakeScope)
 }
-func ZendStdCallIssetter(zobj *types.ZendObject, propName *types.String, retval *types.Zval) {
-	var ce *types.ClassEntry = zobj.GetCe()
-	var origFakeScope *types.ClassEntry = EG__().GetFakeScope()
+func ZendStdCallIssetter(zobj *types.ZendObject, propName string, retval *types.Zval) {
+	var ce = zobj.GetCe()
+	var origFakeScope = EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
 
 	/* __isset handler is called with one argument:
@@ -159,7 +159,7 @@ func ZendStdCallIssetter(zobj *types.ZendObject, propName *types.String, retval 
 
 	   it should return whether the property is set or not
 	*/
-	var fci = types.InitFCallInfo(zobj, retval, types.NewZvalString(propName.GetStr()))
+	var fci = types.InitFCallInfo(zobj, retval, types.NewZvalString(propName))
 
 	var fcic types.ZendFcallInfoCache
 	fcic.SetFunctionHandler(ce.GetIsset())
@@ -200,6 +200,81 @@ func ZendBadPropertyAccess(propInfo *types.PropertyInfo, ce *types.ClassEntry, m
 }
 func ZendBadPropertyName() {
 	faults.ThrowError(nil, "Cannot access property started with '\\0'")
+}
+func _zendGetPropertyOffset(ce *types.ClassEntry, member string, silent bool) (uint32, *types.ClassEntry, *types.PropertyInfo) {
+	var propertyInfo *types.PropertyInfo
+	var flags uint32
+	var scope *types.ClassEntry
+	var offset uint32
+
+	if propertyInfo = ce.GetProperty(member); propertyInfo == nil {
+		if member != "" && member[0] == '\x00' {
+			goto badPropName
+		}
+		goto dynamic
+	}
+	flags = propertyInfo.GetFlags()
+	if (flags & (types.AccChanged | types.AccPrivate | types.AccProtected)) != 0 {
+		if EG__().GetFakeScope() != nil {
+			scope = EG__().GetFakeScope()
+		} else {
+			scope = ZendGetExecutedScope()
+		}
+		if propertyInfo.GetCe() != scope {
+			if (flags & types.AccChanged) != 0 {
+				var p = ZendGetParentPrivateProperty(scope, ce, member)
+
+				/* If there is a public/protected instance property on ce, don't try to use a
+				 * private static property on scope. If both are static, prefer the static
+				 * property on scope. This will throw a static property notice, rather than
+				 * a visibility error. */
+				if p != nil && (!p.IsStatic() || (flags&types.AccStatic) != 0) {
+					propertyInfo = p
+					flags = propertyInfo.GetFlags()
+					goto found
+				} else if (flags & types.AccPublic) != 0 {
+					goto found
+				}
+			}
+			if (flags & types.AccPrivate) != 0 {
+				if propertyInfo.GetCe() != ce {
+					goto dynamic
+				} else {
+					goto wrong
+				}
+			} else {
+				b.Assert((flags & types.AccProtected) != 0)
+				if IsProtectedCompatibleScope(propertyInfo.GetCe(), scope) == 0 {
+					goto wrong
+				}
+			}
+		}
+	}
+found:
+	if (flags & types.AccStatic) != 0 {
+		if !silent {
+			faults.Error(faults.E_NOTICE, "Accessing static property %s::$%s as non static", ce.Name(), member)
+		}
+		return ZEND_DYNAMIC_PROPERTY_OFFSET, nil, nil
+	}
+	offset = propertyInfo.GetOffset()
+	if propertyInfo.GetType() == nil {
+		propertyInfo = nil
+	}
+	return offset, ce, propertyInfo
+dynamic:
+	return ZEND_DYNAMIC_PROPERTY_OFFSET, ce, nil
+wrong:
+	/* Information was available, but we were denied access.  Error out. */
+	if !silent {
+		ZendBadPropertyAccess(propertyInfo, ce, member)
+	}
+	return ZEND_WRONG_PROPERTY_OFFSET, nil, nil
+badPropName:
+	if !silent {
+		ZendBadPropertyName()
+	}
+	return ZEND_WRONG_PROPERTY_OFFSET, nil, nil
 }
 func ZendGetPropertyOffset(ce *types.ClassEntry, member string, silent bool, cacheSlot *any, infoPtr **types.PropertyInfo) uint32 {
 	var propertyInfo *types.PropertyInfo
@@ -388,8 +463,6 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, typ int, 
 	var name *types.String
 	var tmp_name *types.String
 	var retval *types.Zval
-	var property_offset uintPtr
-	var prop_info *types.PropertyInfo = nil
 	var guard *types.PropertyGuard = nil
 	name = operators.ZvalTryGetString(member)
 	if name == nil {
@@ -398,7 +471,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, typ int, 
 
 	/* make zend_get_property_info silent if we have getter - we may want to use it */
 
-	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name.GetStr(), typ == BP_VAR_IS || zobj.GetCe().GetGet() != nil, cache_slot, &prop_info)
+	property_offset, prop_ce, prop_info := _zendGetPropertyOffset(zobj.GetCe(), name.GetStr(), typ == BP_VAR_IS || zobj.GetCe().GetGet() != nil)
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		retval = OBJ_PROP(zobj, property_offset)
 		if retval.IsNotUndef() {
@@ -411,7 +484,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, typ int, 
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
 		if zobj.GetProperties() != nil {
 			if !(IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
-				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
+				var idx uint = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
 				if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
 					if p.GetVal().IsNotUndef() && p.IsStrKey() && p.StrKey() == name.GetStr() {
@@ -445,7 +518,7 @@ func ZendStdReadPropertyEx(zobj *types.ZendObject, member *types.Zval, typ int, 
 			}
 			tmp_result.SetUndef()
 			guard.MarkInIsset(true)
-			ZendStdCallIssetter(zobj, name, &tmp_result)
+			ZendStdCallIssetter(zobj, name.GetStr(), &tmp_result)
 			guard.MarkInIsset(false)
 			if !operators.ZvalIsTrue(&tmp_result) {
 				retval = UninitializedZval()
@@ -526,11 +599,9 @@ func ZendStdWritePropertyEx(zobj *types.ZendObject, member *types.Zval, value *t
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		variable_ptr = OBJ_PROP(zobj, property_offset)
 		if variable_ptr.IsNotUndef() {
-			// value.TryAddRefcount()
 			if prop_info != nil {
 				types.ZVAL_COPY_VALUE(&tmp, value)
 				if ZendVerifyPropertyType(prop_info, &tmp, PropertyUsesStrictTypes()) == 0 {
-					//value.TryDelRefcount()
 					variable_ptr = EG__().GetErrorZval()
 					goto exit
 				}
@@ -608,9 +679,6 @@ exit:
 }
 func ZendBadArrayAccess(ce *types.ClassEntry) {
 	faults.ThrowError(nil, "Cannot use object of type %s as array", ce.Name())
-}
-func ZendStdReadDimension(object *types.Zval, offset *types.Zval, type_ int, rv *types.Zval) *types.Zval {
-	return ZendStdReadDimensionEx(object.Object(), offset, type_, rv)
 }
 func ZendStdReadDimensionEx(object *types.ZendObject, offset *types.Zval, type_ int, rv *types.Zval) *types.Zval {
 	var ce *types.ClassEntry = object.GetCe()
@@ -1214,93 +1282,90 @@ func ZendStdCompareObjectsEx(zobj1 *types.ZendObject, zobj2 *types.ZendObject) i
 func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists int, cache_slot *any) int {
 	return ZendStdHasPropertyEx(object.Object(), member, has_set_exists, cache_slot)
 }
-func ZendStdHasPropertyEx(zobj *types.ZendObject, member *types.Zval, has_set_exists int, cache_slot *any) int {
-	var result int
-	var value *types.Zval = nil
-	var name *types.String
-	var tmp_name *types.String
-	var property_offset uintPtr
-	var prop_info *types.PropertyInfo = nil
-	name = operators.ZvalTryGetString(member)
-	if name == nil {
+func ZendStdHasPropertyEx(zobj *types.ZendObject, member *types.Zval, hasSetExists int, cache_slot *any) int {
+	name, ok := operators.ZvalTryGetStr(member)
+	if !ok {
 		return 0
 	}
-	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name.GetStr(), true, cache_slot, &prop_info)
-	if IS_VALID_PROPERTY_OFFSET(property_offset) {
-		value = OBJ_PROP(zobj, property_offset)
+
+	result := ZendStdHasPropertyExEx(zobj, name, hasSetExists)
+	return types.IntBool(result)
+}
+func ZendStdHasPropertyExEx(zobj *types.ZendObject, name string, hasSetExists int) bool {
+	var result bool
+	var value *types.Zval = nil
+
+	propOffset, _, _ := _zendGetPropertyOffset(zobj.GetCe(), name, true)
+	if propOffset > 0 {
+		value = OBJ_PROP(zobj, propOffset)
 		if value.IsNotUndef() {
 			goto found
 		}
 		if value.GetU2Extra() == types.IS_PROP_UNINIT {
-
 			/* Skip __isset() for uninitialized typed properties */
-
-			result = 0
-			goto exit
+			return false
 		}
-	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
+	} else if propOffset < 0 {
 		if zobj.GetProperties() != nil {
-			if !(IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
-				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
+			if propOffset != ZEND_DYNAMIC_PROPERTY_OFFSET {
+				var idx uint = ZEND_DECODE_DYN_PROP_OFFSET(propOffset)
 				if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-					if p.GetVal().IsNotUndef() && p.IsStrKey() && p.StrKey() == name.GetStr() {
+					if p.GetVal().IsNotUndef() && p.IsStrKey() && p.StrKey() == name {
 						value = p.GetVal()
 						goto found
 					}
 				}
 				CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 			}
-			value = zobj.GetProperties().KeyFind(name.GetStr())
+			value = zobj.GetProperties().KeyFind(name)
 			if value != nil {
 				if cache_slot != nil {
-					PropFindAndCache(zobj, name.GetStr())
+					PropFindAndCache(zobj, name)
 				}
-			found:
-				if has_set_exists == ZEND_PROPERTY_NOT_EMPTY {
-					result = operators.IZendIsTrue(value)
-				} else if has_set_exists < ZEND_PROPERTY_NOT_EMPTY {
-					b.Assert(has_set_exists == ZEND_PROPERTY_ISSET)
-					value = types.ZVAL_DEREF(value)
-					result = !value.IsNull()
-				} else {
-					b.Assert(has_set_exists == ZEND_PROPERTY_EXISTS)
-					result = 1
-				}
-				goto exit
+				goto found
 			}
 		}
 	} else if EG__().GetException() != nil {
-		result = 0
-		goto exit
+		return false
 	}
-	result = 0
-	if has_set_exists != ZEND_PROPERTY_EXISTS && zobj.GetCe().GetIsset() != nil {
-		var guard = zobj.Guard(name.GetStr())
+
+	result = false
+	if hasSetExists != ZEND_PROPERTY_EXISTS && zobj.GetCe().GetIsset() != nil {
+		var guard = zobj.Guard(name)
 		if !guard.InIsset() {
 			var rv types.Zval
 
 			/* have issetter - try with it! */
-			if tmp_name == nil {
-				tmp_name = name.Copy()
-			}
 			guard.MarkInIsset(true)
 			ZendStdCallIssetter(zobj, name, &rv)
-			result = operators.IZendIsTrue(&rv)
-			if has_set_exists == ZEND_PROPERTY_NOT_EMPTY && result != 0 {
+			result = operators.ZvalIsTrue(&rv)
+			if hasSetExists == ZEND_PROPERTY_NOT_EMPTY && result {
 				if EG__().GetException() == nil && zobj.GetCe().GetGet() != nil && !guard.InGet() {
 					guard.MarkInGet(true)
-					ZendStdCallGetter(zobj, name.GetStr(), &rv)
+					ZendStdCallGetter(zobj, name, &rv)
 					guard.MarkInGet(false)
-					result = operators.IZendIsTrue(&rv)
+					result = operators.ZvalIsTrue(&rv)
 				} else {
-					result = 0
+					result = false
 				}
 			}
 			guard.MarkInIsset(false)
 		}
 	}
-exit:
+	return result
+
+found:
+	if hasSetExists == ZEND_PROPERTY_NOT_EMPTY {
+		result = operators.ZvalIsTrue(value)
+	} else if hasSetExists < ZEND_PROPERTY_NOT_EMPTY {
+		b.Assert(hasSetExists == ZEND_PROPERTY_ISSET)
+		value = types.ZVAL_DEREF(value)
+		result = !value.IsNull()
+	} else {
+		b.Assert(hasSetExists == ZEND_PROPERTY_EXISTS)
+		result = true
+	}
 	return result
 }
 

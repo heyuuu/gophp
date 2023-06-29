@@ -33,10 +33,7 @@ func ZEND_PRE_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 		/* here we are sure we are dealing with an object */
 
-		{
-			cache_slot = CACHE_ADDR(opline.GetExtendedValue())
-		}
-
+		cache_slot = CACHE_ADDR(opline.GetExtendedValue())
 		if b.Assign(&zptr, object.Object().GetPropertyPtrEx(property, BP_VAR_RW)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {

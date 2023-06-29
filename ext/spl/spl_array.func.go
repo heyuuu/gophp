@@ -535,9 +535,6 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 		}
 	}
 	var result bool = b.CondF(check_empty != 0, func() int { return operators.IZendIsTrue(value) }, func() bool { return !value.IsNull() })
-	if value == &rv {
-		// zend.ZvalPtrDtor(&rv)
-	}
 	return result
 }
 func SplArrayHasDimension(object *types.Zval, offset *types.Zval, check_empty int) int {

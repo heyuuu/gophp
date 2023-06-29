@@ -10,7 +10,7 @@ import (
 	"unsafe"
 )
 
-func OBJ_PROP(obj *types.ZendObject, offset *types.ZendObject) *types.Zval {
+func OBJ_PROP(obj *types.ZendObject, offset uint32) *types.Zval {
 	return (*types.Zval)((*byte)(obj + offset))
 }
 func OBJ_PROP_TO_OFFSET(num int) int {
