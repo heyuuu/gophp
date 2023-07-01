@@ -2,8 +2,31 @@ package zend
 
 import (
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
+func zend_is_smaller_helper_SPEC(op1 *types.Zval, op2 *types.Zval, executeData *ZendExecuteData) int {
+	var opline *types.ZendOp = executeData.GetOpline()
+	if op1.IsUndef() {
+		op1 = ZVAL_UNDEFINED_OP1(executeData)
+	}
+	if op2.IsUndef() {
+		op2 = ZVAL_UNDEFINED_OP2(executeData)
+	}
+	operators.CompareFunction(opline.Result(), op1, op2)
+	if EG__().GetException() != nil {
+		return 0
+	}
+	if opline.Result().Long() < 0 {
+		ZEND_VM_SMART_BRANCH_TRUE()
+		opline.Result().SetTrue()
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	} else {
+		ZEND_VM_SMART_BRANCH_FALSE()
+		opline.Result().SetFalse()
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	}
+}
 func ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var op1 *types.Zval

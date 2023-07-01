@@ -104,7 +104,6 @@ func ZendFetchPropertyAddress(
 			}
 
 			/* this should modify object only if it's empty */
-
 			if type_ == BP_VAR_UNSET {
 				result.SetNull()
 				return

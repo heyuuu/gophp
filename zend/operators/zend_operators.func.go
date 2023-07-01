@@ -1573,6 +1573,7 @@ func ConvertCompareResultToLong(result *types.Zval) {
 		ConvertToLong(result)
 	}
 }
+
 func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var ret int
 	var converted int = 0

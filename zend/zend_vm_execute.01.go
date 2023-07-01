@@ -93,28 +93,6 @@ func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDa
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
-func zend_is_smaller_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
-	var opline *types.ZendOp = executeData.GetOpline()
-	if op_1.IsUndef() {
-		op_1 = ZVAL_UNDEFINED_OP1(executeData)
-	}
-	if op_2.IsUndef() {
-		op_2 = ZVAL_UNDEFINED_OP2(executeData)
-	}
-	operators.CompareFunction(opline.Result(), op_1, op_2)
-	if EG__().GetException() != nil {
-		return 0
-	}
-	if opline.Result().Long() < 0 {
-		ZEND_VM_SMART_BRANCH_TRUE()
-		opline.Result().SetTrue()
-		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	} else {
-		ZEND_VM_SMART_BRANCH_FALSE()
-		opline.Result().SetFalse()
-		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	}
-}
 func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
