@@ -8,19 +8,6 @@ import (
 	"unicode/utf8"
 )
 
-// A FieldFilter may be provided to Fprint to control the output.
-type FieldFilter func(name string, value reflect.Value) bool
-
-// NotNilFilter returns true for field values that are not nil;
-// it returns false otherwise.
-func NotNilFilter(_ string, v reflect.Value) bool {
-	switch v.Kind() {
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
-		return !v.IsNil()
-	}
-	return true
-}
-
 func fprint(w io.Writer, x any) (err error) {
 	// setup printer
 	p := printer{
@@ -37,10 +24,6 @@ func fprint(w io.Writer, x any) (err error) {
 	}()
 
 	// print x
-	if x == nil {
-		p.printf("nil\n")
-		return
-	}
 	p.print(reflect.ValueOf(x))
 	p.printf("\n")
 
@@ -112,7 +95,7 @@ func (p *printer) printf(format string, args ...any) {
 // should catch those as well.
 
 func (p *printer) print(x reflect.Value) {
-	if !NotNilFilter("", x) {
+	if isNilValue(x) {
 		p.printf("nil")
 		return
 	}
@@ -212,11 +195,21 @@ func (p *printer) print(x reflect.Value) {
 			return
 		}
 		// default
-		p.printf("%v", v)
+		p.printf("%s(%v)", x.Type(), v)
 	}
 }
 
 func isExported(name string) bool {
 	ch, _ := utf8.DecodeRuneInString(name)
 	return unicode.IsUpper(ch)
+}
+
+func isNilValue(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Invalid: // v 未初始化时的类型，此 v 值可来源于 reflect.ValueOf(nil)
+		fallthrough
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
+		return v.IsNil()
+	}
+	return false
 }
