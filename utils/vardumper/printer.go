@@ -1,12 +1,9 @@
-package ir
+package vardumper
 
 import (
 	"fmt"
-	"go/token"
 	"io"
-	"os"
 	"reflect"
-	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -24,34 +21,10 @@ func NotNilFilter(_ string, v reflect.Value) bool {
 	return true
 }
 
-// Fprint prints the (sub-)tree starting at AST node x to w.
-// If fset != nil, position information is interpreted relative
-// to that file set. Otherwise positions are printed as integer
-// values (file set specific offsets).
-//
-// A non-nil FieldFilter f may be provided to control the output:
-// struct fields for which f(fieldname, fieldvalue) is true are
-// printed; all others are filtered from the output. Unexported
-// struct fields are never printed.
-func Fprint(w io.Writer, fset *token.FileSet, x any, f FieldFilter) error {
-	return fprint(w, fset, x, f)
-}
-
-func Sprint(x any) (string, error) {
-	var buf strings.Builder
-	err := fprint(&buf, nil, x, nil)
-	if err != nil {
-		return "", err
-	}
-	return buf.String(), nil
-}
-
-func fprint(w io.Writer, fset *token.FileSet, x any, f FieldFilter) (err error) {
+func fprint(w io.Writer, x any) (err error) {
 	// setup printer
 	p := printer{
 		output: w,
-		fset:   fset,
-		filter: f,
 		ptrmap: make(map[any]int),
 		last:   '\n', // force printing of line number on first line
 	}
@@ -74,16 +47,8 @@ func fprint(w io.Writer, fset *token.FileSet, x any, f FieldFilter) (err error) 
 	return
 }
 
-// Print prints x to standard output, skipping nil fields.
-// Print(fset, x) is the same as Fprint(os.Stdout, fset, x, NotNilFilter).
-func Print(fset *token.FileSet, x any) error {
-	return Fprint(os.Stdout, fset, x, NotNilFilter)
-}
-
 type printer struct {
 	output io.Writer
-	fset   *token.FileSet
-	filter FieldFilter
 	ptrmap map[any]int // *T -> line number
 	indent int         // current indentation level
 	last   byte        // the last byte processed by Write
@@ -226,15 +191,13 @@ func (p *printer) print(x reflect.Value) {
 			// values cannot be accessed via reflection
 			if name := t.Field(i).Name; isExported(name) {
 				value := x.Field(i)
-				if p.filter == nil || p.filter(name, value) {
-					if first {
-						p.printf("\n")
-						first = false
-					}
-					p.printf("%s: ", name)
-					p.print(value)
+				if first {
 					p.printf("\n")
+					first = false
 				}
+				p.printf("%s: ", name)
+				p.print(value)
+				p.printf("\n")
 			}
 		}
 		p.indent--
@@ -247,12 +210,6 @@ func (p *printer) print(x reflect.Value) {
 			// print strings in quotes
 			p.printf("%q", v)
 			return
-		case token.Pos:
-			// position values can be printed nicely if we have a file set
-			if p.fset != nil {
-				p.printf("%s", p.fset.Position(v))
-				return
-			}
 		}
 		// default
 		p.printf("%v", v)

@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/heyuuu/gophp/php/ast"
 	"github.com/heyuuu/gophp/php/ir"
 	"github.com/heyuuu/gophp/php/parser"
 	"github.com/heyuuu/gophp/php/printer"
+	"github.com/heyuuu/gophp/utils/vardumper"
 	"log"
 	"net/http"
 	"os"
@@ -112,7 +112,7 @@ func parseCode(code string, mode string) (astDump string, printDump string, irDu
 		return
 	}
 
-	astDump, err = ast.Sprint(nodes)
+	astDump, err = vardumper.Sprint(nodes)
 	if err != nil {
 		return
 	}
@@ -123,7 +123,7 @@ func parseCode(code string, mode string) (astDump string, printDump string, irDu
 	}
 
 	irNodes := ir.ParseAst(nodes)
-	irDump, err = ir.Sprint(irNodes)
+	irDump, err = vardumper.Sprint(irNodes)
 	if err != nil {
 		return
 	}

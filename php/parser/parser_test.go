@@ -1,8 +1,7 @@
 package parser
 
 import (
-	"fmt"
-	"github.com/heyuuu/gophp/php/ast"
+	"github.com/heyuuu/gophp/utils/vardumper"
 	"log"
 	"os"
 	"path/filepath"
@@ -23,7 +22,7 @@ func TestParseCode(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(ast.Sprint(nodes))
+	vardumper.Print(nodes)
 }
 
 func TestParseFile(t *testing.T) {
@@ -33,5 +32,5 @@ func TestParseFile(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(ast.Sprint(nodes))
+	vardumper.Print(nodes)
 }
