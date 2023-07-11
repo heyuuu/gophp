@@ -4,9 +4,9 @@ type Token int
 
 //go:generate stringer -type=Token
 const (
-	_          = iota
-	Comment    // [T_COMMENT]
-	DocComment // [T_DOC_COMMENT]
+	_          Token = iota
+	Comment          // [T_COMMENT]
+	DocComment       // [T_DOC_COMMENT]
 
 	// literal
 	Ident  // main 		[T_STRING]
