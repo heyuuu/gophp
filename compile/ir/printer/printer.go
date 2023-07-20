@@ -209,7 +209,7 @@ const (
 // A Config node controls the output of Fprint.
 type Config struct {
 	Mode     Mode // default: 0
-	Tabwidth int  // default: 8
+	TabWidth int  // default: 8
 	Indent   int  // default: 0 (all code is indented at least by this much)
 }
 
@@ -224,18 +224,6 @@ func (cfg *Config) Sprint(node any) (string, error) {
 	return cfg.sprint(node)
 }
 
-func (cfg *Config) SprintFile(node any) (string, error) {
-	code, err := cfg.sprint(node)
-	if err != nil {
-		return "", err
-	}
-	return "<?php\n" + code, nil
-}
-
 func Sprint(node any) (string, error) {
-	return (&Config{Tabwidth: 8}).Sprint(node)
-}
-
-func SprintFile(node any) (string, error) {
-	return (&Config{Tabwidth: 8}).SprintFile(node)
+	return (&Config{TabWidth: 8}).Sprint(node)
 }

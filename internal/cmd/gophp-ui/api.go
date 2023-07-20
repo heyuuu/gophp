@@ -89,7 +89,7 @@ func parseCodeEx(code string) (result []ApiTypeResult, err error) {
 	irNodes := ir.ParseAst(astNodes)
 	result = append(result, ApiTypeResult{Type: TypeIr, Content: vardumper.Sprint(irNodes)})
 
-	irPrint, err := irPrinter.SprintFile(irNodes)
+	irPrint, err := irPrinter.Sprint(irNodes)
 	if err != nil {
 		return
 	}
