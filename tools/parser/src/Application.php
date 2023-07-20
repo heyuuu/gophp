@@ -4,6 +4,8 @@ namespace GoPhp\Tools;
 
 use PhpParser\Error;
 use PhpParser\ErrorHandler\Throwing;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
@@ -20,7 +22,7 @@ class Application
         $this->encoder = new NodeEncoder();
     }
 
-    function parseCode(string $code, string $output = null): int
+    public function parseCode(string $code, string $output = null): int
     {
         try {
             $json = $this->parseCodeToJson($code);
@@ -41,7 +43,7 @@ class Application
         }
     }
 
-    function parseFile(string $outputFile, string $output = null): int
+    public function parseFile(string $outputFile, string $output = null): int
     {
         try {
             $json = $this->parseFileToJson($outputFile);
@@ -62,7 +64,7 @@ class Application
         return 0;
     }
 
-    function parseDir(string $dir, string $output): int
+    public function parseDir(string $dir, string $output): int
     {
         try {
             foreach ($this->eachFile($dir) as [$file, $relativeFile]) {
@@ -96,22 +98,33 @@ class Application
 
     private function parseFileToJson(string $file): string
     {
-        $code = file_get_contents($file);
-        $ast  = $this->parser->parse($code);
-        if (!$ast) {
+        try {
+            $code = file_get_contents($file);
+            return $this->internalParseCodeOrFail($code);
+        } catch (Error $exception) {
             throw new \Exception("解析文件语法失败: " . $file);
         }
-        return $this->encoder->encode($ast);
     }
 
     private function parseCodeToJson(string $code): string
     {
         try {
-            $ast = $this->parser->parse($code, new Throwing());
-            return $this->encoder->encode($ast);
+            return $this->internalParseCodeOrFail($code);
         } catch (Error $exception) {
             throw new \Exception("解析文件语法失败: " . $exception->getMessage());
         }
+    }
+
+    private function internalParseCodeOrFail(string $code): string
+    {
+        $ast = $this->parser->parse($code, new Throwing());
+
+        // resolve namespaced name
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NameResolver());
+        $traverser->traverse($ast);
+
+        return $this->encoder->encode($ast);
     }
 
     private function safeWriteFile(string $outputFile, string $content)
