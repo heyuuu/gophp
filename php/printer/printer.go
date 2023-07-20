@@ -87,6 +87,11 @@ func (p *printer) print(args ...any) {
 }
 
 func (p *printer) printNode(node ast.Node) {
+	if node == nil || reflect.ValueOf(node).IsNil() {
+		p.write("nil")
+		return
+	}
+
 	switch x := node.(type) {
 	case *ast.Ident:
 		if x.VarLike {

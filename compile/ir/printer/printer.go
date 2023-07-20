@@ -87,6 +87,11 @@ func (p *printer) print(args ...any) {
 }
 
 func (p *printer) printNode(node ir.Node) {
+	if node == nil || reflect.ValueOf(node).IsNil() {
+		p.write("nil")
+		return
+	}
+
 	switch x := node.(type) {
 	case *ir.Ident:
 		if x.VarLike {
@@ -230,10 +235,19 @@ func (cfg *Config) Sprint(node any) (string, error) {
 func (cfg *Config) SprintFile(f *ir.File) (string, error) {
 	var p = &printer{}
 
-	if f.Init != nil {
-		p.print(f.Init, "\n")
+	for _, seg := range f.Segments {
+		// Namespace
+		if seg.Namespace != "" || len(f.Segments) > 1 {
+			p.print("/**\n * namespace " + seg.Namespace + "\n */\n")
+		}
+		// Init
+		if seg.Init != nil {
+			p.print(seg.Init, "\n")
+		}
+		// Decls
+		p.print(seg.Decls)
 	}
-	p.print(f.Decls)
+
 	return p.result()
 }
 

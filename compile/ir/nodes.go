@@ -141,15 +141,26 @@ const (
 )
 
 type Name struct {
-	Kind  NameType // 0 normal, 1 full-qualified, 2 relative
-	Parts []string // @var string[] Parts of the name
+	Kind NameType // 0 normal, 1 full-qualified, 2 relative
+	Name string
 }
 
-func (n *Name) IsUnqualified() bool    { return n.Kind == NameNormal && len(n.Parts) == 1 }
-func (n *Name) IsQualified() bool      { return n.Kind == NameNormal && len(n.Parts) > 1 }
+func NewName(kind NameType, parts []string) *Name {
+	return &Name{
+		Kind: kind,
+		Name: strings.Join(parts, "\\"),
+	}
+}
+
+func (n *Name) IsUnqualified() bool {
+	return n.Kind == NameNormal && strings.IndexByte(n.Name, '\\') == -1
+}
+func (n *Name) IsQualified() bool {
+	return n.Kind == NameNormal && strings.IndexByte(n.Name, '\\') >= 0
+}
 func (n *Name) IsFullyQualified() bool { return n.Kind == NameFullyQualified }
 func (n *Name) IsRelative() bool       { return n.Kind == NameRelative }
-func (n *Name) ToString() string       { return strings.Join(n.Parts, "\\") }
+func (n *Name) ToString() string       { return n.Name }
 func (n *Name) ToCodeString() string {
 	switch n.Kind {
 	case NameFullyQualified:

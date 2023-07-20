@@ -1,30 +1,63 @@
 package ir
 
 import (
+	"fmt"
 	"github.com/heyuuu/gophp/php/ast"
 	"github.com/heyuuu/gophp/utils/slices"
 )
 
-func ParseAstFile(ast []ast.Stmt) *File {
-	var init []Stmt
+func ParseAstFile(astNodes []ast.Stmt) *File {
+	var defaultStmts []Stmt
 
 	f := &File{}
-	for _, astStmt := range ast {
-		irStmt := parseAstStmt(astStmt)
+	for _, astStmt := range astNodes {
+		switch s := astStmt.(type) {
+		case *ast.NamespaceStmt:
+			f.Segments = append(f.Segments, parseNamespaceStmt(s))
+		default:
+			defaultStmts = append(defaultStmts, parseAstStmt(s))
+		}
+	}
+
+	if len(defaultStmts) > 0 {
+		f.Segments = append(
+			[]Segment{buildSegment("", defaultStmts)},
+			f.Segments...,
+		)
+	}
+
+	return f
+}
+
+func parseNamespaceStmt(n *ast.NamespaceStmt) Segment {
+	var namespace string
+	if n.Name != nil {
+		namespace = n.Name.ToString()
+	}
+	stmts := slices.Map(n.Stmts, parseAstStmt)
+	return buildSegment(namespace, stmts)
+}
+
+func buildSegment(namespace string, stmts []Stmt) Segment {
+	var inits []Stmt
+	var decls []Stmt
+	for _, irStmt := range stmts {
 		switch irStmt.(type) {
 		case *FunctionStmt,
 			*ClassStmt,
 			*InterfaceStmt,
 			*TraitStmt:
-			f.Decls = append(f.Decls, irStmt)
+			decls = append(decls, irStmt)
 		default:
-			init = append(init, irStmt)
+			inits = append(inits, irStmt)
 		}
 	}
-	if len(init) > 0 {
-		f.Init = &InitStmt{Stmts: init}
+
+	var initStmt *InitStmt
+	if len(inits) > 0 {
+		initStmt = &InitStmt{Stmts: inits}
 	}
-	return f
+	return Segment{Namespace: namespace, Init: initStmt, Decls: decls}
 }
 
 func ParseAst(node any) any {
@@ -40,7 +73,6 @@ func ParseAst(node any) any {
 
 // const types
 func parseAstFlags(flags ast.Flags) Flags         { return Flags(flags) }
-func parseAstNameType(kind ast.NameType) NameType { return NameType(kind) }
 func parseAstUseType(useType ast.UseType) UseType { return UseType(useType) }
 
 // interface types
@@ -640,9 +672,16 @@ func parseAstName(n *ast.Name) *Name {
 	if n == nil {
 		return nil
 	}
-	return &Name{
-		Kind:  parseAstNameType(n.Kind),
-		Parts: n.Parts,
+
+	switch n.Kind {
+	case ast.NameNormal:
+		return NewName(NameNormal, n.Parts)
+	case ast.NameFullyQualified:
+		return NewName(NameNormal, n.Parts)
+	case ast.NameRelative:
+		return NewName(NameRelative, n.Parts)
+	default:
+		panic(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
 	}
 }
 func parseAstArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
