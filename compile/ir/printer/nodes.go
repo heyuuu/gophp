@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/php/token"
+	"log"
 )
 
 func (p *printer) arg(n *ir.Arg) {
@@ -161,18 +162,6 @@ func (p *printer) expr(n ir.Expr) {
 		p.print(x.Class, "::", x.Name)
 	case *ir.MagicConstExpr:
 		p.print(x.Kind)
-	case *ir.MatchExpr:
-		p.print("match (", x.Cond, ") {\n")
-		p.indent++
-		for _, arm := range x.Arms {
-			if len(arm.Conds) != 0 {
-				p.print(arm.Conds, " => ", arm.Body, "\n")
-			} else {
-				p.print("default => ", arm.Body, "\n")
-			}
-		}
-		p.indent--
-		p.print("}")
 	case *ir.InstanceofExpr:
 		p.print(x.Expr, " instanceOf ", x.Class)
 	case *ir.ListExpr:
@@ -475,22 +464,7 @@ func (p *printer) stmt(n ir.Stmt) {
 			p.print(" ", x.NewName)
 		}
 		p.print(";")
-	case *ir.EnumStmt:
-		p.print("enum ", x.Name)
-		if x.ScalarType != nil {
-			p.print(": ", x.ScalarType)
-		}
-		if len(x.Implements) != 0 {
-			p.print(" implements ", x.Implements)
-		}
-		p.print("\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
-	case *ir.EnumCaseStmt:
-		if x.Expr != nil {
-			p.print("case ", x.Name, " = ", x.Expr, ";")
-		} else {
-			p.print("case ", x.Name, ";")
-		}
+	default:
+		log.Fatalf("unsupported type of ir.stmt: %v", x)
 	}
 }

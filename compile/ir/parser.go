@@ -77,6 +77,9 @@ func parseAssert(cond bool, message string) {
 		log.Fatal(message)
 	}
 }
+func parseHighVersionFeature(feature string) {
+	parseAssert(false, "high version php feature: "+feature)
+}
 
 // const types
 func parseAstFlags(flags ast.Flags) Flags         { return Flags(flags) }
@@ -97,14 +100,12 @@ func parseAstNode(node ast.Node) Node {
 		return parseAstArg(n)
 	case *ast.Param:
 		return parseAstParam(n)
-	case *ast.Attribute:
-		return parseAstAttribute(n)
-	case *ast.AttributeGroup:
-		return parseAstAttributeGroup(n)
+	case *ast.Attribute, *ast.AttributeGroup:
+		parseHighVersionFeature("php8.0 attribute")
 	case *ast.Const:
 		return parseAstConst(n)
 	case *ast.MatchArm:
-		return parseAstMatchArm(n)
+		parseHighVersionFeature("php8.0 match")
 	case *ast.VariadicPlaceholder:
 		return &VariadicPlaceholder{}
 	}
@@ -144,7 +145,6 @@ func parseAstExpr(node ast.Expr) Expr {
 			Uses:       slices.Map(n.Uses, parseAstClosureUseExpr),
 			ReturnType: parseAstType(n.ReturnType),
 			Stmts:      slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.ClosureUseExpr:
 		return &ClosureUseExpr{
@@ -158,7 +158,6 @@ func parseAstExpr(node ast.Expr) Expr {
 			Params:     slices.Map(n.Params, parseAstParam),
 			ReturnType: parseAstType(n.ReturnType),
 			Expr:       parseAstExpr(n.Expr),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.IndexExpr:
 		return &IndexExpr{
@@ -223,10 +222,7 @@ func parseAstExpr(node ast.Expr) Expr {
 			Kind: n.Kind,
 		}
 	case *ast.MatchExpr:
-		return &MatchExpr{
-			Cond: parseAstExpr(n.Cond),
-			Arms: slices.Map(n.Arms, parseAstMatchArm),
-		}
+		parseHighVersionFeature("php8.0 match")
 	case *ast.InstanceofExpr:
 		return &InstanceofExpr{
 			Expr:  parseAstExpr(n.Expr),
@@ -476,16 +472,14 @@ func parseAstStmt(node ast.Stmt) Stmt {
 			Params:     slices.Map(n.Params, parseAstParam),
 			ReturnType: parseAstType(n.ReturnType),
 			Stmts:      slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.InterfaceStmt:
 		parseAssert(n.NamespacedName != nil, "InterfaceStmt.NamespacedName cannot be nil")
 
 		return &InterfaceStmt{
-			Name:       parseAstNameAsFQ(n.NamespacedName),
-			Extends:    slices.Map(n.Extends, parseAstName),
-			Stmts:      slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
+			Name:    parseAstNameAsFQ(n.NamespacedName),
+			Extends: slices.Map(n.Extends, parseAstName),
+			Stmts:   slices.Map(n.Stmts, parseAstStmt),
 		}
 	case *ast.ClassStmt:
 		// todo 将匿名类和实名类定义区分开
@@ -500,20 +494,17 @@ func parseAstStmt(node ast.Stmt) Stmt {
 			Extends:    parseAstName(n.Extends),
 			Implements: slices.Map(n.Implements, parseAstName),
 			Stmts:      slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.ClassConstStmt:
 		return &ClassConstStmt{
-			Flags:      parseAstFlags(n.Flags),
-			Consts:     slices.Map(n.Consts, parseAstConst),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
+			Flags:  parseAstFlags(n.Flags),
+			Consts: slices.Map(n.Consts, parseAstConst),
 		}
 	case *ast.PropertyStmt:
 		return &PropertyStmt{
-			Flags:      parseAstFlags(n.Flags),
-			Props:      slices.Map(n.Props, parseAstPropertyPropertyStmt),
-			Type:       parseAstType(n.Type),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
+			Flags: parseAstFlags(n.Flags),
+			Props: slices.Map(n.Props, parseAstPropertyPropertyStmt),
+			Type:  parseAstType(n.Type),
 		}
 	case *ast.PropertyPropertyStmt:
 		return &PropertyPropertyStmt{
@@ -528,15 +519,13 @@ func parseAstStmt(node ast.Stmt) Stmt {
 			Params:     slices.Map(n.Params, parseAstParam),
 			ReturnType: parseAstType(n.ReturnType),
 			Stmts:      slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.TraitStmt:
 		parseAssert(n.NamespacedName != nil, "TraitStmt.NamespacedName cannot be nil")
 
 		return &TraitStmt{
-			Name:       parseAstNameAsFQ(n.NamespacedName),
-			Stmts:      slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
+			Name:  parseAstNameAsFQ(n.NamespacedName),
+			Stmts: slices.Map(n.Stmts, parseAstStmt),
 		}
 	case *ast.TraitUseStmt:
 		return &TraitUseStmt{
@@ -556,21 +545,8 @@ func parseAstStmt(node ast.Stmt) Stmt {
 			Trait:     parseAstName(n.Trait),
 			Method:    parseAstIdent(n.Method),
 		}
-	case *ast.EnumStmt:
-		return &EnumStmt{
-			ScalarType:     parseAstIdent(n.ScalarType),
-			Implements:     slices.Map(n.Implements, parseAstName),
-			Name:           parseAstIdent(n.Name),
-			Stmts:          slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups:     slices.Map(n.AttrGroups, parseAstAttributeGroup),
-			NamespacedName: parseAstName(n.NamespacedName),
-		}
-	case *ast.EnumCaseStmt:
-		return &EnumCaseStmt{
-			Name:       parseAstIdent(n.Name),
-			Expr:       parseAstExpr(n.Expr),
-			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
-		}
+	case *ast.EnumStmt, *ast.EnumCaseStmt:
+		parseHighVersionFeature("php8.1 enum")
 	}
 	return nil
 }
@@ -625,17 +601,6 @@ func parseAstArg(n *ast.Arg) *Arg {
 		Unpack: n.Unpack,
 	}
 }
-func parseAstAttribute(n *ast.Attribute) *Attribute {
-	return &Attribute{
-		Name: parseAstName(n.Name),
-		Args: slices.Map(n.Args, parseAstArg),
-	}
-}
-func parseAstAttributeGroup(n *ast.AttributeGroup) *AttributeGroup {
-	return &AttributeGroup{
-		Attrs: slices.Map(n.Attrs, parseAstAttribute),
-	}
-}
 func parseAstConst(n *ast.Const) *Const {
 	return &Const{
 		Name:           parseAstIdent(n.Name),
@@ -652,27 +617,17 @@ func parseAstIdent(n *ast.Ident) *Ident {
 		VarLike: n.VarLike,
 	}
 }
-func parseAstMatchArm(n *ast.MatchArm) *MatchArm {
-	if n == nil {
-		return nil
-	}
-	return &MatchArm{
-		Conds: slices.Map(n.Conds, parseAstExpr),
-		Body:  parseAstExpr(n.Body),
-	}
-}
 func parseAstParam(n *ast.Param) *Param {
 	if n == nil {
 		return nil
 	}
 	return &Param{
-		Type:       parseAstType(n.Type),
-		ByRef:      n.ByRef,
-		Variadic:   n.Variadic,
-		Var:        parseAstVariableExpr(n.Var),
-		Default:    parseAstExpr(n.Default),
-		Flags:      parseAstFlags(n.Flags),
-		AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
+		Type:     parseAstType(n.Type),
+		ByRef:    n.ByRef,
+		Variadic: n.Variadic,
+		Var:      parseAstVariableExpr(n.Var),
+		Default:  parseAstExpr(n.Default),
+		Flags:    parseAstFlags(n.Flags),
 	}
 }
 func parseAstSimpleType(n *ast.SimpleType) *SimpleType {
