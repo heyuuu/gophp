@@ -311,7 +311,7 @@ func (p *printer) stmt(n ast.Stmt) {
 			p.print(" finally {\n", x.Finally.Stmts, "}")
 		}
 	case *ast.ConstStmt:
-		// todo
+		p.print("const ", x.Consts, ";")
 	case *ast.EchoStmt:
 		p.print("echo ", x.Exprs, ";")
 	case *ast.GlobalStmt:

@@ -110,6 +110,8 @@ func (p *printer) printNode(node ir.Node) {
 		p.param(x)
 	case *ir.Arg:
 		p.arg(x)
+	case *ir.Const:
+		p.print(x.Name, " = ", x.Value)
 	default:
 		err := fmt.Errorf("printer: unsupported node type %T", node)
 		p.checkError(err)

@@ -300,7 +300,7 @@ func (p *printer) stmt(n ir.Stmt) {
 			p.print(" finally {\n", x.Finally.Stmts, "}")
 		}
 	case *ir.ConstStmt:
-		// todo
+		p.print("const ", x.Consts, ";")
 	case *ir.EchoStmt:
 		p.print("echo ", x.Exprs, ";")
 	case *ir.GlobalStmt:
