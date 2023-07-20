@@ -35,6 +35,10 @@
                 />
             </div>
             <div class="form-group">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="auto-refresh-switch" :value="autoRefresh" @change="toggleAutoRefresh">
+                    <label class="custom-control-label" for="auto-refresh-switch">定时自动更新</label>
+                </div>
                 <textarea class="form-control" rows="20" v-model="code" @input="codeChange"></textarea>
                 <div class="card-body">
                     <span style="color: red">{{ error }}</span>
@@ -72,6 +76,9 @@
         code: initCode,
         oldCode: "",
         error: "",
+        // 定时自动刷新开关
+        autoRefresh: false,
+        autoRefreshId: 0,
         // 记录隐藏的窗口
         showMode: initShowMode,
         // 处理结果
@@ -96,6 +103,17 @@
         },
         isShow(idx) {
             return (this.showMode & (1 << idx)) !== 0
+        },
+        toggleAutoRefresh() {
+            if (this.autoRefresh) {
+                this.autoRefresh = false
+                clearInterval(this.autoRefreshId)
+            } else {
+                this.autoRefresh = true
+                this.autoRefreshId = setInterval(() => {
+                    this.refresh(true)
+                }, 2000)
+            }
         },
         btnClass(idx) {
             if (this.isShow(idx)) {
@@ -154,9 +172,9 @@
         isRecentlyChanged(idx) {
             return this.recentlyChanged && this.lastChanged[idx]
         },
-        refresh() {
+        refresh(force) {
             // console.log({code:this.code, oldCode:this.oldCode})
-            if (this.code === this.oldCode) {
+            if (!force && this.code === this.oldCode) {
                 return
             }
 
