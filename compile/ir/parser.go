@@ -603,9 +603,8 @@ func parseAstArg(n *ast.Arg) *Arg {
 }
 func parseAstConst(n *ast.Const) *Const {
 	return &Const{
-		Name:           parseAstIdent(n.Name),
-		Value:          parseAstExpr(n.Value),
-		NamespacedName: parseAstName(n.NamespacedName),
+		Name:  parseAstNameAsFQ(n.NamespacedName),
+		Value: parseAstExpr(n.Value),
 	}
 }
 func parseAstIdent(n *ast.Ident) *Ident {
@@ -646,6 +645,9 @@ func parseAstNameAsFQ(n *ast.Name) *Name {
 func parseAstName(n *ast.Name) *Name {
 	if n == nil {
 		return nil
+	}
+	if n.Kind != ast.NameFullyQualified {
+		log.Println("ast.Name.Kind is not FQ")
 	}
 
 	switch n.Kind {
@@ -717,6 +719,7 @@ func parseAstCatchStmt(n *ast.CatchStmt) *CatchStmt {
 	if n == nil {
 		return nil
 	}
+
 	return &CatchStmt{
 		Types: slices.Map(n.Types, parseAstName),
 		Var:   parseAstVariableExpr(n.Var),

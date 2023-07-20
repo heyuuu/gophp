@@ -56,9 +56,8 @@ type (
 	}
 
 	Const struct {
-		Name           *Ident // @var Ident Name
-		Value          Expr   // @var Expr Value
-		NamespacedName *Name  // @var Name|null Namespaced name (if using NameResolver)
+		Name  *Name // @var Name const name
+		Value Expr  // @var Expr const value
 	}
 
 	Ident struct {
