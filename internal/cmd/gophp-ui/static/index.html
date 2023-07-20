@@ -10,36 +10,30 @@
 </head>
 <body>
 <div class="container-fluid" v-scope v-cloak>
-        <div class="row" style="margin-top: 10px">
-            <div :class="codeClass">
-                <div style="margin-top: 10px; margin-bottom: 10px">
-                    <input type="button" class="btn" :class="btnClass(1)" @click="toggleMode(1)" value="AST Nodes"/>
-                    <input type="button" class="btn" :class="btnClass(2)" @click="toggleMode(2)" value="Print"/>
-                    <input type="button" class="btn" :class="btnClass(4)" @click="toggleMode(4)" value="Ir Nodes"/>
-                </div>
-                <div class="form-group">
-                    <textarea class="form-control" rows="20" v-model="code" @input="codeChange"></textarea>
-                    <div class="card-body">
-                        <span style="color: red">{{ error }}</span>
-                    </div>
-                </div>
+    <div class="row" style="margin-top: 10px">
+        <div :class="codeClass">
+            <div style="margin-top: 10px; margin-bottom: 10px">
+                <input
+                        v-for="(re, reIdx) in result"
+                        type="button" class="btn" :class="btnClass(reIdx)" @click="toggleShow(reIdx)"
+                        :value="re.type"
+                        style="margin-right:10px"
+                />
             </div>
-            <div :class="showClass" v-if="showAst">
-                <div class="card" style="height: 100vh">
-                    <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ ast }}</pre>
-                </div>
-            </div>
-            <div :class="showClass" v-if="showPrint">
-                <div class="card" style="height: 100vh">
-                    <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ print }}</pre>
-                </div>
-            </div>
-            <div :class="showClass" v-if="showIr">
-                <div class="card" style="height: 100vh">
-                    <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ ir }}</pre>
+            <div class="form-group">
+                <textarea class="form-control" rows="20" v-model="code" @input="codeChange"></textarea>
+                <div class="card-body">
+                    <span style="color: red">{{ error }}</span>
                 </div>
             </div>
         </div>
+        <div v-for="(re, reIdx) in result" :class="showClass" v-show="isShow(reIdx)">
+            <div class="card" style="height: 100vh">
+                <span style="margin: 5px 0 0 10px; font-weight: bold;">{{ re.type }}</span>
+                <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ re.content }}</pre>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.js"></script>
@@ -52,45 +46,41 @@
         initCode = "<?php\n\n"
     }
 
-    // const
-    const modeAst = 1 << 0
-    const modePrint = 1 << 1
-    const modeIr = 1 << 2
+    const storageShowModeKey = "showMode"
+    let initShowMode = localStorage.getItem(storageShowModeKey)
+    if (!initShowMode) {
+        initShowMode = -1
+    }
 
     // App
     const apiUri = "/api"
-    const app = {
-        mode: modeAst | modePrint | modeIr,
+    const app = window.app = {
         code: initCode,
         oldCode: "",
         error: "",
-        ast: "",
-        print: "",
-        ir: "",
-        get showAst() {
-            return (this.mode & modeAst) !== 0
-        },
-        get showPrint() {
-            return (this.mode & modePrint) !== 0
-        },
-        get showIr() {
-            return (this.mode & modeIr) !== 0
-        },
+        // 记录隐藏的窗口
+        showMode: initShowMode,
+        // 处理结果
+        result: [],
+        // 展示中的结果类型数
         get showCount() {
             let count = 0
-            if (this.showAst) {
-                count++
-            }
-            if (this.showPrint) {
-                count++
-            }
-            if (this.showIr) {
-                count++
+            for (idx in this.result) {
+                if (this.isShow(idx)) {
+                    count++
+                }
             }
             return count
         },
-        btnClass(mode) {
-            if ((this.mode & mode) !== 0) {
+        toggleShow(idx) {
+            this.showMode ^= (1 << idx)
+            localStorage.setItem(storageShowModeKey, this.showMode)
+        },
+        isShow(idx) {
+            return (this.showMode & (1 << idx)) !== 0
+        },
+        btnClass(idx) {
+            if (this.isShow(idx)) {
                 return "btn-primary"
             } else {
                 return "btn-secondary"
@@ -118,13 +108,6 @@
                     return "col-sm-3"
             }
         },
-        toggleMode(mode) {
-            if ((this.mode & mode) !== 0) {
-                this.mode = this.mode & ~mode
-            } else {
-                this.mode = this.mode | mode
-            }
-        },
         codeChange() {
             localStorage.setItem(storageKey, this.code)
             this.refresh()
@@ -136,21 +119,17 @@
             }
 
             const code = this.code
-            postJson(apiUri, {input: code}, (data) => {
-                // console.log({data})
+            postJson(apiUri, {input: code}, (res) => {
                 // 确认文本内容没变才更新
                 if (this.code !== code) {
                     return
                 }
 
-                const error = data.Error
-
+                // 更新数据
                 this.oldCode = code
-                this.error = error
-                if (error === "") {
-                    this.ast = data.Ast
-                    this.print = data.Print
-                    this.ir = data.Ir
+                this.error = res.error
+                if (res.code === 0) {
+                    this.result = res.data.result
                 }
             }, () => {
                 this.error = "请求失败，确认服务是否可用"
