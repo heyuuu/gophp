@@ -7,11 +7,25 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>GoPhp UI</title>
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .changed {
+            animation: changed 2s;
+        }
+
+        @keyframes changed {
+            from {
+                background-color: #FFFF50;
+            }
+            to {
+                background-color: inherit;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="container-fluid" v-scope v-cloak>
     <div class="row" style="margin-top: 10px">
-        <div :class="codeClass">
+        <div :class="codeClass()">
             <div style="margin-top: 10px; margin-bottom: 10px">
                 <input
                         v-for="(re, reIdx) in result"
@@ -27,8 +41,8 @@
                 </div>
             </div>
         </div>
-        <div v-for="(re, reIdx) in result" :class="showClass" v-show="isShow(reIdx)">
-            <div class="card" style="height: 100vh">
+        <div v-for="(re, reIdx) in result" :class="showClass()" v-show="isShow(reIdx)">
+            <div class="card" style="height: 100vh" :class="isRecentlyChanged(reIdx) ? 'changed' : ''">
                 <span style="margin: 5px 0 0 10px; font-weight: bold;">{{ re.type }}</span>
                 <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ re.content }}</pre>
             </div>
@@ -62,6 +76,10 @@
         showMode: initShowMode,
         // 处理结果
         result: [],
+        // 最近一次的修改时间，超过一段时间会清空
+        recentlyChanged: 0,
+        // 各结果的最后更新时间
+        lastChanged: [],
         // 展示中的结果类型数
         get showCount() {
             let count = 0
@@ -86,7 +104,7 @@
                 return "btn-secondary"
             }
         },
-        get codeClass() {
+        codeClass() {
             switch (this.showCount) {
                 case 0:
                     return "col-sm-12"
@@ -98,7 +116,7 @@
                     return "col-sm-3"
             }
         },
-        get showClass() {
+        showClass() {
             switch (this.showCount) {
                 case 1:
                     return "col-sm-8"
@@ -111,6 +129,30 @@
         codeChange() {
             localStorage.setItem(storageKey, this.code)
             this.refresh()
+        },
+        updateResult(result) {
+            const oldResult = this.result
+            this.result = result
+
+            // 设置最近更新时间，并在一定时间后清除
+            if (this.recentlyChanged === 0) {
+                const changeTime = (new Date()).getTime()
+                this.recentlyChanged = changeTime
+                setTimeout(() => {
+                    if (this.recentlyChanged === changeTime) {
+                        this.recentlyChanged = 0
+                    }
+                }, 2000)
+            }
+
+            const now = new Date()
+            for (const i in result) {
+                const isSame = oldResult[i] && result[i].content === oldResult[i].content
+                this.lastChanged[i] = !isSame
+            }
+        },
+        isRecentlyChanged(idx) {
+            return this.recentlyChanged && this.lastChanged[idx]
         },
         refresh() {
             // console.log({code:this.code, oldCode:this.oldCode})
@@ -129,7 +171,7 @@
                 this.oldCode = code
                 this.error = res.error
                 if (res.code === 0) {
-                    this.result = res.data.result
+                    this.updateResult(res.data.result)
                 }
             }, () => {
                 this.error = "请求失败，确认服务是否可用"
