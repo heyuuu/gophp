@@ -2,6 +2,7 @@ package ir
 
 import (
 	"github.com/heyuuu/gophp/php/token"
+	"strconv"
 	"strings"
 )
 
@@ -139,6 +140,19 @@ const (
 	NameFullyQualified
 	NameRelative
 )
+
+func (t NameType) String() string {
+	switch t {
+	case NameNormal:
+		return "Normal"
+	case NameFullyQualified:
+		return "FullQualified"
+	case NameRelative:
+		return "Relative"
+	default:
+		return "NameType(" + strconv.Itoa(int(t)) + ")"
+	}
+}
 
 type Name struct {
 	Kind NameType // 0 normal, 1 full-qualified, 2 relative
@@ -593,33 +607,30 @@ type (
 
 	// StmtFunction : Stmt, FunctionLike
 	FunctionStmt struct {
-		ByRef          bool              // @var bool Whether function returns by reference
-		Name           *Ident            // @var Ident Name
-		Params         []*Param          // @var Param[] Parameters
-		ReturnType     Type              // @var Type|null Return type
-		Stmts          []Stmt            // @var Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
+		Name       *Name             // @var Name function name
+		ByRef      bool              // @var bool Whether function returns by reference
+		Params     []*Param          // @var Param[] Parameters
+		ReturnType Type              // @var Type|null Return type
+		Stmts      []Stmt            // @var Stmt[] Statements
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
 	// InterfaceStmt
 	InterfaceStmt struct {
-		Extends        []*Name           // @var Name[] Extended interfaces
-		Name           *Ident            // @var Ident|null Name
-		Stmts          []Stmt            // @var Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
+		Name       *Name             // @var Name
+		Extends    []*Name           // @var Name[] Extended interfaces
+		Stmts      []Stmt            // @var Stmt[] Statements
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
 	// StmtClass : Stmt, StmtClassLike
 	ClassStmt struct {
-		Flags          Flags             // @var Flags        Type
-		Extends        *Name             // @var Name|null  Name of extended class
-		Implements     []*Name           // @var Name[]     Names of implemented interfaces
-		Name           *Ident            // @var Ident|null Name
-		Stmts          []Stmt            // @var Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
+		Name       *Name             // @var Ident|null Name
+		Flags      Flags             // @var Flags        Type
+		Extends    *Name             // @var Name|null  Name of extended class
+		Implements []*Name           // @var Name[]     Names of implemented interfaces
+		Stmts      []Stmt            // @var Stmt[] Statements
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
 	// StmtClassConst : Stmt
@@ -655,10 +666,9 @@ type (
 
 	// StmtTrait : StmtClassLike
 	TraitStmt struct {
-		Name           *Ident            // @var Ident|null Name
-		Stmts          []Stmt            // @var Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
+		Name       *Name             // @var Ident Name
+		Stmts      []Stmt            // @var Stmt[] Statements
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
 	TraitUseStmt struct {

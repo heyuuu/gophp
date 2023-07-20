@@ -450,7 +450,7 @@ func (p *printer) stmt(n ir.Stmt) {
 		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ir.TraitStmt:
-		p.print("class ", x.Name, "\n{\n")
+		p.print("trait ", x.Name, "\n{\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ir.TraitUseStmt:

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/heyuuu/gophp/php/ast"
 	"github.com/heyuuu/gophp/utils/slices"
+	"log"
 )
 
 func ParseAstFile(astNodes []ast.Stmt) *File {
@@ -68,6 +69,12 @@ func ParseAst(node any) any {
 		return slices.Map(n, parseAstStmt)
 	default:
 		return n
+	}
+}
+
+func parseAssert(cond bool, message string) {
+	if !cond {
+		log.Fatal(message)
 	}
 }
 
@@ -461,32 +468,39 @@ func parseAstStmt(node ast.Stmt) Stmt {
 			Stmts: slices.Map(n.Stmts, parseAstStmt),
 		}
 	case *ast.FunctionStmt:
+		parseAssert(n.NamespacedName != nil, "FunctionStmt.NamespacedName cannot be nil")
+
 		return &FunctionStmt{
-			ByRef:          n.ByRef,
-			Name:           parseAstIdent(n.Name),
-			Params:         slices.Map(n.Params, parseAstParam),
-			ReturnType:     parseAstType(n.ReturnType),
-			Stmts:          slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups:     slices.Map(n.AttrGroups, parseAstAttributeGroup),
-			NamespacedName: parseAstName(n.NamespacedName),
+			Name:       parseAstNameAsFQ(n.NamespacedName),
+			ByRef:      n.ByRef,
+			Params:     slices.Map(n.Params, parseAstParam),
+			ReturnType: parseAstType(n.ReturnType),
+			Stmts:      slices.Map(n.Stmts, parseAstStmt),
+			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.InterfaceStmt:
+		parseAssert(n.NamespacedName != nil, "InterfaceStmt.NamespacedName cannot be nil")
+
 		return &InterfaceStmt{
-			Extends:        slices.Map(n.Extends, parseAstName),
-			Name:           parseAstIdent(n.Name),
-			Stmts:          slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups:     slices.Map(n.AttrGroups, parseAstAttributeGroup),
-			NamespacedName: parseAstName(n.NamespacedName),
+			Name:       parseAstNameAsFQ(n.NamespacedName),
+			Extends:    slices.Map(n.Extends, parseAstName),
+			Stmts:      slices.Map(n.Stmts, parseAstStmt),
+			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.ClassStmt:
+		// todo 将匿名类和实名类定义区分开
+		var name *Name
+		if n.NamespacedName != nil {
+			name = parseAstNameAsFQ(n.NamespacedName)
+		}
+
 		return &ClassStmt{
-			Flags:          parseAstFlags(n.Flags),
-			Extends:        parseAstName(n.Extends),
-			Implements:     slices.Map(n.Implements, parseAstName),
-			Name:           parseAstIdent(n.Name),
-			Stmts:          slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups:     slices.Map(n.AttrGroups, parseAstAttributeGroup),
-			NamespacedName: parseAstName(n.NamespacedName),
+			Name:       name,
+			Flags:      parseAstFlags(n.Flags),
+			Extends:    parseAstName(n.Extends),
+			Implements: slices.Map(n.Implements, parseAstName),
+			Stmts:      slices.Map(n.Stmts, parseAstStmt),
+			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.ClassConstStmt:
 		return &ClassConstStmt{
@@ -517,11 +531,12 @@ func parseAstStmt(node ast.Stmt) Stmt {
 			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.TraitStmt:
+		parseAssert(n.NamespacedName != nil, "TraitStmt.NamespacedName cannot be nil")
+
 		return &TraitStmt{
-			Name:           parseAstIdent(n.Name),
-			Stmts:          slices.Map(n.Stmts, parseAstStmt),
-			AttrGroups:     slices.Map(n.AttrGroups, parseAstAttributeGroup),
-			NamespacedName: parseAstName(n.NamespacedName),
+			Name:       parseAstNameAsFQ(n.NamespacedName),
+			Stmts:      slices.Map(n.Stmts, parseAstStmt),
+			AttrGroups: slices.Map(n.AttrGroups, parseAstAttributeGroup),
 		}
 	case *ast.TraitUseStmt:
 		return &TraitUseStmt{
@@ -668,6 +683,11 @@ func parseAstSimpleType(n *ast.SimpleType) *SimpleType {
 		Name: parseAstName(n.Name),
 	}
 }
+
+func parseAstNameAsFQ(n *ast.Name) *Name {
+	return NewName(NameFullyQualified, n.Parts)
+}
+
 func parseAstName(n *ast.Name) *Name {
 	if n == nil {
 		return nil
@@ -677,7 +697,7 @@ func parseAstName(n *ast.Name) *Name {
 	case ast.NameNormal:
 		return NewName(NameNormal, n.Parts)
 	case ast.NameFullyQualified:
-		return NewName(NameNormal, n.Parts)
+		return NewName(NameFullyQualified, n.Parts)
 	case ast.NameRelative:
 		return NewName(NameRelative, n.Parts)
 	default:
