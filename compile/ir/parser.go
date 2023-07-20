@@ -5,6 +5,28 @@ import (
 	"github.com/heyuuu/gophp/utils/slices"
 )
 
+func ParseAstFile(ast []ast.Stmt) *File {
+	var init []Stmt
+
+	f := &File{}
+	for _, astStmt := range ast {
+		irStmt := parseAstStmt(astStmt)
+		switch irStmt.(type) {
+		case *FunctionStmt,
+			*ClassStmt,
+			*InterfaceStmt,
+			*TraitStmt:
+			f.Decls = append(f.Decls, irStmt)
+		default:
+			init = append(init, irStmt)
+		}
+	}
+	if len(init) > 0 {
+		f.Init = &InitStmt{Stmts: init}
+	}
+	return f
+}
+
 func ParseAst(node any) any {
 	switch n := node.(type) {
 	case ast.Node:

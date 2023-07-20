@@ -360,8 +360,18 @@ func (p *printer) stmt(n ir.Stmt) {
 	case *ir.NamespaceStmt:
 		p.print("namespace ", x.Name, ";\n")
 		p.stmtList(x.Stmts, false)
+	case *ir.InitStmt:
+		p.print("// init\n")
+		if len(x.Stmts) == 0 {
+			p.print("func init() {}")
+		} else {
+			p.print("func init() {\n")
+			p.stmtList(x.Stmts, true)
+			p.print("}\n")
+		}
 	case *ir.FunctionStmt:
-		p.print("function ")
+		p.print("// ", x.Name, "\n")
+		p.print("func ")
 		if x.ByRef {
 			p.print("&")
 		}
@@ -369,9 +379,13 @@ func (p *printer) stmt(n ir.Stmt) {
 		if x.ReturnType != nil {
 			p.print(": ", x.ReturnType)
 		}
-		p.print("\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
+		if len(x.Stmts) == 0 {
+			p.print(" {}\n")
+		} else {
+			p.print(" {\n")
+			p.stmtList(x.Stmts, true)
+			p.print("}\n")
+		}
 	case *ir.InterfaceStmt:
 		p.print("interface ", x.Name)
 		if len(x.Extends) != 0 {
@@ -381,18 +395,19 @@ func (p *printer) stmt(n ir.Stmt) {
 		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ir.ClassStmt:
+		p.print("// class ", x.Name, "\n")
 		if x.Flags != 0 {
 			p.flags(x.Flags)
 			p.print(" ")
 		}
 		p.print("class ", x.Name)
 		if x.Extends != nil {
-			p.print(" extends ", x.Extends)
+			p.print(" < ", x.Extends)
 		}
 		if len(x.Implements) != 0 {
-			p.print(" implements ", x.Implements)
+			p.print(" : ", x.Implements)
 		}
-		p.print("\n{\n")
+		p.print(" {\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ir.ClassConstStmt:

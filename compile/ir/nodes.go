@@ -575,6 +575,11 @@ type (
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
+	// InitStmt : Stmt
+	InitStmt struct {
+		Stmts []Stmt // @var Stmt[] Statements
+	}
+
 	// StmtFunction : Stmt, FunctionLike
 	FunctionStmt struct {
 		ByRef          bool              // @var bool Whether function returns by reference
@@ -772,6 +777,7 @@ func (*DeclareStmt) stmtNode()        {}
 func (*DeclareDeclareStmt) stmtNode() {}
 
 func (*NamespaceStmt) stmtNode()                    {}
+func (*InitStmt) stmtNode()                         {}
 func (*FunctionStmt) stmtNode()                     {}
 func (*InterfaceStmt) stmtNode()                    {}
 func (*ClassStmt) stmtNode()                        {}
@@ -894,6 +900,7 @@ func (*UseStmt) node()                          {}
 func (*DeclareStmt) node()                      {}
 func (*DeclareDeclareStmt) node()               {}
 func (*NamespaceStmt) node()                    {}
+func (*InitStmt) node()                         {}
 func (*FunctionStmt) node()                     {}
 func (*InterfaceStmt) node()                    {}
 func (*ClassStmt) node()                        {}

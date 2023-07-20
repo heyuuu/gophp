@@ -221,9 +221,26 @@ func (cfg *Config) sprint(node any) (string, error) {
 }
 
 func (cfg *Config) Sprint(node any) (string, error) {
-	return cfg.sprint(node)
+	var p = &printer{}
+	// todo 需要验证 node 为 print 可以打印的类型范围
+	p.print(node)
+	return p.result()
+}
+
+func (cfg *Config) SprintFile(f *ir.File) (string, error) {
+	var p = &printer{}
+
+	if f.Init != nil {
+		p.print(f.Init, "\n")
+	}
+	p.print(f.Decls)
+	return p.result()
 }
 
 func Sprint(node any) (string, error) {
 	return (&Config{TabWidth: 8}).Sprint(node)
+}
+
+func SprintFile(file *ir.File) (string, error) {
+	return (&Config{TabWidth: 8}).SprintFile(file)
 }
