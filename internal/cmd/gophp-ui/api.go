@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/heyuuu/gophp/compile/ir"
+	irPrinter "github.com/heyuuu/gophp/compile/ir/printer"
 	"github.com/heyuuu/gophp/php/parser"
 	"github.com/heyuuu/gophp/php/printer"
 	"github.com/heyuuu/gophp/utils/vardumper"
@@ -35,7 +36,7 @@ const (
 	TypeAst      = "AST"
 	TypeAstPrint = "AST-print"
 	TypeIr       = "IR"
-	TypeIrRender = "IR-print"
+	TypeIrPrint  = "IR-print"
 )
 
 type ApiTypeResult struct {
@@ -87,6 +88,12 @@ func parseCodeEx(code string) (result []ApiTypeResult, err error) {
 	// IR
 	irNodes := ir.ParseAst(astNodes)
 	result = append(result, ApiTypeResult{Type: TypeIr, Content: vardumper.Sprint(irNodes)})
+
+	irPrint, err := irPrinter.SprintFile(irNodes)
+	if err != nil {
+		return
+	}
+	result = append(result, ApiTypeResult{Type: TypeIrPrint, Content: irPrint})
 
 	return
 }
