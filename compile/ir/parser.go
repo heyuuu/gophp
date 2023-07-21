@@ -7,22 +7,30 @@ import (
 	"log"
 )
 
-func ParseAstFile(astNodes []ast.Stmt) *File {
+func ParseAstFile(astFile []ast.Stmt) *File {
+	p := &parser{}
+	return p.ParseFile(astFile)
+}
+
+// parser
+type parser struct{}
+
+func (p *parser) ParseFile(astFile []ast.Stmt) *File {
 	var defaultStmts []Stmt
 
 	f := &File{}
-	for _, astStmt := range astNodes {
+	for _, astStmt := range astFile {
 		switch s := astStmt.(type) {
 		case *ast.NamespaceStmt:
-			f.Segments = append(f.Segments, parseNamespaceStmt(s))
+			f.Segments = append(f.Segments, p.parseNamespaceStmt(s))
 		default:
-			defaultStmts = append(defaultStmts, parseAstStmt(s))
+			defaultStmts = append(defaultStmts, p.parseStmt(s))
 		}
 	}
 
 	if len(defaultStmts) > 0 {
 		f.Segments = append(
-			[]Segment{buildSegment("", defaultStmts)},
+			[]Segment{p.buildSegment("", defaultStmts)},
 			f.Segments...,
 		)
 	}
@@ -30,16 +38,17 @@ func ParseAstFile(astNodes []ast.Stmt) *File {
 	return f
 }
 
-func parseNamespaceStmt(n *ast.NamespaceStmt) Segment {
-	var namespace string
-	if n.Name != nil {
-		namespace = n.Name.ToString()
+// misc
+func (p *parser) assert(cond bool, message string) {
+	if !cond {
+		log.Fatal(message)
 	}
-	stmts := slices.Map(n.Stmts, parseAstStmt)
-	return buildSegment(namespace, stmts)
+}
+func (p *parser) unsupportedFeature(feature string) {
+	p.assert(false, "high version php feature: "+feature)
 }
 
-func buildSegment(namespace string, stmts []Stmt) Segment {
+func (p *parser) buildSegment(namespace string, stmts []Stmt) Segment {
 	var inits []Stmt
 	var decls []Stmt
 	for _, irStmt := range stmts {
@@ -61,58 +70,48 @@ func buildSegment(namespace string, stmts []Stmt) Segment {
 	return Segment{Namespace: namespace, Init: initStmt, Decls: decls}
 }
 
-func ParseAst(node any) any {
-	switch n := node.(type) {
-	case ast.Node:
-		return parseAstNode(n)
-	case []ast.Stmt:
-		return slices.Map(n, parseAstStmt)
-	default:
-		return n
-	}
-}
-
-func parseAssert(cond bool, message string) {
-	if !cond {
-		log.Fatal(message)
-	}
-}
-func parseHighVersionFeature(feature string) {
-	parseAssert(false, "high version php feature: "+feature)
-}
-
 // const types
-func parseAstFlags(flags ast.Flags) Flags         { return Flags(flags) }
-func parseAstUseType(useType ast.UseType) UseType { return UseType(useType) }
+func (p *parser) parseFlags(flags ast.Flags) Flags         { return Flags(flags) }
+func (p *parser) parseUseType(useType ast.UseType) UseType { return UseType(useType) }
+
+// special
+func (p *parser) parseNamespaceStmt(n *ast.NamespaceStmt) Segment {
+	var namespace string
+	if n.Name != nil {
+		namespace = n.Name.ToString()
+	}
+	stmts := slices.Map(n.Stmts, p.parseStmt)
+	return p.buildSegment(namespace, stmts)
+}
 
 // interface types
-func parseAstNode(node ast.Node) Node {
+func (p *parser) parseNode(node ast.Node) Node {
 	switch n := node.(type) {
 	case ast.Expr:
-		return parseAstExpr(n)
+		return p.parseExpr(n)
 	case ast.Stmt:
-		return parseAstStmt(n)
+		return p.parseStmt(n)
 	case *ast.Ident:
-		return parseAstIdent(n)
+		return p.parseIdent(n)
 	case *ast.Name:
-		return parseAstName(n)
+		return p.parseName(n)
 	case *ast.Arg:
-		return parseAstArg(n)
+		return p.parseArg(n)
 	case *ast.Param:
-		return parseAstParam(n)
+		return p.parseParam(n)
 	case *ast.Attribute, *ast.AttributeGroup:
-		parseHighVersionFeature("php8.0 attribute")
+		p.unsupportedFeature("php8.0 attribute")
 	case *ast.Const:
-		return parseAstConst(n)
+		return p.parseConst(n)
 	case *ast.MatchArm:
-		parseHighVersionFeature("php8.0 match")
+		p.unsupportedFeature("php8.0 match")
 	case *ast.VariadicPlaceholder:
 		return &VariadicPlaceholder{}
 	}
 	return nil
 }
 
-func parseAstExpr(node ast.Expr) Expr {
+func (p *parser) parseExpr(node ast.Expr) Expr {
 	switch n := node.(type) {
 	case *ast.IntLit:
 		return &IntLit{
@@ -128,12 +127,12 @@ func parseAstExpr(node ast.Expr) Expr {
 		}
 	case *ast.ArrayExpr:
 		return &ArrayExpr{
-			Items: slices.Map(n.Items, parseAstArrayItemExpr),
+			Items: slices.Map(n.Items, p.parseArrayItemExpr),
 		}
 	case *ast.ArrayItemExpr:
 		return &ArrayItemExpr{
-			Key:    parseAstExpr(n.Key),
-			Value:  parseAstExpr(n.Value),
+			Key:    p.parseExpr(n.Key),
+			Value:  p.parseExpr(n.Value),
 			ByRef:  n.ByRef,
 			Unpack: n.Unpack,
 		}
@@ -141,285 +140,285 @@ func parseAstExpr(node ast.Expr) Expr {
 		return &ClosureExpr{
 			Static:     n.Static,
 			ByRef:      n.ByRef,
-			Params:     slices.Map(n.Params, parseAstParam),
-			Uses:       slices.Map(n.Uses, parseAstClosureUseExpr),
-			ReturnType: parseAstType(n.ReturnType),
-			Stmts:      slices.Map(n.Stmts, parseAstStmt),
+			Params:     slices.Map(n.Params, p.parseParam),
+			Uses:       slices.Map(n.Uses, p.parseClosureUseExpr),
+			ReturnType: p.parseType(n.ReturnType),
+			Stmts:      slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.ClosureUseExpr:
 		return &ClosureUseExpr{
-			Var:   parseAstVariableExpr(n.Var),
+			Var:   p.parseVariableExpr(n.Var),
 			ByRef: n.ByRef,
 		}
 	case *ast.ArrowFunctionExpr:
 		return &ArrowFunctionExpr{
 			Static:     n.Static,
 			ByRef:      n.ByRef,
-			Params:     slices.Map(n.Params, parseAstParam),
-			ReturnType: parseAstType(n.ReturnType),
-			Expr:       parseAstExpr(n.Expr),
+			Params:     slices.Map(n.Params, p.parseParam),
+			ReturnType: p.parseType(n.ReturnType),
+			Expr:       p.parseExpr(n.Expr),
 		}
 	case *ast.IndexExpr:
 		return &IndexExpr{
-			Var: parseAstExpr(n.Var),
-			Dim: parseAstExpr(n.Dim),
+			Var: p.parseExpr(n.Var),
+			Dim: p.parseExpr(n.Dim),
 		}
 	case *ast.CastExpr:
 		return &CastExpr{
 			Op:   n.Op,
-			Expr: parseAstExpr(n.Expr),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.UnaryExpr:
 		return &UnaryExpr{
 			Kind: n.Kind,
-			Var:  parseAstExpr(n.Var),
+			Var:  p.parseExpr(n.Var),
 		}
 	case *ast.BinaryExpr:
 		return &BinaryExpr{
 			Op:    n.Op,
-			Left:  parseAstExpr(n.Left),
-			Right: parseAstExpr(n.Right),
+			Left:  p.parseExpr(n.Left),
+			Right: p.parseExpr(n.Right),
 		}
 	case *ast.AssignExpr:
 		return &AssignExpr{
 			Op:   n.Op,
-			Var:  parseAstExpr(n.Var),
-			Expr: parseAstExpr(n.Expr),
+			Var:  p.parseExpr(n.Var),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.AssignRefExpr:
 		return &AssignRefExpr{
-			Var:  parseAstExpr(n.Var),
-			Expr: parseAstExpr(n.Expr),
+			Var:  p.parseExpr(n.Var),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.InternalCallExpr:
 		return &InternalCallExpr{
 			Kind: n.Kind,
-			Args: slices.Map(n.Args, parseAstExpr),
+			Args: slices.Map(n.Args, p.parseExpr),
 		}
 	case *ast.CloneExpr:
 		return &CloneExpr{
-			Expr: parseAstExpr(n.Expr),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.ErrorSuppressExpr:
 		return &ErrorSuppressExpr{
-			Expr: parseAstExpr(n.Expr),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.ExitExpr:
 		return &ExitExpr{
-			Expr: parseAstExpr(n.Expr),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.ConstFetchExpr:
 		return &ConstFetchExpr{
-			Name: parseAstName(n.Name),
+			Name: p.parseName(n.Name),
 		}
 	case *ast.ClassConstFetchExpr:
 		return &ClassConstFetchExpr{
-			Class: parseAstNode(n.Class),
-			Name:  parseAstIdent(n.Name),
+			Class: p.parseNode(n.Class),
+			Name:  p.parseIdent(n.Name),
 		}
 	case *ast.MagicConstExpr:
 		return &MagicConstExpr{
 			Kind: n.Kind,
 		}
 	case *ast.MatchExpr:
-		parseHighVersionFeature("php8.0 match")
+		p.unsupportedFeature("php8.0 match")
 	case *ast.InstanceofExpr:
 		return &InstanceofExpr{
-			Expr:  parseAstExpr(n.Expr),
-			Class: parseAstNode(n.Class),
+			Expr:  p.parseExpr(n.Expr),
+			Class: p.parseNode(n.Class),
 		}
 	case *ast.ListExpr:
 		return &ListExpr{
-			Items: slices.Map(n.Items, parseAstArrayItemExpr),
+			Items: slices.Map(n.Items, p.parseArrayItemExpr),
 		}
 	case *ast.PrintExpr:
 		return &PrintExpr{
-			Expr: parseAstExpr(n.Expr),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.PropertyFetchExpr:
 		return &PropertyFetchExpr{
-			Var:  parseAstExpr(n.Var),
-			Name: parseAstNode(n.Name),
+			Var:  p.parseExpr(n.Var),
+			Name: p.parseNode(n.Name),
 		}
 	case *ast.NullsafePropertyFetchExpr:
 		return &NullsafePropertyFetchExpr{
-			Var:  parseAstExpr(n.Var),
-			Name: parseAstNode(n.Name),
+			Var:  p.parseExpr(n.Var),
+			Name: p.parseNode(n.Name),
 		}
 	case *ast.StaticPropertyFetchExpr:
 		return &StaticPropertyFetchExpr{
-			Class: parseAstNode(n.Class),
-			Name:  parseAstNode(n.Name),
+			Class: p.parseNode(n.Class),
+			Name:  p.parseNode(n.Name),
 		}
 	case *ast.ShellExecExpr:
 		return &ShellExecExpr{
-			Parts: slices.Map(n.Parts, parseAstExpr),
+			Parts: slices.Map(n.Parts, p.parseExpr),
 		}
 	case *ast.TernaryExpr:
 		return &TernaryExpr{
-			Cond: parseAstExpr(n.Cond),
-			If:   parseAstExpr(n.If),
-			Else: parseAstExpr(n.Else),
+			Cond: p.parseExpr(n.Cond),
+			If:   p.parseExpr(n.If),
+			Else: p.parseExpr(n.Else),
 		}
 	case *ast.ThrowExpr:
 		return &ThrowExpr{
-			Expr: parseAstExpr(n.Expr),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.VariableExpr:
 		return &VariableExpr{
-			Name: parseAstNode(n.Name),
+			Name: p.parseNode(n.Name),
 		}
 	case *ast.YieldExpr:
 		return &YieldExpr{
-			Key:   parseAstExpr(n.Key),
-			Value: parseAstExpr(n.Value),
+			Key:   p.parseExpr(n.Key),
+			Value: p.parseExpr(n.Value),
 		}
 	case *ast.YieldFromExpr:
 		return &YieldFromExpr{
-			Expr: parseAstExpr(n.Expr),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.FuncCallExpr:
 		return &FuncCallExpr{
-			Name: parseAstNode(n.Name),
-			Args: slices.Map(n.Args, parseAstNode),
+			Name: p.parseNode(n.Name),
+			Args: slices.Map(n.Args, p.parseNode),
 		}
 	case *ast.NewExpr:
 		return &NewExpr{
-			Class: parseAstNode(n.Class),
-			Args:  slices.Map(n.Args, parseAstNode),
+			Class: p.parseNode(n.Class),
+			Args:  slices.Map(n.Args, p.parseNode),
 		}
 	case *ast.MethodCallExpr:
 		return &MethodCallExpr{
-			Var:  parseAstExpr(n.Var),
-			Name: parseAstNode(n.Name),
-			Args: slices.Map(n.Args, parseAstNode),
+			Var:  p.parseExpr(n.Var),
+			Name: p.parseNode(n.Name),
+			Args: slices.Map(n.Args, p.parseNode),
 		}
 	case *ast.NullsafeMethodCallExpr:
 		return &NullsafeMethodCallExpr{
-			Var:  parseAstExpr(n.Var),
-			Name: parseAstNode(n.Name),
-			Args: slices.Map(n.Args, parseAstNode),
+			Var:  p.parseExpr(n.Var),
+			Name: p.parseNode(n.Name),
+			Args: slices.Map(n.Args, p.parseNode),
 		}
 	case *ast.StaticCallExpr:
 		return &StaticCallExpr{
-			Class: parseAstNode(n.Class),
-			Name:  parseAstNode(n.Name),
-			Args:  slices.Map(n.Args, parseAstNode),
+			Class: p.parseNode(n.Class),
+			Name:  p.parseNode(n.Name),
+			Args:  slices.Map(n.Args, p.parseNode),
 		}
 	}
 	return nil
 }
 
-func parseAstStmt(node ast.Stmt) Stmt {
+func (p *parser) parseStmt(node ast.Stmt) Stmt {
 	switch n := node.(type) {
 	case *ast.EmptyStmt:
 		return &EmptyStmt{}
 	case *ast.BlockStmt:
 		return &BlockStmt{
-			List: slices.Map(n.List, parseAstStmt),
+			List: slices.Map(n.List, p.parseStmt),
 		}
 	case *ast.ExprStmt:
 		return &ExprStmt{
-			Expr: parseAstExpr(n.Expr),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.ReturnStmt:
 		return &ReturnStmt{
-			Expr: parseAstExpr(n.Expr),
+			Expr: p.parseExpr(n.Expr),
 		}
 	case *ast.LabelStmt:
 		return &LabelStmt{
-			Name: parseAstIdent(n.Name),
+			Name: p.parseIdent(n.Name),
 		}
 	case *ast.GotoStmt:
 		return &GotoStmt{
-			Name: parseAstIdent(n.Name),
+			Name: p.parseIdent(n.Name),
 		}
 	case *ast.IfStmt:
 		return &IfStmt{
-			Cond:    parseAstExpr(n.Cond),
-			Stmts:   slices.Map(n.Stmts, parseAstStmt),
-			Elseifs: slices.Map(n.Elseifs, parseAstElseIfStmt),
-			Else:    parseAstElseStmt(n.Else),
+			Cond:    p.parseExpr(n.Cond),
+			Stmts:   slices.Map(n.Stmts, p.parseStmt),
+			Elseifs: slices.Map(n.Elseifs, p.parseElseIfStmt),
+			Else:    p.parseElseStmt(n.Else),
 		}
 	case *ast.ElseIfStmt:
 		return &ElseIfStmt{
-			Cond:  parseAstExpr(n.Cond),
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
+			Cond:  p.parseExpr(n.Cond),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.ElseStmt:
 		return &ElseStmt{
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.SwitchStmt:
 		return &SwitchStmt{
-			Cond:  parseAstExpr(n.Cond),
-			Cases: slices.Map(n.Cases, parseAstCaseStmt),
+			Cond:  p.parseExpr(n.Cond),
+			Cases: slices.Map(n.Cases, p.parseCaseStmt),
 		}
 	case *ast.CaseStmt:
 		return &CaseStmt{
-			Cond:  parseAstExpr(n.Cond),
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
+			Cond:  p.parseExpr(n.Cond),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.ForStmt:
 		return &ForStmt{
-			Init:  slices.Map(n.Init, parseAstExpr),
-			Cond:  slices.Map(n.Cond, parseAstExpr),
-			Loop:  slices.Map(n.Loop, parseAstExpr),
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
+			Init:  slices.Map(n.Init, p.parseExpr),
+			Cond:  slices.Map(n.Cond, p.parseExpr),
+			Loop:  slices.Map(n.Loop, p.parseExpr),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.ForeachStmt:
 		return &ForeachStmt{
-			Expr:     parseAstExpr(n.Expr),
-			KeyVar:   parseAstExpr(n.KeyVar),
+			Expr:     p.parseExpr(n.Expr),
+			KeyVar:   p.parseExpr(n.KeyVar),
 			ByRef:    n.ByRef,
-			ValueVar: parseAstExpr(n.ValueVar),
-			Stmts:    slices.Map(n.Stmts, parseAstStmt),
+			ValueVar: p.parseExpr(n.ValueVar),
+			Stmts:    slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.BreakStmt:
 		return &BreakStmt{
-			Num: parseAstExpr(n.Num),
+			Num: p.parseExpr(n.Num),
 		}
 	case *ast.ContinueStmt:
 		return &ContinueStmt{
-			Num: parseAstExpr(n.Num),
+			Num: p.parseExpr(n.Num),
 		}
 	case *ast.WhileStmt:
 		return &WhileStmt{
-			Cond:  parseAstExpr(n.Cond),
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
+			Cond:  p.parseExpr(n.Cond),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.DoStmt:
 		return &DoStmt{
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
-			Cond:  parseAstExpr(n.Cond),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Cond:  p.parseExpr(n.Cond),
 		}
 	case *ast.TryCatchStmt:
 		return &TryCatchStmt{
-			Stmts:   slices.Map(n.Stmts, parseAstStmt),
-			Catches: slices.Map(n.Catches, parseAstCatchStmt),
-			Finally: parseAstFinallyStmt(n.Finally),
+			Stmts:   slices.Map(n.Stmts, p.parseStmt),
+			Catches: slices.Map(n.Catches, p.parseCatchStmt),
+			Finally: p.parseFinallyStmt(n.Finally),
 		}
 	case *ast.CatchStmt:
 		return &CatchStmt{
-			Types: slices.Map(n.Types, parseAstName),
-			Var:   parseAstVariableExpr(n.Var),
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
+			Types: slices.Map(n.Types, p.parseName),
+			Var:   p.parseVariableExpr(n.Var),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.FinallyStmt:
 		return &FinallyStmt{
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.ConstStmt:
 		return &ConstStmt{
-			Consts: slices.Map(n.Consts, parseAstConst),
+			Consts: slices.Map(n.Consts, p.parseConst),
 		}
 	case *ast.EchoStmt:
 		return &EchoStmt{
-			Exprs: slices.Map(n.Exprs, parseAstExpr),
+			Exprs: slices.Map(n.Exprs, p.parseExpr),
 		}
 	case *ast.GlobalStmt:
 		return &GlobalStmt{
-			Vars: slices.Map(n.Vars, parseAstExpr),
+			Vars: slices.Map(n.Vars, p.parseExpr),
 		}
 	case *ast.HaltCompilerStmt:
 		return &HaltCompilerStmt{
@@ -431,183 +430,183 @@ func parseAstStmt(node ast.Stmt) Stmt {
 		}
 	case *ast.StaticStmt:
 		return &StaticStmt{
-			Vars: slices.Map(n.Vars, parseAstStaticVarStmt),
+			Vars: slices.Map(n.Vars, p.parseStaticVarStmt),
 		}
 	case *ast.StaticVarStmt:
 		return &StaticVarStmt{
-			Var:     parseAstVariableExpr(n.Var),
-			Default: parseAstExpr(n.Default),
+			Var:     p.parseVariableExpr(n.Var),
+			Default: p.parseExpr(n.Default),
 		}
 	case *ast.UnsetStmt:
 		return &UnsetStmt{
-			Vars: slices.Map(n.Vars, parseAstExpr),
+			Vars: slices.Map(n.Vars, p.parseExpr),
 		}
 	case *ast.UseStmt:
 		return &UseStmt{
-			Type:  parseAstUseType(n.Type),
-			Name:  parseAstName(n.Name),
-			Alias: parseAstIdent(n.Alias),
+			Type:  p.parseUseType(n.Type),
+			Name:  p.parseName(n.Name),
+			Alias: p.parseIdent(n.Alias),
 		}
 	case *ast.DeclareStmt:
 		return &DeclareStmt{
-			Declares: slices.Map(n.Declares, parseAstDeclareDeclareStmt),
-			Stmts:    slices.Map(n.Stmts, parseAstStmt),
+			Declares: slices.Map(n.Declares, p.parseDeclareDeclareStmt),
+			Stmts:    slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.DeclareDeclareStmt:
 		return &DeclareDeclareStmt{
-			Key:   parseAstIdent(n.Key),
-			Value: parseAstExpr(n.Value),
+			Key:   p.parseIdent(n.Key),
+			Value: p.parseExpr(n.Value),
 		}
 	case *ast.NamespaceStmt:
 		return &NamespaceStmt{
-			Name:  parseAstName(n.Name),
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
+			Name:  p.parseName(n.Name),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.FunctionStmt:
-		parseAssert(n.NamespacedName != nil, "FunctionStmt.NamespacedName cannot be nil")
+		p.assert(n.NamespacedName != nil, "FunctionStmt.NamespacedName cannot be nil")
 
 		return &FunctionStmt{
-			Name:       parseAstNameAsFQ(n.NamespacedName),
+			Name:       p.parseNameAsFQ(n.NamespacedName),
 			ByRef:      n.ByRef,
-			Params:     slices.Map(n.Params, parseAstParam),
-			ReturnType: parseAstType(n.ReturnType),
-			Stmts:      slices.Map(n.Stmts, parseAstStmt),
+			Params:     slices.Map(n.Params, p.parseParam),
+			ReturnType: p.parseType(n.ReturnType),
+			Stmts:      slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.InterfaceStmt:
-		parseAssert(n.NamespacedName != nil, "InterfaceStmt.NamespacedName cannot be nil")
+		p.assert(n.NamespacedName != nil, "InterfaceStmt.NamespacedName cannot be nil")
 
 		return &InterfaceStmt{
-			Name:    parseAstNameAsFQ(n.NamespacedName),
-			Extends: slices.Map(n.Extends, parseAstName),
-			Stmts:   slices.Map(n.Stmts, parseAstStmt),
+			Name:    p.parseNameAsFQ(n.NamespacedName),
+			Extends: slices.Map(n.Extends, p.parseName),
+			Stmts:   slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.ClassStmt:
 		// todo 将匿名类和实名类定义区分开
 		var name *Name
 		if n.NamespacedName != nil {
-			name = parseAstNameAsFQ(n.NamespacedName)
+			name = p.parseNameAsFQ(n.NamespacedName)
 		}
 
 		return &ClassStmt{
 			Name:       name,
-			Flags:      parseAstFlags(n.Flags),
-			Extends:    parseAstName(n.Extends),
-			Implements: slices.Map(n.Implements, parseAstName),
-			Stmts:      slices.Map(n.Stmts, parseAstStmt),
+			Flags:      p.parseFlags(n.Flags),
+			Extends:    p.parseName(n.Extends),
+			Implements: slices.Map(n.Implements, p.parseName),
+			Stmts:      slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.ClassConstStmt:
 		return &ClassConstStmt{
-			Flags:  parseAstFlags(n.Flags),
-			Consts: slices.Map(n.Consts, parseAstConst),
+			Flags:  p.parseFlags(n.Flags),
+			Consts: slices.Map(n.Consts, p.parseConst),
 		}
 	case *ast.PropertyStmt:
 		return &PropertyStmt{
-			Flags: parseAstFlags(n.Flags),
-			Props: slices.Map(n.Props, parseAstPropertyPropertyStmt),
-			Type:  parseAstType(n.Type),
+			Flags: p.parseFlags(n.Flags),
+			Props: slices.Map(n.Props, p.parsePropertyPropertyStmt),
+			Type:  p.parseType(n.Type),
 		}
 	case *ast.PropertyPropertyStmt:
 		return &PropertyPropertyStmt{
-			Name:    parseAstIdent(n.Name),
-			Default: parseAstExpr(n.Default),
+			Name:    p.parseIdent(n.Name),
+			Default: p.parseExpr(n.Default),
 		}
 	case *ast.ClassMethodStmt:
 		return &ClassMethodStmt{
-			Flags:      parseAstFlags(n.Flags),
+			Flags:      p.parseFlags(n.Flags),
 			ByRef:      n.ByRef,
-			Name:       parseAstIdent(n.Name),
-			Params:     slices.Map(n.Params, parseAstParam),
-			ReturnType: parseAstType(n.ReturnType),
-			Stmts:      slices.Map(n.Stmts, parseAstStmt),
+			Name:       p.parseIdent(n.Name),
+			Params:     slices.Map(n.Params, p.parseParam),
+			ReturnType: p.parseType(n.ReturnType),
+			Stmts:      slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.TraitStmt:
-		parseAssert(n.NamespacedName != nil, "TraitStmt.NamespacedName cannot be nil")
+		p.assert(n.NamespacedName != nil, "TraitStmt.NamespacedName cannot be nil")
 
 		return &TraitStmt{
-			Name:  parseAstNameAsFQ(n.NamespacedName),
-			Stmts: slices.Map(n.Stmts, parseAstStmt),
+			Name:  p.parseNameAsFQ(n.NamespacedName),
+			Stmts: slices.Map(n.Stmts, p.parseStmt),
 		}
 	case *ast.TraitUseStmt:
 		return &TraitUseStmt{
-			Traits:      slices.Map(n.Traits, parseAstName),
-			Adaptations: slices.Map(n.Adaptations, parseAstTraitUseAdaptationStmt),
+			Traits:      slices.Map(n.Traits, p.parseName),
+			Adaptations: slices.Map(n.Adaptations, p.parseTraitUseAdaptationStmt),
 		}
 	case *ast.TraitUseAdaptationAliasStmt:
 		return &TraitUseAdaptationAliasStmt{
-			NewModifier: parseAstFlags(n.NewModifier),
-			NewName:     parseAstIdent(n.NewName),
-			Trait:       parseAstName(n.Trait),
-			Method:      parseAstIdent(n.Method),
+			NewModifier: p.parseFlags(n.NewModifier),
+			NewName:     p.parseIdent(n.NewName),
+			Trait:       p.parseName(n.Trait),
+			Method:      p.parseIdent(n.Method),
 		}
 	case *ast.TraitUseAdaptationPrecedenceStmt:
 		return &TraitUseAdaptationPrecedenceStmt{
-			Insteadof: slices.Map(n.Insteadof, parseAstName),
-			Trait:     parseAstName(n.Trait),
-			Method:    parseAstIdent(n.Method),
+			Insteadof: slices.Map(n.Insteadof, p.parseName),
+			Trait:     p.parseName(n.Trait),
+			Method:    p.parseIdent(n.Method),
 		}
 	case *ast.EnumStmt, *ast.EnumCaseStmt:
-		parseHighVersionFeature("php8.1 enum")
+		p.unsupportedFeature("php8.1 enum")
 	}
 	return nil
 }
 
-func parseAstType(node ast.Type) Type {
+func (p *parser) parseType(node ast.Type) Type {
 	switch n := node.(type) {
 	case *ast.SimpleType:
 		return &SimpleType{
-			Name: parseAstName(n.Name),
+			Name: p.parseName(n.Name),
 		}
 	case *ast.IntersectionType:
 		return &IntersectionType{
-			Types: slices.Map(n.Types, parseAstType),
+			Types: slices.Map(n.Types, p.parseType),
 		}
 	case *ast.UnionType:
 		return &UnionType{
-			Types: slices.Map(n.Types, parseAstType),
+			Types: slices.Map(n.Types, p.parseType),
 		}
 	case *ast.NullableType:
 		return &NullableType{
-			Type: parseAstSimpleType(n.Type),
+			Type: p.parseSimpleType(n.Type),
 		}
 	}
 	return nil
 }
 
-func parseAstTraitUseAdaptationStmt(node ast.TraitUseAdaptationStmt) TraitUseAdaptationStmt {
+func (p *parser) parseTraitUseAdaptationStmt(node ast.TraitUseAdaptationStmt) TraitUseAdaptationStmt {
 	switch n := node.(type) {
 	case *ast.TraitUseAdaptationAliasStmt:
 		return &TraitUseAdaptationAliasStmt{
-			NewModifier: parseAstFlags(n.NewModifier),
-			NewName:     parseAstIdent(n.NewName),
-			Trait:       parseAstName(n.Trait),
-			Method:      parseAstIdent(n.Method),
+			NewModifier: p.parseFlags(n.NewModifier),
+			NewName:     p.parseIdent(n.NewName),
+			Trait:       p.parseName(n.Trait),
+			Method:      p.parseIdent(n.Method),
 		}
 	case *ast.TraitUseAdaptationPrecedenceStmt:
 		return &TraitUseAdaptationPrecedenceStmt{
-			Insteadof: slices.Map(n.Insteadof, parseAstName),
-			Trait:     parseAstName(n.Trait),
-			Method:    parseAstIdent(n.Method),
+			Insteadof: slices.Map(n.Insteadof, p.parseName),
+			Trait:     p.parseName(n.Trait),
+			Method:    p.parseIdent(n.Method),
 		}
 	}
 	return nil
 }
 
 // struct types
-func parseAstArg(n *ast.Arg) *Arg {
+func (p *parser) parseArg(n *ast.Arg) *Arg {
 	return &Arg{
-		Name:   parseAstIdent(n.Name),
-		Value:  parseAstExpr(n.Value),
+		Name:   p.parseIdent(n.Name),
+		Value:  p.parseExpr(n.Value),
 		ByRef:  n.ByRef,
 		Unpack: n.Unpack,
 	}
 }
-func parseAstConst(n *ast.Const) *Const {
+func (p *parser) parseConst(n *ast.Const) *Const {
 	return &Const{
-		Name:  parseAstNameAsFQ(n.NamespacedName),
-		Value: parseAstExpr(n.Value),
+		Name:  p.parseNameAsFQ(n.NamespacedName),
+		Value: p.parseExpr(n.Value),
 	}
 }
-func parseAstIdent(n *ast.Ident) *Ident {
+func (p *parser) parseIdent(n *ast.Ident) *Ident {
 	if n == nil {
 		return nil
 	}
@@ -616,33 +615,33 @@ func parseAstIdent(n *ast.Ident) *Ident {
 		VarLike: n.VarLike,
 	}
 }
-func parseAstParam(n *ast.Param) *Param {
+func (p *parser) parseParam(n *ast.Param) *Param {
 	if n == nil {
 		return nil
 	}
 	return &Param{
-		Type:     parseAstType(n.Type),
+		Type:     p.parseType(n.Type),
 		ByRef:    n.ByRef,
 		Variadic: n.Variadic,
-		Var:      parseAstVariableExpr(n.Var),
-		Default:  parseAstExpr(n.Default),
-		Flags:    parseAstFlags(n.Flags),
+		Var:      p.parseVariableExpr(n.Var),
+		Default:  p.parseExpr(n.Default),
+		Flags:    p.parseFlags(n.Flags),
 	}
 }
-func parseAstSimpleType(n *ast.SimpleType) *SimpleType {
+func (p *parser) parseSimpleType(n *ast.SimpleType) *SimpleType {
 	if n == nil {
 		return nil
 	}
 	return &SimpleType{
-		Name: parseAstName(n.Name),
+		Name: p.parseName(n.Name),
 	}
 }
 
-func parseAstNameAsFQ(n *ast.Name) *Name {
+func (p *parser) parseNameAsFQ(n *ast.Name) *Name {
 	return NewName(NameFullyQualified, n.Parts)
 }
 
-func parseAstName(n *ast.Name) *Name {
+func (p *parser) parseName(n *ast.Name) *Name {
 	if n == nil {
 		return nil
 	}
@@ -661,103 +660,103 @@ func parseAstName(n *ast.Name) *Name {
 		panic(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
 	}
 }
-func parseAstArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
+func (p *parser) parseArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
 	if n == nil {
 		return nil
 	}
 	return &ArrayItemExpr{
-		Key:    parseAstExpr(n.Key),
-		Value:  parseAstExpr(n.Value),
+		Key:    p.parseExpr(n.Key),
+		Value:  p.parseExpr(n.Value),
 		ByRef:  n.ByRef,
 		Unpack: n.Unpack,
 	}
 }
-func parseAstClosureUseExpr(n *ast.ClosureUseExpr) *ClosureUseExpr {
+func (p *parser) parseClosureUseExpr(n *ast.ClosureUseExpr) *ClosureUseExpr {
 	if n == nil {
 		return nil
 	}
 	return &ClosureUseExpr{
-		Var:   parseAstVariableExpr(n.Var),
+		Var:   p.parseVariableExpr(n.Var),
 		ByRef: n.ByRef,
 	}
 }
-func parseAstVariableExpr(n *ast.VariableExpr) *VariableExpr {
+func (p *parser) parseVariableExpr(n *ast.VariableExpr) *VariableExpr {
 	if n == nil {
 		return nil
 	}
 	return &VariableExpr{
-		Name: parseAstNode(n.Name),
+		Name: p.parseNode(n.Name),
 	}
 }
-func parseAstElseIfStmt(n *ast.ElseIfStmt) *ElseIfStmt {
+func (p *parser) parseElseIfStmt(n *ast.ElseIfStmt) *ElseIfStmt {
 	if n == nil {
 		return nil
 	}
 	return &ElseIfStmt{
-		Cond:  parseAstExpr(n.Cond),
-		Stmts: slices.Map(n.Stmts, parseAstStmt),
+		Cond:  p.parseExpr(n.Cond),
+		Stmts: slices.Map(n.Stmts, p.parseStmt),
 	}
 }
-func parseAstElseStmt(n *ast.ElseStmt) *ElseStmt {
+func (p *parser) parseElseStmt(n *ast.ElseStmt) *ElseStmt {
 	if n == nil {
 		return nil
 	}
 	return &ElseStmt{
-		Stmts: slices.Map(n.Stmts, parseAstStmt),
+		Stmts: slices.Map(n.Stmts, p.parseStmt),
 	}
 }
-func parseAstCaseStmt(n *ast.CaseStmt) *CaseStmt {
+func (p *parser) parseCaseStmt(n *ast.CaseStmt) *CaseStmt {
 	if n == nil {
 		return nil
 	}
 	return &CaseStmt{
-		Cond:  parseAstExpr(n.Cond),
-		Stmts: slices.Map(n.Stmts, parseAstStmt),
+		Cond:  p.parseExpr(n.Cond),
+		Stmts: slices.Map(n.Stmts, p.parseStmt),
 	}
 }
-func parseAstCatchStmt(n *ast.CatchStmt) *CatchStmt {
+func (p *parser) parseCatchStmt(n *ast.CatchStmt) *CatchStmt {
 	if n == nil {
 		return nil
 	}
 
 	return &CatchStmt{
-		Types: slices.Map(n.Types, parseAstName),
-		Var:   parseAstVariableExpr(n.Var),
-		Stmts: slices.Map(n.Stmts, parseAstStmt),
+		Types: slices.Map(n.Types, p.parseName),
+		Var:   p.parseVariableExpr(n.Var),
+		Stmts: slices.Map(n.Stmts, p.parseStmt),
 	}
 }
-func parseAstFinallyStmt(n *ast.FinallyStmt) *FinallyStmt {
+func (p *parser) parseFinallyStmt(n *ast.FinallyStmt) *FinallyStmt {
 	if n == nil {
 		return nil
 	}
 	return &FinallyStmt{
-		Stmts: slices.Map(n.Stmts, parseAstStmt),
+		Stmts: slices.Map(n.Stmts, p.parseStmt),
 	}
 }
-func parseAstStaticVarStmt(n *ast.StaticVarStmt) *StaticVarStmt {
+func (p *parser) parseStaticVarStmt(n *ast.StaticVarStmt) *StaticVarStmt {
 	if n == nil {
 		return nil
 	}
 	return &StaticVarStmt{
-		Var:     parseAstVariableExpr(n.Var),
-		Default: parseAstExpr(n.Default),
+		Var:     p.parseVariableExpr(n.Var),
+		Default: p.parseExpr(n.Default),
 	}
 }
-func parseAstDeclareDeclareStmt(n *ast.DeclareDeclareStmt) *DeclareDeclareStmt {
+func (p *parser) parseDeclareDeclareStmt(n *ast.DeclareDeclareStmt) *DeclareDeclareStmt {
 	if n == nil {
 		return nil
 	}
 	return &DeclareDeclareStmt{
-		Key:   parseAstIdent(n.Key),
-		Value: parseAstExpr(n.Value),
+		Key:   p.parseIdent(n.Key),
+		Value: p.parseExpr(n.Value),
 	}
 }
-func parseAstPropertyPropertyStmt(n *ast.PropertyPropertyStmt) *PropertyPropertyStmt {
+func (p *parser) parsePropertyPropertyStmt(n *ast.PropertyPropertyStmt) *PropertyPropertyStmt {
 	if n == nil {
 		return nil
 	}
 	return &PropertyPropertyStmt{
-		Name:    parseAstIdent(n.Name),
-		Default: parseAstExpr(n.Default),
+		Name:    p.parseIdent(n.Name),
+		Default: p.parseExpr(n.Default),
 	}
 }

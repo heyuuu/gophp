@@ -258,7 +258,11 @@ func (p *printer) stmt(n ir.Stmt) {
 		}
 		p.print("}")
 	case *ir.ForStmt:
-		p.print("for (", x.Init, ";", x.Cond, ";", x.Loop, ") {\n")
+		if len(x.Init) == 0 && len(x.Loop) == 0 {
+			p.print("for ", x.Cond, " {\n")
+		} else {
+			p.print("for ", x.Init, ";", x.Cond, ";", x.Loop, " {\n")
+		}
 		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ir.ForeachStmt:
@@ -282,7 +286,7 @@ func (p *printer) stmt(n ir.Stmt) {
 			p.print("continue;")
 		}
 	case *ir.WhileStmt:
-		p.print("while (", x.Cond, ") {\n", x.Stmts, "}")
+		p.print("while ", x.Cond, " {\n", x.Stmts, "}")
 	case *ir.DoStmt:
 		p.print("do {\n", x.Stmts, "} while (", x.Cond, ");")
 	case *ir.TryCatchStmt:
@@ -323,7 +327,7 @@ func (p *printer) stmt(n ir.Stmt) {
 		var useType string
 		switch x.Type {
 		case ir.UseFunction:
-			useType = "function "
+			useType = "func "
 		case ir.UseConstant:
 			useType = "const "
 		}
@@ -427,7 +431,7 @@ func (p *printer) stmt(n ir.Stmt) {
 			p.flags(x.Flags)
 			p.print(" ")
 		}
-		p.print("function ")
+		p.print("func ")
 		if x.ByRef {
 			p.print("&")
 		}
