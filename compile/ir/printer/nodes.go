@@ -8,12 +8,6 @@ import (
 )
 
 func (p *printer) arg(n *ir.Arg) {
-	if n.Name != nil {
-		p.print(n.Name, ": ")
-	}
-	if n.ByRef {
-		p.print("&")
-	}
 	if n.Unpack {
 		p.print("...")
 	}
@@ -172,8 +166,6 @@ func (p *printer) expr(n ir.Expr) {
 		p.print("print ", x.Expr)
 	case *ir.PropertyFetchExpr:
 		p.print(x.Var, "->", x.Name)
-	case *ir.NullsafePropertyFetchExpr:
-		p.print(x.Var, "?->", x.Name)
 	case *ir.StaticPropertyFetchExpr:
 		p.print(x.Class, "::", x.Name)
 	case *ir.ShellExecExpr:

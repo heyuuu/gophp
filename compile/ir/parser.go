@@ -76,6 +76,9 @@ func (p *parser) assert(cond bool, message string) {
 func (p *parser) highVersionFeature(feature string) {
 	p.assert(false, "high version php feature: "+feature)
 }
+func (p *parser) lowerVersionFeature(feature string) {
+	p.assert(false, "lower version php feature: "+feature)
+}
 func (p *parser) unsupported(message string) {
 	p.assert(false, message)
 }
@@ -276,11 +279,6 @@ func (p *parser) parseExpr(node ast.Expr) Expr {
 			Var:  p.parseExpr(n.Var),
 			Name: p.parseNode(n.Name),
 		}
-	case *ast.NullsafePropertyFetchExpr:
-		return &NullsafePropertyFetchExpr{
-			Var:  p.parseExpr(n.Var),
-			Name: p.parseNode(n.Name),
-		}
 	case *ast.StaticPropertyFetchExpr:
 		return &StaticPropertyFetchExpr{
 			Class: p.parseNode(n.Class),
@@ -329,18 +327,16 @@ func (p *parser) parseExpr(node ast.Expr) Expr {
 			Name: p.parseNode(n.Name),
 			Args: slices.Map(n.Args, p.parseNode),
 		}
-	case *ast.NullsafeMethodCallExpr:
-		return &NullsafeMethodCallExpr{
-			Var:  p.parseExpr(n.Var),
-			Name: p.parseNode(n.Name),
-			Args: slices.Map(n.Args, p.parseNode),
-		}
 	case *ast.StaticCallExpr:
 		return &StaticCallExpr{
 			Class: p.parseNode(n.Class),
 			Name:  p.parseNode(n.Name),
 			Args:  slices.Map(n.Args, p.parseNode),
 		}
+	case *ast.NullsafePropertyFetchExpr:
+		p.highVersionFeature("php8.0 nullsafe property fetch")
+	case *ast.NullsafeMethodCallExpr:
+		p.highVersionFeature("php8.0 nullsafe method call")
 	}
 	return nil
 }
@@ -642,10 +638,14 @@ func (p *parser) parseTraitUseAdaptationStmt(node ast.TraitUseAdaptationStmt) Tr
 
 // struct types
 func (p *parser) parseArg(n *ast.Arg) *Arg {
+	if n.Name != nil {
+		p.highVersionFeature("php8.0 named arguments")
+	}
+	if n.ByRef {
+		p.lowerVersionFeature("Call-time pass-by-reference has been removed in PHP 5.4")
+	}
 	return &Arg{
-		Name:   p.parseIdent(n.Name),
 		Value:  p.parseExpr(n.Value),
-		ByRef:  n.ByRef,
 		Unpack: n.Unpack,
 	}
 }
@@ -667,6 +667,9 @@ func (p *parser) parseIdent(n *ast.Ident) *Ident {
 func (p *parser) parseParam(n *ast.Param) *Param {
 	if n == nil {
 		return nil
+	}
+	if n.Flags != 0 {
+		p.highVersionFeature("php8.0 constructor promotion")
 	}
 	return &Param{
 		Type:     p.parseType(n.Type),
