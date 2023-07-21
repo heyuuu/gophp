@@ -8,10 +8,8 @@ func Map[T any, R any](slice []T, mapper func(T) R) []R {
 	return result
 }
 
-func Each[T any, R any](slice []T, handler func(T)) []R {
-	var result []R
+func Each[T any](slice []T, handler func(T)) {
 	for _, item := range slice {
 		handler(item)
 	}
-	return result
 }

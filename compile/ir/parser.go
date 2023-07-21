@@ -1,38 +1,66 @@
 package ir
 
 import (
+	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/php/ast"
 	"github.com/heyuuu/gophp/utils/slices"
 	"log"
 )
 
-func ParseAstFile(astFile []ast.Stmt) *File {
+func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
+	defer func() {
+		switch e := recover().(type) {
+		case nil:
+			return
+		case string:
+			err = errors.New(e)
+		case error:
+			err = e
+		default:
+			panic(e)
+		}
+	}()
+
 	p := &parser{}
-	return p.ParseFile(astFile)
+	return p.ParseFile(astFile), nil
 }
+
+// parsingStmts
+type parsingStmts []Stmt
+
+func (p parsingStmts) node()     {}
+func (p parsingStmts) stmtNode() {}
 
 // parser
 type parser struct{}
 
 func (p *parser) ParseFile(astFile []ast.Stmt) *File {
-	var defaultStmts []Stmt
-
-	f := &File{}
+	// 拆分 declare 语句、全局代码和命名空间代码
+	var declareStmts []*ast.DeclareStmt
+	var globalStmts []ast.Stmt
+	var namespaceStmts []*ast.NamespaceStmt
 	for _, astStmt := range astFile {
 		switch s := astStmt.(type) {
+		case *ast.DeclareStmt:
+			declareStmts = append(declareStmts, s)
 		case *ast.NamespaceStmt:
-			f.Segments = append(f.Segments, p.parseNamespaceStmt(s))
+			namespaceStmts = append(namespaceStmts, s)
 		default:
-			defaultStmts = append(defaultStmts, p.parseStmt(s))
+			globalStmts = append(globalStmts, s)
 		}
 	}
+	p.assert(len(globalStmts) == 0 || len(namespaceStmts) == 0, "Global code should be enclosed in global namespace declaration")
 
-	if len(defaultStmts) > 0 {
-		f.Segments = append(
-			[]Segment{p.buildSegment("", defaultStmts)},
-			f.Segments...,
-		)
+	//
+	f := &File{}
+
+	slices.Each(declareStmts, p.parseDeclareStmt)
+
+	if len(globalStmts) > 0 {
+		f.Segments = []Segment{p.buildSegment("", p.parseStmtList(globalStmts))}
+	} else {
+		f.Segments = slices.Map(namespaceStmts, p.parseNamespaceStmt)
 	}
 
 	return f
@@ -41,11 +69,15 @@ func (p *parser) ParseFile(astFile []ast.Stmt) *File {
 // misc
 func (p *parser) assert(cond bool, message string) {
 	if !cond {
-		log.Fatal(message)
+		log.Println(message)
+		panic(message)
 	}
 }
-func (p *parser) unsupportedFeature(feature string) {
+func (p *parser) highVersionFeature(feature string) {
 	p.assert(false, "high version php feature: "+feature)
+}
+func (p *parser) unsupported(message string) {
+	p.assert(false, message)
 }
 
 func (p *parser) buildSegment(namespace string, stmts []Stmt) Segment {
@@ -75,12 +107,16 @@ func (p *parser) parseFlags(flags ast.Flags) Flags         { return Flags(flags)
 func (p *parser) parseUseType(useType ast.UseType) UseType { return UseType(useType) }
 
 // special
+func (p *parser) parseDeclareStmt(n *ast.DeclareStmt) {
+	// todo declare
+}
+
 func (p *parser) parseNamespaceStmt(n *ast.NamespaceStmt) Segment {
 	var namespace string
 	if n.Name != nil {
 		namespace = n.Name.ToString()
 	}
-	stmts := slices.Map(n.Stmts, p.parseStmt)
+	stmts := p.parseStmtList(n.Stmts)
 	return p.buildSegment(namespace, stmts)
 }
 
@@ -89,8 +125,6 @@ func (p *parser) parseNode(node ast.Node) Node {
 	switch n := node.(type) {
 	case ast.Expr:
 		return p.parseExpr(n)
-	case ast.Stmt:
-		return p.parseStmt(n)
 	case *ast.Ident:
 		return p.parseIdent(n)
 	case *ast.Name:
@@ -99,14 +133,16 @@ func (p *parser) parseNode(node ast.Node) Node {
 		return p.parseArg(n)
 	case *ast.Param:
 		return p.parseParam(n)
-	case *ast.Attribute, *ast.AttributeGroup:
-		p.unsupportedFeature("php8.0 attribute")
 	case *ast.Const:
 		return p.parseConst(n)
-	case *ast.MatchArm:
-		p.unsupportedFeature("php8.0 match")
 	case *ast.VariadicPlaceholder:
 		return &VariadicPlaceholder{}
+	case ast.Stmt:
+		p.unsupported("unsupported parseNode(ast.Stmt), use parseStmtList() or parseStmt() instead.")
+	case *ast.Attribute, *ast.AttributeGroup:
+		p.highVersionFeature("php8.0 attribute")
+	case *ast.MatchArm:
+		p.highVersionFeature("php8.0 match")
 	}
 	return nil
 }
@@ -143,7 +179,7 @@ func (p *parser) parseExpr(node ast.Expr) Expr {
 			Params:     slices.Map(n.Params, p.parseParam),
 			Uses:       slices.Map(n.Uses, p.parseClosureUseExpr),
 			ReturnType: p.parseType(n.ReturnType),
-			Stmts:      slices.Map(n.Stmts, p.parseStmt),
+			Stmts:      p.parseStmtList(n.Stmts),
 		}
 	case *ast.ClosureUseExpr:
 		return &ClosureUseExpr{
@@ -221,7 +257,7 @@ func (p *parser) parseExpr(node ast.Expr) Expr {
 			Kind: n.Kind,
 		}
 	case *ast.MatchExpr:
-		p.unsupportedFeature("php8.0 match")
+		p.highVersionFeature("php8.0 match")
 	case *ast.InstanceofExpr:
 		return &InstanceofExpr{
 			Expr:  p.parseExpr(n.Expr),
@@ -309,13 +345,26 @@ func (p *parser) parseExpr(node ast.Expr) Expr {
 	return nil
 }
 
+func (p *parser) parseStmtList(astStmts []ast.Stmt) []Stmt {
+	var result []Stmt
+	for _, astStmt := range astStmts {
+		irStmt := p.parseStmt(astStmt)
+		if parsingStmts, ok := irStmt.(parsingStmts); ok {
+			result = append(result, parsingStmts...)
+		} else {
+			result = append(result, irStmt)
+		}
+	}
+	return result
+}
+
 func (p *parser) parseStmt(node ast.Stmt) Stmt {
 	switch n := node.(type) {
 	case *ast.EmptyStmt:
 		return &EmptyStmt{}
 	case *ast.BlockStmt:
 		return &BlockStmt{
-			List: slices.Map(n.List, p.parseStmt),
+			List: p.parseStmtList(n.List),
 		}
 	case *ast.ExprStmt:
 		return &ExprStmt{
@@ -336,18 +385,18 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 	case *ast.IfStmt:
 		return &IfStmt{
 			Cond:    p.parseExpr(n.Cond),
-			Stmts:   slices.Map(n.Stmts, p.parseStmt),
+			Stmts:   p.parseStmtList(n.Stmts),
 			Elseifs: slices.Map(n.Elseifs, p.parseElseIfStmt),
 			Else:    p.parseElseStmt(n.Else),
 		}
 	case *ast.ElseIfStmt:
 		return &ElseIfStmt{
 			Cond:  p.parseExpr(n.Cond),
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.ElseStmt:
 		return &ElseStmt{
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.SwitchStmt:
 		return &SwitchStmt{
@@ -357,14 +406,14 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 	case *ast.CaseStmt:
 		return &CaseStmt{
 			Cond:  p.parseExpr(n.Cond),
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.ForStmt:
 		return &ForStmt{
 			Init:  slices.Map(n.Init, p.parseExpr),
 			Cond:  slices.Map(n.Cond, p.parseExpr),
 			Loop:  slices.Map(n.Loop, p.parseExpr),
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.ForeachStmt:
 		return &ForeachStmt{
@@ -372,7 +421,7 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			KeyVar:   p.parseExpr(n.KeyVar),
 			ByRef:    n.ByRef,
 			ValueVar: p.parseExpr(n.ValueVar),
-			Stmts:    slices.Map(n.Stmts, p.parseStmt),
+			Stmts:    p.parseStmtList(n.Stmts),
 		}
 	case *ast.BreakStmt:
 		return &BreakStmt{
@@ -385,16 +434,16 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 	case *ast.WhileStmt:
 		return &WhileStmt{
 			Cond:  p.parseExpr(n.Cond),
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.DoStmt:
 		return &DoStmt{
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 			Cond:  p.parseExpr(n.Cond),
 		}
 	case *ast.TryCatchStmt:
 		return &TryCatchStmt{
-			Stmts:   slices.Map(n.Stmts, p.parseStmt),
+			Stmts:   p.parseStmtList(n.Stmts),
 			Catches: slices.Map(n.Catches, p.parseCatchStmt),
 			Finally: p.parseFinallyStmt(n.Finally),
 		}
@@ -402,11 +451,11 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 		return &CatchStmt{
 			Types: slices.Map(n.Types, p.parseName),
 			Var:   p.parseVariableExpr(n.Var),
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.FinallyStmt:
 		return &FinallyStmt{
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.ConstStmt:
 		return &ConstStmt{
@@ -450,7 +499,7 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 	case *ast.DeclareStmt:
 		return &DeclareStmt{
 			Declares: slices.Map(n.Declares, p.parseDeclareDeclareStmt),
-			Stmts:    slices.Map(n.Stmts, p.parseStmt),
+			Stmts:    p.parseStmtList(n.Stmts),
 		}
 	case *ast.DeclareDeclareStmt:
 		return &DeclareDeclareStmt{
@@ -460,7 +509,7 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 	case *ast.NamespaceStmt:
 		return &NamespaceStmt{
 			Name:  p.parseName(n.Name),
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.FunctionStmt:
 		p.assert(n.NamespacedName != nil, "FunctionStmt.NamespacedName cannot be nil")
@@ -470,7 +519,7 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			ByRef:      n.ByRef,
 			Params:     slices.Map(n.Params, p.parseParam),
 			ReturnType: p.parseType(n.ReturnType),
-			Stmts:      slices.Map(n.Stmts, p.parseStmt),
+			Stmts:      p.parseStmtList(n.Stmts),
 		}
 	case *ast.InterfaceStmt:
 		p.assert(n.NamespacedName != nil, "InterfaceStmt.NamespacedName cannot be nil")
@@ -478,7 +527,7 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 		return &InterfaceStmt{
 			Name:    p.parseNameAsFQ(n.NamespacedName),
 			Extends: slices.Map(n.Extends, p.parseName),
-			Stmts:   slices.Map(n.Stmts, p.parseStmt),
+			Stmts:   p.parseStmtList(n.Stmts),
 		}
 	case *ast.ClassStmt:
 		// todo 将匿名类和实名类定义区分开
@@ -492,7 +541,7 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Flags:      p.parseFlags(n.Flags),
 			Extends:    p.parseName(n.Extends),
 			Implements: slices.Map(n.Implements, p.parseName),
-			Stmts:      slices.Map(n.Stmts, p.parseStmt),
+			Stmts:      p.parseStmtList(n.Stmts),
 		}
 	case *ast.ClassConstStmt:
 		return &ClassConstStmt{
@@ -517,14 +566,14 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Name:       p.parseIdent(n.Name),
 			Params:     slices.Map(n.Params, p.parseParam),
 			ReturnType: p.parseType(n.ReturnType),
-			Stmts:      slices.Map(n.Stmts, p.parseStmt),
+			Stmts:      p.parseStmtList(n.Stmts),
 		}
 	case *ast.TraitStmt:
 		p.assert(n.NamespacedName != nil, "TraitStmt.NamespacedName cannot be nil")
 
 		return &TraitStmt{
 			Name:  p.parseNameAsFQ(n.NamespacedName),
-			Stmts: slices.Map(n.Stmts, p.parseStmt),
+			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.TraitUseStmt:
 		return &TraitUseStmt{
@@ -545,7 +594,7 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Method:    p.parseIdent(n.Method),
 		}
 	case *ast.EnumStmt, *ast.EnumCaseStmt:
-		p.unsupportedFeature("php8.1 enum")
+		p.highVersionFeature("php8.1 enum")
 	}
 	return nil
 }
@@ -694,7 +743,7 @@ func (p *parser) parseElseIfStmt(n *ast.ElseIfStmt) *ElseIfStmt {
 	}
 	return &ElseIfStmt{
 		Cond:  p.parseExpr(n.Cond),
-		Stmts: slices.Map(n.Stmts, p.parseStmt),
+		Stmts: p.parseStmtList(n.Stmts),
 	}
 }
 func (p *parser) parseElseStmt(n *ast.ElseStmt) *ElseStmt {
@@ -702,7 +751,7 @@ func (p *parser) parseElseStmt(n *ast.ElseStmt) *ElseStmt {
 		return nil
 	}
 	return &ElseStmt{
-		Stmts: slices.Map(n.Stmts, p.parseStmt),
+		Stmts: p.parseStmtList(n.Stmts),
 	}
 }
 func (p *parser) parseCaseStmt(n *ast.CaseStmt) *CaseStmt {
@@ -711,7 +760,7 @@ func (p *parser) parseCaseStmt(n *ast.CaseStmt) *CaseStmt {
 	}
 	return &CaseStmt{
 		Cond:  p.parseExpr(n.Cond),
-		Stmts: slices.Map(n.Stmts, p.parseStmt),
+		Stmts: p.parseStmtList(n.Stmts),
 	}
 }
 func (p *parser) parseCatchStmt(n *ast.CatchStmt) *CatchStmt {
@@ -722,7 +771,7 @@ func (p *parser) parseCatchStmt(n *ast.CatchStmt) *CatchStmt {
 	return &CatchStmt{
 		Types: slices.Map(n.Types, p.parseName),
 		Var:   p.parseVariableExpr(n.Var),
-		Stmts: slices.Map(n.Stmts, p.parseStmt),
+		Stmts: p.parseStmtList(n.Stmts),
 	}
 }
 func (p *parser) parseFinallyStmt(n *ast.FinallyStmt) *FinallyStmt {
@@ -730,7 +779,7 @@ func (p *parser) parseFinallyStmt(n *ast.FinallyStmt) *FinallyStmt {
 		return nil
 	}
 	return &FinallyStmt{
-		Stmts: slices.Map(n.Stmts, p.parseStmt),
+		Stmts: p.parseStmtList(n.Stmts),
 	}
 }
 func (p *parser) parseStaticVarStmt(n *ast.StaticVarStmt) *StaticVarStmt {
