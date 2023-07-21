@@ -617,9 +617,7 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 func (p *parser) parseType(node ast.Type) Type {
 	switch n := node.(type) {
 	case *ast.SimpleType:
-		return &SimpleType{
-			Name: p.parseName(n.Name),
-		}
+		return p.parseSimpleType(n)
 	case *ast.IntersectionType:
 		return &IntersectionType{
 			Types: slices.Map(n.Types, p.parseType),
@@ -634,6 +632,15 @@ func (p *parser) parseType(node ast.Type) Type {
 		}
 	}
 	return nil
+}
+
+func (p *parser) parseSimpleType(n *ast.SimpleType) *SimpleType {
+	if n == nil {
+		return nil
+	}
+	return &SimpleType{
+		Name: p.parseNameAsFQ(n.Name),
+	}
 }
 
 func (p *parser) parseTraitUseAdaptationStmt(node ast.TraitUseAdaptationStmt) TraitUseAdaptationStmt {
@@ -690,21 +697,16 @@ func (p *parser) parseParam(n *ast.Param) *Param {
 	if n.Flags != 0 {
 		p.highVersionFeature("php8.0 constructor promotion")
 	}
+	// 提取参数名
+	nameIdent := n.Var.Name.(*ast.Ident)
+	p.assert(nameIdent != nil, "ast.Param.Var.Name must be a Ident")
+
 	return &Param{
+		Name:     nameIdent.Name,
 		Type:     p.parseType(n.Type),
 		ByRef:    n.ByRef,
 		Variadic: n.Variadic,
-		Var:      p.parseVariableExpr(n.Var),
 		Default:  p.parseExpr(n.Default),
-		Flags:    p.parseFlags(n.Flags),
-	}
-}
-func (p *parser) parseSimpleType(n *ast.SimpleType) *SimpleType {
-	if n == nil {
-		return nil
-	}
-	return &SimpleType{
-		Name: p.parseName(n.Name),
 	}
 }
 

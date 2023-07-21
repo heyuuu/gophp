@@ -71,12 +71,11 @@ type (
 	}
 
 	Param struct {
-		Type     Type          // @var Type|null Type declaration
-		ByRef    bool          // @var bool Whether parameter is passed by reference
-		Variadic bool          // @var bool Whether this is a variadic argument
-		Var      *VariableExpr // @var VariableExpr Parameter variable
-		Default  Expr          // @var Expr|null Default value
-		Flags    Flags         // @var Flags
+		Name     string
+		Type     Type // @var Type|null Type declaration
+		ByRef    bool // @var bool Whether parameter is passed by reference
+		Variadic bool // @var bool Whether this is a variadic argument
+		Default  Expr // @var Expr|null Default value
 	}
 
 	// VariadicPlaceholder : PhpParserNodeAbstract

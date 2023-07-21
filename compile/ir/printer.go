@@ -114,6 +114,10 @@ func (p *printer) print(args ...any) {
 		switch v := arg.(type) {
 		case int:
 			p.write(strconv.Itoa(v))
+		case byte:
+			p.write(string(v))
+		case rune:
+			p.write(string(v))
 		case string:
 			p.write(v)
 		case token.Token:
@@ -265,20 +269,18 @@ func (p *printer) arg(n *Arg) {
 }
 
 func (p *printer) param(n *Param) {
-	if n.Flags != 0 {
-		p.flags(n.Flags)
-		p.print(" ")
-	}
-	if n.Type != nil {
-		p.print(n.Type, " ")
-	}
-	if n.ByRef {
-		p.print("&")
-	}
+	p.print(n.Name, " ")
 	if n.Variadic {
 		p.print("...")
 	}
-	p.print(n.Var)
+	if n.ByRef {
+		p.print("*")
+	}
+	if n.Type != nil {
+		p.print(n.Type)
+	} else {
+		p.print("any") // todo Zval
+	}
 	if n.Default != nil {
 		p.print(" = ", n.Default)
 	}
@@ -610,7 +612,7 @@ func (p *printer) stmt(n Stmt) {
 		}
 		p.print(x.Name, "(", x.Params, ")")
 		if x.ReturnType != nil {
-			p.print(": ", x.ReturnType)
+			p.print(" ", x.ReturnType)
 		}
 		if len(x.Stmts) == 0 {
 			p.print(" {}\n")
