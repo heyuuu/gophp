@@ -15,3 +15,8 @@
     - `cmp`     : `go1.21` 新包，比较类型
     - `slices`  : `go1.21` 新包，slice 相关泛型方法
     - `maps`    : `go1.21` 新包，map 相关泛型方法
+
+
+## 未支持特性
+
+- `declare`: declare只支持 strict_types 指令，不支持其他指定(如 ticks、encoding)

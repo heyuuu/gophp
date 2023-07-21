@@ -33,7 +33,13 @@ func (p parsingStmts) node()     {}
 func (p parsingStmts) stmtNode() {}
 
 // parser
-type parser struct{}
+type parser struct {
+	file *File
+}
+
+func (p *parser) clean() {
+	p.file = nil
+}
 
 func (p *parser) ParseFile(astFile []ast.Stmt) *File {
 	// 拆分 declare 语句、全局代码和命名空间代码
@@ -52,18 +58,21 @@ func (p *parser) ParseFile(astFile []ast.Stmt) *File {
 	}
 	p.assert(len(globalStmts) == 0 || len(namespaceStmts) == 0, "Global code should be enclosed in global namespace declaration")
 
-	//
-	f := &File{}
+	// 初始化对象
+	p.file = &File{}
+	defer func() { p.file = nil }()
 
-	slices.Each(declareStmts, p.parseDeclareStmt)
+	// 优先处理 declare，会影响其他代码
+	slices.Each(declareStmts, p.handleDeclareStmt)
 
+	// 区分有无命名空间进行处理
 	if len(globalStmts) > 0 {
-		f.Segments = []Segment{p.buildSegment("", p.parseStmtList(globalStmts))}
+		p.file.Segments = []Segment{p.buildSegment("", p.parseStmtList(globalStmts))}
 	} else {
-		f.Segments = slices.Map(namespaceStmts, p.parseNamespaceStmt)
+		p.file.Segments = slices.Map(namespaceStmts, p.parseNamespaceStmt)
 	}
 
-	return f
+	return p.file
 }
 
 // misc
@@ -110,8 +119,18 @@ func (p *parser) parseFlags(flags ast.Flags) Flags         { return Flags(flags)
 func (p *parser) parseUseType(useType ast.UseType) UseType { return UseType(useType) }
 
 // special
-func (p *parser) parseDeclareStmt(n *ast.DeclareStmt) {
-	// todo declare
+func (p *parser) handleDeclareStmt(n *ast.DeclareStmt) {
+	for _, declare := range n.Declares {
+		declareName := declare.Key.Name
+		if declareName != "strict_types" {
+			p.unsupported("unsupported declare directive: " + declareName)
+		}
+
+		valueLit, ok := declare.Value.(*ast.IntLit)
+		p.assert(ok && (valueLit.Value == 1 || valueLit.Value == 0), "strict_types declaration must have 0 or 1 as its value")
+		p.assert(len(n.Stmts) == 0, "strict_types declaration must not use block mode")
+		p.file.StrictTypes = valueLit.Value == 1
+	}
 }
 
 func (p *parser) parseNamespaceStmt(n *ast.NamespaceStmt) Segment {

@@ -237,6 +237,8 @@ func (cfg *Config) Sprint(node any) (string, error) {
 func (cfg *Config) SprintFile(f *ir.File) (string, error) {
 	var p = &printer{}
 
+	p.print("package ir\n\n")
+
 	for _, seg := range f.Segments {
 		// Namespace
 		if seg.Namespace != "" || len(f.Segments) > 1 {
