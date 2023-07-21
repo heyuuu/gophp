@@ -196,8 +196,6 @@ func (p *printer) expr(n ir.Expr) {
 		p.print("new ", x.Class, "(", x.Args, ")")
 	case *ir.MethodCallExpr:
 		p.print(x.Var, "->", x.Name, "(", x.Args, ")")
-	case *ir.NullsafeMethodCallExpr:
-		p.print(x.Var, "?->", x.Name, "(", x.Args, ")")
 	case *ir.StaticCallExpr:
 		p.print(x.Class, "::", x.Name, "(", x.Args, ")")
 	default:
