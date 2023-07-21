@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ir"
-	irPrinter "github.com/heyuuu/gophp/compile/ir/printer"
 	"github.com/heyuuu/gophp/php/parser"
 	"io/fs"
 	"log"
@@ -76,7 +75,7 @@ func simpleCompileFile(srcFile string, distFile string) error {
 	}
 
 	// render
-	irCode, err := irPrinter.SprintFile(irFile)
+	irCode, err := ir.PrintFile(irFile)
 	if err != nil {
 		return err
 	}

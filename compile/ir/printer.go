@@ -1,20 +1,270 @@
-package printer
+package ir
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/php/token"
 	"log"
+	"os"
+	"reflect"
+	"strconv"
+	"strings"
 )
 
-func (p *printer) arg(n *ir.Arg) {
+/**
+ *	public
+ */
+func PrintFile(file *File) (string, error) {
+	return (&Config{TabWidth: 8}).SprintFile(file)
+}
+func Print(node any) (string, error) {
+	return (&Config{TabWidth: 8}).Sprint(node)
+}
+
+// A Config node controls the output of Fprint.
+type Config struct {
+	TabWidth int // default: 8
+	Indent   int // default: 0 (all code is indented at least by this much)
+}
+
+func (cfg *Config) sprint(node any) (string, error) {
+	var p = &printer{}
+	// todo 需要验证 node 为 print 可以打印的类型范围
+	p.print(node)
+	return p.result()
+}
+
+func (cfg *Config) Sprint(node any) (string, error) {
+	var p = &printer{}
+	// todo 需要验证 node 为 print 可以打印的类型范围
+	p.print(node)
+	return p.result()
+}
+
+func (cfg *Config) SprintFile(f *File) (string, error) {
+	var p = &printer{}
+
+	p.print("package ir\n\n")
+
+	for _, seg := range f.Segments {
+		// Namespace
+		if seg.Namespace != "" || len(f.Segments) > 1 {
+			p.print("/**\n * namespace " + seg.Namespace + "\n */\n")
+		}
+		// Init
+		if seg.Init != nil {
+			p.print(seg.Init, "\n")
+		}
+		// Decls
+		p.print(seg.Decls)
+	}
+
+	return p.result()
+}
+
+/**
+ *	private
+ */
+type printer struct {
+	buf     strings.Builder
+	indent  int
+	err     error
+	newLine bool
+}
+
+func (p *printer) checkError(err error) {
+	if err != nil {
+		p.err = err
+	}
+}
+
+func (p *printer) result() (string, error) {
+	if p.err != nil {
+		return "", p.err
+	}
+	return p.buf.String(), p.err
+}
+
+func (p *printer) write(s string) {
+	if s == "" {
+		return
+	}
+
+	indentStr := strings.Repeat("    ", p.indent)
+	if p.newLine {
+		p.buf.WriteString(indentStr)
+		p.newLine = false
+	}
+
+	l := len(s)
+	if s[l-1] != '\n' {
+		p.buf.WriteString(strings.ReplaceAll(s, "\n", "\n"+indentStr))
+	} else {
+		p.buf.WriteString(strings.ReplaceAll(s[:l-1], "\n", "\n"+indentStr))
+		p.buf.WriteByte('\n')
+		p.newLine = true
+	}
+}
+
+func (p *printer) print(args ...any) {
+	for _, arg := range args {
+		if arg == nil {
+			continue
+		}
+
+		switch v := arg.(type) {
+		case int:
+			p.write(strconv.Itoa(v))
+		case string:
+			p.write(v)
+		case token.Token:
+			p.write(token.TokenName(v))
+		case Node:
+			p.printNode(v)
+		// 以下 case 只是为了加快类型匹配
+		case []Stmt:
+			p.stmtList(v, false)
+		case []Expr:
+			printList(p, v, ", ")
+		case []Node:
+			printList(p, v, ", ")
+		default:
+			if stmts, ok := convertStmtList(arg); ok {
+				p.stmtList(stmts, false)
+			} else if nodes, ok := convertNodeList(arg); ok {
+				printList(p, nodes, ", ")
+			} else {
+				_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
+				panic("gophp/php/printer type")
+			}
+		}
+	}
+}
+
+func (p *printer) printNode(node Node) {
+	if node == nil || reflect.ValueOf(node).IsNil() {
+		p.write("nil")
+		return
+	}
+
+	switch x := node.(type) {
+	case *Ident:
+		if x.VarLike {
+			p.write("$")
+		}
+		p.write(x.Name)
+	case *Name:
+		p.write(x.ToCodeString())
+	case Expr:
+		p.expr(x)
+	case Stmt:
+		p.stmt(x)
+	case Type:
+		p.typeHint(x)
+	case *Param:
+		p.param(x)
+	case *Arg:
+		p.arg(x)
+	case *Const:
+		p.print(x.Name, " = ", x.Value)
+	default:
+		err := fmt.Errorf("printer: unsupported node type %T", node)
+		p.checkError(err)
+	}
+}
+
+func printList[T Node](p *printer, list []T, sep string) {
+	for i, item := range list {
+		if i != 0 {
+			p.print(sep)
+		}
+		p.print(item)
+	}
+}
+
+func convertNodeList(data any) ([]Node, bool) {
+	if nodes, ok := data.([]Node); ok {
+		return nodes, true
+	}
+
+	var nodes []Node
+
+	value := reflect.ValueOf(data)
+	nodeType := reflect.TypeOf(nodes).Elem()
+	if value.Kind() == reflect.Slice && value.Type().Elem().Implements(nodeType) {
+		for i := 0; i < value.Len(); i++ {
+			nodes = append(nodes, value.Index(i).Interface().(Node))
+		}
+		return nodes, true
+	}
+	return nil, false
+}
+
+func convertStmtList(data any) ([]Stmt, bool) {
+	if nodes, ok := data.([]Stmt); ok {
+		return nodes, true
+	}
+
+	var nodes []Stmt
+
+	value := reflect.ValueOf(data)
+	nodeType := reflect.TypeOf(nodes).Elem()
+	if value.Kind() == reflect.Slice && value.Type().Elem().Implements(nodeType) {
+		for i := 0; i < value.Len(); i++ {
+			nodes = append(nodes, value.Index(i).Interface().(Stmt))
+		}
+		return nodes, true
+	}
+	return nil, false
+}
+
+func (p *printer) stmtList(stmtList []Stmt, indent bool) {
+	if indent {
+		p.indent++
+	}
+	printList(p, stmtList, "\n")
+	p.print("\n")
+	if indent {
+		p.indent--
+	}
+}
+
+func (p *printer) flags(flags Flags) {
+	var names []string
+	if flags.Is(FlagPublic) {
+		names = append(names, "public")
+	}
+	if flags.Is(FlagProtected) {
+		names = append(names, "protected")
+	}
+	if flags.Is(FlagPrivate) {
+		names = append(names, "private")
+	}
+	if flags.Is(FlagStatic) {
+		names = append(names, "static")
+	}
+	if flags.Is(FlagAbstract) {
+		names = append(names, "abstract")
+	}
+	if flags.Is(FlagFinal) {
+		names = append(names, "final")
+	}
+	if flags.Is(FlagReadonly) {
+		names = append(names, "readonly")
+	}
+	p.print(strings.Join(names, " "))
+}
+
+/**
+ * nodes
+ */
+func (p *printer) arg(n *Arg) {
 	if n.Unpack {
 		p.print("...")
 	}
 	p.print(n.Value)
 }
 
-func (p *printer) param(n *ir.Param) {
+func (p *printer) param(n *Param) {
 	if n.Flags != 0 {
 		p.flags(n.Flags)
 		p.print(" ")
@@ -33,18 +283,18 @@ func (p *printer) param(n *ir.Param) {
 		p.print(" = ", n.Default)
 	}
 }
-func (p *printer) typeHint(n ir.Type) {
+func (p *printer) typeHint(n Type) {
 	p.typeHint0(n, false)
 }
 
-func (p *printer) typeHint0(n ir.Type, wrap bool) {
+func (p *printer) typeHint0(n Type, wrap bool) {
 	switch t := n.(type) {
-	case *ir.SimpleType:
+	case *SimpleType:
 		p.print(t.Name)
-	case *ir.NullableType:
+	case *NullableType:
 		p.print('?')
 		p.typeHint0(t.Type, true)
-	case *ir.IntersectionType:
+	case *IntersectionType:
 		if wrap {
 			p.print('(')
 		}
@@ -57,7 +307,7 @@ func (p *printer) typeHint0(n ir.Type, wrap bool) {
 		if wrap {
 			p.print(')')
 		}
-	case *ir.UnionType:
+	case *UnionType:
 		if wrap {
 			p.print('(')
 		}
@@ -75,25 +325,25 @@ func (p *printer) typeHint0(n ir.Type, wrap bool) {
 	}
 }
 
-func (p *printer) expr(n ir.Expr) {
+func (p *printer) expr(n Expr) {
 	switch x := n.(type) {
-	case *ir.IntLit:
+	case *IntLit:
 		p.print(x.Value)
-	case *ir.FloatLit:
+	case *FloatLit:
 		p.print(fmt.Printf("%f", x.Value))
-	case *ir.StringLit:
+	case *StringLit:
 		// todo escape
 		p.print("\"", x.Value, "\"")
-	case *ir.ArrayExpr:
+	case *ArrayExpr:
 		p.print("[")
 		printList(p, x.Items, ", ")
 		p.print("]")
-	case *ir.ArrayItemExpr:
+	case *ArrayItemExpr:
 		if x.Key != nil {
 			p.print(x.Key, " => ")
 		}
 		p.print(x.Value)
-	case *ir.ClosureExpr:
+	case *ClosureExpr:
 		p.print("function (")
 		printList(p, x.Params, ", ")
 		p.print(") ")
@@ -105,12 +355,12 @@ func (p *printer) expr(n ir.Expr) {
 		p.print("{\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
-	case *ir.ClosureUseExpr:
+	case *ClosureUseExpr:
 		if x.ByRef {
 			p.print("&")
 		}
 		p.print(x.Var)
-	case *ir.ArrowFunctionExpr:
+	case *ArrowFunctionExpr:
 		if x.Static {
 			p.print("static ")
 		}
@@ -125,103 +375,103 @@ func (p *printer) expr(n ir.Expr) {
 			p.print(": ", x.ReturnType)
 		}
 		p.print(" => ", x.Expr)
-	case *ir.IndexExpr:
+	case *IndexExpr:
 		p.print(x.Var, "[", x.Dim, "]")
-	case *ir.CastExpr:
+	case *CastExpr:
 		p.print(x.Op, x.Expr)
-	case *ir.UnaryExpr:
+	case *UnaryExpr:
 		switch x.Kind {
 		case token.PostInc, token.PostDec:
 			p.print(x.Var, x.Kind)
 		default:
 			p.print(x.Kind, x.Var)
 		}
-	case *ir.BinaryExpr:
+	case *BinaryExpr:
 		p.print(x.Left, " ", x.Op, " ", x.Right)
-	case *ir.AssignExpr:
+	case *AssignExpr:
 		p.print(x.Var, " ", x.Op, " ", x.Expr)
-	case *ir.AssignRefExpr:
+	case *AssignRefExpr:
 		p.print(x.Var, " = &", x.Expr)
-	case *ir.InternalCallExpr:
+	case *InternalCallExpr:
 		p.print(x.Kind)
-	case *ir.CloneExpr:
+	case *CloneExpr:
 		p.print("clone ", x.Expr)
-	case *ir.ErrorSuppressExpr:
+	case *ErrorSuppressExpr:
 		p.print("@", x.Expr)
-	case *ir.ExitExpr:
+	case *ExitExpr:
 		p.print("exist(", x.Expr, ")")
-	case *ir.ConstFetchExpr:
+	case *ConstFetchExpr:
 		p.print(x.Name)
-	case *ir.ClassConstFetchExpr:
+	case *ClassConstFetchExpr:
 		p.print(x.Class, "::", x.Name)
-	case *ir.MagicConstExpr:
+	case *MagicConstExpr:
 		p.print(x.Kind)
-	case *ir.InstanceofExpr:
+	case *InstanceofExpr:
 		p.print(x.Expr, " instanceOf ", x.Class)
-	case *ir.ListExpr:
+	case *ListExpr:
 		p.print("list(")
 		printList(p, x.Items, ", ")
 		p.print(")")
-	case *ir.PrintExpr:
+	case *PrintExpr:
 		p.print("print ", x.Expr)
-	case *ir.PropertyFetchExpr:
+	case *PropertyFetchExpr:
 		p.print(x.Var, "->", x.Name)
-	case *ir.StaticPropertyFetchExpr:
+	case *StaticPropertyFetchExpr:
 		p.print(x.Class, "::", x.Name)
-	case *ir.ShellExecExpr:
+	case *ShellExecExpr:
 		p.print('`')
 		printList(p, x.Parts, "")
 		p.print('`')
-	case *ir.TernaryExpr:
+	case *TernaryExpr:
 		if x.If == nil {
 			p.print(x.Cond, " ?: ", x.Else)
 		} else {
 			p.print(x.Cond, " ? ", x.If, " : ", x.Else)
 		}
-	case *ir.ThrowExpr:
+	case *ThrowExpr:
 		p.print("throw ", x.Expr)
-	case *ir.VariableExpr:
+	case *VariableExpr:
 		p.print("$", x.Name)
-	case *ir.YieldExpr:
+	case *YieldExpr:
 		if x.Key == nil {
 			p.print("yield ", x.Value)
 		} else {
 			p.print("yield ", x.Key, " => ", x.Value)
 		}
-	case *ir.YieldFromExpr:
+	case *YieldFromExpr:
 		p.print("yield from ", x.Expr)
-	case *ir.FuncCallExpr:
+	case *FuncCallExpr:
 		p.print(x.Name, "(", x.Args, ")")
-	case *ir.NewExpr:
+	case *NewExpr:
 		p.print("new ", x.Class, "(", x.Args, ")")
-	case *ir.MethodCallExpr:
+	case *MethodCallExpr:
 		p.print(x.Var, "->", x.Name, "(", x.Args, ")")
-	case *ir.StaticCallExpr:
+	case *StaticCallExpr:
 		p.print(x.Class, "::", x.Name, "(", x.Args, ")")
 	default:
 		panic("unreachable")
 	}
 }
 
-func (p *printer) stmt(n ir.Stmt) {
+func (p *printer) stmt(n Stmt) {
 	switch x := n.(type) {
-	case *ir.EmptyStmt:
+	case *EmptyStmt:
 		//p.print(";")
-	case *ir.BlockStmt:
+	case *BlockStmt:
 		p.stmtList(x.List, false)
-	case *ir.ExprStmt:
+	case *ExprStmt:
 		p.print(x.Expr, ";")
-	case *ir.ReturnStmt:
+	case *ReturnStmt:
 		if x.Expr == nil {
 			p.print("return;")
 		} else {
 			p.print("return ", x.Expr, ";")
 		}
-	case *ir.LabelStmt:
+	case *LabelStmt:
 		p.print(x.Name, ":")
-	case *ir.GotoStmt:
+	case *GotoStmt:
 		p.print("goto ", x.Name, ";")
-	case *ir.IfStmt:
+	case *IfStmt:
 		p.print("if (", x.Cond, ") {\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
@@ -235,7 +485,7 @@ func (p *printer) stmt(n ir.Stmt) {
 			p.stmtList(x.Else.Stmts, true)
 			p.print("}")
 		}
-	case *ir.SwitchStmt:
+	case *SwitchStmt:
 		p.print("switch (", x.Cond, ") {\n")
 		for _, caseStmt := range x.Cases {
 			if caseStmt.Cond != nil {
@@ -247,7 +497,7 @@ func (p *printer) stmt(n ir.Stmt) {
 			}
 		}
 		p.print("}")
-	case *ir.ForStmt:
+	case *ForStmt:
 		if len(x.Init) == 0 && len(x.Loop) == 0 {
 			p.print("for ", x.Cond, " {\n")
 		} else {
@@ -255,7 +505,7 @@ func (p *printer) stmt(n ir.Stmt) {
 		}
 		p.stmtList(x.Stmts, true)
 		p.print("}")
-	case *ir.ForeachStmt:
+	case *ForeachStmt:
 		if x.KeyVar != nil {
 			p.print("foreach (", x.KeyVar, " as ", x.KeyVar, " => ", x.ValueVar, ") {\n")
 		} else {
@@ -263,23 +513,23 @@ func (p *printer) stmt(n ir.Stmt) {
 		}
 		p.stmtList(x.Stmts, true)
 		p.print("}")
-	case *ir.BreakStmt:
+	case *BreakStmt:
 		if x.Num != nil {
 			p.print("break ", x.Num, ";")
 		} else {
 			p.print("break;")
 		}
-	case *ir.ContinueStmt:
+	case *ContinueStmt:
 		if x.Num != nil {
 			p.print("continue ", x.Num, ";")
 		} else {
 			p.print("continue;")
 		}
-	case *ir.WhileStmt:
+	case *WhileStmt:
 		p.print("while ", x.Cond, " {\n", x.Stmts, "}")
-	case *ir.DoStmt:
+	case *DoStmt:
 		p.print("do {\n", x.Stmts, "} while (", x.Cond, ");")
-	case *ir.TryCatchStmt:
+	case *TryCatchStmt:
 		p.print("try {\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
@@ -293,32 +543,32 @@ func (p *printer) stmt(n ir.Stmt) {
 		if x.Finally != nil {
 			p.print(" finally {\n", x.Finally.Stmts, "}")
 		}
-	case *ir.ConstStmt:
+	case *ConstStmt:
 		p.print("const ", x.Consts, ";")
-	case *ir.EchoStmt:
+	case *EchoStmt:
 		p.print("echo ", x.Exprs, ";")
-	case *ir.GlobalStmt:
+	case *GlobalStmt:
 		p.print("global ", x.Vars, ";")
-	case *ir.HaltCompilerStmt:
+	case *HaltCompilerStmt:
 		p.print("__halt_compiler();", x.Remaining)
-	case *ir.InlineHTMLStmt:
+	case *InlineHTMLStmt:
 		p.print("?>", x.Value, "<?php")
-	case *ir.StaticStmt:
+	case *StaticStmt:
 		p.print("static ", x.Vars, ";")
-	case *ir.StaticVarStmt:
+	case *StaticVarStmt:
 		if x.Default != nil {
 			p.print(x.Var, " = ", x.Default)
 		} else {
 			p.print(x.Var)
 		}
-	case *ir.UnsetStmt:
+	case *UnsetStmt:
 		p.print("unset(", x.Vars, ")")
-	case *ir.UseStmt:
+	case *UseStmt:
 		var useType string
 		switch x.Type {
-		case ir.UseFunction:
+		case UseFunction:
 			useType = "func "
-		case ir.UseConstant:
+		case UseConstant:
 			useType = "const "
 		}
 
@@ -327,7 +577,7 @@ func (p *printer) stmt(n ir.Stmt) {
 		} else {
 			p.print("use ", useType, x.Name, ";")
 		}
-	case *ir.DeclareStmt:
+	case *DeclareStmt:
 		p.print("declare(")
 		printList(p, x.Declares, ", ")
 		p.print(")")
@@ -338,12 +588,12 @@ func (p *printer) stmt(n ir.Stmt) {
 			p.stmtList(x.Stmts, true)
 			p.print("}")
 		}
-	case *ir.DeclareDeclareStmt:
+	case *DeclareDeclareStmt:
 		p.print(x.Key, "=", x.Value)
-	case *ir.NamespaceStmt:
+	case *NamespaceStmt:
 		p.print("namespace ", x.Name, ";\n")
 		p.stmtList(x.Stmts, false)
-	case *ir.InitStmt:
+	case *InitStmt:
 		p.print("// init\n")
 		if len(x.Stmts) == 0 {
 			p.print("func init() {}")
@@ -352,7 +602,7 @@ func (p *printer) stmt(n ir.Stmt) {
 			p.stmtList(x.Stmts, true)
 			p.print("}\n")
 		}
-	case *ir.FunctionStmt:
+	case *FunctionStmt:
 		p.print("// ", x.Name, "\n")
 		p.print("func ")
 		if x.ByRef {
@@ -369,7 +619,7 @@ func (p *printer) stmt(n ir.Stmt) {
 			p.stmtList(x.Stmts, true)
 			p.print("}\n")
 		}
-	case *ir.InterfaceStmt:
+	case *InterfaceStmt:
 		p.print("interface ", x.Name)
 		if len(x.Extends) != 0 {
 			p.print(" extends ", x.Extends)
@@ -377,7 +627,7 @@ func (p *printer) stmt(n ir.Stmt) {
 		p.print("\n{\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
-	case *ir.ClassStmt:
+	case *ClassStmt:
 		p.print("// class ", x.Name, "\n")
 		if x.Flags != 0 {
 			p.flags(x.Flags)
@@ -393,7 +643,7 @@ func (p *printer) stmt(n ir.Stmt) {
 		p.print(" {\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
-	case *ir.ClassConstStmt:
+	case *ClassConstStmt:
 		for _, c := range x.Consts {
 			if x.Flags != 0 {
 				p.flags(x.Flags)
@@ -401,7 +651,7 @@ func (p *printer) stmt(n ir.Stmt) {
 			}
 			p.print("const ", c.Name, " = ", c.Value)
 		}
-	case *ir.PropertyStmt:
+	case *PropertyStmt:
 		for _, prop := range x.Props {
 			if x.Flags != 0 {
 				p.flags(x.Flags)
@@ -416,7 +666,7 @@ func (p *printer) stmt(n ir.Stmt) {
 				p.print(prop.Name, ";")
 			}
 		}
-	case *ir.ClassMethodStmt:
+	case *ClassMethodStmt:
 		if x.Flags != 0 {
 			p.flags(x.Flags)
 			p.print(" ")
@@ -432,11 +682,11 @@ func (p *printer) stmt(n ir.Stmt) {
 		p.print("\n{\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
-	case *ir.TraitStmt:
+	case *TraitStmt:
 		p.print("trait ", x.Name, "\n{\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
-	case *ir.TraitUseStmt:
+	case *TraitUseStmt:
 		if len(x.Adaptations) != 0 {
 			p.print("use ", x.Traits, " {\n")
 			p.indent++
@@ -446,9 +696,9 @@ func (p *printer) stmt(n ir.Stmt) {
 		} else {
 			p.print("use ", x.Traits, ";")
 		}
-	case *ir.TraitUseAdaptationPrecedenceStmt:
+	case *TraitUseAdaptationPrecedenceStmt:
 		p.print(x.Trait, "::", x.Method, " insteadof ", x.Insteadof, ";")
-	case *ir.TraitUseAdaptationAliasStmt:
+	case *TraitUseAdaptationAliasStmt:
 		p.print(x.Trait, "::", x.Method, " as")
 		if x.NewModifier != 0 {
 			p.print(" ")
