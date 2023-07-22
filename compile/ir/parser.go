@@ -1,11 +1,11 @@
 package ir
 
 import (
-	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/php/ast"
 	"github.com/heyuuu/gophp/utils/slices"
 	"log"
+	"reflect"
 )
 
 func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
@@ -13,9 +13,7 @@ func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
 		switch e := recover().(type) {
 		case nil:
 			return
-		case string:
-			err = errors.New(e)
-		case error:
+		case parsingError:
 			err = e
 		default:
 			panic(e)
@@ -26,14 +24,37 @@ func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
 	return p.ParseFile(astFile), nil
 }
 
+// parsingError
+type parsingError string
+
+func (p parsingError) Error() string { return string(p) }
+
 // parsingStmts
 type parsingStmts []Stmt
 
 func (p parsingStmts) node()     {}
 func (p parsingStmts) stmtNode() {}
 
+func newParsingStmts[S Stmt](items []S) []Stmt {
+	if len(items) == 0 {
+		return nil
+	}
+
+	result := make([]Stmt, len(items))
+	for i, item := range items {
+		result[i] = item
+	}
+	return result
+}
+
 // parser
-type parser struct{}
+type parser struct {
+	file *File
+}
+
+func (p *parser) clean() {
+	p.file = nil
+}
 
 func (p *parser) ParseFile(astFile []ast.Stmt) *File {
 	// 拆分 declare 语句、全局代码和命名空间代码
@@ -52,32 +73,41 @@ func (p *parser) ParseFile(astFile []ast.Stmt) *File {
 	}
 	p.assert(len(globalStmts) == 0 || len(namespaceStmts) == 0, "Global code should be enclosed in global namespace declaration")
 
-	//
-	f := &File{}
+	// 初始化对象
+	p.file = &File{}
+	defer func() { p.file = nil }()
 
-	slices.Each(declareStmts, p.parseDeclareStmt)
+	// 优先处理 declare，会影响其他代码
+	slices.Each(declareStmts, p.handleDeclareStmt)
 
+	// 区分有无命名空间进行处理
 	if len(globalStmts) > 0 {
-		f.Segments = []Segment{p.buildSegment("", p.parseStmtList(globalStmts))}
+		p.file.Segments = []Segment{p.buildSegment("", p.parseStmtList(globalStmts))}
 	} else {
-		f.Segments = slices.Map(namespaceStmts, p.parseNamespaceStmt)
+		p.file.Segments = slices.Map(namespaceStmts, p.parseNamespaceStmt)
 	}
 
-	return f
+	return p.file
 }
 
 // misc
+func (p *parser) fail(message string) {
+	panic(parsingError(message))
+}
 func (p *parser) assert(cond bool, message string) {
 	if !cond {
 		log.Println(message)
-		panic(message)
+		p.fail(message)
 	}
 }
 func (p *parser) highVersionFeature(feature string) {
-	p.assert(false, "high version php feature: "+feature)
+	p.fail("high version php feature: " + feature)
+}
+func (p *parser) lowerVersionFeature(feature string) {
+	p.fail("lower version php feature: " + feature)
 }
 func (p *parser) unsupported(message string) {
-	p.assert(false, message)
+	p.fail(message)
 }
 
 func (p *parser) buildSegment(namespace string, stmts []Stmt) Segment {
@@ -107,8 +137,18 @@ func (p *parser) parseFlags(flags ast.Flags) Flags         { return Flags(flags)
 func (p *parser) parseUseType(useType ast.UseType) UseType { return UseType(useType) }
 
 // special
-func (p *parser) parseDeclareStmt(n *ast.DeclareStmt) {
-	// todo declare
+func (p *parser) handleDeclareStmt(n *ast.DeclareStmt) {
+	for _, declare := range n.Declares {
+		declareName := declare.Key.Name
+		if declareName != "strict_types" {
+			p.unsupported("unsupported declare directive: " + declareName)
+		}
+
+		valueLit, ok := declare.Value.(*ast.IntLit)
+		p.assert(ok && (valueLit.Value == 1 || valueLit.Value == 0), "strict_types declaration must have 0 or 1 as its value")
+		p.assert(len(n.Stmts) == 0, "strict_types declaration must not use block mode")
+		p.file.StrictTypes = valueLit.Value == 1
+	}
 }
 
 func (p *parser) parseNamespaceStmt(n *ast.NamespaceStmt) Segment {
@@ -131,12 +171,10 @@ func (p *parser) parseNode(node ast.Node) Node {
 		return p.parseName(n)
 	case *ast.Arg:
 		return p.parseArg(n)
-	case *ast.Param:
-		return p.parseParam(n)
-	case *ast.Const:
-		return p.parseConst(n)
 	case *ast.VariadicPlaceholder:
 		return &VariadicPlaceholder{}
+	case *ast.Const:
+		p.unsupported("unsupported parseNode(*ast.Const), use parseStmt(*ast.ConstStmt) or parseStmt(*ast.ClassConstStmt) instead.")
 	case ast.Stmt:
 		p.unsupported("unsupported parseNode(ast.Stmt), use parseStmtList() or parseStmt() instead.")
 	case *ast.Attribute, *ast.AttributeGroup:
@@ -148,6 +186,10 @@ func (p *parser) parseNode(node ast.Node) Node {
 }
 
 func (p *parser) parseExpr(node ast.Expr) Expr {
+	if node == nil || reflect.ValueOf(node).IsNil() {
+		return nil
+	}
+
 	switch n := node.(type) {
 	case *ast.IntLit:
 		return &IntLit{
@@ -276,11 +318,6 @@ func (p *parser) parseExpr(node ast.Expr) Expr {
 			Var:  p.parseExpr(n.Var),
 			Name: p.parseNode(n.Name),
 		}
-	case *ast.NullsafePropertyFetchExpr:
-		return &NullsafePropertyFetchExpr{
-			Var:  p.parseExpr(n.Var),
-			Name: p.parseNode(n.Name),
-		}
 	case *ast.StaticPropertyFetchExpr:
 		return &StaticPropertyFetchExpr{
 			Class: p.parseNode(n.Class),
@@ -329,20 +366,20 @@ func (p *parser) parseExpr(node ast.Expr) Expr {
 			Name: p.parseNode(n.Name),
 			Args: slices.Map(n.Args, p.parseNode),
 		}
-	case *ast.NullsafeMethodCallExpr:
-		return &NullsafeMethodCallExpr{
-			Var:  p.parseExpr(n.Var),
-			Name: p.parseNode(n.Name),
-			Args: slices.Map(n.Args, p.parseNode),
-		}
 	case *ast.StaticCallExpr:
 		return &StaticCallExpr{
 			Class: p.parseNode(n.Class),
 			Name:  p.parseNode(n.Name),
 			Args:  slices.Map(n.Args, p.parseNode),
 		}
+	case *ast.NullsafePropertyFetchExpr:
+		p.highVersionFeature("php8.0 nullsafe property fetch")
+	case *ast.NullsafeMethodCallExpr:
+		p.highVersionFeature("php8.0 nullsafe method call")
+	default:
+		p.fail(fmt.Sprintf("unsupported expr type for parseExpr(node): %T", n))
 	}
-	return nil
+	panic("unreachable")
 }
 
 func (p *parser) parseStmtList(astStmts []ast.Stmt) []Stmt {
@@ -376,11 +413,11 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 		}
 	case *ast.LabelStmt:
 		return &LabelStmt{
-			Name: p.parseIdent(n.Name),
+			Name: p.parseIdentString(n.Name),
 		}
 	case *ast.GotoStmt:
 		return &GotoStmt{
-			Name: p.parseIdent(n.Name),
+			Name: p.parseIdentString(n.Name),
 		}
 	case *ast.IfStmt:
 		return &IfStmt{
@@ -458,9 +495,12 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.ConstStmt:
-		return &ConstStmt{
-			Consts: slices.Map(n.Consts, p.parseConst),
-		}
+		return parsingStmts(slices.Map(n.Consts, func(c *ast.Const) Stmt {
+			return &ConstStmt{
+				Name:  p.parseNameAsFQ(c.NamespacedName),
+				Value: p.parseExpr(c.Value),
+			}
+		}))
 	case *ast.EchoStmt:
 		return &EchoStmt{
 			Exprs: slices.Map(n.Exprs, p.parseExpr),
@@ -478,14 +518,15 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Value: n.Value,
 		}
 	case *ast.StaticStmt:
-		return &StaticStmt{
-			Vars: slices.Map(n.Vars, p.parseStaticVarStmt),
-		}
-	case *ast.StaticVarStmt:
-		return &StaticVarStmt{
-			Var:     p.parseVariableExpr(n.Var),
-			Default: p.parseExpr(n.Default),
-		}
+		return parsingStmts(slices.Map(n.Vars, func(x *ast.StaticVarStmt) Stmt {
+			nameIdent := x.Var.Name.(*ast.Ident)
+			p.assert(nameIdent != nil, "ast.StaticVarStmt.Var.Name must be a Ident")
+
+			return &StaticStmt{
+				Name:    nameIdent.Name,
+				Default: p.parseExpr(x.Default),
+			}
+		}))
 	case *ast.UnsetStmt:
 		return &UnsetStmt{
 			Vars: slices.Map(n.Vars, p.parseExpr),
@@ -495,21 +536,6 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Type:  p.parseUseType(n.Type),
 			Name:  p.parseName(n.Name),
 			Alias: p.parseIdent(n.Alias),
-		}
-	case *ast.DeclareStmt:
-		return &DeclareStmt{
-			Declares: slices.Map(n.Declares, p.parseDeclareDeclareStmt),
-			Stmts:    p.parseStmtList(n.Stmts),
-		}
-	case *ast.DeclareDeclareStmt:
-		return &DeclareDeclareStmt{
-			Key:   p.parseIdent(n.Key),
-			Value: p.parseExpr(n.Value),
-		}
-	case *ast.NamespaceStmt:
-		return &NamespaceStmt{
-			Name:  p.parseName(n.Name),
-			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.FunctionStmt:
 		p.assert(n.NamespacedName != nil, "FunctionStmt.NamespacedName cannot be nil")
@@ -544,21 +570,26 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Stmts:      p.parseStmtList(n.Stmts),
 		}
 	case *ast.ClassConstStmt:
-		return &ClassConstStmt{
-			Flags:  p.parseFlags(n.Flags),
-			Consts: slices.Map(n.Consts, p.parseConst),
-		}
+		flags := p.parseFlags(n.Flags)
+		return parsingStmts(slices.Map(n.Consts, func(x *ast.Const) Stmt {
+			return &ClassConstStmt{
+				Flags: flags,
+				Name:  x.Name.Name,
+				Value: p.parseExpr(x.Value),
+			}
+		}))
 	case *ast.PropertyStmt:
-		return &PropertyStmt{
-			Flags: p.parseFlags(n.Flags),
-			Props: slices.Map(n.Props, p.parsePropertyPropertyStmt),
-			Type:  p.parseType(n.Type),
-		}
-	case *ast.PropertyPropertyStmt:
-		return &PropertyPropertyStmt{
-			Name:    p.parseIdent(n.Name),
-			Default: p.parseExpr(n.Default),
-		}
+		flags := p.parseFlags(n.Flags)
+		typ := p.parseType(n.Type)
+
+		return parsingStmts(slices.Map(n.Props, func(x *ast.PropertyPropertyStmt) Stmt {
+			return &PropertyStmt{
+				Flags:   flags,
+				Type:    typ,
+				Name:    x.Name.Name,
+				Default: p.parseExpr(x.Default),
+			}
+		}))
 	case *ast.ClassMethodStmt:
 		return &ClassMethodStmt{
 			Flags:      p.parseFlags(n.Flags),
@@ -595,16 +626,17 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 		}
 	case *ast.EnumStmt, *ast.EnumCaseStmt:
 		p.highVersionFeature("php8.1 enum")
+	default:
+		p.fail(fmt.Sprintf("parseStmt() cannot support this type: %T", n))
 	}
+	// unreachable
 	return nil
 }
 
 func (p *parser) parseType(node ast.Type) Type {
 	switch n := node.(type) {
 	case *ast.SimpleType:
-		return &SimpleType{
-			Name: p.parseName(n.Name),
-		}
+		return p.parseSimpleType(n)
 	case *ast.IntersectionType:
 		return &IntersectionType{
 			Types: slices.Map(n.Types, p.parseType),
@@ -619,6 +651,15 @@ func (p *parser) parseType(node ast.Type) Type {
 		}
 	}
 	return nil
+}
+
+func (p *parser) parseSimpleType(n *ast.SimpleType) *SimpleType {
+	if n == nil {
+		return nil
+	}
+	return &SimpleType{
+		Name: p.parseNameAsFQ(n.Name),
+	}
 }
 
 func (p *parser) parseTraitUseAdaptationStmt(node ast.TraitUseAdaptationStmt) TraitUseAdaptationStmt {
@@ -642,18 +683,20 @@ func (p *parser) parseTraitUseAdaptationStmt(node ast.TraitUseAdaptationStmt) Tr
 
 // struct types
 func (p *parser) parseArg(n *ast.Arg) *Arg {
+	if n.Name != nil {
+		p.highVersionFeature("php8.0 named arguments")
+	}
+	if n.ByRef {
+		p.lowerVersionFeature("Call-time pass-by-reference has been removed in PHP 5.4")
+	}
 	return &Arg{
-		Name:   p.parseIdent(n.Name),
 		Value:  p.parseExpr(n.Value),
-		ByRef:  n.ByRef,
 		Unpack: n.Unpack,
 	}
 }
-func (p *parser) parseConst(n *ast.Const) *Const {
-	return &Const{
-		Name:  p.parseNameAsFQ(n.NamespacedName),
-		Value: p.parseExpr(n.Value),
-	}
+func (p *parser) parseIdentString(n *ast.Ident) string {
+	p.assert(n != nil, "*ast.Ident cannot be nil")
+	return n.Name
 }
 func (p *parser) parseIdent(n *ast.Ident) *Ident {
 	if n == nil {
@@ -668,21 +711,19 @@ func (p *parser) parseParam(n *ast.Param) *Param {
 	if n == nil {
 		return nil
 	}
+	if n.Flags != 0 {
+		p.highVersionFeature("php8.0 constructor promotion")
+	}
+	// 提取参数名
+	nameIdent := n.Var.Name.(*ast.Ident)
+	p.assert(nameIdent != nil, "ast.Param.Var.Name must be a Ident")
+
 	return &Param{
+		Name:     nameIdent.Name,
 		Type:     p.parseType(n.Type),
 		ByRef:    n.ByRef,
 		Variadic: n.Variadic,
-		Var:      p.parseVariableExpr(n.Var),
 		Default:  p.parseExpr(n.Default),
-		Flags:    p.parseFlags(n.Flags),
-	}
-}
-func (p *parser) parseSimpleType(n *ast.SimpleType) *SimpleType {
-	if n == nil {
-		return nil
-	}
-	return &SimpleType{
-		Name: p.parseName(n.Name),
 	}
 }
 
@@ -706,8 +747,9 @@ func (p *parser) parseName(n *ast.Name) *Name {
 	case ast.NameRelative:
 		return NewName(NameRelative, n.Parts)
 	default:
-		panic(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
+		p.fail(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
 	}
+	panic("unreachable")
 }
 func (p *parser) parseArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
 	if n == nil {
@@ -780,32 +822,5 @@ func (p *parser) parseFinallyStmt(n *ast.FinallyStmt) *FinallyStmt {
 	}
 	return &FinallyStmt{
 		Stmts: p.parseStmtList(n.Stmts),
-	}
-}
-func (p *parser) parseStaticVarStmt(n *ast.StaticVarStmt) *StaticVarStmt {
-	if n == nil {
-		return nil
-	}
-	return &StaticVarStmt{
-		Var:     p.parseVariableExpr(n.Var),
-		Default: p.parseExpr(n.Default),
-	}
-}
-func (p *parser) parseDeclareDeclareStmt(n *ast.DeclareDeclareStmt) *DeclareDeclareStmt {
-	if n == nil {
-		return nil
-	}
-	return &DeclareDeclareStmt{
-		Key:   p.parseIdent(n.Key),
-		Value: p.parseExpr(n.Value),
-	}
-}
-func (p *parser) parsePropertyPropertyStmt(n *ast.PropertyPropertyStmt) *PropertyPropertyStmt {
-	if n == nil {
-		return nil
-	}
-	return &PropertyPropertyStmt{
-		Name:    p.parseIdent(n.Name),
-		Default: p.parseExpr(n.Default),
 	}
 }

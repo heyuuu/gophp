@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/heyuuu/gophp/compile/ir"
-	irPrinter "github.com/heyuuu/gophp/compile/ir/printer"
 	"github.com/heyuuu/gophp/php/parser"
 	"github.com/heyuuu/gophp/php/printer"
 	"github.com/heyuuu/gophp/utils/vardumper"
@@ -92,7 +91,7 @@ func parseCodeEx(code string) (result []ApiTypeResult, err error) {
 		return
 	}
 
-	irPrint, err := irPrinter.SprintFile(irFile)
+	irPrint, err := ir.PrintFile(irFile)
 	if err != nil {
 		return
 	}

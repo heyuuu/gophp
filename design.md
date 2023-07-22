@@ -26,3 +26,8 @@
 ![流程2](doc/images/workflow2.jpg)
 
 两种模式事实上可以并存。只是用第一种模式可以使用更多有效的优化项。
+
+
+## 未支持特性
+
+- `declare`: declare只支持 strict_types 指令，不支持其他指定(如 ticks、encoding)

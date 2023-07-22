@@ -49,15 +49,8 @@ type (
 // misc
 type (
 	Arg struct {
-		Name   *Ident // @var Ident|null Parameter name (for named parameters)
-		Value  Expr   // @var Expr Value to pass
-		ByRef  bool   // @var bool Whether to pass by ref (todo Call-time pass-by-reference has been removed in PHP 5.4)
-		Unpack bool   // @var bool Whether to unpack the argument
-	}
-
-	Const struct {
-		Name  *Name // @var Name const name
-		Value Expr  // @var Expr const value
+		Value  Expr // @var Expr Value to pass
+		Unpack bool // @var bool Whether to unpack the argument
 	}
 
 	Ident struct {
@@ -73,12 +66,11 @@ type (
 	}
 
 	Param struct {
-		Type     Type          // @var Type|null Type declaration
-		ByRef    bool          // @var bool Whether parameter is passed by reference
-		Variadic bool          // @var bool Whether this is a variadic argument
-		Var      *VariableExpr // @var VariableExpr Parameter variable
-		Default  Expr          // @var Expr|null Default value
-		Flags    Flags         // @var Flags
+		Name     string
+		Type     Type // @var Type|null Type declaration
+		ByRef    bool // @var bool Whether parameter is passed by reference
+		Variadic bool // @var bool Whether this is a variadic argument
+		Default  Expr // @var Expr|null Default value
 	}
 
 	// VariadicPlaceholder : PhpParserNodeAbstract
@@ -308,11 +300,6 @@ type (
 		Name Node // @var Ident|Expr Property name
 	}
 
-	NullsafePropertyFetchExpr struct {
-		Var  Expr // @var Expr Variable holding object
-		Name Node // @var Ident|Expr Property name
-	}
-
 	// ExprStaticPropertyFetch : Expr
 	StaticPropertyFetchExpr struct {
 		Class Node // @var Name|Expr Class name
@@ -371,13 +358,6 @@ type (
 		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
-	// NullsafeMethodCallExpr : CallLikeExpr
-	NullsafeMethodCallExpr struct {
-		Var  Expr   // @var Expr Variable holding object
-		Name Node   // @var Ident|Expr Method name
-		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
-	}
-
 	// ExprStaticCall : ExprCallLike
 	StaticCallExpr struct {
 		Class Node   // @var Name|Expr Class name
@@ -431,11 +411,11 @@ type (
 	}
 
 	LabelStmt struct {
-		Name *Ident // @var Ident Name
+		Name string // @var Ident name
 	}
 
 	GotoStmt struct {
-		Name *Ident // @var Ident Name of label to jump to
+		Name string // @var Ident name of label to jump to
 	}
 
 	// IfStmt
@@ -521,7 +501,8 @@ type (
 	}
 
 	ConstStmt struct {
-		Consts []*Const // @var Const_[] Constant declarations
+		Name  *Name // @var Name const name
+		Value Expr  // @var Expr const value
 	}
 
 	EchoStmt struct {
@@ -541,12 +522,8 @@ type (
 	}
 
 	StaticStmt struct {
-		Vars []*StaticVarStmt // @var StaticVar[] Variable definitions
-	}
-
-	StaticVarStmt struct {
-		Var     *VariableExpr // @var VariableExpr Variable
-		Default Expr          // @var Expr|null Default value
+		Name    string // @var string Variable name
+		Default Expr   // @var Expr|null Default value
 	}
 
 	UnsetStmt struct {
@@ -557,23 +534,6 @@ type (
 		Type  UseType // @var UseType     UseNormal UseFunction Or UseConstant
 		Name  *Name   // @var Name        Namespace, class, function or constant to alias
 		Alias *Ident  // @var Ident|null  Alias Name, or nil
-	}
-
-	// DeclareStmt
-	DeclareStmt struct {
-		Declares []*DeclareDeclareStmt // @var DeclareDeclare[] List of declares
-		Stmts    []Stmt                // @var Stmt[]|null Statements
-	}
-
-	DeclareDeclareStmt struct {
-		Key   *Ident // @var Ident Key
-		Value Expr   // @var Expr Value
-	}
-
-	// NamespaceStmt
-	NamespaceStmt struct {
-		Name  *Name  // @var Name|null Name
-		Stmts []Stmt // @var Stmt[] Statements
 	}
 
 	// InitStmt : Stmt
@@ -608,15 +568,17 @@ type (
 
 	// StmtClassConst : Stmt
 	ClassConstStmt struct {
-		Flags  Flags    // @var Flags Modifiers
-		Consts []*Const // @var Const_[] Constant declarations
+		Flags Flags  // @var Flags Modifiers
+		Name  string // @var Name const name
+		Value Expr   // @var Expr const value
 	}
 
 	// PropertyStmt : Stmt
 	PropertyStmt struct {
-		Flags Flags                   // @var Flags Modifiers
-		Props []*PropertyPropertyStmt // @var PropertyProperty[] Properties
-		Type  Type                    // @var Type|null Type declaration
+		Flags   Flags  // @var Flags Modifiers
+		Type    Type   // @var Type|null Type declaration
+		Name    string // @var Ident     Name
+		Default Expr   // @var Expr|null Default
 	}
 
 	PropertyPropertyStmt struct {
@@ -694,24 +656,22 @@ func (*ConstFetchExpr) exprNode()      {}
 func (*ClassConstFetchExpr) exprNode() {}
 func (*MagicConstExpr) exprNode()      {}
 
-func (*InstanceofExpr) exprNode()            {}
-func (*ListExpr) exprNode()                  {}
-func (*PrintExpr) exprNode()                 {}
-func (*PropertyFetchExpr) exprNode()         {}
-func (*NullsafePropertyFetchExpr) exprNode() {}
-func (*StaticPropertyFetchExpr) exprNode()   {}
-func (*ShellExecExpr) exprNode()             {}
-func (*TernaryExpr) exprNode()               {}
-func (*ThrowExpr) exprNode()                 {}
-func (*VariableExpr) exprNode()              {}
-func (*YieldExpr) exprNode()                 {}
-func (*YieldFromExpr) exprNode()             {}
+func (*InstanceofExpr) exprNode()          {}
+func (*ListExpr) exprNode()                {}
+func (*PrintExpr) exprNode()               {}
+func (*PropertyFetchExpr) exprNode()       {}
+func (*StaticPropertyFetchExpr) exprNode() {}
+func (*ShellExecExpr) exprNode()           {}
+func (*TernaryExpr) exprNode()             {}
+func (*ThrowExpr) exprNode()               {}
+func (*VariableExpr) exprNode()            {}
+func (*YieldExpr) exprNode()               {}
+func (*YieldFromExpr) exprNode()           {}
 
-func (*FuncCallExpr) exprNode()           {}
-func (*NewExpr) exprNode()                {}
-func (*MethodCallExpr) exprNode()         {}
-func (*NullsafeMethodCallExpr) exprNode() {}
-func (*StaticCallExpr) exprNode()         {}
+func (*FuncCallExpr) exprNode()   {}
+func (*NewExpr) exprNode()        {}
+func (*MethodCallExpr) exprNode() {}
+func (*StaticCallExpr) exprNode() {}
 
 // Stmt
 func (*EmptyStmt) stmtNode()  {}
@@ -742,21 +702,16 @@ func (*GlobalStmt) stmtNode()       {}
 func (*HaltCompilerStmt) stmtNode() {}
 func (*InlineHTMLStmt) stmtNode()   {}
 func (*StaticStmt) stmtNode()       {}
-func (*StaticVarStmt) stmtNode()    {}
 
-func (*UnsetStmt) stmtNode()          {}
-func (*UseStmt) stmtNode()            {}
-func (*DeclareStmt) stmtNode()        {}
-func (*DeclareDeclareStmt) stmtNode() {}
+func (*UnsetStmt) stmtNode() {}
+func (*UseStmt) stmtNode()   {}
 
-func (*NamespaceStmt) stmtNode()                    {}
 func (*InitStmt) stmtNode()                         {}
 func (*FunctionStmt) stmtNode()                     {}
 func (*InterfaceStmt) stmtNode()                    {}
 func (*ClassStmt) stmtNode()                        {}
 func (*ClassConstStmt) stmtNode()                   {}
 func (*PropertyStmt) stmtNode()                     {}
-func (*PropertyPropertyStmt) stmtNode()             {}
 func (*ClassMethodStmt) stmtNode()                  {}
 func (*TraitStmt) stmtNode()                        {}
 func (*TraitUseStmt) stmtNode()                     {}
@@ -764,11 +719,10 @@ func (*TraitUseAdaptationAliasStmt) stmtNode()      {}
 func (*TraitUseAdaptationPrecedenceStmt) stmtNode() {}
 
 // CallLikeExpr
-func (*FuncCallExpr) callLikeExprNode()           {}
-func (*NewExpr) callLikeExprNode()                {}
-func (*MethodCallExpr) callLikeExprNode()         {}
-func (*NullsafeMethodCallExpr) callLikeExprNode() {}
-func (*StaticCallExpr) callLikeExprNode()         {}
+func (*FuncCallExpr) callLikeExprNode()   {}
+func (*NewExpr) callLikeExprNode()        {}
+func (*MethodCallExpr) callLikeExprNode() {}
+func (*StaticCallExpr) callLikeExprNode() {}
 
 // FunctionLike
 func (*ArrowFunctionExpr) functionLikeNode() {}
@@ -787,7 +741,6 @@ func (*TraitUseAdaptationPrecedenceStmt) traitUseAdaptationStmtNode() {}
 
 // All Node types
 func (*Arg) node()                              {}
-func (*Const) node()                            {}
 func (*Ident) node()                            {}
 func (*Param) node()                            {}
 func (*VariadicPlaceholder) node()              {}
@@ -821,7 +774,6 @@ func (*InstanceofExpr) node()                   {}
 func (*ListExpr) node()                         {}
 func (*PrintExpr) node()                        {}
 func (*PropertyFetchExpr) node()                {}
-func (*NullsafePropertyFetchExpr) node()        {}
 func (*StaticPropertyFetchExpr) node()          {}
 func (*ShellExecExpr) node()                    {}
 func (*TernaryExpr) node()                      {}
@@ -832,7 +784,6 @@ func (*YieldFromExpr) node()                    {}
 func (*FuncCallExpr) node()                     {}
 func (*NewExpr) node()                          {}
 func (*MethodCallExpr) node()                   {}
-func (*NullsafeMethodCallExpr) node()           {}
 func (*StaticCallExpr) node()                   {}
 func (*EmptyStmt) node()                        {}
 func (*BlockStmt) node()                        {}
@@ -860,19 +811,14 @@ func (*GlobalStmt) node()                       {}
 func (*HaltCompilerStmt) node()                 {}
 func (*InlineHTMLStmt) node()                   {}
 func (*StaticStmt) node()                       {}
-func (*StaticVarStmt) node()                    {}
 func (*UnsetStmt) node()                        {}
 func (*UseStmt) node()                          {}
-func (*DeclareStmt) node()                      {}
-func (*DeclareDeclareStmt) node()               {}
-func (*NamespaceStmt) node()                    {}
 func (*InitStmt) node()                         {}
 func (*FunctionStmt) node()                     {}
 func (*InterfaceStmt) node()                    {}
 func (*ClassStmt) node()                        {}
 func (*ClassConstStmt) node()                   {}
 func (*PropertyStmt) node()                     {}
-func (*PropertyPropertyStmt) node()             {}
 func (*ClassMethodStmt) node()                  {}
 func (*TraitStmt) node()                        {}
 func (*TraitUseStmt) node()                     {}

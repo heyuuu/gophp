@@ -60,6 +60,10 @@ func (p *printer) print(args ...any) {
 		switch v := arg.(type) {
 		case int:
 			p.write(strconv.Itoa(v))
+		case byte:
+			p.write(string(v))
+		case rune:
+			p.write(string(v))
 		case string:
 			p.write(v)
 		case token.Token:
