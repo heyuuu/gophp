@@ -522,12 +522,8 @@ type (
 	}
 
 	StaticStmt struct {
-		Vars []*StaticVarStmt // @var StaticVar[] Variable definitions
-	}
-
-	StaticVarStmt struct {
-		Var     *VariableExpr // @var VariableExpr Variable
-		Default Expr          // @var Expr|null Default value
+		Name    string // @var string Variable name
+		Default Expr   // @var Expr|null Default value
 	}
 
 	UnsetStmt struct {
@@ -706,7 +702,6 @@ func (*GlobalStmt) stmtNode()       {}
 func (*HaltCompilerStmt) stmtNode() {}
 func (*InlineHTMLStmt) stmtNode()   {}
 func (*StaticStmt) stmtNode()       {}
-func (*StaticVarStmt) stmtNode()    {}
 
 func (*UnsetStmt) stmtNode() {}
 func (*UseStmt) stmtNode()   {}
@@ -816,7 +811,6 @@ func (*GlobalStmt) node()                       {}
 func (*HaltCompilerStmt) node()                 {}
 func (*InlineHTMLStmt) node()                   {}
 func (*StaticStmt) node()                       {}
-func (*StaticVarStmt) node()                    {}
 func (*UnsetStmt) node()                        {}
 func (*UseStmt) node()                          {}
 func (*InitStmt) node()                         {}

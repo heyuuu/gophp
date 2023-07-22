@@ -554,12 +554,9 @@ func (p *printer) stmt(n Stmt) {
 	case *InlineHTMLStmt:
 		p.print("?>", x.Value, "<?php")
 	case *StaticStmt:
-		p.print("static ", x.Vars, ";")
-	case *StaticVarStmt:
+		p.print("static ", x.Name)
 		if x.Default != nil {
-			p.print(x.Var, " = ", x.Default)
-		} else {
-			p.print(x.Var)
+			p.print(" = ", x.Default)
 		}
 	case *UnsetStmt:
 		p.print("unset(", x.Vars, ")")

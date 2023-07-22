@@ -518,14 +518,15 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Value: n.Value,
 		}
 	case *ast.StaticStmt:
-		return &StaticStmt{
-			Vars: slices.Map(n.Vars, p.parseStaticVarStmt),
-		}
-	case *ast.StaticVarStmt:
-		return &StaticVarStmt{
-			Var:     p.parseVariableExpr(n.Var),
-			Default: p.parseExpr(n.Default),
-		}
+		return parsingStmts(slices.Map(n.Vars, func(x *ast.StaticVarStmt) Stmt {
+			nameIdent := x.Var.Name.(*ast.Ident)
+			p.assert(nameIdent != nil, "ast.StaticVarStmt.Var.Name must be a Ident")
+
+			return &StaticStmt{
+				Name:    nameIdent.Name,
+				Default: p.parseExpr(x.Default),
+			}
+		}))
 	case *ast.UnsetStmt:
 		return &UnsetStmt{
 			Vars: slices.Map(n.Vars, p.parseExpr),
@@ -821,14 +822,5 @@ func (p *parser) parseFinallyStmt(n *ast.FinallyStmt) *FinallyStmt {
 	}
 	return &FinallyStmt{
 		Stmts: p.parseStmtList(n.Stmts),
-	}
-}
-func (p *parser) parseStaticVarStmt(n *ast.StaticVarStmt) *StaticVarStmt {
-	if n == nil {
-		return nil
-	}
-	return &StaticVarStmt{
-		Var:     p.parseVariableExpr(n.Var),
-		Default: p.parseExpr(n.Default),
 	}
 }
