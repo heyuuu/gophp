@@ -53,11 +53,6 @@ type (
 		Unpack bool // @var bool Whether to unpack the argument
 	}
 
-	Const struct {
-		Name  *Name // @var Name const name
-		Value Expr  // @var Expr const value
-	}
-
 	Ident struct {
 		Name string // @var string Ident as string
 		/**
@@ -416,11 +411,11 @@ type (
 	}
 
 	LabelStmt struct {
-		Name *Ident // @var Ident Name
+		Name string // @var Ident name
 	}
 
 	GotoStmt struct {
-		Name *Ident // @var Ident Name of label to jump to
+		Name string // @var Ident name of label to jump to
 	}
 
 	// IfStmt
@@ -506,7 +501,8 @@ type (
 	}
 
 	ConstStmt struct {
-		Consts []*Const // @var Const_[] Constant declarations
+		Name  *Name // @var Name const name
+		Value Expr  // @var Expr const value
 	}
 
 	EchoStmt struct {
@@ -544,23 +540,6 @@ type (
 		Alias *Ident  // @var Ident|null  Alias Name, or nil
 	}
 
-	// DeclareStmt
-	DeclareStmt struct {
-		Declares []*DeclareDeclareStmt // @var DeclareDeclare[] List of declares
-		Stmts    []Stmt                // @var Stmt[]|null Statements
-	}
-
-	DeclareDeclareStmt struct {
-		Key   *Ident // @var Ident Key
-		Value Expr   // @var Expr Value
-	}
-
-	// NamespaceStmt
-	NamespaceStmt struct {
-		Name  *Name  // @var Name|null Name
-		Stmts []Stmt // @var Stmt[] Statements
-	}
-
 	// InitStmt : Stmt
 	InitStmt struct {
 		Stmts []Stmt // @var Stmt[] Statements
@@ -593,8 +572,9 @@ type (
 
 	// StmtClassConst : Stmt
 	ClassConstStmt struct {
-		Flags  Flags    // @var Flags Modifiers
-		Consts []*Const // @var Const_[] Constant declarations
+		Flags Flags  // @var Flags Modifiers
+		Name  string // @var Name const name
+		Value Expr   // @var Expr const value
 	}
 
 	// PropertyStmt : Stmt
@@ -727,12 +707,9 @@ func (*InlineHTMLStmt) stmtNode()   {}
 func (*StaticStmt) stmtNode()       {}
 func (*StaticVarStmt) stmtNode()    {}
 
-func (*UnsetStmt) stmtNode()          {}
-func (*UseStmt) stmtNode()            {}
-func (*DeclareStmt) stmtNode()        {}
-func (*DeclareDeclareStmt) stmtNode() {}
+func (*UnsetStmt) stmtNode() {}
+func (*UseStmt) stmtNode()   {}
 
-func (*NamespaceStmt) stmtNode()                    {}
 func (*InitStmt) stmtNode()                         {}
 func (*FunctionStmt) stmtNode()                     {}
 func (*InterfaceStmt) stmtNode()                    {}
@@ -769,7 +746,6 @@ func (*TraitUseAdaptationPrecedenceStmt) traitUseAdaptationStmtNode() {}
 
 // All Node types
 func (*Arg) node()                              {}
-func (*Const) node()                            {}
 func (*Ident) node()                            {}
 func (*Param) node()                            {}
 func (*VariadicPlaceholder) node()              {}
@@ -843,9 +819,6 @@ func (*StaticStmt) node()                       {}
 func (*StaticVarStmt) node()                    {}
 func (*UnsetStmt) node()                        {}
 func (*UseStmt) node()                          {}
-func (*DeclareStmt) node()                      {}
-func (*DeclareDeclareStmt) node()               {}
-func (*NamespaceStmt) node()                    {}
 func (*InitStmt) node()                         {}
 func (*FunctionStmt) node()                     {}
 func (*InterfaceStmt) node()                    {}

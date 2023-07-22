@@ -1,7 +1,6 @@
 package ir
 
 import (
-	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/php/ast"
 	"github.com/heyuuu/gophp/utils/slices"
@@ -13,9 +12,7 @@ func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
 		switch e := recover().(type) {
 		case nil:
 			return
-		case string:
-			err = errors.New(e)
-		case error:
+		case parsingError:
 			err = e
 		default:
 			panic(e)
@@ -26,11 +23,28 @@ func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
 	return p.ParseFile(astFile), nil
 }
 
+// parsingError
+type parsingError string
+
+func (p parsingError) Error() string { return string(p) }
+
 // parsingStmts
 type parsingStmts []Stmt
 
 func (p parsingStmts) node()     {}
 func (p parsingStmts) stmtNode() {}
+
+func newParsingStmts[S Stmt](items []S) []Stmt {
+	if len(items) == 0 {
+		return nil
+	}
+
+	result := make([]Stmt, len(items))
+	for i, item := range items {
+		result[i] = item
+	}
+	return result
+}
 
 // parser
 type parser struct {
@@ -76,20 +90,23 @@ func (p *parser) ParseFile(astFile []ast.Stmt) *File {
 }
 
 // misc
+func (p *parser) fail(message string) {
+	panic(parsingError(message))
+}
 func (p *parser) assert(cond bool, message string) {
 	if !cond {
 		log.Println(message)
-		panic(message)
+		p.fail(message)
 	}
 }
 func (p *parser) highVersionFeature(feature string) {
-	p.assert(false, "high version php feature: "+feature)
+	p.fail("high version php feature: " + feature)
 }
 func (p *parser) lowerVersionFeature(feature string) {
-	p.assert(false, "lower version php feature: "+feature)
+	p.fail("lower version php feature: " + feature)
 }
 func (p *parser) unsupported(message string) {
-	p.assert(false, message)
+	p.fail(message)
 }
 
 func (p *parser) buildSegment(namespace string, stmts []Stmt) Segment {
@@ -153,12 +170,10 @@ func (p *parser) parseNode(node ast.Node) Node {
 		return p.parseName(n)
 	case *ast.Arg:
 		return p.parseArg(n)
-	case *ast.Param:
-		return p.parseParam(n)
-	case *ast.Const:
-		return p.parseConst(n)
 	case *ast.VariadicPlaceholder:
 		return &VariadicPlaceholder{}
+	case *ast.Const:
+		p.unsupported("unsupported parseNode(*ast.Const), use parseStmt(*ast.ConstStmt) or parseStmt(*ast.ClassConstStmt) instead.")
 	case ast.Stmt:
 		p.unsupported("unsupported parseNode(ast.Stmt), use parseStmtList() or parseStmt() instead.")
 	case *ast.Attribute, *ast.AttributeGroup:
@@ -391,11 +406,11 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 		}
 	case *ast.LabelStmt:
 		return &LabelStmt{
-			Name: p.parseIdent(n.Name),
+			Name: p.parseIdentString(n.Name),
 		}
 	case *ast.GotoStmt:
 		return &GotoStmt{
-			Name: p.parseIdent(n.Name),
+			Name: p.parseIdentString(n.Name),
 		}
 	case *ast.IfStmt:
 		return &IfStmt{
@@ -473,9 +488,12 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Stmts: p.parseStmtList(n.Stmts),
 		}
 	case *ast.ConstStmt:
-		return &ConstStmt{
-			Consts: slices.Map(n.Consts, p.parseConst),
-		}
+		return parsingStmts(slices.Map(n.Consts, func(c *ast.Const) Stmt {
+			return &ConstStmt{
+				Name:  p.parseNameAsFQ(c.NamespacedName),
+				Value: p.parseExpr(c.Value),
+			}
+		}))
 	case *ast.EchoStmt:
 		return &EchoStmt{
 			Exprs: slices.Map(n.Exprs, p.parseExpr),
@@ -511,21 +529,6 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Name:  p.parseName(n.Name),
 			Alias: p.parseIdent(n.Alias),
 		}
-	case *ast.DeclareStmt:
-		return &DeclareStmt{
-			Declares: slices.Map(n.Declares, p.parseDeclareDeclareStmt),
-			Stmts:    p.parseStmtList(n.Stmts),
-		}
-	case *ast.DeclareDeclareStmt:
-		return &DeclareDeclareStmt{
-			Key:   p.parseIdent(n.Key),
-			Value: p.parseExpr(n.Value),
-		}
-	case *ast.NamespaceStmt:
-		return &NamespaceStmt{
-			Name:  p.parseName(n.Name),
-			Stmts: p.parseStmtList(n.Stmts),
-		}
 	case *ast.FunctionStmt:
 		p.assert(n.NamespacedName != nil, "FunctionStmt.NamespacedName cannot be nil")
 
@@ -559,10 +562,14 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			Stmts:      p.parseStmtList(n.Stmts),
 		}
 	case *ast.ClassConstStmt:
-		return &ClassConstStmt{
-			Flags:  p.parseFlags(n.Flags),
-			Consts: slices.Map(n.Consts, p.parseConst),
-		}
+		flags := p.parseFlags(n.Flags)
+		return parsingStmts(slices.Map(n.Consts, func(x *ast.Const) Stmt {
+			return &ClassConstStmt{
+				Flags: flags,
+				Name:  x.Name.Name,
+				Value: p.parseExpr(x.Value),
+			}
+		}))
 	case *ast.PropertyStmt:
 		return &PropertyStmt{
 			Flags: p.parseFlags(n.Flags),
@@ -610,7 +617,10 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 		}
 	case *ast.EnumStmt, *ast.EnumCaseStmt:
 		p.highVersionFeature("php8.1 enum")
+	default:
+		p.fail(fmt.Sprintf("parseStmt() cannot support this type: %T", n))
 	}
+	// unreachable
 	return nil
 }
 
@@ -675,11 +685,9 @@ func (p *parser) parseArg(n *ast.Arg) *Arg {
 		Unpack: n.Unpack,
 	}
 }
-func (p *parser) parseConst(n *ast.Const) *Const {
-	return &Const{
-		Name:  p.parseNameAsFQ(n.NamespacedName),
-		Value: p.parseExpr(n.Value),
-	}
+func (p *parser) parseIdentString(n *ast.Ident) string {
+	p.assert(n != nil, "*ast.Ident cannot be nil")
+	return n.Name
 }
 func (p *parser) parseIdent(n *ast.Ident) *Ident {
 	if n == nil {
@@ -730,7 +738,7 @@ func (p *parser) parseName(n *ast.Name) *Name {
 	case ast.NameRelative:
 		return NewName(NameRelative, n.Parts)
 	default:
-		panic(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
+		p.fail(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
 	}
 }
 func (p *parser) parseArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
@@ -813,15 +821,6 @@ func (p *parser) parseStaticVarStmt(n *ast.StaticVarStmt) *StaticVarStmt {
 	return &StaticVarStmt{
 		Var:     p.parseVariableExpr(n.Var),
 		Default: p.parseExpr(n.Default),
-	}
-}
-func (p *parser) parseDeclareDeclareStmt(n *ast.DeclareDeclareStmt) *DeclareDeclareStmt {
-	if n == nil {
-		return nil
-	}
-	return &DeclareDeclareStmt{
-		Key:   p.parseIdent(n.Key),
-		Value: p.parseExpr(n.Value),
 	}
 }
 func (p *parser) parsePropertyPropertyStmt(n *ast.PropertyPropertyStmt) *PropertyPropertyStmt {

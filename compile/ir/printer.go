@@ -168,8 +168,6 @@ func (p *printer) printNode(node Node) {
 		p.param(x)
 	case *Arg:
 		p.arg(x)
-	case *Const:
-		p.print(x.Name, " = ", x.Value)
 	default:
 		err := fmt.Errorf("printer: unsupported node type %T", node)
 		p.checkError(err)
@@ -546,7 +544,7 @@ func (p *printer) stmt(n Stmt) {
 			p.print(" finally {\n", x.Finally.Stmts, "}")
 		}
 	case *ConstStmt:
-		p.print("const ", x.Consts, ";")
+		p.print("const ", x.Name, " = ", x.Value)
 	case *EchoStmt:
 		p.print("echo ", x.Exprs, ";")
 	case *GlobalStmt:
@@ -579,22 +577,6 @@ func (p *printer) stmt(n Stmt) {
 		} else {
 			p.print("use ", useType, x.Name, ";")
 		}
-	case *DeclareStmt:
-		p.print("declare(")
-		printList(p, x.Declares, ", ")
-		p.print(")")
-		if len(x.Stmts) == 0 {
-			p.print(";")
-		} else {
-			p.print("{\n")
-			p.stmtList(x.Stmts, true)
-			p.print("}")
-		}
-	case *DeclareDeclareStmt:
-		p.print(x.Key, "=", x.Value)
-	case *NamespaceStmt:
-		p.print("namespace ", x.Name, ";\n")
-		p.stmtList(x.Stmts, false)
 	case *InitStmt:
 		p.print("// init\n")
 		if len(x.Stmts) == 0 {
@@ -646,13 +628,11 @@ func (p *printer) stmt(n Stmt) {
 		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ClassConstStmt:
-		for _, c := range x.Consts {
-			if x.Flags != 0 {
-				p.flags(x.Flags)
-				p.print(" ")
-			}
-			p.print("const ", c.Name, " = ", c.Value)
+		if x.Flags != 0 {
+			p.flags(x.Flags)
+			p.print(" ")
 		}
+		p.print("const ", x.Name, " = ", x.Value)
 	case *PropertyStmt:
 		for _, prop := range x.Props {
 			if x.Flags != 0 {
