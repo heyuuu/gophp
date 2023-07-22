@@ -116,6 +116,8 @@ func (p *printer) printNode(node ast.Node) {
 		p.arg(x)
 	case *ast.Const:
 		p.print(x.Name, " = ", x.Value)
+	case *ast.VariadicPlaceholder:
+		p.print("...")
 	default:
 		err := fmt.Errorf("printer: unsupported node type %T", node)
 		p.checkError(err)

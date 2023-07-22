@@ -699,10 +699,15 @@ func (p *parser) pArg(n *ast.Arg) *Arg {
 }
 func (p *parser) pArgs(args []ast.Node) []*Arg {
 	return slices.Map(args, func(n ast.Node) *Arg {
-		arg, ok := n.(*ast.Arg)
-		p.assert(ok, fmt.Sprintf("expected type of arg must be *ast.Arg, provide is %T", arg))
-
-		return p.pArg(arg)
+		switch arg := n.(type) {
+		case *ast.Arg:
+			return p.pArg(arg)
+		case *ast.VariadicPlaceholder:
+			p.highVersionFeature("php8.2 first class callable syntax")
+		default:
+			p.fail(fmt.Sprintf("expected type of arg must be *ast.Arg, provide is %T", arg))
+		}
+		panic("unreachable")
 	})
 }
 
