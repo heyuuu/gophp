@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/php/ast"
 	"github.com/heyuuu/gophp/utils/slices"
 	"log"
+	"reflect"
 )
 
 func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
@@ -185,6 +186,10 @@ func (p *parser) parseNode(node ast.Node) Node {
 }
 
 func (p *parser) parseExpr(node ast.Expr) Expr {
+	if node == nil || reflect.ValueOf(node).IsNil() {
+		return nil
+	}
+
 	switch n := node.(type) {
 	case *ast.IntLit:
 		return &IntLit{
@@ -371,8 +376,10 @@ func (p *parser) parseExpr(node ast.Expr) Expr {
 		p.highVersionFeature("php8.0 nullsafe property fetch")
 	case *ast.NullsafeMethodCallExpr:
 		p.highVersionFeature("php8.0 nullsafe method call")
+	default:
+		p.fail(fmt.Sprintf("unsupported expr type for parseExpr(node): %T", n))
 	}
-	return nil
+	panic("unreachable")
 }
 
 func (p *parser) parseStmtList(astStmts []ast.Stmt) []Stmt {
@@ -571,16 +578,17 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 			}
 		}))
 	case *ast.PropertyStmt:
-		return &PropertyStmt{
-			Flags: p.parseFlags(n.Flags),
-			Props: slices.Map(n.Props, p.parsePropertyPropertyStmt),
-			Type:  p.parseType(n.Type),
-		}
-	case *ast.PropertyPropertyStmt:
-		return &PropertyPropertyStmt{
-			Name:    p.parseIdent(n.Name),
-			Default: p.parseExpr(n.Default),
-		}
+		flags := p.parseFlags(n.Flags)
+		typ := p.parseType(n.Type)
+
+		return parsingStmts(slices.Map(n.Props, func(x *ast.PropertyPropertyStmt) Stmt {
+			return &PropertyStmt{
+				Flags:   flags,
+				Type:    typ,
+				Name:    x.Name.Name,
+				Default: p.parseExpr(x.Default),
+			}
+		}))
 	case *ast.ClassMethodStmt:
 		return &ClassMethodStmt{
 			Flags:      p.parseFlags(n.Flags),
@@ -740,6 +748,7 @@ func (p *parser) parseName(n *ast.Name) *Name {
 	default:
 		p.fail(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
 	}
+	panic("unreachable")
 }
 func (p *parser) parseArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
 	if n == nil {
@@ -820,15 +829,6 @@ func (p *parser) parseStaticVarStmt(n *ast.StaticVarStmt) *StaticVarStmt {
 	}
 	return &StaticVarStmt{
 		Var:     p.parseVariableExpr(n.Var),
-		Default: p.parseExpr(n.Default),
-	}
-}
-func (p *parser) parsePropertyPropertyStmt(n *ast.PropertyPropertyStmt) *PropertyPropertyStmt {
-	if n == nil {
-		return nil
-	}
-	return &PropertyPropertyStmt{
-		Name:    p.parseIdent(n.Name),
 		Default: p.parseExpr(n.Default),
 	}
 }

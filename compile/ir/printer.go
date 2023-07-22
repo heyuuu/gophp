@@ -634,19 +634,17 @@ func (p *printer) stmt(n Stmt) {
 		}
 		p.print("const ", x.Name, " = ", x.Value)
 	case *PropertyStmt:
-		for _, prop := range x.Props {
-			if x.Flags != 0 {
-				p.flags(x.Flags)
-				p.print(" ")
-			}
-			if x.Type != nil {
-				p.print(x.Type, " ")
-			}
-			if prop.Default != nil {
-				p.print(prop.Name, " = ", prop.Default, ";")
-			} else {
-				p.print(prop.Name, ";")
-			}
+		if x.Flags != 0 {
+			p.flags(x.Flags)
+		} else {
+			p.print("var")
+		}
+		p.print(" ", x.Name)
+		if x.Type != nil {
+			p.print(" ", x.Type)
+		}
+		if x.Default != nil {
+			p.print(" = ", x.Default)
 		}
 	case *ClassMethodStmt:
 		if x.Flags != 0 {
