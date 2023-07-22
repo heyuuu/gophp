@@ -162,6 +162,10 @@ func (p *parser) pNamespaceStmt(n *ast.NamespaceStmt) Segment {
 
 // interface types
 func (p *parser) pNode(node ast.Node) Node {
+	if node == nil || reflect.ValueOf(node).IsNil() {
+		return nil
+	}
+
 	switch n := node.(type) {
 	case ast.Expr:
 		return p.pExpr(n)
@@ -171,8 +175,6 @@ func (p *parser) pNode(node ast.Node) Node {
 		return p.pName(n)
 	case *ast.Arg:
 		return p.pArg(n)
-	case *ast.VariadicPlaceholder:
-		return &VariadicPlaceholder{}
 	case *ast.Const:
 		p.unsupported("unsupported parseNode(*ast.Const), use parseStmt(*ast.ConstStmt) or parseStmt(*ast.ClassConstStmt) instead.")
 	case ast.Stmt:
@@ -181,8 +183,12 @@ func (p *parser) pNode(node ast.Node) Node {
 		p.highVersionFeature("php8.0 attribute")
 	case *ast.MatchArm:
 		p.highVersionFeature("php8.0 match")
+	case *ast.VariadicPlaceholder:
+		p.highVersionFeature("php8.2 first class callable syntax")
+	default:
+		p.fail(fmt.Sprintf("unsupported node type for parseNode(node): %T", n))
 	}
-	return nil
+	panic("unreachable")
 }
 
 func (p *parser) pExpr(node ast.Expr) Expr {
@@ -353,24 +359,24 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 	case *ast.FuncCallExpr:
 		return &FuncCallExpr{
 			Name: p.pNode(n.Name),
-			Args: slices.Map(n.Args, p.pNode),
+			Args: p.pArgs(n.Args),
 		}
 	case *ast.NewExpr:
 		return &NewExpr{
 			Class: p.pNode(n.Class),
-			Args:  slices.Map(n.Args, p.pNode),
+			Args:  p.pArgs(n.Args),
 		}
 	case *ast.MethodCallExpr:
 		return &MethodCallExpr{
 			Var:  p.pExpr(n.Var),
 			Name: p.pNode(n.Name),
-			Args: slices.Map(n.Args, p.pNode),
+			Args: p.pArgs(n.Args),
 		}
 	case *ast.StaticCallExpr:
 		return &StaticCallExpr{
 			Class: p.pNode(n.Class),
 			Name:  p.pNode(n.Name),
-			Args:  slices.Map(n.Args, p.pNode),
+			Args:  p.pArgs(n.Args),
 		}
 	case *ast.NullsafePropertyFetchExpr:
 		p.highVersionFeature("php8.0 nullsafe property fetch")
@@ -691,6 +697,15 @@ func (p *parser) pArg(n *ast.Arg) *Arg {
 		Unpack: n.Unpack,
 	}
 }
+func (p *parser) pArgs(args []ast.Node) []*Arg {
+	return slices.Map(args, func(n ast.Node) *Arg {
+		arg, ok := n.(*ast.Arg)
+		p.assert(ok, fmt.Sprintf("expected type of arg must be *ast.Arg, provide is %T", arg))
+
+		return p.pArg(arg)
+	})
+}
+
 func (p *parser) pIdentString(n *ast.Ident) string {
 	p.assert(n != nil, "*ast.Ident cannot be nil")
 	return n.Name

@@ -72,9 +72,6 @@ type (
 		Variadic bool // @var bool Whether this is a variadic argument
 		Default  Expr // @var Expr|null Default value
 	}
-
-	// VariadicPlaceholder : PhpParserNodeAbstract
-	VariadicPlaceholder struct{}
 )
 
 /**
@@ -342,27 +339,27 @@ type (
 	// FuncCallExpr : Expr, CallLikeExpr
 	FuncCallExpr struct {
 		Name Node   // @var Name|Expr Function name
-		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
+		Args []*Arg // @var []*Args Arguments
 	}
 
 	// NewExpr : CallLikeExpr
 	NewExpr struct {
 		Class Node   // @var Name|Expr|ClassStmt Class name
-		Args  []Node // @var array<Arg|VariadicPlaceholder> Arguments
+		Args  []*Arg // @var []*Args Arguments
 	}
 
 	// MethodCallExpr : CallLikeExpr
 	MethodCallExpr struct {
 		Var  Expr   // @var Expr Variable holding object
 		Name Node   // @var Ident|Expr Method name
-		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
+		Args []*Arg // @var []*Args Arguments
 	}
 
 	// ExprStaticCall : ExprCallLike
 	StaticCallExpr struct {
 		Class Node   // @var Name|Expr Class name
 		Name  Node   // @var Ident|Expr Method name
-		Args  []Node // @var array<Arg|VariadicPlaceholder> Arguments
+		Args  []*Arg // @var []*Args Arguments
 	}
 )
 
@@ -743,7 +740,6 @@ func (*TraitUseAdaptationPrecedenceStmt) traitUseAdaptationStmtNode() {}
 func (*Arg) node()                              {}
 func (*Ident) node()                            {}
 func (*Param) node()                            {}
-func (*VariadicPlaceholder) node()              {}
 func (*SimpleType) node()                       {}
 func (*IntersectionType) node()                 {}
 func (*UnionType) node()                        {}
