@@ -271,7 +271,7 @@ type (
 
 	ClassConstFetchExpr struct {
 		Class Node   // @var Name|Expr Class name
-		Name  *Ident // @var Ident Constant name
+		Name  string // @var string Constant name
 	}
 
 	MagicConstExpr struct {
@@ -488,9 +488,9 @@ type (
 	}
 
 	CatchStmt struct {
-		Types []*Name       // @var Name[] Types of exceptions to catch
-		Var   *VariableExpr // @var VariableExpr|null Variable for exception
-		Stmts []Stmt        // @var Stmt[] Statements
+		Types []*Name // @var Name[] Types of exceptions to catch
+		Var   string  // @var string Variable name for exception
+		Stmts []Stmt  // @var Stmt[] Statements
 	}
 
 	FinallyStmt struct {

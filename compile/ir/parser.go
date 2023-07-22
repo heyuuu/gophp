@@ -173,8 +173,6 @@ func (p *parser) pNode(node ast.Node) Node {
 		return p.pIdent(n)
 	case *ast.Name:
 		return p.pName(n)
-	case *ast.Arg:
-		return p.pArg(n)
 	case *ast.Const:
 		p.unsupported("unsupported parseNode(*ast.Const), use parseStmt(*ast.ConstStmt) or parseStmt(*ast.ClassConstStmt) instead.")
 	case ast.Stmt:
@@ -298,7 +296,7 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 	case *ast.ClassConstFetchExpr:
 		return &ClassConstFetchExpr{
 			Class: p.pNode(n.Class),
-			Name:  p.pIdent(n.Name),
+			Name:  p.pIdentString(n.Name),
 		}
 	case *ast.MagicConstExpr:
 		return &MagicConstExpr{
@@ -426,31 +424,9 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 			Name: p.pIdentString(n.Name),
 		}
 	case *ast.IfStmt:
-		return &IfStmt{
-			Cond:    p.pExpr(n.Cond),
-			Stmts:   p.pStmtList(n.Stmts),
-			Elseifs: slices.Map(n.Elseifs, p.pElseIfStmt),
-			Else:    p.pElseStmt(n.Else),
-		}
-	case *ast.ElseIfStmt:
-		return &ElseIfStmt{
-			Cond:  p.pExpr(n.Cond),
-			Stmts: p.pStmtList(n.Stmts),
-		}
-	case *ast.ElseStmt:
-		return &ElseStmt{
-			Stmts: p.pStmtList(n.Stmts),
-		}
+		return p.pIfStmt(n)
 	case *ast.SwitchStmt:
-		return &SwitchStmt{
-			Cond:  p.pExpr(n.Cond),
-			Cases: slices.Map(n.Cases, p.pCaseStmt),
-		}
-	case *ast.CaseStmt:
-		return &CaseStmt{
-			Cond:  p.pExpr(n.Cond),
-			Stmts: p.pStmtList(n.Stmts),
-		}
+		return p.pSwitchStmt(n)
 	case *ast.ForStmt:
 		return &ForStmt{
 			Init:  slices.Map(n.Init, p.pExpr),
@@ -485,21 +461,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 			Cond:  p.pExpr(n.Cond),
 		}
 	case *ast.TryCatchStmt:
-		return &TryCatchStmt{
-			Stmts:   p.pStmtList(n.Stmts),
-			Catches: slices.Map(n.Catches, p.pCatchStmt),
-			Finally: p.pFinallyStmt(n.Finally),
-		}
-	case *ast.CatchStmt:
-		return &CatchStmt{
-			Types: slices.Map(n.Types, p.pName),
-			Var:   p.pVariableExpr(n.Var),
-			Stmts: p.pStmtList(n.Stmts),
-		}
-	case *ast.FinallyStmt:
-		return &FinallyStmt{
-			Stmts: p.pStmtList(n.Stmts),
-		}
+		return p.pTryCatchStmt(n)
 	case *ast.ConstStmt:
 		return parsingStmts(slices.Map(n.Consts, func(c *ast.Const) Stmt {
 			return &ConstStmt{
@@ -634,6 +596,57 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 	}
 	// unreachable
 	return nil
+}
+
+func (p *parser) pIfStmt(n *ast.IfStmt) *IfStmt {
+	return &IfStmt{
+		Cond:  p.pExpr(n.Cond),
+		Stmts: p.pStmtList(n.Stmts),
+		Elseifs: slices.Map(n.Elseifs, func(x *ast.ElseIfStmt) *ElseIfStmt {
+			return &ElseIfStmt{
+				Cond:  p.pExpr(x.Cond),
+				Stmts: p.pStmtList(x.Stmts),
+			}
+		}),
+		Else: nullsafe(n.Else, func(x *ast.ElseStmt) *ElseStmt {
+			return &ElseStmt{
+				Stmts: p.pStmtList(x.Stmts),
+			}
+		}),
+	}
+}
+
+func (p *parser) pSwitchStmt(n *ast.SwitchStmt) *SwitchStmt {
+	return &SwitchStmt{
+		Cond: p.pExpr(n.Cond),
+		Cases: slices.Map(n.Cases, func(x *ast.CaseStmt) *CaseStmt {
+			return &CaseStmt{
+				Cond:  p.pExpr(x.Cond),
+				Stmts: p.pStmtList(x.Stmts),
+			}
+		}),
+	}
+}
+
+func (p *parser) pTryCatchStmt(n *ast.TryCatchStmt) *TryCatchStmt {
+	return &TryCatchStmt{
+		Stmts: p.pStmtList(n.Stmts),
+		Catches: slices.Map(n.Catches, func(x *ast.CatchStmt) *CatchStmt {
+			if x.Var == nil {
+				p.highVersionFeature("php8.0 catch an exception without storing it in a variable.")
+			}
+			return &CatchStmt{
+				Types: slices.Map(x.Types, p.pName),
+				Var:   p.pVariableIdent(x.Var, "ast.CatchStmt.Var"),
+				Stmts: p.pStmtList(n.Stmts),
+			}
+		}),
+		Finally: nullsafe(n.Finally, func(x *ast.FinallyStmt) *FinallyStmt {
+			return &FinallyStmt{
+				Stmts: p.pStmtList(x.Stmts),
+			}
+		}),
+	}
 }
 
 func (p *parser) pType(node ast.Type) Type {
@@ -790,50 +803,5 @@ func (p *parser) pVariableExpr(n *ast.VariableExpr) *VariableExpr {
 	}
 	return &VariableExpr{
 		Name: p.pNode(n.Name),
-	}
-}
-func (p *parser) pElseIfStmt(n *ast.ElseIfStmt) *ElseIfStmt {
-	if n == nil {
-		return nil
-	}
-	return &ElseIfStmt{
-		Cond:  p.pExpr(n.Cond),
-		Stmts: p.pStmtList(n.Stmts),
-	}
-}
-func (p *parser) pElseStmt(n *ast.ElseStmt) *ElseStmt {
-	if n == nil {
-		return nil
-	}
-	return &ElseStmt{
-		Stmts: p.pStmtList(n.Stmts),
-	}
-}
-func (p *parser) pCaseStmt(n *ast.CaseStmt) *CaseStmt {
-	if n == nil {
-		return nil
-	}
-	return &CaseStmt{
-		Cond:  p.pExpr(n.Cond),
-		Stmts: p.pStmtList(n.Stmts),
-	}
-}
-func (p *parser) pCatchStmt(n *ast.CatchStmt) *CatchStmt {
-	if n == nil {
-		return nil
-	}
-
-	return &CatchStmt{
-		Types: slices.Map(n.Types, p.pName),
-		Var:   p.pVariableExpr(n.Var),
-		Stmts: p.pStmtList(n.Stmts),
-	}
-}
-func (p *parser) pFinallyStmt(n *ast.FinallyStmt) *FinallyStmt {
-	if n == nil {
-		return nil
-	}
-	return &FinallyStmt{
-		Stmts: p.pStmtList(n.Stmts),
 	}
 }
