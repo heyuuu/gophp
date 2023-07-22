@@ -199,8 +199,8 @@ type (
 	}
 
 	ClosureUseExpr struct {
-		Var   *VariableExpr // @var VariableExpr Variable to use
-		ByRef bool          // @var bool Whether to use by reference
+		Name  string // @var string variable name
+		ByRef bool   // @var bool Whether to use by reference
 	}
 
 	// ExprArrowFunction : Expr, FunctionLike

@@ -359,7 +359,7 @@ func (p *printer) expr(n Expr) {
 		if x.ByRef {
 			p.print("&")
 		}
-		p.print(x.Var)
+		p.print(x.Name)
 	case *ArrowFunctionExpr:
 		if x.Static {
 			p.print("static ")

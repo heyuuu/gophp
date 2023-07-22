@@ -216,17 +216,17 @@ func (p *parser) parseExpr(node ast.Expr) Expr {
 		}
 	case *ast.ClosureExpr:
 		return &ClosureExpr{
-			Static:     n.Static,
-			ByRef:      n.ByRef,
-			Params:     slices.Map(n.Params, p.parseParam),
-			Uses:       slices.Map(n.Uses, p.parseClosureUseExpr),
+			Static: n.Static,
+			ByRef:  n.ByRef,
+			Params: slices.Map(n.Params, p.parseParam),
+			Uses: slices.Map(n.Uses, func(x *ast.ClosureUseExpr) *ClosureUseExpr {
+				return &ClosureUseExpr{
+					Name:  p.parseVariableIdent(x.Var, "ast.ClosureUseExpr.Var"),
+					ByRef: n.ByRef,
+				}
+			}),
 			ReturnType: p.parseType(n.ReturnType),
 			Stmts:      p.parseStmtList(n.Stmts),
-		}
-	case *ast.ClosureUseExpr:
-		return &ClosureUseExpr{
-			Var:   p.parseVariableExpr(n.Var),
-			ByRef: n.ByRef,
 		}
 	case *ast.ArrowFunctionExpr:
 		return &ArrowFunctionExpr{
@@ -519,11 +519,8 @@ func (p *parser) parseStmt(node ast.Stmt) Stmt {
 		}
 	case *ast.StaticStmt:
 		return parsingStmts(slices.Map(n.Vars, func(x *ast.StaticVarStmt) Stmt {
-			nameIdent := x.Var.Name.(*ast.Ident)
-			p.assert(nameIdent != nil, "ast.StaticVarStmt.Var.Name must be a Ident")
-
 			return &StaticStmt{
-				Name:    nameIdent.Name,
+				Name:    p.parseVariableIdent(x.Var, "ast.StaticVarStmt.Var"),
 				Default: p.parseExpr(x.Default),
 			}
 		}))
@@ -714,12 +711,9 @@ func (p *parser) parseParam(n *ast.Param) *Param {
 	if n.Flags != 0 {
 		p.highVersionFeature("php8.0 constructor promotion")
 	}
-	// 提取参数名
-	nameIdent := n.Var.Name.(*ast.Ident)
-	p.assert(nameIdent != nil, "ast.Param.Var.Name must be a Ident")
 
 	return &Param{
-		Name:     nameIdent.Name,
+		Name:     p.parseVariableIdent(n.Var, "ast.Param.Var"),
 		Type:     p.parseType(n.Type),
 		ByRef:    n.ByRef,
 		Variadic: n.Variadic,
@@ -762,14 +756,13 @@ func (p *parser) parseArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
 		Unpack: n.Unpack,
 	}
 }
-func (p *parser) parseClosureUseExpr(n *ast.ClosureUseExpr) *ClosureUseExpr {
-	if n == nil {
-		return nil
-	}
-	return &ClosureUseExpr{
-		Var:   p.parseVariableExpr(n.Var),
-		ByRef: n.ByRef,
-	}
+func (p *parser) parseVariableIdent(n *ast.VariableExpr, typ string) string {
+	p.assert(n != nil, typ+" must not nil")
+
+	nameIdent := n.Name.(*ast.Ident)
+	p.assert(nameIdent != nil, typ+".Name must be a Ident")
+
+	return nameIdent.Name
 }
 func (p *parser) parseVariableExpr(n *ast.VariableExpr) *VariableExpr {
 	if n == nil {
