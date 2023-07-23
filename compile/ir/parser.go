@@ -499,8 +499,8 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 	case *ast.UseStmt:
 		return &UseStmt{
 			Type:  p.pUseType(n.Type),
-			Name:  p.pName(n.Name),
-			Alias: p.pIdent(n.Alias),
+			Name:  p.pNameAsFQ(n.Name),
+			Alias: nullsafeOrDefault(n.Alias, p.pIdentString, ""),
 		}
 	case *ast.FunctionStmt:
 		p.assert(n.NamespacedName != nil, "FunctionStmt.NamespacedName cannot be nil")
@@ -556,10 +556,10 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 			}
 		}))
 	case *ast.ClassMethodStmt:
-		return &ClassMethodStmt{
+		return &MethodStmt{
 			Flags:      p.pFlags(n.Flags),
 			ByRef:      n.ByRef,
-			Name:       p.pIdent(n.Name),
+			Name:       p.pIdentString(n.Name),
 			Params:     slices.Map(n.Params, p.pParam),
 			ReturnType: p.pType(n.ReturnType),
 			Stmts:      p.pStmtList(n.Stmts),
@@ -732,10 +732,8 @@ func (p *parser) pIdent(n *ast.Ident) *Ident {
 	if n == nil {
 		return nil
 	}
-	return &Ident{
-		Name:    n.Name,
-		VarLike: n.VarLike,
-	}
+	ident := Ident(n.Name)
+	return &ident
 }
 func (p *parser) pParam(n *ast.Param) *Param {
 	if n == nil {

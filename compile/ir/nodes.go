@@ -53,17 +53,7 @@ type (
 		Unpack bool // @var bool Whether to unpack the argument
 	}
 
-	Ident struct {
-		Name string // @var string Ident as string
-		/**
-		 * Represents a name that is written in source code with a leading dollar,
-		 * but is not a proper variable. The leading dollar is not stored as part of the name.
-		 *
-		 * Examples: Names in property declarations are formatted as variables. Names in static property
-		 * lookups are also formatted as variables.
-		 */
-		VarLike bool
-	}
+	Ident string
 
 	Param struct {
 		Name     string
@@ -530,7 +520,7 @@ type (
 	UseStmt struct {
 		Type  UseType // @var UseType     UseNormal UseFunction Or UseConstant
 		Name  *Name   // @var Name        Namespace, class, function or constant to alias
-		Alias *Ident  // @var Ident|null  Alias Name, or nil
+		Alias string  // @var string      Alias Name, or empty string when not set
 	}
 
 	// InitStmt : Stmt
@@ -556,7 +546,7 @@ type (
 
 	// StmtClass : Stmt, StmtClassLike
 	ClassStmt struct {
-		Name       *Name   // @var Ident|null Name
+		Name       *Name   // @var Name|null Name
 		Flags      Flags   // @var Flags        Type
 		Extends    *Name   // @var Name|null  Name of extended class
 		Implements []*Name // @var Name[]     Names of implemented interfaces
@@ -574,20 +564,15 @@ type (
 	PropertyStmt struct {
 		Flags   Flags  // @var Flags Modifiers
 		Type    Type   // @var Type|null Type declaration
-		Name    string // @var Ident     Name
-		Default Expr   // @var Expr|null Default
-	}
-
-	PropertyPropertyStmt struct {
-		Name    *Ident // @var Ident     Name
+		Name    string // @var string    Name
 		Default Expr   // @var Expr|null Default
 	}
 
 	// StmtClassMethod : Stmt, FunctionLike
-	ClassMethodStmt struct {
+	MethodStmt struct {
 		Flags      Flags    // @var Flags Modifiers
 		ByRef      bool     // @var bool Whether to return by reference
-		Name       *Ident   // @var Ident Name
+		Name       string   // @var string Name
 		Params     []*Param // @var Param[] Parameters
 		ReturnType Type     // @var Type|null Return type
 		Stmts      []Stmt   // @var Stmt[]|null Statements
@@ -595,8 +580,8 @@ type (
 
 	// StmtTrait : StmtClassLike
 	TraitStmt struct {
-		Name  *Name  // @var Ident Name
-		Stmts []Stmt // @var Stmt[] Statements
+		Name  *Name  // @var Name 	trait name
+		Stmts []Stmt // @var Stmt[] statements
 	}
 
 	TraitUseStmt struct {
@@ -609,14 +594,14 @@ type (
 		NewModifier Flags  // @var Flags 	    New modifier, default 0
 		NewName     *Ident // @var Ident|null 	New name, or nil
 		Trait       *Name  // @var Name|null 	Trait name, or nil
-		Method      *Ident // @var Ident Method name
+		Method      *Ident // @var Ident 		method name
 	}
 
 	// StmtTraitUseAdaptationPrecedence : StmtTraitUseAdaptation
 	TraitUseAdaptationPrecedenceStmt struct {
-		Insteadof []*Name // @var Name[] Overwritten traits
-		Trait     *Name   // @var Name|null Trait name
-		Method    *Ident  // @var Ident Method name
+		Insteadof []*Name // @var Name[] 	overwritten traits
+		Trait     *Name   // @var Name|null trait name
+		Method    *Ident  // @var Ident 	method name
 	}
 )
 
@@ -709,7 +694,7 @@ func (*InterfaceStmt) stmtNode()                    {}
 func (*ClassStmt) stmtNode()                        {}
 func (*ClassConstStmt) stmtNode()                   {}
 func (*PropertyStmt) stmtNode()                     {}
-func (*ClassMethodStmt) stmtNode()                  {}
+func (*MethodStmt) stmtNode()                       {}
 func (*TraitStmt) stmtNode()                        {}
 func (*TraitUseStmt) stmtNode()                     {}
 func (*TraitUseAdaptationAliasStmt) stmtNode()      {}
@@ -724,7 +709,7 @@ func (*StaticCallExpr) callLikeExprNode() {}
 // FunctionLike
 func (*ArrowFunctionExpr) functionLikeNode() {}
 func (*ClosureExpr) functionLikeNode()       {}
-func (*ClassMethodStmt) functionLikeNode()   {}
+func (*MethodStmt) functionLikeNode()        {}
 func (*FunctionStmt) functionLikeNode()      {}
 
 // ClassLikeStmt
@@ -815,7 +800,7 @@ func (*InterfaceStmt) node()                    {}
 func (*ClassStmt) node()                        {}
 func (*ClassConstStmt) node()                   {}
 func (*PropertyStmt) node()                     {}
-func (*ClassMethodStmt) node()                  {}
+func (*MethodStmt) node()                       {}
 func (*TraitStmt) node()                        {}
 func (*TraitUseStmt) node()                     {}
 func (*TraitUseAdaptationAliasStmt) node()      {}

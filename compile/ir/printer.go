@@ -181,10 +181,7 @@ func (p *printer) printNode(node Node) {
 
 	switch x := node.(type) {
 	case *Ident:
-		if x.VarLike {
-			p.write("$")
-		}
-		p.write(x.Name)
+		p.write(string(*x))
 	case *Name:
 		p.write(x.ToCodeString())
 	case Expr:
@@ -598,7 +595,7 @@ func (p *printer) stmt(n Stmt) {
 			useType = "const "
 		}
 
-		if x.Alias != nil {
+		if x.Alias != "" {
 			p.print("use ", useType, x.Name, " as ", x.Alias, ";")
 		} else {
 			p.print("use ", useType, x.Name, ";")
@@ -672,7 +669,7 @@ func (p *printer) stmt(n Stmt) {
 		if x.Default != nil {
 			p.print(" = ", x.Default)
 		}
-	case *ClassMethodStmt:
+	case *MethodStmt:
 		if x.Flags != 0 {
 			p.flags(x.Flags)
 			p.print(" ")
