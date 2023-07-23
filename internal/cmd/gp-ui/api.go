@@ -6,8 +6,11 @@ import (
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/parser"
+	"github.com/heyuuu/gophp/shim/maps"
 	"github.com/heyuuu/gophp/utils/vardumper"
 	"net/http"
+	"sort"
+	"strings"
 )
 
 type ApiResponse[T any] struct {
@@ -32,10 +35,11 @@ func ApiWrapHandler(handler func(r *http.Request) (any, error)) http.HandlerFunc
 
 //
 const (
-	TypeAst      = "AST"
-	TypeAstPrint = "AST-print"
-	TypeIr       = "IR"
-	TypeIrPrint  = "IR-print"
+	TypeAst       = "AST"
+	TypeAstPrint  = "AST-print"
+	TypeIr        = "IR"
+	TypeIrPrint   = "IR-print"
+	TypeIrProject = "IR-project"
 )
 
 type ApiTypeResult struct {
@@ -91,11 +95,41 @@ func parseCodeEx(code string) (result []ApiTypeResult, err error) {
 		return
 	}
 
-	irPrint, err := ir.PrintFile(irFile)
+	irPrint, err := printIrFileAsProject(irFile)
 	if err != nil {
 		return
 	}
 	result = append(result, ApiTypeResult{Type: TypeIrPrint, Content: irPrint})
 
 	return
+}
+
+func printIrFileAsProject(irFile *ir.File) (string, error) {
+	irProj := ir.NewProject()
+	_ = irProj.AddFile("__main__", irFile)
+
+	contents, err := ir.PrintProject(irProj)
+	if err != nil {
+		return "", err
+	}
+
+	keys := maps.Keys(contents)
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
+
+	var buf strings.Builder
+	for _, key := range keys {
+		nsName := key
+		if nsName == "" {
+			nsName = "_"
+		}
+
+		content := contents[key]
+		buf.WriteString("/**\n * namespace " + nsName + "\n */\n")
+		buf.WriteString(content)
+		buf.WriteString("\n")
+	}
+
+	return buf.String(), nil
 }

@@ -1,7 +1,15 @@
 package ir
 
 // Namespace
-type Namespace struct{}
+type Namespace struct {
+	Name string
+	// 代码段
+	Segments []Segment
+}
+
+func NewNamespace(name string) *Namespace {
+	return &Namespace{Name: name}
+}
 
 // Project
 type Project struct {
@@ -9,12 +17,22 @@ type Project struct {
 }
 
 func NewProject() *Project {
-	// todo
-	return nil
+	return &Project{
+		namespaces: make(map[string]*Namespace),
+	}
 }
 
 func (p *Project) AddFile(fileName string, f *File) error {
-	// todo
+	// todo 临时开发调试代码，待修正
+	for _, segment := range f.Segments {
+		if p.namespaces[segment.Namespace] == nil {
+			p.namespaces[segment.Namespace] = NewNamespace(segment.Namespace)
+		}
+
+		ns := p.namespaces[segment.Namespace]
+		ns.Segments = append(ns.Segments, segment)
+	}
+
 	return nil
 }
 

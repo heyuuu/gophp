@@ -13,17 +13,36 @@ import (
 /**
  *	public
  */
+func PrintProject(proj *Project) (map[string]string, error) {
+	c := DefaultConfig()
+
+	result := make(map[string]string, len(proj.namespaces))
+	for _, namespace := range proj.namespaces {
+		content, err := c.PrintNamespace(namespace)
+		if err != nil {
+			return nil, err
+		}
+
+		result[namespace.Name] = content
+	}
+	return result, nil
+}
+
 func PrintFile(file *File) (string, error) {
-	return (&Config{TabWidth: 8}).PrintFile(file)
+	return DefaultConfig().PrintFile(file)
 }
 
 func Print(node any) (string, error) {
-	return (&Config{TabWidth: 8}).Print(node)
+	return DefaultConfig().Print(node)
 }
 
 type Config struct {
 	TabWidth int // default: 8
 	Indent   int // default: 0 (all code is indented at least by this much)
+}
+
+func DefaultConfig() *Config {
+	return &Config{TabWidth: 8}
 }
 
 func (cfg *Config) Print(node any) (string, error) {
@@ -43,6 +62,23 @@ func (cfg *Config) PrintFile(f *File) (string, error) {
 		if seg.Namespace != "" || len(f.Segments) > 1 {
 			p.print("/**\n * namespace " + seg.Namespace + "\n */\n")
 		}
+		// Init
+		if seg.Init != nil {
+			p.print(seg.Init, "\n")
+		}
+		// Decls
+		p.print(seg.Decls)
+	}
+
+	return p.result()
+}
+
+func (cfg *Config) PrintNamespace(ns *Namespace) (string, error) {
+	var p = &printer{}
+
+	p.print("package ir\n\n")
+
+	for _, seg := range ns.Segments {
 		// Init
 		if seg.Init != nil {
 			p.print(seg.Init, "\n")
