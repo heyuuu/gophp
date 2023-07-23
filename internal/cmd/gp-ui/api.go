@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/heyuuu/gophp/compile/ir"
-	"github.com/heyuuu/gophp/php/parser"
-	"github.com/heyuuu/gophp/php/printer"
+	"github.com/heyuuu/gophp/compile/parser"
+	"github.com/heyuuu/gophp/compile/printer"
 	"github.com/heyuuu/gophp/utils/vardumper"
 	"net/http"
 )

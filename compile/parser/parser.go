@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"github.com/heyuuu/gophp/php/ast"
-	"github.com/heyuuu/gophp/php/parser/internal/phpparse"
+	"github.com/heyuuu/gophp/compile/ast"
+	"github.com/heyuuu/gophp/compile/parser/internal/phpparse"
 	"path/filepath"
 )
 

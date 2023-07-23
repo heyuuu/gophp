@@ -2,7 +2,7 @@ package ir
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/php/ast"
+	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/utils/slices"
 	"log"
 	"reflect"

@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"github.com/heyuuu/gophp/php/token"
+	"github.com/heyuuu/gophp/compile/token"
 	"strings"
 )
 

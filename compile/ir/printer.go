@@ -2,7 +2,7 @@ package ir
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/php/token"
+	"github.com/heyuuu/gophp/compile/token"
 	"log"
 	"os"
 	"reflect"

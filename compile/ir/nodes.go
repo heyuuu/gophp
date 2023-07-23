@@ -1,7 +1,7 @@
 package ir
 
 import (
-	"github.com/heyuuu/gophp/php/token"
+	"github.com/heyuuu/gophp/compile/token"
 	"strconv"
 	"strings"
 )
@@ -408,11 +408,11 @@ type (
 	}
 
 	LabelStmt struct {
-		Name string // @var Ident name
+		Name string // @var string name
 	}
 
 	GotoStmt struct {
-		Name string // @var Ident name of label to jump to
+		Name string // name of label to jump to
 	}
 
 	// IfStmt

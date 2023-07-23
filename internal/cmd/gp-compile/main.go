@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ir"
-	"github.com/heyuuu/gophp/php/parser"
+	"github.com/heyuuu/gophp/compile/parser"
 	"io/fs"
 	"log"
 	"os"
