@@ -14,33 +14,26 @@ import (
  *	public
  */
 func PrintFile(file *File) (string, error) {
-	return (&Config{TabWidth: 8}).SprintFile(file)
-}
-func Print(node any) (string, error) {
-	return (&Config{TabWidth: 8}).Sprint(node)
+	return (&Config{TabWidth: 8}).PrintFile(file)
 }
 
-// A Config node controls the output of Fprint.
+func Print(node any) (string, error) {
+	return (&Config{TabWidth: 8}).Print(node)
+}
+
 type Config struct {
 	TabWidth int // default: 8
 	Indent   int // default: 0 (all code is indented at least by this much)
 }
 
-func (cfg *Config) sprint(node any) (string, error) {
+func (cfg *Config) Print(node any) (string, error) {
 	var p = &printer{}
 	// todo 需要验证 node 为 print 可以打印的类型范围
 	p.print(node)
 	return p.result()
 }
 
-func (cfg *Config) Sprint(node any) (string, error) {
-	var p = &printer{}
-	// todo 需要验证 node 为 print 可以打印的类型范围
-	p.print(node)
-	return p.result()
-}
-
-func (cfg *Config) SprintFile(f *File) (string, error) {
+func (cfg *Config) PrintFile(f *File) (string, error) {
 	var p = &printer{}
 
 	p.print("package ir\n\n")

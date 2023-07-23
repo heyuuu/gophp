@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/parser"
-	"github.com/heyuuu/gophp/compile/printer"
 	"github.com/heyuuu/gophp/utils/vardumper"
 	"net/http"
 )
@@ -78,7 +78,7 @@ func parseCodeEx(code string) (result []ApiTypeResult, err error) {
 	astDump := vardumper.Sprint(astNodes)
 	result = append(result, ApiTypeResult{Type: TypeAst, Content: astDump})
 
-	astPrint, err := printer.SprintFile(astNodes)
+	astPrint, err := ast.PrintFile(astNodes)
 	if err != nil {
 		return
 	}
