@@ -44,6 +44,12 @@ func defaultPrinter() *printer {
 	return newPrinter(nil)
 }
 
+func (p *printer) reset() {
+	p.buf.Reset()
+	p.err = nil
+	p.newLine = false
+}
+
 func (p *printer) PrintProject(proj *Project) (map[string]string, error) {
 	result := make(map[string]string, len(proj.namespaces))
 	for _, namespace := range proj.namespaces {
@@ -58,6 +64,7 @@ func (p *printer) PrintProject(proj *Project) (map[string]string, error) {
 }
 
 func (p *printer) PrintNamespace(ns *Namespace) (string, error) {
+	p.reset()
 	p.pNamespace(ns)
 	return p.result()
 }
@@ -135,9 +142,11 @@ func (p *printer) pSegment(seg Segment) {
 		err := fmt.Errorf("printer: unsupported segment type %T", x)
 		p.checkError(err)
 	}
+	p.print("\n")
 }
 
 func (p *printer) PrintFile(f *File) (string, error) {
+	p.reset()
 	for _, ns := range f.Namespaces {
 		p.pNamespace(ns)
 	}
@@ -219,14 +228,18 @@ func (p *printer) print(args ...any) {
 }
 
 func (p *printer) printNode(node Node) {
-	if node == nil || reflect.ValueOf(node).IsNil() {
+	if isNil(node) {
 		p.write("nil")
 		return
 	}
 
 	switch x := node.(type) {
+	case Ident:
+		p.write(string(x))
 	case *Ident:
 		p.write(string(*x))
+	case Name:
+		p.write(x.ToCodeString())
 	case *Name:
 		p.write(x.ToCodeString())
 	case Expr:

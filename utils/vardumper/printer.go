@@ -207,7 +207,7 @@ func isExported(name string) bool {
 func isNilValue(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Invalid: // v 未初始化时的类型，此 v 值可来源于 reflect.ValueOf(nil)
-		fallthrough
+		return true
 	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
 		return v.IsNil()
 	}

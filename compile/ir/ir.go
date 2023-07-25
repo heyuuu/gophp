@@ -59,7 +59,11 @@ type Namespace struct {
 }
 
 func NewNamespace(name string) *Namespace {
-	return &Namespace{Name: name}
+	return &Namespace{
+		Name:         name,
+		funcMap:      make(map[string]*Func),
+		classLikeMap: make(map[string]ClassLike),
+	}
 }
 
 func (ns *Namespace) merge(newNs *Namespace) error {

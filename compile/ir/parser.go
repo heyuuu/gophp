@@ -5,7 +5,6 @@ import (
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/utils/slices"
 	"log"
-	"reflect"
 )
 
 func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
@@ -142,12 +141,14 @@ func (p *parser) pNamespace(name string, astStmts []ast.Stmt) *Namespace {
 		segments = append([]Segment{initFunc}, segments...)
 	}
 
-	return &Namespace{Name: name, Segments: segments}
+	ns := NewNamespace(name)
+	ns.Segments = segments
+	return ns
 }
 
 // interface types
 func (p *parser) pNode(node ast.Node) Node {
-	if node == nil || reflect.ValueOf(node).IsNil() {
+	if isNil(node) {
 		return nil
 	}
 
@@ -175,7 +176,7 @@ func (p *parser) pNode(node ast.Node) Node {
 }
 
 func (p *parser) pExpr(node ast.Expr) Expr {
-	if node == nil || reflect.ValueOf(node).IsNil() {
+	if isNil(node) {
 		return nil
 	}
 
