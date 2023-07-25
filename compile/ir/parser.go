@@ -35,18 +35,6 @@ type parsingStmts []Stmt
 func (p parsingStmts) node()     {}
 func (p parsingStmts) stmtNode() {}
 
-func newParsingStmts[S Stmt](items []S) []Stmt {
-	if len(items) == 0 {
-		return nil
-	}
-
-	result := make([]Stmt, len(items))
-	for i, item := range items {
-		result[i] = item
-	}
-	return result
-}
-
 // parser
 type parser struct {
 	file *File
@@ -82,9 +70,9 @@ func (p *parser) ParseFile(astFile []ast.Stmt) *File {
 
 	// 区分有无命名空间进行处理
 	if len(globalStmts) > 0 {
-		p.file.Segments = []Segment{p.buildSegment("", p.pStmtList(globalStmts))}
+		p.file.Namespaces = []*Namespace{p.pNamespace("", globalStmts)}
 	} else {
-		p.file.Segments = slices.Map(namespaceStmts, p.pNamespaceStmt)
+		p.file.Namespaces = slices.Map(namespaceStmts, p.pNamespaceStmt)
 	}
 
 	return p.file
@@ -110,28 +98,6 @@ func (p *parser) unsupported(message string) {
 	p.fail(message)
 }
 
-func (p *parser) buildSegment(namespace string, stmts []Stmt) Segment {
-	var inits []Stmt
-	var decls []Stmt
-	for _, irStmt := range stmts {
-		switch irStmt.(type) {
-		case *FunctionStmt,
-			*ClassStmt,
-			*InterfaceStmt,
-			*TraitStmt:
-			decls = append(decls, irStmt)
-		default:
-			inits = append(inits, irStmt)
-		}
-	}
-
-	var initStmt *InitStmt
-	if len(inits) > 0 {
-		initStmt = &InitStmt{Stmts: inits}
-	}
-	return Segment{Namespace: namespace, Init: initStmt, Decls: decls}
-}
-
 // const types
 func (p *parser) pFlags(flags ast.Flags) Flags         { return Flags(flags) }
 func (p *parser) pUseType(useType ast.UseType) UseType { return UseType(useType) }
@@ -151,13 +117,32 @@ func (p *parser) handleDeclareStmt(n *ast.DeclareStmt) {
 	}
 }
 
-func (p *parser) pNamespaceStmt(n *ast.NamespaceStmt) Segment {
-	var namespace string
+func (p *parser) pNamespaceStmt(n *ast.NamespaceStmt) *Namespace {
+	var name string
 	if n.Name != nil {
-		namespace = n.Name.ToString()
+		name = n.Name.ToString()
 	}
-	stmts := p.pStmtList(n.Stmts)
-	return p.buildSegment(namespace, stmts)
+	return p.pNamespace(name, n.Stmts)
+}
+
+func (p *parser) pNamespace(name string, astStmts []ast.Stmt) *Namespace {
+	var initStmts []Stmt
+	var segments []Segment
+
+	for _, stmt := range p.pStmtList(astStmts) {
+		if declStmt, ok := stmt.(*DeclStmt); ok {
+			segments = append(segments, declStmt.Decl)
+		} else {
+			initStmts = append(initStmts, stmt)
+		}
+	}
+
+	if len(initStmts) > 0 {
+		initFunc := &InitFunc{Stmts: initStmts}
+		segments = append([]Segment{initFunc}, segments...)
+	}
+
+	return &Namespace{Name: name, Segments: segments}
 }
 
 // interface types
@@ -505,35 +490,50 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 	case *ast.FunctionStmt:
 		p.assert(n.NamespacedName != nil, "FunctionStmt.NamespacedName cannot be nil")
 
-		return &FunctionStmt{
+		fn := &Func{
 			Name:       p.pNameAsFQ(n.NamespacedName),
 			ByRef:      n.ByRef,
 			Params:     slices.Map(n.Params, p.pParam),
 			ReturnType: p.pType(n.ReturnType),
 			Stmts:      p.pStmtList(n.Stmts),
 		}
+		return &DeclStmt{fn}
 	case *ast.InterfaceStmt:
 		p.assert(n.NamespacedName != nil, "InterfaceStmt.NamespacedName cannot be nil")
 
-		return &InterfaceStmt{
+		it := &Interface{
 			Name:    p.pNameAsFQ(n.NamespacedName),
-			Extends: slices.Map(n.Extends, p.pName),
+			Extends: slices.Map(n.Extends, p.pNameEx),
 			Stmts:   p.pStmtList(n.Stmts),
 		}
+		return &DeclStmt{it}
 	case *ast.ClassStmt:
-		// todo 将匿名类和实名类定义区分开
-		var name *Name
 		if n.NamespacedName != nil {
-			name = p.pNameAsFQ(n.NamespacedName)
+			c := &Class{
+				Name:       p.pNameAsFQ(n.NamespacedName),
+				Flags:      p.pFlags(n.Flags),
+				Extends:    p.pName(n.Extends),
+				Implements: slices.Map(n.Implements, p.pNameEx),
+				Stmts:      p.pStmtList(n.Stmts),
+			}
+			return &DeclStmt{c}
+		} else {
+			// 匿名类
+			return &AnonymousClassStmt{
+				Flags:      p.pFlags(n.Flags),
+				Extends:    p.pName(n.Extends),
+				Implements: slices.Map(n.Implements, p.pNameEx),
+				Stmts:      p.pStmtList(n.Stmts),
+			}
 		}
+	case *ast.TraitStmt:
+		p.assert(n.NamespacedName != nil, "TraitStmt.NamespacedName cannot be nil")
 
-		return &ClassStmt{
-			Name:       name,
-			Flags:      p.pFlags(n.Flags),
-			Extends:    p.pName(n.Extends),
-			Implements: slices.Map(n.Implements, p.pName),
-			Stmts:      p.pStmtList(n.Stmts),
+		t := &Trait{
+			Name:  p.pNameAsFQ(n.NamespacedName),
+			Stmts: p.pStmtList(n.Stmts),
 		}
+		return &DeclStmt{t}
 	case *ast.ClassConstStmt:
 		flags := p.pFlags(n.Flags)
 		return parsingStmts(slices.Map(n.Consts, func(x *ast.Const) Stmt {
@@ -563,13 +563,6 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 			Params:     slices.Map(n.Params, p.pParam),
 			ReturnType: p.pType(n.ReturnType),
 			Stmts:      p.pStmtList(n.Stmts),
-		}
-	case *ast.TraitStmt:
-		p.assert(n.NamespacedName != nil, "TraitStmt.NamespacedName cannot be nil")
-
-		return &TraitStmt{
-			Name:  p.pNameAsFQ(n.NamespacedName),
-			Stmts: p.pStmtList(n.Stmts),
 		}
 	case *ast.TraitUseStmt:
 		return &TraitUseStmt{
@@ -636,7 +629,7 @@ func (p *parser) pTryCatchStmt(n *ast.TryCatchStmt) *TryCatchStmt {
 				p.highVersionFeature("php8.0 catch an exception without storing it in a variable.")
 			}
 			return &CatchStmt{
-				Types: slices.Map(x.Types, p.pName),
+				Types: slices.Map(x.Types, p.pNameEx),
 				Var:   p.pVariableIdent(x.Var, "ast.CatchStmt.Var"),
 				Stmts: p.pStmtList(n.Stmts),
 			}
@@ -752,8 +745,12 @@ func (p *parser) pParam(n *ast.Param) *Param {
 	}
 }
 
-func (p *parser) pNameAsFQ(n *ast.Name) *Name {
-	return NewName(NameFullyQualified, n.Parts)
+func (p *parser) pNameAsFQ(n *ast.Name) Name {
+	return MakeName(NameFullyQualified, n.Parts)
+}
+
+func (p *parser) pNameEx(n *ast.Name) Name {
+	return *p.pName(n)
 }
 
 func (p *parser) pName(n *ast.Name) *Name {

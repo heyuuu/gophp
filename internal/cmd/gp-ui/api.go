@@ -120,15 +120,8 @@ func printIrFileAsProject(irFile *ir.File) (string, error) {
 
 	var buf strings.Builder
 	for _, key := range keys {
-		nsName := key
-		if nsName == "" {
-			nsName = "_"
-		}
-
 		content := contents[key]
-		buf.WriteString("/**\n * namespace " + nsName + "\n */\n")
 		buf.WriteString(content)
-		buf.WriteString("\n")
 	}
 
 	return buf.String(), nil

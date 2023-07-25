@@ -33,12 +33,6 @@ type (
 		functionLikeNode()
 	}
 
-	// StmtClassLike : Stmt
-	ClassLikeStmt interface {
-		Stmt
-		classLikeStmtNode()
-	}
-
 	// TraitUseAdaptationStmt : Stmt
 	TraitUseAdaptationStmt interface {
 		Stmt
@@ -74,7 +68,7 @@ type Type interface {
 type (
 	// IntersectionType : A
 	SimpleType struct {
-		Name *Name
+		Name Name
 	}
 
 	// IntersectionType : A & B & C
@@ -124,6 +118,12 @@ type Name struct {
 
 func NewName(kind NameType, parts []string) *Name {
 	return &Name{
+		Kind: kind,
+		Name: strings.Join(parts, "\\"),
+	}
+}
+func MakeName(kind NameType, parts []string) Name {
+	return Name{
 		Kind: kind,
 		Name: strings.Join(parts, "\\"),
 	}
@@ -328,7 +328,7 @@ type (
 
 	// FuncCallExpr : Expr, CallLikeExpr
 	FuncCallExpr struct {
-		Name Node   // @var Name|Expr Function name
+		Name Node   // @var Name|Expr Func name
 		Args []*Arg // @var []*Args Arguments
 	}
 
@@ -357,10 +357,10 @@ type (
 type UseType int
 
 const (
-	_           = iota
-	UseNormal   = 1 // Class or namespace import
-	UseFunction = 2 // Function import
-	UseConstant = 3 // Constant import
+	_         = iota
+	UseNormal = 1 // Class or namespace import
+	UseFunc   = 2 // Func import
+	UseConst  = 3 // Constant import
 )
 
 // flags
@@ -478,9 +478,9 @@ type (
 	}
 
 	CatchStmt struct {
-		Types []*Name // @var Name[] Types of exceptions to catch
-		Var   string  // @var string Variable name for exception
-		Stmts []Stmt  // @var Stmt[] Statements
+		Types []Name // @var Name[] Types of exceptions to catch
+		Var   string // @var string Variable name for exception
+		Stmts []Stmt // @var Stmt[] Statements
 	}
 
 	FinallyStmt struct {
@@ -488,8 +488,8 @@ type (
 	}
 
 	ConstStmt struct {
-		Name  *Name // @var Name const name
-		Value Expr  // @var Expr const value
+		Name  Name // @var Name const name
+		Value Expr // @var Expr const value
 	}
 
 	EchoStmt struct {
@@ -518,42 +518,25 @@ type (
 	}
 
 	UseStmt struct {
-		Type  UseType // @var UseType     UseNormal UseFunction Or UseConstant
-		Name  *Name   // @var Name        Namespace, class, function or constant to alias
+		Type  UseType // @var UseType     UseNormal UseFunc Or UseConst
+		Name  Name    // @var Name        Namespace, class, function or constant to alias
 		Alias string  // @var string      Alias Name, or empty string when not set
 	}
 
-	// InitStmt : Stmt
-	InitStmt struct {
-		Stmts []Stmt // @var Stmt[] Statements
+	// DeclStmt: Stmt
+	DeclStmt struct {
+		Decl Decl
 	}
 
-	// StmtFunction : Stmt, FunctionLike
-	FunctionStmt struct {
-		Name       *Name    // @var Name function name
-		ByRef      bool     // @var bool Whether function returns by reference
-		Params     []*Param // @var Param[] Parameters
-		ReturnType Type     // @var Type|null Return type
-		Stmts      []Stmt   // @var Stmt[] Statements
+	// AnonymousClassStmt : Stmt, StmtClassLike
+	AnonymousClassStmt struct {
+		Flags      Flags  // @var Flags        Type
+		Extends    *Name  // @var Name|null  Name of extended class
+		Implements []Name // @var Name[]     Names of implemented interfaces
+		Stmts      []Stmt // @var Stmt[] Statements
 	}
 
-	// InterfaceStmt
-	InterfaceStmt struct {
-		Name    *Name   // @var Name
-		Extends []*Name // @var Name[] Extended interfaces
-		Stmts   []Stmt  // @var Stmt[] Statements
-	}
-
-	// StmtClass : Stmt, StmtClassLike
-	ClassStmt struct {
-		Name       *Name   // @var Name|null Name
-		Flags      Flags   // @var Flags        Type
-		Extends    *Name   // @var Name|null  Name of extended class
-		Implements []*Name // @var Name[]     Names of implemented interfaces
-		Stmts      []Stmt  // @var Stmt[] Statements
-	}
-
-	// StmtClassConst : Stmt
+	// ClassConstStmt : Stmt
 	ClassConstStmt struct {
 		Flags Flags  // @var Flags Modifiers
 		Name  string // @var Name const name
@@ -568,7 +551,7 @@ type (
 		Default Expr   // @var Expr|null Default
 	}
 
-	// StmtClassMethod : Stmt, FunctionLike
+	// MethodStmt : Stmt, FunctionLike
 	MethodStmt struct {
 		Flags      Flags    // @var Flags Modifiers
 		ByRef      bool     // @var bool Whether to return by reference
@@ -578,18 +561,13 @@ type (
 		Stmts      []Stmt   // @var Stmt[]|null Statements
 	}
 
-	// StmtTrait : StmtClassLike
-	TraitStmt struct {
-		Name  *Name  // @var Name 	trait name
-		Stmts []Stmt // @var Stmt[] statements
-	}
-
+	// TraitUseStmt : Stmt
 	TraitUseStmt struct {
 		Traits      []*Name                  // @var Name[] Traits
 		Adaptations []TraitUseAdaptationStmt // @var TraitUseAdaptation[] Adaptations
 	}
 
-	// StmtTraitUseAdaptationAlias : StmtTraitUseAdaptation
+	// TraitUseAdaptationAliasStmt : StmtTraitUseAdaptation
 	TraitUseAdaptationAliasStmt struct {
 		NewModifier Flags  // @var Flags 	    New modifier, default 0
 		NewName     *Ident // @var Ident|null 	New name, or nil
@@ -597,7 +575,7 @@ type (
 		Method      *Ident // @var Ident 		method name
 	}
 
-	// StmtTraitUseAdaptationPrecedence : StmtTraitUseAdaptation
+	// TraitUseAdaptationPrecedenceStmt : StmtTraitUseAdaptation
 	TraitUseAdaptationPrecedenceStmt struct {
 		Insteadof []*Name // @var Name[] 	overwritten traits
 		Trait     *Name   // @var Name|null trait name
@@ -688,14 +666,11 @@ func (*StaticStmt) stmtNode()       {}
 func (*UnsetStmt) stmtNode() {}
 func (*UseStmt) stmtNode()   {}
 
-func (*InitStmt) stmtNode()                         {}
-func (*FunctionStmt) stmtNode()                     {}
-func (*InterfaceStmt) stmtNode()                    {}
-func (*ClassStmt) stmtNode()                        {}
+func (*DeclStmt) stmtNode()                         {}
+func (*AnonymousClassStmt) stmtNode()               {}
 func (*ClassConstStmt) stmtNode()                   {}
 func (*PropertyStmt) stmtNode()                     {}
 func (*MethodStmt) stmtNode()                       {}
-func (*TraitStmt) stmtNode()                        {}
 func (*TraitUseStmt) stmtNode()                     {}
 func (*TraitUseAdaptationAliasStmt) stmtNode()      {}
 func (*TraitUseAdaptationPrecedenceStmt) stmtNode() {}
@@ -710,12 +685,6 @@ func (*StaticCallExpr) callLikeExprNode() {}
 func (*ArrowFunctionExpr) functionLikeNode() {}
 func (*ClosureExpr) functionLikeNode()       {}
 func (*MethodStmt) functionLikeNode()        {}
-func (*FunctionStmt) functionLikeNode()      {}
-
-// ClassLikeStmt
-func (*ClassStmt) classLikeStmtNode()     {}
-func (*InterfaceStmt) classLikeStmtNode() {}
-func (*TraitStmt) classLikeStmtNode()     {}
 
 // TraitUseAdaptationStmt
 func (*TraitUseAdaptationAliasStmt) traitUseAdaptationStmtNode()      {}
@@ -723,13 +692,13 @@ func (*TraitUseAdaptationPrecedenceStmt) traitUseAdaptationStmtNode() {}
 
 // All Node types
 func (*Arg) node()                              {}
-func (*Ident) node()                            {}
+func (Ident) node()                             {}
 func (*Param) node()                            {}
 func (*SimpleType) node()                       {}
 func (*IntersectionType) node()                 {}
 func (*UnionType) node()                        {}
 func (*NullableType) node()                     {}
-func (*Name) node()                             {}
+func (Name) node()                              {}
 func (*IntLit) node()                           {}
 func (*FloatLit) node()                         {}
 func (*StringLit) node()                        {}
@@ -794,14 +763,11 @@ func (*InlineHTMLStmt) node()                   {}
 func (*StaticStmt) node()                       {}
 func (*UnsetStmt) node()                        {}
 func (*UseStmt) node()                          {}
-func (*InitStmt) node()                         {}
-func (*FunctionStmt) node()                     {}
-func (*InterfaceStmt) node()                    {}
-func (*ClassStmt) node()                        {}
+func (*DeclStmt) node()                         {}
+func (*AnonymousClassStmt) node()               {}
 func (*ClassConstStmt) node()                   {}
 func (*PropertyStmt) node()                     {}
 func (*MethodStmt) node()                       {}
-func (*TraitStmt) node()                        {}
 func (*TraitUseStmt) node()                     {}
 func (*TraitUseAdaptationAliasStmt) node()      {}
 func (*TraitUseAdaptationPrecedenceStmt) node() {}

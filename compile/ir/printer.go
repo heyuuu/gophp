@@ -3,6 +3,7 @@ package ir
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/compile/token"
+	"github.com/heyuuu/gophp/utils/slices"
 	"log"
 	"os"
 	"reflect"
@@ -14,80 +15,16 @@ import (
  *	public
  */
 func PrintProject(proj *Project) (map[string]string, error) {
-	c := DefaultConfig()
-
-	result := make(map[string]string, len(proj.namespaces))
-	for _, namespace := range proj.namespaces {
-		content, err := c.PrintNamespace(namespace)
-		if err != nil {
-			return nil, err
-		}
-
-		result[namespace.Name] = content
-	}
-	return result, nil
+	return defaultPrinter().PrintProject(proj)
 }
 
 func PrintFile(file *File) (string, error) {
-	return DefaultConfig().PrintFile(file)
-}
-
-func Print(node any) (string, error) {
-	return DefaultConfig().Print(node)
+	return defaultPrinter().PrintFile(file)
 }
 
 type Config struct {
 	TabWidth int // default: 8
 	Indent   int // default: 0 (all code is indented at least by this much)
-}
-
-func DefaultConfig() *Config {
-	return &Config{TabWidth: 8}
-}
-
-func (cfg *Config) Print(node any) (string, error) {
-	var p = &printer{}
-	// todo 需要验证 node 为 print 可以打印的类型范围
-	p.print(node)
-	return p.result()
-}
-
-func (cfg *Config) PrintFile(f *File) (string, error) {
-	var p = &printer{}
-
-	p.print("package ir\n\n")
-
-	for _, seg := range f.Segments {
-		// Namespace
-		if seg.Namespace != "" || len(f.Segments) > 1 {
-			p.print("/**\n * namespace " + seg.Namespace + "\n */\n")
-		}
-		// Init
-		if seg.Init != nil {
-			p.print(seg.Init, "\n")
-		}
-		// Decls
-		p.print(seg.Decls)
-	}
-
-	return p.result()
-}
-
-func (cfg *Config) PrintNamespace(ns *Namespace) (string, error) {
-	var p = &printer{}
-
-	p.print("package ir\n\n")
-
-	for _, seg := range ns.Segments {
-		// Init
-		if seg.Init != nil {
-			p.print(seg.Init, "\n")
-		}
-		// Decls
-		p.print(seg.Decls)
-	}
-
-	return p.result()
 }
 
 /**
@@ -100,6 +37,114 @@ type printer struct {
 	newLine bool
 }
 
+func newPrinter(config *Config) *printer {
+	return &printer{}
+}
+func defaultPrinter() *printer {
+	return newPrinter(nil)
+}
+
+func (p *printer) PrintProject(proj *Project) (map[string]string, error) {
+	result := make(map[string]string, len(proj.namespaces))
+	for _, namespace := range proj.namespaces {
+		content, err := p.PrintNamespace(namespace)
+		if err != nil {
+			return nil, err
+		}
+
+		result[namespace.Name] = content
+	}
+	return result, nil
+}
+
+func (p *printer) PrintNamespace(ns *Namespace) (string, error) {
+	p.pNamespace(ns)
+	return p.result()
+}
+
+func (p *printer) pNamespace(ns *Namespace) {
+	nsName := ns.Name
+	if nsName == "" {
+		nsName = "_"
+	}
+	p.print("/**\n * namespace " + nsName + "\n */\n")
+	p.print("package ir\n\n")
+	slices.Each(ns.Segments, p.pSegment)
+	p.print("\n")
+}
+
+func (p *printer) pSegment(seg Segment) {
+	switch x := seg.(type) {
+	case *InitFunc:
+		p.print("// init\n")
+		if len(x.Stmts) == 0 {
+			p.print("func init() {}")
+		} else {
+			p.print("func init() {\n")
+			p.stmtList(x.Stmts, true)
+			p.print("}\n")
+		}
+	case *Func:
+		p.print("// ", x.Name, "\n")
+		p.print("func ")
+		if x.ByRef {
+			p.print("&")
+		}
+		p.print(x.Name, "(", x.Params, ")")
+		if x.ReturnType != nil {
+			p.print(" ", x.ReturnType)
+		}
+		if len(x.Stmts) == 0 {
+			p.print(" {}\n")
+		} else {
+			p.print(" {\n")
+			p.stmtList(x.Stmts, true)
+			p.print("}\n")
+		}
+	case *Class:
+		p.print("// class ", x.Name, "\n")
+		if x.Flags != 0 {
+			p.flags(x.Flags)
+			p.print(" ")
+		}
+		p.print("class ", x.Name)
+		if x.Extends != nil {
+			p.print(" < ", x.Extends)
+		}
+		if len(x.Implements) != 0 {
+			p.print(" : ", x.Implements)
+		}
+		p.print(" {\n")
+		p.stmtList(x.Stmts, true)
+		p.print("}")
+	case *Interface:
+		p.print("// interface ", x.Name, "\n")
+		p.print("interface ", x.Name)
+		if len(x.Extends) != 0 {
+			p.print(" extends ", x.Extends)
+		}
+		p.print("\n{\n")
+		p.stmtList(x.Stmts, true)
+		p.print("}")
+	case *Trait:
+		p.print("// trait ", x.Name, "\n")
+		p.print("trait ", x.Name, "\n{\n")
+		p.stmtList(x.Stmts, true)
+		p.print("}")
+	default:
+		err := fmt.Errorf("printer: unsupported segment type %T", x)
+		p.checkError(err)
+	}
+}
+
+func (p *printer) PrintFile(f *File) (string, error) {
+	for _, ns := range f.Namespaces {
+		p.pNamespace(ns)
+	}
+	return p.result()
+}
+
+// misc
 func (p *printer) checkError(err error) {
 	if err != nil {
 		p.err = err
@@ -589,9 +634,9 @@ func (p *printer) stmt(n Stmt) {
 	case *UseStmt:
 		var useType string
 		switch x.Type {
-		case UseFunction:
+		case UseFunc:
 			useType = "func "
-		case UseConstant:
+		case UseConst:
 			useType = "const "
 		}
 
@@ -600,47 +645,14 @@ func (p *printer) stmt(n Stmt) {
 		} else {
 			p.print("use ", useType, x.Name, ";")
 		}
-	case *InitStmt:
-		p.print("// init\n")
-		if len(x.Stmts) == 0 {
-			p.print("func init() {}")
-		} else {
-			p.print("func init() {\n")
-			p.stmtList(x.Stmts, true)
-			p.print("}\n")
-		}
-	case *FunctionStmt:
-		p.print("// ", x.Name, "\n")
-		p.print("func ")
-		if x.ByRef {
-			p.print("&")
-		}
-		p.print(x.Name, "(", x.Params, ")")
-		if x.ReturnType != nil {
-			p.print(" ", x.ReturnType)
-		}
-		if len(x.Stmts) == 0 {
-			p.print(" {}\n")
-		} else {
-			p.print(" {\n")
-			p.stmtList(x.Stmts, true)
-			p.print("}\n")
-		}
-	case *InterfaceStmt:
-		p.print("interface ", x.Name)
-		if len(x.Extends) != 0 {
-			p.print(" extends ", x.Extends)
-		}
-		p.print("\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
-	case *ClassStmt:
-		p.print("// class ", x.Name, "\n")
+	case *DeclStmt:
+		p.pSegment(x.Decl)
+	case *AnonymousClassStmt:
 		if x.Flags != 0 {
 			p.flags(x.Flags)
 			p.print(" ")
 		}
-		p.print("class ", x.Name)
+		p.print("class ")
 		if x.Extends != nil {
 			p.print(" < ", x.Extends)
 		}
@@ -683,10 +695,6 @@ func (p *printer) stmt(n Stmt) {
 			p.print(": ", x.ReturnType)
 		}
 		p.print("\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
-	case *TraitStmt:
-		p.print("trait ", x.Name, "\n{\n")
 		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *TraitUseStmt:
