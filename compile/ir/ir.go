@@ -1,5 +1,7 @@
 package ir
 
+import "github.com/heyuuu/gophp/shim/maps"
+
 // File
 type File struct {
 	// 文件是否开启 strict_types
@@ -34,6 +36,10 @@ func (p *Project) AddFile(fileName string, f *File) (err error) {
 		}
 	}
 	return nil
+}
+
+func (p *Project) Namespaces() []*Namespace {
+	return maps.Values(p.namespaces)
 }
 
 func (p *Project) GetConstant(name string) {
