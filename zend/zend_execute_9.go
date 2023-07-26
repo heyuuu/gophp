@@ -26,18 +26,18 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 		fallthrough
 	case ZEND_REQUIRE_ONCE:
 		var resolved_path *string
-		resolved_path = core.PhpResolvePathForZend(inc_filename.String().GetStr())
+		resolved_path = core.PhpResolvePathForZend(inc_filename.StringEx().GetStr())
 		if resolved_path != nil {
 			if EG__().GetIncludedFiles().KeyExists(*resolved_path) {
 				goto already_compiled
 			}
 		} else if EG__().GetException() != nil {
 			break
-		} else if strlen(inc_filename.String().GetVal()) != inc_filename.String().GetLen() {
-			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
+		} else if strlen(inc_filename.StringEx().GetVal()) != inc_filename.StringEx().GetLen() {
+			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.StringEx().GetVal())
 			break
 		} else {
-			*resolved_path = inc_filename.String().GetStr()
+			*resolved_path = inc_filename.StringEx().GetStr()
 		}
 
 		if fh := NewFileHandleByOpenStream(*resolved_path); fh != nil {
@@ -57,13 +57,13 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 				new_op_array = ZEND_FAKE_OP_ARRAY
 			}
 		} else {
-			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
+			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.StringEx().GetVal())
 		}
 	case ZEND_INCLUDE:
 		fallthrough
 	case ZEND_REQUIRE:
-		if strlen(inc_filename.String().GetVal()) != inc_filename.String().GetLen() {
-			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
+		if strlen(inc_filename.StringEx().GetVal()) != inc_filename.StringEx().GetLen() {
+			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.StringEx().GetVal())
 			break
 		}
 		new_op_array = CompileFilename(type_, inc_filename)
@@ -140,17 +140,17 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *types.ZendOp
 func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int, opline *types.ZendOp, executeData *ZendExecuteData) int {
 	var orig_key *types.Zval = key
 	var c *ZendConstant = nil
-	c = EG__().ConstantTable().Get(key.String().GetStr())
+	c = EG__().ConstantTable().Get(key.StringEx().GetStr())
 	if c == nil {
 		key++
-		c = EG__().ConstantTable().Get(key.String().GetStr())
+		c = EG__().ConstantTable().Get(key.StringEx().GetStr())
 		if c == nil || c.IsCaseSensitive() {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
-				c = EG__().ConstantTable().Get(key.String().GetStr())
+				c = EG__().ConstantTable().Get(key.StringEx().GetStr())
 				if c == nil {
 					key++
-					c = EG__().ConstantTable().Get(key.String().GetStr())
+					c = EG__().ConstantTable().Get(key.StringEx().GetStr())
 					if c != nil && c.IsCaseSensitive() {
 						c = nil
 					}
@@ -161,18 +161,18 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 	if c == nil {
 		if check_defined_only == 0 {
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
-				var actual *byte = (*byte)(operators.ZendMemrchr(opline.Const2().String().GetVal(), '\\', opline.Const2().String().GetLen()))
+				var actual *byte = (*byte)(operators.ZendMemrchr(opline.Const2().StringEx().GetVal(), '\\', opline.Const2().StringEx().GetLen()))
 				if actual == nil {
-					opline.Result().SetString(opline.Const2().String().GetStr())
+					opline.Result().SetString(opline.Const2().StringEx().GetStr())
 				} else {
 					actual++
-					opline.Result().SetString(b.CastStr(actual, opline.Const2().String().GetLen()-(actual-opline.Const2().String().GetVal())))
+					opline.Result().SetString(b.CastStr(actual, opline.Const2().StringEx().GetLen()-(actual-opline.Const2().StringEx().GetVal())))
 				}
 
-				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().String().GetVal(), opline.Result().String().GetVal())
+				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().StringEx().GetVal(), opline.Result().StringEx().GetVal())
 
 			} else {
-				faults.ThrowError(nil, "Undefined constant '%s'", opline.Const2().String().GetVal())
+				faults.ThrowError(nil, "Undefined constant '%s'", opline.Const2().StringEx().GetVal())
 				opline.Result().SetUndef()
 			}
 		}
@@ -196,7 +196,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 						access_key = orig_key + 2
 					}
 				}
-				is_deprecated = types.IntBool(c.GetName().GetStr() != access_key.StringVal())
+				is_deprecated = types.IntBool(c.GetName().GetStr() != access_key.String())
 			} else {
 			check_short_name:
 

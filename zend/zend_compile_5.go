@@ -92,7 +92,7 @@ func (compiler *Compiler) DetermineSwitchJumptableType(cases *ZendAstList) uint8
 			/* Non-uniform case types */
 
 		}
-		if cond_zv.IsString() && operators.IsNumericString(cond_zv.String().GetStr(), nil, nil, 0) != 0 {
+		if cond_zv.IsString() && operators.IsNumericString(cond_zv.StringEx().GetStr(), nil, nil, 0) != 0 {
 
 			/* Numeric strings cannot be compared with a simple hash lookup */
 
@@ -199,7 +199,7 @@ func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 					jumptable.IndexAdd(cond_zv.Long(), &jmp_target)
 				} else {
 					b.Assert(cond_zv.IsString())
-					jumptable.KeyAdd(cond_zv.String().GetStr(), &jmp_target)
+					jumptable.KeyAdd(cond_zv.StringEx().GetStr(), &jmp_target)
 				}
 			}
 		} else {
@@ -277,7 +277,7 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 		var classes *ZendAstList = catch_ast.Child(0).AsAstList()
 		var var_ast *ZendAst = catch_ast.Child(1)
 		var stmt_ast *ZendAst = catch_ast.Children()[2]
-		var var_name *types.String = var_ast.Val().String()
+		var var_name *types.String = var_ast.Val().StringEx()
 		var is_last_catch bool = i+1 == catches.GetChildren()
 		var jmp_multicatch *uint32 = SafeEmalloc(b.SizeOf("uint32_t"), classes.GetChildren()-1, 0)
 		var opnum_catch uint32 = uint32 - 1
@@ -509,7 +509,7 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 		var type_ast *ZendAst = param_ast.Child(0)
 		var var_ast *ZendAst = param_ast.Child(1)
 		var default_ast *ZendAst = param_ast.Children()[2]
-		var name *types.String = var_ast.Val().String()
+		var name *types.String = var_ast.Val().StringEx()
 		var is_ref bool = (param_ast.Attr() & ZEND_PARAM_REF) != 0
 		var is_variadic bool = (param_ast.Attr() & ZEND_PARAM_VARIADIC) != 0
 		var var_node Znode

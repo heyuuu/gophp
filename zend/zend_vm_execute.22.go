@@ -39,7 +39,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.StringVal())) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.StringEx() || (p.IsStrKey() && p.StrKey() == offset.String())) {
 							retval = p.GetVal()
 
 							{
@@ -49,7 +49,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = PropFindAndCache(zobj, offset.StringVal())
+				retval = PropFindAndCache(zobj, offset.String())
 				if retval != nil {
 					goto fetch_obj_r_fast_copy
 				}

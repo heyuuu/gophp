@@ -117,7 +117,7 @@ func UserWrapperOpener(
 		/* if the opened path is set, copy it out */
 
 		if args[3].IsRef() && types.Z_REFVAL(args[3]).IsString() && opened_path != nil {
-			*opened_path = types.Z_REFVAL(args[3]).String().Copy()
+			*opened_path = types.Z_REFVAL(args[3]).StringEx().Copy()
 		}
 
 		/* set wrapper data to be a reference to our object */
@@ -242,7 +242,7 @@ func ZifStreamWrapperRegister(executeData zpp.Ex, return_value zpp.Ret, protocol
 
 			/* We failed.  But why? */
 
-			if core.PhpStreamGetUrlStreamWrappersHash().KeyExists(protocol.String()) {
+			if core.PhpStreamGetUrlStreamWrappersHash().KeyExists(protocol.StringEx()) {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Protocol %s:// is already defined.", protocol.GetVal())
 			} else {
 
@@ -368,13 +368,13 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if operators.TryConvertToString(&retval) == 0 {
 		return -1
 	}
-	didread = retval.String().GetLen()
+	didread = retval.StringEx().GetLen()
 	if didread > 0 {
 		if didread > count {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_READ+" - read "+zend.ZEND_LONG_FMT+" bytes more data than requested ("+zend.ZEND_LONG_FMT+" read, "+zend.ZEND_LONG_FMT+" max) - excess data will be lost", us.GetWrapper().GetClassname(), zend_long(didread-count), zend.ZendLong(didread), zend.ZendLong(count))
 			didread = count
 		}
-		memcpy(buf, retval.String().GetVal(), didread)
+		memcpy(buf, retval.StringEx().GetVal(), didread)
 	}
 	// zend.ZvalPtrDtor(&retval)
 	retval.SetUndef()
@@ -966,7 +966,7 @@ func PhpUserstreamopReaddir(stream *core.PhpStream, buf *byte, count int) ssize_
 	call_result = zend.CallUserFunction(lang.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == types.SUCCESS && !retval.IsFalse() && !retval.IsTrue() {
 		operators.ConvertToString(&retval)
-		core.PHP_STRLCPY(ent.GetDName(), retval.String().GetVal(), b.SizeOf("ent -> d_name"), retval.String().GetLen())
+		core.PHP_STRLCPY(ent.GetDName(), retval.StringEx().GetVal(), b.SizeOf("ent -> d_name"), retval.StringEx().GetLen())
 		didread = b.SizeOf("php_stream_dirent")
 	} else if call_result == types.FAILURE {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_DIR_READ+" is not implemented!", us.GetWrapper().GetClassname())

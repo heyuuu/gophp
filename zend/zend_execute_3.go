@@ -155,7 +155,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		}
 		return
 	}
-	if offset < -ZendLong(str.String().GetLen()) {
+	if offset < -ZendLong(str.StringEx().GetLen()) {
 
 		faults.Error(faults.E_WARNING, "Illegal string offset:  "+ZEND_LONG_FMT, offset)
 		if RETURN_VALUE_USED(opline) {
@@ -178,8 +178,8 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		c = uint8(tmp.GetStr()[0])
 		// types.ZendStringReleaseEx(tmp, 0)
 	} else {
-		string_len = value.String().GetLen()
-		c = uint8(value.String().GetStr()[0])
+		string_len = value.StringEx().GetLen()
+		c = uint8(value.StringEx().GetStr()[0])
 	}
 	if string_len == 0 {
 
@@ -192,10 +192,10 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		return
 	}
 	if offset < 0 {
-		offset += ZendLong(str.String().GetLen())
+		offset += ZendLong(str.StringEx().GetLen())
 	}
 
-	s := str.StringVal()
+	s := str.String()
 	if offset >= len(s) {
 		newBytes := make([]byte, offset+1)
 		copy(newBytes, []byte(s))
@@ -324,7 +324,7 @@ func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, 
 	} else {
 		for {
 			if prop.IsRef() {
-				var ref *types.Reference = prop.Reference()
+				var ref *types.Reference = prop.Ref()
 				prop = types.Z_REFVAL_P(prop)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendIncdecTypedRef(ref, nil, opline, executeData)
@@ -359,7 +359,7 @@ func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo,
 		}
 	} else {
 		if prop.IsRef() {
-			var ref *types.Reference = prop.Reference()
+			var ref *types.Reference = prop.Ref()
 			prop = types.Z_REFVAL_P(prop)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendIncdecTypedRef(ref, opline.Result(), opline, executeData)

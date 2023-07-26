@@ -161,11 +161,11 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 		tmp.SetString(operators.ZvalGetStrVal(filename))
 		filename = &tmp
 	}
-	fh := NewFileHandleByFilename(filename.StringVal())
+	fh := NewFileHandleByFilename(filename.String())
 	opArray := CompileFile(fh, type_)
 	if opArray != nil && fh.GetStream().GetHandle() != nil {
 		if fh.GetOpenedPath() == "" {
-			fh.SetOpenedPath(filename.StringVal())
+			fh.SetOpenedPath(filename.String())
 		}
 		zend_hash_add_empty_element(EG__().included_files, file_handle.opened_path)
 		if opened_path != nil {
@@ -180,8 +180,8 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 }
 func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
-	buf := str.StringVal() + strings.Repeat("\x00", ZEND_MMAP_AHEAD)
-	size := str.String().GetLen()
+	buf := str.String() + strings.Repeat("\x00", ZEND_MMAP_AHEAD)
+	size := str.StringEx().GetLen()
 
 	LANG_SCNG__().yy_start = nil
 	YyScanBuffer(buf, size)
@@ -196,7 +196,7 @@ func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray
 	var op_array int = nil
 	var tmp types.Zval
 	tmp.SetString(operators.ZvalGetStrVal(source_string))
-	if tmp.String().GetLen() == 0 {
+	if tmp.StringEx().GetLen() == 0 {
 		return nil
 	}
 	ZendSaveLexicalState(&original_lex_state)
@@ -410,9 +410,9 @@ func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 }
 
 func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
-	var str *byte = zendlval.String().GetVal()
-	var end *byte = str + zendlval.String().GetLen()
-	var copy *byte = zendlval.String().GetVal()
+	var str *byte = zendlval.StringEx().GetVal()
+	var end *byte = str + zendlval.StringEx().GetLen()
+	var copy *byte = zendlval.StringEx().GetVal()
 	var newline_count int = 0
 	var newline_len int
 	var nl *byte
@@ -466,7 +466,7 @@ func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, usin
 		newline_count++
 	}
 	*copy = '0'
-	zendlval.String().GetLen() = copy - zendlval.String().GetVal()
+	zendlval.StringEx().GetLen() = copy - zendlval.StringEx().GetVal()
 	return 1
 error:
 	zval_ptr_dtor_str(zendlval)

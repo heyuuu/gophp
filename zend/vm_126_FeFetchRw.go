@@ -86,7 +86,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 								var prop_info *types.PropertyInfo = ZendGetTypedPropertyInfoForSlot(array.Object(), value)
 								if prop_info != nil {
 									value.SetNewRef(value)
-									ZEND_REF_ADD_TYPE_SOURCE(value.Reference(), prop_info)
+									ZEND_REF_ADD_TYPE_SOURCE(value.Ref(), prop_info)
 									value_type = types.IsRef
 								}
 							}
@@ -182,11 +182,11 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		var variable_ptr *types.Zval = opline.Op2()
 		if variable_ptr != value {
 			var ref *types.Reference
-			ref = value.Reference()
+			ref = value.Ref()
 			variable_ptr.SetReference(ref)
 		}
 	} else {
-		opline.Op2().SetReference(value.Reference())
+		opline.Op2().SetReference(value.Ref())
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

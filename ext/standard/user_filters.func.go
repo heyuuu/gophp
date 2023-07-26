@@ -381,11 +381,11 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		if bucket.GetOwnBuf() == 0 {
 			bucket = streams.PhpStreamBucketMakeWriteable(bucket)
 		}
-		if bucket.GetBuflen() != pzdata.String().GetLen() {
-			bucket.SetBuf(zend.Perealloc(bucket.GetBuf(), pzdata.String().GetLen()))
-			bucket.SetBuflen(pzdata.String().GetLen())
+		if bucket.GetBuflen() != pzdata.StringEx().GetLen() {
+			bucket.SetBuf(zend.Perealloc(bucket.GetBuf(), pzdata.StringEx().GetLen()))
+			bucket.SetBuflen(pzdata.StringEx().GetLen())
 		}
-		memcpy(bucket.GetBuf(), pzdata.String().GetVal(), bucket.GetBuflen())
+		memcpy(bucket.GetBuf(), pzdata.StringEx().GetVal(), bucket.GetBuflen())
 	}
 	if append != 0 {
 		streams.PhpStreamBucketAppend(brigade, bucket)

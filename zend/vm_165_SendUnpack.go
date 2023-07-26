@@ -52,13 +52,13 @@ send_again:
 			if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
 				if arg.IsRef() {
 					// 					arg.AddRefcount()
-					top.SetReference(arg.Reference())
+					top.SetReference(arg.Ref())
 				} else if (opline.GetOp1Type() & (IS_VAR | IS_CV)) != 0 {
 
 					/* array is already separated above */
 
 					types.ZVAL_MAKE_REF_EX(arg, 2)
-					top.SetReference(arg.Reference())
+					top.SetReference(arg.Ref())
 				} else {
 					// arg.TryAddRefcount()
 					top.SetNewRef(arg)

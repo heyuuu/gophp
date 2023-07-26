@@ -15,7 +15,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 	var target_symbol_table *types.Array
 	varname = opline.Const1()
 	{
-		name = varname.String()
+		name = varname.StringEx()
 	}
 
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)

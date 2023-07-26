@@ -102,7 +102,7 @@ func (compiler *Compiler) CompileGroupUse(ast *ZendAst) {
 		var inline_use *ZendAst
 		var use *ZendAst = list.Children()[i]
 		var name_zval *types.Zval = ZendAstGetZval(use.Children()[0])
-		var name *types.String = name_zval.String()
+		var name *types.String = name_zval.StringEx()
 		var compound_ns string = ZendConcatNames(ns.GetStr(), name.GetStr())
 		// types.ZendStringReleaseEx(name, 0)
 		name_zval.SetString(compound_ns)
@@ -297,10 +297,10 @@ func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *types.Zval, op2 
 	if (opcode == ZEND_BW_OR || opcode == ZEND_BW_AND || opcode == ZEND_BW_XOR) && op1.IsString() && op2.IsString() {
 		return 0
 	}
-	if op1.IsString() && operators.IsNumericString(op1.String().GetStr(), nil, nil, 0) == 0 {
+	if op1.IsString() && operators.IsNumericString(op1.StringEx().GetStr(), nil, nil, 0) == 0 {
 		return 1
 	}
-	if op2.IsString() && operators.IsNumericString(op2.String().GetStr(), nil, nil, 0) == 0 {
+	if op2.IsString() && operators.IsNumericString(op2.StringEx().GetStr(), nil, nil, 0) == 0 {
 		return 1
 	}
 	return 0
@@ -428,7 +428,7 @@ func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool 
 			case types.IsLong:
 				result.Array().IndexUpdate(key.Long(), value)
 			case types.IsString:
-				result.Array().SymtableUpdate(key.String().GetStr(), value)
+				result.Array().SymtableUpdate(key.StringEx().GetStr(), value)
 			case types.IsDouble:
 				result.Array().IndexUpdate(operators.DvalToLval(key.Double()), value)
 			case types.IsFalse:

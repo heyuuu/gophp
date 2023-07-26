@@ -135,7 +135,7 @@ func ZendUndefinedMethod(ce *types.ClassEntry, method *types.String) {
 	faults.ThrowError(nil, "Call to undefined method %s::%s()", ce.Name(), method.GetVal())
 }
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
-	faults.ThrowError(nil, "Call to a member function %s() on %s", function_name.String().GetVal(), types.ZendGetTypeByConst(object.Type()))
+	faults.ThrowError(nil, "Call to a member function %s() on %s", function_name.StringEx().GetVal(), types.ZendGetTypeByConst(object.Type()))
 }
 func ZendNonStaticMethodCall(fbc types.IFunction) {
 	if fbc.IsAllowStatic() {
@@ -230,7 +230,7 @@ try_again:
 			retval = ht.IndexAddNew(hval, UninitializedZval())
 		}
 	} else if dim.IsString() {
-		offset_key = dim.String()
+		offset_key = dim.StringEx()
 		{
 			if types.HandleNumericStr(offset_key.GetStr(), &hval) {
 				goto num_index
@@ -296,7 +296,7 @@ try_again:
 	} else {
 		var zv = SlowIndexConvertEx(ht, dim, executeData)
 		if zv.IsString() {
-			offset_key = zv.String()
+			offset_key = zv.StringEx()
 			goto str_index
 		} else if zv.IsLong() {
 			hval = zv.Long()
@@ -353,7 +353,7 @@ func ZendFetchDimensionAddress(
 		result.SetIndirect(retval)
 		return
 	} else if container.IsRef() {
-		var ref *types.Reference = container.Reference()
+		var ref *types.Reference = container.Ref()
 		container = types.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto try_array

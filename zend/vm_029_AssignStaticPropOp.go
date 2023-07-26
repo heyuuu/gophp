@@ -23,7 +23,7 @@ func ZEND_ASSIGN_STATIC_PROP_OP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 	for {
 		if prop.IsRef() {
-			ref = prop.Reference()
+			ref = prop.Ref()
 			prop = types.Z_REFVAL_P(prop)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)

@@ -20,8 +20,8 @@ func Z_OBJPROP(zval Zval) *Array {
 	return zval.Object().GetPropertiesArray()
 }
 func Z_OBJPROP_P(zval_p *Zval) *Array       { return Z_OBJPROP(*zval_p) }
-func Z_REFVAL(zval Zval) *Zval              { return zval.Reference().GetVal() }
-func Z_REFVAL_P(zval_p *Zval) *Zval         { return zval_p.Reference().GetVal() }
+func Z_REFVAL(zval Zval) *Zval              { return zval.Ref().GetVal() }
+func Z_REFVAL_P(zval_p *Zval) *Zval         { return zval_p.Ref().GetVal() }
 func GC_AST(p *ZendAstRef) *zend.ZendAst    { return p.GcAst() }
 func Z_ASTVAL(zval Zval) *zend.ZendAst      { return GC_AST(zval.ConstantAst()) }
 func Z_ASTVAL_P(zval_p *Zval) *zend.ZendAst { return Z_ASTVAL(*zval_p) }

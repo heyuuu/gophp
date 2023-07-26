@@ -51,14 +51,14 @@ func ZendFetchDimensionAddressRead(
 		if !dim.IsLong() {
 			switch dim.Type() {
 			case types.IsString:
-				if types.IsLong == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
+				if types.IsLong == operators.IsNumericString(dim.StringEx().GetStr(), nil, nil, -1) {
 					break
 				}
 				if type_ == BP_VAR_IS {
 					result.SetNull()
 					return
 				}
-				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.String().GetVal())
+				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.StringEx().GetVal())
 			case types.IsUndef:
 				ZVAL_UNDEFINED_OP2(executeData)
 				fallthrough
@@ -82,7 +82,7 @@ func ZendFetchDimensionAddressRead(
 		} else {
 			offset = dim.Long()
 		}
-		if container.String().GetLen() < lang.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
+		if container.StringEx().GetLen() < lang.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
 			if type_ != BP_VAR_IS {
 				faults.Error(faults.E_NOTICE, "Uninitialized string offset: "+ZEND_LONG_FMT, offset)
 				result.SetString("")
@@ -93,11 +93,11 @@ func ZendFetchDimensionAddressRead(
 			var c uint8
 			var real_offset ZendLong
 			if offset < 0 {
-				real_offset = ZendLong(container.String().GetLen() + offset)
+				real_offset = ZendLong(container.StringEx().GetLen() + offset)
 			} else {
 				real_offset = offset
 			}
-			c = uint8(container.String().GetStr()[real_offset])
+			c = uint8(container.StringEx().GetStr()[real_offset])
 			result.SetString(string(c))
 		}
 	} else if container.IsObject() {
@@ -188,9 +188,9 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 			lval = offset.Long()
 		str_offset:
 			if lval < 0 {
-				lval += ZendLong(container.String().GetLen())
+				lval += ZendLong(container.StringEx().GetLen())
 			}
-			if lval >= 0 && int(lval < container.String().GetLen()) != 0 {
+			if lval >= 0 && int(lval < container.StringEx().GetLen()) != 0 {
 				return 1
 			} else {
 				return 0
@@ -203,7 +203,7 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 
 			/*}*/
 
-			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.StringEx().GetStr(), nil, nil, 0) {
 				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -225,10 +225,10 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 			lval = offset.Long()
 		str_offset:
 			if lval < 0 {
-				lval += ZendLong(container.String().GetLen())
+				lval += ZendLong(container.StringEx().GetLen())
 			}
-			if lval >= 0 && int(lval < container.String().GetLen()) != 0 {
-				return container.String().GetStr()[lval] == '0'
+			if lval >= 0 && int(lval < container.StringEx().GetLen()) != 0 {
+				return container.StringEx().GetStr()[lval] == '0'
 			} else {
 				return 1
 			}
@@ -240,7 +240,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 
 			/*}*/
 
-			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.StringEx().GetStr(), nil, nil, 0) {
 				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -257,7 +257,7 @@ func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, executeData *ZendE
 	key = key.DeRef()
 
 	if key.IsString() {
-		str = key.String()
+		str = key.StringEx()
 		if types.HandleNumericStr(str.GetStr(), &hval) {
 			goto num_key
 		}
@@ -311,7 +311,7 @@ func PromotesToArray(val *types.Zval) bool {
 }
 func PromotesToObject(val *types.Zval) bool {
 	val = types.ZVAL_DEREF(val)
-	return val.IsSignFalse() || val.IsString() && val.String().GetLen() == 0
+	return val.IsSignFalse() || val.IsString() && val.StringEx().GetLen() == 0
 }
 func CheckTypeArrayAssignable(type_ types.TypeHint) bool {
 	if type_ == 0 {

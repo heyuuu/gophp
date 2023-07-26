@@ -73,7 +73,7 @@ func ZendHandleFetchObjFlags(result *types.Zval, ptr *types.Zval, obj *types.Obj
 				ptr.SetNull()
 			}
 			ptr.SetNewRef(ptr)
-			ZEND_REF_ADD_TYPE_SOURCE(ptr.Reference(), prop_info)
+			ZEND_REF_ADD_TYPE_SOURCE(ptr.Ref(), prop_info)
 		}
 	default:
 
@@ -134,7 +134,7 @@ func ZendFetchPropertyAddress(
 			}
 		} else if zobj.GetProperties() != nil {
 			zobj.DupProperties()
-			ptr = zobj.GetProperties().KeyFind(prop_ptr.String().GetStr())
+			ptr = zobj.GetProperties().KeyFind(prop_ptr.StringEx().GetStr())
 			if ptr != nil {
 				result.SetIndirect(ptr)
 				return
@@ -253,7 +253,7 @@ func ZendFetchStaticPropertyAddressEx(
 		var class_name *types.Zval = opline.Const2()
 		b.Assert(op1_type != IS_CONST || CACHED_PTR(cache_slot) == nil)
 		if lang.Assign(&ce, CACHED_PTR(cache_slot)) == nil {
-			ce = ZendFetchClassByName(class_name.String(), (class_name + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+			ce = ZendFetchClassByName(class_name.StringEx(), (class_name + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
 				FREE_UNFETCHED_OP(op1_type, opline.GetOp1().GetVar())
 				return types.FAILURE
@@ -279,11 +279,11 @@ func ZendFetchStaticPropertyAddressEx(
 		}
 	}
 	if op1_type == IS_CONST {
-		name = opline.Const1().String()
+		name = opline.Const1().StringEx()
 	} else {
 		var varname *types.Zval = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 		if varname.IsString() {
-			name = varname.String()
+			name = varname.StringEx()
 			tmp_name = nil
 		} else {
 			if op1_type == IS_CV && varname.IsUndef() {

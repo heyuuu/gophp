@@ -105,18 +105,18 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 
 			/* Set proper value for true/false settings */
 
-			if arg2.String().GetLen() == 2 && !(strncasecmp(arg2.String().GetVal(), "on", b.SizeOf("\"on\"")-1)) || arg2.String().GetLen() == 3 && !(strncasecmp(arg2.String().GetVal(), "yes", b.SizeOf("\"yes\"")-1)) || arg2.String().GetLen() == 4 && !(strncasecmp(arg2.String().GetVal(), "true", b.SizeOf("\"true\"")-1)) {
+			if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.StringEx().GetVal(), "on", b.SizeOf("\"on\"")-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.StringEx().GetVal(), "yes", b.SizeOf("\"yes\"")-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.StringEx().GetVal(), "true", b.SizeOf("\"true\"")-1)) {
 				new_value = types.NewString("1")
-			} else if arg2.String().GetLen() == 2 && !(strncasecmp(arg2.String().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.String().GetLen() == 3 && !(strncasecmp(arg2.String().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.String().GetLen() == 4 && !(strncasecmp(arg2.String().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.String().GetLen() == 5 && !(strncasecmp(arg2.String().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
+			} else if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.StringEx().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.StringEx().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.StringEx().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.StringEx().GetLen() == 5 && !(strncasecmp(arg2.StringEx().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
 				new_value = types.NewString("")
 			} else {
-				new_value = BrowscapInternStr(ctx, arg2.String())
+				new_value = BrowscapInternStr(ctx, arg2.StringEx())
 			}
-			if !(strcasecmp(arg1.String().GetVal(), "parent")) {
+			if !(strcasecmp(arg1.StringEx().GetVal(), "parent")) {
 
 				/* parent entry can not be same as current section -> causes infinite loop! */
 
-				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), arg2.String().GetVal())) {
+				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), arg2.StringEx().GetVal())) {
 					faults.Error(faults.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap"))
 					return
 				}
@@ -125,14 +125,14 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 				}
 				ctx.GetCurrentEntry().SetParent(new_value)
 			} else {
-				new_key = BrowscapInternStrCi(ctx, arg1.String())
+				new_key = BrowscapInternStrCi(ctx, arg1.StringEx())
 				bdata.AddKv(new_key.GetStr(), new_value.GetStr())
 				ctx.GetCurrentEntry().SetKvEnd(bdata.GetKvUsed())
 			}
 		}
 	case zend.ZEND_INI_PARSER_SECTION:
 		var entry *BrowscapEntry
-		var pattern *types.String = arg1.String()
+		var pattern *types.String = arg1.StringEx()
 		var pos int
 		var i int
 		if pattern.GetLen() > UINT16_MAX {
@@ -353,7 +353,7 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 			return_value.SetFalse()
 			return
 		}
-		agent_name = http_user_agent.String()
+		agent_name = http_user_agent.StringEx()
 	}
 	lookup_browser_name = operators.ZendStringTolower(agent_name)
 	found_entry = types.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name.GetStr())

@@ -330,7 +330,7 @@ func ZendIsConstDefaultClassRef(name_ast *ZendAst) bool {
 func ZendHandleNumericOp(node *Znode) {
 	if node.GetOpType() == IS_CONST && node.GetConstant().IsString() {
 		var index ZendUlong
-		if types.HandleNumericStr(node.GetConstant().String().GetStr(), &index) {
+		if types.HandleNumericStr(node.GetConstant().StringEx().GetStr(), &index) {
 			node.GetConstant().SetLong(index)
 		}
 	}
@@ -338,7 +338,7 @@ func ZendHandleNumericOp(node *Znode) {
 func ZendHandleNumericDim(opline *types.ZendOp, dim_node *Znode) {
 	if dim_node.GetConstant().IsString() {
 		var index ZendUlong
-		if types.HandleNumericStr(dim_node.GetConstant().String().GetStr(), &index) {
+		if types.HandleNumericStr(dim_node.GetConstant().StringEx().GetStr(), &index) {
 
 			/* For numeric indexes we also keep the original value to use by ArrayAccess
 			 * See bug #63217
@@ -355,7 +355,7 @@ func ZendHandleNumericDim(opline *types.ZendOp, dim_node *Znode) {
 func ZendSetClassNameOp1(opline *types.ZendOp, class_node *Znode) {
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp1Type(IS_CONST)
-		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
+		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().StringEx()))
 	} else {
 		opline.SetOp1Type(class_node.GetOpType())
 		if class_node.GetOpType() == IS_CONST {
@@ -375,7 +375,7 @@ func (compiler *Compiler) CompileClassRef(result *Znode, name_ast *ZendAst, fetc
 			if name_node.GetConstant().Type() != types.IsString {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 			}
-			name = name_node.GetConstant().String()
+			name = name_node.GetConstant().StringEx()
 			fetch_type = ZendGetClassFetchType(name.GetStr())
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
 				result.SetOpType(IS_CONST)
@@ -416,7 +416,7 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 		var zv *types.Zval = nameAst.Val()
 		var name string
 		if zv.IsString() {
-			name = zv.StringVal()
+			name = zv.String()
 		} else {
 			name = operators.ZvalGetStrVal(zv)
 		}
@@ -442,7 +442,7 @@ func (compiler *Compiler) CompileSimpleVarNoCv(result *Znode, ast *ZendAst, type
 	} else {
 		opline = ZendEmitOp(result, ZEND_FETCH_R, &name_node, nil)
 	}
-	if name_node.GetOpType() == IS_CONST && ZendIsAutoGlobal(name_node.GetConstant().StringVal()) {
+	if name_node.GetOpType() == IS_CONST && ZendIsAutoGlobal(name_node.GetConstant().String()) {
 		opline.SetExtendedValue(ZEND_FETCH_GLOBAL)
 	} else {
 		opline.SetExtendedValue(ZEND_FETCH_LOCAL)
@@ -453,7 +453,7 @@ func (compiler *Compiler) CompileSimpleVarNoCv(result *Znode, ast *ZendAst, type
 func IsThisFetch(ast *ZendAst) bool {
 	if ast.Kind() == ZEND_AST_VAR && ast.Child(0).Kind() == ZEND_AST_ZVAL {
 		var name *types.Zval = ast.Child(0).Val()
-		return name.IsString() && name.StringVal() == "this"
+		return name.IsString() && name.String() == "this"
 	}
 	return false
 }
@@ -577,7 +577,7 @@ func (compiler *Compiler) CompileStaticProp(result *Znode, ast *ZendAst, type_ u
 	}
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
+		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().StringEx()))
 		if opline.GetOp1Type() != IS_CONST {
 			opline.SetExtendedValue(ZendAllocCacheSlot())
 		}

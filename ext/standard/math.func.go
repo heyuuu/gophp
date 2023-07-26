@@ -265,15 +265,15 @@ func _parseStringToNumber(s string, base int) (types.Number, bool) {
 
 func ZifBindec(binaryNumber *types.Zval) (*types.Zval, bool) {
 	operators.ConvertToStringEx(binaryNumber)
-	return _parseStringToNumberZval(binaryNumber.StringVal(), 2)
+	return _parseStringToNumberZval(binaryNumber.String(), 2)
 }
 func ZifHexdec(hexadecimalNumber *types.Zval) (*types.Zval, bool) {
 	operators.ConvertToStringEx(hexadecimalNumber)
-	return _parseStringToNumberZval(hexadecimalNumber.StringVal(), 16)
+	return _parseStringToNumberZval(hexadecimalNumber.String(), 16)
 }
 func ZifOctdec(octalNumber *types.Zval) (*types.Zval, bool) {
 	operators.ConvertToStringEx(octalNumber)
-	return _parseStringToNumberZval(octalNumber.StringVal(), 8)
+	return _parseStringToNumberZval(octalNumber.String(), 8)
 }
 func ZifDecbin(decimalNumber int) string {
 	return strconv.FormatInt(int64(decimalNumber), 2)
@@ -297,7 +297,7 @@ func ZifBaseConvert(number *types.Zval, frombase int, tobase int) (string, bool)
 		return "", false
 	}
 
-	num, ok := _parseStringToNumber(number.StringVal(), frombase)
+	num, ok := _parseStringToNumber(number.String(), frombase)
 	if !ok {
 		return "", false
 	}

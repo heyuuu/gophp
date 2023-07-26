@@ -22,7 +22,7 @@ func ZEND_DECLARE_CONST_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) i
 	/* non persistent, case sensitive */
 
 	c.SetFlags(CONST_CS, PHP_USER_CONSTANT)
-	c.SetName(name.StringVal())
+	c.SetName(name.String())
 	ZendRegisterConstant(&c)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

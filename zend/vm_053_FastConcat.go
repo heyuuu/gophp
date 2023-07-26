@@ -10,7 +10,7 @@ func fastConcatHelper(executeData *ZendExecuteData, op1, op2 *types.Zval) int {
 	var checkExcpetion bool = false
 
 	if op1.IsString() {
-		op1Str = op1.StringVal()
+		op1Str = op1.String()
 	} else {
 		checkExcpetion = true
 		if op1.IsUndef() {
@@ -20,7 +20,7 @@ func fastConcatHelper(executeData *ZendExecuteData, op1, op2 *types.Zval) int {
 	}
 
 	if op2.IsString() {
-		op2Str = op2.StringVal()
+		op2Str = op2.String()
 	} else {
 		checkExcpetion = true
 		if op2.IsUndef() {

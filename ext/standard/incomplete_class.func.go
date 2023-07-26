@@ -69,7 +69,7 @@ func PhpLookupClassName(object *types.Zval) *types.String {
 	var object_properties *types.Array
 	object_properties = types.Z_OBJPROP_P(object)
 	if lang.Assign(&val, object_properties.KeyFind(b.CastStrAuto(MAGIC_MEMBER))) != nil && val.IsString() {
-		return val.String().Copy()
+		return val.StringEx().Copy()
 	}
 	return nil
 }

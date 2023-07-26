@@ -54,7 +54,7 @@ func ZifEzmlmHash(executeData zpp.Ex, return_value zpp.Ret, addr *types.Zval) {
 }
 func PhpMailBuildHeadersCheckFieldValue(val *types.Zval) bool {
 	var len_ int = 0
-	var value *types.String = val.String()
+	var value *types.String = val.StringEx()
 
 	/* https://tools.ietf.org/html/rfc2822#section-2.2.1 */
 
@@ -94,12 +94,12 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.String, val *types.Zva
 			return
 		}
 		if PhpMailBuildHeadersCheckFieldValue(val) != types.SUCCESS {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), val.String().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), val.StringEx().GetVal())
 			return
 		}
 		s.WriteString(key.GetStr())
 		s.WriteString(": ")
-		s.WriteString(b.CastStrAuto(val.String().GetVal()))
+		s.WriteString(b.CastStrAuto(val.StringEx().GetVal()))
 		s.WriteString("\r\n")
 	case types.IsArray:
 		PhpMailBuildHeadersElems(s, key, val)
@@ -266,7 +266,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 	if headers != nil {
 		switch headers.Type() {
 		case types.IsString:
-			tmp_headers = types.NewString(headers.String().GetStr())
+			tmp_headers = types.NewString(headers.StringEx().GetStr())
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
 			str_headers = types.NewString(str.PhpTrimRight(tmp_headers.GetStr(), nil))
 			// types.ZendStringReleaseEx(tmp_headers, 0)

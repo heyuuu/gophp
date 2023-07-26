@@ -11,7 +11,7 @@ func ZEND_UNSET_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	var name *types.String
 	var target_symbol_table *types.Array
 	varname = opline.Const1()
-	name = varname.String()
+	name = varname.StringEx()
 
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	target_symbol_table.KeyDeleteIndirect(name.GetStr())
@@ -25,7 +25,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	varname = opline.Op1()
 
 	if varname.IsString() {
-		name = varname.StringVal()
+		name = varname.String()
 	} else {
 		if varname.IsUndef() {
 			varname = ZVAL_UNDEFINED_OP1(executeData)
@@ -47,7 +47,7 @@ func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	varname = opline.Op1()
 
 	if varname.IsString() {
-		name = varname.StringVal()
+		name = varname.String()
 	} else {
 		if varname.IsUndef() {
 			varname = ZVAL_UNDEFINED_OP1(executeData)

@@ -73,8 +73,8 @@ again:
 	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IsString:
-		core.PhpPrintf("%sstring(%zd) \"", common, struc.String().GetLen())
-		core.PhpOutputWrite(struc.StringVal())
+		core.PhpPrintf("%sstring(%zd) \"", common, struc.StringEx().GetLen())
+		core.PhpOutputWrite(struc.String())
 		core.PUTS("\"\n")
 	case types.IsArray:
 		myht := struc.Array()
@@ -201,8 +201,8 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IsString:
-		core.PhpPrintf("%sstring(%zd) \"", common, struc.String().GetLen())
-		core.PUTS(struc.StringVal())
+		core.PhpPrintf("%sstring(%zd) \"", common, struc.StringEx().GetLen())
+		core.PUTS(struc.String())
 		core.PhpPrintf("\"\n")
 	case types.IsArray:
 		myht := struc.Array()
@@ -352,7 +352,7 @@ again:
 			buf.WriteString(".0")
 		}
 	case types.IsString:
-		ztmp := str.PhpAddcslashes(struc.StringVal(), "'\\")
+		ztmp := str.PhpAddcslashes(struc.String(), "'\\")
 		ztmp2 := strings.ReplaceAll(ztmp, "0", "' . \"\\0\" . '")
 		buf.WriteByte('\'')
 		buf.WriteString(ztmp2)
@@ -578,7 +578,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 
 				entry = _z
 				operators.ConvertToStringEx(entry)
-				lcname = operators.ZendStringTolower(entry.String())
+				lcname = operators.ZendStringTolower(entry.StringEx())
 				types.ZendHashAddEmptyElement(class_hash, lcname.GetStr())
 				// types.ZendStringReleaseEx(lcname, 0)
 			}

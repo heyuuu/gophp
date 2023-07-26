@@ -20,7 +20,7 @@ func (compiler *Compiler) CompileClosureBinding(closure *Znode, op_array *types.
 	}
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_name_ast *ZendAst = list.Children()[i]
-		var var_name *types.String = var_name_ast.Val().String()
+		var var_name *types.String = var_name_ast.Val().StringEx()
 		var mode uint32 = var_name_ast.Attr()
 		var opline *types.ZendOp
 		var value *types.Zval
@@ -477,7 +477,7 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 		var name_ast *ZendAst = prop_ast.Child(0)
 		var value_ast *ZendAst = prop_ast.Child(1)
 		var doc_comment_ast *ZendAst = prop_ast.Children()[2]
-		var name *types.String = name_ast.Val().String()
+		var name *types.String = name_ast.Val().StringEx()
 		var doc_comment *types.String = nil
 		var value_zv types.Zval
 		var type_ types.TypeHint = 0
@@ -549,7 +549,7 @@ func (compiler *Compiler) CompileClassConstDecl(ast *ZendAst) {
 		var name_ast *ZendAst = const_ast.Child(0)
 		var value_ast *ZendAst = const_ast.Child(1)
 		var doc_comment_ast *ZendAst = const_ast.Children()[2]
-		var name *types.String = name_ast.Val().String()
+		var name *types.String = name_ast.Val().StringEx()
 		var doc_comment *types.String = lang.CondF1(doc_comment_ast != nil, func() *types.String { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
 		var value_zv types.Zval
 		if (ast.Attr() & (types.AccStatic | types.AccAbstract | types.AccFinal)) != 0 {
@@ -762,7 +762,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 		if extends_node.GetOpType() != IS_CONST || extends_node.GetConstant().Type() != types.IsString {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 		}
-		extends_name = extends_node.GetConstant().String()
+		extends_name = extends_node.GetConstant().StringEx()
 		ce.SetParentName(ZendResolveClassName(extends_name.GetStr(), lang.CondF1(extends_ast.Kind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.Attr() }, ZEND_NAME_FQ)))
 		ce.SetIsInherited(true)
 	}

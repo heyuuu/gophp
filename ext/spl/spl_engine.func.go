@@ -36,7 +36,7 @@ func SplOffsetConvertToLong(offset *types.Zval) zend.ZendLong {
 try_again:
 	switch offset.Type() {
 	case types.IsString:
-		if types.HandleNumericStr(offset.String().GetStr(), &idx) {
+		if types.HandleNumericStr(offset.StringEx().GetStr(), &idx) {
 			return idx
 		}
 	case types.IsDouble:

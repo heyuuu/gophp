@@ -50,7 +50,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().String().GetVal(), error)
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().StringEx().GetVal(), error)
 		Efree(error)
 		if EG__().GetException() != nil {
 			return 0
@@ -119,7 +119,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().String().GetVal(), error)
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().StringEx().GetVal(), error)
 		Efree(error)
 		// ZvalPtrDtorNogc(free_op2)
 		if EG__().GetException() != nil {
@@ -186,7 +186,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().String().GetVal(), error)
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().StringEx().GetVal(), error)
 		Efree(error)
 		if EG__().GetException() != nil {
 			return 0

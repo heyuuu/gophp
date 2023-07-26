@@ -196,9 +196,9 @@ func PhpUrlEncodeHashEx(
 			case types.IsString:
 				var ekey string
 				if enc_type == PHP_QUERY_RFC3986 {
-					ekey = PhpRawUrlEncode(zdata.StringVal())
+					ekey = PhpRawUrlEncode(zdata.String())
 				} else {
-					ekey = PhpUrlEncode(zdata.StringVal())
+					ekey = PhpUrlEncode(zdata.String())
 				}
 				formstr.WriteString(ekey)
 			case types.IsLong:

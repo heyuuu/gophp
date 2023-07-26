@@ -17,7 +17,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 	varname = opline.Op1()
 
 	if varname.IsString() {
-		name = varname.String()
+		name = varname.StringEx()
 		tmp_name = nil
 	} else {
 		if varname.IsUndef() {

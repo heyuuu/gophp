@@ -576,7 +576,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 				q = q.GetListNext()
 				continue
 			}
-			zlen = uint(value.String().GetLen())
+			zlen = uint(value.StringEx().GetLen())
 			if p+4+4+q.GetVarLen()+zlen >= buf+b.SizeOf("buf") {
 				break
 			}
@@ -598,7 +598,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 			}
 			memcpy(p, q.GetVar(), q.GetVarLen())
 			p += q.GetVarLen()
-			memcpy(p, value.String().GetVal(), zlen)
+			memcpy(p, value.StringEx().GetVal(), zlen)
 			p += zlen
 			q = q.GetListNext()
 		}

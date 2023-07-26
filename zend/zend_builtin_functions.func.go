@@ -390,7 +390,7 @@ func ZifGetParentClass(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, obje
 		if object.IsObject() {
 			ce = object.Object().GetCe()
 		} else if object.IsString() {
-			ce = ZendLookupClassString(object.StringVal())
+			ce = ZendLookupClassString(object.String())
 		}
 	}
 	if ce != nil && ce.GetParent() != nil {
@@ -430,7 +430,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 	 */
 
 	if allow_string != 0 && obj.IsString() {
-		instance_ce = ZendLookupClass(obj.String())
+		instance_ce = ZendLookupClass(obj.StringEx())
 		if instance_ce == nil {
 			return_value.SetFalse()
 			return
@@ -605,7 +605,7 @@ func ZifGetClassMethods(class *types.Zval) *types.Zval {
 	if class.IsObject() {
 		ce = class.Object().GetCe()
 	} else if class.IsString() {
-		ce = ZendLookupClass(class.String())
+		ce = ZendLookupClass(class.StringEx())
 	}
 	if ce == nil {
 		return types.NewZvalNull()
@@ -629,7 +629,7 @@ func ZifMethodExists(object *types.Zval, method string) bool {
 	if object.IsObject() {
 		ce = object.Object().GetCe()
 	} else if object.IsString() {
-		ce = ZendLookupClassString(object.StringVal())
+		ce = ZendLookupClassString(object.String())
 	}
 	if ce == nil {
 		return false
@@ -670,7 +670,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 		return
 	}
 	if object.IsString() {
-		ce = ZendLookupClass(object.String())
+		ce = ZendLookupClass(object.StringEx())
 		if ce == nil {
 			return_value.SetFalse()
 			return

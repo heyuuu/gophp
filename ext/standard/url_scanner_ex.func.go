@@ -260,7 +260,7 @@ func CheckHttpHost(target string) int {
 	if tmp != nil && tmp.IsArray() {
 		host := tmp.Array().KeyFind("HTTP_HOST")
 		if host != nil && host.IsString() {
-			hostStr := host.StringVal()
+			hostStr := host.String()
 
 			/* HTTP_HOST could be 'localhost:8888' etc. */
 			if pos := strings.IndexByte(hostStr, ':'); pos >= 0 {

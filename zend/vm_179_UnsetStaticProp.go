@@ -16,7 +16,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	if opline.GetOp2Type() == IS_CONST {
 		ce = CACHED_PTR(opline.GetExtendedValue())
 		if ce == nil {
-			ce = ZendFetchClassByName(opline.Const2().String(), (opline.Const2() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+			ce = ZendFetchClassByName(opline.Const2().StringEx(), (opline.Const2() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
 				b.Assert(EG__().GetException() != nil)
 				FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
@@ -35,9 +35,9 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	}
 	varname = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 	if opline.GetOp1Type() == IS_CONST {
-		name = varname.String()
+		name = varname.StringEx()
 	} else if varname.IsString() {
-		name = varname.String()
+		name = varname.StringEx()
 	} else {
 		if opline.GetOp1Type() == IS_CV && varname.IsUndef() {
 			varname = ZVAL_UNDEFINED_OP1(executeData)

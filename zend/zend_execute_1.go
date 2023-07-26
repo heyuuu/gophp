@@ -105,7 +105,7 @@ func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zv
 	} else if variable_ptr == value_ptr {
 		return
 	}
-	ref = value_ptr.Reference()
+	ref = value_ptr.Ref()
 	variable_ptr.SetReference(ref)
 }
 func ZendAssignToTypedPropertyReference(prop_info *types.PropertyInfo, prop *types.Zval, value_ptr *types.Zval, executeData *ZendExecuteData) *types.Zval {
@@ -113,10 +113,10 @@ func ZendAssignToTypedPropertyReference(prop_info *types.PropertyInfo, prop *typ
 		return UninitializedZval()
 	}
 	if prop.IsRef() {
-		ZEND_REF_DEL_TYPE_SOURCE(prop.Reference(), prop_info)
+		ZEND_REF_DEL_TYPE_SOURCE(prop.Ref(), prop_info)
 	}
 	ZendAssignToVariableReference(prop, value_ptr)
-	ZEND_REF_ADD_TYPE_SOURCE(prop.Reference(), prop_info)
+	ZEND_REF_ADD_TYPE_SOURCE(prop.Ref(), prop_info)
 	return prop
 }
 func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) *types.Zval {
@@ -181,7 +181,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *types.Zend
 		ref = object
 		object = types.Z_REFVAL_P(object)
 	}
-	if object.Type() > types.IsFalse && (!object.IsString() || object.String().GetLen() != 0) {
+	if object.Type() > types.IsFalse && (!object.IsString() || object.StringEx().GetLen() != 0) {
 		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
 			var property_name *types.String = operators.ZvalGetString(property)
 			if opline.GetOpcode() == ZEND_PRE_INC_OBJ || opline.GetOpcode() == ZEND_PRE_DEC_OBJ || opline.GetOpcode() == ZEND_POST_INC_OBJ || opline.GetOpcode() == ZEND_POST_DEC_OBJ {
@@ -198,8 +198,8 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *types.Zend
 		}
 		return nil
 	}
-	if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref.Reference()) {
-		if zend_verify_ref_stdClass_assignable(ref.Reference()) == 0 {
+	if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref.Ref()) {
+		if zend_verify_ref_stdClass_assignable(ref.Ref()) == 0 {
 			if RETURN_VALUE_USED(opline) {
 				opline.Result().SetUndef()
 			}

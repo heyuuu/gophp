@@ -14,17 +14,17 @@ func ZendAstGetZval(ast *ZendAst) *types.Zval {
 func ZendAstGetStr(ast *ZendAst) *types.String {
 	var zv *types.Zval = ast.Val()
 	b.Assert(zv.IsString())
-	return zv.String()
+	return zv.StringEx()
 }
 func ZendAstGetStrVal(ast *ZendAst) string {
 	var zv *types.Zval = ast.Val()
 	b.Assert(zv.IsString())
-	return zv.StringVal()
+	return zv.String()
 }
 func ZendAstGetConstantName(ast *ZendAst) *types.String {
 	b.Assert(ast.Kind() == ZEND_AST_CONSTANT)
 	b.Assert(ast.Val().IsString())
-	return ast.Val().String()
+	return ast.Val().StringEx()
 }
 func ZendAstCreateZnode(node *Znode) *ZendAst {
 	lineno := uint32(CG__().GetZendLineno())
@@ -79,7 +79,7 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 			faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 		}
 	case types.IsString:
-		result.Array().SymtableUpdate(offset.String().GetStr(), expr)
+		result.Array().SymtableUpdate(offset.StringEx().GetStr(), expr)
 	case types.IsNull:
 		result.Array().SymtableUpdate(types.NewString("").GetStr(), expr)
 	case types.IsLong:

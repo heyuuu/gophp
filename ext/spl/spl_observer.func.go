@@ -31,7 +31,7 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *SplObjectStorage, this
 		zend.ZendCallMethodWith1Params(this, intern.GetStd().GetCe(), intern.GetFptrGetHash(), "getHash", &rv, obj)
 		if !(rv.IsUndef()) {
 			if rv.IsString() {
-				*key = types.StrKey(rv.StringVal())
+				*key = types.StrKey(rv.String())
 				return types.SUCCESS
 			} else {
 				faults.ThrowException(spl_ce_RuntimeException, "Hash needs to be a string", 0)
@@ -805,7 +805,7 @@ func SplMultipleIteratorGetAll(intern *SplObjectStorage, get_type int, return_va
 			case types.IsLong:
 				zend.AddIndexZval(return_value, element.GetInf().Long(), &retval)
 			case types.IsString:
-				return_value.Array().SymtableUpdate(element.GetInf().String().GetStr(), &retval)
+				return_value.Array().SymtableUpdate(element.GetInf().StringEx().GetStr(), &retval)
 			default:
 				// zend.ZvalPtrDtor(&retval)
 				faults.ThrowException(spl_ce_InvalidArgumentException, "Sub-Iterator is associated with NULL", 0)

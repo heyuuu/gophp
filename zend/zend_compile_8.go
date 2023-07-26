@@ -388,7 +388,7 @@ func (compiler *Compiler) CompileInstanceof(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOpTmp(result, ZEND_INSTANCEOF, &obj_node, nil)
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
+		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().StringEx()))
 		opline.SetExtendedValue(ZendAllocCacheSlot())
 	} else {
 		opline.SetOp2Type(class_node.GetOpType())
@@ -721,7 +721,7 @@ func (compiler *Compiler) CompileEncapsList(result *Znode, ast *ZendAst) {
 		compiler.CompileExpr(&elem_node, list.Children()[i])
 		if elem_node.GetOpType() == IS_CONST {
 			operators.ConvertToString(elem_node.GetConstant())
-			if elem_node.GetConstant().String().GetLen() == 0 {
+			if elem_node.GetConstant().StringEx().GetLen() == 0 {
 				// ZvalPtrDtor(elem_node.GetConstant())
 			} else if last_const_node.GetOpType() == IS_CONST {
 				operators.ConcatFunction(last_const_node.GetConstant(), last_const_node.GetConstant(), elem_node.GetConstant())

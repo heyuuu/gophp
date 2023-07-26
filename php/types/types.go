@@ -155,6 +155,37 @@ func (zv *Zval) IsConstantAst() bool        { _, ok := zv.v.(*ZendAstRef); retur
 func (zv *Zval) IsIndirect() bool           { _, ok := zv.v.(Indirect); return ok }
 func (zv *Zval) IsError() bool              { return zv.v == IsError }
 
-// wrapper zval value
+// 返回是否为 undef、null、false，用于快速类型判断
+func (zv *Zval) IsSignFalse() bool { return zv.Type() <= IsFalse }
+
+// 返回是否为 undef、null、false 或 true，用于快速类型判断
+func (zv *Zval) IsSignType() bool { return zv.Type() <= IsTrue }
+
+func zvalValue[T any](zv *Zval) T {
+	if v, ok := zv.v.(T); ok {
+		return v
+	}
+	panic("Get Zval value by a mismatched type")
+}
+func (zv *Zval) Long() int           { return zvalValue[int](zv) }
+func (zv *Zval) Double() float64     { return zvalValue[float64](zv) }
+func (zv *Zval) String() string      { return zvalValue[string](zv) }
+func (zv *Zval) StringEx() *String   { return NewString(zv.String()) }
+func (zv *Zval) Array() *Array       { return zvalValue[*Array](zv) }
+func (zv *Zval) Object() *Object     { return zvalValue[*Object](zv) }
+func (zv *Zval) Resource() *Resource { return zvalValue[*Resource](zv) }
+func (zv *Zval) Ref() *Reference     { return zvalValue[*Reference](zv) }
+
+func (zv *Zval) ConstantAst() *ZendAstRef { return zvalValue[*ZendAstRef](zv) }
+func (zv *Zval) Indirect() *Zval          { return zvalValue[Indirect](zv) }
+func (zv *Zval) Ptr() any                 { return zvalValue[Ptr](zv) }
+func (zv *Zval) Class() *ClassEntry       { return zvalValue[*ClassEntry](zv) }
+func (zv *Zval) Func() IFunction          { return zvalValue[IFunction](zv) }
+
+// fast property
+func (zv *Zval) ResourceHandle() int { return zv.Resource().GetHandle() }
+func (zv *Zval) ResourceType() int   { return zv.Resource().GetType() }
+
+/* wrapper zval value */
 type Indirect *Zval
 type Ptr any

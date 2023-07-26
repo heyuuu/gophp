@@ -11,7 +11,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, stri
 	var ret bool
 	var value types.Zval
 	types.ZVAL_COPY(&value, orig_value)
-	ret = ZendVerifyRefAssignableZval(variable_ptr.Reference(), &value, strict)
+	ret = ZendVerifyRefAssignableZval(variable_ptr.Ref(), &value, strict)
 	variable_ptr = types.Z_REFVAL_P(variable_ptr)
 	if ret != 0 {
 		types.ZVAL_COPY_VALUE(variable_ptr, &value)
@@ -20,7 +20,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, stri
 }
 func ZendVerifyPropAssignableByRef(prop_info *types.PropertyInfo, orig_val *types.Zval, strict bool) bool {
 	var val *types.Zval = orig_val
-	if val.IsRef() && ZEND_REF_HAS_TYPE_SOURCES(val.Reference()) {
+	if val.IsRef() && ZEND_REF_HAS_TYPE_SOURCES(val.Ref()) {
 		var result int
 		val = types.Z_REFVAL_P(val)
 		result = IZendVerifyTypeAssignableZval(prop_info.GetType(), prop_info.GetCe(), val, strict)
@@ -28,7 +28,7 @@ func ZendVerifyPropAssignableByRef(prop_info *types.PropertyInfo, orig_val *type
 			return 1
 		}
 		if result < 0 {
-			var ref_prop *types.PropertyInfo = ZEND_REF_FIRST_SOURCE(orig_val.Reference())
+			var ref_prop *types.PropertyInfo = ZEND_REF_FIRST_SOURCE(orig_val.Ref())
 			if prop_info.GetType().Code() != ref_prop.GetType().Code() {
 
 				/* Invalid due to conflicting coercion */

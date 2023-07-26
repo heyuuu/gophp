@@ -126,7 +126,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 	var runtime_resolution = compiler.CompileFunctionName(&name_node, name_ast)
 	if runtime_resolution {
 		if ascii.StrCaseEquals(ZendAstGetStrVal(name_ast), "assert") {
-			compiler.CompileAssert(result, args_ast.AsAstList(), name_node.GetConstant().String(), nil)
+			compiler.CompileAssert(result, args_ast.AsAstList(), name_node.GetConstant().StringEx(), nil)
 		} else {
 			compiler.CompileNsCall(result, &name_node, args_ast)
 		}
@@ -136,7 +136,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 	var lcname *types.String
 	var fbc types.IFunction
 	var opline *types.ZendOp
-	lcname = operators.ZendStringTolower(name.String())
+	lcname = operators.ZendStringTolower(name.StringEx())
 
 	fbc = CG__().FunctionTable().Get(lcname.GetStr())
 	if fbc != nil && lcname.GetStr() == "assert" {
@@ -182,7 +182,7 @@ func (compiler *Compiler) CompileMethodCall(result *Znode, ast *ZendAst, type_ u
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(method_node.GetConstant().String()))
+		opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(method_node.GetConstant().StringEx()))
 		opline.GetResult().SetNum(ZendAllocCacheSlots(2))
 	} else {
 		opline.SetOp2Type(method_node.GetOpType())
@@ -226,7 +226,7 @@ func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ u
 		if !name.IsString() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
-		if ZendIsConstructor(name.String()) != 0 {
+		if ZendIsConstructor(name.StringEx()) != 0 {
 			// ZvalPtrDtor(name)
 			method_node.SetOpType(IS_UNUSED)
 		}
@@ -236,7 +236,7 @@ func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ u
 	ZendSetClassNameOp1(opline, &class_node)
 	if method_node.GetOpType() == IS_CONST {
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(method_node.GetConstant().String()))
+		opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(method_node.GetConstant().StringEx()))
 		opline.GetResult().SetNum(ZendAllocCacheSlots(2))
 	} else {
 		if opline.GetOp1Type() == IS_CONST {
@@ -295,7 +295,7 @@ func (compiler *Compiler) CompileNew(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOp(result, ZEND_NEW, nil, nil)
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp1Type(IS_CONST)
-		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
+		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().StringEx()))
 		opline.GetOp2().SetNum(ZendAllocCacheSlot())
 	} else {
 		opline.SetOp1Type(class_node.GetOpType())
@@ -612,11 +612,11 @@ func (compiler *Compiler) ResolveGotoLabel(op_array *types.ZendOpArray, opline *
 	var label *types.Zval
 	var opnum uint32 = opline - op_array.GetOpcodes()
 	label = CT_CONSTANT_EX(op_array, opline.GetOp2().GetConstant())
-	if dest = CG__().GetContext().GetLabel(label.StringVal()); dest == nil {
+	if dest = CG__().GetContext().GetLabel(label.String()); dest == nil {
 		CG__().SetInCompilation(1)
 		CG__().SetActiveOpArray(op_array)
 		compiler.setLinenoByOpline(opline)
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'goto' to undefined label '%s'", label.String().GetVal())
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'goto' to undefined label '%s'", label.StringEx().GetVal())
 	}
 
 	label.SetNull()

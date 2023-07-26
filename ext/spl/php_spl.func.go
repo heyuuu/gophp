@@ -38,7 +38,7 @@ func ZifClassParents(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*types.A
 	if instance.IsObject() {
 		ce = instance.Object().GetCe()
 	} else if instance.IsString() {
-		ce = SplFindCeByName(instance.StringVal(), autoload)
+		ce = SplFindCeByName(instance.String(), autoload)
 		if ce == nil {
 			return nil, false
 		}
@@ -62,7 +62,7 @@ func ZifClassImplements(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*type
 	if instance.IsObject() {
 		ce = instance.Object().GetCe()
 	} else if instance.IsString() {
-		ce = SplFindCeByName(instance.StringVal(), autoload)
+		ce = SplFindCeByName(instance.String(), autoload)
 		if ce == nil {
 			return nil, false
 		}
@@ -82,7 +82,7 @@ func ZifClassUses(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*types.Arra
 	if instance.IsObject() {
 		ce = instance.Object().GetCe()
 	} else if instance.IsString() {
-		ce = SplFindCeByName(instance.StringVal(), autoload)
+		ce = SplFindCeByName(instance.String(), autoload)
 		if ce == nil {
 			return nil, false
 		}
@@ -527,7 +527,7 @@ func PhpSplObjectHash(obj *types.Zval) string {
 func buildClassListString(arr *types.Array) string {
 	names := make([]string, 0, arr.Len())
 	arr.Foreach(func(key types.ArrayKey, value *types.Zval) {
-		names = append(names, value.StringVal())
+		names = append(names, value.String())
 	})
 	return strings.Join(names, ", ")
 }

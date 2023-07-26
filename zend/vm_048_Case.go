@@ -43,7 +43,7 @@ func caseHandlerHelper(op1 *types.Zval, op2 *types.Zval, executeData *ZendExecut
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result = operators.ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
+			var result = operators.ZendFastEqualStringsEx(op1.String(), op2.String())
 			if result {
 				goto caseTrue
 			} else {

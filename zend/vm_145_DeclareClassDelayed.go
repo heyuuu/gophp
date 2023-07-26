@@ -14,8 +14,8 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 		lcname = opline.Const1()
 		var lcname1 *types.Zval = lcname + 1
 
-		lcnameStr := lcname.StringVal()
-		lcname1Str := lcname1.StringVal()
+		lcnameStr := lcname.String()
+		lcname1Str := lcname1.String()
 
 		if EG__().ClassTable().Exists(lcname1Str) {
 			ce = EG__().ClassTable().Get(lcname1Str)
@@ -26,7 +26,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 			}
 
 			//
-			if ZendDoLinkClass(ce, opline.Const2().String()) == types.FAILURE {
+			if ZendDoLinkClass(ce, opline.Const2().StringEx()) == types.FAILURE {
 				return 0
 			}
 

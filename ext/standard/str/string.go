@@ -753,7 +753,7 @@ func posSubstr(str string, offset int) (string, bool) {
 }
 func parseNeedle(needle *types.Zval) (string, bool) {
 	if needle.IsString() {
-		return needle.StringVal(), true
+		return needle.String(), true
 	} else {
 		/*
 		 * 在 PHP 8.0.0 之前，如果 needle 不是字符串，它将被转换为整数并作为字符的序数值应用。
@@ -999,7 +999,7 @@ func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length
 			replStr = ""
 		}
 	} else {
-		replStr = replace.StringVal()
+		replStr = replace.String()
 	}
 
 	res := substrReplaceSingle(str, replStr, start.Long(), l)
@@ -1065,7 +1065,7 @@ func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval
 				replStr = replaceStr[idx]
 			}
 		} else {
-			replStr = replace.StringVal()
+			replStr = replace.String()
 		}
 
 		ret := substrReplaceSingle(origStr, replStr, f, l)
@@ -1098,7 +1098,7 @@ func ZifSubstrReplace(returnValue zpp.Ret, str *types.Zval, replace *types.Zval,
 	}
 
 	if str.IsString() {
-		res := substrReplaceStr(str.StringVal(), replace, start, length)
+		res := substrReplaceStr(str.String(), replace, start, length)
 		returnValue.SetString(res)
 		return
 	} else {
@@ -1378,7 +1378,7 @@ func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, boo
 			// unreachable, 触发 fatal error
 			return "", false
 		}
-		return Strtr(str, from.StringVal(), *to_), true
+		return Strtr(str, from.String(), *to_), true
 	}
 }
 
@@ -1505,11 +1505,11 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 		return result, replaceCount
 	} else {
 		b.Assert(search.IsString())
-		searchStr := search.StringVal()
+		searchStr := search.String()
 		if searchStr == "" {
 			return subject, 0
 		}
-		replaceStr := replace.StringVal()
+		replaceStr := replace.String()
 
 		if len(searchStr) == 1 {
 			return PhpCharToStr(subject, searchStr[0], replaceStr, caseSensitivity)
@@ -2036,7 +2036,7 @@ func ZifStripTags(str string, _ zpp.Opt, allowableTags *types.Zval) string {
 		} else {
 			/* To maintain a certain BC, we allow anything for the second parameter and return original string */
 			operators.ConvertToString(allow)
-			allowTagsStr = allowableTags.StringVal()
+			allowTagsStr = allowableTags.String()
 		}
 	}
 

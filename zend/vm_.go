@@ -156,7 +156,7 @@ func getIsEqualHandler(executeData *ZendExecuteData) int {
 		}
 		result = d1 == d2
 	case operators.TypePair(types.IsString, types.IsString):
-		result = operators.ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
+		result = operators.ZendFastEqualStringsEx(op1.String(), op2.String())
 	default:
 		return zend_is_equal_helper_SPEC(op1, op2, executeData)
 	}
@@ -207,7 +207,7 @@ func getIsNotEqualHandler(executeData *ZendExecuteData) int {
 		}
 		result = d1 != d2
 	case operators.TypePair(types.IsString, types.IsString):
-		result = !operators.ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
+		result = !operators.ZendFastEqualStringsEx(op1.String(), op2.String())
 	default:
 		return zend_is_not_equal_helper_SPEC(op1, op2, executeData)
 	}

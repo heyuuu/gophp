@@ -143,12 +143,12 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		/* Check if function with given name exists.
 		 * This may be a compound name that includes namespace name */
 
-		if callable.String().GetStr()[0] == '\\' {
+		if callable.StringEx().GetStr()[0] == '\\' {
 			/* Skip leading \ */
-			lmname := ascii.StrToLower(callable.StringVal()[1:])
+			lmname := ascii.StrToLower(callable.String()[1:])
 			func_ = ZendFetchFunctionStr(lmname)
 		} else {
-			lmname := callable.StringVal()
+			lmname := callable.String()
 			func_ = ZendFetchFunctionStr(lmname)
 			if func_ == nil {
 				lmname = ascii.StrToLower(lmname)
@@ -163,12 +163,12 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 
 	/* Split name into class/namespace and method/function names */
 
-	if lang.Assign(&colon, operators.ZendMemrchr(callable.String().GetVal(), ':', callable.String().GetLen())) != nil && colon > callable.String().GetVal() && (*(colon - 1)) == ':' {
+	if lang.Assign(&colon, operators.ZendMemrchr(callable.StringEx().GetVal(), ':', callable.StringEx().GetLen())) != nil && colon > callable.StringEx().GetVal() && (*(colon - 1)) == ':' {
 		var mlen int
 		colon--
-		clen = colon - callable.String().GetVal()
-		mlen = callable.String().GetLen() - clen - 2
-		if colon == callable.String().GetVal() {
+		clen = colon - callable.StringEx().GetVal()
+		mlen = callable.StringEx().GetLen() - clen - 2
+		if colon == callable.StringEx().GetVal() {
 			if error != nil {
 				*error = Estrdup("invalid function name")
 			}
@@ -183,7 +183,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		} else {
 			scope = ZendGetExecutedScope()
 		}
-		cname = types.NewString(b.CastStr(callable.String().GetVal(), clen))
+		cname = types.NewString(b.CastStr(callable.StringEx().GetVal(), clen))
 		if ZendIsCallableCheckClass(cname, scope, fcc, &strict_class, error) == 0 {
 			// types.ZendStringReleaseEx(cname, 0)
 			return 0
@@ -196,12 +196,12 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			}
 			return 0
 		}
-		mname = types.NewString(b.CastStr(callable.String().GetVal()+clen+2, mlen))
+		mname = types.NewString(b.CastStr(callable.StringEx().GetVal()+clen+2, mlen))
 	} else if ce_org != nil {
 
 		/* Try to fetch find static method of given class. */
 
-		mname = callable.String()
+		mname = callable.StringEx()
 		//mname.AddRefcount()
 		ftable = ce_org.FunctionTable()
 		fcc.SetCallingScope(ce_org)
@@ -210,7 +210,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		/* We already checked for plain function before. */
 
 		if error != nil && (check_flags&IS_CALLABLE_CHECK_SILENT) == 0 {
-			*error = ZendSprintf("function '%s' not found or invalid function name", callable.String().GetVal())
+			*error = ZendSprintf("function '%s' not found or invalid function name", callable.StringEx().GetVal())
 		}
 		return 0
 	}
@@ -360,9 +360,9 @@ func ZendGetCallableNameEx(callable *types.Zval, object *types.Object) string {
 	switch callable.Type() {
 	case types.IsString:
 		if object != nil {
-			return ZendCreateMethodString(object.GetCe().Name(), callable.StringVal())
+			return ZendCreateMethodString(object.GetCe().Name(), callable.String())
 		}
-		return callable.StringVal()
+		return callable.String()
 	case types.IsArray:
 		var method *types.Zval = nil
 		var obj *types.Zval = nil
@@ -374,9 +374,9 @@ func ZendGetCallableNameEx(callable *types.Zval, object *types.Object) string {
 			return types.STR_ARRAY_CAPITALIZED
 		}
 		if obj.IsString() {
-			return ZendCreateMethodString(obj.StringVal(), method.StringVal())
+			return ZendCreateMethodString(obj.String(), method.String())
 		} else if obj.IsObject() {
-			return ZendCreateMethodString(obj.Object().GetCe().Name(), method.StringVal())
+			return ZendCreateMethodString(obj.Object().GetCe().Name(), method.String())
 		} else {
 			return types.STR_ARRAY_CAPITALIZED
 		}

@@ -230,7 +230,7 @@ func getConcatHandler(executeData *ZendExecuteData) int {
 
 	// fast
 	if op1.IsString() && op2.IsString() {
-		opline.Result().SetString(op1.StringVal() + op2.StringVal())
+		opline.Result().SetString(op1.String() + op2.String())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 

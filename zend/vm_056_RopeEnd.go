@@ -13,7 +13,7 @@ func ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	rope = ([]*types.String)(opline.Op1())
 	{
 		var_ = opline.Const2()
-		rope[opline.GetExtendedValue()] = var_.String()
+		rope[opline.GetExtendedValue()] = var_.StringEx()
 	}
 
 	var retStr string
@@ -32,7 +32,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	{
 		var_ = opline.Op2()
 		if var_.IsString() {
-			rope[opline.GetExtendedValue()] = var_.String().Copy()
+			rope[opline.GetExtendedValue()] = var_.StringEx().Copy()
 		} else {
 			if var_.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
@@ -62,7 +62,7 @@ func ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	{
 		var_ = opline.Op2()
 		if var_.IsString() {
-			rope[opline.GetExtendedValue()] = var_.String().Copy()
+			rope[opline.GetExtendedValue()] = var_.StringEx().Copy()
 		} else {
 			if var_.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)

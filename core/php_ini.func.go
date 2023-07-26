@@ -120,18 +120,18 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		/* PHP and Zend extensions are not added into configuration hash! */
 
-		if IsSpecialSection == 0 && !(strcasecmp(arg1.String().GetVal(), PHP_EXTENSION_TOKEN)) {
-			extension_name = zend.Estrndup(arg2.String().GetVal(), arg2.String().GetLen())
+		if IsSpecialSection == 0 && !(strcasecmp(arg1.StringEx().GetVal(), PHP_EXTENSION_TOKEN)) {
+			extension_name = zend.Estrndup(arg2.StringEx().GetVal(), arg2.StringEx().GetLen())
 			ExtensionLists.GetFunctions().AddElement(&extension_name)
-		} else if IsSpecialSection == 0 && !(strcasecmp(arg1.String().GetVal(), ZEND_EXTENSION_TOKEN)) {
-			extension_name = zend.Estrndup(arg2.String().GetVal(), arg2.String().GetLen())
+		} else if IsSpecialSection == 0 && !(strcasecmp(arg1.StringEx().GetVal(), ZEND_EXTENSION_TOKEN)) {
+			extension_name = zend.Estrndup(arg2.StringEx().GetVal(), arg2.StringEx().GetLen())
 			ExtensionLists.GetEngine().AddElement(&extension_name)
 		} else {
 
 			/* Store in active hash */
 
-			entry = active_hash.KeyUpdate(arg1.String().GetStr(), arg2)
-			entry.SetString(entry.StringVal())
+			entry = active_hash.KeyUpdate(arg1.StringEx().GetStr(), arg2)
+			entry.SetString(entry.String())
 		}
 
 		/* PHP and Zend extensions are not added into configuration hash! */
@@ -151,25 +151,25 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if lang.Assign(&find_arr, active_hash.KeyFind(arg1.String().GetStr())) == nil || !find_arr.IsArray() {
+		if lang.Assign(&find_arr, active_hash.KeyFind(arg1.StringEx().GetStr())) == nil || !find_arr.IsArray() {
 			option_arr.SetArray(types.NewArray(8))
-			find_arr = active_hash.KeyUpdate(arg1.String().GetStr(), &option_arr)
+			find_arr = active_hash.KeyUpdate(arg1.StringEx().GetStr(), &option_arr)
 		}
 
 		/* arg3 is possible option offset name */
 
-		if arg3 != nil && arg3.String().GetLen() > 0 {
-			entry = find_arr.Array().SymtableUpdate(arg3.String().GetStr(), arg2)
+		if arg3 != nil && arg3.StringEx().GetLen() > 0 {
+			entry = find_arr.Array().SymtableUpdate(arg3.StringEx().GetStr(), arg2)
 		} else {
 			entry = find_arr.Array().Append(arg2)
 		}
-		entry.SetString(entry.StringVal())
+		entry.SetString(entry.String())
 	case zend.ZEND_INI_PARSER_SECTION:
 		var key string
 		/* PATH sections */
-		lcArg1 := ascii.StrToUpper(arg1.StringVal())
+		lcArg1 := ascii.StrToUpper(arg1.String())
 		if strings.HasPrefix(lcArg1, "path") {
-			key = arg1.StringVal()[4:]
+			key = arg1.String()[4:]
 			IsSpecialSection = 1
 			HasPerDirConfig = 1
 		} else if strings.HasPrefix(lcArg1, "host") {
@@ -398,7 +398,7 @@ func PhpInitConfig() int {
 		var tmp types.Zval
 		tmp.SetStringEx(types.NewString(fh.GetFilename()))
 		Config().Set("cfg_file_path", fh.GetFilename())
-		PhpIniOpenedPath = zend.ZendStrndup(tmp.String().GetVal(), tmp.String().GetLen())
+		PhpIniOpenedPath = zend.ZendStrndup(tmp.StringEx().GetVal(), tmp.StringEx().GetLen())
 	}
 
 	/* Check for PHP_INI_SCAN_DIR environment variable to override/set config file scan directory */
@@ -570,7 +570,7 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.A
 func PhpIniActivateConfig(source_hash *types.Array, modify_type int, stage int) {
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */
 	source_hash.Foreach(func(key types.ArrayKey, data *types.Zval) {
-		zend.ZendAlterIniEntryEx(key.StrKey(), data.String(), modify_type, stage, 0)
+		zend.ZendAlterIniEntryEx(key.StrKey(), data.StringEx(), modify_type, stage, 0)
 	})
 }
 func PhpIniHasPerDirConfig() int { return HasPerDirConfig }

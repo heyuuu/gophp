@@ -834,7 +834,7 @@ func zim_spl_RecursiveTreeIterator_current(executeData *zend.ZendExecuteData, re
 	}
 	SplRecursiveTreeIteratorGetPostfix(object, &postfix)
 
-	str := prefix.StringVal() + entry.StringVal() + postfix.StringVal()
+	str := prefix.String() + entry.String() + postfix.String()
 	return_value.SetString(str)
 	return
 }
@@ -867,7 +867,7 @@ func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return
 	SplRecursiveTreeIteratorGetPrefix(object, &prefix)
 	SplRecursiveTreeIteratorGetPostfix(object, &postfix)
 
-	str := prefix.StringVal() + key.StringVal() + postfix.StringVal()
+	str := prefix.String() + key.String() + postfix.String()
 	return_value.SetString(str)
 	return
 }
@@ -1970,7 +1970,7 @@ func zim_spl_CachingIterator___toString(executeData *zend.ZendExecuteData, retur
 		return
 	}
 	if intern.GetZstr().IsString() {
-		return_value.SetString(intern.GetZstr().String().GetStr())
+		return_value.SetString(intern.GetZstr().StringEx().GetStr())
 		return
 	} else {
 		return_value.SetString("")

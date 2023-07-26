@@ -47,7 +47,7 @@ func (zv *Zval) CopyOrDupPropFrom(v *Zval) {
 // ZVAL_DEREF(zv)
 func (zv *Zval) DeRef() *Zval {
 	if zv.IsRef() {
-		return zv.Reference().GetVal()
+		return zv.Ref().GetVal()
 	}
 	return zv
 }

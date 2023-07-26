@@ -25,7 +25,7 @@ func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, strict bo
 	for {
 		if variable_ptr.IsRefcounted() {
 			if variable_ptr.IsRef() {
-				if ZEND_REF_HAS_TYPE_SOURCES(variable_ptr.Reference()) {
+				if ZEND_REF_HAS_TYPE_SOURCES(variable_ptr.Ref()) {
 					return ZendAssignToTypedRef(variable_ptr, value, strict)
 				}
 				variable_ptr = types.Z_REFVAL_P(variable_ptr)

@@ -111,7 +111,7 @@ func GetIntVal(op *types.Zval) int {
 	case types.IsDouble:
 		return int(op.Double())
 	case types.IsString:
-		var val int = atoi(op.String().GetVal())
+		var val int = atoi(op.StringEx().GetVal())
 		//types.ZendStringFree(op.String())
 		return val
 	default:

@@ -97,7 +97,7 @@ func ZendResolveClassNameAst(ast *ZendAst) *types.String {
 	if !class_name.IsString() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
-	resolveName := ZendResolveClassName(class_name.StringVal(), ast.Attr())
+	resolveName := ZendResolveClassName(class_name.String(), ast.Attr())
 	return types.NewString(resolveName)
 }
 func ZendAddTryElement(try_op uint32) uint32 {
@@ -149,22 +149,22 @@ func DoBindFunction(lcname *types.Zval) int {
 	var function types.IFunction
 	var rtd_key *types.Zval
 	rtd_key = lcname + 1
-	function = EG__().FunctionTable().Get(rtd_key.StringVal())
+	function = EG__().FunctionTable().Get(rtd_key.String())
 	if function == nil {
-		DoBindFunctionError(lcname.StringVal(), nil, false)
+		DoBindFunctionError(lcname.String(), nil, false)
 		return types.FAILURE
 	}
 
-	if EG__().FunctionTable().Exists(lcname.StringVal()) {
-		DoBindFunctionError(lcname.StringVal(), function.GetOpArray(), false)
+	if EG__().FunctionTable().Exists(lcname.String()) {
+		DoBindFunctionError(lcname.String(), function.GetOpArray(), false)
 		return types.FAILURE
 	}
 
 	if function.IsPreloaded() && !CG__().IsCompilePreload() {
-		EG__().FunctionTable().Add(lcname.StringVal(), function)
+		EG__().FunctionTable().Add(lcname.String(), function)
 	} else {
-		EG__().FunctionTable().Del(rtd_key.StringVal())
-		EG__().FunctionTable().Add(lcname.StringVal(), function)
+		EG__().FunctionTable().Del(rtd_key.String())
+		EG__().FunctionTable().Add(lcname.String(), function)
 	}
 	return types.SUCCESS
 }
@@ -324,7 +324,7 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	if !class_name.IsString() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
-	fetch_type = ZendGetClassFetchType(class_name.String().GetStr())
+	fetch_type = ZendGetClassFetchType(class_name.StringEx().GetStr())
 	ZendEnsureValidClassFetchType(fetch_type)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:

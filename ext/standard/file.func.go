@@ -463,10 +463,10 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		operators.ConvertToStringEx(data)
 		fallthrough
 	case types.IsString:
-		if data.String().GetLen() != 0 {
-			numbytes = core.PhpStreamWrite(stream, data.String().GetVal(), data.String().GetLen())
-			if numbytes != data.String().GetLen() {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.String().GetLen())
+		if data.StringEx().GetLen() != 0 {
+			numbytes = core.PhpStreamWrite(stream, data.StringEx().GetVal(), data.StringEx().GetLen())
+			if numbytes != data.StringEx().GetLen() {
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.StringEx().GetLen())
 				numbytes = -1
 			}
 		}

@@ -113,10 +113,10 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 
 		/* First, locate the function. */
 
-		fbc = obj.GetMethod(function_name.StringVal(), opline.Const2()+1)
+		fbc = obj.GetMethod(function_name.String(), opline.Const2()+1)
 		if fbc == nil {
 			if EG__().GetException() == nil {
-				ZendUndefinedMethod(obj.GetCe(), function_name.String())
+				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
 		}
@@ -210,10 +210,10 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		var orig_obj *types.Object = obj
 		/* First, locate the function. */
 
-		fbc = obj.GetMethod(function_name.StringVal(), nil)
+		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
 			if EG__().GetException() == nil {
-				ZendUndefinedMethod(obj.GetCe(), function_name.String())
+				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
 		}
@@ -303,10 +303,10 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 		var orig_obj *types.Object = obj
 		/* First, locate the function. */
 
-		fbc = obj.GetMethod(function_name.StringVal(), nil)
+		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
 			if EG__().GetException() == nil {
-				ZendUndefinedMethod(obj.GetCe(), function_name.String())
+				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
 		}
@@ -362,10 +362,10 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 
 		/* First, locate the function. */
 
-		fbc = obj.GetMethod(function_name.StringVal(), opline.Const2()+1)
+		fbc = obj.GetMethod(function_name.String(), opline.Const2()+1)
 		if fbc == nil {
 			if EG__().GetException() == nil {
-				ZendUndefinedMethod(obj.GetCe(), function_name.String())
+				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
 		}
@@ -438,7 +438,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		var orig_obj *types.Object = obj
 		/* First, locate the function. */
 
-		fbc = obj.GetMethod(function_name.StringVal(), nil)
+		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
@@ -504,10 +504,10 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 
 	{
 		/* First, locate the function. */
-		fbc = obj.GetMethod(function_name.StringVal(), nil)
+		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
 			if EG__().GetException() == nil {
-				ZendUndefinedMethod(obj.GetCe(), function_name.String())
+				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
 		}
@@ -583,10 +583,10 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 
 		/* First, locate the function. */
 
-		fbc = obj.GetMethod(function_name.StringVal(), opline.Const2()+1)
+		fbc = obj.GetMethod(function_name.String(), opline.Const2()+1)
 		if fbc == nil {
 			if EG__().GetException() == nil {
-				ZendUndefinedMethod(obj.GetCe(), function_name.String())
+				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
 		}
@@ -690,10 +690,10 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	{
 		var orig_obj *types.Object = obj
 		/* First, locate the function. */
-		fbc = obj.GetMethod(function_name.StringVal(), nil)
+		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
 			if EG__().GetException() == nil {
-				ZendUndefinedMethod(obj.GetCe(), function_name.String())
+				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
 		}
@@ -782,7 +782,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 		var orig_obj *types.Object = obj
 		/* First, locate the function. */
 
-		fbc = obj.GetMethod(function_name.StringVal(), nil)
+		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())

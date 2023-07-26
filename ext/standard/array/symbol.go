@@ -90,7 +90,7 @@ func PhpExtractRefIfExists(arr *types.Array, symbolTable *types.Array) zend.Zend
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)
 			}
-			origVar.SetReference(entry.Reference())
+			origVar.SetReference(entry.Ref())
 			return 1
 		}
 		return 0
@@ -148,7 +148,7 @@ func PhpExtractRefOverwrite(arr *types.Array, symbolTable *types.Array) zend.Zen
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)
 			}
-			origVar.SetReference(entry.Reference())
+			origVar.SetReference(entry.Ref())
 		} else {
 			if entry.IsRef() {
 				// entry.AddRefcount()
@@ -203,12 +203,12 @@ func PhpExtractRefPrefixIfExists(arr *types.Array, symbolTable *types.Array, pre
 					} else {
 						types.ZVAL_MAKE_REF_EX(entry, 2)
 					}
-					origVar.SetReference(entry.Reference())
+					origVar.SetReference(entry.Ref())
 					count++
 					return true
 				}
 			}
-			finalName := prefixVarName(prefix.StringVal(), varName)
+			finalName := prefixVarName(prefix.String(), varName)
 			if isValidVarName(finalName) {
 				if finalName == "this" {
 					faults.ThrowError(nil, "Cannot re-assign $this")
@@ -225,7 +225,7 @@ func PhpExtractRefPrefixIfExists(arr *types.Array, symbolTable *types.Array, pre
 						if origVar2.IsIndirect() {
 							origVar2 = origVar2.Indirect()
 						}
-						origVar2.SetReference(entry.Reference())
+						origVar2.SetReference(entry.Ref())
 					} else {
 						symbolTable.KeyAddNew(finalName, entry)
 					}
@@ -255,7 +255,7 @@ func PhpExtractPrefixIfExists(arr *types.Array, symbolTable *types.Array, prefix
 					return true
 				}
 			}
-			finalName := prefixVarName(prefix.StringVal(), varName)
+			finalName := prefixVarName(prefix.String(), varName)
 			if isValidVarName(finalName) {
 				if finalName == "this" {
 					faults.ThrowError(nil, "Cannot re-assign $this")
@@ -305,7 +305,7 @@ func PhpExtractRefPrefixSame(arr *types.Array, symbolTable *types.Array, prefix 
 					} else {
 						types.ZVAL_MAKE_REF_EX(entry, 2)
 					}
-					origVar.SetReference(entry.Reference())
+					origVar.SetReference(entry.Ref())
 					count++
 					return true
 				}
@@ -328,7 +328,7 @@ func PhpExtractRefPrefixSame(arr *types.Array, symbolTable *types.Array, prefix 
 			return true
 		}
 	prefix:
-		finalName := prefixVarName(prefix.StringVal(), varName)
+		finalName := prefixVarName(prefix.String(), varName)
 		if isValidVarName(finalName) {
 			if finalName == "this" {
 				faults.ThrowError(nil, "Cannot re-assign $this")
@@ -344,7 +344,7 @@ func PhpExtractRefPrefixSame(arr *types.Array, symbolTable *types.Array, prefix 
 					if origVar2.IsIndirect() {
 						origVar2 = origVar2.Indirect()
 					}
-					origVar.SetReference(entry.Reference())
+					origVar.SetReference(entry.Ref())
 				} else {
 					symbolTable.KeyAddNew(finalName, entry)
 				}
@@ -382,7 +382,7 @@ func PhpExtractPrefixSame(arr *types.Array, symbolTable *types.Array, prefix *ty
 			return 1
 		}
 	prefix:
-		finalName := prefixVarName(prefix.StringVal(), varName)
+		finalName := prefixVarName(prefix.String(), varName)
 		if isValidVarName(finalName) {
 			if finalName == "this" {
 				faults.ThrowError(nil, "Cannot re-assign $this")
@@ -410,9 +410,9 @@ func PhpExtractRefPrefixAll(arr *types.Array, symbolTable *types.Array, prefix *
 	return phpExtractEx(arr, func(key types.ArrayKey, entry *types.Zval) int {
 		var finalName string
 		if key.IsStrKey() {
-			finalName = prefixVarName(prefix.StringVal(), key.StrKey())
+			finalName = prefixVarName(prefix.String(), key.StrKey())
 		} else {
-			finalName = prefixVarName(prefix.StringVal(), strconv.Itoa(key.IdxKey()))
+			finalName = prefixVarName(prefix.String(), strconv.Itoa(key.IdxKey()))
 		}
 
 		if isValidVarName(finalName) {
@@ -429,7 +429,7 @@ func PhpExtractRefPrefixAll(arr *types.Array, symbolTable *types.Array, prefix *
 					if origVar.IsIndirect() {
 						origVar = origVar.Indirect()
 					}
-					origVar.SetReference(entry.Reference())
+					origVar.SetReference(entry.Ref())
 				} else {
 					symbolTable.KeyAddNew(finalName, entry)
 				}
@@ -443,9 +443,9 @@ func PhpExtractPrefixAll(arr *types.Array, symbolTable *types.Array, prefix *typ
 	return phpExtractEx(arr, func(key types.ArrayKey, entry *types.Zval) int {
 		var finalName string
 		if key.IsStrKey() {
-			finalName = prefixVarName(prefix.StringVal(), key.StrKey())
+			finalName = prefixVarName(prefix.String(), key.StrKey())
 		} else {
-			finalName = prefixVarName(prefix.StringVal(), strconv.Itoa(key.IdxKey()))
+			finalName = prefixVarName(prefix.String(), strconv.Itoa(key.IdxKey()))
 		}
 
 		if isValidVarName(finalName) {
@@ -478,12 +478,12 @@ func PhpExtractRefPrefixInvalid(arr *types.Array, symbolTable *types.Array, pref
 		if key.IsStrKey() {
 			varName := key.StrKey()
 			if !isValidVarName(varName) || varName == "this" {
-				finalName = prefixVarName(prefix.StringVal(), varName)
+				finalName = prefixVarName(prefix.String(), varName)
 			} else {
 				finalName = varName
 			}
 		} else {
-			finalName = prefixVarName(prefix.StringVal(), strconv.Itoa(key.IdxKey()))
+			finalName = prefixVarName(prefix.String(), strconv.Itoa(key.IdxKey()))
 		}
 		if !isValidVarName(finalName) {
 			return 0
@@ -502,7 +502,7 @@ func PhpExtractRefPrefixInvalid(arr *types.Array, symbolTable *types.Array, pref
 				if origVar.IsIndirect() {
 					origVar = origVar.Indirect()
 				}
-				origVar.SetReference(entry.Reference())
+				origVar.SetReference(entry.Ref())
 			} else {
 				symbolTable.KeyAddNew(finalName, entry)
 			}
@@ -516,12 +516,12 @@ func PhpExtractPrefixInvalid(arr *types.Array, symbolTable *types.Array, prefix 
 		if key.IsStrKey() {
 			varName := key.StrKey()
 			if !isValidVarName(varName) || varName == "this" {
-				finalName = prefixVarName(prefix.StringVal(), varName)
+				finalName = prefixVarName(prefix.String(), varName)
 			} else {
 				finalName = varName
 			}
 		} else {
-			finalName = prefixVarName(prefix.StringVal(), strconv.Itoa(key.IdxKey()))
+			finalName = prefixVarName(prefix.String(), strconv.Itoa(key.IdxKey()))
 		}
 		if !isValidVarName(finalName) {
 			return 0
@@ -561,7 +561,7 @@ func PhpExtractRefSkip(arr *types.Array, symbolTable *types.Array) zend.ZendLong
 					} else {
 						types.ZVAL_MAKE_REF_EX(entry, 2)
 					}
-					origVar.SetReference(entry.Reference())
+					origVar.SetReference(entry.Ref())
 					return 1
 				}
 			}
@@ -618,7 +618,7 @@ func ZifExtract(array zpp.DerefArray, _ zpp.Opt, flags int, prefix *types.Zval) 
 		if operators.TryConvertToString(prefix) == 0 {
 			return 0
 		}
-		if prefix.StringVal() != "" && !isValidVarName(prefix.StringVal()) {
+		if prefix.String() != "" && !isValidVarName(prefix.String()) {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "prefix is not a valid identifier")
 			return 0
 		}
@@ -673,16 +673,16 @@ func ZifExtract(array zpp.DerefArray, _ zpp.Opt, flags int, prefix *types.Zval) 
 func PhpCompactVar(activeSymbolTable *types.Array, resultArr *types.Array, entry *types.Zval) {
 	entry = types.ZVAL_DEREF(entry)
 	if entry.IsString() {
-		if valuePtr := types.ZendHashFindInd(activeSymbolTable, entry.String().GetStr()); valuePtr != nil {
+		if valuePtr := types.ZendHashFindInd(activeSymbolTable, entry.StringEx().GetStr()); valuePtr != nil {
 			valuePtr = types.ZVAL_DEREF(valuePtr)
-			resultArr.KeyUpdate(entry.String().GetStr(), valuePtr)
-		} else if entry.StringVal() == "this" {
+			resultArr.KeyUpdate(entry.StringEx().GetStr(), valuePtr)
+		} else if entry.String() == "this" {
 			var object = zend.ZendGetThisObject(zend.CurrEX())
 			if object != nil {
-				resultArr.KeyUpdate(entry.String().GetStr(), types.NewZvalObject(object))
+				resultArr.KeyUpdate(entry.StringEx().GetStr(), types.NewZvalObject(object))
 			}
 		} else {
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "Undefined variable: %s", entry.String().GetVal())
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "Undefined variable: %s", entry.StringEx().GetVal())
 		}
 	} else if entry.IsArray() {
 		if entry.Array().IsRecursive() {

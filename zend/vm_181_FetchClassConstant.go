@@ -20,7 +20,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			} else if CACHED_PTR(opline.GetExtendedValue()) {
 				ce = CACHED_PTR(opline.GetExtendedValue())
 			} else {
-				ce = ZendFetchClassByName(opline.Const1().String(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+				ce = ZendFetchClassByName(opline.Const1().StringEx(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 				if ce == nil {
 					b.Assert(EG__().GetException() != nil)
 					opline.Result().SetUndef()
@@ -29,11 +29,11 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			}
 		}
 
-		c = ce.ConstantsTable().Get(opline.Const2().StringVal())
+		c = ce.ConstantsTable().Get(opline.Const2().String())
 		if c != nil {
 			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if !ZendVerifyConstAccess(c, scope) {
-				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().String().GetVal())
+				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().StringEx().GetVal())
 				opline.Result().SetUndef()
 				return 0
 			}
@@ -47,7 +47,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			faults.ThrowError(nil, "Undefined class constant '%s'", opline.Const2().String().GetVal())
+			faults.ThrowError(nil, "Undefined class constant '%s'", opline.Const2().StringEx().GetVal())
 			opline.Result().SetUndef()
 			return 0
 		}
@@ -75,11 +75,11 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 				break
 			}
 		}
-		c = ce.ConstantsTable().Get(opline.Const2().String().GetStr())
+		c = ce.ConstantsTable().Get(opline.Const2().StringEx().GetStr())
 		if c != nil {
 			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if !ZendVerifyConstAccess(c, scope) {
-				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().String().GetVal())
+				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().StringEx().GetVal())
 				opline.Result().SetUndef()
 				return 0
 			}
@@ -93,7 +93,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			faults.ThrowError(nil, "Undefined class constant '%s'", opline.Const2().String().GetVal())
+			faults.ThrowError(nil, "Undefined class constant '%s'", opline.Const2().StringEx().GetVal())
 			opline.Result().SetUndef()
 			return 0
 		}
@@ -125,11 +125,11 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 				break
 			}
 		}
-		c = ce.ConstantsTable().Get(opline.Const2().String().GetStr())
+		c = ce.ConstantsTable().Get(opline.Const2().StringEx().GetStr())
 		if c != nil {
 			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if !ZendVerifyConstAccess(c, scope) {
-				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().String().GetVal())
+				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().StringEx().GetVal())
 				opline.Result().SetUndef()
 				return 0
 			}
@@ -143,7 +143,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			faults.ThrowError(nil, "Undefined class constant '%s'", opline.Const2().String().GetVal())
+			faults.ThrowError(nil, "Undefined class constant '%s'", opline.Const2().StringEx().GetVal())
 			opline.Result().SetUndef()
 			return 0
 		}

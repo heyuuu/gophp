@@ -279,7 +279,7 @@ func ZendAddLiteralString(str **types.String) int {
 	zv := types.NewZvalString((*str).GetStr())
 	var ret int
 	ret = ZendAddLiteral(zv)
-	*str = zv.String()
+	*str = zv.StringEx()
 	return ret
 }
 func ZendAddFuncNameLiteral(name *types.String) int {

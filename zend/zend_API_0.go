@@ -142,7 +142,7 @@ func _ZEND_TRY_ASSIGN_NULL(zv *types.Zval, is_ref int) {
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsRef() {
-			var ref *types.Reference = _zv.Reference()
+			var ref *types.Reference = _zv.Ref()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefNull(ref)
 				break
@@ -162,7 +162,7 @@ func _ZEND_TRY_ASSIGN_LONG(zv *types.Zval, lval ZendLong, is_ref int) {
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsRef() {
-			var ref *types.Reference = _zv.Reference()
+			var ref *types.Reference = _zv.Ref()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefLong(ref, lval)
 				break
@@ -182,7 +182,7 @@ func _ZEND_TRY_ASSIGN_DOUBLE(zv *types.Zval, dval float64, is_ref int) {
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsRef() {
-			var ref *types.Reference = _zv.Reference()
+			var ref *types.Reference = _zv.Ref()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefDouble(ref, dval)
 				break
@@ -202,7 +202,7 @@ func _ZEND_TRY_ASSIGN_EMPTY_STRING(zv *types.Zval, is_ref int) {
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsRef() {
-			var ref *types.Reference = _zv.Reference()
+			var ref *types.Reference = _zv.Ref()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefEmptyString(ref)
 				break
@@ -222,7 +222,7 @@ func _ZEND_TRY_ASSIGN_STR(zv *types.Zval, str *types.String, is_ref int) {
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsRef() {
-			var ref *types.Reference = _zv.Reference()
+			var ref *types.Reference = _zv.Ref()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefStr(ref, str)
 				break
@@ -242,7 +242,7 @@ func _ZEND_TRY_ASSIGN_STRING(zv *types.Zval, string *byte, is_ref int) {
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsRef() {
-			var ref *types.Reference = _zv.Reference()
+			var ref *types.Reference = _zv.Ref()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefString(ref, string)
 				break
@@ -262,7 +262,7 @@ func _ZEND_TRY_ASSIGN_STRINGL(zv *types.Zval, string *byte, len_ int, is_ref int
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsRef() {
-			var ref *types.Reference = _zv.Reference()
+			var ref *types.Reference = _zv.Ref()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefStringl(ref, string, len_)
 				break

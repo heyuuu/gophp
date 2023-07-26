@@ -22,7 +22,7 @@ again:
 	case types.IsDouble:
 		return op.Double() != 0
 	case types.IsString:
-		str := op.StringVal()
+		str := op.String()
 		return str != "" && str != "0"
 	case types.IsArray:
 		return op.Array().Len() != 0
@@ -62,9 +62,9 @@ func _zvalGetLongFuncEx(op *types.Zval, silent bool) int {
 	case types.IsString:
 		var r conv.ParseNumberResult
 		if silent {
-			r = zend.StrToNumberAllowErrors(op.StringVal())
+			r = zend.StrToNumberAllowErrors(op.String())
 		} else {
-			r = zend.StrToNumberNoticeErrors(op.StringVal())
+			r = zend.StrToNumberNoticeErrors(op.String())
 		}
 		if r.IsInt() {
 			return r.Int()
@@ -123,7 +123,7 @@ func ZvalGetDoubleFunc(op *types.Zval) float64 {
 	case types.IsDouble:
 		return op.Double()
 	case types.IsString:
-		return zend.ZendStrtod(op.StringVal(), nil)
+		return zend.ZendStrtod(op.String(), nil)
 	case types.IsArray:
 		if op.Array().Len() != 0 {
 			return 1.0
@@ -177,7 +177,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 	op = op.DeRef()
 	switch op.Type() {
 	case types.IsString:
-		return op.StringVal(), true
+		return op.String(), true
 	case types.IsUndef, types.IsNull, types.IsFalse:
 		return "", true
 	case types.IsTrue:
@@ -198,7 +198,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 		var tmp types.Zval
 		if op.Object().CanCast() {
 			if op.Object().Cast(&tmp, types.IsString) == types.SUCCESS {
-				return tmp.StringVal(), true
+				return tmp.String(), true
 			}
 		} else if op.Object().CanGet() {
 			var z *types.Zval = op.Object().Get(&tmp)

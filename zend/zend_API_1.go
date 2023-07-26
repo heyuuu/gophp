@@ -10,7 +10,7 @@ func _ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict bool
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsRef() {
-			var ref *types.Reference = _zv.Reference()
+			var ref *types.Reference = _zv.Ref()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefZvalEx(ref, other_zv, strict)
 				break
@@ -32,7 +32,7 @@ func ZEND_TRY_ASSIGN_COPY_EX(zv *types.Zval, other_zv *types.Zval, strict bool) 
 func ZendTryArrayInitSize(zv *types.Zval, size uint32) *types.Zval {
 	var arr *types.Array = types.NewArray(size)
 	if zv.IsRef() {
-		var ref *types.Reference = zv.Reference()
+		var ref *types.Reference = zv.Ref()
 		if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 			if ZendTryAssignTypedRefArr(ref, arr) != types.SUCCESS {
 				return nil

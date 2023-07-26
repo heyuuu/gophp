@@ -58,7 +58,7 @@ again:
 				if (checkFlags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 					return 1
 				}
-				if ZendIsCallableCheckClass(obj.String(), ZendGetExecutedScope(), fcc, &strict_class, error) == 0 {
+				if ZendIsCallableCheckClass(obj.StringEx(), ZendGetExecutedScope(), fcc, &strict_class, error) == 0 {
 					return 0
 				}
 			} else if obj.IsObject() {

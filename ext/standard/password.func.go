@@ -71,7 +71,7 @@ func PhpPasswordGetSalt(required_salt_len int, options *types.Array) *types.Stri
 	core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
 	switch optionBuffer.Type() {
 	case types.IsString:
-		buffer = optionBuffer.String().Copy()
+		buffer = optionBuffer.StringEx().Copy()
 	case types.IsLong:
 		fallthrough
 	case types.IsDouble:
@@ -232,7 +232,7 @@ func PhpPasswordAlgoFindZvalEx(arg *types.Zval, defaultAlgo *PhpPasswordAlgo) *P
 	if !arg.IsString() {
 		return nil
 	}
-	return PhpPasswordAlgoFind(arg.StringVal())
+	return PhpPasswordAlgoFind(arg.String())
 }
 func PhpPasswordAlgoFindZval(arg *types.Zval) *PhpPasswordAlgo {
 	return PhpPasswordAlgoFindZvalEx(arg, PhpPasswordAlgoDefault())

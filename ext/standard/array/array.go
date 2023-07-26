@@ -343,7 +343,7 @@ func arrayWalk(array *types.Zval, recursive bool, handler func(value *types.Zval
 				var prop_info = zend.ZendGetTypedPropertyInfoForSlot(array.Object(), zv)
 				if prop_info != nil {
 					zv.SetNewRef(zv)
-					zend.ZEND_REF_ADD_TYPE_SOURCE(zv.Reference(), prop_info)
+					zend.ZEND_REF_ADD_TYPE_SOURCE(zv.Ref(), prop_info)
 				}
 			}
 		}
@@ -594,7 +594,7 @@ func ZifRange(low_ *types.Zval, high_ *types.Zval, _ zpp.Opt, step_ *types.Zval)
 		if zstep.IsDouble() {
 			isStepDouble = true
 		} else if zstep.IsString() {
-			r := conv.ParseNumber(zstep.StringVal())
+			r := conv.ParseNumber(zstep.String())
 			if r.IsInt() {
 				// pass
 			} else if r.IsFloat() {
@@ -614,9 +614,9 @@ func ZifRange(low_ *types.Zval, high_ *types.Zval, _ zpp.Opt, step_ *types.Zval)
 	}
 
 	/* If the range is given as strings, generate an array of characters. */
-	if zlow.IsString() && zhigh.IsString() && zlow.String().GetLen() >= 1 && zhigh.String().GetLen() >= 1 {
-		lowStr := zlow.StringVal()
-		highStr := zhigh.StringVal()
+	if zlow.IsString() && zhigh.IsString() && zlow.StringEx().GetLen() >= 1 && zhigh.StringEx().GetLen() >= 1 {
+		lowStr := zlow.String()
+		highStr := zhigh.String()
 
 		r1 := zend.StrToNumber(lowStr)
 		r2 := zend.StrToNumber(highStr)
@@ -947,7 +947,7 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) bool {
 		destZval = destEntry.DeRef()
 
 		// src/dest 对应值均为 array 的情况下，递归替换
-		if destZval.Array().IsRecursive() || srcZval.Array().IsRecursive() || srcEntry.IsRef() && destEntry.IsRef() && srcEntry.Reference() == destEntry.Reference() {
+		if destZval.Array().IsRecursive() || srcZval.Array().IsRecursive() || srcEntry.IsRef() && destEntry.IsRef() && srcEntry.Ref() == destEntry.Ref() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 			return false
 		}
@@ -1121,7 +1121,7 @@ func ZifArrayCountValues(array *types.Array) *types.Array {
 		if entry.IsLong() {
 			key = types.IdxKey(entry.Long())
 		} else if entry.IsString() {
-			key = types.NumericKey(entry.StringVal())
+			key = types.NumericKey(entry.String())
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Can only count STRING and INTEGER values!")
 			return
@@ -1179,7 +1179,7 @@ func ArrayColumnFetchProp(data *types.Zval, name *types.Zval) *types.Zval {
 
 	} else if data.IsType(types.IsArray) {
 		if name.IsString() {
-			prop = data.Array().SymtableFind(name.String().GetStr())
+			prop = data.Array().SymtableFind(name.StringEx().GetStr())
 		} else if name.IsType(types.IsLong) {
 			prop = data.Array().IndexFind(name.Long())
 		}
@@ -1224,7 +1224,7 @@ func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, i
 			if keyVal != nil {
 				switch keyVal.Type() {
 				case types.IsString:
-					retArr.SymtableUpdate(keyVal.String().GetStr(), columnVal)
+					retArr.SymtableUpdate(keyVal.StringEx().GetStr(), columnVal)
 				case types.IsLong:
 					retArr.IndexUpdate(keyVal.Long(), columnVal)
 				case types.IsObject:
@@ -1313,7 +1313,7 @@ func ZifArrayFlip(array *types.Array) *types.Array {
 		if value.IsLong() {
 			retArr.IndexUpdate(value.Long(), key.ToZval())
 		} else if value.IsString() {
-			retArr.SymtableUpdate(value.StringVal(), key.ToZval())
+			retArr.SymtableUpdate(value.String(), key.ToZval())
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Can only flip STRING and INTEGER values!")
 		}
@@ -1877,7 +1877,7 @@ func ZifArrayKeyExists(key *types.Zval, array zpp.ArrayOrObject) bool {
 	}
 	switch key.Type() {
 	case types.IsString:
-		return ht.SymtableExistsInd(key.StringVal())
+		return ht.SymtableExistsInd(key.String())
 	case types.IsLong:
 		return ht.IndexExists(key.Long())
 	case types.IsNull:

@@ -835,9 +835,9 @@ func ZendStdUnsetPropertyEx(zobj *types.Object, member *types.Zval, cache_slot *
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		var slot *types.Zval = OBJ_PROP(zobj, property_offset)
 		if slot.IsNotUndef() {
-			if slot.IsRef() && ZEND_REF_HAS_TYPE_SOURCES(slot.Reference()) {
+			if slot.IsRef() && ZEND_REF_HAS_TYPE_SOURCES(slot.Ref()) {
 				if prop_info != nil {
-					ZEND_REF_DEL_TYPE_SOURCE(slot.Reference(), prop_info)
+					ZEND_REF_DEL_TYPE_SOURCE(slot.Ref(), prop_info)
 				}
 			}
 			var tmp types.Zval
@@ -1009,7 +1009,7 @@ func ZendStdGetMethod_Ex(zobj *types.Object, methodName string, key *types.Zval)
 	var lc_method_name string
 	var scope *types.ClassEntry
 	if key != nil {
-		lc_method_name = key.StringVal()
+		lc_method_name = key.String()
 	} else {
 		lc_method_name = ascii.StrToLower(methodName)
 	}
@@ -1054,7 +1054,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	var object *types.Object
 	var scope *types.ClassEntry
 	if key != nil {
-		lc_function_name = key.String()
+		lc_function_name = key.StringEx()
 	} else {
 		lc_function_name = operators.ZendStringTolower(function_name)
 	}
@@ -1381,7 +1381,7 @@ func StdCastObjectToString(obj *types.Object) (string, bool) {
 		ZendCallMethodWith0Params(types.NewZvalObject(obj), ce, &fun, "__tostring", &retval)
 		EG__().SetFakeScope(fakeScope)
 		if retval.IsString() {
-			return retval.StringVal(), true
+			return retval.String(), true
 		}
 		if EG__().GetException() == nil {
 			faults.ThrowError(nil, "Method %s::__toString() must return a string value", ce.Name())

@@ -336,17 +336,17 @@ func ProcessNestedData(
 					data = ht.IndexAddNew(idx, &d)
 				}
 			} else if key.IsString() {
-				if types.HandleNumericStr(key.String().GetStr(), &idx) {
+				if types.HandleNumericStr(key.StringEx().GetStr(), &idx) {
 					goto numeric_key
 				}
-				if lang.Assign(&old_data, ht.KeyFind(key.String().GetStr())) != nil {
+				if lang.Assign(&old_data, ht.KeyFind(key.StringEx().GetStr())) != nil {
 
 					//??? update hash
 
 					VarPushDtor(var_hash, old_data)
-					data = ht.KeyUpdate(key.String().GetStr(), &d)
+					data = ht.KeyUpdate(key.StringEx().GetStr(), &d)
 				} else {
-					data = ht.KeyAddNew(key.String().GetStr(), &d)
+					data = ht.KeyAddNew(key.StringEx().GetStr(), &d)
 				}
 			} else {
 				// zend.ZvalPtrDtor(&key)
@@ -362,7 +362,7 @@ func ProcessNestedData(
 					var unmangled_prop *byte
 					var unmangled_prop_len int
 					var unmangled *types.String
-					if zend.ZendUnmanglePropertyNameEx(key.String(), &unmangled_class, &unmangled_prop, &unmangled_prop_len) == types.FAILURE {
+					if zend.ZendUnmanglePropertyNameEx(key.StringEx(), &unmangled_class, &unmangled_prop, &unmangled_prop_len) == types.FAILURE {
 						// zend.ZvalPtrDtor(&key)
 						goto failure
 					}
@@ -389,12 +389,12 @@ func ProcessNestedData(
 						// types.ZendStringReleaseEx(unmangled, 0)
 					}
 				}
-				if lang.Assign(&old_data, ht.KeyFind(key.String().GetStr())) != nil {
+				if lang.Assign(&old_data, ht.KeyFind(key.StringEx().GetStr())) != nil {
 					if old_data.IsIndirect() {
 						old_data = old_data.Indirect()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
 						VarPushDtor(var_hash, old_data)
-						data = ht.KeyUpdateIndirect(key.String().GetStr(), &d)
+						data = ht.KeyUpdateIndirect(key.StringEx().GetStr(), &d)
 						if info != nil {
 
 							/* Remember to which property this slot belongs, so we can add a
@@ -407,10 +407,10 @@ func ProcessNestedData(
 						}
 					} else {
 						VarPushDtor(var_hash, old_data)
-						data = ht.KeyUpdateIndirect(key.String().GetStr(), &d)
+						data = ht.KeyUpdateIndirect(key.StringEx().GetStr(), &d)
 					}
 				} else {
-					data = ht.KeyAddNew(key.String().GetStr(), &d)
+					data = ht.KeyAddNew(key.StringEx().GetStr(), &d)
 				}
 			} else if key.IsType(types.IsLong) {
 
@@ -435,7 +435,7 @@ func ProcessNestedData(
 				goto failure
 			}
 			if data.IsRef() {
-				zend.ZEND_REF_ADD_TYPE_SOURCE(data.Reference(), info)
+				zend.ZEND_REF_ADD_TYPE_SOURCE(data.Ref(), info)
 			}
 		}
 		if BG__().unserialize.level > 1 {
@@ -843,7 +843,7 @@ yy18:
 				// zend.ZvalPtrDtor(&args[0])
 				return 0
 			}
-			core.PhpErrorDocref(nil, faults.E_WARNING, "defined (%s) but not found", user_func.String().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "defined (%s) but not found", user_func.StringEx().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 			// zend.ZvalPtrDtor(&user_func)
@@ -863,7 +863,7 @@ yy18:
 
 		BG__().serialize_lock++
 		if lang.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.String().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.StringEx().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 		}
@@ -1499,7 +1499,7 @@ yy85:
 		}
 		rval_ref.SetNewRef(rval_ref)
 		if info != nil {
-			zend.ZEND_REF_ADD_TYPE_SOURCE(rval_ref.Reference(), info)
+			zend.ZEND_REF_ADD_TYPE_SOURCE(rval_ref.Ref(), info)
 		}
 	}
 	types.ZVAL_COPY(rval, rval_ref)

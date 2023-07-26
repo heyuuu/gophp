@@ -146,7 +146,7 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 				if operators.TryConvertToString(args[currentarg]) == 0 {
 					return "", false
 				}
-				arg = args[currentarg].String().GetLen()
+				arg = args[currentarg].StringEx().GetLen()
 				if code == 'Z' {
 					/* add one because Z is always NUL-terminated:
 					 * pack("Z*", "aa") === "aa\0"

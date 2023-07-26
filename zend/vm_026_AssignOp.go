@@ -18,7 +18,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsRef() {
-				var ref *types.Reference = var_ptr.Reference()
+				var ref *types.Reference = var_ptr.Ref()
 				var_ptr = types.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -52,7 +52,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsRef() {
-				var ref *types.Reference = var_ptr.Reference()
+				var ref *types.Reference = var_ptr.Ref()
 				var_ptr = types.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -86,7 +86,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsRef() {
-				var ref *types.Reference = var_ptr.Reference()
+				var ref *types.Reference = var_ptr.Ref()
 				var_ptr = types.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -118,7 +118,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsRef() {
-				var ref *types.Reference = var_ptr.Reference()
+				var ref *types.Reference = var_ptr.Ref()
 				var_ptr = types.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -148,7 +148,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsRef() {
-				var ref *types.Reference = var_ptr.Reference()
+				var ref *types.Reference = var_ptr.Ref()
 				var_ptr = types.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -178,7 +178,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		for {
 			if var_ptr.IsRef() {
-				var ref *types.Reference = var_ptr.Reference()
+				var ref *types.Reference = var_ptr.Ref()
 				var_ptr = types.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)

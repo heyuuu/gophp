@@ -1608,8 +1608,8 @@ func SplFilesystemFileReadLineEx(this_ptr *types.Zval, intern *SplFilesystemObje
 			}
 			SplFilesystemFileFreeLine(intern)
 			if retval.IsString() {
-				intern.SetCurrentLine(zend.Estrndup(retval.String().GetVal(), retval.String().GetLen()))
-				intern.SetCurrentLineLen(retval.String().GetLen())
+				intern.SetCurrentLine(zend.Estrndup(retval.StringEx().GetVal(), retval.StringEx().GetLen()))
+				intern.SetCurrentLineLen(retval.StringEx().GetLen())
 			} else {
 				var value *types.Zval = &retval
 				types.ZVAL_COPY_DEREF(intern.GetCurrentZval(), value)
@@ -1631,11 +1631,11 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) bool {
 	} else if !(intern.GetCurrentZval().IsUndef()) {
 		switch intern.GetCurrentZval().Type() {
 		case types.IsString:
-			return intern.GetCurrentZval().String().GetLen() == 0
+			return intern.GetCurrentZval().StringEx().GetLen() == 0
 		case types.IsArray:
 			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && intern.GetCurrentZval().Array().Len() == 1 {
 				first := intern.GetCurrentZval().Array().First().GetVal()
-				return first.IsString() && first.StringVal() == ""
+				return first.IsString() && first.String() == ""
 			}
 			return intern.GetCurrentZval().Array().Len() == 0
 		case types.IsNull:

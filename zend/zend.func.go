@@ -96,7 +96,7 @@ func PrintFlatHash(ht *types.Array) {
 }
 func PrintZval(expr *types.Zval) string {
 	if expr.IsString() {
-		return expr.StringVal()
+		return expr.String()
 	} else {
 		return operators.ZvalGetStrVal(expr)
 	}
@@ -182,7 +182,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		ZendPrintZvalRToBuf(buf, types.Z_REFVAL_P(expr), indent)
 		break
 	case types.IsString:
-		buf.WriteString(expr.String().GetStr())
+		buf.WriteString(expr.StringEx().GetStr())
 		break
 	default:
 		var str *types.String = operators.ZvalGetString(expr)

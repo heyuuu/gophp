@@ -34,7 +34,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			value.SetReference(ref)
 			variable_ptr.SetReference(ref)
 		} else {
-			variable_ptr.SetReference(value.Reference())
+			variable_ptr.SetReference(value.Ref())
 		}
 	} else {
 		types.ZVAL_COPY(variable_ptr, value)

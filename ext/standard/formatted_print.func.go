@@ -280,8 +280,8 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 		return nil
 	}
 	var buf strings.Builder
-	format = z_format.String().GetVal()
-	format_len = z_format.String().GetLen()
+	format = z_format.StringEx().GetVal()
+	format_len = z_format.StringEx().GetLen()
 	currarg = 0
 	for format_len != 0 {
 		var expprec int

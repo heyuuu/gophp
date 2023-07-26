@@ -198,7 +198,7 @@ func (o *ZicArrayObject) writeDimensionEx(checkInherited bool, offset *types.Zva
 	switch offset.Type() {
 	case types.IsString:
 		isStrKey = true
-		strKey = offset.StringVal()
+		strKey = offset.String()
 	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
 	case types.IsResource:
@@ -258,7 +258,7 @@ func (o *ZicArrayObject) hasDimensionEx(checkInherited bool, offset *types.Zval,
 		switch offset.Type() {
 		case types.IsString:
 			isStrKey = true
-			strKey = offset.StringVal()
+			strKey = offset.String()
 		case types.IsDouble:
 			index = zend.ZendLong(offset.Double())
 		case types.IsResource:
@@ -328,7 +328,7 @@ func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, offset *types.Zva
 	switch offset.Type() {
 	case types.IsString:
 		isStrKey = true
-		strKey = offset.StringVal()
+		strKey = offset.String()
 	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
 	case types.IsResource:
@@ -460,7 +460,7 @@ func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zva
 		strKey = ""
 	case types.IsString:
 		isStrKey = true
-		strKey = offset.StringVal()
+		strKey = offset.String()
 	case types.IsResource:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle())
 		index = offset.ResourceHandle()

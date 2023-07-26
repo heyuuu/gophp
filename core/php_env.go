@@ -68,7 +68,7 @@ func (env *EnvGlobals) UnSetEnv(key string) {
 func (env *EnvGlobals) LookupEnv(key string) (val string, exists bool) {
 	zv := env.table.KeyFind(key)
 	if zv != nil {
-		return zv.StringVal(), true
+		return zv.String(), true
 	}
 	return "", false
 }

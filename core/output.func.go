@@ -372,8 +372,8 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 				status = PHP_OUTPUT_HANDLER_NO_DATA
 				if !retval.IsFalse() && !retval.IsTrue() {
 					operators.ConvertToStringEx(&retval)
-					if retval.String().GetLen() != 0 {
-						context.GetOut().SetFreeDataByStr(retval.StringVal())
+					if retval.StringEx().GetLen() != 0 {
+						context.GetOut().SetFreeDataByStr(retval.String())
 						status = PHP_OUTPUT_HANDLER_SUCCESS
 					}
 				}

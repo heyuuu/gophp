@@ -569,7 +569,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				var rv types.Zval
 				tmp.SetObject(zend.EG__().GetException())
 				msg = zend.ZendReadProperty(faults.ZendCeException, &tmp, "message", 0, &rv)
-				core.PhpPrintf("Exception: %s\n", msg.String().GetVal())
+				core.PhpPrintf("Exception: %s\n", msg.StringEx().GetVal())
 				// zend.ZvalPtrDtor(&tmp)
 				zend.EG__().SetException(nil)
 				exit_status = 1

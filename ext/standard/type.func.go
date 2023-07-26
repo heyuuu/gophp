@@ -18,7 +18,7 @@ func ZifSettype(var_ zpp.RefZval, typ string) bool {
 	var tmp types.Zval
 	var ptr *types.Zval
 	b.Assert(var_.IsRef())
-	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.Reference()) {
+	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.Ref()) {
 		types.ZVAL_COPY(&tmp, types.Z_REFVAL_P(var_))
 		ptr = &tmp
 	} else {
@@ -54,7 +54,7 @@ func ZifSettype(var_ zpp.RefZval, typ string) bool {
 	}
 
 	if ptr == &tmp {
-		zend.ZendTryAssignTypedRef(var_.Reference(), &tmp)
+		zend.ZendTryAssignTypedRef(var_.Ref(), &tmp)
 	}
 	return true
 }
@@ -79,8 +79,8 @@ func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp
 		return
 	}
 	if base == 0 || base == 2 {
-		var strval *byte = num.String().GetVal()
-		var strlen int = num.String().GetLen()
+		var strval *byte = num.StringEx().GetVal()
+		var strlen int = num.StringEx().GetLen()
 		for isspace(*strval) && strlen != 0 {
 			strval++
 			strlen--
@@ -117,7 +117,7 @@ func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp
 		/* Length of 3+ covers "0b#" and "-0b" (which results in 0) */
 
 	}
-	return_value.SetLong(zend.ZEND_STRTOL(num.String().GetVal(), nil, base))
+	return_value.SetLong(zend.ZEND_STRTOL(num.StringEx().GetVal(), nil, base))
 }
 
 //@zif -alias doubleval
@@ -259,7 +259,7 @@ func ZifIsNumeric(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
 		return_value.SetTrue()
 		return
 	case types.IsString:
-		if operators.IsNumericString(arg.String().GetStr(), nil, nil, 0) != 0 {
+		if operators.IsNumericString(arg.StringEx().GetStr(), nil, nil, 0) != 0 {
 			return_value.SetTrue()
 			return
 		} else {

@@ -1584,7 +1584,7 @@ func ZifStreamIsLocal(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zv
 		if operators.TryConvertToString(zstream) == 0 {
 			return
 		}
-		wrapper = streams.PhpStreamLocateUrlWrapper(zstream.String().GetVal(), nil, 0)
+		wrapper = streams.PhpStreamLocateUrlWrapper(zstream.StringEx().GetVal(), nil, 0)
 	}
 	if wrapper == nil {
 		return_value.SetFalse()

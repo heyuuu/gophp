@@ -197,7 +197,7 @@ try_again:
 		offset_key = types.NewString("")
 		goto fetch_dim_string
 	case types.IsString:
-		offset_key = offset.String()
+		offset_key = offset.StringEx()
 	fetch_dim_string:
 		retval = ht.SymtableFind(offset_key.GetStr())
 		if retval != nil {
@@ -355,7 +355,7 @@ try_again:
 	switch offset.Type() {
 	case types.IsString:
 		ht = SplArrayGetHashTable(intern)
-		ht.SymtableUpdateInd(offset.String().GetStr(), value)
+		ht.SymtableUpdateInd(offset.StringEx().GetStr(), value)
 		return
 	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
@@ -410,16 +410,16 @@ try_again:
 	case types.IsString:
 		ht = SplArrayGetHashTable(intern)
 		if ht == zend.EG__().GetSymbolTable() {
-			if !zend.ZendDeleteGlobalVariable(offset.String()) {
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.String().GetVal())
+			if !zend.ZendDeleteGlobalVariable(offset.StringEx()) {
+				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
 			}
 		} else {
-			var data *types.Zval = ht.SymtableFind(offset.String().GetStr())
+			var data *types.Zval = ht.SymtableFind(offset.StringEx().GetStr())
 			if data != nil {
 				if data.IsIndirect() {
 					data = data.Indirect()
 					if data.IsUndef() {
-						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.String().GetVal())
+						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
 					} else {
 						// zend.ZvalPtrDtor(data)
 						data.SetUndef()
@@ -429,11 +429,11 @@ try_again:
 							SplArraySkipProtected(intern, ht)
 						}
 					}
-				} else if ht.SymtableDel(offset.String().GetStr()) == false {
-					faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.String().GetVal())
+				} else if ht.SymtableDel(offset.StringEx().GetStr()) == false {
+					faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
 				}
 			} else {
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.String().GetVal())
+				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
 			}
 		}
 	case types.IsDouble:
@@ -493,7 +493,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 	try_again:
 		switch offset.Type() {
 		case types.IsString:
-			if lang.Assign(&tmp, ht.SymtableFind(offset.String().GetStr())) != nil {
+			if lang.Assign(&tmp, ht.SymtableFind(offset.StringEx().GetStr())) != nil {
 				if check_empty == 2 {
 					return 1
 				}
@@ -1413,12 +1413,12 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	}
 	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.Array())
 	if iterator_class_zv != nil && iterator_class_zv.IsString() {
-		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.String())
+		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.StringEx())
 		if ce == nil {
-			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.String().GetVal())
+			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.StringEx().GetVal())
 			return
 		} else if operators.InstanceofFunction(ce, spl_ce_Iterator) == 0 {
-			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", iterator_class_zv.String().GetVal())
+			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", iterator_class_zv.StringEx().GetVal())
 			return
 		} else {
 			intern.SetCeGetIterator(ce)

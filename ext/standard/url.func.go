@@ -621,23 +621,23 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 		}
 		if format == 0 {
 		no_name_header:
-			zend.AddNextIndexStr(return_value, hdr.String().Copy())
+			zend.AddNextIndexStr(return_value, hdr.StringEx().Copy())
 		} else {
 			var c byte
 			var s *byte
 			var p *byte
-			if lang.Assign(&p, strchr(hdr.String().GetVal(), ':')) {
+			if lang.Assign(&p, strchr(hdr.StringEx().GetVal(), ':')) {
 				c = *p
 				*p = '0'
 				s = p + 1
 				for isspace(int(*((*uint8)(s)))) {
 					s++
 				}
-				if lang.Assign(&prev_val, return_value.Array().KeyFind(b.CastStr(hdr.String().GetVal(), p-hdr.String().GetVal()))) == nil {
-					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.String().GetVal(), p-hdr.String().GetVal()), b.CastStr(s, hdr.String().GetLen()-(s-hdr.String().GetVal())))
+				if lang.Assign(&prev_val, return_value.Array().KeyFind(b.CastStr(hdr.StringEx().GetVal(), p-hdr.StringEx().GetVal()))) == nil {
+					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.StringEx().GetVal(), p-hdr.StringEx().GetVal()), b.CastStr(s, hdr.StringEx().GetLen()-(s-hdr.StringEx().GetVal())))
 				} else {
 					operators.ConvertToArray(prev_val)
-					zend.AddNextIndexStringl(prev_val, s, hdr.String().GetLen()-(s-hdr.String().GetVal()))
+					zend.AddNextIndexStringl(prev_val, s, hdr.StringEx().GetLen()-(s-hdr.StringEx().GetVal()))
 				}
 				*p = c
 			} else {

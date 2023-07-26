@@ -255,7 +255,7 @@ again:
 		se.WriteByte(';')
 		return
 	case types.IsString:
-		se.serializeString(struc.StringVal())
+		se.serializeString(struc.String())
 		return
 	case types.IsObject:
 		var ce = types.Z_OBJCE_P(struc)
@@ -412,7 +412,7 @@ func (d *PhpSerializeData) DecN() { d.n-- }
 func (d *PhpSerializeData) zvalKey(zv *types.Zval) unsafe.Pointer {
 	b.Assert(zv.IsRef() || zv.IsObject())
 	if zv.IsRef() {
-		return unsafe.Pointer(zv.Reference())
+		return unsafe.Pointer(zv.Ref())
 	} else if zv.IsObject() {
 		return unsafe.Pointer(zv.Object())
 	} else {

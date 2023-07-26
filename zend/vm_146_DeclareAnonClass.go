@@ -12,7 +12,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
-		var rtd_key string = opline.Const1().StringVal()
+		var rtd_key string = opline.Const1().String()
 
 		ce = EG__().ClassTable().Get(rtd_key)
 		if ce == nil {
@@ -22,7 +22,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 
 		b.Assert(ce != nil)
 		if !ce.IsLinked() {
-			if ZendDoLinkClass(ce, lang.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return opline.Const2().String() }, nil)) == types.FAILURE {
+			if ZendDoLinkClass(ce, lang.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return opline.Const2().StringEx() }, nil)) == types.FAILURE {
 				return 0
 			}
 		}

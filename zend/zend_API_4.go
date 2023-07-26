@@ -188,7 +188,7 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 	var result *types.Zval
 	switch key.Type() {
 	case types.IsString:
-		result = ht.SymtableUpdate(key.String().GetStr(), value)
+		result = ht.SymtableUpdate(key.StringEx().GetStr(), value)
 		break
 	case types.IsNull:
 		result = ht.SymtableUpdate(types.NewString("").GetStr(), value)
