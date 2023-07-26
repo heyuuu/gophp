@@ -8,7 +8,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendObjectFetchPropertyTypeInfo(obj *types.ZendObject, slot *types.Zval) *types.PropertyInfo {
+func ZendObjectFetchPropertyTypeInfo(obj *types.Object, slot *types.Zval) *types.PropertyInfo {
 	if !(ZEND_CLASS_HAS_TYPE_HINTS(obj.GetCe())) {
 		return nil
 	}
@@ -20,7 +20,7 @@ func ZendObjectFetchPropertyTypeInfo(obj *types.ZendObject, slot *types.Zval) *t
 	}
 	return ZendGetTypedPropertyInfoForSlot(obj, slot)
 }
-func ZendHandleFetchObjFlags(result *types.Zval, ptr *types.Zval, obj *types.ZendObject, prop_info *types.PropertyInfo, flags uint32) bool {
+func ZendHandleFetchObjFlags(result *types.Zval, ptr *types.Zval, obj *types.Object, prop_info *types.PropertyInfo, flags uint32) bool {
 	switch flags {
 	case ZEND_FETCH_DIM_WRITE:
 		if PromotesToArray(ptr) != 0 {
@@ -119,7 +119,7 @@ func ZendFetchPropertyAddress(
 	}
 	if prop_op_type == IS_CONST && types.Z_OBJCE_P(container) == CACHED_PTR_EX(cache_slot) {
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = container.Object()
+		var zobj *types.Object = container.Object()
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			ptr = OBJ_PROP(zobj, prop_offset)
 			if ptr.IsNotUndef() {
@@ -369,7 +369,7 @@ func IZendVerifyTypeAssignableZval(type_ptr *types.TypeHint, self_ce *types.Clas
 	var type_ types.TypeHint = *type_ptr
 	var type_code uint8
 	var zv_type uint8 = zv.GetType()
-	if type_.AllowNull() && zv_type == types.IS_NULL {
+	if type_.AllowNull() && zv_type == types.IsNull {
 		return 1
 	}
 	if type_.IsClass() {
@@ -379,20 +379,20 @@ func IZendVerifyTypeAssignableZval(type_ptr *types.TypeHint, self_ce *types.Clas
 			}
 			type_ = *type_ptr
 		}
-		return zv_type == types.IS_OBJECT && operators.InstanceofFunction(types.Z_OBJCE_P(zv), type_.Ce()) != 0
+		return zv_type == types.IsObject && operators.InstanceofFunction(types.Z_OBJCE_P(zv), type_.Ce()) != 0
 	}
 	type_code = type_.Code()
-	if type_code == zv_type || type_code == types.IS_BOOL && (zv_type == types.IS_FALSE || zv_type == types.IS_TRUE) {
+	if type_code == zv_type || type_code == types.IsBool && (zv_type == types.IsFalse || zv_type == types.IsTrue) {
 		return 1
 	}
-	if type_code == types.IS_ITERABLE {
+	if type_code == types.IsIterable {
 		return ZendIsIterable(zv)
 	}
 
 	/* SSTH Exception: IS_LONG may be accepted as IS_DOUBLE (converted) */
 
 	if strict != 0 {
-		if type_code == types.IS_DOUBLE && zv_type == types.IS_LONG {
+		if type_code == types.IsDouble && zv_type == types.IsLong {
 			return -1
 		}
 		return 0
@@ -400,13 +400,13 @@ func IZendVerifyTypeAssignableZval(type_ptr *types.TypeHint, self_ce *types.Clas
 
 	/* No weak conversions for arrays and objects */
 
-	if type_code == types.IS_ARRAY || type_code == types.IS_OBJECT {
+	if type_code == types.IsArray || type_code == types.IsObject {
 		return 0
 	}
 
 	/* NULL may be accepted only by nullable hints (this is already checked) */
 
-	if zv_type == types.IS_NULL {
+	if zv_type == types.IsNull {
 		return 0
 	}
 
@@ -454,7 +454,7 @@ func ZendVerifyRefAssignableZval(ref *types.ZendReference, zv *types.Zval, stric
 			if seen_prop == nil {
 				seen_prop = prop
 				if prop.GetType().IsClass() {
-					seen_type = types.IS_OBJECT
+					seen_type = types.IsObject
 				} else {
 					seen_type = prop.GetType().Code()
 				}

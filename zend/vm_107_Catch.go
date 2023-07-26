@@ -10,7 +10,7 @@ func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var ce *types.ClassEntry
 	var catch_ce *types.ClassEntry
-	var exception *types.ZendObject
+	var exception *types.Object
 	var ex *types.Zval
 
 	/* Check whether an exception has been thrown, if not, jump over code */

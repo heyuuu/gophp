@@ -5,21 +5,21 @@ import "github.com/heyuuu/gophp/zend"
 // zval 类型展示名
 func ZvalGetType(v *Zval) string {
 	switch v.GetType() {
-	case IS_NULL:
+	case IsNull:
 		return "NULL"
-	case IS_FALSE, IS_TRUE:
+	case IsFalse, IsTrue:
 		return "boolean"
-	case IS_LONG:
+	case IsLong:
 		return "integer"
-	case IS_DOUBLE:
+	case IsDouble:
 		return "double"
-	case IS_STRING:
+	case IsString:
 		return "string"
-	case IS_ARRAY:
+	case IsArray:
 		return "array"
-	case IS_OBJECT:
+	case IsObject:
 		return "object"
-	case IS_RESOURCE:
+	case IsResource:
 		if zend.ZendRsrcListGetRsrcType(v.Resource()) != nil {
 			return "resource"
 		} else {
@@ -37,29 +37,29 @@ func ZendZvalTypeName(arg *Zval) string {
 
 func ZendGetTypeByConst(type_ uint8) string {
 	switch type_ {
-	case IS_FALSE, IS_TRUE, IS_BOOL:
+	case IsFalse, IsTrue, IsBool:
 		return "bool"
-	case IS_LONG:
+	case IsLong:
 		return "int"
-	case IS_DOUBLE:
+	case IsDouble:
 		return "float"
-	case IS_STRING:
+	case IsString:
 		return "string"
-	case IS_OBJECT:
+	case IsObject:
 		return "object"
-	case IS_RESOURCE:
+	case IsResource:
 		return "resource"
-	case IS_NULL:
+	case IsNull:
 		return "null"
-	case IS_CALLABLE:
+	case IsCallable:
 		return "callable"
-	case IS_ITERABLE:
+	case IsIterable:
 		return "iterable"
-	case IS_ARRAY:
+	case IsArray:
 		return "array"
-	case IS_VOID:
+	case IsVoid:
 		return "void"
-	case IS_NUMBER:
+	case IsNumber:
 		return "number"
 	default:
 		return "unknown"

@@ -194,7 +194,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 				if kind == ZEND_LIVE_TMPVAR {
 					// ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_NEW {
-					var obj *types.ZendObject
+					var obj *types.Object
 					b.Assert(var_.IsObject())
 					obj = var_.Object()
 					ZendObjectStoreCtorFailed(obj)
@@ -314,7 +314,7 @@ func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecu
 	var fbc types.IFunction
 	var object_or_called_scope any
 	var called_scope *types.ClassEntry
-	var object *types.ZendObject
+	var object *types.Object
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
 	if function.Object().CanGetClosure() && function.Object().GetClosure(function, &called_scope, &fbc, &object) == types.SUCCESS {
 		object_or_called_scope = called_scope

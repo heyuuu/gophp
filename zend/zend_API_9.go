@@ -183,9 +183,9 @@ func ZendGetObjectType(ce *types.ClassEntry) string {
 }
 func ZendIsIterable(iterable *types.Zval) bool {
 	switch iterable.GetType() {
-	case types.IS_ARRAY:
+	case types.IsArray:
 		return 1
-	case types.IS_OBJECT:
+	case types.IsObject:
 		return operators.InstanceofFunction(types.Z_OBJCE_P(iterable), ZendCeTraversable)
 	default:
 		return 0
@@ -193,9 +193,9 @@ func ZendIsIterable(iterable *types.Zval) bool {
 }
 func ZendIsCountable(countable *types.Zval) bool {
 	switch countable.GetType() {
-	case types.IS_ARRAY:
+	case types.IsArray:
 		return 1
-	case types.IS_OBJECT:
+	case types.IsObject:
 		if countable.Object().CanCountElements() {
 			return 1
 		}

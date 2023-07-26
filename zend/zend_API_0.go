@@ -56,7 +56,7 @@ func AddPropertyLong(arg *types.Zval, key string, n ZendLong) int {
 func AddPropertyNull(arg *types.Zval, key string) int {
 	return AddPropertyNullEx(arg, key)
 }
-func AddPropertyResource(arg *types.Zval, key string, r *types.ZendResource) int {
+func AddPropertyResource(arg *types.Zval, key string, r *types.Resource) int {
 	return AddPropertyResourceEx(arg, key, r)
 }
 func AddPropertyString(arg *types.Zval, key string, __str string) int {
@@ -77,7 +77,7 @@ func CallUserFunction_Ex(object *types.Zval, functionName *types.Zval, retvalPtr
 func CallUserFunctionEx(object *types.Zval, functionName *types.Zval, retvalPtr *types.Zval, paramCount uint32, params []types.Zval, no_separation int) int {
 	b.Assert(int(paramCount) == len(params))
 
-	var objPtr *types.ZendObject
+	var objPtr *types.Object
 	if objPtr != nil {
 		objPtr = object.Object()
 	}

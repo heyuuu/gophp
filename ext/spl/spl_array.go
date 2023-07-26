@@ -31,7 +31,7 @@ func NewZicArrayObject(ce *types.ClassEntry) *ZicArrayObject {
 	return &ZicArrayObject{}
 }
 
-func (o *ZicArrayObject) obj() *types.ZendObject {
+func (o *ZicArrayObject) obj() *types.Object {
 	// todo
 }
 func (o *ZicArrayObject) zv() *types.Zval {
@@ -39,7 +39,7 @@ func (o *ZicArrayObject) zv() *types.Zval {
 }
 
 func (o *ZicArrayObject) CanClone() bool { return true }
-func (o *ZicArrayObject) Clone() *types.ZendObject {
+func (o *ZicArrayObject) Clone() *types.Object {
 	// todo
 	// SplArrayObjectClone
 	panic("implement me")
@@ -196,20 +196,20 @@ func (o *ZicArrayObject) writeDimensionEx(checkInherited bool, offset *types.Zva
 	isStrKey, isAppend, index, strKey := false, false, 0, ""
 	offset = offset.DeRef()
 	switch offset.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		isStrKey = true
 		strKey = offset.StringVal()
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		index = offset.ResourceHandle()
-	case types.IS_FALSE:
+	case types.IsFalse:
 		index = 0
-	case types.IS_TRUE:
+	case types.IsTrue:
 		index = 1
-	case types.IS_LONG:
+	case types.IsLong:
 		index = offset.Long()
-	case types.IS_NULL:
+	case types.IsNull:
 		isAppend = true
 	default:
 		faults.Error(faults.E_WARNING, "Illegal offset type")
@@ -256,18 +256,18 @@ func (o *ZicArrayObject) hasDimensionEx(checkInherited bool, offset *types.Zval,
 
 		offset = offset.DeRef()
 		switch offset.GetType() {
-		case types.IS_STRING:
+		case types.IsString:
 			isStrKey = true
 			strKey = offset.StringVal()
-		case types.IS_DOUBLE:
+		case types.IsDouble:
 			index = zend.ZendLong(offset.Double())
-		case types.IS_RESOURCE:
+		case types.IsResource:
 			index = offset.ResourceHandle()
-		case types.IS_FALSE:
+		case types.IsFalse:
 			index = 0
-		case types.IS_TRUE:
+		case types.IsTrue:
 			index = 1
-		case types.IS_LONG:
+		case types.IsLong:
 			index = offset.Long()
 		default:
 			faults.Error(faults.E_WARNING, "Illegal offset type")
@@ -326,18 +326,18 @@ func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, offset *types.Zva
 	isStrKey, index, strKey := false, 0, ""
 	offset = offset.DeRef()
 	switch offset.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		isStrKey = true
 		strKey = offset.StringVal()
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		index = offset.ResourceHandle()
-	case types.IS_FALSE:
+	case types.IsFalse:
 		index = 0
-	case types.IS_TRUE:
+	case types.IsTrue:
 		index = 1
-	case types.IS_LONG:
+	case types.IsLong:
 		index = offset.Long()
 	default:
 		faults.Error(faults.E_WARNING, "Illegal offset type")
@@ -418,12 +418,12 @@ func (o *ZicArrayObject) countElementsHelper() int {
 	}
 }
 
-func (o *ZicArrayObject) CanCompareObjectsTo(another *types.ZendObject) bool {
+func (o *ZicArrayObject) CanCompareObjectsTo(another *types.Object) bool {
 	_, ok := another.GetData().(*ZicArrayObject)
 	return ok
 }
 
-func (o *ZicArrayObject) CompareObjectsTo(another *types.ZendObject) int {
+func (o *ZicArrayObject) CompareObjectsTo(another *types.Object) int {
 	// SplArrayCompareObjects
 	anotherData, ok := another.GetData().(*ZicArrayObject)
 	if !ok {
@@ -455,22 +455,22 @@ func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zva
 	isStrKey, index, strKey := false, 0, ""
 	offset = offset.DeRef()
 	switch offset.GetType() {
-	case types.IS_NULL:
+	case types.IsNull:
 		isStrKey = true
 		strKey = ""
-	case types.IS_STRING:
+	case types.IsString:
 		isStrKey = true
 		strKey = offset.StringVal()
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle())
 		index = offset.ResourceHandle()
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
-	case types.IS_FALSE:
+	case types.IsFalse:
 		index = 0
-	case types.IS_TRUE:
+	case types.IsTrue:
 		index = 1
-	case types.IS_LONG:
+	case types.IsLong:
 		index = offset.Long()
 	default:
 		faults.Error(faults.E_WARNING, "Illegal offset type")

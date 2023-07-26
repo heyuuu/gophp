@@ -12,15 +12,15 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ht *types.Array
 	expr = opline.Const1()
 	switch opline.GetExtendedValue() {
-	case types.IS_NULL:
+	case types.IsNull:
 		result.SetNull()
-	case types.IS_BOOL:
+	case types.IsBool:
 		result.SetBool(operators.ZvalIsTrue(expr))
-	case types.IS_LONG:
+	case types.IsLong:
 		result.SetLong(operators.ZvalGetLong(expr))
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		result.SetDouble(operators.ZvalGetDouble(expr))
-	case types.IS_STRING:
+	case types.IsString:
 		result.SetString(operators.ZvalGetString(expr))
 	default:
 		/* If value is already of correct type, return it directly */
@@ -29,7 +29,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			result.CopyValueFrom(expr)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
-		if opline.GetExtendedValue() == types.IS_ARRAY {
+		if opline.GetExtendedValue() == types.IsArray {
 			/* fast copy */
 			if !expr.IsNull() {
 				result.SetArray(types.NewArray(1))
@@ -63,15 +63,15 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var ht *types.Array
 	expr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	switch opline.GetExtendedValue() {
-	case types.IS_NULL:
+	case types.IsNull:
 		result.SetNull()
-	case types.IS_BOOL:
+	case types.IsBool:
 		result.SetBool(operators.ZvalIsTrue(expr))
-	case types.IS_LONG:
+	case types.IsLong:
 		result.SetLong(operators.ZvalGetLong(expr))
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		result.SetDouble(operators.ZvalGetDouble(expr))
-	case types.IS_STRING:
+	case types.IsString:
 		result.SetString(operators.ZvalGetString(expr))
 	default:
 		{
@@ -84,7 +84,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			result.CopyValueFrom(expr)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
-		if opline.GetExtendedValue() == types.IS_ARRAY {
+		if opline.GetExtendedValue() == types.IsArray {
 			if !expr.IsObject() || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if !expr.IsNull() {
 					result.SetArray(types.NewArray(1))
@@ -143,15 +143,15 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var ht *types.Array
 	expr = opline.Op1()
 	switch opline.GetExtendedValue() {
-	case types.IS_NULL:
+	case types.IsNull:
 		result.SetNull()
-	case types.IS_BOOL:
+	case types.IsBool:
 		result.SetBool(operators.ZvalIsTrue(expr))
-	case types.IS_LONG:
+	case types.IsLong:
 		result.SetLong(operators.ZvalGetLong(expr))
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		result.SetDouble(operators.ZvalGetDouble(expr))
-	case types.IS_STRING:
+	case types.IsString:
 		result.SetString(operators.ZvalGetString(expr))
 	default:
 		{
@@ -165,7 +165,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			// ZvalPtrDtorNogc(free_op1)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
-		if opline.GetExtendedValue() == types.IS_ARRAY {
+		if opline.GetExtendedValue() == types.IsArray {
 			if !expr.IsObject() || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if !expr.IsNull() {
 					result.SetArray(types.NewArray(1))
@@ -223,15 +223,15 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var ht *types.Array
 	expr = opline.Cv1OrUndef()
 	switch opline.GetExtendedValue() {
-	case types.IS_NULL:
+	case types.IsNull:
 		result.SetNull()
-	case types.IS_BOOL:
+	case types.IsBool:
 		result.SetBool(operators.ZvalIsTrue(expr))
-	case types.IS_LONG:
+	case types.IsLong:
 		result.SetLong(operators.ZvalGetLong(expr))
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		result.SetDouble(operators.ZvalGetDouble(expr))
-	case types.IS_STRING:
+	case types.IsString:
 		result.SetString(operators.ZvalGetString(expr))
 	default:
 		{
@@ -244,7 +244,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			result.CopyValueFrom(expr)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
-		if opline.GetExtendedValue() == types.IS_ARRAY {
+		if opline.GetExtendedValue() == types.IsArray {
 			if !expr.IsObject() || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if !expr.IsNull() {
 					result.SetArray(types.NewArray(1))

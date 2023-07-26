@@ -37,7 +37,7 @@ func PhpStreamFromZval(xstr *PhpStream, pzval *types.Zval) {
 		return
 	}
 }
-func PhpStreamFromRes(xstr *PhpStream, res *types.ZendResource) {
+func PhpStreamFromRes(xstr *PhpStream, res *types.Resource) {
 	if b.Assign(&xstr, (*PhpStream)(zend.ZendFetchResource2(res, "stream", PhpFileLeStream(), PhpFileLePstream()))) == nil {
 		return_value.SetFalse()
 		return

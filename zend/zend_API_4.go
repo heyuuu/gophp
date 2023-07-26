@@ -7,7 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
+func ObjectPropertiesLoad(object *types.Object, properties *types.Array) {
 	var prop *types.Zval
 	var tmp types.Zval
 	var key *types.String
@@ -139,7 +139,7 @@ func AddNextIndexNull(arg *types.Zval) int {
 		return types.FAILURE
 	}
 }
-func AddNextIndexResource(arg *types.Zval, r *types.ZendResource) int {
+func AddNextIndexResource(arg *types.Zval, r *types.Resource) int {
 	var tmp types.Zval
 	tmp.SetResource(r)
 	if arg.Array().Append(&tmp) != nil {
@@ -187,26 +187,26 @@ func AddNextIndexStringl(arg *types.Zval, str *byte, length int) int {
 func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 	var result *types.Zval
 	switch key.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		result = ht.SymtableUpdate(key.String().GetStr(), value)
 		break
-	case types.IS_NULL:
+	case types.IsNull:
 		result = ht.SymtableUpdate(types.NewString("").GetStr(), value)
 		break
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", key.ResourceHandle(), key.ResourceHandle())
 		result = ht.IndexUpdate(key.ResourceHandle(), value)
 		break
-	case types.IS_FALSE:
+	case types.IsFalse:
 		result = ht.IndexUpdate(0, value)
 		break
-	case types.IS_TRUE:
+	case types.IsTrue:
 		result = ht.IndexUpdate(1, value)
 		break
-	case types.IS_LONG:
+	case types.IsLong:
 		result = ht.IndexUpdate(key.Long(), value)
 		break
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		result = ht.IndexUpdate(operators.DvalToLval(key.Double()), value)
 		break
 	default:
@@ -226,7 +226,7 @@ func AddPropertyLongEx(arg *types.Zval, key string, n ZendLong) int {
 func AddPropertyNullEx(arg *types.Zval, key string) int {
 	return AddPropertyZvalEx(arg, key, types.NewZvalNull())
 }
-func AddPropertyResourceEx(arg *types.Zval, key string, r *types.ZendResource) int {
+func AddPropertyResourceEx(arg *types.Zval, key string, r *types.Resource) int {
 	return AddPropertyZvalEx(arg, key, types.NewZvalResource(r))
 }
 func AddPropertyStrEx(arg *types.Zval, key string, str string) int {

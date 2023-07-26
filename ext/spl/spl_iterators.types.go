@@ -11,7 +11,7 @@ import (
 type _spl_cbfilter_it_intern struct {
 	fci    types.ZendFcallInfo
 	fcc    types.ZendFcallInfoCache
-	object *types.ZendObject
+	object *types.Object
 }
 
 // func Make_spl_cbfilter_it_intern(fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, object *zend.ZendObject) _spl_cbfilter_it_intern {
@@ -27,8 +27,8 @@ func (this *_spl_cbfilter_it_intern) GetFci() types.ZendFcallInfo { return this.
 func (this *_spl_cbfilter_it_intern) GetFcc() types.ZendFcallInfoCache { return this.fcc }
 
 // func (this *_spl_cbfilter_it_intern) SetFcc(value zend.ZendFcallInfoCache) { this.fcc = value }
-func (this *_spl_cbfilter_it_intern) GetObject() *types.ZendObject      { return this.object }
-func (this *_spl_cbfilter_it_intern) SetObject(value *types.ZendObject) { this.object = value }
+func (this *_spl_cbfilter_it_intern) GetObject() *types.Object      { return this.object }
+func (this *_spl_cbfilter_it_intern) SetObject(value *types.Object) { this.object = value }
 
 /**
  * SplDualItObject
@@ -37,7 +37,7 @@ type SplDualItObject struct {
 	inner struct {
 		zobject  types.Zval
 		ce       *types.ClassEntry
-		object   *types.ZendObject
+		object   *types.Object
 		iterator *zend.ZendObjectIterator
 	}
 	current struct {
@@ -71,7 +71,7 @@ type SplDualItObject struct {
 		}
 		cbfilter *_spl_cbfilter_it_intern
 	}
-	std *types.ZendObject
+	std *types.Object
 }
 
 func NewSplDualItObject(ce *types.ClassEntry) *SplDualItObject {
@@ -84,7 +84,7 @@ func NewSplDualItObject(ce *types.ClassEntry) *SplDualItObject {
 func (this *SplDualItObject) GetZobject() *types.Zval                    { return &this.inner.zobject }
 func (this *SplDualItObject) GetCe() *types.ClassEntry                   { return this.inner.ce }
 func (this *SplDualItObject) SetCe(value *types.ClassEntry)              { this.inner.ce = value }
-func (this *SplDualItObject) SetObject(value *types.ZendObject)          { this.inner.object = value }
+func (this *SplDualItObject) SetObject(value *types.Object)              { this.inner.object = value }
 func (this *SplDualItObject) GetInnerIterator() *zend.ZendObjectIterator { return this.inner.iterator }
 func (this *SplDualItObject) SetInnerIterator(value *zend.ZendObjectIterator) {
 	this.inner.iterator = value
@@ -125,7 +125,7 @@ func (this *SplDualItObject) GetUseFlags() int                           { retur
 func (this *SplDualItObject) SetUseFlags(value int)                      { this.u.regex.use_flags = value }
 func (this *SplDualItObject) GetCbfilter() *_spl_cbfilter_it_intern      { return this.u.cbfilter }
 func (this *SplDualItObject) SetCbfilter(value *_spl_cbfilter_it_intern) { this.u.cbfilter = value }
-func (this *SplDualItObject) GetStd() *types.ZendObject                  { return &this.std }
+func (this *SplDualItObject) GetStd() *types.Object                      { return &this.std }
 
 // func (this *SplDualItObject) SetStd(value zend.ZendObject) { this.std = value }
 
@@ -251,7 +251,7 @@ func (this *SplSubIterator) SetState(value RecursiveIteratorState) { this.state 
  * SplRecursiveItObject
  */
 type SplRecursiveItObject struct {
-	std *types.ZendObject
+	std *types.Object
 
 	iterators       *SplSubIterator
 	level           int
@@ -277,7 +277,7 @@ func NewSplRecursiveItObject(ce *types.ClassEntry) *SplRecursiveItObject {
 	}
 }
 
-func (this *SplRecursiveItObject) GetStd() *types.ZendObject { return this.std }
+func (this *SplRecursiveItObject) GetStd() *types.Object { return this.std }
 
 func (this *SplRecursiveItObject) GetIterators() []SplSubIterator      { return this.iterators }
 func (this *SplRecursiveItObject) SetIterators(value *SplSubIterator)  { this.iterators = value }

@@ -116,7 +116,7 @@ func PhpPrintGpcseArray(name string) {
 	var string_key *types.String
 	var num_key zend.ZendUlong
 	zend.ZendIsAutoGlobal(name)
-	if lang.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), name)) != nil && data.IsType(types.IS_ARRAY) {
+	if lang.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), name)) != nil && data.IsType(types.IsArray) {
 		var __ht *types.Array = data.Array()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -147,7 +147,7 @@ func PhpPrintGpcseArray(name string) {
 				PhpInfoPrint(" => ")
 			}
 			tmp = types.ZVAL_DEREF(tmp)
-			if tmp.IsType(types.IS_ARRAY) {
+			if tmp.IsType(types.IsArray) {
 				if core.SM__().GetPhpinfoAsText() == 0 {
 					var str *types.String = zend.ZendPrintZvalRToStr(tmp, 0)
 					PhpInfoPrint("<pre>")

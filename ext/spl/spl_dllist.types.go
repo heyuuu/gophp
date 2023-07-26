@@ -60,7 +60,7 @@ func (this *SplPtrLlist) SetCount(value int)                { this.count = value
  * SplDllistObject
  */
 type SplDllistObject struct {
-	std *types.ZendObject
+	std *types.Object
 
 	llist             *SplPtrLlist
 	traverse_position int
@@ -85,7 +85,7 @@ func NewSplDllistObject() *SplDllistObject {
 func (this *SplDllistObject) InitStd(ce *types.ClassEntry, handlers *types.ObjectHandlers) {
 	this.std = types.NewObject(ce, handlers)
 }
-func (this *SplDllistObject) GetStd() *types.ZendObject { return this.std }
+func (this *SplDllistObject) GetStd() *types.Object { return this.std }
 
 func (this *SplDllistObject) GetLlist() *SplPtrLlist                  { return this.llist }
 func (this *SplDllistObject) SetLlist(value *SplPtrLlist)             { this.llist = value }

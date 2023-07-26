@@ -6,7 +6,7 @@ import (
 )
 
 // Register Internal class
-type objCtorType func(*types.ClassEntry) *types.ZendObject
+type objCtorType func(*types.ClassEntry) *types.Object
 type objGetIteratorType func(ce *types.ClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator
 type ClassDefines struct {
 	Name         string

@@ -65,7 +65,7 @@ func arrayDataCompare(v1, v2 *types.Zval) int {
 	if operators.CompareFunction(&result, v1, v2) == types.FAILURE {
 		return 0
 	}
-	b.Assert(result.IsType(types.IS_LONG))
+	b.Assert(result.IsType(types.IsLong))
 	return zend.ZEND_NORMALIZE_BOOL(result.Long())
 }
 

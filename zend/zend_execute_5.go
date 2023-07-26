@@ -50,8 +50,8 @@ func ZendFetchDimensionAddressRead(
 	try_string_offset:
 		if !dim.IsLong() {
 			switch dim.GetType() {
-			case types.IS_STRING:
-				if types.IS_LONG == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
+			case types.IsString:
+				if types.IsLong == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 					break
 				}
 				if type_ == BP_VAR_IS {
@@ -59,20 +59,20 @@ func ZendFetchDimensionAddressRead(
 					return
 				}
 				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.String().GetVal())
-			case types.IS_UNDEF:
+			case types.IsUndef:
 				ZVAL_UNDEFINED_OP2(executeData)
 				fallthrough
-			case types.IS_DOUBLE:
+			case types.IsDouble:
 				fallthrough
-			case types.IS_NULL:
+			case types.IsNull:
 				fallthrough
-			case types.IS_FALSE:
+			case types.IsFalse:
 				fallthrough
-			case types.IS_TRUE:
+			case types.IsTrue:
 				if type_ != BP_VAR_IS {
 					faults.Error(faults.E_NOTICE, "String offset cast occurred")
 				}
-			case types.IS_REFERENCE:
+			case types.IsRef:
 				dim = types.Z_REFVAL_P(dim)
 				goto try_string_offset
 			default:
@@ -203,7 +203,7 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 
 			/*}*/
 
-			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+			if offset.GetType() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
 				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -240,7 +240,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 
 			/*}*/
 
-			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+			if offset.GetType() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
 				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -265,7 +265,7 @@ func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, executeData *ZendE
 	} else if key.IsLong() {
 		hval = key.Long()
 		goto num_key
-	} else if key.GetType() <= types.IS_NULL {
+	} else if key.GetType() <= types.IsNull {
 		if key.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
@@ -273,21 +273,21 @@ func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, executeData *ZendE
 		goto str_key
 	} else {
 		faults.Error(faults.E_WARNING, "array_key_exists(): The first argument should be either a string or an integer")
-		return types.IS_FALSE
+		return types.IsFalse
 	}
 
 num_key:
 	if ht.IndexFind(hval) != nil {
-		return types.IS_TRUE
+		return types.IsTrue
 	} else {
-		return types.IS_FALSE
+		return types.IsFalse
 	}
 
 str_key:
 	if types.ZendHashFindInd(ht, str.GetStr()) != nil {
-		return types.IS_TRUE
+		return types.IsTrue
 	} else {
-		return types.IS_FALSE
+		return types.IsFalse
 	}
 }
 func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, executeData *ZendExecuteData) types.ZvalType {
@@ -303,7 +303,7 @@ func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, executeData *Z
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", types.ZendGetTypeByConst(subject.GetType()))
-		return types.IS_NULL
+		return types.IsNull
 	}
 }
 func PromotesToArray(val *types.Zval) bool {
@@ -317,7 +317,7 @@ func CheckTypeArrayAssignable(type_ types.TypeHint) bool {
 	if type_ == 0 {
 		return 1
 	}
-	return type_.IsCode() && (type_.Code() == types.IS_ARRAY || type_.Code() == types.IS_ITERABLE)
+	return type_.IsCode() && (type_.Code() == types.IsArray || type_.Code() == types.IsIterable)
 }
 func check_type_stdClass_assignable(type_ types.TypeHint) bool {
 	if type_ == 0 {
@@ -330,7 +330,7 @@ func check_type_stdClass_assignable(type_ types.TypeHint) bool {
 			return ascii.StrCaseEquals(type_.Name(), "stdclass")
 		}
 	} else {
-		return type_.Code() == types.IS_OBJECT
+		return type_.Code() == types.IsObject
 	}
 }
 func ZendVerifyRefArrayAssignable(ref *types.ZendReference) bool {

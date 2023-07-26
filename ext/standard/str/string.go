@@ -499,11 +499,11 @@ func ZifImplode(glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
 		glue = ""
 		pieces = arg1.Array()
 	} else {
-		if arg1.IsType(types.IS_ARRAY) {
+		if arg1.IsType(types.IsArray) {
 			glue = operators.ZvalGetStrVal(arg2)
 			pieces = arg1.Array()
 			core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
-		} else if arg2.IsType(types.IS_ARRAY) {
+		} else if arg2.IsType(types.IsArray) {
 			glue = operators.ZvalGetStrVal(arg1)
 			pieces = arg2.Array()
 		} else {
@@ -680,13 +680,13 @@ func PhpStrcspnEx(s1 string, s2 string) int {
 }
 func PhpNeedleChar(needle *types.Zval) (byte, bool) {
 	switch needle.GetType() {
-	case types.IS_LONG:
+	case types.IsLong:
 		return byte(needle.Long()), true
-	case types.IS_NULL, types.IS_FALSE:
+	case types.IsNull, types.IsFalse:
 		return 0, true
-	case types.IS_TRUE:
+	case types.IsTrue:
 		return 1, true
-	case types.IS_DOUBLE, types.IS_OBJECT:
+	case types.IsDouble, types.IsObject:
 		return byte(operators.ZvalGetLong(needle)), true
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "needle is not a string or an integer")
@@ -1561,7 +1561,7 @@ func strReplace(returnValue *types.Zval, search *types.Zval, replace *types.Zval
 
 	// 主逻辑
 	var count int
-	if subject.IsType(types.IS_ARRAY) {
+	if subject.IsType(types.IsArray) {
 		var arr *types.Array
 		arr, count = strReplaceArray(subject.Array(), search, replace, caseSensitivity)
 		returnValue.SetArray(arr)
@@ -2024,7 +2024,7 @@ func ZifStripTags(str string, _ zpp.Opt, allowableTags *types.Zval) string {
 	var allow *types.Zval = allowableTags
 	var allowTagsStr string
 	if allow != nil {
-		if allow.IsType(types.IS_ARRAY) {
+		if allow.IsType(types.IsArray) {
 			var buf strings.Builder
 			allow.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 				tag := operators.ZvalGetStrVal(value)

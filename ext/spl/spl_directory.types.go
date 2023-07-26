@@ -97,7 +97,7 @@ type SplFilesystemObject struct {
 			escape           int
 		}
 	}
-	std *types.ZendObject
+	std *types.Object
 }
 
 func NewSplFilesystemObject(ce *types.ClassEntry, handlers *types.ObjectHandlers) *SplFilesystemObject {
@@ -189,13 +189,13 @@ func (this *SplFilesystemObject) GetFuncGetCurr() types.IFunction {
 func (this *SplFilesystemObject) SetFuncGetCurr(value types.IFunction) {
 	this.u.file.func_getCurr = value
 }
-func (this *SplFilesystemObject) GetDelimiter() byte        { return this.u.file.delimiter }
-func (this *SplFilesystemObject) SetDelimiter(value byte)   { this.u.file.delimiter = value }
-func (this *SplFilesystemObject) GetEnclosure() byte        { return this.u.file.enclosure }
-func (this *SplFilesystemObject) SetEnclosure(value byte)   { this.u.file.enclosure = value }
-func (this *SplFilesystemObject) GetEscape() int            { return this.u.file.escape }
-func (this *SplFilesystemObject) SetEscape(value int)       { this.u.file.escape = value }
-func (this *SplFilesystemObject) GetStd() *types.ZendObject { return &this.std }
+func (this *SplFilesystemObject) GetDelimiter() byte      { return this.u.file.delimiter }
+func (this *SplFilesystemObject) SetDelimiter(value byte) { this.u.file.delimiter = value }
+func (this *SplFilesystemObject) GetEnclosure() byte      { return this.u.file.enclosure }
+func (this *SplFilesystemObject) SetEnclosure(value byte) { this.u.file.enclosure = value }
+func (this *SplFilesystemObject) GetEscape() int          { return this.u.file.escape }
+func (this *SplFilesystemObject) SetEscape(value int)     { this.u.file.escape = value }
+func (this *SplFilesystemObject) GetStd() *types.Object   { return &this.std }
 
 // func (this *SplFilesystemObject) SetStd(value zend.ZendObject) { this.std = value }
 

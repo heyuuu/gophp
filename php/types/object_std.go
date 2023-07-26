@@ -11,7 +11,7 @@ type ObjectStd struct {
 	propertiesTable []Zval // 静态属性
 }
 
-func (o *ObjectStd) obj() *ZendObject { return o }
+func (o *ObjectStd) obj() *Object { return o }
 
 func (o *ObjectStd) ClassName() string          { return o.ce.Name() }
 func (o *ObjectStd) GetCe() *ClassEntry         { return o.ce }
@@ -22,7 +22,7 @@ func (o *ObjectStd) Free() { zend.ZendObjectStdDtor(o.obj()) }
 func (o *ObjectStd) Dtor() { zend.ZendObjectsDestroyObject(o.obj()) }
 
 func (o *ObjectStd) CanClone() bool { return true }
-func (o *ObjectStd) Clone() *ZendObject {
+func (o *ObjectStd) Clone() *Object {
 	return zend.ZendObjectsCloneObjEx(o.obj())
 }
 
@@ -85,11 +85,11 @@ func (o *ObjectStd) GetMethod(method string, key *Zval) IFunction {
 	return zend.ZendStdGetMethod_Ex(o.obj(), method, key)
 }
 
-func (o *ObjectStd) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
+func (o *ObjectStd) CallMethod(method string, object *Object, executeData *zend.ZendExecuteData, returnValue *Zval) int {
 	panic("implement me")
 }
 
-func (o *ObjectStd) GetConstructor(object *ZendObject) IFunction {
+func (o *ObjectStd) GetConstructor(object *Object) IFunction {
 	return zend.ZendStdGetConstructor(object)
 }
 
@@ -100,7 +100,7 @@ func (o *ObjectStd) Cast(retval *Zval, type_ ZvalType) int {
 }
 
 func (o *ObjectStd) CanGetClosure() bool { return false }
-func (o *ObjectStd) GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **ZendObject) int {
+func (o *ObjectStd) GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **Object) int {
 	panic("implement me")
 }
 
@@ -109,12 +109,12 @@ func (o *ObjectStd) DoOperation(opcode uint8, result *Zval, op1 *Zval, op2 *Zval
 	panic("implement me")
 }
 
-func (o *ObjectStd) CanCompareObjectsTo(obj2 *ZendObject) bool {
+func (o *ObjectStd) CanCompareObjectsTo(obj2 *Object) bool {
 	// todo
 	return objectCompareFunc(o.obj().handlers.CompareObjects) == objectCompareFunc(obj2.handlers.CompareObjects)
 }
 
-func (o *ObjectStd) CompareObjectsTo(another *ZendObject) int {
+func (o *ObjectStd) CompareObjectsTo(another *Object) int {
 	return zend.ZendStdCompareObjectsEx(o.obj(), another)
 }
 

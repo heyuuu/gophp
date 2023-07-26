@@ -9,7 +9,7 @@ type ClassTable = *types.Table[*types.ClassEntry]
 type FunctionTable = *types.Table[types.IFunction]
 type ConstantTable = *types.Table[*ZendConstant]
 type IniDirectives = *types.Table[*ZendIniEntry]
-type ResourceTable = *types.Table[*types.ZendResource]
+type ResourceTable = *types.Table[*types.Resource]
 
 /**
  * ZendCompilerGlobals
@@ -254,8 +254,8 @@ type ZendExecutorGlobals struct {
 	modifiedIniDirectives IniDirectives
 
 	error_reporting_ini_entry *ZendIniEntry
-	exception                 *types.ZendObject
-	prev_exception            **types.ZendObject
+	exception                 *types.Object
+	prev_exception            **types.Object
 	opline_before_exception   *types.ZendOp
 	exception_op              [3]types.ZendOp
 	current_module            *ModuleEntry
@@ -358,12 +358,12 @@ func (this *ZendExecutorGlobals) VmStack() *VmStack { return &this.vmStack }
 func (this *ZendExecutorGlobals) GetRegularList() *types.Array { return &this.regular_list }
 
 func (this *ZendExecutorGlobals) InitRegularList() {
-	this.persistentList = types.NewTable[*types.ZendResource](ListEntryDtor)
+	this.persistentList = types.NewTable[*types.Resource](ListEntryDtor)
 }
 func (this *ZendExecutorGlobals) RegularList() ResourceTable { return this.regularList }
 
 func (this *ZendExecutorGlobals) InitPersistentList() {
-	this.persistentList = types.NewTable[*types.ZendResource](PlistEntryDtor)
+	this.persistentList = types.NewTable[*types.Resource](PlistEntryDtor)
 }
 func (this *ZendExecutorGlobals) PersistentList() ResourceTable {
 	return this.persistentList
@@ -492,10 +492,10 @@ func (this *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
 func (this *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
 	this.error_reporting_ini_entry = value
 }
-func (this *ZendExecutorGlobals) GetException() *types.ZendObject      { return this.exception }
-func (this *ZendExecutorGlobals) SetException(value *types.ZendObject) { this.exception = value }
-func (this *ZendExecutorGlobals) GetPrevException() **types.ZendObject { return this.prev_exception }
-func (this *ZendExecutorGlobals) SetPrevException(value **types.ZendObject) {
+func (this *ZendExecutorGlobals) GetException() *types.Object      { return this.exception }
+func (this *ZendExecutorGlobals) SetException(value *types.Object) { this.exception = value }
+func (this *ZendExecutorGlobals) GetPrevException() **types.Object { return this.prev_exception }
+func (this *ZendExecutorGlobals) SetPrevException(value **types.Object) {
 	this.prev_exception = value
 }
 func (this *ZendExecutorGlobals) GetOplineBeforeException() *types.ZendOp {

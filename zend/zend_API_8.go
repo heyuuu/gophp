@@ -7,7 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendIsCallableImpl(callable *types.Zval, object *types.ZendObject, checkFlags uint32, fcc *types.ZendFcallInfoCache, error **byte) bool {
+func ZendIsCallableImpl(callable *types.Zval, object *types.Object, checkFlags uint32, fcc *types.ZendFcallInfoCache, error **byte) bool {
 	var ret bool
 	var fcc_local types.ZendFcallInfoCache
 	var strict_class int = 0
@@ -23,7 +23,7 @@ func ZendIsCallableImpl(callable *types.Zval, object *types.ZendObject, checkFla
 	fcc.SetObject(nil)
 again:
 	switch callable.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		if object != nil {
 			fcc.SetObject(object)
 			fcc.SetCallingScope(object.GetCe())
@@ -38,7 +38,7 @@ again:
 			ZendReleaseFcallInfoCache(fcc)
 		}
 		return ret
-	case types.IS_ARRAY:
+	case types.IsArray:
 		var method *types.Zval = nil
 		var obj *types.Zval = nil
 		if callable.Array().Len() == 2 {
@@ -77,7 +77,7 @@ again:
 		}
 		if callable.Array().Len() == 2 {
 			if obj == nil || lang.CondF(!(obj.IsReference()), func() bool { return !obj.IsString() && !obj.IsObject() }, func() bool {
-				return types.Z_REFVAL_P(obj).GetType() != types.IS_STRING && types.Z_REFVAL_P(obj).GetType() != types.IS_OBJECT
+				return types.Z_REFVAL_P(obj).GetType() != types.IsString && types.Z_REFVAL_P(obj).GetType() != types.IsObject
 			}) {
 				if error != nil {
 					*error = Estrdup("first array member is not a valid class name or object")
@@ -93,7 +93,7 @@ again:
 			}
 		}
 		return 0
-	case types.IS_OBJECT:
+	case types.IsObject:
 		if callable.Object().CanGetClosure() {
 			if callable.Object().GetClosure(callable, fcc.GetCallingScope(), fcc.GetFunctionHandler(), fcc.GetObject()) == types.SUCCESS {
 				fcc.SetCalledScope(fcc.GetCallingScope())
@@ -112,7 +112,7 @@ again:
 			*error = Estrdup("no array or string given")
 		}
 		return 0
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		callable = types.Z_REFVAL_P(callable)
 		goto again
 	default:
@@ -124,7 +124,7 @@ again:
 }
 func ZendIsCallableEx(
 	callable *types.Zval,
-	object *types.ZendObject,
+	object *types.Object,
 	checkFlags uint32,
 	callableName **types.String,
 	fcc *types.ZendFcallInfoCache,
@@ -343,7 +343,7 @@ func ZendDeclareTypedProperty(
 	}
 	if ce.IsInternalClass() {
 		switch property.GetType() {
-		case types.IS_ARRAY, types.IS_OBJECT, types.IS_RESOURCE:
+		case types.IsArray, types.IsObject, types.IsResource:
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Internal zval's can't be arrays, objects or resources")
 		}
 	}

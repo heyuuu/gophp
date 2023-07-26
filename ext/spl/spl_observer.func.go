@@ -11,13 +11,13 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func SplObjectStorageFromObj(obj *types.ZendObject) *SplObjectStorage {
+func SplObjectStorageFromObj(obj *types.Object) *SplObjectStorage {
 	return (*SplObjectStorage)((*byte)(obj - zend_long((*byte)(&((*SplObjectStorage)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLOBJSTORAGE_P(zv *types.Zval) *SplObjectStorage {
 	return SplObjectStorageFromObj(zv.Object())
 }
-func spl_SplObjectStorage_free_storage(object *types.ZendObject) {
+func spl_SplObjectStorage_free_storage(object *types.Object) {
 	var intern *SplObjectStorage = SplObjectStorageFromObj(object)
 	zend.ZendObjectStdDtor(intern.GetStd())
 	intern.GetStorage().Destroy()
@@ -103,7 +103,7 @@ func SplObjectStorageAddall(intern *SplObjectStorage, this *types.Zval, other *S
 
 	intern.SetIndex(0)
 }
-func SplObjectStorageNewEx(class_type *types.ClassEntry, orig *types.Zval) *types.ZendObject {
+func SplObjectStorageNewEx(class_type *types.ClassEntry, orig *types.Zval) *types.Object {
 	var intern *SplObjectStorage = NewSplObjectStorage(class_type)
 	var parent *types.ClassEntry = class_type
 	for parent != nil {
@@ -124,9 +124,9 @@ func SplObjectStorageNewEx(class_type *types.ClassEntry, orig *types.Zval) *type
 	}
 	return intern.GetStd()
 }
-func SplObjectStorageClone(zobject *types.Zval) *types.ZendObject {
-	var old_object *types.ZendObject
-	var new_object *types.ZendObject
+func SplObjectStorageClone(zobject *types.Zval) *types.Object {
+	var old_object *types.Object
+	var new_object *types.Object
 	old_object = zobject.Object()
 	new_object = SplObjectStorageNewEx(old_object.GetCe(), zobject)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
@@ -189,14 +189,14 @@ func SplObjectStorageCompareInfo(e1 *types.Zval, e2 *types.Zval) int {
 	return zend.ZEND_NORMALIZE_BOOL(result.Long())
 }
 func SplObjectStorageCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
-	var zo1 *types.ZendObject = (*types.ZendObject)(o1.Object())
-	var zo2 *types.ZendObject = (*types.ZendObject)(o2.Object())
+	var zo1 *types.Object = (*types.Object)(o1.Object())
+	var zo2 *types.Object = (*types.Object)(o2.Object())
 	if zo1.GetCe() != spl_ce_SplObjectStorage || zo2.GetCe() != spl_ce_SplObjectStorage {
 		return 1
 	}
 	return types.ZendHashCompare(Z_SPLOBJSTORAGE_P(o1).GetStorage(), Z_SPLOBJSTORAGE_P(o2).GetStorage(), SplObjectStorageCompareInfo, 0)
 }
-func spl_SplObjectStorage_new(class_type *types.ClassEntry) *types.ZendObject {
+func spl_SplObjectStorage_new(class_type *types.ClassEntry) *types.Object {
 	return SplObjectStorageNewEx(class_type, nil)
 }
 func SplObjectStorageContains(intern *SplObjectStorage, this *types.Zval, obj *types.Zval) int {
@@ -744,7 +744,7 @@ func zim_spl_MultipleIterator_valid(executeData *zend.ZendExecuteData, return_va
 		it = element.GetObj()
 		zend.ZendCallMethodWith0Params(it, types.Z_OBJCE_P(it), types.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
 		if !(retval.IsUndef()) {
-			valid = retval.IsType(types.IS_TRUE)
+			valid = retval.IsType(types.IsTrue)
 			// zend.ZvalPtrDtor(&retval)
 		} else {
 			valid = 0
@@ -775,7 +775,7 @@ func SplMultipleIteratorGetAll(intern *SplObjectStorage, get_type int, return_va
 		it = element.GetObj()
 		zend.ZendCallMethodWith0Params(it, types.Z_OBJCE_P(it), types.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
 		if !(retval.IsUndef()) {
-			valid = retval.IsType(types.IS_TRUE)
+			valid = retval.IsType(types.IsTrue)
 			// zend.ZvalPtrDtor(&retval)
 		} else {
 			valid = 0
@@ -802,9 +802,9 @@ func SplMultipleIteratorGetAll(intern *SplObjectStorage, get_type int, return_va
 		}
 		if intern.IsKeysAssoc() {
 			switch element.GetInf().GetType() {
-			case types.IS_LONG:
+			case types.IsLong:
 				zend.AddIndexZval(return_value, element.GetInf().Long(), &retval)
-			case types.IS_STRING:
+			case types.IsString:
 				return_value.Array().SymtableUpdate(element.GetInf().String().GetStr(), &retval)
 			default:
 				// zend.ZvalPtrDtor(&retval)

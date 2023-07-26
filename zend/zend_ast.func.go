@@ -74,23 +74,23 @@ func AstCreateList(kind ZendAstKind, children ...*ZendAst) *ZendAst {
 
 func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.Zval) int {
 	switch offset.GetType() {
-	case types.IS_UNDEF:
+	case types.IsUndef:
 		if result.Array().Append(expr) == nil {
 			faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 		}
-	case types.IS_STRING:
+	case types.IsString:
 		result.Array().SymtableUpdate(offset.String().GetStr(), expr)
-	case types.IS_NULL:
+	case types.IsNull:
 		result.Array().SymtableUpdate(types.NewString("").GetStr(), expr)
-	case types.IS_LONG:
+	case types.IsLong:
 		result.Array().IndexUpdate(offset.Long(), expr)
-	case types.IS_FALSE:
+	case types.IsFalse:
 		result.Array().IndexUpdate(0, expr)
-	case types.IS_TRUE:
+	case types.IsTrue:
 		result.Array().IndexUpdate(1, expr)
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		result.Array().IndexUpdate(operators.DvalToLval(offset.Double()), expr)
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle())
 		result.Array().IndexUpdate(offset.ResourceHandle(), expr)
 	default:
@@ -265,7 +265,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ret = types.FAILURE
 			break
 		}
-		if op1.GetType() > types.IS_NULL {
+		if op1.GetType() > types.IsNull {
 			*result = op1
 		} else {
 			if ZendAstEvaluate(result, ast.Child(1), scope) != types.SUCCESS {

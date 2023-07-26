@@ -284,7 +284,7 @@ func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFu
 		} else {
 			return INHERITANCE_ERROR
 		}
-	} else if proto_type.Code() == types.IS_ITERABLE {
+	} else if proto_type.Code() == types.IsIterable {
 		if fe_type.IsClass() {
 			var fe_class_name *types.String = ResolveClassName(fe.GetScope(), fe_type.Name())
 			var fe_ce *types.ClassEntry = LookupClass(fe.GetScope(), fe_class_name)
@@ -298,12 +298,12 @@ func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFu
 				return INHERITANCE_ERROR
 			}
 		}
-		if fe_type.Code() == types.IS_ITERABLE || fe_type.Code() == types.IS_ARRAY {
+		if fe_type.Code() == types.IsIterable || fe_type.Code() == types.IsArray {
 			return INHERITANCE_SUCCESS
 		} else {
 			return INHERITANCE_ERROR
 		}
-	} else if proto_type.Code() == types.IS_OBJECT {
+	} else if proto_type.Code() == types.IsObject {
 		if fe_type.IsClass() {
 
 			/* Currently, any class name would be allowed here. We still perform a class lookup
@@ -318,7 +318,7 @@ func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFu
 			}
 			return INHERITANCE_SUCCESS
 		}
-		if fe_type.Code() == types.IS_OBJECT {
+		if fe_type.Code() == types.IsObject {
 			return INHERITANCE_SUCCESS
 		} else {
 			return INHERITANCE_ERROR

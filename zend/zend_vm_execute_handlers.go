@@ -19,13 +19,13 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 
 	// fast
 	switch operators.TypePair(op1.GetType(), op2.GetType()) {
-	case operators.TypePair(types.IS_LONG, types.IS_LONG):
+	case operators.TypePair(types.IsLong, types.IsLong):
 		result := opline.Result()
 		operators.FastLongAddFunction(result, op1, op2)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case operators.TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
-		operators.TypePair(types.IS_LONG, types.IS_DOUBLE),
-		operators.TypePair(types.IS_DOUBLE, types.IS_LONG):
+	case operators.TypePair(types.IsDouble, types.IsDouble),
+		operators.TypePair(types.IsLong, types.IsDouble),
+		operators.TypePair(types.IsDouble, types.IsLong):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -67,13 +67,13 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 
 	// fast
 	switch operators.TypePair(op1.GetType(), op2.GetType()) {
-	case operators.TypePair(types.IS_LONG, types.IS_LONG):
+	case operators.TypePair(types.IsLong, types.IsLong):
 		result := opline.Result()
 		operators.FastLongSubFunction(result, op1, op2)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case operators.TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
-		operators.TypePair(types.IS_LONG, types.IS_DOUBLE),
-		operators.TypePair(types.IS_DOUBLE, types.IS_LONG):
+	case operators.TypePair(types.IsDouble, types.IsDouble),
+		operators.TypePair(types.IsLong, types.IsDouble),
+		operators.TypePair(types.IsDouble, types.IsLong):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())
@@ -115,7 +115,7 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 
 	// fast
 	switch operators.TypePair(op1.GetType(), op2.GetType()) {
-	case operators.TypePair(types.IS_LONG, types.IS_LONG):
+	case operators.TypePair(types.IsLong, types.IsLong):
 		result := opline.Result()
 		if iVal, dVal, overflow := SignedMultiplyLong(op1.Long(), op2.Long()); overflow {
 			result.SetDouble(dVal)
@@ -123,9 +123,9 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 			result.SetLong(iVal)
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
-	case operators.TypePair(types.IS_DOUBLE, types.IS_DOUBLE),
-		operators.TypePair(types.IS_LONG, types.IS_DOUBLE),
-		operators.TypePair(types.IS_DOUBLE, types.IS_LONG):
+	case operators.TypePair(types.IsDouble, types.IsDouble),
+		operators.TypePair(types.IsLong, types.IsDouble),
+		operators.TypePair(types.IsDouble, types.IsLong):
 		var d1, d2 float64
 		if op1.IsLong() {
 			d1 = float64(op1.Long())

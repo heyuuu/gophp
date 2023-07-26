@@ -12,13 +12,13 @@ type ZendFcallInfo struct {
 	retval       *Zval
 	params       []Zval
 	paramCount   uint32
-	object       *ZendObject
+	object       *Object
 	noSeparation bool
 }
 
 func EmptyFCallInfo() ZendFcallInfo { return ZendFcallInfo{} }
 
-func InitFCallInfo(object *ZendObject, retval *Zval, args ...*Zval) *ZendFcallInfo {
+func InitFCallInfo(object *Object, retval *Zval, args ...*Zval) *ZendFcallInfo {
 	if retval == nil {
 		retval = NewZvalUndef()
 	}
@@ -53,16 +53,16 @@ func (fci *ZendFcallInfo) SetFunctionName(name string) { fci.functionName.SetStr
 func (fci *ZendFcallInfo) SetFunctionNameZval(name *Zval) {
 	fci.functionName.CopyValueFrom(name)
 }
-func (fci *ZendFcallInfo) GetRetval() *Zval            { return fci.retval }
-func (fci *ZendFcallInfo) SetRetval(value *Zval)       { fci.retval = value }
-func (fci *ZendFcallInfo) GetParams() []Zval           { return fci.params }
-func (fci *ZendFcallInfo) SetParams(value []Zval)      { fci.params = value }
-func (fci *ZendFcallInfo) GetObject() *ZendObject      { return fci.object }
-func (fci *ZendFcallInfo) SetObject(value *ZendObject) { fci.object = value }
-func (fci *ZendFcallInfo) GetNoSeparation() bool       { return fci.noSeparation }
-func (fci *ZendFcallInfo) SetNoSeparation(value bool)  { fci.noSeparation = value }
-func (fci *ZendFcallInfo) GetParamCount() uint32       { return fci.paramCount }
-func (fci *ZendFcallInfo) SetParamCount(value uint32)  { fci.paramCount = value }
+func (fci *ZendFcallInfo) GetRetval() *Zval           { return fci.retval }
+func (fci *ZendFcallInfo) SetRetval(value *Zval)      { fci.retval = value }
+func (fci *ZendFcallInfo) GetParams() []Zval          { return fci.params }
+func (fci *ZendFcallInfo) SetParams(value []Zval)     { fci.params = value }
+func (fci *ZendFcallInfo) GetObject() *Object         { return fci.object }
+func (fci *ZendFcallInfo) SetObject(value *Object)    { fci.object = value }
+func (fci *ZendFcallInfo) GetNoSeparation() bool      { return fci.noSeparation }
+func (fci *ZendFcallInfo) SetNoSeparation(value bool) { fci.noSeparation = value }
+func (fci *ZendFcallInfo) GetParamCount() uint32      { return fci.paramCount }
+func (fci *ZendFcallInfo) SetParamCount(value uint32) { fci.paramCount = value }
 
 /**
  * ZendFcallInfoCache
@@ -71,7 +71,7 @@ type ZendFcallInfoCache struct {
 	functionHandler IFunction
 	callingScope    *ClassEntry
 	calledScope     *ClassEntry
-	object          *ZendObject
+	object          *Object
 }
 
 func EmptyFcallInfoCache() ZendFcallInfoCache { return ZendFcallInfoCache{} }
@@ -84,5 +84,5 @@ func (fcc *ZendFcallInfoCache) GetCallingScope() *ClassEntry      { return fcc.c
 func (fcc *ZendFcallInfoCache) SetCallingScope(value *ClassEntry) { fcc.callingScope = value }
 func (fcc *ZendFcallInfoCache) GetCalledScope() *ClassEntry       { return fcc.calledScope }
 func (fcc *ZendFcallInfoCache) SetCalledScope(value *ClassEntry)  { fcc.calledScope = value }
-func (fcc *ZendFcallInfoCache) GetObject() *ZendObject            { return fcc.object }
-func (fcc *ZendFcallInfoCache) SetObject(value *ZendObject)       { fcc.object = value }
+func (fcc *ZendFcallInfoCache) GetObject() *Object                { return fcc.object }
+func (fcc *ZendFcallInfoCache) SetObject(value *Object)           { fcc.object = value }

@@ -93,7 +93,7 @@ func PhpUrlEncodeHashEx(
 			prop_len = 0
 		}
 		zdata = types.ZVAL_DEREF(zdata)
-		if zdata.IsType(types.IS_ARRAY) || zdata.IsType(types.IS_OBJECT) {
+		if zdata.IsType(types.IsArray) || zdata.IsType(types.IsObject) {
 			if key != nil {
 				var ekey *types.String
 				if enc_type == PHP_QUERY_RFC3986 {
@@ -150,10 +150,10 @@ func PhpUrlEncodeHashEx(
 				*p = '0'
 			}
 			ht.ProtectRecursive()
-			PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, lang.Cond(zdata.IsType(types.IS_OBJECT), zdata, nil), arg_sep, enc_type)
+			PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, lang.Cond(zdata.IsType(types.IsObject), zdata, nil), arg_sep, enc_type)
 			ht.UnprotectRecursive()
 			zend.Efree(newprefix)
-		} else if zdata.IsType(types.IS_NULL) || zdata.IsType(types.IS_RESOURCE) {
+		} else if zdata.IsType(types.IsNull) || zdata.IsType(types.IsResource) {
 
 			/* Skip these types */
 
@@ -193,7 +193,7 @@ func PhpUrlEncodeHashEx(
 			}
 			formstr.WriteString("=")
 			switch zdata.GetType() {
-			case types.IS_STRING:
+			case types.IsString:
 				var ekey string
 				if enc_type == PHP_QUERY_RFC3986 {
 					ekey = PhpRawUrlEncode(zdata.StringVal())
@@ -201,11 +201,11 @@ func PhpUrlEncodeHashEx(
 					ekey = PhpUrlEncode(zdata.StringVal())
 				}
 				formstr.WriteString(ekey)
-			case types.IS_LONG:
+			case types.IsLong:
 				formstr.WriteLong(zdata.Long())
-			case types.IS_FALSE:
+			case types.IsFalse:
 				formstr.WriteString("0")
-			case types.IS_TRUE:
+			case types.IsTrue:
 				formstr.WriteString("1")
 			default:
 				var ekey string
@@ -245,7 +245,7 @@ func ZifHttpBuildQuery(executeData zpp.Ex, return_value zpp.Ret, formdata *types
 		}
 		break
 	}
-	if PhpUrlEncodeHashEx(zend.HASH_OF(formdata), &formstr, prefix, prefix_len, nil, 0, nil, 0, lang.Cond(formdata.IsType(types.IS_OBJECT), formdata, nil), arg_sep, int(enc_type)) == types.FAILURE {
+	if PhpUrlEncodeHashEx(zend.HASH_OF(formdata), &formstr, prefix, prefix_len, nil, 0, nil, 0, lang.Cond(formdata.IsType(types.IsObject), formdata, nil), arg_sep, int(enc_type)) == types.FAILURE {
 		if formstr.GetS() != nil {
 			formstr.Free()
 		}

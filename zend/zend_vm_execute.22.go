@@ -18,7 +18,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 	offset = opline.Const2()
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.Object()
+	var zobj *types.Object = container.Object()
 	var retval *types.Zval
 	{
 		cache_slot = CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_FETCH_REF)

@@ -18,7 +18,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 	} else {
 		result = ZendArrayKeyExistsSlow(subject, key, executeData)
 	}
-	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
+	ZEND_VM_SMART_BRANCH(result == types.IsTrue, 1)
 	opline.Result().SetType(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -36,7 +36,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	} else {
 		result = ZendArrayKeyExistsSlow(subject, key, executeData)
 	}
-	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
+	ZEND_VM_SMART_BRANCH(result == types.IsTrue, 1)
 	opline.Result().SetType(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -54,7 +54,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 	} else {
 		result = ZendArrayKeyExistsSlow(subject, key, executeData)
 	}
-	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
+	ZEND_VM_SMART_BRANCH(result == types.IsTrue, 1)
 	opline.Result().SetType(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -72,7 +72,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	} else {
 		result = ZendArrayKeyExistsSlow(subject, key, executeData)
 	}
-	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
+	ZEND_VM_SMART_BRANCH(result == types.IsTrue, 1)
 	opline.Result().SetType(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -90,7 +90,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	} else {
 		result = ZendArrayKeyExistsSlow(subject, key, executeData)
 	}
-	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
+	ZEND_VM_SMART_BRANCH(result == types.IsTrue, 1)
 	opline.Result().SetType(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -108,7 +108,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	} else {
 		result = ZendArrayKeyExistsSlow(subject, key, executeData)
 	}
-	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
+	ZEND_VM_SMART_BRANCH(result == types.IsTrue, 1)
 	opline.Result().SetType(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -126,7 +126,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	} else {
 		result = ZendArrayKeyExistsSlow(subject, key, executeData)
 	}
-	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
+	ZEND_VM_SMART_BRANCH(result == types.IsTrue, 1)
 	opline.Result().SetType(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -144,7 +144,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	} else {
 		result = ZendArrayKeyExistsSlow(subject, key, executeData)
 	}
-	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
+	ZEND_VM_SMART_BRANCH(result == types.IsTrue, 1)
 	opline.Result().SetType(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -162,7 +162,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	} else {
 		result = ZendArrayKeyExistsSlow(subject, key, executeData)
 	}
-	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
+	ZEND_VM_SMART_BRANCH(result == types.IsTrue, 1)
 	opline.Result().SetType(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

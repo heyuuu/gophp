@@ -39,7 +39,7 @@ func Bailout() {
 	throw()
 }
 
-func GetException() *types.ZendObject {
+func GetException() *types.Object {
 	return zend.EG__().GetException()
 }
 func HasException() bool {

@@ -4,19 +4,19 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 )
 
-const MAY_BE_UNDEF = 1 << types.IS_UNDEF
-const MAY_BE_NULL = 1 << types.IS_NULL
-const MAY_BE_FALSE = 1 << types.IS_FALSE
-const MAY_BE_TRUE = 1 << types.IS_TRUE
-const MAY_BE_LONG = 1 << types.IS_LONG
-const MAY_BE_DOUBLE = 1 << types.IS_DOUBLE
-const MAY_BE_STRING = 1 << types.IS_STRING
-const MAY_BE_ARRAY = 1 << types.IS_ARRAY
-const MAY_BE_OBJECT = 1 << types.IS_OBJECT
-const MAY_BE_RESOURCE = 1 << types.IS_RESOURCE
+const MAY_BE_UNDEF = 1 << types.IsUndef
+const MAY_BE_NULL = 1 << types.IsNull
+const MAY_BE_FALSE = 1 << types.IsFalse
+const MAY_BE_TRUE = 1 << types.IsTrue
+const MAY_BE_LONG = 1 << types.IsLong
+const MAY_BE_DOUBLE = 1 << types.IsDouble
+const MAY_BE_STRING = 1 << types.IsString
+const MAY_BE_ARRAY = 1 << types.IsArray
+const MAY_BE_OBJECT = 1 << types.IsObject
+const MAY_BE_RESOURCE = 1 << types.IsResource
 const MAY_BE_ANY = MAY_BE_NULL | MAY_BE_FALSE | MAY_BE_TRUE | MAY_BE_LONG | MAY_BE_DOUBLE | MAY_BE_STRING | MAY_BE_ARRAY | MAY_BE_OBJECT | MAY_BE_RESOURCE
-const MAY_BE_REF = 1 << types.IS_REFERENCE
-const MAY_BE_ARRAY_SHIFT = types.IS_REFERENCE
+const MAY_BE_REF = 1 << types.IsRef
+const MAY_BE_ARRAY_SHIFT = types.IsRef
 const MAY_BE_ARRAY_OF_NULL = MAY_BE_NULL << MAY_BE_ARRAY_SHIFT
 const MAY_BE_ARRAY_OF_FALSE = MAY_BE_FALSE << MAY_BE_ARRAY_SHIFT
 const MAY_BE_ARRAY_OF_TRUE = MAY_BE_TRUE << MAY_BE_ARRAY_SHIFT

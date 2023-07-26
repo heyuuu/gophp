@@ -100,7 +100,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.Object()
+	var zobj *types.Object = container.Object()
 	var retval *types.Zval
 
 	if offset.IsUndef() {
@@ -142,7 +142,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.Object()
+	var zobj *types.Object = container.Object()
 	var retval *types.Zval
 
 	if offset.IsUndef() {
@@ -170,7 +170,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	offset = opline.Op2()
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.Object()
+	var zobj *types.Object = container.Object()
 	var retval *types.Zval
 
 	if offset.IsUndef() {
@@ -195,7 +195,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	offset = opline.Op2()
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.Object()
+	var zobj *types.Object = container.Object()
 	var retval *types.Zval
 
 	if offset.IsUndef() {
@@ -240,7 +240,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.Object()
+	var zobj *types.Object = container.Object()
 	var retval *types.Zval
 
 	if offset.IsUndef() {

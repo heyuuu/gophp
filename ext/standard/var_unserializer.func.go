@@ -299,7 +299,7 @@ func ProcessNestedData(
 	var_hash *PhpUnserializeDataT,
 	ht *types.Array,
 	elements zend.ZendLong,
-	obj *types.ZendObject,
+	obj *types.Object,
 ) int {
 	if var_hash != nil {
 		if var_hash.GetMaxDepth() > 0 && var_hash.GetCurDepth() >= var_hash.GetMaxDepth() {
@@ -323,7 +323,7 @@ func ProcessNestedData(
 		data = nil
 		d.SetUndef()
 		if obj == nil {
-			if key.IsType(types.IS_LONG) {
+			if key.IsType(types.IsLong) {
 				idx = key.Long()
 			numeric_key:
 				if lang.Assign(&old_data, ht.IndexFind(idx)) != nil {
@@ -412,7 +412,7 @@ func ProcessNestedData(
 				} else {
 					data = ht.KeyAddNew(key.String().GetStr(), &d)
 				}
-			} else if key.IsType(types.IS_LONG) {
+			} else if key.IsType(types.IsLong) {
 
 				/* object properties should include no integers */
 

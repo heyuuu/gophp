@@ -4,7 +4,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 )
 
-type RsrcDtorFuncT func(res *types.ZendResource)
+type RsrcDtorFuncT func(res *types.Resource)
 
 var ListDestructors ListDestructorsType
 
@@ -25,7 +25,7 @@ func (lds *ListDestructorsType) Append(lde *ZendRsrcListDtorsEntry) int {
 	return lde.resourceId
 }
 
-func (lds *ListDestructorsType) Find(res *types.ZendResource) *ZendRsrcListDtorsEntry {
+func (lds *ListDestructorsType) Find(res *types.Resource) *ZendRsrcListDtorsEntry {
 	return lds.hash[res.GetType()]
 }
 
@@ -47,7 +47,7 @@ func (lds *ListDestructorsType) CleanByModule(moduleNumber int) {
 		delete(lds.hash, resourceId)
 
 		// CleanModuleResource
-		EG__().PersistentList().Filter(func(_ string, res *types.ZendResource) bool {
+		EG__().PersistentList().Filter(func(_ string, res *types.Resource) bool {
 			return res.GetType() != resourceId
 		})
 	}

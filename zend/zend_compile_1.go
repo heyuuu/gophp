@@ -174,7 +174,7 @@ func ZendMarkFunctionAsGenerator() {
 	}
 	if CG__().GetActiveOpArray().IsHasReturnType() {
 		var return_info ZendArgInfo = CG__().GetActiveOpArray().GetArgInfo()[-1]
-		if return_info.GetType().Code() != types.IS_ITERABLE {
+		if return_info.GetType().Code() != types.IsIterable {
 			var msg = "Generators may only declare a return type of Generator, Iterator, Traversable, or iterable, %s is not permitted"
 			if !(return_info.GetType().IsClass()) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, types.ZendGetTypeByConst(return_info.GetType().Code()))
@@ -247,7 +247,7 @@ func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified bool) bo
 	var c *ZendConstant = EG__().ConstantTable().Get(name)
 
 	/* Substitute case-sensitive (or lowercase) constants */
-	if c != nil && ((c.IsPersistent() && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && !c.IsNoFileCache() || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.Value().GetType() < types.IS_OBJECT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
+	if c != nil && ((c.IsPersistent() && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && !c.IsNoFileCache() || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.Value().GetType() < types.IsObject && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
 		types.ZVAL_COPY_OR_DUP(zv, c.Value())
 		return 1
 	}
@@ -402,7 +402,7 @@ func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *typ
 
 	/* Substitute case-sensitive (or lowercase) persistent class constants */
 
-	if c.GetType() < types.IS_OBJECT {
+	if c.GetType() < types.IsObject {
 		types.ZVAL_COPY_OR_DUP(zv, c)
 		return 1
 	}

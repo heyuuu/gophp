@@ -9,7 +9,7 @@ type IObject interface {
 	Free()
 	Dtor()
 	CanClone() bool
-	Clone() *ZendObject
+	Clone() *Object
 
 	// property
 	ReadProperty(member *Zval, typ int, cacheSlot *any, rv *Zval) *Zval
@@ -43,19 +43,19 @@ type IObject interface {
 	// method
 	CanGetMethod() bool
 	GetMethod(method string, key *Zval) IFunction
-	CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int
-	GetConstructor(object *ZendObject) IFunction
+	CallMethod(method string, object *Object, executeData *zend.ZendExecuteData, returnValue *Zval) int
+	GetConstructor(object *Object) IFunction
 	// cast
 	CanCast() bool
 	Cast(retval *Zval, type_ ZvalType) int
 
 	// mixed
 	CanGetClosure() bool
-	GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **ZendObject) int
+	GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **Object) int
 	CanDoOperation() bool
 	DoOperation(opcode uint8, result *Zval, op1 *Zval, op2 *Zval) int
-	CanCompareObjectsTo(obj2 *ZendObject) bool
-	CompareObjectsTo(another *ZendObject) int
+	CanCompareObjectsTo(obj2 *Object) bool
+	CompareObjectsTo(another *Object) int
 	CanCompare() bool
 	Compare(result *Zval, op1 *Zval, op2 *Zval) int
 }

@@ -11,11 +11,11 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func SplDualItFromObj(obj *types.ZendObject) *SplDualItObject {
+func SplDualItFromObj(obj *types.Object) *SplDualItObject {
 	return (*SplDualItObject)((*byte)(obj - zend_long((*byte)(&((*SplDualItObject)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLDUAL_IT_P(zv *types.Zval) *SplDualItObject { return SplDualItFromObj(zv.Object()) }
-func SplRecursiveItFromObj(obj *types.ZendObject) *SplRecursiveItObject {
+func SplRecursiveItFromObj(obj *types.Object) *SplRecursiveItObject {
 	return (*SplRecursiveItObject)((*byte)(obj - zend_long((*byte)(&((*SplRecursiveItObject)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLRECURSIVE_IT_P(zv *types.Zval) *SplRecursiveItObject {
@@ -612,7 +612,7 @@ func zim_spl_RecursiveIteratorIterator_getMaxDepth(executeData *zend.ZendExecute
 		return
 	}
 }
-func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.String, key *types.Zval) types.IFunction {
+func SplRecursiveItGetMethod(zobject **types.Object, method *types.String, key *types.Zval) types.IFunction {
 	var function_handler types.IFunction
 	var object *SplRecursiveItObject = SplRecursiveItFromObj(*zobject)
 	var level zend.ZendLong = object.GetLevel()
@@ -632,7 +632,7 @@ func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.String, k
 	}
 	return function_handler
 }
-func spl_RecursiveIteratorIterator_dtor(_object *types.ZendObject) {
+func spl_RecursiveIteratorIterator_dtor(_object *types.Object) {
 	var object *SplRecursiveItObject = SplRecursiveItFromObj(_object)
 	var sub_iter *zend.ZendObjectIterator
 
@@ -649,7 +649,7 @@ func spl_RecursiveIteratorIterator_dtor(_object *types.ZendObject) {
 		object.SetIterators(nil)
 	}
 }
-func spl_RecursiveIteratorIterator_free_storage(_object *types.ZendObject) {
+func spl_RecursiveIteratorIterator_free_storage(_object *types.Object) {
 	var object *SplRecursiveItObject = SplRecursiveItFromObj(_object)
 	if object.GetIterators() != nil {
 		zend.Efree(object.GetIterators())
@@ -665,7 +665,7 @@ func spl_RecursiveIteratorIterator_free_storage(_object *types.ZendObject) {
 	object.GetPrefix()[5].Free()
 	object.GetPostfix()[0].Free()
 }
-func spl_RecursiveIteratorIterator_new_ex(class_type *types.ClassEntry, init_prefix int) *types.ZendObject {
+func spl_RecursiveIteratorIterator_new_ex(class_type *types.ClassEntry, init_prefix int) *types.Object {
 	var intern = NewSplRecursiveItObject(class_type)
 	if init_prefix != 0 {
 		intern.GetPrefix()[0].WriteString("")
@@ -678,10 +678,10 @@ func spl_RecursiveIteratorIterator_new_ex(class_type *types.ClassEntry, init_pre
 	}
 	return intern.GetStd()
 }
-func spl_RecursiveIteratorIterator_new(class_type *types.ClassEntry) *types.ZendObject {
+func spl_RecursiveIteratorIterator_new(class_type *types.ClassEntry) *types.Object {
 	return spl_RecursiveIteratorIterator_new_ex(class_type, 0)
 }
-func spl_RecursiveTreeIterator_new(class_type *types.ClassEntry) *types.ZendObject {
+func spl_RecursiveTreeIterator_new(class_type *types.ClassEntry) *types.Object {
 	return spl_RecursiveIteratorIterator_new_ex(class_type, 1)
 }
 func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_value *types.Zval) {
@@ -723,7 +723,7 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 
 		/* TODO: Remove this special case? */
 
-		if data.IsType(types.IS_ARRAY) {
+		if data.IsType(types.IsArray) {
 			return_value.SetStringVal(types.STR_ARRAY_CAPITALIZED)
 		} else {
 			types.ZVAL_COPY(return_value, data)
@@ -871,7 +871,7 @@ func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return
 	return_value.SetStringVal(str)
 	return
 }
-func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) types.IFunction {
+func SplDualItGetMethod(object **types.Object, method *types.String, key *types.Zval) types.IFunction {
 	var function_handler types.IFunction
 	var intern *SplDualItObject
 	intern = SplDualItFromObj(*object)
@@ -1424,7 +1424,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 	if intern.IsUseKey() {
 		subject = operators.ZvalGetString(intern.GetKey())
 	} else {
-		if intern.GetData().IsType(types.IS_ARRAY) {
+		if intern.GetData().IsType(types.IsArray) {
 			return_value.SetFalse()
 			return
 		}
@@ -1633,13 +1633,13 @@ func zim_spl_RecursiveRegexIterator_accept(executeData *zend.ZendExecuteData, re
 	if intern.GetData().IsUndef() {
 		return_value.SetFalse()
 		return
-	} else if intern.GetData().IsType(types.IS_ARRAY) {
+	} else if intern.GetData().IsType(types.IsArray) {
 		return_value.SetBool(intern.GetData().Array().Len() > 0)
 		return
 	}
 	zend.ZendCallMethodWith0Params(executeData.ThisObjectZval(), spl_ce_RegexIterator, nil, "accept", return_value)
 }
-func SplDualItDtor(_object *types.ZendObject) {
+func SplDualItDtor(_object *types.Object) {
 	var object *SplDualItObject = SplDualItFromObj(_object)
 
 	/* call standard dtor */
@@ -1650,7 +1650,7 @@ func SplDualItDtor(_object *types.ZendObject) {
 		//zend.ZendIteratorDtor(object.GetInnerIterator())
 	}
 }
-func SplDualItFreeStorage(_object *types.ZendObject) {
+func SplDualItFreeStorage(_object *types.Object) {
 	var object *SplDualItObject = SplDualItFromObj(_object)
 	if !(object.GetZobject().IsUndef()) {
 		// zend.ZvalPtrDtor(object.GetZobject())
@@ -1685,7 +1685,7 @@ func SplDualItFreeStorage(_object *types.ZendObject) {
 	}
 	zend.ZendObjectStdDtor(object.GetStd())
 }
-func SplDualItNew(class_type *types.ClassEntry) *types.ZendObject {
+func SplDualItNew(class_type *types.ClassEntry) *types.Object {
 	var intern *SplDualItObject = NewSplDualItObject(class_type)
 	return intern.GetStd()
 }

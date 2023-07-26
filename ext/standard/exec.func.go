@@ -164,7 +164,7 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 	if ret_array == nil {
 		ret = PhpExec(mode, cmd, nil, return_value)
 	} else {
-		if types.Z_REFVAL_P(ret_array).IsType(types.IS_ARRAY) {
+		if types.Z_REFVAL_P(ret_array).IsType(types.IsArray) {
 			ret_array = types.ZVAL_DEREF(ret_array)
 			types.SeparateArray(ret_array)
 		} else {

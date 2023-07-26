@@ -175,13 +175,13 @@ func ZendThrowAccessUninitPropByRefError(prop *types.PropertyInfo) {
 	faults.ThrowError(nil, "Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()))
 }
 func MakeRealObject(object *types.Zval, property *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) *types.Zval {
-	var obj *types.ZendObject
+	var obj *types.Object
 	var ref *types.Zval = nil
 	if object.IsReference() {
 		ref = object
 		object = types.Z_REFVAL_P(object)
 	}
-	if object.GetType() > types.IS_FALSE && (!object.IsString() || object.String().GetLen() != 0) {
+	if object.GetType() > types.IsFalse && (!object.IsString() || object.String().GetLen() != 0) {
 		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
 			var property_name *types.String = operators.ZvalGetString(property)
 			if opline.GetOpcode() == ZEND_PRE_INC_OBJ || opline.GetOpcode() == ZEND_PRE_DEC_OBJ || opline.GetOpcode() == ZEND_POST_INC_OBJ || opline.GetOpcode() == ZEND_POST_DEC_OBJ {
@@ -252,13 +252,13 @@ func ZendVerifyTypeErrorCommon(
 		}
 	} else {
 		switch arg_info.GetType().Code() {
-		case types.IS_OBJECT:
+		case types.IsObject:
 			*need_msg = "be an "
 			*need_kind = "object"
-		case types.IS_CALLABLE:
+		case types.IsCallable:
 			*need_msg = "be callable"
 			*need_kind = ""
-		case types.IS_ITERABLE:
+		case types.IsIterable:
 			*need_msg = "be iterable"
 			*need_kind = ""
 		default:

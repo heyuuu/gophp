@@ -1,7 +1,7 @@
 package types
 
 // Object 对象自动析构方法
-func ObjectAutoFree(object *ZendObject) {
+func ObjectAutoFree(object *Object) {
 	// todo 待重构
 
 	/*    Make sure we hold a reference count during the destructor call

@@ -21,7 +21,7 @@ type ZendExecuteData struct {
 	callInfo  uint32
 	numArgs   uint32
 	thisClass *types.ClassEntry
-	thisObj   *types.ZendObject
+	thisObj   *types.Object
 
 	//runtimeCache    *any
 	runtimeCache []types.Zval
@@ -183,7 +183,7 @@ func (ex *ZendExecuteData) SetScope(scope any) {
 	}
 
 	switch s := scope.(type) {
-	case *types.ZendObject:
+	case *types.Object:
 		ex.thisClass, ex.thisObj = s.GetCe(), s
 	case *types.ClassEntry:
 		ex.thisClass, ex.thisObj = s, nil
@@ -191,9 +191,9 @@ func (ex *ZendExecuteData) SetScope(scope any) {
 		panic("ZendExecuteData.SetScope() 只支持 *types.ZendObject、*types.ClassEntry 或 nil 参数")
 	}
 }
-func (ex *ZendExecuteData) InScope() bool                 { return ex.thisClass != nil }
-func (ex *ZendExecuteData) ThisObject() *types.ZendObject { return ex.thisObj }
-func (ex *ZendExecuteData) ThisClass() *types.ClassEntry  { return ex.thisClass }
+func (ex *ZendExecuteData) InScope() bool                { return ex.thisClass != nil }
+func (ex *ZendExecuteData) ThisObject() *types.Object    { return ex.thisObj }
+func (ex *ZendExecuteData) ThisClass() *types.ClassEntry { return ex.thisClass }
 
 // 临时兼容，后续使用 ThisObject 替代
 func (ex *ZendExecuteData) ThisObjectZval() *types.Zval {

@@ -40,7 +40,7 @@ var SplFunctions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("iterator_apply", 0, ZifIteratorApply, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
 		zend.MakeArgInfo("iterator", zend.ArgInfoType(types.TypeHintClassName("Traversable", false))),
 		zend.MakeArgName("function"),
-		zend.MakeArgInfo("args", zend.ArgInfoType(types.TypeHintCode(types.IS_ARRAY, 1))),
+		zend.MakeArgInfo("args", zend.ArgInfoType(types.TypeHintCode(types.IsArray, 1))),
 	}),
 }
 

@@ -12,22 +12,22 @@ import (
 
 func ZendVerifyWeakScalarTypeHint(type_hint uint8, arg *types.Zval) bool {
 	switch type_hint {
-	case types.IS_BOOL:
+	case types.IsBool:
 		if val, ok := zpp.ParseBoolWeak(arg); ok {
 			arg.SetBool(val)
 			return true
 		}
-	case types.IS_LONG:
+	case types.IsLong:
 		if val, ok := zpp.ParseLongWeak(arg, false); ok {
 			arg.SetLong(val)
 			return true
 		}
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		if val, ok := zpp.ParseDoubleWeak(arg); ok {
 			arg.SetDouble(val)
 			return true
 		}
-	case types.IS_STRING:
+	case types.IsString:
 		if val, ok := zpp.ParseZStrWeak(arg); ok {
 			arg.SetString(val)
 			return true
@@ -38,7 +38,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint uint8, arg *types.Zval) bool {
 func ZendVerifyScalarTypeHint(type_hint uint8, arg *types.Zval, strict bool) bool {
 	if strict {
 		/* SSTH Exception: IS_LONG may be accepted as IS_DOUBLE (converted) */
-		if type_hint != types.IS_DOUBLE || !arg.IsLong() {
+		if type_hint != types.IsDouble || !arg.IsLong() {
 			return false
 		}
 	} else if arg.IsNull() {
@@ -113,14 +113,14 @@ func IZendCheckPropertyType(info *types.PropertyInfo, property *types.Zval, stri
 		}
 		return operators.InstanceofFunction(types.Z_OBJCE_P(property), info.GetType().Ce())
 	}
-	b.Assert(info.GetType().Code() != types.IS_CALLABLE)
+	b.Assert(info.GetType().Code() != types.IsCallable)
 	if info.GetType().Code() == property.GetType() {
 		return true
 	} else if property.IsNull() {
 		return info.GetType().AllowNull()
-	} else if info.GetType().Code() == types.IS_BOOL && property.IsFalse() || property.IsTrue() {
+	} else if info.GetType().Code() == types.IsBool && property.IsFalse() || property.IsTrue() {
 		return true
-	} else if info.GetType().Code() == types.IS_ITERABLE {
+	} else if info.GetType().Code() == types.IsIterable {
 		return ZendIsIterable(property)
 	} else {
 		return ZendVerifyScalarTypeHint(info.GetType().Code(), property, strict)
@@ -175,11 +175,11 @@ func ZendCheckType(typ types.TypeHint, arg *types.Zval, ce **types.ClassEntry, c
 		/* Null passed to nullable type */
 		return true
 	}
-	if typ.Code() == types.IS_CALLABLE {
+	if typ.Code() == types.IsCallable {
 		return ZendIsCallable(arg, IS_CALLABLE_CHECK_SILENT, nil)
-	} else if typ.Code() == types.IS_ITERABLE {
+	} else if typ.Code() == types.IsIterable {
 		return ZendIsIterable(arg)
-	} else if typ.Code() == types.IS_BOOL && arg.IsFalse() || arg.IsTrue() {
+	} else if typ.Code() == types.IsBool && arg.IsFalse() || arg.IsTrue() {
 		return true
 	} else if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref) {
 		return false
@@ -277,7 +277,7 @@ func ZendVerifyReturnError(zf types.IFunction, ce *types.ClassEntry, value *type
 }
 func ZendVerifyMissingReturnType(zf types.IFunction, cache_slot *any) int {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
-	if ret_info.GetType().IsSet() && ret_info.GetType().Code() != types.IS_VOID {
+	if ret_info.GetType().IsSet() && ret_info.GetType().Code() != types.IsVoid {
 		var ce *types.ClassEntry = nil
 		if ret_info.GetType().IsClass() {
 			if *cache_slot {
@@ -390,23 +390,23 @@ func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteD
 	var offset ZendLong
 	if !dim.IsLong() {
 		switch dim.GetType() {
-		case types.IS_STRING:
-			if types.IS_LONG == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
+		case types.IsString:
+			if types.IsLong == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 				break
 			}
 			if type_ != BP_VAR_UNSET {
 				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.String().GetVal())
 			}
-		case types.IS_UNDEF:
+		case types.IsUndef:
 			ZVAL_UNDEFINED_OP2(executeData)
 			fallthrough
-		case types.IS_DOUBLE:
+		case types.IsDouble:
 			fallthrough
-		case types.IS_NULL:
+		case types.IsNull:
 			fallthrough
-		case types.IS_FALSE:
+		case types.IsFalse:
 			fallthrough
-		case types.IS_TRUE:
+		case types.IsTrue:
 			faults.Error(faults.E_NOTICE, "String offset cast occurred")
 		default:
 			ZendIllegalOffset()

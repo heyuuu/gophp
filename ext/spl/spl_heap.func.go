@@ -10,7 +10,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func SplHeapFromObj(obj *types.ZendObject) *SplHeapObject {
+func SplHeapFromObj(obj *types.Object) *SplHeapObject {
 	return (*SplHeapObject)((*byte)(obj - zend_long((*byte)(&((*SplHeapObject)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLHEAP_P(zv *types.Zval) *SplHeapObject { return SplHeapFromObj(zv.Object()) }
@@ -267,12 +267,12 @@ func SplPtrHeapDestroy(heap *SplPtrHeap) {
 	zend.Efree(heap.GetElements())
 	zend.Efree(heap)
 }
-func SplHeapObjectFreeStorage(object *types.ZendObject) {
+func SplHeapObjectFreeStorage(object *types.Object) {
 	var intern *SplHeapObject = SplHeapFromObj(object)
 	zend.ZendObjectStdDtor(intern.GetStd())
 	SplPtrHeapDestroy(intern.GetHeap())
 }
-func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
+func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.Object {
 	if orig != nil {
 		var other *SplHeapObject = Z_SPLHEAP_P(orig)
 		intern := NewSplHeapObject(class_type, other.GetStd().GetHandlers())
@@ -321,12 +321,12 @@ func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_or
 	}
 	return intern.GetStd()
 }
-func SplHeapObjectNew(class_type *types.ClassEntry) *types.ZendObject {
+func SplHeapObjectNew(class_type *types.ClassEntry) *types.Object {
 	return SplHeapObjectNewEx(class_type, nil, 0)
 }
-func SplHeapObjectClone(zobject *types.Zval) *types.ZendObject {
-	var old_object *types.ZendObject
-	var new_object *types.ZendObject
+func SplHeapObjectClone(zobject *types.Zval) *types.Object {
+	var old_object *types.Object
+	var new_object *types.Object
 	old_object = zobject.Object()
 	new_object = SplHeapObjectNewEx(old_object.GetCe(), zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)

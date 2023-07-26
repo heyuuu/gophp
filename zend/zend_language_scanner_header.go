@@ -230,7 +230,7 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlight
 func HighlightString(str *types.Zval, syntax_highlighter_ini *zend_syntax_highlighter_ini, str_name *byte) int {
 	var original_lex_state ZendLexState
 	var tmp types.Zval
-	if Z_TYPE_P(str) != types.IS_STRING {
+	if Z_TYPE_P(str) != types.IsString {
 		str = types.NewZvalString(operators.ZvalGetStrVal(str))
 	}
 	ZendSaveLexicalState(&original_lex_state)

@@ -65,10 +65,10 @@ func (zv *Zval) DeIndirect() *Zval {
  */
 func (zv *Zval) IsRefcounted() bool {
 	switch zv.typ {
-	case IS_ARRAY, // 不包含 _IS_IMMUTABLE_ARRAY
-		IS_OBJECT,
-		IS_RESOURCE,
-		IS_REFERENCE:
+	case IsArray, // 不包含 _IS_IMMUTABLE_ARRAY
+		IsObject,
+		IsResource,
+		IsRef:
 		return true
 	default:
 		return false

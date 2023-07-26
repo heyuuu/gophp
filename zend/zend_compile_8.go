@@ -138,7 +138,7 @@ func (compiler *Compiler) CompileCast(result *Znode, ast *ZendAst) {
 	compiler.CompileExpr(&expr_node, expr_ast)
 	opline = ZendEmitOpTmp(result, ZEND_CAST, &expr_node, nil)
 	opline.SetExtendedValue(ast.Attr())
-	if ast.Attr() == types.IS_NULL {
+	if ast.Attr() == types.IsNull {
 		faults.Error(faults.E_DEPRECATED, "The (unset) cast is deprecated")
 	}
 }
@@ -778,7 +778,7 @@ func (compiler *Compiler) CompileEncapsList(result *Znode, ast *ZendAst) {
 			opline.SetNop()
 		} else {
 			opline.SetOpcode(ZEND_CAST)
-			opline.SetExtendedValue(types.IS_STRING)
+			opline.SetExtendedValue(types.IsString)
 			opline.SetOp1Type(opline.GetOp2Type())
 			opline.SetOp1(opline.GetOp2())
 			opline.SetResultType(IS_TMP_VAR)

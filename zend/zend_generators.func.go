@@ -162,7 +162,7 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution bool) {
 		Efree(executeData)
 	}
 }
-func ZendGeneratorDtorStorage(object *types.ZendObject) {
+func ZendGeneratorDtorStorage(object *types.Object) {
 	var generator *ZendGenerator = (*ZendGenerator)(object)
 	var ex *ZendExecuteData = generator.GetExecuteData()
 	var op_num uint32
@@ -259,7 +259,7 @@ func ZendGeneratorDtorStorage(object *types.ZendObject) {
 
 	/* Walk try/catch/finally structures upwards, performing the necessary actions. */
 }
-func ZendGeneratorFreeStorage(object *types.ZendObject) {
+func ZendGeneratorFreeStorage(object *types.Object) {
 	var generator *ZendGenerator = (*ZendGenerator)(object)
 	ZendGeneratorClose(generator, 0)
 
@@ -430,11 +430,11 @@ func ZendGeneratorGetGc(object *types.Zval, table **types.Zval, n *int) *types.A
 		return nil
 	}
 }
-func ZendGeneratorCreate(class_type *types.ClassEntry) *types.ZendObject {
+func ZendGeneratorCreate(class_type *types.ClassEntry) *types.Object {
 	var generator = NewZendGenerator(class_type)
-	return (*types.ZendObject)(generator)
+	return (*types.Object)(generator)
 }
-func ZendGeneratorGetConstructor(object *types.ZendObject) types.IFunction {
+func ZendGeneratorGetConstructor(object *types.Object) types.IFunction {
 	faults.ThrowError(nil, "The \"Generator\" class is reserved for internal use and cannot be manually instantiated")
 	return nil
 }

@@ -16,7 +16,7 @@ func PhpFileLeStream() int       { return LeStream }
 func PhpFileLePstream() int      { return LePstream }
 func PhpFileLeStreamFilter() int { return LeStreamFilter }
 func ZmDeactivateStreams(type_ int, module_number int) int {
-	zend.EG__().PersistentList().Foreach(func(_ string, rsrc *types.ZendResource) {
+	zend.EG__().PersistentList().Foreach(func(_ string, rsrc *types.Resource) {
 		if rsrc.GetType() != LePstream {
 			return
 		}
@@ -41,7 +41,7 @@ func PhpStreamFromPersistentId(persistent_id string, stream **core.PhpStream) in
 	if le != nil {
 		if le.GetType() == LePstream {
 			if stream != nil {
-				var regentry *types.ZendResource = nil
+				var regentry *types.Resource = nil
 
 				/* see if this persistent resource already has been loaded to the
 				 * regular list; allowing the same resource in several entries in the

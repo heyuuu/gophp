@@ -89,7 +89,7 @@ func GetExceptionBase(object *types.Zval) *types.ClassEntry {
 		return ZendCeError
 	}
 }
-func ExceptionSetPrevious(exception *types.ZendObject, add_previous *types.ZendObject) {
+func ExceptionSetPrevious(exception *types.Object, add_previous *types.Object) {
 	var previous *types.Zval
 	var ancestor *types.Zval
 	var ex *types.Zval
@@ -153,7 +153,7 @@ func ExceptionRestore() {
 }
 func ThrowExceptionInternal(exception *types.Zval) {
 	if exception != nil {
-		var previous *types.ZendObject = zend.EG__().GetException()
+		var previous *types.Object = zend.EG__().GetException()
 		ExceptionSetPrevious(exception.Object(), zend.EG__().GetException())
 		zend.EG__().SetException(exception.Object())
 		if previous != nil {
@@ -182,7 +182,7 @@ func ThrowExceptionInternal(exception *types.Zval) {
 	zend.CurrEX().SetOpline(zend.EG__().GetExceptionOp())
 }
 func ClearException() {
-	var exception *types.ZendObject
+	var exception *types.Object
 	if zend.EG__().GetPrevException() != nil {
 		// zend.OBJ_RELEASE(zend.EG__().GetPrevException())
 		zend.EG__().SetPrevException(nil)
@@ -200,7 +200,7 @@ func ClearException() {
 		zend.CurrEX().SetOpline(zend.EG__().GetOplineBeforeException())
 	}
 }
-func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *types.ZendObject {
+func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *types.Object {
 	var obj types.Zval
 	var tmp types.Zval
 	var trace types.Zval
@@ -231,10 +231,10 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_TRACE, &trace)
 	return object
 }
-func DefaultExceptionNew(class_type *types.ClassEntry) *types.ZendObject {
+func DefaultExceptionNew(class_type *types.ClassEntry) *types.Object {
 	return DefaultExceptionNewEx(class_type, 0)
 }
-func ErrorExceptionNew(class_type *types.ClassEntry) *types.ZendObject {
+func ErrorExceptionNew(class_type *types.ClassEntry) *types.Object {
 	return DefaultExceptionNewEx(class_type, 2)
 }
 func ZimExceptionClone(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -283,12 +283,12 @@ func ZimExceptionWakeup(executeData *zend.ZendExecuteData, return_value *types.Z
 	var value types.Zval
 	var pvalue *types.Zval
 	var object *types.Zval = executeData.ThisObjectZval()
-	CHECK_EXC_TYPE(object, types.STR_MESSAGE, types.IS_STRING, &value)
-	CHECK_EXC_TYPE(object, types.STR_STRING, types.IS_STRING, &value)
-	CHECK_EXC_TYPE(object, types.STR_CODE, types.IS_LONG, &value)
-	CHECK_EXC_TYPE(object, types.STR_FILE, types.IS_STRING, &value)
-	CHECK_EXC_TYPE(object, types.STR_LINE, types.IS_LONG, &value)
-	CHECK_EXC_TYPE(object, types.STR_TRACE, types.IS_ARRAY, &value)
+	CHECK_EXC_TYPE(object, types.STR_MESSAGE, types.IsString, &value)
+	CHECK_EXC_TYPE(object, types.STR_STRING, types.IsString, &value)
+	CHECK_EXC_TYPE(object, types.STR_CODE, types.IsLong, &value)
+	CHECK_EXC_TYPE(object, types.STR_FILE, types.IsString, &value)
+	CHECK_EXC_TYPE(object, types.STR_LINE, types.IsLong, &value)
+	CHECK_EXC_TYPE(object, types.STR_TRACE, types.IsArray, &value)
 	pvalue = zend.ZendReadProperty(GetExceptionBase(object), object, "previous", 1, &value)
 	if pvalue != nil && !pvalue.IsNull() && (!pvalue.IsObject() || operators.InstanceofFunction(types.Z_OBJCE_P(pvalue), ZendCeThrowable) == 0 || pvalue == object) {
 		zend.ZendUnsetProperty(GetExceptionBase(object), object, "previous")
@@ -427,9 +427,9 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 
 	arg = types.ZVAL_DEREF(arg)
 	switch arg.GetType() {
-	case types.IS_NULL:
+	case types.IsNull:
 		str.WriteString("NULL, ")
-	case types.IS_STRING:
+	case types.IsString:
 		argStr := arg.StringVal()
 		if len(argStr) > 15 {
 			str.WriteByte('\'')
@@ -440,23 +440,23 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 			str.WriteEscaped(argStr)
 			str.WriteString("', ")
 		}
-	case types.IS_FALSE:
+	case types.IsFalse:
 		str.WriteString("false, ")
-	case types.IS_TRUE:
+	case types.IsTrue:
 		str.WriteString("true, ")
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		str.WriteString("Resource id #")
 		str.WriteLong(arg.ResourceHandle())
 		str.WriteString(", ")
-	case types.IS_LONG:
+	case types.IsLong:
 		str.WriteLong(arg.Long())
 		str.WriteString(", ")
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		str.WriteString(pfmt.Sprintf("%.*G", int(zend.EG__().GetPrecision()), arg.Double()))
 		str.WriteString(", ")
-	case types.IS_ARRAY:
+	case types.IsArray:
 		str.WriteString("Array, ")
-	case types.IS_OBJECT:
+	case types.IsObject:
 		str.WriteString("Object(")
 		str.WriteString(arg.Object().ClassName())
 		str.WriteString("), ")
@@ -661,7 +661,7 @@ func RegisterDefaultException() {
 	ZendCeArithmeticError = zend.RegisterSubClass(ZendCeError, "ArithmeticError", DefaultExceptionNew, nil)
 	ZendCeDivisionByZeroError = zend.RegisterSubClass(ZendCeArithmeticError, "DivisionByZeroError", DefaultExceptionNew, nil)
 }
-func ThrowException(exception_ce *types.ClassEntry, message string, code zend.ZendLong) *types.ZendObject {
+func ThrowException(exception_ce *types.ClassEntry, message string, code zend.ZendLong) *types.Object {
 	var ex types.Zval
 	var tmp types.Zval
 	if exception_ce != nil {
@@ -685,12 +685,12 @@ func ThrowException(exception_ce *types.ClassEntry, message string, code zend.Ze
 	ThrowExceptionInternal(&ex)
 	return ex.Object()
 }
-func ThrowExceptionEx(exception_ce *types.ClassEntry, code zend.ZendLong, format string, args ...any) *types.ZendObject {
+func ThrowExceptionEx(exception_ce *types.ClassEntry, code zend.ZendLong, format string, args ...any) *types.Object {
 	message := zend.ZendSprintf(format, args)
 	obj := ThrowException(exception_ce, message, code)
 	return obj
 }
-func ThrowErrorException(exception_ce *types.ClassEntry, message string, code zend.ZendLong, severity int) *types.ZendObject {
+func ThrowErrorException(exception_ce *types.ClassEntry, message string, code zend.ZendLong, severity int) *types.Object {
 	var ex types.Zval
 	var tmp types.Zval
 	var obj = ThrowException(exception_ce, message, code)
@@ -699,7 +699,7 @@ func ThrowErrorException(exception_ce *types.ClassEntry, message string, code ze
 	zend.ZendUpdatePropertyEx(ZendCeErrorException, &ex, types.STR_SEVERITY, &tmp)
 	return obj
 }
-func ExceptionError(ex *types.ZendObject, severity int) {
+func ExceptionError(ex *types.Object, severity int) {
 	var exception types.Zval
 	var rv types.Zval
 	var ce_exception *types.ClassEntry

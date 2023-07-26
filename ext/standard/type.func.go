@@ -183,7 +183,7 @@ func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type
 		break
 	}
 	if arg.IsType(type_) {
-		if type_ == types.IS_RESOURCE {
+		if type_ == types.IsResource {
 			var type_name *byte = zend.ZendRsrcListGetRsrcType(arg.Resource())
 			if type_name == nil {
 				return_value.SetFalse()
@@ -198,10 +198,10 @@ func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type
 	}
 }
 func ZifIsNull(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	PhpIsType(executeData, return_value, types.IS_NULL)
+	PhpIsType(executeData, return_value, types.IsNull)
 }
 func ZifIsResource(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	PhpIsType(executeData, return_value, types.IS_RESOURCE)
+	PhpIsType(executeData, return_value, types.IsResource)
 }
 func ZifIsBool(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 	var arg *types.Zval
@@ -217,27 +217,27 @@ func ZifIsBool(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	return_value.SetBool(arg.IsType(types.IS_FALSE) || arg.IsType(types.IS_TRUE))
+	return_value.SetBool(arg.IsType(types.IsFalse) || arg.IsType(types.IsTrue))
 	return
 }
 
 //@zif -alias is_integer,is_long
 func ZifIsInt(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	PhpIsType(executeData, return_value, types.IS_LONG)
+	PhpIsType(executeData, return_value, types.IsLong)
 }
 
 //@zif -alias is_double
 func ZifIsFloat(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	PhpIsType(executeData, return_value, types.IS_DOUBLE)
+	PhpIsType(executeData, return_value, types.IsDouble)
 }
 func ZifIsString(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	PhpIsType(executeData, return_value, types.IS_STRING)
+	PhpIsType(executeData, return_value, types.IsString)
 }
 func ZifIsArray(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	PhpIsType(executeData, return_value, types.IS_ARRAY)
+	PhpIsType(executeData, return_value, types.IsArray)
 }
 func ZifIsObject(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	PhpIsType(executeData, return_value, types.IS_OBJECT)
+	PhpIsType(executeData, return_value, types.IsObject)
 }
 func ZifIsNumeric(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
 	var arg *types.Zval
@@ -253,12 +253,12 @@ func ZifIsNumeric(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
 		break
 	}
 	switch arg.GetType() {
-	case types.IS_LONG:
+	case types.IsLong:
 		fallthrough
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		return_value.SetTrue()
 		return
-	case types.IS_STRING:
+	case types.IsString:
 		if operators.IsNumericString(arg.String().GetStr(), nil, nil, 0) != 0 {
 			return_value.SetTrue()
 			return
@@ -285,15 +285,15 @@ func ZifIsScalar(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
 		break
 	}
 	switch arg.GetType() {
-	case types.IS_FALSE:
+	case types.IsFalse:
 		fallthrough
-	case types.IS_TRUE:
+	case types.IsTrue:
 		fallthrough
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		fallthrough
-	case types.IS_LONG:
+	case types.IsLong:
 		fallthrough
-	case types.IS_STRING:
+	case types.IsString:
 		return_value.SetTrue()
 		return
 	default:

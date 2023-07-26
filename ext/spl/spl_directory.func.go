@@ -15,7 +15,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func SplFilesystemFromObj(obj *types.ZendObject) *SplFilesystemObject {
+func SplFilesystemFromObj(obj *types.Object) *SplFilesystemObject {
 	return (*SplFilesystemObject)((*byte)(obj - zend_long((*byte)(&((*SplFilesystemObject)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLFILESYSTEM_P(zv *types.Zval) *SplFilesystemObject {
@@ -54,7 +54,7 @@ func SplFilesystemFileFreeLine(intern *SplFilesystemObject) {
 		intern.GetCurrentZval().SetUndef()
 	}
 }
-func SplFilesystemObjectDestroyObject(object *types.ZendObject) {
+func SplFilesystemObjectDestroyObject(object *types.Object) {
 	var intern *SplFilesystemObject = SplFilesystemFromObj(object)
 	zend.ZendObjectsDestroyObject(object)
 	switch intern.GetType() {
@@ -82,7 +82,7 @@ func SplFilesystemObjectDestroyObject(object *types.ZendObject) {
 
 	}
 }
-func SplFilesystemObjectFreeStorage(object *types.ZendObject) {
+func SplFilesystemObjectFreeStorage(object *types.Object) {
 	var intern *SplFilesystemObject = SplFilesystemFromObj(object)
 	if intern.GetOthHandler() != nil && intern.GetOthHandler().GetDtor() != nil {
 		intern.GetOthHandler().GetDtor()(intern)
@@ -111,14 +111,14 @@ func SplFilesystemObjectFreeStorage(object *types.ZendObject) {
 		SplFilesystemFileFreeLine(intern)
 	}
 }
-func SplFilesystemObjectNewEx(class_type *types.ClassEntry) *types.ZendObject {
+func SplFilesystemObjectNewEx(class_type *types.ClassEntry) *types.Object {
 	var intern = NewSplFilesystemObject(class_type, &SplFilesystemObjectHandlers)
 	return intern.GetStd()
 }
-func SplFilesystemObjectNew(class_type *types.ClassEntry) *types.ZendObject {
+func SplFilesystemObjectNew(class_type *types.ClassEntry) *types.Object {
 	return SplFilesystemObjectNewEx(class_type)
 }
-func SplFilesystemObjectNewCheck(class_type *types.ClassEntry) *types.ZendObject {
+func SplFilesystemObjectNewCheck(class_type *types.ClassEntry) *types.Object {
 	var intern = NewSplFilesystemObject(class_type, &SplFilesystemObjectCheckHandlers)
 	return intern.GetStd()
 }
@@ -208,7 +208,7 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	var tmp types.Zval
 	intern.SetType(SPL_FS_FILE)
 	standard.PhpStat(intern.GetFileName(), intern.GetFileNameLen(), standard.FS_IS_DIR, &tmp)
-	if tmp.IsType(types.IS_TRUE) {
+	if tmp.IsType(types.IsTrue) {
 		intern.SetOpenMode(nil)
 		intern.SetFileName(nil)
 		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Cannot use SplFileObject with directories")
@@ -253,9 +253,9 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	intern.SetFuncGetCurr(intern.GetStd().GetCe().FunctionTable().Get("getcurrentline"))
 	return types.SUCCESS
 }
-func SplFilesystemObjectClone(zobject *types.Zval) *types.ZendObject {
-	var old_object *types.ZendObject
-	var new_object *types.ZendObject
+func SplFilesystemObjectClone(zobject *types.Zval) *types.Object {
+	var old_object *types.Object
+	var new_object *types.Object
 	var intern *SplFilesystemObject
 	var source *SplFilesystemObject
 	var index int
@@ -547,7 +547,7 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.Array {
 	}
 	return rv
 }
-func SplFilesystemObjectGetMethodCheck(object **types.ZendObject, method *types.String, key *types.Zval) types.IFunction {
+func SplFilesystemObjectGetMethodCheck(object **types.Object, method *types.String, key *types.Zval) types.IFunction {
 	var fsobj *SplFilesystemObject = SplFilesystemFromObj(*object)
 	if fsobj.GetDirp() == nil && fsobj.GetOrigPath() == nil {
 		var func_ types.IFunction
@@ -1453,7 +1453,7 @@ func SplFilesystemTreeGetIterator(ce *types.ClassEntry, object *types.Zval, by_r
 }
 func SplFilesystemObjectCast(readobj *types.Zval, writeobj *types.Zval, type_ int) int {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(readobj)
-	if type_ == types.IS_STRING {
+	if type_ == types.IsString {
 		if types.Z_OBJCE_P(readobj).GetTostring() != nil {
 			return zend.ZendStdCastObjectTostring(readobj, writeobj, type_)
 		}
@@ -1630,15 +1630,15 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) bool {
 		return intern.GetCurrentLineLen() == 0
 	} else if !(intern.GetCurrentZval().IsUndef()) {
 		switch intern.GetCurrentZval().GetType() {
-		case types.IS_STRING:
+		case types.IsString:
 			return intern.GetCurrentZval().String().GetLen() == 0
-		case types.IS_ARRAY:
+		case types.IsArray:
 			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && intern.GetCurrentZval().Array().Len() == 1 {
 				first := intern.GetCurrentZval().Array().First().GetVal()
 				return first.IsString() && first.StringVal() == ""
 			}
 			return intern.GetCurrentZval().Array().Len() == 0
-		case types.IS_NULL:
+		case types.IsNull:
 			return true
 		default:
 			return false

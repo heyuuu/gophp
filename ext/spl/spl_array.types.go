@@ -8,7 +8,7 @@ import (
  * SplArrayObject
  */
 type SplArrayObject struct {
-	std *types.ZendObject
+	std *types.Object
 
 	array           types.Zval
 	ht_iter         uint32
@@ -33,7 +33,7 @@ func (this *SplArrayObject) InitStd(ce *types.ClassEntry, handlers *types.Object
 	this.std = types.NewObject(ce, handlers)
 }
 
-func (this *SplArrayObject) GetStd() *types.ZendObject { return this.std }
+func (this *SplArrayObject) GetStd() *types.Object { return this.std }
 
 func (this *SplArrayObject) GetArray() *types.Zval                  { return &this.array }
 func (this *SplArrayObject) GetHtIter() uint32                      { return this.ht_iter }

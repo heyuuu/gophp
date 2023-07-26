@@ -38,7 +38,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 			{
 
 				/* avoid exception check */
@@ -109,7 +109,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 			{
 
 				/* avoid exception check */
@@ -177,7 +177,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteDa
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 			{
 
 				/* avoid exception check */
@@ -236,7 +236,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 			{
 
 				/* avoid exception check */
@@ -312,7 +312,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 			{
 
 				/* avoid exception check */
@@ -386,7 +386,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 			{
 
 				/* avoid exception check */
@@ -449,7 +449,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteDa
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 			{
 
 				/* avoid exception check */
@@ -523,7 +523,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 			{
 
 				/* avoid exception check */
@@ -595,7 +595,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 
 			/* > IS_NULL means not IS_UNDEF and not IS_NULL */
 
-			result = value != nil && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+			result = value != nil && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 			{
 
 				/* avoid exception check */

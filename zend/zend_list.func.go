@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZendResourceDtor(res *types.ZendResource) {
+func ZendResourceDtor(res *types.Resource) {
 	var ld *ZendRsrcListDtorsEntry
 	var r = *res
 	res.SetType(-1)
@@ -20,7 +20,7 @@ func ZendResourceDtor(res *types.ZendResource) {
 		faults.Error(faults.E_WARNING, "Unknown list entry type (%d)", r.GetType())
 	}
 }
-func ZendListClose(res *types.ZendResource) int {
+func ZendListClose(res *types.Resource) int {
 	// todo 移除机制待处理
 	//if res.GetRefcount() <= 0 {
 	//	return ZendListFree(res)
@@ -32,12 +32,12 @@ func ZendListClose(res *types.ZendResource) int {
 	}
 	return types.SUCCESS
 }
-func ZendRegisterResource(rsrc_pointer any, rsrc_type int) *types.ZendResource {
+func ZendRegisterResource(rsrc_pointer any, rsrc_type int) *types.Resource {
 	// resource 计数
 	handle := 0
 	return types.NewZendResource(handle, rsrc_pointer, rsrc_type)
 }
-func ZendFetchResource2(res *types.ZendResource, resource_type_name string, resource_type1 int, resource_type2 int) any {
+func ZendFetchResource2(res *types.Resource, resource_type_name string, resource_type1 int, resource_type2 int) any {
 	if res != nil {
 		if resource_type1 == res.GetType() {
 			return res.GetPtr()
@@ -51,7 +51,7 @@ func ZendFetchResource2(res *types.ZendResource, resource_type_name string, reso
 	}
 	return nil
 }
-func ZendFetchResource(res *types.ZendResource, resource_type_name *byte, resource_type int) any {
+func ZendFetchResource(res *types.Resource, resource_type_name *byte, resource_type int) any {
 	if resource_type == res.GetType() {
 		return res.GetPtr()
 	}
@@ -90,13 +90,13 @@ func ZendFetchResource2Ex(res *types.Zval, resource_type_name string, resource_t
 	}
 	return ZendFetchResource2(res.Resource(), resource_type_name, resource_type1, resource_type2)
 }
-func ListEntryDtor(res *types.ZendResource) {
+func ListEntryDtor(res *types.Resource) {
 	if res.GetType() >= 0 {
 		ZendResourceDtor(res)
 	}
 	EfreeSize(res, b.SizeOf("zend_resource"))
 }
-func PlistEntryDtor(res *types.ZendResource) {
+func PlistEntryDtor(res *types.Resource) {
 	if res.GetType() >= 0 {
 		var ld = ListDestructors.Find(res)
 		if ld != nil {
@@ -132,7 +132,7 @@ func ZendInitRsrcListDtors() int {
 	return types.SUCCESS
 }
 func ZendDestroyRsrcListDtors() { ListDestructors.Destroy() }
-func ZendRsrcListGetRsrcType(res *types.ZendResource) *byte {
+func ZendRsrcListGetRsrcType(res *types.Resource) *byte {
 	var lde = ListDestructors.Find(res)
 	if lde != nil {
 		return lde.GetTypeName()
@@ -140,7 +140,7 @@ func ZendRsrcListGetRsrcType(res *types.ZendResource) *byte {
 		return nil
 	}
 }
-func ZendRsrcListGetRsrcTypeEx(res *types.ZendResource) *string {
+func ZendRsrcListGetRsrcTypeEx(res *types.Resource) *string {
 	var lde = ListDestructors.Find(res)
 	if lde == nil {
 		return nil

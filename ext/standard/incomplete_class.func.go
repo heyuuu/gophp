@@ -43,13 +43,13 @@ func IncompleteClassHasProperty(object *types.Zval, member *types.Zval, check_em
 	IncompleteClassMessage(object, faults.E_NOTICE)
 	return 0
 }
-func IncompleteClassGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) types.IFunction {
+func IncompleteClassGetMethod(object **types.Object, method *types.String, key *types.Zval) types.IFunction {
 	var zobject types.Zval
 	zobject.SetObject(*object)
 	IncompleteClassMessage(&zobject, faults.E_ERROR)
 	return nil
 }
-func PhpCreateIncompleteObject(ce *types.ClassEntry) *types.ZendObject {
+func PhpCreateIncompleteObject(ce *types.ClassEntry) *types.Object {
 	return types.NewObject(ce, &PhpIncompleteObjectHandlers)
 }
 func PhpCreateIncompleteClass() *types.ClassEntry {

@@ -12,7 +12,7 @@ import (
 )
 
 func DIRG(v __auto__) __auto__ { return DirGlobals.v }
-func PhpSetDefaultDir(res *types.ZendResource) {
+func PhpSetDefaultDir(res *types.Resource) {
 	if DIRG(default_dir) {
 		//zend.ZendListDelete(DIRG(default_dir))
 	}
@@ -104,7 +104,7 @@ func ZifClosedir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle 
 	var tmp *types.Zval
 	var myself *types.Zval
 	var dirp *core.PhpStream
-	var res *types.ZendResource
+	var res *types.Resource
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 0, 1, 0)

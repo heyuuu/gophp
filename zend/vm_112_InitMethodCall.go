@@ -73,7 +73,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	var object *types.Zval
 	var fbc types.IFunction
 	var called_scope *types.ClassEntry
-	var obj *types.ZendObject
+	var obj *types.Object
 	var call *ZendExecuteData
 	var call_info uint32
 	object = opline.Op1()
@@ -106,7 +106,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	if CACHED_PTR(opline.GetResult().GetNum()) == called_scope {
 		fbc = CACHED_PTR(opline.GetResult().GetNum() + b.SizeOf("void *"))
 	} else {
-		var orig_obj *types.ZendObject = obj
+		var orig_obj *types.Object = obj
 		{
 			function_name = opline.Const2()
 		}
@@ -141,7 +141,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 
 		/* call static method */
 
-		obj = (*types.ZendObject)(called_scope)
+		obj = (*types.Object)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -158,7 +158,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var object *types.Zval
 	var fbc types.IFunction
 	var called_scope *types.ClassEntry
-	var obj *types.ZendObject
+	var obj *types.Object
 	var call *ZendExecuteData
 	var call_info uint32
 	object = opline.Op1()
@@ -207,7 +207,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	called_scope = obj.GetCe()
 
 	{
-		var orig_obj *types.ZendObject = obj
+		var orig_obj *types.Object = obj
 		/* First, locate the function. */
 
 		fbc = obj.GetMethod(function_name.StringVal(), nil)
@@ -233,7 +233,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		}
 
 		/* call static method */
-		obj = (*types.ZendObject)(called_scope)
+		obj = (*types.Object)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -251,7 +251,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	var object *types.Zval
 	var fbc types.IFunction
 	var called_scope *types.ClassEntry
-	var obj *types.ZendObject
+	var obj *types.Object
 	var call *ZendExecuteData
 	var call_info uint32
 	object = opline.Op1()
@@ -300,7 +300,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	called_scope = obj.GetCe()
 
 	{
-		var orig_obj *types.ZendObject = obj
+		var orig_obj *types.Object = obj
 		/* First, locate the function. */
 
 		fbc = obj.GetMethod(function_name.StringVal(), nil)
@@ -326,7 +326,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 
 		/* call static method */
 
-		obj = (*types.ZendObject)(called_scope)
+		obj = (*types.Object)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -343,7 +343,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 	var object *types.Zval
 	var fbc types.IFunction
 	var called_scope *types.ClassEntry
-	var obj *types.ZendObject
+	var obj *types.Object
 	var call *ZendExecuteData
 	var call_info uint32
 	object = executeData.ThisObjectZval()
@@ -355,7 +355,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 	if CACHED_PTR(opline.GetResult().GetNum()) == called_scope {
 		fbc = CACHED_PTR(opline.GetResult().GetNum() + b.SizeOf("void *"))
 	} else {
-		var orig_obj *types.ZendObject = obj
+		var orig_obj *types.Object = obj
 		{
 			function_name = opline.Const2()
 		}
@@ -384,7 +384,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 	if fbc.IsStatic() {
 		/* call static method */
 
-		obj = (*types.ZendObject)(called_scope)
+		obj = (*types.Object)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 	}
@@ -404,7 +404,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var object *types.Zval
 	var fbc types.IFunction
 	var called_scope *types.ClassEntry
-	var obj *types.ZendObject
+	var obj *types.Object
 	var call *ZendExecuteData
 	var call_info uint32
 	object = executeData.ThisObjectZval()
@@ -435,7 +435,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	called_scope = obj.GetCe()
 
 	{
-		var orig_obj *types.ZendObject = obj
+		var orig_obj *types.Object = obj
 		/* First, locate the function. */
 
 		fbc = obj.GetMethod(function_name.StringVal(), nil)
@@ -457,7 +457,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
 		/* call static method */
-		obj = (*types.ZendObject)(called_scope)
+		obj = (*types.Object)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	}
 
@@ -473,7 +473,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 	var object *types.Zval
 	var fbc types.IFunction
 	var called_scope *types.ClassEntry
-	var obj *types.ZendObject
+	var obj *types.Object
 	var call *ZendExecuteData
 	var call_info uint32
 	object = executeData.ThisObjectZval()
@@ -523,7 +523,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 	if fbc.IsStatic() {
 		/* call static method */
 
-		obj = (*types.ZendObject)(called_scope)
+		obj = (*types.Object)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 	}
@@ -543,7 +543,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	var object *types.Zval
 	var fbc types.IFunction
 	var called_scope *types.ClassEntry
-	var obj *types.ZendObject
+	var obj *types.Object
 	var call *ZendExecuteData
 	var call_info uint32
 	object = opline.Op1()
@@ -576,7 +576,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	if CACHED_PTR(opline.GetResult().GetNum()) == called_scope {
 		fbc = CACHED_PTR(opline.GetResult().GetNum() + b.SizeOf("void *"))
 	} else {
-		var orig_obj *types.ZendObject = obj
+		var orig_obj *types.Object = obj
 		{
 			function_name = opline.Const2()
 		}
@@ -614,7 +614,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 
 		/* call static method */
 
-		obj = (*types.ZendObject)(called_scope)
+		obj = (*types.Object)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		{
@@ -639,7 +639,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var object *types.Zval
 	var fbc types.IFunction
 	var called_scope *types.ClassEntry
-	var obj *types.ZendObject
+	var obj *types.Object
 	var call *ZendExecuteData
 	var call_info uint32
 	object = opline.Op1()
@@ -688,7 +688,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	called_scope = obj.GetCe()
 
 	{
-		var orig_obj *types.ZendObject = obj
+		var orig_obj *types.Object = obj
 		/* First, locate the function. */
 		fbc = obj.GetMethod(function_name.StringVal(), nil)
 		if fbc == nil {
@@ -712,7 +712,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 		}
 
 		/* call static method */
-		obj = (*types.ZendObject)(called_scope)
+		obj = (*types.Object)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -729,7 +729,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	var object *types.Zval
 	var fbc types.IFunction
 	var called_scope *types.ClassEntry
-	var obj *types.ZendObject
+	var obj *types.Object
 	var call *ZendExecuteData
 	var call_info uint32
 	object = opline.Op1()
@@ -779,7 +779,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	called_scope = obj.GetCe()
 
 	{
-		var orig_obj *types.ZendObject = obj
+		var orig_obj *types.Object = obj
 		/* First, locate the function. */
 
 		fbc = obj.GetMethod(function_name.StringVal(), nil)
@@ -810,7 +810,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 
 		/* call static method */
 
-		obj = (*types.ZendObject)(called_scope)
+		obj = (*types.Object)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		/* CV may be changed indirectly (e.g. when it's a reference) */

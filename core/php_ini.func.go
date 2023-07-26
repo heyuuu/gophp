@@ -193,7 +193,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 				section_arr.SetArray(types.NewArray(8))
 				entry = target_hash.KeyUpdate(key, &section_arr)
 			}
-			if entry.IsType(types.IS_ARRAY) {
+			if entry.IsType(types.IsArray) {
 				ActiveIniHash = entry.Array()
 			}
 		}

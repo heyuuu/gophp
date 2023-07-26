@@ -241,7 +241,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit boo
 
 		/* `return ...;` is illegal in a void function (but `return;` isn't) */
 
-		if return_info.GetType().Code() == types.IS_VOID {
+		if return_info.GetType().Code() == types.IsVoid {
 			if expr != nil {
 				if expr.GetOpType() == IS_CONST && expr.GetConstant().IsNull() {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A void function must not return a value "+"(did you mean \"return;\" instead of \"return null;\"?)")
@@ -265,7 +265,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit boo
 			}
 		}
 		if expr != nil && expr.GetOpType() == IS_CONST {
-			if return_info.GetType().Code() == expr.GetConstant().GetType() || return_info.GetType().Code() == types.IS_BOOL && (expr.GetConstant().IsFalse() || expr.GetConstant().IsTrue()) || return_info.GetType().AllowNull() && expr.GetConstant().IsNull() {
+			if return_info.GetType().Code() == expr.GetConstant().GetType() || return_info.GetType().Code() == types.IsBool && (expr.GetConstant().IsFalse() || expr.GetConstant().IsTrue()) || return_info.GetType().AllowNull() && expr.GetConstant().IsNull() {
 
 				/* we don't need run-time check */
 
@@ -372,7 +372,7 @@ func (compiler *Compiler) CompileClassRef(result *Znode, name_ast *ZendAst, fetc
 		compiler.CompileExpr(&name_node, name_ast)
 		if name_node.GetOpType() == IS_CONST {
 			var name *types.String
-			if name_node.GetConstant().GetType() != types.IS_STRING {
+			if name_node.GetConstant().GetType() != types.IsString {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 			}
 			name = name_node.GetConstant().String()

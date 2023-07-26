@@ -74,7 +74,7 @@ func (se *VarSerializer) addVarHash(var_ *types.Zval) int {
 	}
 
 	/* References to objects are treated as if the reference didn't exist */
-	if isRef && types.Z_REFVAL_P(var_).IsType(types.IS_OBJECT) {
+	if isRef && types.Z_REFVAL_P(var_).IsType(types.IsObject) {
 		var_ = types.Z_REFVAL_P(var_)
 	}
 
@@ -225,7 +225,7 @@ func (se *VarSerializer) serializeIntern(struc *types.Zval) {
 				se.WriteLong(varAlready)
 				se.WriteByte(';')
 				return
-			} else if struc.IsType(types.IS_OBJECT) {
+			} else if struc.IsType(types.IsObject) {
 				se.WriteString("r:")
 				se.WriteLong(varAlready)
 				se.WriteByte(';')
@@ -235,29 +235,29 @@ func (se *VarSerializer) serializeIntern(struc *types.Zval) {
 	}
 again:
 	switch struc.GetType() {
-	case types.IS_FALSE:
+	case types.IsFalse:
 		se.WriteString("b:0;")
 		return
-	case types.IS_TRUE:
+	case types.IsTrue:
 		se.WriteString("b:1;")
 		return
-	case types.IS_NULL:
+	case types.IsNull:
 		se.WriteString("N;")
 		return
-	case types.IS_LONG:
+	case types.IsLong:
 		se.serializeLong(struc.Long())
 		return
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		var tmp_str []byte
 		se.WriteString("d:")
 		core.PhpGcvt(struc.Double(), int(core.PG__().serialize_precision), '.', 'E', tmp_str)
 		se.WriteString(b.CastStrAuto(tmp_str))
 		se.WriteByte(';')
 		return
-	case types.IS_STRING:
+	case types.IsString:
 		se.serializeString(struc.StringVal())
 		return
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var ce = types.Z_OBJCE_P(struc)
 		if ce.FunctionTable().Exists("__serialize") {
 			var retval types.Zval
@@ -335,12 +335,12 @@ again:
 		}
 		se.serializeNestedData(struc, myht, count, incompleteClass)
 		return
-	case types.IS_ARRAY:
+	case types.IsArray:
 		se.WriteString("a:")
 		myht := struc.Array()
 		se.serializeNestedData(struc, myht, myht.Count(), false)
 		return
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		struc = types.Z_REFVAL_P(struc)
 		goto again
 	default:

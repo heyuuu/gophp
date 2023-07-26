@@ -168,7 +168,7 @@ func PhpStreamUrlWrapHttpEx(
 		if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "header")) != nil {
 			var s *byte
 			var p *byte
-			if tmpzval.IsType(types.IS_ARRAY) {
+			if tmpzval.IsType(types.IsArray) {
 				var tmpheader *types.Zval = nil
 				var __ht *types.Array = tmpzval.Array()
 				for _, _p := range __ht.ForeachData() {
@@ -368,7 +368,7 @@ func PhpStreamUrlWrapHttpEx(
 	}
 	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "header")) != nil {
 		tmp = nil
-		if tmpzval.IsType(types.IS_ARRAY) {
+		if tmpzval.IsType(types.IsArray) {
 			var tmpheader *types.Zval = nil
 			var tmpstr zend.SmartStr = zend.MakeSmartStr(0)
 			var __ht *types.Array = tmpzval.Array()

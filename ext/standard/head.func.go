@@ -244,7 +244,7 @@ func ZifSetcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, _ 
 		break
 	}
 	if expires_or_options != nil {
-		if expires_or_options.IsType(types.IS_ARRAY) {
+		if expires_or_options.IsType(types.IsArray) {
 			if executeData.NumArgs() > 3 {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot pass arguments after the options array")
 				return_value.SetFalse()
@@ -262,7 +262,7 @@ func ZifSetcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, _ 
 			return_value.SetFalse()
 		}
 	}
-	if expires_or_options != nil && expires_or_options.IsType(types.IS_ARRAY) {
+	if expires_or_options != nil && expires_or_options.IsType(types.IsArray) {
 		if path != nil {
 			// types.ZendStringRelease(path)
 		}
@@ -303,7 +303,7 @@ func ZifSetrawcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval,
 		break
 	}
 	if expires_or_options != nil {
-		if expires_or_options.IsType(types.IS_ARRAY) {
+		if expires_or_options.IsType(types.IsArray) {
 			if executeData.NumArgs() > 3 {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot pass arguments after the options array")
 				return_value.SetFalse()
@@ -321,7 +321,7 @@ func ZifSetrawcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval,
 			return_value.SetFalse()
 		}
 	}
-	if expires_or_options != nil && expires_or_options.IsType(types.IS_ARRAY) {
+	if expires_or_options != nil && expires_or_options.IsType(types.IsArray) {
 		if path != nil {
 			// types.ZendStringRelease(path)
 		}

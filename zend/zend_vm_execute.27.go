@@ -30,7 +30,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.Object()
+	var zobj *types.Object = container.Object()
 	var retval *types.Zval
 
 	retval = zobj.ReadPropertyEx(offset, BP_VAR_R, opline.Result())

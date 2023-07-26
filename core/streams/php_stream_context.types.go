@@ -35,12 +35,12 @@ func (this *PhpStreamNotifier) SetProgressMax(value int) { this.progress_max = v
 type PhpStreamContext struct {
 	notifier *PhpStreamNotifier
 	options  types.Zval
-	res      *types.ZendResource
+	res      *types.Resource
 }
 
 func (this *PhpStreamContext) GetNotifier() *PhpStreamNotifier      { return this.notifier }
 func (this *PhpStreamContext) SetNotifier(value *PhpStreamNotifier) { this.notifier = value }
 func (this *PhpStreamContext) GetOptions() types.Zval               { return this.options }
 
-func (this *PhpStreamContext) GetRes() *types.ZendResource      { return this.res }
-func (this *PhpStreamContext) SetRes(value *types.ZendResource) { this.res = value }
+func (this *PhpStreamContext) GetRes() *types.Resource      { return this.res }
+func (this *PhpStreamContext) SetRes(value *types.Resource) { this.res = value }

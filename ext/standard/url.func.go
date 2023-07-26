@@ -605,7 +605,7 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 		return_value.SetFalse()
 		return
 	}
-	if stream.GetWrapperdata().GetType() != types.IS_ARRAY {
+	if stream.GetWrapperdata().GetType() != types.IsArray {
 		core.PhpStreamClose(stream)
 		return_value.SetFalse()
 		return

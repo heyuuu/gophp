@@ -47,7 +47,7 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			/* If There's no handler and it doesn't implement Countable then add a warning */
 
-		} else if op1.GetType() <= types.IS_NULL {
+		} else if op1.GetType() <= types.IsNull {
 			count = 0
 		} else {
 			count = 1
@@ -102,7 +102,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		} else if op1.IsReference() {
 			op1 = types.Z_REFVAL_P(op1)
 			continue
-		} else if op1.GetType() <= types.IS_NULL {
+		} else if op1.GetType() <= types.IsNull {
 			if op1.IsUndef() {
 				ZVAL_UNDEFINED_OP1(executeData)
 			}
@@ -160,7 +160,7 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		} else if op1.IsReference() {
 			op1 = types.Z_REFVAL_P(op1)
 			continue
-		} else if op1.GetType() <= types.IS_NULL {
+		} else if op1.GetType() <= types.IsNull {
 			if op1.IsUndef() {
 				ZVAL_UNDEFINED_OP1(executeData)
 			}

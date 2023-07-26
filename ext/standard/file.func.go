@@ -17,11 +17,11 @@ import (
 
 func FG__() *PhpFileGlobals { return FileGlobals }
 func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *types.Zval) {
-	b.Assert(arg.IsType(types.IS_RESOURCE))
+	b.Assert(arg.IsType(types.IsResource))
 	core.PhpStreamFromRes(stream, arg.Resource())
 }
 func PhpLeStreamContext() int { return LeStreamContext }
-func FileContextDtor(res *types.ZendResource) {
+func FileContextDtor(res *types.Resource) {
 	var context *core.PhpStreamContext = (*core.PhpStreamContext)(res.GetPtr())
 	if context.GetOptions().IsNotUndef() {
 		// zend.ZvalPtrDtor(context.GetOptions())
@@ -405,7 +405,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		}
 		break
 	}
-	if data.IsType(types.IS_RESOURCE) {
+	if data.IsType(types.IsResource) {
 		core.PhpStreamFromZval(srcstream, data)
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
@@ -440,7 +440,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		core.PhpStreamTruncateSetSize(stream, 0)
 	}
 	switch data.GetType() {
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		var len_ int
 		if core.PhpStreamCopyToStreamEx(srcstream, stream, core.PHP_STREAM_COPY_ALL, &len_) != types.SUCCESS {
 			numbytes = -1
@@ -451,18 +451,18 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 			}
 			numbytes = len_
 		}
-	case types.IS_NULL:
+	case types.IsNull:
 		fallthrough
-	case types.IS_LONG:
+	case types.IsLong:
 		fallthrough
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		fallthrough
-	case types.IS_FALSE:
+	case types.IsFalse:
 		fallthrough
-	case types.IS_TRUE:
+	case types.IsTrue:
 		operators.ConvertToStringEx(data)
 		fallthrough
-	case types.IS_STRING:
+	case types.IsString:
 		if data.String().GetLen() != 0 {
 			numbytes = core.PhpStreamWrite(stream, data.String().GetVal(), data.String().GetLen())
 			if numbytes != data.String().GetLen() {
@@ -470,7 +470,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 				numbytes = -1
 			}
 		}
-	case types.IS_ARRAY:
+	case types.IsArray:
 		if data.Array().Len() != 0 {
 			data.Array().ForeachEx(func(key types.ArrayKey, tmp *types.Zval) bool {
 				var s string = operators.ZvalGetStrVal(tmp)
@@ -486,7 +486,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 				return true
 			})
 		}
-	case types.IS_OBJECT:
+	case types.IsObject:
 		if data.Object().GetHandlers() != nil {
 			if s, ok := zend.StdCastObjectToString(data); ok {
 				numbytes = core.PhpStreamWriteString(stream, s)

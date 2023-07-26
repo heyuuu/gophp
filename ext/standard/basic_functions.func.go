@@ -210,7 +210,7 @@ func ZifConstant(returnValue zpp.Ret, constName string) {
 	c := zend.ZendGetConstantEx(constName, scope, zend.ZEND_FETCH_CLASS_SILENT)
 	if c != nil {
 		types.ZVAL_COPY_OR_DUP(returnValue, c)
-		if returnValue.IsType(types.IS_CONSTANT_AST) {
+		if returnValue.IsType(types.IsConstantAst) {
 			if zend.ZvalUpdateConstantEx(returnValue, scope) != types.SUCCESS {
 				return
 			}
@@ -381,7 +381,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 	/* Get argv from the global symbol table. We calculate argc ourselves
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobal("_SERVER")) && (lang.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || lang.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IsArray || zend.ZendIsAutoGlobal("_SERVER")) && (lang.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || lang.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
 		var pos int = 0
 		if !args.IsArray() {
 			return_value.SetFalse()
@@ -500,7 +500,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 		/* Add this option / argument pair to the result hash. */
 
 		optname_len = strlen(optname)
-		if !(optname_len > 1 && optname[0] == '0') && operators.IsNumericString(b.CastStr(optname, optname_len), nil, nil, 0) == types.IS_LONG {
+		if !(optname_len > 1 && optname[0] == '0') && operators.IsNumericString(b.CastStr(optname, optname_len), nil, nil, 0) == types.IsLong {
 
 			/* numeric string */
 
@@ -618,7 +618,7 @@ func parseConfigArray(hash *types.Array) *types.Array {
 func ZifGetCfgVar(optionName string) *types.Zval {
 	retval := core.CfgGetEntry(optionName)
 	if retval != nil {
-		if retval.IsType(types.IS_ARRAY) {
+		if retval.IsType(types.IsArray) {
 			arr := parseConfigArray(retval.Array())
 			return types.NewZvalArray(arr)
 		} else {
@@ -1207,7 +1207,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			/* bare string - nothing to do */
 
 		}
-		if !(arg1.String().GetLen() > 1 && arg1.String().GetStr()[0] == '0') && operators.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IS_LONG {
+		if !(arg1.String().GetLen() > 1 && arg1.String().GetStr()[0] == '0') && operators.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IsLong {
 			var key = zend.StrToLongWithUnit(arg1.StringVal())
 			if lang.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)

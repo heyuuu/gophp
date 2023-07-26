@@ -9,7 +9,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func SplFixedArrayFromObj(obj *types.ZendObject) *SplFixedArrayObject {
+func SplFixedArrayFromObj(obj *types.Object) *SplFixedArrayObject {
 	return (*SplFixedArrayObject)((*byte)(obj - zend_long((*byte)(&((*SplFixedArrayObject)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLFIXEDARRAY_P(zv *types.Zval) *SplFixedArrayObject {
@@ -98,7 +98,7 @@ func SplFixedarrayObjectGetProperties(obj *types.Zval) *types.Array {
 	}
 	return ht
 }
-func SplFixedarrayObjectFreeStorage(object *types.ZendObject) {
+func SplFixedarrayObjectFreeStorage(object *types.Object) {
 	var intern *SplFixedArrayObject = SplFixedArrayFromObj(object)
 	var i zend.ZendLong
 	if intern.GetArray().GetSize() > 0 {
@@ -111,7 +111,7 @@ func SplFixedarrayObjectFreeStorage(object *types.ZendObject) {
 	}
 	zend.ZendObjectStdDtor(intern.GetStd())
 }
-func SplFixedarrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
+func SplFixedarrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.Object {
 	var intern *SplFixedArrayObject = NewSplFixedArrayObject(class_type)
 	var parent *types.ClassEntry = class_type
 	var inherited int = 0
@@ -179,12 +179,12 @@ func SplFixedarrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, cl
 	}
 	return intern.GetStd()
 }
-func SplFixedarrayNew(class_type *types.ClassEntry) *types.ZendObject {
+func SplFixedarrayNew(class_type *types.ClassEntry) *types.Object {
 	return SplFixedarrayObjectNewEx(class_type, nil, 0)
 }
-func SplFixedarrayObjectClone(zobject *types.Zval) *types.ZendObject {
-	var old_object *types.ZendObject
-	var new_object *types.ZendObject
+func SplFixedarrayObjectClone(zobject *types.Zval) *types.Object {
+	var old_object *types.Object
+	var new_object *types.Object
 	old_object = zobject.Object()
 	new_object = SplFixedarrayObjectNewEx(old_object.GetCe(), zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)

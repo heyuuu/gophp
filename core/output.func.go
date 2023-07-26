@@ -208,9 +208,9 @@ func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flag
 	var err *byte = nil
 	var handler *PhpOutputHandler = nil
 	switch output_handler.GetType() {
-	case types.IS_NULL:
+	case types.IsNull:
 		handler = PhpOutputHandlerCreateInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunk_size, flags)
-	case types.IS_STRING:
+	case types.IsString:
 		fallthrough
 	default:
 		user := &PhpOutputHandlerUserFuncT{}

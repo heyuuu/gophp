@@ -14,7 +14,7 @@ type ObjectOld struct {
 	propertiesTable []Zval // 静态属性
 }
 
-func (o *ObjectOld) obj() *ZendObject { return o }
+func (o *ObjectOld) obj() *Object { return o }
 
 func (o *ObjectOld) ClassName() string  { return o.ce.Name() }
 func (o *ObjectOld) GetCe() *ClassEntry { return o.ce }
@@ -23,7 +23,7 @@ func (o *ObjectOld) Free() { o.handlers.FreeObj(o.obj()) }
 func (o *ObjectOld) Dtor() { o.handlers.DtorObj(o.obj()) }
 
 func (o *ObjectOld) CanClone() bool { return o.handlers.CloneObjEx != nil }
-func (o *ObjectOld) Clone() *ZendObject {
+func (o *ObjectOld) Clone() *Object {
 	b.Assert(o.handlers.CloneObjEx != nil)
 	return o.handlers.CloneObjEx(o.obj())
 }
@@ -96,11 +96,11 @@ func (o *ObjectOld) GetMethod(method string, key *Zval) IFunction {
 	return o.handlers.GetMethod(&obj, NewString(method), key)
 }
 
-func (o *ObjectOld) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
+func (o *ObjectOld) CallMethod(method string, object *Object, executeData *zend.ZendExecuteData, returnValue *Zval) int {
 	return o.handlers.CallMethod(NewString(method), object, executeData, returnValue)
 }
 
-func (o *ObjectOld) GetConstructor(object *ZendObject) IFunction {
+func (o *ObjectOld) GetConstructor(object *Object) IFunction {
 	return o.handlers.GetConstructor(object)
 }
 
@@ -110,7 +110,7 @@ func (o *ObjectOld) Cast(retval *Zval, type_ ZvalType) int {
 }
 
 func (o *ObjectOld) CanGetClosure() bool { return o.handlers.GetClosureEx != nil }
-func (o *ObjectOld) GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **ZendObject) int {
+func (o *ObjectOld) GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **Object) int {
 	return o.handlers.GetClosureEx(o.obj(), cePtr, fptrPtr, objPtr)
 }
 
@@ -120,11 +120,11 @@ func (o *ObjectOld) DoOperation(opcode uint8, result *Zval, op1 *Zval, op2 *Zval
 	return o.handlers.DoOperation(opcode, result, op1, op2)
 }
 
-func (o *ObjectOld) CanCompareObjectsTo(obj2 *ZendObject) bool {
+func (o *ObjectOld) CanCompareObjectsTo(obj2 *Object) bool {
 	return objectCompareFunc(o.handlers.CompareObjects) == objectCompareFunc(obj2.handlers.CompareObjects)
 }
 
-func (o *ObjectOld) CompareObjectsTo(another *ZendObject) int {
+func (o *ObjectOld) CompareObjectsTo(another *Object) int {
 	return o.handlers.CompareObjectsEx(o.obj(), another)
 }
 

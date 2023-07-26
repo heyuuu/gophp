@@ -9,8 +9,8 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func DisplayDisabledClass(classType *types.ClassEntry) *types.ZendObject {
-	var intern *types.ZendObject
+func DisplayDisabledClass(classType *types.ClassEntry) *types.Object {
+	var intern *types.Object
 	intern = types.NewStdObjectSkipPropertiesInit(classType)
 	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", classType.Name())
 	return intern
@@ -96,7 +96,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 		}
 		fcc.SetCallingScope(ce)
 		if scope != nil && fcc.GetObject() == nil {
-			var object *types.ZendObject = ZendGetThisObject(CurrEX())
+			var object *types.Object = ZendGetThisObject(CurrEX())
 			if object != nil && operators.InstanceofFunction(object.GetCe(), scope) != 0 && operators.InstanceofFunction(scope, ce) != 0 {
 				fcc.SetObject(object)
 				fcc.SetCalledScope(object.GetCe())
@@ -272,7 +272,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 				retval = 1
 				call_via_handler = fcc.GetFunctionHandler().IsCallViaTrampoline()
 				if call_via_handler != 0 && fcc.GetObject() == nil {
-					var object *types.ZendObject = ZendGetThisObject(CurrEX())
+					var object *types.Object = ZendGetThisObject(CurrEX())
 					if object != nil && operators.InstanceofFunction(object.GetCe(), fcc.GetCallingScope()) != 0 {
 						fcc.SetObject(object)
 					}
@@ -355,15 +355,15 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 func ZendCreateMethodString(className string, methodName string) string {
 	return className + "::" + methodName
 }
-func ZendGetCallableNameEx(callable *types.Zval, object *types.ZendObject) string {
+func ZendGetCallableNameEx(callable *types.Zval, object *types.Object) string {
 	callable = callable.DeRef()
 	switch callable.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		if object != nil {
 			return ZendCreateMethodString(object.GetCe().Name(), callable.StringVal())
 		}
 		return callable.StringVal()
-	case types.IS_ARRAY:
+	case types.IsArray:
 		var method *types.Zval = nil
 		var obj *types.Zval = nil
 		if callable.Array().Len() == 2 {
@@ -380,10 +380,10 @@ func ZendGetCallableNameEx(callable *types.Zval, object *types.ZendObject) strin
 		} else {
 			return types.STR_ARRAY_CAPITALIZED
 		}
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var calling_scope *types.ClassEntry
 		var fptr types.IFunction
-		var object *types.ZendObject
+		var object *types.Object
 		if callable.Object().CanGetClosure() && callable.Object().GetClosure(callable, &calling_scope, &fptr, &object) == types.SUCCESS {
 			var ce *types.ClassEntry = callable.Object().GetCe()
 			return ce.Name() + "::__invoke"

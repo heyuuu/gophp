@@ -150,7 +150,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 	if ASSERTG(exception) {
 		if description == nil {
 			faults.ThrowException(AssertionErrorCe, nil, faults.E_ERROR)
-		} else if description.IsType(types.IS_OBJECT) && operators.InstanceofFunction(types.Z_OBJCE_P(description), faults.ZendCeThrowable) != 0 {
+		} else if description.IsType(types.IsObject) && operators.InstanceofFunction(types.Z_OBJCE_P(description), faults.ZendCeThrowable) != 0 {
 			// 			description.AddRefcount()
 			faults.ThrowExceptionObject(description)
 		} else {

@@ -154,7 +154,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if group.IsType(types.IS_LONG) {
+			if group.IsType(types.IsLong) {
 				option = core.PHP_STREAM_META_GROUP
 				value = &(group.Long())
 			} else if group.IsString() {
@@ -181,7 +181,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 			return
 		}
 	}
-	if group.IsType(types.IS_LONG) {
+	if group.IsType(types.IsLong) {
 		gid = gid_t(group.Long())
 	} else if group.IsString() {
 		if PhpGetGidByName(group.String().GetVal(), &gid) != types.SUCCESS {
@@ -252,7 +252,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if user.IsType(types.IS_LONG) {
+			if user.IsType(types.IsLong) {
 				option = core.PHP_STREAM_META_OWNER
 				value = &(user.Long())
 			} else if user.IsString() {
@@ -279,7 +279,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 			return
 		}
 	}
-	if user.IsType(types.IS_LONG) {
+	if user.IsType(types.IsLong) {
 		uid = uid_t(user.Long())
 	} else if user.IsString() {
 		if PhpGetUidByName(user.String().GetVal(), &uid) != types.SUCCESS {

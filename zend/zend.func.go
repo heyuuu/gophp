@@ -117,7 +117,7 @@ func ZendPrintZval(expr *types.Zval) int {
 }
 func ZendPrintFlatZvalR(expr *types.Zval) {
 	switch expr.GetType() {
-	case types.IS_ARRAY:
+	case types.IsArray:
 		ZEND_PUTS("Array (")
 		if expr.Array().IsRecursive() {
 			ZEND_PUTS(" *RECURSION*")
@@ -127,7 +127,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 		PrintFlatHash(expr.Array())
 		ZEND_PUTS(")")
 		expr.Array().UnprotectRecursive()
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var properties *types.Array
 		ZendPrintf("%s Object (", expr.Object().ClassName())
 		// types.ZendStringReleaseEx(class_name, 0)
@@ -142,7 +142,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 			expr.Object().UnprotectRecursive()
 		}
 		ZEND_PUTS(")")
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		ZendPrintFlatZvalR(types.Z_REFVAL_P(expr))
 	default:
 		ZendPrintZval(expr)
@@ -150,7 +150,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 }
 func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 	switch expr.GetType() {
-	case types.IS_ARRAY:
+	case types.IsArray:
 		buf.WriteString("Array\n")
 		if expr.Array().IsRecursive() {
 			buf.WriteString(" *RECURSION*")
@@ -159,7 +159,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		expr.Array().ProtectRecursive()
 		PrintHash(buf, expr.Array(), indent, 0)
 		expr.Array().UnprotectRecursive()
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var properties *types.Array
 		buf.WriteString(expr.Object().ClassName())
 		buf.WriteString(" Object\n")
@@ -175,13 +175,13 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		expr.Object().UnprotectRecursive()
 		//ZendReleaseProperties(properties)
 		break
-	case types.IS_LONG:
+	case types.IsLong:
 		buf.WriteLong(expr.Long())
 		break
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		ZendPrintZvalRToBuf(buf, types.Z_REFVAL_P(expr), indent)
 		break
-	case types.IS_STRING:
+	case types.IsString:
 		buf.WriteString(expr.String().GetStr())
 		break
 	default:
@@ -383,7 +383,7 @@ func ZendUserExceptionHandler() {
 	var orig_user_exception_handler types.Zval
 	var params []types.Zval
 	var retval2 types.Zval
-	var old_exception *types.ZendObject
+	var old_exception *types.Object
 	old_exception = EG__().GetException()
 	EG__().SetException(nil)
 	params[0].SetObject(old_exception)

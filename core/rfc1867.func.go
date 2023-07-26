@@ -596,7 +596,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 
 	PG__().rfc1867_protected_variables = types.NewArray(8)
 	SG__().rfc1867UploadedFiles = make(map[string]bool)
-	if PG__().http_globals[TRACK_VARS_FILES].GetType() != types.IS_ARRAY {
+	if PG__().http_globals[TRACK_VARS_FILES].GetType() != types.IsArray {
 
 		/* php_auto_globals_create_files() might have already done that */
 

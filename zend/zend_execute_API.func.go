@@ -94,7 +94,7 @@ func ShutdownExecutor() {
 	EG__().SetIsInResourceShutdown(true)
 
 	faults.Try(func() {
-		EG__().RegularList().ForeachReserve(func(_ string, res *types.ZendResource) {
+		EG__().RegularList().ForeachReserve(func(_ string, res *types.Resource) {
 			if res.GetType() >= 0 {
 				ZendResourceDtor(res)
 			}
@@ -693,7 +693,7 @@ func ZendGetCalledScope(ex *ZendExecuteData) *types.ClassEntry {
 	}
 	return nil
 }
-func ZendGetThisObject(ex *ZendExecuteData) *types.ZendObject {
+func ZendGetThisObject(ex *ZendExecuteData) *types.Object {
 	for ex != nil {
 		if obj := ex.ThisObject(); obj != nil {
 			return obj

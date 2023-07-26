@@ -524,7 +524,7 @@ func PhpStreamUrlWrapFtp(
 
 		/* set resume position if applicable */
 
-		if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(types.IS_LONG) && tmpzval.Long() > 0 {
+		if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(types.IsLong) && tmpzval.Long() > 0 {
 			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", tmpzval.Long())
 			result = GET_FTP_RESULT(stream)
 			if result < 300 || result > 399 {

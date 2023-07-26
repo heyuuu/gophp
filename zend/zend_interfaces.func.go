@@ -19,7 +19,7 @@ func ZendCallMethodWith2Params(obj *types.Zval, objCe *types.ClassEntry, fnProxy
 }
 
 func ZendCallMethod(object *types.Zval, objCe *types.ClassEntry, fnProxy *types.IFunction, functionName string, retvalPtr *types.Zval, args ...*types.Zval) *types.Zval {
-	var objPtr *types.ZendObject = nil
+	var objPtr *types.Object = nil
 	if object != nil {
 		objPtr = object.Object()
 	}
@@ -337,13 +337,13 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 		result = types.FAILURE
 	} else {
 		switch retval.GetType() {
-		case types.IS_NULL:
+		case types.IsNull:
 
 			/* we could also make this '*buf_len = 0' but this allows to skip variables */
 
 			// ZvalPtrDtor(&retval)
 			return types.FAILURE
-		case types.IS_STRING:
+		case types.IsString:
 			*buffer = (*uint8)(Estrndup(retval.String().GetVal(), retval.String().GetLen()))
 			*buf_len = retval.String().GetLen()
 			result = types.SUCCESS

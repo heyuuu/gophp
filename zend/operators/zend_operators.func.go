@@ -51,9 +51,9 @@ func IsNumericString(str string, lval *zend.ZendLong, dval *float64, allow_error
 		*dval = r.Float()
 	}
 	if r.IsInt() {
-		return types.IS_LONG
+		return types.IsLong
 	} else if r.IsFloat() {
-		return types.IS_DOUBLE
+		return types.IsDouble
 	} else {
 		return 0
 	}
@@ -248,7 +248,7 @@ func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype types.ZvalType, 
 func _convertScalarToNumber(op *types.Zval, silent bool, check bool) {
 	op = op.DeRef()
 	switch op.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		var r conv.ParseNumberResult
 		if silent {
 			r = zend.StrToNumberAllowErrors(op.StringVal())
@@ -265,17 +265,17 @@ func _convertScalarToNumber(op *types.Zval, silent bool, check bool) {
 				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
 			}
 		}
-	case types.IS_NULL,
-		types.IS_FALSE:
+	case types.IsNull,
+		types.IsFalse:
 		op.SetLong(0)
-	case types.IS_TRUE:
+	case types.IsTrue:
 		op.SetLong(1)
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		var l zend.ZendLong = op.ResourceHandle()
 		op.SetLong(l)
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var dst types.Zval
-		ConvertObjectToType(op, &dst, types.IS_NUMBER, ConvertScalarToNumber)
+		ConvertObjectToType(op, &dst, types.IsNumber, ConvertScalarToNumber)
 		if check && zend.EG__().GetException() != nil {
 			return
 		}
@@ -289,15 +289,15 @@ func _convertScalarToNumber(op *types.Zval, silent bool, check bool) {
 func ConvertScalarToNumber(op *types.Zval) { _convertScalarToNumber(op, true, false) }
 func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent bool) *types.Zval {
 	switch op.GetType() {
-	case types.IS_NULL:
+	case types.IsNull:
 		fallthrough
-	case types.IS_FALSE:
+	case types.IsFalse:
 		holder.SetLong(0)
 		return holder
-	case types.IS_TRUE:
+	case types.IsTrue:
 		holder.SetLong(1)
 		return holder
-	case types.IS_STRING:
+	case types.IsString:
 		var mode zend.ConvertNumericMode
 		if silent {
 			mode = zend.ConvertContinueOnErrors
@@ -316,18 +316,18 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent bo
 			}
 		}
 		return holder
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		holder.SetLong(op.ResourceHandle())
 		return holder
-	case types.IS_OBJECT:
-		ConvertObjectToType(op, holder, types.IS_NUMBER, ConvertScalarToNumber)
+	case types.IsObject:
+		ConvertObjectToType(op, holder, types.IsNumber, ConvertScalarToNumber)
 		if zend.EG__().GetException() != nil || !holder.IsLong() && !holder.IsDouble() {
 			holder.SetLong(1)
 		}
 		return holder
-	case types.IS_LONG:
+	case types.IsLong:
 		fallthrough
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		fallthrough
 	default:
 		return op
@@ -364,44 +364,44 @@ func ConvertToLongBase(op *types.Zval, base int) {
 	var tmp zend.ZendLong
 try_again:
 	switch op.GetType() {
-	case types.IS_NULL:
+	case types.IsNull:
 		fallthrough
-	case types.IS_FALSE:
+	case types.IsFalse:
 		op.SetLong(0)
-	case types.IS_TRUE:
+	case types.IsTrue:
 		op.SetLong(1)
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		tmp = op.ResourceHandle()
 		// ZvalPtrDtor(op)
 		op.SetLong(tmp)
-	case types.IS_LONG:
+	case types.IsLong:
 
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		op.SetLong(DvalToLval(op.Double()))
-	case types.IS_STRING:
+	case types.IsString:
 		var str *types.String = op.String()
 		if base == 10 {
 			op.SetLong(ZvalGetLong(op))
 		} else {
 			op.SetLong(zend.ZEND_STRTOL(str.GetVal(), nil, base))
 		}
-	case types.IS_ARRAY:
+	case types.IsArray:
 		if op.Array().Len() != 0 {
 			tmp = 1
 		} else {
 			tmp = 0
 		}
 		op.SetLong(tmp)
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var dst types.Zval
-		ConvertObjectToType(op, &dst, types.IS_LONG, ConvertToLong)
+		ConvertObjectToType(op, &dst, types.IsLong, ConvertToLong)
 		if dst.IsLong() {
 			op.SetLong(dst.Long())
 		} else {
 			op.SetLong(1)
 		}
 		return
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		ZendUnwrapReference(op)
 		goto try_again
 	default:
@@ -412,24 +412,24 @@ func ConvertToDouble(op *types.Zval) {
 	var tmp float64
 try_again:
 	switch op.GetType() {
-	case types.IS_NULL:
+	case types.IsNull:
 		fallthrough
-	case types.IS_FALSE:
+	case types.IsFalse:
 		op.SetDouble(0.0)
-	case types.IS_TRUE:
+	case types.IsTrue:
 		op.SetDouble(1.0)
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		var d float64 = float64(op.ResourceHandle())
 		// ZvalPtrDtor(op)
 		op.SetDouble(d)
-	case types.IS_LONG:
+	case types.IsLong:
 		op.SetDouble(float64(op.Long()))
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 
-	case types.IS_STRING:
+	case types.IsString:
 		var str *types.String = op.String()
 		op.SetDouble(zend.ZendStrtod(str.GetStr(), nil))
-	case types.IS_ARRAY:
+	case types.IsArray:
 		if op.Array().Len() != 0 {
 			tmp = 1
 		} else {
@@ -437,16 +437,16 @@ try_again:
 		}
 		// ZvalPtrDtor(op)
 		op.SetDouble(tmp)
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var dst types.Zval
-		ConvertObjectToType(op, &dst, types.IS_DOUBLE, ConvertToDouble)
+		ConvertObjectToType(op, &dst, types.IsDouble, ConvertToDouble)
 		// ZvalPtrDtor(op)
 		if dst.IsDouble() {
 			op.SetDouble(dst.Double())
 		} else {
 			op.SetDouble(1.0)
 		}
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		ZendUnwrapReference(op)
 		goto try_again
 	default:
@@ -460,21 +460,21 @@ func ConvertToBoolean(op *types.Zval) {
 	var tmp int
 try_again:
 	switch op.GetType() {
-	case types.IS_FALSE:
+	case types.IsFalse:
 		fallthrough
-	case types.IS_TRUE:
+	case types.IsTrue:
 
-	case types.IS_NULL:
+	case types.IsNull:
 		op.SetFalse()
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		var l zend.ZendLong = lang.Cond(op.ResourceHandle() != 0, 1, 0)
 		// ZvalPtrDtor(op)
 		op.SetBool(l != 0)
-	case types.IS_LONG:
+	case types.IsLong:
 		op.SetBool(op.Long() != 0)
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		op.SetBool(op.Double() != 0)
-	case types.IS_STRING:
+	case types.IsString:
 		var str *types.String = op.String()
 		if str.GetLen() == 0 || str.GetLen() == 1 && str.GetStr()[0] == '0' {
 			op.SetFalse()
@@ -482,7 +482,7 @@ try_again:
 			op.SetTrue()
 		}
 		// types.ZendStringReleaseEx(str, 0)
-	case types.IS_ARRAY:
+	case types.IsArray:
 		if op.Array().Len() != 0 {
 			tmp = 1
 		} else {
@@ -490,15 +490,15 @@ try_again:
 		}
 		// ZvalPtrDtor(op)
 		op.SetBool(tmp != 0)
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var dst types.Zval
-		ConvertObjectToType(op, &dst, types.IS_BOOL, ConvertToBoolean)
+		ConvertObjectToType(op, &dst, types.IsBool, ConvertToBoolean)
 		if dst.IsFalse() {
 			op.SetFalse()
 		} else { // dst.IsTrue() or others
 			op.SetTrue()
 		}
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		ZendUnwrapReference(op)
 		goto try_again
 	default:
@@ -514,12 +514,12 @@ func ConvertScalarToArray(op *types.Zval) {
 func ConvertToArray(op *types.Zval) {
 try_again:
 	switch op.GetType() {
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		ZendUnwrapReference(op)
 		goto try_again
-	case types.IS_ARRAY:
+	case types.IsArray:
 		// pass
-	case types.IS_OBJECT:
+	case types.IsObject:
 		if types.Z_OBJCE_P(op) == zend.ZendCeClosure {
 			ConvertScalarToArray(op)
 		} else {
@@ -531,7 +531,7 @@ try_again:
 				zend.ArrayInit(op)
 			}
 		}
-	case types.IS_NULL:
+	case types.IsNull:
 		/*ZVAL_EMPTY_ARRAY(op);*/
 		zend.ArrayInit(op)
 	default:
@@ -541,10 +541,10 @@ try_again:
 func ConvertToObject(op *types.Zval) {
 try_again:
 	switch op.GetType() {
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		ZendUnwrapReference(op)
 		goto try_again
-	case types.IS_ARRAY:
+	case types.IsArray:
 		var ht = types.ZendSymtableToProptable(op.Array())
 		//if ht.IsImmutable() {
 		//	/* TODO: try not to duplicate immutable arrays as well ??? */
@@ -555,9 +555,9 @@ try_again:
 		//	//ht.DelRefcount()
 		//}
 		op.SetObject(zend.NewStdClassObject(ht))
-	case types.IS_OBJECT:
+	case types.IsObject:
 
-	case types.IS_NULL:
+	case types.IsNull:
 		zend.ObjectInit(op)
 	default:
 		var tmp types.Zval
@@ -594,20 +594,20 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var converted int = 0
 	for true {
 		var type_pair = TypePair(op1.GetType(), op2.GetType())
-		if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
+		if type_pair == TypePair(types.IsLong, types.IsLong) {
 			if iVal, dVal, overflow := zend.SignedMultiplyLong(op1.Long(), op2.Long()); overflow {
 				result.SetDouble(dVal)
 			} else {
 				result.SetLong(iVal)
 			}
 			return types.SUCCESS
-		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IsDouble, types.IsDouble) {
 			result.SetDouble(op1.Double() * op2.Double())
 			return types.SUCCESS
-		} else if type_pair == TypePair(types.IS_LONG, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IsLong, types.IsDouble) {
 			result.SetDouble(float64(op1.Long()) * op2.Double())
 			return types.SUCCESS
-		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_LONG) {
+		} else if type_pair == TypePair(types.IsDouble, types.IsLong) {
 			result.SetDouble(op1.Double() * float64(op2.Long()))
 			return types.SUCCESS
 		} else {
@@ -662,7 +662,7 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var converted int = 0
 	for true {
 		var type_pair = TypePair(op1.GetType(), op2.GetType())
-		if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
+		if type_pair == TypePair(types.IsLong, types.IsLong) {
 			if op2.Long() >= 0 {
 				var l1 zend.ZendLong = 1
 				var l2 zend.ZendLong = op1.Long()
@@ -704,13 +704,13 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				result.SetDouble(math.Pow(float64(op1.Long()), float64(op2.Long())))
 			}
 			return types.SUCCESS
-		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IsDouble, types.IsDouble) {
 			result.SetDouble(math.Pow(op1.Double(), op2.Double()))
 			return types.SUCCESS
-		} else if type_pair == TypePair(types.IS_LONG, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IsLong, types.IsDouble) {
 			result.SetDouble(math.Pow(float64(op1.Long()), op2.Double()))
 			return types.SUCCESS
-		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_LONG) {
+		} else if type_pair == TypePair(types.IsDouble, types.IsLong) {
 			result.SetDouble(math.Pow(op1.Double(), float64(op2.Long())))
 			return types.SUCCESS
 		} else {
@@ -789,7 +789,7 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var converted int = 0
 	for true {
 		var type_pair uint = TypePair(op1.GetType(), op2.GetType())
-		if type_pair == TypePair(types.IS_LONG, types.IS_LONG) {
+		if type_pair == TypePair(types.IsLong, types.IsLong) {
 			if op2.Long() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")
 				result.SetDouble(float64(op1.Long() / float64(op2.Long())))
@@ -807,19 +807,19 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				result.SetDouble(float64(op1.Long()) / op2.Long())
 			}
 			return types.SUCCESS
-		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IsDouble, types.IsDouble) {
 			if op2.Double() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")
 			}
 			result.SetDouble(op1.Double() / op2.Double())
 			return types.SUCCESS
-		} else if type_pair == TypePair(types.IS_DOUBLE, types.IS_LONG) {
+		} else if type_pair == TypePair(types.IsDouble, types.IsLong) {
 			if op2.Long() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")
 			}
 			result.SetDouble(op1.Double() / float64(op2.Long()))
 			return types.SUCCESS
-		} else if type_pair == TypePair(types.IS_LONG, types.IS_DOUBLE) {
+		} else if type_pair == TypePair(types.IsLong, types.IsDouble) {
 			if op2.Double() == 0 {
 				faults.Error(faults.E_WARNING, "Division by zero")
 			}
@@ -1024,14 +1024,14 @@ func BooleanXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 	return types.SUCCESS
 }
 func BooleanNotFunction(result *types.Zval, op1 *types.Zval) int {
-	if op1.GetType() < types.IS_TRUE {
+	if op1.GetType() < types.IsTrue {
 		result.SetTrue()
 	} else if op1.IsTrue() {
 		result.SetFalse()
 	} else {
 		if op1.IsReference() {
 			op1 = types.Z_REFVAL_P(op1)
-			if op1.GetType() < types.IS_TRUE {
+			if op1.GetType() < types.IsTrue {
 				result.SetTrue()
 				return types.SUCCESS
 			} else if op1.IsTrue() {
@@ -1049,20 +1049,20 @@ func BooleanNotFunction(result *types.Zval, op1 *types.Zval) int {
 func BitwiseNotFunction(result *types.Zval, op1 *types.Zval) int {
 try_again:
 	switch op1.GetType() {
-	case types.IS_LONG:
+	case types.IsLong:
 		result.SetLong(^(op1.Long()))
 		return types.SUCCESS
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		result.SetLong(^(DvalToLval(op1.Double())))
 		return types.SUCCESS
-	case types.IS_STRING:
+	case types.IsString:
 		str := []byte(op1.StringVal())
 		for i, c := range str {
 			str[i] = ^c
 		}
 		result.SetStringVal(string(str))
 		return types.SUCCESS
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		op1 = types.Z_REFVAL_P(op1)
 		goto try_again
 	default:
@@ -1584,7 +1584,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var tmp_free types.Zval
 	for true {
 		switch TypePair(op1.GetType(), op2.GetType()) {
-		case TypePair(types.IS_LONG, types.IS_LONG):
+		case TypePair(types.IsLong, types.IsLong):
 			result.SetLong(lang.CondF2(op1.Long() > op2.Long(), 1, func() int {
 				if op1.Long() < op2.Long() {
 					return -1
@@ -1593,15 +1593,15 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				}
 			}))
 			return types.SUCCESS
-		case TypePair(types.IS_DOUBLE, types.IS_LONG):
+		case TypePair(types.IsDouble, types.IsLong):
 			result.SetDouble(op1.Double() - float64(op2.Long()))
 			result.SetLong(zend.ZEND_NORMALIZE_BOOL(result.Double()))
 			return types.SUCCESS
-		case TypePair(types.IS_LONG, types.IS_DOUBLE):
+		case TypePair(types.IsLong, types.IsDouble):
 			result.SetDouble(float64(op1.Long() - op2.Double()))
 			result.SetLong(zend.ZEND_NORMALIZE_BOOL(result.Double()))
 			return types.SUCCESS
-		case TypePair(types.IS_DOUBLE, types.IS_DOUBLE):
+		case TypePair(types.IsDouble, types.IsDouble):
 			if op1.Double() == op2.Double() {
 				result.SetLong(0)
 			} else {
@@ -1609,43 +1609,43 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				result.SetLong(zend.ZEND_NORMALIZE_BOOL(result.Double()))
 			}
 			return types.SUCCESS
-		case TypePair(types.IS_ARRAY, types.IS_ARRAY):
+		case TypePair(types.IsArray, types.IsArray):
 			result.SetLong(ZendCompareArrays(op1, op2))
 			return types.SUCCESS
-		case TypePair(types.IS_NULL, types.IS_NULL):
+		case TypePair(types.IsNull, types.IsNull):
 			fallthrough
-		case TypePair(types.IS_NULL, types.IS_FALSE):
+		case TypePair(types.IsNull, types.IsFalse):
 			fallthrough
-		case TypePair(types.IS_FALSE, types.IS_NULL):
+		case TypePair(types.IsFalse, types.IsNull):
 			fallthrough
-		case TypePair(types.IS_FALSE, types.IS_FALSE):
+		case TypePair(types.IsFalse, types.IsFalse):
 			fallthrough
-		case TypePair(types.IS_TRUE, types.IS_TRUE):
+		case TypePair(types.IsTrue, types.IsTrue):
 			result.SetLong(0)
 			return types.SUCCESS
-		case TypePair(types.IS_NULL, types.IS_TRUE):
+		case TypePair(types.IsNull, types.IsTrue):
 			result.SetLong(-1)
 			return types.SUCCESS
-		case TypePair(types.IS_TRUE, types.IS_NULL):
+		case TypePair(types.IsTrue, types.IsNull):
 			result.SetLong(1)
 			return types.SUCCESS
-		case TypePair(types.IS_STRING, types.IS_STRING):
+		case TypePair(types.IsString, types.IsString):
 			if op1.String() == op2.String() {
 				result.SetLong(0)
 				return types.SUCCESS
 			}
 			result.SetLong(ZendiSmartStrcmp(op1.StringVal(), op2.StringVal()))
 			return types.SUCCESS
-		case TypePair(types.IS_NULL, types.IS_STRING):
+		case TypePair(types.IsNull, types.IsString):
 			result.SetLong(lang.Cond(op2.String().GetLen() == 0, 0, -1))
 			return types.SUCCESS
-		case TypePair(types.IS_STRING, types.IS_NULL):
+		case TypePair(types.IsString, types.IsNull):
 			result.SetLong(lang.Cond(op1.String().GetLen() == 0, 0, 1))
 			return types.SUCCESS
-		case TypePair(types.IS_OBJECT, types.IS_NULL):
+		case TypePair(types.IsObject, types.IsNull):
 			result.SetLong(1)
 			return types.SUCCESS
-		case TypePair(types.IS_NULL, types.IS_OBJECT):
+		case TypePair(types.IsNull, types.IsObject):
 			result.SetLong(-1)
 			return types.SUCCESS
 		default:
@@ -1689,7 +1689,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					return ret
 				} else if !op2.IsObject() && op1.Object().CanCast() {
 					tmp_free.SetUndef()
-					if op1.Object().Cast(&tmp_free, lang.CondF2(op2.IsFalse() || op2.IsTrue(), types.IS_BOOL, func() __auto__ { return op2.GetType() })) == types.FAILURE {
+					if op1.Object().Cast(&tmp_free, lang.CondF2(op2.IsFalse() || op2.IsTrue(), types.IsBool, func() __auto__ { return op2.GetType() })) == types.FAILURE {
 						result.SetLong(1)
 						//ZendFreeObjGetResult(&tmp_free)
 						return types.SUCCESS
@@ -1711,7 +1711,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 
 					var castType = op1.GetType()
 					if op1.IsBool() {
-						castType = types.IS_BOOL
+						castType = types.IsBool
 					}
 
 					if op2.Object().Cast(&tmp_free, castType) == types.FAILURE {
@@ -1726,13 +1726,13 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				}
 			}
 			if converted == 0 {
-				if op1.GetType() < types.IS_TRUE {
+				if op1.GetType() < types.IsTrue {
 					result.SetLong(lang.Cond(ZvalIsTrue(op2), -1, 0))
 					return types.SUCCESS
 				} else if op1.IsTrue() {
 					result.SetLong(lang.Cond(ZvalIsTrue(op2), 0, 1))
 					return types.SUCCESS
-				} else if op2.GetType() < types.IS_TRUE {
+				} else if op2.GetType() < types.IsTrue {
 					result.SetLong(lang.Cond(ZvalIsTrue(op1), 1, 0))
 					return types.SUCCESS
 				} else if op2.IsTrue() {
@@ -1781,19 +1781,19 @@ func ZendIsIdentical(op1 *types.Zval, op2 *types.Zval) bool {
 		return false
 	}
 	switch op1.GetType() {
-	case types.IS_NULL, types.IS_FALSE, types.IS_TRUE:
+	case types.IsNull, types.IsFalse, types.IsTrue:
 		return true
-	case types.IS_LONG:
+	case types.IsLong:
 		return op1.Long() == op2.Long()
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		return op1.Resource() == op2.Resource()
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		return op1.Double() == op2.Double()
-	case types.IS_STRING:
+	case types.IsString:
 		return op1.StringVal() == op2.StringVal()
-	case types.IS_ARRAY:
+	case types.IsArray:
 		return op1.Array() == op2.Array() || types.ZendHashCompare(op1.Array(), op2.Array(), HashZvalIdenticalFunction, 1) == 0
-	case types.IS_OBJECT:
+	case types.IsObject:
 		return op1.Object() == op2.Object()
 	default:
 		return false
@@ -1928,17 +1928,17 @@ func IncrementStringEx(str string) string {
 func IncrementFunction(op1 *types.Zval) int {
 try_again:
 	switch op1.GetType() {
-	case types.IS_LONG:
+	case types.IsLong:
 		FastLongIncrementFunction(op1)
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		op1.SetDouble(op1.Double() + 1)
-	case types.IS_NULL:
+	case types.IsNull:
 		op1.SetLong(1)
-	case types.IS_STRING:
+	case types.IsString:
 		var lval zend.ZendLong
 		var dval float64
 		switch IsNumericString(op1.String().GetStr(), &lval, &dval, 0) {
-		case types.IS_LONG:
+		case types.IsLong:
 
 			if lval == zend.ZEND_LONG_MAX {
 
@@ -1949,14 +1949,14 @@ try_again:
 			} else {
 				op1.SetLong(lval + 1)
 			}
-		case types.IS_DOUBLE:
+		case types.IsDouble:
 
 			op1.SetDouble(dval + 1)
 		default:
 			/* Perl style string increment */
 			IncrementString(op1)
 		}
-	case types.IS_OBJECT:
+	case types.IsObject:
 		if op1.Object().CanGet() && op1.Object().CanSet() {
 
 			/* proxy object */
@@ -1976,7 +1976,7 @@ try_again:
 			return res
 		}
 		return types.FAILURE
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		op1 = types.Z_REFVAL_P(op1)
 		goto try_again
 	default:
@@ -1989,18 +1989,18 @@ func DecrementFunction(op1 *types.Zval) int {
 	var dval float64
 try_again:
 	switch op1.GetType() {
-	case types.IS_LONG:
+	case types.IsLong:
 		FastLongDecrementFunction(op1)
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		op1.SetDouble(op1.Double() - 1)
-	case types.IS_STRING:
+	case types.IsString:
 		if op1.String().GetLen() == 0 {
 
 			op1.SetLong(-1)
 			break
 		}
 		switch IsNumericString(op1.String().GetStr(), &lval, &dval, 0) {
-		case types.IS_LONG:
+		case types.IsLong:
 
 			if lval == zend.ZEND_LONG_MIN {
 				var d float64 = float64(lval)
@@ -2008,11 +2008,11 @@ try_again:
 			} else {
 				op1.SetLong(lval - 1)
 			}
-		case types.IS_DOUBLE:
+		case types.IsDouble:
 
 			op1.SetDouble(dval - 1)
 		}
-	case types.IS_OBJECT:
+	case types.IsObject:
 		if op1.Object().CanGet() && op1.Object().CanSet() {
 
 			/* proxy object */
@@ -2032,7 +2032,7 @@ try_again:
 			return res
 		}
 		return types.FAILURE
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		op1 = types.Z_REFVAL_P(op1)
 		goto try_again
 	default:
@@ -2043,7 +2043,7 @@ try_again:
 func ZendObjectIsTrue(op *types.Zval) bool {
 	if op.Object().CanCast() {
 		var tmp types.Zval
-		if op.Object().Cast(&tmp, types.IS_BOOL) == types.SUCCESS {
+		if op.Object().Cast(&tmp, types.IsBool) == types.SUCCESS {
 			return tmp.IsTrue()
 		}
 		faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", op.Object().GetCe().Name())

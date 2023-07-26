@@ -18,7 +18,7 @@ func (o *ObjectBase) Free() {}
 func (o *ObjectBase) Dtor() {}
 
 func (o *ObjectBase) CanClone() bool { return false }
-func (o *ObjectBase) Clone() *ZendObject {
+func (o *ObjectBase) Clone() *Object {
 	//TODO implement me
 	panic("implement me")
 }
@@ -112,12 +112,12 @@ func (o *ObjectBase) GetMethod(method string, key *Zval) IFunction {
 	panic("implement me")
 }
 
-func (o *ObjectBase) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
+func (o *ObjectBase) CallMethod(method string, object *Object, executeData *zend.ZendExecuteData, returnValue *Zval) int {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (o *ObjectBase) GetConstructor(object *ZendObject) IFunction {
+func (o *ObjectBase) GetConstructor(object *Object) IFunction {
 	//TODO implement me
 	panic("implement me")
 }
@@ -137,7 +137,7 @@ func (o *ObjectBase) CanGetClosure() bool {
 	panic("implement me")
 }
 
-func (o *ObjectBase) GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **ZendObject) int {
+func (o *ObjectBase) GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **Object) int {
 	//TODO implement me
 	panic("implement me")
 }
@@ -152,12 +152,12 @@ func (o *ObjectBase) DoOperation(opcode uint8, result *Zval, op1 *Zval, op2 *Zva
 	panic("implement me")
 }
 
-func (o *ObjectBase) CanCompareObjectsTo(obj2 *ZendObject) bool {
+func (o *ObjectBase) CanCompareObjectsTo(obj2 *Object) bool {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (o *ObjectBase) CompareObjectsTo(another *ZendObject) int {
+func (o *ObjectBase) CompareObjectsTo(another *Object) int {
 	//TODO implement me
 	panic("implement me")
 }

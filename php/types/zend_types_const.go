@@ -29,40 +29,6 @@ type ZendUintptrT = uintptr
 
 type ZvalComparer func(*Zval, *Zval) int
 
-type ZvalType = uint8
-
-const (
-	/* regular data types */
-	IS_UNDEF     ZvalType = 0
-	IS_NULL      ZvalType = 1
-	IS_FALSE     ZvalType = 2
-	IS_TRUE      ZvalType = 3
-	IS_LONG      ZvalType = 4
-	IS_DOUBLE    ZvalType = 5
-	IS_STRING    ZvalType = 6
-	IS_ARRAY     ZvalType = 7
-	IS_OBJECT    ZvalType = 8
-	IS_RESOURCE  ZvalType = 9
-	IS_REFERENCE ZvalType = 10
-
-	/* constant expressions */
-
-	IS_CONSTANT_AST ZvalType = 11
-
-	/* internal types */
-
-	IS_INDIRECT ZvalType = 13
-	IS_PTR      ZvalType = 14
-	IS_ERROR    ZvalType = 15 // _IS_ERROR
-
-	/* fake types used only for type hinting (Z_TYPE(zv) can not use them) */
-
-	IS_BOOL     ZvalType = 16 // _IS_BOOL
-	IS_CALLABLE ZvalType = 17
-	IS_ITERABLE ZvalType = 18
-	IS_VOID     ZvalType = 19
-	IS_NUMBER   ZvalType = 20 // _IS_NUMBER
-)
 
 /* we should never set just Z_TYPE, we should set Z_TYPE_INFO */
 

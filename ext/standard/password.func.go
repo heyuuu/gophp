@@ -70,26 +70,26 @@ func PhpPasswordGetSalt(required_salt_len int, options *types.Array) *types.Stri
 	var buffer *types.String
 	core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
 	switch optionBuffer.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		buffer = optionBuffer.String().Copy()
-	case types.IS_LONG:
+	case types.IsLong:
 		fallthrough
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		fallthrough
-	case types.IS_OBJECT:
+	case types.IsObject:
 		buffer = operators.ZvalTryGetString(optionBuffer)
 		if buffer == nil {
 			return nil
 		}
-	case types.IS_FALSE:
+	case types.IsFalse:
 		fallthrough
-	case types.IS_TRUE:
+	case types.IsTrue:
 		fallthrough
-	case types.IS_NULL:
+	case types.IsNull:
 		fallthrough
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		fallthrough
-	case types.IS_ARRAY:
+	case types.IsArray:
 		fallthrough
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Non-string salt parameter supplied")

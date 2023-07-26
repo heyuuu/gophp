@@ -11,7 +11,7 @@ func ZEND_ISSET_ISEMPTY_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) i
 	var result int
 	result = ZendFetchStaticPropertyAddress(&value, nil, opline.GetExtendedValue() & ^ZEND_ISEMPTY, BP_VAR_IS, 0, opline, executeData)
 	if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
-		result = result == types.SUCCESS && value.GetType() > types.IS_NULL && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IS_NULL)
+		result = result == types.SUCCESS && value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull)
 	} else {
 		result = result != types.SUCCESS || !operators.ZvalIsTrue(value)
 	}

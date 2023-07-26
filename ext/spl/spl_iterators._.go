@@ -263,7 +263,7 @@ var spl_funcs_RecursiveRegexIterator = []types.FunctionEntry{
 
 var spl_funcs_SeekableIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("seek", types.AccPublic|types.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgInfo("position", zend.ArgInfoType(types.TypeHintCode(types.IS_LONG, 0))),
+		zend.MakeArgInfo("position", zend.ArgInfoType(types.TypeHintCode(types.IsLong, 0))),
 	}),
 }
 var spl_funcs_LimitIterator = []types.FunctionEntry{

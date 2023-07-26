@@ -11,11 +11,11 @@ import (
 	"unsafe"
 )
 
-func OBJ_PROP(obj *types.ZendObject, offset uint32) *types.Zval {
+func OBJ_PROP(obj *types.Object, offset uint32) *types.Zval {
 	return (*types.Zval)((*byte)(obj + offset))
 }
 func OBJ_PROP_TO_OFFSET(num int) int {
-	var tmp *types.ZendObject = nil
+	var tmp *types.Object = nil
 
 	return uintptr(unsafe.Pointer(tmp.GetPropertiesTable())) - uintptr(unsafe.Pointer(tmp)) + b.SizeOf("zval")*num
 }

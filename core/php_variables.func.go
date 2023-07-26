@@ -37,7 +37,7 @@ func PhpRegisterVariableEx(varName string, val *types.Zval, trackVarsArray *type
 	var isArray bool = false
 	var symtable1 *types.Array = nil
 	b.Assert(varName != "")
-	if trackVarsArray != nil && trackVarsArray.IsType(types.IS_ARRAY) {
+	if trackVarsArray != nil && trackVarsArray.IsType(types.IsArray) {
 		symtable1 = trackVarsArray.Array()
 	}
 	if symtable1 == nil {
@@ -515,7 +515,7 @@ func PhpBuildArgv(s string, trackVarsArray *types.Zval) {
 		zend.EG__().GetSymbolTable().KeyUpdate(types.STR_ARGV, argvZval)
 		zend.EG__().GetSymbolTable().KeyUpdate(types.STR_ARGC, argcZval)
 	}
-	if trackVarsArray != nil && trackVarsArray.IsType(types.IS_ARRAY) {
+	if trackVarsArray != nil && trackVarsArray.IsType(types.IsArray) {
 		trackVarsArray.Array().KeyUpdate(types.STR_ARGV, argvZval)
 		trackVarsArray.Array().KeyUpdate(types.STR_ARGC, argcZval)
 	}

@@ -30,7 +30,7 @@ func SPL_LLIST_CHECK_ADDREF(elem *SplPtrLlistElement) {
 		elem.GetRc()++
 	}
 }
-func SplDllistFromObj(obj *types.ZendObject) *SplDllistObject {
+func SplDllistFromObj(obj *types.Object) *SplDllistObject {
 	return (*SplDllistObject)((*byte)(obj - zend_long((*byte)(&((*SplDllistObject)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLDLLIST_P(zv *types.Zval) *SplDllistObject { return SplDllistFromObj(zv.Object()) }
@@ -200,7 +200,7 @@ func SplPtrLlistCopy(from *SplPtrLlist, to *SplPtrLlist) {
 
 	//???    spl_ptr_llist_ctor_func ctor = from->ctor;
 }
-func SplDllistObjectFreeStorage(object *types.ZendObject) {
+func SplDllistObjectFreeStorage(object *types.Object) {
 	var intern *SplDllistObject = SplDllistFromObj(object)
 	var tmp types.Zval
 	zend.ZendObjectStdDtor(intern.GetStd())
@@ -214,7 +214,7 @@ func SplDllistObjectFreeStorage(object *types.ZendObject) {
 	SplPtrLlistDestroy(intern.GetLlist())
 	SPL_LLIST_CHECK_DELREF(intern.GetTraversePointer())
 }
-func SplDllistObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
+func SplDllistObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.Object {
 	var intern *SplDllistObject = NewSplDllistObject()
 	var parent *types.ClassEntry = class_type
 	var inherited int = 0
@@ -279,12 +279,12 @@ func SplDllistObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_
 	}
 	return intern.GetStd()
 }
-func SplDllistObjectNew(class_type *types.ClassEntry) *types.ZendObject {
+func SplDllistObjectNew(class_type *types.ClassEntry) *types.Object {
 	return SplDllistObjectNewEx(class_type, nil, 0)
 }
-func SplDllistObjectClone(zobject *types.Zval) *types.ZendObject {
-	var old_object *types.ZendObject
-	var new_object *types.ZendObject
+func SplDllistObjectClone(zobject *types.Zval) *types.Object {
+	var old_object *types.Object
+	var new_object *types.Object
 	old_object = zobject.Object()
 	new_object = SplDllistObjectNewEx(old_object.GetCe(), zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
@@ -514,7 +514,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(executeData *zend.ZendExecuteData, re
 		return
 	}
 	intern = Z_SPLDLLIST_P(executeData.ThisObjectZval())
-	if zindex.IsType(types.IS_NULL) {
+	if zindex.IsType(types.IsNull) {
 
 		/* $obj[] = ... */
 

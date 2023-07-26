@@ -59,29 +59,29 @@ func (compiler *Compiler) TryCompileSpecialFunc(result *Znode, lcname *types.Str
 	if lcname.GetStr() == "strlen" {
 		return compiler.CompileFuncStrlen(result, args)
 	} else if lcname.GetStr() == "is_null" {
-		return compiler.CompileFuncTypecheck(result, args, types.IS_NULL)
+		return compiler.CompileFuncTypecheck(result, args, types.IsNull)
 	} else if lcname.GetStr() == "is_bool" {
-		return compiler.CompileFuncTypecheck(result, args, types.IS_BOOL)
+		return compiler.CompileFuncTypecheck(result, args, types.IsBool)
 	} else if lcname.GetStr() == "is_long" || lcname.GetStr() == "is_int" || lcname.GetStr() == "is_integer" {
-		return compiler.CompileFuncTypecheck(result, args, types.IS_LONG)
+		return compiler.CompileFuncTypecheck(result, args, types.IsLong)
 	} else if lcname.GetStr() == "is_float" || lcname.GetStr() == "is_double" {
-		return compiler.CompileFuncTypecheck(result, args, types.IS_DOUBLE)
+		return compiler.CompileFuncTypecheck(result, args, types.IsDouble)
 	} else if lcname.GetStr() == "is_string" {
-		return compiler.CompileFuncTypecheck(result, args, types.IS_STRING)
+		return compiler.CompileFuncTypecheck(result, args, types.IsString)
 	} else if lcname.GetStr() == "is_array" {
-		return compiler.CompileFuncTypecheck(result, args, types.IS_ARRAY)
+		return compiler.CompileFuncTypecheck(result, args, types.IsArray)
 	} else if lcname.GetStr() == "is_object" {
-		return compiler.CompileFuncTypecheck(result, args, types.IS_OBJECT)
+		return compiler.CompileFuncTypecheck(result, args, types.IsObject)
 	} else if lcname.GetStr() == "is_resource" {
-		return compiler.CompileFuncTypecheck(result, args, types.IS_RESOURCE)
+		return compiler.CompileFuncTypecheck(result, args, types.IsResource)
 	} else if lcname.GetStr() == "boolval" {
-		return compiler.CompileFuncCast(result, args, types.IS_BOOL)
+		return compiler.CompileFuncCast(result, args, types.IsBool)
 	} else if lcname.GetStr() == "intval" {
-		return compiler.CompileFuncCast(result, args, types.IS_LONG)
+		return compiler.CompileFuncCast(result, args, types.IsLong)
 	} else if lcname.GetStr() == "floatval" || lcname.GetStr() == "doubleval" {
-		return compiler.CompileFuncCast(result, args, types.IS_DOUBLE)
+		return compiler.CompileFuncCast(result, args, types.IsDouble)
 	} else if lcname.GetStr() == "strval" {
-		return compiler.CompileFuncCast(result, args, types.IS_STRING)
+		return compiler.CompileFuncCast(result, args, types.IsString)
 	} else if lcname.GetStr() == "defined" {
 		return compiler.CompileFuncDefined(result, args)
 	} else if lcname.GetStr() == "chr" && type_ == BP_VAR_R {
@@ -118,7 +118,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 	var name_ast *ZendAst = ast.Child(0)
 	var args_ast *ZendAst = ast.Child(1)
 	var name_node Znode
-	if name_ast.Kind() != ZEND_AST_ZVAL || name_ast.Val().GetType() != types.IS_STRING {
+	if name_ast.Kind() != ZEND_AST_ZVAL || name_ast.Val().GetType() != types.IsString {
 		compiler.CompileExpr(&name_node, name_ast)
 		compiler.CompileDynamicCall(result, &name_node, args_ast)
 		return
@@ -178,7 +178,7 @@ func (compiler *Compiler) CompileMethodCall(result *Znode, ast *ZendAst, type_ u
 	compiler.CompileExpr(&method_node, method_ast)
 	opline = ZendEmitOp(nil, ZEND_INIT_METHOD_CALL, &obj_node, nil)
 	if method_node.GetOpType() == IS_CONST {
-		if method_node.GetConstant().GetType() != types.IS_STRING {
+		if method_node.GetConstant().GetType() != types.IsString {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
 		opline.SetOp2Type(IS_CONST)

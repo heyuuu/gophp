@@ -79,7 +79,7 @@ type ClassEntry struct {
 
 	iterator_funcs_ptr *zend.ZendClassIteratorFuncs
 	__1                struct /* union */ {
-		create_object              func(class_type *ClassEntry) *ZendObject
+		create_object              func(class_type *ClassEntry) *Object
 		interface_gets_implemented func(iface *ClassEntry, class_type *ClassEntry) int
 	}
 	get_iterator      func(ce *ClassEntry, object *Zval, by_ref int) *zend.ZendObjectIterator
@@ -122,7 +122,7 @@ func NewInternalClass(name string, moduleNumber int) *ClassEntry {
 	return ce
 }
 
-func NewDisabledClass(origCe *ClassEntry, createObject func(*ClassEntry) *ZendObject) *ClassEntry {
+func NewDisabledClass(origCe *ClassEntry, createObject func(*ClassEntry) *Object) *ClassEntry {
 	ce := &ClassEntry{
 		typ:  origCe.typ,
 		name: origCe.name,
@@ -308,10 +308,10 @@ func (ce *ClassEntry) GetIteratorFuncsPtr() *zend.ZendClassIteratorFuncs {
 func (ce *ClassEntry) SetIteratorFuncsPtr(value *zend.ZendClassIteratorFuncs) {
 	ce.iterator_funcs_ptr = value
 }
-func (ce *ClassEntry) GetCreateObject() func(class_type *ClassEntry) *ZendObject {
+func (ce *ClassEntry) GetCreateObject() func(class_type *ClassEntry) *Object {
 	return ce.__1.create_object
 }
-func (ce *ClassEntry) SetCreateObject(value func(class_type *ClassEntry) *ZendObject) {
+func (ce *ClassEntry) SetCreateObject(value func(class_type *ClassEntry) *Object) {
 	ce.__1.create_object = value
 }
 func (ce *ClassEntry) GetInterfaceGetsImplemented() func(iface *ClassEntry, class_type *ClassEntry) int {

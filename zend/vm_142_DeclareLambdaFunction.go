@@ -8,7 +8,7 @@ import (
 func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var func_ types.IFunction
-	var object *types.ZendObject
+	var object *types.Object
 	var called_scope *types.ClassEntry
 	func_ = CACHED_PTR(opline.GetExtendedValue())
 	if func_ == nil {

@@ -41,9 +41,9 @@ func (guard *PropertyGuard) mark(sign PropertyGuard, v bool) {
 /**
  * ZendObject
  */
-var _ IObject = (*ZendObject)(nil)
+var _ IObject = (*Object)(nil)
 
-type ZendObject struct {
+type Object struct {
 	handle          uint
 	ce              *ClassEntry
 	handlers        *ObjectHandlers
@@ -60,7 +60,7 @@ type ZendObject struct {
 }
 
 // guard
-func (o *ZendObject) Guard(member string) *PropertyGuard {
+func (o *Object) Guard(member string) *PropertyGuard {
 	b.Assert(o.ce.IsUseGuards())
 	// php 原版设计，将 guard 附加在 propertiesTable 最后一位; gophp 中，将其抽出作为单独 map
 
@@ -82,40 +82,40 @@ func (o *ZendObject) Guard(member string) *PropertyGuard {
 }
 
 //
-func NewStdObject(ce *ClassEntry) *ZendObject {
+func NewStdObject(ce *ClassEntry) *Object {
 	return NewObject(ce, zend.StdObjectHandlersPtr)
 }
 
-func NewStdObjectSkipPropertiesInit(ce *ClassEntry) *ZendObject {
+func NewStdObjectSkipPropertiesInit(ce *ClassEntry) *Object {
 	return _newObject(ce, zend.StdObjectHandlersPtr)
 }
 
-func NewStdObjectExEx(ce *ClassEntry, properties *Array) *ZendObject {
+func NewStdObjectExEx(ce *ClassEntry, properties *Array) *Object {
 	o := _newObject(ce, zend.StdObjectHandlersPtr)
 	o.propertiesInitEx(properties)
 	return o
 }
 
-func NewObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
+func NewObject(ce *ClassEntry, handlers *ObjectHandlers) *Object {
 	o := _newObject(ce, handlers)
 	o.propertiesInit()
 	return o
 }
 
-func NewObjectEx(data IObject) *ZendObject {
+func NewObjectEx(data IObject) *Object {
 	// todo 冗余细节待调整
 	o := _newObject(data.GetCe(), nil)
 	o.data = data
 	return o
 }
 
-func _newObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
+func _newObject(ce *ClassEntry, handlers *ObjectHandlers) *Object {
 	propertyCount := ce.GetDefaultPropertiesCount()
 	if ce.IsUseGuards() {
 		propertyCount++
 	}
 
-	o := &ZendObject{
+	o := &Object{
 		ce:              ce,
 		handlers:        handlers,
 		properties:      nil,
@@ -127,7 +127,7 @@ func _newObject(ce *ClassEntry, handlers *ObjectHandlers) *ZendObject {
 	return o
 }
 
-func (o *ZendObject) propertiesInit() {
+func (o *Object) propertiesInit() {
 	defaultPropertiesCount := o.ce.GetDefaultPropertiesCount()
 	if defaultPropertiesCount != 0 {
 		src := o.ce.GetDefaultPropertiesTable()
@@ -144,7 +144,7 @@ func (o *ZendObject) propertiesInit() {
 	}
 }
 
-func (o *ZendObject) propertiesInitEx(properties *Array) {
+func (o *Object) propertiesInitEx(properties *Array) {
 	o.properties = properties
 	defaultPropertiesCount := o.ce.GetDefaultPropertiesCount()
 	if defaultPropertiesCount != 0 {
@@ -168,153 +168,153 @@ func (o *ZendObject) propertiesInitEx(properties *Array) {
 	}
 }
 
-func (o *ZendObject) GetHandle() uint              { return o.handle }
-func (o *ZendObject) ClassName() string            { return o.data.ClassName() }
-func (o *ZendObject) GetCe() *ClassEntry           { return o.data.GetCe() }
-func (o *ZendObject) GetHandlers() *ObjectHandlers { return o.handlers }
-func (o *ZendObject) GetProperties() *Array        { return o.properties }
-func (o *ZendObject) SetProperties(value *Array)   { o.properties = value }
-func (o *ZendObject) DupProperties() {
+func (o *Object) GetHandle() uint              { return o.handle }
+func (o *Object) ClassName() string            { return o.data.ClassName() }
+func (o *Object) GetCe() *ClassEntry           { return o.data.GetCe() }
+func (o *Object) GetHandlers() *ObjectHandlers { return o.handlers }
+func (o *Object) GetProperties() *Array        { return o.properties }
+func (o *Object) SetProperties(value *Array)   { o.properties = value }
+func (o *Object) DupProperties() {
 	o.properties = o.properties.LazyDup()
 }
-func (o *ZendObject) GetPropertiesTable() []Zval { return o.propertiesTable }
+func (o *Object) GetPropertiesTable() []Zval { return o.propertiesTable }
 
-func (o *ZendObject) GetData() IObject { return o.data }
+func (o *Object) GetData() IObject { return o.data }
 
 // object handlers
-func (o *ZendObject) Free()          { o.data.Free() }
-func (o *ZendObject) Dtor()          { o.data.Dtor() }
-func (o *ZendObject) CanClone() bool { return o.data.CanClone() }
-func (o *ZendObject) Clone() *ZendObject {
+func (o *Object) Free()          { o.data.Free() }
+func (o *Object) Dtor()          { o.data.Dtor() }
+func (o *Object) CanClone() bool { return o.data.CanClone() }
+func (o *Object) Clone() *Object {
 	b.Assert(o.data.CanClone())
 	return o.data.Clone()
 }
 
 // property
-func (o *ZendObject) ReadPropertyEx(member *Zval, typ int, rv *Zval) *Zval {
+func (o *Object) ReadPropertyEx(member *Zval, typ int, rv *Zval) *Zval {
 	return o.data.ReadProperty(member, typ, nil, rv)
 }
-func (o *ZendObject) WritePropertyEx(member *Zval, value *Zval) *Zval {
+func (o *Object) WritePropertyEx(member *Zval, value *Zval) *Zval {
 	return o.data.WriteProperty(member, value, nil)
 }
-func (o *ZendObject) HasPropertyEx(member *Zval, hasSetExists int) bool {
+func (o *Object) HasPropertyEx(member *Zval, hasSetExists int) bool {
 	return o.data.HasProperty(member, hasSetExists, nil) != 0
 }
-func (o *ZendObject) UnsetPropertyEx(member *Zval) {
+func (o *Object) UnsetPropertyEx(member *Zval) {
 	o.data.UnsetProperty(member, nil)
 }
-func (o *ZendObject) GetPropertyPtrEx(member *Zval, typ int) *Zval {
+func (o *Object) GetPropertyPtrEx(member *Zval, typ int) *Zval {
 	return o.data.GetPropertyPtr(member, typ, nil)
 }
 
 // properties
-func (o *ZendObject) IsStdGetProperties() bool {
+func (o *Object) IsStdGetProperties() bool {
 	return o.data.IsStdGetProperties()
 }
-func (o *ZendObject) GetPropertiesArray() *Array {
+func (o *Object) GetPropertiesArray() *Array {
 	return o.data.GetPropertiesArray()
 }
-func (o *ZendObject) CanGetPropertiesFor() bool {
+func (o *Object) CanGetPropertiesFor() bool {
 	return o.data.CanGetPropertiesFor()
 }
-func (o *ZendObject) GetPropertiesFor(purpose zend.ZendPropPurpose) *Array {
+func (o *Object) GetPropertiesFor(purpose zend.ZendPropPurpose) *Array {
 	return o.data.GetPropertiesFor(purpose)
 }
 
 // get & set
-func (o *ZendObject) CanGet() bool {
+func (o *Object) CanGet() bool {
 	return o.data.CanGet()
 }
-func (o *ZendObject) Get(rv *Zval) *Zval {
+func (o *Object) Get(rv *Zval) *Zval {
 	return o.data.Get(rv)
 }
-func (o *ZendObject) CanSet() bool {
+func (o *Object) CanSet() bool {
 	return o.data.CanSet()
 }
-func (o *ZendObject) Set(value *Zval) {
+func (o *Object) Set(value *Zval) {
 	o.data.Set(value)
 }
 
 // dimension
-func (o *ZendObject) ReadDimension(offset *Zval, typ int, rv *Zval) *Zval {
+func (o *Object) ReadDimension(offset *Zval, typ int, rv *Zval) *Zval {
 	return o.data.ReadDimension(offset, typ, rv)
 }
-func (o *ZendObject) WriteDimension(offset *Zval, value *Zval) {
+func (o *Object) WriteDimension(offset *Zval, value *Zval) {
 	o.data.WriteDimension(offset, value)
 }
-func (o *ZendObject) HasDimension(offset *Zval, checkEmpty int) int {
+func (o *Object) HasDimension(offset *Zval, checkEmpty int) int {
 	return o.data.HasDimension(offset, checkEmpty)
 }
-func (o *ZendObject) UnsetDimension(offset *Zval) {
+func (o *Object) UnsetDimension(offset *Zval) {
 	o.data.UnsetDimension(offset)
 }
 
 // elements
-func (o *ZendObject) CanCountElements() bool {
+func (o *Object) CanCountElements() bool {
 	return o.data.CanCountElements()
 }
-func (o *ZendObject) CountElements() (int, bool) {
+func (o *Object) CountElements() (int, bool) {
 	return o.data.CountElements()
 }
 
 // method
-func (o *ZendObject) CanGetMethod() bool {
+func (o *Object) CanGetMethod() bool {
 	return o.CanGetMethod()
 }
-func (o *ZendObject) GetMethod(method string, key *Zval) IFunction {
+func (o *Object) GetMethod(method string, key *Zval) IFunction {
 	return o.data.GetMethod(method, key)
 }
-func (o *ZendObject) CallMethod(method string, object *ZendObject, executeData *zend.ZendExecuteData, returnValue *Zval) int {
+func (o *Object) CallMethod(method string, object *Object, executeData *zend.ZendExecuteData, returnValue *Zval) int {
 	return o.data.CallMethod(method, object, executeData, returnValue)
 }
-func (o *ZendObject) GetConstructor(object *ZendObject) IFunction {
+func (o *Object) GetConstructor(object *Object) IFunction {
 	return o.data.GetConstructor(object)
 }
 
 // cast
-func (o *ZendObject) CanCast() bool { return o.data.CanCast() }
-func (o *ZendObject) Cast(retval *Zval, type_ ZvalType) int {
+func (o *Object) CanCast() bool { return o.data.CanCast() }
+func (o *Object) Cast(retval *Zval, type_ ZvalType) int {
 	return o.data.Cast(retval, type_)
 }
 
 // mixed
-func (o *ZendObject) CanGetClosure() bool { return o.data.CanGetClosure() }
-func (o *ZendObject) GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **ZendObject) int {
+func (o *Object) CanGetClosure() bool { return o.data.CanGetClosure() }
+func (o *Object) GetClosure(obj *Zval, cePtr **ClassEntry, fptrPtr *IFunction, objPtr **Object) int {
 	return o.data.GetClosure(obj, cePtr, fptrPtr, objPtr)
 }
 
-func (o *ZendObject) CanDoOperation() bool { return o.data.CanDoOperation() }
-func (o *ZendObject) DoOperation(opcode uint8, result *Zval, op1 *Zval, op2 *Zval) int {
+func (o *Object) CanDoOperation() bool { return o.data.CanDoOperation() }
+func (o *Object) DoOperation(opcode uint8, result *Zval, op1 *Zval, op2 *Zval) int {
 	return o.data.DoOperation(opcode, result, op1, op2)
 }
 
-func (o *ZendObject) CanCompareObjectsTo(obj2 *ZendObject) bool {
+func (o *Object) CanCompareObjectsTo(obj2 *Object) bool {
 	return o.data.CanCompareObjectsTo(obj2)
 }
-func (o *ZendObject) CompareObjectsTo(another *ZendObject) int {
+func (o *Object) CompareObjectsTo(another *Object) int {
 	return o.data.CompareObjectsTo(another)
 }
 
-func (o *ZendObject) CanCompare() bool { return o.data.CanCompare() }
-func (o *ZendObject) Compare(result *Zval, op1 *Zval, op2 *Zval) int {
+func (o *Object) CanCompare() bool { return o.data.CanCompare() }
+func (o *Object) Compare(result *Zval, op1 *Zval, op2 *Zval) int {
 	return o.data.Compare(result, op1, op2)
 }
 
 // object
-func (o *ZendObject) IsObjDtorCalled() bool {
+func (o *Object) IsObjDtorCalled() bool {
 	return o.isDtorCalled
 }
-func (o *ZendObject) MarkObjDtorCalled() {
+func (o *Object) MarkObjDtorCalled() {
 	o.isDtorCalled = true
 }
-func (o *ZendObject) IsObjFreeCalled() bool {
+func (o *Object) IsObjFreeCalled() bool {
 	return o.isFreeCalled
 }
-func (o *ZendObject) MarkObjFreeCalled() {
+func (o *Object) MarkObjFreeCalled() {
 	o.isFreeCalled = true
 }
 
 // recursive
-func (o *ZendObject) IsRecursive() bool   { return o.protected }
-func (o *ZendObject) ProtectRecursive()   { o.protected = true }
-func (o *ZendObject) UnprotectRecursive() { o.protected = false }
+func (o *Object) IsRecursive() bool   { return o.protected }
+func (o *Object) ProtectRecursive()   { o.protected = true }
+func (o *Object) UnprotectRecursive() { o.protected = false }

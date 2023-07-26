@@ -13,7 +13,7 @@ import (
 )
 
 func ZifUserFilterNop(executeData zpp.Ex, return_value zpp.Ret) {}
-func PhpBucketDtor(res *types.ZendResource) {
+func PhpBucketDtor(res *types.Resource) {
 	var bucket *streams.PhpStreamBucket = (*streams.PhpStreamBucket)(res.GetPtr())
 	if bucket != nil {
 		streams.PhpStreamBucketDelref(bucket)
@@ -268,7 +268,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 	func_name.SetStringVal("oncreate")
 	zend.CallUserFunction(&obj, &func_name, &retval, 0, nil)
 	if retval.IsNotUndef() {
-		if retval.IsType(types.IS_FALSE) {
+		if retval.IsType(types.IsFalse) {
 
 			/* User reported filter creation error "return false;" */
 

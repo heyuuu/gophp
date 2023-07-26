@@ -15,7 +15,7 @@ func ZEND_ASSIGN_REF_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 	variable_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if variable_ptr.IsError() {
 		variable_ptr = UninitializedZval()
-	} else if opline.Op1().GetType() != types.IS_INDIRECT {
+	} else if opline.Op1().GetType() != types.IsIndirect {
 		faults.ThrowError(nil, "Cannot assign by reference to an array dimension of an object")
 		variable_ptr = UninitializedZval()
 	} else if value_ptr.IsError() {
@@ -45,7 +45,7 @@ func ZEND_ASSIGN_REF_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	variable_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if variable_ptr.IsError() {
 		variable_ptr = UninitializedZval()
-	} else if opline.Op1().GetType() != types.IS_INDIRECT {
+	} else if opline.Op1().GetType() != types.IsIndirect {
 		faults.ThrowError(nil, "Cannot assign by reference to an array dimension of an object")
 		variable_ptr = UninitializedZval()
 	} else if value_ptr.IsError() {
@@ -72,7 +72,7 @@ func ZEND_ASSIGN_REF_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 	variable_ptr = opline.Op1()
 	if variable_ptr.IsError() {
 		variable_ptr = UninitializedZval()
-	} else if opline.Op1().GetType() != types.IS_INDIRECT {
+	} else if opline.Op1().GetType() != types.IsIndirect {
 		faults.ThrowError(nil, "Cannot assign by reference to an array dimension of an object")
 		variable_ptr = UninitializedZval()
 	} else if value_ptr.IsError() {
@@ -98,7 +98,7 @@ func ZEND_ASSIGN_REF_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	variable_ptr = opline.Op1()
 	if variable_ptr.IsError() {
 		variable_ptr = UninitializedZval()
-	} else if opline.Op1().GetType() != types.IS_INDIRECT {
+	} else if opline.Op1().GetType() != types.IsIndirect {
 		faults.ThrowError(nil, "Cannot assign by reference to an array dimension of an object")
 		variable_ptr = UninitializedZval()
 	} else if value_ptr.IsError() {

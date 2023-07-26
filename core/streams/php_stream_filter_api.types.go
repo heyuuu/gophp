@@ -142,7 +142,7 @@ type PhpStreamFilter struct {
 	is_persistent int
 	chain         *PhpStreamFilterChain
 	buffer        PhpStreamBucketBrigade
-	res           *types.ZendResource
+	res           *types.Resource
 }
 
 func (this *PhpStreamFilter) GetFops() *PhpStreamFilterOps         { return this.fops }
@@ -157,8 +157,8 @@ func (this *PhpStreamFilter) SetIsPersistent(value int)            { this.is_per
 func (this *PhpStreamFilter) GetChain() *PhpStreamFilterChain      { return this.chain }
 func (this *PhpStreamFilter) SetChain(value *PhpStreamFilterChain) { this.chain = value }
 
-func (this *PhpStreamFilter) GetRes() *types.ZendResource      { return this.res }
-func (this *PhpStreamFilter) SetRes(value *types.ZendResource) { this.res = value }
+func (this *PhpStreamFilter) GetRes() *types.Resource      { return this.res }
+func (this *PhpStreamFilter) SetRes(value *types.Resource) { this.res = value }
 
 /**
  * PhpStreamFilterFactory

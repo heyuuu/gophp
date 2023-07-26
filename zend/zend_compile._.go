@@ -18,7 +18,7 @@ const ZEND_LIVE_MASK = 7
 
 type ZifHandler func(executeData *ZendExecuteData, return_value *types.Zval)
 
-const ZEND_CALL_HAS_THIS = uint32(types.IS_OBJECT)
+const ZEND_CALL_HAS_THIS = uint32(types.IsObject)
 
 /* Top 16 bits of Z_TYPE_INFO(EX(This)) are used as call_info flags */
 
@@ -286,13 +286,13 @@ var reservedClassNames = map[string]bool{
 }
 
 var builtinTypes = map[string]types.ZvalType{
-	"int":      types.IS_LONG,
-	"float":    types.IS_DOUBLE,
-	"string":   types.IS_STRING,
-	"bool":     types.IS_BOOL,
-	"void":     types.IS_VOID,
-	"iterable": types.IS_ITERABLE,
-	"object":   types.IS_OBJECT,
+	"int":      types.IsLong,
+	"float":    types.IsDouble,
+	"string":   types.IsString,
+	"bool":     types.IsBool,
+	"void":     types.IsVoid,
+	"iterable": types.IsIterable,
+	"object":   types.IsObject,
 }
 
 /* Common part of zend_add_literal and zend_append_individual_literal */

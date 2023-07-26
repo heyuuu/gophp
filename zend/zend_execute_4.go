@@ -173,7 +173,7 @@ func ZendBinaryAssignOpDimSlow(container *types.Zval, dim *types.Zval, opline *t
 }
 func SlowIndexConvertEx(ht *types.Array, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	switch dim.GetType() {
-	case types.IS_UNDEF:
+	case types.IsUndef:
 		ZVAL_UNDEFINED_OP2(executeData)
 		//if ht.DelRefcount() == 0 {
 		//	ht.Destroy()
@@ -183,16 +183,16 @@ func SlowIndexConvertEx(ht *types.Array, dim *types.Zval, executeData *ZendExecu
 			return types.NewZvalNull()
 		}
 		fallthrough
-	case types.IS_NULL:
+	case types.IsNull:
 		return types.NewZvalString("")
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		return types.NewZvalLong(operators.DvalToLval(dim.Double()))
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		ZendUseResourceAsOffset(dim)
 		return types.NewZvalLong(dim.ResourceHandle())
-	case types.IS_FALSE:
+	case types.IsFalse:
 		return types.NewZvalLong(0)
-	case types.IS_TRUE:
+	case types.IsTrue:
 		return types.NewZvalLong(1)
 	default:
 		ZendIllegalOffset()

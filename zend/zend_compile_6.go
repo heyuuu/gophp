@@ -483,7 +483,7 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 		var type_ types.TypeHint = 0
 		if type_ast != nil {
 			type_ = compiler.CompileTypename(type_ast, 0)
-			if type_.Code() == types.IS_VOID || type_.Code() == types.IS_CALLABLE {
+			if type_.Code() == types.IsVoid || type_.Code() == types.IsCallable {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property %s::$%s cannot have type %s", ce.Name(), name.GetVal(), types.ZendGetTypeByConst(type_.Code()))
 			}
 		}
@@ -509,11 +509,11 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 					}
 				} else if type_.IsClass() {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property of type %s may not have default value", type_.FormatName())
-				} else if type_.Code() == types.IS_ARRAY || type_.Code() == types.IS_ITERABLE {
+				} else if type_.Code() == types.IsArray || type_.Code() == types.IsIterable {
 					if !value_zv.IsArray() {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be an array", type_.FormatName())
 					}
-				} else if type_.Code() == types.IS_DOUBLE {
+				} else if type_.Code() == types.IsDouble {
 					if !value_zv.IsDouble() && !value_zv.IsLong() {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type float can only be float or int")
 					}
@@ -759,7 +759,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", extends_name.GetVal())
 		}
 		compiler.CompileExpr(&extends_node, extends_ast)
-		if extends_node.GetOpType() != IS_CONST || extends_node.GetConstant().GetType() != types.IS_STRING {
+		if extends_node.GetOpType() != IS_CONST || extends_node.GetConstant().GetType() != types.IsString {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 		}
 		extends_name = extends_node.GetConstant().String()

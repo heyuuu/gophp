@@ -308,14 +308,14 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, _ zpp.Opt, autoloadFunction *typ
 	var lcName string = ""
 	var splFuncPtr types.IFunction
 	var alfi AutoloadFuncInfo
-	var objPtr *types.ZendObject
+	var objPtr *types.Object
 	var fcc types.ZendFcallInfoCache
 	if executeData.NumArgs() != 0 {
 		if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_STRICT, &funcName, &fcc, &error_) == 0 {
 			alfi.SetCe(fcc.GetCallingScope())
 			alfi.SetFuncPtr(fcc.GetFunctionHandler())
 			objPtr = fcc.GetObject()
-			if zcallable.IsType(types.IS_ARRAY) {
+			if zcallable.IsType(types.IsArray) {
 				if objPtr == nil && alfi.GetFuncPtr() != nil && !alfi.GetFuncPtr().HasFnFlags(types.AccStatic) {
 					if throw {
 						faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array specifies a non static method but no object (%s)", error_)
@@ -345,7 +345,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, _ zpp.Opt, autoloadFunction *typ
 		alfi.SetCe(fcc.GetCallingScope())
 		alfi.SetFuncPtr(fcc.GetFunctionHandler())
 		objPtr = fcc.GetObject()
-		if zcallable.IsType(types.IS_OBJECT) {
+		if zcallable.IsType(types.IsObject) {
 			types.ZVAL_COPY(alfi.GetClosure(), zcallable)
 			lcName = ascii.StrToLower(funcName.GetStr()) + uintToStr(zcallable.Object().GetHandle())
 		} else {
@@ -419,7 +419,7 @@ func ZifSplAutoloadUnregister(autoloadFunction *types.Zval) bool {
 	var lcName string
 	var success bool = false
 	var splFuncPtr types.IFunction
-	var objPtr *types.ZendObject
+	var objPtr *types.Object
 	var fcc types.ZendFcallInfoCache
 
 	if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_CHECK_SYNTAX_ONLY, &funcName, &fcc, &error_) == 0 {
@@ -427,7 +427,7 @@ func ZifSplAutoloadUnregister(autoloadFunction *types.Zval) bool {
 		return false
 	}
 	objPtr = fcc.GetObject()
-	if zcallable.IsType(types.IS_OBJECT) {
+	if zcallable.IsType(types.IsObject) {
 		lcName = ascii.StrToLower(funcName.GetStr()) + uintToStr(zcallable.Object().GetHandle())
 	} else {
 		/* Skip leading \ */

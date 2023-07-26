@@ -231,7 +231,7 @@ func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *types.PropertyInfo
 		}
 		for ; _prop < _end; _prop++ {
 			prop = *_prop
-			if prop.GetType().Code() != types.IS_DOUBLE {
+			if prop.GetType().Code() != types.IsDouble {
 				return prop
 			}
 		}

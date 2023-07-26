@@ -8,14 +8,14 @@ import (
 /**
  * ZendResource
  */
-type ZendResource struct {
+type Resource struct {
 	handle int
 	type_  int
 	ptr    any
 }
 
-func NewZendResource(handle int, ptr any, type_ int) *ZendResource {
-	var res = &ZendResource{
+func NewZendResource(handle int, ptr any, type_ int) *Resource {
+	var res = &Resource{
 		handle: handle,
 		type_:  type_,
 		ptr:    ptr,
@@ -24,12 +24,12 @@ func NewZendResource(handle int, ptr any, type_ int) *ZendResource {
 	return res
 }
 
-func (this *ZendResource) GetHandle() int      { return this.handle }
-func (this *ZendResource) SetHandle(value int) { this.handle = value }
-func (this *ZendResource) GetType() int        { return this.type_ }
-func (this *ZendResource) SetType(value int)   { this.type_ = value }
-func (this *ZendResource) GetPtr() any         { return this.ptr }
-func (this *ZendResource) SetPtr(value any)    { this.ptr = value }
+func (this *Resource) GetHandle() int      { return this.handle }
+func (this *Resource) SetHandle(value int) { this.handle = value }
+func (this *Resource) GetType() int        { return this.type_ }
+func (this *Resource) SetType(value int)   { this.type_ = value }
+func (this *Resource) GetPtr() any         { return this.ptr }
+func (this *Resource) SetPtr(value any)    { this.ptr = value }
 
 /**
  * ZendPropertyInfoList

@@ -87,7 +87,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 								if prop_info != nil {
 									value.SetNewRef(value)
 									ZEND_REF_ADD_TYPE_SOURCE(value.Reference(), prop_info)
-									value_type = types.IS_REFERENCE
+									value_type = types.IsRef
 								}
 							}
 							break
@@ -172,7 +172,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, opline.GetExtendedValue())
 		return 0
 	}
-	if value_type != types.IS_REFERENCE {
+	if value_type != types.IsRef {
 		var ref *types.Zval
 		value.SetNewEmptyRef()
 		ref = types.Z_REFVAL_P(value)

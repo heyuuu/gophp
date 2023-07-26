@@ -22,7 +22,7 @@ func (this *SplFixedarray) SetElements(value *types.Zval) { this.elements = valu
  * SplFixedArrayObject
  */
 type SplFixedArrayObject struct {
-	std *types.ZendObject
+	std *types.Object
 
 	array           SplFixedarray
 	fptr_offset_get types.IFunction
@@ -70,7 +70,7 @@ func (this *SplFixedArrayObject) GetCeGetIterator() *types.ClassEntry { return t
 func (this *SplFixedArrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplFixedArrayObject) GetStd() *types.ZendObject { return this.std }
+func (this *SplFixedArrayObject) GetStd() *types.Object { return this.std }
 
 /* SplFixedArrayObject.flags */
 func (this *SplFixedArrayObject) AddFlags(value int)      { this.flags |= value }

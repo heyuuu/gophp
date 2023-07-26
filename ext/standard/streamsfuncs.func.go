@@ -864,7 +864,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 		wkey = _p.GetKey()
 		wval = _z
 		wval = types.ZVAL_DEREF(wval)
-		if wkey != nil && wval.IsType(types.IS_ARRAY) {
+		if wkey != nil && wval.IsType(types.IsArray) {
 			var __ht *types.Array = wval.Array()
 			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
@@ -895,7 +895,7 @@ func ParseContextParams(context *core.PhpStreamContext, params *types.Zval) int 
 		context.GetNotifier().SetDtor(UserSpaceStreamNotifierDtor)
 	}
 	if nil != lang.Assign(&tmp, params.Array().KeyFind("options")) {
-		if tmp.IsType(types.IS_ARRAY) {
+		if tmp.IsType(types.IsArray) {
 			ParseContextOptions(context, tmp)
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid stream/context parameter")
@@ -1573,7 +1573,7 @@ func ZifStreamIsLocal(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zv
 		}
 		break
 	}
-	if zstream.IsType(types.IS_RESOURCE) {
+	if zstream.IsType(types.IsResource) {
 		core.PhpStreamFromZval(stream, zstream)
 		if stream == nil {
 			return_value.SetFalse()

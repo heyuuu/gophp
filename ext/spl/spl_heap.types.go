@@ -75,7 +75,7 @@ func (this *SplPtrHeap) SetIsHeapCorrupted(cond bool) { this.SwitchFlags(SPL_HEA
  * SplHeapObject
  */
 type SplHeapObject struct {
-	std *types.ZendObject
+	std *types.Object
 
 	heap            *SplPtrHeap
 	flags           int
@@ -100,7 +100,7 @@ func (this *SplHeapObject) GetFptrCmp() types.IFunction              { return th
 func (this *SplHeapObject) SetFptrCmp(value types.IFunction)         { this.fptr_cmp = value }
 func (this *SplHeapObject) GetFptrCount() types.IFunction            { return this.fptr_count }
 func (this *SplHeapObject) SetFptrCount(value types.IFunction)       { this.fptr_count = value }
-func (this *SplHeapObject) GetStd() *types.ZendObject                { return &this.std }
+func (this *SplHeapObject) GetStd() *types.Object                    { return &this.std }
 
 // func (this *SplHeapObject) SetStd(value zend.ZendObject) { this.std = value }
 

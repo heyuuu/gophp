@@ -62,21 +62,21 @@ again:
 		common = "&"
 	}
 	switch struc.GetType() {
-	case types.IS_FALSE:
+	case types.IsFalse:
 		core.PhpPrintf("%sbool(false)\n", common)
-	case types.IS_TRUE:
+	case types.IsTrue:
 		core.PhpPrintf("%sbool(true)\n", common)
-	case types.IS_NULL:
+	case types.IsNull:
 		core.PhpPrintf("%sNULL\n", common)
-	case types.IS_LONG:
+	case types.IsLong:
 		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", common, struc.Long())
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
-	case types.IS_STRING:
+	case types.IsString:
 		core.PhpPrintf("%sstring(%zd) \"", common, struc.String().GetLen())
 		core.PhpOutputWrite(struc.StringVal())
 		core.PUTS("\"\n")
-	case types.IS_ARRAY:
+	case types.IsArray:
 		myht := struc.Array()
 		if level > 1 {
 			if myht.IsRecursive() {
@@ -97,7 +97,7 @@ again:
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
-	case types.IS_OBJECT:
+	case types.IsObject:
 		if struc.Object().IsRecursive() {
 			core.PUTS("*RECURSION*\n")
 			return
@@ -125,10 +125,10 @@ again:
 		}
 		core.PUTS("}\n")
 		struc.Object().UnprotectRecursive()
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(struc.Resource()), "Unknown")
 		core.PhpPrintf("%sresource(%d) of type (%s)\n", common, struc.ResourceHandle(), typeName)
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		isRef = true
 		struc = types.Z_REFVAL_P(struc)
 		goto again
@@ -190,21 +190,21 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 	}
 
 	switch struc.GetType() {
-	case types.IS_FALSE:
+	case types.IsFalse:
 		core.PhpPrintf("%sbool(false)\n", common)
-	case types.IS_TRUE:
+	case types.IsTrue:
 		core.PhpPrintf("%sbool(true)\n", common)
-	case types.IS_NULL:
+	case types.IsNull:
 		core.PhpPrintf("%sNULL\n", common)
-	case types.IS_LONG:
+	case types.IsLong:
 		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", common, struc.Long())
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
-	case types.IS_STRING:
+	case types.IsString:
 		core.PhpPrintf("%sstring(%zd) \"", common, struc.String().GetLen())
 		core.PUTS(struc.StringVal())
 		core.PhpPrintf("\"\n")
-	case types.IS_ARRAY:
+	case types.IsArray:
 		myht := struc.Array()
 		if level > 1 {
 			if myht.IsRecursive() {
@@ -225,7 +225,7 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
-	case types.IS_OBJECT:
+	case types.IsObject:
 		myht := zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
 		if myht != nil {
 			if myht.IsRecursive() {
@@ -257,7 +257,7 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(struc.Resource()), "Unknown")
 		core.PhpPrintf("%sresource(%d) of type (%s)\n", common, struc.ResourceHandle(), typeName)
 	default:
@@ -320,13 +320,13 @@ func PhpVarExportEx(struc *types.Zval, level int, buf *zend.SmartStr) {
 	var val *types.Zval
 again:
 	switch struc.GetType() {
-	case types.IS_FALSE:
+	case types.IsFalse:
 		buf.WriteString("false")
-	case types.IS_TRUE:
+	case types.IsTrue:
 		buf.WriteString("true")
-	case types.IS_NULL:
+	case types.IsNull:
 		buf.WriteString("NULL")
-	case types.IS_LONG:
+	case types.IsLong:
 
 		/* INT_MIN as a literal will be parsed as a float. Emit something like
 		 * -9223372036854775807-1 to avoid this. */
@@ -337,7 +337,7 @@ again:
 			break
 		}
 		buf.WriteLong(struc.Long())
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		core.PhpGcvt(struc.Double(), int(core.PG__().serialize_precision), '.', 'E', tmp_str)
 		buf.WriteString(b.CastStrAuto(tmp_str))
 
@@ -351,7 +351,7 @@ again:
 		if core.ZendFinite(struc.Double()) && nil == strchr(tmp_str, '.') {
 			buf.WriteString(".0")
 		}
-	case types.IS_STRING:
+	case types.IsString:
 		ztmp := str.PhpAddcslashes(struc.StringVal(), "'\\")
 		ztmp2 := strings.ReplaceAll(ztmp, "0", "' . \"\\0\" . '")
 		buf.WriteByte('\'')
@@ -359,7 +359,7 @@ again:
 		buf.WriteByte('\'')
 		//types.ZendStringFree(ztmp)
 		//types.ZendStringFree(ztmp2)
-	case types.IS_ARRAY:
+	case types.IsArray:
 		myht = struc.Array()
 		if myht.IsRecursive() {
 			buf.WriteString("NULL")
@@ -391,7 +391,7 @@ again:
 			BufferAppendSpaces(buf, level-1)
 		}
 		buf.WriteByte(')')
-	case types.IS_OBJECT:
+	case types.IsObject:
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_VAR_EXPORT)
 		if myht != nil {
 			if myht.IsRecursive() {
@@ -442,7 +442,7 @@ again:
 		} else {
 			buf.WriteString("))")
 		}
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		struc = types.Z_REFVAL_P(struc)
 		goto again
 	default:
@@ -562,14 +562,14 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 			return_value.SetFalse()
 			goto cleanup
 		}
-		if classes != nil && (classes.IsType(types.IS_ARRAY) || !operators.ZvalIsTrue(classes)) {
+		if classes != nil && (classes.IsType(types.IsArray) || !operators.ZvalIsTrue(classes)) {
 			if classes.IsArray() {
 				class_hash = types.NewArray(classes.Array().Len())
 			} else {
 				class_hash = types.NewArray(0)
 			}
 		}
-		if class_hash != nil && classes.IsType(types.IS_ARRAY) {
+		if class_hash != nil && classes.IsType(types.IsArray) {
 			var entry *types.Zval
 			var lcname *types.String
 			var __ht = classes.Array()

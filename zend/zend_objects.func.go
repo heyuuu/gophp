@@ -31,13 +31,13 @@ func ZendObjectStdDtorEx(properties []types.Zval, ce *types.ClassEntry) {
 	}
 }
 
-func ZendObjectStdDtor(object *types.ZendObject) {
+func ZendObjectStdDtor(object *types.Object) {
 	ZendObjectStdDtorEx(object.GetPropertiesTable(), object.GetCe())
 }
-func ZendObjectsDestroyObject(object *types.ZendObject) {
+func ZendObjectsDestroyObject(object *types.Object) {
 	var destructor types.IFunction = object.GetCe().GetDestructor()
 	if destructor != nil {
-		var old_exception *types.ZendObject
+		var old_exception *types.Object
 		var orig_fake_scope *types.ClassEntry
 		if destructor.GetOpArray().HasFnFlags(types.AccPrivate | types.AccProtected) {
 			if destructor.GetOpArray().IsPrivate() {
@@ -104,7 +104,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		EG__().SetFakeScope(orig_fake_scope)
 	}
 }
-func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.ZendObject) {
+func ZendObjectsCloneMembers(new_object *types.Object, old_object *types.Object) {
 	if old_object.GetCe().GetDefaultPropertiesCount() != 0 {
 		var src *types.Zval = old_object.GetPropertiesTable()
 		var dst *types.Zval = new_object.GetPropertiesTable()
@@ -169,7 +169,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		ZendCallFunction(fci, &fcic)
 	}
 }
-func ZendObjectsCloneObjEx(oldObject *types.ZendObject) *types.ZendObject {
+func ZendObjectsCloneObjEx(oldObject *types.Object) *types.Object {
 	/* assume that create isn't overwritten, so when clone depends on the
 	 * overwritten one then it must itself be overwritten */
 	newObject := types.NewStdObjectSkipPropertiesInit(oldObject.GetCe())

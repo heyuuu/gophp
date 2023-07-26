@@ -11,7 +11,7 @@ func ZEND_PROPERTY_INFO_SOURCE_TO_LIST(list uintPtr) *ZendPropertyInfoList {
 }
 func ZEND_PROPERTY_INFO_SOURCE_IS_LIST(list uintPtr) int { return list & 0x1 }
 func ZEND_SAME_FAKE_TYPE(faketype uint8, realtype uint8) bool {
-	return faketype == realtype || faketype == IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
+	return faketype == realtype || faketype == IsBool && (realtype == IsTrue || realtype == IsFalse)
 }
 
 func Z_OBJCE(zval Zval) *ClassEntry    { return zval.Object().GetCe() }

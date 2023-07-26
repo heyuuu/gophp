@@ -11,11 +11,11 @@ import (
 var ZendIteratorClassEntry *types.ClassEntry = types.NewInternalClass("__iterator_wrapper", 0)
 
 var IteratorObjectHandlers *types.ObjectHandlers = types.NewObjectHandlers(types.ObjectHandlersSetting{
-	FreeObj: func(object *types.ZendObject) {
+	FreeObj: func(object *types.Object) {
 		var iter *ZendObjectIterator = (*ZendObjectIterator)(object)
 		iter.GetFuncs().GetDtor()(iter)
 	},
-	DtorObj: func(object *types.ZendObject) {},
+	DtorObj: func(object *types.Object) {},
 })
 
 /**
@@ -88,7 +88,7 @@ func (this *ZendObjectIteratorFuncs) GetInvalidateCurrent() func(iter *ZendObjec
  * ZendObjectIterator
  */
 type ZendObjectIterator struct {
-	std   *types.ZendObject
+	std   *types.Object
 	data  types.Zval
 	funcs *ZendObjectIteratorFuncs
 	index ZendUlong
@@ -98,7 +98,7 @@ func (this *ZendObjectIterator) Init() {
 	this.std = types.NewObject(ZendIteratorClassEntry, IteratorObjectHandlers)
 }
 
-func (this *ZendObjectIterator) GetStd() *types.ZendObject               { return this.std }
+func (this *ZendObjectIterator) GetStd() *types.Object                   { return this.std }
 func (this *ZendObjectIterator) GetData() types.Zval                     { return this.data }
 func (this *ZendObjectIterator) GetFuncs() *ZendObjectIteratorFuncs      { return this.funcs }
 func (this *ZendObjectIterator) SetFuncs(value *ZendObjectIteratorFuncs) { this.funcs = value }

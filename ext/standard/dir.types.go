@@ -8,5 +8,5 @@ import (
  * PhpDirGlobals
  */
 type PhpDirGlobals struct {
-	default_dir *types.ZendResource
+	default_dir *types.Resource
 }

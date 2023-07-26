@@ -17,7 +17,7 @@ func ZmStartupCore(type_ int, module_number int) int {
 	ZendRegisterDefaultClasses()
 	return types.SUCCESS
 }
-func NewStdClassObject(properties *types.Array) *types.ZendObject {
+func NewStdClassObject(properties *types.Array) *types.Object {
 	obj := types.NewStdObject(ZendStandardClassDef)
 	obj.SetProperties(properties)
 	return obj
@@ -294,15 +294,15 @@ func ZifDefine(constantName string, value *types.Zval, _ zpp.Opt, caseInsensitiv
 	val_free.SetUndef()
 repeat:
 	switch value.GetType() {
-	case types.IS_NULL,
-		types.IS_FALSE,
-		types.IS_TRUE,
-		types.IS_LONG,
-		types.IS_DOUBLE,
-		types.IS_STRING,
-		types.IS_RESOURCE:
+	case types.IsNull,
+		types.IsFalse,
+		types.IsTrue,
+		types.IsLong,
+		types.IsDouble,
+		types.IsString,
+		types.IsResource:
 		// pass
-	case types.IS_ARRAY:
+	case types.IsArray:
 		if value.IsRefcounted() {
 			if ValidateConstantArray(value.Array()) == 0 {
 				return false
@@ -311,13 +311,13 @@ repeat:
 				goto register_constant
 			}
 		}
-	case types.IS_OBJECT:
+	case types.IsObject:
 		if val_free.IsUndef() {
 			if value.Object().CanGet() {
 				value = value.Object().Get(&val_free)
 				goto repeat
 			} else if value.Object().CanCast() {
-				if value.Object().Cast(&val_free, types.IS_STRING) == types.SUCCESS {
+				if value.Object().Cast(&val_free, types.IsString) == types.SUCCESS {
 					value = &val_free
 					break
 				}
@@ -1152,7 +1152,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	var call *ZendExecuteData
 	var ptr *ZendExecuteData
 	var skip *ZendExecuteData
-	var object *types.ZendObject
+	var object *types.Object
 	var lineno int
 	var frameno = 0
 	var func_ types.IFunction
@@ -1320,7 +1320,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 	var ptr *ZendExecuteData
 	var skip *ZendExecuteData
 	var call *ZendExecuteData = nil
-	var object *types.ZendObject
+	var object *types.Object
 	var lineno int
 	var frameno = 0
 	var func_ types.IFunction

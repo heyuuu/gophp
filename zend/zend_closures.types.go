@@ -8,7 +8,7 @@ import (
  * ZendClosure
  */
 type ZendClosure struct {
-	std                   *types.ZendObject
+	std                   *types.Object
 	func_                 types.IFunction
 	this_ptr              types.Zval
 	called_scope          *types.ClassEntry
@@ -21,7 +21,7 @@ func NewZendClosure(ce *types.ClassEntry) *ZendClosure {
 	}
 }
 
-func (this *ZendClosure) GetStd() *types.ZendObject               { return this.std }
+func (this *ZendClosure) GetStd() *types.Object                   { return this.std }
 func (this *ZendClosure) GetFunc() types.IFunction                { return this.func_ }
 func (this *ZendClosure) GetThisPtr() *types.Zval                 { return &this.this_ptr }
 func (this *ZendClosure) GetCalledScope() *types.ClassEntry       { return this.called_scope }

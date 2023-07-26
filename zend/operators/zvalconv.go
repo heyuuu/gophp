@@ -15,22 +15,22 @@ func IZendIsTrue(op *types.Zval) int { return types.IntBool(ZvalIsTrue(op)) }
 func ZvalIsTrue(op *types.Zval) bool {
 again:
 	switch op.GetType() {
-	case types.IS_TRUE:
+	case types.IsTrue:
 		return true
-	case types.IS_LONG:
+	case types.IsLong:
 		return op.Long() != 0
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		return op.Double() != 0
-	case types.IS_STRING:
+	case types.IsString:
 		str := op.StringVal()
 		return str != "" && str != "0"
-	case types.IS_ARRAY:
+	case types.IsArray:
 		return op.Array().Len() != 0
-	case types.IS_OBJECT:
+	case types.IsObject:
 		return ZendObjectIsTrue(op)
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		return op.ResourceHandle() != 0
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		op = types.Z_REFVAL_P(op)
 		goto again
 	}
@@ -49,17 +49,17 @@ func _zvalGetLongFuncNoisy(op *types.Zval) int { return _zvalGetLongFuncEx(op, f
 func _zvalGetLongFuncEx(op *types.Zval, silent bool) int {
 	op = op.DeRef()
 	switch op.GetType() {
-	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
+	case types.IsUndef, types.IsNull, types.IsFalse:
 		return 0
-	case types.IS_TRUE:
+	case types.IsTrue:
 		return 1
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		return op.ResourceHandle()
-	case types.IS_LONG:
+	case types.IsLong:
 		return op.Long()
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		return DvalToLval(op.Double())
-	case types.IS_STRING:
+	case types.IsString:
 		var r conv.ParseNumberResult
 		if silent {
 			r = zend.StrToNumberAllowErrors(op.StringVal())
@@ -81,15 +81,15 @@ func _zvalGetLongFuncEx(op *types.Zval, silent bool) int {
 			}
 			return 0
 		}
-	case types.IS_ARRAY:
+	case types.IsArray:
 		if op.Array().Len() != 0 {
 			return 1
 		} else {
 			return 0
 		}
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var dst types.Zval
-		ConvertObjectToType(op, &dst, types.IS_LONG, ConvertToLong)
+		ConvertObjectToType(op, &dst, types.IsLong, ConvertToLong)
 		if dst.IsLong() {
 			return dst.Long()
 		} else {
@@ -110,29 +110,29 @@ func ZvalGetDouble(op *types.Zval) float64 {
 func ZvalGetDoubleFunc(op *types.Zval) float64 {
 	op = op.DeRef()
 	switch op.GetType() {
-	case types.IS_NULL:
+	case types.IsNull:
 		fallthrough
-	case types.IS_FALSE:
+	case types.IsFalse:
 		return 0.0
-	case types.IS_TRUE:
+	case types.IsTrue:
 		return 1.0
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		return float64(op.ResourceHandle())
-	case types.IS_LONG:
+	case types.IsLong:
 		return float64(op.Long())
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		return op.Double()
-	case types.IS_STRING:
+	case types.IsString:
 		return zend.ZendStrtod(op.StringVal(), nil)
-	case types.IS_ARRAY:
+	case types.IsArray:
 		if op.Array().Len() != 0 {
 			return 1.0
 		} else {
 			return 0.0
 		}
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var dst types.Zval
-		ConvertObjectToType(op, &dst, types.IS_DOUBLE, ConvertToDouble)
+		ConvertObjectToType(op, &dst, types.IsDouble, ConvertToDouble)
 		if dst.IsDouble() {
 			return dst.Double()
 		} else {
@@ -176,28 +176,28 @@ func ZvalTryGetString(op *types.Zval) *types.String {
 func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 	op = op.DeRef()
 	switch op.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		return op.StringVal(), true
-	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
+	case types.IsUndef, types.IsNull, types.IsFalse:
 		return "", true
-	case types.IS_TRUE:
+	case types.IsTrue:
 		return "1", true
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		return fmt.Sprintf("Resource id #%d", op.ResourceHandle()), true
-	case types.IS_LONG:
+	case types.IsLong:
 		return strconv.Itoa(op.Long()), true
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		return pfmt.Sprintf("%.*G", zend.EG__().GetPrecision(), op.Double()), true
-	case types.IS_ARRAY:
+	case types.IsArray:
 		faults.Error(faults.E_NOTICE, "Array to string conversion")
 		if try && zend.EG__().GetException() != nil {
 			return "", false
 		}
 		return types.STR_ARRAY_CAPITALIZED, true
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var tmp types.Zval
 		if op.Object().CanCast() {
-			if op.Object().Cast(&tmp, types.IS_STRING) == types.SUCCESS {
+			if op.Object().Cast(&tmp, types.IsString) == types.SUCCESS {
 				return tmp.StringVal(), true
 			}
 		} else if op.Object().CanGet() {

@@ -10,8 +10,8 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func ZEND_CLOSURE_OBJECT(op_array types.IFunction) *types.ZendObject {
-	return (*types.ZendObject)((*byte)(op_array - b.SizeOf("zend_object")))
+func ZEND_CLOSURE_OBJECT(op_array types.IFunction) *types.Object {
+	return (*types.Object)((*byte)(op_array - b.SizeOf("zend_object")))
 }
 func ZEND_CLOSURE_PROPERTY_ERROR() {
 	faults.ThrowError(nil, "Closure object cannot have properties")
@@ -92,7 +92,7 @@ func zim_Closure_call(executeData *ZendExecuteData, returnValue *types.Zval) {
 	var closure *ZendClosure
 	var fci_cache types.ZendFcallInfoCache
 	var my_function types.IFunction
-	var newobj *types.ZendObject
+	var newobj *types.Object
 	closure = (*ZendClosure)(executeData.ThisObject())
 	newobj = newthis.Object()
 	if ZendValidClosureBinding(closure, newthis, types.Z_OBJCE_P(newthis)) == 0 {
@@ -272,14 +272,14 @@ func zim_Closure_fromCallable(executeData *ZendExecuteData, return_value *types.
 		}
 	}
 }
-func ZendClosureGetConstructor(object *types.ZendObject) types.IFunction {
+func ZendClosureGetConstructor(object *types.Object) types.IFunction {
 	faults.ThrowError(nil, "Instantiation of 'Closure' is not allowed")
 	return nil
 }
 func ZendClosureCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 	return o1.Object() != o2.Object()
 }
-func ZendGetClosureInvokeMethod(object *types.ZendObject) types.IFunction {
+func ZendGetClosureInvokeMethod(object *types.Object) types.IFunction {
 	var closure *ZendClosure = (*ZendClosure)(object)
 	var invoke types.IFunction = types.NewInternalFunction()
 
@@ -304,7 +304,7 @@ func ZendGetClosureInvokeMethod(object *types.ZendObject) types.IFunction {
 	invoke.GetInternalFunction().SetFunctionName(types.STR_MAGIC_INVOKE)
 	return invoke
 }
-func ZendClosureGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) types.IFunction {
+func ZendClosureGetMethod(object **types.Object, method *types.String, key *types.Zval) types.IFunction {
 	if ascii.StrCaseEquals(method.GetStr(), ZEND_INVOKE_FUNC_NAME) {
 		return ZendGetClosureInvokeMethod(*object)
 	}
@@ -331,7 +331,7 @@ func ZendClosureHasProperty(object *types.Zval, member *types.Zval, has_set_exis
 func ZendClosureUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *any) {
 	ZEND_CLOSURE_PROPERTY_ERROR()
 }
-func ZendClosureFreeStorage(object *types.ZendObject) {
+func ZendClosureFreeStorage(object *types.Object) {
 	var closure *ZendClosure = (*ZendClosure)(object)
 	ZendObjectStdDtor(closure.GetStd())
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION {
@@ -343,17 +343,17 @@ func ZendClosureFreeStorage(object *types.ZendObject) {
 		// ZvalPtrDtor(closure.GetThisPtr())
 	}
 }
-func ZendClosureNew(class_type *types.ClassEntry) *types.ZendObject {
+func ZendClosureNew(class_type *types.ClassEntry) *types.Object {
 	var closure = NewZendClosure(class_type)
-	return (*types.ZendObject)(closure)
+	return (*types.Object)(closure)
 }
-func ZendClosureClone(zobject *types.Zval) *types.ZendObject {
+func ZendClosureClone(zobject *types.Zval) *types.Object {
 	var closure *ZendClosure = (*ZendClosure)(zobject.Object())
 	var result types.Zval
 	ZendCreateClosure(&result, closure.GetFunc(), closure.GetFunc().GetScope(), closure.GetCalledScope(), closure.GetThisPtr())
 	return result.Object()
 }
-func ZendClosureGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr *types.IFunction, obj_ptr **types.ZendObject) int {
+func ZendClosureGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr *types.IFunction, obj_ptr **types.Object) int {
 	var closure *ZendClosure = (*ZendClosure)(obj.Object())
 	*fptr_ptr = closure.GetFunc()
 	*ce_ptr = closure.GetCalledScope()
@@ -394,13 +394,13 @@ func ZendClosureInternalHandler(executeData *ZendExecuteData, return_value *type
 	executeData.GetFunc() = nil
 }
 func ZendCreateClosure(res *types.Zval, func_ types.IFunction, scope *types.ClassEntry, called_scope *types.ClassEntry, this_ptr *types.Zval) {
-	var thisPtr *types.ZendObject
+	var thisPtr *types.Object
 	if this_ptr != nil && this_ptr.IsNotUndef() {
 		thisPtr = this_ptr.Object()
 	}
 	ZendCreateClosureEx(res, func_, scope, called_scope, thisPtr)
 }
-func ZendCreateClosureEx(res *types.Zval, func_ types.IFunction, scope *types.ClassEntry, called_scope *types.ClassEntry, thisPtr *types.ZendObject) {
+func ZendCreateClosureEx(res *types.Zval, func_ types.IFunction, scope *types.ClassEntry, called_scope *types.ClassEntry, thisPtr *types.Object) {
 	var closure *ZendClosure
 	ObjectInitEx(res, ZendCeClosure)
 	closure = (*ZendClosure)(res.Object())

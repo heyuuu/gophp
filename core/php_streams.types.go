@@ -267,10 +267,10 @@ type PhpStream struct {
 	fgetss_state     uint8
 	mode             []byte
 	flags            uint32
-	res              *types.ZendResource
+	res              *types.Resource
 	stdiocast        *r.File
 	orig_path        *byte
-	ctx              *types.ZendResource
+	ctx              *types.Resource
 	position         zend.ZendOffT
 	readbuf          *uint8
 	readbuflen       int
@@ -305,14 +305,14 @@ func (this *PhpStream) SetFgetssState(state uint8)                    { this.fge
 func (this *PhpStream) GetMode() []byte                               { return this.mode }
 func (this *PhpStream) GetFlags() uint32                              { return this.flags }
 func (this *PhpStream) SetFlags(value uint32)                         { this.flags = value }
-func (this *PhpStream) GetRes() *types.ZendResource                   { return this.res }
-func (this *PhpStream) SetRes(value *types.ZendResource)              { this.res = value }
+func (this *PhpStream) GetRes() *types.Resource                       { return this.res }
+func (this *PhpStream) SetRes(value *types.Resource)                  { this.res = value }
 func (this *PhpStream) GetStdiocast() *r.File                         { return this.stdiocast }
 func (this *PhpStream) SetStdiocast(value *r.File)                    { this.stdiocast = value }
 func (this *PhpStream) GetOrigPath() *byte                            { return this.orig_path }
 func (this *PhpStream) SetOrigPath(value *byte)                       { this.orig_path = value }
-func (this *PhpStream) GetCtx() *types.ZendResource                   { return this.ctx }
-func (this *PhpStream) SetCtx(value *types.ZendResource)              { this.ctx = value }
+func (this *PhpStream) GetCtx() *types.Resource                       { return this.ctx }
+func (this *PhpStream) SetCtx(value *types.Resource)                  { this.ctx = value }
 func (this *PhpStream) GetPosition() zend.ZendOffT                    { return this.position }
 func (this *PhpStream) SetPosition(value zend.ZendOffT)               { this.position = value }
 func (this *PhpStream) GetReadbuf() *uint8                            { return this.readbuf }

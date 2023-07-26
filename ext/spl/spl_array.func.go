@@ -12,7 +12,7 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func SplArrayFromObj(obj *types.ZendObject) *SplArrayObject {
+func SplArrayFromObj(obj *types.Object) *SplArrayObject {
 	return (*SplArrayObject)((*byte)(obj - zend_long((*byte)(&((*SplArrayObject)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLARRAY_P(zv *types.Zval) *SplArrayObject {
@@ -27,10 +27,10 @@ func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.Array {
 	} else if intern.IsUseOther() {
 		var other *SplArrayObject = Z_SPLARRAY_P(intern.GetArray())
 		return SplArrayGetHashTablePtr(other)
-	} else if intern.GetArray().IsType(types.IS_ARRAY) {
+	} else if intern.GetArray().IsType(types.IsArray) {
 		return &(intern.GetArray().Array())
 	} else {
-		var obj *types.ZendObject = intern.GetArray().Object()
+		var obj *types.Object = intern.GetArray().Object()
 		if obj.GetProperties() == nil {
 			zend.RebuildObjectProperties(obj)
 		} else {
@@ -54,7 +54,7 @@ func SplArrayIsObject(intern *SplArrayObject) bool {
 	for intern.IsUseOther() {
 		intern = Z_SPLARRAY_P(intern.GetArray())
 	}
-	return intern.IsIsSelf() || intern.GetArray().IsType(types.IS_OBJECT)
+	return intern.IsIsSelf() || intern.GetArray().IsType(types.IsObject)
 }
 func SplArrayCreateHtIter(ht *types.Array, intern *SplArrayObject) {
 	intern.SetHtIter(zend.EG__().AddArrayIterator(ht))
@@ -66,14 +66,14 @@ func SplArrayGetPosPtr(ht *types.Array, intern *SplArrayObject) *uint32 {
 	}
 	return zend.EG__().GetHtIterators()[intern.GetHtIter()].GetPos()
 }
-func SplArrayObjectFreeStorage(object *types.ZendObject) {
+func SplArrayObjectFreeStorage(object *types.Object) {
 	var intern *SplArrayObject = SplArrayFromObj(object)
 	if intern.GetHtIter() != uint32-1 {
 		zend.EG__().DelArrayIterator(intern.GetHtIter())
 	}
 	zend.ZendObjectStdDtor(intern.GetStd())
 }
-func SplArrayObjectNewEx(classType *types.ClassEntry, orig *types.Zval, cloneOrig int) *types.ZendObject {
+func SplArrayObjectNewEx(classType *types.ClassEntry, orig *types.Zval, cloneOrig int) *types.Object {
 	var intern *SplArrayObject = NewSplArrayObject()
 	var parent *types.ClassEntry = classType
 	var inherited int = 0
@@ -168,12 +168,12 @@ func SplArrayObjectNewEx(classType *types.ClassEntry, orig *types.Zval, cloneOri
 	intern.SetHtIter(uint32 - 1)
 	return intern.GetStd()
 }
-func SplArrayObjectNew(class_type *types.ClassEntry) *types.ZendObject {
+func SplArrayObjectNew(class_type *types.ClassEntry) *types.Object {
 	return SplArrayObjectNewEx(class_type, nil, 0)
 }
-func SplArrayObjectClone(zobject *types.Zval) *types.ZendObject {
-	var old_object *types.ZendObject
-	var new_object *types.ZendObject
+func SplArrayObjectClone(zobject *types.Zval) *types.Object {
+	var old_object *types.Object
+	var new_object *types.Object
 	old_object = zobject.Object()
 	new_object = SplArrayObjectNewEx(old_object.GetCe(), zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
@@ -193,10 +193,10 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 	}
 try_again:
 	switch offset.GetType() {
-	case types.IS_NULL:
+	case types.IsNull:
 		offset_key = types.NewString("")
 		goto fetch_dim_string
-	case types.IS_STRING:
+	case types.IsString:
 		offset_key = offset.String()
 	fetch_dim_string:
 		retval = ht.SymtableFind(offset_key.GetStr())
@@ -239,20 +239,20 @@ try_again:
 			}
 		}
 		return retval
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle())
 		index = offset.ResourceHandle()
 		goto num_index
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
 		goto num_index
-	case types.IS_FALSE:
+	case types.IsFalse:
 		index = 0
 		goto num_index
-	case types.IS_TRUE:
+	case types.IsTrue:
 		index = 1
 		goto num_index
-	case types.IS_LONG:
+	case types.IsLong:
 		index = offset.Long()
 	num_index:
 		if lang.Assign(&retval, ht.IndexFind(index)) == nil {
@@ -274,7 +274,7 @@ try_again:
 			}
 		}
 		return retval
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		offset = types.ZVAL_DEREF(offset)
 		goto try_again
 	default:
@@ -353,33 +353,33 @@ func SplArrayWriteDimensionEx(check_inherited int, object *types.Zval, offset *t
 	}
 try_again:
 	switch offset.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		ht = SplArrayGetHashTable(intern)
 		ht.SymtableUpdateInd(offset.String().GetStr(), value)
 		return
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
 		goto num_index
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		index = offset.ResourceHandle()
 		goto num_index
-	case types.IS_FALSE:
+	case types.IsFalse:
 		index = 0
 		goto num_index
-	case types.IS_TRUE:
+	case types.IsTrue:
 		index = 1
 		goto num_index
-	case types.IS_LONG:
+	case types.IsLong:
 		index = offset.Long()
 	num_index:
 		ht = SplArrayGetHashTable(intern)
 		ht.IndexUpdate(index, value)
 		return
-	case types.IS_NULL:
+	case types.IsNull:
 		ht = SplArrayGetHashTable(intern)
 		ht.Append(value)
 		return
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		offset = types.ZVAL_DEREF(offset)
 		goto try_again
 	default:
@@ -407,7 +407,7 @@ func SplArrayUnsetDimensionEx(check_inherited int, object *types.Zval, offset *t
 	}
 try_again:
 	switch offset.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		ht = SplArrayGetHashTable(intern)
 		if ht == zend.EG__().GetSymbolTable() {
 			if !zend.ZendDeleteGlobalVariable(offset.String()) {
@@ -436,26 +436,26 @@ try_again:
 				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.String().GetVal())
 			}
 		}
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
 		goto num_index
-	case types.IS_RESOURCE:
+	case types.IsResource:
 		index = offset.ResourceHandle()
 		goto num_index
-	case types.IS_FALSE:
+	case types.IsFalse:
 		index = 0
 		goto num_index
-	case types.IS_TRUE:
+	case types.IsTrue:
 		index = 1
 		goto num_index
-	case types.IS_LONG:
+	case types.IsLong:
 		index = offset.Long()
 	num_index:
 		ht = SplArrayGetHashTable(intern)
 		if !ht.IndexDelete(index) {
 			faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
 		}
-	case types.IS_REFERENCE:
+	case types.IsRef:
 		offset = types.ZVAL_DEREF(offset)
 		goto try_again
 	default:
@@ -492,7 +492,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 		var ht *types.Array = SplArrayGetHashTable(intern)
 	try_again:
 		switch offset.GetType() {
-		case types.IS_STRING:
+		case types.IsString:
 			if lang.Assign(&tmp, ht.SymtableFind(offset.String().GetStr())) != nil {
 				if check_empty == 2 {
 					return 1
@@ -500,19 +500,19 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 			} else {
 				return 0
 			}
-		case types.IS_DOUBLE:
+		case types.IsDouble:
 			index = zend.ZendLong(offset.Double())
 			goto num_index
-		case types.IS_RESOURCE:
+		case types.IsResource:
 			index = offset.ResourceHandle()
 			goto num_index
-		case types.IS_FALSE:
+		case types.IsFalse:
 			index = 0
 			goto num_index
-		case types.IS_TRUE:
+		case types.IsTrue:
 			index = 1
 			goto num_index
-		case types.IS_LONG:
+		case types.IsLong:
 			index = offset.Long()
 		num_index:
 			if lang.Assign(&tmp, ht.IndexFind(index)) != nil {
@@ -522,7 +522,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 			} else {
 				return 0
 			}
-		case types.IS_REFERENCE:
+		case types.IsRef:
 			offset = types.ZVAL_DEREF(offset)
 			goto try_again
 		default:
@@ -1177,7 +1177,7 @@ func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *
 		entry = entry.Indirect()
 	}
 	entry = types.ZVAL_DEREF(entry)
-	return_value.SetBool(entry.IsType(types.IS_ARRAY) || entry.IsType(types.IS_OBJECT) && !intern.IsChildArraysOnly())
+	return_value.SetBool(entry.IsType(types.IsArray) || entry.IsType(types.IsObject) && !intern.IsChildArraysOnly())
 	return
 }
 func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1196,7 +1196,7 @@ func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *
 		entry = entry.Indirect()
 	}
 	entry = types.ZVAL_DEREF(entry)
-	if entry.IsType(types.IS_OBJECT) {
+	if entry.IsType(types.IsObject) {
 		if intern.IsChildArraysOnly() {
 			return
 		}
@@ -1308,7 +1308,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 		}
 		intern.SetIsCloneMask(false)
 		intern.AddArFlags(flags & SPL_ARRAY_CLONE_MASK)
-		if array.IsType(types.IS_ARRAY) {
+		if array.IsType(types.IsArray) {
 			// zend.ZvalPtrDtor(intern.GetArray())
 			types.ZVAL_COPY_VALUE(intern.GetArray(), array)
 			array.SetNull()

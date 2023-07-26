@@ -44,7 +44,7 @@ func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zend
 func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num uint32, executeData *ZendExecuteData) int {
 	/* May be NULL during generator closing (only finally blocks are executed) */
 
-	var ex *types.ZendObject = EG__().GetException()
+	var ex *types.Object = EG__().GetException()
 
 	/* Walk try/catch/finally structures upwards, performing the necessary actions */
 

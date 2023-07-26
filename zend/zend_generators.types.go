@@ -46,7 +46,7 @@ func (this *ZendGeneratorNode) SetRoot(value *ZendGenerator)    { this.ptr.root 
  * ZendGenerator
  */
 type ZendGenerator struct {
-	std                   *types.ZendObject
+	std                   *types.Object
 	iterator              *ZendObjectIterator
 	executeData           *ZendExecuteData
 	frozenCallStack       *ZendExecuteData
@@ -84,7 +84,7 @@ func (gen *ZendGenerator) GetValues() *types.Zval  { return &gen.values }
 func (gen *ZendGenerator) GetValuesFePos() uint32  { return gen.values.GetFePos() }
 func (gen *ZendGenerator) SetValuesFePos(v uint32) { gen.values.SetFePos(v) }
 
-func (gen *ZendGenerator) GetStd() *types.ZendObject                 { return gen.std }
+func (gen *ZendGenerator) GetStd() *types.Object                     { return gen.std }
 func (gen *ZendGenerator) GetIterator() *ZendObjectIterator          { return gen.iterator }
 func (gen *ZendGenerator) SetIterator(value *ZendObjectIterator)     { gen.iterator = value }
 func (gen *ZendGenerator) GetExecuteData() *ZendExecuteData          { return gen.executeData }

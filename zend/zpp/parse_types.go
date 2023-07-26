@@ -33,7 +33,7 @@ func ParseBool(arg *types.Zval, checkNull bool, weak bool) (dest bool, isNull bo
 }
 
 func ParseBoolWeak(arg *types.Zval) (dest bool, ok bool) {
-	if arg.GetType() <= types.IS_STRING {
+	if arg.GetType() <= types.IsString {
 		return operators.ZvalIsTrue(arg), true
 	}
 	return false, false
@@ -71,13 +71,13 @@ func ParseLongWeak(arg *types.Zval, cap bool) (dest int, ok bool) {
 	}
 
 	switch arg.GetType() {
-	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
+	case types.IsUndef, types.IsNull, types.IsFalse:
 		dest = 0
-	case types.IS_TRUE:
+	case types.IsTrue:
 		dest = 1
-	case types.IS_LONG:
+	case types.IsLong:
 		dest = arg.Long()
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		return parseArgWeak_DvalToLval(arg.Double(), cap)
 	default:
 		return // fail
@@ -134,13 +134,13 @@ func ParseDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 	}
 
 	switch arg.GetType() {
-	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
+	case types.IsUndef, types.IsNull, types.IsFalse:
 		dest = 0
-	case types.IS_TRUE:
+	case types.IsTrue:
 		dest = 1
-	case types.IS_LONG:
+	case types.IsLong:
 		dest = float64(arg.Long())
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		dest = arg.Double()
 	default:
 		return // fail
@@ -173,7 +173,7 @@ func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.String, 
 }
 
 func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
-	if arg.GetType() < types.IS_STRING {
+	if arg.GetType() < types.IsString {
 		operators.ConvertToString(arg)
 		return arg.String(), true
 	} else if arg.IsString() {
@@ -181,7 +181,7 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 	} else if arg.IsObject() {
 		if arg.Object().CanCast() {
 			var obj types.Zval
-			if arg.Object().Cast(&obj, types.IS_STRING) == types.SUCCESS {
+			if arg.Object().Cast(&obj, types.IsString) == types.SUCCESS {
 				types.ZVAL_COPY_VALUE(arg, &obj)
 				return arg.String(), true
 			}

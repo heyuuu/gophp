@@ -9,7 +9,7 @@ import (
  * spl_SplObjectStorage
  */
 type SplObjectStorage struct {
-	std           *types.ZendObject
+	std           *types.Object
 	storage       *types.Array
 	index         zend.ZendLong
 	pos           types.ArrayPosition
@@ -28,8 +28,8 @@ func NewSplObjectStorage(ce *types.ClassEntry) *SplObjectStorage {
 	return storage
 }
 
-func (this *SplObjectStorage) GetStd() *types.ZendObject { return this.std }
-func (this *SplObjectStorage) GetStorage() *types.Array  { return this.storage }
+func (this *SplObjectStorage) GetStd() *types.Object    { return this.std }
+func (this *SplObjectStorage) GetStorage() *types.Array { return this.storage }
 
 func (this *SplObjectStorage) GetIndex() zend.ZendLong          { return this.index }
 func (this *SplObjectStorage) SetIndex(value zend.ZendLong)     { this.index = value }

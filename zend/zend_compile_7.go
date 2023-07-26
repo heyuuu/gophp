@@ -425,17 +425,17 @@ func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool 
 		if key_ast != nil {
 			var key *types.Zval = key_ast.Val()
 			switch key.GetType() {
-			case types.IS_LONG:
+			case types.IsLong:
 				result.Array().IndexUpdate(key.Long(), value)
-			case types.IS_STRING:
+			case types.IsString:
 				result.Array().SymtableUpdate(key.String().GetStr(), value)
-			case types.IS_DOUBLE:
+			case types.IsDouble:
 				result.Array().IndexUpdate(operators.DvalToLval(key.Double()), value)
-			case types.IS_FALSE:
+			case types.IsFalse:
 				result.Array().IndexUpdate(0, value)
-			case types.IS_TRUE:
+			case types.IsTrue:
 				result.Array().IndexUpdate(1, value)
-			case types.IS_NULL:
+			case types.IsNull:
 				result.Array().KeyUpdate(types.NewString("").GetStr(), value)
 			default:
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal offset type")
@@ -521,14 +521,14 @@ func (compiler *Compiler) CompileBinaryOp(result *Znode, ast *ZendAst) {
 
 			if left_node.GetOpType() == IS_CONST {
 				if left_node.GetConstant().IsArray() {
-					ZendEmitOpTmp(&left_node, ZEND_CAST, &left_node, nil).SetExtendedValue(types.IS_STRING)
+					ZendEmitOpTmp(&left_node, ZEND_CAST, &left_node, nil).SetExtendedValue(types.IsString)
 				} else {
 					operators.ConvertToString(left_node.GetConstant())
 				}
 			}
 			if right_node.GetOpType() == IS_CONST {
 				if right_node.GetConstant().IsArray() {
-					ZendEmitOpTmp(&right_node, ZEND_CAST, &right_node, nil).SetExtendedValue(types.IS_STRING)
+					ZendEmitOpTmp(&right_node, ZEND_CAST, &right_node, nil).SetExtendedValue(types.IsString)
 				} else {
 					operators.ConvertToString(right_node.GetConstant())
 				}

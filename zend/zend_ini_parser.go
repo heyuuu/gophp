@@ -106,11 +106,11 @@ var ZEND_SYSTEM_INI = CG__().GetIniParserUnbufferedErrors()
 
 func GetIntVal(op *types.Zval) int {
 	switch op.GetType() {
-	case types.IS_LONG:
+	case types.IsLong:
 		return op.Long()
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		return int(op.Double())
-	case types.IS_STRING:
+	case types.IsString:
 		var val int = atoi(op.String().GetVal())
 		//types.ZendStringFree(op.String())
 		return val

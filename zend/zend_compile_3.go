@@ -372,10 +372,10 @@ func (compiler *Compiler) CompileFuncTypecheck(result *Znode, args *ZendAstList,
 	}
 	compiler.CompileExpr(&arg_node, args.Children()[0])
 	opline = ZendEmitOpTmp(result, ZEND_TYPE_CHECK, &arg_node, nil)
-	if type_ != types.IS_BOOL {
+	if type_ != types.IsBool {
 		opline.SetExtendedValue(1 << type_)
 	} else {
-		opline.SetExtendedValue(1<<types.IS_FALSE | 1<<types.IS_TRUE)
+		opline.SetExtendedValue(1<<types.IsFalse | 1<<types.IsTrue)
 	}
 	return types.SUCCESS
 }
@@ -447,7 +447,7 @@ func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 	var lcname *types.String
 	var fbc types.IFunction
 	var opline *types.ZendOp
-	if name_ast.Kind() != ZEND_AST_ZVAL || name_ast.Val().GetType() != types.IS_STRING {
+	if name_ast.Kind() != ZEND_AST_ZVAL || name_ast.Val().GetType() != types.IsString {
 		return types.FAILURE
 	}
 	name := ZendAstGetStr(name_ast)
@@ -541,7 +541,7 @@ func (compiler *Compiler) CompileAssert(result *Znode, args *ZendAstList, name *
 			opline.GetOp2().SetConstant(ZendAddNsFuncNameLiteral(name))
 		}
 		opline.GetResult().SetNum(ZendAllocCacheSlot())
-		if args.GetChildren() == 1 && (args.Children()[0].Kind() != ZEND_AST_ZVAL || ZendAstGetZval(args.Children()[0]).GetType() != types.IS_STRING) {
+		if args.GetChildren() == 1 && (args.Children()[0].Kind() != ZEND_AST_ZVAL || ZendAstGetZval(args.Children()[0]).GetType() != types.IsString) {
 
 			/* add "assert(condition) as assertion message */
 			args.AddChild(ZendAstCreateZvalFromStr("assert()"))

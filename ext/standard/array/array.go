@@ -111,17 +111,17 @@ func ZifCount(var_ *types.Zval, _ zpp.Opt, mode int) int {
 	var array = var_
 	var cnt zend.ZendLong
 	switch array.GetType() {
-	case types.IS_NULL:
+	case types.IsNull:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return 0
-	case types.IS_ARRAY:
+	case types.IsArray:
 		if mode != COUNT_RECURSIVE {
 			cnt = array.Array().Count()
 		} else {
 			cnt = PhpCountRecursive(array.Array())
 		}
 		return cnt
-	case types.IS_OBJECT:
+	case types.IsObject:
 		var retval types.Zval
 		var long int
 
@@ -339,7 +339,7 @@ func arrayWalk(array *types.Zval, recursive bool, handler func(value *types.Zval
 			}
 
 			/* Add type source for property references. */
-			if !zv.IsReference() && array.IsType(types.IS_OBJECT) {
+			if !zv.IsReference() && array.IsType(types.IsObject) {
 				var prop_info = zend.ZendGetTypedPropertyInfoForSlot(array.Object(), zv)
 				if prop_info != nil {
 					zv.SetNewRef(zv)
@@ -352,7 +352,7 @@ func arrayWalk(array *types.Zval, recursive bool, handler func(value *types.Zval
 		types.ZVAL_MAKE_REF(zv)
 
 		/* Back up hash position, as it may change */
-		if recursive && types.Z_REFVAL_P(zv).IsType(types.IS_ARRAY) {
+		if recursive && types.Z_REFVAL_P(zv).IsType(types.IsArray) {
 			var thash *types.Array
 			var ref types.Zval
 			types.ZVAL_COPY_VALUE(&ref, zv)
@@ -367,7 +367,7 @@ func arrayWalk(array *types.Zval, recursive bool, handler func(value *types.Zval
 			/* backup the fcall info and cache */
 			thash.ProtectRecursive()
 			result = arrayWalk(zv, recursive, handler)
-			if types.Z_REFVAL(ref).IsType(types.IS_ARRAY) && thash == types.Z_REFVAL(ref).Array() {
+			if types.Z_REFVAL(ref).IsType(types.IsArray) && thash == types.Z_REFVAL(ref).Array() {
 				/* If the hashtable changed in the meantime, we'll "leak" this apply count
 				 * increment -- our reference to thash is no longer valid. */
 				thash.UnprotectRecursive()
@@ -877,7 +877,7 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 		var thash *types.Array
 		var tmp types.Zval
 		var ret int
-		if destZval.IsType(types.IS_ARRAY) {
+		if destZval.IsType(types.IsArray) {
 			thash = destZval.Array()
 		} else {
 			thash = nil
@@ -889,19 +889,19 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 		//b.Assert(!(destEntry.IsReference()) || destEntry.GetRefcount() > 1)
 		types.SeparateZval(destEntry)
 		destZval = destEntry
-		if destZval.IsType(types.IS_NULL) {
+		if destZval.IsType(types.IsNull) {
 			operators.ConvertToArrayEx(destZval)
 			zend.AddNextIndexNull(destZval)
 		} else {
 			operators.ConvertToArrayEx(destZval)
 		}
 		tmp.SetUndef()
-		if srcZval.IsType(types.IS_OBJECT) {
+		if srcZval.IsType(types.IsObject) {
 			types.ZVAL_COPY(&tmp, srcZval)
 			operators.ConvertToArray(&tmp)
 			srcZval = &tmp
 		}
-		if srcZval.IsType(types.IS_ARRAY) {
+		if srcZval.IsType(types.IsArray) {
 			if thash != nil {
 				thash.ProtectRecursive()
 			}
@@ -940,7 +940,7 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) bool {
 		}
 
 		destEntry = dest.Find(key)
-		if destEntry == nil || !destEntry.IsArray() && (!(destEntry.IsReference()) || types.Z_REFVAL_P(destEntry).GetType() != types.IS_ARRAY) {
+		if destEntry == nil || !destEntry.IsArray() && (!(destEntry.IsReference()) || types.Z_REFVAL_P(destEntry).GetType() != types.IsArray) {
 			dest.Update(key, srcEntry)
 			return true
 		}
@@ -1138,19 +1138,19 @@ func ZifArrayCountValues(array *types.Array) *types.Array {
 }
 func ArrayColumnParamHelper(param *types.Zval, name string) bool {
 	switch param.GetType() {
-	case types.IS_DOUBLE:
+	case types.IsDouble:
 		if !param.IsLong() {
 			operators.ConvertToLong(param)
 		}
 		fallthrough
-	case types.IS_LONG:
+	case types.IsLong:
 		return 1
-	case types.IS_OBJECT:
+	case types.IsObject:
 		if operators.TryConvertToString(param) == 0 {
 			return 0
 		}
 		fallthrough
-	case types.IS_STRING:
+	case types.IsString:
 		return 1
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The %s key should be either a string or an integer", name)
@@ -1160,7 +1160,7 @@ func ArrayColumnParamHelper(param *types.Zval, name string) bool {
 func ArrayColumnFetchProp(data *types.Zval, name *types.Zval) *types.Zval {
 	var rv types.Zval
 	var prop *types.Zval = nil
-	if data.IsType(types.IS_OBJECT) {
+	if data.IsType(types.IsObject) {
 
 		/* The has_property check is first performed in "exists" mode (which returns true for
 		 * properties that are null but exist) and then in "has" mode to handle objects that
@@ -1177,10 +1177,10 @@ func ArrayColumnFetchProp(data *types.Zval, name *types.Zval) *types.Zval {
 		 * properties that are null but exist) and then in "has" mode to handle objects that
 		 * implement __isset (which is not called in "exists" mode). */
 
-	} else if data.IsType(types.IS_ARRAY) {
+	} else if data.IsType(types.IsArray) {
 		if name.IsString() {
 			prop = data.Array().SymtableFind(name.String().GetStr())
-		} else if name.IsType(types.IS_LONG) {
+		} else if name.IsType(types.IsLong) {
 			prop = data.Array().IndexFind(name.Long())
 		}
 		if prop != nil {
@@ -1223,21 +1223,21 @@ func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, i
 			var keyVal = ArrayColumnFetchProp(data, indexKey)
 			if keyVal != nil {
 				switch keyVal.GetType() {
-				case types.IS_STRING:
+				case types.IsString:
 					retArr.SymtableUpdate(keyVal.String().GetStr(), columnVal)
-				case types.IS_LONG:
+				case types.IsLong:
 					retArr.IndexUpdate(keyVal.Long(), columnVal)
-				case types.IS_OBJECT:
+				case types.IsObject:
 					retArr.SymtableUpdate(operators.ZvalGetStrVal(keyVal), columnVal)
-				case types.IS_NULL:
+				case types.IsNull:
 					retArr.KeyUpdate("", columnVal)
-				case types.IS_DOUBLE:
+				case types.IsDouble:
 					retArr.IndexUpdate(operators.DvalToLval(keyVal.Double()), columnVal)
-				case types.IS_TRUE:
+				case types.IsTrue:
 					retArr.IndexUpdate(1, columnVal)
-				case types.IS_FALSE:
+				case types.IsFalse:
 					retArr.IndexUpdate(0, columnVal)
-				case types.IS_RESOURCE:
+				case types.IsResource:
 					retArr.IndexUpdate(keyVal.ResourceHandle(), columnVal)
 				default:
 					retArr.Append(columnVal)
@@ -1543,7 +1543,7 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 
 			/* Next one may be an array or a list of sort flags. */
 
-		} else if arg.IsType(types.IS_LONG) {
+		} else if arg.IsType(types.IsLong) {
 			switch arg.Long() & ^PHP_SORT_FLAG_CASE {
 			case PHP_SORT_ASC:
 				fallthrough
@@ -1869,18 +1869,18 @@ func ZifArrayMap(callback zpp.Callable, arrays []*types.Zval) *types.Zval {
 //@zif -alias key_exists
 func ZifArrayKeyExists(key *types.Zval, array zpp.ArrayOrObject) bool {
 	var ht *types.Array
-	if array.IsType(types.IS_ARRAY) {
+	if array.IsType(types.IsArray) {
 		ht = array.Array()
 	} else {
 		ht = zend.ZendGetPropertiesFor(array, zend.ZEND_PROP_PURPOSE_ARRAY_CAST)
 		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Using array_key_exists() on objects is deprecated. Use isset() or property_exists() instead")
 	}
 	switch key.GetType() {
-	case types.IS_STRING:
+	case types.IsString:
 		return ht.SymtableExistsInd(key.StringVal())
-	case types.IS_LONG:
+	case types.IsLong:
 		return ht.IndexExists(key.Long())
-	case types.IS_NULL:
+	case types.IsNull:
 		return ht.KeyExistsIndirect("")
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The first argument should be either a string or an integer")

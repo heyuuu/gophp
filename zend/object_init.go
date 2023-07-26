@@ -34,7 +34,7 @@ func _objectAndPropertiesInit(arg *types.Zval, classType *types.ClassEntry, prop
 		}
 	}
 	if classType.GetCreateObject() == nil {
-		var obj *types.ZendObject
+		var obj *types.Object
 		if properties != nil {
 			obj = types.NewStdObjectExEx(classType, properties)
 		} else {
