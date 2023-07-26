@@ -1,4 +1,4 @@
-package collections
+package mapkit
 
 // common
 type MapEntry[K comparable, V any] struct {
