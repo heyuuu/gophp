@@ -1,5 +1,7 @@
 package lang
 
+// 一元操作
+
 type num interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64
 }
@@ -26,16 +28,19 @@ func PostDec[T num](variable *T) T {
 	return result
 }
 
+// 赋值操作
 func Assign[T any](variable *T, value T) T {
 	*variable = value
 	return *variable
 }
 
-func Cond[T any](cond bool, trueValue T, falseValue T) T {
+// 三元操作 cond ? a : b
+
+func Cond[T any](cond bool, trueVal T, falseVal T) T {
 	if cond {
-		return trueValue
+		return trueVal
 	}
-	return falseValue
+	return falseVal
 }
 
 func CondF[T any](cond bool, trueValue func() T, falseValue func() T) T {
