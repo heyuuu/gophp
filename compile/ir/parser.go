@@ -762,17 +762,18 @@ func (p *parser) pName(n *ast.Name) *Name {
 		log.Println("ast.Name.Kind is not FQ")
 	}
 
+	var kind NameType
 	switch n.Kind {
 	case ast.NameNormal:
-		return NewName(NameNormal, n.Parts)
+		kind = NameNormal
 	case ast.NameFullyQualified:
-		return NewName(NameFullyQualified, n.Parts)
+		kind = NameFullyQualified
 	case ast.NameRelative:
-		return NewName(NameRelative, n.Parts)
+		kind = NameRelative
 	default:
 		p.fail(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
 	}
-	panic("unreachable")
+	return NewName(kind, n.Parts)
 }
 func (p *parser) pArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
 	if n == nil {

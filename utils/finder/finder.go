@@ -59,6 +59,15 @@ func NewFinder(pathStr string, options ...Option) *Finder {
 	return f
 }
 
+func (f *Finder) Files() *Finder {
+	f.mode = ModeOnlyFiles
+	return f
+}
+func (f *Finder) Dirs() *Finder {
+	f.mode = ModeOnlyDirs
+	return f
+}
+
 func (f *Finder) Walk(fn func(File) error) error {
 	return filepath.Walk(f.path, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {

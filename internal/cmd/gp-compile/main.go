@@ -2,10 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/parser"
-	"io/fs"
+	"github.com/heyuuu/gophp/utils/finder"
 	"log"
 	"os"
 	"path/filepath"
@@ -36,52 +35,88 @@ func main() {
 	if distPath == "" {
 		log.Fatal("dist path is not set")
 	}
-	distStat, srcErr := os.Stat(distPath)
-	if srcErr != nil && !distStat.IsDir() {
+	distStat, distErr := os.Stat(distPath)
+	if distErr == nil && !distStat.IsDir() {
 		log.Fatalf("dist path must not exist or be a dir")
 	}
 
 	// compile
-	err := simpleCompileDir(srcPath, distPath)
+	err := run(srcPath, distPath)
 	if err != nil {
 		log.Fatalf("compile failed: %v", err)
 	}
 }
 
-func simpleCompileDir(srcPath string, distPath string) error {
-	return filepath.Walk(srcPath, func(path string, info fs.FileInfo, err error) error {
-		fmt.Println(path)
-		if err != nil || info.IsDir() || !strings.HasSuffix(path, ".php") {
+func run(srcPath string, distPath string) error {
+	proj, err := compileDir(srcPath)
+	if err != nil {
+		return err
+	}
+
+	return printIrProject(distPath, proj)
+}
+
+func compileDir(srcPath string) (*ir.Project, error) {
+	proj := ir.NewProject()
+
+	f := finder.NewFinder(srcPath).Files()
+	err := f.Walk(func(f finder.File) error {
+		if !strings.HasSuffix(f.Path, ".php") {
+			return nil
+		}
+
+		irFile, err := compileFile(f.Path)
+		if err != nil {
 			return err
 		}
 
-		relativePath := path[len(srcPath):]
-		distFile := filepath.Join(distPath, strings.ReplaceAll(relativePath, ".php", ".go"))
-		fmt.Printf("relative=%s, distFile=%s\n", relativePath, distPath)
-		return simpleCompileFile(path, distFile)
+		return proj.AddFile(f.RelativePath, irFile)
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return proj, nil
 }
 
-func simpleCompileFile(srcFile string, distFile string) error {
+func compileFile(srcFile string) (*ir.File, error) {
 	// parse + compile
 	astFile, err := parser.ParseFile(srcFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	irFile, err := ir.ParseAstFile(astFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// render
-	irCode, err := ir.PrintFile(irFile)
+	return irFile, nil
+}
+
+func printIrProject(distPath string, proj *ir.Project) error {
+	codes, err := ir.PrintProject(proj)
 	if err != nil {
 		return err
 	}
 
-	// write file
-	return safeWriteFile(distFile, irCode)
+	for name, code := range codes {
+		// todo 简易文件名规则，后续待优化
+		var filename string
+		if name == "" {
+			filename = "_.go"
+		} else {
+			filename = strings.ReplaceAll(name, "\\", "__") + ".go"
+		}
+
+		distFile := filepath.Join(distPath, filename)
+		err := safeWriteFile(distFile, code)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func safeWriteFile(file string, content string) (err error) {
