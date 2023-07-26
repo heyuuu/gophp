@@ -14,7 +14,7 @@ func ZEND_MAKE_REF_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			types.Z_REFVAL_P(op1).SetNull()
 			opline.Result().SetReference(op1.Reference())
 		} else {
-			if op1.IsReference() {
+			if op1.IsRef() {
 				// 				op1.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(op1, 2)
@@ -35,7 +35,7 @@ func ZEND_MAKE_REF_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			types.Z_REFVAL_P(op1).SetNull()
 			opline.Result().SetReference(op1.Reference())
 		} else {
-			if op1.IsReference() {
+			if op1.IsRef() {
 				// 				op1.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(op1, 2)

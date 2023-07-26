@@ -13,7 +13,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var variable_ptr *types.Zval
 	var idx uintPtr
-	var ref *types.ZendReference
+	var ref *types.Reference
 	for {
 		varname = opline.Const2().String()
 
@@ -48,7 +48,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			/* GLOBAL variable may be an INDIRECT pointer to CV */
 
 		}
-		if !(value.IsReference()) {
+		if !(value.IsRef()) {
 			types.ZVAL_MAKE_REF_EX(value, 2)
 			ref = value.Reference()
 		} else {

@@ -82,8 +82,8 @@ func (compiler *Compiler) DetermineSwitchJumptableType(cases *ZendAstList) uint8
 
 		}
 		if common_type == types.IsUndef {
-			common_type = cond_zv.GetType()
-		} else if common_type != cond_zv.GetType() {
+			common_type = cond_zv.Type()
+		} else if common_type != cond_zv.Type() {
 
 			/* Non-uniform case types */
 
@@ -569,33 +569,33 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 			}
 			if type_ast.Kind() == ZEND_AST_TYPE {
 				if arg_info.GetType().Code() == types.IsArray {
-					if default_ast != nil && has_null_default == 0 && default_node.GetConstant().GetType() != types.IsArray && default_node.GetConstant().GetType() != types.IsConstantAst {
+					if default_ast != nil && has_null_default == 0 && default_node.GetConstant().Type() != types.IsArray && default_node.GetConstant().Type() != types.IsConstantAst {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with array type can only be an array or NULL")
 					}
 				} else if arg_info.GetType().Code() == types.IsCallable && default_ast != nil {
-					if has_null_default == 0 && default_node.GetConstant().GetType() != types.IsConstantAst {
+					if has_null_default == 0 && default_node.GetConstant().Type() != types.IsConstantAst {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with callable type can only be NULL")
 					}
 				}
 			} else {
-				if default_ast != nil && has_null_default == 0 && default_node.GetConstant().GetType() != types.IsConstantAst {
+				if default_ast != nil && has_null_default == 0 && default_node.GetConstant().Type() != types.IsConstantAst {
 					if arg_info.GetType().IsClass() {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a class type can only be NULL")
 					} else {
 						switch arg_info.GetType().Code() {
 						case types.IsDouble:
-							if default_node.GetConstant().GetType() != types.IsDouble && default_node.GetConstant().GetType() != types.IsLong {
+							if default_node.GetConstant().Type() != types.IsDouble && default_node.GetConstant().Type() != types.IsLong {
 								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a float type can only be float, integer, or NULL")
 							}
 							operators.ConvertToDouble(default_node.GetConstant())
 						case types.IsIterable:
-							if default_node.GetConstant().GetType() != types.IsArray {
+							if default_node.GetConstant().Type() != types.IsArray {
 								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with iterable type can only be an array or NULL")
 							}
 						case types.IsObject:
 							faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with an object type can only be NULL")
 						default:
-							if !(types.ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), default_node.GetConstant().GetType())) {
+							if !(types.ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), default_node.GetConstant().Type())) {
 								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", types.ZendGetTypeByConst(arg_info.GetType().Code()), types.ZendGetTypeByConst(arg_info.GetType().Code()))
 							}
 						}

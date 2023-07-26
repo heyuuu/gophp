@@ -373,9 +373,9 @@ func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		return
 	}
 	if lang.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) != nil {
-		return_value.SetString(contents)
+		return_value.SetStringEx(contents)
 	} else {
-		return_value.SetStringVal("")
+		return_value.SetString("")
 	}
 	core.PhpStreamClose(stream)
 }
@@ -439,7 +439,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 	if mode[0] == 'c' {
 		core.PhpStreamTruncateSetSize(stream, 0)
 	}
-	switch data.GetType() {
+	switch data.Type() {
 	case types.IsResource:
 		var len_ int
 		if core.PhpStreamCopyToStreamEx(srcstream, stream, core.PHP_STREAM_COPY_ALL, &len_) != types.SUCCESS {
@@ -647,7 +647,7 @@ func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, prefi
 	return_value.SetFalse()
 	if lang.Assign(&fd, core.PhpOpenTemporaryFdEx(dir, p.GetVal(), &opened_path, core.PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) >= 0 {
 		close(fd)
-		return_value.SetString(opened_path)
+		return_value.SetStringEx(opened_path)
 	}
 	// types.ZendStringReleaseEx(p, 0)
 }
@@ -863,7 +863,7 @@ func ZifFgetc(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	} else {
 		buf[0] = result
 		buf[1] = '0'
-		return_value.SetStringVal(b.CastStr(buf, 1))
+		return_value.SetString(b.CastStr(buf, 1))
 		return
 	}
 }
@@ -1567,7 +1567,7 @@ func ZifFread(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, length *
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetString(str)
+	return_value.SetStringEx(str)
 	return
 }
 func PhpFgetcsvLookupTrailingSpaces(ptr *byte, len_ int, delimiter byte) *byte {
@@ -2171,7 +2171,7 @@ func ZifRealpath(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		return_value.SetStringVal(b.CastStrAuto(resolved_path_buff))
+		return_value.SetString(b.CastStrAuto(resolved_path_buff))
 		return
 	} else {
 		return_value.SetFalse()
@@ -2298,6 +2298,6 @@ func ZifSysGetTempDir(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	return_value.SetStringVal(b.CastStrAuto((*byte)(core.PhpGetTemporaryDirectory())))
+	return_value.SetString(b.CastStrAuto((*byte)(core.PhpGetTemporaryDirectory())))
 	return
 }

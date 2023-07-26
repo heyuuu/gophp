@@ -157,7 +157,7 @@ var DefZifFgets = def.DefFunc("fgets", 1, 2, []def.ArgInfo{{Name: "fp"}, {Name: 
 	}
 	ret, ok := ZifFgets(fp, nil, length)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -185,7 +185,7 @@ var DefZifFgetss = def.DefFunc("fgetss", 1, 3, []def.ArgInfo{{Name: "fp"}, {Name
 	}
 	ret, ok := ZifFgetss(fp, nil, length, allowable_tags)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

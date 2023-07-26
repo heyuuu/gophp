@@ -42,7 +42,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	{
 		array_ptr = nil
 		array_ref = array_ptr
-		if array_ref.IsReference() {
+		if array_ref.IsRef() {
 			array_ptr = types.Z_REFVAL_P(array_ref)
 		}
 	}
@@ -109,7 +109,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	{
 		array_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		array_ref = array_ptr
-		if array_ref.IsReference() {
+		if array_ref.IsRef() {
 			array_ptr = types.Z_REFVAL_P(array_ref)
 		}
 	}
@@ -198,7 +198,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	{
 		array_ptr = opline.Cv1OrUndef()
 		array_ref = array_ptr
-		if array_ref.IsReference() {
+		if array_ref.IsRef() {
 			array_ptr = types.Z_REFVAL_P(array_ref)
 		}
 	}

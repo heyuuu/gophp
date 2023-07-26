@@ -80,7 +80,7 @@ add_unpack_again:
 			}
 			//ZendIteratorDtor(iter)
 		}
-	} else if op1.IsReference() {
+	} else if op1.IsRef() {
 		op1 = types.Z_REFVAL_P(op1)
 		goto add_unpack_again
 	} else {

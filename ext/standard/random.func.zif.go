@@ -13,7 +13,7 @@ var DefZifRandomBytes = def.DefFunc("random_bytes", 1, 1, []def.ArgInfo{{Name: "
 		return
 	}
 	ret := ZifRandomBytes(length)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifRandomInt

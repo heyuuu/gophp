@@ -265,7 +265,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit boo
 			}
 		}
 		if expr != nil && expr.GetOpType() == IS_CONST {
-			if return_info.GetType().Code() == expr.GetConstant().GetType() || return_info.GetType().Code() == types.IsBool && (expr.GetConstant().IsFalse() || expr.GetConstant().IsTrue()) || return_info.GetType().AllowNull() && expr.GetConstant().IsNull() {
+			if return_info.GetType().Code() == expr.GetConstant().Type() || return_info.GetType().Code() == types.IsBool && (expr.GetConstant().IsFalse() || expr.GetConstant().IsTrue()) || return_info.GetType().AllowNull() && expr.GetConstant().IsNull() {
 
 				/* we don't need run-time check */
 
@@ -372,14 +372,14 @@ func (compiler *Compiler) CompileClassRef(result *Znode, name_ast *ZendAst, fetc
 		compiler.CompileExpr(&name_node, name_ast)
 		if name_node.GetOpType() == IS_CONST {
 			var name *types.String
-			if name_node.GetConstant().GetType() != types.IsString {
+			if name_node.GetConstant().Type() != types.IsString {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 			}
 			name = name_node.GetConstant().String()
 			fetch_type = ZendGetClassFetchType(name.GetStr())
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
 				result.SetOpType(IS_CONST)
-				result.GetConstant().SetStringVal(ZendResolveClassName(name.GetStr(), ZEND_NAME_FQ))
+				result.GetConstant().SetString(ZendResolveClassName(name.GetStr(), ZEND_NAME_FQ))
 			} else {
 				ZendEnsureValidClassFetchType(fetch_type)
 				result.SetOpType(IS_UNUSED)
@@ -397,13 +397,13 @@ func (compiler *Compiler) CompileClassRef(result *Znode, name_ast *ZendAst, fetc
 
 	if name_ast.Attr() == ZEND_NAME_FQ {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))
+		result.GetConstant().SetStringEx(ZendResolveClassNameAst(name_ast))
 		return
 	}
 	fetch_type = ZendGetClassFetchType(ZendAstGetStrVal(name_ast))
 	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))
+		result.GetConstant().SetStringEx(ZendResolveClassNameAst(name_ast))
 	} else {
 		ZendEnsureValidClassFetchType(fetch_type)
 		result.SetOpType(IS_UNUSED)

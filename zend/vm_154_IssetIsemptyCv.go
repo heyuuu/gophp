@@ -9,7 +9,7 @@ func ZEND_ISSET_ISEMPTY_CV_SPEC_CV_UNUSED_SET_HANDLER(executeData *ZendExecuteDa
 	var opline *types.ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	value = opline.Op1()
-	if value.GetType() > types.IsNull && (!(value.IsReference()) || types.Z_REFVAL_P(value).GetType() != types.IsNull) {
+	if value.Type() > types.IsNull && (!(value.IsRef()) || types.Z_REFVAL_P(value).Type() != types.IsNull) {
 		ZEND_VM_SMART_BRANCH_TRUE()
 		opline.Result().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)

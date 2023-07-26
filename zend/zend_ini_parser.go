@@ -105,7 +105,7 @@ var ZEND_INI_PARSER_ARG = CG__().GetIniParserParam().GetArg()
 var ZEND_SYSTEM_INI = CG__().GetIniParserUnbufferedErrors()
 
 func GetIntVal(op *types.Zval) int {
-	switch op.GetType() {
+	switch op.Type() {
 	case types.IsLong:
 		return op.Long()
 	case types.IsDouble:
@@ -149,7 +149,7 @@ func ZendIniDoOp(type_ byte, result *types.Zval, op1 *types.Zval, op2 *types.Zva
 		i_result = 0
 	}
 	str_len = sprintf(str_result, "%d", i_result)
-	result.SetString(types.NewString(b.CastStr(str_result, str_len)))
+	result.SetStringEx(types.NewString(b.CastStr(str_result, str_len)))
 }
 
 func IniError(msg *byte) {

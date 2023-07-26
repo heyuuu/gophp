@@ -29,7 +29,7 @@ func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	} else if val.IsSignType() {
 
 		/* The result and op1 can be the same cv zval */
-		var origValType = val.GetType()
+		var origValType = val.Type()
 		opline.Result().SetFalse()
 		if origValType == types.IsUndef {
 			ZVAL_UNDEFINED_OP1(executeData)
@@ -51,7 +51,7 @@ func ZEND_BOOL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else if val.IsSignType() {
 
 		/* The result and op1 can be the same cv zval */
-		var origValType = val.GetType()
+		var origValType = val.Type()
 		opline.Result().SetFalse()
 		if origValType == types.IsUndef {
 			ZVAL_UNDEFINED_OP1(executeData)

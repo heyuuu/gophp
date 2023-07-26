@@ -652,28 +652,28 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 		return
 	case FS_TYPE:
 		if zend.S_ISLNK(ssb.GetSb().st_mode) {
-			return_value.SetStringVal("link")
+			return_value.SetString("link")
 			return
 		}
 		switch ssb.GetSb().st_mode & S_IFMT {
 		case zend.S_IFIFO:
-			return_value.SetStringVal("fifo")
+			return_value.SetString("fifo")
 			return
 		case S_IFCHR:
-			return_value.SetStringVal("char")
+			return_value.SetString("char")
 			return
 		case S_IFDIR:
-			return_value.SetStringVal("dir")
+			return_value.SetString("dir")
 			return
 		case zend.S_IFBLK:
-			return_value.SetStringVal("block")
+			return_value.SetString("block")
 			return
 		case S_IFREG:
-			return_value.SetStringVal("file")
+			return_value.SetString("file")
 			return
 		}
 		core.PhpErrorDocref(nil, faults.E_NOTICE, "Unknown file type (%d)", ssb.GetSb().st_mode&S_IFMT)
-		return_value.SetStringVal("unknown")
+		return_value.SetString("unknown")
 		return
 	case FS_IS_W:
 		return_value.SetBool((ssb.GetSb().st_mode & wmask) != 0)

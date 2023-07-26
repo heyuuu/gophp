@@ -38,7 +38,7 @@ func ZendFetchDimensionAddressRead(
 			retval = ZendFetchDimensionAddressInner(container.Array(), dim, dim_type, type_, executeData)
 			types.ZVAL_COPY_DEREF(result, retval)
 			return
-		} else if container.IsReference() {
+		} else if container.IsRef() {
 			container = types.Z_REFVAL_P(container)
 			if container.IsArray() {
 				goto try_array
@@ -49,7 +49,7 @@ func ZendFetchDimensionAddressRead(
 		var offset ZendLong
 	try_string_offset:
 		if !dim.IsLong() {
-			switch dim.GetType() {
+			switch dim.Type() {
 			case types.IsString:
 				if types.IsLong == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 					break
@@ -85,7 +85,7 @@ func ZendFetchDimensionAddressRead(
 		if container.String().GetLen() < lang.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
 			if type_ != BP_VAR_IS {
 				faults.Error(faults.E_NOTICE, "Uninitialized string offset: "+ZEND_LONG_FMT, offset)
-				result.SetStringVal("")
+				result.SetString("")
 			} else {
 				result.SetNull()
 			}
@@ -98,7 +98,7 @@ func ZendFetchDimensionAddressRead(
 				real_offset = offset
 			}
 			c = uint8(container.String().GetStr()[real_offset])
-			result.SetStringVal(string(c))
+			result.SetString(string(c))
 		}
 	} else if container.IsObject() {
 		if dim.IsUndef() {
@@ -112,7 +112,7 @@ func ZendFetchDimensionAddressRead(
 		if retval != nil {
 			if result != retval {
 				types.ZVAL_COPY_DEREF(result, retval)
-			} else if retval.IsReference() {
+			} else if retval.IsRef() {
 				operators.ZendUnwrapReference(result)
 			}
 		} else {
@@ -203,7 +203,7 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 
 			/*}*/
 
-			if offset.GetType() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
 				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -240,7 +240,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 
 			/*}*/
 
-			if offset.GetType() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
+			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String().GetStr(), nil, nil, 0) {
 				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -265,7 +265,7 @@ func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, executeData *ZendE
 	} else if key.IsLong() {
 		hval = key.Long()
 		goto num_key
-	} else if key.GetType() <= types.IsNull {
+	} else if key.Type() <= types.IsNull {
 		if key.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
@@ -302,12 +302,12 @@ func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, executeData *Z
 		if subject.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", types.ZendGetTypeByConst(subject.GetType()))
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", types.ZendGetTypeByConst(subject.Type()))
 		return types.IsNull
 	}
 }
 func PromotesToArray(val *types.Zval) bool {
-	return val.IsSignFalse() || val.IsReference() && types.Z_REFVAL_P(val).IsSignFalse()
+	return val.IsSignFalse() || val.IsRef() && types.Z_REFVAL_P(val).IsSignFalse()
 }
 func PromotesToObject(val *types.Zval) bool {
 	val = types.ZVAL_DEREF(val)
@@ -333,7 +333,7 @@ func check_type_stdClass_assignable(type_ types.TypeHint) bool {
 		return type_.Code() == types.IsObject
 	}
 }
-func ZendVerifyRefArrayAssignable(ref *types.ZendReference) bool {
+func ZendVerifyRefArrayAssignable(ref *types.Reference) bool {
 	var prop *types.PropertyInfo
 	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
@@ -359,7 +359,7 @@ func ZendVerifyRefArrayAssignable(ref *types.ZendReference) bool {
 	}
 	return 1
 }
-func zend_verify_ref_stdClass_assignable(ref *types.ZendReference) bool {
+func zend_verify_ref_stdClass_assignable(ref *types.Reference) bool {
 	var prop *types.PropertyInfo
 	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())

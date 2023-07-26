@@ -62,7 +62,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 	if retval != opline.Result() {
 	fetch_obj_r_copy:
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
-	} else if retval.IsReference() {
+	} else if retval.IsRef() {
 		operators.ZendUnwrapReference(retval)
 	}
 fetch_obj_r_finish:

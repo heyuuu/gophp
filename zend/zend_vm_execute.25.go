@@ -20,8 +20,8 @@ func zend_pre_inc_helper_SPEC_CV(executeData *ZendExecuteData) int {
 		ZVAL_UNDEFINED_OP1(executeData)
 	}
 	for {
-		if var_ptr.IsReference() {
-			var ref *types.ZendReference = var_ptr.Reference()
+		if var_ptr.IsRef() {
+			var ref *types.Reference = var_ptr.Reference()
 			var_ptr = types.Z_REFVAL_P(var_ptr)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendIncdecTypedRef(ref, nil, opline, executeData)
@@ -51,8 +51,8 @@ func zend_pre_dec_helper_SPEC_CV(executeData *ZendExecuteData) int {
 		ZVAL_UNDEFINED_OP1(executeData)
 	}
 	for {
-		if var_ptr.IsReference() {
-			var ref *types.ZendReference = var_ptr.Reference()
+		if var_ptr.IsRef() {
+			var ref *types.Reference = var_ptr.Reference()
 			var_ptr = types.Z_REFVAL_P(var_ptr)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendIncdecTypedRef(ref, nil, opline, executeData)
@@ -80,8 +80,8 @@ func zend_post_inc_helper_SPEC_CV(executeData *ZendExecuteData) int {
 		ZVAL_UNDEFINED_OP1(executeData)
 	}
 	for {
-		if var_ptr.IsReference() {
-			var ref *types.ZendReference = var_ptr.Reference()
+		if var_ptr.IsRef() {
+			var ref *types.Reference = var_ptr.Reference()
 			var_ptr = types.Z_REFVAL_P(var_ptr)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendIncdecTypedRef(ref, opline.Result(), opline, executeData)
@@ -107,8 +107,8 @@ func zend_post_dec_helper_SPEC_CV(executeData *ZendExecuteData) int {
 		ZVAL_UNDEFINED_OP1(executeData)
 	}
 	for {
-		if var_ptr.IsReference() {
-			var ref *types.ZendReference = var_ptr.Reference()
+		if var_ptr.IsRef() {
+			var ref *types.Reference = var_ptr.Reference()
 			var_ptr = types.Z_REFVAL_P(var_ptr)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendIncdecTypedRef(ref, opline.Result(), opline, executeData)

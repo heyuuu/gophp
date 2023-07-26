@@ -217,13 +217,13 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	//trace.SetRefcount(0)
 	base_ce = GetExceptionBase(&obj)
 	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(lang.Assign(&filename, zend.ZendGetCompiledFilename())) {
-		tmp.SetStringVal(b.CastStrAuto(zend.ZendGetExecutedFilename()))
+		tmp.SetString(b.CastStrAuto(zend.ZendGetExecutedFilename()))
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_FILE, &tmp)
 		// zend.ZvalPtrDtor(&tmp)
 		tmp.SetLong(zend.ZendGetExecutedLineno())
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_LINE, &tmp)
 	} else {
-		tmp.SetStringVal(filename)
+		tmp.SetString(filename)
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_FILE, &tmp)
 		tmp.SetLong(zend.ZendGetCompiledLineno())
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_LINE, &tmp)
@@ -262,7 +262,7 @@ func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *type
 		return
 	}
 	if message != nil {
-		tmp.SetString(message)
+		tmp.SetStringEx(message)
 		zend.ZendUpdatePropertyEx(base_ce, object, types.STR_MESSAGE, &tmp)
 	}
 	if code != 0 {
@@ -275,7 +275,7 @@ func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *type
 }
 func CHECK_EXC_TYPE(object *types.Zval, id string, type_ uint8, value *types.Zval) {
 	pvalue := zend.ZendReadProperty(GetExceptionBase(object), object, id, 1, value)
-	if !pvalue.IsNull() && pvalue.GetType() != type_ {
+	if !pvalue.IsNull() && pvalue.Type() != type_ {
 		zend.ZendUnsetProperty(GetExceptionBase(object), object, id)
 	}
 }
@@ -316,7 +316,7 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 	}
 	object = executeData.ThisObjectZval()
 	if message != nil {
-		tmp.SetStringVal(message.GetStr())
+		tmp.SetString(message.GetStr())
 		zend.ZendUpdatePropertyEx(ZendCeException, object, types.STR_MESSAGE, &tmp)
 		// zend.ZvalPtrDtor(&tmp)
 	}
@@ -330,7 +330,7 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 	tmp.SetLong(severity)
 	zend.ZendUpdatePropertyEx(ZendCeException, object, types.STR_SEVERITY, &tmp)
 	if argc >= 4 {
-		tmp.SetStringVal(filename.GetStr())
+		tmp.SetString(filename.GetStr())
 		zend.ZendUpdatePropertyEx(ZendCeException, object, types.STR_FILE, &tmp)
 		// zend.ZvalPtrDtor(&tmp)
 		if argc < 5 {
@@ -426,7 +426,7 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 	 */
 
 	arg = types.ZVAL_DEREF(arg)
-	switch arg.GetType() {
+	switch arg.Type() {
 	case types.IsNull:
 		str.WriteString("NULL, ")
 	case types.IsString:
@@ -542,7 +542,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 	str.WriteLong(num)
 	str.WriteString(" {main}")
 	str.ZeroTail()
-	return_value.SetString(str.GetS())
+	return_value.SetStringEx(str.GetS())
 	return
 }
 func zim_exception_getPrevious(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -618,9 +618,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	/* We store the result in the private property string so we can access
 	 * the result in uncaught exception handlers without memleaks. */
 
-	tmp.SetString(str)
+	tmp.SetStringEx(str)
 	zend.ZendUpdatePropertyEx(base_ce, exception, types.STR_STRING, &tmp)
-	return_value.SetString(str)
+	return_value.SetStringEx(str)
 	return
 }
 func RegisterDefaultException() {
@@ -674,7 +674,7 @@ func ThrowException(exception_ce *types.ClassEntry, message string, code zend.Ze
 	}
 	zend.ObjectInitEx(&ex, exception_ce)
 	if message {
-		tmp.SetStringVal(b.CastStrAuto(message))
+		tmp.SetString(b.CastStrAuto(message))
 		zend.ZendUpdatePropertyEx(exception_ce, &ex, types.STR_MESSAGE, &tmp)
 		// zend.ZvalPtrDtor(&tmp)
 	}

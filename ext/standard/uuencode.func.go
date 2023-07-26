@@ -169,7 +169,7 @@ func ZifConvertUuencode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zv
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetString(PhpUuencode(src.GetVal(), src.GetLen()))
+	return_value.SetStringEx(PhpUuencode(src.GetVal(), src.GetLen()))
 	return
 }
 func ZifConvertUudecode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
@@ -196,6 +196,6 @@ func ZifConvertUudecode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zv
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetString(dest)
+	return_value.SetStringEx(dest)
 	return
 }

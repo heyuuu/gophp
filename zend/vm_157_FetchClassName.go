@@ -20,17 +20,17 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	}
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
-		opline.Result().SetStringVal(scope.Name())
+		opline.Result().SetString(scope.Name())
 	case ZEND_FETCH_CLASS_PARENT:
 		if scope.GetParent() == nil {
 			faults.ThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
 			opline.Result().SetUndef()
 			return 0
 		}
-		opline.Result().SetStringVal(scope.GetParent().name.GetStr())
+		opline.Result().SetString(scope.GetParent().name.GetStr())
 	case ZEND_FETCH_CLASS_STATIC:
 		called_scope = executeData.ThisClass()
-		opline.Result().SetStringVal(called_scope.Name())
+		opline.Result().SetString(called_scope.Name())
 	default:
 
 	}

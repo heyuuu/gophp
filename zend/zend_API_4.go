@@ -150,7 +150,7 @@ func AddNextIndexResource(arg *types.Zval, r *types.Resource) int {
 }
 func AddNextIndexStrEx(arg *types.Zval, str string) int {
 	var tmp types.Zval
-	tmp.SetStringVal(str)
+	tmp.SetString(str)
 	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
@@ -159,7 +159,7 @@ func AddNextIndexStrEx(arg *types.Zval, str string) int {
 }
 func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 	var tmp types.Zval
-	tmp.SetString(str)
+	tmp.SetStringEx(str)
 	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
@@ -168,7 +168,7 @@ func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 }
 func AddNextIndexString(arg *types.Zval, str string) int {
 	var tmp types.Zval
-	tmp.SetStringVal(str)
+	tmp.SetString(str)
 	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
@@ -177,7 +177,7 @@ func AddNextIndexString(arg *types.Zval, str string) int {
 }
 func AddNextIndexStringl(arg *types.Zval, str *byte, length int) int {
 	var tmp types.Zval
-	tmp.SetStringVal(b.CastStr(str, length))
+	tmp.SetString(b.CastStr(str, length))
 	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {
@@ -186,7 +186,7 @@ func AddNextIndexStringl(arg *types.Zval, str *byte, length int) int {
 }
 func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 	var result *types.Zval
-	switch key.GetType() {
+	switch key.Type() {
 	case types.IsString:
 		result = ht.SymtableUpdate(key.String().GetStr(), value)
 		break

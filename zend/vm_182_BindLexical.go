@@ -13,7 +13,7 @@ func ZEND_BIND_LEXICAL_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 		/* By-ref binding */
 
 		var_ = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp2().GetVar(), executeData)
-		if var_.IsReference() {
+		if var_.IsRef() {
 			// 			var_.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(var_, 2)

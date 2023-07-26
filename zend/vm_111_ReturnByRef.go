@@ -28,7 +28,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 		retval_ptr = nil
 		if executeData.GetReturnValue() {
-			if retval_ptr.IsReference() {
+			if retval_ptr.IsRef() {
 				// 				retval_ptr.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
@@ -54,7 +54,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			if !(executeData.GetReturnValue()) {
 				// ZvalPtrDtorNogc(free_op1)
 			} else {
-				if retval_ptr.IsReference() {
+				if retval_ptr.IsRef() {
 					types.ZVAL_COPY_VALUE(executeData.GetReturnValue(), retval_ptr)
 					break
 				}
@@ -66,7 +66,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		retval_ptr = nil
 		{
 			b.Assert(retval_ptr != UninitializedZval())
-			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
+			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsRef()) {
 				faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {
 					executeData.GetReturnValue().
@@ -76,7 +76,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if executeData.GetReturnValue() {
-			if retval_ptr.IsReference() {
+			if retval_ptr.IsRef() {
 				// 				retval_ptr.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
@@ -102,7 +102,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			if !(executeData.GetReturnValue()) {
 				// ZvalPtrDtorNogc(free_op1)
 			} else {
-				if retval_ptr.IsReference() {
+				if retval_ptr.IsRef() {
 					types.ZVAL_COPY_VALUE(executeData.GetReturnValue(), retval_ptr)
 					break
 				}
@@ -114,7 +114,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		retval_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		{
 			b.Assert(retval_ptr != UninitializedZval())
-			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
+			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsRef()) {
 				faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {
 					executeData.GetReturnValue().
@@ -128,7 +128,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if executeData.GetReturnValue() {
-			if retval_ptr.IsReference() {
+			if retval_ptr.IsRef() {
 				// 				retval_ptr.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
@@ -155,7 +155,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			retval_ptr = opline.Cv1OrUndef()
 			if !(executeData.GetReturnValue()) {
 			} else {
-				if retval_ptr.IsReference() {
+				if retval_ptr.IsRef() {
 					types.ZVAL_COPY_VALUE(executeData.GetReturnValue(), retval_ptr)
 					break
 				}
@@ -167,7 +167,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		retval_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		{
 			b.Assert(retval_ptr != UninitializedZval())
-			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
+			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsRef()) {
 				faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {
 					executeData.GetReturnValue().
@@ -177,7 +177,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if executeData.GetReturnValue() {
-			if retval_ptr.IsReference() {
+			if retval_ptr.IsRef() {
 				// 				retval_ptr.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)

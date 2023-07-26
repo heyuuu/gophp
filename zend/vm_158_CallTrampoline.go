@@ -25,7 +25,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	b.Assert(2 <= call.RuntimeCacheLen())
 
 	call.NumArgs() = 2
-	call.Arg(1).SetStringVal(fbc.FunctionName())
+	call.Arg(1).SetString(fbc.FunctionName())
 	if args != nil {
 		call.Arg(2).SetArray(args)
 	} else {

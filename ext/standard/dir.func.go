@@ -229,7 +229,7 @@ func ZifGetcwd(executeData zpp.Ex, return_value zpp.Ret) {
 	}
 	ret = zend.VCWD_GETCWD(path, core.MAXPATHLEN)
 	if ret != nil {
-		return_value.SetStringVal(b.CastStrAuto(path))
+		return_value.SetString(b.CastStrAuto(path))
 		return
 	} else {
 		return_value.SetFalse()
@@ -332,7 +332,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if core.PhpStreamReaddir(dirp, &entry) != nil {
-		return_value.SetStringVal(entry.GetDName())
+		return_value.SetString(entry.GetDName())
 		return
 	}
 	return_value.SetFalse()

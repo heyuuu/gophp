@@ -679,7 +679,7 @@ func PhpStrcspnEx(s1 string, s2 string) int {
 	return len(s1)
 }
 func PhpNeedleChar(needle *types.Zval) (byte, bool) {
-	switch needle.GetType() {
+	switch needle.Type() {
 	case types.IsLong:
 		return byte(needle.Long()), true
 	case types.IsNull, types.IsFalse:
@@ -1099,7 +1099,7 @@ func ZifSubstrReplace(returnValue zpp.Ret, str *types.Zval, replace *types.Zval,
 
 	if str.IsString() {
 		res := substrReplaceStr(str.StringVal(), replace, start, length)
-		returnValue.SetStringVal(res)
+		returnValue.SetString(res)
 		return
 	} else {
 		res := substrReplaceArray(str.Array(), replace, str, length)
@@ -1532,7 +1532,7 @@ func strReplaceArray(subject *types.Array, search *types.Zval, replace *types.Zv
 		var result types.Zval
 		if !value.IsArray() && !value.IsObject() {
 			tmpResult, count := strReplaceStr(operators.ZvalGetStrVal(value), search, replace, caseSensitivity)
-			result.SetStringVal(tmpResult)
+			result.SetString(tmpResult)
 			replaceCount += count
 		} else {
 			types.ZVAL_COPY(&result, value)
@@ -1568,7 +1568,7 @@ func strReplace(returnValue *types.Zval, search *types.Zval, replace *types.Zval
 	} else {
 		var str string
 		str, count = strReplaceStr(operators.ZvalGetStrVal(subject), search, replace, caseSensitivity)
-		returnValue.SetStringVal(str)
+		returnValue.SetString(str)
 	}
 
 	if replaceCount != nil {

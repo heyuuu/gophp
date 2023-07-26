@@ -7,10 +7,10 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
-func ZEND_REF_HAS_TYPE_SOURCES(ref *types.ZendReference) bool {
+func ZEND_REF_HAS_TYPE_SOURCES(ref *types.Reference) bool {
 	return ref.GetSources().GetPtr() != nil
 }
-func ZEND_REF_FIRST_SOURCE(ref *types.ZendReference) *types.PropertyInfo {
+func ZEND_REF_FIRST_SOURCE(ref *types.Reference) *types.PropertyInfo {
 	if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(ref.GetSources().GetList()) != 0 {
 		return types.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(ref.GetSources().GetList()).GetPtr()[0]
 	} else {
@@ -24,7 +24,7 @@ func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, strict bo
 	value = value.DeRef()
 	for {
 		if variable_ptr.IsRefcounted() {
-			if variable_ptr.IsReference() {
+			if variable_ptr.IsRef() {
 				if ZEND_REF_HAS_TYPE_SOURCES(variable_ptr.Reference()) {
 					return ZendAssignToTypedRef(variable_ptr, value, strict)
 				}
@@ -118,10 +118,10 @@ func DECODE_SPECIAL_CACHE_NUM(ptr *ZendConstant) int { return uintPtr(ptr) >> 1 
 func ZEND_CLASS_HAS_TYPE_HINTS(ce *types.ClassEntry) bool {
 	return (ce.GetCeFlags() & types.AccHasTypeHints) == types.AccHasTypeHints
 }
-func ZEND_REF_ADD_TYPE_SOURCE(ref *types.ZendReference, source *types.PropertyInfo) {
+func ZEND_REF_ADD_TYPE_SOURCE(ref *types.Reference, source *types.PropertyInfo) {
 	ZendRefAddTypeSource(&(ref.GetSources()), source)
 }
-func ZEND_REF_DEL_TYPE_SOURCE(ref *types.ZendReference, source *types.PropertyInfo) {
+func ZEND_REF_DEL_TYPE_SOURCE(ref *types.Reference, source *types.PropertyInfo) {
 	ZendRefDelTypeSource(&(ref.GetSources()), source)
 }
 func GetZvalPtr(op_type int, node types.ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
@@ -164,7 +164,7 @@ func ZendVmStackDestroy() {
 func _getZvalPtrTmp(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
 	var ret *types.Zval = EX_VAR(executeData, var_)
 	*should_free = ret
-	b.Assert(!ret.IsReference())
+	b.Assert(!ret.IsRef())
 	return ret
 }
 func _getZvalPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {

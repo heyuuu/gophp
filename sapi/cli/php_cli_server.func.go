@@ -107,7 +107,7 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 
 		key = _p.GetKey()
 		value = _z.Ptr()
-		tmp.SetStringVal(b.CastStrAuto(value))
+		tmp.SetString(b.CastStrAuto(value))
 		return_value.Array().SymtableUpdate(key.GetStr(), &tmp)
 	}
 }

@@ -36,7 +36,7 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var ref *types.Zval = nil
 	var ret int
 	value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if value.IsReference() {
+	if value.IsRef() {
 		{
 			ref = value
 		}
@@ -70,7 +70,7 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var ref *types.Zval = nil
 	var ret int
 	value = opline.Op1()
-	if value.IsReference() {
+	if value.IsRef() {
 		{
 			ref = value
 		}
@@ -103,7 +103,7 @@ func ZEND_JMP_SET_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var ref *types.Zval = nil
 	var ret int
 	value = opline.Cv1OrUndef()
-	if value.IsReference() {
+	if value.IsRef() {
 		{
 			ref = value
 		}

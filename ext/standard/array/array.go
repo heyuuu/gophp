@@ -110,7 +110,7 @@ func PhpCountRecursive(ht *types.Array) int {
 func ZifCount(var_ *types.Zval, _ zpp.Opt, mode int) int {
 	var array = var_
 	var cnt zend.ZendLong
-	switch array.GetType() {
+	switch array.Type() {
 	case types.IsNull:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return 0
@@ -339,7 +339,7 @@ func arrayWalk(array *types.Zval, recursive bool, handler func(value *types.Zval
 			}
 
 			/* Add type source for property references. */
-			if !zv.IsReference() && array.IsType(types.IsObject) {
+			if !zv.IsRef() && array.IsType(types.IsObject) {
 				var prop_info = zend.ZendGetTypedPropertyInfoForSlot(array.Object(), zv)
 				if prop_info != nil {
 					zv.SetNewRef(zv)
@@ -882,7 +882,7 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 		} else {
 			thash = nil
 		}
-		if thash != nil && thash.IsRecursive() || value == destEntry && destEntry.IsReference() {
+		if thash != nil && thash.IsRecursive() || value == destEntry && destEntry.IsRef() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 			return 0
 		}
@@ -940,14 +940,14 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) bool {
 		}
 
 		destEntry = dest.Find(key)
-		if destEntry == nil || !destEntry.IsArray() && (!(destEntry.IsReference()) || types.Z_REFVAL_P(destEntry).GetType() != types.IsArray) {
+		if destEntry == nil || !destEntry.IsArray() && (!(destEntry.IsRef()) || types.Z_REFVAL_P(destEntry).Type() != types.IsArray) {
 			dest.Update(key, srcEntry)
 			return true
 		}
 		destZval = destEntry.DeRef()
 
 		// src/dest 对应值均为 array 的情况下，递归替换
-		if destZval.Array().IsRecursive() || srcZval.Array().IsRecursive() || srcEntry.IsReference() && destEntry.IsReference() && srcEntry.Reference() == destEntry.Reference() {
+		if destZval.Array().IsRecursive() || srcZval.Array().IsRecursive() || srcEntry.IsRef() && destEntry.IsRef() && srcEntry.Reference() == destEntry.Reference() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 			return false
 		}
@@ -1137,7 +1137,7 @@ func ZifArrayCountValues(array *types.Array) *types.Array {
 	return retArr
 }
 func ArrayColumnParamHelper(param *types.Zval, name string) bool {
-	switch param.GetType() {
+	switch param.Type() {
 	case types.IsDouble:
 		if !param.IsLong() {
 			operators.ConvertToLong(param)
@@ -1222,7 +1222,7 @@ func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, i
 			// key
 			var keyVal = ArrayColumnFetchProp(data, indexKey)
 			if keyVal != nil {
-				switch keyVal.GetType() {
+				switch keyVal.Type() {
 				case types.IsString:
 					retArr.SymtableUpdate(keyVal.String().GetStr(), columnVal)
 				case types.IsLong:
@@ -1875,7 +1875,7 @@ func ZifArrayKeyExists(key *types.Zval, array zpp.ArrayOrObject) bool {
 		ht = zend.ZendGetPropertiesFor(array, zend.ZEND_PROP_PURPOSE_ARRAY_CAST)
 		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Using array_key_exists() on objects is deprecated. Use isset() or property_exists() instead")
 	}
-	switch key.GetType() {
+	switch key.Type() {
 	case types.IsString:
 		return ht.SymtableExistsInd(key.StringVal())
 	case types.IsLong:

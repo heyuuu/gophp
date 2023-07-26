@@ -32,11 +32,11 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			}
 			value = p.GetVal()
-			value_type = value.GetType()
+			value_type = value.Type()
 			if value.IsNotUndef() {
 				if value.IsIndirect() {
 					value = value.Indirect()
-					value_type = value.GetType()
+					value_type = value.Type()
 					if value.IsNotUndef() {
 						break
 					}
@@ -52,7 +52,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			if p.GetKey() == nil {
 				opline.Result().SetLong(p.GetH())
 			} else {
-				opline.Result().SetStringVal(p.GetKey().GetStr())
+				opline.Result().SetString(p.GetKey().GetStr())
 			}
 		}
 		EG__().GetHtIterators()[types.Z_FE_ITER_P(opline.Op1())].SetPos(pos + 1)
@@ -76,13 +76,13 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 				}
 				value = p.GetVal()
-				value_type = value.GetType()
+				value_type = value.Type()
 				if value.IsNotUndef() {
 					if value.IsIndirect() {
 						value = value.Indirect()
-						value_type = value.GetType()
+						value_type = value.Type()
 						if value.IsNotUndef() && ZendCheckPropertyAccess(array.Object(), p.GetKey(), false) == types.SUCCESS {
-							if value.IsReference() {
+							if value.IsRef() {
 								var prop_info *types.PropertyInfo = ZendGetTypedPropertyInfoForSlot(array.Object(), value)
 								if prop_info != nil {
 									value.SetNewRef(value)
@@ -103,13 +103,13 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				if p.GetKey() == nil {
 					opline.Result().SetLong(p.GetH())
 				} else if p.GetKey().GetStr()[0] {
-					opline.Result().SetStringVal(p.GetKey().GetStr())
+					opline.Result().SetString(p.GetKey().GetStr())
 				} else {
 					var class_name *byte
 					var prop_name *byte
 					var prop_name_len int
 					ZendUnmanglePropertyNameEx(p.GetKey(), &class_name, &prop_name, &prop_name_len)
-					opline.Result().SetStringVal(b.CastStr(prop_name, prop_name_len))
+					opline.Result().SetString(b.CastStr(prop_name, prop_name_len))
 				}
 			}
 			EG__().GetHtIterators()[types.Z_FE_ITER_P(opline.Op1())].SetPos(pos + 1)
@@ -160,7 +160,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					opline.Result().SetLong(iter.GetIndex())
 				}
 			}
-			value_type = value.GetType()
+			value_type = value.Type()
 		}
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
@@ -181,7 +181,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	if opline.GetOp2Type() == IS_CV {
 		var variable_ptr *types.Zval = opline.Op2()
 		if variable_ptr != value {
-			var ref *types.ZendReference
+			var ref *types.Reference
 			ref = value.Reference()
 			variable_ptr.SetReference(ref)
 		}

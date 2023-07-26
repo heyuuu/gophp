@@ -185,7 +185,7 @@ func ZifEach(array zpp.RefZval) (*types.Array, bool) {
 	/* add the key elements */
 	var tmp types.Zval
 	if key.IsStrKey() {
-		tmp.SetStringVal(key.StrKey())
+		tmp.SetString(key.StrKey())
 	} else {
 		tmp.SetLong(key.IdxKey())
 	}
@@ -293,7 +293,7 @@ func ZifDefine(constantName string, value *types.Zval, _ zpp.Opt, caseInsensitiv
 	}
 	val_free.SetUndef()
 repeat:
-	switch value.GetType() {
+	switch value.Type() {
 	case types.IsNull,
 		types.IsFalse,
 		types.IsTrue,
@@ -358,7 +358,7 @@ func ZifGetClass(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, object *ty
 	if obj == nil {
 		var scope = ZendGetExecutedScope()
 		if scope != nil {
-			return_value.SetStringVal(scope.Name())
+			return_value.SetString(scope.Name())
 			return
 		} else {
 			faults.Error(faults.E_WARNING, "get_class() called without object from outside a class")
@@ -366,7 +366,7 @@ func ZifGetClass(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, object *ty
 			return
 		}
 	}
-	return_value.SetStringVal(obj.Object().GetCe().Name())
+	return_value.SetString(obj.Object().GetCe().Name())
 	return
 }
 func ZifGetCalledClass(ex zpp.Ex) (string, bool) {
@@ -687,7 +687,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 		return_value.SetTrue()
 		return
 	}
-	property_z.SetString(property)
+	property_z.SetStringEx(property)
 	if object.IsObject() && object.Object().HasPropertyEx(&property_z, 2) {
 		return_value.SetTrue()
 		return
@@ -982,10 +982,10 @@ func ZifGetResourceType(executeData zpp.Ex, return_value zpp.Ret, res *types.Zva
 	}
 	resource_type = ZendRsrcListGetRsrcType(z_resource_type.Resource())
 	if resource_type != nil {
-		return_value.SetStringVal(b.CastStrAuto(resource_type))
+		return_value.SetString(b.CastStrAuto(resource_type))
 		return
 	} else {
-		return_value.SetStringVal("Unknown")
+		return_value.SetString("Unknown")
 		return
 	}
 }
@@ -1383,7 +1383,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 			} else {
 				lineno = skip.GetOpline().GetLineno()
 			}
-			tmp.SetStringVal(filename)
+			tmp.SetString(filename)
 			stack_frame.Array().KeyAddNew(types.STR_FILE, &tmp)
 			tmp.SetLong(lineno)
 			stack_frame.Array().KeyAddNew(types.STR_LINE, &tmp)
@@ -1395,7 +1395,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 					break
 				}
 				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetType()) {
-					tmp.SetStringVal(prev.GetFunc().GetOpArray().GetFilename())
+					tmp.SetString(prev.GetFunc().GetOpArray().GetFilename())
 					stack_frame.Array().KeyAddNew(types.STR_FILE, &tmp)
 					tmp.SetLong(prev.GetOpline().GetLineno())
 					stack_frame.Array().KeyAddNew(types.STR_LINE, &tmp)
@@ -1430,13 +1430,13 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 			functionName = ""
 		}
 		if functionName != "" {
-			tmp.SetStringVal(functionName)
+			tmp.SetString(functionName)
 			stack_frame.Array().KeyAddNew(types.STR_FUNCTION, &tmp)
 			if object != nil {
 				if func_.GetScope() != nil {
-					tmp.SetStringVal(func_.GetScope().GetName().GetStr())
+					tmp.SetString(func_.GetScope().GetName().GetStr())
 				} else {
-					tmp.SetStringVal(object.ClassName())
+					tmp.SetString(object.ClassName())
 				}
 				stack_frame.Array().KeyAddNew(types.STR_CLASS, &tmp)
 				if (options & DEBUG_BACKTRACE_PROVIDE_OBJECT) != 0 {
@@ -1444,12 +1444,12 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 					stack_frame.Array().KeyAddNew(types.STR_OBJECT, &tmp)
 					// 					tmp.AddRefcount()
 				}
-				tmp.SetStringVal(types.STR_OBJECT_OPERATOR)
+				tmp.SetString(types.STR_OBJECT_OPERATOR)
 				stack_frame.Array().KeyAddNew(types.STR_TYPE, &tmp)
 			} else if func_.GetScope() != nil {
-				tmp.SetStringVal(func_.GetScope().GetName().GetStr())
+				tmp.SetString(func_.GetScope().GetName().GetStr())
 				stack_frame.Array().KeyAddNew(types.STR_CLASS, &tmp)
-				tmp.SetStringVal(types.STR_PAAMAYIM_NEKUDOTAYIM)
+				tmp.SetString(types.STR_PAAMAYIM_NEKUDOTAYIM)
 				stack_frame.Array().KeyAddNew(types.STR_TYPE, &tmp)
 			}
 			if (options&DEBUG_BACKTRACE_IGNORE_ARGS) == 0 && func_.GetType() != ZEND_EVAL_CODE {
@@ -1494,11 +1494,11 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 				   if we have called include in the frame above - this is the file we have included.
 				*/
 
-				tmp.SetStringVal(include_filename.GetStr())
+				tmp.SetString(include_filename.GetStr())
 				arg_array.Array().AppendNew(&tmp)
 				stack_frame.Array().KeyAddNew(types.STR_ARGS, &arg_array)
 			}
-			tmp.SetStringVal(pseudo_function_name)
+			tmp.SetString(pseudo_function_name)
 			stack_frame.Array().KeyAddNew(types.STR_FUNCTION, &tmp)
 		}
 		return_value.Array().AppendNew(&stack_frame)

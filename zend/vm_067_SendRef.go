@@ -16,7 +16,7 @@ func ZEND_SEND_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		types.Z_REFVAL_P(arg).SetNull()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
-	if varptr.IsReference() {
+	if varptr.IsRef() {
 		// 		varptr.AddRefcount()
 	} else {
 		types.ZVAL_MAKE_REF_EX(varptr, 2)
@@ -38,7 +38,7 @@ func ZEND_SEND_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		types.Z_REFVAL_P(arg).SetNull()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
-	if varptr.IsReference() {
+	if varptr.IsRef() {
 		// 		varptr.AddRefcount()
 	} else {
 		types.ZVAL_MAKE_REF_EX(varptr, 2)

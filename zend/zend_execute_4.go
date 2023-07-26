@@ -135,7 +135,7 @@ func ZendUndefinedMethod(ce *types.ClassEntry, method *types.String) {
 	faults.ThrowError(nil, "Call to undefined method %s::%s()", ce.Name(), method.GetVal())
 }
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
-	faults.ThrowError(nil, "Call to a member function %s() on %s", function_name.String().GetVal(), types.ZendGetTypeByConst(object.GetType()))
+	faults.ThrowError(nil, "Call to a member function %s() on %s", function_name.String().GetVal(), types.ZendGetTypeByConst(object.Type()))
 }
 func ZendNonStaticMethodCall(fbc types.IFunction) {
 	if fbc.IsAllowStatic() {
@@ -172,7 +172,7 @@ func ZendBinaryAssignOpDimSlow(container *types.Zval, dim *types.Zval, opline *t
 	}
 }
 func SlowIndexConvertEx(ht *types.Array, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
-	switch dim.GetType() {
+	switch dim.Type() {
 	case types.IsUndef:
 		ZVAL_UNDEFINED_OP2(executeData)
 		//if ht.DelRefcount() == 0 {
@@ -290,7 +290,7 @@ try_again:
 				retval = ht.KeyAddNew(offset_key.GetStr(), UninitializedZval())
 			}
 		}
-	} else if dim.IsReference() {
+	} else if dim.IsRef() {
 		dim = types.Z_REFVAL_P(dim)
 		goto try_again
 	} else {
@@ -352,8 +352,8 @@ func ZendFetchDimensionAddress(
 		}
 		result.SetIndirect(retval)
 		return
-	} else if container.IsReference() {
-		var ref *types.ZendReference = container.Reference()
+	} else if container.IsRef() {
+		var ref *types.Reference = container.Reference()
 		container = types.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto try_array
@@ -393,7 +393,7 @@ func ZendFetchDimensionAddress(
 			result.SetNull()
 			faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.Name())
 		} else if retval != nil && retval.IsNotUndef() {
-			if !(retval.IsReference()) {
+			if !(retval.IsRef()) {
 				if result != retval {
 					types.ZVAL_COPY(result, retval)
 					retval = result

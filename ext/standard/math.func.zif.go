@@ -424,7 +424,7 @@ var DefZifDecbin = def.DefFunc("decbin", 1, 1, []def.ArgInfo{{Name: "decimal_num
 		return
 	}
 	ret := ZifDecbin(decimal_number)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifDecoct
@@ -435,7 +435,7 @@ var DefZifDecoct = def.DefFunc("decoct", 1, 1, []def.ArgInfo{{Name: "decimal_num
 		return
 	}
 	ret := ZifDecoct(decimal_number)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifDechex
@@ -446,7 +446,7 @@ var DefZifDechex = def.DefFunc("dechex", 1, 1, []def.ArgInfo{{Name: "decimal_num
 		return
 	}
 	ret := ZifDechex(decimal_number)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifBaseConvert
@@ -460,7 +460,7 @@ var DefZifBaseConvert = def.DefFunc("base_convert", 3, 3, []def.ArgInfo{{Name: "
 	}
 	ret, ok := ZifBaseConvert(number, frombase, tobase)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -478,7 +478,7 @@ var DefZifNumberFormat = def.DefFunc("number_format", 1, 4, []def.ArgInfo{{Name:
 		return
 	}
 	ret := ZifNumberFormat(number, nil, num_decimal_places, dec_separator_, thousands_separator)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifFmod

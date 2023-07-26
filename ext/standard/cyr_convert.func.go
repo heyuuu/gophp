@@ -86,5 +86,5 @@ func ZifConvertCyrString(executeData zpp.Ex, return_value zpp.Ret, str *types.Zv
 	}
 	str = types.NewString(b.CastStr(input, input_len))
 	PhpConvertCyrString((*uint8)(str.GetVal()), str.GetLen(), fr_cs[0], to_cs[0])
-	return_value.SetString(str)
+	return_value.SetStringEx(str)
 }

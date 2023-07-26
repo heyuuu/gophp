@@ -596,7 +596,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 
 	PG__().rfc1867_protected_variables = types.NewArray(8)
 	SG__().rfc1867UploadedFiles = make(map[string]bool)
-	if PG__().http_globals[TRACK_VARS_FILES].GetType() != types.IsArray {
+	if PG__().http_globals[TRACK_VARS_FILES].Type() != types.IsArray {
 
 		/* php_auto_globals_create_files() might have already done that */
 
@@ -987,9 +987,9 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 
 			if is_anonymous == 0 {
 				if temp_filename != nil {
-					zfilename.SetStringVal(temp_filename.GetStr())
+					zfilename.SetString(temp_filename.GetStr())
 				} else {
-					zfilename.SetStringVal("")
+					zfilename.SetString("")
 				}
 				SafePhpRegisterVariableEx(param, &zfilename, nil, 1)
 			}
@@ -1003,9 +1003,9 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 			}
 			AddProtectedVariable(lbuf)
 			if temp_filename != nil {
-				zfilename.SetStringVal(temp_filename.GetStr())
+				zfilename.SetString(temp_filename.GetStr())
 			} else {
-				zfilename.SetStringVal("")
+				zfilename.SetString("")
 			}
 			RegisterHttpPostFilesVariableEx(lbuf, &zfilename, &PG__().http_globals[TRACK_VARS_FILES], 1)
 			var file_size types.Zval
@@ -1043,7 +1043,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 			}
 			if is_anonymous == 0 {
 				if size_overflow != 0 {
-					file_size.SetStringVal(b.CastStrAuto(file_size_buf))
+					file_size.SetString(b.CastStrAuto(file_size_buf))
 				}
 				SafePhpRegisterVariableEx(lbuf, &file_size, nil, size_overflow)
 			}
@@ -1056,7 +1056,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 				Snprintf(lbuf, llen, "%s[size]", param)
 			}
 			if size_overflow != 0 {
-				file_size.SetStringVal(b.CastStrAuto(file_size_buf))
+				file_size.SetString(b.CastStrAuto(file_size_buf))
 			}
 			RegisterHttpPostFilesVariableEx(lbuf, &file_size, &PG__().http_globals[TRACK_VARS_FILES], size_overflow)
 			zend.Efree(param)

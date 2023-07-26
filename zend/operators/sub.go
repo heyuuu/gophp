@@ -15,7 +15,7 @@ func SubFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 }
 
 func _subFunctionFast(result *types.Zval, op1 *types.Zval, op2 *types.Zval) bool {
-	switch TypePair(op1.GetType(), op2.GetType()) {
+	switch TypePair(op1.Type(), op2.Type()) {
 	case TypeLongLong:
 		FastLongSubFunction(result, op1, op2)
 		return true

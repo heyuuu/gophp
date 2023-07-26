@@ -102,10 +102,10 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 
 			/* Return last line from the shell command */
 
-			return_value.SetStringVal(builtin.CastStr(buf, bufl))
+			return_value.SetString(builtin.CastStr(buf, bufl))
 
 		} else {
-			return_value.SetStringVal("")
+			return_value.SetString("")
 		}
 	} else {
 		var read ssize_t
@@ -318,6 +318,6 @@ func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types.Zval) {
 	ret = core.PhpStreamCopyToMem(stream, core.PHP_STREAM_COPY_ALL, 0)
 	core.PhpStreamClose(stream)
 	if ret != nil && ret.GetLen() > 0 {
-		return_value.SetString(ret)
+		return_value.SetStringEx(ret)
 	}
 }

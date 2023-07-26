@@ -33,7 +33,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 			opline.Result().SetCe(types.Z_OBJCE_P(class_name))
 		} else if class_name.IsString() {
 			opline.Result().SetCe(ZendFetchClass(class_name.String().GetStr(), opline.GetOp1().GetNum()))
-		} else if class_name.IsReference() {
+		} else if class_name.IsRef() {
 			class_name = types.Z_REFVAL_P(class_name)
 			goto try_class_name
 		} else {
@@ -70,7 +70,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 			opline.Result().SetCe(types.Z_OBJCE_P(class_name))
 		} else if class_name.IsString() {
 			opline.Result().SetCe(ZendFetchClass(class_name.String().GetStr(), opline.GetOp1().GetNum()))
-		} else if class_name.IsReference() {
+		} else if class_name.IsRef() {
 			class_name = types.Z_REFVAL_P(class_name)
 			goto try_class_name
 		} else {

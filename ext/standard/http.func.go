@@ -192,7 +192,7 @@ func PhpUrlEncodeHashEx(
 				formstr.WriteString(b.CastStr(key_suffix, key_suffix_len))
 			}
 			formstr.WriteString("=")
-			switch zdata.GetType() {
+			switch zdata.Type() {
 			case types.IsString:
 				var ekey string
 				if enc_type == PHP_QUERY_RFC3986 {
@@ -253,10 +253,10 @@ func ZifHttpBuildQuery(executeData zpp.Ex, return_value zpp.Ret, formdata *types
 		return
 	}
 	if formstr.GetS() == nil {
-		return_value.SetStringVal("")
+		return_value.SetString("")
 		return
 	}
 	formstr.ZeroTail()
-	return_value.SetString(formstr.GetS())
+	return_value.SetStringEx(formstr.GetS())
 	return
 }

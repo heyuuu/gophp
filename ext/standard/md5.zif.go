@@ -15,7 +15,7 @@ var DefZifMd5 = def.DefFunc("md5", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "ra
 		return
 	}
 	ret := ZifMd5(str, nil, raw_output)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifMd5File
@@ -29,7 +29,7 @@ var DefZifMd5File = def.DefFunc("md5_file", 1, 2, []def.ArgInfo{{Name: "filename
 	}
 	ret, ok := ZifMd5File(filename, nil, raw_output)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

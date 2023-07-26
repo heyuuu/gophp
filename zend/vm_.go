@@ -137,7 +137,7 @@ func getIsEqualHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	var result bool
-	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	switch operators.TypePair(op1.Type(), op2.Type()) {
 	case operators.TypePair(types.IsLong, types.IsLong):
 		result = op1.Long() == op2.Long()
 	case operators.TypePair(types.IsDouble, types.IsDouble),
@@ -188,7 +188,7 @@ func getIsNotEqualHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	var result bool
-	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	switch operators.TypePair(op1.Type(), op2.Type()) {
 	case operators.TypePair(types.IsLong, types.IsLong):
 		result = op1.Long() != op2.Long()
 	case operators.TypePair(types.IsDouble, types.IsDouble),

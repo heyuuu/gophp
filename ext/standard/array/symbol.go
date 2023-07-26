@@ -85,7 +85,7 @@ func PhpExtractRefIfExists(arr *types.Array, symbolTable *types.Array) zend.Zend
 				faults.ThrowError(nil, "Cannot re-assign $this")
 				return -1
 			}
-			if entry.IsReference() {
+			if entry.IsRef() {
 				// entry.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -143,14 +143,14 @@ func PhpExtractRefOverwrite(arr *types.Array, symbolTable *types.Array) zend.Zen
 			if varName == "GLOBALS" {
 				return 0
 			}
-			if entry.IsReference() {
+			if entry.IsRef() {
 				// entry.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)
 			}
 			origVar.SetReference(entry.Reference())
 		} else {
-			if entry.IsReference() {
+			if entry.IsRef() {
 				// entry.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -198,7 +198,7 @@ func PhpExtractRefPrefixIfExists(arr *types.Array, symbolTable *types.Array, pre
 			if origVar.IsIndirect() {
 				origVar = origVar.Indirect()
 				if origVar.IsUndef() {
-					if entry.IsReference() {
+					if entry.IsRef() {
 						// entry.AddRefcount()
 					} else {
 						types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -215,7 +215,7 @@ func PhpExtractRefPrefixIfExists(arr *types.Array, symbolTable *types.Array, pre
 					count = -1
 					return false
 				} else {
-					if entry.IsReference() {
+					if entry.IsRef() {
 						// entry.AddRefcount()
 					} else {
 						types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -300,7 +300,7 @@ func PhpExtractRefPrefixSame(arr *types.Array, symbolTable *types.Array, prefix 
 			if origVar.IsIndirect() {
 				origVar = origVar.Indirect()
 				if origVar.IsUndef() {
-					if entry.IsReference() {
+					if entry.IsRef() {
 						// entry.AddRefcount()
 					} else {
 						types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -318,7 +318,7 @@ func PhpExtractRefPrefixSame(arr *types.Array, symbolTable *types.Array, prefix 
 			if varName == "this" {
 				goto prefix
 			}
-			if entry.IsReference() {
+			if entry.IsRef() {
 				// entry.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -335,7 +335,7 @@ func PhpExtractRefPrefixSame(arr *types.Array, symbolTable *types.Array, prefix 
 				count = -1
 				return false
 			} else {
-				if entry.IsReference() {
+				if entry.IsRef() {
 					// entry.AddRefcount()
 				} else {
 					types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -420,7 +420,7 @@ func PhpExtractRefPrefixAll(arr *types.Array, symbolTable *types.Array, prefix *
 				faults.ThrowError(nil, "Cannot re-assign $this")
 				return -1
 			} else {
-				if entry.IsReference() {
+				if entry.IsRef() {
 					// entry.AddRefcount()
 				} else {
 					types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -493,7 +493,7 @@ func PhpExtractRefPrefixInvalid(arr *types.Array, symbolTable *types.Array, pref
 			faults.ThrowError(nil, "Cannot re-assign $this")
 			return -1
 		} else {
-			if entry.IsReference() {
+			if entry.IsRef() {
 				// entry.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -556,7 +556,7 @@ func PhpExtractRefSkip(arr *types.Array, symbolTable *types.Array) zend.ZendLong
 			if origVar.IsIndirect() {
 				origVar = origVar.Indirect()
 				if origVar.IsUndef() {
-					if entry.IsReference() {
+					if entry.IsRef() {
 						// entry.AddRefcount()
 					} else {
 						types.ZVAL_MAKE_REF_EX(entry, 2)
@@ -566,7 +566,7 @@ func PhpExtractRefSkip(arr *types.Array, symbolTable *types.Array) zend.ZendLong
 				}
 			}
 		} else {
-			if entry.IsReference() {
+			if entry.IsRef() {
 				// entry.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)

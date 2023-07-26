@@ -143,7 +143,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 				if delayed_call_failed == 0 {
 					var retval types.Zval
 					if wakeup_name.IsUndef() {
-						wakeup_name.SetStringVal("__wakeup")
+						wakeup_name.SetString("__wakeup")
 					}
 					BG__().serialize_lock++
 					if zend.CallUserFunction(zv, &wakeup_name, &retval, 0, 0) == types.FAILURE || retval.IsUndef() {
@@ -166,7 +166,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					var param types.Zval
 					types.ZVAL_COPY(&param, var_dtor_hash.GetData()[i+1])
 					if unserialize_name.IsUndef() {
-						unserialize_name.SetStringVal("__unserialize")
+						unserialize_name.SetString("__unserialize")
 					}
 					BG__().serialize_lock++
 					if zend.CallUserFunction(zv, &unserialize_name, &retval, 1, &param) == types.FAILURE || retval.IsUndef() {
@@ -384,7 +384,7 @@ func ProcessNestedData(
 							new_key = unmangled
 						}
 
-						key.SetString(new_key)
+						key.SetStringEx(new_key)
 					} else {
 						// types.ZendStringReleaseEx(unmangled, 0)
 					}
@@ -434,7 +434,7 @@ func ProcessNestedData(
 				//zend.ZvalDtor(&key)
 				goto failure
 			}
-			if data.IsReference() {
+			if data.IsRef() {
 				zend.ZEND_REF_ADD_TYPE_SOURCE(data.Reference(), info)
 			}
 		}
@@ -832,8 +832,8 @@ yy18:
 
 		/* Call unserialize callback */
 
-		user_func.SetStringVal(b.CastStrAuto(core.PG__().unserialize_callback_func))
-		args[0].SetStringVal(class_name.GetStr())
+		user_func.SetString(b.CastStrAuto(core.PG__().unserialize_callback_func))
+		args[0].SetString(class_name.GetStr())
 		BG__().serialize_lock++
 		if zend.CallUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != types.SUCCESS {
 			BG__().serialize_lock--
@@ -1031,7 +1031,7 @@ yy30:
 	}
 	YYCURSOR += 2
 	*p = YYCURSOR
-	rval.SetString(str)
+	rval.SetStringEx(str)
 	return 1
 yy35:
 	yych = *(lang.PreInc(&YYCURSOR))
@@ -1082,7 +1082,7 @@ yy36:
 	}
 	YYCURSOR += 2
 	*p = YYCURSOR
-	rval.SetStringVal(b.CastStr(str, len_))
+	rval.SetString(b.CastStr(str, len_))
 	return 1
 yy41:
 	yych = *(lang.PreInc(&YYCURSOR))
@@ -1489,10 +1489,10 @@ yy85:
 	if id == -1 || lang.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
 		return 0
 	}
-	if rval_ref.IsUndef() || rval_ref.IsReference() && types.Z_REFVAL_P(rval_ref).IsUndef() {
+	if rval_ref.IsUndef() || rval_ref.IsRef() && types.Z_REFVAL_P(rval_ref).IsUndef() {
 		return 0
 	}
-	if !(rval_ref.IsReference()) {
+	if !(rval_ref.IsRef()) {
 		var info *types.PropertyInfo = nil
 		if var_hash.GetRefProps() != nil {
 			info = types.ZendHashIndexFindPtr(var_hash.GetRefProps(), types.ZendUintptrT(rval_ref))

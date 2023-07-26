@@ -118,7 +118,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 	var name_ast *ZendAst = ast.Child(0)
 	var args_ast *ZendAst = ast.Child(1)
 	var name_node Znode
-	if name_ast.Kind() != ZEND_AST_ZVAL || name_ast.Val().GetType() != types.IsString {
+	if name_ast.Kind() != ZEND_AST_ZVAL || name_ast.Val().Type() != types.IsString {
 		compiler.CompileExpr(&name_node, name_ast)
 		compiler.CompileDynamicCall(result, &name_node, args_ast)
 		return
@@ -156,7 +156,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 		return
 	}
 	// ZvalPtrDtor(name_node.GetConstant())
-	name_node.GetConstant().SetString(lcname)
+	name_node.GetConstant().SetStringEx(lcname)
 	opline = ZendEmitOp(nil, ZEND_INIT_FCALL, nil, &name_node)
 	opline.GetResult().SetNum(ZendAllocCacheSlot())
 	compiler.CompileCallCommon(result, args_ast, fbc)
@@ -178,7 +178,7 @@ func (compiler *Compiler) CompileMethodCall(result *Znode, ast *ZendAst, type_ u
 	compiler.CompileExpr(&method_node, method_ast)
 	opline = ZendEmitOp(nil, ZEND_INIT_METHOD_CALL, &obj_node, nil)
 	if method_node.GetOpType() == IS_CONST {
-		if method_node.GetConstant().GetType() != types.IsString {
+		if method_node.GetConstant().Type() != types.IsString {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
 		opline.SetOp2Type(IS_CONST)

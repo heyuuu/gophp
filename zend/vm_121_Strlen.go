@@ -29,7 +29,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				// ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
-				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
+				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.Type()))
 			}
 			opline.Result().SetNull()
 			break
@@ -48,7 +48,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		var strict bool
-		if value.IsReference() {
+		if value.IsRef() {
 			value = types.Z_REFVAL_P(value)
 			if value.IsString() {
 				opline.Result().SetLong(value.String().GetLen())
@@ -73,7 +73,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				// ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
-				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
+				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.Type()))
 			}
 			opline.Result().SetNull()
 			break
@@ -91,7 +91,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		var strict bool
-		if value.IsReference() {
+		if value.IsRef() {
 			value = types.Z_REFVAL_P(value)
 			if value.IsString() {
 				opline.Result().SetLong(value.String().GetLen())
@@ -115,7 +115,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				// ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
-				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
+				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.Type()))
 			}
 			opline.Result().SetNull()
 			break

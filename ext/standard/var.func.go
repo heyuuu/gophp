@@ -61,7 +61,7 @@ again:
 	if isRef {
 		common = "&"
 	}
-	switch struc.GetType() {
+	switch struc.Type() {
 	case types.IsFalse:
 		core.PhpPrintf("%sbool(false)\n", common)
 	case types.IsTrue:
@@ -184,12 +184,12 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 
 	// deref
 	common := ""
-	if struc.IsReference() {
+	if struc.IsRef() {
 		common = "&"
 		struc = struc.DeRef()
 	}
 
-	switch struc.GetType() {
+	switch struc.Type() {
 	case types.IsFalse:
 		core.PhpPrintf("%sbool(false)\n", common)
 	case types.IsTrue:
@@ -319,7 +319,7 @@ func PhpVarExportEx(struc *types.Zval, level int, buf *zend.SmartStr) {
 	var key *types.String
 	var val *types.Zval
 again:
-	switch struc.GetType() {
+	switch struc.Type() {
 	case types.IsFalse:
 		buf.WriteString("false")
 	case types.IsTrue:
@@ -469,7 +469,7 @@ func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var__ *types.Zval, _
 	PhpVarExportEx(var_, 1, &buf)
 	buf.ZeroTail()
 	if return_output != 0 {
-		return_value.SetString(buf.GetS())
+		return_value.SetStringEx(buf.GetS())
 		return
 	} else {
 		core.PUTS(buf.GetS().GetStr())
@@ -649,7 +649,7 @@ cleanup:
 	 * the very end, because __wakeup() calls performed during UNSERIALIZE_DESTROY might affect
 	 * the value we unwrap here. This is compatible with behavior in PHP <=7.0. */
 
-	if return_value.IsReference() {
+	if return_value.IsRef() {
 		operators.ZendUnwrapReference(return_value)
 	}
 

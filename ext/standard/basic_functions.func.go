@@ -381,7 +381,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 	/* Get argv from the global symbol table. We calculate argc ourselves
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IsArray || zend.ZendIsAutoGlobal("_SERVER")) && (lang.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || lang.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].Type() == types.IsArray || zend.ZendIsAutoGlobal("_SERVER")) && (lang.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || lang.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
 		var pos int = 0
 		if !args.IsArray() {
 			return_value.SetFalse()
@@ -491,7 +491,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 
 			/* keep the arg as binary, since the encoding is not known */
 
-			val.SetStringVal(b.CastStrAuto(php_optarg))
+			val.SetString(b.CastStrAuto(php_optarg))
 
 		} else {
 			val.SetFalse()
@@ -696,7 +696,7 @@ func ZifErrorClearLast() {
 func ZifCallUserFunc(callback zpp.Callable, _ zpp.Opt, args []*types.Zval) *types.Zval {
 	retval, ok := callback.Call(args...)
 	if ok && retval.IsNotUndef() {
-		if retval.IsReference() {
+		if retval.IsRef() {
 			retval = retval.DeRef().Copy()
 		}
 		return retval
@@ -707,7 +707,7 @@ func ZifCallUserFuncArray(callback zpp.Callable, parameters *types.Array) *types
 	args := parameters.Values()
 	retval, ok := callback.Call(args...)
 	if ok && retval.IsNotUndef() {
-		if retval.IsReference() {
+		if retval.IsRef() {
 			retval = retval.DeRef().Copy()
 		}
 		return retval
@@ -754,7 +754,7 @@ func ZifForwardStaticCall(executeData zpp.Ex, return_value zpp.Ret, functionName
 		fci_cache.SetCalledScope(called_scope)
 	}
 	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
-		if retval.IsReference() {
+		if retval.IsRef() {
 			operators.ZendUnwrapReference(&retval)
 		}
 		types.ZVAL_COPY_VALUE(return_value, &retval)
@@ -785,7 +785,7 @@ func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functio
 		fci_cache.SetCalledScope(called_scope)
 	}
 	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
-		if retval.IsReference() {
+		if retval.IsRef() {
 			operators.ZendUnwrapReference(&retval)
 		}
 		types.ZVAL_COPY_VALUE(return_value, &retval)
@@ -867,7 +867,7 @@ func ZifPhpStripWhitespace(returnValue zpp.Ret, fileName string) {
 	if zend.OpenFileForScanning(fh) == types.FAILURE {
 		zend.ZendRestoreLexicalState(&originalLexState)
 		core.PhpOutputEnd()
-		returnValue.SetStringVal("")
+		returnValue.SetString("")
 		return
 	}
 	zend.ZendStrip()
@@ -952,7 +952,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 			} else {
 				if iniEntry.GetValue() != nil {
 					var zv types.Zval
-					zv.SetStringVal(iniEntry.GetValue().GetStr())
+					zv.SetString(iniEntry.GetValue().GetStr())
 					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), &zv)
 				} else {
 					returnValue.Array().SymtableUpdate(iniEntry.GetName().GetStr(), zend.UninitializedZval())
@@ -1094,7 +1094,7 @@ func ZifGetservbyport(executeData zpp.Ex, return_value zpp.Ret, port *types.Zval
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetStringVal(b.CastStrAuto(serv.s_name))
+	return_value.SetString(b.CastStrAuto(serv.s_name))
 	return
 }
 func ZifGetprotobyname(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval) {
@@ -1139,7 +1139,7 @@ func ZifGetprotobynumber(executeData zpp.Ex, return_value zpp.Ret, proto *types.
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetStringVal(b.CastStrAuto(ent.p_name))
+	return_value.SetString(b.CastStrAuto(ent.p_name))
 	return
 }
 func ZifRegisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {

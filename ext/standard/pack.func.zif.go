@@ -16,7 +16,7 @@ var DefZifPack = def.DefFunc("pack", 1, -1, []def.ArgInfo{{Name: "format"}, {Nam
 	}
 	ret, ok := ZifPack(format_, nil, args)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

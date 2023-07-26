@@ -273,7 +273,7 @@ func ZifStreamSocketGetName(executeData zpp.Ex, return_value zpp.Ret, stream *ty
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetString(name)
+	return_value.SetStringEx(name)
 }
 func ZifStreamSocketSendto(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, data *types.Zval, _ zpp.Opt, flags *types.Zval, targetAddr *types.Zval) {
 	var stream *core.PhpStream
@@ -401,10 +401,10 @@ func ZifStreamGetContents(executeData zpp.Ex, return_value zpp.Ret, source *type
 		}
 	}
 	if lang.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) {
-		return_value.SetString(contents)
+		return_value.SetStringEx(contents)
 		return
 	} else {
-		return_value.SetStringVal("")
+		return_value.SetString("")
 		return
 	}
 }
@@ -830,7 +830,7 @@ func UserSpaceStreamNotifier(
 	zvs[0].SetLong(notifycode)
 	zvs[1].SetLong(severity)
 	if xmsg != nil {
-		zvs[2].SetStringVal(b.CastStrAuto(xmsg))
+		zvs[2].SetString(b.CastStrAuto(xmsg))
 	} else {
 		zvs[2].SetNull()
 	}
@@ -1301,7 +1301,7 @@ func ZifStreamGetLine(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zv
 	}
 	core.PhpStreamFromZval(stream, zstream)
 	if lang.Assign(&buf, streams.PhpStreamGetRecord(stream, max_length, str, str_len)) {
-		return_value.SetString(buf)
+		return_value.SetStringEx(buf)
 		return
 	} else {
 		return_value.SetFalse()
@@ -1551,7 +1551,7 @@ func ZifStreamResolveIncludePath(executeData zpp.Ex, return_value zpp.Ret, filen
 	}
 	resolved_path = core.PhpResolvePathForZend(b.CastStr(filename, filename_len))
 	if resolved_path != nil {
-		return_value.SetStringVal(*resolved_path)
+		return_value.SetString(*resolved_path)
 		return
 	}
 	return_value.SetFalse()

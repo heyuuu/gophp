@@ -45,7 +45,7 @@ func phpRound(f float64, dec int, mode int) float64 {
 }
 
 func ZifAbs(number *types.Zval) (*types.Zval, bool) {
-	switch number.GetType() {
+	switch number.Type() {
 	case types.IsDouble:
 		num := number.Double()
 		result := math.Abs(num)
@@ -65,7 +65,7 @@ func ZifAbs(number *types.Zval) (*types.Zval, bool) {
 }
 func ZifCeil(number *types.Zval) (float64, bool) {
 	operators.ConvertScalarToNumberEx(number)
-	switch number.GetType() {
+	switch number.Type() {
 	case types.IsDouble:
 		result := math.Ceil(number.Double())
 		return result, true
@@ -78,7 +78,7 @@ func ZifCeil(number *types.Zval) (float64, bool) {
 }
 func ZifFloor(number *types.Zval) (float64, bool) {
 	operators.ConvertScalarToNumberEx(number)
-	switch number.GetType() {
+	switch number.Type() {
 	case types.IsDouble:
 		result := math.Floor(number.Double())
 		return result, true

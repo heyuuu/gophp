@@ -589,7 +589,7 @@ func ZifPhpSapiName(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	return_value.SetStringVal(core.SM__().Name())
+	return_value.SetString(core.SM__().Name())
 	return
 }
 func ZifPhpUname(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, mode *types.Zval) {
@@ -607,7 +607,7 @@ func ZifPhpUname(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, mode *type
 		}
 		break
 	}
-	return_value.SetString(PhpGetUname(*mode))
+	return_value.SetStringEx(PhpGetUname(*mode))
 	return
 }
 func ZifPhpIniScannedFiles(executeData zpp.Ex, return_value zpp.Ret) {
@@ -615,7 +615,7 @@ func ZifPhpIniScannedFiles(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	if PhpIniScannedFiles != nil {
-		return_value.SetStringVal(b.CastStrAuto(PhpIniScannedFiles))
+		return_value.SetString(b.CastStrAuto(PhpIniScannedFiles))
 		return
 	} else {
 		return_value.SetFalse()
@@ -627,7 +627,7 @@ func ZifPhpIniLoadedFile(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	if PhpIniOpenedPath != nil {
-		return_value.SetStringVal(b.CastStrAuto(PhpIniOpenedPath))
+		return_value.SetString(b.CastStrAuto(PhpIniOpenedPath))
 		return
 	} else {
 		return_value.SetFalse()

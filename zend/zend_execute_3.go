@@ -204,17 +204,17 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		}
 		newBytes[offset] = c
 
-		str.SetStringVal(string(newBytes))
+		str.SetString(string(newBytes))
 	} else {
 		newBytes := []byte(s)
 		newBytes[offset] = c
 
-		str.SetStringVal(string(newBytes))
+		str.SetString(string(newBytes))
 	}
 
-	opline.Result().SetStringVal(string(c))
+	opline.Result().SetString(string(c))
 }
-func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *types.PropertyInfo {
+func ZendGetPropNotAcceptingDouble(ref *types.Reference) *types.PropertyInfo {
 	var prop *types.PropertyInfo
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **types.PropertyInfo
@@ -238,7 +238,7 @@ func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *types.PropertyInfo
 	}
 	return nil
 }
-func ZendThrowIncdecRefError(ref *types.ZendReference, opline *types.ZendOp) ZendLong {
+func ZendThrowIncdecRefError(ref *types.Reference, opline *types.ZendOp) ZendLong {
 	var error_prop *types.PropertyInfo = ZendGetPropNotAcceptingDouble(ref)
 
 	/* Currently there should be no way for a typed reference to accept both int and double.
@@ -265,7 +265,7 @@ func ZendThrowIncdecPropError(prop *types.PropertyInfo, opline *types.ZendOp) Ze
 		return ZEND_LONG_MIN
 	}
 }
-func ZendIncdecTypedRef(ref *types.ZendReference, copy *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
+func ZendIncdecTypedRef(ref *types.Reference, copy *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var tmp types.Zval
 	var var_ptr *types.Zval = ref.GetVal()
 	if copy == nil {
@@ -323,8 +323,8 @@ func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo, 
 		}
 	} else {
 		for {
-			if prop.IsReference() {
-				var ref *types.ZendReference = prop.Reference()
+			if prop.IsRef() {
+				var ref *types.Reference = prop.Reference()
 				prop = types.Z_REFVAL_P(prop)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendIncdecTypedRef(ref, nil, opline, executeData)
@@ -358,8 +358,8 @@ func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *types.PropertyInfo,
 			prop.SetLong(val)
 		}
 	} else {
-		if prop.IsReference() {
-			var ref *types.ZendReference = prop.Reference()
+		if prop.IsRef() {
+			var ref *types.Reference = prop.Reference()
 			prop = types.Z_REFVAL_P(prop)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendIncdecTypedRef(ref, opline.Result(), opline, executeData)

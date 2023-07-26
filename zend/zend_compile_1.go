@@ -247,7 +247,7 @@ func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified bool) bo
 	var c *ZendConstant = EG__().ConstantTable().Get(name)
 
 	/* Substitute case-sensitive (or lowercase) constants */
-	if c != nil && ((c.IsPersistent() && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && !c.IsNoFileCache() || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.Value().GetType() < types.IsObject && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
+	if c != nil && ((c.IsPersistent() && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && !c.IsNoFileCache() || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.Value().Type() < types.IsObject && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
 		types.ZVAL_COPY_OR_DUP(zv, c.Value())
 		return 1
 	}
@@ -329,20 +329,20 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
 		if CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() {
-			zv.SetStringVal(CG__().GetActiveClassEntry().GetName().GetStr())
+			zv.SetString(CG__().GetActiveClassEntry().GetName().GetStr())
 			return 1
 		}
 		return 0
 	case ZEND_FETCH_CLASS_PARENT:
 		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().GetParentName() != nil && ZendIsScopeKnown() {
-			zv.SetStringVal(CG__().GetActiveClassEntry().GetParentName().GetStr())
+			zv.SetString(CG__().GetActiveClassEntry().GetParentName().GetStr())
 			return 1
 		}
 		return 0
 	case ZEND_FETCH_CLASS_STATIC:
 		return 0
 	case ZEND_FETCH_CLASS_DEFAULT:
-		zv.SetString(ZendResolveClassNameAst(class_ast))
+		zv.SetStringEx(ZendResolveClassNameAst(class_ast))
 		return 1
 	default:
 
@@ -402,7 +402,7 @@ func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *typ
 
 	/* Substitute case-sensitive (or lowercase) persistent class constants */
 
-	if c.GetType() < types.IsObject {
+	if c.Type() < types.IsObject {
 		types.ZVAL_COPY_OR_DUP(zv, c)
 		return 1
 	}

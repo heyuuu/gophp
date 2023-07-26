@@ -15,5 +15,5 @@ var DefZifCrypt = def.DefFunc("crypt", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 		return
 	}
 	ret := ZifCrypt(str_, nil, salt_)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })

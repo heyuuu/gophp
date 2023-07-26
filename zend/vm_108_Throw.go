@@ -31,7 +31,7 @@ func ZEND_THROW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	for {
 		if !value.IsObject() {
-			if value.IsReference() {
+			if value.IsRef() {
 				value = types.Z_REFVAL_P(value)
 				if value.IsObject() {
 					break
@@ -61,7 +61,7 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	value = opline.Op1()
 	for {
 		if !value.IsObject() {
-			if value.IsReference() {
+			if value.IsRef() {
 				value = types.Z_REFVAL_P(value)
 				if value.IsObject() {
 					break
@@ -91,7 +91,7 @@ func ZEND_THROW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	value = opline.Op1()
 	for {
 		if !value.IsObject() {
-			if value.IsReference() {
+			if value.IsRef() {
 				value = types.Z_REFVAL_P(value)
 				if value.IsObject() {
 					break

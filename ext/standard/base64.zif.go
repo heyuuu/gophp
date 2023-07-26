@@ -13,7 +13,7 @@ var DefZifBase64Encode = def.DefFunc("base64_encode", 1, 1, []def.ArgInfo{{Name:
 		return
 	}
 	ret := ZifBase64Encode(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifBase64Decode
@@ -27,7 +27,7 @@ var DefZifBase64Decode = def.DefFunc("base64_decode", 1, 2, []def.ArgInfo{{Name:
 	}
 	ret, ok := ZifBase64Decode(str, nil, strict)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

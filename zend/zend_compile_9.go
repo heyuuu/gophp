@@ -593,7 +593,7 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 				return
 			}
 			c = uint8(container.String().GetStr()[offset])
-			result.SetStringVal(string(c))
+			result.SetString(string(c))
 		} else if container.IsSignFalse() {
 			result.SetNull()
 		} else {

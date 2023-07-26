@@ -22,7 +22,7 @@ func ZendIsCallableImpl(callable *types.Zval, object *types.Object, checkFlags u
 	fcc.SetFunctionHandler(nil)
 	fcc.SetObject(nil)
 again:
-	switch callable.GetType() {
+	switch callable.Type() {
 	case types.IsString:
 		if object != nil {
 			fcc.SetObject(object)
@@ -76,8 +76,8 @@ again:
 			break
 		}
 		if callable.Array().Len() == 2 {
-			if obj == nil || lang.CondF(!(obj.IsReference()), func() bool { return !obj.IsString() && !obj.IsObject() }, func() bool {
-				return types.Z_REFVAL_P(obj).GetType() != types.IsString && types.Z_REFVAL_P(obj).GetType() != types.IsObject
+			if obj == nil || lang.CondF(!(obj.IsRef()), func() bool { return !obj.IsString() && !obj.IsObject() }, func() bool {
+				return types.Z_REFVAL_P(obj).Type() != types.IsString && types.Z_REFVAL_P(obj).Type() != types.IsObject
 			}) {
 				if error != nil {
 					*error = Estrdup("first array member is not a valid class name or object")
@@ -199,7 +199,7 @@ func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ types.IFunction, args *
 		var _z *types.Zval = _p.GetVal()
 
 		arg = _z
-		if func_ != nil && !(arg.IsReference()) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
+		if func_ != nil && !(arg.IsRef()) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
 			params.SetNewRef(arg)
 			// arg.TryAddRefcount()
 		} else {
@@ -342,7 +342,7 @@ func ZendDeclareTypedProperty(
 		}
 	}
 	if ce.IsInternalClass() {
-		switch property.GetType() {
+		switch property.Type() {
 		case types.IsArray, types.IsObject, types.IsResource:
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Internal zval's can't be arrays, objects or resources")
 		}
@@ -352,7 +352,7 @@ func ZendDeclareTypedProperty(
 	ce.PropertyTable().Update(name.GetStr(), propInfo)
 	return types.SUCCESS
 }
-func ZendTryAssignTypedRefEx(ref *types.ZendReference, val *types.Zval, strict bool) int {
+func ZendTryAssignTypedRefEx(ref *types.Reference, val *types.Zval, strict bool) int {
 	if ZendVerifyRefAssignableZval(ref, val, strict) == 0 {
 		// ZvalPtrDtor(val)
 		return types.FAILURE
@@ -362,6 +362,6 @@ func ZendTryAssignTypedRefEx(ref *types.ZendReference, val *types.Zval, strict b
 		return types.SUCCESS
 	}
 }
-func ZendTryAssignTypedRef(ref *types.ZendReference, val *types.Zval) int {
+func ZendTryAssignTypedRef(ref *types.Reference, val *types.Zval) int {
 	return ZendTryAssignTypedRefEx(ref, val, CurrEX().IsArgUseStrictTypes())
 }

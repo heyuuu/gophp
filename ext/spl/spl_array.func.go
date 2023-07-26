@@ -192,7 +192,7 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 		return zend.EG__().GetErrorZval()
 	}
 try_again:
-	switch offset.GetType() {
+	switch offset.Type() {
 	case types.IsNull:
 		offset_key = types.NewString("")
 		goto fetch_dim_string
@@ -318,7 +318,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *types.Zval, offset *ty
 	 * by separating (if necessary) and returning as IS_REFERENCE (with refcount == 1)
 	 */
 
-	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW || type_ == zend.BP_VAR_UNSET) && !(ret.IsReference()) && ret != zend.UninitializedZval() {
+	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW || type_ == zend.BP_VAR_UNSET) && !(ret.IsRef()) && ret != zend.UninitializedZval() {
 		ret.SetNewRef(ret)
 	}
 	return ret
@@ -352,7 +352,7 @@ func SplArrayWriteDimensionEx(check_inherited int, object *types.Zval, offset *t
 		return
 	}
 try_again:
-	switch offset.GetType() {
+	switch offset.Type() {
 	case types.IsString:
 		ht = SplArrayGetHashTable(intern)
 		ht.SymtableUpdateInd(offset.String().GetStr(), value)
@@ -406,7 +406,7 @@ func SplArrayUnsetDimensionEx(check_inherited int, object *types.Zval, offset *t
 		return
 	}
 try_again:
-	switch offset.GetType() {
+	switch offset.Type() {
 	case types.IsString:
 		ht = SplArrayGetHashTable(intern)
 		if ht == zend.EG__().GetSymbolTable() {
@@ -491,7 +491,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 	if value == nil {
 		var ht *types.Array = SplArrayGetHashTable(intern)
 	try_again:
-		switch offset.GetType() {
+		switch offset.Type() {
 		case types.IsString:
 			if lang.Assign(&tmp, ht.SymtableFind(offset.String().GetStr())) != nil {
 				if check_empty == 2 {
@@ -788,7 +788,7 @@ func SplArrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *types.Zval) {
 		if pair == nil {
 			key.SetNull()
 		} else if pair.GetKey().IsStrKey() {
-			key.SetStringVal(pair.GetKey().StrKey())
+			key.SetString(pair.GetKey().StrKey())
 		} else {
 			key.SetLong(pair.GetKey().IdxKey())
 		}
@@ -922,7 +922,7 @@ func zim_spl_Array_getIteratorClass(executeData *zend.ZendExecuteData, return_va
 		return
 	}
 	//intern.GetCeGetIterator().GetName().AddRefcount()
-	return_value.SetString(intern.GetCeGetIterator().GetName())
+	return_value.SetStringEx(intern.GetCeGetIterator().GetName())
 	return
 }
 func zim_spl_Array_getFlags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1048,7 +1048,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 	var function_name types.Zval
 	var params []types.Zval
 	var arg *types.Zval = nil
-	function_name.SetStringVal(b.CastStr(fname, fname_len))
+	function_name.SetString(b.CastStr(fname, fname_len))
 	params[0].SetNewEmptyRef()
 	types.Z_REFVAL(params[0]).SetArray(aht)
 	// 	aht.AddRefcount()
@@ -1240,7 +1240,7 @@ func zim_spl_Array_serialize(executeData *zend.ZendExecuteData, return_value *ty
 	/* done */
 	buf.DestroyData()
 
-	return_value.SetStringVal(buf.String())
+	return_value.SetString(buf.String())
 }
 func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = executeData.ThisObjectZval()
@@ -1379,7 +1379,7 @@ func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *
 	if intern.GetCeGetIterator() == spl_ce_ArrayIterator {
 		tmp.SetNull()
 	} else {
-		tmp.SetStringVal(intern.GetCeGetIterator().GetName().GetStr())
+		tmp.SetString(intern.GetCeGetIterator().GetName().GetStr())
 	}
 	return_value.Array().Append(&tmp)
 }

@@ -157,7 +157,7 @@ func (o *ZicArrayObject) readDimensionEx(checkInherited bool, offset *types.Zval
 	 * ZE has to be fooled into thinking this is in a reference set
 	 * by separating (if necessary) and returning as IS_REFERENCE (with refcount == 1)
 	 */
-	if (typ == zend.BP_VAR_W || typ == zend.BP_VAR_RW || typ == zend.BP_VAR_UNSET) && !(ret.IsReference()) && ret != zend.UninitializedZval() {
+	if (typ == zend.BP_VAR_W || typ == zend.BP_VAR_RW || typ == zend.BP_VAR_UNSET) && !(ret.IsRef()) && ret != zend.UninitializedZval() {
 		ret.SetNewRef(ret)
 	}
 	return ret
@@ -195,7 +195,7 @@ func (o *ZicArrayObject) writeDimensionEx(checkInherited bool, offset *types.Zva
 	// 解析 offset 为 string or int
 	isStrKey, isAppend, index, strKey := false, false, 0, ""
 	offset = offset.DeRef()
-	switch offset.GetType() {
+	switch offset.Type() {
 	case types.IsString:
 		isStrKey = true
 		strKey = offset.StringVal()
@@ -255,7 +255,7 @@ func (o *ZicArrayObject) hasDimensionEx(checkInherited bool, offset *types.Zval,
 		isStrKey, index, strKey := false, 0, ""
 
 		offset = offset.DeRef()
-		switch offset.GetType() {
+		switch offset.Type() {
 		case types.IsString:
 			isStrKey = true
 			strKey = offset.StringVal()
@@ -325,7 +325,7 @@ func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, offset *types.Zva
 	// 解析 offset 为 string or int
 	isStrKey, index, strKey := false, 0, ""
 	offset = offset.DeRef()
-	switch offset.GetType() {
+	switch offset.Type() {
 	case types.IsString:
 		isStrKey = true
 		strKey = offset.StringVal()
@@ -454,7 +454,7 @@ func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zva
 	// 解析 offset 为 string or int
 	isStrKey, index, strKey := false, 0, ""
 	offset = offset.DeRef()
-	switch offset.GetType() {
+	switch offset.Type() {
 	case types.IsNull:
 		isStrKey = true
 		strKey = ""

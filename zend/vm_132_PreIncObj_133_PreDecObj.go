@@ -17,7 +17,7 @@ func ZEND_PRE_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	property = opline.Const2()
 	for {
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto pre_incdec_object
 			}
@@ -69,7 +69,7 @@ func ZEND_PRE_INC_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	property = opline.Op2()
 	for {
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto pre_incdec_object
 			}
@@ -123,7 +123,7 @@ func ZEND_PRE_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	property = opline.Cv2OrUndef()
 	for {
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto pre_incdec_object
 			}
@@ -295,7 +295,7 @@ func ZEND_PRE_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	property = opline.Const2()
 	for {
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto pre_incdec_object
 			}
@@ -346,7 +346,7 @@ func ZEND_PRE_INC_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	property = opline.Op2()
 	for {
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto pre_incdec_object
 			}
@@ -396,7 +396,7 @@ func ZEND_PRE_INC_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	property = opline.Cv2OrUndef()
 	for {
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto pre_incdec_object
 			}

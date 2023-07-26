@@ -9,46 +9,46 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendTryAssignTypedRefNull(ref *types.ZendReference) int {
+func ZendTryAssignTypedRefNull(ref *types.Reference) int {
 	var tmp types.Zval
 	tmp.SetNull()
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefLong(ref *types.ZendReference, lval ZendLong) int {
+func ZendTryAssignTypedRefLong(ref *types.Reference, lval ZendLong) int {
 	var tmp types.Zval
 	tmp.SetLong(lval)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefDouble(ref *types.ZendReference, dval float64) int {
+func ZendTryAssignTypedRefDouble(ref *types.Reference, dval float64) int {
 	var tmp types.Zval
 	tmp.SetDouble(dval)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefEmptyString(ref *types.ZendReference) int {
+func ZendTryAssignTypedRefEmptyString(ref *types.Reference) int {
 	zv := types.NewZvalString("")
 	return ZendTryAssignTypedRef(ref, zv)
 }
-func ZendTryAssignTypedRefStr(ref *types.ZendReference, str *types.String) int {
+func ZendTryAssignTypedRefStr(ref *types.Reference, str *types.String) int {
 	var tmp types.Zval
-	tmp.SetString(str)
+	tmp.SetStringEx(str)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefString(ref *types.ZendReference, string *byte) int {
+func ZendTryAssignTypedRefString(ref *types.Reference, string *byte) int {
 	var tmp types.Zval
-	tmp.SetStringVal(b.CastStrAuto(string))
+	tmp.SetString(b.CastStrAuto(string))
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefStringl(ref *types.ZendReference, string *byte, len_ int) int {
+func ZendTryAssignTypedRefStringl(ref *types.Reference, string *byte, len_ int) int {
 	var tmp types.Zval
-	tmp.SetStringVal(b.CastStr(string, len_))
+	tmp.SetString(b.CastStr(string, len_))
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefArr(ref *types.ZendReference, arr *types.Array) int {
+func ZendTryAssignTypedRefArr(ref *types.Reference, arr *types.Array) int {
 	var tmp types.Zval
 	tmp.SetArray(arr)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefZvalEx(ref *types.ZendReference, zv *types.Zval, strict bool) int {
+func ZendTryAssignTypedRefZvalEx(ref *types.Reference, zv *types.Zval, strict bool) int {
 	var tmp types.Zval
 	types.ZVAL_COPY_VALUE(&tmp, zv)
 	return ZendTryAssignTypedRefEx(ref, &tmp, strict)
@@ -74,7 +74,7 @@ func ZendDeclarePropertyLong(ce *types.ClassEntry, name string, name_length int,
 }
 func ZendDeclarePropertyString(ce *types.ClassEntry, name string, name_length int, value string, access_type int) int {
 	var property types.Zval
-	property.SetString(types.NewString(value))
+	property.SetStringEx(types.NewString(value))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, accessType uint32, docComment *types.String) int {
@@ -182,7 +182,7 @@ func ZendGetObjectType(ce *types.ClassEntry) string {
 	}
 }
 func ZendIsIterable(iterable *types.Zval) bool {
-	switch iterable.GetType() {
+	switch iterable.Type() {
 	case types.IsArray:
 		return 1
 	case types.IsObject:
@@ -192,7 +192,7 @@ func ZendIsIterable(iterable *types.Zval) bool {
 	}
 }
 func ZendIsCountable(countable *types.Zval) bool {
-	switch countable.GetType() {
+	switch countable.Type() {
 	case types.IsArray:
 		return 1
 	case types.IsObject:

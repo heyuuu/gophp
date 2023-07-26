@@ -53,7 +53,7 @@ var DefZifUtf8Encode = def.DefFunc("utf8_encode", 1, 1, []def.ArgInfo{{Name: "da
 		return
 	}
 	ret := ZifUtf8Encode(data)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifUtf8Decode
@@ -64,5 +64,5 @@ var DefZifUtf8Decode = def.DefFunc("utf8_decode", 1, 1, []def.ArgInfo{{Name: "da
 		return
 	}
 	ret := ZifUtf8Decode(data)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })

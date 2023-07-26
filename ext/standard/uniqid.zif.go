@@ -15,5 +15,5 @@ var DefZifUniqid = def.DefFunc("uniqid", 0, 2, []def.ArgInfo{{Name: "prefix"}, {
 		return
 	}
 	ret := ZifUniqid(nil, prefix, more_entropy)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })

@@ -13,7 +13,7 @@ func ZEND_ASSIGN_STATIC_PROP_OP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var prop *types.Zval
 	var value *types.Zval
 	var prop_info *types.PropertyInfo
-	var ref *types.ZendReference
+	var ref *types.Reference
 	if ZendFetchStaticPropertyAddress(&prop, &prop_info, (opline+1).GetExtendedValue(), BP_VAR_RW, 0, opline, executeData) != types.SUCCESS {
 		b.Assert(EG__().GetException() != nil)
 		UNDEF_RESULT()
@@ -22,7 +22,7 @@ func ZEND_ASSIGN_STATIC_PROP_OP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	}
 	value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 	for {
-		if prop.IsReference() {
+		if prop.IsRef() {
 			ref = prop.Reference()
 			prop = types.Z_REFVAL_P(prop)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {

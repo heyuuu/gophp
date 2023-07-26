@@ -9,8 +9,8 @@ import (
 func _ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict bool, is_ref int) {
 	for {
 		var _zv *types.Zval = zv
-		if is_ref != 0 || _zv.IsReference() {
-			var ref *types.ZendReference = _zv.Reference()
+		if is_ref != 0 || _zv.IsRef() {
+			var ref *types.Reference = _zv.Reference()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefZvalEx(ref, other_zv, strict)
 				break
@@ -31,8 +31,8 @@ func ZEND_TRY_ASSIGN_COPY_EX(zv *types.Zval, other_zv *types.Zval, strict bool) 
 }
 func ZendTryArrayInitSize(zv *types.Zval, size uint32) *types.Zval {
 	var arr *types.Array = types.NewArray(size)
-	if zv.IsReference() {
-		var ref *types.ZendReference = zv.Reference()
+	if zv.IsRef() {
+		var ref *types.Reference = zv.Reference()
 		if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 			if ZendTryAssignTypedRefArr(ref, arr) != types.SUCCESS {
 				return nil

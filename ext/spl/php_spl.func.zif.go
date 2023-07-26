@@ -86,7 +86,7 @@ var DefZifSplAutoloadExtensions = def.DefFunc("spl_autoload_extensions", 0, 1, [
 		return
 	}
 	ret := ZifSplAutoloadExtensions(nil, file_extensions)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifSplAutoloadCall
@@ -140,7 +140,7 @@ var DefZifSplObjectHash = def.DefFunc("spl_object_hash", 1, 1, []def.ArgInfo{{Na
 		return
 	}
 	ret := ZifSplObjectHash(obj)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifSplObjectId

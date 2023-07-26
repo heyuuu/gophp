@@ -23,7 +23,7 @@ func AddFunctionEx(result *types.Zval, op1 *types.Zval, op2 *types.Zval) bool {
 }
 
 func _addFunctionFast(result *types.Zval, op1 *types.Zval, op2 *types.Zval) bool {
-	switch TypePair(op1.GetType(), op1.GetType()) {
+	switch TypePair(op1.Type(), op1.Type()) {
 	case TypeLongLong:
 		FastLongAddFunction(result, op1, op2)
 		return true

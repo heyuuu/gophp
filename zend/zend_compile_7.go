@@ -105,7 +105,7 @@ func (compiler *Compiler) CompileGroupUse(ast *ZendAst) {
 		var name *types.String = name_zval.String()
 		var compound_ns string = ZendConcatNames(ns.GetStr(), name.GetStr())
 		// types.ZendStringReleaseEx(name, 0)
-		name_zval.SetStringVal(compound_ns)
+		name_zval.SetString(compound_ns)
 		inline_use = AstCreateList(ZEND_AST_USE, use)
 		if ast.Attr() != 0 {
 			inline_use.SetAttr(ast.Attr())
@@ -141,7 +141,7 @@ func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
 			}
 		}
 		name_node.SetOpType(IS_CONST)
-		name_node.GetConstant().SetString(name)
+		name_node.GetConstant().SetStringEx(name)
 		ZendEmitOp(nil, ZEND_DECLARE_CONST, &name_node, &value_node)
 		ZendRegisterSeenSymbol(name, ZEND_SYMBOL_CONST)
 	}
@@ -228,19 +228,19 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) bool {
 	case T_LINE:
 		zv.SetLong(ast.Lineno())
 	case T_FILE:
-		zv.SetStringVal(CG__().GetCompiledFilename())
+		zv.SetString(CG__().GetCompiledFilename())
 	case T_DIR:
 		var filename = CG__().GetCompiledFilename()
 		var dirname = ZendDirname(filename)
 		if dirname == "." {
 			dirname, _ = os.Getwd()
 		}
-		zv.SetStringVal(dirname)
+		zv.SetString(dirname)
 	case T_FUNC_C:
 		if op_array != nil && op_array.FunctionName() != "" {
-			zv.SetStringVal(op_array.FunctionName())
+			zv.SetString(op_array.FunctionName())
 		} else {
-			zv.SetStringVal("")
+			zv.SetString("")
 		}
 	case T_METHOD_C:
 
@@ -252,34 +252,34 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) bool {
 		}
 		if op_array != nil && op_array.FunctionName() != "" {
 			if op_array.GetScope() != nil {
-				zv.SetStringVal(op_array.GetScope().Name() + "::" + op_array.FunctionName())
+				zv.SetString(op_array.GetScope().Name() + "::" + op_array.FunctionName())
 			} else {
-				zv.SetStringVal(op_array.FunctionName())
+				zv.SetString(op_array.FunctionName())
 			}
 		} else {
-			zv.SetStringVal("")
+			zv.SetString("")
 		}
 	case T_CLASS_C:
 		if ce != nil {
 			if ce.IsTrait() {
 				return 0
 			} else {
-				zv.SetStringVal(ce.Name())
+				zv.SetString(ce.Name())
 			}
 		} else {
-			zv.SetStringVal("")
+			zv.SetString("")
 		}
 	case T_TRAIT_C:
 		if ce != nil && ce.IsTrait() {
-			zv.SetStringVal(ce.Name())
+			zv.SetString(ce.Name())
 		} else {
-			zv.SetStringVal("")
+			zv.SetString("")
 		}
 	case T_NS_C:
 		if FC__().GetCurrentNamespace() != nil {
-			zv.SetStringVal(FC__().GetCurrentNamespace().GetStr())
+			zv.SetString(FC__().GetCurrentNamespace().GetStr())
 		} else {
-			zv.SetStringVal("")
+			zv.SetString("")
 		}
 	default:
 
@@ -424,7 +424,7 @@ func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool 
 		key_ast = elem_ast.Child(1)
 		if key_ast != nil {
 			var key *types.Zval = key_ast.Val()
-			switch key.GetType() {
+			switch key.Type() {
 			case types.IsLong:
 				result.Array().IndexUpdate(key.Long(), value)
 			case types.IsString:

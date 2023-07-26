@@ -503,7 +503,7 @@ func ZifVsprintf(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, a
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetString(result)
+	return_value.SetStringEx(result)
 }
 
 //@zif -name printf

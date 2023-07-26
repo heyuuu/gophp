@@ -543,7 +543,7 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 			guard.MarkInGet(false)
 			if rv.IsNotUndef() {
 				retval = rv
-				if !(rv.IsReference()) && (typ == BP_VAR_W || typ == BP_VAR_RW || typ == BP_VAR_UNSET) {
+				if !(rv.IsRef()) && (typ == BP_VAR_W || typ == BP_VAR_RW || typ == BP_VAR_UNSET) {
 					if !rv.IsObject() {
 						faults.Error(faults.E_NOTICE, "Indirect modification of overloaded property %s::$%s has no effect", zobj.GetCe().Name(), name.GetVal())
 					}
@@ -591,7 +591,7 @@ func ZendStdWritePropertyEx(zobj *types.Object, member *types.Zval, value *types
 	var tmp types.Zval
 	var property_offset uintPtr
 	var prop_info *types.PropertyInfo = nil
-	b.Assert(!(value.IsReference()))
+	b.Assert(!(value.IsRef()))
 	name = operators.ZvalTryGetString(member)
 	if name == nil {
 		return value
@@ -835,7 +835,7 @@ func ZendStdUnsetPropertyEx(zobj *types.Object, member *types.Zval, cache_slot *
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		var slot *types.Zval = OBJ_PROP(zobj, property_offset)
 		if slot.IsNotUndef() {
-			if slot.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(slot.Reference()) {
+			if slot.IsRef() && ZEND_REF_HAS_TYPE_SOURCES(slot.Reference()) {
 				if prop_info != nil {
 					ZEND_REF_DEL_TYPE_SOURCE(slot.Reference(), prop_info)
 				}
@@ -1394,7 +1394,7 @@ func ZendStdCastObject(obj *types.Object, retval *types.Zval, typ types.ZvalType
 	switch typ {
 	case types.IsString:
 		if str, ok := StdCastObjectToString(obj); ok {
-			retval.SetStringVal(str)
+			retval.SetString(str)
 			return types.SUCCESS
 		}
 		return types.FAILURE

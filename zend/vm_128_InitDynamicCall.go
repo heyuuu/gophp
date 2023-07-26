@@ -38,7 +38,7 @@ try_function_name:
 		call = ZendInitDynamicCallObject(function_name, opline.GetExtendedValue())
 	} else if function_name.IsArray() {
 		call = ZendInitDynamicCallArray(function_name.GetArr(), opline.GetExtendedValue())
-	} else if function_name.IsReference() {
+	} else if function_name.IsRef() {
 		function_name = types.Z_REFVAL_P(function_name)
 		goto try_function_name
 	} else {
@@ -83,7 +83,7 @@ try_function_name:
 		call = ZendInitDynamicCallObject(function_name, opline.GetExtendedValue())
 	} else if function_name.IsArray() {
 		call = ZendInitDynamicCallArray(function_name.GetArr(), opline.GetExtendedValue())
-	} else if function_name.IsReference() {
+	} else if function_name.IsRef() {
 		function_name = types.Z_REFVAL_P(function_name)
 		goto try_function_name
 	} else {

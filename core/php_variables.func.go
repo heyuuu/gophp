@@ -537,15 +537,15 @@ func PhpRegisterServerVariables() {
 	/* PHP Authentication support */
 
 	if SG__().RequestInfo.authUser {
-		tmp.SetStringVal(b.CastStrAuto(SG__().RequestInfo.authUser))
+		tmp.SetString(b.CastStrAuto(SG__().RequestInfo.authUser))
 		PhpRegisterVariableQuick("PHP_AUTH_USER", &tmp, ht)
 	}
 	if SG__().RequestInfo.authPassword {
-		tmp.SetStringVal(b.CastStrAuto(SG__().RequestInfo.authPassword))
+		tmp.SetString(b.CastStrAuto(SG__().RequestInfo.authPassword))
 		PhpRegisterVariableQuick("PHP_AUTH_PW", &tmp, ht)
 	}
 	if SG__().RequestInfo.authDigest {
-		tmp.SetStringVal(b.CastStrAuto(SG__().RequestInfo.authDigest))
+		tmp.SetString(b.CastStrAuto(SG__().RequestInfo.authDigest))
 		PhpRegisterVariableQuick("PHP_AUTH_DIGEST", &tmp, ht)
 	}
 
@@ -624,7 +624,7 @@ func CheckHttpProxy(var_table *types.Array) {
 			var_table.KeyDelete("HTTP_PROXY")
 		} else {
 			var local_zval types.Zval
-			local_zval.SetStringVal(b.CastStrAuto(local_proxy))
+			local_zval.SetString(b.CastStrAuto(local_proxy))
 			var_table.KeyUpdate("HTTP_PROXY", &local_zval)
 		}
 	}

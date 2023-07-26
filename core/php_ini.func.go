@@ -131,7 +131,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 			/* Store in active hash */
 
 			entry = active_hash.KeyUpdate(arg1.String().GetStr(), arg2)
-			entry.SetStringVal(entry.StringVal())
+			entry.SetString(entry.StringVal())
 		}
 
 		/* PHP and Zend extensions are not added into configuration hash! */
@@ -163,7 +163,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 		} else {
 			entry = find_arr.Array().Append(arg2)
 		}
-		entry.SetStringVal(entry.StringVal())
+		entry.SetString(entry.StringVal())
 	case zend.ZEND_INI_PARSER_SECTION:
 		var key string
 		/* PATH sections */
@@ -396,7 +396,7 @@ func PhpInitConfig() int {
 		RESET_ACTIVE_INI_HASH()
 		zend.ZendParseIniFile(fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash())
 		var tmp types.Zval
-		tmp.SetString(types.NewString(fh.GetFilename()))
+		tmp.SetStringEx(types.NewString(fh.GetFilename()))
 		Config().Set("cfg_file_path", fh.GetFilename())
 		PhpIniOpenedPath = zend.ZendStrndup(tmp.String().GetVal(), tmp.String().GetLen())
 	}

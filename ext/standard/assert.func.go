@@ -127,9 +127,9 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 		var retval types.Zval
 		var lineno uint32 = zend.ZendGetExecutedLineno()
 		var filename *byte = zend.ZendGetExecutedFilename()
-		args[0].SetStringVal(b.CastStrAuto(SAFE_STRING(filename)))
+		args[0].SetString(b.CastStrAuto(SAFE_STRING(filename)))
 		args[1].SetLong(lineno)
-		args[2].SetStringVal(b.CastStrAuto(SAFE_STRING(myeval)))
+		args[2].SetString(b.CastStrAuto(SAFE_STRING(myeval)))
 		retval.SetFalse()
 
 		/* XXX do we want to check for error here? */
@@ -139,7 +139,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 			// zend.ZvalPtrDtor(&args[2])
 			// zend.ZvalPtrDtor(&args[0])
 		} else {
-			args[3].SetString(operators.ZvalGetString(description))
+			args[3].SetStringEx(operators.ZvalGetString(description))
 			zend.CallUserFunction(nil, &(ASSERTG(callback)), &retval, 4, args)
 			// zend.ZvalPtrDtor(&args[3])
 			// zend.ZvalPtrDtor(&args[2])
@@ -261,7 +261,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 		if ASSERTG(callback).IsNotUndef() {
 			types.ZVAL_COPY(return_value, &(ASSERTG(callback)))
 		} else if ASSERTG(cb) {
-			return_value.SetStringVal(b.CastStrAuto(ASSERTG(cb)))
+			return_value.SetString(b.CastStrAuto(ASSERTG(cb)))
 		} else {
 			return_value.SetNull()
 		}

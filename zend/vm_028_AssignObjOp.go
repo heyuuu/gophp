@@ -20,7 +20,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
 			}
@@ -47,9 +47,9 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
-				var ref *types.ZendReference
+				var ref *types.Reference
 				for {
-					if zptr.IsReference() {
+					if zptr.IsRef() {
 						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -109,7 +109,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
 			}
@@ -135,9 +135,9 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
-				var ref *types.ZendReference
+				var ref *types.Reference
 				for {
-					if zptr.IsReference() {
+					if zptr.IsRef() {
 						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -197,7 +197,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
 			}
@@ -223,9 +223,9 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
-				var ref *types.ZendReference
+				var ref *types.Reference
 				for {
-					if zptr.IsReference() {
+					if zptr.IsRef() {
 						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -300,9 +300,9 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) 
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
-				var ref *types.ZendReference
+				var ref *types.Reference
 				for {
-					if zptr.IsReference() {
+					if zptr.IsRef() {
 						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -374,9 +374,9 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData)
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
-				var ref *types.ZendReference
+				var ref *types.Reference
 				for {
-					if zptr.IsReference() {
+					if zptr.IsRef() {
 						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -448,9 +448,9 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
-				var ref *types.ZendReference
+				var ref *types.Reference
 				for {
-					if zptr.IsReference() {
+					if zptr.IsRef() {
 						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -505,7 +505,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
 			}
@@ -532,9 +532,9 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
-				var ref *types.ZendReference
+				var ref *types.Reference
 				for {
-					if zptr.IsReference() {
+					if zptr.IsRef() {
 						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -590,7 +590,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
 			}
@@ -616,9 +616,9 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
-				var ref *types.ZendReference
+				var ref *types.Reference
 				for {
-					if zptr.IsReference() {
+					if zptr.IsRef() {
 						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -674,7 +674,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 		if !object.IsObject() {
-			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
+			if object.IsRef() && types.Z_REFVAL_P(object).IsObject() {
 				object = types.Z_REFVAL_P(object)
 				goto assign_op_object
 			}
@@ -700,9 +700,9 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
-				var ref *types.ZendReference
+				var ref *types.Reference
 				for {
-					if zptr.IsReference() {
+					if zptr.IsRef() {
 						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {

@@ -18,7 +18,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 		if tmp == nil {
 			return nil
 		}
-		tmp_inc_filename.SetString(tmp)
+		tmp_inc_filename.SetStringEx(tmp)
 		inc_filename = &tmp_inc_filename
 	}
 	switch type_ {
@@ -163,10 +163,10 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
 				var actual *byte = (*byte)(operators.ZendMemrchr(opline.Const2().String().GetVal(), '\\', opline.Const2().String().GetLen()))
 				if actual == nil {
-					opline.Result().SetStringVal(opline.Const2().String().GetStr())
+					opline.Result().SetString(opline.Const2().String().GetStr())
 				} else {
 					actual++
-					opline.Result().SetStringVal(b.CastStr(actual, opline.Const2().String().GetLen()-(actual-opline.Const2().String().GetVal())))
+					opline.Result().SetString(b.CastStr(actual, opline.Const2().String().GetLen()-(actual-opline.Const2().String().GetVal())))
 				}
 
 				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().String().GetVal(), opline.Result().String().GetVal())

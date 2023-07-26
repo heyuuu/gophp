@@ -21,7 +21,7 @@ func ZifGethostname(executeData zpp.Ex, return_value zpp.Ret) {
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetStringVal(b.CastStrAuto(buf))
+	return_value.SetString(b.CastStrAuto(buf))
 	return
 }
 func ZifGethostbyaddr(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types.Zval) {
@@ -44,7 +44,7 @@ func ZifGethostbyaddr(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Address is not a valid IPv4 or IPv6 address")
 		return_value.SetFalse()
 	} else {
-		return_value.SetString(hostname)
+		return_value.SetStringEx(hostname)
 	}
 }
 func PhpGethostbyaddr(ip *byte) *types.String {
@@ -82,10 +82,10 @@ func ZifGethostbyname(executeData zpp.Ex, return_value zpp.Ret, hostname *types.
 		/* name too long, protect from CVE-2015-0235 */
 
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
-		return_value.SetStringVal(b.CastStr(hostname, hostname_len))
+		return_value.SetString(b.CastStr(hostname, hostname_len))
 		return
 	}
-	return_value.SetString(PhpGethostbyname(hostname))
+	return_value.SetStringEx(PhpGethostbyname(hostname))
 	return
 }
 func ZifGethostbynamel(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval) {

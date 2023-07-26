@@ -3,7 +3,7 @@ package types
 // ZVAL_COPY_VALUE
 func (zv *Zval) CopyValueFrom(v *Zval) {
 	// 复制除 u2 外所有数据
-	zv.typ, zv.value = v.typ, v.value
+	zv.v = v.v
 }
 func (zv *Zval) CopyValue() *Zval {
 	var tmp Zval
@@ -46,7 +46,7 @@ func (zv *Zval) CopyOrDupPropFrom(v *Zval) {
 
 // ZVAL_DEREF(zv)
 func (zv *Zval) DeRef() *Zval {
-	if zv.IsReference() {
+	if zv.IsRef() {
 		return zv.Reference().GetVal()
 	}
 	return zv
@@ -64,7 +64,7 @@ func (zv *Zval) DeIndirect() *Zval {
  * GC - Refcount
  */
 func (zv *Zval) IsRefcounted() bool {
-	switch zv.typ {
+	switch zv.Type() {
 	case IsArray, // 不包含 _IS_IMMUTABLE_ARRAY
 		IsObject,
 		IsResource,

@@ -300,7 +300,7 @@ func (compiler *Compiler) CompileFunctionName(name_node *Znode, name_ast *ZendAs
 	resolveName, isFullyQualified := ZendResolveFunctionName(orig_name, name_ast.Attr())
 
 	name_node.SetOpType(IS_CONST)
-	name_node.GetConstant().SetStringVal(resolveName)
+	name_node.GetConstant().SetString(resolveName)
 	return !isFullyQualified && FC__().GetCurrentNamespace() != nil
 }
 func (compiler *Compiler) CompileNsCall(result *Znode, name_node *Znode, args_ast *ZendAst) {
@@ -417,7 +417,7 @@ func (compiler *Compiler) CompileFuncDefined(result *Znode, args *ZendAstList) i
 
 	var c types.Zval
 	var lcname *types.String = operators.ZendStringTolower(name)
-	c.SetString(lcname)
+	c.SetStringEx(lcname)
 	ZendAddLiteral(&c)
 	return types.SUCCESS
 }
@@ -425,7 +425,7 @@ func (compiler *Compiler) CompileFuncChr(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.Children()[0].Kind() == ZEND_AST_ZVAL && ZendAstGetZval(args.Children()[0]).IsLong() {
 		var c ZendLong = ZendAstGetZval(args.Children()[0]).Long() & 0xff
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetStringVal(string(byte(c)))
+		result.GetConstant().SetString(string(byte(c)))
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -447,7 +447,7 @@ func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 	var lcname *types.String
 	var fbc types.IFunction
 	var opline *types.ZendOp
-	if name_ast.Kind() != ZEND_AST_ZVAL || name_ast.Val().GetType() != types.IsString {
+	if name_ast.Kind() != ZEND_AST_ZVAL || name_ast.Val().Type() != types.IsString {
 		return types.FAILURE
 	}
 	name := ZendAstGetStr(name_ast)
@@ -533,7 +533,7 @@ func (compiler *Compiler) CompileAssert(result *Znode, args *ZendAstList, name *
 		ZendEmitOp(nil, ZEND_ASSERT_CHECK, nil, nil)
 		if fbc != nil && FbcIsFinalized(fbc) != 0 {
 			name_node.SetOpType(IS_CONST)
-			name_node.GetConstant().SetStringVal(name.GetStr())
+			name_node.GetConstant().SetString(name.GetStr())
 			opline = ZendEmitOp(nil, ZEND_INIT_FCALL, nil, &name_node)
 		} else {
 			opline = ZendEmitOp(nil, ZEND_INIT_NS_FCALL_BY_NAME, nil, nil)
@@ -541,7 +541,7 @@ func (compiler *Compiler) CompileAssert(result *Znode, args *ZendAstList, name *
 			opline.GetOp2().SetConstant(ZendAddNsFuncNameLiteral(name))
 		}
 		opline.GetResult().SetNum(ZendAllocCacheSlot())
-		if args.GetChildren() == 1 && (args.Children()[0].Kind() != ZEND_AST_ZVAL || ZendAstGetZval(args.Children()[0]).GetType() != types.IsString) {
+		if args.GetChildren() == 1 && (args.Children()[0].Kind() != ZEND_AST_ZVAL || ZendAstGetZval(args.Children()[0]).Type() != types.IsString) {
 
 			/* add "assert(condition) as assertion message */
 			args.AddChild(ZendAstCreateZvalFromStr("assert()"))

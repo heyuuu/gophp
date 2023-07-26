@@ -518,7 +518,7 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type float can only be float or int")
 					}
 					operators.ConvertToDouble(&value_zv)
-				} else if !(types.ZEND_SAME_FAKE_TYPE(type_.Code(), value_zv.GetType())) {
+				} else if !(types.ZEND_SAME_FAKE_TYPE(type_.Code(), value_zv.Type())) {
 					typeName := type_.FormatName()
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be %s", typeName, typeName)
 				}
@@ -759,7 +759,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", extends_name.GetVal())
 		}
 		compiler.CompileExpr(&extends_node, extends_ast)
-		if extends_node.GetOpType() != IS_CONST || extends_node.GetConstant().GetType() != types.IsString {
+		if extends_node.GetOpType() != IS_CONST || extends_node.GetConstant().Type() != types.IsString {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 		}
 		extends_name = extends_node.GetConstant().String()

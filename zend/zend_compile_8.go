@@ -478,7 +478,7 @@ func (compiler *Compiler) CompileShellExec(result *Znode, ast *ZendAst) {
 	var name_ast *ZendAst
 	var args_ast *ZendAst
 	var call_ast *ZendAst
-	fn_name.SetStringVal("shell_exec")
+	fn_name.SetString("shell_exec")
 	name_ast = ZendAstCreateZval(&fn_name)
 	args_ast = AstCreateList(ZEND_AST_ARG_LIST, expr_ast)
 	call_ast = AstCreate(ZEND_AST_CALL, name_ast, args_ast)
@@ -758,7 +758,7 @@ func (compiler *Compiler) CompileEncapsList(result *Znode, ast *ZendAst) {
 		if last_const_node.GetOpType() == IS_CONST {
 			types.ZVAL_COPY_VALUE(result.GetConstant(), last_const_node.GetConstant())
 		} else {
-			result.GetConstant().SetStringVal("")
+			result.GetConstant().SetString("")
 		}
 		CG__().GetActiveOpArray().SetLast(reserved_op_number - 1)
 		return

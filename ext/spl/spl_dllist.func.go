@@ -770,7 +770,7 @@ func zim_spl_SplDoublyLinkedList_serialize(executeData *zend.ZendExecuteData, re
 	/* done */
 	serializer.DestroyData()
 
-	return_value.SetStringVal(serializer.String())
+	return_value.SetString(serializer.String())
 }
 func zim_spl_SplDoublyLinkedList_unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(executeData.ThisObjectZval())

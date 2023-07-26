@@ -17,7 +17,7 @@ func ZifGettype(var_ *types.Zval) string {
 func ZifSettype(var_ zpp.RefZval, typ string) bool {
 	var tmp types.Zval
 	var ptr *types.Zval
-	b.Assert(var_.IsReference())
+	b.Assert(var_.IsRef())
 	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.Reference()) {
 		types.ZVAL_COPY(&tmp, types.Z_REFVAL_P(var_))
 		ptr = &tmp
@@ -166,7 +166,7 @@ func ZifStrval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	return_value.SetString(operators.ZvalGetString(num))
+	return_value.SetStringEx(operators.ZvalGetString(num))
 }
 func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type_ int) {
 	var arg *types.Zval
@@ -252,7 +252,7 @@ func ZifIsNumeric(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
 		}
 		break
 	}
-	switch arg.GetType() {
+	switch arg.Type() {
 	case types.IsLong:
 		fallthrough
 	case types.IsDouble:
@@ -284,7 +284,7 @@ func ZifIsScalar(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
 		}
 		break
 	}
-	switch arg.GetType() {
+	switch arg.Type() {
 	case types.IsFalse:
 		fallthrough
 	case types.IsTrue:

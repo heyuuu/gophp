@@ -15,7 +15,7 @@ var DefZifSha1 = def.DefFunc("sha1", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "
 		return
 	}
 	ret := ZifSha1(str, nil, raw_output)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifSha1File
@@ -29,7 +29,7 @@ var DefZifSha1File = def.DefFunc("sha1_file", 1, 2, []def.ArgInfo{{Name: "filena
 	}
 	ret, ok := ZifSha1File(filename, nil, raw_output)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

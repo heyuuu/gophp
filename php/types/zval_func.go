@@ -4,7 +4,7 @@ import "github.com/heyuuu/gophp/zend"
 
 // zval 类型展示名
 func ZvalGetType(v *Zval) string {
-	switch v.GetType() {
+	switch v.Type() {
 	case IsNull:
 		return "NULL"
 	case IsFalse, IsTrue:
@@ -32,7 +32,7 @@ func ZvalGetType(v *Zval) string {
 
 func ZendZvalTypeName(arg *Zval) string {
 	arg = ZVAL_DEREF(arg)
-	return ZendGetTypeByConst(arg.GetType())
+	return ZendGetTypeByConst(arg.Type())
 }
 
 func ZendGetTypeByConst(type_ uint8) string {

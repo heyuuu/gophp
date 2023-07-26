@@ -49,7 +49,7 @@ func (fci *ZendFcallInfo) UnInit() {
 }
 func (fci *ZendFcallInfo) GetFunctionName() *Zval      { return &fci.functionName }
 func (fci *ZendFcallInfo) ClearFunctionName()          { fci.functionName.SetUndef() }
-func (fci *ZendFcallInfo) SetFunctionName(name string) { fci.functionName.SetStringVal(name) }
+func (fci *ZendFcallInfo) SetFunctionName(name string) { fci.functionName.SetString(name) }
 func (fci *ZendFcallInfo) SetFunctionNameZval(name *Zval) {
 	fci.functionName.CopyValueFrom(name)
 }

@@ -669,7 +669,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 
 		key := p.GetKey()
 		if key.IsStrKey() {
-			generator.GetKey().SetStringVal(key.StrKey())
+			generator.GetKey().SetString(key.StrKey())
 		} else {
 			generator.GetKey().SetLong(key.IdxKey())
 		}

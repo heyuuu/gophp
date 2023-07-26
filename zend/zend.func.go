@@ -106,7 +106,7 @@ func ZendMakePrintableZval(expr *types.Zval, expr_copy *types.Zval) int {
 	if expr.IsString() {
 		return 0
 	} else {
-		expr_copy.SetString(operators.ZvalGetString(expr))
+		expr_copy.SetStringEx(operators.ZvalGetString(expr))
 		return 1
 	}
 }
@@ -116,7 +116,7 @@ func ZendPrintZval(expr *types.Zval) int {
 	return len(str)
 }
 func ZendPrintFlatZvalR(expr *types.Zval) {
-	switch expr.GetType() {
+	switch expr.Type() {
 	case types.IsArray:
 		ZEND_PUTS("Array (")
 		if expr.Array().IsRecursive() {
@@ -149,7 +149,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 	}
 }
 func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
-	switch expr.GetType() {
+	switch expr.Type() {
 	case types.IsArray:
 		buf.WriteString("Array\n")
 		if expr.Array().IsRecursive() {

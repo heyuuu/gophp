@@ -476,7 +476,7 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 		if fptr := zend.EG__().FunctionTable().Get(types.STR_MAGIC_AUTOLOAD); fptr != nil {
 			var tmp types.Zval
 			zend.ArrayInit(return_value)
-			tmp.SetStringVal(types.STR_MAGIC_AUTOLOAD)
+			tmp.SetString(types.STR_MAGIC_AUTOLOAD)
 			return_value.Array().AppendNew(&tmp)
 			return
 		}

@@ -99,7 +99,7 @@ var DefZifStreamSocketRecvfrom = def.DefFunc("stream_socket_recvfrom", 2, 4, []d
 	}
 	ret, ok := ZifStreamSocketRecvfrom(executeData, returnValue, stream_, amount, nil, flags, remote_addr)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

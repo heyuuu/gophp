@@ -11,7 +11,7 @@ var DefZifZendVersion = def.DefFunc("zend_version", 0, 0, []def.ArgInfo{}, func(
 		return
 	}
 	ret := ZifZendVersion()
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifGcMemCaches
@@ -235,7 +235,7 @@ var DefZifGetCalledClass = def.DefFunc("get_called_class", 0, 0, []def.ArgInfo{}
 	}
 	ret, ok := ZifGetCalledClass(executeData)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -251,7 +251,7 @@ var DefZifGetParentClass = def.DefFunc("get_parent_class", 0, 1, []def.ArgInfo{{
 	}
 	ret, ok := ZifGetParentClass(executeData, returnValue, nil, object)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

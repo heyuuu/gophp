@@ -69,7 +69,7 @@ func PhpPasswordGetSalt(required_salt_len int, options *types.Array) *types.Stri
 
 	var buffer *types.String
 	core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
-	switch optionBuffer.GetType() {
+	switch optionBuffer.Type() {
 	case types.IsString:
 		buffer = optionBuffer.String().Copy()
 	case types.IsLong:

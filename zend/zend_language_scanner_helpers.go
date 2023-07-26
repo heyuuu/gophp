@@ -182,14 +182,14 @@ func (sc *LangScanner) segLen(len_ uint) string {
 }
 
 func (sc *LangScanner) setStr(str string) {
-	sc.zendlval.SetStringVal(str)
+	sc.zendlval.SetString(str)
 }
 
 func (sc *LangScanner) setStrFiltered(str string) {
 	if sc.outputFilter != nil {
 		str = sc.outputFilter(str)
 	}
-	sc.zendlval.SetStringVal(str)
+	sc.zendlval.SetString(str)
 }
 
 func (sc *LangScanner) isParserMode() bool {

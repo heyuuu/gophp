@@ -13,7 +13,7 @@ func compareResult[T int | float64](r T) int {
 }
 
 func Compare(op1, op2 *types.Zval) int {
-	switch TypePair(op1.GetType(), op2.GetType()) {
+	switch TypePair(op1.Type(), op2.Type()) {
 	case TypeLongLong:
 		return compareResult(op1.Long() - op2.Long())
 	case TypeDoubleDouble:

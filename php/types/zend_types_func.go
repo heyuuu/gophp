@@ -29,7 +29,7 @@ func Z_INDIRECT_P(zval_p *Zval) *Zval       { return zval_p.Indirect() }
 
 func ZVAL_NEW_REF(z *Zval, r *Zval) { z.SetNewRef(r) }
 func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
-	var ref *ZendReference = NewZendReference(z)
+	var ref *Reference = NewZendReference(z)
 	//ref.SetRefcount(refcount)
 	z.SetReference(ref)
 }
@@ -43,7 +43,7 @@ func ZVAL_DEINDIRECT(z *Zval) *Zval     { return z.DeIndirect() }
 
 func ZVAL_MAKE_REF(zv *Zval) {
 	var __zv *Zval = zv
-	if !(__zv.IsReference()) {
+	if !(__zv.IsRef()) {
 		ZVAL_NEW_REF(__zv, __zv)
 	}
 }
@@ -56,7 +56,7 @@ func SeparateArray(zv *Zval) {
 }
 func SeparateZval(zv *Zval) {
 	// 解 Ref
-	if zv.IsReference() {
+	if zv.IsRef() {
 		zv.CopyValueFrom(zv.DeRef())
 	}
 	// 仅数组需要分离

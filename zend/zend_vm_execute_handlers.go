@@ -18,7 +18,7 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
-	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	switch operators.TypePair(op1.Type(), op2.Type()) {
 	case operators.TypePair(types.IsLong, types.IsLong):
 		result := opline.Result()
 		operators.FastLongAddFunction(result, op1, op2)
@@ -66,7 +66,7 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
-	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	switch operators.TypePair(op1.Type(), op2.Type()) {
 	case operators.TypePair(types.IsLong, types.IsLong):
 		result := opline.Result()
 		operators.FastLongSubFunction(result, op1, op2)
@@ -114,7 +114,7 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
-	switch operators.TypePair(op1.GetType(), op2.GetType()) {
+	switch operators.TypePair(op1.Type(), op2.Type()) {
 	case operators.TypePair(types.IsLong, types.IsLong):
 		result := opline.Result()
 		if iVal, dVal, overflow := SignedMultiplyLong(op1.Long(), op2.Long()); overflow {
@@ -230,7 +230,7 @@ func getConcatHandler(executeData *ZendExecuteData) int {
 
 	// fast
 	if op1.IsString() && op2.IsString() {
-		opline.Result().SetStringVal(op1.StringVal() + op2.StringVal())
+		opline.Result().SetString(op1.StringVal() + op2.StringVal())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 

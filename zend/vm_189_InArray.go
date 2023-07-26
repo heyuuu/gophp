@@ -33,7 +33,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			key = _p.GetKey()
 			val = _z
-			key_tmp.SetString(key)
+			key_tmp.SetStringEx(key)
 			operators.CompareFunction(&result_tmp, op1, &key_tmp)
 			if result_tmp.Long() == 0 {
 				result = val
@@ -74,7 +74,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			key = _p.GetKey()
 			val = _z
-			key_tmp.SetString(key)
+			key_tmp.SetStringEx(key)
 			operators.CompareFunction(&result_tmp, op1, &key_tmp)
 			if result_tmp.Long() == 0 {
 				result = val
@@ -116,7 +116,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			key = _p.GetKey()
 			val = _z
-			key_tmp.SetString(key)
+			key_tmp.SetStringEx(key)
 			operators.CompareFunction(&result_tmp, op1, &key_tmp)
 			if result_tmp.Long() == 0 {
 				result = val
@@ -157,7 +157,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			key = _p.GetKey()
 			val = _z
-			key_tmp.SetString(key)
+			key_tmp.SetStringEx(key)
 			operators.CompareFunction(&result_tmp, op1, &key_tmp)
 			if result_tmp.Long() == 0 {
 				result = val

@@ -68,7 +68,7 @@ func (se *VarSerializer) serializeClassName(struc *types.Zval) bool {
 func (se *VarSerializer) addVarHash(var_ *types.Zval) int {
 	se.data.IncN()
 
-	var isRef = var_.IsReference()
+	var isRef = var_.IsRef()
 	if !isRef && !var_.IsObject() {
 		return 0
 	}
@@ -220,7 +220,7 @@ func (se *VarSerializer) serializeIntern(struc *types.Zval) {
 				/* Reference to an object that failed to serialize, replace with null. */
 				se.WriteString("N;")
 				return
-			} else if struc.IsReference() {
+			} else if struc.IsRef() {
 				se.WriteString("R:")
 				se.WriteLong(varAlready)
 				se.WriteByte(';')
@@ -234,7 +234,7 @@ func (se *VarSerializer) serializeIntern(struc *types.Zval) {
 		}
 	}
 again:
-	switch struc.GetType() {
+	switch struc.Type() {
 	case types.IsFalse:
 		se.WriteString("b:0;")
 		return
@@ -410,8 +410,8 @@ func (d *PhpSerializeData) IncN() { d.n++ }
 func (d *PhpSerializeData) DecN() { d.n-- }
 
 func (d *PhpSerializeData) zvalKey(zv *types.Zval) unsafe.Pointer {
-	b.Assert(zv.IsReference() || zv.IsObject())
-	if zv.IsReference() {
+	b.Assert(zv.IsRef() || zv.IsObject())
+	if zv.IsRef() {
 		return unsafe.Pointer(zv.Reference())
 	} else if zv.IsObject() {
 		return unsafe.Pointer(zv.Object())

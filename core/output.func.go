@@ -155,7 +155,7 @@ func PhpOutputGetLevel() int {
 }
 func PhpOutputGetContents(p *types.Zval) int {
 	if OG__().active {
-		p.SetStringVal(b.CastStr(OG__().active.buffer.data, OG__().active.buffer.used))
+		p.SetString(b.CastStr(OG__().active.buffer.data, OG__().active.buffer.used))
 		return types.SUCCESS
 	} else {
 		p.SetNull()
@@ -207,7 +207,7 @@ func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flag
 	var handler_name *types.String = nil
 	var err *byte = nil
 	var handler *PhpOutputHandler = nil
-	switch output_handler.GetType() {
+	switch output_handler.Type() {
 	case types.IsNull:
 		handler = PhpOutputHandlerCreateInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunk_size, flags)
 	case types.IsString:
@@ -358,7 +358,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			var retval types.Zval
 			var ob_data types.Zval
 			var ob_mode types.Zval
-			ob_data.SetStringVal(b.CastStr(handler.GetBuffer().GetData(), handler.GetBuffer().GetUsed()))
+			ob_data.SetString(b.CastStr(handler.GetBuffer().GetData(), handler.GetBuffer().GetUsed()))
 			ob_mode.SetLong(zend.ZendLong(context.GetOp()))
 			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
 			// zend.ZvalPtrDtor(&ob_data)

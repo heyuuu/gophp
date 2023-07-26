@@ -50,7 +50,7 @@ var DefZifEscapeshellcmd = def.DefFunc("escapeshellcmd", 1, 1, []def.ArgInfo{{Na
 		return
 	}
 	ret := ZifEscapeshellcmd(command)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifEscapeshellarg
@@ -61,7 +61,7 @@ var DefZifEscapeshellarg = def.DefFunc("escapeshellarg", 1, 1, []def.ArgInfo{{Na
 		return
 	}
 	ret := ZifEscapeshellarg(arg)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifShellExec

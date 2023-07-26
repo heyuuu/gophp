@@ -50,7 +50,7 @@ send_again:
 			}
 			top = executeData.GetCall().Arg(arg_num)
 			if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
-				if arg.IsReference() {
+				if arg.IsRef() {
 					// 					arg.AddRefcount()
 					top.SetReference(arg.Reference())
 				} else if (opline.GetOp1Type() & (IS_VAR | IS_CV)) != 0 {
@@ -123,7 +123,7 @@ send_again:
 			}
 			//ZendIteratorDtor(iter)
 		}
-	} else if args.IsReference() {
+	} else if args.IsRef() {
 		args = types.Z_REFVAL_P(args)
 		goto send_again
 	} else {

@@ -233,7 +233,7 @@ func toZppSetMethod(typ ZppRetType, ret ast.Expr) (setter string, args []ast.Exp
 	case RetTypeDouble:
 		setter = "SetDouble"
 	case RetTypeString:
-		setter = "SetStringVal"
+		setter = "SetString"
 	case RetTypeArray:
 		setter = "SetArray"
 	case RetTypeIntArray:

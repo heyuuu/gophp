@@ -81,7 +81,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			hval = offset.Long()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
-		} else if offset.IsReference() {
+		} else if offset.IsRef() {
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
@@ -166,7 +166,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 			hval = offset.Long()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
-		} else if offset.IsReference() {
+		} else if offset.IsRef() {
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
@@ -204,7 +204,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -256,7 +256,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -283,7 +283,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 			hval = offset.Long()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
-		} else if offset.IsReference() {
+		} else if offset.IsRef() {
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
@@ -322,7 +322,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -346,7 +346,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -372,7 +372,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 			hval = offset.Long()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
-		} else if offset.IsReference() {
+		} else if offset.IsRef() {
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
@@ -410,7 +410,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -465,7 +465,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -495,7 +495,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 			hval = offset.Long()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
-		} else if offset.IsReference() {
+		} else if offset.IsRef() {
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
@@ -534,7 +534,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -561,7 +561,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -590,7 +590,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			hval = offset.Long()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
-		} else if offset.IsReference() {
+		} else if offset.IsRef() {
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
@@ -627,7 +627,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -678,7 +678,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -705,7 +705,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			hval = offset.Long()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
-		} else if offset.IsReference() {
+		} else if offset.IsRef() {
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
@@ -743,7 +743,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -766,7 +766,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 	var new_expr types.Zval
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
-		if expr_ptr.IsReference() {
+		if expr_ptr.IsRef() {
 			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
@@ -792,7 +792,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 			hval = offset.Long()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
-		} else if offset.IsReference() {
+		} else if offset.IsRef() {
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {

@@ -131,7 +131,7 @@ func zim_Closure_call(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fci_cache.SetCalledScope(newobj.GetCe())
 	fci_cache.SetObject(fci.GetObject())
 	if ZendCallFunction(fci, &fci_cache) == types.SUCCESS && closure_result.IsNotUndef() {
-		if closure_result.IsReference() {
+		if closure_result.IsRef() {
 			operators.ZendUnwrapReference(&closure_result)
 		}
 		types.ZVAL_COPY_VALUE(returnValue, &closure_result)

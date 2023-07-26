@@ -236,7 +236,7 @@ func zim_spl_SplObjectStorage_getHash(executeData *zend.ZendExecuteData, return_
 	if zend.ZendParseParameters(executeData.NumArgs(), "o", &obj) == types.FAILURE {
 		return
 	}
-	return_value.SetStringVal(PhpSplObjectHash(obj))
+	return_value.SetString(PhpSplObjectHash(obj))
 	return
 }
 func zim_spl_SplObjectStorage_offsetGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -452,7 +452,7 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 	/* done */
 	serializer.DestroyData()
 
-	return_value.SetStringVal(serializer.String())
+	return_value.SetString(serializer.String())
 }
 func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplObjectStorage = Z_SPLOBJSTORAGE_P(executeData.ThisObjectZval())
@@ -801,7 +801,7 @@ func SplMultipleIteratorGetAll(intern *SplObjectStorage, get_type int, return_va
 			retval.SetNull()
 		}
 		if intern.IsKeysAssoc() {
-			switch element.GetInf().GetType() {
+			switch element.GetInf().Type() {
 			case types.IsLong:
 				zend.AddIndexZval(return_value, element.GetInf().Long(), &retval)
 			case types.IsString:

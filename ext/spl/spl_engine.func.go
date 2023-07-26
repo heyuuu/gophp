@@ -34,7 +34,7 @@ func SplInstantiate(pce *types.ClassEntry, object *types.Zval) { zend.ObjectInit
 func SplOffsetConvertToLong(offset *types.Zval) zend.ZendLong {
 	var idx zend.ZendUlong
 try_again:
-	switch offset.GetType() {
+	switch offset.Type() {
 	case types.IsString:
 		if types.HandleNumericStr(offset.String().GetStr(), &idx) {
 			return idx

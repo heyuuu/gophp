@@ -87,7 +87,7 @@ func PhpMailBuildHeadersCheckFieldName(key *types.String) bool {
 	return types.SUCCESS
 }
 func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.String, val *types.Zval) {
-	switch val.GetType() {
+	switch val.Type() {
 	case types.IsString:
 		if PhpMailBuildHeadersCheckFieldName(key) != types.SUCCESS {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field name (%s) contains invalid chars", key.GetVal())
@@ -264,7 +264,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 	MAIL_ASCIIZ_CHECK(subject, subject_len)
 	MAIL_ASCIIZ_CHECK(message, message_len)
 	if headers != nil {
-		switch headers.GetType() {
+		switch headers.Type() {
 		case types.IsString:
 			tmp_headers = types.NewString(headers.String().GetStr())
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())

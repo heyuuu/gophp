@@ -97,9 +97,9 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 		default:
 			var params [5]types.Zval
 			params[0].SetLong(typ)
-			params[1].SetStringVal(message)
+			params[1].SetString(message)
 			if errorFilename != "" {
-				params[2].SetStringVal(errorFilename)
+				params[2].SetString(errorFilename)
 			} else {
 				params[2].SetNull()
 			}

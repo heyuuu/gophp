@@ -70,7 +70,7 @@ func UserfilterDtor(thisfilter *core.PhpStreamFilter) {
 		/* If there's no object associated then there's nothing to dispose of */
 
 	}
-	func_name.SetStringVal("onclose")
+	func_name.SetString("onclose")
 	zend.CallUserFunction(obj, &func_name, &retval, 0, nil)
 	// zend.ZvalPtrDtor(&retval)
 	// zend.ZvalPtrDtor(&func_name)
@@ -123,7 +123,7 @@ func UserfilterFilter(
 		/* add_property_zval increments the refcount which is unwanted here */
 
 	}
-	func_name.SetStringVal("filter")
+	func_name.SetString("filter")
 
 	/* Setup calling arguments */
 
@@ -170,7 +170,7 @@ func UserfilterFilter(
 	 * keeping a reference to the stream resource here would prevent it
 	 * from being destroyed properly */
 
-	zpropname.SetStringVal("stream")
+	zpropname.SetString("stream")
 	obj.Object().UnsetPropertyEx(&zpropname)
 	stream.SubFlags(core.PHP_STREAM_FLAG_NO_FCLOSE)
 	stream.AddFlags(orig_no_fclose)
@@ -265,7 +265,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 
 	/* invoke the constructor */
 
-	func_name.SetStringVal("oncreate")
+	func_name.SetString("oncreate")
 	zend.CallUserFunction(&obj, &func_name, &retval, 0, nil)
 	if retval.IsNotUndef() {
 		if retval.IsType(types.IsFalse) {

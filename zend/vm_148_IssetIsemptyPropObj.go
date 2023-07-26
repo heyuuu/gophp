@@ -38,7 +38,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExec
 	container = opline.Op1()
 	offset = opline.Const2()
 	if !container.IsObject() {
-		if container.IsReference() {
+		if container.IsRef() {
 			container = types.Z_REFVAL_P(container)
 			if !container.IsObject() {
 				result = opline.GetExtendedValue()&ZEND_ISEMPTY != 0
@@ -64,7 +64,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExe
 	container = opline.Op1()
 	offset = opline.Op2()
 	if !container.IsObject() {
-		if container.IsReference() {
+		if container.IsRef() {
 			container = types.Z_REFVAL_P(container)
 			if !container.IsObject() {
 				result = opline.GetExtendedValue()&ZEND_ISEMPTY != 0
@@ -90,7 +90,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecute
 	container = opline.Op1()
 	offset = opline.Cv2OrUndef()
 	if !container.IsObject() {
-		if container.IsReference() {
+		if container.IsRef() {
 			container = types.Z_REFVAL_P(container)
 			if !container.IsObject() {
 				result = opline.GetExtendedValue()&ZEND_ISEMPTY != 0
@@ -162,7 +162,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteD
 	container = opline.Op1()
 	offset = opline.Const2()
 	if !container.IsObject() {
-		if container.IsReference() {
+		if container.IsRef() {
 			container = types.Z_REFVAL_P(container)
 			if !container.IsObject() {
 				result = opline.GetExtendedValue()&ZEND_ISEMPTY != 0
@@ -188,7 +188,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecute
 	container = opline.Op1()
 	offset = opline.Op2()
 	if !container.IsObject() {
-		if container.IsReference() {
+		if container.IsRef() {
 			container = types.Z_REFVAL_P(container)
 			if !container.IsObject() {
 				result = opline.GetExtendedValue()&ZEND_ISEMPTY != 0
@@ -214,7 +214,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData
 	container = opline.Op1()
 	offset = opline.Cv2OrUndef()
 	if !container.IsObject() {
-		if container.IsReference() {
+		if container.IsRef() {
 			container = types.Z_REFVAL_P(container)
 			if !container.IsObject() {
 				result = opline.GetExtendedValue()&ZEND_ISEMPTY != 0

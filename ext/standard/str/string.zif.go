@@ -13,7 +13,7 @@ var DefZifBin2hex = def.DefFunc("bin2hex", 1, 1, []def.ArgInfo{{Name: "data"}}, 
 		return
 	}
 	ret := ZifBin2hex(data)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifHex2bin
@@ -25,7 +25,7 @@ var DefZifHex2bin = def.DefFunc("hex2bin", 1, 1, []def.ArgInfo{{Name: "data"}}, 
 	}
 	ret, ok := ZifHex2bin(data)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -91,7 +91,7 @@ var DefZifTrim = def.DefFunc("trim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "
 		return
 	}
 	ret := ZifTrim(str, nil, character_mask)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifRtrim
@@ -104,7 +104,7 @@ var DefZifRtrim = def.DefFunc("rtrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 		return
 	}
 	ret := ZifRtrim(str, nil, character_mask)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifRtrim
@@ -117,7 +117,7 @@ var DefZifChop = def.DefFunc("chop", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "
 		return
 	}
 	ret := ZifRtrim(str, nil, character_mask)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifLtrim
@@ -130,7 +130,7 @@ var DefZifLtrim = def.DefFunc("ltrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 		return
 	}
 	ret := ZifLtrim(str, nil, character_mask)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifWordwrap
@@ -146,7 +146,7 @@ var DefZifWordwrap = def.DefFunc("wordwrap", 1, 4, []def.ArgInfo{{Name: "str"}, 
 	}
 	ret, ok := ZifWordwrap(str, nil, width, break_, cut)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -180,7 +180,7 @@ var DefZifImplode = def.DefFunc("implode", 1, 2, []def.ArgInfo{{Name: "glue"}, {
 		return
 	}
 	ret := ZifImplode(glue_, nil, pieces_)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifImplode
@@ -193,7 +193,7 @@ var DefZifJoin = def.DefFunc("join", 1, 2, []def.ArgInfo{{Name: "glue"}, {Name: 
 		return
 	}
 	ret := ZifImplode(glue_, nil, pieces_)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStrtok
@@ -207,7 +207,7 @@ var DefZifStrtok = def.DefFunc("strtok", 1, 2, []def.ArgInfo{{Name: "str"}, {Nam
 	}
 	ret, ok := ZifStrtok(str, nil, token_)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -221,7 +221,7 @@ var DefZifStrtoupper = def.DefFunc("strtoupper", 1, 1, []def.ArgInfo{{Name: "str
 		return
 	}
 	ret := ZifStrtoupper(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStrtolower
@@ -232,7 +232,7 @@ var DefZifStrtolower = def.DefFunc("strtolower", 1, 1, []def.ArgInfo{{Name: "str
 		return
 	}
 	ret := ZifStrtolower(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifBasename
@@ -245,7 +245,7 @@ var DefZifBasename = def.DefFunc("basename", 1, 2, []def.ArgInfo{{Name: "path"},
 		return
 	}
 	ret := ZifBasename(path, nil, suffix)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifDirname
@@ -258,7 +258,7 @@ var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{Name: "path"}, {
 		return
 	}
 	ret := ZifDirname(path, nil, levels_)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifPathinfo
@@ -286,7 +286,7 @@ var DefZifStristr = def.DefFunc("stristr", 2, 3, []def.ArgInfo{{Name: "haystack"
 	}
 	ret, ok := ZifStristr(haystack, needle, nil, part)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -304,7 +304,7 @@ var DefZifStrstr = def.DefFunc("strstr", 2, 3, []def.ArgInfo{{Name: "haystack"},
 	}
 	ret, ok := ZifStrstr(haystack, needle, nil, part)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -322,7 +322,7 @@ var DefZifStrchr = def.DefFunc("strchr", 2, 3, []def.ArgInfo{{Name: "haystack"},
 	}
 	ret, ok := ZifStrstr(haystack, needle, nil, part)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -410,7 +410,7 @@ var DefZifStrrchr = def.DefFunc("strrchr", 2, 2, []def.ArgInfo{{Name: "haystack"
 	}
 	ret, ok := ZifStrrchr(haystack, needle)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -428,7 +428,7 @@ var DefZifChunkSplit = def.DefFunc("chunk_split", 1, 3, []def.ArgInfo{{Name: "st
 	}
 	ret, ok := ZifChunkSplit(str, nil, chunklen_, ending_)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -446,7 +446,7 @@ var DefZifSubstr = def.DefFunc("substr", 2, 3, []def.ArgInfo{{Name: "str"}, {Nam
 	}
 	ret, ok := ZifSubstr(str, offset, nil, length)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -475,7 +475,7 @@ var DefZifQuotemeta = def.DefFunc("quotemeta", 1, 1, []def.ArgInfo{{Name: "str"}
 	}
 	ret, ok := ZifQuotemeta(str)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -500,7 +500,7 @@ var DefZifChr = def.DefFunc("chr", 1, 1, []def.ArgInfo{{Name: "codepoint"}}, fun
 		return
 	}
 	ret := ZifChr(codepoint)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifUcfirst
@@ -511,7 +511,7 @@ var DefZifUcfirst = def.DefFunc("ucfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, f
 		return
 	}
 	ret := ZifUcfirst(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifLcfirst
@@ -522,7 +522,7 @@ var DefZifLcfirst = def.DefFunc("lcfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, f
 		return
 	}
 	ret := ZifLcfirst(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifUcwords
@@ -535,7 +535,7 @@ var DefZifUcwords = def.DefFunc("ucwords", 1, 2, []def.ArgInfo{{Name: "str"}, {N
 		return
 	}
 	ret := ZifUcwords(str, nil, delimiters)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStrtr
@@ -550,7 +550,7 @@ var DefZifStrtr = def.DefFunc("strtr", 2, 3, []def.ArgInfo{{Name: "str"}, {Name:
 	}
 	ret, ok := ZifStrtr(str, from, nil, to_)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -564,7 +564,7 @@ var DefZifStrrev = def.DefFunc("strrev", 1, 1, []def.ArgInfo{{Name: "str"}}, fun
 		return
 	}
 	ret := ZifStrrev(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifSimilarText
@@ -589,7 +589,7 @@ var DefZifAddslashes = def.DefFunc("addslashes", 1, 1, []def.ArgInfo{{Name: "str
 		return
 	}
 	ret := ZifAddslashes(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifAddcslashes
@@ -601,7 +601,7 @@ var DefZifAddcslashes = def.DefFunc("addcslashes", 2, 2, []def.ArgInfo{{Name: "s
 		return
 	}
 	ret := ZifAddcslashes(str, charlist)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStripslashes
@@ -612,7 +612,7 @@ var DefZifStripslashes = def.DefFunc("stripslashes", 1, 1, []def.ArgInfo{{Name: 
 		return
 	}
 	ret := ZifStripslashes(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStripcslashes
@@ -623,7 +623,7 @@ var DefZifStripcslashes = def.DefFunc("stripcslashes", 1, 1, []def.ArgInfo{{Name
 		return
 	}
 	ret := ZifStripcslashes(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStrReplace
@@ -665,7 +665,7 @@ var DefZifHebrev = def.DefFunc("hebrev", 1, 2, []def.ArgInfo{{Name: "str"}, {Nam
 	}
 	ret, ok := ZifHebrev(str, nil, max_chars_per_line)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -682,7 +682,7 @@ var DefZifHebrevc = def.DefFunc("hebrevc", 1, 2, []def.ArgInfo{{Name: "str"}, {N
 	}
 	ret, ok := ZifHebrevc(str, nil, max_chars_per_line)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -698,7 +698,7 @@ var DefZifNl2br = def.DefFunc("nl2br", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 		return
 	}
 	ret := ZifNl2br(str, nil, is_xhtml_)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStripTags
@@ -711,7 +711,7 @@ var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{Name: "str"
 		return
 	}
 	ret := ZifStripTags(str, nil, allowable_tags)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStrRepeat
@@ -724,7 +724,7 @@ var DefZifStrRepeat = def.DefFunc("str_repeat", 2, 2, []def.ArgInfo{{Name: "inpu
 	}
 	ret, ok := ZifStrRepeat(input, mult)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -803,7 +803,7 @@ var DefZifStrPad = def.DefFunc("str_pad", 2, 4, []def.ArgInfo{{Name: "input"}, {
 	}
 	ret, ok := ZifStrPad(input, pad_length, nil, pad_string_, pad_type_)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -817,7 +817,7 @@ var DefZifStrRot13 = def.DefFunc("str_rot13", 1, 1, []def.ArgInfo{{Name: "str"}}
 		return
 	}
 	ret := ZifStrRot13(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStrShuffle
@@ -828,7 +828,7 @@ var DefZifStrShuffle = def.DefFunc("str_shuffle", 1, 1, []def.ArgInfo{{Name: "st
 		return
 	}
 	ret := ZifStrShuffle(str)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifStrWordCount
@@ -876,7 +876,7 @@ var DefZifStrpbrk = def.DefFunc("strpbrk", 2, 2, []def.ArgInfo{{Name: "haystack"
 	}
 	ret, ok := ZifStrpbrk(haystack, char_list)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

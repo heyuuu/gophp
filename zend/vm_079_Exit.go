@@ -14,7 +14,7 @@ func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			if ptr.IsLong() {
 				EG__().SetExitStatus(ptr.Long())
 			} else {
-				if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && ptr.IsReference() {
+				if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && ptr.IsRef() {
 					ptr = types.Z_REFVAL_P(ptr)
 					if ptr.IsLong() {
 						EG__().SetExitStatus(ptr.Long())

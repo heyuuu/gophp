@@ -7,7 +7,7 @@ func ZEND_COALESCE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var ref *types.Zval = nil
 	value = opline.Const1()
-	if value.GetType() > types.IsNull {
+	if value.Type() > types.IsNull {
 		var result *types.Zval = opline.Result()
 		result.CopyValueFrom(value)
 		{
@@ -26,13 +26,13 @@ func ZEND_COALESCE_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var ref *types.Zval = nil
 	value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if value.IsReference() {
+	if value.IsRef() {
 		{
 			ref = value
 		}
 		value = types.Z_REFVAL_P(value)
 	}
-	if value.GetType() > types.IsNull {
+	if value.Type() > types.IsNull {
 		var result *types.Zval = opline.Result()
 		result.CopyValueFrom(value)
 
@@ -53,13 +53,13 @@ func ZEND_COALESCE_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var ref *types.Zval = nil
 	value = opline.Op1()
-	if value.IsReference() {
+	if value.IsRef() {
 		{
 			ref = value
 		}
 		value = types.Z_REFVAL_P(value)
 	}
-	if value.GetType() > types.IsNull {
+	if value.Type() > types.IsNull {
 		var result *types.Zval = opline.Result()
 		result.CopyValueFrom(value)
 
@@ -79,13 +79,13 @@ func ZEND_COALESCE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var ref *types.Zval = nil
 	value = opline.Op1()
-	if value.IsReference() {
+	if value.IsRef() {
 		{
 			ref = value
 		}
 		value = types.Z_REFVAL_P(value)
 	}
-	if value.GetType() > types.IsNull {
+	if value.Type() > types.IsNull {
 		var result *types.Zval = opline.Result()
 		result.CopyValueFrom(value)
 

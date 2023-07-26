@@ -29,7 +29,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				return 0
 			}
 		}
-		if !(value.IsReference()) {
+		if !(value.IsRef()) {
 			var ref = types.NewZendReference(value)
 			value.SetReference(ref)
 			variable_ptr.SetReference(ref)

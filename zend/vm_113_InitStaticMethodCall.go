@@ -104,7 +104,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 		{
 			if !function_name.IsString() {
 				for {
-					if function_name.IsReference() {
+					if function_name.IsRef() {
 						function_name = types.Z_REFVAL_P(function_name)
 						if function_name.IsString() {
 							break
@@ -253,7 +253,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 		{
 			if !function_name.IsString() {
 				for {
-					if function_name.IsReference() {
+					if function_name.IsRef() {
 						function_name = types.Z_REFVAL_P(function_name)
 						if function_name.IsString() {
 							break
@@ -387,7 +387,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 		{
 			if !function_name.IsString() {
 				for {
-					if function_name.IsReference() {
+					if function_name.IsRef() {
 						function_name = types.Z_REFVAL_P(function_name)
 						if function_name.IsString() {
 							break
@@ -516,7 +516,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 		{
 			if !function_name.IsString() {
 				for {
-					if function_name.IsReference() {
+					if function_name.IsRef() {
 						function_name = types.Z_REFVAL_P(function_name)
 						if function_name.IsString() {
 							break
@@ -663,7 +663,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 		{
 			if !function_name.IsString() {
 				for {
-					if function_name.IsReference() {
+					if function_name.IsRef() {
 						function_name = types.Z_REFVAL_P(function_name)
 						if function_name.IsString() {
 							break
@@ -806,7 +806,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 		{
 			if !function_name.IsString() {
 				for {
-					if function_name.IsReference() {
+					if function_name.IsRef() {
 						function_name = types.Z_REFVAL_P(function_name)
 						if function_name.IsString() {
 							break

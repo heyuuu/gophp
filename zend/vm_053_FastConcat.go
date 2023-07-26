@@ -33,7 +33,7 @@ func fastConcatHelper(executeData *ZendExecuteData, op1, op2 *types.Zval) int {
 
 	//
 	var opline *types.ZendOp = executeData.GetOpline()
-	opline.Result().SetStringVal(str)
+	opline.Result().SetString(str)
 	if checkExcpetion {
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	} else {

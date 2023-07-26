@@ -13,7 +13,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 	offset = opline.Const2()
 	if !container.IsObject() {
 		for {
-			if container.IsReference() {
+			if container.IsRef() {
 				container = types.Z_REFVAL_P(container)
 				if container.IsObject() {
 					break
@@ -36,7 +36,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 	retval = zobj.ReadPropertyEx(offset, BP_VAR_R, opline.Result())
 	if retval != opline.Result() {
 		types.ZVAL_COPY_DEREF(opline.Result(), retval)
-	} else if retval.IsReference() {
+	} else if retval.IsRef() {
 		operators.ZendUnwrapReference(retval)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

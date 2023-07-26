@@ -14,7 +14,7 @@ func ZEND_SEND_FUNC_ARG_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	varptr = opline.Op1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
-	if varptr.IsReference() {
+	if varptr.IsRef() {
 		//var ref *types.ZendRefcounted = varptr.RefCounted()
 		varptr = types.Z_REFVAL_P(varptr)
 		arg.CopyValueFrom(varptr)

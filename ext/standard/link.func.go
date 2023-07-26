@@ -40,7 +40,7 @@ func ZifReadlink(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval)
 	/* Append NULL to the end of the string */
 
 	buff[ret] = '0'
-	return_value.SetStringVal(b.CastStr(buff, ret))
+	return_value.SetString(b.CastStr(buff, ret))
 	return
 }
 func ZifLinkinfo(return_value zpp.Ret, filename zpp.Path) (int, bool) {

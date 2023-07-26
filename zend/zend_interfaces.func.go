@@ -336,7 +336,7 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 	if retval.IsUndef() || EG__().GetException() != nil {
 		result = types.FAILURE
 	} else {
-		switch retval.GetType() {
+		switch retval.Type() {
 		case types.IsNull:
 
 			/* we could also make this '*buf_len = 0' but this allows to skip variables */
@@ -362,7 +362,7 @@ func ZendUserUnserialize(object *types.Zval, ce *types.ClassEntry, buf *uint8, b
 	if ObjectInitEx(object, ce) != types.SUCCESS {
 		return types.FAILURE
 	}
-	zdata.SetStringVal(b.CastStr((*byte)(buf), buf_len))
+	zdata.SetString(b.CastStr((*byte)(buf), buf_len))
 	ZendCallMethodWith1Params(object, ce, ce.GetUnserializeFunc(), "unserialize", nil, &zdata)
 	// ZvalPtrDtor(&zdata)
 	if EG__().GetException() != nil {

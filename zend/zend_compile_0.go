@@ -349,7 +349,7 @@ func ZendAddConstNameLiteral(name string, unqualified bool) int {
 }
 func LITERAL_STR(op types.ZnodeOp, str *types.String) {
 	var _c types.Zval
-	_c.SetString(str)
+	_c.SetStringEx(str)
 	op.SetConstant(ZendAddLiteral(&_c))
 }
 func ZendBeginLoop(free_opcode uint8, loop_var *Znode, is_switch bool) {

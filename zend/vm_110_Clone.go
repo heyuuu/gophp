@@ -41,7 +41,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	obj = opline.Op1()
 	for {
 		if !obj.IsObject() {
-			if obj.IsReference() {
+			if obj.IsRef() {
 				obj = types.Z_REFVAL_P(obj)
 				if obj.IsObject() {
 					break
@@ -76,7 +76,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	obj = opline.Op1()
 	for {
 		if !obj.IsObject() {
-			if obj.IsReference() {
+			if obj.IsRef() {
 				obj = types.Z_REFVAL_P(obj)
 				if obj.IsObject() {
 					break

@@ -61,15 +61,15 @@ func (this *ZendPropertyInfoSourceList) GetList() uintptr           { return thi
 func (this *ZendPropertyInfoSourceList) SetList(value uintptr)      { this.list = value }
 
 /**
- * ZendReference
+ * Reference
  */
-type ZendReference struct {
+type Reference struct {
 	val     Zval
 	sources ZendPropertyInfoSourceList
 }
 
-func NewZendReference(val *Zval) *ZendReference {
-	var ref = &ZendReference{}
+func NewZendReference(val *Zval) *Reference {
+	var ref = &Reference{}
 
 	ZVAL_COPY_VALUE(ref.GetVal(), val)
 	ref.sources.SetPtr(nil)
@@ -77,10 +77,10 @@ func NewZendReference(val *Zval) *ZendReference {
 	return ref
 }
 
-func (this *ZendReference) GetVal() *Zval                               { return &this.val }
-func (this *ZendReference) SetVal(value Zval)                           { this.val = value }
-func (this *ZendReference) GetSources() *ZendPropertyInfoSourceList     { return &this.sources }
-func (this *ZendReference) SetSources(value ZendPropertyInfoSourceList) { this.sources = value }
+func (this *Reference) GetVal() *Zval                               { return &this.val }
+func (this *Reference) SetVal(value Zval)                           { this.val = value }
+func (this *Reference) GetSources() *ZendPropertyInfoSourceList     { return &this.sources }
+func (this *Reference) SetSources(value ZendPropertyInfoSourceList) { this.sources = value }
 
 /**
  * ZendAstRef

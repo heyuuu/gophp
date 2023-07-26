@@ -30,7 +30,7 @@ func RegisterDoubleConstant(name string, dval float64, flags int, moduleNumber i
 }
 func RegisterStringConstant(name string, str string, flags int, moduleNumber int) {
 	c := NewConstant(name, flags, moduleNumber)
-	c.Value().SetStringVal(str)
+	c.Value().SetString(str)
 	ZendRegisterConstant(c)
 }
 

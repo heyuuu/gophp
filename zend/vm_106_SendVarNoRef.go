@@ -13,7 +13,7 @@ func ZEND_SEND_VAR_NO_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	varptr = opline.Op1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	arg.CopyValueFrom(varptr)
-	if varptr.IsReference() {
+	if varptr.IsRef() {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 	arg.SetNewRef(arg)

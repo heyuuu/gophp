@@ -14,7 +14,7 @@ func IZendIsTrue(op *types.Zval) int { return types.IntBool(ZvalIsTrue(op)) }
 
 func ZvalIsTrue(op *types.Zval) bool {
 again:
-	switch op.GetType() {
+	switch op.Type() {
 	case types.IsTrue:
 		return true
 	case types.IsLong:
@@ -48,7 +48,7 @@ func ZvalGetLong(op *types.Zval) int {
 func _zvalGetLongFuncNoisy(op *types.Zval) int { return _zvalGetLongFuncEx(op, false) }
 func _zvalGetLongFuncEx(op *types.Zval, silent bool) int {
 	op = op.DeRef()
-	switch op.GetType() {
+	switch op.Type() {
 	case types.IsUndef, types.IsNull, types.IsFalse:
 		return 0
 	case types.IsTrue:
@@ -109,7 +109,7 @@ func ZvalGetDouble(op *types.Zval) float64 {
 }
 func ZvalGetDoubleFunc(op *types.Zval) float64 {
 	op = op.DeRef()
-	switch op.GetType() {
+	switch op.Type() {
 	case types.IsNull:
 		fallthrough
 	case types.IsFalse:
@@ -175,7 +175,7 @@ func ZvalTryGetString(op *types.Zval) *types.String {
  */
 func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 	op = op.DeRef()
-	switch op.GetType() {
+	switch op.Type() {
 	case types.IsString:
 		return op.StringVal(), true
 	case types.IsUndef, types.IsNull, types.IsFalse:

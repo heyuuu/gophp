@@ -73,7 +73,7 @@ func AstCreateList(kind ZendAstKind, children ...*ZendAst) *ZendAst {
 }
 
 func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.Zval) int {
-	switch offset.GetType() {
+	switch offset.Type() {
 	case types.IsUndef:
 		if result.Array().Append(expr) == nil {
 			faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
@@ -182,9 +182,9 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		types.ZVAL_COPY_OR_DUP(result, zv)
 	case ZEND_AST_CONSTANT_CLASS:
 		if scope != nil {
-			result.SetStringVal(scope.Name())
+			result.SetString(scope.Name())
 		} else {
-			result.SetStringVal("")
+			result.SetString("")
 		}
 	case ZEND_AST_CLASS_NAME:
 		if scope == nil {
@@ -192,13 +192,13 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			return types.FAILURE
 		}
 		if ast.Attr() == ZEND_FETCH_CLASS_SELF {
-			result.SetStringVal(scope.Name())
+			result.SetString(scope.Name())
 		} else if ast.Attr() == ZEND_FETCH_CLASS_PARENT {
 			if !(scope.GetParent()) {
 				faults.ThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
 				return types.FAILURE
 			}
-			result.SetStringVal(scope.GetParent().name.GetStr())
+			result.SetString(scope.GetParent().name.GetStr())
 		} else {
 			b.Assert(false)
 		}
@@ -265,7 +265,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ret = types.FAILURE
 			break
 		}
-		if op1.GetType() > types.IsNull {
+		if op1.Type() > types.IsNull {
 			*result = op1
 		} else {
 			if ZendAstEvaluate(result, ast.Child(1), scope) != types.SUCCESS {

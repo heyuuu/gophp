@@ -20,7 +20,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, stri
 }
 func ZendVerifyPropAssignableByRef(prop_info *types.PropertyInfo, orig_val *types.Zval, strict bool) bool {
 	var val *types.Zval = orig_val
-	if val.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(val.Reference()) {
+	if val.IsRef() && ZEND_REF_HAS_TYPE_SOURCES(val.Reference()) {
 		var result int
 		val = types.Z_REFVAL_P(val)
 		result = IZendVerifyTypeAssignableZval(prop_info.GetType(), prop_info.GetCe(), val, strict)

@@ -13,7 +13,7 @@ var DefZifGettype = def.DefFunc("gettype", 1, 1, []def.ArgInfo{{Name: "var"}}, f
 		return
 	}
 	ret := ZifGettype(var_)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifSettype

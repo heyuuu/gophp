@@ -24,7 +24,7 @@ var DefZifInetNtop = def.DefFunc("inet_ntop", 1, 1, []def.ArgInfo{{Name: "ip"}},
 	}
 	ret, ok := ZifInetNtop(ip)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -39,7 +39,7 @@ var DefZifInetPton = def.DefFunc("inet_pton", 1, 1, []def.ArgInfo{{Name: "ip_add
 	}
 	ret, ok := ZifInetPton(ip_address)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -68,7 +68,7 @@ var DefZifLong2ip = def.DefFunc("long2ip", 1, 1, []def.ArgInfo{{Name: "ip_addres
 		return
 	}
 	ret := ZifLong2ip(ip_address)
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifGetenv
@@ -171,7 +171,7 @@ var DefZifGetCurrentUser = def.DefFunc("get_current_user", 0, 0, []def.ArgInfo{}
 		return
 	}
 	ret := ZifGetCurrentUser()
-	returnValue.SetStringVal(ret)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifGetCfgVar
@@ -350,7 +350,7 @@ var DefZifIniGet = def.DefFunc("ini_get", 1, 1, []def.ArgInfo{{Name: "varname"}}
 	}
 	ret, ok := ZifIniGet(varname)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -378,7 +378,7 @@ var DefZifIniSet = def.DefFunc("ini_set", 2, 2, []def.ArgInfo{{Name: "varname"},
 	}
 	ret, ok := ZifIniSet(returnValue, varname, newvalue)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -394,7 +394,7 @@ var DefZifIniAlter = def.DefFunc("ini_alter", 2, 2, []def.ArgInfo{{Name: "varnam
 	}
 	ret, ok := ZifIniSet(returnValue, varname, newvalue)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -419,7 +419,7 @@ var DefZifSetIncludePath = def.DefFunc("set_include_path", 1, 1, []def.ArgInfo{{
 	}
 	ret, ok := ZifSetIncludePath(new_include_path)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -432,7 +432,7 @@ var DefZifGetIncludePath = def.DefFunc("get_include_path", 0, 0, []def.ArgInfo{}
 	}
 	ret, ok := ZifGetIncludePath()
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

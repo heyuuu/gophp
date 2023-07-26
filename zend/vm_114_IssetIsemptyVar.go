@@ -27,10 +27,10 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 			value = value.Indirect()
 		}
 		if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
-			if value.IsReference() {
+			if value.IsRef() {
 				value = types.Z_REFVAL_P(value)
 			}
-			result = value.GetType() > types.IsNull
+			result = value.Type() > types.IsNull
 		} else {
 			result = !(operators.IZendIsTrue(value))
 		}
@@ -58,10 +58,10 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 			value = value.Indirect()
 		}
 		if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
-			if value.IsReference() {
+			if value.IsRef() {
 				value = types.Z_REFVAL_P(value)
 			}
-			result = value.GetType() > types.IsNull
+			result = value.Type() > types.IsNull
 		} else {
 			result = !(operators.IZendIsTrue(value))
 		}
@@ -88,10 +88,10 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 			value = value.Indirect()
 		}
 		if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
-			if value.IsReference() {
+			if value.IsRef() {
 				value = types.Z_REFVAL_P(value)
 			}
-			result = value.GetType() > types.IsNull
+			result = value.Type() > types.IsNull
 		} else {
 			result = !(operators.IZendIsTrue(value))
 		}

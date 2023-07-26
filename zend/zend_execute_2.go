@@ -29,7 +29,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint uint8, arg *types.Zval) bool {
 		}
 	case types.IsString:
 		if val, ok := zpp.ParseZStrWeak(arg); ok {
-			arg.SetString(val)
+			arg.SetStringEx(val)
 			return true
 		}
 	}
@@ -65,7 +65,7 @@ func ZendVerifyPropertyTypeError(info *types.PropertyInfo, property *types.Zval)
 	if property.IsObject() {
 		propTypeName = property.Object().GetCe().Name()
 	} else {
-		propTypeName = types.ZendGetTypeByConst(property.GetType())
+		propTypeName = types.ZendGetTypeByConst(property.Type())
 	}
 
 	if info.GetType().IsClass() {
@@ -103,7 +103,7 @@ func ZendResolveClassType(type_ *types.TypeHint, selfCe *types.ClassEntry) bool 
 	return true
 }
 func IZendCheckPropertyType(info *types.PropertyInfo, property *types.Zval, strict bool) bool {
-	b.Assert(!(property.IsReference()))
+	b.Assert(!(property.IsRef()))
 	if info.GetType().IsClass() {
 		if !property.IsObject() {
 			return property.IsNull() && info.GetType().AllowNull()
@@ -114,7 +114,7 @@ func IZendCheckPropertyType(info *types.PropertyInfo, property *types.Zval, stri
 		return operators.InstanceofFunction(types.Z_OBJCE_P(property), info.GetType().Ce())
 	}
 	b.Assert(info.GetType().Code() != types.IsCallable)
-	if info.GetType().Code() == property.GetType() {
+	if info.GetType().Code() == property.Type() {
 		return true
 	} else if property.IsNull() {
 		return info.GetType().AllowNull()
@@ -146,11 +146,11 @@ func ZendAssignToTypedProp(info *types.PropertyInfo, property_val *types.Zval, v
 	return ZendAssignToVariable(property_val, &tmp, executeData.IsCallUseStrictTypes())
 }
 func ZendCheckType(typ types.TypeHint, arg *types.Zval, ce **types.ClassEntry, cacheSlot *any, defaultValue *types.Zval, scope *types.ClassEntry) bool {
-	var ref *types.ZendReference = nil
+	var ref *types.Reference = nil
 	if !(typ.IsSet()) {
 		return true
 	}
-	if arg.IsReference() {
+	if arg.IsRef() {
 		ref = arg.Reference()
 		arg = types.Z_REFVAL_P(arg)
 	}
@@ -168,7 +168,7 @@ func ZendCheckType(typ types.TypeHint, arg *types.Zval, ce **types.ClassEntry, c
 			return operators.InstanceofFunction(types.Z_OBJCE_P(arg), *ce)
 		}
 		return arg.IsNull() && (typ.AllowNull() || defaultValue != nil && IsNullConstant(scope, defaultValue) != 0)
-	} else if typ.Code() == arg.GetType() {
+	} else if typ.Code() == arg.Type() {
 		return true
 	}
 	if arg.IsNull() && (typ.AllowNull() || defaultValue != nil && IsNullConstant(scope, defaultValue) != 0) {
@@ -348,7 +348,7 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 	}
 	// 	FREE_OP(free_op_data1)
 }
-func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
+func ZendBinaryAssignOpTypedRef(ref *types.Reference, value *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var z_copy types.Zval
 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */
@@ -389,7 +389,7 @@ func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteD
 
 	var offset ZendLong
 	if !dim.IsLong() {
-		switch dim.GetType() {
+		switch dim.Type() {
 		case types.IsString:
 			if types.IsLong == operators.IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 				break

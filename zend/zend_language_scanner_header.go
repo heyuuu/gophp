@@ -158,7 +158,7 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 	var retval int
 	var opened_path *types.String = nil
 	if filename.IsString() {
-		tmp.SetStringVal(operators.ZvalGetStrVal(filename))
+		tmp.SetString(operators.ZvalGetStrVal(filename))
 		filename = &tmp
 	}
 	fh := NewFileHandleByFilename(filename.StringVal())
@@ -195,7 +195,7 @@ func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray
 	var original_lex_state ZendLexState
 	var op_array int = nil
 	var tmp types.Zval
-	tmp.SetStringVal(operators.ZvalGetStrVal(source_string))
+	tmp.SetString(operators.ZvalGetStrVal(source_string))
 	if tmp.String().GetLen() == 0 {
 		return nil
 	}

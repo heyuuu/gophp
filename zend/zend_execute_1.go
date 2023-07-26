@@ -99,8 +99,8 @@ func _getZvalPtrPtr(op_type int, node types.ZnodeOp, should_free *ZendFreeOp, ty
 	}
 }
 func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zval) {
-	var ref *types.ZendReference
-	if !(value_ptr.IsReference()) {
+	var ref *types.Reference
+	if !(value_ptr.IsRef()) {
 		value_ptr.SetNewRef(value_ptr)
 	} else if variable_ptr == value_ptr {
 		return
@@ -112,7 +112,7 @@ func ZendAssignToTypedPropertyReference(prop_info *types.PropertyInfo, prop *typ
 	if ZendVerifyPropAssignableByRef(prop_info, value_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		return UninitializedZval()
 	}
-	if prop.IsReference() {
+	if prop.IsRef() {
 		ZEND_REF_DEL_TYPE_SOURCE(prop.Reference(), prop_info)
 	}
 	ZendAssignToVariableReference(prop, value_ptr)
@@ -177,11 +177,11 @@ func ZendThrowAccessUninitPropByRefError(prop *types.PropertyInfo) {
 func MakeRealObject(object *types.Zval, property *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) *types.Zval {
 	var obj *types.Object
 	var ref *types.Zval = nil
-	if object.IsReference() {
+	if object.IsRef() {
 		ref = object
 		object = types.Z_REFVAL_P(object)
 	}
-	if object.GetType() > types.IsFalse && (!object.IsString() || object.String().GetLen() != 0) {
+	if object.Type() > types.IsFalse && (!object.IsString() || object.String().GetLen() != 0) {
 		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
 			var property_name *types.String = operators.ZvalGetString(property)
 			if opline.GetOpcode() == ZEND_PRE_INC_OBJ || opline.GetOpcode() == ZEND_PRE_DEC_OBJ || opline.GetOpcode() == ZEND_POST_INC_OBJ || opline.GetOpcode() == ZEND_POST_DEC_OBJ {

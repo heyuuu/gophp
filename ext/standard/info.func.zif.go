@@ -15,7 +15,7 @@ var DefZifPhpversion = def.DefFunc("phpversion", 0, 1, []def.ArgInfo{{Name: "ext
 	}
 	ret, ok := ZifPhpversion(nil, extension)
 	if ok {
-		returnValue.SetStringVal(ret)
+		returnValue.SetString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

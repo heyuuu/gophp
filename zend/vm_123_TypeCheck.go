@@ -7,7 +7,7 @@ func ZEND_TYPE_CHECK_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var result int = 0
 	value = opline.Const1()
-	if (opline.GetExtendedValue() >> uint32(value.GetType()) & 1) != 0 {
+	if (opline.GetExtendedValue() >> uint32(value.Type()) & 1) != 0 {
 	type_check_resource:
 		if !value.IsResource() || nil != ZendRsrcListGetRsrcType(value.GetRes()) {
 			result = 1
@@ -27,14 +27,14 @@ func ZEND_TYPE_CHECK_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var result int = 0
 	var free_op1 ZendFreeOp
 	value = opline.Op1()
-	if (opline.GetExtendedValue() >> uint32(value.GetType()) & 1) != 0 {
+	if (opline.GetExtendedValue() >> uint32(value.Type()) & 1) != 0 {
 	type_check_resource:
 		if !value.IsResource() || nil != ZendRsrcListGetRsrcType(value.GetRes()) {
 			result = 1
 		}
-	} else if value.IsReference() {
+	} else if value.IsRef() {
 		value = types.Z_REFVAL_P(value)
-		if (opline.GetExtendedValue() >> uint32(value.GetType()) & 1) != 0 {
+		if (opline.GetExtendedValue() >> uint32(value.Type()) & 1) != 0 {
 			goto type_check_resource
 		}
 	} else if value.IsUndef() {
@@ -58,14 +58,14 @@ func ZEND_TYPE_CHECK_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var result int = 0
 	value = opline.Op1()
-	if (opline.GetExtendedValue() >> uint32(value.GetType()) & 1) != 0 {
+	if (opline.GetExtendedValue() >> uint32(value.Type()) & 1) != 0 {
 	type_check_resource:
 		if !value.IsResource() || nil != ZendRsrcListGetRsrcType(value.GetRes()) {
 			result = 1
 		}
-	} else if value.IsReference() {
+	} else if value.IsRef() {
 		value = types.Z_REFVAL_P(value)
-		if (opline.GetExtendedValue() >> uint32(value.GetType()) & 1) != 0 {
+		if (opline.GetExtendedValue() >> uint32(value.Type()) & 1) != 0 {
 			goto type_check_resource
 		}
 	} else if value.IsUndef() {

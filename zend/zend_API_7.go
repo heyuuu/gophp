@@ -357,7 +357,7 @@ func ZendCreateMethodString(className string, methodName string) string {
 }
 func ZendGetCallableNameEx(callable *types.Zval, object *types.Object) string {
 	callable = callable.DeRef()
-	switch callable.GetType() {
+	switch callable.Type() {
 	case types.IsString:
 		if object != nil {
 			return ZendCreateMethodString(object.GetCe().Name(), callable.StringVal())

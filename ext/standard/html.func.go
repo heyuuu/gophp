@@ -1356,7 +1356,7 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 		default_charset = GetDefaultCharset()
 	}
 	replaced = PhpEscapeHtmlEntitiesEx((*uint8)(str.GetVal()), str.GetLen(), all, int(flags), lang.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset), double_encode)
-	return_value.SetString(replaced)
+	return_value.SetStringEx(replaced)
 }
 func RegisterHtmlConstants(type_ int, module_number int) {
 	zend.RegisterLongConstant("HTML_SPECIALCHARS", HTML_SPECIALCHARS, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
@@ -1394,7 +1394,7 @@ func ZifHtmlspecialcharsDecode(executeData zpp.Ex, return_value zpp.Ret, string 
 	}
 	replaced = PhpUnescapeHtmlEntities(str, 0, int(quote_style), nil)
 	if replaced != nil {
-		return_value.SetString(replaced)
+		return_value.SetStringEx(replaced)
 		return
 	}
 	return_value.SetFalse()
@@ -1425,7 +1425,7 @@ func ZifHtmlEntityDecode(executeData zpp.Ex, return_value zpp.Ret, string *types
 	}
 	replaced = PhpUnescapeHtmlEntities(str, 1, int(quote_style), lang.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset))
 	if replaced != nil {
-		return_value.SetString(replaced)
+		return_value.SetStringEx(replaced)
 		return
 	}
 	return_value.SetFalse()

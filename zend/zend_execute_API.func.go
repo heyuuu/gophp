@@ -325,7 +325,7 @@ func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *type
 		} else {
 			var result_str *types.String = types.NewString(b.CastStr(actual, actual_len))
 			// ZvalPtrDtorNogc(result)
-			result.SetString(result_str)
+			result.SetStringEx(result_str)
 		}
 	}
 	return types.SUCCESS
@@ -447,7 +447,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 		var arg *types.Zval = fci.GetParams()[i]
 		var must_wrap bool = 0
 		if ARG_SHOULD_BE_SENT_BY_REF(func_, i+1) != 0 {
-			if !(arg.IsReference()) {
+			if !(arg.IsRef()) {
 				if fci.GetNoSeparation() == 0 {
 					/* Separation is enabled -- create a ref */
 					arg.SetNewRef(arg)
@@ -469,7 +469,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 				}
 			}
 		} else {
-			if arg.IsReference() && !func_.IsCallViaTrampoline() {
+			if arg.IsRef() && !func_.IsCallViaTrampoline() {
 
 				/* don't separate references for __call */
 
@@ -713,9 +713,9 @@ func ZendEvalStringl(str string, retval_ptr *types.Zval, string_name *byte) int 
 	var original_compiler_options uint32
 	var retval int
 	if retval_ptr != nil {
-		pv.SetStringVal("return " + str + ";")
+		pv.SetString("return " + str + ";")
 	} else {
-		pv.SetStringVal(str)
+		pv.SetString(str)
 	}
 
 	original_compiler_options = CG__().GetCompilerOptions()

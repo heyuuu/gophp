@@ -20,7 +20,7 @@ func ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
 		retStr += rope[i].GetStr()
 	}
-	opline.Result().SetStringVal(retStr)
+	opline.Result().SetString(retStr)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -49,7 +49,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
 		retStr += rope[i].GetStr()
 	}
-	opline.Result().SetStringVal(retStr)
+	opline.Result().SetString(retStr)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -79,6 +79,6 @@ func ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
 		retStr += rope[i].GetStr()
 	}
-	opline.Result().SetStringVal(retStr)
+	opline.Result().SetString(retStr)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
