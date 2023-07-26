@@ -3,6 +3,7 @@ package zend
 import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -166,7 +167,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 			buf.WriteString(" *RECURSION*")
 			return
 		}
-		if b.Assign(&properties, ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_DEBUG)) == nil {
+		if lang.Assign(&properties, ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_DEBUG)) == nil {
 			break
 		}
 		expr.Object().ProtectRecursive()

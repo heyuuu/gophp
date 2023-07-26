@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -115,7 +116,7 @@ func PhpPrintGpcseArray(name string) {
 	var string_key *types.String
 	var num_key zend.ZendUlong
 	zend.ZendIsAutoGlobal(name)
-	if b.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), name)) != nil && data.IsType(types.IS_ARRAY) {
+	if lang.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), name)) != nil && data.IsType(types.IS_ARRAY) {
 		var __ht *types.Array = data.Array()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -259,9 +260,9 @@ func PhpPrintInfo(flag int) {
 		PhpInfoPrintTableRow(2, "Server API", core.SM__().PrettyName())
 		PhpInfoPrintTableRow(2, "Virtual Directory Support", "disabled")
 		PhpInfoPrintTableRow(2, "Configuration File (php.ini) Path", core.PHP_CONFIG_FILE_PATH)
-		PhpInfoPrintTableRow(2, "Loaded Configuration File", b.Cond(PhpIniOpenedPath != nil, PhpIniOpenedPath, "(none)"))
-		PhpInfoPrintTableRow(2, "Scan this dir for additional .ini files", b.Cond(PhpIniScannedPath != nil, PhpIniScannedPath, "(none)"))
-		PhpInfoPrintTableRow(2, "Additional .ini files parsed", b.Cond(PhpIniScannedFiles != nil, PhpIniScannedFiles, "(none)"))
+		PhpInfoPrintTableRow(2, "Loaded Configuration File", lang.Cond(PhpIniOpenedPath != nil, PhpIniOpenedPath, "(none)"))
+		PhpInfoPrintTableRow(2, "Scan this dir for additional .ini files", lang.Cond(PhpIniScannedPath != nil, PhpIniScannedPath, "(none)"))
+		PhpInfoPrintTableRow(2, "Additional .ini files parsed", lang.Cond(PhpIniScannedFiles != nil, PhpIniScannedFiles, "(none)"))
 		core.Snprintf(temp_api, b.SizeOf("temp_api"), "%d", core.PHP_API_VERSION)
 		PhpInfoPrintTableRow(2, "PHP API", temp_api)
 		core.Snprintf(temp_api, b.SizeOf("temp_api"), "%d", zend.ZEND_MODULE_API_NO)
@@ -291,7 +292,7 @@ func PhpPrintInfo(flag int) {
 			PhpInfoPrint(ZEND_LOGO_DATA_URI + "\" alt=\"Zend logo\" /></a>\n")
 		}
 		PhpInfoPrint("This program makes use of the Zend Scripting Language Engine:")
-		PhpInfoPrint(b.Cond(core.SM__().GetPhpinfoAsText() == 0, "<br />", "\n"))
+		PhpInfoPrint(lang.Cond(core.SM__().GetPhpinfoAsText() == 0, "<br />", "\n"))
 		if core.SM__().GetPhpinfoAsText() != 0 {
 			PhpInfoPrint(zend_version)
 		} else {
@@ -336,7 +337,7 @@ func PhpPrintInfo(flag int) {
 		tsrm_env_lock()
 		for env = cli.Environ; env != nil && (*env) != nil; env++ {
 			tmp1 = zend.Estrdup(*env)
-			if !(b.Assign(&tmp2, strchr(tmp1, '='))) {
+			if !(lang.Assign(&tmp2, strchr(tmp1, '='))) {
 				zend.Efree(tmp1)
 				continue
 			}
@@ -353,16 +354,16 @@ func PhpPrintInfo(flag int) {
 		SECTION("PHP Variables")
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(2, "Variable", "Value")
-		if b.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_SELF")) != nil && data.IsString() {
+		if lang.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_SELF")) != nil && data.IsString() {
 			PhpInfoPrintTableRow(2, "PHP_SELF", data.String().GetVal())
 		}
-		if b.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_AUTH_TYPE")) != nil && data.IsString() {
+		if lang.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_AUTH_TYPE")) != nil && data.IsString() {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_TYPE", data.String().GetVal())
 		}
-		if b.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_AUTH_USER")) != nil && data.IsString() {
+		if lang.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_AUTH_USER")) != nil && data.IsString() {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_USER", data.String().GetVal())
 		}
-		if b.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_AUTH_PW")) != nil && data.IsString() {
+		if lang.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_AUTH_PW")) != nil && data.IsString() {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_PW", data.String().GetVal())
 		}
 		PhpPrintGpcseArray("_REQUEST")
@@ -502,7 +503,7 @@ func PhpInfoPrintTableRowInternal(num_cols int, value_class *byte, row_elements 
 	}
 	for i = 0; i < num_cols; i++ {
 		if core.SM__().GetPhpinfoAsText() == 0 {
-			PhpInfoPrintf("<td class=\"%s\">", b.Cond(i == 0, "e", value_class))
+			PhpInfoPrintf("<td class=\"%s\">", lang.Cond(i == 0, "e", value_class))
 		}
 		row_element = __va_arg(row_elements, (*byte)(_))
 		if row_element == nil || !(*row_element) {

@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -261,28 +262,28 @@ func ZendIniEscapeString(lval *types.Zval, str *byte, len_ int, quote_type byte)
 		if (*s) == '\\' {
 			s++
 			if s >= end {
-				b.PostInc(&(*t)) = '\\'
+				lang.PostInc(&(*t)) = '\\'
 				continue
 			}
 			switch *s {
 			case '"':
 				if (*s) != quote_type {
-					b.PostInc(&(*t)) = '\\'
-					b.PostInc(&(*t)) = *s
+					lang.PostInc(&(*t)) = '\\'
+					lang.PostInc(&(*t)) = *s
 					break
 				}
 				fallthrough
 			case '\\':
 				fallthrough
 			case '$':
-				b.PostInc(&(*t)) = *s
+				lang.PostInc(&(*t)) = *s
 				lval.String().GetLen()--
 			default:
-				b.PostInc(&(*t)) = '\\'
-				b.PostInc(&(*t)) = *s
+				lang.PostInc(&(*t)) = '\\'
+				lang.PostInc(&(*t)) = *s
 			}
 		} else {
-			b.PostInc(&(*t)) = *s
+			lang.PostInc(&(*t)) = *s
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
 			SCNG(lineno)++
@@ -466,7 +467,7 @@ yy3:
 	return TC_LABEL
 yy4:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	goto yy63
 yy5:
 	Yyleng = YYCURSOR - SCNG(yy_text)
@@ -484,14 +485,14 @@ yy7:
 	SCNG(lineno)++
 	return END_OF_LINE
 yy8:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy66
 	}
 	goto yy7
 yy9:
 	yyaccept = 1
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= 0x1f {
 		if yych <= '\n' {
 			if yych <= 0x8 {
@@ -528,11 +529,11 @@ yy10:
 	Yyleng = YYCURSOR - SCNG(yy_text)
 	return Yytext[0]
 yy12:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy25
 yy13:
 	yyaccept = 2
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	goto yy58
 	Yyleng = YYCURSOR - SCNG(yy_text)
 	return 0
@@ -549,7 +550,7 @@ yy16:
 	}
 	return '='
 yy17:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy52
 	}
@@ -558,7 +559,7 @@ yy17:
 	}
 	goto yy25
 yy18:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= 'U' {
 		if yych == 'O' {
 			goto yy43
@@ -581,7 +582,7 @@ yy18:
 		}
 	}
 yy19:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= 'N' {
 		if yych == 'F' {
 			goto yy37
@@ -604,7 +605,7 @@ yy19:
 		}
 	}
 yy20:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy35
 	}
@@ -613,7 +614,7 @@ yy20:
 	}
 	goto yy25
 yy21:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy26
 	}
@@ -648,7 +649,7 @@ yy25:
 	}
 	goto yy3
 yy26:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy30
 	}
@@ -772,7 +773,7 @@ yy33:
 	}
 	goto yy32
 yy35:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'U' {
 		goto yy36
 	}
@@ -780,7 +781,7 @@ yy35:
 		goto yy25
 	}
 yy36:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy30
 	}
@@ -789,7 +790,7 @@ yy36:
 	}
 	goto yy25
 yy37:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'F' {
 		goto yy38
 	}
@@ -885,7 +886,7 @@ yy41:
 	}
 	goto yy40
 yy43:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '\'' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -961,7 +962,7 @@ yy43:
 		}
 	}
 yy44:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy45
 	}
@@ -969,7 +970,7 @@ yy44:
 		goto yy25
 	}
 yy45:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy46
 	}
@@ -1065,7 +1066,7 @@ yy49:
 	}
 	goto yy48
 yy51:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy38
 	}
@@ -1074,7 +1075,7 @@ yy51:
 	}
 	goto yy25
 yy52:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy53
 	}
@@ -1082,7 +1083,7 @@ yy52:
 		goto yy25
 	}
 yy53:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy54
 	}
@@ -1090,7 +1091,7 @@ yy53:
 		goto yy25
 	}
 yy54:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy38
 	}
@@ -1133,7 +1134,7 @@ yy60:
 	SCNG(lineno)++
 	return END_OF_LINE
 yy61:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy59
 	}
@@ -1257,11 +1258,11 @@ yy64:
 		}
 	}
 yy66:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy7
 yy67:
 	YYCURSOR++
-	if b.Assign(&yych, *YYCURSOR) == '\n' {
+	if lang.Assign(&yych, *YYCURSOR) == '\n' {
 		goto yy66
 	}
 	goto yy7
@@ -1287,7 +1288,7 @@ yy71:
 		return 0
 	}
 	for YYCURSOR < YYLIMIT {
-		switch b.PostInc(&(*YYCURSOR)) {
+		switch lang.PostInc(&(*YYCURSOR)) {
 		case '"':
 			if YYCURSOR < YYLIMIT && YYCURSOR[-2] == '\\' && (*YYCURSOR) != '\r' && (*YYCURSOR) != '\n' {
 				continue
@@ -1320,7 +1321,7 @@ yy73:
 	YyPopState()
 	return '"'
 yy74:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych != '{' {
 		goto yy71
 	}
@@ -1423,7 +1424,7 @@ yyc_ST_OFFSET:
 	}
 yy81:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	goto yy100
 yy82:
 	Yyleng = YYCURSOR - SCNG(yy_text)
@@ -1435,7 +1436,7 @@ yy82:
 	return TC_STRING
 yy83:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy126
 	}
@@ -1458,7 +1459,7 @@ yy87:
 	_yyPushState(yycST_DOUBLE_QUOTES)
 	return '"'
 yy88:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '\\' {
 		if yych <= 0x0 {
 			goto yy85
@@ -1475,14 +1476,14 @@ yy88:
 	}
 yy89:
 	yyaccept = 1
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy120
 	}
 	goto yy85
 yy90:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy100
 	}
@@ -1492,7 +1493,7 @@ yy90:
 	goto yy100
 yy91:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy100
 	}
@@ -1502,7 +1503,7 @@ yy91:
 	goto yy100
 yy92:
 	yyaccept = 2
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '\'' {
 		if yych <= '\r' {
 			if yych == '\n' {
@@ -1550,7 +1551,7 @@ yy93:
 	return TC_NUMBER
 yy94:
 	yyaccept = 3
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy110
 	}
@@ -1590,7 +1591,7 @@ yy95:
 	}
 	return TC_CONSTANT
 yy96:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy99
 yy97:
 	YYCURSOR++
@@ -2080,7 +2081,7 @@ yy126:
 		}
 	}
 yy128:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy87
 yy129:
 	YYCURSOR++
@@ -2177,7 +2178,7 @@ end_raw_value_chars:
 	return TC_RAW
 yy136:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '\r' {
 		if yych <= 0x8 {
 			goto yy135
@@ -2210,14 +2211,14 @@ yy138:
 	SCNG(lineno)++
 	return END_OF_LINE
 yy139:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy146
 	}
 	goto yy138
 yy140:
 	yyaccept = 1
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	goto yy142
 yy141:
 	YYCURSOR++
@@ -2240,13 +2241,13 @@ yy144:
 	SCNG(lineno)++
 	return END_OF_LINE
 yy145:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy143
 	}
 	goto yy144
 yy146:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy138
 yy147:
 	yyaccept = 2
@@ -2282,7 +2283,7 @@ yy148:
 
 yy150:
 	YYCURSOR++
-	if b.Assign(&yych, *YYCURSOR) == '\n' {
+	if lang.Assign(&yych, *YYCURSOR) == '\n' {
 		goto yy146
 	}
 	goto yy138
@@ -2349,10 +2350,10 @@ yy160:
 	}
 	goto yy158
 yy161:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy158
 yy162:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy161
 	}
@@ -2452,7 +2453,7 @@ yyc_ST_SECTION_VALUE:
 	}
 yy167:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	goto yy190
 yy168:
 	Yyleng = YYCURSOR - SCNG(yy_text)
@@ -2464,7 +2465,7 @@ yy168:
 	return TC_STRING
 yy169:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= 0x1f {
 		if yych == '\t' {
 			goto yy216
@@ -2491,7 +2492,7 @@ yy173:
 	_yyPushState(yycST_DOUBLE_QUOTES)
 	return '"'
 yy174:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '\\' {
 		if yych <= 0x0 {
 			goto yy171
@@ -2508,14 +2509,14 @@ yy174:
 	}
 yy175:
 	yyaccept = 1
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy210
 	}
 	goto yy171
 yy176:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy190
 	}
@@ -2525,7 +2526,7 @@ yy176:
 	goto yy190
 yy177:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy190
 	}
@@ -2535,7 +2536,7 @@ yy177:
 	goto yy190
 yy178:
 	yyaccept = 2
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '\'' {
 		if yych <= '\r' {
 			if yych == '\n' {
@@ -2583,7 +2584,7 @@ yy179:
 	return TC_NUMBER
 yy180:
 	yyaccept = 3
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 32) != 0 {
 		goto yy200
 	}
@@ -2623,7 +2624,7 @@ yy181:
 	}
 	return TC_CONSTANT
 yy182:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy189
 yy183:
 	YYCURSOR++
@@ -2652,10 +2653,10 @@ yy186:
 	}
 	goto yy184
 yy187:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy184
 yy188:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy187
 	}
@@ -3344,7 +3345,7 @@ yy222:
 	return END_OF_LINE
 yy223:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	goto yy251
 yy224:
 	Yyleng = YYCURSOR - SCNG(yy_text)
@@ -3356,7 +3357,7 @@ yy224:
 	return TC_STRING
 yy225:
 	yyaccept = 1
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	goto yy305
 yy226:
 	Yyleng = YYCURSOR - SCNG(yy_text)
@@ -3374,7 +3375,7 @@ yy228:
 	SCNG(lineno)++
 	return END_OF_LINE
 yy229:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy303
 	}
@@ -3393,7 +3394,7 @@ yy233:
 	_yyPushState(yycST_DOUBLE_QUOTES)
 	return '"'
 yy234:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '\\' {
 		if yych <= 0x0 {
 			goto yy222
@@ -3410,14 +3411,14 @@ yy234:
 	}
 yy235:
 	yyaccept = 2
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy295
 	}
 	goto yy222
 yy236:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy251
 	}
@@ -3427,7 +3428,7 @@ yy236:
 	goto yy251
 yy237:
 	yyaccept = 0
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy251
 	}
@@ -3437,7 +3438,7 @@ yy237:
 	goto yy251
 yy238:
 	yyaccept = 3
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -3506,7 +3507,7 @@ yy239:
 	return TC_NUMBER
 yy240:
 	yyaccept = 2
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	goto yy283
 yy241:
 	YYCURSOR++
@@ -3516,7 +3517,7 @@ yy241:
 	return END_OF_LINE
 yy243:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy252
 	}
@@ -3584,7 +3585,7 @@ yy244:
 	return TC_CONSTANT
 yy245:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '<' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -3670,7 +3671,7 @@ yy245:
 	}
 yy246:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= 'N' {
 		if yych <= '%' {
 			if yych <= 'f' {
@@ -3774,7 +3775,7 @@ yy246:
 	}
 yy247:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= 'E' {
 		if yych <= '%' {
 			if yych <= 'f' {
@@ -3878,7 +3879,7 @@ yy247:
 	}
 yy248:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -3964,7 +3965,7 @@ yy248:
 	}
 yy249:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4142,7 +4143,7 @@ yy252:
 	}
 yy254:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4304,7 +4305,7 @@ yy258:
 	goto yy250
 yy260:
 	yyaccept = 5
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy262
 	}
@@ -4398,7 +4399,7 @@ yy262:
 	goto yy261
 yy264:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4483,7 +4484,7 @@ yy264:
 	}
 yy265:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4569,7 +4570,7 @@ yy265:
 	}
 yy266:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4654,7 +4655,7 @@ yy266:
 	}
 yy267:
 	yyaccept = 6
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy252
 	}
@@ -4739,7 +4740,7 @@ yy269:
 	goto yy268
 yy271:
 	yyaccept = 6
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '<' {
 		if yych <= ' ' {
 			if yych <= '\n' {
@@ -4835,7 +4836,7 @@ yy271:
 	}
 yy272:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4920,7 +4921,7 @@ yy272:
 	}
 yy273:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5005,7 +5006,7 @@ yy273:
 	}
 yy274:
 	yyaccept = 7
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy252
 	}
@@ -5090,7 +5091,7 @@ yy276:
 	goto yy275
 yy278:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5176,7 +5177,7 @@ yy278:
 	}
 yy279:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5261,7 +5262,7 @@ yy279:
 	}
 yy280:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5346,7 +5347,7 @@ yy280:
 	}
 yy281:
 	yyaccept = 4
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5451,7 +5452,7 @@ yy285:
 	SCNG(lineno)++
 	return END_OF_LINE
 yy286:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy284
 	}
@@ -5807,7 +5808,7 @@ yy302:
 	}
 	goto yy231
 yy303:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy228
 yy304:
 	yyaccept = 1
@@ -5848,11 +5849,11 @@ yy305:
 			goto yy226
 		}
 	}
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy233
 yy307:
 	YYCURSOR++
-	if b.Assign(&yych, *YYCURSOR) == '\n' {
+	if lang.Assign(&yych, *YYCURSOR) == '\n' {
 		goto yy303
 	}
 	goto yy228

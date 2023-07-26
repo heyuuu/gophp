@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -82,7 +83,7 @@ func PhpStreamBucketMakeWriteable(bucket *PhpStreamBucket) *PhpStreamBucket {
 	return retval
 }
 func PhpStreamBucketDelref(bucket *PhpStreamBucket) {
-	if b.PreDec(&(bucket.GetRefcount())) == 0 {
+	if lang.PreDec(&(bucket.GetRefcount())) == 0 {
 		if bucket.GetOwnBuf() != 0 {
 			zend.Pefree(bucket.GetBuf())
 		}
@@ -139,9 +140,9 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 	var n int
 	var period *byte
 	n = strlen(filtername)
-	if nil != b.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, b.CastStr(filtername, n))) {
+	if nil != lang.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, b.CastStr(filtername, n))) {
 		filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
-	} else if b.Assign(&period, strrchr(filtername, '.')) {
+	} else if lang.Assign(&period, strrchr(filtername, '.')) {
 
 		/* try a wildcard */
 
@@ -153,7 +154,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 			b.Assert(period[0] == '.')
 			period[1] = '*'
 			period[2] = '0'
-			if nil != b.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, wildname)) {
+			if nil != lang.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, wildname)) {
 				filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
 			}
 			*period = '0'
@@ -310,7 +311,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 	var current *core.PhpStreamFilter
 	var stream *core.PhpStream
 	var flushed_size int = 0
-	var flags long = b.Cond(finish != 0, PSFS_FLAG_FLUSH_CLOSE, PSFS_FLAG_FLUSH_INC)
+	var flags long = lang.Cond(finish != 0, PSFS_FLAG_FLUSH_CLOSE, PSFS_FLAG_FLUSH_INC)
 	if filter.GetChain() == nil || filter.GetChain().GetStream() == nil {
 
 		/* Filter is not attached to a chain, or chain is somehow not part of a stream */
@@ -385,7 +386,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 			/* Grow the buffer */
 
 		}
-		for b.Assign(&bucket, inp.GetHead()) {
+		for lang.Assign(&bucket, inp.GetHead()) {
 			memcpy(stream.GetReadbuf()+stream.GetWritepos(), bucket.GetBuf(), bucket.GetBuflen())
 			stream.SetWritepos(stream.GetWritepos() + bucket.GetBuflen())
 			PhpStreamBucketUnlink(bucket)
@@ -395,7 +396,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 		/* Send flushed data to the stream */
 
-		for b.Assign(&bucket, inp.GetHead()) {
+		for lang.Assign(&bucket, inp.GetHead()) {
 			var count ssize_t = stream.GetOps().GetWrite()(stream, bucket.GetBuf(), bucket.GetBuflen())
 			if count > 0 {
 				stream.SetPosition(stream.GetPosition() + count)

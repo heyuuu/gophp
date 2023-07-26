@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -61,7 +62,7 @@ func ZendGetBrkContTarget(op_array *types.ZendOpArray, opline *types.ZendOp) uin
 		if nest_levels > 1 {
 			array_offset = jmp_to.GetParent()
 		}
-		if b.PreDec(&nest_levels) <= 0 {
+		if lang.PreDec(&nest_levels) <= 0 {
 			break
 		}
 	}

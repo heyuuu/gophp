@@ -2,6 +2,7 @@ package types
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 )
 
 /**
@@ -88,7 +89,7 @@ func (zv *Zval) SetUndef()                       { zv.typ, zv.value = IS_UNDEF, 
 func (zv *Zval) SetNull()                        { zv.typ, zv.value = IS_NULL, nil }
 func (zv *Zval) SetFalse()                       { zv.typ, zv.value = IS_FALSE, nil }
 func (zv *Zval) SetTrue()                        { zv.typ, zv.value = IS_TRUE, nil }
-func (zv *Zval) SetBool(v bool)                  { zv.typ, zv.value = b.Cond(v, IS_TRUE, IS_FALSE), nil }
+func (zv *Zval) SetBool(v bool)                  { zv.typ, zv.value = lang.Cond(v, IS_TRUE, IS_FALSE), nil }
 func (zv *Zval) SetLong(l int)                   { zv.typ, zv.value = IS_LONG, l }
 func (zv *Zval) SetDouble(d float64)             { zv.typ, zv.value = IS_DOUBLE, d }
 func (zv *Zval) SetStringVal(s string)           { zv.typ, zv.value = IS_STRING, NewString(s) }

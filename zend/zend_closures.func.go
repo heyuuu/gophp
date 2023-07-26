@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -103,7 +104,7 @@ func zim_Closure_call(executeData *ZendExecuteData, returnValue *types.Zval) {
 		closure = (*ZendClosure)(new_closure.Object())
 		fci_cache.SetFunctionHandler(closure.GetFunc())
 	} else {
-		memcpy(&my_function, closure.GetFunc(), b.CondF(closure.GetFunc().GetType() == ZEND_USER_FUNCTION, func() __auto__ { return b.SizeOf("zend_op_array") }, func() __auto__ { return b.SizeOf("zend_internal_function") }))
+		memcpy(&my_function, closure.GetFunc(), lang.CondF(closure.GetFunc().GetType() == ZEND_USER_FUNCTION, func() __auto__ { return b.SizeOf("zend_op_array") }, func() __auto__ { return b.SizeOf("zend_internal_function") }))
 		my_function.SetIsClosure(false)
 
 		/* use scope of passed object */
@@ -156,7 +157,7 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 			var class_name *types.String = operators.ZvalGetString(scope_arg)
 			if class_name.GetStr() == "static" {
 				ce = closure.GetFunc().GetScope()
-			} else if b.Assign(&ce, ZendLookupClass(class_name)) == nil {
+			} else if lang.Assign(&ce, ZendLookupClass(class_name)) == nil {
 				faults.Error(faults.E_WARNING, "Class '%s' not found", class_name.GetVal())
 				return_value.SetNull()
 				return

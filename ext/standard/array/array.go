@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/ext/standard/conv"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -817,7 +818,7 @@ func ZifArraySlice(array *types.Array, offset int, _ zpp.Opt, length_ *types.Zva
 	/* Clamp the offset.. */
 	if offset > numIn {
 		return types.NewArray(0)
-	} else if offset < 0 && b.Assign(&offset, numIn+offset) < 0 {
+	} else if offset < 0 && lang.Assign(&offset, numIn+offset) < 0 {
 		offset += numIn
 		if offset < 0 {
 			offset = 0

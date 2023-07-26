@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -56,7 +57,7 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 	} else {
 		hints.ai_family = AF_UNSPEC
 	}
-	if b.Assign(&n, getaddrinfo(host, nil, &hints, &res)) {
+	if lang.Assign(&n, getaddrinfo(host, nil, &hints, &res)) {
 		if error_string != nil {
 
 			/* free error string received during previous iteration (if any) */
@@ -82,7 +83,7 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 		return 0
 	}
 	sai = res
-	for n = 1; b.Assign(&sai, sai.ai_next) != nil; n++ {
+	for n = 1; lang.Assign(&sai, sai.ai_next) != nil; n++ {
 
 	}
 	*sal = zend.SafeEmalloc(n+1, b.SizeOf("* sal"), 0)
@@ -92,7 +93,7 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 		*sap = zend.Emalloc(sai.ai_addrlen)
 		memcpy(*sap, sai.ai_addr, sai.ai_addrlen)
 		sap++
-		if b.Assign(&sai, sai.ai_next) == nil {
+		if lang.Assign(&sai, sai.ai_next) == nil {
 			break
 		}
 	}
@@ -122,7 +123,7 @@ func PhpNetworkConnectSocket(
 	var len_ socklen_t
 	var ret int = 0
 	SET_SOCKET_BLOCKING_MODE(sockfd, orig_flags)
-	if b.Assign(&n, connect(sockfd, addr, addrlen)) != 0 {
+	if lang.Assign(&n, connect(sockfd, addr, addrlen)) != 0 {
 		error = PhpSocketErrno()
 		if error_code != nil {
 			*error_code = error
@@ -146,7 +147,7 @@ func PhpNetworkConnectSocket(
 	if n == 0 {
 		goto ok
 	}
-	if b.Assign(&n, PhpPollfdFor(sockfd, PHP_POLLREADABLE|POLLOUT, timeout)) == 0 {
+	if lang.Assign(&n, PhpPollfdFor(sockfd, PHP_POLLREADABLE|POLLOUT, timeout)) == 0 {
 		error = PHP_TIMEOUT_ERROR_VALUE
 	}
 	if n > 0 {
@@ -563,7 +564,7 @@ func PhpNetworkConnectSocketToHost(
 				// types.ZendStringReleaseEx(*error_string, 0)
 				*error_string = nil
 			}
-			n = PhpNetworkConnectSocket(sock, sa, socklen, asynchronous, b.Cond(timeout != nil, &working_timeout, nil), error_string, error_code)
+			n = PhpNetworkConnectSocket(sock, sa, socklen, asynchronous, lang.Cond(timeout != nil, &working_timeout, nil), error_string, error_code)
 			if n != -1 {
 				goto connected
 			}
@@ -633,7 +634,7 @@ func PhpSocketStrerror(err long, buf *byte, bufsize int) *byte {
 		buf = zend.Estrdup(errstr)
 	} else {
 		strncpy(buf, errstr, bufsize)
-		buf[b.Cond(bufsize != 0, bufsize-1, 0)] = 0
+		buf[lang.Cond(bufsize != 0, bufsize-1, 0)] = 0
 	}
 	return buf
 }

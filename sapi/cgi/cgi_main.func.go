@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -72,7 +73,7 @@ func SapiFcgiUbWrite(str *byte, str_length int) int {
 	var remaining int = str_length
 	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
 	for remaining > 0 {
-		var to_write int = b.CondF2(remaining > core.INT_MAX, core.INT_MAX, func() int { return int(remaining) })
+		var to_write int = lang.CondF2(remaining > core.INT_MAX, core.INT_MAX, func() int { return int(remaining) })
 		var ret int = core.FcgiWrite(request, core.FCGI_STDOUT, ptr, to_write)
 		if ret <= 0 {
 			core.PhpHandleAbortedConnection()
@@ -109,7 +110,7 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 		if CGIG(rfc2616_headers) && core.SG__().sapi_headers.http_status_line {
 			var s *byte
 			len_ = core.Slprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH, "%s", core.SG__().sapi_headers.http_status_line)
-			if b.Assign(&s, strchr(core.SG__().sapi_headers.http_status_line, ' ')) {
+			if lang.Assign(&s, strchr(core.SG__().sapi_headers.http_status_line, ' ')) {
 				response_status = atoi(s + 1)
 			}
 			if len_ > SAPI_CGI_MAX_HEADER_LENGTH {
@@ -117,7 +118,7 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 			}
 		} else {
 			var s *byte
-			if core.SG__().sapi_headers.http_status_line && b.Assign(&s, strchr(core.SG__().sapi_headers.http_status_line, ' ')) != 0 && s-core.SG__().sapi_headers.http_status_line >= 5 && strncasecmp(core.SG__().sapi_headers.http_status_line, "HTTP/", 5) == 0 {
+			if core.SG__().sapi_headers.http_status_line && lang.Assign(&s, strchr(core.SG__().sapi_headers.http_status_line, ' ')) != 0 && s-core.SG__().sapi_headers.http_status_line >= 5 && strncasecmp(core.SG__().sapi_headers.http_status_line, "HTTP/", 5) == 0 {
 				len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status:%s", s)
 				response_status = atoi(s + 1)
 			} else {
@@ -196,7 +197,7 @@ func SapiFcgiReadPost(buffer *byte, count_bytes int) int {
 	}
 	for read_bytes < count_bytes {
 		var diff int = count_bytes - read_bytes
-		var to_read int = b.CondF2(diff > core.INT_MAX, core.INT_MAX, func() int { return int(diff) })
+		var to_read int = lang.CondF2(diff > core.INT_MAX, core.INT_MAX, func() int { return int(diff) })
 		tmp_read_bytes = core.FcgiRead(request, buffer+read_bytes, to_read)
 		if tmp_read_bytes <= 0 {
 			break
@@ -242,7 +243,7 @@ func SapiFcgiReadCookies() *byte {
 }
 func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
 	var array_ptr *types.Zval = (*types.Zval)(arg)
-	var filter_arg int = b.Cond(array_ptr.Array() == core.PG__().http_globals[core.TRACK_VARS_ENV].Array(), core.PARSE_ENV, core.PARSE_SERVER)
+	var filter_arg int = lang.Cond(array_ptr.Array() == core.PG__().http_globals[core.TRACK_VARS_ENV].Array(), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
 	if core.SM__().GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe(b.CastStrAuto(var_), b.CastStr(val, new_val_len), array_ptr)
@@ -360,7 +361,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 
 	/* Find cached config entry: If not found, create one */
 
-	if b.Assign(&entry, types.ZendHashStrFindPtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len))) == nil {
+	if lang.Assign(&entry, types.ZendHashStrFindPtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len))) == nil {
 		new_entry = zend.Pemalloc(b.SizeOf("user_config_cache_entry"))
 		new_entry.SetExpires(0)
 		new_entry.SetUserConfig(types.NewArray(8))
@@ -405,7 +406,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 
 		if strncmp(s1, s2, s_len) == 0 {
 			var ptr *byte = s2 + doc_root_len
-			for b.Assign(&ptr, strchr(ptr, zend.DEFAULT_SLASH)) != nil {
+			for lang.Assign(&ptr, strchr(ptr, zend.DEFAULT_SLASH)) != nil {
 				*ptr = 0
 				core.PhpParseUserIniFile(path, core.PG__().user_ini_filename, entry.GetUserConfig())
 				*ptr = '/'
@@ -644,11 +645,11 @@ func InitRequestInfo(request *core.FcgiRequest) {
 			 * this fixes url's like /info.php/test
 			 */
 
-			if script_path_translated != nil && b.Assign(&script_path_translated_len, strlen(script_path_translated)) > 0 && (script_path_translated[script_path_translated_len-1] == '/' || b.Assign(&real_path, zend.TsrmRealpath(script_path_translated, nil)) == nil) {
+			if script_path_translated != nil && lang.Assign(&script_path_translated_len, strlen(script_path_translated)) > 0 && (script_path_translated[script_path_translated_len-1] == '/' || lang.Assign(&real_path, zend.TsrmRealpath(script_path_translated, nil)) == nil) {
 				var pt *byte = zend.Estrndup(script_path_translated, script_path_translated_len)
 				var len_ int = script_path_translated_len
 				var ptr *byte
-				for b.Assign(&ptr, strrchr(pt, '/')) || b.Assign(&ptr, strrchr(pt, '\\')) {
+				for lang.Assign(&ptr, strrchr(pt, '/')) || lang.Assign(&ptr, strrchr(pt, '\\')) {
 					*ptr = 0
 					if zend.ZendStat(pt, &st) == 0 && zend.S_ISREG(st.st_mode) {
 
@@ -669,8 +670,8 @@ func InitRequestInfo(request *core.FcgiRequest) {
 						 */
 
 						var slen int = len_ - strlen(pt)
-						var pilen int = b.CondF1(env_path_info != nil, func() __auto__ { return strlen(env_path_info) }, 0)
-						var path_info *byte = b.Cond(env_path_info != nil, env_path_info+pilen-slen, nil)
+						var pilen int = lang.CondF1(env_path_info != nil, func() __auto__ { return strlen(env_path_info) }, 0)
+						var path_info *byte = lang.Cond(env_path_info != nil, env_path_info+pilen-slen, nil)
 						if orig_path_info != path_info {
 							if orig_path_info != nil {
 								var old byte
@@ -713,7 +714,7 @@ func InitRequestInfo(request *core.FcgiRequest) {
 							 * SCRIPT_FILENAME=/docroot/info.php
 							 */
 
-							path_translated_len = l + b.CondF1(env_path_info != nil, func() __auto__ { return strlen(env_path_info) }, 0)
+							path_translated_len = l + lang.CondF1(env_path_info != nil, func() __auto__ { return strlen(env_path_info) }, 0)
 							path_translated = (*byte)(zend.Emalloc(path_translated_len + 1))
 							memcpy(path_translated, env_document_root, l)
 							if env_path_info != nil {
@@ -730,7 +731,7 @@ func InitRequestInfo(request *core.FcgiRequest) {
 							/* PATH_TRANSLATED = PATH_TRANSLATED - SCRIPT_NAME + PATH_INFO */
 
 							var ptlen int = strlen(pt) - strlen(env_script_name)
-							var path_translated_len int = ptlen + b.CondF1(env_path_info != nil, func() __auto__ { return strlen(env_path_info) }, 0)
+							var path_translated_len int = ptlen + lang.CondF1(env_path_info != nil, func() __auto__ { return strlen(env_path_info) }, 0)
 							var path_translated *byte = (*byte)(zend.Emalloc(path_translated_len + 1))
 							memcpy(path_translated, pt, ptlen)
 							if env_path_info != nil {
@@ -936,7 +937,7 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 				/* First char keep uppercase */
 
 				*p++
-				b.PostInc(&(*q)) = (*p) - 1
+				lang.PostInc(&(*q)) = (*p) - 1
 				for (*p) != nil {
 					if (*p) == '=' {
 
@@ -947,14 +948,14 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 						/* End of name */
 
 					} else if (*p) == '_' {
-						b.PostInc(&(*q)) = '-'
+						lang.PostInc(&(*q)) = '-'
 						p++
 
 						/* First char after - keep uppercase */
 
 						if (*p) != nil && (*p) != '=' {
 							*p++
-							b.PostInc(&(*q)) = (*p) - 1
+							lang.PostInc(&(*q)) = (*p) - 1
 						}
 
 						/* First char after - keep uppercase */
@@ -963,13 +964,13 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 
 						/* lowercase */
 
-						b.PostInc(&(*q)) = b.PostInc(&(*p)) - 'A' + 'a'
+						lang.PostInc(&(*q)) = lang.PostInc(&(*p)) - 'A' + 'a'
 
 						/* lowercase */
 
 					} else {
 						*p++
-						b.PostInc(&(*q)) = (*p) - 1
+						lang.PostInc(&(*q)) = (*p) - 1
 					}
 				}
 				*q = 0

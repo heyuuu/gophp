@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -116,7 +117,7 @@ func arrayKeyCompareNumeric(k1 types.ArrayKey, k2 types.ArrayKey) int {
 	l1, _, isStr1 := k1.Keys()
 	l2, _, isStr2 := k2.Keys()
 	if !isStr1 && !isStr2 {
-		return b.Cond(l1 < l2, -1, 1)
+		return lang.Cond(l1 < l2, -1, 1)
 	} else {
 		d1 := arrayKeyToDouble(k1)
 		d2 := arrayKeyToDouble(k2)
@@ -129,7 +130,7 @@ func arrayKeyCompare(k1 types.ArrayKey, k2 types.ArrayKey) int {
 	if isStr1 && isStr2 {
 		return operators.ZendiSmartStrcmp(s1, s2)
 	} else if !isStr1 && !isStr2 {
-		return b.Cond(l1 < l2, -1, 1)
+		return lang.Cond(l1 < l2, -1, 1)
 	} else {
 		d1 := arrayKeyToDouble(k1)
 		d2 := arrayKeyToDouble(k2)

@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -207,7 +208,7 @@ func PhpBinaryInit() {
 			var envpath *byte
 			var path *byte
 			var found = 0
-			if b.Assign(&envpath, getenv("PATH")) != nil {
+			if lang.Assign(&envpath, getenv("PATH")) != nil {
 				var search_dir *byte
 				var search_path []*byte
 				var last *byte = nil
@@ -1023,7 +1024,7 @@ func PhpRequestStartup() int {
 			PhpOutputStartUser(&oh, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
 			// zend.ZvalPtrDtor(&oh)
 		} else if PG__().output_buffering {
-			PhpOutputStartUser(nil, b.CondF1(PG__().output_buffering > 1, func() __auto__ { return PG__().output_buffering }, 0), PHP_OUTPUT_HANDLER_STDFLAGS)
+			PhpOutputStartUser(nil, lang.CondF1(PG__().output_buffering > 1, func() __auto__ { return PG__().output_buffering }, 0), PHP_OUTPUT_HANDLER_STDFLAGS)
 		} else if PG__().implicit_flush {
 			PhpOutputSetImplicitFlush(1)
 		}
@@ -1063,7 +1064,7 @@ func PhpRequestShutdown() {
 
 	/* 3. Flush all output buffers */
 	faults.Try(func() {
-		var sendBuffer = b.Cond(SG__().RequestInfo.headersOnly, 0, 1)
+		var sendBuffer = lang.Cond(SG__().RequestInfo.headersOnly, 0, 1)
 		if zend.CG__().GetUncleanShutdown() && PG__().LastError() != nil && PG__().LastError().Type == faults.E_ERROR && PG__().memory_limit < zend.ZendMemoryUsage(true) {
 			sendBuffer = 0
 		}
@@ -1172,8 +1173,8 @@ func PhpRegisterExtensions(ptrs []*zend.ModuleEntry) bool {
 	return true
 }
 func PhpRegisterExtensionsBc(ptr *zend.ModuleEntry, count int) int {
-	for b.PostDec(&count) {
-		if zend.ZendRegisterInternalModule(b.PostInc(&ptr)) == nil {
+	for lang.PostDec(&count) {
+		if zend.ZendRegisterInternalModule(lang.PostInc(&ptr)) == nil {
 			return types.FAILURE
 		}
 	}
@@ -1478,7 +1479,7 @@ func PhpHandleAbortedConnection() {
 }
 func PhpHandleAuthData(auth *byte) int {
 	var ret = -1
-	var auth_len int = b.CondF1(auth != nil, func() __auto__ { return strlen(auth) }, 0)
+	var auth_len int = lang.CondF1(auth != nil, func() __auto__ { return strlen(auth) }, 0)
 	if auth != nil && auth_len > 0 && operators.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Basic ", b.SizeOf("\"Basic \"")-1) == 0 {
 		var pass *byte
 		var user *types.String
@@ -1486,7 +1487,7 @@ func PhpHandleAuthData(auth *byte) int {
 		if user != nil {
 			pass = strchr(user.GetVal(), ':')
 			if pass != nil {
-				b.PostInc(&(*pass)) = '0'
+				lang.PostInc(&(*pass)) = '0'
 				SG__().RequestInfo.authUser = zend.Estrndup(user.GetVal(), user.GetLen())
 				SG__().RequestInfo.authPassword = zend.Estrdup(pass)
 				ret = 0

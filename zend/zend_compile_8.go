@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -21,7 +22,7 @@ func (compiler *Compiler) CompileUnaryPm(result *Znode, ast *ZendAst) {
 		}
 	}
 	lefthand_node.SetOpType(IS_CONST)
-	lefthand_node.GetConstant().SetLong(b.Cond(ast.Kind() == ZEND_AST_UNARY_PLUS, 1, -1))
+	lefthand_node.GetConstant().SetLong(lang.Cond(ast.Kind() == ZEND_AST_UNARY_PLUS, 1, -1))
 	ZendEmitOpTmp(result, ZEND_MUL, &lefthand_node, &expr_node)
 }
 func (compiler *Compiler) CompileShortCircuiting(result *Znode, ast *ZendAst) {
@@ -52,7 +53,7 @@ func (compiler *Compiler) CompileShortCircuiting(result *Znode, ast *ZendAst) {
 		return
 	}
 	opnum_jmpz = GetNextOpNumber()
-	opline_jmpz = ZendEmitOp(nil, b.Cond(ast.Kind() == ZEND_AST_AND, ZEND_JMPZ_EX, ZEND_JMPNZ_EX), &left_node, nil)
+	opline_jmpz = ZendEmitOp(nil, lang.Cond(ast.Kind() == ZEND_AST_AND, ZEND_JMPZ_EX, ZEND_JMPNZ_EX), &left_node, nil)
 	if left_node.GetOpType() == IS_TMP_VAR {
 		opline_jmpz.SetResultType(left_node.GetOpType())
 		if left_node.GetOpType() == IS_CONST {
@@ -103,7 +104,7 @@ func (compiler *Compiler) CompilePostIncdec(result *Znode, ast *ZendAst) {
 	} else {
 		var var_node Znode
 		compiler.CompileVar(&var_node, var_ast, BP_VAR_RW, 0)
-		ZendEmitOpTmp(result, b.Cond(ast.Kind() == ZEND_AST_POST_INC, ZEND_POST_INC, ZEND_POST_DEC), &var_node, nil)
+		ZendEmitOpTmp(result, lang.Cond(ast.Kind() == ZEND_AST_POST_INC, ZEND_POST_INC, ZEND_POST_DEC), &var_node, nil)
 	}
 }
 func (compiler *Compiler) CompilePreIncdec(result *Znode, ast *ZendAst) {
@@ -127,7 +128,7 @@ func (compiler *Compiler) CompilePreIncdec(result *Znode, ast *ZendAst) {
 	} else {
 		var var_node Znode
 		compiler.CompileVar(&var_node, var_ast, BP_VAR_RW, 0)
-		ZendEmitOp(result, b.Cond(ast.Kind() == ZEND_AST_PRE_INC, ZEND_PRE_INC, ZEND_PRE_DEC), &var_node, nil)
+		ZendEmitOp(result, lang.Cond(ast.Kind() == ZEND_AST_PRE_INC, ZEND_PRE_INC, ZEND_PRE_DEC), &var_node, nil)
 	}
 }
 func (compiler *Compiler) CompileCast(result *Znode, ast *ZendAst) {
@@ -746,10 +747,10 @@ func (compiler *Compiler) CompileEncapsList(result *Znode, ast *ZendAst) {
 			}
 			if last_const_node.GetOpType() == IS_CONST {
 				opline = CG__().GetActiveOpArray().GetOpcodes()[reserved_op_number]
-				compiler.CompileRopeAddEx(opline, result, b.PostInc(&j), &last_const_node)
+				compiler.CompileRopeAddEx(opline, result, lang.PostInc(&j), &last_const_node)
 				last_const_node.SetOpType(IS_UNUSED)
 			}
-			opline = compiler.CompileRopeAdd(result, b.PostInc(&j), &elem_node)
+			opline = compiler.CompileRopeAdd(result, lang.PostInc(&j), &elem_node)
 		}
 	}
 	if j == 0 {
@@ -763,7 +764,7 @@ func (compiler *Compiler) CompileEncapsList(result *Znode, ast *ZendAst) {
 		return
 	} else if last_const_node.GetOpType() == IS_CONST {
 		opline = CG__().GetActiveOpArray().GetOpcodes()[reserved_op_number]
-		opline = compiler.CompileRopeAddEx(opline, result, b.PostInc(&j), &last_const_node)
+		opline = compiler.CompileRopeAddEx(opline, result, lang.PostInc(&j), &last_const_node)
 	}
 	init_opline = CG__().GetActiveOpArray().GetOpcodes() + rope_init_lineno
 	if j == 1 {

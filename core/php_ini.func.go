@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -150,7 +151,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if b.Assign(&find_arr, active_hash.KeyFind(arg1.String().GetStr())) == nil || !find_arr.IsArray() {
+		if lang.Assign(&find_arr, active_hash.KeyFind(arg1.String().GetStr())) == nil || !find_arr.IsArray() {
 			option_arr.SetArray(types.NewArray(8))
 			find_arr = active_hash.KeyUpdate(arg1.String().GetStr(), &option_arr)
 		}
@@ -436,7 +437,7 @@ func PhpInitConfig() int {
 		for debpath = bufpath; debpath != nil; debpath = endpath {
 			endpath = strchr(debpath, zend.DEFAULT_DIR_SEPARATOR)
 			if endpath != nil {
-				*(b.PostInc(&endpath)) = 0
+				*(lang.PostInc(&endpath)) = 0
 			}
 			if !(debpath[0]) {
 
@@ -450,12 +451,12 @@ func PhpInitConfig() int {
 
 			}
 			lenpath = int(strlen(debpath))
-			if lenpath > 0 && b.Assign(&ndir, PhpScandir(debpath, &namelist, 0, PhpAlphasort)) > 0 {
+			if lenpath > 0 && lang.Assign(&ndir, PhpScandir(debpath, &namelist, 0, PhpAlphasort)) > 0 {
 				for i = 0; i < ndir; i++ {
 
 					/* check for any file with .ini extension */
 
-					if !(b.Assign(&p, strrchr(namelist[i].d_name, '.'))) || p != nil && strcmp(p, ".ini") {
+					if !(lang.Assign(&p, strrchr(namelist[i].d_name, '.'))) || p != nil && strcmp(p, ".ini") {
 						zend.Free(namelist[i])
 						continue
 					}
@@ -491,7 +492,7 @@ func PhpInitConfig() int {
 		}
 		zend.Efree(bufpath)
 		if total_l != 0 {
-			var php_ini_scanned_files_len int = b.CondF1(PhpIniScannedFiles != nil, func() int { return int(strlen(PhpIniScannedFiles) + 1) }, 0)
+			var php_ini_scanned_files_len int = lang.CondF1(PhpIniScannedFiles != nil, func() int { return int(strlen(PhpIniScannedFiles) + 1) }, 0)
 			PhpIniScannedFiles = (*byte)(realloc(PhpIniScannedFiles, php_ini_scanned_files_len+total_l+1))
 			if php_ini_scanned_files_len == 0 {
 				*PhpIniScannedFiles = '0'
@@ -502,7 +503,7 @@ func PhpInitConfig() int {
 					strlcat(PhpIniScannedFiles, ",\n", total_l)
 				}
 				strlcat(PhpIniScannedFiles, *((**byte)(element.GetData())), total_l)
-				strlcat(PhpIniScannedFiles, b.Cond(element.GetNext() != nil, ",\n", "\n"), total_l)
+				strlcat(PhpIniScannedFiles, lang.Cond(element.GetNext() != nil, ",\n", "\n"), total_l)
 			}
 		}
 		scanned_ini_list.Destroy()
@@ -584,12 +585,12 @@ func PhpIniActivatePerDirConfig(path string) {
 
 	if HasPerDirConfig != 0 && path != "" {
 		ptr = path + 1
-		for b.Assign(&ptr, strchr(ptr, '/')) != nil {
+		for lang.Assign(&ptr, strchr(ptr, '/')) != nil {
 			*ptr = 0
 
 			/* Search for source array matching the path from configuration_hash */
 
-			if b.Assign(&tmp2, Config().KeyFind(b.CastStrAuto(path))) != nil {
+			if lang.Assign(&tmp2, Config().KeyFind(b.CastStrAuto(path))) != nil {
 				PhpIniActivateConfig(tmp2.Array(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 			}
 			*ptr = '/'

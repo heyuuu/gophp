@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -57,7 +58,7 @@ func PhpSprintfAppendstring(
 			len_--
 			copy_len--
 		}
-		for b.PostDec(&npad) > 0 {
+		for lang.PostDec(&npad) > 0 {
 			*pos++
 			buf.WriteByte(padding)
 		}
@@ -65,7 +66,7 @@ func PhpSprintfAppendstring(
 	buf.WriteString(add[:copy_len])
 	*pos += copy_len
 	if alignment == ALIGN_LEFT {
-		for b.PostDec(&npad) != 0 {
+		for lang.PostDec(&npad) != 0 {
 			*pos++
 			buf.WriteByte(padding)
 		}
@@ -100,16 +101,16 @@ func PhpSprintfAppendint(
 	numbuf[i] = '0'
 	for {
 		nmagn = magn / 10
-		numbuf[b.PreDec(&i)] = uint8(magn - nmagn*10 + '0')
+		numbuf[lang.PreDec(&i)] = uint8(magn - nmagn*10 + '0')
 		magn = nmagn
 		if !(magn > 0 && i > 1) {
 			break
 		}
 	}
 	if neg != 0 {
-		numbuf[b.PreDec(&i)] = '-'
+		numbuf[lang.PreDec(&i)] = '-'
 	} else if always_sign != 0 {
-		numbuf[b.PreDec(&i)] = '+'
+		numbuf[lang.PreDec(&i)] = '+'
 	}
 	PhpSprintfAppendstring(buf, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, neg, 0, always_sign)
 }
@@ -135,7 +136,7 @@ func PhpSprintfAppenduint(
 	numbuf[i] = '0'
 	for {
 		nmagn = magn / 10
-		numbuf[b.PreDec(&i)] = uint8(magn - nmagn*10 + '0')
+		numbuf[lang.PreDec(&i)] = uint8(magn - nmagn*10 + '0')
 		magn = nmagn
 		if !(magn > 0 && i > 0) {
 			break
@@ -185,7 +186,7 @@ func PhpSprintfAppenddouble(
 		fallthrough
 	case 'F':
 		lconv = localeconv()
-		s = core.PhpConvFp(b.Cond(fmt == 'f', 'F', fmt), number, 0, precision, b.Cond(fmt == 'f', LCONV_DECIMAL_POINT, '.'), &is_negative, &num_buf[1], &s_len)
+		s = core.PhpConvFp(lang.Cond(fmt == 'f', 'F', fmt), number, 0, precision, lang.Cond(fmt == 'f', LCONV_DECIMAL_POINT, '.'), &is_negative, &num_buf[1], &s_len)
 		if is_negative != 0 {
 			num_buf[0] = '-'
 			s = num_buf
@@ -207,7 +208,7 @@ func PhpSprintfAppenddouble(
 		 */
 
 		lconv = localeconv()
-		s = core.PhpGcvt(number, precision, LCONV_DECIMAL_POINT, b.Cond(fmt == 'G', 'E', 'e'), &num_buf[1])
+		s = core.PhpGcvt(number, precision, LCONV_DECIMAL_POINT, lang.Cond(fmt == 'G', 'E', 'e'), &num_buf[1])
 		is_negative = 0
 		if (*s) == '-' {
 			is_negative = 1
@@ -238,7 +239,7 @@ func PhpSprintfAppend2n(
 	num = zend.ZendUlong(number)
 	numbuf[i] = '0'
 	for {
-		numbuf[b.PreDec(&i)] = chartable[num&andbits]
+		numbuf[lang.PreDec(&i)] = chartable[num&andbits]
 		num >>= n
 		if num <= 0 {
 			break
@@ -359,7 +360,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 				/* after modifiers comes width */
 
 				if isdigit(int(*format)) {
-					if b.Assign(&width, PhpSprintfGetnumber(&format, &format_len)) < 0 {
+					if lang.Assign(&width, PhpSprintfGetnumber(&format, &format_len)) < 0 {
 						core.PhpErrorDocref(nil, faults.E_WARNING, "Width must be greater than zero and less than %d", core.INT_MAX)
 						return nil
 					}
@@ -374,7 +375,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 					format++
 					format_len--
 					if isdigit(int(*format)) {
-						if b.Assign(&precision, PhpSprintfGetnumber(&format, &format_len)) < 0 {
+						if lang.Assign(&precision, PhpSprintfGetnumber(&format, &format_len)) < 0 {
 							core.PhpErrorDocref(nil, faults.E_WARNING, "Precision must be greater than zero and less than %d", core.INT_MAX)
 							return nil
 						}

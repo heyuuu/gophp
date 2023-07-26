@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -82,7 +83,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 			*strict_class = 1
 			ret = 1
 		}
-	} else if b.Assign(&ce, ZendLookupClass(name)) != nil {
+	} else if lang.Assign(&ce, ZendLookupClass(name)) != nil {
 		var scope *types.ClassEntry
 		var ex *ZendExecuteData = CurrEX()
 		for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
@@ -162,7 +163,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 
 	/* Split name into class/namespace and method/function names */
 
-	if b.Assign(&colon, operators.ZendMemrchr(callable.String().GetVal(), ':', callable.String().GetLen())) != nil && colon > callable.String().GetVal() && (*(colon - 1)) == ':' {
+	if lang.Assign(&colon, operators.ZendMemrchr(callable.String().GetVal(), ':', callable.String().GetLen())) != nil && colon > callable.String().GetVal() && (*(colon - 1)) == ':' {
 		var mlen int
 		colon--
 		clen = colon - callable.String().GetVal()

@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -56,7 +57,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 		variable_ptr = opline.Op1()
 		variable_ptr.SetReference(ref)
-		if b.PreInc(&opline).opcode != ZEND_BIND_GLOBAL {
+		if lang.PreInc(&opline).opcode != ZEND_BIND_GLOBAL {
 			break
 		}
 	}

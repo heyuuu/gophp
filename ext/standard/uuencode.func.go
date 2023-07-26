@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -47,41 +48,41 @@ func PhpUuencode(src *byte, src_len int) *types.String {
 				ee = s + int(floor(float64(len_/3))*3)
 			}
 		}
-		b.PostInc(&(*p)) = PHP_UU_ENC(len_)
+		lang.PostInc(&(*p)) = PHP_UU_ENC(len_)
 		for s < ee {
-			b.PostInc(&(*p)) = PHP_UU_ENC((*s) >> 2)
-			b.PostInc(&(*p)) = PHP_UU_ENC_C2(s)
-			b.PostInc(&(*p)) = PHP_UU_ENC_C3(s)
-			b.PostInc(&(*p)) = PHP_UU_ENC((*(s + 2)) & 077)
+			lang.PostInc(&(*p)) = PHP_UU_ENC((*s) >> 2)
+			lang.PostInc(&(*p)) = PHP_UU_ENC_C2(s)
+			lang.PostInc(&(*p)) = PHP_UU_ENC_C3(s)
+			lang.PostInc(&(*p)) = PHP_UU_ENC((*(s + 2)) & 077)
 			s += 3
 		}
 		if len_ == 45 {
-			b.PostInc(&(*p)) = '\n'
+			lang.PostInc(&(*p)) = '\n'
 		}
 	}
 	if s < e {
 		if len_ == 45 {
-			b.PostInc(&(*p)) = PHP_UU_ENC(e - s)
+			lang.PostInc(&(*p)) = PHP_UU_ENC(e - s)
 			len_ = 0
 		}
-		b.PostInc(&(*p)) = PHP_UU_ENC((*s) >> 2)
-		b.PostInc(&(*p)) = PHP_UU_ENC_C2(s)
+		lang.PostInc(&(*p)) = PHP_UU_ENC((*s) >> 2)
+		lang.PostInc(&(*p)) = PHP_UU_ENC_C2(s)
 		if e-s > 1 {
-			b.PostInc(&(*p)) = PHP_UU_ENC_C3(s)
+			lang.PostInc(&(*p)) = PHP_UU_ENC_C3(s)
 		} else {
-			b.PostInc(&(*p)) = PHP_UU_ENC('0')
+			lang.PostInc(&(*p)) = PHP_UU_ENC('0')
 		}
 		if e-s > 2 {
-			b.PostInc(&(*p)) = PHP_UU_ENC((*(s + 2)) & 077)
+			lang.PostInc(&(*p)) = PHP_UU_ENC((*(s + 2)) & 077)
 		} else {
-			b.PostInc(&(*p)) = PHP_UU_ENC('0')
+			lang.PostInc(&(*p)) = PHP_UU_ENC('0')
 		}
 	}
 	if len_ < 45 {
-		b.PostInc(&(*p)) = '\n'
+		lang.PostInc(&(*p)) = '\n'
 	}
-	b.PostInc(&(*p)) = PHP_UU_ENC('0')
-	b.PostInc(&(*p)) = '\n'
+	lang.PostInc(&(*p)) = PHP_UU_ENC('0')
+	lang.PostInc(&(*p)) = '\n'
 	*p = '0'
 	dest = types.ZendStringTruncate(dest, (*byte)(p-dest.GetVal()))
 	return dest
@@ -99,7 +100,7 @@ func PhpUudecode(src *byte, src_len int) *types.String {
 	s = src
 	e = src + src_len
 	for s < e {
-		if b.Assign(&len_, PHP_UU_DEC(b.PostInc(&(*s)))) == 0 {
+		if lang.Assign(&len_, PHP_UU_DEC(lang.PostInc(&(*s)))) == 0 {
 			break
 		}
 
@@ -109,7 +110,7 @@ func PhpUudecode(src *byte, src_len int) *types.String {
 			goto err
 		}
 		total_len += len_
-		ee = s + b.CondF2(len_ == 45, 60, func() int { return int(floor(len_ * 1.33)) })
+		ee = s + lang.CondF2(len_ == 45, 60, func() int { return int(floor(len_ * 1.33)) })
 
 		/* sanity check */
 
@@ -120,9 +121,9 @@ func PhpUudecode(src *byte, src_len int) *types.String {
 			if s+4 > e {
 				goto err
 			}
-			b.PostInc(&(*p)) = PHP_UU_DEC(*s)<<2 | PHP_UU_DEC(*(s + 1))>>4
-			b.PostInc(&(*p)) = PHP_UU_DEC(*(s + 1))<<4 | PHP_UU_DEC(*(s + 2))>>2
-			b.PostInc(&(*p)) = PHP_UU_DEC(*(s + 2))<<6 | PHP_UU_DEC(*(s + 3))
+			lang.PostInc(&(*p)) = PHP_UU_DEC(*s)<<2 | PHP_UU_DEC(*(s + 1))>>4
+			lang.PostInc(&(*p)) = PHP_UU_DEC(*(s + 1))<<4 | PHP_UU_DEC(*(s + 2))>>2
+			lang.PostInc(&(*p)) = PHP_UU_DEC(*(s + 2))<<6 | PHP_UU_DEC(*(s + 3))
 			s += 4
 		}
 		if len_ < 45 {
@@ -137,12 +138,12 @@ func PhpUudecode(src *byte, src_len int) *types.String {
 
 	}
 	b.Assert(p >= dest.GetVal())
-	if b.Assign(&len_, total_len) > size_t(p-dest.GetVal()) {
-		b.PostInc(&(*p)) = PHP_UU_DEC(*s)<<2 | PHP_UU_DEC(*(s + 1))>>4
+	if lang.Assign(&len_, total_len) > size_t(p-dest.GetVal()) {
+		lang.PostInc(&(*p)) = PHP_UU_DEC(*s)<<2 | PHP_UU_DEC(*(s + 1))>>4
 		if len_ > 1 {
-			b.PostInc(&(*p)) = PHP_UU_DEC(*(s + 1))<<4 | PHP_UU_DEC(*(s + 2))>>2
+			lang.PostInc(&(*p)) = PHP_UU_DEC(*(s + 1))<<4 | PHP_UU_DEC(*(s + 2))>>2
 			if len_ > 2 {
-				b.PostInc(&(*p)) = PHP_UU_DEC(*(s + 2))<<6 | PHP_UU_DEC(*(s + 3))
+				lang.PostInc(&(*p)) = PHP_UU_DEC(*(s + 2))<<6 | PHP_UU_DEC(*(s + 3))
 			}
 		}
 	}
@@ -190,7 +191,7 @@ func ZifConvertUudecode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zv
 		return_value.SetFalse()
 		return
 	}
-	if b.Assign(&dest, PhpUudecode(src.GetVal(), src.GetLen())) == nil {
+	if lang.Assign(&dest, PhpUudecode(src.GetVal(), src.GetLen())) == nil {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The given parameter is not a valid uuencoded string")
 		return_value.SetFalse()
 		return

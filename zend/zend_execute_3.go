@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -138,7 +139,7 @@ func ZendWrongPropertyRead(property *types.Zval) {
 	faults.Error(faults.E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
 }
 func ZendDeprecatedFunction(fbc types.IFunction) {
-	faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().Name() }, ""), b.Cond(fbc.GetScope() != nil, "::", ""), fbc.FunctionName())
+	faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", lang.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().Name() }, ""), lang.Cond(fbc.GetScope() != nil, "::", ""), fbc.FunctionName())
 }
 func ZendAbstractMethod(fbc types.IFunction) {
 	faults.ThrowError(nil, "Cannot call abstract method %s::%s()", fbc.GetScope().Name(), fbc.FunctionName())
@@ -245,10 +246,10 @@ func ZendThrowIncdecRefError(ref *types.ZendReference, opline *types.ZendOp) Zen
 
 	b.Assert(error_prop != nil)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		faults.TypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
+		faults.TypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(error_prop.GetName()), lang.Cond(error_prop.GetType().AllowNull(), "?", ""))
 		return ZEND_LONG_MAX
 	} else {
-		faults.TypeError("Cannot decrement a reference held by property %s::$%s of type %sint past its minimal value", error_prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
+		faults.TypeError("Cannot decrement a reference held by property %s::$%s of type %sint past its minimal value", error_prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(error_prop.GetName()), lang.Cond(error_prop.GetType().AllowNull(), "?", ""))
 		return ZEND_LONG_MIN
 	}
 }

@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -148,7 +149,7 @@ func UserfilterFilter(
 	if buckets_in.GetHead() != nil {
 		var bucket *streams.PhpStreamBucket = buckets_in.GetHead()
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unprocessed filter buckets remaining on input brigade")
-		for b.Assign(&bucket, buckets_in.GetHead()) {
+		for lang.Assign(&bucket, buckets_in.GetHead()) {
 
 			/* Remove unconsumed buckets from the brigade */
 
@@ -203,7 +204,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 		   TODO: Allow failed userfilter creations to continue
 		         scanning through the list */
 
-		if b.Assign(&period, strrchr(filtername, '.')) {
+		if lang.Assign(&period, strrchr(filtername, '.')) {
 			var wildcard *byte = zend.SafeEmalloc(len_, 1, 3)
 
 			/* Search for wildcard matches instead */
@@ -233,7 +234,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 	/* bind the classname to the actual class */
 
 	if fdat.GetCe() == nil {
-		if nil == b.Assign(&(fdat.GetCe()), zend.ZendLookupClass(fdat.GetClassname())) {
+		if nil == lang.Assign(&(fdat.GetCe()), zend.ZendLookupClass(fdat.GetClassname())) {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "user-filter \"%s\" requires class \"%s\", but that class is not defined", filtername, fdat.GetClassname())
 			return nil
 		}
@@ -326,12 +327,12 @@ func ZifStreamBucketMakeWriteable(executeData zpp.Ex, return_value zpp.Ret, brig
 		}
 		break
 	}
-	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.Resource(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
+	if lang.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.Resource(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
 		return_value.SetFalse()
 		return
 	}
 	return_value.SetNull()
-	if brigade.GetHead() != nil && b.Assign(&bucket, streams.PhpStreamBucketMakeWriteable(brigade.GetHead())) {
+	if brigade.GetHead() != nil && lang.Assign(&bucket, streams.PhpStreamBucketMakeWriteable(brigade.GetHead())) {
 		zbucket.SetResource(zend.ZendRegisterResource(bucket, LeBucket))
 		zend.ObjectInit(return_value)
 		zend.AddPropertyZval(return_value, "bucket", &zbucket)
@@ -363,20 +364,20 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		}
 		break
 	}
-	if nil == b.Assign(&pzbucket, types.ZendHashStrFindDeref(types.Z_OBJPROP_P(zobject), "bucket")) {
+	if nil == lang.Assign(&pzbucket, types.ZendHashStrFindDeref(types.Z_OBJPROP_P(zobject), "bucket")) {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Object has no bucket property")
 		return_value.SetFalse()
 		return
 	}
-	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.Resource(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
+	if lang.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.Resource(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
 		return_value.SetFalse()
 		return
 	}
-	if b.Assign(&bucket, (*streams.PhpStreamBucket)(zend.ZendFetchResourceEx(pzbucket, PHP_STREAM_BUCKET_RES_NAME, LeBucket))) == nil {
+	if lang.Assign(&bucket, (*streams.PhpStreamBucket)(zend.ZendFetchResourceEx(pzbucket, PHP_STREAM_BUCKET_RES_NAME, LeBucket))) == nil {
 		return_value.SetFalse()
 		return
 	}
-	if nil != b.Assign(&pzdata, types.ZendHashStrFindDeref(types.Z_OBJPROP_P(zobject), "data")) && pzdata.IsString() {
+	if nil != lang.Assign(&pzdata, types.ZendHashStrFindDeref(types.Z_OBJPROP_P(zobject), "data")) && pzdata.IsString() {
 		if bucket.GetOwnBuf() == 0 {
 			bucket = streams.PhpStreamBucketMakeWriteable(bucket)
 		}

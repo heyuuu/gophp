@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -534,10 +535,10 @@ func (compiler *Compiler) CompileReturn(ast *ZendAst) {
 	/* Generator return types are handled separately */
 
 	if is_generator == 0 && CG__().GetActiveOpArray().IsHasReturnType() {
-		ZendEmitReturnTypeCheck(b.Cond(expr_ast != nil, &expr_node, nil), CG__().GetActiveOpArray().GetArgInfo()-1, 0)
+		ZendEmitReturnTypeCheck(lang.Cond(expr_ast != nil, &expr_node, nil), CG__().GetActiveOpArray().GetArgInfo()-1, 0)
 	}
-	ZendHandleLoopsAndFinally(b.Cond((expr_node.GetOpType()&(IS_TMP_VAR|IS_VAR)) != 0, &expr_node, nil))
-	opline = ZendEmitOp(nil, b.Cond(by_ref != 0, ZEND_RETURN_BY_REF, ZEND_RETURN), &expr_node, nil)
+	ZendHandleLoopsAndFinally(lang.Cond((expr_node.GetOpType()&(IS_TMP_VAR|IS_VAR)) != 0, &expr_node, nil))
+	opline = ZendEmitOp(nil, lang.Cond(by_ref != 0, ZEND_RETURN_BY_REF, ZEND_RETURN), &expr_node, nil)
 	if by_ref != 0 && expr_ast != nil {
 		if ZendIsCall(expr_ast) != 0 {
 			opline.SetExtendedValue(ZEND_RETURNS_FUNCTION)
@@ -568,21 +569,21 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 	if depth_ast != nil {
 		var depth_zv *types.Zval
 		if depth_ast.Kind() != ZEND_AST_ZVAL {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator with non-integer operand "+"is no longer supported", b.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator with non-integer operand "+"is no longer supported", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth_zv = depth_ast.Val()
 		if !depth_zv.IsLong() || depth_zv.Long() < 1 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator accepts only positive integers", b.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator accepts only positive integers", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth = depth_zv.Long()
 	} else {
 		depth = 1
 	}
 	if CG__().GetContext().GetCurrentBrkCont() == -1 {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' not in the 'loop' or 'switch' context", b.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' not in the 'loop' or 'switch' context", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
 	} else {
 		if ZendHandleLoopsAndFinallyEx(depth, nil) == 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot '%s' "+ZEND_LONG_FMT+" level%s", b.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"), depth, b.Cond(depth == 1, "", "s"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot '%s' "+ZEND_LONG_FMT+" level%s", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"), depth, lang.Cond(depth == 1, "", "s"))
 		}
 	}
 	if ast.Kind() == ZEND_AST_CONTINUE {
@@ -600,7 +601,7 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 			}
 		}
 	}
-	opline = ZendEmitOp(nil, b.Cond(ast.Kind() == ZEND_AST_BREAK, ZEND_BRK, ZEND_CONT), nil, nil)
+	opline = ZendEmitOp(nil, lang.Cond(ast.Kind() == ZEND_AST_BREAK, ZEND_BRK, ZEND_CONT), nil, nil)
 	opline.GetOp1().SetNum(CG__().GetContext().GetCurrentBrkCont())
 	opline.GetOp2().SetNum(depth)
 }
@@ -647,7 +648,7 @@ func (compiler *Compiler) ResolveGotoLabel(op_array *types.ZendOpArray, opline *
 	opline.SetOp2Type(IS_UNUSED)
 	opline.SetResultType(IS_UNUSED)
 	b.Assert(remove_oplines >= 0)
-	for b.PostDec(&remove_oplines) {
+	for lang.PostDec(&remove_oplines) {
 		opline--
 		opline.SetNop()
 		ZendVmSetOpcodeHandler(opline)
@@ -781,10 +782,10 @@ func (compiler *Compiler) CompileForeach(ast *ZendAst) {
 		ZendSeparateIfCallAndWrite(&expr_node, expr_ast, BP_VAR_W)
 	}
 	opnum_reset = GetNextOpNumber()
-	opline = ZendEmitOp(&reset_node, b.Cond(by_ref != 0, ZEND_FE_RESET_RW, ZEND_FE_RESET_R), &expr_node, nil)
+	opline = ZendEmitOp(&reset_node, lang.Cond(by_ref != 0, ZEND_FE_RESET_RW, ZEND_FE_RESET_R), &expr_node, nil)
 	ZendBeginLoop(ZEND_FE_FREE, &reset_node, 0)
 	opnum_fetch = GetNextOpNumber()
-	opline = ZendEmitOp(nil, b.Cond(by_ref != 0, ZEND_FE_FETCH_RW, ZEND_FE_FETCH_R), &reset_node, nil)
+	opline = ZendEmitOp(nil, lang.Cond(by_ref != 0, ZEND_FE_FETCH_RW, ZEND_FE_FETCH_R), &reset_node, nil)
 	if IsThisFetch(value_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	} else if value_ast.Kind() == ZEND_AST_VAR && ZendTryCompileCv(&value_node, value_ast) == types.SUCCESS {

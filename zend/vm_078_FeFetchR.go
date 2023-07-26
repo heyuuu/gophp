@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -45,7 +46,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		var iter *ZendObjectIterator
 		b.Assert(array.IsObject())
-		if b.Assign(&iter, ZendIteratorUnwrap(array)) == nil {
+		if lang.Assign(&iter, ZendIteratorUnwrap(array)) == nil {
 
 			/* plain object */
 
@@ -92,7 +93,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			EG__().GetHtIterators()[types.Z_FE_ITER_P(array)].SetPos(pos + 1)
 		} else {
-			if b.PreInc(&(iter.GetIndex())) > 0 {
+			if lang.PreInc(&(iter.GetIndex())) > 0 {
 
 				/* This could cause an endless loop if index becomes zero again.
 				 * In case that ever happens we need an additional flag. */

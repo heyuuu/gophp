@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -82,7 +83,7 @@ func ZendResolveClassType(type_ *types.TypeHint, selfCe *types.ClassEntry) bool 
 		 * later using the wrong "self" when the trait is used in a class. */
 
 		if selfCe.IsTrait() {
-			faults.ThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", b.Cond(type_.AllowNull(), " non-null", ""))
+			faults.ThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", lang.Cond(type_.AllowNull(), " non-null", ""))
 			return false
 		}
 		ce = selfCe
@@ -256,9 +257,9 @@ func ZendMissingArgError(executeData *ZendExecuteData) {
 
 	var ptr = executeData.GetPrevExecuteData()
 	if ptr != nil && ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetType()) {
-		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s(), %d passed in %s on line %d and %s %d expected", calleeName, executeData.NumArgs(), ptr.GetFunc().GetOpArray().GetFilename(), ptr.GetOpline().GetLineno(), b.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs)
+		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s(), %d passed in %s on line %d and %s %d expected", calleeName, executeData.NumArgs(), ptr.GetFunc().GetOpArray().GetFilename(), ptr.GetOpline().GetLineno(), lang.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs)
 	} else {
-		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s(), %d passed and %s %d expected", calleeName, executeData.NumArgs(), b.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs)
+		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s(), %d passed and %s %d expected", calleeName, executeData.NumArgs(), lang.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs)
 	}
 }
 func ZendVerifyReturnError(zf types.IFunction, ce *types.ClassEntry, value *types.Zval) {
@@ -320,7 +321,7 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 	var rv types.Zval
 	var res types.Zval
 	value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data1)
-	if b.Assign(&z, object.Object().ReadDimension(property, BP_VAR_R, &rv)) != nil {
+	if lang.Assign(&z, object.Object().ReadDimension(property, BP_VAR_R, &rv)) != nil {
 		if z.IsObject() && z.Object().CanGet() {
 			var rv2 types.Zval
 			var value *types.Zval = z.Object().Get(&rv2)

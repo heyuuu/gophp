@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -28,13 +29,13 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 		}
 	}
 
-	if b.Assign(&fbc, CACHED_PTR(opline.GetResult().GetNum()+b.SizeOf("void *"))) != nil {
+	if lang.Assign(&fbc, CACHED_PTR(opline.GetResult().GetNum()+b.SizeOf("void *"))) != nil {
 	} else {
 		function_name = opline.Const2()
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
-			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), b.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
+			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
 			if EG__().GetException() == nil {
@@ -124,7 +125,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
-			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
+			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
 			if EG__().GetException() == nil {
@@ -272,7 +273,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
-			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), b.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
+			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
 			if EG__().GetException() == nil {
@@ -328,7 +329,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
-			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), b.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
+			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
 			if EG__().GetException() == nil {
@@ -407,7 +408,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
-			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
+			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
 			if EG__().GetException() == nil {
@@ -535,7 +536,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
-			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), b.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
+			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
 			if EG__().GetException() == nil {
@@ -595,7 +596,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
-			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), b.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
+			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
 			if EG__().GetException() == nil {
@@ -682,7 +683,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
-			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
+			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
 			if EG__().GetException() == nil {
@@ -825,7 +826,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
-			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), b.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
+			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
 			if EG__().GetException() == nil {

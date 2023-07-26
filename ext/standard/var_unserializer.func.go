@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -42,7 +43,7 @@ func PhpVarUnserializeDestroy(d PhpUnserializeDataT) {
 		VarDestroy(&d)
 		zend.Efree(d)
 	}
-	if !(BG__().serialize_lock) && !(b.PreDec(&(BG__().unserialize.level))) {
+	if !(BG__().serialize_lock) && !(lang.PreDec(&(BG__().unserialize.level))) {
 		BG__().unserialize.data = nil
 	}
 }
@@ -55,7 +56,7 @@ func VarPush(var_hashx *PhpUnserializeDataT, rval *types.Zval) {
 		var_hashx.GetLast().SetNext(var_hash)
 		var_hashx.SetLast(var_hash)
 	}
-	var_hash.GetData()[b.PostInc(&(var_hash.GetUsedSlots()))] = rval
+	var_hash.GetData()[lang.PostInc(&(var_hash.GetUsedSlots()))] = rval
 }
 func VarPushDtor(var_hashx *PhpUnserializeDataT, rval *types.Zval) {
 	if rval.IsRefcounted() {
@@ -274,7 +275,7 @@ func ParseIv2(p *uint8, q **uint8) zend.ZendLong {
 			return zend.ZEND_LONG_MIN
 		}
 	}
-	return zend_long(b.Cond(neg == 0, result, -result))
+	return zend_long(lang.Cond(neg == 0, result, -result))
 }
 func ParseIv(p *uint8) zend.ZendLong { return ParseIv2(p, nil) }
 func ParseUiv(p *uint8) int {
@@ -307,7 +308,7 @@ func ProcessNestedData(
 		}
 		var_hash.GetCurDepth()++
 	}
-	for b.PostDec(&elements) > 0 {
+	for lang.PostDec(&elements) > 0 {
 		var key types.Zval
 		var data *types.Zval
 		var d types.Zval
@@ -325,7 +326,7 @@ func ProcessNestedData(
 			if key.IsType(types.IS_LONG) {
 				idx = key.Long()
 			numeric_key:
-				if b.Assign(&old_data, ht.IndexFind(idx)) != nil {
+				if lang.Assign(&old_data, ht.IndexFind(idx)) != nil {
 
 					//??? update hash
 
@@ -338,7 +339,7 @@ func ProcessNestedData(
 				if types.HandleNumericStr(key.String().GetStr(), &idx) {
 					goto numeric_key
 				}
-				if b.Assign(&old_data, ht.KeyFind(key.String().GetStr())) != nil {
+				if lang.Assign(&old_data, ht.KeyFind(key.String().GetStr())) != nil {
 
 					//??? update hash
 
@@ -388,7 +389,7 @@ func ProcessNestedData(
 						// types.ZendStringReleaseEx(unmangled, 0)
 					}
 				}
-				if b.Assign(&old_data, ht.KeyFind(key.String().GetStr())) != nil {
+				if lang.Assign(&old_data, ht.KeyFind(key.String().GetStr())) != nil {
 					if old_data.IsIndirect() {
 						old_data = old_data.Indirect()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
@@ -552,7 +553,7 @@ func ObjectCommon(
 }
 func PhpVarUnserialize(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT) int {
 	var orig_var_entries *VarEntries = var_hash.GetLast()
-	var orig_used_slots zend.ZendLong = b.CondF1(orig_var_entries != nil, func() zend.ZendLong { return orig_var_entries.GetUsedSlots() }, 0)
+	var orig_used_slots zend.ZendLong = lang.CondF1(orig_var_entries != nil, func() zend.ZendLong { return orig_var_entries.GetUsedSlots() }, 0)
 	var result int
 	result = PhpVarUnserializeInternal(rval, p, max, var_hash, 0)
 	if result == 0 {
@@ -658,62 +659,62 @@ func PhpVarUnserializeInternal(rval *types.Zval, p **uint8, max *uint8, var_hash
 			}
 		}
 	}
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy84
 	}
 yy3:
 	return 0
 yy4:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy79
 	}
 	goto yy3
 yy5:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == ';' {
 		goto yy77
 	}
 	goto yy3
 yy6:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy70
 	}
 	goto yy3
 yy7:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy64
 	}
 	goto yy3
 yy8:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy41
 	}
 	goto yy3
 yy9:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy35
 	}
 	goto yy3
 yy10:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy29
 	}
 	goto yy3
 yy11:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy23
 	}
 	goto yy3
 yy12:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy16
 	}
@@ -726,10 +727,10 @@ yy13:
 	core.PhpErrorDocref(nil, faults.E_NOTICE, "Unexpected end of serialized data")
 	return 0
 yy15:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy3
 yy16:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy18
 	}
@@ -748,7 +749,7 @@ yy18:
 	if yych != ':' {
 		goto yy17
 	}
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych != '"' {
 		goto yy17
 	}
@@ -861,7 +862,7 @@ yy18:
 		/* The callback function may have defined the class */
 
 		BG__().serialize_lock++
-		if b.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
+		if lang.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.String().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
@@ -915,7 +916,7 @@ yy18:
 	// types.ZendStringReleaseEx(class_name, 0)
 	return ObjectCommon(rval, p, max, var_hash, elements, has_unserialize)
 yy23:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -937,7 +938,7 @@ yy24:
 	if yych >= ';' {
 		goto yy17
 	}
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych != '{' {
 		goto yy17
 	}
@@ -979,7 +980,7 @@ yy24:
 	}
 	return FinishNestedData(rval, p, max, var_hash)
 yy29:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1001,7 +1002,7 @@ yy30:
 	if yych >= ';' {
 		goto yy17
 	}
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych != '"' {
 		goto yy17
 	}
@@ -1015,7 +1016,7 @@ yy30:
 		*p = start + 2
 		return 0
 	}
-	if b.Assign(&str, UnserializeStr(&YYCURSOR, len_, maxlen)) == nil {
+	if lang.Assign(&str, UnserializeStr(&YYCURSOR, len_, maxlen)) == nil {
 		return 0
 	}
 	if (*YYCURSOR) != '"' {
@@ -1033,7 +1034,7 @@ yy30:
 	rval.SetString(str)
 	return 1
 yy35:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1055,7 +1056,7 @@ yy36:
 	if yych >= ';' {
 		goto yy17
 	}
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych != '"' {
 		goto yy17
 	}
@@ -1084,7 +1085,7 @@ yy36:
 	rval.SetStringVal(b.CastStr(str, len_))
 	return 1
 yy41:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		if yych <= ',' {
 			if yych == '+' {
@@ -1115,13 +1116,13 @@ yy41:
 			}
 		}
 	}
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy63
 	}
 	goto yy17
 yy43:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		if yych == '.' {
 			goto yy48
@@ -1136,13 +1137,13 @@ yy43:
 		}
 	}
 yy44:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy59
 	}
 	goto yy17
 yy45:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == '.' {
 		goto yy48
 	}
@@ -1190,7 +1191,7 @@ yy46:
 		}
 	}
 yy48:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1232,7 +1233,7 @@ yy51:
 	rval.SetDouble(zend.ZendStrtod((*byte)(start+2), nil))
 	return 1
 yy53:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= ',' {
 		if yych != '+' {
 			goto yy17
@@ -1250,7 +1251,7 @@ yy53:
 		goto yy17
 	}
 yy54:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1304,12 +1305,12 @@ yy57:
 		}
 	}
 yy59:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych != 'F' {
 		goto yy17
 	}
 yy60:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych != ';' {
 		goto yy17
 	}
@@ -1326,13 +1327,13 @@ yy60:
 	}
 	return 1
 yy63:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy60
 	}
 	goto yy17
 yy64:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= ',' {
 		if yych != '+' {
 			goto yy17
@@ -1350,7 +1351,7 @@ yy64:
 		goto yy17
 	}
 yy65:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1377,7 +1378,7 @@ yy66:
 	rval.SetLong(ParseIv(start + 2))
 	return 1
 yy70:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1389,13 +1390,13 @@ yy70:
 	}
 	goto yy17
 yy71:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych == ';' {
 		goto yy75
 	}
 	goto yy17
 yy72:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych != ';' {
 		goto yy17
 	}
@@ -1414,7 +1415,7 @@ yy77:
 	rval.SetNull()
 	return 1
 yy79:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1443,7 +1444,7 @@ yy80:
 		return 0
 	}
 	id = ParseUiv(start+2) - 1
-	if id == -1 || b.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
+	if id == -1 || lang.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
 		return 0
 	}
 	if rval_ref == rval {
@@ -1456,7 +1457,7 @@ yy80:
 	types.ZVAL_COPY(rval, rval_ref)
 	return 1
 yy84:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1485,7 +1486,7 @@ yy85:
 		return 0
 	}
 	id = ParseUiv(start+2) - 1
-	if id == -1 || b.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
+	if id == -1 || lang.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
 		return 0
 	}
 	if rval_ref.IsUndef() || rval_ref.IsReference() && types.Z_REFVAL_P(rval_ref).IsUndef() {

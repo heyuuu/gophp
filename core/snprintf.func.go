@@ -2,6 +2,7 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -31,10 +32,10 @@ func __cvt(
 	if value == 0.0 {
 		*decpt = 1 - fmode
 		*sign = 0
-		if b.Assign(&rve, b.Assign(&s, (*byte)(zend.Malloc(b.Cond(ndigit != 0, siz, 2))))) == nil {
+		if lang.Assign(&rve, lang.Assign(&s, (*byte)(zend.Malloc(lang.Cond(ndigit != 0, siz, 2))))) == nil {
 			return nil
 		}
-		b.PostInc(&(*rve)) = '0'
+		lang.PostInc(&(*rve)) = '0'
 		*rve = '0'
 		if ndigit == 0 {
 			return s
@@ -48,7 +49,7 @@ func __cvt(
 			*decpt = 0
 			c = *p
 			zend.ZendFreedtoa(p)
-			return strdup(b.Cond(c == 'I', "INF", "NAN"))
+			return strdup(lang.Cond(c == 'I', "INF", "NAN"))
 		}
 
 		/* Make a local copy and adjust rve to be in terms of s */
@@ -56,7 +57,7 @@ func __cvt(
 		if pad != 0 && fmode != 0 {
 			siz += *decpt
 		}
-		if b.Assign(&s, (*byte)(zend.Malloc(siz+1))) == nil {
+		if lang.Assign(&s, (*byte)(zend.Malloc(siz+1))) == nil {
 			zend.ZendFreedtoa(p)
 			return nil
 		}
@@ -69,8 +70,8 @@ func __cvt(
 
 	if pad != 0 {
 		siz -= rve - s
-		for b.PreDec(&siz) {
-			b.PostInc(&(*rve)) = '0'
+		for lang.PreDec(&siz) {
+			lang.PostInc(&(*rve)) = '0'
 		}
 		*rve = '0'
 	}
@@ -89,7 +90,7 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 	var i int
 	var decpt int
 	var sign int
-	var mode int = b.Cond(ndigit >= 0, 2, 0)
+	var mode int = lang.Cond(ndigit >= 0, 2, 0)
 	if mode == 0 {
 		ndigit = 17
 	}
@@ -101,19 +102,19 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 		 * We assume the buffer is at least ndigit long.
 		 */
 
-		Snprintf(buf, ndigit+1, "%s%s", b.Cond(sign != 0 && (*digits) == 'I', "-", ""), b.Cond((*digits) == 'I', "INF", "NAN"))
+		Snprintf(buf, ndigit+1, "%s%s", lang.Cond(sign != 0 && (*digits) == 'I', "-", ""), lang.Cond((*digits) == 'I', "INF", "NAN"))
 		zend.ZendFreedtoa(digits)
 		return buf
 	}
 	dst = buf
 	if sign != 0 {
-		b.PostInc(&(*dst)) = '-'
+		lang.PostInc(&(*dst)) = '-'
 	}
 	if decpt >= 0 && decpt > ndigit || decpt < -3 {
 
 		/* exponential format (e.g. 1.2345e+13) */
 
-		if b.PreDec(&decpt) < 0 {
+		if lang.PreDec(&decpt) < 0 {
 			sign = 1
 			decpt = -decpt
 		} else {
@@ -121,27 +122,27 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 		}
 		src = digits
 		*src++
-		b.PostInc(&(*dst)) = (*src) - 1
-		b.PostInc(&(*dst)) = dec_point
+		lang.PostInc(&(*dst)) = (*src) - 1
+		lang.PostInc(&(*dst)) = dec_point
 		if (*src) == '0' {
-			b.PostInc(&(*dst)) = '0'
+			lang.PostInc(&(*dst)) = '0'
 		} else {
 			for {
 				*src++
-				b.PostInc(&(*dst)) = (*src) - 1
+				lang.PostInc(&(*dst)) = (*src) - 1
 				if (*src) == '0' {
 					break
 				}
 			}
 		}
-		b.PostInc(&(*dst)) = exponent
+		lang.PostInc(&(*dst)) = exponent
 		if sign != 0 {
-			b.PostInc(&(*dst)) = '-'
+			lang.PostInc(&(*dst)) = '-'
 		} else {
-			b.PostInc(&(*dst)) = '+'
+			lang.PostInc(&(*dst)) = '+'
 		}
 		if decpt < 10 {
-			b.PostInc(&(*dst)) = '0' + decpt
+			lang.PostInc(&(*dst)) = '0' + decpt
 			*dst = '0'
 		} else {
 
@@ -158,7 +159,7 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 			}
 			dst[i+1] = '0'
 			for decpt != 0 {
-				dst[b.PostDec(&i)] = '0' + decpt%10
+				dst[lang.PostDec(&i)] = '0' + decpt%10
 				decpt /= 10
 			}
 		}
@@ -166,18 +167,18 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 
 		/* standard format 0. */
 
-		b.PostInc(&(*dst)) = '0'
-		b.PostInc(&(*dst)) = dec_point
+		lang.PostInc(&(*dst)) = '0'
+		lang.PostInc(&(*dst)) = dec_point
 		for {
-			b.PostInc(&(*dst)) = '0'
-			if b.PreInc(&decpt) >= 0 {
+			lang.PostInc(&(*dst)) = '0'
+			if lang.PreInc(&decpt) >= 0 {
 				break
 			}
 		}
 		src = digits
 		for (*src) != '0' {
 			*src++
-			b.PostInc(&(*dst)) = (*src) - 1
+			lang.PostInc(&(*dst)) = (*src) - 1
 		}
 		*dst = '0'
 	} else {
@@ -189,18 +190,18 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 		for ; i < decpt; i++ {
 			if (*src) != '0' {
 				*src++
-				b.PostInc(&(*dst)) = (*src) - 1
+				lang.PostInc(&(*dst)) = (*src) - 1
 			} else {
-				b.PostInc(&(*dst)) = '0'
+				lang.PostInc(&(*dst)) = '0'
 			}
 		}
 		if (*src) != '0' {
 			if src == digits {
-				b.PostInc(&(*dst)) = '0'
+				lang.PostInc(&(*dst)) = '0'
 			}
-			b.PostInc(&(*dst)) = dec_point
+			lang.PostInc(&(*dst)) = dec_point
 			for i = decpt; digits[i] != '0'; i++ {
-				b.PostInc(&(*dst)) = digits[i]
+				lang.PostInc(&(*dst)) = digits[i]
 			}
 		}
 		*dst = '0'
@@ -252,7 +253,7 @@ func ApPhpConv10(num WideInt, is_unsigned BoolInt, is_negative *BoolInt, buf_end
 
 	for {
 		var new_magnitude UWideInt = magnitude / 10
-		*(b.PreDec(&p)) = byte(magnitude - new_magnitude*10 + '0')
+		*(lang.PreDec(&p)) = byte(magnitude - new_magnitude*10 + '0')
 		magnitude = new_magnitude
 		if !magnitude {
 			break
@@ -300,35 +301,35 @@ func PhpConvFp(
 	if format == 'F' {
 		if decimal_point <= 0 {
 			if num != 0 || precision > 0 {
-				b.PostInc(&(*s)) = '0'
+				lang.PostInc(&(*s)) = '0'
 				if precision > 0 {
-					b.PostInc(&(*s)) = dec_point
-					for b.PostInc(&decimal_point) < 0 {
-						b.PostInc(&(*s)) = '0'
+					lang.PostInc(&(*s)) = dec_point
+					for lang.PostInc(&decimal_point) < 0 {
+						lang.PostInc(&(*s)) = '0'
 					}
 				} else if add_dp != 0 {
-					b.PostInc(&(*s)) = dec_point
+					lang.PostInc(&(*s)) = dec_point
 				}
 			}
 		} else {
-			var addz int = b.Cond(decimal_point >= NDIG, decimal_point-NDIG+1, 0)
+			var addz int = lang.Cond(decimal_point >= NDIG, decimal_point-NDIG+1, 0)
 			decimal_point -= addz
-			for b.PostDec(&decimal_point) > 0 {
+			for lang.PostDec(&decimal_point) > 0 {
 				*p++
-				b.PostInc(&(*s)) = (*p) - 1
+				lang.PostInc(&(*s)) = (*p) - 1
 			}
-			for b.PostDec(&addz) > 0 {
-				b.PostInc(&(*s)) = '0'
+			for lang.PostDec(&addz) > 0 {
+				lang.PostInc(&(*s)) = '0'
 			}
 			if precision > 0 || add_dp != 0 {
-				b.PostInc(&(*s)) = dec_point
+				lang.PostInc(&(*s)) = dec_point
 			}
 		}
 	} else {
 		*p++
-		b.PostInc(&(*s)) = (*p) - 1
+		lang.PostInc(&(*s)) = (*p) - 1
 		if precision > 0 || add_dp != 0 {
-			b.PostInc(&(*s)) = '.'
+			lang.PostInc(&(*s)) = '.'
 		}
 	}
 
@@ -338,29 +339,29 @@ func PhpConvFp(
 
 	for *p {
 		*p++
-		b.PostInc(&(*s)) = (*p) - 1
+		lang.PostInc(&(*s)) = (*p) - 1
 	}
 	if format != 'F' {
 		var temp []byte
 		var t_len int
 		var exponent_is_negative BoolInt
-		b.PostInc(&(*s)) = format
+		lang.PostInc(&(*s)) = format
 		decimal_point--
 		if decimal_point != 0 {
 			p = ApPhpConv10(WideInt(decimal_point), FALSE, &exponent_is_negative, &temp[EXPONENT_LENGTH], &t_len)
 			if exponent_is_negative != 0 {
-				b.PostInc(&(*s)) = '-'
+				lang.PostInc(&(*s)) = '-'
 			} else {
-				b.PostInc(&(*s)) = '+'
+				lang.PostInc(&(*s)) = '+'
 			}
 
 			/*
 			 * Make sure the exponent has at least 2 digits
 			 */
 
-			for b.PostDec(&t_len) {
+			for lang.PostDec(&t_len) {
 				*p++
-				b.PostInc(&(*s)) = (*p) - 1
+				lang.PostInc(&(*s)) = (*p) - 1
 			}
 
 			/*
@@ -368,8 +369,8 @@ func PhpConvFp(
 			 */
 
 		} else {
-			b.PostInc(&(*s)) = '+'
-			b.PostInc(&(*s)) = '0'
+			lang.PostInc(&(*s)) = '+'
+			lang.PostInc(&(*s)) = '0'
 		}
 	}
 	*len_ = s - buf
@@ -381,9 +382,9 @@ func ApPhpConvP2(num UWideInt, nbits int, format byte, buf_end *byte, len_ *int)
 	var p *byte = buf_end
 	var low_digits []byte = "0123456789abcdef"
 	var upper_digits []byte = "0123456789ABCDEF"
-	var digits *byte = b.Cond(format == 'X', upper_digits, low_digits)
+	var digits *byte = lang.Cond(format == 'X', upper_digits, low_digits)
 	for {
-		*(b.PreDec(&p)) = digits[num&mask]
+		*(lang.PreDec(&p)) = digits[num&mask]
 		num >>= nbits
 		if !num {
 			break
@@ -394,16 +395,16 @@ func ApPhpConvP2(num UWideInt, nbits int, format byte, buf_end *byte, len_ *int)
 }
 func NUM(c char) int { return c - '0' }
 func STR_TO_DEC(str *byte, num int) {
-	num = NUM(b.PostInc(&(*str)))
+	num = NUM(lang.PostInc(&(*str)))
 	for isdigit(int(*str)) {
 		num *= 10
-		num += NUM(b.PostInc(&(*str)))
+		num += NUM(lang.PostInc(&(*str)))
 	}
 }
 func FIX_PRECISION(adjust BooleanE, precision int, s *byte, s_len int) {
 	if adjust != 0 {
 		for s_len < int(precision) {
-			*(b.PreDec(&s)) = '0'
+			*(lang.PreDec(&s)) = '0'
 			s_len++
 		}
 	}
@@ -411,7 +412,7 @@ func FIX_PRECISION(adjust BooleanE, precision int, s *byte, s_len int) {
 func PAD(width int, len_ int, ch byte) {
 	for {
 		if sp < bep {
-			b.PostInc(&(*sp)) = ch
+			lang.PostInc(&(*sp)) = ch
 		}
 		cc++
 		width--
@@ -458,7 +459,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 	for *fmt {
 		if (*fmt) != '%' {
 			if sp < bep {
-				b.PostInc(&(*sp)) = *fmt
+				lang.PostInc(&(*sp)) = *fmt
 			}
 			cc++
 		} else {
@@ -709,7 +710,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				s = ApPhpConvP2(ui_num, 3, *fmt, &num_buf[NUM_BUF_SIZE], &s_len)
 				FIX_PRECISION(adjust_precision, precision, s, s_len)
 				if alternate_form != 0 && (*s) != '0' {
-					*(b.PreDec(&s)) = '0'
+					*(lang.PreDec(&s)) = '0'
 					s_len++
 				}
 			case 'x':
@@ -736,8 +737,8 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				s = ApPhpConvP2(ui_num, 4, *fmt, &num_buf[NUM_BUF_SIZE], &s_len)
 				FIX_PRECISION(adjust_precision, precision, s, s_len)
 				if alternate_form != 0 && i_num != 0 {
-					*(b.PreDec(&s)) = *fmt
-					*(b.PreDec(&s)) = '0'
+					*(lang.PreDec(&s)) = *fmt
+					*(lang.PreDec(&s)) = '0'
 					s_len += 2
 				}
 			case 's':
@@ -779,7 +780,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					if lconv == nil {
 						lconv = localeconv()
 					}
-					s = PhpConvFp(b.Cond((*fmt) == 'f', 'F', *fmt), fp_num, alternate_form, b.Cond(adjust_precision == NO, FLOAT_DIGITS, precision), b.Cond((*fmt) == 'f', LCONV_DECIMAL_POINT, '.'), &is_negative, &num_buf[1], &s_len)
+					s = PhpConvFp(lang.Cond((*fmt) == 'f', 'F', *fmt), fp_num, alternate_form, lang.Cond(adjust_precision == NO, FLOAT_DIGITS, precision), lang.Cond((*fmt) == 'f', LCONV_DECIMAL_POINT, '.'), &is_negative, &num_buf[1], &s_len)
 					if is_negative != 0 {
 						prefix_char = '-'
 					} else if print_sign != 0 {
@@ -830,7 +831,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				if lconv == nil {
 					lconv = localeconv()
 				}
-				s = PhpGcvt(fp_num, precision, b.Cond((*fmt) == 'H' || (*fmt) == 'k', '.', LCONV_DECIMAL_POINT), b.Cond((*fmt) == 'G' || (*fmt) == 'H', 'E', 'e'), &num_buf[1])
+				s = PhpGcvt(fp_num, precision, lang.Cond((*fmt) == 'H' || (*fmt) == 'k', '.', LCONV_DECIMAL_POINT), lang.Cond((*fmt) == 'G' || (*fmt) == 'H', 'E', 'e'), &num_buf[1])
 				if (*s) == '-' {
 					*s++
 					prefix_char = (*s) - 1
@@ -841,7 +842,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				}
 				s_len = strlen(s)
 				if alternate_form != 0 && strchr(s, '.') == nil {
-					s[b.PostInc(&s_len)] = '.'
+					s[lang.PostInc(&s_len)] = '.'
 				}
 			case 'c':
 				char_buf[0] = byte(__va_arg(ap, int(_)))
@@ -861,8 +862,8 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					ui_num = u_wide_int(int(__va_arg(ap, (*byte)(_))))
 					s = ApPhpConvP2(ui_num, 4, 'x', &num_buf[NUM_BUF_SIZE], &s_len)
 					if ui_num != 0 {
-						*(b.PreDec(&s)) = 'x'
-						*(b.PreDec(&s)) = '0'
+						*(lang.PreDec(&s)) = 'x'
+						*(lang.PreDec(&s)) = '0'
 						s_len += 2
 					}
 				} else {
@@ -888,13 +889,13 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				pad_char = ' '
 			}
 			if prefix_char != NUL {
-				*(b.PreDec(&s)) = prefix_char
+				*(lang.PreDec(&s)) = prefix_char
 				s_len++
 			}
 			if adjust_width != 0 && adjust == RIGHT && int(min_width > s_len) != 0 {
 				if pad_char == '0' && prefix_char != NUL {
 					if sp < bep {
-						b.PostInc(&(*sp)) = *s
+						lang.PostInc(&(*sp)) = *s
 					}
 					cc++
 					s++
@@ -910,7 +911,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 
 			for i = s_len; i != 0; i-- {
 				if sp < bep {
-					b.PostInc(&(*sp)) = *s
+					lang.PostInc(&(*sp)) = *s
 				}
 				cc++
 				s++

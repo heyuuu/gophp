@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -163,7 +164,7 @@ func PhpNextMarker(stream *core.PhpStream, last_marker int, ff_read int) uint {
 
 	if ff_read == 0 {
 		var extraneous int = 0
-		for b.Assign(&marker, core.PhpStreamGetc(stream)) != 0xff {
+		for lang.Assign(&marker, core.PhpStreamGetc(stream)) != 0xff {
 			if marker == r.EOF {
 				return M_EOI
 			}
@@ -175,7 +176,7 @@ func PhpNextMarker(stream *core.PhpStream, last_marker int, ff_read int) uint {
 	}
 	a = 1
 	for {
-		if b.Assign(&marker, core.PhpStreamGetc(stream)) == r.EOF {
+		if lang.Assign(&marker, core.PhpStreamGetc(stream)) == r.EOF {
 			return M_EOI
 		}
 		a++
@@ -213,7 +214,7 @@ func php_read_APP(stream *core.PhpStream, marker uint, info *types.Zval) int {
 		return 0
 	}
 	core.Snprintf(markername, b.SizeOf("markername"), "APP%d", marker-M_APP0)
-	if b.Assign(&tmp, info.Array().KeyFind(b.CastStrAuto(markername))) == nil {
+	if lang.Assign(&tmp, info.Array().KeyFind(b.CastStrAuto(markername))) == nil {
 
 		/* XXX we only catch the 1st tag of it's kind! */
 
@@ -719,10 +720,10 @@ func PhpGetXbm(stream *core.PhpStream, result **Gfxinfo) int {
 	if core.PhpStreamRewind(stream) != 0 {
 		return 0
 	}
-	for b.Assign(&fline, core.PhpStreamGets(stream, nil, 0)) != nil {
+	for lang.Assign(&fline, core.PhpStreamGets(stream, nil, 0)) != nil {
 		iname = zend.Estrdup(fline)
 		if sscanf(fline, "#define %s %d", iname, &value) == 2 {
-			if !(b.Assign(&type_, strrchr(iname, '_'))) {
+			if !(lang.Assign(&type_, strrchr(iname, '_'))) {
 				type_ = iname
 			} else {
 				type_++

@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 )
 
 func __setErrno(val int) __auto__ {
@@ -18,11 +19,11 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 	var c3 uint
 	var c4 uint
 	for {
-		tmp = uint8(b.PostInc(&(*sptr)))
+		tmp = uint8(lang.PostInc(&(*sptr)))
 		if tmp == '$' {
 			break
 		}
-		if uint(b.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
+		if uint(lang.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -30,11 +31,11 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 			return -1
 		}
 		c1 = tmp
-		tmp = uint8(b.PostInc(&(*sptr)))
+		tmp = uint8(lang.PostInc(&(*sptr)))
 		if tmp == '$' {
 			break
 		}
-		if uint(b.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
+		if uint(lang.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -42,15 +43,15 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 			return -1
 		}
 		c2 = tmp
-		b.PostInc(&(*dptr)) = c1<<2 | (c2&0x30)>>4
+		lang.PostInc(&(*dptr)) = c1<<2 | (c2&0x30)>>4
 		if dptr >= end {
 			break
 		}
-		tmp = uint8(b.PostInc(&(*sptr)))
+		tmp = uint8(lang.PostInc(&(*sptr)))
 		if tmp == '$' {
 			break
 		}
-		if uint(b.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
+		if uint(lang.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -58,15 +59,15 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 			return -1
 		}
 		c3 = tmp
-		b.PostInc(&(*dptr)) = (c2&0xf)<<4 | (c3&0x3c)>>2
+		lang.PostInc(&(*dptr)) = (c2&0xf)<<4 | (c3&0x3c)>>2
 		if dptr >= end {
 			break
 		}
-		tmp = uint8(b.PostInc(&(*sptr)))
+		tmp = uint8(lang.PostInc(&(*sptr)))
 		if tmp == '$' {
 			break
 		}
-		if uint(b.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
+		if uint(lang.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -74,7 +75,7 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 			return -1
 		}
 		c4 = tmp
-		b.PostInc(&(*dptr)) = (c3&0x3)<<6 | c4
+		lang.PostInc(&(*dptr)) = (c3&0x3)<<6 | c4
 		if dptr >= end {
 			break
 		}
@@ -83,7 +84,7 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 		return -1
 	}
 	for dptr < end {
-		b.PostInc(&(*dptr)) = 0
+		lang.PostInc(&(*dptr)) = 0
 	}
 	return 0
 }
@@ -96,26 +97,26 @@ func BF_encode(dst *byte, src *BF_word, size int) {
 	for {
 		*sptr++
 		c1 = (*sptr) - 1
-		b.PostInc(&(*dptr)) = BF_itoa64[c1>>2]
+		lang.PostInc(&(*dptr)) = BF_itoa64[c1>>2]
 		c1 = (c1 & 0x3) << 4
 		if sptr >= end {
-			b.PostInc(&(*dptr)) = BF_itoa64[c1]
+			lang.PostInc(&(*dptr)) = BF_itoa64[c1]
 			break
 		}
 		*sptr++
 		c2 = (*sptr) - 1
 		c1 |= c2 >> 4
-		b.PostInc(&(*dptr)) = BF_itoa64[c1]
+		lang.PostInc(&(*dptr)) = BF_itoa64[c1]
 		c1 = (c2 & 0xf) << 2
 		if sptr >= end {
-			b.PostInc(&(*dptr)) = BF_itoa64[c1]
+			lang.PostInc(&(*dptr)) = BF_itoa64[c1]
 			break
 		}
 		*sptr++
 		c2 = (*sptr) - 1
 		c1 |= c2 >> 6
-		b.PostInc(&(*dptr)) = BF_itoa64[c1]
-		b.PostInc(&(*dptr)) = BF_itoa64[c2&0x3f]
+		lang.PostInc(&(*dptr)) = BF_itoa64[c1]
+		lang.PostInc(&(*dptr)) = BF_itoa64[c2&0x3f]
 		if sptr >= end {
 			break
 		}
@@ -129,8 +130,8 @@ func BF_swap(x *BF_word, count int) {
 		for {
 			tmp = *x
 			tmp = tmp<<16 | tmp>>16
-			b.PostInc(&(*x)) = (tmp&0xff00ff)<<8 | tmp>>8&0xff00ff
-			if !(b.PreDec(&count)) {
+			lang.PostInc(&(*x)) = (tmp&0xff00ff)<<8 | tmp>>8&0xff00ff
+			if !(lang.PreDec(&count)) {
 				break
 			}
 		}
@@ -483,7 +484,7 @@ func BF_crypt(key *byte, setting *byte, output *byte, size int, min BF_word) *by
 			data.ctx.GetP()[17] ^= tmp2
 
 		}
-		if !(b.PreDec(&count)) {
+		if !(lang.PreDec(&count)) {
 			break
 		}
 	}
@@ -512,7 +513,7 @@ func BF_crypt(key *byte, setting *byte, output *byte, size int, min BF_word) *by
 			tmp4 = R
 			R = L
 			L = tmp4 ^ data.ctx.GetP()[BF_N+1]
-			if !(b.PreDec(&count)) {
+			if !(lang.PreDec(&count)) {
 				break
 			}
 		}

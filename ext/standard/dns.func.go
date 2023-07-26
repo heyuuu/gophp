@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -715,7 +716,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 	} else {
 		type_ = 0
 	}
-	for ; type_ < b.Cond(addtl != nil, PHP_DNS_NUM_TYPES+2, PHP_DNS_NUM_TYPES) || first_query != 0; type_++ {
+	for ; type_ < lang.Cond(addtl != nil, PHP_DNS_NUM_TYPES+2, PHP_DNS_NUM_TYPES) || first_query != 0; type_++ {
 		first_query = 0
 		switch type_ {
 		case -1:
@@ -847,7 +848,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 
 			/* Skip QD entries, they're only used by dn_expand later on */
 
-			for b.PostDec(&qd) > 0 {
+			for lang.PostDec(&qd) > 0 {
 				n = dn_skipname(cp, end)
 				if n < 0 {
 					core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to parse DNS data received")
@@ -861,7 +862,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 
 			/* YAY! Our real answers! */
 
-			for b.PostDec(&an) && cp != nil && cp < end {
+			for lang.PostDec(&an) && cp != nil && cp < end {
 				var retval types.Zval
 				cp = PhpParserr(cp, end, &answer, type_to_fetch, store_results, raw, &retval)
 				if retval.IsNotUndef() && store_results != 0 {
@@ -874,7 +875,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 				 * Process when only requesting addtl so that we can skip through the section
 				 */
 
-				for b.PostDec(&ns) > 0 && cp != nil && cp < end {
+				for lang.PostDec(&ns) > 0 && cp != nil && cp < end {
 					var retval types.Zval
 					cp = PhpParserr(cp, end, &answer, DNS_T_ANY, authns != nil, raw, &retval)
 					if retval.IsNotUndef() {
@@ -891,7 +892,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 
 				/* Additional records associated with authoritative name servers */
 
-				for b.PostDec(&ar) > 0 && cp != nil && cp < end {
+				for lang.PostDec(&ar) > 0 && cp != nil && cp < end {
 					var retval types.Zval
 					cp = PhpParserr(cp, end, &answer, DNS_T_ANY, 1, raw, &retval)
 					if retval.IsNotUndef() {
@@ -964,16 +965,16 @@ func ZifDnsGetMx(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval,
 	hp = (*HEADER)(&answer)
 	cp = answer.GetQb2() + HFIXEDSZ
 	end = answer.GetQb2() + i
-	for qdc = ntohs(uint16(hp.qdcount)); b.PostDec(&qdc); cp += i + QFIXEDSZ {
-		if b.Assign(&i, dn_skipname(cp, end)) < 0 {
+	for qdc = ntohs(uint16(hp.qdcount)); lang.PostDec(&qdc); cp += i + QFIXEDSZ {
+		if lang.Assign(&i, dn_skipname(cp, end)) < 0 {
 			PhpDnsFreeHandle(handle)
 			return_value.SetFalse()
 			return
 		}
 	}
 	count = ntohs(uint16(hp.ancount))
-	for b.PreDec(&count) >= 0 && cp < end {
-		if b.Assign(&i, dn_skipname(cp, end)) < 0 {
+	for lang.PreDec(&count) >= 0 && cp < end {
+		if lang.Assign(&i, dn_skipname(cp, end)) < 0 {
 			PhpDnsFreeHandle(handle)
 			return_value.SetFalse()
 			return
@@ -987,7 +988,7 @@ func ZifDnsGetMx(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval,
 			continue
 		}
 		GETSHORT(weight, cp)
-		if b.Assign(&i, dn_expand(answer.GetQb2(), end, cp, buf, b.SizeOf("buf")-1)) < 0 {
+		if lang.Assign(&i, dn_expand(answer.GetQb2(), end, cp, buf, b.SizeOf("buf")-1)) < 0 {
 			PhpDnsFreeHandle(handle)
 			return_value.SetFalse()
 			return

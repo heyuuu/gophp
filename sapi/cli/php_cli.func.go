@@ -5,6 +5,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -198,7 +199,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 	var hide_argv int = 0
 	faults.Try(func() {
 		zend.CG__().SetInCompilation(0)
-		for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
+		for lang.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
 			switch c {
 			case 'i':
 				if core.PhpRequestStartup() == types.FAILURE {
@@ -236,7 +237,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 		core.SG__().options |= core.SAPI_OPTION_NO_CHDIR
 		php_optind = orig_optind
 		php_optarg = orig_optarg
-		for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
+		for lang.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
 			switch c {
 			case 'a':
 				if interactive == 0 {
@@ -495,14 +496,14 @@ func DoCli(argc int, argv **byte, args []string) int {
 			if exec_begin != nil && zend.ZendEvalStringEx(exec_begin, nil, "Command line begin code", 1) == types.FAILURE {
 				exit_status = 254
 			}
-			for exit_status == types.SUCCESS && b.Assign(&input, core.PhpStreamGets(SInProcess, nil, 0)) != nil {
+			for exit_status == types.SUCCESS && lang.Assign(&input, core.PhpStreamGets(SInProcess, nil, 0)) != nil {
 				len_ = strlen(input)
-				for len_ > 0 && b.PostDec(&len_) && (input[len_] == '\n' || input[len_] == '\r') {
+				for len_ > 0 && lang.PostDec(&len_) && (input[len_] == '\n' || input[len_] == '\r') {
 					input[len_] = '0'
 				}
 				argn.SetStringVal(b.CastStr(input, len_+1))
 				zend.EG__().GetSymbolTable().KeyUpdate("argn", &argn)
-				argi.SetLong(b.PreInc(&index))
+				argi.SetLong(lang.PreInc(&index))
 				zend.EG__().GetSymbolTable().KeyUpdate("argi", &argi)
 				if exec_run != nil {
 					if zend.ZendEvalStringEx(exec_run, nil, "Command line run code", 1) == types.FAILURE {
@@ -593,9 +594,9 @@ func DoCli(argc int, argv **byte, args []string) int {
 			break
 		case PHP_MODE_SHOW_INI_CONFIG:
 			core.PhpPrintf("Configuration File (php.ini) Path: %s\n", core.PHP_CONFIG_FILE_PATH)
-			core.PhpPrintf("Loaded Configuration File:         %s\n", b.Cond(PhpIniOpenedPath != nil, PhpIniOpenedPath, "(none)"))
-			core.PhpPrintf("Scan for additional .ini files in: %s\n", b.Cond(PhpIniScannedPath != nil, PhpIniScannedPath, "(none)"))
-			core.PhpPrintf("Additional .ini files parsed:      %s\n", b.Cond(PhpIniScannedFiles != nil, PhpIniScannedFiles, "(none)"))
+			core.PhpPrintf("Loaded Configuration File:         %s\n", lang.Cond(PhpIniOpenedPath != nil, PhpIniOpenedPath, "(none)"))
+			core.PhpPrintf("Scan for additional .ini files in: %s\n", lang.Cond(PhpIniScannedPath != nil, PhpIniScannedPath, "(none)"))
+			core.PhpPrintf("Additional .ini files parsed:      %s\n", lang.Cond(PhpIniScannedFiles != nil, PhpIniScannedFiles, "(none)"))
 			break
 		}
 	})

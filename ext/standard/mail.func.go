@@ -6,6 +6,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -24,7 +25,7 @@ func SKIP_LONG_HEADER_SEP(str *byte, pos int) {
 func MAIL_ASCIIZ_CHECK(str __auto__, len_ int) {
 	p = str
 	e = p + len_
-	for b.Assign(&p, memchr(p, '0', e-p)) {
+	for lang.Assign(&p, memchr(p, '0', e-p)) {
 		*p = ' '
 	}
 }
@@ -325,7 +326,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 	} else if extra_cmd != nil {
 		extra_cmd = PhpEscapeShellCmd(extra_cmd.GetVal())
 	}
-	if PhpMail(to_r, subject_r, message, b.CondF1(str_headers != nil && str_headers.GetLen() != 0, func() []byte { return str_headers.GetVal() }, nil), b.CondF1(extra_cmd != nil, func() []byte { return extra_cmd.GetVal() }, nil)) != 0 {
+	if PhpMail(to_r, subject_r, message, lang.CondF1(str_headers != nil && str_headers.GetLen() != 0, func() []byte { return str_headers.GetVal() }, nil), lang.CondF1(extra_cmd != nil, func() []byte { return extra_cmd.GetVal() }, nil)) != 0 {
 		return_value.SetTrue()
 	} else {
 		return_value.SetFalse()
@@ -350,7 +351,7 @@ func PhpMailLogCrlfToSpaces(message *byte) {
 	 */
 
 	var p *byte = message
-	for b.Assign(&p, strpbrk(p, "\r\n")) {
+	for lang.Assign(&p, strpbrk(p, "\r\n")) {
 		*p = ' '
 	}
 }
@@ -426,7 +427,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 
 	if mail_log != nil && (*mail_log) {
 		var logline *byte
-		core.Spprintf(&logline, 0, "mail() on [%s:%d]: To: %s -- Headers: %s -- Subject: %s", zend.ZendGetExecutedFilename(), zend.ZendGetExecutedLineno(), to, b.Cond(hdr != nil, hdr, ""), subject)
+		core.Spprintf(&logline, 0, "mail() on [%s:%d]: To: %s -- Headers: %s -- Subject: %s", zend.ZendGetExecutedFilename(), zend.ZendGetExecutedLineno(), to, lang.Cond(hdr != nil, hdr, ""), subject)
 		if hdr != nil {
 			PhpMailLogCrlfToSpaces(logline)
 		}

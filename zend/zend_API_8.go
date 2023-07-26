@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -75,7 +76,7 @@ again:
 			break
 		}
 		if callable.Array().Len() == 2 {
-			if obj == nil || b.CondF(!(obj.IsReference()), func() bool { return !obj.IsString() && !obj.IsObject() }, func() bool {
+			if obj == nil || lang.CondF(!(obj.IsReference()), func() bool { return !obj.IsString() && !obj.IsObject() }, func() bool {
 				return types.Z_REFVAL_P(obj).GetType() != types.IS_STRING && types.Z_REFVAL_P(obj).GetType() != types.IS_OBJECT
 			}) {
 				if error != nil {

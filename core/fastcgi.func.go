@@ -2,6 +2,7 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
@@ -71,7 +72,7 @@ func FcgiHashClean(h *FcgiHash) {
 func FcgiHashStrndup(h *FcgiHash, str *byte, str_len uint) *byte {
 	var ret *byte
 	if h.GetData().GetPos()+str_len+1 >= h.GetData().GetEnd() {
-		var seg_size uint = b.Cond(str_len+1 > FCGI_HASH_SEG_SIZE, str_len+1, FCGI_HASH_SEG_SIZE)
+		var seg_size uint = lang.Cond(str_len+1 > FCGI_HASH_SEG_SIZE, str_len+1, FCGI_HASH_SEG_SIZE)
 		var p *FcgiDataSeg = (*FcgiDataSeg)(zend.Malloc(b.SizeOf("fcgi_data_seg") - 1 + seg_size))
 		p.SetPos(p.GetData())
 		p.SetEnd(p.GetPos() + seg_size)
@@ -228,7 +229,7 @@ func FcgiListen(path *byte, backlog int) int {
 	var listen_socket int
 	var sa SaT
 	var sock_len socklen_t
-	if b.Assign(&s, strchr(path, ':')) {
+	if lang.Assign(&s, strchr(path, ':')) {
 		port = atoi(s + 1)
 		if port != 0 && s-path < MAXPATHLEN {
 			strncpy(host, path, s-path)
@@ -287,7 +288,7 @@ func FcgiListen(path *byte, backlog int) int {
 
 	/* Create, bind socket and start listen on it */
 
-	if b.Assign(&listen_socket, socket(sa.GetSa().sa_family, SOCK_STREAM, 0)) < 0 || bind(listen_socket, (*__struct__sockaddr)(&sa), sock_len) < 0 || listen(listen_socket, backlog) < 0 {
+	if lang.Assign(&listen_socket, socket(sa.GetSa().sa_family, SOCK_STREAM, 0)) < 0 || bind(listen_socket, (*__struct__sockaddr)(&sa), sock_len) < 0 || listen(listen_socket, backlog) < 0 {
 		close(listen_socket)
 		FcgiLog(FCGI_ERROR, "Cannot bind/listen socket - [%d] %s.\n", errno, strerror(errno))
 		return -1
@@ -450,8 +451,8 @@ func FcgiGetParams(req *FcgiRequest, p *uint8, end *uint8) int {
 				return 0
 			}
 			name_len = (name_len & 0x7f) << 24
-			name_len |= b.PostInc(&(*p)) << 16
-			name_len |= b.PostInc(&(*p)) << 8
+			name_len |= lang.PostInc(&(*p)) << 16
+			name_len |= lang.PostInc(&(*p)) << 8
 			*p++
 			name_len |= (*p) - 1
 		}
@@ -465,8 +466,8 @@ func FcgiGetParams(req *FcgiRequest, p *uint8, end *uint8) int {
 				return 0
 			}
 			val_len = (val_len & 0x7f) << 24
-			val_len |= b.PostInc(&(*p)) << 16
-			val_len |= b.PostInc(&(*p)) << 8
+			val_len |= lang.PostInc(&(*p)) << 16
+			val_len |= lang.PostInc(&(*p)) << 8
 			*p++
 			val_len |= (*p) - 1
 		}
@@ -571,7 +572,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		}
 		q = req.GetEnv().GetList()
 		for q != nil {
-			if b.Assign(&value, FcgiMgmtVars.KeyFind(b.CastStr(q.GetVar(), q.GetVarLen()))) == nil {
+			if lang.Assign(&value, FcgiMgmtVars.KeyFind(b.CastStr(q.GetVar(), q.GetVarLen()))) == nil {
 				q = q.GetListNext()
 				continue
 			}
@@ -580,20 +581,20 @@ func FcgiReadRequest(req *FcgiRequest) int {
 				break
 			}
 			if q.GetVarLen() < 0x80 {
-				b.PostInc(&(*p)) = q.GetVarLen()
+				lang.PostInc(&(*p)) = q.GetVarLen()
 			} else {
-				b.PostInc(&(*p)) = q.GetVarLen()>>24&0xff | 0x80
-				b.PostInc(&(*p)) = q.GetVarLen() >> 16 & 0xff
-				b.PostInc(&(*p)) = q.GetVarLen() >> 8 & 0xff
-				b.PostInc(&(*p)) = q.GetVarLen() & 0xff
+				lang.PostInc(&(*p)) = q.GetVarLen()>>24&0xff | 0x80
+				lang.PostInc(&(*p)) = q.GetVarLen() >> 16 & 0xff
+				lang.PostInc(&(*p)) = q.GetVarLen() >> 8 & 0xff
+				lang.PostInc(&(*p)) = q.GetVarLen() & 0xff
 			}
 			if zlen < 0x80 {
-				b.PostInc(&(*p)) = zlen
+				lang.PostInc(&(*p)) = zlen
 			} else {
-				b.PostInc(&(*p)) = zlen>>24&0xff | 0x80
-				b.PostInc(&(*p)) = zlen >> 16 & 0xff
-				b.PostInc(&(*p)) = zlen >> 8 & 0xff
-				b.PostInc(&(*p)) = zlen & 0xff
+				lang.PostInc(&(*p)) = zlen>>24&0xff | 0x80
+				lang.PostInc(&(*p)) = zlen >> 16 & 0xff
+				lang.PostInc(&(*p)) = zlen >> 8 & 0xff
+				lang.PostInc(&(*p)) = zlen & 0xff
 			}
 			memcpy(p, q.GetVar(), q.GetVarLen())
 			p += q.GetVarLen()

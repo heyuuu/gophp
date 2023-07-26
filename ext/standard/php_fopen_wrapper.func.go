@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cgi"
 	"github.com/heyuuu/gophp/sapi/cli"
@@ -78,14 +79,14 @@ func PhpStreamApplyFilterList(stream *core.PhpStream, filterlist *byte, read_cha
 	for p != nil {
 		PhpUrlDecode(p, strlen(p))
 		if read_chain != 0 {
-			if b.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
+			if lang.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
 				streams.PhpStreamFilterAppend(stream.GetReadfilters(), temp_filter)
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to create filter (%s)", p)
 			}
 		}
 		if write_chain != 0 {
-			if b.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
+			if lang.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
 				streams.PhpStreamFilterAppend(stream.GetWritefilters(), temp_filter)
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to create filter (%s)", p)
@@ -143,7 +144,7 @@ func PhpStreamUrlWrapPhp(
 			return nil
 		}
 		input = zend.Ecalloc(1, b.SizeOf("* input"))
-		if b.Assign(&(input.GetBody()), core.SG__().RequestInfo.request_body) {
+		if lang.Assign(&(input.GetBody()), core.SG__().RequestInfo.request_body) {
 			core.PhpStreamRewind(input.GetBody())
 		} else {
 			input.SetBody(core.PhpStreamTempCreateEx(core.TEMP_STREAM_DEFAULT, core.SAPI_POST_BLOCK_SIZE, core.PG__().upload_tmp_dir))
@@ -174,7 +175,7 @@ func PhpStreamUrlWrapPhp(
 		if core.SM__().Name() == "cli" {
 			var cli_out int = 0
 			fd = cli.STDOUT_FILENO
-			if b.PostInc(&cli_out) {
+			if lang.PostInc(&cli_out) {
 				fd = dup(fd)
 			} else {
 				cli_out = 1
@@ -187,7 +188,7 @@ func PhpStreamUrlWrapPhp(
 		if core.SM__().Name() == "cli" {
 			var cli_err int = 0
 			fd = cli.STDERR_FILENO
-			if b.PostInc(&cli_err) {
+			if lang.PostInc(&cli_err) {
 				fd = dup(fd)
 			} else {
 				cli_err = 1
@@ -246,7 +247,7 @@ func PhpStreamUrlWrapPhp(
 			zend.Efree(pathdup)
 			return nil
 		}
-		if !(b.Assign(&stream, core.PhpStreamOpenWrapper(p+10, mode, options, opened_path))) {
+		if !(lang.Assign(&stream, core.PhpStreamOpenWrapper(p+10, mode, options, opened_path))) {
 			zend.Efree(pathdup)
 			return nil
 		}

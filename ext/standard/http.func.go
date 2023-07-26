@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -114,9 +115,9 @@ func PhpUrlEncodeHashEx(
 					memcpy(p, key_suffix, key_suffix_len)
 					p += key_suffix_len
 				}
-				*(b.PostInc(&p)) = '%'
-				*(b.PostInc(&p)) = '5'
-				*(b.PostInc(&p)) = 'B'
+				*(lang.PostInc(&p)) = '%'
+				*(lang.PostInc(&p)) = '5'
+				*(lang.PostInc(&p)) = 'B'
 				*p = '0'
 			} else {
 				var ekey *byte
@@ -143,13 +144,13 @@ func PhpUrlEncodeHashEx(
 					memcpy(p, key_suffix, key_suffix_len)
 					p += key_suffix_len
 				}
-				*(b.PostInc(&p)) = '%'
-				*(b.PostInc(&p)) = '5'
-				*(b.PostInc(&p)) = 'B'
+				*(lang.PostInc(&p)) = '%'
+				*(lang.PostInc(&p)) = '5'
+				*(lang.PostInc(&p)) = 'B'
 				*p = '0'
 			}
 			ht.ProtectRecursive()
-			PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, b.Cond(zdata.IsType(types.IS_OBJECT), zdata, nil), arg_sep, enc_type)
+			PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, lang.Cond(zdata.IsType(types.IS_OBJECT), zdata, nil), arg_sep, enc_type)
 			ht.UnprotectRecursive()
 			zend.Efree(newprefix)
 		} else if zdata.IsType(types.IS_NULL) || zdata.IsType(types.IS_RESOURCE) {
@@ -244,7 +245,7 @@ func ZifHttpBuildQuery(executeData zpp.Ex, return_value zpp.Ret, formdata *types
 		}
 		break
 	}
-	if PhpUrlEncodeHashEx(zend.HASH_OF(formdata), &formstr, prefix, prefix_len, nil, 0, nil, 0, b.Cond(formdata.IsType(types.IS_OBJECT), formdata, nil), arg_sep, int(enc_type)) == types.FAILURE {
+	if PhpUrlEncodeHashEx(zend.HASH_OF(formdata), &formstr, prefix, prefix_len, nil, 0, nil, 0, lang.Cond(formdata.IsType(types.IS_OBJECT), formdata, nil), arg_sep, int(enc_type)) == types.FAILURE {
 		if formstr.GetS() != nil {
 			formstr.Free()
 		}

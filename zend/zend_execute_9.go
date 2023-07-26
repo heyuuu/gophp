@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -33,7 +34,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 		} else if EG__().GetException() != nil {
 			break
 		} else if strlen(inc_filename.String().GetVal()) != inc_filename.String().GetLen() {
-			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
+			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
 			break
 		} else {
 			*resolved_path = inc_filename.String().GetStr()
@@ -44,7 +45,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 				fh.SetOpenedPath(*resolved_path)
 			}
 			if types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), fh.GetOpenedPath().GetStr()) != nil {
-				var op_array *types.ZendOpArray = CompileFile(&fh, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
+				var op_array *types.ZendOpArray = CompileFile(&fh, lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&fh)
 				if tmp_inc_filename.IsNotUndef() {
 
@@ -56,13 +57,13 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 				new_op_array = ZEND_FAKE_OP_ARRAY
 			}
 		} else {
-			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
+			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
 		}
 	case ZEND_INCLUDE:
 		fallthrough
 	case ZEND_REQUIRE:
 		if strlen(inc_filename.String().GetVal()) != inc_filename.String().GetLen() {
-			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
+			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
 			break
 		}
 		new_op_array = CompileFilename(type_, inc_filename)

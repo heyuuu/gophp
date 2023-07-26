@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -390,7 +391,7 @@ func PhpStdiopStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int {
 	var ret int
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	b.Assert(data != nil)
-	if b.Assign(&ret, DoFstat(data, 1)) == 0 {
+	if lang.Assign(&ret, DoFstat(data, 1)) == 0 {
 		memcpy(ssb.GetSb(), data.GetSb(), b.SizeOf("ssb -> sb"))
 	}
 	return ret
@@ -685,7 +686,7 @@ func PhpPlainFilesUrlStater(wrapper *core.PhpStreamWrapper, url *byte, flags int
 	if strncasecmp(url, "file://", b.SizeOf("\"file://\"")-1) == 0 {
 		url += b.SizeOf("\"file://\"") - 1
 	}
-	if core.PhpCheckOpenBasedirEx(url, b.Cond((flags&core.PHP_STREAM_URL_STAT_QUIET) != 0, 0, 1)) != 0 {
+	if core.PhpCheckOpenBasedirEx(url, lang.Cond((flags&core.PHP_STREAM_URL_STAT_QUIET) != 0, 0, 1)) != 0 {
 		return -1
 	}
 	if (flags & core.PHP_STREAM_URL_STAT_LINK) != 0 {
@@ -762,7 +763,7 @@ func PhpPlainFilesMkdir(wrapper *core.PhpStreamWrapper, dir *byte, mode int, opt
 			return 0
 		}
 		e = buf + strlen(buf)
-		if b.Assign(&p, memchr(buf, zend.DEFAULT_SLASH, dir_len)) {
+		if lang.Assign(&p, memchr(buf, zend.DEFAULT_SLASH, dir_len)) {
 			offset = p - buf + 1
 		}
 		if p != nil && dir_len == 1 {
@@ -771,7 +772,7 @@ func PhpPlainFilesMkdir(wrapper *core.PhpStreamWrapper, dir *byte, mode int, opt
 
 			/* find a top level directory we need to create */
 
-			for b.Assign(&p, strrchr(buf+offset, zend.DEFAULT_SLASH)) || offset != 1 && b.Assign(&p, strrchr(buf, zend.DEFAULT_SLASH)) {
+			for lang.Assign(&p, strrchr(buf+offset, zend.DEFAULT_SLASH)) || offset != 1 && lang.Assign(&p, strrchr(buf, zend.DEFAULT_SLASH)) {
 				var n int = 0
 				*p = '0'
 				for p > buf && (*(p - 1)) == zend.DEFAULT_SLASH {
@@ -797,17 +798,17 @@ func PhpPlainFilesMkdir(wrapper *core.PhpStreamWrapper, dir *byte, mode int, opt
 		}
 		if p == buf {
 			ret = standard.PhpMkdir(dir, mode)
-		} else if !(b.Assign(&ret, standard.PhpMkdir(buf, mode))) {
+		} else if !(lang.Assign(&ret, standard.PhpMkdir(buf, mode))) {
 			if p == nil {
 				p = buf
 			}
 
 			/* create any needed directories if the creation of the 1st directory worked */
 
-			for b.PreInc(&p) != e {
+			for lang.PreInc(&p) != e {
 				if (*p) == '0' {
 					*p = zend.DEFAULT_SLASH
-					if (*(p + 1)) != '0' && b.Assign(&ret, zend.VCWD_MKDIR(buf, mode_t(mode))) < 0 {
+					if (*(p + 1)) != '0' && lang.Assign(&ret, zend.VCWD_MKDIR(buf, mode_t(mode))) < 0 {
 						if (options & core.REPORT_ERRORS) != 0 {
 							core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 						}

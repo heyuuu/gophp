@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -23,7 +24,7 @@ func PhpCanonicalizeVersion(version *byte) *byte {
 	q = buf
 	*p++
 	lp = (*p) - 1
-	b.PostInc(&(*q)) = lp
+	lang.PostInc(&(*q)) = lp
 	for *p {
 
 		/*  s/[-_+]/./g;
@@ -37,24 +38,24 @@ func PhpCanonicalizeVersion(version *byte) *byte {
 		lq = *(q - 1)
 		if isspecialver(*p) {
 			if lq != '.' {
-				b.PostInc(&(*q)) = '.'
+				lang.PostInc(&(*q)) = '.'
 			}
 		} else if isndig(lp) && isdig(*p) || isdig(lp) && isndig(*p) {
 			if lq != '.' {
-				b.PostInc(&(*q)) = '.'
+				lang.PostInc(&(*q)) = '.'
 			}
-			b.PostInc(&(*q)) = *p
+			lang.PostInc(&(*q)) = *p
 		} else if !(isalnum(*p)) {
 			if lq != '.' {
-				b.PostInc(&(*q)) = '.'
+				lang.PostInc(&(*q)) = '.'
 			}
 		} else {
-			b.PostInc(&(*q)) = *p
+			lang.PostInc(&(*q)) = *p
 		}
 		*p++
 		lp = (*p) - 1
 	}
-	b.PostInc(&(*q)) = '0'
+	lang.PostInc(&(*q)) = '0'
 	return buf
 }
 func CompareSpecialVersionForms(form1 string, form2 string) int {
@@ -122,10 +123,10 @@ func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 	n2 = ver2
 	p2 = n2
 	for (*p1) && (*p2) && n1 != nil && n2 != nil {
-		if b.Assign(&n1, strchr(p1, '.')) != nil {
+		if lang.Assign(&n1, strchr(p1, '.')) != nil {
 			*n1 = '0'
 		}
-		if b.Assign(&n2, strchr(p2, '.')) != nil {
+		if lang.Assign(&n2, strchr(p2, '.')) != nil {
 			*n2 = '0'
 		}
 		if isdigit(*p1) && isdigit(*p2) {

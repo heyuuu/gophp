@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -254,7 +255,7 @@ try_again:
 	case types.IS_LONG:
 		index = offset.Long()
 	num_index:
-		if b.Assign(&retval, ht.IndexFind(index)) == nil {
+		if lang.Assign(&retval, ht.IndexFind(index)) == nil {
 			switch type_ {
 			case zend.BP_VAR_R:
 				faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
@@ -492,7 +493,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 	try_again:
 		switch offset.GetType() {
 		case types.IS_STRING:
-			if b.Assign(&tmp, ht.SymtableFind(offset.String().GetStr())) != nil {
+			if lang.Assign(&tmp, ht.SymtableFind(offset.String().GetStr())) != nil {
 				if check_empty == 2 {
 					return 1
 				}
@@ -514,7 +515,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 		case types.IS_LONG:
 			index = offset.Long()
 		num_index:
-			if b.Assign(&tmp, ht.IndexFind(index)) != nil {
+			if lang.Assign(&tmp, ht.IndexFind(index)) != nil {
 				if check_empty == 2 {
 					return 1
 				}
@@ -534,7 +535,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 			value = tmp
 		}
 	}
-	var result bool = b.CondF(check_empty != 0, func() int { return operators.IZendIsTrue(value) }, func() bool { return !value.IsNull() })
+	var result bool = lang.CondF(check_empty != 0, func() int { return operators.IZendIsTrue(value) }, func() bool { return !value.IsNull() })
 	return result
 }
 func SplArrayHasDimension(object *types.Zval, offset *types.Zval, check_empty int) int {
@@ -986,7 +987,7 @@ func zim_spl_Array_seek(executeData *zend.ZendExecuteData, return_value *types.Z
 	if position >= 0 {
 		SplArrayRewind(intern)
 		result = types.SUCCESS
-		for b.PostDec(&position) > 0 && b.Assign(&result, SplArrayNext(intern)) == types.SUCCESS {
+		for lang.PostDec(&position) > 0 && lang.Assign(&result, SplArrayNext(intern)) == types.SUCCESS {
 
 		}
 		if result == types.SUCCESS && types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) {
@@ -1064,7 +1065,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 			types.ZVAL_COPY_VALUE(&params[1], arg)
 		}
 		intern.GetNApplyCount()++
-		zend.CallUserFunction(nil, &function_name, return_value, b.Cond(arg != nil, 2, 1), params)
+		zend.CallUserFunction(nil, &function_name, return_value, lang.Cond(arg != nil, 2, 1), params)
 		intern.GetNApplyCount()--
 	} else {
 		if executeData.NumArgs() != 1 || zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "z", &arg) == types.FAILURE {
@@ -1113,7 +1114,7 @@ func zim_spl_Array_current(executeData *zend.ZendExecuteData, return_value *type
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
+	if lang.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return
 	}
 	if entry.IsIndirect() {
@@ -1168,7 +1169,7 @@ func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
+	if lang.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return_value.SetFalse()
 		return
 	}
@@ -1188,7 +1189,7 @@ func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
+	if lang.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return
 	}
 	if entry.IsIndirect() {
@@ -1269,7 +1270,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 	p = (*uint8)(buf)
 	s = p
 	standard.PHP_VAR_UNSERIALIZE_INIT(var_hash)
-	if (*p) != 'x' || (*(b.PreInc(&p))) != ':' {
+	if (*p) != 'x' || (*(lang.PreInc(&p))) != ':' {
 		goto outexcept
 	}
 	p++
@@ -1323,7 +1324,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 
 	/* members */
 
-	if (*p) != 'm' || (*(b.PreInc(&p))) != ':' {
+	if (*p) != 'm' || (*(lang.PreInc(&p))) != ':' {
 		goto outexcept
 	}
 	p++

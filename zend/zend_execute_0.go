@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -59,7 +60,7 @@ func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 				//}
 			}
 			p++
-			if !(b.PreDec(&count)) {
+			if !(lang.PreDec(&count)) {
 				break
 			}
 		}

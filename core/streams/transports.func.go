@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -22,7 +23,7 @@ func ERR_RETURN(out_err **types.String, local_err *types.String, fmt string) {
 	if out_err != nil {
 		*out_err = local_err
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, fmt, b.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
+		core.PhpErrorDocref(nil, faults.E_WARNING, fmt, lang.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
 		if local_err != nil {
 			// types.ZendStringReleaseEx(local_err, 0)
 			local_err = nil
@@ -91,7 +92,7 @@ func _phpStreamXportCreate(
 		n = 3
 	}
 	if protocol != nil {
-		if nil == b.Assign(&factory, types.ZendHashStrFindPtr(&XportHash, b.CastStr(protocol, n))) {
+		if nil == lang.Assign(&factory, types.ZendHashStrFindPtr(&XportHash, b.CastStr(protocol, n))) {
 			var wrapper_name []byte
 			if n >= b.SizeOf("wrapper_name") {
 				n = b.SizeOf("wrapper_name") - 1
@@ -116,7 +117,7 @@ func _phpStreamXportCreate(
 			/* client */
 
 			if (flags & (STREAM_XPORT_CONNECT | STREAM_XPORT_CONNECT_ASYNC)) != 0 {
-				if -1 == PhpStreamXportConnect(stream, name, namelen, b.Cond((flags&STREAM_XPORT_CONNECT_ASYNC) != 0, 1, 0), timeout, &error_text, error_code) {
+				if -1 == PhpStreamXportConnect(stream, name, namelen, lang.Cond((flags&STREAM_XPORT_CONNECT_ASYNC) != 0, 1, 0), timeout, &error_text, error_code) {
 					ERR_RETURN(error_string, error_text, "connect() failed: %s")
 					failed = 1
 				}
@@ -135,7 +136,7 @@ func _phpStreamXportCreate(
 				} else if (flags & STREAM_XPORT_LISTEN) != 0 {
 					var zbacklog *types.Zval = nil
 					var backlog int = 32
-					if core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&zbacklog, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "backlog")) != nil {
+					if core.PHP_STREAM_CONTEXT(stream) != nil && lang.Assign(&zbacklog, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "backlog")) != nil {
 						backlog = operators.ZvalGetLong(zbacklog)
 					}
 					if 0 != PhpStreamXportListen(stream, backlog, &error_text) {

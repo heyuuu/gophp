@@ -1,8 +1,8 @@
 package standard
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	b "github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/zpp"

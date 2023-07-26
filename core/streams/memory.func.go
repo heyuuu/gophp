@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -245,7 +246,7 @@ func PhpStreamTempClose(stream *core.PhpStream, close_handle int) int {
 	var ret int
 	b.Assert(ts != nil)
 	if ts.GetInnerstream() != nil {
-		ret = core.PhpStreamFreeEnclosed(ts.GetInnerstream(), core.PHP_STREAM_FREE_CLOSE|b.Cond(close_handle != 0, 0, core.PHP_STREAM_FREE_PRESERVE_HANDLE))
+		ret = core.PhpStreamFreeEnclosed(ts.GetInnerstream(), core.PHP_STREAM_FREE_CLOSE|lang.Cond(close_handle != 0, 0, core.PHP_STREAM_FREE_PRESERVE_HANDLE))
 	} else {
 		ret = 0
 	}
@@ -377,7 +378,7 @@ func PhpStreamUrlWrapRfc2397(
 		dlen -= 2
 		path += 2
 	}
-	if b.Assign(&comma, memchr(path, ',', dlen)) == nil {
+	if lang.Assign(&comma, memchr(path, ',', dlen)) == nil {
 		PhpStreamWrapperLogError(wrapper, options, "rfc2397: no comma in URL")
 		return nil
 	}
@@ -433,7 +434,7 @@ func PhpStreamUrlWrapRfc2397(
 			/* found parameter ... the heart of cs ppl lies in +1/-1 or was it +2 this time? */
 
 			plen = sep - path
-			vlen = b.CondF1(semi != nil, func() __auto__ { return size_t(semi - sep) }, mlen-plen) - 1
+			vlen = lang.CondF1(semi != nil, func() __auto__ { return size_t(semi - sep) }, mlen-plen) - 1
 			if plen != b.SizeOf("\"mediatype\"")-1 || memcmp(path, "mediatype", b.SizeOf("\"mediatype\"")-1) {
 				zend.AddAssocStringlEx(&meta, b.CastStr(path, plen), b.CastStr(sep+1, vlen))
 			}
@@ -470,7 +471,7 @@ func PhpStreamUrlWrapRfc2397(
 		dlen = PhpUrlDecode(comma, dlen)
 		ilen = dlen
 	}
-	if b.Assign(&stream, core.PhpStreamTempCreateRel(0, ^0)) != nil {
+	if lang.Assign(&stream, core.PhpStreamTempCreateRel(0, ^0)) != nil {
 
 		/* store data */
 

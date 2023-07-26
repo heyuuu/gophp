@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -43,7 +44,7 @@ func ZendSignalHandlerDefer(signo int, siginfo *siginfo_t, context any) {
 			}
 		} else {
 			SIGG(blocked) = 1
-			if b.Assign(&queue, SIGG(pavail)) {
+			if lang.Assign(&queue, SIGG(pavail)) {
 				SIGG(pavail) = queue.GetNext()
 				queue.GetZendSignal().SetSigno(signo)
 				queue.GetZendSignal().SetSiginfo(siginfo)

@@ -3,6 +3,7 @@ package core
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -91,7 +92,7 @@ func SapiReadPostData() {
 
 	/* now try to find an appropriate POST content handler */
 
-	if b.Assign(&post_entry, types.ZendHashStrFindPtr(&(SG__().knownPostContentTypes), b.CastStr(content_type, content_type_length))) != nil {
+	if lang.Assign(&post_entry, types.ZendHashStrFindPtr(&(SG__().knownPostContentTypes), b.CastStr(content_type, content_type_length))) != nil {
 
 		/* found one, register it for use */
 		SG__().RequestInfo.postEntry = post_entry
@@ -721,20 +722,20 @@ func SapiAddRequestHeader(var_ *byte, var_len uint, val *byte, val_len uint, arg
 		str = zend.DoAlloca(var_len+1, use_heap)
 		var_ = str
 		*p++
-		b.PostInc(&(*str)) = (*p) - 1
+		lang.PostInc(&(*str)) = (*p) - 1
 		for *p {
 			if (*p) == '_' {
-				b.PostInc(&(*str)) = '-'
+				lang.PostInc(&(*str)) = '-'
 				p++
 				if *p {
 					*p++
-					b.PostInc(&(*str)) = (*p) - 1
+					lang.PostInc(&(*str)) = (*p) - 1
 				}
 			} else if (*p) >= 'A' && (*p) <= 'Z' {
-				b.PostInc(&(*str)) = b.PostInc(&(*p)) - 'A' + 'a'
+				lang.PostInc(&(*str)) = lang.PostInc(&(*p)) - 'A' + 'a'
 			} else {
 				*p++
-				b.PostInc(&(*str)) = (*p) - 1
+				lang.PostInc(&(*str)) = (*p) - 1
 			}
 		}
 		*str = 0

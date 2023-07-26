@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -21,7 +22,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 
 		b.Assert(ce != nil)
 		if !ce.IsLinked() {
-			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return opline.Const2().String() }, nil)) == types.FAILURE {
+			if ZendDoLinkClass(ce, lang.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return opline.Const2().String() }, nil)) == types.FAILURE {
 				return 0
 			}
 		}

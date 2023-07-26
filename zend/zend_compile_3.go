@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -314,7 +315,7 @@ func (compiler *Compiler) CompileDynamicCall(result *Znode, name_node *Znode, ar
 	if name_node.GetOpType() == IS_CONST && name_node.GetConstant().IsString() {
 		var colon *byte
 		var str *types.String = name_node.GetConstant().String()
-		if b.Assign(&colon, operators.ZendMemrchr(str.GetVal(), ':', str.GetLen())) != nil && colon > str.GetVal() && (*(colon - 1)) == ':' {
+		if lang.Assign(&colon, operators.ZendMemrchr(str.GetVal(), ':', str.GetLen())) != nil && colon > str.GetVal() && (*(colon - 1)) == ':' {
 			var class *types.String = types.NewString(b.CastStr(str.GetVal(), colon-str.GetVal()-1))
 			var method *types.String = types.NewString(b.CastStr(colon+1, str.GetLen()-(colon-str.GetVal())-1))
 			var opline *types.ZendOp = GetNextOp()

@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"log"
@@ -392,7 +393,7 @@ const YYUNDEFTOK = 2
 const YYMAXUTOK = 272
 
 func YYTRANSLATE(YYX __auto__) uint {
-	return uint(b.CondF1(YYX <= YYMAXUTOK, func() __auto__ { return yytranslate[YYX] }, YYUNDEFTOK))
+	return uint(lang.CondF1(YYX <= YYMAXUTOK, func() __auto__ { return yytranslate[YYX] }, YYUNDEFTOK))
 }
 
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
@@ -452,8 +453,8 @@ var IniYyr1 []yytype_uint8 = []yytype_uint8{0, 44, 45, 45, 46, 46, 46, 46, 46, 4
 
 var IniYyr2 []yytype_uint8 = []yytype_uint8{0, 2, 2, 0, 3, 3, 5, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 2, 2, 0, 1, 1, 3, 2, 2, 4, 1, 1, 3, 2, 2, 4, 1, 3, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 
-const IniYyerrok = b.Assign(&yyerrstatus, 0)
-const IniYyclearin = b.Assign(&yychar, YYEMPTY)
+const IniYyerrok = lang.Assign(&yyerrstatus, 0)
+const IniYyclearin = lang.Assign(&yychar, YYEMPTY)
 const YYEMPTY = -2
 const YYEOF = 0
 
@@ -521,7 +522,7 @@ func IniYystrlen(yystr *byte) YYSIZE_T {
 func IniYystpcpy(yydest *byte, yysrc *byte) *byte {
 	var yyd *byte = yydest
 	var yys *byte = yysrc
-	for b.Assign(&(b.PostInc(&(*yyd))), b.PostInc(&(*yys))) != '0' {
+	for lang.Assign(&(lang.PostInc(&(*yyd))), lang.PostInc(&(*yys))) != '0' {
 		continue
 	}
 	return yyd - 1
@@ -540,13 +541,13 @@ func IniYytnamerr(yyres *byte, yystr *byte) YYSIZE_T {
 		var yyn YYSIZE_T = 0
 		var yyp *byte = yystr
 		for {
-			switch *(b.PreInc(&yyp)) {
+			switch *(lang.PreInc(&yyp)) {
 			case '\'':
 				fallthrough
 			case ',':
 				goto do_not_strip_quotes
 			case '\\':
-				if (*(b.PreInc(&yyp))) != '\\' {
+				if (*(lang.PreInc(&yyp))) != '\\' {
 					goto do_not_strip_quotes
 				}
 				fallthrough
@@ -623,19 +624,19 @@ func IniYysyntaxError(yymsg_alloc *YYSIZE_T, yymsg **byte, yyssp *yytype_int16, 
 
 	if yytoken != YYEMPTY {
 		var yyn int = yypact[*yyssp]
-		yyarg[b.PostInc(&yycount)] = yytname[yytoken]
+		yyarg[lang.PostInc(&yycount)] = yytname[yytoken]
 		if !(yypact_value_is_default(yyn)) {
 
 			/* Start YYX at -YYN if negative to avoid negative indexes in
 			   YYCHECK.  In other words, skip the first -YYN actions for
 			   this state because they are default actions.  */
 
-			var yyxbegin int = b.Cond(yyn < 0, -yyn, 0)
+			var yyxbegin int = lang.Cond(yyn < 0, -yyn, 0)
 
 			/* Stay within bounds of both yycheck and yytname.  */
 
 			var yychecklim int = YYLAST - yyn + 1
-			var yyxend int = b.Cond(yychecklim < YYNTOKENS, yychecklim, YYNTOKENS)
+			var yyxend int = lang.Cond(yychecklim < YYNTOKENS, yychecklim, YYNTOKENS)
 			var yyx int
 			for yyx = yyxbegin; yyx < yyxend; yyx++ {
 				if yycheck[yyx+yyn] == yyx && yyx != YYTERROR && !(yytable_value_is_error(yytable[yyx+yyn])) {
@@ -644,7 +645,7 @@ func IniYysyntaxError(yymsg_alloc *YYSIZE_T, yymsg **byte, yyssp *yytype_int16, 
 						yysize = yysize0
 						break
 					}
-					yyarg[b.PostInc(&yycount)] = yytname[yyx]
+					yyarg[lang.PostInc(&yycount)] = yytname[yyx]
 					var yysize1 YYSIZE_T = yysize + yytnamerr(YY_NULLPTR, yytname[yyx])
 					if !(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM) {
 						return 2
@@ -687,9 +688,9 @@ func IniYysyntaxError(yymsg_alloc *YYSIZE_T, yymsg **byte, yyssp *yytype_int16, 
 
 	var yyp *byte = *yymsg
 	var yyi int = 0
-	for b.Assign(&(*yyp), *yyformat) != '0' {
+	for lang.Assign(&(*yyp), *yyformat) != '0' {
 		if (*yyp) == '%' && yyformat[1] == 's' && yyi < yycount {
-			yyp += yytnamerr(yyp, yyarg[b.PostInc(&yyi)])
+			yyp += yytnamerr(yyp, yyarg[lang.PostInc(&yyi)])
 			yyformat += 2
 		} else {
 			yyp++

@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -196,7 +197,7 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 			 * the amount of data we skip on this search  as an optimization
 			 */
 
-			found_delim = _phpStreamSearchDelim(stream, maxlen, b.Cond(buffered_len >= delim_len-1, buffered_len-(delim_len-1), 0), delim, delim_len)
+			found_delim = _phpStreamSearchDelim(stream, maxlen, lang.Cond(buffered_len >= delim_len-1, buffered_len-(delim_len-1), 0), delim, delim_len)
 			if found_delim != nil {
 				break
 			}
@@ -305,7 +306,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 		*path_for_open = (*byte)(path)
 	}
 	if (options & core.IGNORE_URL) != 0 {
-		return (*core.PhpStreamWrapper)(b.Cond((options&core.STREAM_LOCATE_WRAPPERS_ONLY) != 0, nil, &PhpPlainFilesWrapper))
+		return (*core.PhpStreamWrapper)(lang.Cond((options&core.STREAM_LOCATE_WRAPPERS_ONLY) != 0, nil, &PhpPlainFilesWrapper))
 	}
 	for p = path; isalnum(int(*p)) || (*p) == '+' || (*p) == '-' || (*p) == '.'; p++ {
 		n++
@@ -356,7 +357,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 				if localhost == 1 {
 					*path_for_open += 11
 				}
-				for (*(b.PreInc(&(*path_for_open)))) == '/' {
+				for (*(lang.PreInc(&(*path_for_open)))) == '/' {
 
 				}
 				*path_for_open--
@@ -459,7 +460,7 @@ func PhpStreamNotificationFree(notifier *PhpStreamNotifier) {
 }
 func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername string, optionname string) *types.Zval {
 	var wrapperhash *types.Zval
-	if nil == b.Assign(&wrapperhash, context.GetOptions().Array().KeyFind(b.CastStrAuto(wrappername))) {
+	if nil == lang.Assign(&wrapperhash, context.GetOptions().Array().KeyFind(b.CastStrAuto(wrappername))) {
 		return nil
 	}
 	return wrapperhash.Array().KeyFind(b.CastStrAuto(optionname))

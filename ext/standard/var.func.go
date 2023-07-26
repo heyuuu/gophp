@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -104,7 +105,7 @@ again:
 		struc.Object().ProtectRecursive()
 		myht := zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
 		className := struc.Object().ClassName()
-		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", common, className, struc.Object().GetHandle(), b.CondF1(myht != nil, func() int { return myht.Count() }, 0))
+		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", common, className, struc.Object().GetHandle(), lang.CondF1(myht != nil, func() int { return myht.Count() }, 0))
 		if myht != nil {
 			myht.Foreach(func(key types.ArrayKey, value *types.Zval) {
 				var prop_info *types.PropertyInfo = nil
@@ -235,7 +236,7 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 			myht.ProtectRecursive()
 		}
 		className := struc.Object().ClassName()
-		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", common, className, struc.Object().GetHandle(), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0))
+		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", common, className, struc.Object().GetHandle(), lang.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0))
 		// types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			myht.Foreach(func(key types.ArrayKey, value *types.Zval) {

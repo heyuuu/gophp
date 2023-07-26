@@ -3,6 +3,7 @@ package spl
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -196,7 +197,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 					goto next_step
 				}
 			}
-			if child.IsUndef() || !child.IsObject() || !(b.Assign(&ce, types.Z_OBJCE(child)) && operators.InstanceofFunction(ce, spl_ce_RecursiveIterator) != 0) {
+			if child.IsUndef() || !child.IsObject() || !(lang.Assign(&ce, types.Z_OBJCE(child)) && operators.InstanceofFunction(ce, spl_ce_RecursiveIterator) != 0) {
 				// zend.ZvalPtrDtor(&child)
 				faults.ThrowException(spl_ce_UnexpectedValueException, "Objects returned by RecursiveIterator::getChildren() must implement RecursiveIterator", 0)
 				return
@@ -206,7 +207,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 			} else {
 				object.GetIterators()[object.GetLevel()].SetState(RS_NEXT)
 			}
-			object.SetIterators(zend.Erealloc(object.GetIterators(), b.SizeOf("spl_sub_iterator")*(b.PreInc(&(object.GetLevel()))+1)))
+			object.SetIterators(zend.Erealloc(object.GetIterators(), b.SizeOf("spl_sub_iterator")*(lang.PreInc(&(object.GetLevel()))+1)))
 			sub_iter = ce.GetGetIterator()(ce, &child, 0)
 			types.ZVAL_COPY_VALUE(object.GetIterators()[object.GetLevel()].GetZobject(), &child)
 			object.GetIterators()[object.GetLevel()].SetIterator(sub_iter)
@@ -622,7 +623,7 @@ func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.String, k
 	zobj = object.GetIterators()[level].GetZobject()
 	function_handler = zend.ZendStdGetMethod(zobject, method, key)
 	if function_handler == nil {
-		if b.Assign(&function_handler, types.Z_OBJCE_P(zobj).FunctionTable().Get(method.GetStr())) == nil {
+		if lang.Assign(&function_handler, types.Z_OBJCE_P(zobj).FunctionTable().Get(method.GetStr())) == nil {
 			*zobject = zobj.Object()
 			function_handler = (*zobject).GetMethod(method.GetStr(), key)
 		} else {
@@ -876,7 +877,7 @@ func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *ty
 	intern = SplDualItFromObj(*object)
 	function_handler = zend.ZendStdGetMethod(object, method, key)
 	if function_handler == nil && intern.GetCe() != nil {
-		if b.Assign(&function_handler, intern.GetCe().FunctionTable().Get(method.GetStr())) == nil {
+		if lang.Assign(&function_handler, intern.GetCe().FunctionTable().Get(method.GetStr())) == nil {
 			if intern.GetZobject().Object().CanGetMethod() {
 				*object = intern.GetZobject().Object()
 				function_handler = (*object).GetMethod(method.GetStr(), key)
@@ -971,7 +972,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 		ce = types.Z_OBJCE_P(zobject)
 		if operators.InstanceofFunction(ce, zend.ZendCeIterator) == 0 {
 			if executeData.NumArgs() > 1 {
-				if !(b.Assign(&ce_cast, zend.ZendLookupClass(class_name))) || operators.InstanceofFunction(ce, ce_cast) == 0 || ce_cast.GetGetIterator() == nil {
+				if !(lang.Assign(&ce_cast, zend.ZendLookupClass(class_name))) || operators.InstanceofFunction(ce, ce_cast) == 0 || ce_cast.GetGetIterator() == nil {
 					faults.ThrowException(spl_ce_LogicException, "Class to downcast to not found or not base class or does not implement Traversable", 0)
 					return nil
 				}
@@ -2013,7 +2014,7 @@ func zim_spl_CachingIterator_offsetGet(executeData *zend.ZendExecuteData, return
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == types.FAILURE {
 		return
 	}
-	if b.Assign(&value, intern.GetZcache().Array().SymtableFind(key.GetStr())) == nil {
+	if lang.Assign(&value, intern.GetZcache().Array().SymtableFind(key.GetStr())) == nil {
 		faults.Error(faults.E_NOTICE, "Undefined index: %s", key.GetVal())
 		return
 	}
@@ -2549,7 +2550,7 @@ func ZifIteratorToArray(executeData *zend.ZendExecuteData, return_value *types.Z
 		return
 	}
 	zend.ArrayInit(return_value)
-	SplIteratorApply(obj, b.Cond(use_keys != 0, SplIteratorToArrayApply, SplIteratorToValuesApply), any(return_value))
+	SplIteratorApply(obj, lang.Cond(use_keys != 0, SplIteratorToArrayApply, SplIteratorToValuesApply), any(return_value))
 }
 func SplIteratorCountApply(iter *zend.ZendObjectIterator, puser any) int {
 	*((*zend.ZendLong)(puser))++

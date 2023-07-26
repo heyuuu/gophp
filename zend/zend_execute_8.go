@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -216,7 +217,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 						var j int = last.GetExtendedValue()
 						for {
 							// types.ZendStringReleaseEx(rope[j], 0)
-							if !(b.PostDec(&j)) {
+							if !(lang.PostDec(&j)) {
 								break
 							}
 						}
@@ -255,7 +256,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 	var called_scope *types.ClassEntry
 	var lcname string
 	var colon *byte
-	if b.Assign(&colon, operators.ZendMemrchr(function.GetVal(), ':', function.GetLen())) != nil && colon > function.GetVal() && (*(colon - 1)) == ':' {
+	if lang.Assign(&colon, operators.ZendMemrchr(function.GetVal(), ':', function.GetLen())) != nil && colon > function.GetVal() && (*(colon - 1)) == ':' {
 		var mname *types.String
 		var cname_length int = colon - function.GetVal() - 1
 		var mname_length int = function.GetLen() - cname_length - (b.SizeOf("\"::\"") - 1)

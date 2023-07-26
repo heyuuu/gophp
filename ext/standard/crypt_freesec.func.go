@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 )
 
 func AsciiToBin(ch byte) int {
@@ -307,7 +308,7 @@ func DoDes(
 	l = IpMaskl[0][l_in>>24] | IpMaskl[1][l_in>>16&0xff] | IpMaskl[2][l_in>>8&0xff] | IpMaskl[3][l_in&0xff] | IpMaskl[4][r_in>>24] | IpMaskl[5][r_in>>16&0xff] | IpMaskl[6][r_in>>8&0xff] | IpMaskl[7][r_in&0xff]
 	r = IpMaskr[0][l_in>>24] | IpMaskr[1][l_in>>16&0xff] | IpMaskr[2][l_in>>8&0xff] | IpMaskr[3][l_in&0xff] | IpMaskr[4][r_in>>24] | IpMaskr[5][r_in>>16&0xff] | IpMaskr[6][r_in>>8&0xff] | IpMaskr[7][r_in&0xff]
 	saltbits = data.GetSaltbits()
-	for b.PostDec(&count) {
+	for lang.PostDec(&count) {
 
 		/*
 		 * Do each round.
@@ -316,7 +317,7 @@ func DoDes(
 		kl = kl1
 		kr = kr1
 		round = 16
-		for b.PostDec(&round) {
+		for lang.PostDec(&round) {
 
 			/*
 			 * Expand R to 48 bits (simulate the E-box).
@@ -331,8 +332,8 @@ func DoDes(
 			 */
 
 			f = (r48l ^ r48r) & saltbits
-			r48l ^= f ^ b.PostInc(&(*kl))
-			r48r ^= f ^ b.PostInc(&(*kr))
+			r48l ^= f ^ lang.PostInc(&(*kl))
+			r48r ^= f ^ lang.PostInc(&(*kr))
 
 			/*
 			 * Do sbox lookups (which shrink it back to 32 bits)
@@ -402,7 +403,7 @@ func _cryptExtendedR(key *uint8, setting *byte, data *PhpCryptExtendedData) *byt
 
 	q = (*u_char)(keybuf)
 	for size_t(q-(*u_char)(keybuf)) < b.SizeOf("keybuf") {
-		b.PostInc(&(*q)) = (*key) << 1
+		lang.PostInc(&(*q)) = (*key) << 1
 		if (*key) != 0 {
 			key++
 		}
@@ -455,7 +456,7 @@ func _cryptExtendedR(key *uint8, setting *byte, data *PhpCryptExtendedData) *byt
 
 			q = (*u_char)(keybuf)
 			for size_t(q-(*u_char)(keybuf)) < b.SizeOf("keybuf") && (*key) != 0 {
-				b.PostInc(&(*q)) ^= b.PostInc(&(*key)) << 1
+				lang.PostInc(&(*q)) ^= lang.PostInc(&(*key)) << 1
 			}
 			if DesSetkey((*byte)(keybuf), data) != 0 {
 				return nil
@@ -496,19 +497,19 @@ func _cryptExtendedR(key *uint8, setting *byte, data *PhpCryptExtendedData) *byt
 	 */
 
 	l = r0 >> 8
-	b.PostInc(&(*p)) = Ascii64[l>>18&0x3f]
-	b.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
-	b.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
-	b.PostInc(&(*p)) = Ascii64[l&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l>>18&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l&0x3f]
 	l = r0<<16 | r1>>16&0xffff
-	b.PostInc(&(*p)) = Ascii64[l>>18&0x3f]
-	b.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
-	b.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
-	b.PostInc(&(*p)) = Ascii64[l&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l>>18&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l&0x3f]
 	l = r1 << 2
-	b.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
-	b.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
-	b.PostInc(&(*p)) = Ascii64[l&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
+	lang.PostInc(&(*p)) = Ascii64[l&0x3f]
 	*p = 0
 	return data.GetOutput()
 }

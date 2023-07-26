@@ -2,11 +2,11 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/builtin"
-	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/kits/ascii"
+	b "github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -62,7 +62,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 				/* strip trailing whitespaces */
 
 				l = bufl
-				for builtin.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
+				for b.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
 
 				}
 				if l != bufl-1 {
@@ -88,7 +88,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 
 			if type_ == 2 && buf != b || type_ != 2 {
 				l = bufl
-				for builtin.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
+				for b.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
 
 				}
 				if l != bufl-1 {
@@ -109,7 +109,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 		}
 	} else {
 		var read ssize_t
-		for builtin.Assign(&read, core.PhpStreamRead(stream, buf, core.EXEC_INPUT_BUF)) > 0 {
+		for b.Assign(&read, core.PhpStreamRead(stream, buf, core.EXEC_INPUT_BUF)) > 0 {
 			core.PUTS(b.CastStr(buf, read))
 		}
 	}

@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"strings"
@@ -101,7 +102,7 @@ func ZendResolveClassNameAst(ast *ZendAst) *types.String {
 }
 func ZendAddTryElement(try_op uint32) uint32 {
 	var op_array = CG__().GetActiveOpArray()
-	var try_catch_offset uint32 = b.PostInc(&(op_array.GetLastTryCatch()))
+	var try_catch_offset uint32 = lang.PostInc(&(op_array.GetLastTryCatch()))
 	var elem *ZendTryCatchElement
 	op_array.SetTryCatchArray(SafeErealloc(op_array.GetTryCatchArray(), b.SizeOf("zend_try_catch_element"), op_array.GetLastTryCatch(), 0))
 	elem = op_array.GetTryCatchArray()[try_catch_offset]
@@ -307,7 +308,7 @@ func ZendEnsureValidClassFetchType(fetch_type uint32) {
 	if fetch_type != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() {
 		var ce = CG__().GetActiveClassEntry()
 		if ce == nil {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", lang.Cond(lang.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
 		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && ce.GetParentName() == nil {
 			faults.Error(faults.E_DEPRECATED, "Cannot use \"parent\" when current class scope has no parent")
 		}
@@ -493,7 +494,7 @@ func ZendDirname(path string) string {
 	return path
 }
 func ZendAdjustForFetchType(opline *types.ZendOp, result *Znode, type_ uint32) {
-	var factor uint8 = b.Cond(opline.GetOpcode() == ZEND_FETCH_STATIC_PROP_R, 1, 3)
+	var factor uint8 = lang.Cond(opline.GetOpcode() == ZEND_FETCH_STATIC_PROP_R, 1, 3)
 	switch type_ {
 	case BP_VAR_R:
 		opline.SetResultType(IS_TMP_VAR)

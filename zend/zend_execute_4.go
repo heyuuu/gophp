@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -144,7 +145,7 @@ func ZendNonStaticMethodCall(fbc types.IFunction) {
 	}
 }
 func ZendParamMustBeRef(func_ types.IFunction, arg_num uint32) {
-	faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", arg_num, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
+	faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", arg_num, lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
 }
 func ZendUseScalarAsArray() {
 	faults.Error(faults.E_WARNING, "Cannot use a scalar value as an array")

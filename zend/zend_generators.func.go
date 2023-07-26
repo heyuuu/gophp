@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -375,29 +376,29 @@ func ZendGeneratorGetGc(object *types.Zval, table **types.Zval, n *int) *types.A
 	*n = gc_buffer_size
 	gc_buffer = generator.GetGcBuffer()
 	*table = gc_buffer
-	types.ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), generator.GetValue())
-	types.ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), generator.GetKey())
-	types.ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), generator.GetRetval())
-	types.ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), generator.GetValues())
+	types.ZVAL_COPY_VALUE(lang.PostInc(&gc_buffer), generator.GetValue())
+	types.ZVAL_COPY_VALUE(lang.PostInc(&gc_buffer), generator.GetKey())
+	types.ZVAL_COPY_VALUE(lang.PostInc(&gc_buffer), generator.GetRetval())
+	types.ZVAL_COPY_VALUE(lang.PostInc(&gc_buffer), generator.GetValues())
 	if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
 		var i uint32
 		var num_cvs uint32 = executeData.GetFunc().GetOpArray().last_var
 		for i = 0; i < num_cvs; i++ {
-			types.ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), executeData.VarNum(i))
+			types.ZVAL_COPY_VALUE(lang.PostInc(&gc_buffer), executeData.VarNum(i))
 		}
 	}
 	if (EX_CALL_INFO() & ZEND_CALL_FREE_EXTRA_ARGS) != 0 {
 		var zv *types.Zval = executeData.VarNum(op_array.GetLastVar() + op_array.GetT())
 		var end *types.Zval = zv + (executeData.NumArgs() - op_array.GetNumArgs())
 		for zv != end {
-			types.ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), b.PostInc(&zv))
+			types.ZVAL_COPY_VALUE(lang.PostInc(&gc_buffer), lang.PostInc(&zv))
 		}
 	}
 	if (EX_CALL_INFO() & ZEND_CALL_RELEASE_THIS) != 0 {
-		b.PostInc(&gc_buffer).SetObjectexecuteData.ThisObject()
+		lang.PostInc(&gc_buffer).SetObjectexecuteData.ThisObject()
 	}
 	if (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0 {
-		b.PostInc(&gc_buffer).SetObject(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
+		lang.PostInc(&gc_buffer).SetObject(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 	}
 	if executeData.GetOpline() != op_array.GetOpcodes() {
 		var i uint32
@@ -411,7 +412,7 @@ func ZendGeneratorGetGc(object *types.Zval, table **types.Zval, n *int) *types.A
 				var var_num uint32 = range_.GetVar() & ^ZEND_LIVE_MASK
 				var var_ *types.Zval = EX_VAR(executeData, var_num)
 				if kind == ZEND_LIVE_TMPVAR || kind == ZEND_LIVE_LOOP {
-					types.ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), var_)
+					types.ZVAL_COPY_VALUE(lang.PostInc(&gc_buffer), var_)
 				}
 			}
 		}
@@ -419,7 +420,7 @@ func ZendGeneratorGetGc(object *types.Zval, table **types.Zval, n *int) *types.A
 	if generator.GetNode().GetChildren() == 0 {
 		var root *ZendGenerator = generator.GetNode().GetRoot()
 		for root != generator {
-			b.PostInc(&gc_buffer).SetObject(root.GetStd())
+			lang.PostInc(&gc_buffer).SetObject(root.GetStd())
 			root = ZendGeneratorGetChild(root.GetNode(), generator)
 		}
 	}
@@ -442,7 +443,7 @@ func ZendGeneratorCheckPlaceholderFrame(ptr *ZendExecuteData) *ZendExecuteData {
 		obj := ptr.ThisObject()
 		if obj.GetCe() == ZendCeGenerator {
 			var generator *ZendGenerator = (*ZendGenerator)(obj)
-			var root *ZendGenerator = b.CondF2(generator.GetNode().GetChildren() < 1, generator, func() *ZendGenerator { return generator.GetNode().GetPtrLeaf() }).node.ptr.root
+			var root *ZendGenerator = lang.CondF2(generator.GetNode().GetChildren() < 1, generator, func() *ZendGenerator { return generator.GetNode().GetPtrLeaf() }).node.ptr.root
 			var prev *ZendExecuteData = ptr.GetPrevExecuteData()
 			if generator.GetNode().GetParent() != root {
 				for {
@@ -524,7 +525,7 @@ func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNod
 	})
 }
 func ZendGeneratorAddChild(generator *ZendGenerator, child *ZendGenerator) {
-	var leaf *ZendGenerator = b.CondF1(child.GetNode().GetChildren() != 0, func() *ZendGenerator { return child.GetNode().GetPtrLeaf() }, child)
+	var leaf *ZendGenerator = lang.CondF1(child.GetNode().GetChildren() != 0, func() *ZendGenerator { return child.GetNode().GetPtrLeaf() }, child)
 	var multi_children_node *ZendGeneratorNode
 	var was_leaf bool = generator.GetNode().GetChildren() == 0
 	if was_leaf != 0 {
@@ -619,7 +620,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 						root.GetExecuteData().GetOpline()--
 						faults.ThrowException(zend_ce_ClosedGeneratorException, "Generator yielded from aborted, no return value available", 0)
 						EG__().SetCurrentExecuteData(original_execute_data)
-						if (b.Cond(old_root != nil, old_root, generator).flags & ZEND_GENERATOR_CURRENTLY_RUNNING) == 0 {
+						if (lang.Cond(old_root != nil, old_root, generator).flags & ZEND_GENERATOR_CURRENTLY_RUNNING) == 0 {
 							leaf.GetNode().SetRoot(root)
 							root.GetNode().SetParent(nil)
 							if old_root != nil {
@@ -675,7 +676,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		generator.GetValues().SetFePos(newPos)
 	} else {
 		var iter *ZendObjectIterator = (*ZendObjectIterator)(generator.GetValues().Object())
-		if b.PostInc(&(iter.GetIndex())) > 0 {
+		if lang.PostInc(&(iter.GetIndex())) > 0 {
 			iter.GetFuncs().GetMoveForward()(iter)
 			if EG__().GetException() != nil {
 				goto exception

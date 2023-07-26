@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -124,7 +125,7 @@ func PhpRegisterVariableEx(varName string, val *types.Zval, trackVarsArray *type
 		for true {
 			var index_s *byte
 			var new_idx_len int = 0
-			if b.PreInc(&nest_level) > PG__().max_input_nesting_level {
+			if lang.PreInc(&nest_level) > PG__().max_input_nesting_level {
 				var ht *types.Array
 
 				/* too many levels of nesting */
@@ -170,7 +171,7 @@ func PhpRegisterVariableEx(varName string, val *types.Zval, trackVarsArray *type
 			}
 			if index == nil {
 				zend.ArrayInit(&gpcElement)
-				if b.Assign(&gpcElementP, symtable1.Append(&gpcElement)) == nil {
+				if lang.Assign(&gpcElementP, symtable1.Append(&gpcElement)) == nil {
 					gpcElement.Array().Destroy()
 					// zend.ZvalPtrDtorNogc(val)
 					zend.FreeAlloca(varOrig, use_heap)
@@ -271,7 +272,7 @@ func AddPostVar(arr *types.Zval, var_ *PostVarDataT, eof bool) bool {
 		/* "foo=bar&" or "foo=&" */
 
 		klen = ksep - var_.GetPtr()
-		vlen = vsep - b.PreInc(&ksep)
+		vlen = vsep - lang.PreInc(&ksep)
 	} else {
 		ksep = ""
 
@@ -298,13 +299,13 @@ func AddPostVars(arr *types.Zval, vars *PostVarDataT, eof bool) int {
 	vars.SetPtr(vars.GetStr().GetS().GetVal())
 	vars.SetEnd(vars.GetStr().GetS().GetVal() + vars.GetStr().GetS().GetLen())
 	for AddPostVar(arr, vars, eof) != 0 {
-		if b.PreInc(&(vars.GetCnt())) > max_vars {
+		if lang.PreInc(&(vars.GetCnt())) > max_vars {
 			PhpErrorDocref(nil, faults.E_WARNING, "Input variables exceeded %"+"llu"+". "+"To increase the limit change max_input_vars in php.ini.", max_vars)
 			return types.FAILURE
 		}
 	}
 	if eof == 0 && vars.GetStr().GetS().GetVal() != vars.GetPtr() {
-		memmove(vars.GetStr().GetS().GetVal(), vars.GetPtr(), b.Assign(&(vars.GetStr().GetS().GetLen()), vars.GetEnd()-vars.GetPtr()))
+		memmove(vars.GetStr().GetS().GetVal(), vars.GetPtr(), lang.Assign(&(vars.GetStr().GetS().GetLen()), vars.GetEnd()-vars.GetPtr()))
 	}
 	return types.SUCCESS
 }
@@ -424,12 +425,12 @@ func PhpDefaultTreatData(arg int, str *byte, destArray *types.Zval) {
 				goto next_cookie
 			}
 		}
-		if b.PreInc(&count) > PG__().max_input_vars {
+		if lang.PreInc(&count) > PG__().max_input_vars {
 			PhpErrorDocref(nil, faults.E_WARNING, "Input variables exceeded "+zend.ZEND_LONG_FMT+". To increase the limit change max_input_vars in php.ini.", PG__().max_input_vars)
 			break
 		}
 		if val != nil {
-			b.PostInc(&(*val)) = '0'
+			lang.PostInc(&(*val)) = '0'
 			if arg == PARSE_COOKIE {
 				val_len = standard.PhpRawUrlDecode(val, strlen(val))
 			} else {
@@ -560,7 +561,7 @@ func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {
 	var globalsCheck = dest == zend.EG__().GetSymbolTable()
 
 	src.Foreach(func(key types.ArrayKey, value *types.Zval) {
-		if !value.IsArray() || key.IsStrKey() && b.Assign(&dest_entry, dest.KeyFind(key.StrKey())) == nil || !key.IsStrKey() && b.Assign(&dest_entry, dest.IndexFind(key.IdxKey())) == nil || !dest_entry.IsArray() {
+		if !value.IsArray() || key.IsStrKey() && lang.Assign(&dest_entry, dest.KeyFind(key.StrKey())) == nil || !key.IsStrKey() && lang.Assign(&dest_entry, dest.IndexFind(key.IdxKey())) == nil || !dest_entry.IsArray() {
 			if key.IsStrKey() {
 				if !globalsCheck || key.StrKey() != "GLOBALS" {
 					dest.KeyUpdate(key.StrKey(), value)
@@ -635,7 +636,7 @@ func PhpAutoGlobalsCreateServer(name string) bool {
 			if SG__().RequestInfo.Argc() != 0 {
 				var argc *types.Zval
 				var argv *types.Zval
-				if b.Assign(&argc, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGC)) != nil && b.Assign(&argv, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil {
+				if lang.Assign(&argc, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGC)) != nil && lang.Assign(&argv, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil {
 					// 					argv.AddRefcount()
 					PG__().http_globals[TRACK_VARS_SERVER].Array().KeyUpdate(types.STR_ARGV, argv)
 					PG__().http_globals[TRACK_VARS_SERVER].Array().KeyUpdate(types.STR_ARGC, argc)

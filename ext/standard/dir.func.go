@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -119,23 +120,23 @@ func ZifClosedir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle 
 	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
+			if lang.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
 			}
-			if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResourceEx(tmp, "Directory", streams.PhpFileLeStream()))) == nil {
+			if lang.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResourceEx(tmp, "Directory", streams.PhpFileLeStream()))) == nil {
 				return_value.SetFalse()
 				return
 			}
 		} else {
-			if !(DIRG(default_dir)) || b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(DIRG(default_dir), "Directory", streams.PhpFileLeStream()))) == nil {
+			if !(DIRG(default_dir)) || lang.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(DIRG(default_dir), "Directory", streams.PhpFileLeStream()))) == nil {
 				return_value.SetFalse()
 				return
 			}
 		}
 	} else {
-		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.Resource(), "Directory", streams.PhpFileLeStream()))) == nil {
+		if lang.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.Resource(), "Directory", streams.PhpFileLeStream()))) == nil {
 			return_value.SetFalse()
 			return
 		}
@@ -255,23 +256,23 @@ func ZifRewinddir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle
 	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
+			if lang.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
 			}
-			if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResourceEx(tmp, "Directory", streams.PhpFileLeStream()))) == nil {
+			if lang.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResourceEx(tmp, "Directory", streams.PhpFileLeStream()))) == nil {
 				return_value.SetFalse()
 				return
 			}
 		} else {
-			if !(DIRG(default_dir)) || b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(DIRG(default_dir), "Directory", streams.PhpFileLeStream()))) == nil {
+			if !(DIRG(default_dir)) || lang.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(DIRG(default_dir), "Directory", streams.PhpFileLeStream()))) == nil {
 				return_value.SetFalse()
 				return
 			}
 		}
 	} else {
-		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.Resource(), "Directory", streams.PhpFileLeStream()))) == nil {
+		if lang.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.Resource(), "Directory", streams.PhpFileLeStream()))) == nil {
 			return_value.SetFalse()
 			return
 		}
@@ -304,23 +305,23 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
+			if lang.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
 			}
-			if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResourceEx(tmp, "Directory", streams.PhpFileLeStream()))) == nil {
+			if lang.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResourceEx(tmp, "Directory", streams.PhpFileLeStream()))) == nil {
 				return_value.SetFalse()
 				return
 			}
 		} else {
-			if !(DIRG(default_dir)) || b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(DIRG(default_dir), "Directory", streams.PhpFileLeStream()))) == nil {
+			if !(DIRG(default_dir)) || lang.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(DIRG(default_dir), "Directory", streams.PhpFileLeStream()))) == nil {
 				return_value.SetFalse()
 				return
 			}
 		}
 	} else {
-		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.Resource(), "Directory", streams.PhpFileLeStream()))) == nil {
+		if lang.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.Resource(), "Directory", streams.PhpFileLeStream()))) == nil {
 			return_value.SetFalse()
 			return
 		}
@@ -371,7 +372,7 @@ func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, _ zp
 	}
 	memset(&globbuf, 0, b.SizeOf("glob_t"))
 	globbuf.gl_offs = 0
-	if 0 != b.Assign(&ret, glob(pattern, flags&streams.GLOB_FLAGMASK, nil, &globbuf)) {
+	if 0 != lang.Assign(&ret, glob(pattern, flags&streams.GLOB_FLAGMASK, nil, &globbuf)) {
 		return_value.SetFalse()
 		return
 	}

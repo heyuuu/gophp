@@ -3,6 +3,7 @@ package core
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -59,7 +60,7 @@ func PhpOutputDeactivate() {
 		/* release all output handlers */
 
 		if OG__().Handlers().elements {
-			for b.Assign(&handler, OG__().Handlers().Top()) {
+			for lang.Assign(&handler, OG__().Handlers().Top()) {
 				PhpOutputHandlerFree(handler)
 				OG__().Handlers().DelTop()
 			}
@@ -445,12 +446,12 @@ func PhpOutputOp(op int, str *byte, len_ int) {
 	 *  - or apply op to the handler stack
 	 */
 
-	if OG__().active && b.Assign(&obh_cnt, OG__().Handlers().GetTop()) {
+	if OG__().active && lang.Assign(&obh_cnt, OG__().Handlers().GetTop()) {
 		context.GetIn().SetData((*byte)(str))
 		context.GetIn().SetUsed(len_)
 		if obh_cnt > 1 {
 			zend.ZendStackApplyWithArgument(&(OG__().handlers), zend.ZEND_STACK_APPLY_TOPDOWN, PhpOutputStackApplyOp, &context)
-		} else if b.Assign(&active, OG__().Handlers().Top()) && !active.IsDisabled() {
+		} else if lang.Assign(&active, OG__().Handlers().Top()) && !active.IsDisabled() {
 			PhpOutputHandlerOp(*active, &context)
 		} else {
 			PhpOutputContextPass(&context)
@@ -478,7 +479,7 @@ func PhpOutputStackApplyOp(h any, c any) int {
 	var status PhpOutputHandlerStatusT
 	var handler *PhpOutputHandler = *((**PhpOutputHandler)(h))
 	var context *PhpOutputContext = (*PhpOutputContext)(c)
-	if b.Assign(&was_disabled, handler.GetFlags()&PHP_OUTPUT_HANDLER_DISABLED) {
+	if lang.Assign(&was_disabled, handler.GetFlags()&PHP_OUTPUT_HANDLER_DISABLED) {
 		status = PHP_OUTPUT_HANDLER_FAILURE
 	} else {
 		status = PhpOutputHandlerOp(handler, context)
@@ -564,12 +565,12 @@ func PhpOutputStackPop(flags int) int {
 	var orphan **PhpOutputHandler = OG__().active
 	if orphan == nil {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
-			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer. No buffer to %s", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"))
+			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer. No buffer to %s", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"))
 		}
 		return 0
 	} else if (flags&PHP_OUTPUT_POP_FORCE) == 0 && !orphan.HasFlags(PHP_OUTPUT_HANDLER_REMOVABLE) {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
-			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer of %s (%d)", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.Name(), orphan.GetLevel())
+			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer of %s (%d)", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.Name(), orphan.GetLevel())
 		}
 		return 0
 	} else {
@@ -596,7 +597,7 @@ func PhpOutputStackPop(flags int) int {
 		/* pop it off the stack */
 
 		OG__().Handlers().DelTop()
-		if b.Assign(&current, OG__().Handlers().Top()) {
+		if lang.Assign(&current, OG__().Handlers().Top()) {
 			OG__().SetActive(*current)
 		} else {
 			OG__().SetActive(nil)

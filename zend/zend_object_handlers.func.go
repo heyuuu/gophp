@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -621,7 +622,7 @@ func ZendStdWritePropertyEx(zobj *types.ZendObject, member *types.Zval, value *t
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
 		if zobj.GetProperties() != nil {
 			zobj.DupProperties()
-			if b.Assign(&variable_ptr, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
+			if lang.Assign(&variable_ptr, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
 				goto found
 			}
 		}
@@ -791,7 +792,7 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.ZendObject, member *types.Zval, type
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
 		if zobj.GetProperties() != nil {
 			zobj.DupProperties()
-			if b.Assign(&retval, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
+			if lang.Assign(&retval, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
 				//ZendTmpStringRelease(tmp_name)
 				return retval
 			}
@@ -936,7 +937,7 @@ func ZendCheckProtected(ce *types.ClassEntry, scope *types.ClassEntry) bool {
 func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, is_static int) types.IFunction {
 	var mname_len int
 	var func_ *types.ZendOpArray
-	var fbc types.IFunction = b.CondF(is_static != 0, func() types.IFunction { return ce.GetCallstatic() }, func() types.IFunction { return ce.GetCall() })
+	var fbc types.IFunction = lang.CondF(is_static != 0, func() types.IFunction { return ce.GetCallstatic() }, func() types.IFunction { return ce.GetCall() })
 
 	/* We use non-NULL value to avoid useless run_time_cache allocation.
 	 * The low bit must be zero, to not be interpreted as a MAP_PTR offset.
@@ -982,7 +983,7 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 
 	//??? keep compatibility for "\0" characters
 
-	if b.Assign(&mname_len, strlen(method_name.GetVal())) != method_name.GetLen() {
+	if lang.Assign(&mname_len, strlen(method_name.GetVal())) != method_name.GetLen() {
 		func_.SetFunctionName(method_name.GetStr()[:mname_len])
 	} else {
 		func_.SetFunctionName(method_name.GetStr())
@@ -997,7 +998,7 @@ func ZendGetUserCallFunction(ce *types.ClassEntry, method_name *types.String) ty
 	return ZendGetCallTrampolineFunc(ce, method_name, 0)
 }
 func ZendBadMethodCall(fbc types.IFunction, method_name *types.String, scope *types.ClassEntry) {
-	faults.ThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), b.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
+	faults.ThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
 }
 
 func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key *types.Zval) types.IFunction {
@@ -1064,7 +1065,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && operators.ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.Name(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().FunctionName()[0] != '_' || ce.GetConstructor().FunctionName()[1] != '_') {
 		fbc = ce.GetConstructor()
 	} else {
-		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(CurrEX())) != nil && operators.InstanceofFunction(object.GetCe(), ce) != 0 {
+		if ce.GetCall() != nil && lang.Assign(&object, ZendGetThisObject(CurrEX())) != nil && operators.InstanceofFunction(object.GetCe(), ce) != 0 {
 			/* Call the top-level defined __call().
 			 * see: tests/classes/__call_004.phpt  */
 

@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -69,7 +70,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				return 0
 			}
 			if !(Utf8Trail(str[pos+1])) {
-				*cursor = pos + b.Cond(Utf8Lead(str[pos+1]), 1, 2)
+				*cursor = pos + lang.Cond(Utf8Lead(str[pos+1]), 1, 2)
 				*status = types.FAILURE
 				return 0
 			}
@@ -271,7 +272,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				/* this a jis kanji char */
 
 			} else {
-				*cursor = pos + b.Cond(next != 0xa0 && next != 0xff, 1, 2)
+				*cursor = pos + lang.Cond(next != 0xa0 && next != 0xff, 1, 2)
 				*status = types.FAILURE
 				return 0
 			}
@@ -293,7 +294,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				/* JIS X 0201 kana */
 
 			} else {
-				*cursor = pos + b.Cond(next != 0xa0 && next != 0xff, 1, 2)
+				*cursor = pos + lang.Cond(next != 0xa0 && next != 0xff, 1, 2)
 				*status = types.FAILURE
 				return 0
 			}
@@ -339,7 +340,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 
 		/* single-byte charsets */
 
-		this_char = str[b.PostInc(&pos)]
+		this_char = str[lang.PostInc(&pos)]
 	}
 	*cursor = pos
 	return this_char
@@ -357,11 +358,11 @@ func DetermineCharset(charset_hint *byte) EntityCharset {
 	if charset_hint == nil {
 		return CsUtf8
 	}
-	if b.Assign(&len_, strlen(charset_hint)) != 0 {
+	if lang.Assign(&len_, strlen(charset_hint)) != 0 {
 		goto det_charset
 	}
 	charset_hint = core.SG__().default_charset
-	if charset_hint != nil && b.Assign(&len_, strlen(charset_hint)) != 0 {
+	if charset_hint != nil && lang.Assign(&len_, strlen(charset_hint)) != 0 {
 		goto det_charset
 	}
 
@@ -687,7 +688,7 @@ func ProcessNumericEntity(buf **byte, code_point *unsigned) int {
 	if hexadecimal != 0 && !(isxdigit(*(*buf))) || hexadecimal == 0 && !(isdigit(*(*buf))) {
 		return types.FAILURE
 	}
-	code_l = zend.ZEND_STRTOL(*buf, &endptr, b.Cond(hexadecimal != 0, 16, 10))
+	code_l = zend.ZEND_STRTOL(*buf, &endptr, lang.Cond(hexadecimal != 0, 16, 10))
 
 	/* we're guaranteed there were valid digits, so *endptr > buf */
 
@@ -826,7 +827,7 @@ func TraverseForEntities(
 		 * we're sure it represents the '&' character. */
 
 		if p[0] != '&' || p+3 >= lim {
-			*(b.PostInc(&q)) = *(b.PostInc(&p))
+			*(lang.PostInc(&q)) = *(lang.PostInc(&p))
 			continue
 		}
 
@@ -913,7 +914,7 @@ func TraverseForEntities(
 		continue
 	invalid_code:
 		for ; p < next; p++ {
-			*(b.PostInc(&q)) = *p
+			*(lang.PostInc(&q)) = *p
 		}
 	}
 	*q = '0'
@@ -1201,10 +1202,10 @@ func PhpEscapeHtmlEntitiesEx(
 				FindEntityForCharBasic(this_char, entity_table.GetTable(), &rep, &rep_len)
 			}
 			if rep != nil {
-				replaced.GetStr()[b.PostInc(&len_)] = '&'
+				replaced.GetStr()[lang.PostInc(&len_)] = '&'
 				memcpy(&replaced.GetStr()[len_], rep, rep_len)
 				len_ += rep_len
-				replaced.GetStr()[b.PostInc(&len_)] = ';'
+				replaced.GetStr()[lang.PostInc(&len_)] = ';'
 			} else {
 
 				/* we did not find an entity for this char.
@@ -1254,7 +1255,7 @@ func PhpEscapeHtmlEntitiesEx(
 					memcpy(replaced.GetVal()+len_, mbsequence, mbseqlen)
 					len_ += mbseqlen
 				} else {
-					replaced.GetStr()[b.PostInc(&len_)] = mbsequence[0]
+					replaced.GetStr()[lang.PostInc(&len_)] = mbsequence[0]
 				}
 			}
 		} else {
@@ -1319,10 +1320,10 @@ func PhpEscapeHtmlEntitiesEx(
 					replaced = types.ZendStringRealloc(replaced, maxlen+ent_len+128)
 					maxlen += ent_len + 128
 				}
-				replaced.GetStr()[b.PostInc(&len_)] = '&'
+				replaced.GetStr()[lang.PostInc(&len_)] = '&'
 				memcpy(&replaced.GetStr()[len_], &old[cursor], ent_len)
 				len_ += ent_len
-				replaced.GetStr()[b.PostInc(&len_)] = ';'
+				replaced.GetStr()[lang.PostInc(&len_)] = ';'
 				cursor += ent_len + 1
 			}
 		}
@@ -1354,7 +1355,7 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 	if hint_charset == nil {
 		default_charset = GetDefaultCharset()
 	}
-	replaced = PhpEscapeHtmlEntitiesEx((*uint8)(str.GetVal()), str.GetLen(), all, int(flags), b.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset), double_encode)
+	replaced = PhpEscapeHtmlEntitiesEx((*uint8)(str.GetVal()), str.GetLen(), all, int(flags), lang.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset), double_encode)
 	return_value.SetString(replaced)
 }
 func RegisterHtmlConstants(type_ int, module_number int) {
@@ -1422,7 +1423,7 @@ func ZifHtmlEntityDecode(executeData zpp.Ex, return_value zpp.Ret, string *types
 	if hint_charset == nil {
 		default_charset = GetDefaultCharset()
 	}
-	replaced = PhpUnescapeHtmlEntities(str, 1, int(quote_style), b.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset))
+	replaced = PhpUnescapeHtmlEntities(str, 1, int(quote_style), lang.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset))
 	if replaced != nil {
 		return_value.SetString(replaced)
 		return

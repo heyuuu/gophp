@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -64,7 +65,7 @@ func main(argc int, argv []*byte) int {
 			cgi = 1
 		}
 	}
-	if b.Assign(&query_string, getenv("QUERY_STRING")) != nil && strchr(query_string, '=') == nil {
+	if lang.Assign(&query_string, getenv("QUERY_STRING")) != nil && strchr(query_string, '=') == nil {
 
 		/* we've got query string that has no = - apache CGI will pass it to command line */
 
@@ -79,7 +80,7 @@ func main(argc int, argv []*byte) int {
 		}
 		zend.Free(decoded_query_string)
 	}
-	for skip_getopt == 0 && b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 0, 2)) != -1 {
+	for skip_getopt == 0 && lang.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 0, 2)) != -1 {
 		switch c {
 		case 'c':
 			if CgiModule.GetPhpIniPathOverride() != nil {
@@ -96,7 +97,7 @@ func main(argc int, argv []*byte) int {
 
 			var len_ int = strlen(PhpOptarg)
 			var val *byte
-			if b.Assign(&val, strchr(PhpOptarg, '=')) {
+			if lang.Assign(&val, strchr(PhpOptarg, '=')) {
 				val++
 				if !(isalnum(*val)) && (*val) != '"' && (*val) != '\'' && (*val) != '0' {
 					CgiModule.SetIniEntries(realloc(CgiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\\"\\\"\\n\\0\"")))
@@ -305,7 +306,7 @@ func main(argc int, argv []*byte) int {
 	}
 
 	faults.TryCatch(func() {
-		for skip_getopt == 0 && b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 1, 2)) != -1 {
+		for skip_getopt == 0 && lang.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 1, 2)) != -1 {
 			switch c {
 			case 'T':
 				benchmark = 1
@@ -351,7 +352,7 @@ func main(argc int, argv []*byte) int {
 			}
 			InitRequestInfo(request)
 			if cgi == 0 && fastcgi == 0 {
-				for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 0, 2)) != -1 {
+				for lang.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 0, 2)) != -1 {
 					switch c {
 					case 'a':
 						os.Stdout.WriteString("Interactive mode enabled\n\n")

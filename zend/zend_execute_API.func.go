@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -304,7 +305,7 @@ func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *type
 	var colon *byte
 	if EG__().GetException() != nil {
 		return types.FAILURE
-	} else if b.Assign(&colon, (*byte)(operators.ZendMemrchr(name.GetVal(), ':', name.GetLen()))) {
+	} else if lang.Assign(&colon, (*byte)(operators.ZendMemrchr(name.GetVal(), ':', name.GetLen()))) {
 		faults.ThrowError(nil, "Undefined class constant '%s'", name.GetVal())
 		return types.FAILURE
 	} else if (attr & IS_CONSTANT_UNQUALIFIED) == 0 {
@@ -431,7 +432,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 	}
 	call = ZendVmStackPushCallFrame(call_info, func_, fci.GetParamCount(), object_or_called_scope)
 	if func_.IsDeprecated() {
-		faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
+		faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
 		if EG__().GetException() != nil {
 			ZendVmStackFreeCallFrame(call)
 			if CurrEX() == &dummy_execute_data {
@@ -454,7 +455,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 
 					/* By-value send is not allowed -- emit a warning,
 					 * and perform the call with the value wrapped in a reference. */
-					faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
+					faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
 					must_wrap = 1
 					if EG__().GetException() != nil {
 						call.NumArgs() = i
@@ -765,7 +766,7 @@ func ZendEvalStringEx(str string, retval_ptr *types.Zval, string_name string, ha
 func ZendTimeout(dummy int) {
 	EG__().SetTimedOut(0)
 	ZendSetTimeoutEx(0, 1)
-	faults.ErrorNoreturn(faults.E_ERROR, "Maximum execution time of "+ZEND_LONG_FMT+" second%s exceeded", EG__().GetTimeoutSeconds(), b.Cond(EG__().GetTimeoutSeconds() == 1, "", "s"))
+	faults.ErrorNoreturn(faults.E_ERROR, "Maximum execution time of "+ZEND_LONG_FMT+" second%s exceeded", EG__().GetTimeoutSeconds(), lang.Cond(EG__().GetTimeoutSeconds() == 1, "", "s"))
 }
 func ZendTimeoutHandler(dummy int) {
 	if EG__().GetTimedOut() != 0 {
@@ -889,7 +890,7 @@ check_fetch_type:
 	}
 	if (fetch_type & ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 {
 		return ZendLookupClassEx(className, nil, fetch_type)
-	} else if b.Assign(&ce, ZendLookupClassEx(className, nil, fetch_type)) == nil {
+	} else if lang.Assign(&ce, ZendLookupClassEx(className, nil, fetch_type)) == nil {
 		if (fetch_type&ZEND_FETCH_CLASS_SILENT) == 0 && EG__().GetException() == nil {
 			if fetch_sub_type == ZEND_FETCH_CLASS_INTERFACE {
 				ZendThrowOrError(fetch_type, nil, "Interface '%s' not found", className)
@@ -910,7 +911,7 @@ func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_typ
 	var ce *types.ClassEntry
 	if (fetch_type & ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 {
 		return ZendLookupClassEx(class_name, key, fetch_type)
-	} else if b.Assign(&ce, ZendLookupClassEx(class_name, key, fetch_type)) == nil {
+	} else if lang.Assign(&ce, ZendLookupClassEx(class_name, key, fetch_type)) == nil {
 		if (fetch_type & ZEND_FETCH_CLASS_SILENT) != 0 {
 			return nil
 		}
@@ -961,7 +962,7 @@ func ZendRebuildSymbolTable() *types.Array {
 	}
 	ZEND_ADD_CALL_FLAG(ex, ZEND_CALL_HAS_SYMBOL_TABLE)
 	if EG__().GetSymtableCachePtr() > EG__().GetSymtableCache() {
-		ex.SetSymbolTable(*(b.PreDec(&(EG__().GetSymtableCachePtr()))))
+		ex.SetSymbolTable(*(lang.PreDec(&(EG__().GetSymtableCachePtr()))))
 		symbol_table = ex.GetSymbolTable()
 		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
 			return symbol_table

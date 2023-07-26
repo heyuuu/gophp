@@ -5,6 +5,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/strutil"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -111,7 +112,7 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 
 	/* Preprocess format into formatcodes and formatargs */
 	for i = 0; i < len(format_); formatcount++ {
-		var code = format_[b.PostInc(&i)]
+		var code = format_[lang.PostInc(&i)]
 		var arg = 1
 
 		/* Handle format arguments if any */
@@ -259,15 +260,15 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 		var arg = formatargs[i]
 		switch int(code) {
 		case 'a':
-			str := operators.ZvalGetStrVal(args[b.PostInc(&currentarg)])
+			str := operators.ZvalGetStrVal(args[lang.PostInc(&currentarg)])
 			str = strutil.PadRight(str, arg, '\x00')[:arg]
 			buf.WriteString(str)
 		case 'A':
-			str := operators.ZvalGetStrVal(args[b.PostInc(&currentarg)])
+			str := operators.ZvalGetStrVal(args[lang.PostInc(&currentarg)])
 			str = strutil.PadRight(str, arg, ' ')[:arg]
 			buf.WriteString(str)
 		case 'Z':
-			str := operators.ZvalGetStrVal(args[b.PostInc(&currentarg)])
+			str := operators.ZvalGetStrVal(args[lang.PostInc(&currentarg)])
 			if arg <= 0 {
 				str = "\x00"
 			} else {
@@ -275,17 +276,17 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 			}
 			buf.WriteString(str)
 		case 'h', 'H':
-			var nibbleshift = b.Cond(code == 'h', 0, 4)
+			var nibbleshift = lang.Cond(code == 'h', 0, 4)
 			var first = 1
-			var str = operators.ZvalGetString(args[b.PostInc(&currentarg)])
+			var str = operators.ZvalGetString(args[lang.PostInc(&currentarg)])
 			var v *byte = str.GetVal()
 			outputpos--
 			if arg > str.GetLen() {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: not enough characters in string", code)
 				arg = str.GetLen()
 			}
-			for b.PostDec(&arg) > 0 {
-				var n = b.PostInc(&(*v))
+			for lang.PostDec(&arg) > 0 {
+				var n = lang.PostInc(&(*v))
 				if n >= '0' && n <= '9' {
 					n -= '0'
 				} else if n >= 'A' && n <= 'F' {
@@ -296,8 +297,8 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 					core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: illegal hex digit %c", code, n)
 					n = 0
 				}
-				if b.PostDec(&first) {
-					output.GetStr()[b.PreInc(&outputpos)] = 0
+				if lang.PostDec(&first) {
+					output.GetStr()[lang.PreInc(&outputpos)] = 0
 				} else {
 					first = 1
 				}
@@ -306,8 +307,8 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 			}
 			outputpos++
 		case 'c', 'C':
-			for b.PostDec(&arg) > 0 {
-				packInt8(&buf, args[b.PostInc(&currentarg)])
+			for lang.PostDec(&arg) > 0 {
+				packInt8(&buf, args[lang.PostInc(&currentarg)])
 			}
 		case 's', 'S', 'n', 'v':
 			order := machineEndian
@@ -316,12 +317,12 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 			} else if code == 'v' {
 				order = litteEndian
 			}
-			for b.PostDec(&arg) > 0 {
-				packInt16(&buf, args[b.PostInc(&currentarg)], order)
+			for lang.PostDec(&arg) > 0 {
+				packInt16(&buf, args[lang.PostInc(&currentarg)], order)
 			}
 		case 'i', 'I':
-			for b.PostDec(&arg) > 0 {
-				packInt(&buf, args[b.PostInc(&currentarg)], machineEndian)
+			for lang.PostDec(&arg) > 0 {
+				packInt(&buf, args[lang.PostInc(&currentarg)], machineEndian)
 			}
 		case 'l', 'L', 'N', 'V':
 			order := machineEndian
@@ -330,8 +331,8 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 			} else if code == 'V' {
 				order = litteEndian
 			}
-			for b.PostDec(&arg) > 0 {
-				packInt32(&buf, args[b.PostInc(&currentarg)], order)
+			for lang.PostDec(&arg) > 0 {
+				packInt32(&buf, args[lang.PostInc(&currentarg)], order)
 			}
 		case 'q', 'Q', 'J', 'P':
 			order := machineEndian
@@ -340,36 +341,36 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 			} else if code == 'P' {
 				order = litteEndian
 			}
-			for b.PostDec(&arg) > 0 {
-				packInt64(&buf, args[b.PostInc(&currentarg)], order)
+			for lang.PostDec(&arg) > 0 {
+				packInt64(&buf, args[lang.PostInc(&currentarg)], order)
 			}
 		case 'f':
-			for b.PostDec(&arg) > 0 {
-				packFloat32(&buf, args[b.PostInc(&currentarg)], machineEndian)
+			for lang.PostDec(&arg) > 0 {
+				packFloat32(&buf, args[lang.PostInc(&currentarg)], machineEndian)
 			}
 		case 'g':
 			/* pack little endian float */
-			for b.PostDec(&arg) > 0 {
-				packFloat32(&buf, args[b.PostInc(&currentarg)], litteEndian)
+			for lang.PostDec(&arg) > 0 {
+				packFloat32(&buf, args[lang.PostInc(&currentarg)], litteEndian)
 			}
 		case 'G':
 			/* pack big endian float */
-			for b.PostDec(&arg) > 0 {
-				packFloat32(&buf, args[b.PostInc(&currentarg)], bigEndian)
+			for lang.PostDec(&arg) > 0 {
+				packFloat32(&buf, args[lang.PostInc(&currentarg)], bigEndian)
 			}
 		case 'd':
-			for b.PostDec(&arg) > 0 {
-				packFloat64(&buf, args[b.PostInc(&currentarg)], machineEndian)
+			for lang.PostDec(&arg) > 0 {
+				packFloat64(&buf, args[lang.PostInc(&currentarg)], machineEndian)
 			}
 		case 'e':
 			/* pack little endian double */
-			for b.PostDec(&arg) > 0 {
-				packFloat64(&buf, args[b.PostInc(&currentarg)], litteEndian)
+			for lang.PostDec(&arg) > 0 {
+				packFloat64(&buf, args[lang.PostInc(&currentarg)], litteEndian)
 			}
 		case 'E':
 			/* pack big endian double */
-			for b.PostDec(&arg) > 0 {
-				packFloat64(&buf, args[b.PostInc(&currentarg)], bigEndian)
+			for lang.PostDec(&arg) > 0 {
+				packFloat64(&buf, args[lang.PostInc(&currentarg)], bigEndian)
 			}
 		case 'x':
 			if arg > 0 {
@@ -450,8 +451,8 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 	input += offset
 	inputlen -= offset
 	zend.ArrayInit(return_value)
-	for b.PostDec(&formatlen) > 0 {
-		var type_ byte = *(b.PostInc(&format))
+	for lang.PostDec(&formatlen) > 0 {
+		var type_ byte = *(lang.PostInc(&format))
 		var c byte
 		var arg = 1
 		var argb int
@@ -599,7 +600,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 
 					/* Remove trailing white space and nulls chars from unpacked data */
 
-					for b.PreDec(&len_) >= 0 {
+					for lang.PreDec(&len_) >= 0 {
 						if input[inputpos+len_] != padn && input[inputpos+len_] != pads && input[inputpos+len_] != padt && input[inputpos+len_] != padc && input[inputpos+len_] != padl {
 							break
 						}
@@ -633,7 +634,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 					fallthrough
 				case 'H':
 					var len_ = (inputlen - inputpos) * 2
-					var nibbleshift = b.Cond(type_ == 'h', 0, 4)
+					var nibbleshift = lang.Cond(type_ == 'h', 0, 4)
 					var first = 1
 					var buf *types.String
 					var ipos zend.ZendLong
@@ -659,7 +660,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 						}
 						buf.GetStr()[opos] = cc
 						nibbleshift = nibbleshift + 4&7
-						if b.PostDec(&first) == 0 {
+						if lang.PostDec(&first) == 0 {
 							ipos++
 							first = 1
 						}
@@ -669,7 +670,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 				case 'c':
 					fallthrough
 				case 'C':
-					var issigned = b.CondF1(type_ == 'c', func() int { return input[inputpos] & 0x80 }, 0)
+					var issigned = lang.CondF1(type_ == 'c', func() int { return input[inputpos] & 0x80 }, 0)
 					var v = PhpUnpack(&input[inputpos], 1, issigned, ByteMap)
 					zend.AddAssocLong(return_value, n, v)
 				case 's':
@@ -683,7 +684,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 					var issigned = 0
 					var map_ *int = MachineEndianShortMap
 					if type_ == 's' {
-						issigned = input[inputpos+b.Cond(MachineLittleEndian, 1, 0)] & 0x80
+						issigned = input[inputpos+lang.Cond(MachineLittleEndian, 1, 0)] & 0x80
 					} else if type_ == 'n' {
 						map_ = BigEndianShortMap
 					} else if type_ == 'v' {
@@ -697,7 +698,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 					var v zend.ZendLong
 					var issigned = 0
 					if type_ == 'i' {
-						issigned = input[inputpos+b.CondF1(MachineLittleEndian, func() int { return b.SizeOf("int") - 1 }, 0)] & 0x80
+						issigned = input[inputpos+lang.CondF1(MachineLittleEndian, func() int { return b.SizeOf("int") - 1 }, 0)] & 0x80
 					}
 					v = PhpUnpack(&input[inputpos], b.SizeOf("int"), issigned, IntMap)
 					zend.AddAssocLong(return_value, n, v)
@@ -712,7 +713,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 					var map_ *int = MachineEndianLongMap
 					var v = 0
 					if type_ == 'l' || type_ == 'L' {
-						issigned = input[inputpos+b.Cond(MachineLittleEndian, 3, 0)] & 0x80
+						issigned = input[inputpos+lang.Cond(MachineLittleEndian, 3, 0)] & 0x80
 					} else if type_ == 'N' {
 						issigned = input[inputpos] & 0x80
 						map_ = BigEndianLongMap
@@ -743,7 +744,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 					var map_ *int = MachineEndianLonglongMap
 					var v = 0
 					if type_ == 'q' || type_ == 'Q' {
-						issigned = input[inputpos+b.Cond(MachineLittleEndian, 7, 0)] & 0x80
+						issigned = input[inputpos+lang.Cond(MachineLittleEndian, 7, 0)] & 0x80
 					} else if type_ == 'J' {
 						issigned = input[inputpos] & 0x80
 						map_ = BigEndianLonglongMap

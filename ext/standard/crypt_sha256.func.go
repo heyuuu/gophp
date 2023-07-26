@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 )
@@ -189,7 +190,7 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 
 	if ctx.GetBuflen() != 0 {
 		var left_over int = ctx.GetBuflen()
-		var add int = b.Cond(128-left_over > len_, len_, 128-left_over)
+		var add int = lang.Cond(128-left_over > len_, len_, 128-left_over)
 		memcpy(ctx.GetBuffer()[left_over], buffer, add)
 		ctx.SetBuflen(ctx.GetBuflen() + uint32(add))
 		if ctx.GetBuflen() > 64 {
@@ -463,14 +464,14 @@ func PhpSha256CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 	cp = __phpStpncpy(cp, salt, cli.MIN(int(b.Max(0, buflen)), salt_len))
 	buflen -= cli.MIN(b.Max(0, buflen), int(salt_len))
 	if buflen > 0 {
-		b.PostInc(&(*cp)) = '$'
+		lang.PostInc(&(*cp)) = '$'
 		buflen--
 	}
 	var b64_from_24bit func(B2 __auto__, B1 uint8, B0 uint8, N int) = func(B2 __auto__, B1 uint8, B0 uint8, N int) {
 		var w uint = B2<<16 | B1<<8 | B0
 		var n int = N
-		for b.PostDec(&n) > 0 && buflen > 0 {
-			b.PostInc(&(*cp)) = B64t[w&0x3f]
+		for lang.PostDec(&n) > 0 && buflen > 0 {
+			lang.PostInc(&(*cp)) = B64t[w&0x3f]
 			buflen--
 			w >>= 6
 		}

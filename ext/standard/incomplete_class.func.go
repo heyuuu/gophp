@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -67,7 +68,7 @@ func PhpLookupClassName(object *types.Zval) *types.String {
 	var val *types.Zval
 	var object_properties *types.Array
 	object_properties = types.Z_OBJPROP_P(object)
-	if b.Assign(&val, object_properties.KeyFind(b.CastStrAuto(MAGIC_MEMBER))) != nil && val.IsString() {
+	if lang.Assign(&val, object_properties.KeyFind(b.CastStrAuto(MAGIC_MEMBER))) != nil && val.IsString() {
 		return val.String().Copy()
 	}
 	return nil

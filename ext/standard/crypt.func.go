@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -29,7 +30,7 @@ func ZmShutdownCrypt(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func PhpTo64(s *byte, n int) {
-	for b.PreDec(&n) >= 0 {
+	for lang.PreDec(&n) >= 0 {
 		*s = Itoa64[(*s)&0x3f]
 		s++
 	}

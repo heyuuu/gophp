@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -83,7 +84,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 		}
 	}
 	if ascii.StrCaseEquals(name.GetStr(), "class") {
-		faults.ErrorNoreturn(b.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
+		faults.ErrorNoreturn(lang.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
 
 	var c = types.NewClassConstant(ce, value, docComment, accessType)
@@ -91,7 +92,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 		ce.SetIsConstantsUpdated(false)
 	}
 	if !ce.ConstantsTable().Add(name.GetStr(), c) {
-		faults.ErrorNoreturn(b.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.Name(), name.GetVal())
+		faults.ErrorNoreturn(lang.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.Name(), name.GetVal())
 	}
 	return types.SUCCESS
 }
@@ -122,7 +123,7 @@ func ZendUnsetProperty(scope *types.ClassEntry, object *types.Zval, name string)
 func ZendReadProperty(scope *types.ClassEntry, object *types.Zval, name string, silent bool, rv *types.Zval) *types.Zval {
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
-	value := object.Object().ReadPropertyEx(types.NewZvalString(name), b.Cond(silent, BP_VAR_IS, BP_VAR_R), rv)
+	value := object.Object().ReadPropertyEx(types.NewZvalString(name), lang.Cond(silent, BP_VAR_IS, BP_VAR_R), rv)
 	EG__().SetFakeScope(oldScope)
 	return value
 }

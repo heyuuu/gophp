@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -30,7 +31,7 @@ func ZifHeader(executeData zpp.Ex, return_value zpp.Ret, header *types.Zval, _ z
 		break
 	}
 	ctr.SetLineLen(uint32(len_))
-	core.SapiHeaderOp(b.Cond(rep != 0, core.SAPI_HEADER_REPLACE, core.SAPI_HEADER_ADD), &ctr)
+	core.SapiHeaderOp(lang.Cond(rep != 0, core.SAPI_HEADER_REPLACE, core.SAPI_HEADER_ADD), &ctr)
 }
 func ZifHeaderRemove(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, name *types.Zval) {
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
@@ -48,7 +49,7 @@ func ZifHeaderRemove(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, name *
 		break
 	}
 	ctr.SetLineLen(uint32(len_))
-	core.SapiHeaderOp(b.Cond(executeData.NumArgs() == 0, core.SAPI_HEADER_DELETE_ALL, core.SAPI_HEADER_DELETE), &ctr)
+	core.SapiHeaderOp(lang.Cond(executeData.NumArgs() == 0, core.SAPI_HEADER_DELETE_ALL, core.SAPI_HEADER_DELETE), &ctr)
 }
 func PhpHeader() int {
 	if core.SapiSendHeaders() == types.FAILURE || core.SG__().RequestInfo.headers_only {

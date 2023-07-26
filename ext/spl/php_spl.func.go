@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -25,7 +26,7 @@ func SplFindCeByName(name string, autoload bool) *types.ClassEntry {
 		ce = zend.EG__().ClassTable().Get(name)
 	}
 	if ce == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Class %s does not exist%s", name, b.Cond(autoload, " and could not be loaded", ""))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Class %s does not exist%s", name, lang.Cond(autoload, " and could not be loaded", ""))
 		return nil
 	}
 	return ce
@@ -321,12 +322,12 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, _ zpp.Opt, autoloadFunction *typ
 					}
 					return false
 				} else if throw {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", b.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), b.Cond(objPtr == nil, "static ", ""), error_)
+					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", lang.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), lang.Cond(objPtr == nil, "static ", ""), error_)
 				}
 				return false
 			} else if zcallable.IsString() {
 				if throw {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", funcName.GetVal(), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error_)
+					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", funcName.GetVal(), lang.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error_)
 				}
 				return false
 			} else {

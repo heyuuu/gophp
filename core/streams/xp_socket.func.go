@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -25,7 +26,7 @@ func PhpSockopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		ptimeout = sock.GetTimeout()
 	}
 retry:
-	didwrite = send(sock.GetSocket(), buf, XP_SOCK_BUF_SIZE(count), b.Cond(sock.GetIsBlocked() && ptimeout != nil, MSG_DONTWAIT, 0))
+	didwrite = send(sock.GetSocket(), buf, XP_SOCK_BUF_SIZE(count), lang.Cond(sock.GetIsBlocked() && ptimeout != nil, MSG_DONTWAIT, 0))
 	if didwrite <= 0 {
 		var estr *byte
 		var err int = core.PhpSocketErrno()
@@ -112,7 +113,7 @@ func PhpSockopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 			return 0
 		}
 	}
-	nr_bytes = recv(sock.GetSocket(), buf, XP_SOCK_BUF_SIZE(count), b.Cond(sock.GetIsBlocked() && sock.GetTimeout().tv_sec != -1, MSG_DONTWAIT, 0))
+	nr_bytes = recv(sock.GetSocket(), buf, XP_SOCK_BUF_SIZE(count), lang.Cond(sock.GetIsBlocked() && sock.GetTimeout().tv_sec != -1, MSG_DONTWAIT, 0))
 	err = core.PhpSocketErrno()
 	if nr_bytes < 0 {
 		if err == EAGAIN || err == core.EWOULDBLOCK {
@@ -164,7 +165,7 @@ func SockSendto(
 			return ret
 		}
 	}
-	if b.Assign(&ret, send(sock.GetSocket(), buf, buflen, flags)) == core.SOCK_CONN_ERR {
+	if lang.Assign(&ret, send(sock.GetSocket(), buf, buflen, flags)) == core.SOCK_CONN_ERR {
 		return -1
 	} else {
 		return ret
@@ -279,10 +280,10 @@ func PhpSockopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 			}
 			return core.PHP_STREAM_OPTION_RETURN_OK
 		case STREAM_XPORT_OP_GET_NAME:
-			xparam.SetReturncode(core.PhpNetworkGetSockName(sock.GetSocket(), b.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil)))
+			xparam.SetReturncode(core.PhpNetworkGetSockName(sock.GetSocket(), lang.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), lang.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), lang.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil)))
 			return core.PHP_STREAM_OPTION_RETURN_OK
 		case STREAM_XPORT_OP_GET_PEER_NAME:
-			xparam.SetReturncode(core.PhpNetworkGetPeerName(sock.GetSocket(), b.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil)))
+			xparam.SetReturncode(core.PhpNetworkGetPeerName(sock.GetSocket(), lang.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), lang.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), lang.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil)))
 			return core.PHP_STREAM_OPTION_RETURN_OK
 		case STREAM_XPORT_OP_SEND:
 			flags = 0
@@ -304,7 +305,7 @@ func PhpSockopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 			if (xparam.GetFlags() & STREAM_PEEK) == STREAM_PEEK {
 				flags |= MSG_PEEK
 			}
-			xparam.SetReturncode(SockRecvfrom(sock, xparam.GetBuf(), xparam.GetBuflen(), flags, b.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil)))
+			xparam.SetReturncode(SockRecvfrom(sock, xparam.GetBuf(), xparam.GetBuflen(), flags, lang.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), lang.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), lang.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil)))
 			return core.PHP_STREAM_OPTION_RETURN_OK
 		case STREAM_XPORT_OP_SHUTDOWN:
 			var shutdown_how []int = []int{core.SHUT_RD, core.SHUT_WR, core.SHUT_RDWR}
@@ -393,7 +394,7 @@ func PhpTcpSockopBind(stream *core.PhpStream, sock *core.PhpNetstreamDataT, xpar
 	if host == nil {
 		return -1
 	}
-	sock.SetSocket(core.PhpNetworkBindSocketToLocalAddr(host, portno, b.Cond(stream.GetOps() == &PhpStreamUdpSocketOps, SOCK_DGRAM, SOCK_STREAM), sockopts, b.CondF1(xparam.GetWantErrortext() != 0, func() *types.String { return xparam.GetErrorText() }, nil), &err))
+	sock.SetSocket(core.PhpNetworkBindSocketToLocalAddr(host, portno, lang.Cond(stream.GetOps() == &PhpStreamUdpSocketOps, SOCK_DGRAM, SOCK_STREAM), sockopts, lang.CondF1(xparam.GetWantErrortext() != 0, func() *types.String { return xparam.GetErrorText() }, nil), &err))
 	if host != nil {
 		zend.Efree(host)
 	}
@@ -416,7 +417,7 @@ func PhpTcpSockopConnect(stream *core.PhpStream, sock *core.PhpNetstreamDataT, x
 	if host == nil {
 		return -1
 	}
-	if core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "bindto")) != nil {
+	if core.PHP_STREAM_CONTEXT(stream) != nil && lang.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "bindto")) != nil {
 		if !tmpzval.IsString() {
 			if xparam.GetWantErrortext() != 0 {
 				xparam.SetErrorText(zend.ZendSprintfZStr("local_addr context option is not a string."))
@@ -426,7 +427,7 @@ func PhpTcpSockopConnect(stream *core.PhpStream, sock *core.PhpNetstreamDataT, x
 		}
 		bindto = ParseIpAddressEx(tmpzval.String().GetVal(), tmpzval.String().GetLen(), &bindport, xparam.GetWantErrortext(), xparam.GetErrorText())
 	}
-	if stream.GetOps() != &PhpStreamUdpSocketOps && core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && operators.ZvalIsTrue(tmpzval) {
+	if stream.GetOps() != &PhpStreamUdpSocketOps && core.PHP_STREAM_CONTEXT(stream) != nil && lang.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && operators.ZvalIsTrue(tmpzval) {
 		sockopts |= core.STREAM_SOCKOP_TCP_NODELAY
 	}
 
@@ -434,7 +435,7 @@ func PhpTcpSockopConnect(stream *core.PhpStream, sock *core.PhpNetstreamDataT, x
 	 * want the default to be TCP sockets so that the openssl extension can
 	 * re-use this code. */
 
-	sock.SetSocket(core.PhpNetworkConnectSocketToHost(host, portno, b.Cond(stream.GetOps() == &PhpStreamUdpSocketOps, SOCK_DGRAM, SOCK_STREAM), xparam.GetOp() == STREAM_XPORT_OP_CONNECT_ASYNC, xparam.GetTimeout(), b.CondF1(xparam.GetWantErrortext() != 0, func() *types.String { return xparam.GetErrorText() }, nil), &err, bindto, bindport, sockopts))
+	sock.SetSocket(core.PhpNetworkConnectSocketToHost(host, portno, lang.Cond(stream.GetOps() == &PhpStreamUdpSocketOps, SOCK_DGRAM, SOCK_STREAM), xparam.GetOp() == STREAM_XPORT_OP_CONNECT_ASYNC, xparam.GetTimeout(), lang.CondF1(xparam.GetWantErrortext() != 0, func() *types.String { return xparam.GetErrorText() }, nil), &err, bindto, bindport, sockopts))
 	if sock.GetSocket() == -1 {
 		ret = -1
 	} else {
@@ -463,10 +464,10 @@ func PhpTcpSockopAccept(stream *core.PhpStream, sock *core.PhpNetstreamDataT, xp
 	var nodelay bool = false
 	var tmpzval *types.Zval = nil
 	xparam.SetClient(nil)
-	if nil != core.PHP_STREAM_CONTEXT(stream) && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && operators.ZvalIsTrue(tmpzval) {
+	if nil != core.PHP_STREAM_CONTEXT(stream) && lang.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && operators.ZvalIsTrue(tmpzval) {
 		nodelay = true
 	}
-	clisock = core.PhpNetworkAcceptIncoming(sock.GetSocket(), b.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), b.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil), xparam.GetTimeout(), b.CondF1(xparam.GetWantErrortext() != 0, func() *types.String { return xparam.GetErrorText() }, nil), xparam.GetErrorCode(), nodelay)
+	clisock = core.PhpNetworkAcceptIncoming(sock.GetSocket(), lang.CondF1(xparam.GetWantTextaddr() != 0, func() *types.String { return xparam.GetTextaddr() }, nil), lang.CondF1(xparam.GetWantAddr() != 0, func() *__struct__sockaddr { return xparam.GetOutputsAddr() }, nil), lang.CondF1(xparam.GetWantAddr() != 0, func() socklen_t { return xparam.GetOutputsAddrlen() }, nil), xparam.GetTimeout(), lang.CondF1(xparam.GetWantErrortext() != 0, func() *types.String { return xparam.GetErrorText() }, nil), xparam.GetErrorCode(), nodelay)
 	if clisock >= 0 {
 		var clisockdata *core.PhpNetstreamDataT = (*core.PhpNetstreamDataT)(zend.Emalloc(b.SizeOf("* clisockdata")))
 		memcpy(clisockdata, sock, b.SizeOf("* clisockdata"))

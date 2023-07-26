@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -81,7 +82,7 @@ func ZendFetchDimensionAddressRead(
 		} else {
 			offset = dim.Long()
 		}
-		if container.String().GetLen() < b.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
+		if container.String().GetLen() < lang.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
 			if type_ != BP_VAR_IS {
 				faults.Error(faults.E_NOTICE, "Uninitialized string offset: "+ZEND_LONG_FMT, offset)
 				result.SetStringVal("")

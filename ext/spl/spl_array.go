@@ -1,7 +1,7 @@
 package spl
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
+	b "github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"

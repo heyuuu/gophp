@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -139,7 +140,7 @@ func (compiler *Compiler) CompileClosureUses(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use lexical variable $%s as a parameter name", var_name.GetVal())
 		}
 		compiler.setLinenoByAst(var_ast)
-		compiler.CompileStaticVarCommon(var_name, &zv, b.Cond(var_ast.Attr() != 0, ZEND_BIND_REF, 0))
+		compiler.CompileStaticVarCommon(var_name, &zv, lang.Cond(var_ast.Attr() != 0, ZEND_BIND_REF, 0))
 	}
 }
 func (compiler *Compiler) CompileImplicitClosureUses(info *ClosureInfo) {
@@ -169,10 +170,10 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	}
 	if op_array.IsAbstract() {
 		if op_array.IsPrivate() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s function %s::%s() cannot be declared private", b.Cond(in_interface != 0, "Interface", "Abstract"), ce.Name(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s function %s::%s() cannot be declared private", lang.Cond(in_interface != 0, "Interface", "Abstract"), ce.Name(), name.GetVal())
 		}
 		if has_body != 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s function %s::%s() cannot contain body", b.Cond(in_interface != 0, "Interface", "Abstract"), ce.Name(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s function %s::%s() cannot contain body", lang.Cond(in_interface != 0, "Interface", "Abstract"), ce.Name(), name.GetVal())
 		}
 		ce.SetIsImplicitAbstractClass(true)
 	} else if has_body == 0 {
@@ -549,7 +550,7 @@ func (compiler *Compiler) CompileClassConstDecl(ast *ZendAst) {
 		var value_ast *ZendAst = const_ast.Child(1)
 		var doc_comment_ast *ZendAst = const_ast.Children()[2]
 		var name *types.String = name_ast.Val().String()
-		var doc_comment *types.String = b.CondF1(doc_comment_ast != nil, func() *types.String { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
+		var doc_comment *types.String = lang.CondF1(doc_comment_ast != nil, func() *types.String { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
 		var value_zv types.Zval
 		if (ast.Attr() & (types.AccStatic | types.AccAbstract | types.AccFinal)) != 0 {
 			if (ast.Attr() & types.AccStatic) != 0 {
@@ -633,7 +634,7 @@ func (compiler *Compiler) CompileTraitAlias(ast *ZendAst) {
 }
 func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 	var traits *ZendAstList = ast.Children()[0].AsAstList()
-	var adaptations *ZendAstList = b.CondF1(ast.Child(1) != nil, func() *ZendAstList { return ast.Child(1).AsAstList() }, nil)
+	var adaptations *ZendAstList = lang.CondF1(ast.Child(1) != nil, func() *ZendAstList { return ast.Child(1).AsAstList() }, nil)
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
 	ce.SetIsImplementTraits(true)
@@ -690,7 +691,7 @@ func (compiler *Compiler) CompileImplements(ast *ZendAst) {
 }
 func ZendGenerateAnonClassName(start_lineno uint32) *types.String {
 	var filename = CG__().GetActiveOpArray().GetFilename()
-	var result = ZendSprintf("class@anonymous%c%s:%u$%d", '\000', filename, start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
+	var result = ZendSprintf("class@anonymous%c%s:%u$%d", '\000', filename, start_lineno, lang.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.NewString(result)
 }
 func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.ZendOp {
@@ -762,7 +763,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 		}
 		extends_name = extends_node.GetConstant().String()
-		ce.SetParentName(ZendResolveClassName(extends_name.GetStr(), b.CondF1(extends_ast.Kind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.Attr() }, ZEND_NAME_FQ)))
+		ce.SetParentName(ZendResolveClassName(extends_name.GetStr(), lang.CondF1(extends_ast.Kind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.Attr() }, ZEND_NAME_FQ)))
 		ce.SetIsInherited(true)
 	}
 	CG__().SetActiveClassEntry(ce)

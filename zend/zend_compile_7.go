@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -341,11 +342,11 @@ func ZendCtEvalUnaryOp(result *types.Zval, opcode uint32, op *types.Zval) {
 }
 func ZendTryCtEvalUnaryPm(result *types.Zval, kind ZendAstKind, op *types.Zval) bool {
 	var left types.Zval
-	left.SetLong(b.Cond(kind == ZEND_AST_UNARY_PLUS, 1, -1))
+	left.SetLong(lang.Cond(kind == ZEND_AST_UNARY_PLUS, 1, -1))
 	return ZendTryCtEvalBinaryOp(result, ZEND_MUL, &left, op)
 }
 func ZendCtEvalGreater(result *types.Zval, kind ZendAstKind, op1 *types.Zval, op2 *types.Zval) {
-	var fn BinaryOpType = b.Cond(kind == ZEND_AST_GREATER, operators.IsSmallerFunction, operators.IsSmallerOrEqualFunction)
+	var fn BinaryOpType = lang.Cond(kind == ZEND_AST_GREATER, operators.IsSmallerFunction, operators.IsSmallerOrEqualFunction)
 	fn(result, op2, op1)
 }
 
@@ -555,7 +556,7 @@ func (compiler *Compiler) CompileGreater(result *Znode, ast *ZendAst) {
 		// ZvalPtrDtor(right_node.GetConstant())
 		return
 	}
-	ZendEmitOpTmp(result, b.Cond(ast.Kind() == ZEND_AST_GREATER, ZEND_IS_SMALLER, ZEND_IS_SMALLER_OR_EQUAL), &right_node, &left_node)
+	ZendEmitOpTmp(result, lang.Cond(ast.Kind() == ZEND_AST_GREATER, ZEND_IS_SMALLER, ZEND_IS_SMALLER_OR_EQUAL), &right_node, &left_node)
 }
 func (compiler *Compiler) CompileUnaryOp(result *Znode, ast *ZendAst) {
 	var expr_ast *ZendAst = ast.Child(0)

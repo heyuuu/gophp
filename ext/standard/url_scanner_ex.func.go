@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -40,7 +41,7 @@ func PhpIniOnUpdateTags(
 			var q *byte
 			var keylen int
 			var str *types.String
-			b.PostInc(&(*val)) = '0'
+			lang.PostInc(&(*val)) = '0'
 			for q = key; *q; q++ {
 				*q = tolower(*q)
 			}
@@ -275,7 +276,7 @@ func CheckHttpHost(target string) int {
 }
 func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var url_parts *PhpUrl = nil
-	var allowed_hosts *types.Array = b.CondF(ctx.GetType() != 0, func() *types.Array { return BG__().url_adapt_session_hosts_ht }, func() *types.Array { return BG__().url_adapt_output_hosts_ht })
+	var allowed_hosts *types.Array = lang.CondF(ctx.GetType() != 0, func() *types.Array { return BG__().url_adapt_session_hosts_ht }, func() *types.Array { return BG__().url_adapt_output_hosts_ht })
 	b.Assert(ctx.GetTagType() == TAG_FORM)
 	if ctx.GetAttrVal().GetS() != nil && ctx.GetAttrVal().GetS().GetLen() != 0 {
 		url_parts = PhpUrlParseEx(ctx.GetAttrVal().GetS().GetVal(), ctx.GetAttrVal().GetS().GetLen())
@@ -341,7 +342,7 @@ func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 
 	/* intentionally using str_find here, in case the hash value is set, but the string val is changed later */
 
-	if b.Assign(&(ctx.GetLookupData()), types.ZendHashStrFindPtr(ctx.GetTags(), ctx.GetTag().GetS().GetStr())) != nil {
+	if lang.Assign(&(ctx.GetLookupData()), types.ZendHashStrFindPtr(ctx.GetTags(), ctx.GetTag().GetS().GetStr())) != nil {
 		ok = 1
 		if ctx.GetTag().GetS().GetLen() == b.SizeOf("\"form\"")-1 && !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) {
 			ctx.SetTagType(TAG_FORM)
@@ -526,7 +527,7 @@ state_next_arg:
 	}
 yy17:
 	YYCURSOR++
-	if b.Assign(&yych, *YYCURSOR) == '>' {
+	if lang.Assign(&yych, *YYCURSOR) == '>' {
 		goto yy28
 	}
 yy18:
@@ -551,7 +552,7 @@ yy23:
 	ctx.SetState(STATE_ARG)
 	goto state_arg
 yy25:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy18
 yy26:
 	YYCURSOR++
@@ -629,7 +630,7 @@ state_before_val:
 	}
 	goto yy43
 yy39:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == ' ' {
 		goto yy46
 	}
@@ -648,7 +649,7 @@ yy42:
 	ctx.SetState(STATE_VAL)
 	goto state_val
 yy43:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy40
 yy44:
 	YYCURSOR++
@@ -716,7 +717,7 @@ state_val:
 			goto yy54
 		}
 	}
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych != '>' {
 		goto yy65
 	}
@@ -724,7 +725,7 @@ yy52:
 	Passthru(ctx, start, xp)
 	goto state_next_arg_begin
 yy53:
-	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	yych = *(lang.Assign(&YYMARKER, lang.PreInc(&YYCURSOR)))
 	if yych == '>' {
 		goto yy52
 	}
@@ -737,7 +738,7 @@ yy55:
 	HandleVal(ctx, start, xp, 0, ' ')
 	goto state_next_arg_begin
 yy56:
-	yych = *(b.PreInc(&YYCURSOR))
+	yych = *(lang.PreInc(&YYCURSOR))
 	goto yy52
 yy57:
 	YYCURSOR++
@@ -901,7 +902,7 @@ func PhpUrlScannerSessionHandlerImpl(
 		url_state = &(BG__().url_adapt_output_ex)
 	}
 	if url_state.GetUrlApp().GetS().GetLen() != 0 {
-		*handled_output = UrlAdaptExt(output, output_len, &len_, zend_bool(b.Cond((mode&(core.PHP_OUTPUT_HANDLER_END|core.PHP_OUTPUT_HANDLER_CONT|core.PHP_OUTPUT_HANDLER_FLUSH|core.PHP_OUTPUT_HANDLER_FINAL)) != 0, 1, 0)), url_state)
+		*handled_output = UrlAdaptExt(output, output_len, &len_, zend_bool(lang.Cond((mode&(core.PHP_OUTPUT_HANDLER_END|core.PHP_OUTPUT_HANDLER_CONT|core.PHP_OUTPUT_HANDLER_FLUSH|core.PHP_OUTPUT_HANDLER_FINAL)) != 0, 1, 0)), url_state)
 		if b.SizeOf("unsigned int") < b.SizeOf("size_t") {
 			if len_ > UINT_MAX {
 				len_ = UINT_MAX
@@ -918,7 +919,7 @@ func PhpUrlScannerSessionHandlerImpl(
 			ctx.GetBuf().Free()
 			ctx.GetResult().Free()
 		} else {
-			*handled_output = zend.Estrndup(output, b.Assign(&(*handled_output_len), output_len))
+			*handled_output = zend.Estrndup(output, lang.Assign(&(*handled_output_len), output_len))
 		}
 	} else {
 		*handled_output = nil

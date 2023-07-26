@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -43,7 +44,7 @@ func ReferenceLevdist(
 	for i1 = 0; i1 < l1; i1++ {
 		p2[0] = p1[0] + cost_del
 		for i2 = 0; i2 < l2; i2++ {
-			c0 = p1[i2] + b.Cond(s1[i1] == s2[i2], 0, cost_rep)
+			c0 = p1[i2] + lang.Cond(s1[i1] == s2[i2], 0, cost_rep)
 			c1 = p1[i2+1] + cost_del
 			if c1 < c0 {
 				c0 = c1

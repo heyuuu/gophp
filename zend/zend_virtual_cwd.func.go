@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/php/lang"
 )
 
 func IS_SLASH(c byte) bool                       { return c == '/' }
@@ -281,8 +282,8 @@ func TsrmRealpathR(
 						j = 5
 					} else if j > 0 && path[j+1] == '.' && path[j+2] == '.' && IS_SLASH(path[j+3]) {
 						j += 4
-						path[b.PostInc(&j)] = '.'
-						path[b.PostInc(&j)] = '.'
+						path[lang.PostInc(&j)] = '.'
+						path[lang.PostInc(&j)] = '.'
 						path[j] = DEFAULT_SLASH
 					}
 
@@ -309,7 +310,7 @@ func TsrmRealpathR(
 			if (*t) == 0 {
 				*t = time(0)
 			}
-			if b.Assign(&bucket, RealpathCacheFind(path, len_, *t)) != nil {
+			if lang.Assign(&bucket, RealpathCacheFind(path, len_, *t)) != nil {
 				if is_dir != 0 && bucket.GetIsDir() == 0 {
 
 					/* not a directory */
@@ -348,7 +349,7 @@ func TsrmRealpathR(
 		tmp = DoAlloca(len_+1, use_heap)
 		memcpy(tmp, path, len_+1)
 		if save != 0 && S_ISLNK(st.st_mode) {
-			if b.PreInc(&(*ll)) > LINK_MAX || b.Assign(&j, int(PhpSysReadlink(tmp, path, MAXPATHLEN))) == size_t-1 {
+			if lang.PreInc(&(*ll)) > LINK_MAX || lang.Assign(&j, int(PhpSysReadlink(tmp, path, MAXPATHLEN))) == size_t-1 {
 
 				/* too many links or broken symlinks */
 
@@ -399,9 +400,9 @@ func TsrmRealpathR(
 
 				/* some leading directories may be unaccessable */
 
-				j = TsrmRealpathR(path, start, i-1, ll, t, b.Cond(save != 0, CWD_FILEPATH, use_realpath), 1, nil)
+				j = TsrmRealpathR(path, start, i-1, ll, t, lang.Cond(save != 0, CWD_FILEPATH, use_realpath), 1, nil)
 				if j > start && j != size_t-1 {
-					path[b.PostInc(&j)] = DEFAULT_SLASH
+					path[lang.PostInc(&j)] = DEFAULT_SLASH
 				}
 			}
 			if j == size_t-1 || j+len_ >= MAXPATHLEN-1+i {
@@ -480,13 +481,13 @@ func VirtualFileEx(state *CwdState, path *byte, verify_path VerifyPathFunc, use_
 		return 1
 	}
 	if start == 0 && path_length == 0 {
-		resolved_path[b.PostInc(&path_length)] = '.'
+		resolved_path[lang.PostInc(&path_length)] = '.'
 	}
 	if add_slash != 0 && path_length != 0 && !(IS_SLASH(resolved_path[path_length-1])) {
 		if path_length >= MAXPATHLEN-1 {
 			return -1
 		}
-		resolved_path[b.PostInc(&path_length)] = DEFAULT_SLASH
+		resolved_path[lang.PostInc(&path_length)] = DEFAULT_SLASH
 	}
 	resolved_path[path_length] = 0
 	if verify_path != nil {
@@ -520,7 +521,7 @@ func VirtualChdirFile(path *byte, p_chdir func(path *byte) int) int {
 	if length == 0 {
 		return 1
 	}
-	for b.PreDec(&length) < SIZE_MAX && !(IS_SLASH(path[length])) {
+	for lang.PreDec(&length) < SIZE_MAX && !(IS_SLASH(path[length])) {
 
 	}
 	if length == SIZE_MAX {
@@ -566,7 +567,7 @@ func TsrmRealpath(path *byte, real_path *byte) *byte {
 		return nil
 	}
 	if real_path != nil {
-		var copy_len int = b.CondF2(new_state.GetCwdLength() > MAXPATHLEN-1, MAXPATHLEN-1, func() int { return new_state.GetCwdLength() })
+		var copy_len int = lang.CondF2(new_state.GetCwdLength() > MAXPATHLEN-1, MAXPATHLEN-1, func() int { return new_state.GetCwdLength() })
 		memcpy(real_path, new_state.GetCwd(), copy_len)
 		real_path[copy_len] = '0'
 		Efree(new_state.GetCwd())

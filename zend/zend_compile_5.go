@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -144,7 +145,7 @@ func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 		jumptable = types.NewArray(cases.GetChildren())
 		jumptable_op.SetOpType(IS_CONST)
 		jumptable_op.GetConstant().SetArray(jumptable)
-		opline = ZendEmitOp(nil, b.Cond(jumptable_type == types.IS_LONG, ZEND_SWITCH_LONG, ZEND_SWITCH_STRING), &expr_node, &jumptable_op)
+		opline = ZendEmitOp(nil, lang.Cond(jumptable_type == types.IS_LONG, ZEND_SWITCH_LONG, ZEND_SWITCH_STRING), &expr_node, &jumptable_op)
 		if opline.GetOp1Type() == IS_CONST {
 			//CT_CONSTANT(opline.GetOp1()).TryAddRefcount()
 		}
@@ -169,7 +170,7 @@ func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 		} else if expr_node.GetOpType() == IS_CONST && expr_node.GetConstant().IsTrue() {
 			jmpnz_opnums[i] = ZendEmitCondJump(ZEND_JMPNZ, &cond_node, 0)
 		} else {
-			opline = ZendEmitOp(nil, b.Cond((expr_node.GetOpType()&(IS_VAR|IS_TMP_VAR)) != 0, ZEND_CASE, ZEND_IS_EQUAL), &expr_node, &cond_node)
+			opline = ZendEmitOp(nil, lang.Cond((expr_node.GetOpType()&(IS_VAR|IS_TMP_VAR)) != 0, ZEND_CASE, ZEND_IS_EQUAL), &expr_node, &cond_node)
 			opline.SetResultType(case_node.GetOpType())
 			if case_node.GetOpType() == IS_CONST {
 				opline.GetResult().SetConstant(ZendAddLiteral(case_node.GetConstant()))

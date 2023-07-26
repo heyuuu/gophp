@@ -3,6 +3,7 @@ package core
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -230,7 +231,7 @@ func FindBoundary(self *MultipartBuffer, boundary *byte) int {
 
 	/* loop through lines */
 
-	for b.Assign(&line, GetLine(self)) {
+	for lang.Assign(&line, GetLine(self)) {
 
 		/* finished if we found the boundary */
 
@@ -262,7 +263,7 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 
 	/* get lines of text, or CRLF_CRLF */
 
-	for b.Assign(&line, GetLine(self)) && line[0] != '0' {
+	for lang.Assign(&line, GetLine(self)) && line[0] != '0' {
 
 		/* add header to table */
 
@@ -329,7 +330,7 @@ func PhpApGetword(encoding *zend.ZendEncoding, line **byte, stop byte) *byte {
 	var quote byte
 	var res *byte
 	for (*pos) && (*pos) != stop {
-		if b.Assign(&quote, *pos) == '"' || quote == '\'' {
+		if lang.Assign(&quote, *pos) == '"' || quote == '\'' {
 			pos++
 			for (*pos) && (*pos) != quote {
 				if (*pos) == '\\' && pos[1] && pos[1] == quote {
@@ -363,9 +364,9 @@ func SubstringConf(start *byte, len_ int, quote byte) *byte {
 	var i int
 	for i = 0; i < len_ && start[i] != quote; i++ {
 		if start[i] == '\\' && (start[i+1] == '\\' || quote && start[i+1] == quote) {
-			b.PostInc(&(*resp)) = start[b.PreInc(&i)]
+			lang.PostInc(&(*resp)) = start[lang.PreInc(&i)]
 		} else {
-			b.PostInc(&(*resp)) = start[i]
+			lang.PostInc(&(*resp)) = start[i]
 		}
 	}
 	*resp = '0'
@@ -416,7 +417,7 @@ func PhpApMemstr(haystack *byte, haystacklen int, needle *byte, needlen int, par
 
 	/* iterate through first character matches */
 
-	for b.Assign(&ptr, memchr(ptr, needle[0], len_)) {
+	for lang.Assign(&ptr, memchr(ptr, needle[0], len_)) {
 
 		/* calculate length after match */
 
@@ -424,7 +425,7 @@ func PhpApMemstr(haystack *byte, haystacklen int, needle *byte, needlen int, par
 
 		/* done if matches up to capacity of buffer */
 
-		if memcmp(needle, ptr, b.Cond(needlen < len_, needlen, len_)) == 0 && (partial != 0 || len_ >= needlen) {
+		if memcmp(needle, ptr, lang.Cond(needlen < len_, needlen, len_)) == 0 && (partial != 0 || len_ >= needlen) {
 			break
 		}
 
@@ -448,7 +449,7 @@ func MultipartBufferRead(self *MultipartBuffer, buf *byte, bytes int, end *int) 
 
 	/* look for a potential boundary match, only read data up to that point */
 
-	if b.Assign(&bound, PhpApMemstr(self.GetBufBegin(), self.GetBytesInBuffer(), self.GetBoundaryNext(), self.GetBoundaryNextLen(), 1)) {
+	if lang.Assign(&bound, PhpApMemstr(self.GetBufBegin(), self.GetBytesInBuffer(), self.GetBoundaryNext(), self.GetBoundaryNextLen(), 1)) {
 		max = bound - self.GetBufBegin()
 		if end != nil && PhpApMemstr(self.GetBufBegin(), self.GetBytesInBuffer(), self.GetBoundaryNext(), self.GetBoundaryNextLen(), 0) {
 			*end = 1
@@ -474,7 +475,7 @@ func MultipartBufferRead(self *MultipartBuffer, buf *byte, bytes int, end *int) 
 		memcpy(buf, self.GetBufBegin(), len_)
 		buf[len_] = 0
 		if bound != nil && len_ > 0 && buf[len_-1] == '\r' {
-			buf[b.PreDec(&len_)] = 0
+			buf[lang.PreDec(&len_)] = 0
 		}
 
 		/* update the buffer */
@@ -489,7 +490,7 @@ func MultipartBufferReadBody(self *MultipartBuffer, len_ *int) *byte {
 	var out *byte = nil
 	var total_bytes int = 0
 	var read_bytes int = 0
-	for b.Assign(&read_bytes, MultipartBufferRead(self, buf, b.SizeOf("buf"), nil)) {
+	for lang.Assign(&read_bytes, MultipartBufferRead(self, buf, b.SizeOf("buf"), nil)) {
 		out = zend.Erealloc(out, total_bytes+read_bytes+1)
 		memcpy(out+total_bytes, buf, read_bytes)
 		total_bytes += read_bytes
@@ -557,7 +558,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 		}
 		zend.Efree(content_type_lcase)
 	}
-	if boundary == nil || !(b.Assign(&boundary, strchr(boundary, '='))) {
+	if boundary == nil || !(lang.Assign(&boundary, strchr(boundary, '='))) {
 		SM__().SapiError(faults.E_WARNING, "Missing boundary in multipart/form-data POST data")
 		return
 	}
@@ -586,7 +587,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 
 	/* Initialize the buffer */
 
-	if !(b.Assign(&mbuff, MultipartBufferNew(boundary, boundary_len))) {
+	if !(lang.Assign(&mbuff, MultipartBufferNew(boundary, boundary_len))) {
 		SM__().SapiError(faults.E_WARNING, "Unable to initialize the input buffer")
 		return
 	}
@@ -625,13 +626,13 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 		if MultipartBufferHeaders(mbuff, &header) == 0 {
 			goto fileupload_done
 		}
-		if b.Assign(&cd, PhpMimeGetHdrValue(header, "Content-Disposition")) {
+		if lang.Assign(&cd, PhpMimeGetHdrValue(header, "Content-Disposition")) {
 			var pair *byte = nil
 			var end int = 0
 			for isspace(*cd) {
 				cd++
 			}
-			for (*cd) && b.Assign(&pair, getword(mbuff.GetInputEncoding(), &cd, ';')) {
+			for (*cd) && lang.Assign(&pair, getword(mbuff.GetInputEncoding(), &cd, ';')) {
 				var key *byte = nil
 				var word *byte = pair
 				for isspace(*cd) {
@@ -667,7 +668,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 					value = zend.Estrdup("")
 					value_len = 0
 				}
-				if b.PreInc(&count) <= PG__().max_input_vars && SM__().GetInputFilter()(PARSE_POST, param, &value, value_len, &new_val_len) != 0 {
+				if lang.PreInc(&count) <= PG__().max_input_vars && SM__().GetInputFilter()(PARSE_POST, param, &value, value_len, &new_val_len) != 0 {
 					if PhpRfc1867Callback != nil {
 						var event_formdata MultipartEventFormdata
 						var newlength int = new_val_len
@@ -724,7 +725,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 			if param == nil {
 				is_anonymous = 1
 				param = zend.Emalloc(MAX_SIZE_ANONNAME)
-				Snprintf(param, MAX_SIZE_ANONNAME, "%u", b.PostInc(&anonindex))
+				Snprintf(param, MAX_SIZE_ANONNAME, "%u", lang.PostInc(&anonindex))
 			} else {
 				is_anonymous = 0
 			}
@@ -881,7 +882,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 			 * ends in [.*]
 			 * start_arr is set to point to 1st [ */
 
-			is_arr_upload = b.Assign(&start_arr, strchr(param, '[')) && param[strlen(param)-1] == ']'
+			is_arr_upload = lang.Assign(&start_arr, strchr(param, '[')) && param[strlen(param)-1] == ']'
 			if is_arr_upload != 0 {
 				array_len = strlen(start_arr)
 				if array_index != nil {
@@ -934,7 +935,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 
 			/* Possible Content-Type: */
 
-			if cancel_upload != 0 || !(b.Assign(&cd, PhpMimeGetHdrValue(header, "Content-Type"))) {
+			if cancel_upload != 0 || !(lang.Assign(&cd, PhpMimeGetHdrValue(header, "Content-Type"))) {
 				cd = ""
 			} else {
 

@@ -1,8 +1,8 @@
 package core
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
+	b "github.com/heyuuu/gophp/php/lang"
 	"log"
 )
 

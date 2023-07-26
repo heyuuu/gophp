@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -11,12 +12,12 @@ import (
 )
 
 func SPL_LLIST_DELREF(elem any) {
-	if !(b.PreDec(&(elem.rc))) {
+	if !(lang.PreDec(&(elem.rc))) {
 		zend.Efree(elem)
 	}
 }
 func SPL_LLIST_CHECK_DELREF(elem any) {
-	if elem && !(b.PreDec(&(elem.rc))) {
+	if elem && !(lang.PreDec(&(elem.rc))) {
 		zend.Efree(elem)
 	}
 }
@@ -345,7 +346,7 @@ func SplDllistObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *
 		intern.SetGcData(zend.SafeErealloc(intern.GetGcData(), intern.GetGcDataCount(), b.SizeOf("zval"), 0))
 	}
 	for current != nil {
-		types.ZVAL_COPY_VALUE(intern.GetGcData()[b.PostInc(&i)], current.GetData())
+		types.ZVAL_COPY_VALUE(intern.GetGcData()[lang.PostInc(&i)], current.GetData())
 		current = current.GetNext()
 	}
 	*gc_data = intern.GetGcData()

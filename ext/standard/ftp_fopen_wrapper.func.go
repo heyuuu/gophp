@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -425,7 +426,7 @@ func PhpStreamUrlWrapFtp(
 		streams.PhpStreamWrapperLogError(wrapper, options, "Unknown file open mode")
 		return nil
 	}
-	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "proxy")) != nil {
+	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "proxy")) != nil {
 		if read_write == 1 {
 
 			/* Use http wrapper to proxy ftp request */
@@ -484,7 +485,7 @@ func PhpStreamUrlWrapFtp(
 
 		/* when writing file (but not appending), it must NOT exist, unless a context option exists which allows it */
 
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "overwrite")) != nil {
+		if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "overwrite")) != nil {
 			if tmpzval.Long() != 0 {
 				allow_overwrite = 1
 			} else {
@@ -523,7 +524,7 @@ func PhpStreamUrlWrapFtp(
 
 		/* set resume position if applicable */
 
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(types.IS_LONG) && tmpzval.Long() > 0 {
+		if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(types.IS_LONG) && tmpzval.Long() > 0 {
 			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", tmpzval.Long())
 			result = GET_FTP_RESULT(stream)
 			if result < 300 || result > 399 {
@@ -555,7 +556,7 @@ func PhpStreamUrlWrapFtp(
 		/* Append */
 
 	}
-	core.PhpStreamPrintf(stream, "%s %s\r\n", tmp_line, b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "%s %s\r\n", tmp_line, lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 
 	/* open the data channel */
 
@@ -636,7 +637,7 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	/* Trim off trailing whitespace characters */
 
 	for tmp_len > 0 && (ent.GetDName()[tmp_len-1] == '\n' || ent.GetDName()[tmp_len-1] == '\r' || ent.GetDName()[tmp_len-1] == '\t' || ent.GetDName()[tmp_len-1] == ' ') {
-		ent.GetDName()[b.PreDec(&tmp_len)] = '0'
+		ent.GetDName()[lang.PreDec(&tmp_len)] = '0'
 	}
 	return b.SizeOf("php_stream_dirent")
 }
@@ -712,7 +713,7 @@ func PhpStreamFtpOpendir(
 	if datastream == nil {
 		goto opendir_errexit
 	}
-	core.PhpStreamPrintf(stream, "NLST %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "NLST %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result != 150 && result != 125 {
 
@@ -766,7 +767,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 		goto stat_errexit
 	}
 	ssb.GetSb().st_mode = 0644
-	core.PhpStreamPrintf(stream, "CWD %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "CWD %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		ssb.GetSb().st_mode |= S_IFREG
@@ -778,7 +779,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	if result < 200 || result > 299 {
 		goto stat_errexit
 	}
-	core.PhpStreamPrintf(stream, "SIZE %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "SIZE %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 
@@ -799,7 +800,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	} else {
 		ssb.GetSb().st_size = atoi(tmp_line + 4)
 	}
-	core.PhpStreamPrintf(stream, "MDTM %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "MDTM %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result == 213 {
 		var p *byte = tmp_line + 4
@@ -886,7 +887,7 @@ func PhpStreamFtpUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 
 	/* Attempt to delete the file */
 
-	core.PhpStreamPrintf(stream, "DELE %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "DELE %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {
@@ -932,7 +933,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 
 	/* Rename FROM */
 
-	core.PhpStreamPrintf(stream, "RNFR %s\r\n", b.CondF1(resource_from.GetPath() != nil, func() []byte { return resource_from.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "RNFR %s\r\n", lang.CondF1(resource_from.GetPath() != nil, func() []byte { return resource_from.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 300 || result > 399 {
 		if (options & core.REPORT_ERRORS) != 0 {
@@ -943,7 +944,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 
 	/* Rename TO */
 
-	core.PhpStreamPrintf(stream, "RNTO %s\r\n", b.CondF1(resource_to.GetPath() != nil, func() []byte { return resource_to.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "RNTO %s\r\n", lang.CondF1(resource_to.GetPath() != nil, func() []byte { return resource_to.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {
@@ -1001,16 +1002,16 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 
 		/* find a top level directory we need to create */
 
-		for b.Assign(&p, strrchr(buf, '/')) {
+		for lang.Assign(&p, strrchr(buf, '/')) {
 			*p = '0'
-			core.PhpStreamPrintf(stream, "CWD %s\r\n", b.Cond(strlen(buf), buf, "/"))
+			core.PhpStreamPrintf(stream, "CWD %s\r\n", lang.Cond(strlen(buf), buf, "/"))
 			result = GET_FTP_RESULT(stream)
 			if result >= 200 && result <= 299 {
 				*p = '/'
 				break
 			}
 		}
-		core.PhpStreamPrintf(stream, "MKD %s\r\n", b.Cond(strlen(buf), buf, "/"))
+		core.PhpStreamPrintf(stream, "MKD %s\r\n", lang.Cond(strlen(buf), buf, "/"))
 		result = GET_FTP_RESULT(stream)
 		if result >= 200 && result <= 299 {
 			if p == nil {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -578,7 +579,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) string {
 					str.WriteString("NULL")
 				}
 			}
-			if b.PreInc(&i) < num_args {
+			if lang.PreInc(&i) < num_args {
 				str.WriteString(", ")
 			}
 			arg_info++
@@ -732,7 +733,7 @@ func DoInheritanceCheckOnMethodEx(
 		if check_only != 0 {
 			return INHERITANCE_ERROR
 		}
-		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Access level to %s::%s() must be %s (as in class %s)%s", ZEND_FN_SCOPE_NAME(child), child.FunctionName(), ZendVisibilityString(parent_flags), ZEND_FN_SCOPE_NAME(parent), b.Cond((parent_flags&types.AccPublic) != 0, "", " or weaker"))
+		faults.ErrorAtNoreturn(faults.E_COMPILE_ERROR, nil, FuncLineno(child), "Access level to %s::%s() must be %s (as in class %s)%s", ZEND_FN_SCOPE_NAME(child), child.FunctionName(), ZendVisibilityString(parent_flags), ZEND_FN_SCOPE_NAME(parent), lang.Cond((parent_flags&types.AccPublic) != 0, "", " or weaker"))
 	}
 	if checked == 0 {
 		if check_only != 0 {
@@ -841,10 +842,10 @@ func DoInheritProperty(parent_info *types.PropertyInfo, key string, ce *types.Cl
 		}
 		if !parent_info.IsPrivate() {
 			if (parent_info.GetFlags() & types.AccStatic) != (child_info.GetFlags() & types.AccStatic) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s%s::$%s as %s%s::$%s", b.Cond(parent_info.IsStatic(), "static ", "non static "), ce.GetParent().Name(), key, b.Cond(child_info.IsStatic(), "static ", "non static "), ce.Name(), key)
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s%s::$%s as %s%s::$%s", lang.Cond(parent_info.IsStatic(), "static ", "non static "), ce.GetParent().Name(), key, lang.Cond(child_info.IsStatic(), "static ", "non static "), ce.Name(), key)
 			}
 			if (child_info.GetFlags() & types.AccPppMask) > (parent_info.GetFlags() & types.AccPppMask) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::$%s must be %s (as in class %s)%s", ce.Name(), key, ZendVisibilityString(parent_info.GetFlags()), ce.GetParent().Name(), b.Cond(parent_info.IsPublic(), "", " or weaker"))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::$%s must be %s (as in class %s)%s", ce.Name(), key, ZendVisibilityString(parent_info.GetFlags()), ce.GetParent().Name(), lang.Cond(parent_info.IsPublic(), "", " or weaker"))
 			} else if !child_info.IsStatic() {
 				var parent_num int = OBJ_PROP_TO_NUM(parent_info.GetOffset())
 				var child_num int = OBJ_PROP_TO_NUM(child_info.GetOffset())
@@ -912,7 +913,7 @@ func DoInheritClassConstant(name string, parentConst *types.ClassConstant, ce *t
 	var c = ce.ConstantsTable().Get(name)
 	if c != nil {
 		if c.PriorLevel() > parentConst.PriorLevel() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name, ZendVisibilityString(parentConst.GetAccessFlags()), ce.GetParent().Name(), b.Cond(parentConst.IsPublic(), "", " or weaker"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name, ZendVisibilityString(parentConst.GetAccessFlags()), ce.GetParent().Name(), lang.Cond(parentConst.IsPublic(), "", " or weaker"))
 		}
 	} else if !parentConst.IsPrivate() {
 		if parentConst.GetValue().IsConstantAst() {
@@ -1196,7 +1197,7 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 	}
 	for i := 0; i < ce.GetNumInterfaces(); i++ {
 		if ce.GetInterfaces()[i] == nil {
-			memmove(ce.GetInterfaces()+i, ce.GetInterfaces()+i+1, b.SizeOf("zend_class_entry *")*(b.PreDec(&(ce.GetNumInterfaces()))-i))
+			memmove(ce.GetInterfaces()+i, ce.GetInterfaces()+i+1, b.SizeOf("zend_class_entry *")*(lang.PreDec(&(ce.GetNumInterfaces()))-i))
 			i--
 		} else if ce.GetInterfaces()[i] == iface {
 			if i < parentIfaceNum {
@@ -1308,7 +1309,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFu
 func ZendAddTraitMethod(ce *types.ClassEntry, name string, key string, fn types.IFunction, overridden **types.Array) {
 	var existing_fn types.IFunction = nil
 	var new_fn types.IFunction
-	if b.Assign(&existing_fn, ce.FunctionTable().Get(key)) != nil {
+	if lang.Assign(&existing_fn, ce.FunctionTable().Get(key)) != nil {
 
 		/* if it is the same function with the same visibility and has not been assigned a class scope yet, regardless
 		 * of where it is coming from there is no conflict and we do not need to add it again */
@@ -1321,7 +1322,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name string, key string, fn types.
 			/* members from the current class override trait methods */
 
 			if (*overridden) != nil {
-				if b.Assign(&existing_fn, types.ZendHashFindPtr(*overridden, key)) != nil {
+				if lang.Assign(&existing_fn, types.ZendHashFindPtr(*overridden, key)) != nil {
 					if existing_fn.IsAbstract() {
 						/* Make sure the trait method is compatible with previosly declared abstract method */
 						PerformDelayableImplementationCheck(ce, fn, existing_fn, 1)
@@ -1427,7 +1428,7 @@ func ZendTraitsCopyFunctions(
 
 		/* is not in hashtable, thus, function is not to be excluded */
 
-		memcpy(&fn_copy, fn, b.CondF(fn.GetType() == ZEND_USER_FUNCTION, func() __auto__ { return b.SizeOf("zend_op_array") }, func() __auto__ { return b.SizeOf("zend_internal_function") }))
+		memcpy(&fn_copy, fn, lang.CondF(fn.GetType() == ZEND_USER_FUNCTION, func() __auto__ { return b.SizeOf("zend_op_array") }, func() __auto__ { return b.SizeOf("zend_internal_function") }))
 
 		/* apply aliases which have not alias name, just setting visibility */
 
@@ -1490,7 +1491,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 		i = 0
 		precedences = ce.GetTraitPrecedences()
 		ce.SetTraitPrecedences(nil)
-		for b.Assign(&cur_precedence, precedences[i]) {
+		for lang.Assign(&cur_precedence, precedences[i]) {
 
 			/** Resolve classes for all precedence operations. */
 
@@ -1832,10 +1833,10 @@ func ZendCheckDeprecatedConstructor(ce *types.ClassEntry) {
 	}
 }
 func DISPLAY_ABSTRACT_FN(idx int) {
-	b.CondF1(ai.afn[idx], func() string { return ZEND_FN_SCOPE_NAME(ai.afn[idx]) }, "")
-	b.Cond(ai.afn[idx], "::", "")
-	b.CondF1(ai.afn[idx], func() []byte { return ai.afn[idx].common.function_name.GetVal() }, "")
-	b.CondF2(ai.afn[idx] && ai.afn[idx+1], ", ", func() string {
+	lang.CondF1(ai.afn[idx], func() string { return ZEND_FN_SCOPE_NAME(ai.afn[idx]) }, "")
+	lang.Cond(ai.afn[idx], "::", "")
+	lang.CondF1(ai.afn[idx], func() []byte { return ai.afn[idx].common.function_name.GetVal() }, "")
+	lang.CondF2(ai.afn[idx] && ai.afn[idx+1], ", ", func() string {
 		if ai.afn[idx] && ai.cnt > MAX_ABSTRACT_INFO_CNT {
 			return ", ..."
 		} else {
@@ -1868,7 +1869,7 @@ func ZendVerifyAbstractClass(ce *types.ClassEntry) {
 		ZendVerifyAbstractClassFunction(func_, &ai)
 	})
 	if ai.GetCnt() != 0 {
-		faults.ErrorNoreturn(faults.E_ERROR, "Class %s contains %d abstract method%s and must therefore be declared abstract or implement the remaining methods ("+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+")", ce.Name(), ai.GetCnt(), b.Cond(ai.GetCnt() > 1, "s", ""), DISPLAY_ABSTRACT_FN(0), DISPLAY_ABSTRACT_FN(1), DISPLAY_ABSTRACT_FN(2))
+		faults.ErrorNoreturn(faults.E_ERROR, "Class %s contains %d abstract method%s and must therefore be declared abstract or implement the remaining methods ("+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+")", ce.Name(), ai.GetCnt(), lang.Cond(ai.GetCnt() > 1, "s", ""), DISPLAY_ABSTRACT_FN(0), DISPLAY_ABSTRACT_FN(1), DISPLAY_ABSTRACT_FN(2))
 	} else {
 
 		/* now everything should be fine and an added ZEND_ACC_IMPLICIT_ABSTRACT_CLASS should be removed */
@@ -2065,7 +2066,7 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 		/* Also copy the parent interfaces here, so we don't need to reallocate later. */
 
 		var i uint32
-		var num_parent_interfaces uint32 = b.CondF1(parent != nil, func() uint32 { return parent.GetNumInterfaces() }, 0)
+		var num_parent_interfaces uint32 = lang.CondF1(parent != nil, func() uint32 { return parent.GetNumInterfaces() }, 0)
 		interfaces = Emalloc(b.SizeOf("zend_class_entry *") * (ce.GetNumInterfaces() + num_parent_interfaces))
 		if num_parent_interfaces != 0 {
 			memcpy(interfaces, parent.GetInterfaces(), b.SizeOf("zend_class_entry *")*num_parent_interfaces)

@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
@@ -766,7 +767,7 @@ func ZifClassAlias(executeData zpp.Ex, return_value zpp.Ret, userClassName *type
 	if ZendParseParameters(executeData.NumArgs(), "Ss|b", &class_name, &alias_name, &alias_name_len, &autoload) == types.FAILURE {
 		return
 	}
-	ce = ZendLookupClassEx(class_name, nil, b.Cond(autoload == 0, ZEND_FETCH_CLASS_NO_AUTOLOAD, 0))
+	ce = ZendLookupClassEx(class_name, nil, lang.Cond(autoload == 0, ZEND_FETCH_CLASS_NO_AUTOLOAD, 0))
 	if ce != nil {
 		if ce.IsUserClass() {
 			if ZendRegisterClassAliasEx(b.CastStr(alias_name, alias_name_len), ce, 0) == types.SUCCESS {
@@ -835,7 +836,7 @@ func ZifSetErrorHandler(executeData zpp.Ex, return_value zpp.Ret, errorHandler *
 	if !error_handler.IsNull() {
 		if ZendIsCallable(error_handler, 0, nil) == 0 {
 			var errorHandlerName = ZendGetCallableName(error_handler)
-			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(errorHandlerName != "", func() string { return errorHandlerName }, "unknown"))
+			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), lang.CondF1(errorHandlerName != "", func() string { return errorHandlerName }, "unknown"))
 			return
 		}
 	}
@@ -882,7 +883,7 @@ func ZifSetExceptionHandler(executeData zpp.Ex, return_value zpp.Ret, exceptionH
 	if !exception_handler.IsNull() {
 		if !ZendIsCallable(exception_handler, 0, nil) {
 			var exceptionHandlerName = ZendGetCallableName(exception_handler)
-			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(exceptionHandlerName != "", func() string { return exceptionHandlerName }, "unknown"))
+			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), lang.CondF1(exceptionHandlerName != "", func() string { return exceptionHandlerName }, "unknown"))
 			return
 		}
 	}
@@ -1329,7 +1330,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 	var stack_frame types.Zval
 	var tmp types.Zval
 	ArrayInit(return_value)
-	if !(b.Assign(&ptr, CurrEX())) {
+	if !(lang.Assign(&ptr, CurrEX())) {
 		return
 	}
 	if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetType())) {

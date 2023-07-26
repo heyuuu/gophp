@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
@@ -24,7 +25,7 @@ func ZendCollectModuleHandlers() {
 	ClassCleanupHandlers[class_count] = nil
 	CG__().ClassTable().Foreach(func(_ string, ce *types.ClassEntry) {
 		if ce.IsInternalClass() && ce.GetDefaultStaticMembersCount() > 0 {
-			ClassCleanupHandlers[b.PreDec(&class_count)] = ce
+			ClassCleanupHandlers[lang.PreDec(&class_count)] = ce
 		}
 	})
 }
@@ -158,7 +159,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 	internal_function.SetModule(EG__().GetCurrentModule())
 	if scope != nil {
 		class_name_len = scope.GetName().GetLen()
-		if b.Assign(&lc_class_name, operators.ZendMemrchr(scope.Name(), '\\', class_name_len)) {
+		if lang.Assign(&lc_class_name, operators.ZendMemrchr(scope.Name(), '\\', class_name_len)) {
 			lc_class_name++
 			class_name_len -= lc_class_name - scope.Name()
 			lc_class_name = ascii.StrToLower(b.CastStr(lc_class_name, class_name_len))
@@ -174,7 +175,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		if ptr.GetFlags() != 0 {
 			if !ptr.IsPppMask() {
 				if ptr.GetFlags() != types.AccDeprecated && scope != nil {
-					faults.Error(error_type, "Invalid access level for %s%s%s() - access must be exactly one of public, protected or private", b.CondF1(scope != nil, func() []byte { return scope.Name() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
+					faults.Error(error_type, "Invalid access level for %s%s%s() - access must be exactly one of public, protected or private", lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""), lang.Cond(scope != nil, "::", ""), ptr.GetFname())
 				}
 				internal_function.SetFnFlags(types.AccPublic | ptr.GetFlags())
 			} else {
@@ -242,7 +243,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 				}
 			}
 			if ptr.IsStatic() && (scope == nil || !scope.IsInterface()) {
-				faults.Error(error_type, "Static function %s%s%s() cannot be abstract", b.CondF1(scope != nil, func() []byte { return scope.Name() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
+				faults.Error(error_type, "Static function %s%s%s() cannot be abstract", lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""), lang.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 		} else {
 			if scope != nil && scope.IsInterface() {
@@ -254,7 +255,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 				if scope != nil {
 					Efree((*byte)(lc_class_name))
 				}
-				faults.Error(error_type, "Method %s%s%s() cannot be a NULL function", b.CondF1(scope != nil, func() []byte { return scope.Name() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
+				faults.Error(error_type, "Method %s%s%s() cannot be a NULL function", lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""), lang.Cond(scope != nil, "::", ""), ptr.GetFname())
 				ZendUnregisterFunctions(functions, count, targetFunctionTable)
 				return types.FAILURE
 			}
@@ -371,7 +372,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 			fname_len = strlen(ptr.GetFname())
 			lowercaseName := ascii.StrToLower(b.CastStrAuto(ptr.GetFname()))
 			if targetFunctionTable.Exists(lowercaseName) {
-				faults.Error(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.Name() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
+				faults.Error(error_type, "Function registration failed - duplicate name - %s%s%s", lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""), lang.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 			ptr++
 		}

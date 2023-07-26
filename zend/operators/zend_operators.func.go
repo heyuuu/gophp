@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard/conv"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -466,7 +467,7 @@ try_again:
 	case types.IS_NULL:
 		op.SetFalse()
 	case types.IS_RESOURCE:
-		var l zend.ZendLong = b.Cond(op.ResourceHandle() != 0, 1, 0)
+		var l zend.ZendLong = lang.Cond(op.ResourceHandle() != 0, 1, 0)
 		// ZvalPtrDtor(op)
 		op.SetBool(l != 0)
 	case types.IS_LONG:
@@ -1427,7 +1428,7 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			if op1 == result {
 				// ZvalPtrDtor(result)
 			}
-			result.SetLong(b.Cond(op1_lval < 0, -1, 0))
+			result.SetLong(lang.Cond(op1_lval < 0, -1, 0))
 			return types.SUCCESS
 		} else {
 			if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
@@ -1584,7 +1585,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	for true {
 		switch TypePair(op1.GetType(), op2.GetType()) {
 		case TypePair(types.IS_LONG, types.IS_LONG):
-			result.SetLong(b.CondF2(op1.Long() > op2.Long(), 1, func() int {
+			result.SetLong(lang.CondF2(op1.Long() > op2.Long(), 1, func() int {
 				if op1.Long() < op2.Long() {
 					return -1
 				} else {
@@ -1636,10 +1637,10 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			result.SetLong(ZendiSmartStrcmp(op1.StringVal(), op2.StringVal()))
 			return types.SUCCESS
 		case TypePair(types.IS_NULL, types.IS_STRING):
-			result.SetLong(b.Cond(op2.String().GetLen() == 0, 0, -1))
+			result.SetLong(lang.Cond(op2.String().GetLen() == 0, 0, -1))
 			return types.SUCCESS
 		case TypePair(types.IS_STRING, types.IS_NULL):
-			result.SetLong(b.Cond(op1.String().GetLen() == 0, 0, 1))
+			result.SetLong(lang.Cond(op1.String().GetLen() == 0, 0, 1))
 			return types.SUCCESS
 		case TypePair(types.IS_OBJECT, types.IS_NULL):
 			result.SetLong(1)
@@ -1688,7 +1689,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					return ret
 				} else if !op2.IsObject() && op1.Object().CanCast() {
 					tmp_free.SetUndef()
-					if op1.Object().Cast(&tmp_free, b.CondF2(op2.IsFalse() || op2.IsTrue(), types.IS_BOOL, func() __auto__ { return op2.GetType() })) == types.FAILURE {
+					if op1.Object().Cast(&tmp_free, lang.CondF2(op2.IsFalse() || op2.IsTrue(), types.IS_BOOL, func() __auto__ { return op2.GetType() })) == types.FAILURE {
 						result.SetLong(1)
 						//ZendFreeObjGetResult(&tmp_free)
 						return types.SUCCESS
@@ -1726,16 +1727,16 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			}
 			if converted == 0 {
 				if op1.GetType() < types.IS_TRUE {
-					result.SetLong(b.Cond(ZvalIsTrue(op2), -1, 0))
+					result.SetLong(lang.Cond(ZvalIsTrue(op2), -1, 0))
 					return types.SUCCESS
 				} else if op1.IsTrue() {
-					result.SetLong(b.Cond(ZvalIsTrue(op2), 0, 1))
+					result.SetLong(lang.Cond(ZvalIsTrue(op2), 0, 1))
 					return types.SUCCESS
 				} else if op2.GetType() < types.IS_TRUE {
-					result.SetLong(b.Cond(ZvalIsTrue(op1), 1, 0))
+					result.SetLong(lang.Cond(ZvalIsTrue(op1), 1, 0))
 					return types.SUCCESS
 				} else if op2.IsTrue() {
-					result.SetLong(b.Cond(ZvalIsTrue(op1), 0, -1))
+					result.SetLong(lang.Cond(ZvalIsTrue(op1), 0, -1))
 					return types.SUCCESS
 				} else {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 1)
@@ -1892,15 +1893,15 @@ func IncrementStringEx(str string) string {
 		if ascii.IsLower(c) {
 			last = LOWER_CASE
 			carry = c == 'z'
-			s[i] = b.Cond(carry, 'a', c+1)
+			s[i] = lang.Cond(carry, 'a', c+1)
 		} else if ascii.IsUpper(c) {
 			last = UPPER_CASE
 			carry = c == 'Z'
-			s[i] = b.Cond(carry, 'A', c+1)
+			s[i] = lang.Cond(carry, 'A', c+1)
 		} else if ascii.IsDigit(c) {
 			last = NUMERIC
 			carry = c == '9'
-			s[i] = b.Cond(carry, '0', c+1)
+			s[i] = lang.Cond(carry, '0', c+1)
 		} else {
 			carry = false
 			break
@@ -2063,7 +2064,7 @@ func ZendStrTolowerCopy(dest *byte, source *byte, length int) *byte {
 	var result *uint8 = (*uint8)(dest)
 	var end *uint8 = str + length
 	for str < end {
-		b.PostInc(&(*result)) = ascii.ToLower(b.PostInc(&(*str)))
+		lang.PostInc(&(*result)) = ascii.ToLower(lang.PostInc(&(*str)))
 	}
 	*result = '0'
 	return dest

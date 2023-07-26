@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -57,7 +58,7 @@ func BuildCharSet(cset *CharSet, format *byte) *byte {
 	ch = format - 1
 	start = *ch
 	if (*ch) == ']' || (*ch) == '-' {
-		cset.GetChars()[b.PostInc(&(cset.GetNchars()))] = *ch
+		cset.GetChars()[lang.PostInc(&(cset.GetNchars()))] = *ch
 		format++
 		ch = format - 1
 	}
@@ -85,8 +86,8 @@ func BuildCharSet(cset *CharSet, format *byte) *byte {
 			 */
 
 			if (*format) == ']' {
-				cset.GetChars()[b.PostInc(&(cset.GetNchars()))] = start
-				cset.GetChars()[b.PostInc(&(cset.GetNchars()))] = *ch
+				cset.GetChars()[lang.PostInc(&(cset.GetNchars()))] = start
+				cset.GetChars()[lang.PostInc(&(cset.GetNchars()))] = *ch
 			} else {
 				format++
 				ch = format - 1
@@ -112,7 +113,7 @@ func BuildCharSet(cset *CharSet, format *byte) *byte {
 			 */
 
 		} else {
-			cset.GetChars()[b.PostInc(&(cset.GetNchars()))] = *ch
+			cset.GetChars()[lang.PostInc(&(cset.GetNchars()))] = *ch
 		}
 		format++
 		ch = format - 1
@@ -604,10 +605,10 @@ func PhpSscanfInternal(
 				if numVars != 0 && objIndex >= argCount {
 					break
 				} else if numVars != 0 {
-					current = args + b.PostInc(&objIndex)
+					current = args + lang.PostInc(&objIndex)
 					zend.ZEND_TRY_ASSIGN_REF_LONG(current, zend_long(string-baseString))
 				} else {
-					zend.AddIndexLong(return_value, b.PostInc(&objIndex), string-baseString)
+					zend.AddIndexLong(return_value, lang.PostInc(&objIndex), string-baseString)
 				}
 			}
 			nconversions++
@@ -716,7 +717,7 @@ func PhpSscanfInternal(
 					break
 				}
 				end++
-				if b.PreDec(&width) == 0 {
+				if lang.PreDec(&width) == 0 {
 					break
 				}
 			}
@@ -724,10 +725,10 @@ func PhpSscanfInternal(
 				if numVars != 0 && objIndex >= argCount {
 					break
 				} else if numVars != 0 {
-					current = args + b.PostInc(&objIndex)
+					current = args + lang.PostInc(&objIndex)
 					zend.ZEND_TRY_ASSIGN_REF_STRINGL(current, string, end-string)
 				} else {
-					zend.AddIndexStringl(return_value, b.PostInc(&objIndex), string, end-string)
+					zend.AddIndexStringl(return_value, lang.PostInc(&objIndex), string, end-string)
 				}
 			}
 			string = end
@@ -744,7 +745,7 @@ func PhpSscanfInternal(
 					break
 				}
 				end++
-				if b.PreDec(&width) == 0 {
+				if lang.PreDec(&width) == 0 {
 					break
 				}
 			}
@@ -766,10 +767,10 @@ func PhpSscanfInternal(
 				if numVars != 0 && objIndex >= argCount {
 					break
 				} else if numVars != 0 {
-					current = args + b.PostInc(&objIndex)
+					current = args + lang.PostInc(&objIndex)
 					zend.ZEND_TRY_ASSIGN_REF_STRINGL(current, string, end-string)
 				} else {
-					zend.AddIndexStringl(return_value, b.PostInc(&objIndex), string, end-string)
+					zend.AddIndexStringl(return_value, lang.PostInc(&objIndex), string, end-string)
 				}
 			}
 			string = end
@@ -895,7 +896,7 @@ func PhpSscanfInternal(
 				 */
 
 				*string++
-				b.PostInc(&(*end)) = (*string) - 1
+				lang.PostInc(&(*end)) = (*string) - 1
 				if (*string) == '0' {
 					break
 				}
@@ -933,19 +934,19 @@ func PhpSscanfInternal(
 
 						/* change passed value type to string */
 
-						current = args + b.PostInc(&objIndex)
+						current = args + lang.PostInc(&objIndex)
 						zend.ZEND_TRY_ASSIGN_REF_STRING(current, buf)
 					} else {
-						zend.AddIndexString(return_value, b.PostInc(&objIndex), buf)
+						zend.AddIndexString(return_value, lang.PostInc(&objIndex), buf)
 					}
 				} else {
 					if numVars != 0 && objIndex >= argCount {
 						break
 					} else if numVars != 0 {
-						current = args + b.PostInc(&objIndex)
+						current = args + lang.PostInc(&objIndex)
 						zend.ZEND_TRY_ASSIGN_REF_LONG(current, value)
 					} else {
-						zend.AddIndexLong(return_value, b.PostInc(&objIndex), value)
+						zend.AddIndexLong(return_value, lang.PostInc(&objIndex), value)
 					}
 				}
 			}
@@ -1022,7 +1023,7 @@ func PhpSscanfInternal(
 				 */
 
 				*string++
-				b.PostInc(&(*end)) = (*string) - 1
+				lang.PostInc(&(*end)) = (*string) - 1
 				if (*string) == '0' {
 					break
 				}
@@ -1070,10 +1071,10 @@ func PhpSscanfInternal(
 				if numVars != 0 && objIndex >= argCount {
 					break
 				} else if numVars != 0 {
-					current = args + b.PostInc(&objIndex)
+					current = args + lang.PostInc(&objIndex)
 					zend.ZEND_TRY_ASSIGN_REF_DOUBLE(current, dvalue)
 				} else {
-					zend.AddIndexDouble(return_value, b.PostInc(&objIndex), dvalue)
+					zend.AddIndexDouble(return_value, lang.PostInc(&objIndex), dvalue)
 				}
 			}
 		}

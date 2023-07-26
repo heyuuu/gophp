@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -86,7 +87,7 @@ func StrfilterTolowerCreate(filtername *byte, filterparams *types.Zval, persiste
 }
 func PhpStripTagsFilterCtor(inst *PhpStripTagsFilter, allowed_tags *types.String, persistent int) int {
 	if allowed_tags != nil {
-		if nil == b.Assign(&(inst.GetAllowedTags()), zend.Pemalloc(allowed_tags.GetLen()+1)) {
+		if nil == lang.Assign(&(inst.GetAllowedTags()), zend.Pemalloc(allowed_tags.GetLen()+1)) {
 			return types.FAILURE
 		}
 		memcpy((*byte)(inst.GetAllowedTags()), allowed_tags.GetVal(), allowed_tags.GetLen()+1)
@@ -241,10 +242,10 @@ func PhpConvBase64EncodeFlush(inst *PhpConvBase64Encode, in_pp **byte, in_left_p
 			err = PHP_CONV_ERR_TOO_BIG
 			goto out
 		}
-		*(b.PostInc(&pd)) = B64TblEnc[inst.GetErem()[0]>>2]
-		*(b.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[0]<<4)]
-		*(b.PostInc(&pd)) = '='
-		*(b.PostInc(&pd)) = '='
+		*(lang.PostInc(&pd)) = B64TblEnc[inst.GetErem()[0]>>2]
+		*(lang.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[0]<<4)]
+		*(lang.PostInc(&pd)) = '='
+		*(lang.PostInc(&pd)) = '='
 		inst.SetEremLen(0)
 		ocnt -= 4
 		line_ccnt -= 4
@@ -262,10 +263,10 @@ func PhpConvBase64EncodeFlush(inst *PhpConvBase64Encode, in_pp **byte, in_left_p
 			err = PHP_CONV_ERR_TOO_BIG
 			goto out
 		}
-		*(b.PostInc(&pd)) = B64TblEnc[inst.GetErem()[0]>>2]
-		*(b.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[0]<<4|inst.GetErem()[1]>>4)]
-		*(b.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[1]<<2)]
-		*(b.PostInc(&pd)) = '='
+		*(lang.PostInc(&pd)) = B64TblEnc[inst.GetErem()[0]>>2]
+		*(lang.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[0]<<4|inst.GetErem()[1]>>4)]
+		*(lang.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[1]<<2)]
+		*(lang.PostInc(&pd)) = '='
 		inst.SetEremLen(0)
 		ocnt -= 4
 		line_ccnt -= 4
@@ -315,10 +316,10 @@ func PhpConvBase64EncodeConvert(inst *PhpConvBase64Encode, in_pp **byte, in_left
 				err = PHP_CONV_ERR_TOO_BIG
 				goto out
 			}
-			*(b.PostInc(&pd)) = B64TblEnc[inst.GetErem()[0]>>2]
-			*(b.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[0]<<4|ps[0]>>4)]
-			*(b.PostInc(&pd)) = B64TblEnc[uint8(ps[0]<<2|ps[1]>>6)]
-			*(b.PostInc(&pd)) = B64TblEnc[ps[1]]
+			*(lang.PostInc(&pd)) = B64TblEnc[inst.GetErem()[0]>>2]
+			*(lang.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[0]<<4|ps[0]>>4)]
+			*(lang.PostInc(&pd)) = B64TblEnc[uint8(ps[0]<<2|ps[1]>>6)]
+			*(lang.PostInc(&pd)) = B64TblEnc[ps[1]]
 			ocnt -= 4
 			ps += 2
 			icnt -= 2
@@ -340,10 +341,10 @@ func PhpConvBase64EncodeConvert(inst *PhpConvBase64Encode, in_pp **byte, in_left
 				err = PHP_CONV_ERR_TOO_BIG
 				goto out
 			}
-			*(b.PostInc(&pd)) = B64TblEnc[inst.GetErem()[0]>>2]
-			*(b.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[0]<<4|inst.GetErem()[1]>>4)]
-			*(b.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[1]<<2|ps[0]>>6)]
-			*(b.PostInc(&pd)) = B64TblEnc[ps[0]]
+			*(lang.PostInc(&pd)) = B64TblEnc[inst.GetErem()[0]>>2]
+			*(lang.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[0]<<4|inst.GetErem()[1]>>4)]
+			*(lang.PostInc(&pd)) = B64TblEnc[uint8(inst.GetErem()[1]<<2|ps[0]>>6)]
+			*(lang.PostInc(&pd)) = B64TblEnc[ps[0]]
 			ocnt -= 4
 			ps += 1
 			icnt -= 1
@@ -366,17 +367,17 @@ func PhpConvBase64EncodeConvert(inst *PhpConvBase64Encode, in_pp **byte, in_left
 			err = PHP_CONV_ERR_TOO_BIG
 			goto out
 		}
-		*(b.PostInc(&pd)) = B64TblEnc[ps[0]>>2]
-		*(b.PostInc(&pd)) = B64TblEnc[uint8(ps[0]<<4|ps[1]>>4)]
-		*(b.PostInc(&pd)) = B64TblEnc[uint8(ps[1]<<2|ps[2]>>6)]
-		*(b.PostInc(&pd)) = B64TblEnc[ps[2]]
+		*(lang.PostInc(&pd)) = B64TblEnc[ps[0]>>2]
+		*(lang.PostInc(&pd)) = B64TblEnc[uint8(ps[0]<<4|ps[1]>>4)]
+		*(lang.PostInc(&pd)) = B64TblEnc[uint8(ps[1]<<2|ps[2]>>6)]
+		*(lang.PostInc(&pd)) = B64TblEnc[ps[2]]
 		ps += 3
 		icnt -= 3
 		ocnt -= 4
 		line_ccnt -= 4
 	}
 	for ; icnt > 0; icnt-- {
-		inst.GetErem()[b.PostInc(&(inst.GetEremLen()))] = *(b.PostInc(&ps))
+		inst.GetErem()[lang.PostInc(&(inst.GetEremLen()))] = *(lang.PostInc(&ps))
 	}
 out:
 	*in_pp = (*byte)(ps)
@@ -440,7 +441,7 @@ func PhpConvBase64DecodeConvert(inst *PhpConvBase64Decode, in_pp **byte, in_left
 			if icnt < 1 {
 				break
 			}
-			i = B64TblDec[uint(*(b.PostInc(&ps)))]
+			i = B64TblDec[uint(*(lang.PostInc(&ps)))]
 			icnt--
 			ustat |= i & 0x80
 			if (i & 0xc0) == 0 {
@@ -471,7 +472,7 @@ func PhpConvBase64DecodeConvert(inst *PhpConvBase64Decode, in_pp **byte, in_left
 				err = PHP_CONV_ERR_TOO_BIG
 				break
 			}
-			*(b.PostInc(&pd)) = pack
+			*(lang.PostInc(&pd)) = pack
 			ocnt--
 			pack = 0
 			pack_bcnt = nbitsof_pack
@@ -540,7 +541,7 @@ func PhpConvQprintEncodeConvert(inst *PhpConvQprintEncode, in_pp **byte, in_left
 						break
 					}
 					for i = 0; i < lb_cnt; i++ {
-						*(b.PostInc(&pd)) = inst.GetLbchars()[i]
+						*(lang.PostInc(&pd)) = inst.GetLbchars()[i]
 						ocnt--
 					}
 					line_ccnt = inst.GetLineLen()
@@ -570,7 +571,7 @@ func PhpConvQprintEncodeConvert(inst *PhpConvQprintEncode, in_pp **byte, in_left
 					err = PHP_CONV_ERR_TOO_BIG
 					break
 				}
-				*(b.PostInc(&pd)) = '='
+				*(lang.PostInc(&pd)) = '='
 				ocnt--
 				line_ccnt--
 				memcpy(pd, inst.GetLbchars(), inst.GetLbcharsLen())
@@ -623,7 +624,7 @@ func PhpConvQprintEncodeConvert(inst *PhpConvQprintEncode, in_pp **byte, in_left
 					}
 				}
 				if trail_ws == 0 {
-					*(b.PostInc(&pd)) = c
+					*(lang.PostInc(&pd)) = c
 					ocnt--
 					line_ccnt--
 					if lb_ptr < lb_cnt {
@@ -642,7 +643,7 @@ func PhpConvQprintEncodeConvert(inst *PhpConvQprintEncode, in_pp **byte, in_left
 					err = PHP_CONV_ERR_TOO_BIG
 					break
 				}
-				*(b.PostInc(&pd)) = '='
+				*(lang.PostInc(&pd)) = '='
 				ocnt--
 				line_ccnt--
 				memcpy(pd, inst.GetLbchars(), inst.GetLbcharsLen())
@@ -654,7 +655,7 @@ func PhpConvQprintEncodeConvert(inst *PhpConvQprintEncode, in_pp **byte, in_left
 				err = PHP_CONV_ERR_TOO_BIG
 				break
 			}
-			*(b.PostInc(&pd)) = c
+			*(lang.PostInc(&pd)) = c
 			ocnt--
 			line_ccnt--
 			if lb_ptr < lb_cnt {
@@ -671,7 +672,7 @@ func PhpConvQprintEncodeConvert(inst *PhpConvQprintEncode, in_pp **byte, in_left
 					err = PHP_CONV_ERR_TOO_BIG
 					break
 				}
-				*(b.PostInc(&pd)) = '='
+				*(lang.PostInc(&pd)) = '='
 				ocnt--
 				line_ccnt--
 				memcpy(pd, inst.GetLbchars(), inst.GetLbcharsLen())
@@ -683,9 +684,9 @@ func PhpConvQprintEncodeConvert(inst *PhpConvQprintEncode, in_pp **byte, in_left
 				err = PHP_CONV_ERR_TOO_BIG
 				break
 			}
-			*(b.PostInc(&pd)) = '='
-			*(b.PostInc(&pd)) = qp_digits[c>>4]
-			*(b.PostInc(&pd)) = qp_digits[c&0xf]
+			*(lang.PostInc(&pd)) = '='
+			*(lang.PostInc(&pd)) = qp_digits[c>>4]
+			*(lang.PostInc(&pd)) = qp_digits[c&0xf]
 			ocnt -= 3
 			line_ccnt -= 3
 			if trail_ws > 0 {
@@ -786,7 +787,7 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 					err = PHP_CONV_ERR_TOO_BIG
 					goto out
 				}
-				*(b.PostInc(&pd)) = *ps
+				*(lang.PostInc(&pd)) = *ps
 				ocnt--
 			}
 			ps++
@@ -835,7 +836,7 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 				err = PHP_CONV_ERR_INVALID_SEQ
 				goto out
 			}
-			next_char = next_char<<4 | b.Cond((*ps) >= 'A', (*ps)-0x37, (*ps)-0x30)
+			next_char = next_char<<4 | lang.Cond((*ps) >= 'A', (*ps)-0x37, (*ps)-0x30)
 			scan_stat++
 			ps++
 			icnt--
@@ -848,7 +849,7 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 				err = PHP_CONV_ERR_TOO_BIG
 				goto out
 			}
-			*(b.PostInc(&pd)) = next_char
+			*(lang.PostInc(&pd)) = next_char
 			ocnt--
 			scan_stat = 0
 		case 4:
@@ -905,7 +906,7 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 					err = PHP_CONV_ERR_TOO_BIG
 					goto out
 				}
-				*(b.PostInc(&pd)) = inst.GetLbchars()[b.PostInc(&lb_ptr)]
+				*(lang.PostInc(&pd)) = inst.GetLbchars()[lang.PostInc(&lb_ptr)]
 				ocnt--
 			} else {
 				scan_stat = 0
@@ -958,7 +959,7 @@ func PhpConvGetStringPropEx(
 	var tmpval *types.Zval
 	*pretval = nil
 	*pretval_len = 0
-	if b.Assign(&tmpval, (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
+	if lang.Assign(&tmpval, (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
 		var str *types.String = operators.ZvalGetString(tmpval)
 		*pretval = zend.Pemalloc(str.GetLen() + 1)
 		*pretval_len = str.GetLen()
@@ -997,7 +998,7 @@ func PhpConvGetUintPropEx(ht *types.Array, pretval *uint, field_name string, fie
 	var l zend.ZendUlong
 	var err PhpConvErrT
 	*pretval = 0
-	if b.Assign(&err, PhpConvGetUlongPropEx(ht, &l, field_name, field_name_len)) == PHP_CONV_ERR_SUCCESS {
+	if lang.Assign(&err, PhpConvGetUlongPropEx(ht, &l, field_name, field_name_len)) == PHP_CONV_ERR_SUCCESS {
 		*pretval = uint(l)
 	}
 	return err
@@ -1130,7 +1131,7 @@ func PhpConvertFilterCtor(inst *PhpConvertFilter, conv_mode int, conv_opts *type
 	inst.SetPersistent(persistent)
 	inst.SetFiltername(zend.Pestrdup(filtername))
 	inst.SetStubLen(0)
-	if b.Assign(&(inst.GetCd()), PhpConvOpen(conv_mode, conv_opts, persistent)) == nil {
+	if lang.Assign(&(inst.GetCd()), PhpConvOpen(conv_mode, conv_opts, persistent)) == nil {
 		goto out_failure
 	}
 	return types.SUCCESS
@@ -1200,7 +1201,7 @@ func StrfilterConvertAppendBucket(
 							core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): insufficient buffer", inst.GetFiltername())
 							goto out_failure
 						}
-						inst.GetStub()[b.PostInc(&(inst.GetStubLen()))] = *(b.PostInc(&ps))
+						inst.GetStub()[lang.PostInc(&(inst.GetStubLen()))] = *(lang.PostInc(&ps))
 						icnt--
 						pt = inst.GetStub()
 						tcnt = inst.GetStubLen()
@@ -1220,7 +1221,7 @@ func StrfilterConvertAppendBucket(
 
 					/* whoa! no bigger buckets are sold anywhere... */
 
-					if nil == b.Assign(&new_bucket, streams.PhpStreamBucketNew(stream, out_buf, out_buf_size-ocnt, 1, persistent)) {
+					if nil == lang.Assign(&new_bucket, streams.PhpStreamBucketNew(stream, out_buf, out_buf_size-ocnt, 1, persistent)) {
 						goto out_failure
 					}
 					streams.PhpStreamBucketAppend(buckets_out, new_bucket)
@@ -1277,7 +1278,7 @@ func StrfilterConvertAppendBucket(
 
 				/* whoa! no bigger buckets are sold anywhere... */
 
-				if nil == b.Assign(&new_bucket, streams.PhpStreamBucketNew(stream, out_buf, out_buf_size-ocnt, 1, persistent)) {
+				if nil == lang.Assign(&new_bucket, streams.PhpStreamBucketNew(stream, out_buf, out_buf_size-ocnt, 1, persistent)) {
 					goto out_failure
 				}
 				streams.PhpStreamBucketAppend(buckets_out, new_bucket)
@@ -1302,7 +1303,7 @@ func StrfilterConvertAppendBucket(
 		}
 	}
 	if out_buf_size > ocnt {
-		if nil == b.Assign(&new_bucket, streams.PhpStreamBucketNew(stream, out_buf, out_buf_size-ocnt, 1, persistent)) {
+		if nil == lang.Assign(&new_bucket, streams.PhpStreamBucketNew(stream, out_buf, out_buf_size-ocnt, 1, persistent)) {
 			goto out_failure
 		}
 		streams.PhpStreamBucketAppend(buckets_out, new_bucket)
@@ -1363,7 +1364,7 @@ func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persiste
 		core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): invalid filter parameter", filtername)
 		return nil
 	}
-	if b.Assign(&dot, strchr(filtername, '.')) == nil {
+	if lang.Assign(&dot, strchr(filtername, '.')) == nil {
 		return nil
 	}
 	dot++
@@ -1377,7 +1378,7 @@ func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persiste
 	} else if strcasecmp(dot, "quoted-printable-decode") == 0 {
 		conv_mode = PHP_CONV_QPRINT_DECODE
 	}
-	if PhpConvertFilterCtor(inst, conv_mode, b.CondF1(filterparams != nil, func() *types.Array { return filterparams.Array() }, nil), filtername, persistent) != types.SUCCESS {
+	if PhpConvertFilterCtor(inst, conv_mode, lang.CondF1(filterparams != nil, func() *types.Array { return filterparams.Array() }, nil), filtername, persistent) != types.SUCCESS {
 		goto out
 	}
 	retval = streams.PhpStreamFilterAlloc(&StrfilterConvertOps, inst, persistent)
@@ -1401,7 +1402,7 @@ func ConsumedFilterFilter(
 	if data.GetOffset() == ^0 {
 		data.SetOffset(stream.GetPosition())
 	}
-	for b.Assign(&bucket, buckets_in.GetHead()) != nil {
+	for lang.Assign(&bucket, buckets_in.GetHead()) != nil {
 		streams.PhpStreamBucketUnlink(bucket)
 		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)

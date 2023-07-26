@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -78,7 +79,7 @@ func (compiler *Compiler) CompileConstExprConst(ast_ptr **ZendAst) {
 		return
 	}
 	// ZendAstDestroy(ast)
-	*ast_ptr = ZendAstCreateConstant(resolved_name, b.Cond(!isFullyQualified, IS_CONSTANT_UNQUALIFIED, 0))
+	*ast_ptr = ZendAstCreateConstant(resolved_name, lang.Cond(!isFullyQualified, IS_CONSTANT_UNQUALIFIED, 0))
 }
 func (compiler *Compiler) CompileConstExprMagicConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr

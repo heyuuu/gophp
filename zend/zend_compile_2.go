@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -299,7 +300,7 @@ func ZendEmitFinalReturn(returnOne bool) {
 	} else {
 		zn.GetConstant().SetNull()
 	}
-	ret = ZendEmitOp(nil, b.Cond(returnsReference, ZEND_RETURN_BY_REF, ZEND_RETURN), &zn, nil)
+	ret = ZendEmitOp(nil, lang.Cond(returnsReference, ZEND_RETURN_BY_REF, ZEND_RETURN), &zn, nil)
 	ret.SetExtendedValue(-1)
 }
 func ZendIsVariable(ast *ZendAst) bool {
@@ -666,7 +667,7 @@ func (compiler *Compiler) CompileListAssign(result *Znode, ast *ZendAst, expr_no
 			//expr_node.GetConstant().TryAddRefcount()
 		}
 		ZendVerifyListAssignTarget(var_ast, old_style)
-		opline = ZendEmitOp(&fetch_result, b.CondF1(elem_ast.Attr() != 0, func() __auto__ {
+		opline = ZendEmitOp(&fetch_result, lang.CondF1(elem_ast.Attr() != 0, func() __auto__ {
 			if expr_node.GetOpType() == IS_CV {
 				return ZEND_FETCH_DIM_W
 			} else {

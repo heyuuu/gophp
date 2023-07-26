@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -58,17 +59,17 @@ func IfaceAppendUnicast(
 	zend.AddAssocLong(&u, "flags", flags)
 	if addr != nil {
 		zend.AddAssocLong(&u, "family", addr.sa_family)
-		if b.Assign(&host, PhpInetNtop(addr)) {
+		if lang.Assign(&host, PhpInetNtop(addr)) {
 			zend.AddAssocStr(&u, "address", host.GetStr())
 		}
 	}
-	if b.Assign(&host, PhpInetNtop(netmask)) {
+	if lang.Assign(&host, PhpInetNtop(netmask)) {
 		zend.AddAssocStr(&u, "netmask", host.GetStr())
 	}
-	if b.Assign(&host, PhpInetNtop(broadcast)) {
+	if lang.Assign(&host, PhpInetNtop(broadcast)) {
 		zend.AddAssocStr(&u, "broadcast", host.GetStr())
 	}
-	if b.Assign(&host, PhpInetNtop(ptp)) {
+	if lang.Assign(&host, PhpInetNtop(ptp)) {
 		zend.AddAssocStr(&u, "ptp", host.GetStr())
 	}
 	zend.AddNextIndexZval(unicast, &u)
@@ -100,7 +101,7 @@ func ZifNetGetInterfaces(executeData zpp.Ex, return_value zpp.Ret) {
 			zend.ArrayInit(&newuni)
 			unicast = iface.Array().KeyAdd("unicast", &newuni)
 		}
-		IfaceAppendUnicast(unicast, p.ifa_flags, p.ifa_addr, p.ifa_netmask, b.CondF1((p.ifa_flags&IFF_BROADCAST) != 0, func() __auto__ { return p.ifa_broadaddr }, nil), b.CondF1((p.ifa_flags&IFF_POINTOPOINT) != 0, func() __auto__ { return p.ifa_dstaddr }, nil))
+		IfaceAppendUnicast(unicast, p.ifa_flags, p.ifa_addr, p.ifa_netmask, lang.CondF1((p.ifa_flags&IFF_BROADCAST) != 0, func() __auto__ { return p.ifa_broadaddr }, nil), lang.CondF1((p.ifa_flags&IFF_POINTOPOINT) != 0, func() __auto__ { return p.ifa_dstaddr }, nil))
 		status = iface.Array().KeyFind("up")
 		if status == nil {
 			zend.AddAssocBool(iface, "up", (p.ifa_flags&IFF_UP) != 0)

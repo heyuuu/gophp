@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -90,7 +91,7 @@ func ZendCallMethod(object *types.Zval, objCe *types.ClassEntry, fnProxy *types.
 			}
 		}
 		if EG__().GetException() == nil {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't execute method %s%s%s", b.CondF1(objCe != nil, func() []byte { return objCe.Name() }, ""), b.Cond(objCe != nil, "::", ""), functionName)
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't execute method %s%s%s", lang.CondF1(objCe != nil, func() []byte { return objCe.Name() }, ""), lang.Cond(objCe != nil, "::", ""), functionName)
 		}
 	}
 	return retvalPtr
@@ -189,7 +190,7 @@ func ZendUserItGetNewIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	}
 	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.Object() == object.Object() {
 		if EG__().GetException() == nil {
-			faults.ThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.Name() }, func() []byte { return types.Z_OBJCE_P(object).Name() }))
+			faults.ThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", lang.CondF(ce != nil, func() []byte { return ce.Name() }, func() []byte { return types.Z_OBJCE_P(object).Name() }))
 		}
 		// ZvalPtrDtor(&iterator)
 		return nil

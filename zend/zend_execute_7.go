@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -64,7 +65,7 @@ func ZendRefAddTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *t
 		list.SetNumAllocated(list.GetNum() * 2)
 		list = Erealloc(list, b.SizeOf("zend_property_info_list")+(list.GetNumAllocated()-1)*b.SizeOf("zend_property_info *"))
 	}
-	list.GetPtr()[b.PostInc(&(list.GetNum()))] = prop
+	list.GetPtr()[lang.PostInc(&(list.GetNum()))] = prop
 	source_list.SetList(types.ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list))
 }
 func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *types.PropertyInfo) {
@@ -95,7 +96,7 @@ func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *t
 
 	/* Copy the last list element into the deleted slot. */
 
-	*ptr = list.GetPtr()[b.PreDec(&(list.GetNum()))]
+	*ptr = list.GetPtr()[lang.PreDec(&(list.GetNum()))]
 	if list.GetNum() >= 4 && list.GetNum()*4 == list.GetNumAllocated() {
 		list.SetNumAllocated(list.GetNum() * 2)
 		source_list.SetList(types.ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(Erealloc(list, b.SizeOf("zend_property_info_list")+(list.GetNumAllocated()-1)*b.SizeOf("zend_property_info *"))))
@@ -130,7 +131,7 @@ func ZendFetchThisVar(type_ int, opline *types.ZendOp, executeData *ZendExecuteD
 	}
 }
 func ZendWrongCloneCall(clone types.IFunction, scope *types.ClassEntry) {
-	faults.ThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().Name(), b.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
+	faults.ThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().Name(), lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
 }
 func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
 	/* Clean before putting into the cache, since clean could call dtors,
@@ -141,7 +142,7 @@ func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
 	if EG__().GetSymtableCachePtr() >= EG__().GetSymtableCacheLimit() {
 		symbol_table.Destroy()
 	} else {
-		*(b.PostInc(&(EG__().GetSymtableCachePtr()))) = symbol_table
+		*(lang.PostInc(&(EG__().GetSymtableCachePtr()))) = symbol_table
 	}
 }
 func IFreeCompiledVariables(executeData *ZendExecuteData) {
@@ -194,7 +195,7 @@ func ZendCopyExtraArgs(executeData *ZendExecuteData) {
 			types.ZVAL_COPY_VALUE((*types.Zval)((*byte)(src)+delta), src)
 			src.SetUndef()
 			src--
-			if !(b.PreDec(&count)) {
+			if !(lang.PreDec(&count)) {
 				break
 			}
 		}
@@ -208,7 +209,7 @@ func ZendCopyExtraArgs(executeData *ZendExecuteData) {
 				break
 			}
 			src--
-			if !(b.PreDec(&count)) {
+			if !(lang.PreDec(&count)) {
 				break
 			}
 		}
@@ -221,7 +222,7 @@ func ZendInitCvs(first uint32, last uint32, executeData *ZendExecuteData) {
 		for {
 			var_.SetUndef()
 			var_++
-			if !(b.PreDec(&count)) {
+			if !(lang.PreDec(&count)) {
 				break
 			}
 		}

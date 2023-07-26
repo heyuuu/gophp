@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -30,7 +31,7 @@ func StripHeader(header_bag *byte, lc_header_bag *byte, lc_header_name string) {
 }
 func CheckHasHeader(headers *byte, header string) bool {
 	var s *byte = headers
-	for b.Assign(&s, strstr(s, header)) {
+	for lang.Assign(&s, strstr(s, header)) {
 		if s == headers || (*(s - 1)) == '\n' {
 			return 1
 		}
@@ -90,7 +91,7 @@ func PhpStreamUrlWrapHttpEx(
 		return nil
 	}
 	if !(ascii.StrCaseEquals(resource.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(resource.GetScheme().GetStr(), "https")) {
-		if context == nil || b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) == nil || !tmpzval.IsString() || tmpzval.String().GetLen() == 0 {
+		if context == nil || lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) == nil || !tmpzval.IsString() || tmpzval.String().GetLen() == 0 {
 			PhpUrlFree(resource)
 			return core.PhpStreamOpenWrapperEx(path, mode, core.REPORT_ERRORS, nil, context)
 		}
@@ -120,15 +121,15 @@ func PhpStreamUrlWrapHttpEx(
 		} else if resource.GetPort() == 0 {
 			resource.SetPort(80)
 		}
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
+		if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 			use_proxy = 1
 			transport_len = tmpzval.String().GetLen()
 			transport_string = zend.Estrndup(tmpzval.String().GetVal(), tmpzval.String().GetLen())
 		} else {
-			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", b.Cond(use_ssl != 0, "ssl", "tcp"), resource.GetHost().GetVal(), resource.GetPort())
+			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", lang.Cond(use_ssl != 0, "ssl", "tcp"), resource.GetHost().GetVal(), resource.GetPort())
 		}
 	}
-	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "timeout")) != nil {
+	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "timeout")) != nil {
 		var d float64 = operators.ZvalGetDouble(tmpzval)
 		timeout.tv_sec = int64(d)
 		timeout.tv_usec = size_t((d - timeout.tv_sec) * 1000000)
@@ -151,7 +152,7 @@ func PhpStreamUrlWrapHttpEx(
 
 		/* Set peer_name or name verification will try to use the proxy server name */
 
-		if context == nil || b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ssl", "peer_name")) == nil {
+		if context == nil || lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ssl", "peer_name")) == nil {
 			ssl_proxy_peer_name.SetStringVal(resource.GetHost().GetStr())
 			streams.PhpStreamContextSetOption(core.PHP_STREAM_CONTEXT(stream), "ssl", "peer_name", &ssl_proxy_peer_name)
 			// zend.ZvalPtrDtor(&ssl_proxy_peer_name)
@@ -164,7 +165,7 @@ func PhpStreamUrlWrapHttpEx(
 
 		/* check if we have Proxy-Authorization header */
 
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "header")) != nil {
+		if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "header")) != nil {
 			var s *byte
 			var p *byte
 			if tmpzval.IsType(types.IS_ARRAY) {
@@ -297,11 +298,11 @@ func PhpStreamUrlWrapHttpEx(
 	stream.SubFlags(core.PHP_STREAM_FLAG_DETECT_EOL | core.PHP_STREAM_FLAG_EOL_MAC)
 	streams.PhpStreamContextSet(stream, context)
 	streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_CONNECT, nil, 0)
-	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "max_redirects")) != nil {
+	if header_init != 0 && context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "max_redirects")) != nil {
 		redirect_max = int(operators.ZvalGetLong(tmpzval))
 	}
 	custom_request_method = 0
-	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "method")) != nil {
+	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "method")) != nil {
 		if tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 
 			if redirected == 0 || tmpzval.String().GetLen() == 3 && memcmp("GET", tmpzval.String().GetVal(), 3) == 0 || tmpzval.String().GetLen() == 4 && memcmp("HEAD", tmpzval.String().GetVal(), 4) == 0 {
@@ -321,7 +322,7 @@ func PhpStreamUrlWrapHttpEx(
 
 	/* Should we send the entire path in the request line, default to no. */
 
-	if request_fulluri == 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "request_fulluri")) != nil {
+	if request_fulluri == 0 && context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "request_fulluri")) != nil {
 		request_fulluri = operators.IZendIsTrue(tmpzval)
 	}
 	if request_fulluri != 0 {
@@ -355,7 +356,7 @@ func PhpStreamUrlWrapHttpEx(
 
 	/* protocol version we are speaking */
 
-	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "protocol_version")) != nil {
+	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "protocol_version")) != nil {
 		var protocol_version *byte
 		core.Spprintf(&protocol_version, 0, "%.1F", operators.ZvalGetDouble(tmpzval))
 		req_buf.WriteString(" HTTP/")
@@ -365,7 +366,7 @@ func PhpStreamUrlWrapHttpEx(
 	} else {
 		req_buf.WriteString(" HTTP/1.0\r\n")
 	}
-	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "header")) != nil {
+	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "header")) != nil {
 		tmp = nil
 		if tmpzval.IsType(types.IS_ARRAY) {
 			var tmpheader *types.Zval = nil
@@ -437,7 +438,7 @@ func PhpStreamUrlWrapHttpEx(
 
 			/* remove Proxy-Authorization header */
 
-			if use_proxy != 0 && use_ssl != 0 && b.Assign(&s, strstr(t, "proxy-authorization:")) && (s == t || (*(s - 1)) == '\n') {
+			if use_proxy != 0 && use_ssl != 0 && lang.Assign(&s, strstr(t, "proxy-authorization:")) && (s == t || (*(s - 1)) == '\n') {
 				var p *byte = s + b.SizeOf("\"proxy-authorization:\"") - 1
 				for s > t && ((*(s - 1)) == ' ' || (*(s - 1)) == '\t') {
 					s--
@@ -532,7 +533,7 @@ func PhpStreamUrlWrapHttpEx(
 	if (have_header & HTTP_HEADER_CONNECTION) == 0 {
 		req_buf.WriteString("Connection: close\r\n")
 	}
-	if context != nil && b.Assign(&ua_zval, streams.PhpStreamContextGetOption(context, "http", "user_agent")) != nil && ua_zval.IsString() {
+	if context != nil && lang.Assign(&ua_zval, streams.PhpStreamContextGetOption(context, "http", "user_agent")) != nil && ua_zval.IsString() {
 		ua_str = ua_zval.String().GetVal()
 	} else if FG__().user_agent {
 		ua_str = FG__().user_agent
@@ -547,7 +548,7 @@ func PhpStreamUrlWrapHttpEx(
 
 		if ua_len > b.SizeOf("_UA_HEADER") {
 			ua = zend.Emalloc(ua_len + 1)
-			if b.Assign(&ua_len, core.Slprintf(ua, ua_len, _UA_HEADER, ua_str)) > 0 {
+			if lang.Assign(&ua_len, core.Slprintf(ua, ua_len, _UA_HEADER, ua_str)) > 0 {
 				ua[ua_len] = 0
 				req_buf.WriteString(b.CastStr(ua, ua_len))
 			} else {
@@ -565,7 +566,7 @@ func PhpStreamUrlWrapHttpEx(
 		 * see bug #44603 for details. Since Content-Type maybe part of user's headers we need to do this check first.
 		 */
 
-		if header_init != 0 && context != nil && (have_header&HTTP_HEADER_CONTENT_LENGTH) == 0 && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
+		if header_init != 0 && context != nil && (have_header&HTTP_HEADER_CONTENT_LENGTH) == 0 && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 			req_buf.WriteString("Content-Length: ")
 			req_buf.WriteUlong(tmpzval.String().GetLen())
 			req_buf.WriteString("\r\n")
@@ -578,7 +579,7 @@ func PhpStreamUrlWrapHttpEx(
 
 	/* Request content, such as for POST requests */
 
-	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
+	if header_init != 0 && context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsString() && tmpzval.String().GetLen() > 0 {
 		if (have_header & HTTP_HEADER_CONTENT_LENGTH) == 0 {
 			req_buf.WriteString("Content-Length: ")
 			req_buf.WriteUlong(tmpzval.String().GetLen())
@@ -612,7 +613,7 @@ func PhpStreamUrlWrapHttpEx(
 		} else {
 			response_code = 0
 		}
-		if context != nil && nil != b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "ignore_errors")) {
+		if context != nil && nil != lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "ignore_errors")) {
 			ignore_errors = operators.IZendIsTrue(tmpzval)
 		}
 
@@ -682,7 +683,7 @@ func PhpStreamUrlWrapHttpEx(
 		if http_header_line != nil {
 			zend.Efree(http_header_line)
 		}
-		if b.Assign(&http_header_line, core.PhpStreamGetLine(stream, nil, 0, &http_header_line_length)) && (*http_header_line) != '\n' && (*http_header_line) != '\r' {
+		if lang.Assign(&http_header_line, core.PhpStreamGetLine(stream, nil, 0, &http_header_line_length)) && (*http_header_line) != '\n' && (*http_header_line) != '\r' {
 			var e *byte = http_header_line + http_header_line_length - 1
 			var http_header_value *byte
 			for e >= http_header_line && ((*e) == '\n' || (*e) == '\r') {
@@ -727,7 +728,7 @@ func PhpStreamUrlWrapHttpEx(
 
 			}
 			if !(strncasecmp(http_header_line, "Location:", b.SizeOf("\"Location:\"")-1)) {
-				if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "follow_location")) != nil {
+				if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "follow_location")) != nil {
 					follow_location = operators.IZendIsTrue(tmpzval)
 				} else if !(response_code >= 300 && response_code < 304 || 307 == response_code || 308 == response_code) {
 
@@ -756,7 +757,7 @@ func PhpStreamUrlWrapHttpEx(
 
 				if (options & core.STREAM_ONLY_GET_HEADERS) == 0 {
 					var decode zend.ZendLong = 1
-					if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "auto_decode")) != nil {
+					if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "auto_decode")) != nil {
 						decode = operators.IZendIsTrue(tmpzval)
 					}
 					if decode != 0 {
@@ -834,7 +835,7 @@ func PhpStreamUrlWrapHttpEx(
 
 			/* check for invalid redirection URLs */
 
-			if b.Assign(&resource, PhpUrlParse(new_path)) == nil {
+			if lang.Assign(&resource, PhpUrlParse(new_path)) == nil {
 				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid redirect URL! %s", new_path)
 				goto out
 			}
@@ -857,7 +858,7 @@ func PhpStreamUrlWrapHttpEx(
 				CHECK_FOR_CNTRL_CHARS(resource.GetPass())
 				CHECK_FOR_CNTRL_CHARS(resource.GetPath())
 			}
-			stream = PhpStreamUrlWrapHttpEx(wrapper, new_path, mode, options, opened_path, context, b.PreDec(&redirect_max), HTTP_WRAPPER_REDIRECTED, response_header)
+			stream = PhpStreamUrlWrapHttpEx(wrapper, new_path, mode, options, opened_path, context, lang.PreDec(&redirect_max), HTTP_WRAPPER_REDIRECTED, response_header)
 		} else {
 			streams.PhpStreamWrapperLogError(wrapper, options, "HTTP request failed! %s", tmp_line)
 		}

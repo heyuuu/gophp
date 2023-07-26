@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -133,7 +134,7 @@ func SplFilesystemObjectGetPath(intern *SplFilesystemObject, len_ *int) *byte {
 	return intern.GetPath()
 }
 func SplFilesystemObjectGetFileName(intern *SplFilesystemObject) {
-	var slash byte = b.Cond(SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_DIR_UNIXPATHS) != 0, '/', zend.DEFAULT_SLASH)
+	var slash byte = lang.Cond(SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_DIR_UNIXPATHS) != 0, '/', zend.DEFAULT_SLASH)
 	switch intern.GetType() {
 	case SPL_FS_INFO:
 		fallthrough
@@ -178,7 +179,7 @@ func SplFilesystemDirOpen(intern *SplFilesystemObject, path *byte) {
 	intern.SetPathLen(strlen(path))
 	intern.SetDirp(core.PhpStreamOpendir(path, core.REPORT_ERRORS, standard.FG__().default_context))
 	if intern.GetPathLen() > 1 && IS_SLASH_AT(path, intern.GetPathLen()-1) {
-		intern.SetPath(zend.Estrndup(path, b.PreDec(&(intern.GetPathLen()))))
+		intern.SetPath(zend.Estrndup(path, lang.PreDec(&(intern.GetPathLen()))))
 	} else {
 		intern.SetPath(zend.Estrndup(path, intern.GetPathLen()))
 	}
@@ -214,10 +215,10 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 		return types.FAILURE
 	}
 	intern.SetContext(streams.PhpStreamContextFromZval(intern.GetZcontext(), 0))
-	intern.SetStream(core.PhpStreamOpenWrapperEx(intern.GetFileName(), intern.GetOpenMode(), b.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, intern.GetContext()))
+	intern.SetStream(core.PhpStreamOpenWrapperEx(intern.GetFileName(), intern.GetOpenMode(), lang.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, intern.GetContext()))
 	if intern.GetFileNameLen() == 0 || intern.GetStream() == nil {
 		if zend.EG__().GetException() == nil {
-			faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot open file '%s'", b.CondF1(intern.GetFileNameLen() != 0, func() *byte { return intern.GetFileName() }, ""))
+			faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot open file '%s'", lang.CondF1(intern.GetFileNameLen() != 0, func() *byte { return intern.GetFileName() }, ""))
 		}
 		intern.SetFileName(nil)
 		intern.SetOpenMode(nil)
@@ -317,7 +318,7 @@ func SplFilesystemInfoSetFilename(intern *SplFilesystemObject, path *byte, len_ 
 	p1 = strrchr(intern.GetFileName(), '/')
 	p2 = 0
 	if p1 != nil || p2 != nil {
-		intern.SetPathLen(b.Cond(p1 > p2, p1, p2) - intern.GetFileName())
+		intern.SetPathLen(lang.Cond(p1 > p2, p1, p2) - intern.GetFileName())
 	} else {
 		intern.SetPathLen(0)
 	}
@@ -495,7 +496,7 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.Array {
 	rv = types.ZendArrayDup(intern.GetStd().GetProperties())
 	pnstr = SplGenPrivatePropName(spl_ce_SplFileInfo, "pathName")
 	path = SplFilesystemObjectGetPathname(intern, &path_len)
-	tmp.SetStringVal(b.CastStr(b.Cond(path != nil, path, ""), path_len))
+	tmp.SetStringVal(b.CastStr(lang.Cond(path != nil, path, ""), path_len))
 	rv.SymtableUpdate(pnstr.GetStr(), &tmp)
 	// types.ZendStringReleaseEx(pnstr, 0)
 	if intern.GetFileName() != nil {
@@ -1237,7 +1238,7 @@ func zim_spl_RecursiveDirectoryIterator_getChildren(executeData *zend.ZendExecut
 	var zflags types.Zval
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(executeData.ThisObjectZval())
 	var subdir *SplFilesystemObject
-	var slash byte = b.Cond(SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_DIR_UNIXPATHS) != 0, '/', zend.DEFAULT_SLASH)
+	var slash byte = lang.Cond(SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_DIR_UNIXPATHS) != 0, '/', zend.DEFAULT_SLASH)
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1274,7 +1275,7 @@ func zim_spl_RecursiveDirectoryIterator_getSubPath(executeData *zend.ZendExecute
 }
 func zim_spl_RecursiveDirectoryIterator_getSubPathname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(executeData.ThisObjectZval())
-	var slash byte = b.Cond(SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_DIR_UNIXPATHS) != 0, '/', zend.DEFAULT_SLASH)
+	var slash byte = lang.Cond(SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_DIR_UNIXPATHS) != 0, '/', zend.DEFAULT_SLASH)
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1476,7 +1477,7 @@ func SplFilesystemObjectCast(readobj *types.Zval, writeobj *types.Zval, type_ in
 func SplFilesystemFileRead(intern *SplFilesystemObject, silent int) int {
 	var buf *byte
 	var line_len int = 0
-	var line_add zend.ZendLong = b.Cond(intern.GetCurrentLine() != nil || !(intern.GetCurrentZval().IsUndef()), 1, 0)
+	var line_add zend.ZendLong = lang.Cond(intern.GetCurrentLine() != nil || !(intern.GetCurrentZval().IsUndef()), 1, 0)
 	SplFilesystemFileFreeLine(intern)
 	if core.PhpStreamEof(intern.GetStream()) != 0 {
 		if silent == 0 {
@@ -1526,7 +1527,7 @@ func SplFilesystemFileCall(intern *SplFilesystemObject, funcPtr types.IFunction,
 	}
 
 	// 拼装 params
-	var numArgs int = passNumArgs + b.Cond(arg2 != nil, 2, 1)
+	var numArgs int = passNumArgs + lang.Cond(arg2 != nil, 2, 1)
 	var params []*types.Zval = make([]*types.Zval, 0, numArgs)
 	params = append(params, zresourcePtr)
 	if arg2 != nil {
@@ -1698,7 +1699,7 @@ func zim_spl_SplFileObject___construct(executeData *zend.ZendExecuteData, return
 		p1 = strrchr(tmp_path, '/')
 		p2 = 0
 		if p1 != nil || p2 != nil {
-			intern.SetPathLen(b.Cond(p1 > p2, p1, p2) - tmp_path)
+			intern.SetPathLen(lang.Cond(p1 > p2, p1, p2) - tmp_path)
 		} else {
 			intern.SetPathLen(0)
 		}

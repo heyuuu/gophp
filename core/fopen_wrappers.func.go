@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -176,17 +177,17 @@ func PhpCheckSpecificOpenBasedir(basedir *byte, path *byte) int {
 		if basedir[basedir_len-1] == PHP_DIR_SEPARATOR {
 			if resolved_basedir[resolved_basedir_len-1] != PHP_DIR_SEPARATOR {
 				resolved_basedir[resolved_basedir_len] = PHP_DIR_SEPARATOR
-				resolved_basedir[b.PreInc(&resolved_basedir_len)] = '0'
+				resolved_basedir[lang.PreInc(&resolved_basedir_len)] = '0'
 			}
 		} else {
-			resolved_basedir[b.PostInc(&resolved_basedir_len)] = PHP_DIR_SEPARATOR
+			resolved_basedir[lang.PostInc(&resolved_basedir_len)] = PHP_DIR_SEPARATOR
 			resolved_basedir[resolved_basedir_len] = '0'
 		}
 		resolved_name_len = strlen(resolved_name)
 		if path_tmp[path_len-1] == PHP_DIR_SEPARATOR {
 			if resolved_name[resolved_name_len-1] != PHP_DIR_SEPARATOR {
 				resolved_name[resolved_name_len] = PHP_DIR_SEPARATOR
-				resolved_name[b.PreInc(&resolved_name_len)] = '0'
+				resolved_name[lang.PreInc(&resolved_name_len)] = '0'
 			}
 		}
 
@@ -318,12 +319,12 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 				filename = SG__().RequestInfo.pathTranslated
 			}
 		}
-	} else if PG__().doc_root && path_info != nil && b.Assign(&length, strlen(PG__().doc_root)) && zend.IS_ABSOLUTE_PATH(PG__().doc_root, length) {
+	} else if PG__().doc_root && path_info != nil && lang.Assign(&length, strlen(PG__().doc_root)) && zend.IS_ABSOLUTE_PATH(PG__().doc_root, length) {
 		var path_len int = strlen(path_info)
 		filename = zend.Emalloc(length + path_len + 2)
 		memcpy(filename, PG__().doc_root, length)
 		if !(zend.IS_SLASH(filename[length-1])) {
-			filename[b.PostInc(&length)] = PHP_DIR_SEPARATOR
+			filename[lang.PostInc(&length)] = PHP_DIR_SEPARATOR
 		}
 		if zend.IS_SLASH(path_info[0]) {
 			length--
@@ -476,10 +477,10 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 	/* check in calling scripts' current working directory as a fall back case
 	 */
 
-	if zend.ZendIsExecuting() != 0 && b.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
+	if zend.ZendIsExecuting() != 0 && lang.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
 		var exec_fname *byte = exec_filename.GetVal()
 		var exec_fname_length int = exec_filename.GetLen()
-		for b.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
+		for lang.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
 
 		}
 		if exec_fname_length > 0 && filename_length < MAXPATHLEN-2 && exec_fname_length+1+filename_length+1 < MAXPATHLEN {
@@ -541,10 +542,10 @@ func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **typ
 
 	/* check in provided path */
 
-	if zend.ZendIsExecuting() != 0 && b.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
+	if zend.ZendIsExecuting() != 0 && lang.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
 		var exec_fname *byte = exec_filename.GetVal()
 		var exec_fname_length int = exec_filename.GetLen()
-		for b.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
+		for lang.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
 
 		}
 		if exec_fname != nil && exec_fname[0] == '[' || exec_fname_length <= 0 {
@@ -609,7 +610,7 @@ func PhpStripUrlPasswd(url *byte) *byte {
 						url_start++
 					}
 					for ; *p; p++ {
-						b.PostInc(&(*url_start)) = *p
+						lang.PostInc(&(*url_start)) = *p
 					}
 					*url_start = 0
 					break

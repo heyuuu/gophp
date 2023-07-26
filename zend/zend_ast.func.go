@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -154,7 +155,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 
 			/* op1 > op2 is the same as op2 < op1 */
 
-			var op BinaryOpType = b.Cond(ast.Kind() == ZEND_AST_GREATER, operators.IsSmallerFunction, operators.IsSmallerOrEqualFunction)
+			var op BinaryOpType = lang.Cond(ast.Kind() == ZEND_AST_GREATER, operators.IsSmallerFunction, operators.IsSmallerOrEqualFunction)
 			ret = op(result, &op2, &op1)
 			// ZvalPtrDtorNogc(&op1)
 			// ZvalPtrDtorNogc(&op2)
@@ -324,7 +325,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		} else if ZendAstEvaluate(&op2, ast.Child(1), scope) != types.SUCCESS {
 			ret = types.FAILURE
 		} else {
-			ZendFetchDimensionConst(result, &op1, &op2, b.Cond((ast.Attr()&ZEND_DIM_IS) != 0, BP_VAR_IS, BP_VAR_R))
+			ZendFetchDimensionConst(result, &op1, &op2, lang.Cond((ast.Attr()&ZEND_DIM_IS) != 0, BP_VAR_IS, BP_VAR_R))
 		}
 	default:
 		faults.ThrowError(nil, "Unsupported constant expression")

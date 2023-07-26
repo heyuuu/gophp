@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -83,7 +84,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
 
 	/* parse scheme */
 
-	if b.Assign(&e, memchr(s, ':', length)) && e != s {
+	if lang.Assign(&e, memchr(s, ':', length)) && e != s {
 
 		/* validate scheme */
 
@@ -203,8 +204,8 @@ parse_host:
 
 	/* check for login and password */
 
-	if b.Assign(&p, operators.ZendMemrchr(s, '@', e-s)) {
-		if b.Assign(&pp, memchr(s, ':', p-s)) {
+	if lang.Assign(&p, operators.ZendMemrchr(s, '@', e-s)) {
+		if lang.Assign(&pp, memchr(s, ':', p-s)) {
 			ret.SetUser(types.NewString(b.CastStr(s, pp-s)))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 			pp++
@@ -427,7 +428,7 @@ func PhpHtoi(s *byte) int {
 	if isupper(c) {
 		c = tolower(c)
 	}
-	value = b.Cond(c >= '0' && c <= '9', c-'0', c-'a'+10) * 16
+	value = lang.Cond(c >= '0' && c <= '9', c-'0', c-'a'+10) * 16
 	c = (*uint8)(s)[1]
 	if isupper(c) {
 		c = tolower(c)
@@ -496,7 +497,7 @@ func PhpUrlDecodeEx(str string) string {
 func PhpUrlDecode(str *byte, len_ int) int {
 	var dest *byte = str
 	var data *byte = str
-	for b.PostDec(&len_) {
+	for lang.PostDec(&len_) {
 		if (*data) == '+' {
 			*dest = ' '
 		} else if (*data) == '%' && len_ >= 2 && isxdigit(int(*(data + 1))) && isxdigit(int(*(data + 2))) {
@@ -562,7 +563,7 @@ func PhpRawUrlDecodeEx(str string) string {
 func PhpRawUrlDecode(str *byte, len_ int) int {
 	var dest *byte = str
 	var data *byte = str
-	for b.PostDec(&len_) {
+	for lang.PostDec(&len_) {
 		if (*data) == '%' && len_ >= 2 && isxdigit(int(*(data + 1))) && isxdigit(int(*(data + 2))) {
 			*dest = byte(PhpHtoi(data + 1))
 			data += 2
@@ -600,7 +601,7 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 		break
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
-	if !(b.Assign(&stream, core.PhpStreamOpenWrapperEx(url, "r", core.REPORT_ERRORS|core.STREAM_USE_URL|core.STREAM_ONLY_GET_HEADERS, nil, context))) {
+	if !(lang.Assign(&stream, core.PhpStreamOpenWrapperEx(url, "r", core.REPORT_ERRORS|core.STREAM_USE_URL|core.STREAM_ONLY_GET_HEADERS, nil, context))) {
 		return_value.SetFalse()
 		return
 	}
@@ -625,14 +626,14 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 			var c byte
 			var s *byte
 			var p *byte
-			if b.Assign(&p, strchr(hdr.String().GetVal(), ':')) {
+			if lang.Assign(&p, strchr(hdr.String().GetVal(), ':')) {
 				c = *p
 				*p = '0'
 				s = p + 1
 				for isspace(int(*((*uint8)(s)))) {
 					s++
 				}
-				if b.Assign(&prev_val, return_value.Array().KeyFind(b.CastStr(hdr.String().GetVal(), p-hdr.String().GetVal()))) == nil {
+				if lang.Assign(&prev_val, return_value.Array().KeyFind(b.CastStr(hdr.String().GetVal(), p-hdr.String().GetVal()))) == nil {
 					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.String().GetVal(), p-hdr.String().GetVal()), b.CastStr(s, hdr.String().GetLen()-(s-hdr.String().GetVal())))
 				} else {
 					operators.ConvertToArray(prev_val)

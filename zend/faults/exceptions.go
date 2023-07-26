@@ -4,6 +4,7 @@ import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core/pfmt"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -209,13 +210,13 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	object := types.NewObject(class_type, &DefaultExceptionHandlers)
 	obj.SetObject(object)
 	if zend.CurrEX() != nil {
-		zend.ZendFetchDebugBacktrace(&trace, skip_top_traces, b.Cond(zend.EG__().GetExceptionIgnoreArgs() != 0, zend.DEBUG_BACKTRACE_IGNORE_ARGS, 0), 0)
+		zend.ZendFetchDebugBacktrace(&trace, skip_top_traces, lang.Cond(zend.EG__().GetExceptionIgnoreArgs() != 0, zend.DEBUG_BACKTRACE_IGNORE_ARGS, 0), 0)
 	} else {
 		zend.ArrayInit(&trace)
 	}
 	//trace.SetRefcount(0)
 	base_ce = GetExceptionBase(&obj)
-	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(b.Assign(&filename, zend.ZendGetCompiledFilename())) {
+	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(lang.Assign(&filename, zend.ZendGetCompiledFilename())) {
 		tmp.SetStringVal(b.CastStrAuto(zend.ZendGetExecutedFilename()))
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_FILE, &tmp)
 		// zend.ZvalPtrDtor(&tmp)
@@ -535,7 +536,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 			Error(E_WARNING, "Expected array for frame "+zend.ZEND_ULONG_FMT, key.IdxKey())
 			return
 		}
-		_buildTraceString(&str, frame.Array(), b.PostInc(&num))
+		_buildTraceString(&str, frame.Array(), lang.PostInc(&num))
 	})
 	str.WriteByte('#')
 	str.WriteLong(num)
@@ -584,9 +585,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 			message = real_message
 		}
 		if message.GetLen() > 0 {
-			str = zend.ZendSprintfZStr("%s: %s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), message.GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && trace.String().GetLen() != 0, func() []byte { return trace.String().GetVal() }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = zend.ZendSprintfZStr("%s: %s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), message.GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.String().GetLen() != 0, func() []byte { return trace.String().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		} else {
-			str = zend.ZendSprintfZStr("%s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && trace.String().GetLen() != 0, func() []byte { return trace.String().GetVal() }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = zend.ZendSprintfZStr("%s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.String().GetLen() != 0, func() []byte { return trace.String().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		}
 		// types.ZendStringReleaseEx(prev_str, 0)
 		// types.ZendStringReleaseEx(message, 0)
@@ -603,7 +604,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 
 	/* Reset apply counts */
 
-	for exception != nil && exception.IsObject() && b.Assign(&base_ce, GetExceptionBase(exception)) && operators.InstanceofFunction(types.Z_OBJCE_P(exception), base_ce) != 0 {
+	for exception != nil && exception.IsObject() && lang.Assign(&base_ce, GetExceptionBase(exception)) && operators.InstanceofFunction(types.Z_OBJCE_P(exception), base_ce) != 0 {
 		if exception.Object().IsRecursive() {
 			exception.Object().UnprotectRecursive()
 		} else {

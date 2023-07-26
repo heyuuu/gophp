@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -17,7 +18,7 @@ func PhpSelect(m core.PhpSocketT, r *fd_set, w *fd_set, e *fd_set, t *__struct__
 	return select_(m, r, w, e, t)
 }
 func GET_CTX_OPT(stream *core.PhpStream, wrapper string, name string, val *types.Zval) bool {
-	return core.PHP_STREAM_CONTEXT(stream) != nil && nil != b.Assign(&val, streams.PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), wrapper, name))
+	return core.PHP_STREAM_CONTEXT(stream) != nil && nil != lang.Assign(&val, streams.PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), wrapper, name))
 }
 func ZifStreamSocketPair(executeData zpp.Ex, return_value zpp.Ret, domain *types.Zval, type_ *types.Zval, protocol *types.Zval) {
 	var domain zend.ZendLong
@@ -107,13 +108,13 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 	if zerrstr != nil {
 		zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zerrstr)
 	}
-	stream = streams.PhpStreamXportCreate(host.GetVal(), host.GetLen(), core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|b.Cond((flags&PHP_STREAM_CLIENT_CONNECT) != 0, streams.STREAM_XPORT_CONNECT, 0)|b.Cond((flags&PHP_STREAM_CLIENT_ASYNC_CONNECT) != 0, streams.STREAM_XPORT_CONNECT_ASYNC, 0), hashkey, &tv, context, &errstr, &err)
+	stream = streams.PhpStreamXportCreate(host.GetVal(), host.GetLen(), core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|lang.Cond((flags&PHP_STREAM_CLIENT_CONNECT) != 0, streams.STREAM_XPORT_CONNECT, 0)|lang.Cond((flags&PHP_STREAM_CLIENT_ASYNC_CONNECT) != 0, streams.STREAM_XPORT_CONNECT_ASYNC, 0), hashkey, &tv, context, &errstr, &err)
 	if stream == nil {
 
 		/* host might contain binary characters */
 
 		var quoted_host *types.String = types.NewString(str.PhpAddslashes(host.GetStr()))
-		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), lang.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 		// types.ZendStringReleaseEx(quoted_host, 0)
 	}
 	if hashkey != nil {
@@ -177,7 +178,7 @@ func ZifStreamSocketServer(executeData zpp.Ex, return_value zpp.Ret, localaddres
 	}
 	stream = streams.PhpStreamXportCreate(host, host_len, core.REPORT_ERRORS, streams.STREAM_XPORT_SERVER|int(flags), nil, nil, context, &errstr, &err)
 	if stream == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", host, b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", host, lang.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 	}
 	if stream == nil {
 		if zerrno != nil {
@@ -228,7 +229,7 @@ func ZifStreamSocketAccept(executeData zpp.Ex, return_value zpp.Ret, serverstrea
 	conv = php_timeout_ull(timeout * 1000000.0)
 	tv.tv_sec = conv / 1000000
 	tv.tv_usec = conv % 1000000
-	if 0 == streams.PhpStreamXportAccept(stream, &clistream, b.Cond(zpeername != nil, &peername, nil), nil, nil, &tv, &errstr) && clistream != nil {
+	if 0 == streams.PhpStreamXportAccept(stream, &clistream, lang.Cond(zpeername != nil, &peername, nil), nil, nil, &tv, &errstr) && clistream != nil {
 		if peername != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zpeername, peername)
 		}
@@ -237,7 +238,7 @@ func ZifStreamSocketAccept(executeData zpp.Ex, return_value zpp.Ret, serverstrea
 		if peername != nil {
 			// types.ZendStringRelease(peername)
 		}
-		core.PhpErrorDocref(nil, faults.E_WARNING, "accept failed: %s", b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error"))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "accept failed: %s", lang.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error"))
 		return_value.SetFalse()
 	}
 	if errstr != nil {
@@ -314,7 +315,7 @@ func ZifStreamSocketSendto(executeData zpp.Ex, return_value zpp.Ret, stream *typ
 		/* parse the address */
 
 	}
-	return_value.SetLong(streams.PhpStreamXportSendto(stream, data, datalen, int(flags), b.Cond(target_addr_len != 0, &sa, nil), sl))
+	return_value.SetLong(streams.PhpStreamXportSendto(stream, data, datalen, int(flags), lang.Cond(target_addr_len != 0, &sa, nil), sl))
 	return
 }
 func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream_ zpp.Resource, amount int, _ zpp.Opt, flags int, remoteAddr zpp.RefZval) (string, bool) {
@@ -336,7 +337,7 @@ func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream_ z
 		return "", false
 	}
 	read_buf = types.ZendStringAlloc(to_read, 0)
-	recvd = streams.PhpStreamXportRecvfrom(stream, read_buf.GetVal(), to_read, int(flags), nil, nil, b.Cond(zremote != nil, &remote_addr, nil))
+	recvd = streams.PhpStreamXportRecvfrom(stream, read_buf.GetVal(), to_read, int(flags), nil, nil, lang.Cond(zremote != nil, &remote_addr, nil))
 	if recvd >= 0 {
 		if zremote != nil && remote_addr != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zremote, remote_addr)
@@ -399,7 +400,7 @@ func ZifStreamGetContents(executeData zpp.Ex, return_value zpp.Ret, source *type
 			return
 		}
 	}
-	if b.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) {
+	if lang.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) {
 		return_value.SetString(contents)
 		return
 	} else {
@@ -491,7 +492,7 @@ func ZifStreamGetTransports(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	if b.Assign(&stream_xport_hash, streams.PhpStreamXportGetHash()) {
+	if lang.Assign(&stream_xport_hash, streams.PhpStreamXportGetHash()) {
 		zend.ArrayInit(return_value)
 		var __ht *types.Array = stream_xport_hash
 		for _, _p := range __ht.ForeachData() {
@@ -511,7 +512,7 @@ func ZifStreamGetWrappers(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	if b.Assign(&url_stream_wrappers_hash, core.PhpStreamGetUrlStreamWrappersHash()) {
+	if lang.Assign(&url_stream_wrappers_hash, core.PhpStreamGetUrlStreamWrappersHash()) {
 		zend.ArrayInit(return_value)
 		var __ht *types.Array = url_stream_wrappers_hash
 		for _, _p := range __ht.ForeachData() {
@@ -883,7 +884,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 func ParseContextParams(context *core.PhpStreamContext, params *types.Zval) int {
 	var ret int = types.SUCCESS
 	var tmp *types.Zval
-	if nil != b.Assign(&tmp, params.Array().KeyFind("notification")) {
+	if nil != lang.Assign(&tmp, params.Array().KeyFind("notification")) {
 		if context.GetNotifier() != nil {
 			streams.PhpStreamNotificationFree(context.GetNotifier())
 			context.SetNotifier(nil)
@@ -893,7 +894,7 @@ func ParseContextParams(context *core.PhpStreamContext, params *types.Zval) int 
 		types.ZVAL_COPY(context.GetNotifier().GetPtr(), tmp)
 		context.GetNotifier().SetDtor(UserSpaceStreamNotifierDtor)
 	}
-	if nil != b.Assign(&tmp, params.Array().KeyFind("options")) {
+	if nil != lang.Assign(&tmp, params.Array().KeyFind("options")) {
 		if tmp.IsType(types.IS_ARRAY) {
 			ParseContextOptions(context, tmp)
 		} else {
@@ -970,7 +971,7 @@ func ZifStreamContextSetOption(executeData zpp.Ex, return_value zpp.Ret, streamO
 
 		/* figure out where the context is coming from exactly */
 
-		if !(b.Assign(&context, DecodeContextParam(zcontext))) {
+		if !(lang.Assign(&context, DecodeContextParam(zcontext))) {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid stream/context parameter")
 			return_value.SetFalse()
 			return
@@ -1004,7 +1005,7 @@ func ZifStreamContextSetOption(executeData zpp.Ex, return_value zpp.Ret, streamO
 
 		/* figure out where the context is coming from exactly */
 
-		if !(b.Assign(&context, DecodeContextParam(zcontext))) {
+		if !(lang.Assign(&context, DecodeContextParam(zcontext))) {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid stream/context parameter")
 			return_value.SetFalse()
 			return
@@ -1299,7 +1300,7 @@ func ZifStreamGetLine(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zv
 		max_length = core.PHP_SOCK_CHUNK_SIZE
 	}
 	core.PhpStreamFromZval(stream, zstream)
-	if b.Assign(&buf, streams.PhpStreamGetRecord(stream, max_length, str, str_len)) {
+	if lang.Assign(&buf, streams.PhpStreamGetRecord(stream, max_length, str, str_len)) {
 		return_value.SetString(buf)
 		return
 	} else {
@@ -1402,7 +1403,7 @@ func ZifStreamSetWriteBuffer(executeData zpp.Ex, return_value zpp.Ret, fp *types
 	} else {
 		ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_WRITE_BUFFER, core.PHP_STREAM_BUFFER_FULL, &buff)
 	}
-	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
+	return_value.SetLong(lang.Cond(ret == 0, 0, r.EOF))
 	return
 }
 func ZifStreamSetChunkSize(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, chunkSize *types.Zval) {
@@ -1441,7 +1442,7 @@ func ZifStreamSetChunkSize(executeData zpp.Ex, return_value zpp.Ret, fp *types.Z
 	}
 	core.PhpStreamFromZval(stream, zstream)
 	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_SET_CHUNK_SIZE, int(csize), nil)
-	return_value.SetLong(b.CondF(ret > 0, func() zend.ZendLong { return zend.ZendLong(ret) }, func() zend.ZendLong { return zend.ZendLong(r.EOF) }))
+	return_value.SetLong(lang.CondF(ret > 0, func() zend.ZendLong { return zend.ZendLong(ret) }, func() zend.ZendLong { return zend.ZendLong(r.EOF) }))
 	return
 }
 func ZifStreamSetReadBuffer(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, buffer *types.Zval) {
@@ -1473,7 +1474,7 @@ func ZifStreamSetReadBuffer(executeData zpp.Ex, return_value zpp.Ret, fp *types.
 	} else {
 		ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_READ_BUFFER, core.PHP_STREAM_BUFFER_FULL, &buff)
 	}
-	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
+	return_value.SetLong(lang.Cond(ret == 0, 0, r.EOF))
 	return
 }
 func ZifStreamSocketEnableCrypto(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, enable *types.Zval, _ zpp.Opt, cryptokind *types.Zval, sessionstream *types.Zval) {

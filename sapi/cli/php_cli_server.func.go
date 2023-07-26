@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -64,7 +65,7 @@ func AppendHttpStatusLine(buffer *zend.SmartStr, protocol_version int, response_
 func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, persistent int) {
 	var val *byte
 	var tv __struct__timeval = __struct__timeval{0}
-	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host")) {
+	if nil != lang.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host")) {
 		buffer.WriteString("Host: ")
 		buffer.WriteString(b.CastStrAuto(val))
 		buffer.WriteString("\r\n")
@@ -187,7 +188,7 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 func SapiCliServerReadCookies() *byte {
 	var client *PhpCliServerClient = core.SG__().server_context
 	var val *byte
-	if nil == b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "cookie")) {
+	if nil == lang.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "cookie")) {
 		return nil
 	}
 	return val
@@ -227,7 +228,7 @@ func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 	var client *PhpCliServerClient = core.SG__().server_context
 	SapiCliServerRegisterVariable(track_vars_array, "DOCUMENT_ROOT", client.GetServer().GetDocumentRoot())
 	var tmp *byte
-	if b.Assign(&tmp, strrchr(client.GetAddrStr(), ':')) {
+	if lang.Assign(&tmp, strrchr(client.GetAddrStr(), ':')) {
 		var addr []byte
 		var port []byte
 		var addr_start *byte = client.GetAddrStr()
@@ -742,7 +743,7 @@ func PhpCliServerClientPopulateRequestInfo(client *PhpCliServerClient, request_i
 	request_info.SetAuthDigest("")
 	request_info.SetAuthPassword("")
 	request_info.SetAuthUser("")
-	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "content-type")) {
+	if nil != lang.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "content-type")) {
 		request_info.SetContentType(val)
 	}
 }
@@ -851,7 +852,7 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 		goto fail
 	}
 	PhpCliServerBufferPrepend(client.GetContentSender().GetBuffer(), chunk)
-	PhpCliServerLogResponse(client, status, b.Cond(errstr != nil, errstr, "?"))
+	PhpCliServerLogResponse(client, status, lang.Cond(errstr != nil, errstr, "?"))
 	PhpCliServerPollerAdd(server.GetPoller(), POLLOUT, client.GetSock())
 	if errstr != nil {
 		zend.Pefree(errstr)
@@ -943,7 +944,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient) int {
 	var auth *byte
 	PhpCliServerClientPopulateRequestInfo(client, &(core.SG__().RequestInfo))
-	if nil != b.Assign(&auth, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization")) {
+	if nil != lang.Assign(&auth, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization")) {
 		core.PhpHandleAuthData(auth)
 	}
 	core.SG__().sapi_headers.http_response_code = 200
@@ -1138,7 +1139,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, r
 
 	server_sock = PhpNetworkListenSocket(host, &port, SOCK_STREAM, server.GetAddressFamily(), server.GetSocklen(), &errstr)
 	if server_sock == core.SOCK_ERR {
-		PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "Failed to listen on %s:%d (reason: %s)", host, port, b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "?"))
+		PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "Failed to listen on %s:%d (reason: %s)", host, port, lang.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "?"))
 		if errstr != nil {
 			// types.ZendStringReleaseEx(errstr, 0)
 		}

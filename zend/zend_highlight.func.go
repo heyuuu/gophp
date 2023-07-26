@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -61,7 +62,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 
 	/* highlight stuff coming back from zendlex() */
 
-	for b.Assign(&token_type, LexScan(&token, nil)) {
+	for lang.Assign(&token_type, LexScan(&token, nil)) {
 		switch token_type {
 		case T_INLINE_HTML:
 			next_color = syntax_highlighter_ini.GetHighlightHtml()
@@ -154,7 +155,7 @@ func ZendStrip() {
 	var token types.Zval
 	var token_type int
 	var prev_space int = 0
-	for b.Assign(&token_type, LexScan(&token, nil)) {
+	for lang.Assign(&token_type, LexScan(&token, nil)) {
 		switch token_type {
 		case T_WHITESPACE:
 			if prev_space == 0 {

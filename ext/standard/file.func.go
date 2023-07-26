@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -139,7 +140,7 @@ func ZifFlock(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, operatio
 
 	/* flock_values contains all possible actions if (operation & 4) we won't block on the lock */
 
-	act = FlockValues[act-1] | b.Cond((operation&PHP_LOCK_NB) != 0, LOCK_NB, 0)
+	act = FlockValues[act-1] | lang.Cond((operation&PHP_LOCK_NB) != 0, LOCK_NB, 0)
 	if core.PhpStreamLock(stream, act) != 0 {
 		if operation != 0 && errno == core.EWOULDBLOCK && wouldblock != nil {
 			zend.ZEND_TRY_ASSIGN_REF_LONG(wouldblock, 1)
@@ -187,14 +188,14 @@ func ZifGetMetaTags(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zv
 		}
 		break
 	}
-	md.SetStream(core.PhpStreamOpenWrapper(filename, "rb", b.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil))
+	md.SetStream(core.PhpStreamOpenWrapper(filename, "rb", lang.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil))
 	if md.GetStream() == nil {
 		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)
 	tok_last = TOK_EOF
-	for done == 0 && b.Assign(&tok, PhpNextMetaToken(&md)) != TOK_EOF {
+	for done == 0 && lang.Assign(&tok, PhpNextMetaToken(&md)) != TOK_EOF {
 		if tok == TOK_ID {
 			if tok_last == TOK_OPENTAG {
 				md.SetInMeta(!(strcasecmp("meta", md.GetTokenData())))
@@ -360,18 +361,18 @@ func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		return
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
-	stream = core.PhpStreamOpenWrapperEx(filename, "rb", b.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
+	stream = core.PhpStreamOpenWrapperEx(filename, "rb", lang.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
 	if stream == nil {
 		return_value.SetFalse()
 		return
 	}
-	if offset != 0 && core.PhpStreamSeek(stream, offset, b.Cond(offset > 0, r.SEEK_SET, r.SEEK_END)) < 0 {
+	if offset != 0 && core.PhpStreamSeek(stream, offset, lang.Cond(offset > 0, r.SEEK_SET, r.SEEK_END)) < 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", offset)
 		core.PhpStreamClose(stream)
 		return_value.SetFalse()
 		return
 	}
-	if b.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) != nil {
+	if lang.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) != nil {
 		return_value.SetString(contents)
 	} else {
 		return_value.SetStringVal("")
@@ -424,7 +425,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		mode[0] = 'c'
 	}
 	mode[2] = '0'
-	stream = core.PhpStreamOpenWrapperEx(filename, mode, b.Cond((flags&PHP_FILE_USE_INCLUDE_PATH) != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
+	stream = core.PhpStreamOpenWrapperEx(filename, mode, lang.Cond((flags&PHP_FILE_USE_INCLUDE_PATH) != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
 	if stream == nil {
 		return_value.SetFalse()
 		return
@@ -551,7 +552,7 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 	include_new_line = !(flags & PHP_FILE_IGNORE_NEW_LINES)
 	skip_blank_lines = flags & PHP_FILE_SKIP_EMPTY_LINES
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
-	stream = core.PhpStreamOpenWrapperEx(filename, "rb", b.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
+	stream = core.PhpStreamOpenWrapperEx(filename, "rb", lang.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
 	if stream == nil {
 		return_value.SetFalse()
 		return
@@ -560,10 +561,10 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 	/* Initialize return array */
 
 	zend.ArrayInit(return_value)
-	if b.Assign(&target_buf, core.PhpStreamCopyToMem(stream, core.PHP_STREAM_COPY_ALL, 0)) != nil {
+	if lang.Assign(&target_buf, core.PhpStreamCopyToMem(stream, core.PHP_STREAM_COPY_ALL, 0)) != nil {
 		s = target_buf.GetVal()
 		e = target_buf.GetVal() + target_buf.GetLen()
-		if !(b.Assign(&p, (*byte)(streams.PhpStreamLocateEol(stream, target_buf)))) {
+		if !(lang.Assign(&p, (*byte)(streams.PhpStreamLocateEol(stream, target_buf)))) {
 			p = e
 			goto parse_eol
 		}
@@ -578,9 +579,9 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 			for {
 				p++
 			parse_eol:
-				zend.AddIndexStringl(return_value, b.PostInc(&i), s, p-s)
+				zend.AddIndexStringl(return_value, lang.PostInc(&i), s, p-s)
 				s = p
-				if !(b.Assign(&p, memchr(p, eol_marker, e-p))) {
+				if !(lang.Assign(&p, memchr(p, eol_marker, e-p))) {
 					break
 				}
 			}
@@ -595,10 +596,10 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 					s = p
 					continue
 				}
-				zend.AddIndexStringl(return_value, b.PostInc(&i), s, p-s-windows_eol)
+				zend.AddIndexStringl(return_value, lang.PostInc(&i), s, p-s-windows_eol)
 				p++
 				s = p
-				if !(b.Assign(&p, memchr(p, eol_marker, e-p))) {
+				if !(lang.Assign(&p, memchr(p, eol_marker, e-p))) {
 					break
 				}
 			}
@@ -644,7 +645,7 @@ func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, prefi
 		p.GetStr()[63] = '0'
 	}
 	return_value.SetFalse()
-	if b.Assign(&fd, core.PhpOpenTemporaryFdEx(dir, p.GetVal(), &opened_path, core.PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) >= 0 {
+	if lang.Assign(&fd, core.PhpOpenTemporaryFdEx(dir, p.GetVal(), &opened_path, core.PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) >= 0 {
 		close(fd)
 		return_value.SetString(opened_path)
 	}
@@ -689,7 +690,7 @@ func ZifOpen(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, mod
 		break
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
-	stream = core.PhpStreamOpenWrapperEx(filename, mode, b.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
+	stream = core.PhpStreamOpenWrapperEx(filename, mode, lang.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
 	if stream == nil {
 		return_value.SetFalse()
 		return
@@ -717,7 +718,7 @@ func ZifFclose(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	core.PhpStreamFree(stream, core.PHP_STREAM_FREE_KEEP_RSRC|b.Cond(stream.GetIsPersistent() != 0, core.PHP_STREAM_FREE_CLOSE_PERSISTENT, core.PHP_STREAM_FREE_CLOSE))
+	core.PhpStreamFree(stream, core.PHP_STREAM_FREE_KEEP_RSRC|lang.Cond(stream.GetIsPersistent() != 0, core.PHP_STREAM_FREE_CLOSE_PERSISTENT, core.PHP_STREAM_FREE_CLOSE))
 	return_value.SetTrue()
 	return
 }
@@ -1089,7 +1090,7 @@ func PhpMkdirEx(dir *byte, mode zend.ZendLong, options int) int {
 	if core.PhpCheckOpenBasedir(dir) != 0 {
 		return -1
 	}
-	if b.Assign(&ret, zend.VCWD_MKDIR(dir, mode_t(mode))) < 0 && (options&core.REPORT_ERRORS) != 0 {
+	if lang.Assign(&ret, zend.VCWD_MKDIR(dir, mode_t(mode))) < 0 && (options&core.REPORT_ERRORS) != 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 	}
 	return ret
@@ -1121,7 +1122,7 @@ func ZifMkdir(executeData zpp.Ex, return_value zpp.Ret, pathname *types.Zval, _ 
 		break
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
-	return_value.SetBool(core.PhpStreamMkdir(dir, int(mode), b.Cond(recursive != 0, core.PHP_STREAM_MKDIR_RECURSIVE, 0)|core.REPORT_ERRORS, context) != 0)
+	return_value.SetBool(core.PhpStreamMkdir(dir, int(mode), lang.Cond(recursive != 0, core.PHP_STREAM_MKDIR_RECURSIVE, 0)|core.REPORT_ERRORS, context) != 0)
 	return
 }
 func ZifRmdir(executeData zpp.Ex, return_value zpp.Ret, dirname *types.Zval, _ zpp.Opt, context *types.Zval) {
@@ -1171,7 +1172,7 @@ func ZifReadfile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval,
 		break
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
-	stream = core.PhpStreamOpenWrapperEx(filename, "rb", b.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
+	stream = core.PhpStreamOpenWrapperEx(filename, "rb", lang.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, context)
 	if stream != nil {
 		size = core.PhpStreamPassthru(stream)
 		core.PhpStreamClose(stream)
@@ -1260,7 +1261,7 @@ func ZifRename(executeData zpp.Ex, return_value zpp.Ret, oldName *types.Zval, ne
 		return
 	}
 	if wrapper.GetWops().GetRename() == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "%s wrapper does not support renaming", b.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Source"))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s wrapper does not support renaming", lang.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Source"))
 		return_value.SetFalse()
 		return
 	}
@@ -1301,7 +1302,7 @@ func ZifUnlink(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _
 		return
 	}
 	if wrapper.GetWops().GetUnlink() == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "%s does not allow unlinking", b.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Wrapper"))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s does not allow unlinking", lang.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Wrapper"))
 		return_value.SetFalse()
 		return
 	}
@@ -1507,10 +1508,10 @@ no_stat:
 	var sp *byte
 	var dp *byte
 	var res int
-	if b.Assign(&sp, core.ExpandFilepath(src, nil)) == nil {
+	if lang.Assign(&sp, core.ExpandFilepath(src, nil)) == nil {
 		return ret
 	}
-	if b.Assign(&dp, core.ExpandFilepath(dest, nil)) == nil {
+	if lang.Assign(&dp, core.ExpandFilepath(dest, nil)) == nil {
 		zend.Efree(sp)
 		goto safe_to_copy
 	}
@@ -1733,7 +1734,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 		} else {
 			csvline.WriteString(field_str.GetStr())
 		}
-		if b.PreInc(&i) != count {
+		if lang.PreInc(&i) != count {
 			csvline.WriteString(b.CastStr(&delimiter, 1))
 		}
 	})
@@ -1837,7 +1838,7 @@ func ZifFgetcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.
 	}
 	PHP_STREAM_TO_ZVAL(stream, fd)
 	if len_ < 0 {
-		if b.Assign(&buf, core.PhpStreamGetLine(stream, nil, 0, &buf_len)) == nil {
+		if lang.Assign(&buf, core.PhpStreamGetLine(stream, nil, 0, &buf_len)) == nil {
 			return_value.SetFalse()
 			return
 		}
@@ -1962,7 +1963,7 @@ func PhpFgetcsv(
 						tptr += line_end_len
 						if stream == nil {
 							goto quit_loop_2
-						} else if b.Assign(&new_buf, core.PhpStreamGetLine(stream, nil, 0, &new_len)) == nil {
+						} else if lang.Assign(&new_buf, core.PhpStreamGetLine(stream, nil, 0, &new_len)) == nil {
 
 							/* we've got an unterminated enclosure,
 							 * assign all the data from the start of
@@ -2182,7 +2183,7 @@ func PhpNextMetaToken(md *PhpMetaTagsData) PhpMetaTagsToken {
 	var compliment int
 	var buff []byte
 	memset(any(buff), 0, META_DEF_BUFSIZE+1)
-	for md.GetUlc() != 0 || core.PhpStreamEof(md.GetStream()) == 0 && b.Assign(&ch, core.PhpStreamGetc(md.GetStream())) {
+	for md.GetUlc() != 0 || core.PhpStreamEof(md.GetStream()) == 0 && lang.Assign(&ch, core.PhpStreamGetc(md.GetStream())) {
 		if core.PhpStreamEof(md.GetStream()) != 0 {
 			break
 		}
@@ -2204,8 +2205,8 @@ func PhpNextMetaToken(md *PhpMetaTagsData) PhpMetaTagsToken {
 		case '"':
 			compliment = ch
 			md.SetTokenLen(0)
-			for core.PhpStreamEof(md.GetStream()) == 0 && b.Assign(&ch, core.PhpStreamGetc(md.GetStream())) && ch != compliment && ch != '<' && ch != '>' {
-				buff[b.PostInc(&(md.GetTokenLen()))] = ch
+			for core.PhpStreamEof(md.GetStream()) == 0 && lang.Assign(&ch, core.PhpStreamGetc(md.GetStream())) && ch != compliment && ch != '<' && ch != '>' {
+				buff[lang.PostInc(&(md.GetTokenLen()))] = ch
 				if md.GetTokenLen() == META_DEF_BUFSIZE {
 					break
 				}
@@ -2236,9 +2237,9 @@ func PhpNextMetaToken(md *PhpMetaTagsData) PhpMetaTagsToken {
 		default:
 			if isalnum(ch) {
 				md.SetTokenLen(0)
-				buff[b.PostInc(&(md.GetTokenLen()))] = ch
-				for core.PhpStreamEof(md.GetStream()) == 0 && b.Assign(&ch, core.PhpStreamGetc(md.GetStream())) && (isalnum(ch) || strchr(PHP_META_HTML401_CHARS, ch)) {
-					buff[b.PostInc(&(md.GetTokenLen()))] = ch
+				buff[lang.PostInc(&(md.GetTokenLen()))] = ch
+				for core.PhpStreamEof(md.GetStream()) == 0 && lang.Assign(&ch, core.PhpStreamGetc(md.GetStream())) && (isalnum(ch) || strchr(PHP_META_HTML401_CHARS, ch)) {
+					buff[lang.PostInc(&(md.GetTokenLen()))] = ch
 					if md.GetTokenLen() == META_DEF_BUFSIZE {
 						break
 					}

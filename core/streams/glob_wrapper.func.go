@@ -3,6 +3,7 @@ package streams
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
@@ -52,7 +53,7 @@ func _phpGlobStreamGetCount(stream *core.PhpStream, pflags *int) int {
 func PhpGlobStreamPathSplit(pglob *GlobST, path *byte, get_path int, p_file **byte) {
 	var pos *byte
 	var gpath *byte = path
-	if b.Assign(&pos, strrchr(path, '/')) != nil {
+	if lang.Assign(&pos, strrchr(path, '/')) != nil {
 		path = pos + 1
 	}
 	*p_file = path
@@ -76,7 +77,7 @@ func PhpGlobStreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 
 	if count == b.SizeOf("php_stream_dirent") && pglob != nil {
 		if pglob.GetIndex() < int(pglob.GetGlob().gl_pathc) {
-			PhpGlobStreamPathSplit(pglob, pglob.GetGlob().gl_pathv[b.PostInc(&(pglob.GetIndex()))], pglob.GetFlags()&GLOB_APPEND, &path)
+			PhpGlobStreamPathSplit(pglob, pglob.GetGlob().gl_pathv[lang.PostInc(&(pglob.GetIndex()))], pglob.GetFlags()&GLOB_APPEND, &path)
 			core.PHP_STRLCPY(ent.GetDName(), path, b.SizeOf("ent -> d_name"), strlen(path))
 			return b.SizeOf("php_stream_dirent")
 		}
@@ -136,12 +137,12 @@ func PhpGlobStreamOpener(
 		return nil
 	}
 	pglob = zend.Ecalloc(b.SizeOf("* pglob"), 1)
-	if 0 != b.Assign(&ret, glob(path, pglob.GetFlags()&GLOB_FLAGMASK, nil, pglob.GetGlob())) {
+	if 0 != lang.Assign(&ret, glob(path, pglob.GetFlags()&GLOB_FLAGMASK, nil, pglob.GetGlob())) {
 		zend.Efree(pglob)
 		return nil
 	}
 	pos = path
-	if b.Assign(&tmp, strrchr(pos, '/')) != nil {
+	if lang.Assign(&tmp, strrchr(pos, '/')) != nil {
 		pos = tmp + 1
 	}
 	pglob.SetPatternLen(strlen(pos))

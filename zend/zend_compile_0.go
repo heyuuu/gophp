@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -118,7 +119,7 @@ func GetNextOpNumber() uint32 {
 }
 func GetNextOp() *types.ZendOp {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
-	var next_op_num uint32 = b.PostInc(&(op_array.GetLast()))
+	var next_op_num uint32 = lang.PostInc(&(op_array.GetLast()))
 	var next_op *types.ZendOp
 	if next_op_num >= CG__().GetContext().GetOpcodesSize() {
 		CG__().GetContext().SetOpcodesSize(CG__().GetContext().GetOpcodesSize() * 4)
@@ -132,7 +133,7 @@ func GetNextBrkContElement() *ZendBrkContElement {
 }
 func ZendBuildRuntimeDefinitionKey(name *types.String, start_lineno uint32) *types.String {
 	var filename = CG__().GetActiveOpArray().GetFilename()
-	var result = ZendSprintf("%c%s%s:%u$%d", '\000', name.GetStr(), filename, start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
+	var result = ZendSprintf("%c%s%s:%u$%d", '\000', name.GetStr(), filename, start_lineno, lang.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.NewString(result)
 }
 
@@ -256,7 +257,7 @@ func ZendGetCompiledFilename() string { return CG__().GetCompiledFilename() }
 func ZendGetCompiledLineno() int      { return CG__().GetZendLineno() }
 func ZendIsCompiling() bool           { return CG__().GetInCompilation() }
 func GetTemporaryVariable() uint32 {
-	return b.PostInc(&(CG__().GetActiveOpArray().GetT()))
+	return lang.PostInc(&(CG__().GetActiveOpArray().GetT()))
 }
 func LookupCv(name string) int {
 	var opArray *types.ZendOpArray = CG__().GetActiveOpArray()

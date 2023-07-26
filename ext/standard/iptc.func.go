@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -15,7 +16,7 @@ func PhpIptcPut1(fp *r.File, spool int, c uint8, spoolbuf **uint8) int {
 		core.PUTC(c)
 	}
 	if spoolbuf != nil {
-		b.PostInc(&(*(*spoolbuf))) = c
+		lang.PostInc(&(*(*spoolbuf))) = c
 	}
 	return c
 }
@@ -31,7 +32,7 @@ func PhpIptcGet1(fp *r.File, spool int, spoolbuf **uint8) int {
 		core.PUTC(cc)
 	}
 	if spoolbuf != nil {
-		b.PostInc(&(*(*spoolbuf))) = c
+		lang.PostInc(&(*(*spoolbuf))) = c
 	}
 	return c
 }
@@ -45,15 +46,15 @@ func PhpIptcSkipVariable(fp *r.File, spool int, spoolbuf **uint8) int {
 	var length uint
 	var c1 int
 	var c2 int
-	if b.Assign(&c1, PhpIptcGet1(fp, spool, spoolbuf)) == r.EOF {
+	if lang.Assign(&c1, PhpIptcGet1(fp, spool, spoolbuf)) == r.EOF {
 		return M_EOI
 	}
-	if b.Assign(&c2, PhpIptcGet1(fp, spool, spoolbuf)) == r.EOF {
+	if lang.Assign(&c2, PhpIptcGet1(fp, spool, spoolbuf)) == r.EOF {
 		return M_EOI
 	}
 	length = (uint8(c1) << 8) + uint8(c2)
 	length -= 2
-	for b.PostDec(&length) {
+	for lang.PostDec(&length) {
 		if PhpIptcGet1(fp, spool, spoolbuf) == r.EOF {
 			return M_EOI
 		}
@@ -70,7 +71,7 @@ func PhpIptcNextMarker(fp *r.File, spool int, spoolbuf **uint8) int {
 		return M_EOI
 	}
 	for c != 0xff {
-		if b.Assign(&c, PhpIptcGet1(fp, spool, spoolbuf)) == r.EOF {
+		if lang.Assign(&c, PhpIptcGet1(fp, spool, spoolbuf)) == r.EOF {
 			return M_EOI
 		}
 	}
@@ -127,7 +128,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		return_value.SetFalse()
 		return
 	}
-	if b.Assign(&fp, zend.VCWD_FOPEN(jpeg_file, "rb")) == 0 {
+	if lang.Assign(&fp, zend.VCWD_FOPEN(jpeg_file, "rb")) == 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to open %s", jpeg_file)
 		return_value.SetFalse()
 		return
@@ -141,7 +142,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		poi = (*uint8)(spoolbuf.GetVal())
 		memset(poi, 0, iptcdata_len+b.SizeOf("psheader")+sb.st_size+1024+1)
 	}
-	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xff {
+	if PhpIptcGet1(fp, spool, lang.Cond(poi != nil, &poi, 0)) != 0xff {
 		fp.Close()
 		if spoolbuf != nil {
 			// types.ZendStringEfree(spoolbuf)
@@ -149,7 +150,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		return_value.SetFalse()
 		return
 	}
-	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xd8 {
+	if PhpIptcGet1(fp, spool, lang.Cond(poi != nil, &poi, 0)) != 0xd8 {
 		fp.Close()
 		if spoolbuf != nil {
 			// types.ZendStringEfree(spoolbuf)
@@ -158,11 +159,11 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		return
 	}
 	for done == 0 {
-		marker = PhpIptcNextMarker(fp, spool, b.Cond(poi != nil, &poi, 0))
+		marker = PhpIptcNextMarker(fp, spool, lang.Cond(poi != nil, &poi, 0))
 		if marker == M_EOI {
 			break
 		} else if marker != M_APP13 {
-			PhpIptcPut1(fp, spool, uint8(marker), b.Cond(poi != nil, &poi, 0))
+			PhpIptcPut1(fp, spool, uint8(marker), lang.Cond(poi != nil, &poi, 0))
 		}
 		switch marker {
 		case M_APP13:
@@ -171,7 +172,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 
 			PhpIptcSkipVariable(fp, 0, 0)
 			fp.GetC()
-			PhpIptcReadRemaining(fp, spool, b.Cond(poi != nil, &poi, 0))
+			PhpIptcReadRemaining(fp, spool, lang.Cond(poi != nil, &poi, 0))
 			done = 1
 		case M_APP0:
 			fallthrough
@@ -186,28 +187,28 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 
 			}
 			written = 1
-			PhpIptcSkipVariable(fp, spool, b.Cond(poi != nil, &poi, 0))
+			PhpIptcSkipVariable(fp, spool, lang.Cond(poi != nil, &poi, 0))
 			if (iptcdata_len & 1) != 0 {
 				iptcdata_len++
 			}
 			Psheader[2] = byte(iptcdata_len + 28>>8)
 			Psheader[3] = iptcdata_len + 28&0xff
 			for inx = 0; inx < 28; inx++ {
-				PhpIptcPut1(fp, spool, Psheader[inx], b.Cond(poi != nil, &poi, 0))
+				PhpIptcPut1(fp, spool, Psheader[inx], lang.Cond(poi != nil, &poi, 0))
 			}
-			PhpIptcPut1(fp, spool, uint8(iptcdata_len>>8), b.Cond(poi != nil, &poi, 0))
-			PhpIptcPut1(fp, spool, uint8(iptcdata_len&0xff), b.Cond(poi != nil, &poi, 0))
+			PhpIptcPut1(fp, spool, uint8(iptcdata_len>>8), lang.Cond(poi != nil, &poi, 0))
+			PhpIptcPut1(fp, spool, uint8(iptcdata_len&0xff), lang.Cond(poi != nil, &poi, 0))
 			for inx = 0; inx < iptcdata_len; inx++ {
-				PhpIptcPut1(fp, spool, iptcdata[inx], b.Cond(poi != nil, &poi, 0))
+				PhpIptcPut1(fp, spool, iptcdata[inx], lang.Cond(poi != nil, &poi, 0))
 			}
 		case M_SOS:
 
 			/* we hit data, no more marker-inserting can be done! */
 
-			PhpIptcReadRemaining(fp, spool, b.Cond(poi != nil, &poi, 0))
+			PhpIptcReadRemaining(fp, spool, lang.Cond(poi != nil, &poi, 0))
 			done = 1
 		default:
-			PhpIptcSkipVariable(fp, spool, b.Cond(poi != nil, &poi, 0))
+			PhpIptcSkipVariable(fp, spool, lang.Cond(poi != nil, &poi, 0))
 		}
 	}
 	fp.Close()
@@ -252,14 +253,14 @@ func ZifIptcparse(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		}
 	}
 	for inx < str_len {
-		if buffer[b.PostInc(&inx)] != 0x1c {
+		if buffer[lang.PostInc(&inx)] != 0x1c {
 			break
 		}
 		if inx+4 >= str_len {
 			break
 		}
-		dataset = buffer[b.PostInc(&inx)]
-		recnum = buffer[b.PostInc(&inx)]
+		dataset = buffer[lang.PostInc(&inx)]
+		recnum = buffer[lang.PostInc(&inx)]
 		if (buffer[inx] & uint8(0x80)) != 0 {
 			if inx+6 >= str_len {
 				break
@@ -277,7 +278,7 @@ func ZifIptcparse(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		if tagsfound == 0 {
 			zend.ArrayInit(return_value)
 		}
-		if b.Assign(&element, return_value.Array().KeyFind(b.CastStrAuto(key))) == nil {
+		if lang.Assign(&element, return_value.Array().KeyFind(b.CastStrAuto(key))) == nil {
 			zend.ArrayInit(&values)
 			element = return_value.Array().KeyUpdate(b.CastStrAuto(key), &values)
 		}

@@ -3,6 +3,7 @@ package spl
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -205,7 +206,7 @@ func SplPtrHeapDeleteTop(heap *SplPtrHeap, elem any, cmp_userdata any) int {
 	} else {
 		heap.GetDtor()(SplHeapElem(heap, 0))
 	}
-	bottom = SplHeapElem(heap, b.PreDec(&(heap.GetCount())))
+	bottom = SplHeapElem(heap, lang.PreDec(&(heap.GetCount())))
 	for i = 0; i < limit; i = j {
 
 		/* Find smaller child */
@@ -299,7 +300,7 @@ func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_or
 		}
 		if parent == spl_ce_SplMinHeap || parent == spl_ce_SplMaxHeap || parent == spl_ce_SplHeap {
 			intern = NewSplHeapObject(class_type, &spl_handler_SplHeap)
-			intern.SetHeap(SplPtrHeapInit(b.Cond(parent == spl_ce_SplMinHeap, SplPtrHeapZvalMinCmp, SplPtrHeapZvalMaxCmp), SplPtrHeapZvalCtor, SplPtrHeapZvalDtor, b.SizeOf("zval")))
+			intern.SetHeap(SplPtrHeapInit(lang.Cond(parent == spl_ce_SplMinHeap, SplPtrHeapZvalMinCmp, SplPtrHeapZvalMaxCmp), SplPtrHeapZvalCtor, SplPtrHeapZvalDtor, b.SizeOf("zval")))
 			break
 		}
 		parent = parent.GetParent()

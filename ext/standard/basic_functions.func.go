@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/array"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -339,7 +340,7 @@ func ParseOpts(opts *byte, result **core.Opt) int {
 	*result = paras
 	for (*opts) >= 48 && (*opts) <= 57 || (*opts) >= 65 && (*opts) <= 90 || (*opts) >= 97 && (*opts) <= 122 {
 		paras.SetOptChar(*opts)
-		paras.SetNeedParam((*(b.PreInc(&opts))) == ':')
+		paras.SetNeedParam((*(lang.PreInc(&opts))) == ':')
 		paras.SetOptName(nil)
 		if paras.GetNeedParam() == 1 {
 			opts++
@@ -380,7 +381,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 	/* Get argv from the global symbol table. We calculate argc ourselves
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobal("_SERVER")) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobal("_SERVER")) && (lang.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || lang.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
 		var pos int = 0
 		if !args.IsArray() {
 			return_value.SetFalse()
@@ -396,7 +397,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 		/* Iterate over the hash to construct the argv array. */
 		args.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 			var arg_str *types.String = operators.ZvalGetString(value)
-			argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
+			argv[lang.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
 		})
 
 		/* The C Standard requires argv[argc] to be NULL - this might
@@ -467,7 +468,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 	/* after our pointer arithmetic jump back to the first element */
 
 	opts = orig_opts
-	for b.Assign(&o, core.PhpGetopt(argc, argv, opts, &php_optarg, &php_optind, 0, 1)) != -1 {
+	for lang.Assign(&o, core.PhpGetopt(argc, argv, opts, &php_optarg, &php_optind, 0, 1)) != -1 {
 
 		/* Skip unknown arguments. */
 
@@ -504,7 +505,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 			/* numeric string */
 
 			var optname_int int = atoi(optname)
-			if b.Assign(&args, return_value.Array().IndexFind(optname_int)) != nil {
+			if lang.Assign(&args, return_value.Array().IndexFind(optname_int)) != nil {
 				if !args.IsArray() {
 					operators.ConvertToArrayEx(args)
 				}
@@ -516,7 +517,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 
 			/* other strings */
 
-			if b.Assign(&args, return_value.Array().KeyFind(b.CastStrAuto(optname))) != nil {
+			if lang.Assign(&args, return_value.Array().KeyFind(b.CastStrAuto(optname))) != nil {
 				if !args.IsArray() {
 					operators.ConvertToArrayEx(args)
 				}
@@ -1037,9 +1038,9 @@ func ZifConnectionStatus() int {
 func ZifIgnoreUserAbort(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, enable *bool) int {
 	oldSetting := core.PG__().GetIgnoreUserAbort()
 	if enable != nil {
-		zend.ZendAlterIniEntryChars("ignore_user_abort", b.Cond(*enable, "1", "0"), core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
+		zend.ZendAlterIniEntryChars("ignore_user_abort", lang.Cond(*enable, "1", "0"), core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
 	}
-	return b.Cond(oldSetting, 1, 0)
+	return lang.Cond(oldSetting, 1, 0)
 }
 func ZifGetservbyname(executeData zpp.Ex, return_value zpp.Ret, service *types.Zval, protocol *types.Zval) {
 	var name *byte
@@ -1208,12 +1209,12 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 		}
 		if !(arg1.String().GetLen() > 1 && arg1.String().GetStr()[0] == '0') && operators.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IS_LONG {
 			var key = zend.StrToLongWithUnit(arg1.StringVal())
-			if b.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
+			if lang.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
 				find_hash = arr.Array().IndexAddNew(key, &hash)
 			}
 		} else {
-			if b.Assign(&find_hash, arr.Array().KeyFind(arg1.String().GetStr())) == nil {
+			if lang.Assign(&find_hash, arr.Array().KeyFind(arg1.String().GetStr())) == nil {
 				zend.ArrayInit(&hash)
 				find_hash = arr.Array().KeyAddNew(arg1.String().GetStr(), &hash)
 			}

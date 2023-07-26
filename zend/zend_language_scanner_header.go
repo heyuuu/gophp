@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -458,7 +459,7 @@ func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, usin
 		if str == end {
 			break
 		}
-		var len_ int = b.Cond(nl != nil, nl-str+newline_len, end-str)
+		var len_ int = lang.Cond(nl != nil, nl-str+newline_len, end-str)
 		memmove(copy, str, len_)
 		str += len_
 		copy += len_

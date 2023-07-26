@@ -1,9 +1,9 @@
 package standard
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
+	b "github.com/heyuuu/gophp/php/lang"
 )
 
 func PhpFlock(fd int, operation int) int {

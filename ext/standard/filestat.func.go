@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -550,7 +551,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 		return_value.SetFalse()
 		return
 	}
-	if b.Assign(&wrapper, streams.PhpStreamLocateUrlWrapper(filename, &local, 0)) == &PhpPlainFilesWrapper && core.PhpCheckOpenBasedir(local) != 0 {
+	if lang.Assign(&wrapper, streams.PhpStreamLocateUrlWrapper(filename, &local, 0)) == &PhpPlainFilesWrapper && core.PhpCheckOpenBasedir(local) != 0 {
 		return_value.SetFalse()
 		return
 	}
@@ -572,7 +573,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 		/* Error Occurred */
 
 		if !(IS_EXISTS_CHECK(type_)) {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "%sstat failed for %s", b.Cond(IS_LINK_OPERATION(type_), "L", ""), filename)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%sstat failed for %s", lang.Cond(IS_LINK_OPERATION(type_), "L", ""), filename)
 		}
 		return_value.SetFalse()
 		return

@@ -1,7 +1,7 @@
 package cli
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
+	b "github.com/heyuuu/gophp/php/lang"
 )
 
 /* Maximium header size allowed */

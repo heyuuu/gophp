@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
@@ -46,7 +47,7 @@ func ZifSoundex(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 
 				/* remember first valid char */
 
-				soundex[b.PostInc(&_small)] = byte(code)
+				soundex[lang.PostInc(&_small)] = byte(code)
 				last = soundex_table[code-'A']
 			} else {
 
@@ -55,7 +56,7 @@ func ZifSoundex(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 				code = soundex_table[code-'A']
 				if code != last {
 					if code != 0 {
-						soundex[b.PostInc(&_small)] = byte(code)
+						soundex[lang.PostInc(&_small)] = byte(code)
 					}
 					last = code
 				}
@@ -66,7 +67,7 @@ func ZifSoundex(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	/* pad with '0' and terminate with 0 ;-) */
 
 	for _small < 4 {
-		soundex[b.PostInc(&_small)] = '0'
+		soundex[lang.PostInc(&_small)] = '0'
 	}
 	soundex[_small] = '0'
 	return_value.SetStringVal(b.CastStr(soundex, _small))
