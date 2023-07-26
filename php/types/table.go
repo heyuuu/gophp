@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"sort"
 )
 

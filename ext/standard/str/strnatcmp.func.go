@@ -1,7 +1,7 @@
 package str
 
 import (
-	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/kits/ascii"
 )
 
 func compareRight(a string, ap int, b string, bp int) (result int, newAp int, newBp int) {

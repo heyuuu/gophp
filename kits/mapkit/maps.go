@@ -34,6 +34,10 @@ func (m *StableMap[K, V]) idx(key K) (idx int, ok bool) {
 	return
 }
 
+func (m *StableMap[K, V]) Len(key K) int {
+	return len(m.entries)
+}
+
 func (m *StableMap[K, V]) Exists(key K) bool {
 	_, ok := m.idx(key)
 	return ok

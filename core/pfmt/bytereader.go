@@ -1,7 +1,7 @@
 package pfmt
 
 import (
-	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"strings"
 )
 

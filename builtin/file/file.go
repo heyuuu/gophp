@@ -2,7 +2,7 @@ package file
 
 import (
 	"errors"
-	"github.com/heyuuu/gophp/builtin/sysutil"
+	"github.com/heyuuu/gophp/kits/oskit"
 	"io"
 	"io/fs"
 	"os"
@@ -57,7 +57,7 @@ func (f *File) WriteString(p string) (n int, err error) {
 
 func (f *File) Isatty() bool {
 	if fp, ok := f.h.(*os.File); ok {
-		return sysutil.Isatty(fp)
+		return oskit.Isatty(fp)
 	} else {
 		return false
 	}

@@ -4,10 +4,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/builtin/strutil"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	ascii2 "github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -49,11 +49,11 @@ const (
  * helpers
  */
 func PhpStringToupper(s *types.String) *types.String {
-	return types.NewString(ascii.StrToUpper(s.GetStr()))
+	return types.NewString(ascii2.StrToUpper(s.GetStr()))
 }
 
 func PhpStringTolower(s *types.String) *types.String {
-	return types.NewString(ascii.StrToLower(s.GetStr()))
+	return types.NewString(ascii2.StrToLower(s.GetStr()))
 }
 
 func substr(str string, offset int, length *int) (string, bool) {
@@ -206,7 +206,7 @@ func PhpStripcslashes(str string) string {
 		case 'x':
 			// try \x[0-9a-fA-F]{1,2}
 			hexSize := 0
-			for hexSize < 2 && i+hexSize+1 < len(str) && ascii.IsXDigit(str[i+hexSize+1]) {
+			for hexSize < 2 && i+hexSize+1 < len(str) && ascii2.IsXDigit(str[i+hexSize+1]) {
 				hexSize++
 			}
 			if hexSize > 0 {
@@ -564,10 +564,10 @@ func ZifStrtok(str string, _ zpp.Opt, token_ *string) (string, bool) {
 	}
 }
 func ZifStrtoupper(str string) string {
-	return ascii.StrToUpper(str)
+	return ascii2.StrToUpper(str)
 }
 func ZifStrtolower(str string) string {
-	return ascii.StrToLower(str)
+	return ascii2.StrToLower(str)
 }
 func PhpBasenameZStr(str string, suffix string) *types.String {
 	return types.NewString(PhpBasename(str, suffix))
@@ -703,8 +703,8 @@ func ZifStristr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (stri
 		return "", false
 	}
 
-	haystackLc := ascii.StrToLower(haystack)
-	needleStrLc := ascii.StrToLower(needleStr)
+	haystackLc := ascii2.StrToLower(haystack)
+	needleStrLc := ascii2.StrToLower(needleStr)
 	if pos := strings.Index(haystackLc, needleStrLc); pos >= 0 {
 		if part {
 			return haystack[:pos], true
@@ -804,8 +804,8 @@ func ZifStripos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int
 		return 0, false
 	}
 
-	haystack = ascii.StrToLower(haystack)
-	needleStr = ascii.StrToLower(needleStr)
+	haystack = ascii2.StrToLower(haystack)
+	needleStr = ascii2.StrToLower(needleStr)
 	if pos := strings.Index(haystack, needleStr); pos < 0 {
 		return pos, true
 	} else {
@@ -859,8 +859,8 @@ func ZifStrripos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (in
 		return 0, false
 	}
 
-	haystack = ascii.StrToLower(haystack)
-	needleStr = ascii.StrToLower(needleStr)
+	haystack = ascii2.StrToLower(haystack)
+	needleStr = ascii2.StrToLower(needleStr)
 	if offset >= 0 {
 		haystack, ok = posSubstr(haystack, offset)
 		if !ok {
@@ -1140,14 +1140,14 @@ func ZifChr(codepoint int) string {
 	return string(c)
 }
 func ZifUcfirst(str string) string {
-	if str != "" && ascii.IsLower(str[0]) {
-		return string(ascii.ToUpper(str[0])) + str[1:]
+	if str != "" && ascii2.IsLower(str[0]) {
+		return string(ascii2.ToUpper(str[0])) + str[1:]
 	}
 	return str
 }
 func ZifLcfirst(str string) string {
-	if str != "" && ascii.IsUpper(str[0]) {
-		return string(ascii.ToLower(str[0])) + str[1:]
+	if str != "" && ascii2.IsUpper(str[0]) {
+		return string(ascii2.ToLower(str[0])) + str[1:]
 	}
 	return str
 }
@@ -1162,10 +1162,10 @@ func ZifUcwords(str string, _ zpp.Opt, delimiters *string) string {
 	}
 
 	chars := []byte(str)
-	chars[0] = ascii.ToUpper(chars[0])
+	chars[0] = ascii2.ToUpper(chars[0])
 	for i := 1; i < len(str)-1; i++ {
 		if strings.ContainsRune(mask, rune(chars[i-1])) {
-			chars[i] = ascii.ToUpper(chars[i])
+			chars[i] = ascii2.ToUpper(chars[i])
 		}
 	}
 	return string(chars)
@@ -1193,7 +1193,7 @@ func phpStrtrArray(str string, pats *types.Array) (string, bool) {
 	var minLen int = 128 * 1024        // 最长扫描字符串长度
 	var maxLen int = 0                 // 最短扫描字符串长度
 	numBitset := b.NewBitset(len(str)) // 标记是否有对应长度的扫描字符串
-	bitset := ascii.NewAsciiSet()      // 标记是否有对应字符开头的扫描字符串
+	bitset := ascii2.NewAsciiSet()     // 标记是否有对应字符开头的扫描字符串
 
 	var strMap = make(map[string]*types.Zval, pats.Len())
 	pats.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
@@ -1266,10 +1266,10 @@ func phpStrtrArray(str string, pats *types.Array) (string, bool) {
 func PhpCharToStr(str string, from byte, to string, caseSensitivity bool) (string, int) {
 	// 预计算替换个数
 	var count int
-	if caseSensitivity || !ascii.IsAscii(from) {
+	if caseSensitivity || !ascii2.IsAscii(from) {
 		count = strings.Count(str, string(from))
 	} else {
-		count = strings.Count(str, string(ascii.ToUpper(from))) + strings.Count(str, string(ascii.ToLower(from)))
+		count = strings.Count(str, string(ascii2.ToUpper(from))) + strings.Count(str, string(ascii2.ToLower(from)))
 	}
 	if count == 0 {
 		return str, 0
@@ -1277,12 +1277,12 @@ func PhpCharToStr(str string, from byte, to string, caseSensitivity bool) (strin
 
 	// 替换
 	var result string
-	if caseSensitivity || !ascii.IsAscii(from) {
+	if caseSensitivity || !ascii2.IsAscii(from) {
 		result = strings.ReplaceAll(str, string(from), to)
 	} else {
 		replacer := strings.NewReplacer(
-			string(ascii.ToUpper(from)), to,
-			string(ascii.ToLower(from)), to,
+			string(ascii2.ToUpper(from)), to,
+			string(ascii2.ToLower(from)), to,
 		)
 		result = replacer.Replace(str)
 	}
@@ -1309,7 +1309,7 @@ func PhpStrToStrI(haystack string, lcHaystack string, needle string, str string)
 		return haystack, 0
 	}
 
-	lcNeedle := ascii.StrToLower(needle)
+	lcNeedle := ascii2.StrToLower(needle)
 	if lcHaystack == lcNeedle {
 		return str, 1
 	}
@@ -1494,7 +1494,7 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 				if caseSensitivity {
 					tmpResult, count = PhpStrToStr(result, searchStr, replaceStr)
 				} else {
-					lcSubjectStr := ascii.StrToLower(result)
+					lcSubjectStr := ascii2.StrToLower(result)
 					tmpResult, count = PhpStrToStrI(result, lcSubjectStr, searchStr, replaceStr)
 				}
 			}
@@ -1517,7 +1517,7 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 			if caseSensitivity {
 				return PhpStrToStr(subject, searchStr, replaceStr)
 			} else {
-				lcSubject := ascii.StrToLower(subject)
+				lcSubject := ascii2.StrToLower(subject)
 				return PhpStrToStrI(subject, lcSubject, searchStr, replaceStr)
 			}
 		}
@@ -1775,7 +1775,7 @@ func phpTagFind(tag string, set string) bool {
 	var norm_ strings.Builder
 
 	t := 0 // for tag
-	c := ascii.ToLower(tag[t])
+	c := ascii2.ToLower(tag[t])
 	done := false
 	state := 0
 	for !done {
@@ -1785,7 +1785,7 @@ func phpTagFind(tag string, set string) bool {
 		case '>':
 			done = true
 		default:
-			if !ascii.IsSpace(c) {
+			if !ascii2.IsSpace(c) {
 				if state == 0 {
 					state = 1
 				}
@@ -1799,7 +1799,7 @@ func phpTagFind(tag string, set string) bool {
 			}
 		}
 		t++
-		c = ascii.ToLower(tag[t])
+		c = ascii2.ToLower(tag[t])
 	}
 	norm_.WriteByte('>')
 
@@ -1824,7 +1824,7 @@ func PhpStripTags(str string, state uint8, allowTags string) (string, uint8) {
 		state = 0
 	}
 
-	allowTags = ascii.StrToLower(allowTags)
+	allowTags = ascii2.StrToLower(allowTags)
 	for p, c := range []byte(str) {
 		if state == 0 {
 			switch c {
@@ -1834,7 +1834,7 @@ func PhpStripTags(str string, state uint8, allowTags string) (string, uint8) {
 				if quote != 0 {
 					break
 				}
-				if ascii.IsSpace(str[p+1]) {
+				if ascii2.IsSpace(str[p+1]) {
 					buf.WriteByte(c)
 					break
 				}
@@ -1863,7 +1863,7 @@ func PhpStripTags(str string, state uint8, allowTags string) (string, uint8) {
 				if quote != 0 {
 					break
 				}
-				if ascii.IsSpace(str[p+1]) {
+				if ascii2.IsSpace(str[p+1]) {
 					if allowTags != "" {
 						tagBuf.WriteByte(c)
 					}
@@ -1971,7 +1971,7 @@ func PhpStripTags(str string, state uint8, allowTags string) (string, uint8) {
 				/* swm: If we encounter '<?xml' then we shouldn't be in
 				 * state == 2 (PHP). Switch back to HTML.
 				 */
-				if state == 2 && p > 4 && ascii.StrToLower(str[p-4:p]) == "<?xm" {
+				if state == 2 && p > 4 && ascii2.StrToLower(str[p-4:p]) == "<?xm" {
 					state = 1
 					isXml = true
 				}
@@ -2003,7 +2003,7 @@ func PhpStripTags(str string, state uint8, allowTags string) (string, uint8) {
 				}
 			case 'E', 'e':
 				/* !DOCTYPE exception */
-				if p > 6 && ascii.StrToLower(str[p-6:p+1]) == "doctype" {
+				if p > 6 && ascii2.StrToLower(str[p-6:p+1]) == "doctype" {
 					state = 1
 				}
 			}
@@ -2223,7 +2223,7 @@ func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*type
 
 	start := -1
 	for end, c := range []byte(str) {
-		if ascii.IsAscii(c) || (mask != "" && strings.ContainsRune(mask, rune(c))) {
+		if ascii2.IsAscii(c) || (mask != "" && strings.ContainsRune(mask, rune(c))) {
 			if start < 0 {
 				start = end
 			}
@@ -2331,6 +2331,6 @@ func ZifSubstrCompare(return_value zpp.Ret, haystack string, needle string, offs
 	if caseInsensitivity {
 		return strings.Compare(s1, s2), true
 	} else {
-		return ascii.StrCaseCompare(s1, s2), true
+		return ascii2.StrCaseCompare(s1, s2), true
 	}
 }

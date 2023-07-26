@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/kits/ascii"
 )
 
 type charsetEntry struct {

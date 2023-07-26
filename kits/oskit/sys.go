@@ -1,4 +1,4 @@
-package sysutil
+package oskit
 
 import (
 	"golang.org/x/sys/unix"

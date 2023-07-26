@@ -2,7 +2,7 @@ package zend
 
 import (
 	r "github.com/heyuuu/gophp/builtin/file"
-	"github.com/heyuuu/gophp/builtin/sysutil"
+	"github.com/heyuuu/gophp/kits/oskit"
 	"os"
 )
 
@@ -67,7 +67,7 @@ func NewGoFileStream(fp *os.File) *GoFileStream {
 
 var _ IStream = (*GoFileStream)(nil)
 
-func (s *GoFileStream) Isatty() bool { return sysutil.Isatty(s.fp) }
+func (s *GoFileStream) Isatty() bool { return oskit.Isatty(s.fp) }
 
 func (s *GoFileStream) Read(len_ int) []byte {
 	var buf []byte

@@ -2,7 +2,7 @@ package types
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/zend"
 )
 
