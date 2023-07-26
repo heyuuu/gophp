@@ -22,7 +22,7 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 		if tmp == '$' {
 			break
 		}
-		if uint(b.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
+		if uint(b.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -34,7 +34,7 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 		if tmp == '$' {
 			break
 		}
-		if uint(b.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
+		if uint(b.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -50,7 +50,7 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 		if tmp == '$' {
 			break
 		}
-		if uint(b.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
+		if uint(b.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -66,7 +66,7 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 		if tmp == '$' {
 			break
 		}
-		if uint(b.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
+		if uint(b.Assign(&tmp, tmp-0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]

@@ -149,8 +149,12 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 
 			sign = decpt
 			i = 0
-			for ; b.AssignOp(&sign, "/=", 10) != 0; i++ {
-
+			for {
+				sign /= 10
+				if sign == 0 {
+					break
+				}
+				i++
 			}
 			dst[i+1] = '0'
 			for decpt != 0 {

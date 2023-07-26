@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -172,7 +173,7 @@ func PhpFtpFopenConnect(
 		var s *uint8 = (*uint8)(resource.GetUser().GetVal())
 		var e *uint8 = (*uint8)(s + resource.GetUser().GetLen())
 		for s < e {
-			if iscntrl(*s) {
+			if ascii.IsControl(*s) {
 				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid login %s", resource.GetUser().GetVal())
 				goto connect_errexit
 			}

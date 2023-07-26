@@ -9,12 +9,6 @@ func Assign[T any](variable *T, value T) T {
 	return *variable
 }
 
-func AssignOp[T any](variable *T, value T, op string) T {
-	// todo 待处理各 op 类型
-	*variable = value
-	return *variable
-}
-
 func Cond[T any](cond bool, trueValue T, falseValue T) T {
 	if cond {
 		return trueValue
@@ -41,10 +35,6 @@ func CondF2[T any](cond bool, trueValue T, falseValue func() T) T {
 		return trueValue
 	}
 	return falseValue()
-}
-
-func Goto(label any) {
-	// todo
 }
 
 func SizeOf(typ any) int {

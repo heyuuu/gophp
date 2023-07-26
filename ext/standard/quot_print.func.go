@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -119,8 +120,8 @@ func PhpQuotPrintEncode(str *uint8, length int) *types.String {
 			length--
 			lp = 0
 		} else {
-			if iscntrl(c) || c == 0x7f || (c&0x80) != 0 || c == '=' || c == ' ' && (*str) == '0' {
-				if b.AssignOp(&lp, "+=", 3) > PHP_QPRINT_MAXL && c <= 0x7f || c > 0x7f && c <= 0xdf && lp+3 > PHP_QPRINT_MAXL || c > 0xdf && c <= 0xef && lp+6 > PHP_QPRINT_MAXL || c > 0xef && c <= 0xf4 && lp+9 > PHP_QPRINT_MAXL {
+			if ascii.IsControl(c) || (c&0x80) != 0 || c == '=' || c == ' ' && (*str) == '0' {
+				if b.Assign(&lp, lp+3) > PHP_QPRINT_MAXL && c <= 0x7f || c > 0x7f && c <= 0xdf && lp+3 > PHP_QPRINT_MAXL || c > 0xdf && c <= 0xef && lp+6 > PHP_QPRINT_MAXL || c > 0xef && c <= 0xf4 && lp+9 > PHP_QPRINT_MAXL {
 					b.PostInc(&(*d)) = '='
 					b.PostInc(&(*d)) = '0'
 					b.PostInc(&(*d)) = '0'

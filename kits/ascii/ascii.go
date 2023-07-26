@@ -10,7 +10,7 @@ func IsAsciiRune(r rune) bool {
 }
 
 func IsControl(c byte) bool {
-	return c <= 0x1F
+	return c <= 0x1f || c == 0x7f
 }
 
 func IsAlphaNum(c byte) bool {
