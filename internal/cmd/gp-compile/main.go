@@ -4,7 +4,7 @@ import (
 	"flag"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/parser"
-	"github.com/heyuuu/gophp/utils/finder"
+	"github.com/heyuuu/gophp/kits/finder"
 	"log"
 	"os"
 	"path/filepath"

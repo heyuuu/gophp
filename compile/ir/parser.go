@@ -3,7 +3,7 @@ package ir
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
-	"github.com/heyuuu/gophp/utils/slices"
+	"github.com/heyuuu/gophp/kits/slicekit"
 	"log"
 )
 
@@ -65,13 +65,13 @@ func (p *parser) ParseFile(astFile []ast.Stmt) *File {
 	defer func() { p.file = nil }()
 
 	// 优先处理 declare，会影响其他代码
-	slices.Each(declareStmts, p.handleDeclareStmt)
+	slicekit.Each(declareStmts, p.handleDeclareStmt)
 
 	// 区分有无命名空间进行处理
 	if len(globalStmts) > 0 {
 		p.file.Namespaces = []*Namespace{p.pNamespace("", globalStmts)}
 	} else {
-		p.file.Namespaces = slices.Map(namespaceStmts, p.pNamespaceStmt)
+		p.file.Namespaces = slicekit.Map(namespaceStmts, p.pNamespaceStmt)
 	}
 
 	return p.file
@@ -195,7 +195,7 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 		}
 	case *ast.ArrayExpr:
 		return &ArrayExpr{
-			Items: slices.Map(n.Items, p.pArrayItemExpr),
+			Items: slicekit.Map(n.Items, p.pArrayItemExpr),
 		}
 	case *ast.ArrayItemExpr:
 		return &ArrayItemExpr{
@@ -208,8 +208,8 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 		return &ClosureExpr{
 			Static: n.Static,
 			ByRef:  n.ByRef,
-			Params: slices.Map(n.Params, p.pParam),
-			Uses: slices.Map(n.Uses, func(x *ast.ClosureUseExpr) *ClosureUseExpr {
+			Params: slicekit.Map(n.Params, p.pParam),
+			Uses: slicekit.Map(n.Uses, func(x *ast.ClosureUseExpr) *ClosureUseExpr {
 				return &ClosureUseExpr{
 					Name:  p.pVariableIdent(x.Var, "ast.ClosureUseExpr.Var"),
 					ByRef: n.ByRef,
@@ -222,7 +222,7 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 		return &ArrowFunctionExpr{
 			Static:     n.Static,
 			ByRef:      n.ByRef,
-			Params:     slices.Map(n.Params, p.pParam),
+			Params:     slicekit.Map(n.Params, p.pParam),
 			ReturnType: p.pType(n.ReturnType),
 			Expr:       p.pExpr(n.Expr),
 		}
@@ -261,7 +261,7 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 	case *ast.InternalCallExpr:
 		return &InternalCallExpr{
 			Kind: n.Kind,
-			Args: slices.Map(n.Args, p.pExpr),
+			Args: slicekit.Map(n.Args, p.pExpr),
 		}
 	case *ast.CloneExpr:
 		return &CloneExpr{
@@ -297,7 +297,7 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 		}
 	case *ast.ListExpr:
 		return &ListExpr{
-			Items: slices.Map(n.Items, p.pArrayItemExpr),
+			Items: slicekit.Map(n.Items, p.pArrayItemExpr),
 		}
 	case *ast.PrintExpr:
 		return &PrintExpr{
@@ -315,7 +315,7 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 		}
 	case *ast.ShellExecExpr:
 		return &ShellExecExpr{
-			Parts: slices.Map(n.Parts, p.pExpr),
+			Parts: slicekit.Map(n.Parts, p.pExpr),
 		}
 	case *ast.TernaryExpr:
 		return &TernaryExpr{
@@ -415,9 +415,9 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 		return p.pSwitchStmt(n)
 	case *ast.ForStmt:
 		return &ForStmt{
-			Init:  slices.Map(n.Init, p.pExpr),
-			Cond:  slices.Map(n.Cond, p.pExpr),
-			Loop:  slices.Map(n.Loop, p.pExpr),
+			Init:  slicekit.Map(n.Init, p.pExpr),
+			Cond:  slicekit.Map(n.Cond, p.pExpr),
+			Loop:  slicekit.Map(n.Loop, p.pExpr),
 			Stmts: p.pStmtList(n.Stmts),
 		}
 	case *ast.ForeachStmt:
@@ -449,7 +449,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 	case *ast.TryCatchStmt:
 		return p.pTryCatchStmt(n)
 	case *ast.ConstStmt:
-		return parsingStmts(slices.Map(n.Consts, func(c *ast.Const) Stmt {
+		return parsingStmts(slicekit.Map(n.Consts, func(c *ast.Const) Stmt {
 			return &ConstStmt{
 				Name:  p.pNameAsFQ(c.NamespacedName),
 				Value: p.pExpr(c.Value),
@@ -457,11 +457,11 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 		}))
 	case *ast.EchoStmt:
 		return &EchoStmt{
-			Exprs: slices.Map(n.Exprs, p.pExpr),
+			Exprs: slicekit.Map(n.Exprs, p.pExpr),
 		}
 	case *ast.GlobalStmt:
 		return &GlobalStmt{
-			Vars: slices.Map(n.Vars, p.pExpr),
+			Vars: slicekit.Map(n.Vars, p.pExpr),
 		}
 	case *ast.HaltCompilerStmt:
 		return &HaltCompilerStmt{
@@ -472,7 +472,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 			Value: n.Value,
 		}
 	case *ast.StaticStmt:
-		return parsingStmts(slices.Map(n.Vars, func(x *ast.StaticVarStmt) Stmt {
+		return parsingStmts(slicekit.Map(n.Vars, func(x *ast.StaticVarStmt) Stmt {
 			return &StaticStmt{
 				Name:    p.pVariableIdent(x.Var, "ast.StaticVarStmt.Var"),
 				Default: p.pExpr(x.Default),
@@ -480,7 +480,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 		}))
 	case *ast.UnsetStmt:
 		return &UnsetStmt{
-			Vars: slices.Map(n.Vars, p.pExpr),
+			Vars: slicekit.Map(n.Vars, p.pExpr),
 		}
 	case *ast.UseStmt:
 		return &UseStmt{
@@ -494,7 +494,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 		fn := &Func{
 			Name:       p.pNameAsFQ(n.NamespacedName),
 			ByRef:      n.ByRef,
-			Params:     slices.Map(n.Params, p.pParam),
+			Params:     slicekit.Map(n.Params, p.pParam),
 			ReturnType: p.pType(n.ReturnType),
 			Stmts:      p.pStmtList(n.Stmts),
 		}
@@ -504,7 +504,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 
 		it := &Interface{
 			Name:    p.pNameAsFQ(n.NamespacedName),
-			Extends: slices.Map(n.Extends, p.pNameEx),
+			Extends: slicekit.Map(n.Extends, p.pNameEx),
 			Stmts:   p.pStmtList(n.Stmts),
 		}
 		return &DeclStmt{it}
@@ -514,7 +514,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 				Name:       p.pNameAsFQ(n.NamespacedName),
 				Flags:      p.pFlags(n.Flags),
 				Extends:    p.pName(n.Extends),
-				Implements: slices.Map(n.Implements, p.pNameEx),
+				Implements: slicekit.Map(n.Implements, p.pNameEx),
 				Stmts:      p.pStmtList(n.Stmts),
 			}
 			return &DeclStmt{c}
@@ -523,7 +523,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 			return &AnonymousClassStmt{
 				Flags:      p.pFlags(n.Flags),
 				Extends:    p.pName(n.Extends),
-				Implements: slices.Map(n.Implements, p.pNameEx),
+				Implements: slicekit.Map(n.Implements, p.pNameEx),
 				Stmts:      p.pStmtList(n.Stmts),
 			}
 		}
@@ -537,7 +537,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 		return &DeclStmt{t}
 	case *ast.ClassConstStmt:
 		flags := p.pFlags(n.Flags)
-		return parsingStmts(slices.Map(n.Consts, func(x *ast.Const) Stmt {
+		return parsingStmts(slicekit.Map(n.Consts, func(x *ast.Const) Stmt {
 			return &ClassConstStmt{
 				Flags: flags,
 				Name:  x.Name.Name,
@@ -548,7 +548,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 		flags := p.pFlags(n.Flags)
 		typ := p.pType(n.Type)
 
-		return parsingStmts(slices.Map(n.Props, func(x *ast.PropertyPropertyStmt) Stmt {
+		return parsingStmts(slicekit.Map(n.Props, func(x *ast.PropertyPropertyStmt) Stmt {
 			return &PropertyStmt{
 				Flags:   flags,
 				Type:    typ,
@@ -561,14 +561,14 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 			Flags:      p.pFlags(n.Flags),
 			ByRef:      n.ByRef,
 			Name:       p.pIdentString(n.Name),
-			Params:     slices.Map(n.Params, p.pParam),
+			Params:     slicekit.Map(n.Params, p.pParam),
 			ReturnType: p.pType(n.ReturnType),
 			Stmts:      p.pStmtList(n.Stmts),
 		}
 	case *ast.TraitUseStmt:
 		return &TraitUseStmt{
-			Traits:      slices.Map(n.Traits, p.pName),
-			Adaptations: slices.Map(n.Adaptations, p.pTraitUseAdaptationStmt),
+			Traits:      slicekit.Map(n.Traits, p.pName),
+			Adaptations: slicekit.Map(n.Adaptations, p.pTraitUseAdaptationStmt),
 		}
 	case *ast.TraitUseAdaptationAliasStmt:
 		return &TraitUseAdaptationAliasStmt{
@@ -579,7 +579,7 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 		}
 	case *ast.TraitUseAdaptationPrecedenceStmt:
 		return &TraitUseAdaptationPrecedenceStmt{
-			Insteadof: slices.Map(n.Insteadof, p.pName),
+			Insteadof: slicekit.Map(n.Insteadof, p.pName),
 			Trait:     p.pName(n.Trait),
 			Method:    p.pIdent(n.Method),
 		}
@@ -596,7 +596,7 @@ func (p *parser) pIfStmt(n *ast.IfStmt) *IfStmt {
 	return &IfStmt{
 		Cond:  p.pExpr(n.Cond),
 		Stmts: p.pStmtList(n.Stmts),
-		Elseifs: slices.Map(n.Elseifs, func(x *ast.ElseIfStmt) *ElseIfStmt {
+		Elseifs: slicekit.Map(n.Elseifs, func(x *ast.ElseIfStmt) *ElseIfStmt {
 			return &ElseIfStmt{
 				Cond:  p.pExpr(x.Cond),
 				Stmts: p.pStmtList(x.Stmts),
@@ -613,7 +613,7 @@ func (p *parser) pIfStmt(n *ast.IfStmt) *IfStmt {
 func (p *parser) pSwitchStmt(n *ast.SwitchStmt) *SwitchStmt {
 	return &SwitchStmt{
 		Cond: p.pExpr(n.Cond),
-		Cases: slices.Map(n.Cases, func(x *ast.CaseStmt) *CaseStmt {
+		Cases: slicekit.Map(n.Cases, func(x *ast.CaseStmt) *CaseStmt {
 			return &CaseStmt{
 				Cond:  p.pExpr(x.Cond),
 				Stmts: p.pStmtList(x.Stmts),
@@ -625,12 +625,12 @@ func (p *parser) pSwitchStmt(n *ast.SwitchStmt) *SwitchStmt {
 func (p *parser) pTryCatchStmt(n *ast.TryCatchStmt) *TryCatchStmt {
 	return &TryCatchStmt{
 		Stmts: p.pStmtList(n.Stmts),
-		Catches: slices.Map(n.Catches, func(x *ast.CatchStmt) *CatchStmt {
+		Catches: slicekit.Map(n.Catches, func(x *ast.CatchStmt) *CatchStmt {
 			if x.Var == nil {
 				p.highVersionFeature("php8.0 catch an exception without storing it in a variable.")
 			}
 			return &CatchStmt{
-				Types: slices.Map(x.Types, p.pNameEx),
+				Types: slicekit.Map(x.Types, p.pNameEx),
 				Var:   p.pVariableIdent(x.Var, "ast.CatchStmt.Var"),
 				Stmts: p.pStmtList(n.Stmts),
 			}
@@ -649,11 +649,11 @@ func (p *parser) pType(node ast.Type) Type {
 		return p.pSimpleType(n)
 	case *ast.IntersectionType:
 		return &IntersectionType{
-			Types: slices.Map(n.Types, p.pType),
+			Types: slicekit.Map(n.Types, p.pType),
 		}
 	case *ast.UnionType:
 		return &UnionType{
-			Types: slices.Map(n.Types, p.pType),
+			Types: slicekit.Map(n.Types, p.pType),
 		}
 	case *ast.NullableType:
 		return &NullableType{
@@ -683,7 +683,7 @@ func (p *parser) pTraitUseAdaptationStmt(node ast.TraitUseAdaptationStmt) TraitU
 		}
 	case *ast.TraitUseAdaptationPrecedenceStmt:
 		return &TraitUseAdaptationPrecedenceStmt{
-			Insteadof: slices.Map(n.Insteadof, p.pName),
+			Insteadof: slicekit.Map(n.Insteadof, p.pName),
 			Trait:     p.pName(n.Trait),
 			Method:    p.pIdent(n.Method),
 		}
@@ -705,7 +705,7 @@ func (p *parser) pArg(n *ast.Arg) *Arg {
 	}
 }
 func (p *parser) pArgs(args []ast.Node) []*Arg {
-	return slices.Map(args, func(n ast.Node) *Arg {
+	return slicekit.Map(args, func(n ast.Node) *Arg {
 		switch arg := n.(type) {
 		case *ast.Arg:
 			return p.pArg(arg)

@@ -3,7 +3,7 @@ package ir
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/compile/token"
-	"github.com/heyuuu/gophp/utils/slices"
+	"github.com/heyuuu/gophp/kits/slicekit"
 	"log"
 	"os"
 	"reflect"
@@ -76,7 +76,7 @@ func (p *printer) pNamespace(ns *Namespace) {
 	}
 	p.print("/**\n * namespace " + nsName + "\n */\n")
 	p.print("package ir\n\n")
-	slices.Each(ns.Segments, p.pSegment)
+	slicekit.Each(ns.Segments, p.pSegment)
 	p.print("\n")
 }
 
