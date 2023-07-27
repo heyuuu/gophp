@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/parser"
+	"github.com/heyuuu/gophp/compile/render"
 	"github.com/heyuuu/gophp/kits/vardumper"
 	"github.com/heyuuu/gophp/shim/maps"
 	"net/http"
@@ -108,7 +109,7 @@ func printIrFileAsProject(irFile *ir.File) (string, error) {
 	irProj := ir.NewProject()
 	_ = irProj.AddFile("__main__", irFile)
 
-	contents, err := ir.PrintProject(irProj)
+	contents, err := render.Render(irProj)
 	if err != nil {
 		return "", err
 	}
@@ -121,6 +122,7 @@ func printIrFileAsProject(irFile *ir.File) (string, error) {
 	var buf strings.Builder
 	for _, key := range keys {
 		content := contents[key]
+		buf.WriteString("/* file: " + key + " */\n")
 		buf.WriteString(content)
 	}
 

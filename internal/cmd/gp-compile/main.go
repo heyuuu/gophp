@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/parser"
+	"github.com/heyuuu/gophp/compile/render"
 	"github.com/heyuuu/gophp/kits/finder"
 	"log"
 	"os"
@@ -95,7 +96,7 @@ func compileFile(srcFile string) (*ir.File, error) {
 }
 
 func printIrProject(distPath string, proj *ir.Project) error {
-	codes, err := ir.PrintProject(proj)
+	codes, err := render.Render(proj)
 	if err != nil {
 		return err
 	}

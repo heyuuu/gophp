@@ -4,54 +4,40 @@ import (
 	"github.com/heyuuu/gophp/compile/ir"
 )
 
-// functions
 func Render(proj *ir.Project) (map[string]string, error) {
-	return defaultConfig.Render(proj)
-}
-
-// Config
-var defaultConfig = &Config{}
-
-type Config struct{}
-
-func (c *Config) Render(proj *ir.Project) (map[string]string, error) {
-	r := newRender(c)
+	p := defaultPrinter()
 
 	var result = make(map[string]string)
 	for _, ns := range proj.Namespaces() {
-		name, content, err := r.renderNamespace(ns)
+		p.reset()
+		p.pNamespace(ns)
+		content, err := p.result()
 		if err != nil {
 			return nil, err
 		}
+
+		name := ns.Name
 		result[name] = content
 	}
 	return result, nil
 }
 
 // NameResolver
-type NameResolver func(ir.Name) string
-
-func defaultNameResolver(name ir.Name) string {
-	return name.ToCodeString()
+type NameResolver interface {
+	Namespace(string) string
+	Class(string) string
 }
 
-// render
-type render struct {
-	nameResolver NameResolver
+type defaultNameResolver struct{}
+
+func newDefaultNameResolver() *defaultNameResolver {
+	return &defaultNameResolver{}
 }
 
-func newRender(c *Config) *render {
-	return &render{
-		nameResolver: defaultNameResolver,
-	}
+func (d defaultNameResolver) Namespace(name string) string {
+	return name
 }
 
-func (r *render) renderNamespace(ns *ir.Namespace) (name string, content string, err error) {
-	// build ast
-	// todo
-
-	// render
-	// todo
-
-	return name, content, nil
+func (d defaultNameResolver) Class(name string) string {
+	return name
 }
