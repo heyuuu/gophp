@@ -1,15 +1,5 @@
 package types
 
-import (
-	b "github.com/heyuuu/gophp/builtin"
-)
-
-/** Zval.u1 -> type & typeFlags */
-func (zv *Zval) SetType(typ ZvalType) {
-	b.Assert(typ <= IsTrue)
-	zv.typ, zv.v = typ, nil
-}
-
 /** Zval.u2 */
 func (zv *Zval) GetCacheSlot() uint32      { return zv.u2 }
 func (zv *Zval) SetCacheSlot(value uint32) { zv.u2 = value }
