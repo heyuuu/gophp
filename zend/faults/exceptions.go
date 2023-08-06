@@ -566,7 +566,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	str = types.NewString("")
 	exception = executeData.ThisObjectZval()
 	fname = "gettraceasstring"
-	for exception != nil && exception.IsObject() && operators.InstanceofFunction(types.Z_OBJCE_P(exception), ZendCeThrowable) != 0 {
+	for exception != nil && exception.IsObject() && operators.InstanceofFunction(types.Z_OBJCE_P(exception), ZendCeThrowable) {
 		var prev_str *types.String = str
 		var message *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_MESSAGE, &rv))
 		var file *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_FILE, &rv))
@@ -576,12 +576,10 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		fci.SetFunctionName(fname)
 		zend.ZendCallFunction(fci, nil)
 		if !trace.IsString() {
-			// zend.ZvalPtrDtor(&trace)
 			trace.SetUndef()
 		}
 		if (types.Z_OBJCE_P(exception) == ZendCeTypeError || types.Z_OBJCE_P(exception) == ZendCeArgumentCountError) && strstr(message.GetVal(), ", called in ") {
 			var real_message *types.String = zend.ZendSprintfZStr("%s and defined", message.GetVal())
-			// types.ZendStringReleaseEx(message, 0)
 			message = real_message
 		}
 		if message.GetLen() > 0 {
@@ -589,10 +587,6 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		} else {
 			str = zend.ZendSprintfZStr("%s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		}
-		// types.ZendStringReleaseEx(prev_str, 0)
-		// types.ZendStringReleaseEx(message, 0)
-		// types.ZendStringReleaseEx(file, 0)
-		// zend.ZvalPtrDtor(&trace)
 		exception.Object().ProtectRecursive()
 		exception = GET_PROPERTY(exception, types.STR_PREVIOUS, &rv)
 		if exception != nil && exception.IsObject() && exception.Object().IsRecursive() {
