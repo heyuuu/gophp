@@ -826,23 +826,13 @@ func WriteOctetSequence(buf *uint8, charset EntityCharset, code uint) int {
 	/* code is not necessarily a unicode code point */
 }
 func TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(oldlen int) int { return oldlen + oldlen/5 + 2 }
-func TraverseForEntities(
-	old *byte,
-	oldlen int,
-	ret *types.String,
-	all int,
-	flags int,
-	inv_map *EntityHt,
-	charset EntityCharset,
-) string {
-	var p *byte
-	var lim *byte
+func TraverseForEntities(old string, all bool, flags int, inv_map *EntityHt, charset EntityCharset) string {
 	var doctype int = flags & ENT_HTML_DOC_TYPE_MASK
-	lim = old + oldlen
-	b.Assert((*lim) == '0')
+	var p *byte
 	p = old
+	oldLen := len(old)
 	var buf strings.Builder
-	for p < lim {
+	for idx := 0; idx < oldLen; {
 		var code uint
 		var code2 uint = 0
 		var next *byte = nil
@@ -852,15 +842,15 @@ func TraverseForEntities(
 		 * However, they start at 0x40, therefore if we find a 0x26 byte,
 		 * we're sure it represents the '&' character. */
 
-		if p[0] != '&' || p+3 >= lim {
-			buf.WriteByte(*p)
-			p++
+		if old[idx] != '&' || idx+3 >= oldLen {
+			buf.WriteByte(old[idx])
+			idx++
 			continue
 		}
 
 		/* now p[3] is surely valid and is no terminator */
 
-		if p[1] == '#' {
+		if old[idx+1] == '#' {
 			next = &p[2]
 			if ProcessNumericEntity(&next, &code) == types.FAILURE {
 				goto invalid_code
@@ -868,8 +858,7 @@ func TraverseForEntities(
 
 			/* If we're in htmlspecialchars_decode, we're only decoding entities
 			 * that represent &, <, >, " and '. Is this one of them? */
-
-			if all == 0 && (code > 63 || Stage3TableBeApos00000[code].GetEntity() == nil) {
+			if !all && (code > 63 || Stage3TableBeApos00000[code].GetEntity() == nil) {
 				goto invalid_code
 			}
 
@@ -989,7 +978,6 @@ func PhpUnescapeHtmlEntities(str string, all bool, flags int, hintCharset string
 		charset = DetermineCharset(hintCharset)
 	}
 
-	var ret *types.String
 	var inverse_map *EntityHt
 	var new_size int
 
@@ -1002,7 +990,7 @@ func PhpUnescapeHtmlEntities(str string, all bool, flags int, hintCharset string
 	inverse_map = UnescapeInverseMap(all, flags)
 
 	/* replace numeric entities */
-	return TraverseForEntities(str.GetVal(), str.GetLen(), ret, all, flags, inverse_map, charset)
+	return TraverseForEntities(str, all, flags, inverse_map, charset)
 }
 
 func PhpEscapeHtmlEntities_Ex(old string, all int, flags int, hint_charset string) string {
