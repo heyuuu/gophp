@@ -29,16 +29,16 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 	var ret int = 0
 	var ce *types.ClassEntry
 	var name_len int = name.GetLen()
-	var lcname *types.String = name.ToLower()
+	lcname := ascii.StrToLower(name.GetStr())
 	*strict_class = 0
-	if lcname.GetStr() == "self" {
+	if lcname == "self" {
 		if scope == nil {
 			if error != nil {
 				*error = Estrdup("cannot access self:: when no class scope is active")
 			}
 		} else {
 			fcc.SetCalledScope(ZendGetCalledScope(CurrEX()))
-			if fcc.GetCalledScope() == nil || operators.InstanceofFunction(fcc.GetCalledScope(), scope) == 0 {
+			if fcc.GetCalledScope() == nil || !operators.InstanceofFunction(fcc.GetCalledScope(), scope) {
 				fcc.SetCalledScope(scope)
 			}
 			fcc.SetCallingScope(scope)
@@ -47,18 +47,18 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 			}
 			ret = 1
 		}
-	} else if lcname.GetStr() == "parent" {
+	} else if lcname == "parent" {
 		if scope == nil {
 			if error != nil {
 				*error = Estrdup("cannot access parent:: when no class scope is active")
 			}
-		} else if !(scope.GetParent()) {
+		} else if scope.GetParent() == nil {
 			if error != nil {
 				*error = Estrdup("cannot access parent:: when current class scope has no parent")
 			}
 		} else {
 			fcc.SetCalledScope(ZendGetCalledScope(CurrEX()))
-			if fcc.GetCalledScope() == nil || operators.InstanceofFunction(fcc.GetCalledScope(), scope.GetParent()) == 0 {
+			if fcc.GetCalledScope() == nil || !operators.InstanceofFunction(fcc.GetCalledScope(), scope.GetParent()) {
 				fcc.SetCalledScope(scope.GetParent())
 			}
 			fcc.SetCallingScope(scope.GetParent())
@@ -68,7 +68,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 			*strict_class = 1
 			ret = 1
 		}
-	} else if lcname.GetStr() == "static" {
+	} else if lcname == "static" {
 		var called_scope *types.ClassEntry = ZendGetCalledScope(CurrEX())
 		if called_scope == nil {
 			if error != nil {
@@ -97,7 +97,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 		fcc.SetCallingScope(ce)
 		if scope != nil && fcc.GetObject() == nil {
 			var object *types.Object = ZendGetThisObject(CurrEX())
-			if object != nil && operators.InstanceofFunction(object.GetCe(), scope) != 0 && operators.InstanceofFunction(scope, ce) != 0 {
+			if object != nil && operators.InstanceofFunction(object.GetCe(), scope) && operators.InstanceofFunction(scope, ce) {
 				fcc.SetObject(object)
 				fcc.SetCalledScope(object.GetCe())
 			} else {
