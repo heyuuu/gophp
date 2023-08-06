@@ -6,11 +6,13 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
 func SKIP_LONG_HEADER_SEP(str *byte, pos int) {
@@ -52,177 +54,108 @@ func ZifEzmlmHash(executeData zpp.Ex, return_value zpp.Ret, addr *types.Zval) {
 	return_value.SetLong(zend.ZendLong(h))
 	return
 }
-func PhpMailBuildHeadersCheckFieldValue(val *types.Zval) bool {
-	var len_ int = 0
-	var value *types.String = val.StringEx()
-
+func PhpMailBuildHeadersCheckFieldValue(value string) bool {
 	/* https://tools.ietf.org/html/rfc2822#section-2.2.1 */
-
-	for len_ < value.GetLen() {
-		if (*(value.GetVal() + len_)) == '\r' {
-			if value.GetLen()-len_ >= 3 && (*(value.GetVal() + len_ + 1)) == '\n' && ((*(value.GetVal() + len_ + 2)) == ' ' || (*(value.GetVal() + len_ + 2)) == '\t') {
-				len_ += 3
+	l := len(value)
+	for i := 0; i < l; {
+		if value[i] == '\r' {
+			if i+2 < l && value[i+1] == '\n' && (value[i+2] == ' ' || value[i+2] == '\t') {
+				l += 3
 				continue
 			}
-			return types.FAILURE
+			return false
 		}
-		if (*(value.GetVal() + len_)) == '0' {
-			return types.FAILURE
+		if value[i] == 0 {
+			return false
 		}
-		len_++
+		i++
 	}
-	return types.SUCCESS
+	return true
 }
-func PhpMailBuildHeadersCheckFieldName(key *types.String) bool {
-	var len_ int = 0
-
+func PhpMailBuildHeadersCheckFieldName(key string) bool {
 	/* https://tools.ietf.org/html/rfc2822#section-2.2 */
-
-	for len_ < key.GetLen() {
-		if (*(key.GetVal() + len_)) < 33 || (*(key.GetVal() + len_)) > 126 || (*(key.GetVal() + len_)) == ':' {
-			return types.FAILURE
+	for _, c := range []byte(key) {
+		if c < 33 || c > 126 || c == ':' {
+			return false
 		}
-		len_++
 	}
-	return types.SUCCESS
+	return true
 }
-func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.String, val *types.Zval) {
-	switch val.Type() {
-	case types.IsString:
-		if PhpMailBuildHeadersCheckFieldName(key) != types.SUCCESS {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field name (%s) contains invalid chars", key.GetVal())
+
+func PhpMailBuildHeadersElem(s *strings.Builder, key string, val string) {
+	if !PhpMailBuildHeadersCheckFieldName(key) {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Header field name (%s) contains invalid chars", key)
+		return
+	}
+	if !PhpMailBuildHeadersCheckFieldValue(val) {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key, val)
+		return
+	}
+	s.WriteString(key)
+	s.WriteString(": ")
+	s.WriteString(val)
+	s.WriteString("\r\n")
+}
+func PhpMailBuildHeadersElems(s *strings.Builder, key string, val *types.Array) {
+	val.Foreach(func(tmpKey types.ArrayKey, tmpVal *types.Zval) {
+		if tmpKey.IsStrKey() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple header key must be numeric index (%s)", tmpKey.StrKey())
 			return
 		}
-		if PhpMailBuildHeadersCheckFieldValue(val) != types.SUCCESS {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), val.StringEx().GetVal())
+		if !tmpVal.IsString() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple header values must be string (%s)", key.GetStr())
 			return
 		}
-		s.WriteString(key.GetStr())
-		s.WriteString(": ")
-		s.WriteString(b.CastStrAuto(val.StringEx().GetVal()))
-		s.WriteString("\r\n")
-	case types.IsArray:
-		PhpMailBuildHeadersElems(s, key, val)
-	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "headers array elements must be string or array (%s)", key.GetVal())
+		PhpMailBuildHeadersElem(s, key, tmpVal.String())
+	})
+}
+func PhpMailBuildHeader(s *strings.Builder, key string, val *types.Zval, check bool) {
+	if val.IsString() {
+		PhpMailBuildHeadersElem(s, key, val.String())
+	} else if val.IsType(types.IsArray) {
+		if check {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "'%s' header must be at most one header. Array is passed for '%s'", key, key)
+			return
+		}
+		PhpMailBuildHeadersElems(s, key, val.Array())
+	} else {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Extra header element '%s' cannot be other than string or array.", key)
 	}
 }
-func PhpMailBuildHeadersElems(s *zend.SmartStr, key *types.String, val *types.Zval) {
-	var tmp_key *types.String
-	var tmp_val *types.Zval
-	var __ht *types.Array = val.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
+func PhpMailBuildHeaders(headers *types.Zval) string {
+	b.Assert(headers.IsArray())
 
-		tmp_key = _p.GetKey()
-		tmp_val = _z
-		if tmp_key != nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple header key must be numeric index (%s)", tmp_key.GetVal())
-			continue
-		}
-		if !tmp_val.IsString() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple header values must be string (%s)", key.GetVal())
-			continue
-		}
-		PhpMailBuildHeadersElem(s, key, tmp_val)
-	}
-}
-func PhpMailBuildHeaders(headers *types.Zval) *types.String {
-	var idx zend.ZendUlong
-	var key *types.String
-	var val *types.Zval
-	var s zend.SmartStr = zend.MakeSmartStr(0)
-	b.Assert(headers.IsType(types.IsArray))
-	var __ht *types.Array = headers.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		idx = _p.GetH()
-		key = _p.GetKey()
-		val = _z
-		if key == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Found numeric header ("+zend.ZEND_LONG_FMT+")", idx)
-			continue
+	var s strings.Builder
+	headers.Array().Foreach(func(arrayKey types.ArrayKey, value *types.Zval) {
+		if !arrayKey.IsStrKey() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Found numeric header ("+zend.ZEND_LONG_FMT+")", arrayKey.IdxKey())
+			return
 		}
 
 		/* https://tools.ietf.org/html/rfc2822#section-3.6 */
-
-		switch key.GetLen() {
-		case b.SizeOf("\"orig-date\"") - 1:
-			if !(strncasecmp("orig-date", key.GetVal(), key.GetLen())) {
-				PHP_MAIL_BUILD_HEADER_CHECK("orig-date", s, key, val)
-			} else {
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			}
-		case b.SizeOf("\"from\"") - 1:
-			if !(strncasecmp("from", key.GetVal(), key.GetLen())) {
-				PHP_MAIL_BUILD_HEADER_CHECK("from", s, key, val)
-			} else {
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			}
-		case b.SizeOf("\"sender\"") - 1:
-			if !(strncasecmp("sender", key.GetVal(), key.GetLen())) {
-				PHP_MAIL_BUILD_HEADER_CHECK("sender", s, key, val)
-			} else {
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			}
-		case b.SizeOf("\"reply-to\"") - 1:
-			if !(strncasecmp("reply-to", key.GetVal(), key.GetLen())) {
-				PHP_MAIL_BUILD_HEADER_CHECK("reply-to", s, key, val)
-			} else {
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			}
-		case b.SizeOf("\"to\"") - 1:
-			if !(strncasecmp("to", key.GetVal(), key.GetLen())) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Extra header cannot contain 'To' header")
-				continue
-			}
-			if !(strncasecmp("cc", key.GetVal(), key.GetLen())) {
-				PHP_MAIL_BUILD_HEADER_CHECK("cc", s, key, val)
-			} else {
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			}
-		case b.SizeOf("\"bcc\"") - 1:
-			if !(strncasecmp("bcc", key.GetVal(), key.GetLen())) {
-				PHP_MAIL_BUILD_HEADER_CHECK("bcc", s, key, val)
-			} else {
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			}
-		case b.SizeOf("\"message-id\"") - 1:
-			if !(strncasecmp("message-id", key.GetVal(), key.GetLen())) {
-				PHP_MAIL_BUILD_HEADER_CHECK("message-id", s, key, val)
-			} else if !(strncasecmp("references", key.GetVal(), key.GetLen())) {
-				PHP_MAIL_BUILD_HEADER_CHECK("references", s, key, val)
-			} else {
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			}
-		case b.SizeOf("\"in-reply-to\"") - 1:
-			if !(strncasecmp("in-reply-to", key.GetVal(), key.GetLen())) {
-				PHP_MAIL_BUILD_HEADER_CHECK("in-reply-to", s, key, val)
-			} else {
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			}
-		case b.SizeOf("\"subject\"") - 1:
-			if !(strncasecmp("subject", key.GetVal(), key.GetLen())) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Extra header cannot contain 'Subject' header")
-				continue
-			}
-			PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+		key := arrayKey.StrKey()
+		switch ascii.StrToLower(key) {
+		case "orig-date", "from", "sender", "reply-to", "cc", "bcc", "message-id", "references", "in-reply-to":
+			PhpMailBuildHeader(&s, key, value, true)
+		case "to":
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Extra header cannot contain 'To' header")
+			return
+		case "subject":
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Extra header cannot contain 'Subject' header")
+			return
 		default:
-			PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			PhpMailBuildHeader(&s, key, value, false)
 		}
 
 		/* https://tools.ietf.org/html/rfc2822#section-3.6 */
-
-	}
+	})
 
 	/* Remove the last \r\n */
-
-	if s.GetS() != nil {
-		s.GetS().SetLen(s.GetS().GetLen() - 2)
+	result := s.String()
+	if len(result) > 2 {
+		result = result[:len(result)-2]
 	}
-	s.ZeroTail()
-	return s.GetS()
+	return result
 }
 func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *types.Zval, message *types.Zval, _ zpp.Opt, additionalHeaders *types.Zval, additionalParameters *types.Zval) {
 	var to *byte = nil
@@ -271,7 +204,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 			str_headers = types.NewString(str.PhpTrimRight(tmp_headers.GetStr(), nil))
 			// types.ZendStringReleaseEx(tmp_headers, 0)
 		case types.IsArray:
-			str_headers = PhpMailBuildHeaders(headers)
+			str_headers = types.NewString(PhpMailBuildHeaders(headers))
 		default:
 			core.PhpErrorDocref(nil, faults.E_WARNING, "headers parameter must be string or array")
 			return_value.SetFalse()

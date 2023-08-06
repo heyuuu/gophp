@@ -19,6 +19,10 @@ type SmartStr struct {
 	buffer strings.Builder
 }
 
+func MakeSmartStr() SmartStr {
+	return SmartStr{}
+}
+
 func (s *SmartStr) Write(p []byte) (n int, err error) {
 	return s.buffer.Write(p)
 }
