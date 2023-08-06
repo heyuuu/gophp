@@ -29,7 +29,6 @@ type ZendUintptrT = uintptr
 
 type ZvalComparer func(*Zval, *Zval) int
 
-
 /* we should never set just Z_TYPE, we should set Z_TYPE_INFO */
 
 const Z_TYPE_MASK = 0xff
