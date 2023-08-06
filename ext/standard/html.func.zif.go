@@ -28,7 +28,7 @@ var DefZifHtmlspecialcharsDecode = def.DefFunc("htmlspecialchars_decode", 1, 2, 
 	if fp.HasError() {
 		return
 	}
-	ZifHtmlspecialcharsDecode(executeData, returnValue, string, nil, quote_style)
+	ZifHtmlspecialcharsDecode(string, nil, quote_style)
 })
 
 // generate by ZifHtmlEntityDecode
@@ -41,7 +41,7 @@ var DefZifHtmlEntityDecode = def.DefFunc("html_entity_decode", 1, 3, []def.ArgIn
 	if fp.HasError() {
 		return
 	}
-	ZifHtmlEntityDecode(executeData, returnValue, string, nil, quote_style, encoding)
+	ZifHtmlEntityDecode(string, nil, quote_style, encoding)
 })
 
 // generate by ZifHtmlentities

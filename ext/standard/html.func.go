@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
 func LIMIT_ALL(all __auto__, doctype int, charset EntityCharset) {
@@ -28,13 +29,13 @@ func SjisLead(c uint8) bool {
 func SjisTrail(c uint8) bool {
 	return c >= 0x40 && c != 0x7f && c < 0xfd
 }
-func GetDefaultCharset() *byte {
+func GetDefaultCharset() string {
 	if core.PG__().internal_encoding && core.PG__().internal_encoding[0] {
 		return core.PG__().internal_encoding
 	} else if core.SG__().default_charset && core.SG__().default_charset[0] {
 		return core.SG__().default_charset
 	}
-	return nil
+	return ""
 }
 func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, status *int) uint {
 	var pos int = *cursor
@@ -256,7 +257,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 	case CsEucjp:
 		var c uint8 = str[pos]
 		if c >= 0xa1 && c <= 0xfe {
-			var next unsigned
+			var next uint
 			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
 				*status = types.FAILURE
@@ -278,7 +279,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			}
 			pos += 2
 		} else if c == 0x8e {
-			var next unsigned
+			var next uint
 			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
 				*status = types.FAILURE
@@ -409,7 +410,34 @@ det_charset:
 	}
 	return charset
 }
-func PhpUtf32Utf8(buf *uint8, k unsigned) int {
+func PhpUtf32Utf8Ex(k uint) []byte {
+	/* assert(0x0 <= k <= 0x10FFFF); */
+	/* UTF-8 has been restricted to max 4 bytes since RFC 3629 */
+	if k < 0x80 {
+		return []byte{
+			byte(k),
+		}
+	} else if k < 0x800 {
+		return []byte{
+			byte(0xc0 | k>>6),
+			byte(0x80 | k&0x3f),
+		}
+	} else if k < 0x10000 {
+		return []byte{
+			byte(0xe0 | k>>12),
+			byte(0x80 | k>>6&0x3f),
+			byte(0x80 | k&0x3f),
+		}
+	} else {
+		return []byte{
+			byte(0xf0 | k>>18),
+			byte(0x80 | k>>12&0x3f),
+			byte(0x80 | k>>6&0x3f),
+			byte(0x80 | k&0x3f),
+		}
+	}
+}
+func PhpUtf32Utf8(buf *uint8, k uint) int {
 	var retval int = 0
 
 	/* assert(0x0 <= k <= 0x10FFFF); */
@@ -437,10 +465,8 @@ func PhpUtf32Utf8(buf *uint8, k unsigned) int {
 	/* UTF-8 has been restricted to max 4 bytes since RFC 3629 */
 
 	return retval
-
-	/* UTF-8 has been restricted to max 4 bytes since RFC 3629 */
 }
-func UnimapBsearch(table *UniToEnc, code_key_a unsigned, num int) uint8 {
+func UnimapBsearch(table *UniToEnc, code_key_a uint, num int) uint8 {
 	var l *UniToEnc = table
 	var h *UniToEnc = &table[num-1]
 	var m *UniToEnc
@@ -464,7 +490,7 @@ func UnimapBsearch(table *UniToEnc, code_key_a unsigned, num int) uint8 {
 	}
 	return 0
 }
-func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
+func MapFromUnicode(code uint, charset EntityCharset, res *uint) int {
 	var found uint8
 	var table *UniToEnc
 	var table_size int
@@ -573,14 +599,14 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 	}
 	return types.SUCCESS
 }
-func MapToUnicode(code unsigned, table *EncToUni, res *unsigned) {
+func MapToUnicode(code uint, table *EncToUni, res *uint) {
 	/* only single byte encodings are currently supported; assumed code <= 0xFF */
 
 	*res = table.GetInner()[ENT_ENC_TO_UNI_STAGE1(code)].GetUniCp()[ENT_ENC_TO_UNI_STAGE2(code)]
 
 	/* only single byte encodings are currently supported; assumed code <= 0xFF */
 }
-func UnicodeCpIsAllowed(uni_cp unsigned, document_type int) int {
+func UnicodeCpIsAllowed(uni_cp uint, document_type int) int {
 	/* XML 1.0                HTML 4.01            HTML 5
 	 * 0x09..0x0A            0x09..0x0A            0x09..0x0A
 	 * 0x0D                    0x0D                0x0C..0x0D
@@ -642,7 +668,7 @@ func UnicodeCpIsAllowed(uni_cp unsigned, document_type int) int {
 	 * See <http://cmsmcq.com/2007/C1.xml>.
 	 */
 }
-func NumericEntityIsAllowed(uni_cp unsigned, document_type int) int {
+func NumericEntityIsAllowed(uni_cp uint, document_type int) int {
 	/* less restrictive than unicode_cp_is_allowed */
 
 	switch document_type {
@@ -674,7 +700,7 @@ func NumericEntityIsAllowed(uni_cp unsigned, document_type int) int {
 
 	/* less restrictive than unicode_cp_is_allowed */
 }
-func ProcessNumericEntity(buf **byte, code_point *unsigned) int {
+func ProcessNumericEntity(buf **byte, code_point *uint) int {
 	var code_l zend.ZendLong
 	var hexadecimal int = (*(*buf)) == 'x' || (*(*buf)) == 'X'
 	var endptr *byte
@@ -704,7 +730,7 @@ func ProcessNumericEntity(buf **byte, code_point *unsigned) int {
 		return types.FAILURE
 	}
 	if code_point != nil {
-		*code_point = unsigned(code_l)
+		*code_point = uint(code_l)
 	}
 	return types.SUCCESS
 }
@@ -732,7 +758,7 @@ func ProcessNamedEntityHtml(buf **byte, start **byte, length *int) int {
 	}
 	return types.SUCCESS
 }
-func ResolveNamedEntityHtml(start *byte, length int, ht *EntityHt, uni_cp1 *unsigned, uni_cp2 *unsigned) int {
+func ResolveNamedEntityHtml(start *byte, length int, ht *EntityHt, uni_cp1 *uint, uni_cp2 *uint) int {
 	var s *EntityCpMap
 	var hash zend.ZendUlong = b.HashStr(b.CastStr(start, length))
 	s = ht.GetBuckets()[hash%ht.GetNumElems()]
@@ -748,39 +774,40 @@ func ResolveNamedEntityHtml(start *byte, length int, ht *EntityHt, uni_cp1 *unsi
 	}
 	return types.FAILURE
 }
-func WriteOctetSequence(buf *uint8, charset EntityCharset, code unsigned) int {
+func WriteOctetSequenceAsBytes(charset EntityCharset, code uint) []byte {
+	/* code is not necessarily a unicode code point */
+	switch charset {
+	case CsUtf8:
+		return PhpUtf32Utf8Ex(code)
+	case Cs88591, CsCp1252, Cs885915, CsKoi8r, CsCp1251, Cs88595, CsCp866, CsMacroman:
+		/* single byte stuff */
+		return []byte{byte(code)}
+	case CsBig5, CsBig5hkscs, CsSjis, CsGb2312:
+		/* we don't have complete unicode mappings for these yet in entity_decode,
+		 * and we opt to pass through the octet sequences for these in htmlentities
+		 * instead of converting to an int and then converting back. */
+		return []byte{byte(code)}
+	case CsEucjp:
+		return []byte{byte(code)}
+	default:
+		b.Assert(false)
+		return nil
+	}
+	/* code is not necessarily a unicode code point */
+}
+func WriteOctetSequence(buf *uint8, charset EntityCharset, code uint) int {
 	/* code is not necessarily a unicode code point */
 
 	switch charset {
 	case CsUtf8:
 		return PhpUtf32Utf8(buf, code)
-	case Cs88591:
-		fallthrough
-	case CsCp1252:
-		fallthrough
-	case Cs885915:
-		fallthrough
-	case CsKoi8r:
-		fallthrough
-	case CsCp1251:
-		fallthrough
-	case Cs88595:
-		fallthrough
-	case CsCp866:
-		fallthrough
-	case CsMacroman:
+	case Cs88591, CsCp1252, Cs885915, CsKoi8r, CsCp1251, Cs88595, CsCp866, CsMacroman:
 
 		/* single byte stuff */
 
 		*buf = code
 		return 1
-	case CsBig5:
-		fallthrough
-	case CsBig5hkscs:
-		fallthrough
-	case CsSjis:
-		fallthrough
-	case CsGb2312:
+	case CsBig5, CsBig5hkscs, CsSjis, CsGb2312:
 
 		/* we don't have complete unicode mappings for these yet in entity_decode,
 		 * and we opt to pass through the octet sequences for these in htmlentities
@@ -807,18 +834,17 @@ func TraverseForEntities(
 	flags int,
 	inv_map *EntityHt,
 	charset EntityCharset,
-) {
+) string {
 	var p *byte
 	var lim *byte
-	var q *byte
 	var doctype int = flags & ENT_HTML_DOC_TYPE_MASK
 	lim = old + oldlen
 	b.Assert((*lim) == '0')
 	p = old
-	q = ret.GetVal()
+	var buf strings.Builder
 	for p < lim {
-		var code unsigned
-		var code2 unsigned = 0
+		var code uint
+		var code2 uint = 0
 		var next *byte = nil
 
 		/* Shift JIS, Big5 and HKSCS use multi-byte encodings where an
@@ -827,7 +853,8 @@ func TraverseForEntities(
 		 * we're sure it represents the '&' character. */
 
 		if p[0] != '&' || p+3 >= lim {
-			*(lang.PostInc(&q)) = *(lang.PostInc(&p))
+			buf.WriteByte(*p)
+			p++
 			continue
 		}
 
@@ -874,7 +901,7 @@ func TraverseForEntities(
 					/* uses html4 inv_map, which doesn't include apos;. This is a
 					 * hack to support it */
 
-					code = unsigned('\'')
+					code = uint('\'')
 
 					/* uses html4 inv_map, which doesn't include apos;. This is a
 					 * hack to support it */
@@ -891,38 +918,30 @@ func TraverseForEntities(
 
 		/* UTF-8 doesn't need mapping (ISO-8859-1 doesn't either, but
 		 * the call is needed to ensure the codepoint <= U+00FF)  */
-
 		if charset != CsUtf8 {
-
 			/* replace unicode code point */
-
 			if MapFromUnicode(code, charset, &code) == types.FAILURE || code2 != 0 {
 				goto invalid_code
 			}
-
-			/* replace unicode code point */
-
 		}
-		q += WriteOctetSequence((*uint8)(q), charset, code)
-		if code2 {
-			q += WriteOctetSequence((*uint8)(q), charset, code2)
+		buf.Write(WriteOctetSequenceAsBytes(charset, code))
+		if code2 != 0 {
+			buf.Write(WriteOctetSequenceAsBytes(charset, code2))
 		}
 
 		/* jump over the valid entity; may go beyond size of buffer; np */
-
 		p = next + 1
 		continue
 	invalid_code:
 		for ; p < next; p++ {
-			*(lang.PostInc(&q)) = *p
+			buf.WriteByte(*p)
 		}
 	}
-	*q = '0'
-	ret.SetLen(size_t(q - ret.GetVal()))
+	return buf.String()
 }
-func UnescapeInverseMap(all int, flags int) *EntityHt {
+func UnescapeInverseMap(all bool, flags int) *EntityHt {
 	var document_type int = flags & ENT_HTML_DOC_TYPE_MASK
-	if all != 0 {
+	if all {
 		switch document_type {
 		case ENT_HTML_DOC_HTML401:
 			fallthrough
@@ -960,39 +979,30 @@ func DetermineEntityTable(all int, doctype int) EntityTableOpt {
 	}
 	return retval
 }
-func PhpUnescapeHtmlEntities(str *types.String, all int, flags int, hint_charset *byte) *types.String {
+func PhpUnescapeHtmlEntities(str string, all bool, flags int, hintCharset string) string {
+	if strings.IndexByte(str, '&') < 0 {
+		return str
+	}
+
+	charset := Cs88591
+	if all {
+		charset = DetermineCharset(hintCharset)
+	}
+
 	var ret *types.String
-	var charset EntityCharset
 	var inverse_map *EntityHt
 	var new_size int
-	if !(memchr(str.GetVal(), '&', str.GetLen())) {
-		return str.Copy()
-	}
-	if all != 0 {
-		charset = DetermineCharset(hint_charset)
-	} else {
-		charset = Cs88591
-	}
 
 	/* don't use LIMIT_ALL! */
-
-	new_size = TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(str.GetLen())
-	if str.GetLen() > new_size {
-
+	new_size = TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(len(str))
+	if len(str) > new_size {
 		/* overflow, refuse to do anything */
-
-		return str.Copy()
-
-		/* overflow, refuse to do anything */
-
+		return str
 	}
-	ret = types.ZendStringAlloc(new_size, 0)
 	inverse_map = UnescapeInverseMap(all, flags)
 
 	/* replace numeric entities */
-
-	TraverseForEntities(str.GetVal(), str.GetLen(), ret, all, flags, inverse_map, charset)
-	return ret
+	return TraverseForEntities(str.GetVal(), str.GetLen(), ret, all, flags, inverse_map, charset)
 }
 
 func PhpEscapeHtmlEntities_Ex(old string, all int, flags int, hint_charset string) string {
@@ -1016,7 +1026,7 @@ func FindEntityForChar(
 	oldlen int,
 	cursor *int,
 ) {
-	var stage1_idx unsigned = ENT_STAGE1_INDEX(k)
+	var stage1_idx uint = ENT_STAGE1_INDEX(k)
 	var c *EntityStage3Row
 	if stage1_idx > 0x1d {
 		*entity = nil
@@ -1033,7 +1043,7 @@ func FindEntityForChar(
 
 		var cursor_before int = *cursor
 		var status int = types.SUCCESS
-		var next_char unsigned
+		var next_char uint
 		if (*cursor) >= oldlen {
 			goto no_suitable_2nd
 		}
@@ -1112,7 +1122,7 @@ func PhpEscapeHtmlEntitiesEx(
 		/* first arg is 1 because we want to identify valid named entities
 		 * even if we are only encoding the basic ones */
 
-		inv_map = UnescapeInverseMap(1, flags)
+		inv_map = UnescapeInverseMap(true, flags)
 
 		/* first arg is 1 because we want to identify valid named entities
 		 * even if we are only encoding the basic ones */
@@ -1272,7 +1282,7 @@ func PhpEscapeHtmlEntitiesEx(
 				/* peek at next char */
 
 				if old[cursor] == '#' {
-					var code_point unsigned
+					var code_point uint
 					var valid int
 					var pos *byte = (*byte)(&old[cursor+1])
 					valid = ProcessNumericEntity((**byte)(&pos), &code_point)
@@ -1291,8 +1301,8 @@ func PhpEscapeHtmlEntitiesEx(
 
 					var start *byte = (*byte)(&old[cursor])
 					var next *byte = start
-					var dummy1 unsigned
-					var dummy2 unsigned
+					var dummy1 uint
+					var dummy2 uint
 					if ProcessNamedEntityHtml(&next, &start, &ent_len) == types.FAILURE {
 						goto encode_amp
 					}
@@ -1375,66 +1385,24 @@ func RegisterHtmlConstants(type_ int, module_number int) {
 func ZifHtmlspecialchars(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, quoteStyle *types.Zval, encoding *types.Zval, doubleEncode *types.Zval) {
 	PhpHtmlEntities(executeData, return_value, 0)
 }
-func ZifHtmlspecialcharsDecode(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, quoteStyle *types.Zval) {
-	var str *types.String
-	var quote_style zend.ZendLong = ENT_COMPAT
-	var replaced *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			str = fp.ParseStr()
-			fp.StartOptional()
-			quote_style = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	replaced = PhpUnescapeHtmlEntities(str, 0, int(quote_style), nil)
-	if replaced != nil {
-		return_value.SetStringEx(replaced)
-		return
-	}
-	return_value.SetFalse()
-	return
+func ZifHtmlspecialcharsDecode(str string, _ zpp.Opt, quoteStyle_ *int) string {
+	var quoteStyle = b.Option(quoteStyle_, ENT_COMPAT)
+	return PhpUnescapeHtmlEntities(str, false, quoteStyle, "")
 }
-func ZifHtmlEntityDecode(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, quoteStyle *types.Zval, encoding *types.Zval) {
-	var str *types.String
-	var hint_charset *types.String = nil
-	var default_charset *byte
-	var quote_style zend.ZendLong = ENT_COMPAT
-	var replaced *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			str = fp.ParseStr()
-			fp.StartOptional()
-			quote_style = fp.ParseLong()
-			hint_charset = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifHtmlEntityDecode(str string, _ zpp.Opt, quoteStyle_ *int, encoding *string) string {
+	quoteStyle := b.Option(quoteStyle_, ENT_COMPAT)
+	var charset string
+	if encoding != nil {
+		charset = *encoding
+	} else {
+		charset = GetDefaultCharset()
 	}
-	if hint_charset == nil {
-		default_charset = GetDefaultCharset()
-	}
-	replaced = PhpUnescapeHtmlEntities(str, 1, int(quote_style), lang.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset))
-	if replaced != nil {
-		return_value.SetStringEx(replaced)
-		return
-	}
-	return_value.SetFalse()
-	return
+	return PhpUnescapeHtmlEntities(str, true, quoteStyle, charset)
 }
 func ZifHtmlentities(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, quoteStyle *types.Zval, encoding *types.Zval, doubleEncode *types.Zval) {
 	PhpHtmlEntities(executeData, return_value, 1)
 }
-func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset, arr *types.Zval) {
+func WriteS3rowData(r *EntityStage3Row, orig_cp uint, charset EntityCharset, arr *types.Zval) {
 	var key []byte = ""
 	var entity []byte = []byte{'&'}
 	var written_k1 int
@@ -1445,8 +1413,8 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 		entity[l+1] = ';'
 		zend.AddAssocStringlEx(arr, b.CastStr(key, written_k1), b.CastStr(entity, l+2))
 	} else {
-		var i unsigned
-		var num_entries unsigned
+		var i uint
+		var num_entries uint
 		var mcpr *EntityMulticodepointRow = r.GetMulticodepointTable()
 		if mcpr[0].GetDefaultEntity() != nil {
 			var l int = mcpr[0].GetDefaultEntityLen()
@@ -1458,8 +1426,8 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 		for i = 1; i <= num_entries; i++ {
 			var l int
 			var written_k2 int
-			var uni_cp unsigned
-			var spe_cp unsigned
+			var uni_cp uint
+			var spe_cp uint
 			uni_cp = mcpr[i].GetSecondCp()
 			l = mcpr[i].GetEntityLen()
 			if !(CHARSET_UNICODE_COMPAT(charset)) {
@@ -1515,12 +1483,12 @@ func ZifGetHtmlTranslationTable(executeData zpp.Ex, return_value zpp.Ret, _ zpp.
 	if all != 0 {
 		var ms_table *EntityStage1Row = entity_table.GetMsTable()
 		if CHARSET_UNICODE_COMPAT(charset) {
-			var i unsigned
-			var j unsigned
-			var k unsigned
-			var max_i unsigned
-			var max_j unsigned
-			var max_k unsigned
+			var i uint
+			var j uint
+			var k uint
+			var max_i uint
+			var max_j uint
+			var max_k uint
 
 			/* no mapping to unicode required */
 
@@ -1543,7 +1511,7 @@ func ZifGetHtmlTranslationTable(executeData zpp.Ex, return_value zpp.Ret, _ zpp.
 					}
 					for k = 0; k < max_k; k++ {
 						var r *EntityStage3Row = &ms_table[i][j][k]
-						var code unsigned
+						var code uint
 						if r.GetEntity() == nil {
 							continue
 						}
@@ -1560,10 +1528,10 @@ func ZifGetHtmlTranslationTable(executeData zpp.Ex, return_value zpp.Ret, _ zpp.
 			/* we have to iterate through the set of code points for this
 			 * encoding and map them to unicode code points */
 
-			var i unsigned
+			var i uint
 			for i = 0; i <= 0xff; i++ {
 				var r *EntityStage3Row
-				var uni_cp unsigned
+				var uni_cp uint
 
 				/* can be done before mapping, they're invariant */
 
@@ -1582,8 +1550,8 @@ func ZifGetHtmlTranslationTable(executeData zpp.Ex, return_value zpp.Ret, _ zpp.
 
 		/* we could use sizeof(stage3_table_be_apos_00000) as well */
 
-		var j unsigned
-		var numelems unsigned = b.SizeOf("stage3_table_be_noapos_00000") / b.SizeOf("* stage3_table_be_noapos_00000")
+		var j uint
+		var numelems uint = b.SizeOf("stage3_table_be_noapos_00000") / b.SizeOf("* stage3_table_be_noapos_00000")
 		for j = 0; j < numelems; j++ {
 			var r *EntityStage3Row = entity_table.GetTable()[j]
 			if r.GetEntity() == nil {
