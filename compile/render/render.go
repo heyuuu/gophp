@@ -9,9 +9,8 @@ func Render(proj *ir.Project) (map[string]string, error) {
 
 	var result = make(map[string]string)
 	for _, ns := range proj.Namespaces() {
-		p.reset()
 		p.pNamespace(ns)
-		content, err := p.result()
+		content, err := p.printFile(ns)
 		if err != nil {
 			return nil, err
 		}

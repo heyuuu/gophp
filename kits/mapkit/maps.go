@@ -14,7 +14,7 @@ type Map[K comparable, V any] interface {
 	Set(K, V)
 	Del(K)
 	Keys() []K
-	Values() []K
+	Values() []V
 	Size() int
 }
 
@@ -91,12 +91,12 @@ func (m *StableMap[K, V]) Keys() []K {
 	return keys
 }
 
-func (m *StableMap[K, V]) Values() []K {
+func (m *StableMap[K, V]) Values() []V {
 	if len(m.entries) == 0 {
 		return nil
 	}
 
-	values := make([]K, len(m.entries))
+	values := make([]V, len(m.entries))
 	for idx, entry := range m.entries {
 		values[idx] = entry.Value
 	}

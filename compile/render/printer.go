@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/token"
+	"github.com/heyuuu/gophp/kits/mapkit"
 	"github.com/heyuuu/gophp/kits/slicekit"
 	"log"
 	"os"
@@ -15,6 +16,14 @@ import (
 // Config
 type Config struct{}
 
+/**
+ * private
+ */
+const (
+	PkgExecutor = "github.com/heyuuu/gophp/php/executor"
+	PkgTypes    = "github.com/heyuuu/gophp/php/types"
+)
+
 // printer
 type printer struct {
 	nameResolver NameResolver
@@ -22,30 +31,64 @@ type printer struct {
 	indent       int
 	err          error
 	newLine      bool
+	imports      map[string]bool
 }
 
 func newPrinter(config *Config) *printer {
 	return &printer{
 		nameResolver: newDefaultNameResolver(),
+		imports:      map[string]bool{},
 	}
 }
 func defaultPrinter() *printer {
 	return newPrinter(nil)
 }
 
+func (p *printer) printFile(ns *ir.Namespace) (string, error) {
+	p.reset()
+
+	p.pNamespace(ns)
+	body, err := p.result()
+	if err != nil {
+		return "", err
+	}
+
+	var buf strings.Builder
+	buf.WriteString("/* namespace " + ns.Name + " */\n")
+	buf.WriteString("package ir\n\n")
+
+	imports := mapkit.SortedKeys(p.imports)
+	if len(imports) > 0 {
+		buf.WriteString("import (\n")
+		for _, importName := range imports {
+			buf.WriteString("\n" + importName + "\"\n")
+		}
+		buf.WriteString(")\n")
+	}
+	buf.WriteString(body)
+
+	return buf.String(), nil
+}
+
 func (p *printer) reset() {
 	p.buf.Reset()
 	p.err = nil
 	p.newLine = false
+	p.imports = make(map[string]bool)
+}
+
+func (p *printer) addImport(pkgName string) {
+	p.imports[pkgName] = true
 }
 
 func (p *printer) pNamespace(ns *ir.Namespace) {
-	nsName := ns.Name
-	if nsName == "" {
-		nsName = "_"
-	}
-	p.print("/**\n * namespace " + nsName + "\n */\n")
-	p.print("package ir\n\n")
+	// ns init func
+	nsInitFuncName := "nsInit" + p.nameResolver.Namespace(ns.Name)
+	p.write(fmt.Sprintf("func %s(ex executor.Executor) {\n", nsInitFuncName))
+
+	p.write("}\n")
+
+	//
 	slicekit.Each(ns.Segments, p.pSegment)
 	p.print("\n")
 }
@@ -624,9 +667,9 @@ func (p *printer) stmt(n ir.Stmt) {
 		}
 
 		if x.Alias != "" {
-			p.print("use ", useType, x.Name, " as ", x.Alias, ";")
+			p.print("// use ", useType, x.Name, " as ", x.Alias, ";")
 		} else {
-			p.print("use ", useType, x.Name, ";")
+			p.print("// use ", useType, x.Name, ";")
 		}
 	case *ir.DeclStmt:
 		p.pSegment(x.Decl)
