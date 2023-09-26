@@ -3,22 +3,15 @@
 // parse args
 use GoPhp\Tools\Application;
 
-$opts = getopt("c:f:s:o:", ["code", "file", "src:", "output:"]);
+$opts = getopt("c:f:s:o:", ["code"]);
 $code = $opts["code"] ?? $opts["c"] ?? "";
-$file = $opts["file"] ?? $opts["f"] ?? "";
 
 // main
-if ($code || $file) {
+if ($code) {
     require_once __DIR__ . '/vendor/autoload.php';
     $application = new Application();
-    if ($code) {
-        $status = $application->parseCode($code);
-    } elseif ($file) {
-        $code   = file_get_contents($file);
-        $status = $application->parseCode($code);
-    }
-    // exit($status);
-    exit();
+    $status      = $application->parseCode($code);
+    exit($status);
 }
 
 // Show help

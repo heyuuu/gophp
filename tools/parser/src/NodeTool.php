@@ -11,19 +11,17 @@ class NodeTool
         if ($className == Node::class) {
             return "Node";
         }
+
+        // typeName 为去除前缀和分割符的类名
         if (str_starts_with($className, Node::class . '\\')) {
             $className = substr($className, strlen(Node::class) + 1);
         }
-        return str_replace(['\\', '_'], '', $className);
-    }
+        $typeName = str_replace(['\\', '_'], '', $className);
 
-    public static function getNewTypeName(string $className): string
-    {
-        $typeName = self::getTypeName($className);
-
+        // 特殊类型，父类型名后移
         foreach (["Stmt", "Expr", "Scalar"] as $type) {
-            if (str_starts_with($className, $type)) {
-                $typeName = substr($className, strlen($type)) . $type;
+            if (str_starts_with($typeName, $type)) {
+                $typeName = substr($typeName, strlen($type)) . $type;
                 break;
             }
         }

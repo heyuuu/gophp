@@ -12,16 +12,16 @@ class AstTool
     /**
      * @return NodeType[]
      */
-    public static function allTypes(): array {
+    public static function allTypes(): array
+    {
         $types  = [];
         $finder = new Finder();
         $finder->in(PHP_ROOT . '/vendor/nikic/php-parser/lib/PhpParser/Node')->files();
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
-            $className = Node::class . "\\" . str_replace(["/", ".php"], ["\\", ""], $file->getRelativePathname());
+            $className = Node::class . '\\' . str_replace(['/', '.php'], ['\\', ''], $file->getRelativePathname());
             if (class_exists($className) || interface_exists($className)) {
-                $refClass = new ReflectionClass($className);
-                $types[]  = new NodeType($refClass);
+                $types[] = new NodeType(new ReflectionClass($className));
             }
         }
         usort($types, function (NodeType $a, NodeType $b) {

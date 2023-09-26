@@ -51,7 +51,7 @@ CODE;
 
         return <<<CASE
     case "{$type->typeName}":
-        node = &ast.{$type->newTypeName}{
+        node = &ast.{$type->typeName}{
             {$fieldsStr}
         }
 CASE;

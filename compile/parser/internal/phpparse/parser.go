@@ -16,14 +16,6 @@ func ParseCode(code string) ([]ast.Stmt, error) {
 	return decodeOutput(output)
 }
 
-func ParseFile(file string) ([]ast.Stmt, error) {
-	output, err := runParser("-f", file)
-	if err != nil {
-		return nil, err
-	}
-	return decodeOutput(output)
-}
-
 /* Parser 脚本相关 */
 var scriptPath = "./tools/parser/parser.php"
 

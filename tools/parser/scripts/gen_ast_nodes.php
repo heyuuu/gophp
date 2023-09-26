@@ -9,7 +9,7 @@ require_once __DIR__ . '/bootstrap.php';
 
 class GenAstNodes
 {
-    private string $outputFile = PROJ_ROOT . '/php/ast/ast.go';
+    private string $outputFile = PROJ_ROOT . '/compile/ast/ast.go';
 
     public function run()
     {
@@ -24,7 +24,7 @@ class GenAstNodes
                 $classes[] = $this->printClass($type);
                 foreach ($type->supers as $super) {
                     $superMethod       = lcfirst($super) . "Node";
-                    $extends[$super][] = "func (*{$type->newTypeName}) {$superMethod}() {}\n";
+                    $extends[$super][] = "func (*{$type->typeName}) {$superMethod}() {}\n";
                 }
             }
         }
@@ -44,14 +44,14 @@ class GenAstNodes
     private function printInterface(NodeType $type): string
     {
         $code = $this->buildClassComment($type) . "\n";
-        $code .= "{$type->newTypeName} interface {\n";
+        $code .= "{$type->typeName} interface {\n";
         foreach ($type->supers as $super) {
             if ($super === 'PhpParserNodeAbstract') {
                 $super = 'Node';
             }
             $code .= "    $super\n";
         }
-        $code .= "    " . lcfirst($type->newTypeName) . "Node()\n";
+        $code .= "    " . lcfirst($type->typeName) . "Node()\n";
         $code .= "}\n";
         return $code;
     }
@@ -59,7 +59,7 @@ class GenAstNodes
     private function printClass(NodeType $type): string
     {
         $code = $this->buildClassComment($type) . "\n";
-        $code .= "{$type->newTypeName} struct {\n";
+        $code .= "{$type->typeName} struct {\n";
         foreach ($type->fields as $field) {
             $docComment = $this->clearPropertyDocComment($field->docComment);
             $goType     = $field->typeHint?->toGoType() ?: 'any';

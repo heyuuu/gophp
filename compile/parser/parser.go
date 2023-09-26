@@ -3,6 +3,7 @@ package parser
 import (
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/compile/parser/internal/phpparse"
+	"os"
 	"path/filepath"
 )
 
@@ -16,5 +17,9 @@ func ParseCode(code string) ([]ast.Stmt, error) {
 }
 
 func ParseFile(file string) ([]ast.Stmt, error) {
-	return phpparse.ParseFile(file)
+	bytes, err := os.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+	return phpparse.ParseCode(string(bytes))
 }
