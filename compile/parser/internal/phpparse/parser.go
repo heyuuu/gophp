@@ -2,9 +2,7 @@ package phpparse
 
 import (
 	"errors"
-	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -26,26 +24,6 @@ func ParseFile(file string) ([]ast.Stmt, error) {
 	return decodeOutput(output)
 }
 
-func parseToJsonFile(script string, filename string, output string) error {
-	result, err := runParser("-s", filename, "-o", output)
-	fmt.Println(result)
-	if err != nil {
-		fmt.Println("命令执行失败: " + err.Error())
-		return err
-	}
-
-	return nil
-}
-
-func loadAstJson(jsonFile string) ([]ast.Stmt, error) {
-	binData, err := ioutil.ReadFile(jsonFile)
-	if err != nil {
-		return nil, err
-	}
-
-	return decodeAstData(binData)
-}
-
 /* Parser 脚本相关 */
 var scriptPath = "./tools/parser/parser.php"
 
@@ -61,10 +39,7 @@ func runParser(args ...string) ([]byte, error) {
 		return nil, errors.New("PHP Parser 脚本路径不存在或不可读")
 	}
 
-	var commandArgs = make([]string, len(args)+1)
-	commandArgs[0] = scriptPath
-	copy(commandArgs[1:], args)
-
+	commandArgs := append([]string{scriptPath}, args...)
 	command := exec.Command("php", commandArgs...)
 	log.Printf("Run command: %s\n", command.String())
 	return command.CombinedOutput()

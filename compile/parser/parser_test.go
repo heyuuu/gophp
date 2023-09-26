@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"github.com/heyuuu/gophp/utils/vardumper"
+	"github.com/heyuuu/gophp/kits/vardumper"
 	"log"
 	"os"
 	"path/filepath"
