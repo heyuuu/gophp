@@ -1,7 +1,10 @@
 <?php
 
-require_once __DIR__ . '/_helpers.php';
-require_once __DIR__ . '/_ast_helpers.php';
+use GoPhp\Tools\Scripts\AstTool;
+use GoPhp\Tools\Scripts\NodeType;
+use GoPhp\Tools\Scripts\TypeHint;
+
+require_once __DIR__ . '/bootstrap.php';
 
 (new GenAstDecoder)->run();
 
@@ -26,7 +29,7 @@ CODE;
     public function run()
     {
         $cases = [];
-        foreach (getAllTypes() as $type) {
+        foreach (AstTool::allTypes() as $type) {
             if (!$type->isInterface) {
                 $cases[] = $this->caseType($type);
             }
@@ -36,7 +39,7 @@ CODE;
         file_put_contents($this->outputFile, $code);
     }
 
-    private function caseType(Type $type): string
+    private function caseType(NodeType $type): string
     {
         $indent = str_repeat('    ', 3);
         $fields = [];
@@ -47,8 +50,8 @@ CODE;
         $fieldsStr = join($indent, $fields);
 
         return <<<CASE
-    case "{$type->rawName}":
-        node = &ast.{$type->newName}{
+    case "{$type->typeName}":
+        node = &ast.{$type->newTypeName}{
             {$fieldsStr}
         }
 CASE;

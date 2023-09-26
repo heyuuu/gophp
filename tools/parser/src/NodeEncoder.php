@@ -6,7 +6,7 @@ use PhpParser\Node;
 
 class NodeEncoder
 {
-    function encode(array $ast): string
+    public function encode(array $ast): string
     {
         return json_encode($this->transform($ast), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
@@ -27,9 +27,6 @@ class NodeEncoder
     private function getNodeType(Node $node): string
     {
         $name = get_class($node);
-        if (str_starts_with($name, Node::class . '\\')) {
-            $name = substr($name, strlen(Node::class) + 1);
-        }
-        return str_replace(['\\', '_'], '', $name);
+        return NodeTool::getTypeName($name);
     }
 }

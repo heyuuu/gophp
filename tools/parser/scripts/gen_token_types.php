@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/_helpers.php';
+require_once __DIR__ . '/bootstrap.php';
 
 (new GenTokenTypes)->run();
 

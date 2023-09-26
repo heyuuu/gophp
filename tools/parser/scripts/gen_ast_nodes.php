@@ -1,7 +1,9 @@
 <?php
 
-require_once __DIR__ . '/_helpers.php';
-require_once __DIR__ . '/_ast_helpers.php';
+use GoPhp\Tools\Scripts\AstTool;
+use GoPhp\Tools\Scripts\NodeType;
+
+require_once __DIR__ . '/bootstrap.php';
 
 (new GenAstNodes)->run();
 
@@ -11,7 +13,7 @@ class GenAstNodes
 
     public function run()
     {
-        $types      = getAllTypes();
+        $types      = AstTool::allTypes();
         $interfaces = [];
         $classes    = [];
         $extends    = [];
@@ -22,7 +24,7 @@ class GenAstNodes
                 $classes[] = $this->printClass($type);
                 foreach ($type->supers as $super) {
                     $superMethod       = lcfirst($super) . "Node";
-                    $extends[$super][] = "func (*{$type->newName}) {$superMethod}() {}\n";
+                    $extends[$super][] = "func (*{$type->newTypeName}) {$superMethod}() {}\n";
                 }
             }
         }
@@ -39,25 +41,25 @@ class GenAstNodes
         file_put_contents($this->outputFile, $code);
     }
 
-    private function printInterface(Type $type): string
+    private function printInterface(NodeType $type): string
     {
         $code = $this->buildClassComment($type) . "\n";
-        $code .= "{$type->newName} interface {\n";
+        $code .= "{$type->newTypeName} interface {\n";
         foreach ($type->supers as $super) {
             if ($super === 'PhpParserNodeAbstract') {
                 $super = 'Node';
             }
             $code .= "    $super\n";
         }
-        $code .= "    " . lcfirst($type->newName) . "Node()\n";
+        $code .= "    " . lcfirst($type->newTypeName) . "Node()\n";
         $code .= "}\n";
         return $code;
     }
 
-    private function printClass(Type $type): string
+    private function printClass(NodeType $type): string
     {
         $code = $this->buildClassComment($type) . "\n";
-        $code .= "{$type->newName} struct {\n";
+        $code .= "{$type->newTypeName} struct {\n";
         foreach ($type->fields as $field) {
             $docComment = $this->clearPropertyDocComment($field->docComment);
             $goType     = $field->typeHint?->toGoType() ?: 'any';
@@ -72,9 +74,9 @@ class GenAstNodes
         return $code;
     }
 
-    private function buildClassComment(Type $type): string
+    private function buildClassComment(NodeType $type): string
     {
-        $comment = '// ' . $type->rawName;
+        $comment = '// ' . $type->typeName;
         if ($type->supers) {
             $comment .= ' : ' . join(', ', $type->supers);
         }
