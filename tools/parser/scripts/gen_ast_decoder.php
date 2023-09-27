@@ -10,11 +10,11 @@ require_once __DIR__ . '/bootstrap.php';
 
 class GenAstDecoder
 {
-    private string $outputFile = PROJ_ROOT . '/php/parser/internal/phpparse/decode_node.go';
+    private string $outputFile = PROJ_ROOT . '/compile/parser/internal/phpparse/decode_node.go';
     private string $template   = <<<'CODE'
 package phpparse
 
-import "gophp/php/ast"
+import "github.com/heyuuu/gophp/compile/ast"
 
 func decodeNode(data map[string]any) (node ast.Node, err error) {
 	nodeType := data["nodeType"].(string)
@@ -44,10 +44,10 @@ CODE;
         $indent = str_repeat('    ', 3);
         $fields = [];
         foreach ($type->fields as $field) {
-            $value     = $this->castValue($field->typeHint, "data[\"{$field->rawName}\"]");
-            $fields [] = "{$field->newName}: $value,\n";
+            $value    = $this->castValue($field->typeHint, "data[\"{$field->rawName}\"]");
+            $fields[] = "{$field->newName}: $value,";
         }
-        $fieldsStr = join($indent, $fields);
+        $fieldsStr = join("\n" . $indent, $fields);
 
         return <<<CASE
     case "{$type->typeName}":

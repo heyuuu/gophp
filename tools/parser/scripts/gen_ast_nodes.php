@@ -17,12 +17,18 @@ class GenAstNodes
         $interfaces = [];
         $classes    = [];
         $extends    = [];
+
+        $interfaces[] = "    Node interface {\n        node()\n    }\n";
         foreach ($types as $type) {
             if ($type->isInterface) {
                 $interfaces[] = $this->printInterface($type);
             } else {
-                $classes[] = $this->printClass($type);
+                $classes[]         = $this->printClass($type);
+                $extends["node"][] = "func (*{$type->typeName}) node() {}\n";
                 foreach ($type->supers as $super) {
+                    if ($super === "Node") {
+                        continue;
+                    }
                     $superMethod       = lcfirst($super) . "Node";
                     $extends[$super][] = "func (*{$type->typeName}) {$superMethod}() {}\n";
                 }
@@ -30,7 +36,6 @@ class GenAstNodes
         }
 
         $code = "package ast\n\n";
-        $code .= "type Node interface {}\n\n";
         $code .= "type (\n" . join("\n", $interfaces) . "\n)\n";
         $code .= "type (\n" . join("\n", $classes) . "\n)\n";
         foreach ($extends as $super => $types) {
@@ -43,34 +48,33 @@ class GenAstNodes
 
     private function printInterface(NodeType $type): string
     {
-        $code = $this->buildClassComment($type) . "\n";
-        $code .= "{$type->typeName} interface {\n";
+        $code = "    " . $this->buildClassComment($type) . "\n";
+        $code .= "    {$type->typeName} interface {\n";
         foreach ($type->supers as $super) {
-            if ($super === 'PhpParserNodeAbstract') {
-                $super = 'Node';
+            if ($super == "PhpParserNodeAbstract") {
+                $super = "Node";
             }
-            $code .= "    $super\n";
+            $code .= "        " . $super . "\n";
         }
-        $code .= "    " . lcfirst($type->typeName) . "Node()\n";
-        $code .= "}\n";
+        $code .= "        " . lcfirst($type->typeName) . "Node()\n";
+        $code .= "    }\n";
         return $code;
     }
 
     private function printClass(NodeType $type): string
     {
-        $code = $this->buildClassComment($type) . "\n";
-        $code .= "{$type->typeName} struct {\n";
+        $code = "    " . $this->buildClassComment($type) . "\n";
+        $code .= "    {$type->typeName} struct {\n";
         foreach ($type->fields as $field) {
             $docComment = $this->clearPropertyDocComment($field->docComment);
             $goType     = $field->typeHint?->toGoType() ?: 'any';
             if ($docComment) {
-                $code .= "    {$field->newName} {$goType} // {$docComment}\n";
+                $code .= "        {$field->newName} {$goType} // {$docComment}\n";
             } else {
-                $code .= "    {$field->newName} {$goType}\n";
+                $code .= "        {$field->newName} {$goType}\n";
             }
         }
-        $code .= "}\n";
-
+        $code .= "    }\n";
         return $code;
     }
 

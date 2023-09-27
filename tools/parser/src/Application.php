@@ -19,7 +19,7 @@ class Application
         $this->encoder = new NodeEncoder();
     }
 
-    public function parseCode(string $code): int
+    public function parseCode(string $code): string
     {
         try {
             $ast = $this->parser->parse($code);
@@ -29,18 +29,13 @@ class Application
             $traverser->addVisitor(new NameResolver());
             $traverser->traverse($ast);
 
-            $json = $this->encoder->encode($ast);
+            $data = $this->encoder->encode($ast);
 
-            echo $this->jsonOutput($json);
-            return 0;
+            return $this->jsonOutput($data);
         } catch (Error $e) {
-            $error = "Parse Fail: " . $e->getMessage();
-            echo $this->jsonOutput("", $error);
-            return 1;
+            return $this->jsonOutput("", "Parse Fail: " . $e->getMessage());
         } catch (\Throwable $e) {
-            $error = "Unexpected error:" . $e->getMessage();
-            echo $this->jsonOutput("", $error);
-            return 2;
+            return $this->jsonOutput("", "Unexpected error: " . $e->getMessage());
         }
     }
 

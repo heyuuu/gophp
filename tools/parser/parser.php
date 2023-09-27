@@ -3,15 +3,15 @@
 // parse args
 use GoPhp\Tools\Application;
 
-$opts = getopt("c:f:s:o:", ["code"]);
+$opts = getopt("c:", ["code"]);
 $code = $opts["code"] ?? $opts["c"] ?? "";
 
 // main
 if ($code) {
     require_once __DIR__ . '/vendor/autoload.php';
-    $application = new Application();
-    $status      = $application->parseCode($code);
-    exit($status);
+    $app = new Application();
+    echo $app->parseCode($code);
+    exit();
 }
 
 // Show help
@@ -20,7 +20,6 @@ Usage:
     php parser.php [arguments]
 The arguments are:
     -c|--code       source code string
-    -f|--file       source file path
 For example:
-    php parser.php -c "var_dump(1);"
+    php parser.php -c "<?php var_dump(1);"
 HELP;

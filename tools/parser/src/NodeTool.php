@@ -3,12 +3,13 @@
 namespace GoPhp\Tools;
 
 use PhpParser\Node;
+use PhpParser\NodeAbstract;
 
 class NodeTool
 {
     public static function getTypeName(string $className): string
     {
-        if ($className == Node::class) {
+        if ($className == Node::class || $className == NodeAbstract::class) {
             return "Node";
         }
 
