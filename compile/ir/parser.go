@@ -163,12 +163,6 @@ func (p *parser) pNode(node ast.Node) Node {
 		p.unsupported("unsupported parseNode(*ast.Const), use parseStmt(*ast.ConstStmt) or parseStmt(*ast.ClassConstStmt) instead.")
 	case ast.Stmt:
 		p.unsupported("unsupported parseNode(ast.Stmt), use parseStmtList() or parseStmt() instead.")
-	case *ast.Attribute, *ast.AttributeGroup:
-		p.highVersionFeature("php8.0 attribute")
-	case *ast.MatchArm:
-		p.highVersionFeature("php8.0 match")
-	case *ast.VariadicPlaceholder:
-		p.highVersionFeature("php8.2 first class callable syntax")
 	default:
 		p.fail(fmt.Sprintf("unsupported node type for parseNode(node): %T", n))
 	}
@@ -288,8 +282,6 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 		return &MagicConstExpr{
 			Kind: n.Kind,
 		}
-	case *ast.MatchExpr:
-		p.highVersionFeature("php8.0 match")
 	case *ast.InstanceofExpr:
 		return &InstanceofExpr{
 			Expr:  p.pExpr(n.Expr),
@@ -583,8 +575,6 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 			Trait:     p.pName(n.Trait),
 			Method:    p.pIdent(n.Method),
 		}
-	case *ast.EnumStmt, *ast.EnumCaseStmt:
-		p.highVersionFeature("php8.1 enum")
 	default:
 		p.fail(fmt.Sprintf("parseStmt() cannot support this type: %T", n))
 	}
@@ -709,8 +699,6 @@ func (p *parser) pArgs(args []ast.Node) []*Arg {
 		switch arg := n.(type) {
 		case *ast.Arg:
 			return p.pArg(arg)
-		case *ast.VariadicPlaceholder:
-			p.highVersionFeature("php8.2 first class callable syntax")
 		default:
 			p.fail(fmt.Sprintf("expected type of arg must be *ast.Arg, provide is %T", arg))
 		}

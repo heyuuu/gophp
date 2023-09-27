@@ -1,6 +1,7 @@
 package phpparse
 
 import (
+	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/compile/token"
@@ -16,352 +17,342 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			ByRef:  data["byRef"].(bool),
 			Unpack: data["unpack"].(bool),
 		}
-	case "Attribute":
-		node = &ast.Attribute{
-			Name: data["name"].(*ast.Name),
-			Args: asSlice[*ast.Arg](data["args"]),
-		}
-	case "AttributeGroup":
-		node = &ast.AttributeGroup{
-			Attrs: asSlice[*ast.Attribute](data["attrs"]),
-		}
 	case "Const":
 		node = &ast.Const{
 			Name:           data["name"].(*ast.Ident),
 			Value:          data["value"].(ast.Expr),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
-	case "ExprArray":
+	case "ArrayExpr":
 		node = &ast.ArrayExpr{
 			Items: asSlice[*ast.ArrayItemExpr](data["items"]),
 		}
-	case "ExprArrayDimFetch":
+	case "ArrayDimFetchExpr":
 		node = &ast.IndexExpr{
 			Var: data["var"].(ast.Expr),
 			Dim: asTypeOrNil[ast.Expr](data["dim"]),
 		}
-	case "ExprArrayItem":
+	case "ArrayItemExpr":
 		node = &ast.ArrayItemExpr{
 			Key:    asTypeOrNil[ast.Expr](data["key"]),
 			Value:  data["value"].(ast.Expr),
 			ByRef:  data["byRef"].(bool),
 			Unpack: data["unpack"].(bool),
 		}
-	case "ExprArrowFunction":
+	case "ArrowFunctionExpr":
 		node = &ast.ArrowFunctionExpr{
 			Static:     data["static"].(bool),
 			ByRef:      data["byRef"].(bool),
 			Params:     asSlice[*ast.Param](data["params"]),
 			ReturnType: asTypeNode(data["returnType"]),
 			Expr:       data["expr"].(ast.Expr),
-			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
 		}
-	case "ExprAssign":
+	case "AssignExpr":
 		node = &ast.AssignExpr{
 			Op:   token.Assign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpBitwiseAnd":
+	case "AssignOpBitwiseAndExpr":
 		node = &ast.AssignExpr{
 			Op:   token.AndAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpBitwiseOr":
+	case "AssignOpBitwiseOrExpr":
 		node = &ast.AssignExpr{
 			Op:   token.OrAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpBitwiseXor":
+	case "AssignOpBitwiseXorExpr":
 		node = &ast.AssignExpr{
 			Op:   token.XorAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpCoalesce":
+	case "AssignOpCoalesceExpr":
 		node = &ast.AssignExpr{
 			Op:   token.CoalesceAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpConcat":
+	case "AssignOpConcatExpr":
 		node = &ast.AssignExpr{
 			Op:   token.ConcatAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpDiv":
+	case "AssignOpDivExpr":
 		node = &ast.AssignExpr{
 			Op:   token.DivAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpMinus":
+	case "AssignOpMinusExpr":
 		node = &ast.AssignExpr{
 			Op:   token.SubAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpMod":
+	case "AssignOpModExpr":
 		node = &ast.AssignExpr{
 			Op:   token.ModAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpMul":
+	case "AssignOpMulExpr":
 		node = &ast.AssignExpr{
 			Op:   token.MulAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpPlus":
+	case "AssignOpPlusExpr":
 		node = &ast.AssignExpr{
 			Op:   token.AddAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpPow":
+	case "AssignOpPowExpr":
 		node = &ast.AssignExpr{
 			Op:   token.PowAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpShiftLeft":
+	case "AssignOpShiftLeftExpr":
 		node = &ast.AssignExpr{
 			Op:   token.ShiftLeftAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignOpShiftRight":
+	case "AssignOpShiftRightExpr":
 		node = &ast.AssignExpr{
 			Op:   token.ShiftRightAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprAssignRef":
+	case "AssignRefExpr":
 		node = &ast.AssignRefExpr{
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprBinaryOpBitwiseAnd":
+	case "BinaryOpBitwiseAndExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.And,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpBitwiseOr":
+	case "BinaryOpBitwiseOrExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Or,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpBitwiseXor":
+	case "BinaryOpBitwiseXorExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Xor,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpBooleanAnd":
+	case "BinaryOpBooleanAndExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.BooleanAnd,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpBooleanOr":
+	case "BinaryOpBooleanOrExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.BooleanOr,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpCoalesce":
+	case "BinaryOpCoalesceExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Coalesce,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpConcat":
+	case "BinaryOpConcatExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Concat,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpDiv":
+	case "BinaryOpDivExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Div,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpEqual":
+	case "BinaryOpEqualExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Equal,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpGreater":
+	case "BinaryOpGreaterExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Greater,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpGreaterOrEqual":
+	case "BinaryOpGreaterOrEqualExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.GreaterOrEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpIdentical":
+	case "BinaryOpIdenticalExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Identical,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpLogicalAnd":
+	case "BinaryOpLogicalAndExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.LogicalAnd,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpLogicalOr":
+	case "BinaryOpLogicalOrExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.LogicalOr,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpLogicalXor":
+	case "BinaryOpLogicalXorExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.LogicalXor,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpMinus":
+	case "BinaryOpMinusExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Sub,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpMod":
+	case "BinaryOpModExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Mod,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpMul":
+	case "BinaryOpMulExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Mul,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpNotEqual":
+	case "BinaryOpNotEqualExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.NotEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpNotIdentical":
+	case "BinaryOpNotIdenticalExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.NotIdentical,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpPlus":
+	case "BinaryOpPlusExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Add,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpPow":
+	case "BinaryOpPowExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Pow,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpShiftLeft":
+	case "BinaryOpShiftLeftExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.ShiftLeft,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpShiftRight":
+	case "BinaryOpShiftRightExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.ShiftRight,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpSmaller":
+	case "BinaryOpSmallerExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Smaller,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpSmallerOrEqual":
+	case "BinaryOpSmallerOrEqualExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.SmallerOrEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBinaryOpSpaceship":
+	case "BinaryOpSpaceshipExpr":
 		node = &ast.BinaryExpr{
 			Op:    token.Spaceship,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
-	case "ExprBitwiseNot":
+	case "BitwiseNotExpr":
 		node = &ast.UnaryExpr{
 			Kind: token.Tilde,
 			Var:  data["expr"].(ast.Expr),
 		}
-	case "ExprBooleanNot":
+	case "BooleanNotExpr":
 		node = &ast.UnaryExpr{
 			Kind: token.Not,
 			Var:  data["expr"].(ast.Expr),
 		}
-	case "ExprCastArray":
+	case "CastArrayExpr":
 		node = &ast.CastExpr{
 			Op:   token.ArrayCast,
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprCastBool":
+	case "CastBoolExpr":
 		node = &ast.CastExpr{
 			Op:   token.BoolCast,
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprCastDouble":
+	case "CastDoubleExpr":
 		node = &ast.CastExpr{
 			Op:   token.DoubleCast,
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprCastInt":
+	case "CastIntExpr":
 		node = &ast.CastExpr{
 			Op:   token.IntCast,
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprCastObject":
+	case "CastObjectExpr":
 		node = &ast.CastExpr{
 			Op:   token.ObjectCast,
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprCastString":
+	case "CastStringExpr":
 		node = &ast.CastExpr{
 			Op:   token.StringCast,
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprCastUnset":
+	case "CastUnsetExpr":
 		node = &ast.CastExpr{
 			Op:   token.UnsetCast,
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprClassConstFetch":
+	case "ClassConstFetchExpr":
 		node = &ast.ClassConstFetchExpr{
 			Class: data["class"].(ast.Node),
 			Name:  data["name"].(*ast.Ident),
 		}
-	case "ExprClone":
+	case "CloneExpr":
 		node = &ast.CloneExpr{
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprClosure":
+	case "ClosureExpr":
 		node = &ast.ClosureExpr{
 			Static:     data["static"].(bool),
 			ByRef:      data["byRef"].(bool),
@@ -369,45 +360,44 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Uses:       asSlice[*ast.ClosureUseExpr](data["uses"]),
 			ReturnType: asTypeNode(data["returnType"]),
 			Stmts:      asStmtList(data["stmts"]),
-			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
 		}
-	case "ExprClosureUse":
+	case "ClosureUseExpr":
 		node = &ast.ClosureUseExpr{
 			Var:   data["var"].(*ast.VariableExpr),
 			ByRef: data["byRef"].(bool),
 		}
-	case "ExprConstFetch":
+	case "ConstFetchExpr":
 		node = &ast.ConstFetchExpr{
 			Name: data["name"].(*ast.Name),
 		}
-	case "ExprEmpty":
+	case "EmptyExpr":
 		node = &ast.InternalCallExpr{
 			Kind: token.Empty,
 			Args: []ast.Expr{
 				data["expr"].(ast.Expr),
 			},
 		}
-	case "ExprErrorSuppress":
+	case "ErrorSuppressExpr":
 		node = &ast.ErrorSuppressExpr{
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprEval":
+	case "EvalExpr":
 		node = &ast.InternalCallExpr{
 			Kind: token.Eval,
 			Args: []ast.Expr{
 				data["expr"].(ast.Expr),
 			},
 		}
-	case "ExprExit":
+	case "ExitExpr":
 		node = &ast.ExitExpr{
 			Expr: asTypeOrNil[ast.Expr](data["expr"]),
 		}
-	case "ExprFuncCall":
+	case "FuncCallExpr":
 		node = &ast.FuncCallExpr{
 			Name: data["name"].(ast.Node),
 			Args: asSlice[ast.Node](data["args"]),
 		}
-	case "ExprInclude":
+	case "IncludeExpr":
 		var Kind token.Token
 		typ := asInt(data["type"])
 		switch typ {
@@ -428,112 +418,107 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 				data["expr"].(ast.Expr),
 			},
 		}
-	case "ExprInstanceof":
+	case "InstanceofExpr":
 		node = &ast.InstanceofExpr{
 			Expr:  data["expr"].(ast.Expr),
 			Class: data["class"].(ast.Node),
 		}
-	case "ExprIsset":
+	case "IssetExpr":
 		node = &ast.InternalCallExpr{
 			Kind: token.Isset,
 			Args: asSlice[ast.Expr](data["vars"]),
 		}
-	case "ExprList":
+	case "ListExpr":
 		node = &ast.ListExpr{
 			Items: asSlice[*ast.ArrayItemExpr](data["items"]),
 		}
-	case "ExprMatch":
-		node = &ast.MatchExpr{
-			Cond: data["cond"].(ast.Expr),
-			Arms: asSlice[*ast.MatchArm](data["arms"]),
-		}
-	case "ExprMethodCall":
+	case "MethodCallExpr":
 		node = &ast.MethodCallExpr{
 			Var:  data["var"].(ast.Expr),
 			Name: data["name"].(ast.Node),
 			Args: asSlice[ast.Node](data["args"]),
 		}
-	case "ExprNew":
+	case "NewExpr":
 		node = &ast.NewExpr{
 			Class: data["class"].(ast.Node),
 			Args:  asSlice[ast.Node](data["args"]),
 		}
-	case "ExprNullsafeMethodCall":
+	case "NullsafeMethodCallExpr":
 		node = &ast.NullsafeMethodCallExpr{
 			Var:  data["var"].(ast.Expr),
 			Name: data["name"].(ast.Node),
 			Args: asSlice[ast.Node](data["args"]),
 		}
-	case "ExprNullsafePropertyFetch":
+	case "NullsafePropertyFetchExpr":
 		node = &ast.NullsafePropertyFetchExpr{
 			Var:  data["var"].(ast.Expr),
 			Name: data["name"].(ast.Node),
 		}
-	case "ExprPostDec":
+	case "PostDecExpr":
 		node = &ast.UnaryExpr{
 			Kind: token.PostDec,
 			Var:  data["var"].(ast.Expr),
 		}
-	case "ExprPostInc":
+	case "PostIncExpr":
 		node = &ast.UnaryExpr{
 			Kind: token.PostInc,
 			Var:  data["var"].(ast.Expr),
 		}
-	case "ExprPreDec":
+	case "PreDecExpr":
 		node = &ast.UnaryExpr{
 			Kind: token.PreDec,
 			Var:  data["var"].(ast.Expr),
 		}
-	case "ExprPreInc":
+	case "PreIncExpr":
 		node = &ast.UnaryExpr{
 			Kind: token.PreInc,
 			Var:  data["var"].(ast.Expr),
 		}
-	case "ExprPrint":
+	case "PrintExpr":
 		node = &ast.PrintExpr{
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprPropertyFetch":
+	case "PropertyFetchExpr":
 		node = &ast.PropertyFetchExpr{
 			Var:  data["var"].(ast.Expr),
 			Name: data["name"].(ast.Node),
 		}
-	case "ExprShellExec":
+	case "ShellExecExpr":
 		node = &ast.ShellExecExpr{
 			Parts: asSlice[ast.Expr](data["parts"]),
 		}
-	case "ExprStaticCall":
+	case "StaticCallExpr":
 		node = &ast.StaticCallExpr{
 			Class: data["class"].(ast.Node),
 			Name:  data["name"].(ast.Node),
 			Args:  asSlice[ast.Node](data["args"]),
 		}
-	case "ExprStaticPropertyFetch":
+	case "StaticPropertyFetchExpr":
 		node = &ast.StaticPropertyFetchExpr{
 			Class: data["class"].(ast.Node),
 			Name:  data["name"].(ast.Node),
 		}
-	case "ExprTernary":
+	case "TernaryExpr":
 		node = &ast.TernaryExpr{
 			Cond: data["cond"].(ast.Expr),
 			If:   asTypeOrNil[ast.Expr](data["if"]),
 			Else: data["else"].(ast.Expr),
 		}
-	case "ExprThrow":
+	case "ThrowExpr":
 		node = &ast.ThrowExpr{
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprUnaryMinus":
+	case "UnaryMinusExpr":
 		node = &ast.UnaryExpr{
 			Kind: token.Sub,
 			Var:  data["expr"].(ast.Expr),
 		}
-	case "ExprUnaryPlus":
+	case "UnaryPlusExpr":
 		node = &ast.UnaryExpr{
 			Kind: token.And,
 			Var:  data["expr"].(ast.Expr),
 		}
-	case "ExprVariable":
+	case "VariableExpr":
 		var nameExpr ast.Node
 		switch name := data["name"].(type) {
 		case string:
@@ -544,12 +529,12 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.VariableExpr{
 			Name: nameExpr,
 		}
-	case "ExprYield":
+	case "YieldExpr":
 		node = &ast.YieldExpr{
 			Key:   asTypeOrNil[ast.Expr](data["key"]),
 			Value: asTypeOrNil[ast.Expr](data["value"]),
 		}
-	case "ExprYieldFrom":
+	case "YieldFromExpr":
 		node = &ast.YieldFromExpr{
 			Expr: data["expr"].(ast.Expr),
 		}
@@ -560,11 +545,6 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "IntersectionType":
 		node = &ast.IntersectionType{
 			Types: asTypeNodes(data["types"]),
-		}
-	case "MatchArm":
-		node = &ast.MatchArm{
-			Conds: asSlice[ast.Expr](data["conds"]),
-			Body:  data["body"].(ast.Expr),
 		}
 	case "Name":
 		node = &ast.Name{
@@ -587,13 +567,12 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "Param":
 		node = &ast.Param{
-			Type:       asTypeNode(data["type"]),
-			ByRef:      data["byRef"].(bool),
-			Variadic:   data["variadic"].(bool),
-			Var:        data["var"].(*ast.VariableExpr),
-			Default:    asTypeOrNil[ast.Expr](data["default"]),
-			Flags:      asFlags(data["flags"]),
-			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
+			Type:     asTypeNode(data["type"]),
+			ByRef:    data["byRef"].(bool),
+			Variadic: data["variadic"].(bool),
+			Var:      data["var"].(*ast.VariableExpr),
+			Default:  asTypeOrNil[ast.Expr](data["default"]),
+			Flags:    asFlags(data["flags"]),
 		}
 	case "ScalarDNumber":
 		node = &ast.FloatLit{
@@ -641,38 +620,36 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.StringLit{
 			Value: data["value"].(string),
 		}
-	case "StmtBreak":
+	case "BreakStmt":
 		node = &ast.BreakStmt{
 			Num: asTypeOrNil[ast.Expr](data["num"]),
 		}
-	case "StmtCase":
+	case "CaseStmt":
 		node = &ast.CaseStmt{
 			Cond:  asTypeOrNil[ast.Expr](data["cond"]),
 			Stmts: asStmtList(data["stmts"]),
 		}
-	case "StmtCatch":
+	case "CatchStmt":
 		node = &ast.CatchStmt{
 			Types: asSlice[*ast.Name](data["types"]),
 			Var:   asTypeOrNil[*ast.VariableExpr](data["var"]),
 			Stmts: asStmtList(data["stmts"]),
 		}
-	case "StmtClass":
+	case "ClassStmt":
 		node = &ast.ClassStmt{
 			Flags:          asFlags(data["flags"]),
 			Extends:        asTypeOrNil[*ast.Name](data["extends"]),
 			Implements:     asSlice[*ast.Name](data["implements"]),
 			Name:           asTypeOrNil[*ast.Ident](data["name"]),
 			Stmts:          asStmtList(data["stmts"]),
-			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
-	case "StmtClassConst":
+	case "ClassConstStmt":
 		node = &ast.ClassConstStmt{
-			Flags:      asFlags(data["flags"]),
-			Consts:     asSlice[*ast.Const](data["consts"]),
-			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
+			Flags:  asFlags(data["flags"]),
+			Consts: asSlice[*ast.Const](data["consts"]),
 		}
-	case "StmtClassMethod":
+	case "ClassMethodStmt":
 		node = &ast.ClassMethodStmt{
 			Flags:      asFlags(data["flags"]),
 			ByRef:      data["byRef"].(bool),
@@ -680,75 +657,59 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Params:     asSlice[*ast.Param](data["params"]),
 			ReturnType: asTypeNode(data["returnType"]),
 			Stmts:      asStmtList(data["stmts"]),
-			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
 		}
-	case "StmtConst":
+	case "ConstStmt":
 		node = &ast.ConstStmt{
 			Consts: asSlice[*ast.Const](data["consts"]),
 		}
-	case "StmtContinue":
+	case "ContinueStmt":
 		node = &ast.ContinueStmt{
 			Num: asTypeOrNil[ast.Expr](data["num"]),
 		}
-	case "StmtDeclare":
+	case "DeclareStmt":
 		node = &ast.DeclareStmt{
 			Declares: asSlice[*ast.DeclareDeclareStmt](data["declares"]),
 			Stmts:    asStmtList(data["stmts"]),
 		}
-	case "StmtDeclareDeclare":
+	case "DeclareDeclareStmt":
 		node = &ast.DeclareDeclareStmt{
 			Key:   data["key"].(*ast.Ident),
 			Value: data["value"].(ast.Expr),
 		}
-	case "StmtDo":
+	case "DoStmt":
 		node = &ast.DoStmt{
 			Stmts: asStmtList(data["stmts"]),
 			Cond:  data["cond"].(ast.Expr),
 		}
-	case "StmtEcho":
+	case "EchoStmt":
 		node = &ast.EchoStmt{
 			Exprs: asSlice[ast.Expr](data["exprs"]),
 		}
-	case "StmtElse":
+	case "ElseStmt":
 		node = &ast.ElseStmt{
 			Stmts: asStmtList(data["stmts"]),
 		}
-	case "StmtElseIf":
+	case "ElseIfStmt":
 		node = &ast.ElseIfStmt{
 			Cond:  data["cond"].(ast.Expr),
 			Stmts: asStmtList(data["stmts"]),
 		}
-	case "StmtEnum":
-		node = &ast.EnumStmt{
-			ScalarType:     asTypeOrNil[*ast.Ident](data["scalarType"]),
-			Implements:     asSlice[*ast.Name](data["implements"]),
-			Name:           asTypeOrNil[*ast.Ident](data["name"]),
-			Stmts:          asStmtList(data["stmts"]),
-			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
-			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
-		}
-	case "StmtEnumCase":
-		node = &ast.EnumCaseStmt{
-			Name:       data["name"].(*ast.Ident),
-			Expr:       asTypeOrNil[ast.Expr](data["expr"]),
-			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
-		}
-	case "StmtExpression":
+	case "ExpressionStmt":
 		node = &ast.ExprStmt{
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "StmtFinally":
+	case "FinallyStmt":
 		node = &ast.FinallyStmt{
 			Stmts: asStmtList(data["stmts"]),
 		}
-	case "StmtFor":
+	case "ForStmt":
 		node = &ast.ForStmt{
 			Init:  asSlice[ast.Expr](data["init"]),
 			Cond:  asSlice[ast.Expr](data["cond"]),
 			Loop:  asSlice[ast.Expr](data["loop"]),
 			Stmts: asStmtList(data["stmts"]),
 		}
-	case "StmtForeach":
+	case "ForeachStmt":
 		node = &ast.ForeachStmt{
 			Expr:     data["expr"].(ast.Expr),
 			KeyVar:   asTypeOrNil[ast.Expr](data["keyVar"]),
@@ -756,25 +717,24 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			ValueVar: data["valueVar"].(ast.Expr),
 			Stmts:    asStmtList(data["stmts"]),
 		}
-	case "StmtFunction":
+	case "FunctionStmt":
 		node = &ast.FunctionStmt{
 			ByRef:          data["byRef"].(bool),
 			Name:           data["name"].(*ast.Ident),
 			Params:         asSlice[*ast.Param](data["params"]),
 			ReturnType:     asTypeNode(data["returnType"]),
 			Stmts:          asStmtList(data["stmts"]),
-			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
-	case "StmtGlobal":
+	case "GlobalStmt":
 		node = &ast.GlobalStmt{
 			Vars: asSlice[ast.Expr](data["vars"]),
 		}
-	case "StmtGoto":
+	case "GotoStmt":
 		node = &ast.GotoStmt{
 			Name: data["name"].(*ast.Ident),
 		}
-	case "StmtGroupUse":
+	case "GroupUseStmt":
 		typ := asInt(data["type"])
 		useType, err := getUseType(typ)
 		if err != nil {
@@ -794,112 +754,109 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			stmts = append(stmts, useStmt)
 		}
 		node = &ast.BlockStmt{List: stmts}
-	case "StmtHaltCompiler":
+	case "HaltCompilerStmt":
 		node = &ast.HaltCompilerStmt{
 			Remaining: data["remaining"].(string),
 		}
-	case "StmtIf":
+	case "IfStmt":
 		node = &ast.IfStmt{
 			Cond:    data["cond"].(ast.Expr),
 			Stmts:   asStmtList(data["stmts"]),
 			Elseifs: asSlice[*ast.ElseIfStmt](data["elseifs"]),
 			Else:    asTypeOrNil[*ast.ElseStmt](data["else"]),
 		}
-	case "StmtInlineHTML":
+	case "InlineHTMLStmt":
 		node = &ast.InlineHTMLStmt{
 			Value: data["value"].(string),
 		}
-	case "StmtInterface":
+	case "InterfaceStmt":
 		node = &ast.InterfaceStmt{
 			Extends:        asSlice[*ast.Name](data["extends"]),
 			Name:           asTypeOrNil[*ast.Ident](data["name"]),
 			Stmts:          asStmtList(data["stmts"]),
-			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
-	case "StmtLabel":
+	case "LabelStmt":
 		node = &ast.LabelStmt{
 			Name: data["name"].(*ast.Ident),
 		}
-	case "StmtNamespace":
+	case "NamespaceStmt":
 		node = &ast.NamespaceStmt{
 			Name:  asTypeOrNil[*ast.Name](data["name"]),
 			Stmts: asStmtList(data["stmts"]),
 		}
-	case "StmtNop":
+	case "NopStmt":
 		node = &ast.EmptyStmt{}
-	case "StmtProperty":
+	case "PropertyStmt":
 		node = &ast.PropertyStmt{
-			Flags:      asFlags(data["flags"]),
-			Props:      asSlice[*ast.PropertyPropertyStmt](data["props"]),
-			Type:       asTypeNode(data["type"]),
-			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
+			Flags: asFlags(data["flags"]),
+			Props: asSlice[*ast.PropertyPropertyStmt](data["props"]),
+			Type:  asTypeNode(data["type"]),
 		}
-	case "StmtPropertyProperty":
+	case "PropertyPropertyStmt":
 		node = &ast.PropertyPropertyStmt{
 			Name:    data["name"].(*ast.Ident),
 			Default: asTypeOrNil[ast.Expr](data["default"]),
 		}
-	case "StmtReturn":
+	case "ReturnStmt":
 		node = &ast.ReturnStmt{
 			Expr: asTypeOrNil[ast.Expr](data["expr"]),
 		}
-	case "StmtStatic":
+	case "StaticStmt":
 		node = &ast.StaticStmt{
 			Vars: asSlice[*ast.StaticVarStmt](data["vars"]),
 		}
-	case "StmtStaticVar":
+	case "StaticVarStmt":
 		node = &ast.StaticVarStmt{
 			Var:     data["var"].(*ast.VariableExpr),
 			Default: asTypeOrNil[ast.Expr](data["default"]),
 		}
-	case "StmtSwitch":
+	case "SwitchStmt":
 		node = &ast.SwitchStmt{
 			Cond:  data["cond"].(ast.Expr),
 			Cases: asSlice[*ast.CaseStmt](data["cases"]),
 		}
-	case "StmtThrow":
+	case "ThrowStmt":
 		node = &ast.ExprStmt{
 			Expr: &ast.ThrowExpr{
 				Expr: data["expr"].(ast.Expr),
 			},
 		}
-	case "StmtTrait":
+	case "TraitStmt":
 		node = &ast.TraitStmt{
 			Name:           asTypeOrNil[*ast.Ident](data["name"]),
 			Stmts:          asStmtList(data["stmts"]),
-			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
-	case "StmtTraitUse":
+	case "TraitUseStmt":
 		node = &ast.TraitUseStmt{
 			Traits:      asSlice[*ast.Name](data["traits"]),
 			Adaptations: asSlice[ast.TraitUseAdaptationStmt](data["adaptations"]),
 		}
-	case "StmtTraitUseAdaptationAlias":
+	case "TraitUseAdaptationAliasStmt":
 		node = &ast.TraitUseAdaptationAliasStmt{
 			NewModifier: asFlags(data["newModifier"]),
 			NewName:     asTypeOrNil[*ast.Ident](data["newName"]),
 			Trait:       asTypeOrNil[*ast.Name](data["trait"]),
 			Method:      data["method"].(*ast.Ident),
 		}
-	case "StmtTraitUseAdaptationPrecedence":
+	case "TraitUseAdaptationPrecedenceStmt":
 		node = &ast.TraitUseAdaptationPrecedenceStmt{
 			Insteadof: asSlice[*ast.Name](data["insteadof"]),
 			Trait:     asTypeOrNil[*ast.Name](data["trait"]),
 			Method:    data["method"].(*ast.Ident),
 		}
-	case "StmtTryCatch":
+	case "TryCatchStmt":
 		node = &ast.TryCatchStmt{
 			Stmts:   asStmtList(data["stmts"]),
 			Catches: asSlice[*ast.CatchStmt](data["catches"]),
 			Finally: asTypeOrNil[*ast.FinallyStmt](data["finally"]),
 		}
-	case "StmtUnset":
+	case "UnsetStmt":
 		node = &ast.UnsetStmt{
 			Vars: asSlice[ast.Expr](data["vars"]),
 		}
-	case "StmtUse":
+	case "UseStmt":
 		typ := asInt(data["type"])
 		useType, err := getUseType(typ)
 		if err != nil {
@@ -916,7 +873,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			stmts = append(stmts, useStmt)
 		}
 		node = &ast.BlockStmt{List: stmts}
-	case "StmtUseUse":
+	case "UseUseStmt":
 		typ := asInt(data["type"])
 		useType, err := getUseType(typ)
 		if err != nil {
@@ -927,7 +884,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Name:  data["name"].(*ast.Name),
 			Alias: asTypeOrNil[*ast.Ident](data["alias"]),
 		}
-	case "StmtWhile":
+	case "WhileStmt":
 		node = &ast.WhileStmt{
 			Cond:  data["cond"].(ast.Expr),
 			Stmts: asStmtList(data["stmts"]),
@@ -941,11 +898,22 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Name:    data["name"].(string),
 			VarLike: true,
 		}
+	case "AttributeGroup", "Attribute":
+		err = unsupported("unsupported high version php feature: php8.0 attribute")
+	case "MatchExpr", "MatchArm":
+		err = unsupported("unsupported high version php feature: php8.0 match")
+	case "EnumStmt", "EnumCaseStmt":
+		err = unsupported("unsupported high version php feature: php8.0 match")
 	case "VariadicPlaceholder":
-		node = &ast.VariadicPlaceholder{}
+		err = unsupported("unsupported high version php feature: php8.2 first class callable syntax")
+	default:
+		err = unsupported("unexpected node type: " + nodeType)
 	}
+	return
+}
 
-	return node, nil
+func unsupported(message string) error {
+	return errors.New(message)
 }
 
 func getUseType(typ int) (ast.UseType, error) {

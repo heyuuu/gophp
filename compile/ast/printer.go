@@ -149,8 +149,6 @@ func (p *printer) printNode(node Node) {
 		p.arg(x)
 	case *Const:
 		p.print(x.Name, " = ", x.Value)
-	case *VariadicPlaceholder:
-		p.print("...")
 	default:
 		err := fmt.Errorf("printer: unsupported node type %T", node)
 		p.checkError(err)
@@ -397,18 +395,6 @@ func (p *printer) expr(n Expr) {
 		p.print(x.Class, "::", x.Name)
 	case *MagicConstExpr:
 		p.print(x.Kind)
-	case *MatchExpr:
-		p.print("match (", x.Cond, ") {\n")
-		p.indent++
-		for _, arm := range x.Arms {
-			if len(arm.Conds) != 0 {
-				p.print(arm.Conds, " => ", arm.Body, "\n")
-			} else {
-				p.print("default => ", arm.Body, "\n")
-			}
-		}
-		p.indent--
-		p.print("}")
 	case *InstanceofExpr:
 		p.print(x.Expr, " instanceOf ", x.Class)
 	case *ListExpr:
@@ -696,22 +682,5 @@ func (p *printer) stmt(n Stmt) {
 			p.print(" ", x.NewName)
 		}
 		p.print(";")
-	case *EnumStmt:
-		p.print("enum ", x.Name)
-		if x.ScalarType != nil {
-			p.print(": ", x.ScalarType)
-		}
-		if len(x.Implements) != 0 {
-			p.print(" implements ", x.Implements)
-		}
-		p.print("\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
-	case *EnumCaseStmt:
-		if x.Expr != nil {
-			p.print("case ", x.Name, " = ", x.Expr, ";")
-		} else {
-			p.print("case ", x.Name, ";")
-		}
 	}
 }
