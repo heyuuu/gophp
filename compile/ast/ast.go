@@ -263,7 +263,7 @@ type (
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprPropertyFetch : Expr
+	// PropertyFetchExpr : Expr
 	PropertyFetchExpr struct {
 		Var  Expr // @var Expr Variable holding object
 		Name Node // @var Ident|Expr Property name
@@ -274,41 +274,40 @@ type (
 		Name Node // @var Ident|Expr Property name
 	}
 
-	// ExprStaticPropertyFetch : Expr
 	StaticPropertyFetchExpr struct {
 		Class Node // @var Name|Expr Class name
 		Name  Node // @var Ident|Expr Property name
 	}
 
-	// ExprShellExec : Expr
+	// ShellExecExpr : Expr
 	ShellExecExpr struct {
 		Parts []Expr // @var array Encapsed string array
 	}
 
-	// ExprTernary : Expr
+	// TernaryExpr : Expr
 	TernaryExpr struct {
 		Cond Expr // @var Expr Condition
 		If   Expr // @var Expr|null Expression for true
 		Else Expr // @var Expr Expression for false
 	}
 
-	// ExprThrow : Expr
+	// ThrowExpr : Expr
 	ThrowExpr struct {
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprVariable : Expr
+	// VariableExpr : Expr
 	VariableExpr struct {
 		Name Node // @var Ident|Expr Name
 	}
 
-	// ExprYield : Expr
+	// YieldExpr : Expr
 	YieldExpr struct {
 		Key   Expr // @var Expr|null Key expression
 		Value Expr // @var Expr|null Value expression
 	}
 
-	// ExprYieldFrom : Expr
+	// YieldFromExpr : Expr
 	YieldFromExpr struct {
 		Expr Expr // @var Expr Expression to yield from
 	}
@@ -339,7 +338,7 @@ type (
 		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
-	// ExprStaticCall : ExprCallLike
+	// StaticCallExpr : CallLikeExpr
 	StaticCallExpr struct {
 		Class Node   // @var Name|Expr Class name
 		Name  Node   // @var Ident|Expr Method name
@@ -403,7 +402,7 @@ type (
 	IfStmt struct {
 		Cond    Expr          // @var Expr 			condition expression
 		Stmts   []Stmt        // @var Stmt[] 		body statements
-		Elseifs []*ElseIfStmt // @var ElseIf_[] 	elseif branches
+		Elseifs []*ElseIfStmt // @var ElseIfStmt[] 	elseif branches
 		Else    *ElseStmt     // @var ElseStmt|null else branch; or nil
 	}
 
@@ -537,7 +536,7 @@ type (
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
-	// StmtFunction : Stmt, FunctionLike
+	// FunctionStmt : Stmt, FunctionLike
 	FunctionStmt struct {
 		ByRef          bool     // @var bool Whether function returns by reference
 		Name           *Ident   // @var Ident Name
@@ -555,7 +554,7 @@ type (
 		NamespacedName *Name   // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	// StmtClass : Stmt, StmtClassLike
+	// ClassStmt : ClassLikeStmt
 	ClassStmt struct {
 		Flags          Flags   // @var Flags        Type
 		Extends        *Name   // @var Name|null  Name of extended class
@@ -565,7 +564,7 @@ type (
 		NamespacedName *Name   // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	// StmtClassConst : Stmt
+	// ClassConstStmt : Stmt
 	ClassConstStmt struct {
 		Flags  Flags    // @var Flags Modifiers
 		Consts []*Const // @var Const_[] Constant declarations
@@ -583,7 +582,7 @@ type (
 		Default Expr   // @var Expr|null Default
 	}
 
-	// StmtClassMethod : Stmt, FunctionLike
+	// ClassMethodStmt : Stmt, FunctionLike
 	ClassMethodStmt struct {
 		Flags      Flags    // @var Flags Modifiers
 		ByRef      bool     // @var bool Whether to return by reference
@@ -593,7 +592,7 @@ type (
 		Stmts      []Stmt   // @var Stmt[]|null Statements
 	}
 
-	// StmtTrait : StmtClassLike
+	// TraitStmt : ClassLikeStmt
 	TraitStmt struct {
 		Name           *Ident // @var Ident|null Name
 		Stmts          []Stmt // @var Stmt[] Statements
@@ -605,7 +604,7 @@ type (
 		Adaptations []TraitUseAdaptationStmt // @var TraitUseAdaptation[] Adaptations
 	}
 
-	// StmtTraitUseAdaptationAlias : StmtTraitUseAdaptation
+	// TraitUseAdaptationAliasStmt : TraitUseAdaptationStmt
 	TraitUseAdaptationAliasStmt struct {
 		NewModifier Flags  // @var Flags 	    New modifier, default 0
 		NewName     *Ident // @var Ident|null 	New name, or nil

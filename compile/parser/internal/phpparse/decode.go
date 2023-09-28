@@ -69,12 +69,12 @@ func decodeData(data any) (any, error) {
 				return nil, err
 			}
 		}
-		if nodeType, ok := value["nodeType"].(string); ok {
-			node, err := decodeNode(value)
-			if node == nil || err != nil {
-				return nil, errors.New("node decode failed: nodeType=" + nodeType)
+		if _, ok := value["nodeType"].(string); ok {
+			if node, err := decodeNode(value); err == nil {
+				data = node
+			} else {
+				return nil, err
 			}
-			data = node
 		}
 	}
 

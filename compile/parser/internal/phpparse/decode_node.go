@@ -580,7 +580,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "EncapsedScalar":
 		parts := asSlice[ast.Expr](data["parts"])
 		if len(parts) == 0 {
-			return nil, fmt.Errorf("scalarEncapsed need at least 1 part")
+			return nil, fmt.Errorf("EncapsedScalar need at least 1 part")
 		}
 		expr := parts[0]
 		for _, next := range parts[1:] {
