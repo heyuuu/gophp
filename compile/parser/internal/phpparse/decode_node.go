@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
-	"github.com/heyuuu/gophp/compile/token"
 )
 
 func decodeNode(data map[string]any) (node ast.Node, err error) {
@@ -48,86 +47,86 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Expr:       data["expr"].(ast.Expr),
 		}
 	case "AssignExpr":
-		node = &ast.AssignExpr{
-			Op:   token.Assign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpBitwiseAndExpr":
-		node = &ast.AssignExpr{
-			Op:   token.AndAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpBitwiseAnd,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpBitwiseOrExpr":
-		node = &ast.AssignExpr{
-			Op:   token.OrAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpBitwiseOr,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpBitwiseXorExpr":
-		node = &ast.AssignExpr{
-			Op:   token.XorAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpBitwiseXor,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpCoalesceExpr":
-		node = &ast.AssignExpr{
-			Op:   token.CoalesceAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpCoalesce,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpConcatExpr":
-		node = &ast.AssignExpr{
-			Op:   token.ConcatAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpConcat,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpDivExpr":
-		node = &ast.AssignExpr{
-			Op:   token.DivAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpDiv,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpMinusExpr":
-		node = &ast.AssignExpr{
-			Op:   token.SubAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpMinus,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpModExpr":
-		node = &ast.AssignExpr{
-			Op:   token.ModAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpMod,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpMulExpr":
-		node = &ast.AssignExpr{
-			Op:   token.MulAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpMul,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpPlusExpr":
-		node = &ast.AssignExpr{
-			Op:   token.AddAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpPlus,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpPowExpr":
-		node = &ast.AssignExpr{
-			Op:   token.PowAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpPow,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpShiftLeftExpr":
-		node = &ast.AssignExpr{
-			Op:   token.ShiftLeftAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpShiftLeft,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "AssignOpShiftRightExpr":
-		node = &ast.AssignExpr{
-			Op:   token.ShiftRightAssign,
+		node = &ast.AssignOpExpr{
+			Op:   ast.AssignOpShiftRight,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
@@ -137,210 +136,210 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "BinaryOpBitwiseAndExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.And,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpBitwiseAnd,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpBitwiseOrExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Or,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpBitwiseOr,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpBitwiseXorExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Xor,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpBitwiseXor,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpBooleanAndExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.BooleanAnd,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpBooleanAnd,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpBooleanOrExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.BooleanOr,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpBooleanOr,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpCoalesceExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Coalesce,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpCoalesce,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpConcatExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Concat,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpConcat,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpDivExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Div,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpDiv,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpEqualExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Equal,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpGreaterExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Greater,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpGreater,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpGreaterOrEqualExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.GreaterOrEqual,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpGreaterOrEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpIdenticalExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Identical,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpIdentical,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpLogicalAndExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.LogicalAnd,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpLogicalAnd,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpLogicalOrExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.LogicalOr,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpLogicalOr,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpLogicalXorExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.LogicalXor,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpLogicalXor,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpMinusExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Sub,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpMinus,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpModExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Mod,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpMod,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpMulExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Mul,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpMul,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpNotEqualExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.NotEqual,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpNotEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpNotIdenticalExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.NotIdentical,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpNotIdentical,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpPlusExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Add,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpPlus,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpPowExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Pow,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpPow,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpShiftLeftExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.ShiftLeft,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpShiftLeft,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpShiftRightExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.ShiftRight,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpShiftRight,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpSmallerExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Smaller,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpSmaller,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpSmallerOrEqualExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.SmallerOrEqual,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpSmallerOrEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpSpaceshipExpr":
-		node = &ast.BinaryExpr{
-			Op:    token.Spaceship,
+		node = &ast.BinaryOpExpr{
+			Op:    ast.BinaryOpSpaceship,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BitwiseNotExpr":
 		node = &ast.UnaryExpr{
-			Kind: token.Tilde,
-			Var:  data["expr"].(ast.Expr),
+			Op:  ast.UnaryOpBitwiseNot,
+			Var: data["expr"].(ast.Expr),
 		}
 	case "BooleanNotExpr":
 		node = &ast.UnaryExpr{
-			Kind: token.Not,
-			Var:  data["expr"].(ast.Expr),
+			Op:  ast.UnaryOpBooleanNot,
+			Var: data["expr"].(ast.Expr),
 		}
 	case "CastArrayExpr":
 		node = &ast.CastExpr{
-			Op:   token.ArrayCast,
+			Kind: ast.CastArray,
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "CastBoolExpr":
 		node = &ast.CastExpr{
-			Op:   token.BoolCast,
+			Kind: ast.CastBool,
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "CastDoubleExpr":
 		node = &ast.CastExpr{
-			Op:   token.DoubleCast,
+			Kind: ast.CastDouble,
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "CastIntExpr":
 		node = &ast.CastExpr{
-			Op:   token.IntCast,
+			Kind: ast.CastInt,
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "CastObjectExpr":
 		node = &ast.CastExpr{
-			Op:   token.ObjectCast,
+			Kind: ast.CastObject,
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "CastStringExpr":
 		node = &ast.CastExpr{
-			Op:   token.StringCast,
+			Kind: ast.CastString,
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "CastUnsetExpr":
 		node = &ast.CastExpr{
-			Op:   token.UnsetCast,
+			Kind: ast.CastUnset,
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ClassConstFetchExpr":
@@ -372,7 +371,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "EmptyExpr":
 		node = &ast.InternalCallExpr{
-			Kind: token.Empty,
+			Kind: ast.ICallEmpty,
 			Args: []ast.Expr{
 				data["expr"].(ast.Expr),
 			},
@@ -383,7 +382,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "EvalExpr":
 		node = &ast.InternalCallExpr{
-			Kind: token.Eval,
+			Kind: ast.ICallEval,
 			Args: []ast.Expr{
 				data["expr"].(ast.Expr),
 			},
@@ -398,17 +397,17 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Args: asSlice[ast.Node](data["args"]),
 		}
 	case "IncludeExpr":
-		var Kind token.Token
+		var Kind ast.InternalCallOp
 		typ := asInt(data["type"])
 		switch typ {
 		case 1:
-			Kind = token.Include
+			Kind = ast.ICallInclude
 		case 2:
-			Kind = token.IncludeOnce
+			Kind = ast.ICallIncludeOnce
 		case 3:
-			Kind = token.Require
+			Kind = ast.ICallRequire
 		case 4:
-			Kind = token.RequireOnce
+			Kind = ast.ICallRequireOnce
 		default:
 			return nil, fmt.Errorf("unexpteted ExprInclude.type: %d", typ)
 		}
@@ -425,7 +424,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "IssetExpr":
 		node = &ast.InternalCallExpr{
-			Kind: token.Isset,
+			Kind: ast.ICallIsset,
 			Args: asSlice[ast.Expr](data["vars"]),
 		}
 	case "ListExpr":
@@ -456,23 +455,23 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "PostDecExpr":
 		node = &ast.UnaryExpr{
-			Kind: token.PostDec,
-			Var:  data["var"].(ast.Expr),
+			Op:  ast.UnaryOpPostDec,
+			Var: data["var"].(ast.Expr),
 		}
 	case "PostIncExpr":
 		node = &ast.UnaryExpr{
-			Kind: token.PostInc,
-			Var:  data["var"].(ast.Expr),
+			Op:  ast.UnaryOpPostInc,
+			Var: data["var"].(ast.Expr),
 		}
 	case "PreDecExpr":
 		node = &ast.UnaryExpr{
-			Kind: token.PreDec,
-			Var:  data["var"].(ast.Expr),
+			Op:  ast.UnaryOpPreDec,
+			Var: data["var"].(ast.Expr),
 		}
 	case "PreIncExpr":
 		node = &ast.UnaryExpr{
-			Kind: token.PreInc,
-			Var:  data["var"].(ast.Expr),
+			Op:  ast.UnaryOpPreInc,
+			Var: data["var"].(ast.Expr),
 		}
 	case "PrintExpr":
 		node = &ast.PrintExpr{
@@ -510,13 +509,13 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "UnaryMinusExpr":
 		node = &ast.UnaryExpr{
-			Kind: token.Sub,
-			Var:  data["expr"].(ast.Expr),
+			Op:  ast.UnaryOpMinus,
+			Var: data["expr"].(ast.Expr),
 		}
 	case "UnaryPlusExpr":
 		node = &ast.UnaryExpr{
-			Kind: token.And,
-			Var:  data["expr"].(ast.Expr),
+			Op:  ast.UnaryOpPlus,
+			Var: data["expr"].(ast.Expr),
 		}
 	case "VariableExpr":
 		var nameExpr ast.Node
@@ -585,8 +584,8 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 		expr := parts[0]
 		for _, next := range parts[1:] {
-			expr = &ast.BinaryExpr{
-				Op:    token.Concat,
+			expr = &ast.BinaryOpExpr{
+				Op:    ast.BinaryOpConcat,
 				Left:  expr,
 				Right: next,
 			}
@@ -601,21 +600,21 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Value: asInt(data["value"]),
 		}
 	case "ScalarMagicConstClass":
-		node = &ast.MagicConstExpr{Kind: token.ClassConst}
+		node = &ast.MagicConstExpr{Kind: ast.MagicConstClass}
 	case "ScalarMagicConstDir":
-		node = &ast.MagicConstExpr{Kind: token.DirConst}
+		node = &ast.MagicConstExpr{Kind: ast.MagicConstDir}
 	case "ScalarMagicConstFile":
-		node = &ast.MagicConstExpr{Kind: token.FileConst}
+		node = &ast.MagicConstExpr{Kind: ast.MagicConstFile}
 	case "ScalarMagicConstFunction":
-		node = &ast.MagicConstExpr{Kind: token.FunctionConst}
+		node = &ast.MagicConstExpr{Kind: ast.MagicConstFunction}
 	case "ScalarMagicConstLine":
-		node = &ast.MagicConstExpr{Kind: token.LineConst}
+		node = &ast.MagicConstExpr{Kind: ast.MagicConstLine}
 	case "ScalarMagicConstMethod":
-		node = &ast.MagicConstExpr{Kind: token.MethodConst}
+		node = &ast.MagicConstExpr{Kind: ast.MagicConstMethod}
 	case "ScalarMagicConstNamespace":
-		node = &ast.MagicConstExpr{Kind: token.NamespaceConst}
+		node = &ast.MagicConstExpr{Kind: ast.MagicConstNamespace}
 	case "ScalarMagicConstTrait":
-		node = &ast.MagicConstExpr{Kind: token.TraitConst}
+		node = &ast.MagicConstExpr{Kind: ast.MagicConstTrait}
 	case "ScalarString":
 		node = &ast.StringLit{
 			Value: data["value"].(string),

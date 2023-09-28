@@ -227,21 +227,21 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 		}
 	case *ast.CastExpr:
 		return &CastExpr{
-			Op:   n.Op,
+			Kind: n.Kind,
 			Expr: p.pExpr(n.Expr),
 		}
 	case *ast.UnaryExpr:
 		return &UnaryExpr{
-			Kind: n.Kind,
-			Var:  p.pExpr(n.Var),
+			Op:  n.Op,
+			Var: p.pExpr(n.Var),
 		}
-	case *ast.BinaryExpr:
-		return &BinaryExpr{
+	case *ast.BinaryOpExpr:
+		return &BinaryOpExpr{
 			Op:    n.Op,
 			Left:  p.pExpr(n.Left),
 			Right: p.pExpr(n.Right),
 		}
-	case *ast.AssignExpr:
+	case *ast.AssignOpExpr:
 		return &AssignExpr{
 			Op:   n.Op,
 			Var:  p.pExpr(n.Var),
@@ -747,7 +747,7 @@ func (p *parser) pName(n *ast.Name) *Name {
 		return nil
 	}
 	if n.Kind != ast.NameFullyQualified {
-		log.Println("ast.Name.Kind is not FQ")
+		log.Println("ast.Name.Op is not FQ")
 	}
 
 	var kind NameType
@@ -759,7 +759,7 @@ func (p *parser) pName(n *ast.Name) *Name {
 	case ast.NameRelative:
 		kind = NameRelative
 	default:
-		p.fail(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
+		p.fail(fmt.Sprintf("unexpected ast.Name.Op: %d", n.Kind))
 	}
 	return NewName(kind, n.Parts)
 }

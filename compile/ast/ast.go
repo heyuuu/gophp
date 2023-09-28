@@ -1,7 +1,6 @@
 package ast
 
 import (
-	"github.com/heyuuu/gophp/compile/token"
 	"strings"
 )
 
@@ -112,16 +111,8 @@ type (
 /**
  *	Name
  */
-type NameType int
-
-const (
-	NameNormal NameType = iota
-	NameFullyQualified
-	NameRelative
-)
-
 type Name struct {
-	Kind  NameType // 0 normal, 1 full-qualified, 2 relative
+	Kind  NameKind // kind
 	Parts []string // @var string[] Parts of the name
 }
 
@@ -200,28 +191,28 @@ type (
 
 	// CastExpr
 	CastExpr struct {
-		Op   token.Token // token.
-		Expr Expr        // @var Expr Expression
+		Kind CastKind
+		Expr Expr // @var Expr Expression
 	}
 
 	// UnaryExpr
 	UnaryExpr struct {
-		Kind token.Token // token.Add, token.Sub, token.Not, token.Tilde, token.PreInc, token.PreDec, token.PostInc or token.PostDec
-		Var  Expr        // variable
+		Op  UnaryOpKind
+		Var Expr // variable
 	}
 
-	// BinaryExpr
-	BinaryExpr struct {
-		Op    token.Token // token.IsBinaryOp()
-		Left  Expr        // @var Expr The left-hand side expression
-		Right Expr        // @var Expr The right-hand side expression
+	// BinaryOpExpr
+	BinaryOpExpr struct {
+		Op    BinaryOpKind
+		Left  Expr // @var Expr The left-hand side expression
+		Right Expr // @var Expr The right-hand side expression
 	}
 
 	// AssignExpr
-	AssignExpr struct {
-		Op   token.Token // token.IsAssignOp()
-		Var  Expr        // @var Expr Variable
-		Expr Expr        // @var Expr Expression
+	AssignOpExpr struct {
+		Op   AssignOpKind
+		Var  Expr // @var Expr Variable
+		Expr Expr // @var Expr Expression
 	}
 
 	AssignRefExpr struct {
@@ -231,8 +222,8 @@ type (
 
 	// InternalCallExpr
 	InternalCallExpr struct {
-		Kind token.Token // token.IsInternalCall()
-		Args []Expr      // arguments
+		Kind InternalCallOp
+		Args []Expr // arguments
 	}
 
 	CloneExpr struct {
@@ -258,7 +249,7 @@ type (
 	}
 
 	MagicConstExpr struct {
-		Kind token.Token // token.IsMagicConstKind()
+		Kind MagicConstKind
 	}
 
 	InstanceofExpr struct {
@@ -652,8 +643,8 @@ func (*ArrowFunctionExpr) exprNode() {}
 func (*IndexExpr) exprNode()     {}
 func (*CastExpr) exprNode()      {}
 func (*UnaryExpr) exprNode()     {}
-func (*BinaryExpr) exprNode()    {}
-func (*AssignExpr) exprNode()    {}
+func (*BinaryOpExpr) exprNode()  {}
+func (*AssignOpExpr) exprNode()  {}
 func (*AssignRefExpr) exprNode() {}
 
 func (*InternalCallExpr) exprNode()  {}
@@ -776,8 +767,8 @@ func (*ArrowFunctionExpr) node()                {}
 func (*IndexExpr) node()                        {}
 func (*CastExpr) node()                         {}
 func (*UnaryExpr) node()                        {}
-func (*BinaryExpr) node()                       {}
-func (*AssignExpr) node()                       {}
+func (*BinaryOpExpr) node()                     {}
+func (*AssignOpExpr) node()                     {}
 func (*AssignRefExpr) node()                    {}
 func (*InternalCallExpr) node()                 {}
 func (*CloneExpr) node()                        {}

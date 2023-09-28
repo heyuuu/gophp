@@ -2,8 +2,6 @@ package ast
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/compile/token"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -99,8 +97,6 @@ func (p *printer) print(args ...any) {
 			p.write(string(v))
 		case string:
 			p.write(v)
-		case token.Token:
-			p.write(token.TokenName(v))
 		case Node:
 			p.printNode(v)
 		// 以下 case 只是为了加快类型匹配
@@ -116,8 +112,10 @@ func (p *printer) print(args ...any) {
 			} else if nodes, ok := convertNodeList(arg); ok {
 				printList(p, nodes, ", ")
 			} else {
-				_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
-				panic("gophp/php/printer type")
+				// todo 待优化
+				p.write(fmt.Sprintf("%T(%v)", arg, arg))
+				//_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
+				//panic("gophp/php/printer type")
 			}
 		}
 	}
@@ -367,17 +365,17 @@ func (p *printer) expr(n Expr) {
 	case *IndexExpr:
 		p.print(x.Var, "[", x.Dim, "]")
 	case *CastExpr:
-		p.print(x.Op, x.Expr)
+		p.print(x.Kind, x.Expr)
 	case *UnaryExpr:
-		switch x.Kind {
-		case token.PostInc, token.PostDec:
-			p.print(x.Var, x.Kind)
+		switch x.Op {
+		case UnaryOpPostInc, UnaryOpPostDec:
+			p.print(x.Var, x.Op)
 		default:
-			p.print(x.Kind, x.Var)
+			p.print(x.Op, x.Var)
 		}
-	case *BinaryExpr:
+	case *BinaryOpExpr:
 		p.print(x.Left, " ", x.Op, " ", x.Right)
-	case *AssignExpr:
+	case *AssignOpExpr:
 		p.print(x.Var, " ", x.Op, " ", x.Expr)
 	case *AssignRefExpr:
 		p.print(x.Var, " = &", x.Expr)
