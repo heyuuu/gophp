@@ -26,13 +26,13 @@ type (
 		callLikeExprNode()
 	}
 
-	// FunctionLike
+	// FunctionLike : Node
 	FunctionLike interface {
 		Node
 		functionLikeNode()
 	}
 
-	// StmtClassLike : Stmt
+	// ClassLikeStmt : Stmt
 	ClassLikeStmt interface {
 		Stmt
 		classLikeStmtNode()
@@ -54,15 +54,6 @@ type (
 		Unpack bool   // @var bool Whether to unpack the argument
 	}
 
-	Attribute struct {
-		Name *Name  // @var Name Attribute name
-		Args []*Arg // @var Arg[] Attribute arguments
-	}
-
-	AttributeGroup struct {
-		Attrs []*Attribute // @var Attribute[] Attributes
-	}
-
 	Const struct {
 		Name           *Ident // @var Ident Name
 		Value          Expr   // @var Expr Value
@@ -82,7 +73,7 @@ type (
 	}
 
 	Param struct {
-		Type     Type          // @var Type|null Type declaration
+		Type     TypeHint      // @var TypeHint|null Type declaration
 		ByRef    bool          // @var bool Whether parameter is passed by reference
 		Variadic bool          // @var bool Whether this is a variadic argument
 		Var      *VariableExpr // @var VariableExpr Parameter variable
@@ -91,27 +82,25 @@ type (
 	}
 )
 
-/**
- * Type
- */
-type Type interface {
+// TypeHint 类型标识
+type TypeHint interface {
 	Node
-	typeNode()
+	typeHintNode()
 }
+
 type (
-	// IntersectionType : A
 	SimpleType struct {
 		Name *Name
 	}
 
 	// IntersectionType : A & B & C
 	IntersectionType struct {
-		Types []Type // possible type: SimpleType
+		Types []TypeHint // possible type: SimpleType
 	}
 
 	// UnionType : A | B | C
 	UnionType struct {
-		Types []Type // possible type: SimpleType or IntersectionType
+		Types []TypeHint // possible type: SimpleType or IntersectionType
 	}
 
 	// NullableType : ?A
@@ -155,16 +144,17 @@ func (n *Name) ToCodeString() string {
 // Expr
 type (
 	// literal
+
 	IntLit struct {
 		Value int // number value
 	}
 
 	FloatLit struct {
-		Value float64 // @var float Number value
+		Value float64 // number value
 	}
 
 	StringLit struct {
-		Value string // @var string String value
+		Value string // string value
 	}
 
 	ArrayExpr struct {
@@ -184,7 +174,7 @@ type (
 		ByRef      bool              // @var bool Whether to return by reference
 		Params     []*Param          // @var Param[] Parameters
 		Uses       []*ClosureUseExpr // @var ClosureUse[] use()s
-		ReturnType Type              // @var Type|null Return type
+		ReturnType TypeHint          // @var TypeHint|null Return type
 		Stmts      []Stmt            // @var Stmt[] Statements
 	}
 
@@ -198,7 +188,7 @@ type (
 		Static     bool     // @var bool
 		ByRef      bool     // @var bool
 		Params     []*Param // @var Param[]
-		ReturnType Type     // @var Type|null
+		ReturnType TypeHint // @var TypeHint|null
 		Expr       Expr     // @var Expr
 	}
 
@@ -563,7 +553,7 @@ type (
 		ByRef          bool     // @var bool Whether function returns by reference
 		Name           *Ident   // @var Ident Name
 		Params         []*Param // @var Param[] Parameters
-		ReturnType     Type     // @var Type|null Return type
+		ReturnType     TypeHint // @var TypeHint|null Return type
 		Stmts          []Stmt   // @var Stmt[] Statements
 		NamespacedName *Name    // @var Name|null Namespaced name (if using NameResolver)
 	}
@@ -596,7 +586,7 @@ type (
 	PropertyStmt struct {
 		Flags Flags                   // @var Flags Modifiers
 		Props []*PropertyPropertyStmt // @var PropertyProperty[] Properties
-		Type  Type                    // @var Type|null Type declaration
+		Type  TypeHint                // @var TypeHint|null Type declaration
 	}
 
 	PropertyPropertyStmt struct {
@@ -610,7 +600,7 @@ type (
 		ByRef      bool     // @var bool Whether to return by reference
 		Name       *Ident   // @var Ident Name
 		Params     []*Param // @var Param[] Parameters
-		ReturnType Type     // @var Type|null Return type
+		ReturnType TypeHint // @var TypeHint|null Return type
 		Stmts      []Stmt   // @var Stmt[]|null Statements
 	}
 
@@ -643,10 +633,10 @@ type (
 )
 
 // Type
-func (*SimpleType) typeNode()       {}
-func (*IntersectionType) typeNode() {}
-func (*UnionType) typeNode()        {}
-func (*NullableType) typeNode()     {}
+func (*SimpleType) typeHintNode()       {}
+func (*IntersectionType) typeHintNode() {}
+func (*UnionType) typeHintNode()        {}
+func (*NullableType) typeHintNode()     {}
 
 // Expr
 func (*IntLit) exprNode()        {}
@@ -767,7 +757,6 @@ func (*TraitUseAdaptationPrecedenceStmt) traitUseAdaptationStmtNode() {}
 
 // All Node types
 func (*Arg) node()                              {}
-func (*Attribute) node()                        {}
 func (*Const) node()                            {}
 func (*Ident) node()                            {}
 func (*Param) node()                            {}

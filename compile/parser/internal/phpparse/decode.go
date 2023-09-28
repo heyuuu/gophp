@@ -141,7 +141,7 @@ func asStmtList(data any) []ast.Stmt {
 	return stmts
 }
 
-func asTypeNode(data any) ast.Type {
+func asTypeHint(data any) ast.TypeHint {
 	if data == nil {
 		return nil
 	}
@@ -154,18 +154,18 @@ func asTypeNode(data any) ast.Type {
 	case *ast.Name:
 		return &ast.SimpleType{Name: node}
 	default:
-		return data.(ast.Type)
+		return data.(ast.TypeHint)
 	}
 }
 
-func asTypeNodes(data any) []ast.Type {
+func asTypeHints(data any) []ast.TypeHint {
 	if data == nil {
 		return nil
 	}
 
-	var items []ast.Type
+	var items []ast.TypeHint
 	for _, item := range data.([]any) {
-		items = append(items, asTypeNode(item))
+		items = append(items, asTypeHint(item))
 	}
 	return items
 }

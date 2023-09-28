@@ -44,7 +44,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Static:     data["static"].(bool),
 			ByRef:      data["byRef"].(bool),
 			Params:     asSlice[*ast.Param](data["params"]),
-			ReturnType: asTypeNode(data["returnType"]),
+			ReturnType: asTypeHint(data["returnType"]),
 			Expr:       data["expr"].(ast.Expr),
 		}
 	case "AssignExpr":
@@ -358,7 +358,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			ByRef:      data["byRef"].(bool),
 			Params:     asSlice[*ast.Param](data["params"]),
 			Uses:       asSlice[*ast.ClosureUseExpr](data["uses"]),
-			ReturnType: asTypeNode(data["returnType"]),
+			ReturnType: asTypeHint(data["returnType"]),
 			Stmts:      asStmtList(data["stmts"]),
 		}
 	case "ClosureUseExpr":
@@ -544,7 +544,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "IntersectionType":
 		node = &ast.IntersectionType{
-			Types: asTypeNodes(data["types"]),
+			Types: asTypeHints(data["types"]),
 		}
 	case "Name":
 		node = &ast.Name{
@@ -563,11 +563,11 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "NullableType":
 		node = &ast.NullableType{
-			Type: asTypeNode(data["type"]).(*ast.SimpleType),
+			Type: asTypeHint(data["type"]).(*ast.SimpleType),
 		}
 	case "Param":
 		node = &ast.Param{
-			Type:     asTypeNode(data["type"]),
+			Type:     asTypeHint(data["type"]),
 			ByRef:    data["byRef"].(bool),
 			Variadic: data["variadic"].(bool),
 			Var:      data["var"].(*ast.VariableExpr),
@@ -655,7 +655,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			ByRef:      data["byRef"].(bool),
 			Name:       data["name"].(*ast.Ident),
 			Params:     asSlice[*ast.Param](data["params"]),
-			ReturnType: asTypeNode(data["returnType"]),
+			ReturnType: asTypeHint(data["returnType"]),
 			Stmts:      asStmtList(data["stmts"]),
 		}
 	case "ConstStmt":
@@ -722,7 +722,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			ByRef:          data["byRef"].(bool),
 			Name:           data["name"].(*ast.Ident),
 			Params:         asSlice[*ast.Param](data["params"]),
-			ReturnType:     asTypeNode(data["returnType"]),
+			ReturnType:     asTypeHint(data["returnType"]),
 			Stmts:          asStmtList(data["stmts"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
@@ -791,7 +791,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.PropertyStmt{
 			Flags: asFlags(data["flags"]),
 			Props: asSlice[*ast.PropertyPropertyStmt](data["props"]),
-			Type:  asTypeNode(data["type"]),
+			Type:  asTypeHint(data["type"]),
 		}
 	case "PropertyPropertyStmt":
 		node = &ast.PropertyPropertyStmt{
@@ -891,7 +891,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "UnionType":
 		node = &ast.UnionType{
-			Types: asTypeNodes(data["types"]),
+			Types: asTypeHints(data["types"]),
 		}
 	case "VarLikeIdentifier":
 		node = &ast.Ident{

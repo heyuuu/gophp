@@ -633,7 +633,7 @@ func (p *parser) pTryCatchStmt(n *ast.TryCatchStmt) *TryCatchStmt {
 	}
 }
 
-func (p *parser) pType(node ast.Type) Type {
+func (p *parser) pType(node ast.TypeHint) Type {
 	switch n := node.(type) {
 	case *ast.SimpleType:
 		return p.pSimpleType(n)
