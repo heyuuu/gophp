@@ -1,56 +1,58 @@
 package ast
 
+//go:generate stringer -linecomment -type=AssignOpKind,BinaryOpKind,UnaryOpKind,MagicConstKind,CastKind,InternalCallOp -output=enum_string.go
+
 // AssignOpKind
 type AssignOpKind uint8
 
 const (
-	AssignOpAssign AssignOpKind = iota + 1
-	AssignOpBitwiseAnd
-	AssignOpBitwiseOr
-	AssignOpBitwiseXor
-	AssignOpCoalesce
-	AssignOpConcat
-	AssignOpDiv
-	AssignOpMinus
-	AssignOpMod
-	AssignOpMul
-	AssignOpPlus
-	AssignOpPow
-	AssignOpShiftLeft
-	AssignOpShiftRight
+	AssignOpAssign     AssignOpKind = iota + 1 // =
+	AssignOpBitwiseAnd                         // &=
+	AssignOpBitwiseOr                          // |=
+	AssignOpBitwiseXor                         // ^=
+	AssignOpCoalesce                           // ??=
+	AssignOpConcat                             // .=
+	AssignOpDiv                                // /=
+	AssignOpMinus                              // -=
+	AssignOpMod                                // %=
+	AssignOpMul                                // *=
+	AssignOpPlus                               // +=
+	AssignOpPow                                // **=
+	AssignOpShiftLeft                          // <<=
+	AssignOpShiftRight                         // >>=
 )
 
 // BinaryOpKind
 type BinaryOpKind uint8
 
 const (
-	BinaryOpBitwiseAnd BinaryOpKind = iota + 1
-	BinaryOpBitwiseOr
-	BinaryOpBitwiseXor
-	BinaryOpBooleanAnd
-	BinaryOpBooleanOr
-	BinaryOpCoalesce
-	BinaryOpConcat
-	BinaryOpDiv
-	BinaryOpEqual
-	BinaryOpGreater
-	BinaryOpGreaterOrEqual
-	BinaryOpIdentical
-	BinaryOpLogicalAnd
-	BinaryOpLogicalOr
-	BinaryOpLogicalXor
-	BinaryOpMinus
-	BinaryOpMod
-	BinaryOpMul
-	BinaryOpNotEqual
-	BinaryOpNotIdentical
-	BinaryOpPlus
-	BinaryOpPow
-	BinaryOpShiftLeft
-	BinaryOpShiftRight
-	BinaryOpSmaller
-	BinaryOpSmallerOrEqual
-	BinaryOpSpaceship
+	BinaryOpBitwiseAnd     BinaryOpKind = iota + 1 // &
+	BinaryOpBitwiseOr                              // |
+	BinaryOpBitwiseXor                             // ^
+	BinaryOpBooleanAnd                             // &&
+	BinaryOpBooleanOr                              // ||
+	BinaryOpCoalesce                               // ??
+	BinaryOpConcat                                 // .
+	BinaryOpDiv                                    // /
+	BinaryOpEqual                                  // ==
+	BinaryOpGreater                                // >
+	BinaryOpGreaterOrEqual                         // >=
+	BinaryOpIdentical                              // ===
+	BinaryOpLogicalAnd                             // and
+	BinaryOpLogicalOr                              // or
+	BinaryOpLogicalXor                             // xor
+	BinaryOpMinus                                  // -
+	BinaryOpMod                                    // %
+	BinaryOpMul                                    // *
+	BinaryOpNotEqual                               // !=
+	BinaryOpNotIdentical                           // !==
+	BinaryOpPlus                                   // +
+	BinaryOpPow                                    // **
+	BinaryOpShiftLeft                              // <<
+	BinaryOpShiftRight                             // >>
+	BinaryOpSmaller                                // <
+	BinaryOpSmallerOrEqual                         // <=
+	BinaryOpSpaceship                              // <=>
 )
 
 // UnaryOpKind
@@ -71,27 +73,27 @@ const (
 type MagicConstKind uint8
 
 const (
-	MagicConstClass MagicConstKind = iota + 1
-	MagicConstDir
-	MagicConstFile
-	MagicConstFunction
-	MagicConstLine
-	MagicConstMethod
-	MagicConstNamespace
-	MagicConstTrait
+	MagicConstClass     MagicConstKind = iota + 1 // __CLASS__
+	MagicConstDir                                 // __DIR__
+	MagicConstFile                                // __FILE__
+	MagicConstFunction                            // __FUNCTION__
+	MagicConstLine                                // __LINE__
+	MagicConstMethod                              // __METHOD__
+	MagicConstNamespace                           // __NAMESPACE__
+	MagicConstTrait                               // __TRAIT__
 )
 
 // CastKind
 type CastKind uint8
 
 const (
-	CastArray CastKind = iota + 1
-	CastBool
-	CastDouble
-	CastInt
-	CastObject
-	CastString
-	CastUnset
+	CastArray  CastKind = iota + 1 // (array)
+	CastBool                       // (bool)
+	CastDouble                     // (float)
+	CastInt                        // (int)
+	CastObject                     // (object)
+	CastString                     // (string)
+	CastUnset                      // (unset)
 )
 
 // InternalCallOp

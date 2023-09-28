@@ -397,22 +397,22 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Args: asSlice[ast.Node](data["args"]),
 		}
 	case "IncludeExpr":
-		var Kind ast.InternalCallOp
+		var kind ast.InternalCallOp
 		typ := asInt(data["type"])
 		switch typ {
 		case 1:
-			Kind = ast.ICallInclude
+			kind = ast.ICallInclude
 		case 2:
-			Kind = ast.ICallIncludeOnce
+			kind = ast.ICallIncludeOnce
 		case 3:
-			Kind = ast.ICallRequire
+			kind = ast.ICallRequire
 		case 4:
-			Kind = ast.ICallRequireOnce
+			kind = ast.ICallRequireOnce
 		default:
 			return nil, fmt.Errorf("unexpteted ExprInclude.type: %d", typ)
 		}
 		node = &ast.InternalCallExpr{
-			Kind: Kind,
+			Kind: kind,
 			Args: []ast.Expr{
 				data["expr"].(ast.Expr),
 			},
@@ -573,11 +573,11 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Default:  asTypeOrNil[ast.Expr](data["default"]),
 			Flags:    asFlags(data["flags"]),
 		}
-	case "ScalarDNumber":
+	case "DNumberScalar":
 		node = &ast.FloatLit{
 			Value: asFloat(data["value"]),
 		}
-	case "ScalarEncapsed":
+	case "EncapsedScalar":
 		parts := asSlice[ast.Expr](data["parts"])
 		if len(parts) == 0 {
 			return nil, fmt.Errorf("scalarEncapsed need at least 1 part")
@@ -591,31 +591,31 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			}
 		}
 		node = expr
-	case "ScalarEncapsedStringPart":
+	case "EncapsedStringPartScalar":
 		node = &ast.StringLit{
 			Value: data["value"].(string),
 		}
-	case "ScalarLNumber":
+	case "LNumberScalar":
 		node = &ast.IntLit{
 			Value: asInt(data["value"]),
 		}
-	case "ScalarMagicConstClass":
+	case "MagicConstClassScalar":
 		node = &ast.MagicConstExpr{Kind: ast.MagicConstClass}
-	case "ScalarMagicConstDir":
+	case "MagicConstDirScalar":
 		node = &ast.MagicConstExpr{Kind: ast.MagicConstDir}
-	case "ScalarMagicConstFile":
+	case "MagicConstFileScalar":
 		node = &ast.MagicConstExpr{Kind: ast.MagicConstFile}
-	case "ScalarMagicConstFunction":
+	case "MagicConstFunctionScalar":
 		node = &ast.MagicConstExpr{Kind: ast.MagicConstFunction}
-	case "ScalarMagicConstLine":
+	case "MagicConstLineScalar":
 		node = &ast.MagicConstExpr{Kind: ast.MagicConstLine}
-	case "ScalarMagicConstMethod":
+	case "MagicConstMethodScalar":
 		node = &ast.MagicConstExpr{Kind: ast.MagicConstMethod}
-	case "ScalarMagicConstNamespace":
+	case "MagicConstNamespaceScalar":
 		node = &ast.MagicConstExpr{Kind: ast.MagicConstNamespace}
-	case "ScalarMagicConstTrait":
+	case "MagicConstTraitScalar":
 		node = &ast.MagicConstExpr{Kind: ast.MagicConstTrait}
-	case "ScalarString":
+	case "StringScalar":
 		node = &ast.StringLit{
 			Value: data["value"].(string),
 		}

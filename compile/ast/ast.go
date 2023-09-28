@@ -108,9 +108,7 @@ type (
 	}
 )
 
-/**
- *	Name
- */
+// Name : Node
 type Name struct {
 	Kind  NameKind // kind
 	Parts []string // @var string[] Parts of the name
@@ -159,7 +157,7 @@ type (
 		Unpack bool // @var bool Whether to unpack the argument
 	}
 
-	// ExprClosure : Expr, FunctionLike
+	// ClosureExpr : Expr, FunctionLike
 	ClosureExpr struct {
 		Static     bool              // @var bool Whether the closure is static
 		ByRef      bool              // @var bool Whether to return by reference
@@ -174,7 +172,7 @@ type (
 		ByRef bool          // @var bool Whether to use by reference
 	}
 
-	// ExprArrowFunction : Expr, FunctionLike
+	// ArrowFunctionExpr : Expr, FunctionLike
 	ArrowFunctionExpr struct {
 		Static     bool     // @var bool
 		ByRef      bool     // @var bool

@@ -289,7 +289,7 @@ var specialTokenNames = map[Token]string{
 
 	// cast op tokens
 	BoolCast:   "(bool)",
-	IntCast:    "(int))",
+	IntCast:    "(int)",
 	DoubleCast: "(float)",
 	StringCast: "(string)",
 	ArrayCast:  "(array)",

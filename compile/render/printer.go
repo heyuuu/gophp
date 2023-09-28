@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/kits/mapkit"
 	"github.com/heyuuu/gophp/kits/slicekit"
 	"log"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -217,6 +218,8 @@ func (p *printer) print(args ...any) {
 			p.write(v)
 		case ir.Node:
 			p.printNode(v)
+		case fmt.Stringer:
+			p.print(v.String())
 		// 以下 case 只是为了加快类型匹配
 		case []ir.Stmt:
 			p.stmtList(v, false)
@@ -230,10 +233,8 @@ func (p *printer) print(args ...any) {
 			} else if nodes, ok := convertNodeList(arg); ok {
 				printList(p, nodes, ", ")
 			} else {
-				// todo 待优化
-				p.write(fmt.Sprintf("%T(%v)", arg, arg))
-				//_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
-				//panic("gophp/php/printer type")
+				_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
+				panic("gophp/php/printer type")
 			}
 		}
 	}

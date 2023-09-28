@@ -205,6 +205,8 @@ func (p *printer) print(args ...any) {
 			p.write(v)
 		case Node:
 			p.printNode(v)
+		case fmt.Stringer:
+			p.print(v.String())
 		// 以下 case 只是为了加快类型匹配
 		case []Stmt:
 			p.stmtList(v, false)
