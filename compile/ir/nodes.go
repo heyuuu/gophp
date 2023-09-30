@@ -51,34 +51,32 @@ type (
 
 	Param struct {
 		Name     string
-		Type     Type // @var Type|null Type declaration
-		ByRef    bool // @var bool Whether parameter is passed by reference
-		Variadic bool // @var bool Whether this is a variadic argument
-		Default  Expr // @var Expr|null Default value
+		Type     TypeHint // @var TypeHint|null Type declaration
+		ByRef    bool     // @var bool Whether parameter is passed by reference
+		Variadic bool     // @var bool Whether this is a variadic argument
+		Default  Expr     // @var Expr|null Default value
 	}
 )
 
-/**
- * Type
- */
-type Type interface {
+// TypeHint 类型标识
+type TypeHint interface {
 	Node
-	typeNode()
+	typeHintNode()
 }
+
 type (
-	// IntersectionType : A
 	SimpleType struct {
 		Name Name
 	}
 
 	// IntersectionType : A & B & C
 	IntersectionType struct {
-		Types []Type // possible type: SimpleType
+		Types []TypeHint // possible type: SimpleType
 	}
 
 	// UnionType : A | B | C
 	UnionType struct {
-		Types []Type // possible type: SimpleType or IntersectionType
+		Types []TypeHint // possible type: SimpleType or IntersectionType
 	}
 
 	// NullableType : ?A
@@ -157,11 +155,11 @@ type (
 	}
 
 	FloatLit struct {
-		Value float64 // @var float Number value
+		Value float64 // number value
 	}
 
 	StringLit struct {
-		Value string // @var string String value
+		Value string // string value
 	}
 
 	ArrayExpr struct {
@@ -175,13 +173,13 @@ type (
 		Unpack bool // @var bool Whether to unpack the argument
 	}
 
-	// ExprClosure : Expr, FunctionLike
+	// ClosureExpr : Expr, FunctionLike
 	ClosureExpr struct {
 		Static     bool              // @var bool Whether the closure is static
 		ByRef      bool              // @var bool Whether to return by reference
 		Params     []*Param          // @var Param[] Parameters
 		Uses       []*ClosureUseExpr // @var ClosureUse[] use()s
-		ReturnType Type              // @var Type|null Return type
+		ReturnType TypeHint          // @var TypeHint|null Return type
 		Stmts      []Stmt            // @var Stmt[] Statements
 	}
 
@@ -190,12 +188,12 @@ type (
 		ByRef bool   // @var bool Whether to use by reference
 	}
 
-	// ExprArrowFunction : Expr, FunctionLike
+	// ArrowFunctionExpr : Expr, FunctionLike
 	ArrowFunctionExpr struct {
 		Static     bool     // @var bool
 		ByRef      bool     // @var bool
 		Params     []*Param // @var Param[]
-		ReturnType Type     // @var Type|null
+		ReturnType TypeHint // @var TypeHint|null
 		Expr       Expr     // @var Expr
 	}
 
@@ -226,6 +224,12 @@ type (
 
 	// AssignExpr
 	AssignExpr struct {
+		Var  Expr // @var Expr Variable
+		Expr Expr // @var Expr Expression
+	}
+
+	// AssignOpExpr
+	AssignOpExpr struct {
 		Op   ast.AssignOpKind
 		Var  Expr // @var Expr Variable
 		Expr Expr // @var Expr Expression
@@ -281,7 +285,7 @@ type (
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprPropertyFetch : Expr
+	// PropertyFetchExpr : Expr
 	PropertyFetchExpr struct {
 		Var  Expr // @var Expr Variable holding object
 		Name Node // @var Ident|Expr Property name
@@ -293,35 +297,35 @@ type (
 		Name  Node // @var Ident|Expr Property name
 	}
 
-	// ExprShellExec : Expr
+	// ShellExecExpr : Expr
 	ShellExecExpr struct {
 		Parts []Expr // @var array Encapsed string array
 	}
 
-	// ExprTernary : Expr
+	// TernaryExpr : Expr
 	TernaryExpr struct {
 		Cond Expr // @var Expr Condition
 		If   Expr // @var Expr|null Expression for true
 		Else Expr // @var Expr Expression for false
 	}
 
-	// ExprThrow : Expr
+	// ThrowExpr : Expr
 	ThrowExpr struct {
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprVariable : Expr
+	// VariableExpr : Expr
 	VariableExpr struct {
 		Name Node // @var Ident|Expr Name
 	}
 
-	// ExprYield : Expr
+	// YieldExpr : Expr
 	YieldExpr struct {
 		Key   Expr // @var Expr|null Key expression
 		Value Expr // @var Expr|null Value expression
 	}
 
-	// ExprYieldFrom : Expr
+	// YieldFromExpr : Expr
 	YieldFromExpr struct {
 		Expr Expr // @var Expr Expression to yield from
 	}
@@ -545,10 +549,10 @@ type (
 
 	// PropertyStmt : Stmt
 	PropertyStmt struct {
-		Flags   Flags  // @var Flags Modifiers
-		Type    Type   // @var Type|null Type declaration
-		Name    string // @var string    Name
-		Default Expr   // @var Expr|null Default
+		Flags   Flags    // @var Flags Modifiers
+		Type    TypeHint // @var Type|null Type declaration
+		Name    string   // @var string    Name
+		Default Expr     // @var Expr|null Default
 	}
 
 	// MethodStmt : Stmt, FunctionLike
@@ -557,7 +561,7 @@ type (
 		ByRef      bool     // @var bool Whether to return by reference
 		Name       string   // @var string Name
 		Params     []*Param // @var Param[] Parameters
-		ReturnType Type     // @var Type|null Return type
+		ReturnType TypeHint // @var Type|null Return type
 		Stmts      []Stmt   // @var Stmt[]|null Statements
 	}
 
@@ -584,10 +588,10 @@ type (
 )
 
 // Type
-func (*SimpleType) typeNode()       {}
-func (*IntersectionType) typeNode() {}
-func (*UnionType) typeNode()        {}
-func (*NullableType) typeNode()     {}
+func (*SimpleType) typeHintNode()       {}
+func (*IntersectionType) typeHintNode() {}
+func (*UnionType) typeHintNode()        {}
+func (*NullableType) typeHintNode()     {}
 
 // Expr
 func (*IntLit) exprNode()        {}
@@ -605,6 +609,7 @@ func (*CastExpr) exprNode()      {}
 func (*UnaryExpr) exprNode()     {}
 func (*BinaryOpExpr) exprNode()  {}
 func (*AssignExpr) exprNode()    {}
+func (*AssignOpExpr) exprNode()  {}
 func (*AssignRefExpr) exprNode() {}
 
 func (*InternalCallExpr) exprNode()  {}
@@ -712,6 +717,7 @@ func (*CastExpr) node()                         {}
 func (*UnaryExpr) node()                        {}
 func (*BinaryOpExpr) node()                     {}
 func (*AssignExpr) node()                       {}
+func (*AssignOpExpr) node()                     {}
 func (*AssignRefExpr) node()                    {}
 func (*InternalCallExpr) node()                 {}
 func (*CloneExpr) node()                        {}

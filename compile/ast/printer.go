@@ -59,7 +59,7 @@ func (p *printer) result() (string, error) {
 	if p.err != nil {
 		return "", p.err
 	}
-	return p.buf.String(), p.err
+	return p.buf.String(), nil
 }
 
 func (p *printer) write(s string) {
@@ -101,7 +101,7 @@ func (p *printer) print(args ...any) {
 		case Node:
 			p.printNode(v)
 		case fmt.Stringer:
-			p.print(v.String())
+			p.write(v.String())
 		// 以下 case 只是为了加快类型匹配
 		case []Stmt:
 			p.stmtList(v, false)
@@ -157,9 +157,9 @@ func (p *printer) printNode(node Node) {
 func printList[T Node](p *printer, list []T, sep string) {
 	for i, item := range list {
 		if i != 0 {
-			p.print(sep)
+			p.write(sep)
 		}
-		p.print(item)
+		p.printNode(item)
 	}
 }
 
@@ -376,6 +376,8 @@ func (p *printer) expr(n Expr) {
 		}
 	case *BinaryOpExpr:
 		p.print(x.Left, " ", x.Op, " ", x.Right)
+	case *AssignExpr:
+		p.print(x.Var, " = ", x.Expr)
 	case *AssignOpExpr:
 		p.print(x.Var, " ", x.Op, " ", x.Expr)
 	case *AssignRefExpr:
@@ -387,7 +389,7 @@ func (p *printer) expr(n Expr) {
 	case *ErrorSuppressExpr:
 		p.print("@", x.Expr)
 	case *ExitExpr:
-		p.print("exist(", x.Expr, ")")
+		p.print("exit(", x.Expr, ")")
 	case *ConstFetchExpr:
 		p.print(x.Name)
 	case *ClassConstFetchExpr:
@@ -395,7 +397,7 @@ func (p *printer) expr(n Expr) {
 	case *MagicConstExpr:
 		p.print(x.Kind)
 	case *InstanceofExpr:
-		p.print(x.Expr, " instanceOf ", x.Class)
+		p.print(x.Expr, " instanceof ", x.Class)
 	case *ListExpr:
 		p.print("list(")
 		printList(p, x.Items, ", ")
@@ -482,11 +484,10 @@ func (p *printer) stmt(n Stmt) {
 		for _, caseStmt := range x.Cases {
 			if caseStmt.Cond != nil {
 				p.print("case ", caseStmt.Cond, ":\n")
-				p.stmtList(caseStmt.Stmts, true)
 			} else {
 				p.print("default:\n")
-				p.stmtList(caseStmt.Stmts, true)
 			}
+			p.stmtList(caseStmt.Stmts, true)
 		}
 		p.print("}")
 	case *ForStmt:
@@ -495,9 +496,9 @@ func (p *printer) stmt(n Stmt) {
 		p.print("}")
 	case *ForeachStmt:
 		if x.KeyVar != nil {
-			p.print("foreach (", x.KeyVar, " as ", x.KeyVar, " => ", x.ValueVar, ") {\n")
+			p.print("foreach (", x.Expr, " as ", x.KeyVar, " => ", x.ValueVar, ") {\n")
 		} else {
-			p.print("foreach (", x.KeyVar, " as ", x.ValueVar, ") {\n")
+			p.print("foreach (", x.Expr, " as ", x.ValueVar, ") {\n")
 		}
 		p.stmtList(x.Stmts, true)
 		p.print("}")

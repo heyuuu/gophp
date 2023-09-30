@@ -259,7 +259,7 @@ func (p *printer) printNode(node ir.Node) {
 		p.expr(x)
 	case ir.Stmt:
 		p.stmt(x)
-	case ir.Type:
+	case ir.TypeHint:
 		p.typeHint(x)
 	case *ir.Param:
 		p.param(x)
@@ -380,11 +380,11 @@ func (p *printer) param(n *ir.Param) {
 		p.print(" = ", n.Default)
 	}
 }
-func (p *printer) typeHint(n ir.Type) {
+func (p *printer) typeHint(n ir.TypeHint) {
 	p.typeHint0(n, false)
 }
 
-func (p *printer) typeHint0(n ir.Type, wrap bool) {
+func (p *printer) typeHint0(n ir.TypeHint, wrap bool) {
 	switch t := n.(type) {
 	case *ir.SimpleType:
 		p.print(t.Name)
@@ -486,6 +486,8 @@ func (p *printer) expr(n ir.Expr) {
 	case *ir.BinaryOpExpr:
 		p.print(x.Left, " ", x.Op, " ", x.Right)
 	case *ir.AssignExpr:
+		p.print(x.Var, " = ", x.Expr)
+	case *ir.AssignOpExpr:
 		p.print(x.Var, " ", x.Op, " ", x.Expr)
 	case *ir.AssignRefExpr:
 		p.print(x.Var, " = &", x.Expr)

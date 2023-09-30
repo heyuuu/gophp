@@ -25,7 +25,7 @@ type (
 		callLikeExprNode()
 	}
 
-	// FunctionLike : Node
+	// FunctionLike
 	FunctionLike interface {
 		Node
 		functionLikeNode()
@@ -114,6 +114,10 @@ type Name struct {
 	Parts []string // @var string[] Parts of the name
 }
 
+func NewName(parts ...string) *Name {
+	return &Name{Parts: parts}
+}
+
 func (n *Name) IsUnqualified() bool    { return n.Kind == NameNormal && len(n.Parts) == 1 }
 func (n *Name) IsQualified() bool      { return n.Kind == NameNormal && len(n.Parts) > 1 }
 func (n *Name) IsFullyQualified() bool { return n.Kind == NameFullyQualified }
@@ -125,7 +129,7 @@ func (n *Name) ToCodeString() string {
 		return "\\" + n.ToString()
 	case NameRelative:
 		return "namespace\\" + n.ToString()
-	default:
+	default: // NameNormal
 		return n.ToString()
 	}
 }
@@ -207,6 +211,12 @@ type (
 	}
 
 	// AssignExpr
+	AssignExpr struct {
+		Var  Expr // @var Expr Variable
+		Expr Expr // @var Expr Expression
+	}
+
+	// AssignOpExpr
 	AssignOpExpr struct {
 		Op   AssignOpKind
 		Var  Expr // @var Expr Variable
@@ -612,7 +622,7 @@ type (
 		Method      *Ident // @var Ident Method name
 	}
 
-	// StmtTraitUseAdaptationPrecedence : StmtTraitUseAdaptation
+	// TraitUseAdaptationPrecedenceStmt : TraitUseAdaptationStmt
 	TraitUseAdaptationPrecedenceStmt struct {
 		Insteadof []*Name // @var Name[] Overwritten traits
 		Trait     *Name   // @var Name|null Trait name
@@ -620,7 +630,7 @@ type (
 	}
 )
 
-// Type
+// TypeHint
 func (*SimpleType) typeHintNode()       {}
 func (*IntersectionType) typeHintNode() {}
 func (*UnionType) typeHintNode()        {}
@@ -641,6 +651,7 @@ func (*IndexExpr) exprNode()     {}
 func (*CastExpr) exprNode()      {}
 func (*UnaryExpr) exprNode()     {}
 func (*BinaryOpExpr) exprNode()  {}
+func (*AssignExpr) exprNode()    {}
 func (*AssignOpExpr) exprNode()  {}
 func (*AssignRefExpr) exprNode() {}
 
@@ -765,6 +776,7 @@ func (*IndexExpr) node()                        {}
 func (*CastExpr) node()                         {}
 func (*UnaryExpr) node()                        {}
 func (*BinaryOpExpr) node()                     {}
+func (*AssignExpr) node()                       {}
 func (*AssignOpExpr) node()                     {}
 func (*AssignRefExpr) node()                    {}
 func (*InternalCallExpr) node()                 {}

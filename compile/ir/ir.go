@@ -122,7 +122,7 @@ type (
 		Name       Name
 		ByRef      bool     // @var bool Whether function returns by reference
 		Params     []*Param // @var Param[] Parameters
-		ReturnType Type     // @var Type|null Return type
+		ReturnType TypeHint // @var Type|null Return type
 		Stmts      []Stmt   // @var Stmt[] Statements
 	}
 

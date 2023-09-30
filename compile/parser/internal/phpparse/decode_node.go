@@ -47,8 +47,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Expr:       data["expr"].(ast.Expr),
 		}
 	case "AssignExpr":
-		node = &ast.AssignOpExpr{
-			Op:   ast.AssignOpAssign,
+		node = &ast.AssignExpr{
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}

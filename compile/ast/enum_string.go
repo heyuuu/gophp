@@ -8,25 +8,24 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[AssignOpAssign-1]
-	_ = x[AssignOpBitwiseAnd-2]
-	_ = x[AssignOpBitwiseOr-3]
-	_ = x[AssignOpBitwiseXor-4]
-	_ = x[AssignOpCoalesce-5]
-	_ = x[AssignOpConcat-6]
-	_ = x[AssignOpDiv-7]
-	_ = x[AssignOpMinus-8]
-	_ = x[AssignOpMod-9]
-	_ = x[AssignOpMul-10]
-	_ = x[AssignOpPlus-11]
-	_ = x[AssignOpPow-12]
-	_ = x[AssignOpShiftLeft-13]
-	_ = x[AssignOpShiftRight-14]
+	_ = x[AssignOpBitwiseAnd-1]
+	_ = x[AssignOpBitwiseOr-2]
+	_ = x[AssignOpBitwiseXor-3]
+	_ = x[AssignOpCoalesce-4]
+	_ = x[AssignOpConcat-5]
+	_ = x[AssignOpDiv-6]
+	_ = x[AssignOpMinus-7]
+	_ = x[AssignOpMod-8]
+	_ = x[AssignOpMul-9]
+	_ = x[AssignOpPlus-10]
+	_ = x[AssignOpPow-11]
+	_ = x[AssignOpShiftLeft-12]
+	_ = x[AssignOpShiftRight-13]
 }
 
-const _AssignOpKind_name = "=&=|=^=??=.=/=-=%=*=+=**=<<=>>="
+const _AssignOpKind_name = "&=|=^=??=.=/=-=%=*=+=**=<<=>>="
 
-var _AssignOpKind_index = [...]uint8{0, 1, 3, 5, 7, 10, 12, 14, 16, 18, 20, 22, 25, 28, 31}
+var _AssignOpKind_index = [...]uint8{0, 2, 4, 6, 9, 11, 13, 15, 17, 19, 21, 24, 27, 30}
 
 func (i AssignOpKind) String() string {
 	i -= 1

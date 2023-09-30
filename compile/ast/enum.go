@@ -6,8 +6,7 @@ package ast
 type AssignOpKind uint8
 
 const (
-	AssignOpAssign     AssignOpKind = iota + 1 // =
-	AssignOpBitwiseAnd                         // &=
+	AssignOpBitwiseAnd AssignOpKind = iota + 1 // &=
 	AssignOpBitwiseOr                          // |=
 	AssignOpBitwiseXor                         // ^=
 	AssignOpCoalesce                           // ??=

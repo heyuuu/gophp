@@ -241,8 +241,13 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 			Left:  p.pExpr(n.Left),
 			Right: p.pExpr(n.Right),
 		}
-	case *ast.AssignOpExpr:
+	case *ast.AssignExpr:
 		return &AssignExpr{
+			Var:  p.pExpr(n.Var),
+			Expr: p.pExpr(n.Expr),
+		}
+	case *ast.AssignOpExpr:
+		return &AssignOpExpr{
 			Op:   n.Op,
 			Var:  p.pExpr(n.Var),
 			Expr: p.pExpr(n.Expr),
@@ -633,7 +638,7 @@ func (p *parser) pTryCatchStmt(n *ast.TryCatchStmt) *TryCatchStmt {
 	}
 }
 
-func (p *parser) pType(node ast.TypeHint) Type {
+func (p *parser) pType(node ast.TypeHint) TypeHint {
 	switch n := node.(type) {
 	case *ast.SimpleType:
 		return p.pSimpleType(n)
