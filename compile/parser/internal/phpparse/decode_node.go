@@ -369,22 +369,16 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Name: data["name"].(*ast.Name),
 		}
 	case "EmptyExpr":
-		node = &ast.InternalCallExpr{
-			Kind: ast.ICallEmpty,
-			Args: []ast.Expr{
-				data["expr"].(ast.Expr),
-			},
+		node = &ast.EmptyExpr{
+			Expr: data["expr"].(ast.Expr),
 		}
 	case "ErrorSuppressExpr":
 		node = &ast.ErrorSuppressExpr{
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "EvalExpr":
-		node = &ast.InternalCallExpr{
-			Kind: ast.ICallEval,
-			Args: []ast.Expr{
-				data["expr"].(ast.Expr),
-			},
+		node = &ast.EvalExpr{
+			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExitExpr":
 		node = &ast.ExitExpr{
@@ -393,28 +387,26 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "FuncCallExpr":
 		node = &ast.FuncCallExpr{
 			Name: data["name"].(ast.Node),
-			Args: asSlice[ast.Node](data["args"]),
+			Args: asSlice[*ast.Arg](data["args"]),
 		}
 	case "IncludeExpr":
-		var kind ast.InternalCallOp
+		var kind ast.IncludeKind
 		typ := asInt(data["type"])
 		switch typ {
 		case 1:
-			kind = ast.ICallInclude
+			kind = ast.KindInclude
 		case 2:
-			kind = ast.ICallIncludeOnce
+			kind = ast.KindIncludeOnce
 		case 3:
-			kind = ast.ICallRequire
+			kind = ast.KindRequire
 		case 4:
-			kind = ast.ICallRequireOnce
+			kind = ast.KindRequireOnce
 		default:
 			return nil, fmt.Errorf("unexpteted ExprInclude.type: %d", typ)
 		}
-		node = &ast.InternalCallExpr{
+		node = &ast.IncludeExpr{
 			Kind: kind,
-			Args: []ast.Expr{
-				data["expr"].(ast.Expr),
-			},
+			Expr: data["expr"].(ast.Expr),
 		}
 	case "InstanceofExpr":
 		node = &ast.InstanceofExpr{
@@ -422,9 +414,8 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Class: data["class"].(ast.Node),
 		}
 	case "IssetExpr":
-		node = &ast.InternalCallExpr{
-			Kind: ast.ICallIsset,
-			Args: asSlice[ast.Expr](data["vars"]),
+		node = &ast.IssetExpr{
+			Vars: asSlice[ast.Expr](data["vars"]),
 		}
 	case "ListExpr":
 		node = &ast.ListExpr{
@@ -434,18 +425,18 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.MethodCallExpr{
 			Var:  data["var"].(ast.Expr),
 			Name: data["name"].(ast.Node),
-			Args: asSlice[ast.Node](data["args"]),
+			Args: asSlice[*ast.Arg](data["args"]),
 		}
 	case "NewExpr":
 		node = &ast.NewExpr{
 			Class: data["class"].(ast.Node),
-			Args:  asSlice[ast.Node](data["args"]),
+			Args:  asSlice[*ast.Arg](data["args"]),
 		}
 	case "NullsafeMethodCallExpr":
 		node = &ast.NullsafeMethodCallExpr{
 			Var:  data["var"].(ast.Expr),
 			Name: data["name"].(ast.Node),
-			Args: asSlice[ast.Node](data["args"]),
+			Args: asSlice[*ast.Arg](data["args"]),
 		}
 	case "NullsafePropertyFetchExpr":
 		node = &ast.NullsafePropertyFetchExpr{
@@ -489,7 +480,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.StaticCallExpr{
 			Class: data["class"].(ast.Node),
 			Name:  data["name"].(ast.Node),
-			Args:  asSlice[ast.Node](data["args"]),
+			Args:  asSlice[*ast.Arg](data["args"]),
 		}
 	case "StaticPropertyFetchExpr":
 		node = &ast.StaticPropertyFetchExpr{

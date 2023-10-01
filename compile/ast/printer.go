@@ -90,12 +90,6 @@ func (p *printer) print(args ...any) {
 		}
 
 		switch v := arg.(type) {
-		case int:
-			p.write(strconv.Itoa(v))
-		case byte:
-			p.write(string(v))
-		case rune:
-			p.write(string(v))
 		case string:
 			p.write(v)
 		case Node:
@@ -316,7 +310,7 @@ func (p *printer) typeHint0(n TypeHint, wrap bool) {
 func (p *printer) expr(n Expr) {
 	switch x := n.(type) {
 	case *IntLit:
-		p.print(x.Value)
+		p.print(strconv.Itoa(x.Value))
 	case *FloatLit:
 		p.print(fmt.Sprintf("%f", x.Value))
 	case *StringLit:
@@ -382,8 +376,14 @@ func (p *printer) expr(n Expr) {
 		p.print(x.Var, " ", x.Op, " ", x.Expr)
 	case *AssignRefExpr:
 		p.print(x.Var, " = &", x.Expr)
-	case *InternalCallExpr:
-		p.print(x.Kind)
+	case *IssetExpr:
+		p.print("isset(", x.Vars, ")")
+	case *EmptyExpr:
+		p.print("empty(", x.Expr, ")")
+	case *EvalExpr:
+		p.print("eval(", x.Expr, ")")
+	case *IncludeExpr:
+		p.print(x.Kind, " ", x.Expr)
 	case *CloneExpr:
 		p.print("clone ", x.Expr)
 	case *ErrorSuppressExpr:

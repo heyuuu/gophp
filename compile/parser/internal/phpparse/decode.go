@@ -149,7 +149,7 @@ func asTypeHint(data any) ast.TypeHint {
 	switch node := data.(type) {
 	case *ast.Ident:
 		return &ast.SimpleType{
-			Name: &ast.Name{Parts: []string{node.Name}},
+			Name: ast.NewName(node.Name),
 		}
 	case *ast.Name:
 		return &ast.SimpleType{Name: node}
@@ -172,12 +172,8 @@ func asTypeHints(data any) []ast.TypeHint {
 
 func concatName(name1 *ast.Name, name2 *ast.Name) *ast.Name {
 	// 合并 Parts
-	parts := make([]string, len(name1.Parts)+len(name2.Parts))
-	copy(parts, name1.Parts)
-	copy(parts[len(name1.Parts):], name2.Parts)
+	parts := append(append([]string{}, name1.Parts...), name2.Parts...)
 
 	// newName 继承 name1 的其他属性
-	var newName = *name1
-	newName.Parts = parts
-	return &newName
+	return &ast.Name{Kind: name1.Kind, Parts: parts}
 }

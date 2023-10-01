@@ -491,8 +491,14 @@ func (p *printer) expr(n ir.Expr) {
 		p.print(x.Var, " ", x.Op, " ", x.Expr)
 	case *ir.AssignRefExpr:
 		p.print(x.Var, " = &", x.Expr)
-	case *ir.InternalCallExpr:
-		p.print(x.Kind)
+	case *ir.IssetExpr:
+		p.print("isset(", x.Vars, ")")
+	case *ir.EmptyExpr:
+		p.print("empty(", x.Expr, ")")
+	case *ir.EvalExpr:
+		p.print("eval(", x.Expr, ")")
+	case *ir.IncludeExpr:
+		p.print(x.Kind, " ", x.Expr)
 	case *ir.CloneExpr:
 		p.print("clone ", x.Expr)
 	case *ir.ErrorSuppressExpr:

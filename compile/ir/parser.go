@@ -257,10 +257,22 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 			Var:  p.pExpr(n.Var),
 			Expr: p.pExpr(n.Expr),
 		}
-	case *ast.InternalCallExpr:
-		return &InternalCallExpr{
+	case *ast.IssetExpr:
+		return &IssetExpr{
+			Vars: slicekit.Map(n.Vars, p.pExpr),
+		}
+	case *ast.EmptyExpr:
+		return &EmptyExpr{
+			Expr: p.pExpr(n.Expr),
+		}
+	case *ast.EvalExpr:
+		return &EvalExpr{
+			Expr: p.pExpr(n.Expr),
+		}
+	case *ast.IncludeExpr:
+		return &IncludeExpr{
 			Kind: n.Kind,
-			Args: slicekit.Map(n.Args, p.pExpr),
+			Expr: p.pExpr(n.Expr),
 		}
 	case *ast.CloneExpr:
 		return &CloneExpr{
@@ -699,16 +711,8 @@ func (p *parser) pArg(n *ast.Arg) *Arg {
 		Unpack: n.Unpack,
 	}
 }
-func (p *parser) pArgs(args []ast.Node) []*Arg {
-	return slicekit.Map(args, func(n ast.Node) *Arg {
-		switch arg := n.(type) {
-		case *ast.Arg:
-			return p.pArg(arg)
-		default:
-			p.fail(fmt.Sprintf("expected type of arg must be *ast.Arg, provide is %T", arg))
-		}
-		panic("unreachable")
-	})
+func (p *parser) pArgs(args []*ast.Arg) []*Arg {
+	return slicekit.Map(args, func(n *ast.Arg) *Arg { return p.pArg(n) })
 }
 
 func (p *parser) pIdentString(n *ast.Ident) string {

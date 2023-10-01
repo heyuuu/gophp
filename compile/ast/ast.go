@@ -228,10 +228,21 @@ type (
 		Expr Expr // @var Expr Variable which is referenced
 	}
 
-	// InternalCallExpr
-	InternalCallExpr struct {
-		Kind InternalCallOp
-		Args []Expr // arguments
+	IssetExpr struct {
+		Vars []Expr // @var Expr[] Variables
+	}
+
+	EmptyExpr struct {
+		Expr Expr // @var Expr Expression
+	}
+
+	EvalExpr struct {
+		Expr Expr // @var Expr Expression
+	}
+
+	IncludeExpr struct {
+		Kind IncludeKind // @var int Type of include
+		Expr Expr        // @var Expr Expression
 	}
 
 	CloneExpr struct {
@@ -322,37 +333,37 @@ type (
 		Expr Expr // @var Expr Expression to yield from
 	}
 
-	// FuncCallExpr : Expr, CallLikeExpr
+	// FuncCallExpr : CallLikeExpr
 	FuncCallExpr struct {
 		Name Node   // @var Name|Expr Function name
-		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
+		Args []*Arg // @var Arguments
 	}
 
 	// NewExpr : CallLikeExpr
 	NewExpr struct {
 		Class Node   // @var Name|Expr|ClassStmt Class name
-		Args  []Node // @var array<Arg|VariadicPlaceholder> Arguments
+		Args  []*Arg // @var Arguments
 	}
 
 	// MethodCallExpr : CallLikeExpr
 	MethodCallExpr struct {
 		Var  Expr   // @var Expr Variable holding object
 		Name Node   // @var Ident|Expr Method name
-		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
+		Args []*Arg // @var Arguments
 	}
 
 	// NullsafeMethodCallExpr : CallLikeExpr
 	NullsafeMethodCallExpr struct {
 		Var  Expr   // @var Expr Variable holding object
 		Name Node   // @var Ident|Expr Method name
-		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
+		Args []*Arg // @var Arguments
 	}
 
 	// StaticCallExpr : CallLikeExpr
 	StaticCallExpr struct {
 		Class Node   // @var Name|Expr Class name
 		Name  Node   // @var Ident|Expr Method name
-		Args  []Node // @var array<Arg|VariadicPlaceholder> Arguments
+		Args  []*Arg // @var Arguments
 	}
 )
 
@@ -566,7 +577,7 @@ type (
 
 	// ClassStmt : ClassLikeStmt
 	ClassStmt struct {
-		Flags          Flags   // @var Flags        Type
+		Flags          Flags   // @var Flags      Type
 		Extends        *Name   // @var Name|null  Name of extended class
 		Implements     []*Name // @var Name[]     Names of implemented interfaces
 		Name           *Ident  // @var Ident|null Name
@@ -655,7 +666,10 @@ func (*AssignExpr) exprNode()    {}
 func (*AssignOpExpr) exprNode()  {}
 func (*AssignRefExpr) exprNode() {}
 
-func (*InternalCallExpr) exprNode()  {}
+func (*IssetExpr) exprNode()         {}
+func (*EmptyExpr) exprNode()         {}
+func (*EvalExpr) exprNode()          {}
+func (*IncludeExpr) exprNode()       {}
 func (*CloneExpr) exprNode()         {}
 func (*ErrorSuppressExpr) exprNode() {}
 func (*ExitExpr) exprNode()          {}
@@ -779,7 +793,10 @@ func (*BinaryOpExpr) node()                     {}
 func (*AssignExpr) node()                       {}
 func (*AssignOpExpr) node()                     {}
 func (*AssignRefExpr) node()                    {}
-func (*InternalCallExpr) node()                 {}
+func (*IssetExpr) node()                        {}
+func (*EmptyExpr) node()                        {}
+func (*EvalExpr) node()                         {}
+func (*IncludeExpr) node()                      {}
 func (*CloneExpr) node()                        {}
 func (*ErrorSuppressExpr) node()                {}
 func (*ExitExpr) node()                         {}

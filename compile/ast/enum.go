@@ -1,6 +1,6 @@
 package ast
 
-//go:generate stringer -linecomment -type=AssignOpKind,BinaryOpKind,UnaryOpKind,MagicConstKind,CastKind,InternalCallOp -output=enum_string.go
+//go:generate stringer -linecomment -type=AssignOpKind,BinaryOpKind,UnaryOpKind,MagicConstKind,CastKind,IncludeKind -output=enum_string.go
 
 // AssignOpKind
 type AssignOpKind uint8
@@ -95,17 +95,14 @@ const (
 	CastUnset                      // (unset)
 )
 
-// InternalCallOp
-type InternalCallOp uint8
+// IncludeKind
+type IncludeKind uint8
 
 const (
-	ICallIsset       InternalCallOp = iota + 1 // isset
-	ICallEmpty                                 // empty
-	ICallInclude                               // include
-	ICallIncludeOnce                           // include_once
-	ICallRequire                               // require
-	ICallRequireOnce                           // require_once
-	ICallEval                                  // eval
+	KindInclude     IncludeKind = iota + 1 // include
+	KindIncludeOnce                        // include_once
+	KindRequire                            // require
+	KindRequireOnce                        // require_once
 )
 
 // NameKind

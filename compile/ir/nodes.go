@@ -240,10 +240,21 @@ type (
 		Expr Expr // @var Expr Variable which is referenced
 	}
 
-	// InternalCallExpr
-	InternalCallExpr struct {
-		Kind ast.InternalCallOp
-		Args []Expr // arguments
+	IssetExpr struct {
+		Vars []Expr // @var Expr[] Variables
+	}
+
+	EmptyExpr struct {
+		Expr Expr // @var Expr Expression
+	}
+
+	EvalExpr struct {
+		Expr Expr // @var Expr Expression
+	}
+
+	IncludeExpr struct {
+		Kind ast.IncludeKind // @var int Type of include
+		Expr Expr            // @var Expr Expression
 	}
 
 	CloneExpr struct {
@@ -612,7 +623,10 @@ func (*AssignExpr) exprNode()    {}
 func (*AssignOpExpr) exprNode()  {}
 func (*AssignRefExpr) exprNode() {}
 
-func (*InternalCallExpr) exprNode()  {}
+func (*IssetExpr) exprNode()         {}
+func (*EmptyExpr) exprNode()         {}
+func (*EvalExpr) exprNode()          {}
+func (*IncludeExpr) exprNode()       {}
 func (*CloneExpr) exprNode()         {}
 func (*ErrorSuppressExpr) exprNode() {}
 func (*ExitExpr) exprNode()          {}
@@ -719,7 +733,10 @@ func (*BinaryOpExpr) node()                     {}
 func (*AssignExpr) node()                       {}
 func (*AssignOpExpr) node()                     {}
 func (*AssignRefExpr) node()                    {}
-func (*InternalCallExpr) node()                 {}
+func (*IssetExpr) node()                        {}
+func (*EmptyExpr) node()                        {}
+func (*EvalExpr) node()                         {}
+func (*IncludeExpr) node()                      {}
 func (*CloneExpr) node()                        {}
 func (*ErrorSuppressExpr) node()                {}
 func (*ExitExpr) node()                         {}
