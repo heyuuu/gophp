@@ -6,12 +6,8 @@ import (
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/parser"
-	"github.com/heyuuu/gophp/compile/render"
 	"github.com/heyuuu/gophp/kits/vardumper"
-	"github.com/heyuuu/gophp/shim/maps"
 	"net/http"
-	"sort"
-	"strings"
 )
 
 type ApiResponse[T any] struct {
@@ -48,7 +44,7 @@ type ApiTypeResult struct {
 	Content string `json:"content"`
 }
 
-func apiHandler2(request *http.Request) (data any, err error) {
+func apiHandler(request *http.Request) (data any, err error) {
 	err = request.ParseForm()
 	if err != nil {
 		return
@@ -59,7 +55,7 @@ func apiHandler2(request *http.Request) (data any, err error) {
 		return nil, errors.New("input is empty")
 	}
 
-	result, err := parseCodeEx(input)
+	result, err := parseCode(input)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +69,7 @@ func apiHandler2(request *http.Request) (data any, err error) {
 	}, nil
 }
 
-func parseCodeEx(code string) (result []ApiTypeResult, err error) {
+func parseCode(code string) (result []ApiTypeResult, err error) {
 	// Ast
 	astNodes, err := parser.ParseCode(code)
 	if err != nil {
@@ -96,35 +92,5 @@ func parseCodeEx(code string) (result []ApiTypeResult, err error) {
 		return
 	}
 
-	irPrint, err := printIrFileAsProject(irFile)
-	if err != nil {
-		return
-	}
-	result = append(result, ApiTypeResult{Type: TypeIrPrint, Content: irPrint})
-
 	return
-}
-
-func printIrFileAsProject(irFile *ir.File) (string, error) {
-	irProj := ir.NewProject()
-	_ = irProj.AddFile("__main__", irFile)
-
-	contents, err := render.Render(irProj)
-	if err != nil {
-		return "", err
-	}
-
-	keys := maps.Keys(contents)
-	sort.Slice(keys, func(i, j int) bool {
-		return keys[i] < keys[j]
-	})
-
-	var buf strings.Builder
-	for _, key := range keys {
-		content := contents[key]
-		buf.WriteString("/* file: " + key + " */\n")
-		buf.WriteString(content)
-	}
-
-	return buf.String(), nil
 }
