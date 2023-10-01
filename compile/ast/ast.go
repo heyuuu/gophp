@@ -4,6 +4,11 @@ import (
 	"strings"
 )
 
+type File struct {
+	Declares   []*DeclareStmt
+	Namespaces []*NamespaceStmt
+}
+
 type (
 	Node interface {
 		node()

@@ -12,11 +12,11 @@ func SetProjRoot(projRoot string) {
 	phpparse.SetScriptPath(filepath.Join(projRoot, "tools/parser/parser.php"))
 }
 
-func ParseCode(code string) ([]ast.Stmt, error) {
+func ParseCode(code string) (*ast.File, error) {
 	return phpparse.ParseCode(code)
 }
 
-func ParseFile(file string) ([]ast.Stmt, error) {
+func ParseFile(file string) (*ast.File, error) {
 	bytes, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err

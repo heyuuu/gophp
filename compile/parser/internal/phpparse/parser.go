@@ -8,7 +8,7 @@ import (
 	"os/exec"
 )
 
-func ParseCode(code string) ([]ast.Stmt, error) {
+func ParseCode(code string) (*ast.File, error) {
 	output, err := runParser("-c", code)
 	if err != nil {
 		return nil, err

@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
+func ParseAstFile(astFile *ast.File) (file *File, err error) {
 	defer func() {
 		switch e := recover().(type) {
 		case nil:
@@ -43,36 +43,16 @@ func (p *parser) clean() {
 	p.file = nil
 }
 
-func (p *parser) ParseFile(astFile []ast.Stmt) *File {
-	// 拆分 declare 语句、全局代码和命名空间代码
-	var declareStmts []*ast.DeclareStmt
-	var globalStmts []ast.Stmt
-	var namespaceStmts []*ast.NamespaceStmt
-	for _, astStmt := range astFile {
-		switch s := astStmt.(type) {
-		case *ast.DeclareStmt:
-			declareStmts = append(declareStmts, s)
-		case *ast.NamespaceStmt:
-			namespaceStmts = append(namespaceStmts, s)
-		default:
-			globalStmts = append(globalStmts, s)
-		}
-	}
-	p.assert(len(globalStmts) == 0 || len(namespaceStmts) == 0, "Global code should be enclosed in global namespace declaration")
-
+func (p *parser) ParseFile(astFile *ast.File) *File {
 	// 初始化对象
 	p.file = &File{}
 	defer func() { p.file = nil }()
 
 	// 优先处理 declare，会影响其他代码
-	slicekit.Each(declareStmts, p.handleDeclareStmt)
+	slicekit.Each(astFile.Declares, p.handleDeclareStmt)
 
-	// 区分有无命名空间进行处理
-	if len(globalStmts) > 0 {
-		p.file.Namespaces = []*Namespace{p.pNamespace("", globalStmts)}
-	} else {
-		p.file.Namespaces = slicekit.Map(namespaceStmts, p.pNamespaceStmt)
-	}
+	// 处理命名空间
+	p.file.Namespaces = slicekit.Map(astFile.Namespaces, p.pNamespaceStmt)
 
 	return p.file
 }

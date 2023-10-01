@@ -11,9 +11,9 @@ import (
 /**
  *	public
  */
-func PrintFile(stmts []Stmt) (string, error) {
+func PrintFile(file *File) (string, error) {
 	p := &printer{inCodeScope: false}
-	p.stmtList(stmts, false)
+	p.pFile(file)
 	return p.result()
 }
 
@@ -27,11 +27,12 @@ func PrintNode(node Node) (string, error) {
  *	private
  */
 type printer struct {
-	buf         strings.Builder
-	indent      int
-	err         error
-	newLine     bool
-	inCodeScope bool
+	buf            strings.Builder
+	indent         int
+	err            error
+	newLine        bool
+	inCodeScope    bool
+	multiNamespace bool
 }
 
 func (p *printer) enterCodeScope() {
@@ -80,6 +81,15 @@ func (p *printer) write(s string) {
 		p.buf.WriteByte('\n')
 		p.newLine = true
 	}
+}
+
+func (p *printer) pFile(f *File) {
+	printList(p, f.Declares, "\n")
+	p.print("\n")
+
+	p.multiNamespace = len(f.Namespaces) > 1
+	printList(p, f.Namespaces, "\n")
+	p.print("\n")
 }
 
 func (p *printer) print(args ...any) {
@@ -583,8 +593,20 @@ func (p *printer) stmt(n Stmt) {
 	case *DeclareDeclareStmt:
 		p.print(x.Key, "=", x.Value)
 	case *NamespaceStmt:
-		p.print("namespace ", x.Name, ";\n\n")
-		p.stmtList(x.Stmts, false)
+		if p.multiNamespace {
+			if x.Name != nil {
+				p.print("namespace ", x.Name, " {\n")
+			} else {
+				p.print("namespace {\n")
+			}
+			p.stmtList(x.Stmts, true)
+			p.print("}\n")
+		} else {
+			if x.Name != nil {
+				p.print("namespace ", x.Name, ";\n\n")
+			}
+			p.stmtList(x.Stmts, false)
+		}
 	case *FunctionStmt:
 		p.print("function ")
 		if x.ByRef {

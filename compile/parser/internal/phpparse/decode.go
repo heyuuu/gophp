@@ -14,7 +14,7 @@ type result struct {
 	Error string `json:"error"`
 }
 
-func decodeOutput(output []byte) ([]ast.Stmt, error) {
+func decodeOutput(output []byte) (*ast.File, error) {
 	var res result
 	if err := json.Unmarshal(output, &res); err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func decodeOutput(output []byte) ([]ast.Stmt, error) {
 	return decodeAstData([]byte(res.Data))
 }
 
-func decodeAstData(binData []byte) (stmts []ast.Stmt, err error) {
+func decodeAstData(binData []byte) (file *ast.File, err error) {
 	defer func() {
 		if fault := recover(); fault != nil {
 			err = fmt.Errorf("decode ast data failed: %v", fault)
@@ -47,8 +47,41 @@ func decodeAstData(binData []byte) (stmts []ast.Stmt, err error) {
 	if err != nil {
 		return nil, err
 	}
-	stmts = asStmtList(value)
-	return stmts, nil
+
+	stmts := asStmtList(value)
+	return buildAstFile(stmts), nil
+}
+
+func buildAstFile(stmts []ast.Stmt) *ast.File {
+	// 拆分 declare 语句、全局代码和命名空间代码
+	var declareStmts []*ast.DeclareStmt
+	var globalStmts []ast.Stmt
+	var namespaceStmts []*ast.NamespaceStmt
+	for _, astStmt := range stmts {
+		switch s := astStmt.(type) {
+		case *ast.DeclareStmt:
+			declareStmts = append(declareStmts, s)
+		case *ast.NamespaceStmt:
+			namespaceStmts = append(namespaceStmts, s)
+		default:
+			globalStmts = append(globalStmts, s)
+		}
+	}
+	if len(globalStmts) > 0 && len(namespaceStmts) > 0 {
+		panic("Global code should be enclosed in global namespace declaration")
+	}
+
+	if len(namespaceStmts) == 0 {
+		namespaceStmts = append(namespaceStmts, &ast.NamespaceStmt{
+			Name:  nil,
+			Stmts: globalStmts,
+		})
+	}
+
+	return &ast.File{
+		Declares:   declareStmts,
+		Namespaces: namespaceStmts,
+	}
 }
 
 func decodeData(data any) (any, error) {
