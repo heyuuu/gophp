@@ -10,11 +10,18 @@
     - `printer`: AST Printer，将 AST 转为人类易读文本
     - `ir`     : 中间代码(IR)相关定义
     - `render` : 将 IR 生成为 go 代码
+
+- `kits` 工具相关包
+    - `slicekit` slice相关工具
+    - `mapkit` map相关工具
 - `shim` 模拟新版本 API
     - `builtin` : 模拟新版本内置函数，建议 `import . "gophp/shim/builtin"` 使用
     - `cmp`     : `go1.21` 新包，比较类型
     - `slices`  : `go1.21` 新包，slice 相关泛型方法
     - `maps`    : `go1.21` 新包，map 相关泛型方法
+- `tools` 非go语言的工具
+    - `parser` php原生语法解释器
+
 
 ## 流程图
 
