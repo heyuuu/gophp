@@ -129,7 +129,7 @@ func FastLongAddFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	 * have read the values of op1 and op2.
 	 */
 	l1, l2 := op1.Long(), op2.Long()
-	if l1&LONG_SIGN_MASK == l2&LONG_SIGN_MASK && l1&LONG_SIGN_MASK != l1+l2&LONG_SIGN_MASK {
+	if l1&LONG_SIGN_MASK == l2&LONG_SIGN_MASK && l1&LONG_SIGN_MASK != (l1+l2)&LONG_SIGN_MASK {
 		result.SetDouble(float64(l1) + float64(l2))
 	} else {
 		result.SetLong(l1 + l2)
