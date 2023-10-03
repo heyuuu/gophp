@@ -2,15 +2,14 @@
 
 ## 目录结构
 
+- `cmd` 命令行工具目录
 - `php` 核心目录，定义基础类型、运行时等
 - `compile` PHP 编译相关功能
     - `parser` : PHP解析器，将 PHP 源代码转成 AST 语法树
     - `token`  : PHP 词法相关定义
     - `ast`    : PHP 语法树(AST)相关定义
-    - `printer`: AST Printer，将 AST 转为人类易读文本
     - `ir`     : 中间代码(IR)相关定义
     - `render` : 将 IR 生成为 go 代码
-
 - `kits` 工具相关包
     - `slicekit` slice相关工具
     - `mapkit` map相关工具

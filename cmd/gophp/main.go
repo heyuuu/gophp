@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/heyuuu/gophp/compile"
+	"github.com/heyuuu/gophp/php"
 	"log"
 )
 
@@ -11,14 +11,9 @@ func main() {
 	flag.StringVar(&code, "r", "", "code")
 	flag.Parse()
 
-	source := compile.NewSourcesByCode(code)
-	compiler := compile.Compiler{}
-	proj, err := compiler.Compile(source)
+	r := php.Default()
+	err := r.RunCode(code)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-
-
-	println(code)
 }
