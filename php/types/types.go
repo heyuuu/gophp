@@ -33,15 +33,23 @@ type Zval struct {
 }
 
 // Zval new
-func NewZvalUndef() *Zval                 { var zv Zval; zv.SetUndef(); return &zv }
-func NewZvalNull() *Zval                  { var zv Zval; zv.SetNull(); return &zv }
-func NewZvalFalse() *Zval                 { var zv Zval; zv.SetFalse(); return &zv }
-func NewZvalTrue() *Zval                  { var zv Zval; zv.SetTrue(); return &zv }
-func NewZvalBool(b bool) *Zval            { var zv Zval; zv.SetBool(b); return &zv }
-func NewZvalLong(l int) *Zval             { var zv Zval; zv.SetLong(l); return &zv }
-func NewZvalDouble(d float64) *Zval       { var zv Zval; zv.SetDouble(d); return &zv }
-func NewZvalString(s string) *Zval        { var zv Zval; zv.SetString(s); return &zv }
-func NewZvalArray(a *Array) *Zval         { var zv Zval; zv.SetArray(a); return &zv }
+func NewZvalUndef() *Zval           { var zv Zval; zv.SetUndef(); return &zv }
+func NewZvalNull() *Zval            { var zv Zval; zv.SetNull(); return &zv }
+func NewZvalFalse() *Zval           { var zv Zval; zv.SetFalse(); return &zv }
+func NewZvalTrue() *Zval            { var zv Zval; zv.SetTrue(); return &zv }
+func NewZvalBool(b bool) *Zval      { var zv Zval; zv.SetBool(b); return &zv }
+func NewZvalLong(l int) *Zval       { var zv Zval; zv.SetLong(l); return &zv }
+func NewZvalDouble(d float64) *Zval { var zv Zval; zv.SetDouble(d); return &zv }
+func NewZvalString(s string) *Zval  { var zv Zval; zv.SetString(s); return &zv }
+func NewZvalArray(a *Array) *Zval {
+	if a == nil {
+		a = NewArray()
+	}
+
+	var zv Zval
+	zv.SetArray(a)
+	return &zv
+}
 func NewZvalObject(o *Object) *Zval       { var zv Zval; zv.SetObject(o); return &zv }
 func NewZvalResource(res *Resource) *Zval { var zv Zval; zv.SetResource(res); return &zv }
 
@@ -115,6 +123,10 @@ func (zv *Zval) Ref() *Reference     { return zvalValue[*Reference](zv) }
 // Array
 type Array struct {
 	// todo
+}
+
+func NewArray() *Array {
+	return &Array{}
 }
 
 // Object

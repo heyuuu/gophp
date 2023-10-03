@@ -2,7 +2,7 @@ package ir
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/compile/token"
+	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/kits/slicekit"
 	"log"
 	"os"
@@ -203,10 +203,10 @@ func (p *printer) print(args ...any) {
 			p.write(string(v))
 		case string:
 			p.write(v)
-		case token.Token:
-			p.write(token.TokenName(v))
 		case Node:
 			p.printNode(v)
+		case fmt.Stringer:
+			p.print(v.String())
 		// 以下 case 只是为了加快类型匹配
 		case []Stmt:
 			p.stmtList(v, false)
@@ -246,7 +246,7 @@ func (p *printer) printNode(node Node) {
 		p.expr(x)
 	case Stmt:
 		p.stmt(x)
-	case Type:
+	case TypeHint:
 		p.typeHint(x)
 	case *Param:
 		p.param(x)
@@ -367,11 +367,11 @@ func (p *printer) param(n *Param) {
 		p.print(" = ", n.Default)
 	}
 }
-func (p *printer) typeHint(n Type) {
+func (p *printer) typeHint(n TypeHint) {
 	p.typeHint0(n, false)
 }
 
-func (p *printer) typeHint0(n Type, wrap bool) {
+func (p *printer) typeHint0(n TypeHint, wrap bool) {
 	switch t := n.(type) {
 	case *SimpleType:
 		p.print(t.Name)
@@ -462,22 +462,30 @@ func (p *printer) expr(n Expr) {
 	case *IndexExpr:
 		p.print(x.Var, "[", x.Dim, "]")
 	case *CastExpr:
-		p.print(x.Op, x.Expr)
+		p.print(x.Kind, x.Expr)
 	case *UnaryExpr:
-		switch x.Kind {
-		case token.PostInc, token.PostDec:
-			p.print(x.Var, x.Kind)
+		switch x.Op {
+		case ast.UnaryOpPostInc, ast.UnaryOpPostDec:
+			p.print(x.Var, x.Op)
 		default:
-			p.print(x.Kind, x.Var)
+			p.print(x.Op, x.Var)
 		}
-	case *BinaryExpr:
+	case *BinaryOpExpr:
 		p.print(x.Left, " ", x.Op, " ", x.Right)
 	case *AssignExpr:
+		p.print(x.Var, " = ", x.Expr)
+	case *AssignOpExpr:
 		p.print(x.Var, " ", x.Op, " ", x.Expr)
 	case *AssignRefExpr:
 		p.print(x.Var, " = &", x.Expr)
-	case *InternalCallExpr:
-		p.print(x.Kind)
+	case *IssetExpr:
+		p.print("isset(", x.Vars, ")")
+	case *EmptyExpr:
+		p.print("empty(", x.Expr, ")")
+	case *EvalExpr:
+		p.print("eval(", x.Expr, ")")
+	case *IncludeExpr:
+		p.print(x.Kind, " ", x.Expr)
 	case *CloneExpr:
 		p.print("clone ", x.Expr)
 	case *ErrorSuppressExpr:

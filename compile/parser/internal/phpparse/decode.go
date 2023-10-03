@@ -14,7 +14,7 @@ type result struct {
 	Error string `json:"error"`
 }
 
-func decodeOutput(output []byte) ([]ast.Stmt, error) {
+func decodeOutput(output []byte) (*ast.File, error) {
 	var res result
 	if err := json.Unmarshal(output, &res); err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func decodeOutput(output []byte) ([]ast.Stmt, error) {
 	return decodeAstData([]byte(res.Data))
 }
 
-func decodeAstData(binData []byte) (stmts []ast.Stmt, err error) {
+func decodeAstData(binData []byte) (file *ast.File, err error) {
 	defer func() {
 		if fault := recover(); fault != nil {
 			err = fmt.Errorf("decode ast data failed: %v", fault)
@@ -47,8 +47,41 @@ func decodeAstData(binData []byte) (stmts []ast.Stmt, err error) {
 	if err != nil {
 		return nil, err
 	}
-	stmts = asStmtList(value)
-	return stmts, nil
+
+	stmts := asStmtList(value)
+	return buildAstFile(stmts), nil
+}
+
+func buildAstFile(stmts []ast.Stmt) *ast.File {
+	// 拆分 declare 语句、全局代码和命名空间代码
+	var declareStmts []*ast.DeclareStmt
+	var globalStmts []ast.Stmt
+	var namespaceStmts []*ast.NamespaceStmt
+	for _, astStmt := range stmts {
+		switch s := astStmt.(type) {
+		case *ast.DeclareStmt:
+			declareStmts = append(declareStmts, s)
+		case *ast.NamespaceStmt:
+			namespaceStmts = append(namespaceStmts, s)
+		default:
+			globalStmts = append(globalStmts, s)
+		}
+	}
+	if len(globalStmts) > 0 && len(namespaceStmts) > 0 {
+		panic("Global code should be enclosed in global namespace declaration")
+	}
+
+	if len(namespaceStmts) == 0 {
+		namespaceStmts = append(namespaceStmts, &ast.NamespaceStmt{
+			Name:  nil,
+			Stmts: globalStmts,
+		})
+	}
+
+	return &ast.File{
+		Declares:   declareStmts,
+		Namespaces: namespaceStmts,
+	}
 }
 
 func decodeData(data any) (any, error) {
@@ -69,12 +102,12 @@ func decodeData(data any) (any, error) {
 				return nil, err
 			}
 		}
-		if nodeType, ok := value["nodeType"].(string); ok {
-			node, err := decodeNode(value)
-			if node == nil || err != nil {
-				return nil, errors.New("node decode failed: nodeType=" + nodeType)
+		if _, ok := value["nodeType"].(string); ok {
+			if node, err := decodeNode(value); err == nil {
+				data = node
+			} else {
+				return nil, err
 			}
-			data = node
 		}
 	}
 
@@ -141,7 +174,7 @@ func asStmtList(data any) []ast.Stmt {
 	return stmts
 }
 
-func asTypeNode(data any) ast.Type {
+func asTypeHint(data any) ast.TypeHint {
 	if data == nil {
 		return nil
 	}
@@ -149,35 +182,31 @@ func asTypeNode(data any) ast.Type {
 	switch node := data.(type) {
 	case *ast.Ident:
 		return &ast.SimpleType{
-			Name: &ast.Name{Parts: []string{node.Name}},
+			Name: ast.NewName(node.Name),
 		}
 	case *ast.Name:
 		return &ast.SimpleType{Name: node}
 	default:
-		return data.(ast.Type)
+		return data.(ast.TypeHint)
 	}
 }
 
-func asTypeNodes(data any) []ast.Type {
+func asTypeHints(data any) []ast.TypeHint {
 	if data == nil {
 		return nil
 	}
 
-	var items []ast.Type
+	var items []ast.TypeHint
 	for _, item := range data.([]any) {
-		items = append(items, asTypeNode(item))
+		items = append(items, asTypeHint(item))
 	}
 	return items
 }
 
 func concatName(name1 *ast.Name, name2 *ast.Name) *ast.Name {
 	// 合并 Parts
-	parts := make([]string, len(name1.Parts)+len(name2.Parts))
-	copy(parts, name1.Parts)
-	copy(parts[len(name1.Parts):], name2.Parts)
+	parts := append(append([]string{}, name1.Parts...), name2.Parts...)
 
 	// newName 继承 name1 的其他属性
-	var newName = *name1
-	newName.Parts = parts
-	return &newName
+	return &ast.Name{Kind: name1.Kind, Parts: parts}
 }

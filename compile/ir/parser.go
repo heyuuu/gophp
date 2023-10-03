@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func ParseAstFile(astFile []ast.Stmt) (file *File, err error) {
+func ParseAstFile(astFile *ast.File) (file *File, err error) {
 	defer func() {
 		switch e := recover().(type) {
 		case nil:
@@ -43,36 +43,16 @@ func (p *parser) clean() {
 	p.file = nil
 }
 
-func (p *parser) ParseFile(astFile []ast.Stmt) *File {
-	// 拆分 declare 语句、全局代码和命名空间代码
-	var declareStmts []*ast.DeclareStmt
-	var globalStmts []ast.Stmt
-	var namespaceStmts []*ast.NamespaceStmt
-	for _, astStmt := range astFile {
-		switch s := astStmt.(type) {
-		case *ast.DeclareStmt:
-			declareStmts = append(declareStmts, s)
-		case *ast.NamespaceStmt:
-			namespaceStmts = append(namespaceStmts, s)
-		default:
-			globalStmts = append(globalStmts, s)
-		}
-	}
-	p.assert(len(globalStmts) == 0 || len(namespaceStmts) == 0, "Global code should be enclosed in global namespace declaration")
-
+func (p *parser) ParseFile(astFile *ast.File) *File {
 	// 初始化对象
 	p.file = &File{}
 	defer func() { p.file = nil }()
 
 	// 优先处理 declare，会影响其他代码
-	slicekit.Each(declareStmts, p.handleDeclareStmt)
+	slicekit.Each(astFile.Declares, p.handleDeclareStmt)
 
-	// 区分有无命名空间进行处理
-	if len(globalStmts) > 0 {
-		p.file.Namespaces = []*Namespace{p.pNamespace("", globalStmts)}
-	} else {
-		p.file.Namespaces = slicekit.Map(namespaceStmts, p.pNamespaceStmt)
-	}
+	// 处理命名空间
+	p.file.Namespaces = slicekit.Map(astFile.Namespaces, p.pNamespaceStmt)
 
 	return p.file
 }
@@ -163,12 +143,6 @@ func (p *parser) pNode(node ast.Node) Node {
 		p.unsupported("unsupported parseNode(*ast.Const), use parseStmt(*ast.ConstStmt) or parseStmt(*ast.ClassConstStmt) instead.")
 	case ast.Stmt:
 		p.unsupported("unsupported parseNode(ast.Stmt), use parseStmtList() or parseStmt() instead.")
-	case *ast.Attribute, *ast.AttributeGroup:
-		p.highVersionFeature("php8.0 attribute")
-	case *ast.MatchArm:
-		p.highVersionFeature("php8.0 match")
-	case *ast.VariadicPlaceholder:
-		p.highVersionFeature("php8.2 first class callable syntax")
 	default:
 		p.fail(fmt.Sprintf("unsupported node type for parseNode(node): %T", n))
 	}
@@ -233,22 +207,27 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 		}
 	case *ast.CastExpr:
 		return &CastExpr{
-			Op:   n.Op,
+			Kind: n.Kind,
 			Expr: p.pExpr(n.Expr),
 		}
 	case *ast.UnaryExpr:
 		return &UnaryExpr{
-			Kind: n.Kind,
-			Var:  p.pExpr(n.Var),
+			Op:  n.Op,
+			Var: p.pExpr(n.Var),
 		}
-	case *ast.BinaryExpr:
-		return &BinaryExpr{
+	case *ast.BinaryOpExpr:
+		return &BinaryOpExpr{
 			Op:    n.Op,
 			Left:  p.pExpr(n.Left),
 			Right: p.pExpr(n.Right),
 		}
 	case *ast.AssignExpr:
 		return &AssignExpr{
+			Var:  p.pExpr(n.Var),
+			Expr: p.pExpr(n.Expr),
+		}
+	case *ast.AssignOpExpr:
+		return &AssignOpExpr{
 			Op:   n.Op,
 			Var:  p.pExpr(n.Var),
 			Expr: p.pExpr(n.Expr),
@@ -258,10 +237,22 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 			Var:  p.pExpr(n.Var),
 			Expr: p.pExpr(n.Expr),
 		}
-	case *ast.InternalCallExpr:
-		return &InternalCallExpr{
+	case *ast.IssetExpr:
+		return &IssetExpr{
+			Vars: slicekit.Map(n.Vars, p.pExpr),
+		}
+	case *ast.EmptyExpr:
+		return &EmptyExpr{
+			Expr: p.pExpr(n.Expr),
+		}
+	case *ast.EvalExpr:
+		return &EvalExpr{
+			Expr: p.pExpr(n.Expr),
+		}
+	case *ast.IncludeExpr:
+		return &IncludeExpr{
 			Kind: n.Kind,
-			Args: slicekit.Map(n.Args, p.pExpr),
+			Expr: p.pExpr(n.Expr),
 		}
 	case *ast.CloneExpr:
 		return &CloneExpr{
@@ -288,8 +279,6 @@ func (p *parser) pExpr(node ast.Expr) Expr {
 		return &MagicConstExpr{
 			Kind: n.Kind,
 		}
-	case *ast.MatchExpr:
-		p.highVersionFeature("php8.0 match")
 	case *ast.InstanceofExpr:
 		return &InstanceofExpr{
 			Expr:  p.pExpr(n.Expr),
@@ -583,8 +572,6 @@ func (p *parser) pStmt(node ast.Stmt) Stmt {
 			Trait:     p.pName(n.Trait),
 			Method:    p.pIdent(n.Method),
 		}
-	case *ast.EnumStmt, *ast.EnumCaseStmt:
-		p.highVersionFeature("php8.1 enum")
 	default:
 		p.fail(fmt.Sprintf("parseStmt() cannot support this type: %T", n))
 	}
@@ -643,7 +630,7 @@ func (p *parser) pTryCatchStmt(n *ast.TryCatchStmt) *TryCatchStmt {
 	}
 }
 
-func (p *parser) pType(node ast.Type) Type {
+func (p *parser) pType(node ast.TypeHint) TypeHint {
 	switch n := node.(type) {
 	case *ast.SimpleType:
 		return p.pSimpleType(n)
@@ -704,18 +691,8 @@ func (p *parser) pArg(n *ast.Arg) *Arg {
 		Unpack: n.Unpack,
 	}
 }
-func (p *parser) pArgs(args []ast.Node) []*Arg {
-	return slicekit.Map(args, func(n ast.Node) *Arg {
-		switch arg := n.(type) {
-		case *ast.Arg:
-			return p.pArg(arg)
-		case *ast.VariadicPlaceholder:
-			p.highVersionFeature("php8.2 first class callable syntax")
-		default:
-			p.fail(fmt.Sprintf("expected type of arg must be *ast.Arg, provide is %T", arg))
-		}
-		panic("unreachable")
-	})
+func (p *parser) pArgs(args []*ast.Arg) []*Arg {
+	return slicekit.Map(args, func(n *ast.Arg) *Arg { return p.pArg(n) })
 }
 
 func (p *parser) pIdentString(n *ast.Ident) string {
@@ -759,7 +736,7 @@ func (p *parser) pName(n *ast.Name) *Name {
 		return nil
 	}
 	if n.Kind != ast.NameFullyQualified {
-		log.Println("ast.Name.Kind is not FQ")
+		log.Println("ast.Name.Op is not FQ")
 	}
 
 	var kind NameType
@@ -771,7 +748,7 @@ func (p *parser) pName(n *ast.Name) *Name {
 	case ast.NameRelative:
 		kind = NameRelative
 	default:
-		p.fail(fmt.Sprintf("unexpected ast.Name.Kind: %d", n.Kind))
+		p.fail(fmt.Sprintf("unexpected ast.Name.Op: %d", n.Kind))
 	}
 	return NewName(kind, n.Parts)
 }

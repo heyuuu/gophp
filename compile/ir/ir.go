@@ -1,7 +1,5 @@
 package ir
 
-import "github.com/heyuuu/gophp/shim/maps"
-
 // File
 type File struct {
 	// 文件是否开启 strict_types
@@ -36,22 +34,6 @@ func (p *Project) AddFile(fileName string, f *File) (err error) {
 		}
 	}
 	return nil
-}
-
-func (p *Project) Namespaces() []*Namespace {
-	return maps.Values(p.namespaces)
-}
-
-func (p *Project) GetConstant(name string) {
-	// todo
-}
-
-func (p *Project) GetFunction(name string) {
-	// todo
-}
-
-func (p *Project) GetClass(name string) {
-	// todo
 }
 
 // Namespace
@@ -122,7 +104,7 @@ type (
 		Name       Name
 		ByRef      bool     // @var bool Whether function returns by reference
 		Params     []*Param // @var Param[] Parameters
-		ReturnType Type     // @var Type|null Return type
+		ReturnType TypeHint // @var Type|null Return type
 		Stmts      []Stmt   // @var Stmt[] Statements
 	}
 

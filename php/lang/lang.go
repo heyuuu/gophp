@@ -35,7 +35,6 @@ func Assign[T any](variable *T, value T) T {
 }
 
 // 三元操作 cond ? a : b
-
 func Cond[T any](cond bool, trueVal T, falseVal T) T {
 	if cond {
 		return trueVal
@@ -62,4 +61,12 @@ func CondF2[T any](cond bool, trueValue T, falseValue func() T) T {
 		return trueValue
 	}
 	return falseValue()
+}
+
+// 空安全操作 a ?? b
+func Nullsafe[T *any](checkValue T, defaultValue T) T {
+	if checkValue != nil {
+		return checkValue
+	}
+	return defaultValue
 }
