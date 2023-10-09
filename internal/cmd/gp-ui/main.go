@@ -25,7 +25,7 @@ func main() {
 
 	// start server
 	http.HandleFunc("/", staticHandler(indexHtml))
-	http.HandleFunc("/api", ApiWrapHandler(apiHandler2))
+	http.HandleFunc("/api", ApiWrapHandler(apiHandler))
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatal(err)

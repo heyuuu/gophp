@@ -1,10 +1,12 @@
 {
     "autoload": {
         "psr-4": {
-            "GoPhp\\Tools\\": "src"
+            "GoPhp\\Tools\\": "src",
+            "GoPhp\\Tools\\Scripts\\": "scripts/lib"
         }
     },
     "require": {
+        "ext-json": "*",
         "nikic/php-parser": "^4.15",
         "symfony/finder": "^6.2"
     }

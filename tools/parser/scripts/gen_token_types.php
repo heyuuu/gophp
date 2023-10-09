@@ -1,12 +1,12 @@
 <?php
 
-require_once __DIR__ . '/_helpers.php';
+require_once __DIR__ . '/bootstrap.php';
 
 (new GenTokenTypes)->run();
 
 class GenTokenTypes
 {
-    private string $outputFile   = PROJ_ROOT . '/php/token/token.go';
+    private string $outputFile   = PROJ_ROOT . '/compile/token/token.go';
     private array  $tokens       = [];
     private array  $tokenSamples = [];
     private string $template     = <<<'TEMPLATE'

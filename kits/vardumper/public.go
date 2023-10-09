@@ -1,14 +1,12 @@
 package vardumper
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"strings"
 )
 
 func Print(v any) error {
-	fmt.Println()
 	return Fprint(os.Stdout, v)
 }
 

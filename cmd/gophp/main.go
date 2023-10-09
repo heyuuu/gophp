@@ -1,7 +1,24 @@
 package main
 
-import "github.com/heyuuu/gophp/sapi/cli"
+import (
+	"flag"
+	"github.com/heyuuu/gophp/compile"
+	"log"
+)
 
 func main() {
-	cli.Main()
+	var code string
+	flag.StringVar(&code, "r", "", "code")
+	flag.Parse()
+
+	source := compile.NewSourcesByCode(code)
+	compiler := compile.Compiler{}
+	proj, err := compiler.Compile(source)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+
+
+	println(code)
 }

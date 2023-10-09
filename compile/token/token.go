@@ -20,10 +20,10 @@ const (
 	Inc   // ++ [T_INC]
 	Dec   // -- [T_DEC]
 
-	PreInc  // 并非真实 token，用于 UnaryExpr.Kind 与 PostInc 区分
-	PreDec  // 并非真实 token，用于 UnaryExpr.Kind 与 PostDec 区分
-	PostInc // 并非真实 token，用于 UnaryExpr.Kind 与 PreInc 区分
-	PostDec // 并非真实 token，用于 UnaryExpr.Kind 与 PreDec 区分
+	PreInc  // 并非真实 token，用于 UnaryExpr.Op 与 PostInc 区分
+	PreDec  // 并非真实 token，用于 UnaryExpr.Op 与 PostDec 区分
+	PostInc // 并非真实 token，用于 UnaryExpr.Op 与 PreInc 区分
+	PostDec // 并非真实 token，用于 UnaryExpr.Op 与 PreDec 区分
 
 	binary_begin
 	// binary operators
@@ -289,7 +289,7 @@ var specialTokenNames = map[Token]string{
 
 	// cast op tokens
 	BoolCast:   "(bool)",
-	IntCast:    "(int))",
+	IntCast:    "(int)",
 	DoubleCast: "(float)",
 	StringCast: "(string)",
 	ArrayCast:  "(array)",
