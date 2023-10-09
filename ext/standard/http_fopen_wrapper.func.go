@@ -805,7 +805,7 @@ func PhpStreamUrlWrapHttpEx(
 							s = resource.GetPath().GetVal()
 							if resource.GetPath().GetLen() == 0 {
 								// types.ZendStringReleaseEx(resource.GetPath(), 0)
-								resource.SetPath(types.NewString("/"))
+								resource.SetPath("/")
 								s = resource.GetPath().GetVal()
 							} else {
 								*s = '/'

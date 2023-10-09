@@ -107,7 +107,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
 			p++
 		}
 		if e+1 == ue {
-			ret.SetScheme(types.NewString(b.CastStr(s, e-s)))
+			ret.SetScheme(b.CastStr(s, e-s))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			return ret
 		}
@@ -130,12 +130,12 @@ func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
 			if (p == ue || (*p) == '/') && p-e < 7 {
 				goto parse_port
 			}
-			ret.SetScheme(types.NewString(b.CastStr(s, e-s)))
+			ret.SetScheme(b.CastStr(s, e-s))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			s = e + 1
 			goto just_path
 		} else {
-			ret.SetScheme(types.NewString(b.CastStr(s, e-s)))
+			ret.SetScheme(b.CastStr(s, e-s))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			if e+2 < ue && (*(e + 2)) == '/' {
 				s = e + 3
@@ -206,13 +206,13 @@ parse_host:
 
 	if lang.Assign(&p, operators.ZendMemrchr(s, '@', e-s)) {
 		if lang.Assign(&pp, memchr(s, ':', p-s)) {
-			ret.SetUser(types.NewString(b.CastStr(s, pp-s)))
+			ret.SetUser(b.CastStr(s, pp-s))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 			pp++
-			ret.SetPass(types.NewString(b.CastStr(pp, p-pp)))
+			ret.SetPass(b.CastStr(pp, p-pp))
 			PhpReplaceControlcharsEx(ret.GetPass().GetVal(), ret.GetPass().GetLen())
 		} else {
-			ret.SetUser(types.NewString(b.CastStr(s, p-s)))
+			ret.SetUser(b.CastStr(s, p-s))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 		}
 		s = p + 1
@@ -267,7 +267,7 @@ parse_host:
 		PhpUrlFree(ret)
 		return nil
 	}
-	ret.SetHost(types.NewString(b.CastStr(s, p-s)))
+	ret.SetHost(b.CastStr(s, p-s))
 	PhpReplaceControlcharsEx(ret.GetHost().GetVal(), ret.GetHost().GetLen())
 	if e == ue {
 		return ret
@@ -279,7 +279,7 @@ just_path:
 	if p {
 		p++
 		if p < e {
-			ret.SetFragment(types.NewString(b.CastStr(p, e-p)))
+			ret.SetFragment(b.CastStr(p, e-p))
 			PhpReplaceControlcharsEx(ret.GetFragment().GetVal(), ret.GetFragment().GetLen())
 		}
 		e = p - 1
@@ -288,13 +288,13 @@ just_path:
 	if p {
 		p++
 		if p < e {
-			ret.SetQuery(types.NewString(b.CastStr(p, e-p)))
+			ret.SetQuery(b.CastStr(p, e-p))
 			PhpReplaceControlcharsEx(ret.GetQuery().GetVal(), ret.GetQuery().GetLen())
 		}
 		e = p - 1
 	}
 	if s < e || s == ue {
-		ret.SetPath(types.NewString(b.CastStr(s, e-s)))
+		ret.SetPath(b.CastStr(s, e-s))
 		PhpReplaceControlcharsEx(ret.GetPath().GetVal(), ret.GetPath().GetLen())
 	}
 	return ret

@@ -71,7 +71,7 @@ func PhpFtpFopenConnect(
 	var reuseid *core.PhpStream = nil
 	var resource *PhpUrl = nil
 	var result int
-	var use_ssl int
+	var use_ssl bool
 	var use_ssl_on_data int = 0
 	var tmp_line []byte
 	var transport *byte
@@ -83,7 +83,7 @@ func PhpFtpFopenConnect(
 		}
 		return nil
 	}
-	use_ssl = resource.GetScheme() != nil && resource.GetScheme().GetLen() > 3 && resource.GetScheme().GetStr()[3] == 's'
+	use_ssl = len(resource.Scheme()) > 3 && resource.Scheme()[3] == 's'
 
 	/* use port 21 if one wasn't specified */
 
@@ -107,7 +107,7 @@ func PhpFtpFopenConnect(
 		streams.PhpStreamNotifyError(context, streams.PHP_STREAM_NOTIFY_FAILURE, tmp_line, result)
 		goto connect_errexit
 	}
-	if use_ssl != 0 {
+	if use_ssl {
 
 		/* send the AUTH TLS request name */
 
@@ -139,7 +139,7 @@ func PhpFtpFopenConnect(
 			}
 		}
 	}
-	if use_ssl != 0 {
+	if use_ssl {
 		if streams.PhpStreamXportCryptoSetup(stream, streams.STREAM_CRYPTO_METHOD_SSLv23_CLIENT, nil) < 0 || streams.PhpStreamXportCryptoEnable(stream, 1) < 0 {
 			streams.PhpStreamWrapperLogError(wrapper, options, "Unable to activate SSL mode")
 			core.PhpStreamClose(stream)
@@ -234,7 +234,7 @@ func PhpFtpFopenConnect(
 		goto connect_errexit
 	}
 	if puse_ssl != nil {
-		*puse_ssl = use_ssl
+		*puse_ssl = types.IntBool(use_ssl)
 	}
 	if puse_ssl_on_data != nil {
 		*puse_ssl_on_data = use_ssl_on_data
