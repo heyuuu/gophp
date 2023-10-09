@@ -314,7 +314,7 @@ func (compiler *Compiler) CompileAssignCoalesce(result *Znode, ast *ZendAst) {
 }
 func (compiler *Compiler) CompilePrint(result *Znode, ast *ZendAst) {
 	var opline *types.ZendOp
-	var expr_ast *ZendAst = ast.Children()[0]
+	var expr_ast *ZendAst = ast.Child(0)
 	var expr_node Znode
 	compiler.CompileExpr(&expr_node, expr_ast)
 	opline = ZendEmitOp(nil, ZEND_ECHO, &expr_node, nil)

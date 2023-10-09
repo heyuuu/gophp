@@ -2670,16 +2670,12 @@ func vmGetPostDecObjHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	return handlers[offset]
 }
 func vmGetEchoHandler(op *types.ZendOp) types.OpcodeHandlerT {
-	spec := 2071 | SPEC_RULE_OP1
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]types.OpcodeHandlerT{
-		ZEND_ECHO_SPEC_CONST_HANDLER,  // IS_CONST * ---
-		ZEND_ECHO_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
-		ZEND_ECHO_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
-		nil,                           // IS_UNUSED * ---
-		ZEND_ECHO_SPEC_CV_HANDLER,     // IS_CV * ---
+	// SPEC_RULE_OP1
+	opType1 := op.GetOp1Type()
+	if opType1 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return vmEchoHandler
 }
 func vmGetInstanceofHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	spec := 2077 | SPEC_RULE_OP1 | SPEC_RULE_OP2
@@ -2892,7 +2888,8 @@ func vmGetSpaceshipHandler(op *types.ZendOp) types.OpcodeHandlerT {
 }
 func vmGetFuncGetArgsHandler(op *types.ZendOp) types.OpcodeHandlerT {
 	// SPEC_RULE_OP1
-	switch op.op1Type {
+	opType1 := op.GetOp1Type()
+	switch opType1 {
 	case IS_CONST, IS_UNUSED:
 		return ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER
 	default:
