@@ -1,6 +1,11 @@
+GO=go
+GOFMT=gofmt
+BULIDPATH=./temp/
+
 gophp-ui:
-	go build -o ./temp/ ./internal/cmd/gp-ui
-	./temp/gp-ui
+	${GO} build -o ${BULIDPATH} ./internal/cmd/gp-ui
+	${BULIDPATH}gp-ui
+
 gophp-dev:
-	go build -o ./temp/ ./cmd/gophp
-	./temp/gophp -r "echo 123, 456, 'abc';"
+	${GO} build -o ${BULIDPATH} ./cmd/gophp
+	${BULIDPATH}gophp -r "echo 123, 456, 'abc';"
