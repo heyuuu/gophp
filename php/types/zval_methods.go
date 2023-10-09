@@ -44,14 +44,6 @@ func (zv *Zval) CopyOrDupPropFrom(v *Zval) {
 	zv.u2 = v.u2
 }
 
-// ZVAL_DEREF(zv)
-func (zv *Zval) DeRef() *Zval {
-	if zv.IsRef() {
-		return zv.Ref().GetVal()
-	}
-	return zv
-}
-
 // ZVAL_DEINDIRECT(zv)
 func (zv *Zval) DeIndirect() *Zval {
 	if zv.IsIndirect() {

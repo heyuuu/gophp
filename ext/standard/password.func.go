@@ -277,7 +277,7 @@ func ZifPasswordGetInfo(hash_ string) *types.Zval {
 		arr := types.NewArray(0)
 		arr.KeyAdd("algo", types.NewZvalNull())
 		arr.KeyAdd("algoName", types.NewZvalString("unknown"))
-		arr.KeyAdd("options", types.NewZvalEmptyArray())
+		arr.KeyAdd("options", types.NewZvalArray(nil))
 		return types.NewZvalArray(arr)
 	} else if options_ := algo.GetInfo(hash_); options_ != nil {
 		arr := types.NewArray(0)

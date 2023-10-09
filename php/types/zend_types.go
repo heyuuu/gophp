@@ -63,6 +63,7 @@ func (this *ZendPropertyInfoSourceList) SetList(value uintptr)      { this.list 
 /**
  * Reference
  */
+type Ref = Reference
 type Reference struct {
 	val     Zval
 	sources ZendPropertyInfoSourceList

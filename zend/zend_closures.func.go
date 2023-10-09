@@ -185,7 +185,7 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, returnValue *types.Zval)
 		param2 = types.NewZvalArray(types.NewArray(executeData.NumArgs()))
 		ZendCopyParametersArray(executeData.NumArgs(), param2)
 	} else {
-		param2 = types.NewZvalEmptyArray()
+		param2 = types.NewZvalArray(nil)
 	}
 	fci := types.InitFCallInfo(obj, returnValue, param1, param2)
 
