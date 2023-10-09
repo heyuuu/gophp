@@ -247,9 +247,9 @@ func PhpFtpFopenConnect(
 	}
 	return stream
 connect_errexit:
-	if resource != nil {
-		PhpUrlFree(resource)
-	}
+	//if resource != nil {
+	//	PhpUrlFree(resource)
+	//}
 	if stream != nil {
 		core.PhpStreamClose(stream)
 	}
@@ -594,12 +594,12 @@ func PhpStreamUrlWrapFtp(
 	/* remember control stream */
 
 	datastream.SetWrapperthis(stream)
-	PhpUrlFree(resource)
+	//PhpUrlFree(resource)
 	return datastream
 errexit:
-	if resource != nil {
-		PhpUrlFree(resource)
-	}
+	//if resource != nil {
+	//	PhpUrlFree(resource)
+	//}
 	if stream != nil {
 		streams.PhpStreamNotifyError(context, streams.PHP_STREAM_NOTIFY_FAILURE, tmp_line, result)
 		core.PhpStreamClose(stream)
@@ -732,16 +732,16 @@ func PhpStreamFtpOpendir(
 		datastream = nil
 		goto opendir_errexit
 	}
-	PhpUrlFree(resource)
+	//PhpUrlFree(resource)
 	dirsdata = zend.Emalloc(sizeof * dirsdata)
 	dirsdata.SetDatastream(datastream)
 	dirsdata.SetControlstream(stream)
 	dirsdata.SetDirstream(core.PhpStreamAlloc(&PhpFtpDirstreamOps, dirsdata, 0, mode))
 	return dirsdata.GetDirstream()
 opendir_errexit:
-	if resource != nil {
-		PhpUrlFree(resource)
-	}
+	//if resource != nil {
+	//PhpUrlFree(resource)
+	//}
 	if stream != nil {
 		streams.PhpStreamNotifyError(context, streams.PHP_STREAM_NOTIFY_FAILURE, tmp_line, result)
 		core.PhpStreamClose(stream)
@@ -855,12 +855,12 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	ssb.GetSb().st_blksize = 4096
 	ssb.GetSb().st_blocks = int((4095 + ssb.GetSb().st_size) / ssb.GetSb().st_blksize)
 	core.PhpStreamClose(stream)
-	PhpUrlFree(resource)
+	//PhpUrlFree(resource)
 	return 0
 stat_errexit:
-	if resource != nil {
-		PhpUrlFree(resource)
-	}
+	//if resource != nil {
+	//	PhpUrlFree(resource)
+	//}
 	if stream != nil {
 		core.PhpStreamClose(stream)
 	}
@@ -895,13 +895,13 @@ func PhpStreamFtpUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 		}
 		goto unlink_errexit
 	}
-	PhpUrlFree(resource)
+	//PhpUrlFree(resource)
 	core.PhpStreamClose(stream)
 	return 1
 unlink_errexit:
-	if resource != nil {
-		PhpUrlFree(resource)
-	}
+	//if resource != nil {
+	//	PhpUrlFree(resource)
+	//}
 	if stream != nil {
 		core.PhpStreamClose(stream)
 	}
@@ -952,17 +952,17 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 		}
 		goto rename_errexit
 	}
-	PhpUrlFree(resource_from)
-	PhpUrlFree(resource_to)
+	//PhpUrlFree(resource_from)
+	//PhpUrlFree(resource_to)
 	core.PhpStreamClose(stream)
 	return 1
 rename_errexit:
-	if resource_from != nil {
-		PhpUrlFree(resource_from)
-	}
-	if resource_to != nil {
-		PhpUrlFree(resource_to)
-	}
+	//if resource_from != nil {
+	//	PhpUrlFree(resource_from)
+	//}
+	//if resource_to != nil {
+	//	PhpUrlFree(resource_to)
+	//}
 	if stream != nil {
 		core.PhpStreamClose(stream)
 	}
@@ -1040,7 +1040,7 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 		}
 		zend.Efree(buf)
 	}
-	PhpUrlFree(resource)
+	//PhpUrlFree(resource)
 	core.PhpStreamClose(stream)
 	if result < 200 || result > 299 {
 
@@ -1053,9 +1053,9 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 	}
 	return 1
 mkdir_errexit:
-	if resource != nil {
-		PhpUrlFree(resource)
-	}
+	//if resource != nil {
+	//PhpUrlFree(resource)
+	//}
 	if stream != nil {
 		core.PhpStreamClose(stream)
 	}
@@ -1087,13 +1087,13 @@ func PhpStreamFtpRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, c
 		}
 		goto rmdir_errexit
 	}
-	PhpUrlFree(resource)
+	//PhpUrlFree(resource)
 	core.PhpStreamClose(stream)
 	return 1
 rmdir_errexit:
-	if resource != nil {
-		PhpUrlFree(resource)
-	}
+	//if resource != nil {
+	//	PhpUrlFree(resource)
+	//}
 	if stream != nil {
 		core.PhpStreamClose(stream)
 	}

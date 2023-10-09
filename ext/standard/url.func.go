@@ -12,49 +12,19 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"strings"
+	"unicode"
 )
 
-func PhpUrlFree(theurl *PhpUrl) {
-	if theurl.GetScheme() != nil {
-		// types.ZendStringReleaseEx(theurl.GetScheme(), 0)
-	}
-	if theurl.GetUser() != nil {
-		// types.ZendStringReleaseEx(theurl.GetUser(), 0)
-	}
-	if theurl.GetPass() != nil {
-		// types.ZendStringReleaseEx(theurl.GetPass(), 0)
-	}
-	if theurl.GetHost() != nil {
-		// types.ZendStringReleaseEx(theurl.GetHost(), 0)
-	}
-	if theurl.GetPath() != nil {
-		// types.ZendStringReleaseEx(theurl.GetPath(), 0)
-	}
-	if theurl.GetQuery() != nil {
-		// types.ZendStringReleaseEx(theurl.GetQuery(), 0)
-	}
-	if theurl.GetFragment() != nil {
-		// types.ZendStringReleaseEx(theurl.GetFragment(), 0)
-	}
-	zend.Efree(theurl)
-}
-func PhpReplaceControlcharsEx(str *byte, len_ int) *byte {
-	var s *uint8 = (*uint8)(str)
-	var e *uint8 = (*uint8)(str + len_)
-	if str == nil {
-		return nil
-	}
-	for s < e {
-		if iscntrl(*s) {
-			*s = '_'
+func urlReplaceControlChars(s string) string {
+	// PhpReplaceControlchars || PhpReplaceControlcharsEx
+	return strings.Map(func(r rune) rune {
+		if unicode.IsControl(r) {
+			return '_'
 		}
-		s++
-	}
-	return str
+		return r
+	}, s)
 }
-func PhpReplaceControlchars(str *byte) *byte {
-	return PhpReplaceControlcharsEx(str, strlen(str))
-}
+
 func PhpUrlParse(str *byte) *PhpUrl { return PhpUrlParseEx(str, strlen(str)) }
 func BinaryStrcspn(s *byte, e *byte, chars string) *byte {
 	for *chars {
@@ -108,7 +78,6 @@ func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
 		}
 		if e+1 == ue {
 			ret.SetScheme(b.CastStr(s, e-s))
-			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			return ret
 		}
 
@@ -131,12 +100,10 @@ func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
 				goto parse_port
 			}
 			ret.SetScheme(b.CastStr(s, e-s))
-			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			s = e + 1
 			goto just_path
 		} else {
 			ret.SetScheme(b.CastStr(s, e-s))
-			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			if e+2 < ue && (*(e + 2)) == '/' {
 				s = e + 3
 				if ascii.StrCaseEquals(ret.GetScheme().GetStr(), "file") {
@@ -183,11 +150,11 @@ func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
 					s += 2
 				}
 			} else {
-				PhpUrlFree(ret)
+				//PhpUrlFree(ret)
 				return nil
 			}
 		} else if p == pp && pp == ue {
-			PhpUrlFree(ret)
+			//PhpUrlFree(ret)
 			return nil
 		} else if s+1 < ue && (*s) == '/' && (*(s + 1)) == '/' {
 			s += 2
@@ -207,13 +174,10 @@ parse_host:
 	if lang.Assign(&p, operators.ZendMemrchr(s, '@', e-s)) {
 		if lang.Assign(&pp, memchr(s, ':', p-s)) {
 			ret.SetUser(b.CastStr(s, pp-s))
-			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 			pp++
 			ret.SetPass(b.CastStr(pp, p-pp))
-			PhpReplaceControlcharsEx(ret.GetPass().GetVal(), ret.GetPass().GetLen())
 		} else {
 			ret.SetUser(b.CastStr(s, p-s))
-			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 		}
 		s = p + 1
 	}
@@ -239,7 +203,7 @@ parse_host:
 		if ret.GetPort() == 0 {
 			p++
 			if e-p > 5 {
-				PhpUrlFree(ret)
+				//PhpUrlFree(ret)
 				return nil
 			} else if e-p > 0 {
 				var port zend.ZendLong
@@ -251,7 +215,7 @@ parse_host:
 					*has_port = 1
 					ret.SetPort(uint16(port))
 				} else {
-					PhpUrlFree(ret)
+					//PhpUrlFree(ret)
 					return nil
 				}
 			}
@@ -264,11 +228,10 @@ parse_host:
 	/* check if we have a valid host, if we don't reject the string as url */
 
 	if p-s < 1 {
-		PhpUrlFree(ret)
+		//PhpUrlFree(ret)
 		return nil
 	}
 	ret.SetHost(b.CastStr(s, p-s))
-	PhpReplaceControlcharsEx(ret.GetHost().GetVal(), ret.GetHost().GetLen())
 	if e == ue {
 		return ret
 	}
@@ -280,7 +243,6 @@ just_path:
 		p++
 		if p < e {
 			ret.SetFragment(b.CastStr(p, e-p))
-			PhpReplaceControlcharsEx(ret.GetFragment().GetVal(), ret.GetFragment().GetLen())
 		}
 		e = p - 1
 	}
@@ -289,13 +251,11 @@ just_path:
 		p++
 		if p < e {
 			ret.SetQuery(b.CastStr(p, e-p))
-			PhpReplaceControlcharsEx(ret.GetQuery().GetVal(), ret.GetQuery().GetLen())
 		}
 		e = p - 1
 	}
 	if s < e || s == ue {
 		ret.SetPath(b.CastStr(s, e-s))
-		PhpReplaceControlcharsEx(ret.GetPath().GetVal(), ret.GetPath().GetLen())
 	}
 	return ret
 }
@@ -407,7 +367,7 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zp
 		return_value.Array().KeyAddNew(types.STR_FRAGMENT, &tmp)
 	}
 done:
-	PhpUrlFree(resource)
+	//PhpUrlFree(resource)
 }
 func _H2I(c byte) byte {
 	if '0' <= c && c <= '9' {

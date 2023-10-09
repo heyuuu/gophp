@@ -151,7 +151,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	if url_parts.GetFragment() != nil && '#' == url.GetS().GetStr()[0] {
 		dest.AppendSmartStr(url)
-		PhpUrlFree(url_parts)
+		//PhpUrlFree(url_parts)
 		return
 	}
 
@@ -159,7 +159,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	if url_parts.GetScheme() != nil && !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "https")) {
 		dest.AppendSmartStr(url)
-		PhpUrlFree(url_parts)
+		//PhpUrlFree(url_parts)
 		return
 	}
 
@@ -170,7 +170,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 		if !BG__().url_adapt_session_hosts_ht.KeyExists(tmp.GetStr()) {
 			// types.ZendStringReleaseEx(tmp, 0)
 			dest.AppendSmartStr(url)
-			PhpUrlFree(url_parts)
+			//PhpUrlFree(url_parts)
 			return
 		}
 		// types.ZendStringReleaseEx(tmp, 0)
@@ -189,7 +189,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 		dest.WriteByte('/')
 		dest.WriteByte('?')
 		dest.AppendSmartStr(url_app)
-		PhpUrlFree(url_parts)
+		//PhpUrlFree(url_parts)
 		return
 	}
 	if url_parts.GetScheme() != nil {
@@ -228,7 +228,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 		dest.WriteByte('#')
 		dest.WriteString(b.CastStrAuto(url_parts.GetFragment().GetVal()))
 	}
-	PhpUrlFree(url_parts)
+	//PhpUrlFree(url_parts)
 }
 func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 	var f byte = 0
@@ -292,7 +292,7 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 		   A bit hacky check this here, but saves a URL parse. */
 
 		if !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "https")) {
-			PhpUrlFree(url_parts)
+			//PhpUrlFree(url_parts)
 			return types.FAILURE
 		}
 
@@ -301,18 +301,18 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 
 	}
 	if url_parts.GetHost() == nil {
-		PhpUrlFree(url_parts)
+		//PhpUrlFree(url_parts)
 		return types.SUCCESS
 	}
 	if !(allowed_hosts.Len()) && CheckHttpHost(url_parts.GetHost().GetVal()) == types.SUCCESS {
-		PhpUrlFree(url_parts)
+		//PhpUrlFree(url_parts)
 		return types.SUCCESS
 	}
 	if allowed_hosts.KeyFind(url_parts.GetHost().GetStr()) == nil {
-		PhpUrlFree(url_parts)
+		//PhpUrlFree(url_parts)
 		return types.FAILURE
 	}
-	PhpUrlFree(url_parts)
+	//PhpUrlFree(url_parts)
 	return types.SUCCESS
 }
 func HandleForm(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {

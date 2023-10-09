@@ -52,11 +52,15 @@ func (url *PhpUrl) GetPath() *types.String     { return (*types.String)(url.path
 func (url *PhpUrl) GetQuery() *types.String    { return (*types.String)(url.query) }
 func (url *PhpUrl) GetFragment() *types.String { return (*types.String)(url.fragment) }
 
-func (url *PhpUrl) SetScheme(value string)   { url.scheme = &value }
-func (url *PhpUrl) SetUser(value string)     { url.user = &value }
-func (url *PhpUrl) SetPass(value string)     { url.pass = &value }
-func (url *PhpUrl) SetHost(value string)     { url.host = &value }
+func (url *PhpUrl) prepareStr(s string) *string {
+	s = urlReplaceControlChars(s)
+	return &s
+}
+func (url *PhpUrl) SetScheme(value string)   { url.scheme = url.prepareStr(value) }
+func (url *PhpUrl) SetUser(value string)     { url.user = url.prepareStr(value) }
+func (url *PhpUrl) SetPass(value string)     { url.pass = url.prepareStr(value) }
+func (url *PhpUrl) SetHost(value string)     { url.host = url.prepareStr(value) }
 func (url *PhpUrl) SetPort(value uint16)     { url.port = value }
-func (url *PhpUrl) SetPath(value string)     { url.path = &value }
-func (url *PhpUrl) SetQuery(value string)    { url.query = &value }
-func (url *PhpUrl) SetFragment(value string) { url.fragment = &value }
+func (url *PhpUrl) SetPath(value string)     { url.path = url.prepareStr(value) }
+func (url *PhpUrl) SetQuery(value string)    { url.query = url.prepareStr(value) }
+func (url *PhpUrl) SetFragment(value string) { url.fragment = url.prepareStr(value) }

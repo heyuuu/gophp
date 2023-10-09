@@ -92,7 +92,7 @@ func PhpStreamUrlWrapHttpEx(
 	}
 	if !(ascii.StrCaseEquals(resource.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(resource.GetScheme().GetStr(), "https")) {
 		if context == nil || lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) == nil || !tmpzval.IsString() || tmpzval.StringEx().GetLen() == 0 {
-			PhpUrlFree(resource)
+			//PhpUrlFree(resource)
 			return core.PhpStreamOpenWrapperEx(path, mode, core.REPORT_ERRORS, nil, context)
 		}
 
@@ -109,7 +109,7 @@ func PhpStreamUrlWrapHttpEx(
 
 		if strpbrk(mode, "awx+") {
 			streams.PhpStreamWrapperLogError(wrapper, options, "HTTP wrapper does not support writeable connections")
-			PhpUrlFree(resource)
+			//PhpUrlFree(resource)
 			return nil
 		}
 		use_ssl = resource.GetScheme() != nil && resource.GetScheme().GetLen() > 4 && resource.GetScheme().GetStr()[4] == 's'
@@ -831,7 +831,7 @@ func PhpStreamUrlWrapHttpEx(
 			} else {
 				strlcpy(new_path, location, b.SizeOf("new_path"))
 			}
-			PhpUrlFree(resource)
+			//PhpUrlFree(resource)
 
 			/* check for invalid redirection URLs */
 
@@ -868,9 +868,9 @@ out:
 	if http_header_line != nil {
 		zend.Efree(http_header_line)
 	}
-	if resource != nil {
-		PhpUrlFree(resource)
-	}
+	//if resource != nil {
+	//	PhpUrlFree(resource)
+	//}
 	if stream != nil {
 		if header_init != 0 {
 			types.ZVAL_COPY(stream.GetWrapperdata(), response_header)
