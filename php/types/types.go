@@ -39,17 +39,14 @@ func NewZvalBool(b bool) *Zval      { return &Zval{v: b} }
 func NewZvalLong(l int) *Zval       { return &Zval{v: l} }
 func NewZvalDouble(d float64) *Zval { return &Zval{v: d} }
 func NewZvalString(s string) *Zval  { return &Zval{v: s} }
-func NewZvalArray(a *Array) *Zval {
-	if a == nil {
-		a = NewArray()
+func NewZvalArray(arr *Array) *Zval {
+	if arr == nil {
+		arr = NewArray()
 	}
-
-	var zv Zval
-	zv.SetArray(a)
-	return &zv
+	return &Zval{v: arr}
 }
-func NewZvalObject(o *Object) *Zval       { var zv Zval; zv.SetObject(o); return &zv }
-func NewZvalResource(res *Resource) *Zval { var zv Zval; zv.SetResource(res); return &zv }
+func NewZvalObject(obj *Object) *Zval     { return &Zval{v: obj} }
+func NewZvalResource(res *Resource) *Zval { return &Zval{v: res} }
 
 // Zval setter
 func (zv *Zval) SetUndef()                 { zv.v = nil }
@@ -89,12 +86,13 @@ func (zv *Zval) Type() ZvalType {
 		return IsObject
 	case *Resource:
 		return IsResource
-	case *Reference:
+	case *Ref:
 		return IsRef
 	default:
 		panic("unreachable")
 	}
 }
+
 func (zv *Zval) IsType(typ ZvalType) bool { return zv.Type() == typ }
 func (zv *Zval) IsUndef() bool            { return zv.v == nil }
 func (zv *Zval) IsNotUndef() bool         { return zv.v != nil }
@@ -108,7 +106,7 @@ func (zv *Zval) IsString() bool           { _, ok := zv.v.(string); return ok }
 func (zv *Zval) IsArray() bool            { _, ok := zv.v.(*Array); return ok }
 func (zv *Zval) IsObject() bool           { _, ok := zv.v.(*Object); return ok }
 func (zv *Zval) IsResource() bool         { _, ok := zv.v.(*Resource); return ok }
-func (zv *Zval) IsRef() bool              { _, ok := zv.v.(*Reference); return ok }
+func (zv *Zval) IsRef() bool              { _, ok := zv.v.(*Ref); return ok }
 
 func zvalValue[T any](zv *Zval) T {
 	if v, ok := zv.v.(T); ok {
@@ -116,6 +114,7 @@ func zvalValue[T any](zv *Zval) T {
 	}
 	panic("Get Zval value by a mismatched type")
 }
+
 func (zv *Zval) Bool() bool          { return zvalValue[bool](zv) }
 func (zv *Zval) Long() int           { return zvalValue[int](zv) }
 func (zv *Zval) Double() float64     { return zvalValue[float64](zv) }
@@ -123,7 +122,13 @@ func (zv *Zval) String() string      { return zvalValue[string](zv) }
 func (zv *Zval) Array() *Array       { return zvalValue[*Array](zv) }
 func (zv *Zval) Object() *Object     { return zvalValue[*Object](zv) }
 func (zv *Zval) Resource() *Resource { return zvalValue[*Resource](zv) }
-func (zv *Zval) Ref() *Reference     { return zvalValue[*Reference](zv) }
+func (zv *Zval) Ref() *Ref           { return zvalValue[*Ref](zv) }
+func (zv *Zval) DeRef() *Zval {
+	if ref, ok := zv.v.(*Ref); ok {
+		return &ref.val
+	}
+	return zv
+}
 
 // Array
 type Array struct {
@@ -134,6 +139,11 @@ func NewArray() *Array {
 	return &Array{}
 }
 
+func (arr *Array) Len() int {
+	// todo
+	return 0
+}
+
 // Object
 type Object struct {
 	// todo
@@ -141,11 +151,16 @@ type Object struct {
 
 // Resource
 type Resource struct {
+	handle int
 	// todo
 }
 
-// Reference
-type Reference struct {
+func (res *Resource) Handle() int {
+	return res.handle
+}
+
+// Ref
+type Ref struct {
 	val Zval
 	// todo
 }

@@ -3,4 +3,4 @@ gophp-ui:
 	./temp/gp-ui
 gophp-dev:
 	go build -o ./temp/ ./cmd/gophp
-	./temp/gophp -r "var_dump(1+1);"
+	./temp/gophp -r "echo 123, 456, 'abc';"

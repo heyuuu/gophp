@@ -12,7 +12,7 @@ func main() {
 	flag.Parse()
 
 	r := php.Default()
-	err := r.RunCode(code)
+	err := r.RunCode("<?php " + code)
 	if err != nil {
 		log.Fatalln(err)
 	}
