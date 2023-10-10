@@ -12,6 +12,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
+	"strings"
 )
 
 func StripHeader(header_bag *byte, lc_header_bag *byte, lc_header_name string) {
@@ -127,7 +128,7 @@ func PhpStreamUrlWrapHttpEx(
 			transport_len = tmpzval.StringEx().GetLen()
 			transport_string = zend.Estrndup(tmpzval.StringEx().GetVal(), tmpzval.StringEx().GetLen())
 		} else {
-			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", lang.Cond(use_ssl, "ssl", "tcp"), resource.GetHost().GetVal(), resource.Port())
+			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", lang.Cond(use_ssl, "ssl", "tcp"), resource.Host(), resource.Port())
 		}
 	}
 	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "timeout")) != nil {
@@ -154,14 +155,13 @@ func PhpStreamUrlWrapHttpEx(
 		/* Set peer_name or name verification will try to use the proxy server name */
 
 		if context == nil || lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ssl", "peer_name")) == nil {
-			ssl_proxy_peer_name.SetString(resource.GetHost().GetStr())
+			ssl_proxy_peer_name.SetString(resource.Host())
 			streams.PhpStreamContextSetOption(core.PHP_STREAM_CONTEXT(stream), "ssl", "peer_name", &ssl_proxy_peer_name)
-			// zend.ZvalPtrDtor(&ssl_proxy_peer_name)
 		}
 		header.WriteString("CONNECT ")
-		header.WriteString(b.CastStrAuto(resource.GetHost().GetVal()))
+		header.WriteString(resource.Host())
 		header.WriteByte(':')
-		header.WriteUlong(resource.Port())
+		header.WriteUlong(uint(resource.Port()))
 		header.WriteString(" HTTP/1.0\r\n")
 
 		/* check if we have Proxy-Authorization header */
@@ -465,38 +465,19 @@ func PhpStreamUrlWrapHttpEx(
 
 	/* auth header if it was specified */
 
-	if (have_header&HTTP_HEADER_AUTH) == 0 && resource.GetUser() != nil {
-
-		/* make scratch large enough to hold the whole URL (over-estimate) */
-
-		var scratch_len int = strlen(path) + 1
-		var scratch *byte = zend.Emalloc(scratch_len)
-		var stmp *types.String
-
+	if (have_header&HTTP_HEADER_AUTH) == 0 && resource.HasUser() {
 		/* decode the strings first */
-
-		PhpUrlDecode(resource.GetUser().GetVal(), resource.GetUser().GetLen())
-		strcpy(scratch, resource.GetUser().GetVal())
-		strcat(scratch, ":")
-
-		/* Note: password is optional! */
-
-		if resource.GetPass() != nil {
-			PhpUrlDecode(resource.GetPass().GetVal(), resource.GetPass().GetLen())
-			strcat(scratch, resource.GetPass().GetVal())
-		}
-		stmp = types.NewString(PhpBase64Encode(b.CastStrAuto(scratch)))
+		scratch := PhpUrlDecodeEx(resource.User()) + ":" + PhpUrlDecodeEx(resource.Pass())
+		stmp := PhpBase64Encode(scratch)
 		req_buf.WriteString("Authorization: Basic ")
-		req_buf.WriteString(b.CastStrAuto(stmp.GetVal()))
+		req_buf.WriteString(stmp)
 		req_buf.WriteString("\r\n")
 		streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_AUTH_REQUIRED, nil, 0)
-		//types.ZendStringFree(stmp)
 		zend.Efree(scratch)
 	}
 
 	/* if the user has configured who they are, send a From: line */
-
-	if (have_header&HTTP_HEADER_FROM) == 0 && FG__().from_address {
+	if (have_header&HTTP_HEADER_FROM) == 0 && FG__().from_address != nil {
 		req_buf.WriteString("From: ")
 		req_buf.WriteString(b.CastStrAuto(FG__().from_address))
 		req_buf.WriteString("\r\n")
@@ -506,10 +487,10 @@ func PhpStreamUrlWrapHttpEx(
 
 	if (have_header & HTTP_HEADER_HOST) == 0 {
 		req_buf.WriteString("Host: ")
-		req_buf.WriteString(b.CastStrAuto(resource.GetHost().GetVal()))
+		req_buf.WriteString(resource.Host())
 		if use_ssl && resource.Port() != 443 && resource.Port() != 0 || !use_ssl && resource.Port() != 80 && resource.Port() != 0 {
 			req_buf.WriteByte(':')
-			req_buf.WriteUlong(resource.Port())
+			req_buf.WriteUlong(uint(resource.Port()))
 		}
 		req_buf.WriteString("\r\n")
 	}
@@ -790,23 +771,17 @@ func PhpStreamUrlWrapHttpEx(
 			*new_path = '0'
 			if strlen(location) < 8 || strncasecmp(location, "http://", b.SizeOf("\"http://\"")-1) && strncasecmp(location, "https://", b.SizeOf("\"https://\"")-1) && strncasecmp(location, "ftp://", b.SizeOf("\"ftp://\"")-1) && strncasecmp(location, "ftps://", b.SizeOf("\"ftps://\"")-1) {
 				if (*location) != '/' {
-					if (*(location + 1)) != '0' && resource.GetPath() != nil {
-						var s *byte = strrchr(resource.GetPath().GetVal(), '/')
-						if s == nil {
-							s = resource.GetPath().GetVal()
-							if resource.GetPath().GetLen() == 0 {
-								// types.ZendStringReleaseEx(resource.GetPath(), 0)
-								resource.SetPath("/")
-								s = resource.GetPath().GetVal()
-							} else {
-								*s = '/'
-							}
-						}
-						s[1] = '0'
-						if resource.GetPath() != nil && resource.GetPath().GetStr()[0] == '/' && resource.GetPath().GetStr()[1] == '0' {
-							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s%s", resource.GetPath().GetVal(), location)
+					if (*(location + 1)) != '\000' && resource.HasPath() {
+						resourcePath := resource.Path()
+						if idx := strings.LastIndexByte(resourcePath, '/'); idx >= 0 {
+							resourcePath = resourcePath[:idx+1]
 						} else {
-							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s/%s", resource.GetPath().GetVal(), location)
+							resourcePath = "/"
+						}
+						if resourcePath == "/" {
+							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s%s", resourcePath, location)
+						} else {
+							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s/%s", resourcePath, location)
 						}
 					} else {
 						core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "/%s", location)
@@ -845,9 +820,9 @@ func PhpStreamUrlWrapHttpEx(
 
 			/* check for control characters in login, password & path */
 			if ascii.StrCaseEquals(new_path, "http://") || ascii.StrCaseEquals(new_path, "https://") {
-				CHECK_FOR_CNTRL_CHARS(resource.GetUser())
-				CHECK_FOR_CNTRL_CHARS(resource.GetPass())
-				CHECK_FOR_CNTRL_CHARS(resource.GetPath())
+				CHECK_FOR_CNTRL_CHARS(resource.User())
+				CHECK_FOR_CNTRL_CHARS(resource.Pass())
+				CHECK_FOR_CNTRL_CHARS(resource.Path())
 			}
 			stream = PhpStreamUrlWrapHttpEx(wrapper, new_path, mode, options, opened_path, context, lang.PreDec(&redirect_max), HTTP_WRAPPER_REDIRECTED, response_header)
 		} else {

@@ -1,9 +1,5 @@
 package standard
 
-import (
-	"github.com/heyuuu/gophp/php/types"
-)
-
 const PHP_URL_SCHEME = 0
 const PHP_URL_HOST = 1
 const PHP_URL_PORT = 2
@@ -52,11 +48,6 @@ func (url *PhpUrl) Port() uint16     { return safeDeref(url.port) }
 func (url *PhpUrl) Path() string     { return safeDeref(url.path) }
 func (url *PhpUrl) Query() string    { return safeDeref(url.query) }
 func (url *PhpUrl) Fragment() string { return safeDeref(url.fragment) }
-
-func (url *PhpUrl) GetUser() *types.String { return (*types.String)(url.user) }
-func (url *PhpUrl) GetPass() *types.String { return (*types.String)(url.pass) }
-func (url *PhpUrl) GetHost() *types.String { return (*types.String)(url.host) }
-func (url *PhpUrl) GetPath() *types.String { return (*types.String)(url.path) }
 
 func (url *PhpUrl) prepareStr(s string) *string {
 	s = urlReplaceControlChars(s)

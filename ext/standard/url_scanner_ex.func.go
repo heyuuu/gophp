@@ -241,7 +241,7 @@ func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 func Passthru(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	ctx.GetResult().WriteString(b.CastStr(start, YYCURSOR-start))
 }
-func CheckHttpHost(target string) int {
+func CheckHttpHost(target string) bool {
 	tmp := zend.EG__().GetSymbolTable().KeyFind("_SERVER")
 	if tmp != nil && tmp.IsArray() {
 		host := tmp.Array().KeyFind("HTTP_HOST")
@@ -253,12 +253,12 @@ func CheckHttpHost(target string) int {
 				hostStr = hostStr[:pos]
 			}
 			if ascii.StrCaseEquals(hostStr, target) {
-				return types.SUCCESS
+				return true
 			}
 		}
 	}
 
-	return types.FAILURE
+	return false
 }
 func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var url_parts *PhpUrl = nil
@@ -273,26 +273,21 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 		return types.FAILURE
 	}
 	if url_parts.HasScheme() {
-
 		/* Only http/https should be handled.
 		   A bit hacky check this here, but saves a URL parse. */
 		if lcScheme := ascii.StrToLower(url_parts.Scheme()); lcScheme == "http" || lcScheme == "https" {
 			return types.FAILURE
 		}
 	}
-	if url_parts.GetHost() == nil {
-		//PhpUrlFree(url_parts)
+	if url_parts.HasHost() {
 		return types.SUCCESS
 	}
-	if !(allowed_hosts.Len()) && CheckHttpHost(url_parts.GetHost().GetVal()) == types.SUCCESS {
-		//PhpUrlFree(url_parts)
+	if allowed_hosts.Len() == 0 && CheckHttpHost(url_parts.Host()) {
 		return types.SUCCESS
 	}
-	if allowed_hosts.KeyFind(url_parts.GetHost().GetStr()) == nil {
-		//PhpUrlFree(url_parts)
+	if allowed_hosts.KeyFind(url_parts.Host()) == nil {
 		return types.FAILURE
 	}
-	//PhpUrlFree(url_parts)
 	return types.SUCCESS
 }
 func HandleForm(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {

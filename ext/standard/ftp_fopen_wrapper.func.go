@@ -192,7 +192,7 @@ func PhpFtpFopenConnect(
 			pass := PhpRawUrlDecodeEx(resource.Pass())
 			for _, c := range []byte(pass) {
 				if ascii.IsControl(c) {
-					streams.PhpStreamWrapperLogError(wrapper, options, "Invalid password %s", resource.GetPass().GetVal())
+					streams.PhpStreamWrapperLogError(wrapper, options, "Invalid password %s", resource.Pass())
 					goto connect_errexit
 				}
 			}
@@ -911,14 +911,14 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	stream = PhpFtpFopenConnect(wrapper, url_from, "r", 0, nil, context, nil, nil, nil, nil)
 	if stream == nil {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to connect to %s", resource_from.GetHost().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to connect to %s", resource_from.Host())
 		}
 		goto rename_errexit
 	}
 
 	/* Rename FROM */
 
-	core.PhpStreamPrintf(stream, "RNFR %s\r\n", lang.CondF1(resource_from.GetPath() != nil, func() []byte { return resource_from.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "RNFR %s\r\n", lang.Cond(resource_from.HasPath(), resource_from.Path(), "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 300 || result > 399 {
 		if (options & core.REPORT_ERRORS) != 0 {
@@ -928,8 +928,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	}
 
 	/* Rename TO */
-
-	core.PhpStreamPrintf(stream, "RNTO %s\r\n", lang.CondF1(resource_to.GetPath() != nil, func() []byte { return resource_to.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "RNTO %s\r\n", lang.Cond(resource_to.HasPath(), resource_to.Path(), "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {
@@ -976,8 +975,9 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 		var p *byte
 		var e *byte
 		var buf *byte
-		buf = zend.Estrndup(resource.Path(), resource.GetPath().GetLen())
-		e = buf + resource.GetPath().GetLen()
+		path := resource.Path()
+		buf = b.CastStrPtr(path)
+		e = buf + len(path)
 
 		/* find a top level directory we need to create */
 
