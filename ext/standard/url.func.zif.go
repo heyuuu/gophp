@@ -8,13 +8,14 @@ import (
 // generate by ZifParseUrl
 var DefZifParseUrl = def.DefFunc("parse_url", 1, 2, []def.ArgInfo{{Name: "url"}, {Name: "component"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	url := fp.ParseZval()
+	url := fp.ParseStringVal()
 	fp.StartOptional()
-	component := fp.ParseZval()
+	component := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifParseUrl(executeData, returnValue, url, nil, component)
+	ret := ZifParseUrl(url, nil, component)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifUrlencode

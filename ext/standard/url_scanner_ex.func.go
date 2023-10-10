@@ -7,7 +7,6 @@ import (
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/operators"
 	"strings"
 )
 
@@ -148,87 +147,74 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	}
 
 	/* Don't modify URLs of the format "#mark" */
-
-	if url_parts.GetFragment() != nil && '#' == url.GetS().GetStr()[0] {
+	if fragment := url_parts.Fragment(); len(fragment) > 0 && fragment[0] == '#' {
 		dest.AppendSmartStr(url)
-		//PhpUrlFree(url_parts)
 		return
 	}
 
 	/* Check protocol. Only http/https is allowed. */
-
-	if url_parts.GetScheme() != nil && !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "https")) {
+	if lcScheme := ascii.StrToLower(url_parts.Scheme()); lcScheme == "http" || lcScheme == "https" {
 		dest.AppendSmartStr(url)
-		//PhpUrlFree(url_parts)
 		return
 	}
 
 	/* Check host whitelist. If it's not listed, do nothing. */
-
-	if url_parts.GetHost() != nil {
-		var tmp *types.String = operators.ZendStringTolower(url_parts.GetHost())
-		if !BG__().url_adapt_session_hosts_ht.KeyExists(tmp.GetStr()) {
-			// types.ZendStringReleaseEx(tmp, 0)
+	if url_parts.HasHost() {
+		var tmp = ascii.StrToLower(url_parts.Host())
+		if !BG__().url_adapt_session_hosts_ht.KeyExists(tmp) {
 			dest.AppendSmartStr(url)
-			//PhpUrlFree(url_parts)
 			return
 		}
-		// types.ZendStringReleaseEx(tmp, 0)
 	}
 
 	/*
 	 * When URL does not have path and query string add "/?".
 	 * i.e. If URL is only "?foo=bar", should not add "/?".
 	 */
-
-	if url_parts.GetPath() == nil && url_parts.GetQuery() == nil && url_parts.GetFragment() == nil {
-
+	if !url_parts.HasPath() && !url_parts.HasQuery() && !url_parts.HasFragment() {
 		/* URL is http://php.net or like */
-
 		dest.AppendSmartStr(url)
 		dest.WriteByte('/')
 		dest.WriteByte('?')
 		dest.AppendSmartStr(url_app)
-		//PhpUrlFree(url_parts)
 		return
 	}
-	if url_parts.GetScheme() != nil {
-		dest.WriteString(b.CastStrAuto(url_parts.GetScheme().GetVal()))
+	if url_parts.HasScheme() {
+		dest.WriteString(url_parts.Scheme())
 		dest.WriteString("://")
 	} else if (*(url.GetS().GetVal())) == '/' && (*(url.GetS().GetVal() + 1)) == '/' {
 		dest.WriteString("//")
 	}
-	if url_parts.GetUser() != nil {
-		dest.WriteString(b.CastStrAuto(url_parts.GetUser().GetVal()))
-		if url_parts.GetPass() != nil {
-			dest.WriteString(b.CastStrAuto(url_parts.GetPass().GetVal()))
+	if url_parts.HasUser() {
+		dest.WriteString(url_parts.User())
+		if url_parts.HasPass() {
+			dest.WriteString(url_parts.Pass())
 			dest.WriteByte(':')
 		}
 		dest.WriteByte('@')
 	}
-	if url_parts.GetHost() != nil {
-		dest.WriteString(b.CastStrAuto(url_parts.GetHost().GetVal()))
+	if url_parts.HasHost() {
+		dest.WriteString(url_parts.Host())
 	}
-	if url_parts.GetPort() != 0 {
+	if url_parts.Port() != 0 {
 		dest.WriteByte(':')
-		dest.WriteUlong(long(url_parts.GetPort()))
+		dest.WriteUlong(uint(url_parts.Port()))
 	}
-	if url_parts.GetPath() != nil {
-		dest.WriteString(b.CastStrAuto(url_parts.GetPath().GetVal()))
+	if url_parts.HasPath() {
+		dest.WriteString(url_parts.Path())
 	}
 	dest.WriteByte('?')
-	if url_parts.GetQuery() != nil {
-		dest.WriteString(b.CastStrAuto(url_parts.GetQuery().GetVal()))
+	if url_parts.HasQuery() {
+		dest.WriteString(url_parts.Query())
 		dest.WriteString(b.CastStrAuto(separator))
 		dest.AppendSmartStr(url_app)
 	} else {
 		dest.AppendSmartStr(url_app)
 	}
-	if url_parts.GetFragment() != nil {
+	if url_parts.HasFragment() {
 		dest.WriteByte('#')
-		dest.WriteString(b.CastStrAuto(url_parts.GetFragment().GetVal()))
+		dest.WriteString(url_parts.Fragment())
 	}
-	//PhpUrlFree(url_parts)
 }
 func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 	var f byte = 0
@@ -286,19 +272,13 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	if url_parts == nil {
 		return types.FAILURE
 	}
-	if url_parts.GetScheme() != nil {
+	if url_parts.HasScheme() {
 
 		/* Only http/https should be handled.
 		   A bit hacky check this here, but saves a URL parse. */
-
-		if !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "https")) {
-			//PhpUrlFree(url_parts)
+		if lcScheme := ascii.StrToLower(url_parts.Scheme()); lcScheme == "http" || lcScheme == "https" {
 			return types.FAILURE
 		}
-
-		/* Only http/https should be handled.
-		   A bit hacky check this here, but saves a URL parse. */
-
 	}
 	if url_parts.GetHost() == nil {
 		//PhpUrlFree(url_parts)

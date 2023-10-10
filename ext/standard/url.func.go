@@ -25,7 +25,6 @@ func urlReplaceControlChars(s string) string {
 	}, s)
 }
 
-func PhpUrlParse(str *byte) *PhpUrl { return PhpUrlParseEx(str, strlen(str)) }
 func BinaryStrcspn(s *byte, e *byte, chars string) *byte {
 	for *chars {
 		var p *byte = memchr(s, *chars, e-s)
@@ -36,19 +35,20 @@ func BinaryStrcspn(s *byte, e *byte, chars string) *byte {
 	}
 	return e
 }
-func PhpUrlParseEx(str *byte, length int) *PhpUrl {
-	var has_port bool
-	return PhpUrlParseEx2(str, length, &has_port)
+
+func PhpUrlParse(str *byte) *PhpUrl { return PhpUrlParseString(b.CastStrAuto(str)) }
+func PhpUrlParseString(str string) *PhpUrl {
+	s := b.CastStrPtr(str)
+	return PhpUrlParseEx(s, len(str))
 }
-func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
+func PhpUrlParseEx(str *byte, length int) *PhpUrl {
 	var port_buf []byte
-	var ret *PhpUrl = zend.Ecalloc(1, b.SizeOf("php_url"))
+	var ret *PhpUrl = &PhpUrl{}
 	var s *byte
 	var e byte
 	var p byte
 	var pp byte
 	var ue byte
-	*has_port = 0
 	s = str
 	ue = s + length
 
@@ -106,7 +106,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
 			ret.SetScheme(b.CastStr(s, e-s))
 			if e+2 < ue && (*(e + 2)) == '/' {
 				s = e + 3
-				if ascii.StrCaseEquals(ret.GetScheme().GetStr(), "file") {
+				if ascii.StrCaseEquals(ret.Scheme(), "file") {
 					if e+3 < ue && (*(e + 3)) == '/' {
 
 						/* support windows drive letters as in:
@@ -144,7 +144,6 @@ func PhpUrlParseEx2(str *byte, length int, has_port *bool) *PhpUrl {
 			port_buf[pp-p] = '0'
 			port = zend.ZEND_STRTOL(port_buf, &end, 10)
 			if port >= 0 && port <= 65535 && end != port_buf {
-				*has_port = 1
 				ret.SetPort(uint16(port))
 				if s+1 < ue && (*s) == '/' && (*(s + 1)) == '/' {
 					s += 2
@@ -200,7 +199,7 @@ parse_host:
 		p = operators.ZendMemrchr(s, ':', e-s)
 	}
 	if p {
-		if ret.GetPort() == 0 {
+		if ret.Port() == 0 {
 			p++
 			if e-p > 5 {
 				//PhpUrlFree(ret)
@@ -212,7 +211,6 @@ parse_host:
 				port_buf[e-p] = '0'
 				port = zend.ZEND_STRTOL(port_buf, &end, 10)
 				if port >= 0 && port <= 65535 && end != port_buf {
-					*has_port = 1
 					ret.SetPort(uint16(port))
 				} else {
 					//PhpUrlFree(ret)
@@ -259,115 +257,80 @@ just_path:
 	}
 	return ret
 }
-func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zpp.Opt, component *types.Zval) {
-	var str *byte
-	var str_len int
+func ZifParseUrl(url string, _ zpp.Opt, component *int) *types.Zval {
 	var resource *PhpUrl
-	var key zend.ZendLong = -1
-	var tmp types.Zval
-	var has_port bool
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			str, str_len = fp.ParseString()
-			fp.StartOptional()
-			key = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	resource = PhpUrlParseEx2(str, str_len, &has_port)
+	var key zend.ZendLong = b.Option(component, -1)
+	resource = PhpUrlParseString(url)
 	if resource == nil {
-
-		/* @todo Find a method to determine why php_url_parse_ex() failed */
-
-		return_value.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
 	if key > -1 {
 		switch key {
 		case PHP_URL_SCHEME:
-			if resource.GetScheme() != nil {
-				return_value.SetString(resource.GetScheme().GetStr())
+			if resource.HasScheme() {
+				return types.NewZvalString(resource.Scheme())
 			}
 		case PHP_URL_HOST:
-			if resource.GetHost() != nil {
-				return_value.SetString(resource.GetHost().GetStr())
+			if resource.HasHost() {
+				return types.NewZvalString(resource.Host())
 			}
 		case PHP_URL_PORT:
-			if has_port != 0 {
-				return_value.SetLong(resource.GetPort())
+			if resource.HasPort() {
+				return types.NewZvalLong(int(resource.Port()))
 			}
 		case PHP_URL_USER:
-			if resource.GetUser() != nil {
-				return_value.SetString(resource.GetUser().GetStr())
+			if resource.HasUser() {
+				return types.NewZvalString(resource.User())
 			}
 		case PHP_URL_PASS:
-			if resource.GetPass() != nil {
-				return_value.SetString(resource.GetPass().GetStr())
+			if resource.HasPass() {
+				return types.NewZvalString(resource.Pass())
 			}
 		case PHP_URL_PATH:
-			if resource.GetPath() != nil {
-				return_value.SetString(resource.GetPath().GetStr())
+			if resource.HasPath() {
+				return types.NewZvalString(resource.Path())
 			}
 		case PHP_URL_QUERY:
-			if resource.GetQuery() != nil {
-				return_value.SetString(resource.GetQuery().GetStr())
+			if resource.HasQuery() {
+				return types.NewZvalString(resource.Query())
 			}
 		case PHP_URL_FRAGMENT:
-			if resource.GetFragment() != nil {
-				return_value.SetString(resource.GetFragment().GetStr())
+			if resource.HasFragment() {
+				return types.NewZvalString(resource.Fragment())
 			}
 		default:
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid URL component identifier "+zend.ZEND_LONG_FMT, key)
-			return_value.SetFalse()
+			return types.NewZvalFalse()
 		}
-		goto done
 	}
-
-	/* allocate an array for return */
-
-	zend.ArrayInit(return_value)
 
 	/* add the various elements to the array */
-
-	if resource.GetScheme() != nil {
-		tmp.SetString(resource.GetScheme().GetStr())
-		return_value.Array().KeyAddNew(types.STR_SCHEME, &tmp)
+	arr := types.NewArray(0)
+	if resource.HasScheme() {
+		arr.KeyAddNew("scheme", types.NewZvalString(resource.Scheme()))
 	}
-	if resource.GetHost() != nil {
-		tmp.SetString(resource.GetHost().GetStr())
-		return_value.Array().KeyAddNew(types.STR_HOST, &tmp)
+	if resource.HasHost() {
+		arr.KeyAddNew("host", types.NewZvalString(resource.Host()))
 	}
-	if has_port != 0 {
-		tmp.SetLong(resource.GetPort())
-		return_value.Array().KeyAddNew(types.STR_PORT, &tmp)
+	if resource.HasPort() {
+		arr.KeyAddNew("port", types.NewZvalLong(int(resource.Port())))
 	}
-	if resource.GetUser() != nil {
-		tmp.SetString(resource.GetUser().GetStr())
-		return_value.Array().KeyAddNew(types.STR_USER, &tmp)
+	if resource.HasUser() {
+		arr.KeyAddNew("user", types.NewZvalString(resource.User()))
 	}
-	if resource.GetPass() != nil {
-		tmp.SetString(resource.GetPass().GetStr())
-		return_value.Array().KeyAddNew(types.STR_PASS, &tmp)
+	if resource.HasPass() {
+		arr.KeyAddNew("pass", types.NewZvalString(resource.Pass()))
 	}
-	if resource.GetPath() != nil {
-		tmp.SetString(resource.GetPath().GetStr())
-		return_value.Array().KeyAddNew(types.STR_PATH, &tmp)
+	if resource.HasPath() {
+		arr.KeyAddNew("path", types.NewZvalString(resource.Path()))
 	}
-	if resource.GetQuery() != nil {
-		tmp.SetString(resource.GetQuery().GetStr())
-		return_value.Array().KeyAddNew(types.STR_QUERY, &tmp)
+	if resource.HasQuery() {
+		arr.KeyAddNew("query", types.NewZvalString(resource.Query()))
 	}
-	if resource.GetFragment() != nil {
-		tmp.SetString(resource.GetFragment().GetStr())
-		return_value.Array().KeyAddNew(types.STR_FRAGMENT, &tmp)
+	if resource.HasFragment() {
+		arr.KeyAddNew("fragment", types.NewZvalString(resource.Fragment()))
 	}
-done:
-	//PhpUrlFree(resource)
+	return types.NewZvalArray(arr)
 }
 func _H2I(c byte) byte {
 	if '0' <= c && c <= '9' {

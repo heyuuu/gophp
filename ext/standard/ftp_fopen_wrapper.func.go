@@ -77,7 +77,7 @@ func PhpFtpFopenConnect(
 	var transport *byte
 	var transport_len int
 	resource = PhpUrlParse(path)
-	if resource == nil || resource.GetPath() == nil {
+	if resource == nil || resource.HasPath() {
 		if resource != nil && presource != nil {
 			*presource = resource
 		}
@@ -87,10 +87,10 @@ func PhpFtpFopenConnect(
 
 	/* use port 21 if one wasn't specified */
 
-	if resource.GetPort() == 0 {
+	if resource.Port() == 0 {
 		resource.SetPort(21)
 	}
-	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", resource.GetHost().GetVal(), resource.GetPort()))
+	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", resource.Host(), resource.Port()))
 	stream = streams.PhpStreamXportCreate(transport, transport_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, nil, nil)
 	zend.Efree(transport)
 	if stream == nil {
@@ -169,42 +169,34 @@ func PhpFtpFopenConnect(
 
 	/* send the user name */
 
-	if resource.GetUser() != nil {
-		resource.GetUser().GetLen() = PhpRawUrlDecode(resource.GetUser().GetVal(), resource.GetUser().GetLen())
-		var s *uint8 = (*uint8)(resource.GetUser().GetVal())
-		var e *uint8 = (*uint8)(s + resource.GetUser().GetLen())
-		for s < e {
-			if ascii.IsControl(*s) {
-				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid login %s", resource.GetUser().GetVal())
+	if resource.HasUser() {
+		user := PhpRawUrlDecodeEx(resource.User())
+		for _, c := range []byte(user) {
+			if ascii.IsControl(c) {
+				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid login %s", resource.User())
 				goto connect_errexit
 			}
-			s++
 		}
-		core.PhpStreamPrintf(stream, "USER %s\r\n", resource.GetUser().GetVal())
+		core.PhpStreamPrintf(stream, "USER %s\r\n", resource.user)
 	} else {
 		core.PhpStreamWriteString(stream, "USER anonymous\r\n")
 	}
 
 	/* get the response */
-
 	result = GET_FTP_RESULT(stream)
 
 	/* if a password is required, send it */
-
 	if result >= 300 && result <= 399 {
 		streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_AUTH_REQUIRED, tmp_line, 0)
-		if resource.GetPass() != nil {
-			resource.GetPass().GetLen() = PhpRawUrlDecode(resource.GetPass().GetVal(), resource.GetPass().GetLen())
-			var s *uint8 = (*uint8)(resource.GetPass().GetVal())
-			var e *uint8 = (*uint8)(s + resource.GetPass().GetLen())
-			for s < e {
-				if iscntrl(*s) {
+		if resource.HasPass() {
+			pass := PhpRawUrlDecodeEx(resource.Pass())
+			for _, c := range []byte(pass) {
+				if ascii.IsControl(c) {
 					streams.PhpStreamWrapperLogError(wrapper, options, "Invalid password %s", resource.GetPass().GetVal())
 					goto connect_errexit
 				}
-				s++
 			}
-			core.PhpStreamPrintf(stream, "PASS %s\r\n", resource.GetPass().GetVal())
+			core.PhpStreamPrintf(stream, "PASS %s\r\n", pass)
 		} else {
 
 			/* if the user has configured who they are,
@@ -247,9 +239,6 @@ func PhpFtpFopenConnect(
 	}
 	return stream
 connect_errexit:
-	//if resource != nil {
-	//	PhpUrlFree(resource)
-	//}
 	if stream != nil {
 		core.PhpStreamClose(stream)
 	}
@@ -458,7 +447,7 @@ func PhpStreamUrlWrapFtp(
 
 	/* find out the size of the file (verifying it exists) */
 
-	core.PhpStreamPrintf(stream, "SIZE %s\r\n", resource.GetPath().GetVal())
+	core.PhpStreamPrintf(stream, "SIZE %s\r\n", resource.Path())
 
 	/* read the response */
 
@@ -498,7 +487,7 @@ func PhpStreamUrlWrapFtp(
 				/* Context permits overwriting file,
 				   so we just delete whatever's there in preparation */
 
-				core.PhpStreamPrintf(stream, "DELE %s\r\n", resource.GetPath().GetVal())
+				core.PhpStreamPrintf(stream, "DELE %s\r\n", resource.Path())
 				result = GET_FTP_RESULT(stream)
 				if result >= 300 || result <= 199 {
 					goto errexit
@@ -556,12 +545,12 @@ func PhpStreamUrlWrapFtp(
 		/* Append */
 
 	}
-	core.PhpStreamPrintf(stream, "%s %s\r\n", tmp_line, lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "%s %s\r\n", tmp_line, lang.Cond(resource.HasPath(), resource.Path(), "/"))
 
 	/* open the data channel */
 
 	if hoststart == nil {
-		hoststart = resource.GetHost().GetVal()
+		hoststart = resource.Host()
 	}
 	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", hoststart, portno))
 	datastream = streams.PhpStreamXportCreate(transport, transport_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, &error_message, nil)
@@ -707,13 +696,13 @@ func PhpStreamFtpOpendir(
 	/* open the data channel */
 
 	if hoststart == nil {
-		hoststart = resource.GetHost().GetVal()
+		hoststart = resource.Host()
 	}
 	datastream = core.PhpStreamSockOpenHost(hoststart, portno, SOCK_STREAM, 0, 0)
 	if datastream == nil {
 		goto opendir_errexit
 	}
-	core.PhpStreamPrintf(stream, "NLST %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "NLST %s\r\n", lang.Cond(resource.HasPath(), resource.Path(), "/"))
 	result = GET_FTP_RESULT(stream)
 	if result != 150 && result != 125 {
 
@@ -767,7 +756,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 		goto stat_errexit
 	}
 	ssb.GetSb().st_mode = 0644
-	core.PhpStreamPrintf(stream, "CWD %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "CWD %s\r\n", lang.Cond(resource.HasPath(), resource.Path(), "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		ssb.GetSb().st_mode |= S_IFREG
@@ -779,7 +768,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	if result < 200 || result > 299 {
 		goto stat_errexit
 	}
-	core.PhpStreamPrintf(stream, "SIZE %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "SIZE %s\r\n", lang.Cond(resource.HasPath(), resource.Path(), "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 
@@ -800,7 +789,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	} else {
 		ssb.GetSb().st_size = atoi(tmp_line + 4)
 	}
-	core.PhpStreamPrintf(stream, "MDTM %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "MDTM %s\r\n", lang.Cond(resource.HasPath(), resource.Path(), "/"))
 	result = GET_FTP_RESULT(stream)
 	if result == 213 {
 		var p *byte = tmp_line + 4
@@ -878,7 +867,7 @@ func PhpStreamFtpUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 		}
 		goto unlink_errexit
 	}
-	if resource.GetPath() == nil {
+	if resource.HasPath() {
 		if (options & core.REPORT_ERRORS) != 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid path provided in %s", url)
 		}
@@ -887,7 +876,7 @@ func PhpStreamFtpUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 
 	/* Attempt to delete the file */
 
-	core.PhpStreamPrintf(stream, "DELE %s\r\n", lang.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
+	core.PhpStreamPrintf(stream, "DELE %s\r\n", lang.Cond(resource.HasPath(), resource.Path(), "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {
@@ -895,13 +884,9 @@ func PhpStreamFtpUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 		}
 		goto unlink_errexit
 	}
-	//PhpUrlFree(resource)
 	core.PhpStreamClose(stream)
 	return 1
 unlink_errexit:
-	//if resource != nil {
-	//	PhpUrlFree(resource)
-	//}
 	if stream != nil {
 		core.PhpStreamClose(stream)
 	}
@@ -920,7 +905,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	   (or a 21/0 0/21 combination which is also "same")
 	  Also require paths to/from */
 
-	if resource_from == nil || resource_to == nil || resource_from.GetScheme() == nil || resource_to.GetScheme() == nil || resource_from.GetScheme().GetStr() != resource_to.GetScheme().GetStr() || resource_from.GetHost() == nil || resource_to.GetHost() == nil || resource_from.GetHost().GetStr() != resource_to.GetHost().GetStr() || resource_from.GetPort() != resource_to.GetPort() && resource_from.GetPort()*resource_to.GetPort() != 0 && resource_from.GetPort()+resource_to.GetPort() != 21 || resource_from.GetPath() == nil || resource_to.GetPath() == nil {
+	if resource_from == nil || resource_to == nil || !resource_from.HasScheme() || !resource_to.HasScheme() || resource_from.Scheme() != resource_to.Scheme() || !resource_from.HasHost() || !resource_to.HasHost() || resource_from.Host() != resource_to.Host() || resource_from.Port() != resource_to.Port() && resource_from.Port()*resource_to.Port() != 0 && resource_from.Port()+resource_to.Port() != 21 || !resource_from.HasPath() || !resource_to.HasPath() {
 		goto rename_errexit
 	}
 	stream = PhpFtpFopenConnect(wrapper, url_from, "r", 0, nil, context, nil, nil, nil, nil)
@@ -957,12 +942,6 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	core.PhpStreamClose(stream)
 	return 1
 rename_errexit:
-	//if resource_from != nil {
-	//	PhpUrlFree(resource_from)
-	//}
-	//if resource_to != nil {
-	//	PhpUrlFree(resource_to)
-	//}
 	if stream != nil {
 		core.PhpStreamClose(stream)
 	}
@@ -981,14 +960,14 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 		}
 		goto mkdir_errexit
 	}
-	if resource.GetPath() == nil {
+	if resource.HasPath() {
 		if (options & core.REPORT_ERRORS) != 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid path provided in %s", url)
 		}
 		goto mkdir_errexit
 	}
 	if recursive == 0 {
-		core.PhpStreamPrintf(stream, "MKD %s\r\n", resource.GetPath().GetVal())
+		core.PhpStreamPrintf(stream, "MKD %s\r\n", resource.Path())
 		result = GET_FTP_RESULT(stream)
 	} else {
 
@@ -997,7 +976,7 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 		var p *byte
 		var e *byte
 		var buf *byte
-		buf = zend.Estrndup(resource.GetPath().GetVal(), resource.GetPath().GetLen())
+		buf = zend.Estrndup(resource.Path(), resource.GetPath().GetLen())
 		e = buf + resource.GetPath().GetLen()
 
 		/* find a top level directory we need to create */
@@ -1073,13 +1052,13 @@ func PhpStreamFtpRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, c
 		}
 		goto rmdir_errexit
 	}
-	if resource.GetPath() == nil {
+	if resource.HasPath() {
 		if (options & core.REPORT_ERRORS) != 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid path provided in %s", url)
 		}
 		goto rmdir_errexit
 	}
-	core.PhpStreamPrintf(stream, "RMD %s\r\n", resource.GetPath().GetVal())
+	core.PhpStreamPrintf(stream, "RMD %s\r\n", resource.Path())
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {

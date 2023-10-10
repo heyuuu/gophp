@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
@@ -52,7 +53,7 @@ func PhpStreamUrlWrapHttpEx(
 ) *core.PhpStream {
 	var stream *core.PhpStream = nil
 	var resource *PhpUrl = nil
-	var use_ssl int
+	var use_ssl bool
 	var use_proxy int = 0
 	var tmp *types.String = nil
 	var ua_str *byte = nil
@@ -90,7 +91,7 @@ func PhpStreamUrlWrapHttpEx(
 	if resource == nil {
 		return nil
 	}
-	if !(ascii.StrCaseEquals(resource.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(resource.GetScheme().GetStr(), "https")) {
+	if !(ascii.StrCaseEquals(resource.Scheme(), "http")) && !(ascii.StrCaseEquals(resource.Scheme(), "https")) {
 		if context == nil || lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) == nil || !tmpzval.IsString() || tmpzval.StringEx().GetLen() == 0 {
 			//PhpUrlFree(resource)
 			return core.PhpStreamOpenWrapperEx(path, mode, core.REPORT_ERRORS, nil, context)
@@ -99,7 +100,7 @@ func PhpStreamUrlWrapHttpEx(
 		/* Called from a non-http wrapper with http proxying requested (i.e. ftp) */
 
 		request_fulluri = 1
-		use_ssl = 0
+		use_ssl = false
 		use_proxy = 1
 		transport_len = tmpzval.StringEx().GetLen()
 		transport_string = zend.Estrndup(tmpzval.StringEx().GetVal(), tmpzval.StringEx().GetLen())
@@ -112,13 +113,13 @@ func PhpStreamUrlWrapHttpEx(
 			//PhpUrlFree(resource)
 			return nil
 		}
-		use_ssl = resource.GetScheme() != nil && resource.GetScheme().GetLen() > 4 && resource.GetScheme().GetStr()[4] == 's'
+		use_ssl = len(resource.Scheme()) > 4 && resource.Scheme()[4] == 's'
 
 		/* choose default ports */
 
-		if use_ssl != 0 && resource.GetPort() == 0 {
+		if use_ssl && resource.Port() == 0 {
 			resource.SetPort(443)
-		} else if resource.GetPort() == 0 {
+		} else if resource.Port() == 0 {
 			resource.SetPort(80)
 		}
 		if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) != nil && tmpzval.IsString() && tmpzval.StringEx().GetLen() > 0 {
@@ -126,7 +127,7 @@ func PhpStreamUrlWrapHttpEx(
 			transport_len = tmpzval.StringEx().GetLen()
 			transport_string = zend.Estrndup(tmpzval.StringEx().GetVal(), tmpzval.StringEx().GetLen())
 		} else {
-			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", lang.Cond(use_ssl != 0, "ssl", "tcp"), resource.GetHost().GetVal(), resource.GetPort())
+			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", lang.Cond(use_ssl, "ssl", "tcp"), resource.GetHost().GetVal(), resource.Port())
 		}
 	}
 	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "timeout")) != nil {
@@ -147,7 +148,7 @@ func PhpStreamUrlWrapHttpEx(
 		errstr = nil
 	}
 	zend.Efree(transport_string)
-	if stream != nil && use_proxy != 0 && use_ssl != 0 {
+	if stream != nil && use_proxy != 0 && use_ssl {
 		var header zend.SmartStr = zend.MakeSmartStr(0)
 
 		/* Set peer_name or name verification will try to use the proxy server name */
@@ -160,7 +161,7 @@ func PhpStreamUrlWrapHttpEx(
 		header.WriteString("CONNECT ")
 		header.WriteString(b.CastStrAuto(resource.GetHost().GetVal()))
 		header.WriteByte(':')
-		header.WriteUlong(resource.GetPort())
+		header.WriteUlong(resource.Port())
 		header.WriteString(" HTTP/1.0\r\n")
 
 		/* check if we have Proxy-Authorization header */
@@ -326,32 +327,22 @@ func PhpStreamUrlWrapHttpEx(
 		request_fulluri = operators.IZendIsTrue(tmpzval)
 	}
 	if request_fulluri != 0 {
-
 		/* Ask for everything */
-
 		req_buf.WriteString(b.CastStrAuto(path))
-
-		/* Ask for everything */
-
 	} else {
 
 		/* Send the traditional /path/to/file?query_string */
-
-		if resource.GetPath() != nil && resource.GetPath().GetLen() != 0 {
-			req_buf.WriteString(b.CastStrAuto(resource.GetPath().GetVal()))
+		if resource.Path() != "" {
+			req_buf.WriteString(resource.Path())
 		} else {
 			req_buf.WriteByte('/')
 		}
 
 		/* query string */
-
-		if resource.GetQuery() != nil {
+		if resource.HasQuery() {
 			req_buf.WriteByte('?')
-			req_buf.WriteString(b.CastStrAuto(resource.GetQuery().GetVal()))
+			req_buf.WriteString(resource.Query())
 		}
-
-		/* query string */
-
 	}
 
 	/* protocol version we are speaking */
@@ -438,7 +429,7 @@ func PhpStreamUrlWrapHttpEx(
 
 			/* remove Proxy-Authorization header */
 
-			if use_proxy != 0 && use_ssl != 0 && lang.Assign(&s, strstr(t, "proxy-authorization:")) && (s == t || (*(s - 1)) == '\n') {
+			if use_proxy != 0 && use_ssl && lang.Assign(&s, strstr(t, "proxy-authorization:")) && (s == t || (*(s - 1)) == '\n') {
 				var p *byte = s + b.SizeOf("\"proxy-authorization:\"") - 1
 				for s > t && ((*(s - 1)) == ' ' || (*(s - 1)) == '\t') {
 					s--
@@ -516,9 +507,9 @@ func PhpStreamUrlWrapHttpEx(
 	if (have_header & HTTP_HEADER_HOST) == 0 {
 		req_buf.WriteString("Host: ")
 		req_buf.WriteString(b.CastStrAuto(resource.GetHost().GetVal()))
-		if use_ssl != 0 && resource.GetPort() != 443 && resource.GetPort() != 0 || use_ssl == 0 && resource.GetPort() != 80 && resource.GetPort() != 0 {
+		if use_ssl && resource.Port() != 443 && resource.Port() != 0 || !use_ssl && resource.Port() != 80 && resource.Port() != 0 {
 			req_buf.WriteByte(':')
-			req_buf.WriteUlong(resource.GetPort())
+			req_buf.WriteUlong(resource.Port())
 		}
 		req_buf.WriteString("\r\n")
 	}
@@ -823,10 +814,10 @@ func PhpStreamUrlWrapHttpEx(
 				} else {
 					strlcpy(loc_path, location, b.SizeOf("loc_path"))
 				}
-				if use_ssl != 0 && resource.GetPort() != 443 || use_ssl == 0 && resource.GetPort() != 80 {
-					core.Snprintf(new_path, b.SizeOf("new_path")-1, "%s://%s:%d%s", resource.GetScheme().GetVal(), resource.GetHost().GetVal(), resource.GetPort(), loc_path)
+				if use_ssl && resource.Port() != 443 || !use_ssl && resource.Port() != 80 {
+					core.Snprintf(new_path, b.SizeOf("new_path")-1, fmt.Sprintf("%s://%s:%d%s", resource.Scheme(), resource.Host(), resource.Port(), loc_path))
 				} else {
-					core.Snprintf(new_path, b.SizeOf("new_path")-1, "%s://%s%s", resource.GetScheme().GetVal(), resource.GetHost().GetVal(), loc_path)
+					core.Snprintf(new_path, b.SizeOf("new_path")-1, fmt.Sprintf("%s://%s%s", resource.Scheme(), resource.Host(), loc_path))
 				}
 			} else {
 				strlcpy(new_path, location, b.SizeOf("new_path"))

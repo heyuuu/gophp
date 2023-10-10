@@ -20,28 +20,30 @@ var DefZifHtmlspecialchars = def.DefFunc("htmlspecialchars", 1, 4, []def.ArgInfo
 })
 
 // generate by ZifHtmlspecialcharsDecode
-var DefZifHtmlspecialcharsDecode = def.DefFunc("htmlspecialchars_decode", 1, 2, []def.ArgInfo{{Name: "string"}, {Name: "quote_style"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifHtmlspecialcharsDecode = def.DefFunc("htmlspecialchars_decode", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "quote_style"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	string := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	quote_style := fp.ParseZval()
+	quote_style_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifHtmlspecialcharsDecode(string, nil, quote_style)
+	ret := ZifHtmlspecialcharsDecode(str, nil, quote_style_)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifHtmlEntityDecode
-var DefZifHtmlEntityDecode = def.DefFunc("html_entity_decode", 1, 3, []def.ArgInfo{{Name: "string"}, {Name: "quote_style"}, {Name: "encoding"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifHtmlEntityDecode = def.DefFunc("html_entity_decode", 1, 3, []def.ArgInfo{{Name: "str"}, {Name: "quote_style"}, {Name: "encoding"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
-	string := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	quote_style := fp.ParseZval()
-	encoding := fp.ParseZval()
+	quote_style_ := fp.ParseLongNullable()
+	encoding := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifHtmlEntityDecode(string, nil, quote_style, encoding)
+	ret := ZifHtmlEntityDecode(str, nil, quote_style_, encoding)
+	returnValue.SetString(ret)
 })
 
 // generate by ZifHtmlentities
