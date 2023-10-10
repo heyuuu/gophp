@@ -167,9 +167,9 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 		/* TODO: these need correct docrefs */
 
 		if factory == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "unable to locate filter \"%s\"", filtername)
+			core.PhpErrorDocref("", faults.E_WARNING, "unable to locate filter \"%s\"", filtername)
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "unable to create or locate filter \"%s\"", filtername)
+			core.PhpErrorDocref("", faults.E_WARNING, "unable to create or locate filter \"%s\"", filtername)
 		}
 
 		/* TODO: these need correct docrefs */
@@ -253,7 +253,7 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 				PhpStreamBucketUnlink(bucket)
 				PhpStreamBucketDelref(bucket)
 			}
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Filter failed to process pre-buffered data")
+			core.PhpErrorDocref("", faults.E_WARNING, "Filter failed to process pre-buffered data")
 			return types.FAILURE
 		case PSFS_FEED_ME:
 

@@ -54,7 +54,7 @@ func ZifParseStr(encodedString string, _ zpp.Opt, result zpp.RefZval) {
 		if zend.ZendForbidDynamicCall("parse_str() with a single argument") == types.FAILURE {
 			return
 		}
-		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
+		core.PhpErrorDocref("", faults.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
 		var tmp types.Zval
 		var symbol_table *types.Array
 		symbol_table = zend.ZendRebuildSymbolTable()

@@ -16,14 +16,14 @@ func ERR_REPORT(out_err **types.String, fmt string, arg []byte) {
 	if out_err != nil {
 		*out_err = zend.ZendSprintfZStr(fmt, arg)
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, fmt, arg)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt, arg)
 	}
 }
 func ERR_RETURN(out_err **types.String, local_err *types.String, fmt string) {
 	if out_err != nil {
 		*out_err = local_err
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, fmt, lang.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt, lang.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
 		if local_err != nil {
 			// types.ZendStringReleaseEx(local_err, 0)
 			local_err = nil
@@ -106,7 +106,7 @@ func _phpStreamXportCreate(
 
 		/* should never happen */
 
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Could not find a factory !?")
+		core.PhpErrorDocref("", faults.E_WARNING, "Could not find a factory !?")
 		return nil
 	}
 	stream = factory(protocol, n, (*byte)(name), namelen, persistent_id, options, flags, timeout, context)
@@ -406,7 +406,7 @@ func PhpStreamXportSendto(
 	var oob int
 	oob = (flags & STREAM_OOB) == STREAM_OOB
 	if (oob != 0 || addr) && stream.GetWritefilters().GetHead() != nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "cannot write OOB data, or data to a targeted address on a filtered stream")
+		core.PhpErrorDocref("", faults.E_WARNING, "cannot write OOB data, or data to a targeted address on a filtered stream")
 		return -1
 	}
 	memset(&param, 0, b.SizeOf("param"))

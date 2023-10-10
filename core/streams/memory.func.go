@@ -219,7 +219,7 @@ func PhpStreamTempWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		if memsize+count >= ts.GetSmax() {
 			var file *core.PhpStream = PhpStreamFopenTemporaryFile(ts.GetTmpdir(), "php", nil)
 			if file == nil {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to create temporary file, Check permissions in temporary files directory.")
+				core.PhpErrorDocref("", faults.E_WARNING, "Unable to create temporary file, Check permissions in temporary files directory.")
 				return 0
 			}
 			core.PhpStreamWrite(file, membuf, memsize)
@@ -309,7 +309,7 @@ func PhpStreamTempCast(stream *core.PhpStream, castas int, ret *any) int {
 	}
 	file = _phpStreamFopenTmpfile(0)
 	if file == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to create temporary file.")
+		core.PhpErrorDocref("", faults.E_WARNING, "Unable to create temporary file.")
 		return types.FAILURE
 	}
 

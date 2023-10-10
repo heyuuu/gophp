@@ -106,7 +106,7 @@ func PhpCrypt(password string, salt string, quiet bool) *types.String {
 			if !(IS_VALID_SALT_CHARACTER(salt[0])) || !(IS_VALID_SALT_CHARACTER(salt[1])) {
 				if quiet == 0 {
 					/* error consistently about invalid DES fallbacks */
-					core.PhpErrorDocref(nil, faults.E_DEPRECATED, DES_INVALID_SALT_ERROR)
+					core.PhpErrorDocref("", faults.E_DEPRECATED, DES_INVALID_SALT_ERROR)
 				}
 			}
 			/* DES style hashes */
@@ -136,7 +136,7 @@ func ZifCrypt(str_ string, _ zpp.Opt, salt_ string) string {
 	if salt_ != "" {
 		realSalt = salt_ + strings.Repeat("$", PHP_MAX_SALT_LEN-len(salt_))
 	} else {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "No salt parameter was specified. You must use a randomly generated salt and a strong hash function to produce a secure hash.")
+		core.PhpErrorDocref("", faults.E_NOTICE, "No salt parameter was specified. You must use a randomly generated salt and a strong hash function to produce a secure hash.")
 	}
 
 	/* The automatic salt generation covers standard DES, md5-crypt and Blowfish (simple) */

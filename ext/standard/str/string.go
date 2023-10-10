@@ -248,13 +248,13 @@ func ZifBin2hex(data string) string {
 }
 func ZifHex2bin(data string) (string, bool) {
 	if len(data)%2 != 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Hexadecimal input string must have an even length")
+		core.PhpErrorDocref("", faults.E_WARNING, "Hexadecimal input string must have an even length")
 		return "", false
 	}
 
 	bin, err := hex.DecodeString(data)
 	if err != nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Input string must be hexadecimal string")
+		core.PhpErrorDocref("", faults.E_WARNING, "Input string must be hexadecimal string")
 		return "", false
 	}
 	return string(bin), true
@@ -307,20 +307,20 @@ func PhpCharmaskEx(input string) (string, bool) {
 			/* Error, try to be as helpful as possible:
 			   (a range ending/starting with '.' won't be captured here) */
 			if pos == 0 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, no character to the left of '..'")
+				core.PhpErrorDocref("", faults.E_WARNING, "Invalid '..'-range, no character to the left of '..'")
 				return "", false
 			}
 			if pos+2 >= len(input)-1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, no character to the right of '..'")
+				core.PhpErrorDocref("", faults.E_WARNING, "Invalid '..'-range, no character to the right of '..'")
 				return "", false
 			}
 			if input[pos-1] > input[pos+2] {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, '..'-range needs to be incrementing")
+				core.PhpErrorDocref("", faults.E_WARNING, "Invalid '..'-range, '..'-range needs to be incrementing")
 				return "", false
 			}
 
 			/* FIXME: better error (a..b..c is the only left possibility?) */
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range")
+			core.PhpErrorDocref("", faults.E_WARNING, "Invalid '..'-range")
 			return "", false
 		}
 
@@ -369,11 +369,11 @@ func ZifWordwrap(str string, _ zpp.Opt, width *int, break_ *string, cut bool) (s
 		return "", true
 	}
 	if breakchar == "" {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Break string cannot be empty")
+		core.PhpErrorDocref("", faults.E_WARNING, "Break string cannot be empty")
 		return "", false
 	}
 	if linelength == 0 && cut {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Can't force cut when width is zero")
+		core.PhpErrorDocref("", faults.E_WARNING, "Can't force cut when width is zero")
 		return "", false
 	}
 
@@ -457,7 +457,7 @@ func ZifExplode(separator string, str string, _ zpp.Opt, limit_ *int) ([]string,
 	}
 
 	if len(separator) == 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty delimiter")
+		core.PhpErrorDocref("", faults.E_WARNING, "Empty delimiter")
 		return nil, false
 	}
 
@@ -493,7 +493,7 @@ func ZifImplode(glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
 	// - implode(array $array, string $separator)
 	if arg2 == nil {
 		if !arg1.IsArray() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Argument must be an array")
+			core.PhpErrorDocref("", faults.E_WARNING, "Argument must be an array")
 			return ""
 		}
 		glue = ""
@@ -502,12 +502,12 @@ func ZifImplode(glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
 		if arg1.IsType(types.IsArray) {
 			glue = operators.ZvalGetStrVal(arg2)
 			pieces = arg1.Array()
-			core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
+			core.PhpErrorDocref("", faults.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
 		} else if arg2.IsType(types.IsArray) {
 			glue = operators.ZvalGetStrVal(arg1)
 			pieces = arg2.Array()
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid arguments passed")
+			core.PhpErrorDocref("", faults.E_WARNING, "Invalid arguments passed")
 			return ""
 		}
 	}
@@ -600,7 +600,7 @@ func ZifDirname(path string, _ zpp.Opt, levels_ *int) string {
 		/* Default case */
 		return zend.ZendDirname(path)
 	} else if levels < 1 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid argument, levels must be >= 1")
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid argument, levels must be >= 1")
 		return ""
 	} else {
 		/* Some levels up */
@@ -689,7 +689,7 @@ func PhpNeedleChar(needle *types.Zval) (byte, bool) {
 	case types.IsDouble, types.IsObject:
 		return byte(operators.ZvalGetLong(needle)), true
 	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "needle is not a string or an integer")
+		core.PhpErrorDocref("", faults.E_WARNING, "needle is not a string or an integer")
 		return 0, false
 	}
 }
@@ -699,7 +699,7 @@ func ZifStristr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (stri
 		return "", false
 	}
 	if needleStr == "" {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
+		core.PhpErrorDocref("", faults.E_WARNING, "Empty needle")
 		return "", false
 	}
 
@@ -723,7 +723,7 @@ func ZifStrstr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (strin
 		return "", false
 	}
 	if needleStr == "" {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
+		core.PhpErrorDocref("", faults.E_WARNING, "Empty needle")
 		return "", false
 	}
 
@@ -743,7 +743,7 @@ func posSubstr(str string, offset int) (string, bool) {
 		offset += len(str)
 	}
 	if offset < 0 || offset > len(str) {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Offset not contained in string")
+		core.PhpErrorDocref("", faults.E_WARNING, "Offset not contained in string")
 		return "", false
 	}
 	if offset == 0 {
@@ -764,7 +764,7 @@ func parseNeedle(needle *types.Zval) (string, bool) {
 			return "", false
 		}
 
-		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+		core.PhpErrorDocref("", faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
 
 		return string([]byte{needleChar}), true
 	}
@@ -835,7 +835,7 @@ func ZifStrrpos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int
 	} else { // offset < 0
 		offset += len(haystack)
 		if offset < 0 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
+			core.PhpErrorDocref("", faults.E_WARNING, "Offset is greater than the length of haystack string")
 			return 0, false
 		}
 
@@ -874,7 +874,7 @@ func ZifStrripos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (in
 	} else { // offset < 0
 		offset += len(haystack)
 		if offset < 0 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
+			core.PhpErrorDocref("", faults.E_WARNING, "Offset is greater than the length of haystack string")
 			return 0, false
 		}
 
@@ -905,7 +905,7 @@ func ZifChunkSplit(str string, _ zpp.Opt, chunklen_ *int, ending_ *string) (stri
 	ending := b.Option(ending_, "\r\n")
 
 	if chunklen <= 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Chunk length should be greater than zero")
+		core.PhpErrorDocref("", faults.E_WARNING, "Chunk length should be greater than zero")
 		return "", false
 	}
 
@@ -970,16 +970,16 @@ func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length
 	// 其他情况都会触发 warning 并返回原字符串
 	if start.IsArray() {
 		if length == nil || !length.IsArray() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should be of same type - numerical or array ")
+			core.PhpErrorDocref("", faults.E_WARNING, "'start' and 'length' should be of same type - numerical or array ")
 		} else if length.IsArray() && start.Array().Len() != length.Array().Len() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should have the same number of elements")
+			core.PhpErrorDocref("", faults.E_WARNING, "'start' and 'length' should have the same number of elements")
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Functionality of 'start' and 'length' as arrays is not implemented")
+			core.PhpErrorDocref("", faults.E_WARNING, "Functionality of 'start' and 'length' as arrays is not implemented")
 		}
 		return str
 	}
 	if length != nil && length.IsArray() {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should be of same type - numerical or array ")
+		core.PhpErrorDocref("", faults.E_WARNING, "'start' and 'length' should be of same type - numerical or array ")
 		return str
 	}
 
@@ -1341,7 +1341,7 @@ func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, boo
 	// - strtr(string, array)
 	// - strtr(string, string, string)
 	if to_ != nil && !from.IsArray() {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The second argument is not an array")
+		core.PhpErrorDocref("", faults.E_WARNING, "The second argument is not an array")
 		return "", false
 	}
 
@@ -2046,7 +2046,7 @@ func ZifStripTags(str string, _ zpp.Opt, allowableTags *types.Zval) string {
 
 func ZifStrRepeat(input string, mult int) (string, bool) {
 	if mult < 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Second argument has to be greater than or equal to 0")
+		core.PhpErrorDocref("", faults.E_WARNING, "Second argument has to be greater than or equal to 0")
 		return "", false
 	}
 	/* Don't waste our time if it's empty */
@@ -2058,7 +2058,7 @@ func ZifStrRepeat(input string, mult int) (string, bool) {
 }
 func ZifCountChars(input string, _ zpp.Opt, mode int) (*types.Zval, bool) {
 	if mode < 0 || mode > 4 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown mode")
+		core.PhpErrorDocref("", faults.E_WARNING, "Unknown mode")
 		return nil, false
 	}
 
@@ -2097,7 +2097,7 @@ func ZifStrnatcasecmp(s1 string, s2 string) int {
 func ZifSubstrCount(haystack string, needle string, _ zpp.Opt, offset int, length_ *int) (int, bool) {
 	// check needle
 	if needle == "" {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty substring")
+		core.PhpErrorDocref("", faults.E_WARNING, "Empty substring")
 		return 0, false
 	}
 
@@ -2106,7 +2106,7 @@ func ZifSubstrCount(haystack string, needle string, _ zpp.Opt, offset int, lengt
 		offset += len(haystack)
 	}
 	if offset < 0 || offset > len(haystack) {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Offset not contained in string")
+		core.PhpErrorDocref("", faults.E_WARNING, "Offset not contained in string")
 		return 0, false
 	}
 
@@ -2118,7 +2118,7 @@ func ZifSubstrCount(haystack string, needle string, _ zpp.Opt, offset int, lengt
 			length += len(haystack) - offset
 		}
 		if length < 0 || length > len(haystack)-offset {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid length value")
+			core.PhpErrorDocref("", faults.E_WARNING, "Invalid length value")
 			return 0, false
 		}
 	}
@@ -2139,16 +2139,16 @@ func ZifStrPad(input string, padLength int, _ zpp.Opt, padString_ *string, padTy
 		return input, true
 	}
 	if padString == "" {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding string cannot be empty")
+		core.PhpErrorDocref("", faults.E_WARNING, "Padding string cannot be empty")
 		return "", false
 	}
 	if padType < STR_PAD_LEFT || padType > STR_PAD_BOTH {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH")
+		core.PhpErrorDocref("", faults.E_WARNING, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH")
 		return "", false
 	}
 	numPadChars := padLength - len(input)
 	if numPadChars >= core.INT_MAX {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding length is too long")
+		core.PhpErrorDocref("", faults.E_WARNING, "Padding length is too long")
 		return "", false
 	}
 
@@ -2254,7 +2254,7 @@ func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*type
 		}
 		return types.NewZvalArray(arr), true
 	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, format)
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, format)
 		return nil, false
 	}
 }
@@ -2262,7 +2262,7 @@ func ZifStrSplit(str string, _ zpp.Opt, splitLength_ *int) ([]string, bool) {
 	var splitLength zend.ZendLong = b.Option(splitLength_, 1)
 
 	if splitLength <= 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The length of each segment must be greater than zero")
+		core.PhpErrorDocref("", faults.E_WARNING, "The length of each segment must be greater than zero")
 		return nil, false
 	}
 
@@ -2283,7 +2283,7 @@ func ZifStrSplit(str string, _ zpp.Opt, splitLength_ *int) ([]string, bool) {
 }
 func ZifStrpbrk(haystack string, charList string) (string, bool) {
 	if charList == "" {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The character list cannot be empty")
+		core.PhpErrorDocref("", faults.E_WARNING, "The character list cannot be empty")
 		return "", false
 	}
 	if pos := strings.IndexAny(haystack, charList); pos >= 0 {
@@ -2298,7 +2298,7 @@ func ZifSubstrCompare(return_value zpp.Ret, haystack string, needle string, offs
 			return_value.SetLong(0)
 			return 0, true
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "The length must be greater than or equal to zero")
+			core.PhpErrorDocref("", faults.E_WARNING, "The length must be greater than or equal to zero")
 			return 0, false
 		}
 	}
@@ -2311,7 +2311,7 @@ func ZifSubstrCompare(return_value zpp.Ret, haystack string, needle string, offs
 		}
 	}
 	if offset > len(haystack) {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The start position cannot exceed initial string length")
+		core.PhpErrorDocref("", faults.E_WARNING, "The start position cannot exceed initial string length")
 		return_value.SetFalse()
 		return 0, false
 	}

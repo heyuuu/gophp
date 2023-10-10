@@ -405,7 +405,7 @@ det_charset:
 		/* look for the codeset */
 		charset, found = GetCharset(b.CastStr(charset_hint, len_))
 		if !found {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "charset `%s' not supported, assuming utf-8", charset_hint)
+			core.PhpErrorDocref("", faults.E_WARNING, "charset `%s' not supported, assuming utf-8", charset_hint)
 		}
 	}
 	return charset
@@ -1097,7 +1097,7 @@ func PhpEscapeHtmlEntitiesEx(
 	var replacement_len int = 0
 	if all != 0 {
 		if CHARSET_PARTIAL_SUPPORT(charset) {
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "Only basic entities "+"substitution is supported for multi-byte encodings other than UTF-8; "+"functionality is equivalent to htmlspecialchars")
+			core.PhpErrorDocref("", faults.E_NOTICE, "Only basic entities "+"substitution is supported for multi-byte encodings other than UTF-8; "+"functionality is equivalent to htmlspecialchars")
 		}
 		LIMIT_ALL(all, doctype, charset)
 	}

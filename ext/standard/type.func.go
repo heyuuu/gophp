@@ -46,9 +46,9 @@ func ZifSettype(var_ zpp.RefZval, typ string) bool {
 			// zend.ZvalPtrDtor(&tmp)
 		}
 		if typ == "resource" {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot convert to resource type")
+			core.PhpErrorDocref("", faults.E_WARNING, "Cannot convert to resource type")
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid type")
+			core.PhpErrorDocref("", faults.E_WARNING, "Invalid type")
 		}
 		return false
 	}

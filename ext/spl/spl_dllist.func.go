@@ -253,7 +253,7 @@ func SplDllistObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_
 		inherited = 1
 	}
 	if parent == nil {
-		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplDoublyLinkedList")
+		core.PhpErrorDocref("", faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplDoublyLinkedList")
 	}
 	if inherited != 0 {
 		intern.SetFptrOffsetGet(class_type.FunctionTable().Get("offsetget"))

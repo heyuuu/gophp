@@ -247,7 +247,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 		gotSequential = 1
 		if gotXpg != 0 {
 		mixedXPG:
-			core.PhpErrorDocref(nil, faults.E_WARNING, "%s", "cannot mix \"%\" and \"%n$\" conversion specifiers")
+			core.PhpErrorDocref("", faults.E_WARNING, "%s", "cannot mix \"%\" and \"%n$\" conversion specifiers")
 			goto error
 		}
 	xpgCheckDone:
@@ -338,7 +338,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 				ch = format - 1
 			}
 		default:
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Bad scan conversion character \"%c\"", *ch)
+			core.PhpErrorDocref("", faults.E_WARNING, "Bad scan conversion character \"%c\"", *ch)
 			goto error
 		}
 		if (flags & SCAN_SUPPRESS) == 0 {
@@ -389,7 +389,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 	}
 	for i = 0; i < numVars; i++ {
 		if nassign[i] > 1 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "%s", "Variable is assigned by multiple \"%n$\" conversion specifiers")
+			core.PhpErrorDocref("", faults.E_WARNING, "%s", "Variable is assigned by multiple \"%n$\" conversion specifiers")
 			goto error
 		} else if xpgSize == 0 && nassign[i] == 0 {
 
@@ -398,7 +398,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 			 * used, and/or numVars != 0), then too many vars were given
 			 */
 
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Variable is not assigned by any conversion specifiers")
+			core.PhpErrorDocref("", faults.E_WARNING, "Variable is not assigned by any conversion specifiers")
 			goto error
 		}
 	}
@@ -408,9 +408,9 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 	return SCAN_SUCCESS
 badIndex:
 	if gotXpg != 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", "\"%n$\" argument index out of range")
+		core.PhpErrorDocref("", faults.E_WARNING, "%s", "\"%n$\" argument index out of range")
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Different numbers of variable names and field specifiers")
+		core.PhpErrorDocref("", faults.E_WARNING, "Different numbers of variable names and field specifiers")
 	}
 error:
 	if nassign != staticAssign {
@@ -477,7 +477,7 @@ func PhpSscanfInternal(
 	if numVars != 0 {
 		for i = varStart; i < argCount; i++ {
 			if !(args[i].IsReference()) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter %d must be passed by reference", i)
+				core.PhpErrorDocref("", faults.E_WARNING, "Parameter %d must be passed by reference", i)
 				ScanSetErrorReturn(numVars, return_value)
 				return SCAN_ERROR_VAR_PASSED_BYVAL
 			}

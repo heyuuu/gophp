@@ -116,7 +116,7 @@ func PhpOpenTemporaryFdEx(dir *byte, pfx *byte, opened_path_p **types.String, fl
 		/* Use default temporary directory. */
 
 		if (flags & PHP_TMP_FILE_SILENT) == 0 {
-			PhpErrorDocref(nil, faults.E_NOTICE, "file created in the system's temporary directory")
+			PhpErrorDocref("", faults.E_NOTICE, "file created in the system's temporary directory")
 		}
 		goto def_tmp
 	}

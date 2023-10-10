@@ -67,7 +67,7 @@ retry:
 			}
 		}
 		estr = core.PhpSocketStrerror(err, nil, 0)
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "send of "+zend.ZEND_LONG_FMT+" bytes failed with errno=%d %s", zend.ZendLong(count), err, estr)
+		core.PhpErrorDocref("", faults.E_NOTICE, "send of "+zend.ZEND_LONG_FMT+" bytes failed with errno=%d %s", zend.ZendLong(count), err, estr)
 		zend.Efree(estr)
 	}
 	if didwrite > 0 {
@@ -293,7 +293,7 @@ func PhpSockopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 			xparam.SetReturncode(SockSendto(sock, xparam.GetBuf(), xparam.GetBuflen(), flags, xparam.GetInputsAddr(), xparam.GetInputsAddrlen()))
 			if xparam.GetReturncode() == -1 {
 				var err *byte = core.PhpSocketStrerror(core.PhpSocketErrno(), nil, 0)
-				core.PhpErrorDocref(nil, faults.E_WARNING, "%s\n", err)
+				core.PhpErrorDocref("", faults.E_WARNING, "%s\n", err)
 				zend.Efree(err)
 			}
 			return core.PHP_STREAM_OPTION_RETURN_OK

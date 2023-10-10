@@ -140,7 +140,7 @@ func SplFilesystemObjectGetFileName(intern *SplFilesystemObject) {
 		fallthrough
 	case SPL_FS_FILE:
 		if intern.GetFileName() == nil {
-			core.PhpErrorDocref(nil, faults.E_ERROR, "Object not initialized")
+			core.PhpErrorDocref("", faults.E_ERROR, "Object not initialized")
 		}
 	case SPL_FS_DIR:
 		var path_len int = 0
@@ -594,7 +594,7 @@ func SplFilesystemObjectConstruct(executeData *zend.ZendExecuteData, return_valu
 		/* object is already initialized */
 
 		zend.ZendRestoreErrorHandling(&error_handling)
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Directory object is already initialized")
+		core.PhpErrorDocref("", faults.E_WARNING, "Directory object is already initialized")
 		return
 	}
 	intern.SetFlags(flags)
@@ -1066,13 +1066,13 @@ func zim_spl_SplFileInfo_getLinkTarget(executeData *zend.ZendExecuteData, return
 		SplFilesystemObjectGetFileName(intern)
 	}
 	if intern.GetFileName() == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty filename")
+		core.PhpErrorDocref("", faults.E_WARNING, "Empty filename")
 		return_value.SetFalse()
 		return
 	} else if !(zend.IS_ABSOLUTE_PATH(intern.GetFileName(), intern.GetFileNameLen())) {
 		var expanded_path []byte
 		if core.ExpandFilepathWithMode(intern.GetFileName(), expanded_path, nil, 0, zend.CWD_EXPAND) == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "No such file or directory")
+			core.PhpErrorDocref("", faults.E_WARNING, "No such file or directory")
 			return_value.SetFalse()
 			return
 		}
@@ -1305,7 +1305,7 @@ func zim_spl_GlobIterator_count(executeData *zend.ZendExecuteData, return_value 
 
 		/* should not happen */
 
-		core.PhpErrorDocref(nil, faults.E_ERROR, "GlobIterator lost glob state")
+		core.PhpErrorDocref("", faults.E_ERROR, "GlobIterator lost glob state")
 
 		/* should not happen */
 
@@ -1899,7 +1899,7 @@ func zim_spl_SplFileObject_fgetcsv(executeData *zend.ZendExecuteData, return_val
 		switch executeData.NumArgs() {
 		case 3:
 			if esc_len > 1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "escape must be empty or a single character")
+				core.PhpErrorDocref("", faults.E_WARNING, "escape must be empty or a single character")
 				return_value.SetFalse()
 				return
 			}
@@ -1911,7 +1911,7 @@ func zim_spl_SplFileObject_fgetcsv(executeData *zend.ZendExecuteData, return_val
 			fallthrough
 		case 2:
 			if e_len != 1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "enclosure must be a character")
+				core.PhpErrorDocref("", faults.E_WARNING, "enclosure must be a character")
 				return_value.SetFalse()
 				return
 			}
@@ -1919,7 +1919,7 @@ func zim_spl_SplFileObject_fgetcsv(executeData *zend.ZendExecuteData, return_val
 			fallthrough
 		case 1:
 			if d_len != 1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "delimiter must be a character")
+				core.PhpErrorDocref("", faults.E_WARNING, "delimiter must be a character")
 				return_value.SetFalse()
 				return
 			}
@@ -1953,14 +1953,14 @@ func zim_spl_SplFileObject_fputcsv(executeData *zend.ZendExecuteData, return_val
 			case 1:
 				escape = uint8(esc[0])
 			default:
-				core.PhpErrorDocref(nil, faults.E_WARNING, "escape must be empty or a single character")
+				core.PhpErrorDocref("", faults.E_WARNING, "escape must be empty or a single character")
 				return_value.SetFalse()
 				return
 			}
 			fallthrough
 		case 3:
 			if e_len != 1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "enclosure must be a character")
+				core.PhpErrorDocref("", faults.E_WARNING, "enclosure must be a character")
 				return_value.SetFalse()
 				return
 			}
@@ -1968,7 +1968,7 @@ func zim_spl_SplFileObject_fputcsv(executeData *zend.ZendExecuteData, return_val
 			fallthrough
 		case 2:
 			if d_len != 1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "delimiter must be a character")
+				core.PhpErrorDocref("", faults.E_WARNING, "delimiter must be a character")
 				return_value.SetFalse()
 				return
 			}
@@ -2008,14 +2008,14 @@ func zim_spl_SplFileObject_setCsvControl(executeData *zend.ZendExecuteData, retu
 			case 1:
 				escape = uint8(esc[0])
 			default:
-				core.PhpErrorDocref(nil, faults.E_WARNING, "escape must be empty or a single character")
+				core.PhpErrorDocref("", faults.E_WARNING, "escape must be empty or a single character")
 				return_value.SetFalse()
 				return
 			}
 			fallthrough
 		case 2:
 			if e_len != 1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "enclosure must be a character")
+				core.PhpErrorDocref("", faults.E_WARNING, "enclosure must be a character")
 				return_value.SetFalse()
 				return
 			}
@@ -2023,7 +2023,7 @@ func zim_spl_SplFileObject_setCsvControl(executeData *zend.ZendExecuteData, retu
 			fallthrough
 		case 1:
 			if d_len != 1 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "delimiter must be a character")
+				core.PhpErrorDocref("", faults.E_WARNING, "delimiter must be a character")
 				return_value.SetFalse()
 				return
 			}
@@ -2226,7 +2226,7 @@ func zim_spl_SplFileObject_fread(executeData *zend.ZendExecuteData, return_value
 		return "", false
 	}
 	if length <= 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter must be greater than 0")
+		core.PhpErrorDocref("", faults.E_WARNING, "Length parameter must be greater than 0")
 		return_value.SetFalse()
 		return "", false
 	}

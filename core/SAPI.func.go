@@ -49,7 +49,7 @@ func SapiRunHeaderCallback(callback *types.Zval) {
 		}
 	} else {
 	callback_failed:
-		PhpErrorDocref(nil, faults.E_WARNING, "Could not call the sapi_header_callback")
+		PhpErrorDocref("", faults.E_WARNING, "Could not call the sapi_header_callback")
 	}
 	if callback_error != nil {
 		zend.Efree(callback_error)
@@ -150,7 +150,7 @@ func SapiReadPostBlock(buffer *byte, buflen int) int {
 }
 func SapiReadStandardFormData() {
 	if SG__().postMaxSize > 0 && SG__().RequestInfo.ContentLength() > SG__().postMaxSize {
-		PhpErrorDocref(nil, faults.E_WARNING, "POST Content-Length of %d bytes exceeds the limit of %d bytes", SG__().RequestInfo.ContentLength(), SG__().postMaxSize)
+		PhpErrorDocref("", faults.E_WARNING, "POST Content-Length of %d bytes exceeds the limit of %d bytes", SG__().RequestInfo.ContentLength(), SG__().postMaxSize)
 		return
 	}
 	SG__().RequestInfo.requestBody = PhpStreamTempCreateEx(TEMP_STREAM_DEFAULT, SAPI_POST_BLOCK_SIZE, PG__().upload_tmp_dir)
@@ -165,12 +165,12 @@ func SapiReadStandardFormData() {
 					/* if parts of the stream can't be written, purge it completely */
 
 					PhpStreamTruncateSetSize(SG__().RequestInfo.requestBody, 0)
-					PhpErrorDocref(nil, faults.E_WARNING, "POST data can't be buffered; all data discarded")
+					PhpErrorDocref("", faults.E_WARNING, "POST data can't be buffered; all data discarded")
 					break
 				}
 			}
 			if SG__().postMaxSize > 0 && SG__().readPostBytes > SG__().postMaxSize {
-				PhpErrorDocref(nil, faults.E_WARNING, "Actual POST length does not match Content-Length, and exceeds "+zend.ZEND_LONG_FMT+" bytes", SG__().postMaxSize)
+				PhpErrorDocref("", faults.E_WARNING, "Actual POST length does not match Content-Length, and exceeds "+zend.ZEND_LONG_FMT+" bytes", SG__().postMaxSize)
 				break
 			}
 			if read_bytes < SAPI_POST_BLOCK_SIZE {

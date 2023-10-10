@@ -42,18 +42,18 @@ func PhpPasswordSaltTo64(str string, outLen int) (string, bool) {
 }
 func PhpPasswordMakeSalt(length int) *types.String {
 	if length > core.INT_MAX/3 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Length is too large to safely generate")
+		core.PhpErrorDocref("", faults.E_WARNING, "Length is too large to safely generate")
 		return nil
 	}
 	buffer, ok := PhpRandomStringSafe(length*3/4 + 1)
 	if !ok {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to generate salt")
+		core.PhpErrorDocref("", faults.E_WARNING, "Unable to generate salt")
 		return nil
 	}
 
 	salt, ok := PhpPasswordSaltTo64(buffer, length)
 	if !ok {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Generated salt too short")
+		core.PhpErrorDocref("", faults.E_WARNING, "Generated salt too short")
 		return nil
 	}
 	return types.NewString(salt)
@@ -68,7 +68,7 @@ func PhpPasswordGetSalt(required_salt_len int, options *types.Array) *types.Stri
 	}
 
 	var buffer *types.String
-	core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
+	core.PhpErrorDocref("", faults.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
 	switch optionBuffer.Type() {
 	case types.IsString:
 		buffer = optionBuffer.StringEx().Copy()
@@ -92,7 +92,7 @@ func PhpPasswordGetSalt(required_salt_len int, options *types.Array) *types.Stri
 	case types.IsArray:
 		fallthrough
 	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Non-string salt parameter supplied")
+		core.PhpErrorDocref("", faults.E_WARNING, "Non-string salt parameter supplied")
 		return nil
 	}
 
@@ -101,17 +101,17 @@ func PhpPasswordGetSalt(required_salt_len int, options *types.Array) *types.Stri
 	   the > INT_MAX check. */
 
 	if zend.ZEND_SIZE_T_INT_OVFL(buffer.GetLen()) {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Supplied salt is too long")
+		core.PhpErrorDocref("", faults.E_WARNING, "Supplied salt is too long")
 		return nil
 	}
 	if buffer.GetLen() < required_salt_len {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Provided salt is too short: %zd expecting %zd", buffer.GetLen(), required_salt_len)
+		core.PhpErrorDocref("", faults.E_WARNING, "Provided salt is too short: %zd expecting %zd", buffer.GetLen(), required_salt_len)
 		return nil
 	}
 	if !PhpPasswordSaltIsAlphabet(buffer.GetStr()) {
 		salt, ok := PhpPasswordSaltTo64(buffer.GetStr(), required_salt_len)
 		if !ok {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Provided salt is too short: %zd", buffer.GetLen())
+			core.PhpErrorDocref("", faults.E_WARNING, "Provided salt is too short: %zd", buffer.GetLen())
 			return nil
 		}
 		return types.NewString(salt)
@@ -173,7 +173,7 @@ func PhpPasswordBcryptHash(password string, options *types.Array) (string, bool)
 		cost = operators.ZvalGetLong(zcost)
 	}
 	if cost < 4 || cost > 31 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid bcrypt cost parameter specified: "+zend.ZEND_LONG_FMT, cost)
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid bcrypt cost parameter specified: "+zend.ZEND_LONG_FMT, cost)
 		return "", false
 	}
 	hashFormat := fmt.Sprintf("$2y$%02d$", cost)
@@ -311,7 +311,7 @@ func ZifPasswordHash(password string, algo_ *types.Zval, _ zpp.Opt, options zpp.
 	var algo = PhpPasswordAlgoFindZval(algo_)
 	if algo == nil {
 		var algoStr = operators.ZvalGetStrVal(algo_)
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown password hashing algorithm: %s", algoStr)
+		core.PhpErrorDocref("", faults.E_WARNING, "Unknown password hashing algorithm: %s", algoStr)
 		return types.NewZvalNull()
 	}
 	if digest, ok := algo.Hash(password, options); ok {

@@ -65,7 +65,7 @@ func ReferenceLevdist(
 	return c0
 }
 func CustomLevdist(str1 *byte, str2 *byte, callback_name *byte) int {
-	core.PhpErrorDocref(nil, faults.E_WARNING, "The general Levenshtein support is not there yet")
+	core.PhpErrorDocref("", faults.E_WARNING, "The general Levenshtein support is not there yet")
 
 	/* not there yet */
 
@@ -106,7 +106,7 @@ func ZifLevenshtein(executeData zpp.Ex, return_value zpp.Ret, str1 *types.Zval, 
 		return
 	}
 	if distance < 0 && executeData.NumArgs() != 3 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Argument string(s) too long")
+		core.PhpErrorDocref("", faults.E_WARNING, "Argument string(s) too long")
 	}
 	return_value.SetLong(distance)
 	return

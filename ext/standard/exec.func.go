@@ -27,7 +27,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 	var bufl int = 0
 	fp = zend.VCWD_POPEN(cmd, "r")
 	if fp == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to fork [%s]", cmd)
+		core.PhpErrorDocref("", faults.E_WARNING, "Unable to fork [%s]", cmd)
 		goto err
 	}
 	stream = streams.PhpStreamFopenFromPipe(fp, "rb")
@@ -152,12 +152,12 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 		break
 	}
 	if cmd_len == 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot execute a blank command")
+		core.PhpErrorDocref("", faults.E_WARNING, "Cannot execute a blank command")
 		return_value.SetFalse()
 		return
 	}
 	if strlen(cmd) != cmd_len {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "NULL byte detected. Possible attack")
+		core.PhpErrorDocref("", faults.E_WARNING, "NULL byte detected. Possible attack")
 		return_value.SetFalse()
 		return
 	}
@@ -191,7 +191,7 @@ func ZifPassthru(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, 
 func PhpEscapeShellCmd(str string) string {
 	/* max command line length - two single quotes - \0 byte length */
 	if len(str) > CmdMaxLen-2-1 {
-		core.PhpErrorDocref(nil, faults.E_ERROR, "Command exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref("", faults.E_ERROR, "Command exceeds the allowed length of %zu bytes", CmdMaxLen)
 		return ""
 	}
 
@@ -229,7 +229,7 @@ func PhpEscapeShellCmd(str string) string {
 		}
 	}
 	if buf.Len() > CmdMaxLen+1 {
-		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref("", faults.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
 		return ""
 	}
 	return buf.String()
@@ -237,7 +237,7 @@ func PhpEscapeShellCmd(str string) string {
 func PhpEscapeShellArg(str string) string {
 	/* max command line length - two single quotes - \0 byte length */
 	if len(str) > CmdMaxLen-2-1 {
-		core.PhpErrorDocref(nil, faults.E_ERROR, "Argument exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref("", faults.E_ERROR, "Argument exceeds the allowed length of %zu bytes", CmdMaxLen)
 		return ""
 	}
 
@@ -261,7 +261,7 @@ func PhpEscapeShellArg(str string) string {
 	}
 	buf.WriteByte('\'')
 	if buf.Len() > CmdMaxLen+1 {
-		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref("", faults.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
 		return ""
 	}
 	return buf.String()
@@ -271,14 +271,14 @@ func ZifEscapeshellcmd(command string) string {
 		return ""
 	}
 	if pos := strings.IndexByte(command, 0); pos >= 0 {
-		core.PhpErrorDocref(nil, faults.E_ERROR, "Input string contains NULL bytes")
+		core.PhpErrorDocref("", faults.E_ERROR, "Input string contains NULL bytes")
 	}
 
 	return PhpEscapeShellCmd(command)
 }
 func ZifEscapeshellarg(arg string) string {
 	if pos := strings.IndexByte(arg, 0); pos >= 0 {
-		core.PhpErrorDocref(nil, faults.E_ERROR, "Input string contains NULL bytes")
+		core.PhpErrorDocref("", faults.E_ERROR, "Input string contains NULL bytes")
 	}
 	return PhpEscapeShellArg(arg)
 }
@@ -300,17 +300,17 @@ func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types.Zval) {
 		break
 	}
 	if command_len == 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot execute a blank command")
+		core.PhpErrorDocref("", faults.E_WARNING, "Cannot execute a blank command")
 		return_value.SetFalse()
 		return
 	}
 	if strlen(command) != command_len {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "NULL byte detected. Possible attack")
+		core.PhpErrorDocref("", faults.E_WARNING, "NULL byte detected. Possible attack")
 		return_value.SetFalse()
 		return
 	}
 	if b.Assign(&in, zend.VCWD_POPEN(command, "r")) == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to execute '%s'", command)
+		core.PhpErrorDocref("", faults.E_WARNING, "Unable to execute '%s'", command)
 		return_value.SetFalse()
 		return
 	}

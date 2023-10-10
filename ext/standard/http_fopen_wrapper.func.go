@@ -524,7 +524,7 @@ func PhpStreamUrlWrapHttpEx(
 				ua[ua_len] = 0
 				req_buf.WriteString(b.CastStr(ua, ua_len))
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot construct User-agent header")
+				core.PhpErrorDocref("", faults.E_WARNING, "Cannot construct User-agent header")
 			}
 			zend.Efree(ua)
 		}
@@ -559,7 +559,7 @@ func PhpStreamUrlWrapHttpEx(
 		}
 		if (have_header & HTTP_HEADER_TYPE) == 0 {
 			req_buf.WriteString("Content-Type: application/x-www-form-urlencoded\r\n")
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "Content-type not specified assuming application/x-www-form-urlencoded")
+			core.PhpErrorDocref("", faults.E_NOTICE, "Content-type not specified assuming application/x-www-form-urlencoded")
 		}
 		req_buf.WriteString("\r\n")
 		req_buf.WriteString(tmpzval.StringEx().GetStr())

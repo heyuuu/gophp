@@ -141,7 +141,7 @@ func (se *VarSerializer) tryAddSleepProp(ht *types.Array, props *types.Array, na
 		}
 	}
 	if ht.KeyAdd(name.GetStr(), val) == nil {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" is returned from __sleep multiple times", errorName.GetVal())
+		core.PhpErrorDocref("", faults.E_NOTICE, "\"%s\" is returned from __sleep multiple times", errorName.GetVal())
 		return types.SUCCESS
 	}
 	return types.SUCCESS
@@ -171,7 +171,7 @@ func (se *VarSerializer) getSleepProps(ht *types.Array, struc *types.Zval, sleep
 		var prot_name *types.String
 		name_val = types.ZVAL_DEREF(name_val)
 		if !name_val.IsString() {
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
+			core.PhpErrorDocref("", faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
 		}
 		name = operators.ZvalGetString(name_val)
 		if se.tryAddSleepProp(ht, props, name, name, struc) == types.SUCCESS {
@@ -197,7 +197,7 @@ func (se *VarSerializer) getSleepProps(ht *types.Array, struc *types.Zval, sleep
 			retval = types.FAILURE
 			break
 		}
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
+		core.PhpErrorDocref("", faults.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
 		ht.KeyAdd(name.GetStr(), zend.UninitializedZval())
 	}
 	return retval
@@ -358,7 +358,7 @@ func (se *VarSerializer) callSleep(retval *types.Zval, struc *types.Zval) bool {
 		return false
 	}
 	if zend.HASH_OF(retval) == nil {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize")
+		core.PhpErrorDocref("", faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize")
 		return false
 	}
 	return true

@@ -192,7 +192,7 @@ func ZifConvertUudecode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zv
 		return
 	}
 	if lang.Assign(&dest, PhpUudecode(src.GetVal(), src.GetLen())) == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The given parameter is not a valid uuencoded string")
+		core.PhpErrorDocref("", faults.E_WARNING, "The given parameter is not a valid uuencoded string")
 		return_value.SetFalse()
 		return
 	}

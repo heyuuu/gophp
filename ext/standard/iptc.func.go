@@ -124,12 +124,12 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		return
 	}
 	if iptcdata_len >= SIZE_MAX-b.SizeOf("psheader")-1025 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "IPTC data too large")
+		core.PhpErrorDocref("", faults.E_WARNING, "IPTC data too large")
 		return_value.SetFalse()
 		return
 	}
 	if lang.Assign(&fp, zend.VCWD_FOPEN(jpeg_file, "rb")) == 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to open %s", jpeg_file)
+		core.PhpErrorDocref("", faults.E_WARNING, "Unable to open %s", jpeg_file)
 		return_value.SetFalse()
 		return
 	}

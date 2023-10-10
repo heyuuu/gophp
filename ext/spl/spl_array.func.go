@@ -111,7 +111,7 @@ func SplArrayObjectNewEx(classType *types.ClassEntry, orig *types.Zval, cloneOri
 		inherited = 1
 	}
 	if parent == nil {
-		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of ArrayObject or ArrayIterator")
+		core.PhpErrorDocref("", faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of ArrayObject or ArrayIterator")
 	}
 	if inherited != 0 {
 		intern.SetFptrOffsetGet(classType.FunctionTable().Get("offsetget"))

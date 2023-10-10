@@ -307,7 +307,7 @@ func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_or
 		inherited = 1
 	}
 	if parent == nil {
-		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplHeap")
+		core.PhpErrorDocref("", faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplHeap")
 	}
 	if inherited != 0 {
 		intern.SetFptrCmp(class_type.FunctionTable().Get("compare"))

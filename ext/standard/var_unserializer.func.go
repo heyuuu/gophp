@@ -268,7 +268,7 @@ func ParseIv2(p *uint8, q **uint8) zend.ZendLong {
 	/* number too long or overflow */
 
 	if p-start > zend.MAX_LENGTH_OF_LONG-1 || zend.SIZEOF_ZEND_LONG == 4 && p-start == zend.MAX_LENGTH_OF_LONG-1 && (*start) > '2' || result > zend.ZEND_LONG_MAX+neg {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Numerical result out of range")
+		core.PhpErrorDocref("", faults.E_WARNING, "Numerical result out of range")
 		if neg == 0 {
 			return zend.ZEND_LONG_MAX
 		} else {
@@ -303,7 +303,7 @@ func ProcessNestedData(
 ) int {
 	if var_hash != nil {
 		if var_hash.GetMaxDepth() > 0 && var_hash.GetCurDepth() >= var_hash.GetMaxDepth() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Maximum depth of "+zend.ZEND_LONG_FMT+" exceeded. "+"The depth limit can be changed using the max_depth unserialize() option "+"or the unserialize_max_depth ini setting", var_hash.GetMaxDepth())
+			core.PhpErrorDocref("", faults.E_WARNING, "Maximum depth of "+zend.ZEND_LONG_FMT+" exceeded. "+"The depth limit can be changed using the max_depth unserialize() option "+"or the unserialize_max_depth ini setting", var_hash.GetMaxDepth())
 			return 0
 		}
 		var_hash.GetCurDepth()++
@@ -724,7 +724,7 @@ yy13:
 
 	/* this is the case where we have less data than planned */
 
-	core.PhpErrorDocref(nil, faults.E_NOTICE, "Unexpected end of serialized data")
+	core.PhpErrorDocref("", faults.E_NOTICE, "Unexpected end of serialized data")
 	return 0
 yy15:
 	yych = *(lang.PreInc(&YYCURSOR))
@@ -843,7 +843,7 @@ yy18:
 				// zend.ZvalPtrDtor(&args[0])
 				return 0
 			}
-			core.PhpErrorDocref(nil, faults.E_WARNING, "defined (%s) but not found", user_func.StringEx().GetVal())
+			core.PhpErrorDocref("", faults.E_WARNING, "defined (%s) but not found", user_func.StringEx().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 			// zend.ZvalPtrDtor(&user_func)
@@ -863,7 +863,7 @@ yy18:
 
 		BG__().serialize_lock++
 		if lang.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.StringEx().GetVal())
+			core.PhpErrorDocref("", faults.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.StringEx().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 		}

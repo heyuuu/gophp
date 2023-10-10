@@ -171,7 +171,7 @@ func PhpNextMarker(stream *core.PhpStream, last_marker int, ff_read int) uint {
 			extraneous++
 		}
 		if extraneous != 0 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "corrupt JPEG data: %zu extraneous bytes before marker", extraneous)
+			core.PhpErrorDocref("", faults.E_WARNING, "corrupt JPEG data: %zu extraneous bytes before marker", extraneous)
 		}
 	}
 	a = 1
@@ -362,7 +362,7 @@ func PhpHandleJpc(stream *core.PhpStream) *Gfxinfo {
 	/* Ensure that this marker is SIZ (as is mandated by the standard) */
 
 	if first_marker_id != JPEG2000_MARKER_SIZ {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "JPEG2000 codestream corrupt(Expected SIZ marker not found after SOC)")
+		core.PhpErrorDocref("", faults.E_WARNING, "JPEG2000 codestream corrupt(Expected SIZ marker not found after SOC)")
 		return nil
 	}
 	result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
@@ -458,7 +458,7 @@ func PhpHandleJp2(stream *core.PhpStream) *Gfxinfo {
 
 	}
 	if result == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "JP2 file has no codestreams at root level")
+		core.PhpErrorDocref("", faults.E_WARNING, "JP2 file has no codestreams at root level")
 	}
 	return result
 }
@@ -956,7 +956,7 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 		filetype = tmp
 	}
 	if core.PhpStreamRead(stream, filetype, 3) != 3 {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "Read error!")
+		core.PhpErrorDocref("", faults.E_NOTICE, "Read error!")
 		return IMAGE_FILETYPE_UNKNOWN
 	}
 
@@ -968,13 +968,13 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 		return IMAGE_FILETYPE_JPEG
 	} else if !(memcmp(filetype, PhpSigPng, 3)) {
 		if core.PhpStreamRead(stream, filetype+3, 5) != 5 {
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "Read error!")
+			core.PhpErrorDocref("", faults.E_NOTICE, "Read error!")
 			return IMAGE_FILETYPE_UNKNOWN
 		}
 		if !(memcmp(filetype, PhpSigPng, 8)) {
 			return IMAGE_FILETYPE_PNG
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "PNG file corrupted by ASCII conversion")
+			core.PhpErrorDocref("", faults.E_WARNING, "PNG file corrupted by ASCII conversion")
 			return IMAGE_FILETYPE_UNKNOWN
 		}
 	} else if !(memcmp(filetype, PhpSigSwf, 3)) {
@@ -989,7 +989,7 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 		return IMAGE_FILETYPE_JPC
 	} else if !(memcmp(filetype, PhpSigRiff, 3)) {
 		if core.PhpStreamRead(stream, filetype+3, 9) != 9 {
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "Read error!")
+			core.PhpErrorDocref("", faults.E_NOTICE, "Read error!")
 			return IMAGE_FILETYPE_UNKNOWN
 		}
 		if !(memcmp(filetype+8, PhpSigWebp, 4)) {
@@ -999,7 +999,7 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 		}
 	}
 	if core.PhpStreamRead(stream, filetype+3, 1) != 1 {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "Read error!")
+		core.PhpErrorDocref("", faults.E_NOTICE, "Read error!")
 		return IMAGE_FILETYPE_UNKNOWN
 	}
 
@@ -1031,7 +1031,7 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 		return IMAGE_FILETYPE_WBMP
 	}
 	if twelve_bytes_read == 0 {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "Read error!")
+		core.PhpErrorDocref("", faults.E_NOTICE, "Read error!")
 		return IMAGE_FILETYPE_UNKNOWN
 	}
 	if PhpGetXbm(stream, nil) != 0 {
@@ -1061,7 +1061,7 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *types.Zval, execute
 	case IMAGE_FILETYPE_SWF:
 		result = PhpHandleSwf(stream)
 	case IMAGE_FILETYPE_SWC:
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled")
+		core.PhpErrorDocref("", faults.E_NOTICE, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled")
 	case IMAGE_FILETYPE_PSD:
 		result = PhpHandlePsd(stream)
 	case IMAGE_FILETYPE_BMP:
@@ -1130,7 +1130,7 @@ func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *typ
 		break
 	}
 	if mode == FROM_PATH && zend.CHECK_NULL_PATH(input, input_len) {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid path")
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid path")
 		return
 	}
 	if argc == 2 {

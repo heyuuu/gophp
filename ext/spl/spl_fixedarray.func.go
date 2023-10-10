@@ -130,7 +130,7 @@ func SplFixedarrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, cl
 		inherited = 1
 	}
 	if parent == nil {
-		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplFixedArray")
+		core.PhpErrorDocref("", faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplFixedArray")
 	}
 	funcs_ptr = class_type.GetIteratorFuncsPtr()
 	if funcs_ptr.GetZfCurrent() == nil {

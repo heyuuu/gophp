@@ -109,7 +109,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 			return_value.SetFalse()
 			return
 		}
-		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Calling assert() with a string argument is deprecated")
+		core.PhpErrorDocref("", faults.E_DEPRECATED, "Calling assert() with a string argument is deprecated")
 		return_value.SetFalse()
 		return
 	} else {
@@ -161,16 +161,16 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 	} else if ASSERTG(warning) {
 		if description == nil {
 			if myeval != nil {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Assertion \"%s\" failed", myeval)
+				core.PhpErrorDocref("", faults.E_WARNING, "Assertion \"%s\" failed", myeval)
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Assertion failed")
+				core.PhpErrorDocref("", faults.E_WARNING, "Assertion failed")
 			}
 		} else {
 			var str *types.String = operators.ZvalGetString(description)
 			if myeval != nil {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "%s: \"%s\" failed", str.GetVal(), myeval)
+				core.PhpErrorDocref("", faults.E_WARNING, "%s: \"%s\" failed", str.GetVal(), myeval)
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "%s failed", str.GetVal())
+				core.PhpErrorDocref("", faults.E_WARNING, "%s failed", str.GetVal())
 			}
 			// types.ZendStringReleaseEx(str, 0)
 		}
@@ -285,7 +285,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 		return_value.SetLong(oldint)
 		return
 	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown value "+zend.ZEND_LONG_FMT, what)
+		core.PhpErrorDocref("", faults.E_WARNING, "Unknown value "+zend.ZEND_LONG_FMT, what)
 	}
 	return_value.SetFalse()
 	return

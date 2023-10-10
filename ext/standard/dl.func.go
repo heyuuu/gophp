@@ -65,7 +65,7 @@ func PhpLoadExtension(filename *byte) int {
 		}
 		handle = PhpLoadShlib(libpath, &err2)
 		if !handle {
-			core.PhpErrorDocref(nil, error_type, "Unable to load dynamic library '%s' (tried: %s (%s), %s (%s))", filename, orig_libpath, err1, libpath, err2)
+			core.PhpErrorDocref("", error_type, "Unable to load dynamic library '%s' (tried: %s (%s), %s (%s))", filename, orig_libpath, err1, libpath, err2)
 			zend.Efree(orig_libpath)
 			zend.Efree(err1)
 			zend.Efree(libpath)
@@ -88,11 +88,11 @@ func PhpLoadExtension(filename *byte) int {
 	if get_module == nil {
 		if zend.DL_FETCH_SYMBOL(handle, "zend_extension_entry") || zend.DL_FETCH_SYMBOL(handle, "_zend_extension_entry") {
 			zend.DL_UNLOAD(handle)
-			core.PhpErrorDocref(nil, error_type, "Invalid library (appears to be a Zend Extension, try loading using zend_extension=%s from php.ini)", filename)
+			core.PhpErrorDocref("", error_type, "Invalid library (appears to be a Zend Extension, try loading using zend_extension=%s from php.ini)", filename)
 			return types.FAILURE
 		}
 		zend.DL_UNLOAD(handle)
-		core.PhpErrorDocref(nil, error_type, "Invalid library (maybe not a PHP library) '%s'", filename)
+		core.PhpErrorDocref("", error_type, "Invalid library (maybe not a PHP library) '%s'", filename)
 		return types.FAILURE
 	}
 	module_entry = get_module()

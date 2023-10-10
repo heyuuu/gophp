@@ -13,10 +13,10 @@ func IncompleteClassMessage(object *types.Zval, error_type int) {
 	var class_name *types.String
 	class_name = PhpLookupClassName(object)
 	if class_name != nil {
-		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, class_name.GetVal())
+		core.PhpErrorDocref("", error_type, INCOMPLETE_CLASS_MSG, class_name.GetVal())
 		// types.ZendStringReleaseEx(class_name, 0)
 	} else {
-		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, "unknown")
+		core.PhpErrorDocref("", error_type, INCOMPLETE_CLASS_MSG, "unknown")
 	}
 }
 func IncompleteClassGetProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {

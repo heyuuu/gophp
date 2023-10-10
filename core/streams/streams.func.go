@@ -72,7 +72,7 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 	core.Vspprintf(&buffer, 0, fmt, args)
 	va_end(args)
 	if (options&core.REPORT_ERRORS) != 0 || wrapper == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", buffer)
+		core.PhpErrorDocref("", faults.E_WARNING, "%s", buffer)
 		zend.Efree(buffer)
 	} else {
 		//var list *zend.ZendLlist = nil
@@ -324,7 +324,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 					n = b.SizeOf("wrapper_name") - 1
 				}
 				core.PHP_STRLCPY(wrapper_name, protocol, b.SizeOf("wrapper_name"), n)
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find the wrapper \"%s\" - did you forget to enable it when you configured PHP?", wrapper_name)
+				core.PhpErrorDocref("", faults.E_WARNING, "Unable to find the wrapper \"%s\" - did you forget to enable it when you configured PHP?", wrapper_name)
 				wrapper = nil
 				protocol = nil
 			}
@@ -345,7 +345,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 			}
 			if localhost == 0 && path[n+3] != '0' && path[n+3] != '/' {
 				if (options & core.REPORT_ERRORS) != 0 {
-					core.PhpErrorDocref(nil, faults.E_WARNING, "remote host file access not supported, %s", path)
+					core.PhpErrorDocref("", faults.E_WARNING, "remote host file access not supported, %s", path)
 				}
 				return nil
 			}
@@ -379,7 +379,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 				return wrapper
 			}
 			if (options & core.REPORT_ERRORS) != 0 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "file:// wrapper is disabled in the server configuration")
+				core.PhpErrorDocref("", faults.E_WARNING, "file:// wrapper is disabled in the server configuration")
 			}
 			return nil
 		}
@@ -391,9 +391,9 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 			/* protocol[n] probably isn't '\0' */
 
 			if !(core.PG__().allow_url_fopen) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_fopen=0", int(n), protocol)
+				core.PhpErrorDocref("", faults.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_fopen=0", int(n), protocol)
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_include=0", int(n), protocol)
+				core.PhpErrorDocref("", faults.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_include=0", int(n), protocol)
 			}
 
 			/* protocol[n] probably isn't '\0' */

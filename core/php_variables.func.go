@@ -140,7 +140,7 @@ func PhpRegisterVariableEx(varName string, val *types.Zval, trackVarsArray *type
 				   this helps us to to avoid "information disclosure" */
 
 				if !(PG__().display_errors) {
-					PhpErrorDocref(nil, faults.E_WARNING, "Input variable nesting level exceeded "+zend.ZEND_LONG_FMT+". To increase the limit change max_input_nesting_level in php.ini.", PG__().max_input_nesting_level)
+					PhpErrorDocref("", faults.E_WARNING, "Input variable nesting level exceeded "+zend.ZEND_LONG_FMT+". To increase the limit change max_input_nesting_level in php.ini.", PG__().max_input_nesting_level)
 				}
 				zend.FreeAlloca(varOrig, use_heap)
 				return
@@ -300,7 +300,7 @@ func AddPostVars(arr *types.Zval, vars *PostVarDataT, eof bool) int {
 	vars.SetEnd(vars.GetStr().GetS().GetVal() + vars.GetStr().GetS().GetLen())
 	for AddPostVar(arr, vars, eof) != 0 {
 		if lang.PreInc(&(vars.GetCnt())) > max_vars {
-			PhpErrorDocref(nil, faults.E_WARNING, "Input variables exceeded %"+"llu"+". "+"To increase the limit change max_input_vars in php.ini.", max_vars)
+			PhpErrorDocref("", faults.E_WARNING, "Input variables exceeded %"+"llu"+". "+"To increase the limit change max_input_vars in php.ini.", max_vars)
 			return types.FAILURE
 		}
 	}
@@ -426,7 +426,7 @@ func PhpDefaultTreatData(arg int, str *byte, destArray *types.Zval) {
 			}
 		}
 		if lang.PreInc(&count) > PG__().max_input_vars {
-			PhpErrorDocref(nil, faults.E_WARNING, "Input variables exceeded "+zend.ZEND_LONG_FMT+". To increase the limit change max_input_vars in php.ini.", PG__().max_input_vars)
+			PhpErrorDocref("", faults.E_WARNING, "Input variables exceeded "+zend.ZEND_LONG_FMT+". To increase the limit change max_input_vars in php.ini.", PG__().max_input_vars)
 			break
 		}
 		if val != nil {

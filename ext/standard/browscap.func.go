@@ -136,7 +136,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		var pos int
 		var i int
 		if pattern.GetLen() > UINT16_MAX {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Skipping excessively long pattern of length %zd", pattern.GetLen())
+			core.PhpErrorDocref("", faults.E_WARNING, "Skipping excessively long pattern of length %zd", pattern.GetLen())
 			break
 		}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry")))
@@ -324,7 +324,7 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 	var agent_ht *types.Array
 
 	if GlobalBdata.GetHtab() == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "browscap ini directive not set")
+		core.PhpErrorDocref("", faults.E_WARNING, "browscap ini directive not set")
 		return_value.SetFalse()
 		return
 	}
@@ -349,7 +349,7 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 			http_user_agent = core.PG__().http_globals[core.TRACK_VARS_SERVER].Array().KeyFind("HTTP_USER_AGENT")
 		}
 		if http_user_agent == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")
+			core.PhpErrorDocref("", faults.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")
 			return_value.SetFalse()
 			return
 		}

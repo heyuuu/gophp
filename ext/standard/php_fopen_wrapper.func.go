@@ -82,14 +82,14 @@ func PhpStreamApplyFilterList(stream *core.PhpStream, filterlist *byte, read_cha
 			if lang.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
 				streams.PhpStreamFilterAppend(stream.GetReadfilters(), temp_filter)
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to create filter (%s)", p)
+				core.PhpErrorDocref("", faults.E_WARNING, "Unable to create filter (%s)", p)
 			}
 		}
 		if write_chain != 0 {
 			if lang.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
 				streams.PhpStreamFilterAppend(stream.GetWritefilters(), temp_filter)
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to create filter (%s)", p)
+				core.PhpErrorDocref("", faults.E_WARNING, "Unable to create filter (%s)", p)
 			}
 		}
 		p = core.PhpStrtokR(nil, "|", &token)
@@ -139,7 +139,7 @@ func PhpStreamUrlWrapPhp(
 		var input *PhpStreamInputT
 		if (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG__().allow_url_include) {
 			if (options & core.REPORT_ERRORS) != 0 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "URL file-access is disabled in the server configuration")
+				core.PhpErrorDocref("", faults.E_WARNING, "URL file-access is disabled in the server configuration")
 			}
 			return nil
 		}
@@ -155,7 +155,7 @@ func PhpStreamUrlWrapPhp(
 	if !(strcasecmp(path, "stdin")) {
 		if (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG__().allow_url_include) {
 			if (options & core.REPORT_ERRORS) != 0 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "URL file-access is disabled in the server configuration")
+				core.PhpErrorDocref("", faults.E_WARNING, "URL file-access is disabled in the server configuration")
 			}
 			return nil
 		}
@@ -204,13 +204,13 @@ func PhpStreamUrlWrapPhp(
 		var dtablesize int
 		if core.SM__().Name() != "cli" {
 			if (options & core.REPORT_ERRORS) != 0 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Direct access to file descriptors is only available from command-line PHP")
+				core.PhpErrorDocref("", faults.E_WARNING, "Direct access to file descriptors is only available from command-line PHP")
 			}
 			return nil
 		}
 		if (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG__().allow_url_include) {
 			if (options & core.REPORT_ERRORS) != 0 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "URL file-access is disabled in the server configuration")
+				core.PhpErrorDocref("", faults.E_WARNING, "URL file-access is disabled in the server configuration")
 			}
 			return nil
 		}
@@ -273,7 +273,7 @@ func PhpStreamUrlWrapPhp(
 
 		/* invalid php://thingy */
 
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid php:// URL specified")
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid php:// URL specified")
 		return nil
 	}
 

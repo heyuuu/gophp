@@ -217,7 +217,7 @@ func ZifConstant(returnValue zpp.Ret, constName string) {
 		}
 	} else {
 		if zend.EG__().GetException() == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Couldn't find constant %s", constName)
+			core.PhpErrorDocref("", faults.E_WARNING, "Couldn't find constant %s", constName)
 		}
 		returnValue.SetNull()
 		return
@@ -297,7 +297,7 @@ func ZifGetenv(_ zpp.Opt, varname_ *string, localOnly bool) *types.Zval {
 }
 func ZifPutenv(setting string) bool {
 	if setting == "" || setting[0] == '=' {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid parameter syntax")
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid parameter syntax")
 		return false
 	}
 
@@ -544,7 +544,7 @@ func ZifFlush() {
 }
 func ZifSleep(seconds int) (int, bool) {
 	if seconds < 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of seconds must be greater than or equal to 0")
+		core.PhpErrorDocref("", faults.E_WARNING, "Number of seconds must be greater than or equal to 0")
 		return 0, false
 	}
 	rest := zend.Sleep(time.Duration(seconds) * time.Second)
@@ -552,7 +552,7 @@ func ZifSleep(seconds int) (int, bool) {
 }
 func ZifUsleep(microSeconds int) *types.Zval {
 	if microSeconds < 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of microseconds must be greater than or equal to 0")
+		core.PhpErrorDocref("", faults.E_WARNING, "Number of microseconds must be greater than or equal to 0")
 		return types.NewZvalFalse()
 	}
 	zend.Sleep(time.Duration(microSeconds) * time.Microsecond)
@@ -560,11 +560,11 @@ func ZifUsleep(microSeconds int) *types.Zval {
 }
 func ZifTimeNanosleep(seconds int, nanoseconds int) *types.Zval {
 	if seconds < 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The seconds value must be greater than 0")
+		core.PhpErrorDocref("", faults.E_WARNING, "The seconds value must be greater than 0")
 		return types.NewZvalFalse()
 	}
 	if nanoseconds < 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The nanoseconds value must be greater than 0")
+		core.PhpErrorDocref("", faults.E_WARNING, "The nanoseconds value must be greater than 0")
 		return types.NewZvalFalse()
 	}
 
@@ -583,7 +583,7 @@ func ZifTimeSleepUntil(timestamp float64) *types.Zval {
 	targetTime := time.UnixMilli(int64(timestamp * float64(time.Second)))
 
 	if targetTime.Before(time.Now()) {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Sleep until to time is less than current time")
+		core.PhpErrorDocref("", faults.E_WARNING, "Sleep until to time is less than current time")
 		return types.NewZvalFalse()
 	}
 
@@ -651,7 +651,7 @@ func ZifErrorLog(message string, _ zpp.Opt, messageType int, destination *zpp.Pa
 			return false
 		}
 	case 2: /*send to an address */
-		core.PhpErrorDocref(nil, faults.E_WARNING, "TCP/IP option not available!")
+		core.PhpErrorDocref("", faults.E_WARNING, "TCP/IP option not available!")
 		return false
 	case 3: /*save to a file */
 		stream = core.PhpStreamOpenWrapper(destination, "a", core.IGNORE_URL_WIN|core.REPORT_ERRORS, nil)
@@ -814,7 +814,7 @@ func ZifRegisterShutdownFunction(functionName *types.Zval, _ zpp.Opt, parameters
 	/* Prevent entering of anything but valid callback (syntax check only!) */
 	if !zend.ZendIsCallable(functionName, 0, nil) {
 		var callbackName = zend.ZendGetCallableName(functionName)
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid shutdown callback '%s' passed", callbackName)
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid shutdown callback '%s' passed", callbackName)
 		return
 	}
 
@@ -919,7 +919,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 	if extension != nil {
 		module := globals.G().GetModule(*extension)
 		if module == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find extension '%s'", *extension)
+			core.PhpErrorDocref("", faults.E_WARNING, "Unable to find extension '%s'", *extension)
 			returnValue.SetFalse()
 			return
 		}
@@ -1168,7 +1168,7 @@ func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path string, 
 		umask(oldmask)
 		ret = zend.VCWD_CHMOD(newPath, 0666 & ^oldmask)
 		if ret == -1 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
+			core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
 		}
 	} else if PhpCopyFileEx(path, newPath, core.STREAM_DISABLE_OPEN_BASEDIR) == types.SUCCESS {
 		zend.VCWD_UNLINK(path)
@@ -1177,7 +1177,7 @@ func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path string, 
 	if successful != 0 {
 		core.SG__().DeleteUploadFile(path)
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
+		core.PhpErrorDocref("", faults.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}
 	return successful != 0
 }
@@ -1266,7 +1266,7 @@ func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename string, 
 		break
 	}
 	if filename == "" {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Filename cannot be empty!")
+		core.PhpErrorDocref("", faults.E_WARNING, "Filename cannot be empty!")
 		return_value.SetFalse()
 		return
 	}

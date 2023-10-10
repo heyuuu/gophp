@@ -164,7 +164,7 @@ func PhpSprintfAppenddouble(
 	if (adjust & ADJ_PRECISION) == 0 {
 		precision = FLOAT_PRECISION
 	} else if precision > MAX_FLOAT_PRECISION {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, MAX_FLOAT_PRECISION)
+		core.PhpErrorDocref("", faults.E_NOTICE, "Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, MAX_FLOAT_PRECISION)
 		precision = MAX_FLOAT_PRECISION
 	}
 	if core.ZendIsNaN(number) {
@@ -326,7 +326,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 				if (*temppos) == '$' {
 					argnum = PhpSprintfGetnumber(&format, &format_len)
 					if argnum <= 0 {
-						core.PhpErrorDocref(nil, faults.E_WARNING, "Argument number must be greater than zero")
+						core.PhpErrorDocref("", faults.E_WARNING, "Argument number must be greater than zero")
 						return nil
 					}
 					argnum--
@@ -361,7 +361,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 
 				if isdigit(int(*format)) {
 					if lang.Assign(&width, PhpSprintfGetnumber(&format, &format_len)) < 0 {
-						core.PhpErrorDocref(nil, faults.E_WARNING, "Width must be greater than zero and less than %d", core.INT_MAX)
+						core.PhpErrorDocref("", faults.E_WARNING, "Width must be greater than zero and less than %d", core.INT_MAX)
 						return nil
 					}
 					adjusting |= ADJ_WIDTH
@@ -376,7 +376,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 					format_len--
 					if isdigit(int(*format)) {
 						if lang.Assign(&precision, PhpSprintfGetnumber(&format, &format_len)) < 0 {
-							core.PhpErrorDocref(nil, faults.E_WARNING, "Precision must be greater than zero and less than %d", core.INT_MAX)
+							core.PhpErrorDocref("", faults.E_WARNING, "Precision must be greater than zero and less than %d", core.INT_MAX)
 							return nil
 						}
 						adjusting |= ADJ_PRECISION
@@ -389,7 +389,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 				}
 			}
 			if argnum >= argc {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Too few arguments")
+				core.PhpErrorDocref("", faults.E_WARNING, "Too few arguments")
 				return nil
 			}
 			if (*format) == 'l' {

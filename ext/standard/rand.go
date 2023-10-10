@@ -58,7 +58,7 @@ func ZifMtRand(_ zpp.Opt, min_ *int, max_ *int) (int, bool) {
 	var min = b.Option(min_, 0)
 	var max = b.Option(max_, PHP_MT_RAND_MAX)
 	if max < min {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "max("+zend.ZEND_LONG_FMT+") is smaller than min("+zend.ZEND_LONG_FMT+")", max, min)
+		core.PhpErrorDocref("", faults.E_WARNING, "max("+zend.ZEND_LONG_FMT+") is smaller than min("+zend.ZEND_LONG_FMT+")", max, min)
 		return 0, false
 	}
 	return PhpMtRandRange(min, max), true

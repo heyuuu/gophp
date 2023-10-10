@@ -26,7 +26,7 @@ func SplFindCeByName(name string, autoload bool) *types.ClassEntry {
 		ce = zend.EG__().ClassTable().Get(name)
 	}
 	if ce == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Class %s does not exist%s", name, lang.Cond(autoload, " and could not be loaded", ""))
+		core.PhpErrorDocref("", faults.E_WARNING, "Class %s does not exist%s", name, lang.Cond(autoload, " and could not be loaded", ""))
 		return nil
 	}
 	return ce
@@ -43,7 +43,7 @@ func ZifClassParents(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*types.A
 			return nil, false
 		}
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "object or string expected")
+		core.PhpErrorDocref("", faults.E_WARNING, "object or string expected")
 		return nil, false
 	}
 
@@ -67,7 +67,7 @@ func ZifClassImplements(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*type
 			return nil, false
 		}
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "object or string expected")
+		core.PhpErrorDocref("", faults.E_WARNING, "object or string expected")
 		return nil, false
 	}
 
@@ -87,7 +87,7 @@ func ZifClassUses(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*types.Arra
 			return nil, false
 		}
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "object or string expected")
+		core.PhpErrorDocref("", faults.E_WARNING, "object or string expected")
 		return nil, false
 	}
 

@@ -659,21 +659,15 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 	PhpError(type_, message)
 }
 
-func PhpErrorDocref(docRef_ *string, typ int, format string, args ...any) {
-	docRef := b.Option(docRef_, "")
+func PhpErrorDocref(docRef string, typ int, format string, args ...any) {
 	PhpVerror(docRef, "", typ, format, args)
 }
-func PhpErrorDocref1(docRef_ *string, param1_ *string, type_ int, format string, args ...any) {
-	docRef := b.Option(docRef_, "")
-	params := b.Option(param1_, "")
+func PhpErrorDocref1(docRef string, param1 string, type_ int, format string, args ...any) {
+	params := param1
 	PhpVerror(docRef, params, type_, format, args)
 }
-func PhpErrorDocref2(docRef_ *string, param1_ *string, param2_ *string, type_ int, format string, args ...any) {
-	docRef := b.Option(docRef_, "")
-	params := pfmt.Sprintf("%s,%s", b.Option(param1_, ""), b.Option(param2_, ""))
-	if params == "" {
-		params = "..."
-	}
+func PhpErrorDocref2(docRef string, param1 string, param2 string, type_ int, format string, args ...any) {
+	params := param1 + "," + param2
 	PhpVerror(docRef, params, type_, format, args)
 }
 func PhpHtmlPuts(str *byte, size int) { zend.ZendHtmlPuts(str, size) }
@@ -960,7 +954,7 @@ func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 	case zend.ZMSG_FAILED_REQUIRE_FOPEN:
 		PhpErrorDocref("function.require", faults.E_COMPILE_ERROR, "Failed opening required '%s' (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path))
 	case zend.ZMSG_FAILED_HIGHLIGHT_FOPEN:
-		PhpErrorDocref(nil, faults.E_WARNING, "Failed opening '%s' for highlighting", PhpStripUrlPasswd((*byte)(data)))
+		PhpErrorDocref("", faults.E_WARNING, "Failed opening '%s' for highlighting", PhpStripUrlPasswd((*byte)(data)))
 	case zend.ZMSG_MEMORY_LEAK_DETECTED:
 		fallthrough
 	case zend.ZMSG_MEMORY_LEAK_REPEATED:

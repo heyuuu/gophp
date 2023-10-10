@@ -607,11 +607,11 @@ func ZifExtract(array zpp.DerefArray, _ zpp.Opt, flags int, prefix *types.Zval) 
 
 	extractType := flags & 0xff
 	if extractType < EXTR_OVERWRITE || extractType > EXTR_IF_EXISTS {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid extract type")
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid extract type")
 		return 0
 	}
 	if extractType > EXTR_SKIP && extractType <= EXTR_PREFIX_IF_EXISTS && prefix == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "specified extract type requires the prefix parameter")
+		core.PhpErrorDocref("", faults.E_WARNING, "specified extract type requires the prefix parameter")
 		return 0
 	}
 	if prefix != nil {
@@ -619,7 +619,7 @@ func ZifExtract(array zpp.DerefArray, _ zpp.Opt, flags int, prefix *types.Zval) 
 			return 0
 		}
 		if prefix.String() != "" && !isValidVarName(prefix.String()) {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "prefix is not a valid identifier")
+			core.PhpErrorDocref("", faults.E_WARNING, "prefix is not a valid identifier")
 			return 0
 		}
 	}
@@ -682,11 +682,11 @@ func PhpCompactVar(activeSymbolTable *types.Array, resultArr *types.Array, entry
 				resultArr.KeyUpdate(entry.StringEx().GetStr(), types.NewZvalObject(object))
 			}
 		} else {
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "Undefined variable: %s", entry.StringEx().GetVal())
+			core.PhpErrorDocref("", faults.E_NOTICE, "Undefined variable: %s", entry.StringEx().GetVal())
 		}
 	} else if entry.IsArray() {
 		if entry.Array().IsRecursive() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
+			core.PhpErrorDocref("", faults.E_WARNING, "recursion detected")
 			return
 		}
 		entry.Array().ProtectRecursive()

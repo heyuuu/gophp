@@ -299,7 +299,7 @@ func ZifParseUrl(url string, _ zpp.Opt, component *int) *types.Zval {
 				return types.NewZvalString(resource.Fragment())
 			}
 		default:
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid URL component identifier "+zend.ZEND_LONG_FMT, key)
+			core.PhpErrorDocref("", faults.E_WARNING, "Invalid URL component identifier "+zend.ZEND_LONG_FMT, key)
 			return types.NewZvalFalse()
 		}
 	}

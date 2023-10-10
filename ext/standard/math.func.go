@@ -178,7 +178,7 @@ func ZifLog(number float64, _ zpp.Opt, base *float64) (float64, bool) {
 		return math.NaN(), true
 	}
 	if *base <= 0.0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "base must be greater than 0")
+		core.PhpErrorDocref("", faults.E_WARNING, "base must be greater than 0")
 		return 0, false
 	}
 	return math.Log(number) / math.Log(*base), true
@@ -289,11 +289,11 @@ func ZifBaseConvert(number *types.Zval, frombase int, tobase int) (string, bool)
 		return "", false
 	}
 	if frombase < 2 || frombase > 36 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid `from base' ("+zend.ZEND_LONG_FMT+")", frombase)
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid `from base' ("+zend.ZEND_LONG_FMT+")", frombase)
 		return "", false
 	}
 	if tobase < 2 || tobase > 36 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid `to base' ("+zend.ZEND_LONG_FMT+")", tobase)
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid `to base' ("+zend.ZEND_LONG_FMT+")", tobase)
 		return "", false
 	}
 
@@ -304,7 +304,7 @@ func ZifBaseConvert(number *types.Zval, frombase int, tobase int) (string, bool)
 
 	/* Don't try to convert +/- infinity */
 	if num.IsInf() {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Number too large")
+		core.PhpErrorDocref("", faults.E_WARNING, "Number too large")
 		return "", true
 	}
 

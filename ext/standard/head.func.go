@@ -200,17 +200,17 @@ func PhpHeadParseCookieOptionsArray(
 				*samesite = operators.ZvalGetString(value)
 				found++
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unrecognized key '%s' found in the options array", strKey)
+				core.PhpErrorDocref("", faults.E_WARNING, "Unrecognized key '%s' found in the options array", strKey)
 			}
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Numeric key found in the options array")
+			core.PhpErrorDocref("", faults.E_WARNING, "Numeric key found in the options array")
 		}
 	})
 
 	/* Array is not empty but no valid keys were found */
 
 	if found == 0 && options.Array().Len() > 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "No valid options were found in the given array")
+		core.PhpErrorDocref("", faults.E_WARNING, "No valid options were found in the given array")
 	}
 
 	/* Array is not empty but no valid keys were found */
@@ -246,7 +246,7 @@ func ZifSetcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, _ 
 	if expires_or_options != nil {
 		if expires_or_options.IsType(types.IsArray) {
 			if executeData.NumArgs() > 3 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot pass arguments after the options array")
+				core.PhpErrorDocref("", faults.E_WARNING, "Cannot pass arguments after the options array")
 				return_value.SetFalse()
 				return
 			}
@@ -305,7 +305,7 @@ func ZifSetrawcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval,
 	if expires_or_options != nil {
 		if expires_or_options.IsType(types.IsArray) {
 			if executeData.NumArgs() > 3 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot pass arguments after the options array")
+				core.PhpErrorDocref("", faults.E_WARNING, "Cannot pass arguments after the options array")
 				return_value.SetFalse()
 				return
 			}

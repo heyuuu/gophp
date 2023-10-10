@@ -558,7 +558,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 		var max_depth *types.Zval
 		classes = types.ZendHashStrFindDeref(options.Array(), "allowed_classes")
 		if classes != nil && !classes.IsArray() && !classes.IsTrue() && !classes.IsFalse() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "allowed_classes option should be array or boolean")
+			core.PhpErrorDocref("", faults.E_WARNING, "allowed_classes option should be array or boolean")
 			return_value.SetFalse()
 			goto cleanup
 		}
@@ -593,12 +593,12 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 		max_depth = types.ZendHashStrFindDeref(options.Array(), "max_depth")
 		if max_depth != nil {
 			if !max_depth.IsLong() {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "max_depth should be int")
+				core.PhpErrorDocref("", faults.E_WARNING, "max_depth should be int")
 				return_value.SetFalse()
 				goto cleanup
 			}
 			if max_depth.Long() < 0 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "max_depth cannot be negative")
+				core.PhpErrorDocref("", faults.E_WARNING, "max_depth cannot be negative")
 				return_value.SetFalse()
 				goto cleanup
 			}
@@ -621,7 +621,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 	}
 	if PhpVarUnserialize(retval, &p, p+buf_len, &var_hash) == 0 {
 		if zend.EG__().GetException() == nil {
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
+			core.PhpErrorDocref("", faults.E_NOTICE, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
 		}
 		if BG__().unserialize.level <= 1 {
 			// zend.ZvalPtrDtor(return_value)

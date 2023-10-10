@@ -89,7 +89,7 @@ func ZifKsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 
 func PhpCountRecursive(ht *types.Array) int {
 	if ht.IsRecursive() {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
+		core.PhpErrorDocref("", faults.E_WARNING, "recursion detected")
 		return 0
 	}
 	ht.ProtectRecursive()
@@ -112,7 +112,7 @@ func ZifCount(var_ *types.Zval, _ zpp.Opt, mode int) int {
 	var cnt zend.ZendLong
 	switch array.Type() {
 	case types.IsNull:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
+		core.PhpErrorDocref("", faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return 0
 	case types.IsArray:
 		if mode != COUNT_RECURSIVE {
@@ -146,10 +146,10 @@ func ZifCount(var_ *types.Zval, _ zpp.Opt, mode int) int {
 		}
 
 		/* If There's no handler and it doesn't implement Countable then add a warning */
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
+		core.PhpErrorDocref("", faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return 1
 	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
+		core.PhpErrorDocref("", faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return 1
 	}
 }
@@ -266,14 +266,14 @@ func ZifMin(arg *types.Zval, args []*types.Zval) *types.Zval {
 	/* mixed min ( array $values ) */
 	if len(args) == 0 {
 		if !arg.IsArray() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "When only one parameter is given, it must be an array")
+			core.PhpErrorDocref("", faults.E_WARNING, "When only one parameter is given, it must be an array")
 			return types.NewZvalNull()
 		} else {
 			result := arg.Array().Min(arrayDataComparer(arrayDataCompare))
 			if result != nil {
 				return result.GetVal()
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Array must contain at least one element")
+				core.PhpErrorDocref("", faults.E_WARNING, "Array must contain at least one element")
 				return types.NewZvalBool(false)
 			}
 		}
@@ -291,14 +291,14 @@ func ZifMax(arg *types.Zval, args []*types.Zval) *types.Zval {
 	/* mixed max ( array $values ) */
 	if len(args) == 0 {
 		if !arg.IsArray() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "When only one parameter is given, it must be an array")
+			core.PhpErrorDocref("", faults.E_WARNING, "When only one parameter is given, it must be an array")
 			return types.NewZvalNull()
 		} else {
 			result := arg.Array().Max(arrayDataComparer(arrayDataCompare))
 			if result != nil {
 				return result.GetVal()
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Array must contain at least one element")
+				core.PhpErrorDocref("", faults.E_WARNING, "Array must contain at least one element")
 				return types.NewZvalBool(false)
 			}
 		}
@@ -360,7 +360,7 @@ func arrayWalk(array *types.Zval, recursive bool, handler func(value *types.Zval
 			types.SeparateArray(zv)
 			thash = zv.Array()
 			if thash.IsRecursive() {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
+				core.PhpErrorDocref("", faults.E_WARNING, "recursion detected")
 				return false
 			}
 
@@ -471,17 +471,17 @@ func ZifArraySearch(needle *types.Zval, haystack *types.Array, _ zpp.Opt, strict
 
 func ZifArrayFill(startKey int, num int, val *types.Zval) (*types.Array, bool) {
 	if num < 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of elements can't be negative")
+		core.PhpErrorDocref("", faults.E_WARNING, "Number of elements can't be negative")
 		return nil, false
 	}
 	if num == 0 {
 		return types.NewArray(), true
 	}
 	if num > math.MaxInt32 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Too many elements")
+		core.PhpErrorDocref("", faults.E_WARNING, "Too many elements")
 		return nil, false
 	} else if startKey > math.MaxInt-num+1 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
+		core.PhpErrorDocref("", faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 		return nil, false
 	}
 
@@ -512,20 +512,20 @@ func rangeDouble(zLow *types.Zval, zHigh *types.Zval, step float64) ([]*types.Zv
 	low := operators.ZvalGetDouble(zLow)
 	high := operators.ZvalGetDouble(zHigh)
 	if core.ZendIsInf(high) || core.ZendIsInf(low) {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range supplied: start=%0.0f end=%0.0f", low, high)
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid range supplied: start=%0.0f end=%0.0f", low, high)
 		return nil, false
 	}
 	if low > high {
 		low, high = high, low
 	}
 	if high-low < step {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "step exceeds the specified range")
+		core.PhpErrorDocref("", faults.E_WARNING, "step exceeds the specified range")
 		return nil, false
 	}
 
 	size := (high-low)/step + 1
 	if size >= float64(types.MaxArraySize) {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", low, high)
+		core.PhpErrorDocref("", faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", low, high)
 		return nil, false
 	}
 
@@ -548,13 +548,13 @@ func rangeLong(zLow *types.Zval, zHigh *types.Zval, step int) ([]*types.Zval, bo
 		low, high = high, low
 	}
 	if high-low < step {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "step exceeds the specified range")
+		core.PhpErrorDocref("", faults.E_WARNING, "step exceeds the specified range")
 		return nil, false
 	}
 
 	size := (high-low)/step + 1
 	if size >= types.MaxArraySize {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%d end=%d", low, high)
+		core.PhpErrorDocref("", faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%d end=%d", low, high)
 		return nil, false
 	}
 
@@ -601,7 +601,7 @@ func ZifRange(low_ *types.Zval, high_ *types.Zval, _ zpp.Opt, step_ *types.Zval)
 				isStepDouble = true
 			} else {
 				/* bad number */
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range string - must be numeric")
+				core.PhpErrorDocref("", faults.E_WARNING, "Invalid range string - must be numeric")
 				return nil, false
 			}
 		}
@@ -720,7 +720,7 @@ func phpSplice(arr *types.Array, offset int, length int, replace *types.Array) (
 func ZifArrayPush(stack zpp.RefArray, _ zpp.Opt, args []*types.Zval) (int, bool) {
 	for _, arg := range args {
 		if stack.Array().Append(arg) == nil {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
+			core.PhpErrorDocref("", faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			return 0, false
 		}
 	}
@@ -883,7 +883,7 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 			thash = nil
 		}
 		if thash != nil && thash.IsRecursive() || value == destEntry && destEntry.IsRef() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
+			core.PhpErrorDocref("", faults.E_WARNING, "recursion detected")
 			return 0
 		}
 		//b.Assert(!(destEntry.IsReference()) || destEntry.GetRefcount() > 1)
@@ -948,7 +948,7 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) bool {
 
 		// src/dest 对应值均为 array 的情况下，递归替换
 		if destZval.Array().IsRecursive() || srcZval.Array().IsRecursive() || srcEntry.IsRef() && destEntry.IsRef() && srcEntry.Ref() == destEntry.Ref() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
+			core.PhpErrorDocref("", faults.E_WARNING, "recursion detected")
 			return false
 		}
 		types.SeparateZval(destEntry)
@@ -976,7 +976,7 @@ func arrayMergeWrapper(args []*types.Zval, recursive bool) *types.Array {
 	count := 0
 	for i, arg := range args {
 		if !arg.IsArray() {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(arg))
+			core.PhpErrorDocref("", faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(arg))
 			return nil
 		}
 		count += arg.Array().Len()
@@ -1123,7 +1123,7 @@ func ZifArrayCountValues(array *types.Array) *types.Array {
 		} else if entry.IsString() {
 			key = types.NumericKey(entry.String())
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Can only count STRING and INTEGER values!")
+			core.PhpErrorDocref("", faults.E_WARNING, "Can only count STRING and INTEGER values!")
 			return
 		}
 
@@ -1153,7 +1153,7 @@ func ArrayColumnParamHelper(param *types.Zval, name string) bool {
 	case types.IsString:
 		return 1
 	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The %s key should be either a string or an integer", name)
+		core.PhpErrorDocref("", faults.E_WARNING, "The %s key should be either a string or an integer", name)
 		return 0
 	}
 }
@@ -1272,7 +1272,7 @@ func ZifArrayPad(array *types.Array, padSize int, padValue *types.Zval) (*types.
 		padSizeAbs = -padSizeAbs
 	}
 	if padSizeAbs < 0 || padSizeAbs-inputSize > maxPadInOneTimes {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "You may only pad up to 1048576 elements at a time")
+		core.PhpErrorDocref("", faults.E_WARNING, "You may only pad up to 1048576 elements at a time")
 		return nil, false
 	}
 
@@ -1315,7 +1315,7 @@ func ZifArrayFlip(array *types.Array) *types.Array {
 		} else if value.IsString() {
 			retArr.SymtableUpdate(value.String(), key.ToZval())
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Can only flip STRING and INTEGER values!")
+			core.PhpErrorDocref("", faults.E_WARNING, "Can only flip STRING and INTEGER values!")
 		}
 	})
 	return retArr
@@ -1558,7 +1558,7 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 					}
 					parseState[MULTISORT_ORDER] = 0
 				} else {
-					core.PhpErrorDocref(nil, faults.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
+					core.PhpErrorDocref("", faults.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
 					return false
 				}
 			case PHP_SORT_REGULAR:
@@ -1576,15 +1576,15 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 					sortType = arg.Long()
 					parseState[MULTISORT_TYPE] = 0
 				} else {
-					core.PhpErrorDocref(nil, faults.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
+					core.PhpErrorDocref("", faults.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
 					return false
 				}
 			default:
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Argument #%d is an unknown sort flag", i+1)
+				core.PhpErrorDocref("", faults.E_WARNING, "Argument #%d is an unknown sort flag", i+1)
 				return false
 			}
 		} else {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Argument #%d is expected to be an array or a sort flag", i+1)
+			core.PhpErrorDocref("", faults.E_WARNING, "Argument #%d is expected to be an array or a sort flag", i+1)
 			return false
 		}
 	}
@@ -1596,7 +1596,7 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 	arraySize := arrays[0].Array().Len()
 	for _, array := range arrays {
 		if array.Array().Len() != arraySize {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Array sizes are inconsistent")
+			core.PhpErrorDocref("", faults.E_WARNING, "Array sizes are inconsistent")
 			return false
 		}
 	}
@@ -1652,11 +1652,11 @@ func ZifArrayRand(arg *types.Array, _ zpp.Opt, numReq_ *int) *types.Zval {
 
 	numAvail := arg.Len()
 	if numAvail == 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Array is empty")
+		core.PhpErrorDocref("", faults.E_WARNING, "Array is empty")
 		return nil
 	}
 	if numReq <= 0 || numReq > numAvail {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Second argument has to be between 1 and the number of elements in the array")
+		core.PhpErrorDocref("", faults.E_WARNING, "Second argument has to be between 1 and the number of elements in the array")
 		return nil
 	}
 
@@ -1873,7 +1873,7 @@ func ZifArrayKeyExists(key *types.Zval, array zpp.ArrayOrObject) bool {
 		ht = array.Array()
 	} else {
 		ht = zend.ZendGetPropertiesFor(array, zend.ZEND_PROP_PURPOSE_ARRAY_CAST)
-		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Using array_key_exists() on objects is deprecated. Use isset() or property_exists() instead")
+		core.PhpErrorDocref("", faults.E_DEPRECATED, "Using array_key_exists() on objects is deprecated. Use isset() or property_exists() instead")
 	}
 	switch key.Type() {
 	case types.IsString:
@@ -1883,13 +1883,13 @@ func ZifArrayKeyExists(key *types.Zval, array zpp.ArrayOrObject) bool {
 	case types.IsNull:
 		return ht.KeyExistsIndirect("")
 	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "The first argument should be either a string or an integer")
+		core.PhpErrorDocref("", faults.E_WARNING, "The first argument should be either a string or an integer")
 		return false
 	}
 }
 func ZifArrayChunk(array *types.Array, length int, _ zpp.Opt, preserveKeys bool) *types.Array {
 	if length < 1 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Size parameter expected to be greater than 0")
+		core.PhpErrorDocref("", faults.E_WARNING, "Size parameter expected to be greater than 0")
 		return nil
 	}
 
@@ -1915,7 +1915,7 @@ func ZifArrayChunk(array *types.Array, length int, _ zpp.Opt, preserveKeys bool)
 }
 func ZifArrayCombine(keys *types.Array, values *types.Array) (*types.Array, bool) {
 	if keys.Len() != values.Len() {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Both parameters should have an equal number of elements")
+		core.PhpErrorDocref("", faults.E_WARNING, "Both parameters should have an equal number of elements")
 		return nil, false
 	}
 	if keys.Len() == 0 {
