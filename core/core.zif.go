@@ -5,6 +5,28 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
+// generate by ZifHeaderRegisterCallback
+var DefZifHeaderRegisterCallback = def.DefFunc("header_register_callback", 1, 1, []def.ArgInfo{{Name: "callback"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	callback := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifHeaderRegisterCallback(callback)
+	returnValue.SetBool(ret)
+})
+
+// generate by ZifSetTimeLimit
+var DefZifSetTimeLimit = def.DefFunc("set_time_limit", 1, 1, []def.ArgInfo{{Name: "seconds"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	seconds := fp.ParseLong()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifSetTimeLimit(seconds)
+	returnValue.SetBool(ret)
+})
+
 // generate by ZifObStart
 var DefZifObStart = def.DefFunc("ob_start", 0, 3, []def.ArgInfo{{Name: "user_function"}, {Name: "chunk_size"}, {Name: "flags"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 3, 0)

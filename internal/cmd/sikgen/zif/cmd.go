@@ -90,7 +90,7 @@ func eachGenZifFile(dir string, isPkgMode bool, handler func(zifFile string, cod
 				return
 			}
 
-			zifFile := filepath.Join(dir, pkgName+".zif.go")
+			zifFile := filepath.Join(dirPath, pkgName+".zif.go")
 			zifCode := printNode(genFileNode(pkgName, zifInfos))
 			handler(zifFile, zifCode)
 		})
