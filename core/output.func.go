@@ -180,12 +180,12 @@ func PhpOutputStartDefault() int {
 	PhpOutputHandlerFree(&handler)
 	return types.FAILURE
 }
-func PhpOutputStartUser(output_handler *types.Zval, chunk_size int, flags int) int {
+func PhpOutputStartUser(outputHandler *types.Zval, chunkSize int, flags int) int {
 	var handler *PhpOutputHandler
-	if output_handler != nil {
-		handler = PhpOutputHandlerCreateUser(output_handler, chunk_size, flags)
+	if outputHandler != nil {
+		handler = PhpOutputHandlerCreateUser(outputHandler, chunkSize, flags)
 	} else {
-		handler = PhpOutputHandlerCreateInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunk_size, flags)
+		handler = PhpOutputHandlerCreateInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunkSize, flags)
 	}
 	if types.SUCCESS == PhpOutputHandlerStart(handler) {
 		return types.SUCCESS
@@ -636,23 +636,19 @@ func PhpOutputHandlerDefaultFunc(handler_context *any, output_context *PhpOutput
 	PhpOutputContextPass(output_context)
 	return types.SUCCESS
 }
-func ZifObStart(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, userFunction *types.Zval, chunkSize *types.Zval, flags *types.Zval) {
-	var output_handler *types.Zval = nil
-	var chunk_size zend.ZendLong = 0
-	var flags zend.ZendLong = PHP_OUTPUT_HANDLER_STDFLAGS
-	if zend.ZendParseParameters(executeData.NumArgs(), "|zll", &output_handler, &chunk_size, &flags) == types.FAILURE {
-		return
+
+//zif -old "|zll"
+func ZifObStart(_ zpp.Opt, userFunction *types.Zval, chunkSize int, flags_ *int) bool {
+	var flags = b.Option(flags_, PHP_OUTPUT_HANDLER_STDFLAGS)
+	if chunkSize < 0 {
+		chunkSize = 0
 	}
-	if chunk_size < 0 {
-		chunk_size = 0
-	}
-	if PhpOutputStartUser(output_handler, chunk_size, flags) == types.FAILURE {
+
+	if PhpOutputStartUser(userFunction, chunkSize, flags) == types.FAILURE {
 		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to create buffer")
-		return_value.SetFalse()
-		return
+		return false
 	}
-	return_value.SetTrue()
-	return
+	return true
 }
 func ZifObFlush(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
