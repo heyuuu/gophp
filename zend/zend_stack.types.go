@@ -87,13 +87,13 @@ func (this *ZendStack[T]) ApplyWithArgument(type_ int, apply_function func(eleme
 	}
 }
 
-func (this *ZendStack[T]) Clean(func_ func(any), free_elements bool) {
+func (this *ZendStack[T]) Clean(func_ func(any), freeElements bool) {
 	if func_ != nil {
 		for _, element := range this.elements {
 			func_(element)
 		}
 	}
-	if free_elements != 0 {
+	if freeElements {
 		this.Init()
 	}
 }

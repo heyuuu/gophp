@@ -157,11 +157,16 @@ func (this *PhpOutputHandler) SetIsProcessed(cond bool) {
 	this.SwitchFlags(PHP_OUTPUT_HANDLER_PROCESSED, cond)
 }
 
+func (this *PhpOutputHandler) IsCleanable() bool { return this.HasFlags(PHP_OUTPUT_HANDLER_CLEANABLE) }
+func (this *PhpOutputHandler) IsFlushable() bool { return this.HasFlags(PHP_OUTPUT_HANDLER_FLUSHABLE) }
+func (this *PhpOutputHandler) IsRemovable() bool { return this.HasFlags(PHP_OUTPUT_HANDLER_REMOVABLE) }
+
 /**
  * ZendOutputGlobals
  */
 type ZendOutputGlobals struct {
 	handlers            zend.ZendStack
+	handlersEx          []**PhpOutputHandler
 	active              *PhpOutputHandler
 	running             *PhpOutputHandler
 	outputStartFilename string
@@ -182,10 +187,37 @@ func (g *ZendOutputGlobals) Init() {
 	*g = ZendOutputGlobals{}
 }
 
-// fields
-func (g *ZendOutputGlobals) Handlers() zend.ZendStack            { return g.handlers }
-func (g *ZendOutputGlobals) SetHandlers(handlers zend.ZendStack) { g.handlers = handlers }
+func (g *ZendOutputGlobals) Activate() {
+	g.Init()
+	g.SetActivated(true)
+}
 
+func (g *ZendOutputGlobals) Deactivate() {
+	if g.IsActivated() {
+		g.SetActivated(false)
+		g.active = nil
+		g.running = nil
+		g.handlersEx = nil
+	}
+}
+
+// handlers
+func (g *ZendOutputGlobals) Handlers() *zend.ZendStack { return g.handlers }
+func (g *ZendOutputGlobals) CountHandlers() int        { return len(g.handlersEx) }
+func (g *ZendOutputGlobals) PushHandler(h **PhpOutputHandler) int {
+	g.handlersEx = append(g.handlersEx, h)
+	return len(g.handlersEx)
+}
+func (g *ZendOutputGlobals) PopHandler() **PhpOutputHandler {
+	var c **PhpOutputHandler
+	if len(g.handlersEx) > 0 {
+		c = g.handlersEx[len(g.handlersEx)-1]
+		g.handlersEx = g.handlersEx[:len(g.handlersEx)-1]
+	}
+	return c
+}
+
+// fields
 func (g *ZendOutputGlobals) Active() *PhpOutputHandler          { return g.active }
 func (g *ZendOutputGlobals) SetActive(active *PhpOutputHandler) { g.active = active }
 

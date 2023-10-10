@@ -44,28 +44,13 @@ func PhpOutputShutdown() {
 	PhpOutputDirect = PhpOutputStderr
 }
 func PhpOutputActivate() int {
-	memset(&OutputGlobals, 0, b.SizeOf("zend_output_globals"))
-	OG__().Handlers().Init()
-	OG__().SetActivated(true)
+	OG__().Activate()
 	return types.SUCCESS
 }
 func PhpOutputDeactivate() {
-	var handler **PhpOutputHandler = nil
 	if OG__().IsActivated() {
 		PhpOutputHeader()
-		OG__().SetActivated(false)
-		OG__().active = nil
-		OG__().running = nil
-
-		/* release all output handlers */
-
-		if OG__().Handlers().elements {
-			for lang.Assign(&handler, OG__().Handlers().Top()) {
-				PhpOutputHandlerFree(handler)
-				OG__().Handlers().DelTop()
-			}
-		}
-		OG__().Handlers().Destroy()
+		OG__().Deactivate()
 	}
 }
 func PhpOutputRegisterConstants() {
@@ -103,13 +88,13 @@ func PhpOutputWrite(str string) int {
 }
 func PhpOutputFlush() int {
 	var context PhpOutputContext
-	if OG__().active && (OG__().active.flags&PHP_OUTPUT_HANDLER_FLUSHABLE) != 0 {
+	if active := OG__().Active(); active != nil && active.IsFlushable() {
 		context.Init(PHP_OUTPUT_HANDLER_FLUSH)
-		PhpOutputHandlerOp(OG__().active, &context)
+		PhpOutputHandlerOp(active, &context)
 		if context.GetOut().GetData() != nil && context.GetOut().GetUsed() != 0 {
-			OG__().Handlers().DelTop()
+			OG__().PopHandler()
 			PhpOutputWrite(context.GetOut().GetData(), context.GetOut().GetUsed())
-			OG__().Handlers().Push(&(OG__().active))
+			OG__().PushHandler(&active)
 		}
 		return types.SUCCESS
 	}
@@ -117,7 +102,7 @@ func PhpOutputFlush() int {
 }
 func PhpOutputClean() int {
 	var context PhpOutputContext
-	if OG__().active && (OG__().active.flags&PHP_OUTPUT_HANDLER_CLEANABLE) != 0 {
+	if active := OG__().Active(); active != nil && active.IsCleanable() {
 		context.Init(PHP_OUTPUT_HANDLER_CLEAN)
 		PhpOutputHandlerOp(OG__().active, &context)
 		return types.SUCCESS
@@ -131,7 +116,7 @@ func PhpOutputEnd() int {
 	return types.FAILURE
 }
 func PhpOutputEndAll() {
-	for OG__().active && PhpOutputStackPop(PHP_OUTPUT_POP_FORCE) != 0 {
+	for OG__().Active() != nil && PhpOutputStackPop(PHP_OUTPUT_POP_FORCE) != 0 {
 
 	}
 }
@@ -142,19 +127,19 @@ func PhpOutputDiscard() int {
 	return types.FAILURE
 }
 func PhpOutputDiscardAll() {
-	for OG__().active {
+	for OG__().Active() != nil {
 		PhpOutputStackPop(PHP_OUTPUT_POP_DISCARD | PHP_OUTPUT_POP_FORCE)
 	}
 }
 func PhpOutputGetLevel() int {
-	if OG__().active {
-		return OG__().Handlers().GetTop()
+	if OG__().Active() != nil {
+		return OG__().CountHandlers()
 	} else {
 		return 0
 	}
 }
 func PhpOutputGetContents(p *types.Zval) int {
-	if OG__().active {
+	if OG__().Active() != nil {
 		p.SetString(b.CastStr(OG__().active.buffer.data, OG__().active.buffer.used))
 		return types.SUCCESS
 	} else {
@@ -163,7 +148,7 @@ func PhpOutputGetContents(p *types.Zval) int {
 	}
 }
 func PhpOutputGetLength(p *types.Zval) int {
-	if OG__().active {
+	if OG__().Active() != nil {
 		p.SetLong(OG__().active.buffer.used)
 		return types.SUCCESS
 	} else {
@@ -260,11 +245,8 @@ func PhpOutputGetStartFilename() string { return OG__().OutputStartFilename() }
 func PhpOutputGetStartLineno() int      { return OG__().OutputStartLineno() }
 func PhpOutputLockError(op int) int {
 	/* if there's no ob active, ob has been stopped */
-
-	if op != 0 && OG__().active && OG__().running {
-
+	if op != 0 && OG__().active != nil && OG__().running != nil {
 		/* fatal error */
-
 		PhpOutputDeactivate()
 		PhpErrorDocref("ref.outcontrol", faults.E_ERROR, "Cannot use output buffering in output buffering display handlers")
 		return 1
@@ -332,24 +314,16 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 	var status PhpOutputHandlerStatusT
 	var original_op int = context.GetOp()
 	if PhpOutputLockError(context.GetOp()) != 0 {
-
 		/* fatal error */
-
 		return PHP_OUTPUT_HANDLER_FAILURE
-
-		/* fatal error */
-
 	}
 
 	/* storable? */
-
 	if PhpOutputHandlerAppend(handler, context.GetIn()) != 0 && context.GetOp() == 0 {
 		context.SetOp(original_op)
 		return PHP_OUTPUT_HANDLER_NO_DATA
 	} else {
-
 		/* need to start? */
-
 		if !handler.IsStarted() {
 			context.SetOp(context.GetOp() | PHP_OUTPUT_HANDLER_START)
 		}
@@ -432,12 +406,13 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 	return status
 }
 func PhpOutputOp(op int, str *byte, len_ int) {
-	var context PhpOutputContext
-	var active **PhpOutputHandler
-	var obh_cnt int
 	if PhpOutputLockError(op) != 0 {
 		return
 	}
+
+	var context PhpOutputContext
+	var active **PhpOutputHandler
+	var obh_cnt int
 	context.Init(op)
 
 	/*
@@ -445,7 +420,6 @@ func PhpOutputOp(op int, str *byte, len_ int) {
 	 *  - apply op to the one active handler; note that OG__().active might be popped off the stack on a flush
 	 *  - or apply op to the handler stack
 	 */
-
 	if OG__().active && lang.Assign(&obh_cnt, OG__().Handlers().GetTop()) {
 		context.GetIn().SetData((*byte)(str))
 		context.GetIn().SetUsed(len_)
@@ -505,25 +479,15 @@ func PhpOutputStackApplyOp(h any, c any) int {
 		fallthrough
 	default:
 		if was_disabled != 0 {
-
 			/* pass input along, if it's the last handler in the stack */
-
 			if handler.GetLevel() == 0 {
 				PhpOutputContextPass(context)
 			}
-
-			/* pass input along, if it's the last handler in the stack */
-
 		} else {
-
 			/* swap buffers, unless this is the last handler */
-
 			if handler.GetLevel() != 0 {
 				PhpOutputContextSwap(context)
 			}
-
-			/* swap buffers, unless this is the last handler */
-
 		}
 		return 0
 	}
@@ -562,13 +526,13 @@ func PhpOutputHandlerStatus(handler *PhpOutputHandler, entry *types.Zval) *types
 func PhpOutputStackPop(flags int) int {
 	var context PhpOutputContext
 	var current **PhpOutputHandler
-	var orphan **PhpOutputHandler = OG__().active
+	var orphan *PhpOutputHandler = OG__().Active()
 	if orphan == nil {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
 			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer. No buffer to %s", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"))
 		}
 		return 0
-	} else if (flags&PHP_OUTPUT_POP_FORCE) == 0 && !orphan.HasFlags(PHP_OUTPUT_HANDLER_REMOVABLE) {
+	} else if (flags&PHP_OUTPUT_POP_FORCE) == 0 && !orphan.IsRemovable() {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
 			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer of %s (%d)", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.Name(), orphan.GetLevel())
 		}
