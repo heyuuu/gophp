@@ -463,15 +463,9 @@ func (this *ZendExecutorGlobals) GetUserErrorHandlersErrorReporting() ZendStack 
 func (this *ZendExecutorGlobals) SetUserErrorHandlersErrorReporting(value ZendStack) {
 	this.user_error_handlers_error_reporting = value
 }
-func (this *ZendExecutorGlobals) GetUserErrorHandlers() ZendStack { return this.user_error_handlers }
-func (this *ZendExecutorGlobals) SetUserErrorHandlers(value ZendStack) {
-	this.user_error_handlers = value
-}
-func (this *ZendExecutorGlobals) GetUserExceptionHandlers() ZendStack {
+func (this *ZendExecutorGlobals) GetUserErrorHandlers() *ZendStack { return this.user_error_handlers }
+func (this *ZendExecutorGlobals) GetUserExceptionHandlers() *ZendStack {
 	return this.user_exception_handlers
-}
-func (this *ZendExecutorGlobals) SetUserExceptionHandlers(value ZendStack) {
-	this.user_exception_handlers = value
 }
 func (this *ZendExecutorGlobals) GetErrorHandling() ZendErrorHandlingT { return this.error_handling }
 func (this *ZendExecutorGlobals) SetErrorHandling(value ZendErrorHandlingT) {

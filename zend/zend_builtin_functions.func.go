@@ -862,7 +862,7 @@ func ZifRestoreErrorHandler(executeData zpp.Ex, return_value zpp.Ret) {
 		EG__().GetUserErrorHandler().SetUndef()
 		// ZvalPtrDtor(&zeh)
 	}
-	if ZendStackIsEmpty(EG__().GetUserErrorHandlers()) != 0 {
+	if EG__().GetUserErrorHandlers().IsEmpty() {
 		EG__().GetUserErrorHandler().SetUndef()
 	} else {
 		var tmp *types.Zval
@@ -904,7 +904,7 @@ func ZifRestoreExceptionHandler(executeData zpp.Ex, return_value zpp.Ret) {
 	if EG__().GetUserExceptionHandler().IsNotUndef() {
 		// ZvalPtrDtor(EG__().GetUserExceptionHandler())
 	}
-	if ZendStackIsEmpty(EG__().GetUserExceptionHandlers()) != 0 {
+	if EG__().GetUserExceptionHandlers().IsEmpty() {
 		EG__().GetUserExceptionHandler().SetUndef()
 	} else {
 		var tmp *types.Zval = EG__().GetUserExceptionHandlers().Top()

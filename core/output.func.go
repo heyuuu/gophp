@@ -23,7 +23,7 @@ func PhpOutputStderr(str string) int {
 func PhpOutputHeader() {
 	if !SG__().headersSent {
 		if OG__().OutputStartFilename() == "" {
-			if zend.ZendIsCompiling() != 0 {
+			if zend.ZendIsCompiling() {
 				OG__().SetOutputStartFilename(zend.ZendGetCompiledFilename())
 				OG__().SetOutputStartLineno(zend.ZendGetCompiledLineno())
 			} else if zend.ZendIsExecuting() {
@@ -188,37 +188,6 @@ func PhpOutputStartInternal(name string, output_handler PhpOutputHandlerFuncT, c
 	PhpOutputHandlerFree(&handler)
 	return types.FAILURE
 }
-func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flags int) *PhpOutputHandler {
-	var handler_name *types.String = nil
-	var err *byte = nil
-	var handler *PhpOutputHandler = nil
-	switch output_handler.Type() {
-	case types.IsNull:
-		handler = PhpOutputHandlerCreateInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunk_size, flags)
-	case types.IsString:
-		fallthrough
-	default:
-		user := &PhpOutputHandlerUserFuncT{}
-		if types.SUCCESS == zend.ZendFcallInfoInit(output_handler, 0, user.GetFci(), user.GetFcc(), &handler_name, &error) {
-			handler = NewPhpOutputHandler(handler_name.GetStr(), chunk_size, flags & ^0xf | PHP_OUTPUT_HANDLER_USER)
-			types.ZVAL_COPY(user.GetZoh(), output_handler)
-			handler.SetUser(user)
-		} else {
-			zend.Efree(user)
-		}
-		if err != nil {
-			PhpErrorDocref("ref.outcontrol", faults.E_WARNING, "%s", err)
-		}
-	}
-	return handler
-}
-func PhpOutputHandlerCreateInternal(name string, output_handler PhpOutputHandlerContextFuncT, chunk_size int, flags int) *PhpOutputHandler {
-	var handler *PhpOutputHandler
-	var str = types.NewString(name)
-	handler = PhpOutputHandlerInit(str, chunk_size, flags & ^0xf | PHP_OUTPUT_HANDLER_INTERNAL)
-	handler.SetInternal(output_handler)
-	return handler
-}
 func PhpOutputHandlerSetContext(handler *PhpOutputHandler, opaq any) {
 	handler.SetOpaq(opaq)
 }
@@ -269,9 +238,6 @@ func PhpOutputContextSwap(context *PhpOutputContext) {
 func PhpOutputContextPass(context *PhpOutputContext) {
 	context.SetOut(context.GetIn())
 	context.SetIn(EmptyOutputBuffer())
-}
-func PhpOutputHandlerInit(name *types.String, chunkSize int, flags int) *PhpOutputHandler {
-	return NewPhpOutputHandler(name.GetStr(), flags, chunkSize)
 }
 func PhpOutputHandlerAppend(handler *PhpOutputHandler, buf *PhpOutputBuffer) int {
 	if buf.GetUsed() != 0 {
