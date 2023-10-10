@@ -22,7 +22,7 @@ func run(args []string) {
 	fmt.Printf("%+v\n", opts)
 	switch opts.cmd {
 	case "gen-func":
-		zif.RunGenFunc(opts.dir)
+		zif.RunGenFunc(opts.dir, opts.mode)
 	case "clear-func":
 		zif.RunClearFunc(opts.dir)
 	case "":
@@ -32,19 +32,18 @@ func run(args []string) {
 	}
 }
 
-type opts struct {
-	cmd string
-	dir string
+type optsType struct {
+	cmd  string
+	dir  string
+	mode string
 }
 
-func parseOpts(args []string) opts {
-	var cmd string
-	var dir string
-
+func parseOpts(args []string) (opts optsType) {
 	// options
 	flagSet := flag.NewFlagSet(args[0], flag.ExitOnError)
-	flagSet.StringVar(&cmd, "cmd", "", "command")
-	flagSet.StringVar(&dir, "d", "", "dir")
+	flagSet.StringVar(&opts.cmd, "cmd", "", "command")
+	flagSet.StringVar(&opts.dir, "d", "", "dir")
+	flagSet.StringVar(&opts.mode, "mode", "file", "mode: file | pkg, default file")
 	_ = flagSet.Parse(args[1:])
 
 	// workdir
@@ -52,9 +51,7 @@ func parseOpts(args []string) opts {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	opts.dir = filepath.Join(wd, opts.dir)
 
-	return opts{
-		cmd: cmd,
-		dir: filepath.Join(wd, dir),
-	}
+	return
 }

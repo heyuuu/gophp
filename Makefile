@@ -16,7 +16,7 @@ lexer:
 
 sikgen:
 	${GO} build -o ${BULIDPATH} ./internal/cmd/sikgen
-	${BULIDPATH}sikgen -cmd gen-func
+	${BULIDPATH}sikgen -cmd gen-func -mode pkg
 	${GOFMT} -w .
 
 sikgen-clear:

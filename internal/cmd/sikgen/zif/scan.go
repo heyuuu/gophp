@@ -5,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"go/ast"
+	"go/parser"
+	"go/token"
 	"log"
 	"os"
 	"path/filepath"
@@ -32,7 +34,39 @@ func eachGoFile(dir string, handler func(fileName string)) {
 	}
 }
 
-func scanZifInFile(file *ast.File) []*ZifInfo {
+func eachGoDir(dir string, handler func(dirPath string, filePaths []string)) {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		return
+	}
+	var filePaths []string
+	for _, file := range files {
+		name := file.Name()
+		if strings.HasPrefix(name, "_") || strings.HasPrefix(name, ".") {
+			continue
+		}
+
+		path := filepath.Join(dir, name)
+		if file.IsDir() {
+			eachGoDir(path, handler)
+		} else if strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go") {
+			filePaths = append(filePaths, path)
+		}
+	}
+	if len(filePaths) > 0 {
+		handler(dir, filePaths)
+	}
+}
+
+func scanZifInFile(file string) (string, []*ZifInfo, error) {
+	astFile, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ParseComments)
+	if err != nil {
+		return "", nil, err
+	}
+	return astFile.Name.Name, scanZifInAstFile(astFile), nil
+}
+
+func scanZifInAstFile(file *ast.File) []*ZifInfo {
 	var zifInfos []*ZifInfo
 	ast.Inspect(file, func(node ast.Node) bool {
 		funcDecl, ok := node.(*ast.FuncDecl)

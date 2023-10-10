@@ -1,42 +1,41 @@
 package zif
 
 import (
+	"fmt"
 	"go/ast"
-	"go/parser"
 	"go/printer"
 	"go/token"
 	"log"
 	"os"
+	"path/filepath"
+	"sort"
 	"strings"
 )
 
-func RunGenFunc(dir string) {
+const (
+	ModeEachFile = "file"
+	ModeEachPkg  = "pkg"
+)
+
+func RunGenFunc(dir string, mode string) {
 	handledFiles := make(map[string]bool)
 	unchanged, updated, deleted := 0, 0, 0
 
-	eachGoFile(dir, func(fileName string) {
-		file, err := parser.ParseFile(token.NewFileSet(), fileName, nil, parser.ParseComments)
+	fmt.Println(mode)
+
+	eachGenZifFile(dir, mode == ModeEachPkg, func(zifFile string, code string) {
+		isChanged, err := writeFileIfChanged(zifFile, code)
 		if err != nil {
 			log.Fatal(err)
 		}
-		zifInfos := scanZifInFile(file)
-		if len(zifInfos) > 0 {
-			zifInfoFileName := fileName[:len(fileName)-3] + ".zif.go" // 将 .go 后缀改为 .zif.go
-			zifInfoFileCode := printNode(genFileNode(file.Name.Name, zifInfos))
 
-			isChanged, err := writeFileIfChanged(zifInfoFileName, zifInfoFileCode)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			handledFiles[zifInfoFileName] = true
-			if isChanged {
-				updated++
-				log.Println("Update file: " + zifInfoFileName)
-			} else {
-				unchanged++
-				//log.Println("Unchanged file: " + zifInfoFileName)
-			}
+		handledFiles[zifFile] = true
+		if isChanged {
+			updated++
+			log.Println("Update file: " + zifFile)
+		} else {
+			unchanged++
+			//log.Println("Unchanged file: " + zifInfoFileName)
 		}
 	})
 	eachGoFile(dir, func(fileName string) {
@@ -56,6 +55,46 @@ func RunGenFunc(dir string) {
 		log.Println("Remove File: " + fileName)
 	})
 	log.Printf("处理完成. 共有更新文件 %d, 未变更文件 %d, 移除文件 %d\n", updated, unchanged, deleted)
+}
+
+func eachGenZifFile(dir string, isPkgMode bool, handler func(zifFile string, code string)) {
+	if !isPkgMode {
+		eachGoFile(dir, func(fileName string) {
+			pkgName, zifInfos, err := scanZifInFile(fileName)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if len(zifInfos) == 0 {
+				return
+			}
+
+			zifFile := fileName[:len(fileName)-3] + ".zif.go" // 将 .go 后缀改为 .zif.go
+			zifCode := printNode(genFileNode(pkgName, zifInfos))
+			handler(zifFile, zifCode)
+		})
+	} else {
+		eachGoDir(dir, func(dirPath string, filePaths []string) {
+			var pkgName string
+			var zifInfos []*ZifInfo
+
+			sort.Strings(filePaths)
+			for _, filePath := range filePaths {
+				filePkgName, fileZifInfos, err := scanZifInFile(filePath)
+				if err != nil {
+					log.Fatal(err)
+				}
+				pkgName = filePkgName
+				zifInfos = append(zifInfos, fileZifInfos...)
+			}
+			if len(zifInfos) == 0 {
+				return
+			}
+
+			zifFile := filepath.Join(dir, pkgName+".zif.go")
+			zifCode := printNode(genFileNode(pkgName, zifInfos))
+			handler(zifFile, zifCode)
+		})
+	}
 }
 
 func RunClearFunc(dir string) {
