@@ -151,7 +151,7 @@ func (se *VarSerializer) getSleepProps(ht *types.Array, struc *types.Zval, sleep
 	var props = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
 	var name_val *types.Zval
 	var retval = types.SUCCESS
-	*ht = *types.NewArray(sleep_retval.Len())
+	*ht = *types.NewArrayCap(sleep_retval.Len())
 
 	/* TODO: Rewrite this by fetching the property info instead of trying out different
 	 * name manglings? */

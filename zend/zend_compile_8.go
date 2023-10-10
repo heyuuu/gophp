@@ -248,7 +248,7 @@ func (compiler *Compiler) CompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	if IsThisFetch(var_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
-	CG__().SetMemoizedExprs(types.NewArray(0))
+	CG__().SetMemoizedExprs(types.NewArray())
 	CG__().SetMemoizeMode(ZEND_MEMOIZE_COMPILE)
 	compiler.CompileVar(&var_node_is, var_ast, BP_VAR_IS, 0)
 	coalesce_opnum = GetNextOpNumber()

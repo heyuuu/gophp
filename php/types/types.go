@@ -69,7 +69,7 @@ func NewZvalDouble(d float64) *Zval { return &Zval{v: d} }
 func NewZvalString(s string) *Zval  { return &Zval{v: s} }
 func NewZvalArray(arr *Array) *Zval {
 	if arr == nil {
-		arr = NewArray(0)
+		arr = NewArray()
 	}
 	return &Zval{v: arr}
 }
@@ -92,7 +92,7 @@ func (zv *Zval) SetObject(obj *Object)     { zv.v = obj }
 func (zv *Zval) SetResource(res *Resource) { zv.v = res }
 
 func (zv *Zval) SetStringEx(s *String)          { zv.v = s.GetStr() }
-func (zv *Zval) SetEmptyArray()                 { zv.v = NewArray(0) }
+func (zv *Zval) SetEmptyArray()                 { zv.v = NewArray() }
 func (zv *Zval) SetArrayOfInt(arr []int)        { zv.SetArray(NewArrayOfInt(arr)) }
 func (zv *Zval) SetArrayOfString(arr []string)  { zv.SetArray(NewArrayOfString(arr)) }
 func (zv *Zval) SetArrayOfZval(arr []*Zval)     { zv.SetArray(NewArrayOfZval(arr)) }

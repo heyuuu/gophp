@@ -348,7 +348,7 @@ func (compiler *Compiler) CompileStaticVarCommon(var_name *types.String, value *
 		if CG__().GetActiveOpArray().GetScope() != nil {
 			CG__().GetActiveOpArray().GetScope().SetIsHasStaticInMethods(true)
 		}
-		CG__().GetActiveOpArray().SetStaticVariables(types.NewArray(8))
+		CG__().GetActiveOpArray().SetStaticVariables(types.NewArrayCap(8))
 	}
 
 	_, offset := CG__().GetActiveOpArray().GetStaticVariables().KeyUpdateValAndPos(var_name.GetStr(), value)

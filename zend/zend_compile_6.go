@@ -16,7 +16,7 @@ func (compiler *Compiler) CompileClosureBinding(closure *Znode, op_array *types.
 		return
 	}
 	if op_array.GetStaticVariables() == nil {
-		op_array.SetStaticVariables(types.NewArray(8))
+		op_array.SetStaticVariables(types.NewArrayCap(8))
 	}
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_name_ast *ZendAst = list.Children()[i]
@@ -98,7 +98,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst) {
 	var param_list *ZendAstList = params_ast.AsAstList()
 	var i uint32
-	info.SetUses(types.NewArray(param_list.GetChildren()))
+	info.SetUses(types.NewArrayCap(param_list.GetChildren()))
 	FindImplicitBindsRecursively(info, stmt_ast)
 
 	/* Remove variables that are parameters */
@@ -116,7 +116,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *ty
 		return
 	}
 	if op_array.GetStaticVariables() == nil {
-		op_array.SetStaticVariables(types.NewArray(8))
+		op_array.SetStaticVariables(types.NewArrayCap(8))
 	}
 	info.GetUses().Foreach(func(key types.ArrayKey, _ *types.Zval) {
 		var_name := key.StrKey()

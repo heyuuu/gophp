@@ -564,9 +564,9 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 		}
 		if classes != nil && (classes.IsType(types.IsArray) || !operators.ZvalIsTrue(classes)) {
 			if classes.IsArray() {
-				class_hash = types.NewArray(classes.Array().Len())
+				class_hash = types.NewArrayCap(classes.Array().Len())
 			} else {
-				class_hash = types.NewArray(0)
+				class_hash = types.NewArray()
 			}
 		}
 		if class_hash != nil && classes.IsType(types.IsArray) {

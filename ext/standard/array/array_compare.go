@@ -304,7 +304,7 @@ func arrayDiffKeyWrapper(args []*types.Zval, cmp zvalComparer) (*types.Array, bo
 }
 
 func arrayDiffKey(array *types.Array, arrays []*types.Array, dataComparer zvalComparer) *types.Array {
-	retArr := types.NewArray(0)
+	retArr := types.NewArray()
 	array.Foreach(func(key types.ArrayKey, val *types.Zval) {
 		keep := true
 		for _, cmpArray := range arrays {
@@ -331,7 +331,7 @@ func arrayIntersectWrapper(args []*types.Zval, cmp types.ArrayComparer) (*types.
 
 func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayComparer) *types.Array {
 	if len(arrays) == 0 {
-		return types.NewArray(0)
+		return types.NewArray()
 	}
 
 	// 获取基准键值对，并排序
@@ -345,7 +345,7 @@ func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayCo
 		sortPairs(cmpPairsList[i], cmp)
 	}
 
-	retArr := types.NewArray(array.Len())
+	retArr := types.NewArrayCap(array.Len())
 	for _, pair := range basePairs {
 		keep := true // 标识会否保留此元素
 		for cmpIdx, cmpPairs := range cmpPairsList {
@@ -386,7 +386,7 @@ func arrayIntersectKeyWrapper(args []*types.Zval, cmp zvalComparer) (*types.Arra
 }
 
 func arrayIntersectKey(array *types.Array, arrays []*types.Array, dataComparer zvalComparer) *types.Array {
-	retArr := types.NewArray(array.Len())
+	retArr := types.NewArrayCap(array.Len())
 	array.Foreach(func(key types.ArrayKey, val *types.Zval) {
 		keep := true
 		for _, cmpArray := range arrays {

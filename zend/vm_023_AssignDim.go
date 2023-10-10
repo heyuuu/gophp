@@ -60,7 +60,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				dim = opline.Const2()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -142,7 +142,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -225,7 +225,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -305,7 +305,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 				dim = opline.Const2()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -382,7 +382,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExec
 				dim = opline.Op2()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -465,7 +465,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -549,7 +549,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -630,7 +630,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecute
 				dim = opline.Op2()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -708,7 +708,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 				dim = nil
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -790,7 +790,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -873,7 +873,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -953,7 +953,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 				dim = nil
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1029,7 +1029,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteD
 				dim = opline.Cv2OrUndef()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1108,7 +1108,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDat
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1188,7 +1188,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDat
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1265,7 +1265,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData
 				dim = opline.Cv2OrUndef()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1343,7 +1343,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 				dim = opline.Const2()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1420,7 +1420,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1498,7 +1498,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1573,7 +1573,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 				dim = opline.Const2()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1645,7 +1645,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				dim = opline.Op2()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1724,7 +1724,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1804,7 +1804,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1881,7 +1881,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 				dim = opline.Op2()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1955,7 +1955,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				dim = nil
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -2032,7 +2032,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -2110,7 +2110,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -2185,7 +2185,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 				dim = nil
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -2256,7 +2256,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteDa
 				dim = opline.Cv2OrUndef()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -2330,7 +2330,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteData
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -2405,7 +2405,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData
 				// ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -2477,7 +2477,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 				dim = opline.Cv2OrUndef()
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewArray(8))
+				object_ptr.SetArray(types.NewArrayCap(8))
 				goto try_assign_dim_array
 			}
 		} else {

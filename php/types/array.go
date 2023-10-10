@@ -134,10 +134,13 @@ type Array struct {
 /**
  * Constructor && Init
  */
-func NewArray(size int) *Array {
+func NewArray() *Array {
+	return NewArrayCap(0)
+}
+func NewArrayCap(cap int) *Array {
 	var data []Bucket
-	if size > 0 {
-		data = make([]Bucket, 0, size)
+	if cap > 0 {
+		data = make([]Bucket, 0, cap)
 	}
 
 	var ht = &Array{
@@ -186,7 +189,7 @@ func (ht *Array) Pairs() []ArrayPair {
 
 func (ht *Array) MapWithKey(mapper func(key ArrayKey, value *Zval) (ArrayKey, *Zval)) *Array {
 	// todo 考虑 rehash 等操作 或 对其他属性的处理
-	arr := NewArray(ht.Len())
+	arr := NewArrayCap(ht.Len())
 	ht.Foreach(func(key ArrayKey, value *Zval) {
 		newKey, newValue := mapper(key, value)
 		arr.Add(newKey, newValue)

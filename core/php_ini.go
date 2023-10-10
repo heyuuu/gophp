@@ -13,7 +13,7 @@ type Configuration struct {
 }
 
 func (this *Configuration) Init() {
-	this.hash = types.NewArray(0)
+	this.hash = types.NewArray()
 }
 
 func (this *Configuration) Set(key string, value string) {

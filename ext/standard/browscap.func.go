@@ -80,7 +80,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String) *types.Strin
 	return ctx.GetInternedStr(lcName)
 }
 func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *types.Array {
-	var ht = types.NewArray(8)
+	var ht = types.NewArrayCap(8)
 	ht.KeyAdd("browser_name_regex", types.NewZvalString(BrowscapConvertPatternEx(entry.GetPattern().GetStr())))
 	ht.KeyAdd("browser_name_pattern", types.NewZvalString(entry.GetPattern().GetStr()))
 	if entry.GetParent() != nil {

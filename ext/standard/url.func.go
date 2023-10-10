@@ -305,7 +305,7 @@ func ZifParseUrl(url string, _ zpp.Opt, component *int) *types.Zval {
 	}
 
 	/* add the various elements to the array */
-	arr := types.NewArray(0)
+	arr := types.NewArray()
 	if resource.HasScheme() {
 		arr.KeyAddNew("scheme", types.NewZvalString(resource.Scheme()))
 	}

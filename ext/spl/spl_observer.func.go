@@ -141,7 +141,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 	var zname *types.String
 	var debug_info *types.Array
 	props = types.Z_OBJPROP_P(obj)
-	debug_info = types.NewArray(props.Len() + 1)
+	debug_info = types.NewArrayCap(props.Len() + 1)
 	types.ZendHashCopy(debug_info, props)
 	zend.ArrayInit(&storage)
 

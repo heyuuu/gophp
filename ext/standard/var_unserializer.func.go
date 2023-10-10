@@ -401,7 +401,7 @@ func ProcessNestedData(
 							 * type source if it is turned into a reference lateron. */
 
 							if (**var_hash).GetRefProps() == nil {
-								(**var_hash).SetRefProps(types.NewArray(8))
+								(**var_hash).SetRefProps(types.NewArrayCap(8))
 							}
 							types.ZendHashIndexUpdatePtr((**var_hash).GetRefProps(), types.ZendUintptrT(data), info)
 						}

@@ -131,7 +131,7 @@ func PhpPasswordBcryptGetInfo(hash string) *types.Array {
 	}
 
 	sscanf(hash, "$2y$"+zend.ZEND_LONG_FMT+"$", &cost)
-	arr := types.NewArray(0)
+	arr := types.NewArray()
 	arr.KeyAdd("cost", types.NewZvalLong(cost))
 	return arr
 }
@@ -196,7 +196,7 @@ func PhpPasswordBcryptHash(password string, options *types.Array) (string, bool)
 	return result.GetStr(), true
 }
 func ZmStartupPassword(type_ int, module_number int) int {
-	PhpPasswordAlgos = types.NewArray(0)
+	PhpPasswordAlgos = types.NewArray()
 	if !PhpPasswordAlgoRegister("2y", passwordAlgoBcrypt) {
 		return types.FAILURE
 	}
@@ -274,13 +274,13 @@ func ZifPasswordGetInfo(hash_ string) *types.Zval {
 		algo = PhpPasswordAlgoFind(ident.GetStr())
 	}
 	if algo == nil || !algo.Valid(hash_) {
-		arr := types.NewArray(0)
+		arr := types.NewArray()
 		arr.KeyAdd("algo", types.NewZvalNull())
 		arr.KeyAdd("algoName", types.NewZvalString("unknown"))
 		arr.KeyAdd("options", types.NewZvalArray(nil))
 		return types.NewZvalArray(arr)
 	} else if options_ := algo.GetInfo(hash_); options_ != nil {
-		arr := types.NewArray(0)
+		arr := types.NewArray()
 		arr.KeyAdd("algo", types.NewZvalString(PhpPasswordAlgoExtractIdent(hash_).GetStr()))
 		arr.KeyAdd("algoName", types.NewZvalString(algo.Name()))
 		arr.KeyAdd("options", types.NewZvalArray(options_))

@@ -358,7 +358,7 @@ func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.Arr
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
-	debug_info = types.NewArray(intern.GetStd().GetProperties().Len() + 1)
+	debug_info = types.NewArrayCap(intern.GetStd().GetProperties().Len() + 1)
 	types.ZendHashCopy(debug_info, intern.GetStd().GetProperties())
 	pnstr = SplGenPrivatePropName(ce, "flags")
 	tmp.SetLong(intern.GetFlags())

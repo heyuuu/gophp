@@ -17,7 +17,7 @@ type EnvGlobals struct {
 }
 
 func InitEnviron(environs []string) *EnvGlobals {
-	env := &EnvGlobals{table: types.NewArray(0)}
+	env := &EnvGlobals{table: types.NewArray()}
 	for _, environ := range environs {
 		env.PutEnv(environ)
 	}

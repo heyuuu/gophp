@@ -49,7 +49,7 @@ func RebuildObjectProperties(zobj *types.Object) {
 		var prop_info *types.PropertyInfo
 		var ce *types.ClassEntry = zobj.GetCe()
 		var flags uint32 = 0
-		zobj.SetProperties(types.NewArray(ce.GetDefaultPropertiesCount()))
+		zobj.SetProperties(types.NewArrayCap(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
 			//types.ZendHashRealInitMixed(zobj.GetProperties())
 

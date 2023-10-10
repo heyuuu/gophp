@@ -182,7 +182,7 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, returnValue *types.Zval)
 	param1 := types.NewZvalString(executeData.GetFunc().FunctionName())
 	var param2 *types.Zval
 	if executeData.NumArgs() != 0 {
-		param2 = types.NewZvalArray(types.NewArray(executeData.NumArgs()))
+		param2 = types.NewZvalArray(types.NewArrayCap(executeData.NumArgs()))
 		ZendCopyParametersArray(executeData.NumArgs(), param2)
 	} else {
 		param2 = types.NewZvalArray(nil)

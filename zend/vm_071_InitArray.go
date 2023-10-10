@@ -11,7 +11,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int 
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -29,7 +29,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -47,7 +47,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -65,7 +65,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -83,7 +83,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -101,7 +101,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -119,7 +119,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -137,7 +137,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -155,7 +155,7 @@ func ZEND_INIT_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -173,7 +173,7 @@ func ZEND_INIT_ARRAY_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -191,7 +191,7 @@ func ZEND_INIT_ARRAY_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -209,7 +209,7 @@ func ZEND_INIT_ARRAY_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -229,7 +229,7 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int
 	/* Explicitly initialize array as not-packed if flag is set */
 
 	{
-		array.SetArray(types.NewArray(0))
+		array.SetArray(types.NewArray())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
@@ -242,7 +242,7 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	/* Explicitly initialize array as not-packed if flag is set */
 
 	{
-		array.SetArray(types.NewArray(0))
+		array.SetArray(types.NewArray())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
@@ -255,7 +255,7 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) in
 	/* Explicitly initialize array as not-packed if flag is set */
 
 	{
-		array.SetArray(types.NewArray(0))
+		array.SetArray(types.NewArray())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
@@ -268,7 +268,7 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Explicitly initialize array as not-packed if flag is set */
 
 	{
-		array.SetArray(types.NewArray(0))
+		array.SetArray(types.NewArray())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
@@ -279,7 +279,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -297,7 +297,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -315,7 +315,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -333,7 +333,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = opline.Result()
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewArray(size))
+		array.SetArray(types.NewArrayCap(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 

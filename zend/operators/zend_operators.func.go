@@ -507,7 +507,7 @@ try_again:
 }
 
 func ConvertScalarToArray(op *types.Zval) {
-	var ht *types.Array = types.NewArray(1)
+	var ht *types.Array = types.NewArrayCap(1)
 	ht.IndexAddNew(0, op)
 	op.SetArray(ht)
 }

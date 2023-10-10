@@ -642,7 +642,7 @@ func SplArrayGetDebugInfo(obj *types.Zval) *types.Array {
 		return types.ZendArrayDup(intern.GetStd().GetProperties())
 	} else {
 		var debug_info *types.Array
-		debug_info = types.NewArray(intern.GetStd().GetProperties().Len() + 1)
+		debug_info = types.NewArrayCap(intern.GetStd().GetProperties().Len() + 1)
 		types.ZendHashCopy(debug_info, intern.GetStd().GetProperties())
 		storage = intern.GetArray()
 		//storage.TryAddRefcount()

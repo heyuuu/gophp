@@ -36,12 +36,12 @@ func InitExecutor() {
 	EG__().SetErrorHandling(EH_NORMAL)
 	EG__().SetFlags(EG_FLAGS_INITIAL)
 	ZendVmStackInit()
-	EG__().SetSymbolTable(types.NewArray(64))
+	EG__().SetSymbolTable(types.NewArrayCap(64))
 	ZendExtensions.Apply(func(ext *ZendExtension) {
 		ZendExtensionActivator(ext)
 	})
 
-	EG__().SetIncludedFiles(types.NewArray(8))
+	EG__().SetIncludedFiles(types.NewArrayCap(8))
 	EG__().GetUserErrorHandler().SetUndef()
 	EG__().GetUserExceptionHandler().SetUndef()
 	EG__().SetCurrentExecuteData(nil)
@@ -640,7 +640,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 		return nil
 	}
 	if EG__().GetInAutoload() == nil {
-		EG__().SetInAutoload(types.NewArray(0))
+		EG__().SetInAutoload(types.NewArray())
 	}
 	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name) == nil {
 		return nil
@@ -968,7 +968,7 @@ func ZendRebuildSymbolTable() *types.Array {
 			return symbol_table
 		}
 	} else {
-		ex.SetSymbolTable(types.NewArray(ex.GetFunc().GetOpArray().GetLastVar()))
+		ex.SetSymbolTable(types.NewArrayCap(ex.GetFunc().GetOpArray().GetLastVar()))
 		symbol_table = ex.GetSymbolTable()
 		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
 			return symbol_table

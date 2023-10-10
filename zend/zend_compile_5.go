@@ -142,7 +142,7 @@ func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 	jumptable_type = compiler.DetermineSwitchJumptableType(cases)
 	if jumptable_type != types.IsUndef && ShouldUseJumptable(cases, jumptable_type) != 0 {
 		var jumptable_op Znode
-		jumptable = types.NewArray(cases.GetChildren())
+		jumptable = types.NewArrayCap(cases.GetChildren())
 		jumptable_op.SetOpType(IS_CONST)
 		jumptable_op.GetConstant().SetArray(jumptable)
 		opline = ZendEmitOp(nil, lang.Cond(jumptable_type == types.IsLong, ZEND_SWITCH_LONG, ZEND_SWITCH_STRING), &expr_node, &jumptable_op)

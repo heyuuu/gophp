@@ -590,7 +590,7 @@ func (compiler *Compiler) CompileFuncInArray(result *Znode, args *ZendAstList) i
 		var val *types.Zval
 		var tmp types.Zval
 		var src *types.Array = array.GetConstant().Array()
-		var dst *types.Array = types.NewArray(src.Len())
+		var dst *types.Array = types.NewArrayCap(src.Len())
 		tmp.SetTrue()
 		if strict != 0 {
 			src.ForeachEx(func(_ types.ArrayKey, val *types.Zval) bool {

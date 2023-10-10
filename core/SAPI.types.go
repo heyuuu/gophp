@@ -151,7 +151,7 @@ func (sg *SapiGlobals) Activate() {
 }
 
 func (sg *SapiGlobals) Init() {
-	sg.knownPostContentTypes = *types.NewArray(8)
+	sg.knownPostContentTypes = *types.NewArrayCap(8)
 	PhpSetupSapiContentTypes()
 }
 

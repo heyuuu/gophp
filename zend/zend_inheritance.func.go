@@ -172,7 +172,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 		/* We'll autoload this class and process delayed variance obligations later. */
 
 		if CG__().GetDelayedAutoloads() == nil {
-			CG__().SetDelayedAutoloads(types.NewArray(0))
+			CG__().SetDelayedAutoloads(types.NewArray())
 		}
 		types.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name.GetStr())
 	} else {
@@ -1334,7 +1334,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name string, key string, fn types.
 					}
 				}
 			} else {
-				*overridden = types.NewArray(8)
+				*overridden = types.NewArrayCap(8)
 			}
 			types.ZendHashUpdateMem(*overridden, key, fn, b.SizeOf("zend_function"))
 			return
@@ -1523,7 +1523,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				}
 				trait_num = ZendCheckTraitUsage(ce, exclude_ce, traits)
 				if exclude_tables[trait_num] == nil {
-					exclude_tables[trait_num] = types.NewArray(0)
+					exclude_tables[trait_num] = types.NewArray()
 				}
 				if types.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname) == nil {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", precedences[i].GetTraitMethod().MethodName(), exclude_ce.Name())
@@ -1884,14 +1884,14 @@ func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
 	var ht *types.Array
 	var key ZendUlong
 	if CG__().GetDelayedVarianceObligations() == nil {
-		CG__().SetDelayedVarianceObligations(types.NewArray(0))
+		CG__().SetDelayedVarianceObligations(types.NewArray())
 	}
 	key = ZendUlong(uintPtr(ce))
 	ht = types.ZendHashIndexFindPtr(CG__().GetDelayedVarianceObligations(), key)
 	if ht != nil {
 		return ht
 	}
-	ht = types.NewArray(0)
+	ht = types.NewArray()
 	types.ZendHashIndexAddNewPtr(CG__().GetDelayedVarianceObligations(), key, ht)
 	ce.SetIsUnresolvedVariance(true)
 	return ht

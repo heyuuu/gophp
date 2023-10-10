@@ -50,7 +50,7 @@ type BrowserData struct {
 
 func NewBrowserData(kvSize uint32) *BrowserData {
 	return &BrowserData{
-		htab:    types.NewArray(0),
+		htab:    types.NewArray(),
 		kv:      make([]BrowscapKv, 0, kvSize),
 		kv_used: 0,
 		kv_size: kvSize,

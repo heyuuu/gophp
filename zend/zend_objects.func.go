@@ -139,7 +139,7 @@ func ZendObjectsCloneMembers(new_object *types.Object, old_object *types.Object)
 	}
 	if old_object.GetProperties() != nil && old_object.GetProperties().Len() {
 		if new_object.GetProperties() == nil {
-			new_object.SetProperties(types.NewArray(old_object.GetProperties().Len()))
+			new_object.SetProperties(types.NewArrayCap(old_object.GetProperties().Len()))
 		}
 		new_object.GetProperties().CopyFlags(old_object.GetProperties())
 		new_object.GetProperties().MarkHasEmptyIndex()

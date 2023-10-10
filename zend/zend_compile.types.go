@@ -83,7 +83,7 @@ func (this *ZendFileContext) SetHasBracketedNamespaces(value bool) {
 	this.has_bracketed_namespaces = value
 }
 func (this *ZendFileContext) InitSeenSymbols() {
-	this.seen_symbols = types.NewArray(0)
+	this.seen_symbols = types.NewArray()
 }
 func (this *ZendFileContext) GetSeenSymbols() *types.Array { return this.seen_symbols }
 

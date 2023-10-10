@@ -10,8 +10,8 @@ func CE_STATIC_MEMBERS(ce *types.ClassEntry) *types.Zval {
 	// todo
 	return (ZEND_MAP_PTR_GET(ce.static_members_table__ptr)).(*types.Zval)
 }
-func ArrayInit(arg *types.Zval)                  { arg.SetArray(types.NewArray(0)) }
-func ArrayInitSize(arg *types.Zval, size uint32) { arg.SetArray(types.NewArray(size)) }
+func ArrayInit(arg *types.Zval)                  { arg.SetArray(types.NewArray()) }
+func ArrayInitSize(arg *types.Zval, size uint32) { arg.SetArray(types.NewArrayCap(size)) }
 func AddAssocLong(arg *types.Zval, key string, n ZendLong) int {
 	return AddAssocLongEx(arg, key, n)
 }

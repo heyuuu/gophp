@@ -35,7 +35,7 @@ func ArrayRealDup(arr *Array) *Array {
 
 func NewArrayOfInt(items []int) *Array {
 	// todo
-	arr := NewArray(0)
+	arr := NewArrayCap(len(items))
 	for _, item := range items {
 		arr.Append(NewZvalLong(item))
 	}
@@ -43,7 +43,7 @@ func NewArrayOfInt(items []int) *Array {
 }
 func NewArrayOfString(items []string) *Array {
 	// todo
-	arr := NewArray(0)
+	arr := NewArrayCap(len(items))
 	for _, item := range items {
 		arr.Append(NewZvalString(item))
 	}
@@ -51,7 +51,7 @@ func NewArrayOfString(items []string) *Array {
 }
 func NewArrayOfZval(items []*Zval) *Array {
 	// todo
-	arr := NewArray(0)
+	arr := NewArrayCap(len(items))
 	for _, item := range items {
 		arr.Append(item)
 	}
@@ -245,12 +245,12 @@ func ZendHashCopy(target *Array, source *Array) {
 func ZendArrayDup(source *Array) *Array {
 	// 空数组单独处理
 	if source.elementsCount == 0 {
-		target := NewArray(0)
+		target := NewArray()
 		target.nextFreeElement = source.nextFreeElement
 		return target
 	}
 
-	var ht *Array = NewArray(source.Cap())
+	var ht *Array = NewArrayCap(source.Cap())
 	ht.flags = source.flags
 
 	// todo 待处理复制逻辑(参考逻辑: 非延迟复制，考虑内部指针)
@@ -456,7 +456,7 @@ func ZendSymtableToProptable(ht *Array) *Array {
 	}
 	return ht
 convert:
-	var newHt *Array = NewArray(ht.Len())
+	var newHt *Array = NewArrayCap(ht.Len())
 	ht.Foreach(func(key ArrayKey, zv *Zval) {
 		var strKey string
 		if key.IsStrKey() {
@@ -493,7 +493,7 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 	}
 	return ht
 convert:
-	var new_ht *Array = NewArray(ht.Len())
+	var new_ht *Array = NewArrayCap(ht.Len())
 	var __ht__1 *Array = ht
 	for _, _p := range __ht__1.ForeachData() {
 		var _z *Zval = _p.GetVal()

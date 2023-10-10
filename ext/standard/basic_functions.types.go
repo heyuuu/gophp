@@ -59,8 +59,8 @@ func (bg *PhpBasicGlobals) Ctor() {
 	bg.unserialize = unserializeType{}
 	bg.url_adapt_session_ex = UrlAdaptStateExT{type_: 1}
 	bg.url_adapt_output_ex = UrlAdaptStateExT{type_: 0}
-	bg.url_adapt_session_hosts_ht = types.NewArray(0)
-	bg.url_adapt_output_hosts_ht = types.NewArray(0)
+	bg.url_adapt_session_hosts_ht = types.NewArray()
+	bg.url_adapt_output_hosts_ht = types.NewArray()
 	bg.incomplete_class = IncompleteClassEntry
 }
 func (bg *PhpBasicGlobals) Activate() {

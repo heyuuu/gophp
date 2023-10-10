@@ -573,7 +573,7 @@ func ZifTimeNanosleep(seconds int, nanoseconds int) *types.Zval {
 	if rest == 0 {
 		return types.NewZvalTrue()
 	} else {
-		arr := types.NewArray(2)
+		arr := types.NewArrayCap(2)
 		arr.KeyAdd("seconds", types.NewZvalLong(int(rest.Seconds())))
 		arr.KeyAdd("nanoseconds", types.NewZvalLong(int(rest.Nanoseconds())%int(time.Second)))
 		return types.NewZvalArray(arr)
@@ -599,7 +599,7 @@ func ZifGetCurrentUser() string {
 }
 
 func parseConfigArray(hash *types.Array) *types.Array {
-	arr := types.NewArray(0)
+	arr := types.NewArray()
 	hash.Foreach(func(key types.ArrayKey, value *types.Zval) {
 		if value.IsString() {
 			if key.IsStrKey() {
@@ -677,7 +677,7 @@ func ZifErrorLog(message string, _ zpp.Opt, messageType int, destination *zpp.Pa
 func ZifErrorGetLast() *types.Zval {
 	lastError := core.PG__().LastError()
 	if lastError != nil {
-		arr := types.NewArray(4)
+		arr := types.NewArrayCap(4)
 		arr.KeyAdd("type", types.NewZvalLong(lastError.Type))
 		arr.KeyAdd("message", types.NewZvalString(lastError.Message))
 		if lastError.File != "" {

@@ -47,7 +47,7 @@ func ZifClassParents(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*types.A
 		return nil, false
 	}
 
-	retArr := types.NewArray(0)
+	retArr := types.NewArray()
 	parentClass := ce.GetParent()
 	for parentClass != nil {
 		SplAddClassName(retArr, parentClass, 0, 0)
@@ -71,7 +71,7 @@ func ZifClassImplements(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*type
 		return nil, false
 	}
 
-	retArr := types.NewArray(0)
+	retArr := types.NewArray()
 	SplAddInterfaces(retArr, ce, 1, types.AccInterface)
 	return retArr, true
 }
@@ -91,7 +91,7 @@ func ZifClassUses(instance *types.Zval, _ zpp.Opt, autoload_ *bool) (*types.Arra
 		return nil, false
 	}
 
-	retArr := types.NewArray(0)
+	retArr := types.NewArray()
 	SplAddTraits(retArr, ce, 1, types.AccTrait)
 	return retArr, true
 }
@@ -158,7 +158,7 @@ func splClasses() []*types.ClassEntry {
 func ZifSplClasses() *types.Array {
 	classes := splClasses()
 
-	list := types.NewArray(0)
+	list := types.NewArray()
 	for _, ce := range classes {
 		if ce != nil {
 			SplAddClassName(list, ce, 0, 0)
@@ -369,7 +369,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, _ zpp.Opt, autoloadFunction *typ
 			alfi.GetObj().SetUndef()
 		}
 		if SPL_G__().autoloadFunctions == nil {
-			SPL_G__().autoloadFunctions = types.NewArray(1)
+			SPL_G__().autoloadFunctions = types.NewArrayCap(1)
 		}
 		splFuncPtr = SplAutoloadFn
 		if zend.EG__().GetAutoloadFunc() == splFuncPtr {
@@ -491,7 +491,7 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 			if !(alfi.GetClosure().IsUndef()) {
 				zend.AddNextIndexZval(return_value, alfi.GetClosure())
 			} else if alfi.GetFuncPtr().GetScope() != nil {
-				tmpArr := types.NewArray(0)
+				tmpArr := types.NewArray()
 				if !(alfi.GetObj().IsUndef()) {
 					tmpArr.Append(alfi.GetObj())
 				} else {

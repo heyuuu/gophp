@@ -32,7 +32,7 @@ func PhpIniOnUpdateTags(
 	if ctx.GetTags() != nil {
 		ctx.GetTags().Destroy()
 	}
-	ctx.SetTags(types.NewArray(0))
+	ctx.SetTags(types.NewArray())
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var val *byte
 		val = strchr(key, '=')

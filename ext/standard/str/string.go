@@ -619,7 +619,7 @@ func ZifDirname(path string, _ zpp.Opt, levels_ *int) string {
 func ZifPathinfo(path string, _ zpp.Opt, options *int) *types.Zval {
 	opt := b.Option(options, PHP_PATHINFO_ALL)
 
-	arr := types.NewArray(0)
+	arr := types.NewArray()
 	if (opt & PHP_PATHINFO_DIRNAME) == PHP_PATHINFO_DIRNAME {
 		dirname := zend.ZendDirname(path)
 		if dirname != "" {
@@ -1007,7 +1007,7 @@ func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length
 }
 
 func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval, length *types.Zval) *types.Array {
-	arr := types.NewArray(str.Len())
+	arr := types.NewArrayCap(str.Len())
 
 	var replaceStr []string
 	if replace.IsArray() {
@@ -1524,7 +1524,7 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 	}
 }
 func strReplaceArray(subject *types.Array, search *types.Zval, replace *types.Zval, caseSensitivity bool) (*types.Array, int) {
-	arr := types.NewArray(subject.Len())
+	arr := types.NewArrayCap(subject.Len())
 	replaceCount := 0
 	subject.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 		value = types.ZVAL_DEREF(value)
@@ -2069,7 +2069,7 @@ func ZifCountChars(input string, _ zpp.Opt, mode int) (*types.Zval, bool) {
 	}
 
 	if mode < 3 { // mode=0,1,2 以数组返回
-		arr := types.NewArray(0)
+		arr := types.NewArray()
 		for i := 0; i < 256; i++ {
 			count := charCount[i]
 			if mode == 0 || (mode == 1 && count != 0) || (mode == 2 && count == 0) {
@@ -2242,13 +2242,13 @@ func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*type
 		count := len(spans)
 		return types.NewZvalLong(count), true
 	case 1:
-		arr := types.NewArray(len(spans))
+		arr := types.NewArrayCap(len(spans))
 		for _, span := range spans {
 			arr.Append(types.NewZvalString(str[span.start:span.end]))
 		}
 		return types.NewZvalArray(arr), true
 	case 2:
-		arr := types.NewArray(len(spans))
+		arr := types.NewArrayCap(len(spans))
 		for _, span := range spans {
 			arr.IndexUpdate(span.start, types.NewZvalString(str[span.start:span.end]))
 		}

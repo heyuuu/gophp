@@ -475,7 +475,7 @@ func ZifArrayFill(startKey int, num int, val *types.Zval) (*types.Array, bool) {
 		return nil, false
 	}
 	if num == 0 {
-		return types.NewArray(0), true
+		return types.NewArray(), true
 	}
 	if num > math.MaxInt32 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Too many elements")
@@ -488,14 +488,14 @@ func ZifArrayFill(startKey int, num int, val *types.Zval) (*types.Array, bool) {
 	// todo 尽量创建 packed array
 
 	/* create hash */
-	arr := types.NewArray(num)
+	arr := types.NewArrayCap(num)
 	for i := 0; i < num; i++ {
 		arr.IndexAdd(startKey+i, val)
 	}
 	return arr, true
 }
 func ZifArrayFillKeys(keys *types.Array, val *types.Zval) *types.Array {
-	arr := types.NewArray(keys.Len())
+	arr := types.NewArrayCap(keys.Len())
 	keys.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
 		entry = types.ZVAL_DEREF(entry)
 		if entry.IsLong() {
@@ -671,8 +671,8 @@ func phpSplice(arr *types.Array, offset int, length int, replace *types.Array) (
 		length = 0
 	}
 
-	outHash := types.NewArray(0)
-	removed := types.NewArray(0)
+	outHash := types.NewArray()
+	removed := types.NewArray()
 	pairs := arr.Pairs()
 
 	// handle range [0, offset)
@@ -774,7 +774,7 @@ func ZifArrayShift(stack zpp.RefArray) *types.Zval {
 	return val
 }
 func ZifArrayUnshift(stack zpp.RefZval, values []*types.Zval) int {
-	newArr := types.NewArray(stack.Array().Len() + len(values))
+	newArr := types.NewArrayCap(stack.Array().Len() + len(values))
 	for _, value := range values {
 		newArr.Append(value)
 	}
@@ -817,7 +817,7 @@ func ZifArraySlice(array *types.Array, offset int, _ zpp.Opt, length_ *types.Zva
 
 	/* Clamp the offset.. */
 	if offset > numIn {
-		return types.NewArray(0)
+		return types.NewArray()
 	} else if offset < 0 && lang.Assign(&offset, numIn+offset) < 0 {
 		offset += numIn
 		if offset < 0 {
@@ -832,11 +832,11 @@ func ZifArraySlice(array *types.Array, offset int, _ zpp.Opt, length_ *types.Zva
 		length = numIn - offset
 	}
 	if length <= 0 {
-		return types.NewArray(0)
+		return types.NewArray()
 	}
 
 	/* Initialize returned array */
-	retArr := types.NewArray(length)
+	retArr := types.NewArrayCap(length)
 
 	/* Start at the beginning and go until we hit offset */
 	count := 0
@@ -970,7 +970,7 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) bool {
 func arrayMergeWrapper(args []*types.Zval, recursive bool) *types.Array {
 	var dest *types.Array
 	if len(args) == 0 {
-		return types.NewArray(0)
+		return types.NewArray()
 	}
 
 	count := 0
@@ -982,7 +982,7 @@ func arrayMergeWrapper(args []*types.Zval, recursive bool) *types.Array {
 		count += arg.Array().Len()
 	}
 
-	arr := types.NewArray(count)
+	arr := types.NewArrayCap(count)
 
 	args[0].Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 		if key.IsStrKey() {
@@ -1056,12 +1056,12 @@ func ZifArrayKeys(array *types.Array, _ zpp.Opt, searchValue *types.Zval, strict
 
 	/* Base case: empty input */
 	if arrLen == 0 {
-		return types.NewArray(0)
+		return types.NewArray()
 	}
 
 	/* Initialize return array */
 	if searchValue != nil {
-		keys := types.NewArray(0)
+		keys := types.NewArray()
 		if strict {
 			array.ForeachIndirect(func(key types.ArrayKey, entry *types.Zval) {
 				entry = types.ZVAL_DEREF(entry)
@@ -1078,7 +1078,7 @@ func ZifArrayKeys(array *types.Array, _ zpp.Opt, searchValue *types.Zval, strict
 		}
 		return keys
 	} else {
-		keys := types.NewArray(arrLen)
+		keys := types.NewArrayCap(arrLen)
 		array.ForeachIndirect(func(key types.ArrayKey, _ *types.Zval) {
 			keys.Append(key.ToZval())
 		})
@@ -1102,18 +1102,18 @@ func ZifArrayKeyLast(array *types.Array) *types.Zval {
 func ZifArrayValues(array *types.Array) *types.Array {
 	arrLen := array.Len()
 	if arrLen == 0 {
-		return types.NewArray(0)
+		return types.NewArray()
 	}
 
 	/* Initialize return array */
-	values := types.NewArray(array.Len())
+	values := types.NewArrayCap(array.Len())
 	array.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
 		values.Append(entry)
 	})
 	return values
 }
 func ZifArrayCountValues(array *types.Array) *types.Array {
-	retArr := types.NewArray(0)
+	retArr := types.NewArray()
 	array.Foreach(func(_ types.ArrayKey, entry *types.Zval) {
 		entry = types.ZVAL_DEREF(entry)
 
@@ -1194,7 +1194,7 @@ func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, i
 		return nil, false
 	}
 
-	retArr := types.NewArray(array.Len())
+	retArr := types.NewArrayCap(array.Len())
 	if indexKey == nil {
 		array.Foreach(func(_ types.ArrayKey, data *types.Zval) {
 			var columnVal *types.Zval
@@ -1251,7 +1251,7 @@ func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, i
 	return retArr, true
 }
 func ZifArrayReverse(array *types.Array, _ zpp.Opt, preserveKeys bool) *types.Array {
-	retArr := types.NewArray(array.Len())
+	retArr := types.NewArrayCap(array.Len())
 	array.ForeachReserve(func(key types.ArrayKey, value *types.Zval) {
 		if preserveKeys || key.IsStrKey() {
 			retArr.Add(key, value)
@@ -1286,7 +1286,7 @@ func ZifArrayPad(array *types.Array, padSize int, padValue *types.Zval) (*types.
 	}
 
 	numPads := padSizeAbs - inputSize
-	retArr := types.NewArray(padSizeAbs)
+	retArr := types.NewArrayCap(padSizeAbs)
 	if padSize < 0 {
 		for i := 0; i < numPads; i++ {
 			retArr.Append(padValue)
@@ -1307,7 +1307,7 @@ func ZifArrayPad(array *types.Array, padSize int, padValue *types.Zval) (*types.
 	return retArr, true
 }
 func ZifArrayFlip(array *types.Array) *types.Array {
-	retArr := types.NewArray(array.Len())
+	retArr := types.NewArrayCap(array.Len())
 	array.Foreach(func(key types.ArrayKey, value *types.Zval) {
 		value = value.DeRef()
 		if value.IsLong() {
@@ -1322,7 +1322,7 @@ func ZifArrayFlip(array *types.Array) *types.Array {
 }
 func ZifArrayChangeKeyCase(array *types.Array, _ zpp.Opt, case_ *int) *types.Array {
 	var caseFlag = b.Option(case_, CASE_LOWER)
-	retArr := types.NewArray(array.Len())
+	retArr := types.NewArrayCap(array.Len())
 	array.Foreach(func(key types.ArrayKey, value *types.Zval) {
 		if key.IsStrKey() {
 			if caseFlag == CASE_LOWER {
@@ -1341,7 +1341,7 @@ func ZifArrayUnique(arg *types.Array, _ zpp.Opt, flags *int) *types.Array {
 
 	if sortType == PHP_SORT_STRING {
 		existValues := make(map[string]bool, arg.Len())
-		retArr := types.NewArray(arg.Len())
+		retArr := types.NewArrayCap(arg.Len())
 		arg.ForeachIndirect(func(key types.ArrayKey, val *types.Zval) {
 			var strVal = operators.ZvalGetStrVal(val)
 			if _, exists := existValues[strVal]; !exists {
@@ -1437,7 +1437,7 @@ func ZifArrayDiffUkey(arrays []*types.Zval, callbackKeyCompFunc zpp.Callable) (*
 
 func simpleArrayDiff(array *types.Array, arrays []*types.Array) *types.Array {
 	if array.Len() == 0 {
-		return types.NewArray(0)
+		return types.NewArray()
 	}
 
 	// array.Len() > 1
@@ -1452,7 +1452,7 @@ func simpleArrayDiff(array *types.Array, arrays []*types.Array) *types.Array {
 		return array
 	}
 
-	retArr := types.NewArray(array.Len())
+	retArr := types.NewArrayCap(array.Len())
 	array.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 		str := operators.ZvalGetStrVal(value)
 		if _, excluded := exclude[str]; !excluded {
@@ -1634,7 +1634,7 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 
 	/* Restructure the arrays based on sorted indirect - this is mostly taken from zend_hash_sort() function. */
 	for i, array := range arrays {
-		newHash := types.NewArray(array.Array().Len())
+		newHash := types.NewArrayCap(array.Array().Len())
 		for idx := 0; idx < arraySize; idx++ {
 			pair := matrix[idx][i]
 			if pair.GetKey().IsStrKey() {
@@ -1679,7 +1679,7 @@ func ZifArrayRand(arg *types.Array, _ zpp.Opt, numReq_ *int) *types.Zval {
 			}
 		}
 
-		retArr := types.NewArray(numReq)
+		retArr := types.NewArrayCap(numReq)
 		for i, key := range keys {
 			if !negative && randIdxSet[i] || negative && !randIdxSet[i] {
 				retArr.Append(key.ToZval())
@@ -1741,7 +1741,7 @@ func ZifArrayReduce(array *types.Array, callback zpp.Callable, _ zpp.Opt, initia
 	return zend.ZvalZval(&result, true, true)
 }
 func ZifArrayFilter(array_ *types.Array, _ zpp.Opt, callback zpp.Callable, mode int) *types.Array {
-	retArr := types.NewArray(0)
+	retArr := types.NewArray()
 	if array_.Len() == 0 {
 		return retArr
 	}
@@ -1790,7 +1790,7 @@ func ZifArrayFilter(array_ *types.Array, _ zpp.Opt, callback zpp.Callable, mode 
 }
 
 func arrayMapSingle(callback zpp.Callable, array *types.Array) *types.Array {
-	retArr := types.NewArray(array.Len())
+	retArr := types.NewArrayCap(array.Len())
 	ok := array.ForeachEx(func(key types.ArrayKey, value *types.Zval) bool {
 		retVal, ok := callback.Call(value)
 		if !ok || retVal.IsUndef() {
@@ -1828,7 +1828,7 @@ func arrayMapMulti(callback zpp.Callable, arrays []*types.Array) *types.Array {
 		}
 	}
 
-	retArr := types.NewArray(len_)
+	retArr := types.NewArrayCap(len_)
 	for _, argColumns := range argMatrix {
 		if callback == nil {
 			retArr.Append(types.NewZvalArray(types.NewArrayOfZval(argColumns)))
@@ -1894,13 +1894,13 @@ func ZifArrayChunk(array *types.Array, length int, _ zpp.Opt, preserveKeys bool)
 	}
 
 	chunkCount := (array.Len()-1)/length + 1 // ceil(len/length)
-	retArr := types.NewArray(chunkCount)
+	retArr := types.NewArrayCap(chunkCount)
 
 	var currChunk *types.Array = nil
 	itemCount := 0
 	array.Foreach(func(key types.ArrayKey, entry *types.Zval) {
 		if itemCount%length == 0 {
-			currChunk = types.NewArray(length)
+			currChunk = types.NewArrayCap(length)
 			retArr.Append(types.NewZvalArray(currChunk))
 		}
 
@@ -1919,12 +1919,12 @@ func ZifArrayCombine(keys *types.Array, values *types.Array) (*types.Array, bool
 		return nil, false
 	}
 	if keys.Len() == 0 {
-		return types.NewArray(0), true
+		return types.NewArray(), true
 	}
 
 	zvKeys := keys.Values()
 	zvValues := values.Values()
-	retArr := types.NewArray(keys.Len())
+	retArr := types.NewArrayCap(keys.Len())
 	for i, key := range zvKeys {
 		if i > len(zvValues) {
 			break

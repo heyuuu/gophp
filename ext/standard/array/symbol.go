@@ -708,7 +708,7 @@ func ZifCompact(varNames []*types.Zval) *types.Array {
 		return nil
 	}
 
-	retArr := types.NewArray(len(varNames))
+	retArr := types.NewArrayCap(len(varNames))
 	for _, varName := range varNames {
 		PhpCompactVar(symbolTable, retArr, varName)
 	}

@@ -109,7 +109,7 @@ func ZifFuncGetArgs(executeData zpp.Ex) (*types.Array, bool) {
 
 	argCount := ex.NumArgs()
 	if argCount == 0 {
-		return types.NewArray(0), true
+		return types.NewArray(), true
 	}
 
 	firstExtraArg := int(ex.GetFunc().GetOpArray().GetNumArgs())
@@ -125,7 +125,7 @@ func ZifFuncGetArgs(executeData zpp.Ex) (*types.Array, bool) {
 		}
 	}
 
-	arr := types.NewArray(argCount)
+	arr := types.NewArrayCap(argCount)
 	for _, zv := range values {
 		if zv.IsUndef() {
 			arr.AppendNew(types.NewZvalNull())
@@ -176,7 +176,7 @@ func ZifEach(array zpp.RefZval) (*types.Array, bool) {
 	key := pair.GetKey()
 	val := pair.GetVal().DeRef()
 
-	result := types.NewArray(4)
+	result := types.NewArrayCap(4)
 
 	/* add value elements */
 	result.IndexAddNew(1, val)
@@ -266,7 +266,7 @@ func ValidateConstantArray(ht *types.Array) int {
 	return ret
 }
 func CopyConstantArray(dst *types.Zval, src *types.Zval) {
-	dstArr := types.NewArray(src.Array().Len())
+	dstArr := types.NewArrayCap(src.Array().Len())
 	src.Array().Foreach(func(key types.ArrayKey, val *types.Zval) {
 		/* constant arrays can't contain references */
 		val = types.ZVAL_DEREF(val)
@@ -540,7 +540,7 @@ func ZifGetObjectVars(obj zpp.Object) (*types.Array, bool) {
 		}
 		return types.ZendProptableToSymtable(properties, 1), true
 	} else {
-		retArr := types.NewArray(properties.Len())
+		retArr := types.NewArrayCap(properties.Len())
 		properties.Foreach(func(key types.ArrayKey, value *types.Zval) {
 			var isDynamic = true
 			if value.IsIndirect() {
@@ -792,7 +792,7 @@ func ZifClassAlias(executeData zpp.Ex, return_value zpp.Ret, userClassName *type
 
 //@zif -alias get_required_files
 func ZifGetIncludedFiles() *types.Array {
-	retArr := types.NewArray(0)
+	retArr := types.NewArray()
 	EG__().GetIncludedFiles().Foreach(func(key types.ArrayKey, value *types.Zval) {
 		if key.IsStrKey() {
 			retArr.Append(types.NewZvalString(key.StrKey()))
@@ -916,7 +916,7 @@ func ZifRestoreExceptionHandler(executeData zpp.Ex, return_value zpp.Ret) {
 }
 
 func GetDeclaredClassImpl(flags uint32, skipFlags uint32) *types.Array {
-	arr := types.NewArray(EG__().ClassTable().Len())
+	arr := types.NewArrayCap(EG__().ClassTable().Len())
 	EG__().ClassTable().Foreach(func(key string, ce *types.ClassEntry) {
 		if key != "" && ce.HasCeFlags(flags) && !ce.HasCeFlags(skipFlags) {
 			// 非别名创建的 ce 使用真实类名；class_alias 别名创建的 ce 使用 key 值，此时类名为小写
@@ -990,7 +990,7 @@ func ZifGetResourceType(executeData zpp.Ex, return_value zpp.Ret, res *types.Zva
 	}
 }
 func ZifGetResources(_ zpp.Opt, type_ *string) (*types.Array, bool) {
-	retArr := types.NewArray(0)
+	retArr := types.NewArray()
 	if type_ == nil {
 		// skip 跳过获取全局resouce的逻辑
 	} else if *type_ == "Unknown" {
@@ -1092,7 +1092,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		var p = call.Arg(1)
 		ArrayInitSize(arg_array, numArgs)
 
-		arr := types.NewArray(numArgs)
+		arr := types.NewArrayCap(numArgs)
 		if call.GetFunc().GetType() == ZEND_USER_FUNCTION {
 			var firstExtraArg = b.Min(numArgs, call.GetFunc().GetOpArray().GetNumArgs())
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
