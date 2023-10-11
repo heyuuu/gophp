@@ -81,12 +81,6 @@ func wrapHandlerFuncT(handler PhpOutputHandlerFuncT) OutputHandlerFunc {
 	}
 }
 
-func wrapHandlerFuncContextT(handler PhpOutputHandlerContextFuncT) OutputHandlerFunc {
-	return func(context *PhpOutputContext) bool {
-		return handler(nil, context) == types.SUCCESS
-	}
-}
-
 /**
  * types
  */

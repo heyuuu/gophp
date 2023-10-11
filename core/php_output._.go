@@ -1,7 +1,5 @@
 package core
 
-import b "github.com/heyuuu/gophp/builtin"
-
 /* handler ops */
 const PHP_OUTPUT_HANDLER_WRITE = 0x0
 const PHP_OUTPUT_HANDLER_START = 0x1
@@ -48,16 +46,3 @@ type PhpOutputHandlerFuncT func(output *byte, output_len int, handled_output **b
 type PhpOutputHandlerContextFuncT func(handlerContext any, outputContext *PhpOutputContext) int
 
 type OutputHandlerT func(output string, mode int) (handledOutput string)
-
-// todo temp, need remove
-func wrapOutputHandler(h PhpOutputHandlerFuncT) OutputHandlerT {
-	if h == nil {
-		return nil
-	}
-	return func(output string, mode int) (handledOutput string) {
-		var outputPtr *byte
-		var outputLen int
-		h(b.CastStrPtr(output), len(output), &outputPtr, &outputLen, mode)
-		return b.CastStr(outputPtr, outputLen)
-	}
-}

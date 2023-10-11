@@ -206,8 +206,5 @@ func ZendStrip() {
 	}
 
 	/* Discard parse errors thrown during tokenization */
-
 	faults.ClearException()
-
-	/* Discard parse errors thrown during tokenization */
 }
