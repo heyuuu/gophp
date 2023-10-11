@@ -273,7 +273,7 @@ func ZendGetExecutedFilenameEx() *types.String {
 		return nil
 	}
 }
-func ZendGetExecutedLineno() uint32 {
+func ZendGetExecutedLineno() int {
 	var ex *ZendExecuteData = CurrEX()
 	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 		ex = ex.GetPrevExecuteData()

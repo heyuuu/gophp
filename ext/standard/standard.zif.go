@@ -378,19 +378,21 @@ var DefZifPhpStripWhitespace = def.DefFunc("php_strip_whitespace", 1, 1, []def.A
 	if fp.HasError() {
 		return
 	}
-	ZifPhpStripWhitespace(returnValue, file_name)
+	ret := ZifPhpStripWhitespace(file_name)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifHighlightString
 var DefZifHighlightString = def.DefFunc("highlight_string", 1, 2, []def.ArgInfo{{Name: "string"}, {Name: "return"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	string_ := fp.ParseZval()
+	string := fp.ParseStringVal()
 	fp.StartOptional()
 	return_ := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifHighlightString(returnValue, string_, nil, return_)
+	ret := ZifHighlightString(string, nil, return_)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifIniGet

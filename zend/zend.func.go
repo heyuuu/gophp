@@ -429,18 +429,18 @@ func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*FileHandle) boo
 }
 
 func ZendMakeCompiledStringDescription(name string) string {
-	var cur_filename string
-	var cur_lineno int
-	if ZendIsCompiling() != 0 {
-		cur_filename = ZendGetCompiledFilename()
-		cur_lineno = ZendGetCompiledLineno()
+	var curFilename string
+	var curLineno int
+	if ZendIsCompiling() {
+		curFilename = ZendGetCompiledFilename()
+		curLineno = ZendGetCompiledLineno()
 	} else if ZendIsExecuting() {
-		cur_filename = ZendGetExecutedFilename()
-		cur_lineno = ZendGetExecutedLineno()
+		curFilename = ZendGetExecutedFilename()
+		curLineno = ZendGetExecutedLineno()
 	} else {
-		cur_filename = "Unknown"
-		cur_lineno = 0
+		curFilename = "Unknown"
+		curLineno = 0
 	}
-	return ZendSprintf(COMPILED_STRING_DESCRIPTION_FORMAT, cur_filename, cur_lineno, name)
+	return ZendSprintf(COMPILED_STRING_DESCRIPTION_FORMAT, curFilename, curLineno, name)
 }
 func FreeEstring(str_p **byte) { Efree(*str_p) }

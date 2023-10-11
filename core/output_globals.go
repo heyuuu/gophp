@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/heyuuu/gophp/kits/slicekit"
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"io"
 	"os"
@@ -170,6 +171,13 @@ func (g *ZendOutputGlobals) GetContents() (string, bool) {
 		return g.active.buffer.String(), true
 	}
 	return "", false
+}
+func (g *ZendOutputGlobals) GetContentsZval() *types.Zval {
+	if contents, ok := g.GetContents(); ok {
+		return types.NewZvalString(contents)
+	} else {
+		return types.NewZvalNull()
+	}
 }
 func (g *ZendOutputGlobals) GetLength() (int, bool) {
 	if g.active != nil {

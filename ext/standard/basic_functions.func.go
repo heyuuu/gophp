@@ -863,7 +863,7 @@ func ZifHighlightFile(fileName zpp.Path, _ zpp.Opt, return_ bool) *types.Zval {
 		return types.NewZvalTrue()
 	}
 }
-func ZifPhpStripWhitespace(returnValue zpp.Ret, fileName string) {
+func ZifPhpStripWhitespace(fileName string) *types.Zval {
 	var originalLexState zend.ZendLexState
 	core.PhpOutputStartDefault()
 
@@ -872,44 +872,38 @@ func ZifPhpStripWhitespace(returnValue zpp.Ret, fileName string) {
 	if zend.OpenFileForScanning(fh) == types.FAILURE {
 		zend.ZendRestoreLexicalState(&originalLexState)
 		core.PhpOutputEnd()
-		returnValue.SetString("")
-		return
+		return types.NewZvalString("")
 	}
 	zend.ZendStrip()
 	zend.ZendDestroyFileHandle(fh)
 	zend.ZendRestoreLexicalState(&originalLexState)
-	core.PhpOutputGetContents(returnValue)
+	ret := core.OG__().GetContentsZval()
 	core.PhpOutputDiscard()
+	return ret
 }
-func ZifHighlightString(returnValue zpp.Ret, string_ *types.Zval, _ zpp.Opt, return_ bool) {
-	var expr *types.Zval
-	var hicompiledStringDescription *byte
+func ZifHighlightString(string string, _ zpp.Opt, return_ bool) *types.Zval {
 	var oldErrorReporting int = zend.EG__().GetErrorReporting()
-	if !operators.TryConvertToString(string_) {
-		return
-	}
 	if return_ {
 		core.PhpOutputStartDefault()
 	}
 	zend.EG__().SetErrorReporting(faults.E_ERROR)
-	hicompiledStringDescription = zend.ZendMakeCompiledStringDescription("highlighted code")
-	if zend.HighlightString(expr, GetHighlightIni(), hicompiledStringDescription) == types.FAILURE {
+	hicompiledStringDescription := zend.ZendMakeCompiledStringDescription("highlighted code")
+	if zend.HighlightString(types.NewZvalString(string), GetHighlightIni(), hicompiledStringDescription) == types.FAILURE {
 		zend.Efree(hicompiledStringDescription)
 		zend.EG__().SetErrorReporting(oldErrorReporting)
 		if return_ {
 			core.PhpOutputEnd()
 		}
-		returnValue.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
 	zend.Efree(hicompiledStringDescription)
 	zend.EG__().SetErrorReporting(oldErrorReporting)
 	if return_ {
-		core.PhpOutputGetContents(returnValue)
+		ret := core.OG__().GetContentsZval()
 		core.PhpOutputDiscard()
+		return ret
 	} else {
-		returnValue.SetTrue()
-		return
+		return types.NewZvalTrue()
 	}
 }
 func ZifIniGet(varname string) (string, bool) {

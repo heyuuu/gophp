@@ -227,14 +227,14 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlight
 	ZendRestoreLexicalState(&original_lex_state)
 	return types.SUCCESS
 }
-func HighlightString(str *types.Zval, syntax_highlighter_ini *zend_syntax_highlighter_ini, str_name *byte) int {
+func HighlightString(str *types.Zval, syntaxHighlighterIni *ZendSyntaxHighlighterIni, strName *byte) int {
 	var original_lex_state ZendLexState
 	var tmp types.Zval
 	if Z_TYPE_P(str) != types.IsString {
 		str = types.NewZvalString(operators.ZvalGetStrVal(str))
 	}
 	ZendSaveLexicalState(&original_lex_state)
-	if ZendPrepareStringForScanning(str, str_name) == types.FAILURE {
+	if ZendPrepareStringForScanning(str, strName) == types.FAILURE {
 		ZendRestoreLexicalState(&original_lex_state)
 		if str == &tmp {
 			zval_ptr_dtor(&tmp)
@@ -242,7 +242,7 @@ func HighlightString(str *types.Zval, syntax_highlighter_ini *zend_syntax_highli
 		return types.FAILURE
 	}
 	BEGIN(INITIAL)
-	zend_highlight(syntax_highlighter_ini)
+	zend_highlight(syntaxHighlighterIni)
 	if LANG_SCNG__().script_filtered {
 		efree(LANG_SCNG__().script_filtered)
 		LANG_SCNG__().script_filtered = nil
