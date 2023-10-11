@@ -167,7 +167,7 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 		if fh.GetOpenedPath() == "" {
 			fh.SetOpenedPath(filename.String())
 		}
-		zend_hash_add_empty_element(EG__().included_files, file_handle.opened_path)
+		zend_hash_add_empty_element(EG__().includedFiles, file_handle.opened_path)
 		if opened_path != nil {
 			zend_string_release_ex(opened_path, 0)
 		}

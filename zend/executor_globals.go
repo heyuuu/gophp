@@ -11,19 +11,20 @@ var ExecutorGlobals ZendExecutorGlobals
 func EG__() *ZendExecutorGlobals { return &ExecutorGlobals }
 
 // ZendExecutorGlobals
+const SYMTABLE_CACHE_SIZE = 32
+
 type ZendExecutorGlobals struct {
-	error_zval           types.Zval
-	symtable_cache       []*types.Array
-	symtable_cache_limit **types.Array
-	symtable_cache_ptr   **types.Array
-	symbol_table         *types.Array
-	included_files       *types.Array
-	error_reporting      int
-	exit_status          int
-	functionTable        FunctionTable
-	classTable           ClassTable
-	constantTable        ConstantTable
-	vmStack              VmStack
+	errorZval        types.Zval
+	symtableCache    [SYMTABLE_CACHE_SIZE]*types.Array
+	symtableCacheIdx int
+	symbolTable      *types.Array
+	includedFiles    *types.Array
+	errorReporting   int
+	exitStatus       int
+	functionTable    FunctionTable
+	classTable       ClassTable
+	constantTable    ConstantTable
+	vmStack          VmStack
 
 	current_execute_data                *ZendExecuteData
 	fake_scope                          *types.ClassEntry
@@ -93,26 +94,27 @@ func (eg *ZendExecutorGlobals) Shutdown() {
 }
 func (eg *ZendExecutorGlobals) Activate() {
 	ZendInitFpu()
-	eg.GetErrorZval().SetIsError()
 
-	/* destroys stack frame, therefore makes core dumps worthless */
-	eg.SetSymtableCachePtr(eg.GetSymtableCache())
-	eg.SetSymtableCacheLimit(eg.GetSymtableCache() + SYMTABLE_CACHE_SIZE)
-	eg.SetNoExtensions(0)
+	eg.errorZval.SetIsError()
+	//eg.symtable_cache = [SYMTABLE_CACHE_SIZE]*types.Array{}
+	eg.symtableCacheIdx = 0
+	eg.symbolTable = types.NewArrayCap(64)
+
+	eg.no_extensions = false
 	eg.functionTable = CG__().FunctionTable()
 	eg.classTable = CG__().ClassTable()
 	eg.SetInAutoload(nil)
 	eg.SetAutoloadFunc(nil)
 	eg.SetErrorHandling(EH_NORMAL)
 	eg.SetFlags(EG_FLAGS_INITIAL)
-	ZendVmStackInit()
-	eg.SetSymbolTable(types.NewArrayCap(64))
+	eg.VmStack().Reset()
 	ZendExtensions.Apply(func(ext *ZendExtension) {
 		if ext.GetActivate() != nil {
 			ext.GetActivate()()
 		}
 	})
-	eg.SetIncludedFiles(types.NewArrayCap(8))
+
+	eg.includedFiles = types.NewArrayCap(8)
 	eg.GetUserErrorHandler().SetUndef()
 	eg.GetUserExceptionHandler().SetUndef()
 	eg.SetCurrentExecuteData(nil)
@@ -197,15 +199,8 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 		})
 
 		/* Also release error and exception handlers, which may hold objects. */
-
-		if eg.GetUserErrorHandler().IsNotUndef() {
-			// ZvalPtrDtor(eg.GetUserErrorHandler())
-			eg.GetUserErrorHandler().SetUndef()
-		}
-		if eg.GetUserExceptionHandler().IsNotUndef() {
-			// ZvalPtrDtor(eg.GetUserExceptionHandler())
-			eg.GetUserExceptionHandler().SetUndef()
-		}
+		eg.GetUserErrorHandler().SetUndef()
+		eg.GetUserExceptionHandler().SetUndef()
 		ZendStackClean(eg.GetUserErrorHandlersErrorReporting(), nil, 1)
 		ZendStackClean(eg.GetUserErrorHandlers(), nil, 1)
 		ZendStackClean(eg.GetUserExceptionHandlers(), nil, 1)
@@ -239,7 +234,7 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 		})
 		ZendCleanupInternalClasses()
 	} else {
-		ZendVmStackDestroy()
+		eg.VmStack().Reset()
 		if eg.GetFullTablesCleanup() {
 			eg.ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
 				return c.IsPersistent()
@@ -276,9 +271,9 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 				return false
 			})
 		}
-		for eg.GetSymtableCachePtr() > eg.GetSymtableCache() {
-			eg.GetSymtableCachePtr()--
-			(*eg.GetSymtableCachePtr()).Destroy()
+		for eg.symtableCacheIdx > 0 {
+			eg.symtableCacheIdx--
+			eg.symtableCache[eg.symtableCacheIdx].Destroy()
 		}
 		eg.GetIncludedFiles().Destroy()
 		eg.GetUserErrorHandlersErrorReporting().Destroy()
@@ -291,6 +286,30 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 	}
 	eg.ResetArrayIterators()
 	ZendShutdownFpu()
+}
+
+// symtable cache
+func (eg *ZendExecutorGlobals) PopSymbolTable(cap int) (symbolTable *types.Array) {
+	if eg.symtableCacheIdx > 0 {
+		eg.symtableCacheIdx--
+		symbolTable = eg.symtableCache[eg.symtableCacheIdx]
+	} else {
+		symbolTable = types.NewArrayCap(cap)
+	}
+	return symbolTable
+}
+
+func (eg *ZendExecutorGlobals) CleanAndCacheSymbolTable(symbolTable *types.Array) {
+	/* Clean before putting into the cache, since clean could call dtors,
+	 * which could use the cached hash. Also do this before the check for
+	 * available cache slots, as those may be used by a dtor as well. */
+	symbolTable.Clean()
+	if eg.symtableCacheIdx >= len(eg.symtableCache) {
+		symbolTable.Destroy()
+	} else {
+		eg.symtableCache[eg.symtableCacheIdx] = symbolTable
+		eg.symtableCacheIdx++
+	}
 }
 
 /**
@@ -379,28 +398,19 @@ func (eg *ZendExecutorGlobals) IsActive() bool { return eg.active }
  * 以下是自动生成的方法
  */
 
-func (eg *ZendExecutorGlobals) GetErrorZval() *types.Zval        { return &eg.error_zval }
-func (eg *ZendExecutorGlobals) GetSymtableCache() []*types.Array { return eg.symtable_cache }
-func (eg *ZendExecutorGlobals) GetSymtableCacheLimit() **types.Array {
-	return eg.symtable_cache_limit
-}
-func (eg *ZendExecutorGlobals) SetSymtableCacheLimit(value **types.Array) {
-	eg.symtable_cache_limit = value
-}
+func (eg *ZendExecutorGlobals) GetErrorZval() *types.Zval        { return &eg.errorZval }
+func (eg *ZendExecutorGlobals) GetSymtableCache() []*types.Array { return eg.symtableCache }
 func (eg *ZendExecutorGlobals) GetSymtableCachePtr() **types.Array {
 	return eg.symtable_cache_ptr
 }
-func (eg *ZendExecutorGlobals) SetSymtableCachePtr(value **types.Array) {
-	eg.symtable_cache_ptr = value
-}
-func (eg *ZendExecutorGlobals) GetSymbolTable() *types.Array        { return eg.symbol_table }
-func (eg *ZendExecutorGlobals) SetSymbolTable(value *types.Array)   { eg.symbol_table = value }
-func (eg *ZendExecutorGlobals) GetIncludedFiles() *types.Array      { return eg.included_files }
-func (eg *ZendExecutorGlobals) SetIncludedFiles(value *types.Array) { eg.included_files = value }
-func (eg *ZendExecutorGlobals) GetErrorReporting() int              { return eg.error_reporting }
-func (eg *ZendExecutorGlobals) SetErrorReporting(value int)         { eg.error_reporting = value }
-func (eg *ZendExecutorGlobals) GetExitStatus() int                  { return eg.exit_status }
-func (eg *ZendExecutorGlobals) SetExitStatus(value int)             { eg.exit_status = value }
+func (eg *ZendExecutorGlobals) GetSymbolTable() *types.Array        { return eg.symbolTable }
+func (eg *ZendExecutorGlobals) SetSymbolTable(value *types.Array)   { eg.symbolTable = value }
+func (eg *ZendExecutorGlobals) GetIncludedFiles() *types.Array      { return eg.includedFiles }
+func (eg *ZendExecutorGlobals) SetIncludedFiles(value *types.Array) { eg.includedFiles = value }
+func (eg *ZendExecutorGlobals) GetErrorReporting() int              { return eg.errorReporting }
+func (eg *ZendExecutorGlobals) SetErrorReporting(value int)         { eg.errorReporting = value }
+func (eg *ZendExecutorGlobals) GetExitStatus() int                  { return eg.exitStatus }
+func (eg *ZendExecutorGlobals) SetExitStatus(value int)             { eg.exitStatus = value }
 func (eg *ZendExecutorGlobals) GetCurrentExecuteData() *ZendExecuteData {
 	return eg.current_execute_data
 }

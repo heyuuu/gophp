@@ -123,7 +123,7 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution bool) {
 
 		generator.SetExecuteData(nil)
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
-			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable())
+			EG__().CleanAndCacheSymbolTable(executeData.GetSymbolTable())
 		}
 
 		/* always free the CV's, in the symtable are only not-free'd IS_INDIRECT's */

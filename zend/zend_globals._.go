@@ -1,6 +1,5 @@
 package zend
 
-const SYMTABLE_CACHE_SIZE = 32
 
 const EG_FLAGS_INITIAL = 0
 const EG_FLAGS_IN_SHUTDOWN = 1 << 0

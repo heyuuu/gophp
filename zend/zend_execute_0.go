@@ -155,12 +155,6 @@ func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *types.Zval, result *t
 }
 func CV_DEF_OF(i __auto__) __auto__ { return executeData.GetFunc().GetOpArray().vars[i] }
 
-func ZendVmStackInit() {
-	EG__().VmStack().Reset()
-}
-func ZendVmStackDestroy() {
-	EG__().VmStack().Reset()
-}
 func _getZvalPtrTmp(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
 	var ret *types.Zval = EX_VAR(executeData, var_)
 	*should_free = ret

@@ -217,7 +217,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		if (call_info & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			/* Free extra args before releasing the closure,
 			 * as that may free the op_array. */
-			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable())
+			EG__().CleanAndCacheSymbolTable(executeData.GetSymbolTable())
 		}
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
@@ -256,7 +256,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 			IFreeCompiledVariables(executeData)
 			if (call_info & (ZEND_CALL_HAS_SYMBOL_TABLE | ZEND_CALL_FREE_EXTRA_ARGS)) != 0 {
 				if (call_info & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
-					ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable())
+					EG__().CleanAndCacheSymbolTable(executeData.GetSymbolTable())
 				}
 				ZendVmStackFreeExtraArgsEx(call_info, executeData)
 			}

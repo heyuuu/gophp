@@ -749,20 +749,10 @@ func ZendRebuildSymbolTable() *types.Array {
 		return ex.GetSymbolTable()
 	}
 	ZEND_ADD_CALL_FLAG(ex, ZEND_CALL_HAS_SYMBOL_TABLE)
-	if EG__().GetSymtableCachePtr() > EG__().GetSymtableCache() {
-		ex.SetSymbolTable(*(lang.PreDec(&(EG__().GetSymtableCachePtr()))))
-		symbol_table = ex.GetSymbolTable()
-		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
-			return symbol_table
-		}
-	} else {
-		ex.SetSymbolTable(types.NewArrayCap(ex.GetFunc().GetOpArray().GetLastVar()))
-		symbol_table = ex.GetSymbolTable()
-		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
-			return symbol_table
-		}
-		//types.ZendHashRealInitMixed(symbol_table)
-	}
+
+	symbol_table = EG__().PopSymbolTable(ex.GetFunc().GetOpArray().GetLastVar())
+	ex.SetSymbolTable(symbol_table)
+
 	if ex.GetFunc().GetOpArray().GetLastVar() != 0 {
 		vars := ex.GetFunc().GetOpArray().VarNames()
 		for i, varName := range vars {

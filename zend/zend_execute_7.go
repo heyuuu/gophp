@@ -133,17 +133,6 @@ func ZendFetchThisVar(type_ int, opline *types.ZendOp, executeData *ZendExecuteD
 func ZendWrongCloneCall(clone types.IFunction, scope *types.ClassEntry) {
 	faults.ThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().Name(), lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
 }
-func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
-	/* Clean before putting into the cache, since clean could call dtors,
-	 * which could use the cached hash. Also do this before the check for
-	 * available cache slots, as those may be used by a dtor as well. */
-	symbol_table.SymtableClean()
-	if EG__().GetSymtableCachePtr() >= EG__().GetSymtableCacheLimit() {
-		symbol_table.Destroy()
-	} else {
-		*(lang.PostInc(&(EG__().GetSymtableCachePtr()))) = symbol_table
-	}
-}
 func IFreeCompiledVariables(executeData *ZendExecuteData) {
 	var cv *types.Zval = executeData.VarNum(0)
 	var count int = executeData.GetFunc().GetOpArray().GetLastVar()
