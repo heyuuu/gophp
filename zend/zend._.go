@@ -11,9 +11,9 @@ type ZendSerializeData = __struct___zend_serialize_data
 type ZendUnserializeData = __struct___zend_unserialize_data
 
 /* output support */
-var ZendPrintf = core.PhpPrintf
-var ZendWrite = core.PhpOutputWrite
-var ZendOnTimeout = core.PhpOnTimeout
+var ZendPrintf func(format string, args ...any) int = core.PhpPrintf
+var ZendWrite func(str string) int = core.PUTS
+var ZendOnTimeout func(seconds int) = core.PhpOnTimeout
 
 var ZendUv ZendUtilityValues
 

@@ -24,12 +24,8 @@ func SECTION(name string) {
 	}
 }
 func PhpInfoPrintHtmlEsc(str *byte, len_ int) int {
-	var written int
-	var new_str *types.String
-	new_str = PhpEscapeHtmlEntities((*uint8)(str), len_, 0, ENT_QUOTES, "utf-8")
-	written = core.PhpOutputWrite(new_str.GetVal(), new_str.GetLen())
-	//types.ZendStringFree(new_str)
-	return written
+	newStr := PhpEscapeHtmlEntities_Ex(b.CastStr(str, len_), 0, ENT_QUOTES, "utf-8")
+	return core.OG__().WriteString(newStr)
 }
 
 func PhpInfoPrintf(fmt string, _ ...any) int {
@@ -40,12 +36,12 @@ func PhpInfoPrintf(fmt string, _ ...any) int {
 	va_start(argv, fmt)
 	len_ = core.Vspprintf(&buf, 0, fmt, argv)
 	va_end(argv)
-	written = core.PhpOutputWrite(buf, len_)
+	written = core.OG__().Write(b.CastBytes(buf, len_))
 	zend.Efree(buf)
 	return written
 }
 func PhpInfoPrint(str string) int {
-	return core.PhpOutputWrite(str)
+	return core.OG__().WriteString(str)
 }
 func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 	var key *types.String

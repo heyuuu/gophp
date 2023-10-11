@@ -605,10 +605,8 @@ func main(argc int, argv []*byte) int {
 				}
 				return types.SUCCESS
 			case PHP_MODE_HIGHLIGHT:
-				var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
 				if zend.OpenFileForScanning(fileHandle) == types.SUCCESS {
-					standard.PhpGetHighlight(&syntax_highlighter_ini)
-					zend.ZendHighlight(&syntax_highlighter_ini)
+					zend.ZendHighlight(standard.GetHighlightIni())
 					if fastcgi != 0 {
 						goto fastcgi_request_done
 					}

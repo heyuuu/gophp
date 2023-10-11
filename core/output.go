@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/heyuuu/gophp/kits/slicekit"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/shim/slices"
 	"github.com/heyuuu/gophp/zend"
@@ -9,19 +8,7 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-var OutputGlobals ZendOutputGlobals
-var PhpOutputDirect = PhpOutputStderr
-
 const PhpOutputDefaultHandlerName = "default output handler"
-
-/**
- * functions
- */
-
-func OG__() *ZendOutputGlobals { return &OutputGlobals }
-func PUTS(str string) int      { return PhpOutputWrite(str) }
-func PUTS_H(str string)        { PhpOutputWriteUnbuffered(str) }
-func PUTC(c byte)              { PhpOutputWrite(string(c)) }
 
 /**
  * types
@@ -222,154 +209,3 @@ type PhpOutputHandlerUserFuncT struct {
 func (this *PhpOutputHandlerUserFuncT) GetFci() *types.ZendFcallInfo      { return &this.fci }
 func (this *PhpOutputHandlerUserFuncT) GetFcc() *types.ZendFcallInfoCache { return &this.fcc }
 func (this *PhpOutputHandlerUserFuncT) GetZoh() *types.Zval               { return &this.zoh }
-
-// ZendOutputGlobals
-type ZendOutputGlobals struct {
-	activated           bool
-	flags               uint8
-	handlers            []*PhpOutputHandler
-	active              *PhpOutputHandler
-	running             *PhpOutputHandler
-	outputStartFilename string
-	outputStartLineno   int
-}
-
-const (
-	/* output global flags */
-	outputImplicitFlush = 0x1
-	OutputDisabled      = 0x2
-	outputWritten       = 0x4
-	outputSent          = 0x8
-)
-
-// life cycle
-func (g *ZendOutputGlobals) StartUp() {
-	g.reset()
-	PhpOutputDirect = PhpOutputStdout
-}
-func (g *ZendOutputGlobals) Shutdown() {
-	PhpOutputDirect = PhpOutputStderr
-}
-func (g *ZendOutputGlobals) Activate() {
-	g.reset()
-	g.activated = true
-}
-
-func (g *ZendOutputGlobals) Deactivate() {
-	if g.IsActivated() {
-		PhpOutputHeader()
-
-		g.activated = false
-		g.active = nil
-		g.running = nil
-		g.handlers = nil
-	}
-}
-
-func (g *ZendOutputGlobals) Teardown() {
-	PhpOutputEndAll()
-	g.Deactivate()
-	g.Shutdown()
-}
-
-func (g *ZendOutputGlobals) reset() {
-	*g = ZendOutputGlobals{}
-}
-
-// handlers
-func (g *ZendOutputGlobals) CountHandlers() int { return len(g.handlers) }
-func (g *ZendOutputGlobals) PushHandler(h *PhpOutputHandler) int {
-	g.handlers = append(g.handlers, h)
-	return len(g.handlers)
-}
-func (g *ZendOutputGlobals) TopHandler() *PhpOutputHandler {
-	if len(g.handlers) == 0 {
-		return nil
-	}
-
-	return g.handlers[len(g.handlers)-1]
-}
-func (g *ZendOutputGlobals) PopHandler() *PhpOutputHandler {
-	if len(g.handlers) == 0 {
-		return nil
-	}
-
-	h := g.handlers[len(g.handlers)-1]
-	g.handlers = g.handlers[:len(g.handlers)-1]
-	return h
-}
-func (g *ZendOutputGlobals) EachHandler(bottomUp bool, handler func(h *PhpOutputHandler)) {
-	if bottomUp {
-		slicekit.Each(g.handlers, handler)
-	} else {
-		slicekit.EachReserve(g.handlers, handler)
-	}
-}
-func (g *ZendOutputGlobals) EachHandlerEx(bottomUp bool, handler func(h *PhpOutputHandler) bool) {
-	if bottomUp {
-		slicekit.EachEx(g.handlers, handler)
-	} else {
-		slicekit.EachReserveEx(g.handlers, handler)
-	}
-}
-func (g *ZendOutputGlobals) StartHandler(h *PhpOutputHandler) bool {
-	if h == nil {
-		return false
-	}
-
-	h.level = len(g.handlers)
-	g.handlers = append(g.handlers, h)
-	g.active = h
-	return true
-}
-func (g *ZendOutputGlobals) EndHandler() {
-	g.PopHandler()
-	g.active = g.TopHandler()
-}
-func (g *ZendOutputGlobals) GetLevel() int {
-	if g.active != nil {
-		return g.CountHandlers()
-	}
-	return 0
-}
-func (g *ZendOutputGlobals) GetContents() (string, bool) {
-	if g.active != nil {
-		return g.active.buffer.String(), true
-	}
-	return "", false
-}
-func (g *ZendOutputGlobals) GetLength() (int, bool) {
-	if g.active != nil {
-		return g.active.buffer.Used(), true
-	}
-	return 0, false
-}
-
-// fields
-func (g *ZendOutputGlobals) IsActivated() bool                { return g.activated }
-func (g *ZendOutputGlobals) Active() *PhpOutputHandler        { return g.active }
-func (g *ZendOutputGlobals) Running() *PhpOutputHandler       { return g.running }
-func (g *ZendOutputGlobals) StartFilename() string            { return g.outputStartFilename }
-func (g *ZendOutputGlobals) SetStartFilename(filename string) { g.outputStartFilename = filename }
-func (g *ZendOutputGlobals) StartLineno() int                 { return g.outputStartLineno }
-func (g *ZendOutputGlobals) SetStartLineno(lineno int)        { g.outputStartLineno = lineno }
-
-// flags
-func (g *ZendOutputGlobals) IsImplicitFlush() bool { return g.flags&outputImplicitFlush != 0 }
-func (g *ZendOutputGlobals) MarkImplicitFlush(v bool) {
-	if v {
-		g.flags |= outputImplicitFlush
-	} else {
-		g.flags &^= outputImplicitFlush
-	}
-}
-
-func (g *ZendOutputGlobals) IsDisabled() bool   { return g.flags&OutputDisabled != 0 }
-func (g *ZendOutputGlobals) MarkDisabled()      { g.flags |= OutputDisabled }
-func (g *ZendOutputGlobals) SetStatusDisabled() { g.flags = OutputDisabled }
-
-func (g *ZendOutputGlobals) IsWritten() bool { return g.flags&outputWritten != 0 }
-func (g *ZendOutputGlobals) MarkWritten()    { g.flags |= outputWritten }
-
-func (g *ZendOutputGlobals) IsSend() bool { return g.flags&outputSent != 0 }
-func (g *ZendOutputGlobals) MarkSent()    { g.flags |= outputSent }

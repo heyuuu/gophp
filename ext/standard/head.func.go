@@ -352,8 +352,9 @@ func ZifHeadersSent(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, file_ z
 		break
 	}
 	if core.SG__().headers_sent {
-		line = core.PhpOutputGetStartLineno()
-		file = core.PhpOutputGetStartFilename()
+		line = core.OG__().StartLineno()
+		file = core.OG__().StartFilename()
+
 	}
 	switch executeData.NumArgs() {
 	case 2:

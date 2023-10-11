@@ -16,7 +16,7 @@ import (
 func PhpArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
 	if key.IsStrKey() {
 		core.PhpPrintf("%*c[\"", level+1, ' ')
-		core.PhpOutputWrite(key.StrKey())
+		core.OG__().WriteString(key.StrKey())
 		core.PhpPrintf("\"]=>\n")
 	} else {
 		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key.IdxKey())
@@ -37,7 +37,7 @@ func PhpObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key_ ty
 			}
 		} else {
 			core.PhpPrintf("\"")
-			core.PhpOutputWrite(key_.StrKey())
+			core.OG__().WriteString(key_.StrKey())
 			core.PhpPrintf("\"")
 		}
 		zend.ZEND_PUTS("]=>\n")
@@ -74,7 +74,7 @@ again:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IsString:
 		core.PhpPrintf("%sstring(%zd) \"", common, struc.StringEx().GetLen())
-		core.PhpOutputWrite(struc.String())
+		core.OG__().WriteString(struc.String())
 		core.PUTS("\"\n")
 	case types.IsArray:
 		myht := struc.Array()

@@ -994,7 +994,7 @@ func PhpUnescapeHtmlEntities(str string, all bool, flags int, hintCharset string
 }
 
 func PhpEscapeHtmlEntities_Ex(old string, all int, flags int, hint_charset string) string {
-	zstr := PhpEscapeHtmlEntitiesEx(b.CastStrPtr(old), len(old), all, flags, hint_charset, 1)
+	zstr := PhpEscapeHtmlEntitiesEx(b.CastStrPtr(old), len(old), all, flags, hint_charset, true)
 	if zstr == nil {
 		return ""
 	}
@@ -1002,7 +1002,7 @@ func PhpEscapeHtmlEntities_Ex(old string, all int, flags int, hint_charset strin
 }
 
 func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_charset string) *types.String {
-	return PhpEscapeHtmlEntitiesEx(old, oldlen, all, flags, hint_charset, 1)
+	return PhpEscapeHtmlEntitiesEx(old, oldlen, all, flags, hint_charset, true)
 }
 func FindEntityForChar(
 	k uint,

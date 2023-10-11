@@ -11,10 +11,6 @@ import (
 	"os"
 )
 
-func PhpOutputStdout(str string) int {
-	os.Stdout.WriteString(str)
-	return len(str)
-}
 func PhpOutputStderr(str string) int {
 	os.Stderr.WriteString(str)
 	return len(str)
@@ -50,45 +46,6 @@ func PhpOutputRegisterConstants() {
 	zend.RegisterMainLongConstant("PHP_OUTPUT_HANDLER_STARTED", PHP_OUTPUT_HANDLER_STARTED, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.RegisterMainLongConstant("PHP_OUTPUT_HANDLER_DISABLED", PHP_OUTPUT_HANDLER_DISABLED, zend.CONST_CS|zend.CONST_PERSISTENT)
 }
-func PhpOutputWriteUnbuffered(str string) int {
-	if OG__().IsActivated() {
-		return SM__().UbWrite(str)
-	}
-	return PhpOutputDirect(str)
-}
-func PhpOutputWrite(str string) int {
-	if OG__().IsActivated() {
-		ptr := b.CastStrPtr(str)
-		len_ := len(str)
-		PhpOutputOp(PHP_OUTPUT_HANDLER_WRITE, ptr, len_)
-		return len(str)
-	}
-	if OG__().IsDisabled() {
-		return 0
-	}
-	return PhpOutputDirect(str)
-}
-func PhpOutputFlush() bool {
-	if active := OG__().Active(); active != nil && active.IsFlushable() {
-		context := InitOutputContext(PHP_OUTPUT_HANDLER_FLUSH)
-		PhpOutputHandlerOp(active, context)
-		if data := context.GetOut().String(); data != "" {
-			OG__().PopHandler()
-			PhpOutputWrite(data)
-			OG__().PushHandler(active)
-		}
-		return true
-	}
-	return false
-}
-func PhpOutputClean() bool {
-	if active := OG__().Active(); active != nil && active.IsCleanable() {
-		context := InitOutputContext(PHP_OUTPUT_HANDLER_CLEAN)
-		PhpOutputHandlerOp(OG__().active, context)
-		return true
-	}
-	return false
-}
 func PhpOutputEnd() bool {
 	return PhpOutputStackPop(PHP_OUTPUT_POP_TRY) != 0
 }
@@ -115,28 +72,20 @@ func PhpOutputGetContents(p *types.Zval) bool {
 }
 func PhpOutputStartDefault() bool {
 	handler := NewOutputHandlerInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
-	return PhpOutputHandlerStart(handler)
+	return OG__().StartHandler(handler)
 }
 func PhpOutputStartUser(outputHandler *types.Zval, chunkSize int, flags int) bool {
 	handler := NewOutputHandlerUser(outputHandler, chunkSize, flags)
-	return PhpOutputHandlerStart(handler)
+	return OG__().StartHandler(handler)
 }
 func PhpOutputStartInternal(name string, outputHandler PhpOutputHandlerFuncT, chunkSize int, flags int) bool {
 	handler := NewOutputHandlerInternal(name, PhpOutputHandlerCompatFunc, chunkSize, flags)
 	PhpOutputHandlerSetContext(handler, outputHandler)
-	return PhpOutputHandlerStart(handler)
+	return OG__().StartHandler(handler)
 }
 func PhpOutputHandlerSetContext(handler *PhpOutputHandler, opaq any) {
 	handler.SetOpaq(opaq)
 }
-func PhpOutputHandlerStart(handler *PhpOutputHandler) bool {
-	if PhpOutputLockError(PHP_OUTPUT_HANDLER_START) != 0 {
-		return false
-	}
-	return OG__().StartHandler(handler)
-}
-func PhpOutputGetStartFilename() string { return OG__().StartFilename() }
-func PhpOutputGetStartLineno() int      { return OG__().StartLineno() }
 func PhpOutputLockError(op int) int {
 	/* if there's no ob active, ob has been stopped */
 	if op != 0 && OG__().active != nil && OG__().running != nil {
@@ -334,7 +283,7 @@ func PhpOutputStackPop(flags int) int {
 
 		/* pass output along */
 		if context.GetOut().Used() != 0 && (flags&PHP_OUTPUT_POP_DISCARD) == 0 {
-			PhpOutputWrite(context.GetOut().String())
+			OG__().WriteString(context.GetOut().String())
 		}
 
 		/* destroy the handler (after write!) */
@@ -382,7 +331,7 @@ func ZifObFlush() bool {
 		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to flush buffer. No buffer to flush")
 		return false
 	}
-	if !PhpOutputFlush() {
+	if !OG__().Flush() {
 		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to flush buffer of %s (%d)", OG__().Active().GetName(), OG__().Active().GetLevel())
 		return false
 	}
@@ -393,7 +342,7 @@ func ZifObClean() bool {
 		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer. No buffer to delete")
 		return false
 	}
-	if !PhpOutputClean() {
+	if !OG__().Clean() {
 		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG__().active.name.GetVal(), OG__().active.level)
 		return false
 	}

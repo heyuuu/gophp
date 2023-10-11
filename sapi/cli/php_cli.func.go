@@ -473,10 +473,8 @@ func DoCli(argc int, argv **byte, args []string) int {
 			goto out
 			break
 		case PHP_MODE_HIGHLIGHT:
-			var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
 			if zend.OpenFileForScanning(file_handle) == types.SUCCESS {
-				standard.PhpGetHighlight(&syntax_highlighter_ini)
-				zend.ZendHighlight(&syntax_highlighter_ini)
+				zend.ZendHighlight(standard.GetHighlightIni())
 			}
 			goto out
 			break

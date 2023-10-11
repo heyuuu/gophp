@@ -825,35 +825,40 @@ func ZifRegisterShutdownFunction(functionName *types.Zval, _ zpp.Opt, parameters
 	}
 	BG__().AddUserShutdownFunction(*NewShutdownFunction(fn, args))
 }
-func PhpGetHighlight(syntaxHighlighterIni *zend.ZendSyntaxHighlighterIni) {
+
+func GetHighlightIni() *zend.ZendSyntaxHighlighterIni {
+	var syntaxHighlighterIni zend.ZendSyntaxHighlighterIni
 	syntaxHighlighterIni.SetHighlightComment(zend.INI_STR("highlight.comment"))
 	syntaxHighlighterIni.SetHighlightDefault(zend.INI_STR("highlight.default"))
 	syntaxHighlighterIni.SetHighlightHtml(zend.INI_STR("highlight.html"))
 	syntaxHighlighterIni.SetHighlightKeyword(zend.INI_STR("highlight.keyword"))
 	syntaxHighlighterIni.SetHighlightString(zend.INI_STR("highlight.string"))
+	return &syntaxHighlighterIni
 }
 
 //@zif -alias show_source
-func ZifHighlightFile(return_value zpp.Ret, fileName zpp.Path, _ zpp.Opt, return_ bool) *types.Zval {
-	var ret int
-	var syntaxHighlighterIni zend.ZendSyntaxHighlighterIni
+func ZifHighlightFile(fileName zpp.Path, _ zpp.Opt, return_ bool) *types.Zval {
 	if core.PhpCheckOpenBasedir(fileName) != 0 {
 		return types.NewZvalFalse()
 	}
 	if return_ {
 		core.PhpOutputStartDefault()
 	}
-	PhpGetHighlight(&syntaxHighlighterIni)
-	ret = zend.HighlightFile(fileName, &syntaxHighlighterIni)
-	if ret == types.FAILURE {
+	if ret := zend.HighlightFile(fileName, GetHighlightIni()); ret == types.FAILURE {
 		if return_ {
 			core.PhpOutputEnd()
 		}
 		return types.NewZvalFalse()
 	}
 	if return_ {
-		core.PhpOutputGetContents(return_value)
+		contents, ok := core.OG__().GetContents()
 		core.PhpOutputDiscard()
+
+		if ok {
+			return types.NewZvalString(contents)
+		} else {
+			return types.NewZvalNull()
+		}
 	} else {
 		return types.NewZvalTrue()
 	}
@@ -878,7 +883,6 @@ func ZifPhpStripWhitespace(returnValue zpp.Ret, fileName string) {
 }
 func ZifHighlightString(returnValue zpp.Ret, string_ *types.Zval, _ zpp.Opt, return_ bool) {
 	var expr *types.Zval
-	var syntaxHighlighterIni zend.ZendSyntaxHighlighterIni
 	var hicompiledStringDescription *byte
 	var oldErrorReporting int = zend.EG__().GetErrorReporting()
 	if !operators.TryConvertToString(string_) {
@@ -888,9 +892,8 @@ func ZifHighlightString(returnValue zpp.Ret, string_ *types.Zval, _ zpp.Opt, ret
 		core.PhpOutputStartDefault()
 	}
 	zend.EG__().SetErrorReporting(faults.E_ERROR)
-	PhpGetHighlight(&syntaxHighlighterIni)
 	hicompiledStringDescription = zend.ZendMakeCompiledStringDescription("highlighted code")
-	if zend.HighlightString(expr, &syntaxHighlighterIni, hicompiledStringDescription) == types.FAILURE {
+	if zend.HighlightString(expr, GetHighlightIni(), hicompiledStringDescription) == types.FAILURE {
 		zend.Efree(hicompiledStringDescription)
 		zend.EG__().SetErrorReporting(oldErrorReporting)
 		if return_ {

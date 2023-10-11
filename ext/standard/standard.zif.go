@@ -354,7 +354,7 @@ var DefZifHighlightFile = def.DefFunc("highlight_file", 1, 2, []def.ArgInfo{{Nam
 	if fp.HasError() {
 		return
 	}
-	ret := ZifHighlightFile(returnValue, file_name, nil, return_)
+	ret := ZifHighlightFile(file_name, nil, return_)
 	returnValue.SetBy(ret)
 })
 
@@ -367,7 +367,7 @@ var DefZifShowSource = def.DefFunc("show_source", 1, 2, []def.ArgInfo{{Name: "fi
 	if fp.HasError() {
 		return
 	}
-	ret := ZifHighlightFile(returnValue, file_name, nil, return_)
+	ret := ZifHighlightFile(file_name, nil, return_)
 	returnValue.SetBy(ret)
 })
 
