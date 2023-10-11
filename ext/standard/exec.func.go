@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/kits/ascii"
-	b "github.com/heyuuu/gophp/php/lang"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -54,7 +54,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 			}
 			if type_ == 1 {
 				core.PUTS(builtin.CastStr(buf, bufl))
-				if core.PhpOutputGetLevel() < 1 {
+				if core.OG__().GetLevel() < 1 {
 					core.SapiFlush()
 				}
 			} else if type_ == 2 {
@@ -62,7 +62,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 				/* strip trailing whitespaces */
 
 				l = bufl
-				for b.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
+				for lang.PostDec(&l) > 0 && ascii.IsSpace((*uint8)(buf)[l]) {
 
 				}
 				if l != bufl-1 {
@@ -78,8 +78,8 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 			/* output remaining data in buffer */
 
 			if type_ == 1 && buf != b {
-				core.PUTS(b.CastStr(buf, bufl))
-				if core.PhpOutputGetLevel() < 1 {
+				core.PUTS(builtin.CastStr(buf, bufl))
+				if core.OG__().GetLevel() < 1 {
 					core.SapiFlush()
 				}
 			}
@@ -88,7 +88,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 
 			if type_ == 2 && buf != b || type_ != 2 {
 				l = bufl
-				for b.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
+				for lang.PostDec(&l) > 0 && ascii.IsSpace((*uint8)(buf)[l]) {
 
 				}
 				if l != bufl-1 {
@@ -109,8 +109,8 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 		}
 	} else {
 		var read ssize_t
-		for b.Assign(&read, core.PhpStreamRead(stream, buf, core.EXEC_INPUT_BUF)) > 0 {
-			core.PUTS(b.CastStr(buf, read))
+		for lang.Assign(&read, core.PhpStreamRead(stream, buf, core.EXEC_INPUT_BUF)) > 0 {
+			core.PUTS(builtin.CastStr(buf, read))
 		}
 	}
 	pclose_return = core.PhpStreamClose(stream)
@@ -133,7 +133,7 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
-		var _max_num_args int = b.Cond(mode != 0, 2, 3)
+		var _max_num_args int = lang.Cond(mode != 0, 2, 3)
 
 		for {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
@@ -309,7 +309,7 @@ func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	if b.Assign(&in, zend.VCWD_POPEN(command, "r")) == nil {
+	if lang.Assign(&in, zend.VCWD_POPEN(command, "r")) == nil {
 		core.PhpErrorDocref("", faults.E_WARNING, "Unable to execute '%s'", command)
 		return_value.SetFalse()
 		return

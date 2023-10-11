@@ -601,7 +601,7 @@ func main(argc int, argv []*byte) int {
 				if zend.OpenFileForScanning(fileHandle) == types.SUCCESS {
 					zend.ZendStrip()
 					fileHandle.Destroy()
-					core.PhpOutputTeardown()
+					core.OG__().Teardown()
 				}
 				return types.SUCCESS
 			case PHP_MODE_HIGHLIGHT:
@@ -613,7 +613,7 @@ func main(argc int, argv []*byte) int {
 						goto fastcgi_request_done
 					}
 					fileHandle.Destroy()
-					core.PhpOutputTeardown()
+					core.OG__().Teardown()
 				}
 				return types.SUCCESS
 			}

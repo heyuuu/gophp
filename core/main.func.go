@@ -987,7 +987,7 @@ func PhpRequestStartup() int {
 	retVal := faults.Try(func() {
 		PG__().in_error_log = 0
 		PG__().during_request_startup = 1
-		PhpOutputActivate()
+		OG__().Activate()
 
 		/* initialize global variables */
 
@@ -1020,7 +1020,7 @@ func PhpRequestStartup() int {
 		} else if PG__().output_buffering {
 			PhpOutputStartUser(nil, lang.CondF1(PG__().output_buffering > 1, func() __auto__ { return PG__().output_buffering }, 0), PHP_OUTPUT_HANDLER_STDFLAGS)
 		} else if PG__().implicit_flush {
-			PhpOutputSetImplicitFlush(1)
+			OG__().MarkImplicitFlush(true)
 		}
 
 		/* We turn this off in php_execute_script() */
@@ -1081,7 +1081,7 @@ func PhpRequestShutdown() {
 
 	/* 6. Shutdown output layer (send the set HTTP headers, cleanup output handlers, etc.) */
 	faults.Try(func() {
-		PhpOutputDeactivate()
+		OG__().Deactivate()
 	})
 
 	/* 7. Free shutdown functions */
@@ -1191,7 +1191,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 		return types.SUCCESS
 	}
 	SetSM__(sf)
-	PhpOutputStartup()
+	OG__().StartUp()
 	memset(&CoreGlobals, 0, b.SizeOf("core_globals"))
 
 	zend.ZendStartup()
@@ -1387,7 +1387,7 @@ func PhpModuleShutdown() {
 	PhpShutdownConfig()
 	zend.ZendIniShutdown()
 	zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown(), true)
-	PhpOutputShutdown()
+	OG__().Shutdown()
 	ModuleInitialized = 0
 	CoreGlobalsDtor(&CoreGlobals)
 	//zend.GcGlobalsDtor()

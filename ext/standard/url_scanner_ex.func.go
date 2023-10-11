@@ -968,8 +968,8 @@ func PhpUrlScannerAddVarImpl(
 	hvalue.Free()
 	return types.SUCCESS
 }
-func PhpUrlScannerAddVar(name *byte, name_len int, value *byte, value_len int, encode int) int {
-	return PhpUrlScannerAddVarImpl(name, name_len, value, value_len, encode, 0)
+func PhpUrlScannerAddVar(name string, value string, encode int) bool {
+	return PhpUrlScannerAddVarImpl(b.CastStrPtr(name), len(name), b.CastStrPtr(value), len(value), encode, 0) == types.SUCCESS
 }
 func PhpUrlScannerResetVarsImpl(type_ int) {
 	var url_state *UrlAdaptStateExT
@@ -985,9 +985,8 @@ func PhpUrlScannerResetVarsImpl(type_ int) {
 		url_state.GetUrlApp().GetS().GetLen() = 0
 	}
 }
-func PhpUrlScannerResetVars() int {
+func PhpUrlScannerResetVars() {
 	PhpUrlScannerResetVarsImpl(0)
-	return types.SUCCESS
 }
 func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 	var start *byte

@@ -28,8 +28,9 @@ func (this *ZendStack[T]) Slice(len_ int) {
 }
 
 func (this *ZendStack[T]) Push(element T) int {
+	count := len(this.elements)
 	this.elements = append(this.elements, element)
-	return len(this.elements)
+	return count
 }
 
 func (this *ZendStack[T]) Pop() T {
