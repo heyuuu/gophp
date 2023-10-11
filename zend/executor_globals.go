@@ -43,15 +43,14 @@ type ZendExecutorGlobals struct {
 	persistentList  ResourceTable
 
 	userErrorHandlerErrorReporting  int
-	userErrorHandler                types.Zval
+	userErrorHandler                *types.Zval
 	userExceptionHandler            *types.Zval
-	userErrorHandlersErrorReporting ZendStack
-	userErrorHandlers               ZendStack
-	userExceptionHandlers           ZendStack
+	userErrorHandlersErrorReporting []int
+	userErrorHandlers               []*types.Zval
+	userExceptionHandlers           []*types.Zval
 	errorHandling                   ZendErrorHandlingT
 	exceptionClass                  *types.ClassEntry
 	timeoutSeconds                  int
-	lambdaCount                     int
 
 	iniDirectives         IniDirectives
 	modifiedIniDirectives IniDirectives
@@ -103,12 +102,12 @@ func (eg *ZendExecutorGlobals) Activate() {
 	eg.autoloadFunc = nil
 	eg.errorHandling = EH_NORMAL
 	eg.flags = EG_FLAGS_INITIAL
-	eg.userErrorHandler.SetUndef()
-	eg.userExceptionHandler.SetUndef()
+	eg.userErrorHandler = nil
+	eg.userExceptionHandler = nil
 	eg.currentExecuteData = nil
-	eg.userErrorHandlersErrorReporting.Init()
-	eg.userErrorHandlers.Init()
-	eg.userExceptionHandlers.Init()
+	eg.userErrorHandlersErrorReporting = nil
+	eg.userErrorHandlers = nil
+	eg.userExceptionHandlers = nil
 	eg.vmInterrupt = false
 	eg.timedOut = false
 	eg.exception = nil
@@ -186,9 +185,9 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 		/* Also release error and exception handlers, which may hold objects. */
 		eg.GetUserErrorHandler().SetUndef()
 		eg.GetUserExceptionHandler().SetUndef()
-		ZendStackClean(eg.GetUserErrorHandlersErrorReporting(), nil, 1)
-		ZendStackClean(eg.GetUserErrorHandlers(), nil, 1)
-		ZendStackClean(eg.GetUserExceptionHandlers(), nil, 1)
+		eg.userErrorHandlersErrorReporting = nil
+		eg.userErrorHandlers = nil
+		eg.userExceptionHandlers = nil
 	}
 
 	if fastShutdown {
@@ -225,9 +224,9 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 			eg.symtableCache[eg.symtableCacheIdx].Destroy()
 		}
 		eg.GetIncludedFiles().Destroy()
-		eg.GetUserErrorHandlersErrorReporting().Destroy()
-		eg.GetUserErrorHandlers().Destroy()
-		eg.GetUserExceptionHandlers().Destroy()
+		eg.userErrorHandlersErrorReporting = nil
+		eg.userErrorHandlers = nil
+		eg.userExceptionHandlers = nil
 		//eg.GetObjectsStore().Destroy()
 		if eg.GetInAutoload() != nil {
 			eg.GetInAutoload().Destroy()
@@ -327,7 +326,7 @@ func (eg *ZendExecutorGlobals) VmStackPush(ex *ZendExecuteData) {
 	eg.vmStack = append(eg.vmStack, ex)
 }
 func (eg *ZendExecutorGlobals) VmStackPop() *ZendExecuteData {
-	ex, _ := slicekit.PopPtr(&eg.vmStack)
+	ex, _ := slicekit.Pop(&eg.vmStack)
 	return ex
 }
 func (eg *ZendExecutorGlobals) VmStackPopCheck(ex *ZendExecuteData) {
@@ -350,6 +349,40 @@ func (eg *ZendExecutorGlobals) PersistentList() ResourceTable {
 }
 
 func (eg *ZendExecutorGlobals) IsActive() bool { return eg.active }
+
+// error && exception
+func (eg *ZendExecutorGlobals) SetUserErrorHandler(errorHandler *types.Zval, errorLevels int) {
+	slicekit.Push(&eg.userErrorHandlersErrorReporting, eg.userErrorHandlerErrorReporting)
+	slicekit.Push(&eg.userErrorHandlers, eg.userErrorHandler)
+
+	eg.userErrorHandler = nil
+	if !errorHandler.IsNull() {
+		eg.userErrorHandler = errorHandler.Copy()
+		eg.userErrorHandlerErrorReporting = errorLevels
+	}
+}
+func (eg *ZendExecutorGlobals) RestoreUserErrorHandler() {
+	eg.userErrorHandler = nil
+	if len(eg.userErrorHandlers) > 0 {
+		eg.userErrorHandlerErrorReporting, _ = slicekit.Pop(&eg.userErrorHandlersErrorReporting)
+		eg.userErrorHandler, _ = slicekit.Pop(&eg.userErrorHandlers)
+	}
+}
+
+func (eg *ZendExecutorGlobals) SetUserExceptionHandler(exceptionHandler *types.Zval) {
+	slicekit.Push(&eg.userExceptionHandlers, eg.userExceptionHandler)
+
+	eg.userExceptionHandler = nil
+	if !exceptionHandler.IsNull() {
+		eg.userExceptionHandler = exceptionHandler.Copy()
+	}
+}
+func (eg *ZendExecutorGlobals) RestoreUserExceptionHandler() {
+	eg.userExceptionHandler = nil
+	if len(eg.userExceptionHandlers) > 0 {
+		eg.userExceptionHandler, _ = slicekit.Pop(&eg.userExceptionHandlers)
+	}
+}
 
 /**
  * 以下是自动生成的方法
@@ -391,34 +424,15 @@ func (eg *ZendExecutorGlobals) GetUserErrorHandlerErrorReporting() int {
 func (eg *ZendExecutorGlobals) SetUserErrorHandlerErrorReporting(value int) {
 	eg.userErrorHandlerErrorReporting = value
 }
-func (eg *ZendExecutorGlobals) GetUserErrorHandler() *types.Zval { return &eg.userErrorHandler }
-func (eg *ZendExecutorGlobals) SetUserErrorHandler(value types.Zval) {
-	eg.userErrorHandler = value
-}
-func (eg *ZendExecutorGlobals) GetUserExceptionHandler() *types.Zval {
-	return eg.userExceptionHandler
-}
-func (eg *ZendExecutorGlobals) SetUserExceptionHandler(value *types.Zval) {
-	eg.userExceptionHandler = value
-}
-func (eg *ZendExecutorGlobals) GetUserErrorHandlersErrorReporting() ZendStack {
-	return eg.userErrorHandlersErrorReporting
-}
-func (eg *ZendExecutorGlobals) SetUserErrorHandlersErrorReporting(value ZendStack) {
-	eg.userErrorHandlersErrorReporting = value
-}
-func (eg *ZendExecutorGlobals) GetUserErrorHandlers() *ZendStack { return eg.userErrorHandlers }
-func (eg *ZendExecutorGlobals) GetUserExceptionHandlers() *ZendStack {
-	return eg.userExceptionHandlers
-}
+func (eg *ZendExecutorGlobals) GetUserErrorHandler() *types.Zval     { return eg.userErrorHandler }
+func (eg *ZendExecutorGlobals) GetUserExceptionHandler() *types.Zval { return eg.userExceptionHandler }
+
 func (eg *ZendExecutorGlobals) GetErrorHandling() ZendErrorHandlingT      { return eg.errorHandling }
 func (eg *ZendExecutorGlobals) SetErrorHandling(value ZendErrorHandlingT) { eg.errorHandling = value }
 func (eg *ZendExecutorGlobals) GetExceptionClass() *types.ClassEntry      { return eg.exceptionClass }
 func (eg *ZendExecutorGlobals) SetExceptionClass(value *types.ClassEntry) { eg.exceptionClass = value }
 func (eg *ZendExecutorGlobals) GetTimeoutSeconds() int                    { return eg.timeoutSeconds }
 func (eg *ZendExecutorGlobals) SetTimeoutSeconds(value int)               { eg.timeoutSeconds = value }
-func (eg *ZendExecutorGlobals) GetLambdaCount() int                       { return eg.lambdaCount }
-func (eg *ZendExecutorGlobals) SetLambdaCount(value int)                  { eg.lambdaCount = value }
 
 func (eg *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
 	return eg.errorReportingIniEntry

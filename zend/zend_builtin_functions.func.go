@@ -827,92 +827,51 @@ func ZifTriggerError(executeData zpp.Ex, return_value zpp.Ret, message *types.Zv
 	return_value.SetTrue()
 	return
 }
-func ZifSetErrorHandler(executeData zpp.Ex, return_value zpp.Ret, errorHandler *types.Zval, _ zpp.Opt, errorTypes *types.Zval) {
-	var error_handler *types.Zval
-	var error_type = faults.E_ALL
-	if ZendParseParameters(executeData.NumArgs(), "z|l", &error_handler, &error_type) == types.FAILURE {
-		return
-	}
-	if !error_handler.IsNull() {
-		if ZendIsCallable(error_handler, 0, nil) == 0 {
-			var errorHandlerName = ZendGetCallableName(error_handler)
+
+//zif -old "z|l"
+func ZifSetErrorHandler(returnValue zpp.Ret, errorHandler *types.Zval, _ zpp.Opt, errorTypes *int) {
+	var errorType = b.Option(errorTypes, faults.E_ALL)
+	if !errorHandler.IsNull() {
+		if !ZendIsCallable(errorHandler, 0, nil) {
+			var errorHandlerName = ZendGetCallableName(errorHandler)
 			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), lang.CondF1(errorHandlerName != "", func() string { return errorHandlerName }, "unknown"))
 			return
 		}
 	}
+
 	if EG__().GetUserErrorHandler().IsNotUndef() {
-		types.ZVAL_COPY(return_value, EG__().GetUserErrorHandler())
+		types.ZVAL_COPY(returnValue, EG__().GetUserErrorHandler())
 	}
-	EG__().GetUserErrorHandlersErrorReporting().Push(EG__().GetUserErrorHandlerErrorReporting())
-	EG__().GetUserErrorHandlers().Push(EG__().GetUserErrorHandler())
-	if error_handler.IsNull() {
-		EG__().GetUserErrorHandler().SetUndef()
-		return
-	}
-	types.ZVAL_COPY(EG__().GetUserErrorHandler(), error_handler)
-	EG__().SetUserErrorHandlerErrorReporting(int(error_type))
+
+	EG__().SetUserErrorHandler(errorHandler, errorType)
 }
-func ZifRestoreErrorHandler(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	if EG__().GetUserErrorHandler().IsNotUndef() {
-		var zeh types.Zval
-		types.ZVAL_COPY_VALUE(&zeh, EG__().GetUserErrorHandler())
-		EG__().GetUserErrorHandler().SetUndef()
-		// ZvalPtrDtor(&zeh)
-	}
-	if EG__().GetUserErrorHandlers().IsEmpty() {
-		EG__().GetUserErrorHandler().SetUndef()
-	} else {
-		var tmp *types.Zval
-		EG__().SetUserErrorHandlerErrorReporting(ZendStackIntTop(EG__().GetUserErrorHandlersErrorReporting()))
-		EG__().GetUserErrorHandlersErrorReporting().DelTop()
-		tmp = EG__().GetUserErrorHandlers().Top()
-		types.ZVAL_COPY_VALUE(EG__().GetUserErrorHandler(), tmp)
-		EG__().GetUserErrorHandlers().DelTop()
-	}
-	return_value.SetTrue()
-	return
+func ZifRestoreErrorHandler() bool {
+	EG__().RestoreUserErrorHandler()
+	return true
 }
-func ZifSetExceptionHandler(executeData zpp.Ex, return_value zpp.Ret, exceptionHandler *types.Zval) {
-	var exception_handler *types.Zval
-	if ZendParseParameters(executeData.NumArgs(), "z", &exception_handler) == types.FAILURE {
-		return
-	}
-	if !exception_handler.IsNull() {
-		if !ZendIsCallable(exception_handler, 0, nil) {
-			var exceptionHandlerName = ZendGetCallableName(exception_handler)
+
+//zif -old "z"
+func ZifSetExceptionHandler(exceptionHandler *types.Zval) *types.Zval {
+	var returnValue = new(types.Zval)
+
+	if !exceptionHandler.IsNull() {
+		if !ZendIsCallable(exceptionHandler, 0, nil) {
+			var exceptionHandlerName = ZendGetCallableName(exceptionHandler)
 			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), lang.CondF1(exceptionHandlerName != "", func() string { return exceptionHandlerName }, "unknown"))
-			return
+			return returnValue
 		}
 	}
+
 	if EG__().GetUserExceptionHandler().IsNotUndef() {
-		types.ZVAL_COPY(return_value, EG__().GetUserExceptionHandler())
+		types.ZVAL_COPY(returnValue, EG__().GetUserExceptionHandler())
 	}
-	EG__().GetUserExceptionHandlers().Push(EG__().GetUserExceptionHandler())
-	if exception_handler.IsNull() {
-		EG__().GetUserExceptionHandler().SetUndef()
-		return
-	}
-	types.ZVAL_COPY(EG__().GetUserExceptionHandler(), exception_handler)
+
+	EG__().SetUserExceptionHandler(exceptionHandler)
+	return returnValue
 }
-func ZifRestoreExceptionHandler(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	if EG__().GetUserExceptionHandler().IsNotUndef() {
-		// ZvalPtrDtor(EG__().GetUserExceptionHandler())
-	}
-	if EG__().GetUserExceptionHandlers().IsEmpty() {
-		EG__().GetUserExceptionHandler().SetUndef()
-	} else {
-		var tmp *types.Zval = EG__().GetUserExceptionHandlers().Top()
-		types.ZVAL_COPY_VALUE(EG__().GetUserExceptionHandler(), tmp)
-		EG__().GetUserExceptionHandlers().DelTop()
-	}
-	return_value.SetTrue()
-	return
+func ZifRestoreExceptionHandler() bool {
+	EG__().RestoreUserExceptionHandler()
+	return true
 }
 
 func GetDeclaredClassImpl(flags uint32, skipFlags uint32) *types.Array {

@@ -459,11 +459,11 @@ var DefZifSetErrorHandler = def.DefFunc("set_error_handler", 1, 2, []def.ArgInfo
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	error_handler := fp.ParseZval()
 	fp.StartOptional()
-	error_types := fp.ParseZval()
+	error_types := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifSetErrorHandler(executeData, returnValue, error_handler, nil, error_types)
+	ZifSetErrorHandler(returnValue, error_handler, nil, error_types)
 })
 
 // generate by ZifRestoreErrorHandler
@@ -471,7 +471,8 @@ var DefZifRestoreErrorHandler = def.DefFunc("restore_error_handler", 0, 0, []def
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifRestoreErrorHandler(executeData, returnValue)
+	ret := ZifRestoreErrorHandler()
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifSetExceptionHandler
@@ -481,7 +482,8 @@ var DefZifSetExceptionHandler = def.DefFunc("set_exception_handler", 1, 1, []def
 	if fp.HasError() {
 		return
 	}
-	ZifSetExceptionHandler(executeData, returnValue, exception_handler)
+	ret := ZifSetExceptionHandler(exception_handler)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifRestoreExceptionHandler
@@ -489,7 +491,8 @@ var DefZifRestoreExceptionHandler = def.DefFunc("restore_exception_handler", 0, 
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifRestoreExceptionHandler(executeData, returnValue)
+	ret := ZifRestoreExceptionHandler()
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifGetDeclaredTraits
@@ -568,11 +571,12 @@ var DefZifGetResources = def.DefFunc("get_resources", 0, 1, []def.ArgInfo{{Name:
 var DefZifGetLoadedExtensions = def.DefFunc("get_loaded_extensions", 0, 1, []def.ArgInfo{{Name: "zend_extensions"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
-	zend_extensions := fp.ParseZval()
+	zend_extensions := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifGetLoadedExtensions(executeData, returnValue, nil, zend_extensions)
+	ret := ZifGetLoadedExtensions(nil, zend_extensions)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifGetDefinedConstants
