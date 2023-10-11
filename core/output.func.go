@@ -61,15 +61,6 @@ func PhpOutputDiscardAll() {
 		PhpOutputStackPop(PHP_OUTPUT_POP_DISCARD | PHP_OUTPUT_POP_FORCE)
 	}
 }
-func PhpOutputGetContents(p *types.Zval) bool {
-	if contents, ok := OG__().GetContents(); ok {
-		p.SetString(contents)
-		return true
-	} else {
-		p.SetNull()
-		return false
-	}
-}
 func PhpOutputStartDefault() bool {
 	handler := NewOutputHandlerInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
 	return OG__().StartHandler(handler)
@@ -165,45 +156,6 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 	}
 	context.SetOp(originalOp)
 	return status
-}
-func PhpOutputOp(op int, str *byte, len_ int) {
-	if PhpOutputLockError(op) != 0 {
-		return
-	}
-
-	context := InitOutputContext(op)
-
-	/*
-	 * broken up for better performance:
-	 *  - apply op to the one active handler; note that OG__().active might be popped off the stack on a flush
-	 *  - or apply op to the handler stack
-	 */
-	if OG__().Active() != nil && OG__().CountHandlers() != 0 {
-		obh_cnt := OG__().CountHandlers()
-		context.GetIn().SetData(b.CastBytes(str, len_))
-		if obh_cnt > 1 {
-			OG__().EachHandlerEx(false, func(h *PhpOutputHandler) bool {
-				return PhpOutputStackApplyOp(h, context) == 0
-			})
-		} else if active := OG__().TopHandler(); active != nil && !active.IsDisabled() {
-			PhpOutputHandlerOp(active, context)
-		} else {
-			context.Pass()
-		}
-	} else {
-		context.GetOut().SetData(b.CastBytes(str, len_))
-	}
-	if outData := context.GetOut().String(); outData != "" {
-		PhpOutputHeader()
-
-		if !OG__().IsDisabled() {
-			SM__().UbWrite(outData)
-			if OG__().IsImplicitFlush() {
-				SapiFlush()
-			}
-			OG__().MarkSent()
-		}
-	}
 }
 func PhpOutputStackApplyOp(handler *PhpOutputHandler, context *PhpOutputContext) int {
 	var status PhpOutputHandlerStatusT

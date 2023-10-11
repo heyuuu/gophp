@@ -227,7 +227,7 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlight
 	ZendRestoreLexicalState(&original_lex_state)
 	return types.SUCCESS
 }
-func HighlightString(str *types.Zval, syntaxHighlighterIni *ZendSyntaxHighlighterIni, strName *byte) int {
+func HighlightString(str *types.Zval, syntaxHighlighterIni *ZendSyntaxHighlighterIni, strName string) int {
 	var original_lex_state ZendLexState
 	var tmp types.Zval
 	if Z_TYPE_P(str) != types.IsString {
