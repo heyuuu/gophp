@@ -13,3 +13,29 @@ func Each[T any](slice []T, handler func(T)) {
 		handler(item)
 	}
 }
+
+func EachReserve[T any](slice []T, handler func(T)) {
+	for i := len(slice) - 1; i >= 0; i-- {
+		item := slice[i]
+		handler(item)
+	}
+}
+
+func EachEx[T any](slice []T, handler func(T) bool) {
+	for _, item := range slice {
+		ok := handler(item)
+		if !ok {
+			return
+		}
+	}
+}
+
+func EachReserveEx[T any](slice []T, handler func(T) bool) {
+	for i := len(slice) - 1; i >= 0; i-- {
+		item := slice[i]
+		ok := handler(item)
+		if !ok {
+			return
+		}
+	}
+}

@@ -15,9 +15,7 @@ var PhpOutputDirect func(str string) int = PhpOutputStderr
  * types
  */
 
-/**
- * PhpOutputHandler
- */
+// PhpOutputHandler
 type PhpOutputHandler struct {
 	name   string
 	flags  int
@@ -32,43 +30,34 @@ type PhpOutputHandler struct {
 	}
 }
 
-func PhpOutputHandlerCreateUser(outputHandler *types.Zval, chunkSize int, flags int) *PhpOutputHandler {
+func NewOutputHandlerUser(outputHandler *types.Zval, chunkSize int, flags int) *PhpOutputHandler {
+	if outputHandler == nil || outputHandler.IsNull() {
+		return NewOutputHandlerInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunkSize, flags)
+	}
+
 	var handlerName *types.String = nil
 	var err *byte = nil
 	var handler *PhpOutputHandler = nil
-	switch outputHandler.Type() {
-	case types.IsNull:
-		handler = PhpOutputHandlerCreateInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunkSize, flags)
-	case types.IsString:
-		fallthrough
-	default:
-		user := &PhpOutputHandlerUserFuncT{}
-		if types.SUCCESS == zend.ZendFcallInfoInit(outputHandler, 0, user.GetFci(), user.GetFcc(), &handlerName, &error) {
-			handler = NewPhpOutputHandler(handlerName.GetStr(), chunkSize, flags & ^0xf | PHP_OUTPUT_HANDLER_USER)
-			types.ZVAL_COPY(user.GetZoh(), outputHandler)
-			handler.SetUser(user)
-		} else {
-			zend.Efree(user)
-		}
-		if err != nil {
-			PhpErrorDocref("ref.outcontrol", faults.E_WARNING, "%s", err)
-		}
+
+	user := &PhpOutputHandlerUserFuncT{}
+	if types.SUCCESS == zend.ZendFcallInfoInit(outputHandler, 0, user.GetFci(), user.GetFcc(), &handlerName, &error) {
+		handler = newPhpOutputHandler(handlerName.GetStr(), chunkSize, flags & ^0xf | PHP_OUTPUT_HANDLER_USER)
+		types.ZVAL_COPY(user.GetZoh(), outputHandler)
+		handler.SetUser(user)
+	}
+	if err != nil {
+		PhpErrorDocref("ref.outcontrol", faults.E_WARNING, "%s", err)
 	}
 	return handler
 }
 
-func PhpOutputHandlerCreateInternal(name string, outputHandler PhpOutputHandlerContextFuncT, chunkSize int, flags int) *PhpOutputHandler {
-	var handler *PhpOutputHandler
-	var str = types.NewString(name)
-	handler = PhpOutputHandlerInit(str, chunkSize, flags & ^0xf | PHP_OUTPUT_HANDLER_INTERNAL)
-	handler.SetInternal(outputHandler)
+func NewOutputHandlerInternal(name string, outputHandler PhpOutputHandlerContextFuncT, chunkSize int, flags int) *PhpOutputHandler {
+	handler := newPhpOutputHandler(name, chunkSize, flags & ^0xf | PHP_OUTPUT_HANDLER_INTERNAL)
+	handler.func_.internal = outputHandler
 	return handler
 }
-func PhpOutputHandlerInit(name *types.String, chunkSize int, flags int) *PhpOutputHandler {
-	return NewPhpOutputHandler(name.GetStr(), flags, chunkSize)
-}
 
-func NewPhpOutputHandler(name string, flags int, chunkSize int) *PhpOutputHandler {
+func newPhpOutputHandler(name string, chunkSize int, flags int) *PhpOutputHandler {
 	handler := &PhpOutputHandler{
 		name:  name,
 		size:  chunkSize,

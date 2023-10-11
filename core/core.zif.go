@@ -32,12 +32,13 @@ var DefZifObStart = def.DefFunc("ob_start", 0, 3, []def.ArgInfo{{Name: "user_fun
 	fp := zpp.FastParseStart(executeData, 0, 3, 0)
 	fp.StartOptional()
 	user_function := fp.ParseZval()
-	chunk_size := fp.ParseZval()
-	flags := fp.ParseZval()
+	chunk_size := fp.ParseLong()
+	flags_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifObStart(executeData, returnValue, nil, user_function, chunk_size, flags)
+	ret := ZifObStart(nil, user_function, chunk_size, flags_)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifObFlush
@@ -128,7 +129,8 @@ var DefZifObGetStatus = def.DefFunc("ob_get_status", 0, 1, []def.ArgInfo{{Name: 
 	if fp.HasError() {
 		return
 	}
-	ZifObGetStatus(returnValue, nil, full_status)
+	ret := ZifObGetStatus(nil, full_status)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifObImplicitFlush

@@ -2,6 +2,7 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/kits/slicekit"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
@@ -16,31 +17,24 @@ type PhpOutputBuffer struct {
 	free bool
 }
 
-func NewOutputBuffer(data *byte, size int, used int, free bool) *PhpOutputBuffer {
-	return &PhpOutputBuffer{data: data, size: size, used: used, free: free}
-}
-func EmptyOutputBuffer() *PhpOutputBuffer {
-	return NewOutputBuffer(nil, 0, 0, false)
-}
+func (buf *PhpOutputBuffer) GetData() *byte      { return buf.data }
+func (buf *PhpOutputBuffer) SetData(value *byte) { buf.data = value }
+func (buf *PhpOutputBuffer) GetSize() int        { return buf.size }
+func (buf *PhpOutputBuffer) SetSize(value int)   { buf.size = value }
+func (buf *PhpOutputBuffer) GetUsed() int        { return buf.used }
+func (buf *PhpOutputBuffer) SetUsed(value int)   { buf.used = value }
+func (buf *PhpOutputBuffer) IsFree() bool        { return buf.free }
+func (buf *PhpOutputBuffer) SetFree(value bool)  { buf.free = value }
 
-func (this *PhpOutputBuffer) GetData() *byte      { return this.data }
-func (this *PhpOutputBuffer) SetData(value *byte) { this.data = value }
-func (this *PhpOutputBuffer) GetSize() int        { return this.size }
-func (this *PhpOutputBuffer) SetSize(value int)   { this.size = value }
-func (this *PhpOutputBuffer) GetUsed() int        { return this.used }
-func (this *PhpOutputBuffer) SetUsed(value int)   { this.used = value }
-func (this *PhpOutputBuffer) IsFree() bool        { return this.free }
-func (this *PhpOutputBuffer) SetFree(value bool)  { this.free = value }
-
-func (this *PhpOutputBuffer) SetFreeData(handler *PhpOutputBuffer) {
-	this.data = handler.data
-	this.used = handler.used
-	this.free = true
+func (buf *PhpOutputBuffer) SetFreeData(handler *PhpOutputBuffer) {
+	buf.data = handler.data
+	buf.used = handler.used
+	buf.free = true
 }
-func (this *PhpOutputBuffer) SetFreeDataByStr(data string) {
-	this.data = b.CastStrPtr(data)
-	this.used = len(data)
-	this.free = true
+func (buf *PhpOutputBuffer) SetFreeDataByStr(data string) {
+	buf.data = b.CastStrPtr(data)
+	buf.used = len(data)
+	buf.free = true
 }
 
 /**
@@ -48,30 +42,56 @@ func (this *PhpOutputBuffer) SetFreeDataByStr(data string) {
  */
 type PhpOutputContext struct {
 	op  int
-	in  *PhpOutputBuffer
-	out *PhpOutputBuffer
+	in  PhpOutputBuffer
+	out PhpOutputBuffer
 }
 
-func (this *PhpOutputContext) Init(op int) {
-	this.op = op
-	this.in = nil
-	this.out = nil
+func InitOutputContext(op int) *PhpOutputContext {
+	return &PhpOutputContext{op: op}
 }
 
-func (this *PhpOutputContext) Reset() {
-	op := this.op
-	this.Init(op)
+func (c *PhpOutputContext) Reset() {
+	c.in = PhpOutputBuffer{}
+	c.out = PhpOutputBuffer{}
 }
 
-func (this *PhpOutputContext) GetOp() int              { return this.op }
-func (this *PhpOutputContext) SetOp(value int)         { this.op = value }
-func (this *PhpOutputContext) GetIn() *PhpOutputBuffer { return this.in }
-func (this *PhpOutputContext) SetIn(buffer *PhpOutputBuffer) {
-	this.in = buffer
+func (c *PhpOutputContext) GetOutData() (string, bool) {
+	if c.out.data == nil || c.out.used == 0 {
+		return "", false
+	}
+
+	return b.CastStr(c.out.data, c.out.used), true
 }
-func (this *PhpOutputContext) GetOut() *PhpOutputBuffer { return this.out }
-func (this *PhpOutputContext) SetOut(buffer *PhpOutputBuffer) {
-	this.in = buffer
+
+func (c *PhpOutputContext) Feed(buffer PhpOutputBuffer) {
+	if c.in.free && c.in.data != nil {
+		zend.Efree(c.in.data)
+	}
+	c.in = buffer
+}
+
+func (c *PhpOutputContext) Swap() {
+	if c.in.free && c.in.data != nil {
+		zend.Efree(c.in.data)
+	}
+	c.in = c.out
+	c.out = PhpOutputBuffer{}
+}
+
+func (c *PhpOutputContext) Pass() {
+	c.out = c.in
+	c.in = PhpOutputBuffer{}
+}
+
+func (c *PhpOutputContext) GetOp() int              { return c.op }
+func (c *PhpOutputContext) SetOp(value int)         { c.op = value }
+func (c *PhpOutputContext) GetIn() *PhpOutputBuffer { return &c.in }
+func (c *PhpOutputContext) SetIn(buffer PhpOutputBuffer) {
+	c.in = buffer
+}
+func (c *PhpOutputContext) GetOut() *PhpOutputBuffer { return &c.out }
+func (c *PhpOutputContext) SetOut(buffer PhpOutputBuffer) {
+	c.in = buffer
 }
 
 /**
@@ -86,7 +106,6 @@ type PhpOutputHandlerUserFuncT struct {
 func (this *PhpOutputHandlerUserFuncT) GetFci() types.ZendFcallInfo      { return this.fci }
 func (this *PhpOutputHandlerUserFuncT) GetFcc() types.ZendFcallInfoCache { return this.fcc }
 func (this *PhpOutputHandlerUserFuncT) GetZoh() types.Zval               { return this.zoh }
-
 
 /**
  * ZendOutputGlobals
@@ -135,13 +154,35 @@ func (g *ZendOutputGlobals) PushHandler(h **PhpOutputHandler) int {
 	g.handlersEx = append(g.handlersEx, h)
 	return len(g.handlersEx)
 }
-func (g *ZendOutputGlobals) PopHandler() **PhpOutputHandler {
-	var c **PhpOutputHandler
-	if len(g.handlersEx) > 0 {
-		c = g.handlersEx[len(g.handlersEx)-1]
-		g.handlersEx = g.handlersEx[:len(g.handlersEx)-1]
+func (g *ZendOutputGlobals) TopHandler() **PhpOutputHandler {
+	if len(g.handlersEx) == 0 {
+		return nil
 	}
-	return c
+
+	return g.handlersEx[len(g.handlersEx)-1]
+}
+func (g *ZendOutputGlobals) PopHandler() **PhpOutputHandler {
+	if len(g.handlersEx) == 0 {
+		return nil
+	}
+
+	h := g.handlersEx[len(g.handlersEx)-1]
+	g.handlersEx = g.handlersEx[:len(g.handlersEx)-1]
+	return h
+}
+func (g *ZendOutputGlobals) EachHandler(bottomUp bool, handler func(h **PhpOutputHandler)) {
+	if bottomUp {
+		slicekit.Each(g.handlersEx, handler)
+	} else {
+		slicekit.EachReserve(g.handlersEx, handler)
+	}
+}
+func (g *ZendOutputGlobals) EachHandlerEx(bottomUp bool, handler func(h **PhpOutputHandler) bool) {
+	if bottomUp {
+		slicekit.EachEx(g.handlersEx, handler)
+	} else {
+		slicekit.EachReserveEx(g.handlersEx, handler)
+	}
 }
 
 // fields

@@ -1,5 +1,7 @@
 package core
 
+import b "github.com/heyuuu/gophp/builtin"
+
 /* handler ops */
 
 const PHP_OUTPUT_HANDLER_WRITE = 0x0
@@ -55,6 +57,21 @@ const PHP_OUTPUT_HANDLER_DEFAULT_SIZE = 0x4000
 /* old-style, stateless callback */
 
 type PhpOutputHandlerFuncT func(output *byte, output_len int, handled_output **byte, handled_output_len *int, mode int)
+
+type OutputHandler func(output string, mode int) (handledOutput string)
+
+// todo temp, need remove
+func wrapOutputHandler(h PhpOutputHandlerFuncT) OutputHandler {
+	if h == nil {
+		return nil
+	}
+	return func(output string, mode int) (handledOutput string) {
+		var outputPtr *byte
+		var outputLen int
+		h(b.CastStrPtr(output), len(output), &outputPtr, &outputLen, mode)
+		return b.CastStr(outputPtr, outputLen)
+	}
+}
 
 /* new-style, opaque context callback */
 

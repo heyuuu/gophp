@@ -16,6 +16,10 @@ func CastUintptr[T any](ptr *T) uintptr {
 
 func CastStr[I integer](str *byte, len_ I) string {
 	// todo 此段代码仅表意，实际不应依赖此实现 (因为无法保证 *byte 后续内存有效)
+	if str == nil || len_ == 0 {
+		return ""
+	}
+
 	var bytes = make([]byte, len_)
 	var ptr = uintptr(unsafe.Pointer(str))
 	for i := uint(0); i < uint(len_); i++ {
