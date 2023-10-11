@@ -191,7 +191,7 @@ func (g *ZendOutputGlobals) lockError(op int) bool {
 	/* if there's no ob active, ob has been stopped */
 	if op != 0 && g.active != nil && g.running != nil {
 		/* fatal error */
-		OG__().Deactivate()
+		g.Deactivate()
 		PhpErrorDocref("ref.outcontrol", faults.E_ERROR, "Cannot use output buffering in output buffering display handlers")
 		return true
 	}

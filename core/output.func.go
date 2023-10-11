@@ -71,21 +71,8 @@ func PhpOutputStartUser(outputHandler *types.Zval, chunkSize int, flags int) boo
 }
 func PhpOutputStartInternal(name string, outputHandler PhpOutputHandlerFuncT, chunkSize int, flags int) bool {
 	handler := NewOutputHandlerInternal(name, PhpOutputHandlerCompatFunc, chunkSize, flags)
-	PhpOutputHandlerSetContext(handler, outputHandler)
+	handler.SetOpaq(outputHandler)
 	return OG__().StartHandler(handler)
-}
-func PhpOutputHandlerSetContext(handler *PhpOutputHandler, opaq any) {
-	handler.SetOpaq(opaq)
-}
-func PhpOutputLockError(op int) int {
-	/* if there's no ob active, ob has been stopped */
-	if op != 0 && OG__().active != nil && OG__().running != nil {
-		/* fatal error */
-		OG__().Deactivate()
-		PhpErrorDocref("ref.outcontrol", faults.E_ERROR, "Cannot use output buffering in output buffering display handlers")
-		return 1
-	}
-	return 0
 }
 func PhpOutputHandlerAppend(handler *PhpOutputHandler, buf *PhpOutputBuffer) bool {
 	if buf.Used() != 0 {
@@ -107,7 +94,7 @@ func PhpOutputHandlerAppend(handler *PhpOutputHandler, buf *PhpOutputBuffer) boo
 	return true
 }
 func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) PhpOutputHandlerStatusT {
-	if PhpOutputLockError(context.GetOp()) != 0 {
+	if OG__().lockError(context.GetOp()) {
 		/* fatal error */
 		return PHP_OUTPUT_HANDLER_FAILURE
 	}

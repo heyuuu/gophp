@@ -22,7 +22,6 @@ type PhpOutputHandler struct {
 	size   int
 	buffer PhpOutputBuffer
 	opaq   any
-	dtor   func(opaq any)
 	func_  struct /* union */ {
 		user     *PhpOutputHandlerUserFuncT
 		internal PhpOutputHandlerContextFuncT
