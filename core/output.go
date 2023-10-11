@@ -1,6 +1,7 @@
 package core
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/shim/slices"
 	"github.com/heyuuu/gophp/zend"
@@ -8,69 +9,29 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-const PhpOutputDefaultHandlerName = "default output handler"
+var PhpOutputDefaultHandlerName = "default output handler"
 
-/**
- * types
- */
-
-// PhpOutputHandler
-type PhpOutputHandler struct {
-	name   string
-	flags  int
-	level  int
-	size   int
-	buffer PhpOutputBuffer
-	opaq   any
-	func_  struct /* union */ {
-		user     *PhpOutputHandlerUserFuncT
-		internal PhpOutputHandlerContextFuncT
-	}
+func PhpOutputHandlerDefaultFunc(context *PhpOutputContext) bool {
+	context.Pass()
+	return true
 }
 
-func NewOutputHandlerUser(outputHandler *types.Zval, chunkSize int, flags int) *PhpOutputHandler {
+func wrapOutputHandlerUser(outputHandler *types.Zval) (name string, handler OutputHandlerFunc, ok bool) {
+	// 未定义或定义值为 nil 时
 	if outputHandler == nil || outputHandler.IsNull() {
-		return NewOutputHandlerInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunkSize, flags)
+		return "", nil, true
 	}
 
+	// 自定义 callable 时
 	var handlerName *types.String = nil
 	var err *byte = nil
-	var handler *PhpOutputHandler = nil
-
 	user := &PhpOutputHandlerUserFuncT{}
-	if types.SUCCESS == zend.ZendFcallInfoInit(outputHandler, 0, user.GetFci(), user.GetFcc(), &handlerName, &error) {
-		handler = newPhpOutputHandler(handlerName.GetStr(), chunkSize, flags & ^0xf | PHP_OUTPUT_HANDLER_USER)
+	if types.SUCCESS == zend.ZendFcallInfoInit(outputHandler, 0, user.GetFci(), user.GetFcc(), &handlerName, &err) {
 		types.ZVAL_COPY(user.GetZoh(), outputHandler)
-		handler.SetUser(user)
-	}
-	if err != nil {
-		PhpErrorDocref("ref.outcontrol", faults.E_WARNING, "%s", err)
-	}
-	return handler
-}
 
-func NewOutputHandlerInternal(name string, outputHandler PhpOutputHandlerContextFuncT, chunkSize int, flags int) *PhpOutputHandler {
-	handler := newPhpOutputHandler(name, chunkSize, flags & ^0xf | PHP_OUTPUT_HANDLER_INTERNAL)
-	handler.func_.internal = outputHandler
-	return handler
-}
-
-func newPhpOutputHandler(name string, chunkSize int, flags int) *PhpOutputHandler {
-	handler := &PhpOutputHandler{
-		name:  name,
-		size:  chunkSize,
-		flags: flags,
-	}
-	handler.buffer.Init(chunkSize)
-	return handler
-}
-
-type OutputHandler func(context *PhpOutputContext) bool
-
-func (h *PhpOutputHandler) Handler() OutputHandler {
-	if h.IsUser() {
-		user := h.func_.user
-		return func(context *PhpOutputContext) (result bool) {
+		ok = true
+		name = handlerName.GetStr()
+		handler = func(context *PhpOutputContext) (result bool) {
 			zend.ZendFcallInfoArgn(user.GetFci(), 2, types.NewZvalString(context.GetIn().String()), types.NewZvalLong(context.GetOp()))
 
 			var retval types.Zval
@@ -85,28 +46,96 @@ func (h *PhpOutputHandler) Handler() OutputHandler {
 			zend.ZendFcallInfoArgn(user.GetFci(), 0)
 			return result
 		}
-	} else {
-		internal := h.func_.internal
+	}
+	if err != nil {
+		PhpErrorDocref("ref.outcontrol", faults.E_WARNING, "%s", err)
+	}
+	return
+}
+
+func wrapHandlerFuncT(handler PhpOutputHandlerFuncT) OutputHandlerFunc {
+	if handler == nil {
 		return func(context *PhpOutputContext) bool {
-			return internal(h.GetOpaq(), context) == types.SUCCESS
+			return false
 		}
+	}
+
+	h := func(output string, mode int) (handledOutput string) {
+		var outputPtr *byte
+		var outputLen int
+		handler(b.CastStrPtr(output), len(output), &outputPtr, &outputLen, mode)
+		return b.CastStr(outputPtr, outputLen)
+	}
+
+	return func(context *PhpOutputContext) bool {
+		var handledOutput string
+		if data := context.GetOut().String(); data != "" {
+			handledOutput = h(data, context.GetOp())
+		}
+		if len(handledOutput) > 0 {
+			context.GetOut().SetDataStr(handledOutput)
+		} else {
+			context.Pass()
+		}
+		return true
 	}
 }
 
-func (h *PhpOutputHandler) GetName() string                           { return h.name }
-func (h *PhpOutputHandler) GetFlags() int                             { return h.flags }
-func (h *PhpOutputHandler) GetLevel() int                             { return h.level }
-func (h *PhpOutputHandler) GetSize() int                              { return h.size }
-func (h *PhpOutputHandler) GetBuffer() *PhpOutputBuffer               { return &h.buffer }
-func (h *PhpOutputHandler) GetOpaq() any                              { return h.opaq }
-func (h *PhpOutputHandler) GetUser() *PhpOutputHandlerUserFuncT       { return h.func_.user }
-func (h *PhpOutputHandler) GetInternal() PhpOutputHandlerContextFuncT { return h.func_.internal }
-func (h *PhpOutputHandler) SetLevel(value int)                        { h.level = value }
-func (h *PhpOutputHandler) SetOpaq(value any)                         { h.opaq = value }
-func (h *PhpOutputHandler) SetUser(value *PhpOutputHandlerUserFuncT)  { h.func_.user = value }
-func (h *PhpOutputHandler) SetInternal(value PhpOutputHandlerContextFuncT) {
-	h.func_.internal = value
+func wrapHandlerFuncContextT(handler PhpOutputHandlerContextFuncT) OutputHandlerFunc {
+	return func(context *PhpOutputContext) bool {
+		return handler(nil, context) == types.SUCCESS
+	}
 }
+
+/**
+ * types
+ */
+type OutputHandlerFunc func(context *PhpOutputContext) bool
+
+// PhpOutputHandler
+type PhpOutputHandler struct {
+	name    string
+	flags   int
+	level   int
+	size    int
+	buffer  PhpOutputBuffer
+	handler OutputHandlerFunc
+}
+
+func NewOutputHandlerUser(outputHandler *types.Zval, chunkSize int, flags int) *PhpOutputHandler {
+	if name, userHandler, ok := wrapOutputHandlerUser(outputHandler); ok {
+		return NewOutputHandler(name, userHandler, chunkSize, flags & ^0xf)
+	} else {
+		return nil
+	}
+}
+
+func NewOutputHandler(name string, handlerFunc OutputHandlerFunc, chunkSize int, flags int) *PhpOutputHandler {
+	if name == "" {
+		name = PhpOutputDefaultHandlerName
+	}
+	handler := &PhpOutputHandler{
+		name:    name,
+		size:    chunkSize,
+		flags:   flags &^ 0xf,
+		handler: handlerFunc,
+	}
+	handler.buffer.Init(chunkSize)
+	return handler
+}
+
+func (h *PhpOutputHandler) HandleContext(context *PhpOutputContext) bool {
+	if h.handler != nil {
+		return h.handler(context)
+	}
+	return PhpOutputHandlerDefaultFunc(context)
+}
+
+func (h *PhpOutputHandler) GetName() string             { return h.name }
+func (h *PhpOutputHandler) GetFlags() int               { return h.flags }
+func (h *PhpOutputHandler) GetLevel() int               { return h.level }
+func (h *PhpOutputHandler) GetSize() int                { return h.size }
+func (h *PhpOutputHandler) GetBuffer() *PhpOutputBuffer { return &h.buffer }
 
 /* PhpOutputHandler.flags */
 func (h *PhpOutputHandler) AddFlags(value int)      { h.flags |= value }
@@ -119,11 +148,9 @@ func (h *PhpOutputHandler) SwitchFlags(value int, cond bool) {
 		h.SubFlags(value)
 	}
 }
-func (h PhpOutputHandler) IsUser() bool         { return h.HasFlags(PHP_OUTPUT_HANDLER_USER) }
-func (h PhpOutputHandler) IsStarted() bool      { return h.HasFlags(PHP_OUTPUT_HANDLER_STARTED) }
-func (h PhpOutputHandler) IsDisabled() bool     { return h.HasFlags(PHP_OUTPUT_HANDLER_DISABLED) }
-func (h PhpOutputHandler) IsProcessed() bool    { return h.HasFlags(PHP_OUTPUT_HANDLER_PROCESSED) }
-func (h *PhpOutputHandler) SetIsUser(cond bool) { h.SwitchFlags(PHP_OUTPUT_HANDLER_USER, cond) }
+func (h PhpOutputHandler) IsStarted() bool   { return h.HasFlags(PHP_OUTPUT_HANDLER_STARTED) }
+func (h PhpOutputHandler) IsDisabled() bool  { return h.HasFlags(PHP_OUTPUT_HANDLER_DISABLED) }
+func (h PhpOutputHandler) IsProcessed() bool { return h.HasFlags(PHP_OUTPUT_HANDLER_PROCESSED) }
 func (h *PhpOutputHandler) SetIsStarted(cond bool) {
 	h.SwitchFlags(PHP_OUTPUT_HANDLER_STARTED, cond)
 }

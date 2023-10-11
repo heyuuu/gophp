@@ -8,13 +8,8 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
-	"os"
 )
 
-func PhpOutputStderr(str string) int {
-	os.Stderr.WriteString(str)
-	return len(str)
-}
 func PhpOutputHeader() {
 	if !SG__().headersSent {
 		if OG__().StartFilename() == "" {
@@ -62,7 +57,7 @@ func PhpOutputDiscardAll() {
 	}
 }
 func PhpOutputStartDefault() bool {
-	handler := NewOutputHandlerInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
+	handler := NewOutputHandler(PhpOutputDefaultHandlerName, nil, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
 	return OG__().StartHandler(handler)
 }
 func PhpOutputStartUser(outputHandler *types.Zval, chunkSize int, flags int) bool {
@@ -70,8 +65,7 @@ func PhpOutputStartUser(outputHandler *types.Zval, chunkSize int, flags int) boo
 	return OG__().StartHandler(handler)
 }
 func PhpOutputStartInternal(name string, outputHandler PhpOutputHandlerFuncT, chunkSize int, flags int) bool {
-	handler := NewOutputHandlerInternal(name, PhpOutputHandlerCompatFunc, chunkSize, flags)
-	handler.SetOpaq(outputHandler)
+	handler := NewOutputHandler(name, wrapHandlerFuncT(outputHandler), chunkSize, flags)
 	return OG__().StartHandler(handler)
 }
 func PhpOutputHandlerAppend(handler *PhpOutputHandler, buf *PhpOutputBuffer) bool {
@@ -113,7 +107,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 		OG__().running = handler
 
 		context.Feed(*handler.GetBuffer())
-		if handler.Handler()(context) {
+		if handler.HandleContext(context) {
 			status = PHP_OUTPUT_HANDLER_NO_DATA
 			if context.GetOut().Used() != 0 {
 				status = PHP_OUTPUT_HANDLER_SUCCESS
@@ -193,7 +187,7 @@ func PhpOutputStackPop(flags int) int {
 		return 0
 	} else if (flags&PHP_OUTPUT_POP_FORCE) == 0 && !orphan.IsRemovable() {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
-			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer of %s (%d)", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.Name(), orphan.GetLevel())
+			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer of %s (%d)", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.GetName(), orphan.GetLevel())
 		}
 		return 0
 	} else {
@@ -228,28 +222,6 @@ func PhpOutputStackPop(flags int) int {
 		/* destroy the handler (after write!) */
 		return 1
 	}
-}
-func PhpOutputHandlerCompatFunc(handler_context *any, output_context *PhpOutputContext) int {
-	var func_ = (*handler_context).(PhpOutputHandlerFuncT)
-	var handler = wrapOutputHandler(func_)
-
-	if handler != nil {
-		var handledOutput string
-		if data := output_context.GetOut().String(); data != "" {
-			handledOutput = handler(data, output_context.GetOp())
-		}
-		if len(handledOutput) > 0 {
-			output_context.GetOut().SetDataStr(handledOutput)
-		} else {
-			output_context.Pass()
-		}
-		return types.SUCCESS
-	}
-	return types.FAILURE
-}
-func PhpOutputHandlerDefaultFunc(handler_context *any, output_context *PhpOutputContext) int {
-	output_context.Pass()
-	return types.SUCCESS
 }
 
 //zif -old "|zll"
@@ -365,7 +337,7 @@ func ZifObGetStatus(_ zpp.Opt, fullStatus bool) *types.Array {
 func outputHandlerStatus(handler *PhpOutputHandler) *types.Array {
 	arr := types.NewArrayCap(7)
 	arr.KeyUpdate("name", types.NewZvalString(handler.GetName()))
-	arr.KeyUpdate("type", types.NewZvalLong(handler.GetFlags()&0xf))
+	arr.KeyUpdate("type", types.NewZvalLong(handler.GetFlags()))
 	arr.KeyUpdate("flags", types.NewZvalLong(handler.GetFlags()))
 	arr.KeyUpdate("level", types.NewZvalLong(handler.GetLevel()))
 	arr.KeyUpdate("chunk_size", types.NewZvalLong(handler.GetSize()))

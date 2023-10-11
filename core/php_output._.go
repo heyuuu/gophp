@@ -11,10 +11,6 @@ const PHP_OUTPUT_HANDLER_FINAL = 0x8
 const PHP_OUTPUT_HANDLER_CONT = PHP_OUTPUT_HANDLER_WRITE
 const PHP_OUTPUT_HANDLER_END = PHP_OUTPUT_HANDLER_FINAL
 
-/* handler types */
-const PHP_OUTPUT_HANDLER_INTERNAL = 0x0
-const PHP_OUTPUT_HANDLER_USER = 0x1
-
 /* handler ability flags */
 const PHP_OUTPUT_HANDLER_CLEANABLE = 0x10
 const PHP_OUTPUT_HANDLER_FLUSHABLE = 0x20
@@ -49,7 +45,7 @@ const PHP_OUTPUT_HANDLER_DEFAULT_SIZE = 0x4000
 type PhpOutputHandlerFuncT func(output *byte, output_len int, handled_output **byte, handled_output_len *int, mode int)
 
 /* new-style, opaque context callback */
-type PhpOutputHandlerContextFuncT func(handler_context *any, output_context *PhpOutputContext) int
+type PhpOutputHandlerContextFuncT func(handlerContext any, outputContext *PhpOutputContext) int
 
 type OutputHandlerT func(output string, mode int) (handledOutput string)
 

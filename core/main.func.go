@@ -1018,7 +1018,7 @@ func PhpRequestStartup() int {
 			PhpOutputStartUser(&oh, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
 			// zend.ZvalPtrDtor(&oh)
 		} else if PG__().output_buffering {
-			PhpOutputStartUser(nil, lang.CondF1(PG__().output_buffering > 1, func() __auto__ { return PG__().output_buffering }, 0), PHP_OUTPUT_HANDLER_STDFLAGS)
+			PhpOutputStartUser(nil, lang.Cond(PG__().output_buffering > 1, PG__().output_buffering, 0), PHP_OUTPUT_HANDLER_STDFLAGS)
 		} else if PG__().implicit_flush {
 			OG__().MarkImplicitFlush(true)
 		}
