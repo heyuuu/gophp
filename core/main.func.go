@@ -645,7 +645,7 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 	} else {
 		message = fmt.Sprintf("%s: %s", origin, buffer)
 	}
-	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsUndef() || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
+	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().IsActive() && (zend.EG__().GetUserErrorHandler().IsUndef() || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
 		var tmp types.Zval
 		tmp.SetString(buffer)
 		if zend.CurrEX() != nil {
@@ -884,7 +884,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 		zend.Efree(buffer)
 		return
 	}
-	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 {
+	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().IsActive() {
 		var tmp types.Zval
 		tmp.SetString(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {
@@ -1041,7 +1041,6 @@ func PhpRequestShutdown() {
 	/* EG(current_execute_data) points into nirvana and therefore cannot be safely accessed
 	 * inside zend_executor callback functions.
 	 */
-
 	zend.EG__().SetCurrentExecuteData(nil)
 
 	/* 1. Call all possible shutdown functions registered with register_shutdown_function() */
@@ -1102,7 +1101,6 @@ func PhpRequestShutdown() {
 	PhpFreeRequestGlobals()
 
 	/* 10. Shutdown scanner/executor/compiler and restore ini entries */
-
 	zend.ZendDeactivate()
 
 	/* 11. Call all extensions post-RSHUTDOWN functions */

@@ -1,9 +1,16 @@
 package zend
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/contracts"
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/faults"
+)
+
+var ExecutorGlobals ZendExecutorGlobals
+
+func EG__() *ZendExecutorGlobals { return &ExecutorGlobals }
 
 // ZendExecutorGlobals
-
 type ZendExecutorGlobals struct {
 	error_zval           types.Zval
 	symtable_cache       []*types.Array
@@ -73,280 +80,479 @@ type ZendExecutorGlobals struct {
 	reserved                []any
 }
 
-func (this *ZendExecutorGlobals) InitTables() {
-	this.constantTable = types.NewTable[*ZendConstant](nil)
+/**
+ * 生命周期
+ */
+var _ contracts.ModuleLifeCycle = (*ZendExecutorGlobals)(nil)
+
+func (eg *ZendExecutorGlobals) StartUp() {
+	eg.constantTable = types.NewTable[*ZendConstant](nil)
 }
-func (this *ZendExecutorGlobals) DestroyTables() {
-	this.constantTable.Destroy()
+func (eg *ZendExecutorGlobals) Shutdown() {
+	eg.constantTable.Destroy()
+}
+func (eg *ZendExecutorGlobals) Activate() {
+	ZendInitFpu()
+	eg.GetErrorZval().SetIsError()
+
+	/* destroys stack frame, therefore makes core dumps worthless */
+	eg.SetSymtableCachePtr(eg.GetSymtableCache())
+	eg.SetSymtableCacheLimit(eg.GetSymtableCache() + SYMTABLE_CACHE_SIZE)
+	eg.SetNoExtensions(0)
+	eg.functionTable = CG__().FunctionTable()
+	eg.classTable = CG__().ClassTable()
+	eg.SetInAutoload(nil)
+	eg.SetAutoloadFunc(nil)
+	eg.SetErrorHandling(EH_NORMAL)
+	eg.SetFlags(EG_FLAGS_INITIAL)
+	ZendVmStackInit()
+	eg.SetSymbolTable(types.NewArrayCap(64))
+	ZendExtensions.Apply(func(ext *ZendExtension) {
+		if ext.GetActivate() != nil {
+			ext.GetActivate()()
+		}
+	})
+	eg.SetIncludedFiles(types.NewArrayCap(8))
+	eg.GetUserErrorHandler().SetUndef()
+	eg.GetUserExceptionHandler().SetUndef()
+	eg.SetCurrentExecuteData(nil)
+	eg.GetUserErrorHandlersErrorReporting().Init()
+	eg.GetUserErrorHandlers().Init()
+	eg.GetUserExceptionHandlers().Init()
+	eg.SetVmInterrupt(0)
+	eg.SetTimedOut(0)
+	eg.SetException(nil)
+	eg.SetPrevException(nil)
+	eg.SetFakeScope(nil)
+	eg.GetTrampoline().SetFunctionName("")
+	eg.ResetArrayIterators()
+	eg.SetEachDeprecationThrown(0)
+	eg.SetPersistentConstantsCount(uint32(eg.ConstantTable().Len()))
+	eg.SetPersistentFunctionsCount(uint32(eg.FunctionTable().Len()))
+	eg.SetPersistentClassesCount(uint32(eg.ClassTable().Len()))
+
+	eg.active = true
+}
+func (eg *ZendExecutorGlobals) Deactivate() {
+	var fastShutdown bool = IsZendMm() != 0 && !EG__().GetFullTablesCleanup()
+
+	faults.Try(func() {
+		CG__().GetOpenFiles().Destroy()
+	})
+
+	eg.SetIsInResourceShutdown(true)
+
+	faults.Try(func() {
+		eg.RegularList().ForeachReserve(func(_ string, res *types.Resource) {
+			if res.GetType() >= 0 {
+				ZendResourceDtor(res)
+			}
+		})
+	})
+
+	/* No PHP callback functions should be called after this point. */
+	eg.active = false
+	if !fastShutdown {
+		eg.GetSymbolTable().Clean()
+
+		/* Release static properties and static variables prior to the final GC run,
+		 * as they may hold GC roots. */
+		eg.FunctionTable().ForeachReserve(func(_ string, f types.IFunction) {
+			if f.GetType() == ZEND_INTERNAL_FUNCTION {
+				return
+			}
+
+			opArray := f.GetOpArray()
+			if opArray.GetStaticVariables() != nil {
+				var ht *types.Array = opArray.GetStaticVariablesPtr()
+				if ht != nil {
+					//if ht.DelRefcount() == 0 {
+					//	ht.Destroy()
+					//}
+					opArray.SetStaticVariablesPtr(nil)
+				}
+			}
+		})
+
+		eg.ClassTable().ForeachReserve(func(_ string, ce *types.ClassEntry) {
+			if ce.GetDefaultStaticMembersCount() != 0 {
+				//ZendCleanupInternalClassData(ce)
+			}
+			if ce.IsHasStaticInMethods() {
+				ce.FunctionTable().Foreach(func(_ string, f types.IFunction) {
+					if f.GetType() == ZEND_USER_FUNCTION {
+						opArray := f.GetOpArray()
+						if opArray.GetStaticVariables() != nil {
+							var ht *types.Array = opArray.GetStaticVariablesPtr()
+							if ht != nil {
+								//if ht.DelRefcount() == 0 {
+								//	ht.Destroy()
+								//}
+								opArray.SetStaticVariablesPtr(nil)
+							}
+						}
+					}
+				})
+			}
+		})
+
+		/* Also release error and exception handlers, which may hold objects. */
+
+		if eg.GetUserErrorHandler().IsNotUndef() {
+			// ZvalPtrDtor(eg.GetUserErrorHandler())
+			eg.GetUserErrorHandler().SetUndef()
+		}
+		if eg.GetUserExceptionHandler().IsNotUndef() {
+			// ZvalPtrDtor(eg.GetUserExceptionHandler())
+			eg.GetUserExceptionHandler().SetUndef()
+		}
+		ZendStackClean(eg.GetUserErrorHandlersErrorReporting(), nil, 1)
+		ZendStackClean(eg.GetUserErrorHandlers(), nil, 1)
+		ZendStackClean(eg.GetUserExceptionHandlers(), nil, 1)
+	}
+
+	// notice: 无需主动调用析构函数，使用自动析构代替
+	//ZendObjectsStoreFreeObjectStorage(eg.GetObjectsStore(), fast_shutdown)
+	//ZendWeakrefsShutdown()
+	faults.Try(func() {
+		ZendExtensions.Apply(func(ext *ZendExtension) {
+			if ext.GetDeactivate() != nil {
+				ext.GetDeactivate()()
+			}
+		})
+	})
+
+	if fastShutdown {
+		/* Fast Request Shutdown
+		 * =====================
+		 * Zend Memory Manager frees memory by its own. We don't have to free
+		 * each allocated block separately.
+		 */
+		eg.ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
+			return c.IsPersistent()
+		})
+		eg.FunctionTable().FilterReserve(func(_ string, f types.IFunction) bool {
+			return f.GetType() == ZEND_INTERNAL_FUNCTION
+		})
+		eg.ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
+			return ce.IsInternalClass()
+		})
+		ZendCleanupInternalClasses()
+	} else {
+		ZendVmStackDestroy()
+		if eg.GetFullTablesCleanup() {
+			eg.ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
+				return c.IsPersistent()
+			})
+			eg.FunctionTable().FilterReserve(func(_ string, f types.IFunction) bool {
+				return f.GetType() == ZEND_INTERNAL_FUNCTION
+			})
+			eg.ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
+				return ce.IsInternalClass()
+			})
+		} else {
+			eg.ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
+				if c.IsPersistent() {
+					return true
+				}
+
+				// ZvalPtrDtorNogc(c.Value())
+				return false
+			})
+
+			eg.FunctionTable().FilterReserve(func(key string, f types.IFunction) bool {
+				if f.GetType() == ZEND_INTERNAL_FUNCTION {
+					return true
+				}
+				return false
+			})
+
+			eg.ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
+				if ce.IsInternalClass() {
+					return true
+				}
+
+				//DestroyZendClass(zv)
+				return false
+			})
+		}
+		for eg.GetSymtableCachePtr() > eg.GetSymtableCache() {
+			eg.GetSymtableCachePtr()--
+			(*eg.GetSymtableCachePtr()).Destroy()
+		}
+		eg.GetIncludedFiles().Destroy()
+		eg.GetUserErrorHandlersErrorReporting().Destroy()
+		eg.GetUserErrorHandlers().Destroy()
+		eg.GetUserExceptionHandlers().Destroy()
+		//eg.GetObjectsStore().Destroy()
+		if eg.GetInAutoload() != nil {
+			eg.GetInAutoload().Destroy()
+		}
+	}
+	eg.ResetArrayIterators()
+	ZendShutdownFpu()
 }
 
 /**
  * 辅助方法
  */
-func (this *ZendExecutorGlobals) ArrayIterators() []*types.ArrayIterator {
-	return this.arrayIterators
+func (eg *ZendExecutorGlobals) ArrayIterators() []*types.ArrayIterator {
+	return eg.arrayIterators
 }
-func (this *ZendExecutorGlobals) ResetArrayIterators() {
-	this.arrayIterators = nil
+func (eg *ZendExecutorGlobals) ResetArrayIterators() {
+	eg.arrayIterators = nil
 }
-func (this *ZendExecutorGlobals) AddArrayIterator(ht *types.Array) uint32 {
-	this.arrayIterators = append(this.arrayIterators, ht.Iterator())
-	return uint32(len(this.arrayIterators) - 1)
+func (eg *ZendExecutorGlobals) AddArrayIterator(ht *types.Array) uint32 {
+	eg.arrayIterators = append(eg.arrayIterators, ht.Iterator())
+	return uint32(len(eg.arrayIterators) - 1)
 }
-func (this *ZendExecutorGlobals) GetArrayIterator(idx uint32) *types.ArrayIterator {
-	len_ := uint32(len(this.arrayIterators))
+func (eg *ZendExecutorGlobals) GetArrayIterator(idx uint32) *types.ArrayIterator {
+	len_ := uint32(len(eg.arrayIterators))
 	if idx >= len_ {
 		return nil
 	}
-	return this.arrayIterators[idx]
+	return eg.arrayIterators[idx]
 }
-func (this *ZendExecutorGlobals) SetArrayIterator(idx uint32, iterator *types.ArrayIterator) {
-	len_ := uint32(len(this.arrayIterators))
+func (eg *ZendExecutorGlobals) SetArrayIterator(idx uint32, iterator *types.ArrayIterator) {
+	len_ := uint32(len(eg.arrayIterators))
 	for len_ <= idx {
-		this.arrayIterators = append(this.arrayIterators, nil)
+		eg.arrayIterators = append(eg.arrayIterators, nil)
 		len_++
 	}
-	this.arrayIterators[idx] = iterator
+	eg.arrayIterators[idx] = iterator
 }
-func (this *ZendExecutorGlobals) DelArrayIterator(idx uint32) {
-	len_ := uint32(len(this.arrayIterators))
+func (eg *ZendExecutorGlobals) DelArrayIterator(idx uint32) {
+	len_ := uint32(len(eg.arrayIterators))
 	if idx >= len_ {
 		return
 	}
-	this.arrayIterators[idx] = nil
+	eg.arrayIterators[idx] = nil
 	// tail
 	if idx == len_-1 {
-		for idx > 0 && this.arrayIterators[idx-1] == nil {
+		for idx > 0 && eg.arrayIterators[idx-1] == nil {
 			idx--
 		}
-		this.arrayIterators = this.arrayIterators[:idx]
+		eg.arrayIterators = eg.arrayIterators[:idx]
 	}
 }
 
-func (this *ZendExecutorGlobals) GetHtIteratorsUsed() uint32           { return this.ht_iterators_used }
-func (this *ZendExecutorGlobals) GetHtIterators() *types.ArrayIterator { return this.ht_iterators }
+func (eg *ZendExecutorGlobals) GetHtIteratorsUsed() uint32           { return eg.ht_iterators_used }
+func (eg *ZendExecutorGlobals) GetHtIterators() *types.ArrayIterator { return eg.ht_iterators }
 
-func (this *ZendExecutorGlobals) ClassTable() ClassTable     { return this.classTable }
-func (this *ZendExecutorGlobals) SetClassTable(t ClassTable) { this.classTable = t }
+func (eg *ZendExecutorGlobals) ClassTable() ClassTable       { return eg.classTable }
+func (eg *ZendExecutorGlobals) FunctionTable() FunctionTable { return eg.functionTable }
+func (eg *ZendExecutorGlobals) ConstantTable() ConstantTable { return eg.constantTable }
 
-func (this *ZendExecutorGlobals) FunctionTable() FunctionTable     { return this.functionTable }
-func (this *ZendExecutorGlobals) SetFunctionTable(t FunctionTable) { this.functionTable = t }
-
-func (this *ZendExecutorGlobals) ConstantTable() ConstantTable { return this.constantTable }
-
-func (this *ZendExecutorGlobals) IniDirectives() IniDirectives {
-	return this.iniDirectives
+func (eg *ZendExecutorGlobals) IniDirectives() IniDirectives {
+	return eg.iniDirectives
 }
-func (this *ZendExecutorGlobals) InitIniDirectives() {
-	this.iniDirectives = types.NewTable[*ZendIniEntry](nil)
+func (eg *ZendExecutorGlobals) InitIniDirectives() {
+	eg.iniDirectives = types.NewTable[*ZendIniEntry](nil)
 }
-func (this *ZendExecutorGlobals) ModifiedIniDirectives() IniDirectives {
-	return this.modifiedIniDirectives
+func (eg *ZendExecutorGlobals) ModifiedIniDirectives() IniDirectives {
+	return eg.modifiedIniDirectives
 }
-func (this *ZendExecutorGlobals) InitModifiedIniDirectives() {
-	this.modifiedIniDirectives = types.NewTable[*ZendIniEntry](nil)
+func (eg *ZendExecutorGlobals) InitModifiedIniDirectives() {
+	eg.modifiedIniDirectives = types.NewTable[*ZendIniEntry](nil)
 }
 
-func (this *ZendExecutorGlobals) VmStack() *VmStack { return &this.vmStack }
+func (eg *ZendExecutorGlobals) VmStack() *VmStack { return &eg.vmStack }
 
 // llist
-func (this *ZendExecutorGlobals) GetRegularList() *types.Array { return &this.regular_list }
+func (eg *ZendExecutorGlobals) GetRegularList() *types.Array { return &eg.regular_list }
 
-func (this *ZendExecutorGlobals) InitRegularList() {
-	this.persistentList = types.NewTable[*types.Resource](ListEntryDtor)
+func (eg *ZendExecutorGlobals) InitRegularList() {
+	eg.persistentList = types.NewTable[*types.Resource](ListEntryDtor)
 }
-func (this *ZendExecutorGlobals) RegularList() ResourceTable { return this.regularList }
+func (eg *ZendExecutorGlobals) RegularList() ResourceTable { return eg.regularList }
 
-func (this *ZendExecutorGlobals) InitPersistentList() {
-	this.persistentList = types.NewTable[*types.Resource](PlistEntryDtor)
+func (eg *ZendExecutorGlobals) InitPersistentList() {
+	eg.persistentList = types.NewTable[*types.Resource](PlistEntryDtor)
 }
-func (this *ZendExecutorGlobals) PersistentList() ResourceTable {
-	return this.persistentList
+func (eg *ZendExecutorGlobals) PersistentList() ResourceTable {
+	return eg.persistentList
 }
+
+func (eg *ZendExecutorGlobals) IsActive() bool { return eg.active }
 
 /**
  * 以下是自动生成的方法
  */
 
-func (this *ZendExecutorGlobals) GetErrorZval() *types.Zval        { return &this.error_zval }
-func (this *ZendExecutorGlobals) GetSymtableCache() []*types.Array { return this.symtable_cache }
-func (this *ZendExecutorGlobals) SetSymtableCache(value []*types.Array) {
-	this.symtable_cache = value
+func (eg *ZendExecutorGlobals) GetErrorZval() *types.Zval        { return &eg.error_zval }
+func (eg *ZendExecutorGlobals) GetSymtableCache() []*types.Array { return eg.symtable_cache }
+func (eg *ZendExecutorGlobals) GetSymtableCacheLimit() **types.Array {
+	return eg.symtable_cache_limit
 }
-func (this *ZendExecutorGlobals) GetSymtableCacheLimit() **types.Array {
-	return this.symtable_cache_limit
+func (eg *ZendExecutorGlobals) SetSymtableCacheLimit(value **types.Array) {
+	eg.symtable_cache_limit = value
 }
-func (this *ZendExecutorGlobals) SetSymtableCacheLimit(value **types.Array) {
-	this.symtable_cache_limit = value
+func (eg *ZendExecutorGlobals) GetSymtableCachePtr() **types.Array {
+	return eg.symtable_cache_ptr
 }
-func (this *ZendExecutorGlobals) GetSymtableCachePtr() **types.Array {
-	return this.symtable_cache_ptr
+func (eg *ZendExecutorGlobals) SetSymtableCachePtr(value **types.Array) {
+	eg.symtable_cache_ptr = value
 }
-func (this *ZendExecutorGlobals) SetSymtableCachePtr(value **types.Array) {
-	this.symtable_cache_ptr = value
+func (eg *ZendExecutorGlobals) GetSymbolTable() *types.Array        { return eg.symbol_table }
+func (eg *ZendExecutorGlobals) SetSymbolTable(value *types.Array)   { eg.symbol_table = value }
+func (eg *ZendExecutorGlobals) GetIncludedFiles() *types.Array      { return eg.included_files }
+func (eg *ZendExecutorGlobals) SetIncludedFiles(value *types.Array) { eg.included_files = value }
+func (eg *ZendExecutorGlobals) GetErrorReporting() int              { return eg.error_reporting }
+func (eg *ZendExecutorGlobals) SetErrorReporting(value int)         { eg.error_reporting = value }
+func (eg *ZendExecutorGlobals) GetExitStatus() int                  { return eg.exit_status }
+func (eg *ZendExecutorGlobals) SetExitStatus(value int)             { eg.exit_status = value }
+func (eg *ZendExecutorGlobals) GetCurrentExecuteData() *ZendExecuteData {
+	return eg.current_execute_data
 }
-func (this *ZendExecutorGlobals) GetSymbolTable() *types.Array        { return this.symbol_table }
-func (this *ZendExecutorGlobals) SetSymbolTable(value *types.Array)   { this.symbol_table = value }
-func (this *ZendExecutorGlobals) GetIncludedFiles() *types.Array      { return this.included_files }
-func (this *ZendExecutorGlobals) SetIncludedFiles(value *types.Array) { this.included_files = value }
-func (this *ZendExecutorGlobals) GetErrorReporting() int              { return this.error_reporting }
-func (this *ZendExecutorGlobals) SetErrorReporting(value int)         { this.error_reporting = value }
-func (this *ZendExecutorGlobals) GetExitStatus() int                  { return this.exit_status }
-func (this *ZendExecutorGlobals) SetExitStatus(value int)             { this.exit_status = value }
-func (this *ZendExecutorGlobals) GetCurrentExecuteData() *ZendExecuteData {
-	return this.current_execute_data
+func (eg *ZendExecutorGlobals) SetCurrentExecuteData(value *ZendExecuteData) {
+	eg.current_execute_data = value
 }
-func (this *ZendExecutorGlobals) SetCurrentExecuteData(value *ZendExecuteData) {
-	this.current_execute_data = value
+func (eg *ZendExecutorGlobals) GetFakeScope() *types.ClassEntry      { return eg.fake_scope }
+func (eg *ZendExecutorGlobals) SetFakeScope(value *types.ClassEntry) { eg.fake_scope = value }
+func (eg *ZendExecutorGlobals) GetPrecision() ZendLong               { return eg.precision }
+func (eg *ZendExecutorGlobals) SetPrecision(value ZendLong)          { eg.precision = value }
+func (eg *ZendExecutorGlobals) GetPersistentConstantsCount() uint32 {
+	return eg.persistent_constants_count
 }
-func (this *ZendExecutorGlobals) GetFakeScope() *types.ClassEntry      { return this.fake_scope }
-func (this *ZendExecutorGlobals) SetFakeScope(value *types.ClassEntry) { this.fake_scope = value }
-func (this *ZendExecutorGlobals) GetPrecision() ZendLong               { return this.precision }
-func (this *ZendExecutorGlobals) SetPrecision(value ZendLong)          { this.precision = value }
-func (this *ZendExecutorGlobals) GetPersistentConstantsCount() uint32 {
-	return this.persistent_constants_count
+func (eg *ZendExecutorGlobals) SetPersistentConstantsCount(value uint32) {
+	eg.persistent_constants_count = value
 }
-func (this *ZendExecutorGlobals) SetPersistentConstantsCount(value uint32) {
-	this.persistent_constants_count = value
+func (eg *ZendExecutorGlobals) GetPersistentFunctionsCount() uint32 {
+	return eg.persistent_functions_count
 }
-func (this *ZendExecutorGlobals) GetPersistentFunctionsCount() uint32 {
-	return this.persistent_functions_count
+func (eg *ZendExecutorGlobals) SetPersistentFunctionsCount(value uint32) {
+	eg.persistent_functions_count = value
 }
-func (this *ZendExecutorGlobals) SetPersistentFunctionsCount(value uint32) {
-	this.persistent_functions_count = value
+func (eg *ZendExecutorGlobals) GetPersistentClassesCount() uint32 {
+	return eg.persistent_classes_count
 }
-func (this *ZendExecutorGlobals) GetPersistentClassesCount() uint32 {
-	return this.persistent_classes_count
+func (eg *ZendExecutorGlobals) SetPersistentClassesCount(value uint32) {
+	eg.persistent_classes_count = value
 }
-func (this *ZendExecutorGlobals) SetPersistentClassesCount(value uint32) {
-	this.persistent_classes_count = value
+func (eg *ZendExecutorGlobals) GetInAutoload() *types.Array      { return eg.in_autoload }
+func (eg *ZendExecutorGlobals) SetInAutoload(value *types.Array) { eg.in_autoload = value }
+func (eg *ZendExecutorGlobals) GetAutoloadFunc() types.IFunction { return eg.autoload_func }
+func (eg *ZendExecutorGlobals) SetAutoloadFunc(value types.IFunction) {
+	eg.autoload_func = value
 }
-func (this *ZendExecutorGlobals) GetInAutoload() *types.Array      { return this.in_autoload }
-func (this *ZendExecutorGlobals) SetInAutoload(value *types.Array) { this.in_autoload = value }
-func (this *ZendExecutorGlobals) GetAutoloadFunc() types.IFunction { return this.autoload_func }
-func (this *ZendExecutorGlobals) SetAutoloadFunc(value types.IFunction) {
-	this.autoload_func = value
+func (eg *ZendExecutorGlobals) GetFullTablesCleanup() bool    { return 0 }
+func (eg *ZendExecutorGlobals) GetNoExtensions() bool         { return eg.no_extensions }
+func (eg *ZendExecutorGlobals) SetNoExtensions(value bool)    { eg.no_extensions = value }
+func (eg *ZendExecutorGlobals) GetVmInterrupt() bool          { return eg.vm_interrupt }
+func (eg *ZendExecutorGlobals) SetVmInterrupt(value bool)     { eg.vm_interrupt = value }
+func (eg *ZendExecutorGlobals) GetTimedOut() bool             { return eg.timed_out }
+func (eg *ZendExecutorGlobals) SetTimedOut(value bool)        { eg.timed_out = value }
+func (eg *ZendExecutorGlobals) GetHardTimeout() ZendLong      { return eg.hard_timeout }
+func (eg *ZendExecutorGlobals) SetHardTimeout(value ZendLong) { eg.hard_timeout = value }
+func (eg *ZendExecutorGlobals) GetUserErrorHandlerErrorReporting() int {
+	return eg.user_error_handler_error_reporting
 }
-func (this *ZendExecutorGlobals) GetFullTablesCleanup() bool    { return 0 }
-func (this *ZendExecutorGlobals) GetNoExtensions() bool         { return this.no_extensions }
-func (this *ZendExecutorGlobals) SetNoExtensions(value bool)    { this.no_extensions = value }
-func (this *ZendExecutorGlobals) GetVmInterrupt() bool          { return this.vm_interrupt }
-func (this *ZendExecutorGlobals) SetVmInterrupt(value bool)     { this.vm_interrupt = value }
-func (this *ZendExecutorGlobals) GetTimedOut() bool             { return this.timed_out }
-func (this *ZendExecutorGlobals) SetTimedOut(value bool)        { this.timed_out = value }
-func (this *ZendExecutorGlobals) GetHardTimeout() ZendLong      { return this.hard_timeout }
-func (this *ZendExecutorGlobals) SetHardTimeout(value ZendLong) { this.hard_timeout = value }
-func (this *ZendExecutorGlobals) GetUserErrorHandlerErrorReporting() int {
-	return this.user_error_handler_error_reporting
+func (eg *ZendExecutorGlobals) SetUserErrorHandlerErrorReporting(value int) {
+	eg.user_error_handler_error_reporting = value
 }
-func (this *ZendExecutorGlobals) SetUserErrorHandlerErrorReporting(value int) {
-	this.user_error_handler_error_reporting = value
+func (eg *ZendExecutorGlobals) GetUserErrorHandler() *types.Zval { return &eg.user_error_handler }
+func (eg *ZendExecutorGlobals) SetUserErrorHandler(value types.Zval) {
+	eg.user_error_handler = value
 }
-func (this *ZendExecutorGlobals) GetUserErrorHandler() *types.Zval { return &this.user_error_handler }
-func (this *ZendExecutorGlobals) SetUserErrorHandler(value types.Zval) {
-	this.user_error_handler = value
+func (eg *ZendExecutorGlobals) GetUserExceptionHandler() *types.Zval {
+	return eg.user_exception_handler
 }
-func (this *ZendExecutorGlobals) GetUserExceptionHandler() *types.Zval {
-	return this.user_exception_handler
+func (eg *ZendExecutorGlobals) SetUserExceptionHandler(value *types.Zval) {
+	eg.user_exception_handler = value
 }
-func (this *ZendExecutorGlobals) SetUserExceptionHandler(value *types.Zval) {
-	this.user_exception_handler = value
+func (eg *ZendExecutorGlobals) GetUserErrorHandlersErrorReporting() ZendStack {
+	return eg.user_error_handlers_error_reporting
 }
-func (this *ZendExecutorGlobals) GetUserErrorHandlersErrorReporting() ZendStack {
-	return this.user_error_handlers_error_reporting
+func (eg *ZendExecutorGlobals) SetUserErrorHandlersErrorReporting(value ZendStack) {
+	eg.user_error_handlers_error_reporting = value
 }
-func (this *ZendExecutorGlobals) SetUserErrorHandlersErrorReporting(value ZendStack) {
-	this.user_error_handlers_error_reporting = value
+func (eg *ZendExecutorGlobals) GetUserErrorHandlers() *ZendStack { return eg.user_error_handlers }
+func (eg *ZendExecutorGlobals) GetUserExceptionHandlers() *ZendStack {
+	return eg.user_exception_handlers
 }
-func (this *ZendExecutorGlobals) GetUserErrorHandlers() *ZendStack { return this.user_error_handlers }
-func (this *ZendExecutorGlobals) GetUserExceptionHandlers() *ZendStack {
-	return this.user_exception_handlers
+func (eg *ZendExecutorGlobals) GetErrorHandling() ZendErrorHandlingT { return eg.error_handling }
+func (eg *ZendExecutorGlobals) SetErrorHandling(value ZendErrorHandlingT) {
+	eg.error_handling = value
 }
-func (this *ZendExecutorGlobals) GetErrorHandling() ZendErrorHandlingT { return this.error_handling }
-func (this *ZendExecutorGlobals) SetErrorHandling(value ZendErrorHandlingT) {
-	this.error_handling = value
+func (eg *ZendExecutorGlobals) GetExceptionClass() *types.ClassEntry { return eg.exception_class }
+func (eg *ZendExecutorGlobals) SetExceptionClass(value *types.ClassEntry) {
+	eg.exception_class = value
 }
-func (this *ZendExecutorGlobals) GetExceptionClass() *types.ClassEntry { return this.exception_class }
-func (this *ZendExecutorGlobals) SetExceptionClass(value *types.ClassEntry) {
-	this.exception_class = value
-}
-func (this *ZendExecutorGlobals) GetTimeoutSeconds() ZendLong      { return this.timeout_seconds }
-func (this *ZendExecutorGlobals) SetTimeoutSeconds(value ZendLong) { this.timeout_seconds = value }
-func (this *ZendExecutorGlobals) GetLambdaCount() int              { return this.lambda_count }
-func (this *ZendExecutorGlobals) SetLambdaCount(value int)         { this.lambda_count = value }
+func (eg *ZendExecutorGlobals) GetTimeoutSeconds() ZendLong      { return eg.timeout_seconds }
+func (eg *ZendExecutorGlobals) SetTimeoutSeconds(value ZendLong) { eg.timeout_seconds = value }
+func (eg *ZendExecutorGlobals) GetLambdaCount() int              { return eg.lambda_count }
+func (eg *ZendExecutorGlobals) SetLambdaCount(value int)         { eg.lambda_count = value }
 
-func (this *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
-	return this.error_reporting_ini_entry
+func (eg *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
+	return eg.error_reporting_ini_entry
 }
-func (this *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
-	this.error_reporting_ini_entry = value
+func (eg *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
+	eg.error_reporting_ini_entry = value
 }
-func (this *ZendExecutorGlobals) GetException() *types.Object      { return this.exception }
-func (this *ZendExecutorGlobals) SetException(value *types.Object) { this.exception = value }
-func (this *ZendExecutorGlobals) GetPrevException() **types.Object { return this.prev_exception }
-func (this *ZendExecutorGlobals) SetPrevException(value **types.Object) {
-	this.prev_exception = value
+func (eg *ZendExecutorGlobals) GetException() *types.Object      { return eg.exception }
+func (eg *ZendExecutorGlobals) SetException(value *types.Object) { eg.exception = value }
+func (eg *ZendExecutorGlobals) GetPrevException() **types.Object { return eg.prev_exception }
+func (eg *ZendExecutorGlobals) SetPrevException(value **types.Object) {
+	eg.prev_exception = value
 }
-func (this *ZendExecutorGlobals) GetOplineBeforeException() *types.ZendOp {
-	return this.opline_before_exception
+func (eg *ZendExecutorGlobals) GetOplineBeforeException() *types.ZendOp {
+	return eg.opline_before_exception
 }
-func (this *ZendExecutorGlobals) SetOplineBeforeException(value *types.ZendOp) {
-	this.opline_before_exception = value
+func (eg *ZendExecutorGlobals) SetOplineBeforeException(value *types.ZendOp) {
+	eg.opline_before_exception = value
 }
-func (this *ZendExecutorGlobals) GetExceptionOp() *[3]types.ZendOp { return &this.exception_op }
-func (this *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry   { return this.current_module }
-func (this *ZendExecutorGlobals) SetCurrentModule(value *ModuleEntry) {
-	this.current_module = value
+func (eg *ZendExecutorGlobals) GetExceptionOp() *[3]types.ZendOp { return &eg.exception_op }
+func (eg *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry   { return eg.current_module }
+func (eg *ZendExecutorGlobals) SetCurrentModule(value *ModuleEntry) {
+	eg.current_module = value
 }
-func (this *ZendExecutorGlobals) GetActive() bool                      { return this.active }
-func (this *ZendExecutorGlobals) SetActive(value bool)                 { this.active = value }
-func (this *ZendExecutorGlobals) GetFlags() uint8                      { return this.flags }
-func (this *ZendExecutorGlobals) SetFlags(value uint8)                 { this.flags = value }
-func (this *ZendExecutorGlobals) GetAssertions() ZendLong              { return this.assertions }
-func (this *ZendExecutorGlobals) SetAssertions(value ZendLong)         { this.assertions = value }
-func (this *ZendExecutorGlobals) GetSavedFpuCwPtr() any                { return this.saved_fpu_cw_ptr }
-func (this *ZendExecutorGlobals) SetSavedFpuCwPtr(value any)           { this.saved_fpu_cw_ptr = value }
-func (this *ZendExecutorGlobals) GetTrampoline() types.IFunction       { return this.trampoline }
-func (this *ZendExecutorGlobals) SetTrampoline(value types.IFunction)  { this.trampoline = value }
-func (this *ZendExecutorGlobals) GetCallTrampolineOp() *types.ZendOp   { return this.callTrampolineOp }
-func (this *ZendExecutorGlobals) SetCallTrampolineOp(op *types.ZendOp) { this.callTrampolineOp = op }
-func (this *ZendExecutorGlobals) GetEachDeprecationThrown() bool {
-	return this.each_deprecation_thrown
+func (eg *ZendExecutorGlobals) GetFlags() uint8                      { return eg.flags }
+func (eg *ZendExecutorGlobals) SetFlags(value uint8)                 { eg.flags = value }
+func (eg *ZendExecutorGlobals) GetAssertions() ZendLong              { return eg.assertions }
+func (eg *ZendExecutorGlobals) SetAssertions(value ZendLong)         { eg.assertions = value }
+func (eg *ZendExecutorGlobals) GetSavedFpuCwPtr() any                { return eg.saved_fpu_cw_ptr }
+func (eg *ZendExecutorGlobals) SetSavedFpuCwPtr(value any)           { eg.saved_fpu_cw_ptr = value }
+func (eg *ZendExecutorGlobals) GetTrampoline() types.IFunction       { return eg.trampoline }
+func (eg *ZendExecutorGlobals) SetTrampoline(value types.IFunction)  { eg.trampoline = value }
+func (eg *ZendExecutorGlobals) GetCallTrampolineOp() *types.ZendOp   { return eg.callTrampolineOp }
+func (eg *ZendExecutorGlobals) SetCallTrampolineOp(op *types.ZendOp) { eg.callTrampolineOp = op }
+func (eg *ZendExecutorGlobals) GetEachDeprecationThrown() bool {
+	return eg.each_deprecation_thrown
 }
-func (this *ZendExecutorGlobals) SetEachDeprecationThrown(value bool) {
-	this.each_deprecation_thrown = value
+func (eg *ZendExecutorGlobals) SetEachDeprecationThrown(value bool) {
+	eg.each_deprecation_thrown = value
 }
-func (this *ZendExecutorGlobals) GetWeakrefs() types.Array      { return this.weakrefs }
-func (this *ZendExecutorGlobals) SetWeakrefs(value types.Array) { this.weakrefs = value }
-func (this *ZendExecutorGlobals) GetExceptionIgnoreArgs() bool {
-	return this.exception_ignore_args
+func (eg *ZendExecutorGlobals) GetWeakrefs() types.Array      { return eg.weakrefs }
+func (eg *ZendExecutorGlobals) SetWeakrefs(value types.Array) { eg.weakrefs = value }
+func (eg *ZendExecutorGlobals) GetExceptionIgnoreArgs() bool {
+	return eg.exception_ignore_args
 }
-func (this *ZendExecutorGlobals) SetExceptionIgnoreArgs(value bool) {
-	this.exception_ignore_args = value
+func (eg *ZendExecutorGlobals) SetExceptionIgnoreArgs(value bool) {
+	eg.exception_ignore_args = value
 }
-func (this *ZendExecutorGlobals) GetReserved() []any      { return this.reserved }
-func (this *ZendExecutorGlobals) SetReserved(value []any) { this.reserved = value }
+func (eg *ZendExecutorGlobals) GetReserved() []any      { return eg.reserved }
+func (eg *ZendExecutorGlobals) SetReserved(value []any) { eg.reserved = value }
 
 /* ZendExecutorGlobals.flags */
-func (this *ZendExecutorGlobals) AddFlags(value uint8)      { this.flags |= value }
-func (this *ZendExecutorGlobals) SubFlags(value uint8)      { this.flags &^= value }
-func (this *ZendExecutorGlobals) HasFlags(value uint8) bool { return this.flags&value != 0 }
-func (this *ZendExecutorGlobals) SwitchFlags(value uint8, cond bool) {
+func (eg *ZendExecutorGlobals) AddFlags(value uint8)      { eg.flags |= value }
+func (eg *ZendExecutorGlobals) SubFlags(value uint8)      { eg.flags &^= value }
+func (eg *ZendExecutorGlobals) HasFlags(value uint8) bool { return eg.flags&value != 0 }
+func (eg *ZendExecutorGlobals) SwitchFlags(value uint8, cond bool) {
 	if cond {
-		this.AddFlags(value)
+		eg.AddFlags(value)
 	} else {
-		this.SubFlags(value)
+		eg.SubFlags(value)
 	}
 }
-func (this ZendExecutorGlobals) IsObjectStoreNoReuse() bool {
-	return this.HasFlags(EG_FLAGS_OBJECT_STORE_NO_REUSE)
+func (eg ZendExecutorGlobals) IsObjectStoreNoReuse() bool {
+	return eg.HasFlags(EG_FLAGS_OBJECT_STORE_NO_REUSE)
 }
-func (this ZendExecutorGlobals) IsInResourceShutdown() bool {
-	return this.HasFlags(EG_FLAGS_IN_RESOURCE_SHUTDOWN)
+func (eg ZendExecutorGlobals) IsInResourceShutdown() bool {
+	return eg.HasFlags(EG_FLAGS_IN_RESOURCE_SHUTDOWN)
 }
-func (this *ZendExecutorGlobals) SetIsObjectStoreNoReuse(cond bool) {
-	this.SwitchFlags(EG_FLAGS_OBJECT_STORE_NO_REUSE, cond)
+func (eg *ZendExecutorGlobals) SetIsObjectStoreNoReuse(cond bool) {
+	eg.SwitchFlags(EG_FLAGS_OBJECT_STORE_NO_REUSE, cond)
 }
-func (this *ZendExecutorGlobals) SetIsInResourceShutdown(cond bool) {
-	this.SwitchFlags(EG_FLAGS_IN_RESOURCE_SHUTDOWN, cond)
+func (eg *ZendExecutorGlobals) SetIsInResourceShutdown(cond bool) {
+	eg.SwitchFlags(EG_FLAGS_IN_RESOURCE_SHUTDOWN, cond)
 }

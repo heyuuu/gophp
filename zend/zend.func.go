@@ -251,7 +251,7 @@ func ZendStartup() int {
 	ZendVersionInfo = ZEND_CORE_VERSION_INFO
 
 	CG__().InitTables()
-	EG__().InitTables()
+	EG__().StartUp()
 
 	ZendInitRsrcListDtors()
 	IniScannerGlobalsCtor(&ini_scanner_globals)
@@ -304,7 +304,7 @@ func ZendShutdown() {
 	VirtualCwdShutdown()
 
 	CG__().DestroyTables()
-	EG__().DestroyTables()
+	EG__().Shutdown()
 
 	ZendExtensions.Shutdown()
 
@@ -328,7 +328,7 @@ func GetZendVersion() string { return ZendVersionInfo }
 func ZendActivate() {
 	//GcReset()
 	InitCompiler()
-	InitExecutor()
+	EG__().Activate()
 	StartupScanner()
 	ZendMapPtrActivate()
 }
@@ -344,7 +344,7 @@ func ZendDeactivate() {
 	faults.Try(func() { ShutdownScanner() })
 
 	/* shutdown_executor() takes care of its own bailout handling */
-	ShutdownExecutor()
+	EG__().Deactivate()
 
 	faults.Try(func() { ZendIniDeactivate() })
 	faults.Try(func() { ShutdownCompiler() })

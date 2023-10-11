@@ -137,7 +137,6 @@ func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
 	/* Clean before putting into the cache, since clean could call dtors,
 	 * which could use the cached hash. Also do this before the check for
 	 * available cache slots, as those may be used by a dtor as well. */
-
 	symbol_table.SymtableClean()
 	if EG__().GetSymtableCachePtr() >= EG__().GetSymtableCacheLimit() {
 		symbol_table.Destroy()
