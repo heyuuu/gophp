@@ -51,10 +51,10 @@ type PhpOutputHandlerFuncT func(output *byte, output_len int, handled_output **b
 /* new-style, opaque context callback */
 type PhpOutputHandlerContextFuncT func(handler_context *any, output_context *PhpOutputContext) int
 
-type OutputHandler func(output string, mode int) (handledOutput string)
+type OutputHandlerT func(output string, mode int) (handledOutput string)
 
 // todo temp, need remove
-func wrapOutputHandler(h PhpOutputHandlerFuncT) OutputHandler {
+func wrapOutputHandler(h PhpOutputHandlerFuncT) OutputHandlerT {
 	if h == nil {
 		return nil
 	}

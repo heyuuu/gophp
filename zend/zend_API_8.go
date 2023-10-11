@@ -231,6 +231,7 @@ func ZendFcallInfoArgv(fci *types.ZendFcallInfo, argc int, argv *va_list) int {
 	}
 	return types.SUCCESS
 }
+
 func ZendFcallInfoArgn(fci *types.ZendFcallInfo, argc int, _ ...any) int {
 	var ret int
 	var argv va_list
@@ -239,7 +240,7 @@ func ZendFcallInfoArgn(fci *types.ZendFcallInfo, argc int, _ ...any) int {
 	va_end(argv)
 	return ret
 }
-func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, retval_ptr *types.Zval, args *types.Zval) int {
+func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, retval_ptr *types.Zval, args *types.Zval) bool {
 	var retval types.Zval
 	var org_params *types.Zval = nil
 	var result int
@@ -260,7 +261,7 @@ func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, 
 	if args != nil {
 		ZendFcallInfoArgsRestore(fci, org_count, org_params)
 	}
-	return result
+	return result == types.SUCCESS
 }
 func ZendDeclareTypedProperty(
 	ce *types.ClassEntry,

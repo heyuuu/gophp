@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/shim/slices"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/operators"
 )
 
 var OutputGlobals ZendOutputGlobals
@@ -78,6 +79,34 @@ func newPhpOutputHandler(name string, chunkSize int, flags int) *PhpOutputHandle
 	return handler
 }
 
+type OutputHandler func(context *PhpOutputContext) bool
+
+func (h *PhpOutputHandler) Handler() OutputHandler {
+	if h.IsUser() {
+		user := h.func_.user
+		return func(context *PhpOutputContext) (result bool) {
+			zend.ZendFcallInfoArgn(user.GetFci(), 2, types.NewZvalString(context.GetIn().String()), types.NewZvalLong(context.GetOp()))
+
+			var retval types.Zval
+			if zend.ZendFcallInfoCall(user.GetFci(), user.GetFcc(), &retval, nil) && !retval.IsUndef() && !retval.IsFalse() {
+				result = true
+				if !retval.IsTrue() {
+					operators.ConvertToStringEx(&retval)
+					context.GetOut().SetDataStr(retval.String())
+				}
+			}
+
+			zend.ZendFcallInfoArgn(user.GetFci(), 0)
+			return result
+		}
+	} else {
+		internal := h.func_.internal
+		return func(context *PhpOutputContext) bool {
+			return internal(h.GetOpaq(), context) == types.SUCCESS
+		}
+	}
+}
+
 func (h *PhpOutputHandler) GetName() string                           { return h.name }
 func (h *PhpOutputHandler) GetFlags() int                             { return h.flags }
 func (h *PhpOutputHandler) GetLevel() int                             { return h.level }
@@ -86,10 +115,9 @@ func (h *PhpOutputHandler) GetBuffer() *PhpOutputBuffer               { return &
 func (h *PhpOutputHandler) GetOpaq() any                              { return h.opaq }
 func (h *PhpOutputHandler) GetUser() *PhpOutputHandlerUserFuncT       { return h.func_.user }
 func (h *PhpOutputHandler) GetInternal() PhpOutputHandlerContextFuncT { return h.func_.internal }
-
-func (h *PhpOutputHandler) SetLevel(value int)                       { h.level = value }
-func (h *PhpOutputHandler) SetOpaq(value any)                        { h.opaq = value }
-func (h *PhpOutputHandler) SetUser(value *PhpOutputHandlerUserFuncT) { h.func_.user = value }
+func (h *PhpOutputHandler) SetLevel(value int)                        { h.level = value }
+func (h *PhpOutputHandler) SetOpaq(value any)                         { h.opaq = value }
+func (h *PhpOutputHandler) SetUser(value *PhpOutputHandlerUserFuncT)  { h.func_.user = value }
 func (h *PhpOutputHandler) SetInternal(value PhpOutputHandlerContextFuncT) {
 	h.func_.internal = value
 }
@@ -191,9 +219,9 @@ type PhpOutputHandlerUserFuncT struct {
 	zoh types.Zval
 }
 
-func (this *PhpOutputHandlerUserFuncT) GetFci() types.ZendFcallInfo      { return this.fci }
-func (this *PhpOutputHandlerUserFuncT) GetFcc() types.ZendFcallInfoCache { return this.fcc }
-func (this *PhpOutputHandlerUserFuncT) GetZoh() types.Zval               { return this.zoh }
+func (this *PhpOutputHandlerUserFuncT) GetFci() *types.ZendFcallInfo      { return &this.fci }
+func (this *PhpOutputHandlerUserFuncT) GetFcc() *types.ZendFcallInfoCache { return &this.fcc }
+func (this *PhpOutputHandlerUserFuncT) GetZoh() *types.Zval               { return &this.zoh }
 
 // ZendOutputGlobals
 type ZendOutputGlobals struct {

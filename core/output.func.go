@@ -7,7 +7,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"os"
 )
@@ -185,45 +184,15 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			context.SetOp(context.GetOp() | PHP_OUTPUT_HANDLER_START)
 		}
 		OG__().running = handler
-		if handler.IsUser() {
-			var retval types.Zval
-			var ob_data types.Zval
-			var ob_mode types.Zval
-			ob_data.SetString(handler.GetBuffer().String())
-			ob_mode.SetLong(zend.ZendLong(context.GetOp()))
-			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
-			// zend.ZvalPtrDtor(&ob_data)
-			var PHP_OUTPUT_USER_SUCCESS func(retval types.Zval) bool = func(retval types.Zval) bool {
-				return retval.IsNotUndef() && !retval.IsFalse()
-			}
-			if types.SUCCESS == zend.ZendFcallInfoCall(handler.GetUser().GetFci(), handler.GetUser().GetFcc(), &retval, nil) && PHP_OUTPUT_USER_SUCCESS(retval) {
 
-				/* user handler may have returned TRUE */
-
-				status = PHP_OUTPUT_HANDLER_NO_DATA
-				if !retval.IsFalse() && !retval.IsTrue() {
-					operators.ConvertToStringEx(&retval)
-					if retval.StringEx().GetLen() != 0 {
-						context.GetOut().SetDataStr(retval.String())
-						status = PHP_OUTPUT_HANDLER_SUCCESS
-					}
-				}
-			} else {
-				/* call failed, pass internal buffer along */
-				status = PHP_OUTPUT_HANDLER_FAILURE
+		context.Feed(*handler.GetBuffer())
+		if handler.Handler()(context) {
+			status = PHP_OUTPUT_HANDLER_NO_DATA
+			if context.GetOut().Used() != 0 {
+				status = PHP_OUTPUT_HANDLER_SUCCESS
 			}
-			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 0)
 		} else {
-			context.Feed(*handler.GetBuffer())
-			if types.SUCCESS == handler.GetInternal()(handler.GetOpaq(), context) {
-				if context.GetOut().Used() != 0 {
-					status = PHP_OUTPUT_HANDLER_SUCCESS
-				} else {
-					status = PHP_OUTPUT_HANDLER_NO_DATA
-				}
-			} else {
-				status = PHP_OUTPUT_HANDLER_FAILURE
-			}
+			status = PHP_OUTPUT_HANDLER_FAILURE
 		}
 		handler.SetIsStarted(true)
 		OG__().running = nil
