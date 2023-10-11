@@ -1005,27 +1005,18 @@ func ZifGetResources(_ zpp.Opt, type_ *string) (*types.Array, bool) {
 	}
 	return retArr, true
 }
-func AddZendextInfo(ext *ZendExtension, arg any) int {
-	var name_array = (*types.Zval)(arg)
-	AddNextIndexString(name_array, ext.GetName())
-	return 0
-}
-func ZifGetLoadedExtensions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, zendExtensions *types.Zval) {
-	var zendext = 0
-	if ZendParseParameters(executeData.NumArgs(), "|b", &zendext) == types.FAILURE {
-		return
-	}
-	ArrayInit(return_value)
-	if zendext != 0 {
-		ZendExtensions.Apply(func(ext *ZendExtension) {
-			AddZendextInfo(ext, return_value)
-		})
 
+//zif -old "|b"
+func ZifGetLoadedExtensions(_ zpp.Opt, zendExtensions bool) *types.Array {
+	arr := types.NewArray()
+	if zendExtensions {
+		// not support zend extensions yet
 	} else {
 		globals.G().EachModule(func(module *ModuleEntry) {
-			AddNextIndexString(return_value, module.GetName())
+			arr.Append(types.NewZvalString(module.GetName()))
 		})
 	}
+	return arr
 }
 func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, categorize *types.Zval) {
 	var categorize = 0

@@ -10,11 +10,6 @@ import (
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendExtensionActivator(extension *ZendExtension) {
-	if extension.GetActivate() != nil {
-		extension.GetActivate()()
-	}
-}
 func ZendThrowOrError(fetch_type int, exception_ce *types.ClassEntry, format string, args ...any) {
 	message := ZendSprintf(format, args)
 	if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) != 0 {

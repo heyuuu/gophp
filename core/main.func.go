@@ -1301,7 +1301,6 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	zend.ZendStartupModules()
 
 	/* start Zend extensions */
-	zend.ZendExtensions.Startup()
 	zend.ZendCollectModuleHandlers()
 
 	/* register additional functions */

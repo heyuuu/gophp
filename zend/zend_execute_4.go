@@ -69,21 +69,6 @@ func ZendAssignOpOverloadedProperty(
 		types.ZVAL_COPY(opline.Result(), &res)
 	}
 }
-func ZendExtensionStatementHandler(extension *ZendExtension, frame *ZendExecuteData) {
-	if extension.GetStatementHandler() != nil {
-		extension.GetStatementHandler()(frame)
-	}
-}
-func ZendExtensionFcallBeginHandler(extension *ZendExtension, frame *ZendExecuteData) {
-	if extension.GetFcallBeginHandler() != nil {
-		extension.GetFcallBeginHandler()(frame)
-	}
-}
-func ZendExtensionFcallEndHandler(extension *ZendExtension, frame *ZendExecuteData) {
-	if extension.GetFcallEndHandler() != nil {
-		extension.GetFcallEndHandler()(frame)
-	}
-}
 func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *types.Array {
 	var ht *types.Array
 	if (fetch_type & (ZEND_FETCH_GLOBAL_LOCK | ZEND_FETCH_GLOBAL)) != 0 {

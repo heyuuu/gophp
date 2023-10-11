@@ -11,7 +11,6 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
 	"os"
-	"sort"
 	"strings"
 )
 
@@ -64,20 +63,8 @@ func PrintModules() {
 		core.PhpPrintf("%s\n", module.GetName())
 	}
 }
-func PrintExtensionInfo(ext *zend.ZendExtension, arg any) {
-	core.PhpPrintf("%s\n", ext.GetName())
-}
 func PrintExtensions() {
-	extensions := zend.ZendExtensions.Elements()
-	sort.Slice(extensions, func(i, j int) bool {
-		ext1 := extensions[i]
-		ext2 := extensions[j]
-		return ext1.GetNameStr() < ext2.GetNameStr()
-	})
-
-	for _, ext := range extensions {
-		PrintExtensionInfo(ext, nil)
-	}
+	// not support zend extensions yet
 }
 func SapiCliRegisterVariables(track_vars_array *types.Zval) {
 	var len_ int

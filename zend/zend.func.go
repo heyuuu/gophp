@@ -1,7 +1,6 @@
 package zend
 
 import (
-	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
@@ -246,8 +245,6 @@ func ZendStartup() int {
 	VirtualCwdStartup()
 	//ZendStartupStrtod()
 
-	ZendExtensions.Init()
-
 	ZendVersionInfo = ZEND_CORE_VERSION_INFO
 
 	CG__().InitTables()
@@ -306,8 +303,6 @@ func ZendShutdown() {
 	CG__().DestroyTables()
 	EG__().Shutdown()
 
-	ZendExtensions.Shutdown()
-
 	ZendMapPtrShutdown()
 	ZendDestroyRsrcListDtors()
 }
@@ -319,9 +314,6 @@ func Zenderror(error *byte) {
 		return
 	}
 	faults.ThrowException(faults.ZendCeParseError, error, 0)
-}
-func ZendAppendVersionInfo(extension *ZendExtension) {
-	ZendVersionInfo += fmt.Sprintf("    with %s v%s, %s, by %s\n", extension.GetNameStr(), extension.GetVersionStr(), extension.GetCopyrightStr(), extension.GetAuthorStr())
 }
 func GetZendVersion() string { return ZendVersionInfo }
 

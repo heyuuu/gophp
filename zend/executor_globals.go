@@ -108,12 +108,6 @@ func (eg *ZendExecutorGlobals) Activate() {
 	eg.SetErrorHandling(EH_NORMAL)
 	eg.SetFlags(EG_FLAGS_INITIAL)
 	eg.VmStack().Reset()
-	ZendExtensions.Apply(func(ext *ZendExtension) {
-		if ext.GetActivate() != nil {
-			ext.GetActivate()()
-		}
-	})
-
 	eg.includedFiles = types.NewArrayCap(8)
 	eg.GetUserErrorHandler().SetUndef()
 	eg.GetUserExceptionHandler().SetUndef()
@@ -205,17 +199,6 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 		ZendStackClean(eg.GetUserErrorHandlers(), nil, 1)
 		ZendStackClean(eg.GetUserExceptionHandlers(), nil, 1)
 	}
-
-	// notice: 无需主动调用析构函数，使用自动析构代替
-	//ZendObjectsStoreFreeObjectStorage(eg.GetObjectsStore(), fast_shutdown)
-	//ZendWeakrefsShutdown()
-	faults.Try(func() {
-		ZendExtensions.Apply(func(ext *ZendExtension) {
-			if ext.GetDeactivate() != nil {
-				ext.GetDeactivate()()
-			}
-		})
-	})
 
 	if fastShutdown {
 		/* Fast Request Shutdown

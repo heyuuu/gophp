@@ -12,7 +12,6 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 	"log"
 	"os"
-	"sort"
 )
 
 func CGIG(v __auto__) __auto__ { return php_cgi_globals.v }
@@ -28,21 +27,8 @@ func PrintModules() {
 		core.PhpPrintf("%s\n", module.GetName())
 	}
 }
-func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
-	core.PhpPrintf("%s\n", ext.GetName())
-	return 0
-}
 func PrintExtensions() {
-	extensions := zend.ZendExtensions.Elements()
-	sort.Slice(extensions, func(i, j int) bool {
-		ext1 := extensions[i]
-		ext2 := extensions[j]
-		return ext1.GetNameStr() < ext2.GetNameStr()
-	})
-
-	for _, ext := range extensions {
-		PrintExtensionInfo(ext, nil)
-	}
+	// not support zend extensions yet
 }
 
 func SapiCgiSingleWrite(str *byte, str_length int) int {

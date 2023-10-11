@@ -71,3 +71,5 @@ var IniEntries = []ZendIniEntryDef{
 const ShortTagsDefault = 1
 const CompilerOptionsDefault uint32 = ZEND_COMPILE_DEFAULT
 const COMPILED_STRING_DESCRIPTION_FORMAT = "%s(%d) : %s"
+
+const ZEND_EXTENSION_API_NO = 320190902
