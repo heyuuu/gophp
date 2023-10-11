@@ -14,6 +14,11 @@ func CastUintptr[T any](ptr *T) uintptr {
 	return uintptr(unsafe.Pointer(ptr))
 }
 
+func CastBytes[I integer](str *byte, len_ I) []byte {
+	// todo 此段代码仅表意，实际不应依赖此实现
+	return []byte(CastStr(str, len_))
+}
+
 func CastStr[I integer](str *byte, len_ I) string {
 	// todo 此段代码仅表意，实际不应依赖此实现 (因为无法保证 *byte 后续内存有效)
 	if str == nil || len_ == 0 {

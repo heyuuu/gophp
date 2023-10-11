@@ -22,13 +22,13 @@ func PhpOutputStderr(str string) int {
 }
 func PhpOutputHeader() {
 	if !SG__().headersSent {
-		if OG__().OutputStartFilename() == "" {
+		if OG__().StartFilename() == "" {
 			if zend.ZendIsCompiling() {
-				OG__().SetOutputStartFilename(zend.ZendGetCompiledFilename())
-				OG__().SetOutputStartLineno(zend.ZendGetCompiledLineno())
+				OG__().SetStartFilename(zend.ZendGetCompiledFilename())
+				OG__().SetStartLineno(zend.ZendGetCompiledLineno())
 			} else if zend.ZendIsExecuting() {
-				OG__().SetOutputStartFilename(zend.ZendGetExecutedFilename())
-				OG__().SetOutputStartLineno(zend.ZendGetExecutedLineno())
+				OG__().SetStartFilename(zend.ZendGetExecutedFilename())
+				OG__().SetStartLineno(zend.ZendGetExecutedLineno())
 			}
 		}
 		if standard.PhpHeader() == 0 {
@@ -73,7 +73,7 @@ func PhpOutputFlush() bool {
 	if active := OG__().Active(); active != nil && active.IsFlushable() {
 		context := InitOutputContext(PHP_OUTPUT_HANDLER_FLUSH)
 		PhpOutputHandlerOp(active, context)
-		if data, ok := context.GetOutData(); ok {
+		if data := context.GetOut().String(); data != "" {
 			OG__().PopHandler()
 			PhpOutputWrite(data)
 			OG__().PushHandler(active)
@@ -136,8 +136,8 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) bool {
 	}
 	return OG__().StartHandler(handler)
 }
-func PhpOutputGetStartFilename() string { return OG__().OutputStartFilename() }
-func PhpOutputGetStartLineno() int      { return OG__().OutputStartLineno() }
+func PhpOutputGetStartFilename() string { return OG__().StartFilename() }
+func PhpOutputGetStartLineno() int      { return OG__().StartLineno() }
 func PhpOutputLockError(op int) int {
 	/* if there's no ob active, ob has been stopped */
 	if op != 0 && OG__().active != nil && OG__().running != nil {
@@ -148,53 +148,36 @@ func PhpOutputLockError(op int) int {
 	}
 	return 0
 }
-func PhpOutputHandlerAppend(handler *PhpOutputHandler, buf *PhpOutputBuffer) int {
-	if buf.GetUsed() != 0 {
+func PhpOutputHandlerAppend(handler *PhpOutputHandler, buf *PhpOutputBuffer) bool {
+	if buf.Used() != 0 {
 		OG__().MarkWritten()
 
 		/* store it away */
-		if handler.GetBuffer().GetSize()-handler.GetBuffer().GetUsed() <= buf.GetUsed() {
-			var grow_int int = PHP_OUTPUT_HANDLER_INITBUF_SIZE(handler.GetSize())
-			var grow_buf int = PHP_OUTPUT_HANDLER_INITBUF_SIZE(buf.GetUsed() - (handler.GetBuffer().GetSize() - handler.GetBuffer().GetUsed()))
-			var grow_max int = b.Max(grow_int, grow_buf)
-			handler.GetBuffer().SetData(zend.SafeErealloc(handler.GetBuffer().GetData(), 1, handler.GetBuffer().GetSize(), grow_max))
-			handler.GetBuffer().SetSize(handler.GetBuffer().GetSize() + grow_max)
-		}
-		memcpy(handler.GetBuffer().GetData()+handler.GetBuffer().GetUsed(), buf.GetData(), buf.GetUsed())
-		handler.GetBuffer().SetUsed(handler.GetBuffer().GetUsed() + buf.GetUsed())
+		handler.GetBuffer().Append(buf.Bytes())
 
 		/* chunked buffering */
-
-		if handler.GetSize() != 0 && handler.GetBuffer().GetUsed() >= handler.GetSize() {
-
+		if handler.GetSize() != 0 && handler.GetBuffer().Used() >= handler.GetSize() {
 			/* store away errors and/or any intermediate output */
-
-			if OG__().running {
-				return 1
+			if OG__().Running() != nil {
+				return true
 			} else {
-				return 0
+				return false
 			}
-
-			/* store away errors and/or any intermediate output */
-
 		}
-
-		/* chunked buffering */
-
 	}
-	return 1
+	return true
 }
 func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) PhpOutputHandlerStatusT {
-	var status PhpOutputHandlerStatusT
-	var originalOp int = context.GetOp()
 	if PhpOutputLockError(context.GetOp()) != 0 {
 		/* fatal error */
 		return PHP_OUTPUT_HANDLER_FAILURE
 	}
 
+	var status PhpOutputHandlerStatusT
+	var originalOp int = context.GetOp()
+
 	/* storable? */
-	if PhpOutputHandlerAppend(handler, context.GetIn()) != 0 && context.GetOp() == 0 {
-		context.SetOp(originalOp)
+	if PhpOutputHandlerAppend(handler, context.GetIn()) && context.GetOp() == 0 {
 		return PHP_OUTPUT_HANDLER_NO_DATA
 	} else {
 		/* need to start? */
@@ -206,7 +189,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			var retval types.Zval
 			var ob_data types.Zval
 			var ob_mode types.Zval
-			ob_data.SetString(b.CastStr(handler.GetBuffer().GetData(), handler.GetBuffer().GetUsed()))
+			ob_data.SetString(handler.GetBuffer().String())
 			ob_mode.SetLong(zend.ZendLong(context.GetOp()))
 			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
 			// zend.ZvalPtrDtor(&ob_data)
@@ -221,7 +204,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 				if !retval.IsFalse() && !retval.IsTrue() {
 					operators.ConvertToStringEx(&retval)
 					if retval.StringEx().GetLen() != 0 {
-						context.GetOut().SetFreeDataByStr(retval.String())
+						context.GetOut().SetDataStr(retval.String())
 						status = PHP_OUTPUT_HANDLER_SUCCESS
 					}
 				}
@@ -233,7 +216,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 		} else {
 			context.Feed(*handler.GetBuffer())
 			if types.SUCCESS == handler.GetInternal()(handler.GetOpaq(), context) {
-				if context.GetOut().GetUsed() != 0 {
+				if context.GetOut().Used() != 0 {
 					status = PHP_OUTPUT_HANDLER_SUCCESS
 				} else {
 					status = PHP_OUTPUT_HANDLER_NO_DATA
@@ -249,22 +232,17 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 	case PHP_OUTPUT_HANDLER_FAILURE:
 		/* disable this handler */
 		handler.SetIsDisabled(true)
-		if context.GetOut().GetData() != nil && context.GetOut().IsFree() {
-			zend.Efree(context.GetOut().GetData())
-		}
 
 		/* returns handlers buffer */
-		context.GetOut().SetFreeData(handler.GetBuffer())
-		handler.GetBuffer().SetData(nil)
-		handler.GetBuffer().SetUsed(0)
-		handler.GetBuffer().SetSize(0)
+		context.GetOut().SetDataNoClone(handler.GetBuffer().Bytes())
+		handler.GetBuffer().Clean()
 	case PHP_OUTPUT_HANDLER_NO_DATA:
 		/* handler ate all */
 		context.Reset()
 		fallthrough
 	case PHP_OUTPUT_HANDLER_SUCCESS:
 		/* no more buffered data */
-		handler.GetBuffer().SetUsed(0)
+		handler.GetBuffer().Reset()
 		handler.SetIsProcessed(true)
 	}
 	context.SetOp(originalOp)
@@ -284,8 +262,7 @@ func PhpOutputOp(op int, str *byte, len_ int) {
 	 */
 	if OG__().Active() != nil && OG__().CountHandlers() != 0 {
 		obh_cnt := OG__().CountHandlers()
-		context.GetIn().SetData((*byte)(str))
-		context.GetIn().SetUsed(len_)
+		context.GetIn().SetData(b.CastBytes(str, len_))
 		if obh_cnt > 1 {
 			OG__().EachHandlerEx(false, func(h *PhpOutputHandler) bool {
 				return PhpOutputStackApplyOp(h, context) == 0
@@ -296,16 +273,13 @@ func PhpOutputOp(op int, str *byte, len_ int) {
 			context.Pass()
 		}
 	} else {
-		context.GetOut().SetData((*byte)(str))
-		context.GetOut().SetUsed(len_)
+		context.GetOut().SetData(b.CastBytes(str, len_))
 	}
-	if context.GetOut().GetData() != nil && context.GetOut().GetUsed() != 0 {
+	if outData := context.GetOut().String(); outData != "" {
 		PhpOutputHeader()
 
 		if !OG__().IsDisabled() {
-			SM__().UbWrite(
-				b.CastStr(context.GetOut().GetData(), context.GetOut().GetUsed()),
-			)
+			SM__().UbWrite(outData)
 			if OG__().IsImplicitFlush() {
 				SapiFlush()
 			}
@@ -387,16 +361,11 @@ func PhpOutputStackPop(flags int) int {
 		}
 
 		/* pop it off the stack */
-		OG__().PopHandler()
-		if current := OG__().TopHandler(); current != nil {
-			OG__().SetActive(current)
-		} else {
-			OG__().SetActive(nil)
-		}
+		OG__().EndHandler()
 
 		/* pass output along */
-		if context.GetOut().GetData() != nil && context.GetOut().GetUsed() != 0 && (flags&PHP_OUTPUT_POP_DISCARD) == 0 {
-			PhpOutputWrite(context.GetOut().GetData(), context.GetOut().GetUsed())
+		if context.GetOut().Used() != 0 && (flags&PHP_OUTPUT_POP_DISCARD) == 0 {
+			PhpOutputWrite(context.GetOut().String())
 		}
 
 		/* destroy the handler (after write!) */
@@ -409,11 +378,11 @@ func PhpOutputHandlerCompatFunc(handler_context *any, output_context *PhpOutputC
 
 	if handler != nil {
 		var handledOutput string
-		if data, ok := output_context.GetOutData(); ok {
+		if data := output_context.GetOut().String(); data != "" {
 			handledOutput = handler(data, output_context.GetOp())
 		}
 		if len(handledOutput) > 0 {
-			output_context.GetOut().SetFreeDataByStr(handledOutput)
+			output_context.GetOut().SetDataStr(handledOutput)
 		} else {
 			output_context.Pass()
 		}
@@ -543,8 +512,8 @@ func outputHandlerStatus(handler *PhpOutputHandler) *types.Array {
 	arr.KeyUpdate("flags", types.NewZvalLong(handler.GetFlags()))
 	arr.KeyUpdate("level", types.NewZvalLong(handler.GetLevel()))
 	arr.KeyUpdate("chunk_size", types.NewZvalLong(handler.GetSize()))
-	arr.KeyUpdate("buffer_size", types.NewZvalLong(handler.GetBuffer().GetSize()))
-	arr.KeyUpdate("buffer_used", types.NewZvalLong(handler.GetBuffer().GetUsed()))
+	arr.KeyUpdate("buffer_size", types.NewZvalLong(handler.GetBuffer().Size()))
+	arr.KeyUpdate("buffer_used", types.NewZvalLong(handler.GetBuffer().Used()))
 	return arr
 }
 

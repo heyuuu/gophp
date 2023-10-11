@@ -1,9 +1,9 @@
 package core
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/slicekit"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/shim/slices"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -18,16 +18,9 @@ const PhpOutputDefaultHandlerName = "default output handler"
  */
 
 func OG__() *ZendOutputGlobals { return &OutputGlobals }
-func PHP_OUTPUT_HANDLER_INITBUF_SIZE(s int) int {
-	if s > 1 {
-		return s + PHP_OUTPUT_HANDLER_ALIGNTO_SIZE - s%PHP_OUTPUT_HANDLER_ALIGNTO_SIZE
-	} else {
-		return PHP_OUTPUT_HANDLER_DEFAULT_SIZE
-	}
-}
-func PUTS(str string) int { return PhpOutputWrite(str) }
-func PUTS_H(str string)   { PhpOutputWriteUnbuffered(str) }
-func PUTC(c byte)         { PhpOutputWrite(string(c)) }
+func PUTS(str string) int      { return PhpOutputWrite(str) }
+func PUTS_H(str string)        { PhpOutputWriteUnbuffered(str) }
+func PUTC(c byte)              { PhpOutputWrite(string(c)) }
 
 /**
  * types
@@ -81,8 +74,7 @@ func newPhpOutputHandler(name string, chunkSize int, flags int) *PhpOutputHandle
 		size:  chunkSize,
 		flags: flags,
 	}
-	handler.GetBuffer().SetSize(PHP_OUTPUT_HANDLER_INITBUF_SIZE(chunkSize))
-	handler.GetBuffer().SetData(zend.Emalloc(handler.GetBuffer().GetSize()))
+	handler.buffer.Init(chunkSize)
 	return handler
 }
 
@@ -133,34 +125,29 @@ func (h *PhpOutputHandler) IsFlushable() bool { return h.HasFlags(PHP_OUTPUT_HAN
 func (h *PhpOutputHandler) IsRemovable() bool { return h.HasFlags(PHP_OUTPUT_HANDLER_REMOVABLE) }
 
 // PhpOutputBuffer
-type PhpOutputBuffer struct {
-	data *byte
-	size int
-	used int
-	free bool
+type PhpOutputBuffer struct{ data []byte }
+
+func (buf *PhpOutputBuffer) Init(chunkSize int) {
+	buf.data = make([]byte, buf.initSize(chunkSize))
+}
+func (buf *PhpOutputBuffer) initSize(s int) int {
+	if s > 1 {
+		return s + PHP_OUTPUT_HANDLER_ALIGNTO_SIZE - s%PHP_OUTPUT_HANDLER_ALIGNTO_SIZE
+	}
+	return PHP_OUTPUT_HANDLER_DEFAULT_SIZE
 }
 
-func (buf *PhpOutputBuffer) GetData() *byte      { return buf.data }
-func (buf *PhpOutputBuffer) SetData(value *byte) { buf.data = value }
-func (buf *PhpOutputBuffer) GetSize() int        { return buf.size }
-func (buf *PhpOutputBuffer) SetSize(value int)   { buf.size = value }
-func (buf *PhpOutputBuffer) GetUsed() int        { return buf.used }
-func (buf *PhpOutputBuffer) SetUsed(value int)   { buf.used = value }
-func (buf *PhpOutputBuffer) IsFree() bool        { return buf.free }
-func (buf *PhpOutputBuffer) SetFree(value bool)  { buf.free = value }
+func (buf *PhpOutputBuffer) Append(data []byte)         { buf.data = append(buf.data, data...) }
+func (buf *PhpOutputBuffer) SetData(data []byte)        { buf.data = slices.Clone(data) }
+func (buf *PhpOutputBuffer) SetDataNoClone(data []byte) { buf.data = data }
+func (buf *PhpOutputBuffer) SetDataStr(data string)     { buf.data = []byte(data) }
+func (buf *PhpOutputBuffer) Reset()                     { buf.data = buf.data[:0] }
+func (buf *PhpOutputBuffer) Clean()                     { buf.data = nil }
 
-func (buf *PhpOutputBuffer) GetString() string { return b.CastStr(buf.data, buf.used) }
-
-func (buf *PhpOutputBuffer) SetFreeData(handler *PhpOutputBuffer) {
-	buf.data = handler.data
-	buf.used = handler.used
-	buf.free = true
-}
-func (buf *PhpOutputBuffer) SetFreeDataByStr(data string) {
-	buf.data = b.CastStrPtr(data)
-	buf.used = len(data)
-	buf.free = true
-}
+func (buf *PhpOutputBuffer) Bytes() []byte  { return buf.data }
+func (buf *PhpOutputBuffer) String() string { return string(buf.data) }
+func (buf *PhpOutputBuffer) Size() int      { return cap(buf.data) }
+func (buf *PhpOutputBuffer) Used() int      { return len(buf.data) }
 
 // PhpOutputContext
 type PhpOutputContext struct {
@@ -178,25 +165,11 @@ func (c *PhpOutputContext) Reset() {
 	c.out = PhpOutputBuffer{}
 }
 
-func (c *PhpOutputContext) GetOutData() (string, bool) {
-	if c.out.data == nil || c.out.used == 0 {
-		return "", false
-	}
-
-	return b.CastStr(c.out.data, c.out.used), true
-}
-
 func (c *PhpOutputContext) Feed(buffer PhpOutputBuffer) {
-	if c.in.free && c.in.data != nil {
-		zend.Efree(c.in.data)
-	}
 	c.in = buffer
 }
 
 func (c *PhpOutputContext) Swap() {
-	if c.in.free && c.in.data != nil {
-		zend.Efree(c.in.data)
-	}
 	c.in = c.out
 	c.out = PhpOutputBuffer{}
 }
@@ -206,16 +179,10 @@ func (c *PhpOutputContext) Pass() {
 	c.in = PhpOutputBuffer{}
 }
 
-func (c *PhpOutputContext) GetOp() int              { return c.op }
-func (c *PhpOutputContext) SetOp(value int)         { c.op = value }
-func (c *PhpOutputContext) GetIn() *PhpOutputBuffer { return &c.in }
-func (c *PhpOutputContext) SetIn(buffer PhpOutputBuffer) {
-	c.in = buffer
-}
+func (c *PhpOutputContext) GetOp() int               { return c.op }
+func (c *PhpOutputContext) SetOp(value int)          { c.op = value }
+func (c *PhpOutputContext) GetIn() *PhpOutputBuffer  { return &c.in }
 func (c *PhpOutputContext) GetOut() *PhpOutputBuffer { return &c.out }
-func (c *PhpOutputContext) SetOut(buffer PhpOutputBuffer) {
-	c.in = buffer
-}
 
 // PhpOutputHandlerUserFuncT
 type PhpOutputHandlerUserFuncT struct {
@@ -230,13 +197,13 @@ func (this *PhpOutputHandlerUserFuncT) GetZoh() types.Zval               { retur
 
 // ZendOutputGlobals
 type ZendOutputGlobals struct {
+	activated           bool
+	flags               uint8
 	handlers            []*PhpOutputHandler
 	active              *PhpOutputHandler
 	running             *PhpOutputHandler
 	outputStartFilename string
 	outputStartLineno   int
-	activated           bool
-	flags               uint8
 }
 
 const (
@@ -327,7 +294,10 @@ func (g *ZendOutputGlobals) StartHandler(h *PhpOutputHandler) bool {
 	g.active = h
 	return true
 }
-
+func (g *ZendOutputGlobals) EndHandler() {
+	g.PopHandler()
+	g.active = g.TopHandler()
+}
 func (g *ZendOutputGlobals) GetLevel() int {
 	if g.active != nil {
 		return g.CountHandlers()
@@ -336,37 +306,25 @@ func (g *ZendOutputGlobals) GetLevel() int {
 }
 func (g *ZendOutputGlobals) GetContents() (string, bool) {
 	if g.active != nil {
-		return g.active.buffer.GetString(), true
+		return g.active.buffer.String(), true
 	}
 	return "", false
 }
 func (g *ZendOutputGlobals) GetLength() (int, bool) {
 	if g.active != nil {
-		return g.active.buffer.GetUsed(), true
+		return g.active.buffer.Used(), true
 	}
 	return 0, false
 }
 
 // fields
-func (g *ZendOutputGlobals) Active() *PhpOutputHandler          { return g.active }
-func (g *ZendOutputGlobals) SetActive(active *PhpOutputHandler) { g.active = active }
-
-func (g *ZendOutputGlobals) Running() *PhpOutputHandler           { return g.running }
-func (g *ZendOutputGlobals) SetRunning(running *PhpOutputHandler) { g.running = running }
-
-func (g *ZendOutputGlobals) OutputStartFilename() string { return g.outputStartFilename }
-func (g *ZendOutputGlobals) SetOutputStartFilename(outputStartFilename string) {
-	g.outputStartFilename = outputStartFilename
-}
-
-func (g *ZendOutputGlobals) OutputStartLineno() int { return g.outputStartLineno }
-func (g *ZendOutputGlobals) SetOutputStartLineno(outputStartLineno int) {
-	g.outputStartLineno = outputStartLineno
-}
-
-// activated
-func (g *ZendOutputGlobals) IsActivated() bool   { return g.activated }
-func (g *ZendOutputGlobals) SetActivated(v bool) { g.activated = v }
+func (g *ZendOutputGlobals) IsActivated() bool                { return g.activated }
+func (g *ZendOutputGlobals) Active() *PhpOutputHandler        { return g.active }
+func (g *ZendOutputGlobals) Running() *PhpOutputHandler       { return g.running }
+func (g *ZendOutputGlobals) StartFilename() string            { return g.outputStartFilename }
+func (g *ZendOutputGlobals) SetStartFilename(filename string) { g.outputStartFilename = filename }
+func (g *ZendOutputGlobals) StartLineno() int                 { return g.outputStartLineno }
+func (g *ZendOutputGlobals) SetStartLineno(lineno int)        { g.outputStartLineno = lineno }
 
 // flags
 func (g *ZendOutputGlobals) IsImplicitFlush() bool { return g.flags&outputImplicitFlush != 0 }
