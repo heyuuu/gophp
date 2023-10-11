@@ -62,13 +62,13 @@ func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 
 		if (call_info & (ZEND_CALL_TOP | ZEND_CALL_ALLOCATED)) == 0 {
-			EG__().VmStack().PopCheck(executeData)
+			EG__().VmStackPopCheck(executeData)
 
 			executeData = executeData.GetPrevExecuteData()
 			ZEND_VM_INC_OPCODE(executeData)
 			return 2
 		} else if (call_info & ZEND_CALL_TOP) == 0 {
-			EG__().VmStack().PopCheck(executeData)
+			EG__().VmStackPopCheck(executeData)
 
 			executeData = executeData.GetPrevExecuteData()
 			ZEND_VM_INC_OPCODE(executeData)

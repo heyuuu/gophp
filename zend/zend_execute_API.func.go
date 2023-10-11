@@ -164,7 +164,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 
 		/* Insert fake frame in case of include or magic calls */
 
-		dummy_execute_data = (*EG__)().current_execute_data
+		dummy_execute_data = *EG__().GetCurrentExecuteData()
 		dummy_execute_data.SetPrevExecuteData(CurrEX())
 		dummy_execute_data.SetCall(nil)
 		dummy_execute_data.SetOpline(nil)
@@ -507,7 +507,6 @@ func ZendEvalStringl(str string, retval_ptr *types.Zval, string_name *byte) int 
 	CG__().SetCompilerOptions(original_compiler_options)
 	if new_op_array != nil {
 		var local_retval types.Zval
-		EG__().SetNoExtensions(1)
 		new_op_array.SetScope(ZendGetExecutedScope())
 
 		faults.TryCatch(func() {
@@ -526,7 +525,6 @@ func ZendEvalStringl(str string, retval_ptr *types.Zval, string_name *byte) int 
 				retval_ptr.SetNull()
 			}
 		}
-		EG__().SetNoExtensions(0)
 		retval = types.SUCCESS
 	} else {
 		retval = types.FAILURE

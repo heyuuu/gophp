@@ -210,7 +210,7 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	object := types.NewObject(class_type, &DefaultExceptionHandlers)
 	obj.SetObject(object)
 	if zend.CurrEX() != nil {
-		zend.ZendFetchDebugBacktrace(&trace, skip_top_traces, lang.Cond(zend.EG__().GetExceptionIgnoreArgs() != 0, zend.DEBUG_BACKTRACE_IGNORE_ARGS, 0), 0)
+		zend.ZendFetchDebugBacktrace(&trace, skip_top_traces, lang.Cond(zend.EG__().GetExceptionIgnoreArgs(), zend.DEBUG_BACKTRACE_IGNORE_ARGS, 0), 0)
 	} else {
 		zend.ArrayInit(&trace)
 	}

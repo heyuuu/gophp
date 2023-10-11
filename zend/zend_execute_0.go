@@ -81,7 +81,7 @@ func ZendVmStackFreeArgs(call *ZendExecuteData) {
 	}
 }
 func ZendVmStackFreeCallFrame(call *ZendExecuteData) {
-	EG__().VmStack().PopCheck(call)
+	EG__().VmStackPopCheck(call)
 }
 func CACHE_ADDR(num __auto__) *any {
 	return (*any)((*byte)(executeData.GetRunTimeCache() + num))

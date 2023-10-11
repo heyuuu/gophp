@@ -1,6 +1,8 @@
 package zend
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/kits/slicekit"
 	"github.com/heyuuu/gophp/php/contracts"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -24,61 +26,57 @@ type ZendExecutorGlobals struct {
 	functionTable    FunctionTable
 	classTable       ClassTable
 	constantTable    ConstantTable
-	vmStack          VmStack
+	vmStack          []*ZendExecuteData
 
-	current_execute_data                *ZendExecuteData
-	fake_scope                          *types.ClassEntry
-	precision                           ZendLong
-	persistent_constants_count          uint32
-	persistent_functions_count          uint32
-	persistent_classes_count            uint32
-	in_autoload                         *types.Array
-	autoload_func                       types.IFunction
-	no_extensions                       bool
-	vm_interrupt                        bool
-	timed_out                           bool
-	hard_timeout                        ZendLong
-	regular_list                        types.Array
-	persistent_list                     types.Array
-	regularList                         ResourceTable
-	persistentList                      ResourceTable
-	user_error_handler_error_reporting  int
-	user_error_handler                  types.Zval
-	user_exception_handler              *types.Zval
-	user_error_handlers_error_reporting ZendStack
-	user_error_handlers                 ZendStack
-	user_exception_handlers             ZendStack
-	error_handling                      ZendErrorHandlingT
-	exception_class                     *types.ClassEntry
-	timeout_seconds                     ZendLong
-	lambda_count                        int
+	currentExecuteData *ZendExecuteData
+	fakeScope          *types.ClassEntry
+	precision          int
+	inAutoload         *types.Array
+	autoloadFunc       types.IFunction
+	vmInterrupt        bool
+	timedOut           bool
+	hardTimeout        int
+
+	regular_list    types.Array
+	persistent_list types.Array
+	regularList     ResourceTable
+	persistentList  ResourceTable
+
+	userErrorHandlerErrorReporting  int
+	userErrorHandler                types.Zval
+	userExceptionHandler            *types.Zval
+	userErrorHandlersErrorReporting ZendStack
+	userErrorHandlers               ZendStack
+	userExceptionHandlers           ZendStack
+	errorHandling                   ZendErrorHandlingT
+	exceptionClass                  *types.ClassEntry
+	timeoutSeconds                  int
+	lambdaCount                     int
 
 	iniDirectives         IniDirectives
 	modifiedIniDirectives IniDirectives
 
-	error_reporting_ini_entry *ZendIniEntry
-	exception                 *types.Object
-	prev_exception            **types.Object
-	opline_before_exception   *types.ZendOp
-	exception_op              [3]types.ZendOp
-	current_module            *ModuleEntry
-	active                    bool
-	flags                     uint8
-	assertions                ZendLong
+	errorReportingIniEntry *ZendIniEntry
+	exception              *types.Object
+	prevException          **types.Object
+	oplineBeforeException  *types.ZendOp
+	exceptionOp            [3]types.ZendOp
+	currentModule          *ModuleEntry
+	active                 bool
+	flags                  uint8
+	assertions             int
 
-	ht_iterators_count uint32
-	ht_iterators_used  uint32
-	ht_iterators       *types.ArrayIterator
-	ht_iterators_slots []types.ArrayIterator
-	arrayIterators     []*types.ArrayIterator
+	htIteratorsCount uint32
+	htIteratorsUsed  uint32
+	htIterators      *types.ArrayIterator
+	htIteratorsSlots []types.ArrayIterator
+	arrayIterators   []*types.ArrayIterator
 
-	saved_fpu_cw_ptr        any
-	trampoline              types.IFunction
-	callTrampolineOp        *types.ZendOp
-	each_deprecation_thrown bool
-	weakrefs                types.Array
-	exception_ignore_args   bool
-	reserved                []any
+	trampoline            types.IFunction
+	callTrampolineOp      *types.ZendOp
+	eachDeprecationThrown bool
+	exceptionIgnoreArgs   bool
+	reserved              []any
 }
 
 /**
@@ -93,44 +91,37 @@ func (eg *ZendExecutorGlobals) Shutdown() {
 	eg.constantTable.Destroy()
 }
 func (eg *ZendExecutorGlobals) Activate() {
-	ZendInitFpu()
-
 	eg.errorZval.SetIsError()
-	//eg.symtable_cache = [SYMTABLE_CACHE_SIZE]*types.Array{}
-	eg.symtableCacheIdx = 0
 	eg.symbolTable = types.NewArrayCap(64)
+	eg.includedFiles = types.NewArrayCap(8)
 
-	eg.no_extensions = false
 	eg.functionTable = CG__().FunctionTable()
 	eg.classTable = CG__().ClassTable()
-	eg.SetInAutoload(nil)
-	eg.SetAutoloadFunc(nil)
-	eg.SetErrorHandling(EH_NORMAL)
-	eg.SetFlags(EG_FLAGS_INITIAL)
-	eg.VmStack().Reset()
-	eg.includedFiles = types.NewArrayCap(8)
-	eg.GetUserErrorHandler().SetUndef()
-	eg.GetUserExceptionHandler().SetUndef()
-	eg.SetCurrentExecuteData(nil)
-	eg.GetUserErrorHandlersErrorReporting().Init()
-	eg.GetUserErrorHandlers().Init()
-	eg.GetUserExceptionHandlers().Init()
-	eg.SetVmInterrupt(0)
-	eg.SetTimedOut(0)
-	eg.SetException(nil)
-	eg.SetPrevException(nil)
-	eg.SetFakeScope(nil)
+	eg.vmStack = nil
+
+	eg.inAutoload = nil
+	eg.autoloadFunc = nil
+	eg.errorHandling = EH_NORMAL
+	eg.flags = EG_FLAGS_INITIAL
+	eg.userErrorHandler.SetUndef()
+	eg.userExceptionHandler.SetUndef()
+	eg.currentExecuteData = nil
+	eg.userErrorHandlersErrorReporting.Init()
+	eg.userErrorHandlers.Init()
+	eg.userExceptionHandlers.Init()
+	eg.vmInterrupt = false
+	eg.timedOut = false
+	eg.exception = nil
+	eg.prevException = nil
+	eg.fakeScope = nil
 	eg.GetTrampoline().SetFunctionName("")
 	eg.ResetArrayIterators()
-	eg.SetEachDeprecationThrown(0)
-	eg.SetPersistentConstantsCount(uint32(eg.ConstantTable().Len()))
-	eg.SetPersistentFunctionsCount(uint32(eg.FunctionTable().Len()))
-	eg.SetPersistentClassesCount(uint32(eg.ClassTable().Len()))
+	eg.eachDeprecationThrown = false
 
 	eg.active = true
 }
 func (eg *ZendExecutorGlobals) Deactivate() {
-	var fastShutdown bool = IsZendMm() != 0 && !EG__().GetFullTablesCleanup()
+	var fastShutdown bool = IsZendMm() != 0
 
 	faults.Try(func() {
 		CG__().GetOpenFiles().Destroy()
@@ -217,43 +208,18 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 		})
 		ZendCleanupInternalClasses()
 	} else {
-		eg.VmStack().Reset()
-		if eg.GetFullTablesCleanup() {
-			eg.ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
-				return c.IsPersistent()
-			})
-			eg.FunctionTable().FilterReserve(func(_ string, f types.IFunction) bool {
-				return f.GetType() == ZEND_INTERNAL_FUNCTION
-			})
-			eg.ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
-				return ce.IsInternalClass()
-			})
-		} else {
-			eg.ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
-				if c.IsPersistent() {
-					return true
-				}
+		eg.vmStack = nil
 
-				// ZvalPtrDtorNogc(c.Value())
-				return false
-			})
+		eg.ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
+			return c.IsPersistent()
+		})
+		eg.FunctionTable().FilterReserve(func(_ string, f types.IFunction) bool {
+			return f.GetType() == ZEND_INTERNAL_FUNCTION
+		})
+		eg.ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
+			return ce.IsInternalClass()
+		})
 
-			eg.FunctionTable().FilterReserve(func(key string, f types.IFunction) bool {
-				if f.GetType() == ZEND_INTERNAL_FUNCTION {
-					return true
-				}
-				return false
-			})
-
-			eg.ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
-				if ce.IsInternalClass() {
-					return true
-				}
-
-				//DestroyZendClass(zv)
-				return false
-			})
-		}
 		for eg.symtableCacheIdx > 0 {
 			eg.symtableCacheIdx--
 			eg.symtableCache[eg.symtableCacheIdx].Destroy()
@@ -268,7 +234,6 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 		}
 	}
 	eg.ResetArrayIterators()
-	ZendShutdownFpu()
 }
 
 // symtable cache
@@ -338,8 +303,8 @@ func (eg *ZendExecutorGlobals) DelArrayIterator(idx uint32) {
 	}
 }
 
-func (eg *ZendExecutorGlobals) GetHtIteratorsUsed() uint32           { return eg.ht_iterators_used }
-func (eg *ZendExecutorGlobals) GetHtIterators() *types.ArrayIterator { return eg.ht_iterators }
+func (eg *ZendExecutorGlobals) GetHtIteratorsUsed() uint32           { return eg.htIteratorsUsed }
+func (eg *ZendExecutorGlobals) GetHtIterators() *types.ArrayIterator { return eg.htIterators }
 
 func (eg *ZendExecutorGlobals) ClassTable() ClassTable       { return eg.classTable }
 func (eg *ZendExecutorGlobals) FunctionTable() FunctionTable { return eg.functionTable }
@@ -358,7 +323,16 @@ func (eg *ZendExecutorGlobals) InitModifiedIniDirectives() {
 	eg.modifiedIniDirectives = types.NewTable[*ZendIniEntry](nil)
 }
 
-func (eg *ZendExecutorGlobals) VmStack() *VmStack { return &eg.vmStack }
+func (eg *ZendExecutorGlobals) VmStackPush(ex *ZendExecuteData) {
+	eg.vmStack = append(eg.vmStack, ex)
+}
+func (eg *ZendExecutorGlobals) VmStackPop() *ZendExecuteData {
+	ex, _ := slicekit.PopPtr(&eg.vmStack)
+	return ex
+}
+func (eg *ZendExecutorGlobals) VmStackPopCheck(ex *ZendExecuteData) {
+	b.Assert(eg.VmStackPop() == ex)
+}
 
 // llist
 func (eg *ZendExecutorGlobals) GetRegularList() *types.Array { return &eg.regular_list }
@@ -380,12 +354,7 @@ func (eg *ZendExecutorGlobals) IsActive() bool { return eg.active }
 /**
  * 以下是自动生成的方法
  */
-
-func (eg *ZendExecutorGlobals) GetErrorZval() *types.Zval        { return &eg.errorZval }
-func (eg *ZendExecutorGlobals) GetSymtableCache() []*types.Array { return eg.symtableCache }
-func (eg *ZendExecutorGlobals) GetSymtableCachePtr() **types.Array {
-	return eg.symtable_cache_ptr
-}
+func (eg *ZendExecutorGlobals) GetErrorZval() *types.Zval           { return &eg.errorZval }
 func (eg *ZendExecutorGlobals) GetSymbolTable() *types.Array        { return eg.symbolTable }
 func (eg *ZendExecutorGlobals) SetSymbolTable(value *types.Array)   { eg.symbolTable = value }
 func (eg *ZendExecutorGlobals) GetIncludedFiles() *types.Array      { return eg.includedFiles }
@@ -395,136 +364,99 @@ func (eg *ZendExecutorGlobals) SetErrorReporting(value int)         { eg.errorRe
 func (eg *ZendExecutorGlobals) GetExitStatus() int                  { return eg.exitStatus }
 func (eg *ZendExecutorGlobals) SetExitStatus(value int)             { eg.exitStatus = value }
 func (eg *ZendExecutorGlobals) GetCurrentExecuteData() *ZendExecuteData {
-	return eg.current_execute_data
+	return eg.currentExecuteData
 }
 func (eg *ZendExecutorGlobals) SetCurrentExecuteData(value *ZendExecuteData) {
-	eg.current_execute_data = value
+	eg.currentExecuteData = value
 }
-func (eg *ZendExecutorGlobals) GetFakeScope() *types.ClassEntry      { return eg.fake_scope }
-func (eg *ZendExecutorGlobals) SetFakeScope(value *types.ClassEntry) { eg.fake_scope = value }
-func (eg *ZendExecutorGlobals) GetPrecision() ZendLong               { return eg.precision }
-func (eg *ZendExecutorGlobals) SetPrecision(value ZendLong)          { eg.precision = value }
-func (eg *ZendExecutorGlobals) GetPersistentConstantsCount() uint32 {
-	return eg.persistent_constants_count
-}
-func (eg *ZendExecutorGlobals) SetPersistentConstantsCount(value uint32) {
-	eg.persistent_constants_count = value
-}
-func (eg *ZendExecutorGlobals) GetPersistentFunctionsCount() uint32 {
-	return eg.persistent_functions_count
-}
-func (eg *ZendExecutorGlobals) SetPersistentFunctionsCount(value uint32) {
-	eg.persistent_functions_count = value
-}
-func (eg *ZendExecutorGlobals) GetPersistentClassesCount() uint32 {
-	return eg.persistent_classes_count
-}
-func (eg *ZendExecutorGlobals) SetPersistentClassesCount(value uint32) {
-	eg.persistent_classes_count = value
-}
-func (eg *ZendExecutorGlobals) GetInAutoload() *types.Array      { return eg.in_autoload }
-func (eg *ZendExecutorGlobals) SetInAutoload(value *types.Array) { eg.in_autoload = value }
-func (eg *ZendExecutorGlobals) GetAutoloadFunc() types.IFunction { return eg.autoload_func }
+func (eg *ZendExecutorGlobals) GetFakeScope() *types.ClassEntry      { return eg.fakeScope }
+func (eg *ZendExecutorGlobals) SetFakeScope(value *types.ClassEntry) { eg.fakeScope = value }
+func (eg *ZendExecutorGlobals) GetPrecision() int                    { return eg.precision }
+func (eg *ZendExecutorGlobals) SetPrecision(value int)               { eg.precision = value }
+func (eg *ZendExecutorGlobals) GetInAutoload() *types.Array          { return eg.inAutoload }
+func (eg *ZendExecutorGlobals) SetInAutoload(value *types.Array)     { eg.inAutoload = value }
+func (eg *ZendExecutorGlobals) GetAutoloadFunc() types.IFunction     { return eg.autoloadFunc }
 func (eg *ZendExecutorGlobals) SetAutoloadFunc(value types.IFunction) {
-	eg.autoload_func = value
+	eg.autoloadFunc = value
 }
-func (eg *ZendExecutorGlobals) GetFullTablesCleanup() bool    { return 0 }
-func (eg *ZendExecutorGlobals) GetNoExtensions() bool         { return eg.no_extensions }
-func (eg *ZendExecutorGlobals) SetNoExtensions(value bool)    { eg.no_extensions = value }
-func (eg *ZendExecutorGlobals) GetVmInterrupt() bool          { return eg.vm_interrupt }
-func (eg *ZendExecutorGlobals) SetVmInterrupt(value bool)     { eg.vm_interrupt = value }
-func (eg *ZendExecutorGlobals) GetTimedOut() bool             { return eg.timed_out }
-func (eg *ZendExecutorGlobals) SetTimedOut(value bool)        { eg.timed_out = value }
-func (eg *ZendExecutorGlobals) GetHardTimeout() ZendLong      { return eg.hard_timeout }
-func (eg *ZendExecutorGlobals) SetHardTimeout(value ZendLong) { eg.hard_timeout = value }
+func (eg *ZendExecutorGlobals) GetVmInterrupt() bool      { return eg.vmInterrupt }
+func (eg *ZendExecutorGlobals) SetVmInterrupt(value bool) { eg.vmInterrupt = value }
+func (eg *ZendExecutorGlobals) GetTimedOut() bool         { return eg.timedOut }
+func (eg *ZendExecutorGlobals) SetTimedOut(value bool)    { eg.timedOut = value }
+func (eg *ZendExecutorGlobals) GetHardTimeout() int       { return eg.hardTimeout }
+func (eg *ZendExecutorGlobals) SetHardTimeout(value int)  { eg.hardTimeout = value }
 func (eg *ZendExecutorGlobals) GetUserErrorHandlerErrorReporting() int {
-	return eg.user_error_handler_error_reporting
+	return eg.userErrorHandlerErrorReporting
 }
 func (eg *ZendExecutorGlobals) SetUserErrorHandlerErrorReporting(value int) {
-	eg.user_error_handler_error_reporting = value
+	eg.userErrorHandlerErrorReporting = value
 }
-func (eg *ZendExecutorGlobals) GetUserErrorHandler() *types.Zval { return &eg.user_error_handler }
+func (eg *ZendExecutorGlobals) GetUserErrorHandler() *types.Zval { return &eg.userErrorHandler }
 func (eg *ZendExecutorGlobals) SetUserErrorHandler(value types.Zval) {
-	eg.user_error_handler = value
+	eg.userErrorHandler = value
 }
 func (eg *ZendExecutorGlobals) GetUserExceptionHandler() *types.Zval {
-	return eg.user_exception_handler
+	return eg.userExceptionHandler
 }
 func (eg *ZendExecutorGlobals) SetUserExceptionHandler(value *types.Zval) {
-	eg.user_exception_handler = value
+	eg.userExceptionHandler = value
 }
 func (eg *ZendExecutorGlobals) GetUserErrorHandlersErrorReporting() ZendStack {
-	return eg.user_error_handlers_error_reporting
+	return eg.userErrorHandlersErrorReporting
 }
 func (eg *ZendExecutorGlobals) SetUserErrorHandlersErrorReporting(value ZendStack) {
-	eg.user_error_handlers_error_reporting = value
+	eg.userErrorHandlersErrorReporting = value
 }
-func (eg *ZendExecutorGlobals) GetUserErrorHandlers() *ZendStack { return eg.user_error_handlers }
+func (eg *ZendExecutorGlobals) GetUserErrorHandlers() *ZendStack { return eg.userErrorHandlers }
 func (eg *ZendExecutorGlobals) GetUserExceptionHandlers() *ZendStack {
-	return eg.user_exception_handlers
+	return eg.userExceptionHandlers
 }
-func (eg *ZendExecutorGlobals) GetErrorHandling() ZendErrorHandlingT { return eg.error_handling }
-func (eg *ZendExecutorGlobals) SetErrorHandling(value ZendErrorHandlingT) {
-	eg.error_handling = value
-}
-func (eg *ZendExecutorGlobals) GetExceptionClass() *types.ClassEntry { return eg.exception_class }
-func (eg *ZendExecutorGlobals) SetExceptionClass(value *types.ClassEntry) {
-	eg.exception_class = value
-}
-func (eg *ZendExecutorGlobals) GetTimeoutSeconds() ZendLong      { return eg.timeout_seconds }
-func (eg *ZendExecutorGlobals) SetTimeoutSeconds(value ZendLong) { eg.timeout_seconds = value }
-func (eg *ZendExecutorGlobals) GetLambdaCount() int              { return eg.lambda_count }
-func (eg *ZendExecutorGlobals) SetLambdaCount(value int)         { eg.lambda_count = value }
+func (eg *ZendExecutorGlobals) GetErrorHandling() ZendErrorHandlingT      { return eg.errorHandling }
+func (eg *ZendExecutorGlobals) SetErrorHandling(value ZendErrorHandlingT) { eg.errorHandling = value }
+func (eg *ZendExecutorGlobals) GetExceptionClass() *types.ClassEntry      { return eg.exceptionClass }
+func (eg *ZendExecutorGlobals) SetExceptionClass(value *types.ClassEntry) { eg.exceptionClass = value }
+func (eg *ZendExecutorGlobals) GetTimeoutSeconds() int                    { return eg.timeoutSeconds }
+func (eg *ZendExecutorGlobals) SetTimeoutSeconds(value int)               { eg.timeoutSeconds = value }
+func (eg *ZendExecutorGlobals) GetLambdaCount() int                       { return eg.lambdaCount }
+func (eg *ZendExecutorGlobals) SetLambdaCount(value int)                  { eg.lambdaCount = value }
 
 func (eg *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
-	return eg.error_reporting_ini_entry
+	return eg.errorReportingIniEntry
 }
 func (eg *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
-	eg.error_reporting_ini_entry = value
+	eg.errorReportingIniEntry = value
 }
 func (eg *ZendExecutorGlobals) GetException() *types.Object      { return eg.exception }
 func (eg *ZendExecutorGlobals) SetException(value *types.Object) { eg.exception = value }
-func (eg *ZendExecutorGlobals) GetPrevException() **types.Object { return eg.prev_exception }
+func (eg *ZendExecutorGlobals) GetPrevException() **types.Object { return eg.prevException }
 func (eg *ZendExecutorGlobals) SetPrevException(value **types.Object) {
-	eg.prev_exception = value
+	eg.prevException = value
 }
 func (eg *ZendExecutorGlobals) GetOplineBeforeException() *types.ZendOp {
-	return eg.opline_before_exception
+	return eg.oplineBeforeException
 }
 func (eg *ZendExecutorGlobals) SetOplineBeforeException(value *types.ZendOp) {
-	eg.opline_before_exception = value
+	eg.oplineBeforeException = value
 }
-func (eg *ZendExecutorGlobals) GetExceptionOp() *[3]types.ZendOp { return &eg.exception_op }
-func (eg *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry   { return eg.current_module }
+func (eg *ZendExecutorGlobals) GetExceptionOp() *[3]types.ZendOp { return &eg.exceptionOp }
+func (eg *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry   { return eg.currentModule }
 func (eg *ZendExecutorGlobals) SetCurrentModule(value *ModuleEntry) {
-	eg.current_module = value
+	eg.currentModule = value
 }
 func (eg *ZendExecutorGlobals) GetFlags() uint8                      { return eg.flags }
 func (eg *ZendExecutorGlobals) SetFlags(value uint8)                 { eg.flags = value }
-func (eg *ZendExecutorGlobals) GetAssertions() ZendLong              { return eg.assertions }
-func (eg *ZendExecutorGlobals) SetAssertions(value ZendLong)         { eg.assertions = value }
-func (eg *ZendExecutorGlobals) GetSavedFpuCwPtr() any                { return eg.saved_fpu_cw_ptr }
-func (eg *ZendExecutorGlobals) SetSavedFpuCwPtr(value any)           { eg.saved_fpu_cw_ptr = value }
+func (eg *ZendExecutorGlobals) GetAssertions() int                   { return eg.assertions }
+func (eg *ZendExecutorGlobals) SetAssertions(value int)              { eg.assertions = value }
 func (eg *ZendExecutorGlobals) GetTrampoline() types.IFunction       { return eg.trampoline }
 func (eg *ZendExecutorGlobals) SetTrampoline(value types.IFunction)  { eg.trampoline = value }
 func (eg *ZendExecutorGlobals) GetCallTrampolineOp() *types.ZendOp   { return eg.callTrampolineOp }
 func (eg *ZendExecutorGlobals) SetCallTrampolineOp(op *types.ZendOp) { eg.callTrampolineOp = op }
-func (eg *ZendExecutorGlobals) GetEachDeprecationThrown() bool {
-	return eg.each_deprecation_thrown
-}
-func (eg *ZendExecutorGlobals) SetEachDeprecationThrown(value bool) {
-	eg.each_deprecation_thrown = value
-}
-func (eg *ZendExecutorGlobals) GetWeakrefs() types.Array      { return eg.weakrefs }
-func (eg *ZendExecutorGlobals) SetWeakrefs(value types.Array) { eg.weakrefs = value }
-func (eg *ZendExecutorGlobals) GetExceptionIgnoreArgs() bool {
-	return eg.exception_ignore_args
-}
-func (eg *ZendExecutorGlobals) SetExceptionIgnoreArgs(value bool) {
-	eg.exception_ignore_args = value
-}
-func (eg *ZendExecutorGlobals) GetReserved() []any      { return eg.reserved }
-func (eg *ZendExecutorGlobals) SetReserved(value []any) { eg.reserved = value }
+func (eg *ZendExecutorGlobals) GetEachDeprecationThrown() bool       { return eg.eachDeprecationThrown }
+func (eg *ZendExecutorGlobals) SetEachDeprecationThrown(value bool)  { eg.eachDeprecationThrown = value }
+func (eg *ZendExecutorGlobals) GetExceptionIgnoreArgs() bool         { return eg.exceptionIgnoreArgs }
+func (eg *ZendExecutorGlobals) SetExceptionIgnoreArgs(value bool)    { eg.exceptionIgnoreArgs = value }
+func (eg *ZendExecutorGlobals) GetReserved() []any                   { return eg.reserved }
+func (eg *ZendExecutorGlobals) SetReserved(value []any)              { eg.reserved = value }
 
 /* ZendExecutorGlobals.flags */
 func (eg *ZendExecutorGlobals) AddFlags(value uint8)      { eg.flags |= value }

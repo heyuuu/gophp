@@ -202,7 +202,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 		IFreeCompiledVariables(executeData)
 
-		EG__().VmStack().PopCheck(executeData)
+		EG__().VmStackPopCheck(executeData)
 
 		executeData = executeData.GetPrevExecuteData()
 		if EG__().GetException() != nil {

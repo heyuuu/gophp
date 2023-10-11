@@ -159,9 +159,9 @@ func ZifStrncasecmp(str1 string, str2 string, len_ int) (int, bool) {
 
 //@zif -old "z/"
 func ZifEach(array zpp.RefZval) (*types.Array, bool) {
-	if EG__().GetEachDeprecationThrown() == 0 {
+	if !EG__().GetEachDeprecationThrown() {
 		faults.Error(faults.E_DEPRECATED, "The each() function is deprecated. This message will be suppressed on further calls")
-		EG__().SetEachDeprecationThrown(1)
+		EG__().SetEachDeprecationThrown(true)
 	}
 	targetHash := HASH_OF(array)
 	if targetHash == nil {

@@ -20,6 +20,6 @@ func ZendVmCalcUsedStack(numArgs uint32, func_ types.IFunction) uint32 {
 
 func ZendVmStackPushCallFrameEx(runtimeCacheSize uint32, callInfo uint32, func_ types.IFunction, numArgs uint32, objectOrCalledScope any) *ZendExecuteData {
 	var call = NewExecuteData(callInfo, func_, numArgs, objectOrCalledScope, runtimeCacheSize)
-	EG__().VmStack().Push(call)
+	EG__().VmStackPush(call)
 	return call
 }

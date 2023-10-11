@@ -39,3 +39,26 @@ func EachReserveEx[T any](slice []T, handler func(T) bool) {
 		}
 	}
 }
+
+func Pop[T any](slice []T) ([]T, T, bool) {
+	if len(slice) == 0 {
+		var tmp T
+		return slice, tmp, false
+	}
+
+	top := slice[len(slice)-1]
+	slice = slice[:len(slice)-1]
+	return slice, top, true
+}
+
+func PopPtr[T any](slicePtr *[]T) (T, bool) {
+	slice := *slicePtr
+	if len(slice) == 0 {
+		var tmp T
+		return tmp, false
+	}
+
+	top := slice[len(slice)-1]
+	*slicePtr = slice[:len(slice)-1]
+	return top, true
+}
