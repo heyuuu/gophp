@@ -10,12 +10,6 @@ import (
 type String string
 
 func NewString(str string) *String { tmp := String(str); return &tmp }
-func NewStringSafe(str *string) *String {
-	if str == nil {
-		return nil
-	}
-	return NewString(*str)
-}
 
 func (zs String) Copy() *String        { return &zs }
 func (zs String) GetStr() string       { return string(zs) }

@@ -1269,39 +1269,25 @@ func ZifStreamFilterRemove(executeData zpp.Ex, return_value zpp.Ret, streamFilte
 		return
 	}
 }
-func ZifStreamGetLine(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, maxlen *types.Zval, _ zpp.Opt, ending *types.Zval) {
+func ZifStreamGetLine(executeData zpp.Ex, return_value zpp.Ret, stream_ zpp.Resource, maxlen int, _ zpp.Opt, ending *string) {
 	var str *byte = nil
 	var str_len int = 0
-	var max_length zend.ZendLong
-	var zstream *types.Zval
-	var buf *types.String
-	var stream *core.PhpStream
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			zstream = fp.ParseResource()
-			max_length = fp.ParseLong()
-			fp.StartOptional()
-			str, str_len = fp.ParseString()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
+	if ending != nil {
+		str, str_len = b.CastStrPtr(*ending), len(*ending)
 	}
-	if max_length < 0 {
+
+	var stream *core.PhpStream
+	if maxlen < 0 {
 		core.PhpErrorDocref("", faults.E_WARNING, "The maximum allowed length must be greater than or equal to zero")
 		return_value.SetFalse()
 		return
 	}
-	if max_length == 0 {
-		max_length = core.PHP_SOCK_CHUNK_SIZE
+	if maxlen == 0 {
+		maxlen = core.PHP_SOCK_CHUNK_SIZE
 	}
-	core.PhpStreamFromZval(stream, zstream)
-	if lang.Assign(&buf, streams.PhpStreamGetRecord(stream, max_length, str, str_len)) {
-		return_value.SetStringEx(buf)
+	core.PhpStreamFromZval(stream, stream_)
+	if buf := streams.PhpStreamGetRecord(stream, maxlen, str, str_len); buf != nil {
+		return_value.SetString(*buf)
 		return
 	} else {
 		return_value.SetFalse()

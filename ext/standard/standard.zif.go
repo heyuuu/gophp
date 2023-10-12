@@ -3439,14 +3439,14 @@ var DefZifStreamFilterRemove = def.DefFunc("stream_filter_remove", 1, 1, []def.A
 // generate by ZifStreamGetLine
 var DefZifStreamGetLine = def.DefFunc("stream_get_line", 2, 3, []def.ArgInfo{{Name: "stream"}, {Name: "maxlen"}, {Name: "ending"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	stream := fp.ParseZval()
-	maxlen := fp.ParseZval()
+	stream_ := fp.ParseResource()
+	maxlen := fp.ParseLong()
 	fp.StartOptional()
 	ending := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifStreamGetLine(executeData, returnValue, stream, maxlen, nil, ending)
+	ZifStreamGetLine(executeData, returnValue, stream_, maxlen, nil, ending)
 })
 
 // generate by ZifStreamSetBlocking

@@ -159,7 +159,7 @@ func _phpStreamSearchDelim(stream *core.PhpStream, maxlen int, skiplen int, deli
 		return core.PhpMemnstr((*byte)(stream.GetReadbuf()[stream.GetReadpos()+skiplen]), delim, delim_len, (*byte)(stream.GetReadbuf()[stream.GetReadpos()+seek_len]))
 	}
 }
-func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_len int) *types.String {
+func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_len int) *string {
 	var ret_buf *types.String
 	var found_delim *byte = nil
 	var buffered_len int
@@ -245,7 +245,7 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 		stream.SetReadpos(stream.GetReadpos() + delim_len)
 		stream.SetPosition(stream.GetPosition() + delim_len)
 	}
-	return types.NewStringSafe(retStr)
+	return retStr
 }
 func PhpStreamWrapperSchemeValidate(protocol string) bool {
 	for _, c := range []byte(protocol) {
