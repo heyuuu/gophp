@@ -338,13 +338,13 @@ func (ag *ZendAutoGlobal) UpdateArmed() {
  * ZendLoopVar
  */
 type ZendLoopVar struct {
-	opcode           uint8
+	opcode           OpCode
 	var_type         uint8
 	var_num          uint32
 	try_catch_offset uint32
 }
 
-func MakeZendLoopVar(opcode uint8, var_type uint8, var_num uint32, try_catch_offset uint32) ZendLoopVar {
+func MakeZendLoopVar(opcode OpCode, var_type uint8, var_num uint32, try_catch_offset uint32) ZendLoopVar {
 	return ZendLoopVar{
 		opcode:           opcode,
 		var_type:         var_type,
@@ -352,8 +352,8 @@ func MakeZendLoopVar(opcode uint8, var_type uint8, var_num uint32, try_catch_off
 		try_catch_offset: try_catch_offset,
 	}
 }
-func (this *ZendLoopVar) GetOpcode() uint8               { return this.opcode }
-func (this *ZendLoopVar) SetOpcode(value uint8)          { this.opcode = value }
+func (this *ZendLoopVar) GetOpcode() OpCode              { return this.opcode }
+func (this *ZendLoopVar) SetOpcode(value OpCode)         { this.opcode = value }
 func (this *ZendLoopVar) GetVarType() uint8              { return this.var_type }
 func (this *ZendLoopVar) SetVarType(value uint8)         { this.var_type = value }
 func (this *ZendLoopVar) GetVarNum() uint32              { return this.var_num }

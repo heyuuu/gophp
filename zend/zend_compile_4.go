@@ -403,97 +403,82 @@ func (compiler *Compiler) CompileUnset(ast *ZendAst) {
 
 	}
 }
-func ZendHandleLoopsAndFinallyEx(depth ZendLong, return_value *Znode) int {
-	var base *ZendLoopVar
-	var loop_var *ZendLoopVar = CG__().GetLoopVarStack().Top()
-	if loop_var == nil {
-		return 1
+func ZendHandleLoopsAndFinallyEx(depth int, returnValue *Znode) bool {
+	if CG__().LoopVarStackDepth() == 0 {
+		return true
 	}
-	base = CG__().GetLoopVarStack().GetElements()
-	for ; loop_var >= base; loop_var-- {
-		if loop_var.GetOpcode() == ZEND_FAST_CALL {
+
+	CG__().LoopVarStackEach(func(loopVar *ZendLoopVar) bool {
+		if loopVar.GetOpcode() == ZEND_FAST_CALL {
 			var opline *types.ZendOp = GetNextOp()
 			opline.SetOpcode(ZEND_FAST_CALL)
 			opline.SetResultType(IS_TMP_VAR)
-			opline.GetResult().SetVar(loop_var.GetVarNum())
-			if return_value != nil {
-				opline.SetOp2Type(return_value.GetOpType())
-				if return_value.GetOpType() == IS_CONST {
-					opline.GetOp2().SetConstant(ZendAddLiteral(return_value.GetConstant()))
+			opline.GetResult().SetVar(loopVar.GetVarNum())
+			if returnValue != nil {
+				opline.SetOp2Type(returnValue.GetOpType())
+				if returnValue.GetOpType() == IS_CONST {
+					opline.GetOp2().SetConstant(ZendAddLiteral(returnValue.GetConstant()))
 				} else {
-					opline.SetOp2(return_value.GetOp())
+					opline.SetOp2(returnValue.GetOp())
 				}
 			}
-			opline.GetOp1().SetNum(loop_var.GetTryCatchOffset())
-		} else if loop_var.GetOpcode() == ZEND_DISCARD_EXCEPTION {
+			opline.GetOp1().SetNum(loopVar.GetTryCatchOffset())
+		} else if loopVar.GetOpcode() == ZEND_DISCARD_EXCEPTION {
 			var opline *types.ZendOp = GetNextOp()
 			opline.SetOpcode(ZEND_DISCARD_EXCEPTION)
 			opline.SetOp1Type(IS_TMP_VAR)
-			opline.GetOp1().SetVar(loop_var.GetVarNum())
-		} else if loop_var.GetOpcode() == ZEND_RETURN {
-
+			opline.GetOp1().SetVar(loopVar.GetVarNum())
+		} else if loopVar.GetOpcode() == ZEND_RETURN {
 			/* Stack separator */
+			return false
+		}
 
-			break
-
-			/* Stack separator */
-
-		} else if depth <= 1 {
-			return 1
-		} else if loop_var.GetOpcode() == ZEND_NOP {
-
+		depth--
+		if depth == 0 {
+			return false
+		}
+		if loopVar.GetOpcode() == ZEND_NOP {
 			/* Loop doesn't have freeable variable */
-
-			depth--
-
-			/* Loop doesn't have freeable variable */
-
 		} else {
 			var opline *types.ZendOp
-			b.Assert((loop_var.GetVarType() & (IS_VAR | IS_TMP_VAR)) != 0)
+			b.Assert((loopVar.GetVarType() & (IS_VAR | IS_TMP_VAR)) != 0)
 			opline = GetNextOp()
-			opline.SetOpcode(loop_var.GetOpcode())
-			opline.SetOp1Type(loop_var.GetVarType())
-			opline.GetOp1().SetVar(loop_var.GetVarNum())
+			opline.SetOpcode(loopVar.GetOpcode())
+			opline.SetOp1Type(loopVar.GetVarType())
+			opline.GetOp1().SetVar(loopVar.GetVarNum())
 			opline.SetExtendedValue(ZEND_FREE_ON_RETURN)
-			depth--
 		}
-	}
+		return true
+	})
 	return depth == 0
 }
-func ZendHandleLoopsAndFinally(return_value *Znode) int {
-	return ZendHandleLoopsAndFinallyEx(CG__().GetLoopVarStack().GetTop()+1, return_value)
+func ZendHandleLoopsAndFinally(return_value *Znode) bool {
+	return ZendHandleLoopsAndFinallyEx(CG__().LoopVarStackDepth(), return_value)
 }
-func ZendHasFinallyEx(depth ZendLong) int {
-	var base *ZendLoopVar
-	var loop_var *ZendLoopVar = CG__().GetLoopVarStack().Top()
-	if loop_var == nil {
-		return 0
-	}
-	base = CG__().GetLoopVarStack().GetElements()
-	for ; loop_var >= base; loop_var-- {
-		if loop_var.GetOpcode() == ZEND_FAST_CALL {
-			return 1
-		} else if loop_var.GetOpcode() == ZEND_DISCARD_EXCEPTION {
-
-		} else if loop_var.GetOpcode() == ZEND_RETURN {
-
+func ZendHasFinallyEx(depth ZendLong) bool {
+	result := false
+	CG__().LoopVarStackEach(func(loopVar *ZendLoopVar) bool {
+		switch loopVar.GetOpcode() {
+		case ZEND_FAST_CALL:
+			result = true
+			return false
+		case ZEND_DISCARD_EXCEPTION:
+			// pass
+		case ZEND_RETURN:
 			/* Stack separator */
-
-			return 0
-
-			/* Stack separator */
-
-		} else if depth <= 1 {
-			return 0
-		} else {
+			return false
+		default:
 			depth--
+			if depth <= 0 {
+				return false
+			}
 		}
-	}
-	return 0
+		return true
+	})
+	return result
 }
-func ZendHasFinally() int {
-	return ZendHasFinallyEx(CG__().GetLoopVarStack().GetTop() + 1)
+func ZendHasFinally() bool {
+	return ZendHasFinallyEx(CG__().LoopVarStackDepth())
 }
 func (compiler *Compiler) CompileReturn(ast *ZendAst) {
 	var expr_ast *ZendAst = ast.Child(0)
@@ -518,7 +503,7 @@ func (compiler *Compiler) CompileReturn(ast *ZendAst) {
 	} else {
 		compiler.CompileExpr(&expr_node, expr_ast)
 	}
-	if CG__().GetActiveOpArray().IsHasFinallyBlock() && (expr_node.GetOpType() == IS_CV || by_ref != 0 && expr_node.GetOpType() == IS_VAR) && ZendHasFinally() != 0 {
+	if CG__().GetActiveOpArray().IsHasFinallyBlock() && (expr_node.GetOpType() == IS_CV || by_ref != 0 && expr_node.GetOpType() == IS_VAR) && ZendHasFinally() {
 
 		/* Copy return value into temporary VAR to avoid modification in finally code */
 
@@ -582,7 +567,7 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 	if CG__().GetContext().GetCurrentBrkCont() == -1 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' not in the 'loop' or 'switch' context", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
 	} else {
-		if ZendHandleLoopsAndFinallyEx(depth, nil) == 0 {
+		if !ZendHandleLoopsAndFinallyEx(depth, nil) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot '%s' "+ZEND_LONG_FMT+" level%s", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"), depth, lang.Cond(depth == 1, "", "s"))
 		}
 	}

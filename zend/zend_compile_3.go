@@ -21,29 +21,21 @@ func (compiler *Compiler) CompileAssignRef(result *Znode, ast *ZendAst) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
 	ZendEnsureWritableVariable(target_ast)
-	offset = ZendDelayedCompileBegin()
-	compiler.DelayedCompileVar(&target_node, target_ast, BP_VAR_W, 1)
-	compiler.CompileVar(&source_node, source_ast, BP_VAR_W, 1)
-	if (target_ast.Kind() != ZEND_AST_VAR || target_ast.Child(0).Kind() != ZEND_AST_ZVAL) && source_node.GetOpType() != IS_CV {
 
-		/* Both LHS and RHS expressions may modify the same data structure,
-		 * and the modification during RHS evaluation may dangle the pointer
-		 * to the result of the LHS evaluation.
-		 * Use MAKE_REF instruction to replace direct pointer with REFERENCE.
-		 * See: Bug #71539
-		 */
+	opline = ZendDelayedCompileBlock(func() {
+		compiler.DelayedCompileVar(&target_node, target_ast, BP_VAR_W, 1)
+		compiler.CompileVar(&source_node, source_ast, BP_VAR_W, 1)
+		if (target_ast.Kind() != ZEND_AST_VAR || target_ast.Child(0).Kind() != ZEND_AST_ZVAL) && source_node.GetOpType() != IS_CV {
+			/* Both LHS and RHS expressions may modify the same data structure,
+			 * and the modification during RHS evaluation may dangle the pointer
+			 * to the result of the LHS evaluation.
+			 * Use MAKE_REF instruction to replace direct pointer with REFERENCE.
+			 * See: Bug #71539
+			 */
+			ZendEmitOp(&source_node, ZEND_MAKE_REF, &source_node, nil)
+		}
+	})
 
-		ZendEmitOp(&source_node, ZEND_MAKE_REF, &source_node, nil)
-
-		/* Both LHS and RHS expressions may modify the same data structure,
-		 * and the modification during RHS evaluation may dangle the pointer
-		 * to the result of the LHS evaluation.
-		 * Use MAKE_REF instruction to replace direct pointer with REFERENCE.
-		 * See: Bug #71539
-		 */
-
-	}
-	opline = ZendDelayedCompileEnd(offset)
 	if source_node.GetOpType() != IS_VAR && ZendIsCall(source_ast) != 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use result of built-in function in write context")
 	}
@@ -87,18 +79,18 @@ func (compiler *Compiler) CompileCompoundAssign(result *Znode, ast *ZendAst) {
 	ZendEnsureWritableVariable(var_ast)
 	switch var_ast.Kind() {
 	case ZEND_AST_VAR:
-		offset = ZendDelayedCompileBegin()
-		compiler.DelayedCompileVar(&var_node, var_ast, BP_VAR_RW, 0)
-		compiler.CompileExpr(&expr_node, expr_ast)
-		ZendDelayedCompileEnd(offset)
+		ZendDelayedCompileBlock(func() {
+			compiler.DelayedCompileVar(&var_node, var_ast, BP_VAR_RW, 0)
+			compiler.CompileExpr(&expr_node, expr_ast)
+		})
 		opline = ZendEmitOp(result, ZEND_ASSIGN_OP, &var_node, &expr_node)
 		opline.SetExtendedValue(opcode)
 		return
 	case ZEND_AST_STATIC_PROP:
-		offset = ZendDelayedCompileBegin()
-		compiler.DelayedCompileVar(result, var_ast, BP_VAR_RW, 0)
-		compiler.CompileExpr(&expr_node, expr_ast)
-		opline = ZendDelayedCompileEnd(offset)
+		opline = ZendDelayedCompileBlock(func() {
+			compiler.DelayedCompileVar(result, var_ast, BP_VAR_RW, 0)
+			compiler.CompileExpr(&expr_node, expr_ast)
+		})
 		cache_slot = opline.GetExtendedValue()
 		opline.SetOpcode(ZEND_ASSIGN_STATIC_PROP_OP)
 		opline.SetExtendedValue(opcode)
@@ -106,19 +98,19 @@ func (compiler *Compiler) CompileCompoundAssign(result *Znode, ast *ZendAst) {
 		opline.SetExtendedValue(cache_slot)
 		return
 	case ZEND_AST_DIM:
-		offset = ZendDelayedCompileBegin()
-		compiler.DelayedCompileDim(result, var_ast, BP_VAR_RW)
-		compiler.CompileExpr(&expr_node, expr_ast)
-		opline = ZendDelayedCompileEnd(offset)
+		opline = ZendDelayedCompileBlock(func() {
+			compiler.DelayedCompileDim(result, var_ast, BP_VAR_RW)
+			compiler.CompileExpr(&expr_node, expr_ast)
+		})
 		opline.SetOpcode(ZEND_ASSIGN_DIM_OP)
 		opline.SetExtendedValue(opcode)
 		ZendEmitOpData(&expr_node)
 		return
 	case ZEND_AST_PROP:
-		offset = ZendDelayedCompileBegin()
-		compiler.DelayedCompileProp(result, var_ast, BP_VAR_RW)
-		compiler.CompileExpr(&expr_node, expr_ast)
-		opline = ZendDelayedCompileEnd(offset)
+		opline = ZendDelayedCompileBlock(func() {
+			compiler.DelayedCompileProp(result, var_ast, BP_VAR_RW)
+			compiler.CompileExpr(&expr_node, expr_ast)
+		})
 		cache_slot = opline.GetExtendedValue()
 		opline.SetOpcode(ZEND_ASSIGN_OBJ_OP)
 		opline.SetExtendedValue(opcode)

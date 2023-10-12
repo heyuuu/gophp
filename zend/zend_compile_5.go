@@ -265,7 +265,7 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 		fast_call.SetVarType(IS_TMP_VAR)
 		fast_call.SetVarNum(CG__().GetContext().GetFastCallVar())
 		fast_call.SetTryCatchOffset(try_catch_offset)
-		CG__().GetLoopVarStack().Push(&fast_call)
+		CG__().LoopVarStackPush(&fast_call)
 	}
 	CG__().GetContext().SetTryCatchOffset(try_catch_offset)
 	compiler.CompileStmt(try_ast)
@@ -334,14 +334,14 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 
 		/* Pop FAST_CALL from unwind stack */
 
-		CG__().GetLoopVarStack().DelTop()
+		CG__().LoopVarStackPop()
 
 		/* Push DISCARD_EXCEPTION on unwind stack */
 
 		discard_exception.SetOpcode(ZEND_DISCARD_EXCEPTION)
 		discard_exception.SetVarType(IS_TMP_VAR)
 		discard_exception.SetVarNum(CG__().GetContext().GetFastCallVar())
-		CG__().GetLoopVarStack().Push(&discard_exception)
+		CG__().LoopVarStackPush(&discard_exception)
 		compiler.setLinenoByAst(finally_ast)
 		opline = ZendEmitOp(nil, ZEND_FAST_CALL, nil, nil)
 		opline.GetOp1().SetNum(try_catch_offset)
@@ -359,11 +359,7 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 		CG__().GetContext().SetFastCallVar(orig_fast_call_var)
 
 		/* Pop DISCARD_EXCEPTION from unwind stack */
-
-		CG__().GetLoopVarStack().DelTop()
-
-		/* Pop DISCARD_EXCEPTION from unwind stack */
-
+		CG__().LoopVarStackPop()
 	}
 	CG__().GetContext().SetTryCatchOffset(orig_try_catch_offset)
 	Efree(jmp_opnums)

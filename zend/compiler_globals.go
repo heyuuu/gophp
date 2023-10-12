@@ -1,12 +1,20 @@
 package zend
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/kits/slicekit"
+	"github.com/heyuuu/gophp/php/contracts"
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/zend/faults"
+)
 
-/**
- * ZendCompilerGlobals
- */
+var CompilerGlobals ZendCompilerGlobals
+
+func CG__() *ZendCompilerGlobals { return &CompilerGlobals }
+
+// ZendCompilerGlobals
 type ZendCompilerGlobals struct {
-	loop_var_stack     ZendStack
+	loopVarStack       []*ZendLoopVar
 	active_class_entry *types.ClassEntry
 	compiled_filename  string
 	zend_lineno        int
@@ -31,7 +39,7 @@ type ZendCompilerGlobals struct {
 	context                      ZendOparrayContext
 	file_context                 ZendFileContext
 	ast                          *ZendAst
-	delayed_oplines_stack        ZendStack
+	delayedOplinesStack          []*types.ZendOp
 	memoized_exprs               *types.Array
 	memoize_mode                 int
 	map_ptr_base                 any
@@ -42,16 +50,58 @@ type ZendCompilerGlobals struct {
 	rtd_key_counter              uint32
 }
 
-func (cg *ZendCompilerGlobals) InitTables() {
+// life cycle
+var _ contracts.ModuleLifeCycle = (*ZendCompilerGlobals)(nil)
+
+func (cg *ZendCompilerGlobals) StartUp() {
 	cg.functionTable = types.NewLcTable[types.IFunction](nil)
 	cg.classTable = types.NewLcTable[*types.ClassEntry](nil)
 	cg.autoGlobals = make(map[string]*ZendAutoGlobal)
 }
 
-func (cg *ZendCompilerGlobals) DestroyTables() {
+func (cg *ZendCompilerGlobals) Shutdown() {
 	cg.functionTable.Destroy()
 	cg.classTable.Destroy()
 	cg.autoGlobals = nil
+}
+
+func (cg *ZendCompilerGlobals) Activate() {
+	cg.active_op_array = nil
+	cg.context = ZendOparrayContext{}
+
+	// ZendInitCompilerDataStructures
+	cg.loopVarStack = nil
+	cg.delayedOplinesStack = nil
+	cg.active_class_entry = nil
+	cg.in_compilation = false
+	cg.skip_shebang = false
+	cg.memoized_exprs = nil
+	cg.memoize_mode = 0
+
+	// ZendInitRsrcList
+	EG__().InitRegularList()
+
+	cg.filenamesTable = make(map[string]string)
+	cg.open_files.Init(b.SizeOf("zend_file_handle"), (func(any))(FileHandleDtor), 0)
+	cg.unclean_shutdown = false
+	cg.delayed_variance_obligations = nil
+	cg.delayed_autoloads = nil
+}
+
+func (cg *ZendCompilerGlobals) Deactivate() {
+	faults.Try(func() {
+		cg.loopVarStack = nil
+		cg.delayedOplinesStack = nil
+		cg.filenamesTable = nil
+		if cg.delayed_variance_obligations != nil {
+			cg.delayed_variance_obligations.Destroy()
+			cg.delayed_variance_obligations = nil
+		}
+		if cg.delayed_autoloads != nil {
+			cg.delayed_autoloads.Destroy()
+			cg.delayed_autoloads = nil
+		}
+	})
 }
 
 // class table
@@ -87,9 +137,42 @@ func (cg *ZendCompilerGlobals) EachAutoGlobal(fn func(*ZendAutoGlobal)) {
 	}
 }
 
+// stack
+func (cg *ZendCompilerGlobals) LoopVarStackPush(loopVar *ZendLoopVar) {
+	slicekit.Push(&cg.loopVarStack, loopVar)
+}
+func (cg *ZendCompilerGlobals) LoopVarStackPop() {
+	slicekit.Pop(&cg.loopVarStack)
+}
+func (cg *ZendCompilerGlobals) LoopVarStackTop() *ZendLoopVar {
+	loopVar, _ := slicekit.Last(&cg.loopVarStack)
+	return loopVar
+}
+func (cg *ZendCompilerGlobals) LoopVarStackEach(f func(*ZendLoopVar) bool) {
+	slicekit.EachReserveEx(cg.loopVarStack, f)
+}
+func (cg *ZendCompilerGlobals) LoopVarStackDepth() int {
+	return len(cg.loopVarStack)
+}
+
+func (cg *ZendCompilerGlobals) DelayedOplinesStackPush(opline *types.ZendOp) {
+	slicekit.Push(&cg.delayedOplinesStack, opline)
+}
+func (cg *ZendCompilerGlobals) DelayedOplinesStackTop() *types.ZendOp {
+	opline, _ := slicekit.Last(&cg.delayedOplinesStack)
+	return opline
+}
+func (cg *ZendCompilerGlobals) DelayedOplinesStackDepth() int {
+	return len(cg.delayedOplinesStack)
+}
+func (cg *ZendCompilerGlobals) DelayedOplinesStackCut(offset int) []*types.ZendOp {
+	b.Assert(offset < len(cg.delayedOplinesStack))
+	ret := cg.delayedOplinesStack[offset:]
+	cg.delayedOplinesStack = cg.delayedOplinesStack[:offset]
+	return ret
+}
+
 // getter/setter
-func (cg *ZendCompilerGlobals) GetLoopVarStack() ZendStack      { return cg.loop_var_stack }
-func (cg *ZendCompilerGlobals) SetLoopVarStack(value ZendStack) { cg.loop_var_stack = value }
 func (cg *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
 	return cg.active_class_entry
 }
@@ -148,13 +231,7 @@ func (cg *ZendCompilerGlobals) GetFileContext() *ZendFileContext     { return &c
 func (cg *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { cg.file_context = value }
 func (cg *ZendCompilerGlobals) GetAst() *ZendAst                     { return cg.ast }
 func (cg *ZendCompilerGlobals) SetAst(value *ZendAst)                { cg.ast = value }
-func (cg *ZendCompilerGlobals) GetDelayedOplinesStack() ZendStack {
-	return cg.delayed_oplines_stack
-}
-func (cg *ZendCompilerGlobals) SetDelayedOplinesStack(value ZendStack) {
-	cg.delayed_oplines_stack = value
-}
-func (cg *ZendCompilerGlobals) GetMemoizedExprs() *types.Array { return cg.memoized_exprs }
+func (cg *ZendCompilerGlobals) GetMemoizedExprs() *types.Array       { return cg.memoized_exprs }
 func (cg *ZendCompilerGlobals) SetMemoizedExprs(value *types.Array) {
 	cg.memoized_exprs = value
 }
@@ -195,4 +272,37 @@ func (cg *ZendCompilerGlobals) SwitchExtraFnFlags(value uint32, cond bool) {
 	} else {
 		cg.SubExtraFnFlags(value)
 	}
+}
+
+//
+type CGBackupStack struct {
+	activeClassEntry    *types.ClassEntry
+	loopVarStack        []*ZendLoopVar
+	delayedOplinesStack []*types.ZendOp
+}
+
+func (cg *ZendCompilerGlobals) BackupStack() (backup *CGBackupStack) {
+	if !cg.in_compilation {
+		backup = &CGBackupStack{
+			activeClassEntry:    cg.active_class_entry,
+			loopVarStack:        cg.loopVarStack,
+			delayedOplinesStack: cg.delayedOplinesStack,
+		}
+
+		cg.in_compilation = false
+		cg.active_class_entry = nil
+		cg.loopVarStack = nil
+		cg.delayedOplinesStack = nil
+	}
+	return
+}
+func (cg *ZendCompilerGlobals) RestorePostError(backup *CGBackupStack) {
+	if backup == nil {
+		return
+	}
+
+	cg.in_compilation = true
+	cg.active_class_entry = backup.activeClassEntry
+	cg.loopVarStack = backup.loopVarStack
+	cg.delayedOplinesStack = backup.delayedOplinesStack
 }

@@ -2,7 +2,6 @@ package zend
 
 import "github.com/heyuuu/gophp/php/types"
 
-func CG__() *ZendCompilerGlobals          { return &CompilerGlobals }
 func INI_SCNG__() *ZendIniScannerGlobals  { return &IniScannerGlobals }
 func LANG_SCNG__() *ZendPhpScannerGlobals { return &LanguageScannerGlobals }
 func FC__() *ZendFileContext              { return CG__().GetFileContext() }

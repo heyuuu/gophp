@@ -247,7 +247,7 @@ func ZendStartup() int {
 
 	ZendVersionInfo = ZEND_CORE_VERSION_INFO
 
-	CG__().InitTables()
+	CG__().StartUp()
 	EG__().StartUp()
 
 	ZendInitRsrcListDtors()
@@ -300,7 +300,7 @@ func ZendShutdown() {
 	VirtualCwdDeactivate()
 	VirtualCwdShutdown()
 
-	CG__().DestroyTables()
+	CG__().Shutdown()
 	EG__().Shutdown()
 
 	ZendMapPtrShutdown()
@@ -318,8 +318,7 @@ func Zenderror(error *byte) {
 func GetZendVersion() string { return ZendVersionInfo }
 
 func ZendActivate() {
-	//GcReset()
-	InitCompiler()
+	CG__().Activate()
 	EG__().Activate()
 	StartupScanner()
 	ZendMapPtrActivate()
@@ -332,15 +331,10 @@ func ZendCallDestructors() {
 func ZendDeactivate() {
 	/* we're no longer executing anything */
 	EG__().SetCurrentExecuteData(nil)
-
 	faults.Try(func() { ShutdownScanner() })
-
-	/* shutdown_executor() takes care of its own bailout handling */
 	EG__().Deactivate()
-
 	faults.Try(func() { ZendIniDeactivate() })
-	faults.Try(func() { ShutdownCompiler() })
-
+	CG__().Deactivate()
 	EG__().RegularList().DestroyReverse()
 }
 func ZendMessageDispatcher(message ZendLong, data any) {
@@ -353,22 +347,6 @@ func ZendGetConfigurationDirective(name *types.String) *types.Zval {
 		return ZendGetConfigurationDirectiveP(name.GetStr())
 	} else {
 		return nil
-	}
-}
-func SAVE_STACK(stack ZendStack) {
-	if CG__().stack.top {
-		memcpy(&stack, CG__().stack, b.SizeOf("zend_stack"))
-		CG__().stack.max = 0
-		CG__().stack.top = CG__().stack.max
-		CG__().stack.elements = nil
-	} else {
-		stack.SetTop(0)
-	}
-}
-func RESTORE_STACK(stack ZendStack) {
-	if stack.GetTop() != 0 {
-		ZendStackDestroy(CG__().stack)
-		memcpy(CG__().stack, &stack, b.SizeOf("zend_stack"))
 	}
 }
 func ZendUserExceptionHandler() {

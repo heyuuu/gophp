@@ -267,7 +267,6 @@ const ZEND_COMPILE_DEFAULT = ZEND_COMPILE_HANDLE_OP_ARRAY
 
 const ZEND_COMPILE_DEFAULT_FOR_EVAL = 0
 
-var CompilerGlobals ZendCompilerGlobals
 var reservedClassNames = map[string]bool{
 	"bool":     true,
 	"false":    true,

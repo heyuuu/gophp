@@ -55,3 +55,14 @@ func Pop[T any](slicePtr *[]T) (T, bool) {
 	*slicePtr = slice[:len(slice)-1]
 	return top, true
 }
+
+func Last[T any](slicePtr *[]T) (T, bool) {
+	slice := *slicePtr
+	if len(slice) == 0 {
+		var tmp T
+		return tmp, false
+	}
+
+	top := slice[len(slice)-1]
+	return top, true
+}

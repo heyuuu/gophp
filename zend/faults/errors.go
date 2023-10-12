@@ -115,10 +115,8 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 
 			var retval types.Zval
 			var orig_user_error_handler types.Zval
-			var saved_class_entry *types.ClassEntry
-			var loop_var_stack zend.ZendStack[any]
-			var delayed_oplines_stack zend.ZendStack[any]
 			var orig_fake_scope *types.ClassEntry
+			var cgBackup *zend.CGBackupStack
 
 			types.ZVAL_COPY_VALUE(&orig_user_error_handler, zend.EG__().GetUserErrorHandler())
 			zend.EG__().GetUserErrorHandler().SetUndef()
@@ -128,14 +126,7 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 			 * such scripts recursively, but some CG() variables may be
 			 * inconsistent. */
 
-			in_compilation := zend.CG__().GetInCompilation()
-			if in_compilation != 0 {
-				saved_class_entry = zend.CG__().GetActiveClassEntry()
-				zend.CG__().SetActiveClassEntry(nil)
-				zend.SAVE_STACK(loop_var_stack)
-				zend.SAVE_STACK(delayed_oplines_stack)
-				zend.CG__().SetInCompilation(0)
-			}
+			cgBackup = zend.CG__().BackupStack()
 			orig_fake_scope = zend.EG__().GetFakeScope()
 			zend.EG__().SetFakeScope(nil)
 			if zend.CallUserFunction(nil, &orig_user_error_handler, &retval, 5, params[:]) == types.SUCCESS {
@@ -150,15 +141,8 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 				errorCb(typ, errorFilename, errorLineno, message)
 			}
 			zend.EG__().SetFakeScope(orig_fake_scope)
-			if in_compilation != 0 {
-				zend.CG__().SetActiveClassEntry(saved_class_entry)
-				zend.RESTORE_STACK(loop_var_stack)
-				zend.RESTORE_STACK(delayed_oplines_stack)
-				zend.CG__().SetInCompilation(1)
-			}
-			// zend.ZvalPtrDtor(&params[4])
-			// zend.ZvalPtrDtor(&params[2])
-			// zend.ZvalPtrDtor(&params[1])
+			zend.CG__().RestorePostError(cgBackup)
+
 			if zend.EG__().GetUserErrorHandler().IsUndef() {
 				types.ZVAL_COPY_VALUE(zend.EG__().GetUserErrorHandler(), &orig_user_error_handler)
 			} else {

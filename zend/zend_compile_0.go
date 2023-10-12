@@ -197,15 +197,6 @@ func ZendFileContextEnd(prevContext *ZendFileContext) {
 	CG__().SetFileContext(*prevContext)
 }
 
-func ZendInitCompilerDataStructures() {
-	CG__().GetLoopVarStack().Init()
-	CG__().GetDelayedOplinesStack().Init()
-	CG__().SetActiveClassEntry(nil)
-	CG__().SetInCompilation(0)
-	CG__().SetSkipShebang(0)
-	CG__().SetMemoizedExprs(nil)
-	CG__().SetMemoizeMode(0)
-}
 func ZendRegisterSeenSymbol(name *types.String, kind uint32) {
 	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
 	if zv != nil {
@@ -221,30 +212,6 @@ func ZendHaveSeenSymbol(name string, kind uint32) bool {
 	return zv != nil && (zv.Long()&kind) != 0
 }
 func FileHandleDtor(fh *FileHandle) { fh.Destroy() }
-func InitCompiler() {
-	CG__().SetActiveOpArray(nil)
-	memset(CG__().GetContext(), 0, b.SizeOf("CG ( context )"))
-	ZendInitCompilerDataStructures()
-	ZendInitRsrcList()
-	CG__().filenamesTable = make(map[string]string)
-	CG__().GetOpenFiles().Init(b.SizeOf("zend_file_handle"), (func(any))(FileHandleDtor), 0)
-	CG__().SetUncleanShutdown(0)
-	CG__().SetDelayedVarianceObligations(nil)
-	CG__().SetDelayedAutoloads(nil)
-}
-func ShutdownCompiler() {
-	CG__().GetLoopVarStack().Destroy()
-	CG__().GetDelayedOplinesStack().Destroy()
-	CG__().filenamesTable = nil
-	if CG__().GetDelayedVarianceObligations() != nil {
-		CG__().GetDelayedVarianceObligations().Destroy()
-		CG__().SetDelayedVarianceObligations(nil)
-	}
-	if CG__().GetDelayedAutoloads() != nil {
-		CG__().GetDelayedAutoloads().Destroy()
-		CG__().SetDelayedAutoloads(nil)
-	}
-}
 func ZendSetCompiledFilename(new_compiled_filename string) {
 	if _, ok := CG__().filenamesTable[new_compiled_filename]; !ok {
 		CG__().filenamesTable[new_compiled_filename] = new_compiled_filename
@@ -378,7 +345,7 @@ func ZendBeginLoop(free_opcode uint8, loop_var *Znode, is_switch bool) {
 		 * We won't try to free something of we don't have loop variable.  */
 
 	}
-	CG__().GetLoopVarStack().Push(&info)
+	CG__().LoopVarStackPush(&info)
 }
 func ZendEndLoop(cont_addr int, var_node *Znode) {
 	var end uint32 = GetNextOpNumber()
@@ -386,7 +353,7 @@ func ZendEndLoop(cont_addr int, var_node *Znode) {
 	brk_cont_element.SetCont(cont_addr)
 	brk_cont_element.SetBrk(end)
 	CG__().GetContext().SetCurrentBrkCont(brk_cont_element.GetParent())
-	CG__().GetLoopVarStack().DelTop()
+	CG__().LoopVarStackPop()
 }
 func ZendDoFree(op1 *Znode) {
 	if op1.GetOpType() == IS_TMP_VAR {

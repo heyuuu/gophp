@@ -183,27 +183,24 @@ func ZendDelayedEmitOp(result *Znode, opcode OpCode, op1 *Znode, op2 *Znode) *ty
 		}
 	}
 	if result != nil {
-		ZendMakeVarResult(result, &tmp_opline)
+		ZendMakeVarResult(result, tmp_opline)
 	}
-	CG__().GetDelayedOplinesStack().Push(&tmp_opline)
-	return CG__().GetDelayedOplinesStack().Top()
+	CG__().DelayedOplinesStackPush(tmp_opline)
+	return CG__().DelayedOplinesStackTop()
 }
-func ZendDelayedCompileBegin() uint32 {
-	return CG__().GetDelayedOplinesStack().GetTop()
-}
-func ZendDelayedCompileEnd(offset uint32) *types.ZendOp {
+
+func ZendDelayedCompileBlock(block func()) *types.ZendOp {
+	offset := CG__().DelayedOplinesStackDepth()
+
+	block()
+
 	var opline *types.ZendOp = nil
-	var oplines *types.ZendOp = CG__().GetDelayedOplinesStack().GetElements()
-	var i uint32
-	var count uint32 = CG__().GetDelayedOplinesStack().GetTop()
-	b.Assert(count >= offset)
-	for i = offset; i < count; i++ {
-		opline = GetNextOp()
-		memcpy(opline, &oplines[i], b.SizeOf("zend_op"))
+	for _, delayedOpline := range CG__().DelayedOplinesStackCut(offset) {
+		*opline = *delayedOpline
 	}
-	CG__().GetDelayedOplinesStack().SetTop(offset)
 	return opline
 }
+
 func (compiler *Compiler) CompileMemoizedExpr(result *Znode, expr *ZendAst) {
 	var memoize_mode int = CG__().GetMemoizeMode()
 	if memoize_mode == ZEND_MEMOIZE_COMPILE {
@@ -521,9 +518,9 @@ func (compiler *Compiler) DelayedCompileDim(result *Znode, ast *ZendAst, type_ u
 	return opline
 }
 func (compiler *Compiler) CompileDim(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
-	var offset uint32 = ZendDelayedCompileBegin()
-	compiler.DelayedCompileDim(result, ast, type_)
-	return ZendDelayedCompileEnd(offset)
+	return ZendDelayedCompileBlock(func() {
+		compiler.DelayedCompileDim(result, ast, type_)
+	})
 }
 func (compiler *Compiler) DelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *types.ZendOp {
 	var obj_ast *ZendAst = ast.Child(0)
@@ -551,12 +548,12 @@ func (compiler *Compiler) DelayedCompileProp(result *Znode, ast *ZendAst, type_ 
 	return opline
 }
 func (compiler *Compiler) CompileProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *types.ZendOp {
-	var offset uint32 = ZendDelayedCompileBegin()
-	var opline *types.ZendOp = compiler.DelayedCompileProp(result, ast, type_)
-	if by_ref != 0 {
-		opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_FETCH_REF)
-	}
-	return ZendDelayedCompileEnd(offset)
+	return ZendDelayedCompileBlock(func() {
+		var opline *types.ZendOp = compiler.DelayedCompileProp(result, ast, type_)
+		if by_ref != 0 {
+			opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_FETCH_REF)
+		}
+	})
 }
 func (compiler *Compiler) CompileStaticProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int, delayed int) *types.ZendOp {
 	var class_ast *ZendAst = ast.Child(0)
@@ -733,45 +730,43 @@ func (compiler *Compiler) CompileAssign(result *Znode, ast *ZendAst) {
 	ZendEnsureWritableVariable(var_ast)
 	switch var_ast.Kind() {
 	case ZEND_AST_VAR:
-		offset = ZendDelayedCompileBegin()
-		compiler.DelayedCompileVar(&var_node, var_ast, BP_VAR_W, 0)
-		compiler.CompileExpr(&expr_node, expr_ast)
-		ZendDelayedCompileEnd(offset)
+		ZendDelayedCompileBlock(func() {
+			compiler.DelayedCompileVar(&var_node, var_ast, BP_VAR_W, 0)
+			compiler.CompileExpr(&expr_node, expr_ast)
+		})
 		ZendEmitOp(result, ZEND_ASSIGN, &var_node, &expr_node)
 		return
 	case ZEND_AST_STATIC_PROP:
-		offset = ZendDelayedCompileBegin()
-		compiler.DelayedCompileVar(result, var_ast, BP_VAR_W, 0)
-		compiler.CompileExpr(&expr_node, expr_ast)
-		opline = ZendDelayedCompileEnd(offset)
+		opline = ZendDelayedCompileBlock(func() {
+			compiler.DelayedCompileVar(result, var_ast, BP_VAR_W, 0)
+			compiler.CompileExpr(&expr_node, expr_ast)
+		})
 		opline.SetOpcode(ZEND_ASSIGN_STATIC_PROP)
 		ZendEmitOpData(&expr_node)
 		return
 	case ZEND_AST_DIM:
-		offset = ZendDelayedCompileBegin()
-		compiler.DelayedCompileDim(result, var_ast, BP_VAR_W)
-		if ZendIsAssignToSelf(var_ast, expr_ast) != 0 && !IsThisFetch(expr_ast) {
-
-			/* $a[0] = $a should evaluate the right $a first */
-
-			var cv_node Znode
-			if ZendTryCompileCv(&cv_node, expr_ast) == types.FAILURE {
-				compiler.CompileSimpleVarNoCv(&expr_node, expr_ast, BP_VAR_R, 0)
+		opline = ZendDelayedCompileBlock(func() {
+			compiler.DelayedCompileDim(result, var_ast, BP_VAR_W)
+			if ZendIsAssignToSelf(var_ast, expr_ast) != 0 && !IsThisFetch(expr_ast) {
+				/* $a[0] = $a should evaluate the right $a first */
+				var cv_node Znode
+				if ZendTryCompileCv(&cv_node, expr_ast) == types.FAILURE {
+					compiler.CompileSimpleVarNoCv(&expr_node, expr_ast, BP_VAR_R, 0)
+				} else {
+					ZendEmitOpTmp(&expr_node, ZEND_QM_ASSIGN, &cv_node, nil)
+				}
 			} else {
-				ZendEmitOpTmp(&expr_node, ZEND_QM_ASSIGN, &cv_node, nil)
+				compiler.CompileExpr(&expr_node, expr_ast)
 			}
-		} else {
-			compiler.CompileExpr(&expr_node, expr_ast)
-		}
-		opline = ZendDelayedCompileEnd(offset)
+		})
 		opline.SetOpcode(ZEND_ASSIGN_DIM)
 		opline = ZendEmitOpData(&expr_node)
 		return
 	case ZEND_AST_PROP:
-		offset = ZendDelayedCompileBegin()
-		compiler.DelayedCompileProp(result, var_ast, BP_VAR_W)
-		compiler.CompileExpr(&expr_node, expr_ast)
-		opline = ZendDelayedCompileEnd(offset)
+		opline = ZendDelayedCompileBlock(func() {
+			compiler.DelayedCompileProp(result, var_ast, BP_VAR_W)
+			compiler.CompileExpr(&expr_node, expr_ast)
+		})
 		opline.SetOpcode(ZEND_ASSIGN_OBJ)
 		ZendEmitOpData(&expr_node)
 		return

@@ -109,10 +109,6 @@ func PlistEntryDtor(res *types.Resource) {
 	}
 	Free(res)
 }
-func ZendInitRsrcList() int {
-	EG__().InitRegularList()
-	return types.SUCCESS
-}
 func ZendInitRsrcPlist() int {
 	EG__().InitPersistentList()
 	return types.SUCCESS

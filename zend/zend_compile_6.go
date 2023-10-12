@@ -430,7 +430,7 @@ func (compiler *Compiler) CompileFuncDecl(result *Znode, ast *ZendAst, toplevel 
 
 	var dummy_var ZendLoopVar
 	dummy_var.SetOpcode(ZEND_RETURN)
-	CG__().GetLoopVarStack().Push(any(&dummy_var))
+	CG__().LoopVarStackPush(&dummy_var)
 	compiler.CompileParams(params_ast, return_type_ast)
 	if CG__().GetActiveOpArray().IsGenerator() {
 		ZendMarkFunctionAsGenerator()
@@ -456,8 +456,7 @@ func (compiler *Compiler) CompileFuncDecl(result *Znode, ast *ZendAst, toplevel 
 	ZendOparrayContextEnd(&orig_oparray_context)
 
 	/* Pop the loop variable stack separator */
-
-	CG__().GetLoopVarStack().DelTop()
+	CG__().LoopVarStackPop()
 	CG__().SetActiveOpArray(orig_op_array)
 	CG__().SetActiveClassEntry(orig_class_entry)
 }
