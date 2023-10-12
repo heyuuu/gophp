@@ -239,140 +239,44 @@ func ZifIsArray(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 func ZifIsObject(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IsObject)
 }
-func ZifIsNumeric(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
-	var arg *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	switch arg.Type() {
-	case types.IsLong:
-		fallthrough
-	case types.IsDouble:
-		return_value.SetTrue()
-		return
+func ZifIsNumeric(value *types.Zval) bool {
+	switch value.Type() {
+	case types.IsLong, types.IsDouble:
+		return true
 	case types.IsString:
-		if operators.IsNumericString(arg.StringEx().GetStr(), nil, nil, 0) != 0 {
-			return_value.SetTrue()
-			return
+		if operators.IsNumericString(value.String(), nil, nil, 0) != 0 {
+			return true
 		} else {
-			return_value.SetFalse()
-			return
+			return false
 		}
 	default:
-		return_value.SetFalse()
-		return
+		return false
 	}
 }
-func ZifIsScalar(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
-	var arg *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	switch arg.Type() {
-	case types.IsFalse:
-		fallthrough
-	case types.IsTrue:
-		fallthrough
-	case types.IsDouble:
-		fallthrough
-	case types.IsLong:
-		fallthrough
-	case types.IsString:
-		return_value.SetTrue()
-		return
+func ZifIsScalar(value *types.Zval) bool {
+	switch value.Type() {
+	case types.IsFalse, types.IsTrue, types.IsLong, types.IsDouble, types.IsString:
+		return true
 	default:
-		return_value.SetFalse()
-		return
+		return false
 	}
 }
-func ZifIsCallable(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, syntaxOnly *types.Zval, callableName zpp.RefZval) {
-	var var_ *types.Zval
-	var callable_name *types.Zval = nil
-	var name *types.String
-	var error *byte
-	var retval bool
-	var syntax_only bool = 0
-	var check_flags int = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			var_ = fp.ParseZval()
-			fp.StartOptional()
-			syntax_only = fp.ParseBool()
-			callable_name = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifIsCallable(value *types.Zval, _ zpp.Opt, syntaxOnly bool, callableName zpp.RefZval) bool {
+	var checkFlags uint32 = 0
+	if syntaxOnly {
+		checkFlags |= zend.IS_CALLABLE_CHECK_SYNTAX_ONLY
 	}
-	if syntax_only != 0 {
-		check_flags |= zend.IS_CALLABLE_CHECK_SYNTAX_ONLY
+
+	retval := zend.IsCallable(value, nil, checkFlags)
+	if callableName != nil {
+		name := zend.GetCallableName(value, nil)
+		callableName.SetString(name)
 	}
-	if executeData.NumArgs() > 2 {
-		retval = zend.ZendIsCallableEx(var_, nil, check_flags, &name, nil, &error)
-		zend.ZEND_TRY_ASSIGN_REF_STR(callable_name, name)
-	} else {
-		retval = zend.ZendIsCallableEx(var_, nil, check_flags, nil, nil, &error)
-	}
-	if error != nil {
-
-		/* ignore errors */
-
-		zend.Efree(error)
-
-		/* ignore errors */
-
-	}
-	return_value.SetBool(retval != 0)
-	return
+	return retval
 }
-func ZifIsIterable(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	var var_ *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			var_ = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetBool(zend.ZendIsIterable(var_) != 0)
-	return
+func ZifIsIterable(value *types.Zval) bool {
+	return zend.ZendIsIterable(value)
 }
-func ZifIsCountable(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	var var_ *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			var_ = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetBool(zend.ZendIsCountable(var_) != 0)
-	return
+func ZifIsCountable(value *types.Zval) bool {
+	return zend.ZendIsCountable(value)
 }

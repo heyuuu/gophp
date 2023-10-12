@@ -832,8 +832,8 @@ func ZifTriggerError(executeData zpp.Ex, return_value zpp.Ret, message *types.Zv
 func ZifSetErrorHandler(returnValue zpp.Ret, errorHandler *types.Zval, _ zpp.Opt, errorTypes *int) {
 	var errorType = b.Option(errorTypes, faults.E_ALL)
 	if !errorHandler.IsNull() {
-		if !ZendIsCallable(errorHandler, 0, nil) {
-			var errorHandlerName = ZendGetCallableName(errorHandler)
+		if !IsCallable(errorHandler, nil, 0) {
+			var errorHandlerName = GetCallableName(errorHandler, nil)
 			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), lang.CondF1(errorHandlerName != "", func() string { return errorHandlerName }, "unknown"))
 			return
 		}
@@ -855,8 +855,8 @@ func ZifSetExceptionHandler(exceptionHandler *types.Zval) *types.Zval {
 	var returnValue = new(types.Zval)
 
 	if !exceptionHandler.IsNull() {
-		if !ZendIsCallable(exceptionHandler, 0, nil) {
-			var exceptionHandlerName = ZendGetCallableName(exceptionHandler)
+		if !IsCallable(exceptionHandler, nil, 0) {
+			var exceptionHandlerName = GetCallableName(exceptionHandler, nil)
 			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), lang.CondF1(exceptionHandlerName != "", func() string { return exceptionHandlerName }, "unknown"))
 			return returnValue
 		}

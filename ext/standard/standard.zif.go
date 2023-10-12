@@ -3829,7 +3829,8 @@ var DefZifIsNumeric = def.DefFunc("is_numeric", 1, 1, []def.ArgInfo{{Name: "valu
 	if fp.HasError() {
 		return
 	}
-	ZifIsNumeric(executeData, returnValue, value)
+	ret := ZifIsNumeric(value)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifIsScalar
@@ -3839,40 +3840,44 @@ var DefZifIsScalar = def.DefFunc("is_scalar", 1, 1, []def.ArgInfo{{Name: "value"
 	if fp.HasError() {
 		return
 	}
-	ZifIsScalar(executeData, returnValue, value)
+	ret := ZifIsScalar(value)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifIsCallable
-var DefZifIsCallable = def.DefFunc("is_callable", 1, 3, []def.ArgInfo{{Name: "var"}, {Name: "syntax_only"}, {Name: "callable_name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifIsCallable = def.DefFunc("is_callable", 1, 3, []def.ArgInfo{{Name: "value"}, {Name: "syntax_only"}, {Name: "callable_name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
-	var_ := fp.ParseZval()
+	value := fp.ParseZval()
 	fp.StartOptional()
-	syntax_only := fp.ParseZval()
+	syntax_only := fp.ParseBoolVal()
 	callable_name := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
 		return
 	}
-	ZifIsCallable(executeData, returnValue, var_, nil, syntax_only, callable_name)
+	ret := ZifIsCallable(value, nil, syntax_only, callable_name)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifIsIterable
-var DefZifIsIterable = def.DefFunc("is_iterable", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifIsIterable = def.DefFunc("is_iterable", 1, 1, []def.ArgInfo{{Name: "value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	var_ := fp.ParseZval()
+	value := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifIsIterable(executeData, returnValue, var_)
+	ret := ZifIsIterable(value)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifIsCountable
-var DefZifIsCountable = def.DefFunc("is_countable", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifIsCountable = def.DefFunc("is_countable", 1, 1, []def.ArgInfo{{Name: "value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	var_ := fp.ParseZval()
+	value := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifIsCountable(executeData, returnValue, var_)
+	ret := ZifIsCountable(value)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifUniqid

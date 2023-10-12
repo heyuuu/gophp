@@ -311,7 +311,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, _ zpp.Opt, autoloadFunction *typ
 	var objPtr *types.Object
 	var fcc types.ZendFcallInfoCache
 	if executeData.NumArgs() != 0 {
-		if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_STRICT, &funcName, &fcc, &error_) == 0 {
+		if !zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_STRICT, &funcName, &fcc, &error_) {
 			alfi.SetCe(fcc.GetCallingScope())
 			alfi.SetFuncPtr(fcc.GetFunctionHandler())
 			objPtr = fcc.GetObject()

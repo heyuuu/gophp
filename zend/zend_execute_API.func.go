@@ -176,9 +176,9 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 		if fciCache == nil {
 			fciCache = &fci_cache_local
 		}
-		if ZendIsCallableEx(fci.GetFunctionName(), fci.GetObject(), IS_CALLABLE_CHECK_SILENT, nil, fciCache, &error) == 0 {
+		if !ZendIsCallableEx(fci.GetFunctionName(), fci.GetObject(), IS_CALLABLE_CHECK_SILENT, nil, fciCache, &error) {
 			if error != nil {
-				var callableName = ZendGetCallableNameEx(fci.GetFunctionName(), fci.GetObject())
+				var callableName = GetCallableName(fci.GetFunctionName(), fci.GetObject())
 				faults.Error(faults.E_WARNING, "Invalid callback %s, %s", callableName, error)
 				Efree(error)
 			}

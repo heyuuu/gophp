@@ -176,7 +176,7 @@ func ZendCheckType(typ types.TypeHint, arg *types.Zval, ce **types.ClassEntry, c
 		return true
 	}
 	if typ.Code() == types.IsCallable {
-		return ZendIsCallable(arg, IS_CALLABLE_CHECK_SILENT, nil)
+		return IsCallable(arg, nil, IS_CALLABLE_CHECK_SILENT)
 	} else if typ.Code() == types.IsIterable {
 		return ZendIsIterable(arg)
 	} else if typ.Code() == types.IsBool && arg.IsFalse() || arg.IsTrue() {

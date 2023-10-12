@@ -615,7 +615,12 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 		func_name.SetString(USERSTREAM_TRUNCATE)
 		switch value {
 		case core.PHP_STREAM_TRUNCATE_SUPPORTED:
-			if zend.ZendIsCallableEx(&func_name, lang.CondF2(us.GetObject().IsUndef(), nil, func() *types.Object { return us.GetObject().Object() }), zend.IS_CALLABLE_CHECK_SILENT, nil, nil, nil) != 0 {
+			var object *types.Object
+			if !us.GetObject().IsUndef() {
+				object = us.GetObject().Object()
+			}
+
+			if zend.IsCallable(&func_name, object, zend.IS_CALLABLE_CHECK_SILENT) {
 				ret = core.PHP_STREAM_OPTION_RETURN_OK
 			} else {
 				ret = core.PHP_STREAM_OPTION_RETURN_ERR

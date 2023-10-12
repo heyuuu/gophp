@@ -32,4 +32,4 @@ type _phpUserstreamData struct {
 
 func (this *_phpUserstreamData) GetWrapper() *PhpUserStreamWrapper      { return this.wrapper }
 func (this *_phpUserstreamData) SetWrapper(value *PhpUserStreamWrapper) { this.wrapper = value }
-func (this *_phpUserstreamData) GetObject() types.Zval                  { return this.object }
+func (this *_phpUserstreamData) GetObject() *types.Zval                 { return &this.object }

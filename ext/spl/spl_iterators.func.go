@@ -722,9 +722,8 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 		data = types.ZVAL_DEREF(data)
 
 		/* TODO: Remove this special case? */
-
 		if data.IsType(types.IsArray) {
-			return_value.SetString(types.STR_ARRAY_CAPITALIZED)
+			return_value.SetString("Array")
 		} else {
 			types.ZVAL_COPY(return_value, data)
 			operators.ConvertToString(return_value)

@@ -21,7 +21,7 @@ func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader(
 
 //@alias -old
 func ZifHeaderRegisterCallback(callback *types.Zval) bool {
-	if !zend.ZendIsCallable(callback, 0, nil) {
+	if !zend.IsCallable(callback, nil, 0) {
 		return false
 	}
 

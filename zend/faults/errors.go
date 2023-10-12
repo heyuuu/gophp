@@ -166,7 +166,7 @@ func getFilenameLineno(typ int) (string, uint32) {
 		return "Unknown", 0
 	case E_PARSE, E_COMPILE_ERROR, E_COMPILE_WARNING, E_ERROR, E_NOTICE, E_STRICT, E_DEPRECATED,
 		E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_USER_DEPRECATED, E_RECOVERABLE_ERROR:
-		if zend.ZendIsCompiling() != 0 {
+		if zend.ZendIsCompiling() {
 			return zend.ZendGetCompiledFilename(), uint32(zend.ZendGetCompiledLineno())
 		} else if zend.ZendIsExecuting() {
 			filename := zend.ZendGetExecutedFilename()

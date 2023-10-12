@@ -61,5 +61,4 @@ var (
 	STR_TRACE                = "trace"
 	STR_ARGV                 = "argv"
 	STR_ARGC                 = "argc"
-	STR_ARRAY_CAPITALIZED    = "Array"
 )

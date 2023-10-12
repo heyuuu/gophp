@@ -20,8 +20,8 @@ import (
 	"time"
 )
 
-func SAFE_FILENAME(f __auto__) string {
-	if f {
+func SAFE_FILENAME(f string) string {
+	if f != "" {
 		return f
 	} else {
 		return "-"

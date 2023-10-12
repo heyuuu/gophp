@@ -797,8 +797,8 @@ func PhpCallShutdownFunctions() {
 		faults.Try(func() {
 			BG__().EachUserShutdownFunction(func(shutdownFunctionEntry *PhpShutdownFunction) {
 				var retval types.Zval
-				if !zend.ZendIsCallable(shutdownFunctionEntry.Fn(), 0, nil) {
-					var functionName = zend.ZendGetCallableName(shutdownFunctionEntry.Fn())
+				if !zend.IsCallable(shutdownFunctionEntry.Fn(), nil, 0) {
+					var functionName = zend.GetCallableName(shutdownFunctionEntry.Fn(), nil)
 					core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", functionName)
 				} else {
 					zend.CallUserFunction_Ex(nil, shutdownFunctionEntry.Fn(), &retval, shutdownFunctionEntry.Args())
@@ -812,8 +812,8 @@ func PhpFreeShutdownFunctions() {
 }
 func ZifRegisterShutdownFunction(functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
 	/* Prevent entering of anything but valid callback (syntax check only!) */
-	if !zend.ZendIsCallable(functionName, 0, nil) {
-		var callbackName = zend.ZendGetCallableName(functionName)
+	if !zend.IsCallable(functionName, nil, 0) {
+		var callbackName = zend.GetCallableName(functionName, nil)
 		core.PhpErrorDocref("", faults.E_WARNING, "Invalid shutdown callback '%s' passed", callbackName)
 		return
 	}

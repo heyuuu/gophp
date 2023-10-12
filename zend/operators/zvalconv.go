@@ -193,7 +193,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 		if try && zend.EG__().GetException() != nil {
 			return "", false
 		}
-		return types.STR_ARRAY_CAPITALIZED, true
+		return "Array", true
 	case types.IsObject:
 		var tmp types.Zval
 		if op.Object().CanCast() {

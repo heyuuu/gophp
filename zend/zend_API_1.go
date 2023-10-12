@@ -41,26 +41,10 @@ func ZendTryArrayInitSize(zv *types.Zval, size uint32) *types.Zval {
 		}
 		zv = ref.GetVal()
 	}
-	// ZvalPtrDtor(zv)
 	zv.SetArray(arr)
 	return zv
 }
 func ZendTryArrayInit(zv *types.Zval) *types.Zval { return ZendTryArrayInitSize(zv, 0) }
-func _zendGetParametersArrayEx(paramCount int, argumentArray *types.Zval) int {
-	var param_ptr *types.Zval
-	var arg_count int
-	param_ptr = CurrEX().Arg(1)
-	arg_count = CurrEX().NumArgs()
-	if paramCount > arg_count {
-		return types.FAILURE
-	}
-	for b.PostDec(&paramCount) > 0 {
-		argumentArray.CopyValueFrom(param_ptr)
-		argumentArray++
-		param_ptr++
-	}
-	return types.SUCCESS
-}
 func ZendCopyParametersArray(param_count int, argument_array *types.Zval) int {
 	var param_ptr *types.Zval
 	var arg_count int
