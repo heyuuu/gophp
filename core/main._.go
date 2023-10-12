@@ -5,7 +5,6 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
-var CoreGlobals PhpCoreGlobals
 var PhpInternalEncodingChanged func() = nil
 var OnChangeBrowscap func(
 	entry *zend.ZendIniEntry,
