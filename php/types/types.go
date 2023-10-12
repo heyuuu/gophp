@@ -190,6 +190,16 @@ func (zv *Zval) DeRef() *Zval {
 	}
 	return zv
 }
+func (zv *Zval) SafeDeRef() *Zval {
+	if zv == nil {
+		return nil
+	}
+
+	if ref, ok := zv.v.(*Ref); ok {
+		return ref.GetVal()
+	}
+	return zv
+}
 
 func (zv *Zval) ConstantAst() *ZendAstRef { return zvalValue[*ZendAstRef](zv) }
 func (zv *Zval) Indirect() *Zval          { return zvalValue[Indirect](zv) }

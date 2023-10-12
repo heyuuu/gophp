@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
+	"strings"
 )
 
 func PropFindAndCache(zobj *types.Object, key string) *types.Zval {
@@ -934,10 +935,10 @@ func ZendCheckProtected(ce *types.ClassEntry, scope *types.ClassEntry) bool {
 	}
 	return false
 }
-func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, is_static int) types.IFunction {
-	var mname_len int
+
+func ZendGetCallTrampolineFunc(ce *types.ClassEntry, methodName string, isStatic bool) types.IFunction {
 	var func_ *types.ZendOpArray
-	var fbc types.IFunction = lang.CondF(is_static != 0, func() types.IFunction { return ce.GetCallstatic() }, func() types.IFunction { return ce.GetCall() })
+	var fbc types.IFunction = lang.Cond(isStatic, ce.GetCallstatic(), ce.GetCall())
 
 	/* We use non-NULL value to avoid useless run_time_cache allocation.
 	 * The low bit must be zero, to not be interpreted as a MAP_PTR offset.
@@ -951,11 +952,11 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 		func_ = types.NewOpArray()
 	}
 	func_.SetFnFlags(types.AccCallViaTrampoline | types.AccPublic)
-	if is_static != 0 {
+	if isStatic {
 		func_.SetIsStatic(true)
 	}
 	func_.SetOpcodes(EG__().GetCallTrampolineOp())
-	ZEND_MAP_PTR_INIT(func_.run_time_cache, (**any)(&dummy))
+	ZEND_MAP_PTR_INIT(func_.GetRunTimeCache(), (**any)(&dummy))
 	func_.SetScope(fbc.GetScope())
 
 	/* reserve space for arguments, local and temporary variables */
@@ -982,12 +983,8 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 	}
 
 	//??? keep compatibility for "\0" characters
-
-	if lang.Assign(&mname_len, strlen(method_name.GetVal())) != method_name.GetLen() {
-		func_.SetFunctionName(method_name.GetStr()[:mname_len])
-	} else {
-		func_.SetFunctionName(method_name.GetStr())
-	}
+	methodName = strings.TrimRight(methodName, "\000")
+	func_.SetFunctionName(methodName)
 	func_.SetPrototype(nil)
 	func_.SetNumArgs(0)
 	func_.SetRequiredNumArgs(0)
@@ -995,7 +992,7 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 	return (types.IFunction)(func_)
 }
 func ZendGetUserCallFunction(ce *types.ClassEntry, method_name *types.String) types.IFunction {
-	return ZendGetCallTrampolineFunc(ce, method_name, 0)
+	return ZendGetCallTrampolineFunc(ce, method_name.GetStr(), false)
 }
 func ZendBadMethodCall(fbc types.IFunction, method_name *types.String, scope *types.ClassEntry) {
 	faults.ThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
@@ -1047,7 +1044,7 @@ func ZendStdGetMethod_Ex(zobj *types.Object, methodName string, key *types.Zval)
 	return fbc
 }
 func ZendGetUserCallstaticFunction(ce *types.ClassEntry, method_name *types.String) types.IFunction {
-	return ZendGetCallTrampolineFunc(ce, method_name, 1)
+	return ZendGetCallTrampolineFunc(ce, method_name.GetStr(), true)
 }
 func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, key *types.Zval) types.IFunction {
 	var lc_function_name *types.String
