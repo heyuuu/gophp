@@ -922,7 +922,7 @@ func zim_spl_Array_getIteratorClass(executeData *zend.ZendExecuteData, return_va
 		return
 	}
 	//intern.GetCeGetIterator().GetName().AddRefcount()
-	return_value.SetStringEx(intern.GetCeGetIterator().GetName())
+	return_value.SetString(intern.GetCeGetIterator().Name())
 	return
 }
 func zim_spl_Array_getFlags(executeData *zend.ZendExecuteData, return_value *types.Zval) {

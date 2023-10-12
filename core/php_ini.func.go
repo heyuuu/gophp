@@ -396,7 +396,7 @@ func PhpInitConfig() int {
 		RESET_ACTIVE_INI_HASH()
 		zend.ZendParseIniFile(fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash())
 		var tmp types.Zval
-		tmp.SetStringEx(types.NewString(fh.GetFilename()))
+		tmp.SetString(fh.GetFilename())
 		Config().Set("cfg_file_path", fh.GetFilename())
 		PhpIniOpenedPath = zend.ZendStrndup(tmp.StringEx().GetVal(), tmp.StringEx().GetLen())
 	}
@@ -405,13 +405,8 @@ func PhpInitConfig() int {
 
 	PhpIniScannedPath = getenv("PHP_INI_SCAN_DIR")
 	if PhpIniScannedPath == nil {
-
 		/* Or fall back using possible --with-config-file-scan-dir setting (defaults to empty string!) */
-
 		PhpIniScannedPath = PHP_CONFIG_FILE_SCAN_DIR
-
-		/* Or fall back using possible --with-config-file-scan-dir setting (defaults to empty string!) */
-
 	}
 	php_ini_scanned_path_len = int(strlen(PhpIniScannedPath))
 

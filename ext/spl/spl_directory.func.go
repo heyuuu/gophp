@@ -816,12 +816,11 @@ func zim_spl_DirectoryIterator_getBasename(executeData *zend.ZendExecuteData, re
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(executeData.ThisObjectZval())
 	var suffix *byte = 0
 	var slen int = 0
-	var fname *types.String
 	if zend.ZendParseParameters(executeData.NumArgs(), "|s", &suffix, &slen) == types.FAILURE {
 		return
 	}
-	fname = str.PhpBasenameZStr(intern.GetEntry().GetDName(), b.CastStr(suffix, slen))
-	return_value.SetStringEx(fname)
+	fname := str.PhpBasename(intern.GetEntry().GetDName(), b.CastStr(suffix, slen))
+	return_value.SetString(fname)
 }
 func zim_spl_SplFileInfo_getPathname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(executeData.ThisObjectZval())
