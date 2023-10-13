@@ -447,19 +447,19 @@ func (compiler *Compiler) CompileTypename(ast *ZendAst, force_allow_null bool) t
 	var orig_ast_attr ZendAstAttr = ast.Attr()
 	var type_ types.TypeHint
 	if (ast.Attr() & ZEND_TYPE_NULLABLE) != 0 {
-		allow_null = 1
+		allow_null = true
 		ast.SetAttr(ast.Attr() &^ ZEND_TYPE_NULLABLE)
 	}
 	if ast.Kind() == ZEND_AST_TYPE {
 		return types.TypeHintCode(ast.Attr(), allow_null)
 	} else {
 		var class_name *types.String = ZendAstGetStr(ast)
-		var type_code uint8 = ZendLookupBuiltinTypeByName(class_name.GetStr())
+		var type_code types.ZvalType = ZendLookupBuiltinTypeByName(class_name.GetStr())
 		if type_code != 0 {
 			if (ast.Attr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", operators.ZendStringTolower(class_name).GetVal())
 			}
-			type_ = types.TypeHintCode(type_code, allow_null != 0)
+			type_ = types.TypeHintCode(type_code, allow_null)
 		} else {
 			var fetch_type uint32 = ZendGetClassFetchTypeAst(ast)
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
@@ -469,7 +469,7 @@ func (compiler *Compiler) CompileTypename(ast *ZendAst, force_allow_null bool) t
 				ZendEnsureValidClassFetchType(fetch_type)
 				//class_name.AddRefcount()
 			}
-			type_ = types.TypeHintClassName(class_name, allow_null != 0)
+			type_ = types.TypeHintClassName(class_name, allow_null)
 		}
 	}
 	ast.SetAttr(orig_ast_attr)

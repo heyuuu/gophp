@@ -172,6 +172,17 @@ func (cg *ZendCompilerGlobals) DelayedOplinesStackCut(offset int) []*types.ZendO
 	return ret
 }
 
+// fileContext
+func (cg *ZendCompilerGlobals) GetFileContext() *ZendFileContext { return &cg.file_context }
+func (cg *ZendCompilerGlobals) FileContextBegin() (prevContext ZendFileContext) {
+	prevContext = cg.file_context
+	cg.file_context = ZendFileContext{}
+	return prevContext
+}
+func (cg *ZendCompilerGlobals) FileContextEnd(prevContext ZendFileContext) {
+	cg.file_context = prevContext
+}
+
 // getter/setter
 func (cg *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
 	return cg.active_class_entry
@@ -221,17 +232,15 @@ func (cg *ZendCompilerGlobals) GetIncrementLineno() bool  { return cg.increment_
 func (cg *ZendCompilerGlobals) SetIncrementLineno(value bool) {
 	cg.increment_lineno = value
 }
-func (cg *ZendCompilerGlobals) GetDocComment() *types.String         { return cg.doc_comment }
-func (cg *ZendCompilerGlobals) SetDocComment(value *types.String)    { cg.doc_comment = value }
-func (cg *ZendCompilerGlobals) GetExtraFnFlags() uint32              { return cg.extra_fn_flags }
-func (cg *ZendCompilerGlobals) SetExtraFnFlags(value uint32)         { cg.extra_fn_flags = value }
-func (cg *ZendCompilerGlobals) GetContext() *ZendOparrayContext      { return &cg.context }
-func (cg *ZendCompilerGlobals) SetContext(value ZendOparrayContext)  { cg.context = value }
-func (cg *ZendCompilerGlobals) GetFileContext() *ZendFileContext     { return &cg.file_context }
-func (cg *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { cg.file_context = value }
-func (cg *ZendCompilerGlobals) GetAst() *ZendAst                     { return cg.ast }
-func (cg *ZendCompilerGlobals) SetAst(value *ZendAst)                { cg.ast = value }
-func (cg *ZendCompilerGlobals) GetMemoizedExprs() *types.Array       { return cg.memoized_exprs }
+func (cg *ZendCompilerGlobals) GetDocComment() *types.String        { return cg.doc_comment }
+func (cg *ZendCompilerGlobals) SetDocComment(value *types.String)   { cg.doc_comment = value }
+func (cg *ZendCompilerGlobals) GetExtraFnFlags() uint32             { return cg.extra_fn_flags }
+func (cg *ZendCompilerGlobals) SetExtraFnFlags(value uint32)        { cg.extra_fn_flags = value }
+func (cg *ZendCompilerGlobals) GetContext() *ZendOparrayContext     { return &cg.context }
+func (cg *ZendCompilerGlobals) SetContext(value ZendOparrayContext) { cg.context = value }
+func (cg *ZendCompilerGlobals) GetAst() *ZendAst                    { return cg.ast }
+func (cg *ZendCompilerGlobals) SetAst(value *ZendAst)               { cg.ast = value }
+func (cg *ZendCompilerGlobals) GetMemoizedExprs() *types.Array      { return cg.memoized_exprs }
 func (cg *ZendCompilerGlobals) SetMemoizedExprs(value *types.Array) {
 	cg.memoized_exprs = value
 }

@@ -316,9 +316,9 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	name = ZendPrefixWithNs(unqualified_name)
 	op_array.SetFunctionName(name.GetStr())
 	lcname = operators.ZendStringTolower(name)
-	if FC__().GetImportsFunction() != nil {
-		var import_name *types.String = ZendHashFindPtrLc(FC__().GetImportsFunction(), unqualified_name.GetVal(), unqualified_name.GetLen())
-		if import_name != nil && !(ascii.StrCaseEquals(lcname.GetStr(), import_name.GetStr())) {
+	if FC__().HasImportsFunction() {
+		var importName = FC__().FindImportFunction(unqualified_name.GetStr())
+		if importName != "" && !(ascii.StrCaseEquals(lcname.GetStr(), importName)) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare function %s "+"because the name is already in use", name.GetVal())
 		}
 	}
@@ -331,7 +331,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	if ascii.StrCaseEquals(unqualified_name.GetStr(), "assert") {
 		faults.Error(faults.E_DEPRECATED, "Defining a custom assert() function is deprecated, "+"as the function has special semantics")
 	}
-	ZendRegisterSeenSymbol(lcname, ZEND_SYMBOL_FUNCTION)
+	FC__().RegisterSeenSymbol(lcname.GetStr(), ZEND_SYMBOL_FUNCTION)
 	if toplevel != 0 {
 		if !CG__().FunctionTable().Add(lcname.GetStr(), op_array) {
 			DoBindFunctionError(lcname.GetStr(), op_array, true)
@@ -709,15 +709,14 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 		}
 		ZendAssertValidClassName(unqualified_name.GetStr())
 		name = ZendPrefixWithNs(unqualified_name)
-		//name = types.ZendNewInternedString(name)
 		lcname = operators.ZendStringTolower(name)
-		if FC__().GetImports() != nil {
-			var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), unqualified_name.GetVal(), unqualified_name.GetLen())
-			if import_name != nil && !(ascii.StrCaseEquals(lcname.GetStr(), import_name.GetStr())) {
+		if FC__().HasImports() {
+			importName := FC__().FindImport(unqualified_name.GetStr())
+			if importName != "" && !(ascii.StrCaseEquals(lcname.GetStr(), importName)) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare class %s "+"because the name is already in use", name.GetVal())
 			}
 		}
-		ZendRegisterSeenSymbol(lcname, ZEND_SYMBOL_CLASS)
+		FC__().RegisterSeenSymbol(lcname.GetStr(), ZEND_SYMBOL_CLASS)
 	} else {
 		/* Find an anon class name that is not in use yet. */
 		name = nil

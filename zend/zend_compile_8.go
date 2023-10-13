@@ -600,7 +600,7 @@ func (compiler *Compiler) CompileConst(result *Znode, ast *ZendAst) {
 		opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name, 0))
 	} else {
 		opline.GetOp1().SetNum(IS_CONSTANT_UNQUALIFIED)
-		if FC__().GetCurrentNamespace() != nil {
+		if FC__().CurrentNamespace() != "" {
 			opline.GetOp1().SetNum(opline.GetOp1().GetNum() | IS_CONSTANT_IN_NAMESPACE)
 			opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name.GetStr(), 1))
 		} else {

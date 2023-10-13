@@ -293,7 +293,7 @@ func (compiler *Compiler) CompileFunctionName(name_node *Znode, name_ast *ZendAs
 
 	name_node.SetOpType(IS_CONST)
 	name_node.GetConstant().SetString(resolveName)
-	return !isFullyQualified && FC__().GetCurrentNamespace() != nil
+	return !isFullyQualified && FC__().CurrentNamespace() != ""
 }
 func (compiler *Compiler) CompileNsCall(result *Znode, name_node *Znode, args_ast *ZendAst) {
 	var opline *types.ZendOp = GetNextOp()

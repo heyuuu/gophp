@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"github.com/heyuuu/gophp/kits/mapkit"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -27,65 +28,76 @@ func (this *Znode) GetConstant() *types.Zval  { return &this.u.constant }
  */
 type ImportNames = *types.Table[string]
 type ZendFileContext struct {
-	current_namespace        *types.String
-	in_namespace             bool
-	has_bracketed_namespaces bool
-	imports                  ImportNames
-	imports_function         ImportNames
-	imports_const            ImportNames
-	seen_symbols             *types.Array
+	currentNamespace       string
+	inNamespace            bool
+	hasBracketedNamespaces bool
+	imports                map[string]string
+	importsFunction        map[string]string
+	importsConst           map[string]string
+	seenSymbols            map[string]uint32
 }
 
-func (this *ZendFileContext) ResetImportTables() {
-	this.imports = nil
-	this.imports_function = nil
-	this.imports_const = nil
-}
+func (fc *ZendFileContext) BeginNamespace(name string, withBracket bool) {
+	fc.inNamespace = true
+	fc.currentNamespace = name
+	fc.resetImportTables()
 
-func (this *ZendFileContext) Imports() ImportNames {
-	if this.imports == nil {
-		this.imports = types.NewLcTable[string]()
+	if withBracket {
+		fc.hasBracketedNamespaces = true
 	}
-	return this.imports
-}
-func (this *ZendFileContext) ImportsFunction() ImportNames {
-	if this.imports_function == nil {
-		this.imports_function = types.NewLcTable[string]()
-	}
-	return this.imports_function
-}
-func (this *ZendFileContext) ImportsConst() ImportNames {
-	if this.imports_const == nil {
-		this.imports_const = types.NewLcTable[string]()
-	}
-	return this.imports_const
 }
 
-func (this *ZendFileContext) GetImports() ImportNames          { return this.imports }
-func (this *ZendFileContext) SetImports(value *types.Array)    { this.imports = value }
-func (this *ZendFileContext) GetImportsFunction() *types.Array { return this.imports_function }
-func (this *ZendFileContext) SetImportsFunction(value *types.Array) {
-	this.imports_function = value
+func (fc *ZendFileContext) EndNamespace() {
+	fc.inNamespace = false
+	fc.currentNamespace = ""
+	fc.resetImportTables()
 }
-func (this *ZendFileContext) GetImportsConst() *types.Array      { return this.imports_const }
-func (this *ZendFileContext) SetImportsConst(value *types.Array) { this.imports_const = value }
 
-func (this *ZendFileContext) GetCurrentNamespace() *types.String { return this.current_namespace }
-func (this *ZendFileContext) SetCurrentNamespace(value *types.String) {
-	this.current_namespace = value
+func (fc *ZendFileContext) resetImportTables() {
+	fc.imports = nil
+	fc.importsFunction = nil
+	fc.importsConst = nil
 }
-func (this *ZendFileContext) GetInNamespace() bool      { return this.in_namespace }
-func (this *ZendFileContext) SetInNamespace(value bool) { this.in_namespace = value }
-func (this *ZendFileContext) GetHasBracketedNamespaces() bool {
-	return this.has_bracketed_namespaces
+
+func (fc *ZendFileContext) CurrentNamespace() string     { return fc.currentNamespace }
+func (fc *ZendFileContext) InNamespace() bool            { return fc.inNamespace }
+func (fc *ZendFileContext) HasBracketedNamespaces() bool { return fc.hasBracketedNamespaces }
+
+func (fc *ZendFileContext) HasImports() bool         { return len(fc.imports) != 0 }
+func (fc *ZendFileContext) HasImportsFunction() bool { return len(fc.importsFunction) != 0 }
+func (fc *ZendFileContext) HasImportsConst() bool    { return len(fc.importsConst) != 0 }
+
+func (fc *ZendFileContext) FindImport(name string) string {
+	return mapkit.Get(fc.imports, name)
 }
-func (this *ZendFileContext) SetHasBracketedNamespaces(value bool) {
-	this.has_bracketed_namespaces = value
+func (fc *ZendFileContext) AddImport(lookupName, name string) bool {
+	return mapkit.Add(&fc.imports, lookupName, name)
 }
-func (this *ZendFileContext) InitSeenSymbols() {
-	this.seen_symbols = types.NewArray()
+func (fc *ZendFileContext) FindImportFunction(name string) string {
+	return mapkit.Get(fc.importsFunction, name)
 }
-func (this *ZendFileContext) GetSeenSymbols() *types.Array { return this.seen_symbols }
+func (fc *ZendFileContext) AddImportFunction(lookupName, name string) bool {
+	return mapkit.Add(&fc.importsFunction, lookupName, name)
+}
+func (fc *ZendFileContext) FindImportConst(name string) string {
+	return mapkit.Get(fc.importsConst, name)
+}
+func (fc *ZendFileContext) AddImportConst(lookupName, name string) bool {
+	return mapkit.Add(&fc.importsConst, lookupName, name)
+}
+
+func (fc *ZendFileContext) RegisterSeenSymbol(name string, kind uint32) {
+	if fc.seenSymbols == nil {
+		fc.seenSymbols = map[string]uint32{}
+	}
+	fc.seenSymbols[name] |= kind
+}
+func (fc *ZendFileContext) HaveSeenSymbol(name string, kind uint32) bool {
+	if fc.seenSymbols == nil {
+		return false
+	}
+	return fc.seenSymbols[name]&kind != 0
+}
 
 /**
  * ZendParserStackElem

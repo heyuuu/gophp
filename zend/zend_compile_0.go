@@ -155,7 +155,7 @@ func ZendAssertValidClassName(name string) {
 	}
 }
 
-func ZendLookupBuiltinTypeByName(name string) uint8 {
+func ZendLookupBuiltinTypeByName(name string) types.ZvalType {
 	lcName := ascii.StrToLower(name)
 	if typ, ok := builtinTypes[lcName]; ok {
 		return typ
@@ -169,47 +169,6 @@ func ZendOparrayContextBegin(prev_context *ZendOparrayContext) {
 func ZendOparrayContextEnd(prev_context *ZendOparrayContext) {
 	//CG__().GetContext().End()
 	CG__().SetContext(*prev_context)
-}
-func ZendResetImportTables() {
-	FC__().ResetImportTables()
-}
-func ZendEndNamespace() {
-	FC__().SetInNamespace(0)
-	ZendResetImportTables()
-	if FC__().GetCurrentNamespace() != nil {
-		// types.ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
-		FC__().SetCurrentNamespace(nil)
-	}
-}
-func ZendFileContextBegin(prevContext *ZendFileContext) {
-	*prevContext = *CG__().GetFileContext()
-	FC__().SetImports(nil)
-	FC__().SetImportsFunction(nil)
-	FC__().SetImportsConst(nil)
-	FC__().SetCurrentNamespace(nil)
-	FC__().SetInNamespace(0)
-	FC__().SetHasBracketedNamespaces(0)
-	FC__().InitSeenSymbols()
-}
-func ZendFileContextEnd(prevContext *ZendFileContext) {
-	ZendEndNamespace()
-	FC__().GetSeenSymbols().Destroy()
-	CG__().SetFileContext(*prevContext)
-}
-
-func ZendRegisterSeenSymbol(name *types.String, kind uint32) {
-	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
-	if zv != nil {
-		zv.SetLong(zv.Long() | kind)
-	} else {
-		var tmp types.Zval
-		tmp.SetLong(kind)
-		FC__().GetSeenSymbols().KeyAddNew(name.GetStr(), &tmp)
-	}
-}
-func ZendHaveSeenSymbol(name string, kind uint32) bool {
-	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name)
-	return zv != nil && (zv.Long()&kind) != 0
 }
 func FileHandleDtor(fh *FileHandle) { fh.Destroy() }
 func ZendSetCompiledFilename(new_compiled_filename string) {
@@ -416,15 +375,9 @@ func ZendPrefixWithNs(name *types.String) *types.String {
 	return types.NewString(str)
 }
 func ZendPrefixWithNsEx(name string) string {
-	if FC__().GetCurrentNamespace() != nil {
-		var ns = FC__().GetCurrentNamespace()
-		return ZendConcatNames(ns.GetStr(), name)
+	if ns := FC__().CurrentNamespace(); ns != "" {
+		return ZendConcatNames(ns, name)
 	} else {
 		return name
 	}
-}
-func ZendHashFindPtrLc(ht *types.Array, str *byte, len_ int) any {
-	name := b.CastStr(str, len_)
-	lcName := ascii.StrToLower(name)
-	return types.ZendHashFindPtr(ht, lcName)
 }

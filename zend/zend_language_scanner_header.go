@@ -134,7 +134,7 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 
 		/* Use heap to not waste arena memory */
 		opArray.AddFnFlags(types.AccHeapRtCache)
-		ZendFileContextBegin(&originalFileContext)
+		originalFileContext = CG__().FileContextBegin()
 		ZendOparrayContextBegin(&originalOparrayContext)
 		compiler.CompileTopStmt(CG__().ast)
 		CG__().zend_lineno = last_lineno
@@ -143,7 +143,7 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 		opArray.line_end = last_lineno
 		compiler.PassTwo(opArray)
 		ZendOparrayContextEnd(&originalOparrayContext)
-		ZendFileContextEnd(&originalFileContext)
+		CG__().FileContextEnd(originalFileContext)
 		CG__().active_op_array = originalActiveOpArray
 	}
 	// ZendAstDestroy(CG__().ast)

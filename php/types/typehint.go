@@ -15,12 +15,12 @@ const (
 
 type TypeHint struct {
 	flags uint8
-	code  uint8
+	code  ZvalType
 	ce    *ClassEntry
 	name  string
 }
 
-func TypeHintCode(code uint8, allowNull bool) TypeHint {
+func TypeHintCode(code ZvalType, allowNull bool) TypeHint {
 	var flags uint8 = typeHintIsCode
 	if allowNull {
 		flags |= typeHintAllowNull
@@ -51,7 +51,7 @@ func (t TypeHint) IsName() bool    { return t.flags&typeHintIsName != 0 }
 
 func (t TypeHint) Ce() *ClassEntry  { return t.ce }
 func (t TypeHint) Name() string     { return t.name }
-func (t TypeHint) Code() uint8      { return t.code }
+func (t TypeHint) Code() ZvalType   { return t.code }
 func (t TypeHint) CodeName() string { return ZendGetTypeByConst(t.code) }
 
 func (t *TypeHint) FormatName() string {

@@ -10,18 +10,19 @@ import (
 	"os"
 )
 
-func ZendGetImportHt(type_ uint32) ImportNames {
-	switch type_ {
+func ZendAddImport(typ uint32, lookupName string, oldName string) bool {
+	switch typ {
 	case ZEND_SYMBOL_CLASS:
-		return FC__().Imports()
+		return FC__().AddImport(lookupName, oldName)
 	case ZEND_SYMBOL_FUNCTION:
-		return FC__().ImportsFunction()
+		return FC__().AddImportFunction(lookupName, oldName)
 	case ZEND_SYMBOL_CONST:
-		return FC__().ImportsConst()
+		return FC__().AddImportConst(lookupName, oldName)
 	default:
+		panic("unreachable")
 	}
-	return nil
 }
+
 func ZendGetUseTypeStr(type_ uint32) string {
 	switch type_ {
 	case ZEND_SYMBOL_CLASS:
@@ -43,9 +44,8 @@ func ZendCheckAlreadyInUse(type_ uint32, old_name *types.String, new_name *types
 func (compiler *Compiler) CompileUse(ast *ZendAst) {
 	var list *ZendAstList = ast.AsAstList()
 	var i uint32
-	var current_ns *types.String = FC__().GetCurrentNamespace()
+	var current_ns = FC__().CurrentNamespace()
 	var type_ uint32 = ast.Attr()
-	var current_import ImportNames = ZendGetImportHt(type_)
 	var case_sensitive bool = type_ == ZEND_SYMBOL_CONST
 	for i = 0; i < list.GetChildren(); i++ {
 		var use_ast *ZendAst = list.Children()[i]
@@ -62,7 +62,7 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 				new_name = types.NewString(unqualifiedName)
 			} else {
 				new_name = old_name.Copy()
-				if current_ns == nil {
+				if current_ns == "" {
 					if type_ == T_CLASS && new_name.GetStr() == "strict" {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "You seem to be trying to use a different language...")
 					}
@@ -78,17 +78,17 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use %s as %s because '%s' "+"is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
 		}
-		if current_ns != nil {
-			nsName := ascii.StrToLower(current_ns.GetStr()) + "\\" + lookup_name
-			if ZendHaveSeenSymbol(nsName, type_) {
+		if current_ns != "" {
+			nsName := ascii.StrToLower(current_ns) + "\\" + lookup_name
+			if FC__().HaveSeenSymbol(nsName, type_) {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, nsName)
 			}
 		} else {
-			if ZendHaveSeenSymbol(lookup_name, type_) {
+			if FC__().HaveSeenSymbol(lookup_name, type_) {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, lookup_name)
 			}
 		}
-		if !current_import.Add(lookup_name, old_name.GetStr()) {
+		if ZendAddImport(type_, lookup_name, old_name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
 	}
@@ -134,52 +134,38 @@ func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
 		}
 		name = ZendPrefixWithNs(unqualified_name)
 		//name = types.ZendNewInternedString(name)
-		if FC__().GetImportsConst() != nil {
-			var import_name *types.String = types.ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name.GetStr())
-			if import_name != nil && import_name.GetStr() != name.GetStr() {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
-			}
+		if importName := FC__().FindImportConst(unqualified_name.GetStr()); importName != "" && importName != name.GetStr() {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
 		}
 		name_node.SetOpType(IS_CONST)
 		name_node.GetConstant().SetStringEx(name)
 		ZendEmitOp(nil, ZEND_DECLARE_CONST, &name_node, &value_node)
-		ZendRegisterSeenSymbol(name, ZEND_SYMBOL_CONST)
+		FC__().RegisterSeenSymbol(name.GetStr(), ZEND_SYMBOL_CONST)
 	}
 }
 func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
-	var name_ast *ZendAst = ast.Child(0)
-	var stmt_ast *ZendAst = ast.Child(1)
-	var name *types.String
-	var with_bracket bool = stmt_ast != nil
+	var nameAst *ZendAst = ast.Child(0)
+	var stmtAst *ZendAst = ast.Child(1)
+	var name string
+	var withBracket bool = stmtAst != nil
 
 	/* handle mixed syntax declaration or nested namespaces */
 
-	if FC__().GetHasBracketedNamespaces() == 0 {
-		if FC__().GetCurrentNamespace() != nil {
-
-			/* previous namespace declarations were unbracketed */
-
-			if with_bracket != 0 {
+	if !FC__().HasBracketedNamespaces() {
+		if FC__().CurrentNamespace() != "" {
+			if withBracket {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations "+"with unbracketed namespace declarations")
 			}
-
-			/* previous namespace declarations were unbracketed */
-
 		}
 	} else {
-
 		/* previous namespace declarations were bracketed */
-
-		if with_bracket == 0 {
+		if !withBracket {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations "+"with unbracketed namespace declarations")
-		} else if FC__().GetCurrentNamespace() != nil || FC__().GetInNamespace() != 0 {
+		} else if FC__().CurrentNamespace() != "" || FC__().InNamespace() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declarations cannot be nested")
 		}
-
-		/* previous namespace declarations were bracketed */
-
 	}
-	if (with_bracket == 0 && FC__().GetCurrentNamespace() == nil || with_bracket != 0 && FC__().GetHasBracketedNamespaces() == 0) && CG__().GetActiveOpArray().GetLast() > 0 {
+	if (!withBracket && FC__().CurrentNamespace() == "" || withBracket && !FC__().HasBracketedNamespaces()) && CG__().GetActiveOpArray().GetLast() > 0 {
 
 		/* ignore ZEND_EXT_STMT */
 
@@ -191,30 +177,23 @@ func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declaration statement has to be "+"the very first statement or after any declare call in the script")
 		}
 	}
-	if name_ast != nil {
-		name = ZendAstGetStr(name_ast)
-		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as namespace name", name.GetVal())
+	if nameAst != nil {
+		name = ZendAstGetStr(nameAst).GetStr()
+		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as namespace name", name)
 		}
-		FC__().SetCurrentNamespace(name.Copy())
-	} else {
-		FC__().SetCurrentNamespace(nil)
 	}
-	ZendResetImportTables()
-	FC__().SetInNamespace(1)
-	if with_bracket != 0 {
-		FC__().SetHasBracketedNamespaces(1)
-	}
-	if stmt_ast != nil {
-		compiler.CompileTopStmt(stmt_ast)
-		ZendEndNamespace()
+	FC__().BeginNamespace(name, withBracket)
+	if stmtAst != nil {
+		compiler.CompileTopStmt(stmtAst)
+		FC__().EndNamespace()
 	}
 }
 func (compiler *Compiler) CompileHaltCompiler(ast *ZendAst) {
 	var offsetAst *ZendAst = ast.Child(0)
 	var offset ZendLong = offsetAst.Val().Long()
 	var constName = "__COMPILER_HALT_OFFSET__"
-	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() != 0 {
+	if FC__().HasBracketedNamespaces() != 0 && FC__().InNamespace() != 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "__HALT_COMPILER() can only be used from the outermost scope")
 	}
 	filename := ZendGetCompiledFilename()
@@ -276,11 +255,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) bool {
 			zv.SetString("")
 		}
 	case T_NS_C:
-		if FC__().GetCurrentNamespace() != nil {
-			zv.SetString(FC__().GetCurrentNamespace().GetStr())
-		} else {
-			zv.SetString("")
-		}
+		zv.SetString(FC__().CurrentNamespace())
 	default:
 
 	}

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func ZendResolveNonClassName(name string, typ uint32, caseSensitive bool, currentImportSub ImportNames) (string, bool) {
+func ZendResolveNonClassName(name string, typ uint32, caseSensitive bool, importFinder func(string) string) (string, bool) {
 	isFullyQualified := false
 	if name[0] == '\\' {
 		/* Remove \ prefix (only relevant if this is a string rather than a label) */
@@ -21,13 +21,13 @@ func ZendResolveNonClassName(name string, typ uint32, caseSensitive bool, curren
 	if typ == ZEND_NAME_RELATIVE {
 		return ZendPrefixWithNsEx(name), true
 	}
-	if currentImportSub != nil {
+	if importFinder != nil {
 		/* If an unqualified name is a function/const alias, replace it. */
 		var importName string
 		if caseSensitive {
-			importName = currentImportSub.Get(name)
+			importName = importFinder(name)
 		} else {
-			importName = currentImportSub.Get(ascii.StrToLower(name))
+			importName = importFinder(ascii.StrToLower(name))
 		}
 		if importName != "" {
 			return importName, true
@@ -39,9 +39,9 @@ func ZendResolveNonClassName(name string, typ uint32, caseSensitive bool, curren
 		isFullyQualified = true
 	}
 
-	if compoundPos >= 0 && FC__().GetImports() != nil {
+	if compoundPos >= 0 && FC__().HasImports() {
 		/* If the first part of a qualified name is an alias, substitute it. */
-		var importName = FC__().GetImports().Get(ascii.StrToLower(name[:compoundPos]))
+		var importName = FC__().FindImport(ascii.StrToLower(name[:compoundPos]))
 		if importName != "" {
 			return ZendConcatNames(importName, name[compoundPos+1:]), isFullyQualified
 		}
@@ -50,10 +50,10 @@ func ZendResolveNonClassName(name string, typ uint32, caseSensitive bool, curren
 }
 
 func ZendResolveFunctionName(name string, typ uint32) (resolveName string, isFullyQualified bool) {
-	return ZendResolveNonClassName(name, typ, false, FC__().ImportsFunction())
+	return ZendResolveNonClassName(name, typ, false, FC__().FindImportFunction)
 }
 func ZendResolveConstName(name string, typ uint32) (resolveName string, isFullyQualified bool) {
-	return ZendResolveNonClassName(name, typ, true, FC__().ImportsConst())
+	return ZendResolveNonClassName(name, typ, true, FC__().FindImportConst)
 }
 
 func ZendResolveClassName(name string, typ uint32) string {
@@ -72,17 +72,17 @@ func ZendResolveClassName(name string, typ uint32) string {
 		}
 		return name
 	}
-	if FC__().GetImports().Len() != 0 {
+	if FC__().HasImports() {
 		pos := strings.IndexByte(name, '\\')
 		if pos >= 0 {
 			/* If the first part of a qualified name is an alias, substitute it. */
-			var importName = FC__().Imports().Get(name[:pos])
+			var importName = FC__().FindImport(name[:pos])
 			if importName != "" {
 				return ZendConcatNames(importName, name[pos+1:])
 			}
 		} else {
 			/* If an unqualified name is an alias, replace it. */
-			var importName = FC__().Imports().Get(name)
+			var importName = FC__().FindImport(name)
 			if importName != "" {
 				return importName
 			}
@@ -462,7 +462,7 @@ func ZendActivateAutoGlobals() {
 	})
 }
 func ZendVerifyNamespace() {
-	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() == 0 {
+	if FC__().HasBracketedNamespaces() != 0 && FC__().InNamespace() == 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "No code may exist outside of namespace {}")
 	}
 }
