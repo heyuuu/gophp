@@ -508,7 +508,7 @@ func ZifSerialize(var_ *types.Zval) *types.Zval {
 	serializer.Serialize(var_)
 	serializer.DestroyData()
 
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		return types.NewZvalFalse()
 	}
 
@@ -585,7 +585,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 
 			/* Exception during string conversion. */
 
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				goto cleanup
 			}
 		}

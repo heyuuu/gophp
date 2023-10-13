@@ -810,14 +810,14 @@ yy18:
 		ce = zend.ZendLookupClass(class_name)
 		if ce != nil {
 			BG__().serialize_lock--
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				// types.ZendStringReleaseEx(class_name, 0)
 				return 0
 			}
 			break
 		}
 		BG__().serialize_lock--
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			// types.ZendStringReleaseEx(class_name, 0)
 			return 0
 		}
@@ -837,7 +837,7 @@ yy18:
 		BG__().serialize_lock++
 		if zend.CallUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != types.SUCCESS {
 			BG__().serialize_lock--
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				// types.ZendStringReleaseEx(class_name, 0)
 				// zend.ZvalPtrDtor(&user_func)
 				// zend.ZvalPtrDtor(&args[0])
@@ -852,7 +852,7 @@ yy18:
 		}
 		BG__().serialize_lock--
 		// zend.ZvalPtrDtor(&retval)
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			// types.ZendStringReleaseEx(class_name, 0)
 			// zend.ZvalPtrDtor(&user_func)
 			// zend.ZvalPtrDtor(&args[0])

@@ -15,7 +15,7 @@ func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 	/* Check whether an exception has been thrown, if not, jump over code */
 
-	faults.ExceptionRestore()
+	EG__().ExceptionRestore()
 	if EG__().GetException() == nil {
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}

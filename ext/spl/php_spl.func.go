@@ -205,7 +205,7 @@ func ZifSplAutoload(className string, _ zpp.Opt, fileExtensions *string) {
 	lcName := ascii.StrToLower(className)
 	exts := strings.Split(fileExts, ",")
 	for _, ext := range exts {
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			break
 		}
 		if SplAutoload(className, lcName, ext) != 0 {
@@ -261,7 +261,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, className string) {
 				fcic.SetCalledScope(types.Z_OBJCE(alfi.GetObj()))
 			}
 			zend.ZendCallFunction(fci, &fcic)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				return false
 			}
 			if zend.EG__().ClassTable().Exists(lc_name) {

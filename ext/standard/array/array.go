@@ -131,7 +131,7 @@ func ZifCount(var_ *types.Zval, _ zpp.Opt, mode int) int {
 			if c, ok := array.Object().CountElements(); ok {
 				return c
 			}
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				return long
 			}
 		}
@@ -381,7 +381,7 @@ func arrayWalk(array *types.Zval, recursive bool, handler func(value *types.Zval
 		}
 
 		/* Reload array and position -- both may have changed */
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			return false
 		}
 

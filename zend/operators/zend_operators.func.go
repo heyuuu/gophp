@@ -276,7 +276,7 @@ func _convertScalarToNumber(op *types.Zval, silent bool, check bool) {
 	case types.IsObject:
 		var dst types.Zval
 		ConvertObjectToType(op, &dst, types.IsNumber, ConvertScalarToNumber)
-		if check && zend.EG__().GetException() != nil {
+		if check && zend.EG__().HasException() {
 			return
 		}
 		if dst.IsLong() || dst.IsDouble() {
@@ -321,7 +321,7 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent bo
 		return holder
 	case types.IsObject:
 		ConvertObjectToType(op, holder, types.IsNumber, ConvertScalarToNumber)
-		if zend.EG__().GetException() != nil || !holder.IsLong() && !holder.IsDouble() {
+		if zend.EG__().HasException() || !holder.IsLong() && !holder.IsDouble() {
 			holder.SetLong(1)
 		}
 		return holder
@@ -639,7 +639,7 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, false)
 					op2 = op1
 				}
-				if zend.EG__().GetException() != nil {
+				if zend.EG__().HasException() {
 					if result != op1 {
 						result.SetUndef()
 					}
@@ -766,7 +766,7 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					}
 					op2 = op1
 				}
-				if zend.EG__().GetException() != nil {
+				if zend.EG__().HasException() {
 					if result != op1 {
 						result.SetUndef()
 					}
@@ -854,7 +854,7 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 					op2 = op1
 				}
-				if zend.EG__().GetException() != nil {
+				if zend.EG__().HasException() {
 					if result != op1 {
 						result.SetUndef()
 					}
@@ -898,7 +898,7 @@ func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -922,7 +922,7 @@ func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				return types.SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1110,7 +1110,7 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1124,7 +1124,7 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 			return types.SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1173,7 +1173,7 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1187,7 +1187,7 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			return types.SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1236,7 +1236,7 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1250,7 +1250,7 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			return types.SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			if result != op1 {
 				result.SetUndef()
 			}
@@ -1292,7 +1292,7 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1316,7 +1316,7 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 				return types.SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1385,7 +1385,7 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1409,7 +1409,7 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 				return types.SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -1479,7 +1479,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				return types.SUCCESS
 			}
 			op1_copy.SetStringEx(ZvalGetString(op1))
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 
 				if orig_op1 != result {
 					result.SetUndef()
@@ -1507,7 +1507,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				return types.SUCCESS
 			}
 			op2_copy.SetStringEx(ZvalGetString(op2))
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 
 				if orig_op1 != result {
 					result.SetUndef()
@@ -1741,7 +1741,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				} else {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 1)
 					op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 1)
-					if zend.EG__().GetException() != nil {
+					if zend.EG__().HasException() {
 						if result != op1 {
 							result.SetUndef()
 						}

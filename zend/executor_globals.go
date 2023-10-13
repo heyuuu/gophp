@@ -57,7 +57,7 @@ type ZendExecutorGlobals struct {
 
 	errorReportingIniEntry *ZendIniEntry
 	exception              *types.Object
-	prevException          **types.Object
+	prevException          *types.Object
 	oplineBeforeException  *types.ZendOp
 	exceptionOp            [3]types.ZendOp
 	currentModule          *ModuleEntry
@@ -442,7 +442,7 @@ func (eg *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
 }
 func (eg *ZendExecutorGlobals) GetException() *types.Object      { return eg.exception }
 func (eg *ZendExecutorGlobals) SetException(value *types.Object) { eg.exception = value }
-func (eg *ZendExecutorGlobals) GetPrevException() **types.Object { return eg.prevException }
+func (eg *ZendExecutorGlobals) GetPrevException() *types.Object  { return eg.prevException }
 func (eg *ZendExecutorGlobals) SetPrevException(value **types.Object) {
 	eg.prevException = value
 }
@@ -494,4 +494,38 @@ func (eg *ZendExecutorGlobals) SetIsObjectStoreNoReuse(cond bool) {
 }
 func (eg *ZendExecutorGlobals) SetIsInResourceShutdown(cond bool) {
 	eg.SwitchFlags(EG_FLAGS_IN_RESOURCE_SHUTDOWN, cond)
+}
+
+/**
+ * exceptions && errors
+ */
+func (eg *ZendExecutorGlobals) HasException() bool { return eg.exception != nil }
+func (eg *ZendExecutorGlobals) ClearException() {
+	eg.prevException = nil
+	if eg.exception != nil {
+		eg.exception = nil
+		if eg.currentExecuteData != nil {
+			eg.currentExecuteData.SetOpline(eg.oplineBeforeException)
+		}
+	}
+}
+func (eg *ZendExecutorGlobals) ExceptionSave() {
+	if eg.prevException != nil {
+		faults.ExceptionSetPrevious(eg.exception, eg.prevException)
+	}
+	if eg.exception != nil {
+		eg.prevException = eg.exception
+	}
+	eg.exception = nil
+}
+
+func (eg *ZendExecutorGlobals) ExceptionRestore() {
+	if eg.prevException != nil {
+		if eg.exception != nil {
+			faults.ExceptionSetPrevious(eg.exception, eg.prevException)
+		} else {
+			eg.exception = eg.prevException
+		}
+		eg.prevException = nil
+	}
 }

@@ -65,7 +65,7 @@ func ParseLongWeak(arg *types.Zval, cap bool) (dest int, ok bool) {
 		if arg == nil {
 			return // fail
 		}
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			return // fail
 		}
 	}
@@ -128,7 +128,7 @@ func ParseDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 		if arg == nil {
 			return // fail
 		}
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			return // fail
 		}
 	}

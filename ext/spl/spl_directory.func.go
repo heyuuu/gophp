@@ -184,7 +184,7 @@ func SplFilesystemDirOpen(intern *SplFilesystemObject, path *byte) {
 		intern.SetPath(zend.Estrndup(path, intern.GetPathLen()))
 	}
 	intern.SetIndex(0)
-	if zend.EG__().GetException() != nil || intern.GetDirp() == nil {
+	if zend.EG__().HasException() || intern.GetDirp() == nil {
 		intern.GetEntry().GetDName()[0] = '0'
 		if zend.EG__().GetException() == nil {
 

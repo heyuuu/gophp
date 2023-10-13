@@ -146,10 +146,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 	ZendPrintf("</code>")
 
 	/* Discard parse errors thrown during tokenization */
-
-	faults.ClearException()
-
-	/* Discard parse errors thrown during tokenization */
+	EG__().ClearException()
 }
 func ZendStrip() {
 	var token types.Zval
@@ -206,5 +203,5 @@ func ZendStrip() {
 	}
 
 	/* Discard parse errors thrown during tokenization */
-	faults.ClearException()
+	EG__().ClearException()
 }

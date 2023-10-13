@@ -2037,7 +2037,7 @@ func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 		b.Assert(EG__().GetException() != nil && "Exception must have been thrown")
 		exception_zv.SetObject(EG__().GetException())
 		// 		exception_zv.AddRefcount()
-		faults.ClearException()
+		EG__().ClearException()
 		exception_str = operators.ZvalGetString(&exception_zv)
 		faults.ErrorNoreturn(faults.E_ERROR, "During inheritance of %s with variance dependencies: Uncaught %s", ce.Name(), exception_str.GetVal())
 	}

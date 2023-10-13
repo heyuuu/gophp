@@ -118,7 +118,7 @@ func PhpExtractIfExists(arr *types.Array, symbolTable *types.Array) zend.ZendLon
 			}
 			entry = types.ZVAL_DEREF(entry)
 			zend.ZEND_TRY_ASSIGN_COPY_EX(origVar, entry, 0)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				return -1
 			}
 			return 1
@@ -176,7 +176,7 @@ func PhpExtractOverwrite(arr *types.Array, symbolTable *types.Array) zend.ZendLo
 			}
 			entry = types.ZVAL_DEREF(entry)
 			zend.ZEND_TRY_ASSIGN_COPY_EX(origVar, entry, 0)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				return -1
 			}
 		} else {
@@ -268,7 +268,7 @@ func PhpExtractPrefixIfExists(arr *types.Array, symbolTable *types.Array, prefix
 							origVar2 = origVar2.Indirect()
 						}
 						zend.ZEND_TRY_ASSIGN_COPY_EX(origVar2, entry, 0)
-						if zend.EG__().GetException() != nil {
+						if zend.EG__().HasException() {
 							count = -1
 							return false
 						}
@@ -394,7 +394,7 @@ func PhpExtractPrefixSame(arr *types.Array, symbolTable *types.Array, prefix *ty
 						origVar = origVar.Indirect()
 					}
 					zend.ZEND_TRY_ASSIGN_COPY_EX(origVar, entry, 0)
-					if zend.EG__().GetException() != nil {
+					if zend.EG__().HasException() {
 						return -1
 					}
 				} else {
@@ -459,7 +459,7 @@ func PhpExtractPrefixAll(arr *types.Array, symbolTable *types.Array, prefix *typ
 						origVar = origVar.Indirect()
 					}
 					zend.ZEND_TRY_ASSIGN_COPY_EX(origVar, entry, 0)
-					if zend.EG__().GetException() != nil {
+					if zend.EG__().HasException() {
 						return -1
 					}
 				} else {
@@ -536,7 +536,7 @@ func PhpExtractPrefixInvalid(arr *types.Array, symbolTable *types.Array, prefix 
 					origVar = origVar.Indirect()
 				}
 				zend.ZEND_TRY_ASSIGN_COPY_EX(origVar, entry, 0)
-				if zend.EG__().GetException() != nil {
+				if zend.EG__().HasException() {
 					return -1
 				}
 			} else {

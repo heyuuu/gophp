@@ -177,7 +177,7 @@ func isCallableImpl(call *Callable, checkFlags uint32, throw bool) (bool, error)
 				return true, nil
 			} else {
 				/* Discard exceptions thrown from Z_OBJ_HANDLER_P(callable, get_closure) */
-				faults.ClearException()
+				zend.EG__().ClearException()
 			}
 		}
 		return false, errors.New("no array or string given")

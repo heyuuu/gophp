@@ -318,7 +318,7 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 	call_result = zend.CallUserFunctionEx(lang.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0)
 	// zend.ZvalPtrDtor(&args[0])
 	// zend.ZvalPtrDtor(&func_name)
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		return -1
 	}
 	if call_result == types.SUCCESS && retval.IsNotUndef() {
@@ -355,7 +355,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	call_result = zend.CallUserFunctionEx(lang.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0)
 	// zend.ZvalPtrDtor(&args[0])
 	// zend.ZvalPtrDtor(&func_name)
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		return -1
 	}
 	if call_result == types.FAILURE {
@@ -384,7 +384,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	func_name.SetString(USERSTREAM_EOF)
 	call_result = zend.CallUserFunction(lang.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	// zend.ZvalPtrDtor(&func_name)
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		stream.SetEof(1)
 		return -1
 	}

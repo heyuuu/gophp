@@ -52,7 +52,7 @@ func _subFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int 
 		op1 = ZendiConvertScalarToNumber(op1, &op1Copy, result, 0)
 		op2 = op1
 	}
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		if result != op1 {
 			result.SetUndef()
 		}

@@ -381,7 +381,7 @@ func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*FileHandle) boo
 		ZendDestroyFileHandle(fileHandle)
 		if opArray != nil {
 			ZendExecute(opArray, retval)
-			faults.ExceptionRestore()
+			EG__().ExceptionRestore()
 			if EG__().GetException() != nil {
 				if EG__().GetUserExceptionHandler().IsNotUndef() {
 					ZendUserExceptionHandler()

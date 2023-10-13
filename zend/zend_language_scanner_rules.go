@@ -365,11 +365,11 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 		sc.onEvent = nil
 		CG__().doc_comment = nil
 		currentState.heredocLabelStack.ApplyReverse(CopyHeredocLabelStack)
-		faults.ExceptionSave()
+		EG__().ExceptionSave()
 		for heredocNestingLevel != 0 {
 			retval, _ := sc.LexScan(nil)
-			if EG__().exception != nil {
-				faults.ClearException()
+			if EG__().HasException() {
+				EG__().ClearException()
 				break
 			}
 			if firstToken == 0 {
@@ -384,7 +384,7 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 				heredocNestingLevel = 0
 			}
 		}
-		faults.ExceptionRestore()
+		EG__().ExceptionRestore()
 		if b.EqualsAny(firstToken, T_VARIABLE, T_DOLLAR_OPEN_CURLY_BRACES, T_CURLY_OPEN) && sc.heredocIndentation != 0 {
 			faults.ThrowExceptionEx(faults.ZendCeParseError, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", sc.heredocIndentation)
 			errno = 1

@@ -1093,7 +1093,7 @@ func ZifSubstrReplace(returnValue zpp.Ret, str *types.Zval, replace *types.Zval,
 	if length != nil && !length.IsArray() {
 		operators.ConvertToLong(length)
 	}
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		return
 	}
 
@@ -1555,7 +1555,7 @@ func strReplace(returnValue *types.Zval, search *types.Zval, replace *types.Zval
 	} else if !replace.IsArray() {
 		operators.ConvertToStringEx(replace)
 	}
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		return
 	}
 

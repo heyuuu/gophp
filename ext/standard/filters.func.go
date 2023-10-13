@@ -157,7 +157,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 
 		/* Exception during string conversion. */
 
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			if allowed_tags != nil {
 				// types.ZendStringRelease(allowed_tags)
 			}

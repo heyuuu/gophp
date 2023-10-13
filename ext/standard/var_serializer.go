@@ -177,7 +177,7 @@ func (se *VarSerializer) getSleepProps(ht *types.Array, struc *types.Zval, sleep
 		if se.tryAddSleepProp(ht, props, name, name, struc) == types.SUCCESS {
 			continue
 		}
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			retval = types.FAILURE
 			break
 		}
@@ -185,7 +185,7 @@ func (se *VarSerializer) getSleepProps(ht *types.Array, struc *types.Zval, sleep
 		if se.tryAddSleepProp(ht, props, priv_name, name, struc) == types.SUCCESS {
 			continue
 		}
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			retval = types.FAILURE
 			break
 		}
@@ -193,7 +193,7 @@ func (se *VarSerializer) getSleepProps(ht *types.Array, struc *types.Zval, sleep
 		if se.tryAddSleepProp(ht, props, prot_name, name, struc) == types.SUCCESS {
 			continue
 		}
-		if zend.EG__().GetException() != nil {
+		if zend.EG__().HasException() {
 			retval = types.FAILURE
 			break
 		}
@@ -211,7 +211,7 @@ func (se *VarSerializer) serializeClass(struc *types.Zval, retval_ptr *types.Zva
 	props.Destroy()
 }
 func (se *VarSerializer) serializeIntern(struc *types.Zval) {
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		return
 	}
 	if se.data != nil {

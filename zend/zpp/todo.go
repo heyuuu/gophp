@@ -5,5 +5,5 @@ import "github.com/heyuuu/gophp/zend"
 func currExecuteData() ExecuteData { return zend.CurrEX() }
 
 func existException() bool {
-	return zend.EG__().GetException() != nil
+	return zend.EG__().HasException()
 }

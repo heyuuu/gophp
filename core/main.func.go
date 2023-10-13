@@ -719,15 +719,11 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 		case faults.E_NOTICE:
 			fallthrough
 		case faults.E_USER_NOTICE:
-
 			/* notices are no errors and are not treated as such like E_WARNINGS */
-
 		default:
-
 			/* throw an exception if we are in EH_THROW mode
 			 * but DO NOT overwrite a pending exception
 			 */
-
 			if zend.EG__().GetException() == nil {
 				faults.ThrowErrorException(zend.EG__().GetExceptionClass(), buffer, 0, type_)
 			}
@@ -1450,7 +1446,7 @@ func PhpExecuteScript(primaryFile *zend.FileHandle) bool {
 		}
 	})
 
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		faults.Try(func() {
 			faults.ExceptionError(zend.EG__().GetException(), faults.E_ERROR)
 		})
@@ -1514,7 +1510,7 @@ func PhpLintScript(file *zend.FileHandle) int {
 			retval = types.SUCCESS
 		}
 	})
-	if zend.EG__().GetException() != nil {
+	if zend.EG__().HasException() {
 		faults.ExceptionError(zend.EG__().GetException(), faults.E_ERROR)
 	}
 	return retval

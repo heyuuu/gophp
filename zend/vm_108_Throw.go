@@ -16,12 +16,12 @@ func ZEND_THROW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 		break
 	}
-	faults.ExceptionSave()
+	EG__().ExceptionSave()
 	{
 		// value.TryAddRefcount()
 	}
 	faults.ThrowExceptionObject(value)
-	faults.ExceptionRestore()
+	EG__().ExceptionRestore()
 	return 0
 }
 func ZEND_THROW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
@@ -49,9 +49,9 @@ func ZEND_THROW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		}
 		break
 	}
-	faults.ExceptionSave()
+	EG__().ExceptionSave()
 	faults.ThrowExceptionObject(value)
-	faults.ExceptionRestore()
+	EG__().ExceptionRestore()
 	return 0
 }
 func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -79,10 +79,9 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 		break
 	}
-	faults.ExceptionSave()
+	EG__().ExceptionSave()
 	faults.ThrowExceptionObject(value)
-	faults.ExceptionRestore()
-	// ZvalPtrDtorNogc(free_op1)
+	EG__().ExceptionRestore()
 	return 0
 }
 func ZEND_THROW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -108,8 +107,8 @@ func ZEND_THROW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		break
 	}
-	faults.ExceptionSave()
+	EG__().ExceptionSave()
 	faults.ThrowExceptionObject(value)
-	faults.ExceptionRestore()
+	EG__().ExceptionRestore()
 	return 0
 }

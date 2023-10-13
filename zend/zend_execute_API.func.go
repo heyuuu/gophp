@@ -445,14 +445,14 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 
 	orig_fake_scope = EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
-	faults.ExceptionSave()
+	EG__().ExceptionSave()
 
 	var ce *types.ClassEntry = nil
 	if ZendCallFunction(fci, &fcc) == types.SUCCESS && EG__().GetException() == nil {
 		ce = EG__().ClassTable().Get(lc_name)
 	}
 
-	faults.ExceptionRestore()
+	EG__().ExceptionRestore()
 	EG__().SetFakeScope(orig_fake_scope)
 	EG__().GetInAutoload().KeyDelete(lc_name)
 	return ce
@@ -702,7 +702,7 @@ func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_typ
 				var exception_zv types.Zval
 				exception_zv.SetObject(EG__().GetException())
 				// 				exception_zv.AddRefcount()
-				faults.ClearException()
+				EG__().ClearException()
 				exception_str = operators.ZvalGetString(&exception_zv)
 				faults.ErrorNoreturn(faults.E_ERROR, "During class fetch: Uncaught %s", exception_str.GetVal())
 			}

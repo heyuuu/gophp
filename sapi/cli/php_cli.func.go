@@ -548,7 +548,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 			memset(&executeData, 0, b.SizeOf("zend_execute_data"))
 			zend.EG__().SetCurrentExecuteData(&executeData)
 			zend.ZendCallMethodWith1Params(&ref, pce, pce.GetConstructor(), "__construct", nil, &arg)
-			if zend.EG__().GetException() != nil {
+			if zend.EG__().HasException() {
 				var tmp types.Zval
 				var msg *types.Zval
 				var rv types.Zval

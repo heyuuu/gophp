@@ -190,7 +190,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 		return pfmt.Sprintf("%.*G", zend.EG__().GetPrecision(), op.Double()), true
 	case types.IsArray:
 		faults.Error(faults.E_NOTICE, "Array to string conversion")
-		if try && zend.EG__().GetException() != nil {
+		if try && zend.EG__().HasException() {
 			return "", false
 		}
 		return "Array", true
