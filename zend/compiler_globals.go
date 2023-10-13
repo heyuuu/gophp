@@ -54,8 +54,8 @@ type ZendCompilerGlobals struct {
 var _ contracts.ModuleLifeCycle = (*ZendCompilerGlobals)(nil)
 
 func (cg *ZendCompilerGlobals) StartUp() {
-	cg.functionTable = types.NewLcTable[types.IFunction](nil)
-	cg.classTable = types.NewLcTable[*types.ClassEntry](nil)
+	cg.functionTable = types.NewLcTable[types.IFunction]()
+	cg.classTable = types.NewLcTable[*types.ClassEntry]()
 	cg.autoGlobals = make(map[string]*ZendAutoGlobal)
 }
 

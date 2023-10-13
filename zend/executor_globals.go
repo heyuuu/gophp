@@ -84,7 +84,7 @@ type ZendExecutorGlobals struct {
 var _ contracts.ModuleLifeCycle = (*ZendExecutorGlobals)(nil)
 
 func (eg *ZendExecutorGlobals) StartUp() {
-	eg.constantTable = types.NewTable[*ZendConstant](nil)
+	eg.constantTable = types.NewTable[*ZendConstant]()
 }
 func (eg *ZendExecutorGlobals) Shutdown() {
 	eg.constantTable.Destroy()
@@ -313,13 +313,13 @@ func (eg *ZendExecutorGlobals) IniDirectives() IniDirectives {
 	return eg.iniDirectives
 }
 func (eg *ZendExecutorGlobals) InitIniDirectives() {
-	eg.iniDirectives = types.NewTable[*ZendIniEntry](nil)
+	eg.iniDirectives = types.NewTable[*ZendIniEntry]()
 }
 func (eg *ZendExecutorGlobals) ModifiedIniDirectives() IniDirectives {
 	return eg.modifiedIniDirectives
 }
 func (eg *ZendExecutorGlobals) InitModifiedIniDirectives() {
-	eg.modifiedIniDirectives = types.NewTable[*ZendIniEntry](nil)
+	eg.modifiedIniDirectives = types.NewTable[*ZendIniEntry]()
 }
 
 func (eg *ZendExecutorGlobals) VmStackPush(ex *ZendExecuteData) {
@@ -337,12 +337,12 @@ func (eg *ZendExecutorGlobals) VmStackPopCheck(ex *ZendExecuteData) {
 func (eg *ZendExecutorGlobals) GetRegularList() *types.Array { return &eg.regular_list }
 
 func (eg *ZendExecutorGlobals) InitRegularList() {
-	eg.persistentList = types.NewTable[*types.Resource](ListEntryDtor)
+	eg.persistentList = types.NewTableEx[*types.Resource](ListEntryDtor)
 }
 func (eg *ZendExecutorGlobals) RegularList() ResourceTable { return eg.regularList }
 
 func (eg *ZendExecutorGlobals) InitPersistentList() {
-	eg.persistentList = types.NewTable[*types.Resource](PlistEntryDtor)
+	eg.persistentList = types.NewTableEx[*types.Resource](PlistEntryDtor)
 }
 func (eg *ZendExecutorGlobals) PersistentList() ResourceTable {
 	return eg.persistentList

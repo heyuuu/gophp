@@ -44,19 +44,19 @@ func (this *ZendFileContext) ResetImportTables() {
 
 func (this *ZendFileContext) Imports() ImportNames {
 	if this.imports == nil {
-		this.imports = types.NewLcTable[string](nil)
+		this.imports = types.NewLcTable[string]()
 	}
 	return this.imports
 }
 func (this *ZendFileContext) ImportsFunction() ImportNames {
 	if this.imports_function == nil {
-		this.imports_function = types.NewLcTable[string](nil)
+		this.imports_function = types.NewLcTable[string]()
 	}
 	return this.imports_function
 }
 func (this *ZendFileContext) ImportsConst() ImportNames {
 	if this.imports_const == nil {
-		this.imports_const = types.NewLcTable[string](nil)
+		this.imports_const = types.NewLcTable[string]()
 	}
 	return this.imports_const
 }

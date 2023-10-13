@@ -146,9 +146,9 @@ func (ce *ClassEntry) initData() {
 }
 
 func (ce *ClassEntry) initTables() {
-	ce.functionTable = NewLcTable[IFunction](nil)
-	ce.propertyTable = NewTable[*PropertyInfo](nil)
-	ce.constantTable = NewTable[*ClassConstant](nil)
+	ce.functionTable = NewLcTable[IFunction]()
+	ce.propertyTable = NewTable[*PropertyInfo]()
+	ce.constantTable = NewTable[*ClassConstant]()
 }
 
 func (ce *ClassEntry) Name() string      { return ce.name }

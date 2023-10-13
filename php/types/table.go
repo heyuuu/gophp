@@ -19,15 +19,23 @@ type Table[T any] struct {
 	caseIgnore bool
 }
 
-func NewLcTable[T any](destructor func(T)) *Table[T] {
+func NewLcTable[T any]() *Table[T] {
 	return &Table[T]{
 		keys:       nil,
 		m:          make(map[string]T),
-		destructor: destructor,
 		caseIgnore: true,
 	}
 }
-func NewTable[T any](destructor func(T)) *Table[T] {
+
+func NewTable[T any]() *Table[T] {
+	return &Table[T]{
+		keys:       nil,
+		m:          make(map[string]T),
+		caseIgnore: false,
+	}
+}
+
+func NewTableEx[T any](destructor func(T)) *Table[T] {
 	return &Table[T]{
 		keys:       nil,
 		m:          make(map[string]T),
