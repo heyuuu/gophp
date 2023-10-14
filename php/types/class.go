@@ -233,6 +233,7 @@ func (ce *ClassEntry) GetProperty(name string) *PropertyInfo {
 }
 
 // interfaces
+func (ce *ClassEntry) HasInterfaces() bool { return ce.GetNumInterfaces() != 0 }
 func (ce *ClassEntry) GetNumInterfaces() int {
 	if ce.IsResolvedInterfaces() {
 		return len(ce.interfaces)

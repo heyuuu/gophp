@@ -178,56 +178,44 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 }
 func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) bool {
 	if ce1 == ce2 {
-		return 1
+		return true
 	}
 	if ce1.IsLinked() {
 		return operators.InstanceofFunction(ce1, ce2)
 	}
-	if ce1.GetParent() {
-		var parent_ce *types.ClassEntry
+	if ce1.GetParent() != nil {
+		var parentCe *types.ClassEntry
 		if ce1.IsResolvedParent() {
-			parent_ce = ce1.GetParent()
+			parentCe = ce1.GetParent()
 		} else {
-			parent_ce = ZendLookupClassEx(types.NewString(ce1.ParentName()), nil, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			parentCe = ZendLookupClassEx(types.NewString(ce1.ParentName()), nil, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		}
 
 		/* It's not sufficient to only check the parent chain itself, as need to do a full
 		 * recursive instanceof in case the parent interfaces haven't been copied yet. */
-
-		if parent_ce != nil && UnlinkedInstanceof(parent_ce, ce2) != 0 {
-			return 1
+		if parentCe != nil && UnlinkedInstanceof(parentCe, ce2) {
+			return true
 		}
-
-		/* It's not sufficient to only check the parent chain itself, as need to do a full
-		 * recursive instanceof in case the parent interfaces haven't been copied yet. */
-
 	}
-	if ce1.GetNumInterfaces() != 0 {
-		var i uint32
+	if ce1.HasInterfaces() {
 		if ce1.IsResolvedInterfaces() {
-
 			/* Unlike the normal instanceof_function(), we have to perform a recursive
 			 * check here, as the parent interfaces might not have been fully copied yet. */
-
-			for i = 0; i < ce1.GetNumInterfaces(); i++ {
-				if UnlinkedInstanceof(ce1.GetInterfaces()[i], ce2) != 0 {
-					return 1
+			for _, iface := range ce1.GetInterfaces() {
+				if UnlinkedInstanceof(iface, ce2) {
+					return true
 				}
 			}
-
-			/* Unlike the normal instanceof_function(), we have to perform a recursive
-			 * check here, as the parent interfaces might not have been fully copied yet. */
-
 		} else {
-			for i = 0; i < ce1.GetNumInterfaces(); i++ {
-				var ce *types.ClassEntry = ZendLookupClassEx_Ex(ce1.GetInterfaceNames()[i].GetName(), ce1.GetInterfaceNames()[i].GetLcName(), ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
-				if ce != nil && UnlinkedInstanceof(ce, ce2) != 0 {
-					return 1
+			for _, ifaceName := range ce1.GetInterfaceNames() {
+				var ce = ZendLookupClassEx_Ex(ifaceName.GetName(), ifaceName.GetLcName(), ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				if ce != nil && UnlinkedInstanceof(ce, ce2) {
+					return true
 				}
 			}
 		}
 	}
-	return 0
+	return false
 }
 func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFunction, fe_arg_info *ZendArgInfo, proto types.IFunction, proto_arg_info *ZendArgInfo) InheritanceStatus {
 	var fe_type types.TypeHint = fe_arg_info.GetType()
@@ -263,7 +251,7 @@ func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFu
 			*unresolved_class = proto_class_name
 			return INHERITANCE_UNRESOLVED
 		}
-		if UnlinkedInstanceof(fe_ce, proto_ce) != 0 {
+		if UnlinkedInstanceof(fe_ce, proto_ce) {
 			return INHERITANCE_SUCCESS
 		} else {
 			return INHERITANCE_ERROR
@@ -276,7 +264,7 @@ func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFu
 				*unresolved_class = fe_class_name
 				return INHERITANCE_UNRESOLVED
 			}
-			if UnlinkedInstanceof(fe_ce, ZendCeTraversable) != 0 {
+			if UnlinkedInstanceof(fe_ce, ZendCeTraversable) {
 				return INHERITANCE_SUCCESS
 			} else {
 				return INHERITANCE_ERROR
@@ -953,7 +941,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parentCe *types.ClassEntry, check
 	ce.SetIsResolvedParent(true)
 
 	/* Inherit interfaces */
-	if parentCe.GetNumInterfaces() != 0 {
+	if parentCe.HasInterfaces() {
 		if !ce.IsImplementInterfaces() {
 			ZendDoInheritInterfaces(ce, parentCe)
 		} else {
@@ -1160,15 +1148,14 @@ func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
 		DoInheritMethod(key, func_, ce, 1, 0)
 	})
 	DoImplementInterface(ce, iface)
-	if iface.GetNumInterfaces() != 0 {
+	if iface.HasInterfaces() {
 		ZendDoInheritInterfaces(ce, iface)
 	}
 }
 func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 	b.Assert(ce.IsLinked())
 
-	var ignore uint32 = 0
-	var currentIfaceNum = ce.GetNumInterfaces()
+	var ignore = false
 	var parentIfaceNum = 0
 	if ce.GetParent() != nil {
 		parentIfaceNum = ce.GetParent().GetNumInterfaces()
@@ -1179,13 +1166,13 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 			i--
 		} else if ce.GetInterfaces()[i] == iface {
 			if i < parentIfaceNum {
-				ignore = 1
+				ignore = true
 			} else {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot implement previously implemented interface %s", ce.Name(), iface.Name())
 			}
 		}
 	}
-	if ignore != 0 {
+	if ignore {
 		/* Check for attempt to redeclare interface constants */
 		ce.ConstantsTable().Foreach(func(key string, c *types.ClassConstant) {
 			DoInheritConstantCheck(iface.ConstantsTable(), c, key, iface)
@@ -1337,7 +1324,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name string, key string, fn types.
 	ZendAddMagicMethods(ce, key, new_fn)
 }
 func ZendFixupTraitMethod(fn types.IFunction, ce *types.ClassEntry) {
-	if (fn.GetScope().GetCeFlags() & types.AccTrait) == types.AccTrait {
+	if fn.GetScope().IsTrait() {
 		fn.SetScope(ce)
 		if fn.IsAbstract() {
 			ce.SetIsImplicitAbstractClass(true)
@@ -1520,7 +1507,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits []*types.ClassEn
 	}
 	return excludeTables, aliases
 }
-func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry, excludeTables []*types.Array, aliases []*types.ClassEntry) {
+func doTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry, excludeTables []*types.Array, aliases []*types.ClassEntry) {
 	b.Assert(ce.GetNumTraits() == len(traits))
 
 	var overridden *types.Array = nil
@@ -1564,7 +1551,7 @@ func FindFirstDefinition(ce *types.ClassEntry, traits []*types.ClassEntry, curre
 	}
 	return coliding_ce
 }
-func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntry) {
+func doTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntry) {
 	var coliding_prop *types.PropertyInfo
 	var prop_name *types.String
 	var not_compatible bool
@@ -1582,9 +1569,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 			continue
 		}
 		trait.PropertyTable().Foreach(func(_ string, property_info *types.PropertyInfo) {
-			/* first get the unmangeld name if necessary,
-			 * then check whether the property is already there
-			 */
+			/* first get the unmangeld name if necessary, then check whether the property is already there */
 			flags = property_info.GetFlags()
 			if (flags & types.AccPublic) != 0 {
 				prop_name = types.NewString(property_info.GetName())
@@ -1595,7 +1580,6 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 			}
 
 			/* next: check for conflicts with current class */
-
 			coliding_prop = ce.PropertyTable().Get(prop_name.GetStr())
 			if coliding_prop != nil {
 				if coliding_prop.IsPrivate() && coliding_prop.GetCe() != ce {
@@ -1606,7 +1590,6 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 					if (coliding_prop.GetFlags()&(types.AccPppMask|types.AccStatic)) == (flags&(types.AccPppMask|types.AccStatic)) && PropertyTypesCompatible(property_info, coliding_prop) == INHERITANCE_SUCCESS {
 
 						/* the flags are identical, thus, the properties may be compatible */
-
 						var op1 *types.Zval
 						var op2 *types.Zval
 						var op1_tmp types.Zval
@@ -1644,7 +1627,6 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 					if not_compatible != 0 {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).Name(), property_info.GetCe().Name(), prop_name.GetVal(), ce.Name())
 					}
-					// types.ZendStringReleaseEx(prop_name, 0)
 					return
 				}
 			}
@@ -1660,46 +1642,26 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 			ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
 		})
 	}
-
-	/* In the following steps the properties are inserted into the property table
-	 * for that, a very strict approach is applied:
-	 * - check for compatibility, if not compatible with any property in class -> fatal
-	 * - if compatible, then strict notice
-	 */
 }
-func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **types.ClassEntry) {
-	var i int = 0
-	var cur_alias *ZendTraitAlias
-	if ce.GetTraitAliases() != nil {
-		for ce.GetTraitAliases()[i] != nil {
-			cur_alias = ce.GetTraitAliases()[i]
-
-			/** The trait for this alias has not been resolved, this means, this
-			  alias was not applied. Abort with an error. */
-
-			if aliases[i] == nil {
-				if cur_alias.GetAlias() != "" {
-					/** Plain old inconsistency/typo/bug */
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias (%s) was defined for method %s(), but this method does not exist", cur_alias.GetAlias(), cur_alias.GetTraitMethod().MethodName())
+func doCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases []*types.ClassEntry) {
+	for i, curAlias := range ce.GetTraitAliases() {
+		/** The trait for this alias has not been resolved, this means, this alias was not applied. Abort with an error. */
+		if aliases[i] == nil {
+			if curAlias.GetAlias() != "" {
+				/** Plain old inconsistency/typo/bug */
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias (%s) was defined for method %s(), but this method does not exist", curAlias.GetAlias(), curAlias.GetTraitMethod().MethodName())
+			} else {
+				/** Here are two possible cases:
+				  1) this is an attempt to modify the visibility of a method introduce as part of another alias.
+				     Since that seems to violate the DRY principle, we check against it and abort.
+				  2) it is just a plain old inconsitency/typo/bug as in the case where alias is set. */
+				lcMethodName := ascii.StrToLower(curAlias.GetTraitMethod().MethodName())
+				if ce.FunctionTable().Exists(lcMethodName) {
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers for the trait alias %s() need to be changed in the same statement in which the alias is defined. Error", curAlias.GetTraitMethod().MethodName())
 				} else {
-
-					/** Here are two possible cases:
-					  1) this is an attempt to modify the visibility
-					     of a method introduce as part of another alias.
-					     Since that seems to violate the DRY principle,
-					     we check against it and abort.
-					  2) it is just a plain old inconsitency/typo/bug
-					     as in the case where alias is set. */
-
-					lcMethodName := ascii.StrToLower(cur_alias.GetTraitMethod().MethodName())
-					if ce.FunctionTable().Exists(lcMethodName) {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers for the trait alias %s() need to be changed in the same statement in which the alias is defined. Error", cur_alias.GetTraitMethod().MethodName())
-					} else {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers of the trait method %s() are changed, but this method does not exist. Error", cur_alias.GetTraitMethod().MethodName())
-					}
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers of the trait method %s() are changed, but this method does not exist. Error", curAlias.GetTraitMethod().MethodName())
 				}
 			}
-			i++
 		}
 	}
 }
@@ -1727,13 +1689,13 @@ func ZendDoBindTraits(ce *types.ClassEntry) {
 	excludeTables, aliases := ZendTraitsInitTraitStructures(ce, traits)
 
 	/* first care about all methods to be flattened into the class */
-	ZendDoTraitsMethodBinding(ce, traits, excludeTables, aliases)
+	doTraitsMethodBinding(ce, traits, excludeTables, aliases)
 
 	/* Aliases which have not been applied indicate typos/bugs. */
-	ZendDoCheckForInconsistentTraitsAliasing(ce, aliases)
+	doCheckForInconsistentTraitsAliasing(ce, aliases)
 
 	/* then flatten the properties into it, to, mostly to notfiy developer about problems */
-	ZendDoTraitsPropertyBinding(ce, traits)
+	doTraitsPropertyBinding(ce, traits)
 
 	/* Emit E_DEPRECATED for PHP 4 constructors */
 	ZendCheckDeprecatedConstructor(ce)
@@ -1788,13 +1750,8 @@ func ZendVerifyAbstractClass(ce *types.ClassEntry) {
 	if ai.GetCnt() != 0 {
 		faults.ErrorNoreturn(faults.E_ERROR, "Class %s contains %d abstract method%s and must therefore be declared abstract or implement the remaining methods ("+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+")", ce.Name(), ai.GetCnt(), lang.Cond(ai.GetCnt() > 1, "s", ""), DISPLAY_ABSTRACT_FN(0), DISPLAY_ABSTRACT_FN(1), DISPLAY_ABSTRACT_FN(2))
 	} else {
-
 		/* now everything should be fine and an added ZEND_ACC_IMPLICIT_ABSTRACT_CLASS should be removed */
-
 		ce.SetIsImplicitAbstractClass(false)
-
-		/* now everything should be fine and an added ZEND_ACC_IMPLICIT_ABSTRACT_CLASS should be removed */
-
 	}
 }
 func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
@@ -1958,17 +1915,11 @@ func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 		exception_str = operators.ZvalGetString(&exception_zv)
 		faults.ErrorNoreturn(faults.E_ERROR, "During inheritance of %s with variance dependencies: Uncaught %s", ce.Name(), exception_str.GetVal())
 	}
-
-	/* If this class has been used while unlinked through a variance obligation, it is not legal
-	 * to remove the class from the class table and throw an exception, because there is already
-	 * a dependence on the inheritance hierarchy of this specific class. Instead we fall back to
-	 * a fatal error, as would happen if we did not allow exceptions in the first place. */
 }
 func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 	/* Load parent/interface dependencies first, so we can still gracefully abort linking
 	 * with an exception and remove the class from the class table. This is only possible
 	 * if no variance obligations on the current class have been added during autoloading. */
-
 	var parent *types.ClassEntry = nil
 	var interfaces **types.ClassEntry = nil
 	if ce.HasParent() {
@@ -1978,7 +1929,7 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 			return types.FAILURE
 		}
 	}
-	if ce.GetNumInterfaces() != 0 {
+	if ce.HasInterfaces() {
 
 		/* Also copy the parent interfaces here, so we don't need to reallocate later. */
 
@@ -2028,15 +1979,12 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 	}
 	return types.SUCCESS
 }
-func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) InheritanceStatus {
+func ZendCanEarlyBind(ce *types.ClassEntry, parentCe *types.ClassEntry) InheritanceStatus {
 	var ret InheritanceStatus = INHERITANCE_SUCCESS
-	var key *types.String
-	var parent_info *types.PropertyInfo
-
-	parent_ce.FunctionTable().ForeachEx(func(key string, parent_func types.IFunction) bool {
-		var child_func types.IFunction = ce.FunctionTable().Get(key)
-		if child_func != nil {
-			var status InheritanceStatus = DoInheritanceCheckOnMethodEx(child_func, parent_func, ce, nil, 1, 0)
+	parentCe.FunctionTable().ForeachEx(func(key string, parentFunc types.IFunction) bool {
+		var childFunc types.IFunction = ce.FunctionTable().Get(key)
+		if childFunc != nil {
+			var status InheritanceStatus = DoInheritanceCheckOnMethodEx(childFunc, parentFunc, ce, nil, 1, 0)
 			if status != INHERITANCE_SUCCESS {
 				b.Assert(status == INHERITANCE_UNRESOLVED || status == INHERITANCE_ERROR)
 				ret = status
@@ -2051,14 +1999,14 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 		return ret
 	}
 
-	parent_ce.PropertyTable().ForeachEx(func(key string, parent_info *types.PropertyInfo) bool {
-		if parent_info.IsPrivate() || !(parent_info.GetType().IsSet()) {
+	parentCe.PropertyTable().ForeachEx(func(key string, parentInfo *types.PropertyInfo) bool {
+		if parentInfo.IsPrivate() || !(parentInfo.GetType().IsSet()) {
 			return true
 		}
 		var childInfo *types.PropertyInfo = ce.PropertyTable().Get(key)
 		if childInfo != nil {
 			if childInfo.GetType().IsSet() {
-				var status InheritanceStatus = PropertyTypesCompatible(parent_info, childInfo)
+				var status InheritanceStatus = PropertyTypesCompatible(parentInfo, childInfo)
 				if status != INHERITANCE_SUCCESS {
 					b.Assert(status == INHERITANCE_UNRESOLVED || status == INHERITANCE_ERROR)
 					ret = status

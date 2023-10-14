@@ -17,10 +17,10 @@ func SplAddClassName(list *types.Array, pce *types.ClassEntry, allow int, ceFlag
 	}
 }
 func SplAddInterfaces(list *types.Array, pce *types.ClassEntry, allow int, ceFlags uint32) {
-	if pce.GetNumInterfaces() != 0 {
+	if pce.HasInterfaces() {
 		b.Assert(pce.HasCeFlags(types.AccLinked))
-		for numInterfaces := 0; numInterfaces < pce.GetNumInterfaces(); numInterfaces++ {
-			SplAddClassName(list, pce.GetInterfaces()[numInterfaces], allow, ceFlags)
+		for _, iface := range pce.GetInterfaces() {
+			SplAddClassName(list, iface, allow, ceFlags)
 		}
 	}
 }

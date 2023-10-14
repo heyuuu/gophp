@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/shim/slices"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"math"
@@ -1847,24 +1848,22 @@ func InstanceofClass(instance_ce *types.ClassEntry, ce *types.ClassEntry) bool {
 	}
 	return false
 }
-func InstanceofInterface(instance_ce *types.ClassEntry, ce *types.ClassEntry) bool {
-	if instance_ce.GetNumInterfaces() != 0 {
-		b.Assert(instance_ce.IsResolvedInterfaces())
-		for i := 0; i < instance_ce.GetNumInterfaces(); i++ {
-			if instance_ce.GetInterfaces()[i] == ce {
-				return true
-			}
+func InstanceofInterface(instanceCe *types.ClassEntry, ce *types.ClassEntry) bool {
+	if instanceCe.HasInterfaces() {
+		b.Assert(instanceCe.IsResolvedInterfaces())
+		if slices.Contains(instanceCe.GetInterfaces(), ce) {
+			return true
 		}
 	}
-	return instance_ce == ce
+	return instanceCe == ce
 }
-func InstanceofFunctionEx(instance_ce *types.ClassEntry, ce *types.ClassEntry, isInterface bool) bool {
+func InstanceofFunctionEx(instanceCe *types.ClassEntry, ce *types.ClassEntry, isInterface bool) bool {
 	if isInterface {
 		b.Assert(ce.IsInterface())
-		return InstanceofInterface(instance_ce, ce)
+		return InstanceofInterface(instanceCe, ce)
 	} else {
 		b.Assert(!ce.IsInterface())
-		return InstanceofClass(instance_ce, ce)
+		return InstanceofClass(instanceCe, ce)
 	}
 }
 func InstanceofFunction(instance_ce *types.ClassEntry, ce *types.ClassEntry) bool {

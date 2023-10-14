@@ -209,7 +209,7 @@ func ZendImplementTraversable(interface_ *types.ClassEntry, class_type *types.Cl
 	if class_type.GetGetIterator() != nil || class_type.GetParent() != nil && class_type.GetParent().GetGetIterator() != nil {
 		return types.SUCCESS
 	}
-	if class_type.GetNumInterfaces() != 0 {
+	if class_type.HasInterfaces() {
 		b.Assert(class_type.IsResolvedInterfaces())
 		if slicekit.Any(class_type.GetInterfaces(), isTraversableRootInterface) {
 			return types.SUCCESS
@@ -235,7 +235,7 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 
 			/* c-level get_iterator cannot be changed (exception being only Traversable is implemented) */
 
-			if class_type.GetNumInterfaces() != 0 {
+			if class_type.HasInterfaces() {
 				b.Assert(class_type.IsResolvedInterfaces())
 				for i = 0; i < class_type.GetNumInterfaces(); i++ {
 					if class_type.GetInterfaces()[i] == ZendCeIterator {
