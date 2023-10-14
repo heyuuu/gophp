@@ -413,7 +413,7 @@ again:
 		if types.Z_OBJCE_P(struc) == zend.ZendStandardClassDef {
 			buf.WriteString("(object) array(\n")
 		} else {
-			buf.WriteString(types.Z_OBJCE_P(struc).GetName().GetStr())
+			buf.WriteString(types.Z_OBJCE_P(struc).Name())
 			buf.WriteString("::__set_state(array(\n")
 		}
 		if myht != nil {

@@ -228,18 +228,11 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		}
 		if ptr.IsAbstract() {
 			if scope != nil {
-
 				/* This is a class that must be abstract itself. Here we set the check info. */
-
 				scope.SetIsImplicitAbstractClass(true)
 				if !scope.IsInterface() {
-
 					/* Since the class is not an interface it needs to be declared as a abstract class. */
-
 					scope.SetIsExplicitAbstractClass(true)
-
-					/* Since the class is not an interface it needs to be declared as a abstract class. */
-
 				}
 			}
 			if ptr.IsStatic() && (scope == nil || !scope.IsInterface()) {

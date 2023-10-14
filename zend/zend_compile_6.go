@@ -730,29 +730,31 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 		}
 	}
 
-	var ce *types.ClassEntry = types.NewUserClass(name.GetStr())
+	var docComment string
+	if decl.GetDocComment() != nil {
+		docComment = decl.GetDocComment().GetStr()
+	}
+	var ce *types.ClassEntry = types.NewUserClass(
+		name.GetStr(),
+		decl.GetFlags(),
+		ZendGetCompiledFilename(),
+		decl.GetStartLineno(),
+		decl.GetEndLineno(),
+		docComment,
+	)
 	if CG__().IsCompilePreload() {
 		ce.SetIsPreloaded(true)
 		ZEND_MAP_PTR_NEW(ce.static_members_table)
 	}
-	ce.AddCeFlags(decl.GetFlags())
-	ce.SetFilename(ZendGetCompiledFilename())
-	ce.SetLineStart(decl.GetStartLineno())
-	ce.SetLineEnd(decl.GetEndLineno())
-	if decl.GetDocComment() != nil {
-		ce.SetDocComment(decl.GetDocComment().GetStr())
-	}
 	if decl.IsAnonClass() {
-
 		/* Serialization is not supported for anonymous classes */
-
 		ce.SetSerialize(ZendClassSerializeDeny)
 		ce.SetUnserialize(ZendClassUnserializeDeny)
 	}
 	if extends_ast != nil {
 		var extends_node Znode
 		var extends_name *types.String
-		if ZendIsConstDefaultClassRef(extends_ast) == 0 {
+		if !ZendIsConstDefaultClassRef(extends_ast) {
 			extends_name = ZendAstGetStr(extends_ast)
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", extends_name.GetVal())
 		}
@@ -768,16 +770,10 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 	compiler.CompileStmt(stmt_ast)
 
 	/* Reset lineno for final opcodes and errors */
-
 	compiler.setLinenoByAst(ast)
 	if !ce.IsImplementTraits() {
-
 		/* For traits this check is delayed until after trait binding */
-
 		ZendCheckDeprecatedConstructor(ce)
-
-		/* For traits this check is delayed until after trait binding */
-
 	}
 	if ce.GetConstructor() != nil {
 		ce.GetConstructor().SetIsCtor(true)

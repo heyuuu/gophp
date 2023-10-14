@@ -1379,7 +1379,7 @@ func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *
 	if intern.GetCeGetIterator() == spl_ce_ArrayIterator {
 		tmp.SetNull()
 	} else {
-		tmp.SetString(intern.GetCeGetIterator().GetName().GetStr())
+		tmp.SetString(intern.GetCeGetIterator().Name())
 	}
 	return_value.Array().Append(&tmp)
 }

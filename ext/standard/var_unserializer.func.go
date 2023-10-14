@@ -376,7 +376,7 @@ func ProcessNestedData(
 							if unmangled_class != nil && strcmp(unmangled_class, "*") != 0 {
 								new_key = zend.ZendManglePropertyName_ZStr(unmangled_class, unmangled.GetStr())
 							} else {
-								new_key = zend.ZendManglePropertyName_ZStr(existing_propinfo.GetCe().GetName().GetStr(), unmangled.GetStr())
+								new_key = zend.ZendManglePropertyName_ZStr(existing_propinfo.GetCe().Name(), unmangled.GetStr())
 							}
 							// types.ZendStringReleaseEx(unmangled, 0)
 						} else {

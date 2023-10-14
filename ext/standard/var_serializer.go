@@ -289,10 +289,11 @@ again:
 			var serialized_data *uint8 = nil
 			var serialized_length int
 			if ce.GetSerialize()(struc, &serialized_data, &serialized_length, se.data) == types.SUCCESS {
+				ceName := types.Z_OBJCE_P(struc).Name()
 				se.WriteString("C:")
-				se.WriteLong(types.Z_OBJCE_P(struc).GetName().GetLen())
+				se.WriteLong(len(ceName))
 				se.WriteString(":\"")
-				se.WriteString(types.Z_OBJCE_P(struc).GetName().GetStr())
+				se.WriteString(ceName)
 				se.WriteString("\":")
 				se.WriteLong(serialized_length)
 				se.WriteString(":{")

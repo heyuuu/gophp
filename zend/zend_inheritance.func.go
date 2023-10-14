@@ -747,18 +747,18 @@ func DoInheritanceCheckOnMethodEx(
 func DoInheritMethod(key string, parent types.IFunction, ce *types.ClassEntry, is_interface bool, checked bool) {
 	var func_ = ce.FunctionTable().Get(key)
 	if func_ != nil {
-		if is_interface != 0 && func_ == parent {
+		if is_interface && func_ == parent {
 			/* The same method in interface may be inherited few times */
 			return
 		}
 		dupCallback := func(f types.IFunction) { ce.FunctionTable().UpdateDirect(key, f) }
-		if checked != 0 {
+		if checked {
 			DoInheritanceCheckOnMethodEx(func_, parent, ce, dupCallback, 0, checked)
 		} else {
 			DoInheritanceCheckOnMethodEx(func_, parent, ce, dupCallback, 0, 0)
 		}
 	} else {
-		if is_interface != 0 || parent.IsAbstract() {
+		if is_interface || parent.IsAbstract() {
 			ce.SetIsImplicitAbstractClass(true)
 		}
 		parent = ZendDuplicateFunction(parent, ce, is_interface)
