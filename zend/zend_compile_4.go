@@ -257,7 +257,7 @@ func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ u
 		if opline.GetOp1Type() == IS_CONST {
 			var lcname *types.String = (CT_CONSTANT(opline.GetOp1()) + 1).GetStr()
 			ce = CG__().ClassTable().Get(lcname.GetStr())
-			if ce == nil && CG__().GetActiveClassEntry() != nil && ascii.StrCaseEquals(CG__().GetActiveClassEntry().GetName().GetStr(), lcname.GetStr()) {
+			if ce == nil && CG__().GetActiveClassEntry() != nil && ascii.StrCaseEquals(CG__().GetActiveClassEntry().Name(), lcname.GetStr()) {
 				ce = CG__().GetActiveClassEntry()
 			}
 		} else if opline.GetOp1Type() == IS_UNUSED && (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF && ZendIsScopeKnown() {

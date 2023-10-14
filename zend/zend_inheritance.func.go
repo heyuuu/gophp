@@ -772,8 +772,8 @@ func DoInheritMethod(key string, parent types.IFunction, ce *types.ClassEntry, i
 	}
 }
 func PropertyTypesCompatible(parent_info *types.PropertyInfo, child_info *types.PropertyInfo) InheritanceStatus {
-	var parent_name *types.String
-	var child_name *types.String
+	var parent_name string
+	var child_name string
 	var parent_type_ce *types.ClassEntry
 	var child_type_ce *types.ClassEntry
 	if parent_info.GetType() == child_info.GetType() {
@@ -783,7 +783,7 @@ func PropertyTypesCompatible(parent_info *types.PropertyInfo, child_info *types.
 		return INHERITANCE_ERROR
 	}
 	if parent_info.GetType().IsCe() {
-		parent_name = parent_info.GetType().Ce().GetName()
+		parent_name = parent_info.GetType().Ce().Name()
 	} else {
 		parent_name = ResolveClassName(parent_info.GetCe(), parent_info.GetType().Name())
 	}
@@ -792,7 +792,7 @@ func PropertyTypesCompatible(parent_info *types.PropertyInfo, child_info *types.
 	} else {
 		child_name = ResolveClassName(child_info.GetCe(), child_info.GetType().Name())
 	}
-	if ascii.StrCaseEquals(parent_name.GetStr(), child_name.GetStr()) {
+	if ascii.StrCaseEquals(parent_name, child_name) {
 		return INHERITANCE_SUCCESS
 	}
 
@@ -1257,53 +1257,48 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces []*types.ClassEn
 		DoInterfaceImplementation(ce, ce.GetInterfaces()[i])
 	}
 }
-func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFunction) {
-	if mname.GetStr() == "serialize" {
+func ZendAddMagicMethods(ce *types.ClassEntry, lcMethodName string, fe types.IFunction) {
+	if lcMethodName == "serialize" {
 		ce.SetSerializeFunc(fe)
-	} else if mname.GetStr() == "unserialize" {
+	} else if lcMethodName == "unserialize" {
 		ce.SetUnserializeFunc(fe)
-	} else if ce.GetName().GetLen() != mname.GetLen() && (mname.GetStr()[0] != '_' || mname.GetStr()[1] != '_') {
+	} else if len(ce.Name()) != len(lcMethodName) && (lcMethodName[0] != '_' || lcMethodName[1] != '_') {
 
-	} else if mname.GetStr() == ZEND_CLONE_FUNC_NAME {
+	} else if lcMethodName == ZEND_CLONE_FUNC_NAME {
 		ce.SetClone(fe)
-	} else if mname.GetStr() == ZEND_CONSTRUCTOR_FUNC_NAME {
-		if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
+	} else if lcMethodName == ZEND_CONSTRUCTOR_FUNC_NAME {
+		if ce.GetConstructor() != nil && (ce.GetParent() == nil || ce.GetConstructor() != ce.GetParent().GetConstructor()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.Name())
 		}
 		ce.SetConstructor(fe)
-	} else if mname.GetStr() == ZEND_DESTRUCTOR_FUNC_NAME {
+	} else if lcMethodName == ZEND_DESTRUCTOR_FUNC_NAME {
 		ce.SetDestructor(fe)
-	} else if mname.GetStr() == ZEND_GET_FUNC_NAME {
+	} else if lcMethodName == ZEND_GET_FUNC_NAME {
 		ce.SetGet(fe)
 		ce.SetIsUseGuards(true)
-	} else if mname.GetStr() == ZEND_SET_FUNC_NAME {
+	} else if lcMethodName == ZEND_SET_FUNC_NAME {
 		ce.SetSet(fe)
 		ce.SetIsUseGuards(true)
-	} else if mname.GetStr() == ZEND_CALL_FUNC_NAME {
+	} else if lcMethodName == ZEND_CALL_FUNC_NAME {
 		ce.SetCall(fe)
-	} else if mname.GetStr() == ZEND_UNSET_FUNC_NAME {
+	} else if lcMethodName == ZEND_UNSET_FUNC_NAME {
 		ce.SetUnset(fe)
 		ce.SetIsUseGuards(true)
-	} else if mname.GetStr() == ZEND_ISSET_FUNC_NAME {
+	} else if lcMethodName == ZEND_ISSET_FUNC_NAME {
 		ce.SetIsset(fe)
 		ce.SetIsUseGuards(true)
-	} else if mname.GetStr() == ZEND_CALLSTATIC_FUNC_NAME {
+	} else if lcMethodName == ZEND_CALLSTATIC_FUNC_NAME {
 		ce.SetCallstatic(fe)
-	} else if mname.GetStr() == ZEND_TOSTRING_FUNC_NAME {
+	} else if lcMethodName == ZEND_TOSTRING_FUNC_NAME {
 		ce.SetTostring(fe)
-	} else if mname.GetStr() == ZEND_DEBUGINFO_FUNC_NAME {
+	} else if lcMethodName == ZEND_DEBUGINFO_FUNC_NAME {
 		ce.SetDebugInfo(fe)
-	} else if ce.GetName().GetLen() == mname.GetLen() {
-		var lowercase_name *types.String = operators.ZendStringTolower(ce.GetName())
-		// lowercase_name = types.ZendNewInternedString(lowercase_name)
-		if !(memcmp(mname.GetVal(), lowercase_name.GetVal(), mname.GetLen())) {
-			if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.Name())
-			}
-			ce.SetConstructor(fe)
-			fe.SetIsCtor(true)
+	} else if len(ce.Name()) == len(lcMethodName) && ascii.StrToLower(ce.Name()) == lcMethodName {
+		if ce.GetConstructor() != nil && (ce.GetParent() == nil || ce.GetConstructor() != ce.GetParent().GetConstructor()) {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.Name())
 		}
-		// types.ZendStringReleaseEx(lowercase_name, 0)
+		ce.SetConstructor(fe)
+		fe.SetIsCtor(true)
 	}
 }
 func ZendAddTraitMethod(ce *types.ClassEntry, name string, key string, fn types.IFunction, overridden **types.Array) {
@@ -1506,7 +1501,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 
 			lcname := ascii.StrToLower(cur_method_ref.MethodName())
 			if !trait.FunctionTable().Exists(lcname) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A precedence rule was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.MethodName())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A precedence rule was defined for %s::%s but this method does not exist", trait.Name(), cur_method_ref.MethodName())
 			}
 
 			/** With the other traits, we are more permissive.
@@ -1569,7 +1564,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 
 				lcname := ascii.StrToLower(cur_method_ref.MethodName())
 				if !trait.FunctionTable().Exists(lcname) {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.MethodName())
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias was defined for %s::%s but this method does not exist", trait.Name(), cur_method_ref.MethodName())
 				}
 			}
 			i++

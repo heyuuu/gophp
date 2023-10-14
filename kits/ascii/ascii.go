@@ -78,7 +78,15 @@ func StrToLower(s string) string {
 }
 
 func StrCaseEquals(a string, b string) bool {
-	return StrToLower(a) == StrToLower(b)
+	if len(a) != len(b) {
+		return false
+	}
+	for i := 0; i < len(a); i++ {
+		if ToLower(a[i]) != ToLower(b[i]) {
+			return false
+		}
+	}
+	return true
 }
 
 func StrCaseCompare(a string, b string) int {

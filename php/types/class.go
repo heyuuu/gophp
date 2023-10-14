@@ -256,7 +256,6 @@ func (ce *ClassEntry) SetPropertiesInfoTable(value []*PropertyInfo) {
 /**
  * Getter / Setter
  */
-func (ce *ClassEntry) GetName() *String      { return NewString(ce.name) }
 func (ce *ClassEntry) IsInternalClass() bool { return ce.typ == typeInternalClass }
 func (ce *ClassEntry) IsUserClass() bool     { return ce.typ == typeUserClass }
 
