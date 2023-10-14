@@ -1,7 +1,6 @@
 package zif
 
 import (
-	"github.com/heyuuu/gophp/builtin/strutil"
 	f "github.com/heyuuu/gophp/internal/cmd/sikgen/astutil"
 	"go/ast"
 	"go/token"
@@ -51,7 +50,7 @@ func genFileNode(name string, infos []*ZifInfo) *ast.File {
 func genDefValueSpec(zifInfo *ZifInfo, phpFuncName string) *ast.GenDecl {
 	return f.ValueSpecDeclEx(
 		f.DocComment("\n// generate by "+zifInfo.funcName),
-		f.Ident("DefZif"+strutil.UpperCamelCase(phpFuncName)),
+		f.Ident("DefZif"+strkit.UpperCamelCase(phpFuncName)),
 		&ast.CallExpr{
 			Fun:  defPkgIdent("DefFunc"),
 			Args: genDefFuncArgs(zifInfo, phpFuncName),

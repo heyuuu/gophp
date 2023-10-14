@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/builtin/strutil"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
@@ -1181,7 +1180,7 @@ func Strtr(str string, from string, to string) string {
 	for i := 0; i < l; i++ {
 		runeMap[from[i]] = to[i]
 	}
-	return strutil.MapByte(func(b byte) byte {
+	return strkit.MapByte(func(b byte) byte {
 		if r, ok := runeMap[b]; ok {
 			return r
 		}

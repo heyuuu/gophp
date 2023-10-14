@@ -1384,7 +1384,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 			stack_frame.Array().KeyAddNew(types.STR_FUNCTION, &tmp)
 			if object != nil {
 				if func_.GetScope() != nil {
-					tmp.SetString(func_.GetScope().GetName().GetStr())
+					tmp.SetString(func_.GetScope().Name())
 				} else {
 					tmp.SetString(object.ClassName())
 				}
@@ -1397,7 +1397,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 				tmp.SetString(types.STR_OBJECT_OPERATOR)
 				stack_frame.Array().KeyAddNew(types.STR_TYPE, &tmp)
 			} else if func_.GetScope() != nil {
-				tmp.SetString(func_.GetScope().GetName().GetStr())
+				tmp.SetString(func_.GetScope().Name())
 				stack_frame.Array().KeyAddNew(types.STR_CLASS, &tmp)
 				tmp.SetString(types.STR_PAAMAYIM_NEKUDOTAYIM)
 				stack_frame.Array().KeyAddNew(types.STR_TYPE, &tmp)

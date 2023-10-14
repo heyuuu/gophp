@@ -290,7 +290,7 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 			/* c-level get_iterator cannot be changed */
 
 			if class_type.GetGetIterator() == ZendUserItGetNewIterator {
-				faults.ErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.Name(), interface_.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
+				faults.ErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.Name(), interface_.Name(), ZendCeAggregate.Name())
 			}
 			return types.FAILURE
 		}

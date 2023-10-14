@@ -3,11 +3,11 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/kits/strkit"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
-	"github.com/heyuuu/gophp/zend/operators"
 	"strings"
 )
 
@@ -158,14 +158,9 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 
 	internal_function.SetModule(EG__().GetCurrentModule())
 	if scope != nil {
-		class_name_len = scope.GetName().GetLen()
-		if lang.Assign(&lc_class_name, operators.ZendMemrchr(scope.Name(), '\\', class_name_len)) {
-			lc_class_name++
-			class_name_len -= lc_class_name - scope.Name()
-			lc_class_name = ascii.StrToLower(b.CastStr(lc_class_name, class_name_len))
-		} else {
-			lc_class_name = ascii.StrToLower(b.CastStr(scope.Name(), class_name_len))
-		}
+		_, class_name, _ := strkit.LastCut(scope.Name(), "\\")
+		lc_class_name = ascii.StrToLower(class_name)
+		class_name_len = len(class_name)
 	}
 	for ptr.GetFname() != nil {
 		fname_len = strlen(ptr.GetFname())

@@ -540,9 +540,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 			message = real_message
 		}
 		if message.GetLen() > 0 {
-			str = zend.ZendSprintfZStr("%s: %s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), message.GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = zend.ZendSprintfZStr("%s: %s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), message.GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		} else {
-			str = zend.ZendSprintfZStr("%s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = zend.ZendSprintfZStr("%s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		}
 		exception.Object().ProtectRecursive()
 		exception = GET_PROPERTY(exception, types.STR_PREVIOUS, &rv)
@@ -676,7 +676,7 @@ func ExceptionError(ex *types.Object, severity int) {
 		zend.ZendCallMethodWith0Params(&exception, ce_exception, ex.GetCe().GetTostring(), "__tostring", &tmp)
 		if zend.EG__().GetException() == nil {
 			if !tmp.IsString() {
-				Error(E_WARNING, "%s::__toString() must return a string", ce_exception.GetName().GetVal())
+				Error(E_WARNING, "%s::__toString() must return a string", ce_exception.Name())
 			} else {
 				zend.ZendUpdatePropertyEx(GetExceptionBase(&exception), &exception, types.STR_STRING, &tmp)
 			}
@@ -713,7 +713,7 @@ func ExceptionError(ex *types.Object, severity int) {
 		// types.ZendStringReleaseEx(str, 0)
 		// types.ZendStringReleaseEx(file, 0)
 	} else {
-		Error(severity, "Uncaught exception '%s'", ce_exception.GetName().GetVal())
+		Error(severity, "Uncaught exception '%s'", ce_exception.Name())
 	}
 	// zend.OBJ_RELEASE(ex)
 }

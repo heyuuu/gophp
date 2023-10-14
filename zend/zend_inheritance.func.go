@@ -1533,7 +1533,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				   exclude_from_classes, for consistency */
 
 				if trait == exclude_ce {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Inconsistent insteadof definition. "+"The method %s is to be used from %s, but %s is also on the exclude list", cur_method_ref.MethodName(), trait.GetName().GetVal(), trait.GetName().GetVal())
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Inconsistent insteadof definition. "+"The method %s is to be used from %s, but %s is also on the exclude list", cur_method_ref.MethodName(), trait.Name(), trait.Name())
 				}
 
 				/* make sure that the trait method is not from a class mentioned in
@@ -1701,7 +1701,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntr
 						}
 					}
 					if not_compatible != 0 {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).GetName().GetVal(), property_info.GetCe().Name(), prop_name.GetVal(), ce.Name())
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).Name(), property_info.GetCe().Name(), prop_name.GetVal(), ce.Name())
 					}
 					// types.ZendStringReleaseEx(prop_name, 0)
 					return
@@ -1777,7 +1777,7 @@ func ZendDoBindTraits(ce *types.ClassEntry) {
 			return
 		}
 		if !trait.IsTrait() {
-			faults.ErrorNoreturn(faults.E_ERROR, "%s cannot use %s - it is not a trait", ce.Name(), trait.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_ERROR, "%s cannot use %s - it is not a trait", ce.Name(), trait.Name())
 			return
 		}
 		for j = 0; j < i; j++ {

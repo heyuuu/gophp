@@ -1059,7 +1059,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	fbc := ce.FunctionTable().Get(lc_function_name.GetStr())
 	if fbc != nil {
 		// pass
-	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && operators.ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.Name(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().FunctionName()[0] != '_' || ce.GetConstructor().FunctionName()[1] != '_') {
+	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == len(ce.Name()) && operators.ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.Name(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().FunctionName()[0] != '_' || ce.GetConstructor().FunctionName()[1] != '_') {
 		fbc = ce.GetConstructor()
 	} else {
 		if ce.GetCall() != nil && lang.Assign(&object, ZendGetThisObject(CurrEX())) != nil && operators.InstanceofFunction(object.GetCe(), ce) != 0 {

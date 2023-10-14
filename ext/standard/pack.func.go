@@ -3,7 +3,6 @@ package standard
 import (
 	"encoding/binary"
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/builtin/strutil"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
@@ -261,18 +260,18 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 		switch int(code) {
 		case 'a':
 			str := operators.ZvalGetStrVal(args[lang.PostInc(&currentarg)])
-			str = strutil.PadRight(str, arg, '\x00')[:arg]
+			str = strkit.PadRight(str, arg, '\x00')[:arg]
 			buf.WriteString(str)
 		case 'A':
 			str := operators.ZvalGetStrVal(args[lang.PostInc(&currentarg)])
-			str = strutil.PadRight(str, arg, ' ')[:arg]
+			str = strkit.PadRight(str, arg, ' ')[:arg]
 			buf.WriteString(str)
 		case 'Z':
 			str := operators.ZvalGetStrVal(args[lang.PostInc(&currentarg)])
 			if arg <= 0 {
 				str = "\x00"
 			} else {
-				str = strutil.PadRight(str, arg-1, '\x00')[:arg-1] + "\x00"
+				str = strkit.PadRight(str, arg-1, '\x00')[:arg-1] + "\x00"
 			}
 			buf.WriteString(str)
 		case 'h', 'H':

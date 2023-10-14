@@ -1,4 +1,4 @@
-package strutil
+package strkit
 
 func IndexNewline(str string) (pos int, newlineLen int) {
 	len_ := len(str)
