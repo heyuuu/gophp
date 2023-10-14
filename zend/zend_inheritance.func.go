@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/shim/slices"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
 )
@@ -13,20 +14,14 @@ import (
 func ZendDoInheritance(ce *types.ClassEntry, parentCe *types.ClassEntry) {
 	ZendDoInheritanceEx(ce, parentCe, false)
 }
-func ZendDuplicatePropertyInfoInternal(property_info *types.PropertyInfo) *types.PropertyInfo {
-	var new_property_info *types.PropertyInfo = Pemalloc(b.SizeOf("zend_property_info"))
-	memcpy(new_property_info, property_info, b.SizeOf("zend_property_info"))
-	return new_property_info
+func ZendDuplicatePropertyInfoInternal(propertyInfo *types.PropertyInfo) *types.PropertyInfo {
+	var newPropertyInfo = new(types.PropertyInfo)
+	*newPropertyInfo = *propertyInfo
+	return newPropertyInfo
 }
 func ZendDuplicateInternalFunction(func_ *types.InternalFunction, ce *types.ClassEntry) *types.InternalFunction {
-	var newFunction *types.InternalFunction
-	if ce.IsInternalClass() {
-		newFunction = types.CopyInternalFunction(func_)
-	} else {
-		newFunction = types.CopyInternalFunction(func_)
-		newFunction.SetIsArenaAllocated(true)
-	}
-	return newFunction
+	// todo zend_duplicate_internal_function
+	return types.CopyInternalFunction(func_)
 }
 func ZendDuplicateUserFunction(func_ *types.UserFunction) *types.UserFunction {
 	var newFunction = types.CopyOpArray(func_)
@@ -59,22 +54,15 @@ func DoInheritParentConstructor(ce *types.ClassEntry) {
 	b.Assert(parent != nil)
 
 	/* You cannot change create_object */
-
 	ce.SetCreateObject(parent.GetCreateObject())
 
 	/* Inherit special functions if needed */
-
 	if ce.GetGetIterator() == nil {
 		ce.SetGetIterator(parent.GetGetIterator())
 	}
 	if parent.GetIteratorFuncsPtr() != nil {
-
 		/* Must be initialized through iface->interface_gets_implemented() */
-
 		b.Assert(ce.GetIteratorFuncsPtr() != nil)
-
-		/* Must be initialized through iface->interface_gets_implemented() */
-
 	}
 	if ce.GetGet() == nil {
 		ce.SetGet(parent.GetGet())
@@ -875,7 +863,7 @@ func DoInheritProperty(parent_info *types.PropertyInfo, key string, ce *types.Cl
 	}
 }
 func DoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
-	if !ce.IsInterface() && iface.GetInterfaceGetsImplemented() && iface.GetInterfaceGetsImplemented()(iface, ce) == types.FAILURE {
+	if !ce.IsInterface() && iface.GetInterfaceGetsImplemented() != nil && iface.GetInterfaceGetsImplemented()(iface, ce) == types.FAILURE {
 		faults.ErrorNoreturn(faults.E_CORE_ERROR, "Class %s could not implement interface %s", ce.Name(), iface.Name())
 	}
 
@@ -888,13 +876,7 @@ func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
 	interfaces := ce.GetInterfaces()
 	rawNum := len(interfaces)
 	for _, newInterface := range iface.GetInterfaces() {
-		i := 0
-		for ; i < rawNum; i++ {
-			if interfaces[i] == newInterface {
-				break
-			}
-		}
-		if i == rawNum {
+		if !slices.Contains(interfaces[:rawNum], newInterface) {
 			interfaces = append(interfaces, newInterface)
 		}
 	}
@@ -1344,7 +1326,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name string, key string, fn types.
 	}
 	if fn.IsInternalFunction() {
 		new_fn = types.CopyInternalFunction(fn.GetInternalFunction())
-		new_fn.SetIsArenaAllocated(true)
+		//new_fn.SetIsArenaAllocated(true)
 	} else {
 		new_fn = types.CopyOpArray(fn.GetOpArray())
 		new_fn.GetOpArray().SetIsTraitClone(true)

@@ -59,7 +59,6 @@ type IFunction interface {
 	IsFinal() bool
 	IsCtor() bool
 	IsReturnReference() bool
-	IsArenaAllocated() bool
 	IsDtor() bool
 	IsEarlyBinding() bool
 	IsHasFinallyBlock() bool
@@ -89,7 +88,6 @@ type IFunction interface {
 	SetIsFinal(b bool)
 	SetIsCtor(b bool)
 	SetIsReturnReference(b bool)
-	SetIsArenaAllocated(b bool)
 	SetIsHasTypeHints(b bool)
 	SetIsDtor(b bool)
 	SetIsEarlyBinding(b bool)
@@ -185,7 +183,6 @@ func (f *functionHeader) IsDeprecated() bool        { return f.HasFnFlags(AccDep
 func (f *functionHeader) IsFinal() bool             { return f.HasFnFlags(AccFinal) }
 func (f *functionHeader) IsCtor() bool              { return f.HasFnFlags(AccCtor) }
 func (f *functionHeader) IsReturnReference() bool   { return f.HasFnFlags(AccReturnReference) }
-func (f *functionHeader) IsArenaAllocated() bool    { return f.HasFnFlags(AccArenaAllocated) }
 func (f *functionHeader) IsDtor() bool              { return f.HasFnFlags(AccDtor) }
 func (f *functionHeader) IsEarlyBinding() bool      { return f.HasFnFlags(AccEarlyBinding) }
 func (f *functionHeader) IsHasFinallyBlock() bool   { return f.HasFnFlags(AccHasFinallyBlock) }
@@ -217,7 +214,6 @@ func (f *functionHeader) SetIsDeprecated(b bool)      { f.SwitchFnFlags(AccDepre
 func (f *functionHeader) SetIsFinal(b bool)           { f.SwitchFnFlags(AccFinal, b) }
 func (f *functionHeader) SetIsCtor(b bool)            { f.SwitchFnFlags(AccCtor, b) }
 func (f *functionHeader) SetIsReturnReference(b bool) { f.SwitchFnFlags(AccReturnReference, b) }
-func (f *functionHeader) SetIsArenaAllocated(b bool)  { f.SwitchFnFlags(AccArenaAllocated, b) }
 func (f *functionHeader) SetIsHasTypeHints(b bool)    { f.SwitchFnFlags(AccHasTypeHints, b) }
 func (f *functionHeader) SetIsDtor(b bool)            { f.SwitchFnFlags(AccDtor, b) }
 func (f *functionHeader) SetIsEarlyBinding(b bool)    { f.SwitchFnFlags(AccEarlyBinding, b) }

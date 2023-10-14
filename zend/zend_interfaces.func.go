@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/kits/slicekit"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -199,19 +200,19 @@ func ZendUserItGetNewIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	// ZvalPtrDtor(&iterator)
 	return new_iterator
 }
+func isTraversableRootInterface(iface *types.ClassEntry) bool {
+	return iface == ZendCeAggregate || iface == ZendCeIterator
+}
+
 func ZendImplementTraversable(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {
 	/* check that class_type is traversable at c-level or implements at least one of 'aggregate' and 'Iterator' */
-
-	var i uint32
 	if class_type.GetGetIterator() != nil || class_type.GetParent() != nil && class_type.GetParent().GetGetIterator() != nil {
 		return types.SUCCESS
 	}
 	if class_type.GetNumInterfaces() != 0 {
 		b.Assert(class_type.IsResolvedInterfaces())
-		for i = 0; i < class_type.GetNumInterfaces(); i++ {
-			if class_type.GetInterfaces()[i] == ZendCeAggregate || class_type.GetInterfaces()[i] == ZendCeIterator {
-				return types.SUCCESS
-			}
+		if slicekit.Any(class_type.GetInterfaces(), isTraversableRootInterface) {
+			return types.SUCCESS
 		}
 	}
 	faults.ErrorNoreturn(faults.E_CORE_ERROR, "Class %s must implement interface %s as part of either %s or %s", class_type.Name(), ZendCeTraversable.Name(), ZendCeIterator.Name(), ZendCeAggregate.Name())

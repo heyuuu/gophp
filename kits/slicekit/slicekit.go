@@ -66,3 +66,21 @@ func Last[T any](slicePtr *[]T) (T, bool) {
 	top := slice[len(slice)-1]
 	return top, true
 }
+
+func All[T any](slice []T, handler func(T) bool) bool {
+	for _, item := range slice {
+		if !handler(item) {
+			return false
+		}
+	}
+	return true
+}
+
+func Any[T any](slice []T, handler func(T) bool) bool {
+	for _, item := range slice {
+		if handler(item) {
+			return true
+		}
+	}
+	return false
+}
