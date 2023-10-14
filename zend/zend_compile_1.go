@@ -309,7 +309,7 @@ func ZendEnsureValidClassFetchType(fetch_type uint32) {
 		var ce = CG__().GetActiveClassEntry()
 		if ce == nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", lang.Cond(lang.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
-		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && ce.GetParentName() == nil {
+		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && ce.HasParent() {
 			faults.Error(faults.E_DEPRECATED, "Cannot use \"parent\" when current class scope has no parent")
 		}
 	}
@@ -334,8 +334,8 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 		}
 		return 0
 	case ZEND_FETCH_CLASS_PARENT:
-		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().GetParentName() != nil && ZendIsScopeKnown() {
-			zv.SetString(CG__().GetActiveClassEntry().GetParentName().GetStr())
+		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().HasParent() && ZendIsScopeKnown() {
+			zv.SetString(CG__().GetActiveClassEntry().ParentName())
 			return 1
 		}
 		return 0
@@ -365,7 +365,7 @@ func ZendVerifyCtConstAccess(c *types.ClassConstant, scope *types.ClassEntry) bo
 			if ce.IsResolvedParent() {
 				ce = ce.GetParent()
 			} else {
-				ce = CG__().ClassTable().Get(ce.GetParentName().GetStr())
+				ce = CG__().ClassTable().Get(ce.ParentName())
 				if ce == nil {
 					break
 				}

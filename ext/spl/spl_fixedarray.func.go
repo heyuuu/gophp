@@ -676,7 +676,7 @@ func SplFixedarrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	return iterator.GetIntern().GetIt()
 }
 func ZmStartupSplFixedarray(type_ int, module_number int) int {
-	spl_ce_SplFixedArray = zend.RegisterClassEx(&zend.ClassDefines{
+	spl_ce_SplFixedArray = zend.RegisterClassEx(&types.InternalClassDecl{
 		Name:         "SplFixedArray",
 		CreateObject: SplFixedarrayNew,
 		Functions:    spl_funcs_SplFixedArray,
@@ -686,7 +686,7 @@ func ZmStartupSplFixedarray(type_ int, module_number int) int {
 			spl_ce_Countable,
 		},
 		GetIterator: SplFixedarrayGetIterator,
-		AddCeFlags:  types.AccReuseGetIterator,
+		CeFlags:     types.AccReuseGetIterator,
 	})
 
 	spl_handler_SplFixedArray = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{

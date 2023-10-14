@@ -141,11 +141,7 @@ func ResolveClassName(scope *types.ClassEntry, name string) string {
 
 	lcName := ascii.StrToLower(name)
 	if lcName == "parent" && scope.GetParent() != nil {
-		if scope.IsResolvedParent() {
-			return scope.GetParent().Name()
-		} else {
-			return scope.GetParentName().GetStr()
-		}
+		return scope.ParentNameEx()
 	} else if lcName == "self" {
 		return scope.Name()
 	} else {
@@ -204,7 +200,7 @@ func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) bool {
 		if ce1.IsResolvedParent() {
 			parent_ce = ce1.GetParent()
 		} else {
-			parent_ce = ZendLookupClassEx(ce1.GetParentName(), nil, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			parent_ce = ZendLookupClassEx(types.NewString(ce1.ParentName()), nil, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		}
 
 		/* It's not sufficient to only check the parent chain itself, as need to do a full
@@ -2049,8 +2045,8 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 
 	var parent *types.ClassEntry = nil
 	var interfaces **types.ClassEntry = nil
-	if ce.GetParentName() {
-		parent = ZendFetchClassByName(ce.GetParentName(), lc_parent_name, ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
+	if ce.HasParent() {
+		parent = ZendFetchClassByName(types.NewString(ce.ParentName()), lc_parent_name, ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
 		if parent == nil {
 			CheckUnrecoverableLoadFailure(ce)
 			return types.FAILURE

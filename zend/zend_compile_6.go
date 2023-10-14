@@ -730,18 +730,36 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 		}
 	}
 
-	var docComment string
-	if decl.GetDocComment() != nil {
-		docComment = decl.GetDocComment().GetStr()
+	var classDecl = types.UserClassDecl{
+		Name:        name.GetStr(),
+		CeFlags:     decl.GetFlags(),
+		Filename:    ZendGetCompiledFilename(),
+		StartLineno: decl.GetStartLineno(),
+		EndLineno:   decl.GetEndLineno(),
 	}
-	var ce *types.ClassEntry = types.NewUserClass(
-		name.GetStr(),
-		decl.GetFlags(),
-		ZendGetCompiledFilename(),
-		decl.GetStartLineno(),
-		decl.GetEndLineno(),
-		docComment,
-	)
+	if decl.GetDocComment() != nil {
+		classDecl.DocComment = decl.GetDocComment().GetStr()
+	}
+	if extends_ast != nil {
+		var extendsNode Znode
+		var extendsName string
+		if !ZendIsConstDefaultClassRef(extends_ast) {
+			extendsName = ZendAstGetStr(extends_ast).GetStr()
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", extendsName)
+		}
+		compiler.CompileExpr(&extendsNode, extends_ast)
+		if extendsNode.GetOpType() != IS_CONST || extendsNode.GetConstant().Type() != types.IsString {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
+		}
+		extendsName = extendsNode.GetConstant().String()
+		if extends_ast.kind == ZEND_AST_ZVAL {
+			classDecl.ParentName = ZendResolveClassName(extendsName, extends_ast.Attr())
+		} else {
+			classDecl.ParentName = ZendResolveClassName(extendsName, ZEND_NAME_FQ)
+		}
+	}
+
+	var ce *types.ClassEntry = types.NewUserClass(classDecl)
 	if CG__().IsCompilePreload() {
 		ce.SetIsPreloaded(true)
 		ZEND_MAP_PTR_NEW(ce.static_members_table)
@@ -751,21 +769,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 		ce.SetSerialize(ZendClassSerializeDeny)
 		ce.SetUnserialize(ZendClassUnserializeDeny)
 	}
-	if extends_ast != nil {
-		var extends_node Znode
-		var extends_name *types.String
-		if !ZendIsConstDefaultClassRef(extends_ast) {
-			extends_name = ZendAstGetStr(extends_ast)
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", extends_name.GetVal())
-		}
-		compiler.CompileExpr(&extends_node, extends_ast)
-		if extends_node.GetOpType() != IS_CONST || extends_node.GetConstant().Type() != types.IsString {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
-		}
-		extends_name = extends_node.GetConstant().StringEx()
-		ce.SetParentName(ZendResolveClassName(extends_name.GetStr(), lang.CondF1(extends_ast.Kind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.Attr() }, ZEND_NAME_FQ)))
-		ce.SetIsInherited(true)
-	}
+
 	CG__().SetActiveClassEntry(ce)
 	compiler.CompileStmt(stmt_ast)
 
@@ -811,7 +815,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 	}
 	if toplevel != 0 && !ce.HasCeFlags(types.AccImplementInterfaces|types.AccImplementTraits) && !CG__().IsCompilePreload() {
 		if extends_ast != nil {
-			var parent_ce *types.ClassEntry = ZendLookupClassEx(ce.GetParentName(), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			var parent_ce *types.ClassEntry = ZendLookupClassEx(types.NewString(ce.ParentName()), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if parent_ce != nil && (!parent_ce.IsInternalClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_CLASSES) == 0) && (!parent_ce.IsUserClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || parent_ce.GetFilename() == ce.GetFilename()) {
 				compiler.setLinenoByDeclEnd(decl)
 				if ZendTryEarlyBind(ce, parent_ce, lcname) {
@@ -830,11 +834,11 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 		}
 	}
 	opline = GetNextOp()
-	if ce.GetParentName() {
+	if ce.HasParent() {
 
 		/* Lowercased parent name */
 
-		var lc_parent_name *types.String = operators.ZendStringTolower(ce.GetParentName())
+		var lc_parent_name *types.String = types.NewString(ascii.StrToLower(ce.ParentName()))
 		opline.SetOp2Type(IS_CONST)
 		LITERAL_STR(opline.GetOp2(), lc_parent_name)
 	}

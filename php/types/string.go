@@ -18,6 +18,19 @@ func (zs String) Cutoff(l int) *String { tmp := zs[:l]; return &tmp }
 
 func (zs String) GetVal() []byte { return []byte(zs) } // todo remove
 
+func (zs *String) SafeGetStr() string {
+	if zs == nil {
+		return ""
+	}
+	return zs.GetStr()
+}
+func (zs *String) SafeGetLen() int {
+	if zs == nil {
+		return 0
+	}
+	return zs.GetLen()
+}
+
 /**
  * String Constants
  */

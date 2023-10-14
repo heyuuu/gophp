@@ -3,6 +3,7 @@ package types
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/zend"
 )
 
@@ -14,6 +15,31 @@ const (
 type FunctionTable = *Table[IFunction]
 type PropertyTable = *Table[*PropertyInfo]
 type ClassConstantTable = *Table[*ClassConstant]
+
+// UserClassDecl
+type UserClassDecl struct {
+	Name        string
+	CeFlags     uint32
+	ParentName  string
+	Filename    string
+	StartLineno uint32
+	EndLineno   uint32
+	DocComment  string
+}
+
+// InternalClassDecl
+type ObjCtorType = func(*ClassEntry) *Object
+type ObjGetIteratorType = func(ce *ClassEntry, object *Zval, byRef int) *zend.ZendObjectIterator
+type InternalClassDecl struct {
+	Name         string
+	CreateObject ObjCtorType
+	Functions    []FunctionEntry
+	Parent       *ClassEntry
+	Interfaces   []*ClassEntry
+	GetIterator  ObjGetIteratorType
+	CeFlags      uint32
+	IsInterface  bool
+}
 
 /**
  * ClassName
@@ -38,11 +64,11 @@ func (n ClassName) GetLcName() string { return n.lcName }
  */
 type ClassEntry struct {
 	typ     byte
-	name    string // *String
+	name    string
 	ceFlags uint32
 
 	// 继承父类，在 link 前只有 parentName 可能有值，在 link 后只有 parent 可能有值(union)。
-	parentName *String
+	parentName string
 	parent     *ClassEntry
 
 	// 继承接口列表，在 link 前只有 interfaceNames 可能有值，在 link 后只有 interfaces 可能有值(union)。
@@ -104,27 +130,47 @@ type userClassInfo = struct {
 	docComment string
 }
 
-func NewUserClass(name string, ceFlags uint32, fileName string, lineStart uint32, lineEnd uint32, docComment string) *ClassEntry {
+func NewUserClass(decl UserClassDecl) *ClassEntry {
 	ce := &ClassEntry{
-		typ:  typeUserClass,
-		name: name,
+		typ:        typeUserClass,
+		name:       decl.Name,
+		parentName: decl.ParentName,
 		infoUser: userClassInfo{
-			filename:   fileName,
-			lineStart:  lineStart,
-			lineEnd:    lineEnd,
-			docComment: docComment,
+			filename:   decl.Filename,
+			lineStart:  decl.StartLineno,
+			lineEnd:    decl.EndLineno,
+			docComment: decl.DocComment,
 		},
 	}
 	ce.initData()
-	ce.AddCeFlags(ceFlags)
+	ce.AddCeFlags(decl.CeFlags)
+	if decl.ParentName != "" {
+		ce.SetIsInherited(true)
+	}
 	return ce
 }
 
-func NewInternalClass(name string, moduleNumber int) *ClassEntry {
+func NewInternalClassEx(decl *InternalClassDecl, moduleNumber int) *ClassEntry {
+	ce := NewInternalClass(decl.Name, moduleNumber, lang.Cond(decl.IsInterface, uint32(AccInterface), 0))
+
+	return ce
+}
+
+func NewInternalClass(name string, moduleNumber int, ceFlags uint32) *ClassEntry {
 	var ce = &ClassEntry{
 		typ:          typeInternalClass,
 		name:         name,
 		moduleNumber: moduleNumber,
+	}
+	ce.initData()
+	ce.SetCeFlags(ceFlags | AccConstantsUpdated | AccLinked | AccResolvedParent | AccResolvedInterfaces)
+	return ce
+}
+
+func NewInternalClassSimple(name string) *ClassEntry {
+	var ce = &ClassEntry{
+		typ:  typeInternalClass,
+		name: name,
 	}
 	ce.initData()
 	return ce
@@ -165,6 +211,16 @@ func (ce *ClassEntry) ModuleNumber() int { return ce.moduleNumber }
 func (ce *ClassEntry) FunctionTable() FunctionTable       { return ce.functionTable }
 func (ce *ClassEntry) PropertyTable() PropertyTable       { return ce.propertyTable }
 func (ce *ClassEntry) ConstantsTable() ClassConstantTable { return ce.constantTable }
+
+func (ce *ClassEntry) HasParent() bool    { return ce.parentName != "" }
+func (ce *ClassEntry) ParentName() string { return ce.parentName }
+func (ce *ClassEntry) ParentNameEx() string {
+	if ce.IsResolvedParent() {
+		return ce.parent.Name()
+	} else {
+		return ce.parentName
+	}
+}
 
 // methods
 func (ce *ClassEntry) GetPropertyInfo(propNum int) *PropertyInfo {
@@ -262,8 +318,7 @@ func (ce *ClassEntry) IsUserClass() bool     { return ce.typ == typeUserClass }
 func (ce *ClassEntry) GetType() byte               { return ce.typ }
 func (ce *ClassEntry) GetParent() *ClassEntry      { return ce.parent }
 func (ce *ClassEntry) SetParent(value *ClassEntry) { ce.parent = value }
-func (ce *ClassEntry) GetParentName() *String      { return ce.parentName }
-func (ce *ClassEntry) SetParentName(value string)  { ce.parentName = NewString(value) }
+func (ce *ClassEntry) SetParentName(value string)  { ce.parentName = value }
 func (ce *ClassEntry) GetCeFlags() uint32          { return ce.ceFlags }
 func (ce *ClassEntry) SetCeFlags(value uint32)     { ce.ceFlags = value }
 func (ce *ClassEntry) GetDefaultStaticMembersCount() int {

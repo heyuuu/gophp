@@ -8,7 +8,7 @@ import (
 /**
  * constants and global variables
  */
-var ZendIteratorClassEntry *types.ClassEntry = types.NewInternalClass("__iterator_wrapper", 0)
+var ZendIteratorClassEntry *types.ClassEntry = types.NewInternalClassSimple("__iterator_wrapper")
 
 var IteratorObjectHandlers *types.ObjectHandlers = types.NewObjectHandlers(types.ObjectHandlersSetting{
 	FreeObj: func(object *types.Object) {
