@@ -14,7 +14,7 @@ func zend_is_smaller_helper_SPEC(op1 *types.Zval, op2 *types.Zval, executeData *
 		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.CompareFunction(opline.Result(), op1, op2)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return 0
 	}
 	if opline.Result().Long() < 0 {

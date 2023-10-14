@@ -504,7 +504,7 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 				goto exit
 			}
 		}
-	} else if EG__().GetException() != nil {
+	} else if EG__().HasException() {
 		retval = UninitializedZval()
 		goto exit
 	}
@@ -562,7 +562,7 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 			/* Trigger the correct error */
 
 			ZendGetPropertyOffset(zobj.GetCe(), name.GetStr(), false, nil, &prop_info)
-			b.Assert(EG__().GetException() != nil)
+			b.Assert(EG__().HasException())
 			retval = UninitializedZval()
 			goto exit
 		}
@@ -627,7 +627,7 @@ func ZendStdWritePropertyEx(zobj *types.Object, member *types.Zval, value *types
 				goto found
 			}
 		}
-	} else if EG__().GetException() != nil {
+	} else if EG__().HasException() {
 		variable_ptr = EG__().GetErrorZval()
 		goto exit
 	}
@@ -648,7 +648,7 @@ func ZendStdWritePropertyEx(zobj *types.Object, member *types.Zval, value *types
 			/* Trigger the correct error */
 
 			ZendWrongOffset(zobj.GetCe(), name)
-			b.Assert(EG__().GetException() != nil)
+			b.Assert(EG__().HasException())
 			variable_ptr = EG__().GetErrorZval()
 			goto exit
 		}
@@ -705,7 +705,7 @@ func ZendStdReadDimensionEx(object *types.Object, offset *types.Zval, type_ int,
 		}
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", rv, &tmp_offset)
 		if rv.IsUndef() {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				faults.ThrowError(nil, "Undefined offset for object of type %s used as array", ce.Name())
 			}
 			return nil
@@ -749,7 +749,7 @@ func ZendStdHasDimensionEx(object *types.Object, offset *types.Zval, check_empty
 		tmp_object.SetObject(object)
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", &retval, &tmp_offset)
 		result = operators.IZendIsTrue(&retval)
-		if check_empty != 0 && result != 0 && EG__().GetException() == nil {
+		if check_empty != 0 && result != 0 && EG__().NoException() {
 			ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", &retval, &tmp_offset)
 			result = operators.IZendIsTrue(&retval)
 		}
@@ -862,7 +862,7 @@ func ZendStdUnsetPropertyEx(zobj *types.Object, member *types.Zval, cache_slot *
 		if !zobj.GetProperties().KeyDelete(name.GetStr()) {
 			goto exit
 		}
-	} else if EG__().GetException() != nil {
+	} else if EG__().HasException() {
 		goto exit
 	}
 
@@ -878,7 +878,7 @@ func ZendStdUnsetPropertyEx(zobj *types.Object, member *types.Zval, cache_slot *
 		} else if IS_WRONG_PROPERTY_OFFSET(property_offset) {
 			/* Trigger the correct error */
 			ZendWrongOffset(zobj.GetCe(), name)
-			b.Assert(EG__().GetException() != nil)
+			b.Assert(EG__().HasException())
 			goto exit
 		}
 	}
@@ -1324,7 +1324,7 @@ func ZendStdHasPropertyExEx(zobj *types.Object, name string, hasSetExists int) b
 				goto found
 			}
 		}
-	} else if EG__().GetException() != nil {
+	} else if EG__().HasException() {
 		return false
 	}
 
@@ -1339,7 +1339,7 @@ func ZendStdHasPropertyExEx(zobj *types.Object, name string, hasSetExists int) b
 			ZendStdCallIssetter(zobj, name, &rv)
 			result = operators.ZvalIsTrue(&rv)
 			if hasSetExists == ZEND_PROPERTY_NOT_EMPTY && result {
-				if EG__().GetException() == nil && zobj.GetCe().GetGet() != nil && !guard.InGet() {
+				if EG__().NoException() && zobj.GetCe().GetGet() != nil && !guard.InGet() {
 					guard.MarkInGet(true)
 					ZendStdCallGetter(zobj, name, &rv)
 					guard.MarkInGet(false)
@@ -1380,7 +1380,7 @@ func StdCastObjectToString(obj *types.Object) (string, bool) {
 		if retval.IsString() {
 			return retval.String(), true
 		}
-		if EG__().GetException() == nil {
+		if EG__().NoException() {
 			faults.ThrowError(nil, "Method %s::__toString() must return a string value", ce.Name())
 		}
 	}

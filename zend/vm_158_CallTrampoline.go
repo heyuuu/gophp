@@ -84,7 +84,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		return -1
 	}
 	ZendVmStackFreeCallFrame(call)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		faults.RethrowException(executeData)
 		return 2
 	}

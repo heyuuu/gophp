@@ -255,7 +255,7 @@ func ZifSetcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, _ 
 			expires = operators.ZvalGetLong(expires_or_options)
 		}
 	}
-	if zend.EG__().GetException() == nil {
+	if zend.EG__().NoException() {
 		if PhpSetcookie(name, value, expires, path, domain, secure, httponly, samesite, 1) == types.SUCCESS {
 			return_value.SetTrue()
 		} else {
@@ -314,7 +314,7 @@ func ZifSetrawcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval,
 			expires = operators.ZvalGetLong(expires_or_options)
 		}
 	}
-	if zend.EG__().GetException() == nil {
+	if zend.EG__().NoException() {
 		if PhpSetcookie(name, value, expires, path, domain, secure, httponly, samesite, 0) == types.SUCCESS {
 			return_value.SetTrue()
 		} else {

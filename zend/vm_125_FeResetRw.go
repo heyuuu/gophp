@@ -86,7 +86,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
 			var is_empty bool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			} else if is_empty != 0 {
 				return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -170,7 +170,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			} else if is_empty != 0 {
 				return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -242,7 +242,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
 			var is_empty bool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			} else if is_empty != 0 {
 				return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)

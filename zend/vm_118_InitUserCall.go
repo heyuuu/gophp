@@ -23,7 +23,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 			/* This is the only soft error is_callable() can generate */
 
 			ZendNonStaticMethodCall(func_)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 		}
@@ -52,7 +52,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 	} else {
 		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().StringEx().GetVal(), error)
 		Efree(error)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 		func_ = (types.IFunction)(&ZendPassFunction)
@@ -82,7 +82,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			/* This is the only soft error is_callable() can generate */
 
 			ZendNonStaticMethodCall(func_)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				// ZvalPtrDtorNogc(free_op2)
 				return 0
 			}
@@ -107,7 +107,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}
 		// ZvalPtrDtorNogc(free_op2)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			if (call_info & ZEND_CALL_CLOSURE) != 0 {
 				//ZendObjectRelease(ZEND_CLOSURE_OBJECT(func_))
 			} else if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
@@ -122,7 +122,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().StringEx().GetVal(), error)
 		Efree(error)
 		// ZvalPtrDtorNogc(free_op2)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 		func_ = (types.IFunction)(&ZendPassFunction)
@@ -151,7 +151,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 			/* This is the only soft error is_callable() can generate */
 
 			ZendNonStaticMethodCall(func_)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 		}
@@ -174,7 +174,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 			object_or_called_scope = fcc.GetObject()
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			if (call_info & ZEND_CALL_CLOSURE) != 0 {
 				//ZendObjectRelease(ZEND_CLOSURE_OBJECT(func_))
 			} else if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
@@ -188,7 +188,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 	} else {
 		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().StringEx().GetVal(), error)
 		Efree(error)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 		func_ = (types.IFunction)(&ZendPassFunction)

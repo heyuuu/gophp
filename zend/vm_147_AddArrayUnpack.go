@@ -41,7 +41,7 @@ add_unpack_again:
 			iter = ce.GetGetIterator()(ce, op1, 0)
 			if iter == nil {
 				// 				FREE_OP(free_op1)
-				if EG__().GetException() == nil {
+				if EG__().NoException() {
 					faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.Name())
 				}
 				return 0
@@ -51,17 +51,17 @@ add_unpack_again:
 			}
 			for iter.GetFuncs().GetValid()(iter) == types.SUCCESS {
 				var val *types.Zval
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					break
 				}
 				val = iter.GetFuncs().GetGetCurrentData()(iter)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					break
 				}
 				if iter.GetFuncs().GetGetCurrentKey() != nil {
 					var key types.Zval
 					iter.GetFuncs().GetGetCurrentKey()(iter, &key)
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						break
 					}
 					if !key.IsLong() {

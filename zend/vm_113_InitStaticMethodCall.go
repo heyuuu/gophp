@@ -23,7 +23,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 		if ce == nil {
 			ce = ZendFetchClassByName(opline.Const1().StringEx(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
-				b.Assert(EG__().GetException() != nil)
+				b.Assert(EG__().HasException())
 				return 0
 			}
 		}
@@ -38,7 +38,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
 			return 0
@@ -57,7 +57,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -88,7 +88,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 		if ce == nil {
 			ce = ZendFetchClassByName(opline.Const1().StringEx(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
-				b.Assert(EG__().GetException() != nil)
+				b.Assert(EG__().HasException())
 				// ZvalPtrDtorNogc(opline.Op2())
 				return 0
 			}
@@ -111,7 +111,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 						}
 					} else if function_name.IsUndef() {
 						ZVAL_UNDEFINED_OP2(executeData)
-						if EG__().GetException() != nil {
+						if EG__().HasException() {
 							return 0
 						}
 					}
@@ -128,7 +128,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
 			// ZvalPtrDtorNogc(free_op2)
@@ -148,7 +148,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -179,7 +179,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 		if ce == nil {
 			ce = ZendFetchClassByName(opline.Const1().StringEx(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
-				b.Assert(EG__().GetException() != nil)
+				b.Assert(EG__().HasException())
 				return 0
 			}
 			{
@@ -208,7 +208,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -239,7 +239,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 		if ce == nil {
 			ce = ZendFetchClassByName(opline.Const1().StringEx(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
-				b.Assert(EG__().GetException() != nil)
+				b.Assert(EG__().HasException())
 				return 0
 			}
 			{
@@ -260,7 +260,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 						}
 					} else if function_name.IsUndef() {
 						ZVAL_UNDEFINED_OP2(executeData)
-						if EG__().GetException() != nil {
+						if EG__().HasException() {
 							return 0
 						}
 					}
@@ -276,7 +276,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
 			return 0
@@ -292,7 +292,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -332,7 +332,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
 			return 0
@@ -351,7 +351,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -394,7 +394,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 						}
 					} else if function_name.IsUndef() {
 						ZVAL_UNDEFINED_OP2(executeData)
-						if EG__().GetException() != nil {
+						if EG__().HasException() {
 							return 0
 						}
 					}
@@ -411,7 +411,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
 			// ZvalPtrDtorNogc(free_op2)
@@ -431,7 +431,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -481,7 +481,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -523,7 +523,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 						}
 					} else if function_name.IsUndef() {
 						ZVAL_UNDEFINED_OP2(executeData)
-						if EG__().GetException() != nil {
+						if EG__().HasException() {
 							return 0
 						}
 					}
@@ -539,7 +539,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
 			return 0
@@ -555,7 +555,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -584,7 +584,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 	{
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
-			b.Assert(EG__().GetException() != nil)
+			b.Assert(EG__().HasException())
 			return 0
 		}
 	}
@@ -599,7 +599,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
 			return 0
@@ -618,7 +618,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -651,7 +651,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 	{
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
-			b.Assert(EG__().GetException() != nil)
+			b.Assert(EG__().HasException())
 			// ZvalPtrDtorNogc(opline.Op2())
 			return 0
 		}
@@ -670,7 +670,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 						}
 					} else if function_name.IsUndef() {
 						ZVAL_UNDEFINED_OP2(executeData)
-						if EG__().GetException() != nil {
+						if EG__().HasException() {
 							return 0
 						}
 					}
@@ -686,7 +686,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
 			// ZvalPtrDtorNogc(free_op2)
@@ -706,7 +706,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -739,7 +739,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 	{
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
-			b.Assert(EG__().GetException() != nil)
+			b.Assert(EG__().HasException())
 			return 0
 		}
 	}
@@ -764,7 +764,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self
@@ -796,7 +796,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 	{
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
-			b.Assert(EG__().GetException() != nil)
+			b.Assert(EG__().HasException())
 			return 0
 		}
 	}
@@ -813,7 +813,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 						}
 					} else if function_name.IsUndef() {
 						ZVAL_UNDEFINED_OP2(executeData)
-						if EG__().GetException() != nil {
+						if EG__().HasException() {
 							return 0
 						}
 					}
@@ -829,7 +829,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 			fbc = ZendStdGetStaticMethod(ce, function_name.GetStr(), lang.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
 			return 0
@@ -845,7 +845,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 			goto check_parent_and_self

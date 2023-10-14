@@ -206,7 +206,7 @@ func __zvalGetStrFunc(op *types.Zval, try bool) (string, bool) {
 				return __zvalGetStrFunc(z, try)
 			}
 		}
-		if zend.EG__().GetException() == nil {
+		if zend.EG__().NoException() {
 			faults.ThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).Name())
 		}
 		if try {

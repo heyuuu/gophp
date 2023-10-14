@@ -15,7 +15,7 @@ func ZEND_ASSIGN_STATIC_PROP_OP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var prop_info *types.PropertyInfo
 	var ref *types.Reference
 	if ZendFetchStaticPropertyAddress(&prop, &prop_info, (opline+1).GetExtendedValue(), BP_VAR_RW, 0, opline, executeData) != types.SUCCESS {
-		b.Assert(EG__().GetException() != nil)
+		b.Assert(EG__().HasException())
 		UNDEF_RESULT()
 		FREE_UNFETCHED_OP((opline + 1).GetOp1Type(), (opline + 1).GetOp1().GetVar())
 		return 0

@@ -44,7 +44,7 @@ try_function_name:
 	} else {
 		if function_name.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 		}
@@ -56,7 +56,7 @@ try_function_name:
 		return 0
 	}
 	{
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			if call != nil {
 				if call.GetFunc().IsCallViaTrampoline() {
 					// types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
@@ -89,7 +89,7 @@ try_function_name:
 	} else {
 		if function_name.IsUndef() {
 			ZVAL_UNDEFINED_OP2(executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return 0
 			}
 		}
@@ -100,7 +100,7 @@ try_function_name:
 		return 0
 	}
 	{
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			if call != nil {
 				if call.GetFunc().IsCallViaTrampoline() {
 					// types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)

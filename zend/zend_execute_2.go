@@ -49,7 +49,7 @@ func ZendVerifyScalarTypeHint(type_hint uint8, arg *types.Zval, strict bool) boo
 }
 func ZendVerifyPropertyTypeError(info *types.PropertyInfo, property *types.Zval) {
 	/* we _may_ land here in case reading already errored and runtime cache thus has not been updated (i.e. it contains a valid but unrelated info) */
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return
 	}
 

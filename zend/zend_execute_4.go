@@ -15,7 +15,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	var z_copy types.Zval
 	obj.SetObject(object.Object())
 	z = obj.Object().ReadPropertyEx(property, BP_VAR_R, &rv)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetNull()
 		}
@@ -51,7 +51,7 @@ func ZendAssignOpOverloadedProperty(
 	var res types.Zval
 	obj.SetObject(object.Object())
 	z = obj.Object().ReadPropertyEx(property, BP_VAR_R, &rv)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetUndef()
 		}
@@ -97,7 +97,7 @@ func ZendUndefinedOffsetWrite(ht *types.Array, lval ZendLong) int {
 	//	ht.Destroy()
 	//	return types.FAILURE
 	//}
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return types.FAILURE
 	}
 	return types.SUCCESS
@@ -111,7 +111,7 @@ func ZendUndefinedIndexWrite(ht *types.Array, offset *types.String) int {
 	//	ht.Destroy()
 	//	return types.FAILURE
 	//}
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return types.FAILURE
 	}
 	return types.SUCCESS
@@ -164,7 +164,7 @@ func SlowIndexConvertEx(ht *types.Array, dim *types.Zval, executeData *ZendExecu
 		//	ht.Destroy()
 		//	return types.NewZvalNull()
 		//}
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return types.NewZvalNull()
 		}
 		fallthrough

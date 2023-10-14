@@ -147,7 +147,7 @@ func ZendFetchPropertyAddress(
 		if ptr == result {
 			return
 		}
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			result.IsError()
 			return
 		}

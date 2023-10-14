@@ -22,7 +22,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			} else {
 				ce = ZendFetchClassByName(opline.Const1().StringEx(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 				if ce == nil {
-					b.Assert(EG__().GetException() != nil)
+					b.Assert(EG__().HasException())
 					opline.Result().SetUndef()
 					return 0
 				}
@@ -40,7 +40,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			value = c.GetValue()
 			if value.IsConstantAst() {
 				ZvalUpdateConstantEx(value, c.GetCe())
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					opline.Result().SetUndef()
 					return 0
 				}
@@ -86,7 +86,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 			value = c.GetValue()
 			if value.IsConstantAst() {
 				ZvalUpdateConstantEx(value, c.GetCe())
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					opline.Result().SetUndef()
 					return 0
 				}
@@ -114,7 +114,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 			{
 				ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 				if ce == nil {
-					b.Assert(EG__().GetException() != nil)
+					b.Assert(EG__().HasException())
 					opline.Result().SetUndef()
 					return 0
 				}
@@ -136,7 +136,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 			value = c.GetValue()
 			if value.IsConstantAst() {
 				ZvalUpdateConstantEx(value, c.GetCe())
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					opline.Result().SetUndef()
 					return 0
 				}

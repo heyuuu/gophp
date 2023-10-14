@@ -81,7 +81,7 @@ try_instanceof:
 		{
 			ce = ZendFetchClass(nil, opline.GetOp2().GetNum())
 			if ce == nil {
-				b.Assert(EG__().GetException() != nil)
+				b.Assert(EG__().HasException())
 				// ZvalPtrDtorNogc(free_op1)
 				opline.Result().SetUndef()
 				return 0
@@ -173,7 +173,7 @@ try_instanceof:
 		{
 			ce = ZendFetchClass(nil, opline.GetOp2().GetNum())
 			if ce == nil {
-				b.Assert(EG__().GetException() != nil)
+				b.Assert(EG__().HasException())
 				opline.Result().SetUndef()
 				return 0
 			}

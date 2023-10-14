@@ -16,7 +16,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		if ce == nil {
 			ce = ZendFetchClassByName(opline.Const1().StringEx(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
-				b.Assert(EG__().GetException() != nil)
+				b.Assert(EG__().HasException())
 				opline.Result().SetUndef()
 				return 0
 			}
@@ -31,7 +31,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	}
 	constructor = result.Object().GetConstructor(result.Object())
 	if constructor == nil {
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 
@@ -78,7 +78,7 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	}
 	constructor = result.Object().GetConstructor(result.Object())
 	if constructor == nil {
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 
@@ -120,7 +120,7 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	{
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
-			b.Assert(EG__().GetException() != nil)
+			b.Assert(EG__().HasException())
 			opline.Result().SetUndef()
 			return 0
 		}
@@ -133,7 +133,7 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	}
 	constructor = result.Object().GetConstructor(result.Object())
 	if constructor == nil {
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 

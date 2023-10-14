@@ -21,7 +21,7 @@ func ZEND_DO_ICALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	ZendVmStackFreeArgs(call)
 	ZendVmStackFreeCallFrame(call)
 	// IZvalPtrDtor(ret)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		faults.RethrowException(executeData)
 		return 0
 	}
@@ -45,7 +45,7 @@ func ZEND_DO_ICALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	ZendVmStackFreeArgs(call)
 	ZendVmStackFreeCallFrame(call)
 
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		faults.RethrowException(executeData)
 		return 0
 	}

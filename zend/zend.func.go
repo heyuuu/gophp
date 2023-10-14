@@ -309,7 +309,7 @@ func ZendShutdown() {
 func ZendSetUtilityValues(utility_values *ZendUtilityValues) { ZendUv = *utility_values }
 func Zenderror(error *byte) {
 	CG__().SetParseError(0)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		/* An exception was thrown in the lexer, don't throw another in the parser. */
 		return
 	}
@@ -360,7 +360,7 @@ func ZendUserExceptionHandler() {
 	types.ZVAL_COPY_VALUE(&orig_user_exception_handler, EG__().GetUserExceptionHandler())
 	if CallUserFunction(nil, &orig_user_exception_handler, &retval2, 1, params) == types.SUCCESS {
 		// ZvalPtrDtor(&retval2)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			// OBJ_RELEASE(EG__().GetException())
 			EG__().SetException(nil)
 		}
@@ -382,11 +382,11 @@ func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*FileHandle) boo
 		if opArray != nil {
 			ZendExecute(opArray, retval)
 			EG__().ExceptionRestore()
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				if EG__().GetUserExceptionHandler().IsNotUndef() {
 					ZendUserExceptionHandler()
 				}
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					faults.ExceptionError(EG__().GetException(), faults.E_ERROR)
 				}
 			}

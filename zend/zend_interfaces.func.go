@@ -91,7 +91,7 @@ func ZendCallMethod(object *types.Zval, objCe *types.ClassEntry, fnProxy *types.
 				objCe = nil
 			}
 		}
-		if EG__().GetException() == nil {
+		if EG__().NoException() {
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't execute method %s%s%s", lang.CondF1(objCe != nil, func() []byte { return objCe.Name() }, ""), lang.Cond(objCe != nil, "::", ""), functionName)
 		}
 	}
@@ -146,7 +146,7 @@ func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *types.Zval) {
 	if retval.IsNotUndef() {
 		ZVAL_ZVAL(key, &retval, 1, 1)
 	} else {
-		if EG__().GetException() == nil {
+		if EG__().NoException() {
 			faults.Error(faults.E_WARNING, "Nothing returned from %s::key()", iter.GetCe().Name())
 		}
 		key.SetLong(0)
@@ -190,7 +190,7 @@ func ZendUserItGetNewIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 		ce_it = nil
 	}
 	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.Object() == object.Object() {
-		if EG__().GetException() == nil {
+		if EG__().NoException() {
 			faults.ThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", lang.CondF(ce != nil, func() []byte { return ce.Name() }, func() []byte { return types.Z_OBJCE_P(object).Name() }))
 		}
 		// ZvalPtrDtor(&iterator)
@@ -334,7 +334,7 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 	var retval types.Zval
 	var result int
 	ZendCallMethodWith0Params(object, ce, ce.GetSerializeFunc(), "serialize", &retval)
-	if retval.IsUndef() || EG__().GetException() != nil {
+	if retval.IsUndef() || EG__().HasException() {
 		result = types.FAILURE
 	} else {
 		switch retval.Type() {
@@ -353,7 +353,7 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 		}
 		// ZvalPtrDtor(&retval)
 	}
-	if result == types.FAILURE && EG__().GetException() == nil {
+	if result == types.FAILURE && EG__().NoException() {
 		faults.ThrowExceptionEx(nil, 0, "%s::serialize() must return a string or NULL", ce.Name())
 	}
 	return result
@@ -366,7 +366,7 @@ func ZendUserUnserialize(object *types.Zval, ce *types.ClassEntry, buf *uint8, b
 	zdata.SetString(b.CastStr((*byte)(buf), buf_len))
 	ZendCallMethodWith1Params(object, ce, ce.GetUnserializeFunc(), "unserialize", nil, &zdata)
 	// ZvalPtrDtor(&zdata)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return types.FAILURE
 	} else {
 		return types.SUCCESS

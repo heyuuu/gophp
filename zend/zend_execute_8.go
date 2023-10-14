@@ -273,7 +273,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 			fbc = ZendStdGetStaticMethod(called_scope, mname, nil)
 		}
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(called_scope, mname)
 			}
 			// types.ZendStringReleaseEx(lcname, 0)
@@ -284,7 +284,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 		// types.ZendStringReleaseEx(mname, 0)
 		if !fbc.IsStatic() {
 			ZendNonStaticMethodCall(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return nil
 			}
 		}
@@ -379,14 +379,14 @@ func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecu
 				fbc = ZendStdGetStaticMethod(called_scope, method.StringEx(), nil)
 			}
 			if fbc == nil {
-				if EG__().GetException() == nil {
+				if EG__().NoException() {
 					ZendUndefinedMethod(called_scope, method.StringEx())
 				}
 				return nil
 			}
 			if !fbc.IsStatic() {
 				ZendNonStaticMethodCall(fbc)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return nil
 				}
 			}
@@ -394,7 +394,7 @@ func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecu
 		} else {
 			fbc = obj.Object().GetMethod(method.String(), nil)
 			if fbc == nil {
-				if EG__().GetException() == nil {
+				if EG__().NoException() {
 					ZendUndefinedMethod(obj.Object().GetCe(), method.StringEx())
 				}
 				return nil

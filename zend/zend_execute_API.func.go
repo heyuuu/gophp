@@ -62,7 +62,7 @@ func ZendGetExecutedLineno() int {
 		ex = ex.GetPrevExecuteData()
 	}
 	if ex != nil {
-		if EG__().GetException() != nil && ex.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION && ex.GetOpline().GetLineno() == 0 && EG__().GetOplineBeforeException() != nil {
+		if EG__().HasException() && ex.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION && ex.GetOpline().GetLineno() == 0 && EG__().GetOplineBeforeException() != nil {
 			return EG__().GetOplineBeforeException().GetLineno()
 		}
 		return ex.GetOpline().GetLineno()
@@ -86,7 +86,7 @@ func ZendIsExecuting() bool {
 }
 func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *types.Zval) int {
 	var colon *byte
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return types.FAILURE
 	} else if lang.Assign(&colon, (*byte)(operators.ZendMemrchr(name.GetVal(), ':', name.GetLen()))) {
 		faults.ThrowError(nil, "Undefined class constant '%s'", name.GetVal())
@@ -103,7 +103,7 @@ func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *type
 			actual_len -= actual - name.GetVal()
 		}
 		faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", actual, actual)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return types.FAILURE
 		} else {
 			var result_str *types.String = types.NewString(b.CastStr(actual, actual_len))
@@ -145,7 +145,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 	if !EG__().IsActive() {
 		return types.FAILURE
 	}
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return types.FAILURE
 	}
 	b.Assert(fci.IsInit())
@@ -195,7 +195,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 			}
 			faults.Error(faults.E_DEPRECATED, "%s", error)
 			Efree(error)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				if CurrEX() == &dummy_execute_data {
 					EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
 				}
@@ -216,7 +216,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 	call = ZendVmStackPushCallFrame(call_info, func_, fci.GetParamCount(), object_or_called_scope)
 	if func_.IsDeprecated() {
 		faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			ZendVmStackFreeCallFrame(call)
 			if CurrEX() == &dummy_execute_data {
 				EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
@@ -240,7 +240,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 					 * and perform the call with the value wrapped in a reference. */
 					faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
 					must_wrap = 1
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						call.NumArgs() = i
 						ZendVmStackFreeArgs(call)
 						ZendVmStackFreeCallFrame(call)
@@ -312,7 +312,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 		}
 		EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
 		ZendVmStackFreeArgs(call)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			// ZvalPtrDtor(fci.GetRetval())
 			fci.GetRetval().SetUndef()
 		}
@@ -343,7 +343,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 			// types.ZendStringReleaseEx(func_.GetFunctionName(), 0)
 		}
 		Efree(func_)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			// ZvalPtrDtor(fci.GetRetval())
 			fci.GetRetval().SetUndef()
 		}
@@ -352,7 +352,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 	if CurrEX() == &dummy_execute_data {
 		EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
 	}
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		if CurrEX() == nil {
 			faults.ThrowExceptionInternal(nil)
 		} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetType()) {
@@ -448,7 +448,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	EG__().ExceptionSave()
 
 	var ce *types.ClassEntry = nil
-	if ZendCallFunction(fci, &fcc) == types.SUCCESS && EG__().GetException() == nil {
+	if ZendCallFunction(fci, &fcc) == types.SUCCESS && EG__().NoException() {
 		ce = EG__().ClassTable().Get(lc_name)
 	}
 
@@ -535,7 +535,7 @@ func ZendEvalStringl(str string, retval_ptr *types.Zval, string_name *byte) int 
 func ZendEvalStringlEx(str string, retval_ptr *types.Zval, string_name *byte, handle_exceptions int) int {
 	var result int
 	result = ZendEvalStringl(str, retval_ptr, string_name)
-	if handle_exceptions != 0 && EG__().GetException() != nil {
+	if handle_exceptions != 0 && EG__().HasException() {
 		faults.ExceptionError(EG__().GetException(), faults.E_ERROR)
 		result = types.FAILURE
 	}
@@ -672,7 +672,7 @@ check_fetch_type:
 	if (fetch_type & ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 {
 		return ZendLookupClassEx(className, nil, fetch_type)
 	} else if lang.Assign(&ce, ZendLookupClassEx(className, nil, fetch_type)) == nil {
-		if (fetch_type&ZEND_FETCH_CLASS_SILENT) == 0 && EG__().GetException() == nil {
+		if (fetch_type&ZEND_FETCH_CLASS_SILENT) == 0 && EG__().NoException() {
 			if fetch_sub_type == ZEND_FETCH_CLASS_INTERFACE {
 				ZendThrowOrError(fetch_type, nil, "Interface '%s' not found", className)
 			} else if fetch_sub_type == ZEND_FETCH_CLASS_TRAIT {
@@ -696,7 +696,7 @@ func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_typ
 		if (fetch_type & ZEND_FETCH_CLASS_SILENT) != 0 {
 			return nil
 		}
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) == 0 {
 				var exception_str *types.String
 				var exception_zv types.Zval

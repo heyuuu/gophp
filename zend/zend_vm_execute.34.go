@@ -29,7 +29,7 @@ func ZendExecute(opArray *types.ZendOpArray, returnValue *types.Zval) {
 	var executeData *ZendExecuteData
 	var objectOrCalledScope any
 	var callInfo uint32
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return
 	}
 	objectOrCalledScope = ZendGetThisObject(CurrEX())

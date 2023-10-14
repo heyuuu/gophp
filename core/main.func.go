@@ -724,7 +724,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			/* throw an exception if we are in EH_THROW mode
 			 * but DO NOT overwrite a pending exception
 			 */
-			if zend.EG__().GetException() == nil {
+			if zend.EG__().NoException() {
 				faults.ThrowErrorException(zend.EG__().GetExceptionClass(), buffer, 0, type_)
 			}
 			zend.Efree(buffer)

@@ -136,7 +136,7 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 					}
 					// zend.ZvalPtrDtor(&retval)
 				}
-			} else if zend.EG__().GetException() == nil {
+			} else if zend.EG__().NoException() {
 				/* The user error handler failed, use built-in error handler */
 				errorCb(typ, errorFilename, errorLineno, message)
 			}
@@ -230,7 +230,7 @@ func ThrowErrorEx(exceptionCe *types.ClassEntry, message string) {
 	}
 
 	/* Marker used to disable exception generation during preloading. */
-	if zend.EG__().GetException() == nil {
+	if zend.EG__().NoException() {
 		return
 	}
 

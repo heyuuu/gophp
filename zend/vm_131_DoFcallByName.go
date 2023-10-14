@@ -24,7 +24,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteDa
 		b.Assert(fbc.GetType() == ZEND_INTERNAL_FUNCTION)
 		if fbc.IsDeprecated() {
 			ZendDeprecatedFunction(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				UNDEF_RESULT()
 				ret = &retval
 				ret.SetUndef()
@@ -48,7 +48,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteDa
 		ZendVmStackFreeCallFrame(call)
 		// IZvalPtrDtor(ret)
 	}
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		faults.RethrowException(executeData)
 		return 0
 	}
@@ -74,7 +74,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData
 		b.Assert(fbc.GetType() == ZEND_INTERNAL_FUNCTION)
 		if fbc.IsDeprecated() {
 			ZendDeprecatedFunction(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				UNDEF_RESULT()
 
 				goto fcall_by_name_end
@@ -96,7 +96,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData
 		ZendVmStackFreeCallFrame(call)
 
 	}
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		faults.RethrowException(executeData)
 		return 0
 	}

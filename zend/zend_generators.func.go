@@ -602,7 +602,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 	}
 	if root.GetNode().GetParent() != nil {
 		if root.GetNode().GetParent().GetExecuteData() == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				var yield_from *types.ZendOp = (*types.ZendOp)(root.GetExecuteData().GetOpline() - 1)
 				if yield_from.GetOpcode() == ZEND_YIELD_FROM {
 					if root.GetNode().GetParent().GetRetval().IsUndef() {
@@ -678,12 +678,12 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		var iter *ZendObjectIterator = (*ZendObjectIterator)(generator.GetValues().Object())
 		if lang.PostInc(&(iter.GetIndex())) > 0 {
 			iter.GetFuncs().GetMoveForward()(iter)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				goto exception
 			}
 		}
 		if iter.GetFuncs().GetValid()(iter) == types.FAILURE {
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				goto exception
 			}
 
@@ -695,7 +695,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 
 		}
 		value = iter.GetFuncs().GetGetCurrentData()(iter)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			goto exception
 		} else if value == nil {
 			goto failure
@@ -705,7 +705,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		// ZvalPtrDtor(generator.GetKey())
 		if iter.GetFuncs().GetGetCurrentKey() != nil {
 			iter.GetFuncs().GetGetCurrentKey()(iter, generator.GetKey())
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				generator.GetKey().SetUndef()
 				goto exception
 			}
@@ -809,7 +809,7 @@ try_again:
 	 * In case we did yield from, the Exception must be rethrown into
 	 * its calling frame (see above in if (check_yield_from). */
 
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		if generator == orig_generator {
 			ZendGeneratorClose(generator, 0)
 			if CurrEX() == nil {
@@ -986,7 +986,7 @@ func zim_Generator_getReturn(executeData *ZendExecuteData, return_value *types.Z
 	}
 	generator = (*ZendGenerator)(executeData.ThisObject())
 	ZendGeneratorEnsureInitialized(generator)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return
 	}
 	if generator.GetRetval().IsUndef() {

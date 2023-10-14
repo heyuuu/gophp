@@ -173,7 +173,7 @@ func _getZvalPtrVarDeref(var_ uint32, should_free *ZendFreeOp, executeData *Zend
 	return ret
 }
 func ZvalUndefinedCv(var_ uint32, executeData *ZendExecuteData) *types.Zval {
-	if EG__().GetException() == nil {
+	if EG__().NoException() {
 		var cv *types.String = CV_DEF_OF(EX_VAR_TO_NUM(var_))
 		faults.Error(faults.E_NOTICE, "Undefined variable: %s", cv.GetVal())
 	}

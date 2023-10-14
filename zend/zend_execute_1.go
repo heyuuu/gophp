@@ -121,7 +121,7 @@ func ZendAssignToTypedPropertyReference(prop_info *types.PropertyInfo, prop *typ
 }
 func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) *types.Zval {
 	faults.Error(faults.E_NOTICE, "Only variables should be assigned by reference")
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return UninitializedZval()
 	}
 
@@ -298,7 +298,7 @@ func ZendVerifyArgError(zf types.IFunction, arg_info *ZendArgInfo, arg_num int, 
 	var need_or_null *byte
 	var given_msg *byte
 	var given_kind *byte
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 
 		/* The type verification itself might have already thrown an exception
 		 * through a promoted warning. */

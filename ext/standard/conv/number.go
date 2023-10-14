@@ -111,7 +111,7 @@ func ParseNumberPrefix(str string, strict bool) (result ParseNumberResult, match
 		}
 		if mode == ModeNoticeOnErrors {
 			faults.Error(faults.E_NOTICE, "A non well formed numeric value encountered")
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				return
 			}
 		}

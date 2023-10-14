@@ -28,7 +28,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				}
 				// ZvalPtrDtor(&tmp)
 			}
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.Type()))
 			}
 			opline.Result().SetNull()
@@ -72,7 +72,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 				// ZvalPtrDtor(&tmp)
 			}
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.Type()))
 			}
 			opline.Result().SetNull()
@@ -114,7 +114,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				}
 				// ZvalPtrDtor(&tmp)
 			}
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.Type()))
 			}
 			opline.Result().SetNull()

@@ -28,7 +28,7 @@ func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zend
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		// ZvalPtrDtorNogc(op_2)
 	}
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return 0
 	}
 	if opline.Result().Long() == 0 {

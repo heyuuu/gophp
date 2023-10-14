@@ -13,7 +13,7 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var end *types.ZendOp
 	var var_ uint32
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return
 	}
 	switch opline.GetOpcode() {
@@ -149,7 +149,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 	var string_len int
 	var offset ZendLong
 	offset = ZendCheckStringOffset(dim, BP_VAR_W, executeData)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetUndef()
 		}
@@ -386,7 +386,7 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	obj.SetObject(object.Object())
 	// 	obj.AddRefcount()
 	z = obj.Object().ReadPropertyEx(property, BP_VAR_R, &rv)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		// OBJ_RELEASE(obj.Object())
 		opline.Result().SetUndef()
 		return

@@ -620,7 +620,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 		retval = return_value
 	}
 	if PhpVarUnserialize(retval, &p, p+buf_len, &var_hash) == 0 {
-		if zend.EG__().GetException() == nil {
+		if zend.EG__().NoException() {
 			core.PhpErrorDocref("", faults.E_NOTICE, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
 		}
 		if BG__().unserialize.level <= 1 {

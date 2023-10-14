@@ -674,7 +674,7 @@ func ExceptionError(ex *types.Object, severity int) {
 		var file *types.String = nil
 		var line zend.ZendLong = 0
 		zend.ZendCallMethodWith0Params(&exception, ce_exception, ex.GetCe().GetTostring(), "__tostring", &tmp)
-		if zend.EG__().GetException() == nil {
+		if zend.EG__().NoException() {
 			if !tmp.IsString() {
 				Error(E_WARNING, "%s::__toString() must return a string", ce_exception.Name())
 			} else {

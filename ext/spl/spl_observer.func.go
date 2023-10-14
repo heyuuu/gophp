@@ -698,7 +698,7 @@ func zim_spl_MultipleIterator_rewind(executeData *zend.ZendExecuteData, return_v
 		return
 	}
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
-	for lang.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().GetException() == nil {
+	for lang.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().NoException() {
 		it = element.GetObj()
 		zend.ZendCallMethodWith0Params(it, types.Z_OBJCE_P(it), types.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfRewind(), "rewind", nil)
 		types.ZendHashMoveForwardEx(intern.GetStorage(), intern.GetPos())
@@ -713,7 +713,7 @@ func zim_spl_MultipleIterator_next(executeData *zend.ZendExecuteData, return_val
 		return
 	}
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
-	for lang.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().GetException() == nil {
+	for lang.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().NoException() {
 		it = element.GetObj()
 		zend.ZendCallMethodWith0Params(it, types.Z_OBJCE_P(it), types.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfNext(), "next", nil)
 		types.ZendHashMoveForwardEx(intern.GetStorage(), intern.GetPos())
@@ -740,7 +740,7 @@ func zim_spl_MultipleIterator_valid(executeData *zend.ZendExecuteData, return_va
 		expect = 0
 	}
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
-	for lang.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().GetException() == nil {
+	for lang.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().NoException() {
 		it = element.GetObj()
 		zend.ZendCallMethodWith0Params(it, types.Z_OBJCE_P(it), types.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
 		if !(retval.IsUndef()) {
@@ -771,7 +771,7 @@ func SplMultipleIteratorGetAll(intern *SplObjectStorage, get_type int, return_va
 	}
 	zend.ArrayInitSize(return_value, num_elements)
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
-	for lang.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().GetException() == nil {
+	for lang.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().NoException() {
 		it = element.GetObj()
 		zend.ZendCallMethodWith0Params(it, types.Z_OBJCE_P(it), types.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
 		if !(retval.IsUndef()) {

@@ -76,7 +76,7 @@ func ZendObjectsDestroyObject(object *types.Object) {
 		 */
 
 		old_exception = nil
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			if EG__().GetException() == object {
 				faults.ErrorNoreturn(faults.E_CORE_ERROR, "Attempt to destruct pending exception")
 			} else {
@@ -95,7 +95,7 @@ func ZendObjectsDestroyObject(object *types.Object) {
 
 		ZendCallFunction(fci, &fcic)
 		if old_exception != nil {
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				faults.ExceptionSetPrevious(EG__().GetException(), old_exception)
 			} else {
 				EG__().SetException(old_exception)

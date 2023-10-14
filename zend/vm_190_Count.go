@@ -25,7 +25,7 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					count = c
 					break
 				}
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					count = 0
 					break
 				}
@@ -77,7 +77,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					count = c
 					break
 				}
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					count = 0
 					break
 				}
@@ -135,7 +135,7 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					count = c
 					break
 				}
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					count = 0
 					break
 				}

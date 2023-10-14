@@ -31,7 +31,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 			if EG__().GetIncludedFiles().KeyExists(*resolved_path) {
 				goto already_compiled
 			}
-		} else if EG__().GetException() != nil {
+		} else if EG__().HasException() {
 			break
 		} else if strlen(inc_filename.StringEx().GetVal()) != inc_filename.StringEx().GetLen() {
 			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.StringEx().GetVal())
@@ -107,11 +107,11 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *types.ZendOp
 	var ce *types.ClassEntry = types.Z_OBJCE_P(array_ptr)
 	var iter *ZendObjectIterator = ce.GetGetIterator()(ce, array_ptr, by_ref)
 	var is_empty bool
-	if iter == nil || EG__().GetException() != nil {
+	if iter == nil || EG__().HasException() {
 		if iter != nil {
 			// OBJ_RELEASE(iter.GetStd())
 		}
-		if EG__().GetException() == nil {
+		if EG__().NoException() {
 			faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.Name())
 		}
 		opline.Result().SetUndef()
@@ -120,14 +120,14 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *types.ZendOp
 	iter.SetIndex(0)
 	if iter.GetFuncs().GetRewind() != nil {
 		iter.GetFuncs().GetRewind()(iter)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			// OBJ_RELEASE(iter.GetStd())
 			opline.Result().SetUndef()
 			return 1
 		}
 	}
 	is_empty = iter.GetFuncs().GetValid()(iter) != types.SUCCESS
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		// OBJ_RELEASE(iter.GetStd())
 		opline.Result().SetUndef()
 		return 1
@@ -232,7 +232,7 @@ func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData *ZendExecuteData) int {
 	return 0
 }
 func ZEND_VM_NEXT_OPCODE(executeData *ZendExecuteData, opline *types.ZendOp) int {
-	b.Assert(EG__().GetException() == nil)
+	b.Assert(EG__().NoException())
 	OPLINE = opline + 1
 	return 0
 }
@@ -241,7 +241,7 @@ func ZEND_VM_SET_RELATIVE_OPCODE(executeData *ZendExecuteData, opline *types.Zen
 	ZEND_VM_INTERRUPT_CHECK(executeData)
 }
 func ZEND_VM_JMP_EX(executeData *ZendExecuteData, new_op *types.ZendOp, check_exception int) int {
-	if check_exception != 0 && EG__().GetException() != nil {
+	if check_exception != 0 && EG__().HasException() {
 		return 0
 	}
 	OPLINE = new_op
@@ -257,7 +257,7 @@ func ZEND_VM_INC_OPCODE(executeData *ZendExecuteData) int {
 }
 func ZEND_VM_SMART_BRANCH(_result bool, _check int) {
 	for {
-		if _check != 0 && EG__().GetException() != nil {
+		if _check != 0 && EG__().HasException() {
 			break
 		}
 		if (opline + 1).opcode == ZEND_JMPZ {

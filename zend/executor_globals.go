@@ -440,12 +440,6 @@ func (eg *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
 func (eg *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
 	eg.errorReportingIniEntry = value
 }
-func (eg *ZendExecutorGlobals) GetException() *types.Object      { return eg.exception }
-func (eg *ZendExecutorGlobals) SetException(value *types.Object) { eg.exception = value }
-func (eg *ZendExecutorGlobals) GetPrevException() *types.Object  { return eg.prevException }
-func (eg *ZendExecutorGlobals) SetPrevException(value **types.Object) {
-	eg.prevException = value
-}
 func (eg *ZendExecutorGlobals) GetOplineBeforeException() *types.ZendOp {
 	return eg.oplineBeforeException
 }
@@ -499,6 +493,10 @@ func (eg *ZendExecutorGlobals) SetIsInResourceShutdown(cond bool) {
 /**
  * exceptions && errors
  */
+func (eg *ZendExecutorGlobals) GetException() *types.Object      { return eg.exception }
+func (eg *ZendExecutorGlobals) SetException(value *types.Object) { eg.exception = value }
+
+func (eg *ZendExecutorGlobals) NoException() bool  { return eg.exception != nil }
 func (eg *ZendExecutorGlobals) HasException() bool { return eg.exception != nil }
 func (eg *ZendExecutorGlobals) ClearException() {
 	eg.prevException = nil

@@ -99,7 +99,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				 * In case that ever happens we need an additional flag. */
 
 				iter.GetFuncs().GetMoveForward()(iter)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					UNDEF_RESULT()
 					return 0
 				}
@@ -107,7 +107,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 					/* reached end of iteration */
 
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						UNDEF_RESULT()
 						return 0
 					}
@@ -115,7 +115,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 			value = iter.GetFuncs().GetGetCurrentData()(iter)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				UNDEF_RESULT()
 				return 0
 			}
@@ -131,7 +131,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			if RETURN_VALUE_USED(opline) {
 				if iter.GetFuncs().GetGetCurrentKey() != nil {
 					iter.GetFuncs().GetGetCurrentKey()(iter, opline.Result())
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						UNDEF_RESULT()
 						return 0
 					}

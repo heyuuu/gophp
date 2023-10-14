@@ -30,7 +30,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 				}
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}
@@ -56,7 +56,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 				}
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}
@@ -88,7 +88,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 				}
 				if object.IsUndef() {
 					object = ZVAL_UNDEFINED_OP1(executeData)
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						return 0
 					}
 				}
@@ -115,7 +115,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 
 		fbc = obj.GetMethod(function_name.String(), opline.Const2()+1)
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
@@ -135,7 +135,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 
@@ -174,7 +174,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 				}
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}
@@ -193,7 +193,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 				}
 				if object.IsUndef() {
 					object = ZVAL_UNDEFINED_OP1(executeData)
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						return 0
 					}
 				}
@@ -212,7 +212,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 
 		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
@@ -228,7 +228,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 
@@ -267,7 +267,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 				}
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}
@@ -286,7 +286,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 				}
 				if object.IsUndef() {
 					object = ZVAL_UNDEFINED_OP1(executeData)
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						return 0
 					}
 				}
@@ -305,7 +305,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 
 		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
@@ -320,7 +320,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 
@@ -364,7 +364,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 
 		fbc = obj.GetMethod(function_name.String(), opline.Const2()+1)
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
@@ -423,7 +423,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 				}
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}
@@ -440,7 +440,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 
 		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
 			}
 			return 0
@@ -490,7 +490,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 				}
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}
@@ -506,7 +506,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 		/* First, locate the function. */
 		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
@@ -558,7 +558,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 				}
 				if object.IsUndef() {
 					object = ZVAL_UNDEFINED_OP1(executeData)
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						return 0
 					}
 				}
@@ -585,7 +585,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 
 		fbc = obj.GetMethod(function_name.String(), opline.Const2()+1)
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
@@ -608,7 +608,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 
@@ -655,7 +655,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 				}
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}
@@ -674,7 +674,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 				}
 				if object.IsUndef() {
 					object = ZVAL_UNDEFINED_OP1(executeData)
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						return 0
 					}
 				}
@@ -692,7 +692,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 		/* First, locate the function. */
 		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(obj.GetCe(), function_name.StringEx())
 			}
 			return 0
@@ -707,7 +707,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 
@@ -745,7 +745,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 				}
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}
@@ -765,7 +765,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 				}
 				if object.IsUndef() {
 					object = ZVAL_UNDEFINED_OP1(executeData)
-					if EG__().GetException() != nil {
+					if EG__().HasException() {
 						return 0
 					}
 				}
@@ -784,7 +784,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 
 		fbc = obj.GetMethod(function_name.String(), nil)
 		if fbc == nil {
-			if EG__().GetException() == nil {
+			if EG__().NoException() {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
 			}
 			return 0
@@ -804,7 +804,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			return 0
 		}
 

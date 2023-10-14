@@ -216,7 +216,7 @@ func ZifConstant(returnValue zpp.Ret, constName string) {
 			}
 		}
 	} else {
-		if zend.EG__().GetException() == nil {
+		if zend.EG__().NoException() {
 			core.PhpErrorDocref("", faults.E_WARNING, "Couldn't find constant %s", constName)
 		}
 		returnValue.SetNull()

@@ -22,7 +22,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 			goto fcall_end
 		} else {
 			ZendDeprecatedFunction(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				goto fcall_except
 			}
 		}
@@ -76,7 +76,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 		// OBJ_RELEASE(call.GetThis().Object())
 	}
 	ZendVmStackFreeCallFrame(call)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		faults.RethrowException(executeData)
 		return 0
 	}
@@ -100,7 +100,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 			goto fcall_end
 		} else {
 			ZendDeprecatedFunction(fbc)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				goto fcall_except
 			}
 		}
@@ -154,7 +154,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 		// OBJ_RELEASE(call.GetThis().Object())
 	}
 	ZendVmStackFreeCallFrame(call)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		faults.RethrowException(executeData)
 		return 0
 	}

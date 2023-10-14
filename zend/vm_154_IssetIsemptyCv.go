@@ -25,7 +25,7 @@ func ZEND_ISSET_ISEMPTY_CV_SPEC_CV_UNUSED_EMPTY_HANDLER(executeData *ZendExecute
 	value = opline.Op1()
 	var result int
 	result = !(operators.IZendIsTrue(value))
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		opline.Result().SetUndef()
 		return 0
 	}

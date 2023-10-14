@@ -264,7 +264,7 @@ again:
 			var obj types.Zval
 			obj.SetObject(struc.Object())
 			if !se.callSerialize(&retval, &obj) {
-				if zend.EG__().GetException() == nil {
+				if zend.EG__().NoException() {
 					se.WriteString("N;")
 				}
 				return
@@ -314,7 +314,7 @@ again:
 			var tmp types.Zval
 			tmp.SetObject(struc.Object())
 			if !se.callSleep(&retval, &tmp) {
-				if zend.EG__().GetException() == nil {
+				if zend.EG__().NoException() {
 					/* we should still add element even if it's not OK,
 					 * since we already wrote the length of the array before */
 					se.WriteString("N;")

@@ -2007,7 +2007,7 @@ func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 	if ce.IsHasUnlinkedUses() {
 		var exception_str *types.String
 		var exception_zv types.Zval
-		b.Assert(EG__().GetException() != nil && "Exception must have been thrown")
+		b.Assert(EG__().HasException() && "Exception must have been thrown")
 		exception_zv.SetObject(EG__().GetException())
 		// 		exception_zv.AddRefcount()
 		EG__().ClearException()

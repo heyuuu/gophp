@@ -18,7 +18,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		if ce == nil {
 			ce = ZendFetchClassByName(opline.Const2().StringEx(), (opline.Const2() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
-				b.Assert(EG__().GetException() != nil)
+				b.Assert(EG__().HasException())
 				FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
 				return 0
 			}
@@ -26,7 +26,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	} else if opline.GetOp2Type() == IS_UNUSED {
 		ce = ZendFetchClass(nil, opline.GetOp2().GetNum())
 		if ce == nil {
-			b.Assert(EG__().GetException() != nil)
+			b.Assert(EG__().HasException())
 			FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
 			return 0
 		}

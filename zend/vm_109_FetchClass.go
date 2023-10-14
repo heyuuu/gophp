@@ -39,7 +39,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		} else {
 			if class_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}
@@ -76,7 +76,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			if class_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					return 0
 				}
 			}

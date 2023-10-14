@@ -186,7 +186,7 @@ func SplFilesystemDirOpen(intern *SplFilesystemObject, path *byte) {
 	intern.SetIndex(0)
 	if zend.EG__().HasException() || intern.GetDirp() == nil {
 		intern.GetEntry().GetDName()[0] = '0'
-		if zend.EG__().GetException() == nil {
+		if zend.EG__().NoException() {
 
 			/* open failed w/out notice (turned to exception due to EH_THROW) */
 
@@ -217,7 +217,7 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	intern.SetContext(streams.PhpStreamContextFromZval(intern.GetZcontext(), 0))
 	intern.SetStream(core.PhpStreamOpenWrapperEx(intern.GetFileName(), intern.GetOpenMode(), lang.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, intern.GetContext()))
 	if intern.GetFileNameLen() == 0 || intern.GetStream() == nil {
-		if zend.EG__().GetException() == nil {
+		if zend.EG__().NoException() {
 			faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot open file '%s'", lang.CondF1(intern.GetFileNameLen() != 0, func() *byte { return intern.GetFileName() }, ""))
 		}
 		intern.SetFileName(nil)

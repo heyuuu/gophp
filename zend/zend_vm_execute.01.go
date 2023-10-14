@@ -58,7 +58,7 @@ func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.CompareFunction(opline.Result(), op_1, op_2)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return 0
 	}
 	if opline.Result().Long() == 0 {
@@ -80,7 +80,7 @@ func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDa
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.CompareFunction(opline.Result(), op_1, op_2)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return 0
 	}
 	if opline.Result().Long() != 0 {
@@ -102,7 +102,7 @@ func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, ex
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	operators.CompareFunction(opline.Result(), op_1, op_2)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		return 0
 	}
 	if opline.Result().Long() <= 0 {
@@ -169,7 +169,7 @@ func zend_fetch_static_prop_helper_SPEC(type_ int, executeData *ZendExecuteData)
 	var opline *types.ZendOp = executeData.GetOpline()
 	var prop *types.Zval
 	if ZendFetchStaticPropertyAddress(&prop, nil, opline.GetExtendedValue() & ^ZEND_FETCH_OBJ_FLAGS, type_, opline.GetExtendedValue()&ZEND_FETCH_OBJ_FLAGS, opline, executeData) != types.SUCCESS {
-		b.Assert(EG__().GetException() != nil || type_ == BP_VAR_IS)
+		b.Assert(EG__().HasException() || type_ == BP_VAR_IS)
 		prop = UninitializedZval()
 	}
 	if type_ == BP_VAR_R || type_ == BP_VAR_IS {
@@ -205,7 +205,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		EG__().VmStackPopCheck(executeData)
 
 		executeData = executeData.GetPrevExecuteData()
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			faults.RethrowException(executeData)
 			return 2
 		}
@@ -229,7 +229,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		old_execute_data = executeData
 		executeData = executeData.GetPrevExecuteData()
 		ZendVmStackFreeCallFrame(old_execute_data)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			faults.RethrowException(executeData)
 			return 2
 		}
@@ -244,7 +244,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		executeData = CurrEX()
 		ZendVmStackFreeCallFrame(old_execute_data)
 		ZendAttachSymbolTable(executeData)
-		if EG__().GetException() != nil {
+		if EG__().HasException() {
 			faults.RethrowException(executeData)
 			return 2
 		}

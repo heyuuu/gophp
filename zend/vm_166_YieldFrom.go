@@ -86,8 +86,8 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			var iter *ZendObjectIterator = ce.GetGetIterator()(ce, val, 0)
 			// ZvalPtrDtorNogc(free_op1)
-			if iter == nil || EG__().GetException() != nil {
-				if EG__().GetException() == nil {
+			if iter == nil || EG__().HasException() {
+				if EG__().NoException() {
 					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.Name())
 				}
 				UNDEF_RESULT()
@@ -96,7 +96,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			iter.SetIndex(0)
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					// OBJ_RELEASE(iter.GetStd())
 					UNDEF_RESULT()
 					return 0
@@ -176,8 +176,8 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			var iter *ZendObjectIterator = ce.GetGetIterator()(ce, val, 0)
 			// ZvalPtrDtorNogc(free_op1)
-			if iter == nil || EG__().GetException() != nil {
-				if EG__().GetException() == nil {
+			if iter == nil || EG__().HasException() {
+				if EG__().NoException() {
 					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.Name())
 				}
 				UNDEF_RESULT()
@@ -186,7 +186,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			iter.SetIndex(0)
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					// OBJ_RELEASE(iter.GetStd())
 					UNDEF_RESULT()
 					return 0
@@ -261,8 +261,8 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 		} else {
 			var iter *ZendObjectIterator = ce.GetGetIterator()(ce, val, 0)
-			if iter == nil || EG__().GetException() != nil {
-				if EG__().GetException() == nil {
+			if iter == nil || EG__().HasException() {
+				if EG__().NoException() {
 					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.Name())
 				}
 				UNDEF_RESULT()
@@ -271,7 +271,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			iter.SetIndex(0)
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
-				if EG__().GetException() != nil {
+				if EG__().HasException() {
 					// OBJ_RELEASE(iter.GetStd())
 					UNDEF_RESULT()
 					return 0

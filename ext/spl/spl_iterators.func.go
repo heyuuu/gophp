@@ -89,7 +89,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 	var sub_iter *zend.ZendObjectIterator
 	var has_children int
 	SPL_FETCH_SUB_ITERATOR(iterator, object)
-	for zend.EG__().GetException() == nil {
+	for zend.EG__().NoException() {
 	next_step:
 		iterator = object.GetIterators()[object.GetLevel()].GetIterator()
 		switch object.GetIterators()[object.GetLevel()].GetState() {
@@ -265,7 +265,7 @@ func SplRecursiveItRewindEx(object *SplRecursiveItObject, zthis *types.Zval) {
 		sub_iter = object.GetIterators()[object.GetLevel()].GetIterator()
 		//zend.ZendIteratorDtor(sub_iter)
 		// zend.ZvalPtrDtor(object.GetIterators()[b.PostDec(&(object.GetLevel()))].GetZobject())
-		if zend.EG__().GetException() == nil && (object.GetEndChildren() == nil || object.GetEndChildren().GetScope() != spl_ce_RecursiveIteratorIterator) {
+		if zend.EG__().NoException() && (object.GetEndChildren() == nil || object.GetEndChildren().GetScope() != spl_ce_RecursiveIteratorIterator) {
 			zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetEndChildren(), "endchildren", nil)
 		}
 	}
@@ -275,7 +275,7 @@ func SplRecursiveItRewindEx(object *SplRecursiveItObject, zthis *types.Zval) {
 	if sub_iter.GetFuncs().GetRewind() != nil {
 		sub_iter.GetFuncs().GetRewind()(sub_iter)
 	}
-	if zend.EG__().GetException() == nil && object.GetBeginIteration() != nil && object.GetInIteration() == 0 {
+	if zend.EG__().NoException() && object.GetBeginIteration() != nil && object.GetInIteration() == 0 {
 		zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetBeginIteration(), "beginIteration", nil)
 	}
 	object.SetInIteration(1)
@@ -1335,7 +1335,7 @@ func zim_spl_RecursiveFilterIterator_getChildren(executeData *zend.ZendExecuteDa
 	}
 	intern = it
 	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
-	if zend.EG__().GetException() == nil && retval.IsNotUndef() {
+	if zend.EG__().NoException() && retval.IsNotUndef() {
 		SplInstantiateArgEx1(types.Z_OBJCE_P(executeData.ThisObjectZval()), return_value, &retval)
 	}
 	// zend.ZvalPtrDtor(&retval)
@@ -1353,7 +1353,7 @@ func zim_spl_RecursiveCallbackFilterIterator_getChildren(executeData *zend.ZendE
 	}
 	intern = it
 	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
-	if zend.EG__().GetException() == nil && retval.IsNotUndef() {
+	if zend.EG__().NoException() && retval.IsNotUndef() {
 		SplInstantiateArgEx2(types.Z_OBJCE_P(executeData.ThisObjectZval()), return_value, &retval, intern.GetCbfilter().GetFci().GetFunctionName())
 	}
 	// zend.ZvalPtrDtor(&retval)
@@ -1607,7 +1607,7 @@ func zim_spl_RecursiveRegexIterator_getChildren(executeData *zend.ZendExecuteDat
 	}
 	intern = it
 	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
-	if zend.EG__().GetException() == nil {
+	if zend.EG__().NoException() {
 		var args = []*types.Zval{
 			&retval,
 			types.NewZvalString(intern.GetURegexRegex().GetStr()),
@@ -1712,7 +1712,7 @@ func SplLimitItSeek(intern *SplDualItObject, pos zend.ZendLong) {
 		zpos.SetLong(pos)
 		SplDualItFree(intern)
 		zend.ZendCallMethodWith1Params(intern.GetZobject(), intern.GetCe(), nil, "seek", nil, &zpos)
-		if zend.EG__().GetException() == nil {
+		if zend.EG__().NoException() {
 			intern.SetPos(pos)
 			if SplLimitItValid(intern) == types.SUCCESS {
 				SplDualItFetch(intern, 0)

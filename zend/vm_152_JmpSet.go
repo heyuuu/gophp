@@ -12,7 +12,7 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ret int
 	value = opline.Const1()
 	ret = operators.IZendIsTrue(value)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		opline.Result().SetUndef()
 		return 0
 	}
@@ -43,7 +43,7 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		value = types.Z_REFVAL_P(value)
 	}
 	ret = operators.IZendIsTrue(value)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		// ZvalPtrDtorNogc(free_op1)
 		opline.Result().SetUndef()
 		return 0
@@ -77,7 +77,7 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		value = types.Z_REFVAL_P(value)
 	}
 	ret = operators.IZendIsTrue(value)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		// ZvalPtrDtorNogc(free_op1)
 		opline.Result().SetUndef()
 		return 0
@@ -110,7 +110,7 @@ func ZEND_JMP_SET_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		value = types.Z_REFVAL_P(value)
 	}
 	ret = operators.IZendIsTrue(value)
-	if EG__().GetException() != nil {
+	if EG__().HasException() {
 		opline.Result().SetUndef()
 		return 0
 	}

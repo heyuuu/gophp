@@ -29,7 +29,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 			value = ht.IndexFind(hval)
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				result = 0
 				goto isset_dim_obj_exit
 			}
@@ -100,7 +100,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				result = 0
 				goto isset_dim_obj_exit
 			}
@@ -168,7 +168,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteDa
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				result = 0
 				goto isset_dim_obj_exit
 			}
@@ -227,7 +227,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 			value = ht.IndexFind(hval)
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				result = 0
 				goto isset_dim_obj_exit
 			}
@@ -303,7 +303,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				result = 0
 				goto isset_dim_obj_exit
 			}
@@ -377,7 +377,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				result = 0
 				goto isset_dim_obj_exit
 			}
@@ -440,7 +440,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteDa
 			value = ht.IndexFind(hval)
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				result = 0
 				goto isset_dim_obj_exit
 			}
@@ -514,7 +514,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				result = 0
 				goto isset_dim_obj_exit
 			}
@@ -586,7 +586,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 			goto isset_again
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
-			if EG__().GetException() != nil {
+			if EG__().HasException() {
 				result = 0
 				goto isset_dim_obj_exit
 			}
