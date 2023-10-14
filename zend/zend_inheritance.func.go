@@ -1433,53 +1433,40 @@ func ZendTraitsCopyFunctions(
 		ZendAddTraitMethod(ce, fn.FunctionName(), fnname, &fn_copy, overridden)
 	}
 }
-func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits **types.ClassEntry) uint32 {
-	var i uint32
-	if (trait.GetCeFlags() & types.AccTrait) != types.AccTrait {
+func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits []*types.ClassEntry) uint32 {
+	if !trait.IsTrait() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s is not a trait, Only traits may be used in 'as' and 'insteadof' statements", trait.Name())
 		return 0
 	}
-	for i = 0; i < ce.GetNumTraits(); i++ {
-		if traits[i] == trait {
-			return i
-		}
+	// todo remove
+	b.Assert(ce.GetNumTraits() == len(traits))
+	if idx := slices.Index(traits, trait); idx >= 0 {
+		return uint32(idx)
 	}
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Required Trait %s wasn't added to %s", trait.Name(), ce.Name())
 	return 0
 }
-func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEntry, exclude_tables_ptr ***types.Array, aliases_ptr ***types.ClassEntry) {
-	var i int
-	var j int = 0
-	var precedences []*ZendTraitPrecedence
-	var cur_precedence *ZendTraitPrecedence
-	var cur_method_ref *ZendTraitMethodReference
-	var exclude_tables []*types.Array = nil
-	var aliases **types.ClassEntry = nil
-	var trait *types.ClassEntry
-
+func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits []*types.ClassEntry) (excludeTables []*types.Array, aliases []*types.ClassEntry) {
 	/* resolve class references */
-
 	if ce.GetTraitPrecedences() != nil {
-		exclude_tables = Ecalloc(ce.GetNumTraits(), b.SizeOf("HashTable *"))
-		i = 0
-		precedences = ce.GetTraitPrecedences()
+		excludeTables = make([]*types.Array, ce.GetNumTraits())
+		precedences := ce.GetTraitPrecedences()
 		ce.SetTraitPrecedences(nil)
-		for lang.Assign(&cur_precedence, precedences[i]) {
+		for i := 0; precedences[i] != nil; i++ {
+			curPrecedence := precedences[i]
 
 			/** Resolve classes for all precedence operations. */
-
-			cur_method_ref = cur_precedence.GetTraitMethod()
-			trait = ZendFetchClass(cur_method_ref.ClassName(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			curMethodRef := curPrecedence.GetTraitMethod()
+			trait := ZendFetchClass(curMethodRef.ClassName(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if trait == nil {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", cur_method_ref.ClassName())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", curMethodRef.ClassName())
 			}
 			ZendCheckTraitUsage(ce, trait, traits)
 
 			/** Ensure that the preferred method is actually available. */
-
-			lcname := ascii.StrToLower(cur_method_ref.MethodName())
+			lcname := ascii.StrToLower(curMethodRef.MethodName())
 			if !trait.FunctionTable().Exists(lcname) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A precedence rule was defined for %s::%s but this method does not exist", trait.Name(), cur_method_ref.MethodName())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A precedence rule was defined for %s::%s but this method does not exist", trait.Name(), curMethodRef.MethodName())
 			}
 
 			/** With the other traits, we are more permissive.
@@ -1488,90 +1475,72 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 			  However, we want to make sure that the insteadof declaration
 			  is consistent in itself.
 			*/
-			for _, class_name := range cur_precedence.GetExcludeClassNames() {
-				var exclude_ce *types.ClassEntry = ZendFetchClass(class_name, ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
-				var trait_num uint32
-				if exclude_ce == nil {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", class_name)
+			for _, className := range curPrecedence.GetExcludeClassNames() {
+				var excludeCe *types.ClassEntry = ZendFetchClass(className, ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				var traitNum uint32
+				if excludeCe == nil {
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", className)
 				}
-				trait_num = ZendCheckTraitUsage(ce, exclude_ce, traits)
-				if exclude_tables[trait_num] == nil {
-					exclude_tables[trait_num] = types.NewArray()
+				traitNum = ZendCheckTraitUsage(ce, excludeCe, traits)
+				if excludeTables[traitNum] == nil {
+					excludeTables[traitNum] = types.NewArray()
 				}
-				if types.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname) == nil {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", precedences[i].GetTraitMethod().MethodName(), exclude_ce.Name())
-				}
-
-				/* make sure that the trait method is not from a class mentioned in
-				   exclude_from_classes, for consistency */
-
-				if trait == exclude_ce {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Inconsistent insteadof definition. "+"The method %s is to be used from %s, but %s is also on the exclude list", cur_method_ref.MethodName(), trait.Name(), trait.Name())
+				if types.ZendHashAddEmptyElement(excludeTables[traitNum], lcname) == nil {
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", curPrecedence.GetTraitMethod().MethodName(), excludeCe.Name())
 				}
 
-				/* make sure that the trait method is not from a class mentioned in
-				   exclude_from_classes, for consistency */
-
+				/* make sure that the trait method is not from a class mentioned in exclude_from_classes, for consistency */
+				if trait == excludeCe {
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Inconsistent insteadof definition. The method %s is to be used from %s, but %s is also on the exclude list", curMethodRef.MethodName(), trait.Name(), trait.Name())
+				}
 			}
-			// types.ZendStringReleaseEx(lcname, 0)
-			i++
 		}
 		ce.SetTraitPrecedences(precedences)
 	}
 	if ce.GetTraitAliases() != nil {
-		i = 0
-		for ce.GetTraitAliases()[i] != nil {
-			i++
-		}
-		aliases = Ecalloc(i, b.SizeOf("zend_class_entry *"))
-		i = 0
-		for ce.GetTraitAliases()[i] != nil {
-
+		aliases = make([]*types.ClassEntry, len(ce.GetTraitAliases()))
+		for i, traitAlias := range ce.GetTraitAliases() {
 			/** For all aliases with an explicit class name, resolve the class now. */
-
-			if ce.GetTraitAliases()[i].GetTraitMethod().ClassName() != "" {
-				cur_method_ref = ce.GetTraitAliases()[i].GetTraitMethod()
-				trait = ZendFetchClass(cur_method_ref.ClassName(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			if traitAlias.GetTraitMethod().ClassName() != "" {
+				curMethodRef := traitAlias.GetTraitMethod()
+				trait := ZendFetchClass(curMethodRef.ClassName(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if trait == nil {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", cur_method_ref.ClassName())
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", curMethodRef.ClassName())
 				}
 				ZendCheckTraitUsage(ce, trait, traits)
 				aliases[i] = trait
 
 				/** And, ensure that the referenced method is resolvable, too. */
-
-				lcname := ascii.StrToLower(cur_method_ref.MethodName())
+				lcname := ascii.StrToLower(curMethodRef.MethodName())
 				if !trait.FunctionTable().Exists(lcname) {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias was defined for %s::%s but this method does not exist", trait.Name(), cur_method_ref.MethodName())
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias was defined for %s::%s but this method does not exist", trait.Name(), curMethodRef.MethodName())
 				}
 			}
-			i++
 		}
 	}
-	*exclude_tables_ptr = exclude_tables
-	*aliases_ptr = aliases
+	return excludeTables, aliases
 }
-func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry, exclude_tables []*types.Array, aliases **types.ClassEntry) {
-	var i uint32
-	var overridden *types.Array = nil
-	if exclude_tables != nil {
-		for i = 0; i < ce.GetNumTraits(); i++ {
-			if traits[i] != nil {
+func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry, excludeTables []*types.Array, aliases []*types.ClassEntry) {
+	b.Assert(ce.GetNumTraits() == len(traits))
 
+	var overridden *types.Array = nil
+	if excludeTables != nil {
+		for i, trait := range traits {
+			if trait != nil {
 				/* copies functions, applies defined aliasing, and excludes unused trait methods */
-				traits[i].FunctionTable().Foreach(func(key string, fn types.IFunction) {
-					ZendTraitsCopyFunctions(key, fn, ce, &overridden, exclude_tables[i], aliases)
+				trait.FunctionTable().Foreach(func(key string, fn types.IFunction) {
+					ZendTraitsCopyFunctions(key, fn, ce, &overridden, excludeTables[i], aliases)
 				})
-				if exclude_tables[i] != nil {
-					exclude_tables[i].Destroy()
-					exclude_tables[i] = nil
+				if excludeTables[i] != nil {
+					excludeTables[i].Destroy()
+					excludeTables[i] = nil
 				}
 			}
 		}
 	} else {
-		for i = 0; i < ce.GetNumTraits(); i++ {
-			if traits[i] != nil {
-				traits[i].FunctionTable().Foreach(func(key string, fn types.IFunction) {
+		for _, trait := range traits {
+			if trait != nil {
+				trait.FunctionTable().Foreach(func(key string, fn types.IFunction) {
 					ZendTraitsCopyFunctions(key, fn, ce, &overridden, nil, aliases)
 				})
 			}
@@ -1584,11 +1553,11 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry,
 		overridden.Destroy()
 	}
 }
-func FindFirstDefinition(ce *types.ClassEntry, traits **types.ClassEntry, current_trait int, prop_name *types.String, coliding_ce *types.ClassEntry) *types.ClassEntry {
+func FindFirstDefinition(ce *types.ClassEntry, traits []*types.ClassEntry, current_trait int, prop_name *types.String, coliding_ce *types.ClassEntry) *types.ClassEntry {
 	var i int
 	if coliding_ce == ce {
 		for i = 0; i < current_trait; i++ {
-			if traits[i] != nil && traits[i].GetPropertiesInfo().KeyExists(prop_name.GetStr()) {
+			if traits[i] != nil && traits[i].PropertyTable().Exists(prop_name.GetStr()) {
 				return traits[i]
 			}
 		}
@@ -1598,7 +1567,6 @@ func FindFirstDefinition(ce *types.ClassEntry, traits **types.ClassEntry, curren
 func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntry) {
 	var coliding_prop *types.PropertyInfo
 	var prop_name *types.String
-	var class_name_unused *byte
 	var not_compatible bool
 	var prop_value *types.Zval
 	var flags uint32
@@ -1736,16 +1704,11 @@ func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **ty
 	}
 }
 func ZendDoBindTraits(ce *types.ClassEntry) {
-	var exclude_tables **types.Array
-	var aliases **types.ClassEntry
-	var traits **types.ClassEntry
-	var trait **types.ClassEntry
-	var i uint32
-	var j uint32
 	b.Assert(ce.GetNumTraits() > 0)
-	traits = Emalloc(b.SizeOf("zend_class_entry *") * ce.GetNumTraits())
-	for i = 0; i < ce.GetNumTraits(); i++ {
-		trait = ZendFetchClassByName(ce.GetTraitNames()[i].GetName(), ce.GetTraitNames()[i].GetLcName(), ZEND_FETCH_CLASS_TRAIT)
+
+	var traits []*types.ClassEntry
+	for i, traitName := range ce.GetTraitNames() {
+		trait := ZendFetchClassByName_Ex2(traitName, ZEND_FETCH_CLASS_TRAIT)
 		if trait == nil {
 			return
 		}
@@ -1753,46 +1716,27 @@ func ZendDoBindTraits(ce *types.ClassEntry) {
 			faults.ErrorNoreturn(faults.E_ERROR, "%s cannot use %s - it is not a trait", ce.Name(), trait.Name())
 			return
 		}
-		for j = 0; j < i; j++ {
-			if traits[j] == trait {
-
-				/* skip duplications */
-
-				trait = nil
-				break
-			}
+		if slices.Contains(traits, trait) {
+			/* skip duplications */
+			continue
 		}
 		traits[i] = trait
 	}
 
 	/* complete initialization of trait strutures in ce */
-
-	ZendTraitsInitTraitStructures(ce, traits, &exclude_tables, &aliases)
+	excludeTables, aliases := ZendTraitsInitTraitStructures(ce, traits)
 
 	/* first care about all methods to be flattened into the class */
-
-	ZendDoTraitsMethodBinding(ce, traits, exclude_tables, aliases)
+	ZendDoTraitsMethodBinding(ce, traits, excludeTables, aliases)
 
 	/* Aliases which have not been applied indicate typos/bugs. */
-
 	ZendDoCheckForInconsistentTraitsAliasing(ce, aliases)
-	if aliases != nil {
-		Efree(aliases)
-	}
-	if exclude_tables != nil {
-		Efree(exclude_tables)
-	}
 
 	/* then flatten the properties into it, to, mostly to notfiy developer about problems */
-
 	ZendDoTraitsPropertyBinding(ce, traits)
-	Efree(traits)
 
 	/* Emit E_DEPRECATED for PHP 4 constructors */
-
 	ZendCheckDeprecatedConstructor(ce)
-
-	/* Emit E_DEPRECATED for PHP 4 constructors */
 }
 func ZendHasDeprecatedConstructor(ce *types.ClassEntry) bool {
 	if ce.GetConstructor() == nil {

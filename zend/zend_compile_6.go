@@ -637,10 +637,9 @@ func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
 	ce.SetIsImplementTraits(true)
-	ce.SetTraitNames(Erealloc(ce.GetTraitNames(), b.SizeOf("zend_class_name")*(ce.GetNumTraits()+traits.GetChildren())))
-	for i = 0; i < traits.GetChildren(); i++ {
-		var trait_ast *ZendAst = traits.Children()[i]
-		var name *types.String = ZendAstGetStr(trait_ast)
+
+	for _, traitAst := range traits.Children() {
+		var name = ZendAstGetStr(traitAst)
 		if ce.IsInterface() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use traits inside of interfaces. "+"%s is used in %s", name.GetVal(), ce.Name())
 		}
@@ -652,10 +651,9 @@ func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 		case ZEND_FETCH_CLASS_STATIC:
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as trait name "+"as it is reserved", name.GetVal())
 		}
-		ce.GetTraitNames()[ce.GetNumTraits()].SetName(ZendResolveClassNameAst(trait_ast))
-		ce.GetTraitNames()[ce.GetNumTraits()].SetLcName(operators.ZendStringTolower(ce.GetTraitNames()[ce.GetNumTraits()].GetName()))
-		ce.GetNumTraits()++
+		ce.AddTraitName(ZendResolveClassNameAst(traitAst).GetStr())
 	}
+
 	if adaptations == nil {
 		return
 	}

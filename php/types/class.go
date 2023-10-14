@@ -114,7 +114,7 @@ type ClassEntry struct {
 	unserialize       func(object *Zval, ce *ClassEntry, buf *uint8, buf_len int, data *zend.ZendUnserializeData) int
 	num_traits        uint32
 
-	trait_names       *ClassName
+	trait_names       []ClassName
 	trait_aliases     []*zend.ZendTraitAlias
 	trait_precedences []*zend.ZendTraitPrecedence
 
@@ -406,11 +406,13 @@ func (ce *ClassEntry) GetUnserialize() func(object *Zval, ce *ClassEntry, buf *u
 func (ce *ClassEntry) SetUnserialize(value func(object *Zval, ce *ClassEntry, buf *uint8, buf_len int, data *zend.ZendUnserializeData) int) {
 	ce.unserialize = value
 }
-func (ce *ClassEntry) GetNumTraits() uint32      { return ce.num_traits }
-func (ce *ClassEntry) SetNumTraits(value uint32) { ce.num_traits = value }
 
-func (ce *ClassEntry) GetTraitNames() []ClassName                   { return ce.trait_names }
-func (ce *ClassEntry) SetTraitNames(value *ClassName)               { ce.trait_names = value }
+func (ce *ClassEntry) GetNumTraits() int          { return len(ce.trait_names) }
+func (ce *ClassEntry) GetTraitNames() []ClassName { return ce.trait_names }
+func (ce *ClassEntry) AddTraitName(name string) {
+	ce.trait_names = append(ce.trait_names, MakeClassName(name))
+}
+
 func (ce *ClassEntry) GetTraitAliases() []*zend.ZendTraitAlias      { return ce.trait_aliases }
 func (ce *ClassEntry) SetTraitAliases(value []*zend.ZendTraitAlias) { ce.trait_aliases = value }
 func (ce *ClassEntry) GetTraitPrecedences() []*zend.ZendTraitPrecedence {

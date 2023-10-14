@@ -685,6 +685,9 @@ check_fetch_type:
 	}
 	return ce
 }
+func ZendFetchClassByName_Ex2(className types.ClassName, fetchType int) *types.ClassEntry {
+	return ZendFetchClassByName(types.NewString(className.GetName()), types.NewString(className.GetLcName()), fetchType)
+}
 func ZendFetchClassByName_Ex(class_name string, key string, fetch_type int) *types.ClassEntry {
 	return ZendFetchClassByName(types.NewString(class_name), types.NewString(key), fetch_type)
 }
