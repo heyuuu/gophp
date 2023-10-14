@@ -685,7 +685,7 @@ func ZifErrorGetLast() *types.Zval {
 		} else {
 			arr.KeyAdd("file", types.NewZvalString("-"))
 		}
-		arr.KeyAdd("line", types.NewZvalLong(lastError.Lineno))
+		arr.KeyAdd("line", types.NewZvalLong(int(lastError.Lineno)))
 		return types.NewZvalArray(arr)
 	}
 	return types.NewZvalNull()

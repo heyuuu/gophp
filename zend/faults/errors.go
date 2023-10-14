@@ -32,19 +32,13 @@ const E_CORE = E_CORE_ERROR | E_CORE_WARNING
  * functions
  */
 func Bailout() {
-	zend.CG__().SetUncleanShutdown(1)
+	zend.CG__().SetUncleanShutdown(true)
 	zend.CG__().SetActiveClassEntry(nil)
-	zend.CG__().SetInCompilation(0)
+	zend.CG__().SetInCompilation(false)
 	zend.EG__().SetCurrentExecuteData(nil)
 	throw()
 }
 
-func GetException() *types.Object {
-	return zend.EG__().GetException()
-}
-func HasException() bool {
-	return GetException() != nil
-}
 func GetUserErrorHandler() *types.Zval {
 	return zend.EG__().GetUserErrorHandler()
 }
@@ -58,7 +52,7 @@ func errorCb(typ int, errorFilename string, errorLineno uint32, message string) 
 
 func errorVaList(typ int, errorFilename string, errorLineno uint32, message string) {
 	/* Report about uncaught exception in case of fatal errors */
-	if HasException() {
+	if zend.EG__().HasException() {
 		switch typ {
 		case E_CORE_ERROR,
 			E_ERROR,

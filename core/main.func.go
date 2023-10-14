@@ -672,24 +672,22 @@ func PhpErrorDocref2(docRef string, param1 string, param2 string, type_ int, for
 }
 func PhpHtmlPuts(str *byte, size int) { zend.ZendHtmlPuts(str, size) }
 func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format string, args ...any) {
-	var buffer *byte
-	var buffer_len int
-	var display int
-	buffer_len = int(Vspprintf(&buffer, PG__().log_errors_max_len, format, args))
+	var display bool
 
 	/* check for repeated errors to be ignored */
-
 	lastError := PG__().LastError()
 	if PG__().ignore_repeated_errors && lastError != nil {
 		/* no check for PG__().last_error_file is needed since it cannot
 		 * be NULL if PG__().last_error_message is not NULL */
-		if lastError.Message != buffer || (!PG__().ignore_repeated_source && lastError.Lineno != int(error_lineno)) || lastError.File != error_filename {
-			display = 1
+		if lastError.Message != format {
+			display = true
+		} else if !PG__().ignore_repeated_source && (lastError.Lineno != error_lineno || lastError.File != error_filename) {
+			display = true
 		} else {
-			display = 0
+			display = false
 		}
 	} else {
-		display = 1
+		display = true
 	}
 
 	/* according to error handling mode, throw exception or show it */
@@ -725,26 +723,24 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			 * but DO NOT overwrite a pending exception
 			 */
 			if zend.EG__().NoException() {
-				faults.ThrowErrorException(zend.EG__().GetExceptionClass(), buffer, 0, type_)
+				faults.ThrowErrorException(zend.EG__().GetExceptionClass(), format, 0, type_)
 			}
-			zend.Efree(buffer)
 			return
 		}
 	}
 
 	/* store the error if it has changed */
 
-	if display != 0 {
-		if error_filename == nil {
+	if display {
+		if error_filename == "" {
 			error_filename = "Unknown"
 		}
-		PG__().AddLastError(type_, strdup(buffer), strdup(error_filename), error_lineno)
+		PG__().AddLastError(type_, format, error_filename, error_lineno)
 	}
 
 	/* display/log the error if necessary */
-
-	if display != 0 && ((zend.EG__().GetErrorReporting()&type_) != 0 || (type_&faults.E_CORE) != 0) && (PG__().log_errors || PG__().display_errors || ModuleInitialized == 0) {
-		var error_type_str *byte
+	if display && ((zend.EG__().GetErrorReporting()&type_) != 0 || (type_&faults.E_CORE) != 0) && (PG__().log_errors || PG__().display_errors || ModuleInitialized == 0) {
+		var error_type_str string
 		var syslog_type_int int = LOG_NOTICE
 		switch type_ {
 		case faults.E_ERROR:
@@ -788,37 +784,29 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			error_type_str = "Unknown error"
 		}
 		if ModuleInitialized == 0 || PG__().log_errors {
-			var log_buffer *byte
-			Spprintf(&log_buffer, 0, "PHP %s:  %s in %s on line %"+"u", error_type_str, buffer, error_filename, error_lineno)
-			PhpLogErrWithSeverity(log_buffer, syslog_type_int)
-			zend.Efree(log_buffer)
+			logBuffer := fmt.Sprintf("PHP %s:  %s in %s on line %d", error_type_str, format, error_filename, error_lineno)
+			PhpLogErrWithSeverity(logBuffer, syslog_type_int)
 		}
 		if PG__().display_errors && (ModuleInitialized != 0 && !(PG__().during_request_startup) || PG__().display_startup_errors) {
 			if PG__().xmlrpc_errors {
-				PhpPrintf("<?xml version=\"1.0\"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>"+zend.ZEND_LONG_FMT+"</int></value></member><member><name>faultString</name><value><string>%s:%s in %s on line %"+"u"+"</string></value></member></struct></value></fault></methodResponse>", PG__().xmlrpc_error_number, error_type_str, buffer, error_filename, error_lineno)
+				PUTS(fmt.Sprintf("<?xml version=\"1.0\"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>%d</int></value></member><member><name>faultString</name><value><string>%s:%s in %s on line %d</string></value></member></struct></value></fault></methodResponse>", PG__().xmlrpc_error_number, error_type_str, format, error_filename, error_lineno))
 			} else {
 				var prepend_string = zend.INI_STR("error_prepend_string")
 				var append_string = zend.INI_STR("error_append_string")
 				if PG__().html_errors {
 					if type_ == faults.E_ERROR || type_ == faults.E_PARSE {
-						var buf = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
-						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf.GetVal(), error_filename, error_lineno, STR_PRINT(append_string))
-						//types.ZendStringFree(buf)
+						var buf = standard.PhpEscapeHtmlEntities_Ex(format, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
+						PUTS(fmt.Sprintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%d</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf, error_filename, error_lineno, STR_PRINT(append_string)))
 					} else {
-						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buffer, error_filename, error_lineno, STR_PRINT(append_string))
+						PUTS(fmt.Sprintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%d</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, format, error_filename, error_lineno, STR_PRINT(append_string)))
 					}
 				} else {
-
 					/* Write CLI/CGI errors to stderr if display_errors = "stderr" */
-
 					if PG__().display_errors == PHP_DISPLAY_ERRORS_STDERR {
-						log.Printf("%s: %s in %s on line %"+"u"+"\n", error_type_str, buffer, error_filename, error_lineno)
+						log.Printf("%s: %s in %s on line %d\n", error_type_str, format, error_filename, error_lineno)
 					} else {
-						PhpPrintf("%s\n%s: %s in %s on line %"+"u"+"\n%s", STR_PRINT(prepend_string), error_type_str, buffer, error_filename, error_lineno, STR_PRINT(append_string))
+						PUTS(fmt.Sprintf("%s\n%s: %s in %s on line %d\n%s", STR_PRINT(prepend_string), error_type_str, format, error_filename, error_lineno, STR_PRINT(append_string)))
 					}
-
-					/* Write CLI/CGI errors to stderr if display_errors = "stderr" */
-
 				}
 			}
 		}
@@ -829,13 +817,8 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	switch type_ {
 	case faults.E_CORE_ERROR:
 		if ModuleInitialized == 0 {
-
 			/* bad error in module startup - no way we can live with this */
-
 			exit(-2)
-
-			/* bad error in module startup - no way we can live with this */
-
 		}
 		fallthrough
 	case faults.E_ERROR:
@@ -859,39 +842,27 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			/* the parser would return 1 (failure), we can bail out nicely */
 
 			if type_ != faults.E_PARSE {
-
 				/* restore memory limit */
-
 				zend.ZendSetMemoryLimit(PG__().memory_limit)
-				zend.Efree(buffer)
-				//zend.ZendObjectsStoreMarkDestructed(zend.EG__().GetObjectsStore())
 				faults.Bailout()
 				return
 			}
-
-			/* the parser would return 1 (failure), we can bail out nicely */
-
 		}
 	}
 
 	/* Log if necessary */
-
-	if display == 0 {
-		zend.Efree(buffer)
+	if !display {
 		return
 	}
 	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().IsActive() {
 		var tmp types.Zval
-		tmp.SetString(b.CastStr(buffer, buffer_len))
+		tmp.SetString(format)
 		if zend.CurrEX() != nil {
-			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types.FAILURE {
-				// zend.ZvalPtrDtor(&tmp)
-			}
+			zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0)
 		} else {
 			zend.EG__().GetSymbolTable().KeyUpdateIndirect("php_errormsg", &tmp)
 		}
 	}
-	zend.Efree(buffer)
 }
 
 //@alias -old

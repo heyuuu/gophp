@@ -13,7 +13,7 @@ type LastError struct {
 	Type    int
 	Message string
 	File    string
-	Lineno  int
+	Lineno  uint32
 }
 
 type ArgSeparators struct {
@@ -35,7 +35,7 @@ type PhpCoreGlobals struct {
 	memory_limit                int
 	max_input_time              int
 	track_errors                bool
-	display_errors              bool
+	display_errors              bool // todo maybe = PHP_DISPLAY_ERRORS_STDERR(2) ?
 	display_startup_errors      bool
 	log_errors                  bool
 	log_errors_max_len          int
@@ -104,7 +104,7 @@ type PhpCoreGlobals struct {
 
 // last error
 func (pg *PhpCoreGlobals) LastError() *LastError { return pg.lastError }
-func (pg *PhpCoreGlobals) AddLastError(typ int, message string, file string, lineno int) {
+func (pg *PhpCoreGlobals) AddLastError(typ int, message string, file string, lineno uint32) {
 	pg.lastError = &LastError{Type: typ, Message: message, File: file, Lineno: lineno}
 }
 func (pg *PhpCoreGlobals) ClearLastError() { pg.lastError = nil }
