@@ -1,7 +1,6 @@
 package core
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -24,7 +23,7 @@ func (this *SapiHeader) SetHeaderLen(value int) { this.header_len = value }
  * SapiHeaders
  */
 type SapiHeaders struct {
-	headers                zend.ZendLlist
+	headers                zend.ZendLlist[*SapiHeader]
 	httpResponseCode       int
 	sendDefaultContentType uint8
 	mimetype               *byte
@@ -32,7 +31,7 @@ type SapiHeaders struct {
 }
 
 func (sh *SapiHeaders) Init() {
-	sh.headers.Init(b.SizeOf("sapi_header_struct"), (func(any))(SapiFreeHeader), 0)
+	sh.headers.Init()
 	sh.sendDefaultContentType = 1
 	//sh.httpResponseCode = 200
 	sh.httpStatusLine = nil

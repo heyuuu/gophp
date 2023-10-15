@@ -266,8 +266,8 @@ func PhpInitConfig() int {
 	if SM__().GetIniDefaults() != nil {
 		SM__().GetIniDefaults()(Config().GetHash())
 	}
-	ExtensionLists.GetEngine().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
-	ExtensionLists.GetFunctions().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
+	ExtensionLists.GetEngine().Init()
+	ExtensionLists.GetFunctions().Init()
 	open_basedir = PG__().open_basedir
 	if SM__().GetPhpIniPathOverride() != nil {
 		php_ini_file_name = SM__().GetPhpIniPathOverride()
@@ -419,7 +419,7 @@ func PhpInitConfig() int {
 		var sb zend.ZendStatT
 		var ini_file []byte
 		var p *byte
-		var scanned_ini_list zend.ZendLlist
+		var scanned_ini_list zend.ZendLlist[*byte]
 		var element *zend.ZendLlistElement
 		var l int
 		var total_l int = 0
@@ -427,7 +427,7 @@ func PhpInitConfig() int {
 		var debpath *byte
 		var endpath *byte
 		var lenpath int
-		scanned_ini_list.Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
+		scanned_ini_list.Init()
 		bufpath = zend.Estrdup(PhpIniScannedPath)
 		for debpath = bufpath; debpath != nil; debpath = endpath {
 			endpath = strchr(debpath, zend.DEFAULT_DIR_SEPARATOR)
@@ -493,15 +493,15 @@ func PhpInitConfig() int {
 				*PhpIniScannedFiles = '0'
 			}
 			total_l += php_ini_scanned_files_len
-			for element = scanned_ini_list.GetHead(); element != nil; element = element.GetNext() {
+			for element = scanned_ini_list.GetHead(); element != nil; element = element.Next() {
 				if php_ini_scanned_files_len != 0 {
 					strlcat(PhpIniScannedFiles, ",\n", total_l)
 				}
-				strlcat(PhpIniScannedFiles, *((**byte)(element.GetData())), total_l)
-				strlcat(PhpIniScannedFiles, lang.Cond(element.GetNext() != nil, ",\n", "\n"), total_l)
+				strlcat(PhpIniScannedFiles, *((**byte)(element.Data())), total_l)
+				strlcat(PhpIniScannedFiles, lang.Cond(element.Next() != nil, ",\n", "\n"), total_l)
 			}
 		}
-		scanned_ini_list.Destroy()
+		scanned_ini_list.Clean()
 	} else {
 
 		/* Make sure an empty php_ini_scanned_path ends up as NULL */
@@ -535,8 +535,8 @@ func PhpShutdownConfig() int {
 func PhpIniRegisterExtensions() {
 	ExtensionLists.GetEngine().Apply(PhpLoadZendExtensionCb)
 	ExtensionLists.GetFunctions().Apply(PhpLoadPhpExtensionCb)
-	ExtensionLists.GetEngine().Destroy()
-	ExtensionLists.GetFunctions().Destroy()
+	ExtensionLists.GetEngine().Clean()
+	ExtensionLists.GetFunctions().Clean()
 }
 func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.Array) int {
 	var sb zend.ZendStatT

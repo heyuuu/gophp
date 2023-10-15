@@ -278,7 +278,7 @@ func SapiSendHeadersFree() {
 	}
 }
 func SapiDeactivate() {
-	SG__().sapiHeaders.headers.Destroy()
+	SG__().sapiHeaders.headers.Clean()
 	if SG__().RequestInfo.requestBody {
 		SG__().RequestInfo.requestBody = nil
 	} else if SG__().serverContext {
@@ -350,30 +350,14 @@ func SapiUpdateResponseCode(ncode int) {
 	}
 	SG__().sapiHeaders.httpResponseCode = ncode
 }
-func SapiRemoveHeader(l *zend.ZendLlist, name *byte, len_ int) {
-	var header *SapiHeader
-	var next *zend.ZendLlistElement
-	var current *zend.ZendLlistElement = l.GetHead()
-	for current != nil {
-		header = (*SapiHeader)(current.GetData())
-		next = current.GetNext()
+func SapiRemoveHeader(l *zend.ZendLlist[*SapiHeader], name *byte, len_ int) {
+	l.Filter(func(header *SapiHeader) bool {
 		if header.GetHeaderLen() > len_ && header.GetHeader()[len_] == ':' && !(strncasecmp(header.GetHeader(), name, len_)) {
-			if current.GetPrev() != nil {
-				current.GetPrev().SetNext(next)
-			} else {
-				l.SetHead(next)
-			}
-			if next != nil {
-				next.SetPrev(current.GetPrev())
-			} else {
-				l.SetTail(current.GetPrev())
-			}
-			SapiFreeHeader(header)
-			zend.Efree(current)
-			l.GetCount()--
+			return false
 		}
-		current = next
-	}
+		return true
+	})
+
 }
 func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
 	result := SM__().HeaderHandler(sapi_header, op, &(SG__().sapiHeaders))
@@ -383,13 +367,13 @@ func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
 			if colon_offset != nil {
 				var sav byte = *colon_offset
 				*colon_offset = 0
-				SapiRemoveHeader(SG__().sapiHeaders.headers, sapi_header.GetHeader(), strlen(sapi_header.GetHeader()))
+				SapiRemoveHeader(&SG__().sapiHeaders.headers, sapi_header.GetHeader(), strlen(sapi_header.GetHeader()))
 				*colon_offset = sav
 			}
 		}
 		SG__().sapiHeaders.headers.AddElement(any(sapi_header))
 	} else {
-		SapiFreeHeader(sapi_header)
+		//SapiFreeHeader(sapi_header)
 	}
 }
 func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
@@ -454,7 +438,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		sapi_header.SetHeader(header_line)
 		sapi_header.SetHeaderLen(header_line_len)
 		SM__().HeaderHandler(&sapi_header, op, &(SG__().sapiHeaders))
-		SapiRemoveHeader(SG__().sapiHeaders.headers, header_line, header_line_len)
+		SapiRemoveHeader(&SG__().sapiHeaders.headers, header_line, header_line_len)
 		zend.Efree(header_line)
 		return types.SUCCESS
 	} else {
@@ -631,7 +615,7 @@ func SapiSendHeaders() int {
 			var default_header SapiHeader
 			SapiGetDefaultContentTypeHeader(&default_header)
 			SM__().GetSendHeader()(&default_header, SG__().serverContext)
-			SapiFreeHeader(&default_header)
+			//SapiFreeHeader(&default_header)
 		}
 		SM__().GetSendHeader()(nil, SG__().serverContext)
 		ret = types.SUCCESS

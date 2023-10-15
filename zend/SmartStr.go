@@ -14,7 +14,6 @@ const VkEscape = '\x1b'
 /**
  * SmartStr
  */
-type SmartString = SmartStr
 type SmartStr struct {
 	buffer strings.Builder
 }

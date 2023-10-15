@@ -30,7 +30,6 @@ func IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(offset uintPtr) bool {
 	return offset == ZEND_DYNAMIC_PROPERTY_OFFSET
 }
 func ZEND_DECODE_DYN_PROP_OFFSET(offset int) uintptr { return uintptr(-offset - 2) }
-func ZEND_ENCODE_DYN_PROP_OFFSET(offset int) uintptr { return uintptr(-(offset + 2)) }
 func ZendGetFunctionRootClass(fbc types.IFunction) *types.ClassEntry {
 	if fbc.GetPrototype() != nil {
 		return fbc.GetPrototype().GetScope()

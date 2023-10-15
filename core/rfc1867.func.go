@@ -218,41 +218,24 @@ func GetLine(self *MultipartBuffer) *byte {
 	}
 	return ptr
 }
-func PhpFreeHdrEntry(h *MimeHeaderEntry) {
-	if h.GetKey() != nil {
-		zend.Efree(h.GetKey())
-	}
-	if h.GetValue() != nil {
-		zend.Efree(h.GetValue())
-	}
-}
 func FindBoundary(self *MultipartBuffer, boundary *byte) int {
 	var line *byte
 
 	/* loop through lines */
-
 	for lang.Assign(&line, GetLine(self)) {
-
 		/* finished if we found the boundary */
-
 		if !(strcmp(line, boundary)) {
 			return 1
 		}
-
-		/* finished if we found the boundary */
-
 	}
 
 	/* didn't find the boundary */
-
 	return 0
-
-	/* didn't find the boundary */
 }
 func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 	var line *byte
 	var entry MimeHeaderEntry = MakeMimeHeaderEntry(0)
-	var buf_value zend.SmartString = zend.MakeSmartString(0)
+	var buf_value zend.SmartStr
 	var key *byte = nil
 
 	/* didn't find boundary, abort */
@@ -522,7 +505,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 	var mbuff *MultipartBuffer
 	var array_ptr *types.Zval = (*types.Zval)(arg)
 	var fd int = -1
-	var header zend.ZendLlist
+	var header zend.ZendLlist[*MimeHeaderEntry]
 	var event_extra_data any = nil
 	var llen uint = 0
 	var upload_cnt int = zend.INI_INT("max_file_uploads")
@@ -605,7 +588,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 		/* php_auto_globals_create_files() might have already done that */
 
 	}
-	header.Init(b.SizeOf("mime_header_entry"), zend.LlistDtorFuncT(PhpFreeHdrEntry), 0)
+	header.Init()
 	if PhpRfc1867Callback != nil {
 		var event_start MultipartEventStart
 		event_start.SetContentLength(SG__().RequestInfo.contentLength)
@@ -1079,7 +1062,7 @@ fileupload_done:
 	}
 	PG__().rfc1867_protected_variables.Destroy()
 	PG__().rfc1867_protected_variables = nil
-	header.Destroy()
+	header.Clean()
 	if mbuff.GetBoundaryNext() != nil {
 		zend.Efree(mbuff.GetBoundaryNext())
 	}

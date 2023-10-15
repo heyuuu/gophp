@@ -413,4 +413,3 @@ func ZendMakeCompiledStringDescription(name string) string {
 	}
 	return ZendSprintf(COMPILED_STRING_DESCRIPTION_FORMAT, curFilename, curLineno, name)
 }
-func FreeEstring(str_p **byte) { Efree(*str_p) }

@@ -29,7 +29,7 @@ type ZendCompilerGlobals struct {
 	short_tags                   bool
 	unclean_shutdown             bool
 	ini_parser_unbuffered_errors bool
-	open_files                   ZendLlist
+	open_files                   ZendLlist[*FileHandle]
 	ini_parser_param             *ZendIniParserParam
 	skip_shebang                 bool
 	increment_lineno             bool
@@ -82,7 +82,7 @@ func (cg *ZendCompilerGlobals) Activate() {
 	EG__().InitRegularList()
 
 	cg.filenamesTable = make(map[string]string)
-	cg.open_files.Init(b.SizeOf("zend_file_handle"), (func(any))(FileHandleDtor), 0)
+	cg.open_files.InitEx(FileHandleDtor)
 	cg.unclean_shutdown = false
 	cg.delayed_variance_obligations = nil
 	cg.delayed_autoloads = nil
@@ -218,7 +218,7 @@ func (cg *ZendCompilerGlobals) GetIniParserUnbufferedErrors() bool {
 func (cg *ZendCompilerGlobals) SetIniParserUnbufferedErrors(value bool) {
 	cg.ini_parser_unbuffered_errors = value
 }
-func (cg *ZendCompilerGlobals) GetOpenFiles() ZendLlist      { return cg.open_files }
+func (cg *ZendCompilerGlobals) GetOpenFiles() *ZendLlist     { return cg.open_files }
 func (cg *ZendCompilerGlobals) SetOpenFiles(value ZendLlist) { cg.open_files = value }
 func (cg *ZendCompilerGlobals) GetIniParserParam() *ZendIniParserParam {
 	return cg.ini_parser_param
