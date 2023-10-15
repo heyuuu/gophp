@@ -410,11 +410,11 @@ try_again:
 	case types.IsString:
 		ht = SplArrayGetHashTable(intern)
 		if ht == zend.EG__().GetSymbolTable() {
-			if !zend.ZendDeleteGlobalVariable(offset.StringEx()) {
+			if !zend.ZendDeleteGlobalVariable(offset.String()) {
 				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
 			}
 		} else {
-			var data *types.Zval = ht.SymtableFind(offset.StringEx().GetStr())
+			var data *types.Zval = ht.SymtableFind(offset.String())
 			if data != nil {
 				if data.IsIndirect() {
 					data = data.Indirect()
@@ -1413,7 +1413,7 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	}
 	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.Array())
 	if iterator_class_zv != nil && iterator_class_zv.IsString() {
-		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.StringEx())
+		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.String())
 		if ce == nil {
 			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.StringEx().GetVal())
 			return

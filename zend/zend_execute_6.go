@@ -253,7 +253,7 @@ func ZendFetchStaticPropertyAddressEx(
 		var class_name *types.Zval = opline.Const2()
 		b.Assert(op1_type != IS_CONST || CACHED_PTR(cache_slot) == nil)
 		if lang.Assign(&ce, CACHED_PTR(cache_slot)) == nil {
-			ce = ZendFetchClassByName(class_name.StringEx(), (class_name + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+			ce = ZendFetchClassByName(class_name.String(), (class_name + 1).String(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
 				FREE_UNFETCHED_OP(op1_type, opline.GetOp1().GetVar())
 				return types.FAILURE

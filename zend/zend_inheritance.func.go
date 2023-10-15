@@ -148,7 +148,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 	var ce *types.ClassEntry
 	if CG__().GetInCompilation() == 0 {
 		var flags uint32 = ZEND_FETCH_CLASS_ALLOW_UNLINKED | ZEND_FETCH_CLASS_NO_AUTOLOAD
-		ce = ZendLookupClassEx(name, nil, flags)
+		ce = ZendLookupClassEx(name.GetStr(), "", flags)
 		if ce != nil {
 			return ce
 		}
@@ -160,7 +160,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 		}
 		types.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name.GetStr())
 	} else {
-		ce = ZendLookupClassEx(name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
+		ce = ZendLookupClassEx(name.GetStr(), "", ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		if ce != nil && ClassVisible(ce) {
 			return ce
 		}
@@ -188,7 +188,7 @@ func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) bool {
 		if ce1.IsResolvedParent() {
 			parentCe = ce1.GetParent()
 		} else {
-			parentCe = ZendLookupClassEx(types.NewString(ce1.ParentName()), nil, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			parentCe = ZendLookupClassEx(ce1.ParentName(), "", ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		}
 
 		/* It's not sufficient to only check the parent chain itself, as need to do a full
@@ -208,7 +208,7 @@ func UnlinkedInstanceof(ce1 *types.ClassEntry, ce2 *types.ClassEntry) bool {
 			}
 		} else {
 			for _, ifaceName := range ce1.GetInterfaceNames() {
-				var ce = ZendLookupClassEx_Ex(ifaceName.GetName(), ifaceName.GetLcName(), ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				var ce = ZendLookupClassEx(ifaceName.GetName(), ifaceName.GetLcName(), ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil && UnlinkedInstanceof(ce, ce2) {
 					return true
 				}
@@ -1670,7 +1670,7 @@ func ZendDoBindTraits(ce *types.ClassEntry) {
 
 	var traits []*types.ClassEntry
 	for i, traitName := range ce.GetTraitNames() {
-		trait := ZendFetchClassByName_Ex2(traitName, ZEND_FETCH_CLASS_TRAIT)
+		trait := ZendFetchClassByNameEx(traitName, ZEND_FETCH_CLASS_TRAIT)
 		if trait == nil {
 			return
 		}
@@ -1849,7 +1849,7 @@ func LoadDelayedClasses() {
 	CG__().SetDelayedAutoloads(nil)
 	delayed_autoloads.Foreach(func(key types.ArrayKey, value *types.Zval) {
 		name := key.StrKey()
-		ZendLookupClassString(name)
+		ZendLookupClass(name)
 	})
 	delayed_autoloads.Destroy()
 }
@@ -1921,9 +1921,9 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 	 * with an exception and remove the class from the class table. This is only possible
 	 * if no variance obligations on the current class have been added during autoloading. */
 	var parent *types.ClassEntry = nil
-	var interfaces **types.ClassEntry = nil
+	var interfaces []*types.ClassEntry = nil
 	if ce.HasParent() {
-		parent = ZendFetchClassByName(types.NewString(ce.ParentName()), lc_parent_name, ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
+		parent = ZendFetchClassByName(ce.ParentName(), lc_parent_name, ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
 		if parent == nil {
 			CheckUnrecoverableLoadFailure(ce)
 			return types.FAILURE
@@ -1932,21 +1932,15 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 	if ce.HasInterfaces() {
 
 		/* Also copy the parent interfaces here, so we don't need to reallocate later. */
-
-		var i uint32
-		var num_parent_interfaces uint32 = lang.CondF1(parent != nil, func() uint32 { return parent.GetNumInterfaces() }, 0)
-		interfaces = Emalloc(b.SizeOf("zend_class_entry *") * (ce.GetNumInterfaces() + num_parent_interfaces))
-		if num_parent_interfaces != 0 {
-			memcpy(interfaces, parent.GetInterfaces(), b.SizeOf("zend_class_entry *")*num_parent_interfaces)
-		}
-		for i = 0; i < ce.GetNumInterfaces(); i++ {
-			var iface *types.ClassEntry = ZendFetchClassByName_Ex(ce.GetInterfaceNames()[i].GetName(), ce.GetInterfaceNames()[i].GetLcName(), ZEND_FETCH_CLASS_INTERFACE|ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
+		interfaces = parent.GetInterfaces()
+		for _, interfaceName := range ce.GetInterfaceNames() {
+			var iface = ZendFetchClassByNameEx(interfaceName, ZEND_FETCH_CLASS_INTERFACE|ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
 			if iface == nil {
 				CheckUnrecoverableLoadFailure(ce)
 				Efree(interfaces)
 				return types.FAILURE
 			}
-			interfaces[num_parent_interfaces+i] = iface
+			interfaces = append(interfaces, iface)
 		}
 	}
 	if parent != nil {

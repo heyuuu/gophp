@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -390,7 +391,7 @@ func ZifGetParentClass(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, obje
 		if object.IsObject() {
 			ce = object.Object().GetCe()
 		} else if object.IsString() {
-			ce = ZendLookupClassString(object.String())
+			ce = ZendLookupClass(object.String())
 		}
 	}
 	if ce != nil && ce.GetParent() != nil {
@@ -430,7 +431,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 	 */
 
 	if allow_string != 0 && obj.IsString() {
-		instance_ce = ZendLookupClass(obj.StringEx())
+		instance_ce = ZendLookupClass(obj.String())
 		if instance_ce == nil {
 			return_value.SetFalse()
 			return
@@ -444,7 +445,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 	if only_subclass == 0 && instance_ce.Name() == class_name.GetStr() {
 		retval = 1
 	} else {
-		ce = ZendLookupClassEx(class_name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
+		ce = ZendLookupClassEx(class_name.GetStr(), "", ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		if ce == nil {
 			retval = 0
 		} else {
@@ -510,7 +511,7 @@ func ZifGetClassVars(executeData zpp.Ex, return_value zpp.Ret, className *types.
 	if ZendParseParameters(executeData.NumArgs(), "S", &class_name) == types.FAILURE {
 		return
 	}
-	ce = ZendLookupClass(class_name)
+	ce = ZendLookupClass(class_name.GetStr())
 	if ce == nil {
 		return_value.SetFalse()
 		return
@@ -605,7 +606,7 @@ func ZifGetClassMethods(class *types.Zval) *types.Zval {
 	if class.IsObject() {
 		ce = class.Object().GetCe()
 	} else if class.IsString() {
-		ce = ZendLookupClass(class.StringEx())
+		ce = ZendLookupClass(class.String())
 	}
 	if ce == nil {
 		return types.NewZvalNull()
@@ -629,7 +630,7 @@ func ZifMethodExists(object *types.Zval, method string) bool {
 	if object.IsObject() {
 		ce = object.Object().GetCe()
 	} else if object.IsString() {
-		ce = ZendLookupClassString(object.String())
+		ce = ZendLookupClass(object.String())
 	}
 	if ce == nil {
 		return false
@@ -670,7 +671,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 		return
 	}
 	if object.IsString() {
-		ce = ZendLookupClass(object.StringEx())
+		ce = ZendLookupClass(object.String())
 		if ce == nil {
 			return_value.SetFalse()
 			return
@@ -722,7 +723,7 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 		}
 		ce = EG__().ClassTable().Get(lcname)
 	} else {
-		ce = ZendLookupClass(name)
+		ce = ZendLookupClass(name.GetStr())
 	}
 	if ce != nil {
 		return_value.SetBool((ce.GetCeFlags()&flags) == flags && !ce.HasCeFlags(skip_flags))
@@ -758,35 +759,31 @@ func ZifFunctionExists(functionName string) bool {
 	 */
 	return func_ != nil && (func_.GetType() != ZEND_INTERNAL_FUNCTION || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction)
 }
-func ZifClassAlias(executeData zpp.Ex, return_value zpp.Ret, userClassName *types.Zval, aliasName *types.Zval, _ zpp.Opt, autoload *types.Zval) {
-	var class_name *types.String
-	var alias_name *byte
-	var ce *types.ClassEntry
-	var alias_name_len int
-	var autoload = 1
-	if ZendParseParameters(executeData.NumArgs(), "Ss|b", &class_name, &alias_name, &alias_name_len, &autoload) == types.FAILURE {
-		return
+
+//zif -old "Ss|b"
+func ZifClassAlias(className string, aliasName string, _ zpp.Opt, autoload_ *bool) bool {
+	var autoload = b.Option(autoload_, true)
+	var flags uint32 = 0
+	if autoload {
+		flags = ZEND_FETCH_CLASS_NO_AUTOLOAD
 	}
-	ce = ZendLookupClassEx(class_name, nil, lang.Cond(autoload == 0, ZEND_FETCH_CLASS_NO_AUTOLOAD, 0))
+
+	ce := ZendLookupClassEx(className, "", flags)
 	if ce != nil {
 		if ce.IsUserClass() {
-			if ZendRegisterClassAliasEx(b.CastStr(alias_name, alias_name_len), ce, 0) == types.SUCCESS {
-				return_value.SetTrue()
-				return
+			if ZendRegisterClassAliasEx(aliasName, ce, 0) == types.SUCCESS {
+				return true
 			} else {
-				faults.Error(faults.E_WARNING, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), alias_name)
-				return_value.SetFalse()
-				return
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), aliasName))
+				return false
 			}
 		} else {
 			faults.Error(faults.E_WARNING, "First argument of class_alias() must be a name of user defined class")
-			return_value.SetFalse()
-			return
+			return false
 		}
 	} else {
-		faults.Error(faults.E_WARNING, "Class '%s' not found", class_name.GetVal())
-		return_value.SetFalse()
-		return
+		faults.Error(faults.E_WARNING, fmt.Sprintf("Class '%s' not found", className))
+		return false
 	}
 }
 
@@ -801,15 +798,10 @@ func ZifGetIncludedFiles() *types.Array {
 	return retArr
 }
 
-//@zif -alias user_error
-func ZifTriggerError(executeData zpp.Ex, return_value zpp.Ret, message *types.Zval, _ zpp.Opt, errorType *types.Zval) {
-	var error_type = faults.E_USER_NOTICE
-	var message *byte
-	var message_len int
-	if ZendParseParameters(executeData.NumArgs(), "s|l", &message, &message_len, &error_type) == types.FAILURE {
-		return
-	}
-	switch error_type {
+//@zif -alias user_error -old "s|l"
+func ZifTriggerError(message string, _ zpp.Opt, errorType_ *int) bool {
+	var errorType = b.Option(errorType_, faults.E_USER_NOTICE)
+	switch errorType {
 	case faults.E_USER_ERROR:
 		fallthrough
 	case faults.E_USER_WARNING:
@@ -820,12 +812,10 @@ func ZifTriggerError(executeData zpp.Ex, return_value zpp.Ret, message *types.Zv
 
 	default:
 		faults.Error(faults.E_WARNING, "Invalid error type specified")
-		return_value.SetFalse()
-		return
+		return false
 	}
-	faults.Error(int(error_type), "%s", message)
-	return_value.SetTrue()
-	return
+	faults.Error(errorType, message)
+	return true
 }
 
 //zif -old "z|l"
@@ -834,7 +824,7 @@ func ZifSetErrorHandler(returnValue zpp.Ret, errorHandler *types.Zval, _ zpp.Opt
 	if !errorHandler.IsNull() {
 		if !IsCallable(errorHandler, nil, 0) {
 			var errorHandlerName = GetCallableName(errorHandler, nil)
-			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), lang.CondF1(errorHandlerName != "", func() string { return errorHandlerName }, "unknown"))
+			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", CurrEX().FunctionName(), lang.CondF1(errorHandlerName != "", func() string { return errorHandlerName }, "unknown"))
 			return
 		}
 	}
@@ -857,7 +847,7 @@ func ZifSetExceptionHandler(exceptionHandler *types.Zval) *types.Zval {
 	if !exceptionHandler.IsNull() {
 		if !IsCallable(exceptionHandler, nil, 0) {
 			var exceptionHandlerName = GetCallableName(exceptionHandler, nil)
-			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), lang.CondF1(exceptionHandlerName != "", func() string { return exceptionHandlerName }, "unknown"))
+			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", CurrEX().FunctionName(), lang.CondF1(exceptionHandlerName != "", func() string { return exceptionHandlerName }, "unknown"))
 			return returnValue
 		}
 	}

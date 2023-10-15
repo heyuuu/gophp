@@ -26,7 +26,7 @@ func SplAddInterfaces(list *types.Array, pce *types.ClassEntry, allow int, ceFla
 }
 func SplAddTraits(list *types.Array, pce *types.ClassEntry, allow int, ceFlags uint32) {
 	for _, traitName := range pce.GetTraitNames() {
-		trait := zend.ZendFetchClassByName_Ex2(traitName, zend.ZEND_FETCH_CLASS_TRAIT)
+		trait := zend.ZendFetchClassByNameEx(traitName, zend.ZEND_FETCH_CLASS_TRAIT)
 		b.Assert(trait != nil)
 		SplAddClassName(list, trait, allow, ceFlags)
 	}

@@ -443,7 +443,7 @@ func isCallableCheckClass(name string, scope *types.ClassEntry, fcc *types.ZendF
 			strictClass = true
 			return nil
 		}
-	} else if ce := ZendLookupClassString(name); ce != nil {
+	} else if ce := ZendLookupClass(name); ce != nil {
 		var ceScope *types.ClassEntry
 		var ex *ZendExecuteData = CurrEX()
 		for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {

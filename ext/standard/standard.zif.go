@@ -3442,7 +3442,7 @@ var DefZifStreamGetLine = def.DefFunc("stream_get_line", 2, 3, []def.ArgInfo{{Na
 	stream_ := fp.ParseResource()
 	maxlen := fp.ParseLong()
 	fp.StartOptional()
-	ending := fp.ParseZval()
+	ending := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}

@@ -756,7 +756,7 @@ func ZifArrayShift(stack zpp.RefArray) *types.Zval {
 
 	/* Delete the first value */
 	if key.IsStrKey() && stack.Array() == zend.EG__().GetSymbolTable() {
-		zend.ZendDeleteGlobalVariable(p.GetKey())
+		zend.ZendDeleteGlobalVariable(p.GetKey().GetStr())
 	} else {
 		stack.Array().Delete(key)
 	}

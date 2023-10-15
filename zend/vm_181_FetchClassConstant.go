@@ -20,7 +20,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			} else if CACHED_PTR(opline.GetExtendedValue()) {
 				ce = CACHED_PTR(opline.GetExtendedValue())
 			} else {
-				ce = ZendFetchClassByName(opline.Const1().StringEx(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+				ce = ZendFetchClassByName(opline.Const1().String(), (opline.Const1() + 1).String(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 				if ce == nil {
 					b.Assert(EG__().HasException())
 					opline.Result().SetUndef()

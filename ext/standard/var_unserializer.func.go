@@ -807,7 +807,7 @@ yy18:
 		/* Try to find class directly */
 
 		BG__().serialize_lock++
-		ce = zend.ZendLookupClass(class_name)
+		ce = zend.ZendLookupClass(class_name.GetStr())
 		if ce != nil {
 			BG__().serialize_lock--
 			if zend.EG__().HasException() {
@@ -862,7 +862,7 @@ yy18:
 		/* The callback function may have defined the class */
 
 		BG__().serialize_lock++
-		if lang.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
+		if lang.Assign(&ce, zend.ZendLookupClass(class_name.GetStr())) == nil {
 			core.PhpErrorDocref("", faults.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.StringEx().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY

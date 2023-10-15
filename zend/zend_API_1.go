@@ -61,5 +61,5 @@ func ZendCopyParametersArray(param_count int, argument_array *types.Zval) int {
 	return types.SUCCESS
 }
 func ZendWrongParamCount() {
-	faults.InternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), "Wrong parameter count for %s()", GetActiveCalleeName())
+	faults.InternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), "Wrong parameter count for %s()", CurrEX().CalleeName())
 }

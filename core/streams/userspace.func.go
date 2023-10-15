@@ -234,7 +234,7 @@ func ZifStreamWrapperRegister(executeData zpp.Ex, return_value zpp.Ret, protocol
 	uwrap.GetWrapper().SetAbstract(uwrap)
 	uwrap.GetWrapper().SetIsUrl((flags & core.PHP_STREAM_IS_URL) != 0)
 	rsrc = zend.ZendRegisterResource(uwrap, LeProtocols)
-	if lang.Assign(&(uwrap.GetCe()), zend.ZendLookupClass(classname)) != nil {
+	if lang.Assign(&(uwrap.GetCe()), zend.ZendLookupClass(classname.String())) != nil {
 		if PhpRegisterUrlStreamWrapperVolatile(protocol, uwrap.GetWrapper()) == types.SUCCESS {
 			return_value.SetTrue()
 			return

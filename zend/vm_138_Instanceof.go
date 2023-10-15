@@ -18,7 +18,7 @@ try_instanceof:
 		{
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
-				ce = ZendFetchClassByName(opline.Const2().StringEx(), (opline.Const2() + 1).GetStr(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				ce = ZendFetchClassByName(opline.Const2().String(), (opline.Const2() + 1).String(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil {
 					CACHE_PTR(opline.GetExtendedValue(), ce)
 				}
@@ -114,7 +114,7 @@ try_instanceof:
 		{
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
-				ce = ZendFetchClassByName(opline.Const2().StringEx(), (opline.Const2() + 1).GetStr(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				ce = ZendFetchClassByName(opline.Const2().String(), (opline.Const2() + 1).String(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil {
 					CACHE_PTR(opline.GetExtendedValue(), ce)
 				}

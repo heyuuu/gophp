@@ -14,7 +14,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	{
 		ce = CACHED_PTR(opline.GetOp2().GetNum())
 		if ce == nil {
-			ce = ZendFetchClassByName(opline.Const1().StringEx(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+			ce = ZendFetchClassByName(opline.Const1().String(), (opline.Const1() + 1).String(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
 				b.Assert(EG__().HasException())
 				opline.Result().SetUndef()

@@ -47,7 +47,7 @@ func ZendFetchResource2(res *types.Resource, resource_type_name string, resource
 		}
 	}
 	if resource_type_name {
-		faults.Error(faults.E_WARNING, "%s(): supplied resource is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
+		faults.Error(faults.E_WARNING, "%s(): supplied resource is not a valid %s resource", CurrEX().CalleeName(), resource_type_name)
 	}
 	return nil
 }
@@ -56,20 +56,20 @@ func ZendFetchResource(res *types.Resource, resource_type_name *byte, resource_t
 		return res.GetPtr()
 	}
 	if resource_type_name != nil {
-		faults.Error(faults.E_WARNING, "%s(): supplied resource is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
+		faults.Error(faults.E_WARNING, "%s(): supplied resource is not a valid %s resource", CurrEX().CalleeName(), resource_type_name)
 	}
 	return nil
 }
 func ZendFetchResourceEx(res *types.Zval, resource_type_name string, resource_type int) any {
 	if res == nil {
 		if resource_type_name {
-			faults.Error(faults.E_WARNING, "%s(): no %s resource supplied", GetActiveCalleeName(), resource_type_name)
+			faults.Error(faults.E_WARNING, "%s(): no %s resource supplied", CurrEX().CalleeName(), resource_type_name)
 		}
 		return nil
 	}
 	if !res.IsResource() {
 		if resource_type_name {
-			faults.Error(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
+			faults.Error(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", CurrEX().CalleeName(), resource_type_name)
 		}
 		return nil
 	}
@@ -78,13 +78,13 @@ func ZendFetchResourceEx(res *types.Zval, resource_type_name string, resource_ty
 func ZendFetchResource2Ex(res *types.Zval, resource_type_name string, resource_type1 int, resource_type2 int) any {
 	if res == nil {
 		if resource_type_name {
-			faults.Error(faults.E_WARNING, "%s(): no %s resource supplied", GetActiveCalleeName(), resource_type_name)
+			faults.Error(faults.E_WARNING, "%s(): no %s resource supplied", CurrEX().CalleeName(), resource_type_name)
 		}
 		return nil
 	}
 	if !res.IsResource() {
 		if resource_type_name {
-			faults.Error(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
+			faults.Error(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", CurrEX().CalleeName(), resource_type_name)
 		}
 		return nil
 	}

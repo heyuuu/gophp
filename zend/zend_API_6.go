@@ -105,7 +105,7 @@ func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int)
 	return types.FAILURE
 }
 func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *types.Zval) {
-	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())
+	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", CurrEX().FunctionName())
 }
 func ZendDisableFunction(functionName string) int {
 	f := CG__().FunctionTable().Get(functionName)

@@ -971,7 +971,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 		ce = types.Z_OBJCE_P(zobject)
 		if operators.InstanceofFunction(ce, zend.ZendCeIterator) == 0 {
 			if executeData.NumArgs() > 1 {
-				if !(lang.Assign(&ce_cast, zend.ZendLookupClass(class_name))) || operators.InstanceofFunction(ce, ce_cast) == 0 || ce_cast.GetGetIterator() == nil {
+				if !(lang.Assign(&ce_cast, zend.ZendLookupClassEx(class_name.GetStr()))) || operators.InstanceofFunction(ce, ce_cast) == 0 || ce_cast.GetGetIterator() == nil {
 					faults.ThrowException(spl_ce_LogicException, "Class to downcast to not found or not base class or does not implement Traversable", 0)
 					return nil
 				}

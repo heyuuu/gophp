@@ -347,7 +347,7 @@ func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, offset *types.Zva
 	ht := o.array.Array()
 	if isStrKey {
 		if ht == zend.EG__().GetSymbolTable() {
-			if !zend.ZendDeleteGlobalVariableEx(strKey) {
+			if !zend.ZendDeleteGlobalVariable(strKey) {
 				faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
 			}
 		} else {

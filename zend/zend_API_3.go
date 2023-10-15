@@ -34,7 +34,7 @@ func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec str
 		ce := args[1].(*types.ClassEntry)
 		*object = this_ptr
 		if ce != nil && operators.InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() must be derived from %s::%s", types.Z_OBJCE_P(this_ptr).Name(), GetActiveFunctionName(), ce.Name(), GetActiveFunctionName())
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() must be derived from %s::%s", types.Z_OBJCE_P(this_ptr).Name(), CurrEX().FunctionName(), ce.Name(), CurrEX().FunctionName())
 		}
 		ret := zpp.ParseVaArgs(num_args, type_spec[1:], args[2:], 0)
 		return types.IntBool(ret)

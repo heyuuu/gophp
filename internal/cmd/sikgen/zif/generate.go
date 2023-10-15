@@ -2,6 +2,7 @@ package zif
 
 import (
 	f "github.com/heyuuu/gophp/internal/cmd/sikgen/astutil"
+	"github.com/heyuuu/gophp/kits/strkit"
 	"go/ast"
 	"go/token"
 	"log"

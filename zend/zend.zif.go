@@ -400,16 +400,17 @@ var DefZifFunctionExists = def.DefFunc("function_exists", 1, 1, []def.ArgInfo{{N
 })
 
 // generate by ZifClassAlias
-var DefZifClassAlias = def.DefFunc("class_alias", 2, 3, []def.ArgInfo{{Name: "user_class_name"}, {Name: "alias_name"}, {Name: "autoload"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifClassAlias = def.DefFunc("class_alias", 2, 3, []def.ArgInfo{{Name: "class_name"}, {Name: "alias_name"}, {Name: "autoload"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	user_class_name := fp.ParseZval()
-	alias_name := fp.ParseZval()
+	class_name := fp.ParseStringVal()
+	alias_name := fp.ParseStringVal()
 	fp.StartOptional()
-	autoload := fp.ParseZval()
+	autoload_ := fp.ParseBoolValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifClassAlias(executeData, returnValue, user_class_name, alias_name, nil, autoload)
+	ret := ZifClassAlias(class_name, alias_name, nil, autoload_)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifGetIncludedFiles
@@ -432,26 +433,28 @@ var DefZifGetRequiredFiles = def.DefFunc("get_required_files", 0, 0, []def.ArgIn
 
 // generate by ZifTriggerError
 var DefZifTriggerError = def.DefFunc("trigger_error", 1, 2, []def.ArgInfo{{Name: "message"}, {Name: "error_type"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	message := fp.ParseZval()
+	fp := zpp.FastParseStart(executeData, 1, 2, zpp.FlagOldMode)
+	message := fp.ParseStringVal()
 	fp.StartOptional()
-	error_type := fp.ParseZval()
+	error_type_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifTriggerError(executeData, returnValue, message, nil, error_type)
+	ret := ZifTriggerError(message, nil, error_type_)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifTriggerError
 var DefZifUserError = def.DefFunc("user_error", 1, 2, []def.ArgInfo{{Name: "message"}, {Name: "error_type"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	message := fp.ParseZval()
+	fp := zpp.FastParseStart(executeData, 1, 2, zpp.FlagOldMode)
+	message := fp.ParseStringVal()
 	fp.StartOptional()
-	error_type := fp.ParseZval()
+	error_type_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifTriggerError(executeData, returnValue, message, nil, error_type)
+	ret := ZifTriggerError(message, nil, error_type_)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifSetErrorHandler

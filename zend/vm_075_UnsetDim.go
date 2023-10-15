@@ -26,7 +26,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				key = offset.GetStr()
 			str_index_dim:
 				if ht == EG__().GetSymbolTable() {
-					ZendDeleteGlobalVariable(key)
+					ZendDeleteGlobalVariable(key.GetStr())
 				} else {
 					ht.KeyDelete(key.GetStr())
 				}
@@ -103,7 +103,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 			str_index_dim:
 				if ht == EG__().GetSymbolTable() {
-					ZendDeleteGlobalVariable(key)
+					ZendDeleteGlobalVariable(key.GetStr())
 				} else {
 					ht.KeyDelete(key.GetStr())
 				}
@@ -187,7 +187,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				}
 			str_index_dim:
 				if ht == EG__().GetSymbolTable() {
-					ZendDeleteGlobalVariable(key)
+					ZendDeleteGlobalVariable(key.GetStr())
 				} else {
 					ht.KeyDelete(key.GetStr())
 				}
@@ -264,7 +264,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				key = offset.GetStr()
 			str_index_dim:
 				if ht == EG__().GetSymbolTable() {
-					ZendDeleteGlobalVariable(key)
+					ZendDeleteGlobalVariable(key.GetStr())
 				} else {
 					ht.KeyDelete(key.GetStr())
 				}
@@ -337,7 +337,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 			str_index_dim:
 				if ht == EG__().GetSymbolTable() {
-					ZendDeleteGlobalVariable(key)
+					ZendDeleteGlobalVariable(key.GetStr())
 				} else {
 					ht.KeyDelete(key.GetStr())
 				}
@@ -417,7 +417,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				}
 			str_index_dim:
 				if ht == EG__().GetSymbolTable() {
-					ZendDeleteGlobalVariable(key)
+					ZendDeleteGlobalVariable(key.GetStr())
 				} else {
 					ht.KeyDelete(key.GetStr())
 				}

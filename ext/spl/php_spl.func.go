@@ -21,7 +21,7 @@ func ZmGlobalsCtorSpl(spl_globals *ZendSplGlobals) {
 func SplFindCeByName(name string, autoload bool) *types.ClassEntry {
 	var ce *types.ClassEntry
 	if autoload {
-		ce = zend.ZendLookupClassString(name)
+		ce = zend.ZendLookupClass(name)
 	} else {
 		ce = zend.EG__().ClassTable().Get(name)
 	}

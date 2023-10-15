@@ -813,7 +813,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 	}
 	if toplevel != 0 && !ce.HasCeFlags(types.AccImplementInterfaces|types.AccImplementTraits) && !CG__().IsCompilePreload() {
 		if extends_ast != nil {
-			var parent_ce *types.ClassEntry = ZendLookupClassEx(types.NewString(ce.ParentName()), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			var parent_ce *types.ClassEntry = ZendLookupClassEx(ce.ParentName(), "", ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if parent_ce != nil && (!parent_ce.IsInternalClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_CLASSES) == 0) && (!parent_ce.IsUserClass() || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || parent_ce.GetFilename() == ce.GetFilename()) {
 				compiler.setLinenoByDeclEnd(decl)
 				if ZendTryEarlyBind(ce, parent_ce, lcname) {

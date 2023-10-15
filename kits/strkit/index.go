@@ -1,5 +1,18 @@
 package strkit
 
+import (
+	"strings"
+)
+
+func IndexAnyExcept(s string, exceptChars string) int {
+	for i, c := range s {
+		if strings.IndexRune(exceptChars, c) < 0 {
+			return i
+		}
+	}
+	return -1
+}
+
 func IndexNewline(str string) (pos int, newlineLen int) {
 	len_ := len(str)
 	for i, c := range str {

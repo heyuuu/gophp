@@ -261,7 +261,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 		var cname_length int = colon - function.GetVal() - 1
 		var mname_length int = function.GetLen() - cname_length - (b.SizeOf("\"::\"") - 1)
 		lcname = function.GetStr()[:cname_length]
-		called_scope = ZendFetchClassByName(types.NewString(lcname), nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+		called_scope = ZendFetchClassByName(lcname, "", ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 		if called_scope == nil {
 			// types.ZendStringReleaseEx(lcname, 0)
 			return nil
@@ -369,7 +369,7 @@ func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecu
 			return nil
 		}
 		if obj.IsString() {
-			var called_scope *types.ClassEntry = ZendFetchClassByName(obj.StringEx(), nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+			var called_scope *types.ClassEntry = ZendFetchClassByName(obj.String(), nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if called_scope == nil {
 				return nil
 			}

@@ -94,7 +94,7 @@ func ZendResolveClassType(type_ *types.TypeHint, selfCe *types.ClassEntry) bool 
 		}
 		ce = selfCe.GetParent()
 	} else {
-		ce = ZendLookupClassEx_Ex(name, "", ZEND_FETCH_CLASS_NO_AUTOLOAD)
+		ce = ZendLookupClassEx(name, "", ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		if ce == nil {
 			return false
 		}

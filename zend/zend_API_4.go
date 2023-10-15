@@ -22,18 +22,13 @@ func ObjectPropertiesLoad(object *types.Object, properties *types.Array) {
 		prop = _z
 		if key != nil {
 			if key.GetStr()[0] == '0' {
-				var class_name *byte
-				var prop_name *byte
-				var prop_name_len int
-				if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == types.SUCCESS {
-					var pname *types.String = types.NewString(b.CastStr(prop_name, prop_name_len))
-					var prev_scope *types.ClassEntry = EG__().GetFakeScope()
-					if class_name != nil && class_name[0] != '*' {
-						var cname *types.String = types.NewString(class_name)
-						EG__().SetFakeScope(ZendLookupClass(cname))
+				if className, propName, ok := ZendUnmanglePropertyName_Ex(key.GetStr()); ok {
+					var prevScope *types.ClassEntry = EG__().GetFakeScope()
+					if className != "" && className[0] != '*' {
+						EG__().SetFakeScope(ZendLookupClass(className))
 					}
-					property_info = ZendGetPropertyInfo(object.GetCe(), pname.GetStr())
-					EG__().SetFakeScope(prev_scope)
+					property_info = ZendGetPropertyInfo(object.GetCe(), propName)
+					EG__().SetFakeScope(prevScope)
 				} else {
 					property_info = nil
 				}

@@ -477,7 +477,7 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 	/* check in calling scripts' current working directory as a fall back case
 	 */
 
-	if zend.ZendIsExecuting() != 0 && lang.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
+	if zend.ZendIsExecuting() && lang.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
 		var exec_fname *byte = exec_filename.GetVal()
 		var exec_fname_length int = exec_filename.GetLen()
 		for lang.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
@@ -542,7 +542,7 @@ func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **typ
 
 	/* check in provided path */
 
-	if zend.ZendIsExecuting() != 0 && lang.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
+	if zend.ZendIsExecuting() && lang.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
 		var exec_fname *byte = exec_filename.GetVal()
 		var exec_fname_length int = exec_filename.GetLen()
 		for lang.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {

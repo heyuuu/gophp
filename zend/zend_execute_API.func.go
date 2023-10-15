@@ -1,19 +1,20 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/kits/strkit"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
-func ZendThrowOrError(fetch_type int, exception_ce *types.ClassEntry, format string, args ...any) {
-	message := ZendSprintf(format, args)
-	if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
-		faults.ThrowError(exception_ce, "%s", message)
+func ZendThrowOrError(fetchType int, exceptionCe *types.ClassEntry, message string) {
+	if (fetchType & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
+		faults.ThrowError(exceptionCe, "%s", message)
 	} else {
 		faults.Error(faults.E_ERROR, "%s", message)
 	}
@@ -31,8 +32,6 @@ func ShutdownDestructors() {
 	})
 }
 
-func GetActiveCalleeName() string   { return CurrEX().CalleeName() }
-func GetActiveFunctionName() string { return CurrEX().FunctionName() }
 func ZendGetExecutedFilename() string {
 	var ex *ZendExecuteData = CurrEX()
 	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
@@ -361,31 +360,27 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 	}
 	return types.SUCCESS
 }
-func ZendLookupClassEx_Ex(name string, key string, flags uint32) *types.ClassEntry {
-	var nameZStr *types.String = types.NewString(name)
-	var keyZStr *types.String = nil
-	if key != "" {
-		keyZStr = types.NewString(key)
-	}
-	return ZendLookupClassEx(nameZStr, keyZStr, flags)
+func isValidClassName(name string) bool {
+	return strkit.IndexAnyExcept(name, validClassNameChars) < 0
 }
-func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *types.ClassEntry {
-	var lc_name string
-	var orig_fake_scope *types.ClassEntry
-	if key != nil {
-		lc_name = key.GetStr()
-	} else {
-		if name == nil || name.GetLen() == 0 {
-			return nil
-		}
-		if name.GetStr()[0] == '\\' {
-			lc_name = ascii.StrToLower(name.GetStr()[1:])
-		} else {
-			lc_name = ascii.StrToLower(name.GetStr())
-		}
+func trimClassName(name string) string {
+	if name != "" && name[0] == '\\' {
+		return name[1:]
+	}
+	return name
+}
+
+func ZendLookupClassEx(name string, key string, flags uint32) *types.ClassEntry {
+	if name == "" && key == "" {
+		return nil
 	}
 
-	if ce := EG__().ClassTable().Get(lc_name); ce != nil {
+	var lcName = key
+	if lcName == "" {
+		lcName = ascii.StrToLower(trimClassName(name))
+	}
+
+	if ce := EG__().ClassTable().Get(lcName); ce != nil {
 		if !ce.IsLinked() {
 			if (flags&ZEND_FETCH_CLASS_ALLOW_UNLINKED) != 0 || (flags&ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED) != 0 && ce.IsNearlyLinked() {
 				ce.SetIsHasUnlinkedUses(true)
@@ -399,11 +394,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	/* The compiler is not-reentrant. Make sure we __autoload() only during run-time
 	 * (doesn't impact functionality of __autoload()
 	 */
-
-	if (flags&ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 || ZendIsCompiling() != 0 {
-		if key == nil {
-			// types.ZendStringReleaseEx(lc_name, 0)
-		}
+	if (flags&ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 || ZendIsCompiling() {
 		return nil
 	}
 	if EG__().GetAutoloadFunc() == nil {
@@ -411,29 +402,23 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 		if func_ != nil {
 			EG__().SetAutoloadFunc(func_)
 		} else {
-			if key == nil {
-				// types.ZendStringReleaseEx(lc_name, 0)
-			}
 			return nil
 		}
 	}
 
 	/* Verify class name before passing it to __autoload() */
-	if key == nil && strspn(name.GetVal(), "0123456789_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ200201202203204205206207210211212213214215216217220221222223224225226227230231232233234235236237240241242243244245246247250251252253254255256257260261262263264265266267270271272273274275276277300301302303304305306307310311312313314315316317320321322323324325326327330331332333334335336337340341342343344345346347350351352353354355356357360361362363364365366367370371372373374375376377\\") != name.GetLen() {
+	if lcName == "" && isValidClassName(name) {
 		return nil
 	}
 	if EG__().GetInAutoload() == nil {
 		EG__().SetInAutoload(types.NewArray())
 	}
-	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name) == nil {
+	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lcName) == nil {
 		return nil
 	}
 
 	// init fci
-	var arg0 = name.GetStr()
-	if arg0 != "" && arg0[0] == '\\' {
-		arg0 = arg0[1:]
-	}
+	var arg0 = trimClassName(name)
 	var fci = types.InitFCallInfo(nil, nil, types.NewZvalString(arg0))
 	fci.SetFunctionName(EG__().GetAutoloadFunc().FunctionName())
 
@@ -443,25 +428,22 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	fcc.SetCalledScope(nil)
 	fcc.SetObject(nil)
 
-	orig_fake_scope = EG__().GetFakeScope()
+	origFakeScope := EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
 	EG__().ExceptionSave()
 
 	var ce *types.ClassEntry = nil
 	if ZendCallFunction(fci, &fcc) == types.SUCCESS && EG__().NoException() {
-		ce = EG__().ClassTable().Get(lc_name)
+		ce = EG__().ClassTable().Get(lcName)
 	}
 
 	EG__().ExceptionRestore()
-	EG__().SetFakeScope(orig_fake_scope)
-	EG__().GetInAutoload().KeyDelete(lc_name)
+	EG__().SetFakeScope(origFakeScope)
+	EG__().GetInAutoload().KeyDelete(lcName)
 	return ce
 }
-func ZendLookupClass(name *types.String) *types.ClassEntry {
-	return ZendLookupClassEx(name, nil, 0)
-}
-func ZendLookupClassString(name string) *types.ClassEntry {
-	return ZendLookupClassEx(types.NewString(name), nil, 0)
+func ZendLookupClass(name string) *types.ClassEntry {
+	return ZendLookupClassEx(name, "", 0)
 }
 func ZendGetCalledScope(ex *ZendExecuteData) *types.ClassEntry {
 	for ex != nil {
@@ -634,32 +616,32 @@ func ZendUnsetTimeout() {
 	}
 	EG__().SetTimedOut(0)
 }
-func ZendFetchClass(className string, fetch_type int) *types.ClassEntry {
+func ZendFetchClass(className string, fetchType int) *types.ClassEntry {
 	var ce *types.ClassEntry
 	var scope *types.ClassEntry
-	var fetch_sub_type int = fetch_type & ZEND_FETCH_CLASS_MASK
+	var fetch_sub_type int = fetchType & ZEND_FETCH_CLASS_MASK
 check_fetch_type:
 	switch fetch_sub_type {
 	case ZEND_FETCH_CLASS_SELF:
 		scope = ZendGetExecutedScope()
 		if scope == nil {
-			ZendThrowOrError(fetch_type, nil, "Cannot access self:: when no class scope is active")
+			ZendThrowOrError(fetchType, nil, "Cannot access self:: when no class scope is active")
 		}
 		return scope
 	case ZEND_FETCH_CLASS_PARENT:
 		scope = ZendGetExecutedScope()
 		if scope == nil {
-			ZendThrowOrError(fetch_type, nil, "Cannot access parent:: when no class scope is active")
+			ZendThrowOrError(fetchType, nil, "Cannot access parent:: when no class scope is active")
 			return nil
 		}
 		if !(scope.GetParent()) {
-			ZendThrowOrError(fetch_type, nil, "Cannot access parent:: when current class scope has no parent")
+			ZendThrowOrError(fetchType, nil, "Cannot access parent:: when current class scope has no parent")
 		}
 		return scope.GetParent()
 	case ZEND_FETCH_CLASS_STATIC:
 		ce = ZendGetCalledScope(CurrEX())
 		if ce == nil {
-			ZendThrowOrError(fetch_type, nil, "Cannot access static:: when no class scope is active")
+			ZendThrowOrError(fetchType, nil, "Cannot access static:: when no class scope is active")
 			return nil
 		}
 		return ce
@@ -669,63 +651,50 @@ check_fetch_type:
 			goto check_fetch_type
 		}
 	}
-	if (fetch_type & ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 {
-		return ZendLookupClassEx(className, nil, fetch_type)
-	} else if lang.Assign(&ce, ZendLookupClassEx(className, nil, fetch_type)) == nil {
-		if (fetch_type&ZEND_FETCH_CLASS_SILENT) == 0 && EG__().NoException() {
-			if fetch_sub_type == ZEND_FETCH_CLASS_INTERFACE {
-				ZendThrowOrError(fetch_type, nil, "Interface '%s' not found", className)
-			} else if fetch_sub_type == ZEND_FETCH_CLASS_TRAIT {
-				ZendThrowOrError(fetch_type, nil, "Trait '%s' not found", className)
-			} else {
-				ZendThrowOrError(fetch_type, nil, "Class '%s' not found", className)
-			}
-		}
-		return nil
+
+	ce = ZendLookupClassEx(className, "", fetchType)
+	if ce != nil || fetchType&ZEND_FETCH_CLASS_NO_AUTOLOAD != 0 || fetchType&ZEND_FETCH_CLASS_SILENT != 0 {
+		return ce
 	}
-	return ce
-}
-func ZendFetchClassByName_Ex2(className types.ClassName, fetchType int) *types.ClassEntry {
-	return ZendFetchClassByName(types.NewString(className.GetName()), types.NewString(className.GetLcName()), fetchType)
-}
-func ZendFetchClassByName_Ex(class_name string, key string, fetch_type int) *types.ClassEntry {
-	return ZendFetchClassByName(types.NewString(class_name), types.NewString(key), fetch_type)
-}
-func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_type int) *types.ClassEntry {
-	var ce *types.ClassEntry
-	if (fetch_type & ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 {
-		return ZendLookupClassEx(class_name, key, fetch_type)
-	} else if lang.Assign(&ce, ZendLookupClassEx(class_name, key, fetch_type)) == nil {
-		if (fetch_type & ZEND_FETCH_CLASS_SILENT) != 0 {
-			return nil
-		}
-		if EG__().HasException() {
-			if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) == 0 {
-				var exception_str *types.String
-				var exception_zv types.Zval
-				exception_zv.SetObject(EG__().GetException())
-				// 				exception_zv.AddRefcount()
-				EG__().ClearException()
-				exception_str = operators.ZvalGetString(&exception_zv)
-				faults.ErrorNoreturn(faults.E_ERROR, "During class fetch: Uncaught %s", exception_str.GetVal())
-			}
-			return nil
-		}
-		if (fetch_type & ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_INTERFACE {
-			ZendThrowOrError(fetch_type, nil, "Interface '%s' not found", class_name.GetVal())
-		} else if (fetch_type & ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_TRAIT {
-			ZendThrowOrError(fetch_type, nil, "Trait '%s' not found", class_name.GetVal())
+	if EG__().NoException() {
+		if fetch_sub_type == ZEND_FETCH_CLASS_INTERFACE {
+			ZendThrowOrError(fetchType, nil, fmt.Sprintf("Interface '%s' not found", className))
+		} else if fetch_sub_type == ZEND_FETCH_CLASS_TRAIT {
+			ZendThrowOrError(fetchType, nil, fmt.Sprintf("Trait '%s' not found", className))
 		} else {
-			ZendThrowOrError(fetch_type, nil, "Class '%s' not found", class_name.GetVal())
+			ZendThrowOrError(fetchType, nil, fmt.Sprintf("Class '%s' not found", className))
+		}
+	}
+	return nil
+}
+func ZendFetchClassByNameEx(className types.ClassName, fetchType int) *types.ClassEntry {
+	return ZendFetchClassByName(className.GetName(), className.GetLcName(), fetchType)
+}
+func ZendFetchClassByName(className string, key string, fetchType int) *types.ClassEntry {
+	ce := ZendLookupClassEx(className, key, fetchType)
+	if ce != nil || fetchType&ZEND_FETCH_CLASS_NO_AUTOLOAD != 0 || fetchType&ZEND_FETCH_CLASS_SILENT != 0 {
+		return ce
+	}
+
+	if EG__().HasException() {
+		if (fetchType & ZEND_FETCH_CLASS_EXCEPTION) == 0 {
+			exceptionZv := types.NewZvalObject(EG__().GetException())
+			exceptionStr := operators.ZvalGetStrVal(exceptionZv)
+			EG__().ClearException()
+			faults.ErrorNoreturn(faults.E_ERROR, "During class fetch: Uncaught %s", exceptionStr)
 		}
 		return nil
 	}
-	return ce
+	if (fetchType & ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_INTERFACE {
+		ZendThrowOrError(fetchType, nil, fmt.Sprintf("Interface '%s' not found", className))
+	} else if (fetchType & ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_TRAIT {
+		ZendThrowOrError(fetchType, nil, fmt.Sprintf("Trait '%s' not found", className))
+	} else {
+		ZendThrowOrError(fetchType, nil, fmt.Sprintf("Class '%s' not found", className))
+	}
+	return nil
 }
-func ZendDeleteGlobalVariable(name *types.String) bool {
-	return EG__().GetSymbolTable().KeyDeleteIndirect(name.GetStr())
-}
-func ZendDeleteGlobalVariableEx(name string) bool {
+func ZendDeleteGlobalVariable(name string) bool {
 	return EG__().GetSymbolTable().KeyDeleteIndirect(name)
 }
 func ZendRebuildSymbolTable() *types.Array {

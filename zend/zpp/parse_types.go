@@ -293,18 +293,18 @@ func ParseClass(arg *types.Zval, baseCe *types.ClassEntry, num int, checkNull bo
 		return nil, true
 	}
 
-	if operators.TryConvertToString(arg) == 0 {
+	if !operators.TryConvertToString(arg) {
 		return nil, false
 	}
-	ce = zend.ZendLookupClass(arg.StringEx())
+	ce = zend.ZendLookupClass(arg.String())
 	if baseCe != nil {
-		if ce == nil || operators.InstanceofFunction(ce, baseCe) == 0 {
-			faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.GetActiveCalleeName(), num, baseCe.Name(), arg.String())
+		if ce == nil || !operators.InstanceofFunction(ce, baseCe) {
+			faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.CurrEX().CalleeName(), num, baseCe.Name(), arg.String())
 			return nil, false
 		}
 	}
 	if ce == nil {
-		faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", zend.GetActiveCalleeName(), num, arg.StringEx().GetVal())
+		faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", zend.CurrEX().CalleeName(), num, arg.StringEx().GetVal())
 		return nil, false
 	}
 	return ce, true
