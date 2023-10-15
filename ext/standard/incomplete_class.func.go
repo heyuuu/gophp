@@ -3,18 +3,14 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func IncompleteClassMessage(object *types.Zval, error_type int) {
-	var class_name *types.String
-	class_name = PhpLookupClassName(object)
-	if class_name != nil {
-		core.PhpErrorDocref("", error_type, INCOMPLETE_CLASS_MSG, class_name.GetVal())
-		// types.ZendStringReleaseEx(class_name, 0)
+	if className, ok := PhpLookupClassName(object); ok {
+		core.PhpErrorDocref("", error_type, INCOMPLETE_CLASS_MSG, className)
 	} else {
 		core.PhpErrorDocref("", error_type, INCOMPLETE_CLASS_MSG, "unknown")
 	}
@@ -64,14 +60,12 @@ func PhpCreateIncompleteClass() *types.ClassEntry {
 
 	return zend.RegisterClass(INCOMPLETE_CLASS, PhpCreateIncompleteObject, nil)
 }
-func PhpLookupClassName(object *types.Zval) *types.String {
-	var val *types.Zval
-	var object_properties *types.Array
-	object_properties = types.Z_OBJPROP_P(object)
-	if lang.Assign(&val, object_properties.KeyFind(b.CastStrAuto(MAGIC_MEMBER))) != nil && val.IsString() {
-		return val.StringEx().Copy()
+func PhpLookupClassName(object *types.Zval) (string, bool) {
+	objectProperties := types.Z_OBJPROP_P(object)
+	if val := objectProperties.KeyFind(MAGIC_MEMBER); val != nil && val.IsString() {
+		return val.String(), true
 	}
-	return nil
+	return "", false
 }
 func PhpStoreClassName(object *types.Zval, name *byte, len_ int) {
 	var val types.Zval

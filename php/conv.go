@@ -57,7 +57,7 @@ func _zvalGetLongEx(zv *types.Zval, silent bool) int {
 		// todo parse
 		return 0
 	case types.IsResource:
-		return zv.Resource().Handle()
+		return zv.ResourceHandle()
 	case types.IsArray:
 		if zv.Array().Len() != 0 {
 			return 1

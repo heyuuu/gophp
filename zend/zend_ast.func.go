@@ -21,10 +21,10 @@ func ZendAstGetStrVal(ast *ZendAst) string {
 	b.Assert(zv.IsString())
 	return zv.String()
 }
-func ZendAstGetConstantName(ast *ZendAst) *types.String {
+func ZendAstGetConstantName(ast *ZendAst) string {
 	b.Assert(ast.Kind() == ZEND_AST_CONSTANT)
 	b.Assert(ast.Val().IsString())
-	return ast.Val().StringEx()
+	return ast.Val().String()
 }
 func ZendAstCreateZnode(node *Znode) *ZendAst {
 	lineno := uint32(CG__().GetZendLineno())
@@ -118,14 +118,12 @@ func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 					faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 					break
 				}
-				// val.TryAddRefcount()
 			}
 		}
 		return types.SUCCESS
 	}
 
 	/* Objects or references cannot occur in a constant expression. */
-
 	faults.ThrowError(nil, "Only arrays and Traversables can be unpacked")
 	return types.FAILURE
 }
@@ -172,8 +170,8 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		var zv *types.Zval = ast.Val()
 		types.ZVAL_COPY(result, zv)
 	case ZEND_AST_CONSTANT:
-		var name *types.String = ZendAstGetConstantName(ast)
-		var zv *types.Zval = ZendGetConstantEx(name.GetStr(), scope, ast.Attr())
+		var name = ZendAstGetConstantName(ast)
+		var zv *types.Zval = ZendGetConstantEx(name, scope, ast.Attr())
 		if zv == nil {
 			result.SetUndef()
 			ret = ZendUseUndefinedConstant(name, ast.Attr(), result)

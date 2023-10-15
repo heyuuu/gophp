@@ -10,6 +10,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
+	"strings"
 )
 
 func ZendThrowOrError(fetchType int, exceptionCe *types.ClassEntry, message string) {
@@ -83,41 +84,32 @@ func ZendGetExecutedScope() *types.ClassEntry {
 func ZendIsExecuting() bool {
 	return CurrEX() != nil
 }
-func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *types.Zval) int {
-	var colon *byte
+func ZendUseUndefinedConstant(name string, attr ZendAstAttr, result *types.Zval) bool {
 	if EG__().HasException() {
-		return types.FAILURE
-	} else if lang.Assign(&colon, (*byte)(operators.ZendMemrchr(name.GetVal(), ':', name.GetLen()))) {
-		faults.ThrowError(nil, "Undefined class constant '%s'", name.GetVal())
-		return types.FAILURE
+		return false
+	} else if strings.ContainsRune(name, ':') {
+		faults.ThrowError(nil, fmt.Sprintf("Undefined class constant '%s'", name))
+		return false
 	} else if (attr & IS_CONSTANT_UNQUALIFIED) == 0 {
-		faults.ThrowError(nil, "Undefined constant '%s'", name.GetVal())
-		return types.FAILURE
+		faults.ThrowError(nil, fmt.Sprintf("Undefined constant '%s'", name))
+		return false
 	} else {
-		var actual *byte = name.GetVal()
-		var actual_len int = name.GetLen()
-		var slash *byte = (*byte)(operators.ZendMemrchr(actual, '\\', actual_len))
-		if slash != nil {
-			actual = slash + 1
-			actual_len -= actual - name.GetVal()
-		}
-		faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", actual, actual)
+		_, actualStr, _ := strkit.LastCut(name, "\\")
+		faults.Error(faults.E_WARNING, fmt.Sprintf("Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", actualStr, actualStr))
 		if EG__().HasException() {
-			return types.FAILURE
+			return false
 		} else {
-			var result_str *types.String = types.NewString(b.CastStr(actual, actual_len))
-			// ZvalPtrDtorNogc(result)
-			result.SetStringEx(result_str)
+			result.SetString(actualStr)
 		}
 	}
-	return types.SUCCESS
+	return true
 }
-func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) int {
+func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) bool {
 	if p.IsConstantAst() {
 		var ast *ZendAst = types.Z_ASTVAL_P(p)
 		if ast.Kind() == ZEND_AST_CONSTANT {
-			var name *types.String = ZendAstGetConstantName(ast)
-			var zv *types.Zval = ZendGetConstantEx(name.GetStr(), scope, ast.Attr())
+			var name = ZendAstGetConstantName(ast)
+			var zv *types.Zval = ZendGetConstantEx(name, scope, ast.Attr())
 			if zv == nil {
 				return ZendUseUndefinedConstant(name, ast.Attr(), p)
 			}
@@ -125,12 +117,12 @@ func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) int {
 		} else {
 			var tmp types.Zval
 			if ZendAstEvaluate(&tmp, ast, scope) != types.SUCCESS {
-				return types.FAILURE
+				return false
 			}
 			types.ZVAL_COPY_VALUE(p, &tmp)
 		}
 	}
-	return types.SUCCESS
+	return true
 }
 func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCache) int {
 	var i uint32

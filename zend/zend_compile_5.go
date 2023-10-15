@@ -557,7 +557,7 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 			is_variadic,
 		)
 		if type_ast != nil {
-			var has_null_default bool = default_ast != nil && (default_node.GetConstant().IsNull() || default_node.GetConstant().IsConstantAst() && types.Z_ASTVAL(default_node.GetConstant()).Kind() == ZEND_AST_CONSTANT && strcasecmp(ZendAstGetConstantName(types.Z_ASTVAL(default_node.GetConstant())).GetVal(), "NULL") == 0)
+			var has_null_default bool = default_ast != nil && (default_node.GetConstant().IsNull() || default_node.GetConstant().IsConstantAst() && types.Z_ASTVAL(default_node.GetConstant()).Kind() == ZEND_AST_CONSTANT && ascii.StrCaseEquals(ZendAstGetConstantName(types.Z_ASTVAL(default_node.GetConstant())), "NULL"))
 			op_array.SetIsHasTypeHints(true)
 			arg_info.SetType(compiler.CompileTypename(type_ast, has_null_default))
 			if arg_info.GetType().Code() == types.IsVoid {
