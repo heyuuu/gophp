@@ -69,9 +69,7 @@ func ZendRestoreLexicalState(lexState *ZendLexState) {
 	sc.restoreLexState(lexState)
 }
 func ZendDestroyFileHandle(fileHandle *FileHandle) {
-	CG__().GetOpenFiles().DeleteFunc(func(fh *FileHandle) bool {
-		return IsFileHandlesEquals(fh, fileHandle)
-	})
+	CG__().DelOpenFile(fileHandle)
 
 	fileHandle.openedPath = ""
 	fileHandle.filename = ""
@@ -81,14 +79,14 @@ func OpenFileForScanning(fileHandle *FileHandle) int {
 	buf, ok := fileHandle.Fixup()
 	if !ok {
 		/* Still add it to open_files to make destroy_file_handle work */
-		CG__().GetOpenFiles().AddElement(fileHandle)
+		CG__().AddOpenFile(fileHandle)
 		return types.FAILURE
 	}
 	size := len(buf)
 
 	b.Assert(!(EG__().exception) && "stream_fixup() should have failed")
 
-	CG__().GetOpenFiles().AddElement(fileHandle)
+	CG__().AddOpenFile(fileHandle)
 
 	/* Reset the scanner for scanning the new file */
 	sc := NewLangScanner(buf)

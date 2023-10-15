@@ -125,7 +125,7 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 	var fastShutdown bool = IsZendMm() != 0
 
 	faults.Try(func() {
-		CG__().GetOpenFiles().Clean()
+		CG__().CleanOpenFiles()
 	})
 
 	eg.SetIsInResourceShutdown(true)

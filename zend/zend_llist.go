@@ -28,13 +28,12 @@ type ZendLlist[T any] struct {
 	head  *ZendLlistElement[T]
 	tail  *ZendLlistElement[T]
 	count int
-	dtor  func(T)
 }
 
-func (l *ZendLlist[T]) Init()               { *l = ZendLlist[T]{} }
-func (l *ZendLlist[T]) InitEx(dtor func(T)) { *l = ZendLlist[T]{dtor: dtor} }
+func (l *ZendLlist[T]) Init()  { *l = ZendLlist[T]{} }
+func (l *ZendLlist[T]) Clean() { l.Init() }
 
-func (l *ZendLlist[T]) AddElement(element T) {
+func (l *ZendLlist[T]) AddLast(element T) {
 	node := NewZendLlistElement(element)
 
 	node.prev = l.tail
@@ -50,7 +49,7 @@ func (l *ZendLlist[T]) AddElement(element T) {
 	l.count++
 }
 
-func (l *ZendLlist[T]) PrependElement(element T) {
+func (l *ZendLlist[T]) AddFirst(element T) {
 	node := NewZendLlistElement(element)
 
 	node.prev = nil
@@ -80,9 +79,6 @@ func (l *ZendLlist[T]) deleteElement(curr *ZendLlistElement[T]) {
 	} else {
 		l.tail = curr.prev
 	}
-	if l.dtor != nil {
-		l.dtor(curr.data)
-	}
 	l.count--
 }
 
@@ -107,15 +103,6 @@ func (l *ZendLlist[T]) FindFunc(check func(T) bool) (data T, ok bool) {
 	return
 }
 
-func (l *ZendLlist[T]) DeleteFunc(check func(T) bool) {
-	for curr := l.head; curr != nil; curr = curr.next {
-		if check(curr.data) {
-			l.deleteElement(curr)
-			break
-		}
-	}
-}
-
 func (l *ZendLlist[T]) Filter(handler func(T) bool) {
 	for curr := l.head; curr != nil; {
 		next := curr.next
@@ -124,18 +111,4 @@ func (l *ZendLlist[T]) Filter(handler func(T) bool) {
 		}
 		curr = next
 	}
-}
-
-func (l *ZendLlist[T]) Clean() {
-	current := l.head
-	for current != nil {
-		next := current.next
-		if l.dtor != nil {
-			l.dtor(current.data)
-		}
-		current = next
-	}
-	l.count = 0
-	l.tail = nil
-	l.head = nil
 }

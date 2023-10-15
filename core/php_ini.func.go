@@ -122,10 +122,10 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		if IsSpecialSection == 0 && !(strcasecmp(arg1.StringEx().GetVal(), PHP_EXTENSION_TOKEN)) {
 			extension_name = zend.Estrndup(arg2.StringEx().GetVal(), arg2.StringEx().GetLen())
-			ExtensionLists.GetFunctions().AddElement(&extension_name)
+			ExtensionLists.GetFunctions().AddLast(&extension_name)
 		} else if IsSpecialSection == 0 && !(strcasecmp(arg1.StringEx().GetVal(), ZEND_EXTENSION_TOKEN)) {
 			extension_name = zend.Estrndup(arg2.StringEx().GetVal(), arg2.StringEx().GetLen())
-			ExtensionLists.GetEngine().AddElement(&extension_name)
+			ExtensionLists.GetEngine().AddLast(&extension_name)
 		} else {
 
 			/* Store in active hash */
@@ -474,7 +474,7 @@ func PhpInitConfig() int {
 									l = int(strlen(ini_file))
 									total_l += l + 2
 									p = zend.Estrndup(ini_file, l)
-									scanned_ini_list.AddElement(&p)
+									scanned_ini_list.AddLast(&p)
 								}
 							}
 						}

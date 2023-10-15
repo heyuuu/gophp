@@ -356,7 +356,6 @@ func SapiRemoveHeader(l *zend.ZendLlist[*SapiHeader], name *byte, len_ int) {
 		}
 		return true
 	})
-
 }
 func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
 	result := SM__().HeaderHandler(sapi_header, op, &(SG__().sapiHeaders))
@@ -370,7 +369,7 @@ func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
 				*colon_offset = sav
 			}
 		}
-		SG__().sapiHeaders.headers.AddElement(any(sapi_header))
+		SG__().sapiHeaders.headers.AddLast(any(sapi_header))
 	} else {
 		//SapiFreeHeader(sapi_header)
 	}

@@ -89,7 +89,7 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 		//}
 
 		/* append to linked list */
-		//list.AddElement(&buffer)
+		//list.AddLast(&buffer)
 	}
 }
 func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *string {

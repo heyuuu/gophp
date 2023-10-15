@@ -82,7 +82,7 @@ func (cg *ZendCompilerGlobals) Activate() {
 	EG__().InitRegularList()
 
 	cg.filenamesTable = make(map[string]string)
-	cg.openFiles.InitEx(FileHandleDtor)
+	cg.openFiles.Init()
 	cg.unclean_shutdown = false
 	cg.delayed_variance_obligations = nil
 	cg.delayed_autoloads = nil
@@ -184,7 +184,24 @@ func (cg *ZendCompilerGlobals) FileContextEnd(prevContext ZendFileContext) {
 }
 
 // open_files
-func (cg *ZendCompilerGlobals) GetOpenFiles() *ZendLlist[*FileHandle] { return &cg.openFiles }
+func (cg *ZendCompilerGlobals) AddOpenFile(fh *FileHandle) {
+	cg.openFiles.AddLast(fh)
+}
+func (cg *ZendCompilerGlobals) DelOpenFile(fh *FileHandle) {
+	cg.openFiles.Filter(func(fileHandle *FileHandle) bool {
+		if IsFileHandlesEquals(fileHandle, fh) {
+			fileHandle.Destroy()
+			return false
+		}
+		return true
+	})
+}
+func (cg *ZendCompilerGlobals) CleanOpenFiles() {
+	cg.openFiles.Each(func(fileHandle *FileHandle) {
+		fileHandle.Destroy()
+	})
+	cg.openFiles.Clean()
+}
 
 // getter/setter
 func (cg *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
