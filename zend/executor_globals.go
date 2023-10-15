@@ -15,12 +15,14 @@ func EG__() *ZendExecutorGlobals { return &ExecutorGlobals }
 // ZendExecutorGlobals
 const SYMTABLE_CACHE_SIZE = 32
 
+type stringSet = map[string]struct{}
+
 type ZendExecutorGlobals struct {
 	errorZval        types.Zval
 	symtableCache    [SYMTABLE_CACHE_SIZE]*types.Array
 	symtableCacheIdx int
 	symbolTable      *types.Array
-	includedFiles    *types.Array
+	includedFiles    map[string]int
 	errorReporting   int
 	exitStatus       int
 	functionTable    FunctionTable
@@ -31,7 +33,7 @@ type ZendExecutorGlobals struct {
 	currentExecuteData *ZendExecuteData
 	fakeScope          *types.ClassEntry
 	precision          int
-	inAutoload         *types.Array
+	inAutoload         stringSet
 	autoloadFunc       types.IFunction
 	vmInterrupt        bool
 	timedOut           bool
@@ -223,14 +225,12 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 			eg.symtableCacheIdx--
 			eg.symtableCache[eg.symtableCacheIdx].Destroy()
 		}
-		eg.GetIncludedFiles().Destroy()
+		eg.includedFiles = nil
 		eg.userErrorHandlersErrorReporting = nil
 		eg.userErrorHandlers = nil
 		eg.userExceptionHandlers = nil
 		//eg.GetObjectsStore().Destroy()
-		if eg.GetInAutoload() != nil {
-			eg.GetInAutoload().Destroy()
-		}
+		eg.inAutoload = nil
 	}
 	eg.ResetArrayIterators()
 }
@@ -384,18 +384,64 @@ func (eg *ZendExecutorGlobals) RestoreUserExceptionHandler() {
 	}
 }
 
+// includedFiles
+func (eg *ZendExecutorGlobals) IncludedFiles() []string {
+	if len(eg.includedFiles) == 0 {
+		return nil
+	}
+
+	files := make([]string, len(eg.includedFiles))
+	for file, i := range eg.includedFiles {
+		files[i] = file
+	}
+	return files
+}
+func (eg *ZendExecutorGlobals) AddIncludedFile(file string) bool {
+	if eg.includedFiles == nil {
+		eg.includedFiles = map[string]int{}
+	}
+	if _, exists := eg.includedFiles[file]; exists {
+		return false
+	}
+	eg.includedFiles[file] = len(eg.includedFiles)
+	return true
+}
+func (eg *ZendExecutorGlobals) ExistIncludedFile(file string) bool {
+	if eg.includedFiles == nil {
+		return false
+	}
+	_, exists := eg.includedFiles[file]
+	return exists
+}
+
+// inAutoload
+func (eg *ZendExecutorGlobals) MarkInAutoload(lcName string) bool {
+	if eg.inAutoload == nil {
+		eg.inAutoload = stringSet{}
+	}
+	if _, ok := eg.inAutoload[lcName]; ok {
+		return false
+	}
+	eg.inAutoload[lcName] = struct{}{}
+	return true
+}
+func (eg *ZendExecutorGlobals) UnmarkInAutoload(lcName string) {
+	if eg.inAutoload == nil {
+		return
+	}
+	delete(eg.inAutoload, lcName)
+}
+
 /**
  * 以下是自动生成的方法
  */
-func (eg *ZendExecutorGlobals) GetErrorZval() *types.Zval           { return &eg.errorZval }
-func (eg *ZendExecutorGlobals) GetSymbolTable() *types.Array        { return eg.symbolTable }
-func (eg *ZendExecutorGlobals) SetSymbolTable(value *types.Array)   { eg.symbolTable = value }
-func (eg *ZendExecutorGlobals) GetIncludedFiles() *types.Array      { return eg.includedFiles }
-func (eg *ZendExecutorGlobals) SetIncludedFiles(value *types.Array) { eg.includedFiles = value }
-func (eg *ZendExecutorGlobals) GetErrorReporting() int              { return eg.errorReporting }
-func (eg *ZendExecutorGlobals) SetErrorReporting(value int)         { eg.errorReporting = value }
-func (eg *ZendExecutorGlobals) GetExitStatus() int                  { return eg.exitStatus }
-func (eg *ZendExecutorGlobals) SetExitStatus(value int)             { eg.exitStatus = value }
+func (eg *ZendExecutorGlobals) GetErrorZval() *types.Zval         { return &eg.errorZval }
+func (eg *ZendExecutorGlobals) GetSymbolTable() *types.Array      { return eg.symbolTable }
+func (eg *ZendExecutorGlobals) SetSymbolTable(value *types.Array) { eg.symbolTable = value }
+func (eg *ZendExecutorGlobals) GetErrorReporting() int            { return eg.errorReporting }
+func (eg *ZendExecutorGlobals) SetErrorReporting(value int)       { eg.errorReporting = value }
+func (eg *ZendExecutorGlobals) GetExitStatus() int                { return eg.exitStatus }
+func (eg *ZendExecutorGlobals) SetExitStatus(value int)           { eg.exitStatus = value }
 func (eg *ZendExecutorGlobals) GetCurrentExecuteData() *ZendExecuteData {
 	return eg.currentExecuteData
 }
@@ -406,9 +452,8 @@ func (eg *ZendExecutorGlobals) GetFakeScope() *types.ClassEntry      { return eg
 func (eg *ZendExecutorGlobals) SetFakeScope(value *types.ClassEntry) { eg.fakeScope = value }
 func (eg *ZendExecutorGlobals) GetPrecision() int                    { return eg.precision }
 func (eg *ZendExecutorGlobals) SetPrecision(value int)               { eg.precision = value }
-func (eg *ZendExecutorGlobals) GetInAutoload() *types.Array          { return eg.inAutoload }
-func (eg *ZendExecutorGlobals) SetInAutoload(value *types.Array)     { eg.inAutoload = value }
-func (eg *ZendExecutorGlobals) GetAutoloadFunc() types.IFunction     { return eg.autoloadFunc }
+
+func (eg *ZendExecutorGlobals) GetAutoloadFunc() types.IFunction { return eg.autoloadFunc }
 func (eg *ZendExecutorGlobals) SetAutoloadFunc(value types.IFunction) {
 	eg.autoloadFunc = value
 }

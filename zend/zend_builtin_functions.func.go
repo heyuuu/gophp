@@ -790,11 +790,9 @@ func ZifClassAlias(className string, aliasName string, _ zpp.Opt, autoload_ *boo
 //@zif -alias get_required_files
 func ZifGetIncludedFiles() *types.Array {
 	retArr := types.NewArray()
-	EG__().GetIncludedFiles().Foreach(func(key types.ArrayKey, value *types.Zval) {
-		if key.IsStrKey() {
-			retArr.Append(types.NewZvalString(key.StrKey()))
-		}
-	})
+	for _, file := range EG__().IncludedFiles() {
+		retArr.Append(types.NewZvalString(file))
+	}
 	return retArr
 }
 

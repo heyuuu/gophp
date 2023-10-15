@@ -1383,7 +1383,7 @@ func PhpExecuteScript(primaryFile *zend.FileHandle) bool {
 		if primaryFile.GetFilename() != nil && strcmp("Standard input code", primaryFile.GetFilename()) && primaryFile.GetOpenedPath() == nil && !primaryFile.IsTypeHandleFileName() {
 			if ExpandFilepath(primaryFile.GetFilename(), realfile) != nil {
 				primaryFile.SetOpenedPath(realfile)
-				types.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primaryFile.GetOpenedPath().GetStr())
+				zend.EG__().AddIncludedFile(primaryFile.GetOpenedPath())
 			}
 		}
 		if PG__().auto_prepend_file && PG__().auto_prepend_file[0] {

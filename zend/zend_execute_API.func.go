@@ -402,10 +402,7 @@ func ZendLookupClassEx(name string, key string, flags uint32) *types.ClassEntry 
 	if lcName == "" && isValidClassName(name) {
 		return nil
 	}
-	if EG__().GetInAutoload() == nil {
-		EG__().SetInAutoload(types.NewArray())
-	}
-	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lcName) == nil {
+	if !EG__().MarkInAutoload(lcName) {
 		return nil
 	}
 
@@ -431,7 +428,7 @@ func ZendLookupClassEx(name string, key string, flags uint32) *types.ClassEntry 
 
 	EG__().ExceptionRestore()
 	EG__().SetFakeScope(origFakeScope)
-	EG__().GetInAutoload().KeyDelete(lcName)
+	EG__().UnmarkInAutoload(lcName)
 	return ce
 }
 func ZendLookupClass(name string) *types.ClassEntry {

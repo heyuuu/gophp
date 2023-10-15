@@ -167,7 +167,6 @@ func ZifSplClasses() *types.Array {
 	return list
 }
 func SplAutoload(className string, lcName string, ext string) int {
-	var dummy types.Zval
 	var opArray *types.ZendOpArray
 	var result types.Zval
 
@@ -178,8 +177,7 @@ func SplAutoload(className string, lcName string, ext string) int {
 			fh.SetOpenedPath(classFile)
 		}
 		openedPath := fh.GetOpenedPath()
-		dummy.SetNull()
-		if zend.EG__().GetIncludedFiles().KeyAdd(openedPath, &dummy) != nil {
+		if zend.EG__().AddIncludedFile(openedPath) {
 			opArray = zend.CompileFile(fh, zend.ZEND_REQUIRE)
 			zend.ZendDestroyFileHandle(fh)
 		} else {

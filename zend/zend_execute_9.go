@@ -28,7 +28,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 		var resolved_path *string
 		resolved_path = core.PhpResolvePathForZend(inc_filename.String())
 		if resolved_path != nil {
-			if EG__().GetIncludedFiles().KeyExists(*resolved_path) {
+			if EG__().ExistIncludedFile(*resolved_path) {
 				goto already_compiled
 			}
 		} else if EG__().HasException() {
@@ -44,7 +44,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 			if fh.GetOpenedPath() == "" {
 				fh.SetOpenedPath(*resolved_path)
 			}
-			if types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), fh.GetOpenedPath().GetStr()) != nil {
+			if EG__().AddIncludedFile(fh.GetOpenedPath()) {
 				var op_array *types.ZendOpArray = CompileFile(&fh, lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&fh)
 				if tmp_inc_filename.IsNotUndef() {
