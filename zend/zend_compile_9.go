@@ -572,7 +572,7 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 					return
 				}
 			} else if dim.IsString() {
-				el = container.Array().SymtableFind(dim.StringEx().GetStr())
+				el = container.Array().SymtableFind(dim.String())
 				if el != nil {
 					types.ZVAL_COPY(&result, el)
 				} else {
@@ -586,13 +586,13 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 			var c uint8
 			if dim.IsLong() {
 				offset = dim.Long()
-			} else if !dim.IsString() || operators.IsNumericString(dim.StringEx().GetStr(), &offset, nil, 1) != types.IsLong {
+			} else if !dim.IsString() || operators.IsNumericString(dim.String(), &offset, nil, 1) != types.IsLong {
 				return
 			}
 			if offset < 0 || int(offset >= container.StringEx().GetLen()) != 0 {
 				return
 			}
-			c = uint8(container.StringEx().GetStr()[offset])
+			c = uint8(container.String()[offset])
 			result.SetString(string(c))
 		} else if container.IsSignFalse() {
 			result.SetNull()

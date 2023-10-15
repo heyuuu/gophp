@@ -1936,7 +1936,7 @@ try_again:
 	case types.IsString:
 		var lval zend.ZendLong
 		var dval float64
-		switch IsNumericString(op1.StringEx().GetStr(), &lval, &dval, 0) {
+		switch IsNumericString(op1.String(), &lval, &dval, 0) {
 		case types.IsLong:
 
 			if lval == zend.ZEND_LONG_MAX {
@@ -1998,7 +1998,7 @@ try_again:
 			op1.SetLong(-1)
 			break
 		}
-		switch IsNumericString(op1.StringEx().GetStr(), &lval, &dval, 0) {
+		switch IsNumericString(op1.String(), &lval, &dval, 0) {
 		case types.IsLong:
 
 			if lval == zend.ZEND_LONG_MIN {

@@ -1179,7 +1179,7 @@ func ArrayColumnFetchProp(data *types.Zval, name *types.Zval) *types.Zval {
 
 	} else if data.IsType(types.IsArray) {
 		if name.IsString() {
-			prop = data.Array().SymtableFind(name.StringEx().GetStr())
+			prop = data.Array().SymtableFind(name.String())
 		} else if name.IsType(types.IsLong) {
 			prop = data.Array().IndexFind(name.Long())
 		}
@@ -1224,7 +1224,7 @@ func ZifArrayColumn(array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, i
 			if keyVal != nil {
 				switch keyVal.Type() {
 				case types.IsString:
-					retArr.SymtableUpdate(keyVal.StringEx().GetStr(), columnVal)
+					retArr.SymtableUpdate(keyVal.String(), columnVal)
 				case types.IsLong:
 					retArr.IndexUpdate(keyVal.Long(), columnVal)
 				case types.IsObject:

@@ -181,7 +181,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		ZendPrintZvalRToBuf(buf, types.Z_REFVAL_P(expr), indent)
 		break
 	case types.IsString:
-		buf.WriteString(expr.StringEx().GetStr())
+		buf.WriteString(expr.String())
 		break
 	default:
 		var str *types.String = operators.ZvalGetString(expr)

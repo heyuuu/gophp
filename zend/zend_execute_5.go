@@ -51,7 +51,7 @@ func ZendFetchDimensionAddressRead(
 		if !dim.IsLong() {
 			switch dim.Type() {
 			case types.IsString:
-				if types.IsLong == operators.IsNumericString(dim.StringEx().GetStr(), nil, nil, -1) {
+				if types.IsLong == operators.IsNumericString(dim.String(), nil, nil, -1) {
 					break
 				}
 				if type_ == BP_VAR_IS {
@@ -97,7 +97,7 @@ func ZendFetchDimensionAddressRead(
 			} else {
 				real_offset = offset
 			}
-			c = uint8(container.StringEx().GetStr()[real_offset])
+			c = uint8(container.String()[real_offset])
 			result.SetString(string(c))
 		}
 	} else if container.IsObject() {
@@ -203,7 +203,7 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 
 			/*}*/
 
-			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.StringEx().GetStr(), nil, nil, 0) {
+			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String(), nil, nil, 0) {
 				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -228,7 +228,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 				lval += ZendLong(container.StringEx().GetLen())
 			}
 			if lval >= 0 && int(lval < container.StringEx().GetLen()) != 0 {
-				return container.StringEx().GetStr()[lval] == '0'
+				return container.String()[lval] == '0'
 			} else {
 				return 1
 			}
@@ -240,7 +240,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 
 			/*}*/
 
-			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.StringEx().GetStr(), nil, nil, 0) {
+			if offset.Type() < types.IsString || offset.IsString() && types.IsLong == operators.IsNumericString(offset.String(), nil, nil, 0) {
 				lval = operators.ZvalGetLong(offset)
 				goto str_offset
 			}

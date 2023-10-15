@@ -1969,7 +1969,7 @@ func zim_spl_CachingIterator___toString(executeData *zend.ZendExecuteData, retur
 		return
 	}
 	if intern.GetZstr().IsString() {
-		return_value.SetString(intern.GetZstr().StringEx().GetStr())
+		return_value.SetString(intern.GetZstr().String())
 		return
 	} else {
 		return_value.SetString("")

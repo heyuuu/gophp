@@ -92,7 +92,7 @@ func (compiler *Compiler) DetermineSwitchJumptableType(cases *ZendAstList) uint8
 			/* Non-uniform case types */
 
 		}
-		if cond_zv.IsString() && operators.IsNumericString(cond_zv.StringEx().GetStr(), nil, nil, 0) != 0 {
+		if cond_zv.IsString() && operators.IsNumericString(cond_zv.String(), nil, nil, 0) != 0 {
 
 			/* Numeric strings cannot be compared with a simple hash lookup */
 
@@ -199,7 +199,7 @@ func (compiler *Compiler) CompileSwitch(ast *ZendAst) {
 					jumptable.IndexAdd(cond_zv.Long(), &jmp_target)
 				} else {
 					b.Assert(cond_zv.IsString())
-					jumptable.KeyAdd(cond_zv.StringEx().GetStr(), &jmp_target)
+					jumptable.KeyAdd(cond_zv.String(), &jmp_target)
 				}
 			}
 		} else {

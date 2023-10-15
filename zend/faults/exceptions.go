@@ -443,7 +443,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 			} else {
 				line = 0
 			}
-			str.WriteString(file.StringEx().GetStr())
+			str.WriteString(file.String())
 			str.WriteByte('(')
 			str.WriteLong(line)
 			str.WriteString("): ")

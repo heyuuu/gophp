@@ -75,7 +75,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 				break
 			}
 		}
-		c = ce.ConstantsTable().Get(opline.Const2().StringEx().GetStr())
+		c = ce.ConstantsTable().Get(opline.Const2().String())
 		if c != nil {
 			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if !ZendVerifyConstAccess(c, scope) {
@@ -125,7 +125,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 				break
 			}
 		}
-		c = ce.ConstantsTable().Get(opline.Const2().StringEx().GetStr())
+		c = ce.ConstantsTable().Get(opline.Const2().String())
 		if c != nil {
 			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if !ZendVerifyConstAccess(c, scope) {

@@ -673,13 +673,13 @@ func ZifExtract(array zpp.DerefArray, _ zpp.Opt, flags int, prefix *types.Zval) 
 func PhpCompactVar(activeSymbolTable *types.Array, resultArr *types.Array, entry *types.Zval) {
 	entry = types.ZVAL_DEREF(entry)
 	if entry.IsString() {
-		if valuePtr := types.ZendHashFindInd(activeSymbolTable, entry.StringEx().GetStr()); valuePtr != nil {
+		if valuePtr := types.ZendHashFindInd(activeSymbolTable, entry.String()); valuePtr != nil {
 			valuePtr = types.ZVAL_DEREF(valuePtr)
-			resultArr.KeyUpdate(entry.StringEx().GetStr(), valuePtr)
+			resultArr.KeyUpdate(entry.String(), valuePtr)
 		} else if entry.String() == "this" {
 			var object = zend.ZendGetThisObject(zend.CurrEX())
 			if object != nil {
-				resultArr.KeyUpdate(entry.StringEx().GetStr(), types.NewZvalObject(object))
+				resultArr.KeyUpdate(entry.String(), types.NewZvalObject(object))
 			}
 		} else {
 			core.PhpErrorDocref("", faults.E_NOTICE, "Undefined variable: %s", entry.StringEx().GetVal())

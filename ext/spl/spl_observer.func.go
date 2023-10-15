@@ -805,7 +805,7 @@ func SplMultipleIteratorGetAll(intern *SplObjectStorage, get_type int, return_va
 			case types.IsLong:
 				zend.AddIndexZval(return_value, element.GetInf().Long(), &retval)
 			case types.IsString:
-				return_value.Array().SymtableUpdate(element.GetInf().StringEx().GetStr(), &retval)
+				return_value.Array().SymtableUpdate(element.GetInf().String(), &retval)
 			default:
 				// zend.ZvalPtrDtor(&retval)
 				faults.ThrowException(spl_ce_InvalidArgumentException, "Sub-Iterator is associated with NULL", 0)

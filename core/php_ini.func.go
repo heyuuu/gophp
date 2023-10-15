@@ -130,7 +130,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 			/* Store in active hash */
 
-			entry = active_hash.KeyUpdate(arg1.StringEx().GetStr(), arg2)
+			entry = active_hash.KeyUpdate(arg1.String(), arg2)
 			entry.SetString(entry.String())
 		}
 
@@ -151,15 +151,15 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if lang.Assign(&find_arr, active_hash.KeyFind(arg1.StringEx().GetStr())) == nil || !find_arr.IsArray() {
+		if lang.Assign(&find_arr, active_hash.KeyFind(arg1.String())) == nil || !find_arr.IsArray() {
 			option_arr.SetArray(types.NewArrayCap(8))
-			find_arr = active_hash.KeyUpdate(arg1.StringEx().GetStr(), &option_arr)
+			find_arr = active_hash.KeyUpdate(arg1.String(), &option_arr)
 		}
 
 		/* arg3 is possible option offset name */
 
 		if arg3 != nil && arg3.StringEx().GetLen() > 0 {
-			entry = find_arr.Array().SymtableUpdate(arg3.StringEx().GetStr(), arg2)
+			entry = find_arr.Array().SymtableUpdate(arg3.String(), arg2)
 		} else {
 			entry = find_arr.Array().Append(arg2)
 		}

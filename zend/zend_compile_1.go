@@ -324,7 +324,7 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	if !class_name.IsString() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
-	fetch_type = ZendGetClassFetchType(class_name.StringEx().GetStr())
+	fetch_type = ZendGetClassFetchType(class_name.String())
 	ZendEnsureValidClassFetchType(fetch_type)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:

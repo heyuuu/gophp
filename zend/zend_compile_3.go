@@ -426,7 +426,7 @@ func (compiler *Compiler) CompileFuncChr(result *Znode, args *ZendAstList) int {
 func (compiler *Compiler) CompileFuncOrd(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.Children()[0].Kind() == ZEND_AST_ZVAL && ZendAstGetZval(args.Children()[0]).IsString() {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetLong(uint8(ZendAstGetZval(args.Children()[0]).StringEx().GetStr()[0]))
+		result.GetConstant().SetLong(uint8(ZendAstGetZval(args.Children()[0]).String()[0]))
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -587,7 +587,7 @@ func (compiler *Compiler) CompileFuncInArray(result *Znode, args *ZendAstList) i
 		if strict != 0 {
 			src.ForeachEx(func(_ types.ArrayKey, val *types.Zval) bool {
 				if val.IsString() {
-					dst.KeyAdd(val.StringEx().GetStr(), &tmp)
+					dst.KeyAdd(val.String(), &tmp)
 				} else if val.IsLong() {
 					dst.IndexAdd(val.Long(), &tmp)
 				} else {
@@ -603,12 +603,12 @@ func (compiler *Compiler) CompileFuncInArray(result *Znode, args *ZendAstList) i
 				var _z *types.Zval = _p.GetVal()
 
 				val = _z
-				if !val.IsString() || operators.IsNumericString(val.StringEx().GetStr(), nil, nil, 0) != 0 {
+				if !val.IsString() || operators.IsNumericString(val.String(), nil, nil, 0) != 0 {
 					dst.Destroy()
 					ok = 0
 					break
 				}
-				dst.KeyAdd(val.StringEx().GetStr(), &tmp)
+				dst.KeyAdd(val.String(), &tmp)
 			}
 		}
 		src.Destroy()

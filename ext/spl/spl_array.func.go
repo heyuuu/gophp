@@ -355,7 +355,7 @@ try_again:
 	switch offset.Type() {
 	case types.IsString:
 		ht = SplArrayGetHashTable(intern)
-		ht.SymtableUpdateInd(offset.StringEx().GetStr(), value)
+		ht.SymtableUpdateInd(offset.String(), value)
 		return
 	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
@@ -429,7 +429,7 @@ try_again:
 							SplArraySkipProtected(intern, ht)
 						}
 					}
-				} else if ht.SymtableDel(offset.StringEx().GetStr()) == false {
+				} else if ht.SymtableDel(offset.String()) == false {
 					faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
 				}
 			} else {
@@ -493,7 +493,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 	try_again:
 		switch offset.Type() {
 		case types.IsString:
-			if lang.Assign(&tmp, ht.SymtableFind(offset.StringEx().GetStr())) != nil {
+			if lang.Assign(&tmp, ht.SymtableFind(offset.String())) != nil {
 				if check_empty == 2 {
 					return 1
 				}

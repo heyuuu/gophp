@@ -79,7 +79,7 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 			faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 		}
 	case types.IsString:
-		result.Array().SymtableUpdate(offset.StringEx().GetStr(), expr)
+		result.Array().SymtableUpdate(offset.String(), expr)
 	case types.IsNull:
 		result.Array().SymtableUpdate(types.NewString("").GetStr(), expr)
 	case types.IsLong:

@@ -272,10 +272,10 @@ func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *types.Zval, op2 
 	if (opcode == ZEND_BW_OR || opcode == ZEND_BW_AND || opcode == ZEND_BW_XOR) && op1.IsString() && op2.IsString() {
 		return 0
 	}
-	if op1.IsString() && operators.IsNumericString(op1.StringEx().GetStr(), nil, nil, 0) == 0 {
+	if op1.IsString() && operators.IsNumericString(op1.String(), nil, nil, 0) == 0 {
 		return 1
 	}
-	if op2.IsString() && operators.IsNumericString(op2.StringEx().GetStr(), nil, nil, 0) == 0 {
+	if op2.IsString() && operators.IsNumericString(op2.String(), nil, nil, 0) == 0 {
 		return 1
 	}
 	return 0
@@ -403,7 +403,7 @@ func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool 
 			case types.IsLong:
 				result.Array().IndexUpdate(key.Long(), value)
 			case types.IsString:
-				result.Array().SymtableUpdate(key.StringEx().GetStr(), value)
+				result.Array().SymtableUpdate(key.String(), value)
 			case types.IsDouble:
 				result.Array().IndexUpdate(operators.DvalToLval(key.Double()), value)
 			case types.IsFalse:

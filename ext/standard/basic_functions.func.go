@@ -1191,7 +1191,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 
 		}
 		// arg2.TryAddRefcount()
-		arr.Array().SymtableUpdate(arg1.StringEx().GetStr(), arg2)
+		arr.Array().SymtableUpdate(arg1.String(), arg2)
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
 		var hash types.Zval
 		var find_hash *types.Zval
@@ -1204,16 +1204,16 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			/* bare string - nothing to do */
 
 		}
-		if !(arg1.StringEx().GetLen() > 1 && arg1.StringEx().GetStr()[0] == '0') && operators.IsNumericString(arg1.StringEx().GetStr(), nil, nil, 0) == types.IsLong {
+		if !(arg1.StringEx().GetLen() > 1 && arg1.String()[0] == '0') && operators.IsNumericString(arg1.String(), nil, nil, 0) == types.IsLong {
 			var key = zend.StrToLongWithUnit(arg1.String())
 			if lang.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
 				find_hash = arr.Array().IndexAddNew(key, &hash)
 			}
 		} else {
-			if lang.Assign(&find_hash, arr.Array().KeyFind(arg1.StringEx().GetStr())) == nil {
+			if lang.Assign(&find_hash, arr.Array().KeyFind(arg1.String())) == nil {
 				zend.ArrayInit(&hash)
-				find_hash = arr.Array().KeyAddNew(arg1.StringEx().GetStr(), &hash)
+				find_hash = arr.Array().KeyAddNew(arg1.String(), &hash)
 			}
 		}
 		if !find_hash.IsArray() {
@@ -1233,7 +1233,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arr *types.Zval) {
 	if callback_type == zend.ZEND_INI_PARSER_SECTION {
 		zend.ArrayInit(&(BG__().active_ini_file_section))
-		arr.Array().SymtableUpdate(arg1.StringEx().GetStr(), &(BG__().active_ini_file_section))
+		arr.Array().SymtableUpdate(arg1.String(), &(BG__().active_ini_file_section))
 	} else if arg2 != nil {
 		var active_arr *types.Zval
 		if BG__().active_ini_file_section.IsNotUndef() {

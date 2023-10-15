@@ -308,7 +308,7 @@ func PhpStreamUrlWrapHttpEx(
 
 			if redirected == 0 || tmpzval.StringEx().GetLen() == 3 && memcmp("GET", tmpzval.StringEx().GetVal(), 3) == 0 || tmpzval.StringEx().GetLen() == 4 && memcmp("HEAD", tmpzval.StringEx().GetVal(), 4) == 0 {
 				custom_request_method = 1
-				req_buf.WriteString(tmpzval.StringEx().GetStr())
+				req_buf.WriteString(tmpzval.String())
 				req_buf.WriteByte(' ')
 			}
 
@@ -368,7 +368,7 @@ func PhpStreamUrlWrapHttpEx(
 
 				tmpheader = _z
 				if tmpheader.IsString() {
-					tmpstr.WriteString(tmpheader.StringEx().GetStr())
+					tmpstr.WriteString(tmpheader.String())
 					tmpstr.WriteString("\r\n")
 				}
 			}
@@ -562,7 +562,7 @@ func PhpStreamUrlWrapHttpEx(
 			core.PhpErrorDocref("", faults.E_NOTICE, "Content-type not specified assuming application/x-www-form-urlencoded")
 		}
 		req_buf.WriteString("\r\n")
-		req_buf.WriteString(tmpzval.StringEx().GetStr())
+		req_buf.WriteString(tmpzval.String())
 	} else {
 		req_buf.WriteString("\r\n")
 	}

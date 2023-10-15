@@ -26,7 +26,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 		fallthrough
 	case ZEND_REQUIRE_ONCE:
 		var resolved_path *string
-		resolved_path = core.PhpResolvePathForZend(inc_filename.StringEx().GetStr())
+		resolved_path = core.PhpResolvePathForZend(inc_filename.String())
 		if resolved_path != nil {
 			if EG__().GetIncludedFiles().KeyExists(*resolved_path) {
 				goto already_compiled
@@ -37,7 +37,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.StringEx().GetVal())
 			break
 		} else {
-			*resolved_path = inc_filename.StringEx().GetStr()
+			*resolved_path = inc_filename.String()
 		}
 
 		if fh := NewFileHandleByOpenStream(*resolved_path); fh != nil {
@@ -140,17 +140,17 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *types.ZendOp
 func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int, opline *types.ZendOp, executeData *ZendExecuteData) int {
 	var orig_key *types.Zval = key
 	var c *ZendConstant = nil
-	c = EG__().ConstantTable().Get(key.StringEx().GetStr())
+	c = EG__().ConstantTable().Get(key.String())
 	if c == nil {
 		key++
-		c = EG__().ConstantTable().Get(key.StringEx().GetStr())
+		c = EG__().ConstantTable().Get(key.String())
 		if c == nil || c.IsCaseSensitive() {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
-				c = EG__().ConstantTable().Get(key.StringEx().GetStr())
+				c = EG__().ConstantTable().Get(key.String())
 				if c == nil {
 					key++
-					c = EG__().ConstantTable().Get(key.StringEx().GetStr())
+					c = EG__().ConstantTable().Get(key.String())
 					if c != nil && c.IsCaseSensitive() {
 						c = nil
 					}
@@ -163,7 +163,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
 				var actual *byte = (*byte)(operators.ZendMemrchr(opline.Const2().StringEx().GetVal(), '\\', opline.Const2().StringEx().GetLen()))
 				if actual == nil {
-					opline.Result().SetString(opline.Const2().StringEx().GetStr())
+					opline.Result().SetString(opline.Const2().String())
 				} else {
 					actual++
 					opline.Result().SetString(b.CastStr(actual, opline.Const2().StringEx().GetLen()-(actual-opline.Const2().StringEx().GetVal())))

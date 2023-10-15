@@ -146,7 +146,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 			filterparams.Array().Foreach(func(_ types.ArrayKey, tmp *types.Zval) {
 				operators.ConvertToStringEx(tmp)
 				tags_ss.WriteByte('<')
-				tags_ss.WriteString(tmp.StringEx().GetStr())
+				tags_ss.WriteString(tmp.String())
 				tags_ss.WriteByte('>')
 			})
 			tags_ss.ZeroTail()

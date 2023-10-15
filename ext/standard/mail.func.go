@@ -199,7 +199,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 	if headers != nil {
 		switch headers.Type() {
 		case types.IsString:
-			tmp_headers = types.NewString(headers.StringEx().GetStr())
+			tmp_headers = types.NewString(headers.String())
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
 			str_headers = types.NewString(str.PhpTrimRight(tmp_headers.GetStr(), nil))
 			// types.ZendStringReleaseEx(tmp_headers, 0)

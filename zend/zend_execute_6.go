@@ -134,7 +134,7 @@ func ZendFetchPropertyAddress(
 			}
 		} else if zobj.GetProperties() != nil {
 			zobj.DupProperties()
-			ptr = zobj.GetProperties().KeyFind(prop_ptr.StringEx().GetStr())
+			ptr = zobj.GetProperties().KeyFind(prop_ptr.String())
 			if ptr != nil {
 				result.SetIndirect(ptr)
 				return

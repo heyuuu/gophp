@@ -336,17 +336,17 @@ func ProcessNestedData(
 					data = ht.IndexAddNew(idx, &d)
 				}
 			} else if key.IsString() {
-				if types.HandleNumericStr(key.StringEx().GetStr(), &idx) {
+				if types.HandleNumericStr(key.String(), &idx) {
 					goto numeric_key
 				}
-				if lang.Assign(&old_data, ht.KeyFind(key.StringEx().GetStr())) != nil {
+				if lang.Assign(&old_data, ht.KeyFind(key.String())) != nil {
 
 					//??? update hash
 
 					VarPushDtor(var_hash, old_data)
-					data = ht.KeyUpdate(key.StringEx().GetStr(), &d)
+					data = ht.KeyUpdate(key.String(), &d)
 				} else {
-					data = ht.KeyAddNew(key.StringEx().GetStr(), &d)
+					data = ht.KeyAddNew(key.String(), &d)
 				}
 			} else {
 				// zend.ZvalPtrDtor(&key)
@@ -389,12 +389,12 @@ func ProcessNestedData(
 						// types.ZendStringReleaseEx(unmangled, 0)
 					}
 				}
-				if lang.Assign(&old_data, ht.KeyFind(key.StringEx().GetStr())) != nil {
+				if lang.Assign(&old_data, ht.KeyFind(key.String())) != nil {
 					if old_data.IsIndirect() {
 						old_data = old_data.Indirect()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
 						VarPushDtor(var_hash, old_data)
-						data = ht.KeyUpdateIndirect(key.StringEx().GetStr(), &d)
+						data = ht.KeyUpdateIndirect(key.String(), &d)
 						if info != nil {
 
 							/* Remember to which property this slot belongs, so we can add a
@@ -407,10 +407,10 @@ func ProcessNestedData(
 						}
 					} else {
 						VarPushDtor(var_hash, old_data)
-						data = ht.KeyUpdateIndirect(key.StringEx().GetStr(), &d)
+						data = ht.KeyUpdateIndirect(key.String(), &d)
 					}
 				} else {
-					data = ht.KeyAddNew(key.StringEx().GetStr(), &d)
+					data = ht.KeyAddNew(key.String(), &d)
 				}
 			} else if key.IsType(types.IsLong) {
 

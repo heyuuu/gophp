@@ -179,7 +179,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		// types.ZendStringReleaseEx(tmp, 0)
 	} else {
 		string_len = value.StringEx().GetLen()
-		c = uint8(value.StringEx().GetStr()[0])
+		c = uint8(value.String()[0])
 	}
 	if string_len == 0 {
 

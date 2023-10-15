@@ -391,7 +391,7 @@ func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteD
 	if !dim.IsLong() {
 		switch dim.Type() {
 		case types.IsString:
-			if types.IsLong == operators.IsNumericString(dim.StringEx().GetStr(), nil, nil, -1) {
+			if types.IsLong == operators.IsNumericString(dim.String(), nil, nil, -1) {
 				break
 			}
 			if type_ != BP_VAR_UNSET {
