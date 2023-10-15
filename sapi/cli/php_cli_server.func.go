@@ -115,7 +115,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 	var s *byte
 	var p *byte
 	var len_ ptrdiff_t
-	if h.GetHeaderLen() > 0 {
+	if h.Len() > 0 {
 		p = strchr(h.GetHeader(), ':')
 		len_ = p - h.GetHeader()
 		if p != nil && len_ > 0 {
@@ -132,7 +132,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 						break
 					}
 				}
-				zend.AddAssocStringlEx(return_value, b.CastStr(s, uint32(len_)), b.CastStr(p, h.GetHeaderLen()-(p-h.GetHeader())))
+				zend.AddAssocStringlEx(return_value, b.CastStr(s, uint32(len_)), b.CastStr(p, h.Len()-(p-h.GetHeader())))
 				zend.FreeAlloca(s, use_heap)
 			}
 		}
@@ -170,8 +170,8 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 	}
 	AppendEssentialHeaders(&buffer, client, 0)
 	sapi_headers.GetHeaders().Each(func(h *core.SapiHeader) {
-		if h.GetHeaderLen() != 0 {
-			buffer.WriteString(b.CastStr(h.GetHeader(), h.GetHeaderLen()))
+		if h.Len() != 0 {
+			buffer.WriteString(b.CastStr(h.GetHeader(), h.Len()))
 			buffer.WriteString("\r\n")
 		}
 	})

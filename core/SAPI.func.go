@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -185,48 +186,29 @@ func SapiReadStandardFormData() {
 		PhpStreamRewind(SG__().RequestInfo.requestBody)
 	}
 }
-func GetDefaultContentType(prefix_len uint32, len_ *uint32) *byte {
-	var mimetype *byte
-	var charset *byte
-	var content_type *byte
-	var mimetype_len uint32
-	var charset_len uint32
-	if SG__().defaultMimetype {
-		mimetype = SG__().defaultMimetype
-		mimetype_len = uint32(strlen(SG__().defaultMimetype))
+func GetDefaultContentType(prefix string) string {
+	var mimetype string
+	var charset string
+	if SG__().DefaultMimetype() != "" {
+		mimetype = SG__().DefaultMimetype()
 	} else {
 		mimetype = SAPI_DEFAULT_MIMETYPE
-		mimetype_len = b.SizeOf("SAPI_DEFAULT_MIMETYPE") - 1
 	}
-	if SG__().defaultCharset {
-		charset = SG__().defaultCharset
-		charset_len = uint32(strlen(SG__().defaultCharset))
+
+	if SG__().DefaultCharset() != "" {
+		charset = SG__().DefaultCharset()
 	} else {
 		charset = SAPI_DEFAULT_CHARSET
-		charset_len = b.SizeOf("SAPI_DEFAULT_CHARSET") - 1
 	}
-	if (*charset) && strncasecmp(mimetype, "text/", 5) == 0 {
-		var p *byte
-		*len_ = prefix_len + mimetype_len + b.SizeOf("\"; charset=\"") - 1 + charset_len
-		content_type = (*byte)(zend.Emalloc((*len_) + 1))
-		p = content_type + prefix_len
-		memcpy(p, mimetype, mimetype_len)
-		p += mimetype_len
-		memcpy(p, "; charset=", b.SizeOf("\"; charset=\"")-1)
-		p += b.SizeOf("\"; charset=\"") - 1
-		memcpy(p, charset, charset_len+1)
+
+	if charset != "" && len(mimetype) >= 5 && ascii.StrToLower(mimetype) == "text/" {
+		return prefix + mimetype + "; charset=" + charset
 	} else {
-		*len_ = prefix_len + mimetype_len
-		content_type = (*byte)(zend.Emalloc((*len_) + 1))
-		memcpy(content_type+prefix_len, mimetype, mimetype_len+1)
+		return prefix + mimetype
 	}
-	return content_type
 }
-func SapiGetDefaultContentTypeHeader(default_header *SapiHeader) {
-	var len_ uint32
-	default_header.SetHeader(GetDefaultContentType(b.SizeOf("\"Content-type: \"")-1, &len_))
-	default_header.SetHeaderLen(len_)
-	memcpy(default_header.GetHeader(), "Content-type: ", b.SizeOf("\"Content-type: \"")-1)
+func SapiGetDefaultContentTypeHeader() *SapiHeader {
+	return NewSapiHeader(GetDefaultContentType("Content-type: "))
 }
 func SapiApplyDefaultCharset(mimetype **byte, len_ int) int {
 	var charset *byte
@@ -340,7 +322,7 @@ func SapiUpdateResponseCode(ncode int) {
 	/* if the status code did not change, we do not want
 	   to change the status line, and no need to change the code */
 
-	if SG__().sapiHeaders.httpResponseCode == ncode {
+	if SG__().SapiHeaders().HttpResponseCode() == ncode {
 		return
 	}
 	if SG__().sapiHeaders.httpStatusLine {
@@ -351,7 +333,7 @@ func SapiUpdateResponseCode(ncode int) {
 }
 func SapiRemoveHeader(l *zend.ZendLlist[*SapiHeader], name *byte, len_ int) {
 	l.Filter(func(header *SapiHeader) bool {
-		if header.GetHeaderLen() > len_ && header.GetHeader()[len_] == ':' && !(strncasecmp(header.GetHeader(), name, len_)) {
+		if header.Len() > len_ && header.GetHeader()[len_] == ':' && !(strncasecmp(header.GetHeader(), name, len_)) {
 			return false
 		}
 		return true
@@ -433,8 +415,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 			return types.FAILURE
 		}
 
-		sapi_header.SetHeader(header_line)
-		sapi_header.SetHeaderLen(header_line_len)
+		sapi_header.SetHeader(b.CastStr(header_line, header_line_len))
 		SM__().HeaderHandler(&sapi_header, op, &(SG__().sapiHeaders))
 		SapiRemoveHeader(&SG__().sapiHeaders.headers, header_line, header_line_len)
 		zend.Efree(header_line)
@@ -460,8 +441,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 			}
 		}
 	}
-	sapi_header.SetHeader(header_line)
-	sapi_header.SetHeaderLen(header_line_len)
+	sapi_header.SetHeader(b.CastStr(header_line, header_line_len))
 
 	/* Check the header for a few cases that we have special support for in SAPI */
 
@@ -510,8 +490,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 					newheader = zend.Emalloc(newlen)
 					PHP_STRLCPY(newheader, "Content-type: ", newlen, b.SizeOf("\"Content-type: \"")-1)
 					strlcat(newheader, mimetype, newlen)
-					sapi_header.SetHeader(newheader)
-					sapi_header.SetHeaderLen(uint32(newlen - 1))
+					sapi_header.SetHeader(b.CastStr(newheader, newlen-1))
 					zend.Efree(header_line)
 				}
 				zend.Efree(mimetype)
@@ -566,19 +545,10 @@ func SapiSendHeaders() int {
 	 */
 
 	if SG__().sapiHeaders.sendDefaultContentType && SM__().GetSendHeaders() != nil {
-		var len_ uint32 = 0
-		var default_mimetype *byte = GetDefaultContentType(0, &len_)
-		if default_mimetype != nil && len_ != 0 {
-			var default_header SapiHeader
-			SG__().sapiHeaders.mimetype = default_mimetype
-			default_header.SetHeaderLen(b.SizeOf("\"Content-type: \"") - 1 + len_)
-			default_header.SetHeader(zend.Emalloc(default_header.GetHeaderLen() + 1))
-			memcpy(default_header.GetHeader(), "Content-type: ", b.SizeOf("\"Content-type: \"")-1)
-			memcpy(default_header.GetHeader()+b.SizeOf("\"Content-type: \"")-1, SG__().sapiHeaders.mimetype, len_+1)
-			SapiHeaderAddOp(SAPI_HEADER_ADD, &default_header)
-		} else {
-			zend.Efree(default_mimetype)
-		}
+		var defaultMimetype = GetDefaultContentType("")
+		var defaultHeader = NewSapiHeader("Content-type: " + defaultMimetype)
+		SG__().sapiHeaders.mimetype = defaultMimetype
+		SapiHeaderAddOp(SAPI_HEADER_ADD, defaultHeader)
 		SG__().sapiHeaders.sendDefaultContentType = 0
 	}
 	if SG__().callbackFunc.IsNotUndef() {
@@ -602,10 +572,8 @@ func SapiSendHeaders() int {
 		var buf []byte
 		if SG__().sapiHeaders.httpStatusLine {
 			http_status_line.SetHeader(SG__().sapiHeaders.httpStatusLine)
-			http_status_line.SetHeaderLen(uint32(strlen(SG__().sapiHeaders.httpStatusLine)))
 		} else {
-			http_status_line.SetHeader(buf)
-			http_status_line.SetHeaderLen(Slprintf(buf, b.SizeOf("buf"), "HTTP/1.0 %d X", SG__().sapiHeaders.httpResponseCode))
+			http_status_line.SetHeader(fmt.Sprintf("HTTP/1.0 %d X", SG__().sapiHeaders.httpResponseCode)))
 		}
 		SM__().GetSendHeader()(&http_status_line, SG__().serverContext)
 		SG__().SapiHeaders().GetHeaders().Each(func(h *SapiHeader) {
@@ -613,10 +581,8 @@ func SapiSendHeaders() int {
 		})
 
 		if SG__().sapiHeaders.sendDefaultContentType {
-			var default_header SapiHeader
-			SapiGetDefaultContentTypeHeader(&default_header)
-			SM__().GetSendHeader()(&default_header, SG__().serverContext)
-			//SapiFreeHeader(&default_header)
+			defaultHeader := SapiGetDefaultContentTypeHeader()
+			SM__().GetSendHeader()(defaultHeader, SG__().serverContext)
 		}
 		SM__().GetSendHeader()(nil, SG__().serverContext)
 		ret = types.SUCCESS

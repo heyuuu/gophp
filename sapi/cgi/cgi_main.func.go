@@ -128,17 +128,17 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 	}
 	sapi_headers.GetHeaders().Each(func(h *core.SapiHeader) {
 		/* prevent CRLFCRLF */
-		if h.GetHeaderLen() != 0 {
+		if h.Len() != 0 {
 			if h.HasKey("Status") {
 				if !ignore_status {
 					ignore_status = true
-					core.PUTS_H(h.String())
+					core.PUTS_H(h.Header())
 					core.PUTS_H("\r\n")
 				}
 			} else if response_status == 304 && h.HasKey("Content-Type") {
 				// pass
 			} else {
-				core.PUTS_H(h.String())
+				core.PUTS_H(h.Header())
 				core.PUTS_H("\r\n")
 			}
 		}
@@ -965,7 +965,7 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 	}
 }
 func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
-	if h.GetHeaderLen() > 0 {
+	if h.Len() > 0 {
 		var s *byte
 		var len_ int = 0
 		var p *byte = strchr(h.GetHeader(), ':')
@@ -986,7 +986,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 						break
 					}
 				}
-				zend.AddAssocStringlEx(return_value, b.CastStr(s, len_), b.CastStr(p, h.GetHeaderLen()-(p-h.GetHeader())))
+				zend.AddAssocStringlEx(return_value, b.CastStr(s, len_), b.CastStr(p, h.Len()-(p-h.GetHeader())))
 				zend.FreeAlloca(s, use_heap)
 			}
 		}

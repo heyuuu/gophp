@@ -10,22 +10,22 @@ import (
  * SapiHeader
  */
 type SapiHeader struct {
-	s          string
-	header     *byte
-	header_len int
+	s string
 }
 
-func (this *SapiHeader) GetHeader() *byte       { return this.header }
-func (this *SapiHeader) SetHeader(value *byte)  { this.header = value }
-func (this *SapiHeader) GetHeaderLen() int      { return this.header_len }
-func (this *SapiHeader) SetHeaderLen(value int) { this.header_len = value }
-
-func (this *SapiHeader) String() string {
-	// todo
+func NewSapiHeader(s string) *SapiHeader {
+	return &SapiHeader{s: s}
 }
-func (this *SapiHeader) HasKey(key string) bool {
+
+func (h *SapiHeader) GetHeader() *byte { /** todo remove */ }
+
+func (h *SapiHeader) Len() int           { return len(h.s) }
+func (h *SapiHeader) Header() string     { return h.s }
+func (h *SapiHeader) SetHeader(s string) { h.s = s }
+
+func (h *SapiHeader) HasKey(key string) bool {
 	keyLen := len(key)
-	if len(this.s) > keyLen && this.s[keyLen] == ':' && ascii.StrCaseEquals(this.s[:keyLen], key) {
+	if len(h.s) > keyLen && h.s[keyLen] == ':' && ascii.StrCaseEquals(h.s[:keyLen], key) {
 		return true
 	}
 	return false
@@ -38,8 +38,8 @@ type SapiHeaders struct {
 	headers                zend.ZendLlist[*SapiHeader]
 	httpResponseCode       int
 	sendDefaultContentType uint8
-	mimetype               *byte
-	httpStatusLine         *byte
+	mimetype               string
+	httpStatusLine         string
 }
 
 func (sh *SapiHeaders) Init() {
@@ -134,8 +134,8 @@ type SapiGlobals struct {
 	postRead              uint8
 	headersSent           bool
 	globalStat            zend.ZendStatT
-	defaultMimetype       *byte
-	defaultCharset        *byte
+	defaultMimetype       string
+	defaultCharset        string
 	rfc1867UploadedFiles  map[string]bool
 	postMaxSize           zend.ZendLong
 	options               int
@@ -192,14 +192,10 @@ func (sg *SapiGlobals) DeleteUploadFile(path string) {
 }
 
 func (sg *SapiGlobals) SapiHeaders() *SapiHeaders { return &sg.sapiHeaders }
-
-/**
- * generate
- */
-func (sg *SapiGlobals) GetDefaultMimetype() *byte     { return sg.defaultMimetype }
-func (sg *SapiGlobals) GetDefaultCharset() *byte      { return sg.defaultCharset }
-func (sg *SapiGlobals) GetPostMaxSize() zend.ZendLong { return sg.postMaxSize }
-func (sg *SapiGlobals) GetKnownPostContentTypes() types.Array {
+func (sg *SapiGlobals) DefaultMimetype() string   { return sg.defaultMimetype }
+func (sg *SapiGlobals) DefaultCharset() string    { return sg.defaultCharset }
+func (sg *SapiGlobals) PostMaxSize() int          { return sg.postMaxSize }
+func (sg *SapiGlobals) KnownPostContentTypes() types.Array {
 	return sg.knownPostContentTypes
 }
 
