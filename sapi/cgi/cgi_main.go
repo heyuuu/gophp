@@ -160,7 +160,7 @@ func main(argc int, argv []*byte) int {
 
 		if !(getenv("REDIRECT_STATUS")) && !(getenv("HTTP_REDIRECT_STATUS")) && (!(CGIG(redirect_status_env)) || !(getenv(CGIG(redirect_status_env)))) {
 			faults.Try(func() {
-				core.SG__().sapi_headers.http_response_code = 400
+				core.SG__().SapiHeaders().SetHttpResponseCode(400)
 				core.PUTS("<b>Security Alert!</b> The PHP CGI cannot be accessed directly.\n\n\n<p>This PHP CGI binary was compiled with force-cgi-redirect enabled.  This\n\nmeans that a page will only be served up if the REDIRECT_STATUS CGI variable is\n\nset, e.g. via an Apache Action directive.</p>\n\n<p>For more information as to <i>why</i> this behaviour exists, see the <a href=\"http://php.net/security.cgi-bin\">\nmanual page for CGI security</a>.</p>\n\n<p>For more information about changing this behaviour or re-enabling this webserver,\n\nconsult the installation file that came with this distribution, or visit \n\n<a href=\"http://php.net/install.windows\">the manual page</a>.</p>\n")
 			})
 			return types.FAILURE
@@ -552,10 +552,10 @@ func main(argc int, argv []*byte) int {
 				if fileHandle == nil {
 					faults.Try(func() {
 						if errno == EACCES {
-							core.SG__().sapi_headers.http_response_code = 403
+							core.SG__().SapiHeaders().SetHttpResponseCode(403)
 							core.PUTS("Access denied.\n")
 						} else {
-							core.SG__().sapi_headers.http_response_code = 404
+							core.SG__().SapiHeaders().SetHttpResponseCode(404)
 							core.PUTS("No input file specified.\n")
 						}
 					})

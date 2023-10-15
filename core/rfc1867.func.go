@@ -3,6 +3,7 @@ package core
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -294,17 +295,15 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 	}
 	return 1
 }
-func PhpMimeGetHdrValue(header zend.ZendLlist, key string) *byte {
-	var entry *MimeHeaderEntry
-	if key == nil {
+func PhpMimeGetHdrValue(header zend.ZendLlist[*MimeHeaderEntry], key string) *byte {
+	if key == "" {
 		return nil
 	}
-	entry = zend.ZendLlistGetFirst(&header)
-	for entry != nil {
-		if !(strcasecmp(entry.GetKey(), key)) {
-			return entry.GetValue()
-		}
-		entry = zend.ZendLlistGetNext(&header)
+	entry, _ := header.FindFunc(func(e *MimeHeaderEntry) bool {
+		return ascii.StrCaseEquals(e.GetKey(), key)
+	})
+	if entry != nil {
+		return entry.GetValue()
 	}
 	return nil
 }

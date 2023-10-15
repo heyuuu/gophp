@@ -386,7 +386,9 @@ func ZifHeadersList(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	zend.ArrayInit(return_value)
-	core.SG__().sapi_headers.headers.ApplyWithArgument(PhpHeadApplyHeaderListToHash, return_value)
+	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
+		PhpHeadApplyHeaderListToHash(h, return_value)
+	})
 }
 func ZifHttpResponseCode(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, responseCode *types.Zval) {
 	var response_code zend.ZendLong = 0
@@ -404,8 +406,8 @@ func ZifHttpResponseCode(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, re
 	}
 	if response_code != 0 {
 		var old_response_code zend.ZendLong
-		old_response_code = core.SG__().sapi_headers.http_response_code
-		core.SG__().sapi_headers.http_response_code = int(response_code)
+		old_response_code = core.SG__().SapiHeaders().HttpResponseCode()
+		core.SG__().SapiHeaders().SetHttpResponseCode(response_code)
 		if old_response_code != 0 {
 			return_value.SetLong(old_response_code)
 			return
@@ -413,10 +415,10 @@ func ZifHttpResponseCode(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, re
 		return_value.SetTrue()
 		return
 	}
-	if !(core.SG__().sapi_headers.http_response_code) {
+	if !(core.SG__().SapiHeaders().HttpResponseCode()) {
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetLong(core.SG__().sapi_headers.http_response_code)
+	return_value.SetLong(core.SG__().SapiHeaders().HttpResponseCode())
 	return
 }

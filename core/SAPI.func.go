@@ -17,7 +17,6 @@ func SapiAddHeader(str string) int {
 	ctr := MakeSapiHeaderLineEx(str)
 	return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
 }
-func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader()) }
 
 //@alias -old
 func ZifHeaderRegisterCallback(callback *types.Zval) bool {
@@ -610,7 +609,10 @@ func SapiSendHeaders() int {
 			http_status_line.SetHeaderLen(Slprintf(buf, b.SizeOf("buf"), "HTTP/1.0 %d X", SG__().sapiHeaders.httpResponseCode))
 		}
 		SM__().GetSendHeader()(&http_status_line, SG__().serverContext)
-		SG__().sapiHeaders.headers.ApplyWithArgument(zend.LlistApplyWithArgFuncT(SM__().GetSendHeader()), SG__().serverContext)
+		SG__().SapiHeaders().GetHeaders().Each(func(h *SapiHeader) {
+			SM__().GetSendHeader()(h, SG__().serverContext)
+		})
+
 		if SG__().sapiHeaders.sendDefaultContentType {
 			var default_header SapiHeader
 			SapiGetDefaultContentTypeHeader(&default_header)

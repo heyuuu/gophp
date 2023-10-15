@@ -10,6 +10,7 @@ import (
  * SapiHeader
  */
 type SapiHeader struct {
+	s          string
 	header     *byte
 	header_len int
 }
@@ -18,6 +19,17 @@ func (this *SapiHeader) GetHeader() *byte       { return this.header }
 func (this *SapiHeader) SetHeader(value *byte)  { this.header = value }
 func (this *SapiHeader) GetHeaderLen() int      { return this.header_len }
 func (this *SapiHeader) SetHeaderLen(value int) { this.header_len = value }
+
+func (this *SapiHeader) String() string {
+	// todo
+}
+func (this *SapiHeader) HasKey(key string) bool {
+	keyLen := len(key)
+	if len(this.s) > keyLen && this.s[keyLen] == ':' && ascii.StrCaseEquals(this.s[:keyLen], key) {
+		return true
+	}
+	return false
+}
 
 /**
  * SapiHeaders
@@ -38,7 +50,10 @@ func (sh *SapiHeaders) Init() {
 	sh.mimetype = nil
 }
 
-func (sh *SapiHeaders) GetHeaders() zend.ZendLlist { return sh.headers }
+func (sh *SapiHeaders) GetHeaders() *zend.ZendLlist[*SapiHeader] { return &sh.headers }
+
+func (sh *SapiHeaders) HttpResponseCode() int        { return sh.httpResponseCode }
+func (sh *SapiHeaders) SetHttpResponseCode(code int) { sh.httpResponseCode = code }
 
 /**
  * SapiRequestInfo
@@ -175,6 +190,8 @@ func (sg *SapiGlobals) ExistUploadFile(path string) bool {
 func (sg *SapiGlobals) DeleteUploadFile(path string) {
 	delete(sg.rfc1867UploadedFiles, path)
 }
+
+func (sg *SapiGlobals) SapiHeaders() *SapiHeaders { return &sg.sapiHeaders }
 
 /**
  * generate

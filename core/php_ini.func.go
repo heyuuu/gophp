@@ -199,11 +199,11 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 		}
 	}
 }
-func PhpLoadPhpExtensionCb(arg any) {
-	standard.PhpLoadExtension(*((**byte)(arg)), zend.MODULE_PERSISTENT, 0)
+func PhpLoadPhpExtensionCb(arg *byte) {
+	standard.PhpLoadExtension(arg)
 }
-func PhpLoadZendExtensionCb(arg any) {
-	var filename *byte = *((**byte)(arg))
+func PhpLoadZendExtensionCb(arg *byte) {
+	var filename *byte = arg
 	var length int = strlen(filename)
 	void(length)
 	if zend.IS_ABSOLUTE_PATH(filename, length) {
@@ -420,7 +420,6 @@ func PhpInitConfig() int {
 		var ini_file []byte
 		var p *byte
 		var scanned_ini_list zend.ZendLlist[*byte]
-		var element *zend.ZendLlistElement
 		var l int
 		var total_l int = 0
 		var bufpath *byte
@@ -493,13 +492,13 @@ func PhpInitConfig() int {
 				*PhpIniScannedFiles = '0'
 			}
 			total_l += php_ini_scanned_files_len
-			for element = scanned_ini_list.GetHead(); element != nil; element = element.Next() {
+			scanned_ini_list.EachElement(func(elem zend.ZendLlistElement[*byte]) {
 				if php_ini_scanned_files_len != 0 {
 					strlcat(PhpIniScannedFiles, ",\n", total_l)
 				}
-				strlcat(PhpIniScannedFiles, *((**byte)(element.Data())), total_l)
-				strlcat(PhpIniScannedFiles, lang.Cond(element.Next() != nil, ",\n", "\n"), total_l)
-			}
+				strlcat(PhpIniScannedFiles, elem.Data(), total_l)
+				strlcat(PhpIniScannedFiles, lang.Cond(elem.Next() != nil, ",\n", "\n"), total_l)
+			})
 		}
 		scanned_ini_list.Clean()
 	} else {
@@ -533,8 +532,8 @@ func PhpShutdownConfig() int {
 	return types.SUCCESS
 }
 func PhpIniRegisterExtensions() {
-	ExtensionLists.GetEngine().Apply(PhpLoadZendExtensionCb)
-	ExtensionLists.GetFunctions().Apply(PhpLoadPhpExtensionCb)
+	ExtensionLists.GetEngine().Each(PhpLoadZendExtensionCb)
+	ExtensionLists.GetFunctions().Each(PhpLoadPhpExtensionCb)
 	ExtensionLists.GetEngine().Clean()
 	ExtensionLists.GetFunctions().Clean()
 }

@@ -82,21 +82,19 @@ func SapiFcgiFlush(server_context any) {
 	}
 }
 func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
-	var h *core.SapiHeader
-	var pos zend.ZendLlistPosition
-	var ignore_status bool = 0
-	var response_status int = core.SG__().sapi_headers.http_response_code
+	var ignore_status bool = false
+	var response_status int = core.SG__().SapiHeaders().HttpResponseCode()
 	if core.SG__().RequestInfo.no_headers == 1 {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
-	if CGIG(nph) || core.SG__().sapi_headers.http_response_code != 200 {
+	if CGIG(nph) || core.SG__().SapiHeaders().HttpResponseCode() != 200 {
 		var len_ int
-		var has_status bool = 0
+		var has_status bool = false
 		var buf []byte
-		if CGIG(rfc2616_headers) && core.SG__().sapi_headers.http_status_line {
+		if CGIG(rfc2616_headers) && core.SG__().SapiHeaders().http_status_line {
 			var s *byte
-			len_ = core.Slprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH, "%s", core.SG__().sapi_headers.http_status_line)
-			if lang.Assign(&s, strchr(core.SG__().sapi_headers.http_status_line, ' ')) {
+			len_ = core.Slprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH, "%s", core.SG__().SapiHeaders().http_status_line)
+			if lang.Assign(&s, strchr(core.SG__().SapiHeaders().http_status_line, ' ')) {
 				response_status = atoi(s + 1)
 			}
 			if len_ > SAPI_CGI_MAX_HEADER_LENGTH {
@@ -104,20 +102,16 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 			}
 		} else {
 			var s *byte
-			if core.SG__().sapi_headers.http_status_line && lang.Assign(&s, strchr(core.SG__().sapi_headers.http_status_line, ' ')) != 0 && s-core.SG__().sapi_headers.http_status_line >= 5 && strncasecmp(core.SG__().sapi_headers.http_status_line, "HTTP/", 5) == 0 {
+			if core.SG__().SapiHeaders().http_status_line && lang.Assign(&s, strchr(core.SG__().SapiHeaders().http_status_line, ' ')) != 0 && s-core.SG__().SapiHeaders().http_status_line >= 5 && strncasecmp(core.SG__().SapiHeaders().http_status_line, "HTTP/", 5) == 0 {
 				len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status:%s", s)
 				response_status = atoi(s + 1)
 			} else {
-				h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(sapi_headers.GetHeaders(), &pos))
-				for h != nil {
-					if h.GetHeaderLen() > b.SizeOf("\"Status:\"")-1 && strncasecmp(h.GetHeader(), "Status:", b.SizeOf("\"Status:\"")-1) == 0 {
-						has_status = 1
-						break
-					}
-					h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
-				}
-				if has_status == 0 {
-					code := core.SG__().sapi_headers.http_response_code
+				_, has_status = sapi_headers.GetHeaders().FindFunc(func(h *core.SapiHeader) bool {
+					return h.HasKey("Status")
+				})
+
+				if !has_status {
+					code := core.SG__().SapiHeaders().HttpResponseCode()
 					if codeStr, ok := core.HttpStatusMap[code]; ok {
 						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d %s", code, codeStr)
 					} else {
@@ -126,34 +120,29 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 				}
 			}
 		}
-		if has_status == 0 {
+		if !has_status {
 			core.PUTS_H(b.CastStr(buf, len_))
 			core.PUTS_H("\r\n")
 			ignore_status = 1
 		}
 	}
-	h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(sapi_headers.GetHeaders(), &pos))
-	for h != nil {
-
+	sapi_headers.GetHeaders().Each(func(h *core.SapiHeader) {
 		/* prevent CRLFCRLF */
-
 		if h.GetHeaderLen() != 0 {
-			if h.GetHeaderLen() > b.SizeOf("\"Status:\"")-1 && strncasecmp(h.GetHeader(), "Status:", b.SizeOf("\"Status:\"")-1) == 0 {
-				if ignore_status == 0 {
-					ignore_status = 1
-					core.PUTS_H(b.CastStr(h.GetHeader(), h.GetHeaderLen()))
+			if h.HasKey("Status") {
+				if !ignore_status {
+					ignore_status = true
+					core.PUTS_H(h.String())
 					core.PUTS_H("\r\n")
 				}
-			} else if response_status == 304 && h.GetHeaderLen() > b.SizeOf("\"Content-Type:\"")-1 && strncasecmp(h.GetHeader(), "Content-Type:", b.SizeOf("\"Content-Type:\"")-1) == 0 {
-				h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
-				continue
+			} else if response_status == 304 && h.HasKey("Content-Type") {
+				// pass
 			} else {
-				core.PUTS_H(b.CastStr(h.GetHeader(), h.GetHeaderLen()))
+				core.PUTS_H(h.String())
 				core.PUTS_H("\r\n")
 			}
 		}
-		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
-	}
+	})
 	core.PUTS_H("\r\n")
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
 }
@@ -576,7 +565,7 @@ func InitRequestInfo(request *core.FcgiRequest) {
 	core.SG__().RequestInfo.request_uri = nil
 	core.SG__().RequestInfo.content_type = nil
 	core.SG__().RequestInfo.content_length = 0
-	core.SG__().sapi_headers.http_response_code = 200
+	core.SG__().SapiHeaders().SetHttpResponseCode(200)
 
 	/* script_path_translated being set is a good indication that
 	 * we are running in a cgi environment, since it is always
@@ -745,7 +734,7 @@ func InitRequestInfo(request *core.FcgiRequest) {
 						CGI_PUTENV("ORIG_SCRIPT_FILENAME", orig_script_filename)
 					}
 					script_path_translated = CGI_PUTENV("SCRIPT_FILENAME", nil)
-					core.SG__().sapi_headers.http_response_code = 404
+					core.SG__().SapiHeaders().SetHttpResponseCode(404)
 				}
 				if !(core.SG__().RequestInfo.request_uri) {
 					if orig_script_name == nil || strcmp(orig_script_name, env_script_name) != 0 {
@@ -1003,10 +992,9 @@ func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 		}
 	}
 }
-func ZifApacheResponseHeaders(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
+func ZifApacheResponseHeaders(return_value zpp.Ret) {
 	zend.ArrayInit(return_value)
-	zend.ZendLlistApplyWithArgument(core.SG__().sapi_headers.headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
+	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
+		AddResponseHeader(h, return_value)
+	})
 }

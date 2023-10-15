@@ -138,12 +138,11 @@ func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 		}
 	}
 }
-func ZifApacheResponseHeaders(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
+func ZifApacheResponseHeaders(return_value zpp.Ret) {
 	zend.ArrayInit(return_value)
-	zend.ZendLlistApplyWithArgument(core.SG__().sapi_headers.headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
+	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
+		AddResponseHeader(h, return_value)
+	})
 }
 func ZmStartupCliServer(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)
@@ -159,27 +158,24 @@ func SapiCliServerDiscardHeaders(sapi_headers *core.SapiHeaders) int {
 }
 func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 	var client *PhpCliServerClient = core.SG__().server_context
-	var buffer zend.SmartStr = zend.MakeSmartStr(0)
-	var h *core.SapiHeader
-	var pos zend.ZendLlistPosition
+	var buffer zend.SmartStr
 	if client == nil || core.SG__().RequestInfo.no_headers {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
-	if core.SG__().sapi_headers.http_status_line {
-		buffer.WriteString(b.CastStrAuto(core.SG__().sapi_headers.http_status_line))
+	if core.SG__().SapiHeaders().http_status_line {
+		buffer.WriteString(b.CastStrAuto(core.SG__().SapiHeaders().http_status_line))
 		buffer.WriteString("\r\n")
 	} else {
-		AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), core.SG__().sapi_headers.http_response_code, 0)
+		AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), core.SG__().SapiHeaders().HttpResponseCode(), 0)
 	}
 	AppendEssentialHeaders(&buffer, client, 0)
-	h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(sapi_headers.GetHeaders(), &pos))
-	for h != nil {
+	sapi_headers.GetHeaders().Each(func(h *core.SapiHeader) {
 		if h.GetHeaderLen() != 0 {
 			buffer.WriteString(b.CastStr(h.GetHeader(), h.GetHeaderLen()))
 			buffer.WriteString("\r\n")
 		}
-		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
-	}
+	})
+
 	buffer.WriteString("\r\n")
 	PhpCliServerClientSendThrough(client, buffer.GetS().GetVal(), buffer.GetS().GetLen())
 	buffer.Free()
@@ -880,7 +876,7 @@ func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient
 	faults.Try(func() {
 		core.PhpExecuteScript(zfd)
 	})
-	PhpCliServerLogResponse(client, core.SG__().sapi_headers.http_response_code, nil)
+	PhpCliServerLogResponse(client, core.SG__().SapiHeaders().HttpResponseCode(), nil)
 	return types.SUCCESS
 }
 func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClient) int {
@@ -947,7 +943,7 @@ func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient
 	if nil != lang.Assign(&auth, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization")) {
 		core.PhpHandleAuthData(auth)
 	}
-	core.SG__().sapi_headers.http_response_code = 200
+	core.SG__().SapiHeaders().SetHttpResponseCode(200)
 	if types.FAILURE == core.PhpRequestStartup() {
 
 		/* should never be happen */
@@ -1014,8 +1010,8 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 	}
 	if is_static_file == 0 {
 		if types.SUCCESS == PhpCliServerDispatchScript(server, client) || types.SUCCESS != PhpCliServerSendErrorPage(server, client, 500) {
-			if core.SG__().sapi_headers.http_response_code == 304 {
-				core.SG__().sapi_headers.send_default_content_type = 0
+			if core.SG__().SapiHeaders().HttpResponseCode() == 304 {
+				core.SG__().SapiHeaders().send_default_content_type = 0
 			}
 			PhpCliServerRequestShutdown(server, client)
 			return types.SUCCESS
@@ -1027,14 +1023,14 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 
 			/* do not generate default content type header */
 
-			core.SG__().sapi_headers.send_default_content_type = 0
+			core.SG__().SapiHeaders().send_default_content_type = 0
 
 			/* we don't want headers to be sent */
 
 			core.SM__().SetSendHeaders(SapiCliServerDiscardHeaders)
 			core.PhpRequestShutdown()
 			core.SM__().SetSendHeaders(send_header_func)
-			core.SG__().sapi_headers.send_default_content_type = 1
+			core.SG__().SapiHeaders().send_default_content_type = 1
 			core.SG__().ResetUploadFiles()
 		}
 		if types.SUCCESS != PhpCliServerBeginSendStatic(server, client) {
