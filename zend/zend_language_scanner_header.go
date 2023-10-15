@@ -153,30 +153,17 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 
 	return opArray
 }
-func CompileFilename(type_ int, filename *types.Zval) int {
-	var tmp types.Zval
-	var retval int
-	var opened_path *types.String = nil
-	if filename.IsString() {
-		tmp.SetString(operators.ZvalGetStrVal(filename))
-		filename = &tmp
-	}
-	fh := NewFileHandleByFilename(filename.String())
+func CompileFilename(type_ int, filename string) *types.ZendOpArray {
+	fh := NewFileHandleByFilename(filename)
 	opArray := CompileFile(fh, type_)
 	if opArray != nil && fh.GetStream().GetHandle() != nil {
 		if fh.GetOpenedPath() == "" {
-			fh.SetOpenedPath(filename.String())
+			fh.SetOpenedPath(filename)
 		}
-		zend_hash_add_empty_element(EG__().includedFiles, file_handle.opened_path)
-		if opened_path != nil {
-			zend_string_release_ex(opened_path, 0)
-		}
+		EG__().AddIncludedFile(fh.GetOpenedPath())
 	}
 	ZendDestroyFileHandle(fh)
-	if filename == &tmp {
-		zval_ptr_dtor(&tmp)
-	}
-	return retval
+	return opArray
 }
 func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */

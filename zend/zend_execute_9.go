@@ -66,7 +66,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.StringEx().GetVal())
 			break
 		}
-		new_op_array = CompileFilename(type_, inc_filename)
+		new_op_array = CompileFilename(type_, inc_filename.String())
 	case ZEND_EVAL:
 		var eval_desc *byte = ZendMakeCompiledStringDescription("eval()'d code")
 		new_op_array = CompileString(inc_filename, eval_desc)

@@ -94,7 +94,7 @@ func (eg *ZendExecutorGlobals) Shutdown() {
 func (eg *ZendExecutorGlobals) Activate() {
 	eg.errorZval.SetIsError()
 	eg.symbolTable = types.NewArrayCap(64)
-	eg.includedFiles = types.NewArrayCap(8)
+	eg.includedFiles = nil
 
 	eg.functionTable = CG__().FunctionTable()
 	eg.classTable = CG__().ClassTable()
