@@ -832,7 +832,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	case faults.E_USER_ERROR:
 		zend.EG__().SetExitStatus(255)
 		if ModuleInitialized != 0 {
-			if !PG__().display_errors && !SG__().headersSent && SG__().sapiHeaders.httpResponseCode == 200 {
+			if !PG__().display_errors && !SG__().headersSent && SG__().SapiHeaders().httpResponseCode == 200 {
 				var ctr = MakeSapiHeaderLine(0)
 				ctr.SetLine("HTTP/1.0 500 Internal Server Error")
 				ctr.SetLineLen(b.SizeOf("\"HTTP/1.0 500 Internal Server Error\"") - 1)

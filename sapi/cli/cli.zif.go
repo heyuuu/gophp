@@ -26,5 +26,6 @@ var DefZifApacheResponseHeaders = def.DefFunc("apache_response_headers", 0, 0, [
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifApacheResponseHeaders(returnValue)
+	ret := ZifApacheResponseHeaders()
+	returnValue.SetArray(ret)
 })

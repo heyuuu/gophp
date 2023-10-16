@@ -1929,7 +1929,8 @@ var DefZifHeadersList = def.DefFunc("headers_list", 0, 0, []def.ArgInfo{}, func(
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifHeadersList(executeData, returnValue)
+	ret := ZifHeadersList()
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifHttpResponseCode

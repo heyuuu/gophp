@@ -375,20 +375,12 @@ func ZifHeadersSent(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, file_ z
 		return
 	}
 }
-func PhpHeadApplyHeaderListToHash(data any, arg any) {
-	var sapi_header *core.SapiHeader = (*core.SapiHeader)(data)
-	if arg && sapi_header != nil {
-		zend.AddNextIndexString((*types.Zval)(arg), (*byte)(sapi_header.GetHeader()))
-	}
-}
-func ZifHeadersList(executeData zpp.Ex, return_value zpp.Ret) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	zend.ArrayInit(return_value)
+func ZifHeadersList() *types.Array {
+	arr := types.NewArray()
 	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
-		PhpHeadApplyHeaderListToHash(h, return_value)
+		arr.Append(types.NewZvalString(h.Header()))
 	})
+	return arr
 }
 func ZifHttpResponseCode(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, responseCode *types.Zval) {
 	var response_code zend.ZendLong = 0

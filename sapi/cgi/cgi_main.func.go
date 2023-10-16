@@ -12,6 +12,7 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 	"log"
 	"os"
+	"strings"
 )
 
 func CGIG(v __auto__) __auto__ { return php_cgi_globals.v }
@@ -964,37 +965,16 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 		}
 	}
 }
-func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
-	if h.Len() > 0 {
-		var s *byte
-		var len_ int = 0
-		var p *byte = strchr(h.GetHeader(), ':')
-		if nil != p {
-			len_ = p - h.GetHeader()
-		}
-		if len_ > 0 {
-			for len_ != 0 && (h.GetHeader()[len_-1] == ' ' || h.GetHeader()[len_-1] == '\t') {
-				len_--
-			}
-			if len_ != 0 {
-				s = zend.DoAlloca(len_+1, use_heap)
-				memcpy(s, h.GetHeader(), len_)
-				s[len_] = 0
-				for {
-					p++
-					if !((*p) == ' ' || (*p) == '\t') {
-						break
-					}
-				}
-				zend.AddAssocStringlEx(return_value, b.CastStr(s, len_), b.CastStr(p, h.Len()-(p-h.GetHeader())))
-				zend.FreeAlloca(s, use_heap)
-			}
-		}
-	}
-}
-func ZifApacheResponseHeaders(return_value zpp.Ret) {
-	zend.ArrayInit(return_value)
+func ZifApacheResponseHeaders() *types.Array {
+	arr := types.NewArray()
 	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
-		AddResponseHeader(h, return_value)
+		if key, val, ok := strings.Cut(h.Header(), ":"); ok {
+			key = strings.TrimRight(key, " \t")
+			if len(key) > 0 {
+				val = strings.TrimLeft(val, " \t")
+				arr.SymtableUpdate(key, types.NewZvalString(val))
+			}
+		}
 	})
+	return arr
 }

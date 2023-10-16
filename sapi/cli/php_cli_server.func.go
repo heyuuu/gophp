@@ -111,38 +111,18 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 		return_value.Array().SymtableUpdate(key.GetStr(), &tmp)
 	}
 }
-func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
-	var s *byte
-	var p *byte
-	var len_ ptrdiff_t
-	if h.Len() > 0 {
-		p = strchr(h.GetHeader(), ':')
-		len_ = p - h.GetHeader()
-		if p != nil && len_ > 0 {
-			for len_ > 0 && (h.GetHeader()[len_-1] == ' ' || h.GetHeader()[len_-1] == '\t') {
-				len_--
-			}
-			if len_ {
-				s = zend.DoAlloca(len_+1, use_heap)
-				memcpy(s, h.GetHeader(), len_)
-				s[len_] = 0
-				for {
-					p++
-					if !((*p) == ' ' || (*p) == '\t') {
-						break
-					}
-				}
-				zend.AddAssocStringlEx(return_value, b.CastStr(s, uint32(len_)), b.CastStr(p, h.Len()-(p-h.GetHeader())))
-				zend.FreeAlloca(s, use_heap)
+func ZifApacheResponseHeaders() *types.Array {
+	arr := types.NewArray()
+	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
+		if key, val, ok := strings.Cut(h.Header(), ":"); ok {
+			key = strings.TrimRight(key, " \t")
+			if len(key) > 0 {
+				val = strings.TrimLeft(val, " \t")
+				arr.SymtableUpdate(key, types.NewZvalString(val))
 			}
 		}
-	}
-}
-func ZifApacheResponseHeaders(return_value zpp.Ret) {
-	zend.ArrayInit(return_value)
-	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
-		AddResponseHeader(h, return_value)
 	})
+	return arr
 }
 func ZmStartupCliServer(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)
@@ -171,7 +151,7 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 	AppendEssentialHeaders(&buffer, client, 0)
 	sapi_headers.GetHeaders().Each(func(h *core.SapiHeader) {
 		if h.Len() != 0 {
-			buffer.WriteString(b.CastStr(h.GetHeader(), h.Len()))
+			buffer.WriteString(h.Header())
 			buffer.WriteString("\r\n")
 		}
 	})

@@ -4,6 +4,7 @@ import (
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
+	"strings"
 )
 
 /**
@@ -22,13 +23,14 @@ func (h *SapiHeader) GetHeader() *byte { /** todo remove */ }
 func (h *SapiHeader) Len() int           { return len(h.s) }
 func (h *SapiHeader) Header() string     { return h.s }
 func (h *SapiHeader) SetHeader(s string) { h.s = s }
+func (h *SapiHeader) GetKey() (string, bool) {
+	key, _, ok := strings.Cut(h.s, ":")
+	return key, ok
+}
 
-func (h *SapiHeader) HasKey(key string) bool {
-	keyLen := len(key)
-	if len(h.s) > keyLen && h.s[keyLen] == ':' && ascii.StrCaseEquals(h.s[:keyLen], key) {
-		return true
-	}
-	return false
+func (h *SapiHeader) HasKey(findKey string) bool {
+	key, ok := h.GetKey()
+	return ok && ascii.StrCaseEquals(key, findKey)
 }
 
 /**
@@ -37,23 +39,33 @@ func (h *SapiHeader) HasKey(key string) bool {
 type SapiHeaders struct {
 	headers                zend.ZendLlist[*SapiHeader]
 	httpResponseCode       int
-	sendDefaultContentType uint8
+	sendDefaultContentType bool
 	mimetype               string
 	httpStatusLine         string
 }
 
 func (sh *SapiHeaders) Init() {
 	sh.headers.Init()
-	sh.sendDefaultContentType = 1
-	//sh.httpResponseCode = 200
-	sh.httpStatusLine = nil
-	sh.mimetype = nil
+	sh.sendDefaultContentType = true
+	sh.httpStatusLine = ""
+	sh.mimetype = ""
 }
 
 func (sh *SapiHeaders) GetHeaders() *zend.ZendLlist[*SapiHeader] { return &sh.headers }
 
-func (sh *SapiHeaders) HttpResponseCode() int        { return sh.httpResponseCode }
-func (sh *SapiHeaders) SetHttpResponseCode(code int) { sh.httpResponseCode = code }
+func (sh *SapiHeaders) HttpResponseCode() int            { return sh.httpResponseCode }
+func (sh *SapiHeaders) SetHttpResponseCode(code int)     { sh.httpResponseCode = code }
+func (sh *SapiHeaders) SendDefaultContentType() bool     { return sh.sendDefaultContentType }
+func (sh *SapiHeaders) SetSendDefaultContentType(b bool) { sh.sendDefaultContentType = b }
+func (sh *SapiHeaders) HttpStatusLine() string           { return sh.httpStatusLine }
+func (sh *SapiHeaders) SetHttpStatusLine(line string)    { sh.httpStatusLine = line }
+
+func (sh *SapiHeaders) AddHeader(header *SapiHeader) {
+	sh.headers.AddLast(header)
+}
+func (sh *SapiHeaders) RemoveHeaderByKey(key string) {
+	sh.headers.Filter(func(h *SapiHeader) bool { return h.HasKey(key) })
+}
 
 /**
  * SapiRequestInfo

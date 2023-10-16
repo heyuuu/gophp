@@ -253,13 +253,13 @@ func SapiActivate() {
 	SM__().InputFilterInit()
 }
 func SapiSendHeadersFree() {
-	if SG__().sapiHeaders.httpStatusLine {
-		zend.Efree(SG__().sapiHeaders.httpStatusLine)
-		SG__().sapiHeaders.httpStatusLine = nil
+	if SG__().SapiHeaders().httpStatusLine {
+		zend.Efree(SG__().SapiHeaders().httpStatusLine)
+		SG__().SapiHeaders().httpStatusLine = nil
 	}
 }
 func SapiDeactivate() {
-	SG__().sapiHeaders.headers.Clean()
+	SG__().SapiHeaders().headers.Clean()
 	if SG__().RequestInfo.requestBody {
 		SG__().RequestInfo.requestBody = nil
 	} else if SG__().serverContext {
@@ -293,9 +293,9 @@ func SapiDeactivate() {
 	if SG__().rfc1867UploadedFiles != nil {
 		DestroyUploadedFilesHash()
 	}
-	if SG__().sapiHeaders.mimetype {
-		zend.Efree(SG__().sapiHeaders.mimetype)
-		SG__().sapiHeaders.mimetype = nil
+	if SG__().SapiHeaders().mimetype {
+		zend.Efree(SG__().SapiHeaders().mimetype)
+		SG__().SapiHeaders().mimetype = nil
 	}
 	SapiSendHeadersFree()
 	SG__().sapiStarted = 0
@@ -325,33 +325,21 @@ func SapiUpdateResponseCode(ncode int) {
 	if SG__().SapiHeaders().HttpResponseCode() == ncode {
 		return
 	}
-	if SG__().sapiHeaders.httpStatusLine {
-		zend.Efree(SG__().sapiHeaders.httpStatusLine)
-		SG__().sapiHeaders.httpStatusLine = nil
+	if SG__().SapiHeaders().httpStatusLine {
+		zend.Efree(SG__().SapiHeaders().httpStatusLine)
+		SG__().SapiHeaders().httpStatusLine = nil
 	}
-	SG__().sapiHeaders.httpResponseCode = ncode
-}
-func SapiRemoveHeader(l *zend.ZendLlist[*SapiHeader], name *byte, len_ int) {
-	l.Filter(func(header *SapiHeader) bool {
-		if header.Len() > len_ && header.GetHeader()[len_] == ':' && !(strncasecmp(header.GetHeader(), name, len_)) {
-			return false
-		}
-		return true
-	})
+	SG__().SapiHeaders().httpResponseCode = ncode
 }
 func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
-	result := SM__().HeaderHandler(sapi_header, op, &(SG__().sapiHeaders))
+	result := SM__().HeaderHandler(sapi_header, op, &(SG__().SapiHeaders()))
 	if (SAPI_HEADER_ADD & result) != 0 {
 		if op == SAPI_HEADER_REPLACE {
-			var colon_offset *byte = strchr(sapi_header.GetHeader(), ':')
-			if colon_offset != nil {
-				var sav byte = *colon_offset
-				*colon_offset = 0
-				SapiRemoveHeader(&SG__().sapiHeaders.headers, sapi_header.GetHeader(), strlen(sapi_header.GetHeader()))
-				*colon_offset = sav
+			if key, ok := sapi_header.GetKey(); ok {
+				SG__().SapiHeaders().RemoveHeaderByKey(key)
 			}
 		}
-		SG__().sapiHeaders.headers.AddLast(any(sapi_header))
+		SG__().SapiHeaders().AddHeader(sapi_header)
 	} else {
 		//SapiFreeHeader(sapi_header)
 	}
@@ -363,10 +351,10 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 	var header_line_len int
 	var http_response_code int
 	if SG__().headersSent && !(SG__().RequestInfo.noHeaders) {
-		var output_start_filename = OG__().StartFilename()
-		var output_start_lineno = OG__().StartLineno()
-		if output_start_filename != "" {
-			SM__().SapiError(faults.E_WARNING, "Cannot modify header information - headers already sent by (output started at %s:%d)", output_start_filename, output_start_lineno)
+		var outputStartFilename = OG__().StartFilename()
+		var outputStartLineno = OG__().StartLineno()
+		if outputStartFilename != "" {
+			SM__().SapiError(faults.E_WARNING, "Cannot modify header information - headers already sent by (output started at %s:%d)", outputStartFilename, outputStartLineno)
 		} else {
 			SM__().SapiError(faults.E_WARNING, "Cannot modify header information - headers already sent")
 		}
@@ -389,74 +377,51 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		header_line_len = p.GetLineLen()
 		http_response_code = p.GetResponseCode()
 	case SAPI_HEADER_DELETE_ALL:
-		SM__().HeaderHandler(&sapi_header, op, &(SG__().sapiHeaders))
-		SG__().sapiHeaders.headers.Clean()
+		SM__().HeaderHandler(&sapi_header, op, &(SG__().SapiHeaders()))
+		SG__().SapiHeaders().headers.Clean()
 		return types.SUCCESS
 	default:
 		return types.FAILURE
 	}
 	header_line = zend.Estrndup(header_line, header_line_len)
+	headerLine := b.CastStrAuto(header_line)
 
 	/* cut off trailing spaces, linefeeds and carriage-returns */
-
-	if header_line_len != 0 && isspace(header_line[header_line_len-1]) {
-		for {
-			header_line_len--
-			if !(header_line_len != 0 && isspace(header_line[header_line_len-1])) {
-				break
-			}
-		}
-		header_line[header_line_len] = '0'
-	}
+	headerLine = strings.TrimRightFunc(headerLine, ascii.IsSpaceRune)
 	if op == SAPI_HEADER_DELETE {
-		if strchr(header_line, ':') {
-			zend.Efree(header_line)
+		if strings.ContainsRune(headerLine, ':') {
 			SM__().SapiError(faults.E_WARNING, "Header to delete may not contain colon.")
 			return types.FAILURE
 		}
 
-		sapi_header.SetHeader(b.CastStr(header_line, header_line_len))
-		SM__().HeaderHandler(&sapi_header, op, &(SG__().sapiHeaders))
-		SapiRemoveHeader(&SG__().sapiHeaders.headers, header_line, header_line_len)
-		zend.Efree(header_line)
+		sapi_header.SetHeader(headerLine)
+		SM__().HeaderHandler(&sapi_header, op, SG__().SapiHeaders())
+		SG__().SapiHeaders().RemoveHeaderByKey(headerLine)
 		return types.SUCCESS
 	} else {
-
 		/* new line/NUL character safety check */
-
-		var i uint32
-		for i = 0; i < header_line_len; i++ {
-
+		for _, c := range []byte(headerLine) {
 			/* RFC 7230 ch. 3.2.4 deprecates folding support */
-
-			if header_line[i] == '\n' || header_line[i] == '\r' {
+			if c == '\n' || c == '\r' {
 				zend.Efree(header_line)
-				SM__().SapiError(faults.E_WARNING, "Header may not contain "+"more than a single header, new line detected")
+				SM__().SapiError(faults.E_WARNING, "Header may not contain more than a single header, new line detected")
 				return types.FAILURE
 			}
-			if header_line[i] == '0' {
+			if c == 0 {
 				zend.Efree(header_line)
 				SM__().SapiError(faults.E_WARNING, "Header may not contain NUL bytes")
 				return types.FAILURE
 			}
 		}
 	}
-	sapi_header.SetHeader(b.CastStr(header_line, header_line_len))
+	sapi_header.SetHeader(headerLine)
 
 	/* Check the header for a few cases that we have special support for in SAPI */
-
-	if header_line_len >= 5 && !(strncasecmp(header_line, "HTTP/", 5)) {
-
+	if len(headerLine) >= 5 && ascii.StrCaseEquals(headerLine[:5], "HTTP/") {
 		/* filter out the response code */
-
 		SapiUpdateResponseCode(SapiExtractResponseCode(header_line))
 
-		/* sapi_update_response_code doesn't free the status line if the code didn't change */
-
-		if SG__().sapiHeaders.httpStatusLine {
-			zend.Efree(SG__().sapiHeaders.httpStatusLine)
-		}
-		SG__().sapiHeaders.httpStatusLine = header_line
+		SG__().SapiHeaders().SetHttpStatusLine(headerLine)
 		return types.SUCCESS
 	} else {
 		colon_offset = strchr(header_line, ':')
@@ -482,8 +447,8 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 				}
 				mimetype = zend.Estrdup(ptr)
 				newlen = SapiApplyDefaultCharset(&mimetype, len_)
-				if !(SG__().sapiHeaders.mimetype) {
-					SG__().sapiHeaders.mimetype = zend.Estrdup(mimetype)
+				if !(SG__().SapiHeaders().mimetype) {
+					SG__().SapiHeaders().mimetype = zend.Estrdup(mimetype)
 				}
 				if newlen != 0 {
 					newlen += b.SizeOf("\"Content-type: \"")
@@ -494,7 +459,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 					zend.Efree(header_line)
 				}
 				zend.Efree(mimetype)
-				SG__().sapiHeaders.sendDefaultContentType = 0
+				SG__().SapiHeaders().SetSendDefaultContentType(false)
 			} else if !(strcasecmp(header_line, "Content-Length")) {
 
 				/* Script is setting Content-length. The script cannot reasonably
@@ -507,7 +472,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 				zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 				// types.ZendStringReleaseEx(key, 0)
 			} else if ascii.StrCaseEquals(header_line, "Location") {
-				if (SG__().sapiHeaders.httpResponseCode < 300 || SG__().sapiHeaders.httpResponseCode > 399) && SG__().sapiHeaders.httpResponseCode != 201 {
+				if (SG__().SapiHeaders().httpResponseCode < 300 || SG__().SapiHeaders().httpResponseCode > 399) && SG__().SapiHeaders().httpResponseCode != 201 {
 
 					/* Return a Found Redirect if one is not already specified */
 
@@ -544,12 +509,12 @@ func SapiSendHeaders() int {
 	 * in case of an error situation.
 	 */
 
-	if SG__().sapiHeaders.sendDefaultContentType && SM__().GetSendHeaders() != nil {
+	if SG__().SapiHeaders().SendDefaultContentType() && SM__().GetSendHeaders() != nil {
 		var defaultMimetype = GetDefaultContentType("")
 		var defaultHeader = NewSapiHeader("Content-type: " + defaultMimetype)
-		SG__().sapiHeaders.mimetype = defaultMimetype
+		SG__().SapiHeaders().mimetype = defaultMimetype
 		SapiHeaderAddOp(SAPI_HEADER_ADD, defaultHeader)
-		SG__().sapiHeaders.sendDefaultContentType = 0
+		SG__().SapiHeaders().SetSendDefaultContentType(false)
 	}
 	if SG__().callbackFunc.IsNotUndef() {
 		var cb types.Zval
@@ -560,7 +525,7 @@ func SapiSendHeaders() int {
 	}
 	SG__().headersSent = true
 	if SM__().GetSendHeaders() != nil {
-		retval = SM__().GetSendHeaders()(&(SG__().sapiHeaders))
+		retval = SM__().GetSendHeaders()(&(SG__().SapiHeaders()))
 	} else {
 		retval = SAPI_HEADER_DO_SEND
 	}
@@ -569,18 +534,17 @@ func SapiSendHeaders() int {
 		ret = types.SUCCESS
 	case SAPI_HEADER_DO_SEND:
 		var http_status_line SapiHeader
-		var buf []byte
-		if SG__().sapiHeaders.httpStatusLine {
-			http_status_line.SetHeader(SG__().sapiHeaders.httpStatusLine)
+		if SG__().SapiHeaders().HttpStatusLine() != "" {
+			http_status_line.SetHeader(SG__().SapiHeaders().httpStatusLine)
 		} else {
-			http_status_line.SetHeader(fmt.Sprintf("HTTP/1.0 %d X", SG__().sapiHeaders.httpResponseCode)))
+			http_status_line.SetHeader(fmt.Sprintf("HTTP/1.0 %d X", SG__().SapiHeaders().HttpResponseCode()))
 		}
 		SM__().GetSendHeader()(&http_status_line, SG__().serverContext)
 		SG__().SapiHeaders().GetHeaders().Each(func(h *SapiHeader) {
 			SM__().GetSendHeader()(h, SG__().serverContext)
 		})
 
-		if SG__().sapiHeaders.sendDefaultContentType {
+		if SG__().SapiHeaders().SendDefaultContentType() != 0 {
 			defaultHeader := SapiGetDefaultContentTypeHeader()
 			SM__().GetSendHeader()(defaultHeader, SG__().serverContext)
 		}
