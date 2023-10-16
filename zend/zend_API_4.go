@@ -233,10 +233,10 @@ func AddPropertyZvalEx(arg *types.Zval, key string, value *types.Zval) int {
 	return types.SUCCESS
 }
 func ZendStartupModuleEx(module *ModuleEntry) bool {
-	if module.GetModuleStarted() != 0 {
+	if module.IsModuleStarted() {
 		return true
 	}
-	module.SetModuleStarted(1)
+	module.SetModuleStarted(true)
 
 	/* Initialize module globals */
 	if module.GetGlobalsSize() != 0 {
@@ -244,14 +244,13 @@ func ZendStartupModuleEx(module *ModuleEntry) bool {
 			module.GetGlobalsCtor()(module.GetGlobalsPtr())
 		}
 	}
-	if module.GetModuleStartupFunc() != nil {
-		EG__().SetCurrentModule(module)
-		if module.GetModuleStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unable to start %s module", module.GetName())
-			EG__().SetCurrentModule(nil)
-			return false
-		}
+
+	EG__().SetCurrentModule(module)
+	if !module.ModuleStartup() {
+		faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unable to start %s module", module.Name())
 		EG__().SetCurrentModule(nil)
+		return false
 	}
+	EG__().SetCurrentModule(nil)
 	return true
 }

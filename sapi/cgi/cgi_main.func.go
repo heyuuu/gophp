@@ -25,7 +25,7 @@ func FcgiLog(type_ int, format *byte, _ ...any) {
 func PrintModules() {
 	var modules = globals.G().GetSortedModules()
 	for _, module := range modules {
-		core.PhpPrintf("%s\n", module.GetName())
+		core.PhpPrintf("%s\n", module.Name())
 	}
 }
 func PrintExtensions() {

@@ -1,16 +1,20 @@
 package core
 
-import (
-	"github.com/heyuuu/gophp/zend"
-)
-
 /**
  * PhpExtensionLists
  */
 type PhpExtensionLists struct {
-	engine    zend.ZendLlist[*byte]
-	functions zend.ZendLlist[*byte]
+	zendExtensions []string
+	phpExtensions  []string
 }
 
-func (this *PhpExtensionLists) GetEngine() *zend.ZendLlist[*byte]    { return &this.engine }
-func (this *PhpExtensionLists) GetFunctions() *zend.ZendLlist[*byte] { return &this.functions }
+func (l *PhpExtensionLists) Reset() {
+	l.zendExtensions = nil
+	l.phpExtensions = nil
+}
+func (l *PhpExtensionLists) AddZendExtension(file string) {
+	l.zendExtensions = append(l.zendExtensions, file)
+}
+func (l *PhpExtensionLists) AddPhpExtension(file string) {
+	l.phpExtensions = append(l.phpExtensions, file)
+}

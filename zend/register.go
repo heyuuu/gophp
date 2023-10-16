@@ -16,7 +16,7 @@ func RegisterClass(decl *types.InternalClassDecl) *types.ClassEntry {
 	var moduleNumber = EG__().GetCurrentModule().GetModuleNumber()
 	var ce = types.NewInternalClassEx(decl, moduleNumber)
 	if len(decl.Functions) != 0 {
-		ZendRegisterFunctions(ce, decl.Functions, ce.FunctionTable(), EG__().GetCurrentModule().GetType())
+		ZendRegisterFunctions(ce, decl.Functions, ce.FunctionTable(), EG__().GetCurrentModule().IsPersistent())
 	}
 	CG__().ClassTable().Update(ce.Name(), ce)
 

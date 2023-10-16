@@ -32,7 +32,7 @@ func ZendCollectModuleHandlers() {
 func ZendStartupModules() int {
 	for _, module := range globals.G().GetSortedModules() {
 		if !ZendStartupModuleEx(module) {
-			globals.G().DelModule(module.GetName())
+			globals.G().DelModule(module.Name())
 		}
 	}
 	return types.SUCCESS
@@ -49,15 +49,15 @@ func ZendRegisterModuleEx(module *ModuleEntry) *ModuleEntry {
 	/* Check module dependencies */
 	module = globals.G().RegisterModule(module)
 	if module == nil {
-		faults.Error(faults.E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
+		faults.Error(faults.E_CORE_WARNING, "Module '%s' already loaded", module.Name())
 		return nil
 	}
 
 	EG__().SetCurrentModule(module)
-	if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == types.FAILURE {
-		globals.G().DelModule(module.GetName())
+	if module.Functions() != nil && ZendRegisterFunctions(nil, module.Functions(), nil, module.IsPersistent()) == types.FAILURE {
+		globals.G().DelModule(module.Name())
 		EG__().SetCurrentModule(nil)
-		faults.Error(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
+		faults.Error(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.Name())
 		return nil
 	}
 	EG__().SetCurrentModule(nil)
@@ -120,12 +120,12 @@ func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFuncti
 		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.Name(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
-func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEntry, functionTable FunctionTable, type_ int) int {
+func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEntry, functionTable FunctionTable, isPersistent bool) int {
 	var ptr *types.FunctionEntry = functions
 	var count int = 0
 	var unload int = 0
 	var targetFunctionTable FunctionTable = functionTable
-	var error_type int
+	var error_type int = lang.Cond(isPersistent, faults.E_CORE_WARNING, faults.E_WARNING)
 	var ctor types.IFunction = nil
 	var dtor types.IFunction = nil
 	var clone types.IFunction = nil
@@ -143,11 +143,6 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 	var fname_len int
 	var lc_class_name *byte = nil
 	var class_name_len int = 0
-	if type_ == MODULE_PERSISTENT {
-		error_type = faults.E_CORE_WARNING
-	} else {
-		error_type = faults.E_WARNING
-	}
 	if targetFunctionTable == nil {
 		targetFunctionTable = CG__().FunctionTable()
 	}

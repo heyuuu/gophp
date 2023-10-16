@@ -28,16 +28,13 @@ func CleanModuleClasses(moduleNumber int) {
 	})
 }
 func ModuleDestructor(module *ModuleEntry) {
-	if module.GetType() == MODULE_TEMPORARY {
+	if !module.IsPersistent() {
 		ZendCleanModuleRsrcDtors(module.GetModuleNumber())
 		CleanModuleConstants(module.GetModuleNumber())
 		CleanModuleClasses(module.GetModuleNumber())
 	}
-	if module.GetModuleStarted() != 0 && module.GetModuleShutdownFunc() != nil {
-		module.GetModuleShutdownFunc()(module.GetType(), module.GetModuleNumber())
-	}
-	if module.GetModuleStarted() != 0 && module.GetModuleShutdownFunc() == nil && module.GetType() == MODULE_TEMPORARY {
-		ZendUnregisterIniEntries(module.GetModuleNumber())
+	if module.IsModuleStarted() {
+		module.ModuleShutdown()
 	}
 
 	/* Deinitilaise module globals */
@@ -46,21 +43,12 @@ func ModuleDestructor(module *ModuleEntry) {
 			module.GetGlobalsDtor()(module.GetGlobalsPtr())
 		}
 	}
-	module.SetModuleStarted(0)
-	if module.GetType() == MODULE_TEMPORARY && module.GetFunctions() != nil {
-		ZendUnregisterFunctions(module.GetFunctions(), -1, nil)
-	}
-	if module.GetHandle() && !(getenv("ZEND_DONT_UNLOAD_MODULES")) {
-		DL_UNLOAD(module.GetHandle())
-	}
+	module.SetModuleStarted(false)
 }
 func ZendActivateModules() {
 	globals.G().EachModuleReserve(func(module *ModuleEntry) {
-		if module.GetModuleStartupFunc() == nil {
-			return
-		}
-		if module.GetRequestStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
-			faults.Error(faults.E_WARNING, "request_startup() for %s module failed", module.GetName())
+		if !module.RequestStartup() {
+			faults.Error(faults.E_WARNING, "request_startup() for %s module failed", module.Name())
 			exit(1)
 		}
 	})
@@ -69,9 +57,7 @@ func ZendDeactivateModules() {
 	EG__().SetCurrentExecuteData(nil)
 	faults.Try(func() {
 		globals.G().EachModuleReserve(func(module *ModuleEntry) {
-			if module.GetRequestShutdownFunc() != nil {
-				module.GetRequestShutdownFunc()(module.GetType(), module.GetModuleNumber())
-			}
+			module.RequestShutdown()
 		})
 	})
 }
@@ -85,19 +71,11 @@ func ZendCleanupInternalClasses() {
 func ZendNextFreeModule() int {
 	return globals.G().CountModules() + 1
 }
-func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int) int {
+func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry) bool {
 	/* TODO: Move this out of here in 7.4. */
-	if persistent != 0 && EG__().GetCurrentModule() != nil && EG__().GetCurrentModule().GetType() == MODULE_TEMPORARY {
-		persistent = 0
-	}
-	if name[0] == '\\' {
-		name = name[1:]
-	}
+	name = trimClassName(name)
 	ZendAssertValidClassName(name)
-	if CG__().ClassTable().Add(name, ce) {
-		return types.SUCCESS
-	}
-	return types.FAILURE
+	return CG__().ClassTable().Add(name, ce)
 }
 func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", CurrEX().FunctionName())

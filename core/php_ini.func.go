@@ -8,7 +8,6 @@ import (
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
 	"strings"
 )
@@ -100,7 +99,6 @@ func RESET_ACTIVE_INI_HASH() {
 func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, target_hash *types.Array) {
 	var entry *types.Zval
 	var active_hash *types.Array
-	var extension_name *byte
 	if ActiveIniHash != nil {
 		active_hash = ActiveIniHash
 	} else {
@@ -109,27 +107,17 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 	switch callback_type {
 	case zend.ZEND_INI_PARSER_ENTRY:
 		if arg2 == nil {
-
 			/* bare string - nothing to do */
-
 			break
-
-			/* bare string - nothing to do */
-
 		}
 
 		/* PHP and Zend extensions are not added into configuration hash! */
-
-		if IsSpecialSection == 0 && !(strcasecmp(arg1.StringEx().GetVal(), PHP_EXTENSION_TOKEN)) {
-			extension_name = zend.Estrndup(arg2.StringEx().GetVal(), arg2.StringEx().GetLen())
-			ExtensionLists.GetFunctions().AddLast(&extension_name)
-		} else if IsSpecialSection == 0 && !(strcasecmp(arg1.StringEx().GetVal(), ZEND_EXTENSION_TOKEN)) {
-			extension_name = zend.Estrndup(arg2.StringEx().GetVal(), arg2.StringEx().GetLen())
-			ExtensionLists.GetEngine().AddLast(&extension_name)
+		if IsSpecialSection == 0 && ascii.StrCaseEquals(arg1.String(), PHP_EXTENSION_TOKEN) {
+			ExtensionLists.AddPhpExtension(arg2.String())
+		} else if IsSpecialSection == 0 && ascii.StrCaseEquals(arg1.String(), ZEND_EXTENSION_TOKEN) {
+			ExtensionLists.AddZendExtension(arg2.String())
 		} else {
-
 			/* Store in active hash */
-
 			entry = active_hash.KeyUpdate(arg1.String(), arg2)
 			entry.SetString(entry.String())
 		}
@@ -199,60 +187,6 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 		}
 	}
 }
-func PhpLoadPhpExtensionCb(arg *byte) {
-	standard.PhpLoadExtension(arg)
-}
-func PhpLoadZendExtensionCb(arg *byte) {
-	var filename *byte = arg
-	var length int = strlen(filename)
-	void(length)
-	if zend.IS_ABSOLUTE_PATH(filename, length) {
-		zend.ZendLoadExtension(filename)
-	} else {
-		var handle any
-		var libpath *byte
-		var extension_dir *byte = zend.INI_STR("extension_dir")
-		var slash_suffix int = 0
-		var err1 *byte
-		var err2 *byte
-		if extension_dir != nil && extension_dir[0] {
-			slash_suffix = zend.IS_SLASH(extension_dir[strlen(extension_dir)-1])
-		}
-
-		/* Try as filename first */
-
-		if slash_suffix != 0 {
-			Spprintf(&libpath, 0, "%s%s", extension_dir, filename)
-		} else {
-			Spprintf(&libpath, 0, "%s%c%s", extension_dir, zend.DEFAULT_SLASH, filename)
-		}
-		handle = any(standard.PhpLoadShlib(libpath, &err1))
-		if !handle {
-
-			/* If file does not exist, consider as extension name and build file name */
-
-			var orig_libpath *byte = libpath
-			if slash_suffix != 0 {
-				Spprintf(&libpath, 0, "%s"+PHP_SHLIB_EXT_PREFIX+"%s."+PHP_SHLIB_SUFFIX, extension_dir, filename)
-			} else {
-				Spprintf(&libpath, 0, "%s%c"+PHP_SHLIB_EXT_PREFIX+"%s."+PHP_SHLIB_SUFFIX, extension_dir, zend.DEFAULT_SLASH, filename)
-			}
-			handle = any(standard.PhpLoadShlib(libpath, &err2))
-			if !handle {
-				PhpError(faults.E_CORE_WARNING, "Failed loading Zend extension '%s' (tried: %s (%s), %s (%s))", filename, orig_libpath, err1, libpath, err2)
-				zend.Efree(orig_libpath)
-				zend.Efree(err1)
-				zend.Efree(libpath)
-				zend.Efree(err2)
-				return
-			}
-			zend.Efree(orig_libpath)
-			zend.Efree(err1)
-		}
-		zend.ZendLoadExtensionHandle(handle, libpath)
-		zend.Efree(libpath)
-	}
-}
 func PhpInitConfig() int {
 	var php_ini_file_name *byte = nil
 	var php_ini_search_path *byte = nil
@@ -266,8 +200,7 @@ func PhpInitConfig() int {
 	if SM__().GetIniDefaults() != nil {
 		SM__().GetIniDefaults()(Config().GetHash())
 	}
-	ExtensionLists.GetEngine().Init()
-	ExtensionLists.GetFunctions().Init()
+	ExtensionLists.Reset()
 	open_basedir = PG__().open_basedir
 	if SM__().GetPhpIniPathOverride() != nil {
 		php_ini_file_name = SM__().GetPhpIniPathOverride()
@@ -532,10 +465,9 @@ func PhpShutdownConfig() int {
 	return types.SUCCESS
 }
 func PhpIniRegisterExtensions() {
-	ExtensionLists.GetEngine().Each(PhpLoadZendExtensionCb)
-	ExtensionLists.GetFunctions().Each(PhpLoadPhpExtensionCb)
-	ExtensionLists.GetEngine().Clean()
-	ExtensionLists.GetFunctions().Clean()
+	//ExtensionLists.ZendExtensions().Each(PhpLoadZendExtensionCb)
+	//ExtensionLists.PhpExtensions().Each(PhpLoadPhpExtensionCb)
+	ExtensionLists.Reset()
 }
 func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.Array) int {
 	var sb zend.ZendStatT

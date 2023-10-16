@@ -82,12 +82,12 @@ func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 func PhpInfoPrintModule(zend_module *zend.ModuleEntry) {
 	if zend_module.GetInfoFunc() != nil {
 		if core.SM__().GetPhpinfoAsText() == 0 {
-			var urlName = PhpUrlEncode(zend_module.GetName())
+			var urlName = PhpUrlEncode(zend_module.Name())
 			urlName = ascii.StrToLower(urlName)
-			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", urlName, zend_module.GetName())
+			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", urlName, zend_module.Name())
 		} else {
 			PhpInfoPrintTableStart()
-			PhpInfoPrintTableHeader(1, zend_module.GetName())
+			PhpInfoPrintTableHeader(1, zend_module.Name())
 			PhpInfoPrintTableEnd()
 		}
 		if zend_module.GetInfoFunc() != nil {
@@ -100,9 +100,9 @@ func PhpInfoPrintModule(zend_module *zend.ModuleEntry) {
 		}
 	} else {
 		if core.SM__().GetPhpinfoAsText() == 0 {
-			PhpInfoPrintf("<tr><td class=\"v\">%s</td></tr>\n", zend_module.GetName())
+			PhpInfoPrintf("<tr><td class=\"v\">%s</td></tr>\n", zend_module.Name())
 		} else {
-			PhpInfoPrintf("%s\n", zend_module.GetName())
+			PhpInfoPrintf("%s\n", zend_module.Name())
 		}
 	}
 }

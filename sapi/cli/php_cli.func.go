@@ -60,7 +60,7 @@ const usage string = `Usage: %s [options] [-f] <file> [--] [args...]
 func PrintModules() {
 	var modules = globals.G().GetSortedModules()
 	for _, module := range modules {
-		core.PhpPrintf("%s\n", module.GetName())
+		core.PhpPrintf("%s\n", module.Name())
 	}
 }
 func PrintExtensions() {

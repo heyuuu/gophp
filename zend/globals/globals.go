@@ -20,7 +20,7 @@ func (g *Globals) InitModules() {
 }
 
 func (g *Globals) RegisterModule(m *zend.ModuleEntry) *zend.ModuleEntry {
-	lcName := ascii.StrToLower(m.GetName())
+	lcName := ascii.StrToLower(m.Name())
 	// 若已注册，返回nil
 	if _, ok := g.modules[lcName]; ok {
 		return nil
@@ -53,7 +53,7 @@ func (g *Globals) GetSortedModules() []*zend.ModuleEntry {
 		modules = append(modules, module)
 	}
 	sort.Slice(modules, func(i, j int) bool {
-		return ascii.StrCaseCompare(modules[i].GetName(), modules[j].GetName()) < 0
+		return ascii.StrCaseCompare(modules[i].Name(), modules[j].Name()) < 0
 	})
 	return modules
 }

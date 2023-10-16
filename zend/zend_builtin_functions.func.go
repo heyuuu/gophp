@@ -775,7 +775,7 @@ func ZifClassAlias(className string, aliasName string, _ zpp.Opt, autoload_ *boo
 	ce := ZendLookupClassEx(className, "", flags)
 	if ce != nil {
 		if ce.IsUserClass() {
-			if ZendRegisterClassAliasEx(aliasName, ce, 0) == types.SUCCESS {
+			if ZendRegisterClassAliasEx(aliasName, ce) {
 				return true
 			} else {
 				faults.Error(faults.E_WARNING, fmt.Sprintf("Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), aliasName))
@@ -964,7 +964,7 @@ func ZifGetLoadedExtensions(_ zpp.Opt, zendExtensions bool) *types.Array {
 		// not support zend extensions yet
 	} else {
 		globals.G().EachModule(func(module *ModuleEntry) {
-			arr.Append(types.NewZvalString(module.GetName()))
+			arr.Append(types.NewZvalString(module.Name()))
 		})
 	}
 	return arr
@@ -986,7 +986,7 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		module_names = make([]string, globals.G().CountModules()+2)
 		module_names[0] = "internal"
 		globals.G().EachModule(func(module *ModuleEntry) {
-			module_names[module.GetModuleNumber()] = module.GetName()
+			module_names[module.GetModuleNumber()] = module.Name()
 			i++
 		})
 		module_names[i] = "user"
@@ -1477,7 +1477,7 @@ func ZifGetExtensionFuncs(executeData zpp.Ex, return_value zpp.Ret, extensionNam
 		return_value.SetFalse()
 		return
 	}
-	if module.GetFunctions() != nil {
+	if module.Functions() != nil {
 
 		/* avoid BC break, if functions list is empty, will return an empty array */
 
