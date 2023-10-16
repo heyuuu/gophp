@@ -1080,7 +1080,7 @@ func DebugPrintBacktraceArgs(argArray *types.Zval) {
 	var i = 0
 	argArray.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 		if i != 0 {
-			ZEND_PUTS(", ")
+			ZendWrite(", ")
 		}
 		i++
 		ZendPrintFlatZvalR(value)
@@ -1220,18 +1220,18 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			}
 			call_type = nil
 		}
-		ZendPrintf("#%-2d ", indent)
+		ZendWrite(fmt.Sprintf("#%-2d ", indent))
 		if class_name != "" {
-			ZEND_PUTS(class_name)
-			ZEND_PUTS(call_type)
+			ZendWrite(class_name)
+			ZendWrite(call_type)
 		}
-		ZendPrintf("%s(", functionName)
+		ZendWrite(functionName + "(")
 		if arg_array.IsNotUndef() {
 			DebugPrintBacktraceArgs(&arg_array)
 			// ZvalPtrDtor(&arg_array)
 		}
 		if filename != "" {
-			ZendPrintf(") called at [%s:%d]\n", filename, lineno)
+			ZendWrite(fmt.Sprintf(") called at [%s:%d]\n", filename, lineno))
 		} else {
 			var prev_call = skip
 			var prev = skip.GetPrevExecuteData()
@@ -1241,14 +1241,14 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 					break
 				}
 				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetType()) {
-					ZendPrintf(") called at [%s:%d]\n", prev.GetFunc().GetOpArray().GetFilename(), prev.GetOpline().GetLineno())
+					ZendWrite(fmt.Sprintf(") called at [%s:%d]\n", prev.GetFunc().GetOpArray().GetFilename(), prev.GetOpline().GetLineno()))
 					break
 				}
 				prev_call = prev
 				prev = prev.GetPrevExecuteData()
 			}
 			if prev == nil {
-				ZEND_PUTS(")\n")
+				ZendWrite(")\n")
 			}
 		}
 		include_filename = filename

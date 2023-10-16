@@ -1,28 +1,28 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func ZendHtmlPutc(c byte) {
 	switch c {
 	case '\n':
-		ZEND_PUTS("<br />")
+		ZendWrite("<br />")
 	case '<':
-		ZEND_PUTS("&lt;")
+		ZendWrite("&lt;")
 	case '>':
-		ZEND_PUTS("&gt;")
+		ZendWrite("&gt;")
 	case '&':
-		ZEND_PUTS("&amp;")
+		ZendWrite("&amp;")
 	case ' ':
-		ZEND_PUTS("&nbsp;")
+		ZendWrite("&nbsp;")
 	case '\t':
-		ZEND_PUTS("&nbsp;&nbsp;&nbsp;&nbsp;")
+		ZendWrite("&nbsp;&nbsp;&nbsp;&nbsp;")
 	default:
-		ZEND_PUTC(c)
+		ZendWriteByte(c)
 	}
 }
 func ZendHtmlPuts(s *byte, len_ int) {
@@ -57,8 +57,8 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 	var token_type int
 	var last_color *byte = syntax_highlighter_ini.GetHighlightHtml()
 	var next_color *byte
-	ZendPrintf("<code>")
-	ZendPrintf("<span style=\"color: %s\">\n", last_color)
+	ZendWrite("<code>")
+	ZendWrite(fmt.Sprintf(`<span style="color: %s">\n`, last_color))
 
 	/* highlight stuff coming back from zendlex() */
 
@@ -111,11 +111,11 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 		}
 		if last_color != next_color {
 			if last_color != syntax_highlighter_ini.GetHighlightHtml() {
-				ZendPrintf("</span>")
+				ZendWrite("</span>")
 			}
 			last_color = next_color
 			if last_color != syntax_highlighter_ini.GetHighlightHtml() {
-				ZendPrintf("<span style=\"color: %s\">", last_color)
+				ZendWrite(fmt.Sprintf(`<span style="color: %s">`, last_color))
 			}
 		}
 		ZendHtmlPuts((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
@@ -140,10 +140,10 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 		token.SetUndef()
 	}
 	if last_color != syntax_highlighter_ini.GetHighlightHtml() {
-		ZendPrintf("</span>\n")
+		ZendWrite("</span>\n")
 	}
-	ZendPrintf("</span>\n")
-	ZendPrintf("</code>")
+	ZendWrite("</span>\n")
+	ZendWrite("</code>")
 
 	/* Discard parse errors thrown during tokenization */
 	EG__().ClearException()

@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/types"
@@ -284,9 +285,9 @@ func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 		value = 0
 	}
 	if value != 0 {
-		ZEND_PUTS("On")
+		ZendWrite("On")
 	} else {
-		ZEND_PUTS("Off")
+		ZendWrite("Off")
 	}
 }
 func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
@@ -299,16 +300,16 @@ func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 		value = nil
 	}
 	if value != nil {
-		if ZendUv.GetHtmlErrors() != 0 {
-			ZendPrintf("<font style=\"color: %s\">%s</font>", value, value)
+		if ZendUv.GetHtmlErrors() {
+			ZendWrite(fmt.Sprintf("<font style=\"color: %s\">%s</font>", value, value))
 		} else {
-			ZEND_PUTS(value)
+			ZendWrite(value)
 		}
 	} else {
 		if ZendUv.GetHtmlErrors() != 0 {
-			ZEND_PUTS(NO_VALUE_HTML)
+			ZendWrite(NO_VALUE_HTML)
 		} else {
-			ZEND_PUTS(NO_VALUE_PLAINTEXT)
+			ZendWrite(NO_VALUE_PLAINTEXT)
 		}
 	}
 }

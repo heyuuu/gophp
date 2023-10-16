@@ -1236,7 +1236,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	 */
 
 	if PhpInitStreamWrappers(module_number) == types.FAILURE {
-		PhpPrintf("PHP:  Unable to initialize stream url wrappers.\n")
+		PUTS("PHP:  Unable to initialize stream url wrappers.\n")
 		return types.FAILURE
 	}
 	zuv.SetHtmlErrors(1)

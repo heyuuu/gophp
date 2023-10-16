@@ -1,15 +1,18 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
+	"strconv"
 )
 
-func ZEND_PUTS(str string) int { return ZendWrite(str) }
-func ZEND_PUTC(c byte) int     { return ZendWrite(string([]byte{c})) }
+func ZendWrite(str string) { core.PUTS(str) }
+func ZendWriteByte(c byte) { core.PUTC(c) }
 
 func OnUpdateErrorReportingEx(entry *ZendIniEntry, newValue *string, stage int) bool {
 	if newValue == nil {
@@ -79,17 +82,17 @@ func PrintFlatHash(ht *types.Array) {
 	var i = 0
 	ht.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 		if i > 0 {
-			ZEND_PUTS(",")
+			ZendWrite(",")
 		}
 		i++
 
-		ZEND_PUTS("[")
+		ZendWrite("[")
 		if key.IsStrKey() {
 			ZendWrite(key.StrKey())
 		} else {
-			ZendPrintf(ZEND_ULONG_FMT, key.IdxKey())
+			ZendWrite(strconv.Itoa(key.IdxKey()))
 		}
-		ZEND_PUTS("] => ")
+		ZendWrite("] => ")
 		ZendPrintFlatZvalR(value)
 	})
 }
@@ -117,21 +120,21 @@ func ZendPrintZval(expr *types.Zval) int {
 func ZendPrintFlatZvalR(expr *types.Zval) {
 	switch expr.Type() {
 	case types.IsArray:
-		ZEND_PUTS("Array (")
+		ZendWrite("Array (")
 		if expr.Array().IsRecursive() {
-			ZEND_PUTS(" *RECURSION*")
+			ZendWrite(" *RECURSION*")
 			return
 		}
 		expr.Array().ProtectRecursive()
 		PrintFlatHash(expr.Array())
-		ZEND_PUTS(")")
+		ZendWrite(")")
 		expr.Array().UnprotectRecursive()
 	case types.IsObject:
 		var properties *types.Array
-		ZendPrintf("%s Object (", expr.Object().ClassName())
+		ZendWrite(fmt.Sprintf("%s Object (", expr.Object().ClassName()))
 		// types.ZendStringReleaseEx(class_name, 0)
 		if expr.Object().IsRecursive() {
-			ZEND_PUTS(" *RECURSION*")
+			ZendWrite(" *RECURSION*")
 			return
 		}
 		properties = types.Z_OBJPROP_P(expr)
@@ -140,7 +143,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 			PrintFlatHash(properties)
 			expr.Object().UnprotectRecursive()
 		}
-		ZEND_PUTS(")")
+		ZendWrite(")")
 	case types.IsRef:
 		ZendPrintFlatZvalR(types.Z_REFVAL_P(expr))
 	default:

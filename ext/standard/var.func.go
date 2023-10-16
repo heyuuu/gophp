@@ -40,7 +40,7 @@ func PhpObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key_ ty
 			core.OG__().WriteString(key_.StrKey())
 			core.PhpPrintf("\"")
 		}
-		zend.ZEND_PUTS("]=>\n")
+		zend.ZendWrite("]=>\n")
 	}
 	if zv.IsUndef() {
 		b.Assert(propInfo.GetType() != nil)
@@ -166,7 +166,7 @@ func ZvalObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key ty
 		} else {
 			core.PhpPrintf("\"%s\"", propName)
 		}
-		zend.ZEND_PUTS("]=>\n")
+		zend.ZendWrite("]=>\n")
 	}
 	if propInfo != nil && zv.IsUndef() {
 		b.Assert(propInfo.GetType() != nil)
