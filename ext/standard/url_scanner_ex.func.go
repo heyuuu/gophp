@@ -136,7 +136,7 @@ func OnUpdateOutputHosts(
 }
 func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.SmartStr, separator *byte) {
 	var url_parts *PhpUrl
-	url.ZeroTail()
+	//url.ZeroTail()
 	url_parts = PhpUrlParseEx(url.GetS().GetVal(), url.GetS().GetLen())
 
 	/* Ignore malformed URLs */
@@ -788,9 +788,9 @@ func PhpUrlScannerAdaptSingleUrl(
 	encode int,
 ) *byte {
 	var result *byte
-	var surl zend.SmartStr = zend.MakeSmartStr(0)
-	var buf zend.SmartStr = zend.MakeSmartStr(0)
-	var url_app zend.SmartStr = zend.MakeSmartStr(0)
+	var surl zend.SmartStr
+	var buf zend.SmartStr
+	var url_app zend.SmartStr
 	var encoded string
 	surl.WriteString(b.CastStr(url, urllen))
 	if encode != 0 {
@@ -807,7 +807,7 @@ func PhpUrlScannerAdaptSingleUrl(
 		url_app.WriteString(b.CastStrAuto(value))
 	}
 	AppendModifiedUrl(&surl, &buf, &url_app, core.PG__().arg_separator.output)
-	buf.ZeroTail()
+	//buf.ZeroTail()
 	if newlen != nil {
 		*newlen = buf.GetS().GetLen()
 	}
@@ -825,7 +825,7 @@ func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush bool, ctx *UrlAdap
 	} else {
 		*newlen = ctx.GetResult().GetS().GetLen()
 	}
-	ctx.GetResult().ZeroTail()
+	//ctx.GetResult().ZeroTail()
 	if do_flush != 0 {
 		ctx.GetResult().WriteString(ctx.GetBuf().GetS().GetStr())
 		*newlen += ctx.GetBuf().GetS().GetLen()
@@ -914,10 +914,10 @@ func PhpUrlScannerAddVarImpl(
 	encode int,
 	type_ int,
 ) int {
-	var sname zend.SmartStr = zend.MakeSmartStr(0)
-	var svalue zend.SmartStr = zend.MakeSmartStr(0)
-	var hname zend.SmartStr = zend.MakeSmartStr(0)
-	var hvalue zend.SmartStr = zend.MakeSmartStr(0)
+	var sname zend.SmartStr
+	var svalue zend.SmartStr
+	var hname zend.SmartStr
+	var hvalue zend.SmartStr
 	var url_state *UrlAdaptStateExT
 	var handler core.PhpOutputHandlerFuncT
 	if type_ != 0 {
@@ -993,10 +993,10 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 	var end *byte
 	var limit *byte
 	var separator_len int
-	var sname zend.SmartStr = zend.MakeSmartStr(0)
-	var hname zend.SmartStr = zend.MakeSmartStr(0)
-	var url_app zend.SmartStr = zend.MakeSmartStr(0)
-	var form_app zend.SmartStr = zend.MakeSmartStr(0)
+	var sname zend.SmartStr
+	var hname zend.SmartStr
+	var url_app zend.SmartStr
+	var form_app zend.SmartStr
 	var ret int = types.SUCCESS
 	var sep_removed bool = 0
 	var url_state *UrlAdaptStateExT
@@ -1020,15 +1020,15 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 		sname.WriteString(name.GetStr())
 		hname.WriteString(name.GetStr())
 	}
-	sname.ZeroTail()
-	hname.ZeroTail()
+	//sname.ZeroTail()
+	//hname.ZeroTail()
 	url_app.AppendSmartStr(&sname)
 	url_app.WriteByte('=')
-	url_app.ZeroTail()
+	//url_app.ZeroTail()
 	form_app.WriteString("<input type=\"hidden\" name=\"")
 	form_app.AppendSmartStr(&hname)
 	form_app.WriteString("\" value=\"")
-	form_app.ZeroTail()
+	//form_app.ZeroTail()
 
 	/* Short circuit check. Only check url_app. */
 

@@ -883,7 +883,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 	client.SetContentSenderInitialized(1)
 	client.SetFileFd(fd)
 	var chunk *PhpCliServerChunk
-	var buffer zend.SmartStr = zend.MakeSmartStr(0)
+	var buffer zend.SmartStr
 	var mime_type *byte = GetMimeType(server, client.GetRequest().GetExt(), client.GetRequest().GetExtLen())
 	AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), status, 1)
 	if buffer.GetS() == nil {

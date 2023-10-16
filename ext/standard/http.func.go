@@ -227,7 +227,7 @@ func ZifHttpBuildQuery(executeData zpp.Ex, return_value zpp.Ret, formdata *types
 	var arg_sep *byte = nil
 	var arg_sep_len int = 0
 	var prefix_len int = 0
-	var formstr zend.SmartStr = zend.MakeSmartStr(0)
+	var formstr zend.SmartStr
 	var enc_type zend.ZendLong = PHP_QUERY_RFC1738
 	for {
 		for {
@@ -256,7 +256,7 @@ func ZifHttpBuildQuery(executeData zpp.Ex, return_value zpp.Ret, formdata *types
 		return_value.SetString("")
 		return
 	}
-	formstr.ZeroTail()
+	//formstr.ZeroTail()
 	return_value.SetStringEx(formstr.GetS())
 	return
 }

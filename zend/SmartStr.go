@@ -18,10 +18,6 @@ type SmartStr struct {
 	buffer strings.Builder
 }
 
-func MakeSmartStr() SmartStr {
-	return SmartStr{}
-}
-
 func (s *SmartStr) Write(p []byte) (n int, err error) {
 	return s.buffer.Write(p)
 }
@@ -65,19 +61,15 @@ func (s *SmartStr) Free() {
 	s.Reset()
 }
 
-func (s *SmartStr) ZeroTail() {
-	// c 字符串尾部设置0
-}
-
 /**
  * 快捷方法
  */
-func (s *SmartStr) WriteLong(num ZendLong) {
+func (s *SmartStr) WriteLong(num int) {
 	var str = strconv.FormatInt(int64(num), 10)
 	s.WriteString(str)
 }
 
-func (s *SmartStr) WriteUlong(num ZendUlong) {
+func (s *SmartStr) WriteUlong(num uint) {
 	var str = strconv.FormatUint(uint64(num), 10)
 	s.WriteString(str)
 }
@@ -120,10 +112,7 @@ func (s *SmartStr) WriteEscaped(str string) {
 	}
 }
 
-/**
- * todo 待移除方法
- */
-
+func (s *SmartStr) String() string { return s.GetStr() }
 func (s *SmartStr) GetS() *types.String {
 	// todo 需要确认是否兼容 ZendStringAlloc() 但未使用时的空 []byte
 	return types.NewString(s.GetStr())

@@ -562,7 +562,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) string {
 		str.WriteString(": ")
 		ZendAppendTypeHint(&str, fptr, fptr.GetArgInfo()-1, 1)
 	}
-	str.ZeroTail()
+	//str.ZeroTail()
 	return str.GetStr()
 }
 func FuncLineno(fn types.IFunction) uint32 {

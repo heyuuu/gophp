@@ -262,7 +262,7 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 
 				/* new entry, add the old one to the list */
 
-				buf_value.ZeroTail()
+				//buf_value.ZeroTail()
 				entry.SetKey(key)
 				entry.SetValue(buf_value.GetC())
 				header.AddLast(&entry)
@@ -288,7 +288,7 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 
 		/* add the last one to the list */
 
-		buf_value.ZeroTail()
+		//buf_value.ZeroTail()
 		entry.SetKey(key)
 		entry.SetValue(buf_value.GetC())
 		header.AddLast(&entry)

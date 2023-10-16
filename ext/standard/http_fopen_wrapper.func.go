@@ -81,7 +81,7 @@ func PhpStreamUrlWrapHttpEx(
 	var follow_location bool = 1
 	var transfer_encoding *core.PhpStreamFilter = nil
 	var response_code int
-	var req_buf zend.SmartStr = zend.MakeSmartStr(0)
+	var req_buf zend.SmartStr
 	var custom_request_method bool
 	tmp_line[0] = '0'
 	if redirect_max < 1 {
@@ -150,7 +150,7 @@ func PhpStreamUrlWrapHttpEx(
 	}
 	zend.Efree(transport_string)
 	if stream != nil && use_proxy != 0 && use_ssl {
-		var header zend.SmartStr = zend.MakeSmartStr(0)
+		var header zend.SmartStr
 
 		/* Set peer_name or name verification will try to use the proxy server name */
 
@@ -361,7 +361,7 @@ func PhpStreamUrlWrapHttpEx(
 		tmp = nil
 		if tmpzval.IsType(types.IsArray) {
 			var tmpheader *types.Zval = nil
-			var tmpstr zend.SmartStr = zend.MakeSmartStr(0)
+			var tmpstr zend.SmartStr
 			var __ht *types.Array = tmpzval.Array()
 			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
@@ -372,7 +372,7 @@ func PhpStreamUrlWrapHttpEx(
 					tmpstr.WriteString("\r\n")
 				}
 			}
-			tmpstr.ZeroTail()
+			//tmpstr.ZeroTail()
 
 			/* Remove newlines and spaces from start and end. there's at least one extra \r\n at the end that needs to go. */
 

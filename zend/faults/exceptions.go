@@ -498,7 +498,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 	str.WriteByte('#')
 	str.WriteLong(num)
 	str.WriteString(" {main}")
-	str.ZeroTail()
+	//str.ZeroTail()
 	return_value.SetStringEx(str.GetS())
 	return
 }

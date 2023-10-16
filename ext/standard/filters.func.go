@@ -142,14 +142,14 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 	core.PhpErrorDocref("", faults.E_DEPRECATED, "The string.strip_tags filter is deprecated")
 	if filterparams != nil {
 		if filterparams.IsType(types.IsArray) {
-			var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
+			var tags_ss zend.SmartStr
 			filterparams.Array().Foreach(func(_ types.ArrayKey, tmp *types.Zval) {
 				operators.ConvertToStringEx(tmp)
 				tags_ss.WriteByte('<')
 				tags_ss.WriteString(tmp.String())
 				tags_ss.WriteByte('>')
 			})
-			tags_ss.ZeroTail()
+			//tags_ss.ZeroTail()
 			allowed_tags = tags_ss.GetS()
 		} else {
 			allowed_tags = operators.ZvalGetString(filterparams)

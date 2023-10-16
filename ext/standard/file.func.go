@@ -1706,7 +1706,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 	var i int = 0
 	var ret int
 	var field_tmp *types.Zval
-	var csvline zend.SmartStr = zend.MakeSmartStr(0)
+	var csvline zend.SmartStr
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = fields.Array().Len()
 	fields.Array().Foreach(func(_ types.ArrayKey, field_tmp *types.Zval) {
@@ -1739,7 +1739,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 		}
 	})
 	csvline.WriteByte('\n')
-	csvline.ZeroTail()
+	//csvline.ZeroTail()
 	ret = core.PhpStreamWrite(stream, csvline.GetS().GetVal(), csvline.GetS().GetLen())
 	csvline.Free()
 	return ret

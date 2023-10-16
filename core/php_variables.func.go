@@ -295,7 +295,7 @@ func AddPostVar(arr *types.Zval, var_ *PostVarDataT, eof bool) bool {
 	return 1
 }
 func AddPostVars(arr *types.Zval, vars *PostVarDataT, eof bool) int {
-	var max_vars uint64 = PG__().max_input_vars
+	var max_vars uint64 = PG__().GetMaxInputVars()
 	vars.SetPtr(vars.GetStr().GetS().GetVal())
 	vars.SetEnd(vars.GetStr().GetS().GetVal() + vars.GetStr().GetS().GetLen())
 	for AddPostVar(arr, vars, eof) != 0 {
@@ -328,8 +328,8 @@ func PhpStdPostHandler(contentTypeDup string, arr *types.Zval) {
 				break
 			}
 		}
-		if post_data.GetStr().GetS() != nil {
-			AddPostVars(arr, &post_data, 1)
+		if post_data.GetStr().String() != "" {
+			AddPostVars(arr, &post_data, true)
 			post_data.GetStr().Free()
 		}
 	}

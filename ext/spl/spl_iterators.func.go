@@ -685,7 +685,7 @@ func spl_RecursiveTreeIterator_new(class_type *types.ClassEntry) *types.Object {
 	return spl_RecursiveIteratorIterator_new_ex(class_type, 1)
 }
 func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_value *types.Zval) {
-	var str zend.SmartStr = zend.MakeSmartStr(0)
+	var str zend.SmartStr
 	var has_next types.Zval
 	var level int
 	str.WriteString(object.GetPrefix()[0].GetStr())
@@ -697,7 +697,6 @@ func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_valu
 			} else {
 				str.WriteString(object.GetPrefix()[2].GetStr())
 			}
-			// zend.ZvalPtrDtor(&has_next)
 		}
 	}
 	zend.ZendCallMethodWith0Params(object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
@@ -707,11 +706,9 @@ func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_valu
 		} else {
 			str.WriteString(object.GetPrefix()[4].GetStr())
 		}
-		// zend.ZvalPtrDtor(&has_next)
 	}
 	str.WriteString(object.GetPrefix()[5].GetStr())
-	str.ZeroTail()
-	return_value.SetStringEx(str.GetS())
+	return_value.SetString(str.String())
 	return
 }
 func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value *types.Zval) {

@@ -452,7 +452,7 @@ again:
 func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var__ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
 	var var_ *types.Zval
 	var return_output = 0
-	var buf zend.SmartStr = zend.MakeSmartStr(0)
+	var buf zend.SmartStr
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -467,7 +467,7 @@ func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var__ *types.Zval, _
 		break
 	}
 	PhpVarExportEx(var_, 1, &buf)
-	buf.ZeroTail()
+	//buf.ZeroTail()
 	if return_output != 0 {
 		return_value.SetStringEx(buf.GetS())
 		return

@@ -72,7 +72,7 @@ func PhpSetcookie(
 	var dt *types.String
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var result int
-	var buf zend.SmartStr = zend.MakeSmartStr(0)
+	var buf zend.SmartStr
 	if name.GetLen() == 0 {
 		faults.Error(faults.E_WARNING, "Cookie names must not be empty")
 		return types.FAILURE

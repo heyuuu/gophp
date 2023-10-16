@@ -193,7 +193,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 func ZendPrintZvalRToStr(expr *types.Zval, indent int) *types.String {
 	var buf SmartStr = SmartStr{}
 	ZendPrintZvalRToBuf(&buf, expr, indent)
-	buf.ZeroTail()
+	//buf.ZeroTail()
 	return buf.GetS()
 }
 func ZendPrintZvalR(expr *types.Zval, indent int) {
