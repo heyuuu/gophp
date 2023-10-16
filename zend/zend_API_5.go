@@ -7,38 +7,19 @@ import (
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/globals"
 	"strings"
 )
 
-func ZendCollectModuleHandlers() {
-	var class_count int = 0
-
-	/* Collect internal classes with static members */
-	CG__().ClassTable().Foreach(func(_ string, ce *types.ClassEntry) {
-		if ce.IsInternalClass() && ce.GetDefaultStaticMembersCount() > 0 {
-			class_count++
-		}
-	})
-
-	ClassCleanupHandlers = (**types.ClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
-	ClassCleanupHandlers[class_count] = nil
-	CG__().ClassTable().Foreach(func(_ string, ce *types.ClassEntry) {
-		if ce.IsInternalClass() && ce.GetDefaultStaticMembersCount() > 0 {
-			ClassCleanupHandlers[lang.PreDec(&class_count)] = ce
-		}
-	})
-}
 func ZendStartupModules() {
-	for _, module := range globals.G().GetSortedModules() {
+	for _, module := range G().GetSortedModules() {
 		if !ZendStartupModuleEx(module) {
-			globals.G().DelModule(module.Name())
+			G().DelModule(module.Name())
 		}
 	}
 }
 func ZendDestroyModules() {
-	Free(ClassCleanupHandlers)
-	globals.G().DestroyModules()
+	//Free(ClassCleanupHandlers)
+	G().DestroyModules()
 }
 func ZendRegisterModuleEx(module *ModuleEntry) *ModuleEntry {
 	if module == nil {
@@ -46,7 +27,7 @@ func ZendRegisterModuleEx(module *ModuleEntry) *ModuleEntry {
 	}
 
 	/* Check module dependencies */
-	module = globals.G().RegisterModule(module)
+	module = G().RegisterModule(module)
 	if module == nil {
 		faults.Error(faults.E_CORE_WARNING, "Module '%s' already loaded", module.Name())
 		return nil
@@ -54,7 +35,7 @@ func ZendRegisterModuleEx(module *ModuleEntry) *ModuleEntry {
 
 	EG__().SetCurrentModule(module)
 	if module.Functions() != nil && !ZendRegisterFunctions(nil, module.Functions(), nil) {
-		globals.G().DelModule(module.Name())
+		G().DelModule(module.Name())
 		EG__().SetCurrentModule(nil)
 		faults.Error(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.Name())
 		return nil

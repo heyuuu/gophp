@@ -9,7 +9,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
@@ -311,7 +310,7 @@ func PhpPrintInfo(flag int) {
 		}
 	}
 	if (flag & PHP_INFO_MODULES) != 0 {
-		sortedRegistryModules := globals.G().GetSortedModules()
+		sortedRegistryModules := zend.G().GetSortedModules()
 		for _, module := range sortedRegistryModules {
 			PhpInfoPrintModule(module)
 		}
@@ -556,7 +555,7 @@ func ZifPhpversion(_ zpp.Opt, extension *string) (string, bool) {
 	if extension == nil {
 		return core.PHP_VERSION, true
 	} else {
-		module := globals.G().GetModule(*extension)
+		module := zend.G().GetModule(*extension)
 		if module == nil {
 			return "", false
 		}

@@ -9,7 +9,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/globals"
 	"os"
 	"strings"
 )
@@ -58,7 +57,7 @@ const usage string = `Usage: %s [options] [-f] <file> [--] [args...]
 `
 
 func PrintModules() {
-	var modules = globals.G().GetSortedModules()
+	var modules = zend.G().GetSortedModules()
 	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.Name())
 	}
@@ -566,7 +565,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 			// zend.ZvalPtrDtor(&arg)
 			break
 		case PHP_MODE_REFLECTION_EXT_INFO:
-			if module := globals.G().GetModule(b.CastStrAuto(reflection_what)); module != nil {
+			if module := zend.G().GetModule(b.CastStrAuto(reflection_what)); module != nil {
 				standard.PhpInfoPrintModule(module)
 			} else {
 				if reflection_what == "main" {

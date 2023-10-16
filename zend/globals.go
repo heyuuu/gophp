@@ -1,25 +1,24 @@
-package globals
+package zend
 
 import (
 	"github.com/heyuuu/gophp/kits/ascii"
-	"github.com/heyuuu/gophp/zend"
 	"sort"
 )
 
-func G() *Globals { return currGlobals }
+var currEngine *Engine
 
-var currGlobals *Globals
+func G() *Engine { return currEngine }
 
-type Globals struct {
-	modules map[string]*zend.ModuleEntry
+type Engine struct {
+	modules map[string]*ModuleEntry
 }
 
 /* module register */
-func (g *Globals) InitModules() {
-	g.modules = make(map[string]*zend.ModuleEntry, 32)
+func (g *Engine) InitModules() {
+	g.modules = make(map[string]*ModuleEntry, 32)
 }
 
-func (g *Globals) RegisterModule(m *zend.ModuleEntry) *zend.ModuleEntry {
+func (g *Engine) RegisterModule(m *ModuleEntry) *ModuleEntry {
 	lcName := ascii.StrToLower(m.Name())
 	// 若已注册，返回nil
 	if _, ok := g.modules[lcName]; ok {
@@ -32,7 +31,7 @@ func (g *Globals) RegisterModule(m *zend.ModuleEntry) *zend.ModuleEntry {
 	return &tmp
 }
 
-func (g *Globals) GetModule(name string) *zend.ModuleEntry {
+func (g *Engine) GetModule(name string) *ModuleEntry {
 	lcName := ascii.StrToLower(name)
 	if m, ok := g.modules[lcName]; ok {
 		return m
@@ -40,15 +39,15 @@ func (g *Globals) GetModule(name string) *zend.ModuleEntry {
 	return nil
 }
 
-func (g *Globals) DelModule(name string) {
+func (g *Engine) DelModule(name string) {
 	lcName := ascii.StrToLower(name)
 	delete(g.modules, lcName)
 }
 
-func (g *Globals) CountModules() int { return len(g.modules) }
+func (g *Engine) CountModules() int { return len(g.modules) }
 
-func (g *Globals) GetSortedModules() []*zend.ModuleEntry {
-	var modules []*zend.ModuleEntry
+func (g *Engine) GetSortedModules() []*ModuleEntry {
+	var modules []*ModuleEntry
 	for _, module := range g.modules {
 		modules = append(modules, module)
 	}
@@ -58,13 +57,13 @@ func (g *Globals) GetSortedModules() []*zend.ModuleEntry {
 	return modules
 }
 
-func (g *Globals) EachModule(handler func(module *zend.ModuleEntry)) {
+func (g *Engine) EachModule(handler func(module *ModuleEntry)) {
 	for _, module := range g.modules {
 		handler(module)
 	}
 }
 
-func (g *Globals) EachModuleReserve(handler func(module *zend.ModuleEntry)) {
+func (g *Engine) EachModuleReserve(handler func(module *ModuleEntry)) {
 	// todo 确认 reserve 方式是否符合原意
 	modules := g.GetSortedModules()
 	for i := len(modules) - 1; i >= 0; i-- {
@@ -72,9 +71,9 @@ func (g *Globals) EachModuleReserve(handler func(module *zend.ModuleEntry)) {
 		handler(module)
 	}
 }
-func (g *Globals) DestroyModules() {
-	g.EachModuleReserve(func(module *zend.ModuleEntry) {
-		zend.ModuleDestructor(module)
+func (g *Engine) DestroyModules() {
+	g.EachModuleReserve(func(module *ModuleEntry) {
+		ModuleDestructor(module)
 	})
 	g.InitModules()
 }

@@ -10,7 +10,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
@@ -908,7 +907,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 	var moduleNumber int = 0
 	zend.ZendIniSortEntries()
 	if extension != nil {
-		module := globals.G().GetModule(*extension)
+		module := zend.G().GetModule(*extension)
 		if module == nil {
 			core.PhpErrorDocref("", faults.E_WARNING, "Unable to find extension '%s'", *extension)
 			returnValue.SetFalse()

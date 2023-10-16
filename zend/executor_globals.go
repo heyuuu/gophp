@@ -207,7 +207,7 @@ func (eg *ZendExecutorGlobals) Deactivate() {
 		eg.ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
 			return ce.IsInternalClass()
 		})
-		ZendCleanupInternalClasses()
+		//ZendCleanupInternalClasses()
 	} else {
 		eg.vmStack = nil
 

@@ -3,7 +3,6 @@ package zend
 import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/globals"
 )
 
 func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functionTable FunctionTable) {
@@ -25,7 +24,7 @@ func ModuleDestructor(module *ModuleEntry) {
 	module.ModuleShutdown()
 }
 func ZendActivateModules() {
-	globals.G().EachModuleReserve(func(module *ModuleEntry) {
+	G().EachModuleReserve(func(module *ModuleEntry) {
 		if !module.RequestStartup() {
 			faults.Error(faults.E_WARNING, "request_startup() for %s module failed", module.Name())
 			exit(1)
@@ -35,20 +34,13 @@ func ZendActivateModules() {
 func ZendDeactivateModules() {
 	EG__().SetCurrentExecuteData(nil)
 	faults.Try(func() {
-		globals.G().EachModuleReserve(func(module *ModuleEntry) {
+		G().EachModuleReserve(func(module *ModuleEntry) {
 			module.RequestShutdown()
 		})
 	})
 }
-func ZendCleanupInternalClasses() {
-	var p **types.ClassEntry = ClassCleanupHandlers
-	for (*p) != nil {
-		//ZendCleanupInternalClassData(*p)
-		p++
-	}
-}
 func ZendNextFreeModule() int {
-	return globals.G().CountModules() + 1
+	return G().CountModules() + 1
 }
 func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry) bool {
 	/* TODO: Move this out of here in 7.4. */

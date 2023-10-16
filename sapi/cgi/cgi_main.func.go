@@ -8,7 +8,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"log"
 	"os"
@@ -23,7 +22,7 @@ func FcgiLog(type_ int, format *byte, _ ...any) {
 	va_end(ap)
 }
 func PrintModules() {
-	var modules = globals.G().GetSortedModules()
+	var modules = zend.G().GetSortedModules()
 	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.Name())
 	}

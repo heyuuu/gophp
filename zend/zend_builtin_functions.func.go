@@ -7,7 +7,6 @@ import (
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"strings"
@@ -963,7 +962,7 @@ func ZifGetLoadedExtensions(_ zpp.Opt, zendExtensions bool) *types.Array {
 	if zendExtensions {
 		// not support zend extensions yet
 	} else {
-		globals.G().EachModule(func(module *ModuleEntry) {
+		G().EachModule(func(module *ModuleEntry) {
 			arr.Append(types.NewZvalString(module.Name()))
 		})
 	}
@@ -982,10 +981,10 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		var const_val types.Zval
 		var module_names []string
 		var i = 1
-		modules = make([]types.Zval, globals.G().CountModules()+2)
-		module_names = make([]string, globals.G().CountModules()+2)
+		modules = make([]types.Zval, G().CountModules()+2)
+		module_names = make([]string, G().CountModules()+2)
 		module_names[0] = "internal"
-		globals.G().EachModule(func(module *ModuleEntry) {
+		G().EachModule(func(module *ModuleEntry) {
 			module_names[module.ModuleNumber()] = module.Name()
 			i++
 		})
@@ -1458,7 +1457,7 @@ func ZifDebugBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, opti
 	ZendFetchDebugBacktrace(return_value, 1, options, limit)
 }
 func ZifExtensionLoaded(extensionName string) bool {
-	return globals.G().GetModule(extensionName) != nil
+	return G().GetModule(extensionName) != nil
 }
 func ZifGetExtensionFuncs(executeData zpp.Ex, return_value zpp.Ret, extensionName *types.Zval) {
 	var extension_name *types.String
@@ -1469,9 +1468,9 @@ func ZifGetExtensionFuncs(executeData zpp.Ex, return_value zpp.Ret, extensionNam
 	}
 
 	if !ascii.StrCaseEquals(extension_name.GetStr(), "zend") {
-		module = globals.G().GetModule(extension_name.GetStr())
+		module = G().GetModule(extension_name.GetStr())
 	} else {
-		module = globals.G().GetModule("core")
+		module = G().GetModule("core")
 	}
 	if module == nil {
 		return_value.SetFalse()

@@ -11,7 +11,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/operators"
 	"log"
 	"os"
@@ -1268,12 +1267,12 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	zend.ZendStartupModules()
 
 	/* start Zend extensions */
-	zend.ZendCollectModuleHandlers()
+	//zend.ZendCollectModuleHandlers()
 
 	/* register additional functions */
 
 	if SM__().GetAdditionalFunctions() != nil {
-		if module := globals.G().GetModule("standard"); module != nil {
+		if module := zend.G().GetModule("standard"); module != nil {
 			zend.EG__().SetCurrentModule(module)
 			zend.ZendRegisterFunctions(nil, SM__().GetAdditionalFunctions(), nil)
 			zend.EG__().SetCurrentModule(nil)
@@ -1286,7 +1285,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	PhpDisableClasses()
 
 	/* make core report what it should */
-	if module := globals.G().GetModule("core"); module != nil {
+	if module := zend.G().GetModule("core"); module != nil {
 		module.SetInfoFunc(ZmInfoPhpCore)
 	}
 	ModuleInitialized = 1
