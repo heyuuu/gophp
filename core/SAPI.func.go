@@ -210,28 +210,17 @@ func GetDefaultContentType(prefix string) string {
 func SapiGetDefaultContentTypeHeader() *SapiHeader {
 	return NewSapiHeader(GetDefaultContentType("Content-type: "))
 }
-func SapiApplyDefaultCharset(mimetype **byte, len_ int) int {
-	var charset *byte
-	var newtype *byte
-	var newlen int
-	if SG__().defaultCharset {
+func SapiApplyDefaultCharset(mimetype string) (string, bool) {
+	var charset string
+	if SG__().DefaultCharset() != "" {
 		charset = SG__().defaultCharset
 	} else {
 		charset = SAPI_DEFAULT_CHARSET
 	}
-	if (*mimetype) != nil {
-		if (*charset) && strncmp(*mimetype, "text/", 5) == 0 && strstr(*mimetype, "charset=") == nil {
-			newlen = len_ + (b.SizeOf("\";charset=\"") - 1) + strlen(charset)
-			newtype = zend.Emalloc(newlen + 1)
-			PHP_STRLCPY(newtype, *mimetype, newlen+1, len_)
-			strlcat(newtype, ";charset=", newlen+1)
-			strlcat(newtype, charset, newlen+1)
-			zend.Efree(*mimetype)
-			*mimetype = newtype
-			return newlen
-		}
+	if charset != "" && strings.HasPrefix(mimetype, "text/") && !strings.Contains(mimetype, "charset=") {
+		return mimetype + ";charset=" + charset, true
 	}
-	return 0
+	return mimetype, false
 }
 func SapiActivate() {
 	SG__().Activate()
@@ -307,28 +296,25 @@ func SapiInitializeEmptyRequest() {
 	SG__().serverContext = nil
 	SG__().RequestInfo.InitEmpty()
 }
-func SapiExtractResponseCode(header_line *byte) int {
-	var code int = 200
-	var ptr *byte
-	for ptr = header_line; *ptr; ptr++ {
-		if (*ptr) == ' ' && (*(ptr + 1)) != ' ' {
-			code = atoi(ptr + 1)
-			break
+func SapiExtractResponseCode(headerLine string) int {
+	defaultCode := 200
+	if idx := strings.IndexByte(headerLine, ' '); idx >= 0 {
+		for idx < len(headerLine) && headerLine[idx] == ' ' {
+			idx++
+		}
+		if code, _, ok := zend.TryStrToLong(headerLine[idx:]); ok {
+			return code
 		}
 	}
-	return code
+	return defaultCode
 }
 func SapiUpdateResponseCode(ncode int) {
 	/* if the status code did not change, we do not want
 	   to change the status line, and no need to change the code */
-
 	if SG__().SapiHeaders().HttpResponseCode() == ncode {
 		return
 	}
-	if SG__().SapiHeaders().httpStatusLine {
-		zend.Efree(SG__().SapiHeaders().httpStatusLine)
-		SG__().SapiHeaders().httpStatusLine = nil
-	}
+	SG__().SapiHeaders().SetHttpStatusLine("")
 	SG__().SapiHeaders().httpResponseCode = ncode
 }
 func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
@@ -345,11 +331,9 @@ func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
 	}
 }
 func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
-	var sapi_header SapiHeader
-	var colon_offset *byte
-	var header_line *byte
-	var header_line_len int
-	var http_response_code int
+	var sapiHeader SapiHeader
+	var headerLine string
+	var httpResponseCode int
 	if SG__().headersSent && !(SG__().RequestInfo.noHeaders) {
 		var outputStartFilename = OG__().StartFilename()
 		var outputStartLineno = OG__().StartLineno()
@@ -373,18 +357,15 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		if p.GetLine() == nil || p.GetLineLen() == 0 {
 			return types.FAILURE
 		}
-		header_line = p.GetLine()
-		header_line_len = p.GetLineLen()
-		http_response_code = p.GetResponseCode()
+		headerLine = b.CastStr(p.GetLine(), p.GetLineLen())
+		httpResponseCode = p.GetResponseCode()
 	case SAPI_HEADER_DELETE_ALL:
-		SM__().HeaderHandler(&sapi_header, op, &(SG__().SapiHeaders()))
-		SG__().SapiHeaders().headers.Clean()
+		SM__().HeaderHandler(&sapiHeader, op, SG__().SapiHeaders())
+		SG__().SapiHeaders().CleanHeaders()
 		return types.SUCCESS
 	default:
 		return types.FAILURE
 	}
-	header_line = zend.Estrndup(header_line, header_line_len)
-	headerLine := b.CastStrAuto(header_line)
 
 	/* cut off trailing spaces, linefeeds and carriage-returns */
 	headerLine = strings.TrimRightFunc(headerLine, ascii.IsSpaceRune)
@@ -394,8 +375,8 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 			return types.FAILURE
 		}
 
-		sapi_header.SetHeader(headerLine)
-		SM__().HeaderHandler(&sapi_header, op, SG__().SapiHeaders())
+		sapiHeader.SetHeader(headerLine)
+		SM__().HeaderHandler(&sapiHeader, op, SG__().SapiHeaders())
 		SG__().SapiHeaders().RemoveHeaderByKey(headerLine)
 		return types.SUCCESS
 	} else {
@@ -403,99 +384,69 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		for _, c := range []byte(headerLine) {
 			/* RFC 7230 ch. 3.2.4 deprecates folding support */
 			if c == '\n' || c == '\r' {
-				zend.Efree(header_line)
 				SM__().SapiError(faults.E_WARNING, "Header may not contain more than a single header, new line detected")
 				return types.FAILURE
 			}
 			if c == 0 {
-				zend.Efree(header_line)
 				SM__().SapiError(faults.E_WARNING, "Header may not contain NUL bytes")
 				return types.FAILURE
 			}
 		}
 	}
-	sapi_header.SetHeader(headerLine)
+	sapiHeader.SetHeader(headerLine)
 
 	/* Check the header for a few cases that we have special support for in SAPI */
 	if len(headerLine) >= 5 && ascii.StrCaseEquals(headerLine[:5], "HTTP/") {
 		/* filter out the response code */
-		SapiUpdateResponseCode(SapiExtractResponseCode(header_line))
+		SapiUpdateResponseCode(SapiExtractResponseCode(headerLine))
 
 		SG__().SapiHeaders().SetHttpStatusLine(headerLine)
 		return types.SUCCESS
 	} else {
-		colon_offset = strchr(header_line, ':')
-		if colon_offset != nil {
-			*colon_offset = 0
-			if !(strcasecmp(header_line, "Content-Type")) {
-				var ptr *byte = colon_offset + 1
-				var mimetype *byte = nil
-				var newheader *byte
-				var len_ int = header_line_len - (ptr - header_line)
-				var newlen int
-				for (*ptr) == ' ' {
-					ptr++
-					len_--
-				}
+		if headerKey, headerValue, ok := strings.Cut(headerLine, ":"); ok {
+			if ascii.StrCaseEquals(headerKey, "Content-Type") {
+				headerValue = strings.TrimLeft(headerValue, " ")
 
 				/* Disable possible output compression for images */
+				if strings.HasPrefix(headerValue, "image/") {
+					zend.ZendAlterIniEntryChars("zlib.output_compression", "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
+				}
 
-				if !(strncmp(ptr, "image/", b.SizeOf("\"image/\"")-1)) {
-					var key *types.String = types.NewString("zlib.output_compression")
-					zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
-					// types.ZendStringReleaseEx(key, 0)
+				mimetype, changed := SapiApplyDefaultCharset(headerValue)
+				if SG__().SapiHeaders().Mimetype() == "" {
+					SG__().SapiHeaders().SetMimetype(mimetype)
 				}
-				mimetype = zend.Estrdup(ptr)
-				newlen = SapiApplyDefaultCharset(&mimetype, len_)
-				if !(SG__().SapiHeaders().mimetype) {
-					SG__().SapiHeaders().mimetype = zend.Estrdup(mimetype)
+				if changed {
+					sapiHeader.SetHeader("Content-type: " + mimetype)
 				}
-				if newlen != 0 {
-					newlen += b.SizeOf("\"Content-type: \"")
-					newheader = zend.Emalloc(newlen)
-					PHP_STRLCPY(newheader, "Content-type: ", newlen, b.SizeOf("\"Content-type: \"")-1)
-					strlcat(newheader, mimetype, newlen)
-					sapi_header.SetHeader(b.CastStr(newheader, newlen-1))
-					zend.Efree(header_line)
-				}
-				zend.Efree(mimetype)
 				SG__().SapiHeaders().SetSendDefaultContentType(false)
-			} else if !(strcasecmp(header_line, "Content-Length")) {
-
+			} else if ascii.StrCaseEquals(headerKey, "Content-Length") {
 				/* Script is setting Content-length. The script cannot reasonably
 				 * know the size of the message body after compression, so it's best
 				 * do disable compression altogether. This contributes to making scripts
 				 * portable between setups that have and don't have zlib compression
 				 * enabled globally. See req #44164 */
-
-				var key *types.String = types.NewString("zlib.output_compression")
-				zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
-				// types.ZendStringReleaseEx(key, 0)
-			} else if ascii.StrCaseEquals(header_line, "Location") {
-				if (SG__().SapiHeaders().httpResponseCode < 300 || SG__().SapiHeaders().httpResponseCode > 399) && SG__().SapiHeaders().httpResponseCode != 201 {
-
+				zend.ZendAlterIniEntryChars("zlib.output_compression", "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
+			} else if ascii.StrCaseEquals(headerKey, "Location") {
+				if (SG__().SapiHeaders().HttpResponseCode() < 300 || SG__().SapiHeaders().HttpResponseCode() > 399) && SG__().SapiHeaders().HttpResponseCode() != 201 {
 					/* Return a Found Redirect if one is not already specified */
-
-					if http_response_code != 0 {
-						SapiUpdateResponseCode(http_response_code)
+					if httpResponseCode != 0 {
+						SapiUpdateResponseCode(httpResponseCode)
 					} else if SG__().RequestInfo.protoNum > 1000 && !SG__().RequestInfo.IsRequestMethod("HEAD") && !SG__().RequestInfo.IsRequestMethod("GET") {
 						SapiUpdateResponseCode(303)
 					} else {
 						SapiUpdateResponseCode(302)
 					}
 				}
-			} else if ascii.StrCaseEquals(header_line, "WWW-Authenticate") {
+			} else if ascii.StrCaseEquals(headerKey, "WWW-Authenticate") {
 				SapiUpdateResponseCode(401)
-			}
-			if sapi_header.GetHeader() == header_line {
-				*colon_offset = ':'
 			}
 		}
 	}
-	if http_response_code != 0 {
-		SapiUpdateResponseCode(http_response_code)
+	if httpResponseCode != 0 {
+		SapiUpdateResponseCode(httpResponseCode)
 	}
-	SapiHeaderAddOp(op, &sapi_header)
+	SapiHeaderAddOp(op, &sapiHeader)
 	return types.SUCCESS
 }
 func SapiSendHeaders() int {
@@ -540,7 +491,7 @@ func SapiSendHeaders() int {
 			http_status_line.SetHeader(fmt.Sprintf("HTTP/1.0 %d X", SG__().SapiHeaders().HttpResponseCode()))
 		}
 		SM__().GetSendHeader()(&http_status_line, SG__().serverContext)
-		SG__().SapiHeaders().GetHeaders().Each(func(h *SapiHeader) {
+		SG__().SapiHeaders().EachHeader(func(h *SapiHeader) {
 			SM__().GetSendHeader()(h, SG__().serverContext)
 		})
 

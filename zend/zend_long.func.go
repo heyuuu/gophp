@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"github.com/heyuuu/gophp/kits/ascii"
 	"strconv"
 )
 
@@ -10,6 +11,23 @@ func ZEND_ATOL(i __auto__, s __auto__) __auto__ {
 }
 func ZEND_STRTOL(s0 __auto__, s1 **byte, base int) __auto__  { return strtoll(s0, s1, base) }
 func ZEND_STRTOUL(s0 __auto__, s1 **byte, base int) __auto__ { return strtoull(s0, s1, base) }
+
+func TryStrToLong(str string) (n int, useLen int, ok bool) {
+	if len(str) == 0 || !ascii.IsDigit(str[0]) {
+		return 0, 0, false
+	}
+
+	useLen = 1
+	for useLen < len(str) && ascii.IsDigit(str[useLen]) {
+		useLen++
+	}
+
+	if val, err := strconv.Atoi(str[:useLen]); err == nil {
+		return val, useLen, true
+	} else {
+		return 0, 0, false
+	}
+}
 
 func StrToLong(s string, base int) (int, error) {
 	i := 0

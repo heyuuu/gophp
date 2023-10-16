@@ -107,7 +107,7 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 				len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status:%s", s)
 				response_status = atoi(s + 1)
 			} else {
-				_, has_status = sapi_headers.GetHeaders().FindFunc(func(h *core.SapiHeader) bool {
+				_, has_status = sapi_headers.Headers().FindFunc(func(h *core.SapiHeader) bool {
 					return h.HasKey("Status")
 				})
 
@@ -127,9 +127,9 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 			ignore_status = 1
 		}
 	}
-	sapi_headers.GetHeaders().Each(func(h *core.SapiHeader) {
+	sapi_headers.EachHeader(func(h *core.SapiHeader) {
 		/* prevent CRLFCRLF */
-		if h.Len() != 0 {
+		if h.Header() != "" {
 			if h.HasKey("Status") {
 				if !ignore_status {
 					ignore_status = true
@@ -967,7 +967,7 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 }
 func ZifApacheResponseHeaders() *types.Array {
 	arr := types.NewArray()
-	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
+	core.SG__().SapiHeaders().EachHeader(func(h *core.SapiHeader) {
 		if key, val, ok := strings.Cut(h.Header(), ":"); ok {
 			key = strings.TrimRight(key, " \t")
 			if len(key) > 0 {

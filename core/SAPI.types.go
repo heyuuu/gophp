@@ -18,16 +18,12 @@ func NewSapiHeader(s string) *SapiHeader {
 	return &SapiHeader{s: s}
 }
 
-func (h *SapiHeader) GetHeader() *byte { /** todo remove */ }
-
-func (h *SapiHeader) Len() int           { return len(h.s) }
 func (h *SapiHeader) Header() string     { return h.s }
 func (h *SapiHeader) SetHeader(s string) { h.s = s }
 func (h *SapiHeader) GetKey() (string, bool) {
 	key, _, ok := strings.Cut(h.s, ":")
 	return key, ok
 }
-
 func (h *SapiHeader) HasKey(findKey string) bool {
 	key, ok := h.GetKey()
 	return ok && ascii.StrCaseEquals(key, findKey)
@@ -51,21 +47,22 @@ func (sh *SapiHeaders) Init() {
 	sh.mimetype = ""
 }
 
-func (sh *SapiHeaders) GetHeaders() *zend.ZendLlist[*SapiHeader] { return &sh.headers }
-
 func (sh *SapiHeaders) HttpResponseCode() int            { return sh.httpResponseCode }
 func (sh *SapiHeaders) SetHttpResponseCode(code int)     { sh.httpResponseCode = code }
 func (sh *SapiHeaders) SendDefaultContentType() bool     { return sh.sendDefaultContentType }
 func (sh *SapiHeaders) SetSendDefaultContentType(b bool) { sh.sendDefaultContentType = b }
+func (sh *SapiHeaders) Mimetype() string                 { return sh.mimetype }
+func (sh *SapiHeaders) SetMimetype(mimetype string)      { sh.mimetype = mimetype }
 func (sh *SapiHeaders) HttpStatusLine() string           { return sh.httpStatusLine }
 func (sh *SapiHeaders) SetHttpStatusLine(line string)    { sh.httpStatusLine = line }
 
-func (sh *SapiHeaders) AddHeader(header *SapiHeader) {
-	sh.headers.AddLast(header)
-}
+func (sh *SapiHeaders) Headers() *zend.ZendLlist[*SapiHeader] { return &sh.headers }
+func (sh *SapiHeaders) AddHeader(header *SapiHeader)          { sh.headers.AddLast(header) }
+func (sh *SapiHeaders) CleanHeaders()                         { sh.headers.Clean() }
 func (sh *SapiHeaders) RemoveHeaderByKey(key string) {
 	sh.headers.Filter(func(h *SapiHeader) bool { return h.HasKey(key) })
 }
+func (sh *SapiHeaders) EachHeader(h func(h *SapiHeader)) { sh.headers.Each(h) }
 
 /**
  * SapiRequestInfo

@@ -377,7 +377,7 @@ func ZifHeadersSent(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, file_ z
 }
 func ZifHeadersList() *types.Array {
 	arr := types.NewArray()
-	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
+	core.SG__().SapiHeaders().EachHeader(func(h *core.SapiHeader) {
 		arr.Append(types.NewZvalString(h.Header()))
 	})
 	return arr

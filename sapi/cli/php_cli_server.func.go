@@ -113,7 +113,7 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 }
 func ZifApacheResponseHeaders() *types.Array {
 	arr := types.NewArray()
-	core.SG__().SapiHeaders().GetHeaders().Each(func(h *core.SapiHeader) {
+	core.SG__().SapiHeaders().EachHeader(func(h *core.SapiHeader) {
 		if key, val, ok := strings.Cut(h.Header(), ":"); ok {
 			key = strings.TrimRight(key, " \t")
 			if len(key) > 0 {
@@ -149,8 +149,8 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 		AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), core.SG__().SapiHeaders().HttpResponseCode(), 0)
 	}
 	AppendEssentialHeaders(&buffer, client, 0)
-	sapi_headers.GetHeaders().Each(func(h *core.SapiHeader) {
-		if h.Len() != 0 {
+	sapi_headers.EachHeader(func(h *core.SapiHeader) {
+		if h.Header() != "" {
 			buffer.WriteString(h.Header())
 			buffer.WriteString("\r\n")
 		}

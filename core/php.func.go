@@ -4,6 +4,18 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
+func StrLcpy(dst []byte, src string, size int, src_size int) {
+	var php_str_len int
+	if src_size >= size {
+		php_str_len = size - 1
+	} else {
+		php_str_len = src_size
+	}
+	memcpy(dst, src, php_str_len)
+	dst[php_str_len] = '0'
+
+}
+
 func PHP_STRLCPY(dst []char, src __auto__, size int, src_size int) {
 	var php_str_len int
 	if src_size >= size {
