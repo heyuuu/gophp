@@ -2599,10 +2599,22 @@ func ZifIteratorApply(executeData *zend.ZendExecuteData, return_value *types.Zva
 	return
 }
 func ZmStartupSplIterators(type_ int, module_number int) int {
-	spl_ce_RecursiveIterator = zend.RegisterInternalInterface("RecursiveIterator", spl_funcs_RecursiveIterator)
-	zend.ZendClassImplements(spl_ce_RecursiveIterator, 1, zend.ZendCeIterator)
-	spl_ce_RecursiveIteratorIterator = zend.RegisterClass("RecursiveIteratorIterator", spl_RecursiveIteratorIterator_new, spl_funcs_RecursiveIteratorIterator)
-	zend.ZendClassImplements(spl_ce_RecursiveIteratorIterator, 1, zend.ZendCeIterator)
+	spl_ce_RecursiveIterator = zend.RegisterInterface(&types.InternalClassDecl{
+		Name:       "RecursiveIterator",
+		Interfaces: []*types.ClassEntry{zend.ZendCeIterator},
+	})
+
+	spl_ce_RecursiveIteratorIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "RecursiveIteratorIterator",
+		Functions:    spl_funcs_RecursiveIteratorIterator,
+		Interfaces:   []*types.ClassEntry{zend.ZendCeIterator, spl_ce_OuterIterator},
+		GetIterator:  SplRecursiveItGetIterator,
+		CreateObject: spl_RecursiveIteratorIterator_new,
+	})
+	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "LEAVES_ONLY", zend.ZendLong(RIT_LEAVES_ONLY))
+	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "SELF_FIRST", zend.ZendLong(RIT_SELF_FIRST))
+	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "CHILD_FIRST", zend.ZendLong(RIT_CHILD_FIRST))
+	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "CATCH_GET_CHILD", zend.ZendLong(RIT_CATCH_GET_CHILD))
 
 	SplHandlersRecItIt = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:    int((*byte)(&((*SplRecursiveItObject)(nil).GetStd())) - (*byte)(nil)),
@@ -2619,43 +2631,110 @@ func ZmStartupSplIterators(type_ int, module_number int) int {
 		FreeObj:   SplDualItFreeStorage,
 	})
 
-	spl_ce_RecursiveIteratorIterator.SetGetIterator(SplRecursiveItGetIterator)
-	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "LEAVES_ONLY", zend.ZendLong(RIT_LEAVES_ONLY))
-	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "SELF_FIRST", zend.ZendLong(RIT_SELF_FIRST))
-	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "CHILD_FIRST", zend.ZendLong(RIT_CHILD_FIRST))
-	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveIteratorIterator, "CATCH_GET_CHILD", zend.ZendLong(RIT_CATCH_GET_CHILD))
-	spl_ce_OuterIterator = zend.RegisterInternalInterface("OuterIterator", spl_funcs_OuterIterator)
-	zend.ZendClassImplements(spl_ce_OuterIterator, 1, zend.ZendCeIterator)
-	spl_ce_IteratorIterator = zend.RegisterClass("IteratorIterator", SplDualItNew, spl_funcs_IteratorIterator)
-	zend.ZendClassImplements(spl_ce_IteratorIterator, 1, zend.ZendCeIterator)
-	zend.ZendClassImplements(spl_ce_IteratorIterator, 1, spl_ce_OuterIterator)
-	spl_ce_FilterIterator = zend.RegisterSubClass(spl_ce_IteratorIterator, "FilterIterator", SplDualItNew, spl_funcs_FilterIterator)
-	spl_ce_FilterIterator.AddCeFlags(types.AccExplicitAbstractClass)
-	spl_ce_RecursiveFilterIterator = zend.RegisterSubClass(spl_ce_FilterIterator, "RecursiveFilterIterator", SplDualItNew, spl_funcs_RecursiveFilterIterator)
-	zend.ZendClassImplements(spl_ce_RecursiveFilterIterator, 1, spl_ce_RecursiveIterator)
-	spl_ce_CallbackFilterIterator = zend.RegisterSubClass(spl_ce_FilterIterator, "CallbackFilterIterator", SplDualItNew, spl_funcs_CallbackFilterIterator)
-	spl_ce_RecursiveCallbackFilterIterator = zend.RegisterSubClass(spl_ce_CallbackFilterIterator, "RecursiveCallbackFilterIterator", SplDualItNew, spl_funcs_RecursiveCallbackFilterIterator)
-	zend.ZendClassImplements(spl_ce_RecursiveCallbackFilterIterator, 1, spl_ce_RecursiveIterator)
-	spl_ce_ParentIterator = zend.RegisterSubClass(spl_ce_RecursiveFilterIterator, "ParentIterator", SplDualItNew, spl_funcs_ParentIterator)
-	spl_ce_SeekableIterator = zend.RegisterInternalInterface("SeekableIterator", spl_funcs_SeekableIterator)
-	zend.ZendClassImplements(spl_ce_SeekableIterator, 1, zend.ZendCeIterator)
-	spl_ce_LimitIterator = zend.RegisterSubClass(spl_ce_IteratorIterator, "LimitIterator", SplDualItNew, spl_funcs_LimitIterator)
-	spl_ce_CachingIterator = zend.RegisterSubClass(spl_ce_IteratorIterator, "CachingIterator", SplDualItNew, spl_funcs_CachingIterator)
-	zend.ZendClassImplements(spl_ce_CachingIterator, 1, spl_ce_ArrayAccess)
-	zend.ZendClassImplements(spl_ce_CachingIterator, 1, spl_ce_Countable)
+	spl_ce_OuterIterator = zend.RegisterInterface(&types.InternalClassDecl{
+		Name:       "OuterIterator",
+		Functions:  spl_funcs_OuterIterator,
+		Interfaces: []*types.ClassEntry{zend.ZendCeIterator},
+	})
+
+	spl_ce_IteratorIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "IteratorIterator",
+		Interfaces:   []*types.ClassEntry{zend.ZendCeIterator, spl_ce_OuterIterator},
+		Functions:    spl_funcs_IteratorIterator,
+		CreateObject: SplDualItNew,
+	})
+
+	spl_ce_FilterIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "FilterIterator",
+		Parent:       spl_ce_IteratorIterator,
+		Functions:    spl_funcs_FilterIterator,
+		CreateObject: SplDualItNew,
+		CeFlags:      types.AccExplicitAbstractClass,
+	})
+
+	spl_ce_RecursiveFilterIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "RecursiveFilterIterator",
+		Parent:       spl_ce_FilterIterator,
+		Interfaces:   []*types.ClassEntry{spl_ce_RecursiveIterator},
+		Functions:    spl_funcs_RecursiveFilterIterator,
+		CreateObject: SplDualItNew,
+	})
+	spl_ce_CallbackFilterIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "CallbackFilterIterator",
+		Parent:       spl_ce_FilterIterator,
+		Functions:    spl_funcs_CallbackFilterIterator,
+		CreateObject: SplDualItNew,
+	})
+	spl_ce_RecursiveCallbackFilterIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "RecursiveCallbackFilterIterator",
+		Parent:       spl_ce_CallbackFilterIterator,
+		Interfaces:   []*types.ClassEntry{spl_ce_RecursiveIterator},
+		Functions:    spl_funcs_RecursiveCallbackFilterIterator,
+		CreateObject: SplDualItNew,
+	})
+	spl_ce_ParentIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "ParentIterator",
+		Parent:       spl_ce_RecursiveFilterIterator,
+		Functions:    spl_funcs_ParentIterator,
+		CreateObject: SplDualItNew,
+	})
+
+	spl_ce_SeekableIterator = zend.RegisterInterface(&types.InternalClassDecl{
+		Name:       "SeekableIterator",
+		Functions:  spl_funcs_SeekableIterator,
+		Interfaces: []*types.ClassEntry{zend.ZendCeIterator},
+	})
+
+	spl_ce_LimitIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "LimitIterator",
+		Parent:       spl_ce_IteratorIterator,
+		Functions:    spl_funcs_LimitIterator,
+		CreateObject: SplDualItNew,
+	})
+	spl_ce_CachingIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "CachingIterator",
+		Parent:       spl_ce_IteratorIterator,
+		Interfaces:   []*types.ClassEntry{spl_ce_ArrayAccess, spl_ce_Countable},
+		Functions:    spl_funcs_CachingIterator,
+		CreateObject: SplDualItNew,
+	})
 	zend.ZendDeclareClassConstantLong(spl_ce_CachingIterator, "CALL_TOSTRING", zend.ZendLong(CIT_CALL_TOSTRING))
 	zend.ZendDeclareClassConstantLong(spl_ce_CachingIterator, "CATCH_GET_CHILD", zend.ZendLong(CIT_CATCH_GET_CHILD))
 	zend.ZendDeclareClassConstantLong(spl_ce_CachingIterator, "TOSTRING_USE_KEY", zend.ZendLong(CIT_TOSTRING_USE_KEY))
 	zend.ZendDeclareClassConstantLong(spl_ce_CachingIterator, "TOSTRING_USE_CURRENT", zend.ZendLong(CIT_TOSTRING_USE_CURRENT))
 	zend.ZendDeclareClassConstantLong(spl_ce_CachingIterator, "TOSTRING_USE_INNER", zend.ZendLong(CIT_TOSTRING_USE_INNER))
 	zend.ZendDeclareClassConstantLong(spl_ce_CachingIterator, "FULL_CACHE", zend.ZendLong(CIT_FULL_CACHE))
-	spl_ce_RecursiveCachingIterator = zend.RegisterSubClass(spl_ce_CachingIterator, "RecursiveCachingIterator", SplDualItNew, spl_funcs_RecursiveCachingIterator)
-	zend.ZendClassImplements(spl_ce_RecursiveCachingIterator, 1, spl_ce_RecursiveIterator)
-	spl_ce_NoRewindIterator = zend.RegisterSubClass(spl_ce_IteratorIterator, "NoRewindIterator", SplDualItNew, spl_funcs_NoRewindIterator)
-	spl_ce_AppendIterator = zend.RegisterSubClass(spl_ce_IteratorIterator, "AppendIterator", SplDualItNew, spl_funcs_AppendIterator)
-	zend.ZendClassImplements(spl_ce_RecursiveIteratorIterator, 1, spl_ce_OuterIterator)
-	spl_ce_InfiniteIterator = zend.RegisterSubClass(spl_ce_IteratorIterator, "InfiniteIterator", SplDualItNew, spl_funcs_InfiniteIterator)
-	spl_ce_RegexIterator = zend.RegisterSubClass(spl_ce_FilterIterator, "RegexIterator", SplDualItNew, spl_funcs_RegexIterator)
+	spl_ce_RecursiveCachingIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "RecursiveCachingIterator",
+		Parent:       spl_ce_CachingIterator,
+		Interfaces:   []*types.ClassEntry{spl_ce_RecursiveIterator},
+		Functions:    spl_funcs_RecursiveCachingIterator,
+		CreateObject: SplDualItNew,
+	})
+	spl_ce_NoRewindIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "NoRewindIterator",
+		Parent:       spl_ce_IteratorIterator,
+		Functions:    spl_funcs_NoRewindIterator,
+		CreateObject: SplDualItNew,
+	})
+	spl_ce_AppendIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "AppendIterator",
+		Parent:       spl_ce_IteratorIterator,
+		Functions:    spl_funcs_AppendIterator,
+		CreateObject: SplDualItNew,
+	})
+	spl_ce_InfiniteIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "InfiniteIterator",
+		Parent:       spl_ce_IteratorIterator,
+		Functions:    spl_funcs_InfiniteIterator,
+		CreateObject: SplDualItNew,
+	})
+	spl_ce_RegexIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "RegexIterator",
+		Parent:       spl_ce_FilterIterator,
+		Functions:    spl_funcs_RegexIterator,
+		CreateObject: SplDualItNew,
+	})
 	zend.ZendDeclareClassConstantLong(spl_ce_RegexIterator, "USE_KEY", zend.ZendLong(REGIT_USE_KEY))
 	zend.ZendDeclareClassConstantLong(spl_ce_RegexIterator, "INVERT_MATCH", zend.ZendLong(REGIT_INVERTED))
 	zend.ZendDeclareClassConstantLong(spl_ce_RegexIterator, "MATCH", zend.ZendLong(REGIT_MODE_MATCH))
@@ -2664,11 +2743,25 @@ func ZmStartupSplIterators(type_ int, module_number int) int {
 	zend.ZendDeclareClassConstantLong(spl_ce_RegexIterator, "SPLIT", zend.ZendLong(REGIT_MODE_SPLIT))
 	zend.ZendDeclareClassConstantLong(spl_ce_RegexIterator, "REPLACE", zend.ZendLong(REGIT_MODE_REPLACE))
 	SplRegisterProperty(spl_ce_RegexIterator, "replacement", b.SizeOf("\"replacement\"")-1, 0)
-	spl_ce_RecursiveRegexIterator = zend.RegisterSubClass(spl_ce_RegexIterator, "RecursiveRegexIterator", SplDualItNew, spl_funcs_RecursiveRegexIterator)
-	zend.ZendClassImplements(spl_ce_RecursiveRegexIterator, 1, spl_ce_RecursiveIterator)
-	spl_ce_EmptyIterator = zend.RegisterClass("EmptyIterator", nil, spl_funcs_EmptyIterator)
-	zend.ZendClassImplements(spl_ce_EmptyIterator, 1, zend.ZendCeIterator)
-	spl_ce_RecursiveTreeIterator = zend.RegisterSubClass(spl_ce_RecursiveIteratorIterator, "RecursiveTreeIterator", spl_RecursiveTreeIterator_new, spl_funcs_RecursiveTreeIterator)
+	spl_ce_RecursiveRegexIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "RecursiveRegexIterator",
+		Parent:       spl_ce_RegexIterator,
+		Interfaces:   []*types.ClassEntry{spl_ce_RecursiveIterator},
+		Functions:    spl_funcs_RecursiveRegexIterator,
+		CreateObject: SplDualItNew,
+	})
+	spl_ce_EmptyIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "EmptyIterator",
+		Interfaces:   []*types.ClassEntry{zend.ZendCeIterator},
+		Functions:    spl_funcs_EmptyIterator,
+		CreateObject: nil,
+	})
+	spl_ce_RecursiveTreeIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "RecursiveTreeIterator",
+		Parent:       spl_ce_RecursiveIteratorIterator,
+		Functions:    spl_funcs_RecursiveTreeIterator,
+		CreateObject: spl_RecursiveTreeIterator_new,
+	})
 	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveTreeIterator, "BYPASS_CURRENT", zend.ZendLong(RTIT_BYPASS_CURRENT))
 	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveTreeIterator, "BYPASS_KEY", zend.ZendLong(RTIT_BYPASS_KEY))
 	zend.ZendDeclareClassConstantLong(spl_ce_RecursiveTreeIterator, "PREFIX_LEFT", zend.ZendLong(0))

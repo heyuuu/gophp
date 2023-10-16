@@ -751,9 +751,15 @@ func SplPqueueGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 	return iterator.GetIntern().GetIt()
 }
 func ZmStartupSplHeap(type_ int, module_number int) int {
-	spl_ce_SplHeap = zend.RegisterClass("SplHeap", SplHeapObjectNew, spl_funcs_SplHeap)
-	memcpy(&spl_handler_SplHeap, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
+	spl_ce_SplHeap = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplHeap",
+		Interfaces:   []*types.ClassEntry{spl_ce_Iterator, spl_ce_Countable},
+		Functions:    spl_funcs_SplHeap,
+		CreateObject: SplHeapObjectNew,
+		GetIterator:  SplHeapGetIterator,
+	})
 
+	memcpy(&spl_handler_SplHeap, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	spl_handler_SplHeap = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:        int((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:      SplHeapObjectClone,
@@ -761,15 +767,30 @@ func ZmStartupSplHeap(type_ int, module_number int) int {
 		FreeObj:       SplHeapObjectFreeStorage,
 	})
 
-	zend.ZendClassImplements(spl_ce_SplHeap, 1, spl_ce_Iterator)
-	zend.ZendClassImplements(spl_ce_SplHeap, 1, spl_ce_Countable)
-	spl_ce_SplHeap.SetGetIterator(SplHeapGetIterator)
-	spl_ce_SplMinHeap = zend.RegisterSubClass(spl_ce_SplHeap, "SplMinHeap", SplHeapObjectNew, spl_funcs_SplMinHeap)
-	spl_ce_SplMaxHeap = zend.RegisterSubClass(spl_ce_SplHeap, "SplMaxHeap", SplHeapObjectNew, spl_funcs_SplMaxHeap)
-	spl_ce_SplMaxHeap.SetGetIterator(SplHeapGetIterator)
-	spl_ce_SplMinHeap.SetGetIterator(SplHeapGetIterator)
+	spl_ce_SplMinHeap = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplMinHeap",
+		Parent:       spl_ce_SplHeap,
+		Functions:    spl_funcs_SplMinHeap,
+		CreateObject: SplHeapObjectNew,
+		GetIterator:  SplHeapGetIterator,
+	})
 
-	spl_ce_SplPriorityQueue = zend.RegisterClass("SplPriorityQueue", SplHeapObjectNew, spl_funcs_SplPriorityQueue)
+	spl_ce_SplMaxHeap = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplMaxHeap",
+		Parent:       spl_ce_SplHeap,
+		Functions:    spl_funcs_SplMaxHeap,
+		CreateObject: SplHeapObjectNew,
+		GetIterator:  SplHeapGetIterator,
+	})
+
+	spl_ce_SplPriorityQueue = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplPriorityQueue",
+		Interfaces:   []*types.ClassEntry{spl_ce_Iterator, spl_ce_Countable},
+		Functions:    spl_funcs_SplPriorityQueue,
+		CreateObject: SplHeapObjectNew,
+		GetIterator:  SplPqueueGetIterator,
+	})
+
 	spl_handler_SplPriorityQueue = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:        int((*byte)(&((*SplHeapObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:      SplHeapObjectClone,
@@ -778,9 +799,6 @@ func ZmStartupSplHeap(type_ int, module_number int) int {
 		FreeObj:       SplHeapObjectFreeStorage,
 	})
 
-	zend.ZendClassImplements(spl_ce_SplPriorityQueue, 1, spl_ce_Iterator)
-	zend.ZendClassImplements(spl_ce_SplPriorityQueue, 1, spl_ce_Countable)
-	spl_ce_SplPriorityQueue.SetGetIterator(SplPqueueGetIterator)
 	zend.ZendDeclareClassConstantLong(spl_ce_SplPriorityQueue, "EXTR_BOTH", zend.ZendLong(SPL_PQUEUE_EXTR_BOTH))
 	zend.ZendDeclareClassConstantLong(spl_ce_SplPriorityQueue, "EXTR_PRIORITY", zend.ZendLong(SPL_PQUEUE_EXTR_PRIORITY))
 	zend.ZendDeclareClassConstantLong(spl_ce_SplPriorityQueue, "EXTR_DATA", zend.ZendLong(SPL_PQUEUE_EXTR_DATA))

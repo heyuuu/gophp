@@ -5,31 +5,12 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 )
 
-func RegisterInternalInterface(name string, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
-	return RegisterClassEx(&types.InternalClassDecl{
-		Name:        name,
-		Functions:   builtinFunctions,
-		IsInterface: true,
-	})
+func RegisterInterface(decl *types.InternalClassDecl) *types.ClassEntry {
+	decl.IsInterface = true
+	return RegisterClass(decl)
 }
 
-func RegisterClass(name string, objCtor types.ObjCtorType, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
-	return RegisterClassEx(&types.InternalClassDecl{
-		Name:         name,
-		Functions:    builtinFunctions,
-		CreateObject: objCtor,
-	})
-}
-func RegisterSubClass(parentCe *types.ClassEntry, name string, objCtor types.ObjCtorType, builtinFunctions []types.FunctionEntry) *types.ClassEntry {
-	return RegisterClassEx(&types.InternalClassDecl{
-		Name:         name,
-		Functions:    builtinFunctions,
-		Parent:       parentCe,
-		CreateObject: objCtor,
-	})
-}
-
-func RegisterClassEx(decl *types.InternalClassDecl) *types.ClassEntry {
+func RegisterClass(decl *types.InternalClassDecl) *types.ClassEntry {
 	b.Assert(decl.Name != "")
 
 	var moduleNumber = EG__().GetCurrentModule().GetModuleNumber()
@@ -39,16 +20,22 @@ func RegisterClassEx(decl *types.InternalClassDecl) *types.ClassEntry {
 	}
 	CG__().ClassTable().Update(ce.Name(), ce)
 
-	if !decl.IsInterface {
+	// handle interfaces
+	for _, iface := range decl.Interfaces {
+		ZendDoImplementInterface(ce, iface)
+	}
+
+	if decl.IsInterface {
+		if decl.InterfaceGetsImplemented != nil {
+			ce.SetInterfaceGetsImplemented(decl.InterfaceGetsImplemented)
+		}
+	} else {
 		// handle parent
 		parent := decl.Parent
 		if parent != nil {
 			ZendDoInheritance(ce, parent)
 			ZendBuildPropertiesInfoTable(ce)
 		}
-
-		// handle interfaces
-		ZendClassImplements(ce, 1, decl.Interfaces...)
 
 		// handle objCtor
 		if decl.CreateObject != nil {

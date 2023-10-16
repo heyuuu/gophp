@@ -58,7 +58,8 @@ func PhpCreateIncompleteClass() *types.ClassEntry {
 		GetMethod:         IncompleteClassGetMethod,
 	})
 
-	return zend.RegisterClass(INCOMPLETE_CLASS, PhpCreateIncompleteObject, nil)
+	return zend.RegisterClass(&types.InternalClassDecl{
+		Name: INCOMPLETE_CLASS, CreateObject: PhpCreateIncompleteObject})
 }
 func PhpLookupClassName(object *types.Zval) (string, bool) {
 	objectProperties := types.Z_OBJPROP_P(object)

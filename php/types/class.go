@@ -30,15 +30,21 @@ type UserClassDecl struct {
 // InternalClassDecl
 type ObjCtorType = func(*ClassEntry) *Object
 type ObjGetIteratorType = func(ce *ClassEntry, object *Zval, byRef int) *zend.ZendObjectIterator
+type InterfaceGetsImplementedType = func(iface *ClassEntry, classType *ClassEntry) int
 type InternalClassDecl struct {
-	Name         string
-	CreateObject ObjCtorType
-	Functions    []FunctionEntry
-	Parent       *ClassEntry
-	Interfaces   []*ClassEntry
+	Name        string
+	Parent      *ClassEntry
+	Interfaces  []*ClassEntry
+	Constants   []any
+	Properties  []any
+	Functions   []FunctionEntry
+	CeFlags     uint32
+	IsInterface bool
+
 	GetIterator  ObjGetIteratorType
-	CeFlags      uint32
-	IsInterface  bool
+	CreateObject ObjCtorType
+
+	InterfaceGetsImplemented InterfaceGetsImplementedType
 }
 
 /**

@@ -961,7 +961,14 @@ func SplDllistGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 	return iterator.GetIntern().GetIt()
 }
 func ZmStartupSplDllist(type_ int, module_number int) int {
-	spl_ce_SplDoublyLinkedList = zend.RegisterClass("SplDoublyLinkedList", SplDllistObjectNew, spl_funcs_SplDoublyLinkedList)
+	spl_ce_SplDoublyLinkedList = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplDoublyLinkedList",
+		Interfaces:   []*types.ClassEntry{spl_ce_Iterator, spl_ce_Countable, spl_ce_ArrayAccess, spl_ce_Serializable},
+		Functions:    spl_funcs_SplDoublyLinkedList,
+		CreateObject: SplDllistObjectNew,
+		GetIterator:  SplDllistGetIterator,
+	})
+
 	spl_handler_SplDoublyLinkedList = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:        int((*byte)(&((*SplDllistObject)(nil).GetStd())) - (*byte)(nil)),
 		CloneObj:      SplDllistObjectClone,
@@ -973,14 +980,20 @@ func ZmStartupSplDllist(type_ int, module_number int) int {
 	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_FIFO", zend.ZendLong(0))
 	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_DELETE", zend.ZendLong(SPL_DLLIST_IT_DELETE))
 	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_KEEP", zend.ZendLong(0))
-	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_Iterator)
-	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_Countable)
-	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_ArrayAccess)
-	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_Serializable)
-	spl_ce_SplDoublyLinkedList.SetGetIterator(SplDllistGetIterator)
-	spl_ce_SplQueue = zend.RegisterSubClass(spl_ce_SplDoublyLinkedList, "SplQueue", SplDllistObjectNew, spl_funcs_SplQueue)
-	spl_ce_SplStack = zend.RegisterSubClass(spl_ce_SplDoublyLinkedList, "SplStack", SplDllistObjectNew, nil)
-	spl_ce_SplQueue.SetGetIterator(SplDllistGetIterator)
-	spl_ce_SplStack.SetGetIterator(SplDllistGetIterator)
+
+	spl_ce_SplQueue = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplQueue",
+		Parent:       spl_ce_SplDoublyLinkedList,
+		Functions:    spl_funcs_SplQueue,
+		CreateObject: SplDllistObjectNew,
+		GetIterator:  SplDllistGetIterator,
+	})
+	spl_ce_SplStack = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplStack",
+		Parent:       spl_ce_SplDoublyLinkedList,
+		Functions:    nil,
+		CreateObject: SplDllistObjectNew,
+		GetIterator:  SplDllistGetIterator,
+	})
 	return types.SUCCESS
 }

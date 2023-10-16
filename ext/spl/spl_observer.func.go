@@ -834,9 +834,20 @@ func zim_spl_MultipleIterator_key(executeData *zend.ZendExecuteData, return_valu
 	SplMultipleIteratorGetAll(intern, SPL_MULTIPLE_ITERATOR_GET_ALL_KEY, return_value)
 }
 func ZmStartupSplObserver(type_ int, module_number int) int {
-	spl_ce_SplObserver = zend.RegisterInternalInterface("SplObserver", spl_funcs_SplObserver)
-	spl_ce_SplSubject = zend.RegisterInternalInterface("SplSubject", spl_funcs_SplSubject)
-	spl_ce_SplObjectStorage = zend.RegisterClass("SplObjectStorage", spl_SplObjectStorage_new, spl_funcs_SplObjectStorage)
+	spl_ce_SplObserver = zend.RegisterInterface(&types.InternalClassDecl{
+		Name:      "SplObserver",
+		Functions: spl_funcs_SplObserver,
+	})
+	spl_ce_SplSubject = zend.RegisterInterface(&types.InternalClassDecl{
+		Name:      "SplSubject",
+		Functions: spl_funcs_SplSubject,
+	})
+	spl_ce_SplObjectStorage = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplObjectStorage",
+		Interfaces:   []*types.ClassEntry{spl_ce_Countable, spl_ce_Iterator, spl_ce_Serializable, spl_ce_ArrayAccess},
+		Functions:    spl_funcs_SplObjectStorage,
+		CreateObject: spl_SplObjectStorage_new,
+	})
 
 	spl_handler_SplObjectStorage = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		Offset:         int((*byte)(&((*SplObjectStorage)(nil).GetStd())) - (*byte)(nil)),
@@ -846,12 +857,12 @@ func ZmStartupSplObserver(type_ int, module_number int) int {
 		FreeObj:        spl_SplObjectStorage_free_storage,
 	})
 
-	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_Countable)
-	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_Iterator)
-	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_Serializable)
-	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_ArrayAccess)
-	spl_ce_MultipleIterator = zend.RegisterClass("MultipleIterator", spl_SplObjectStorage_new, spl_funcs_MultipleIterator)
-	zend.ZendClassImplements(spl_ce_MultipleIterator, 1, zend.ZendCeIterator)
+	spl_ce_MultipleIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "MultipleIterator",
+		Interfaces:   []*types.ClassEntry{zend.ZendCeIterator},
+		Functions:    spl_funcs_MultipleIterator,
+		CreateObject: spl_SplObjectStorage_new,
+	})
 	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ANY", MIT_NEED_ANY)
 	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ALL", MIT_NEED_ALL)
 	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_KEYS_NUMERIC", MIT_KEYS_NUMERIC)

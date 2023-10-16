@@ -1061,15 +1061,18 @@ func ZendGeneratorGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	return iterator
 }
 func ZendRegisterGeneratorCe() {
-	ZendCeGenerator = RegisterClass("Generator", ZendGeneratorCreate, GeneratorFunctions)
+	ZendCeGenerator = RegisterClass(&types.InternalClassDecl{
+		Name:         "Generator",
+		Interfaces:   []*types.ClassEntry{ZendCeIterator},
+		Functions:    GeneratorFunctions,
+		CreateObject: ZendGeneratorCreate,
+		GetIterator:  ZendGeneratorGetIterator,
+	})
 	ZendCeGenerator.SetIsFinal(true)
 	ZendCeGenerator.SetSerialize(ZendClassSerializeDeny)
 	ZendCeGenerator.SetUnserialize(ZendClassUnserializeDeny)
 
 	/* get_iterator has to be assigned *after* implementing the inferface */
-
-	ZendClassImplements(ZendCeGenerator, 1, ZendCeIterator)
-	ZendCeGenerator.SetGetIterator(ZendGeneratorGetIterator)
 	ZendGeneratorHandlers = *types.NewObjectHandlersEx(StdObjectHandlersPtr, types.ObjectHandlersSetting{
 		FreeObj:        ZendGeneratorFreeStorage,
 		DtorObj:        ZendGeneratorDtorStorage,
@@ -1077,5 +1080,5 @@ func ZendRegisterGeneratorCe() {
 		GetConstructor: ZendGeneratorGetConstructor,
 	})
 
-	zend_ce_ClosedGeneratorException = RegisterSubClass(faults.ZendCeException, "ClosedGeneratorException", nil, nil)
+	zend_ce_ClosedGeneratorException = RegisterClass(&types.InternalClassDecl{Name: "ClosedGeneratorException", Parent: faults.ZendCeException})
 }

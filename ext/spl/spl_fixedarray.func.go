@@ -676,7 +676,7 @@ func SplFixedarrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	return iterator.GetIntern().GetIt()
 }
 func ZmStartupSplFixedarray(type_ int, module_number int) int {
-	spl_ce_SplFixedArray = zend.RegisterClassEx(&types.InternalClassDecl{
+	spl_ce_SplFixedArray = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "SplFixedArray",
 		CreateObject: SplFixedarrayNew,
 		Functions:    spl_funcs_SplFixedArray,

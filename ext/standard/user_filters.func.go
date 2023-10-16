@@ -23,7 +23,11 @@ func PhpBucketDtor(res *types.Resource) {
 func ZmStartupUserFilters(type_ int, module_number int) int {
 	/* init the filter class ancestor */
 
-	var phpUserFilter = zend.RegisterClass("php_user_filter", nil, UserFilterClassFuncs)
+	var phpUserFilter = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "php_user_filter",
+		Functions:    UserFilterClassFuncs,
+		CreateObject: nil,
+	})
 	zend.ZendDeclarePropertyString(phpUserFilter, "filtername", b.SizeOf("\"filtername\"")-1, "", types.AccPublic)
 	zend.ZendDeclarePropertyString(phpUserFilter, "params", b.SizeOf("\"params\"")-1, "", types.AccPublic)
 

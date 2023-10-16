@@ -85,11 +85,6 @@ func ZendCleanupInternalClasses() {
 func ZendNextFreeModule() int {
 	return globals.G().CountModules() + 1
 }
-func ZendClassImplements(classEntry *types.ClassEntry, _ int, interfaces ...*types.ClassEntry) {
-	for _, iface := range interfaces {
-		ZendDoImplementInterface(classEntry, iface)
-	}
-}
 func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int) int {
 	/* TODO: Move this out of here in 7.4. */
 	if persistent != 0 && EG__().GetCurrentModule() != nil && EG__().GetCurrentModule().GetType() == MODULE_TEMPORARY {

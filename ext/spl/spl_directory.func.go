@@ -2286,7 +2286,11 @@ func zim_spl_SplFileObject_seek(executeData *zend.ZendExecuteData, return_value 
 	}
 }
 func ZmStartupSplDirectory(type_ int, module_number int) int {
-	spl_ce_SplFileInfo = zend.RegisterClass("SplFileInfo", SplFilesystemObjectNew, spl_SplFileInfo_functions)
+	spl_ce_SplFileInfo = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplFileInfo",
+		Functions:    spl_SplFileInfo_functions,
+		CreateObject: SplFilesystemObjectNew,
+	})
 	spl_ce_SplFileInfo.SetSerialize(zend.ZendClassSerializeDeny)
 	spl_ce_SplFileInfo.SetUnserialize(zend.ZendClassUnserializeDeny)
 	SplFilesystemObjectHandlers = *types.NewObjectHandlersEx(zend.StdObjectHandlersPtr, types.ObjectHandlersSetting{
@@ -2297,11 +2301,21 @@ func ZmStartupSplDirectory(type_ int, module_number int) int {
 		FreeObj:    SplFilesystemObjectFreeStorage,
 	})
 
-	spl_ce_DirectoryIterator = zend.RegisterSubClass(spl_ce_SplFileInfo, "DirectoryIterator", SplFilesystemObjectNew, spl_DirectoryIterator_functions)
-	zend.ZendClassImplements(spl_ce_DirectoryIterator, 1, zend.ZendCeIterator)
-	zend.ZendClassImplements(spl_ce_DirectoryIterator, 1, spl_ce_SeekableIterator)
-	spl_ce_DirectoryIterator.SetGetIterator(SplFilesystemDirGetIterator)
-	spl_ce_FilesystemIterator = zend.RegisterSubClass(spl_ce_DirectoryIterator, "FilesystemIterator", SplFilesystemObjectNew, spl_FilesystemIterator_functions)
+	spl_ce_DirectoryIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "DirectoryIterator",
+		Parent:       spl_ce_SplFileInfo,
+		Interfaces:   []*types.ClassEntry{zend.ZendCeIterator, spl_ce_SeekableIterator},
+		Functions:    spl_DirectoryIterator_functions,
+		CreateObject: SplFilesystemObjectNew,
+		GetIterator:  SplFilesystemDirGetIterator,
+	})
+	spl_ce_FilesystemIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "FilesystemIterator",
+		Parent:       spl_ce_DirectoryIterator,
+		Functions:    spl_FilesystemIterator_functions,
+		CreateObject: SplFilesystemObjectNew,
+		GetIterator:  SplFilesystemTreeGetIterator,
+	})
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "CURRENT_MODE_MASK", zend.ZendLong(SPL_FILE_DIR_CURRENT_MODE_MASK))
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "CURRENT_AS_PATHNAME", zend.ZendLong(SPL_FILE_DIR_CURRENT_AS_PATHNAME))
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "CURRENT_AS_FILEINFO", zend.ZendLong(SPL_FILE_DIR_CURRENT_AS_FILEINFO))
@@ -2314,22 +2328,45 @@ func ZmStartupSplDirectory(type_ int, module_number int) int {
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "OTHER_MODE_MASK", zend.ZendLong(SPL_FILE_DIR_OTHERS_MASK))
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "SKIP_DOTS", zend.ZendLong(SPL_FILE_DIR_SKIPDOTS))
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "UNIX_PATHS", zend.ZendLong(SPL_FILE_DIR_UNIXPATHS))
-	spl_ce_FilesystemIterator.SetGetIterator(SplFilesystemTreeGetIterator)
-	spl_ce_RecursiveDirectoryIterator = zend.RegisterSubClass(spl_ce_FilesystemIterator, "RecursiveDirectoryIterator", SplFilesystemObjectNew, spl_RecursiveDirectoryIterator_functions)
-	zend.ZendClassImplements(spl_ce_RecursiveDirectoryIterator, 1, spl_ce_RecursiveIterator)
+
+	spl_ce_RecursiveDirectoryIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "RecursiveDirectoryIterator",
+		Parent:       spl_ce_FilesystemIterator,
+		Interfaces:   []*types.ClassEntry{spl_ce_RecursiveIterator},
+		Functions:    spl_RecursiveDirectoryIterator_functions,
+		CreateObject: SplFilesystemObjectNew,
+	})
+
 	SplFilesystemObjectCheckHandlers = *types.NewObjectHandlersEx(&SplFilesystemObjectHandlers, types.ObjectHandlersSetting{
 		CloneObj:  nil,
 		GetMethod: SplFilesystemObjectGetMethodCheck,
 	})
-	spl_ce_GlobIterator = zend.RegisterSubClass(spl_ce_FilesystemIterator, "GlobIterator", SplFilesystemObjectNewCheck, spl_GlobIterator_functions)
-	zend.ZendClassImplements(spl_ce_GlobIterator, 1, spl_ce_Countable)
-	spl_ce_SplFileObject = zend.RegisterSubClass(spl_ce_SplFileInfo, "SplFileObject", SplFilesystemObjectNewCheck, spl_SplFileObject_functions)
-	zend.ZendClassImplements(spl_ce_SplFileObject, 1, spl_ce_RecursiveIterator)
-	zend.ZendClassImplements(spl_ce_SplFileObject, 1, spl_ce_SeekableIterator)
+
+	spl_ce_GlobIterator = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "GlobIterator",
+		Parent:       spl_ce_FilesystemIterator,
+		Interfaces:   []*types.ClassEntry{spl_ce_Countable},
+		Functions:    spl_GlobIterator_functions,
+		CreateObject: SplFilesystemObjectNewCheck,
+	})
+
+	spl_ce_SplFileObject = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplFileObject",
+		Parent:       spl_ce_SplFileInfo,
+		Interfaces:   []*types.ClassEntry{spl_ce_RecursiveIterator, spl_ce_SeekableIterator},
+		Functions:    spl_SplFileObject_functions,
+		CreateObject: SplFilesystemObjectNewCheck,
+	})
 	zend.ZendDeclareClassConstantLong(spl_ce_SplFileObject, "DROP_NEW_LINE", zend.ZendLong(SPL_FILE_OBJECT_DROP_NEW_LINE))
 	zend.ZendDeclareClassConstantLong(spl_ce_SplFileObject, "READ_AHEAD", zend.ZendLong(SPL_FILE_OBJECT_READ_AHEAD))
 	zend.ZendDeclareClassConstantLong(spl_ce_SplFileObject, "SKIP_EMPTY", zend.ZendLong(SPL_FILE_OBJECT_SKIP_EMPTY))
 	zend.ZendDeclareClassConstantLong(spl_ce_SplFileObject, "READ_CSV", zend.ZendLong(SPL_FILE_OBJECT_READ_CSV))
-	spl_ce_SplTempFileObject = zend.RegisterSubClass(spl_ce_SplFileObject, "SplTempFileObject", SplFilesystemObjectNewCheck, spl_SplTempFileObject_functions)
+
+	spl_ce_SplTempFileObject = zend.RegisterClass(&types.InternalClassDecl{
+		Name:         "SplTempFileObject",
+		Parent:       spl_ce_SplFileObject,
+		Functions:    spl_SplTempFileObject_functions,
+		CreateObject: SplFilesystemObjectNewCheck,
+	})
 	return types.SUCCESS
 }
