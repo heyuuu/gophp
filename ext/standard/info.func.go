@@ -94,7 +94,7 @@ func PhpInfoPrintModule(zend_module *zend.ModuleEntry) {
 			zend_module.GetInfoFunc()(zend_module)
 		} else {
 			PhpInfoPrintTableStart()
-			PhpInfoPrintTableRow(2, "Version", zend_module.GetVersion())
+			PhpInfoPrintTableRow(2, "Version", zend_module.Version())
 			PhpInfoPrintTableEnd()
 			zend.DISPLAY_INI_ENTRIES()
 		}
@@ -534,23 +534,23 @@ func PhpInfoPrintTableRow(num_cols int, _ ...any) {
 	PhpInfoPrintTableRowInternal(num_cols, "v", row_elements)
 	va_end(row_elements)
 }
-func RegisterPhpinfoConstants(type_ int, module_number int) {
-	zend.RegisterLongConstant("INFO_GENERAL", PHP_INFO_GENERAL, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("INFO_CREDITS", PHP_INFO_CREDITS, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("INFO_CONFIGURATION", PHP_INFO_CONFIGURATION, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("INFO_MODULES", PHP_INFO_MODULES, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("INFO_ENVIRONMENT", PHP_INFO_ENVIRONMENT, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("INFO_VARIABLES", PHP_INFO_VARIABLES, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("INFO_LICENSE", PHP_INFO_LICENSE, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("INFO_ALL", PHP_INFO_ALL, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("CREDITS_GROUP", PHP_CREDITS_GROUP, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("CREDITS_GENERAL", PHP_CREDITS_GENERAL, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("CREDITS_SAPI", PHP_CREDITS_SAPI, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("CREDITS_MODULES", PHP_CREDITS_MODULES, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("CREDITS_DOCS", PHP_CREDITS_DOCS, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("CREDITS_FULLPAGE", PHP_CREDITS_FULLPAGE, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("CREDITS_QA", PHP_CREDITS_QA, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("CREDITS_ALL", PHP_CREDITS_ALL, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
+func RegisterPhpinfoConstants(moduleNumber int) {
+	zend.RegisterLongConstant("INFO_GENERAL", PHP_INFO_GENERAL, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("INFO_CREDITS", PHP_INFO_CREDITS, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("INFO_CONFIGURATION", PHP_INFO_CONFIGURATION, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("INFO_MODULES", PHP_INFO_MODULES, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("INFO_ENVIRONMENT", PHP_INFO_ENVIRONMENT, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("INFO_VARIABLES", PHP_INFO_VARIABLES, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("INFO_LICENSE", PHP_INFO_LICENSE, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("INFO_ALL", PHP_INFO_ALL, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("CREDITS_GROUP", PHP_CREDITS_GROUP, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("CREDITS_GENERAL", PHP_CREDITS_GENERAL, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("CREDITS_SAPI", PHP_CREDITS_SAPI, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("CREDITS_MODULES", PHP_CREDITS_MODULES, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("CREDITS_DOCS", PHP_CREDITS_DOCS, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("CREDITS_FULLPAGE", PHP_CREDITS_FULLPAGE, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("CREDITS_QA", PHP_CREDITS_QA, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("CREDITS_ALL", PHP_CREDITS_ALL, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
 }
 func ZifPhpversion(_ zpp.Opt, extension *string) (string, bool) {
 	if extension == nil {
@@ -560,7 +560,7 @@ func ZifPhpversion(_ zpp.Opt, extension *string) (string, bool) {
 		if module == nil {
 			return "", false
 		}
-		return module.GetVersion(), true
+		return module.Version(), true
 	}
 }
 func ZifPhpcredits(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, flag *types.Zval) {

@@ -986,7 +986,7 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		module_names = make([]string, globals.G().CountModules()+2)
 		module_names[0] = "internal"
 		globals.G().EachModule(func(module *ModuleEntry) {
-			module_names[module.GetModuleNumber()] = module.Name()
+			module_names[module.ModuleNumber()] = module.Name()
 			i++
 		})
 		module_names[i] = "user"

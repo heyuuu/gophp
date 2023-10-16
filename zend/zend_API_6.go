@@ -21,29 +21,8 @@ func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functio
 	}
 }
 
-func CleanModuleClasses(moduleNumber int) {
-	EG__().ClassTable().Filter(func(_ string, ce *types.ClassEntry) bool {
-		needClean := ce.IsInternalClass() && ce.ModuleNumber() == moduleNumber
-		return !needClean
-	})
-}
 func ModuleDestructor(module *ModuleEntry) {
-	if !module.IsPersistent() {
-		ZendCleanModuleRsrcDtors(module.GetModuleNumber())
-		CleanModuleConstants(module.GetModuleNumber())
-		CleanModuleClasses(module.GetModuleNumber())
-	}
-	if module.IsModuleStarted() {
-		module.ModuleShutdown()
-	}
-
-	/* Deinitilaise module globals */
-	if module.GetGlobalsSize() != 0 {
-		if module.GetGlobalsDtor() != nil {
-			module.GetGlobalsDtor()(module.GetGlobalsPtr())
-		}
-	}
-	module.SetModuleStarted(false)
+	module.ModuleShutdown()
 }
 func ZendActivateModules() {
 	globals.G().EachModuleReserve(func(module *ModuleEntry) {

@@ -663,7 +663,7 @@ func ZifMemoryGetUsage(_ zpp.Opt, realUsage bool) int {
 func ZifMemoryGetPeakUsage(_ zpp.Opt, realUsage bool) int {
 	return zend.ZendMemoryPeakUsage(realUsage)
 }
-func ZmStartupVar(type_ int, moduleNumber int) int {
+func ZmStartupVar(moduleNumber int) int {
 	zend.REGISTER_INI_ENTRIES(moduleNumber)
 	return types.SUCCESS
 }

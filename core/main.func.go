@@ -1275,7 +1275,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	if SM__().GetAdditionalFunctions() != nil {
 		if module := globals.G().GetModule("standard"); module != nil {
 			zend.EG__().SetCurrentModule(module)
-			zend.ZendRegisterFunctions(nil, SM__().GetAdditionalFunctions(), nil, true)
+			zend.ZendRegisterFunctions(nil, SM__().GetAdditionalFunctions(), nil)
 			zend.EG__().SetCurrentModule(nil)
 		}
 	}

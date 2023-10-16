@@ -54,9 +54,8 @@ func (g *ZendSplGlobals) GetAutoloadExtensions() string {
 func (g *ZendSplGlobals) SetAutoloadExtensions(value string) {
 	g.autoloadExtensions = &value
 }
-
 func (g *ZendSplGlobals) GetAutoloadFunctions() *types.Array {
-
+	return g.autoloadFunctions
 }
 func (g *ZendSplGlobals) SetAutoloadFunctions(value *types.Array) {
 	g.autoloadFunctions = value

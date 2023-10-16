@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/kits/strkit"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -834,7 +835,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 		}
 	}
 }
-func ZmStartupPack(type_ int, module_number int) int {
+func ZmStartupPack(moduleNumber int) int {
 	var machine_endian_check = 1
 	var i int
 	MachineLittleEndian = (*byte)(&machine_endian_check)[0]

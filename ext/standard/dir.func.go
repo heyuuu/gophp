@@ -21,11 +21,11 @@ func PhpSetDefaultDir(res *types.Resource) {
 	}
 	DIRG(default_dir) = res
 }
-func ZmActivateDir(type_ int, module_number int) int {
+func ZmActivateDir() int {
 	DIRG(default_dir) = nil
 	return types.SUCCESS
 }
-func ZmStartupDir(type_ int, module_number int) int {
+func ZmStartupDir(module_number int) int {
 	var dirsep_str []byte
 	var pathsep_str []byte
 	DirClassEntryPtr = zend.RegisterClass(&types.InternalClassDecl{

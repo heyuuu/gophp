@@ -49,12 +49,6 @@ func RegisterMainDoubleConstant(name string, dval float64, flags int) {
 func RegisterMainStringConstant(name string, str string, flags int) {
 	RegisterStringConstant(name, str, flags, 0)
 }
-
-func CleanModuleConstants(moduleNumber int) {
-	EG__().ConstantTable().Filter(func(_ string, c *ZendConstant) bool {
-		return c.ModuleNumber() != moduleNumber
-	})
-}
 func ZendRegisterStandardConstants() {
 	RegisterMainLongConstant("E_ERROR", faults.E_ERROR, CONST_PERSISTENT|CONST_CS)
 	RegisterMainLongConstant("E_RECOVERABLE_ERROR", faults.E_RECOVERABLE_ERROR, CONST_PERSISTENT|CONST_CS)

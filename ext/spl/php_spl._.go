@@ -1,10 +1,10 @@
 package spl
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
-	"unsafe"
 )
 
 const PHP_SPL_VERSION = core.PHP_VERSION
@@ -44,20 +44,44 @@ var SplFunctions []types.FunctionEntry = []types.FunctionEntry{
 	}),
 }
 
-/* {{{ spl_module_entry
- */
+// SplModuleData
+type SplModuleData struct {
+	globals ZendSplGlobals
+}
 
-var SplModuleEntry zend.ModuleEntry = zend.MakeZendModuleEntry(
-	"SPL",
-	SplFunctions,
-	ZmStartupSpl,
-	nil,
-	ZmActivateSpl,
-	ZmDeactivateSpl,
-	ZmInfoSpl,
-	PHP_SPL_VERSION,
-	unsafe.Sizeof(ZendSplGlobals),
-	SplGlobals,
-	(func(any))(ZmGlobalsCtorSpl),
-	nil,
-)
+var _ zend.ModuleData = (*SplModuleData)(nil)
+
+func (s SplModuleData) Name() string                     { return "SPL" }
+func (s SplModuleData) Version() string                  { return PHP_SPL_VERSION }
+func (s SplModuleData) Functions() []types.FunctionEntry { return SplFunctions }
+func (s SplModuleData) ModuleStartup(moduleNumber int) bool {
+	ZmStartupSplExceptions()
+	ZmStartupSplIterators()
+	ZmStartupSplArray()
+	ZmStartupSplDirectory()
+	ZmStartupSplDllist()
+	ZmStartupSplHeap()
+	ZmStartupSplFixedarray()
+	ZmStartupSplObserver()
+
+	SplAutoloadFn = zend.CG__().FunctionTable().Get("spl_autoload")
+	SplAutoloadCallFn = zend.CG__().FunctionTable().Get("spl_autoload_call")
+	b.Assert(SplAutoloadFn != nil && SplAutoloadCallFn != nil)
+
+	return true
+}
+func (s SplModuleData) ModuleShutdown(moduleNumber int) bool {
+	return true
+}
+func (s SplModuleData) RequestStartup(moduleNumber int) bool {
+	SplGlobals = ZendSplGlobals{}
+	SplGlobals.Reset()
+	return true
+}
+func (s SplModuleData) RequestShutdown(moduleNumber int) bool {
+	SplGlobals.Deactivate()
+	return true
+}
+
+// SplModuleEntry
+var SplModuleEntry = zend.MakeZendModuleEntry(SplModuleData{}, ZmInfoSpl)

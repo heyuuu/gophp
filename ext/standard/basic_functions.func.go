@@ -21,111 +21,105 @@ import (
 )
 
 func BG__() *PhpBasicGlobals { return &BasicGlobals }
-func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
+func ZmStartupBasic(type_ int, moduleNumber int) int {
 	BG__().Ctor()
-}
-func BasicGlobalsDtor(basic_globals_p *PhpBasicGlobals) {
-	basic_globals_p.Dtor()
-}
-func ZmStartupBasic(type_ int, module_number int) int {
-	BasicGlobalsCtor(&BasicGlobals)
 	IncompleteClassEntry = PhpCreateIncompleteClass()
 	BG__().incomplete_class = IncompleteClassEntry
-	zend.RegisterLongConstant("CONNECTION_ABORTED", core.PHP_CONNECTION_ABORTED, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("CONNECTION_NORMAL", core.PHP_CONNECTION_NORMAL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("CONNECTION_TIMEOUT", core.PHP_CONNECTION_TIMEOUT, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("INI_USER", zend.ZEND_INI_USER, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("INI_PERDIR", zend.ZEND_INI_PERDIR, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("INI_SYSTEM", zend.ZEND_INI_SYSTEM, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("INI_ALL", zend.ZEND_INI_ALL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("INI_SCANNER_NORMAL", zend.ZEND_INI_SCANNER_NORMAL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("INI_SCANNER_RAW", zend.ZEND_INI_SCANNER_RAW, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("INI_SCANNER_TYPED", zend.ZEND_INI_SCANNER_TYPED, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_URL_SCHEME", PHP_URL_SCHEME, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_URL_HOST", PHP_URL_HOST, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_URL_PORT", PHP_URL_PORT, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_URL_USER", PHP_URL_USER, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_URL_PASS", PHP_URL_PASS, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_URL_PATH", PHP_URL_PATH, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_URL_QUERY", PHP_URL_QUERY, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_URL_FRAGMENT", PHP_URL_FRAGMENT, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_QUERY_RFC1738", PHP_QUERY_RFC1738, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_QUERY_RFC3986", PHP_QUERY_RFC3986, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("CONNECTION_ABORTED", core.PHP_CONNECTION_ABORTED, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("CONNECTION_NORMAL", core.PHP_CONNECTION_NORMAL, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("CONNECTION_TIMEOUT", core.PHP_CONNECTION_TIMEOUT, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("INI_USER", zend.ZEND_INI_USER, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("INI_PERDIR", zend.ZEND_INI_PERDIR, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("INI_SYSTEM", zend.ZEND_INI_SYSTEM, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("INI_ALL", zend.ZEND_INI_ALL, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("INI_SCANNER_NORMAL", zend.ZEND_INI_SCANNER_NORMAL, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("INI_SCANNER_RAW", zend.ZEND_INI_SCANNER_RAW, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("INI_SCANNER_TYPED", zend.ZEND_INI_SCANNER_TYPED, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_URL_SCHEME", PHP_URL_SCHEME, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_URL_HOST", PHP_URL_HOST, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_URL_PORT", PHP_URL_PORT, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_URL_USER", PHP_URL_USER, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_URL_PASS", PHP_URL_PASS, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_URL_PATH", PHP_URL_PATH, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_URL_QUERY", PHP_URL_QUERY, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_URL_FRAGMENT", PHP_URL_FRAGMENT, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_QUERY_RFC1738", PHP_QUERY_RFC1738, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_QUERY_RFC3986", PHP_QUERY_RFC3986, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
 
 	// #define REGISTER_MATH_CONSTANT(x) REGISTER_DOUBLE_CONSTANT ( # x , x , CONST_CS | CONST_PERSISTENT )
 
-	zend.RegisterDoubleConstant("M_E", M_E, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_LOG2E", M_LOG2E, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_LOG10E", M_LOG10E, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_LN2", M_LN2, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_LN10", M_LN10, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_PI", M_PI, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_PI_2", M_PI_2, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_PI_4", M_PI_4, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_1_PI", M_1_PI, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_2_PI", M_2_PI, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_SQRTPI", M_SQRTPI, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_2_SQRTPI", M_2_SQRTPI, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_LNPI", M_LNPI, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_EULER", M_EULER, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_SQRT2", M_SQRT2, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_SQRT1_2", M_SQRT1_2, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("M_SQRT3", M_SQRT3, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("INF", math.Inf(1), zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("NAN", math.NaN(), zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_ROUND_HALF_UP", PHP_ROUND_HALF_UP, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_ROUND_HALF_DOWN", PHP_ROUND_HALF_DOWN, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_ROUND_HALF_EVEN", PHP_ROUND_HALF_EVEN, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PHP_ROUND_HALF_ODD", PHP_ROUND_HALF_ODD, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	RegisterPhpinfoConstants(type_, module_number)
-	RegisterHtmlConstants(type_, module_number)
-	str.RegisterStringConstants(type_, module_number)
-	if ZmStartupVar(type_, module_number) != types.SUCCESS {
+	zend.RegisterDoubleConstant("M_E", M_E, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_LOG2E", M_LOG2E, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_LOG10E", M_LOG10E, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_LN2", M_LN2, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_LN10", M_LN10, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_PI", M_PI, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_PI_2", M_PI_2, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_PI_4", M_PI_4, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_1_PI", M_1_PI, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_2_PI", M_2_PI, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_SQRTPI", M_SQRTPI, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_2_SQRTPI", M_2_SQRTPI, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_LNPI", M_LNPI, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_EULER", M_EULER, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_SQRT2", M_SQRT2, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_SQRT1_2", M_SQRT1_2, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("M_SQRT3", M_SQRT3, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("INF", math.Inf(1), zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterDoubleConstant("NAN", math.NaN(), zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_ROUND_HALF_UP", PHP_ROUND_HALF_UP, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_ROUND_HALF_DOWN", PHP_ROUND_HALF_DOWN, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_ROUND_HALF_EVEN", PHP_ROUND_HALF_EVEN, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PHP_ROUND_HALF_ODD", PHP_ROUND_HALF_ODD, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	RegisterPhpinfoConstants(moduleNumber)
+	RegisterHtmlConstants(moduleNumber)
+	str.RegisterStringConstants(moduleNumber)
+	if ZmStartupVar(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupFile(type_, module_number) != types.SUCCESS {
+	if ZmStartupFile(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupPack(type_, module_number) != types.SUCCESS {
+	if ZmStartupPack(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupBrowscap(type_, module_number) != types.SUCCESS {
+	if ZmStartupBrowscap() != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupStandardFilters(type_, module_number) != types.SUCCESS {
+	if ZmStartupStandardFilters() != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupUserFilters(type_, module_number) != types.SUCCESS {
+	if ZmStartupUserFilters(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupPassword(type_, module_number) != types.SUCCESS {
+	if ZmStartupPassword(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupMtRand(type_, module_number) != types.SUCCESS {
+	if ZmStartupMtRand(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupCrypt(type_, module_number) != types.SUCCESS {
+	if ZmStartupCrypt(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupDir(type_, module_number) != types.SUCCESS {
+	if ZmStartupDir(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupSyslog(type_, module_number) != types.SUCCESS {
+	if ZmStartupSyslog(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if array.ZmStartupArray(type_, module_number) != types.SUCCESS {
+	if array.ZmStartupArray(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupAssert(type_, module_number) != types.SUCCESS {
+	if ZmStartupAssert(moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupUrlScannerEx(type_, module_number) != types.SUCCESS {
+	if ZmStartupUrlScannerEx(type_, moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupUserStreams(type_, module_number) != types.SUCCESS {
+	if ZmStartupUserStreams(type_, moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupImagetypes(type_, module_number) != types.SUCCESS {
+	if ZmStartupImagetypes(type_, moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
 	streams.PhpRegisterUrlStreamWrapper("php", &PhpStreamPhpWrapper)
@@ -134,33 +128,33 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	streams.PhpRegisterUrlStreamWrapper("data", &streams.PhpStreamRfc2397Wrapper)
 	streams.PhpRegisterUrlStreamWrapper("http", &PhpStreamHttpWrapper)
 	streams.PhpRegisterUrlStreamWrapper("ftp", &PhpStreamFtpWrapper)
-	if ZmStartupDns(type_, module_number) != types.SUCCESS {
+	if ZmStartupDns(type_, moduleNumber) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupHrtime(type_, module_number) != types.SUCCESS {
+	if ZmStartupHrtime() != types.SUCCESS {
 		return types.FAILURE
 	}
 	return types.SUCCESS
 }
 func ZmShutdownBasic(type_ int, module_number int) int {
 	ZmShutdownSyslog(type_, module_number)
-	BasicGlobalsDtor(&BasicGlobals)
+	BasicGlobals.Dtor()
 	streams.PhpUnregisterUrlStreamWrapper("php")
 	streams.PhpUnregisterUrlStreamWrapper("http")
 	streams.PhpUnregisterUrlStreamWrapper("ftp")
-	ZmShutdownBrowscap(type_, module_number)
+	ZmShutdownBrowscap()
 	//array.ZmShutdownArray(type_, module_number)
-	ZmShutdownAssert(type_, module_number)
+	ZmShutdownAssert()
 	ZmShutdownUrlScannerEx(type_, module_number)
 	ZmShutdownFile(type_, module_number)
-	ZmShutdownStandardFilters(type_, module_number)
-	ZmShutdownCrypt(type_, module_number)
+	ZmShutdownStandardFilters()
+	ZmShutdownCrypt()
 	ZmShutdownPassword(type_, module_number)
 	return types.SUCCESS
 }
 func ZmActivateBasic(type_ int, module_number int) int {
 	BG__().Activate()
-	ZmActivateDir(type_, module_number)
+	ZmActivateDir()
 	ZmActivateUrlScannerEx(type_, module_number)
 
 	/* Setup default context */
@@ -192,7 +186,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	 * during php_request_shutdown() */
 
 	ZmDeactivateFilestat(type_, module_number)
-	ZmDeactivateAssert(type_, module_number)
+	ZmDeactivateAssert()
 	ZmDeactivateUrlScannerEx(type_, module_number)
 	streams.ZmDeactivateStreams(type_, module_number)
 	ZmDeactivateUserFilters(type_, module_number)
@@ -920,7 +914,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 			returnValue.SetFalse()
 			return
 		}
-		moduleNumber = module.GetModuleNumber()
+		moduleNumber = module.ModuleNumber()
 	}
 
 	zend.ArrayInit(returnValue)

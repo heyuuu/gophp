@@ -15,9 +15,6 @@ import (
 )
 
 func SPL_G__() *ZendSplGlobals { return &SplGlobals }
-func ZmGlobalsCtorSpl(spl_globals *ZendSplGlobals) {
-	spl_globals.Ctor()
-}
 func SplFindCeByName(name string, autoload bool) *types.ClassEntry {
 	var ce *types.ClassEntry
 	if autoload {
@@ -522,14 +519,6 @@ func ZifSplObjectId(obj zpp.Object) int {
 func PhpSplObjectHash(obj *types.Zval) string {
 	return SPL_G__().SplObjectHash(obj.Object().GetHandle())
 }
-func buildClassListString(arr *types.Array) string {
-	names := make([]string, 0, arr.Len())
-	arr.Foreach(func(key types.ArrayKey, value *types.Zval) {
-		names = append(names, value.String())
-	})
-	return strings.Join(names, ", ")
-}
-
 func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	classes := splClasses()
 
@@ -555,26 +544,4 @@ func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	standard.PhpInfoPrintTableRow(2, "Classes", classNames.String())
 
 	standard.PhpInfoPrintTableEnd()
-}
-func ZmStartupSpl(type_ int, module_number int) int {
-	ZmStartupSplExceptions(type_, module_number)
-	ZmStartupSplIterators(type_, module_number)
-	ZmStartupSplArray(type_, module_number)
-	ZmStartupSplDirectory(type_, module_number)
-	ZmStartupSplDllist(type_, module_number)
-	ZmStartupSplHeap(type_, module_number)
-	ZmStartupSplFixedarray(type_, module_number)
-	ZmStartupSplObserver(type_, module_number)
-	SplAutoloadFn = zend.CG__().FunctionTable().Get("spl_autoload")
-	SplAutoloadCallFn = zend.CG__().FunctionTable().Get("spl_autoload_call")
-	b.Assert(SplAutoloadFn != nil && SplAutoloadCallFn != nil)
-	return types.SUCCESS
-}
-func ZmActivateSpl(type_ int, module_number int) int {
-	SPL_G__().Reset()
-	return types.SUCCESS
-}
-func ZmDeactivateSpl(type_ int, module_number int) int {
-	SPL_G__().Deactivate()
-	return types.SUCCESS
 }

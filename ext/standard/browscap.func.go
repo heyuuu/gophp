@@ -172,7 +172,7 @@ func BrowscapReadFileEx(filename string) *BrowserData {
 
 	return browserData
 }
-func ZmStartupBrowscap(type_ int, module_number int) int {
+func ZmStartupBrowscap() int {
 	var browscap = zend.INI_STRING("browscap")
 
 	/* ctor call not really needed for non-ZTS */
@@ -184,7 +184,7 @@ func ZmStartupBrowscap(type_ int, module_number int) int {
 	}
 	return types.SUCCESS
 }
-func ZmShutdownBrowscap(type_ int, module_number int) int {
+func ZmShutdownBrowscap() int {
 	GlobalBdata = nil
 	return types.SUCCESS
 }

@@ -113,9 +113,6 @@ func ZendInitRsrcPlist() int {
 	EG__().InitPersistentList()
 	return types.SUCCESS
 }
-func ZendCleanModuleRsrcDtors(moduleNumber int) {
-	ListDestructors.CleanByModule(moduleNumber)
-}
 func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, typeName string, moduleNumber int) int {
 	var lde = NewZendRsrcListDtorsEntry(ld, pld, typeName, moduleNumber)
 	return ListDestructors.Append(lde)

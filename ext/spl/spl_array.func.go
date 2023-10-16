@@ -1432,7 +1432,7 @@ func zim_spl_Array___debugInfo(executeData *zend.ZendExecuteData, return_value *
 	return_value.SetArray(SplArrayGetDebugInfo(zend.getThis()))
 	return
 }
-func ZmStartupSplArray(type_ int, module_number int) int {
+func ZmStartupSplArray() int {
 	spl_ce_ArrayObject = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "ArrayObject",
 		Interfaces:   []*types.ClassEntry{spl_ce_Aggregate, spl_ce_ArrayAccess, spl_ce_Serializable, spl_ce_Countable},

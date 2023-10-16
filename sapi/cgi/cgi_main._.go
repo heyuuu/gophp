@@ -88,18 +88,26 @@ var CgiFunctions = []types.FunctionEntry{
 	DefZifApacheResponseHeaders,
 	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var CgiModuleEntry = zend.MakeZendModuleEntry(
-	"cgi-fcgi",
-	CgiFunctions,
-	ZmStartupCgi,
-	ZmShutdownCgi,
-	nil,
-	nil,
-	ZmInfoCgi,
-	core.PHP_VERSION,
 
-	0,
-	nil,
-	nil,
-	nil,
-)
+// CgiModuleData
+type CgiModuleData struct{}
+
+var _ zend.ModuleData = (*CgiModuleData)(nil)
+
+func (d *CgiModuleData) Name() string                     { return "cgi-fcgi" }
+func (d *CgiModuleData) Version() string                  { return core.PHP_VERSION }
+func (d *CgiModuleData) Functions() []types.FunctionEntry { return CgiFunctions }
+func (d *CgiModuleData) ModuleStartup(moduleNumber int) bool {
+	return ZmStartupCgi(0, moduleNumber) == types.SUCCESS
+}
+func (d *CgiModuleData) ModuleShutdown(moduleNumber int) bool {
+	return ZmShutdownCgi(0, moduleNumber) == types.SUCCESS
+}
+func (d *CgiModuleData) RequestStartup(moduleNumber int) bool {
+	return true
+}
+func (d *CgiModuleData) RequestShutdown(moduleNumber int) bool {
+	return true
+}
+
+var CgiModuleEntry = zend.MakeZendModuleEntry(&CgiModuleData{}, ZmInfoCgi)

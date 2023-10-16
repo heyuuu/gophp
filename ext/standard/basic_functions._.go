@@ -579,17 +579,26 @@ var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	core.DefZifOutputResetRewriteVars,
 	DefZifSysGetTempDir,
 }
-var BasicFunctionsModule = zend.MakeZendModuleEntry(
-	"standard",
-	BasicFunctions,
-	ZmStartupBasic,
-	ZmShutdownBasic,
-	ZmActivateBasic,
-	ZmDeactivateBasic,
-	ZmInfoBasic,
-	core.PHP_VERSION,
-	0,
-	nil,
-	nil,
-	nil,
-)
+
+// BasicModuleData
+type BasicModuleData struct{}
+
+var _ zend.ModuleData = (*BasicModuleData)(nil)
+
+func (d *BasicModuleData) Name() string                     { return "standard" }
+func (d *BasicModuleData) Version() string                  { return core.PHP_VERSION }
+func (d *BasicModuleData) Functions() []types.FunctionEntry { return BasicFunctions }
+func (d *BasicModuleData) ModuleStartup(moduleNumber int) bool {
+	return ZmStartupBasic(0, moduleNumber) == types.SUCCESS
+}
+func (d *BasicModuleData) ModuleShutdown(moduleNumber int) bool {
+	return ZmShutdownBasic(0, moduleNumber) == types.SUCCESS
+}
+func (d *BasicModuleData) RequestStartup(moduleNumber int) bool {
+	return ZmActivateBasic(0, moduleNumber) == types.SUCCESS
+}
+func (d *BasicModuleData) RequestShutdown(moduleNumber int) bool {
+	return ZmDeactivateBasic(0, moduleNumber) == types.SUCCESS
+}
+
+var BasicFunctionsModule = zend.MakeZendModuleEntry(&BasicModuleData{}, ZmInfoBasic)

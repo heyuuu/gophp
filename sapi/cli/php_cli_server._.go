@@ -28,23 +28,31 @@ const PHP_CLI_SERVER_LOG_MESSAGE = 3
 
 var PhpCliServerLogLevel int = 3
 
-var CliServerModuleEntry = zend.MakeZendModuleEntry(
-	"cli_server",
-	nil,
-	ZmStartupCliServer,
-	ZmShutdownCliServer,
-	nil,
-	nil,
-	ZmInfoCliServer,
-	core.PHP_VERSION,
-	0,
-	nil,
-	nil,
-	nil,
-)
-
 var ServerAdditionalFunctions = []types.FunctionEntry{
 	DefZifApacheRequestHeaders,
 	DefZifApacheResponseHeaders,
 	DefZifGetallheaders,
 }
+
+// CliModuleData
+type CliModuleData struct{}
+
+var _ zend.ModuleData = (*CliModuleData)(nil)
+
+func (d *CliModuleData) Name() string                     { return "cli_server" }
+func (d *CliModuleData) Version() string                  { return core.PHP_VERSION }
+func (d *CliModuleData) Functions() []types.FunctionEntry { return nil }
+func (d *CliModuleData) ModuleStartup(moduleNumber int) bool {
+	return ZmStartupCliServer(0, moduleNumber) == types.SUCCESS
+}
+func (d *CliModuleData) ModuleShutdown(moduleNumber int) bool {
+	return ZmShutdownCliServer(0, moduleNumber) == types.SUCCESS
+}
+func (d *CliModuleData) RequestStartup(moduleNumber int) bool {
+	return true
+}
+func (d *CliModuleData) RequestShutdown(moduleNumber int) bool {
+	return true
+}
+
+var CliServerModuleEntry = zend.MakeZendModuleEntry(&CliModuleData{}, ZmInfoCliServer)

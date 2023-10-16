@@ -1611,7 +1611,7 @@ func ChunkedFilterCreate(filtername *byte, filterparams *types.Zval, persistent 
 	fops = &ChunkedFilterOps
 	return streams.PhpStreamFilterAlloc(fops, data, persistent)
 }
-func ZmStartupStandardFilters(type_ int, module_number int) int {
+func ZmStartupStandardFilters() int {
 	var i int
 	for i = 0; StandardFilters[i].ops != nil; i++ {
 		if types.FAILURE == streams.PhpStreamFilterRegisterFactory(StandardFilters[i].ops.GetLabel(), StandardFilters[i].factory) {
@@ -1620,7 +1620,7 @@ func ZmStartupStandardFilters(type_ int, module_number int) int {
 	}
 	return types.SUCCESS
 }
-func ZmShutdownStandardFilters(type_ int, module_number int) int {
+func ZmShutdownStandardFilters() int {
 	var i int
 	for i = 0; StandardFilters[i].ops != nil; i++ {
 		streams.PhpStreamFilterUnregisterFactory(StandardFilters[i].ops.GetLabel())

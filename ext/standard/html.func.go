@@ -1356,19 +1356,19 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 	replaced = PhpEscapeHtmlEntitiesEx((*uint8)(str.GetVal()), str.GetLen(), all, int(flags), lang.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset), double_encode)
 	return_value.SetStringEx(replaced)
 }
-func RegisterHtmlConstants(type_ int, module_number int) {
-	zend.RegisterLongConstant("HTML_SPECIALCHARS", HTML_SPECIALCHARS, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("HTML_ENTITIES", HTML_ENTITIES, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_COMPAT", ENT_COMPAT, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_QUOTES", ENT_QUOTES, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_NOQUOTES", ENT_NOQUOTES, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_IGNORE", ENT_IGNORE, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_SUBSTITUTE", ENT_SUBSTITUTE, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_DISALLOWED", ENT_DISALLOWED, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_HTML401", ENT_HTML401, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_XML1", ENT_XML1, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_XHTML", ENT_XHTML, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
-	zend.RegisterLongConstant("ENT_HTML5", ENT_HTML5, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
+func RegisterHtmlConstants(moduleNumber int) {
+	zend.RegisterLongConstant("HTML_SPECIALCHARS", HTML_SPECIALCHARS, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("HTML_ENTITIES", HTML_ENTITIES, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_COMPAT", ENT_COMPAT, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_QUOTES", ENT_QUOTES, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_NOQUOTES", ENT_NOQUOTES, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_IGNORE", ENT_IGNORE, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_SUBSTITUTE", ENT_SUBSTITUTE, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_DISALLOWED", ENT_DISALLOWED, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_HTML401", ENT_HTML401, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_XML1", ENT_XML1, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_XHTML", ENT_XHTML, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
+	zend.RegisterLongConstant("ENT_HTML5", ENT_HTML5, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
 }
 func ZifHtmlspecialchars(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, quoteStyle *types.Zval, encoding *types.Zval, doubleEncode *types.Zval) {
 	PhpHtmlEntities(executeData, return_value, 0)

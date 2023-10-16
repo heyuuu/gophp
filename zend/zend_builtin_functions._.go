@@ -62,17 +62,26 @@ var BuiltinFunctions = []types.FunctionEntry{
 	DefZifGcDisable,
 	DefZifGcStatus,
 }
-var ZendBuiltinModule = MakeZendModuleEntry(
-	"Core",
-	BuiltinFunctions,
-	ZmStartupCore,
-	nil,
-	nil,
-	nil,
-	nil,
-	ZEND_VERSION,
-	0,
-	nil,
-	nil,
-	nil,
-)
+
+// BasicModuleData
+type BasicModuleData struct{}
+
+var _ ModuleData = (*BasicModuleData)(nil)
+
+func (d *BasicModuleData) Name() string                     { return "Core" }
+func (d *BasicModuleData) Version() string                  { return ZEND_VERSION }
+func (d *BasicModuleData) Functions() []types.FunctionEntry { return BuiltinFunctions }
+func (d *BasicModuleData) ModuleStartup(moduleNumber int) bool {
+	return ZmStartupCore(0, moduleNumber) == types.SUCCESS
+}
+func (d *BasicModuleData) ModuleShutdown(moduleNumber int) bool {
+	return true
+}
+func (d *BasicModuleData) RequestStartup(moduleNumber int) bool {
+	return true
+}
+func (d *BasicModuleData) RequestShutdown(moduleNumber int) bool {
+	return true
+}
+
+var ZendBuiltinModule = MakeZendModuleEntry(&BasicModuleData{}, nil)

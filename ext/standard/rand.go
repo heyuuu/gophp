@@ -32,9 +32,9 @@ func PhpMtRandRange(min int, max int) int {
 	return min + getRand().Intn(max-min)
 }
 
-func ZmStartupMtRand(type_ int, module_number int) int {
-	zend.RegisterLongConstant("MT_RAND_MT19937", MT_RAND_MT19937, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("MT_RAND_PHP", MT_RAND_PHP, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+func ZmStartupMtRand(moduleNumber int) int {
+	zend.RegisterLongConstant("MT_RAND_MT19937", MT_RAND_MT19937, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("MT_RAND_PHP", MT_RAND_PHP, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
 	return types.SUCCESS
 }
 

@@ -236,16 +236,8 @@ func ZendStartupModuleEx(module *ModuleEntry) bool {
 	if module.IsModuleStarted() {
 		return true
 	}
-	module.SetModuleStarted(true)
-
-	/* Initialize module globals */
-	if module.GetGlobalsSize() != 0 {
-		if module.GetGlobalsCtor() != nil {
-			module.GetGlobalsCtor()(module.GetGlobalsPtr())
-		}
-	}
-
 	EG__().SetCurrentModule(module)
+
 	if !module.ModuleStartup() {
 		faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unable to start %s module", module.Name())
 		EG__().SetCurrentModule(nil)

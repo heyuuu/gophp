@@ -13,10 +13,10 @@ func RegisterInterface(decl *types.InternalClassDecl) *types.ClassEntry {
 func RegisterClass(decl *types.InternalClassDecl) *types.ClassEntry {
 	b.Assert(decl.Name != "")
 
-	var moduleNumber = EG__().GetCurrentModule().GetModuleNumber()
+	var moduleNumber = EG__().GetCurrentModule().ModuleNumber()
 	var ce = types.NewInternalClassEx(decl, moduleNumber)
 	if len(decl.Functions) != 0 {
-		ZendRegisterFunctions(ce, decl.Functions, ce.FunctionTable(), EG__().GetCurrentModule().IsPersistent())
+		ZendRegisterFunctions(ce, decl.Functions, ce.FunctionTable())
 	}
 	CG__().ClassTable().Update(ce.Name(), ce)
 

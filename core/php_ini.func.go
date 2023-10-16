@@ -57,7 +57,7 @@ func DisplayIniEntries(module *zend.ModuleEntry) {
 	var module_number int
 	var first bool = true
 	if module != nil {
-		module_number = module.GetModuleNumber()
+		module_number = module.ModuleNumber()
 	} else {
 		module_number = 0
 	}

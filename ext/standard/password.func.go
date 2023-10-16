@@ -195,15 +195,15 @@ func PhpPasswordBcryptHash(password string, options *types.Array) (string, bool)
 	}
 	return result.GetStr(), true
 }
-func ZmStartupPassword(type_ int, module_number int) int {
+func ZmStartupPassword(moduleNumber int) int {
 	PhpPasswordAlgos = types.NewArray()
 	if !PhpPasswordAlgoRegister("2y", passwordAlgoBcrypt) {
 		return types.FAILURE
 	}
 
-	zend.RegisterStringConstant("PASSWORD_DEFAULT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterStringConstant("PASSWORD_BCRYPT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("PASSWORD_BCRYPT_DEFAULT_COST", PHP_PASSWORD_BCRYPT_COST, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterStringConstant("PASSWORD_DEFAULT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterStringConstant("PASSWORD_BCRYPT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("PASSWORD_BCRYPT_DEFAULT_COST", PHP_PASSWORD_BCRYPT_COST, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
 	return types.SUCCESS
 }
 func ZmShutdownPassword(type_ int, module_number int) int {

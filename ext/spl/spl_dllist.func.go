@@ -960,7 +960,7 @@ func SplDllistGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 	SPL_LLIST_CHECK_ADDREF(iterator.GetTraversePointer())
 	return iterator.GetIntern().GetIt()
 }
-func ZmStartupSplDllist(type_ int, module_number int) int {
+func ZmStartupSplDllist() int {
 	spl_ce_SplDoublyLinkedList = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "SplDoublyLinkedList",
 		Interfaces:   []*types.ClassEntry{spl_ce_Iterator, spl_ce_Countable, spl_ce_ArrayAccess, spl_ce_Serializable},

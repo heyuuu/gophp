@@ -2285,7 +2285,7 @@ func zim_spl_SplFileObject_seek(executeData *zend.ZendExecuteData, return_value 
 		}
 	}
 }
-func ZmStartupSplDirectory(type_ int, module_number int) int {
+func ZmStartupSplDirectory() int {
 	spl_ce_SplFileInfo = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "SplFileInfo",
 		Functions:    spl_SplFileInfo_functions,

@@ -1951,7 +1951,7 @@ var DefZifHrtime = def.DefFunc("hrtime", 1, 1, []def.ArgInfo{{Name: "get_as_numb
 	if fp.HasError() {
 		return
 	}
-	ZifHrtime(executeData, returnValue, get_as_number)
+	ZifHrtime()
 })
 
 // generate by ZifHtmlspecialchars

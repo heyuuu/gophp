@@ -750,7 +750,7 @@ func SplPqueueGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 	iterator.GetIntern().GetValue().SetUndef()
 	return iterator.GetIntern().GetIt()
 }
-func ZmStartupSplHeap(type_ int, module_number int) int {
+func ZmStartupSplHeap() int {
 	spl_ce_SplHeap = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "SplHeap",
 		Interfaces:   []*types.ClassEntry{spl_ce_Iterator, spl_ce_Countable},

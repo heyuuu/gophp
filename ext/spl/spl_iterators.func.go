@@ -2598,7 +2598,7 @@ func ZifIteratorApply(executeData *zend.ZendExecuteData, return_value *types.Zva
 	return_value.SetLong(apply_info.GetCount())
 	return
 }
-func ZmStartupSplIterators(type_ int, module_number int) int {
+func ZmStartupSplIterators() int {
 	spl_ce_RecursiveIterator = zend.RegisterInterface(&types.InternalClassDecl{
 		Name:       "RecursiveIterator",
 		Interfaces: []*types.ClassEntry{zend.ZendCeIterator},

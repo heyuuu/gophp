@@ -20,7 +20,7 @@ func PhpBucketDtor(res *types.Resource) {
 		bucket = nil
 	}
 }
-func ZmStartupUserFilters(type_ int, module_number int) int {
+func ZmStartupUserFilters(module_number int) int {
 	/* init the filter class ancestor */
 
 	var phpUserFilter = zend.RegisterClass(&types.InternalClassDecl{

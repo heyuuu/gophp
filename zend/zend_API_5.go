@@ -29,13 +29,12 @@ func ZendCollectModuleHandlers() {
 		}
 	})
 }
-func ZendStartupModules() int {
+func ZendStartupModules() {
 	for _, module := range globals.G().GetSortedModules() {
 		if !ZendStartupModuleEx(module) {
 			globals.G().DelModule(module.Name())
 		}
 	}
-	return types.SUCCESS
 }
 func ZendDestroyModules() {
 	Free(ClassCleanupHandlers)
@@ -54,7 +53,7 @@ func ZendRegisterModuleEx(module *ModuleEntry) *ModuleEntry {
 	}
 
 	EG__().SetCurrentModule(module)
-	if module.Functions() != nil && ZendRegisterFunctions(nil, module.Functions(), nil, module.IsPersistent()) == types.FAILURE {
+	if module.Functions() != nil && !ZendRegisterFunctions(nil, module.Functions(), nil) {
 		globals.G().DelModule(module.Name())
 		EG__().SetCurrentModule(nil)
 		faults.Error(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.Name())
@@ -64,7 +63,7 @@ func ZendRegisterModuleEx(module *ModuleEntry) *ModuleEntry {
 	return module
 }
 func ZendRegisterInternalModule(module *ModuleEntry) *ModuleEntry {
-	module.SetModuleNumber(ZendNextFreeModule())
+	module.Init(ZendNextFreeModule())
 	return ZendRegisterModuleEx(module)
 }
 func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFunction, error_type int) {
@@ -120,12 +119,12 @@ func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFuncti
 		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.Name(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
-func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEntry, functionTable FunctionTable, isPersistent bool) int {
+func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEntry, functionTable FunctionTable) bool {
 	var ptr *types.FunctionEntry = functions
 	var count int = 0
 	var unload int = 0
 	var targetFunctionTable FunctionTable = functionTable
-	var error_type int = lang.Cond(isPersistent, faults.E_CORE_WARNING, faults.E_WARNING)
+	var error_type int = faults.E_CORE_WARNING
 	var ctor types.IFunction = nil
 	var dtor types.IFunction = nil
 	var clone types.IFunction = nil
@@ -232,7 +231,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 			if scope != nil && scope.IsInterface() {
 				Efree((*byte)(lc_class_name))
 				faults.Error(error_type, "Interface %s cannot contain non abstract method %s()", scope.Name(), ptr.GetFname())
-				return types.FAILURE
+				return false
 			}
 			if internal_function.GetHandler() == nil {
 				if scope != nil {
@@ -240,7 +239,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 				}
 				faults.Error(error_type, "Method %s%s%s() cannot be a NULL function", lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""), lang.Cond(scope != nil, "::", ""), ptr.GetFname())
 				ZendUnregisterFunctions(functions, count, targetFunctionTable)
-				return types.FAILURE
+				return false
 			}
 		}
 		lowercase_name = types.NewString(ascii.StrToLower(internal_function.FunctionName()))
@@ -345,7 +344,6 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		}
 		ptr++
 		count++
-		// types.ZendStringRelease(lowercase_name)
 	}
 	if unload != 0 {
 		if scope != nil {
@@ -360,7 +358,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 			ptr++
 		}
 		ZendUnregisterFunctions(functions, count, targetFunctionTable)
-		return types.FAILURE
+		return false
 	}
 	if scope != nil {
 		scope.SetConstructor(ctor)
@@ -454,5 +452,5 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		}
 		Efree((*byte)(lc_class_name))
 	}
-	return types.SUCCESS
+	return true
 }

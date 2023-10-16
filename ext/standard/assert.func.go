@@ -52,29 +52,29 @@ func PhpAssertInitGlobals(assert_globals_p *ZendAssertGlobals) {
 	assert_globals_p.GetCallback().SetUndef()
 	assert_globals_p.SetCb(nil)
 }
-func ZmStartupAssert(type_ int, module_number int) int {
+func ZmStartupAssert(moduleNumber int) int {
 	PhpAssertInitGlobals(&AssertGlobals)
-	zend.REGISTER_INI_ENTRIES(module_number)
-	zend.RegisterLongConstant("ASSERT_ACTIVE", ASSERT_ACTIVE, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("ASSERT_CALLBACK", ASSERT_CALLBACK, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("ASSERT_BAIL", ASSERT_BAIL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("ASSERT_WARNING", ASSERT_WARNING, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("ASSERT_QUIET_EVAL", ASSERT_QUIET_EVAL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("ASSERT_EXCEPTION", ASSERT_EXCEPTION, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.REGISTER_INI_ENTRIES(moduleNumber)
+	zend.RegisterLongConstant("ASSERT_ACTIVE", ASSERT_ACTIVE, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("ASSERT_CALLBACK", ASSERT_CALLBACK, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("ASSERT_BAIL", ASSERT_BAIL, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("ASSERT_WARNING", ASSERT_WARNING, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("ASSERT_QUIET_EVAL", ASSERT_QUIET_EVAL, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("ASSERT_EXCEPTION", ASSERT_EXCEPTION, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
 
 	AssertionErrorCe = zend.RegisterClass(&types.InternalClassDecl{
 		Name: "AssertionError", Parent: faults.ZendCeError, Functions: nil, CreateObject: nil})
 
 	return types.SUCCESS
 }
-func ZmShutdownAssert(type_ int, module_number int) int {
+func ZmShutdownAssert() int {
 	if ASSERTG(cb) {
 		zend.Pefree(ASSERTG(cb))
 		ASSERTG(cb) = nil
 	}
 	return types.SUCCESS
 }
-func ZmDeactivateAssert(type_ int, module_number int) int {
+func ZmDeactivateAssert() int {
 	if ASSERTG(callback).IsNotUndef() {
 		// zend.ZvalPtrDtor(&(ASSERTG(callback)))
 		ASSERTG(callback).SetUndef()

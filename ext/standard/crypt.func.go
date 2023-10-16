@@ -3,7 +3,6 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -14,28 +13,21 @@ import (
 func IS_VALID_SALT_CHARACTER(c byte) bool {
 	return c >= '.' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z'
 }
-func ZmStartupCrypt(type_ int, module_number int) int {
-	zend.RegisterLongConstant("CRYPT_SALT_LENGTH", PHP_MAX_SALT_LEN, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("CRYPT_STD_DES", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("CRYPT_EXT_DES", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("CRYPT_MD5", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("CRYPT_BLOWFISH", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("CRYPT_SHA256", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("CRYPT_SHA512", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+func ZmStartupCrypt(moduleNumber int) int {
+	zend.RegisterLongConstant("CRYPT_SALT_LENGTH", PHP_MAX_SALT_LEN, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("CRYPT_STD_DES", 1, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("CRYPT_EXT_DES", 1, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("CRYPT_MD5", 1, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("CRYPT_BLOWFISH", 1, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("CRYPT_SHA256", 1, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("CRYPT_SHA512", 1, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
 	PhpInitCryptR()
 	return types.SUCCESS
 }
-func ZmShutdownCrypt(type_ int, module_number int) int {
+func ZmShutdownCrypt() int {
 	PhpShutdownCryptR()
 	return types.SUCCESS
 }
-func PhpTo64(s *byte, n int) {
-	for lang.PreDec(&n) >= 0 {
-		*s = Itoa64[(*s)&0x3f]
-		s++
-	}
-}
-
 func PhpTo64Ex(s string) string {
 	var bytes = []byte(s)
 	for i, c := range bytes {

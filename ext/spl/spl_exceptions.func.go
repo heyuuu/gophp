@@ -5,7 +5,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
-func ZmStartupSplExceptions(type_ int, module_number int) int {
+func ZmStartupSplExceptions() int {
 	spl_ce_LogicException = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "LogicException",
 		Parent:       spl_ce_Exception,

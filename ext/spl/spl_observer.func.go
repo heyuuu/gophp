@@ -833,7 +833,7 @@ func zim_spl_MultipleIterator_key(executeData *zend.ZendExecuteData, return_valu
 	}
 	SplMultipleIteratorGetAll(intern, SPL_MULTIPLE_ITERATOR_GET_ALL_KEY, return_value)
 }
-func ZmStartupSplObserver(type_ int, module_number int) int {
+func ZmStartupSplObserver() int {
 	spl_ce_SplObserver = zend.RegisterInterface(&types.InternalClassDecl{
 		Name:      "SplObserver",
 		Functions: spl_funcs_SplObserver,

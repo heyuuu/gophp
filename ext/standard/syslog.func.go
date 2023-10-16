@@ -7,42 +7,42 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func ZmStartupSyslog(type_ int, module_number int) int {
+func ZmStartupSyslog(moduleNumber int) int {
 	/* error levels */
 
-	zend.RegisterLongConstant("LOG_EMERG", LOG_EMERG, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_ALERT", LOG_ALERT, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_CRIT", LOG_CRIT, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_ERR", LOG_ERR, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_WARNING", LOG_WARNING, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_NOTICE", LOG_NOTICE, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_INFO", LOG_INFO, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_DEBUG", LOG_DEBUG, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("LOG_EMERG", LOG_EMERG, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_ALERT", LOG_ALERT, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_CRIT", LOG_CRIT, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_ERR", LOG_ERR, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_WARNING", LOG_WARNING, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_NOTICE", LOG_NOTICE, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_INFO", LOG_INFO, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_DEBUG", LOG_DEBUG, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
 
 	/* facility: type of program logging the message */
 
-	zend.RegisterLongConstant("LOG_KERN", LOG_KERN, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_USER", LOG_USER, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_MAIL", LOG_MAIL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_DAEMON", LOG_DAEMON, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_AUTH", LOG_AUTH, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_SYSLOG", LOG_SYSLOG, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_LPR", LOG_LPR, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_LOCAL0", LOG_LOCAL0, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_LOCAL1", LOG_LOCAL1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_LOCAL2", LOG_LOCAL2, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_LOCAL3", LOG_LOCAL3, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_LOCAL4", LOG_LOCAL4, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_LOCAL5", LOG_LOCAL5, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_LOCAL6", LOG_LOCAL6, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_LOCAL7", LOG_LOCAL7, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("LOG_KERN", LOG_KERN, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_USER", LOG_USER, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_MAIL", LOG_MAIL, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_DAEMON", LOG_DAEMON, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_AUTH", LOG_AUTH, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_SYSLOG", LOG_SYSLOG, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_LPR", LOG_LPR, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_LOCAL0", LOG_LOCAL0, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_LOCAL1", LOG_LOCAL1, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_LOCAL2", LOG_LOCAL2, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_LOCAL3", LOG_LOCAL3, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_LOCAL4", LOG_LOCAL4, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_LOCAL5", LOG_LOCAL5, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_LOCAL6", LOG_LOCAL6, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_LOCAL7", LOG_LOCAL7, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
 
 	/* options */
 
-	zend.RegisterLongConstant("LOG_PID", LOG_PID, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_CONS", LOG_CONS, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_ODELAY", LOG_ODELAY, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterLongConstant("LOG_NDELAY", LOG_NDELAY, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("LOG_PID", LOG_PID, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_CONS", LOG_CONS, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_ODELAY", LOG_ODELAY, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
+	zend.RegisterLongConstant("LOG_NDELAY", LOG_NDELAY, zend.CONST_CS|zend.CONST_PERSISTENT, moduleNumber)
 	BG__().syslog_device = nil
 	return types.SUCCESS
 }
