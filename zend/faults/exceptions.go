@@ -591,13 +591,13 @@ func RegisterDefaultException() {
 		Functions:    DefaultExceptionFunctions,
 		CreateObject: DefaultExceptionNew,
 	})
-	zend.ZendDeclarePropertyString(ZendCeException, "message", b.SizeOf("\"message\"")-1, "", types.AccProtected)
-	zend.ZendDeclarePropertyString(ZendCeException, "string", b.SizeOf("\"string\"")-1, "", types.AccPrivate)
-	zend.ZendDeclarePropertyLong(ZendCeException, "code", b.SizeOf("\"code\"")-1, 0, types.AccProtected)
-	zend.ZendDeclarePropertyNull(ZendCeException, "file", b.SizeOf("\"file\"")-1, types.AccProtected)
-	zend.ZendDeclarePropertyNull(ZendCeException, "line", b.SizeOf("\"line\"")-1, types.AccProtected)
-	zend.ZendDeclarePropertyNull(ZendCeException, "trace", b.SizeOf("\"trace\"")-1, types.AccPrivate)
-	zend.ZendDeclarePropertyNull(ZendCeException, "previous", b.SizeOf("\"previous\"")-1, types.AccPrivate)
+	zend.ZendDeclarePropertyString(ZendCeException, "message", "", types.AccProtected)
+	zend.ZendDeclarePropertyString(ZendCeException, "string", "", types.AccPrivate)
+	zend.ZendDeclarePropertyLong(ZendCeException, "code", 0, types.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeException, "file", types.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeException, "line", types.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeException, "trace", types.AccPrivate)
+	zend.ZendDeclarePropertyNull(ZendCeException, "previous", types.AccPrivate)
 
 	ZendCeErrorException = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "ErrorException",
@@ -605,7 +605,7 @@ func RegisterDefaultException() {
 		Functions:    ErrorExceptionFunctions,
 		CreateObject: ErrorExceptionNew,
 	})
-	zend.ZendDeclarePropertyLong(ZendCeErrorException, "severity", b.SizeOf("\"severity\"")-1, E_ERROR, types.AccProtected)
+	zend.ZendDeclarePropertyLong(ZendCeErrorException, "severity", E_ERROR, types.AccProtected)
 
 	ZendCeError = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "Error",
@@ -613,13 +613,13 @@ func RegisterDefaultException() {
 		Functions:    DefaultExceptionFunctions,
 		CreateObject: DefaultExceptionNew,
 	})
-	zend.ZendDeclarePropertyString(ZendCeError, "message", b.SizeOf("\"message\"")-1, "", types.AccProtected)
-	zend.ZendDeclarePropertyString(ZendCeError, "string", b.SizeOf("\"string\"")-1, "", types.AccPrivate)
-	zend.ZendDeclarePropertyLong(ZendCeError, "code", b.SizeOf("\"code\"")-1, 0, types.AccProtected)
-	zend.ZendDeclarePropertyNull(ZendCeError, "file", b.SizeOf("\"file\"")-1, types.AccProtected)
-	zend.ZendDeclarePropertyNull(ZendCeError, "line", b.SizeOf("\"line\"")-1, types.AccProtected)
-	zend.ZendDeclarePropertyNull(ZendCeError, "trace", b.SizeOf("\"trace\"")-1, types.AccPrivate)
-	zend.ZendDeclarePropertyNull(ZendCeError, "previous", b.SizeOf("\"previous\"")-1, types.AccPrivate)
+	zend.ZendDeclarePropertyString(ZendCeError, "message", "", types.AccProtected)
+	zend.ZendDeclarePropertyString(ZendCeError, "string", "", types.AccPrivate)
+	zend.ZendDeclarePropertyLong(ZendCeError, "code", 0, types.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeError, "file", types.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeError, "line", types.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeError, "trace", types.AccPrivate)
+	zend.ZendDeclarePropertyNull(ZendCeError, "previous", types.AccPrivate)
 
 	ZendCeCompileError = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "CompileError",

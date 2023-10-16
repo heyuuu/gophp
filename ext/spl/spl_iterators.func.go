@@ -2739,7 +2739,7 @@ func ZmStartupSplIterators() int {
 	zend.ZendDeclareClassConstantLong(spl_ce_RegexIterator, "ALL_MATCHES", zend.ZendLong(REGIT_MODE_ALL_MATCHES))
 	zend.ZendDeclareClassConstantLong(spl_ce_RegexIterator, "SPLIT", zend.ZendLong(REGIT_MODE_SPLIT))
 	zend.ZendDeclareClassConstantLong(spl_ce_RegexIterator, "REPLACE", zend.ZendLong(REGIT_MODE_REPLACE))
-	SplRegisterProperty(spl_ce_RegexIterator, "replacement", b.SizeOf("\"replacement\"")-1, 0)
+	zend.ZendDeclarePropertyNull(spl_ce_RegexIterator, "replacement", 0)
 	spl_ce_RecursiveRegexIterator = zend.RegisterClass(&types.InternalClassDecl{
 		Name:         "RecursiveRegexIterator",
 		Parent:       spl_ce_RegexIterator,

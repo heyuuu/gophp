@@ -1639,7 +1639,7 @@ func doTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntry) {
 				prop_value = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 			}
 			doc_comment = property_info.GetDocComment()
-			ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
+			ZendDeclareTypedProperty(ce, prop_name.GetStr(), prop_value, flags, doc_comment, property_info.GetType())
 		})
 	}
 }

@@ -7,12 +7,12 @@ type PropertyInfo struct {
 	offset     uint32
 	flags      uint32
 	name       string
-	docComment *string
+	docComment string
 	ce         *ClassEntry
 	typ        *TypeHint
 }
 
-func NewPropertyInfo(offset uint32, flags uint32, name string, docComment *string, ce *ClassEntry, typ *TypeHint) *PropertyInfo {
+func NewPropertyInfo(offset uint32, flags uint32, name string, docComment string, ce *ClassEntry, typ *TypeHint) *PropertyInfo {
 	// 默认访问等级为 public
 	if flags&AccPppMask == 0 {
 		flags |= AccPublic
@@ -31,12 +31,12 @@ func NewPropertyInfo(offset uint32, flags uint32, name string, docComment *strin
 func (this *PropertyInfo) SetOffset(value uint32) { this.offset = value }
 func (this *PropertyInfo) SetType(value TypeHint) { this.typ = &value }
 
-func (this *PropertyInfo) GetOffset() uint32      { return this.offset }
-func (this *PropertyInfo) GetFlags() uint32       { return this.flags }
-func (this *PropertyInfo) GetName() string        { return this.name }
-func (this *PropertyInfo) GetDocComment() *string { return this.docComment }
-func (this *PropertyInfo) GetCe() *ClassEntry     { return this.ce }
-func (this *PropertyInfo) GetType() *TypeHint     { return this.typ }
+func (this *PropertyInfo) GetOffset() uint32     { return this.offset }
+func (this *PropertyInfo) GetFlags() uint32      { return this.flags }
+func (this *PropertyInfo) GetName() string       { return this.name }
+func (this *PropertyInfo) GetDocComment() string { return this.docComment }
+func (this *PropertyInfo) GetCe() *ClassEntry    { return this.ce }
+func (this *PropertyInfo) GetType() *TypeHint    { return this.typ }
 
 /* PropertyInfo.flags */
 func (this *PropertyInfo) AddFlags(value uint32)      { this.flags |= value }

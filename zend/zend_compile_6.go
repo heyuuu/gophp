@@ -527,7 +527,7 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 		} else {
 			value_zv.SetUndef()
 		}
-		ZendDeclareTypedProperty(ce, name, &value_zv, flags, doc_comment, type_)
+		ZendDeclareTypedProperty(ce, name.GetStr(), &value_zv, flags, doc_comment, type_)
 	}
 }
 func (compiler *Compiler) CompilePropGroup(list *ZendAst) {

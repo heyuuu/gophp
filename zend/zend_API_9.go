@@ -44,38 +44,22 @@ func ZendTryAssignTypedRefStringl(ref *types.Reference, string *byte, len_ int) 
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 func ZendTryAssignTypedRefArr(ref *types.Reference, arr *types.Array) int {
-	var tmp types.Zval
-	tmp.SetArray(arr)
-	return ZendTryAssignTypedRef(ref, &tmp)
+	return ZendTryAssignTypedRef(ref, types.NewZvalArray(arr))
 }
 func ZendTryAssignTypedRefZvalEx(ref *types.Reference, zv *types.Zval, strict bool) int {
-	var tmp types.Zval
-	types.ZVAL_COPY_VALUE(&tmp, zv)
-	return ZendTryAssignTypedRefEx(ref, &tmp, strict)
+	return ZendTryAssignTypedRefEx(ref, zv.CopyValue(), strict)
 }
-func ZendDeclarePropertyEx(ce *types.ClassEntry, name *types.String, property *types.Zval, access_type int, doc_comment *types.String) int {
-	return ZendDeclareTypedProperty(ce, name, property, access_type, doc_comment, 0)
+func ZendDeclareProperty(ce *types.ClassEntry, name string, property *types.Zval, accessType uint32) int {
+	return ZendDeclareTypedProperty(ce, name, property, accessType, "", nil)
 }
-func ZendDeclareProperty(ce *types.ClassEntry, name *byte, name_length int, property *types.Zval, access_type int) int {
-	var key *types.String = types.NewString(b.CastStr(name, name_length))
-	var ret int = ZendDeclarePropertyEx(ce, key, property, access_type, nil)
-	// types.ZendStringRelease(key)
-	return ret
+func ZendDeclarePropertyNull(ce *types.ClassEntry, name string, accessType uint32) int {
+	return ZendDeclareProperty(ce, name, types.NewZvalNull(), accessType)
 }
-func ZendDeclarePropertyNull(ce *types.ClassEntry, name string, name_length int, access_type int) int {
-	var property types.Zval
-	property.SetNull()
-	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
+func ZendDeclarePropertyLong(ce *types.ClassEntry, name string, value int, accessType uint32) int {
+	return ZendDeclareProperty(ce, name, types.NewZvalLong(value), accessType)
 }
-func ZendDeclarePropertyLong(ce *types.ClassEntry, name string, name_length int, value ZendLong, access_type int) int {
-	var property types.Zval
-	property.SetLong(value)
-	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
-}
-func ZendDeclarePropertyString(ce *types.ClassEntry, name string, name_length int, value string, access_type int) int {
-	var property types.Zval
-	property.SetStringEx(types.NewString(value))
-	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
+func ZendDeclarePropertyString(ce *types.ClassEntry, name string, value string, accessType uint32) int {
+	return ZendDeclareProperty(ce, name, types.NewZvalString(value), accessType)
 }
 func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, accessType uint32, docComment *types.String) int {
 	if ce.IsInterface() {

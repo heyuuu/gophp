@@ -6,9 +6,6 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
-func SplRegisterProperty(classEntry *types.ClassEntry, propName string, propNameLen int, propFlags int) {
-	zend.ZendDeclarePropertyNull(classEntry, propName, propNameLen, propFlags)
-}
 func SplAddClassName(list *types.Array, pce *types.ClassEntry, allow int, ceFlags uint32) {
 	if allow == 0 || allow > 0 && pce.HasCeFlags(ceFlags) || allow < 0 && !pce.HasCeFlags(ceFlags) {
 		if !list.KeyExists(pce.Name()) {

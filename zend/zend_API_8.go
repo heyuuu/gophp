@@ -130,26 +130,18 @@ func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, 
 	}
 	return result == types.SUCCESS
 }
-func ZendDeclareTypedProperty(
-	ce *types.ClassEntry,
-	name *types.String,
-	property *types.Zval,
-	accessType uint32,
-	docComment *string,
-	typ types.TypeHint,
-) int {
+func ZendDeclareTypedProperty(ce *types.ClassEntry, name string, property *types.Zval, accessType uint32, docComment string, typ *types.TypeHint) int {
 	// calc prop name
 	var propName string
 	if accessType&types.AccPrivate != 0 {
-		propName = ZendManglePropertyName_Ex(ce.Name(), name.GetStr())
+		propName = ZendManglePropertyName_Ex(ce.Name(), name)
 	} else if accessType&types.AccProtected != 0 {
-		propName = ZendManglePropertyName_Ex("*", name.GetStr())
+		propName = ZendManglePropertyName_Ex("*", name)
 	} else { // public
-		//b.Assert(accessType&types.AccPublic != 0 || accessType&types.AccPppMask == 0)
-		propName = name.GetStr()
+		b.Assert(accessType&types.AccPublic != 0 || accessType&types.AccPppMask == 0)
+		propName = name
 	}
 
-	//
 	var propInfo = types.NewPropertyInfo(0, accessType, propName, docComment, ce, typ)
 	var propInfoPtr *types.PropertyInfo
 	var propOffset uint32 = 0
@@ -161,10 +153,10 @@ func ZendDeclareTypedProperty(
 		ce.SetIsConstantsUpdated(false)
 	}
 	if propInfo.IsStatic() {
-		propInfoPtr = ce.PropertyTable().Get(name.GetStr())
+		propInfoPtr = ce.PropertyTable().Get(name)
 		if propInfoPtr != nil && propInfoPtr.IsStatic() {
 			propOffset = propInfoPtr.GetOffset()
-			ce.PropertyTable().Del(name.GetStr())
+			ce.PropertyTable().Del(name)
 		} else {
 			ce.GetDefaultStaticMembersCount()++
 			propOffset = ce.GetDefaultStaticMembersCount() - 1
@@ -182,10 +174,10 @@ func ZendDeclareTypedProperty(
 		}
 	} else {
 		var propertyDefaultPtr *types.Zval
-		propInfoPtr = ce.PropertyTable().Get(name.GetStr())
+		propInfoPtr = ce.PropertyTable().Get(name)
 		if propInfoPtr != nil && !propInfoPtr.IsStatic() {
 			propOffset = propInfoPtr.GetOffset()
-			ce.PropertyTable().Del(name.GetStr())
+			ce.PropertyTable().Del(name)
 			b.Assert(ce.IsInternalClass())
 			b.Assert(ce.GetPropertiesInfoTable() != nil)
 
@@ -217,15 +209,13 @@ func ZendDeclareTypedProperty(
 	}
 
 	propInfo.SetOffset(propOffset)
-	ce.PropertyTable().Update(name.GetStr(), propInfo)
+	ce.PropertyTable().Update(name, propInfo)
 	return types.SUCCESS
 }
 func ZendTryAssignTypedRefEx(ref *types.Reference, val *types.Zval, strict bool) int {
-	if ZendVerifyRefAssignableZval(ref, val, strict) == 0 {
-		// ZvalPtrDtor(val)
+	if !ZendVerifyRefAssignableZval(ref, val, strict) {
 		return types.FAILURE
 	} else {
-		// ZvalPtrDtor(ref.GetVal())
 		types.ZVAL_COPY_VALUE(ref.GetVal(), val)
 		return types.SUCCESS
 	}
