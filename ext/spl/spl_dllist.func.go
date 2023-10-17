@@ -822,7 +822,7 @@ func zim_spl_SplDoublyLinkedList_unserialize(executeData *zend.ZendExecuteData, 
 	return
 error:
 	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
-	faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset %zd of %zd bytes", (*byte)(p-buf), buf_len)
+	faults.ThrowException(spl_ce_UnexpectedValueException, fmt.Sprintf("Error at offset %zd of %zd bytes", (*byte)(p-buf), buf_len), 0)
 	return
 }
 func zim_spl_SplDoublyLinkedList___serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {

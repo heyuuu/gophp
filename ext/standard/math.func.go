@@ -382,12 +382,12 @@ func ZifFmod(x float64, y float64) float64 {
 }
 func ZifIntdiv(dividend int, divisor int) int {
 	if divisor == 0 {
-		faults.ThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Division by zero")
+		faults.ThrowException(faults.ZendCeDivisionByZeroError, "Division by zero", 0)
 		return 0
 	} else if divisor == -1 && dividend == zend.ZEND_LONG_MIN {
 		/* Prevent overflow error/crash ... really should not happen:
 		   We don't return a float here as that violates function contract */
-		faults.ThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Division of PHP_INT_MIN by -1 is not an integer")
+		faults.ThrowException(faults.ZendCeArithmeticError, "Division of PHP_INT_MIN by -1 is not an integer", 0)
 		return 0
 	}
 	return dividend / divisor

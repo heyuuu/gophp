@@ -81,7 +81,7 @@ send_again:
 			if iter == nil {
 				// 				FREE_OP(free_op1)
 				if EG__().NoException() {
-					faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.Name())
+					faults.ThrowException(nil, fmt.Sprintf("Object of type %s did not create an Iterator", ce.Name()), 0)
 				}
 				return 0
 			}

@@ -12,7 +12,7 @@ func ZEND_VM_DISPATCH(executeData *ZendExecuteData, opcode OpCode, opline *types
 }
 func zend_mod_by_zero_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
-	faults.ThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Modulo by zero")
+	faults.ThrowException(faults.ZendCeDivisionByZeroError, "Modulo by zero", 0)
 	opline.Result().SetUndef()
 	return 0
 }

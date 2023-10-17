@@ -191,7 +191,7 @@ func ZendUserItGetNewIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	}
 	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.Object() == object.Object() {
 		if EG__().NoException() {
-			faults.ThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", lang.CondF(ce != nil, func() []byte { return ce.Name() }, func() []byte { return types.Z_OBJCE_P(object).Name() }))
+			faults.ThrowException(nil, fmt.Sprintf("Objects returned by %s::getIterator() must be traversable or implement interface Iterator", lang.CondF(ce != nil, func() []byte { return ce.Name() }, func() []byte { return types.Z_OBJCE_P(object).Name() })), 0)
 		}
 		// ZvalPtrDtor(&iterator)
 		return nil
@@ -354,7 +354,7 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 		// ZvalPtrDtor(&retval)
 	}
 	if result == types.FAILURE && EG__().NoException() {
-		faults.ThrowExceptionEx(nil, 0, "%s::serialize() must return a string or NULL", ce.Name())
+		faults.ThrowException(nil, fmt.Sprintf("%s::serialize() must return a string or NULL", ce.Name()), 0)
 	}
 	return result
 }
@@ -374,11 +374,11 @@ func ZendUserUnserialize(object *types.Zval, ce *types.ClassEntry, buf *uint8, b
 }
 func ZendClassSerializeDeny(object *types.Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(object)
-	faults.ThrowExceptionEx(nil, 0, "Serialization of '%s' is not allowed", ce.Name())
+	faults.ThrowException(nil, fmt.Sprintf("Serialization of '%s' is not allowed", ce.Name()), 0)
 	return types.FAILURE
 }
 func ZendClassUnserializeDeny(object *types.Zval, ce *types.ClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int {
-	faults.ThrowExceptionEx(nil, 0, "Unserialization of '%s' is not allowed", ce.Name())
+	faults.ThrowException(nil, fmt.Sprintf("Unserialization of '%s' is not allowed", ce.Name()), 0)
 	return types.FAILURE
 }
 func ZendImplementSerializable(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {

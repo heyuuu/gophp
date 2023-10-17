@@ -662,7 +662,7 @@ func ThrowException(exception_ce *types.ClassEntry, message string, code zend.Ze
 	var ex types.Zval
 	var tmp types.Zval
 	if exception_ce != nil {
-		if operators.InstanceofFunction(exception_ce, ZendCeThrowable) == 0 {
+		if !operators.InstanceofFunction(exception_ce, ZendCeThrowable) {
 			Error(E_NOTICE, "Exceptions must implement Throwable")
 			exception_ce = ZendCeException
 		}
@@ -670,10 +670,9 @@ func ThrowException(exception_ce *types.ClassEntry, message string, code zend.Ze
 		exception_ce = ZendCeException
 	}
 	zend.ObjectInitEx(&ex, exception_ce)
-	if message {
+	if message != "" {
 		tmp.SetString(b.CastStrAuto(message))
 		zend.ZendUpdatePropertyEx(exception_ce, &ex, types.STR_MESSAGE, &tmp)
-		// zend.ZvalPtrDtor(&tmp)
 	}
 	if code != 0 {
 		tmp.SetLong(code)
@@ -681,11 +680,6 @@ func ThrowException(exception_ce *types.ClassEntry, message string, code zend.Ze
 	}
 	ThrowExceptionInternal(&ex)
 	return ex.Object()
-}
-func ThrowExceptionEx(exceptionCe *types.ClassEntry, code zend.ZendLong, format string, args ...any) *types.Object {
-	message := zend.ZendSprintf(format, args)
-	obj := ThrowException(exceptionCe, message, code)
-	return obj
 }
 func ThrowErrorException(exceptionCe *types.ClassEntry, message string, code zend.ZendLong, severity int) *types.Object {
 	var ex types.Zval

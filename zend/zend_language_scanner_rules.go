@@ -386,7 +386,7 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 		}
 		EG__().ExceptionRestore()
 		if b.EqualsAny(firstToken, T_VARIABLE, T_DOLLAR_OPEN_CURLY_BRACES, T_CURLY_OPEN) && sc.heredocIndentation != 0 {
-			faults.ThrowExceptionEx(faults.ZendCeParseError, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", sc.heredocIndentation)
+			faults.ThrowException(faults.ZendCeParseError, fmt.Sprintf("Invalid body indentation level (expecting an indentation level of at least %d)", sc.heredocIndentation), 0)
 			errno = 1
 		}
 		heredocLabel.indentation = sc.heredocIndentation

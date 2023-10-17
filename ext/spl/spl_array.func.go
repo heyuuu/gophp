@@ -845,7 +845,7 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 			}
 		} else {
 			if !array.Object().IsStdGetProperties() {
-				faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Overloaded object of type %s is not compatible with %s", array.Object().GetCe().Name(), intern.GetStd().GetCe().Name())
+				faults.ThrowException(spl_ce_InvalidArgumentException, fmt.Sprintf("Overloaded object of type %s is not compatible with %s", array.Object().GetCe().Name(), intern.GetStd().GetCe().Name()), 0)
 				return
 			}
 			types.ZVAL_COPY(intern.GetArray(), array)
@@ -995,7 +995,7 @@ func zim_spl_Array_seek(executeData *zend.ZendExecuteData, return_value *types.Z
 			return
 		}
 	}
-	faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position %d is out of range", opos)
+	faults.ThrowException(spl_ce_OutOfBoundsException, fmt.Sprintf("Seek position %d is out of range", opos), 0)
 }
 func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 	var aht *types.Array = SplArrayGetHashTable(intern)
@@ -1344,7 +1344,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 	return
 outexcept:
 	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
-	faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset %d of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
+	faults.ThrowException(spl_ce_UnexpectedValueException, fmt.Sprintf("Error at offset %d of %zd bytes", zend_long((*byte)(p-buf)), buf_len), 0)
 	return
 }
 func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1416,10 +1416,10 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	if iterator_class_zv != nil && iterator_class_zv.IsString() {
 		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.String())
 		if ce == nil {
-			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.StringEx().GetVal())
+			faults.ThrowException(spl_ce_UnexpectedValueException, fmt.Sprintf("Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.StringEx().GetVal()), 0)
 			return
 		} else if operators.InstanceofFunction(ce, spl_ce_Iterator) == 0 {
-			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", iterator_class_zv.StringEx().GetVal())
+			faults.ThrowException(spl_ce_UnexpectedValueException, fmt.Sprintf("Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", iterator_class_zv.StringEx().GetVal()), 0)
 			return
 		} else {
 			intern.SetCeGetIterator(ce)

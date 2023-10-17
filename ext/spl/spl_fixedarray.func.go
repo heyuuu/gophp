@@ -375,7 +375,7 @@ func zim_spl_SplFixedArray___construct(executeData *zend.ZendExecuteData, return
 		return
 	}
 	if size < 0 {
-		faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array size cannot be less than zero")
+		faults.ThrowException(spl_ce_InvalidArgumentException, "array size cannot be less than zero", 0)
 		return
 	}
 	intern = Z_SPLFIXEDARRAY_P(object)
@@ -457,7 +457,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		for iter := data.Array().Iterator(); iter.Valid(); iter.Next() {
 			key := iter.Key()
 			if key.IsStrKey() || key.IdxKey() < 0 {
-				faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array must contain only positive integer keys")
+				faults.ThrowException(spl_ce_InvalidArgumentException, "array must contain only positive integer keys", 0)
 				return
 			}
 			numIndex := uint(key.IdxKey())
@@ -467,7 +467,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		}
 		tmp := int(maxIndex + 1)
 		if tmp <= 0 {
-			faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "integer overflow detected")
+			faults.ThrowException(spl_ce_InvalidArgumentException, "integer overflow detected", 0)
 			return
 		}
 		SplFixedarrayInit(&array, tmp)
@@ -506,7 +506,7 @@ func zim_spl_SplFixedArray_setSize(executeData *zend.ZendExecuteData, return_val
 		return
 	}
 	if size < 0 {
-		faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array size cannot be less than zero")
+		faults.ThrowException(spl_ce_InvalidArgumentException, "array size cannot be less than zero", 0)
 		return
 	}
 	intern = Z_SPLFIXEDARRAY_P(object)

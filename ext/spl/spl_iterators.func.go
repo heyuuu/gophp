@@ -1,6 +1,7 @@
 package spl
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/lang"
@@ -23,7 +24,7 @@ func Z_SPLRECURSIVE_IT_P(zv *types.Zval) *SplRecursiveItObject {
 }
 func SPL_FETCH_SUB_ITERATOR(var_ *zend.ZendObjectIterator, object *SplRecursiveItObject) {
 	if object.GetIterators() == nil {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	var_ = object.GetIterators()[object.GetLevel()].GetIterator()
@@ -490,7 +491,7 @@ func zim_spl_RecursiveIteratorIterator_getSubIterator(executeData *zend.ZendExec
 		return
 	}
 	if object.GetIterators() == nil {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	value = object.GetIterators()[level].GetZobject()
@@ -503,7 +504,7 @@ func zim_spl_RecursiveIteratorIterator_getInnerIterator(executeData *zend.ZendEx
 		return
 	}
 	if object.GetIterators() == nil {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	zobject = object.GetIterators()[object.GetLevel()].GetZobject()
@@ -531,7 +532,7 @@ func zim_spl_RecursiveIteratorIterator_callHasChildren(executeData *zend.ZendExe
 		return
 	}
 	if object.GetIterators() == nil {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	ce = object.GetIterators()[object.GetLevel()].GetCe()
@@ -555,7 +556,7 @@ func zim_spl_RecursiveIteratorIterator_callGetChildren(executeData *zend.ZendExe
 		return
 	}
 	if object.GetIterators() == nil {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	ce = object.GetIterators()[object.GetLevel()].GetCe()
@@ -743,7 +744,7 @@ func zim_spl_RecursiveTreeIterator_setPrefixPart(executeData *zend.ZendExecuteDa
 		return
 	}
 	if 0 > part || part > 5 {
-		faults.ThrowExceptionEx(spl_ce_OutOfRangeException, 0, "Use RecursiveTreeIterator::PREFIX_* constant")
+		faults.ThrowException(spl_ce_OutOfRangeException, "Use RecursiveTreeIterator::PREFIX_* constant", 0)
 		return
 	}
 	object.GetPrefix()[part].Free()
@@ -755,7 +756,7 @@ func zim_spl_RecursiveTreeIterator_getPrefix(executeData *zend.ZendExecuteData, 
 		return
 	}
 	if object.GetIterators() == nil {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	SplRecursiveTreeIteratorGetPrefix(object, return_value)
@@ -776,7 +777,7 @@ func zim_spl_RecursiveTreeIterator_getEntry(executeData *zend.ZendExecuteData, r
 		return
 	}
 	if object.GetIterators() == nil {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	SplRecursiveTreeIteratorGetEntry(object, return_value)
@@ -787,7 +788,7 @@ func zim_spl_RecursiveTreeIterator_getPostfix(executeData *zend.ZendExecuteData,
 		return
 	}
 	if object.GetIterators() == nil {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	SplRecursiveTreeIteratorGetPostfix(object, return_value)
@@ -802,7 +803,7 @@ func zim_spl_RecursiveTreeIterator_current(executeData *zend.ZendExecuteData, re
 		return
 	}
 	if object.GetIterators() == nil {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	if object.IsRtitBypassCurrent() {
@@ -886,7 +887,7 @@ func SplDualItGetMethod(object **types.Object, method *types.String, key *types.
 }
 func APPENDIT_CHECK_CTOR(intern *SplDualItObject) {
 	if intern.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "Classes derived from %s must call %s::__construct()", spl_ce_AppendIterator.Name(), spl_ce_AppendIterator.Name())
+		faults.ThrowException(spl_ce_BadMethodCallException, fmt.Sprintf("Classes derived from %s must call %s::__construct()", spl_ce_AppendIterator.Name(), spl_ce_AppendIterator.Name()), 0)
 		return
 	}
 }
@@ -927,7 +928,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 	var error_handling zend.ZendErrorHandling
 	intern = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if intern.GetDitType() != DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s::getIterator() must be called exactly once per instance", ce_base.Name())
+		faults.ThrowException(spl_ce_BadMethodCallException, fmt.Sprintf("%s::getIterator() must be called exactly once per instance", ce_base.Name()), 0)
 		return nil
 	}
 	intern.SetDitType(dit_type)
@@ -981,7 +982,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 					return nil
 				}
 				if !retval.IsObject() || operators.InstanceofFunction(types.Z_OBJCE(retval), zend.ZendCeTraversable) == 0 {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "%s::getIterator() must return an object that implements Traversable", ce.Name())
+					faults.ThrowException(spl_ce_LogicException, fmt.Sprintf("%s::getIterator() must return an object that implements Traversable", ce.Name()), 0)
 					return nil
 				}
 				zobject = &retval
@@ -1008,7 +1009,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 			return nil
 		}
 		if mode < 0 || mode >= REGIT_MODE_MAX {
-			faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Illegal mode %d", mode)
+			faults.ThrowException(spl_ce_InvalidArgumentException, fmt.Sprintf("Illegal mode %d", mode), 0)
 			return nil
 		}
 		intern.SetMode(mode)
@@ -1072,7 +1073,7 @@ func zim_spl_dual_it_getInnerIterator(executeData *zend.ZendExecuteData, return_
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1167,7 +1168,7 @@ func ZimSplDualItRewind(executeData *zend.ZendExecuteData, return_value *types.Z
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1181,7 +1182,7 @@ func ZimSplDualItValid(executeData *zend.ZendExecuteData, return_value *types.Zv
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1195,7 +1196,7 @@ func ZimSplDualItKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1214,7 +1215,7 @@ func ZimSplDualItCurrent(executeData *zend.ZendExecuteData, return_value *types.
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1233,7 +1234,7 @@ func ZimSplDualItNext(executeData *zend.ZendExecuteData, return_value *types.Zva
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1273,7 +1274,7 @@ func zim_spl_FilterIterator_rewind(executeData *zend.ZendExecuteData, return_val
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1286,7 +1287,7 @@ func zim_spl_FilterIterator_next(executeData *zend.ZendExecuteData, return_value
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1306,7 +1307,7 @@ func zim_spl_RecursiveFilterIterator_hasChildren(executeData *zend.ZendExecuteDa
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1327,7 +1328,7 @@ func zim_spl_RecursiveFilterIterator_getChildren(executeData *zend.ZendExecuteDa
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1345,7 +1346,7 @@ func zim_spl_RecursiveCallbackFilterIterator_getChildren(executeData *zend.ZendE
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1409,7 +1410,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1487,7 +1488,7 @@ func zim_spl_RegexIterator_getRegex(executeData *zend.ZendExecuteData, return_va
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1501,7 +1502,7 @@ func zim_spl_RegexIterator_getMode(executeData *zend.ZendExecuteData, return_val
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1515,12 +1516,12 @@ func zim_spl_RegexIterator_setMode(executeData *zend.ZendExecuteData, return_val
 		return
 	}
 	if mode < 0 || mode >= REGIT_MODE_MAX {
-		faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Illegal mode %d", mode)
+		faults.ThrowException(spl_ce_InvalidArgumentException, fmt.Sprintf("Illegal mode %d", mode), 0)
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1533,7 +1534,7 @@ func zim_spl_RegexIterator_getFlags(executeData *zend.ZendExecuteData, return_va
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1548,7 +1549,7 @@ func zim_spl_RegexIterator_setFlags(executeData *zend.ZendExecuteData, return_va
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1561,7 +1562,7 @@ func zim_spl_RegexIterator_getPregFlags(executeData *zend.ZendExecuteData, retur
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1581,7 +1582,7 @@ func zim_spl_RegexIterator_setPregFlags(executeData *zend.ZendExecuteData, retur
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1599,7 +1600,7 @@ func zim_spl_RecursiveRegexIterator_getChildren(executeData *zend.ZendExecuteDat
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1622,7 +1623,7 @@ func zim_spl_RecursiveRegexIterator_accept(executeData *zend.ZendExecuteData, re
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1698,11 +1699,11 @@ func SplLimitItSeek(intern *SplDualItObject, pos zend.ZendLong) {
 	var zpos types.Zval
 	SplDualItFree(intern)
 	if pos < intern.GetOffset() {
-		faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Cannot seek to %d which is below the offset %d", pos, intern.GetOffset())
+		faults.ThrowException(spl_ce_OutOfBoundsException, fmt.Sprintf("Cannot seek to %d which is below the offset %d", pos, intern.GetOffset()), 0)
 		return
 	}
 	if pos >= intern.GetOffset()+intern.GetCount() && intern.GetCount() != -1 {
-		faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Cannot seek to "+"%d which is behind offset %d plus count %d", pos, intern.GetOffset(), intern.GetCount())
+		faults.ThrowException(spl_ce_OutOfBoundsException, fmt.Sprintf("Cannot seek to %d which is behind offset %d plus count %d", pos, intern.GetOffset(), intern.GetCount()), 0)
 		return
 	}
 	if pos != intern.GetPos() && operators.InstanceofFunction(intern.GetCe(), spl_ce_SeekableIterator) != 0 {
@@ -1737,7 +1738,7 @@ func zim_spl_LimitIterator_rewind(executeData *zend.ZendExecuteData, return_valu
 	var intern *SplDualItObject
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1748,7 +1749,7 @@ func zim_spl_LimitIterator_valid(executeData *zend.ZendExecuteData, return_value
 	var intern *SplDualItObject
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1762,7 +1763,7 @@ func zim_spl_LimitIterator_next(executeData *zend.ZendExecuteData, return_value 
 	var intern *SplDualItObject
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1779,7 +1780,7 @@ func zim_spl_LimitIterator_seek(executeData *zend.ZendExecuteData, return_value 
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1791,7 +1792,7 @@ func zim_spl_LimitIterator_getPosition(executeData *zend.ZendExecuteData, return
 	var intern *SplDualItObject
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1897,7 +1898,7 @@ func zim_spl_CachingIterator_rewind(executeData *zend.ZendExecuteData, return_va
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1910,7 +1911,7 @@ func zim_spl_CachingIterator_valid(executeData *zend.ZendExecuteData, return_val
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1924,7 +1925,7 @@ func zim_spl_CachingIterator_next(executeData *zend.ZendExecuteData, return_valu
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1937,7 +1938,7 @@ func zim_spl_CachingIterator_hasNext(executeData *zend.ZendExecuteData, return_v
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -1948,12 +1949,12 @@ func zim_spl_CachingIterator___toString(executeData *zend.ZendExecuteData, retur
 	var intern *SplDualItObject
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
 	if !intern.HasUCachingFlags(CIT_CALL_TOSTRING | CIT_TOSTRING_USE_KEY | CIT_TOSTRING_USE_CURRENT | CIT_TOSTRING_USE_INNER) {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not fetch string value (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name())
+		faults.ThrowException(spl_ce_BadMethodCallException, fmt.Sprintf("%s does not fetch string value (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name()), 0)
 		return
 	}
 	if intern.IsTostringUseKey() {
@@ -1979,12 +1980,12 @@ func zim_spl_CachingIterator_offsetSet(executeData *zend.ZendExecuteData, return
 	var value *types.Zval
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name())
+		faults.ThrowException(spl_ce_BadMethodCallException, fmt.Sprintf("%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name()), 0)
 		return
 	}
 	if zend.ZendParseParameters(executeData.NumArgs(), "Sz", &key, &value) == types.FAILURE {
@@ -1999,12 +2000,12 @@ func zim_spl_CachingIterator_offsetGet(executeData *zend.ZendExecuteData, return
 	var value *types.Zval
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name())
+		faults.ThrowException(spl_ce_BadMethodCallException, fmt.Sprintf("%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name()), 0)
 		return
 	}
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == types.FAILURE {
@@ -2021,12 +2022,12 @@ func zim_spl_CachingIterator_offsetUnset(executeData *zend.ZendExecuteData, retu
 	var key *types.String
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name())
+		faults.ThrowException(spl_ce_BadMethodCallException, fmt.Sprintf("%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name()), 0)
 		return
 	}
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == types.FAILURE {
@@ -2039,12 +2040,12 @@ func zim_spl_CachingIterator_offsetExists(executeData *zend.ZendExecuteData, ret
 	var key *types.String
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name())
+		faults.ThrowException(spl_ce_BadMethodCallException, fmt.Sprintf("%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name()), 0)
 		return
 	}
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == types.FAILURE {
@@ -2060,12 +2061,12 @@ func zim_spl_CachingIterator_getCache(executeData *zend.ZendExecuteData, return_
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name())
+		faults.ThrowException(spl_ce_BadMethodCallException, fmt.Sprintf("%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name()), 0)
 		return
 	}
 	types.ZVAL_COPY(return_value, intern.GetZcache())
@@ -2077,7 +2078,7 @@ func zim_spl_CachingIterator_getFlags(executeData *zend.ZendExecuteData, return_
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2089,7 +2090,7 @@ func zim_spl_CachingIterator_setFlags(executeData *zend.ZendExecuteData, return_
 	var flags zend.ZendLong
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2126,12 +2127,12 @@ func zim_spl_CachingIterator_count(executeData *zend.ZendExecuteData, return_val
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name())
+		faults.ThrowException(spl_ce_BadMethodCallException, fmt.Sprintf("%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(executeData.ThisObjectZval()).Name()), 0)
 		return
 	}
 	return_value.SetLong(intern.GetZcache().Array().Len())
@@ -2147,7 +2148,7 @@ func zim_spl_RecursiveCachingIterator_hasChildren(executeData *zend.ZendExecuteD
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2161,7 +2162,7 @@ func zim_spl_RecursiveCachingIterator_getChildren(executeData *zend.ZendExecuteD
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2191,7 +2192,7 @@ func zim_spl_NoRewindIterator_valid(executeData *zend.ZendExecuteData, return_va
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2205,7 +2206,7 @@ func zim_spl_NoRewindIterator_key(executeData *zend.ZendExecuteData, return_valu
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2224,7 +2225,7 @@ func zim_spl_NoRewindIterator_current(executeData *zend.ZendExecuteData, return_
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2240,7 +2241,7 @@ func zim_spl_NoRewindIterator_next(executeData *zend.ZendExecuteData, return_val
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2256,7 +2257,7 @@ func zim_spl_InfiniteIterator_next(executeData *zend.ZendExecuteData, return_val
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2345,7 +2346,7 @@ func zim_spl_AppendIterator_append(executeData *zend.ZendExecuteData, return_val
 	var it *types.Zval
 	var it__1 *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it__1.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it__1
@@ -2378,7 +2379,7 @@ func zim_spl_AppendIterator_current(executeData *zend.ZendExecuteData, return_va
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2398,7 +2399,7 @@ func zim_spl_AppendIterator_rewind(executeData *zend.ZendExecuteData, return_val
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2414,7 +2415,7 @@ func zim_spl_AppendIterator_valid(executeData *zend.ZendExecuteData, return_valu
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2428,7 +2429,7 @@ func zim_spl_AppendIterator_next(executeData *zend.ZendExecuteData, return_value
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2441,7 +2442,7 @@ func zim_spl_AppendIterator_getIteratorIndex(executeData *zend.ZendExecuteData, 
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it
@@ -2456,7 +2457,7 @@ func zim_spl_AppendIterator_getArrayIterator(executeData *zend.ZendExecuteData, 
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
 	if it.GetDitType() == DIT_Unknown {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
+		faults.ThrowException(spl_ce_LogicException, "The object is in an invalid state as the parent constructor was not called", 0)
 		return
 	}
 	intern = it

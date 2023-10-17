@@ -939,7 +939,7 @@ func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 		/* modulus by zero */
 
 		if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
-			faults.ThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Modulo by zero")
+			faults.ThrowException(faults.ZendCeDivisionByZeroError, "Modulo by zero", 0)
 		} else {
 			faults.ErrorNoreturn(faults.E_ERROR, "Modulo by zero")
 		}
@@ -1340,7 +1340,7 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 			return types.SUCCESS
 		} else {
 			if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
-				faults.ThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Bit shift by negative number")
+				faults.ThrowException(faults.ZendCeArithmeticError, "Bit shift by negative number", 0)
 			} else {
 				faults.ErrorNoreturn(faults.E_ERROR, "Bit shift by negative number")
 			}
@@ -1433,7 +1433,7 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			return types.SUCCESS
 		} else {
 			if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
-				faults.ThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Bit shift by negative number")
+				faults.ThrowException(faults.ZendCeArithmeticError, "Bit shift by negative number", 0)
 			} else {
 				faults.ErrorNoreturn(faults.E_ERROR, "Bit shift by negative number")
 			}

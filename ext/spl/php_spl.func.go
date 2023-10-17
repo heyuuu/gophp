@@ -1,6 +1,7 @@
 package spl
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
@@ -313,27 +314,27 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, _ zpp.Opt, autoloadFunction *typ
 			if zcallable.IsType(types.IsArray) {
 				if objPtr == nil && alfi.GetFuncPtr() != nil && !alfi.GetFuncPtr().HasFnFlags(types.AccStatic) {
 					if throw {
-						faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array specifies a non static method but no object (%s)", error_)
+						faults.ThrowException(spl_ce_LogicException, fmt.Sprintf("Passed array specifies a non static method but no object (%s)", error_), 0)
 					}
 					return false
 				} else if throw {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", lang.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), lang.Cond(objPtr == nil, "static ", ""), error_)
+					faults.ThrowException(spl_ce_LogicException, fmt.Sprintf("Passed array does not specify %s %smethod (%s)", lang.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), lang.Cond(objPtr == nil, "static ", ""), error_), 0)
 				}
 				return false
 			} else if zcallable.IsString() {
 				if throw {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", funcName.GetVal(), lang.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error_)
+					faults.ThrowException(spl_ce_LogicException, fmt.Sprintf("Function '%s' not %s (%s)", funcName.GetVal(), lang.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error_), 0)
 				}
 				return false
 			} else {
 				if throw {
-					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Illegal value passed (%s)", error_)
+					faults.ThrowException(spl_ce_LogicException, fmt.Sprintf("Illegal value passed (%s)", error_), 0)
 				}
 				return false
 			}
 		} else if interFunc, ok := fcc.GetFunctionHandler().(*types.InternalFunction); ok && interFunc.GetHandler() == ZifSplAutoloadCall {
 			if throw {
-				faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function spl_autoload_call() cannot be registered")
+				faults.ThrowException(spl_ce_LogicException, "Function spl_autoload_call() cannot be registered", 0)
 			}
 			return false
 		}
@@ -418,7 +419,7 @@ func ZifSplAutoloadUnregister(autoloadFunction *types.Zval) bool {
 	var fcc types.ZendFcallInfoCache
 
 	if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_CHECK_SYNTAX_ONLY, &funcName, &fcc, &error_) == 0 {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Unable to unregister invalid function (%s)", error_)
+		faults.ThrowException(spl_ce_LogicException, fmt.Sprintf("Unable to unregister invalid function (%s)", error_), 0)
 		return false
 	}
 	objPtr = fcc.GetObject()

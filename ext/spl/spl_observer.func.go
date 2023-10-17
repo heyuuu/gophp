@@ -252,7 +252,7 @@ func zim_spl_SplObjectStorage_offsetGet(executeData *zend.ZendExecuteData, retur
 	}
 	element = SplObjectStorageGet(intern, &key)
 	if element == nil {
-		faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Object not found")
+		faults.ThrowException(spl_ce_UnexpectedValueException, "Object not found", 0)
 	} else {
 		var value *types.Zval = element.GetInf()
 		types.ZVAL_COPY_DEREF(return_value, value)
@@ -569,7 +569,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 	return
 outexcept:
 	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
-	faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset %zd of %zd bytes", (*byte)(p-buf), buf_len)
+	faults.ThrowException(spl_ce_UnexpectedValueException, fmt.Sprintf("Error at offset %zd of %zd bytes", (*byte)(p-buf), buf_len), 0)
 	return
 }
 func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
