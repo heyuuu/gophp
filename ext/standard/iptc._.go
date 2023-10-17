@@ -1,3 +1,7 @@
 package standard
 
-var Psheader = "xFFxED00Photoshop 3.008BIMx04x040000"
+import "math"
+
+const Psheader = "\xFF\xED\000\000Photoshop 3.0\0008BIM\x04\x04\000\000\000\000"
+
+const SIZE_MAX = math.MaxInt

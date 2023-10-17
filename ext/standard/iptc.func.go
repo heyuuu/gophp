@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
@@ -9,285 +10,253 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"io"
+	"strings"
 )
 
-func PhpIptcPut1(fp *r.File, spool int, c uint8, spoolbuf **uint8) int {
-	if spool > 0 {
-		core.PUTC(c)
-	}
-	if spoolbuf != nil {
-		lang.PostInc(&(*(*spoolbuf))) = c
-	}
-	return c
+type iptcWriter struct {
+	fp    *r.File
+	spool int
+	buf   io.Writer
 }
-func PhpIptcGet1(fp *r.File, spool int, spoolbuf **uint8) int {
-	var c byte
-	var cc byte
-	c, ok := fp.GetC()
+
+func (w *iptcWriter) Write(data []byte) {
+	if w.spool > 0 {
+		core.PUTS(string(data))
+	}
+	if w.buf != nil {
+		w.buf.Write(data)
+	}
+}
+func (w *iptcWriter) WriteByte(c byte) {
+	w.Write([]byte{c})
+}
+func (w *iptcWriter) ReadByte() (byte, bool) {
+	c, ok := w.fp.GetC()
 	if !ok {
-		return r.EOF
+		return 0, false
 	}
-	if spool > 0 {
-		cc = c
-		core.PUTC(cc)
-	}
-	if spoolbuf != nil {
-		lang.PostInc(&(*(*spoolbuf))) = c
-	}
-	return c
+	return c, true
 }
-func PhpIptcReadRemaining(fp *r.File, spool int, spoolbuf **uint8) int {
-	for PhpIptcGet1(fp, spool, spoolbuf) != r.EOF {
-		continue
+func (w *iptcWriter) ReadWrite() (byte, bool) {
+	c, ok := w.fp.GetC()
+	if !ok {
+		return 0, false
 	}
-	return M_EOI
+	w.WriteByte(c)
+	return c, true
 }
-func PhpIptcSkipVariable(fp *r.File, spool int, spoolbuf **uint8) int {
-	var length uint
-	var c1 int
-	var c2 int
-	if lang.Assign(&c1, PhpIptcGet1(fp, spool, spoolbuf)) == r.EOF {
-		return M_EOI
-	}
-	if lang.Assign(&c2, PhpIptcGet1(fp, spool, spoolbuf)) == r.EOF {
-		return M_EOI
-	}
-	length = (uint8(c1) << 8) + uint8(c2)
-	length -= 2
-	for lang.PostDec(&length) {
-		if PhpIptcGet1(fp, spool, spoolbuf) == r.EOF {
-			return M_EOI
-		}
-	}
-	return 0
-}
-func PhpIptcNextMarker(fp *r.File, spool int, spoolbuf **uint8) int {
-	var c int
-
+func (w *iptcWriter) NextMarker() byte {
+	var c byte
+	var ok bool
 	/* skip unimportant stuff */
-
-	c = PhpIptcGet1(fp, spool, spoolbuf)
-	if c == r.EOF {
+	c, ok = w.ReadWrite()
+	if !ok {
 		return M_EOI
 	}
 	for c != 0xff {
-		if lang.Assign(&c, PhpIptcGet1(fp, spool, spoolbuf)) == r.EOF {
+		if c, ok = w.ReadWrite(); ok {
 			return M_EOI
 		}
 	}
 
 	/* get marker byte, swallowing possible padding */
-
 	for {
-		c = PhpIptcGet1(fp, 0, 0)
-		if c == r.EOF {
+		c, ok = w.ReadWrite()
+		if !ok {
 			return M_EOI
 		} else if c == 0xff {
-			PhpIptcPut1(fp, spool, uint8(c), spoolbuf)
+			w.WriteByte(c)
 		}
 		if c != 0xff {
 			break
 		}
 	}
-	return uint(c)
+	return c
 }
-func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval, jpegFileName *types.Zval, _ zpp.Opt, spool *types.Zval) {
-	var iptcdata *byte
-	var jpeg_file *byte
-	var iptcdata_len int
-	var jpeg_file_len int
-	var spool zend.ZendLong = 0
-	var fp *r.File
-	var marker uint
-	var done uint = 0
-	var inx int
-	var spoolbuf *types.String = nil
-	var poi *uint8 = nil
-	var sb zend.ZendStatT
-	var written bool = 0
+func (w *iptcWriter) SkipVariable() byte {
+	var c1, c2 byte
+	var ok bool
+	if c1, ok = w.ReadWrite(); !ok {
+		return M_EOI
+	}
+	if c2, ok = w.ReadWrite(); !ok {
+		return M_EOI
+	}
+	length := int(c1)<<8 + int(c2) - 2
+	for ; length > 0; length-- {
+		if _, ok = w.ReadWrite(); !ok {
+			return M_EOI
+		}
+	}
+	return 0
+}
+func (w *iptcWriter) SkipVariableNoOutput() byte {
+	var c1, c2 byte
+	var ok bool
+	if c1, ok = w.ReadByte(); !ok {
+		return M_EOI
+	}
+	if c2, ok = w.ReadByte(); !ok {
+		return M_EOI
+	}
+	length := int(c1)<<8 + int(c2) - 2
+	for ; length > 0; length-- {
+		if _, ok = w.ReadByte(); !ok {
+			return M_EOI
+		}
+	}
+	return 0
+}
+func (w *iptcWriter) ReadRemaining() {
 	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			iptcdata, iptcdata_len = fp.ParseString()
-			jpeg_file, jpeg_file_len = fp.ParsePath()
-			fp.StartOptional()
-			spool = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
+		if _, ok := w.ReadWrite(); !ok {
 			break
 		}
-		break
 	}
-	if core.PhpCheckOpenBasedir(jpeg_file) != 0 {
-		return_value.SetFalse()
-		return
+}
+
+func ZifIptcembed(iptcData string, filename zpp.Path, _ zpp.Opt, spool int) *types.Zval {
+	var fp *r.File
+	var marker byte
+	var done uint = 0
+	var spoolBuf strings.Builder
+	var sb zend.ZendStatT
+	var written bool
+
+	if core.PhpCheckOpenBasedir(filename) != 0 {
+		return types.NewZvalFalse()
 	}
-	if iptcdata_len >= SIZE_MAX-b.SizeOf("psheader")-1025 {
+	if len(iptcData) >= SIZE_MAX-b.SizeOf("psheader")-1025 {
 		core.PhpErrorDocref("", faults.E_WARNING, "IPTC data too large")
-		return_value.SetFalse()
-		return
+		return types.NewZvalFalse()
 	}
-	if lang.Assign(&fp, zend.VCWD_FOPEN(jpeg_file, "rb")) == 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Unable to open %s", jpeg_file)
-		return_value.SetFalse()
-		return
+	if fp = zend.VCWD_FOPEN(filename, "rb"); fp == nil {
+		core.PhpErrorDocref("", faults.E_WARNING, "Unable to open %s", filename)
+		return types.NewZvalFalse()
 	}
+	defer func() { fp.Close() }()
+
+	w := iptcWriter{fp: fp, spool: spool}
 	if spool < 2 {
 		if zend.ZendFstat(fileno(fp), &sb) != 0 {
-			return_value.SetFalse()
-			return
+			return types.NewZvalFalse()
 		}
-		spoolbuf = types.ZendStringAlloc(iptcdata_len+b.SizeOf("psheader")+1024+1+sb.st_size, 0)
-		poi = (*uint8)(spoolbuf.GetVal())
-		memset(poi, 0, iptcdata_len+b.SizeOf("psheader")+sb.st_size+1024+1)
+		spoolBuf.Grow(len(iptcData) + b.SizeOf(Psheader) + 1024 + 1 + sb.st_size)
+		w.buf = &spoolBuf
 	}
-	if PhpIptcGet1(fp, spool, lang.Cond(poi != nil, &poi, 0)) != 0xff {
-		fp.Close()
-		if spoolbuf != nil {
-			// types.ZendStringEfree(spoolbuf)
-		}
-		return_value.SetFalse()
-		return
+
+	if c, ok := w.ReadWrite(); !ok || c != 0xff {
+		return types.NewZvalFalse()
 	}
-	if PhpIptcGet1(fp, spool, lang.Cond(poi != nil, &poi, 0)) != 0xd8 {
-		fp.Close()
-		if spoolbuf != nil {
-			// types.ZendStringEfree(spoolbuf)
-		}
-		return_value.SetFalse()
-		return
+	if c, ok := w.ReadWrite(); !ok || c != 0xd8 {
+		return types.NewZvalFalse()
 	}
+
 	for done == 0 {
-		marker = PhpIptcNextMarker(fp, spool, lang.Cond(poi != nil, &poi, 0))
+		marker = w.NextMarker()
 		if marker == M_EOI {
 			break
 		} else if marker != M_APP13 {
-			PhpIptcPut1(fp, spool, uint8(marker), lang.Cond(poi != nil, &poi, 0))
+			w.WriteByte(marker)
 		}
 		switch marker {
 		case M_APP13:
-
 			/* we are going to write a new APP13 marker, so don't output the old one */
-
-			PhpIptcSkipVariable(fp, 0, 0)
+			w.SkipVariableNoOutput()
 			fp.GetC()
-			PhpIptcReadRemaining(fp, spool, lang.Cond(poi != nil, &poi, 0))
+			w.ReadRemaining()
 			done = 1
 		case M_APP0:
 			fallthrough
 		case M_APP1:
-			if written != 0 {
-
+			if written {
 				/* don't try to write the data twice */
-
 				break
+			}
+			written = true
+			w.SkipVariable()
 
-				/* don't try to write the data twice */
-
+			iptcdataLen := len(iptcData)
+			if (iptcdataLen & 1) != 0 {
+				iptcdataLen++
 			}
-			written = 1
-			PhpIptcSkipVariable(fp, spool, lang.Cond(poi != nil, &poi, 0))
-			if (iptcdata_len & 1) != 0 {
-				iptcdata_len++
-			}
-			Psheader[2] = byte(iptcdata_len + 28>>8)
-			Psheader[3] = iptcdata_len + 28&0xff
-			for inx = 0; inx < 28; inx++ {
-				PhpIptcPut1(fp, spool, Psheader[inx], lang.Cond(poi != nil, &poi, 0))
-			}
-			PhpIptcPut1(fp, spool, uint8(iptcdata_len>>8), lang.Cond(poi != nil, &poi, 0))
-			PhpIptcPut1(fp, spool, uint8(iptcdata_len&0xff), lang.Cond(poi != nil, &poi, 0))
-			for inx = 0; inx < iptcdata_len; inx++ {
-				PhpIptcPut1(fp, spool, iptcdata[inx], lang.Cond(poi != nil, &poi, 0))
-			}
+			psheader := []byte(Psheader)
+			psheader[2] = byte((iptcdataLen + 28) >> 8)
+			psheader[3] = byte((iptcdataLen + 28) & 0xff)
+			w.Write(psheader)
+			w.WriteByte(uint8(iptcdataLen >> 8))
+			w.WriteByte(uint8(iptcdataLen & 0xff))
+			w.Write([]byte(iptcData))
 		case M_SOS:
-
 			/* we hit data, no more marker-inserting can be done! */
-
-			PhpIptcReadRemaining(fp, spool, lang.Cond(poi != nil, &poi, 0))
+			w.ReadRemaining()
 			done = 1
 		default:
-			PhpIptcSkipVariable(fp, spool, lang.Cond(poi != nil, &poi, 0))
+			w.SkipVariable()
 		}
 	}
-	fp.Close()
 	if spool < 2 {
-		spoolbuf = types.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()))
-		return_value.SetStringEx(spoolbuf)
-		return
+		return types.NewZvalString(spoolBuf.String())
 	} else {
-		return_value.SetTrue()
-		return
+		return types.NewZvalTrue()
 	}
 }
-func ZifIptcparse(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval) {
-	var inx int = 0
-	var len_ int
+func ZifIptcparse(iptcdata string) (*types.Array, bool) {
+	var idx uint = 0
+	var len_ uint
 	var tagsfound uint = 0
-	var buffer *uint8
 	var recnum uint8
 	var dataset uint8
-	var str *byte
-	var key []*byte
-	var str_len int
-	var values types.Zval
-	var element *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			str, str_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	buffer = (*uint8)(str)
-	for inx < str_len {
-		if buffer[inx] == 0x1c && (buffer[inx+1] == 0x1 || buffer[inx+1] == 0x2) {
+
+	data := iptcdata
+	dataLen := uint(len(iptcdata))
+	for idx < dataLen {
+		if idx+1 < dataLen && data[idx] == 0x1c && (data[idx+1] == 0x1 || data[idx+1] == 0x2) {
 			break
 		} else {
-			inx++
+			idx++
 		}
 	}
-	for inx < str_len {
-		if buffer[lang.PostInc(&inx)] != 0x1c {
+
+	arr := types.NewArray()
+	for idx < dataLen {
+		if data[lang.PostInc(&idx)] != 0x1c {
 			break
 		}
-		if inx+4 >= str_len {
+		if idx+4 >= dataLen {
 			break
 		}
-		dataset = buffer[lang.PostInc(&inx)]
-		recnum = buffer[lang.PostInc(&inx)]
-		if (buffer[inx] & uint8(0x80)) != 0 {
-			if inx+6 >= str_len {
+		dataset = data[lang.PostInc(&idx)]
+		recnum = data[lang.PostInc(&idx)]
+		if (data[idx] & 0x80) != 0 {
+			if idx+6 >= dataLen {
 				break
 			}
-			len_ = (zend.ZendLong(buffer[inx+2]) << 24) + (zend.ZendLong(buffer[inx+3]) << 16) + (zend.ZendLong(buffer[inx+4]) << 8) + zend.ZendLong(buffer[inx+5])
-			inx += 6
+			len_ = uint(data[idx+2])<<24 + uint(data[idx+3])<<16 + uint(data[idx+4])<<8 + uint(data[idx+5])
+			idx += 6
 		} else {
-			len_ = uint16(buffer[inx])<<8 | uint16(buffer[inx+1])
-			inx += 2
+			len_ = uint(data[idx])<<8 | uint(data[idx+1])
+			idx += 2
 		}
-		if len_ > str_len || inx+len_ > str_len {
+		if len_ > dataLen || idx+len_ > dataLen {
 			break
 		}
-		core.Snprintf(key, b.SizeOf("key"), "%d#%03d", uint(dataset), uint(recnum))
-		if tagsfound == 0 {
-			zend.ArrayInit(return_value)
+
+		key := fmt.Sprintf("%d#%03d", uint(dataset), uint(recnum))
+		element := arr.KeyFind(key)
+		if element == nil {
+			element = types.NewZvalArray(nil)
+			arr.KeyUpdate(key, element)
 		}
-		if lang.Assign(&element, return_value.Array().KeyFind(b.CastStrAuto(key))) == nil {
-			zend.ArrayInit(&values)
-			element = return_value.Array().KeyUpdate(b.CastStrAuto(key), &values)
-		}
-		zend.AddNextIndexStringl(element, (*byte)(buffer+inx), len_)
-		inx += len_
+		element.Array().Append(types.NewZvalString(data[idx : idx+len_]))
+
+		idx += len_
 		tagsfound++
 	}
 	if tagsfound == 0 {
-		return_value.SetFalse()
-		return
+		return nil, false
 	}
+
+	return arr, true
 }
