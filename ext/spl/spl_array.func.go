@@ -572,7 +572,7 @@ func zim_spl_Array_offsetSet(executeData *zend.ZendExecuteData, return_value *ty
 func SplArrayIteratorAppend(object *types.Zval, append_value *types.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	if SplArrayIsObject(intern) != 0 {
-		faults.ThrowError(nil, "Cannot append properties to objects, use %s::offsetSet() instead", types.Z_OBJCE_P(object).Name())
+		faults.ThrowError(nil, fmt.Sprintf("Cannot append properties to objects, use %s::offsetSet() instead", types.Z_OBJCE_P(object).Name()))
 		return
 	}
 	SplArrayWriteDimension(object, nil, append_value)

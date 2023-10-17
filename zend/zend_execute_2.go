@@ -83,7 +83,7 @@ func ZendResolveClassType(type_ *types.TypeHint, selfCe *types.ClassEntry) bool 
 		 * later using the wrong "self" when the trait is used in a class. */
 
 		if selfCe.IsTrait() {
-			faults.ThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", lang.Cond(type_.AllowNull(), " non-null", ""))
+			faults.ThrowError(nil, fmt.Sprintf("Cannot write a%s value to a 'self' typed static property of a trait", lang.Cond(type_.AllowNull(), " non-null", "")))
 			return false
 		}
 		ce = selfCe
@@ -257,9 +257,9 @@ func ZendMissingArgError(executeData *ZendExecuteData) {
 
 	var ptr = executeData.GetPrevExecuteData()
 	if ptr != nil && ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetType()) {
-		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s(), %d passed in %s on line %d and %s %d expected", calleeName, executeData.NumArgs(), ptr.GetFunc().GetOpArray().GetFilename(), ptr.GetOpline().GetLineno(), lang.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs)
+		faults.ThrowError(faults.ZendCeArgumentCountError, fmt.Sprintf("Too few arguments to function %s(), %d passed in %s on line %d and %s %d expected", calleeName, executeData.NumArgs(), ptr.GetFunc().GetOpArray().GetFilename(), ptr.GetOpline().GetLineno(), lang.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs))
 	} else {
-		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s(), %d passed and %s %d expected", calleeName, executeData.NumArgs(), lang.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs)
+		faults.ThrowError(faults.ZendCeArgumentCountError, fmt.Sprintf("Too few arguments to function %s(), %d passed and %s %d expected", calleeName, executeData.NumArgs(), lang.Cond(requiredNumArgs == numArgs, "exactly", "at least"), requiredNumArgs))
 	}
 }
 func ZendVerifyReturnError(zf types.IFunction, ce *types.ClassEntry, value *types.Zval) {

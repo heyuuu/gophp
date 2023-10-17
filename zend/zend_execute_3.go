@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
@@ -132,7 +133,7 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	default:
 
 	}
-	faults.ThrowErrorEx(nil, msg)
+	faults.ThrowError(nil, msg)
 }
 func ZendWrongPropertyRead(property *types.Zval) {
 	var property_name *types.String = operators.ZvalGetString(property)
@@ -142,7 +143,7 @@ func ZendDeprecatedFunction(fbc types.IFunction) {
 	faults.Error(faults.E_DEPRECATED, fmt.Sprintf("Function %s%s%s() is deprecated", lang.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().Name() }, ""), lang.Cond(fbc.GetScope() != nil, "::", ""), fbc.FunctionName()))
 }
 func ZendAbstractMethod(fbc types.IFunction) {
-	faults.ThrowError(nil, "Cannot call abstract method %s::%s()", fbc.GetScope().Name(), fbc.FunctionName())
+	faults.ThrowError(nil, fmt.Sprintf("Cannot call abstract method %s::%s()", fbc.GetScope().Name(), fbc.FunctionName()))
 }
 func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) {
 	var c uint8

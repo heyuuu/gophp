@@ -1,7 +1,7 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/php/lang"
+	"fmt"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -14,7 +14,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	fetch_type = opline.GetOp1().GetNum()
 	scope = executeData.GetFunc().GetOpArray().scope
 	if scope == nil {
-		faults.ThrowError(nil, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
+		faults.ThrowError(nil, fmt.Sprintf("Cannot use \"%s\" when no class scope is active", fetchTypeName(fetch_type)))
 		opline.Result().SetUndef()
 		return 0
 	}

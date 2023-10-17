@@ -300,7 +300,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 
 		fbc = EG__().FunctionTable().Get(lcname)
 		if fbc == nil {
-			faults.ThrowError(nil, "Call to undefined function %s()", function.GetVal())
+			faults.ThrowError(nil, fmt.Sprintf("Call to undefined function %s()", function.GetVal()))
 			return nil
 		}
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {

@@ -10,7 +10,7 @@ func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var arg *types.Zval
 	var arg_num uint32 = opline.GetOp2().GetNum()
-	faults.ThrowError(nil, "Cannot pass parameter %d by reference", arg_num)
+	faults.ThrowError(nil, fmt.Sprintf("Cannot pass parameter %d by reference", arg_num))
 	FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	arg.SetUndef()

@@ -197,7 +197,7 @@ func ZendGetParentPrivateProperty(scope *types.ClassEntry, ce *types.ClassEntry,
 }
 
 func ZendBadPropertyAccess(propInfo *types.PropertyInfo, ce *types.ClassEntry, member string) {
-	faults.ThrowError(nil, "Cannot access %s property %s::$%s", ZendVisibilityString(propInfo.GetFlags()), ce.Name(), member)
+	faults.ThrowError(nil, fmt.Sprintf("Cannot access %s property %s::$%s", ZendVisibilityString(propInfo.GetFlags()), ce.Name(), member))
 }
 func ZendBadPropertyName() {
 	faults.ThrowError(nil, "Cannot access property started with '\\0'")
@@ -569,7 +569,7 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 uninit_error:
 	if typ != BP_VAR_IS {
 		if prop_info != nil {
-			faults.ThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name.GetVal())
+			faults.ThrowError(nil, fmt.Sprintf("Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name.GetVal()))
 		} else {
 			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal()))
 		}
@@ -679,7 +679,7 @@ exit:
 	return variable_ptr
 }
 func ZendBadArrayAccess(ce *types.ClassEntry) {
-	faults.ThrowError(nil, "Cannot use object of type %s as array", ce.Name())
+	faults.ThrowError(nil, fmt.Sprintf("Cannot use object of type %s as array", ce.Name()))
 }
 func ZendStdReadDimensionEx(object *types.Object, offset *types.Zval, type_ int, rv *types.Zval) *types.Zval {
 	var ce *types.ClassEntry = object.GetCe()
@@ -705,7 +705,7 @@ func ZendStdReadDimensionEx(object *types.Object, offset *types.Zval, type_ int,
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", rv, &tmp_offset)
 		if rv.IsUndef() {
 			if EG__().NoException() {
-				faults.ThrowError(nil, "Undefined offset for object of type %s used as array", ce.Name())
+				faults.ThrowError(nil, fmt.Sprintf("Undefined offset for object of type %s used as array", ce.Name()))
 			}
 			return nil
 		}
@@ -777,7 +777,7 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.Object, member *types.Zval, type_ in
 			if zobj.GetCe().GetGet() == nil || zobj.Guard(name.GetStr()).InGet() || prop_info != nil && retval.GetU2Extra() == types.IS_PROP_UNINIT {
 				if type_ == BP_VAR_RW || type_ == BP_VAR_R {
 					if prop_info != nil {
-						faults.ThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name.GetVal())
+						faults.ThrowError(nil, fmt.Sprintf("Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name.GetVal()))
 						retval = EG__().GetErrorZval()
 					} else {
 						retval.SetNull()
@@ -994,7 +994,7 @@ func ZendGetUserCallFunction(ce *types.ClassEntry, method_name *types.String) ty
 	return ZendGetCallTrampolineFunc(ce, method_name.GetStr(), false)
 }
 func ZendBadMethodCall(fbc types.IFunction, method_name *types.String, scope *types.ClassEntry) {
-	faults.ThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
+	faults.ThrowError(nil, fmt.Sprintf("Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), lang.CondF1(scope != nil, func() []byte { return scope.Name() }, "")))
 }
 
 func ZendStdGetMethod(obj_ptr **types.Object, method_name *types.String, key *types.Zval) types.IFunction {
@@ -1154,7 +1154,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 		} else {
 		undeclared_property:
 			if type_ != BP_VAR_IS {
-				faults.ThrowError(nil, "Access to undeclared static property: %s::$%s", ce.Name(), property_name.GetVal())
+				faults.ThrowError(nil, fmt.Sprintf("Access to undeclared static property: %s::$%s", ce.Name(), property_name.GetVal()))
 			}
 			return nil
 		}
@@ -1162,7 +1162,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 	ret = CE_STATIC_MEMBERS(ce) + property_info.GetOffset()
 	ret = types.ZVAL_DEINDIRECT(ret)
 	if (type_ == BP_VAR_R || type_ == BP_VAR_RW) && ret.IsUndef() && property_info.GetType() != 0 {
-		faults.ThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(property_name.GetStr()))
+		faults.ThrowError(nil, fmt.Sprintf("Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(property_name.GetStr())))
 		return nil
 	}
 	return ret
@@ -1172,14 +1172,14 @@ func ZendStdGetStaticProperty(ce *types.ClassEntry, property_name *types.String,
 	return ZendStdGetStaticPropertyWithInfo(ce, property_name, type_, &prop_info)
 }
 func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name *types.String) bool {
-	faults.ThrowError(nil, "Attempt to unset static property %s::$%s", ce.Name(), property_name.GetVal())
+	faults.ThrowError(nil, fmt.Sprintf("Attempt to unset static property %s::$%s", ce.Name(), property_name.GetVal()))
 	return 0
 }
 func ZendBadConstructorCall(constructor types.IFunction, scope *types.ClassEntry) {
 	if scope != nil {
-		faults.ThrowError(nil, "Call to %s %s::%s() from context '%s'", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.FunctionName(), scope.Name())
+		faults.ThrowError(nil, fmt.Sprintf("Call to %s %s::%s() from context '%s'", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.FunctionName(), scope.Name()))
 	} else {
-		faults.ThrowError(nil, "Call to %s %s::%s() from invalid context", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.FunctionName())
+		faults.ThrowError(nil, fmt.Sprintf("Call to %s %s::%s() from invalid context", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().Name(), constructor.FunctionName()))
 	}
 }
 func ZendStdGetConstructor(zobj *types.Object) types.IFunction {
@@ -1380,7 +1380,7 @@ func StdCastObjectToString(obj *types.Object) (string, bool) {
 			return retval.String(), true
 		}
 		if EG__().NoException() {
-			faults.ThrowError(nil, "Method %s::__toString() must return a string value", ce.Name())
+			faults.ThrowError(nil, fmt.Sprintf("Method %s::__toString() must return a string value", ce.Name()))
 		}
 	}
 	return "", false

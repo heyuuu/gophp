@@ -172,7 +172,7 @@ func ZendThrowAutoInitInRefError(prop *types.PropertyInfo, type_ string) {
 	faults.TypeError("Cannot auto-initialize an %s inside a reference held by property %s::$%s of type %s%s", type_, prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
 }
 func ZendThrowAccessUninitPropByRefError(prop *types.PropertyInfo) {
-	faults.ThrowError(nil, "Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()))
+	faults.ThrowError(nil, fmt.Sprintf("Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName())))
 }
 func MakeRealObject(object *types.Zval, property *types.Zval, opline *types.ZendOp, executeData *ZendExecuteData) *types.Zval {
 	var obj *types.Object

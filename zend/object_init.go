@@ -18,11 +18,11 @@ func ObjectInit(arg *types.Zval) int {
 func _objectAndPropertiesInit(arg *types.Zval, classType *types.ClassEntry, properties *types.Array) int {
 	if classType.HasCeFlags(types.AccInterface | types.AccTrait | types.AccImplicitAbstractClass | types.AccExplicitAbstractClass) {
 		if classType.IsInterface() {
-			faults.ThrowError(nil, "Cannot instantiate interface %s", classType.Name())
+			faults.ThrowError(nil, fmt.Sprintf("Cannot instantiate interface %s", classType.Name()))
 		} else if classType.IsTrait() {
-			faults.ThrowError(nil, "Cannot instantiate trait %s", classType.Name())
+			faults.ThrowError(nil, fmt.Sprintf("Cannot instantiate trait %s", classType.Name()))
 		} else {
-			faults.ThrowError(nil, "Cannot instantiate abstract class %s", classType.Name())
+			faults.ThrowError(nil, fmt.Sprintf("Cannot instantiate abstract class %s", classType.Name()))
 		}
 		arg.SetNull()
 		return types.FAILURE

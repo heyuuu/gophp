@@ -117,16 +117,16 @@ func ZendUndefinedIndexWrite(ht *types.Array, offset *types.String) int {
 	return types.SUCCESS
 }
 func ZendUndefinedMethod(ce *types.ClassEntry, method *types.String) {
-	faults.ThrowError(nil, "Call to undefined method %s::%s()", ce.Name(), method.GetVal())
+	faults.ThrowError(nil, fmt.Sprintf("Call to undefined method %s::%s()", ce.Name(), method.GetVal()))
 }
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
-	faults.ThrowError(nil, "Call to a member function %s() on %s", function_name.StringEx().GetVal(), types.ZendGetTypeByConst(object.Type()))
+	faults.ThrowError(nil, fmt.Sprintf("Call to a member function %s() on %s", function_name.StringEx().GetVal(), types.ZendGetTypeByConst(object.Type())))
 }
 func ZendNonStaticMethodCall(fbc types.IFunction) {
 	if fbc.IsAllowStatic() {
 		faults.Error(faults.E_DEPRECATED, fmt.Sprintf("Non-static method %s::%s() should not be called statically", fbc.GetScope().Name(), fbc.FunctionName()))
 	} else {
-		faults.ThrowError(faults.ZendCeError, "Non-static method %s::%s() cannot be called statically", fbc.GetScope().Name(), fbc.FunctionName())
+		faults.ThrowError(faults.ZendCeError, fmt.Sprintf("Non-static method %s::%s() cannot be called statically", fbc.GetScope().Name(), fbc.FunctionName()))
 	}
 }
 func ZendParamMustBeRef(func_ types.IFunction, arg_num uint32) {

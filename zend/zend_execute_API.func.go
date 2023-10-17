@@ -15,7 +15,7 @@ import (
 
 func ZendThrowOrError(fetchType int, exceptionCe *types.ClassEntry, message string) {
 	if (fetchType & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
-		faults.ThrowError(exceptionCe, "%s", message)
+		faults.ThrowError(exceptionCe, fmt.Sprintf("%s", message))
 	} else {
 		faults.Error(faults.E_ERROR, fmt.Sprintf("%s", message))
 	}

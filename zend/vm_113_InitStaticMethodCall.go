@@ -194,7 +194,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 			return 0
 		}
 		if executeData.InScope() && executeData.ThisClass() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.Name())
+			faults.ThrowError(nil, fmt.Sprintf("Cannot call private %s::__construct()", ce.Name()))
 			return 0
 		}
 		fbc = ce.GetConstructor()
@@ -467,7 +467,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 			return 0
 		}
 		if executeData.InScope() && executeData.ThisClass() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.Name())
+			faults.ThrowError(nil, fmt.Sprintf("Cannot call private %s::__construct()", ce.Name()))
 			return 0
 		}
 		fbc = ce.GetConstructor()
@@ -750,7 +750,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 			return 0
 		}
 		if executeData.InScope() && executeData.ThisClass() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.Name())
+			faults.ThrowError(nil, fmt.Sprintf("Cannot call private %s::__construct()", ce.Name()))
 			return 0
 		}
 		fbc = ce.GetConstructor()

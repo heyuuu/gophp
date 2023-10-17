@@ -131,7 +131,7 @@ func ZendFetchThisVar(type_ int, opline *types.ZendOp, executeData *ZendExecuteD
 	}
 }
 func ZendWrongCloneCall(clone types.IFunction, scope *types.ClassEntry) {
-	faults.ThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().Name(), lang.CondF1(scope != nil, func() []byte { return scope.Name() }, ""))
+	faults.ThrowError(nil, fmt.Sprintf("Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().Name(), lang.CondF1(scope != nil, func() []byte { return scope.Name() }, "")))
 }
 func IFreeCompiledVariables(executeData *ZendExecuteData) {
 	var cv *types.Zval = executeData.VarNum(0)

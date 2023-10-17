@@ -180,14 +180,14 @@ func ZendGetConstantEx(name string, scope *types.ClassEntry, flags uint32) *type
 		var c = ce.ConstantsTable().Get(constantName)
 		if c == nil {
 			if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-				faults.ThrowError(nil, "Undefined class constant '%s::%s'", className, constantName)
+				faults.ThrowError(nil, fmt.Sprintf("Undefined class constant '%s::%s'", className, constantName))
 				return nil
 			}
 			return nil
 		}
 		if !ZendVerifyConstAccess(c, scope) {
 			if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), className, constantName)
+				faults.ThrowError(nil, fmt.Sprintf("Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), className, constantName))
 			}
 			return nil
 		}
@@ -197,7 +197,7 @@ func ZendGetConstantEx(name string, scope *types.ClassEntry, flags uint32) *type
 		if retConstant != nil && retConstant.IsConstantAst() {
 			var ret int
 			if c.IsVisited() {
-				faults.ThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", className, constantName)
+				faults.ThrowError(nil, fmt.Sprintf("Cannot declare self-referencing constant '%s::%s'", className, constantName))
 				retConstant = nil
 				return nil
 			}

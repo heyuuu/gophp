@@ -173,7 +173,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 				faults.Error(faults.E_WARNING, fmt.Sprintf("Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().StringEx().GetVal(), opline.Result().StringEx().GetVal()))
 
 			} else {
-				faults.ThrowError(nil, "Undefined constant '%s'", opline.Const2().StringEx().GetVal())
+				faults.ThrowError(nil, fmt.Sprintf("Undefined constant '%s'", opline.Const2().StringEx().GetVal()))
 				opline.Result().SetUndef()
 			}
 		}

@@ -204,7 +204,7 @@ func ErrorNoreturn(typ int, message string) {
 	/* Should never reach this. */
 	panic("unreachable")
 }
-func ThrowErrorEx(exceptionCe *types.ClassEntry, message string) {
+func ThrowError(exceptionCe *types.ClassEntry, message string) {
 	if exceptionCe != nil {
 		if !operators.InstanceofFunction(exceptionCe, ZendCeError) {
 			Error(E_NOTICE, "Error exceptions must be derived from Error")
@@ -225,10 +225,6 @@ func ThrowErrorEx(exceptionCe *types.ClassEntry, message string) {
 	} else {
 		Error(E_ERROR, message)
 	}
-}
-func ThrowError(exceptionCe *types.ClassEntry, format string, args ...any) {
-	message := zend.ZendSprintf(format, args...)
-	ThrowErrorEx(exceptionCe, message)
 }
 func TypeError(format string, args ...any) {
 	message := zend.ZendSprintf(format, args...)
