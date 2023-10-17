@@ -513,18 +513,17 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	var trace types.Zval
 	var exception *types.Zval
 	var base_ce *types.ClassEntry
-	var str *types.String
+	var str string
 	var rv types.Zval
 	var tmp types.Zval
 	var fname string
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	str = types.NewString("")
 	exception = executeData.ThisObjectZval()
 	fname = "gettraceasstring"
 	for exception != nil && exception.IsObject() && operators.InstanceofFunction(types.Z_OBJCE_P(exception), ZendCeThrowable) {
-		var prev_str *types.String = str
+		var prev_str = str
 		var message *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_MESSAGE, &rv))
 		var file *types.String = operators.ZvalGetString(GET_PROPERTY(exception, types.STR_FILE, &rv))
 		var line zend.ZendLong = operators.ZvalGetLong(GET_PROPERTY(exception, types.STR_LINE, &rv))
@@ -536,13 +535,13 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 			trace.SetUndef()
 		}
 		if (types.Z_OBJCE_P(exception) == ZendCeTypeError || types.Z_OBJCE_P(exception) == ZendCeArgumentCountError) && strstr(message.GetVal(), ", called in ") {
-			var real_message *types.String = zend.ZendSprintfZStr("%s and defined", message.GetVal())
+			var real_message *types.String = types.NewString(fmt.Sprintf("%s and defined", message.GetStr()))
 			message = real_message
 		}
 		if message.GetLen() > 0 {
-			str = zend.ZendSprintfZStr("%s: %s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), message.GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = fmt.Sprintf("%s: %s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), message.GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
 		} else {
-			str = zend.ZendSprintfZStr("%s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = fmt.Sprintf("%s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
 		}
 		exception.Object().ProtectRecursive()
 		exception = GET_PROPERTY(exception, types.STR_PREVIOUS, &rv)
@@ -569,9 +568,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	/* We store the result in the private property string so we can access
 	 * the result in uncaught exception handlers without memleaks. */
 
-	tmp.SetStringEx(str)
+	tmp.SetString(str)
 	zend.ZendUpdatePropertyEx(base_ce, exception, types.STR_STRING, &tmp)
-	return_value.SetStringEx(str)
+	return_value.SetString(str)
 	return
 }
 func RegisterDefaultException() {

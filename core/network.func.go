@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
@@ -35,6 +36,17 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 	hints.ai_family = AF_INET
 	hints.ai_socktype = socktype
 
+	var errorString string
+	if error_string != nil {
+		defer func() {
+			if errorString != "" {
+				*error_string = types.NewString(errorString)
+			} else {
+				*error_string = nil
+			}
+		}()
+	}
+
 	/* probe for a working IPv6 stack; even if detected as having v6 at compile
 	 * time, at runtime some stacks are slow to resolve or have other issues
 	 * if they are not correctly configured.
@@ -58,28 +70,16 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 		hints.ai_family = AF_UNSPEC
 	}
 	if lang.Assign(&n, getaddrinfo(host, nil, &hints, &res)) {
-		if error_string != nil {
-
-			/* free error string received during previous iteration (if any) */
-			*error_string = zend.ZendSprintfZStr("php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
-			PhpErrorDocref("", faults.E_WARNING, "%s", error_string.GetVal())
-		} else {
-			PhpErrorDocref("", faults.E_WARNING, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
-		}
+		errorString = fmt.Sprintf("php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
+		PhpErrorDocref("", faults.E_WARNING, errorString)
 		return 0
 	} else if res == nil {
 		if error_string != nil {
-
-			/* free error string received during previous iteration (if any) */
-
-			if (*error_string) != nil {
-				// types.ZendStringReleaseEx(*error_string, 0)
-			}
-			*error_string = zend.ZendSprintfZStr("php_network_getaddresses: getaddrinfo failed (null result pointer) errno=%d", errno)
-			PhpErrorDocref("", faults.E_WARNING, "%s", error_string.GetVal())
+			errorString = fmt.Sprintf("php_network_getaddresses: getaddrinfo failed (null result pointer) errno=%d", errno)
 		} else {
-			PhpErrorDocref("", faults.E_WARNING, "php_network_getaddresses: getaddrinfo failed (null result pointer)")
+			errorString = "php_network_getaddresses: getaddrinfo failed (null result pointer)"
 		}
+		PhpErrorDocref("", faults.E_WARNING, "%s", errorString)
 		return 0
 	}
 	sai = res
@@ -374,12 +374,12 @@ func PhpNetworkPopulateNameFromSockaddr(sa *__struct__sockaddr, sl socklen_t, te
 
 			buf = inet_ntoa((*__struct__sockaddr_in)(sa).sin_addr)
 			if buf != nil {
-				*textaddr = zend.ZendSprintfZStr("%s:%d", buf, ntohs((*__struct__sockaddr_in)(sa).sin_port))
+				*textaddr = types.NewString(fmt.Sprintf("%s:%d", buf, ntohs((*__struct__sockaddr_in)(sa).sin_port)))
 			}
 		case AF_INET6:
 			buf = (*byte)(inet_ntop(sa.sa_family, (*__struct__sockaddr_in6)(sa).sin6_addr, (*byte)(&abuf), b.SizeOf("abuf")))
 			if buf != nil {
-				*textaddr = zend.ZendSprintfZStr("[%s]:%d", buf, ntohs((*__struct__sockaddr_in6)(sa).sin6_port))
+				*textaddr = types.NewString(fmt.Sprintf("[%s]:%d", buf, ntohs((*__struct__sockaddr_in6)(sa).sin6_port)))
 			}
 		}
 	}

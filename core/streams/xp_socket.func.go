@@ -1,6 +1,7 @@
 package streams
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
@@ -358,7 +359,7 @@ func ParseIpAddressEx(str *byte, str_len int, portno *int, get_err int, err **ty
 		p = memchr(str+1, ']', str_len-2)
 		if p == nil || (*(p + 1)) != ':' {
 			if get_err != 0 {
-				*err = zend.ZendSprintfZStr(`Failed to parse IPv6 address "%s"`, str)
+				*err = types.NewString(fmt.Sprintf(`Failed to parse IPv6 address "%s"`, str))
 			}
 			return nil
 		}
@@ -375,7 +376,7 @@ func ParseIpAddressEx(str *byte, str_len int, portno *int, get_err int, err **ty
 		host = zend.Estrndup(str, colon-str)
 	} else {
 		if get_err != 0 {
-			*err = zend.ZendSprintfZStr(`Failed to parse address "%s"`, str)
+			*err = types.NewString(fmt.Sprintf(`Failed to parse address "%s"`, str))
 		}
 		return nil
 	}
@@ -420,7 +421,7 @@ func PhpTcpSockopConnect(stream *core.PhpStream, sock *core.PhpNetstreamDataT, x
 	if core.PHP_STREAM_CONTEXT(stream) != nil && lang.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "bindto")) != nil {
 		if !tmpzval.IsString() {
 			if xparam.GetWantErrortext() != 0 {
-				xparam.SetErrorText(zend.ZendSprintfZStr("local_addr context option is not a string."))
+				xparam.SetErrorText(types.NewString(fmt.Sprintf("local_addr context option is not a string.")))
 			}
 			zend.Efree(host)
 			return -1

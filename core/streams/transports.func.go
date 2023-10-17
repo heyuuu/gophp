@@ -1,22 +1,22 @@
 package streams
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
 )
 
 func PhpStreamXportGetHash() *types.Array { return &XportHash }
-func ERR_REPORT(out_err **types.String, fmt string, arg []byte) {
+func ERR_REPORT(out_err **types.String, message string) {
 	if out_err != nil {
-		*out_err = zend.ZendSprintfZStr(fmt, arg)
+		*out_err = types.NewString(message)
 	} else {
-		core.PhpErrorDocref("", faults.E_WARNING, fmt, arg)
+		core.PhpErrorDocref("", faults.E_WARNING, message)
 	}
 }
 func ERR_RETURN(out_err **types.String, local_err *types.String, fmt string) {
@@ -98,7 +98,7 @@ func _phpStreamXportCreate(
 				n = b.SizeOf("wrapper_name") - 1
 			}
 			core.PHP_STRLCPY(wrapper_name, protocol, b.SizeOf("wrapper_name"), n)
-			ERR_REPORT(error_string, `Unable to find the socket transport "%s" - did you forget to enable it when you configured PHP?`, wrapper_name)
+			ERR_REPORT(error_string, fmt.Sprintf(`Unable to find the socket transport "%s" - did you forget to enable it when you configured PHP?`, wrapper_name))
 			return nil
 		}
 	}
