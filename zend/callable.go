@@ -216,13 +216,13 @@ func isCallableCheckFunc(checkFlags uint32, callableName string, fcc *types.Zend
 		if callableName != "" && callableName[0] == '\\' {
 			/* Skip leading \ */
 			lmname := ascii.StrToLower(callableName[1:])
-			func_ = ZendFetchFunctionStr(lmname)
+			func_ = ZendFetchFunction(lmname)
 		} else {
 			lmname := callableName
-			func_ = ZendFetchFunctionStr(lmname)
+			func_ = ZendFetchFunction(lmname)
 			if func_ == nil {
 				lmname = ascii.StrToLower(callableName)
-				func_ = ZendFetchFunctionStr(lmname)
+				func_ = ZendFetchFunction(lmname)
 			}
 		}
 		if func_ != nil {

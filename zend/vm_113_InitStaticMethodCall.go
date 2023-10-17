@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
@@ -689,14 +690,10 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 			if EG__().NoException() {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
-			// ZvalPtrDtorNogc(free_op2)
 			return 0
 		}
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
-		}
-		{
-			// ZvalPtrDtorNogc(free_op2)
 		}
 	}
 

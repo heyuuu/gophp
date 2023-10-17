@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
@@ -253,10 +254,7 @@ func InitFuncRunTimeCacheI(op_array *types.ZendOpArray) {
 	ZEND_MAP_PTR_SET(op_array.run_time_cache, run_time_cache)
 }
 func InitFuncRunTimeCache(op_array *types.ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
-func ZendFetchFunction(name *types.String) types.IFunction {
-	return ZendFetchFunctionStr(name.GetStr())
-}
-func ZendFetchFunctionStr(name string) types.IFunction {
+func ZendFetchFunction(name string) types.IFunction {
 	var fbc types.IFunction = EG__().FunctionTable().Get(name)
 	if fbc != nil {
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {

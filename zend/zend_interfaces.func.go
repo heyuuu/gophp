@@ -51,7 +51,7 @@ func ZendCallMethod(object *types.Zval, objCe *types.ClassEntry, fnProxy *types.
 					faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Couldn't find implementation for method %s::%s", objCe.Name(), functionName))
 				}
 			} else {
-				fcic.SetFunctionHandler(ZendFetchFunctionStr(functionName))
+				fcic.SetFunctionHandler(ZendFetchFunction(functionName))
 				if fcic.GetFunctionHandler() == nil {
 					/* error at c-level */
 					faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Couldn't find implementation for function %s", functionName))
