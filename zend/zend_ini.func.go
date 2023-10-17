@@ -301,7 +301,7 @@ func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 	}
 	if value != nil {
 		if ZendUv.GetHtmlErrors() {
-			ZendWrite(fmt.Sprintf("<font style=\"color: %s\">%s</font>", value, value))
+			ZendWrite(fmt.Sprintf(`<font style="color: %s">%s</font>`, value, value))
 		} else {
 			ZendWrite(value)
 		}

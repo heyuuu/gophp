@@ -71,7 +71,7 @@ func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, p
 		buffer.WriteString("\r\n")
 	}
 	if !(gettimeofday(&tv, nil)) {
-		var dt *types.String = php_format_date("D, d M Y H:i:s", b.SizeOf("\"D, d M Y H:i:s\"")-1, tv.tv_sec, 0)
+		var dt *types.String = php_format_date("D, d M Y H:i:s", b.SizeOf(`"D, d M Y H:i:s"`)-1, tv.tv_sec, 0)
 		buffer.WriteString("Date: ")
 		buffer.WriteString(b.CastStrAuto(dt.GetVal()))
 		buffer.WriteString(" GMT\r\n")
@@ -276,13 +276,13 @@ func SapiCliServerLogWrite(type_ int, msg *byte) {
 		return
 	}
 	if PhpCliServerGetSystemTime(buf) != 0 {
-		memmove(buf, "unknown time, can't be fetched", b.SizeOf("\"unknown time, can't be fetched\""))
+		memmove(buf, "unknown time, can't be fetched", b.SizeOf(`"unknown time, can't be fetched"`))
 	} else {
 		var l int = strlen(buf)
 		if l > 0 {
 			buf[l-1] = '0'
 		} else {
-			memmove(buf, "unknown", b.SizeOf("\"unknown\""))
+			memmove(buf, "unknown", b.SizeOf(`"unknown"`))
 		}
 	}
 	if PhpCliServerWorkersMax > 1 {

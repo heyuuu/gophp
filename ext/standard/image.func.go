@@ -1095,7 +1095,7 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *types.Zval, execute
 		zend.AddIndexLong(return_value, 0, result.GetWidth())
 		zend.AddIndexLong(return_value, 1, result.GetHeight())
 		zend.AddIndexLong(return_value, 2, itype)
-		core.Snprintf(temp, b.SizeOf("temp"), "width=\"%d\" height=\"%d\"", result.GetWidth(), result.GetHeight())
+		core.Snprintf(temp, b.SizeOf("temp"), `width="%d" height="%d"`, result.GetWidth(), result.GetHeight())
 		zend.AddIndexString(return_value, 3, temp)
 		if result.GetBits() != 0 {
 			zend.AddAssocLong(return_value, "bits", result.GetBits())

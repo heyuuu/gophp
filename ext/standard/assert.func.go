@@ -163,7 +163,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 	} else if ASSERTG(warning) {
 		if description == nil {
 			if myeval != nil {
-				core.PhpErrorDocref("", faults.E_WARNING, "Assertion \"%s\" failed", myeval)
+				core.PhpErrorDocref("", faults.E_WARNING, `Assertion "%s" failed`, myeval)
 			} else {
 				core.PhpErrorDocref("", faults.E_WARNING, "Assertion failed")
 			}

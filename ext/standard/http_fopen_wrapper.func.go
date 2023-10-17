@@ -188,7 +188,7 @@ func PhpStreamUrlWrapHttpEx(
 							}
 							if (*p) == ':' {
 								p++
-								if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && operators.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf("\"Proxy-Authorization:\"")-1), "Proxy-Authorization:") == 0 {
+								if p-s == b.SizeOf(`"Proxy-Authorization:"`)-1 && operators.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf(`"Proxy-Authorization:"`)-1), "Proxy-Authorization:") == 0 {
 									for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
 										p++
 									}
@@ -223,7 +223,7 @@ func PhpStreamUrlWrapHttpEx(
 					}
 					if (*p) == ':' {
 						p++
-						if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && operators.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf("\"Proxy-Authorization:\"")-1), "Proxy-Authorization:") == 0 {
+						if p-s == b.SizeOf(`"Proxy-Authorization:"`)-1 && operators.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf(`"Proxy-Authorization:"`)-1), "Proxy-Authorization:") == 0 {
 							for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
 								p++
 							}
@@ -430,7 +430,7 @@ func PhpStreamUrlWrapHttpEx(
 			/* remove Proxy-Authorization header */
 
 			if use_proxy != 0 && use_ssl && lang.Assign(&s, strstr(t, "proxy-authorization:")) && (s == t || (*(s - 1)) == '\n') {
-				var p *byte = s + b.SizeOf("\"proxy-authorization:\"") - 1
+				var p *byte = s + b.SizeOf(`"proxy-authorization:"`) - 1
 				for s > t && ((*(s - 1)) == ' ' || (*(s - 1)) == '\t') {
 					s--
 				}
@@ -603,7 +603,7 @@ func PhpStreamUrlWrapHttpEx(
 
 			/* consume lines until we find a line starting 'HTTP/1' */
 
-			for core.PhpStreamEof(stream) == 0 && core.PhpStreamGetLine(stream, tmp_line, b.SizeOf("tmp_line")-1, &tmp_line_len) != nil && (tmp_line_len < b.SizeOf("\"HTTP/1\"")-1 || strncasecmp(tmp_line, "HTTP/1", b.SizeOf("\"HTTP/1\"")-1)) {
+			for core.PhpStreamEof(stream) == 0 && core.PhpStreamGetLine(stream, tmp_line, b.SizeOf("tmp_line")-1, &tmp_line_len) != nil && (tmp_line_len < b.SizeOf(`"HTTP/1"`)-1 || strncasecmp(tmp_line, "HTTP/1", b.SizeOf(`"HTTP/1"`)-1)) {
 
 			}
 			if tmp_line_len > 9 {
@@ -699,7 +699,7 @@ func PhpStreamUrlWrapHttpEx(
 				 * effectively an empty string. */
 
 			}
-			if !(strncasecmp(http_header_line, "Location:", b.SizeOf("\"Location:\"")-1)) {
+			if !(strncasecmp(http_header_line, "Location:", b.SizeOf(`"Location:"`)-1)) {
 				if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "follow_location")) != nil {
 					follow_location = operators.IZendIsTrue(tmpzval)
 				} else if !(response_code >= 300 && response_code < 304 || 307 == response_code || 308 == response_code) {
@@ -718,12 +718,12 @@ func PhpStreamUrlWrapHttpEx(
 
 				}
 				strlcpy(location, http_header_value, b.SizeOf("location"))
-			} else if !(strncasecmp(http_header_line, "Content-Type:", b.SizeOf("\"Content-Type:\"")-1)) {
+			} else if !(strncasecmp(http_header_line, "Content-Type:", b.SizeOf(`"Content-Type:"`)-1)) {
 				streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_MIME_TYPE_IS, http_header_value, 0)
-			} else if !(strncasecmp(http_header_line, "Content-Length:", b.SizeOf("\"Content-Length:\"")-1)) {
+			} else if !(strncasecmp(http_header_line, "Content-Length:", b.SizeOf(`"Content-Length:"`)-1)) {
 				file_size = atoi(http_header_value)
 				streams.PhpStreamNotifyFileSize(context, file_size, http_header_line, 0)
-			} else if !(strncasecmp(http_header_line, "Transfer-Encoding:", b.SizeOf("\"Transfer-Encoding:\"")-1)) && !(strncasecmp(http_header_value, "Chunked", b.SizeOf("\"Chunked\"")-1)) {
+			} else if !(strncasecmp(http_header_line, "Transfer-Encoding:", b.SizeOf(`"Transfer-Encoding:"`)-1)) && !(strncasecmp(http_header_value, "Chunked", b.SizeOf(`"Chunked"`)-1)) {
 
 				/* create filter to decode response body */
 
@@ -769,7 +769,7 @@ func PhpStreamUrlWrapHttpEx(
 			var new_path []byte
 			var loc_path []byte
 			*new_path = '0'
-			if strlen(location) < 8 || strncasecmp(location, "http://", b.SizeOf("\"http://\"")-1) && strncasecmp(location, "https://", b.SizeOf("\"https://\"")-1) && strncasecmp(location, "ftp://", b.SizeOf("\"ftp://\"")-1) && strncasecmp(location, "ftps://", b.SizeOf("\"ftps://\"")-1) {
+			if strlen(location) < 8 || strncasecmp(location, "http://", b.SizeOf(`"http://"`)-1) && strncasecmp(location, "https://", b.SizeOf(`"https://"`)-1) && strncasecmp(location, "ftp://", b.SizeOf(`"ftp://"`)-1) && strncasecmp(location, "ftps://", b.SizeOf(`"ftps://"`)-1) {
 				if (*location) != '/' {
 					if (*(location + 1)) != '\000' && resource.HasPath() {
 						resourcePath := resource.Path()

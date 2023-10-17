@@ -256,7 +256,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit boo
 		}
 		if expr == nil && implicit == 0 {
 			if return_info.GetType().AllowNull() {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A function with return type must return a value (did you mean \"return null;\" instead of \"return;\"?)")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, `A function with return type must return a value (did you mean "return null;" instead of "return;"?)`)
 			} else {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A function with return type must return a value")
 			}

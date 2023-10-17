@@ -788,7 +788,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 		}
 		if PG__().display_errors && (ModuleInitialized != 0 && !(PG__().during_request_startup) || PG__().display_startup_errors) {
 			if PG__().xmlrpc_errors {
-				PUTS(fmt.Sprintf("<?xml version=\"1.0\"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>%d</int></value></member><member><name>faultString</name><value><string>%s:%s in %s on line %d</string></value></member></struct></value></fault></methodResponse>", PG__().xmlrpc_error_number, error_type_str, format, error_filename, error_lineno))
+				PUTS(fmt.Sprintf(`<?xml version="1.0"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>%d</int></value></member><member><name>faultString</name><value><string>%s:%s in %s on line %d</string></value></member></struct></value></fault></methodResponse>`, PG__().xmlrpc_error_number, error_type_str, format, error_filename, error_lineno))
 			} else {
 				var prepend_string = zend.INI_STR("error_prepend_string")
 				var append_string = zend.INI_STR("error_append_string")
@@ -834,7 +834,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			if !PG__().display_errors && !SG__().headersSent && SG__().SapiHeaders().httpResponseCode == 200 {
 				var ctr = MakeSapiHeaderLine(0)
 				ctr.SetLine("HTTP/1.0 500 Internal Server Error")
-				ctr.SetLineLen(b.SizeOf("\"HTTP/1.0 500 Internal Server Error\"") - 1)
+				ctr.SetLineLen(b.SizeOf(`"HTTP/1.0 500 Internal Server Error"`) - 1)
 				SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
 			}
 
@@ -1437,7 +1437,7 @@ func PhpHandleAbortedConnection() {
 func PhpHandleAuthData(auth *byte) int {
 	var ret = -1
 	var auth_len int = lang.CondF1(auth != nil, func() __auto__ { return strlen(auth) }, 0)
-	if auth != nil && auth_len > 0 && operators.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Basic ", b.SizeOf("\"Basic \"")-1) == 0 {
+	if auth != nil && auth_len > 0 && operators.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Basic ", b.SizeOf(`"Basic "`)-1) == 0 {
 		var pass *byte
 		var user *types.String
 		user = types.NewString(standard.PhpBase64Decode(b.CastStr((*uint8)(auth+6), auth_len-6)))
@@ -1458,7 +1458,7 @@ func PhpHandleAuthData(auth *byte) int {
 	} else {
 		SG__().RequestInfo.authDigest = nil
 	}
-	if ret == -1 && auth != nil && auth_len > 0 && operators.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Digest ", b.SizeOf("\"Digest \"")-1) == 0 {
+	if ret == -1 && auth != nil && auth_len > 0 && operators.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Digest ", b.SizeOf(`"Digest "`)-1) == 0 {
 		SG__().RequestInfo.authDigest = zend.Estrdup(auth + 7)
 		ret = 0
 	}

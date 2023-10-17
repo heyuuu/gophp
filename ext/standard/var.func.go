@@ -15,7 +15,7 @@ import (
 
 func PhpArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
 	if key.IsStrKey() {
-		core.PhpPrintf("%*c[\"", level+1, ' ')
+		core.PhpPrintf(`%*c["`, level+1, ' ')
 		core.OG__().WriteString(key.StrKey())
 		core.PhpPrintf("\"]=>\n")
 	} else {
@@ -31,14 +31,14 @@ func PhpObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key_ ty
 		core.PhpPrintf("%*c[", level+1, ' ')
 		if ok {
 			if className[0] == '*' {
-				core.PhpPrintf("\"%s\":protected", propName)
+				core.PhpPrintf(`"%s":protected`, propName)
 			} else {
-				core.PhpPrintf("\"%s\":\"%s\":private", propName, className)
+				core.PhpPrintf(`"%s":"%s":private`, propName, className)
 			}
 		} else {
-			core.PhpPrintf("\"")
+			core.PhpPrintf(`"`)
 			core.OG__().WriteString(key_.StrKey())
-			core.PhpPrintf("\"")
+			core.PhpPrintf(`"`)
 		}
 		zend.ZendWrite("]=>\n")
 	}
@@ -73,7 +73,7 @@ again:
 	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IsString:
-		core.PhpPrintf("%sstring(%zd) \"", common, struc.StringEx().GetLen())
+		core.PhpPrintf(`%sstring(%zd) "`, common, struc.StringEx().GetLen())
 		core.OG__().WriteString(struc.String())
 		core.PUTS("\"\n")
 	case types.IsArray:
@@ -145,7 +145,7 @@ func ZvalArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
 	if !key.IsStrKey() {
 		core.PhpPrintf("%*c[%d]=>\n", level+1, ' ', key.IdxKey())
 	} else {
-		core.PhpPrintf("%*c[\"", level+1, ' ')
+		core.PhpPrintf(`%*c["`, level+1, ' ')
 		core.PUTS(key.StrKey())
 		core.PUTS("\"]=>\n")
 	}
@@ -159,12 +159,12 @@ func ZvalObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key ty
 		core.PhpPrintf("%*c[", level+1, ' ')
 		if ok {
 			if className[0] == '*' {
-				core.PhpPrintf("\"%s\":protected", propName)
+				core.PhpPrintf(`"%s":protected`, propName)
 			} else {
-				core.PhpPrintf("\"%s\":\"%s\":private", propName, className)
+				core.PhpPrintf(`"%s":"%s":private`, propName, className)
 			}
 		} else {
-			core.PhpPrintf("\"%s\"", propName)
+			core.PhpPrintf(`"%s"`, propName)
 		}
 		zend.ZendWrite("]=>\n")
 	}
@@ -201,7 +201,7 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IsString:
-		core.PhpPrintf("%sstring(%zd) \"", common, struc.StringEx().GetLen())
+		core.PhpPrintf(`%sstring(%zd) "`, common, struc.StringEx().GetLen())
 		core.PUTS(struc.String())
 		core.PhpPrintf("\"\n")
 	case types.IsArray:

@@ -1014,8 +1014,8 @@ func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 		var lbchars *byte = nil
 		var lbchars_len int
 		if options != nil {
-			PhpConvGetStringPropEx(options, &lbchars, &lbchars_len, "line-break-chars", b.SizeOf("\"line-break-chars\""), 0)
-			PhpConvGetUintPropEx(options, &line_len, "line-length", b.SizeOf("\"line-length\""))
+			PhpConvGetStringPropEx(options, &lbchars, &lbchars_len, "line-break-chars", b.SizeOf(`"line-break-chars"`), 0)
+			PhpConvGetUintPropEx(options, &line_len, "line-length", b.SizeOf(`"line-length"`))
 			if line_len < 4 {
 				if lbchars != nil {
 					zend.Pefree(lbchars)
@@ -1055,10 +1055,10 @@ func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 		if options != nil {
 			var opt_binary int = 0
 			var opt_force_encode_first int = 0
-			PhpConvGetStringPropEx(options, &lbchars, &lbchars_len, "line-break-chars", b.SizeOf("\"line-break-chars\""), 0)
-			PhpConvGetUintPropEx(options, &line_len, "line-length", b.SizeOf("\"line-length\""))
-			PhpConvGetBoolPropEx(options, &opt_binary, "binary", b.SizeOf("\"binary\""))
-			PhpConvGetBoolPropEx(options, &opt_force_encode_first, "force-encode-first", b.SizeOf("\"force-encode-first\""))
+			PhpConvGetStringPropEx(options, &lbchars, &lbchars_len, "line-break-chars", b.SizeOf(`"line-break-chars"`), 0)
+			PhpConvGetUintPropEx(options, &line_len, "line-length", b.SizeOf(`"line-length"`))
+			PhpConvGetBoolPropEx(options, &opt_binary, "binary", b.SizeOf(`"binary"`))
+			PhpConvGetBoolPropEx(options, &opt_force_encode_first, "force-encode-first", b.SizeOf(`"force-encode-first"`))
 			if line_len < 4 {
 				if lbchars != nil {
 					zend.Pefree(lbchars)
@@ -1100,7 +1100,7 @@ func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 
 			/* If line-break-chars are not specified, filter will attempt to detect line endings (\r, \n, or \r\n) */
 
-			PhpConvGetStringPropEx(options, &lbchars, &lbchars_len, "line-break-chars", b.SizeOf("\"line-break-chars\""), 0)
+			PhpConvGetStringPropEx(options, &lbchars, &lbchars_len, "line-break-chars", b.SizeOf(`"line-break-chars"`), 0)
 
 			/* If line-break-chars are not specified, filter will attempt to detect line endings (\r, \n, or \r\n) */
 

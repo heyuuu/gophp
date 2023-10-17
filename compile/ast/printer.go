@@ -325,7 +325,7 @@ func (p *printer) expr(n Expr) {
 		p.print(fmt.Sprintf("%f", x.Value))
 	case *StringLit:
 		// todo escape
-		p.print("\"", x.Value, "\"")
+		p.print(`"`, x.Value, `"`)
 	case *ArrayExpr:
 		p.print("[")
 		printList(p, x.Items, ", ")

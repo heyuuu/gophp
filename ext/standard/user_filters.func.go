@@ -230,7 +230,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 			zend.Efree(wildcard)
 		}
 		if fdat == nil {
-			core.PhpErrorDocref("", faults.E_WARNING, "Err, filter \"%s\" is not in the user-filter map, but somehow the user-filter-factory was invoked for it!?", filtername)
+			core.PhpErrorDocref("", faults.E_WARNING, `Err, filter "%s" is not in the user-filter map, but somehow the user-filter-factory was invoked for it!?`, filtername)
 			return nil
 		}
 	}
@@ -239,7 +239,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 
 	if fdat.GetCe() == nil {
 		if nil == lang.Assign(&(fdat.GetCe()), zend.ZendLookupClass(fdat.GetClassname())) {
-			core.PhpErrorDocref("", faults.E_WARNING, "user-filter \"%s\" requires class \"%s\", but that class is not defined", filtername, fdat.GetClassname())
+			core.PhpErrorDocref("", faults.E_WARNING, `user-filter "%s" requires class "%s", but that class is not defined`, filtername, fdat.GetClassname())
 			return nil
 		}
 	}

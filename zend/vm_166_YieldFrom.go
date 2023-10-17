@@ -12,7 +12,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	val = opline.Const1()
 	if generator.IsForcedClose() {
-		faults.ThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
+		faults.ThrowError(nil, `Cannot use "yield from" in a force-closed generator`)
 		UNDEF_RESULT()
 		return 0
 	}
@@ -20,7 +20,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
 		generator.SetValuesFePos(0)
 	} else {
-		faults.ThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
+		faults.ThrowError(nil, `Can use "yield from" only with arrays and Traversables`)
 		UNDEF_RESULT()
 		return 0
 	}
@@ -53,7 +53,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	val = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if generator.IsForcedClose() {
-		faults.ThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
+		faults.ThrowError(nil, `Cannot use "yield from" in a force-closed generator`)
 		UNDEF_RESULT()
 		return 0
 	}
@@ -106,7 +106,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			generator.GetValues().SetObject(iter.GetStd())
 		}
 	} else {
-		faults.ThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
+		faults.ThrowError(nil, `Can use "yield from" only with arrays and Traversables`)
 		// ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		return 0
@@ -140,7 +140,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	val = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if generator.IsForcedClose() {
-		faults.ThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
+		faults.ThrowError(nil, `Cannot use "yield from" in a force-closed generator`)
 		// ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		return 0
@@ -196,7 +196,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			generator.GetValues().SetObject(iter.GetStd())
 		}
 	} else {
-		faults.ThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
+		faults.ThrowError(nil, `Can use "yield from" only with arrays and Traversables`)
 		// ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		return 0
@@ -229,7 +229,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	val = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	if generator.IsForcedClose() {
-		faults.ThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
+		faults.ThrowError(nil, `Cannot use "yield from" in a force-closed generator`)
 		UNDEF_RESULT()
 		return 0
 	}
@@ -281,7 +281,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			generator.GetValues().SetObject(iter.GetStd())
 		}
 	} else {
-		faults.ThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
+		faults.ThrowError(nil, `Can use "yield from" only with arrays and Traversables`)
 		UNDEF_RESULT()
 		return 0
 	}

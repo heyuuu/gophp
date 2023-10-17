@@ -27,10 +27,10 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 			} else {
 				if SM__().GetPhpinfoAsText() == 0 {
 					display_string = "<i>no value</i>"
-					display_string_length = b.SizeOf("\"<i>no value</i>\"") - 1
+					display_string_length = b.SizeOf(`"<i>no value</i>"`) - 1
 				} else {
 					display_string = "no value"
-					display_string_length = b.SizeOf("\"no value\"") - 1
+					display_string_length = b.SizeOf(`"no value"`) - 1
 				}
 			}
 		} else if ini_entry.GetValue() != nil && ini_entry.GetValue().GetStr()[0] {
@@ -40,10 +40,10 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 		} else {
 			if SM__().GetPhpinfoAsText() == 0 {
 				display_string = "<i>no value</i>"
-				display_string_length = b.SizeOf("\"<i>no value</i>\"") - 1
+				display_string_length = b.SizeOf(`"<i>no value</i>"`) - 1
 			} else {
 				display_string = "no value"
-				display_string_length = b.SizeOf("\"no value\"") - 1
+				display_string_length = b.SizeOf(`"no value"`) - 1
 			}
 		}
 		if esc_html != 0 {
@@ -72,11 +72,11 @@ func DisplayIniEntries(module *zend.ModuleEntry) {
 		}
 		if SM__().GetPhpinfoAsText() == 0 {
 			PUTS("<tr>")
-			PUTS("<td class=\"e\">")
+			PUTS(`<td class="e">`)
 			PUTS(ini_entry.GetName().GetStr())
-			PUTS("</td><td class=\"v\">")
+			PUTS(`</td><td class="v">`)
 			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
-			PUTS("</td><td class=\"v\">")
+			PUTS(`</td><td class="v">`)
 			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
 			PUTS("</td></tr>\n")
 		} else {

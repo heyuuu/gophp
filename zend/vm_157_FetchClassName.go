@@ -14,7 +14,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	fetch_type = opline.GetOp1().GetNum()
 	scope = executeData.GetFunc().GetOpArray().scope
 	if scope == nil {
-		faults.ThrowError(nil, fmt.Sprintf("Cannot use \"%s\" when no class scope is active", fetchTypeName(fetch_type)))
+		faults.ThrowError(nil, fmt.Sprintf(`Cannot use "%s" when no class scope is active`, fetchTypeName(fetch_type)))
 		opline.Result().SetUndef()
 		return 0
 	}
@@ -23,7 +23,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		opline.Result().SetString(scope.Name())
 	case ZEND_FETCH_CLASS_PARENT:
 		if scope.GetParent() == nil {
-			faults.ThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
+			faults.ThrowError(nil, `Cannot use "parent" when current class scope has no parent`)
 			opline.Result().SetUndef()
 			return 0
 		}

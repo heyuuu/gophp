@@ -876,7 +876,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 				}
 			}
 		} else {
-			core.PhpErrorDocref("", faults.E_WARNING, "options should have the form [\"wrappername\"][\"optionname\"] = $value")
+			core.PhpErrorDocref("", faults.E_WARNING, `options should have the form ["wrappername"]["optionname"] = $value`)
 		}
 	}
 	return ret

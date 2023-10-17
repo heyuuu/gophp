@@ -435,7 +435,7 @@ func ZendGeneratorCreate(class_type *types.ClassEntry) *types.Object {
 	return (*types.Object)(generator)
 }
 func ZendGeneratorGetConstructor(object *types.Object) types.IFunction {
-	faults.ThrowError(nil, "The \"Generator\" class is reserved for internal use and cannot be manually instantiated")
+	faults.ThrowError(nil, `The "Generator" class is reserved for internal use and cannot be manually instantiated`)
 	return nil
 }
 func ZendGeneratorCheckPlaceholderFrame(ptr *ZendExecuteData) *ZendExecuteData {

@@ -403,7 +403,7 @@ func PhpStreamUrlWrapRfc2397(
 			zend.AddAssocStringl(&meta, "mediatype", (*byte)(path), plen)
 			mlen -= plen
 			path += plen
-		} else if semi != path || mlen != b.SizeOf("\";base64\"")-1 || memcmp(path, ";base64", b.SizeOf("\";base64\"")-1) {
+		} else if semi != path || mlen != b.SizeOf(`";base64"`)-1 || memcmp(path, ";base64", b.SizeOf(`";base64"`)-1) {
 			// zend.ZvalPtrDtor(&meta)
 			PhpStreamWrapperLogError(wrapper, options, "rfc2397: illegal media type")
 			return nil
@@ -417,7 +417,7 @@ func PhpStreamUrlWrapRfc2397(
 			sep = memchr(path, '=', mlen)
 			semi = memchr(path, ';', mlen)
 			if sep == nil || semi != nil && semi < sep {
-				if mlen != b.SizeOf("\"base64\"")-1 || memcmp(path, "base64", b.SizeOf("\"base64\"")-1) {
+				if mlen != b.SizeOf(`"base64"`)-1 || memcmp(path, "base64", b.SizeOf(`"base64"`)-1) {
 
 					/* must be error since parameters are only allowed after mediatype and we have no '=' sign */
 
@@ -426,8 +426,8 @@ func PhpStreamUrlWrapRfc2397(
 					return nil
 				}
 				base64 = 1
-				mlen -= b.SizeOf("\"base64\"") - 1
-				path += b.SizeOf("\"base64\"") - 1
+				mlen -= b.SizeOf(`"base64"`) - 1
+				path += b.SizeOf(`"base64"`) - 1
 				break
 			}
 
@@ -435,7 +435,7 @@ func PhpStreamUrlWrapRfc2397(
 
 			plen = sep - path
 			vlen = lang.CondF1(semi != nil, func() __auto__ { return size_t(semi - sep) }, mlen-plen) - 1
-			if plen != b.SizeOf("\"mediatype\"")-1 || memcmp(path, "mediatype", b.SizeOf("\"mediatype\"")-1) {
+			if plen != b.SizeOf(`"mediatype"`)-1 || memcmp(path, "mediatype", b.SizeOf(`"mediatype"`)-1) {
 				zend.AddAssocStringlEx(&meta, b.CastStr(path, plen), b.CastStr(sep+1, vlen))
 			}
 			plen += vlen + 1

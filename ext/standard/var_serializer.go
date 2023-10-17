@@ -52,17 +52,17 @@ func (se *VarSerializer) serializeLong(val zend.ZendLong) {
 func (se *VarSerializer) serializeString(str string) {
 	se.WriteString("s:")
 	se.WriteLong(len(str))
-	se.WriteString(":\"")
+	se.WriteString(`:"`)
 	se.WriteString(str)
-	se.WriteString("\";")
+	se.WriteString(`";`)
 }
 func (se *VarSerializer) serializeClassName(struc *types.Zval) bool {
 	className, incompleteClass := PhpClassAttributes(struc)
 	se.WriteString("O:")
 	se.WriteLong(len(className))
-	se.WriteString(":\"")
+	se.WriteString(`:"`)
 	se.WriteString(className)
-	se.WriteString("\":")
+	se.WriteString(`":`)
 	return incompleteClass
 }
 func (se *VarSerializer) addVarHash(var_ *types.Zval) int {
@@ -141,7 +141,7 @@ func (se *VarSerializer) tryAddSleepProp(ht *types.Array, props *types.Array, na
 		}
 	}
 	if ht.KeyAdd(name.GetStr(), val) == nil {
-		core.PhpErrorDocref("", faults.E_NOTICE, "\"%s\" is returned from __sleep multiple times", errorName.GetVal())
+		core.PhpErrorDocref("", faults.E_NOTICE, `"%s" is returned from __sleep multiple times`, errorName.GetVal())
 		return types.SUCCESS
 	}
 	return types.SUCCESS
@@ -197,7 +197,7 @@ func (se *VarSerializer) getSleepProps(ht *types.Array, struc *types.Zval, sleep
 			retval = types.FAILURE
 			break
 		}
-		core.PhpErrorDocref("", faults.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
+		core.PhpErrorDocref("", faults.E_NOTICE, `"%s" returned as member variable from __sleep() but does not exist`, name.GetVal())
 		ht.KeyAdd(name.GetStr(), zend.UninitializedZval())
 	}
 	return retval
@@ -292,9 +292,9 @@ again:
 				ceName := types.Z_OBJCE_P(struc).Name()
 				se.WriteString("C:")
 				se.WriteLong(len(ceName))
-				se.WriteString(":\"")
+				se.WriteString(`:"`)
 				se.WriteString(ceName)
-				se.WriteString("\":")
+				se.WriteString(`":`)
 				se.WriteLong(serialized_length)
 				se.WriteString(":{")
 				se.WriteString(b.CastStr((*byte)(serialized_data), serialized_length))

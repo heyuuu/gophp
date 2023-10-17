@@ -127,7 +127,7 @@ func UserWrapperOpener(
 		/* set wrapper data to be a reference to our object */
 
 	} else {
-		PhpStreamWrapperLogError(wrapper, options, "\"%s::"+USERSTREAM_OPEN+"\" call failed", us.GetWrapper().GetClassname())
+		PhpStreamWrapperLogError(wrapper, options, `"%s::`+USERSTREAM_OPEN+`" call failed`, us.GetWrapper().GetClassname())
 	}
 
 	/* destroy everything else */
@@ -198,7 +198,7 @@ func UserWrapperOpendir(
 		/* set wrapper data to be a reference to our object */
 
 	} else {
-		PhpStreamWrapperLogError(wrapper, options, "\"%s::"+USERSTREAM_DIR_OPEN+"\" call failed", us.GetWrapper().GetClassname())
+		PhpStreamWrapperLogError(wrapper, options, `"%s::`+USERSTREAM_DIR_OPEN+`" call failed`, us.GetWrapper().GetClassname())
 	}
 
 	/* destroy everything else */

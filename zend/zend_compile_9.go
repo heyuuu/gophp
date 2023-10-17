@@ -34,7 +34,7 @@ func (compiler *Compiler) CompileConstExprClassConst(astPtr **ZendAst) {
 	className = ZendAstGetStr(classAst)
 	fetchType = ZendGetClassFetchType(className.GetStr())
 	if ZEND_FETCH_CLASS_STATIC == fetchType {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "\"static::\" is not allowed in compile-time constants")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, `"static::" is not allowed in compile-time constants`)
 	}
 	if ZEND_FETCH_CLASS_DEFAULT == fetchType {
 		className = ZendResolveClassNameAst(classAst)

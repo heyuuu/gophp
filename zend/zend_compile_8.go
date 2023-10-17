@@ -366,7 +366,7 @@ func (compiler *Compiler) CompileYieldFrom(result *Znode, ast *ZendAst) {
 	var expr_node Znode
 	ZendMarkFunctionAsGenerator()
 	if CG__().GetActiveOpArray().IsReturnReference() {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"yield from\" inside a by-reference generator")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, `Cannot use "yield from" inside a by-reference generator`)
 	}
 	compiler.CompileExpr(&expr_node, expr_ast)
 	ZendEmitOpTmp(result, ZEND_YIELD_FROM, &expr_node, nil)

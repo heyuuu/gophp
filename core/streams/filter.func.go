@@ -167,9 +167,9 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 		/* TODO: these need correct docrefs */
 
 		if factory == nil {
-			core.PhpErrorDocref("", faults.E_WARNING, "unable to locate filter \"%s\"", filtername)
+			core.PhpErrorDocref("", faults.E_WARNING, `unable to locate filter "%s"`, filtername)
 		} else {
-			core.PhpErrorDocref("", faults.E_WARNING, "unable to create or locate filter \"%s\"", filtername)
+			core.PhpErrorDocref("", faults.E_WARNING, `unable to create or locate filter "%s"`, filtername)
 		}
 
 		/* TODO: these need correct docrefs */

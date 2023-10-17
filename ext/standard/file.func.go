@@ -415,8 +415,8 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 
 		/* check to make sure we are dealing with a regular file */
 
-		if core.PhpMemnstr(filename, "://", b.SizeOf("\"://\"")-1, filename+filename_len) {
-			if strncasecmp(filename, "file://", b.SizeOf("\"file://\"")-1) {
+		if core.PhpMemnstr(filename, "://", b.SizeOf(`"://"`)-1, filename+filename_len) {
+			if strncasecmp(filename, "file://", b.SizeOf(`"file://"`)-1) {
 				core.PhpErrorDocref("", faults.E_WARNING, "Exclusive locks may only be set for regular files")
 				return_value.SetFalse()
 				return

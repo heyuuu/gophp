@@ -103,12 +103,12 @@ func main(argc int, argv []*byte) int {
 					CgiModule.SetIniEntries(realloc(CgiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\\"\\\"\\n\\0\"")))
 					memcpy(CgiModule.GetIniEntries()+ini_entries_len, PhpOptarg, val-PhpOptarg)
 					ini_entries_len += val - PhpOptarg
-					memcpy(CgiModule.GetIniEntries()+ini_entries_len, "\"", 1)
+					memcpy(CgiModule.GetIniEntries()+ini_entries_len, `"`, 1)
 					ini_entries_len++
 					memcpy(CgiModule.GetIniEntries()+ini_entries_len, val, len_-(val-PhpOptarg))
 					ini_entries_len += len_ - (val - PhpOptarg)
 					memcpy(CgiModule.GetIniEntries()+ini_entries_len, "\"\n0", b.SizeOf("\"\\\"\\n\\0\""))
-					ini_entries_len += b.SizeOf("\"\\n\\0\\\"\"") - 2
+					ini_entries_len += b.SizeOf("\"\\n\\0\\\`"`) - 2
 				} else {
 					CgiModule.SetIniEntries(realloc(CgiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\n\\0\"")))
 					memcpy(CgiModule.GetIniEntries()+ini_entries_len, PhpOptarg, len_)
@@ -217,17 +217,17 @@ func main(argc int, argv []*byte) int {
 				log.Printf("PHP_FCGI_CHILDREN is not valid\n")
 				return types.FAILURE
 			}
-			core.FcgiSetMgmtVar("FCGI_MAX_CONNS", b.SizeOf("\"FCGI_MAX_CONNS\"")-1, children_str, strlen(children_str))
+			core.FcgiSetMgmtVar("FCGI_MAX_CONNS", b.SizeOf(`"FCGI_MAX_CONNS"`)-1, children_str, strlen(children_str))
 
 			/* This is the number of concurrent requests, equals FCGI_MAX_CONNS */
 
-			core.FcgiSetMgmtVar("FCGI_MAX_REQS", b.SizeOf("\"FCGI_MAX_REQS\"")-1, children_str, strlen(children_str))
+			core.FcgiSetMgmtVar("FCGI_MAX_REQS", b.SizeOf(`"FCGI_MAX_REQS"`)-1, children_str, strlen(children_str))
 
 			/* This is the number of concurrent requests, equals FCGI_MAX_CONNS */
 
 		} else {
-			core.FcgiSetMgmtVar("FCGI_MAX_CONNS", b.SizeOf("\"FCGI_MAX_CONNS\"")-1, "1", b.SizeOf("\"1\"")-1)
-			core.FcgiSetMgmtVar("FCGI_MAX_REQS", b.SizeOf("\"FCGI_MAX_REQS\"")-1, "1", b.SizeOf("\"1\"")-1)
+			core.FcgiSetMgmtVar("FCGI_MAX_CONNS", b.SizeOf(`"FCGI_MAX_CONNS"`)-1, "1", b.SizeOf(`"1"`)-1)
+			core.FcgiSetMgmtVar("FCGI_MAX_REQS", b.SizeOf(`"FCGI_MAX_REQS"`)-1, "1", b.SizeOf(`"1"`)-1)
 		}
 		if Children != 0 {
 			var running int = 0

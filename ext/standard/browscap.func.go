@@ -106,9 +106,9 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 
 			/* Set proper value for true/false settings */
 
-			if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.StringEx().GetVal(), "on", b.SizeOf("\"on\"")-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.StringEx().GetVal(), "yes", b.SizeOf("\"yes\"")-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.StringEx().GetVal(), "true", b.SizeOf("\"true\"")-1)) {
+			if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.StringEx().GetVal(), "on", b.SizeOf(`"on"`)-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.StringEx().GetVal(), "yes", b.SizeOf(`"yes"`)-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.StringEx().GetVal(), "true", b.SizeOf(`"true"`)-1)) {
 				new_value = types.NewString("1")
-			} else if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.StringEx().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.StringEx().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.StringEx().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.StringEx().GetLen() == 5 && !(strncasecmp(arg2.StringEx().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
+			} else if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.StringEx().GetVal(), "no", b.SizeOf(`"no"`)-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.StringEx().GetVal(), "off", b.SizeOf(`"off"`)-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.StringEx().GetVal(), "none", b.SizeOf(`"none"`)-1)) || arg2.StringEx().GetLen() == 5 && !(strncasecmp(arg2.StringEx().GetVal(), "false", b.SizeOf(`"false"`)-1)) {
 				new_value = types.NewString("")
 			} else {
 				new_value = BrowscapInternStr(ctx, arg2.StringEx())

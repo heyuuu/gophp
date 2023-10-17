@@ -181,7 +181,7 @@ func FcgiInit() int {
 		var sa SaT
 		var len_ socklen_t = b.SizeOf("sa")
 		FcgiMgmtVars = types.NewArray()
-		FcgiSetMgmtVar("FCGI_MPXS_CONNS", b.SizeOf("\"FCGI_MPXS_CONNS\"")-1, "0", b.SizeOf("\"0\"")-1)
+		FcgiSetMgmtVar("FCGI_MPXS_CONNS", b.SizeOf(`"FCGI_MPXS_CONNS"`)-1, "0", b.SizeOf(`"0"`)-1)
 		IsInitialized = 1
 		errno = 0
 		if getpeername(0, (*__struct__sockaddr)(&sa), &len_) != 0 && errno == ENOTCONN {
@@ -251,7 +251,7 @@ func FcgiListen(path *byte, backlog int) int {
 		sa.GetSaInet().sin_family = AF_INET
 		sa.GetSaInet().sin_port = htons(port)
 		sock_len = b.SizeOf("sa . sa_inet")
-		if !(*host) || !(strncmp(host, "*", b.SizeOf("\"*\"")-1)) {
+		if !(*host) || !(strncmp(host, "*", b.SizeOf(`"*"`)-1)) {
 			sa.GetSaInet().sin_addr.s_addr = htonl(INADDR_ANY)
 		} else {
 			sa.GetSaInet().sin_addr.s_addr = inet_addr(host)
@@ -525,11 +525,11 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		req.SetKeep(b.GetFlags() & FCGI_KEEP_CONN)
 		switch (b.GetRoleB1() << 8) + b.GetRoleB0() {
 		case FCGI_RESPONDER:
-			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "RESPONDER", b.SizeOf("\"RESPONDER\"")-1)
+			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf(`"FCGI_ROLE"`)-1), "FCGI_ROLE", b.SizeOf(`"FCGI_ROLE"`)-1, "RESPONDER", b.SizeOf(`"RESPONDER"`)-1)
 		case FCGI_AUTHORIZER:
-			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "AUTHORIZER", b.SizeOf("\"AUTHORIZER\"")-1)
+			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf(`"FCGI_ROLE"`)-1), "FCGI_ROLE", b.SizeOf(`"FCGI_ROLE"`)-1, "AUTHORIZER", b.SizeOf(`"AUTHORIZER"`)-1)
 		case FCGI_FILTER:
-			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "FILTER", b.SizeOf("\"FILTER\"")-1)
+			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf(`"FCGI_ROLE"`)-1), "FCGI_ROLE", b.SizeOf(`"FCGI_ROLE"`)-1, "FILTER", b.SizeOf(`"FILTER"`)-1)
 		default:
 			return 0
 		}

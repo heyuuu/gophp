@@ -190,7 +190,7 @@ func SplFilesystemDirOpen(intern *SplFilesystemObject, path *byte) {
 
 			/* open failed w/out notice (turned to exception due to EH_THROW) */
 
-			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Failed to open directory \"%s\"", path)
+			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, `Failed to open directory "%s"`, path)
 
 			/* open failed w/out notice (turned to exception due to EH_THROW) */
 

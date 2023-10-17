@@ -75,7 +75,7 @@ func PhpRegisterVariableEx(varName string, val *types.Zval, trackVarsArray *type
 
 	/* Discard variable if mangling made it start with __Host-, where pre-mangling it did not start with __Host- */
 
-	if strncmp(var_, "__Host-", b.SizeOf("\"__Host-\"")-1) == 0 && strncmp(varName, "__Host-", b.SizeOf("\"__Host-\"")-1) != 0 {
+	if strncmp(var_, "__Host-", b.SizeOf(`"__Host-"`)-1) == 0 && strncmp(varName, "__Host-", b.SizeOf(`"__Host-"`)-1) != 0 {
 		// zend.ZvalPtrDtorNogc(val)
 		zend.FreeAlloca(varOrig, use_heap)
 		return
@@ -83,7 +83,7 @@ func PhpRegisterVariableEx(varName string, val *types.Zval, trackVarsArray *type
 
 	/* Discard variable if mangling made it start with __Secure-, where pre-mangling it did not start with __Secure- */
 
-	if strncmp(var_, "__Secure-", b.SizeOf("\"__Secure-\"")-1) == 0 && strncmp(varName, "__Secure-", b.SizeOf("\"__Secure-\"")-1) != 0 {
+	if strncmp(var_, "__Secure-", b.SizeOf(`"__Secure-"`)-1) == 0 && strncmp(varName, "__Secure-", b.SizeOf(`"__Secure-"`)-1) != 0 {
 		// zend.ZvalPtrDtorNogc(val)
 		zend.FreeAlloca(varOrig, use_heap)
 		return
@@ -93,12 +93,12 @@ func PhpRegisterVariableEx(varName string, val *types.Zval, trackVarsArray *type
 		zend.FreeAlloca(varOrig, use_heap)
 		return
 	}
-	if varLen == b.SizeOf("\"this\"")-1 && zend.CurrEX() != nil {
+	if varLen == b.SizeOf(`"this"`)-1 && zend.CurrEX() != nil {
 		var ex *zend.ZendExecuteData = zend.CurrEX()
 		for ex != nil {
 			if ex.GetFunc() != nil && zend.ZEND_USER_CODE(ex.GetFunc().GetType()) {
 				if (zend.ZEND_CALL_INFO(ex)&zend.ZEND_CALL_HAS_SYMBOL_TABLE) != 0 && ex.GetSymbolTable() == symtable1 {
-					if memcmp(var_, "this", b.SizeOf("\"this\"")-1) == 0 {
+					if memcmp(var_, "this", b.SizeOf(`"this"`)-1) == 0 {
 						faults.ThrowError(nil, "Cannot re-assign $this")
 						// zend.ZvalPtrDtorNogc(val)
 						zend.FreeAlloca(varOrig, use_heap)
@@ -113,7 +113,7 @@ func PhpRegisterVariableEx(varName string, val *types.Zval, trackVarsArray *type
 
 	/* GLOBALS hijack attempt, reject parameter */
 
-	if symtable1 == zend.EG__().GetSymbolTable() && varLen == b.SizeOf("\"GLOBALS\"")-1 && !(memcmp(var_, "GLOBALS", b.SizeOf("\"GLOBALS\"")-1)) {
+	if symtable1 == zend.EG__().GetSymbolTable() && varLen == b.SizeOf(`"GLOBALS"`)-1 && !(memcmp(var_, "GLOBALS", b.SizeOf(`"GLOBALS"`)-1)) {
 		// zend.ZvalPtrDtorNogc(val)
 		zend.FreeAlloca(varOrig, use_heap)
 		return

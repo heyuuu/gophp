@@ -1090,22 +1090,22 @@ exit:
 	//types.ZendStringFree(function_name.String())
 }
 func zim_spl_Array_asort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	SplArrayMethod(executeData, return_value, "asort", b.SizeOf("\"asort\"")-1, SPL_ARRAY_METHOD_MAY_USER_ARG)
+	SplArrayMethod(executeData, return_value, "asort", b.SizeOf(`"asort"`)-1, SPL_ARRAY_METHOD_MAY_USER_ARG)
 }
 func zim_spl_Array_ksort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	SplArrayMethod(executeData, return_value, "ksort", b.SizeOf("\"ksort\"")-1, SPL_ARRAY_METHOD_MAY_USER_ARG)
+	SplArrayMethod(executeData, return_value, "ksort", b.SizeOf(`"ksort"`)-1, SPL_ARRAY_METHOD_MAY_USER_ARG)
 }
 func zim_spl_Array_uasort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	SplArrayMethod(executeData, return_value, "uasort", b.SizeOf("\"uasort\"")-1, SPL_ARRAY_METHOD_USE_ARG)
+	SplArrayMethod(executeData, return_value, "uasort", b.SizeOf(`"uasort"`)-1, SPL_ARRAY_METHOD_USE_ARG)
 }
 func zim_spl_Array_uksort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	SplArrayMethod(executeData, return_value, "uksort", b.SizeOf("\"uksort\"")-1, SPL_ARRAY_METHOD_USE_ARG)
+	SplArrayMethod(executeData, return_value, "uksort", b.SizeOf(`"uksort"`)-1, SPL_ARRAY_METHOD_USE_ARG)
 }
 func zim_spl_Array_natsort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	SplArrayMethod(executeData, return_value, "natsort", b.SizeOf("\"natsort\"")-1, SPL_ARRAY_METHOD_NO_ARG)
+	SplArrayMethod(executeData, return_value, "natsort", b.SizeOf(`"natsort"`)-1, SPL_ARRAY_METHOD_NO_ARG)
 }
 func zim_spl_Array_natcasesort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	SplArrayMethod(executeData, return_value, "natcasesort", b.SizeOf("\"natcasesort\"")-1, SPL_ARRAY_METHOD_NO_ARG)
+	SplArrayMethod(executeData, return_value, "natcasesort", b.SizeOf(`"natcasesort"`)-1, SPL_ARRAY_METHOD_NO_ARG)
 }
 func zim_spl_Array_current(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = executeData.ThisObjectZval()

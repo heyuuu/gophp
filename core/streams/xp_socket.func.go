@@ -358,7 +358,7 @@ func ParseIpAddressEx(str *byte, str_len int, portno *int, get_err int, err **ty
 		p = memchr(str+1, ']', str_len-2)
 		if p == nil || (*(p + 1)) != ':' {
 			if get_err != 0 {
-				*err = zend.ZendSprintfZStr("Failed to parse IPv6 address \"%s\"", str)
+				*err = zend.ZendSprintfZStr(`Failed to parse IPv6 address "%s"`, str)
 			}
 			return nil
 		}
@@ -375,7 +375,7 @@ func ParseIpAddressEx(str *byte, str_len int, portno *int, get_err int, err **ty
 		host = zend.Estrndup(str, colon-str)
 	} else {
 		if get_err != 0 {
-			*err = zend.ZendSprintfZStr("Failed to parse address \"%s\"", str)
+			*err = zend.ZendSprintfZStr(`Failed to parse address "%s"`, str)
 		}
 		return nil
 	}

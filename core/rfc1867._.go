@@ -30,7 +30,7 @@ var PhpRfc1867Callback func(event uint, event_data any, extra *any) int = nil
 
 /* The longest property name we use in an uploaded file array */
 
-const MAX_SIZE_OF_INDEX = b.SizeOf("\"[tmp_name]\"")
+const MAX_SIZE_OF_INDEX = b.SizeOf(`"[tmp_name]"`)
 
 /* The longest anonymous name */
 

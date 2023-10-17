@@ -41,7 +41,7 @@ func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 		if ht.Len() != 0 {
 			var first int = 1
 			if core.SM__().GetPhpinfoAsText() == 0 {
-				PhpInfoPrintf("<tr><td class=\"e\">Registered %s</td><td class=\"v\">", name)
+				PhpInfoPrintf(`<tr><td class="e">Registered %s</td><td class="v">`, name)
 			} else {
 				PhpInfoPrintf("\nRegistered %s => ", name)
 			}
@@ -114,7 +114,7 @@ func PhpPrintGpcseArray(name string) {
 			tmp = _z
 			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("<tr>")
-				PhpInfoPrint("<td class=\"e\">")
+				PhpInfoPrint(`<td class="e">`)
 			}
 			PhpInfoPrint("$")
 			PhpInfoPrint(name)
@@ -130,7 +130,7 @@ func PhpPrintGpcseArray(name string) {
 			}
 			PhpInfoPrint("']")
 			if core.SM__().GetPhpinfoAsText() == 0 {
-				PhpInfoPrint("</td><td class=\"v\">")
+				PhpInfoPrint(`</td><td class="v">`)
 			} else {
 				PhpInfoPrint(" => ")
 			}
@@ -197,11 +197,11 @@ func PhpGetUname(mode byte) *types.String {
 }
 func PhpPrintInfoHtmlhead() {
 	PhpInfoPrint("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">\n")
-	PhpInfoPrint("<html xmlns=\"http://www.w3.org/1999/xhtml\">")
+	PhpInfoPrint(`<html xmlns="http://www.w3.org/1999/xhtml">`)
 	PhpInfoPrint("<head>\n")
 	PhpInfoPrintStyle()
 	PhpInfoPrintf("<title>PHP %s - phpinfo()</title>", core.PHP_VERSION)
-	PhpInfoPrint("<meta name=\"ROBOTS\" content=\"NOINDEX,NOFOLLOW,NOARCHIVE\" />")
+	PhpInfoPrint(`<meta name="ROBOTS" content="NOINDEX,NOFOLLOW,NOARCHIVE" />`)
 	PhpInfoPrint("</head>\n")
 	PhpInfoPrint("<body><div class=\"center\">\n")
 }
@@ -228,11 +228,11 @@ func PhpPrintInfo(flag int) {
 			var tmbuf __struct__tm
 			the_time = time(nil)
 			ta = core.PhpLocaltimeR(&the_time, &tmbuf)
-			PhpInfoPrint("<a href=\"http://www.php.net/\"><img border=\"0\" src=\"")
+			PhpInfoPrint(`<a href="http://www.php.net/"><img border="0" src="`)
 			if ta != nil && ta.tm_mon == 3 && ta.tm_mday == 1 {
-				PhpInfoPrint(PHP_EGG_LOGO_DATA_URI + "\" alt=\"PHP logo\" /></a>")
+				PhpInfoPrint(PHP_EGG_LOGO_DATA_URI + `" alt="PHP logo" /></a>`)
 			} else {
-				PhpInfoPrint(PHP_LOGO_DATA_URI + "\" alt=\"PHP logo\" /></a>")
+				PhpInfoPrint(PHP_LOGO_DATA_URI + `" alt="PHP logo" /></a>`)
 			}
 		}
 		if core.SM__().GetPhpinfoAsText() == 0 {
@@ -276,7 +276,7 @@ func PhpPrintInfo(flag int) {
 
 		PhpInfoPrintBoxStart(0)
 		if core.SM__().GetPhpinfoAsText() == 0 {
-			PhpInfoPrint("<a href=\"http://www.zend.com/\"><img border=\"0\" src=\"")
+			PhpInfoPrint(`<a href="http://www.zend.com/"><img border="0" src="`)
 			PhpInfoPrint(ZEND_LOGO_DATA_URI + "\" alt=\"Zend logo\" /></a>\n")
 		}
 		PhpInfoPrint("This program makes use of the Zend Scripting Language Engine:")
@@ -458,7 +458,7 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 	var row_element *byte
 	va_start(row_elements, num_cols)
 	if core.SM__().GetPhpinfoAsText() == 0 {
-		PhpInfoPrint("<tr class=\"h\">")
+		PhpInfoPrint(`<tr class="h">`)
 	}
 	for i = 0; i < num_cols; i++ {
 		row_element = __va_arg(row_elements, (*byte)(_))
@@ -491,7 +491,7 @@ func PhpInfoPrintTableRowInternal(num_cols int, value_class *byte, row_elements 
 	}
 	for i = 0; i < num_cols; i++ {
 		if core.SM__().GetPhpinfoAsText() == 0 {
-			PhpInfoPrintf("<td class=\"%s\">", lang.Cond(i == 0, "e", value_class))
+			PhpInfoPrintf(`<td class="%s">`, lang.Cond(i == 0, "e", value_class))
 		}
 		row_element = __va_arg(row_elements, (*byte)(_))
 		if row_element == nil || !(*row_element) {
@@ -582,7 +582,7 @@ func ZifPhpSapiName(executeData zpp.Ex, return_value zpp.Ret) {
 }
 func ZifPhpUname(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, mode *types.Zval) {
 	var mode *byte = "a"
-	var modelen int = b.SizeOf("\"a\"") - 1
+	var modelen int = b.SizeOf(`"a"`) - 1
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 0, 1, 0)

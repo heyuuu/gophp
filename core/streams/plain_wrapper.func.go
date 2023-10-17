@@ -683,8 +683,8 @@ func PhpPlainFilesStreamOpener(
 	return core.PhpStreamFopenRel(path, mode, opened_path, options)
 }
 func PhpPlainFilesUrlStater(wrapper *core.PhpStreamWrapper, url *byte, flags int, ssb *core.PhpStreamStatbuf, context *core.PhpStreamContext) int {
-	if strncasecmp(url, "file://", b.SizeOf("\"file://\"")-1) == 0 {
-		url += b.SizeOf("\"file://\"") - 1
+	if strncasecmp(url, "file://", b.SizeOf(`"file://"`)-1) == 0 {
+		url += b.SizeOf(`"file://"`) - 1
 	}
 	if core.PhpCheckOpenBasedirEx(url, lang.Cond((flags&core.PHP_STREAM_URL_STAT_QUIET) != 0, 0, 1)) != 0 {
 		return -1
@@ -697,8 +697,8 @@ func PhpPlainFilesUrlStater(wrapper *core.PhpStreamWrapper, url *byte, flags int
 }
 func PhpPlainFilesUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, context *core.PhpStreamContext) int {
 	var ret int
-	if strncasecmp(url, "file://", b.SizeOf("\"file://\"")-1) == 0 {
-		url += b.SizeOf("\"file://\"") - 1
+	if strncasecmp(url, "file://", b.SizeOf(`"file://"`)-1) == 0 {
+		url += b.SizeOf(`"file://"`) - 1
 	}
 	if core.PhpCheckOpenBasedir(url) != 0 {
 		return 0
@@ -721,11 +721,11 @@ func PhpPlainFilesRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to 
 	if url_from == nil || url_to == nil {
 		return 0
 	}
-	if strncasecmp(url_from, "file://", b.SizeOf("\"file://\"")-1) == 0 {
-		url_from += b.SizeOf("\"file://\"") - 1
+	if strncasecmp(url_from, "file://", b.SizeOf(`"file://"`)-1) == 0 {
+		url_from += b.SizeOf(`"file://"`) - 1
 	}
-	if strncasecmp(url_to, "file://", b.SizeOf("\"file://\"")-1) == 0 {
-		url_to += b.SizeOf("\"file://\"") - 1
+	if strncasecmp(url_to, "file://", b.SizeOf(`"file://"`)-1) == 0 {
+		url_to += b.SizeOf(`"file://"`) - 1
 	}
 	if core.PhpCheckOpenBasedir(url_from) != 0 || core.PhpCheckOpenBasedir(url_to) != 0 {
 		return 0
@@ -744,8 +744,8 @@ func PhpPlainFilesMkdir(wrapper *core.PhpStreamWrapper, dir *byte, mode int, opt
 	var ret int
 	var recursive int = options & core.PHP_STREAM_MKDIR_RECURSIVE
 	var p *byte
-	if strncasecmp(dir, "file://", b.SizeOf("\"file://\"")-1) == 0 {
-		dir += b.SizeOf("\"file://\"") - 1
+	if strncasecmp(dir, "file://", b.SizeOf(`"file://"`)-1) == 0 {
+		dir += b.SizeOf(`"file://"`) - 1
 	}
 	if recursive == 0 {
 		ret = standard.PhpMkdir(dir, mode)
@@ -840,8 +840,8 @@ func PhpPlainFilesMkdir(wrapper *core.PhpStreamWrapper, dir *byte, mode int, opt
 	}
 }
 func PhpPlainFilesRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, context *core.PhpStreamContext) int {
-	if strncasecmp(url, "file://", b.SizeOf("\"file://\"")-1) == 0 {
-		url += b.SizeOf("\"file://\"") - 1
+	if strncasecmp(url, "file://", b.SizeOf(`"file://"`)-1) == 0 {
+		url += b.SizeOf(`"file://"`) - 1
 	}
 	if core.PhpCheckOpenBasedir(url) != 0 {
 		return 0
@@ -862,8 +862,8 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 	var gid gid_t
 	var mode mode_t
 	var ret int = 0
-	if strncasecmp(url, "file://", b.SizeOf("\"file://\"")-1) == 0 {
-		url += b.SizeOf("\"file://\"") - 1
+	if strncasecmp(url, "file://", b.SizeOf(`"file://"`)-1) == 0 {
+		url += b.SizeOf(`"file://"`) - 1
 	}
 	if core.PhpCheckOpenBasedir(url) != 0 {
 		return 0

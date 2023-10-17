@@ -100,7 +100,7 @@ func PhpSetcookie(
 		 * pick an expiry date in the past
 		 */
 
-		dt = php_format_date("D, d-M-Y H:i:s T", b.SizeOf("\"D, d-M-Y H:i:s T\"")-1, 1, 0)
+		dt = php_format_date("D, d-M-Y H:i:s T", b.SizeOf(`"D, d-M-Y H:i:s T"`)-1, 1, 0)
 		buf.WriteString("Set-Cookie: ")
 		buf.WriteString(name.GetStr())
 		buf.WriteString("=deleted; expires=")
@@ -121,7 +121,7 @@ func PhpSetcookie(
 			var p *byte
 			var diff float64
 			buf.WriteString(b.CastStrAuto(COOKIE_EXPIRES))
-			dt = php_format_date("D, d-M-Y H:i:s T", b.SizeOf("\"D, d-M-Y H:i:s T\"")-1, expires, 0)
+			dt = php_format_date("D, d-M-Y H:i:s T", b.SizeOf(`"D, d-M-Y H:i:s T"`)-1, expires, 0)
 
 			/* check to make sure that the year does not exceed 4 digits in length */
 

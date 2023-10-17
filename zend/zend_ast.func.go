@@ -187,14 +187,14 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		}
 	case ZEND_AST_CLASS_NAME:
 		if scope == nil {
-			faults.ThrowError(nil, "Cannot use \"self\" when no class scope is active")
+			faults.ThrowError(nil, `Cannot use "self" when no class scope is active`)
 			return types.FAILURE
 		}
 		if ast.Attr() == ZEND_FETCH_CLASS_SELF {
 			result.SetString(scope.Name())
 		} else if ast.Attr() == ZEND_FETCH_CLASS_PARENT {
 			if !(scope.GetParent()) {
-				faults.ThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
+				faults.ThrowError(nil, `Cannot use "parent" when current class scope has no parent`)
 				return types.FAILURE
 			}
 			result.SetString(scope.GetParent().name.GetStr())

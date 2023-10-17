@@ -294,7 +294,7 @@ func HandleForm(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	var doit int = 0
 	if ctx.GetFormApp().GetS().GetLen() > 0 {
 		switch ctx.GetTag().GetS().GetLen() {
-		case b.SizeOf("\"form\"") - 1:
+		case b.SizeOf(`"form"`) - 1:
 			if !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) && CheckHostWhitelist(ctx) == types.SUCCESS {
 				doit = 1
 			}
@@ -319,7 +319,7 @@ func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 
 	if lang.Assign(&(ctx.GetLookupData()), types.ZendHashStrFindPtr(ctx.GetTags(), ctx.GetTag().GetS().GetStr())) != nil {
 		ok = 1
-		if ctx.GetTag().GetS().GetLen() == b.SizeOf("\"form\"")-1 && !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) {
+		if ctx.GetTag().GetS().GetLen() == b.SizeOf(`"form"`)-1 && !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) {
 			ctx.SetTagType(TAG_FORM)
 		} else {
 			ctx.SetTagType(TAG_NORMAL)
@@ -957,11 +957,11 @@ func PhpUrlScannerAddVarImpl(
 	url_state.GetUrlApp().AppendSmartStr(&sname)
 	url_state.GetUrlApp().WriteByte('=')
 	url_state.GetUrlApp().AppendSmartStr(&svalue)
-	url_state.GetFormApp().WriteString("<input type=\"hidden\" name=\"")
+	url_state.GetFormApp().WriteString(`<input type="hidden" name="`)
 	url_state.GetFormApp().AppendSmartStr(&hname)
-	url_state.GetFormApp().WriteString("\" value=\"")
+	url_state.GetFormApp().WriteString(`" value="`)
 	url_state.GetFormApp().AppendSmartStr(&hvalue)
-	url_state.GetFormApp().WriteString("\" />")
+	url_state.GetFormApp().WriteString(`" />`)
 	sname.Free()
 	svalue.Free()
 	hname.Free()
@@ -1025,9 +1025,9 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 	url_app.AppendSmartStr(&sname)
 	url_app.WriteByte('=')
 	//url_app.ZeroTail()
-	form_app.WriteString("<input type=\"hidden\" name=\"")
+	form_app.WriteString(`<input type="hidden" name="`)
 	form_app.AppendSmartStr(&hname)
-	form_app.WriteString("\" value=\"")
+	form_app.WriteString(`" value="`)
 	//form_app.ZeroTail()
 
 	/* Short circuit check. Only check url_app. */

@@ -957,9 +957,9 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 					}
 				}
 				*q = 0
-			} else if var_len == b.SizeOf("\"CONTENT_TYPE\"")-1 && memcmp(var_, "CONTENT_TYPE", b.SizeOf("\"CONTENT_TYPE\"")-1) == 0 {
+			} else if var_len == b.SizeOf(`"CONTENT_TYPE"`)-1 && memcmp(var_, "CONTENT_TYPE", b.SizeOf(`"CONTENT_TYPE"`)-1) == 0 {
 				var_ = "Content-Type"
-			} else if var_len == b.SizeOf("\"CONTENT_LENGTH\"")-1 && memcmp(var_, "CONTENT_LENGTH", b.SizeOf("\"CONTENT_LENGTH\"")-1) == 0 {
+			} else if var_len == b.SizeOf(`"CONTENT_LENGTH"`)-1 && memcmp(var_, "CONTENT_LENGTH", b.SizeOf(`"CONTENT_LENGTH"`)-1) == 0 {
 				var_ = "Content-Length"
 			} else {
 				continue

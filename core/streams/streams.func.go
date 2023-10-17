@@ -324,7 +324,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 					n = b.SizeOf("wrapper_name") - 1
 				}
 				core.PHP_STRLCPY(wrapper_name, protocol, b.SizeOf("wrapper_name"), n)
-				core.PhpErrorDocref("", faults.E_WARNING, "Unable to find the wrapper \"%s\" - did you forget to enable it when you configured PHP?", wrapper_name)
+				core.PhpErrorDocref("", faults.E_WARNING, `Unable to find the wrapper "%s" - did you forget to enable it when you configured PHP?`, wrapper_name)
 				wrapper = nil
 				protocol = nil
 			}

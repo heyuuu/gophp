@@ -524,7 +524,7 @@ func PhpStreamUrlWrapFtp(
 
 		/* retrieve file */
 
-		memcpy(tmp_line, "RETR", b.SizeOf("\"RETR\""))
+		memcpy(tmp_line, "RETR", b.SizeOf(`"RETR"`))
 
 		/* retrieve file */
 
@@ -532,7 +532,7 @@ func PhpStreamUrlWrapFtp(
 
 		/* Write new file */
 
-		memcpy(tmp_line, "STOR", b.SizeOf("\"STOR\""))
+		memcpy(tmp_line, "STOR", b.SizeOf(`"STOR"`))
 
 		/* Write new file */
 
@@ -540,7 +540,7 @@ func PhpStreamUrlWrapFtp(
 
 		/* Append */
 
-		memcpy(tmp_line, "APPE", b.SizeOf("\"APPE\""))
+		memcpy(tmp_line, "APPE", b.SizeOf(`"APPE"`))
 
 		/* Append */
 

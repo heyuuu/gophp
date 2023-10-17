@@ -127,8 +127,8 @@ func PhpGlobStreamOpener(
 	var ret int
 	var tmp *byte
 	var pos *byte
-	if !(strncmp(path, "glob://", b.SizeOf("\"glob://\"")-1)) {
-		path += b.SizeOf("\"glob://\"") - 1
+	if !(strncmp(path, "glob://", b.SizeOf(`"glob://"`)-1)) {
+		path += b.SizeOf(`"glob://"`) - 1
 		if opened_path != nil {
 			*opened_path = types.NewString(path)
 		}

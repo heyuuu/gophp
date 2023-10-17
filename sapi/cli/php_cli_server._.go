@@ -17,7 +17,7 @@ var PhpCliServerWorkersMax zend.ZendLong
 
 var TemplateMap = map[int]string{
 	400: "<h1>%s</h1><p>Your browser sent a request that this server could not understand.</p>",
-	404: "<h1>%s</h1><p>The requested resource <code class=\"url\">%s</code> was not found on this server.</p>",
+	404: `<h1>%s</h1><p>The requested resource <code class="url">%s</code> was not found on this server.</p>`,
 	500: "<h1>%s</h1><p>The server is temporarily unavailable.</p>",
 	501: "<h1>%s</h1><p>Request method not supported.</p>",
 }

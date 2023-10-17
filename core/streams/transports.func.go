@@ -98,7 +98,7 @@ func _phpStreamXportCreate(
 				n = b.SizeOf("wrapper_name") - 1
 			}
 			core.PHP_STRLCPY(wrapper_name, protocol, b.SizeOf("wrapper_name"), n)
-			ERR_REPORT(error_string, "Unable to find the socket transport \"%s\" - did you forget to enable it when you configured PHP?", wrapper_name)
+			ERR_REPORT(error_string, `Unable to find the socket transport "%s" - did you forget to enable it when you configured PHP?`, wrapper_name)
 			return nil
 		}
 	}
