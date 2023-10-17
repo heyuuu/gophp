@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -39,7 +40,7 @@ func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types.Zva
 		zend.AddAssocLong(return_value, "dsttime", offset.is_dst)
 		timelib_time_offset_dtor(offset)
 	} else {
-		return_value.SetString(zend.ZendSprintf("%.8F %ld", tp.tv_usec/MICRO_IN_SEC, long(tp.tv_sec)))
+		return_value.SetString(fmt.Sprintf("%.8F %d", tp.tv_usec/MICRO_IN_SEC, int(tp.tv_sec)))
 		return
 	}
 }

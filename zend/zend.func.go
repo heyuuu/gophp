@@ -414,5 +414,5 @@ func ZendMakeCompiledStringDescription(name string) string {
 		curFilename = "Unknown"
 		curLineno = 0
 	}
-	return ZendSprintf(COMPILED_STRING_DESCRIPTION_FORMAT, curFilename, curLineno, name)
+	return fmt.Sprintf(COMPILED_STRING_DESCRIPTION_FORMAT, curFilename, curLineno, name)
 }

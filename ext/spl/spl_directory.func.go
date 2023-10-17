@@ -1275,7 +1275,7 @@ func zim_spl_RecursiveDirectoryIterator_getSubPathname(executeData *zend.ZendExe
 		return
 	}
 	if intern.GetSubPath() != nil {
-		return_value.SetString(zend.ZendSprintf("%s%c%s", intern.GetSubPath(), slash, intern.GetEntry().GetDName()))
+		return_value.SetString(fmt.Sprintf("%s%c%s", intern.GetSubPath(), slash, intern.GetEntry().GetDName()))
 		return
 	} else {
 		return_value.SetString(b.CastStrAuto(intern.GetEntry().GetDName()))

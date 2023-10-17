@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -688,7 +689,7 @@ func (compiler *Compiler) CompileImplements(ast *ZendAst) {
 }
 func ZendGenerateAnonClassName(start_lineno uint32) *types.String {
 	var filename = CG__().GetActiveOpArray().GetFilename()
-	var result = ZendSprintf("class@anonymous%c%s:%u$%d", '\000', filename, start_lineno, lang.PostInc(&(CG__().GetRtdKeyCounter())))
+	var result = fmt.Sprintf("class@anonymous%c%s:%d$%d", '\000', filename, start_lineno, lang.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.NewString(result)
 }
 func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.ZendOp {
