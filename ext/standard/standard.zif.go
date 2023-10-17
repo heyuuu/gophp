@@ -3240,7 +3240,7 @@ var DefZifStreamSocketRecvfrom = def.DefFunc("stream_socket_recvfrom", 2, 4, []d
 	if fp.HasError() {
 		return
 	}
-	ret, ok := ZifStreamSocketRecvfrom(executeData, returnValue, stream_, amount, nil, flags, remote_addr)
+	ret, ok := ZifStreamSocketRecvfrom(stream_, amount, nil, flags, remote_addr)
 	if ok {
 		returnValue.SetString(ret)
 	} else {

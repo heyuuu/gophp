@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"bytes"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/lang"
@@ -10,7 +11,7 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func PhpInetNtop(addr *__struct__sockaddr) *types.String {
+func PhpInetNtop(addr *__struct__sockaddr) (string, bool) {
 	var addrlen socklen_t = b.SizeOf("struct sockaddr_in")
 	if addr == nil {
 		return nil
@@ -20,30 +21,25 @@ func PhpInetNtop(addr *__struct__sockaddr) *types.String {
 
 	switch addr.sa_family {
 	case AF_INET:
-		var ret *types.String = types.ZendStringAlloc(INET_ADDRSTRLEN, 0)
-		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), ret.GetVal(), INET_ADDRSTRLEN) {
-			return ret.Cutoff(strlen(ret.GetVal()))
+		var buf = make([]byte, INET_ADDRSTRLEN)
+		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), buf, INET_ADDRSTRLEN) {
+			return string(buf[:strlen(buf)]), true
 		}
 	}
 
 	/* Fallback on getnameinfo() */
-
 	switch addr.sa_family {
 	case AF_INET:
-		var ret *types.String = types.ZendStringAlloc(NI_MAXHOST, 0)
-		if getnameinfo(addr, addrlen, ret.GetVal(), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == types.SUCCESS {
-
+		var buf = make([]byte, NI_MAXHOST)
+		if getnameinfo(addr, addrlen, buf, NI_MAXHOST, nil, 0, NI_NUMERICHOST) == types.SUCCESS {
 			/* Also demangle numeric host with %name suffix */
-
-			var colon *byte = strchr(ret.GetVal(), '%')
-			if colon != nil {
-				*colon = 0
+			if idx := bytes.IndexByte(buf, '%'); idx >= 0 {
+				buf[idx] = 0
 			}
-			return ret.Cutoff(strlen(ret.GetVal()))
+			return string(buf[:strlen(buf)]), true
 		}
-		// types.ZendStringEfree(ret)
 	}
-	return nil
+	return "", false
 }
 func IfaceAppendUnicast(
 	unicast *types.Zval,
@@ -53,24 +49,23 @@ func IfaceAppendUnicast(
 	broadcast *__struct__sockaddr,
 	ptp *__struct__sockaddr,
 ) {
-	var host *types.String
 	var u types.Zval
 	zend.ArrayInit(&u)
 	zend.AddAssocLong(&u, "flags", flags)
 	if addr != nil {
 		zend.AddAssocLong(&u, "family", addr.sa_family)
-		if lang.Assign(&host, PhpInetNtop(addr)) {
-			zend.AddAssocStr(&u, "address", host.GetStr())
+		if host, ok := PhpInetNtop(addr); ok {
+			zend.AddAssocStr(&u, "address", host)
 		}
 	}
-	if lang.Assign(&host, PhpInetNtop(netmask)) {
-		zend.AddAssocStr(&u, "netmask", host.GetStr())
+	if host, ok := PhpInetNtop(addr); ok {
+		zend.AddAssocStr(&u, "netmask", host)
 	}
-	if lang.Assign(&host, PhpInetNtop(broadcast)) {
-		zend.AddAssocStr(&u, "broadcast", host.GetStr())
+	if host, ok := PhpInetNtop(broadcast); ok {
+		zend.AddAssocStr(&u, "broadcast", host)
 	}
-	if lang.Assign(&host, PhpInetNtop(ptp)) {
-		zend.AddAssocStr(&u, "ptp", host.GetStr())
+	if host, ok := PhpInetNtop(ptp); ok {
+		zend.AddAssocStr(&u, "ptp", host)
 	}
 	zend.AddNextIndexZval(unicast, &u)
 }

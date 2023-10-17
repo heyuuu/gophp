@@ -10,6 +10,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
 	"math"
+	"strings"
 )
 
 func PhpVarUnserializeInit() PhpUnserializeDataT {
@@ -195,43 +196,33 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 		var_hashx.GetRefProps().Destroy()
 	}
 }
-func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
-	var i int
-	var j int
-	var str *types.String = types.ZendStringAlloc(len_, 0)
-	var end *uint8 = *((**uint8)(p + maxlen))
-	if end < (*p) {
-		// types.ZendStringEfree(str)
-		return nil
-	}
-	for i = 0; i < len_; i++ {
-		if (*p) >= end {
-			// types.ZendStringEfree(str)
-			return nil
-		}
-		if (*(*p)) != '\\' {
-			str.GetStr()[i] = byte(*(*p))
-		} else {
-			var ch uint8 = 0
-			for j = 0; j < 2; j++ {
-				*p++
-				if (*(*p)) >= '0' && (*(*p)) <= '9' {
-					ch = (ch << 4) + ((*(*p)) - '0')
-				} else if (*(*p)) >= 'a' && (*(*p)) <= 'f' {
-					ch = (ch << 4) + ((*(*p)) - 'a' + 10)
-				} else if (*(*p)) >= 'A' && (*(*p)) <= 'F' {
-					ch = (ch << 4) + ((*(*p)) - 'A' + 10)
+func UnserializeStr(s string) (string, bool) {
+	var buf strings.Builder
+	for i := 0; i < len(s); i++ {
+		if s[i] != '\\' {
+			buf.WriteByte(s[i])
+		} else if i+2 < len(s) {
+			var ch byte
+			for j := 0; j < 2; j++ {
+				c := s[i]
+				if '0' <= c && c <= '9' {
+					ch = ch<<4 + (c - '0')
+				} else if 'a' <= c && c <= 'f' {
+					ch = ch<<4 + (c - 'a' + 10)
+				} else if 'A' <= c && c <= 'F' {
+					ch = ch<<4 + (c - 'A' + 10)
 				} else {
-					// types.ZendStringEfree(str)
-					return nil
+					return "", false
 				}
 			}
-			str.GetStr()[i] = byte(ch)
+			buf.WriteByte(ch)
+		} else {
+			return "", false
 		}
-		*p++
 	}
-	return str.Cutoff(i)
+	return buf.String(), true
 }
+
 func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserializeDataT) bool {
 	var classes *types.Array = (**var_hashx).GetAllowedClasses()
 	if classes == nil {
@@ -1016,7 +1007,7 @@ yy30:
 		*p = start + 2
 		return 0
 	}
-	if lang.Assign(&str, UnserializeStr(&YYCURSOR, len_, maxlen)) == nil {
+	if str, _ = UnserializeStr(b.CastStr(&YYCURSOR, len_)); str == "" {
 		return 0
 	}
 	if (*YYCURSOR) != '"' {

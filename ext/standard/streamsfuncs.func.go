@@ -318,13 +318,12 @@ func ZifStreamSocketSendto(executeData zpp.Ex, return_value zpp.Ret, stream *typ
 	return_value.SetLong(streams.PhpStreamXportSendto(stream, data, datalen, int(flags), lang.Cond(target_addr_len != 0, &sa, nil), sl))
 	return
 }
-func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream_ zpp.Resource, amount int, _ zpp.Opt, flags int, remoteAddr zpp.RefZval) (string, bool) {
+func ZifStreamSocketRecvfrom(stream_ zpp.Resource, amount int, _ zpp.Opt, flags int, remoteAddr zpp.RefZval) (string, bool) {
 	var zstream *types.Zval = stream_
 	var to_read zend.ZendLong = amount
 	var zremote *types.Zval = remoteAddr
 	var stream *core.PhpStream
 	var remote_addr *types.String = nil
-	var read_buf *types.String
 	var recvd int
 
 	core.PhpStreamFromZval(stream, zstream)
@@ -336,13 +335,14 @@ func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream_ z
 		core.PhpErrorDocref("", faults.E_WARNING, "Length parameter must be greater than 0")
 		return "", false
 	}
-	read_buf = types.ZendStringAlloc(to_read, 0)
-	recvd = streams.PhpStreamXportRecvfrom(stream, read_buf.GetVal(), to_read, int(flags), nil, nil, lang.Cond(zremote != nil, &remote_addr, nil))
+
+	read_buf := make([]byte, to_read)
+	recvd = streams.PhpStreamXportRecvfrom(stream, read_buf, to_read, int(flags), nil, nil, lang.Cond(zremote != nil, &remote_addr, nil))
 	if recvd >= 0 {
 		if zremote != nil && remote_addr != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zremote, remote_addr)
 		}
-		return read_buf.Cutoff(recvd).GetStr()
+		return string(read_buf[:recvd]), true
 	}
 	return "", false
 }

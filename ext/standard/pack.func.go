@@ -636,7 +636,6 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 					var len_ = (inputlen - inputpos) * 2
 					var nibbleshift = lang.Cond(type_ == 'h', 0, 4)
 					var first = 1
-					var buf *types.String
 					var ipos zend.ZendLong
 					var opos zend.ZendLong
 
@@ -648,7 +647,8 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 					if len_ > 0 && argb > 0 {
 						len_ -= argb % 2
 					}
-					buf = types.ZendStringAlloc(len_, 0)
+
+					buf := make([]byte, len_)
 					opos = 0
 					ipos = opos
 					for ; opos < len_; opos++ {
@@ -658,15 +658,14 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 						} else {
 							cc += 'a' - 10
 						}
-						buf.GetStr()[opos] = cc
+						buf[opos] = cc
 						nibbleshift = nibbleshift + 4&7
 						if lang.PostDec(&first) == 0 {
 							ipos++
 							first = 1
 						}
 					}
-					buf.GetStr()[len_] = '0'
-					zend.AddAssocStr(return_value, n, buf.GetStr())
+					zend.AddAssocStr(return_value, n, string(buf))
 				case 'c':
 					fallthrough
 				case 'C':
