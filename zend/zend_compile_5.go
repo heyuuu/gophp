@@ -404,7 +404,7 @@ func (compiler *Compiler) CompileDeclare(ast *ZendAst) {
 		var value_ast *ZendAst = declare_ast.Child(1)
 		var name *types.String = ZendAstGetStr(name_ast)
 		if value_ast.Kind() != ZEND_AST_ZVAL {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "declare(%s) value must be a literal", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("declare(%s) value must be a literal", name.GetVal()))
 		}
 		if ascii.StrCaseEquals(name.GetStr(), "ticks") {
 			// todo 触发不支持 ticks 的 warning
@@ -457,7 +457,7 @@ func (compiler *Compiler) CompileTypename(ast *ZendAst, force_allow_null bool) t
 		var type_code types.ZvalType = ZendLookupBuiltinTypeByName(class_name.GetStr())
 		if type_code != 0 {
 			if (ast.Attr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", operators.ZendStringTolower(class_name).GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Type declaration '%s' must be unqualified", operators.ZendStringTolower(class_name).GetVal()))
 			}
 			type_ = types.TypeHintCode(type_code, allow_null)
 		} else {
@@ -514,12 +514,12 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 		var opline *types.ZendOp
 		var arg_info *ZendArgInfo
 		if ZendIsAutoGlobal(name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign auto-global variable %s", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot re-assign auto-global variable %s", name.GetVal()))
 		}
 		var_node.SetOpType(IS_CV)
 		var_node.GetOp().SetVar(LookupCv(name.GetStr()))
 		if EX_VAR_TO_NUM(var_node.GetOp().GetVar()) != i {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Redefinition of parameter $%s", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Redefinition of parameter $%s", name.GetVal()))
 		} else if name.GetStr() == "this" {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as parameter")
 		}
@@ -592,7 +592,7 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 							faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters with an object type can only be NULL")
 						default:
 							if !(types.ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), default_node.GetConstant().Type())) {
-								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters with a %s type can only be %s or NULL", types.ZendGetTypeByConst(arg_info.GetType().Code()), types.ZendGetTypeByConst(arg_info.GetType().Code()))
+								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Default value for parameters with a %s type can only be %s or NULL", types.ZendGetTypeByConst(arg_info.GetType().Code()), types.ZendGetTypeByConst(arg_info.GetType().Code())))
 							}
 						}
 					}

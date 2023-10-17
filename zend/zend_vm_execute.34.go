@@ -7,7 +7,7 @@ import (
 
 func ZEND_NULL_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
-	faults.ErrorNoreturn(faults.E_ERROR, "Invalid opcode %d/%d/%d.", opline.GetOpcode(), opline.GetOp1Type(), opline.GetOp2Type())
+	faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Invalid opcode %d/%d/%d.", opline.GetOpcode(), opline.GetOp1Type(), opline.GetOp2Type()))
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ExecuteEx(ex *ZendExecuteData) {

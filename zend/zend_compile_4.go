@@ -555,21 +555,21 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 	if depth_ast != nil {
 		var depth_zv *types.Zval
 		if depth_ast.Kind() != ZEND_AST_ZVAL {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator with non-integer operand is no longer supported", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("'%s' operator with non-integer operand is no longer supported", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue")))
 		}
 		depth_zv = depth_ast.Val()
 		if !depth_zv.IsLong() || depth_zv.Long() < 1 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator accepts only positive integers", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("'%s' operator accepts only positive integers", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue")))
 		}
 		depth = depth_zv.Long()
 	} else {
 		depth = 1
 	}
 	if CG__().GetContext().GetCurrentBrkCont() == -1 {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' not in the 'loop' or 'switch' context", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("'%s' not in the 'loop' or 'switch' context", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue")))
 	} else {
 		if !ZendHandleLoopsAndFinallyEx(depth, nil) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot '%s' %d level%s", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"), depth, lang.Cond(depth == 1, "", "s"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot '%s' %d level%s", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"), depth, lang.Cond(depth == 1, "", "s")))
 		}
 	}
 	if ast.Kind() == ZEND_AST_CONTINUE {
@@ -602,7 +602,7 @@ func (compiler *Compiler) ResolveGotoLabel(op_array *types.ZendOpArray, opline *
 		CG__().SetInCompilation(1)
 		CG__().SetActiveOpArray(op_array)
 		compiler.setLinenoByOpline(opline)
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'goto' to undefined label '%s'", label.StringEx().GetVal())
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("'goto' to undefined label '%s'", label.StringEx().GetVal()))
 	}
 
 	label.SetNull()
@@ -658,7 +658,7 @@ func (compiler *Compiler) CompileLabel(ast *ZendAst) {
 	var label = ZendAstGetStr(ast.Child(0)).GetStr()
 	dest := NewZendLabel(label, CG__().GetContext().GetCurrentBrkCont(), GetNextOpNumber())
 	if !CG__().GetContext().AddLabel(dest) {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Label '%s' already defined", label)
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Label '%s' already defined", label))
 	}
 }
 func (compiler *Compiler) CompileWhile(ast *ZendAst) {

@@ -79,7 +79,7 @@ func ZendImplementThrowable(interface_ *types.ClassEntry, classType *types.Class
 	if operators.InstanceofFunction(classType, ZendCeException) || operators.InstanceofFunction(classType, ZendCeError) {
 		return types.SUCCESS
 	}
-	ErrorNoreturn(E_ERROR, "Class %s cannot implement interface %s, extend %s or %s instead", classType.Name(), interface_.Name(), ZendCeException.Name(), ZendCeError.Name())
+	ErrorNoreturn(E_ERROR, fmt.Sprintf("Class %s cannot implement interface %s, extend %s or %s instead", classType.Name(), interface_.Name(), ZendCeException.Name(), ZendCeError.Name()))
 	return types.FAILURE
 }
 func GetExceptionBase(object *types.Zval) *types.ClassEntry {

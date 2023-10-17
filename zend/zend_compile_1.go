@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -68,7 +69,7 @@ func ZendResolveClassName(name string, typ uint32) string {
 
 		/* Ensure that \self, \parent and \static are not used */
 		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'\\%s' is an invalid class name", name)
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("'\\%s' is an invalid class name", name))
 		}
 		return name
 	}
@@ -140,9 +141,9 @@ func DoBindFunctionError(lcname string, opArray *types.ZendOpArray, compileTime 
 	}
 
 	if oldFunction.GetType() == ZEND_USER_FUNCTION && oldFunction.GetOpArray().GetLast() > 0 {
-		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s() (previously declared in %s:%d)", functionName, oldFunction.GetOpArray().GetFilename(), oldFunction.GetOpArray().GetOpcodes()[0].GetLineno())
+		faults.ErrorNoreturn(errorLevel, fmt.Sprintf("Cannot redeclare %s() (previously declared in %s:%d)", functionName, oldFunction.GetOpArray().GetFilename(), oldFunction.GetOpArray().GetOpcodes()[0].GetLineno()))
 	} else {
-		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s()", functionName)
+		faults.ErrorNoreturn(errorLevel, fmt.Sprintf("Cannot redeclare %s()", functionName))
 	}
 }
 func DoBindFunction(lcname *types.Zval) int {
@@ -170,17 +171,17 @@ func DoBindFunction(lcname *types.Zval) int {
 }
 func ZendMarkFunctionAsGenerator() {
 	if CG__().GetActiveOpArray().FunctionName() == "" {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The \"yield\" expression can only be used inside a function")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, `The "yield" expression can only be used inside a function`)
 	}
 	if CG__().GetActiveOpArray().IsHasReturnType() {
 		var return_info ZendArgInfo = CG__().GetActiveOpArray().GetArgInfo()[-1]
 		if return_info.GetType().Code() != types.IsIterable {
 			var msg = "Generators may only declare a return type of Generator, Iterator, Traversable, or iterable, %s is not permitted"
 			if !(return_info.GetType().IsClass()) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, types.ZendGetTypeByConst(return_info.GetType().Code()))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf(msg, types.ZendGetTypeByConst(return_info.GetType().Code())))
 			}
 			if !(ascii.StrCaseEquals(return_info.GetType().Name(), "Traversable")) && !(ascii.StrCaseEquals(return_info.GetType().Name(), "Iterator")) && !(ascii.StrCaseEquals(return_info.GetType().Name(), "Generator")) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, return_info.GetType().Name())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf(msg, return_info.GetType().Name()))
 			}
 		}
 	}
@@ -304,13 +305,25 @@ func ZendGetClassFetchTypeAst(name_ast *ZendAst) uint32 {
 	}
 	return ZendGetClassFetchType(ZendAstGetStrVal(name_ast))
 }
-func ZendEnsureValidClassFetchType(fetch_type uint32) {
-	if fetch_type != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() {
+
+func fetchTypeName(fetchType uint32) string {
+	switch fetchType {
+	case ZEND_FETCH_CLASS_SELF:
+		return "self"
+	case ZEND_FETCH_CLASS_PARENT:
+		return "parents"
+	default:
+		return "static"
+	}
+}
+
+func ZendEnsureValidClassFetchType(fetchType uint32) {
+	if fetchType != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() {
 		var ce = CG__().GetActiveClassEntry()
 		if ce == nil {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", lang.Cond(lang.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
-		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && ce.HasParent() {
-			faults.Error(faults.E_DEPRECATED, "Cannot use \"parent\" when current class scope has no parent")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf(`Cannot use "%s" when no class scope is active`, fetchTypeName(fetchType)))
+		} else if fetchType == ZEND_FETCH_CLASS_PARENT && ce.HasParent() {
+			faults.Error(faults.E_DEPRECATED, `Cannot use "parent" when current class scope has no parent`)
 		}
 	}
 }

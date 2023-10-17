@@ -42,7 +42,7 @@ func PhpSprintfAppendstring(
 	}
 	m_width = b.Max(min_width, copy_len)
 	if m_width > core.INT_MAX-(*pos)-1 {
-		faults.ErrorNoreturn(faults.E_ERROR, "Field width %zd is too long", m_width)
+		faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Field width %zd is too long", m_width))
 	}
 	req_size = (*pos) + m_width + 1
 	if alignment == ALIGN_RIGHT {

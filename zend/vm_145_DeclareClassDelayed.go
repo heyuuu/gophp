@@ -22,7 +22,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 
 			// 判断新名称是否已存在
 			if EG__().ClassTable().Exists(lcnameStr) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.Name())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.Name()))
 			}
 
 			//

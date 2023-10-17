@@ -241,7 +241,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit boo
 		if return_info.GetType().Code() == types.IsVoid {
 			if expr != nil {
 				if expr.GetOpType() == IS_CONST && expr.GetConstant().IsNull() {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A void function must not return a value "+"(did you mean \"return;\" instead of \"return null;\"?)")
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, `A void function must not return a value (did you mean "return;" instead of "return null;"?)`)
 				} else {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A void function must not return a value")
 				}
@@ -256,7 +256,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit boo
 		}
 		if expr == nil && implicit == 0 {
 			if return_info.GetType().AllowNull() {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A function with return type must return a value "+"(did you mean \"return null;\" instead of \"return;\"?)")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A function with return type must return a value (did you mean \"return null;\" instead of \"return;\"?)")
 			} else {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A function with return type must return a value")
 			}

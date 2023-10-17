@@ -186,7 +186,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 						type_name++
 					}
 					if scope == nil && (!(strcasecmp(type_name, "self")) || !(strcasecmp(type_name, "parent"))) {
-						faults.ErrorNoreturn(faults.E_CORE_ERROR, "Cannot declare a return type of %s outside of a class scope", type_name)
+						faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Cannot declare a return type of %s outside of a class scope", type_name))
 					}
 				}
 				internal_function.SetIsHasReturnType(true)
@@ -423,13 +423,13 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 			}
 		}
 		if ctor != nil && ctor.IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Constructor %s::%s() cannot declare a return type", scope.Name(), ctor.FunctionName())
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Constructor %s::%s() cannot declare a return type", scope.Name(), ctor.FunctionName()))
 		}
 		if dtor != nil && dtor.IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Destructor %s::%s() cannot declare a return type", scope.Name(), dtor.FunctionName())
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Destructor %s::%s() cannot declare a return type", scope.Name(), dtor.FunctionName()))
 		}
 		if clone != nil && clone.IsHasReturnType() {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() cannot declare a return type", scope.Name(), clone.FunctionName())
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("%s::%s() cannot declare a return type", scope.Name(), clone.FunctionName()))
 		}
 		Efree((*byte)(lc_class_name))
 	}

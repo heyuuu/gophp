@@ -31,7 +31,7 @@ func ZendSafeAddmult(nmemb int, size int, offset int, message string) int {
 	var overflow int
 	var ret int = ZendSafeAddress(nmemb, size, offset, &overflow)
 	if overflow != 0 {
-		faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in %s (%zu * %zu + %zu)", message, nmemb, size, offset)
+		faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Possible integer overflow in %s (%zu * %zu + %zu)", message, nmemb, size, offset))
 		return 0
 	}
 	return ret

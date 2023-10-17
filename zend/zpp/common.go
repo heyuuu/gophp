@@ -51,5 +51,5 @@ func ZendParseArgStrWeak(arg *types.Zval, dest **types.String) int {
 }
 
 func ZendParseParametersDebugError(msg string) {
-	faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s(): %s", currExecuteData().CalleeName(), msg)
+	faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("%s(): %s", currExecuteData().CalleeName(), msg))
 }

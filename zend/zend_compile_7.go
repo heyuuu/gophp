@@ -39,7 +39,7 @@ func ZendCheckAlreadyInUse(type_ uint32, old_name *types.String, new_name *types
 	if ascii.StrCaseEquals(old_name.GetStr(), check_name) {
 		return
 	}
-	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
+	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal()))
 }
 func (compiler *Compiler) CompileUse(ast *ZendAst) {
 	var list *ZendAstList = ast.AsAstList()
@@ -76,7 +76,7 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 			lookup_name = ascii.StrToLower(new_name.GetStr())
 		}
 		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use %s as %s because '%s' is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use %s as %s because '%s' is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal()))
 		}
 		if current_ns != "" {
 			nsName := ascii.StrToLower(current_ns) + "\\" + lookup_name
@@ -89,7 +89,7 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 			}
 		}
 		if ZendAddImport(type_, lookup_name, old_name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal()))
 		}
 	}
 }
@@ -130,12 +130,12 @@ func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
 		value_node.SetOpType(IS_CONST)
 		compiler.ConstExprToZval(value_zv, value_ast)
 		if ZendLookupReservedConst(unqualified_name.GetStr()) != nil {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare constant '%s'", unqualified_name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot redeclare constant '%s'", unqualified_name.GetVal()))
 		}
 		name = ZendPrefixWithNs(unqualified_name)
 		//name = types.ZendNewInternedString(name)
 		if importName := FC__().FindImportConst(unqualified_name.GetStr()); importName != "" && importName != name.GetStr() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because the name is already in use", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare const %s because the name is already in use", name.GetVal()))
 		}
 		name_node.SetOpType(IS_CONST)
 		name_node.GetConstant().SetStringEx(name)
@@ -180,7 +180,7 @@ func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
 	if nameAst != nil {
 		name = ZendAstGetStr(nameAst).GetStr()
 		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as namespace name", name)
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use '%s' as namespace name", name))
 		}
 	}
 	FC__().BeginNamespace(name, withBracket)

@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -64,7 +65,7 @@ func ZendDeclarePropertyString(ce *types.ClassEntry, name string, value string, 
 func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, accessType uint32, docComment *types.String) int {
 	if ce.IsInterface() {
 		if accessType != types.AccPublic {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ce.Name(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Access type for interface constant %s::%s must be public", ce.Name(), name.GetStr()))
 		}
 	}
 	if ascii.StrCaseEquals(name.GetStr(), "class") {
@@ -76,7 +77,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 		ce.SetIsConstantsUpdated(false)
 	}
 	if !ce.ConstantsTable().Add(name.GetStr(), c) {
-		faults.ErrorNoreturn(lang.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.Name(), name.GetVal())
+		faults.ErrorNoreturn(lang.Cond(ce.IsInternalClass(), faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), fmt.Sprintf("Cannot redefine class __special__  constant %s::%s", ce.Name(), name.GetStr()))
 	}
 	return types.SUCCESS
 }

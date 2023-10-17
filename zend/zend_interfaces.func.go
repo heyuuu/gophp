@@ -48,13 +48,13 @@ func ZendCallMethod(object *types.Zval, objCe *types.ClassEntry, fnProxy *types.
 				fcic.SetFunctionHandler(objCe.FunctionTable().Get(functionName))
 				if fcic.GetFunctionHandler() == nil {
 					/* error at c-level */
-					faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't find implementation for method %s::%s", objCe.Name(), functionName)
+					faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Couldn't find implementation for method %s::%s", objCe.Name(), functionName))
 				}
 			} else {
 				fcic.SetFunctionHandler(ZendFetchFunctionStr(functionName))
 				if fcic.GetFunctionHandler() == nil {
 					/* error at c-level */
-					faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't find implementation for function %s", functionName)
+					faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Couldn't find implementation for function %s", functionName))
 				}
 			}
 			if fnProxy != nil {
@@ -92,7 +92,7 @@ func ZendCallMethod(object *types.Zval, objCe *types.ClassEntry, fnProxy *types.
 			}
 		}
 		if EG__().NoException() {
-			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Couldn't execute method %s%s%s", lang.CondF1(objCe != nil, func() []byte { return objCe.Name() }, ""), lang.Cond(objCe != nil, "::", ""), functionName)
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Couldn't execute method %s%s%s", lang.CondF1(objCe != nil, func() []byte { return objCe.Name() }, ""), lang.Cond(objCe != nil, "::", ""), functionName))
 		}
 	}
 	return retvalPtr
@@ -215,7 +215,7 @@ func ZendImplementTraversable(interface_ *types.ClassEntry, class_type *types.Cl
 			return types.SUCCESS
 		}
 	}
-	faults.ErrorNoreturn(faults.E_CORE_ERROR, "Class %s must implement interface %s as part of either %s or %s", class_type.Name(), ZendCeTraversable.Name(), ZendCeIterator.Name(), ZendCeAggregate.Name())
+	faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Class %s must implement interface %s as part of either %s or %s", class_type.Name(), ZendCeTraversable.Name(), ZendCeIterator.Name(), ZendCeAggregate.Name()))
 	return types.FAILURE
 }
 func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {
@@ -239,7 +239,7 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 				b.Assert(class_type.IsResolvedInterfaces())
 				for i = 0; i < class_type.GetNumInterfaces(); i++ {
 					if class_type.GetInterfaces()[i] == ZendCeIterator {
-						faults.ErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.Name(), interface_.Name(), ZendCeIterator.Name())
+						faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Class %s cannot implement both %s and %s at the same time", class_type.Name(), interface_.Name(), ZendCeIterator.Name()))
 						return types.FAILURE
 					}
 					if class_type.GetInterfaces()[i] == ZendCeTraversable {
@@ -291,7 +291,7 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 			/* c-level get_iterator cannot be changed */
 
 			if class_type.GetGetIterator() == ZendUserItGetNewIterator {
-				faults.ErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.Name(), interface_.Name(), ZendCeAggregate.Name())
+				faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Class %s cannot implement both %s and %s at the same time", class_type.Name(), interface_.Name(), ZendCeAggregate.Name()))
 			}
 			return types.FAILURE
 		}

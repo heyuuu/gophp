@@ -34,7 +34,7 @@ func Pestrndup(s *byte, length int) *byte { return b.Strndup(s, length) }
 func IsZendMm() int                       { return 0 }
 func ZendStrndup(s *byte, length int) *byte {
 	if length+1 == 0 {
-		faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (1 * %zu + 1)", length)
+		faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Possible integer overflow in memory allocation (1 * %zu + 1)", length))
 	}
 	var str = b.CastStr(s, length)
 	return b.CastStrPtr(str)

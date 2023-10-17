@@ -151,7 +151,7 @@ func ZendIsReservedClassName(name string) bool {
 }
 func ZendAssertValidClassName(name string) {
 	if ZendIsReservedClassName(name) {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", name)
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use '%s' as class name as it is reserved", name))
 	}
 }
 

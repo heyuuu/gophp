@@ -516,7 +516,7 @@ func ZendEvalStringEx(str string, retval_ptr *types.Zval, string_name string, ha
 func ZendTimeout(dummy int) {
 	EG__().SetTimedOut(0)
 	ZendSetTimeoutEx(0, 1)
-	faults.ErrorNoreturn(faults.E_ERROR, "Maximum execution time of %d second%s exceeded", EG__().GetTimeoutSeconds(), lang.Cond(EG__().GetTimeoutSeconds() == 1, "", "s"))
+	faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Maximum execution time of %d second%s exceeded", EG__().GetTimeoutSeconds(), lang.Cond(EG__().GetTimeoutSeconds() == 1, "", "s")))
 }
 func ZendTimeoutHandler(dummy int) {
 	if EG__().GetTimedOut() != 0 {
@@ -668,7 +668,7 @@ func ZendFetchClassByName(className string, key string, fetchType int) *types.Cl
 			exceptionZv := types.NewZvalObject(EG__().GetException())
 			exceptionStr := operators.ZvalGetStrVal(exceptionZv)
 			EG__().ClearException()
-			faults.ErrorNoreturn(faults.E_ERROR, "During class fetch: Uncaught %s", exceptionStr)
+			faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("During class fetch: Uncaught %s", exceptionStr))
 		}
 		return nil
 	}

@@ -177,44 +177,36 @@ func getFilenameLineno(typ int) (string, uint32) {
 	}
 }
 
-func ErrorAt(typ int, filename *string, lineno uint32, format string, args ...any) {
-	var filenameStr string
-	if filename == nil {
-		filenameStr, _ = getFilenameLineno(typ)
-	} else {
-		filenameStr = *filename
+func ErrorAt(typ int, filename string, lineno uint32, message string) {
+	if filename == "" {
+		filename, _ = getFilenameLineno(typ)
 	}
-	message := zend.ZendSprintf(format, args...)
-	errorVaList(typ, filenameStr, lineno, message)
+	errorVaList(typ, filename, lineno, message)
 }
 func Error(typ int, message string) {
 	filename, lineno := getFilenameLineno(typ)
 	errorVaList(typ, filename, lineno, message)
 }
-func ErrorAtNoreturn(typ int, filename *string, lineno uint32, format string, args ...any) {
+func ErrorAtNoreturn(typ int, filename *string, lineno uint32, message string) {
 	var filenameStr string
 	if filename == nil {
 		filenameStr, _ = getFilenameLineno(typ)
 	} else {
 		filenameStr = *filename
 	}
-	message := zend.ZendSprintf(format, args...)
 	errorVaList(typ, filenameStr, lineno, message)
 
 	/* Should never reach this. */
 	panic("unreachable")
 }
-func ErrorNoreturn(typ int, format string, args ...any) {
-	filename, lineno := getFilenameLineno(typ)
-	message := zend.ZendSprintf(format, args...)
-	errorVaList(typ, filename, lineno, message)
-
+func ErrorNoreturn(typ int, message string) {
+	Error(typ, message)
 	/* Should never reach this. */
 	panic("unreachable")
 }
 func ThrowErrorEx(exceptionCe *types.ClassEntry, message string) {
 	if exceptionCe != nil {
-		if operators.InstanceofFunction(exceptionCe, ZendCeError) == 0 {
+		if !operators.InstanceofFunction(exceptionCe, ZendCeError) {
 			Error(E_NOTICE, "Error exceptions must be derived from Error")
 			exceptionCe = ZendCeError
 		}
@@ -228,7 +220,7 @@ func ThrowErrorEx(exceptionCe *types.ClassEntry, message string) {
 	}
 
 	//TODO: we can't convert compile-time errors to exceptions yet???
-	if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
+	if zend.CurrEX() != nil && !zend.CG__().GetInCompilation() {
 		ThrowException(exceptionCe, message, 0)
 	} else {
 		Error(E_ERROR, message)

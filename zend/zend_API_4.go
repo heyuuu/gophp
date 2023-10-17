@@ -239,7 +239,7 @@ func ZendStartupModuleEx(module *ModuleEntry) bool {
 	EG__().SetCurrentModule(module)
 
 	if !module.ModuleStartup() {
-		faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unable to start %s module", module.Name())
+		faults.ErrorNoreturn(faults.E_CORE_ERROR, fmt.Sprintf("Unable to start %s module", module.Name()))
 		EG__().SetCurrentModule(nil)
 		return false
 	}

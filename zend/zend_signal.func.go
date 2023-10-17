@@ -141,7 +141,7 @@ func ZendSigaction(signo int, act *__struct__sigaction, oldact *__struct__sigact
 			sa.sa_mask = GlobalSigmask
 		}
 		if sigaction(signo, &sa, nil) < 0 {
-			faults.ErrorNoreturn(faults.E_ERROR, "Error installing signal handler for %d", signo)
+			faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Error installing signal handler for %d", signo))
 		}
 
 		/* unsure this signal is not blocked */
@@ -176,7 +176,7 @@ func ZendSignalRegister(signo int, handler func(int, *siginfo_t, any)) int {
 		sa.sa_sigaction = handler
 		sa.sa_mask = GlobalSigmask
 		if sigaction(signo, &sa, nil) < 0 {
-			faults.ErrorNoreturn(faults.E_ERROR, "Error installing signal handler for %d", signo)
+			faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Error installing signal handler for %d", signo))
 		}
 		return types.SUCCESS
 	}
