@@ -1,6 +1,7 @@
 package zpp
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -299,12 +300,12 @@ func ParseClass(arg *types.Zval, baseCe *types.ClassEntry, num int, checkNull bo
 	ce = zend.ZendLookupClass(arg.String())
 	if baseCe != nil {
 		if ce == nil || !operators.InstanceofFunction(ce, baseCe) {
-			faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.CurrEX().CalleeName(), num, baseCe.Name(), arg.String())
+			faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), fmt.Sprintf("%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.CurrEX().CalleeName(), num, baseCe.Name(), arg.String()))
 			return nil, false
 		}
 	}
 	if ce == nil {
-		faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", zend.CurrEX().CalleeName(), num, arg.StringEx().GetVal())
+		faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), fmt.Sprintf("%s() expects parameter %d to be a valid class name, '%s' given", zend.CurrEX().CalleeName(), num, arg.String()))
 		return nil, false
 	}
 	return ce, true

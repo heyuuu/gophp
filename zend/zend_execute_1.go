@@ -163,13 +163,13 @@ func ZendThrowAutoInitInPropError(prop *types.PropertyInfo, type_ string) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
-	faults.TypeError("Cannot auto-initialize an %s inside property %s::$%s of type %s%s", type_, prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
+	faults.TypeError(fmt.Sprintf("Cannot auto-initialize an %s inside property %s::$%s of type %s%s", type_, prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2))
 }
 func ZendThrowAutoInitInRefError(prop *types.PropertyInfo, type_ string) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
-	faults.TypeError("Cannot auto-initialize an %s inside a reference held by property %s::$%s of type %s%s", type_, prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2)
+	faults.TypeError(fmt.Sprintf("Cannot auto-initialize an %s inside a reference held by property %s::$%s of type %s%s", type_, prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName()), prop_type1, prop_type2))
 }
 func ZendThrowAccessUninitPropByRefError(prop *types.PropertyInfo) {
 	faults.ThrowError(nil, fmt.Sprintf("Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().Name(), ZendGetUnmangledPropertyNameEx(prop.GetName())))
@@ -313,12 +313,12 @@ func ZendVerifyArgError(zf types.IFunction, arg_info *ZendArgInfo, arg_num int, 
 		ZendVerifyTypeErrorCommon(zf, arg_info, ce, value, &fname, &fsep, &fclass, &need_msg, &need_kind, &need_or_null, &given_msg, &given_kind)
 		if zf.GetType() == ZEND_USER_FUNCTION {
 			if ptr != nil && ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetType()) {
-				faults.TypeError("Argument %d passed to %s%s%s() must %s%s%s, %s%s given, called in %s on line %d", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind, ptr.GetFunc().GetOpArray().GetFilename(), ptr.GetOpline().GetLineno())
+				faults.TypeError(fmt.Sprintf("Argument %d passed to %s%s%s() must %s%s%s, %s%s given, called in %s on line %d", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind, ptr.GetFunc().GetOpArray().GetFilename(), ptr.GetOpline().GetLineno()))
 			} else {
-				faults.TypeError("Argument %d passed to %s%s%s() must %s%s%s, %s%s given", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
+				faults.TypeError(fmt.Sprintf("Argument %d passed to %s%s%s() must %s%s%s, %s%s given", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind))
 			}
 		} else {
-			faults.TypeError("Argument %d passed to %s%s%s() must %s%s%s, %s%s given", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
+			faults.TypeError(fmt.Sprintf("Argument %d passed to %s%s%s() must %s%s%s, %s%s given", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind))
 		}
 	} else {
 		ZendMissingArgError(ptr)

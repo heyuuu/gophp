@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -265,7 +266,7 @@ func zim_Closure_fromCallable(executeData *ZendExecuteData, return_value *types.
 	EG__().SetCurrentExecuteData(executeData)
 	if success == types.FAILURE || error != nil {
 		if error != nil {
-			faults.TypeError("Failed to create closure from callable: %s", error)
+			faults.TypeError(fmt.Sprintf("Failed to create closure from callable: %s", error))
 			Efree(error)
 		} else {
 			faults.TypeError("Failed to create closure from callable")

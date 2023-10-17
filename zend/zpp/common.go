@@ -1,6 +1,7 @@
 package zpp
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -31,11 +32,11 @@ func CheckNumArgsEx(numArgs int, executeData ExecuteData, minNumArgs int, maxNum
 		// 构建错误信息
 		callee := executeData.CalleeName()
 		if minNumArgs == maxNumArgs {
-			faults.InternalArgumentCountError(throwException, "%s() expects exactly %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs)
+			faults.InternalArgumentCountError(throwException, fmt.Sprintf("%s() expects exactly %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs))
 		} else if numArgs < minNumArgs {
-			faults.InternalArgumentCountError(throwException, "%s() expects at least %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs)
+			faults.InternalArgumentCountError(throwException, fmt.Sprintf("%s() expects at least %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs))
 		} else { // numArgs > maxNumArgs
-			faults.InternalArgumentCountError(throwException, "%s() expects at most %d parameter%s, %d given", callee, maxNumArgs, b.Cond(maxNumArgs == 1, "", "s"), numArgs)
+			faults.InternalArgumentCountError(throwException, fmt.Sprintf("%s() expects at most %d parameter%s, %d given", callee, maxNumArgs, b.Cond(maxNumArgs == 1, "", "s"), numArgs))
 		}
 	}
 

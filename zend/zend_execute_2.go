@@ -69,9 +69,9 @@ func ZendVerifyPropertyTypeError(info *types.PropertyInfo, property *types.Zval)
 	}
 
 	if info.GetType().IsClass() {
-		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", ceName, propName, propType2, orNullTips, propTypeName)
+		faults.TypeError(fmt.Sprintf("Typed property %s::$%s must be an instance of %s%s, %s used", ceName, propName, propType2, orNullTips, propTypeName))
 	} else {
-		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", ceName, propName, propType2, orNullTips, propTypeName)
+		faults.TypeError(fmt.Sprintf("Typed property %s::$%s must be %s%s, %s used", ceName, propName, propType2, orNullTips, propTypeName))
 	}
 }
 func ZendResolveClassType(type_ *types.TypeHint, selfCe *types.ClassEntry) bool {
@@ -273,7 +273,7 @@ func ZendVerifyReturnError(zf types.IFunction, ce *types.ClassEntry, value *type
 	var given_msg *byte
 	var given_kind *byte
 	ZendVerifyTypeErrorCommon(zf, arg_info, ce, value, &fname, &fsep, &fclass, &need_msg, &need_kind, &need_or_null, &given_msg, &given_kind)
-	faults.TypeError("Return value of %s%s%s() must %s%s%s, %s%s returned", fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
+	faults.TypeError(fmt.Sprintf("Return value of %s%s%s() must %s%s%s, %s%s returned", fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind))
 }
 func ZendVerifyMissingReturnType(zf types.IFunction, cache_slot *any) int {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1

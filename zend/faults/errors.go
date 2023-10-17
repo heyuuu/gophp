@@ -226,28 +226,17 @@ func ThrowError(exceptionCe *types.ClassEntry, message string) {
 		Error(E_ERROR, message)
 	}
 }
-func TypeError(format string, args ...any) {
-	message := zend.ZendSprintf(format, args...)
+func TypeError(message string) {
 	ThrowException(ZendCeTypeError, message, 0)
 }
-
-func InternalTypeErrorEx(throwException bool, message string) {
+func InternalTypeError(throwException bool, message string) {
 	if throwException {
 		ThrowException(ZendCeTypeError, message, 0)
 	} else {
 		Error(E_WARNING, message)
 	}
 }
-func InternalTypeError(throwException bool, format string, args ...any) {
-	message := zend.ZendSprintf(format, args...)
-	if throwException {
-		ThrowException(ZendCeTypeError, message, 0)
-	} else {
-		Error(E_WARNING, message)
-	}
-}
-func InternalArgumentCountError(throwException bool, format string, args ...any) {
-	message := zend.ZendSprintf(format, args...)
+func InternalArgumentCountError(throwException bool, message string) {
 	if throwException {
 		ThrowException(ZendCeArgumentCountError, message, 0)
 	} else {

@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -61,5 +62,5 @@ func ZendCopyParametersArray(param_count int, argument_array *types.Zval) int {
 	return types.SUCCESS
 }
 func ZendWrongParamCount() {
-	faults.InternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), "Wrong parameter count for %s()", CurrEX().CalleeName())
+	faults.InternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), fmt.Sprintf("Wrong parameter count for %s()", CurrEX().CalleeName()))
 }

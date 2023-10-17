@@ -373,7 +373,7 @@ func (se *VarSerializer) callSerialize(retval *types.Zval, obj *types.Zval) bool
 		return false
 	}
 	if !retval.IsArray() {
-		faults.TypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).Name())
+		faults.TypeError(fmt.Sprintf("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).Name()))
 		return false
 	}
 	return true
