@@ -1708,7 +1708,7 @@ func ZendHasDeprecatedConstructor(ce *types.ClassEntry) bool {
 }
 func ZendCheckDeprecatedConstructor(ce *types.ClassEntry) {
 	if ZendHasDeprecatedConstructor(ce) {
-		faults.Error(faults.E_DEPRECATED, "Methods with the same name as their class will not be constructors in a future version of PHP; %s has a deprecated constructor", ce.Name())
+		faults.Error(faults.E_DEPRECATED, fmt.Sprintf("Methods with the same name as their class will not be constructors in a future version of PHP; %s has a deprecated constructor", ce.Name()))
 	}
 }
 func DISPLAY_ABSTRACT_FN(idx int) {

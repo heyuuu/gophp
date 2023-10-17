@@ -254,7 +254,7 @@ func _zendGetPropertyOffset(ce *types.ClassEntry, member string, silent bool) (u
 found:
 	if (flags & types.AccStatic) != 0 {
 		if !silent {
-			faults.Error(faults.E_NOTICE, "Accessing static property %s::$%s as non static", ce.Name(), member)
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Accessing static property %s::$%s as non static", ce.Name(), member))
 		}
 		return ZEND_DYNAMIC_PROPERTY_OFFSET, nil, nil
 	}
@@ -332,7 +332,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member string, silent bool, cac
 found:
 	if (flags & types.AccStatic) != 0 {
 		if !silent {
-			faults.Error(faults.E_NOTICE, "Accessing static property %s::$%s as non static", ce.Name(), member)
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Accessing static property %s::$%s as non static", ce.Name(), member))
 		}
 		return ZEND_DYNAMIC_PROPERTY_OFFSET
 	}
@@ -545,7 +545,7 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 				retval = rv
 				if !(rv.IsRef()) && (typ == BP_VAR_W || typ == BP_VAR_RW || typ == BP_VAR_UNSET) {
 					if !rv.IsObject() {
-						faults.Error(faults.E_NOTICE, "Indirect modification of overloaded property %s::$%s has no effect", zobj.GetCe().Name(), name.GetVal())
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Indirect modification of overloaded property %s::$%s has no effect", zobj.GetCe().Name(), name.GetVal()))
 					}
 				}
 			} else {
@@ -571,7 +571,7 @@ uninit_error:
 		if prop_info != nil {
 			faults.ThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name.GetVal())
 		} else {
-			faults.Error(faults.E_NOTICE, "Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal())
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal()))
 		}
 	}
 	retval = UninitializedZval()
@@ -781,7 +781,7 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.Object, member *types.Zval, type_ in
 						retval = EG__().GetErrorZval()
 					} else {
 						retval.SetNull()
-						faults.Error(faults.E_NOTICE, "Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal())
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal()))
 					}
 				}
 			} else {
@@ -807,7 +807,7 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.Object, member *types.Zval, type_ in
 			 * being overwritten in an error handler. */
 
 			if type_ == BP_VAR_RW || type_ == BP_VAR_R {
-				faults.Error(faults.E_NOTICE, "Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal())
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal()))
 			}
 
 			/* Notice is thrown after creation of the property, to avoid EG(std_property_info)
@@ -1399,17 +1399,17 @@ func ZendStdCastObject(obj *types.Object, retval *types.Zval, typ types.ZvalType
 		return types.SUCCESS
 	case types.IsLong:
 		className := obj.GetCe().Name()
-		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to int", className)
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Object of class %s could not be converted to int", className))
 		retval.SetLong(1)
 		return types.SUCCESS
 	case types.IsDouble:
 		className := obj.GetCe().Name()
-		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to float", className)
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Object of class %s could not be converted to float", className))
 		retval.SetDouble(1)
 		return types.SUCCESS
 	case types.IsNumber:
 		className := obj.GetCe().Name()
-		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to number", className)
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Object of class %s could not be converted to number", className))
 		retval.SetLong(1)
 		return types.SUCCESS
 	default:

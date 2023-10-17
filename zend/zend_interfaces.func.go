@@ -147,7 +147,7 @@ func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *types.Zval) {
 		ZVAL_ZVAL(key, &retval, 1, 1)
 	} else {
 		if EG__().NoException() {
-			faults.Error(faults.E_WARNING, "Nothing returned from %s::key()", iter.GetCe().Name())
+			faults.Error(faults.E_WARNING, fmt.Sprintf("Nothing returned from %s::key()", iter.GetCe().Name()))
 		}
 		key.SetLong(0)
 	}

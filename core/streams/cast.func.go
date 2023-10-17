@@ -154,7 +154,7 @@ exit_success:
 		 * will be accessing the stream.  Emit a warning so that the end-user will
 		 * know that they should try something else */
 
-		core.PhpErrorDocref("", faults.E_WARNING, zend.ZEND_LONG_FMT+" bytes of buffered data lost during stream conversion!", zend_long(stream.GetWritepos()-stream.GetReadpos()))
+		core.PhpErrorDocref("", faults.E_WARNING, "%d bytes of buffered data lost during stream conversion!", zend_long(stream.GetWritepos()-stream.GetReadpos()))
 
 		/* the data we have buffered will be lost to the third party library that
 		 * will be accessing the stream.  Emit a warning so that the end-user will

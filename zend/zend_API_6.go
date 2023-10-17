@@ -26,7 +26,7 @@ func ModuleDestructor(module *ModuleEntry) {
 func ZendActivateModules() {
 	G().EachModuleReserve(func(module *ModuleEntry) {
 		if !module.RequestStartup() {
-			faults.Error(faults.E_WARNING, "request_startup() for %s module failed", module.Name())
+			faults.Error(faults.E_WARNING, fmt.Sprintf("request_startup() for %s module failed", module.Name()))
 			exit(1)
 		}
 	})
@@ -49,7 +49,7 @@ func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry) bool {
 	return CG__().ClassTable().Add(name, ce)
 }
 func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *types.Zval) {
-	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", CurrEX().FunctionName())
+	faults.Error(faults.E_WARNING, fmt.Sprintf("%s() has been disabled for security reasons", CurrEX().FunctionName()))
 }
 func ZendDisableFunction(functionName string) int {
 	f := CG__().FunctionTable().Get(functionName)

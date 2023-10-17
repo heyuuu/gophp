@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -110,7 +111,12 @@ send_again:
 					}
 				}
 				if ARG_MUST_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
-					faults.Error(faults.E_WARNING, "Cannot pass by-reference argument %d of %s%s%s()"+" by unpacking a Traversable, passing by-value instead", arg_num, b.CondF1(executeData.GetCall().func_.common.scope, func() []byte { return executeData.GetCall().func_.common.scope.name.GetVal() }, ""), b.Cond(executeData.GetCall().func_.common.scope, "::", ""), executeData.GetCall().func_.common.function_name.GetVal())
+					var scopePrefix string
+					if executeData.GetCall().GetFunc().GetScope() != nil {
+						scopePrefix = executeData.GetCall().GetFunc().GetScope().Name() + "::"
+					}
+
+					faults.Error(faults.E_WARNING, fmt.Sprintf("Cannot pass by-reference argument %d of %s%s() by unpacking a Traversable, passing by-value instead", arg_num, scopePrefix, executeData.GetCall().FunctionName()))
 				}
 				arg = types.ZVAL_DEREF(arg)
 				// arg.TryAddRefcount()

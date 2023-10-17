@@ -187,9 +187,8 @@ func ErrorAt(typ int, filename *string, lineno uint32, format string, args ...an
 	message := zend.ZendSprintf(format, args...)
 	errorVaList(typ, filenameStr, lineno, message)
 }
-func Error(typ int, format string, args ...any) {
+func Error(typ int, message string) {
 	filename, lineno := getFilenameLineno(typ)
-	message := zend.ZendSprintf(format, args...)
 	errorVaList(typ, filename, lineno, message)
 }
 func ErrorAtNoreturn(typ int, filename *string, lineno uint32, format string, args ...any) {

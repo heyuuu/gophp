@@ -971,7 +971,7 @@ func ApPhpSlprintf(buf *byte, len_ int, format *byte, _ ...any) int {
 	}
 	return cc
 }
-func ApPhpSnprintf(buf *byte, len_ int, format *byte, _ ...any) int {
+func ApPhpSnprintf(buf *byte, len_ int, format string, _ ...any) int {
 	var cc int
 	var ap va_list
 	va_start(ap, format)

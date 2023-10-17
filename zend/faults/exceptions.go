@@ -490,7 +490,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 	}
 	trace.Array().Foreach(func(key types.ArrayKey, frame *types.Zval) {
 		if !frame.IsArray() {
-			Error(E_WARNING, "Expected array for frame "+zend.ZEND_ULONG_FMT, key.IdxKey())
+			Error(E_WARNING, fmt.Sprintf("Expected array for frame %d", key.IdxKey()))
 			return
 		}
 		_buildTraceString(&str, frame.Array(), lang.PostInc(&num))
@@ -540,9 +540,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 			message = real_message
 		}
 		if message.GetLen() > 0 {
-			str = zend.ZendSprintfZStr("%s: %s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), message.GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = zend.ZendSprintfZStr("%s: %s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), message.GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		} else {
-			str = zend.ZendSprintfZStr("%s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = zend.ZendSprintfZStr("%s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() []byte { return trace.StringEx().GetVal() }, "#0 {main}\n"), lang.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		}
 		exception.Object().ProtectRecursive()
 		exception = GET_PROPERTY(exception, types.STR_PREVIOUS, &rv)

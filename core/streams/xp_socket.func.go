@@ -67,7 +67,7 @@ retry:
 			}
 		}
 		estr = core.PhpSocketStrerror(err, nil, 0)
-		core.PhpErrorDocref("", faults.E_NOTICE, "send of "+zend.ZEND_LONG_FMT+" bytes failed with errno=%d %s", zend.ZendLong(count), err, estr)
+		core.PhpErrorDocref("", faults.E_NOTICE, "send of %d bytes failed with errno=%d %s", zend.ZendLong(count), err, estr)
 		zend.Efree(estr)
 	}
 	if didwrite > 0 {

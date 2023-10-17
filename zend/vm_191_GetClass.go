@@ -15,7 +15,7 @@ func ZEND_GET_CLASS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 			if op1.IsObject() {
 				opline.Result().SetString(types.Z_OBJCE_P(op1).Name())
 			} else {
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.Type()))
+				faults.Error(faults.E_WARNING, fmt.Sprintf("get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.Type())))
 				opline.Result().SetFalse()
 			}
 			break
@@ -40,7 +40,7 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 				if op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1(executeData)
 				}
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.Type()))
+				faults.Error(faults.E_WARNING, fmt.Sprintf("get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.Type())))
 				opline.Result().SetFalse()
 			}
 			break
@@ -79,7 +79,7 @@ func ZEND_GET_CLASS_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				if op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1(executeData)
 				}
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.Type()))
+				faults.Error(faults.E_WARNING, fmt.Sprintf("get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.Type())))
 				opline.Result().SetFalse()
 			}
 			break

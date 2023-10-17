@@ -84,7 +84,7 @@ func ZifFuncGetArg(executeData zpp.Ex, returnValue zpp.Ret, argNum int) {
 
 	argCount := ex.NumArgs()
 	if argNum >= argCount {
-		faults.Error(faults.E_WARNING, "func_get_arg():  Argument "+ZEND_LONG_FMT+" not passed to function", argNum)
+		faults.Error(faults.E_WARNING, fmt.Sprintf("func_get_arg():  Argument %d not passed to function", argNum))
 		returnValue.SetFalse()
 		return
 	}
@@ -825,7 +825,7 @@ func ZifSetErrorHandler(returnValue zpp.Ret, errorHandler *types.Zval, _ zpp.Opt
 	if !errorHandler.IsNull() {
 		if !IsCallable(errorHandler, nil, 0) {
 			var errorHandlerName = GetCallableName(errorHandler, nil)
-			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", CurrEX().FunctionName(), lang.CondF1(errorHandlerName != "", func() string { return errorHandlerName }, "unknown"))
+			faults.Error(faults.E_WARNING, fmt.Sprintf("%s() expects the argument (%s) to be a valid callback", CurrEX().FunctionName(), lang.CondF1(errorHandlerName != "", func() string { return errorHandlerName }, "unknown")))
 			return
 		}
 	}
@@ -848,7 +848,7 @@ func ZifSetExceptionHandler(exceptionHandler *types.Zval) *types.Zval {
 	if !exceptionHandler.IsNull() {
 		if !IsCallable(exceptionHandler, nil, 0) {
 			var exceptionHandlerName = GetCallableName(exceptionHandler, nil)
-			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", CurrEX().FunctionName(), lang.CondF1(exceptionHandlerName != "", func() string { return exceptionHandlerName }, "unknown"))
+			faults.Error(faults.E_WARNING, fmt.Sprintf("%s() expects the argument (%s) to be a valid callback", CurrEX().FunctionName(), lang.CondF1(exceptionHandlerName != "", func() string { return exceptionHandlerName }, "unknown")))
 			return returnValue
 		}
 	}
@@ -948,7 +948,7 @@ func ZifGetResources(_ zpp.Opt, type_ *string) (*types.Array, bool) {
 	} else {
 		var id = ZendFetchListDtorId(*type_)
 		if id <= 0 {
-			faults.Error(faults.E_WARNING, "get_resources():  Unknown resource type '%s'", *type_)
+			faults.Error(faults.E_WARNING, fmt.Sprintf("get_resources():  Unknown resource type '%s'", *type_))
 			return nil, false
 		}
 		// pass

@@ -83,10 +83,10 @@ func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *typ
 	return ht
 }
 func ZendUndefinedOffset(lval ZendLong) {
-	faults.Error(faults.E_NOTICE, "Undefined offset: "+ZEND_LONG_FMT, lval)
+	faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined offset: %d", lval))
 }
 func ZendUndefinedIndex(offset *types.String) {
-	faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.GetVal())
+	faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.GetVal()))
 }
 func ZendUndefinedOffsetWrite(ht *types.Array, lval ZendLong) int {
 	/* The array may be destroyed while throwing the notice.
@@ -124,13 +124,13 @@ func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
 }
 func ZendNonStaticMethodCall(fbc types.IFunction) {
 	if fbc.IsAllowStatic() {
-		faults.Error(faults.E_DEPRECATED, "Non-static method %s::%s() should not be called statically", fbc.GetScope().Name(), fbc.FunctionName())
+		faults.Error(faults.E_DEPRECATED, fmt.Sprintf("Non-static method %s::%s() should not be called statically", fbc.GetScope().Name(), fbc.FunctionName()))
 	} else {
 		faults.ThrowError(faults.ZendCeError, "Non-static method %s::%s() cannot be called statically", fbc.GetScope().Name(), fbc.FunctionName())
 	}
 }
 func ZendParamMustBeRef(func_ types.IFunction, arg_num uint32) {
-	faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", arg_num, lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
+	faults.Error(faults.E_WARNING, fmt.Sprintf("Parameter %d to %s%s%s() expected to be a reference, value given", arg_num, lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName()))
 }
 func ZendUseScalarAsArray() {
 	faults.Error(faults.E_WARNING, "Cannot use a scalar value as an array")
@@ -139,7 +139,7 @@ func ZendCannotAddElement() {
 	faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 }
 func ZendUseResourceAsOffset(dim *types.Zval) {
-	faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", dim.ResourceHandle(), dim.ResourceHandle())
+	faults.Error(faults.E_NOTICE, fmt.Sprintf("Resource ID#%d used as offset, casting to integer (%d)", dim.ResourceHandle(), dim.ResourceHandle()))
 }
 func ZendUseNewElementForString() {
 	faults.ThrowError(nil, "[] operator not supported for strings")
@@ -376,7 +376,7 @@ func ZendFetchDimensionAddress(
 		if retval == UninitializedZval() {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(container)
 			result.SetNull()
-			faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.Name())
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Indirect modification of overloaded element of %s has no effect", ce.Name()))
 		} else if retval != nil && retval.IsNotUndef() {
 			if !(retval.IsRef()) {
 				if result != retval {
@@ -385,7 +385,7 @@ func ZendFetchDimensionAddress(
 				}
 				if !retval.IsObject() {
 					var ce *types.ClassEntry = types.Z_OBJCE_P(container)
-					faults.Error(faults.E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.Name())
+					faults.Error(faults.E_NOTICE, fmt.Sprintf("Indirect modification of overloaded element of %s has no effect", ce.Name()))
 				}
 			}
 			if result != retval {

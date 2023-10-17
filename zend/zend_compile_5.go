@@ -410,15 +410,15 @@ func (compiler *Compiler) CompileDeclare(ast *ZendAst) {
 			// todo 触发不支持 ticks 的 warning
 		} else if ascii.StrCaseEquals(name.GetStr(), "encoding") {
 			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Encoding declaration pragma must be "+"the very first statement in the script")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Encoding declaration pragma must be the very first statement in the script")
 			}
 		} else if ascii.StrCaseEquals(name.GetStr(), "strict_types") {
 			var value_zv types.Zval
 			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must be "+"the very first statement in the script")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must be the very first statement in the script")
 			}
 			if ast.Child(1) != nil {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must not "+"use block mode")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must not use block mode")
 			}
 			compiler.ConstExprToZval(&value_zv, value_ast)
 			if !value_zv.IsLong() || value_zv.Long() != 0 && value_zv.Long() != 1 {
@@ -428,7 +428,7 @@ func (compiler *Compiler) CompileDeclare(ast *ZendAst) {
 				CG__().GetActiveOpArray().SetIsStrictTypes(true)
 			}
 		} else {
-			faults.Error(faults.E_COMPILE_WARNING, "Unsupported declare '%s'", name.GetVal())
+			faults.Error(faults.E_COMPILE_WARNING, fmt.Sprintf("Unsupported declare '%s'", name.GetVal()))
 		}
 	}
 	if stmt_ast != nil {
@@ -566,33 +566,33 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 			if type_ast.Kind() == ZEND_AST_TYPE {
 				if arg_info.GetType().Code() == types.IsArray {
 					if default_ast != nil && has_null_default == 0 && default_node.GetConstant().Type() != types.IsArray && default_node.GetConstant().Type() != types.IsConstantAst {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with array type can only be an array or NULL")
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters with array type can only be an array or NULL")
 					}
 				} else if arg_info.GetType().Code() == types.IsCallable && default_ast != nil {
 					if has_null_default == 0 && default_node.GetConstant().Type() != types.IsConstantAst {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with callable type can only be NULL")
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters with callable type can only be NULL")
 					}
 				}
 			} else {
 				if default_ast != nil && has_null_default == 0 && default_node.GetConstant().Type() != types.IsConstantAst {
 					if arg_info.GetType().IsClass() {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a class type can only be NULL")
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters with a class type can only be NULL")
 					} else {
 						switch arg_info.GetType().Code() {
 						case types.IsDouble:
 							if default_node.GetConstant().Type() != types.IsDouble && default_node.GetConstant().Type() != types.IsLong {
-								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a float type can only be float, integer, or NULL")
+								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters with a float type can only be float, integer, or NULL")
 							}
 							operators.ConvertToDouble(default_node.GetConstant())
 						case types.IsIterable:
 							if default_node.GetConstant().Type() != types.IsArray {
-								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with iterable type can only be an array or NULL")
+								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters with iterable type can only be an array or NULL")
 							}
 						case types.IsObject:
-							faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with an object type can only be NULL")
+							faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters with an object type can only be NULL")
 						default:
 							if !(types.ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), default_node.GetConstant().Type())) {
-								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", types.ZendGetTypeByConst(arg_info.GetType().Code()), types.ZendGetTypeByConst(arg_info.GetType().Code()))
+								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters with a %s type can only be %s or NULL", types.ZendGetTypeByConst(arg_info.GetType().Code()), types.ZendGetTypeByConst(arg_info.GetType().Code()))
 							}
 						}
 					}

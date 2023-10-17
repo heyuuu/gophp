@@ -164,7 +164,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	var lcname *types.String
 	if in_interface != 0 {
 		if is_public == 0 || op_array.HasFnFlags(types.AccFinal|types.AccAbstract) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface method "+"%s::%s() must be omitted", ce.Name(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface method %s::%s() must be omitted", ce.Name(), name.GetVal())
 		}
 		op_array.SetIsAbstract(true)
 	}
@@ -191,39 +191,39 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 
 		} else if lcname.GetStr() == ZEND_CALL_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __call() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __call() must have public visibility and cannot be static")
 			}
 		} else if lcname.GetStr() == ZEND_CALLSTATIC_FUNC_NAME {
 			if is_public == 0 || is_static == 0 {
-				faults.Error(faults.E_WARNING, "The magic method __callStatic() must have "+"public visibility and be static")
+				faults.Error(faults.E_WARNING, "The magic method __callStatic() must have public visibility and be static")
 			}
 		} else if lcname.GetStr() == ZEND_GET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __get() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __get() must have public visibility and cannot be static")
 			}
 		} else if lcname.GetStr() == ZEND_SET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __set() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __set() must have public visibility and cannot be static")
 			}
 		} else if lcname.GetStr() == ZEND_UNSET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __unset() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __unset() must have public visibility and cannot be static")
 			}
 		} else if lcname.GetStr() == ZEND_ISSET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __isset() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __isset() must have public visibility and cannot be static")
 			}
 		} else if lcname.GetStr() == ZEND_TOSTRING_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __toString() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __toString() must have public visibility and cannot be static")
 			}
 		} else if lcname.GetStr() == ZEND_INVOKE_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __invoke() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __invoke() must have public visibility and cannot be static")
 			}
 		} else if lcname.GetStr() == ZEND_DEBUGINFO_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __debugInfo() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __debugInfo() must have public visibility and cannot be static")
 			}
 		}
 	} else {
@@ -253,50 +253,50 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 			ce.SetClone((types.IFunction)(op_array))
 		} else if lcname.GetStr() == ZEND_CALL_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __call() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __call() must have public visibility and cannot be static")
 			}
 			ce.SetCall((types.IFunction)(op_array))
 		} else if lcname.GetStr() == ZEND_CALLSTATIC_FUNC_NAME {
 			if is_public == 0 || is_static == 0 {
-				faults.Error(faults.E_WARNING, "The magic method __callStatic() must have "+"public visibility and be static")
+				faults.Error(faults.E_WARNING, "The magic method __callStatic() must have public visibility and be static")
 			}
 			ce.SetCallstatic((types.IFunction)(op_array))
 		} else if lcname.GetStr() == ZEND_GET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __get() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __get() must have public visibility and cannot be static")
 			}
 			ce.SetGet((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
 		} else if lcname.GetStr() == ZEND_SET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __set() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __set() must have public visibility and cannot be static")
 			}
 			ce.SetSet((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
 		} else if lcname.GetStr() == ZEND_UNSET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __unset() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __unset() must have public visibility and cannot be static")
 			}
 			ce.SetUnset((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
 		} else if lcname.GetStr() == ZEND_ISSET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __isset() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __isset() must have public visibility and cannot be static")
 			}
 			ce.SetIsset((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
 		} else if lcname.GetStr() == ZEND_TOSTRING_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __toString() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __toString() must have public visibility and cannot be static")
 			}
 			ce.SetTostring((types.IFunction)(op_array))
 		} else if lcname.GetStr() == ZEND_INVOKE_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __invoke() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __invoke() must have public visibility and cannot be static")
 			}
 		} else if lcname.GetStr() == ZEND_DEBUGINFO_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
-				faults.Error(faults.E_WARNING, "The magic method __debugInfo() must have "+"public visibility and cannot be static")
+				faults.Error(faults.E_WARNING, "The magic method __debugInfo() must have public visibility and cannot be static")
 			}
 			ce.SetDebugInfo((types.IFunction)(op_array))
 		} else if is_static == 0 {
@@ -319,7 +319,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	if FC__().HasImportsFunction() {
 		var importName = FC__().FindImportFunction(unqualified_name.GetStr())
 		if importName != "" && !(ascii.StrCaseEquals(lcname.GetStr(), importName)) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare function %s "+"because the name is already in use", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare function %s because the name is already in use", name.GetVal())
 		}
 	}
 	if lcname.GetStr() == ZEND_AUTOLOAD_FUNC_NAME {
@@ -329,7 +329,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 		faults.Error(faults.E_DEPRECATED, "__autoload() is deprecated, use spl_autoload_register() instead")
 	}
 	if ascii.StrCaseEquals(unqualified_name.GetStr(), "assert") {
-		faults.Error(faults.E_DEPRECATED, "Defining a custom assert() function is deprecated, "+"as the function has special semantics")
+		faults.Error(faults.E_DEPRECATED, "Defining a custom assert() function is deprecated, as the function has special semantics")
 	}
 	FC__().RegisterSeenSymbol(lcname.GetStr(), ZEND_SYMBOL_FUNCTION)
 	if toplevel != 0 {
@@ -493,7 +493,7 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 			doc_comment = ZendAstGetStr(doc_comment_ast).Copy()
 		}
 		if (flags & types.AccFinal) != 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare property %s::$%s final, "+"the final modifier is allowed only for methods and classes", ce.Name(), name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare property %s::$%s final, the final modifier is allowed only for methods and classes", ce.Name(), name.GetVal())
 		}
 		if ce.PropertyTable().Exists(name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::$%s", ce.Name(), name.GetVal())
@@ -641,7 +641,7 @@ func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 	for _, traitAst := range traits.Children() {
 		var name = ZendAstGetStr(traitAst)
 		if ce.IsInterface() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use traits inside of interfaces. "+"%s is used in %s", name.GetVal(), ce.Name())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use traits inside of interfaces. %s is used in %s", name.GetVal(), ce.Name())
 		}
 		switch ZendGetClassFetchType(name.GetStr()) {
 		case ZEND_FETCH_CLASS_SELF:
@@ -649,7 +649,7 @@ func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 		case ZEND_FETCH_CLASS_PARENT:
 			fallthrough
 		case ZEND_FETCH_CLASS_STATIC:
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as trait name "+"as it is reserved", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as trait name as it is reserved", name.GetVal())
 		}
 		ce.AddTraitName(ZendResolveClassNameAst(traitAst).GetStr())
 	}
@@ -711,7 +711,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 		if FC__().HasImports() {
 			importName := FC__().FindImport(unqualified_name.GetStr())
 			if importName != "" && !(ascii.StrCaseEquals(lcname.GetStr(), importName)) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare class %s "+"because the name is already in use", name.GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare class %s because the name is already in use", name.GetVal())
 			}
 		}
 		FC__().RegisterSeenSymbol(lcname.GetStr(), ZEND_SYMBOL_CLASS)

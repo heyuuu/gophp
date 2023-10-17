@@ -348,7 +348,7 @@ func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, offset *types.Zva
 	if isStrKey {
 		if ht == zend.EG__().GetSymbolTable() {
 			if !zend.ZendDeleteGlobalVariable(strKey) {
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", strKey))
 			}
 		} else {
 			numericKey := types.NumericKey(strKey)
@@ -357,7 +357,7 @@ func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, offset *types.Zva
 				if data.IsIndirect() {
 					data = data.Indirect()
 					if data.IsUndef() {
-						faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", strKey))
 					} else {
 						data.SetUndef()
 						ht.MarkHasEmptyIndex()
@@ -367,15 +367,15 @@ func (o *ZicArrayObject) unsetDimensionEx(checkInherited bool, offset *types.Zva
 						}
 					}
 				} else if ht.SymtableDel(strKey) == false {
-					faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+					faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", strKey))
 				}
 			} else {
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", strKey))
 			}
 		}
 	} else {
 		if !ht.IndexDelete(index) {
-			faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined offset: %d", index))
 		}
 	}
 }
@@ -462,7 +462,7 @@ func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zva
 		isStrKey = true
 		strKey = offset.String()
 	case types.IsResource:
-		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle())
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle()))
 		index = offset.ResourceHandle()
 	case types.IsDouble:
 		index = zend.ZendLong(offset.Double())
@@ -489,14 +489,14 @@ func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zva
 				if retval.IsUndef() {
 					switch typ {
 					case zend.BP_VAR_R:
-						faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", strKey))
 						fallthrough
 					case zend.BP_VAR_UNSET:
 						fallthrough
 					case zend.BP_VAR_IS:
 						retval = zend.UninitializedZval()
 					case zend.BP_VAR_RW:
-						faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", strKey))
 						fallthrough
 					case zend.BP_VAR_W:
 						retval.SetNull()
@@ -506,14 +506,14 @@ func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zva
 		} else {
 			switch typ {
 			case zend.BP_VAR_R:
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", strKey))
 				fallthrough
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
 				retval = zend.UninitializedZval()
 			case zend.BP_VAR_RW:
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", strKey)
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", strKey))
 				fallthrough
 			case zend.BP_VAR_W:
 				var value types.Zval
@@ -526,14 +526,14 @@ func (o *ZicArrayObject) getDimensionPtr(offset *types.Zval, typ int) *types.Zva
 		if b.Assign(&retval, ht.IndexFind(index)) == nil {
 			switch typ {
 			case zend.BP_VAR_R:
-				faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined offset: %d", index))
 				fallthrough
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
 				retval = zend.UninitializedZval()
 			case zend.BP_VAR_RW:
-				faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined offset: %d", index))
 				fallthrough
 			case zend.BP_VAR_W:
 				var value types.Zval

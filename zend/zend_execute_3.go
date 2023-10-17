@@ -136,10 +136,10 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 }
 func ZendWrongPropertyRead(property *types.Zval) {
 	var property_name *types.String = operators.ZvalGetString(property)
-	faults.Error(faults.E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
+	faults.Error(faults.E_NOTICE, fmt.Sprintf("Trying to get property '%s' of non-object", property_name.GetVal()))
 }
 func ZendDeprecatedFunction(fbc types.IFunction) {
-	faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", lang.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().Name() }, ""), lang.Cond(fbc.GetScope() != nil, "::", ""), fbc.FunctionName())
+	faults.Error(faults.E_DEPRECATED, fmt.Sprintf("Function %s%s%s() is deprecated", lang.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().Name() }, ""), lang.Cond(fbc.GetScope() != nil, "::", ""), fbc.FunctionName()))
 }
 func ZendAbstractMethod(fbc types.IFunction) {
 	faults.ThrowError(nil, "Cannot call abstract method %s::%s()", fbc.GetScope().Name(), fbc.FunctionName())
@@ -157,7 +157,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 	}
 	if offset < -ZendLong(str.StringEx().GetLen()) {
 
-		faults.Error(faults.E_WARNING, "Illegal string offset:  "+ZEND_LONG_FMT, offset)
+		faults.Error(faults.E_WARNING, fmt.Sprintf("Illegal string offset:  %d", offset))
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetNull()
 		}

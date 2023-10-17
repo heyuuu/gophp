@@ -98,7 +98,7 @@ func OnChangeMemoryLimit(
 		 * shut down and the minimal amount of memory is used. */
 
 		if stage != zend.ZEND_INI_STAGE_DEACTIVATE {
-			faults.Error(faults.E_WARNING, "Failed to set memory limit to %zd bytes (Current memory usage is %zd bytes)", value, zend.ZendMemoryUsage(true))
+			faults.Error(faults.E_WARNING, fmt.Sprintf("Failed to set memory limit to %zd bytes (Current memory usage is %zd bytes)", value, zend.ZendMemoryUsage(true)))
 			return types.FAILURE
 		}
 
@@ -1316,7 +1316,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 			for _, p := range directive.directives {
 				var value zend.ZendLong
 				if CfgGetLong(p, &value) == types.SUCCESS && value != 0 {
-					faults.Error(directive.error_level, directive.phrase, p)
+					faults.Error(directive.error_level, fmt.Sprintf(directive.phrase, p))
 				}
 			}
 		}

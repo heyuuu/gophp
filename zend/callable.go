@@ -366,7 +366,7 @@ func isCallableCheckFunc(checkFlags uint32, callableName string, fcc *types.Zend
 					if severity == faults.E_ERROR {
 						faults.ThrowError(nil, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().FunctionName(), verb)
 					} else {
-						faults.Error(severity, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().FunctionName(), verb)
+						faults.Error(severity, fmt.Sprintf("Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().Name(), fcc.GetFunctionHandler().FunctionName(), verb))
 					}
 				}
 			}

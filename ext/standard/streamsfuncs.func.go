@@ -395,7 +395,7 @@ func ZifStreamGetContents(executeData zpp.Ex, return_value zpp.Ret, source *type
 
 		}
 		if seek_res != 0 {
-			core.PhpErrorDocref("", faults.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", desiredpos)
+			core.PhpErrorDocref("", faults.E_WARNING, "Failed to seek to position %d in the stream", desiredpos)
 			return_value.SetFalse()
 			return
 		}
@@ -436,7 +436,7 @@ func ZifStreamCopyToStream(executeData zpp.Ex, return_value zpp.Ret, source *typ
 	core.PhpStreamFromZval(src, zsrc)
 	core.PhpStreamFromZval(dest, zdest)
 	if pos > 0 && core.PhpStreamSeek(src, pos, r.SEEK_SET) < 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", pos)
+		core.PhpErrorDocref("", faults.E_WARNING, "Failed to seek to position %d in the stream", pos)
 		return_value.SetFalse()
 		return
 	}
@@ -1411,7 +1411,7 @@ func ZifStreamSetChunkSize(executeData zpp.Ex, return_value zpp.Ret, fp *types.Z
 		break
 	}
 	if csize <= 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "The chunk size must be a positive integer, given "+zend.ZEND_LONG_FMT, csize)
+		core.PhpErrorDocref("", faults.E_WARNING, "The chunk size must be a positive integer, given %d", csize)
 		return_value.SetFalse()
 		return
 	}

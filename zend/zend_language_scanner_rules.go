@@ -197,7 +197,7 @@ func (sc *LangScanner) lexerRule17() (int, bool) {
 	if sc.canRead() {
 		sc.skip()
 	} else if !sc.heredocScanAhead {
-		faults.Error(faults.E_COMPILE_WARNING, "Unterminated comment starting line %d", CG__().zend_lineno)
+		faults.Error(faults.E_COMPILE_WARNING, fmt.Sprintf("Unterminated comment starting line %d", CG__().zend_lineno))
 	}
 
 	sc.resetLen()
@@ -681,7 +681,7 @@ func (sc *LangScanner) lexerRule27() (int, bool) {
 		return sc.token(END)
 	}
 	if !sc.heredocScanAhead {
-		faults.Error(faults.E_COMPILE_WARNING, "Unexpected character in input:  '%c' (ASCII=%d) state=%d", sc.yyText0(), sc.yyText0(), sc.state)
+		faults.Error(faults.E_COMPILE_WARNING, fmt.Sprintf("Unexpected character in input:  '%c' (ASCII=%d) state=%d", sc.yyText0(), sc.yyText0(), sc.state))
 	}
 	if sc.isParserMode() {
 		return 0, true

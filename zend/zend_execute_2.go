@@ -395,7 +395,7 @@ func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteD
 				break
 			}
 			if type_ != BP_VAR_UNSET {
-				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.StringEx().GetVal())
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Illegal string offset '%s'", dim.StringEx().GetVal()))
 			}
 		case types.IsUndef:
 			ZVAL_UNDEFINED_OP2(executeData)

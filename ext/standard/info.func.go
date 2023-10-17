@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -11,6 +12,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strconv"
 )
 
 func SECTION(name string) {
@@ -27,17 +29,8 @@ func PhpInfoPrintHtmlEsc(str *byte, len_ int) int {
 	return core.OG__().WriteString(newStr)
 }
 
-func PhpInfoPrintf(fmt string, _ ...any) int {
-	var buf *byte
-	var len_ int
-	var written int
-	var argv va_list
-	va_start(argv, fmt)
-	len_ = core.Vspprintf(&buf, 0, fmt, argv)
-	va_end(argv)
-	written = core.OG__().Write(b.CastBytes(buf, len_))
-	zend.Efree(buf)
-	return written
+func PhpInfoPrintf(fmt string, args ...any) int {
+	return core.OG__().WriteString(pfmt.Sprintf(fmt, args...))
 }
 func PhpInfoPrint(str string) int {
 	return core.OG__().WriteString(str)
@@ -133,7 +126,7 @@ func PhpPrintGpcseArray(name string) {
 					PhpInfoPrint(string_key.GetVal())
 				}
 			} else {
-				PhpInfoPrintf(zend.ZEND_ULONG_FMT, num_key)
+				PhpInfoPrintf(strconv.Itoa(int(num_key)))
 			}
 			PhpInfoPrint("']")
 			if core.SM__().GetPhpinfoAsText() == 0 {

@@ -130,7 +130,7 @@ func PhpPasswordBcryptGetInfo(hash string) *types.Array {
 		return nil
 	}
 
-	sscanf(hash, "$2y$"+zend.ZEND_LONG_FMT+"$", &cost)
+	sscanf(hash, "$2y$%d$", &cost)
 	arr := types.NewArray()
 	arr.KeyAdd("cost", types.NewZvalLong(cost))
 	return arr
@@ -143,7 +143,7 @@ func PhpPasswordBcryptNeedsRehash(hash string, options *types.Array) bool {
 		/* Should never get called this way. */
 		return true
 	}
-	sscanf(hash, "$2y$"+zend.ZEND_LONG_FMT+"$", &old_cost)
+	sscanf(hash, "$2y$%d$", &old_cost)
 	if options != nil && b.Assign(&znew_cost, options.KeyFind("cost")) != nil {
 		new_cost = operators.ZvalGetLong(znew_cost)
 	}
@@ -173,7 +173,7 @@ func PhpPasswordBcryptHash(password string, options *types.Array) (string, bool)
 		cost = operators.ZvalGetLong(zcost)
 	}
 	if cost < 4 || cost > 31 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Invalid bcrypt cost parameter specified: "+zend.ZEND_LONG_FMT, cost)
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid bcrypt cost parameter specified: %d", cost)
 		return "", false
 	}
 	hashFormat := fmt.Sprintf("$2y$%02d$", cost)

@@ -297,7 +297,7 @@ func SplRecursiveItGetIterator(ce *types.ClassEntry, zobject *types.Zval, by_ref
 	iterator = zend.Emalloc(b.SizeOf("spl_recursive_it_iterator"))
 	object = Z_SPLRECURSIVE_IT_P(zobject)
 	if object.GetIterators() == nil {
-		faults.Error(faults.E_ERROR, "The object to be iterated is in an invalid state: "+"the parent constructor has not been called")
+		faults.Error(faults.E_ERROR, "The object to be iterated is in an invalid state: the parent constructor has not been called")
 	}
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	// 	zobject.AddRefcount()
@@ -1008,7 +1008,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 			return nil
 		}
 		if mode < 0 || mode >= REGIT_MODE_MAX {
-			faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Illegal mode "+zend.ZEND_LONG_FMT, mode)
+			faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Illegal mode %d", mode)
 			return nil
 		}
 		intern.SetMode(mode)
@@ -1515,7 +1515,7 @@ func zim_spl_RegexIterator_setMode(executeData *zend.ZendExecuteData, return_val
 		return
 	}
 	if mode < 0 || mode >= REGIT_MODE_MAX {
-		faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Illegal mode "+zend.ZEND_LONG_FMT, mode)
+		faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Illegal mode %d", mode)
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(executeData.ThisObjectZval())
@@ -1698,11 +1698,11 @@ func SplLimitItSeek(intern *SplDualItObject, pos zend.ZendLong) {
 	var zpos types.Zval
 	SplDualItFree(intern)
 	if pos < intern.GetOffset() {
-		faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Cannot seek to "+zend.ZEND_LONG_FMT+" which is below the offset "+zend.ZEND_LONG_FMT, pos, intern.GetOffset())
+		faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Cannot seek to %d which is below the offset %d", pos, intern.GetOffset())
 		return
 	}
 	if pos >= intern.GetOffset()+intern.GetCount() && intern.GetCount() != -1 {
-		faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Cannot seek to "+zend.ZEND_LONG_FMT+" which is behind offset "+zend.ZEND_LONG_FMT+" plus count "+zend.ZEND_LONG_FMT, pos, intern.GetOffset(), intern.GetCount())
+		faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Cannot seek to "+"%d which is behind offset %d plus count %d", pos, intern.GetOffset(), intern.GetCount())
 		return
 	}
 	if pos != intern.GetPos() && operators.InstanceofFunction(intern.GetCe(), spl_ce_SeekableIterator) != 0 {
@@ -2011,7 +2011,7 @@ func zim_spl_CachingIterator_offsetGet(executeData *zend.ZendExecuteData, return
 		return
 	}
 	if lang.Assign(&value, intern.GetZcache().Array().SymtableFind(key.GetStr())) == nil {
-		faults.Error(faults.E_NOTICE, "Undefined index: %s", key.GetVal())
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", key.GetVal()))
 		return
 	}
 	types.ZVAL_COPY_DEREF(return_value, value)

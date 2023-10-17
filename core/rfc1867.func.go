@@ -523,7 +523,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 		_basename = PhpApBasename
 	}
 	if SG__().postMaxSize > 0 && SG__().RequestInfo.contentLength > SG__().postMaxSize {
-		SM__().SapiError(faults.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().RequestInfo.contentLength, SG__().postMaxSize)
+		SM__().SapiError(faults.E_WARNING, "POST Content-Length of %d bytes exceeds the limit of %d bytes", SG__().RequestInfo.contentLength, SG__().postMaxSize)
 		return
 	}
 
@@ -669,7 +669,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 					SafePhpRegisterVariable(param, value, new_val_len, array_ptr, 0)
 				} else {
 					if count == PG__().max_input_vars+1 {
-						PhpErrorDocref("", faults.E_WARNING, "Input variables exceeded "+zend.ZEND_LONG_FMT+". To increase the limit change max_input_vars in php.ini.", PG__().max_input_vars)
+						PhpErrorDocref("", faults.E_WARNING, "Input variables exceeded %d. To increase the limit change max_input_vars in php.ini.", PG__().max_input_vars)
 					}
 					if PhpRfc1867Callback != nil {
 						var event_formdata MultipartEventFormdata
@@ -1002,7 +1002,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 				file_size.SetLong(0)
 			} else {
 				if total_bytes > zend.ZEND_LONG_MAX {
-					var __len int = Snprintf(file_size_buf, 65, "%"+"lld", total_bytes)
+					var __len int = Snprintf(file_size_buf, 65, "%lld", total_bytes)
 					file_size_buf[__len] = '0'
 					size_overflow = 1
 				} else {

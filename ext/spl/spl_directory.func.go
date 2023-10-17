@@ -686,7 +686,7 @@ func zim_spl_DirectoryIterator_seek(executeData *zend.ZendExecuteData, return_va
 		valid = operators.IZendIsTrue(&retval)
 		// zend.ZvalPtrDtor(&retval)
 		if valid == 0 {
-			faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", pos)
+			faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position %d is out of range", pos)
 			return
 		}
 		zend.ZendCallMethodWith0Params(executeData.ThisObjectZval(), types.Z_OBJCE_P(executeData.ThisObjectZval()), intern.GetFuncNext(), "next", nil)
@@ -1172,7 +1172,7 @@ func zim_spl_SplFileInfo___debugInfo(executeData *zend.ZendExecuteData, return_v
 	return
 }
 func zim_spl_SplFileInfo__bad_state_ex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The parent constructor was not called: the object is in an "+"invalid state ")
+	faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The parent constructor was not called: the object is in an invalid state ")
 }
 func zim_spl_FilesystemIterator___construct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	SplFilesystemObjectConstruct(executeData, return_value, DIT_CTOR_FLAGS|SPL_FILE_DIR_SKIPDOTS)
@@ -1719,7 +1719,7 @@ func zim_spl_SplTempFileObject___construct(executeData *zend.ZendExecuteData, re
 		intern.SetFileName("php://memory")
 		intern.SetFileNameLen(12)
 	} else if executeData.NumArgs() != 0 {
-		intern.SetFileNameLen(core.Slprintf(tmp_fname, b.SizeOf("tmp_fname"), "php://temp/maxmemory:"+zend.ZEND_LONG_FMT, max_memory))
+		intern.SetFileNameLen(core.Slprintf(tmp_fname, b.SizeOf("tmp_fname"), "php://temp/maxmemory:%d", max_memory))
 		intern.SetFileName(tmp_fname)
 	} else {
 		intern.SetFileName("php://temp")
@@ -2274,7 +2274,7 @@ func zim_spl_SplFileObject_seek(executeData *zend.ZendExecuteData, return_value 
 		return
 	}
 	if line_pos < 0 {
-		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Can't seek file %s to negative line "+zend.ZEND_LONG_FMT, intern.GetFileName(), line_pos)
+		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Can't seek file %s to negative line %d", intern.GetFileName(), line_pos)
 		return_value.SetFalse()
 		return
 	}

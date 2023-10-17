@@ -125,7 +125,7 @@ func PhpUrlEncodeHashEx(
 
 				/* Is an integer key */
 
-				ekey_len = core.Spprintf(&ekey, 0, zend.ZEND_LONG_FMT, idx)
+				ekey_len = core.Spprintf(&ekey, 0, "%d", idx)
 				newprefix_len = key_prefix_len + num_prefix_len + ekey_len + key_suffix_len + 3
 				newprefix = zend.Emalloc(newprefix_len + 1)
 				p = newprefix

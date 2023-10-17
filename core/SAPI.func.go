@@ -170,7 +170,7 @@ func SapiReadStandardFormData() {
 				}
 			}
 			if SG__().postMaxSize > 0 && SG__().readPostBytes > SG__().postMaxSize {
-				PhpErrorDocref("", faults.E_WARNING, "Actual POST length does not match Content-Length, and exceeds "+zend.ZEND_LONG_FMT+" bytes", SG__().postMaxSize)
+				PhpErrorDocref("", faults.E_WARNING, "Actual POST length does not match Content-Length, and exceeds %d bytes", SG__().postMaxSize)
 				break
 			}
 			if read_bytes < SAPI_POST_BLOCK_SIZE {

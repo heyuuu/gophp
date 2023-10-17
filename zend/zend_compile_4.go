@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -554,7 +555,7 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 	if depth_ast != nil {
 		var depth_zv *types.Zval
 		if depth_ast.Kind() != ZEND_AST_ZVAL {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator with non-integer operand "+"is no longer supported", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator with non-integer operand is no longer supported", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth_zv = depth_ast.Val()
 		if !depth_zv.IsLong() || depth_zv.Long() < 1 {
@@ -568,7 +569,7 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' not in the 'loop' or 'switch' context", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"))
 	} else {
 		if !ZendHandleLoopsAndFinallyEx(depth, nil) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot '%s' "+ZEND_LONG_FMT+" level%s", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"), depth, lang.Cond(depth == 1, "", "s"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot '%s' %d level%s", lang.Cond(ast.Kind() == ZEND_AST_BREAK, "break", "continue"), depth, lang.Cond(depth == 1, "", "s"))
 		}
 	}
 	if ast.Kind() == ZEND_AST_CONTINUE {
@@ -580,9 +581,9 @@ func (compiler *Compiler) CompileBreakContinue(ast *ZendAst) {
 		}
 		if CG__().GetContext().GetBrkContArray()[cur].GetIsSwitch() != 0 {
 			if depth == 1 {
-				faults.Error(faults.E_WARNING, "\"continue\" targeting switch is equivalent to \"break\". "+"Did you mean to use \"continue "+ZEND_LONG_FMT+"\"?", depth+1)
+				faults.Error(faults.E_WARNING, fmt.Sprintf(`"continue" targeting switch is equivalent to "break". Did you mean to use "continue %d"?`, depth+1))
 			} else {
-				faults.Error(faults.E_WARNING, "\"continue "+ZEND_LONG_FMT+"\" targeting switch is equivalent to \"break "+ZEND_LONG_FMT+"\". "+"Did you mean to use \"continue "+ZEND_LONG_FMT+"\"?", depth, depth, depth+1)
+				faults.Error(faults.E_WARNING, fmt.Sprintf(`"continue %d" targeting switch is equivalent to "break %d". Did you mean to use "continue %d"?`, depth, depth, depth+1))
 			}
 		}
 	}

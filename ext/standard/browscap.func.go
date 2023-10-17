@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/kits/ascii"
@@ -117,7 +118,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 				/* parent entry can not be same as current section -> causes infinite loop! */
 
 				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), arg2.StringEx().GetVal())) {
-					faults.Error(faults.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap"))
+					faults.Error(faults.E_CORE_ERROR, fmt.Sprintf("Invalid browscap ini file: 'Parent' value cannot be same as the section name: %s (in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap")))
 					return
 				}
 				if ctx.GetCurrentEntry().GetParent() != nil {
@@ -160,7 +161,7 @@ func BrowscapReadFileEx(filename string) *BrowserData {
 	}
 	var fh = zend.NewFileHandleByOpenFile(filename)
 	if fh == nil {
-		faults.Error(faults.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
+		faults.Error(faults.E_CORE_WARNING, fmt.Sprintf("Cannot open '%s' for reading", filename))
 		return nil
 	}
 

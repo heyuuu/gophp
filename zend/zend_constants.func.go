@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/types"
@@ -248,7 +249,7 @@ func ZendGetConstantEx(name string, scope *types.ClassEntry, flags uint32) *type
 	}
 	if (flags & ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) == 0 {
 		if !c.IsCaseSensitive() && !c.IsCtSubst() && IsAccessDeprecated(c, name) {
-			faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.Name())
+			faults.Error(faults.E_DEPRECATED, fmt.Sprintf(`Case-insensitive constants are deprecated. The correct casing for this constant is "%s"`, c.Name()))
 		}
 	}
 	return c.Value()
@@ -267,7 +268,7 @@ func ZendRegisterConstant(c *ZendConstant) bool {
 
 	/* Check if the user is trying to define the __special__  internal pseudo constant name __COMPILER_HALT_OFFSET__ */
 	if name == "__COMPILER_HALT_OFFSET__" || !EG__().ConstantTable().Add(name, CopyConstant(c)) {
-		faults.Error(faults.E_NOTICE, "Constant %s already defined", name)
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Constant %s already defined", name))
 		return false
 	}
 

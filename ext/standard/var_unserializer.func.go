@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/kits/ascii"
@@ -294,7 +295,7 @@ func ProcessNestedData(
 ) int {
 	if var_hash != nil {
 		if var_hash.GetMaxDepth() > 0 && var_hash.GetCurDepth() >= var_hash.GetMaxDepth() {
-			core.PhpErrorDocref("", faults.E_WARNING, "Maximum depth of "+zend.ZEND_LONG_FMT+" exceeded. "+"The depth limit can be changed using the max_depth unserialize() option "+"or the unserialize_max_depth ini setting", var_hash.GetMaxDepth())
+			core.PhpErrorDocref("", faults.E_WARNING, "Maximum depth of %d exceeded. The depth limit can be changed using the max_depth unserialize() option or the unserialize_max_depth ini setting", var_hash.GetMaxDepth())
 			return 0
 		}
 		var_hash.GetCurDepth()++
@@ -460,7 +461,7 @@ func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserial
 	datalen = ParseIv2((*p)+2, p)
 	*p += 2
 	if datalen < 0 || max-(*p) <= datalen {
-		faults.Error(faults.E_WARNING, "Insufficient data for unserializing - "+zend.ZEND_LONG_FMT+" required, "+zend.ZEND_LONG_FMT+" present", datalen, zend_long(max-(*p)))
+		faults.Error(faults.E_WARNING, fmt.Sprintf("Insufficient data for unserializing - %d required, %d present", datalen, zend_long(max-(*p))))
 		return 0
 	}
 
@@ -472,7 +473,7 @@ func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserial
 		return 0
 	}
 	if ce.GetUnserialize() == nil {
-		faults.Error(faults.E_WARNING, "Class %s has no unserializer", ce.Name())
+		faults.Error(faults.E_WARNING, fmt.Sprintf("Class %s has no unserializer", ce.Name()))
 		zend.ObjectInitEx(rval, ce)
 	} else if ce.GetUnserialize()(rval, ce, (*uint8)(*p), datalen, (*zend.ZendUnserializeData)(var_hash)) != types.SUCCESS {
 		return 0
@@ -893,7 +894,7 @@ yy18:
 	 * depending on the serialization format. */
 
 	if ce.GetSerialize() != nil && has_unserialize == 0 {
-		faults.Error(faults.E_WARNING, "Erroneous data format for unserializing '%s'", ce.Name())
+		faults.Error(faults.E_WARNING, fmt.Sprintf("Erroneous data format for unserializing '%s'", ce.Name()))
 		// types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}

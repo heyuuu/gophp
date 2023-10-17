@@ -763,7 +763,7 @@ func parseNeedle(needle *types.Zval) (string, bool) {
 			return "", false
 		}
 
-		core.PhpErrorDocref("", faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+		core.PhpErrorDocref("", faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior")
 
 		return string([]byte{needleChar}), true
 	}
@@ -2253,7 +2253,7 @@ func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*type
 		}
 		return types.NewZvalArray(arr), true
 	default:
-		core.PhpErrorDocref("", faults.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, format)
+		core.PhpErrorDocref("", faults.E_WARNING, "Invalid format value %d", format)
 		return nil, false
 	}
 }

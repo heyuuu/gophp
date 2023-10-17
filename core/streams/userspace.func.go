@@ -336,7 +336,7 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 	/* don't allow strange buffer overruns due to bogus return */
 
 	if didwrite > 0 && didwrite > count {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s::"+USERSTREAM_WRITE+" wrote "+zend.ZEND_LONG_FMT+" bytes more data than requested ("+zend.ZEND_LONG_FMT+" written, "+zend.ZEND_LONG_FMT+" max)", us.GetWrapper().GetClassname(), zend_long(didwrite-count), zend.ZendLong(didwrite), zend.ZendLong(count))
+		core.PhpErrorDocref("", faults.E_WARNING, "%s::"+USERSTREAM_WRITE+" wrote "+"%d"+" bytes more data than requested (%d written, %d max)", us.GetWrapper().GetClassname(), zend_long(didwrite-count), zend.ZendLong(didwrite), zend.ZendLong(count))
 		didwrite = count
 	}
 	// zend.ZvalPtrDtor(&retval)
@@ -371,7 +371,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	didread = retval.StringEx().GetLen()
 	if didread > 0 {
 		if didread > count {
-			core.PhpErrorDocref("", faults.E_WARNING, "%s::"+USERSTREAM_READ+" - read "+zend.ZEND_LONG_FMT+" bytes more data than requested ("+zend.ZEND_LONG_FMT+" read, "+zend.ZEND_LONG_FMT+" max) - excess data will be lost", us.GetWrapper().GetClassname(), zend_long(didread-count), zend.ZendLong(didread), zend.ZendLong(count))
+			core.PhpErrorDocref("", faults.E_WARNING, "%s::"+USERSTREAM_READ+" - read "+"%d"+" bytes more data than requested (%d read, %d max) - excess data will be lost", us.GetWrapper().GetClassname(), zend_long(didread-count), zend.ZendLong(didread), zend.ZendLong(count))
 			didread = count
 		}
 		memcpy(buf, retval.StringEx().GetVal(), didread)

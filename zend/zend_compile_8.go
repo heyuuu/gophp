@@ -176,13 +176,13 @@ func (compiler *Compiler) CompileConditional(result *Znode, ast *ZendAst) {
 	if cond_ast.Kind() == ZEND_AST_CONDITIONAL && cond_ast.Attr() != ZEND_PARENTHESIZED_CONDITIONAL {
 		if cond_ast.Child(1) != nil {
 			if true_ast != nil {
-				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ? b : c ? d : e` is deprecated. "+"Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)`")
+				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ? b : c ? d : e` is deprecated. Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)`")
 			} else {
-				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ? b : c ?: d` is deprecated. "+"Use either `(a ? b : c) ?: d` or `a ? b : (c ?: d)`")
+				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ? b : c ?: d` is deprecated. Use either `(a ? b : c) ?: d` or `a ? b : (c ?: d)`")
 			}
 		} else {
 			if true_ast != nil {
-				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ?: b ? c : d` is deprecated. "+"Use either `(a ?: b) ? c : d` or `a ?: (b ? c : d)`")
+				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ?: b ? c : d` is deprecated. Use either `(a ?: b) ? c : d` or `a ?: (b ? c : d)`")
 			}
 		}
 	}

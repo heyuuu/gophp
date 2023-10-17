@@ -286,7 +286,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 		return_value.SetLong(oldint)
 		return
 	default:
-		core.PhpErrorDocref("", faults.E_WARNING, "Unknown value "+zend.ZEND_LONG_FMT, what)
+		core.PhpErrorDocref("", faults.E_WARNING, "Unknown value %d", what)
 	}
 	return_value.SetFalse()
 	return

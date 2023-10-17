@@ -128,7 +128,7 @@ func PhpMailBuildHeaders(headers *types.Zval) string {
 	var s strings.Builder
 	headers.Array().Foreach(func(arrayKey types.ArrayKey, value *types.Zval) {
 		if !arrayKey.IsStrKey() {
-			core.PhpErrorDocref("", faults.E_WARNING, "Found numeric header ("+zend.ZEND_LONG_FMT+")", arrayKey.IdxKey())
+			core.PhpErrorDocref("", faults.E_WARNING, "Found numeric header (%d)", arrayKey.IdxKey())
 			return
 		}
 
@@ -388,9 +388,9 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 		var f *types.String
 		f = str.PhpBasenameZStr(tmp, "")
 		if headers != nil && (*headers) {
-			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s\n%s", PhpGetuid(), f.GetVal(), headers)
+			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: %d:%s\n%s", PhpGetuid(), f.GetVal(), headers)
 		} else {
-			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s", PhpGetuid(), f.GetVal())
+			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: %d:%s", PhpGetuid(), f.GetVal())
 		}
 		// types.ZendStringReleaseEx(f, 0)
 	}

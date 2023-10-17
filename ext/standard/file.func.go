@@ -367,7 +367,7 @@ func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		return
 	}
 	if offset != 0 && core.PhpStreamSeek(stream, offset, lang.Cond(offset > 0, r.SEEK_SET, r.SEEK_END)) < 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", offset)
+		core.PhpErrorDocref("", faults.E_WARNING, "Failed to seek to position %d in the stream", offset)
 		core.PhpStreamClose(stream)
 		return_value.SetFalse()
 		return
@@ -446,7 +446,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 			numbytes = -1
 		} else {
 			if len_ > zend.ZEND_LONG_MAX {
-				core.PhpErrorDocref("", faults.E_WARNING, "content truncated from %zu to "+zend.ZEND_LONG_FMT+" bytes", len_, zend.ZEND_LONG_MAX)
+				core.PhpErrorDocref("", faults.E_WARNING, "content truncated from %zu to %d bytes", len_, zend.ZEND_LONG_MAX)
 				len_ = zend.ZEND_LONG_MAX
 			}
 			numbytes = len_
@@ -544,7 +544,7 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 		break
 	}
 	if flags < 0 || flags > (PHP_FILE_USE_INCLUDE_PATH|PHP_FILE_IGNORE_NEW_LINES|PHP_FILE_SKIP_EMPTY_LINES|PHP_FILE_NO_DEFAULT_CONTEXT) {
-		core.PhpErrorDocref("", faults.E_WARNING, "'"+zend.ZEND_LONG_FMT+"' flag is not supported", flags)
+		core.PhpErrorDocref("", faults.E_WARNING, "'%d' flag is not supported", flags)
 		return_value.SetFalse()
 		return
 	}

@@ -40,7 +40,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 
 			/* Binding incompatible $this to an internal method is not supported. */
 
-			faults.Error(faults.E_WARNING, "Cannot bind method %s::%s() to object of class %s", func_.GetScope().Name(), func_.FunctionName(), types.Z_OBJCE_P(newthis).Name())
+			faults.Error(faults.E_WARNING, fmt.Sprintf("Cannot bind method %s::%s() to object of class %s", func_.GetScope().Name(), func_.FunctionName(), types.Z_OBJCE_P(newthis).Name()))
 			return 0
 		}
 	} else if is_fake_closure != 0 && func_.GetScope() != nil && !func_.IsStatic() {
@@ -63,7 +63,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 
 		/* rebinding to internal class is not allowed */
 
-		faults.Error(faults.E_WARNING, "Cannot bind closure to scope of internal class %s", scope.Name())
+		faults.Error(faults.E_WARNING, fmt.Sprintf("Cannot bind closure to scope of internal class %s", scope.Name()))
 		return 0
 	}
 	if is_fake_closure != 0 && scope != func_.GetScope() {
@@ -158,7 +158,7 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 			if class_name.GetStr() == "static" {
 				ce = closure.GetFunc().GetScope()
 			} else if lang.Assign(&ce, ZendLookupClass(class_name.GetStr())) == nil {
-				faults.Error(faults.E_WARNING, "Class '%s' not found", class_name.GetVal())
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Class '%s' not found", class_name.GetVal()))
 				return_value.SetNull()
 				return
 			}

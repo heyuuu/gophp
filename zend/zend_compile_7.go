@@ -39,7 +39,7 @@ func ZendCheckAlreadyInUse(type_ uint32, old_name *types.String, new_name *types
 	if ascii.StrCaseEquals(old_name.GetStr(), check_name) {
 		return
 	}
-	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
+	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 }
 func (compiler *Compiler) CompileUse(ast *ZendAst) {
 	var list *ZendAstList = ast.AsAstList()
@@ -66,7 +66,7 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 					if type_ == T_CLASS && new_name.GetStr() == "strict" {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "You seem to be trying to use a different language...")
 					}
-					faults.Error(faults.E_WARNING, "The use statement with non-compound name '%s' "+"has no effect", new_name.GetVal())
+					faults.Error(faults.E_WARNING, fmt.Sprintf("The use statement with non-compound name '%s' has no effect", new_name.GetVal()))
 				}
 			}
 		}
@@ -76,7 +76,7 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 			lookup_name = ascii.StrToLower(new_name.GetStr())
 		}
 		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use %s as %s because '%s' "+"is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use %s as %s because '%s' is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
 		}
 		if current_ns != "" {
 			nsName := ascii.StrToLower(current_ns) + "\\" + lookup_name
@@ -89,7 +89,7 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 			}
 		}
 		if ZendAddImport(type_, lookup_name, old_name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
 	}
 }
@@ -135,7 +135,7 @@ func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
 		name = ZendPrefixWithNs(unqualified_name)
 		//name = types.ZendNewInternedString(name)
 		if importName := FC__().FindImportConst(unqualified_name.GetStr()); importName != "" && importName != name.GetStr() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because the name is already in use", name.GetVal())
 		}
 		name_node.SetOpType(IS_CONST)
 		name_node.GetConstant().SetStringEx(name)
@@ -154,13 +154,13 @@ func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
 	if !FC__().HasBracketedNamespaces() {
 		if FC__().CurrentNamespace() != "" {
 			if withBracket {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations "+"with unbracketed namespace declarations")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations with unbracketed namespace declarations")
 			}
 		}
 	} else {
 		/* previous namespace declarations were bracketed */
 		if !withBracket {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations "+"with unbracketed namespace declarations")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations with unbracketed namespace declarations")
 		} else if FC__().CurrentNamespace() != "" || FC__().InNamespace() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declarations cannot be nested")
 		}
@@ -174,7 +174,7 @@ func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
 			num--
 		}
 		if num > 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declaration statement has to be "+"the very first statement or after any declare call in the script")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declaration statement has to be the very first statement or after any declare call in the script")
 		}
 	}
 	if nameAst != nil {

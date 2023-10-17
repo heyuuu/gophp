@@ -236,7 +236,7 @@ func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype types.ZvalType, 
 	dst.SetUndef()
 	if op.Object().CanCast() {
 		if op.Object().Cast(dst, ctype) == types.FAILURE {
-			faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).Name(), types.ZendGetTypeByConst(ctype))
+			faults.Error(faults.E_RECOVERABLE_ERROR, fmt.Sprintf("Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).Name(), types.ZendGetTypeByConst(ctype)))
 		}
 	} else if op.Object().CanGet() {
 		var newop *types.Zval = op.Object().Get(dst)
@@ -2045,7 +2045,7 @@ func ZendObjectIsTrue(op *types.Zval) bool {
 		if op.Object().Cast(&tmp, types.IsBool) == types.SUCCESS {
 			return tmp.IsTrue()
 		}
-		faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", op.Object().GetCe().Name())
+		faults.Error(faults.E_RECOVERABLE_ERROR, fmt.Sprintf("Object of class %s could not be converted to bool", op.Object().GetCe().Name()))
 	} else if op.Object().CanGet() {
 		var result bool
 		var rv types.Zval

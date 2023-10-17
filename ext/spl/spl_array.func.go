@@ -1,6 +1,7 @@
 package spl
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
@@ -206,14 +207,14 @@ try_again:
 				if retval.IsUndef() {
 					switch type_ {
 					case zend.BP_VAR_R:
-						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetVal()))
 						fallthrough
 					case zend.BP_VAR_UNSET:
 						fallthrough
 					case zend.BP_VAR_IS:
 						retval = zend.UninitializedZval()
 					case zend.BP_VAR_RW:
-						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetVal()))
 						fallthrough
 					case zend.BP_VAR_W:
 						retval.SetNull()
@@ -223,14 +224,14 @@ try_again:
 		} else {
 			switch type_ {
 			case zend.BP_VAR_R:
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetVal()))
 				fallthrough
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
 				retval = zend.UninitializedZval()
 			case zend.BP_VAR_RW:
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetVal()))
 				fallthrough
 			case zend.BP_VAR_W:
 				var value types.Zval
@@ -240,7 +241,7 @@ try_again:
 		}
 		return retval
 	case types.IsResource:
-		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle())
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle()))
 		index = offset.ResourceHandle()
 		goto num_index
 	case types.IsDouble:
@@ -258,14 +259,14 @@ try_again:
 		if lang.Assign(&retval, ht.IndexFind(index)) == nil {
 			switch type_ {
 			case zend.BP_VAR_R:
-				faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined offset: %d", index))
 				fallthrough
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
 				retval = zend.UninitializedZval()
 			case zend.BP_VAR_RW:
-				faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined offset: %d", index))
 				fallthrough
 			case zend.BP_VAR_W:
 				var value types.Zval
@@ -411,7 +412,7 @@ try_again:
 		ht = SplArrayGetHashTable(intern)
 		if ht == zend.EG__().GetSymbolTable() {
 			if !zend.ZendDeleteGlobalVariable(offset.String()) {
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.StringEx().GetVal()))
 			}
 		} else {
 			var data *types.Zval = ht.SymtableFind(offset.String())
@@ -419,7 +420,7 @@ try_again:
 				if data.IsIndirect() {
 					data = data.Indirect()
 					if data.IsUndef() {
-						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.StringEx().GetVal()))
 					} else {
 						// zend.ZvalPtrDtor(data)
 						data.SetUndef()
@@ -430,10 +431,10 @@ try_again:
 						}
 					}
 				} else if ht.SymtableDel(offset.String()) == false {
-					faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
+					faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.StringEx().GetVal()))
 				}
 			} else {
-				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.StringEx().GetVal())
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.StringEx().GetVal()))
 			}
 		}
 	case types.IsDouble:
@@ -453,7 +454,7 @@ try_again:
 	num_index:
 		ht = SplArrayGetHashTable(intern)
 		if !ht.IndexDelete(index) {
-			faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined offset: %d", index))
 		}
 	case types.IsRef:
 		offset = types.ZVAL_DEREF(offset)
@@ -994,7 +995,7 @@ func zim_spl_Array_seek(executeData *zend.ZendExecuteData, return_value *types.Z
 			return
 		}
 	}
-	faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", opos)
+	faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position %d is out of range", opos)
 }
 func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 	var aht *types.Array = SplArrayGetHashTable(intern)
@@ -1343,7 +1344,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 	return
 outexcept:
 	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
-	faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
+	faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset %d of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
 	return
 }
 func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {

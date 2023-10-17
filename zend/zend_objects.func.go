@@ -50,7 +50,7 @@ func ZendObjectsDestroyObject(object *types.Object) {
 						return
 					}
 				} else {
-					faults.Error(faults.E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", object.GetCe().Name())
+					faults.Error(faults.E_WARNING, fmt.Sprintf("Call to private %s::__destruct() from context '' during shutdown ignored", object.GetCe().Name()))
 					return
 				}
 			} else {
@@ -63,7 +63,7 @@ func ZendObjectsDestroyObject(object *types.Object) {
 						return
 					}
 				} else {
-					faults.Error(faults.E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", object.GetCe().Name())
+					faults.Error(faults.E_WARNING, fmt.Sprintf("Call to protected %s::__destruct() from context '' during shutdown ignored", object.GetCe().Name()))
 					return
 				}
 			}

@@ -189,7 +189,7 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 		result = ht.SymtableUpdate(types.NewString("").GetStr(), value)
 		break
 	case types.IsResource:
-		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", key.ResourceHandle(), key.ResourceHandle())
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Resource ID#%d used as offset, casting to integer (%d)", key.ResourceHandle(), key.ResourceHandle()))
 		result = ht.IndexUpdate(key.ResourceHandle(), value)
 		break
 	case types.IsFalse:

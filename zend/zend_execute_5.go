@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -58,7 +59,7 @@ func ZendFetchDimensionAddressRead(
 					result.SetNull()
 					return
 				}
-				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.StringEx().GetVal())
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Illegal string offset '%s'", dim.StringEx().GetVal()))
 			case types.IsUndef:
 				ZVAL_UNDEFINED_OP2(executeData)
 				fallthrough
@@ -84,7 +85,7 @@ func ZendFetchDimensionAddressRead(
 		}
 		if container.StringEx().GetLen() < lang.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
 			if type_ != BP_VAR_IS {
-				faults.Error(faults.E_NOTICE, "Uninitialized string offset: "+ZEND_LONG_FMT, offset)
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Uninitialized string offset: %d", offset))
 				result.SetString("")
 			} else {
 				result.SetNull()
@@ -126,7 +127,7 @@ func ZendFetchDimensionAddressRead(
 			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if is_list == 0 && type_ != BP_VAR_IS {
-			faults.Error(faults.E_NOTICE, "Trying to access array offset on value of type %s", types.ZendZvalTypeName(container))
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Trying to access array offset on value of type %s", types.ZendZvalTypeName(container)))
 		}
 		result.SetNull()
 	}

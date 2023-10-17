@@ -227,7 +227,7 @@ func PhpStreamUrlWrapPhp(
 		}
 		fd = dup(int(fildes_ori))
 		if fd == -1 {
-			streams.PhpStreamWrapperLogError(wrapper, options, "Error duping file descriptor "+zend.ZEND_LONG_FMT+"; possibly it doesn't exist: "+"[%d]: %s", fildes_ori, errno, strerror(errno))
+			streams.PhpStreamWrapperLogError(wrapper, options, "Error duping file descriptor %d; possibly it doesn't exist: [%d]: %s", fildes_ori, errno, strerror(errno))
 			return nil
 		}
 	} else if !(strncasecmp(path, "filter/", 7)) {

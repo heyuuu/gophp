@@ -685,6 +685,6 @@ func PhpSetSockBlocking(socketd PhpSocketT, block int) int {
 	return ret
 }
 func _phpEmitFdSetsizeWarning(max_fd int) {
-	PhpErrorDocref("", faults.E_WARNING, "You MUST recompile PHP with a larger value of FD_SETSIZE.\n"+"It is set to %d, but you have descriptors numbered at least as high as %d.\n"+" --enable-fd-setsize=%d is recommended, but you may want to set it\n"+"to equal the maximum number of open files supported by your system,\n"+"in order to avoid seeing this error again at a later date.", FD_SETSIZE, max_fd, max_fd + 1024 & ^1023)
+	PhpErrorDocref("", faults.E_WARNING, "You MUST recompile PHP with a larger value of FD_SETSIZE.\nIt is set to %d, but you have descriptors numbered at least as high as %d.\n --enable-fd-setsize=%d is recommended, but you may want to set it\nto equal the maximum number of open files supported by your system,\nin order to avoid seeing this error again at a later date.", FD_SETSIZE, max_fd, max_fd + 1024 & ^1023)
 }
 func PhpNetworkGethostbyname(name *byte) *__struct__hostent { return gethostbyname(name) }

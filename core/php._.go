@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
 )
@@ -32,7 +33,7 @@ const PhpSleep = sleep
 var Environ **byte
 
 func PhpError(typ int, format string, args ...any) {
-	faults.Error(typ, format, args...)
+	faults.Error(typ, pfmt.Sprintf(format, args...))
 }
 
 /* PHPAPI void php_error(int type, const char *format, ...); */

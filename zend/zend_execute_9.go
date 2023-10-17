@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/lang"
@@ -169,7 +170,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 					opline.Result().SetString(b.CastStr(actual, opline.Const2().StringEx().GetLen()-(actual-opline.Const2().StringEx().GetVal())))
 				}
 
-				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().StringEx().GetVal(), opline.Result().StringEx().GetVal())
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().StringEx().GetVal(), opline.Result().StringEx().GetVal()))
 
 			} else {
 				faults.ThrowError(nil, "Undefined constant '%s'", opline.Const2().StringEx().GetVal())
@@ -212,8 +213,8 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 				}
 				is_deprecated = memcmp(c.Name()+shortname_offset, (orig_key-1).GetStr().GetVal()+shortname_offset, shortname_len) != 0
 			}
-			if is_deprecated != 0 {
-				faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.Name())
+			if is_deprecated {
+				faults.Error(faults.E_DEPRECATED, fmt.Sprintf(`Case-insensitive constants are deprecated. The correct casing for this constant is "%s"`, c.Name()))
 				return types.SUCCESS
 			}
 		}

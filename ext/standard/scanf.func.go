@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -927,7 +928,7 @@ func PhpSscanfInternal(
 				*end = '0'
 				value = zend_long(*fn)(buf, nil, base)
 				if (flags&SCAN_UNSIGNED) != 0 && value < 0 {
-					core.Snprintf(buf, b.SizeOf("buf"), zend.ZEND_ULONG_FMT, value)
+					core.Snprintf(buf, b.SizeOf("buf"), pfmt.Sprintf("%u", value))
 					if numVars != 0 && objIndex >= argCount {
 						break
 					} else if numVars != 0 {

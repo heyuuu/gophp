@@ -354,7 +354,7 @@ func (sc *LangScanner) setEscapeString(str string, quoteType byte) bool {
 				}
 				if octal > 0377 && !sc.heredocScanAhead {
 					/* 3 octit values must not overflow 0xFF (\377) */
-					faults.Error(faults.E_COMPILE_WARNING, "Octal escape sequence overflow \\%s is greater than \\377", str[start:i+1])
+					faults.Error(faults.E_COMPILE_WARNING, fmt.Sprintf("Octal escape sequence overflow \\%s is greater than \\377", str[start:i+1]))
 				}
 				buf.WriteByte(byte(octal))
 			} else {

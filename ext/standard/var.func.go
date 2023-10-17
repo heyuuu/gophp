@@ -19,13 +19,13 @@ func PhpArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
 		core.OG__().WriteString(key.StrKey())
 		core.PhpPrintf("\"]=>\n")
 	} else {
-		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key.IdxKey())
+		core.PhpPrintf("%*c[%d]=>\n", level+1, ' ', key.IdxKey())
 	}
 	PhpVarDump(zv, level+2)
 }
 func PhpObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key_ types.ArrayKey, level int) {
 	if !key_.IsStrKey() {
-		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key_.IdxKey())
+		core.PhpPrintf("%*c[%d]=>\n", level+1, ' ', key_.IdxKey())
 	} else {
 		className, propName, ok := zend.ZendUnmanglePropertyName_Ex(key_.StrKey())
 		core.PhpPrintf("%*c[", level+1, ' ')
@@ -69,7 +69,7 @@ again:
 	case types.IsNull:
 		core.PhpPrintf("%sNULL\n", common)
 	case types.IsLong:
-		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", common, struc.Long())
+		core.PhpPrintf("%sint(%d)\n", common, struc.Long())
 	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IsString:
@@ -143,7 +143,7 @@ func ZifVarDump(vars []*types.Zval) {
 }
 func ZvalArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
 	if !key.IsStrKey() {
-		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key.IdxKey())
+		core.PhpPrintf("%*c[%d]=>\n", level+1, ' ', key.IdxKey())
 	} else {
 		core.PhpPrintf("%*c[\"", level+1, ' ')
 		core.PUTS(key.StrKey())
@@ -153,7 +153,7 @@ func ZvalArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
 }
 func ZvalObjectPropertyDump(propInfo *types.PropertyInfo, zv *types.Zval, key types.ArrayKey, level int) {
 	if !key.IsStrKey() {
-		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key.IdxKey())
+		core.PhpPrintf("%*c[%d]=>\n", level+1, ' ', key.IdxKey())
 	} else {
 		className, propName, ok := zend.ZendUnmanglePropertyName_Ex(key.StrKey())
 		core.PhpPrintf("%*c[", level+1, ' ')
@@ -197,7 +197,7 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 	case types.IsNull:
 		core.PhpPrintf("%sNULL\n", common)
 	case types.IsLong:
-		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", common, struc.Long())
+		core.PhpPrintf("%sint(%d)\n", common, struc.Long())
 	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IsString:
@@ -621,7 +621,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 	}
 	if PhpVarUnserialize(retval, &p, p+buf_len, &var_hash) == 0 {
 		if zend.EG__().NoException() {
-			core.PhpErrorDocref("", faults.E_NOTICE, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
+			core.PhpErrorDocref("", faults.E_NOTICE, "Error at offset %d of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
 		}
 		if BG__().unserialize.level <= 1 {
 			// zend.ZvalPtrDtor(return_value)

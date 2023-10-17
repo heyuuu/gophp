@@ -44,10 +44,10 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 		break
 	}
 	if persistent != 0 {
-		core.Spprintf(&hashkey, 0, "pfsockopen__%s:"+zend.ZEND_LONG_FMT, host, port)
+		core.Spprintf(&hashkey, 0, "pfsockopen__%s:%d", host, port)
 	}
 	if port > 0 {
-		hostname_len = core.Spprintf(&hostname, 0, "%s:"+zend.ZEND_LONG_FMT, host, port)
+		hostname_len = core.Spprintf(&hostname, 0, "%s:%d", host, port)
 	} else {
 		hostname_len = host_len
 		hostname = host
@@ -63,7 +63,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 		zend.Efree(hostname)
 	}
 	if stream == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, "unable to connect to %s:"+zend.ZEND_LONG_FMT+" (%s)", host, port, b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
+		core.PhpErrorDocref("", faults.E_WARNING, "unable to connect to %s:%d (%s)", host, port, b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 	}
 	if hashkey != nil {
 		zend.Efree(hashkey)

@@ -444,7 +444,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 	inputlen = inputarg.GetLen()
 	inputpos = 0
 	if offset < 0 || offset > inputlen {
-		core.PhpErrorDocref("", faults.E_WARNING, "Offset "+zend.ZEND_LONG_FMT+" is out of input range", offset)
+		core.PhpErrorDocref("", faults.E_WARNING, "Offset %d is out of input range", offset)
 		return_value.SetFalse()
 		return
 	}
@@ -822,7 +822,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 				/* Reached end of input for '*' repeater */
 
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: not enough input, need %d, have "+zend.ZEND_LONG_FMT, type_, size, inputlen-inputpos)
+				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: not enough input, need %d, have %d", type_, size, inputlen-inputpos)
 				return_value.Array().Destroy()
 				return_value.SetFalse()
 				return

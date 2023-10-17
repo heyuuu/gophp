@@ -17,7 +17,7 @@ func ZendThrowOrError(fetchType int, exceptionCe *types.ClassEntry, message stri
 	if (fetchType & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
 		faults.ThrowError(exceptionCe, "%s", message)
 	} else {
-		faults.Error(faults.E_ERROR, "%s", message)
+		faults.Error(faults.E_ERROR, fmt.Sprintf("%s", message))
 	}
 }
 func ShutdownDestructors() {
@@ -168,7 +168,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 		if !ZendIsCallableEx(fci.GetFunctionName(), fci.GetObject(), IS_CALLABLE_CHECK_SILENT, nil, fciCache, &error) {
 			if error != nil {
 				var callableName = GetCallableName(fci.GetFunctionName(), fci.GetObject())
-				faults.Error(faults.E_WARNING, "Invalid callback %s, %s", callableName, error)
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Invalid callback %s, %s", callableName, error))
 				Efree(error)
 			}
 			if CurrEX() == &dummy_execute_data {
@@ -182,7 +182,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 			if error[0] >= 'a' && error[0] <= 'z' {
 				error[0] += 'A' - 'a'
 			}
-			faults.Error(faults.E_DEPRECATED, "%s", error)
+			faults.Error(faults.E_DEPRECATED, fmt.Sprintf("%s", error))
 			Efree(error)
 			if EG__().HasException() {
 				if CurrEX() == &dummy_execute_data {
@@ -204,7 +204,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 	}
 	call = ZendVmStackPushCallFrame(call_info, func_, fci.GetParamCount(), object_or_called_scope)
 	if func_.IsDeprecated() {
-		faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
+		faults.Error(faults.E_DEPRECATED, fmt.Sprintf("Function %s%s%s() is deprecated", lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName()))
 		if EG__().HasException() {
 			ZendVmStackFreeCallFrame(call)
 			if CurrEX() == &dummy_execute_data {
@@ -227,7 +227,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fciCache *types.ZendFcallInfoCac
 
 					/* By-value send is not allowed -- emit a warning,
 					 * and perform the call with the value wrapped in a reference. */
-					faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName())
+					faults.Error(faults.E_WARNING, fmt.Sprintf("Parameter %d to %s%s%s() expected to be a reference, value given", i+1, lang.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().Name() }, ""), lang.Cond(func_.GetScope() != nil, "::", ""), func_.FunctionName()))
 					must_wrap = 1
 					if EG__().HasException() {
 						call.NumArgs() = i
@@ -516,7 +516,7 @@ func ZendEvalStringEx(str string, retval_ptr *types.Zval, string_name string, ha
 func ZendTimeout(dummy int) {
 	EG__().SetTimedOut(0)
 	ZendSetTimeoutEx(0, 1)
-	faults.ErrorNoreturn(faults.E_ERROR, "Maximum execution time of "+ZEND_LONG_FMT+" second%s exceeded", EG__().GetTimeoutSeconds(), lang.Cond(EG__().GetTimeoutSeconds() == 1, "", "s"))
+	faults.ErrorNoreturn(faults.E_ERROR, "Maximum execution time of %d second%s exceeded", EG__().GetTimeoutSeconds(), lang.Cond(EG__().GetTimeoutSeconds() == 1, "", "s"))
 }
 func ZendTimeoutHandler(dummy int) {
 	if EG__().GetTimedOut() != 0 {
@@ -542,7 +542,7 @@ func ZendTimeoutHandler(dummy int) {
 		if error_filename == "" {
 			error_filename = "Unknown"
 		}
-		output_len = core.Snprintf(log_buffer, b.SizeOf("log_buffer"), "\nFatal error: Maximum execution time of "+ZEND_LONG_FMT+"+"+ZEND_LONG_FMT+" seconds exceeded (terminated) in %s on line %d\n", EG__().GetTimeoutSeconds(), EG__().GetHardTimeout(), error_filename, error_lineno)
+		output_len = core.Snprintf(log_buffer, b.SizeOf("log_buffer"), "\nFatal error: Maximum execution time of %d+%d seconds exceeded (terminated) in %s on line %d\n", EG__().GetTimeoutSeconds(), EG__().GetHardTimeout(), error_filename, error_lineno)
 		if output_len > 0 {
 			ZendQuietWrite(2, log_buffer, b.Min(output_len, b.SizeOf("log_buffer")))
 		}

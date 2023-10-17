@@ -198,7 +198,7 @@ func ZendSignalDeactivate() {
 		var x int
 		var sa __struct__sigaction
 		if SIGG(depth) != 0 {
-			faults.Error(faults.E_CORE_WARNING, "zend_signal: shutdown with non-zero blocking depth (%d)", SIGG(depth))
+			faults.Error(faults.E_CORE_WARNING, fmt.Sprintf("zend_signal: shutdown with non-zero blocking depth (%d)", SIGG(depth)))
 		}
 
 		/* did anyone steal our installed handler */
@@ -206,7 +206,7 @@ func ZendSignalDeactivate() {
 		for x = 0; x < b.SizeOf("zend_sigs")/b.SizeOf("* zend_sigs"); x++ {
 			sigaction(ZendSigs[x], nil, &sa)
 			if sa.sa_sigaction != ZendSignalHandlerDefer && sa.sa_sigaction != any(SIG_IGN) {
-				faults.Error(faults.E_CORE_WARNING, "zend_signal: handler was replaced for signal (%d) after startup", ZendSigs[x])
+				faults.Error(faults.E_CORE_WARNING, fmt.Sprintf("zend_signal: handler was replaced for signal (%d) after startup", ZendSigs[x]))
 			}
 		}
 

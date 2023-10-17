@@ -46,7 +46,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 		} else if type_ == BP_VAR_IS {
 			retval = UninitializedZval()
 		} else {
-			faults.Error(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name.GetVal()))
 			if type_ == BP_VAR_RW {
 				retval = target_symbol_table.KeyUpdate(name.GetStr(), UninitializedZval())
 			} else {
@@ -64,7 +64,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 			} else if type_ == BP_VAR_IS {
 				retval = UninitializedZval()
 			} else {
-				faults.Error(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name.GetVal()))
 				if type_ == BP_VAR_RW {
 					retval.SetNull()
 				} else {

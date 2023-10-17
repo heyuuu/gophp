@@ -684,13 +684,13 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 	}
 	if raw == 0 {
 		if (type_param & ^PHP_DNS_ALL) != 0 && type_param != PHP_DNS_ANY {
-			core.PhpErrorDocref("", faults.E_WARNING, "Type '"+zend.ZEND_LONG_FMT+"' not supported", type_param)
+			core.PhpErrorDocref("", faults.E_WARNING, "Type '%d' not supported", type_param)
 			return_value.SetFalse()
 			return
 		}
 	} else {
 		if type_param < 1 || type_param > 0xffff {
-			core.PhpErrorDocref("", faults.E_WARNING, "Numeric DNS record type must be between 1 and 65535, '"+zend.ZEND_LONG_FMT+"' given", type_param)
+			core.PhpErrorDocref("", faults.E_WARNING, "Numeric DNS record type must be between 1 and 65535, '%d' given", type_param)
 			return_value.SetFalse()
 			return
 		}

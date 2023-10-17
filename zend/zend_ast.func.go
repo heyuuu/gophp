@@ -91,7 +91,7 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 	case types.IsDouble:
 		result.Array().IndexUpdate(operators.DvalToLval(offset.Double()), expr)
 	case types.IsResource:
-		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle())
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Resource ID#%d used as offset, casting to integer (%d)", offset.ResourceHandle(), offset.ResourceHandle()))
 		result.Array().IndexUpdate(offset.ResourceHandle(), expr)
 	default:
 		faults.ThrowError(nil, "Illegal offset type")

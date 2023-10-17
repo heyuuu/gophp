@@ -52,7 +52,7 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			count = 1
 		}
-		faults.Error(faults.E_WARNING, "%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count"))
+		faults.Error(faults.E_WARNING, fmt.Sprintf("%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count")))
 		break
 	}
 	opline.Result().SetLong(count)
@@ -110,7 +110,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			count = 1
 		}
-		faults.Error(faults.E_WARNING, "%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count"))
+		faults.Error(faults.E_WARNING, fmt.Sprintf("%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count")))
 		break
 	}
 	opline.Result().SetLong(count)
@@ -168,7 +168,7 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			count = 1
 		}
-		faults.Error(faults.E_WARNING, "%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count"))
+		faults.Error(faults.E_WARNING, fmt.Sprintf("%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count")))
 		break
 	}
 	opline.Result().SetLong(count)
