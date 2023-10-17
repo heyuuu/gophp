@@ -4,11 +4,13 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"os"
+	"strings"
 )
 
 func OnUpdateBaseDir(
@@ -63,7 +65,7 @@ func OnUpdateBaseDir(
 			*end = '0'
 			end++
 		}
-		if ptr[0] == '.' && ptr[1] == '.' && (ptr[2] == '0' || zend.IS_SLASH(ptr[2])) {
+		if ptr[0] == '.' && ptr[1] == '.' && (ptr[2] == '0' || zend.IsSlash(ptr[2])) {
 
 			/* Don't allow paths with a leading .. path component to be set at runtime */
 
@@ -276,16 +278,14 @@ func PhpCheckOpenBasedirEx(path *byte, warn int) int {
 
 	/* Nothing to check... */
 }
-func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **types.String) *r.File {
+func PhpFopenAndSetOpenedPath(path string, mode string, opened_path **types.String) *r.File {
 	var fp *r.File
 	if PhpCheckOpenBasedir((*byte)(path)) != 0 {
 		return nil
 	}
 	fp = zend.VCWD_FOPEN(path, mode)
 	if fp != nil && opened_path != nil {
-
 		//TODO :avoid reallocation
-
 		var tmp *byte = ExpandFilepathWithMode(path, nil, nil, 0, zend.CWD_EXPAND)
 		if tmp != nil {
 			*opened_path = types.NewString(tmp)
@@ -319,14 +319,14 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 				filename = SG__().RequestInfo.pathTranslated
 			}
 		}
-	} else if PG__().doc_root && path_info != nil && lang.Assign(&length, strlen(PG__().doc_root)) && zend.IS_ABSOLUTE_PATH(PG__().doc_root, length) {
+	} else if PG__().doc_root && path_info != nil && lang.Assign(&length, strlen(PG__().doc_root)) && zend.IsAbsolutePathOld(PG__().doc_root, length) {
 		var path_len int = strlen(path_info)
 		filename = zend.Emalloc(length + path_len + 2)
 		memcpy(filename, PG__().doc_root, length)
-		if !(zend.IS_SLASH(filename[length-1])) {
+		if !(zend.IsSlash(filename[length-1])) {
 			filename[lang.PostInc(&length)] = PHP_DIR_SEPARATOR
 		}
-		if zend.IS_SLASH(path_info[0]) {
+		if zend.IsSlash(path_info[0]) {
 			length--
 		}
 		strncpy(filename+length, path_info, path_len+1)
@@ -379,23 +379,29 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 	}
 	return fileHandle
 }
-func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, path *byte) *types.String {
+func parseProtocol(name string) (protocol string, remain string, ok bool) {
+	idx := 0
+	for idx < len(name) && (ascii.IsAlphaNum(name[idx]) || name[idx] == '+' || name[idx] == '-' || name[idx] == '.') {
+		idx++
+	}
+	if idx > 1 && strings.HasPrefix(name[idx:], "://") {
+		return name[:idx], name[idx+3:], true
+	}
+	return "", name, false
+}
+
+func PhpResolvePath(filename string, filenamePtr *byte, filename_length int, path string) *types.String {
 	var resolved_path []byte
-	var trypath []byte
-	var ptr *byte
-	var end *byte
-	var p *byte
-	var actual_path *byte
-	var wrapper *PhpStreamWrapper
 	var exec_filename *types.String
 
-	/* Don't resolve paths which contain protocol (except of file://) */
-
-	for p = filenamePtr; isalnum(int(*p)) || (*p) == '+' || (*p) == '-' || (*p) == '.'; p++ {
-
+	if filename == "" {
+		return nil
 	}
-	if (*p) == ':' && p-filenamePtr > 1 && p[1] == '/' && p[2] == '/' {
-		wrapper = PhpStreamLocateUrlWrapper(filenamePtr, &actual_path, STREAM_OPEN_FOR_INCLUDE)
+
+	/* Don't resolve paths which contain protocol (except of file://) */
+	if _, _, ok := parseProtocol(filename); ok {
+		var actual_path string
+		wrapper := PhpStreamLocateUrlWrapper(filename, &actual_path, STREAM_OPEN_FOR_INCLUDE)
 		if wrapper == &streams.PhpPlainFilesWrapper {
 			if zend.TsrmRealpath(actual_path, resolved_path) != nil {
 				return types.NewString(resolved_path)
@@ -403,57 +409,43 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 		}
 		return nil
 	}
-	if (*filenamePtr) == '.' && (zend.IS_SLASH(filenamePtr[1]) || filenamePtr[1] == '.' && zend.IS_SLASH(filenamePtr[2])) || zend.IS_ABSOLUTE_PATH(filenamePtr, filename_length) || path == nil || !(*path) {
+
+	var direct = false
+	if len(filename) > 2 && filename[0] == '.' && zend.IsSlash(filename[1]) {
+		direct = true
+	} else if len(filename) > 3 && filename[:2] == ".." && zend.IsSlash(filename[2]) {
+		direct = true
+	} else if zend.IsAbsolutePath(filename) {
+		direct = true
+	} else if path == "" {
+		direct = true
+	}
+	if direct {
 		if zend.TsrmRealpath(filenamePtr, resolved_path) != nil {
 			return types.NewString(resolved_path)
 		} else {
 			return nil
 		}
 	}
-	ptr = path
-	for ptr != nil && (*ptr) {
 
+	for _, onePath := range strings.Split(path, zend.DEFAULT_DIR_SEPARATOR) {
 		/* Check for stream wrapper */
-
-		var is_stream_wrapper int = 0
-		for p = ptr; isalnum(int(*p)) || (*p) == '+' || (*p) == '-' || (*p) == '.'; p++ {
-
-		}
-		if (*p) == ':' && p-ptr > 1 && p[1] == '/' && p[2] == '/' {
-
+		streamWrapper := false
+		if protocol, remain, ok := parseProtocol(path); ok {
 			/* .:// or ..:// is not a stream wrapper */
-
-			if p[-1] != '.' || p[-2] != '.' || p-2 != ptr {
-				p += 3
-				is_stream_wrapper = 1
+			if protocol != ".." {
+				streamWrapper = true
+				onePath = remain
 			}
-
-			/* .:// or ..:// is not a stream wrapper */
-
 		}
-		end = strchr(p, zend.DEFAULT_DIR_SEPARATOR)
-		if end != nil {
-			if filename_length > MAXPATHLEN-2 || end-ptr > MAXPATHLEN || end-ptr+1+filename_length+1 >= MAXPATHLEN {
-				ptr = end + 1
-				continue
-			}
-			memcpy(trypath, ptr, end-ptr)
-			trypath[end-ptr] = '/'
-			memcpy(trypath+(end-ptr)+1, filenamePtr, filename_length+1)
-			ptr = end + 1
-		} else {
-			var len_ int = strlen(ptr)
-			if filename_length > MAXPATHLEN-2 || len_ > MAXPATHLEN || len_+1+filename_length+1 >= MAXPATHLEN {
-				break
-			}
-			memcpy(trypath, ptr, len_)
-			trypath[len_] = '/'
-			memcpy(trypath+len_+1, filenamePtr, filename_length+1)
-			ptr = nil
+
+		if len(filename)+len(onePath)+2 >= MAXPATHLEN {
+			continue
 		}
-		actual_path = trypath
-		if is_stream_wrapper != 0 {
-			wrapper = PhpStreamLocateUrlWrapper(trypath, &actual_path, STREAM_OPEN_FOR_INCLUDE)
+		trypath := onePath + "/" + filename
+		actual_path := trypath
+		if streamWrapper {
+			wrapper := PhpStreamLocateUrlWrapper(trypath, &actual_path, STREAM_OPEN_FOR_INCLUDE)
 			if wrapper == nil {
 				continue
 			} else if wrapper != &streams.PhpPlainFilesWrapper {
@@ -474,27 +466,16 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 		}
 	}
 
-	/* check in calling scripts' current working directory as a fall back case
-	 */
-
-	if zend.ZendIsExecuting() && lang.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
-		var exec_fname *byte = exec_filename.GetVal()
-		var exec_fname_length int = exec_filename.GetLen()
-		for lang.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
-
-		}
-		if exec_fname_length > 0 && filename_length < MAXPATHLEN-2 && exec_fname_length+1+filename_length+1 < MAXPATHLEN {
-			memcpy(trypath, exec_fname, exec_fname_length+1)
-			memcpy(trypath+exec_fname_length+1, filenamePtr, filename_length+1)
-			actual_path = trypath
+	/* check in calling scripts' current working directory as a fall back case */
+	if zend.ZendIsExecuting() {
+		execDirname, _ := zend.CutPath(zend.ZendGetExecutedFilenameEx())
+		if execDirname != "" && len(execDirname)+len(filename)+2 < MAXPATHLEN {
+			trypath := execDirname + "/" + filename
+			actual_path := trypath
 
 			/* Check for stream wrapper */
-
-			for p = trypath; isalnum(int(*p)) || (*p) == '+' || (*p) == '-' || (*p) == '.'; p++ {
-
-			}
-			if (*p) == ':' && p-trypath > 1 && p[1] == '/' && p[2] == '/' {
-				wrapper = PhpStreamLocateUrlWrapper(trypath, &actual_path, STREAM_OPEN_FOR_INCLUDE)
+			if _, _, ok := parseProtocol(trypath); ok {
+				wrapper := PhpStreamLocateUrlWrapper(trypath, &actual_path, STREAM_OPEN_FOR_INCLUDE)
 				if wrapper == nil {
 					return nil
 				} else if wrapper != &streams.PhpPlainFilesWrapper {
@@ -517,74 +498,39 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 	}
 	return nil
 }
-func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **types.String) *r.File {
-	var pathbuf *byte
-	var ptr *byte
-	var end *byte
-	var trypath []byte
+func PhpFopenWithPath(filename string, mode string, path string, openedPath **types.String) *r.File {
 	var fp *r.File
-	var filename_length int
-	var exec_filename *types.String
-	if opened_path != nil {
-		*opened_path = nil
+	if openedPath != nil {
+		*openedPath = nil
 	}
-	if filename == nil {
+	if filename == "" {
 		return nil
 	}
-	filename_length = strlen(filename)
-	void(filename_length)
 
 	/* Relative path open */
-
-	if (*filename) == '.' || zend.IS_ABSOLUTE_PATH(filename, filename_length) || (path == nil || !(*path)) {
-		return PhpFopenAndSetOpenedPath(filename, mode, opened_path)
+	if filename[0] == '.' || zend.IsAbsolutePath(filename) || path == "" {
+		return PhpFopenAndSetOpenedPath(filename, mode, openedPath)
 	}
 
 	/* check in provided path */
-
-	if zend.ZendIsExecuting() && lang.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
-		var exec_fname *byte = exec_filename.GetVal()
-		var exec_fname_length int = exec_filename.GetLen()
-		for lang.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
-
+	if zend.ZendIsExecuting() {
+		execDirname, _ := zend.CutPath(zend.ZendGetExecutedFilenameEx())
+		if execDirname != "" {
+			path = path + string(zend.DEFAULT_DIR_SEPARATOR) + execDirname
 		}
-		if exec_fname != nil && exec_fname[0] == '[' || exec_fname_length <= 0 {
-
-			/* [no active file] or no path */
-
-			pathbuf = zend.Estrdup(path)
-
-			/* [no active file] or no path */
-
-		} else {
-			var path_length int = strlen(path)
-			pathbuf = (*byte)(zend.Emalloc(exec_fname_length + path_length + 1 + 1))
-			memcpy(pathbuf, path, path_length)
-			pathbuf[path_length] = zend.DEFAULT_DIR_SEPARATOR
-			memcpy(pathbuf+path_length+1, exec_fname, exec_fname_length)
-			pathbuf[path_length+exec_fname_length+1] = '0'
-		}
-	} else {
-		pathbuf = zend.Estrdup(path)
 	}
-	ptr = pathbuf
-	for ptr != nil && (*ptr) {
-		end = strchr(ptr, zend.DEFAULT_DIR_SEPARATOR)
-		if end != nil {
-			*end = '0'
-			end++
+
+	for _, onePath := range strings.Split(path, string(zend.DEFAULT_DIR_SEPARATOR)) {
+		trypath := onePath + "/" + filename
+		if len(trypath) >= MAXPATHLEN {
+			trypath = trypath[:MAXPATHLEN]
+			PhpErrorDocref("", faults.E_NOTICE, "%s/%s path was truncated to %d", onePath, filename, MAXPATHLEN)
 		}
-		if Snprintf(trypath, MAXPATHLEN, "%s/%s", ptr, filename) >= MAXPATHLEN {
-			PhpErrorDocref("", faults.E_NOTICE, "%s/%s path was truncated to %d", ptr, filename, MAXPATHLEN)
-		}
-		fp = PhpFopenAndSetOpenedPath(trypath, mode, opened_path)
+		fp = PhpFopenAndSetOpenedPath(trypath, mode, openedPath)
 		if fp != nil {
-			zend.Efree(pathbuf)
 			return fp
 		}
-		ptr = end
 	}
-	zend.Efree(pathbuf)
 	return nil
 }
 func PhpStripUrlPasswd(url *byte) *byte {
@@ -638,7 +584,7 @@ func ExpandFilepathWithMode(filepath *byte, real_path *byte, relative_to *byte, 
 		return nil
 	}
 	path_len = strlen(filepath)
-	if zend.IS_ABSOLUTE_PATH(filepath, path_len) {
+	if zend.IsAbsolutePathOld(filepath, path_len) {
 		cwd[0] = '0'
 	} else {
 		var iam *byte = SG__().RequestInfo.pathTranslated

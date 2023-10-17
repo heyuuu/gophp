@@ -44,17 +44,15 @@ func ZendGetExecutedFilename() string {
 		return "[no active file]"
 	}
 }
-func ZendGetExecutedFilenameEx() *types.String {
+func ZendGetExecutedFilenameEx() string {
 	var ex *ZendExecuteData = CurrEX()
 	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 		ex = ex.GetPrevExecuteData()
 	}
-	if ex != nil {
-		filename := ex.GetFunc().GetOpArray().GetFilename()
-		return types.NewString(filename)
-	} else {
-		return nil
+	if ex == nil {
+		return ""
 	}
+	return ex.GetFunc().GetOpArray().GetFilename()
 }
 func ZendGetExecutedLineno() int {
 	var ex *ZendExecuteData = CurrEX()

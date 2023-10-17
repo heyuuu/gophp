@@ -354,7 +354,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 		/* Clear the expired config */
 
 		entry.GetUserConfig().Clean()
-		if !(zend.IS_ABSOLUTE_PATH(path, path_len)) {
+		if !(zend.IsAbsolutePathOld(path, path_len)) {
 			var real_path_len int
 			real_path = zend.TsrmRealpath(path, nil)
 			if real_path == nil {
@@ -457,7 +457,7 @@ func SapiCgiActivate() int {
 
 			if doc_root != nil {
 				var doc_root_len int = strlen(doc_root)
-				if doc_root_len > 0 && zend.IS_SLASH(doc_root[doc_root_len-1]) {
+				if doc_root_len > 0 && zend.IsSlash(doc_root[doc_root_len-1]) {
 					doc_root_len--
 				}
 				PhpCgiIniActivateUserConfig(path, path_len, doc_root, doc_root_len)
@@ -508,17 +508,17 @@ func IsValidPath(path *byte) int {
 	if p == nil {
 		return 0
 	}
-	if (*p) == '.' && (*(p + 1)) == '.' && (!(*(p + 2)) || zend.IS_SLASH(*(p + 2))) {
+	if (*p) == '.' && (*(p + 1)) == '.' && (!(*(p + 2)) || zend.IsSlash(*(p + 2))) {
 		return 0
 	}
 	for *p {
-		if zend.IS_SLASH(*p) {
+		if zend.IsSlash(*p) {
 			p++
 			if (*p) == '.' {
 				p++
 				if (*p) == '.' {
 					p++
-					if !(*p) || zend.IS_SLASH(*p) {
+					if !(*p) || zend.IsSlash(*p) {
 						return 0
 					}
 				}

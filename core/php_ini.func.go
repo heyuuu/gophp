@@ -391,7 +391,7 @@ func PhpInitConfig() int {
 					/* Reset active ini section */
 
 					RESET_ACTIVE_INI_HASH()
-					if zend.IS_SLASH(debpath[lenpath-1]) {
+					if zend.IsSlash(debpath[lenpath-1]) {
 						Snprintf(ini_file, MAXPATHLEN, "%s%s", debpath, namelist[i].d_name)
 					} else {
 						Snprintf(ini_file, MAXPATHLEN, "%s%c%s", debpath, zend.DEFAULT_SLASH, namelist[i].d_name)

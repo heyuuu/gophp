@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
@@ -169,11 +170,10 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 		} else {
 			var str *types.String = operators.ZvalGetString(description)
 			if myeval != nil {
-				core.PhpErrorDocref("", faults.E_WARNING, "%s: \"%s\" failed", str.GetVal(), myeval)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf(`%s: "%s" failed`, str.GetStr(), myeval))
 			} else {
 				core.PhpErrorDocref("", faults.E_WARNING, "%s failed", str.GetVal())
 			}
-			// types.ZendStringReleaseEx(str, 0)
 		}
 	}
 	if ASSERTG(bail) {

@@ -169,7 +169,7 @@ func SplFilesystemDirRead(intern *SplFilesystemObject) int {
 		return 1
 	}
 }
-func IS_SLASH_AT(zs []byte, pos int) bool { return zend.IS_SLASH(zs[pos]) }
+func IS_SLASH_AT(zs []byte, pos int) bool { return zend.IsSlash(zs[pos]) }
 func SplFilesystemIsDot(d_name *byte) int {
 	return !(strcmp(d_name, ".")) || !(strcmp(d_name, ".."))
 }
@@ -1068,7 +1068,7 @@ func zim_spl_SplFileInfo_getLinkTarget(executeData *zend.ZendExecuteData, return
 		core.PhpErrorDocref("", faults.E_WARNING, "Empty filename")
 		return_value.SetFalse()
 		return
-	} else if !(zend.IS_ABSOLUTE_PATH(intern.GetFileName(), intern.GetFileNameLen())) {
+	} else if !(zend.IsAbsolutePathOld(intern.GetFileName(), intern.GetFileNameLen())) {
 		var expanded_path []byte
 		if core.ExpandFilepathWithMode(intern.GetFileName(), expanded_path, nil, 0, zend.CWD_EXPAND) == nil {
 			core.PhpErrorDocref("", faults.E_WARNING, "No such file or directory")

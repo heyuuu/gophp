@@ -4,11 +4,22 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/php/lang"
+	"strings"
 )
 
-func IS_SLASH(c byte) bool                       { return c == '/' }
-func COPY_WHEN_ABSOLUTE(path *byte) int          { return 0 }
-func IS_ABSOLUTE_PATH(path *byte, len_ int) bool { return IS_SLASH(path[0]) }
+const SlashChars = "/"
+
+func IsSlash(c byte) bool { return c == '/' }
+func CutPath(filepath string) (path string, file string) {
+	if idx := strings.LastIndexAny(file, SlashChars); idx >= 0 {
+		return file[:idx-1], file[idx+1:]
+	}
+	return "", filepath
+}
+
+func COPY_WHEN_ABSOLUTE(path *byte) int            { return 0 }
+func IsAbsolutePath(path string) bool              { return path != "" && IsSlash(path[0]) }
+func IsAbsolutePathOld(path string, len_ int) bool { return path != "" && IsSlash(path[0]) }
 func PhpSysReadlink(link *byte, target *byte, target_len int) __auto__ {
 	return readlink(link, target, target_len)
 }
@@ -233,7 +244,7 @@ func TsrmRealpathR(
 			return start
 		}
 		i = len_
-		for i > start && !(IS_SLASH(path[i-1])) {
+		for i > start && !(IsSlash(path[i-1])) {
 			i--
 		}
 		b.Assert(i < MAXPATHLEN)
@@ -267,7 +278,7 @@ func TsrmRealpathR(
 			if j > start && j != size_t-1 {
 				j--
 				b.Assert(i < MAXPATHLEN)
-				for j > start && !(IS_SLASH(path[j])) {
+				for j > start && !(IsSlash(path[j])) {
 					j--
 				}
 				b.Assert(i < MAXPATHLEN)
@@ -275,12 +286,12 @@ func TsrmRealpathR(
 
 					/* leading '..' must not be removed in case of relative path */
 
-					if j == 0 && path[0] == '.' && path[1] == '.' && IS_SLASH(path[2]) {
+					if j == 0 && path[0] == '.' && path[1] == '.' && IsSlash(path[2]) {
 						path[3] = '.'
 						path[4] = '.'
 						path[5] = DEFAULT_SLASH
 						j = 5
-					} else if j > 0 && path[j+1] == '.' && path[j+2] == '.' && IS_SLASH(path[j+3]) {
+					} else if j > 0 && path[j+1] == '.' && path[j+2] == '.' && IsSlash(path[j+3]) {
 						j += 4
 						path[lang.PostInc(&j)] = '.'
 						path[lang.PostInc(&j)] = '.'
@@ -357,7 +368,7 @@ func TsrmRealpathR(
 				return size_t - 1
 			}
 			path[j] = 0
-			if IS_ABSOLUTE_PATH(path, j) {
+			if IsAbsolutePathOld(path, j) {
 				j = TsrmRealpathR(path, 1, j, ll, t, use_realpath, is_dir, &directory)
 				if j == size_t-1 {
 					FreeAlloca(tmp, use_heap)
@@ -443,7 +454,7 @@ func VirtualFileEx(state *CwdState, path *byte, verify_path VerifyPathFunc, use_
 	 * This can happen under solaris when a dir does not have read permissions
 	 * but *does* have execute permissions */
 
-	if !(IS_ABSOLUTE_PATH(path, path_length)) {
+	if !(IsAbsolutePathOld(path, path_length)) {
 		if state.GetCwdLength() == 0 {
 
 			/* resolve relative path */
@@ -469,7 +480,7 @@ func VirtualFileEx(state *CwdState, path *byte, verify_path VerifyPathFunc, use_
 	} else {
 		memcpy(resolved_path, path, path_length+1)
 	}
-	add_slash = use_realpath != CWD_REALPATH && path_length > 0 && IS_SLASH(resolved_path[path_length-1])
+	add_slash = use_realpath != CWD_REALPATH && path_length > 0 && IsSlash(resolved_path[path_length-1])
 	if CWDG__().realpath_cache_ttl {
 		t = 0
 	} else {
@@ -483,7 +494,7 @@ func VirtualFileEx(state *CwdState, path *byte, verify_path VerifyPathFunc, use_
 	if start == 0 && path_length == 0 {
 		resolved_path[lang.PostInc(&path_length)] = '.'
 	}
-	if add_slash != 0 && path_length != 0 && !(IS_SLASH(resolved_path[path_length-1])) {
+	if add_slash != 0 && path_length != 0 && !(IsSlash(resolved_path[path_length-1])) {
 		if path_length >= MAXPATHLEN-1 {
 			return -1
 		}
@@ -521,7 +532,7 @@ func VirtualChdirFile(path *byte, p_chdir func(path *byte) int) int {
 	if length == 0 {
 		return 1
 	}
-	for lang.PreDec(&length) < SIZE_MAX && !(IS_SLASH(path[length])) {
+	for lang.PreDec(&length) < SIZE_MAX && !(IsSlash(path[length])) {
 
 	}
 	if length == SIZE_MAX {
@@ -531,7 +542,7 @@ func VirtualChdirFile(path *byte, p_chdir func(path *byte) int) int {
 		errno = ENOENT
 		return -1
 	}
-	if length == COPY_WHEN_ABSOLUTE(path) && IS_ABSOLUTE_PATH(path, length+1) {
+	if length == COPY_WHEN_ABSOLUTE(path) && IsAbsolutePathOld(path, length+1) {
 		length++
 	}
 	temp = (*byte)(DoAlloca(length+1, use_heap))
@@ -554,7 +565,7 @@ func TsrmRealpath(path *byte, real_path *byte) *byte {
 		if VCWD_GETCWD(cwd, MAXPATHLEN) {
 			path = cwd
 		}
-	} else if !(IS_ABSOLUTE_PATH(path, strlen(path))) && VCWD_GETCWD(cwd, MAXPATHLEN) {
+	} else if !(IsAbsolutePathOld(path, strlen(path))) && VCWD_GETCWD(cwd, MAXPATHLEN) {
 		new_state.SetCwd(Estrdup(cwd))
 		new_state.SetCwdLength(strlen(cwd))
 	} else {

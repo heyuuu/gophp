@@ -214,11 +214,11 @@ func ZifChdir(executeData zpp.Ex, return_value zpp.Ret, directory *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	if BG__().CurrentStatFile && !(zend.IS_ABSOLUTE_PATH(BG__().CurrentStatFile, strlen(BG__().CurrentStatFile))) {
+	if BG__().CurrentStatFile && !(zend.IsAbsolutePathOld(BG__().CurrentStatFile, strlen(BG__().CurrentStatFile))) {
 		zend.Efree(BG__().CurrentStatFile)
 		BG__().CurrentStatFile = nil
 	}
-	if BG__().CurrentLStatFile && !(zend.IS_ABSOLUTE_PATH(BG__().CurrentLStatFile, strlen(BG__().CurrentLStatFile))) {
+	if BG__().CurrentLStatFile && !(zend.IsAbsolutePathOld(BG__().CurrentLStatFile, strlen(BG__().CurrentLStatFile))) {
 		zend.Efree(BG__().CurrentLStatFile)
 		BG__().CurrentLStatFile = nil
 	}

@@ -24,7 +24,7 @@ func PhpDoOpenTemporaryFile(path *byte, pfx *byte, opened_path_p **types.String)
 		zend.Efree(new_state.GetCwd())
 		return -1
 	}
-	if zend.IS_SLASH(new_state.GetCwd()[new_state.GetCwdLength()-1]) {
+	if zend.IsSlash(new_state.GetCwd()[new_state.GetCwdLength()-1]) {
 		trailing_slash = ""
 	} else {
 		trailing_slash = "/"

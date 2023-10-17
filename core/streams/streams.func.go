@@ -481,8 +481,8 @@ func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte
 	return types.SUCCESS
 }
 func PhpStreamDirentAlphasort(i **types.String, j **types.String) int {
-	return b.StrColl(i.GetVal(), j.GetVal())
+	return b.StrColl((*i).GetStr(), (*j).GetStr())
 }
 func PhpStreamDirentAlphasortr(i **types.String, j **types.String) int {
-	return b.StrColl(j.GetVal(), i.GetVal())
+	return b.StrColl((*j).GetStr(), (*i).GetStr())
 }
