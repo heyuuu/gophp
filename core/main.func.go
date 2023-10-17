@@ -521,10 +521,10 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 	/* get error text into buffer and escape for html if necessary */
 	buffer := pfmt.Sprintf(format, args...)
 	if PG__().html_errors {
-		replaceBuffer := standard.PhpEscapeHtmlEntities_Ex(buffer, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
+		replaceBuffer := standard.PhpEscapeHtmlEntities(buffer, false, standard.ENT_COMPAT, GetSafeCharsetHint())
 		/* Retry with substituting invalid chars on fail. */
 		if replaceBuffer == "" {
-			replaceBuffer = standard.PhpEscapeHtmlEntities_Ex(buffer, 0, standard.ENT_COMPAT|standard.ENT_HTML_SUBSTITUTE_ERRORS, GetSafeCharsetHint())
+			replaceBuffer = standard.PhpEscapeHtmlEntities(buffer, false, standard.ENT_COMPAT|standard.ENT_HTML_SUBSTITUTE_ERRORS, GetSafeCharsetHint())
 		}
 		buffer = replaceBuffer
 	}
@@ -575,7 +575,7 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 		origin = function
 	}
 	if PG__().html_errors {
-		origin = standard.PhpEscapeHtmlEntities_Ex(origin, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
+		origin = standard.PhpEscapeHtmlEntities(origin, false, standard.ENT_COMPAT, GetSafeCharsetHint())
 	}
 
 	/* origin and buffer available, so lets come up with the error message */
@@ -794,7 +794,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 				var append_string = zend.INI_STR("error_append_string")
 				if PG__().html_errors {
 					if type_ == faults.E_ERROR || type_ == faults.E_PARSE {
-						var buf = standard.PhpEscapeHtmlEntities_Ex(format, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
+						var buf = standard.PhpEscapeHtmlEntities(format, false, standard.ENT_COMPAT, GetSafeCharsetHint())
 						PUTS(fmt.Sprintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%d</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf, error_filename, error_lineno, STR_PRINT(append_string)))
 					} else {
 						PUTS(fmt.Sprintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%d</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, format, error_filename, error_lineno, STR_PRINT(append_string)))

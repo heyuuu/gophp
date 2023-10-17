@@ -942,10 +942,10 @@ func PhpUrlScannerAddVarImpl(
 		encoded = PhpRawUrlEncode(b.CastStr(value, value_len))
 		svalue.WriteString(encoded)
 		//types.ZendStringFree(encoded)
-		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name), name_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0).GetStr()
+		encoded = PhpEscapeHtmlEntitiesEx(b.CastStr(name, name_len), false, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().DefaultCharset(), false)
 		hname.WriteString(encoded)
 		//types.ZendStringFree(encoded)
-		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(value), value_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0).GetStr()
+		encoded = PhpEscapeHtmlEntitiesEx(b.CastStr(value, value_len), false, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().DefaultCharset(), false)
 		hvalue.WriteString(encoded)
 		//types.ZendStringFree(encoded)
 	} else {
@@ -1014,7 +1014,7 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 	if encode != 0 {
 		encoded := PhpRawUrlEncode(name.GetStr())
 		sname.WriteString(encoded)
-		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name.GetVal()), name.GetLen(), 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0).GetStr()
+		encoded = PhpEscapeHtmlEntitiesEx(name.GetStr(), false, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().DefaultCharset(), false)
 		hname.WriteString(encoded)
 	} else {
 		sname.WriteString(name.GetStr())

@@ -23,7 +23,7 @@ func SECTION(name string) {
 	}
 }
 func PhpInfoPrintHtmlEsc(str *byte, len_ int) int {
-	newStr := PhpEscapeHtmlEntities_Ex(b.CastStr(str, len_), 0, ENT_QUOTES, "utf-8")
+	newStr := PhpEscapeHtmlEntities(b.CastStr(str, len_), false, ENT_QUOTES, "utf-8")
 	return core.OG__().WriteString(newStr)
 }
 

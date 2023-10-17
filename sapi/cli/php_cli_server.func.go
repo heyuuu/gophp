@@ -764,14 +764,14 @@ func PhpCliServerCloseConnection(server *PhpCliServer, client *PhpCliServerClien
 	server.DelClient(client.GetSock())
 }
 func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient, status int) int {
-	var escaped_request_uri *types.String = nil
+	var escaped_request_uri string
 	var status_string *byte = GetStatusString(status)
 	var content_template string = GetTemplateString(status)
 	var errstr *byte = GetLastError()
 	b.Assert(status_string != nil)
 	PhpCliServerContentSenderCtor(client.GetContentSender())
 	client.SetContentSenderInitialized(1)
-	escaped_request_uri = standard.PhpEscapeHtmlEntitiesEx((*uint8)(client.GetRequest().GetRequestUri()), client.GetRequest().GetRequestUriLen(), 0, standard.ENT_QUOTES, nil, 0)
+	escaped_request_uri = standard.PhpEscapeHtmlEntitiesEx(b.CastStr(client.GetRequest().GetRequestUri(), client.GetRequest().GetRequestUriLen()), false, standard.ENT_QUOTES, "", false)
 	var prologue_template []byte = "<!doctype html><html><head><title>%d %s</title>"
 	var chunk *php_cli_server_chunk = php_cli_server_chunk_heap_new_self_contained(strlen(prologue_template) + 3 + strlen(status_string) + 1)
 	if chunk == nil {
@@ -791,11 +791,11 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 		goto fail
 	}
 	PhpCliServerBufferAppend(client.GetContentSender().GetBuffer(), chunk)
-	var chunk *php_cli_server_chunk = php_cli_server_chunk_heap_new_self_contained(strlen(content_template) + ZSTR_LEN(escaped_request_uri) + 3 + strlen(status_string) + 1)
+	var chunk *php_cli_server_chunk = php_cli_server_chunk_heap_new_self_contained(strlen(content_template) + len(escaped_request_uri) + 3 + strlen(status_string) + 1)
 	if chunk == nil {
 		goto fail
 	}
-	core.Snprintf(chunk.GetDataHeapP(), chunk.GetDataHeapLen(), content_template, status_string, escaped_request_uri.GetVal())
+	core.Snprintf(chunk.GetDataHeapP(), chunk.GetDataHeapLen(), content_template, status_string, escaped_request_uri)
 	chunk.SetDataHeapLen(strlen(chunk.GetDataHeapP()))
 	PhpCliServerBufferAppend(client.GetContentSender().GetBuffer(), chunk)
 	var epilogue_template []byte = "</body></html>"

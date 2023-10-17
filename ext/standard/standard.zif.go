@@ -4042,21 +4042,31 @@ var DefZifStreamFilterRegister = def.DefFunc("stream_filter_register", 2, 2, []d
 // generate by ZifConvertUuencode
 var DefZifConvertUuencode = def.DefFunc("convert_uuencode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	data := fp.ParseZval()
+	data := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifConvertUuencode(executeData, returnValue, data)
+	ret, ok := ZifConvertUuencode(data)
+	if ok {
+		returnValue.SetString(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifConvertUudecode
 var DefZifConvertUudecode = def.DefFunc("convert_uudecode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	data := fp.ParseZval()
+	data := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifConvertUudecode(executeData, returnValue, data)
+	ret, ok := ZifConvertUudecode(data)
+	if ok {
+		returnValue.SetString(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifVarDump

@@ -950,10 +950,10 @@ func UnescapeInverseMap(all bool, flags int) *EntityHt {
 		}
 	}
 }
-func DetermineEntityTable(all int, doctype int) EntityTableOpt {
-	var retval EntityTableOpt = MakeEntityTableOpt(nil)
-	b.Assert(!(doctype == ENT_HTML_DOC_XML1 && all != 0))
-	if all != 0 {
+func DetermineEntityTable(all bool, doctype int) EntityTableOpt {
+	var retval EntityTableOpt = MakeEntityTableOpt(nil, nil)
+	b.Assert(!(doctype == ENT_HTML_DOC_XML1 && all))
+	if all {
 		if doctype == ENT_HTML_DOC_HTML5 {
 			retval.SetMsTable(EntityMsTableHtml5)
 		} else {
@@ -993,17 +993,10 @@ func PhpUnescapeHtmlEntities(str string, all bool, flags int, hintCharset string
 	return TraverseForEntities(str, all, flags, inverse_map, charset)
 }
 
-func PhpEscapeHtmlEntities_Ex(old string, all int, flags int, hint_charset string) string {
-	zstr := PhpEscapeHtmlEntitiesEx(b.CastStrPtr(old), len(old), all, flags, hint_charset, true)
-	if zstr == nil {
-		return ""
-	}
-	return zstr.GetStr()
+func PhpEscapeHtmlEntities(old string, all bool, flags int, hintCharset string) string {
+	return PhpEscapeHtmlEntitiesEx(old, all, flags, hintCharset, true)
 }
 
-func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_charset string) *types.String {
-	return PhpEscapeHtmlEntitiesEx(old, oldlen, all, flags, hint_charset, true)
-}
 func FindEntityForChar(
 	k uint,
 	charset EntityCharset,
@@ -1073,39 +1066,30 @@ func FindEntityForCharBasic(k uint, table *EntityStage3Row, entity **uint8, enti
 	*entity = (*uint8)(table[k].GetEntity())
 	*entity_len = table[k].GetEntityLen()
 }
-func PhpEscapeHtmlEntitiesEx(
-	old *uint8,
-	oldlen int,
-	all int,
-	flags int,
-	hint_charset string,
-	double_encode bool,
-) *types.String {
+func PhpEscapeHtmlEntitiesEx(old string, all bool, flags int, hintCharset string, doubleEncode bool) string {
 	var cursor int
-	var maxlen int
-	var len_ int
-	var replaced *types.String
-	var charset EntityCharset = DetermineCharset(hint_charset)
+	var buf strings.Builder
+	var charset EntityCharset = DetermineCharset(hintCharset)
 	var doctype int = flags & ENT_HTML_DOC_TYPE_MASK
 	var entity_table EntityTableOpt
 	var to_uni_table *EncToUni = nil
 	var inv_map *EntityHt = nil
+	oldlen := len(old)
 
 	/* only used if flags includes ENT_HTML_IGNORE_ERRORS or ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS */
-
-	var replacement *uint8 = nil
+	var replacement string
 	var replacement_len int = 0
-	if all != 0 {
+	if all {
 		if CHARSET_PARTIAL_SUPPORT(charset) {
-			core.PhpErrorDocref("", faults.E_NOTICE, "Only basic entities "+"substitution is supported for multi-byte encodings other than UTF-8; "+"functionality is equivalent to htmlspecialchars")
+			core.PhpErrorDocref("", faults.E_NOTICE, "Only basic entities substitution is supported for multi-byte encodings other than UTF-8; functionality is equivalent to htmlspecialchars")
 		}
 		LIMIT_ALL(all, doctype, charset)
 	}
 	entity_table = DetermineEntityTable(all, doctype)
-	if all != 0 && !(CHARSET_UNICODE_COMPAT(charset)) {
+	if all && !(CHARSET_UNICODE_COMPAT(charset)) {
 		to_uni_table = EncToUniIndex[charset]
 	}
-	if double_encode == 0 {
+	if !doubleEncode {
 
 		/* first arg is 1 because we want to identify valid named entities
 		 * even if we are only encoding the basic ones */
@@ -1118,23 +1102,14 @@ func PhpEscapeHtmlEntitiesEx(
 	}
 	if (flags & (ENT_HTML_SUBSTITUTE_ERRORS | ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS)) != 0 {
 		if charset == CsUtf8 {
-			replacement = (*uint8)("xEFxBFxBD")
-			replacement_len = b.SizeOf("\"\\xEF\\xBF\\xBD\"") - 1
+			replacement = "\xEF\xBF\xBD"
 		} else {
-			replacement = (*uint8)("&#xFFFD;")
-			replacement_len = b.SizeOf("\"&#xFFFD;\"") - 1
+			replacement = "&#xFFFD;"
 		}
+		replacement_len = len(replacement)
 	}
 
 	/* initial estimate */
-
-	if oldlen < 64 {
-		maxlen = 128
-	} else {
-		maxlen = zend.ZendSafeAddmult(oldlen, 2, 0, "html_entities")
-	}
-	replaced = types.ZendStringAlloc(maxlen, 0)
-	len_ = 0
 	cursor = 0
 	for cursor < oldlen {
 		var mbsequence *uint8 = nil
@@ -1145,28 +1120,16 @@ func PhpEscapeHtmlEntitiesEx(
 
 		/* guarantee we have at least 40 bytes to write.
 		 * In HTML5, entities may take up to 33 bytes */
-
-		if len_ > maxlen-40 {
-			replaced = types.ZendStringRealloc(replaced, maxlen+128)
-			maxlen += 128
-		}
 		if status == types.FAILURE {
-
 			/* invalid MB sequence */
-
 			if (flags & ENT_HTML_IGNORE_ERRORS) != 0 {
 				continue
 			} else if (flags & ENT_HTML_SUBSTITUTE_ERRORS) != 0 {
-				memcpy(&replaced.GetStr()[len_], replacement, replacement_len)
-				len_ += replacement_len
+				buf.WriteString(replacement)
 				continue
 			} else {
-				// types.ZendStringEfree(replaced)
-				return types.NewString("")
+				return ""
 			}
-
-			/* invalid MB sequence */
-
 		} else {
 			mbsequence = &old[cursor_before]
 			mbseqlen = cursor - cursor_before
@@ -1177,13 +1140,11 @@ func PhpEscapeHtmlEntitiesEx(
 			if this_char == '\'' && (flags&ENT_HTML_QUOTE_SINGLE) == 0 || this_char == '"' && (flags&ENT_HTML_QUOTE_DOUBLE) == 0 {
 				goto pass_char_through
 			}
-			if all != 0 {
+			if all {
 				if to_uni_table != nil {
-
 					/* !CHARSET_UNICODE_COMPAT therefore not UTF-8; since UTF-8
 					 * is the only multibyte encoding with !CHARSET_PARTIAL_SUPPORT,
 					 * we're using a single byte encoding */
-
 					MapToUnicode(this_char, to_uni_table, &this_char)
 					if this_char == 0xffff {
 						goto pass_char_through
@@ -1191,24 +1152,18 @@ func PhpEscapeHtmlEntitiesEx(
 				}
 
 				/* the cursor may advance */
-
 				FindEntityForChar(this_char, charset, entity_table.GetMsTable(), &rep, &rep_len, old, oldlen, &cursor)
-
-				/* the cursor may advance */
-
 			} else {
 				FindEntityForCharBasic(this_char, entity_table.GetTable(), &rep, &rep_len)
 			}
 			if rep != nil {
-				replaced.GetStr()[lang.PostInc(&len_)] = '&'
-				memcpy(&replaced.GetStr()[len_], rep, rep_len)
-				len_ += rep_len
-				replaced.GetStr()[lang.PostInc(&len_)] = ';'
+				buf.WriteByte('&')
+				buf.WriteString(rep)
+				buf.WriteByte(';')
 			} else {
 
 				/* we did not find an entity for this char.
 				 * check for its validity, if its valid pass it unchanged */
-
 				if (flags & ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS) != 0 {
 					if CHARSET_UNICODE_COMPAT(charset) {
 						if UnicodeCpIsAllowed(this_char, doctype) == 0 {
@@ -1237,30 +1192,19 @@ func PhpEscapeHtmlEntitiesEx(
 							mbsequence = replacement
 							mbseqlen = replacement_len
 						}
-
-						/* not a unicode code point, unless, coincidentally, it's in
-						 * the 0x20..0x7D range (except 0x5C in sjis). We know nothing
-						 * about other code points, because we have no tables. Since
-						 * Unicode code points in that range are not disallowed in any
-						 * document type, we could do nothing. However, conversion
-						 * tables frequently map 0x00-0x1F to the respective C0 code
-						 * points. Let's play it safe and admit that's the case */
-
 					}
 				}
 			pass_char_through:
 				if mbseqlen > 1 {
-					memcpy(replaced.GetVal()+len_, mbsequence, mbseqlen)
-					len_ += mbseqlen
+					buf.WriteString(b.CastStr(mbsequence, mbseqlen))
 				} else {
-					replaced.GetStr()[lang.PostInc(&len_)] = mbsequence[0]
+					buf.WriteByte(mbsequence[0])
 				}
 			}
 		} else {
-			if double_encode != 0 {
+			if doubleEncode != 0 {
 			encode_amp:
-				memcpy(&replaced.GetStr()[len_], "&amp;", b.SizeOf("\"&amp;\"")-1)
-				len_ += b.SizeOf("\"&amp;\"") - 1
+				buf.WriteString("&amp;")
 			} else {
 
 				/* check if entity is valid */
@@ -1296,44 +1240,27 @@ func PhpEscapeHtmlEntitiesEx(
 					}
 					if ResolveNamedEntityHtml(start, ent_len, inv_map, &dummy1, &dummy2) == types.FAILURE {
 						if !(doctype == ENT_HTML_DOC_XHTML && ent_len == 4 && start[0] == 'a' && start[1] == 'p' && start[2] == 'o' && start[3] == 's') {
-
-							/* uses html4 inv_map, which doesn't include apos;. This is a
-							 * hack to support it */
-
+							/* uses html4 inv_map, which doesn't include apos;. This is a hack to support it */
 							goto encode_amp
-
-							/* uses html4 inv_map, which doesn't include apos;. This is a
-							 * hack to support it */
-
 						}
 					}
 				}
 
 				/* checks passed; copy entity to result */
+				buf.WriteByte('&')
+				buf.WriteString(old[cursor : cursor+ent_len])
+				buf.WriteByte(';')
 
-				if maxlen-len_ < ent_len+2 {
-
-					/* ent_len < oldlen, which is certainly <= SIZE_MAX/2 */
-
-					replaced = types.ZendStringRealloc(replaced, maxlen+ent_len+128)
-					maxlen += ent_len + 128
-				}
-				replaced.GetStr()[lang.PostInc(&len_)] = '&'
-				memcpy(&replaced.GetStr()[len_], &old[cursor], ent_len)
-				len_ += ent_len
-				replaced.GetStr()[lang.PostInc(&len_)] = ';'
 				cursor += ent_len + 1
 			}
 		}
 	}
-	return replaced.Cutoff(len_)
+	return buf.String()
 }
 func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval, all int) {
 	var str *types.String
-	var hint_charset *types.String = nil
-	var default_charset *byte
+	var hint_charset *types.String
 	var flags zend.ZendLong = ENT_COMPAT
-	var replaced *types.String
 	var double_encode bool = 1
 	for {
 		for {
@@ -1350,11 +1277,14 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 		}
 		break
 	}
+	var hintCharset string
 	if hint_charset == nil {
-		default_charset = GetDefaultCharset()
+		hintCharset = GetDefaultCharset()
+	} else {
+		hintCharset = hint_charset.GetStr()
 	}
-	replaced = PhpEscapeHtmlEntitiesEx((*uint8)(str.GetVal()), str.GetLen(), all, int(flags), lang.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset), double_encode)
-	return_value.SetStringEx(replaced)
+	replaced := PhpEscapeHtmlEntitiesEx(str.GetStr(), all != 0, flags, hintCharset, double_encode)
+	return_value.SetString(replaced)
 }
 func RegisterHtmlConstants(moduleNumber int) {
 	zend.RegisterLongConstant("HTML_SPECIALCHARS", HTML_SPECIALCHARS, zend.CONST_PERSISTENT|zend.CONST_CS, moduleNumber)
@@ -1464,7 +1394,7 @@ func ZifGetHtmlTranslationTable(executeData zpp.Ex, return_value zpp.Ret, _ zpp.
 	doctype = flags & ENT_HTML_DOC_TYPE_MASK
 	LIMIT_ALL(all, doctype, charset)
 	zend.ArrayInit(return_value)
-	entity_table = DetermineEntityTable(int(all), doctype)
+	entity_table = DetermineEntityTable(all != 0, doctype)
 	if all != 0 && !(CHARSET_UNICODE_COMPAT(charset)) {
 		to_uni_table = EncToUniIndex[charset]
 	}
