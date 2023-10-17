@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
@@ -269,12 +270,8 @@ func ZifDebugZvalDump(vars []*types.Zval) {
 		PhpDebugZvalDump(zval, 1)
 	}
 }
-func BufferAppendSpaces(buf *zend.SmartStr, num_spaces int) {
-	var tmp_spaces *byte
-	var tmp_spaces_len int
-	tmp_spaces_len = core.Spprintf(&tmp_spaces, 0, "%*c", num_spaces, ' ')
-	buf.WriteString(b.CastStr(tmp_spaces, tmp_spaces_len))
-	zend.Efree(tmp_spaces)
+func BufferAppendSpaces(buf *zend.SmartStr, numSpaces int) {
+	buf.WriteString(pfmt.Sprintf("%*c", numSpaces, ' '))
 }
 func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.String, level int, buf *zend.SmartStr) {
 	if key == nil {

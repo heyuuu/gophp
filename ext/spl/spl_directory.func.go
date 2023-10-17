@@ -152,11 +152,14 @@ func SplFilesystemObjectGetFileName(intern *SplFilesystemObject) {
 
 		/* if there is parent path, ammend it, otherwise just use the given path as is */
 
+		var filename string
 		if path_len == 0 {
-			intern.SetFileNameLen(core.Spprintf(intern.GetFileName(), 0, "%s", intern.GetEntry().GetDName()))
+			filename = intern.GetEntry().GetDName()
 		} else {
-			intern.SetFileNameLen(core.Spprintf(intern.GetFileName(), 0, "%s%c%s", path, slash, intern.GetEntry().GetDName()))
+			filename = fmt.Sprintf("%s%c%s", path, slash, intern.GetEntry().GetDName())
 		}
+		intern.SetFileName(filename)
+		intern.SetFileNameLen(len(filename))
 
 		/* if there is parent path, ammend it, otherwise just use the given path as is */
 
@@ -595,7 +598,7 @@ func SplFilesystemObjectConstruct(executeData *zend.ZendExecuteData, return_valu
 	}
 	intern.SetFlags(flags)
 	if SPL_HAS_FLAG(ctor_flags, DIT_CTOR_GLOB) != 0 && strstr(path, "glob://") != path {
-		core.Spprintf(&path, 0, "glob://%s", path)
+		path = fmt.Sprintf("glob://%s", path)
 		SplFilesystemDirOpen(intern, path)
 		zend.Efree(path)
 	} else {
@@ -1245,7 +1248,9 @@ func zim_spl_RecursiveDirectoryIterator_getChildren(executeData *zend.ZendExecut
 	subdir = Z_SPLFILESYSTEM_P(return_value)
 	if subdir != nil {
 		if intern.GetSubPath() != nil && intern.GetSubPath()[0] {
-			subdir.SetSubPathLen(core.Spprintf(subdir.GetSubPath(), 0, "%s%c%s", intern.GetSubPath(), slash, intern.GetEntry().GetDName()))
+			path := fmt.Sprintf("%s%c%s", intern.GetSubPath(), slash, intern.GetEntry().GetDName())
+			subdir.SetPath(path)
+			subdir.SetSubPathLen(len(path))
 		} else {
 			subdir.SetSubPathLen(strlen(intern.GetEntry().GetDName()))
 			subdir.SetSubPath(zend.Estrndup(intern.GetEntry().GetDName(), subdir.GetSubPathLen()))

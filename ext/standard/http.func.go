@@ -2,12 +2,12 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/operators"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strconv"
 )
 
 func PhpUrlEncodeHashEx(
@@ -24,7 +24,7 @@ func PhpUrlEncodeHashEx(
 	enc_type int,
 ) int {
 	var key *types.String = nil
-	var newprefix *byte
+	var newprefix string
 	var p *byte
 	var prop_name *byte
 	var arg_sep_len int
@@ -95,60 +95,19 @@ func PhpUrlEncodeHashEx(
 		zdata = types.ZVAL_DEREF(zdata)
 		if zdata.IsType(types.IsArray) || zdata.IsType(types.IsObject) {
 			if key != nil {
-				var ekey *types.String
+				var ekey string
 				if enc_type == PHP_QUERY_RFC3986 {
-					ekey = types.NewString(PhpRawUrlEncode(b.CastStr(prop_name, prop_len)))
+					ekey = PhpRawUrlEncode(b.CastStr(prop_name, prop_len))
 				} else {
-					ekey = types.NewString(PhpUrlEncode(b.CastStr(prop_name, prop_len)))
+					ekey = PhpUrlEncode(b.CastStr(prop_name, prop_len))
 				}
-				newprefix_len = key_suffix_len + ekey.GetLen() + key_prefix_len + 3
-				newprefix = zend.Emalloc(newprefix_len + 1)
-				p = newprefix
-				if key_prefix != nil {
-					memcpy(p, key_prefix, key_prefix_len)
-					p += key_prefix_len
-				}
-				memcpy(p, ekey.GetVal(), ekey.GetLen())
-				p += ekey.GetLen()
-				//types.ZendStringFree(ekey)
-				if key_suffix {
-					memcpy(p, key_suffix, key_suffix_len)
-					p += key_suffix_len
-				}
-				*(lang.PostInc(&p)) = '%'
-				*(lang.PostInc(&p)) = '5'
-				*(lang.PostInc(&p)) = 'B'
-				*p = '0'
+				newprefix = key_prefix + ekey + key_suffix + "%5B"
 			} else {
-				var ekey *byte
-				var ekey_len int
-
 				/* Is an integer key */
-
-				ekey_len = core.Spprintf(&ekey, 0, "%d", idx)
-				newprefix_len = key_prefix_len + num_prefix_len + ekey_len + key_suffix_len + 3
-				newprefix = zend.Emalloc(newprefix_len + 1)
-				p = newprefix
-				if key_prefix != nil {
-					memcpy(p, key_prefix, key_prefix_len)
-					p += key_prefix_len
-				}
-				if num_prefix != nil {
-					memcpy(p, num_prefix, num_prefix_len)
-					p += num_prefix_len
-				}
-				memcpy(p, ekey, ekey_len)
-				p += ekey_len
-				zend.Efree(ekey)
-				if key_suffix {
-					memcpy(p, key_suffix, key_suffix_len)
-					p += key_suffix_len
-				}
-				*(lang.PostInc(&p)) = '%'
-				*(lang.PostInc(&p)) = '5'
-				*(lang.PostInc(&p)) = 'B'
-				*p = '0'
+				ekey := strconv.Itoa(idx)
+				newprefix = key_prefix[:key_prefix_len] + num_prefix[:num_prefix_len] + ekey + key_prefix[:key_suffix_len] + "%5B"
 			}
+			newprefix_len = len(newprefix)
 			ht.ProtectRecursive()
 			PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, lang.Cond(zdata.IsType(types.IsObject), zdata, nil), arg_sep, enc_type)
 			ht.UnprotectRecursive()

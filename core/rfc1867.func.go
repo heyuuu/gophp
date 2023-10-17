@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/kits/ascii"
@@ -163,8 +164,11 @@ func MultipartBufferNew(boundary *byte, boundary_len int) *MultipartBuffer {
 	}
 	self.SetBuffer((*byte)(zend.Ecalloc(1, minsize+1)))
 	self.SetBufsize(minsize)
-	Spprintf(self.GetBoundary(), 0, "--%s", boundary)
-	self.SetBoundaryNextLen(int(Spprintf(self.GetBoundaryNext(), 0, "\n--%s", boundary)))
+	self.SetBoundary(fmt.Sprintf("--%s", boundary))
+
+	boundaryNext := fmt.Sprintf("\n--%s", boundary)
+	self.SetBoundaryNext(boundaryNext)
+	self.SetBoundaryNextLen(len(boundaryNext))
 	self.SetBufBegin(self.GetBuffer())
 	self.SetBytesInBuffer(0)
 	if PhpRfc1867EncodingTranslation() != 0 {

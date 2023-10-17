@@ -68,9 +68,8 @@ func PhpStreamUrlWrapHttpEx(
 	var chunk_size int = 0
 	var file_size int = 0
 	var eol_detect int = 0
-	var transport_string *byte
+	var transport_string string
 	var errstr *types.String = nil
-	var transport_len int
 	var have_header int = 0
 	var request_fulluri bool = 0
 	var ignore_errors bool = 0
@@ -103,8 +102,7 @@ func PhpStreamUrlWrapHttpEx(
 		request_fulluri = 1
 		use_ssl = false
 		use_proxy = 1
-		transport_len = tmpzval.StringEx().GetLen()
-		transport_string = zend.Estrndup(tmpzval.StringEx().GetVal(), tmpzval.StringEx().GetLen())
+		transport_string = tmpzval.String()
 
 		/* Normal http request (possibly with proxy) */
 	} else {
@@ -125,10 +123,9 @@ func PhpStreamUrlWrapHttpEx(
 		}
 		if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) != nil && tmpzval.IsString() && tmpzval.StringEx().GetLen() > 0 {
 			use_proxy = 1
-			transport_len = tmpzval.StringEx().GetLen()
-			transport_string = zend.Estrndup(tmpzval.StringEx().GetVal(), tmpzval.StringEx().GetLen())
+			transport_string = tmpzval.String()
 		} else {
-			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", lang.Cond(use_ssl, "ssl", "tcp"), resource.Host(), resource.Port())
+			transport_string = fmt.Sprintf("%s://%s:%d", lang.Cond(use_ssl, "ssl", "tcp"), resource.Host(), resource.Port())
 		}
 	}
 	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "timeout")) != nil {
@@ -139,21 +136,18 @@ func PhpStreamUrlWrapHttpEx(
 		timeout.tv_sec = FG__().default_socket_timeout
 		timeout.tv_usec = 0
 	}
-	stream = streams.PhpStreamXportCreate(transport_string, transport_len, options, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, &timeout, context, &errstr, nil)
+	stream = streams.PhpStreamXportCreate(transport_string, len(transport_string), options, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, &timeout, context, &errstr, nil)
 	if stream != nil {
 		core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_READ_TIMEOUT, 0, &timeout)
 	}
 	if errstr != nil {
 		streams.PhpStreamWrapperLogError(wrapper, options, "%s", errstr.GetVal())
-		// types.ZendStringReleaseEx(errstr, 0)
 		errstr = nil
 	}
-	zend.Efree(transport_string)
 	if stream != nil && use_proxy != 0 && use_ssl {
 		var header zend.SmartStr
 
 		/* Set peer_name or name verification will try to use the proxy server name */
-
 		if context == nil || lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ssl", "peer_name")) == nil {
 			ssl_proxy_peer_name.SetString(resource.Host())
 			streams.PhpStreamContextSetOption(core.PHP_STREAM_CONTEXT(stream), "ssl", "peer_name", &ssl_proxy_peer_name)
@@ -349,7 +343,7 @@ func PhpStreamUrlWrapHttpEx(
 
 	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "protocol_version")) != nil {
 		var protocol_version *byte
-		core.Spprintf(&protocol_version, 0, "%.1F", operators.ZvalGetDouble(tmpzval))
+		protocol_version = fmt.Sprintf("%.1F", operators.ZvalGetDouble(tmpzval))
 		req_buf.WriteString(" HTTP/")
 		req_buf.WriteString(b.CastStrAuto(protocol_version))
 		req_buf.WriteString("\r\n")

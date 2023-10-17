@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/streams"
@@ -314,7 +315,7 @@ func PhpFopenPrimaryScript() *zend.FileHandle {
 			user[length] = '0'
 			pw = getpwnam(user)
 			if pw != nil && pw.pw_dir {
-				Spprintf(&filename, 0, "%s%c%s%c%s", pw.pw_dir, PHP_DIR_SEPARATOR, PG__().user_dir, PHP_DIR_SEPARATOR, s+1)
+				filename = fmt.Sprintf("%s%c%s%c%s", pw.pw_dir, PHP_DIR_SEPARATOR, PG__().user_dir, PHP_DIR_SEPARATOR, s+1)
 			} else {
 				filename = SG__().RequestInfo.pathTranslated
 			}

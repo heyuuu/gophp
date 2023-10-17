@@ -360,26 +360,20 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 
 	if mail_log != nil && (*mail_log) {
 		var logline *byte
-		core.Spprintf(&logline, 0, "mail() on [%s:%d]: To: %s -- Headers: %s -- Subject: %s", zend.ZendGetExecutedFilename(), zend.ZendGetExecutedLineno(), to, lang.Cond(hdr != nil, hdr, ""), subject)
+		logline = fmt.Sprintf("mail() on [%s:%d]: To: %s -- Headers: %s -- Subject: %s", zend.ZendGetExecutedFilename(), zend.ZendGetExecutedLineno(), to, lang.Cond(hdr != nil, hdr, ""), subject)
 		if hdr != nil {
 			PhpMailLogCrlfToSpaces(logline)
 		}
 		if !(strcmp(mail_log, "syslog")) {
 			PhpMailLogToSyslog(logline)
 		} else {
-
 			/* Add date when logging to file */
-
-			var tmp *byte
 			var curtime int64
 			var date_str *types.String
-			var len_ int
 			time(&curtime)
 			date_str = php_format_date("d-M-Y H:i:s e", 13, curtime, 1)
-			len_ = core.Spprintf(&tmp, 0, "[%s] %s%s", date_str.GetVal(), logline, core.PHP_EOL)
-			PhpMailLogToFile(mail_log, tmp, len_)
-			//types.ZendStringFree(date_str)
-			zend.Efree(tmp)
+			temp := fmt.Sprintf("[%s] %s%s", date_str.GetVal(), logline, core.PHP_EOL)
+			PhpMailLogToFile(mail_log, temp, len(temp))
 		}
 		zend.Efree(logline)
 	}
@@ -388,9 +382,9 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 		var f *types.String
 		f = str.PhpBasenameZStr(tmp, "")
 		if headers != nil && (*headers) {
-			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: %d:%s\n%s", PhpGetuid(), f.GetVal(), headers)
+			hdr = fmt.Sprintf("X-PHP-Originating-Script: %d:%s\n%s", PhpGetuid(), f.GetVal(), headers)
 		} else {
-			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: %d:%s", PhpGetuid(), f.GetVal())
+			hdr = fmt.Sprintf("X-PHP-Originating-Script: %d:%s", PhpGetuid(), f.GetVal())
 		}
 		// types.ZendStringReleaseEx(f, 0)
 	}
@@ -408,7 +402,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 		return 0
 	}
 	if extra_cmd != nil {
-		core.Spprintf(&sendmail_cmd, 0, "%s %s", sendmail_path, extra_cmd)
+		sendmail_cmd = fmt.Sprintf("%s %s", sendmail_path, extra_cmd)
 	} else {
 		sendmail_cmd = sendmail_path
 	}

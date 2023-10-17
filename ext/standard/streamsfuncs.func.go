@@ -94,7 +94,7 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
 	if (flags & PHP_STREAM_CLIENT_PERSISTENT) != 0 {
-		core.Spprintf(&hashkey, 0, "stream_socket_client__%s", host.GetVal())
+		hashkey = fmt.Sprintf("stream_socket_client__%s", host.GetVal())
 	}
 
 	/* prepare the timeout value for use */

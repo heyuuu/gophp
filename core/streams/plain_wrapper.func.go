@@ -595,7 +595,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.String, opt
 		}
 	}
 	if persistent != 0 {
-		core.Spprintf(&persistent_id, 0, "streams_stdio_%d_%s", open_flags, realpath)
+		persistent_id = fmt.Sprintf("streams_stdio_%d_%s", open_flags, realpath)
 		switch PhpStreamFromPersistentId(persistent_id, &ret) {
 		case core.PHP_STREAM_PERSISTENT_SUCCESS:
 			if opened_path != nil {

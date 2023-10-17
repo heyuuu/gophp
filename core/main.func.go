@@ -628,7 +628,7 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 			/* add the extension if it is set in ini */
 
 			if PG__().docref_ext && strlen(PG__().docref_ext) {
-				Spprintf(&docrefBuf, 0, "%s%s", ref, PG__().docref_ext)
+				docrefBuf = fmt.Sprintf("%s%s", ref, PG__().docref_ext)
 				zend.Efree(ref)
 			}
 			docref = docrefBuf

@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
@@ -75,7 +76,6 @@ func PhpFtpFopenConnect(
 	var use_ssl_on_data int = 0
 	var tmp_line []byte
 	var transport *byte
-	var transport_len int
 	resource = PhpUrlParse(path)
 	if resource == nil || resource.HasPath() {
 		if resource != nil && presource != nil {
@@ -90,8 +90,8 @@ func PhpFtpFopenConnect(
 	if resource.Port() == 0 {
 		resource.SetPort(21)
 	}
-	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", resource.Host(), resource.Port()))
-	stream = streams.PhpStreamXportCreate(transport, transport_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, nil, nil)
+	transport = fmt.Sprintf("tcp://%s:%d", resource.Host(), resource.Port())
+	stream = streams.PhpStreamXportCreate(transport, len(transport), core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, nil, nil)
 	zend.Efree(transport)
 	if stream == nil {
 		result = 0
@@ -391,7 +391,6 @@ func PhpStreamUrlWrapFtp(
 	var allow_overwrite bool = 0
 	var read_write int8_t = 0
 	var transport *byte
-	var transport_len int
 	var error_message *types.String = nil
 	tmp_line[0] = '0'
 	if strpbrk(mode, "r+") {
@@ -552,9 +551,8 @@ func PhpStreamUrlWrapFtp(
 	if hoststart == nil {
 		hoststart = resource.Host()
 	}
-	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", hoststart, portno))
-	datastream = streams.PhpStreamXportCreate(transport, transport_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, &error_message, nil)
-	zend.Efree(transport)
+	transport = fmt.Sprintf("tcp://%s:%d", hoststart, portno)
+	datastream = streams.PhpStreamXportCreate(transport, len(transport), core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, &error_message, nil)
 	if datastream == nil {
 		tmp_line[0] = '0'
 		goto errexit

@@ -133,7 +133,9 @@ func (this *MultipartBuffer) SetBufsize(value int)                      { this.b
 func (this *MultipartBuffer) GetBytesInBuffer() int                     { return this.bytes_in_buffer }
 func (this *MultipartBuffer) SetBytesInBuffer(value int)                { this.bytes_in_buffer = value }
 func (this *MultipartBuffer) GetBoundary() *byte                        { return this.boundary }
+func (this *MultipartBuffer) SetBoundary(value string)                  { this.boundary = value }
 func (this *MultipartBuffer) GetBoundaryNext() *byte                    { return this.boundary_next }
+func (this *MultipartBuffer) SetBoundaryNext(value string)              { this.boundary_next = value }
 func (this *MultipartBuffer) GetBoundaryNextLen() int                   { return this.boundary_next_len }
 func (this *MultipartBuffer) SetBoundaryNextLen(value int)              { this.boundary_next_len = value }
 func (this *MultipartBuffer) GetInputEncoding() *zend.ZendEncoding      { return this.input_encoding }

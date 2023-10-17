@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	b "github.com/heyuuu/gophp/php/lang"
@@ -44,10 +45,11 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 		break
 	}
 	if persistent != 0 {
-		core.Spprintf(&hashkey, 0, "pfsockopen__%s:%d", host, port)
+		hashkey = fmt.Sprintf("pfsockopen__%s:%d", host, port)
 	}
 	if port > 0 {
-		hostname_len = core.Spprintf(&hostname, 0, "%s:%d", host, port)
+		hostname = fmt.Sprintf("%s:%d", host, port)
+		hostname_len = len(hostname)
 	} else {
 		hostname_len = host_len
 		hostname = host

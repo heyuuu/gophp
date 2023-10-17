@@ -661,13 +661,8 @@ func _phpStreamSockOpenFromSocket(socket PhpSocketT, persistent_id *byte) *PhpSt
 	return stream
 }
 func _phpStreamSockOpenHost(host *byte, port uint16, socktype int, timeout *__struct__timeval, persistent_id *byte) *PhpStream {
-	var res *byte
-	var reslen zend.ZendLong
-	var stream *PhpStream
-	reslen = Spprintf(&res, 0, "tcp://%s:%d", host, port)
-	stream = streams.PhpStreamXportCreate(res, reslen, REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, persistent_id, timeout, nil, nil, nil)
-	zend.Efree(res)
-	return stream
+	res := fmt.Sprintf("tcp://%s:%d", host, port)
+	return streams.PhpStreamXportCreate(res, len(res), REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, persistent_id, timeout, nil, nil, nil)
 }
 func PhpSetSockBlocking(socketd PhpSocketT, block int) int {
 	var ret int = types.SUCCESS

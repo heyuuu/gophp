@@ -300,7 +300,7 @@ func PhpInitConfig() int {
 		if fp == nil {
 			var fmt *byte = "php-%s.ini"
 			var ini_fname *byte
-			Spprintf(&ini_fname, 0, fmt, SM__().Name())
+			ini_fname = fmt.Sprintf(fmt, SM__().Name())
 			fp = PhpFopenWithPath(ini_fname, "r", php_ini_search_path, &opened_path)
 			zend.Efree(ini_fname)
 			if fp != nil {

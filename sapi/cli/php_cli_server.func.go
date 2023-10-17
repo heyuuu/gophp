@@ -4,6 +4,7 @@ import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -225,16 +226,16 @@ func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 		SapiCliServerRegisterVariable(track_vars_array, "REMOTE_ADDR", client.GetAddrStr())
 	}
 	var tmp *byte
-	core.Spprintf(&tmp, 0, "PHP %s Development Server", core.PHP_VERSION)
+	tmp = fmt.Sprintf("PHP %s Development Server", core.PHP_VERSION)
 	SapiCliServerRegisterVariable(track_vars_array, "SERVER_SOFTWARE", tmp)
 	zend.Efree(tmp)
 	var tmp *byte
-	core.Spprintf(&tmp, 0, "HTTP/%d.%d", client.GetRequest().GetProtocolVersion()/100, client.GetRequest().GetProtocolVersion()%100)
+	tmp = fmt.Sprintf("HTTP/%d.%d", client.GetRequest().GetProtocolVersion()/100, client.GetRequest().GetProtocolVersion()%100)
 	SapiCliServerRegisterVariable(track_vars_array, "SERVER_PROTOCOL", tmp)
 	zend.Efree(tmp)
 	SapiCliServerRegisterVariable(track_vars_array, "SERVER_NAME", client.GetServer().GetHost())
 	var tmp *byte
-	core.Spprintf(&tmp, 0, "%i", client.GetServer().GetPort())
+	tmp = fmt.Sprintf("%i", client.GetServer().GetPort())
 	SapiCliServerRegisterVariable(track_vars_array, "SERVER_PORT", tmp)
 	zend.Efree(tmp)
 	SapiCliServerRegisterVariable(track_vars_array, "REQUEST_URI", client.GetRequest().GetRequestUri())
@@ -250,7 +251,7 @@ func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 	}
 	if client.GetRequest().GetPathInfoLen() != 0 {
 		var tmp *byte
-		core.Spprintf(&tmp, 0, "%s%s", client.GetRequest().GetVpath(), client.GetRequest().GetPathInfo())
+		tmp = fmt.Sprintf("%s%s", client.GetRequest().GetVpath(), client.GetRequest().GetPathInfo())
 		SapiCliServerRegisterVariable(track_vars_array, "PHP_SELF", tmp)
 		zend.Efree(tmp)
 	} else {
@@ -498,7 +499,7 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 
 	/* basic */
 
-	core.Spprintf(&basic_buf, 0, "%s [%d]: %s %s", client.GetAddrStr(), status, core.SG__().RequestInfo.request_method, client.GetRequest().GetRequestUri())
+	basic_buf = fmt.Sprintf("%s [%d]: %s %s", client.GetAddrStr(), status, core.SG__().RequestInfo.request_method, client.GetRequest().GetRequestUri())
 	if basic_buf == nil {
 		return
 	}
@@ -506,7 +507,7 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 	/* message */
 
 	if message != nil {
-		core.Spprintf(&message_buf, 0, " - %s", message)
+		message_buf = fmt.Sprintf(" - %s", message)
 		if message_buf == nil {
 			zend.Efree(basic_buf)
 			return
@@ -516,7 +517,7 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 	/* error */
 
 	if append_error_message != 0 {
-		core.Spprintf(&error_buf, 0, " - %s in %s on line %d", core.PG__().last_error_message, core.PG__().last_error_file, core.PG__().last_error_lineno)
+		error_buf = fmt.Sprintf(" - %s in %s on line %d", core.PG__().last_error_message, core.PG__().last_error_file, core.PG__().last_error_lineno)
 		if error_buf == nil {
 			zend.Efree(basic_buf)
 			if message != nil {
@@ -538,15 +539,18 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 		zend.Efree(error_buf)
 	}
 }
-func PhpCliServerLogf(type_ int, format string, _ ...any) {
+func PhpCliServerLogf(type_ int, format string, args ...any) {
 	var buf *byte = nil
-	var ap va_list
+	//var ap va_list
 	if PhpCliServerLogLevel < type_ {
 		return
 	}
-	va_start(ap, format)
-	core.Vspprintf(&buf, 0, format, ap)
-	va_end(ap)
+	//va_start(ap, format)
+	//core.Vspprintf(&buf, 0, format, ap)
+	if buf != nil {
+		buf = pfmt.Sprintf(format, args...)
+	}
+	//va_end(ap)
 	if buf == nil {
 		return
 	}
