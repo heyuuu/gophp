@@ -617,7 +617,7 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	}
 	basename = str.PhpBasenameZStr(b.CastStr(ent.GetDName(), tmp_len), "")
 	tmp_len = cli.MIN(b.SizeOf("ent -> d_name"), basename.GetLen()-1)
-	memcpy(ent.GetDName(), basename.GetVal(), tmp_len)
+	memcpy(ent.GetDName(), basename.GetStr(), tmp_len)
 	ent.GetDName()[tmp_len-1] = '0'
 	// types.ZendStringReleaseEx(basename, 0)
 

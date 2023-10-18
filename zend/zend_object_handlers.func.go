@@ -774,11 +774,11 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.Object, member *types.Zval, type_ in
 			if zobj.GetCe().GetGet() == nil || zobj.Guard(name.GetStr()).InGet() || prop_info != nil && retval.GetU2Extra() == types.IS_PROP_UNINIT {
 				if type_ == BP_VAR_RW || type_ == BP_VAR_R {
 					if prop_info != nil {
-						faults.ThrowError(nil, fmt.Sprintf("Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name.GetVal()))
+						faults.ThrowError(nil, fmt.Sprintf("Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name.GetStr()))
 						retval = EG__().GetErrorZval()
 					} else {
 						retval.SetNull()
-						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal()))
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetStr()))
 					}
 				}
 			} else {
@@ -804,7 +804,7 @@ func ZendStdGetPropertyPtrPtrEx(zobj *types.Object, member *types.Zval, type_ in
 			 * being overwritten in an error handler. */
 
 			if type_ == BP_VAR_RW || type_ == BP_VAR_R {
-				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal()))
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetStr()))
 			}
 
 			/* Notice is thrown after creation of the property, to avoid EG(std_property_info)
@@ -991,7 +991,7 @@ func ZendGetUserCallFunction(ce *types.ClassEntry, method_name *types.String) ty
 	return ZendGetCallTrampolineFunc(ce, method_name.GetStr(), false)
 }
 func ZendBadMethodCall(fbc types.IFunction, method_name *types.String, scope *types.ClassEntry) {
-	faults.ThrowError(nil, fmt.Sprintf("Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), lang.CondF1(scope != nil, func() []byte { return scope.Name() }, "")))
+	faults.ThrowError(nil, fmt.Sprintf("Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetStr(), lang.CondF1(scope != nil, func() string { return scope.Name() }, "")))
 }
 
 func ZendStdGetMethod(obj_ptr **types.Object, method_name *types.String, key *types.Zval) types.IFunction {
@@ -1151,7 +1151,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 		} else {
 		undeclared_property:
 			if type_ != BP_VAR_IS {
-				faults.ThrowError(nil, fmt.Sprintf("Access to undeclared static property: %s::$%s", ce.Name(), property_name.GetVal()))
+				faults.ThrowError(nil, fmt.Sprintf("Access to undeclared static property: %s::$%s", ce.Name(), property_name.GetStr()))
 			}
 			return nil
 		}
@@ -1169,7 +1169,7 @@ func ZendStdGetStaticProperty(ce *types.ClassEntry, property_name *types.String,
 	return ZendStdGetStaticPropertyWithInfo(ce, property_name, type_, &prop_info)
 }
 func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name *types.String) bool {
-	faults.ThrowError(nil, fmt.Sprintf("Attempt to unset static property %s::$%s", ce.Name(), property_name.GetVal()))
+	faults.ThrowError(nil, fmt.Sprintf("Attempt to unset static property %s::$%s", ce.Name(), property_name.GetStr()))
 	return 0
 }
 func ZendBadConstructorCall(constructor types.IFunction, scope *types.ClassEntry) {

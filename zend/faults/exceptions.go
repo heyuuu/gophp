@@ -534,14 +534,14 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		if !trace.IsString() {
 			trace.SetUndef()
 		}
-		if (types.Z_OBJCE_P(exception) == ZendCeTypeError || types.Z_OBJCE_P(exception) == ZendCeArgumentCountError) && strstr(message.GetVal(), ", called in ") {
+		if (types.Z_OBJCE_P(exception) == ZendCeTypeError || types.Z_OBJCE_P(exception) == ZendCeArgumentCountError) && strstr(message.GetStr(), ", called in ") {
 			var real_message *types.String = types.NewString(fmt.Sprintf("%s and defined", message.GetStr()))
 			message = real_message
 		}
 		if message.GetLen() > 0 {
-			str = fmt.Sprintf("%s: %s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), message.GetVal(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
+			str = fmt.Sprintf("%s: %s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), message.GetStr(), file.GetStr(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
 		} else {
-			str = fmt.Sprintf("%s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), file.GetVal(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
+			str = fmt.Sprintf("%s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), file.GetStr(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
 		}
 		exception.Object().ProtectRecursive()
 		exception = GET_PROPERTY(exception, types.STR_PREVIOUS, &rv)

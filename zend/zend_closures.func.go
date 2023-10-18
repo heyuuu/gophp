@@ -159,7 +159,7 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 			if class_name.GetStr() == "static" {
 				ce = closure.GetFunc().GetScope()
 			} else if lang.Assign(&ce, ZendLookupClass(class_name.GetStr())) == nil {
-				faults.Error(faults.E_WARNING, fmt.Sprintf("Class '%s' not found", class_name.GetVal()))
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Class '%s' not found", class_name.GetStr()))
 				return_value.SetNull()
 				return
 			}

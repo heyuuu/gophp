@@ -225,8 +225,8 @@ func ZifStreamWrapperRegister(executeData zpp.Ex, return_value zpp.Ret, protocol
 		return
 	}
 	uwrap = (*PhpUserStreamWrapper)(zend.Ecalloc(1, b.SizeOf("* uwrap")))
-	uwrap.SetProtoname(zend.Estrndup(protocol.GetVal(), protocol.GetLen()))
-	uwrap.SetClassname(zend.Estrndup(classname.GetVal(), classname.GetLen()))
+	uwrap.SetProtoname(protocol.String())
+	uwrap.SetClassname(classname.String())
 	uwrap.GetWrapper().SetWops(&UserStreamWops)
 	uwrap.GetWrapper().SetAbstract(uwrap)
 	uwrap.GetWrapper().SetIsUrl((flags & core.PHP_STREAM_IS_URL) != 0)
@@ -238,24 +238,15 @@ func ZifStreamWrapperRegister(executeData zpp.Ex, return_value zpp.Ret, protocol
 		} else {
 
 			/* We failed.  But why? */
-
-			if core.PhpStreamGetUrlStreamWrappersHash().KeyExists(protocol.StringEx()) {
-				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Protocol %s:// is already defined.", protocol.GetVal()))
+			if core.PhpStreamGetUrlStreamWrappersHash().KeyExists(protocol.String()) {
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Protocol %s:// is already defined.", protocol.String()))
 			} else {
-
 				/* Hash doesn't exist so it must have been an invalid protocol scheme */
-
-				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", classname.GetVal(), protocol.GetVal()))
-
-				/* Hash doesn't exist so it must have been an invalid protocol scheme */
-
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", classname.String(), protocol.String()))
 			}
-
-			/* We failed.  But why? */
-
 		}
 	} else {
-		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("class '%s' is undefined", classname.GetVal()))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("class '%s' is undefined", classname.String()))
 	}
 	//zend.ZendListDelete(rsrc)
 	return_value.SetFalse()
@@ -271,7 +262,7 @@ func ZifStreamWrapperUnregister(executeData zpp.Ex, return_value zpp.Ret, protoc
 
 		/* We failed */
 
-		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to unregister protocol %s://", protocol.GetVal()))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to unregister protocol %s://", protocol.String()))
 		return_value.SetFalse()
 		return
 	}
@@ -371,7 +362,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s::"+USERSTREAM_READ+" - read "+"%d"+" bytes more data than requested (%d read, %d max) - excess data will be lost", us.GetWrapper().GetClassname(), zend_long(didread-count), zend.ZendLong(didread), zend.ZendLong(count)))
 			didread = count
 		}
-		memcpy(buf, retval.StringEx().GetVal(), didread)
+		memcpy(buf, retval.String(), didread)
 	}
 	// zend.ZvalPtrDtor(&retval)
 	retval.SetUndef()
@@ -968,7 +959,7 @@ func PhpUserstreamopReaddir(stream *core.PhpStream, buf *byte, count int) ssize_
 	call_result = zend.CallUserFunction(lang.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == types.SUCCESS && !retval.IsFalse() && !retval.IsTrue() {
 		operators.ConvertToString(&retval)
-		core.PHP_STRLCPY(ent.GetDName(), retval.StringEx().GetVal(), b.SizeOf("ent -> d_name"), retval.StringEx().GetLen())
+		core.PHP_STRLCPY(ent.GetDName(), retval.String(), b.SizeOf("ent -> d_name"), retval.StringEx().GetLen())
 		didread = b.SizeOf("php_stream_dirent")
 	} else if call_result == types.FAILURE {
 		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s::"+USERSTREAM_DIR_READ+" is not implemented!", us.GetWrapper().GetClassname()))

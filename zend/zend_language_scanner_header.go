@@ -390,9 +390,9 @@ func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 }
 
 func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
-	var str *byte = zendlval.StringEx().GetVal()
+	var str *byte = zendlval.String()
 	var end *byte = str + zendlval.StringEx().GetLen()
-	var copy *byte = zendlval.StringEx().GetVal()
+	var copy *byte = zendlval.String()
 	var newline_count int = 0
 	var newline_len int
 	var nl *byte
@@ -446,7 +446,7 @@ func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, usin
 		newline_count++
 	}
 	*copy = '0'
-	zendlval.StringEx().GetLen() = copy - zendlval.StringEx().GetVal()
+	zendlval.StringEx().GetLen() = copy - zendlval.String()
 	return 1
 error:
 	zval_ptr_dtor_str(zendlval)

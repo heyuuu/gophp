@@ -77,7 +77,7 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 			lookup_name = ascii.StrToLower(new_name)
 		}
 		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use %s as %s because '%s' is a special class name", old_name.GetVal(), new_name, new_name))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use %s as %s because '%s' is a special class name", old_name.GetStr(), new_name, new_name))
 		}
 		if current_ns != "" {
 			nsName := ascii.StrToLower(current_ns) + "\\" + lookup_name
@@ -90,7 +90,7 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 			}
 		}
 		if ZendAddImport(type_, lookup_name, old_name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetStr(), new_name))
 		}
 	}
 }
@@ -131,12 +131,12 @@ func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
 		value_node.SetOpType(IS_CONST)
 		compiler.ConstExprToZval(value_zv, value_ast)
 		if ZendLookupReservedConst(unqualified_name.GetStr()) != nil {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot redeclare constant '%s'", unqualified_name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot redeclare constant '%s'", unqualified_name.GetStr()))
 		}
 		name = ZendPrefixWithNs(unqualified_name)
 		//name = types.ZendNewInternedString(name)
 		if importName := FC__().FindImportConst(unqualified_name.GetStr()); importName != "" && importName != name.GetStr() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare const %s because the name is already in use", name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare const %s because the name is already in use", name.GetStr()))
 		}
 		name_node.SetOpType(IS_CONST)
 		name_node.GetConstant().SetStringEx(name)

@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/types"
@@ -141,7 +142,7 @@ func (se *VarSerializer) tryAddSleepProp(ht *types.Array, props *types.Array, na
 		}
 	}
 	if ht.KeyAdd(name.GetStr(), val) == nil {
-		core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf(`"%s" is returned from __sleep multiple times`, errorName.GetVal()))
+		core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf(`"%s" is returned from __sleep multiple times`, errorName.GetStr()))
 		return types.SUCCESS
 	}
 	return types.SUCCESS
@@ -197,7 +198,7 @@ func (se *VarSerializer) getSleepProps(ht *types.Array, struc *types.Zval, sleep
 			retval = types.FAILURE
 			break
 		}
-		core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf(`"%s" returned as member variable from __sleep() but does not exist`, name.GetVal()))
+		core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf(`"%s" returned as member variable from __sleep() but does not exist`, name.GetStr()))
 		ht.KeyAdd(name.GetStr(), zend.UninitializedZval())
 	}
 	return retval

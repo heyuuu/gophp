@@ -835,7 +835,7 @@ yy18:
 				// zend.ZvalPtrDtor(&args[0])
 				return 0
 			}
-			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("defined (%s) but not found", user_func.StringEx().GetVal()))
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("defined (%s) but not found", user_func.String()))
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 			// zend.ZvalPtrDtor(&user_func)
@@ -855,7 +855,7 @@ yy18:
 
 		BG__().serialize_lock++
 		if lang.Assign(&ce, zend.ZendLookupClass(class_name.GetStr())) == nil {
-			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Function %s() hasn't defined the class it was called for", user_func.StringEx().GetVal()))
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Function %s() hasn't defined the class it was called for", user_func.String()))
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 		}
@@ -870,7 +870,7 @@ yy18:
 		var ret int
 		ret = ObjectCustom(rval, p, max, var_hash, ce)
 		if ret != 0 && incomplete_class != 0 {
-			PhpStoreClassName(rval, class_name.GetVal(), len2)
+			PhpStoreClassName(rval, class_name.GetStr(), len2)
 		}
 		// types.ZendStringReleaseEx(class_name, 0)
 		return ret
@@ -903,7 +903,7 @@ yy18:
 		return 0
 	}
 	if incomplete_class != 0 {
-		PhpStoreClassName(rval, class_name.GetVal(), len2)
+		PhpStoreClassName(rval, class_name.GetStr(), len2)
 	}
 	// types.ZendStringReleaseEx(class_name, 0)
 	return ObjectCommon(rval, p, max, var_hash, elements, has_unserialize)

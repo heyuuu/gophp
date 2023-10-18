@@ -59,7 +59,7 @@ func ZendFetchDimensionAddressRead(
 					result.SetNull()
 					return
 				}
-				faults.Error(faults.E_WARNING, fmt.Sprintf("Illegal string offset '%s'", dim.StringEx().GetVal()))
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Illegal string offset '%s'", dim.String()))
 			case types.IsUndef:
 				ZVAL_UNDEFINED_OP2(executeData)
 				fallthrough

@@ -236,7 +236,7 @@ func ZifErrorReporting(ret zpp.Ret, _ zpp.Opt, newErrorLevel *types.Zval) {
 			if newErrorLevel.IsLong() {
 				EG__().SetErrorReporting(newErrorLevel.Long())
 			} else {
-				EG__().SetErrorReporting(atoi(p.GetValue().GetVal()))
+				EG__().SetErrorReporting(atoi(p.GetValue().GetStr()))
 			}
 			break
 		}

@@ -11,23 +11,17 @@ type String string
 
 func NewString(str string) *String { tmp := String(str); return &tmp }
 
-func (zs String) Copy() *String  { return &zs }
-func (zs String) GetStr() string { return string(zs) }
-func (zs String) GetLen() int    { return len(zs) }
-
-func (zs String) GetVal() []byte { return []byte(zs) } // todo remove
-
-func (zs *String) SafeGetStr() string {
+func (zs *String) GetStr() string {
 	if zs == nil {
 		return ""
 	}
-	return zs.GetStr()
+	return string(*zs)
 }
-func (zs *String) SafeGetLen() int {
+func (zs *String) GetLen() int {
 	if zs == nil {
 		return 0
 	}
-	return zs.GetLen()
+	return len(*zs)
 }
 
 /**

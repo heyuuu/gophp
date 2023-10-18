@@ -107,7 +107,7 @@ func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **types
 		if stream != nil {
 			var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 			stream.SetWrapper((*core.PhpStreamWrapper)(&PhpPlainFilesWrapper))
-			stream.SetOrigPath(zend.Estrndup(opened_path.GetVal(), opened_path.GetLen()))
+			stream.SetOrigPath(zend.Estrndup(opened_path.GetStr(), opened_path.GetLen()))
 			self.SetTempName(opened_path)
 			self.SetLockFlag(LOCK_UN)
 			return stream
@@ -281,7 +281,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 			return 0
 		}
 		if data.GetTempName() != nil {
-			unlink(data.GetTempName().GetVal())
+			unlink(data.GetTempName().GetStr())
 
 			/* temporary streams are never persistent */
 

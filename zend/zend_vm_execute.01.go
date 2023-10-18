@@ -162,7 +162,7 @@ func zend_undefined_function_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	function_name = opline.Const2()
-	faults.ThrowError(nil, fmt.Sprintf("Call to undefined function %s()", function_name.StringEx().GetVal()))
+	faults.ThrowError(nil, fmt.Sprintf("Call to undefined function %s()", function_name.String()))
 	return 0
 }
 func zend_fetch_static_prop_helper_SPEC(type_ int, executeData *ZendExecuteData) int {

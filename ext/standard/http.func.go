@@ -70,7 +70,7 @@ func PhpUrlEncodeHashEx(
 		/* handling for private & protected object properties */
 
 		if key != nil {
-			prop_name = key.GetVal()
+			prop_name = key.GetStr()
 			prop_len = key.GetLen()
 			if type_ != nil && zend.ZendCheckPropertyAccess(type_.Object(), key, is_dynamic) != types.SUCCESS {
 
@@ -85,7 +85,7 @@ func PhpUrlEncodeHashEx(
 				var tmp *byte
 				zend.ZendUnmanglePropertyNameEx(key, &tmp, &prop_name, &prop_len)
 			} else {
-				prop_name = key.GetVal()
+				prop_name = key.GetStr()
 				prop_len = key.GetLen()
 			}
 		} else {

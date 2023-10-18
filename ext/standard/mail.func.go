@@ -200,7 +200,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 		switch headers.Type() {
 		case types.IsString:
 			tmp_headers = types.NewString(headers.String())
-			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
+			MAIL_ASCIIZ_CHECK(tmp_headers.GetStr(), tmp_headers.GetLen())
 			str_headers = types.NewString(str.PhpTrimRight(tmp_headers.GetStr(), nil))
 			// types.ZendStringReleaseEx(tmp_headers, 0)
 		case types.IsArray:
@@ -212,7 +212,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 		}
 	}
 	if extra_cmd != nil {
-		MAIL_ASCIIZ_CHECK(extra_cmd.GetVal(), extra_cmd.GetLen())
+		MAIL_ASCIIZ_CHECK(extra_cmd.GetStr(), extra_cmd.GetLen())
 	}
 	if to_len > 0 {
 		to_r = zend.Estrndup(to, to_len)
@@ -257,9 +257,9 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 	if force_extra_parameters != nil {
 		extra_cmd = PhpEscapeShellCmd(force_extra_parameters)
 	} else if extra_cmd != nil {
-		extra_cmd = PhpEscapeShellCmd(extra_cmd.GetVal())
+		extra_cmd = PhpEscapeShellCmd(extra_cmd.GetStr())
 	}
-	if PhpMail(to_r, subject_r, message, lang.CondF1(str_headers != nil && str_headers.GetLen() != 0, func() []byte { return str_headers.GetVal() }, nil), lang.CondF1(extra_cmd != nil, func() []byte { return extra_cmd.GetVal() }, nil)) != 0 {
+	if PhpMail(to_r, subject_r, message, lang.CondF1(str_headers != nil && str_headers.GetLen() != 0, func() []byte { return str_headers.GetStr() }, nil), lang.CondF1(extra_cmd != nil, func() []byte { return extra_cmd.GetStr() }, nil)) != 0 {
 		return_value.SetTrue()
 	} else {
 		return_value.SetFalse()
@@ -372,7 +372,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 			var date_str *types.String
 			time(&curtime)
 			date_str = php_format_date("d-M-Y H:i:s e", 13, curtime, 1)
-			temp := fmt.Sprintf("[%s] %s%s", date_str.GetVal(), logline, core.PHP_EOL)
+			temp := fmt.Sprintf("[%s] %s%s", date_str.GetStr(), logline, core.PHP_EOL)
 			PhpMailLogToFile(mail_log, temp, len(temp))
 		}
 		zend.Efree(logline)
@@ -382,9 +382,9 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 		var f *types.String
 		f = str.PhpBasenameZStr(tmp, "")
 		if headers != nil && (*headers) {
-			hdr = fmt.Sprintf("X-PHP-Originating-Script: %d:%s\n%s", PhpGetuid(), f.GetVal(), headers)
+			hdr = fmt.Sprintf("X-PHP-Originating-Script: %d:%s\n%s", PhpGetuid(), f.GetStr(), headers)
 		} else {
-			hdr = fmt.Sprintf("X-PHP-Originating-Script: %d:%s", PhpGetuid(), f.GetVal())
+			hdr = fmt.Sprintf("X-PHP-Originating-Script: %d:%s", PhpGetuid(), f.GetStr())
 		}
 		// types.ZendStringReleaseEx(f, 0)
 	}

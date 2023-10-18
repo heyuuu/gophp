@@ -464,7 +464,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		fallthrough
 	case types.IsString:
 		if data.StringEx().GetLen() != 0 {
-			numbytes = core.PhpStreamWrite(stream, data.StringEx().GetVal(), data.StringEx().GetLen())
+			numbytes = core.PhpStreamWrite(stream, data.String(), data.StringEx().GetLen())
 			if numbytes != data.StringEx().GetLen() {
 				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.StringEx().GetLen()))
 				numbytes = -1
@@ -562,8 +562,8 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 
 	zend.ArrayInit(return_value)
 	if lang.Assign(&target_buf, core.PhpStreamCopyToMem(stream, core.PHP_STREAM_COPY_ALL, 0)) != nil {
-		s = target_buf.GetVal()
-		e = target_buf.GetVal() + target_buf.GetLen()
+		s = target_buf.GetStr()
+		e = target_buf.GetStr() + target_buf.GetLen()
 		if !(lang.Assign(&p, (*byte)(streams.PhpStreamLocateEol(stream, target_buf)))) {
 			p = e
 			goto parse_eol
@@ -588,7 +588,7 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 		} else {
 			for {
 				var windows_eol int = 0
-				if p != target_buf.GetVal() && eol_marker == '\n' && (*(p - 1)) == '\r' {
+				if p != target_buf.GetStr() && eol_marker == '\n' && (*(p - 1)) == '\r' {
 					windows_eol++
 				}
 				if skip_blank_lines != 0 && p-s-windows_eol == 0 {
@@ -645,7 +645,7 @@ func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, prefi
 		p.GetStr()[63] = '0'
 	}
 	return_value.SetFalse()
-	if lang.Assign(&fd, core.PhpOpenTemporaryFdEx(dir, p.GetVal(), &opened_path, core.PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) >= 0 {
+	if lang.Assign(&fd, core.PhpOpenTemporaryFdEx(dir, p.GetStr(), &opened_path, core.PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) >= 0 {
 		close(fd)
 		return_value.SetStringEx(opened_path)
 	}
@@ -1715,7 +1715,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 		/* enclose a field that contains a delimiter, an enclosure character, or a newline */
 
 		if FPUTCSV_FLD_CHK(delimiter) || FPUTCSV_FLD_CHK(enclosure) || escape_char != PHP_CSV_NO_ESCAPE && FPUTCSV_FLD_CHK(escape_char) || FPUTCSV_FLD_CHK('\n') || FPUTCSV_FLD_CHK('\r') || FPUTCSV_FLD_CHK('\t') || FPUTCSV_FLD_CHK(' ') {
-			var ch *byte = field_str.GetVal()
+			var ch *byte = field_str.GetStr()
 			var end *byte = ch + field_str.GetLen()
 			var escaped int = 0
 			csvline.WriteByte(enclosure)
@@ -1740,7 +1740,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 	})
 	csvline.WriteByte('\n')
 	//csvline.ZeroTail()
-	ret = core.PhpStreamWrite(stream, csvline.GetS().GetVal(), csvline.GetS().GetLen())
+	ret = core.PhpStreamWrite(stream, csvline.GetS().GetStr(), csvline.GetS().GetLen())
 	csvline.Free()
 	return ret
 }

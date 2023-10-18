@@ -557,11 +557,11 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 				for isspace(int(*((*uint8)(s)))) {
 					s++
 				}
-				if lang.Assign(&prev_val, return_value.Array().KeyFind(b.CastStr(hdr.StringEx().GetVal(), p-hdr.StringEx().GetVal()))) == nil {
-					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.StringEx().GetVal(), p-hdr.StringEx().GetVal()), b.CastStr(s, hdr.StringEx().GetLen()-(s-hdr.StringEx().GetVal())))
+				if lang.Assign(&prev_val, return_value.Array().KeyFind(b.CastStr(hdr.String(), p-hdr.String()))) == nil {
+					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.String(), p-hdr.String()), b.CastStr(s, hdr.StringEx().GetLen()-(s-hdr.String())))
 				} else {
 					operators.ConvertToArray(prev_val)
-					zend.AddNextIndexStringl(prev_val, s, hdr.StringEx().GetLen()-(s-hdr.StringEx().GetVal()))
+					zend.AddNextIndexStringl(prev_val, s, hdr.StringEx().GetLen()-(s-hdr.String()))
 				}
 				*p = c
 			} else {

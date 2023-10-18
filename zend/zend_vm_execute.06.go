@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -31,7 +32,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 		} else if type_ == BP_VAR_IS {
 			retval = UninitializedZval()
 		} else {
-			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name.GetVal()))
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name.GetStr()))
 			if type_ == BP_VAR_RW {
 				retval = target_symbol_table.KeyUpdate(name.GetStr(), UninitializedZval())
 			} else {
@@ -49,7 +50,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 			} else if type_ == BP_VAR_IS {
 				retval = UninitializedZval()
 			} else {
-				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name.GetVal()))
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name.GetStr()))
 				if type_ == BP_VAR_RW {
 					retval.SetNull()
 				} else {

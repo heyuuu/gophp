@@ -602,7 +602,7 @@ func (compiler *Compiler) ResolveGotoLabel(op_array *types.ZendOpArray, opline *
 		CG__().SetInCompilation(1)
 		CG__().SetActiveOpArray(op_array)
 		compiler.setLinenoByOpline(opline)
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("'goto' to undefined label '%s'", label.StringEx().GetVal()))
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("'goto' to undefined label '%s'", label.String()))
 	}
 
 	label.SetNull()

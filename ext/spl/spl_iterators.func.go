@@ -1443,7 +1443,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 			return_value.SetFalse()
 			return
 		}
-		rc = pcre2_match(re, PCRE2_SPTR(subject.GetVal()), subject.GetLen(), 0, 0, match_data, php_pcre_mctx())
+		rc = pcre2_match(re, PCRE2_SPTR(subject.GetStr()), subject.GetLen(), 0, 0, match_data, php_pcre_mctx())
 		return_value.SetBool(rc >= 0)
 		php_pcre_free_match_data(match_data)
 	case REGIT_MODE_ALL_MATCHES:
@@ -1465,7 +1465,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 		if replacement_str == nil {
 			return
 		}
-		result = php_pcre_replace_impl(intern.GetPce(), subject, subject.GetVal(), subject.GetLen(), replacement_str, -1, &count)
+		result = php_pcre_replace_impl(intern.GetPce(), subject, subject.GetStr(), subject.GetLen(), replacement_str, -1, &count)
 		if intern.IsUseKey() {
 			// zend.ZvalPtrDtor(intern.GetKey())
 			intern.GetKey().SetStringEx(result)
@@ -2012,7 +2012,7 @@ func zim_spl_CachingIterator_offsetGet(executeData *zend.ZendExecuteData, return
 		return
 	}
 	if lang.Assign(&value, intern.GetZcache().Array().SymtableFind(key.GetStr())) == nil {
-		faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", key.GetVal()))
+		faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", key.GetStr()))
 		return
 	}
 	types.ZVAL_COPY_DEREF(return_value, value)

@@ -79,7 +79,7 @@ func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp
 		return
 	}
 	if base == 0 || base == 2 {
-		var strval *byte = num.StringEx().GetVal()
+		var strval *byte = num.String()
 		var strlen int = num.StringEx().GetLen()
 		for isspace(*strval) && strlen != 0 {
 			strval++
@@ -117,7 +117,7 @@ func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp
 		/* Length of 3+ covers "0b#" and "-0b" (which results in 0) */
 
 	}
-	return_value.SetLong(zend.ZEND_STRTOL(num.StringEx().GetVal(), nil, base))
+	return_value.SetLong(zend.ZEND_STRTOL(num.String(), nil, base))
 }
 
 //@zif -alias doubleval

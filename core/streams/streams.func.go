@@ -1,6 +1,7 @@
 package streams
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
@@ -100,7 +101,7 @@ func PhpStreamLocateEol(stream *core.PhpStream, buf *types.String) *byte {
 		readptr = (*byte)(stream.GetReadbuf() + stream.GetReadpos())
 		avail = stream.GetWritepos() - stream.GetReadpos()
 	} else {
-		readptr = buf.GetVal()
+		readptr = buf.GetStr()
 		avail = buf.GetLen()
 	}
 

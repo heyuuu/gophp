@@ -279,7 +279,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 			 * a constructor already.
 			 */
 
-			if fname_len == class_name_len && ctor == nil && !(memcmp(lowercase_name.GetVal(), lc_class_name, class_name_len+1)) {
+			if fname_len == class_name_len && ctor == nil && !(memcmp(lowercase_name.GetStr(), lc_class_name, class_name_len+1)) {
 				ctor = reg_function
 			} else if lowercase_name.GetStr() == "serialize" {
 				serialize_func = reg_function

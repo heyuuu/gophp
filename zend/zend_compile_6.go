@@ -35,7 +35,7 @@ func (compiler *Compiler) CompileClosureBinding(closure *Znode, op_array *types.
 		var offset uint32
 		value, offset = op_array.GetStaticVariables().KeyAddValAndPos(var_name.GetStr(), UninitializedZval())
 		if value == nil {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use variable $%s twice", var_name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use variable $%s twice", var_name.GetStr()))
 		}
 		compiler.setLinenoByAst(var_name_ast)
 		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
@@ -138,7 +138,7 @@ func (compiler *Compiler) CompileClosureUses(ast *ZendAst) {
 		var zv types.Zval
 		zv.SetNull()
 		if j := op_array.FindVarName(var_name.GetStr()); j >= 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use lexical variable $%s as a parameter name", var_name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use lexical variable $%s as a parameter name", var_name.GetStr()))
 		}
 		compiler.setLinenoByAst(var_ast)
 		compiler.CompileStaticVarCommon(var_name, &zv, lang.Cond(var_ast.Attr() != 0, ZEND_BIND_REF, 0))
@@ -163,29 +163,29 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	var is_public bool = op_array.IsPublic()
 	var is_static bool = op_array.IsStatic()
 	var lcname *types.String
-	if in_interface != 0 {
-		if is_public == 0 || op_array.HasFnFlags(types.AccFinal|types.AccAbstract) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Access type for interface method %s::%s() must be omitted", ce.Name(), name.GetVal()))
+	if in_interface {
+		if is_public || op_array.HasFnFlags(types.AccFinal|types.AccAbstract) {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Access type for interface method %s::%s() must be omitted", ce.Name(), name.GetStr()))
 		}
 		op_array.SetIsAbstract(true)
 	}
 	if op_array.IsAbstract() {
 		if op_array.IsPrivate() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("%s function %s::%s() cannot be declared private", lang.Cond(in_interface != 0, "Interface", "Abstract"), ce.Name(), name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("%s function %s::%s() cannot be declared private", lang.Cond(in_interface, "Interface", "Abstract"), ce.Name(), name.GetStr()))
 		}
-		if has_body != 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("%s function %s::%s() cannot contain body", lang.Cond(in_interface != 0, "Interface", "Abstract"), ce.Name(), name.GetVal()))
+		if has_body {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("%s function %s::%s() cannot contain body", lang.Cond(in_interface, "Interface", "Abstract"), ce.Name(), name.GetStr()))
 		}
 		ce.SetIsImplicitAbstractClass(true)
-	} else if has_body == 0 {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Non-abstract method %s::%s() must contain body", ce.Name(), name.GetVal()))
+	} else if has_body {
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Non-abstract method %s::%s() must contain body", ce.Name(), name.GetStr()))
 	}
 	op_array.SetScope(ce)
 	op_array.SetFunctionName(name.GetStr())
 	lcname = operators.ZendStringTolower(name)
 	//lcname = types.ZendNewInternedString(lcname)
 	if !ce.FunctionTable().Add(name.GetStr(), op_array) {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot redeclare %s::%s()", ce.Name(), name.GetVal()))
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot redeclare %s::%s()", ce.Name(), name.GetStr()))
 	}
 	if in_interface != 0 {
 		if lcname.GetStr()[0] != '_' || lcname.GetStr()[1] != '_' {
@@ -320,7 +320,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	if FC__().HasImportsFunction() {
 		var importName = FC__().FindImportFunction(unqualified_name.GetStr())
 		if importName != "" && !(ascii.StrCaseEquals(lcname.GetStr(), importName)) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare function %s because the name is already in use", name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare function %s because the name is already in use", name.GetStr()))
 		}
 	}
 	if lcname.GetStr() == ZEND_AUTOLOAD_FUNC_NAME {
@@ -484,7 +484,7 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 		if type_ast != nil {
 			type_ = compiler.CompileTypename(type_ast, 0)
 			if type_.Code() == types.IsVoid || type_.Code() == types.IsCallable {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Property %s::$%s cannot have type %s", ce.Name(), name.GetVal(), types.ZendGetTypeByConst(type_.Code())))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Property %s::$%s cannot have type %s", ce.Name(), name.GetStr(), types.ZendGetTypeByConst(type_.Code())))
 			}
 		}
 
@@ -494,10 +494,10 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 			doc_comment = ZendAstGetStr(doc_comment_ast).GetStr()
 		}
 		if (flags & types.AccFinal) != 0 {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare property %s::$%s final, the final modifier is allowed only for methods and classes", ce.Name(), name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare property %s::$%s final, the final modifier is allowed only for methods and classes", ce.Name(), name.GetStr()))
 		}
 		if ce.PropertyTable().Exists(name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot redeclare %s::$%s", ce.Name(), name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot redeclare %s::$%s", ce.Name(), name.GetStr()))
 		}
 		if value_ast != nil {
 			compiler.ConstExprToZval(&value_zv, value_ast)
@@ -646,7 +646,7 @@ func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 	for _, traitAst := range traits.Children() {
 		var name = ZendAstGetStr(traitAst)
 		if ce.IsInterface() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use traits inside of interfaces. %s is used in %s", name.GetVal(), ce.Name()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use traits inside of interfaces. %s is used in %s", name.GetStr(), ce.Name()))
 		}
 		switch ZendGetClassFetchType(name.GetStr()) {
 		case ZEND_FETCH_CLASS_SELF:
@@ -654,7 +654,7 @@ func (compiler *Compiler) CompileUseTrait(ast *ZendAst) {
 		case ZEND_FETCH_CLASS_PARENT:
 			fallthrough
 		case ZEND_FETCH_CLASS_STATIC:
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use '%s' as trait name as it is reserved", name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use '%s' as trait name as it is reserved", name.GetStr()))
 		}
 		ce.AddTraitName(ZendResolveClassNameAst(traitAst).GetStr())
 	}
@@ -684,7 +684,7 @@ func (compiler *Compiler) CompileImplements(ast *ZendAst) {
 		var name *types.String = ZendAstGetStr(class_ast)
 		if ZendIsConstDefaultClassRef(class_ast) == 0 {
 			Efree(interfaceNames)
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use '%s' as interface name as it is reserved", name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use '%s' as interface name as it is reserved", name.GetStr()))
 		}
 		interfaceName := ZendResolveClassNameAst(class_ast).GetStr()
 		interfaceNames = append(interfaceNames, interfaceName)
@@ -716,7 +716,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 		if FC__().HasImports() {
 			importName := FC__().FindImport(unqualified_name.GetStr())
 			if importName != "" && !(ascii.StrCaseEquals(lcname.GetStr(), importName)) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare class %s because the name is already in use", name.GetVal()))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare class %s because the name is already in use", name.GetStr()))
 			}
 		}
 		FC__().RegisterSeenSymbol(lcname.GetStr(), ZEND_SYMBOL_CLASS)
@@ -853,7 +853,7 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 		opline.GetResult().SetVar(GetTemporaryVariable())
 		if !CG__().ClassTable().Add(lcname.GetStr(), ce) {
 			/* We checked above that the class name is not used. This really shouldn't happen. */
-			faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Runtime definition key collision for %s. This is a bug", name.GetVal()))
+			faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Runtime definition key collision for %s. This is a bug", name.GetStr()))
 		}
 	} else {
 

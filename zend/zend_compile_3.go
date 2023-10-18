@@ -307,9 +307,9 @@ func (compiler *Compiler) CompileDynamicCall(result *Znode, name_node *Znode, ar
 	if name_node.GetOpType() == IS_CONST && name_node.GetConstant().IsString() {
 		var colon *byte
 		var str *types.String = name_node.GetConstant().StringEx()
-		if lang.Assign(&colon, operators.ZendMemrchr(str.GetVal(), ':', str.GetLen())) != nil && colon > str.GetVal() && (*(colon - 1)) == ':' {
-			var class *types.String = types.NewString(b.CastStr(str.GetVal(), colon-str.GetVal()-1))
-			var method *types.String = types.NewString(b.CastStr(colon+1, str.GetLen()-(colon-str.GetVal())-1))
+		if lang.Assign(&colon, operators.ZendMemrchr(str.GetStr(), ':', str.GetLen())) != nil && colon > str.GetStr() && (*(colon - 1)) == ':' {
+			var class *types.String = types.NewString(b.CastStr(str.GetStr(), colon-str.GetStr()-1))
+			var method *types.String = types.NewString(b.CastStr(colon+1, str.GetLen()-(colon-str.GetStr())-1))
 			var opline *types.ZendOp = GetNextOp()
 			opline.SetOpcode(ZEND_INIT_STATIC_METHOD_CALL)
 			opline.SetOp1Type(IS_CONST)
@@ -389,7 +389,7 @@ func (compiler *Compiler) CompileFuncDefined(result *Znode, args *ZendAstList) i
 		return types.FAILURE
 	}
 	name = operators.ZvalGetString(args.Child(0).Val())
-	if operators.ZendMemrchr(name.GetVal(), '\\', name.GetLen()) || operators.ZendMemrchr(name.GetVal(), ':', name.GetLen()) {
+	if operators.ZendMemrchr(name.GetStr(), '\\', name.GetLen()) || operators.ZendMemrchr(name.GetStr(), ':', name.GetLen()) {
 		// types.ZendStringReleaseEx(name, 0)
 		return types.FAILURE
 	}

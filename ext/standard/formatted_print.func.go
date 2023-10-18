@@ -280,7 +280,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 		return nil
 	}
 	var buf strings.Builder
-	format = z_format.StringEx().GetVal()
+	format = z_format.String()
 	format_len = z_format.StringEx().GetLen()
 	currarg = 0
 	for format_len != 0 {
@@ -403,7 +403,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 			switch *format {
 			case 's':
 				var str *types.String = operators.ZvalGetString(tmp)
-				PhpSprintfAppendstring(&buf, &outpos, str.GetVal(), width, precision, padding, alignment, str.GetLen(), 0, expprec, 0)
+				PhpSprintfAppendstring(&buf, &outpos, str.GetStr(), width, precision, padding, alignment, str.GetLen(), 0, expprec, 0)
 			case 'd':
 				PhpSprintfAppendint(&buf, &outpos, operators.ZvalGetLong(tmp), width, padding, alignment, always_sign)
 			case 'u':
@@ -607,7 +607,7 @@ func ZifFprintf(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, fo
 		return_value.SetFalse()
 		return
 	}
-	core.PhpStreamWrite(stream, result.GetVal(), result.GetLen())
+	core.PhpStreamWrite(stream, result.GetStr(), result.GetLen())
 	return_value.SetLong(result.GetLen())
 	// types.ZendStringEfree(result)
 }
@@ -645,7 +645,7 @@ func ZifVfprintf(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, f
 		return_value.SetFalse()
 		return
 	}
-	core.PhpStreamWrite(stream, result.GetVal(), result.GetLen())
+	core.PhpStreamWrite(stream, result.GetStr(), result.GetLen())
 	return_value.SetLong(result.GetLen())
 	// types.ZendStringEfree(result)
 }

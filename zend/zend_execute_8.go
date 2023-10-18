@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -256,9 +257,9 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 	var called_scope *types.ClassEntry
 	var lcname string
 	var colon *byte
-	if lang.Assign(&colon, operators.ZendMemrchr(function.GetVal(), ':', function.GetLen())) != nil && colon > function.GetVal() && (*(colon - 1)) == ':' {
+	if lang.Assign(&colon, operators.ZendMemrchr(function.GetStr(), ':', function.GetLen())) != nil && colon > function.GetStr() && (*(colon - 1)) == ':' {
 		var mname *types.String
-		var cname_length int = colon - function.GetVal() - 1
+		var cname_length int = colon - function.GetStr() - 1
 		var mname_length int = function.GetLen() - cname_length - (b.SizeOf(`"::"`) - 1)
 		lcname = function.GetStr()[:cname_length]
 		called_scope = ZendFetchClassByName(lcname, "", ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
@@ -266,7 +267,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 			// types.ZendStringReleaseEx(lcname, 0)
 			return nil
 		}
-		mname = types.NewString(b.CastStr(function.GetVal()+(cname_length+b.SizeOf(`"::"`)-1), mname_length))
+		mname = types.NewString(b.CastStr(function.GetStr()+(cname_length+b.SizeOf(`"::"`)-1), mname_length))
 		if called_scope.GetGetStaticMethod() != nil {
 			fbc = called_scope.GetGetStaticMethod()(called_scope, mname)
 		} else {
@@ -300,7 +301,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 
 		fbc = EG__().FunctionTable().Get(lcname)
 		if fbc == nil {
-			faults.ThrowError(nil, fmt.Sprintf("Call to undefined function %s()", function.GetVal()))
+			faults.ThrowError(nil, fmt.Sprintf("Call to undefined function %s()", function.GetStr()))
 			return nil
 		}
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {

@@ -1,6 +1,7 @@
 package operators
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard/conv"
@@ -384,7 +385,7 @@ try_again:
 		if base == 10 {
 			op.SetLong(ZvalGetLong(op))
 		} else {
-			op.SetLong(zend.ZEND_STRTOL(str.GetVal(), nil, base))
+			op.SetLong(zend.ZEND_STRTOL(str.GetStr(), nil, base))
 		}
 	case types.IsArray:
 		if op.Array().Len() != 0 {

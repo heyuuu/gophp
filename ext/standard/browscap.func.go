@@ -106,19 +106,19 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 
 			/* Set proper value for true/false settings */
 
-			if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.StringEx().GetVal(), "on", b.SizeOf(`"on"`)-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.StringEx().GetVal(), "yes", b.SizeOf(`"yes"`)-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.StringEx().GetVal(), "true", b.SizeOf(`"true"`)-1)) {
+			if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.String(), "on", b.SizeOf(`"on"`)-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.String(), "yes", b.SizeOf(`"yes"`)-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.String(), "true", b.SizeOf(`"true"`)-1)) {
 				new_value = types.NewString("1")
-			} else if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.StringEx().GetVal(), "no", b.SizeOf(`"no"`)-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.StringEx().GetVal(), "off", b.SizeOf(`"off"`)-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.StringEx().GetVal(), "none", b.SizeOf(`"none"`)-1)) || arg2.StringEx().GetLen() == 5 && !(strncasecmp(arg2.StringEx().GetVal(), "false", b.SizeOf(`"false"`)-1)) {
+			} else if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.String(), "no", b.SizeOf(`"no"`)-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.String(), "off", b.SizeOf(`"off"`)-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.String(), "none", b.SizeOf(`"none"`)-1)) || arg2.StringEx().GetLen() == 5 && !(strncasecmp(arg2.String(), "false", b.SizeOf(`"false"`)-1)) {
 				new_value = types.NewString("")
 			} else {
 				new_value = BrowscapInternStr(ctx, arg2.StringEx())
 			}
-			if !(strcasecmp(arg1.StringEx().GetVal(), "parent")) {
+			if !(strcasecmp(arg1.String(), "parent")) {
 
 				/* parent entry can not be same as current section -> causes infinite loop! */
 
-				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), arg2.StringEx().GetVal())) {
-					faults.Error(faults.E_CORE_ERROR, fmt.Sprintf("Invalid browscap ini file: 'Parent' value cannot be same as the section name: %s (in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap")))
+				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetStr(), arg2.String())) {
+					faults.Error(faults.E_CORE_ERROR, fmt.Sprintf("Invalid browscap ini file: 'Parent' value cannot be same as the section name: %s (in file %s)", ctx.GetCurrentSectionName().GetStr(), zend.INI_STR("browscap")))
 					return
 				}
 				if ctx.GetCurrentEntry().GetParent() != nil {
@@ -224,10 +224,10 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 
 	/* Check if the agent contains the "contains" portions */
 
-	cur = agent_name.GetVal() + entry.GetPrefixLen()
+	cur = agent_name.GetStr() + entry.GetPrefixLen()
 	for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
 		if entry.GetContainsLen()[i] != 0 {
-			cur = operators.ZendMemnstr(cur, pattern_lc.GetVal()+entry.GetContainsStart()[i], entry.GetContainsLen()[i], agent_name.GetVal()+agent_name.GetLen())
+			cur = operators.ZendMemnstr(cur, pattern_lc.GetStr()+entry.GetContainsStart()[i], entry.GetContainsLen()[i], agent_name.GetStr()+agent_name.GetLen())
 			if cur == nil {
 				//pattern_lc.Free()
 				return 0
@@ -254,7 +254,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 		// types.ZendStringRelease(regex)
 		return 0
 	}
-	rc = pcre2_match(re, PCRE2_SPTR(agent_name.GetVal()), agent_name.GetLen(), 0, 0, match_data, php_pcre_mctx())
+	rc = pcre2_match(re, PCRE2_SPTR(agent_name.GetStr()), agent_name.GetLen(), 0, 0, match_data, php_pcre_mctx())
 	php_pcre_free_match_data(match_data)
 	if PCRE2_ERROR_NOMATCH != rc {
 

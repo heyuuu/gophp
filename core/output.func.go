@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/php/lang"
@@ -254,7 +255,7 @@ func ZifObClean() bool {
 		return false
 	}
 	if !OG__().Clean() {
-		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, fmt.Sprintf("failed to delete buffer of %s (%d)", OG__().active.name.GetVal(), OG__().active.level))
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, fmt.Sprintf("failed to delete buffer of %s (%d)", OG__().active.name, OG__().active.level))
 		return false
 	}
 	return true

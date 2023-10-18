@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/streams"
@@ -296,16 +297,16 @@ func AddPostVar(arr *types.Zval, var_ *PostVarDataT, eof bool) bool {
 }
 func AddPostVars(arr *types.Zval, vars *PostVarDataT, eof bool) int {
 	var max_vars uint64 = PG__().GetMaxInputVars()
-	vars.SetPtr(vars.GetStr().GetS().GetVal())
-	vars.SetEnd(vars.GetStr().GetS().GetVal() + vars.GetStr().GetS().GetLen())
+	vars.SetPtr(vars.GetStr().GetS().GetStr())
+	vars.SetEnd(vars.GetStr().GetS().GetStr() + vars.GetStr().GetS().GetLen())
 	for AddPostVar(arr, vars, eof) != 0 {
 		if lang.PreInc(&(vars.GetCnt())) > max_vars {
 			PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Input variables exceeded %llu. To increase the limit change max_input_vars in php.ini.", max_vars))
 			return types.FAILURE
 		}
 	}
-	if eof == 0 && vars.GetStr().GetS().GetVal() != vars.GetPtr() {
-		memmove(vars.GetStr().GetS().GetVal(), vars.GetPtr(), lang.Assign(&(vars.GetStr().GetS().GetLen()), vars.GetEnd()-vars.GetPtr()))
+	if eof == 0 && vars.GetStr().GetS().GetStr() != vars.GetPtr() {
+		memmove(vars.GetStr().GetS().GetStr(), vars.GetPtr(), lang.Assign(&(vars.GetStr().GetS().GetLen()), vars.GetEnd()-vars.GetPtr()))
 	}
 	return types.SUCCESS
 }

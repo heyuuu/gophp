@@ -159,7 +159,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 				value = &(group.Long())
 			} else if group.IsString() {
 				option = core.PHP_STREAM_META_GROUP_NAME
-				value = group.StringEx().GetVal()
+				value = group.String()
 			} else {
 				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("parameter 2 should be string or int, %s given", types.ZendZvalTypeName(group)))
 				return_value.SetFalse()
@@ -184,8 +184,8 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 	if group.IsType(types.IsLong) {
 		gid = gid_t(group.Long())
 	} else if group.IsString() {
-		if PhpGetGidByName(group.StringEx().GetVal(), &gid) != types.SUCCESS {
-			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to find gid for %s", group.StringEx().GetVal()))
+		if PhpGetGidByName(group.String(), &gid) != types.SUCCESS {
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to find gid for %s", group.String()))
 			return_value.SetFalse()
 			return
 		}
@@ -257,7 +257,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 				value = &(user.Long())
 			} else if user.IsString() {
 				option = core.PHP_STREAM_META_OWNER_NAME
-				value = user.StringEx().GetVal()
+				value = user.String()
 			} else {
 				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("parameter 2 should be string or int, %s given", types.ZendZvalTypeName(user)))
 				return_value.SetFalse()
@@ -282,8 +282,8 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 	if user.IsType(types.IsLong) {
 		uid = uid_t(user.Long())
 	} else if user.IsString() {
-		if PhpGetUidByName(user.StringEx().GetVal(), &uid) != types.SUCCESS {
-			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to find uid for %s", user.StringEx().GetVal()))
+		if PhpGetUidByName(user.String(), &uid) != types.SUCCESS {
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to find uid for %s", user.String()))
 			return_value.SetFalse()
 			return
 		}

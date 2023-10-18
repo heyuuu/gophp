@@ -38,7 +38,7 @@ func OnSetFacility(
 	mh_arg3 any,
 	stage int,
 ) int {
-	var facility *byte = new_value.GetVal()
+	var facility *byte = new_value.GetStr()
 	return types.FAILURE
 }
 func OnSetPrecision(
@@ -50,7 +50,7 @@ func OnSetPrecision(
 	stage int,
 ) int {
 	var i zend.ZendLong
-	zend.ZEND_ATOL(i, new_value.GetVal())
+	zend.ZEND_ATOL(i, new_value.GetStr())
 	if i >= -1 {
 		zend.EG__().SetPrecision(i)
 		return types.SUCCESS
@@ -67,7 +67,7 @@ func OnSetSerializePrecision(
 	stage int,
 ) int {
 	var i zend.ZendLong
-	zend.ZEND_ATOL(i, new_value.GetVal())
+	zend.ZEND_ATOL(i, new_value.GetStr())
 	if i >= -1 {
 		PG__().serialize_precision = i
 		return types.SUCCESS
@@ -118,7 +118,7 @@ func OnSetLogFilter(
 	mh_arg3 any,
 	stage int,
 ) int {
-	var filter *byte = new_value.GetVal()
+	var filter *byte = new_value.GetStr()
 	if !(strcmp(filter, "all")) {
 		PG__().syslog_filter = PHP_SYSLOG_FILTER_ALL
 		return types.SUCCESS
@@ -246,11 +246,11 @@ func OnUpdateTimeout(
 
 		/* Don't set a timeout on startup, only per-request */
 
-		zend.ZEND_ATOL(zend.EG__().GetTimeoutSeconds(), new_value.GetVal())
+		zend.ZEND_ATOL(zend.EG__().GetTimeoutSeconds(), new_value.GetStr())
 		return types.SUCCESS
 	}
 	zend.ZendUnsetTimeout()
-	zend.ZEND_ATOL(zend.EG__().GetTimeoutSeconds(), new_value.GetVal())
+	zend.ZEND_ATOL(zend.EG__().GetTimeoutSeconds(), new_value.GetStr())
 	if stage != PHP_INI_STAGE_DEACTIVATE {
 
 		/*
@@ -336,7 +336,7 @@ func OnUpdateDefaultCharset(
 	mh_arg3 any,
 	stage int,
 ) int {
-	if memchr(new_value.GetVal(), '0', new_value.GetLen()) || strpbrk(new_value.GetVal(), "\r\n") {
+	if memchr(new_value.GetStr(), '0', new_value.GetLen()) || strpbrk(new_value.GetStr(), "\r\n") {
 		return types.FAILURE
 	}
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
@@ -356,7 +356,7 @@ func OnUpdateDefaultMimeTye(
 	mh_arg3 any,
 	stage int,
 ) int {
-	if memchr(new_value.GetVal(), '0', new_value.GetLen()) || strpbrk(new_value.GetVal(), "\r\n") {
+	if memchr(new_value.GetStr(), '0', new_value.GetLen()) || strpbrk(new_value.GetStr(), "\r\n") {
 		return types.FAILURE
 	}
 	return zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
@@ -422,8 +422,8 @@ func OnUpdateErrorLog(
 ) int {
 	/* Only do the safemode/open_basedir check at runtime */
 
-	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil && strcmp(new_value.GetVal(), "syslog") {
-		if PG__().open_basedir && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
+	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil && strcmp(new_value.GetStr(), "syslog") {
+		if PG__().open_basedir && PhpCheckOpenBasedir(new_value.GetStr()) != 0 {
 			return types.FAILURE
 		}
 	}
@@ -441,7 +441,7 @@ func OnUpdateMailLog(
 	/* Only do the safemode/open_basedir check at runtime */
 
 	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil {
-		if PG__().open_basedir && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
+		if PG__().open_basedir && PhpCheckOpenBasedir(new_value.GetStr()) != 0 {
 			return types.FAILURE
 		}
 	}
@@ -1437,10 +1437,10 @@ func PhpHandleAuthData(auth *byte) int {
 		var user *types.String
 		user = types.NewString(standard.PhpBase64Decode(b.CastStr((*uint8)(auth+6), auth_len-6)))
 		if user != nil {
-			pass = strchr(user.GetVal(), ':')
+			pass = strchr(user.GetStr(), ':')
 			if pass != nil {
 				lang.PostInc(&(*pass)) = '0'
-				SG__().RequestInfo.authUser = zend.Estrndup(user.GetVal(), user.GetLen())
+				SG__().RequestInfo.authUser = zend.Estrndup(user.GetStr(), user.GetLen())
 				SG__().RequestInfo.authPassword = zend.Estrdup(pass)
 				ret = 0
 			}

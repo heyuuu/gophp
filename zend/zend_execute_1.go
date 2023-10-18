@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -185,11 +186,11 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *types.Zend
 		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
 			var property_name *types.String = operators.ZvalGetString(property)
 			if opline.GetOpcode() == ZEND_PRE_INC_OBJ || opline.GetOpcode() == ZEND_PRE_DEC_OBJ || opline.GetOpcode() == ZEND_POST_INC_OBJ || opline.GetOpcode() == ZEND_POST_DEC_OBJ {
-				faults.Error(faults.E_WARNING, fmt.Sprintf("Attempt to increment/decrement property '%s' of non-object", property_name.GetVal()))
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Attempt to increment/decrement property '%s' of non-object", property_name.GetStr()))
 			} else if opline.GetOpcode() == ZEND_FETCH_OBJ_W || opline.GetOpcode() == ZEND_FETCH_OBJ_RW || opline.GetOpcode() == ZEND_FETCH_OBJ_FUNC_ARG || opline.GetOpcode() == ZEND_ASSIGN_OBJ_REF {
-				faults.Error(faults.E_WARNING, fmt.Sprintf("Attempt to modify property '%s' of non-object", property_name.GetVal()))
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Attempt to modify property '%s' of non-object", property_name.GetStr()))
 			} else {
-				faults.Error(faults.E_WARNING, fmt.Sprintf("Attempt to assign property '%s' of non-object", property_name.GetVal()))
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Attempt to assign property '%s' of non-object", property_name.GetStr()))
 			}
 			//ZendTmpStringRelease(tmp_property_name)
 		}

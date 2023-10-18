@@ -165,13 +165,13 @@ func ZendIniLong(name string, orig int) ZendLong {
 	if ini_entry != nil {
 		if orig != 0 && ini_entry.GetModified() != 0 {
 			if ini_entry.GetOrigValue() != nil {
-				return ZEND_STRTOL(ini_entry.GetOrigValue().GetVal(), nil, 0)
+				return ZEND_STRTOL(ini_entry.GetOrigValue().GetStr(), nil, 0)
 			} else {
 				return 0
 			}
 		} else {
 			if ini_entry.GetValue() != nil {
-				return ZEND_STRTOL(ini_entry.GetValue().GetVal(), nil, 0)
+				return ZEND_STRTOL(ini_entry.GetValue().GetStr(), nil, 0)
 			} else {
 				return 0
 			}
@@ -255,10 +255,10 @@ func ZendIniStringParseBool(str string) bool {
 	}
 }
 func ZendIniParseBool(str *types.String) bool {
-	if str.GetLen() == 4 && strcasecmp(str.GetVal(), "true") == 0 || str.GetLen() == 3 && strcasecmp(str.GetVal(), "yes") == 0 || str.GetLen() == 2 && strcasecmp(str.GetVal(), "on") == 0 {
+	if str.GetLen() == 4 && strcasecmp(str.GetStr(), "true") == 0 || str.GetLen() == 3 && strcasecmp(str.GetStr(), "yes") == 0 || str.GetLen() == 2 && strcasecmp(str.GetStr(), "on") == 0 {
 		return 1
 	} else {
-		return atoi(str.GetVal()) != 0
+		return atoi(str.GetStr()) != 0
 	}
 }
 func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
@@ -289,9 +289,9 @@ func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 	var value *byte
 	if type_ == ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
-		value = ini_entry.GetOrigValue().GetVal()
+		value = ini_entry.GetOrigValue().GetStr()
 	} else if ini_entry.GetValue() != nil {
-		value = ini_entry.GetValue().GetVal()
+		value = ini_entry.GetValue().GetStr()
 	} else {
 		value = nil
 	}
@@ -367,7 +367,7 @@ func OnUpdateReal(
 	var p *float64
 	var base *byte = (*byte)(mh_arg2)
 	p = (*float64)(base + int(mh_arg1))
-	*p = ZendStrtod(new_value.GetVal(), nil)
+	*p = ZendStrtod(new_value.GetStr(), nil)
 	return types.SUCCESS
 }
 func OnUpdateString(
@@ -382,7 +382,7 @@ func OnUpdateString(
 	var base *byte = (*byte)(mh_arg2)
 	p = (**byte)(base + int(mh_arg1))
 	if new_value != nil {
-		*p = new_value.GetVal()
+		*p = new_value.GetStr()
 	} else {
 		*p = nil
 	}
@@ -403,7 +403,7 @@ func OnUpdateStringUnempty(
 	}
 	p = (**byte)(base + int(mh_arg1))
 	if new_value != nil {
-		*p = new_value.GetVal()
+		*p = new_value.GetStr()
 	} else {
 		*p = nil
 	}

@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
@@ -86,7 +87,7 @@ func ZendUndefinedOffset(lval ZendLong) {
 	faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined offset: %d", lval))
 }
 func ZendUndefinedIndex(offset *types.String) {
-	faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.GetVal()))
+	faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.GetStr()))
 }
 func ZendUndefinedOffsetWrite(ht *types.Array, lval ZendLong) int {
 	/* The array may be destroyed while throwing the notice.
@@ -117,10 +118,10 @@ func ZendUndefinedIndexWrite(ht *types.Array, offset *types.String) int {
 	return types.SUCCESS
 }
 func ZendUndefinedMethod(ce *types.ClassEntry, method *types.String) {
-	faults.ThrowError(nil, fmt.Sprintf("Call to undefined method %s::%s()", ce.Name(), method.GetVal()))
+	faults.ThrowError(nil, fmt.Sprintf("Call to undefined method %s::%s()", ce.Name(), method.GetStr()))
 }
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
-	faults.ThrowError(nil, fmt.Sprintf("Call to a member function %s() on %s", function_name.StringEx().GetVal(), types.ZendGetTypeByConst(object.Type())))
+	faults.ThrowError(nil, fmt.Sprintf("Call to a member function %s() on %s", function_name.String(), types.ZendGetTypeByConst(object.Type())))
 }
 func ZendNonStaticMethodCall(fbc types.IFunction) {
 	if fbc.IsAllowStatic() {

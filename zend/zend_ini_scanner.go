@@ -255,7 +255,7 @@ func ZendIniEscapeString(lval *types.Zval, str *byte, len_ int, quote_type byte)
 
 	/* convert escape sequences */
 
-	t = lval.StringEx().GetVal()
+	t = lval.String()
 	s = t
 	end = s + lval.StringEx().GetLen()
 	for s < end {

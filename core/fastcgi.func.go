@@ -598,7 +598,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 			}
 			memcpy(p, q.GetVar(), q.GetVarLen())
 			p += q.GetVarLen()
-			memcpy(p, value.StringEx().GetVal(), zlen)
+			memcpy(p, value.String(), zlen)
 			p += zlen
 			q = q.GetListNext()
 		}

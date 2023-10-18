@@ -323,7 +323,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, _ zpp.Opt, autoloadFunction *typ
 				return false
 			} else if zcallable.IsString() {
 				if throw {
-					faults.ThrowException(spl_ce_LogicException, fmt.Sprintf("Function '%s' not %s (%s)", funcName.GetVal(), lang.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error_), 0)
+					faults.ThrowException(spl_ce_LogicException, fmt.Sprintf("Function '%s' not %s (%s)", funcName.GetStr(), lang.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error_), 0)
 				}
 				return false
 			} else {

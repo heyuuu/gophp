@@ -28,7 +28,7 @@ func DoBindClass(lcname *types.Zval, rtdKey *types.Zval, lcParentName *types.Str
 			return types.FAILURE
 		} else {
 			b.Assert(CurrEX().GetFunc().GetOpArray().IsPreloaded())
-			faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Class %s wasn't preloaded", lcname.StringEx().GetVal()))
+			faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("Class %s wasn't preloaded", lcname.String()))
 			return types.FAILURE
 		}
 	}

@@ -33,7 +33,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 		if c != nil {
 			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if !ZendVerifyConstAccess(c, scope) {
-				faults.ThrowError(nil, fmt.Sprintf("Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().StringEx().GetVal()))
+				faults.ThrowError(nil, fmt.Sprintf("Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().String()))
 				opline.Result().SetUndef()
 				return 0
 			}
@@ -47,7 +47,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			faults.ThrowError(nil, fmt.Sprintf("Undefined class constant '%s'", opline.Const2().StringEx().GetVal()))
+			faults.ThrowError(nil, fmt.Sprintf("Undefined class constant '%s'", opline.Const2().String()))
 			opline.Result().SetUndef()
 			return 0
 		}
@@ -79,7 +79,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 		if c != nil {
 			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if !ZendVerifyConstAccess(c, scope) {
-				faults.ThrowError(nil, fmt.Sprintf("Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().StringEx().GetVal()))
+				faults.ThrowError(nil, fmt.Sprintf("Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().String()))
 				opline.Result().SetUndef()
 				return 0
 			}
@@ -93,7 +93,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			faults.ThrowError(nil, fmt.Sprintf("Undefined class constant '%s'", opline.Const2().StringEx().GetVal()))
+			faults.ThrowError(nil, fmt.Sprintf("Undefined class constant '%s'", opline.Const2().String()))
 			opline.Result().SetUndef()
 			return 0
 		}
@@ -129,7 +129,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 		if c != nil {
 			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if !ZendVerifyConstAccess(c, scope) {
-				faults.ThrowError(nil, fmt.Sprintf("Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().StringEx().GetVal()))
+				faults.ThrowError(nil, fmt.Sprintf("Cannot access %s const %s::%s", ZendVisibilityString(c.GetAccessFlags()), ce.Name(), opline.Const2().String()))
 				opline.Result().SetUndef()
 				return 0
 			}
@@ -143,7 +143,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			faults.ThrowError(nil, fmt.Sprintf("Undefined class constant '%s'", opline.Const2().StringEx().GetVal()))
+			faults.ThrowError(nil, fmt.Sprintf("Undefined class constant '%s'", opline.Const2().String()))
 			opline.Result().SetUndef()
 			return 0
 		}

@@ -682,7 +682,7 @@ func PhpCompactVar(activeSymbolTable *types.Array, resultArr *types.Array, entry
 				resultArr.KeyUpdate(entry.String(), types.NewZvalObject(object))
 			}
 		} else {
-			core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", entry.StringEx().GetVal()))
+			core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", entry.String()))
 		}
 	} else if entry.IsArray() {
 		if entry.Array().IsRecursive() {

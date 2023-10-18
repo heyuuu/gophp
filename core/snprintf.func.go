@@ -626,7 +626,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					zvp = &zcopy
 				}
 				s_len = zvp.StringEx().GetLen()
-				s = zvp.StringEx().GetVal()
+				s = zvp.String()
 				if adjust_precision != 0 && int(precision < s_len) != 0 {
 					s_len = precision
 				}

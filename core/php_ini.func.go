@@ -21,7 +21,7 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 		var esc_html int = 0
 		if type_ == zend.ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
 			if ini_entry.GetOrigValue() != nil && ini_entry.GetOrigValue().GetStr()[0] {
-				display_string = ini_entry.GetOrigValue().GetVal()
+				display_string = ini_entry.GetOrigValue().GetStr()
 				display_string_length = ini_entry.GetOrigValue().GetLen()
 				esc_html = !(SM__().GetPhpinfoAsText())
 			} else {
@@ -34,7 +34,7 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 				}
 			}
 		} else if ini_entry.GetValue() != nil && ini_entry.GetValue().GetStr()[0] {
-			display_string = ini_entry.GetValue().GetVal()
+			display_string = ini_entry.GetValue().GetStr()
 			display_string_length = ini_entry.GetValue().GetLen()
 			esc_html = !(SM__().GetPhpinfoAsText())
 		} else {
@@ -304,7 +304,7 @@ func PhpInitConfig() int {
 			fp = PhpFopenWithPath(ini_fname, "r", php_ini_search_path, &opened_path)
 			zend.Efree(ini_fname)
 			if fp != nil {
-				filename = opened_path.GetVal()
+				filename = opened_path.GetStr()
 			}
 		}
 
@@ -313,7 +313,7 @@ func PhpInitConfig() int {
 		if fp == nil {
 			fp = PhpFopenWithPath("php.ini", "r", php_ini_search_path, &opened_path)
 			if fp != nil {
-				filename = opened_path.GetVal()
+				filename = opened_path.GetStr()
 			}
 		}
 
@@ -331,7 +331,7 @@ func PhpInitConfig() int {
 		var tmp types.Zval
 		tmp.SetString(fh.GetFilename())
 		Config().Set("cfg_file_path", fh.GetFilename())
-		PhpIniOpenedPath = zend.ZendStrndup(tmp.StringEx().GetVal(), tmp.StringEx().GetLen())
+		PhpIniOpenedPath = zend.ZendStrndup(tmp.String(), tmp.StringEx().GetLen())
 	}
 
 	/* Check for PHP_INI_SCAN_DIR environment variable to override/set config file scan directory */

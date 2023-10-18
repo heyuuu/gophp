@@ -207,14 +207,14 @@ try_again:
 				if retval.IsUndef() {
 					switch type_ {
 					case zend.BP_VAR_R:
-						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetVal()))
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetStr()))
 						fallthrough
 					case zend.BP_VAR_UNSET:
 						fallthrough
 					case zend.BP_VAR_IS:
 						retval = zend.UninitializedZval()
 					case zend.BP_VAR_RW:
-						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetVal()))
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetStr()))
 						fallthrough
 					case zend.BP_VAR_W:
 						retval.SetNull()
@@ -224,14 +224,14 @@ try_again:
 		} else {
 			switch type_ {
 			case zend.BP_VAR_R:
-				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetVal()))
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetStr()))
 				fallthrough
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
 				retval = zend.UninitializedZval()
 			case zend.BP_VAR_RW:
-				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetVal()))
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetStr()))
 				fallthrough
 			case zend.BP_VAR_W:
 				var value types.Zval
@@ -412,7 +412,7 @@ try_again:
 		ht = SplArrayGetHashTable(intern)
 		if ht == zend.EG__().GetSymbolTable() {
 			if !zend.ZendDeleteGlobalVariable(offset.String()) {
-				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.StringEx().GetVal()))
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.String()))
 			}
 		} else {
 			var data *types.Zval = ht.SymtableFind(offset.String())
@@ -420,7 +420,7 @@ try_again:
 				if data.IsIndirect() {
 					data = data.Indirect()
 					if data.IsUndef() {
-						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.StringEx().GetVal()))
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.String()))
 					} else {
 						// zend.ZvalPtrDtor(data)
 						data.SetUndef()
@@ -431,10 +431,10 @@ try_again:
 						}
 					}
 				} else if ht.SymtableDel(offset.String()) == false {
-					faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.StringEx().GetVal()))
+					faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.String()))
 				}
 			} else {
-				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.StringEx().GetVal()))
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset.String()))
 			}
 		}
 	case types.IsDouble:
@@ -1416,10 +1416,10 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	if iterator_class_zv != nil && iterator_class_zv.IsString() {
 		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.String())
 		if ce == nil {
-			faults.ThrowException(spl_ce_UnexpectedValueException, fmt.Sprintf("Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.StringEx().GetVal()), 0)
+			faults.ThrowException(spl_ce_UnexpectedValueException, fmt.Sprintf("Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.String()), 0)
 			return
 		} else if operators.InstanceofFunction(ce, spl_ce_Iterator) == 0 {
-			faults.ThrowException(spl_ce_UnexpectedValueException, fmt.Sprintf("Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", iterator_class_zv.StringEx().GetVal()), 0)
+			faults.ThrowException(spl_ce_UnexpectedValueException, fmt.Sprintf("Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", iterator_class_zv.String()), 0)
 			return
 		} else {
 			intern.SetCeGetIterator(ce)

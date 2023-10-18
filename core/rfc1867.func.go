@@ -843,7 +843,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 				var event_file_end MultipartEventFileEnd
 				event_file_end.SetPostBytesProcessed(SG__().readPostBytes)
 				if temp_filename != nil {
-					event_file_end.SetTempFilename(temp_filename.GetVal())
+					event_file_end.SetTempFilename(temp_filename.GetStr())
 				} else {
 					event_file_end.SetTempFilename(nil)
 				}
@@ -855,7 +855,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 			if cancel_upload != 0 {
 				if temp_filename != nil {
 					if cancel_upload != UPLOAD_ERROR_E {
-						unlink(temp_filename.GetVal())
+						unlink(temp_filename.GetStr())
 					}
 					// types.ZendStringReleaseEx(temp_filename, 0)
 				}

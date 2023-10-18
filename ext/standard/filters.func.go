@@ -90,7 +90,7 @@ func PhpStripTagsFilterCtor(inst *PhpStripTagsFilter, allowed_tags *types.String
 		if nil == lang.Assign(&(inst.GetAllowedTags()), zend.Pemalloc(allowed_tags.GetLen()+1)) {
 			return types.FAILURE
 		}
-		memcpy((*byte)(inst.GetAllowedTags()), allowed_tags.GetVal(), allowed_tags.GetLen()+1)
+		memcpy((*byte)(inst.GetAllowedTags()), allowed_tags.GetStr(), allowed_tags.GetLen()+1)
 		inst.SetAllowedTagsLen(int(allowed_tags.GetLen()))
 	} else {
 		inst.SetAllowedTags(nil)
@@ -963,7 +963,7 @@ func PhpConvGetStringPropEx(
 		var str *types.String = operators.ZvalGetString(tmpval)
 		*pretval = zend.Pemalloc(str.GetLen() + 1)
 		*pretval_len = str.GetLen()
-		memcpy(*pretval, str.GetVal(), str.GetLen()+1)
+		memcpy(*pretval, str.GetStr(), str.GetLen()+1)
 	} else {
 		return PHP_CONV_ERR_NOT_FOUND
 	}

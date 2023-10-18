@@ -464,7 +464,7 @@ func PhpStreamUrlWrapRfc2397(
 			PhpStreamWrapperLogError(wrapper, options, "rfc2397: unable to decode")
 			return nil
 		}
-		comma = base64_comma.GetVal()
+		comma = base64_comma.GetStr()
 		ilen = base64_comma.GetLen()
 	} else {
 		comma = zend.Estrndup(comma, dlen)

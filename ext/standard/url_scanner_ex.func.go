@@ -28,7 +28,7 @@ func PhpIniOnUpdateTags(
 	} else {
 		ctx = &(BG__().url_adapt_output_ex)
 	}
-	tmp = zend.Estrndup(new_value.GetVal(), new_value.GetLen())
+	tmp = zend.Estrndup(new_value.GetStr(), new_value.GetLen())
 	if ctx.GetTags() != nil {
 		ctx.GetTags().Destroy()
 	}
@@ -96,7 +96,7 @@ func PhpIniOnUpdateHosts(
 
 	/* Use user supplied host whitelist */
 
-	tmp = zend.Estrndup(new_value.GetVal(), new_value.GetLen())
+	tmp = zend.Estrndup(new_value.GetStr(), new_value.GetLen())
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var keylen int
 		var tmp_key *types.String
@@ -137,7 +137,7 @@ func OnUpdateOutputHosts(
 func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.SmartStr, separator *byte) {
 	var url_parts *PhpUrl
 	//url.ZeroTail()
-	url_parts = PhpUrlParseEx(url.GetS().GetVal(), url.GetS().GetLen())
+	url_parts = PhpUrlParseEx(url.GetS().GetStr(), url.GetS().GetLen())
 
 	/* Ignore malformed URLs */
 
@@ -182,7 +182,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	if url_parts.HasScheme() {
 		dest.WriteString(url_parts.Scheme())
 		dest.WriteString("://")
-	} else if (*(url.GetS().GetVal())) == '/' && (*(url.GetS().GetVal() + 1)) == '/' {
+	} else if (*(url.GetS().GetStr())) == '/' && (*(url.GetS().GetStr() + 1)) == '/' {
 		dest.WriteString("//")
 	}
 	if url_parts.HasUser() {
@@ -223,7 +223,7 @@ func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 	   To avoid partial match, NUL is added here */
 
 	ctx.GetArg().GetS().GetStr()[ctx.GetArg().GetS().GetLen()] = '0'
-	if !(strcasecmp(ctx.GetArg().GetS().GetVal(), ctx.GetLookupData())) {
+	if !(strcasecmp(ctx.GetArg().GetS().GetStr(), ctx.GetLookupData())) {
 		f = 1
 	}
 	if quotes {
@@ -265,7 +265,7 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var allowed_hosts *types.Array = lang.CondF(ctx.GetType() != 0, func() *types.Array { return BG__().url_adapt_session_hosts_ht }, func() *types.Array { return BG__().url_adapt_output_hosts_ht })
 	b.Assert(ctx.GetTagType() == TAG_FORM)
 	if ctx.GetAttrVal().GetS() != nil && ctx.GetAttrVal().GetS().GetLen() != 0 {
-		url_parts = PhpUrlParseEx(ctx.GetAttrVal().GetS().GetVal(), ctx.GetAttrVal().GetS().GetLen())
+		url_parts = PhpUrlParseEx(ctx.GetAttrVal().GetS().GetStr(), ctx.GetAttrVal().GetS().GetLen())
 	} else {
 		return types.SUCCESS
 	}
@@ -295,7 +295,7 @@ func HandleForm(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	if ctx.GetFormApp().GetS().GetLen() > 0 {
 		switch ctx.GetTag().GetS().GetLen() {
 		case b.SizeOf(`"form"`) - 1:
-			if !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) && CheckHostWhitelist(ctx) == types.SUCCESS {
+			if !(strncasecmp(ctx.GetTag().GetS().GetStr(), "form", ctx.GetTag().GetS().GetLen())) && CheckHostWhitelist(ctx) == types.SUCCESS {
 				doit = 1
 			}
 		}
@@ -319,7 +319,7 @@ func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 
 	if lang.Assign(&(ctx.GetLookupData()), types.ZendHashStrFindPtr(ctx.GetTags(), ctx.GetTag().GetS().GetStr())) != nil {
 		ok = 1
-		if ctx.GetTag().GetS().GetLen() == b.SizeOf(`"form"`)-1 && !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) {
+		if ctx.GetTag().GetS().GetLen() == b.SizeOf(`"form"`)-1 && !(strncasecmp(ctx.GetTag().GetS().GetStr(), "form", ctx.GetTag().GetS().GetLen())) {
 			ctx.SetTagType(TAG_FORM)
 		} else {
 			ctx.SetTagType(TAG_NORMAL)
@@ -336,7 +336,7 @@ func HandleArg(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 		ctx.GetArg().GetS().GetLen() = 0
 	}
 	ctx.GetArg().WriteString(b.CastStr(start, YYCURSOR-start))
-	if ctx.GetTagType() == TAG_FORM && strncasecmp(ctx.GetArg().GetS().GetVal(), "action", ctx.GetArg().GetS().GetLen()) == 0 {
+	if ctx.GetTagType() == TAG_FORM && strncasecmp(ctx.GetArg().GetS().GetStr(), "action", ctx.GetArg().GetS().GetLen()) == 0 {
 		ctx.SetAttrType(ATTR_ACTION)
 	} else {
 		ctx.SetAttrType(ATTR_NORMAL)
@@ -356,8 +356,8 @@ func XxMainloop(ctx *UrlAdaptStateExT, newdata *byte, newlen int) {
 	var start *byte
 	var rest int
 	ctx.GetBuf().WriteString(b.CastStr(newdata, newlen))
-	YYCURSOR = ctx.GetBuf().GetS().GetVal()
-	YYLIMIT = ctx.GetBuf().GetS().GetVal() + ctx.GetBuf().GetS().GetLen()
+	YYCURSOR = ctx.GetBuf().GetS().GetStr()
+	YYLIMIT = ctx.GetBuf().GetS().GetStr() + ctx.GetBuf().GetS().GetLen()
 	switch ctx.GetState() {
 	case STATE_PLAIN:
 		goto state_plain
@@ -775,7 +775,7 @@ stop:
 		rest = YYLIMIT - start
 	}
 	if rest != 0 {
-		memmove(ctx.GetBuf().GetS().GetVal(), start, rest)
+		memmove(ctx.GetBuf().GetS().GetStr(), start, rest)
 	}
 	ctx.GetBuf().GetS().GetLen() = rest
 }
@@ -811,7 +811,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	if newlen != nil {
 		*newlen = buf.GetS().GetLen()
 	}
-	result = zend.Estrndup(buf.GetS().GetVal(), buf.GetS().GetLen())
+	result = zend.Estrndup(buf.GetS().GetStr(), buf.GetS().GetLen())
 	url_app.Free()
 	buf.Free()
 	return result
@@ -833,7 +833,7 @@ func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush bool, ctx *UrlAdap
 		ctx.GetVal().Free()
 		ctx.GetAttrVal().Free()
 	}
-	retval = zend.Estrndup(ctx.GetResult().GetS().GetVal(), ctx.GetResult().GetS().GetLen())
+	retval = zend.Estrndup(ctx.GetResult().GetS().GetStr(), ctx.GetResult().GetS().GetLen())
 	ctx.GetResult().Free()
 	return retval
 }
@@ -889,7 +889,7 @@ func PhpUrlScannerSessionHandlerImpl(
 		if ctx.GetBuf().GetS() != nil && ctx.GetBuf().GetS().GetLen() != 0 {
 			ctx.GetResult().WriteString(ctx.GetBuf().GetS().GetStr())
 			ctx.GetResult().WriteString(b.CastStr(output, output_len))
-			*handled_output = zend.Estrndup(ctx.GetResult().GetS().GetVal(), ctx.GetResult().GetS().GetLen())
+			*handled_output = zend.Estrndup(ctx.GetResult().GetS().GetStr(), ctx.GetResult().GetS().GetLen())
 			*handled_output_len = ctx.GetBuf().GetS().GetLen() + output_len
 			ctx.GetBuf().Free()
 			ctx.GetResult().Free()
@@ -1032,7 +1032,7 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 
 	/* Short circuit check. Only check url_app. */
 
-	start = (*byte)(core.PhpMemnstr(url_state.GetUrlApp().GetS().GetVal(), url_app.GetS().GetVal(), url_app.GetS().GetLen(), url_state.GetUrlApp().GetS().GetVal()+url_state.GetUrlApp().GetS().GetLen()))
+	start = (*byte)(core.PhpMemnstr(url_state.GetUrlApp().GetS().GetStr(), url_app.GetS().GetStr(), url_app.GetS().GetLen(), url_state.GetUrlApp().GetS().GetStr()+url_state.GetUrlApp().GetS().GetLen()))
 	if start == nil {
 		ret = types.FAILURE
 		goto finish
@@ -1040,7 +1040,7 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 
 	/* Get end of url var */
 
-	limit = url_state.GetUrlApp().GetS().GetVal() + url_state.GetUrlApp().GetS().GetLen()
+	limit = url_state.GetUrlApp().GetS().GetStr() + url_state.GetUrlApp().GetS().GetLen()
 	end = start + url_app.GetS().GetLen()
 	separator_len = strlen(core.PG__().arg_separator.output)
 	for end < limit {
@@ -1067,13 +1067,13 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 
 	/* Remove partially */
 
-	memmove(start, end, url_state.GetUrlApp().GetS().GetLen()-(end-url_state.GetUrlApp().GetS().GetVal()))
+	memmove(start, end, url_state.GetUrlApp().GetS().GetLen()-(end-url_state.GetUrlApp().GetS().GetStr()))
 	url_state.GetUrlApp().GetS().GetLen() -= end - start
 	url_state.GetUrlApp().GetS().GetStr()[url_state.GetUrlApp().GetS().GetLen()] = '0'
 
 	/* Remove form var */
 
-	start = (*byte)(core.PhpMemnstr(url_state.GetFormApp().GetS().GetVal(), form_app.GetS().GetVal(), form_app.GetS().GetLen(), url_state.GetFormApp().GetS().GetVal()+url_state.GetFormApp().GetS().GetLen()))
+	start = (*byte)(core.PhpMemnstr(url_state.GetFormApp().GetS().GetStr(), form_app.GetS().GetStr(), form_app.GetS().GetLen(), url_state.GetFormApp().GetS().GetStr()+url_state.GetFormApp().GetS().GetLen()))
 	if start == nil {
 
 		/* Should not happen */
@@ -1085,7 +1085,7 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 
 	/* Get end of form var */
 
-	limit = url_state.GetFormApp().GetS().GetVal() + url_state.GetFormApp().GetS().GetLen()
+	limit = url_state.GetFormApp().GetS().GetStr() + url_state.GetFormApp().GetS().GetLen()
 	end = start + form_app.GetS().GetLen()
 	for end < limit {
 		if (*end) == '>' {
@@ -1097,7 +1097,7 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 
 	/* Remove partially */
 
-	memmove(start, end, url_state.GetFormApp().GetS().GetLen()-(end-url_state.GetFormApp().GetS().GetVal()))
+	memmove(start, end, url_state.GetFormApp().GetS().GetLen()-(end-url_state.GetFormApp().GetS().GetStr()))
 	url_state.GetFormApp().GetS().GetLen() -= end - start
 	url_state.GetFormApp().GetS().GetStr()[url_state.GetFormApp().GetS().GetLen()] = '0'
 finish:

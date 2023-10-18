@@ -391,7 +391,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 		/* Iterate over the hash to construct the argv array. */
 		args.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 			var arg_str *types.String = operators.ZvalGetString(value)
-			argv[lang.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
+			argv[lang.PostInc(&pos)] = zend.Estrdup(arg_str.GetStr())
 		})
 
 		/* The C Standard requires argv[argc] to be NULL - this might
@@ -427,7 +427,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, shortOptions string, _ 
 		p_longopts.Array().Foreach(func(_ types.ArrayKey, entry *types.Zval) {
 			var arg_str *types.String = operators.ZvalGetString(entry)
 			opts.SetNeedParam(0)
-			opts.SetOptName(zend.Estrdup(arg_str.GetVal()))
+			opts.SetOptName(zend.Estrdup(arg_str.GetStr()))
 			len_ = strlen(opts.GetOptName())
 			if len_ > 0 && opts.GetOptName()[len_-1] == ':' {
 				opts.GetNeedParam()++

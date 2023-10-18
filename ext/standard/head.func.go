@@ -76,19 +76,19 @@ func PhpSetcookie(
 	if name.GetLen() == 0 {
 		faults.Error(faults.E_WARNING, "Cookie names must not be empty")
 		return types.FAILURE
-	} else if strpbrk(name.GetVal(), "=,; \t\r\n013014") != nil {
+	} else if strpbrk(name.GetStr(), "=,; \t\r\n013014") != nil {
 		faults.Error(faults.E_WARNING, "Cookie names cannot contain any of the following '=,; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
-	if url_encode == 0 && value != nil && strpbrk(value.GetVal(), ",; \t\r\n013014") != nil {
+	if url_encode == 0 && value != nil && strpbrk(value.GetStr(), ",; \t\r\n013014") != nil {
 		faults.Error(faults.E_WARNING, "Cookie values cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
-	if path != nil && strpbrk(path.GetVal(), ",; \t\r\n013014") != nil {
+	if path != nil && strpbrk(path.GetStr(), ",; \t\r\n013014") != nil {
 		faults.Error(faults.E_WARNING, "Cookie paths cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
-	if domain != nil && strpbrk(domain.GetVal(), ",; \t\r\n013014") != nil {
+	if domain != nil && strpbrk(domain.GetStr(), ",; \t\r\n013014") != nil {
 		faults.Error(faults.E_WARNING, "Cookie domains cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
@@ -125,7 +125,7 @@ func PhpSetcookie(
 
 			/* check to make sure that the year does not exceed 4 digits in length */
 
-			p = operators.ZendMemrchr(dt.GetVal(), '-', dt.GetLen())
+			p = operators.ZendMemrchr(dt.GetStr(), '-', dt.GetLen())
 			if p == nil || (*(p + 5)) != ' ' {
 				//types.ZendStringFree(dt)
 				buf.Free()
@@ -160,7 +160,7 @@ func PhpSetcookie(
 		buf.WriteString(b.CastStrAuto(COOKIE_SAMESITE))
 		buf.WriteString(samesite.GetStr())
 	}
-	ctr.SetLine(buf.GetS().GetVal())
+	ctr.SetLine(buf.GetS().GetStr())
 	ctr.SetLineLen(uint32(buf.GetS().GetLen()))
 	result = core.SapiHeaderOp(core.SAPI_HEADER_ADD, &ctr)
 	// types.ZendStringRelease(buf.GetS())

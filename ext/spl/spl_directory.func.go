@@ -758,10 +758,10 @@ func zim_spl_SplFileInfo_getExtension(executeData *zend.ZendExecuteData, return_
 		flen = intern.GetFileNameLen()
 	}
 	ret = str.PhpBasenameZStr(b.CastStr(fname, flen), "")
-	p = operators.ZendMemrchr(ret.GetVal(), '.', ret.GetLen())
+	p = operators.ZendMemrchr(ret.GetStr(), '.', ret.GetLen())
 	if p != nil {
-		idx = p - ret.GetVal()
-		return_value.SetString(b.CastStr(ret.GetVal()+idx+1, ret.GetLen()-idx-1))
+		idx = p - ret.GetStr()
+		return_value.SetString(b.CastStr(ret.GetStr()+idx+1, ret.GetLen()-idx-1))
 		// types.ZendStringReleaseEx(ret, 0)
 		return
 	} else {
@@ -779,10 +779,10 @@ func zim_spl_DirectoryIterator_getExtension(executeData *zend.ZendExecuteData, r
 		return
 	}
 	fname = str.PhpBasenameZStr(intern.GetEntry().GetDName(), "")
-	p = operators.ZendMemrchr(fname.GetVal(), '.', fname.GetLen())
+	p = operators.ZendMemrchr(fname.GetStr(), '.', fname.GetLen())
 	if p != nil {
-		idx = p - fname.GetVal()
-		return_value.SetString(b.CastStr(fname.GetVal()+idx+1, fname.GetLen()-idx-1))
+		idx = p - fname.GetStr()
+		return_value.SetString(b.CastStr(fname.GetStr()+idx+1, fname.GetLen()-idx-1))
 		// types.ZendStringReleaseEx(fname, 0)
 	} else {
 		// types.ZendStringReleaseEx(fname, 0)
@@ -1608,7 +1608,7 @@ func SplFilesystemFileReadLineEx(this_ptr *types.Zval, intern *SplFilesystemObje
 			}
 			SplFilesystemFileFreeLine(intern)
 			if retval.IsString() {
-				intern.SetCurrentLine(zend.Estrndup(retval.StringEx().GetVal(), retval.StringEx().GetLen()))
+				intern.SetCurrentLine(zend.Estrndup(retval.String(), retval.StringEx().GetLen()))
 				intern.SetCurrentLineLen(retval.StringEx().GetLen())
 			} else {
 				var value *types.Zval = &retval

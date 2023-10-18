@@ -73,7 +73,7 @@ func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, p
 	if !(gettimeofday(&tv, nil)) {
 		var dt *types.String = php_format_date("D, d M Y H:i:s", b.SizeOf(`"D, d M Y H:i:s"`)-1, tv.tv_sec, 0)
 		buffer.WriteString("Date: ")
-		buffer.WriteString(b.CastStrAuto(dt.GetVal()))
+		buffer.WriteString(b.CastStrAuto(dt.GetStr()))
 		buffer.WriteString(" GMT\r\n")
 		// types.ZendStringReleaseEx(dt, 0)
 	}
@@ -157,7 +157,7 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 	})
 
 	buffer.WriteString("\r\n")
-	PhpCliServerClientSendThrough(client, buffer.GetS().GetVal(), buffer.GetS().GetLen())
+	PhpCliServerClientSendThrough(client, buffer.GetS().GetStr(), buffer.GetS().GetLen())
 	buffer.Free()
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
 }
@@ -714,7 +714,7 @@ func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, cl
 	client.SetAddrLen(addr_len)
 	var addr_str *types.String = 0
 	core.PhpNetworkPopulateNameFromSockaddr(addr, addr_len, &addr_str, nil, 0)
-	client.SetAddrStr(zend.Pestrndup(addr_str.GetVal(), addr_str.GetLen()))
+	client.SetAddrStr(zend.Pestrndup(addr_str.GetStr(), addr_str.GetLen()))
 	client.SetAddrStrLen(addr_str.GetLen())
 	// types.ZendStringReleaseEx(addr_str, 0)
 	PhpHttpParserInit(client.GetParser(), PHP_HTTP_REQUEST)
@@ -805,7 +805,7 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 	buffer.WriteUlong(PhpCliServerBufferSize(client.GetContentSender().GetBuffer()))
 	buffer.WriteString("\r\n")
 	buffer.WriteString("\r\n")
-	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetVal(), buffer.GetS().GetLen())
+	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetStr(), buffer.GetS().GetLen())
 	if chunk == nil {
 		buffer.Free()
 		goto fail
@@ -889,7 +889,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 	buffer.WriteUlong(client.GetRequest().GetSb().st_size)
 	buffer.WriteString("\r\n")
 	buffer.WriteString("\r\n")
-	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetVal(), buffer.GetS().GetLen())
+	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetStr(), buffer.GetS().GetLen())
 	if chunk == nil {
 		buffer.Free()
 		PhpCliServerLogResponse(client, 500, nil)

@@ -279,7 +279,7 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 			var nibbleshift = lang.Cond(code == 'h', 0, 4)
 			var first = 1
 			var str = operators.ZvalGetString(args[lang.PostInc(&currentarg)])
-			var v *byte = str.GetVal()
+			var v *byte = str.GetStr()
 			outputpos--
 			if arg > str.GetLen() {
 				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: not enough characters in string", code))
@@ -438,9 +438,9 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 		}
 		break
 	}
-	format = formatarg.GetVal()
+	format = formatarg.GetStr()
 	formatlen = formatarg.GetLen()
-	input = inputarg.GetVal()
+	input = inputarg.GetStr()
 	inputlen = inputarg.GetLen()
 	inputpos = 0
 	if offset < 0 || offset > inputlen {

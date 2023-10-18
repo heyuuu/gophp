@@ -41,7 +41,7 @@ func OnChangeCallback(
 		}
 		if new_value != nil && new_value.GetLen() != 0 {
 			ASSERTG(cb) = zend.Pemalloc(new_value.GetLen() + 1)
-			memcpy(ASSERTG(cb), new_value.GetVal(), new_value.GetLen())
+			memcpy(ASSERTG(cb), new_value.GetStr(), new_value.GetLen())
 			ASSERTG(cb)[new_value.GetLen()] = '0'
 		} else {
 			ASSERTG(cb) = nil
@@ -157,7 +157,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 			faults.ThrowExceptionObject(description)
 		} else {
 			var str *types.String = operators.ZvalGetString(description)
-			faults.ThrowException(AssertionErrorCe, str.GetVal(), faults.E_ERROR)
+			faults.ThrowException(AssertionErrorCe, str.GetStr(), faults.E_ERROR)
 			// types.ZendStringReleaseEx(str, 0)
 		}
 	} else if ASSERTG(warning) {
@@ -172,7 +172,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 			if myeval != nil {
 				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf(fmt.Sprintf(`%s: "%s" failed`, str.GetStr(), myeval)))
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s failed", str.GetVal()))
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s failed", str.GetStr()))
 			}
 		}
 	}

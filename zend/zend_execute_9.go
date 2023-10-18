@@ -34,8 +34,8 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 			}
 		} else if EG__().HasException() {
 			break
-		} else if strlen(inc_filename.StringEx().GetVal()) != inc_filename.StringEx().GetLen() {
-			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.StringEx().GetVal())
+		} else if strlen(inc_filename.String()) != inc_filename.StringEx().GetLen() {
+			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String())
 			break
 		} else {
 			*resolved_path = inc_filename.String()
@@ -58,13 +58,13 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 				new_op_array = ZEND_FAKE_OP_ARRAY
 			}
 		} else {
-			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.StringEx().GetVal())
+			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String())
 		}
 	case ZEND_INCLUDE:
 		fallthrough
 	case ZEND_REQUIRE:
-		if strlen(inc_filename.StringEx().GetVal()) != inc_filename.StringEx().GetLen() {
-			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.StringEx().GetVal())
+		if strlen(inc_filename.String()) != inc_filename.StringEx().GetLen() {
+			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String())
 			break
 		}
 		new_op_array = CompileFilename(type_, inc_filename.String())
@@ -162,18 +162,18 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 	if c == nil {
 		if check_defined_only == 0 {
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
-				var actual *byte = (*byte)(operators.ZendMemrchr(opline.Const2().StringEx().GetVal(), '\\', opline.Const2().StringEx().GetLen()))
+				var actual *byte = (*byte)(operators.ZendMemrchr(opline.Const2().String(), '\\', opline.Const2().StringEx().GetLen()))
 				if actual == nil {
 					opline.Result().SetString(opline.Const2().String())
 				} else {
 					actual++
-					opline.Result().SetString(b.CastStr(actual, opline.Const2().StringEx().GetLen()-(actual-opline.Const2().StringEx().GetVal())))
+					opline.Result().SetString(b.CastStr(actual, opline.Const2().StringEx().GetLen()-(actual-opline.Const2().String())))
 				}
 
-				faults.Error(faults.E_WARNING, fmt.Sprintf("Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().StringEx().GetVal(), opline.Result().StringEx().GetVal()))
+				faults.Error(faults.E_WARNING, fmt.Sprintf("Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().String(), opline.Result().String()))
 
 			} else {
-				faults.ThrowError(nil, fmt.Sprintf("Undefined constant '%s'", opline.Const2().StringEx().GetVal()))
+				faults.ThrowError(nil, fmt.Sprintf("Undefined constant '%s'", opline.Const2().String()))
 				opline.Result().SetUndef()
 			}
 		}

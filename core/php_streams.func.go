@@ -182,7 +182,7 @@ func PhpStreamOpenWrapper(path *byte, mode string, options int, opened **types.S
 func PhpStreamOpenWrapperEx(path string, mode string, options int, opened **types.String, context *PhpStreamContext) *PhpStream {
 	return _phpStreamOpenWrapperEx(path, mode, options, opened, context)
 }
-func PhpStreamGetUrlStreamWrappersHash() map[string]*PhpStreamWrapper {
+func PhpStreamGetUrlStreamWrappersHash() *types.Array {
 	return _phpStreamGetUrlStreamWrappersHash()
 }
 func PhpGetStreamFiltersHash() *types.Array { return _phpGetStreamFiltersHash() }

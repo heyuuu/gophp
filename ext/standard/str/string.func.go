@@ -92,7 +92,7 @@ func ZifStrGetcsv(return_value zpp.Ret, string_ string, _ zpp.Opt, delimiter *st
 		}
 	}
 
-	standard.PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetVal(), return_value)
+	standard.PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetStr(), return_value)
 }
 
 func ZifSscanf(str string, format string, vars []zpp.RefZval) *types.Zval {

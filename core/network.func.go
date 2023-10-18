@@ -333,7 +333,7 @@ func PhpNetworkParseNetworkAddressWithPort(addr *byte, addrlen zend.ZendLong, sa
 	n = PhpNetworkGetaddresses(tmp, SOCK_DGRAM, &psal, &errstr)
 	if n == 0 {
 		if errstr != nil {
-			PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Failed to resolve `%s': %s", tmp, errstr.GetVal()))
+			PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Failed to resolve `%s': %s", tmp, errstr.GetStr()))
 			// types.ZendStringReleaseEx(errstr, 0)
 		}
 		goto out

@@ -527,7 +527,7 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) string {
 							str.WriteString("NULL")
 						} else if zv.IsString() {
 							str.WriteByte('\'')
-							str.WriteString(b.CastStr(zv.StringEx().GetVal(), b.Min(zv.StringEx().GetLen(), 10)))
+							str.WriteString(b.CastStr(zv.String(), b.Min(zv.StringEx().GetLen(), 10)))
 							if zv.StringEx().GetLen() > 10 {
 								str.WriteString("...")
 							}
@@ -584,7 +584,7 @@ func EmitIncompatibleMethodError(
 	var childPrototype = ZendGetFunctionDeclaration(child)
 	var errorMsg string
 	if status == INHERITANCE_UNRESOLVED {
-		errorMsg = fmt.Sprintf("Could not check compatibility between %s and %s, because class %s is not available", childPrototype, parentPrototype, unresolved_class.GetVal())
+		errorMsg = fmt.Sprintf("Could not check compatibility between %s and %s, because class %s is not available", childPrototype, parentPrototype, unresolved_class.GetStr())
 	} else {
 		errorMsg = fmt.Sprintf("Declaration of %s %s be compatible with %s", childPrototype, error_verb, parentPrototype)
 	}
@@ -1625,7 +1625,7 @@ func doTraitsPropertyBinding(ce *types.ClassEntry, traits []*types.ClassEntry) {
 						}
 					}
 					if not_compatible != 0 {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).Name(), property_info.GetCe().Name(), prop_name.GetVal(), ce.Name()))
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).Name(), property_info.GetCe().Name(), prop_name.GetStr(), ce.Name()))
 					}
 					return
 				}
@@ -1913,7 +1913,7 @@ func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 		// 		exception_zv.AddRefcount()
 		EG__().ClearException()
 		exception_str = operators.ZvalGetString(&exception_zv)
-		faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("During inheritance of %s with variance dependencies: Uncaught %s", ce.Name(), exception_str.GetVal()))
+		faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("During inheritance of %s with variance dependencies: Uncaught %s", ce.Name(), exception_str.GetStr()))
 	}
 }
 func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {

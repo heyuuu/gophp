@@ -171,7 +171,7 @@ func PhpStreamUrlWrapHttpEx(
 
 					tmpheader = _z
 					if tmpheader.IsString() {
-						s = tmpheader.StringEx().GetVal()
+						s = tmpheader.String()
 						for {
 							for (*s) == ' ' || (*s) == '\t' {
 								s++
@@ -206,7 +206,7 @@ func PhpStreamUrlWrapHttpEx(
 					}
 				}
 			} else if tmpzval.IsString() && tmpzval.StringEx().GetLen() != 0 {
-				s = tmpzval.StringEx().GetVal()
+				s = tmpzval.String()
 				for {
 					for (*s) == ' ' || (*s) == '\t' {
 						s++
@@ -242,7 +242,7 @@ func PhpStreamUrlWrapHttpEx(
 		}
 	finish:
 		header.WriteString("\r\n")
-		if core.PhpStreamWrite(stream, header.GetS().GetVal(), header.GetS().GetLen()) != header.GetS().GetLen() {
+		if core.PhpStreamWrite(stream, header.GetS().GetStr(), header.GetS().GetLen()) != header.GetS().GetLen() {
 			streams.PhpStreamWrapperLogError(wrapper, options, "Cannot connect to HTTPS server through proxy")
 			core.PhpStreamClose(stream)
 			stream = nil
@@ -300,7 +300,7 @@ func PhpStreamUrlWrapHttpEx(
 	if context != nil && lang.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "method")) != nil {
 		if tmpzval.IsString() && tmpzval.StringEx().GetLen() > 0 {
 
-			if redirected == 0 || tmpzval.StringEx().GetLen() == 3 && memcmp("GET", tmpzval.StringEx().GetVal(), 3) == 0 || tmpzval.StringEx().GetLen() == 4 && memcmp("HEAD", tmpzval.StringEx().GetVal(), 4) == 0 {
+			if redirected == 0 || tmpzval.StringEx().GetLen() == 3 && memcmp("GET", tmpzval.String(), 3) == 0 || tmpzval.StringEx().GetLen() == 4 && memcmp("HEAD", tmpzval.String(), 4) == 0 {
 				custom_request_method = 1
 				req_buf.WriteString(tmpzval.String())
 				req_buf.WriteByte(' ')
@@ -382,7 +382,7 @@ func PhpStreamUrlWrapHttpEx(
 		if tmp != nil && tmp.GetLen() != 0 {
 			var s *byte
 			var t *byte
-			user_headers = zend.Estrndup(tmp.GetVal(), tmp.GetLen())
+			user_headers = zend.Estrndup(tmp.GetStr(), tmp.GetLen())
 			//if tmp.GetRefcount() > 1 {
 			//	tmp.DelRefcount()
 			//	tmp = types.NewString(tmp.String())
@@ -390,8 +390,8 @@ func PhpStreamUrlWrapHttpEx(
 
 			/* Make lowercase for easy comparison against 'standard' headers */
 
-			str.PhpStrtolower(tmp.GetVal(), tmp.GetLen())
-			t = tmp.GetVal()
+			str.PhpStrtolower(tmp.GetStr(), tmp.GetLen())
+			t = tmp.GetStr()
 			if header_init == 0 {
 
 				/* strip POST headers on redirect */
@@ -500,7 +500,7 @@ func PhpStreamUrlWrapHttpEx(
 		req_buf.WriteString("Connection: close\r\n")
 	}
 	if context != nil && lang.Assign(&ua_zval, streams.PhpStreamContextGetOption(context, "http", "user_agent")) != nil && ua_zval.IsString() {
-		ua_str = ua_zval.StringEx().GetVal()
+		ua_str = ua_zval.String()
 	} else if FG__().user_agent {
 		ua_str = FG__().user_agent
 	}
@@ -563,7 +563,7 @@ func PhpStreamUrlWrapHttpEx(
 
 	/* send it */
 
-	core.PhpStreamWrite(stream, req_buf.GetS().GetVal(), req_buf.GetS().GetLen())
+	core.PhpStreamWrite(stream, req_buf.GetS().GetStr(), req_buf.GetS().GetLen())
 	location[0] = '0'
 	if response_header.IsUndef() {
 		zend.ArrayInit(response_header)

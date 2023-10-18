@@ -33,7 +33,7 @@ func OnUpdateBaseDir(
 		/* We're in a PHP_INI_SYSTEM context, no restrictions */
 
 		if new_value != nil {
-			*p = new_value.GetVal()
+			*p = new_value.GetStr()
 		} else {
 			*p = nil
 		}
@@ -46,19 +46,19 @@ func OnUpdateBaseDir(
 
 		/* open_basedir not set yet, go ahead and give it a value */
 
-		*p = new_value.GetVal()
+		*p = new_value.GetStr()
 		return types.SUCCESS
 	}
 
 	/* Shortcut: When we have a open_basedir and someone tries to unset, we know it'll fail */
 
-	if new_value == nil || !new_value.GetVal() {
+	if new_value == nil || new_value.GetStr() == "" {
 		return types.FAILURE
 	}
 
 	/* Is the proposed open_basedir at least as restrictive as the current setting? */
 
-	pathbuf = zend.Estrdup(new_value.GetVal())
+	pathbuf = zend.Estrdup(new_value.GetStr())
 	ptr = pathbuf
 	for ptr != nil && (*ptr) != nil {
 		end = strchr(ptr, zend.DEFAULT_DIR_SEPARATOR)
@@ -86,7 +86,7 @@ func OnUpdateBaseDir(
 
 	/* Everything checks out, set it */
 
-	*p = new_value.GetVal()
+	*p = new_value.GetStr()
 	return types.SUCCESS
 }
 func PhpCheckSpecificOpenBasedir(basedir *byte, path *byte) int {

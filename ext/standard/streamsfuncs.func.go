@@ -95,7 +95,7 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
 	if (flags & PHP_STREAM_CLIENT_PERSISTENT) != 0 {
-		hashkey = fmt.Sprintf("stream_socket_client__%s", host.GetVal())
+		hashkey = fmt.Sprintf("stream_socket_client__%s", host.GetStr())
 	}
 
 	/* prepare the timeout value for use */
@@ -109,13 +109,13 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 	if zerrstr != nil {
 		zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zerrstr)
 	}
-	stream = streams.PhpStreamXportCreate(host.GetVal(), host.GetLen(), core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|lang.Cond((flags&PHP_STREAM_CLIENT_CONNECT) != 0, streams.STREAM_XPORT_CONNECT, 0)|lang.Cond((flags&PHP_STREAM_CLIENT_ASYNC_CONNECT) != 0, streams.STREAM_XPORT_CONNECT_ASYNC, 0), hashkey, &tv, context, &errstr, &err)
+	stream = streams.PhpStreamXportCreate(host.GetStr(), host.GetLen(), core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|lang.Cond((flags&PHP_STREAM_CLIENT_CONNECT) != 0, streams.STREAM_XPORT_CONNECT, 0)|lang.Cond((flags&PHP_STREAM_CLIENT_ASYNC_CONNECT) != 0, streams.STREAM_XPORT_CONNECT_ASYNC, 0), hashkey, &tv, context, &errstr, &err)
 	if stream == nil {
 
 		/* host might contain binary characters */
 
 		var quoted_host *types.String = types.NewString(str.PhpAddslashes(host.GetStr()))
-		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("unable to connect to %s (%s)", quoted_host.GetVal(), lang.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() })))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("unable to connect to %s (%s)", quoted_host.GetStr(), lang.CondF2(errstr == nil, "Unknown error", func() string { return errstr.GetStr() })))
 		// types.ZendStringReleaseEx(quoted_host, 0)
 	}
 	if hashkey != nil {
@@ -179,7 +179,7 @@ func ZifStreamSocketServer(executeData zpp.Ex, return_value zpp.Ret, localaddres
 	}
 	stream = streams.PhpStreamXportCreate(host, host_len, core.REPORT_ERRORS, streams.STREAM_XPORT_SERVER|int(flags), nil, nil, context, &errstr, &err)
 	if stream == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("unable to connect to %s (%s)", host, lang.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() })))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("unable to connect to %s (%s)", host, lang.CondF2(errstr == nil, "Unknown error", func() string { return errstr.GetStr() })))
 	}
 	if stream == nil {
 		if zerrno != nil {
@@ -239,7 +239,7 @@ func ZifStreamSocketAccept(executeData zpp.Ex, return_value zpp.Ret, serverstrea
 		if peername != nil {
 			// types.ZendStringRelease(peername)
 		}
-		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("accept failed: %s", lang.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error")))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("accept failed: %s", lang.CondF1(errstr != nil, func() string { return errstr.GetStr() }, "Unknown error")))
 		return_value.SetFalse()
 	}
 	if errstr != nil {
@@ -855,7 +855,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 				okey = _p.GetKey()
 				oval = _z
 				if okey != nil {
-					streams.PhpStreamContextSetOption(context, wkey.GetVal(), okey.GetVal(), oval)
+					streams.PhpStreamContextSetOption(context, wkey.GetStr(), okey.GetStr(), oval)
 				}
 			}
 		} else {
@@ -1553,7 +1553,7 @@ func ZifStreamIsLocal(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zv
 		if operators.TryConvertToString(zstream) == 0 {
 			return
 		}
-		wrapper = streams.PhpStreamLocateUrlWrapper(zstream.StringEx().GetVal(), nil, 0)
+		wrapper = streams.PhpStreamLocateUrlWrapper(zstream.String(), nil, 0)
 	}
 	if wrapper == nil {
 		return_value.SetFalse()
