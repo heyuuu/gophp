@@ -108,7 +108,7 @@ func ZendMakePrintableZval(expr *types.Zval, expr_copy *types.Zval) int {
 	if expr.IsString() {
 		return 0
 	} else {
-		expr_copy.SetStringEx(operators.ZvalGetString(expr))
+		expr_copy.SetString(operators.ZvalGetStrVal(expr))
 		return 1
 	}
 }

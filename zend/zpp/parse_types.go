@@ -161,7 +161,7 @@ func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.String, 
 
 	// base parse
 	if arg.IsString() {
-		return arg.StringEx(), true
+		return types.NewString(arg.String()), true
 	}
 
 	// weak parse
@@ -173,18 +173,18 @@ func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.String, 
 	return
 }
 
-func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
+func ParseStrWeak(arg *types.Zval) (string, bool) {
 	if arg.Type() < types.IsString {
 		operators.ConvertToString(arg)
-		return arg.StringEx(), true
+		return arg.String(), true
 	} else if arg.IsString() {
-		return arg.StringEx(), true
+		return arg.String(), true
 	} else if arg.IsObject() {
 		if arg.Object().CanCast() {
 			var obj types.Zval
 			if arg.Object().Cast(&obj, types.IsString) == types.SUCCESS {
 				types.ZVAL_COPY_VALUE(arg, &obj)
-				return arg.StringEx(), true
+				return arg.String(), true
 			}
 		} else if arg.Object().CanGet() {
 			var rv types.Zval
@@ -193,15 +193,22 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 				if z.IsString() {
 					arg.CopyValueFrom(z)
 				} else {
-					arg.SetStringEx(operators.ZvalGetString(z))
+					arg.SetString(operators.ZvalGetStrVal(z))
 				}
-				return arg.StringEx(), true
+				return arg.String(), true
 			}
 		}
-		return nil, false
+		return "", false
 	} else {
-		return nil, false
+		return "", false
 	}
+}
+
+func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
+	if str, ok := ParseStrWeak(arg); ok {
+		return types.NewString(str), true
+	}
+	return nil, false
 }
 
 // @see Micro CHECK_NULL_PATH

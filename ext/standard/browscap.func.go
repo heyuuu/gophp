@@ -73,11 +73,11 @@ func BrowscapConvertPatternEx(pattern string) string {
 	buf.WriteString("$~")
 	return buf.String()
 }
-func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.String) *types.String {
-	return ctx.GetInternedStr(str.GetStr())
+func BrowscapInternStr(ctx *BrowscapParserCtx, str string) *types.String {
+	return ctx.GetInternedStr(str)
 }
-func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String) *types.String {
-	lcName := ascii.StrToLower(str.GetStr())
+func BrowscapInternStrCi(ctx *BrowscapParserCtx, str string) *types.String {
+	lcName := ascii.StrToLower(str)
 	return ctx.GetInternedStr(lcName)
 }
 func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *types.Array {
@@ -106,12 +106,12 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 
 			/* Set proper value for true/false settings */
 
-			if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.String(), "on", b.SizeOf(`"on"`)-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.String(), "yes", b.SizeOf(`"yes"`)-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.String(), "true", b.SizeOf(`"true"`)-1)) {
+			if len(arg2.String()) == 2 && !(strncasecmp(arg2.String(), "on", b.SizeOf(`"on"`)-1)) || len(arg2.String()) == 3 && !(strncasecmp(arg2.String(), "yes", b.SizeOf(`"yes"`)-1)) || len(arg2.String()) == 4 && !(strncasecmp(arg2.String(), "true", b.SizeOf(`"true"`)-1)) {
 				new_value = types.NewString("1")
-			} else if arg2.StringEx().GetLen() == 2 && !(strncasecmp(arg2.String(), "no", b.SizeOf(`"no"`)-1)) || arg2.StringEx().GetLen() == 3 && !(strncasecmp(arg2.String(), "off", b.SizeOf(`"off"`)-1)) || arg2.StringEx().GetLen() == 4 && !(strncasecmp(arg2.String(), "none", b.SizeOf(`"none"`)-1)) || arg2.StringEx().GetLen() == 5 && !(strncasecmp(arg2.String(), "false", b.SizeOf(`"false"`)-1)) {
+			} else if len(arg2.String()) == 2 && !(strncasecmp(arg2.String(), "no", b.SizeOf(`"no"`)-1)) || len(arg2.String()) == 3 && !(strncasecmp(arg2.String(), "off", b.SizeOf(`"off"`)-1)) || len(arg2.String()) == 4 && !(strncasecmp(arg2.String(), "none", b.SizeOf(`"none"`)-1)) || len(arg2.String()) == 5 && !(strncasecmp(arg2.String(), "false", b.SizeOf(`"false"`)-1)) {
 				new_value = types.NewString("")
 			} else {
-				new_value = BrowscapInternStr(ctx, arg2.StringEx())
+				new_value = BrowscapInternStr(ctx, arg2.String())
 			}
 			if !(strcasecmp(arg1.String(), "parent")) {
 
@@ -126,7 +126,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 				}
 				ctx.GetCurrentEntry().SetParent(new_value)
 			} else {
-				new_key = BrowscapInternStrCi(ctx, arg1.StringEx())
+				new_key = BrowscapInternStrCi(ctx, arg1.String())
 				bdata.AddKv(new_key.GetStr(), new_value.GetStr())
 				ctx.GetCurrentEntry().SetKvEnd(bdata.GetKvUsed())
 			}

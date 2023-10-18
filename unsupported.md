@@ -15,6 +15,7 @@
 - `eval`
 - `create_function`
 - `get_resources` (注: 在 go 无弱引用情况下，记录全局resource影响自动 GC。在有 Weak Reference 方案后再支持)
+- `convert_cyr_string` (注: `本函数已自 PHP 7.4.0 起弃用，自 PHP 8.0.0 起移除。强烈建议不要依赖本函数。`)
 
 # 部分功能不支持的函数
 

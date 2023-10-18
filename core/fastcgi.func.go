@@ -576,7 +576,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 				q = q.GetListNext()
 				continue
 			}
-			zlen = uint(value.StringEx().GetLen())
+			zlen = uint(len(value.String()))
 			if p+4+4+q.GetVarLen()+zlen >= buf+b.SizeOf("buf") {
 				break
 			}

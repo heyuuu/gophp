@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/pfmt"
@@ -74,7 +75,7 @@ again:
 	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IsString:
-		core.PhpPrintf(`%sstring(%zd) "`, common, struc.StringEx().GetLen())
+		core.PhpPrintf(`%sstring(%zd) "`, common, len(struc.String()))
 		core.OG__().WriteString(struc.String())
 		core.PUTS("\"\n")
 	case types.IsArray:
@@ -202,7 +203,7 @@ func PhpDebugZvalDump(struc *types.Zval, level int) {
 	case types.IsDouble:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IsString:
-		core.PhpPrintf(`%sstring(%zd) "`, common, struc.StringEx().GetLen())
+		core.PhpPrintf(`%sstring(%zd) "`, common, len(struc.String()))
 		core.PUTS(struc.String())
 		core.PhpPrintf("\"\n")
 	case types.IsArray:
@@ -466,7 +467,7 @@ func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var__ *types.Zval, _
 	PhpVarExportEx(var_, 1, &buf)
 	//buf.ZeroTail()
 	if return_output != 0 {
-		return_value.SetStringEx(buf.GetS())
+		return_value.SetString(buf.GetStr())
 		return
 	} else {
 		core.PUTS(buf.GetS().GetStr())

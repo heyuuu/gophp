@@ -146,7 +146,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		/* arg3 is possible option offset name */
 
-		if arg3 != nil && arg3.StringEx().GetLen() > 0 {
+		if arg3 != nil && len(arg3.String()) > 0 {
 			entry = find_arr.Array().SymtableUpdate(arg3.String(), arg2)
 		} else {
 			entry = find_arr.Array().Append(arg2)
@@ -331,7 +331,7 @@ func PhpInitConfig() int {
 		var tmp types.Zval
 		tmp.SetString(fh.GetFilename())
 		Config().Set("cfg_file_path", fh.GetFilename())
-		PhpIniOpenedPath = zend.ZendStrndup(tmp.String(), tmp.StringEx().GetLen())
+		PhpIniOpenedPath = zend.ZendStrndup(tmp.String(), len(tmp.String()))
 	}
 
 	/* Check for PHP_INI_SCAN_DIR environment variable to override/set config file scan directory */

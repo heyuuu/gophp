@@ -1,11 +1,13 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"log"
+	"strconv"
 )
 
 /* A Bison parser, made by GNU Bison 3.0.2.  */
@@ -148,8 +150,7 @@ func ZendIniDoOp(type_ byte, result *types.Zval, op1 *types.Zval, op2 *types.Zva
 	default:
 		i_result = 0
 	}
-	str_len = sprintf(str_result, "%d", i_result)
-	result.SetStringEx(types.NewString(b.CastStr(str_result, str_len)))
+	result.SetString(strconv.Itoa(i_result))
 }
 
 func IniError(msg *byte) {

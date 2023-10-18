@@ -80,7 +80,7 @@ func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp
 	}
 	if base == 0 || base == 2 {
 		var strval *byte = num.String()
-		var strlen int = num.StringEx().GetLen()
+		var strlen int = len(num.String())
 		for isspace(*strval) && strlen != 0 {
 			strval++
 			strlen--
@@ -166,7 +166,7 @@ func ZifStrval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	return_value.SetStringEx(operators.ZvalGetString(num))
+	return_value.SetString(operators.ZvalGetStrVal(num))
 }
 func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type_ int) {
 	var arg *types.Zval

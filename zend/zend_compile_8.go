@@ -721,7 +721,7 @@ func (compiler *Compiler) CompileEncapsList(result *Znode, ast *ZendAst) {
 		compiler.CompileExpr(&elem_node, list.Children()[i])
 		if elem_node.GetOpType() == IS_CONST {
 			operators.ConvertToString(elem_node.GetConstant())
-			if elem_node.GetConstant().StringEx().GetLen() == 0 {
+			if elem_node.GetConstant().String() == "" {
 				// ZvalPtrDtor(elem_node.GetConstant())
 			} else if last_const_node.GetOpType() == IS_CONST {
 				operators.ConcatFunction(last_const_node.GetConstant(), last_const_node.GetConstant(), elem_node.GetConstant())

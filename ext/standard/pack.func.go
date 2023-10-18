@@ -2,6 +2,7 @@ package standard
 
 import (
 	"encoding/binary"
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/kits/strkit"
@@ -146,7 +147,7 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 				if operators.TryConvertToString(args[currentarg]) == 0 {
 					return "", false
 				}
-				arg = args[currentarg].StringEx().GetLen()
+				arg = len(args[currentarg].String())
 				if code == 'Z' {
 					/* add one because Z is always NUL-terminated:
 					 * pack("Z*", "aa") === "aa\0"

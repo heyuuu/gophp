@@ -31,7 +31,7 @@ func ZendTryAssignTypedRefEmptyString(ref *types.Reference) int {
 }
 func ZendTryAssignTypedRefStr(ref *types.Reference, str *types.String) int {
 	var tmp types.Zval
-	tmp.SetStringEx(str)
+	tmp.SetString(str.GetStr())
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 func ZendTryAssignTypedRefString(ref *types.Reference, string *byte) int {

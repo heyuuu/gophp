@@ -274,7 +274,7 @@ func ZifStreamSocketGetName(executeData zpp.Ex, return_value zpp.Ret, stream *ty
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetStringEx(name)
+	return_value.SetString(name.GetStr())
 }
 func ZifStreamSocketSendto(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, data *types.Zval, _ zpp.Opt, flags *types.Zval, targetAddr *types.Zval) {
 	var stream *core.PhpStream
@@ -402,7 +402,7 @@ func ZifStreamGetContents(executeData zpp.Ex, return_value zpp.Ret, source *type
 		}
 	}
 	if lang.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) {
-		return_value.SetStringEx(contents)
+		return_value.SetString(contents.GetStr())
 		return
 	} else {
 		return_value.SetString("")

@@ -29,7 +29,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint uint8, arg *types.Zval) bool {
 		}
 	case types.IsString:
 		if val, ok := zpp.ParseZStrWeak(arg); ok {
-			arg.SetStringEx(val)
+			arg.SetString(val.GetStr())
 			return true
 		}
 	}

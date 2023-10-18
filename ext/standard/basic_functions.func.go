@@ -1198,7 +1198,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			/* bare string - nothing to do */
 
 		}
-		if !(arg1.StringEx().GetLen() > 1 && arg1.String()[0] == '0') && operators.IsNumericString(arg1.String(), nil, nil, 0) == types.IsLong {
+		if !(len(arg1.String()) > 1 && arg1.String()[0] == '0') && operators.IsNumericString(arg1.String(), nil, nil, 0) == types.IsLong {
 			var key = zend.StrToLongWithUnit(arg1.String())
 			if lang.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
@@ -1214,7 +1214,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			// zend.ZvalPtrDtorNogc(find_hash)
 			zend.ArrayInit(find_hash)
 		}
-		if arg3 == nil || arg3.IsString() && arg3.StringEx().GetLen() == 0 {
+		if arg3 == nil || arg3.IsString() && len(arg3.String()) == 0 {
 			// arg2.TryAddRefcount()
 			zend.AddNextIndexZval(find_hash, arg2)
 		} else {

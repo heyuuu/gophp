@@ -139,7 +139,7 @@ func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare const %s because the name is already in use", name.GetStr()))
 		}
 		name_node.SetOpType(IS_CONST)
-		name_node.GetConstant().SetStringEx(name)
+		name_node.GetConstant().SetString(name.GetStr())
 		ZendEmitOp(nil, ZEND_DECLARE_CONST, &name_node, &value_node)
 		FC__().RegisterSeenSymbol(name.GetStr(), ZEND_SYMBOL_CONST)
 	}

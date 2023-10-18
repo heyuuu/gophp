@@ -345,8 +345,8 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 			// ZvalPtrDtor(&retval)
 			return types.FAILURE
 		case types.IsString:
-			*buffer = (*uint8)(Estrndup(retval.String(), retval.StringEx().GetLen()))
-			*buf_len = retval.StringEx().GetLen()
+			*buffer = (*uint8)(Estrndup(retval.String(), len(retval.String())))
+			*buf_len = len(retval.String())
 			result = types.SUCCESS
 		default:
 			result = types.FAILURE

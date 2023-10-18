@@ -141,7 +141,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 			// zend.ZvalPtrDtor(&args[2])
 			// zend.ZvalPtrDtor(&args[0])
 		} else {
-			args[3].SetStringEx(operators.ZvalGetString(description))
+			args[3].SetString(operators.ZvalGetStrVal(description))
 			zend.CallUserFunction(nil, &(ASSERTG(callback)), &retval, 4, args)
 			// zend.ZvalPtrDtor(&args[3])
 			// zend.ZvalPtrDtor(&args[2])

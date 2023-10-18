@@ -83,7 +83,7 @@ func ZendFetchDimensionAddressRead(
 		} else {
 			offset = dim.Long()
 		}
-		if container.StringEx().GetLen() < lang.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
+		if len(container.String()) < lang.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
 			if type_ != BP_VAR_IS {
 				faults.Error(faults.E_NOTICE, fmt.Sprintf("Uninitialized string offset: %d", offset))
 				result.SetString("")
@@ -94,7 +94,7 @@ func ZendFetchDimensionAddressRead(
 			var c uint8
 			var real_offset ZendLong
 			if offset < 0 {
-				real_offset = ZendLong(container.StringEx().GetLen() + offset)
+				real_offset = ZendLong(len(container.String()) + offset)
 			} else {
 				real_offset = offset
 			}
@@ -189,9 +189,9 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 			lval = offset.Long()
 		str_offset:
 			if lval < 0 {
-				lval += ZendLong(container.StringEx().GetLen())
+				lval += ZendLong(len(container.String()))
 			}
-			if lval >= 0 && int(lval < container.StringEx().GetLen()) != 0 {
+			if lval >= 0 && int(lval < len(container.String())) != 0 {
 				return 1
 			} else {
 				return 0
@@ -226,9 +226,9 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 			lval = offset.Long()
 		str_offset:
 			if lval < 0 {
-				lval += ZendLong(container.StringEx().GetLen())
+				lval += ZendLong(len(container.String()))
 			}
-			if lval >= 0 && int(lval < container.StringEx().GetLen()) != 0 {
+			if lval >= 0 && int(lval < len(container.String())) != 0 {
 				return container.String()[lval] == '0'
 			} else {
 				return 1
@@ -312,7 +312,7 @@ func PromotesToArray(val *types.Zval) bool {
 }
 func PromotesToObject(val *types.Zval) bool {
 	val = types.ZVAL_DEREF(val)
-	return val.IsSignFalse() || val.IsString() && val.StringEx().GetLen() == 0
+	return val.IsSignFalse() || val.IsString() && len(val.String()) == 0
 }
 func CheckTypeArrayAssignable(type_ types.TypeHint) bool {
 	if type_ == 0 {

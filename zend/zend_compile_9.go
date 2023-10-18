@@ -589,7 +589,7 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 			} else if !dim.IsString() || operators.IsNumericString(dim.String(), &offset, nil, 1) != types.IsLong {
 				return
 			}
-			if offset < 0 || int(offset >= container.StringEx().GetLen()) != 0 {
+			if offset < 0 || int(offset >= len(container.String())) != 0 {
 				return
 			}
 			c = uint8(container.String()[offset])

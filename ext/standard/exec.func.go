@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	"github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
@@ -318,6 +319,6 @@ func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types.Zval) {
 	ret = core.PhpStreamCopyToMem(stream, core.PHP_STREAM_COPY_ALL, 0)
 	core.PhpStreamClose(stream)
 	if ret != nil && ret.GetLen() > 0 {
-		return_value.SetStringEx(ret)
+		return_value.SetString(ret.GetStr())
 	}
 }

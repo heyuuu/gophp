@@ -376,7 +376,7 @@ func ProcessNestedData(
 							new_key = unmangled
 						}
 
-						key.SetStringEx(new_key)
+						key.SetString(new_key.GetStr())
 					} else {
 						// types.ZendStringReleaseEx(unmangled, 0)
 					}
@@ -1023,7 +1023,7 @@ yy30:
 	}
 	YYCURSOR += 2
 	*p = YYCURSOR
-	rval.SetStringEx(str)
+	rval.SetString(str.GetStr())
 	return 1
 yy35:
 	yych = *(lang.PreInc(&YYCURSOR))

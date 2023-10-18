@@ -987,11 +987,11 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, methodName string, isStatic
 	func_.SetArgInfo(0)
 	return (types.IFunction)(func_)
 }
-func ZendGetUserCallFunction(ce *types.ClassEntry, method_name *types.String) types.IFunction {
-	return ZendGetCallTrampolineFunc(ce, method_name.GetStr(), false)
+func ZendGetUserCallFunction(ce *types.ClassEntry, method_name string) types.IFunction {
+	return ZendGetCallTrampolineFunc(ce, method_name, false)
 }
-func ZendBadMethodCall(fbc types.IFunction, method_name *types.String, scope *types.ClassEntry) {
-	faults.ThrowError(nil, fmt.Sprintf("Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetStr(), lang.CondF1(scope != nil, func() string { return scope.Name() }, "")))
+func ZendBadMethodCall(fbc types.IFunction, method_name string, scope *types.ClassEntry) {
+	faults.ThrowError(nil, fmt.Sprintf("Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name, lang.CondF1(scope != nil, func() string { return scope.Name() }, "")))
 }
 
 func ZendStdGetMethod(obj_ptr **types.Object, method_name *types.String, key *types.Zval) types.IFunction {
@@ -1009,7 +1009,7 @@ func ZendStdGetMethod_Ex(zobj *types.Object, methodName string, key *types.Zval)
 	fbc = zobj.GetCe().FunctionTable().Get(lc_method_name)
 	if fbc == nil {
 		if zobj.GetCe().GetCall() != nil {
-			return ZendGetUserCallFunction(zobj.GetCe(), types.NewString(methodName))
+			return ZendGetUserCallFunction(zobj.GetCe(), methodName)
 		} else {
 			return nil
 		}
@@ -1029,9 +1029,9 @@ func ZendStdGetMethod_Ex(zobj *types.Object, methodName string, key *types.Zval)
 			}
 			if fbc.GetOpArray().IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) {
 				if zobj.GetCe().GetCall() != nil {
-					return ZendGetUserCallFunction(zobj.GetCe(), types.NewString(methodName))
+					return ZendGetUserCallFunction(zobj.GetCe(), methodName)
 				} else {
-					ZendBadMethodCall(fbc, types.NewString(methodName), scope)
+					ZendBadMethodCall(fbc, methodName, scope)
 					return nil
 				}
 			}
@@ -1039,26 +1039,26 @@ func ZendStdGetMethod_Ex(zobj *types.Object, methodName string, key *types.Zval)
 	}
 	return fbc
 }
-func ZendGetUserCallstaticFunction(ce *types.ClassEntry, method_name *types.String) types.IFunction {
-	return ZendGetCallTrampolineFunc(ce, method_name.GetStr(), true)
+func ZendGetUserCallstaticFunction(ce *types.ClassEntry, method_name string) types.IFunction {
+	return ZendGetCallTrampolineFunc(ce, method_name, true)
 }
-func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, key *types.Zval) types.IFunction {
-	var lc_function_name *types.String
+func ZendStdGetStaticMethod(ce *types.ClassEntry, functionName string, key *types.Zval) types.IFunction {
+	var lcFunctionName string
 	var object *types.Object
 	var scope *types.ClassEntry
 	if key != nil {
-		lc_function_name = key.StringEx()
+		lcFunctionName = key.String()
 	} else {
-		lc_function_name = operators.ZendStringTolower(function_name)
+		lcFunctionName = ascii.StrToLower(functionName)
 	}
 
-	fbc := ce.FunctionTable().Get(lc_function_name.GetStr())
+	fbc := ce.FunctionTable().Get(lcFunctionName)
 	if fbc != nil {
 		// pass
-	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == len(ce.Name()) && operators.ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.Name(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().FunctionName()[0] != '_' || ce.GetConstructor().FunctionName()[1] != '_') {
+	} else if ce.GetConstructor() != nil && len(lcFunctionName) == len(ce.Name()) && operators.ZendBinaryStrncasecmp(lcFunctionName, b.CastStr(ce.Name(), len(lcFunctionName)), len(lcFunctionName)) == 0 && (ce.GetConstructor().FunctionName()[0] != '_' || ce.GetConstructor().FunctionName()[1] != '_') {
 		fbc = ce.GetConstructor()
 	} else {
-		if ce.GetCall() != nil && lang.Assign(&object, ZendGetThisObject(CurrEX())) != nil && operators.InstanceofFunction(object.GetCe(), ce) != 0 {
+		if ce.GetCall() != nil && lang.Assign(&object, ZendGetThisObject(CurrEX())) != nil && operators.InstanceofFunction(object.GetCe(), ce) {
 			/* Call the top-level defined __call().
 			 * see: tests/classes/__call_004.phpt  */
 
@@ -1066,9 +1066,9 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 			for call_ce.GetCall() == nil {
 				call_ce = call_ce.GetParent()
 			}
-			return ZendGetUserCallFunction(call_ce, function_name)
+			return ZendGetUserCallFunction(call_ce, functionName)
 		} else if ce.GetCallstatic() != nil {
-			return ZendGetUserCallstaticFunction(ce, function_name)
+			return ZendGetUserCallstaticFunction(ce, functionName)
 		} else {
 			return nil
 		}
@@ -1078,16 +1078,13 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 		if fbc.GetScope() != scope {
 			if fbc.GetOpArray().IsPrivate() || !ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) {
 				if ce.GetCallstatic() != nil {
-					fbc = ZendGetUserCallstaticFunction(ce, function_name)
+					fbc = ZendGetUserCallstaticFunction(ce, functionName)
 				} else {
-					ZendBadMethodCall(fbc, function_name, scope)
+					ZendBadMethodCall(fbc, functionName, scope)
 					fbc = nil
 				}
 			}
 		}
-	}
-	if key == nil {
-		// types.ZendStringReleaseEx(lc_function_name, 0)
 	}
 	return fbc
 }

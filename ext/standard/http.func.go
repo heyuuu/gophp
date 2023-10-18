@@ -216,6 +216,6 @@ func ZifHttpBuildQuery(executeData zpp.Ex, return_value zpp.Ret, formdata *types
 		return
 	}
 	//formstr.ZeroTail()
-	return_value.SetStringEx(formstr.GetS())
+	return_value.SetString(formstr.GetStr())
 	return
 }

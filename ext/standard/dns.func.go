@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/lang"
@@ -44,7 +45,7 @@ func ZifGethostbyaddr(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types
 		core.PhpErrorDocref("", faults.E_WARNING, "Address is not a valid IPv4 or IPv6 address")
 		return_value.SetFalse()
 	} else {
-		return_value.SetStringEx(hostname)
+		return_value.SetString(hostname.GetStr())
 	}
 }
 func PhpGethostbyaddr(ip *byte) *types.String {
@@ -85,7 +86,7 @@ func ZifGethostbyname(executeData zpp.Ex, return_value zpp.Ret, hostname *types.
 		return_value.SetString(b.CastStr(hostname, hostname_len))
 		return
 	}
-	return_value.SetStringEx(PhpGethostbyname(hostname))
+	return_value.SetString(PhpGethostbyname(hostname).GetStr())
 	return
 }
 func ZifGethostbynamel(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval) {

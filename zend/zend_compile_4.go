@@ -157,7 +157,7 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 		return
 	}
 	// ZvalPtrDtor(name_node.GetConstant())
-	name_node.GetConstant().SetStringEx(lcname)
+	name_node.GetConstant().SetString(lcname.GetStr())
 	opline = ZendEmitOp(nil, ZEND_INIT_FCALL, nil, &name_node)
 	opline.GetResult().SetNum(ZendAllocCacheSlot())
 	compiler.CompileCallCommon(result, args_ast, fbc)

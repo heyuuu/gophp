@@ -595,7 +595,7 @@ func ZifPhpUname(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, mode *type
 		}
 		break
 	}
-	return_value.SetStringEx(PhpGetUname(*mode))
+	return_value.SetString(PhpGetUname(*mode).GetStr())
 	return
 }
 func ZifPhpIniScannedFiles(executeData zpp.Ex, return_value zpp.Ret) {

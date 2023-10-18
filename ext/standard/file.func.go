@@ -373,7 +373,7 @@ func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		return
 	}
 	if lang.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) != nil {
-		return_value.SetStringEx(contents)
+		return_value.SetString(contents.GetStr())
 	} else {
 		return_value.SetString("")
 	}
@@ -463,10 +463,11 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		operators.ConvertToStringEx(data)
 		fallthrough
 	case types.IsString:
-		if data.StringEx().GetLen() != 0 {
-			numbytes = core.PhpStreamWrite(stream, data.String(), data.StringEx().GetLen())
-			if numbytes != data.StringEx().GetLen() {
-				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.StringEx().GetLen()))
+		iflen(data.String()) != 0
+		{
+			numbytes = core.PhpStreamWrite(stream, data.String(), len(data.String()))
+			if numbytes != len(data.String()) {
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Only %zd of %zd bytes written, possibly out of free disk space", numbytes, len(data.String())))
 				numbytes = -1
 			}
 		}
@@ -647,7 +648,7 @@ func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, prefi
 	return_value.SetFalse()
 	if lang.Assign(&fd, core.PhpOpenTemporaryFdEx(dir, p.GetStr(), &opened_path, core.PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) >= 0 {
 		close(fd)
-		return_value.SetStringEx(opened_path)
+		return_value.SetString(opened_path.GetStr())
 	}
 	// types.ZendStringReleaseEx(p, 0)
 }
@@ -1567,7 +1568,7 @@ func ZifFread(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, length *
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetStringEx(str)
+	return_value.SetString(str.GetStr())
 	return
 }
 func PhpFgetcsvLookupTrailingSpaces(ptr *byte, len_ int, delimiter byte) *byte {

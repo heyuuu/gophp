@@ -117,8 +117,8 @@ func ZendUndefinedIndexWrite(ht *types.Array, offset *types.String) int {
 	}
 	return types.SUCCESS
 }
-func ZendUndefinedMethod(ce *types.ClassEntry, method *types.String) {
-	faults.ThrowError(nil, fmt.Sprintf("Call to undefined method %s::%s()", ce.Name(), method.GetStr()))
+func ZendUndefinedMethod(ce *types.ClassEntry, method string) {
+	faults.ThrowError(nil, fmt.Sprintf("Call to undefined method %s::%s()", ce.Name(), method))
 }
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
 	faults.ThrowError(nil, fmt.Sprintf("Call to a member function %s() on %s", function_name.String(), types.ZendGetTypeByConst(object.Type())))

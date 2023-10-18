@@ -808,7 +808,7 @@ func zim_spl_SplFileInfo_getBasename(executeData *zend.ZendExecuteData, return_v
 		fname = intern.GetFileName()
 		flen = intern.GetFileNameLen()
 	}
-	return_value.SetStringEx(str.PhpBasenameZStr(b.CastStr(fname, flen), b.CastStr(suffix, slen)))
+	return_value.SetString(str.PhpBasename(b.CastStr(fname, flen), b.CastStr(suffix, slen)))
 	return
 }
 func zim_spl_DirectoryIterator_getBasename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1608,8 +1608,8 @@ func SplFilesystemFileReadLineEx(this_ptr *types.Zval, intern *SplFilesystemObje
 			}
 			SplFilesystemFileFreeLine(intern)
 			if retval.IsString() {
-				intern.SetCurrentLine(zend.Estrndup(retval.String(), retval.StringEx().GetLen()))
-				intern.SetCurrentLineLen(retval.StringEx().GetLen())
+				intern.SetCurrentLine(zend.Estrndup(retval.String(), len(retval.String())))
+				intern.SetCurrentLineLen(len(retval.String()))
 			} else {
 				var value *types.Zval = &retval
 				types.ZVAL_COPY_DEREF(intern.GetCurrentZval(), value)
@@ -1631,7 +1631,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) bool {
 	} else if !(intern.GetCurrentZval().IsUndef()) {
 		switch intern.GetCurrentZval().Type() {
 		case types.IsString:
-			return intern.GetCurrentZval().StringEx().GetLen() == 0
+			return len(intern.GetCurrentZval().String()) == 0
 		case types.IsArray:
 			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && intern.GetCurrentZval().Array().Len() == 1 {
 				first := intern.GetCurrentZval().Array().First().GetVal()

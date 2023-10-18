@@ -230,7 +230,7 @@ func _ZEND_TRY_ASSIGN_STR(zv *types.Zval, str *types.String, is_ref int) {
 			_zv = ref.GetVal()
 		}
 		// ZvalPtrDtor(_zv)
-		_zv.SetStringEx(str)
+		_zv.SetString(str.GetStr())
 		break
 	}
 }

@@ -729,7 +729,7 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 	}
 }
 func SplRecursiveTreeIteratorGetPostfix(object *SplRecursiveItObject, return_value *types.Zval) {
-	return_value.SetStringEx(object.GetPostfix()[0].GetS())
+	return_value.SetString(object.GetPostfix()[0].GetStr())
 	// 	return_value.AddRefcount()
 }
 func zim_spl_RecursiveTreeIterator___construct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1468,10 +1468,10 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 		result = php_pcre_replace_impl(intern.GetPce(), subject, subject.GetStr(), subject.GetLen(), replacement_str, -1, &count)
 		if intern.IsUseKey() {
 			// zend.ZvalPtrDtor(intern.GetKey())
-			intern.GetKey().SetStringEx(result)
+			intern.GetKey().SetString(result.GetStr())
 		} else {
 			// zend.ZvalPtrDtor(intern.GetData())
-			intern.GetData().SetStringEx(result)
+			intern.GetData().SetString(result.GetStr())
 		}
 		// types.ZendStringRelease(replacement_str)
 		return_value.SetBool(count > 0)

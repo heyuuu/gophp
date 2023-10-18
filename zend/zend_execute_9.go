@@ -4,6 +4,7 @@ import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/kits/strkit"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -19,7 +20,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 		if tmp == nil {
 			return nil
 		}
-		tmp_inc_filename.SetStringEx(tmp)
+		tmp_inc_filename.SetString(tmp.GetStr())
 		inc_filename = &tmp_inc_filename
 	}
 	switch type_ {
@@ -34,7 +35,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 			}
 		} else if EG__().HasException() {
 			break
-		} else if strlen(inc_filename.String()) != inc_filename.StringEx().GetLen() {
+		} else if strlen(inc_filename.String()) != len(inc_filename.String()) {
 			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String())
 			break
 		} else {
@@ -63,7 +64,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 	case ZEND_INCLUDE:
 		fallthrough
 	case ZEND_REQUIRE:
-		if strlen(inc_filename.String()) != inc_filename.StringEx().GetLen() {
+		if strlen(inc_filename.String()) != len(inc_filename.String()) {
 			ZendMessageDispatcher(lang.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String())
 			break
 		}
@@ -162,13 +163,8 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 	if c == nil {
 		if check_defined_only == 0 {
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
-				var actual *byte = (*byte)(operators.ZendMemrchr(opline.Const2().String(), '\\', opline.Const2().StringEx().GetLen()))
-				if actual == nil {
-					opline.Result().SetString(opline.Const2().String())
-				} else {
-					actual++
-					opline.Result().SetString(b.CastStr(actual, opline.Const2().StringEx().GetLen()-(actual-opline.Const2().String())))
-				}
+				_, actual, _ := strkit.LastCut(opline.Const2().String(), `\\`)
+				opline.Result().SetString(actual)
 
 				faults.Error(faults.E_WARNING, fmt.Sprintf("Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().String(), opline.Result().String()))
 

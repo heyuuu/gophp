@@ -156,7 +156,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		}
 		return
 	}
-	if offset < -ZendLong(str.StringEx().GetLen()) {
+	if offset < -ZendLong(len(str.String())) {
 
 		faults.Error(faults.E_WARNING, fmt.Sprintf("Illegal string offset:  %d", offset))
 		if RETURN_VALUE_USED(opline) {
@@ -179,7 +179,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		c = uint8(tmp.GetStr()[0])
 		// types.ZendStringReleaseEx(tmp, 0)
 	} else {
-		string_len = value.StringEx().GetLen()
+		string_len = len(value.String())
 		c = uint8(value.String()[0])
 	}
 	if string_len == 0 {
@@ -193,7 +193,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		return
 	}
 	if offset < 0 {
-		offset += ZendLong(str.StringEx().GetLen())
+		offset += ZendLong(len(str.String()))
 	}
 
 	s := str.String()

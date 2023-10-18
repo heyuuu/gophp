@@ -21,7 +21,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	case types.IsDouble:
 		result.SetDouble(operators.ZvalGetDouble(expr))
 	case types.IsString:
-		result.SetStringEx(operators.ZvalGetString(expr))
+		result.SetString(operators.ZvalGetStrVal(expr))
 	default:
 		/* If value is already of correct type, return it directly */
 
@@ -72,7 +72,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	case types.IsDouble:
 		result.SetDouble(operators.ZvalGetDouble(expr))
 	case types.IsString:
-		result.SetStringEx(operators.ZvalGetString(expr))
+		result.SetString(operators.ZvalGetStrVal(expr))
 	default:
 		{
 			expr = types.ZVAL_DEREF(expr)
@@ -152,7 +152,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	case types.IsDouble:
 		result.SetDouble(operators.ZvalGetDouble(expr))
 	case types.IsString:
-		result.SetStringEx(operators.ZvalGetString(expr))
+		result.SetString(operators.ZvalGetStrVal(expr))
 	default:
 		{
 			expr = types.ZVAL_DEREF(expr)
@@ -232,7 +232,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	case types.IsDouble:
 		result.SetDouble(operators.ZvalGetDouble(expr))
 	case types.IsString:
-		result.SetStringEx(operators.ZvalGetString(expr))
+		result.SetString(operators.ZvalGetStrVal(expr))
 	default:
 		{
 			expr = types.ZVAL_DEREF(expr)

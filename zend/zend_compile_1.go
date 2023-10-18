@@ -355,7 +355,7 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	case ZEND_FETCH_CLASS_STATIC:
 		return 0
 	case ZEND_FETCH_CLASS_DEFAULT:
-		zv.SetStringEx(ZendResolveClassNameAst(class_ast))
+		zv.SetString(ZendResolveClassNameAst(class_ast).GetStr())
 		return 1
 	default:
 

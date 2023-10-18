@@ -614,7 +614,7 @@ func ZifRange(low_ *types.Zval, high_ *types.Zval, _ zpp.Opt, step_ *types.Zval)
 	}
 
 	/* If the range is given as strings, generate an array of characters. */
-	if zlow.IsString() && zhigh.IsString() && zlow.StringEx().GetLen() >= 1 && zhigh.StringEx().GetLen() >= 1 {
+	if zlow.IsString() && zhigh.IsString() && len(zlow.String()) >= 1 && len(zhigh.String()) >= 1 {
 		lowStr := zlow.String()
 		highStr := zhigh.String()
 

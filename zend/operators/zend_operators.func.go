@@ -429,8 +429,8 @@ try_again:
 	case types.IsDouble:
 
 	case types.IsString:
-		var str *types.String = op.StringEx()
-		op.SetDouble(zend.ZendStrtod(str.GetStr(), nil))
+		var str = op.String()
+		op.SetDouble(zend.ZendStrtod(str, nil))
 	case types.IsArray:
 		if op.Array().Len() != 0 {
 			tmp = 1
@@ -477,8 +477,8 @@ try_again:
 	case types.IsDouble:
 		op.SetBool(op.Double() != 0)
 	case types.IsString:
-		var str *types.String = op.StringEx()
-		if str.GetLen() == 0 || str.GetLen() == 1 && str.GetStr()[0] == '0' {
+		var str = op.String()
+		if str == "" || str == "0" {
 			op.SetFalse()
 		} else {
 			op.SetTrue()
@@ -1480,7 +1480,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			} else if op2.IsObject() && op2.Object().CanDoOperation() && types.SUCCESS == op2.Object().DoOperation(zend.ZEND_CONCAT, result, op1, op2) {
 				return types.SUCCESS
 			}
-			op1_copy.SetStringEx(ZvalGetString(op1))
+			op1_copy.SetString(ZvalGetStrVal(op1))
 			if zend.EG__().HasException() {
 
 				if orig_op1 != result {
@@ -1508,7 +1508,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			if op2.IsObject() && op2.Object().CanDoOperation() && types.SUCCESS == op2.Object().DoOperation(zend.ZEND_CONCAT, result, op1, op2) {
 				return types.SUCCESS
 			}
-			op2_copy.SetStringEx(ZvalGetString(op2))
+			op2_copy.SetString(ZvalGetStrVal(op2))
 			if zend.EG__().HasException() {
 
 				if orig_op1 != result {
@@ -1520,17 +1520,17 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 		}
 		break
 	}
-	if op1.StringEx().GetLen() == 0 {
+	if len(op1.String()) == 0 {
 		if result != op2 {
 			types.ZVAL_COPY(result, op2)
 		}
-	} else if op2.StringEx().GetLen() == 0 {
+	} else if len(op2.String()) == 0 {
 		if result != op1 {
 			types.ZVAL_COPY(result, op1)
 		}
 	} else {
-		var op1_len int = op1.StringEx().GetLen()
-		var op2_len int = op2.StringEx().GetLen()
+		var op1_len int = len(op1.String())
+		var op2_len int = len(op2.String())
 		if op1_len > types.StrMaxLen-op2_len {
 			faults.ThrowError(nil, "String size overflow")
 			if orig_op1 != result {
@@ -1632,17 +1632,17 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			result.SetLong(1)
 			return types.SUCCESS
 		case TypePair(types.IsString, types.IsString):
-			if op1.StringEx() == op2.StringEx() {
+			if op1.String() == op2.String() {
 				result.SetLong(0)
 				return types.SUCCESS
 			}
 			result.SetLong(ZendiSmartStrcmp(op1.String(), op2.String()))
 			return types.SUCCESS
 		case TypePair(types.IsNull, types.IsString):
-			result.SetLong(lang.Cond(op2.StringEx().GetLen() == 0, 0, -1))
+			result.SetLong(lang.Cond(len(op2.String()) == 0, 0, -1))
 			return types.SUCCESS
 		case TypePair(types.IsString, types.IsNull):
-			result.SetLong(lang.Cond(op1.StringEx().GetLen() == 0, 0, 1))
+			result.SetLong(lang.Cond(len(op1.String()) == 0, 0, 1))
 			return types.SUCCESS
 		case TypePair(types.IsObject, types.IsNull):
 			result.SetLong(1)
@@ -1994,7 +1994,8 @@ try_again:
 	case types.IsDouble:
 		op1.SetDouble(op1.Double() - 1)
 	case types.IsString:
-		if op1.StringEx().GetLen() == 0 {
+		iflen(op1.String()) == 0
+		{
 
 			op1.SetLong(-1)
 			break

@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
+	"strings"
 )
 
 // #define _ZEND_INI_SCANNER_H
@@ -116,7 +117,7 @@ func EAT_TRAILING_WHITESPACE_EX(ch char) {
 
 func EAT_TRAILING_WHITESPACE() { EAT_TRAILING_WHITESPACE_EX('X') }
 func ZendIniCopyValue(retval *types.Zval, str *byte, len_ int) {
-	retval.SetStringEx(types.NewString(b.CastStr(str, len_)))
+	retval.SetString(b.CastStr(str, len_))
 }
 
 // #define RETURN_TOKEN(type,str,len) { if ( SCNG ( scanner_mode ) == ZEND_INI_SCANNER_TYPED && ( YYSTATE == STATE ( ST_VALUE ) || YYSTATE == STATE ( ST_RAW ) ) ) { zend_ini_copy_typed_value ( ini_lval , type , str , len ) ; } else { zend_ini_copy_value ( ini_lval , str , len ) ; } return type ; }
@@ -247,50 +248,32 @@ func ZendIniPrepareStringForScanning(str *byte, scanner_mode int) int {
 
 /* }}} */
 
-func ZendIniEscapeString(lval *types.Zval, str *byte, len_ int, quote_type byte) {
-	var s *byte
-	var t *byte
-	var end *byte
-	ZendIniCopyValue(lval, str, len_)
+func ZendIniEscapeString(lval *types.Zval, str *byte, len_ int, quoteType byte) {
+	lval.SetString(ZendIniEscapeStringEx(b.CastStr(str, len_), quoteType))
+}
 
-	/* convert escape sequences */
+func ZendIniEscapeStringEx(s string, quoteType byte) string {
+	var buf strings.Builder
 
-	t = lval.String()
-	s = t
-	end = s + lval.StringEx().GetLen()
-	for s < end {
-		if (*s) == '\\' {
-			s++
-			if s >= end {
-				lang.PostInc(&(*t)) = '\\'
-				continue
-			}
-			switch *s {
-			case '"':
-				if (*s) != quote_type {
-					lang.PostInc(&(*t)) = '\\'
-					lang.PostInc(&(*t)) = *s
-					break
-				}
-				fallthrough
-			case '\\':
-				fallthrough
-			case '$':
-				lang.PostInc(&(*t)) = *s
-				lval.StringEx().GetLen()--
-			default:
-				lang.PostInc(&(*t)) = '\\'
-				lang.PostInc(&(*t)) = *s
+	length := len(s)
+	for i := 0; i < length; i++ {
+		if s[i] == '\\' && i+1 < length {
+			i++
+			char := s[i]
+			if char == '\\' || char == '$' || (char == '"' && quoteType != '"') {
+				buf.WriteByte(char)
+			} else {
+				buf.WriteByte('\\')
+				buf.WriteByte(char)
 			}
 		} else {
-			lang.PostInc(&(*t)) = *s
+			buf.WriteByte(s[i])
 		}
-		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			SCNG(lineno)++
+		if s[i] == '\n' || s[i] == '\r' && (i+1 >= length || s[i+1] != '\n') {
+			INI_SCNG__().lineno++
 		}
-		s++
 	}
-	*t = 0
+	return buf.String()
 }
 
 /* }}} */

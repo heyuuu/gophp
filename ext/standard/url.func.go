@@ -558,10 +558,10 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 					s++
 				}
 				if lang.Assign(&prev_val, return_value.Array().KeyFind(b.CastStr(hdr.String(), p-hdr.String()))) == nil {
-					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.String(), p-hdr.String()), b.CastStr(s, hdr.StringEx().GetLen()-(s-hdr.String())))
+					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.String(), p-hdr.String()), b.CastStr(s, len(hdr.String())-(s-hdr.String())))
 				} else {
 					operators.ConvertToArray(prev_val)
-					zend.AddNextIndexStringl(prev_val, s, hdr.StringEx().GetLen()-(s-hdr.String()))
+					zend.AddNextIndexStringl(prev_val, s, len(hdr.String())-(s-hdr.String()))
 				}
 				*p = c
 			} else {

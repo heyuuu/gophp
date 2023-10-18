@@ -183,7 +183,7 @@ func SplArrayObjectClone(zobject *types.Zval) *types.Object {
 func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset *types.Zval, type_ int) *types.Zval {
 	var retval *types.Zval
 	var index zend.ZendLong
-	var offset_key *types.String
+	var offsetKey string
 	var ht *types.Array = SplArrayGetHashTable(intern)
 	if offset == nil || offset.IsUndef() || ht == nil {
 		return zend.UninitializedZval()
@@ -195,26 +195,26 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 try_again:
 	switch offset.Type() {
 	case types.IsNull:
-		offset_key = types.NewString("")
+		offsetKey = ""
 		goto fetch_dim_string
 	case types.IsString:
-		offset_key = offset.StringEx()
+		offsetKey = offset.String()
 	fetch_dim_string:
-		retval = ht.SymtableFind(offset_key.GetStr())
+		retval = ht.SymtableFind(offsetKey)
 		if retval != nil {
 			if retval.IsIndirect() {
 				retval = retval.Indirect()
 				if retval.IsUndef() {
 					switch type_ {
 					case zend.BP_VAR_R:
-						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetStr()))
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offsetKey))
 						fallthrough
 					case zend.BP_VAR_UNSET:
 						fallthrough
 					case zend.BP_VAR_IS:
 						retval = zend.UninitializedZval()
 					case zend.BP_VAR_RW:
-						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetStr()))
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offsetKey))
 						fallthrough
 					case zend.BP_VAR_W:
 						retval.SetNull()
@@ -224,19 +224,19 @@ try_again:
 		} else {
 			switch type_ {
 			case zend.BP_VAR_R:
-				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetStr()))
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offsetKey))
 				fallthrough
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
 				retval = zend.UninitializedZval()
 			case zend.BP_VAR_RW:
-				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offset_key.GetStr()))
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined index: %s", offsetKey))
 				fallthrough
 			case zend.BP_VAR_W:
 				var value types.Zval
 				value.SetNull()
-				retval = ht.SymtableUpdate(offset_key.GetStr(), &value)
+				retval = ht.SymtableUpdate(offsetKey, &value)
 			}
 		}
 		return retval

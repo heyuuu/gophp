@@ -219,7 +219,7 @@ func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *type
 		return
 	}
 	if message != nil {
-		tmp.SetStringEx(message)
+		tmp.SetString(message.GetStr())
 		zend.ZendUpdatePropertyEx(base_ce, object, types.STR_MESSAGE, &tmp)
 	}
 	if code != 0 {
@@ -499,7 +499,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 	str.WriteLong(num)
 	str.WriteString(" {main}")
 	//str.ZeroTail()
-	return_value.SetStringEx(str.GetS())
+	return_value.SetString(str.GetStr())
 	return
 }
 func zim_exception_getPrevious(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -539,9 +539,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 			message = real_message
 		}
 		if message.GetLen() > 0 {
-			str = fmt.Sprintf("%s: %s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), message.GetStr(), file.GetStr(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
+			str = fmt.Sprintf("%s: %s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), message.GetStr(), file.GetStr(), line, lang.CondF1(trace.IsString() && len(trace.String()) != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
 		} else {
-			str = fmt.Sprintf("%s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), file.GetStr(), line, lang.CondF1(trace.IsString() && trace.StringEx().GetLen() != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
+			str = fmt.Sprintf("%s in %s:%d\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).Name(), file.GetStr(), line, lang.CondF1(trace.IsString() && len(trace.String()) != 0, func() string { return trace.String() }, "#0 {main}\n"), lang.Cond(len(prev_str) != 0, "\n\nNext ", ""), prev_str)
 		}
 		exception.Object().ProtectRecursive()
 		exception = GET_PROPERTY(exception, types.STR_PREVIOUS, &rv)

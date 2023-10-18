@@ -91,7 +91,6 @@ func (zv *Zval) SetArray(arr *Array)       { zv.v = arr }
 func (zv *Zval) SetObject(obj *Object)     { zv.v = obj }
 func (zv *Zval) SetResource(res *Resource) { zv.v = res }
 
-func (zv *Zval) SetStringEx(s *String)          { zv.v = s.GetStr() }
 func (zv *Zval) SetEmptyArray()                 { zv.v = NewArray() }
 func (zv *Zval) SetArrayOfInt(arr []int)        { zv.SetArray(NewArrayOfInt(arr)) }
 func (zv *Zval) SetArrayOfString(arr []string)  { zv.SetArray(NewArrayOfString(arr)) }

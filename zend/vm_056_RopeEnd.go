@@ -13,7 +13,7 @@ func ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	rope = ([]*types.String)(opline.Op1())
 	{
 		var_ = opline.Const2()
-		rope[opline.GetExtendedValue()] = var_.StringEx()
+		rope[opline.GetExtendedValue()] = types.NewString(var_.String())
 	}
 
 	var retStr string

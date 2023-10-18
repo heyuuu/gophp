@@ -527,8 +527,9 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) string {
 							str.WriteString("NULL")
 						} else if zv.IsString() {
 							str.WriteByte('\'')
-							str.WriteString(b.CastStr(zv.String(), b.Min(zv.StringEx().GetLen(), 10)))
-							if zv.StringEx().GetLen() > 10 {
+							str.WriteString(b.CastStr(zv.String(), b.Min(len(zv.String()), 10)))
+							iflen(zv.String()) > 10
+							{
 								str.WriteString("...")
 							}
 							str.WriteByte('\'')

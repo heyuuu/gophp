@@ -154,7 +154,7 @@ func AddNextIndexStrEx(arg *types.Zval, str string) int {
 }
 func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 	var tmp types.Zval
-	tmp.SetStringEx(str)
+	tmp.SetString(str.GetStr())
 	if arg.Array().Append(&tmp) != nil {
 		return types.SUCCESS
 	} else {

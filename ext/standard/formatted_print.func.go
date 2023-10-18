@@ -281,7 +281,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 	}
 	var buf strings.Builder
 	format = z_format.String()
-	format_len = z_format.StringEx().GetLen()
+	format_len = len(z_format.String())
 	currarg = 0
 	for format_len != 0 {
 		var expprec int
@@ -503,7 +503,7 @@ func ZifVsprintf(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, a
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetStringEx(result)
+	return_value.SetString(result.GetStr())
 }
 
 //@zif -name printf

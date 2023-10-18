@@ -350,7 +350,7 @@ func (compiler *Compiler) CompileFuncStrlen(result *Znode, args *ZendAstList) in
 	compiler.CompileExpr(&arg_node, args.Children()[0])
 	if arg_node.GetOpType() == IS_CONST && arg_node.GetConstant().IsString() {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetLong(arg_node.GetConstant().StringEx().GetLen())
+		result.GetConstant().SetLong(len(arg_node.GetConstant().String()))
 	} else {
 		ZendEmitOpTmp(result, ZEND_STRLEN, &arg_node, nil)
 	}
@@ -409,7 +409,7 @@ func (compiler *Compiler) CompileFuncDefined(result *Znode, args *ZendAstList) i
 
 	var c types.Zval
 	var lcname *types.String = operators.ZendStringTolower(name)
-	c.SetStringEx(lcname)
+	c.SetString(lcname.GetStr())
 	ZendAddLiteral(&c)
 	return types.SUCCESS
 }

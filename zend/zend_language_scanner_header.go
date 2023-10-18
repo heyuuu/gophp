@@ -1,8 +1,8 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/operators"
@@ -161,7 +161,7 @@ func CompileFilename(type_ int, filename string) *types.ZendOpArray {
 func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 	buf := str.String() + strings.Repeat("\x00", ZEND_MMAP_AHEAD)
-	size := str.StringEx().GetLen()
+	size := len(str.String())
 
 	LANG_SCNG__().yy_start = nil
 	YyScanBuffer(buf, size)
@@ -176,7 +176,8 @@ func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray
 	var op_array int = nil
 	var tmp types.Zval
 	tmp.SetString(operators.ZvalGetStrVal(source_string))
-	if tmp.StringEx().GetLen() == 0 {
+	iflen(tmp.String()) == 0
+	{
 		return nil
 	}
 	ZendSaveLexicalState(&original_lex_state)
@@ -371,87 +372,88 @@ func (sc *LangScanner) setEscapeString(str string, quoteType byte) bool {
 const HEREDOC_USING_SPACES = 1
 const HEREDOC_USING_TABS = 2
 
-func NextNewline(str *byte, end *byte, newline_len *int) *byte {
-	for ; str < end; str++ {
-		if (*str) == '\r' {
-			if str+1 < end && (*(str + 1)) == '\n' {
-				*newline_len = 2
+func nextNewLine(str string, start int) (int, int) {
+	for i := start; i < len(str); i++ {
+		if str[i] == '\r' {
+			if i+1 < len(str) && str[i+1] == '\n' {
+				return i, 2
 			} else {
-				*newline_len = 1
+				return i, 1
 			}
-			return str
-		} else if (*str) == '\n' {
-			*newline_len = 1
-			return str
+		} else if str[i] == '\n' {
+			return i, 1
 		}
 	}
-	*newline_len = 0
-	return nil
+	return -1, 0
 }
 
-func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
-	var str *byte = zendlval.String()
-	var end *byte = str + zendlval.StringEx().GetLen()
-	var copy *byte = zendlval.String()
-	var newline_count int = 0
-	var newline_len int
-	var nl *byte
-	if !newline_at_start {
-		nl = NextNewline(str, end, &newline_len)
-		if nl == nil {
-			return 1
-		}
-		str = nl + newline_len
-		copy = (*byte)(nl + newline_len)
-		newline_count++
+func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, usingSpaces bool, newlineAtStart bool, newlineAtEnd bool) bool {
+	if str, ok := StripMultilineStringIndentationEx(zendlval.String(), indentation, usingSpaces, newlineAtStart, newlineAtEnd); ok {
+		zendlval.SetString(str)
+		return true
 	} else {
-		nl = str
+		zendlval.SetUndef()
+		return false
+	}
+}
+
+func splitLines(s string) []string {
+	length := len(s)
+	lineStart := 0
+	var lines []string
+	for i := 0; i < length; i++ {
+		if s[i] == '\r' || s[i] == '\n' {
+			if i+1 < len(s) && s[i] == '\r' && s[i+1] == '\n' {
+				i++
+			}
+
+			lines = append(lines, s[lineStart:i+1])
+			lineStart = i + 1
+		}
+	}
+	if lineStart < length {
+		lines = append(lines, s[lineStart:])
+	}
+	return lines
+}
+
+func StripMultilineStringIndentationEx(s string, indentation int, usingSpaces bool, newlineAtStart bool, newlineAtEnd bool) (string, bool) {
+	var newlineCount int = 0
+	var buf strings.Builder
+
+	lines := splitLines(s)
+	if !newlineAtStart {
+		if len(lines) <= 1 {
+			return s, true
+		}
+		lines = lines[1:]
+		newlineCount++
 	}
 
 	/* <= intentional */
-
-	for str <= end && nl != nil {
-		var skip int
-		nl = NextNewline(str, end, &newline_len)
-		if nl == nil && newline_at_end {
-			nl = end
-		}
-
+	for _, line := range lines {
 		/* Try to skip indentation */
-		for skip = 0; skip < indentation; {
-			if str == nl {
+		for skip := 0; skip < indentation; skip++ {
+			if line == "" || line[0] == '\r' || line[0] == '\n' {
 				/* Don't require full indentation on whitespace-only lines */
 				break
 			}
-			if str == end || (*str) != ' ' && (*str) != '\t' {
-				CG__().zend_lineno += newline_count
-				zend_throw_exception_ex(zend_ce_parse_error, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", indentation)
-				goto error
+			if line[0] != ' ' && line[0] != '\t' {
+				CG__().zend_lineno += newlineCount
+				faults.ThrowException(faults.ZendCeParseError, fmt.Sprintf("Invalid body indentation level (expecting an indentation level of at least %d)", indentation), 0)
+				return "", false
 			}
-			if !using_spaces && (*str) == ' ' || using_spaces && (*str) == '\t' {
-				CG__().zend_lineno += newline_count
-				zend_throw_exception(zend_ce_parse_error, "Invalid indentation - tabs and spaces cannot be mixed", 0)
-				goto error
+			if !usingSpaces && s[0] == ' ' || usingSpaces && s[0] == '\t' {
+				CG__().zend_lineno += newlineCount
+				faults.ThrowException(faults.ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
+				return "", false
 			}
-			skip++
-			str++
+			line = line[1:]
 		}
-		if str == end {
-			break
-		}
-		var len_ int = lang.Cond(nl != nil, nl-str+newline_len, end-str)
-		memmove(copy, str, len_)
-		str += len_
-		copy += len_
-		newline_count++
+		buf.WriteString(line)
+		newlineCount++
 	}
-	*copy = '0'
-	zendlval.StringEx().GetLen() = copy - zendlval.String()
-	return 1
-error:
-	zval_ptr_dtor_str(zendlval)
-	ZVAL_UNDEF(zendlval)
-	return 0
+	return buf.String(), true
 }
 
 func CopyHeredocLabelStack(heredocLabel *ZendHeredocLabel) {
