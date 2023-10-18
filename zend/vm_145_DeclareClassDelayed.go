@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
 )
@@ -26,7 +27,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 			}
 
 			//
-			if ZendDoLinkClass(ce, opline.Const2().StringEx()) == types.FAILURE {
+			if ZendDoLinkClass(ce, opline.Const2().String()) == types.FAILURE {
 				return 0
 			}
 

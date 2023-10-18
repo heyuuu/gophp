@@ -321,7 +321,7 @@ func isCallableCheckFunc(checkFlags uint32, callableName string, fcc *types.Zend
 			}
 		} else if fcc.GetCallingScope() != nil {
 			if fcc.GetCallingScope().GetGetStaticMethod() != nil {
-				fcc.SetFunctionHandler(fcc.GetCallingScope().GetGetStaticMethod()(fcc.GetCallingScope(), types.NewString(methodName)))
+				fcc.SetFunctionHandler(fcc.GetCallingScope().GetGetStaticMethod()(fcc.GetCallingScope(), methodName))
 			} else {
 				fcc.SetFunctionHandler(ZendStdGetStaticMethod(fcc.GetCallingScope(), methodName, nil))
 			}

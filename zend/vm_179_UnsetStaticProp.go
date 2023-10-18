@@ -9,8 +9,7 @@ import (
 func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *types.ZendOp = executeData.GetOpline()
 	var varname *types.Zval
-	var name *types.String
-	var tmp_name *types.String = nil
+	var name string
 	var ce *types.ClassEntry
 	var free_op1 ZendFreeOp
 	if opline.GetOp2Type() == IS_CONST {
@@ -35,16 +34,15 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	}
 	varname = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 	if opline.GetOp1Type() == IS_CONST {
-		name = varname.StringEx()
+		name = varname.String()
 	} else if varname.IsString() {
-		name = varname.StringEx()
+		name = varname.String()
 	} else {
 		if opline.GetOp1Type() == IS_CV && varname.IsUndef() {
 			varname = ZVAL_UNDEFINED_OP1(executeData)
 		}
-		name = operators.ZvalGetString(varname)
+		name = operators.ZvalGetStrVal(varname)
 	}
 	ZendStdUnsetStaticProperty(ce, name)
-	// 	FREE_OP(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

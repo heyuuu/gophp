@@ -251,41 +251,29 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 		return 1
 	}
 }
-func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, executeData *ZendExecuteData) types.ZvalType {
-	var str *types.String
-	var hval int
 
-	key = key.DeRef()
+func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, executeData *ZendExecuteData) types.ZvalType {
+	var arrayKey types.ArrayKey
 
 	if key.IsString() {
-		str = key.StringEx()
-		if types.HandleNumericStr(str.GetStr(), &hval) {
-			goto num_key
+		if idx, ok := types.ParseNumericStr(key.String()); ok {
+			arrayKey = types.IdxKey(idx)
+		} else {
+			arrayKey = types.StrKey(key.String())
 		}
-		goto str_key
 	} else if key.IsLong() {
-		hval = key.Long()
-		goto num_key
+		arrayKey = types.IdxKey(key.Long())
 	} else if key.Type() <= types.IsNull {
 		if key.IsUndef() {
 			ZVAL_UNDEFINED_OP1(executeData)
 		}
-		str = types.NewString("")
-		goto str_key
+		arrayKey = types.StrKey("")
 	} else {
 		faults.Error(faults.E_WARNING, "array_key_exists(): The first argument should be either a string or an integer")
 		return types.IsFalse
 	}
 
-num_key:
-	if ht.IndexFind(hval) != nil {
-		return types.IsTrue
-	} else {
-		return types.IsFalse
-	}
-
-str_key:
-	if types.ZendHashFindInd(ht, str.GetStr()) != nil {
+	if ht.Exists(arrayKey) {
 		return types.IsTrue
 	} else {
 		return types.IsFalse

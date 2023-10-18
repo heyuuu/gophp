@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard/str"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
@@ -569,16 +570,14 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 		}
 		if class_hash != nil && classes.IsType(types.IsArray) {
 			var entry *types.Zval
-			var lcname *types.String
 			var __ht = classes.Array()
 			for _, _p := range __ht.ForeachData() {
 				var _z = _p.GetVal()
 
 				entry = _z
 				operators.ConvertToStringEx(entry)
-				lcname = operators.ZendStringTolower(entry.StringEx())
-				types.ZendHashAddEmptyElement(class_hash, lcname.GetStr())
-				// types.ZendStringReleaseEx(lcname, 0)
+				lcname := ascii.StrToLower(entry.String())
+				types.ZendHashAddEmptyElement(class_hash, lcname)
 			}
 
 			/* Exception during string conversion. */

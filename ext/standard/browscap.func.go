@@ -26,15 +26,15 @@ func BrowscapComputePrefixLen(pattern string) uint8 {
 	}
 	return i
 }
-func BrowscapComputeContains(pattern *types.String, start_pos int, contains_start *uint16, contains_len *uint8) int {
+func BrowscapComputeContains(pattern_ string, start_pos int, contains_start *uint16, contains_len *uint8) int {
 	var i int = start_pos
 
 	/* Find first non-placeholder character after prefix */
-	for ; i < pattern.GetLen(); i++ {
-		if !IsPlaceholder(pattern.GetStr()[i]) {
+	for ; i < len(pattern_); i++ {
+		if !IsPlaceholder(pattern_[i]) {
 			/* Skip the case of a single non-placeholder character.
 			 * Let's try to find something longer instead. */
-			if i+1 < pattern.GetLen() && !IsPlaceholder(pattern.GetStr()[i+1]) {
+			if i+1 < len(pattern_) && !IsPlaceholder(pattern_[i+1]) {
 				break
 			}
 		}
@@ -43,8 +43,8 @@ func BrowscapComputeContains(pattern *types.String, start_pos int, contains_star
 
 	/* Find first placeholder character after that */
 
-	for ; i < pattern.GetLen(); i++ {
-		if IsPlaceholder(pattern.GetStr()[i]) {
+	for ; i < len(pattern_); i++ {
+		if IsPlaceholder(pattern_[i]) {
 			break
 		}
 	}
@@ -133,22 +133,22 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		}
 	case zend.ZEND_INI_PARSER_SECTION:
 		var entry *BrowscapEntry
-		var pattern *types.String = arg1.StringEx()
+		var pattern string = arg1.String()
 		var pos int
 		var i int
-		if pattern.GetLen() > UINT16_MAX {
-			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Skipping excessively long pattern of length %zd", pattern.GetLen()))
+		if len(pattern) > UINT16_MAX {
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Skipping excessively long pattern of length %d", len(pattern)))
 			break
 		}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry")))
 		entry = ctx.GetCurrentEntry()
-		bdata.GetHtab().KeyUpdate(pattern.GetStr(), types.NewZvalPtr(entry))
-		ctx.SetCurrentSectionName(types.NewString(pattern.GetStr()))
-		entry.SetPattern(types.NewString(pattern.GetStr()))
+		bdata.GetHtab().KeyUpdate(pattern, types.NewZvalPtr(entry))
+		ctx.SetCurrentSectionName(types.NewString(pattern))
+		entry.SetPattern(types.NewString(pattern))
 		entry.SetKvStart(bdata.GetKvUsed())
 		entry.SetKvEnd(entry.GetKvStart())
 		entry.SetParent(nil)
-		entry.SetPrefixLen(BrowscapComputePrefixLen(pattern.GetStr()))
+		entry.SetPrefixLen(BrowscapComputePrefixLen(pattern))
 		pos = entry.GetPrefixLen()
 		for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
 			pos = BrowscapComputeContains(pattern, pos, entry.GetContainsStart()[i], entry.GetContainsLen()[i])
@@ -318,7 +318,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 }
 func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserName *string, returnArray bool) {
 	var agent_name *string = browserName
-	var lookup_browser_name *types.String
+	var lookup_browser_name string
 	var return_array bool = 0
 	var bdata *BrowserData
 	var found_entry *BrowscapEntry = nil
@@ -354,14 +354,14 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 			return_value.SetFalse()
 			return
 		}
-		agent_name = http_user_agent.StringEx()
+		*agent_name = http_user_agent.String()
 	}
-	lookup_browser_name = operators.ZendStringTolower(agent_name)
-	found_entry = types.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name.GetStr())
+	lookup_browser_name = ascii.StrToLower(*agent_name)
+	found_entry = types.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name)
 	if found_entry == nil {
 		bdata.GetHtab().ForeachEx(func(_ types.ArrayKey, value *types.Zval) bool {
 			var entry *BrowscapEntry = value.Ptr()
-			if BrowserRegCompare(entry, lookup_browser_name, &found_entry) != 0 {
+			if BrowserRegCompare(entry, types.NewString(lookup_browser_name), &found_entry) != 0 {
 				return false
 			}
 			return true

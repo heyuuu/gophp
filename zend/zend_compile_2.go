@@ -352,7 +352,7 @@ func ZendHandleNumericDim(opline *types.ZendOp, dim_node *Znode) {
 func ZendSetClassNameOp1(opline *types.ZendOp, class_node *Znode) {
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp1Type(IS_CONST)
-		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().StringEx()))
+		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
 	} else {
 		opline.SetOp1Type(class_node.GetOpType())
 		if class_node.GetOpType() == IS_CONST {
@@ -368,15 +368,15 @@ func (compiler *Compiler) CompileClassRef(result *Znode, name_ast *ZendAst, fetc
 		var name_node Znode
 		compiler.CompileExpr(&name_node, name_ast)
 		if name_node.GetOpType() == IS_CONST {
-			var name *types.String
+			var name string
 			if name_node.GetConstant().Type() != types.IsString {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 			}
-			name = name_node.GetConstant().StringEx()
-			fetch_type = ZendGetClassFetchType(name.GetStr())
+			name = name_node.GetConstant().String()
+			fetch_type = ZendGetClassFetchType(name)
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
 				result.SetOpType(IS_CONST)
-				result.GetConstant().SetString(ZendResolveClassName(name.GetStr(), ZEND_NAME_FQ))
+				result.GetConstant().SetString(ZendResolveClassName(name, ZEND_NAME_FQ))
 			} else {
 				ZendEnsureValidClassFetchType(fetch_type)
 				result.SetOpType(IS_UNUSED)
@@ -394,13 +394,13 @@ func (compiler *Compiler) CompileClassRef(result *Znode, name_ast *ZendAst, fetc
 
 	if name_ast.Attr() == ZEND_NAME_FQ {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast).GetStr())
+		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))
 		return
 	}
 	fetch_type = ZendGetClassFetchType(ZendAstGetStrVal(name_ast))
 	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast).GetStr())
+		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))
 	} else {
 		ZendEnsureValidClassFetchType(fetch_type)
 		result.SetOpType(IS_UNUSED)
@@ -574,7 +574,7 @@ func (compiler *Compiler) CompileStaticProp(result *Znode, ast *ZendAst, type_ u
 	}
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().StringEx()))
+		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
 		if opline.GetOp1Type() != IS_CONST {
 			opline.SetExtendedValue(ZendAllocCacheSlot())
 		}

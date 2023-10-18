@@ -20,7 +20,7 @@ func ZendResolveNonClassName(name string, typ uint32, caseSensitive bool, import
 		return name, true
 	}
 	if typ == ZEND_NAME_RELATIVE {
-		return ZendPrefixWithNsEx(name), true
+		return ZendPrefixWithNs(name), true
 	}
 	if importFinder != nil {
 		/* If an unqualified name is a function/const alias, replace it. */
@@ -47,7 +47,7 @@ func ZendResolveNonClassName(name string, typ uint32, caseSensitive bool, import
 			return ZendConcatNames(importName, name[compoundPos+1:]), isFullyQualified
 		}
 	}
-	return ZendPrefixWithNsEx(name), isFullyQualified
+	return ZendPrefixWithNs(name), isFullyQualified
 }
 
 func ZendResolveFunctionName(name string, typ uint32) (resolveName string, isFullyQualified bool) {
@@ -59,7 +59,7 @@ func ZendResolveConstName(name string, typ uint32) (resolveName string, isFullyQ
 
 func ZendResolveClassName(name string, typ uint32) string {
 	if typ == ZEND_NAME_RELATIVE {
-		return ZendPrefixWithNsEx(name)
+		return ZendPrefixWithNs(name)
 	}
 	if typ == ZEND_NAME_FQ || (name != "" && name[0] == '\\') {
 		/* Remove \ prefix (only relevant if this is a string rather than a label) */
@@ -91,15 +91,15 @@ func ZendResolveClassName(name string, typ uint32) string {
 	}
 
 	/* If not fully qualified and not an alias, prepend the current namespace */
-	return ZendPrefixWithNsEx(name)
+	return ZendPrefixWithNs(name)
 }
-func ZendResolveClassNameAst(ast *ZendAst) *types.String {
+func ZendResolveClassNameAst(ast *ZendAst) string {
 	var class_name = ast.Val()
 	if !class_name.IsString() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
 	resolveName := ZendResolveClassName(class_name.String(), ast.Attr())
-	return types.NewString(resolveName)
+	return resolveName
 }
 func ZendAddTryElement(try_op uint32) uint32 {
 	var op_array = CG__().GetActiveOpArray()
@@ -223,8 +223,8 @@ func ZendUnmanglePropertyName_Ex(name string) (className string, propName string
 	}
 }
 
-func ZendUnmanglePropertyNameEx(name *types.String, class_name **byte, prop_name **byte, prop_len *int) int {
-	className, propName, ok := ZendUnmanglePropertyName_Ex(name.GetStr())
+func ZendUnmanglePropertyNameEx(name string, class_name **byte, prop_name **byte, prop_len *int) int {
+	className, propName, ok := ZendUnmanglePropertyName_Ex(name)
 
 	*class_name = className
 	*prop_name = propName
@@ -355,7 +355,7 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	case ZEND_FETCH_CLASS_STATIC:
 		return 0
 	case ZEND_FETCH_CLASS_DEFAULT:
-		zv.SetString(ZendResolveClassNameAst(class_ast).GetStr())
+		zv.SetString(ZendResolveClassNameAst(class_ast))
 		return 1
 	default:
 

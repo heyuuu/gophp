@@ -216,11 +216,9 @@ try_again:
 			retval = ht.IndexAddNew(hval, UninitializedZval())
 		}
 	} else if dim.IsString() {
-		offset_key = dim.StringEx()
-		{
-			if types.HandleNumericStr(offset_key.GetStr(), &hval) {
-				goto num_index
-			}
+		offset_key = types.NewString(dim.String())
+		if types.HandleNumericStr(offset_key.GetStr(), &hval) {
+			goto num_index
 		}
 	str_index:
 		retval = ht.KeyFind(offset_key.GetStr())
@@ -282,7 +280,7 @@ try_again:
 	} else {
 		var zv = SlowIndexConvertEx(ht, dim, executeData)
 		if zv.IsString() {
-			offset_key = zv.StringEx()
+			offset_key = types.NewString(zv.String())
 			goto str_index
 		} else if zv.IsLong() {
 			hval = zv.Long()

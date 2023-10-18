@@ -13,9 +13,7 @@ func ZendAstGetZval(ast *ZendAst) *types.Zval {
 	return ast.Val()
 }
 func ZendAstGetStr(ast *ZendAst) *types.String {
-	var zv *types.Zval = ast.Val()
-	b.Assert(zv.IsString())
-	return zv.StringEx()
+	return types.NewString(ZendAstGetStrVal(ast))
 }
 func ZendAstGetStrVal(ast *ZendAst) string {
 	var zv *types.Zval = ast.Val()

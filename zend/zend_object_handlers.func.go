@@ -421,10 +421,10 @@ func ZendCheckPropertyAccess(zobj *types.Object, prop_info_name *types.String, i
 	var member *types.String
 	var prop_name_len int
 	if prop_info_name.GetStr()[0] == 0 {
-		if is_dynamic != 0 {
+		if is_dynamic {
 			return types.SUCCESS
 		}
-		ZendUnmanglePropertyNameEx(prop_info_name, &class_name, &prop_name, &prop_name_len)
+		ZendUnmanglePropertyNameEx(prop_info_name.GetStr(), &class_name, &prop_name, &prop_name_len)
 		member = types.NewString(b.CastStr(prop_name, prop_name_len))
 		property_info = ZendGetPropertyInfo(zobj.GetCe(), member.GetStr())
 		if property_info == nil {
@@ -1108,10 +1108,10 @@ func ZendClassInitStatics(class_type *types.ClassEntry) {
 		}
 	}
 }
-func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types.String, type_ int, property_info_ptr **types.PropertyInfo) *types.Zval {
+func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name string, type_ int, property_info_ptr **types.PropertyInfo) *types.Zval {
 	var ret *types.Zval
 	var scope *types.ClassEntry
-	var property_info *types.PropertyInfo = ce.PropertyTable().Get(property_name.GetStr())
+	var property_info *types.PropertyInfo = ce.PropertyTable().Get(property_name)
 	*property_info_ptr = property_info
 	if property_info == nil {
 		goto undeclared_property
@@ -1125,7 +1125,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 		if property_info.GetCe() != scope {
 			if property_info.IsPrivate() || IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
 				if type_ != BP_VAR_IS {
-					ZendBadPropertyAccess(property_info, ce, property_name.GetStr())
+					ZendBadPropertyAccess(property_info, ce, property_name)
 				}
 				return nil
 			}
@@ -1148,7 +1148,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 		} else {
 		undeclared_property:
 			if type_ != BP_VAR_IS {
-				faults.ThrowError(nil, fmt.Sprintf("Access to undeclared static property: %s::$%s", ce.Name(), property_name.GetStr()))
+				faults.ThrowError(nil, fmt.Sprintf("Access to undeclared static property: %s::$%s", ce.Name(), property_name))
 			}
 			return nil
 		}
@@ -1156,18 +1156,14 @@ func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types
 	ret = CE_STATIC_MEMBERS(ce) + property_info.GetOffset()
 	ret = types.ZVAL_DEINDIRECT(ret)
 	if (type_ == BP_VAR_R || type_ == BP_VAR_RW) && ret.IsUndef() && property_info.GetType() != 0 {
-		faults.ThrowError(nil, fmt.Sprintf("Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(property_name.GetStr())))
+		faults.ThrowError(nil, fmt.Sprintf("Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().Name(), ZendGetUnmangledPropertyNameEx(property_name)))
 		return nil
 	}
 	return ret
 }
-func ZendStdGetStaticProperty(ce *types.ClassEntry, property_name *types.String, type_ int) *types.Zval {
-	var prop_info *types.PropertyInfo
-	return ZendStdGetStaticPropertyWithInfo(ce, property_name, type_, &prop_info)
-}
-func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name *types.String) bool {
-	faults.ThrowError(nil, fmt.Sprintf("Attempt to unset static property %s::$%s", ce.Name(), property_name.GetStr()))
-	return 0
+func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name string) bool {
+	faults.ThrowError(nil, fmt.Sprintf("Attempt to unset static property %s::$%s", ce.Name(), property_name))
+	return false
 }
 func ZendBadConstructorCall(constructor types.IFunction, scope *types.ClassEntry) {
 	if scope != nil {

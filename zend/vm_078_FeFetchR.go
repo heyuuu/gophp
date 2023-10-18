@@ -87,7 +87,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					var class_name *byte
 					var prop_name *byte
 					var prop_name_len int
-					ZendUnmanglePropertyNameEx(p.GetKey(), &class_name, &prop_name, &prop_name_len)
+					ZendUnmanglePropertyNameEx(p.GetKey().GetStr(), &class_name, &prop_name, &prop_name_len)
 					opline.Result().SetString(b.CastStr(prop_name, prop_name_len))
 				}
 			}

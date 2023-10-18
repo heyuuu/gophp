@@ -31,7 +31,7 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 				/* even if on_modify bails out, we have to continue on with restoring,
 				   since there can be allocated variables that would be freed on MM shutdown
 				   and would lead to memory corruption later ini entry is modified again */
-				result = ini_entry.EmitOnModify(ini_entry.GetOrigValue(), stage)
+				result = ini_entry.EmitOnModify(ini_entry.GetOrigValue().GetStr(), stage)
 			})
 		}
 		if stage == ZEND_INI_STAGE_RUNTIME && result == false {
@@ -93,11 +93,11 @@ func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) in
 		}
 
 		var defaultValue *types.Zval = ZendGetConfigurationDirective(p.GetName())
-		if defaultValue != nil && p.EmitOnModify(defaultValue.StringEx(), ZEND_INI_STAGE_STARTUP) {
+		if defaultValue != nil && p.EmitOnModify(defaultValue.String(), ZEND_INI_STAGE_STARTUP) {
 			p.SetValue(types.NewString(defaultValue.String()))
 		} else {
 			p.SetValueStr(iniEntryDef.GetValueStr())
-			p.EmitOnModify(p.GetValue(), ZEND_INI_STAGE_STARTUP)
+			p.EmitOnModify(p.GetValue().GetStr(), ZEND_INI_STAGE_STARTUP)
 		}
 	}
 	return types.SUCCESS
@@ -139,7 +139,7 @@ func ZendAlterIniEntryEx(name string, new_value string, modify_type int, stage i
 		EG__().ModifiedIniDirectives().Add(ini_entry.GetName().GetStr(), ini_entry)
 	}
 	duplicate = types.NewString(new_value)
-	if ini_entry.EmitOnModify(duplicate, stage) {
+	if ini_entry.EmitOnModify(duplicate.GetStr(), stage) {
 		ini_entry.SetValue(duplicate)
 	} else {
 		return false

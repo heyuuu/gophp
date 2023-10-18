@@ -34,12 +34,12 @@ func TypeHintCe(ce *ClassEntry, allowNull bool) TypeHint {
 	}
 	return TypeHint{flags: flags, ce: ce}
 }
-func TypeHintClassName(className *String, allowNull bool) TypeHint {
+func TypeHintClassName(className string, allowNull bool) TypeHint {
 	var flags uint8 = typeHintIsClass | typeHintIsName
 	if allowNull {
 		flags |= typeHintAllowNull
 	}
-	return TypeHint{flags: flags, name: className.GetStr()}
+	return TypeHint{flags: flags, name: className}
 }
 
 func (t TypeHint) IsSet() bool     { return t.flags != 0 }

@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
@@ -243,7 +244,7 @@ func ZendFetchStaticPropertyAddressEx(
 	executeData *ZendExecuteData,
 ) int {
 	var free_op1 ZendFreeOp
-	var name *types.String
+	var name string
 	var tmp_name *types.String
 	var ce *types.ClassEntry
 	var property_info *types.PropertyInfo
@@ -279,11 +280,11 @@ func ZendFetchStaticPropertyAddressEx(
 		}
 	}
 	if op1_type == IS_CONST {
-		name = opline.Const1().StringEx()
+		name = opline.Const1().String()
 	} else {
 		var varname *types.Zval = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 		if varname.IsString() {
-			name = varname.StringEx()
+			name = varname.String()
 			tmp_name = nil
 		} else {
 			if op1_type == IS_CV && varname.IsUndef() {

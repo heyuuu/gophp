@@ -43,16 +43,16 @@ func ZendCheckAlreadyInUse(typ uint32, oldName string, newName string, checkName
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(typ), oldName, newName))
 }
 func (compiler *Compiler) CompileUse(ast *ZendAst) {
-	var list *ZendAstList = ast.AsAstList()
+	var list = ast.AsAstList()
 	var i uint32
 	var current_ns = FC__().CurrentNamespace()
 	var type_ uint32 = ast.Attr()
-	var case_sensitive bool = type_ == ZEND_SYMBOL_CONST
+	var case_sensitive = type_ == ZEND_SYMBOL_CONST
 	for i = 0; i < list.GetChildren(); i++ {
-		var use_ast *ZendAst = list.Children()[i]
-		var old_name_ast *ZendAst = use_ast.Child(0)
-		var new_name_ast *ZendAst = use_ast.Child(1)
-		var old_name *types.String = ZendAstGetStr(old_name_ast)
+		var use_ast = list.Children()[i]
+		var old_name_ast = use_ast.Child(0)
+		var new_name_ast = use_ast.Child(1)
+		var old_name = ZendAstGetStr(old_name_ast)
 		var new_name string
 		var lookup_name string
 		if new_name_ast != nil {
@@ -97,14 +97,14 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 
 func (compiler *Compiler) CompileGroupUse(ast *ZendAst) {
 	var i uint32
-	var ns *types.String = ZendAstGetStr(ast.Child(0))
-	var list *ZendAstList = ast.Child(1).AsAstList()
+	var ns = ZendAstGetStr(ast.Child(0))
+	var list = ast.Child(1).AsAstList()
 	for i = 0; i < list.GetChildren(); i++ {
 		var inline_use *ZendAst
-		var use *ZendAst = list.Children()[i]
-		var name_zval *types.Zval = ZendAstGetZval(use.Children()[0])
-		var name *types.String = name_zval.StringEx()
-		var compound_ns string = ZendConcatNames(ns.GetStr(), name.GetStr())
+		var use = list.Children()[i]
+		var name_zval = ZendAstGetZval(use.Children()[0])
+		var name = name_zval.String()
+		var compound_ns = ZendConcatNames(ns.GetStr(), name)
 		// types.ZendStringReleaseEx(name, 0)
 		name_zval.SetString(compound_ns)
 		inline_use = AstCreateList(ZEND_AST_USE, use)
@@ -117,38 +117,37 @@ func (compiler *Compiler) CompileGroupUse(ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileConstDecl(ast *ZendAst) {
-	var list *ZendAstList = ast.AsAstList()
+	var list = ast.AsAstList()
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
-		var const_ast *ZendAst = list.Children()[i]
-		var name_ast *ZendAst = const_ast.Child(0)
-		var value_ast *ZendAst = const_ast.Child(1)
-		var unqualified_name *types.String = ZendAstGetStr(name_ast)
-		var name *types.String
+		var const_ast = list.Children()[i]
+		var name_ast = const_ast.Child(0)
+		var value_ast = const_ast.Child(1)
+		var unqualified_name = ZendAstGetStrVal(name_ast)
+		var name string
 		var name_node Znode
 		var value_node Znode
-		var value_zv *types.Zval = value_node.GetConstant()
+		var value_zv = value_node.GetConstant()
 		value_node.SetOpType(IS_CONST)
 		compiler.ConstExprToZval(value_zv, value_ast)
-		if ZendLookupReservedConst(unqualified_name.GetStr()) != nil {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot redeclare constant '%s'", unqualified_name.GetStr()))
+		if ZendLookupReservedConst(unqualified_name) != nil {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot redeclare constant '%s'", unqualified_name))
 		}
 		name = ZendPrefixWithNs(unqualified_name)
-		//name = types.ZendNewInternedString(name)
-		if importName := FC__().FindImportConst(unqualified_name.GetStr()); importName != "" && importName != name.GetStr() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare const %s because the name is already in use", name.GetStr()))
+		if importName := FC__().FindImportConst(unqualified_name); importName != "" && importName != name {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare const %s because the name is already in use", name))
 		}
 		name_node.SetOpType(IS_CONST)
-		name_node.GetConstant().SetString(name.GetStr())
+		name_node.GetConstant().SetString(name)
 		ZendEmitOp(nil, ZEND_DECLARE_CONST, &name_node, &value_node)
-		FC__().RegisterSeenSymbol(name.GetStr(), ZEND_SYMBOL_CONST)
+		FC__().RegisterSeenSymbol(name, ZEND_SYMBOL_CONST)
 	}
 }
 func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
-	var nameAst *ZendAst = ast.Child(0)
-	var stmtAst *ZendAst = ast.Child(1)
+	var nameAst = ast.Child(0)
+	var stmtAst = ast.Child(1)
 	var name string
-	var withBracket bool = stmtAst != nil
+	var withBracket = stmtAst != nil
 
 	/* handle mixed syntax declaration or nested namespaces */
 
@@ -170,7 +169,7 @@ func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
 
 		/* ignore ZEND_EXT_STMT */
 
-		var num uint32 = CG__().GetActiveOpArray().GetLast()
+		var num = CG__().GetActiveOpArray().GetLast()
 		for num > 0 && CG__().GetActiveOpArray().GetOpcodes()[num-1].GetOpcode() == ZEND_EXT_STMT {
 			num--
 		}
@@ -191,8 +190,8 @@ func (compiler *Compiler) CompileNamespace(ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileHaltCompiler(ast *ZendAst) {
-	var offsetAst *ZendAst = ast.Child(0)
-	var offset ZendLong = offsetAst.Val().Long()
+	var offsetAst = ast.Child(0)
+	var offset = offsetAst.Val().Long()
 	var constName = "__COMPILER_HALT_OFFSET__"
 	if FC__().HasBracketedNamespaces() != 0 && FC__().InNamespace() != 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "__HALT_COMPILER() can only be used from the outermost scope")
@@ -202,8 +201,8 @@ func (compiler *Compiler) CompileHaltCompiler(ast *ZendAst) {
 	RegisterLongConstant(name, offset, CONST_CS, 0)
 }
 func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) bool {
-	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
-	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
+	var op_array = CG__().GetActiveOpArray()
+	var ce = CG__().GetActiveClassEntry()
 	switch ast.Attr() {
 	case T_LINE:
 		zv.SetLong(ast.Lineno())
@@ -288,7 +287,7 @@ func ZendBinaryOpProducesArrayConversionError(opcode uint32, op1 *types.Zval, op
 	return 0
 }
 func ZendTryCtEvalBinaryOp(result *types.Zval, opcode uint32, op1 *types.Zval, op2 *types.Zval) bool {
-	var fn BinaryOpType = GetBinaryOp(opcode)
+	var fn = GetBinaryOp(opcode)
 
 	/* don't evaluate division by zero at compile-time */
 
@@ -313,7 +312,7 @@ func ZendTryCtEvalBinaryOp(result *types.Zval, opcode uint32, op1 *types.Zval, o
 	return 1
 }
 func ZendCtEvalUnaryOp(result *types.Zval, opcode uint32, op *types.Zval) {
-	var fn UnaryOpType = GetUnaryOp(opcode)
+	var fn = GetUnaryOp(opcode)
 	fn(result, op)
 }
 func ZendTryCtEvalUnaryPm(result *types.Zval, kind ZendAstKind, op *types.Zval) bool {
@@ -327,7 +326,7 @@ func ZendCtEvalGreater(result *types.Zval, kind ZendAstKind, op1 *types.Zval, op
 }
 
 func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool {
-	var list *ZendAstList = ast.AsAstList()
+	var list = ast.AsAstList()
 	var last_elem_ast *ZendAst = nil
 	var i uint32
 	var is_constant bool = 1
@@ -338,7 +337,7 @@ func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool 
 	/* First ensure that *all* child nodes are constant and by-val */
 
 	for i = 0; i < list.GetChildren(); i++ {
-		var elem_ast *ZendAst = list.Children()[i]
+		var elem_ast = list.Children()[i]
 		if elem_ast == nil {
 
 			/* Report error at line of last non-empty element */
@@ -371,13 +370,13 @@ func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool 
 	}
 	ArrayInitSize(result, list.GetChildren())
 	for i = 0; i < list.GetChildren(); i++ {
-		var elem_ast *ZendAst = list.Children()[i]
-		var value_ast *ZendAst = elem_ast.Child(0)
+		var elem_ast = list.Children()[i]
+		var value_ast = elem_ast.Child(0)
 		var key_ast *ZendAst
-		var value *types.Zval = value_ast.Val()
+		var value = value_ast.Val()
 		if elem_ast.Kind() == ZEND_AST_UNPACK {
 			if value.IsArray() {
-				var ht *types.Array = value.Array()
+				var ht = value.Array()
 				ok := ht.ForeachEx(func(key types.ArrayKey, value *types.Zval) bool {
 					if key.IsStrKey() {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unpack array with string keys")
@@ -399,7 +398,7 @@ func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool 
 		// value.TryAddRefcount()
 		key_ast = elem_ast.Child(1)
 		if key_ast != nil {
-			var key *types.Zval = key_ast.Val()
+			var key = key_ast.Val()
 			switch key.Type() {
 			case types.IsLong:
 				result.Array().IndexUpdate(key.Long(), value)
@@ -427,8 +426,8 @@ func (compiler *Compiler) TryCtEvalArray(result *types.Zval, ast *ZendAst) bool 
 	return 1
 }
 func (compiler *Compiler) CompileBinaryOp(result *Znode, ast *ZendAst) {
-	var left_ast *ZendAst = ast.Child(0)
-	var right_ast *ZendAst = ast.Child(1)
+	var left_ast = ast.Child(0)
+	var right_ast = ast.Child(1)
 	var opcode uint32 = ast.Attr()
 	if (opcode == ZEND_ADD || opcode == ZEND_SUB) && left_ast.Kind() == ZEND_AST_BINARY_OP && left_ast.Attr() == ZEND_CONCAT {
 		faults.Error(faults.E_DEPRECATED, "The behavior of unparenthesized expressions containing both '.' and '+'/'-' will change in PHP 8: '+'/'-' will take a higher precedence")
@@ -518,8 +517,8 @@ func (compiler *Compiler) CompileBinaryOp(result *Znode, ast *ZendAst) {
 	}
 }
 func (compiler *Compiler) CompileGreater(result *Znode, ast *ZendAst) {
-	var left_ast *ZendAst = ast.Child(0)
-	var right_ast *ZendAst = ast.Child(1)
+	var left_ast = ast.Child(0)
+	var right_ast = ast.Child(1)
 	var left_node Znode
 	var right_node Znode
 	b.Assert(ast.Kind() == ZEND_AST_GREATER || ast.Kind() == ZEND_AST_GREATER_EQUAL)
@@ -535,7 +534,7 @@ func (compiler *Compiler) CompileGreater(result *Znode, ast *ZendAst) {
 	ZendEmitOpTmp(result, lang.Cond(ast.Kind() == ZEND_AST_GREATER, ZEND_IS_SMALLER, ZEND_IS_SMALLER_OR_EQUAL), &right_node, &left_node)
 }
 func (compiler *Compiler) CompileUnaryOp(result *Znode, ast *ZendAst) {
-	var expr_ast *ZendAst = ast.Child(0)
+	var expr_ast = ast.Child(0)
 	var opcode uint32 = ast.Attr()
 	var expr_node Znode
 	compiler.CompileExpr(&expr_node, expr_ast)

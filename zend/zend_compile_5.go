@@ -278,7 +278,7 @@ func (compiler *Compiler) CompileTry(ast *ZendAst) {
 		var classes *ZendAstList = catch_ast.Child(0).AsAstList()
 		var var_ast *ZendAst = catch_ast.Child(1)
 		var stmt_ast *ZendAst = catch_ast.Children()[2]
-		var var_name *types.String = var_ast.Val().StringEx()
+		var var_name *types.String = types.NewString(var_ast.Val().String())
 		var is_last_catch bool = i+1 == catches.GetChildren()
 		var jmp_multicatch *uint32 = SafeEmalloc(b.SizeOf("uint32_t"), classes.GetChildren()-1, 0)
 		var opnum_catch uint32 = uint32 - 1
@@ -454,21 +454,20 @@ func (compiler *Compiler) CompileTypename(ast *ZendAst, force_allow_null bool) t
 	if ast.Kind() == ZEND_AST_TYPE {
 		return types.TypeHintCode(ast.Attr(), allow_null)
 	} else {
-		var class_name *types.String = ZendAstGetStr(ast)
-		var type_code types.ZvalType = ZendLookupBuiltinTypeByName(class_name.GetStr())
+		var class_name = ZendAstGetStrVal(ast)
+		var type_code types.ZvalType = ZendLookupBuiltinTypeByName(class_name)
 		if type_code != 0 {
 			if (ast.Attr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Type declaration '%s' must be unqualified", ascii.StrToLower(class_name.GetStr())))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Type declaration '%s' must be unqualified", ascii.StrToLower(class_name)))
 			}
 			type_ = types.TypeHintCode(type_code, allow_null)
 		} else {
 			var fetch_type uint32 = ZendGetClassFetchTypeAst(ast)
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
 				class_name = ZendResolveClassNameAst(ast)
-				ZendAssertValidClassName(class_name.GetStr())
+				ZendAssertValidClassName(class_name)
 			} else {
 				ZendEnsureValidClassFetchType(fetch_type)
-				//class_name.AddRefcount()
 			}
 			type_ = types.TypeHintClassName(class_name, allow_null)
 		}
@@ -506,7 +505,7 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 		var type_ast *ZendAst = param_ast.Child(0)
 		var var_ast *ZendAst = param_ast.Child(1)
 		var default_ast *ZendAst = param_ast.Children()[2]
-		var name *types.String = var_ast.Val().StringEx()
+		var name *types.String = types.NewString(var_ast.Val().String())
 		var is_ref bool = (param_ast.Attr() & ZEND_PARAM_REF) != 0
 		var is_variadic bool = (param_ast.Attr() & ZEND_PARAM_VARIADIC) != 0
 		var var_node Znode

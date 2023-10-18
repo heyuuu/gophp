@@ -15,7 +15,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var idx uintPtr
 	var ref *types.Reference
 	for {
-		varname = opline.Const2().StringEx()
+		varname = types.NewString(opline.Const2().String())
 
 		/* We store "hash slot index" + 1 (NULL is a mark of uninitialized cache slot) */
 

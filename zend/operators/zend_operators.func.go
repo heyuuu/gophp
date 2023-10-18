@@ -90,9 +90,6 @@ func TryConvertToString(op *types.Zval) bool {
 func ConvertToString(op *types.Zval) {
 	TryConvertToString(op)
 }
-func ZendStringTolower(str *types.String) *types.String {
-	return types.NewString(ascii.StrToLower(str.GetStr()))
-}
 func ConvertToStringEx(pzv *types.Zval) {
 	if !pzv.IsString() {
 		ConvertToString(pzv)
@@ -381,11 +378,11 @@ try_again:
 	case types.IsDouble:
 		op.SetLong(DvalToLval(op.Double()))
 	case types.IsString:
-		var str *types.String = op.StringEx()
+		var str = op.String()
 		if base == 10 {
 			op.SetLong(ZvalGetLong(op))
 		} else {
-			op.SetLong(zend.ZEND_STRTOL(str.GetStr(), nil, base))
+			op.SetLong(zend.ZEND_STRTOL(str, nil, base))
 		}
 	case types.IsArray:
 		if op.Array().Len() != 0 {

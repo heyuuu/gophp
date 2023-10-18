@@ -178,7 +178,6 @@ func (zv *Zval) Bool() bool          { return zvalValue[bool](zv) }
 func (zv *Zval) Long() int           { return zvalValue[int](zv) }
 func (zv *Zval) Double() float64     { return zvalValue[float64](zv) }
 func (zv *Zval) String() string      { return zvalValue[string](zv) }
-func (zv *Zval) StringEx() *String   { return NewString(zv.String()) }
 func (zv *Zval) Array() *Array       { return zvalValue[*Array](zv) }
 func (zv *Zval) Object() *Object     { return zvalValue[*Object](zv) }
 func (zv *Zval) Resource() *Resource { return zvalValue[*Resource](zv) }

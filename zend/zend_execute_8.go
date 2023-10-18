@@ -269,7 +269,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 		}
 		mname = types.NewString(b.CastStr(function.GetStr()+(cname_length+b.SizeOf(`"::"`)-1), mname_length))
 		if called_scope.GetGetStaticMethod() != nil {
-			fbc = called_scope.GetGetStaticMethod()(called_scope, mname)
+			fbc = called_scope.GetGetStaticMethod()(called_scope, mname.GetStr())
 		} else {
 			fbc = ZendStdGetStaticMethod(called_scope, mname.GetStr(), nil)
 		}
@@ -375,7 +375,7 @@ func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecu
 				return nil
 			}
 			if called_scope.GetGetStaticMethod() != nil {
-				fbc = called_scope.GetGetStaticMethod()(called_scope, method.StringEx())
+				fbc = called_scope.GetGetStaticMethod()(called_scope, method.String())
 			} else {
 				fbc = ZendStdGetStaticMethod(called_scope, method.String(), nil)
 			}

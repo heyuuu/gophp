@@ -395,8 +395,13 @@ func (ce *ClassEntry) GetGetIterator() func(ce *ClassEntry, object *Zval, by_ref
 func (ce *ClassEntry) SetGetIterator(value func(ce *ClassEntry, object *Zval, by_ref int) *zend.ZendObjectIterator) {
 	ce.get_iterator = value
 }
-func (ce *ClassEntry) GetGetStaticMethod() func(ce *ClassEntry, method *String) IFunction {
-	return ce.get_static_method
+func (ce *ClassEntry) GetGetStaticMethod() func(ce *ClassEntry, method string) IFunction {
+	if ce.get_static_method == nil {
+		return nil
+	}
+	return func(ce *ClassEntry, method string) IFunction {
+		return ce.get_static_method(ce, NewString(method))
+	}
 }
 func (ce *ClassEntry) SetGetStaticMethod(value func(ce *ClassEntry, method *String) IFunction) {
 	ce.get_static_method = value

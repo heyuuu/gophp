@@ -388,7 +388,7 @@ func (compiler *Compiler) CompileInstanceof(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOpTmp(result, ZEND_INSTANCEOF, &obj_node, nil)
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().StringEx()))
+		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
 		opline.SetExtendedValue(ZendAllocCacheSlot())
 	} else {
 		opline.SetOp2Type(class_node.GetOpType())
@@ -620,14 +620,11 @@ func (compiler *Compiler) CompileClassConst(result *Znode, ast *ZendAst) {
 	class_ast = ast.Children()[0]
 	const_ast = ast.Child(1)
 	if class_ast.Kind() == ZEND_AST_ZVAL {
-		var resolved_name *types.String
-		resolved_name = ZendResolveClassNameAst(class_ast)
-		if const_ast.Kind() == ZEND_AST_ZVAL && ZendTryCtEvalClassConst(result.GetConstant(), resolved_name, ZendAstGetStr(const_ast)) != 0 {
+		resolved_name := ZendResolveClassNameAst(class_ast)
+		if const_ast.Kind() == ZEND_AST_ZVAL && ZendTryCtEvalClassConst(result.GetConstant(), types.NewString(resolved_name), ZendAstGetStr(const_ast)) {
 			result.SetOpType(IS_CONST)
-			// types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
-		// types.ZendStringReleaseEx(resolved_name, 0)
 	}
 	compiler.CompileClassRef(&class_node, class_ast, ZEND_FETCH_CLASS_EXCEPTION)
 	compiler.CompileExpr(&const_node, const_ast)

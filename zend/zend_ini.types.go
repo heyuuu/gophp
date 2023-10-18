@@ -87,7 +87,7 @@ func (this *ZendIniEntry) HasOnModify() bool {
 	return this.onModify != nil
 }
 
-func (this *ZendIniEntry) EmitOnModify(new_value *types.String, stage int) bool {
+func (this *ZendIniEntry) EmitOnModify(new_value string, stage int) bool {
 	if this.onModify == nil {
 		return true
 	}
@@ -96,7 +96,7 @@ func (this *ZendIniEntry) EmitOnModify(new_value *types.String, stage int) bool 
 }
 
 func (this *ZendIniEntry) EmitOnModifyCurrValue(stage int) bool {
-	return this.EmitOnModify(this.GetValue(), stage)
+	return this.EmitOnModify(this.GetValue().GetStr(), stage)
 }
 
 /**

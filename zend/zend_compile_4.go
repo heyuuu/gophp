@@ -127,37 +127,32 @@ func (compiler *Compiler) CompileCall(result *Znode, ast *ZendAst, type_ uint32)
 	var runtime_resolution = compiler.CompileFunctionName(&name_node, name_ast)
 	if runtime_resolution {
 		if ascii.StrCaseEquals(ZendAstGetStrVal(name_ast), "assert") {
-			compiler.CompileAssert(result, args_ast.AsAstList(), name_node.GetConstant().StringEx(), nil)
+			compiler.CompileAssert(result, args_ast.AsAstList(), name_node.GetConstant().String(), nil)
 		} else {
 			compiler.CompileNsCall(result, &name_node, args_ast)
 		}
 		return
 	}
 	var name *types.Zval = name_node.GetConstant()
-	var lcname *types.String
+	var lcname string
 	var fbc types.IFunction
 	var opline *types.ZendOp
-	lcname = operators.ZendStringTolower(name.StringEx())
+	lcname = ascii.StrToLower(name.String())
 
-	fbc = CG__().FunctionTable().Get(lcname.GetStr())
-	if fbc != nil && lcname.GetStr() == "assert" {
+	fbc = CG__().FunctionTable().Get(lcname)
+	if fbc != nil && lcname == "assert" {
 		compiler.CompileAssert(result, args_ast.AsAstList(), lcname, fbc)
-		// types.ZendStringRelease(lcname)
-		// ZvalPtrDtor(name_node.GetConstant())
 		return
 	}
-	if fbc == nil || FbcIsFinalized(fbc) == 0 || fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_USER_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) != 0 && fbc.GetOpArray().GetFilename() != CG__().GetActiveOpArray().GetFilename() {
-		// types.ZendStringReleaseEx(lcname, 0)
+	if fbc == nil || !FbcIsFinalized(fbc) || fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_USER_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) != 0 && fbc.GetOpArray().GetFilename() != CG__().GetActiveOpArray().GetFilename() {
 		compiler.CompileDynamicCall(result, &name_node, args_ast)
 		return
 	}
-	if compiler.TryCompileSpecialFunc(result, lcname, args_ast.AsAstList(), fbc, type_) == types.SUCCESS {
-		// types.ZendStringReleaseEx(lcname, 0)
-		// ZvalPtrDtor(name_node.GetConstant())
+	if compiler.TryCompileSpecialFunc(result, types.NewString(lcname), args_ast.AsAstList(), fbc, type_) == types.SUCCESS {
 		return
 	}
 	// ZvalPtrDtor(name_node.GetConstant())
-	name_node.GetConstant().SetString(lcname.GetStr())
+	name_node.GetConstant().SetString(lcname)
 	opline = ZendEmitOp(nil, ZEND_INIT_FCALL, nil, &name_node)
 	opline.GetResult().SetNum(ZendAllocCacheSlot())
 	compiler.CompileCallCommon(result, args_ast, fbc)
@@ -183,7 +178,7 @@ func (compiler *Compiler) CompileMethodCall(result *Znode, ast *ZendAst, type_ u
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(method_node.GetConstant().StringEx()))
+		opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(method_node.GetConstant().String()))
 		opline.GetResult().SetNum(ZendAllocCacheSlots(2))
 	} else {
 		opline.SetOp2Type(method_node.GetOpType())
@@ -197,20 +192,19 @@ func (compiler *Compiler) CompileMethodCall(result *Znode, ast *ZendAst, type_ u
 	/* Check if this calls a known method on $this */
 
 	if opline.GetOp1Type() == IS_UNUSED && opline.GetOp2Type() == IS_CONST && CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() {
-		var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
-		fbc = CG__().GetActiveClassEntry().FunctionTable().Get(lcname.GetStr())
+		var lcname string = (CT_CONSTANT(opline.GetOp2()) + 1).String()
+		fbc = CG__().GetActiveClassEntry().FunctionTable().Get(lcname)
 		if fbc != nil && !fbc.HasFnFlags(types.AccPrivate|types.AccFinal) {
 			fbc = nil
 		}
 
 		/* We only know the exact method that is being called if it is either private or final.
 		 * Otherwise an overriding method in a child class may be called. */
-
 	}
 	compiler.CompileCallCommon(result, args_ast, fbc)
 }
-func ZendIsConstructor(name *types.String) bool {
-	return ascii.StrCaseEquals(name.GetStr(), ZEND_CONSTRUCTOR_FUNC_NAME)
+func ZendIsConstructor(name string) bool {
+	return ascii.StrCaseEquals(name, ZEND_CONSTRUCTOR_FUNC_NAME)
 }
 func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var class_ast *ZendAst = ast.Child(0)
@@ -227,7 +221,7 @@ func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ u
 		if !name.IsString() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
-		if ZendIsConstructor(name.StringEx()) != 0 {
+		if ZendIsConstructor(name.String()) {
 			// ZvalPtrDtor(name)
 			method_node.SetOpType(IS_UNUSED)
 		}
@@ -237,7 +231,7 @@ func (compiler *Compiler) CompileStaticCall(result *Znode, ast *ZendAst, type_ u
 	ZendSetClassNameOp1(opline, &class_node)
 	if method_node.GetOpType() == IS_CONST {
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(method_node.GetConstant().StringEx()))
+		opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(method_node.GetConstant().String()))
 		opline.GetResult().SetNum(ZendAllocCacheSlots(2))
 	} else {
 		if opline.GetOp1Type() == IS_CONST {
@@ -296,7 +290,7 @@ func (compiler *Compiler) CompileNew(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOp(result, ZEND_NEW, nil, nil)
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp1Type(IS_CONST)
-		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().StringEx()))
+		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
 		opline.GetOp2().SetNum(ZendAllocCacheSlot())
 	} else {
 		opline.SetOp1Type(class_node.GetOpType())

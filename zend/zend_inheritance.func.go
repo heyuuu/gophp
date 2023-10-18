@@ -1917,7 +1917,8 @@ func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 		faults.ErrorNoreturn(faults.E_ERROR, fmt.Sprintf("During inheritance of %s with variance dependencies: Uncaught %s", ce.Name(), exception_str.GetStr()))
 	}
 }
-func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
+
+func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name string) int {
 	/* Load parent/interface dependencies first, so we can still gracefully abort linking
 	 * with an exception and remove the class from the class table. This is only possible
 	 * if no variance obligations on the current class have been added during autoloading. */

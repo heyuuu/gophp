@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/kits/strkit"
@@ -268,7 +269,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 						allow_null = 1
 					}
 					str = types.NewString(b.CastStrAuto(class_name))
-					new_arg_info[i].SetType(types.TypeHintClassName(str, allow_null != 0))
+					new_arg_info[i].SetType(types.TypeHintClassName(str.GetStr(), allow_null != 0))
 				}
 			}
 		}

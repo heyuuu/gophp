@@ -25,21 +25,21 @@ func (compiler *Compiler) CompileConstExprClassConst(astPtr **ZendAst) {
 	var ast *ZendAst = *astPtr
 	var classAst *ZendAst = ast.Child(0)
 	var constAst *ZendAst = ast.Child(1)
-	var className *types.String
-	var constName *types.String = ZendAstGetStr(constAst)
-	var fetchType int
+	var className string
+	var constName string = ZendAstGetStrVal(constAst)
+	var fetchType uint32
 	if classAst.Kind() != ZEND_AST_ZVAL {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Dynamic class names are not allowed in compile-time class constant references")
 	}
-	className = ZendAstGetStr(classAst)
-	fetchType = ZendGetClassFetchType(className.GetStr())
+	className = ZendAstGetStrVal(classAst)
+	fetchType = ZendGetClassFetchType(className)
 	if ZEND_FETCH_CLASS_STATIC == fetchType {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, `"static::" is not allowed in compile-time constants`)
 	}
 	if ZEND_FETCH_CLASS_DEFAULT == fetchType {
 		className = ZendResolveClassNameAst(classAst)
 	}
-	name := className.GetStr() + "::" + constName.GetStr()
+	name := className + "::" + constName
 	// ZendAstDestroy(ast)
 	*astPtr = ZendAstCreateConstant(types.NewString(name), fetchType|ZEND_FETCH_CLASS_EXCEPTION)
 }
@@ -616,8 +616,8 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_CLASS_CONST:
 		var class_ast *ZendAst
 		var name_ast *ZendAst
-		var resolved_name *types.String
-		compiler.EvalConstExpr(ast.Children()[0])
+		var resolved_name string
+		compiler.EvalConstExpr(ast.Child(0))
 		compiler.EvalConstExpr(ast.Child(1))
 		class_ast = ast.Children()[0]
 		name_ast = ast.Child(1)
@@ -625,14 +625,12 @@ func (compiler *Compiler) EvalConstExpr(ast_ptr **ZendAst) {
 			return
 		}
 		resolved_name = ZendResolveClassNameAst(class_ast)
-		if ZendTryCtEvalClassConst(&result, resolved_name, ZendAstGetStr(name_ast)) == 0 {
-			// types.ZendStringReleaseEx(resolved_name, 0)
+		if !ZendTryCtEvalClassConst(&result, types.NewString(resolved_name), ZendAstGetStr(name_ast)) {
 			return
 		}
-		// types.ZendStringReleaseEx(resolved_name, 0)
 	case ZEND_AST_CLASS_NAME:
 		var class_ast *ZendAst = ast.Children()[0]
-		if ZendTryCompileConstExprResolveClassName(&result, class_ast) == 0 {
+		if !ZendTryCompileConstExprResolveClassName(&result, class_ast) {
 			return
 		}
 	default:

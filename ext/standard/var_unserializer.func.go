@@ -354,7 +354,7 @@ func ProcessNestedData(
 					var unmangled_prop *byte
 					var unmangled_prop_len int
 					var unmangled *types.String
-					if zend.ZendUnmanglePropertyNameEx(key.StringEx(), &unmangled_class, &unmangled_prop, &unmangled_prop_len) == types.FAILURE {
+					if zend.ZendUnmanglePropertyNameEx(key.String(), &unmangled_class, &unmangled_prop, &unmangled_prop_len) == types.FAILURE {
 						// zend.ZvalPtrDtor(&key)
 						goto failure
 					}

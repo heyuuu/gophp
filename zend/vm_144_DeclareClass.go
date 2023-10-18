@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -13,14 +14,14 @@ func ZEND_DECLARE_CLASS_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var rtdKey *types.Zval = lcname + 1
 
 	if opline.GetOp2Type() == IS_CONST {
-		DoBindClass(lcname, rtdKey, opline.Const2().StringEx())
+		DoBindClass(lcname, rtdKey, opline.Const2().String())
 	} else {
 		DoBindClass(lcname, rtdKey, nil)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 
-func DoBindClass(lcname *types.Zval, rtdKey *types.Zval, lcParentName *types.String) int {
+func DoBindClass(lcname *types.Zval, rtdKey *types.Zval, lcParentName string) int {
 	ce := EG__().ClassTable().Get(rtdKey.String())
 	if ce == nil {
 		if EG__().ClassTable().Exists(lcname.String()) {

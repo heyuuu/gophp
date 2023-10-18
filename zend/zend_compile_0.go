@@ -7,7 +7,6 @@ import (
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
-	"github.com/heyuuu/gophp/zend/operators"
 	"strings"
 	"unsafe"
 )
@@ -132,10 +131,9 @@ func GetNextOp() *types.ZendOp {
 func GetNextBrkContElement() *ZendBrkContElement {
 	return CG__().GetContext().AddBrkCont()
 }
-func ZendBuildRuntimeDefinitionKey(name *types.String, start_lineno uint32) *types.String {
+func ZendBuildRuntimeDefinitionKey(name string, start_lineno uint32) string {
 	var filename = CG__().GetActiveOpArray().GetFilename()
-	var result = fmt.Sprintf("%c%s%s:%d$%d", '\000', name.GetStr(), filename, start_lineno, lang.PostInc(&(CG__().GetRtdKeyCounter())))
-	return types.NewString(result)
+	return fmt.Sprintf("%c%s%s:%d$%d", '\000', name, filename, start_lineno, lang.PostInc(&(CG__().GetRtdKeyCounter())))
 }
 
 func ZendGetUnqualifiedNameEx(name string) (string, bool) {
@@ -171,7 +169,6 @@ func ZendOparrayContextEnd(prev_context *ZendOparrayContext) {
 	//CG__().GetContext().End()
 	CG__().SetContext(*prev_context)
 }
-func FileHandleDtor(fh *FileHandle) { fh.Destroy() }
 func ZendSetCompiledFilename(new_compiled_filename string) {
 	if _, ok := CG__().filenamesTable[new_compiled_filename]; !ok {
 		CG__().filenamesTable[new_compiled_filename] = new_compiled_filename
@@ -198,56 +195,45 @@ func ZendAddLiteral(zv *types.Zval) int {
 	var opArray = CG__().GetActiveOpArray()
 	return opArray.AddLiteral(zv)
 }
-func ZendAddLiteralStringEx(str string) int {
+func ZendAddLiteralString(str string) int {
 	zv := types.NewZvalString(str)
 	return ZendAddLiteral(zv)
 }
-func ZendAddLiteralString(str **types.String) int {
-	zv := types.NewZvalString((*str).GetStr())
-	var ret int
-	ret = ZendAddLiteral(zv)
-	*str = zv.StringEx()
-	return ret
-}
-func ZendAddFuncNameLiteral(name *types.String) int {
+func ZendAddFuncNameLiteral(name string) int {
 	/* Original name */
-
-	var ret int = ZendAddLiteralString(&name)
+	var ret = ZendAddLiteralString(name)
 
 	/* Lowercased name */
+	ZendAddLiteralString(ascii.StrToLower(name))
 
-	var lc_name *types.String = operators.ZendStringTolower(name)
-	ZendAddLiteralString(&lc_name)
 	return ret
 }
-func ZendAddNsFuncNameLiteral(name *types.String) int {
+func ZendAddNsFuncNameLiteral(name string) int {
 	/* Original name */
-	var ret int = ZendAddLiteralString(&name)
+	var ret int = ZendAddLiteralString(name)
 
 	/* Lowercased name */
-	lcName := types.NewString(ascii.StrToLower(name.GetStr()))
-	ZendAddLiteralString(&lcName)
+	lcName := ascii.StrToLower(name)
+	ZendAddLiteralString(lcName)
 
 	/* Lowercased unqualfied name */
-	if unqualifiedName, ok := ZendGetUnqualifiedNameEx(name.GetStr()); ok {
+	if unqualifiedName, ok := ZendGetUnqualifiedNameEx(name); ok {
 		uqLcName := types.NewString(ascii.StrToLower(unqualifiedName))
-		ZendAddLiteralString(&uqLcName)
+		ZendAddLiteralString(uqLcName.GetStr())
 	}
 	return ret
 }
-func ZendAddClassNameLiteral(name *types.String) int {
+func ZendAddClassNameLiteral(name string) int {
 	/* Original name */
-
-	var ret int = ZendAddLiteralString(&name)
+	var ret int = ZendAddLiteralString(name)
 
 	/* Lowercased name */
-
-	var lc_name *types.String = operators.ZendStringTolower(name)
-	ZendAddLiteralString(&lc_name)
+	var lc_name = ascii.StrToLower(name)
+	ZendAddLiteralString(lc_name)
 	return ret
 }
 func ZendAddConstNameLiteral(name string, unqualified bool) int {
-	var ret int = ZendAddLiteralStringEx(name)
+	var ret int = ZendAddLiteralString(name)
 
 	var afterNs string
 	if pos := strings.IndexByte(name, '\\'); pos >= 0 {
@@ -255,10 +241,10 @@ func ZendAddConstNameLiteral(name string, unqualified bool) int {
 		afterNs = name[pos+1:]
 
 		/* lowercased namespace name & original constant name */
-		ZendAddLiteralStringEx(ascii.StrToLower(ns))
+		ZendAddLiteralString(ascii.StrToLower(ns))
 
 		/* lowercased namespace name & lowercased constant name */
-		ZendAddLiteralStringEx(ascii.StrToLower(name))
+		ZendAddLiteralString(ascii.StrToLower(name))
 		if unqualified == 0 {
 			return ret
 		}
@@ -267,10 +253,10 @@ func ZendAddConstNameLiteral(name string, unqualified bool) int {
 	}
 
 	/* original unqualified constant name */
-	ZendAddLiteralStringEx(afterNs)
+	ZendAddLiteralString(afterNs)
 
 	/* lowercased unqualified constant name */
-	ZendAddLiteralStringEx(ascii.StrToLower(afterNs))
+	ZendAddLiteralString(ascii.StrToLower(afterNs))
 
 	return ret
 }
@@ -371,11 +357,7 @@ func ZendDoFree(op1 *Znode) {
 func ZendConcatNames(name1 string, name2 string) string {
 	return name1 + "\\" + name2
 }
-func ZendPrefixWithNs(name *types.String) *types.String {
-	str := ZendPrefixWithNsEx(name.GetStr())
-	return types.NewString(str)
-}
-func ZendPrefixWithNsEx(name string) string {
+func ZendPrefixWithNs(name string) string {
 	if ns := FC__().CurrentNamespace(); ns != "" {
 		return ZendConcatNames(ns, name)
 	} else {

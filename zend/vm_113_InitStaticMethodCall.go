@@ -34,7 +34,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 	} else {
 		function_name = opline.Const2()
 		if ce.GetGetStaticMethod() != nil {
-			fbc = ce.GetGetStaticMethod()(ce, function_name.StringEx())
+			fbc = ce.GetGetStaticMethod()(ce, function_name.String())
 		} else {
 			fbc = ZendStdGetStaticMethod(ce, function_name.String(), lang.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
@@ -124,7 +124,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 			}
 		}
 		if ce.GetGetStaticMethod() != nil {
-			fbc = ce.GetGetStaticMethod()(ce, function_name.StringEx())
+			fbc = ce.GetGetStaticMethod()(ce, function_name.String())
 		} else {
 			fbc = ZendStdGetStaticMethod(ce, function_name.String(), lang.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
@@ -272,7 +272,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 			}
 		}
 		if ce.GetGetStaticMethod() != nil {
-			fbc = ce.GetGetStaticMethod()(ce, function_name.StringEx())
+			fbc = ce.GetGetStaticMethod()(ce, function_name.String())
 		} else {
 			fbc = ZendStdGetStaticMethod(ce, function_name.String(), lang.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
@@ -328,7 +328,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 	} else {
 		function_name = opline.Const2()
 		if ce.GetGetStaticMethod() != nil {
-			fbc = ce.GetGetStaticMethod()(ce, function_name.StringEx())
+			fbc = ce.GetGetStaticMethod()(ce, function_name.String())
 		} else {
 			fbc = ZendStdGetStaticMethod(ce, function_name.String(), lang.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
@@ -407,7 +407,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 			}
 		}
 		if ce.GetGetStaticMethod() != nil {
-			fbc = ce.GetGetStaticMethod()(ce, function_name.StringEx())
+			fbc = ce.GetGetStaticMethod()(ce, function_name.String())
 		} else {
 			fbc = ZendStdGetStaticMethod(ce, function_name.String(), lang.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
@@ -535,7 +535,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 			}
 		}
 		if ce.GetGetStaticMethod() != nil {
-			fbc = ce.GetGetStaticMethod()(ce, function_name.StringEx())
+			fbc = ce.GetGetStaticMethod()(ce, function_name.String())
 		} else {
 			fbc = ZendStdGetStaticMethod(ce, function_name.String(), lang.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
@@ -595,7 +595,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 	} else {
 		function_name = opline.Const2()
 		if ce.GetGetStaticMethod() != nil {
-			fbc = ce.GetGetStaticMethod()(ce, function_name.StringEx())
+			fbc = ce.GetGetStaticMethod()(ce, function_name.String())
 		} else {
 			fbc = ZendStdGetStaticMethod(ce, function_name.String(), lang.CondF1(IS_CONST == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
@@ -682,7 +682,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 			}
 		}
 		if ce.GetGetStaticMethod() != nil {
-			fbc = ce.GetGetStaticMethod()(ce, function_name.StringEx())
+			fbc = ce.GetGetStaticMethod()(ce, function_name.String())
 		} else {
 			fbc = ZendStdGetStaticMethod(ce, function_name.String(), lang.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}
@@ -821,7 +821,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 			}
 		}
 		if ce.GetGetStaticMethod() != nil {
-			fbc = ce.GetGetStaticMethod()(ce, function_name.StringEx())
+			fbc = ce.GetGetStaticMethod()(ce, function_name.String())
 		} else {
 			fbc = ZendStdGetStaticMethod(ce, function_name.String(), lang.CondF1(IS_CV == IS_CONST, func() *types.Zval { return opline.Const2() + 1 }, nil))
 		}

@@ -83,7 +83,7 @@ func PhpUrlEncodeHashEx(
 			}
 			if key.GetStr()[0] == '0' && type_ != nil {
 				var tmp *byte
-				zend.ZendUnmanglePropertyNameEx(key, &tmp, &prop_name, &prop_len)
+				zend.ZendUnmanglePropertyNameEx(key.GetStr(), &tmp, &prop_name, &prop_len)
 			} else {
 				prop_name = key.GetStr()
 				prop_len = key.GetLen()

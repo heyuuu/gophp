@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -585,11 +586,11 @@ heredoc_scan_done:
 	sc.setStr(sc.segLen(sc.len_ - newline))
 	if !(sc.heredocScanAhead) && !(EG__().exception) && sc.isParserMode() {
 		newlineAtStart := b.EqualsAny(sc.yyTextN(-1), '\r', '\n')
-		var copy *types.String = sc.zendlval.StringEx()
-		if !(StripMultilineStringIndentation(zendlval, heredocLabel.indentation, heredocLabel.indentationUsesSpaces, newlineAtStart, newline != 0)) {
+		var copyStr = sc.zendlval.String()
+		if !(StripMultilineStringIndentation(sc.zendlval, heredocLabel.indentation, heredocLabel.indentationUsesSpaces, newlineAtStart, newline != 0)) {
 			return sc.token(T_ERROR)
 		}
-		if sc.setEscapeString(copy.GetStr(), 0) {
+		if sc.setEscapeString(copyStr, 0) {
 			return sc.token(T_ERROR)
 		}
 	} else {

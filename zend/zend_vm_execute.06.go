@@ -11,30 +11,27 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	var opline *types.ZendOp = executeData.GetOpline()
 	var varname *types.Zval
 	var retval *types.Zval
-	var name *types.String
-	var tmp_name *types.String
+	var name string
 	var target_symbol_table *types.Array
 	varname = opline.Const1()
-	{
-		name = varname.StringEx()
-	}
+	name = varname.String()
 
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	retval = target_symbol_table.KeyFind(name.GetStr())
+	retval = target_symbol_table.KeyFind(name)
 	if retval == nil {
-		if name.GetStr() == types.STR_THIS {
+		if name == types.STR_THIS {
 		fetch_this:
 			ZendFetchThisVar(type_, opline, executeData)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 		if type_ == BP_VAR_W {
-			retval = target_symbol_table.KeyAddNew(name.GetStr(), UninitializedZval())
+			retval = target_symbol_table.KeyAddNew(name, UninitializedZval())
 		} else if type_ == BP_VAR_IS {
 			retval = UninitializedZval()
 		} else {
-			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name.GetStr()))
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name))
 			if type_ == BP_VAR_RW {
-				retval = target_symbol_table.KeyUpdate(name.GetStr(), UninitializedZval())
+				retval = target_symbol_table.KeyUpdate(name, UninitializedZval())
 			} else {
 				retval = UninitializedZval()
 			}
@@ -42,7 +39,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	} else if retval.IsIndirect() {
 		retval = retval.Indirect()
 		if retval.IsUndef() {
-			if name.GetStr() == types.STR_THIS {
+			if name == types.STR_THIS {
 				goto fetch_this
 			}
 			if type_ == BP_VAR_W {
@@ -50,7 +47,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 			} else if type_ == BP_VAR_IS {
 				retval = UninitializedZval()
 			} else {
-				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name.GetStr()))
+				faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name))
 				if type_ == BP_VAR_RW {
 					retval.SetNull()
 				} else {
@@ -58,8 +55,6 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 				}
 			}
 		}
-	}
-	if (opline.GetExtendedValue() & ZEND_FETCH_GLOBAL_LOCK) == 0 {
 	}
 	b.Assert(retval != nil)
 	if type_ == BP_VAR_R || type_ == BP_VAR_IS {
