@@ -81,23 +81,23 @@ func NewBucket(key ArrayKey, zval *Zval) *Bucket {
 	return bucket
 }
 
-func (this *Bucket) IsStrKey() bool            { return this.key.IsStrKey() }
-func (this *Bucket) StrKey() string            { return this.key.StrKey() }
-func (this *Bucket) IndexKey() int             { return this.key.IdxKey() }
-func (this *Bucket) Keys() (int, string, bool) { return this.key.Keys() }
+func (bkt *Bucket) IsStrKey() bool            { return bkt.key.IsStrKey() }
+func (bkt *Bucket) StrKey() string            { return bkt.key.StrKey() }
+func (bkt *Bucket) IndexKey() int             { return bkt.key.IdxKey() }
+func (bkt *Bucket) Keys() (int, string, bool) { return bkt.key.Keys() }
 
-func (this *Bucket) SetStrKey(key string)  { this.key = StrKey(key) }
-func (this *Bucket) SetIndexKey(index int) { this.key = IdxKey(index) }
-func (this *Bucket) GetArrayKey() ArrayKey { return this.key }
+func (bkt *Bucket) SetStrKey(key string)  { bkt.key = StrKey(key) }
+func (bkt *Bucket) SetIndexKey(index int) { bkt.key = IdxKey(index) }
+func (bkt *Bucket) GetArrayKey() ArrayKey { return bkt.key }
 
-func (this *Bucket) GetVal() *Zval     { return &this.val }
-func (this *Bucket) SetVal(zval *Zval) { ZVAL_COPY_VALUE(&this.val, zval) }
+func (bkt *Bucket) GetVal() *Zval     { return &bkt.val }
+func (bkt *Bucket) SetVal(zval *Zval) { ZVAL_COPY_VALUE(&bkt.val, zval) }
 
-func (this *Bucket) IsValid() bool { return !this.val.IsUndef() }
+func (bkt *Bucket) IsValid() bool { return !bkt.val.IsUndef() }
 
-func (this *Bucket) CopyFrom(from *Bucket) {
-	this.SetVal(from.GetVal())
-	this.key = from.key
+func (bkt *Bucket) CopyFrom(from *Bucket) {
+	bkt.SetVal(from.GetVal())
+	bkt.key = from.key
 }
 
 /**

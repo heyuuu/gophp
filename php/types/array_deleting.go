@@ -7,25 +7,25 @@ import (
 /**
  *  Bucket 相关
  */
-func (this *Bucket) GetH() uint {
-	if this.IsStrKey() {
-		return b.HashStr(this.key.StrKey())
+func (bkt *Bucket) GetH() uint {
+	if bkt.IsStrKey() {
+		return b.HashStr(bkt.key.StrKey())
 	} else {
-		return uint(this.key.IdxKey())
+		return uint(bkt.key.IdxKey())
 	}
 }
-func (this *Bucket) GetKey() *String {
-	if this.IsStrKey() {
-		return NewString(this.key.StrKey())
+func (bkt *Bucket) GetKey() *String {
+	if bkt.IsStrKey() {
+		return NewString(bkt.key.StrKey())
 	} else {
 		return nil
 	}
 }
-func (this *Bucket) SetH(value int) {
+func (bkt *Bucket) SetH(value int) {
 	// todo remove
 	assert(false)
 }
-func (this *Bucket) SetKey(value *String) {
+func (bkt *Bucket) SetKey(value *String) {
 	// todo remove
 	assert(false)
 }
