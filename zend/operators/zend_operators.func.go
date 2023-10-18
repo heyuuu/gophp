@@ -1531,7 +1531,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	} else {
 		var op1_len int = op1.StringEx().GetLen()
 		var op2_len int = op2.StringEx().GetLen()
-		if op1_len > types.STR_MAX_LEN-op2_len {
+		if op1_len > types.StrMaxLen-op2_len {
 			faults.ThrowError(nil, "String size overflow")
 			if orig_op1 != result {
 				result.SetUndef()

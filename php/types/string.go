@@ -1,12 +1,12 @@
 package types
 
-import (
-	"math"
-)
+import "math"
 
 /**
  * String
  */
+const StrMaxLen = math.MaxInt
+
 type String string
 
 func NewString(str string) *String { tmp := String(str); return &tmp }
@@ -23,11 +23,6 @@ func (zs *String) GetLen() int {
 	}
 	return len(*zs)
 }
-
-/**
- * String Constants
- */
-const STR_MAX_LEN = math.MaxInt
 
 // ZendKnownString
 var (
