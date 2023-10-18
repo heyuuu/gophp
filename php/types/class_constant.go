@@ -10,12 +10,12 @@ import (
  */
 type ClassConstant struct {
 	value       Zval
-	docComment  *String
+	docComment  string
 	ce          *ClassEntry
 	accessFlags uint32
 }
 
-func NewClassConstant(ce *ClassEntry, value *Zval, docComment *String, accessType uint32) *ClassConstant {
+func NewClassConstant(ce *ClassEntry, value *Zval, docComment string, accessType uint32) *ClassConstant {
 	b.Assert(accessType == AccPublic || accessType == AccProtected || accessType == AccPrivate)
 	c := &ClassConstant{
 		ce:          ce,
@@ -36,7 +36,7 @@ func CopyClassConstant(c *ClassConstant) *ClassConstant {
 
 func (c *ClassConstant) GetCe() *ClassEntry          { return c.ce }
 func (c *ClassConstant) GetValue() *Zval             { return &c.value }
-func (c *ClassConstant) GetDocComment() *String      { return c.docComment }
+func (c *ClassConstant) GetDocComment() string       { return c.docComment }
 func (c *ClassConstant) GetAccessFlags() uint32      { return c.accessFlags }
 func (c *ClassConstant) SetAccessFlags(value uint32) { c.accessFlags = value }
 

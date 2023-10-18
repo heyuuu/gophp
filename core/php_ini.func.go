@@ -496,7 +496,7 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.A
 func PhpIniActivateConfig(source_hash *types.Array, modify_type int, stage int) {
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */
 	source_hash.Foreach(func(key types.ArrayKey, data *types.Zval) {
-		zend.ZendAlterIniEntryEx(key.StrKey(), data.StringEx(), modify_type, stage, 0)
+		zend.ZendAlterIniEntryEx(key.StrKey(), data.String(), modify_type, stage, 0)
 	})
 }
 func PhpIniHasPerDirConfig() int { return HasPerDirConfig }

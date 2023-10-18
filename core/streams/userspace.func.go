@@ -100,7 +100,7 @@ func UserWrapperOpener(
 	args[1].SetString(b.CastStrAuto(mode))
 	args[2].SetLong(options)
 	args[3].SetNewRef(zend.UninitializedZval())
-	zfuncname.SetString(b.CastStrAuto(USERSTREAM_OPEN))
+	zfuncname.SetString(USERSTREAM_OPEN)
 
 	faults.TryCatch(func() {
 		call_result = zend.CallUserFunctionEx(lang.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &zfuncname, &zretval, 4, args, 0)
@@ -118,15 +118,11 @@ func UserWrapperOpener(
 		/* if the opened path is set, copy it out */
 
 		if args[3].IsRef() && types.Z_REFVAL(args[3]).IsString() && opened_path != nil {
-			*opened_path = types.Z_REFVAL(args[3]).StringEx().Copy()
+			*opened_path = types.NewString(types.Z_REFVAL(args[3]).String())
 		}
 
 		/* set wrapper data to be a reference to our object */
-
 		types.ZVAL_COPY(stream.GetWrapperdata(), us.GetObject())
-
-		/* set wrapper data to be a reference to our object */
-
 	} else {
 		PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf(`"%s::%s" call failed`, USERSTREAM_OPEN, us.GetWrapper().GetClassname()))
 	}

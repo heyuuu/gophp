@@ -1013,7 +1013,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 			return nil
 		}
 		intern.SetMode(mode)
-		intern.SetURegexRegex(regex.Copy())
+		intern.SetURegexRegex(types.NewString(regex.GetStr()))
 		zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_InvalidArgumentException, &error_handling)
 		intern.SetPce(pcre_get_compiled_regex_cache(regex))
 		zend.ZendRestoreErrorHandling(&error_handling)

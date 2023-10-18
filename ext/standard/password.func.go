@@ -40,84 +40,71 @@ func PhpPasswordSaltTo64(str string, outLen int) (string, bool) {
 	}
 	return ret, true
 }
-func PhpPasswordMakeSalt(length int) *types.String {
+func PhpPasswordMakeSalt(length int) (string, bool) {
 	if length > core.INT_MAX/3 {
 		core.PhpErrorDocref("", faults.E_WARNING, "Length is too large to safely generate")
-		return nil
+		return "", false
 	}
 	buffer, ok := PhpRandomStringSafe(length*3/4 + 1)
 	if !ok {
 		core.PhpErrorDocref("", faults.E_WARNING, "Unable to generate salt")
-		return nil
+		return "", false
 	}
 
 	salt, ok := PhpPasswordSaltTo64(buffer, length)
 	if !ok {
 		core.PhpErrorDocref("", faults.E_WARNING, "Generated salt too short")
-		return nil
+		return "", false
 	}
-	return types.NewString(salt)
+	return salt, true
 }
-func PhpPasswordGetSalt(required_salt_len int, options *types.Array) *types.String {
+func PhpPasswordGetSalt(requiredSaltLen int, options *types.Array) (string, bool) {
 	var optionBuffer *types.Zval = nil
 	if options != nil {
 		optionBuffer = options.KeyFind("salt")
 	}
 	if optionBuffer == nil {
-		return PhpPasswordMakeSalt(required_salt_len)
+		return PhpPasswordMakeSalt(requiredSaltLen)
 	}
 
-	var buffer *types.String
+	var buffer string
+	var ok bool
 	core.PhpErrorDocref("", faults.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
 	switch optionBuffer.Type() {
 	case types.IsString:
-		buffer = optionBuffer.StringEx().Copy()
-	case types.IsLong:
-		fallthrough
-	case types.IsDouble:
-		fallthrough
-	case types.IsObject:
-		buffer = operators.ZvalTryGetString(optionBuffer)
-		if buffer == nil {
-			return nil
+		buffer = optionBuffer.String()
+	case types.IsLong, types.IsDouble, types.IsObject:
+		buffer, ok = operators.ZvalTryGetStr(optionBuffer)
+		if !ok {
+			return "", false
 		}
-	case types.IsFalse:
-		fallthrough
-	case types.IsTrue:
-		fallthrough
-	case types.IsNull:
-		fallthrough
-	case types.IsResource:
-		fallthrough
-	case types.IsArray:
-		fallthrough
 	default:
 		core.PhpErrorDocref("", faults.E_WARNING, "Non-string salt parameter supplied")
-		return nil
+		return "", false
 	}
 
 	/* XXX all the crypt related APIs work with int for string length.
 	   That should be revised for size_t and then we maybe don't require
 	   the > INT_MAX check. */
 
-	if zend.ZEND_SIZE_T_INT_OVFL(buffer.GetLen()) {
+	if zend.ZEND_SIZE_T_INT_OVFL(len(buffer)) {
 		core.PhpErrorDocref("", faults.E_WARNING, "Supplied salt is too long")
-		return nil
+		return "", false
 	}
-	if buffer.GetLen() < required_salt_len {
-		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Provided salt is too short: %zd expecting %zd", buffer.GetLen(), required_salt_len))
-		return nil
+	if len(buffer) < requiredSaltLen {
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Provided salt is too short: %d expecting %d", len(buffer), requiredSaltLen))
+		return "", false
 	}
-	if !PhpPasswordSaltIsAlphabet(buffer.GetStr()) {
-		salt, ok := PhpPasswordSaltTo64(buffer.GetStr(), required_salt_len)
+	if !PhpPasswordSaltIsAlphabet(buffer) {
+		salt, ok := PhpPasswordSaltTo64(buffer, requiredSaltLen)
 		if !ok {
-			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Provided salt is too short: %zd", buffer.GetLen()))
-			return nil
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Provided salt is too short: %d", len(buffer)))
+			return "", false
 		}
-		return types.NewString(salt)
+		return salt, true
 	} else {
-		salt := buffer.GetStr()[:required_salt_len]
-		return types.NewString(salt)
+		salt := buffer[:requiredSaltLen]
+		return salt, true
 	}
 }
 func PhpPasswordBcryptValid(hash string) bool {
@@ -178,12 +165,12 @@ func PhpPasswordBcryptHash(password string, options *types.Array) (string, bool)
 	}
 	hashFormat := fmt.Sprintf("$2y$%02d$", cost)
 
-	salt := PhpPasswordGetSalt(22, options)
-	if salt == nil {
+	salt, ok := PhpPasswordGetSalt(22, options)
+	if !ok {
 		return "", false
 	}
 
-	hash := hashFormat + salt.GetStr()
+	hash := hashFormat + salt
 
 	/* This cast is safe, since both values are defined here in code and cannot overflow */
 	result = PhpCrypt(password, hash, true)

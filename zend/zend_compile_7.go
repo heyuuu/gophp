@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -35,11 +36,11 @@ func ZendGetUseTypeStr(type_ uint32) string {
 	}
 	return " unknown"
 }
-func ZendCheckAlreadyInUse(type_ uint32, old_name *types.String, new_name *types.String, check_name string) {
-	if ascii.StrCaseEquals(old_name.GetStr(), check_name) {
+func ZendCheckAlreadyInUse(typ uint32, oldName string, newName string, checkName string) {
+	if ascii.StrCaseEquals(oldName, checkName) {
 		return
 	}
-	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal()))
+	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(typ), oldName, newName))
 }
 func (compiler *Compiler) CompileUse(ast *ZendAst) {
 	var list *ZendAstList = ast.AsAstList()
@@ -52,44 +53,44 @@ func (compiler *Compiler) CompileUse(ast *ZendAst) {
 		var old_name_ast *ZendAst = use_ast.Child(0)
 		var new_name_ast *ZendAst = use_ast.Child(1)
 		var old_name *types.String = ZendAstGetStr(old_name_ast)
-		var new_name *types.String
+		var new_name string
 		var lookup_name string
 		if new_name_ast != nil {
-			new_name = ZendAstGetStr(new_name_ast).Copy()
+			new_name = ZendAstGetStr(new_name_ast).GetStr()
 		} else {
 			if unqualifiedName, ok := ZendGetUnqualifiedNameEx(old_name.GetStr()); ok {
 				/* The form "use A\B" is equivalent to "use A\B as B" */
-				new_name = types.NewString(unqualifiedName)
+				new_name = unqualifiedName
 			} else {
-				new_name = old_name.Copy()
+				new_name = old_name.GetStr()
 				if current_ns == "" {
-					if type_ == T_CLASS && new_name.GetStr() == "strict" {
+					if type_ == T_CLASS && new_name == "strict" {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "You seem to be trying to use a different language...")
 					}
-					faults.Error(faults.E_WARNING, fmt.Sprintf("The use statement with non-compound name '%s' has no effect", new_name.GetVal()))
+					faults.Error(faults.E_WARNING, fmt.Sprintf("The use statement with non-compound name '%s' has no effect", new_name))
 				}
 			}
 		}
 		if case_sensitive {
-			lookup_name = new_name.GetStr()
+			lookup_name = new_name
 		} else {
-			lookup_name = ascii.StrToLower(new_name.GetStr())
+			lookup_name = ascii.StrToLower(new_name)
 		}
-		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use %s as %s because '%s' is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal()))
+		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name) {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use %s as %s because '%s' is a special class name", old_name.GetVal(), new_name, new_name))
 		}
 		if current_ns != "" {
 			nsName := ascii.StrToLower(current_ns) + "\\" + lookup_name
 			if FC__().HaveSeenSymbol(nsName, type_) {
-				ZendCheckAlreadyInUse(type_, old_name, new_name, nsName)
+				ZendCheckAlreadyInUse(type_, old_name.GetStr(), new_name, nsName)
 			}
 		} else {
 			if FC__().HaveSeenSymbol(lookup_name, type_) {
-				ZendCheckAlreadyInUse(type_, old_name, new_name, lookup_name)
+				ZendCheckAlreadyInUse(type_, old_name.GetStr(), new_name, lookup_name)
 			}
 		}
 		if ZendAddImport(type_, lookup_name, old_name.GetStr()) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal()))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot use%s %s as %s because the name is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name))
 		}
 	}
 }

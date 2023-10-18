@@ -62,7 +62,7 @@ func ZendDeclarePropertyLong(ce *types.ClassEntry, name string, value int, acces
 func ZendDeclarePropertyString(ce *types.ClassEntry, name string, value string, accessType uint32) int {
 	return ZendDeclareProperty(ce, name, types.NewZvalString(value), accessType)
 }
-func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, accessType uint32, docComment *types.String) int {
+func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, accessType uint32, docComment string) int {
 	if ce.IsInterface() {
 		if accessType != types.AccPublic {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Access type for interface constant %s::%s must be public", ce.Name(), name.GetStr()))
@@ -83,7 +83,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 }
 func ZendDeclareClassConstant(ce *types.ClassEntry, name string, value *types.Zval) int {
 	key := types.NewString(name)
-	ret := ZendDeclareClassConstantEx(ce, key, value, types.AccPublic, nil)
+	ret := ZendDeclareClassConstantEx(ce, key, value, types.AccPublic, "")
 	return ret
 }
 func ZendDeclareClassConstantLong(ce *types.ClassEntry, name string, value ZendLong) int {

@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -461,18 +462,17 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 	return ZendStdReadPropertyEx(object.Object(), member, type_, cache_slot, rv)
 }
 func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cache_slot *any, rv *types.Zval) *types.Zval {
-	var name *types.String
-	var tmp_name *types.String
-	var retval *types.Zval
-	var guard *types.PropertyGuard = nil
-	name = operators.ZvalTryGetString(member)
-	if name == nil {
+	name, ok := operators.ZvalTryGetStr(member)
+	if !ok {
 		return UninitializedZval()
 	}
 
+	var retval *types.Zval
+	var guard *types.PropertyGuard = nil
+
 	/* make zend_get_property_info silent if we have getter - we may want to use it */
 
-	property_offset, prop_ce, prop_info := _zendGetPropertyOffset(zobj.GetCe(), name.GetStr(), typ == BP_VAR_IS || zobj.GetCe().GetGet() != nil)
+	property_offset, _, prop_info := _zendGetPropertyOffset(zobj.GetCe(), name, typ == BP_VAR_IS || zobj.GetCe().GetGet() != nil)
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		retval = OBJ_PROP(zobj, property_offset)
 		if retval.IsNotUndef() {
@@ -488,17 +488,17 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 				var idx uint = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
 				if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-					if p.GetVal().IsNotUndef() && p.IsStrKey() && p.StrKey() == name.GetStr() {
+					if p.GetVal().IsNotUndef() && p.IsStrKey() && p.StrKey() == name {
 						retval = p.GetVal()
 						goto exit
 					}
 				}
 				CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 			}
-			retval = zobj.GetProperties().KeyFind(name.GetStr())
+			retval = zobj.GetProperties().KeyFind(name)
 			if retval != nil {
 				if cache_slot != nil {
-					PropFindAndCache(zobj, name.GetStr())
+					PropFindAndCache(zobj, name)
 				}
 				goto exit
 			}
@@ -512,14 +512,11 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 
 	if typ == BP_VAR_IS && zobj.GetCe().GetIsset() != nil {
 		var tmp_result types.Zval
-		guard = zobj.Guard(name.GetStr())
+		guard = zobj.Guard(name)
 		if !guard.InIsset() {
-			if tmp_name == nil {
-				tmp_name = name.Copy()
-			}
 			tmp_result.SetUndef()
 			guard.MarkInIsset(true)
-			ZendStdCallIssetter(zobj, name.GetStr(), &tmp_result)
+			ZendStdCallIssetter(zobj, name, &tmp_result)
 			guard.MarkInIsset(false)
 			if !operators.ZvalIsTrue(&tmp_result) {
 				retval = UninitializedZval()
@@ -534,18 +531,18 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 	} else if zobj.GetCe().GetGet() != nil {
 
 		/* magic get */
-		guard = zobj.Guard(name.GetStr())
+		guard = zobj.Guard(name)
 		if !guard.InGet() {
 		call_getter_addref:
 		call_getter:
 			guard.MarkInGet(true)
-			ZendStdCallGetter(zobj, name.GetStr(), rv)
+			ZendStdCallGetter(zobj, name, rv)
 			guard.MarkInGet(false)
 			if rv.IsNotUndef() {
 				retval = rv
 				if !(rv.IsRef()) && (typ == BP_VAR_W || typ == BP_VAR_RW || typ == BP_VAR_UNSET) {
 					if !rv.IsObject() {
-						faults.Error(faults.E_NOTICE, fmt.Sprintf("Indirect modification of overloaded property %s::$%s has no effect", zobj.GetCe().Name(), name.GetVal()))
+						faults.Error(faults.E_NOTICE, fmt.Sprintf("Indirect modification of overloaded property %s::$%s has no effect", zobj.GetCe().Name(), name))
 					}
 				}
 			} else {
@@ -560,7 +557,7 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 
 			/* Trigger the correct error */
 
-			ZendGetPropertyOffset(zobj.GetCe(), name.GetStr(), false, nil, &prop_info)
+			ZendGetPropertyOffset(zobj.GetCe(), name, false, nil, &prop_info)
 			b.Assert(EG__().HasException())
 			retval = UninitializedZval()
 			goto exit
@@ -569,9 +566,9 @@ func ZendStdReadPropertyEx(zobj *types.Object, member *types.Zval, typ int, cach
 uninit_error:
 	if typ != BP_VAR_IS {
 		if prop_info != nil {
-			faults.ThrowError(nil, fmt.Sprintf("Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name.GetVal()))
+			faults.ThrowError(nil, fmt.Sprintf("Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().Name(), name))
 		} else {
-			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name.GetVal()))
+			faults.Error(faults.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", zobj.GetCe().Name(), name))
 		}
 	}
 	retval = UninitializedZval()

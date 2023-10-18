@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
@@ -486,47 +487,29 @@ func ZifStreamGetMetaData(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zv
 		zend.AddAssocString(return_value, "uri", stream.GetOrigPath())
 	}
 }
-func ZifStreamGetTransports(executeData zpp.Ex, return_value zpp.Ret) {
-	var stream_xport_hash *types.Array
-	var stream_xport *types.String
-	if !executeData.CheckNumArgsNone(false) {
-		return
+func ZifStreamGetTransports() (*types.Array, bool) {
+	streamXportHash := streams.PhpStreamXportGetHash()
+	if streamXportHash == nil {
+		return nil, false
 	}
-	if lang.Assign(&stream_xport_hash, streams.PhpStreamXportGetHash()) {
-		zend.ArrayInit(return_value)
-		var __ht *types.Array = stream_xport_hash
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
 
-			stream_xport = _p.GetKey()
-			zend.AddNextIndexStr(return_value, stream_xport.Copy())
-		}
-	} else {
-		return_value.SetFalse()
-		return
-	}
+	arr := types.NewArray()
+	streamXportHash.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		arr.Append(types.NewZvalString(key.StrKey()))
+	})
+	return arr, true
 }
-func ZifStreamGetWrappers(executeData zpp.Ex, return_value zpp.Ret) {
-	var url_stream_wrappers_hash *types.Array
-	var stream_protocol *types.String
-	if !executeData.CheckNumArgsNone(false) {
-		return
+func ZifStreamGetWrappers() (*types.Array, bool) {
+	var urlStreamWrappersHash *types.Array = core.PhpStreamGetUrlStreamWrappersHash()
+	if urlStreamWrappersHash == nil {
+		return nil, false
 	}
-	if lang.Assign(&url_stream_wrappers_hash, core.PhpStreamGetUrlStreamWrappersHash()) {
-		zend.ArrayInit(return_value)
-		var __ht *types.Array = url_stream_wrappers_hash
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
 
-			stream_protocol = _p.GetKey()
-			if stream_protocol != nil {
-				zend.AddNextIndexStr(return_value, stream_protocol.Copy())
-			}
-		}
-	} else {
-		return_value.SetFalse()
-		return
-	}
+	arr := types.NewArray()
+	urlStreamWrappersHash.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		arr.Append(types.NewZvalString(key.StrKey()))
+	})
+	return arr, true
 }
 func StreamArrayToFdSet(stream_array *types.Zval, fds *fd_set, max_fd *core.PhpSocketT) int {
 	var elem *types.Zval

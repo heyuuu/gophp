@@ -3300,7 +3300,12 @@ var DefZifStreamGetTransports = def.DefFunc("stream_get_transports", 0, 0, []def
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifStreamGetTransports(executeData, returnValue)
+	ret, ok := ZifStreamGetTransports()
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStreamGetWrappers
@@ -3308,7 +3313,12 @@ var DefZifStreamGetWrappers = def.DefFunc("stream_get_wrappers", 0, 0, []def.Arg
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifStreamGetWrappers(executeData, returnValue)
+	ret, ok := ZifStreamGetWrappers()
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStreamSelect

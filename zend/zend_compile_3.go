@@ -402,7 +402,7 @@ func (compiler *Compiler) CompileFuncDefined(result *Znode, args *ZendAstList) i
 	}
 	opline = ZendEmitOpTmp(result, ZEND_DEFINED, nil, nil)
 	opline.SetOp1Type(IS_CONST)
-	LITERAL_STR(opline.GetOp1(), name)
+	LITERAL_STR(opline.GetOp1(), name.GetStr())
 	opline.SetExtendedValue(ZendAllocCacheSlot())
 
 	/* Lowercase constant name in a separate literal */
@@ -452,7 +452,7 @@ func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 	opline.SetExtendedValue(num_args)
 	opline.GetOp1().SetNum(ZendVmCalcUsedStack(num_args, fbc))
 	opline.SetOp2Type(IS_CONST)
-	LITERAL_STR(opline.GetOp2(), lcname)
+	LITERAL_STR(opline.GetOp2(), lcname.GetStr())
 	opline.GetResult().SetNum(ZendAllocCacheSlot())
 	return types.SUCCESS
 }
@@ -465,7 +465,7 @@ func (compiler *Compiler) CompileInitUserFunc(name_ast *ZendAst, num_args uint32
 	compiler.CompileExpr(&name_node, name_ast)
 	opline = ZendEmitOp(nil, ZEND_INIT_USER_CALL, nil, &name_node)
 	opline.SetOp1Type(IS_CONST)
-	LITERAL_STR(opline.GetOp1(), orig_func_name.Copy())
+	LITERAL_STR(opline.GetOp1(), orig_func_name.GetStr())
 	opline.SetExtendedValue(num_args)
 }
 func (compiler *Compiler) CompileFuncCufa(result *Znode, args *ZendAstList, lcname *types.String) int {

@@ -108,9 +108,9 @@ func ZendUnregisterIniEntries(module_number int) {
 	})
 }
 func ZendAlterIniEntryChars(name string, value string, modify_type int, stage int) bool {
-	return ZendAlterIniEntryEx(types.NewString(name).GetStr(), types.NewString(value), modify_type, stage, 0)
+	return ZendAlterIniEntryEx(name, value, modify_type, stage, 0)
 }
-func ZendAlterIniEntryEx(name string, new_value *types.String, modify_type int, stage int, force_change int) bool {
+func ZendAlterIniEntryEx(name string, new_value string, modify_type int, stage int, force_change int) bool {
 	var duplicate *types.String
 	var modifiable uint8
 	var modified bool
@@ -126,26 +126,22 @@ func ZendAlterIniEntryEx(name string, new_value *types.String, modify_type int, 
 	}
 	if force_change == 0 {
 		if (ini_entry.GetModifiable() & modify_type) == 0 {
-			return types.FAILURE
+			return false
 		}
 	}
 	if EG__().ModifiedIniDirectives() == nil {
 		EG__().InitModifiedIniDirectives()
 	}
-	if modified == 0 {
+	if !modified {
 		ini_entry.SetOrigValue(ini_entry.GetValue())
 		ini_entry.SetOrigModifiable(modifiable)
 		ini_entry.SetModified(1)
 		EG__().ModifiedIniDirectives().Add(ini_entry.GetName().GetStr(), ini_entry)
 	}
-	duplicate = new_value.Copy()
+	duplicate = types.NewString(new_value)
 	if ini_entry.EmitOnModify(duplicate, stage) {
-		if modified != 0 && ini_entry.GetOrigValue() != ini_entry.GetValue() {
-			// types.ZendStringRelease(ini_entry.GetValue())
-		}
 		ini_entry.SetValue(duplicate)
 	} else {
-		// types.ZendStringRelease(duplicate)
 		return false
 	}
 	return true

@@ -108,7 +108,7 @@ func main(argc int, argv []*byte) int {
 					memcpy(CgiModule.GetIniEntries()+ini_entries_len, val, len_-(val-PhpOptarg))
 					ini_entries_len += len_ - (val - PhpOptarg)
 					memcpy(CgiModule.GetIniEntries()+ini_entries_len, "\"\n0", b.SizeOf("\"\\\"\\n\\0\""))
-					ini_entries_len += b.SizeOf("\"\\n\\0\\\`"`) - 2
+					ini_entries_len += b.SizeOf("\"\\n\\0\\\"\"") - 2
 				} else {
 					CgiModule.SetIniEntries(realloc(CgiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\n\\0\"")))
 					memcpy(CgiModule.GetIniEntries()+ini_entries_len, PhpOptarg, len_)

@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -550,7 +551,7 @@ func (compiler *Compiler) CompileParams(ast *ZendAst, return_type_ast *ZendAst) 
 		}
 		arg_info = &arg_infos[i]
 		*arg_info = MakeZendArgInfo(
-			name.Copy(),
+			types.NewString(name.GetStr()),
 			/* TODO: Keep compatibility, but may be better reset "allow_null" ??? */
 			types.TypeHintCode(0, 1),
 			is_ref,

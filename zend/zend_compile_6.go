@@ -354,12 +354,12 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 		opline = ZendEmitOpTmp(result, ZEND_DECLARE_LAMBDA_FUNCTION, nil, nil)
 		opline.SetExtendedValue(ZendAllocCacheSlot())
 		opline.SetOp1Type(IS_CONST)
-		LITERAL_STR(opline.GetOp1(), key)
+		LITERAL_STR(opline.GetOp1(), key.GetStr())
 	} else {
 		opline = GetNextOp()
 		opline.SetOpcode(ZEND_DECLARE_FUNCTION)
 		opline.SetOp1Type(IS_CONST)
-		LITERAL_STR(opline.GetOp1(), lcname.Copy())
+		LITERAL_STR(opline.GetOp1(), lcname.GetStr())
 
 		/* RTD key is placed after lcname literal in op1 */
 
@@ -478,7 +478,7 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 		var value_ast *ZendAst = prop_ast.Child(1)
 		var doc_comment_ast *ZendAst = prop_ast.Children()[2]
 		var name *types.String = name_ast.Val().StringEx()
-		var doc_comment *types.String = nil
+		var doc_comment string
 		var value_zv types.Zval
 		var type_ types.TypeHint = 0
 		if type_ast != nil {
@@ -491,7 +491,7 @@ func (compiler *Compiler) CompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags
 		/* Doc comment has been appended as last element in ZEND_AST_PROP_ELEM ast */
 
 		if doc_comment_ast != nil {
-			doc_comment = ZendAstGetStr(doc_comment_ast).Copy()
+			doc_comment = ZendAstGetStr(doc_comment_ast).GetStr()
 		}
 		if (flags & types.AccFinal) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, fmt.Sprintf("Cannot declare property %s::$%s final, the final modifier is allowed only for methods and classes", ce.Name(), name.GetVal()))
@@ -550,8 +550,12 @@ func (compiler *Compiler) CompileClassConstDecl(ast *ZendAst) {
 		var value_ast *ZendAst = const_ast.Child(1)
 		var doc_comment_ast *ZendAst = const_ast.Children()[2]
 		var name *types.String = name_ast.Val().StringEx()
-		var doc_comment *types.String = lang.CondF1(doc_comment_ast != nil, func() *types.String { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
+		var doc_comment string
 		var value_zv types.Zval
+
+		if doc_comment_ast != nil {
+			doc_comment = ZendAstGetStr(doc_comment_ast).GetStr()
+		}
 		if (ast.Attr() & (types.AccStatic | types.AccAbstract | types.AccFinal)) != 0 {
 			if (ast.Attr() & types.AccStatic) != 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use 'static' as constant modifier")
@@ -836,13 +840,12 @@ func (compiler *Compiler) CompileClassDecl(ast *ZendAst, toplevel bool) *types.Z
 	if ce.HasParent() {
 
 		/* Lowercased parent name */
-
-		var lc_parent_name *types.String = types.NewString(ascii.StrToLower(ce.ParentName()))
+		var lc_parent_name string = ascii.StrToLower(ce.ParentName())
 		opline.SetOp2Type(IS_CONST)
 		LITERAL_STR(opline.GetOp2(), lc_parent_name)
 	}
 	opline.SetOp1Type(IS_CONST)
-	LITERAL_STR(opline.GetOp1(), lcname)
+	LITERAL_STR(opline.GetOp1(), lcname.GetStr())
 	if decl.IsAnonClass() {
 		opline.SetOpcode(ZEND_DECLARE_ANON_CLASS)
 		opline.SetExtendedValue(ZendAllocCacheSlot())

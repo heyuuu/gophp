@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
@@ -544,12 +545,12 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 		}
 		if format == 0 {
 		no_name_header:
-			zend.AddNextIndexStr(return_value, hdr.StringEx().Copy())
+			return_value.Array().Append(types.NewZvalString(hdr.String()))
 		} else {
 			var c byte
 			var s *byte
 			var p *byte
-			if lang.Assign(&p, strchr(hdr.StringEx().GetVal(), ':')) {
+			if lang.Assign(&p, strchr(hdr.String(), ':')) {
 				c = *p
 				*p = '0'
 				s = p + 1

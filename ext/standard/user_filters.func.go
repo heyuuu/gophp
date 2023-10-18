@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
@@ -469,7 +470,7 @@ func ZifStreamGetFilters(executeData zpp.Ex, return_value zpp.Ret) {
 
 			filter_name = _p.GetKey()
 			if filter_name != nil {
-				zend.AddNextIndexStr(return_value, filter_name.Copy())
+				return_value.Array().Append(types.NewZvalString(filter_name.GetStr()))
 			}
 		}
 	}
