@@ -41,7 +41,7 @@ func ZifFtok(executeData zpp.Ex, return_value zpp.Ret, pathname *types.Zval, pro
 	}
 	k = ftok(pathname, proj[0])
 	if k == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "ftok() failed - %s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("ftok() failed - %s", strerror(errno)))
 	}
 	return_value.SetLong(k)
 	return

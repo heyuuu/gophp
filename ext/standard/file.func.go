@@ -367,7 +367,7 @@ func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		return
 	}
 	if offset != 0 && core.PhpStreamSeek(stream, offset, lang.Cond(offset > 0, r.SEEK_SET, r.SEEK_END)) < 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Failed to seek to position %d in the stream", offset)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Failed to seek to position %d in the stream", offset))
 		core.PhpStreamClose(stream)
 		return_value.SetFalse()
 		return
@@ -446,7 +446,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 			numbytes = -1
 		} else {
 			if len_ > zend.ZEND_LONG_MAX {
-				core.PhpErrorDocref("", faults.E_WARNING, "content truncated from %zu to %d bytes", len_, zend.ZEND_LONG_MAX)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("content truncated from %zu to %d bytes", len_, zend.ZEND_LONG_MAX))
 				len_ = zend.ZEND_LONG_MAX
 			}
 			numbytes = len_
@@ -466,7 +466,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		if data.StringEx().GetLen() != 0 {
 			numbytes = core.PhpStreamWrite(stream, data.StringEx().GetVal(), data.StringEx().GetLen())
 			if numbytes != data.StringEx().GetLen() {
-				core.PhpErrorDocref("", faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.StringEx().GetLen())
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.StringEx().GetLen()))
 				numbytes = -1
 			}
 		}
@@ -478,7 +478,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 					numbytes += len(s)
 					bytesWritten := core.PhpStreamWriteString(stream, s)
 					if bytesWritten != len(s) {
-						core.PhpErrorDocref("", faults.E_WARNING, "Failed to write %zd bytes to %s", len(s), filename)
+						core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Failed to write %zd bytes to %s", len(s), filename))
 						numbytes = -1
 						return false
 					}
@@ -491,7 +491,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 			if s, ok := zend.StdCastObjectToString(data); ok {
 				numbytes = core.PhpStreamWriteString(stream, s)
 				if numbytes != len(s) {
-					core.PhpErrorDocref("", faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, len(s))
+					core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Only %zd of %zd bytes written, possibly out of free disk space", numbytes, len(s)))
 					numbytes = -1
 				}
 
@@ -544,7 +544,7 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 		break
 	}
 	if flags < 0 || flags > (PHP_FILE_USE_INCLUDE_PATH|PHP_FILE_IGNORE_NEW_LINES|PHP_FILE_SKIP_EMPTY_LINES|PHP_FILE_NO_DEFAULT_CONTEXT) {
-		core.PhpErrorDocref("", faults.E_WARNING, "'%d' flag is not supported", flags)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("'%d' flag is not supported", flags))
 		return_value.SetFalse()
 		return
 	}
@@ -714,7 +714,7 @@ func ZifFclose(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	}
 	PHP_STREAM_TO_ZVAL(stream, res)
 	if stream.HasFlags(core.PHP_STREAM_FLAG_NO_FCLOSE) {
-		core.PhpErrorDocref("", faults.E_WARNING, "%d is not a valid stream resource", stream.GetRes().GetHandle())
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%d is not a valid stream resource", stream.GetRes().GetHandle()))
 		return_value.SetFalse()
 		return
 	}
@@ -749,14 +749,14 @@ func ZifPopen(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, mod
 	}
 	fp = zend.VCWD_POPEN(command, posix_mode)
 	if fp == nil {
-		core.PhpErrorDocref2("", command, posix_mode, faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref2("", command, posix_mode, faults.E_WARNING, strerror(errno))
 		zend.Efree(posix_mode)
 		return_value.SetFalse()
 		return
 	}
 	stream = streams.PhpStreamFopenFromPipe(fp, mode)
 	if stream == nil {
-		core.PhpErrorDocref2("", command, mode, faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref2("", command, mode, faults.E_WARNING, strerror(errno))
 		return_value.SetFalse()
 	} else {
 		core.PhpStreamToZval(stream, return_value)
@@ -1091,7 +1091,7 @@ func PhpMkdirEx(dir *byte, mode zend.ZendLong, options int) int {
 		return -1
 	}
 	if lang.Assign(&ret, zend.VCWD_MKDIR(dir, mode_t(mode))) < 0 && (options&core.REPORT_ERRORS) != 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 	}
 	return ret
 }
@@ -1261,7 +1261,7 @@ func ZifRename(executeData zpp.Ex, return_value zpp.Ret, oldName *types.Zval, ne
 		return
 	}
 	if wrapper.GetWops().GetRename() == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s wrapper does not support renaming", lang.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Source"))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s wrapper does not support renaming", lang.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Source")))
 		return_value.SetFalse()
 		return
 	}
@@ -1302,7 +1302,7 @@ func ZifUnlink(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _
 		return
 	}
 	if wrapper.GetWops().GetUnlink() == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s does not allow unlinking", lang.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Wrapper"))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s does not allow unlinking", lang.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Wrapper")))
 		return_value.SetFalse()
 		return
 	}
@@ -2282,12 +2282,12 @@ func ZifFnmatch(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, f
 		break
 	}
 	if filename_len >= core.MAXPATHLEN {
-		core.PhpErrorDocref("", faults.E_WARNING, "Filename exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Filename exceeds the maximum allowed length of %d characters", core.MAXPATHLEN))
 		return_value.SetFalse()
 		return
 	}
 	if pattern_len >= core.MAXPATHLEN {
-		core.PhpErrorDocref("", faults.E_WARNING, "Pattern exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Pattern exceeds the maximum allowed length of %d characters", core.MAXPATHLEN))
 		return_value.SetFalse()
 		return
 	}

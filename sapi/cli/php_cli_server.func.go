@@ -4,7 +4,6 @@ import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -271,7 +270,7 @@ func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 		}
 	})
 }
-func SapiCliServerLogWrite(type_ int, msg *byte) {
+func SapiCliServerLogWrite(type_ int, msg string) {
 	var buf []byte
 	if PhpCliServerLogLevel < type_ {
 		return
@@ -452,9 +451,7 @@ func PhpCliServerContentSenderPull(sender *PhpCliServerContentSender, fd int, nb
 	_nbytes_read = read(fd, chunk.GetDataHeapP(), chunk.GetDataHeapLen())
 	if _nbytes_read < 0 {
 		if PhpCliServerLogLevel >= PHP_CLI_SERVER_LOG_ERROR {
-			var errstr *byte = GetLastError()
-			PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "%s", errstr)
-			zend.Pefree(errstr)
+			SapiCliServerLogWrite(PHP_CLI_SERVER_LOG_ERROR, GetLastError())
 		}
 		PhpCliServerChunkDtor(chunk)
 		zend.Pefree(chunk)
@@ -527,9 +524,9 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 		}
 	}
 	if color != 0 {
-		PhpCliServerLogf(PHP_CLI_SERVER_LOG_MESSAGE, "x1b[3%dm%s%s%sx1b[0m", color, basic_buf, message_buf, error_buf)
+		SapiCliServerLogWrite(PHP_CLI_SERVER_LOG_MESSAGE, fmt.Sprintf("x1b[3%dm%s%s%sx1b[0m", color, basic_buf, message_buf, error_buf))
 	} else {
-		PhpCliServerLogf(PHP_CLI_SERVER_LOG_MESSAGE, "%s%s%s", basic_buf, message_buf, error_buf)
+		SapiCliServerLogWrite(PHP_CLI_SERVER_LOG_MESSAGE, fmt.Sprintf("%s%s%s", basic_buf, message_buf, error_buf))
 	}
 	zend.Efree(basic_buf)
 	if message != nil {
@@ -538,24 +535,6 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 	if append_error_message != 0 {
 		zend.Efree(error_buf)
 	}
-}
-func PhpCliServerLogf(type_ int, format string, args ...any) {
-	var buf *byte = nil
-	//var ap va_list
-	if PhpCliServerLogLevel < type_ {
-		return
-	}
-	//va_start(ap, format)
-	//core.Vspprintf(&buf, 0, format, ap)
-	if buf != nil {
-		buf = pfmt.Sprintf(format, args...)
-	}
-	//va_end(ap)
-	if buf == nil {
-		return
-	}
-	SapiCliServerLogWrite(type_, buf)
-	zend.Efree(buf)
 }
 func PhpNetworkListenSocket(host *byte, port *int, socktype int, af *int, socklen *socklen_t, errstr **types.String) core.PhpSocketT {
 	var retval core.PhpSocketT = core.SOCK_ERR
@@ -764,7 +743,7 @@ func PhpCliServerClientDtor(client *PhpCliServerClient) {
 	}
 }
 func PhpCliServerCloseConnection(server *PhpCliServer, client *PhpCliServerClient) {
-	PhpCliServerLogf(PHP_CLI_SERVER_LOG_MESSAGE, "%s Closing", client.GetAddrStr())
+	SapiCliServerLogWrite(PHP_CLI_SERVER_LOG_MESSAGE, fmt.Sprintf("%s Closing", client.GetAddrStr()))
 	server.DelClient(client.GetSock())
 }
 func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient, status int) int {
@@ -1119,10 +1098,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, r
 
 	server_sock = PhpNetworkListenSocket(host, &port, SOCK_STREAM, server.GetAddressFamily(), server.GetSocklen(), &errstr)
 	if server_sock == core.SOCK_ERR {
-		PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "Failed to listen on %s:%d (reason: %s)", host, port, lang.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "?"))
-		if errstr != nil {
-			// types.ZendStringReleaseEx(errstr, 0)
-		}
+		SapiCliServerLogWrite(PHP_CLI_SERVER_LOG_ERROR, fmt.Sprintf("Failed to listen on %s:%d (reason: %s)", host, port, lang.CondF1(errstr != nil, func() string { return errstr.GetStr() }, "?")))
 		retval = types.FAILURE
 		goto out
 	}
@@ -1227,7 +1203,7 @@ func DoCliServer(optArgs core.OptArgs) int {
 		return 1
 	}
 	core.SM__().SetPhpinfoAsText(0)
-	PhpCliServerLogf(PHP_CLI_SERVER_LOG_PROCESS, "PHP %s Development Server (http://%s) started", core.PHP_VERSION, server_bind_address)
+	SapiCliServerLogWrite(PHP_CLI_SERVER_LOG_PROCESS, fmt.Sprintf("PHP %s Development Server (http://%s) started", core.PHP_VERSION, server_bind_address))
 	zend.ZendSignalInit()
 
 	err := Server.Serve()

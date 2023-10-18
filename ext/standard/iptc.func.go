@@ -132,7 +132,7 @@ func ZifIptcembed(iptcData string, filename zpp.Path, _ zpp.Opt, spool int) *typ
 		return types.NewZvalFalse()
 	}
 	if fp = zend.VCWD_FOPEN(filename, "rb"); fp == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, "Unable to open %s", filename)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to open %s", filename))
 		return types.NewZvalFalse()
 	}
 	defer func() { fp.Close() }()

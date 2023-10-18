@@ -182,12 +182,12 @@ func PhpOutputStackPop(flags int) int {
 	var orphan *PhpOutputHandler = OG__().Active()
 	if orphan == nil {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
-			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer. No buffer to %s", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"))
+			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, fmt.Sprintf("failed to %s buffer. No buffer to %s", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send")))
 		}
 		return 0
 	} else if (flags&PHP_OUTPUT_POP_FORCE) == 0 && !orphan.IsRemovable() {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
-			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer of %s (%d)", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.GetName(), orphan.GetLevel())
+			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, fmt.Sprintf("failed to %s buffer of %s (%d)", lang.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.GetName(), orphan.GetLevel()))
 		}
 		return 0
 	} else {
@@ -243,7 +243,7 @@ func ZifObFlush() bool {
 		return false
 	}
 	if !OG__().Flush() {
-		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to flush buffer of %s (%d)", OG__().Active().GetName(), OG__().Active().GetLevel())
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, fmt.Sprintf("failed to flush buffer of %s (%d)", OG__().Active().GetName(), OG__().Active().GetLevel()))
 		return false
 	}
 	return true
@@ -254,7 +254,7 @@ func ZifObClean() bool {
 		return false
 	}
 	if !OG__().Clean() {
-		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG__().active.name.GetVal(), OG__().active.level)
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, fmt.Sprintf("failed to delete buffer of %s (%d)", OG__().active.name.GetVal(), OG__().active.level))
 		return false
 	}
 	return true
@@ -280,7 +280,7 @@ func ZifObGetFlush() (string, bool) {
 		return "", false
 	}
 	if !PhpOutputEnd() {
-		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG__().Active().GetName(), OG__().Active().GetLevel())
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, fmt.Sprintf("failed to delete buffer of %s (%d)", OG__().Active().GetName(), OG__().Active().GetLevel()))
 	}
 	return contents, true
 }
@@ -295,7 +295,7 @@ func ZifObGetClean() (string, bool) {
 		return "", false
 	}
 	if !PhpOutputDiscard() {
-		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG__().Active().GetName(), OG__().Active().GetLevel())
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, fmt.Sprintf("failed to delete buffer of %s (%d)", OG__().Active().GetName(), OG__().Active().GetLevel()))
 	}
 	return contents, true
 }

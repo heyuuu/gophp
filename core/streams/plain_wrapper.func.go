@@ -184,7 +184,7 @@ func PhpStdiopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 				/* TODO: Should this be treated as a proper error or not? */
 
 			}
-			core.PhpErrorDocref("", faults.E_NOTICE, "write of %zu bytes failed with errno=%d %s", count, errno, strerror(errno))
+			core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf("write of %zu bytes failed with errno=%d %s", count, errno, strerror(errno)))
 		}
 		return bytes_written
 	} else {
@@ -230,7 +230,7 @@ func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 			} else if errno == EINTR {
 
 			} else {
-				core.PhpErrorDocref("", faults.E_NOTICE, "read of %zu bytes failed with errno=%d %s", count, errno, strerror(errno))
+				core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf("read of %zu bytes failed with errno=%d %s", count, errno, strerror(errno)))
 
 				/* TODO: Remove this special-case? */
 
@@ -707,7 +707,7 @@ func PhpPlainFilesUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int,
 	ret = zend.VCWD_UNLINK(url)
 	if ret == -1 {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref1("", url, faults.E_WARNING, "%s", strerror(errno))
+			core.PhpErrorDocref1("", url, faults.E_WARNING, strerror(errno))
 		}
 		return 0
 	}
@@ -732,7 +732,7 @@ func PhpPlainFilesRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to 
 		return 0
 	}
 	if err := os.Rename(url_from, url_to); err != nil {
-		core.PhpErrorDocref2("", url_from, url_to, faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref2("", url_from, url_to, faults.E_WARNING, strerror(errno))
 		return 0
 	}
 
@@ -811,7 +811,7 @@ func PhpPlainFilesMkdir(wrapper *core.PhpStreamWrapper, dir *byte, mode int, opt
 					*p = zend.DEFAULT_SLASH
 					if (*(p + 1)) != '0' && lang.Assign(&ret, zend.VCWD_MKDIR(buf, mode_t(mode))) < 0 {
 						if (options & core.REPORT_ERRORS) != 0 {
-							core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+							core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 						}
 						break
 					}
@@ -848,7 +848,7 @@ func PhpPlainFilesRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 		return 0
 	}
 	if zend.VCWD_RMDIR(url) < 0 {
-		core.PhpErrorDocref1("", url, faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref1("", url, faults.E_WARNING, strerror(errno))
 		return 0
 	}
 
@@ -875,7 +875,7 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 		if zend.VCWD_ACCESS(url, F_OK) != 0 {
 			var file *r.File = zend.VCWD_FOPEN(url, "w")
 			if file == nil {
-				core.PhpErrorDocref1("", url, faults.E_WARNING, "Unable to create file %s because %s", url, strerror(errno))
+				core.PhpErrorDocref1("", url, faults.E_WARNING, fmt.Sprintf("Unable to create file %s because %s", url, strerror(errno)))
 				return 0
 			}
 			file.Close()
@@ -886,7 +886,7 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 	case core.PHP_STREAM_META_OWNER:
 		if option == core.PHP_STREAM_META_OWNER_NAME {
 			if PhpGetUidByName((*byte)(value), &uid) != types.SUCCESS {
-				core.PhpErrorDocref1("", url, faults.E_WARNING, "Unable to find uid for %s", (*byte)(value))
+				core.PhpErrorDocref1("", url, faults.E_WARNING, fmt.Sprintf("Unable to find uid for %s", (*byte)(value)))
 				return 0
 			}
 		} else {
@@ -898,7 +898,7 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 	case core.PHP_STREAM_META_GROUP_NAME:
 		if option == core.PHP_STREAM_META_GROUP_NAME {
 			if PhpGetGidByName((*byte)(value), &gid) != types.SUCCESS {
-				core.PhpErrorDocref1("", url, faults.E_WARNING, "Unable to find gid for %s", (*byte)(value))
+				core.PhpErrorDocref1("", url, faults.E_WARNING, fmt.Sprintf("Unable to find gid for %s", (*byte)(value)))
 				return 0
 			}
 		} else {
@@ -909,11 +909,11 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 		mode = mode_t * (*zend.ZendLong)(value)
 		ret = zend.VCWD_CHMOD(url, mode)
 	default:
-		core.PhpErrorDocref1("", url, faults.E_WARNING, "Unknown option %d for stream_metadata", option)
+		core.PhpErrorDocref1("", url, faults.E_WARNING, fmt.Sprintf("Unknown option %d for stream_metadata", option))
 		return 0
 	}
 	if ret == -1 {
-		core.PhpErrorDocref1("", url, faults.E_WARNING, "Operation failed: %s", strerror(errno))
+		core.PhpErrorDocref1("", url, faults.E_WARNING, fmt.Sprintf("Operation failed: %s", strerror(errno)))
 		return 0
 	}
 	standard.PhpClearStatCache(0, nil, 0)

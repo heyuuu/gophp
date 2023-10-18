@@ -32,7 +32,7 @@ func ZifReadlink(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval)
 	}
 	ret = zend.PhpSysReadlink(link, buff, core.MAXPATHLEN-1)
 	if ret == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		return_value.SetFalse()
 		return
 	}
@@ -54,7 +54,7 @@ func ZifLinkinfo(return_value zpp.Ret, filename zpp.Path) (int, bool) {
 	}
 	ret = zend.VCWD_LSTAT(filename, &sb)
 	if ret == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		return_value.SetLong(int64(-1))
 		return -1, true
 	}
@@ -97,7 +97,7 @@ func ZifSymlink(target zpp.Path, link zpp.Path) bool {
 
 	ret = zend.PhpSysSymlink(topath, source_p)
 	if ret == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		return false
 	}
 	return true
@@ -142,7 +142,7 @@ func ZifLink(executeData zpp.Ex, return_value zpp.Ret, target *types.Zval, link 
 	}
 	ret = zend.PhpSysLink(topath, frompath)
 	if ret == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		return_value.SetFalse()
 		return
 	}

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend"
 )
@@ -136,7 +137,7 @@ func (this *BaseSapiModule) InputFilter(arg int, name string, value string) stri
 }
 
 func (this *BaseSapiModule) SapiError(type_ int, error_msg string, args ...any) {
-	PhpError(type_, error_msg, args...)
+	PhpError(type_, pfmt.Sprintf(error_msg, args...))
 }
 
 func (this *BaseSapiModule) InputFilterInit() {

@@ -512,7 +512,7 @@ func rangeDouble(zLow *types.Zval, zHigh *types.Zval, step float64) ([]*types.Zv
 	low := operators.ZvalGetDouble(zLow)
 	high := operators.ZvalGetDouble(zHigh)
 	if core.ZendIsInf(high) || core.ZendIsInf(low) {
-		core.PhpErrorDocref("", faults.E_WARNING, "Invalid range supplied: start=%0.0f end=%0.0f", low, high)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Invalid range supplied: start=%0.0f end=%0.0f", low, high))
 		return nil, false
 	}
 	if low > high {
@@ -525,7 +525,7 @@ func rangeDouble(zLow *types.Zval, zHigh *types.Zval, step float64) ([]*types.Zv
 
 	size := (high-low)/step + 1
 	if size >= float64(types.MaxArraySize) {
-		core.PhpErrorDocref("", faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", low, high)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", low, high))
 		return nil, false
 	}
 
@@ -554,7 +554,7 @@ func rangeLong(zLow *types.Zval, zHigh *types.Zval, step int) ([]*types.Zval, bo
 
 	size := (high-low)/step + 1
 	if size >= types.MaxArraySize {
-		core.PhpErrorDocref("", faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%d end=%d", low, high)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("The supplied range exceeds the maximum array size: start=%d end=%d", low, high))
 		return nil, false
 	}
 
@@ -976,7 +976,7 @@ func arrayMergeWrapper(args []*types.Zval, recursive bool) *types.Array {
 	count := 0
 	for i, arg := range args {
 		if !arg.IsArray() {
-			core.PhpErrorDocref("", faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(arg))
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Expected parameter %d to be an array, %s given", i+1, types.ZendZvalTypeName(arg)))
 			return nil
 		}
 		count += arg.Array().Len()
@@ -1153,7 +1153,7 @@ func ArrayColumnParamHelper(param *types.Zval, name string) bool {
 	case types.IsString:
 		return 1
 	default:
-		core.PhpErrorDocref("", faults.E_WARNING, "The %s key should be either a string or an integer", name)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("The %s key should be either a string or an integer", name))
 		return 0
 	}
 }
@@ -1558,7 +1558,7 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 					}
 					parseState[MULTISORT_ORDER] = 0
 				} else {
-					core.PhpErrorDocref("", faults.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
+					core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1))
 					return false
 				}
 			case PHP_SORT_REGULAR:
@@ -1576,15 +1576,15 @@ func ZifArrayMultisort(args []*types.Zval) bool {
 					sortType = arg.Long()
 					parseState[MULTISORT_TYPE] = 0
 				} else {
-					core.PhpErrorDocref("", faults.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
+					core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1))
 					return false
 				}
 			default:
-				core.PhpErrorDocref("", faults.E_WARNING, "Argument #%d is an unknown sort flag", i+1)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Argument #%d is an unknown sort flag", i+1))
 				return false
 			}
 		} else {
-			core.PhpErrorDocref("", faults.E_WARNING, "Argument #%d is expected to be an array or a sort flag", i+1)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Argument #%d is expected to be an array or a sort flag", i+1))
 			return false
 		}
 	}

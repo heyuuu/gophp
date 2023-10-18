@@ -28,7 +28,7 @@ func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
 	case 'K':
 
 	default:
-		core.PhpErrorDocref("", faults.E_WARNING, "Unknown source charset: %c", from)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unknown source charset: %c", from))
 	}
 	switch toupper(int(uint8(to))) {
 	case 'W':
@@ -44,7 +44,7 @@ func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
 	case 'K':
 
 	default:
-		core.PhpErrorDocref("", faults.E_WARNING, "Unknown destination charset: %c", to)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unknown destination charset: %c", to))
 	}
 	if str == nil {
 		return (*byte)(str)

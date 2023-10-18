@@ -673,7 +673,7 @@ func Rfc1867PostHandler(contentTypeDup string, arg *types.Zval) {
 					SafePhpRegisterVariable(param, value, new_val_len, array_ptr, 0)
 				} else {
 					if count == PG__().max_input_vars+1 {
-						PhpErrorDocref("", faults.E_WARNING, "Input variables exceeded %d. To increase the limit change max_input_vars in php.ini.", PG__().max_input_vars)
+						PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Input variables exceeded %d. To increase the limit change max_input_vars in php.ini.", PG__().max_input_vars))
 					}
 					if PhpRfc1867Callback != nil {
 						var event_formdata MultipartEventFormdata

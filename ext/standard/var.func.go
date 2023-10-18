@@ -618,7 +618,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 	}
 	if PhpVarUnserialize(retval, &p, p+buf_len, &var_hash) == 0 {
 		if zend.EG__().NoException() {
-			core.PhpErrorDocref("", faults.E_NOTICE, "Error at offset %d of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
+			core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf("Error at offset %d of %zd bytes", zend_long((*byte)(p-buf)), buf_len))
 		}
 		if BG__().unserialize.level <= 1 {
 			// zend.ZvalPtrDtor(return_value)

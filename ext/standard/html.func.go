@@ -405,7 +405,7 @@ det_charset:
 		/* look for the codeset */
 		charset, found = GetCharset(b.CastStr(charset_hint, len_))
 		if !found {
-			core.PhpErrorDocref("", faults.E_WARNING, "charset `%s' not supported, assuming utf-8", charset_hint)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("charset `%s' not supported, assuming utf-8", charset_hint))
 		}
 	}
 	return charset

@@ -2253,7 +2253,7 @@ func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*type
 		}
 		return types.NewZvalArray(arr), true
 	default:
-		core.PhpErrorDocref("", faults.E_WARNING, "Invalid format value %d", format)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Invalid format value %d", format))
 		return nil, false
 	}
 }

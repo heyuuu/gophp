@@ -144,7 +144,7 @@ func O_phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int)
 		/* these names depend on the values of the PHP_STREAM_AS_XXX defines in php_streams.h */
 
 		var cast_names []*byte = []*byte{"STDIO FILE*", "File Descriptor", "Socket Descriptor", "select()able descriptor"}
-		core.PhpErrorDocref("", faults.E_WARNING, "cannot represent a stream of type %s as a %s", stream.GetOps().GetLabel(), cast_names[castas])
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("cannot represent a stream of type %s as a %s", stream.GetOps().GetLabel(), cast_names[castas]))
 	}
 	return types.FAILURE
 exit_success:
@@ -154,7 +154,7 @@ exit_success:
 		 * will be accessing the stream.  Emit a warning so that the end-user will
 		 * know that they should try something else */
 
-		core.PhpErrorDocref("", faults.E_WARNING, "%d bytes of buffered data lost during stream conversion!", zend_long(stream.GetWritepos()-stream.GetReadpos()))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%d bytes of buffered data lost during stream conversion!", zend_long(stream.GetWritepos()-stream.GetReadpos())))
 
 		/* the data we have buffered will be lost to the third party library that
 		 * will be accessing the stream.  Emit a warning so that the end-user will

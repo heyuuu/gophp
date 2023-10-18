@@ -289,11 +289,11 @@ func ZifBaseConvert(number *types.Zval, frombase int, tobase int) (string, bool)
 		return "", false
 	}
 	if frombase < 2 || frombase > 36 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Invalid `from base' (%d)", frombase)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Invalid `from base' (%d)", frombase))
 		return "", false
 	}
 	if tobase < 2 || tobase > 36 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Invalid `to base' (%d)", tobase)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Invalid `to base' (%d)", tobase))
 		return "", false
 	}
 

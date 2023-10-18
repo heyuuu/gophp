@@ -247,7 +247,7 @@ func PhpCheckOpenBasedirEx(path *byte, warn int) int {
 		 * message. */
 
 		if strlen(path) > MAXPATHLEN-1 {
-			PhpErrorDocref("", faults.E_WARNING, "File name is longer than the maximum allowed path length on this platform (%d): %s", MAXPATHLEN, path)
+			PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("File name is longer than the maximum allowed path length on this platform (%d): %s", MAXPATHLEN, path))
 			errno = EINVAL
 			return -1
 		}
@@ -266,7 +266,7 @@ func PhpCheckOpenBasedirEx(path *byte, warn int) int {
 			ptr = end
 		}
 		if warn != 0 {
-			PhpErrorDocref("", faults.E_WARNING, "open_basedir restriction in effect. File(%s) is not within the allowed path(s): (%s)", path, PG__().open_basedir)
+			PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("open_basedir restriction in effect. File(%s) is not within the allowed path(s): (%s)", path, PG__().open_basedir))
 		}
 		zend.Efree(pathbuf)
 		errno = EPERM
@@ -525,7 +525,7 @@ func PhpFopenWithPath(filename string, mode string, path string, openedPath **ty
 		trypath := onePath + "/" + filename
 		if len(trypath) >= MAXPATHLEN {
 			trypath = trypath[:MAXPATHLEN]
-			PhpErrorDocref("", faults.E_NOTICE, "%s/%s path was truncated to %d", onePath, filename, MAXPATHLEN)
+			PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf("%s/%s path was truncated to %d", onePath, filename, MAXPATHLEN))
 		}
 		fp = PhpFopenAndSetOpenedPath(trypath, mode, openedPath)
 		if fp != nil {

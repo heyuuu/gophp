@@ -27,7 +27,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 	var bufl int = 0
 	fp = zend.VCWD_POPEN(cmd, "r")
 	if fp == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, "Unable to fork [%s]", cmd)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to fork [%s]", cmd))
 		goto err
 	}
 	stream = streams.PhpStreamFopenFromPipe(fp, "rb")
@@ -191,7 +191,7 @@ func ZifPassthru(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, 
 func PhpEscapeShellCmd(str string) string {
 	/* max command line length - two single quotes - \0 byte length */
 	if len(str) > CmdMaxLen-2-1 {
-		core.PhpErrorDocref("", faults.E_ERROR, "Command exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref("", faults.E_ERROR, fmt.Sprintf("Command exceeds the allowed length of %zu bytes", CmdMaxLen))
 		return ""
 	}
 
@@ -229,7 +229,7 @@ func PhpEscapeShellCmd(str string) string {
 		}
 	}
 	if buf.Len() > CmdMaxLen+1 {
-		core.PhpErrorDocref("", faults.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref("", faults.E_ERROR, fmt.Sprintf("Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen))
 		return ""
 	}
 	return buf.String()
@@ -237,7 +237,7 @@ func PhpEscapeShellCmd(str string) string {
 func PhpEscapeShellArg(str string) string {
 	/* max command line length - two single quotes - \0 byte length */
 	if len(str) > CmdMaxLen-2-1 {
-		core.PhpErrorDocref("", faults.E_ERROR, "Argument exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref("", faults.E_ERROR, fmt.Sprintf("Argument exceeds the allowed length of %zu bytes", CmdMaxLen))
 		return ""
 	}
 
@@ -261,7 +261,7 @@ func PhpEscapeShellArg(str string) string {
 	}
 	buf.WriteByte('\'')
 	if buf.Len() > CmdMaxLen+1 {
-		core.PhpErrorDocref("", faults.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref("", faults.E_ERROR, fmt.Sprintf("Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen))
 		return ""
 	}
 	return buf.String()
@@ -310,7 +310,7 @@ func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types.Zval) {
 		return
 	}
 	if lang.Assign(&in, zend.VCWD_POPEN(command, "r")) == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, "Unable to execute '%s'", command)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to execute '%s'", command))
 		return_value.SetFalse()
 		return
 	}

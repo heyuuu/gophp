@@ -2,6 +2,7 @@ package standard
 
 import (
 	"bytes"
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/php/lang"
@@ -76,7 +77,7 @@ func ZifNetGetInterfaces(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	if getifaddrs(&addrs) {
-		core.PhpError(faults.E_WARNING, "getifaddrs() failed %d: %s", errno, strerror(errno))
+		core.PhpError(faults.E_WARNING, fmt.Sprintf("getifaddrs() failed %d: %s", errno, strerror(errno)))
 		return_value.SetFalse()
 		return
 	}

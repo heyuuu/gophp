@@ -163,16 +163,16 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 	} else if ASSERTG(warning) {
 		if description == nil {
 			if myeval != nil {
-				core.PhpErrorDocref("", faults.E_WARNING, `Assertion "%s" failed`, myeval)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf(`Assertion "%s" failed`, myeval))
 			} else {
 				core.PhpErrorDocref("", faults.E_WARNING, "Assertion failed")
 			}
 		} else {
 			var str *types.String = operators.ZvalGetString(description)
 			if myeval != nil {
-				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf(`%s: "%s" failed`, str.GetStr(), myeval))
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf(fmt.Sprintf(`%s: "%s" failed`, str.GetStr(), myeval)))
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, "%s failed", str.GetVal())
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s failed", str.GetVal()))
 			}
 		}
 	}
@@ -286,7 +286,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 		return_value.SetLong(oldint)
 		return
 	default:
-		core.PhpErrorDocref("", faults.E_WARNING, "Unknown value %d", what)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unknown value %d", what))
 	}
 	return_value.SetFalse()
 	return

@@ -31,7 +31,7 @@ func PhpDiskTotalSpace(path *byte, space *float64) int {
 	var bytestotal float64 = 0
 	var buf __struct__statvfs
 	if statvfs(path, &buf) {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		return types.FAILURE
 	}
 	if buf.f_frsize {
@@ -77,7 +77,7 @@ func PhpDiskFreeSpace(path *byte, space *float64) int {
 	var bytesfree float64 = 0
 	var buf __struct__statvfs
 	if statvfs(path, &buf) {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		return types.FAILURE
 	}
 	if buf.f_frsize {
@@ -161,7 +161,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 				option = core.PHP_STREAM_META_GROUP_NAME
 				value = group.StringEx().GetVal()
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(group))
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("parameter 2 should be string or int, %s given", types.ZendZvalTypeName(group)))
 				return_value.SetFalse()
 				return
 			}
@@ -185,12 +185,12 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		gid = gid_t(group.Long())
 	} else if group.IsString() {
 		if PhpGetGidByName(group.StringEx().GetVal(), &gid) != types.SUCCESS {
-			core.PhpErrorDocref("", faults.E_WARNING, "Unable to find gid for %s", group.StringEx().GetVal())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to find gid for %s", group.StringEx().GetVal()))
 			return_value.SetFalse()
 			return
 		}
 	} else {
-		core.PhpErrorDocref("", faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(group))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("parameter 2 should be string or int, %s given", types.ZendZvalTypeName(group)))
 		return_value.SetFalse()
 		return
 	}
@@ -207,7 +207,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		ret = zend.VCWD_CHOWN(filename, -1, gid)
 	}
 	if ret == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		return_value.SetFalse()
 		return
 	}
@@ -259,7 +259,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 				option = core.PHP_STREAM_META_OWNER_NAME
 				value = user.StringEx().GetVal()
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(user))
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("parameter 2 should be string or int, %s given", types.ZendZvalTypeName(user)))
 				return_value.SetFalse()
 				return
 			}
@@ -283,12 +283,12 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		uid = uid_t(user.Long())
 	} else if user.IsString() {
 		if PhpGetUidByName(user.StringEx().GetVal(), &uid) != types.SUCCESS {
-			core.PhpErrorDocref("", faults.E_WARNING, "Unable to find uid for %s", user.StringEx().GetVal())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to find uid for %s", user.StringEx().GetVal()))
 			return_value.SetFalse()
 			return
 		}
 	} else {
-		core.PhpErrorDocref("", faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(user))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("parameter 2 should be string or int, %s given", types.ZendZvalTypeName(user)))
 		return_value.SetFalse()
 		return
 	}
@@ -305,7 +305,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		ret = zend.VCWD_CHOWN(filename, uid, -1)
 	}
 	if ret == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		return_value.SetFalse()
 		return
 	}
@@ -364,7 +364,7 @@ func ZifChmod(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, mo
 	imode = mode_t(mode)
 	ret = zend.VCWD_CHMOD(filename, imode)
 	if ret == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		return_value.SetFalse()
 		return
 	}
@@ -457,7 +457,7 @@ func ZifTouch(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ 
 	if zend.VCWD_ACCESS(filename, F_OK) != 0 {
 		file = zend.VCWD_FOPEN(filename, "w")
 		if file == nil {
-			core.PhpErrorDocref("", faults.E_WARNING, "Unable to create file %s because %s", filename, strerror(errno))
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to create file %s because %s", filename, strerror(errno)))
 			return_value.SetFalse()
 			return
 		}
@@ -465,7 +465,7 @@ func ZifTouch(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ 
 	}
 	ret = zend.VCWD_UTIME(filename, newtime)
 	if ret == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Utime failed: %s", strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Utime failed: %s", strerror(errno)))
 		return_value.SetFalse()
 		return
 	}
@@ -573,7 +573,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 		/* Error Occurred */
 
 		if !(IS_EXISTS_CHECK(type_)) {
-			core.PhpErrorDocref("", faults.E_WARNING, "%sstat failed for %s", lang.Cond(IS_LINK_OPERATION(type_), "L", ""), filename)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%sstat failed for %s", lang.Cond(IS_LINK_OPERATION(type_), "L", ""), filename))
 		}
 		return_value.SetFalse()
 		return
@@ -672,7 +672,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 			return_value.SetString("file")
 			return
 		}
-		core.PhpErrorDocref("", faults.E_NOTICE, "Unknown file type (%d)", ssb.GetSb().st_mode&S_IFMT)
+		core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf("Unknown file type (%d)", ssb.GetSb().st_mode&S_IFMT))
 		return_value.SetString("unknown")
 		return
 	case FS_IS_W:

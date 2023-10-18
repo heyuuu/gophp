@@ -83,14 +83,14 @@ func PhpStreamApplyFilterList(stream *core.PhpStream, filterlist *byte, read_cha
 			if lang.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
 				streams.PhpStreamFilterAppend(stream.GetReadfilters(), temp_filter)
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, "Unable to create filter (%s)", p)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to create filter (%s)", p))
 			}
 		}
 		if write_chain != 0 {
 			if lang.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
 				streams.PhpStreamFilterAppend(stream.GetWritefilters(), temp_filter)
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, "Unable to create filter (%s)", p)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to create filter (%s)", p))
 			}
 		}
 		p = core.PhpStrtokR(nil, "|", &token)

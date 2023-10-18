@@ -24,7 +24,7 @@ func SplFindCeByName(name string, autoload bool) *types.ClassEntry {
 		ce = zend.EG__().ClassTable().Get(name)
 	}
 	if ce == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, "Class %s does not exist%s", name, lang.Cond(autoload, " and could not be loaded", ""))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Class %s does not exist%s", name, lang.Cond(autoload, " and could not be loaded", "")))
 		return nil
 	}
 	return ce

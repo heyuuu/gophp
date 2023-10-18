@@ -84,11 +84,11 @@ func PhpMailBuildHeadersCheckFieldName(key string) bool {
 
 func PhpMailBuildHeadersElem(s *strings.Builder, key string, val string) {
 	if !PhpMailBuildHeadersCheckFieldName(key) {
-		core.PhpErrorDocref("", faults.E_WARNING, "Header field name (%s) contains invalid chars", key)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Header field name (%s) contains invalid chars", key))
 		return
 	}
 	if !PhpMailBuildHeadersCheckFieldValue(val) {
-		core.PhpErrorDocref("", faults.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key, val)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Header field value (%s => %s) contains invalid chars or format", key, val))
 		return
 	}
 	s.WriteString(key)
@@ -99,11 +99,11 @@ func PhpMailBuildHeadersElem(s *strings.Builder, key string, val string) {
 func PhpMailBuildHeadersElems(s *strings.Builder, key string, val *types.Array) {
 	val.Foreach(func(tmpKey types.ArrayKey, tmpVal *types.Zval) {
 		if tmpKey.IsStrKey() {
-			core.PhpErrorDocref("", faults.E_WARNING, "Multiple header key must be numeric index (%s)", tmpKey.StrKey())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Multiple header key must be numeric index (%s)", tmpKey.StrKey()))
 			return
 		}
 		if !tmpVal.IsString() {
-			core.PhpErrorDocref("", faults.E_WARNING, "Multiple header values must be string (%s)", key.GetStr())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Multiple header values must be string (%s)", key.GetStr()))
 			return
 		}
 		PhpMailBuildHeadersElem(s, key, tmpVal.String())
@@ -114,12 +114,12 @@ func PhpMailBuildHeader(s *strings.Builder, key string, val *types.Zval, check b
 		PhpMailBuildHeadersElem(s, key, val.String())
 	} else if val.IsType(types.IsArray) {
 		if check {
-			core.PhpErrorDocref("", faults.E_WARNING, "'%s' header must be at most one header. Array is passed for '%s'", key, key)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("'%s' header must be at most one header. Array is passed for '%s'", key, key))
 			return
 		}
 		PhpMailBuildHeadersElems(s, key, val.Array())
 	} else {
-		core.PhpErrorDocref("", faults.E_WARNING, "Extra header element '%s' cannot be other than string or array.", key)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Extra header element '%s' cannot be other than string or array.", key))
 	}
 }
 func PhpMailBuildHeaders(headers *types.Zval) string {
@@ -128,7 +128,7 @@ func PhpMailBuildHeaders(headers *types.Zval) string {
 	var s strings.Builder
 	headers.Array().Foreach(func(arrayKey types.ArrayKey, value *types.Zval) {
 		if !arrayKey.IsStrKey() {
-			core.PhpErrorDocref("", faults.E_WARNING, "Found numeric header (%d)", arrayKey.IdxKey())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Found numeric header (%d)", arrayKey.IdxKey()))
 			return
 		}
 
@@ -418,7 +418,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 	}
 	if sendmail != nil {
 		if EACCES == errno {
-			core.PhpErrorDocref("", faults.E_WARNING, "Permission denied: unable to execute shell to run mail delivery binary '%s'", sendmail_path)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Permission denied: unable to execute shell to run mail delivery binary '%s'", sendmail_path))
 			pclose(sendmail)
 			if hdr != headers {
 				zend.Efree(hdr)
@@ -444,7 +444,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 			return 1
 		}
 	} else {
-		core.PhpErrorDocref("", faults.E_WARNING, "Could not execute mail delivery program '%s'", sendmail_path)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Could not execute mail delivery program '%s'", sendmail_path))
 		if hdr != headers {
 			zend.Efree(hdr)
 		}

@@ -619,7 +619,7 @@ func SplRecursiveItGetMethod(zobject **types.Object, method *types.String, key *
 	var level zend.ZendLong = object.GetLevel()
 	var zobj *types.Zval
 	if object.GetIterators() == nil {
-		core.PhpErrorDocref("", faults.E_ERROR, "The %s instance wasn't initialized properly", zobject.GetCe().Name())
+		core.PhpErrorDocref("", faults.E_ERROR, fmt.Sprintf("The %s instance wasn't initialized properly", zobject.GetCe().Name()))
 	}
 	zobj = object.GetIterators()[level].GetZobject()
 	function_handler = zend.ZendStdGetMethod(zobject, method, key)

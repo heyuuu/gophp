@@ -171,7 +171,7 @@ func PhpNextMarker(stream *core.PhpStream, last_marker int, ff_read int) uint {
 			extraneous++
 		}
 		if extraneous != 0 {
-			core.PhpErrorDocref("", faults.E_WARNING, "corrupt JPEG data: %zu extraneous bytes before marker", extraneous)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("corrupt JPEG data: %zu extraneous bytes before marker", extraneous))
 		}
 	}
 	a = 1

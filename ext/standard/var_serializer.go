@@ -141,7 +141,7 @@ func (se *VarSerializer) tryAddSleepProp(ht *types.Array, props *types.Array, na
 		}
 	}
 	if ht.KeyAdd(name.GetStr(), val) == nil {
-		core.PhpErrorDocref("", faults.E_NOTICE, `"%s" is returned from __sleep multiple times`, errorName.GetVal())
+		core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf(`"%s" is returned from __sleep multiple times`, errorName.GetVal()))
 		return types.SUCCESS
 	}
 	return types.SUCCESS
@@ -197,7 +197,7 @@ func (se *VarSerializer) getSleepProps(ht *types.Array, struc *types.Zval, sleep
 			retval = types.FAILURE
 			break
 		}
-		core.PhpErrorDocref("", faults.E_NOTICE, `"%s" returned as member variable from __sleep() but does not exist`, name.GetVal())
+		core.PhpErrorDocref("", faults.E_NOTICE, fmt.Sprintf(`"%s" returned as member variable from __sleep() but does not exist`, name.GetVal()))
 		ht.KeyAdd(name.GetStr(), zend.UninitializedZval())
 	}
 	return retval

@@ -150,7 +150,7 @@ func SapiReadPostBlock(buffer *byte, buflen int) int {
 }
 func SapiReadStandardFormData() {
 	if SG__().postMaxSize > 0 && SG__().RequestInfo.ContentLength() > SG__().postMaxSize {
-		PhpErrorDocref("", faults.E_WARNING, "POST Content-Length of %d bytes exceeds the limit of %d bytes", SG__().RequestInfo.ContentLength(), SG__().postMaxSize)
+		PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("POST Content-Length of %d bytes exceeds the limit of %d bytes", SG__().RequestInfo.ContentLength(), SG__().postMaxSize))
 		return
 	}
 	SG__().RequestInfo.requestBody = PhpStreamTempCreateEx(TEMP_STREAM_DEFAULT, SAPI_POST_BLOCK_SIZE, PG__().upload_tmp_dir)
@@ -170,7 +170,7 @@ func SapiReadStandardFormData() {
 				}
 			}
 			if SG__().postMaxSize > 0 && SG__().readPostBytes > SG__().postMaxSize {
-				PhpErrorDocref("", faults.E_WARNING, "Actual POST length does not match Content-Length, and exceeds %d bytes", SG__().postMaxSize)
+				PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Actual POST length does not match Content-Length, and exceeds %d bytes", SG__().postMaxSize))
 				break
 			}
 			if read_bytes < SAPI_POST_BLOCK_SIZE {

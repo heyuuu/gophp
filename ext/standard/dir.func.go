@@ -146,7 +146,7 @@ func ZifClosedir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle 
 		}
 	}
 	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
-		core.PhpErrorDocref("", faults.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%d is not a valid Directory resource", dirp.GetRes().GetHandle()))
 		return_value.SetFalse()
 		return
 	}
@@ -174,14 +174,14 @@ func ZifChroot(executeData zpp.Ex, return_value zpp.Ret, directory *types.Zval) 
 	}
 	ret = chroot(str)
 	if ret != 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s (errno %d)", strerror(errno), errno)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s (errno %d)", strerror(errno), errno))
 		return_value.SetFalse()
 		return
 	}
 	PhpClearStatCache(1, nil, 0)
 	ret = chdir("/")
 	if ret != 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s (errno %d)", strerror(errno), errno)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s (errno %d)", strerror(errno), errno))
 		return_value.SetFalse()
 		return
 	}
@@ -210,7 +210,7 @@ func ZifChdir(executeData zpp.Ex, return_value zpp.Ret, directory *types.Zval) {
 	}
 	ret = zend.VCWD_CHDIR(str)
 	if ret != 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s (errno %d)", strerror(errno), errno)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%s (errno %d)", strerror(errno), errno))
 		return_value.SetFalse()
 		return
 	}
@@ -282,7 +282,7 @@ func ZifRewinddir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle
 		}
 	}
 	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
-		core.PhpErrorDocref("", faults.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%d is not a valid Directory resource", dirp.GetRes().GetHandle()))
 		return_value.SetFalse()
 		return
 	}
@@ -331,7 +331,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 	}
 	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
-		core.PhpErrorDocref("", faults.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%d is not a valid Directory resource", dirp.GetRes().GetHandle()))
 		return_value.SetFalse()
 		return
 	}
@@ -365,7 +365,7 @@ func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, _ zp
 		break
 	}
 	if pattern_len >= core.MAXPATHLEN {
-		core.PhpErrorDocref("", faults.E_WARNING, "Pattern exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Pattern exceeds the maximum allowed length of %d characters", core.MAXPATHLEN))
 		return_value.SetFalse()
 		return
 	}
@@ -475,7 +475,7 @@ func ZifScandir(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, _ zpp
 		n = core.PhpStreamScandir(dirn, &namelist, context, any(streams.PhpStreamDirentAlphasortr))
 	}
 	if n < 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "(errno %d): %s", errno, strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("(errno %d): %s", errno, strerror(errno)))
 		return_value.SetFalse()
 		return
 	}

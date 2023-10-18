@@ -4,7 +4,6 @@ import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core/date"
-	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -502,10 +501,7 @@ func PhpLogErrWithSeverity(logMessage string, syslogTypeInt int) {
 		SM__().GetLogMessage()(logMessage, syslogTypeInt)
 	}
 }
-func PhpPrintf(format string, args ...any) int {
-	return PUTS(pfmt.Sprintf(format, args))
-}
-func PhpVerror(docref string, params string, type_ int, format string, args ...any) {
+func PhpVerror(docref string, params string, typ int, buffer string) {
 	var docrefBuf = ""
 	var target = ""
 	var docref_target = ""
@@ -519,7 +515,6 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 	var isFunction = false
 
 	/* get error text into buffer and escape for html if necessary */
-	buffer := pfmt.Sprintf(format, args...)
 	if PG__().html_errors {
 		replaceBuffer := standard.PhpEscapeHtmlEntities(buffer, false, standard.ENT_COMPAT, GetSafeCharsetHint())
 		/* Retry with substituting invalid chars on fail. */
@@ -644,7 +639,7 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 	} else {
 		message = fmt.Sprintf("%s: %s", origin, buffer)
 	}
-	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().IsActive() && (zend.EG__().GetUserErrorHandler().IsUndef() || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
+	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().IsActive() && (zend.EG__().GetUserErrorHandler().IsUndef() || (zend.EG__().GetUserErrorHandlerErrorReporting()&typ) == 0) {
 		var tmp types.Zval
 		tmp.SetString(buffer)
 		if zend.CurrEX() != nil {
@@ -655,22 +650,22 @@ func PhpVerror(docref string, params string, type_ int, format string, args ...a
 			zend.EG__().GetSymbolTable().KeyUpdateIndirect("php_errormsg", &tmp)
 		}
 	}
-	PhpError(type_, message)
+	PhpError(typ, message)
 }
 
-func PhpErrorDocref(docRef string, typ int, format string, args ...any) {
-	PhpVerror(docRef, "", typ, format, args)
+func PhpErrorDocref(docRef string, typ int, message string) {
+	PhpVerror(docRef, "", typ, message)
 }
-func PhpErrorDocref1(docRef string, param1 string, type_ int, format string, args ...any) {
+func PhpErrorDocref1(docRef string, param1 string, type_ int, message string) {
 	params := param1
-	PhpVerror(docRef, params, type_, format, args)
+	PhpVerror(docRef, params, type_, message)
 }
-func PhpErrorDocref2(docRef string, param1 string, param2 string, type_ int, format string, args ...any) {
+func PhpErrorDocref2(docRef string, param1 string, param2 string, type_ int, message string) {
 	params := param1 + "," + param2
-	PhpVerror(docRef, params, type_, format, args)
+	PhpVerror(docRef, params, type_, message)
 }
 func PhpHtmlPuts(str *byte, size int) { zend.ZendHtmlPuts(str, size) }
-func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format string, args ...any) {
+func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, message string) {
 	var display bool
 
 	/* check for repeated errors to be ignored */
@@ -678,7 +673,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	if PG__().ignore_repeated_errors && lastError != nil {
 		/* no check for PG__().last_error_file is needed since it cannot
 		 * be NULL if PG__().last_error_message is not NULL */
-		if lastError.Message != format {
+		if lastError.Message != message {
 			display = true
 		} else if !PG__().ignore_repeated_source && (lastError.Lineno != error_lineno || lastError.File != error_filename) {
 			display = true
@@ -722,7 +717,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			 * but DO NOT overwrite a pending exception
 			 */
 			if zend.EG__().NoException() {
-				faults.ThrowErrorException(zend.EG__().GetExceptionClass(), format, 0, type_)
+				faults.ThrowErrorException(zend.EG__().GetExceptionClass(), message, 0, type_)
 			}
 			return
 		}
@@ -734,7 +729,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 		if error_filename == "" {
 			error_filename = "Unknown"
 		}
-		PG__().AddLastError(type_, format, error_filename, error_lineno)
+		PG__().AddLastError(type_, message, error_filename, error_lineno)
 	}
 
 	/* display/log the error if necessary */
@@ -783,28 +778,28 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			error_type_str = "Unknown error"
 		}
 		if ModuleInitialized == 0 || PG__().log_errors {
-			logBuffer := fmt.Sprintf("PHP %s:  %s in %s on line %d", error_type_str, format, error_filename, error_lineno)
+			logBuffer := fmt.Sprintf("PHP %s:  %s in %s on line %d", error_type_str, message, error_filename, error_lineno)
 			PhpLogErrWithSeverity(logBuffer, syslog_type_int)
 		}
 		if PG__().display_errors && (ModuleInitialized != 0 && !(PG__().during_request_startup) || PG__().display_startup_errors) {
 			if PG__().xmlrpc_errors {
-				PUTS(fmt.Sprintf(`<?xml version="1.0"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>%d</int></value></member><member><name>faultString</name><value><string>%s:%s in %s on line %d</string></value></member></struct></value></fault></methodResponse>`, PG__().xmlrpc_error_number, error_type_str, format, error_filename, error_lineno))
+				PUTS(fmt.Sprintf(`<?xml version="1.0"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>%d</int></value></member><member><name>faultString</name><value><string>%s:%s in %s on line %d</string></value></member></struct></value></fault></methodResponse>`, PG__().xmlrpc_error_number, error_type_str, message, error_filename, error_lineno))
 			} else {
 				var prepend_string = zend.INI_STR("error_prepend_string")
 				var append_string = zend.INI_STR("error_append_string")
 				if PG__().html_errors {
 					if type_ == faults.E_ERROR || type_ == faults.E_PARSE {
-						var buf = standard.PhpEscapeHtmlEntities(format, false, standard.ENT_COMPAT, GetSafeCharsetHint())
+						var buf = standard.PhpEscapeHtmlEntities(message, false, standard.ENT_COMPAT, GetSafeCharsetHint())
 						PUTS(fmt.Sprintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%d</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf, error_filename, error_lineno, STR_PRINT(append_string)))
 					} else {
-						PUTS(fmt.Sprintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%d</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, format, error_filename, error_lineno, STR_PRINT(append_string)))
+						PUTS(fmt.Sprintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%d</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, message, error_filename, error_lineno, STR_PRINT(append_string)))
 					}
 				} else {
 					/* Write CLI/CGI errors to stderr if display_errors = "stderr" */
 					if PG__().display_errors == PHP_DISPLAY_ERRORS_STDERR {
-						log.Printf("%s: %s in %s on line %d\n", error_type_str, format, error_filename, error_lineno)
+						log.Printf("%s: %s in %s on line %d\n", error_type_str, message, error_filename, error_lineno)
 					} else {
-						PUTS(fmt.Sprintf("%s\n%s: %s in %s on line %d\n%s", STR_PRINT(prepend_string), error_type_str, format, error_filename, error_lineno, STR_PRINT(append_string)))
+						PUTS(fmt.Sprintf("%s\n%s: %s in %s on line %d\n%s", STR_PRINT(prepend_string), error_type_str, message, error_filename, error_lineno, STR_PRINT(append_string)))
 					}
 				}
 			}
@@ -855,7 +850,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	}
 	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().IsActive() {
 		var tmp types.Zval
-		tmp.SetString(format)
+		tmp.SetString(message)
 		if zend.CurrEX() != nil {
 			zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0)
 		} else {
@@ -916,11 +911,11 @@ func PhpFreeRequestGlobals() {
 func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 	switch message {
 	case zend.ZMSG_FAILED_INCLUDE_FOPEN:
-		PhpErrorDocref("function.include", faults.E_WARNING, "Failed opening '%s' for inclusion (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path))
+		PhpErrorDocref("function.include", faults.E_WARNING, fmt.Sprintf("Failed opening '%s' for inclusion (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path)))
 	case zend.ZMSG_FAILED_REQUIRE_FOPEN:
-		PhpErrorDocref("function.require", faults.E_COMPILE_ERROR, "Failed opening required '%s' (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path))
+		PhpErrorDocref("function.require", faults.E_COMPILE_ERROR, fmt.Sprintf("Failed opening required '%s' (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path)))
 	case zend.ZMSG_FAILED_HIGHLIGHT_FOPEN:
-		PhpErrorDocref("", faults.E_WARNING, "Failed opening '%s' for highlighting", PhpStripUrlPasswd((*byte)(data)))
+		PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Failed opening '%s' for highlighting", PhpStripUrlPasswd((*byte)(data))))
 	case zend.ZMSG_MEMORY_LEAK_DETECTED:
 		fallthrough
 	case zend.ZMSG_MEMORY_LEAK_REPEATED:

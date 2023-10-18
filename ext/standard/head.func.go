@@ -200,7 +200,7 @@ func PhpHeadParseCookieOptionsArray(
 				*samesite = operators.ZvalGetString(value)
 				found++
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, "Unrecognized key '%s' found in the options array", strKey)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unrecognized key '%s' found in the options array", strKey))
 			}
 		} else {
 			core.PhpErrorDocref("", faults.E_WARNING, "Numeric key found in the options array")

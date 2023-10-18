@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/kits/slicekit"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -14,6 +15,10 @@ func OG__() *ZendOutputGlobals { return &OutputGlobals }
 func PUTS(str string) int      { return OG__().WriteString(str) }
 func PUTS_H(str string)        { OG__().WriteStringUnbuffered(str) }
 func PUTC(c byte)              { OG__().Write([]byte{c}) }
+
+func PhpPrintf(format string, args ...any) int {
+	return PUTS(pfmt.Sprintf(format, args))
+}
 
 // ZendOutputGlobals
 type ZendOutputGlobals struct {

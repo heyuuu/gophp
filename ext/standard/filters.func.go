@@ -1192,13 +1192,13 @@ func StrfilterConvertAppendBucket(
 			err = PhpConvConvert(inst.GetCd(), &pt, &tcnt, &pd, &ocnt)
 			switch err {
 			case PHP_CONV_ERR_INVALID_SEQ:
-				core.PhpErrorDocref("", faults.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("stream filter (%s): invalid byte sequence", inst.GetFiltername()))
 				goto out_failure
 			case PHP_CONV_ERR_MORE:
 				if ps != nil {
 					if icnt > 0 {
 						if inst.GetStubLen() >= b.SizeOf("inst -> stub") {
-							core.PhpErrorDocref("", faults.E_WARNING, "stream filter (%s): insufficient buffer", inst.GetFiltername())
+							core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("stream filter (%s): insufficient buffer", inst.GetFiltername()))
 							goto out_failure
 						}
 						inst.GetStub()[lang.PostInc(&(inst.GetStubLen()))] = *(lang.PostInc(&ps))
@@ -1211,7 +1211,7 @@ func StrfilterConvertAppendBucket(
 					}
 				}
 			case PHP_CONV_ERR_UNEXPECTED_EOS:
-				core.PhpErrorDocref("", faults.E_WARNING, "stream filter (%s): unexpected end of stream", inst.GetFiltername())
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("stream filter (%s): unexpected end of stream", inst.GetFiltername()))
 				goto out_failure
 			case PHP_CONV_ERR_TOO_BIG:
 				var new_out_buf *byte
@@ -1237,7 +1237,7 @@ func StrfilterConvertAppendBucket(
 					out_buf_size = new_out_buf_size
 				}
 			case PHP_CONV_ERR_UNKNOWN:
-				core.PhpErrorDocref("", faults.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("stream filter (%s): unknown error", inst.GetFiltername()))
 				goto out_failure
 			default:
 
@@ -1254,12 +1254,12 @@ func StrfilterConvertAppendBucket(
 		}
 		switch err {
 		case PHP_CONV_ERR_INVALID_SEQ:
-			core.PhpErrorDocref("", faults.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("stream filter (%s): invalid byte sequence", inst.GetFiltername()))
 			goto out_failure
 		case PHP_CONV_ERR_MORE:
 			if ps != nil {
 				if icnt > b.SizeOf("inst -> stub") {
-					core.PhpErrorDocref("", faults.E_WARNING, "stream filter (%s): insufficient buffer", inst.GetFiltername())
+					core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("stream filter (%s): insufficient buffer", inst.GetFiltername()))
 					goto out_failure
 				}
 				memcpy(inst.GetStub(), ps, icnt)
@@ -1267,7 +1267,7 @@ func StrfilterConvertAppendBucket(
 				ps += icnt
 				icnt = 0
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, "stream filter (%s): unexpected octet values", inst.GetFiltername())
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("stream filter (%s): unexpected octet values", inst.GetFiltername()))
 				goto out_failure
 			}
 		case PHP_CONV_ERR_TOO_BIG:
@@ -1294,7 +1294,7 @@ func StrfilterConvertAppendBucket(
 				out_buf_size = new_out_buf_size
 			}
 		case PHP_CONV_ERR_UNKNOWN:
-			core.PhpErrorDocref("", faults.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("stream filter (%s): unknown error", inst.GetFiltername()))
 			goto out_failure
 		default:
 			if ps == nil {
@@ -1361,7 +1361,7 @@ func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persiste
 	var dot *byte
 	var conv_mode int = 0
 	if filterparams != nil && !filterparams.IsArray() {
-		core.PhpErrorDocref("", faults.E_WARNING, "stream filter (%s): invalid filter parameter", filtername)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("stream filter (%s): invalid filter parameter", filtername))
 		return nil
 	}
 	if lang.Assign(&dot, strchr(filtername, '.')) == nil {

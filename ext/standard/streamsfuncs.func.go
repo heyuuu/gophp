@@ -43,7 +43,7 @@ func ZifStreamSocketPair(executeData zpp.Ex, return_value zpp.Ret, domain *types
 	}
 	if 0 != socketpair(int(domain), int(type_), int(protocol), pair) {
 		var errbuf []byte
-		core.PhpErrorDocref("", faults.E_WARNING, "failed to create sockets: [%d]: %s", core.PhpSocketErrno(), core.PhpSocketStrerror(core.PhpSocketErrno(), errbuf, b.SizeOf("errbuf")))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("failed to create sockets: [%d]: %s", core.PhpSocketErrno(), core.PhpSocketStrerror(core.PhpSocketErrno(), errbuf, b.SizeOf("errbuf"))))
 		return_value.SetFalse()
 		return
 	}
@@ -114,7 +114,7 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 		/* host might contain binary characters */
 
 		var quoted_host *types.String = types.NewString(str.PhpAddslashes(host.GetStr()))
-		core.PhpErrorDocref("", faults.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), lang.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("unable to connect to %s (%s)", quoted_host.GetVal(), lang.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() })))
 		// types.ZendStringReleaseEx(quoted_host, 0)
 	}
 	if hashkey != nil {
@@ -178,7 +178,7 @@ func ZifStreamSocketServer(executeData zpp.Ex, return_value zpp.Ret, localaddres
 	}
 	stream = streams.PhpStreamXportCreate(host, host_len, core.REPORT_ERRORS, streams.STREAM_XPORT_SERVER|int(flags), nil, nil, context, &errstr, &err)
 	if stream == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, "unable to connect to %s (%s)", host, lang.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("unable to connect to %s (%s)", host, lang.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() })))
 	}
 	if stream == nil {
 		if zerrno != nil {
@@ -238,7 +238,7 @@ func ZifStreamSocketAccept(executeData zpp.Ex, return_value zpp.Ret, serverstrea
 		if peername != nil {
 			// types.ZendStringRelease(peername)
 		}
-		core.PhpErrorDocref("", faults.E_WARNING, "accept failed: %s", lang.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error"))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("accept failed: %s", lang.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error")))
 		return_value.SetFalse()
 	}
 	if errstr != nil {
@@ -307,7 +307,7 @@ func ZifStreamSocketSendto(executeData zpp.Ex, return_value zpp.Ret, stream *typ
 		/* parse the address */
 
 		if types.FAILURE == core.PhpNetworkParseNetworkAddressWithPort(target_addr, target_addr_len, (*__struct__sockaddr)(&sa), &sl) {
-			core.PhpErrorDocref("", faults.E_WARNING, "Failed to parse `%s' into a valid network address", target_addr)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Failed to parse `%s' into a valid network address", target_addr))
 			return_value.SetFalse()
 			return
 		}
@@ -395,7 +395,7 @@ func ZifStreamGetContents(executeData zpp.Ex, return_value zpp.Ret, source *type
 
 		}
 		if seek_res != 0 {
-			core.PhpErrorDocref("", faults.E_WARNING, "Failed to seek to position %d in the stream", desiredpos)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Failed to seek to position %d in the stream", desiredpos))
 			return_value.SetFalse()
 			return
 		}
@@ -436,7 +436,7 @@ func ZifStreamCopyToStream(executeData zpp.Ex, return_value zpp.Ret, source *typ
 	core.PhpStreamFromZval(src, zsrc)
 	core.PhpStreamFromZval(dest, zdest)
 	if pos > 0 && core.PhpStreamSeek(src, pos, r.SEEK_SET) < 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Failed to seek to position %d in the stream", pos)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Failed to seek to position %d in the stream", pos))
 		return_value.SetFalse()
 		return
 	}
@@ -797,7 +797,7 @@ func ZifStreamSelect(executeData zpp.Ex, return_value zpp.Ret, readStreams zpp.R
 	}
 	retval = PhpSelect(max_fd+1, &rfds, &wfds, &efds, tv_p)
 	if retval == -1 {
-		core.PhpErrorDocref("", faults.E_WARNING, "unable to select [%d]: %s (max_fd=%d)", errno, strerror(errno), max_fd)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("unable to select [%d]: %s (max_fd=%d)", errno, strerror(errno), max_fd))
 		return_value.SetFalse()
 		return
 	}
@@ -876,7 +876,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 				}
 			}
 		} else {
-			core.PhpErrorDocref("", faults.E_WARNING, `options should have the form ["wrappername"]["optionname"] = $value`)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf(`options should have the form ["wrappername"]["optionname"] = $value`))
 		}
 	}
 	return ret
@@ -1411,7 +1411,7 @@ func ZifStreamSetChunkSize(executeData zpp.Ex, return_value zpp.Ret, fp *types.Z
 		break
 	}
 	if csize <= 0 {
-		core.PhpErrorDocref("", faults.E_WARNING, "The chunk size must be a positive integer, given %d", csize)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("The chunk size must be a positive integer, given %d", csize))
 		return_value.SetFalse()
 		return
 	}
@@ -1422,7 +1422,7 @@ func ZifStreamSetChunkSize(executeData zpp.Ex, return_value zpp.Ret, fp *types.Z
 	 */
 
 	if csize > core.INT_MAX {
-		core.PhpErrorDocref("", faults.E_WARNING, "The chunk size cannot be larger than %d", core.INT_MAX)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("The chunk size cannot be larger than %d", core.INT_MAX))
 		return_value.SetFalse()
 		return
 	}

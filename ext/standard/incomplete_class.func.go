@@ -10,9 +10,9 @@ import (
 
 func IncompleteClassMessage(object *types.Zval, error_type int) {
 	if className, ok := PhpLookupClassName(object); ok {
-		core.PhpErrorDocref("", error_type, INCOMPLETE_CLASS_MSG, className)
+		core.PhpErrorDocref("", error_type, fmt.Sprintf(INCOMPLETE_CLASS_MSG, className))
 	} else {
-		core.PhpErrorDocref("", error_type, INCOMPLETE_CLASS_MSG, "unknown")
+		core.PhpErrorDocref("", error_type, fmt.Sprintf(INCOMPLETE_CLASS_MSG, "unknown"))
 	}
 }
 func IncompleteClassGetProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {

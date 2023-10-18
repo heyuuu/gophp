@@ -295,7 +295,7 @@ func ProcessNestedData(
 ) int {
 	if var_hash != nil {
 		if var_hash.GetMaxDepth() > 0 && var_hash.GetCurDepth() >= var_hash.GetMaxDepth() {
-			core.PhpErrorDocref("", faults.E_WARNING, "Maximum depth of %d exceeded. The depth limit can be changed using the max_depth unserialize() option or the unserialize_max_depth ini setting", var_hash.GetMaxDepth())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Maximum depth of %d exceeded. The depth limit can be changed using the max_depth unserialize() option or the unserialize_max_depth ini setting", var_hash.GetMaxDepth()))
 			return 0
 		}
 		var_hash.GetCurDepth()++
@@ -835,7 +835,7 @@ yy18:
 				// zend.ZvalPtrDtor(&args[0])
 				return 0
 			}
-			core.PhpErrorDocref("", faults.E_WARNING, "defined (%s) but not found", user_func.StringEx().GetVal())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("defined (%s) but not found", user_func.StringEx().GetVal()))
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 			// zend.ZvalPtrDtor(&user_func)
@@ -855,7 +855,7 @@ yy18:
 
 		BG__().serialize_lock++
 		if lang.Assign(&ce, zend.ZendLookupClass(class_name.GetStr())) == nil {
-			core.PhpErrorDocref("", faults.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.StringEx().GetVal())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Function %s() hasn't defined the class it was called for", user_func.StringEx().GetVal()))
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 		}

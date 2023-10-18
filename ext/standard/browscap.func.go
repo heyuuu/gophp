@@ -137,7 +137,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		var pos int
 		var i int
 		if pattern.GetLen() > UINT16_MAX {
-			core.PhpErrorDocref("", faults.E_WARNING, "Skipping excessively long pattern of length %zd", pattern.GetLen())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Skipping excessively long pattern of length %zd", pattern.GetLen()))
 			break
 		}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry")))

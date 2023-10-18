@@ -23,7 +23,7 @@ func ERR_RETURN(out_err **types.String, local_err *types.String, fmt string) {
 	if out_err != nil {
 		*out_err = local_err
 	} else {
-		core.PhpErrorDocref("", faults.E_WARNING, fmt, lang.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf(fmt, lang.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error")))
 		if local_err != nil {
 			// types.ZendStringReleaseEx(local_err, 0)
 			local_err = nil

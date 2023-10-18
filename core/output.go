@@ -48,7 +48,7 @@ func wrapOutputHandlerUser(outputHandler *types.Zval) (name string, handler Outp
 		}
 	}
 	if err != nil {
-		PhpErrorDocref("ref.outcontrol", faults.E_WARNING, "%s", err)
+		PhpErrorDocref("ref.outcontrol", faults.E_WARNING, err)
 	}
 	return
 }

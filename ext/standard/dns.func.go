@@ -17,7 +17,7 @@ func ZifGethostname(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	if gethostname(buf, b.SizeOf("buf")) {
-		core.PhpErrorDocref("", faults.E_WARNING, "unable to fetch host [%d]: %s", errno, strerror(errno))
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("unable to fetch host [%d]: %s", errno, strerror(errno)))
 		return_value.SetFalse()
 		return
 	}
@@ -81,7 +81,7 @@ func ZifGethostbyname(executeData zpp.Ex, return_value zpp.Ret, hostname *types.
 
 		/* name too long, protect from CVE-2015-0235 */
 
-		core.PhpErrorDocref("", faults.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Host name is too long, the limit is %d characters", core.MAXFQDNLEN))
 		return_value.SetString(b.CastStr(hostname, hostname_len))
 		return
 	}
@@ -109,7 +109,7 @@ func ZifGethostbynamel(executeData zpp.Ex, return_value zpp.Ret, hostname *types
 
 		/* name too long, protect from CVE-2015-0235 */
 
-		core.PhpErrorDocref("", faults.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Host name is too long, the limit is %d characters", core.MAXFQDNLEN))
 		return_value.SetFalse()
 		return
 	}
@@ -212,7 +212,7 @@ func ZifDnsCheckRecord(executeData zpp.Ex, return_value zpp.Ret, host *types.Zva
 		} else if !(strcasecmp("A6", rectype)) {
 			type_ = DNS_T_A6
 		} else {
-			core.PhpErrorDocref("", faults.E_WARNING, "Type '%s' not supported", rectype)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type '%s' not supported", rectype))
 			return_value.SetFalse()
 			return
 		}
@@ -684,13 +684,13 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 	}
 	if raw == 0 {
 		if (type_param & ^PHP_DNS_ALL) != 0 && type_param != PHP_DNS_ANY {
-			core.PhpErrorDocref("", faults.E_WARNING, "Type '%d' not supported", type_param)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type '%d' not supported", type_param))
 			return_value.SetFalse()
 			return
 		}
 	} else {
 		if type_param < 1 || type_param > 0xffff {
-			core.PhpErrorDocref("", faults.E_WARNING, "Numeric DNS record type must be between 1 and 65535, '%d' given", type_param)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Numeric DNS record type must be between 1 and 65535, '%d' given", type_param))
 			return_value.SetFalse()
 			return
 		}

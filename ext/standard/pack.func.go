@@ -134,12 +134,12 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 		switch int(code) {
 		case 'x', 'X', '@':
 			if arg < 0 {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: '*' ignored", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: '*' ignored", code))
 				arg = 1
 			}
 		case 'a', 'A', 'Z', 'h', 'H':
 			if currentarg >= num_args {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: not enough arguments", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: not enough arguments", code))
 				return "", false
 			}
 			if arg < 0 {
@@ -160,23 +160,23 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 				arg = num_args - currentarg
 			}
 			if currentarg > core.INT_MAX-arg {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: too few arguments", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: too few arguments", code))
 				return "", false
 			}
 			currentarg += arg
 			if currentarg > num_args {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: too few arguments", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: too few arguments", code))
 				return "", false
 			}
 		default:
-			core.PhpErrorDocref("", faults.E_WARNING, "Type %c: unknown format code", code)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: unknown format code", code))
 			return "", false
 		}
 		formatcodes[formatcount] = code
 		formatargs[formatcount] = arg
 	}
 	if currentarg < num_args {
-		core.PhpErrorDocref("", faults.E_WARNING, "%d arguments unused", num_args-currentarg)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("%d arguments unused", num_args-currentarg))
 	}
 
 	/* Calculate output length and upper bound while processing*/
@@ -187,56 +187,56 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 		switch int(code) {
 		case 'h', 'H':
 			if (arg+arg%2)/2 < 0 || (core.INT_MAX-outputpos)/int(1) < (arg+arg%2)/2 {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow in format string", code))
 				return "", false
 			}
 			outputpos += (arg + arg%2) / 2 * 1
 		case 'a', 'A', 'Z', 'c', 'C', 'x':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(1) < arg {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow in format string", code))
 				return "", false
 			}
 			outputpos += arg * 1
 		case 's', 'S', 'n', 'v':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(2) < arg {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow in format string", code))
 				return "", false
 			}
 			outputpos += arg * 2
 		case 'i', 'I':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(b.SizeOf("int")) < arg {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow in format string", code))
 				return "", false
 			}
 			outputpos += arg * b.SizeOf("int")
 		case 'l', 'L', 'N', 'V':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(4) < arg {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow in format string", code))
 				return "", false
 			}
 			outputpos += arg * 4
 		case 'q', 'Q', 'J', 'P':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(8) < arg {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow in format string", code))
 				return "", false
 			}
 			outputpos += arg * 8
 		case 'f', 'g', 'G':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(b.SizeOf("float")) < arg {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow in format string", code))
 				return "", false
 			}
 			outputpos += arg * b.SizeOf("float")
 		case 'd', 'e', 'E':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(b.SizeOf("double")) < arg {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow in format string", code))
 				return "", false
 			}
 			outputpos += arg * b.SizeOf("double")
 		case 'X':
 			outputpos -= arg
 			if outputpos < 0 {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: outside of string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: outside of string", code))
 				outputpos = 0
 			}
 		case '@':
@@ -282,7 +282,7 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 			var v *byte = str.GetVal()
 			outputpos--
 			if arg > str.GetLen() {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: not enough characters in string", code)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: not enough characters in string", code))
 				arg = str.GetLen()
 			}
 			for lang.PostDec(&arg) > 0 {
@@ -294,7 +294,7 @@ func ZifPack(format_ string, _ zpp.Opt, args []*types.Zval) (string, bool) {
 				} else if n >= 'a' && n <= 'f' {
 					n -= 'a' - 10
 				} else {
-					core.PhpErrorDocref("", faults.E_WARNING, "Type %c: illegal hex digit %c", code, n)
+					core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: illegal hex digit %c", code, n))
 					n = 0
 				}
 				if lang.PostDec(&first) {
@@ -444,7 +444,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 	inputlen = inputarg.GetLen()
 	inputpos = 0
 	if offset < 0 || offset > inputlen {
-		core.PhpErrorDocref("", faults.E_WARNING, "Offset %d is out of input range", offset)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Offset %d is out of input range", offset))
 		return_value.SetFalse()
 		return
 	}
@@ -493,7 +493,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 		case 'X':
 			size = -1
 			if arg < 0 {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: '*' ignored", type_)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: '*' ignored", type_))
 				arg = 1
 			}
 		case '@':
@@ -523,13 +523,13 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 		case 'd', 'e', 'E':
 			size = b.SizeOf("double")
 		default:
-			core.PhpErrorDocref("", faults.E_WARNING, "Invalid format type %c", type_)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Invalid format type %c", type_))
 			return_value.Array().Destroy()
 			return_value.SetFalse()
 			return
 		}
 		if size != 0 && size != -1 && size < 0 {
-			core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow", type_)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow", type_))
 			return_value.Array().Destroy()
 			return_value.SetFalse()
 			return
@@ -560,7 +560,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 
 			}
 			if size != 0 && size != -1 && core.INT_MAX-size+1 < inputpos {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: integer overflow", type_)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: integer overflow", type_))
 				return_value.Array().Destroy()
 				return_value.SetFalse()
 				return
@@ -795,21 +795,21 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 						inputpos = -size
 						i = arg - 1
 						if arg >= 0 {
-							core.PhpErrorDocref("", faults.E_WARNING, "Type %c: outside of string", type_)
+							core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: outside of string", type_))
 						}
 					}
 				case '@':
 					if arg <= inputlen {
 						inputpos = arg
 					} else {
-						core.PhpErrorDocref("", faults.E_WARNING, "Type %c: outside of string", type_)
+						core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: outside of string", type_))
 					}
 					i = arg - 1
 				}
 				inputpos += size
 				if inputpos < 0 {
 					if size != -1 {
-						core.PhpErrorDocref("", faults.E_WARNING, "Type %c: outside of string", type_)
+						core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: outside of string", type_))
 					}
 					inputpos = 0
 				}
@@ -822,7 +822,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 				/* Reached end of input for '*' repeater */
 
 			} else {
-				core.PhpErrorDocref("", faults.E_WARNING, "Type %c: not enough input, need %d, have %d", type_, size, inputlen-inputpos)
+				core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Type %c: not enough input, need %d, have %d", type_, size, inputlen-inputpos))
 				return_value.Array().Destroy()
 				return_value.SetFalse()
 				return

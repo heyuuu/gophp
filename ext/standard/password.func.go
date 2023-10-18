@@ -105,13 +105,13 @@ func PhpPasswordGetSalt(required_salt_len int, options *types.Array) *types.Stri
 		return nil
 	}
 	if buffer.GetLen() < required_salt_len {
-		core.PhpErrorDocref("", faults.E_WARNING, "Provided salt is too short: %zd expecting %zd", buffer.GetLen(), required_salt_len)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Provided salt is too short: %zd expecting %zd", buffer.GetLen(), required_salt_len))
 		return nil
 	}
 	if !PhpPasswordSaltIsAlphabet(buffer.GetStr()) {
 		salt, ok := PhpPasswordSaltTo64(buffer.GetStr(), required_salt_len)
 		if !ok {
-			core.PhpErrorDocref("", faults.E_WARNING, "Provided salt is too short: %zd", buffer.GetLen())
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Provided salt is too short: %zd", buffer.GetLen()))
 			return nil
 		}
 		return types.NewString(salt)
@@ -173,7 +173,7 @@ func PhpPasswordBcryptHash(password string, options *types.Array) (string, bool)
 		cost = operators.ZvalGetLong(zcost)
 	}
 	if cost < 4 || cost > 31 {
-		core.PhpErrorDocref("", faults.E_WARNING, "Invalid bcrypt cost parameter specified: %d", cost)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Invalid bcrypt cost parameter specified: %d", cost))
 		return "", false
 	}
 	hashFormat := fmt.Sprintf("$2y$%02d$", cost)
@@ -311,7 +311,7 @@ func ZifPasswordHash(password string, algo_ *types.Zval, _ zpp.Opt, options zpp.
 	var algo = PhpPasswordAlgoFindZval(algo_)
 	if algo == nil {
 		var algoStr = operators.ZvalGetStrVal(algo_)
-		core.PhpErrorDocref("", faults.E_WARNING, "Unknown password hashing algorithm: %s", algoStr)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unknown password hashing algorithm: %s", algoStr))
 		return types.NewZvalNull()
 	}
 	if digest, ok := algo.Hash(password, options); ok {

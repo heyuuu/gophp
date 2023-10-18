@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
@@ -210,7 +211,7 @@ func ZifConstant(returnValue zpp.Ret, constName string) {
 		}
 	} else {
 		if zend.EG__().NoException() {
-			core.PhpErrorDocref("", faults.E_WARNING, "Couldn't find constant %s", constName)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Couldn't find constant %s", constName))
 		}
 		returnValue.SetNull()
 		return
@@ -792,7 +793,7 @@ func PhpCallShutdownFunctions() {
 				var retval types.Zval
 				if !zend.IsCallable(shutdownFunctionEntry.Fn(), nil, 0) {
 					var functionName = zend.GetCallableName(shutdownFunctionEntry.Fn(), nil)
-					core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", functionName)
+					core.PhpError(faults.E_WARNING, fmt.Sprintf("(Registered shutdown functions) Unable to call %s() - function does not exist", functionName))
 				} else {
 					zend.CallUserFunction_Ex(nil, shutdownFunctionEntry.Fn(), &retval, shutdownFunctionEntry.Args())
 				}
@@ -807,7 +808,7 @@ func ZifRegisterShutdownFunction(functionName *types.Zval, _ zpp.Opt, parameters
 	/* Prevent entering of anything but valid callback (syntax check only!) */
 	if !zend.IsCallable(functionName, nil, 0) {
 		var callbackName = zend.GetCallableName(functionName, nil)
-		core.PhpErrorDocref("", faults.E_WARNING, "Invalid shutdown callback '%s' passed", callbackName)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Invalid shutdown callback '%s' passed", callbackName))
 		return
 	}
 
@@ -909,7 +910,7 @@ func ZifIniGetAll(returnValue zpp.Ret, _ zpp.Opt, extension *string, details_ *b
 	if extension != nil {
 		module := zend.G().GetModule(*extension)
 		if module == nil {
-			core.PhpErrorDocref("", faults.E_WARNING, "Unable to find extension '%s'", *extension)
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to find extension '%s'", *extension))
 			returnValue.SetFalse()
 			return
 		}
@@ -1158,7 +1159,7 @@ func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path string, 
 		umask(oldmask)
 		ret = zend.VCWD_CHMOD(newPath, 0666 & ^oldmask)
 		if ret == -1 {
-			core.PhpErrorDocref("", faults.E_WARNING, "%s", strerror(errno))
+			core.PhpErrorDocref("", faults.E_WARNING, strerror(errno))
 		}
 	} else if PhpCopyFileEx(path, newPath, core.STREAM_DISABLE_OPEN_BASEDIR) == types.SUCCESS {
 		zend.VCWD_UNLINK(path)
@@ -1167,7 +1168,7 @@ func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path string, 
 	if successful != 0 {
 		core.SG__().DeleteUploadFile(path)
 	} else {
-		core.PhpErrorDocref("", faults.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
+		core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Unable to move '%s' to '%s'", path, new_path))
 	}
 	return successful != 0
 }

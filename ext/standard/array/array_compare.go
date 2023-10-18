@@ -241,7 +241,7 @@ func checkArrayArgs(args []*types.Zval, startIdx int) ([]*types.Array, bool) {
 	var arrays = make([]*types.Array, len(args))
 	for i, arg := range args {
 		if !arg.IsArray() {
-			core.PhpErrorDocref("", faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+startIdx+1, types.ZendZvalTypeName(args[i]))
+			core.PhpErrorDocref("", faults.E_WARNING, fmt.Sprintf("Expected parameter %d to be an array, %s given", i+startIdx+1, types.ZendZvalTypeName(args[i])))
 			return nil, false
 		}
 		arrays[i] = arg.Array()
