@@ -3,7 +3,6 @@ package streams
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/lang"
@@ -66,19 +65,10 @@ func PhpStreamFromPersistentId(persistent_id string, stream **core.PhpStream) in
 	}
 	return core.PHP_STREAM_PERSISTENT_NOT_EXIST
 }
-func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, format string, args ...any) {
-	//var args va_list
-	var buffer *byte = nil
-	//va_start(args, format)
-	//core.Vspprintf(&buffer, 0, fmt, args)
-	if buffer != nil {
-		buffer = pfmt.Sprintf(format, args...)
-	}
-	//va_end(args)
 
+func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, message string) {
 	if (options&core.REPORT_ERRORS) != 0 || wrapper == nil {
-		core.PhpErrorDocref("", faults.E_WARNING, "%s", buffer)
-		zend.Efree(buffer)
+		core.PhpErrorDocref("", faults.E_WARNING, message)
 	} else {
 		//var list *zend.ZendLlist = nil
 		//if !(standard.FG__().GetWrapperErrors()) {

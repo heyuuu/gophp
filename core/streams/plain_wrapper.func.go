@@ -1,6 +1,7 @@
 package streams
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
@@ -584,7 +585,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.String, opt
 	var persistent int = options & core.STREAM_OPEN_PERSISTENT
 	var persistent_id *byte = nil
 	if types.FAILURE == PhpStreamParseFopenModes(mode, &open_flags) {
-		PhpStreamWrapperLogError(&PhpPlainFilesWrapper, options, "`%s' is not a valid mode for fopen", mode)
+		PhpStreamWrapperLogError(&PhpPlainFilesWrapper, options, fmt.Sprintf("`%s' is not a valid mode for fopen", mode))
 		return nil
 	}
 	if (options & core.STREAM_ASSUME_REALPATH) != 0 {

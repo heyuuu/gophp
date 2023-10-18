@@ -1,6 +1,7 @@
 package streams
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
@@ -127,7 +128,7 @@ func UserWrapperOpener(
 		/* set wrapper data to be a reference to our object */
 
 	} else {
-		PhpStreamWrapperLogError(wrapper, options, `"%s::`+USERSTREAM_OPEN+`" call failed`, us.GetWrapper().GetClassname())
+		PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf(`"%s::%s" call failed`, USERSTREAM_OPEN, us.GetWrapper().GetClassname()))
 	}
 
 	/* destroy everything else */
@@ -198,7 +199,7 @@ func UserWrapperOpendir(
 		/* set wrapper data to be a reference to our object */
 
 	} else {
-		PhpStreamWrapperLogError(wrapper, options, `"%s::`+USERSTREAM_DIR_OPEN+`" call failed`, us.GetWrapper().GetClassname())
+		PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf(`"%s::%s" call failed`, USERSTREAM_DIR_OPEN, us.GetWrapper().GetClassname()))
 	}
 
 	/* destroy everything else */

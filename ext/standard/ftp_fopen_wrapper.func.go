@@ -173,7 +173,7 @@ func PhpFtpFopenConnect(
 		user := PhpRawUrlDecodeEx(resource.User())
 		for _, c := range []byte(user) {
 			if ascii.IsControl(c) {
-				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid login %s", resource.User())
+				streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("Invalid login %s", resource.User()))
 				goto connect_errexit
 			}
 		}
@@ -192,7 +192,7 @@ func PhpFtpFopenConnect(
 			pass := PhpRawUrlDecodeEx(resource.Pass())
 			for _, c := range []byte(pass) {
 				if ascii.IsControl(c) {
-					streams.PhpStreamWrapperLogError(wrapper, options, "Invalid password %s", resource.Pass())
+					streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("Invalid password %s", resource.Pass()))
 					goto connect_errexit
 				}
 			}
@@ -516,7 +516,7 @@ func PhpStreamUrlWrapFtp(
 			core.PhpStreamPrintf(stream, "REST %d\r\n", tmpzval.Long())
 			result = GET_FTP_RESULT(stream)
 			if result < 300 || result > 399 {
-				streams.PhpStreamWrapperLogError(wrapper, options, "Unable to resume from offset %d", tmpzval.Long())
+				streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("Unable to resume from offset %d", tmpzval.Long()))
 				goto errexit
 			}
 		}
@@ -592,10 +592,10 @@ errexit:
 		core.PhpStreamClose(stream)
 	}
 	if tmp_line[0] != '0' {
-		streams.PhpStreamWrapperLogError(wrapper, options, "FTP server reports %s", tmp_line)
+		streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("FTP server reports %s", tmp_line))
 	}
 	if error_message != nil {
-		streams.PhpStreamWrapperLogError(wrapper, options, "Failed to set up data channel: %s", error_message.GetVal())
+		streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("Failed to set up data channel: %s", error_message.GetStr()))
 		// types.ZendStringRelease(error_message)
 	}
 	return nil
@@ -734,7 +734,7 @@ opendir_errexit:
 		core.PhpStreamClose(stream)
 	}
 	if tmp_line[0] != '0' {
-		streams.PhpStreamWrapperLogError(wrapper, options, "FTP server reports %s", tmp_line)
+		streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("FTP server reports %s", tmp_line))
 	}
 	return nil
 }

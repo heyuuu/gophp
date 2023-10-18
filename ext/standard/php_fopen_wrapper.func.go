@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
@@ -222,12 +223,12 @@ func PhpStreamUrlWrapPhp(
 		}
 		dtablesize = getdtablesize()
 		if fildes_ori < 0 || fildes_ori >= dtablesize {
-			streams.PhpStreamWrapperLogError(wrapper, options, "The file descriptors must be non-negative numbers smaller than %d", dtablesize)
+			streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("The file descriptors must be non-negative numbers smaller than %d", dtablesize))
 			return nil
 		}
 		fd = dup(int(fildes_ori))
 		if fd == -1 {
-			streams.PhpStreamWrapperLogError(wrapper, options, "Error duping file descriptor %d; possibly it doesn't exist: [%d]: %s", fildes_ori, errno, strerror(errno))
+			streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("Error duping file descriptor %d; possibly it doesn't exist: [%d]: %s", fildes_ori, errno, strerror(errno)))
 			return nil
 		}
 	} else if !(strncasecmp(path, "filter/", 7)) {

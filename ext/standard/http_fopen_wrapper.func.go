@@ -141,7 +141,7 @@ func PhpStreamUrlWrapHttpEx(
 		core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_READ_TIMEOUT, 0, &timeout)
 	}
 	if errstr != nil {
-		streams.PhpStreamWrapperLogError(wrapper, options, "%s", errstr.GetVal())
+		streams.PhpStreamWrapperLogError(wrapper, options, errstr.GetStr())
 		errstr = nil
 	}
 	if stream != nil && use_proxy != 0 && use_ssl {
@@ -796,7 +796,7 @@ func PhpStreamUrlWrapHttpEx(
 			/* check for invalid redirection URLs */
 
 			if lang.Assign(&resource, PhpUrlParse(new_path)) == nil {
-				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid redirect URL! %s", new_path)
+				streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("Invalid redirect URL! %s", new_path))
 				goto out
 			}
 			var CHECK_FOR_CNTRL_CHARS func(val *types.String) = func(val *types.String) {
@@ -805,7 +805,7 @@ func PhpStreamUrlWrapHttpEx(
 
 					for _, c := range []byte(val.GetStr()) {
 						if ascii.IsControl(c) {
-							streams.PhpStreamWrapperLogError(wrapper, options, "Invalid redirect URL! %s", new_path)
+							streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("Invalid redirect URL! %s", new_path))
 							goto out
 						}
 					}
@@ -820,7 +820,7 @@ func PhpStreamUrlWrapHttpEx(
 			}
 			stream = PhpStreamUrlWrapHttpEx(wrapper, new_path, mode, options, opened_path, context, lang.PreDec(&redirect_max), HTTP_WRAPPER_REDIRECTED, response_header)
 		} else {
-			streams.PhpStreamWrapperLogError(wrapper, options, "HTTP request failed! %s", tmp_line)
+			streams.PhpStreamWrapperLogError(wrapper, options, fmt.Sprintf("HTTP request failed! %s", tmp_line))
 		}
 	}
 out:
