@@ -11,3 +11,52 @@ func SortedKeys[K cmp.Ordered, V any](m map[K]V) []K {
 	slices.Sort(keys)
 	return keys
 }
+
+func Each[K comparable, V any](m map[K]V, handler func(K, V)) {
+	for k, v := range m {
+		handler(k, v)
+	}
+}
+
+func EachEx[K comparable, V any](m map[K]V, handler func(K, V) bool) {
+	for k, v := range m {
+		ok := handler(k, v)
+		if !ok {
+			return
+		}
+	}
+}
+
+func GetValue[K comparable, V any](m map[K]V, key K) V {
+	v, _ := Get(m, key)
+	return v
+}
+
+func Get[K comparable, V any](m map[K]V, key K) (V, bool) {
+	if m == nil {
+		var temp V
+		return temp, false
+	} else {
+		v, ok := m[key]
+		return v, ok
+	}
+}
+
+func Add[K comparable, V any](m *map[K]V, key K, value V) bool {
+	if *m == nil {
+		*m = map[K]V{key: value}
+		return true
+	} else if _, exists := (*m)[key]; exists {
+		return false
+	} else {
+		(*m)[key] = value
+		return true
+	}
+}
+func Set[K comparable, V any](m *map[K]V, key K, value V) {
+	if *m == nil {
+		*m = map[K]V{key: value}
+	} else {
+		(*m)[key] = value
+	}
+}
