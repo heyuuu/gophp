@@ -25,7 +25,12 @@ const (
 	IsNumber
 )
 
-// Zval
+/**
+ * Zval
+ *
+ * tips:
+ * - 零值为合法的 Undef 类型，无需 SetUndef() 初始化
+ */
 type Zval struct {
 	v any
 }
@@ -128,20 +133,6 @@ func (zv *Zval) DeRef() *Zval {
 		return &ref.val
 	}
 	return zv
-}
-
-// Array
-type Array struct {
-	// todo
-}
-
-func NewArray() *Array {
-	return &Array{}
-}
-
-func (arr *Array) Len() int {
-	// todo
-	return 0
 }
 
 // Object
