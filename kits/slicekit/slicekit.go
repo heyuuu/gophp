@@ -1,5 +1,7 @@
 package slicekit
 
+import "github.com/heyuuu/gophp/shim/slices"
+
 func Map[T any, R any](slice []T, mapper func(T) R) []R {
 	var result []R
 	for _, item := range slice {
@@ -83,4 +85,10 @@ func Any[T any](slice []T, handler func(T) bool) bool {
 		}
 	}
 	return false
+}
+
+func Filter[T any](slice []T, handler func(T) bool) []T {
+	return slices.DeleteFunc(slice, func(item T) bool {
+		return !handler(item)
+	})
 }

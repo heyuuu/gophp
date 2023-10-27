@@ -1,4 +1,5 @@
 package php
 
-// CompileGlobals
-type CompilerGlobals struct{}
+// CompilerGlobals
+type CompilerGlobals struct {
+}
