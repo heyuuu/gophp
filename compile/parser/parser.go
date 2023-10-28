@@ -13,6 +13,13 @@ func SetProjRoot(projRoot string) {
 }
 
 func ParseCode(code string) (*ast.File, error) {
+	return ParseCodeEx(code, false)
+}
+
+func ParseCodeEx(code string, skipShebang bool) (*ast.File, error) {
+	if skipShebang {
+		code = "<?php " + code
+	}
 	return phpparse.ParseCode(code)
 }
 

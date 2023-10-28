@@ -8,8 +8,14 @@ func NewEngine() *Engine {
 	return &Engine{}
 }
 
-//func (e *Engine) Start() error {
-//}
+func (e *Engine) NewContext() *Context {
+	return &Context{engine: e}
+}
+
+func (e *Engine) Start() error {
+	// todo
+	return nil
+}
 
 //func (e *Engine) HandleRequest() error {
 //	err := e.RequestStartup()
@@ -20,7 +26,3 @@ func NewEngine() *Engine {
 //
 //func (e *Engine) RequestStartup() error {
 //}
-
-func (e *Engine) ExecuteScript(primaryFile *FileHandle) error {
-
-}

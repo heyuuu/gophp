@@ -11,9 +11,13 @@ func main() {
 	flag.StringVar(&code, "r", "", "code")
 	flag.Parse()
 
-	r := php.Default()
-	err := r.RunCode("<?php " + code)
+	fileHandle := php.NewFileHandleByString(code)
+
+	engine := php.NewEngine()
+	ctx := engine.NewContext()
+	retval, err := php.ExecuteScript(ctx, fileHandle, true)
 	if err != nil {
-		log.Fatalln(err)
+		panic("Execute failed: " + err.Error())
 	}
+	log.Printf("Execute succed, retval = %v", retval)
 }
