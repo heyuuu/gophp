@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
-	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/parser"
 	"github.com/heyuuu/gophp/kits/vardumper"
 	"github.com/heyuuu/gophp/php"
@@ -35,12 +34,9 @@ func ApiWrapHandler(handler func(r *http.Request) (any, error)) http.HandlerFunc
 
 //
 const (
-	TypeAst       = "AST"
-	TypeAstPrint  = "AST-print"
-	TypeIr        = "IR"
-	TypeIrPrint   = "IR-print"
-	TypeIrProject = "IR-project"
-	TypeRun       = "Run"
+	TypeAst      = "AST"
+	TypeAstPrint = "AST-print"
+	TypeRun      = "Run"
 )
 
 type ApiTypeResult struct {
@@ -88,13 +84,6 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 		return
 	}
 	result = append(result, ApiTypeResult{Type: TypeAstPrint, Content: astPrint})
-
-	// IR
-	irFile, err := ir.ParseAstFile(astNodes)
-	result = append(result, ApiTypeResult{Type: TypeIr, Content: vardumper.Sprint(irFile)})
-	if err != nil {
-		return
-	}
 
 	// run code
 	output := runCode(code)
