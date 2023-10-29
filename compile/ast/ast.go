@@ -52,10 +52,8 @@ type (
 // misc
 type (
 	Arg struct {
-		Name   *Ident // @var Ident|null Parameter name (for named parameters)
-		Value  Expr   // @var Expr Value to pass
-		ByRef  bool   // @var bool Whether to pass by ref (todo Call-time pass-by-reference has been removed in PHP 5.4)
-		Unpack bool   // @var bool Whether to unpack the argument
+		Value  Expr // @var Expr Value to pass
+		Unpack bool // @var bool Whether to unpack the argument
 	}
 
 	Const struct {
@@ -291,13 +289,9 @@ type (
 
 	// PropertyFetchExpr : Expr
 	PropertyFetchExpr struct {
-		Var  Expr // @var Expr Variable holding object
-		Name Node // @var Ident|Expr Property name
-	}
-
-	NullsafePropertyFetchExpr struct {
-		Var  Expr // @var Expr Variable holding object
-		Name Node // @var Ident|Expr Property name
+		Var      Expr // @var Expr Variable holding object
+		Name     Node // @var Ident|Expr Property name
+		Nullable bool
 	}
 
 	StaticPropertyFetchExpr struct {
@@ -352,16 +346,10 @@ type (
 
 	// MethodCallExpr : CallLikeExpr
 	MethodCallExpr struct {
-		Var  Expr   // @var Expr Variable holding object
-		Name Node   // @var Ident|Expr Method name
-		Args []*Arg // @var Arguments
-	}
-
-	// NullsafeMethodCallExpr : CallLikeExpr
-	NullsafeMethodCallExpr struct {
-		Var  Expr   // @var Expr Variable holding object
-		Name Node   // @var Ident|Expr Method name
-		Args []*Arg // @var Arguments
+		Var      Expr   // @var Expr Variable holding object
+		Name     Node   // @var Ident|Expr Method name
+		Args     []*Arg // @var Arguments
+		Nullsafe bool
 	}
 
 	// StaticCallExpr : CallLikeExpr
@@ -683,24 +671,22 @@ func (*ConstFetchExpr) exprNode()      {}
 func (*ClassConstFetchExpr) exprNode() {}
 func (*MagicConstExpr) exprNode()      {}
 
-func (*InstanceofExpr) exprNode()            {}
-func (*ListExpr) exprNode()                  {}
-func (*PrintExpr) exprNode()                 {}
-func (*PropertyFetchExpr) exprNode()         {}
-func (*NullsafePropertyFetchExpr) exprNode() {}
-func (*StaticPropertyFetchExpr) exprNode()   {}
-func (*ShellExecExpr) exprNode()             {}
-func (*TernaryExpr) exprNode()               {}
-func (*ThrowExpr) exprNode()                 {}
-func (*VariableExpr) exprNode()              {}
-func (*YieldExpr) exprNode()                 {}
-func (*YieldFromExpr) exprNode()             {}
+func (*InstanceofExpr) exprNode()          {}
+func (*ListExpr) exprNode()                {}
+func (*PrintExpr) exprNode()               {}
+func (*PropertyFetchExpr) exprNode()       {}
+func (*StaticPropertyFetchExpr) exprNode() {}
+func (*ShellExecExpr) exprNode()           {}
+func (*TernaryExpr) exprNode()             {}
+func (*ThrowExpr) exprNode()               {}
+func (*VariableExpr) exprNode()            {}
+func (*YieldExpr) exprNode()               {}
+func (*YieldFromExpr) exprNode()           {}
 
-func (*FuncCallExpr) exprNode()           {}
-func (*NewExpr) exprNode()                {}
-func (*MethodCallExpr) exprNode()         {}
-func (*NullsafeMethodCallExpr) exprNode() {}
-func (*StaticCallExpr) exprNode()         {}
+func (*FuncCallExpr) exprNode()   {}
+func (*NewExpr) exprNode()        {}
+func (*MethodCallExpr) exprNode() {}
+func (*StaticCallExpr) exprNode() {}
 
 // Stmt
 func (*EmptyStmt) stmtNode()  {}
@@ -752,11 +738,10 @@ func (*TraitUseAdaptationAliasStmt) stmtNode()      {}
 func (*TraitUseAdaptationPrecedenceStmt) stmtNode() {}
 
 // CallLikeExpr
-func (*FuncCallExpr) callLikeExprNode()           {}
-func (*NewExpr) callLikeExprNode()                {}
-func (*MethodCallExpr) callLikeExprNode()         {}
-func (*NullsafeMethodCallExpr) callLikeExprNode() {}
-func (*StaticCallExpr) callLikeExprNode()         {}
+func (*FuncCallExpr) callLikeExprNode()   {}
+func (*NewExpr) callLikeExprNode()        {}
+func (*MethodCallExpr) callLikeExprNode() {}
+func (*StaticCallExpr) callLikeExprNode() {}
 
 // FunctionLike
 func (*ArrowFunctionExpr) functionLikeNode() {}
@@ -812,7 +797,6 @@ func (*InstanceofExpr) node()                   {}
 func (*ListExpr) node()                         {}
 func (*PrintExpr) node()                        {}
 func (*PropertyFetchExpr) node()                {}
-func (*NullsafePropertyFetchExpr) node()        {}
 func (*StaticPropertyFetchExpr) node()          {}
 func (*ShellExecExpr) node()                    {}
 func (*TernaryExpr) node()                      {}
@@ -823,7 +807,6 @@ func (*YieldFromExpr) node()                    {}
 func (*FuncCallExpr) node()                     {}
 func (*NewExpr) node()                          {}
 func (*MethodCallExpr) node()                   {}
-func (*NullsafeMethodCallExpr) node()           {}
 func (*StaticCallExpr) node()                   {}
 func (*EmptyStmt) node()                        {}
 func (*BlockStmt) node()                        {}

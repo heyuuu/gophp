@@ -10,10 +10,20 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	nodeType := data["nodeType"].(string)
 	switch nodeType {
 	case "Arg":
+		name := asTypeOrNil[*ast.Ident](data["name"])
+		if name != nil {
+			err = unsupported("unsupported high version php feature: php8.0 named arguments")
+			break
+		}
+
+		byRef := data["byRef"].(bool)
+		if byRef {
+			err = unsupported("Call-time pass-by-reference has been removed in PHP 5.4")
+			break
+		}
+
 		node = &ast.Arg{
-			Name:   asTypeOrNil[*ast.Ident](data["name"]),
 			Value:  data["value"].(ast.Expr),
-			ByRef:  data["byRef"].(bool),
 			Unpack: data["unpack"].(bool),
 		}
 	case "Const":
@@ -433,15 +443,17 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Args:  asSlice[*ast.Arg](data["args"]),
 		}
 	case "NullsafeMethodCallExpr":
-		node = &ast.NullsafeMethodCallExpr{
-			Var:  data["var"].(ast.Expr),
-			Name: data["name"].(ast.Node),
-			Args: asSlice[*ast.Arg](data["args"]),
+		node = &ast.MethodCallExpr{
+			Var:      data["var"].(ast.Expr),
+			Name:     data["name"].(ast.Node),
+			Args:     asSlice[*ast.Arg](data["args"]),
+			Nullsafe: true,
 		}
 	case "NullsafePropertyFetchExpr":
-		node = &ast.NullsafePropertyFetchExpr{
-			Var:  data["var"].(ast.Expr),
-			Name: data["name"].(ast.Node),
+		node = &ast.PropertyFetchExpr{
+			Var:      data["var"].(ast.Expr),
+			Name:     data["name"].(ast.Node),
+			Nullable: true,
 		}
 	case "PostDecExpr":
 		node = &ast.UnaryExpr{

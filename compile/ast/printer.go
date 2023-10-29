@@ -243,12 +243,6 @@ func (p *printer) flags(flags Flags) {
  * nodes
  */
 func (p *printer) arg(n *Arg) {
-	if n.Name != nil {
-		p.print(n.Name, ": ")
-	}
-	if n.ByRef {
-		p.print("&")
-	}
 	if n.Unpack {
 		p.print("...")
 	}
@@ -418,9 +412,11 @@ func (p *printer) expr(n Expr) {
 	case *PrintExpr:
 		p.print("print ", x.Expr)
 	case *PropertyFetchExpr:
-		p.print(x.Var, "->", x.Name)
-	case *NullsafePropertyFetchExpr:
-		p.print(x.Var, "?->", x.Name)
+		if !x.Nullable {
+			p.print(x.Var, "->", x.Name)
+		} else {
+			p.print(x.Var, "?->", x.Name)
+		}
 	case *StaticPropertyFetchExpr:
 		p.print(x.Class, "::", x.Name)
 	case *ShellExecExpr:
@@ -457,9 +453,11 @@ func (p *printer) expr(n Expr) {
 	case *NewExpr:
 		p.print("new ", x.Class, "(", x.Args, ")")
 	case *MethodCallExpr:
-		p.print(x.Var, "->", x.Name, "(", x.Args, ")")
-	case *NullsafeMethodCallExpr:
-		p.print(x.Var, "?->", x.Name, "(", x.Args, ")")
+		if !x.Nullsafe {
+			p.print(x.Var, "->", x.Name, "(", x.Args, ")")
+		} else {
+			p.print(x.Var, "?->", x.Name, "(", x.Args, ")")
+		}
 	case *StaticCallExpr:
 		p.print(x.Class, "::", x.Name, "(", x.Args, ")")
 	default:
