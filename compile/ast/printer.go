@@ -250,10 +250,6 @@ func (p *printer) arg(n *Arg) {
 }
 
 func (p *printer) param(n *Param) {
-	if n.Flags != 0 {
-		p.flags(n.Flags)
-		p.print(" ")
-	}
 	if n.Type != nil {
 		p.print(n.Type, " ")
 	}

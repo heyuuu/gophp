@@ -18,7 +18,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 
 		byRef := data["byRef"].(bool)
 		if byRef {
-			err = unsupported("Call-time pass-by-reference has been removed in PHP 5.4")
+			err = unsupported("lower version php feature: Call-time pass-by-reference has been removed in PHP 5.4")
 			break
 		}
 
@@ -567,13 +567,18 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Type: asTypeHint(data["type"]).(*ast.SimpleType),
 		}
 	case "Param":
+		flags := asFlags(data["flags"])
+		if flags != 0 {
+			err = unsupported("unsupported high version php feature: php8.0 constructor promotion")
+			break
+		}
+
 		node = &ast.Param{
 			Type:     asTypeHint(data["type"]),
 			ByRef:    data["byRef"].(bool),
 			Variadic: data["variadic"].(bool),
 			Var:      data["var"].(*ast.VariableExpr),
 			Default:  asTypeOrNil[ast.Expr](data["default"]),
-			Flags:    asFlags(data["flags"]),
 		}
 	case "DNumberScalar":
 		node = &ast.FloatLit{
@@ -631,9 +636,15 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Stmts: asStmtList(data["stmts"]),
 		}
 	case "CatchStmt":
+		var_ := asTypeOrNil[*ast.VariableExpr](data["var"])
+		if var_ == nil {
+			err = unsupported("php8.0 catch an exception without storing it in a variable.")
+			break
+		}
+
 		node = &ast.CatchStmt{
 			Types: asSlice[*ast.Name](data["types"]),
-			Var:   asTypeOrNil[*ast.VariableExpr](data["var"]),
+			Var:   var_,
 			Stmts: asStmtList(data["stmts"]),
 		}
 	case "ClassStmt":

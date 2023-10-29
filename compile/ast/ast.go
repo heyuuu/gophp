@@ -80,7 +80,6 @@ type (
 		Variadic bool          // @var bool Whether this is a variadic argument
 		Var      *VariableExpr // @var VariableExpr Parameter variable
 		Default  Expr          // @var Expr|null Default value
-		Flags    Flags         // @var Flags
 	}
 )
 
