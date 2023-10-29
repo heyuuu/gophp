@@ -3,11 +3,14 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/compile/ir"
 	"github.com/heyuuu/gophp/compile/parser"
 	"github.com/heyuuu/gophp/kits/vardumper"
+	"github.com/heyuuu/gophp/php"
 	"net/http"
+	"strings"
 )
 
 type ApiResponse[T any] struct {
@@ -37,6 +40,7 @@ const (
 	TypeIr        = "IR"
 	TypeIrPrint   = "IR-print"
 	TypeIrProject = "IR-project"
+	TypeRun       = "Run"
 )
 
 type ApiTypeResult struct {
@@ -92,5 +96,25 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 		return
 	}
 
+	// run code
+	output := runCode(code)
+	result = append(result, ApiTypeResult{Type: TypeRun, Content: output})
 	return
+}
+
+var engine = php.NewEngine()
+
+func runCode(code string) string {
+	var buf strings.Builder
+
+	fileHandle := php.NewFileHandleByString(code)
+	ctx := engine.NewContext()
+	retval, err := php.ExecuteScript(ctx, fileHandle, false)
+	if err != nil {
+		buf.WriteString("Execute failed: " + err.Error())
+	} else {
+		buf.WriteString(fmt.Sprintf("Execute succed, retval = %v", retval))
+	}
+
+	return buf.String()
 }
