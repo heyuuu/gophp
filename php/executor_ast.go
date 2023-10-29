@@ -8,6 +8,12 @@ import (
 	"os"
 )
 
+// public functions
+func ExecuteAstFunction(executeData *ExecuteData, f *types.AstFunction) (Val, error) {
+	executor := NewExecutor()
+	return executor.executeAstFile(f.AstFile())
+}
+
 // errors
 type ExecutorError string
 
@@ -41,9 +47,6 @@ func (r continueResult) state() executeState { return stateContinue }
 func (r gotoResult) state() executeState     { return stateGoto }
 
 //
-func Default() *Executor {
-	return NewExecutor()
-}
 
 type Executor struct {
 	sources    Sources

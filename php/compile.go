@@ -5,7 +5,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 )
 
-func CompileFile(ctx *Context, fileHandle *FileHandle, skipShebang bool) (*types.Function, error) {
+func CompileFile(ctx *Context, fileHandle *FileHandle, skipShebang bool) (types.Function, error) {
 	code, err := fileHandle.ReadAll()
 	if err != nil {
 		return nil, err
@@ -16,5 +16,5 @@ func CompileFile(ctx *Context, fileHandle *FileHandle, skipShebang bool) (*types
 		return nil, err
 	}
 
-	return types.NewUserFunction(astFile), nil
+	return types.NewAstTopFunction(astFile), nil
 }

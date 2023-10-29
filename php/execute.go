@@ -2,6 +2,7 @@ package php
 
 import (
 	"errors"
+	"fmt"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -18,12 +19,14 @@ func ExecuteScript(ctx *Context, fileHandle *FileHandle, skipShebang bool) (retv
 	return Execute(ctx, topFunc)
 }
 
-func Execute(ctx *Context, fun *types.Function) (Val, error) {
-	astFile := fun.GetUserAstFile()
-	if astFile == nil {
-		return nil, errors.New("获取 astFile 失败")
-	}
+func Execute(ctx *Context, fun types.Function) (Val, error) {
+	// todo push stack
+	executeData := NewExecuteData()
 
-	executor := Default()
-	return executor.executeAstFile(astFile)
+	switch f := fun.(type) {
+	case *types.AstFunction:
+		return ExecuteAstFunction(executeData, f)
+	default:
+		panic(fmt.Sprintf("unsupported function type: %T", f))
+	}
 }
