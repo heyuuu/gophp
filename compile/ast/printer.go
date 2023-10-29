@@ -149,8 +149,6 @@ func (p *printer) printNode(node Node) {
 		p.param(x)
 	case *Arg:
 		p.arg(x)
-	case *Const:
-		p.print(x.Name, " = ", x.Value)
 	default:
 		err := fmt.Errorf("printer: unsupported node type %T", node)
 		p.checkError(err)
@@ -544,7 +542,7 @@ func (p *printer) stmt(n Stmt) {
 			p.print(" finally {\n", x.Finally.Stmts, "}")
 		}
 	case *ConstStmt:
-		p.print("const ", x.Consts, ";")
+		p.print("const ", x.Name, " = ", x.Value, ";")
 	case *EchoStmt:
 		p.print("echo ", x.Exprs, ";")
 	case *GlobalStmt:
@@ -644,7 +642,7 @@ func (p *printer) stmt(n Stmt) {
 			p.flags(x.Flags)
 			p.print(" ")
 		}
-		p.print("const ", x.Consts, ";")
+		p.print("const ", x.Name, " = ", x.Value, ";")
 	case *PropertyStmt:
 		if x.Flags != 0 {
 			p.flags(x.Flags)

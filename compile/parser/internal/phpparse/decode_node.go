@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
+	"github.com/heyuuu/gophp/kits/slicekit"
 )
 
 func decodeNode(data map[string]any) (node ast.Node, err error) {
@@ -27,7 +28,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Unpack: data["unpack"].(bool),
 		}
 	case "Const":
-		node = &ast.Const{
+		node = &ast.ConstStmt{
 			Name:           data["name"].(*ast.Ident),
 			Value:          data["value"].(ast.Expr),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
@@ -657,10 +658,20 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
 	case "ClassConstStmt":
-		node = &ast.ClassConstStmt{
-			Flags:  asFlags(data["flags"]),
-			Consts: asSlice[*ast.Const](data["consts"]),
-		}
+		flags := asFlags(data["flags"])
+		consts := asSlice[*ast.ConstStmt](data["consts"])
+		stmts := slicekit.Map(consts, func(c *ast.ConstStmt) ast.Stmt {
+			if c.NamespacedName != nil {
+				err = unsupported("ClassConst 不应有 NamespacedName")
+			}
+
+			return &ast.ClassConstStmt{
+				Flags: flags,
+				Name:  c.Name,
+				Value: c.Value,
+			}
+		})
+		node = &ast.BlockStmt{List: stmts}
 	case "ClassMethodStmt":
 		node = &ast.ClassMethodStmt{
 			Flags:      asFlags(data["flags"]),
@@ -671,9 +682,8 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Stmts:      asStmtList(data["stmts"]),
 		}
 	case "ConstStmt":
-		node = &ast.ConstStmt{
-			Consts: asSlice[*ast.Const](data["consts"]),
-		}
+		stmts := asStmtList(data["consts"])
+		node = &ast.BlockStmt{List: stmts}
 	case "ContinueStmt":
 		node = &ast.ContinueStmt{
 			Num: asTypeOrNil[ast.Expr](data["num"]),

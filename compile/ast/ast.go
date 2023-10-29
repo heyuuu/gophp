@@ -56,12 +56,6 @@ type (
 		Unpack bool // @var bool Whether to unpack the argument
 	}
 
-	Const struct {
-		Name           *Ident // @var Ident Name
-		Value          Expr   // @var Expr Value
-		NamespacedName *Name  // @var Name|null Namespaced name (if using NameResolver)
-	}
-
 	Ident struct {
 		Name string // @var string Ident as string
 		/**
@@ -259,7 +253,6 @@ type (
 		Expr Expr // @var Expr|null Expression
 	}
 
-	// Const
 	ConstFetchExpr struct {
 		Name *Name // @var Name Constant name
 	}
@@ -494,7 +487,9 @@ type (
 	}
 
 	ConstStmt struct {
-		Consts []*Const // @var Const_[] Constant declarations
+		Name           *Ident // @var Ident Name
+		Value          Expr   // @var Expr Value
+		NamespacedName *Name  // @var Name|null Namespaced name (if using NameResolver)
 	}
 
 	EchoStmt struct {
@@ -579,8 +574,9 @@ type (
 
 	// ClassConstStmt : Stmt
 	ClassConstStmt struct {
-		Flags  Flags    // @var Flags Modifiers
-		Consts []*Const // @var Const_[] Constant declarations
+		Flags Flags  // @var Flags Modifiers
+		Name  *Ident // @var Ident Name
+		Value Expr   // @var Expr Value
 	}
 
 	// PropertyStmt : Stmt
@@ -759,7 +755,6 @@ func (*TraitUseAdaptationPrecedenceStmt) traitUseAdaptationStmtNode() {}
 
 // All Node types
 func (*Arg) node()                              {}
-func (*Const) node()                            {}
 func (*Ident) node()                            {}
 func (*Param) node()                            {}
 func (*SimpleType) node()                       {}
