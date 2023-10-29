@@ -107,9 +107,15 @@ var engine = php.NewEngine()
 func runCode(code string) string {
 	var buf strings.Builder
 
-	fileHandle := php.NewFileHandleByString(code)
 	ctx := engine.NewContext()
+
+	buf.WriteString(">>> output start:\n")
+	ctx.OG().PushHandler(&buf)
+
+	fileHandle := php.NewFileHandleByString(code)
 	retval, err := php.ExecuteScript(ctx, fileHandle, false)
+
+	buf.WriteString("\n>>> output end\n\n")
 	if err != nil {
 		buf.WriteString("Execute failed: " + err.Error())
 	} else {

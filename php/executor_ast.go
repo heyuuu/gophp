@@ -5,12 +5,11 @@ import (
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/compile/parser"
 	"github.com/heyuuu/gophp/php/types"
-	"os"
 )
 
 // public functions
-func ExecuteAstFunction(executeData *ExecuteData, f *types.AstFunction) (Val, error) {
-	executor := NewExecutor()
+func ExecuteAstFunction(ctx *Context, executeData *ExecuteData, f *types.AstFunction) (Val, error) {
+	executor := &astExecutor{ctx: ctx, executeData: executeData}
 	return executor.executeAstFile(f.AstFile())
 }
 
@@ -46,31 +45,17 @@ func (r breakResult) state() executeState    { return stateBreak }
 func (r continueResult) state() executeState { return stateContinue }
 func (r gotoResult) state() executeState     { return stateGoto }
 
-//
-
-type Executor struct {
-	sources    Sources
-	currFile   *ast.File
-	currNs     *ast.NamespaceStmt
-	currRetVal Val
+// private
+type astExecutor struct {
+	ctx         *Context
+	executeData *ExecuteData
+	sources     Sources
+	currFile    *ast.File
+	currNs      *ast.NamespaceStmt
+	currRetVal  Val
 }
 
-func NewExecutor() *Executor {
-	return &Executor{}
-}
-
-func (e *Executor) RunCode(code string) error {
-	sources := NewSourcesByCode(code)
-	return e.Run(sources, DefaultSourcePath)
-}
-
-func (e *Executor) Run(sources Sources, enterFile string) error {
-	e.sources = sources
-	_, err := e.executeFile(enterFile)
-	return err
-}
-
-func (e *Executor) executeFile(filePath string) (Val, error) {
+func (e *astExecutor) executeFile(filePath string) (Val, error) {
 	code, ok := e.sources.LoadSource(filePath)
 	if !ok {
 		return nil, ExecutorError("source file is not exist")
@@ -84,7 +69,7 @@ func (e *Executor) executeFile(filePath string) (Val, error) {
 	return e.executeAstFile(astFile)
 }
 
-func (e *Executor) executeAstFile(f *ast.File) (Val, error) {
+func (e *astExecutor) executeAstFile(f *ast.File) (Val, error) {
 	// todo f.Declares
 
 	e.currFile = f
@@ -104,7 +89,7 @@ func (e *Executor) executeAstFile(f *ast.File) (Val, error) {
 	return nil, nil
 }
 
-func (e *Executor) executeStmts(stmts []ast.Stmt) (result executeResult, err error) {
+func (e *astExecutor) executeStmts(stmts []ast.Stmt) (result executeResult, err error) {
 	var labels = map[string]int{}
 	for i, stmt := range stmts {
 		if label, ok := stmt.(*ast.LabelStmt); ok {
@@ -138,10 +123,8 @@ func (e *Executor) executeStmts(stmts []ast.Stmt) (result executeResult, err err
 				return nil, err
 			}
 			for _, value := range values {
-				// todo change writer
-				vmEcho(os.Stdout, value)
+				vmEcho(e.ctx, value)
 			}
-
 		// todo
 		default:
 			panic(fmt.Sprintf("todo executor.executeStmts(%T)", x))
@@ -150,7 +133,7 @@ func (e *Executor) executeStmts(stmts []ast.Stmt) (result executeResult, err err
 	return
 }
 
-func (e *Executor) executeExprs(exprs []ast.Expr) (values []Val, err error) {
+func (e *astExecutor) executeExprs(exprs []ast.Expr) (values []Val, err error) {
 	values = make([]Val, len(exprs))
 	for i, expr := range exprs {
 		values[i], err = e.executeExpr(expr)
@@ -161,7 +144,7 @@ func (e *Executor) executeExprs(exprs []ast.Expr) (values []Val, err error) {
 	return
 }
 
-func (e *Executor) executeExpr(expr ast.Expr) (val Val, err error) {
+func (e *astExecutor) executeExpr(expr ast.Expr) (val Val, err error) {
 	switch x := expr.(type) {
 	case *ast.IntLit:
 		val = types.NewZvalLong(x.Value)

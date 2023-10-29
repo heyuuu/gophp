@@ -63,10 +63,15 @@ func CondF2[T any](cond bool, trueValue T, falseValue func() T) T {
 	return falseValue()
 }
 
-// 空安全操作 a ?? b
-func Nullsafe[T *any](checkValue T, defaultValue T) T {
-	if checkValue != nil {
-		return checkValue
+func Option[T any](ptr *T, defaultValue T) T {
+	if ptr != nil {
+		return *ptr
+	} else {
+		return defaultValue
 	}
-	return defaultValue
+}
+
+// 异或操作
+func Xor(a, b bool) bool {
+	return (a || b) && !(a && b)
 }

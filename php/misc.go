@@ -17,7 +17,6 @@ var String = types.NewZvalString
 var Array = types.NewZvalArray
 
 // helpers
-
 func Assert(cond bool) {
 	if !cond {
 		panic("Internal Assert Fail")

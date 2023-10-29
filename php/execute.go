@@ -25,7 +25,7 @@ func Execute(ctx *Context, fun types.Function) (Val, error) {
 
 	switch f := fun.(type) {
 	case *types.AstFunction:
-		return ExecuteAstFunction(executeData, f)
+		return ExecuteAstFunction(ctx, executeData, f)
 	default:
 		panic(fmt.Sprintf("unsupported function type: %T", f))
 	}
