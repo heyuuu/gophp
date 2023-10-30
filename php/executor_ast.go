@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/compile/parser"
+	"github.com/heyuuu/gophp/php/operators"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -281,60 +282,60 @@ func (e *astExecutor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val, err 
 	}
 
 	switch expr.Op {
-	case ast.BinaryOpBitwiseAnd: // &
-		panic("todo BinaryOpBitwiseAnd")
-	case ast.BinaryOpBitwiseOr: // |
-		panic("todo BinaryOpBitwiseOr")
-	case ast.BinaryOpBitwiseXor: // ^
-		panic("todo BinaryOpBitwiseXor")
-	case ast.BinaryOpBooleanAnd: // &&
-		panic("todo BinaryOpBooleanAnd")
-	case ast.BinaryOpBooleanOr: // ||
-		panic("todo BinaryOpBooleanOr")
-	case ast.BinaryOpCoalesce: // ??
-		panic("todo BinaryOpCoalesce")
-	case ast.BinaryOpConcat: // .
-		panic("todo BinaryOpConcat")
-	case ast.BinaryOpDiv: // /
-		panic("todo BinaryOpDiv")
-	case ast.BinaryOpEqual: // ==
-		panic("todo BinaryOpEqual")
-	case ast.BinaryOpGreater: // >
-		panic("todo BinaryOpGreater")
-	case ast.BinaryOpGreaterOrEqual: // >=
-		panic("todo BinaryOpGreaterOrEqual")
-	case ast.BinaryOpIdentical: // ===
-		panic("todo BinaryOpIdentical")
-	case ast.BinaryOpLogicalAnd: // and
-		panic("todo BinaryOpLogicalAnd")
-	case ast.BinaryOpLogicalOr: // or
-		panic("todo BinaryOpLogicalOr")
-	case ast.BinaryOpLogicalXor: // xor
-		panic("todo BinaryOpLogicalXor")
-	case ast.BinaryOpMinus: // -
-		panic("todo BinaryOpMinus")
-	case ast.BinaryOpMod: // %
-		panic("todo BinaryOpMod")
-	case ast.BinaryOpMul: // *
-		panic("todo BinaryOpMul")
-	case ast.BinaryOpNotEqual: // !=
-		panic("todo BinaryOpNotEqual")
-	case ast.BinaryOpNotIdentical: // !==
-		panic("todo BinaryOpNotIdentical")
 	case ast.BinaryOpPlus: // +
-		return vmAdd(e.ctx, left, right)
+		return vmBinaryOp(e.ctx, left, right, operators.Add)
+	case ast.BinaryOpMinus: // -
+		return vmBinaryOp(e.ctx, left, right, operators.Sub)
+	case ast.BinaryOpMul: // *
+		return vmBinaryOp(e.ctx, left, right, operators.Mul)
+	case ast.BinaryOpDiv: // /
+		return vmBinaryOp(e.ctx, left, right, operators.Div)
+	case ast.BinaryOpMod: // %
+		return vmBinaryOp(e.ctx, left, right, operators.Mod)
 	case ast.BinaryOpPow: // **
-		panic("todo BinaryOpPow")
+		return vmBinaryOp(e.ctx, left, right, operators.Pow)
+	case ast.BinaryOpBitwiseAnd: // &
+		return vmBinaryOp(e.ctx, left, right, operators.BitwiseAnd)
+	case ast.BinaryOpBitwiseOr: // n|
+		return vmBinaryOp(e.ctx, left, right, operators.BitwiseOr)
+	case ast.BinaryOpBitwiseXor: // ^
+		return vmBinaryOp(e.ctx, left, right, operators.BitwiseXor)
+	case ast.BinaryOpBooleanAnd: // &&
+		return vmBinaryOp(e.ctx, left, right, operators.BooleanAnd)
+	case ast.BinaryOpBooleanOr: // ||
+		return vmBinaryOp(e.ctx, left, right, operators.BooleanOr)
+	case ast.BinaryOpCoalesce: // ??
+		return vmBinaryOp(e.ctx, left, right, operators.Coalesce)
+	case ast.BinaryOpConcat: // .
+		return vmBinaryOp(e.ctx, left, right, operators.Concat)
+	case ast.BinaryOpEqual: // ==
+		return vmBinaryOp(e.ctx, left, right, operators.Equal)
+	case ast.BinaryOpGreater: // >
+		return vmBinaryOp(e.ctx, left, right, operators.Greater)
+	case ast.BinaryOpGreaterOrEqual: // >=
+		return vmBinaryOp(e.ctx, left, right, operators.GreaterOrEqual)
+	case ast.BinaryOpIdentical: // ===
+		return vmBinaryOp(e.ctx, left, right, operators.Identical)
+	case ast.BinaryOpLogicalAnd: // and
+		return vmBinaryOp(e.ctx, left, right, operators.LogicalAnd)
+	case ast.BinaryOpLogicalOr: // or
+		return vmBinaryOp(e.ctx, left, right, operators.LogicalOr)
+	case ast.BinaryOpLogicalXor: // xor
+		return vmBinaryOp(e.ctx, left, right, operators.LogicalXor)
+	case ast.BinaryOpNotEqual: // !=
+		return vmBinaryOp(e.ctx, left, right, operators.NotEqual)
+	case ast.BinaryOpNotIdentical: // !==
+		return vmBinaryOp(e.ctx, left, right, operators.NotIdentical)
 	case ast.BinaryOpShiftLeft: // <<
-		panic("todo BinaryOpShiftLeft")
+		return vmBinaryOp(e.ctx, left, right, operators.ShiftLeft)
 	case ast.BinaryOpShiftRight: // >>
-		panic("todo BinaryOpShiftRight")
+		return vmBinaryOp(e.ctx, left, right, operators.ShiftRight)
 	case ast.BinaryOpSmaller: // <
-		panic("todo BinaryOpSmaller")
+		return vmBinaryOp(e.ctx, left, right, operators.Smaller)
 	case ast.BinaryOpSmallerOrEqual: // <=
-		panic("todo BinaryOpSmallerOrEqual")
+		return vmBinaryOp(e.ctx, left, right, operators.SmallerOrEqual)
 	case ast.BinaryOpSpaceship: // <=>
-		panic("todo BinaryOpSpaceship")
+		return vmBinaryOp(e.ctx, left, right, operators.Spaceship)
 	default:
 		panic("unreachable")
 	}
