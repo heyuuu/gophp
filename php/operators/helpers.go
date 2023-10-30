@@ -1,11 +1,11 @@
-package operator
+package operators
 
 import "github.com/heyuuu/gophp/php/types"
 
 type ZvalTypePair = uint
 
 // inline
-func typePair(v1, v2 *types.Zval) ZvalTypePair {
+func typePair(v1, v2 Val) ZvalTypePair {
 	return ZvalTypePair(uint(v1.Type())<<8 | uint(v2.Type()))
 }
 
@@ -61,9 +61,18 @@ const (
 	IsArrayArray                = uint(types.IsArray)<<8 | uint(types.IsArray)
 )
 
-// fast functions
+// fast type and functions
+type Val = *types.Zval
+
+var NewVal = types.NewZvalUndef
+var Null = types.NewZvalNull
+var False = types.NewZvalFalse
+var True = types.NewZvalTrue
+var Bool = types.NewZvalBool
 var Long = types.NewZvalLong
 var Double = types.NewZvalDouble
+var String = types.NewZvalString
+var Array = types.NewZvalArray
 
 // internal functions
 func sign(i int) int {
@@ -71,4 +80,14 @@ func sign(i int) int {
 		return 1
 	}
 	return 0
+}
+
+func fastGetDouble(v Val) float64 {
+	if v.IsLong() {
+		return float64(v.Long())
+	} else if v.IsDouble() {
+		return v.Double()
+	} else {
+		return 0
+	}
 }

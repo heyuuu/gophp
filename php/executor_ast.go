@@ -147,13 +147,195 @@ func (e *astExecutor) executeExprs(exprs []ast.Expr) (values []Val, err error) {
 func (e *astExecutor) executeExpr(expr ast.Expr) (val Val, err error) {
 	switch x := expr.(type) {
 	case *ast.IntLit:
-		val = types.NewZvalLong(x.Value)
+		val = Long(x.Value)
+	case *ast.FloatLit:
+		val = Double(x.Value)
 	case *ast.StringLit:
-		val = types.NewZvalString(x.Value)
-	// todo
+		val = String(x.Value)
+	case *ast.ArrayExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ArrayItemExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ClosureExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ClosureUseExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ArrowFunctionExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.IndexExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.CastExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.UnaryExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.BinaryOpExpr:
+		return e.executeBinaryOpExpr(x)
+	case *ast.AssignExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.AssignOpExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.AssignRefExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.IssetExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.EmptyExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.EvalExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.IncludeExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.CloneExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ErrorSuppressExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ExitExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ConstFetchExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ClassConstFetchExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.MagicConstExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.InstanceofExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ListExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.PrintExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.PropertyFetchExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.StaticPropertyFetchExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ShellExecExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.TernaryExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.ThrowExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.VariableExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.YieldExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.YieldFromExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.FuncCallExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.NewExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.MethodCallExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
+	case *ast.StaticCallExpr:
+		// todo
+		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
 	default:
 		panic(fmt.Sprintf("todo executor.executeExpr(%T)", x))
 	}
 
 	return
+}
+
+func (e *astExecutor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val, err error) {
+	left, err := e.executeExpr(expr.Left)
+	if err != nil {
+		return nil, err
+	}
+
+	right, err := e.executeExpr(expr.Right)
+	if err != nil {
+		return nil, err
+	}
+
+	switch expr.Op {
+	case ast.BinaryOpBitwiseAnd: // &
+		panic("todo BinaryOpBitwiseAnd")
+	case ast.BinaryOpBitwiseOr: // |
+		panic("todo BinaryOpBitwiseOr")
+	case ast.BinaryOpBitwiseXor: // ^
+		panic("todo BinaryOpBitwiseXor")
+	case ast.BinaryOpBooleanAnd: // &&
+		panic("todo BinaryOpBooleanAnd")
+	case ast.BinaryOpBooleanOr: // ||
+		panic("todo BinaryOpBooleanOr")
+	case ast.BinaryOpCoalesce: // ??
+		panic("todo BinaryOpCoalesce")
+	case ast.BinaryOpConcat: // .
+		panic("todo BinaryOpConcat")
+	case ast.BinaryOpDiv: // /
+		panic("todo BinaryOpDiv")
+	case ast.BinaryOpEqual: // ==
+		panic("todo BinaryOpEqual")
+	case ast.BinaryOpGreater: // >
+		panic("todo BinaryOpGreater")
+	case ast.BinaryOpGreaterOrEqual: // >=
+		panic("todo BinaryOpGreaterOrEqual")
+	case ast.BinaryOpIdentical: // ===
+		panic("todo BinaryOpIdentical")
+	case ast.BinaryOpLogicalAnd: // and
+		panic("todo BinaryOpLogicalAnd")
+	case ast.BinaryOpLogicalOr: // or
+		panic("todo BinaryOpLogicalOr")
+	case ast.BinaryOpLogicalXor: // xor
+		panic("todo BinaryOpLogicalXor")
+	case ast.BinaryOpMinus: // -
+		panic("todo BinaryOpMinus")
+	case ast.BinaryOpMod: // %
+		panic("todo BinaryOpMod")
+	case ast.BinaryOpMul: // *
+		panic("todo BinaryOpMul")
+	case ast.BinaryOpNotEqual: // !=
+		panic("todo BinaryOpNotEqual")
+	case ast.BinaryOpNotIdentical: // !==
+		panic("todo BinaryOpNotIdentical")
+	case ast.BinaryOpPlus: // +
+		return vmAdd(e.ctx, left, right)
+	case ast.BinaryOpPow: // **
+		panic("todo BinaryOpPow")
+	case ast.BinaryOpShiftLeft: // <<
+		panic("todo BinaryOpShiftLeft")
+	case ast.BinaryOpShiftRight: // >>
+		panic("todo BinaryOpShiftRight")
+	case ast.BinaryOpSmaller: // <
+		panic("todo BinaryOpSmaller")
+	case ast.BinaryOpSmallerOrEqual: // <=
+		panic("todo BinaryOpSmallerOrEqual")
+	case ast.BinaryOpSpaceship: // <=>
+		panic("todo BinaryOpSpaceship")
+	default:
+		panic("unreachable")
+	}
 }
