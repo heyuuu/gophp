@@ -19,11 +19,12 @@ func ExecuteScript(ctx *Context, fileHandle *FileHandle, skipShebang bool) (retv
 	return Execute(ctx, topFunc)
 }
 
-func Execute(ctx *Context, fun types.Function) (Val, error) {
+func Execute(ctx *Context, fn *types.Function) (Val, error) {
 	// todo push stack
 	executeData := NewExecuteData()
 
-	switch f := fun.(type) {
+	switch fn. {
+	case *TypeUserFunction:
 	case *types.AstFunction:
 		return ExecuteAstFunction(ctx, executeData, f)
 	default:
