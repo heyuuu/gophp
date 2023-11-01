@@ -15,5 +15,3 @@ func (b *blockInfo) LineEnd() uint32                 { return b.lineEnd }
 func (b *blockInfo) SetLineEnd(lineEnd uint32)       { b.lineEnd = lineEnd }
 func (b *blockInfo) DocComment() string              { return b.docComment }
 func (b *blockInfo) SetDocComment(docComment string) { b.docComment = docComment }
-
-type Class interface{}

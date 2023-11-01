@@ -1,6 +1,7 @@
 package operators
 
 import (
+	"github.com/heyuuu/gophp/php/faults"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -20,6 +21,8 @@ again:
 		return Array(retArr), true
 	default:
 		if converted {
+			// fail
+			faults.ThrowError(nil, "Unsupported operand types")
 			return nil, false
 		}
 
@@ -61,11 +64,12 @@ again:
 		goto again
 	}
 }
+
 func SubLong(i1, i2 int) Val {
-	if sign(i1) != sign(i2) && sign(i1) != sign(i1-i2) { // 判断相加是否越界
+	if sign(i1) != sign(i2) && sign(i1) != sign(i1-i2) { // 判断是否越界
 		return Double(float64(i1) - float64(i2))
 	} else {
-		return Long(i1 + i2)
+		return Long(i1 - i2)
 	}
 }
 
