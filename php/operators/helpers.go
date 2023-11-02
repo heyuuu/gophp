@@ -93,3 +93,17 @@ func fastGetDouble(v Val) float64 {
 		return 0
 	}
 }
+
+func hasException() bool {
+	// todo EG__().HasException()
+	return false
+}
+
+func opScalarGetNumber(op1, op2 Val) (Val, Val) {
+	// todo 类型转换
+	return op1, op2
+}
+
+func throwIfExecuting(ce *types.Class, message string) {
+	// todo 触发错误或异常信息
+}

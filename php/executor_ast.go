@@ -271,6 +271,35 @@ func (e *astExecutor) executeExpr(expr ast.Expr) (val Val, err error) {
 }
 
 func (e *astExecutor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val, err error) {
+	// and / or 操作比较特殊，右表达式节点可能不会执行
+	switch expr.Op {
+	case ast.BinaryOpBooleanAnd: // &&
+		if left, err := e.executeExpr(expr.Left); err != nil {
+			return nil, err
+		} else if !ZvalIsTrue(left) {
+			return False(), nil
+		}
+
+		if right, err := e.executeExpr(expr.Right); err != nil {
+			return nil, err
+		} else {
+			return Bool(ZvalIsTrue(right)), nil
+		}
+	case ast.BinaryOpBooleanOr: // ||
+		if left, err := e.executeExpr(expr.Left); err != nil {
+			return nil, err
+		} else if ZvalIsTrue(left) {
+			return True(), nil
+		}
+
+		if right, err := e.executeExpr(expr.Right); err != nil {
+			return nil, err
+		} else {
+			return Bool(ZvalIsTrue(right)), nil
+		}
+	}
+
+	// common
 	left, err := e.executeExpr(expr.Left)
 	if err != nil {
 		return nil, err
@@ -300,10 +329,6 @@ func (e *astExecutor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val, err 
 		return vmBinaryOp(e.ctx, left, right, operators.BitwiseOr)
 	case ast.BinaryOpBitwiseXor: // ^
 		return vmBinaryOp(e.ctx, left, right, operators.BitwiseXor)
-	case ast.BinaryOpBooleanAnd: // &&
-		return vmBinaryOp(e.ctx, left, right, operators.BooleanAnd)
-	case ast.BinaryOpBooleanOr: // ||
-		return vmBinaryOp(e.ctx, left, right, operators.BooleanOr)
 	case ast.BinaryOpCoalesce: // ??
 		return vmBinaryOp(e.ctx, left, right, operators.Coalesce)
 	case ast.BinaryOpConcat: // .
