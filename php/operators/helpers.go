@@ -107,3 +107,8 @@ func opScalarGetNumber(op1, op2 Val) (Val, Val) {
 func throwIfExecuting(ce *types.Class, message string) {
 	// todo 触发错误或异常信息
 }
+
+func getPrecision() int {
+	//  php.EG__().GetPrecision()
+	return 14
+}

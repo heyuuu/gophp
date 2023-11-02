@@ -41,6 +41,10 @@ func NewArray() *Array {
 	return &Array{}
 }
 
+func NewArrayCap(cap int) *Array {
+	return &Array{}
+}
+
 func (arr *Array) Len() int {
 	// todo
 	return 0

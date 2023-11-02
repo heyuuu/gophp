@@ -17,12 +17,12 @@ const (
 	IsResource
 	IsRef
 
-	/* fake types */
-	IsBool
-	IsCallable
-	IsIterable
-	IsVoid
-	IsNumber
+	/* fake types used only for type hinting (Z_TYPE(zv) can not use them) */
+	IsBool     ZvalType = 16 // _IS_BOOL
+	IsCallable ZvalType = 17
+	IsIterable ZvalType = 18
+	IsVoid     ZvalType = 19
+	IsNumber   ZvalType = 20 // _IS_NUMBER
 )
 
 /**
@@ -54,15 +54,20 @@ func NewZvalObject(obj *Object) *Zval     { return &Zval{v: obj} }
 func NewZvalResource(res *Resource) *Zval { return &Zval{v: res} }
 
 // Zval setter
-func (zv *Zval) SetUndef()                 { zv.v = nil }
-func (zv *Zval) SetNull()                  { zv.v = IsNull }
-func (zv *Zval) SetFalse()                 { zv.v = false }
-func (zv *Zval) SetTrue()                  { zv.v = true }
-func (zv *Zval) SetBool(b bool)            { zv.v = b }
-func (zv *Zval) SetLong(l int)             { zv.v = l }
-func (zv *Zval) SetDouble(d float64)       { zv.v = d }
-func (zv *Zval) SetString(s string)        { zv.v = s }
-func (zv *Zval) SetArray(arr *Array)       { zv.v = arr }
+func (zv *Zval) SetUndef()           { zv.v = nil }
+func (zv *Zval) SetNull()            { zv.v = IsNull }
+func (zv *Zval) SetFalse()           { zv.v = false }
+func (zv *Zval) SetTrue()            { zv.v = true }
+func (zv *Zval) SetBool(b bool)      { zv.v = b }
+func (zv *Zval) SetLong(l int)       { zv.v = l }
+func (zv *Zval) SetDouble(d float64) { zv.v = d }
+func (zv *Zval) SetString(s string)  { zv.v = s }
+func (zv *Zval) SetArray(arr *Array) {
+	if arr == nil {
+		arr = NewArray()
+	}
+	zv.v = arr
+}
 func (zv *Zval) SetObject(obj *Object)     { zv.v = obj }
 func (zv *Zval) SetResource(res *Resource) { zv.v = res }
 
@@ -113,13 +118,18 @@ func (zv *Zval) IsObject() bool           { _, ok := zv.v.(*Object); return ok }
 func (zv *Zval) IsResource() bool         { _, ok := zv.v.(*Resource); return ok }
 func (zv *Zval) IsRef() bool              { _, ok := zv.v.(*Ref); return ok }
 
+// 返回是否为 undef、null、false，用于快速类型判断
+func (zv *Zval) IsSignFalse() bool { return zv.Type() <= IsFalse }
+
+// 返回是否为 undef、null、false 或 true，用于快速类型判断
+func (zv *Zval) IsSignType() bool { return zv.Type() <= IsTrue }
+
 func zvalValue[T any](zv *Zval) T {
 	if v, ok := zv.v.(T); ok {
 		return v
 	}
 	panic("Get Zval value by a mismatched type")
 }
-
 func (zv *Zval) Bool() bool          { return zvalValue[bool](zv) }
 func (zv *Zval) Long() int           { return zvalValue[int](zv) }
 func (zv *Zval) Double() float64     { return zvalValue[float64](zv) }
@@ -129,29 +139,40 @@ func (zv *Zval) Object() *Object     { return zvalValue[*Object](zv) }
 func (zv *Zval) Resource() *Resource { return zvalValue[*Resource](zv) }
 func (zv *Zval) Ref() *Ref           { return zvalValue[*Ref](zv) }
 func (zv *Zval) DeRef() *Zval {
+	if zv == nil {
+		return nil
+	}
 	if ref, ok := zv.v.(*Ref); ok {
-		return &ref.val
+		return ref.Val()
 	}
 	return zv
 }
 
-// Object
-type Object struct {
-	// todo
-}
+// fast property
+func (zv *Zval) ResourceHandle() int { return zv.Resource().Handle() }
+func (zv *Zval) ResourceType() int   { return zv.Resource().Type() }
+func (zv *Zval) RefVal() *Zval       { return zv.Ref().Val() }
 
 // Resource
 type Resource struct {
 	handle int
-	// todo
+	typ    int
+	ptr    any
 }
 
-func (res *Resource) Handle() int {
-	return res.handle
+func NewResource(handle int, typ int, ptr any) *Resource {
+	return &Resource{handle: handle, typ: typ, ptr: ptr}
 }
 
-// Ref
-type Ref struct {
+func (res *Resource) Handle() int { return res.handle }
+func (res *Resource) Type() int   { return res.typ }
+func (res *Resource) Ptr() any    { return res.ptr }
+
+// Reference
+type Ref = Reference
+type Reference struct {
 	val Zval
 	// todo
 }
+
+func (ref *Reference) Val() *Zval { return &ref.val }
