@@ -493,7 +493,7 @@ func BitwiseXor(op1, op2 Val) (Val, bool) {
 	return Long(op1Lval ^ op2Lval), true
 }
 
-// LogicalXor
+// BooleanXor
 func BooleanXor(op1, op2 Val) (Val, bool) {
 	op1Val := ZvalIsTrue(op1)
 	op2Val := ZvalIsTrue(op2)

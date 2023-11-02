@@ -6,7 +6,8 @@ type Object struct {
 	ce *Class
 }
 
-func (o Object) Ce() *Class { return o.ce }
+func (o Object) Ce() *Class     { return o.ce }
+func (o Object) CeName() string { return o.ce.Name() }
 
 func (o Object) CanCast() bool {
 	// todo

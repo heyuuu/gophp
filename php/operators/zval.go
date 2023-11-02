@@ -242,7 +242,7 @@ func zvalGetStrEx(op Val, try bool) (string, bool) {
 			return tmp.String(), true
 		}
 		if !hasException() {
-			faults.ThrowError(nil, fmt.Sprintf("Object of class %s could not be converted to string", op.Object().Ce().Name()))
+			faults.ThrowError(nil, fmt.Sprintf("Object of class %s could not be converted to string", op.Object().CeName()))
 		}
 		if try {
 			return "", false
