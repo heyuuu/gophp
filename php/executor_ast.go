@@ -9,7 +9,8 @@ import (
 )
 
 // public functions
-func ExecuteAstFunction(ctx *Context, executeData *ExecuteData, f *types.AstFunction) (Val, error) {
+func ExecuteAstFunction(ctx *Context, executeData *ExecuteData, f *types.Function) (Val, error) {
+	Assert(f.IsUserFunction())
 	executor := &astExecutor{ctx: ctx, executeData: executeData}
 	return executor.executeAstFile(f.AstFile())
 }
@@ -341,11 +342,7 @@ func (e *astExecutor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val, err 
 		return vmBinaryOp(e.ctx, left, right, operators.GreaterOrEqual)
 	case ast.BinaryOpIdentical: // ===
 		return vmBinaryOp(e.ctx, left, right, operators.Identical)
-	case ast.BinaryOpLogicalAnd: // and
-		return vmBinaryOp(e.ctx, left, right, operators.LogicalAnd)
-	case ast.BinaryOpLogicalOr: // or
-		return vmBinaryOp(e.ctx, left, right, operators.LogicalOr)
-	case ast.BinaryOpLogicalXor: // xor
+	case ast.BinaryOpBooleanXor: // xor
 		return vmBinaryOp(e.ctx, left, right, operators.LogicalXor)
 	case ast.BinaryOpNotEqual: // !=
 		return vmBinaryOp(e.ctx, left, right, operators.NotEqual)

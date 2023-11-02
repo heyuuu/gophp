@@ -23,11 +23,10 @@ func Execute(ctx *Context, fn *types.Function) (Val, error) {
 	// todo push stack
 	executeData := NewExecuteData()
 
-	switch fn. {
-	case *TypeUserFunction:
-	case *types.AstFunction:
-		return ExecuteAstFunction(ctx, executeData, f)
+	switch fn.Type() {
+	case types.TypeUserFunction:
+		return ExecuteAstFunction(ctx, executeData, fn)
 	default:
-		panic(fmt.Sprintf("unsupported function type: %T", f))
+		panic(fmt.Sprintf("unsupported function type: %T", fn.Type()))
 	}
 }

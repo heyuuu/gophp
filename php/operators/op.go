@@ -494,40 +494,40 @@ func BitwiseXor(op1, op2 Val) (Val, bool) {
 }
 
 // Coalesce
-func Coalesce(op1, op2 Val) (Val, bool) {}
+func Coalesce(op1, op2 Val) (Val, bool) { return nil, false }
 
 // Equal
-func Equal(op1, op2 Val) (Val, bool) {}
+func Equal(op1, op2 Val) (Val, bool) { return nil, false }
 
 // Greater
-func Greater(op1, op2 Val) (Val, bool) {}
+func Greater(op1, op2 Val) (Val, bool) { return nil, false }
 
 // GreaterOrEqual
-func GreaterOrEqual(op1, op2 Val) (Val, bool) {}
+func GreaterOrEqual(op1, op2 Val) (Val, bool) { return nil, false }
 
 // Identical
-func Identical(op1, op2 Val) (Val, bool) {}
+func Identical(op1, op2 Val) (Val, bool) { return nil, false }
 
 // LogicalAnd
-func LogicalAnd(op1, op2 Val) (Val, bool) {}
+func LogicalAnd(op1, op2 Val) (Val, bool) { return nil, false }
 
 // LogicalOr
-func LogicalOr(op1, op2 Val) (Val, bool) {}
+func LogicalOr(op1, op2 Val) (Val, bool) { return nil, false }
 
 // LogicalXor
-func LogicalXor(op1, op2 Val) (Val, bool) {}
+func LogicalXor(op1, op2 Val) (Val, bool) { return nil, false }
 
 // NotEqual
-func NotEqual(op1, op2 Val) (Val, bool) {}
+func NotEqual(op1, op2 Val) (Val, bool) { return nil, false }
 
 // NotIdentical
-func NotIdentical(op1, op2 Val) (Val, bool) {}
+func NotIdentical(op1, op2 Val) (Val, bool) { return nil, false }
 
 // Smaller
-func Smaller(op1, op2 Val) (Val, bool) {}
+func Smaller(op1, op2 Val) (Val, bool) { return nil, false }
 
 // SmallerOrEqual
-func SmallerOrEqual(op1, op2 Val) (Val, bool) {}
+func SmallerOrEqual(op1, op2 Val) (Val, bool) { return nil, false }
 
 // Spaceship
-func Spaceship(op1, op2 Val) (Val, bool) {}
+func Spaceship(op1, op2 Val) (Val, bool) { return nil, false }

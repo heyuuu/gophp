@@ -43,33 +43,31 @@ func _() {
 	_ = x[BinaryOpBitwiseXor-3]
 	_ = x[BinaryOpBooleanAnd-4]
 	_ = x[BinaryOpBooleanOr-5]
-	_ = x[BinaryOpCoalesce-6]
-	_ = x[BinaryOpConcat-7]
-	_ = x[BinaryOpDiv-8]
-	_ = x[BinaryOpEqual-9]
-	_ = x[BinaryOpGreater-10]
-	_ = x[BinaryOpGreaterOrEqual-11]
-	_ = x[BinaryOpIdentical-12]
-	_ = x[BinaryOpLogicalAnd-13]
-	_ = x[BinaryOpLogicalOr-14]
-	_ = x[BinaryOpLogicalXor-15]
-	_ = x[BinaryOpMinus-16]
-	_ = x[BinaryOpMod-17]
-	_ = x[BinaryOpMul-18]
-	_ = x[BinaryOpNotEqual-19]
-	_ = x[BinaryOpNotIdentical-20]
-	_ = x[BinaryOpPlus-21]
-	_ = x[BinaryOpPow-22]
-	_ = x[BinaryOpShiftLeft-23]
-	_ = x[BinaryOpShiftRight-24]
-	_ = x[BinaryOpSmaller-25]
-	_ = x[BinaryOpSmallerOrEqual-26]
-	_ = x[BinaryOpSpaceship-27]
+	_ = x[BinaryOpBooleanXor-6]
+	_ = x[BinaryOpCoalesce-7]
+	_ = x[BinaryOpConcat-8]
+	_ = x[BinaryOpDiv-9]
+	_ = x[BinaryOpEqual-10]
+	_ = x[BinaryOpGreater-11]
+	_ = x[BinaryOpGreaterOrEqual-12]
+	_ = x[BinaryOpIdentical-13]
+	_ = x[BinaryOpMinus-14]
+	_ = x[BinaryOpMod-15]
+	_ = x[BinaryOpMul-16]
+	_ = x[BinaryOpNotEqual-17]
+	_ = x[BinaryOpNotIdentical-18]
+	_ = x[BinaryOpPlus-19]
+	_ = x[BinaryOpPow-20]
+	_ = x[BinaryOpShiftLeft-21]
+	_ = x[BinaryOpShiftRight-22]
+	_ = x[BinaryOpSmaller-23]
+	_ = x[BinaryOpSmallerOrEqual-24]
+	_ = x[BinaryOpSpaceship-25]
 }
 
-const _BinaryOpKind_name = "&|^&&||??./==>>====andorxor-%*!=!==+**<<>><<=<=>"
+const _BinaryOpKind_name = "&|^&&||xor??./==>>====-%*!=!==+**<<>><<=<=>"
 
-var _BinaryOpKind_index = [...]uint8{0, 1, 2, 3, 5, 7, 9, 10, 11, 13, 14, 16, 19, 22, 24, 27, 28, 29, 30, 32, 35, 36, 38, 40, 42, 43, 45, 48}
+var _BinaryOpKind_index = [...]uint8{0, 1, 2, 3, 5, 7, 10, 12, 13, 14, 16, 17, 19, 22, 23, 24, 25, 27, 30, 31, 33, 35, 37, 38, 40, 43}
 
 func (i BinaryOpKind) String() string {
 	i -= 1

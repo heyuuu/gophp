@@ -30,7 +30,11 @@ type Function struct {
 	astFile *ast.File
 }
 
-func (f *Function) Type() FunctionType  { return f.typ }
+func (f *Function) Type() FunctionType { return f.typ }
+
+func (f *Function) IsInternalFunction() bool { return f.typ == TypeInternalFunction }
+func (f *Function) IsUserFunction() bool     { return f.typ == TypeUserFunction }
+
 func (f *Function) Name() string        { return f.functionName }
 func (f *Function) ArgInfos() []ArgInfo { return f.argInfos }
 

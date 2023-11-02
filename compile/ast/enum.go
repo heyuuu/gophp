@@ -30,6 +30,7 @@ const (
 	BinaryOpBitwiseXor                             // ^
 	BinaryOpBooleanAnd                             // &&
 	BinaryOpBooleanOr                              // ||
+	BinaryOpBooleanXor                             // xor
 	BinaryOpCoalesce                               // ??
 	BinaryOpConcat                                 // .
 	BinaryOpDiv                                    // /
@@ -37,9 +38,6 @@ const (
 	BinaryOpGreater                                // >
 	BinaryOpGreaterOrEqual                         // >=
 	BinaryOpIdentical                              // ===
-	BinaryOpLogicalAnd                             // and
-	BinaryOpLogicalOr                              // or
-	BinaryOpLogicalXor                             // xor
 	BinaryOpMinus                                  // -
 	BinaryOpMod                                    // %
 	BinaryOpMul                                    // *

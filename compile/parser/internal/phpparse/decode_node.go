@@ -219,19 +219,19 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "BinaryOpLogicalAndExpr":
 		node = &ast.BinaryOpExpr{
-			Op:    ast.BinaryOpLogicalAnd,
+			Op:    ast.BinaryOpBooleanAnd, // 使用 `&&` 代替 `and`
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpLogicalOrExpr":
 		node = &ast.BinaryOpExpr{
-			Op:    ast.BinaryOpLogicalOr,
+			Op:    ast.BinaryOpBooleanOr, // 使用 `||` 代替 `or`
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "BinaryOpLogicalXorExpr":
 		node = &ast.BinaryOpExpr{
-			Op:    ast.BinaryOpLogicalXor,
+			Op:    ast.BinaryOpBooleanXor,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
