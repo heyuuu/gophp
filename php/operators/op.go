@@ -493,8 +493,12 @@ func BitwiseXor(op1, op2 Val) (Val, bool) {
 	return Long(op1Lval ^ op2Lval), true
 }
 
-// Coalesce
-func Coalesce(op1, op2 Val) (Val, bool) { return nil, false }
+// LogicalXor
+func BooleanXor(op1, op2 Val) (Val, bool) {
+	op1Val := ZvalIsTrue(op1)
+	op2Val := ZvalIsTrue(op2)
+	return Bool(lang.Xor(op1Val, op2Val)), true
+}
 
 // Equal
 func Equal(op1, op2 Val) (Val, bool) { return nil, false }
@@ -513,9 +517,6 @@ func LogicalAnd(op1, op2 Val) (Val, bool) { return nil, false }
 
 // LogicalOr
 func LogicalOr(op1, op2 Val) (Val, bool) { return nil, false }
-
-// LogicalXor
-func LogicalXor(op1, op2 Val) (Val, bool) { return nil, false }
 
 // NotEqual
 func NotEqual(op1, op2 Val) (Val, bool) { return nil, false }
