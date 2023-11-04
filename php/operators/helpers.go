@@ -61,6 +61,8 @@ const (
 	IsArrayDouble               = ZvalTypePair(types.IsArray)<<8 | ZvalTypePair(types.IsDouble)
 	IsArrayString               = ZvalTypePair(types.IsArray)<<8 | ZvalTypePair(types.IsString)
 	IsArrayArray                = ZvalTypePair(types.IsArray)<<8 | ZvalTypePair(types.IsArray)
+	IsObjectNull                = ZvalTypePair(types.IsObject)<<8 | ZvalTypePair(types.IsNull)
+	IsNullObject                = ZvalTypePair(types.IsNull)<<8 | ZvalTypePair(types.IsObject)
 )
 
 // fast type and functions
@@ -94,21 +96,36 @@ func fastGetDouble(v Val) float64 {
 	}
 }
 
-func hasException() bool {
-	// todo EG__().HasException()
-	return false
-}
-
 func opScalarGetNumber(op1, op2 Val) (Val, Val) {
 	// todo 类型转换
 	return op1, op2
+}
+
+func objectCompare(obj *types.Object, op1, op2 Val) (result int, ok bool) {
+	// todo object 比较
+	return 1, true
+}
+
+func getPrecision() int {
+	//  php.EG__().GetPrecision()
+	return 14
+}
+
+func hasException() bool {
+	// todo EG__().HasException()
+	return false
 }
 
 func throwIfExecuting(ce *types.Class, message string) {
 	// todo 触发错误或异常信息
 }
 
-func getPrecision() int {
-	//  php.EG__().GetPrecision()
-	return 14
+func normalizeSign[T int | float64](n T) int {
+	if n == 0 {
+		return 0
+	} else if n < 0 {
+		return -1
+	} else {
+		return 1
+	}
 }

@@ -3,7 +3,9 @@ package operators
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/php/faults"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/shim/cmp"
 	"strconv"
 )
 
@@ -251,5 +253,147 @@ func zvalGetStrEx(op Val, try bool) (string, bool) {
 		}
 	default:
 		return "", false
+	}
+}
+
+// compare
+func ZvalCompare(op1 Val, op2 Val) (int, bool) {
+	var converted int = 0
+
+	op1 = op1.DeRef()
+	op2 = op2.DeRef()
+	for {
+		switch typePair(op1, op2) {
+		case IsLongLong:
+			return cmp.Compare(op1.Long(), op2.Long()), true
+		case IsLongDouble, IsDoubleLong, IsDoubleDouble:
+			d1 := fastGetDouble(op1)
+			d2 := fastGetDouble(op2)
+			return cmp.Compare(d1, d2), true
+		case IsArrayArray:
+			return ZendCompareArrays(op1, op2), true
+		case IsNullNull, IsNullFalse, IsFalseNull, IsFalseFalse, IsTrueTrue:
+			return 0, true
+		case IsNullTrue:
+			return -1, true
+		case IsTrueNull:
+			return 1, true
+		case IsStringString:
+			if op1.String() == op2.String() {
+				return 0, true
+			}
+			return ZendiSmartStrcmp(op1.String(), op2.String()), true
+		case IsNullString:
+			return lang.Cond(len(op2.String()) == 0, 0, -1), true
+		case IsStringNull:
+			return lang.Cond(len(op1.String()) == 0, 0, 1), true
+		case IsObjectNull:
+			return 1, true
+		case IsNullObject:
+			return -1, true
+		default:
+			if op1.IsObject() && op1.Object().CanCompare() {
+				return objectCompare(op1.Object(), op1, op2)
+			} else if op2.IsObject() && op2.Object().CanCompare() {
+				return objectCompare(op2.Object(), op1, op2)
+			}
+			if op1.IsObject() && op2.IsObject() {
+				if op1.Object() == op2.Object() {
+					/* object handles are identical, apparently this is the same object */
+					return 0, true
+				}
+				if retval, ok := op1.Object().CompareObjectsTo(op2.Object()); ok {
+					return retval, true
+				}
+				return 1, true
+			}
+			if op1.IsObject() && !op2.IsObject() && op1.Object().CanCast() {
+				if tmp, ok := op1.Object().Cast(op2.Type()); ok {
+					return ZvalCompare(tmp, op2)
+				} else {
+					return 1, true
+				}
+			}
+			if op2.IsObject() && !op1.IsObject() && op2.Object().CanCast() {
+				if tmp, ok := op2.Object().Cast(op1.Type()); ok {
+					return ZvalCompare(op1, tmp)
+				} else {
+					return -1, true
+				}
+			}
+
+			if converted == 0 {
+				if op1.Type() < types.IsTrue {
+					return lang.Cond(ZvalIsTrue(op2), -1, 0), true
+				} else if op1.IsTrue() {
+					return lang.Cond(ZvalIsTrue(op2), 0, 1), true
+				} else if op2.Type() < types.IsTrue {
+					return lang.Cond(ZvalIsTrue(op1), 1, 0), true
+				} else if op2.IsTrue() {
+					return lang.Cond(ZvalIsTrue(op1), 0, -1), true
+				} else {
+					op1, op2 = opScalarGetNumberEx(op1, op2, true)
+					if hasException() {
+						return 0, false
+					}
+					converted = 1
+				}
+			} else if op1.IsArray() {
+				return 1, true
+			} else if op2.IsArray() {
+				return -1, true
+			} else {
+				lang.Assert(false)
+				faults.ThrowError(nil, "Unsupported operand types")
+				return 0, false
+			}
+		}
+	}
+}
+
+// equals
+func ZvalEquals(op1, op2 Val) (result bool, ok bool) {
+	switch typePair(op1, op2) {
+	case IsLongLong:
+		return op1.Long() == op2.Long(), true
+	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
+		d1 := fastGetDouble(op1)
+		d2 := fastGetDouble(op2)
+		return d1 == d2, true
+	case IsStringString:
+		return ZendFastEqualStringsEx(op1.String(), op2.String()), true
+	default:
+		ret, ok := ZvalCompare(op1, op2)
+		if !ok {
+			return false, false
+		}
+		return ret == 0, true
+	}
+}
+
+// identical
+func ZvalIsIdentical(op1 Val, op2 Val) bool {
+	if op1.Type() != op2.Type() {
+		return false
+	}
+	switch op1.Type() {
+	case types.IsNull, types.IsFalse, types.IsTrue:
+		return true
+	case types.IsLong:
+		return op1.Long() == op2.Long()
+	case types.IsResource:
+		return op1.Resource() == op2.Resource()
+	case types.IsDouble:
+		return op1.Double() == op2.Double()
+	case types.IsString:
+		return op1.String() == op2.String()
+	case types.IsArray:
+		// todo array compare
+		return op1.Array() == op2.Array() // || types.ZendHashCompare(op1.Array(), op2.Array(), HashZvalIdenticalFunction, 1) == 0
+		//return op1.Array() == op2.Array() || types.ZendHashCompare(op1.Array(), op2.Array(), HashZvalIdenticalFunction, 1) == 0
+	case types.IsObject:
+		return op1.Object() == op2.Object()
+	default:
+		return false
 	}
 }

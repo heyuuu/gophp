@@ -500,35 +500,54 @@ func BooleanXor(op1, op2 Val) (Val, bool) {
 	return Bool(lang.Xor(op1Val, op2Val)), true
 }
 
-// Equal
-func Equal(op1, op2 Val) (Val, bool) { return nil, false }
-
-// Greater
-func Greater(op1, op2 Val) (Val, bool) { return nil, false }
-
-// GreaterOrEqual
-func GreaterOrEqual(op1, op2 Val) (Val, bool) { return nil, false }
-
 // Identical
-func Identical(op1, op2 Val) (Val, bool) { return nil, false }
-
-// LogicalAnd
-func LogicalAnd(op1, op2 Val) (Val, bool) { return nil, false }
-
-// LogicalOr
-func LogicalOr(op1, op2 Val) (Val, bool) { return nil, false }
-
-// NotEqual
-func NotEqual(op1, op2 Val) (Val, bool) { return nil, false }
+func Identical(op1, op2 Val) (Val, bool) {
+	return Bool(ZvalIsIdentical(op1, op2)), true
+}
 
 // NotIdentical
-func NotIdentical(op1, op2 Val) (Val, bool) { return nil, false }
+func NotIdentical(op1, op2 Val) (Val, bool) {
+	return Bool(!ZvalIsIdentical(op1, op2)), true
+}
+
+// Equal
+func Equal(op1, op2 Val) (Val, bool) {
+	result, ok := ZvalEquals(op1, op2)
+	return Bool(result), ok
+}
+
+// NotEqual
+func NotEqual(op1, op2 Val) (Val, bool) {
+	result, ok := ZvalEquals(op1, op2)
+	return Bool(!result), ok
+}
+
+// Greater
+func Greater(op1, op2 Val) (Val, bool) {
+	result, ok := ZvalCompare(op1, op2)
+	return Bool(result > 0), ok
+}
+
+// GreaterOrEqual
+func GreaterOrEqual(op1, op2 Val) (Val, bool) {
+	result, ok := ZvalCompare(op1, op2)
+	return Bool(result >= 0), ok
+}
 
 // Smaller
-func Smaller(op1, op2 Val) (Val, bool) { return nil, false }
+func Smaller(op1, op2 Val) (Val, bool) {
+	result, ok := ZvalCompare(op1, op2)
+	return Bool(result < 0), ok
+}
 
 // SmallerOrEqual
-func SmallerOrEqual(op1, op2 Val) (Val, bool) { return nil, false }
+func SmallerOrEqual(op1, op2 Val) (Val, bool) {
+	result, ok := ZvalCompare(op1, op2)
+	return Bool(result <= 0), ok
+}
 
 // Spaceship
-func Spaceship(op1, op2 Val) (Val, bool) { return nil, false }
+func Spaceship(op1, op2 Val) (Val, bool) {
+	result, ok := ZvalCompare(op1, op2)
+	return Long(result), ok
+}
