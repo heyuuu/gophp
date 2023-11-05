@@ -4,11 +4,6 @@ import (
 	"github.com/heyuuu/gophp/compile/ast"
 )
 
-type AstFunction struct {
-	name     string
-	argInfos []ArgInfo
-}
-
 func NewAstFunction(name string, argInfos []ArgInfo, stmts []ast.Stmt) *Function {
 	return &Function{
 		typ:          TypeUserFunction,
@@ -18,10 +13,15 @@ func NewAstFunction(name string, argInfos []ArgInfo, stmts []ast.Stmt) *Function
 	}
 }
 
-func NewAstTopFunction(ast *ast.File) *Function {
+func NewAstTopFunction(astFile *ast.File) *Function {
+	var stmts []ast.Stmt
+	for _, namespace := range astFile.Namespaces {
+		stmts = append(stmts, namespace.Stmts...)
+	}
+
 	return &Function{
-		typ:     TypeUserFunction,
-		astFile: ast,
+		typ:   TypeUserFunction,
+		stmts: stmts,
 	}
 }
 

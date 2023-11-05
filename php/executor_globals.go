@@ -12,3 +12,18 @@ type ExecutorGlobals struct {
 	functionTable FunctionTable
 	classTable    ClassTable
 }
+
+func (e *ExecutorGlobals) Init() {
+	e.constantTable = types.NewTable[*types.Constant]()
+	e.functionTable = types.NewTable[*types.Function]()
+	e.classTable = types.NewTable[*types.Class]()
+}
+
+func (e *ExecutorGlobals) ConstantTable() ConstantTable { return e.constantTable }
+func (e *ExecutorGlobals) FunctionTable() FunctionTable { return e.functionTable }
+func (e *ExecutorGlobals) ClassTable() ClassTable       { return e.classTable }
+
+func (e *ExecutorGlobals) FindFunction(name string) *types.Function {
+	// todo 完善 caseIgnore 及命名空间处理
+	return e.functionTable.Get(name)
+}

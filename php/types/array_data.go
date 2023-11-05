@@ -5,9 +5,9 @@ type ArrayData interface {
 	Exists(key ArrayKey) bool
 	Find(key ArrayKey) *Zval
 
-	Add(key ArrayKey, data *Zval) bool
-	Update(key ArrayKey, data *Zval)
+	Add(key ArrayKey, value *Zval) bool
+	Update(key ArrayKey, value *Zval)
 	Delete(key ArrayKey) bool
-	Push(data *Zval) bool
+	Push(value *Zval) int
 	Clean()
 }

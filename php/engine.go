@@ -9,7 +9,7 @@ func NewEngine() *Engine {
 }
 
 func (e *Engine) NewContext() *Context {
-	return &Context{engine: e}
+	return NewContext(e)
 }
 
 func (e *Engine) Start() error {

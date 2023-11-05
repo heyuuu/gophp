@@ -1,0 +1,64 @@
+package php
+
+import (
+	"fmt"
+	"github.com/heyuuu/gophp/php/faults"
+	"github.com/heyuuu/gophp/php/lang"
+	"github.com/heyuuu/gophp/php/operators"
+	"github.com/heyuuu/gophp/php/types"
+)
+
+// ExecutorError
+type ExecutorError string
+
+func (e ExecutorError) Error() string { return string(e) }
+
+// executor
+type executor struct {
+	ctx         *Context
+	executeData *ExecuteData
+	operator    *operators.Operator
+}
+
+func NewExecutor(ctx *Context) *executor {
+	return &executor{
+		ctx:      ctx,
+		operator: ctx.Operator(),
+	}
+}
+
+func (e *executor) Execute(fn *types.Function) (retval Val, ret error) {
+	//defer func() {
+	//	if e := recover(); e != nil {
+	//		if err_, ok := e.(ExecutorError); ok {
+	//			retval, ret = nil, err_
+	//		} else {
+	//			panic(fmt.Errorf("%w", e)) // re-panic
+	//		}
+	//	}
+	//}()
+
+	return e.function(fn, nil), nil
+}
+
+func (e *executor) function(fn *types.Function, args []Val) Val {
+	lang.Assert(fn != nil)
+	if fn.IsInternalFunction() {
+		// todo
+		var retval Val
+		fn.Handler()(nil, retval)
+		return retval
+	} else {
+		return e.userFunction(fn, args)
+	}
+}
+
+func (e *executor) initStringCall(name string) *types.Function {
+	// todo ZendInitDynamicCallString
+	fn := e.ctx.EG().FindFunction(name)
+	if fn == nil {
+		faults.ThrowError(nil, fmt.Sprintf("Call to undefined function %s()", name))
+		return nil
+	}
+	return fn
+}

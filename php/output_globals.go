@@ -11,6 +11,9 @@ type OutputGlobals struct {
 	active io.Writer
 }
 
+func (g *OutputGlobals) Init() {
+}
+
 func (g *OutputGlobals) writer() io.Writer {
 	if g.active != nil {
 		return g.active
