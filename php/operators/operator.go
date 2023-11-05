@@ -27,15 +27,14 @@ again:
 		retArr := op.AddArray(op1.Array(), op2.Array())
 		return Array(retArr)
 	default:
-		if converted {
+		if !converted {
 			// fail
 			op.throwErrorNoReturn(nil, "Unsupported operand types")
 		}
 
 		// convert
-		op1, op2 = op.opScalarGetNumber(op1, op2)
-
 		converted = true
+		op1, op2 = op.opScalarGetNumber(op1, op2)
 		goto again
 	}
 }
@@ -71,9 +70,8 @@ again:
 		}
 
 		// convert
-		op1, op2 = op.opScalarGetNumber(op1, op2)
-
 		converted = true
+		op1, op2 = op.opScalarGetNumber(op1, op2)
 		goto again
 	}
 }
@@ -104,9 +102,8 @@ again:
 		}
 
 		// convert
-		op1, op2 = op.opScalarGetNumber(op1, op2)
-
 		converted = true
+		op1, op2 = op.opScalarGetNumber(op1, op2)
 		goto again
 	}
 }
@@ -144,7 +141,7 @@ again:
 		d1 := fastGetDouble(op1)
 		d2 := fastGetDouble(op2)
 		if d2 == 0 {
-			faults.Error(faults.E_WARNING, "Division by zero")
+			op.error(faults.E_WARNING, "Division by zero")
 			return Double(math.Inf(int(d1)))
 		}
 		return Double(d1 / d2)
@@ -155,16 +152,15 @@ again:
 		}
 
 		// convert
-		op1, op2 = op.opScalarGetNumber(op1, op2)
-
 		converted = true
+		op1, op2 = op.opScalarGetNumber(op1, op2)
 		goto again
 	}
 }
 
 func (op *Operator) DivLong(i1, i2 int) Val {
 	if i2 == 0 {
-		faults.Error(faults.E_WARNING, "Division by zero")
+		op.error(faults.E_WARNING, "Division by zero")
 		return Double(math.Inf(i1))
 	} else if i2 == -1 && i1 == math.MinInt {
 		/* Prevent overflow error/crash */
@@ -198,7 +194,7 @@ func (op *Operator) Mod(op1, op2 Val) Val {
 
 	if op2Lval == 0 {
 		/* modulus by zero */
-		op.throwIfExecuting(nil, "Modulo by zero")
+		op.throwIfExecutingNoReturn(nil, "Modulo by zero")
 	}
 
 	return Long(op1Lval % op2Lval)
@@ -224,7 +220,7 @@ func (op *Operator) SL(op1, op2 Val) Val {
 	}
 
 	if op2Lval < 0 {
-		op.throwIfExecuting(nil, "Bit shift by negative number")
+		op.throwIfExecutingNoReturn(nil, "Bit shift by negative number")
 	}
 
 	return Long(op1Lval << op2Lval)
@@ -250,7 +246,7 @@ func (op *Operator) SR(op1, op2 Val) Val {
 	}
 
 	if op2Lval < 0 {
-		op.throwIfExecuting(nil, "Bit shift by negative number")
+		op.throwIfExecutingNoReturn(nil, "Bit shift by negative number")
 	}
 
 	return Long(op1Lval >> op2Lval)
@@ -399,9 +395,7 @@ func (op *Operator) BitwiseOr(op1, op2 Val) Val {
 	}
 
 	var op1Lval = op.zvalGetLongNoisy(op1)
-
 	var op2Lval = op.zvalGetLongNoisy(op2)
-
 	return Long(op1Lval | op2Lval)
 }
 
