@@ -20,11 +20,11 @@ func (op *Operator) Add(op1, op2 Val) Val {
 again:
 	switch typePair(op1, op2) {
 	case IsLongLong:
-		return AddLong(op1.Long(), op2.Long())
+		return op.AddLong(op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		return Double(fastGetDouble(op1) + fastGetDouble(op2))
 	case IsArrayArray:
-		retArr := AddArray(op1.Array(), op2.Array())
+		retArr := op.AddArray(op1.Array(), op2.Array())
 		return Array(retArr)
 	default:
 		if converted {
@@ -61,7 +61,7 @@ func (op *Operator) Sub(op1, op2 Val) Val {
 again:
 	switch typePair(op1, op2) {
 	case IsLongLong:
-		return SubLong(op1.Long(), op2.Long())
+		return op.SubLong(op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		return Double(fastGetDouble(op1) - fastGetDouble(op2))
 	default:
@@ -94,7 +94,7 @@ func (op *Operator) Mul(op1, op2 Val) Val {
 again:
 	switch typePair(op1, op2) {
 	case IsLongLong:
-		return MulLong(op1.Long(), op2.Long())
+		return op.MulLong(op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		return Double(fastGetDouble(op1) * fastGetDouble(op2))
 	default:
@@ -112,7 +112,7 @@ again:
 }
 
 func (op *Operator) MulLong(i1, i2 int) Val {
-	if iVal, dVal, overflow := mulLong(i1, i2); !overflow {
+	if iVal, dVal, overflow := op.mulLong(i1, i2); !overflow {
 		return Long(iVal)
 	} else {
 		return Double(dVal)
@@ -139,7 +139,7 @@ func (op *Operator) Div(op1, op2 Val) Val {
 again:
 	switch typePair(op1, op2) {
 	case IsLongLong:
-		return DivLong(op1.Long(), op2.Long())
+		return op.DivLong(op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		d1 := fastGetDouble(op1)
 		d2 := fastGetDouble(op2)
@@ -205,7 +205,7 @@ func (op *Operator) Mod(op1, op2 Val) Val {
 }
 
 // ShiftLeft (SL)
-func (op *Operator) ShiftLeft(op1, op2 Val) Val {
+func (op *Operator) SL(op1, op2 Val) Val {
 	var op1Lval int
 	var op2Lval int
 
@@ -231,7 +231,7 @@ func (op *Operator) ShiftLeft(op1, op2 Val) Val {
 }
 
 // ShiftRight (SR)
-func (op *Operator) ShiftRight(op1, op2 Val) Val {
+func (op *Operator) SR(op1, op2 Val) Val {
 	var op1Lval int
 	var op2Lval int
 
@@ -290,7 +290,7 @@ func (op *Operator) Pow(op1, op2 Val) Val {
 again:
 	switch typePair(op1, op2) {
 	case IsLongLong:
-		return PowLong(op1.Long(), op2.Long())
+		return op.PowLong(op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		d1 := fastGetDouble(op1)
 		d2 := fastGetDouble(op2)
@@ -339,10 +339,10 @@ func (op *Operator) PowLong(i1, i2 int) Val {
 		for pow >= 1 {
 			if pow%2 != 0 {
 				pow--
-				l1, _, overflow = mulLong(l1, l2)
+				l1, _, overflow = op.mulLong(l1, l2)
 			} else {
 				i2 /= 2
-				l2, _, overflow = mulLong(l2, l2)
+				l2, _, overflow = op.mulLong(l2, l2)
 			}
 			if overflow {
 				goto doubleVal
@@ -426,6 +426,36 @@ func (op *Operator) BitwiseXor(op1, op2 Val) Val {
 	var op1Lval = op.zvalGetLongNoisy(op1)
 	var op2Lval = op.zvalGetLongNoisy(op2)
 	return Long(op1Lval ^ op2Lval)
+}
+
+// Coalesce(??)
+func (op *Operator) Coalesce(op1 Val, op2 LazyVal) Val {
+	if !op1.IsUndef() && !op1.IsNull() {
+		return op1
+	}
+	return op2()
+}
+
+// BooleanAnd
+func (op *Operator) BooleanAnd(op1 Val, op2 LazyVal) Val {
+	op1Val := ZvalIsTrue(op1)
+	if !op1Val {
+		return False()
+	}
+
+	op2Val := ZvalIsTrue(op2())
+	return Bool(op2Val)
+}
+
+// BooleanOr
+func (op *Operator) BooleanOr(op1 Val, op2 LazyVal) Val {
+	op1Val := ZvalIsTrue(op1)
+	if op1Val {
+		return True()
+	}
+
+	op2Val := ZvalIsTrue(op2())
+	return Bool(op2Val)
 }
 
 // BooleanXor

@@ -16,6 +16,7 @@ type iOperator interface {
 	BitwiseAnd(Val, Val) Val
 	BitwiseOr(Val, Val) Val
 	BitwiseXor(Val, Val) Val
+	Coalesce(Val, LazyVal) Val
 	BooleanAnd(Val, LazyVal) Val
 	BooleanOr(Val, LazyVal) Val
 	BooleanXor(Val, Val) Val

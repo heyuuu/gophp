@@ -73,15 +73,10 @@ func (e *astExecutor) executeFile(filePath string) (Val, error) {
 }
 
 func (e *astExecutor) executeAstFile(f *ast.File) (Val, error) {
-	// todo f.Declares
-
 	e.currFile = f
 	for _, ns := range f.Namespaces {
 		e.currNs = ns
-		res, err := e.executeStmts(ns.Stmts)
-		if err != nil {
-			return nil, err
-		}
+		res := e.stmtList(ns.Stmts)
 		switch r := res.(type) {
 		case *returnResult:
 			return r.retVal, nil
@@ -92,7 +87,7 @@ func (e *astExecutor) executeAstFile(f *ast.File) (Val, error) {
 	return nil, nil
 }
 
-func (e *astExecutor) executeStmts(stmts []ast.Stmt) (result executeResult, err error) {
+func (e *astExecutor) stmtList(stmts []ast.Stmt) (result executeResult) {
 	var labels = map[string]int{}
 	for i, stmt := range stmts {
 		if label, ok := stmt.(*ast.LabelStmt); ok {
@@ -101,14 +96,14 @@ func (e *astExecutor) executeStmts(stmts []ast.Stmt) (result executeResult, err 
 	}
 
 	l := len(stmts)
-	for i := 0; i < l && err == nil; i++ {
+	for i := 0; i < l; i++ {
 		switch x := stmts[i].(type) {
 		case *ast.EmptyStmt: // pass
 		case *ast.ExprStmt:
-			_, err = e.executeExpr(x.Expr)
+			_ = e.expr(x.Expr)
 		case *ast.ReturnStmt:
-			retVal, err := e.executeExpr(x.Expr)
-			return returnResult{retVal: retVal}, err
+			retVal := e.expr(x.Expr)
+			return returnResult{retVal: retVal}
 		case *ast.LabelStmt:
 			// pass
 			// todo goto 能跳到非循环结构内(比如 if)
@@ -118,43 +113,37 @@ func (e *astExecutor) executeStmts(stmts []ast.Stmt) (result executeResult, err 
 			if v, ok := labels[labelName]; ok {
 				i = v
 			} else {
-				return gotoResult{labelName}, err
+				return gotoResult{labelName}
 			}
 		case *ast.EchoStmt:
-			values, err := e.executeExprs(x.Exprs)
-			if err != nil {
-				return nil, err
-			}
+			values := e.exprList(x.Exprs)
 			for _, value := range values {
 				vmEcho(e.ctx, value)
 			}
 		// todo
 		default:
-			panic(fmt.Sprintf("todo executor.executeStmts(%T)", x))
+			panic(fmt.Sprintf("todo executor.stmtList(%T)", x))
 		}
 	}
 	return
 }
 
-func (e *astExecutor) executeExprs(exprs []ast.Expr) (values []Val, err error) {
-	values = make([]Val, len(exprs))
+func (e *astExecutor) exprList(exprs []ast.Expr) []Val {
+	values := make([]Val, len(exprs))
 	for i, expr := range exprs {
-		values[i], err = e.executeExpr(expr)
-		if err != nil {
-			return nil, err
-		}
+		values[i] = e.expr(expr)
 	}
-	return
+	return values
 }
 
-func (e *astExecutor) executeExpr(expr ast.Expr) (val Val, err error) {
+func (e *astExecutor) expr(expr ast.Expr) Val {
 	switch x := expr.(type) {
 	case *ast.IntLit:
-		return Long(x.Value), nil
+		return Long(x.Value)
 	case *ast.FloatLit:
-		return Double(x.Value), nil
+		return Double(x.Value)
 	case *ast.StringLit:
-		return String(x.Value), nil
+		return String(x.Value)
 	case *ast.ArrayExpr:
 		return e.executeArrayExpr(x)
 	case *ast.ClosureExpr:
@@ -234,153 +223,119 @@ func (e *astExecutor) executeExpr(expr ast.Expr) (val Val, err error) {
 	}
 }
 
-func (e *astExecutor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val, err error) {
+func (e *astExecutor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
+	op := e.operator
+
 	// && / || / ?? 操作比较特殊，右表达式节点可能不会执行
 	switch expr.Op {
 	case ast.BinaryOpBooleanAnd: // &&
-		if left, err := e.executeExpr(expr.Left); err != nil {
-			return nil, err
-		} else if !ZvalIsTrue(left) {
-			return False(), nil
-		}
-
-		if right, err := e.executeExpr(expr.Right); err != nil {
-			return nil, err
-		} else {
-			return Bool(ZvalIsTrue(right)), nil
-		}
+		left := e.expr(expr.Left)
+		right := func() Val { return e.expr(expr.Right) }
+		return op.BooleanAnd(left, right)
 	case ast.BinaryOpBooleanOr: // ||
-		if left, err := e.executeExpr(expr.Left); err != nil {
-			return nil, err
-		} else if ZvalIsTrue(left) {
-			return True(), nil
-		}
-
-		if right, err := e.executeExpr(expr.Right); err != nil {
-			return nil, err
-		} else {
-			return Bool(ZvalIsTrue(right)), nil
-		}
+		left := e.expr(expr.Left)
+		right := func() Val { return e.expr(expr.Right) }
+		return op.BooleanAnd(left, right)
 	case ast.BinaryOpCoalesce: // ??
-		if left, err := e.executeExpr(expr.Left); err != nil {
-			return nil, err
-		} else if !left.IsUndef() && !left.IsNull() {
-			return left, nil
-		}
-
-		return e.executeExpr(expr.Right)
+		left := e.expr(expr.Left)
+		right := func() Val { return e.expr(expr.Right) }
+		return op.Coalesce(left, right)
 	}
 
 	// common
-	left, err := e.executeExpr(expr.Left)
-	if err != nil {
-		return nil, err
-	}
-
-	right, err := e.executeExpr(expr.Right)
-	if err != nil {
-		return nil, err
-	}
+	left := e.expr(expr.Left)
+	right := e.expr(expr.Right)
 
 	switch expr.Op {
 	case ast.BinaryOpPlus: // +
-		return vmBinaryOp(e.ctx, left, right, operators.Add)
+		return op.Add(left, right)
 	case ast.BinaryOpMinus: // -
-		return vmBinaryOp(e.ctx, left, right, operators.Sub)
+		return op.Sub(left, right)
 	case ast.BinaryOpMul: // *
-		return vmBinaryOp(e.ctx, left, right, operators.Mul)
+		return op.Mul(left, right)
 	case ast.BinaryOpDiv: // /
-		return vmBinaryOp(e.ctx, left, right, operators.Div)
+		return op.Div(left, right)
 	case ast.BinaryOpMod: // %
-		return vmBinaryOp(e.ctx, left, right, operators.Mod)
+		return op.Mod(left, right)
 	case ast.BinaryOpPow: // **
-		return vmBinaryOp(e.ctx, left, right, operators.Pow)
+		return op.Pow(left, right)
 	case ast.BinaryOpBitwiseAnd: // &
-		return vmBinaryOp(e.ctx, left, right, operators.BitwiseAnd)
+		return op.BitwiseAnd(left, right)
 	case ast.BinaryOpBitwiseOr: // n|
-		return vmBinaryOp(e.ctx, left, right, operators.BitwiseOr)
+		return op.BitwiseOr(left, right)
 	case ast.BinaryOpBitwiseXor: // ^
-		return vmBinaryOp(e.ctx, left, right, operators.BitwiseXor)
+		return op.BitwiseXor(left, right)
 	case ast.BinaryOpConcat: // .
-		return vmBinaryOp(e.ctx, left, right, operators.Concat)
+		return op.Concat(left, right)
 	case ast.BinaryOpEqual: // ==
-		return vmBinaryOp(e.ctx, left, right, operators.Equal)
+		return op.Equal(left, right)
 	case ast.BinaryOpGreater: // >
-		return vmBinaryOp(e.ctx, left, right, operators.Greater)
+		return op.Greater(left, right)
 	case ast.BinaryOpGreaterOrEqual: // >=
-		return vmBinaryOp(e.ctx, left, right, operators.GreaterOrEqual)
+		return op.GreaterOrEqual(left, right)
 	case ast.BinaryOpIdentical: // ===
-		return vmBinaryOp(e.ctx, left, right, operators.Identical)
+		return op.Identical(left, right)
 	case ast.BinaryOpBooleanXor: // xor
-		return vmBinaryOp(e.ctx, left, right, operators.BooleanXor)
+		return op.BooleanXor(left, right)
 	case ast.BinaryOpNotEqual: // !=
-		return vmBinaryOp(e.ctx, left, right, operators.NotEqual)
+		return op.NotEqual(left, right)
 	case ast.BinaryOpNotIdentical: // !==
-		return vmBinaryOp(e.ctx, left, right, operators.NotIdentical)
+		return op.NotIdentical(left, right)
 	case ast.BinaryOpShiftLeft: // <<
-		return vmBinaryOp(e.ctx, left, right, operators.ShiftLeft)
+		return op.SL(left, right)
 	case ast.BinaryOpShiftRight: // >>
-		return vmBinaryOp(e.ctx, left, right, operators.ShiftRight)
+		return op.SR(left, right)
 	case ast.BinaryOpSmaller: // <
-		return vmBinaryOp(e.ctx, left, right, operators.Smaller)
+		return op.Smaller(left, right)
 	case ast.BinaryOpSmallerOrEqual: // <=
-		return vmBinaryOp(e.ctx, left, right, operators.SmallerOrEqual)
+		return op.SmallerOrEqual(left, right)
 	case ast.BinaryOpSpaceship: // <=>
-		return vmBinaryOp(e.ctx, left, right, operators.Spaceship)
+		return op.Spaceship(left, right)
 	default:
 		panic("unreachable")
 	}
 }
-func (e *astExecutor) executeArrayExpr(expr *ast.ArrayExpr) (val Val, err error) {
-	arr := types.NewArrayCap(len(expr.Items))
-	for _, item := range expr.Items {
-		if item.ByRef {
-			// todo item byref
-			panic("todo item byref")
-		} else if item.Unpack && item.Key != nil {
-			// todo item unpack with key
-			panic("todo item unpack with key")
-		}
-
-		var key, value Val
-		if item.Key != nil {
-			key, err = e.executeExpr(item.Key)
-			if err != nil {
-				return
-			}
-		}
-		value, err = e.executeExpr(item.Value)
-		if err != nil {
-			return
-		}
-
-		if key == nil {
-			// todo array add
-		} else {
-			// todo array add
-		}
-	}
+func (e *astExecutor) executeArrayExpr(expr *ast.ArrayExpr) Val {
+	//arr := types.NewArrayCap(len(expr.Items))
+	//for _, item := range expr.Items {
+	//	if item.ByRef {
+	//		// todo item byref
+	//		panic("todo item byref")
+	//	} else if item.Unpack && item.Key != nil {
+	//		// todo item unpack with key
+	//		panic("todo item unpack with key")
+	//	}
+	//
+	//	if item.Key != nil {
+	//		key := e.expr(item.Key)
+	//		value := e.expr(item.Value)
+	//		// todo array add
+	//	} else {
+	//		value := e.expr(item.Value)
+	//		// todo array add
+	//	}
+	//}
 
 	panic(fmt.Sprintf("todo executeArrayExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeClosureExpr(expr *ast.ClosureExpr) (val Val, err error) {
+func (e *astExecutor) executeClosureExpr(expr *ast.ClosureExpr) Val {
 	panic(fmt.Sprintf("todo executeClosureExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeClosureUseExpr(expr *ast.ClosureUseExpr) (val Val, err error) {
+func (e *astExecutor) executeClosureUseExpr(expr *ast.ClosureUseExpr) Val {
 	panic(fmt.Sprintf("todo executeClosureUseExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeArrowFunctionExpr(expr *ast.ArrowFunctionExpr) (val Val, err error) {
+func (e *astExecutor) executeArrowFunctionExpr(expr *ast.ArrowFunctionExpr) Val {
 	panic(fmt.Sprintf("todo executeArrowFunctionExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeIndexExpr(expr *ast.IndexExpr) (val Val, err error) {
+func (e *astExecutor) executeIndexExpr(expr *ast.IndexExpr) Val {
 	panic(fmt.Sprintf("todo executeIndexExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeCastExpr(expr *ast.CastExpr) (val Val, err error) {
+func (e *astExecutor) executeCastExpr(expr *ast.CastExpr) Val {
 	switch expr.Kind {
 	case ast.CastArray:
 	case ast.CastBool:
@@ -390,121 +345,121 @@ func (e *astExecutor) executeCastExpr(expr *ast.CastExpr) (val Val, err error) {
 	case ast.CastString:
 	case ast.CastUnset:
 	}
-	return
+	return nil
 }
-func (e *astExecutor) executeUnaryExpr(expr *ast.UnaryExpr) (val Val, err error) {
+func (e *astExecutor) executeUnaryExpr(expr *ast.UnaryExpr) Val {
 	panic(fmt.Sprintf("todo executeUnaryExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeAssignExpr(expr *ast.AssignExpr) (val Val, err error) {
+func (e *astExecutor) executeAssignExpr(expr *ast.AssignExpr) Val {
 	panic(fmt.Sprintf("todo executeAssignExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeAssignOpExpr(expr *ast.AssignOpExpr) (val Val, err error) {
+func (e *astExecutor) executeAssignOpExpr(expr *ast.AssignOpExpr) Val {
 	panic(fmt.Sprintf("todo executeAssignOpExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeAssignRefExpr(expr *ast.AssignRefExpr) (val Val, err error) {
+func (e *astExecutor) executeAssignRefExpr(expr *ast.AssignRefExpr) Val {
 	panic(fmt.Sprintf("todo executeAssignRefExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeIssetExpr(expr *ast.IssetExpr) (val Val, err error) {
+func (e *astExecutor) executeIssetExpr(expr *ast.IssetExpr) Val {
 	panic(fmt.Sprintf("todo executeIssetExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeEmptyExpr(expr *ast.EmptyExpr) (val Val, err error) {
+func (e *astExecutor) executeEmptyExpr(expr *ast.EmptyExpr) Val {
 	panic(fmt.Sprintf("todo executeEmptyExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeEvalExpr(expr *ast.EvalExpr) (val Val, err error) {
+func (e *astExecutor) executeEvalExpr(expr *ast.EvalExpr) Val {
 	panic(fmt.Sprintf("todo executeEvalExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeIncludeExpr(expr *ast.IncludeExpr) (val Val, err error) {
+func (e *astExecutor) executeIncludeExpr(expr *ast.IncludeExpr) Val {
 	panic(fmt.Sprintf("todo executeIncludeExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeCloneExpr(expr *ast.CloneExpr) (val Val, err error) {
+func (e *astExecutor) executeCloneExpr(expr *ast.CloneExpr) Val {
 	panic(fmt.Sprintf("todo executeCloneExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeErrorSuppressExpr(expr *ast.ErrorSuppressExpr) (val Val, err error) {
+func (e *astExecutor) executeErrorSuppressExpr(expr *ast.ErrorSuppressExpr) Val {
 	panic(fmt.Sprintf("todo executeErrorSuppressExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeExitExpr(expr *ast.ExitExpr) (val Val, err error) {
+func (e *astExecutor) executeExitExpr(expr *ast.ExitExpr) Val {
 	panic(fmt.Sprintf("todo executeExitExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeConstFetchExpr(expr *ast.ConstFetchExpr) (val Val, err error) {
+func (e *astExecutor) executeConstFetchExpr(expr *ast.ConstFetchExpr) Val {
 	panic(fmt.Sprintf("todo executeConstFetchExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeClassConstFetchExpr(expr *ast.ClassConstFetchExpr) (val Val, err error) {
+func (e *astExecutor) executeClassConstFetchExpr(expr *ast.ClassConstFetchExpr) Val {
 	panic(fmt.Sprintf("todo executeClassConstFetchExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeMagicConstExpr(expr *ast.MagicConstExpr) (val Val, err error) {
+func (e *astExecutor) executeMagicConstExpr(expr *ast.MagicConstExpr) Val {
 	panic(fmt.Sprintf("todo executeMagicConstExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeInstanceofExpr(expr *ast.InstanceofExpr) (val Val, err error) {
+func (e *astExecutor) executeInstanceofExpr(expr *ast.InstanceofExpr) Val {
 	panic(fmt.Sprintf("todo executeInstanceofExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeListExpr(expr *ast.ListExpr) (val Val, err error) {
+func (e *astExecutor) executeListExpr(expr *ast.ListExpr) Val {
 	panic(fmt.Sprintf("todo executeListExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executePrintExpr(expr *ast.PrintExpr) (val Val, err error) {
+func (e *astExecutor) executePrintExpr(expr *ast.PrintExpr) Val {
 	panic(fmt.Sprintf("todo executePrintExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executePropertyFetchExpr(expr *ast.PropertyFetchExpr) (val Val, err error) {
+func (e *astExecutor) executePropertyFetchExpr(expr *ast.PropertyFetchExpr) Val {
 	panic(fmt.Sprintf("todo executePropertyFetchExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeStaticPropertyFetchExpr(expr *ast.StaticPropertyFetchExpr) (val Val, err error) {
+func (e *astExecutor) executeStaticPropertyFetchExpr(expr *ast.StaticPropertyFetchExpr) Val {
 	panic(fmt.Sprintf("todo executeStaticPropertyFetchExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeShellExecExpr(expr *ast.ShellExecExpr) (val Val, err error) {
+func (e *astExecutor) executeShellExecExpr(expr *ast.ShellExecExpr) Val {
 	panic(fmt.Sprintf("todo executeShellExecExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeTernaryExpr(expr *ast.TernaryExpr) (val Val, err error) {
+func (e *astExecutor) executeTernaryExpr(expr *ast.TernaryExpr) Val {
 	panic(fmt.Sprintf("todo executeTernaryExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeThrowExpr(expr *ast.ThrowExpr) (val Val, err error) {
+func (e *astExecutor) executeThrowExpr(expr *ast.ThrowExpr) Val {
 	panic(fmt.Sprintf("todo executeThrowExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeVariableExpr(expr *ast.VariableExpr) (val Val, err error) {
+func (e *astExecutor) executeVariableExpr(expr *ast.VariableExpr) Val {
 	panic(fmt.Sprintf("todo executeVariableExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeYieldExpr(expr *ast.YieldExpr) (val Val, err error) {
+func (e *astExecutor) executeYieldExpr(expr *ast.YieldExpr) Val {
 	panic(fmt.Sprintf("todo executeYieldExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeYieldFromExpr(expr *ast.YieldFromExpr) (val Val, err error) {
+func (e *astExecutor) executeYieldFromExpr(expr *ast.YieldFromExpr) Val {
 	panic(fmt.Sprintf("todo executeYieldFromExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeFuncCallExpr(expr *ast.FuncCallExpr) (val Val, err error) {
+func (e *astExecutor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 	panic(fmt.Sprintf("todo executeFuncCallExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeNewExpr(expr *ast.NewExpr) (val Val, err error) {
+func (e *astExecutor) executeNewExpr(expr *ast.NewExpr) Val {
 	panic(fmt.Sprintf("todo executeNewExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeMethodCallExpr(expr *ast.MethodCallExpr) (val Val, err error) {
+func (e *astExecutor) executeMethodCallExpr(expr *ast.MethodCallExpr) Val {
 	panic(fmt.Sprintf("todo executeMethodCallExpr"))
-	return
+	return nil
 }
-func (e *astExecutor) executeStaticCallExpr(expr *ast.StaticCallExpr) (val Val, err error) {
+func (e *astExecutor) executeStaticCallExpr(expr *ast.StaticCallExpr) Val {
 	panic(fmt.Sprintf("todo executeStaticCallExpr"))
-	return
+	return nil
 }
