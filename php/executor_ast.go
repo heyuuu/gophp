@@ -55,6 +55,7 @@ type astExecutor struct {
 	currFile    *ast.File
 	currNs      *ast.NamespaceStmt
 	currRetVal  Val
+	operator    *operators.Operator
 }
 
 func (e *astExecutor) executeFile(filePath string) (Val, error) {
