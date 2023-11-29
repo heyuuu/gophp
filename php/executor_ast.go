@@ -34,7 +34,7 @@ func (r gotoResult) state() executeState     { return stateGoto }
 
 // private
 
-func (e *executor) executeAstFile(f *ast.File) (Val, error) {
+func (e *Executor) executeAstFile(f *ast.File) (Val, error) {
 	for _, ns := range f.Namespaces {
 		res := e.stmtList(ns.Stmts)
 		switch r := res.(type) {
@@ -47,7 +47,7 @@ func (e *executor) executeAstFile(f *ast.File) (Val, error) {
 	return nil, nil
 }
 
-func (e *executor) userFunction(fn *types.Function, args []Val) Val {
+func (e *Executor) userFunction(fn *types.Function, args []Val) Val {
 	// todo 初始化 args
 	res := e.stmtList(fn.Stmts())
 	switch r := res.(type) {
@@ -59,7 +59,7 @@ func (e *executor) userFunction(fn *types.Function, args []Val) Val {
 	return nil
 }
 
-func (e *executor) stmtList(stmts []ast.Stmt) (result executeResult) {
+func (e *Executor) stmtList(stmts []ast.Stmt) (result executeResult) {
 	var labels = map[string]int{}
 	for i, stmt := range stmts {
 		if label, ok := stmt.(*ast.LabelStmt); ok {
@@ -100,7 +100,7 @@ func (e *executor) stmtList(stmts []ast.Stmt) (result executeResult) {
 	return
 }
 
-func (e *executor) exprList(exprs []ast.Expr) []Val {
+func (e *Executor) exprList(exprs []ast.Expr) []Val {
 	values := make([]Val, len(exprs))
 	for i, expr := range exprs {
 		values[i] = e.expr(expr)
@@ -108,7 +108,7 @@ func (e *executor) exprList(exprs []ast.Expr) []Val {
 	return values
 }
 
-func (e *executor) expr(expr ast.Expr) Val {
+func (e *Executor) expr(expr ast.Expr) Val {
 	switch x := expr.(type) {
 	case *ast.IntLit:
 		return Long(x.Value)
@@ -195,7 +195,7 @@ func (e *executor) expr(expr ast.Expr) Val {
 	}
 }
 
-func (e *executor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
+func (e *Executor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
 	op := e.operator
 
 	// && / || / ?? 操作比较特殊，右表达式节点可能不会执行
@@ -267,7 +267,7 @@ func (e *executor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
 		panic("unreachable")
 	}
 }
-func (e *executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
+func (e *Executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
 	arr := types.NewArrayCap(len(expr.Items))
 	for _, item := range expr.Items {
 		if item.ByRef {
@@ -290,23 +290,23 @@ func (e *executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
 	}
 	return nil
 }
-func (e *executor) executeClosureExpr(expr *ast.ClosureExpr) Val {
+func (e *Executor) executeClosureExpr(expr *ast.ClosureExpr) Val {
 	panic(fmt.Sprintf("todo executeClosureExpr"))
 	return nil
 }
-func (e *executor) executeClosureUseExpr(expr *ast.ClosureUseExpr) Val {
+func (e *Executor) executeClosureUseExpr(expr *ast.ClosureUseExpr) Val {
 	panic(fmt.Sprintf("todo executeClosureUseExpr"))
 	return nil
 }
-func (e *executor) executeArrowFunctionExpr(expr *ast.ArrowFunctionExpr) Val {
+func (e *Executor) executeArrowFunctionExpr(expr *ast.ArrowFunctionExpr) Val {
 	panic(fmt.Sprintf("todo executeArrowFunctionExpr"))
 	return nil
 }
-func (e *executor) executeIndexExpr(expr *ast.IndexExpr) Val {
+func (e *Executor) executeIndexExpr(expr *ast.IndexExpr) Val {
 	panic(fmt.Sprintf("todo executeIndexExpr"))
 	return nil
 }
-func (e *executor) executeCastExpr(expr *ast.CastExpr) Val {
+func (e *Executor) executeCastExpr(expr *ast.CastExpr) Val {
 	switch expr.Kind {
 	case ast.CastArray:
 	case ast.CastBool:
@@ -318,107 +318,107 @@ func (e *executor) executeCastExpr(expr *ast.CastExpr) Val {
 	}
 	return nil
 }
-func (e *executor) executeUnaryExpr(expr *ast.UnaryExpr) Val {
+func (e *Executor) executeUnaryExpr(expr *ast.UnaryExpr) Val {
 	panic(fmt.Sprintf("todo executeUnaryExpr"))
 	return nil
 }
-func (e *executor) executeAssignExpr(expr *ast.AssignExpr) Val {
+func (e *Executor) executeAssignExpr(expr *ast.AssignExpr) Val {
 	panic(fmt.Sprintf("todo executeAssignExpr"))
 	return nil
 }
-func (e *executor) executeAssignOpExpr(expr *ast.AssignOpExpr) Val {
+func (e *Executor) executeAssignOpExpr(expr *ast.AssignOpExpr) Val {
 	panic(fmt.Sprintf("todo executeAssignOpExpr"))
 	return nil
 }
-func (e *executor) executeAssignRefExpr(expr *ast.AssignRefExpr) Val {
+func (e *Executor) executeAssignRefExpr(expr *ast.AssignRefExpr) Val {
 	panic(fmt.Sprintf("todo executeAssignRefExpr"))
 	return nil
 }
-func (e *executor) executeIssetExpr(expr *ast.IssetExpr) Val {
+func (e *Executor) executeIssetExpr(expr *ast.IssetExpr) Val {
 	panic(fmt.Sprintf("todo executeIssetExpr"))
 	return nil
 }
-func (e *executor) executeEmptyExpr(expr *ast.EmptyExpr) Val {
+func (e *Executor) executeEmptyExpr(expr *ast.EmptyExpr) Val {
 	panic(fmt.Sprintf("todo executeEmptyExpr"))
 	return nil
 }
-func (e *executor) executeEvalExpr(expr *ast.EvalExpr) Val {
+func (e *Executor) executeEvalExpr(expr *ast.EvalExpr) Val {
 	panic(fmt.Sprintf("todo executeEvalExpr"))
 	return nil
 }
-func (e *executor) executeIncludeExpr(expr *ast.IncludeExpr) Val {
+func (e *Executor) executeIncludeExpr(expr *ast.IncludeExpr) Val {
 	panic(fmt.Sprintf("todo executeIncludeExpr"))
 	return nil
 }
-func (e *executor) executeCloneExpr(expr *ast.CloneExpr) Val {
+func (e *Executor) executeCloneExpr(expr *ast.CloneExpr) Val {
 	panic(fmt.Sprintf("todo executeCloneExpr"))
 	return nil
 }
-func (e *executor) executeErrorSuppressExpr(expr *ast.ErrorSuppressExpr) Val {
+func (e *Executor) executeErrorSuppressExpr(expr *ast.ErrorSuppressExpr) Val {
 	panic(fmt.Sprintf("todo executeErrorSuppressExpr"))
 	return nil
 }
-func (e *executor) executeExitExpr(expr *ast.ExitExpr) Val {
+func (e *Executor) executeExitExpr(expr *ast.ExitExpr) Val {
 	panic(fmt.Sprintf("todo executeExitExpr"))
 	return nil
 }
-func (e *executor) executeConstFetchExpr(expr *ast.ConstFetchExpr) Val {
+func (e *Executor) executeConstFetchExpr(expr *ast.ConstFetchExpr) Val {
 	panic(fmt.Sprintf("todo executeConstFetchExpr"))
 	return nil
 }
-func (e *executor) executeClassConstFetchExpr(expr *ast.ClassConstFetchExpr) Val {
+func (e *Executor) executeClassConstFetchExpr(expr *ast.ClassConstFetchExpr) Val {
 	panic(fmt.Sprintf("todo executeClassConstFetchExpr"))
 	return nil
 }
-func (e *executor) executeMagicConstExpr(expr *ast.MagicConstExpr) Val {
+func (e *Executor) executeMagicConstExpr(expr *ast.MagicConstExpr) Val {
 	panic(fmt.Sprintf("todo executeMagicConstExpr"))
 	return nil
 }
-func (e *executor) executeInstanceofExpr(expr *ast.InstanceofExpr) Val {
+func (e *Executor) executeInstanceofExpr(expr *ast.InstanceofExpr) Val {
 	panic(fmt.Sprintf("todo executeInstanceofExpr"))
 	return nil
 }
-func (e *executor) executeListExpr(expr *ast.ListExpr) Val {
+func (e *Executor) executeListExpr(expr *ast.ListExpr) Val {
 	panic(fmt.Sprintf("todo executeListExpr"))
 	return nil
 }
-func (e *executor) executePrintExpr(expr *ast.PrintExpr) Val {
+func (e *Executor) executePrintExpr(expr *ast.PrintExpr) Val {
 	panic(fmt.Sprintf("todo executePrintExpr"))
 	return nil
 }
-func (e *executor) executePropertyFetchExpr(expr *ast.PropertyFetchExpr) Val {
+func (e *Executor) executePropertyFetchExpr(expr *ast.PropertyFetchExpr) Val {
 	panic(fmt.Sprintf("todo executePropertyFetchExpr"))
 	return nil
 }
-func (e *executor) executeStaticPropertyFetchExpr(expr *ast.StaticPropertyFetchExpr) Val {
+func (e *Executor) executeStaticPropertyFetchExpr(expr *ast.StaticPropertyFetchExpr) Val {
 	panic(fmt.Sprintf("todo executeStaticPropertyFetchExpr"))
 	return nil
 }
-func (e *executor) executeShellExecExpr(expr *ast.ShellExecExpr) Val {
+func (e *Executor) executeShellExecExpr(expr *ast.ShellExecExpr) Val {
 	panic(fmt.Sprintf("todo executeShellExecExpr"))
 	return nil
 }
-func (e *executor) executeTernaryExpr(expr *ast.TernaryExpr) Val {
+func (e *Executor) executeTernaryExpr(expr *ast.TernaryExpr) Val {
 	panic(fmt.Sprintf("todo executeTernaryExpr"))
 	return nil
 }
-func (e *executor) executeThrowExpr(expr *ast.ThrowExpr) Val {
+func (e *Executor) executeThrowExpr(expr *ast.ThrowExpr) Val {
 	panic(fmt.Sprintf("todo executeThrowExpr"))
 	return nil
 }
-func (e *executor) executeVariableExpr(expr *ast.VariableExpr) Val {
+func (e *Executor) executeVariableExpr(expr *ast.VariableExpr) Val {
 	panic(fmt.Sprintf("todo executeVariableExpr"))
 	return nil
 }
-func (e *executor) executeYieldExpr(expr *ast.YieldExpr) Val {
+func (e *Executor) executeYieldExpr(expr *ast.YieldExpr) Val {
 	panic(fmt.Sprintf("todo executeYieldExpr"))
 	return nil
 }
-func (e *executor) executeYieldFromExpr(expr *ast.YieldFromExpr) Val {
+func (e *Executor) executeYieldFromExpr(expr *ast.YieldFromExpr) Val {
 	panic(fmt.Sprintf("todo executeYieldFromExpr"))
 	return nil
 }
-func (e *executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
+func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 	var name Val
 	switch nameAst := expr.Name.(type) {
 	case *ast.Name:
@@ -451,15 +451,15 @@ func (e *executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 
 	return e.function(fn, args)
 }
-func (e *executor) executeNewExpr(expr *ast.NewExpr) Val {
+func (e *Executor) executeNewExpr(expr *ast.NewExpr) Val {
 	panic(fmt.Sprintf("todo executeNewExpr"))
 	return nil
 }
-func (e *executor) executeMethodCallExpr(expr *ast.MethodCallExpr) Val {
+func (e *Executor) executeMethodCallExpr(expr *ast.MethodCallExpr) Val {
 	panic(fmt.Sprintf("todo executeMethodCallExpr"))
 	return nil
 }
-func (e *executor) executeStaticCallExpr(expr *ast.StaticCallExpr) Val {
+func (e *Executor) executeStaticCallExpr(expr *ast.StaticCallExpr) Val {
 	panic(fmt.Sprintf("todo executeStaticCallExpr"))
 	return nil
 }

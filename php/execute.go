@@ -2,10 +2,11 @@ package php
 
 import (
 	"errors"
+	"github.com/heyuuu/gophp/php/lang"
 )
 
 func ExecuteScript(ctx *Context, fileHandle *FileHandle, skipShebang bool) (retval Val, err error) {
-	Assert(fileHandle != nil)
+	lang.Assert(fileHandle != nil)
 	topFunc, err := CompileFile(ctx, fileHandle, skipShebang)
 	if err != nil {
 		return nil, err

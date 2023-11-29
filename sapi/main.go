@@ -180,8 +180,6 @@ func Run(args []string) int {
 	// prepare engine
 	engine := php.NewEngine()
 
-	fmt.Printf("run cli:%+v\n", optArgs)
-
 	switch optArgs.mode {
 	case modeVersion:
 		showVersion()

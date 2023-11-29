@@ -14,20 +14,20 @@ type ExecutorError string
 func (e ExecutorError) Error() string { return string(e) }
 
 // executor
-type executor struct {
+type Executor struct {
 	ctx         *Context
 	executeData *ExecuteData
 	operator    *operators.Operator
 }
 
-func NewExecutor(ctx *Context) *executor {
-	return &executor{
+func NewExecutor(ctx *Context) *Executor {
+	return &Executor{
 		ctx:      ctx,
 		operator: ctx.Operator(),
 	}
 }
 
-func (e *executor) Execute(fn *types.Function) (retval Val, ret error) {
+func (e *Executor) Execute(fn *types.Function) (retval Val, ret error) {
 	//defer func() {
 	//	if e := recover(); e != nil {
 	//		if err_, ok := e.(ExecutorError); ok {
@@ -41,7 +41,7 @@ func (e *executor) Execute(fn *types.Function) (retval Val, ret error) {
 	return e.function(fn, nil), nil
 }
 
-func (e *executor) function(fn *types.Function, args []Val) Val {
+func (e *Executor) function(fn *types.Function, args []Val) Val {
 	lang.Assert(fn != nil)
 	if fn.IsInternalFunction() {
 		// todo
@@ -53,7 +53,7 @@ func (e *executor) function(fn *types.Function, args []Val) Val {
 	}
 }
 
-func (e *executor) initStringCall(name string) *types.Function {
+func (e *Executor) initStringCall(name string) *types.Function {
 	// todo ZendInitDynamicCallString
 	fn := e.ctx.EG().FindFunction(name)
 	if fn == nil {

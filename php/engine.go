@@ -1,26 +1,48 @@
 package php
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 // Engine
 type Engine struct {
+	host string
+	port int
 }
 
 func NewEngine() *Engine {
 	return &Engine{}
 }
 
-func (e *Engine) NewContext(request *http.Request, response http.ResponseWriter) *Context {
-	return NewContext(e, request, response)
-}
-
-func (e *Engine) Start() error {
+func (engine *Engine) Start() error {
 	// todo
 	return nil
 }
 
-func (e *Engine) HandleContext(ctx *Context) {
+/* lifecycle */
+func (engine *Engine) NewContext(request *http.Request, response http.ResponseWriter) *Context {
+	return NewContext(engine, request, response)
+}
 
+func (engine *Engine) HandleContext(ctx *Context, handler func(ctx *Context)) {
+	ctx.Start()
+	defer ctx.Finish()
+	handler(ctx)
+}
+
+func (engine *Engine) HttpServe(host string, port int, handler func(ctx *Context)) error {
+	engine.host = host
+	engine.port = port
+	addr := fmt.Sprintf("%s:%d", host, port)
+	err := http.ListenAndServe(addr, http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		ctx := NewContext(engine, req, res)
+		engine.HandleContext(ctx, handler)
+	}))
+	if err != http.ErrServerClosed {
+		return err
+	}
+	return nil
 }
 
 //func (e *Engine) HandleRequest() error {

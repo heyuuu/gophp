@@ -23,6 +23,10 @@ func NewContext(e *Engine, request *http.Request, response http.ResponseWriter) 
 	return ctx
 }
 
+/* lifecycle */
+func (c *Context) Start()  {}
+func (c *Context) Finish() {}
+
 func (c *Context) Engine() *Engine { return c.engine }
 
 func (c *Context) CG() *CompilerGlobals { return &c.cg }
