@@ -144,7 +144,7 @@ func (p *OptsParser) getopt() (*Opt, string, error) {
 
 	// check needParam
 	needParam := matchOpt.NeedParam()
-	if optArg != "" && needParam != 0 {
+	if optArg == "" && needParam != 0 {
 		if p.idx < len(p.args) {
 			optArg = p.args[p.idx]
 			p.idx++

@@ -92,3 +92,19 @@ func Filter[T any](slice []T, handler func(T) bool) []T {
 		return !handler(item)
 	})
 }
+
+func Unique[T comparable](slice []T) []T {
+	if len(slice) == 0 {
+		return nil
+	}
+
+	existsSet := make(map[T]struct{}, len(slice))
+	return slices.DeleteFunc(slice, func(item T) bool {
+		if _, exists := existsSet[item]; exists {
+			return true
+		} else {
+			existsSet[item] = struct{}{}
+			return false
+		}
+	})
+}
