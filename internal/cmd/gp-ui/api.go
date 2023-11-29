@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/compile/parser"
 	"github.com/heyuuu/gophp/kits/vardumper"
 	"github.com/heyuuu/gophp/php"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -94,15 +95,16 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 var engine = php.NewEngine()
 
 func runCode(code string) (output string) {
-	//defer func() {
-	//	if e := recover(); e != nil {
-	//		output = fmt.Sprintf("Execute panic: %s", e)
-	//	}
-	//}()
+	defer func() {
+		if e := recover(); e != nil {
+			output = fmt.Sprintf("Execute panic: %v", e)
+			log.Printf("%+v\n", e)
+		}
+	}()
 
 	var buf strings.Builder
 
-	ctx := engine.NewContext()
+	ctx := engine.NewContext(nil, nil)
 
 	buf.WriteString(">>> output start:\n")
 	ctx.OG().PushHandler(&buf)
