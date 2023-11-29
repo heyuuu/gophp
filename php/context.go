@@ -1,6 +1,9 @@
 package php
 
-import "github.com/heyuuu/gophp/php/operators"
+import (
+	"github.com/heyuuu/gophp/php/operators"
+	"net/http"
+)
 
 // Context
 type Context struct {
@@ -12,7 +15,7 @@ type Context struct {
 	operator *operators.Operator
 }
 
-func NewContext(e *Engine) *Context {
+func NewContext(e *Engine, request *http.Request, response http.ResponseWriter) *Context {
 	ctx := &Context{engine: e}
 	ctx.cg.Init()
 	ctx.eg.Init()
