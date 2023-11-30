@@ -42,7 +42,7 @@ func (e *Executor) executeAstFile(f *ast.File) (Val, error) {
 		case *returnResult:
 			return r.retVal, nil
 		case *continueResult, *breakResult, *gotoResult:
-			panic("unreachable")
+			panic(perr.Unreachable())
 		}
 	}
 	return nil, nil
@@ -55,7 +55,7 @@ func (e *Executor) userFunction(fn *types.Function, args []Val) Val {
 	case *returnResult:
 		return r.retVal
 	case *continueResult, *breakResult, *gotoResult:
-		panic("unreachable")
+		panic(perr.Unreachable())
 	}
 	return nil
 }
@@ -265,7 +265,7 @@ func (e *Executor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
 	case ast.BinaryOpSpaceship: // <=>
 		return op.Spaceship(left, right)
 	default:
-		panic("unreachable")
+		panic(perr.Unreachable())
 	}
 }
 func (e *Executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
@@ -427,7 +427,7 @@ func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 	case ast.Expr:
 		name = e.expr(nameAst)
 	default:
-		panic("unreachable")
+		panic(perr.Unreachable())
 	}
 
 	var fn *types.Function

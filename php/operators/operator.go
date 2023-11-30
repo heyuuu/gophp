@@ -3,6 +3,7 @@ package operators
 import (
 	"github.com/heyuuu/gophp/php/faults"
 	"github.com/heyuuu/gophp/php/lang"
+	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"math"
 )
@@ -49,7 +50,7 @@ func (op *Operator) AddLong(i1, i2 int) Val {
 
 func (op *Operator) AddArray(a1, a2 *types.Array) *types.Array {
 	// todo AddArray
-	panic("unreachable")
+	panic(perr.Unreachable())
 }
 
 // Sub

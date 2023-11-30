@@ -2,6 +2,7 @@ package ast
 
 import (
 	"fmt"
+	"github.com/heyuuu/gophp/php/perr"
 	"os"
 	"reflect"
 	"strconv"
@@ -301,7 +302,7 @@ func (p *printer) typeHint0(n TypeHint, wrap bool) {
 			p.print(")")
 		}
 	default:
-		panic("unreachable")
+		panic(perr.Unreachable())
 	}
 }
 
@@ -455,7 +456,7 @@ func (p *printer) expr(n Expr) {
 	case *StaticCallExpr:
 		p.print(x.Class, "::", x.Name, "(", x.Args, ")")
 	default:
-		panic("unreachable")
+		panic(perr.Unreachable())
 	}
 }
 
@@ -700,6 +701,6 @@ func (p *printer) stmt(n Stmt) {
 		}
 		p.print(";")
 	default:
-		panic("unreachable")
+		panic(perr.Unreachable())
 	}
 }

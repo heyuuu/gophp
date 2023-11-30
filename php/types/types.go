@@ -1,5 +1,7 @@
 package types
 
+import "github.com/heyuuu/gophp/php/perr"
+
 // ZvalType
 type ZvalType uint8
 
@@ -99,7 +101,7 @@ func (zv *Zval) Type() ZvalType {
 	case *Ref:
 		return IsRef
 	default:
-		panic("unreachable")
+		panic(perr.Unreachable())
 	}
 }
 
