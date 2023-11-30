@@ -105,19 +105,20 @@ func runCode(code string) (output string) {
 	var buf strings.Builder
 
 	ctx := engine.NewContext(nil, nil)
+	engine.HandleContext(ctx, func(ctx *php.Context) {
+		buf.WriteString(">>> output start:\n")
+		ctx.OG().PushHandler(&buf)
 
-	buf.WriteString(">>> output start:\n")
-	ctx.OG().PushHandler(&buf)
+		fileHandle := php.NewFileHandleByString(code)
+		retval, err := php.ExecuteScript(ctx, fileHandle, false)
 
-	fileHandle := php.NewFileHandleByString(code)
-	retval, err := php.ExecuteScript(ctx, fileHandle, false)
-
-	buf.WriteString("\n>>> output end\n\n")
-	if err != nil {
-		buf.WriteString("Execute failed: " + err.Error())
-	} else {
-		buf.WriteString(fmt.Sprintf("Execute succed, retval = %v", retval))
-	}
+		buf.WriteString("\n>>> output end\n\n")
+		if err != nil {
+			buf.WriteString("Execute failed: " + err.Error())
+		} else {
+			buf.WriteString(fmt.Sprintf("Execute succed, retval = %v", retval))
+		}
+	})
 
 	return buf.String()
 }

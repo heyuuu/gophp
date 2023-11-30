@@ -28,7 +28,7 @@ again:
 		retArr := op.AddArray(op1.Array(), op2.Array())
 		return Array(retArr)
 	default:
-		if !converted {
+		if converted {
 			// fail
 			op.throwErrorNoReturn(nil, "Unsupported operand types")
 		}

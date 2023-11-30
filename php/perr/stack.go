@@ -4,14 +4,20 @@ import (
 	"fmt"
 	"io"
 	"runtime"
+	"strings"
 )
 
 type stack []uintptr
+
+const pkgPrefix = "github.com/heyuuu/gophp/php/perr."
 
 func (s stack) Format(w io.Writer) {
 	frames := runtime.CallersFrames(s)
 	for i := 0; i < len(s); i++ {
 		frame, _ := frames.Next()
+		if strings.HasPrefix(frame.Function, pkgPrefix) {
+			continue
+		}
 		_, _ = fmt.Fprintf(w, "\n%s\n\t%s:%d", frame.Function, frame.File, frame.Line)
 	}
 }
@@ -19,7 +25,7 @@ func (s stack) Format(w io.Writer) {
 func callers() *stack {
 	const depth = 32
 	var pcs [depth]uintptr
-	n := runtime.Callers(4, pcs[:])
+	n := runtime.Callers(3, pcs[:])
 	var callStack stack = pcs[0:n]
 	return &callStack
 }

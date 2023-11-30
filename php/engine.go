@@ -2,13 +2,16 @@ package php
 
 import (
 	"fmt"
+	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/types"
 	"net/http"
 )
 
 // Engine
 type Engine struct {
-	host string
-	port int
+	modules *types.Table[*Module]
+	host    string
+	port    int
 }
 
 func NewEngine() *Engine {
@@ -45,12 +48,18 @@ func (engine *Engine) HttpServe(host string, port int, handler func(ctx *Context
 	return nil
 }
 
-//func (e *Engine) HandleRequest() error {
-//	err := e.RequestStartup()
-//	if err != nil {
-//		return err
-//	}
-//}
-//
-//func (e *Engine) RequestStartup() error {
-//}
+/* modules */
+
+func (engine *Engine) RegisterModule(m *Module) *Module {
+	lcName := ascii.StrToLower(m.Name())
+	// 若已注册，返回nil
+	if engine.modules.Exists(lcName) {
+		return nil
+	}
+
+	// 复制值，返回新地址
+	tmp := *m
+	tmp.moduleNumber = engine.modules.Len()
+	engine.modules.Add(lcName, &tmp)
+	return &tmp
+}
