@@ -1,6 +1,8 @@
 package slicekit
 
-import "github.com/heyuuu/gophp/shim/slices"
+import (
+	"github.com/heyuuu/gophp/shim/slices"
+)
 
 func Map[T any, R any](slice []T, mapper func(T) R) []R {
 	var result []R
@@ -23,23 +25,25 @@ func EachReserve[T any](slice []T, handler func(T)) {
 	}
 }
 
-func EachEx[T any](slice []T, handler func(T) bool) {
+func EachEx[T any](slice []T, handler func(T) error) error {
 	for _, item := range slice {
-		ok := handler(item)
-		if !ok {
-			return
+		err := handler(item)
+		if err != nil {
+			return err
 		}
 	}
+	return nil
 }
 
-func EachReserveEx[T any](slice []T, handler func(T) bool) {
+func EachReserveEx[T any](slice []T, handler func(T) error) error {
 	for i := len(slice) - 1; i >= 0; i-- {
 		item := slice[i]
-		ok := handler(item)
-		if !ok {
-			return
+		err := handler(item)
+		if err != nil {
+			return err
 		}
 	}
+	return nil
 }
 
 func Push[T any](slicePtr *[]T, item T) {

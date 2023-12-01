@@ -18,13 +18,14 @@ func Each[K comparable, V any](m map[K]V, handler func(K, V)) {
 	}
 }
 
-func EachEx[K comparable, V any](m map[K]V, handler func(K, V) bool) {
+func EachEx[K comparable, V any](m map[K]V, handler func(K, V) error) error {
 	for k, v := range m {
-		ok := handler(k, v)
-		if !ok {
-			return
+		err := handler(k, v)
+		if err != nil {
+			return err
 		}
 	}
+	return nil
 }
 
 func GetValue[K comparable, V any](m map[K]V, key K) V {
@@ -58,5 +59,14 @@ func Set[K comparable, V any](m *map[K]V, key K, value V) {
 		*m = map[K]V{key: value}
 	} else {
 		(*m)[key] = value
+	}
+}
+
+func Clean[K comparable, V any](m map[K]V) {
+	if m == nil {
+		return
+	}
+	for k := range m {
+		delete(m, k)
 	}
 }
