@@ -46,6 +46,43 @@ func EachReserveEx[T any](slice []T, handler func(T) error) error {
 	return nil
 }
 
+func First[T any](slice []T) (T, bool) {
+	if len(slice) > 0 {
+		return slice[0], true
+	}
+	var temp T
+	return temp, false
+}
+
+func FirstFunc[T any](slice []T, predicate func(T) bool) (T, bool) {
+	for _, item := range slice {
+		if predicate(item) {
+			return item, true
+		}
+	}
+	var temp T
+	return temp, false
+}
+
+func Last[T any](slice []T) (T, bool) {
+	if len(slice) > 0 {
+		return slice[len(slice)-1], true
+	}
+	var temp T
+	return temp, false
+}
+
+func LastFunc[T any](slice []T, predicate func(T) bool) (T, bool) {
+	for i := len(slice) - 1; i >= 0; i-- {
+		item := slice[i]
+		if predicate(item) {
+			return item, true
+		}
+	}
+	var temp T
+	return temp, false
+}
+
 func Push[T any](slicePtr *[]T, item T) {
 	*slicePtr = append(*slicePtr, item)
 }
@@ -59,17 +96,6 @@ func Pop[T any](slicePtr *[]T) (T, bool) {
 
 	top := slice[len(slice)-1]
 	*slicePtr = slice[:len(slice)-1]
-	return top, true
-}
-
-func Last[T any](slicePtr *[]T) (T, bool) {
-	slice := *slicePtr
-	if len(slice) == 0 {
-		var tmp T
-		return tmp, false
-	}
-
-	top := slice[len(slice)-1]
 	return top, true
 }
 
