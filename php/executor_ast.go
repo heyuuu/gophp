@@ -369,8 +369,7 @@ func (e *Executor) executeConstFetchExpr(expr *ast.ConstFetchExpr) Val {
 	if c == nil {
 		panic(perr.New("const not defined: " + name))
 	}
-	value := c.Value()
-	return &value
+	return c.Value()
 }
 func (e *Executor) executeClassConstFetchExpr(expr *ast.ClassConstFetchExpr) Val {
 	panic(perr.New("todo executeClassConstFetchExpr"))

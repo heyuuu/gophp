@@ -15,11 +15,16 @@ type Context struct {
 	operator *operators.Operator
 }
 
-func NewContext(e *Engine, request *http.Request, response http.ResponseWriter) *Context {
+func initContext(e *Engine, baseCtx *Context, request *http.Request, response http.ResponseWriter) *Context {
 	ctx := &Context{engine: e}
 	ctx.cg.Init()
 	ctx.eg.Init()
 	ctx.og.Init()
+
+	if baseCtx != nil {
+		ctx.eg.constantTable = baseCtx.eg.constantTable
+	}
+
 	return ctx
 }
 

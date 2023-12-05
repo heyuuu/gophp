@@ -92,8 +92,6 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 	return
 }
 
-var engine = php.NewEngine()
-
 func runCode(code string) (output string) {
 	defer func() {
 		if e := recover(); e != nil {
@@ -103,6 +101,9 @@ func runCode(code string) (output string) {
 	}()
 
 	var buf strings.Builder
+
+	engine := php.NewEngine()
+	engine.Start()
 
 	ctx := engine.NewContext(nil, nil)
 	engine.HandleContext(ctx, func(ctx *php.Context) {

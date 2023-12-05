@@ -3,6 +3,7 @@ package php
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"net/http"
 )
@@ -12,20 +13,40 @@ type Engine struct {
 	modules *types.Table[*Module]
 	host    string
 	port    int
+	baseCtx *Context
 }
 
 func NewEngine() *Engine {
-	return &Engine{}
+	engine := &Engine{}
+	engine.init()
+	return engine
 }
 
-func (engine *Engine) Start() error {
+func (engine *Engine) init() {
+	engine.modules = types.NewTable[*Module]()
+	engine.baseCtx = initContext(engine, nil, nil, nil)
+
+	engine.RegisterModule(BuiltinModule)
+}
+
+func (engine *Engine) Start() (err error) {
 	// todo
+	err = engine.modules.EachEx(func(_ string, m *Module) error {
+		if !m.ModuleStartup(engine.baseCtx) {
+			return perr.New("module start failed: " + m.Name())
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 /* lifecycle */
 func (engine *Engine) NewContext(request *http.Request, response http.ResponseWriter) *Context {
-	return NewContext(engine, request, response)
+	return initContext(engine, engine.baseCtx, request, response)
 }
 
 func (engine *Engine) HandleContext(ctx *Context, handler func(ctx *Context)) {
@@ -39,7 +60,7 @@ func (engine *Engine) HttpServe(host string, port int, handler func(ctx *Context
 	engine.port = port
 	addr := fmt.Sprintf("%s:%d", host, port)
 	err := http.ListenAndServe(addr, http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		ctx := NewContext(engine, req, res)
+		ctx := engine.NewContext(req, res)
 		engine.HandleContext(ctx, handler)
 	}))
 	if err != http.ErrServerClosed {
@@ -50,16 +71,16 @@ func (engine *Engine) HttpServe(host string, port int, handler func(ctx *Context
 
 /* modules */
 
-func (engine *Engine) RegisterModule(m *Module) *Module {
-	lcName := ascii.StrToLower(m.Name())
+func (engine *Engine) RegisterModule(entry ModuleEntry) *Module {
+	lcName := ascii.StrToLower(entry.Name)
 	// 若已注册，返回nil
 	if engine.modules.Exists(lcName) {
 		return nil
 	}
 
 	// 复制值，返回新地址
-	tmp := *m
-	tmp.moduleNumber = engine.modules.Len()
-	engine.modules.Add(lcName, &tmp)
-	return &tmp
+	moduleNumber := engine.modules.Len()
+	module := NewModule(moduleNumber, entry)
+	engine.modules.Add(lcName, module)
+	return module
 }

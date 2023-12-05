@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/shim/slices"
 )
 
@@ -92,6 +93,7 @@ func (t *Table[T]) EachReserve(handler func(string, T)) {
 	}
 }
 func (t *Table[T]) EachEx(handler func(string, T) error) error {
+	lang.Assert(t != nil)
 	for _, k := range t.keys {
 		v := t.m[k]
 		err := handler(k, v)
