@@ -2,8 +2,8 @@ package php
 
 import "github.com/heyuuu/gophp/php/types"
 
-func RegisterConstantEx(ctx *Context, moduleNumber int, name string, value Val, flags uint32) {
-	c := types.NewConstant(name, value, flags)
+func RegisterConstantEx(ctx *Context, moduleNumber int, name string, value Val, flags types.ConstFlag) {
+	c := types.NewConstant(name, value, flags, moduleNumber)
 	ctx.EG().ConstantTable().Set(name, c)
 }
 

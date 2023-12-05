@@ -1,48 +1,33 @@
 package types
 
 import (
-	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/shim/slices"
 )
 
 /**
  * 内部频繁使用的 map, 有如下特征
  * - 有序
  * - key 为字符串，可无视大小写(可选)
- * - value 为引用且不为空。get(key) 方法返回 nil 表示 key 不存在
+ * - 主要操作是查询和添加，较少有删除操作
  */
 type Table[T any] struct {
-	keys       []string
-	m          map[string]T
-	caseIgnore bool
+	keys []string
+	m    map[string]T
 }
 
-func NewLcTable[T any]() *Table[T] {
-	return &Table[T]{
-		keys:       nil,
-		m:          make(map[string]T),
-		caseIgnore: true,
-	}
-}
 func NewTable[T any]() *Table[T] {
 	return &Table[T]{
-		keys:       nil,
-		m:          make(map[string]T),
-		caseIgnore: false,
+		keys: nil,
+		m:    make(map[string]T),
 	}
-}
-func (t *Table[T]) realKey(key string) string {
-	if t.caseIgnore {
-		return ascii.StrToLower(key)
-	}
-	return key
 }
 
-func (t *Table[T]) Clean()                 { t.keys, t.m = nil, make(map[string]T) }
-func (t *Table[T]) Len() int               { return len(t.m) }
-func (t *Table[T]) Get(key string) T       { return t.m[t.realKey(key)] }
-func (t *Table[T]) Exists(key string) bool { _, ok := t.m[t.realKey(key)]; return ok }
+func (t *Table[T]) Clean()                    { t.keys, t.m = nil, make(map[string]T) }
+func (t *Table[T]) Len() int                  { return len(t.m) }
+func (t *Table[T]) Get(key string) T          { return t.m[key] }
+func (t *Table[T]) Find(key string) (T, bool) { v, ok := t.m[key]; return v, ok }
+func (t *Table[T]) Exists(key string) bool    { _, ok := t.m[key]; return ok }
 func (t *Table[T]) Add(key string, val T) bool {
-	key = t.realKey(key)
 	if _, ok := t.m[key]; ok {
 		return false
 	} else {
@@ -51,8 +36,16 @@ func (t *Table[T]) Add(key string, val T) bool {
 		return true
 	}
 }
+func (t *Table[T]) AddToHead(key string, val T) bool {
+	if _, ok := t.m[key]; ok {
+		return false
+	} else {
+		t.keys = append([]string{key}, t.keys...)
+		t.m[key] = val
+		return true
+	}
+}
 func (t *Table[T]) Set(key string, val T) {
-	key = t.realKey(key)
 	if _, ok := t.m[key]; ok {
 		t.m[key] = val
 	} else {
@@ -61,7 +54,6 @@ func (t *Table[T]) Set(key string, val T) {
 	}
 }
 func (t *Table[T]) Del(key string) {
-	key = t.realKey(key)
 	if _, exists := t.m[key]; !exists {
 		return
 	}
@@ -77,31 +69,47 @@ func (t *Table[T]) Del(key string) {
 	}
 }
 
-func (t *Table[T]) Each(handler func(string, T)) {
-	for _, k := range t.keys {
-		val := t.m[k]
-		handler(k, val)
+func (t *Table[T]) Keys() []string { return slices.Clone(t.keys) }
+func (t *Table[T]) Values() []T {
+	values := make([]T, len(t.keys))
+	for i, key := range t.keys {
+		values[i] = t.m[key]
 	}
+	return values
 }
 
-func (t *Table[T]) EachEx(handler func(string, T) bool) bool {
+func (t *Table[T]) Each(handler func(string, T)) {
 	for _, k := range t.keys {
-		val := t.m[k]
-		if !handler(k, val) {
-			return false
+		v := t.m[k]
+		handler(k, v)
+	}
+}
+func (t *Table[T]) EachReserve(handler func(string, T)) {
+	for i := len(t.keys) - 1; i >= 0; i-- {
+		k := t.keys[i]
+		v := t.m[k]
+		handler(k, v)
+	}
+}
+func (t *Table[T]) EachEx(handler func(string, T) error) error {
+	for _, k := range t.keys {
+		v := t.m[k]
+		err := handler(k, v)
+		if err != nil {
+			return err
 		}
 	}
-	return true
+	return nil
 }
 
 func (t *Table[T]) Filter(handler func(string, T) bool) {
 	newKeys := make([]string, 0, len(t.keys))
-	for _, key := range t.keys {
-		val := t.m[key]
-		if handler(key, val) {
-			newKeys = append(newKeys, key)
+	for _, k := range t.keys {
+		v := t.m[k]
+		if handler(k, v) {
+			newKeys = append(newKeys, k)
 		} else {
-			delete(t.m, key)
+			delete(t.m, k)
 		}
 	}
 	t.keys = newKeys
