@@ -97,7 +97,16 @@ func fastGetDouble(v Val) float64 {
 }
 
 func opScalarGetNumber(op1, op2 Val) (Val, Val) {
-	// todo 类型转换
+	return opScalarGetNumberEx(op1, op2, false)
+}
+func opScalarGetNumberEx(op1, op2 Val, silent bool) (Val, Val) {
+	if op1 != op2 {
+		op1 = ScalarGetNumber(op1, silent)
+		op2 = ScalarGetNumber(op2, silent)
+	} else {
+		op1 = ScalarGetNumber(op1, silent)
+		op2 = op1
+	}
 	return op1, op2
 }
 
