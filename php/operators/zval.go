@@ -2,7 +2,7 @@ package operators
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/php/faults"
+	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/shim/cmp"
@@ -67,7 +67,7 @@ again:
 		var r Val = StrToNumberPrefix(op.String(), silent)
 		if r == nil {
 			if !silent {
-				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
+				php.Error(php.E_WARNING, "A non-numeric value encountered")
 			}
 			return 0
 		}
@@ -172,7 +172,7 @@ func ScalarGetNumber(op Val, silent bool) Val {
 		r := StrToNumberPrefix(op.String(), silent)
 		if r == nil {
 			if !silent {
-				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
+				php.Error(php.E_WARNING, "A non-numeric value encountered")
 			}
 			return Long(0)
 		}
@@ -234,7 +234,7 @@ func zvalGetStrEx(op Val, try bool) (string, bool) {
 	case types.IsDouble:
 		return fmt.Sprintf("%.*G", getPrecision(), op.Double()), true
 	case types.IsArray:
-		faults.Error(faults.E_NOTICE, "Array to string conversion")
+		php.Error(php.E_NOTICE, "Array to string conversion")
 		if try && hasException() {
 			return "", false
 		}
@@ -244,7 +244,7 @@ func zvalGetStrEx(op Val, try bool) (string, bool) {
 			return tmp.String(), true
 		}
 		if !hasException() {
-			faults.ThrowError(nil, fmt.Sprintf("Object of class %s could not be converted to string", op.Object().CeName()))
+			php.ThrowError(nil, fmt.Sprintf("Object of class %s could not be converted to string", op.Object().CeName()))
 		}
 		if try {
 			return "", false
@@ -344,7 +344,7 @@ func ZvalCompare(op1 Val, op2 Val) (int, bool) {
 				return -1, true
 			} else {
 				lang.Assert(false)
-				faults.ThrowError(nil, "Unsupported operand types")
+				php.ThrowError(nil, "Unsupported operand types")
 				return 0, false
 			}
 		}

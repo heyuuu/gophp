@@ -1,7 +1,7 @@
 package operators
 
 import (
-	"github.com/heyuuu/gophp/php/faults"
+	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
@@ -137,7 +137,7 @@ again:
 		d1 := fastGetDouble(op1)
 		d2 := fastGetDouble(op2)
 		if d2 == 0 {
-			op.error(faults.E_WARNING, "Division by zero")
+			op.error(php.E_WARNING, "Division by zero")
 			return Double(math.Inf(int(d1)))
 		}
 		return Double(d1 / d2)
@@ -156,7 +156,7 @@ again:
 
 func (op *Operator) DivLong(i1, i2 int) Val {
 	if i2 == 0 {
-		op.error(faults.E_WARNING, "Division by zero")
+		op.error(php.E_WARNING, "Division by zero")
 		return Double(math.Inf(i1))
 	} else if i2 == -1 && i1 == math.MinInt {
 		/* Prevent overflow error/crash */

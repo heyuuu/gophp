@@ -1,18 +1,18 @@
 package operators
 
 import (
-	"github.com/heyuuu/gophp/php/faults"
+	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 )
 
 func (op *Operator) error(typ int, message string) {
-	faults.Error(typ, message)
+	php.Error(typ, message)
 }
 
 func (op *Operator) throwErrorNoReturn(exceptionCe *types.Class, message string) {
 	// fail
-	faults.ThrowError(exceptionCe, message)
+	php.ThrowError(exceptionCe, message)
 	panic(perr.Unreachable())
 }
 

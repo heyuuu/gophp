@@ -2,7 +2,6 @@ package php
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/php/faults"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/operators"
 	"github.com/heyuuu/gophp/php/types"
@@ -57,7 +56,7 @@ func (e *Executor) initStringCall(name string) *types.Function {
 	// todo ZendInitDynamicCallString
 	fn := e.ctx.EG().FindFunction(name)
 	if fn == nil {
-		faults.ThrowError(nil, fmt.Sprintf("Call to undefined function %s()", name))
+		ThrowError(nil, fmt.Sprintf("Call to undefined function %s()", name))
 		return nil
 	}
 	return fn
