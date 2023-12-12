@@ -33,7 +33,7 @@ func (engine *Engine) Start() (err error) {
 	// todo
 	err = engine.modules.EachEx(func(_ string, m *Module) error {
 		if !m.ModuleStartup(engine.baseCtx) {
-			return perr.New("module start failed: " + m.Name())
+			return perr.NewInternal("module start failed: " + m.Name())
 		}
 		return nil
 	})

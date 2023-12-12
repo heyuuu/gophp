@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/lang"
+	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/shim/cmp"
 	"strconv"
@@ -67,7 +68,7 @@ again:
 		var r Val = StrToNumberPrefix(op.String(), silent)
 		if r == nil {
 			if !silent {
-				php.Error(php.E_WARNING, "A non-numeric value encountered")
+				php.Error(perr.E_WARNING, "A non-numeric value encountered")
 			}
 			return 0
 		}
@@ -172,7 +173,7 @@ func ScalarGetNumber(op Val, silent bool) Val {
 		r := StrToNumberPrefix(op.String(), silent)
 		if r == nil {
 			if !silent {
-				php.Error(php.E_WARNING, "A non-numeric value encountered")
+				php.Error(perr.E_WARNING, "A non-numeric value encountered")
 			}
 			return Long(0)
 		}
@@ -234,7 +235,7 @@ func zvalGetStrEx(op Val, try bool) (string, bool) {
 	case types.IsDouble:
 		return fmt.Sprintf("%.*G", getPrecision(), op.Double()), true
 	case types.IsArray:
-		php.Error(php.E_NOTICE, "Array to string conversion")
+		php.Error(perr.E_NOTICE, "Array to string conversion")
 		if try && hasException() {
 			return "", false
 		}

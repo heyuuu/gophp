@@ -95,7 +95,7 @@ func (e *Executor) stmtList(stmts []ast.Stmt) (result executeResult) {
 			}
 		// todo
 		default:
-			panic(perr.New(fmt.Sprintf("todo executor.stmtList(%T)", x)))
+			panic(perr.NewInternal(fmt.Sprintf("todo executor.stmtList(%T)", x)))
 		}
 	}
 	return
@@ -190,9 +190,9 @@ func (e *Executor) expr(expr ast.Expr) Val {
 	case *ast.StaticCallExpr:
 		return e.executeStaticCallExpr(x)
 	case *ast.ArrayItemExpr:
-		panic(perr.New(fmt.Sprintf("unexpected execute type: %T", x)))
+		panic(perr.NewInternal(fmt.Sprintf("unexpected execute type: %T", x)))
 	default:
-		panic(perr.New(fmt.Sprintf("todo executor.executeExpr(%T)", x)))
+		panic(perr.NewInternal(fmt.Sprintf("todo executor.executeExpr(%T)", x)))
 	}
 }
 
@@ -292,19 +292,19 @@ func (e *Executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
 	return nil
 }
 func (e *Executor) executeClosureExpr(expr *ast.ClosureExpr) Val {
-	panic(perr.New("todo executeClosureExpr"))
+	panic(perr.NewInternal("todo executeClosureExpr"))
 	return nil
 }
 func (e *Executor) executeClosureUseExpr(expr *ast.ClosureUseExpr) Val {
-	panic(perr.New("todo executeClosureUseExpr"))
+	panic(perr.NewInternal("todo executeClosureUseExpr"))
 	return nil
 }
 func (e *Executor) executeArrowFunctionExpr(expr *ast.ArrowFunctionExpr) Val {
-	panic(perr.New("todo executeArrowFunctionExpr"))
+	panic(perr.NewInternal("todo executeArrowFunctionExpr"))
 	return nil
 }
 func (e *Executor) executeIndexExpr(expr *ast.IndexExpr) Val {
-	panic(perr.New("todo executeIndexExpr"))
+	panic(perr.NewInternal("todo executeIndexExpr"))
 	return nil
 }
 func (e *Executor) executeCastExpr(expr *ast.CastExpr) Val {
@@ -320,107 +320,107 @@ func (e *Executor) executeCastExpr(expr *ast.CastExpr) Val {
 	return nil
 }
 func (e *Executor) executeUnaryExpr(expr *ast.UnaryExpr) Val {
-	panic(perr.New("todo executeUnaryExpr"))
+	panic(perr.NewInternal("todo executeUnaryExpr"))
 	return nil
 }
 func (e *Executor) executeAssignExpr(expr *ast.AssignExpr) Val {
-	panic(perr.New("todo executeAssignExpr"))
+	panic(perr.NewInternal("todo executeAssignExpr"))
 	return nil
 }
 func (e *Executor) executeAssignOpExpr(expr *ast.AssignOpExpr) Val {
-	panic(perr.New("todo executeAssignOpExpr"))
+	panic(perr.NewInternal("todo executeAssignOpExpr"))
 	return nil
 }
 func (e *Executor) executeAssignRefExpr(expr *ast.AssignRefExpr) Val {
-	panic(perr.New("todo executeAssignRefExpr"))
+	panic(perr.NewInternal("todo executeAssignRefExpr"))
 	return nil
 }
 func (e *Executor) executeIssetExpr(expr *ast.IssetExpr) Val {
-	panic(perr.New("todo executeIssetExpr"))
+	panic(perr.NewInternal("todo executeIssetExpr"))
 	return nil
 }
 func (e *Executor) executeEmptyExpr(expr *ast.EmptyExpr) Val {
-	panic(perr.New("todo executeEmptyExpr"))
+	panic(perr.NewInternal("todo executeEmptyExpr"))
 	return nil
 }
 func (e *Executor) executeEvalExpr(expr *ast.EvalExpr) Val {
-	panic(perr.New("todo executeEvalExpr"))
+	panic(perr.NewInternal("todo executeEvalExpr"))
 	return nil
 }
 func (e *Executor) executeIncludeExpr(expr *ast.IncludeExpr) Val {
-	panic(perr.New("todo executeIncludeExpr"))
+	panic(perr.NewInternal("todo executeIncludeExpr"))
 	return nil
 }
 func (e *Executor) executeCloneExpr(expr *ast.CloneExpr) Val {
-	panic(perr.New("todo executeCloneExpr"))
+	panic(perr.NewInternal("todo executeCloneExpr"))
 	return nil
 }
 func (e *Executor) executeErrorSuppressExpr(expr *ast.ErrorSuppressExpr) Val {
-	panic(perr.New("todo executeErrorSuppressExpr"))
+	panic(perr.NewInternal("todo executeErrorSuppressExpr"))
 	return nil
 }
 func (e *Executor) executeExitExpr(expr *ast.ExitExpr) Val {
-	panic(perr.New("todo executeExitExpr"))
+	panic(perr.NewInternal("todo executeExitExpr"))
 	return nil
 }
 func (e *Executor) executeConstFetchExpr(expr *ast.ConstFetchExpr) Val {
 	name := expr.Name.ToCodeString()
 	c := GetConstant(e.ctx, name)
 	if c == nil {
-		panic(perr.New("const not defined: " + name))
+		panic(perr.NewInternal("const not defined: " + name))
 	}
 	return c.Value()
 }
 func (e *Executor) executeClassConstFetchExpr(expr *ast.ClassConstFetchExpr) Val {
-	panic(perr.New("todo executeClassConstFetchExpr"))
+	panic(perr.NewInternal("todo executeClassConstFetchExpr"))
 	return nil
 }
 func (e *Executor) executeMagicConstExpr(expr *ast.MagicConstExpr) Val {
-	panic(perr.New("todo executeMagicConstExpr"))
+	panic(perr.NewInternal("todo executeMagicConstExpr"))
 	return nil
 }
 func (e *Executor) executeInstanceofExpr(expr *ast.InstanceofExpr) Val {
-	panic(perr.New("todo executeInstanceofExpr"))
+	panic(perr.NewInternal("todo executeInstanceofExpr"))
 	return nil
 }
 func (e *Executor) executeListExpr(expr *ast.ListExpr) Val {
-	panic(perr.New("todo executeListExpr"))
+	panic(perr.NewInternal("todo executeListExpr"))
 	return nil
 }
 func (e *Executor) executePrintExpr(expr *ast.PrintExpr) Val {
-	panic(perr.New("todo executePrintExpr"))
+	panic(perr.NewInternal("todo executePrintExpr"))
 	return nil
 }
 func (e *Executor) executePropertyFetchExpr(expr *ast.PropertyFetchExpr) Val {
-	panic(perr.New("todo executePropertyFetchExpr"))
+	panic(perr.NewInternal("todo executePropertyFetchExpr"))
 	return nil
 }
 func (e *Executor) executeStaticPropertyFetchExpr(expr *ast.StaticPropertyFetchExpr) Val {
-	panic(perr.New("todo executeStaticPropertyFetchExpr"))
+	panic(perr.NewInternal("todo executeStaticPropertyFetchExpr"))
 	return nil
 }
 func (e *Executor) executeShellExecExpr(expr *ast.ShellExecExpr) Val {
-	panic(perr.New("todo executeShellExecExpr"))
+	panic(perr.NewInternal("todo executeShellExecExpr"))
 	return nil
 }
 func (e *Executor) executeTernaryExpr(expr *ast.TernaryExpr) Val {
-	panic(perr.New("todo executeTernaryExpr"))
+	panic(perr.NewInternal("todo executeTernaryExpr"))
 	return nil
 }
 func (e *Executor) executeThrowExpr(expr *ast.ThrowExpr) Val {
-	panic(perr.New("todo executeThrowExpr"))
+	panic(perr.NewInternal("todo executeThrowExpr"))
 	return nil
 }
 func (e *Executor) executeVariableExpr(expr *ast.VariableExpr) Val {
-	panic(perr.New("todo executeVariableExpr"))
+	panic(perr.NewInternal("todo executeVariableExpr"))
 	return nil
 }
 func (e *Executor) executeYieldExpr(expr *ast.YieldExpr) Val {
-	panic(perr.New("todo executeYieldExpr"))
+	panic(perr.NewInternal("todo executeYieldExpr"))
 	return nil
 }
 func (e *Executor) executeYieldFromExpr(expr *ast.YieldFromExpr) Val {
-	panic(perr.New("todo executeYieldFromExpr"))
+	panic(perr.NewInternal("todo executeYieldFromExpr"))
 	return nil
 }
 func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
@@ -439,7 +439,7 @@ func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 		fn = e.initStringCall(name.String())
 	} else {
 		// todo 各种类型的 function name 处理
-		panic(perr.New("todo executeFuncCallExpr"))
+		panic(perr.NewInternal("todo executeFuncCallExpr"))
 	}
 
 	args := make([]Val, 0, len(expr.Args))
@@ -457,14 +457,14 @@ func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 	return e.function(fn, args)
 }
 func (e *Executor) executeNewExpr(expr *ast.NewExpr) Val {
-	panic(perr.New("todo executeNewExpr"))
+	panic(perr.NewInternal("todo executeNewExpr"))
 	return nil
 }
 func (e *Executor) executeMethodCallExpr(expr *ast.MethodCallExpr) Val {
-	panic(perr.New("todo executeMethodCallExpr"))
+	panic(perr.NewInternal("todo executeMethodCallExpr"))
 	return nil
 }
 func (e *Executor) executeStaticCallExpr(expr *ast.StaticCallExpr) Val {
-	panic(perr.New("todo executeStaticCallExpr"))
+	panic(perr.NewInternal("todo executeStaticCallExpr"))
 	return nil
 }

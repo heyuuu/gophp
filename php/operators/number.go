@@ -4,6 +4,7 @@ import (
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/kits/mathkit"
 	"github.com/heyuuu/gophp/php"
+	"github.com/heyuuu/gophp/php/perr"
 	"log"
 	"math"
 	"strconv"
@@ -36,7 +37,7 @@ func StrToNumberPrefix(str string, silent bool) Val {
 	zv, _, matchLen := parseNumberPrefix(str)
 	if matchLen != len(str) && !silent {
 		// notice: 此处可能会触发 Exception
-		php.Error(php.E_NOTICE, "A non well formed numeric value encountered")
+		php.Error(perr.E_NOTICE, "A non well formed numeric value encountered")
 		if hasException() {
 			return nil
 		}
