@@ -2,7 +2,6 @@ package operators
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
@@ -11,31 +10,31 @@ import (
 )
 
 // bool
-
-func ZvalIsTrue(op Val) bool {
+func (op *Operator) IsTrue(v Val) bool { return op.ToBool(v) }
+func (op *Operator) ToBool(v Val) bool {
 again:
-	switch op.Type() {
+	switch v.Type() {
 	case types.IsTrue:
 		return true
 	case types.IsLong:
-		return op.Long() != 0
+		return v.Long() != 0
 	case types.IsDouble:
-		return op.Double() != 0
+		return v.Double() != 0
 	case types.IsString:
-		str := op.String()
+		str := v.String()
 		return str != "" && str != "0"
 	case types.IsArray:
-		return op.Array().Len() != 0
+		return v.Array().Len() != 0
 	case types.IsObject:
-		dst := ConvertObjectToType(op.Object(), types.IsBool)
+		dst := op.convertObjectToType(v.Object(), types.IsBool)
 		if dst != nil {
 			return dst.IsTrue()
 		}
 		return true
 	case types.IsResource:
-		return op.ResourceHandle() != 0
+		return v.ResourceHandle() != 0
 	case types.IsRef:
-		op = op.RefVal()
+		v = v.RefVal()
 		goto again
 	}
 	return false
@@ -43,32 +42,32 @@ again:
 
 // long
 
-func ZvalGetLong(op Val) int      { return zvalGetLongEx(op, true) }
-func zvalGetLongNoisy(op Val) int { return zvalGetLongEx(op, false) }
-func zvalGetLongEx(op Val, silent bool) int {
+func (op *Operator) ToLong(v Val) int      { return op.ToLongEx(v, true) }
+func (op *Operator) ToLongNoisy(v Val) int { return op.ToLongEx(v, false) }
+func (op *Operator) ToLongEx(v Val, silent bool) int {
 	// fast
-	if op.IsLong() {
-		return op.Long()
+	if v.IsLong() {
+		return v.Long()
 	}
 
 	// common
 again:
-	switch op.Type() {
+	switch v.Type() {
 	case types.IsUndef, types.IsNull, types.IsFalse:
 		return 0
 	case types.IsTrue:
 		return 1
 	case types.IsResource:
-		return op.ResourceHandle()
+		return v.ResourceHandle()
 	case types.IsLong:
-		return op.Long()
+		return v.Long()
 	case types.IsDouble:
-		return DoubleToLong(op.Double())
+		return DoubleToLong(v.Double())
 	case types.IsString:
-		var r Val = StrToNumberPrefix(op.String(), silent)
+		var r Val = op.parseNumberPrefix(v.String(), silent)
 		if r == nil {
 			if !silent {
-				php.Error(perr.E_WARNING, "A non-numeric value encountered")
+				op.Error(perr.E_WARNING, "A non-numeric value encountered")
 			}
 			return 0
 		}
@@ -83,33 +82,33 @@ again:
 			return DoubleToLongCap(r.Double())
 		}
 	case types.IsArray:
-		if op.Array().Len() != 0 {
+		if v.Array().Len() != 0 {
 			return 1
 		} else {
 			return 0
 		}
 	case types.IsObject:
-		dst := ConvertObjectToType(op.Object(), types.IsLong)
+		dst := op.convertObjectToType(v.Object(), types.IsLong)
 		if dst.IsLong() {
 			return dst.Long()
 		} else {
 			return 1
 		}
 	case types.IsRef:
-		op = op.DeRef()
+		v = v.DeRef()
 		goto again
 	default:
 		return 0
 	}
 }
 
-// ZvalTryGetLong。 相比 ZvalGetLong，不考虑 Array/Object/Resource 等复杂类型。
-func ZvalTryGetLong(op Val) (int, bool) {
-	op = op.DeRef()
-	if op.Type() < types.IsString {
-		return ZvalGetLong(op), true
-	} else if op.IsString() {
-		v, err := strconv.Atoi(op.String())
+// TryToLong。 相比 ToLong，不考虑 Array/Object/Resource 等复杂类型。
+func (op *Operator) TryToLong(v Val) (int, bool) {
+	v = v.DeRef()
+	if v.Type() < types.IsString {
+		return op.ToLong(v), true
+	} else if v.IsString() {
+		v, err := strconv.Atoi(v.String())
 		if err == nil {
 			return v, true
 		}
@@ -118,14 +117,13 @@ func ZvalTryGetLong(op Val) (int, bool) {
 }
 
 // double
-
-func ZvalGetDouble(op Val) float64 {
-	if op.IsDouble() {
-		return op.Double()
+func (op *Operator) ToDouble(v Val) float64 {
+	if v.IsDouble() {
+		return v.Double()
 	}
 
-	op = op.DeRef()
-	switch op.Type() {
+	v = v.DeRef()
+	switch v.Type() {
 	case types.IsNull:
 		fallthrough
 	case types.IsFalse:
@@ -133,21 +131,21 @@ func ZvalGetDouble(op Val) float64 {
 	case types.IsTrue:
 		return 1.0
 	case types.IsResource:
-		return float64(op.ResourceHandle())
+		return float64(v.ResourceHandle())
 	case types.IsLong:
-		return float64(op.Long())
+		return float64(v.Long())
 	case types.IsDouble:
-		return op.Double()
+		return v.Double()
 	case types.IsString:
-		return StrToDouble(op.String())
+		return ParseDouble(v.String())
 	case types.IsArray:
-		if op.Array().Len() != 0 {
+		if v.Array().Len() != 0 {
 			return 1.0
 		} else {
 			return 0.0
 		}
 	case types.IsObject:
-		dst := ConvertObjectToType(op.Object(), types.IsDouble)
+		dst := op.convertObjectToType(v.Object(), types.IsDouble)
 		if dst.IsDouble() {
 			return dst.Double()
 		} else {
@@ -159,31 +157,32 @@ func ZvalGetDouble(op Val) float64 {
 }
 
 // scalar to number
-func ScalarGetNumber(op Val, silent bool) Val {
-	switch op.Type() {
+func (op *Operator) ToNumber(v Val) Val { return op.ToNumberEx(v, true) }
+func (op *Operator) ToNumberEx(v Val, silent bool) Val {
+	switch v.Type() {
 	case types.IsNull, types.IsFalse:
 		return Long(0)
 	case types.IsTrue:
 		return Long(1)
 	case types.IsLong:
-		return Long(op.Long())
+		return Long(v.Long())
 	case types.IsDouble:
-		return Double(op.Double())
+		return Double(v.Double())
 	case types.IsString:
-		r := StrToNumberPrefix(op.String(), silent)
+		r := op.parseNumberPrefix(v.String(), silent)
 		if r == nil {
 			if !silent {
-				php.Error(perr.E_WARNING, "A non-numeric value encountered")
+				op.Error(perr.E_WARNING, "A non-numeric value encountered")
 			}
 			return Long(0)
 		}
 		return r
 	case types.IsResource:
-		var l = op.ResourceHandle()
+		var l = v.ResourceHandle()
 		return Long(l)
 	case types.IsObject:
-		dst := ConvertObjectToType(op.Object(), types.IsNumber)
-		if hasException() {
+		dst := op.convertObjectToType(v.Object(), types.IsNumber)
+		if op.HasException() {
 			return Long(1)
 		}
 		if dst.IsLong() || dst.IsDouble() {
@@ -198,20 +197,19 @@ func ScalarGetNumber(op Val, silent bool) Val {
 }
 
 // string
-
-func ZvalGetStrVal(op Val) string {
-	str, _ := ZvalGetStr(op)
+func (op *Operator) ToStrVal(v Val) string {
+	str, _ := op.toStrEx(v, false)
 	return str
 }
-func ZvalGetStr(op Val) (string, bool) {
-	return zvalGetStrEx(op, false)
+func (op *Operator) ToStr(v Val) (string, bool) {
+	return op.toStrEx(v, false)
 }
-func ZvalTryGetStrVal(op Val) string {
-	str, _ := zvalGetStrEx(op, true)
+func (op *Operator) TryToStrVal(v Val) string {
+	str, _ := op.toStrEx(v, true)
 	return str
 }
-func ZvalTryGetStr(op Val) (string, bool) {
-	return zvalGetStrEx(op, true)
+func (op *Operator) TryToStr(v Val) (string, bool) {
+	return op.toStrEx(v, true)
 }
 
 /**
@@ -219,33 +217,33 @@ func ZvalTryGetStr(op Val) (string, bool) {
  * @return string 返回的字符串值。
  * @return bool   是否成功。
  */
-func zvalGetStrEx(op Val, try bool) (string, bool) {
-	op = op.DeRef()
-	switch op.Type() {
+func (op *Operator) toStrEx(v Val, try bool) (string, bool) {
+	v = v.DeRef()
+	switch v.Type() {
 	case types.IsString:
-		return op.String(), true
+		return v.String(), true
 	case types.IsUndef, types.IsNull, types.IsFalse:
 		return "", true
 	case types.IsTrue:
 		return "1", true
 	case types.IsResource:
-		return fmt.Sprintf("Resource id #%d", op.ResourceHandle()), true
+		return fmt.Sprintf("Resource id #%d", v.ResourceHandle()), true
 	case types.IsLong:
-		return strconv.Itoa(op.Long()), true
+		return strconv.Itoa(v.Long()), true
 	case types.IsDouble:
-		return fmt.Sprintf("%.*G", getPrecision(), op.Double()), true
+		return fmt.Sprintf("%.*G", op.Precision(), v.Double()), true
 	case types.IsArray:
-		php.Error(perr.E_NOTICE, "Array to string conversion")
-		if try && hasException() {
+		op.Error(perr.E_NOTICE, "Array to string conversion")
+		if try && op.HasException() {
 			return "", false
 		}
 		return "Array", true
 	case types.IsObject:
-		if tmp, ok := op.Object().Cast(types.IsString); ok {
+		if tmp, ok := v.Object().Cast(types.IsString); ok {
 			return tmp.String(), true
 		}
-		if !hasException() {
-			php.ThrowError(nil, fmt.Sprintf("Object of class %s could not be converted to string", op.Object().CeName()))
+		if !op.HasException() {
+			op.ThrowError(nil, fmt.Sprintf("Object of class %s could not be converted to string", v.Object().CeName()))
 		}
 		if try {
 			return "", false
@@ -257,22 +255,73 @@ func zvalGetStrEx(op Val, try bool) (string, bool) {
 	}
 }
 
+// array
+func (op *Operator) ToArray(v Val) *types.Array {
+	v = v.DeRef()
+	switch v.Type() {
+	case types.IsArray:
+		return v.Array()
+	case types.IsObject:
+		return op.ObjectGetArray(v.Object())
+	case types.IsNull:
+		return types.NewArray()
+	default:
+		return types.NewArrayOf(v)
+	}
+}
+
+// object
+func (op *Operator) ToObject(v Val) *types.Object {
+	v = v.DeRef()
+	switch v.Type() {
+	case types.IsArray:
+		var ht = v.Array()
+		// todo
+		return op.NewObject(ht)
+	case types.IsObject:
+		return v.Object()
+	case types.IsNull:
+		return op.NewObject(nil)
+	default:
+		obj := op.NewObject(nil)
+		//obj.GetPropertiesArray().KeyAdd(types.STR_SCALAR, v.CloneValue())
+		return obj
+	}
+}
+
+func (op *Operator) convertObjectToType(obj *types.Object, ctype types.ZvalType) Val {
+	if result, ok := obj.Cast(ctype); ok {
+		return result
+	} else if obj.CanCast() {
+		op.Error(perr.E_RECOVERABLE_ERROR, fmt.Sprintf("Object of class %s could not be converted to %s", obj.CeName(), types.ZendGetTypeByConst(ctype)))
+	}
+	return nil
+}
+
 // compare
-func ZvalCompare(op1 Val, op2 Val) (int, bool) {
+func (op *Operator) Compare(v1 Val, v2 Val) int {
+	result, ok := op.CompareEx(v1, v2)
+	if !ok {
+		// todo
+		panic(perr.Unreachable())
+	}
+	return result
+}
+func (op *Operator) CompareEx(v1 Val, v2 Val) (int, bool) {
 	var converted int = 0
 
-	op1 = op1.DeRef()
-	op2 = op2.DeRef()
+	v1 = v1.DeRef()
+	v2 = v2.DeRef()
 	for {
-		switch typePair(op1, op2) {
+		switch typePair(v1, v2) {
 		case IsLongLong:
-			return cmp.Compare(op1.Long(), op2.Long()), true
+			return cmp.Compare(v1.Long(), v2.Long()), true
 		case IsLongDouble, IsDoubleLong, IsDoubleDouble:
-			d1 := fastGetDouble(op1)
-			d2 := fastGetDouble(op2)
+			d1 := fastGetDouble(v1)
+			d2 := fastGetDouble(v2)
 			return cmp.Compare(d1, d2), true
 		case IsArrayArray:
-			return ZendCompareArrays(op1, op2), true
+			return op.CompareArray(v1.Array(), v2.Array()), true
 		case IsNullNull, IsNullFalse, IsFalseNull, IsFalseFalse, IsTrueTrue:
 			return 0, true
 		case IsNullTrue:
@@ -280,91 +329,105 @@ func ZvalCompare(op1 Val, op2 Val) (int, bool) {
 		case IsTrueNull:
 			return 1, true
 		case IsStringString:
-			if op1.String() == op2.String() {
+			if v1.String() == v2.String() {
 				return 0, true
 			}
-			return ZendiSmartStrcmp(op1.String(), op2.String()), true
+			return SmartStrCompare(v1.String(), v2.String()), true
 		case IsNullString:
-			return lang.Cond(len(op2.String()) == 0, 0, -1), true
+			return lang.Cond(len(v2.String()) == 0, 0, -1), true
 		case IsStringNull:
-			return lang.Cond(len(op1.String()) == 0, 0, 1), true
+			return lang.Cond(len(v1.String()) == 0, 0, 1), true
 		case IsObjectNull:
 			return 1, true
 		case IsNullObject:
 			return -1, true
 		default:
-			if op1.IsObject() && op1.Object().CanCompare() {
-				return objectCompare(op1.Object(), op1, op2)
-			} else if op2.IsObject() && op2.Object().CanCompare() {
-				return objectCompare(op2.Object(), op1, op2)
+			if v1.IsObject() && v1.Object().CanCompare() {
+				return op.opObjectCompare(v1.Object(), v1, v2)
+			} else if v2.IsObject() && v2.Object().CanCompare() {
+				return op.opObjectCompare(v2.Object(), v1, v2)
 			}
-			if op1.IsObject() && op2.IsObject() {
-				if op1.Object() == op2.Object() {
+			if v1.IsObject() && v2.IsObject() {
+				if v1.Object() == v2.Object() {
 					/* object handles are identical, apparently this is the same object */
 					return 0, true
 				}
-				if retval, ok := op1.Object().CompareObjectsTo(op2.Object()); ok {
+				if retval, ok := v1.Object().CompareObjectsTo(v2.Object()); ok {
 					return retval, true
 				}
 				return 1, true
 			}
-			if op1.IsObject() && !op2.IsObject() && op1.Object().CanCast() {
-				if tmp, ok := op1.Object().Cast(op2.Type()); ok {
-					return ZvalCompare(tmp, op2)
+			if v1.IsObject() && !v2.IsObject() && v1.Object().CanCast() {
+				if tmp, ok := v1.Object().Cast(v2.Type()); ok {
+					return op.CompareEx(tmp, v2)
 				} else {
 					return 1, true
 				}
 			}
-			if op2.IsObject() && !op1.IsObject() && op2.Object().CanCast() {
-				if tmp, ok := op2.Object().Cast(op1.Type()); ok {
-					return ZvalCompare(op1, tmp)
+			if v2.IsObject() && !v1.IsObject() && v2.Object().CanCast() {
+				if tmp, ok := v2.Object().Cast(v1.Type()); ok {
+					return op.CompareEx(v1, tmp)
 				} else {
 					return -1, true
 				}
 			}
 
 			if converted == 0 {
-				if op1.Type() < types.IsTrue {
-					return lang.Cond(ZvalIsTrue(op2), -1, 0), true
-				} else if op1.IsTrue() {
-					return lang.Cond(ZvalIsTrue(op2), 0, 1), true
-				} else if op2.Type() < types.IsTrue {
-					return lang.Cond(ZvalIsTrue(op1), 1, 0), true
-				} else if op2.IsTrue() {
-					return lang.Cond(ZvalIsTrue(op1), 0, -1), true
+				if v1.Type() < types.IsTrue {
+					return lang.Cond(op.IsTrue(v2), -1, 0), true
+				} else if v1.IsTrue() {
+					return lang.Cond(op.IsTrue(v2), 0, 1), true
+				} else if v2.Type() < types.IsTrue {
+					return lang.Cond(op.IsTrue(v1), 1, 0), true
+				} else if v2.IsTrue() {
+					return lang.Cond(op.IsTrue(v1), 0, -1), true
 				} else {
-					op1, op2 = opScalarGetNumberEx(op1, op2, true)
-					if hasException() {
+					v1, v2 = op.opScalarGetNumberEx(v1, v2, true)
+					if op.HasException() {
 						return 0, false
 					}
 					converted = 1
 				}
-			} else if op1.IsArray() {
+			} else if v1.IsArray() {
 				return 1, true
-			} else if op2.IsArray() {
+			} else if v2.IsArray() {
 				return -1, true
 			} else {
 				lang.Assert(false)
-				php.ThrowError(nil, "Unsupported operand types")
+				op.ThrowError(nil, "Unsupported operand types")
 				return 0, false
 			}
 		}
 	}
 }
 
+func (op *Operator) CompareArray(ht1, ht2 *types.Array) int {
+	// todo
+	panic("todo")
+}
+
 // equals
-func ZvalEquals(op1, op2 Val) (result bool, ok bool) {
-	switch typePair(op1, op2) {
+func (op *Operator) Equals(op1, op2 Val) bool {
+	result, ok := op.IsEquals(op1, op2)
+	if !ok {
+		// todo
+		panic(perr.Unreachable())
+	}
+	return result
+}
+
+func (op *Operator) IsEquals(v1, v2 Val) (result bool, ok bool) {
+	switch typePair(v1, v2) {
 	case IsLongLong:
-		return op1.Long() == op2.Long(), true
+		return v1.Long() == v2.Long(), true
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
-		d1 := fastGetDouble(op1)
-		d2 := fastGetDouble(op2)
+		d1 := fastGetDouble(v1)
+		d2 := fastGetDouble(v2)
 		return d1 == d2, true
 	case IsStringString:
-		return ZendFastEqualStringsEx(op1.String(), op2.String()), true
+		return SmartStrEquals(v1.String(), v2.String()), true
 	default:
-		ret, ok := ZvalCompare(op1, op2)
+		ret, ok := op.CompareEx(v1, v2)
 		if !ok {
 			return false, false
 		}
@@ -373,28 +436,31 @@ func ZvalEquals(op1, op2 Val) (result bool, ok bool) {
 }
 
 // identical
-func ZvalIsIdentical(op1 Val, op2 Val) bool {
-	if op1.Type() != op2.Type() {
+func (op *Operator) IsIdentical(v1 Val, v2 Val) bool {
+	if v1.Type() != v2.Type() {
 		return false
 	}
-	switch op1.Type() {
+	switch v1.Type() {
 	case types.IsNull, types.IsFalse, types.IsTrue:
 		return true
 	case types.IsLong:
-		return op1.Long() == op2.Long()
+		return v1.Long() == v2.Long()
 	case types.IsResource:
-		return op1.Resource() == op2.Resource()
+		return v1.Resource() == v2.Resource()
 	case types.IsDouble:
-		return op1.Double() == op2.Double()
+		return v1.Double() == v2.Double()
 	case types.IsString:
-		return op1.String() == op2.String()
+		return v1.String() == v2.String()
 	case types.IsArray:
-		// todo array compare
-		return op1.Array() == op2.Array() // || types.ZendHashCompare(op1.Array(), op2.Array(), HashZvalIdenticalFunction, 1) == 0
-		//return op1.Array() == op2.Array() || types.ZendHashCompare(op1.Array(), op2.Array(), HashZvalIdenticalFunction, 1) == 0
+		return v1.Array() == v2.Array() || op.IsIdenticalArray(v1.Array(), v2.Array())
 	case types.IsObject:
-		return op1.Object() == op2.Object()
+		return v1.Object() == v2.Object()
 	default:
 		return false
 	}
+}
+
+func (op *Operator) IsIdenticalArray(ht1, ht2 *types.Array) bool {
+	// todo
+	return false
 }

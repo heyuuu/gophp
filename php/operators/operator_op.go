@@ -24,7 +24,7 @@ again:
 	default:
 		if converted {
 			// fail
-			op.throwErrorNoReturn(nil, "Unsupported operand types")
+			op.ThrowError(nil, "Unsupported operand types")
 		}
 
 		// convert
@@ -61,7 +61,7 @@ again:
 	default:
 		if converted {
 			// fail
-			op.throwErrorNoReturn(nil, "Unsupported operand types")
+			op.ThrowError(nil, "Unsupported operand types")
 		}
 
 		// convert
@@ -93,7 +93,7 @@ again:
 	default:
 		if converted {
 			// fail
-			op.throwErrorNoReturn(nil, "Unsupported operand types")
+			op.ThrowError(nil, "Unsupported operand types")
 		}
 
 		// convert
@@ -136,14 +136,14 @@ again:
 		d1 := fastGetDouble(op1)
 		d2 := fastGetDouble(op2)
 		if d2 == 0 {
-			op.error(perr.E_WARNING, "Division by zero")
+			op.Error(perr.E_WARNING, "Division by zero")
 			return Double(math.Inf(int(d1)))
 		}
 		return Double(d1 / d2)
 	default:
 		if converted {
 			// fail
-			op.throwErrorNoReturn(nil, "Unsupported operand types")
+			op.ThrowError(nil, "Unsupported operand types")
 		}
 
 		// convert
@@ -155,7 +155,7 @@ again:
 
 func (op *Operator) DivLong(i1, i2 int) Val {
 	if i2 == 0 {
-		op.error(perr.E_WARNING, "Division by zero")
+		op.Error(perr.E_WARNING, "Division by zero")
 		return Double(math.Inf(i1))
 	} else if i2 == -1 && i1 == math.MinInt {
 		/* Prevent overflow error/crash */
@@ -177,19 +177,19 @@ func (op *Operator) Mod(op1, op2 Val) Val {
 	if op1.IsLong() {
 		op1Lval = op1.Long()
 	} else {
-		op1Lval = op.zvalGetLongNoisy(op1)
+		op1Lval = op.ToLongNoisy(op1)
 	}
 
 	op2 = op2.DeRef()
 	if op2.IsLong() {
 		op2Lval = op2.Long()
 	} else {
-		op2Lval = op.zvalGetLongNoisy(op2)
+		op2Lval = op.ToLongNoisy(op2)
 	}
 
 	if op2Lval == 0 {
 		/* modulus by zero */
-		op.throwIfExecutingNoReturn(nil, "Modulo by zero")
+		op.ThrowException(nil, "Modulo by zero")
 	}
 
 	return Long(op1Lval % op2Lval)
@@ -204,18 +204,18 @@ func (op *Operator) SL(op1, op2 Val) Val {
 	if op1.IsLong() {
 		op1Lval = op1.Long()
 	} else {
-		op1Lval = op.zvalGetLongNoisy(op1)
+		op1Lval = op.ToLongNoisy(op1)
 	}
 
 	op2 = op2.DeRef()
 	if op2.IsLong() {
 		op2Lval = op2.Long()
 	} else {
-		op2Lval = op.zvalGetLongNoisy(op2)
+		op2Lval = op.ToLongNoisy(op2)
 	}
 
 	if op2Lval < 0 {
-		op.throwIfExecutingNoReturn(nil, "Bit shift by negative number")
+		op.ThrowException(nil, "Bit shift by negative number")
 	}
 
 	return Long(op1Lval << op2Lval)
@@ -230,18 +230,18 @@ func (op *Operator) SR(op1, op2 Val) Val {
 	if op1.IsLong() {
 		op1Lval = op1.Long()
 	} else {
-		op1Lval = op.zvalGetLongNoisy(op1)
+		op1Lval = op.ToLongNoisy(op1)
 	}
 
 	op2 = op2.DeRef()
 	if op2.IsLong() {
 		op2Lval = op2.Long()
 	} else {
-		op2Lval = op.zvalGetLongNoisy(op2)
+		op2Lval = op.ToLongNoisy(op2)
 	}
 
 	if op2Lval < 0 {
-		op.throwIfExecutingNoReturn(nil, "Bit shift by negative number")
+		op.ThrowException(nil, "Bit shift by negative number")
 	}
 
 	return Long(op1Lval >> op2Lval)
@@ -257,17 +257,17 @@ func (op *Operator) Concat(op1, op2 Val) Val {
 	if op1.IsString() {
 		s1 = op1.String()
 	} else {
-		s1 = op.ZvalGetStrVal(op1)
+		s1 = op.ToStrVal(op1)
 	}
 
 	if op2.IsString() {
 		s2 = op2.String()
 	} else {
-		s2 = op.ZvalGetStrVal(op2)
+		s2 = op.ToStrVal(op2)
 	}
 
 	if len(s1)+len(s2) > math.MaxInt {
-		op.throwErrorNoReturn(nil, "String size overflow")
+		op.ThrowError(nil, "String size overflow")
 	}
 
 	return String(s1 + s2)
@@ -289,7 +289,7 @@ again:
 	default:
 		if converted {
 			// fail
-			op.throwErrorNoReturn(nil, "Unsupported operand types")
+			op.ThrowError(nil, "Unsupported operand types")
 		}
 
 		// array type
@@ -367,8 +367,8 @@ func (op *Operator) BitwiseAnd(op1, op2 Val) Val {
 	}
 
 	// common
-	var op1Lval = op.zvalGetLongNoisy(op1)
-	var op2Lval = op.zvalGetLongNoisy(op2)
+	var op1Lval = op.ToLongNoisy(op1)
+	var op2Lval = op.ToLongNoisy(op2)
 	return Long(op1Lval & op2Lval)
 }
 
@@ -389,8 +389,8 @@ func (op *Operator) BitwiseOr(op1, op2 Val) Val {
 		return String(string(str))
 	}
 
-	var op1Lval = op.zvalGetLongNoisy(op1)
-	var op2Lval = op.zvalGetLongNoisy(op2)
+	var op1Lval = op.ToLongNoisy(op1)
+	var op2Lval = op.ToLongNoisy(op2)
 	return Long(op1Lval | op2Lval)
 }
 
@@ -412,9 +412,34 @@ func (op *Operator) BitwiseXor(op1, op2 Val) Val {
 		return String(string(str))
 	}
 
-	var op1Lval = op.zvalGetLongNoisy(op1)
-	var op2Lval = op.zvalGetLongNoisy(op2)
+	var op1Lval = op.ToLongNoisy(op1)
+	var op2Lval = op.ToLongNoisy(op2)
 	return Long(op1Lval ^ op2Lval)
+}
+
+// BitwiseNot
+func (op *Operator) BitwiseNot(op1 Val) Val {
+again:
+	switch op1.Type() {
+	case types.IsLong:
+		v := ^op1.Long()
+		return Long(v)
+	case types.IsDouble:
+		v := ^DoubleToLong(op1.Double())
+		return Long(v)
+	case types.IsString:
+		str := []byte(op1.String())
+		for i, c := range str {
+			str[i] = ^c
+		}
+		return String(string(str))
+	case types.IsRef:
+		op1 = op1.DeRef()
+		goto again
+	default:
+		op.ThrowError(nil, "Unsupported operand types")
+		panic("unreachable")
+	}
 }
 
 // Coalesce(??)
@@ -427,41 +452,47 @@ func (op *Operator) Coalesce(op1 Val, op2 LazyVal) Val {
 
 // BooleanAnd
 func (op *Operator) BooleanAnd(op1 Val, op2 LazyVal) Val {
-	op1Val := ZvalIsTrue(op1)
+	op1Val := op.IsTrue(op1)
 	if !op1Val {
 		return False()
 	}
 
-	op2Val := ZvalIsTrue(op2())
+	op2Val := op.IsTrue(op2())
 	return Bool(op2Val)
 }
 
 // BooleanOr
 func (op *Operator) BooleanOr(op1 Val, op2 LazyVal) Val {
-	op1Val := ZvalIsTrue(op1)
+	op1Val := op.IsTrue(op1)
 	if op1Val {
 		return True()
 	}
 
-	op2Val := ZvalIsTrue(op2())
+	op2Val := op.IsTrue(op2())
 	return Bool(op2Val)
+}
+
+// BooleanNot
+func (op *Operator) BooleanNot(op1 Val) Val {
+	op1Val := op.IsTrue(op1)
+	return Bool(!op1Val)
 }
 
 // BooleanXor
 func (op *Operator) BooleanXor(op1, op2 Val) Val {
-	op1Val := ZvalIsTrue(op1)
-	op2Val := ZvalIsTrue(op2)
+	op1Val := op.IsTrue(op1)
+	op2Val := op.IsTrue(op2)
 	return Bool(lang.Xor(op1Val, op2Val))
 }
 
 // Identical
 func (op *Operator) Identical(op1, op2 Val) Val {
-	return Bool(ZvalIsIdentical(op1, op2))
+	return Bool(op.IsIdentical(op1, op2))
 }
 
 // NotIdentical
 func (op *Operator) NotIdentical(op1, op2 Val) Val {
-	return Bool(!ZvalIsIdentical(op1, op2))
+	return Bool(!op.IsIdentical(op1, op2))
 }
 
 // Equal

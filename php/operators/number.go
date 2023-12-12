@@ -3,17 +3,12 @@ package operators
 import (
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/kits/mathkit"
-	"github.com/heyuuu/gophp/php"
-	"github.com/heyuuu/gophp/php/perr"
 	"log"
 	"math"
 	"strconv"
 )
 
-/**
- * public
- */
-func StrToDouble(str string) float64 {
+func ParseDouble(str string) float64 {
 	matchStr, _, _ := matchNumberPrefix(str)
 	if matchStr == "" { // not match
 		return 0 // todo 异常处理
@@ -22,27 +17,20 @@ func StrToDouble(str string) float64 {
 	return d
 }
 
-func StrToNumber(str string) Val {
-	zv, _ := StrToNumberEx(str)
+func ParseNumber(str string) Val {
+	zv, _ := ParseNumberEx(str)
 	return zv
 }
-func StrToNumberEx(str string) (Val, int) {
+func ParseNumberEx(str string) (Val, int) {
 	zv, overflow, matchLen := parseNumberPrefix(str)
 	if matchLen != len(str) {
 		return nil, 0
 	}
 	return zv, overflow
 }
-func StrToNumberPrefix(str string, silent bool) Val {
+func ParseNumberPrefix(str string) (Val, int) {
 	zv, _, matchLen := parseNumberPrefix(str)
-	if matchLen != len(str) && !silent {
-		// notice: 此处可能会触发 Exception
-		php.Error(perr.E_NOTICE, "A non well formed numeric value encountered")
-		if hasException() {
-			return nil
-		}
-	}
-	return zv
+	return zv, matchLen
 }
 
 func DoubleToLong(d float64) int {
