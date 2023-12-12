@@ -56,7 +56,7 @@ func (e *Executor) initStringCall(name string) *types.Function {
 	// todo ZendInitDynamicCallString
 	fn := e.ctx.EG().FindFunction(name)
 	if fn == nil {
-		ThrowError(nil, fmt.Sprintf("Call to undefined function %s()", name))
+		ThrowError(e.ctx, nil, fmt.Sprintf("Call to undefined function %s()", name))
 		return nil
 	}
 	return fn
