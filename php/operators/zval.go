@@ -393,7 +393,7 @@ func (op *Operator) CompareEx(v1 Val, v2 Val) (int, bool) {
 			} else if v2.IsArray() {
 				return -1, true
 			} else {
-				lang.Assert(false)
+				perr.Assert(false)
 				op.ThrowError(nil, "Unsupported operand types")
 				return 0, false
 			}

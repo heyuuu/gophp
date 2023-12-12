@@ -1,6 +1,8 @@
 package types
 
-import "github.com/heyuuu/gophp/php/lang"
+import (
+	"github.com/heyuuu/gophp/php/perr"
+)
 
 // arrayKeySign ArrayKey 内部标识符，用于标识是否为字符串
 // 不再使用 \x00，因为内部会使用 \x00 开始标识一些特殊字符串，较容易冲突 (比如 protected 的方法名等)
@@ -70,7 +72,7 @@ func NewArrayOfZval(values []*Zval) *Array {
 func (ht *Array) Len() int { return ht.data0.Len() }
 
 /* misc */
-func (ht *Array) assertWritable() { lang.Assert(ht.writable) }
+func (ht *Array) assertWritable() { perr.Assert(ht.writable) }
 
 // Methods use ArrayKey
 

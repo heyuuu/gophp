@@ -2,8 +2,8 @@ package php
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/operators"
+	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -41,7 +41,7 @@ func (e *Executor) Execute(fn *types.Function) (retval Val, ret error) {
 }
 
 func (e *Executor) function(fn *types.Function, args []Val) Val {
-	lang.Assert(fn != nil)
+	perr.Assert(fn != nil)
 	if fn.IsInternalFunction() {
 		// todo
 		var retval Val

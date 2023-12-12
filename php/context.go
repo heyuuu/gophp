@@ -20,11 +20,10 @@ func initContext(e *Engine, baseCtx *Context, request *http.Request, response ht
 	ctx.cg.Init()
 	ctx.eg.Init()
 	ctx.og.Init()
-
 	if baseCtx != nil {
 		ctx.eg.constantTable = baseCtx.eg.constantTable
 	}
-
+	ctx.operator = NewOperator(ctx)
 	return ctx
 }
 
