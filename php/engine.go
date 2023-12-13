@@ -26,7 +26,9 @@ func (engine *Engine) init() {
 	engine.modules = types.NewTable[*Module]()
 	engine.baseCtx = initContext(engine, nil, nil, nil)
 
-	engine.RegisterModule(BuiltinModule)
+	for _, entry := range builtinModuleEntries {
+		engine.RegisterModule(entry)
+	}
 }
 
 func (engine *Engine) Start() (err error) {

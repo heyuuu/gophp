@@ -2,6 +2,17 @@ package php
 
 import "github.com/heyuuu/gophp/php/types"
 
+var builtinModuleEntries []ModuleEntry
+
+func AddBuiltinModule(m ModuleEntry) {
+	builtinModuleEntries = append(builtinModuleEntries, m)
+}
+
+// BuiltinModule
+func init() {
+	AddBuiltinModule(BuiltinModule)
+}
+
 var BuiltinModule = ModuleEntry{
 	Name: "Core",
 	ModuleStartup: func(ctx *Context, moduleNumber int) bool {
