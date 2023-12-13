@@ -93,14 +93,15 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 }
 
 func runCode(code string) (output string) {
+	var buf strings.Builder
 	defer func() {
 		if e := recover(); e != nil {
-			output = fmt.Sprintf("Execute panic: %v", e)
+			buf.WriteString(fmt.Sprintf(">>> Execute panic: %v", e))
 			log.Printf("%+v\n", e)
 		}
-	}()
 
-	var buf strings.Builder
+		output = buf.String()
+	}()
 
 	engine := php.NewEngine()
 	engine.Start()
@@ -121,5 +122,5 @@ func runCode(code string) (output string) {
 		}
 	})
 
-	return buf.String()
+	return
 }
