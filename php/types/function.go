@@ -19,7 +19,7 @@ type ZifHandler func(executeData contracts.IExecuteData, returnValue *Zval)
 type Function struct {
 	typ          FunctionType
 	functionName string
-	ce           *Class
+	scope        *Class
 	argInfos     []ArgInfo
 
 	// fields for internal function

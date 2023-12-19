@@ -10,6 +10,7 @@ import (
 	"github.com/heyuuu/gophp/php"
 	"log"
 	"net/http"
+	"os/exec"
 	"strings"
 )
 
@@ -38,6 +39,7 @@ const (
 	TypeAst      = "AST"
 	TypeAstPrint = "AST-print"
 	TypeRun      = "Run"
+	TypeRawRun   = "Raw-Run"
 )
 
 type ApiTypeResult struct {
@@ -89,6 +91,11 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 	// run code
 	output := runCode(code)
 	result = append(result, ApiTypeResult{Type: TypeRun, Content: output})
+
+	// raw run code
+	rawOutput := rawRunCode(code)
+	result = append(result, ApiTypeResult{Type: TypeRawRun, Content: rawOutput})
+
 	return
 }
 
@@ -123,4 +130,20 @@ func runCode(code string) (output string) {
 	})
 
 	return
+}
+
+func rawRunCode(code string) string {
+	if strings.HasPrefix(code, "<?php\n") {
+		code = code[6:]
+	} else {
+		code = "?>" + code
+	}
+
+	command := exec.Command("php", "-r", code)
+	log.Printf("raw run code: %s\n", command.String())
+	if output, err := command.CombinedOutput(); err == nil {
+		return string(output)
+	} else {
+		return fmt.Sprintf("run fail: %s\n", err.Error())
+	}
 }
