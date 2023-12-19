@@ -17,6 +17,7 @@ type Engine struct {
 }
 
 func NewEngine() *Engine {
+	CheckIsBoot()
 	engine := &Engine{}
 	engine.init()
 	return engine
@@ -84,5 +85,9 @@ func (engine *Engine) RegisterModule(entry ModuleEntry) *Module {
 	moduleNumber := engine.modules.Len()
 	module := NewModule(moduleNumber, entry)
 	engine.modules.Add(lcName, module)
+
+	// 注册模块函数
+	RegisterModuleFunctions(engine.baseCtx, module, entry.Functions)
+
 	return module
 }

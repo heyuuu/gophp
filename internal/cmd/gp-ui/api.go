@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/compile/parser"
 	"github.com/heyuuu/gophp/kits/vardumper"
 	"github.com/heyuuu/gophp/php"
+	_ "github.com/heyuuu/gophp/php/boot"
 	"log"
 	"net/http"
 	"os/exec"

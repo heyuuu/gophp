@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/heyuuu/gophp/php/perr"
+	"github.com/heyuuu/gophp/shim/maps"
 	"github.com/heyuuu/gophp/shim/slices"
 )
 
@@ -20,6 +20,13 @@ func NewTable[T any]() *Table[T] {
 	return &Table[T]{
 		keys: nil,
 		m:    make(map[string]T),
+	}
+}
+
+func (t *Table[T]) Clone() *Table[T] {
+	return &Table[T]{
+		keys: slices.Clone(t.keys),
+		m:    maps.Clone(t.m),
 	}
 }
 
@@ -93,7 +100,6 @@ func (t *Table[T]) EachReserve(handler func(string, T)) {
 	}
 }
 func (t *Table[T]) EachEx(handler func(string, T) error) error {
-	perr.Assert(t != nil)
 	for _, k := range t.keys {
 		v := t.m[k]
 		err := handler(k, v)

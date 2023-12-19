@@ -17,12 +17,16 @@ type Context struct {
 
 func initContext(e *Engine, baseCtx *Context, request *http.Request, response http.ResponseWriter) *Context {
 	ctx := &Context{engine: e}
-	ctx.cg.Init()
-	ctx.eg.Init()
-	ctx.og.Init()
 	if baseCtx != nil {
-		ctx.eg.constantTable = baseCtx.eg.constantTable
+		ctx.cg.Init()
+		ctx.eg.Init(&baseCtx.eg)
+		ctx.og.Init()
+	} else {
+		ctx.cg.Init()
+		ctx.eg.Init(nil)
+		ctx.og.Init()
 	}
+
 	ctx.operator = NewOperator(ctx)
 	return ctx
 }

@@ -8,4 +8,7 @@ func init() {
 
 var BasicModuleEntry = php.ModuleEntry{
 	Name: "standard",
+	Functions: []php.FunctionEntry{
+		php.DefFunctionEntry("var_dump", ZifVarDump),
+	},
 }

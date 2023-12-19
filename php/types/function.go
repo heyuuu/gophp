@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/heyuuu/gophp/compile/ast"
-	"github.com/heyuuu/gophp/php/contracts"
 )
 
 type FunctionType uint8
@@ -13,9 +12,6 @@ const (
 	TypeEvalCode         FunctionType = 4
 )
 
-/* zend_internal_function_handler */
-type ZifHandler func(executeData contracts.IExecuteData, returnValue *Zval)
-
 type Function struct {
 	typ          FunctionType
 	functionName string
@@ -23,11 +19,21 @@ type Function struct {
 	argInfos     []ArgInfo
 
 	// fields for internal function
-	handler ZifHandler
+	handler      any
+	moduleNumber int
 
 	// fields for user function
 	stmts   []ast.Stmt
 	astFile *ast.File
+}
+
+func NewInternalFunction(name string, handler any, moduleNumber int) *Function {
+	return &Function{
+		typ:          TypeInternalFunction,
+		functionName: name,
+		handler:      handler,
+		moduleNumber: moduleNumber,
+	}
 }
 
 func (f *Function) Type() FunctionType { return f.typ }
@@ -38,5 +44,4 @@ func (f *Function) IsUserFunction() bool     { return f.typ == TypeUserFunction 
 func (f *Function) Name() string        { return f.functionName }
 func (f *Function) ArgInfos() []ArgInfo { return f.argInfos }
 
-func (f *Function) Handler() ZifHandler           { return f.handler }
-func (f *Function) SetHandler(handler ZifHandler) { f.handler = handler }
+func (f *Function) Handler() any { return f.handler }

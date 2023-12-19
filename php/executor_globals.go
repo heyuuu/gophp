@@ -13,10 +13,16 @@ type ExecutorGlobals struct {
 	classTable    ClassTable
 }
 
-func (e *ExecutorGlobals) Init() {
-	e.constantTable = types.NewTable[*types.Constant]()
-	e.functionTable = types.NewTable[*types.Function]()
-	e.classTable = types.NewTable[*types.Class]()
+func (e *ExecutorGlobals) Init(base *ExecutorGlobals) {
+	if base != nil {
+		e.constantTable = base.constantTable.Clone()
+		e.functionTable = base.functionTable.Clone()
+		e.classTable = base.classTable.Clone()
+	} else {
+		e.constantTable = types.NewTable[*types.Constant]()
+		e.functionTable = types.NewTable[*types.Function]()
+		e.classTable = types.NewTable[*types.Class]()
+	}
 }
 
 func (e *ExecutorGlobals) ConstantTable() ConstantTable { return e.constantTable }

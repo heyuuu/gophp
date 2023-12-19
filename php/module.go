@@ -4,6 +4,7 @@ package php
 type ModuleEntry struct {
 	Name            string
 	Version         string
+	Functions       []FunctionEntry
 	ModuleStartup   func(ctx *Context, moduleNumber int) bool
 	ModuleShutdown  func(ctx *Context, moduleNumber int) bool
 	RequestStartup  func(ctx *Context, moduleNumber int) bool
