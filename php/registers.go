@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func RegisterModuleFunctions(ctx *Context, m *Module, functions []FunctionEntry) {
+func RegisterModuleFunctions(ctx *Context, m *Module, functions []types.FunctionEntry) {
 	for _, entry := range functions {
 		lcName := strings.ToLower(entry.Name())
 		fn := types.NewInternalFunction(entry.Name(), entry.Handler(), m.moduleNumber)

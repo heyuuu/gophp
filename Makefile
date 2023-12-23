@@ -9,3 +9,6 @@ gophp-ui:
 gophp-dev:
 	${GO} build -o ${BULIDPATH} ./cmd/gophp
 	${BULIDPATH}gophp -r "echo 123, 456, 'abc';"
+
+gp-gen:
+	gp-gen -cmd gen-func
