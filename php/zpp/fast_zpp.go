@@ -30,12 +30,13 @@ func (p *FastParser) HasError() bool {
 }
 
 func (p *FastParser) nextArg() *types.Zval {
-	if p.err != nil || p.argIndex+1 >= p.ex.NumArgs() {
+	if p.err != nil || p.argIndex >= p.ex.NumArgs() {
 		return nil
 	}
 
+	arg := p.ex.Arg(p.argIndex)
 	p.argIndex++
-	return p.ex.Arg(p.argIndex)
+	return arg
 }
 
 func (p *FastParser) ParseBool() bool {
@@ -161,6 +162,13 @@ func (p *FastParser) ParseZvalDeref() *types.Zval {
 }
 
 func (p *FastParser) ParseVariadic() []*types.Zval {
-	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	var args []*types.Zval
+	for {
+		arg := p.nextArg()
+		if arg == nil {
+			break
+		}
+		args = append(args, arg)
+	}
+	return args
 }
