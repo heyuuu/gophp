@@ -8,14 +8,14 @@ import (
 var zifFunctions = []def.FuncType{DefZifVarDump}
 
 // generate by ZifVarDump
-var DefZifVarDump = def.DefFunc("var_dump", 1, 1, []def.ArgInfo{{Name: "value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifVarDump = def.DefFunc("var_dump", 1, 1, []def.ArgInfo{{Name: "ctx"}, {Name: "value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
-	fp := zpp.NewFastParser(executeData, 1, 1, 0)
+	fp := zpp.NewParser(executeData, 1, 1, 0)
 	value := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifVarDump(executeData, value)
+	ZifVarDump(executeData.Ctx(), executeData, value)
 })
