@@ -115,7 +115,6 @@ func (ht *ArrayDataHt) Add(key ArrayKey, value *Zval) (bool, error) {
 		return true, nil
 	}
 }
-
 func (ht *ArrayDataHt) Update(key ArrayKey, value *Zval) error {
 	ht.assertWritable()
 	if pos, exists := ht.indexes[key]; exists {

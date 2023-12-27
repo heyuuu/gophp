@@ -78,20 +78,20 @@ again:
 	case types.IsArray:
 		myht := struc.Array()
 		if level > 1 {
-			//if myht.IsRecursive() {
-			//	w.WriteString("*RECURSION*\n")
-			//	return
-			//}
-			//myht.ProtectRecursive()
+			if myht.IsRecursive() {
+				w.WriteString("*RECURSION*\n")
+				return
+			}
+			myht.ProtectRecursive()
 		}
 		count := myht.Len()
 		w.WriteString(fmt.Sprintf("%sarray(%d) {\n", common, count))
-		//myht.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
-		//	PhpArrayElementDump(w, value, key, level)
-		//})
-		//if level > 1 {
-		//	myht.UnprotectRecursive()
-		//}
+		myht.Each(func(key types.ArrayKey, value *types.Zval) {
+			PhpArrayElementDump(w, value, key, level)
+		})
+		if level > 1 {
+			myht.UnprotectRecursive()
+		}
 		if level > 1 {
 			w.WriteString(fmt.Sprintf("%*c", level-1, ' '))
 		}

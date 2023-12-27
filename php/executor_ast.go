@@ -273,10 +273,10 @@ func (e *Executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
 	for _, item := range expr.Items {
 		if item.ByRef {
 			// todo item byref
-			panic("todo item byref")
+			perr.Panic("todo item byref")
 		} else if item.Unpack && item.Key != nil {
 			// todo item unpack with key
-			panic("todo item unpack with key")
+			perr.Panic("todo item unpack with key")
 		}
 
 		if item.Key != nil {
@@ -289,7 +289,7 @@ func (e *Executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
 			arr.Append(value)
 		}
 	}
-	return nil
+	return Array(arr)
 }
 func (e *Executor) executeClosureExpr(expr *ast.ClosureExpr) Val {
 	panic(perr.NewInternal("todo executeClosureExpr"))

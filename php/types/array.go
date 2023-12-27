@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/heyuuu/gophp/php/perr"
 	"math"
 )
 
@@ -49,8 +50,9 @@ const maxArrayPos = math.MaxInt
 
 // Array
 type Array struct {
-	data     ArrayData
-	writable bool // todo 完成写锁逻辑
+	data      ArrayData
+	writable  bool // todo 完成写锁逻辑
+	protected bool
 }
 
 /**
@@ -113,9 +115,17 @@ func (ht *Array) Count() int               { return ht.data.Count() }
 func (ht *Array) Exists(key ArrayKey) bool { return ht.data.Exists(key) }
 func (ht *Array) Find(key ArrayKey) *Zval  { val, _ := ht.data.Find(key); return val }
 
+func (ht *Array) Each(handler func(key ArrayKey, value *Zval)) {
+	_ = ht.data.Each(func(key ArrayKey, value *Zval) error {
+		handler(key, value)
+		return nil
+	})
+}
+
 // 常用写操作
 
 func (ht *Array) Add(key ArrayKey, value *Zval) bool {
+	perr.Assert(value != nil)
 	ht.assertWritable()
 	ret, err := ht.data.Add(key, value)
 	if err == arrayDataUnsupported && ht.makeOperable() {
@@ -124,6 +134,7 @@ func (ht *Array) Add(key ArrayKey, value *Zval) bool {
 	return ret
 }
 func (ht *Array) Update(key ArrayKey, value *Zval) {
+	perr.Assert(value != nil)
 	ht.assertWritable()
 	err := ht.data.Update(key, value)
 	if err == arrayDataUnsupported && ht.makeOperable() {
@@ -139,6 +150,7 @@ func (ht *Array) Delete(key ArrayKey) bool {
 	return ret
 }
 func (ht *Array) Append(value *Zval) int {
+	perr.Assert(value != nil)
 	ht.assertWritable()
 	ret, err := ht.data.Append(value)
 	if err == arrayDataUnsupported && ht.makeOperable() {
@@ -182,3 +194,8 @@ func (ht *Array) KeyFind(key string) *Zval            { return ht.Find(StrKey(ke
 func (ht *Array) KeyAdd(key string, value *Zval) bool { return ht.Add(StrKey(key), value) }
 func (ht *Array) KeyUpdate(key string, value *Zval)   { ht.Update(StrKey(key), value) }
 func (ht *Array) KeyDelete(key string) bool           { return ht.Delete(StrKey(key)) }
+
+// recursive
+func (ht *Array) IsRecursive() bool   { return ht.protected }
+func (ht *Array) ProtectRecursive()   { ht.protected = true }
+func (ht *Array) UnprotectRecursive() { ht.protected = false }
