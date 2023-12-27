@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/heyuuu/gophp/php/perr"
+	"math"
 )
 
 // arrayKeySign ArrayKey 内部标识符，用于标识是否为字符串
@@ -30,6 +30,7 @@ func StrKey(str string) ArrayKey {
 	return ArrayKey{0, str}
 }
 
+func (k ArrayKey) IsIdxKey() bool { return k.str == "" }
 func (k ArrayKey) IsStrKey() bool { return k.str != "" }
 func (k ArrayKey) IdxKey() int    { return k.idx }
 func (k ArrayKey) StrKey() string {
@@ -40,9 +41,15 @@ func (k ArrayKey) StrKey() string {
 	}
 }
 
+// ArrayPosition
+type ArrayPosition = int
+
+const InvalidArrayPos = math.MinInt
+const maxArrayPos = math.MaxInt
+
 // Array
 type Array struct {
-	data0    ArrayData
+	data     ArrayData
 	writable bool // todo 完成写锁逻辑
 }
 
@@ -53,42 +60,111 @@ func NewArray() *Array {
 	return NewArrayCap(0)
 }
 func NewArrayCap(cap int) *Array {
-	return &Array{}
-}
-
-func NewArrayOf(values ...*Zval) *Array {
-	return NewArrayOfZval(values)
-}
-
-func NewArrayOfZval(values []*Zval) *Array {
-	// todo 优化
-	arr := NewArrayCap(len(values))
-	for _, value := range values {
-		arr.Append(value)
+	var data ArrayData = emptyArrayData
+	if cap > 0 {
+		data = newArrayDataHt(cap)
 	}
-	return arr
+
+	return &Array{data: data, writable: true}
+}
+func NewArrayOf(values ...*Zval) *Array {
+	data := NewArrayDataList(
+		values,
+		func(v *Zval) *Zval { return v },
+		func(v *Zval) (*Zval, bool) { return v, true },
+	)
+	return &Array{data: data, writable: true}
+}
+func NewArrayOfZval(values []*Zval) *Array {
+	return NewArrayOf(values...)
+}
+func NewArrayOfInt(values []int) *Array {
+	data := NewArrayDataList(
+		values,
+		func(v int) *Zval { return NewZvalLong(v) },
+		func(v *Zval) (int, bool) {
+			if v.IsLong() {
+				return v.Long(), true
+			}
+			return 0, false
+		},
+	)
+	return &Array{data: data, writable: true}
+}
+func NewArrayOfString(values []string) *Array {
+	data := NewArrayDataList(
+		values,
+		func(v string) *Zval { return NewZvalString(v) },
+		func(v *Zval) (string, bool) {
+			if v.IsString() {
+				return v.String(), true
+			}
+			return "", false
+		},
+	)
+	return &Array{data: data, writable: true}
 }
 
-func (ht *Array) Len() int { return ht.data0.Len() }
+// 常用读操作
 
-/* misc */
-func (ht *Array) assertWritable() { perr.Assert(ht.writable) }
+func (ht *Array) Len() int                 { return ht.data.Len() }
+func (ht *Array) Cap() int                 { return ht.data.Cap() }
+func (ht *Array) Count() int               { return ht.data.Count() }
+func (ht *Array) Exists(key ArrayKey) bool { return ht.data.Exists(key) }
+func (ht *Array) Find(key ArrayKey) *Zval  { val, _ := ht.data.Find(key); return val }
 
-// Methods use ArrayKey
+// 常用写操作
 
-func (ht *Array) Exists(key ArrayKey) bool { return ht.data0.Exists(key) }
-func (ht *Array) Find(key ArrayKey) *Zval  { return ht.data0.Find(key) }
 func (ht *Array) Add(key ArrayKey, value *Zval) bool {
-	return ht.data0.Add(key, value)
+	ht.assertWritable()
+	ret, err := ht.data.Add(key, value)
+	if err == arrayDataUnsupported && ht.makeOperable() {
+		ret, _ = ht.data.Add(key, value)
+	}
+	return ret
 }
 func (ht *Array) Update(key ArrayKey, value *Zval) {
-	ht.data0.Update(key, value)
+	ht.assertWritable()
+	err := ht.data.Update(key, value)
+	if err == arrayDataUnsupported && ht.makeOperable() {
+		_ = ht.data.Update(key, value)
+	}
 }
 func (ht *Array) Delete(key ArrayKey) bool {
-	return ht.data0.Delete(key)
+	ht.assertWritable()
+	ret, err := ht.data.Delete(key)
+	if err == arrayDataUnsupported && ht.makeOperable() {
+		ret, _ = ht.data.Delete(key)
+	}
+	return ret
 }
 func (ht *Array) Append(value *Zval) int {
-	return ht.data0.Push(value)
+	ht.assertWritable()
+	ret, err := ht.data.Append(value)
+	if err == arrayDataUnsupported && ht.makeOperable() {
+		ret, _ = ht.data.Append(value)
+	}
+	return ret
+}
+
+func (ht *Array) assertWritable() { assert(ht.writable) }
+
+// 使 ArrayData 支持所有操作
+func (ht *Array) makeOperable() bool {
+	// 已经是 ArrayDataHt，就无法再转化了
+	if _, ok := ht.data.(*ArrayDataHt); ok {
+		return false
+	}
+
+	// 构建 ArrayDataHt 类型的 data 并拷贝已有数据
+	data := ht.data
+	newData := newArrayDataHt(data.Len())
+	_ = data.Each(func(key ArrayKey, value *Zval) error {
+		_, _ = newData.Add(key, value)
+		return nil
+	})
+	ht.data = newData
+	return true
 }
 
 // Methods use idx key
