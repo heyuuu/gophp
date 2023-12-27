@@ -5,9 +5,13 @@ import (
 )
 
 func Map[T any, R any](slice []T, mapper func(T) R) []R {
-	var result []R
-	for _, item := range slice {
-		result = append(result, mapper(item))
+	if len(slice) == 0 {
+		return nil
+	}
+
+	result := make([]R, len(slice))
+	for i, item := range slice {
+		result[i] = mapper(item)
 	}
 	return result
 }
