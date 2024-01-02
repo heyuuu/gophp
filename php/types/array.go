@@ -1,7 +1,6 @@
 package types
 
 import (
-	"github.com/heyuuu/gophp/php/perr"
 	"math"
 )
 
@@ -41,6 +40,32 @@ func (k ArrayKey) StrKey() string {
 		return k.str
 	}
 }
+func (k ArrayKey) ToZval() *Zval {
+	if k.IsStrKey() {
+		return NewZvalString(k.StrKey())
+	} else {
+		return NewZvalLong(k.IdxKey())
+	}
+}
+
+// ArrayPair
+type ArrayPair struct {
+	key ArrayKey
+	val *Zval
+}
+
+func MakeArrayPair(key ArrayKey, val *Zval) ArrayPair {
+	return ArrayPair{key: key, val: val}
+}
+func NewArrayPair(key ArrayKey, val *Zval) *ArrayPair {
+	return &ArrayPair{key: key, val: val}
+}
+func (p ArrayPair) IsStrKey() bool          { return p.key.IsStrKey() }
+func (p ArrayPair) StrKey() string          { return p.key.StrKey() }
+func (p ArrayPair) IdxKey() int             { return p.key.IdxKey() }
+func (p ArrayPair) Key() ArrayKey           { return p.key }
+func (p ArrayPair) Val() *Zval              { return p.val }
+func (p ArrayPair) Pair() (ArrayKey, *Zval) { return p.key, p.val }
 
 // ArrayPosition
 type ArrayPosition = int
@@ -51,8 +76,10 @@ const maxArrayPos = math.MaxInt
 // Array
 type Array struct {
 	data      ArrayData
-	writable  bool // todo 完成写锁逻辑
+
+	// flags todo 待合并
 	protected bool
+	writable  bool // todo 完成写锁逻辑
 }
 
 /**
@@ -122,10 +149,21 @@ func (ht *Array) Each(handler func(key ArrayKey, value *Zval)) {
 	})
 }
 
+func (ht *Array) EachEx(handler func(key ArrayKey, value *Zval) error) error {
+	return ht.data.Each(handler)
+}
+
+func (ht *Array) EachReserve(handler func(key ArrayKey, value *Zval)) {
+	_ = ht.data.EachReserve(func(key ArrayKey, value *Zval) error {
+		handler(key, value)
+		return nil
+	})
+}
+
 // 常用写操作
 
 func (ht *Array) Add(key ArrayKey, value *Zval) bool {
-	perr.Assert(value != nil)
+	assert(value != nil)
 	ht.assertWritable()
 	ret, err := ht.data.Add(key, value)
 	if err == arrayDataUnsupported && ht.makeOperable() {
@@ -134,7 +172,7 @@ func (ht *Array) Add(key ArrayKey, value *Zval) bool {
 	return ret
 }
 func (ht *Array) Update(key ArrayKey, value *Zval) {
-	perr.Assert(value != nil)
+	assert(value != nil)
 	ht.assertWritable()
 	err := ht.data.Update(key, value)
 	if err == arrayDataUnsupported && ht.makeOperable() {
@@ -150,7 +188,7 @@ func (ht *Array) Delete(key ArrayKey) bool {
 	return ret
 }
 func (ht *Array) Append(value *Zval) int {
-	perr.Assert(value != nil)
+	assert(value != nil)
 	ht.assertWritable()
 	ret, err := ht.data.Append(value)
 	if err == arrayDataUnsupported && ht.makeOperable() {
@@ -196,6 +234,43 @@ func (ht *Array) KeyUpdate(key string, value *Zval)   { ht.Update(StrKey(key), v
 func (ht *Array) KeyDelete(key string) bool           { return ht.Delete(StrKey(key)) }
 
 // recursive
+
 func (ht *Array) IsRecursive() bool   { return ht.protected }
 func (ht *Array) ProtectRecursive()   { ht.protected = true }
 func (ht *Array) UnprotectRecursive() { ht.protected = false }
+
+// sort
+type ArrayComparer interface {
+	Compare(k1 ArrayKey, v1 *Zval, k2 ArrayKey, v2 *Zval) int
+}
+
+type ArrayPairComparer func(p1, p2 ArrayPair) int
+
+func (c ArrayPairComparer) Compare(k1 ArrayKey, v1 *Zval, k2 ArrayKey, v2 *Zval) int {
+	return c(MakeArrayPair(k1, v1), MakeArrayPair(k2, v2))
+}
+
+type ArrayKeyComparer func(k1, k2 ArrayKey) int
+
+func (c ArrayKeyComparer) Compare(k1 ArrayKey, v1 *Zval, k2 ArrayKey, v2 *Zval) int {
+	return c(k1, k2)
+}
+
+type ArrayValueComparer func(v1, v2 *Zval) int
+
+func (c ArrayValueComparer) Compare(k1 ArrayKey, v1 *Zval, k2 ArrayKey, v2 *Zval) int {
+	return c(v1, v2)
+}
+
+func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
+	ht.assertWritable()
+
+	if ht.Len() == 0 || (ht.Len() == 1 && !renumber) {
+		return
+	}
+
+	// 将 ht.data 转成 *ArrayDataHt 后排序
+	// todo 细分可优化情况单独处理 (例如，预判是否 IsSorted 以跳过排序、对 List 类型不保留key的排序可直接操作等 )
+	ht.makeOperable()
+	ht.data.(*ArrayDataHt).Sort(comparer, renumber)
+}

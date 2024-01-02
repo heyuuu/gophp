@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/heyuuu/gophp/kits/mapkit"
+	"sort"
 )
 
 // bucket
@@ -140,6 +141,32 @@ func (ht *ArrayDataHt) Append(value *Zval) (int, error) {
 	assert(!ht.Exists(key))
 	ht.appendBucket(key, value)
 	return idx, nil
+}
+
+func (ht *ArrayDataHt) Sort(comparer ArrayComparer, renumber bool) {
+	ht.assertWritable()
+
+	if ht.elementsCount == 0 || (ht.elementsCount == 1 && !renumber) {
+		return
+	}
+
+	ht.removeHoles()
+
+	sort.SliceStable(ht.data, func(i, j int) bool {
+		bkt1 := &ht.data[i]
+		bkt2 := &ht.data[j]
+		ret := comparer.Compare(bkt1.Key(), bkt1.Val(), bkt2.Key(), bkt2.Val())
+		return ret < 0
+	})
+
+	if renumber {
+		for pos, _ := range ht.data {
+			ht.data[pos].SetKey(IdxKey(pos))
+		}
+		ht.nextFreeElement = len(ht.data)
+	}
+
+	ht.rehash()
 }
 
 func (ht *ArrayDataHt) assertWritable() { assert(ht.writable) }

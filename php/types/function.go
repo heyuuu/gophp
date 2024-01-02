@@ -19,8 +19,8 @@ type Function struct {
 	argInfos     []ArgInfo
 
 	// fields for internal function
-	handler      any
 	moduleNumber int
+	handler      any
 
 	// fields for user function
 	stmts   []ast.Stmt

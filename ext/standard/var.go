@@ -3,6 +3,7 @@ package standard
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/php"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
 )
@@ -84,7 +85,7 @@ again:
 			}
 			myht.ProtectRecursive()
 		}
-		count := myht.Len()
+		count := myht.Count()
 		w.WriteString(fmt.Sprintf("%sarray(%d) {\n", common, count))
 		myht.Each(func(key types.ArrayKey, value *types.Zval) {
 			PhpArrayElementDump(w, value, key, level)
@@ -97,7 +98,34 @@ again:
 		}
 		w.WriteString("}\n")
 	case types.IsObject:
-		w.WriteString("Object{}\n")
+		obj := struc.Object()
+		if obj.IsRecursive() {
+			w.WriteString("*RECURSION*\n")
+			return
+		}
+		obj.ProtectRecursive()
+		myht := obj.PropertiesFor(types.PropPurposeDebug)
+		className := obj.ClassName()
+		w.WriteString(fmt.Sprintf("%sobject(%s)#%d (%d) {\n", common, className, obj.Handle(), lang.CondF1(myht != nil, func() int { return myht.Count() }, 0)))
+		if myht != nil {
+			myht.Each(func(key types.ArrayKey, value *types.Zval) {
+				//		var prop_info *types.PropertyInfo = nil
+				//		if value.IsIndirect() {
+				//			value = value.Indirect()
+				//			if key.IsStrKey() {
+				//				prop_info = php.ZendGetTypedPropertyInfoForSlot(obj, value)
+				//			}
+				//		}
+				//		if !value.IsUndef() || prop_info != nil {
+				//			PhpObjectPropertyDump(w, prop_info, value, key, level)
+				//		}
+			})
+		}
+		if level > 1 {
+			w.WriteString(fmt.Sprintf("%*c", level-1, ' '))
+		}
+		w.WriteString("}\n")
+		obj.UnprotectRecursive()
 	case types.IsResource:
 		//typeName := lang.Option(php.ZendRsrcListGetRsrcTypeEx(struc.Resource()), "Unknown")
 		typeName := "Unknown"
