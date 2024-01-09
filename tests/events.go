@@ -28,7 +28,7 @@ func (l *DefaultEventHandler) OnAllStart(startTime time.Time, testCount int, ext
 	l.summary = &Summary{}
 	l.summary.StartTime = startTime
 	l.summary.ExtSkipped = extSkipped
-	l.summary.ExtTested = ignoreByExt
+	l.summary.IgnoredByExt = ignoreByExt
 
 	l.testCount = testCount
 
