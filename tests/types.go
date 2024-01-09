@@ -1,10 +1,15 @@
 package tests
 
-import "time"
+import (
+	"time"
+)
 
 type TestCase struct {
 	File          string
 	ShortFileName string
+	TestName      string
+
+	sections map[string]string
 }
 
 type ResultType string
@@ -42,11 +47,10 @@ func ValidResultType(t ResultType) bool {
 }
 
 type TestResult struct {
-	Case     *TestCase
-	Type     ResultType
-	TestName string
-	Reason   string
-	UseTime  time.Duration
+	Case    *TestCase
+	Type    ResultType
+	Reason  string
+	UseTime time.Duration
 }
 
 type Summary struct {

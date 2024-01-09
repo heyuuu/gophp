@@ -90,35 +90,28 @@ func (c Config) parallelRunTests(testFiles []string, limit int) (err error) {
 	return nil
 }
 
-func (c Config) initTestCase(file string) *TestCase {
-	shortFileName := file
-	if strings.HasPrefix(file, c.SrcDir+"/") {
-		shortFileName = file[len(c.SrcDir)+1:]
-	}
-	return &TestCase{
-		File:          file,
-		ShortFileName: shortFileName,
-	}
-}
-
 func (c Config) runTest(testIndex int, testFile string) (*TestResult, error) {
-	tc := c.initTestCase(testFile)
+	tc, err := parseTestCase(testFile, c.SrcDir)
+	if err != nil {
+		c.Events.OnTestEnd(testIndex, tc, nil)
+		return nil, err
+	}
 
 	c.Events.OnTestStart(testIndex, tc)
 
 	rawResult, err := runPhpScript(tc.File)
 	if err != nil {
+		c.Events.OnTestEnd(testIndex, tc, nil)
 		return nil, err
 	}
 
 	c.Events.Log(testIndex, strings.TrimSpace(rawResult.Output))
 
 	result := &TestResult{
-		Case:     tc,
-		Type:     rawResult.Type,
-		TestName: rawResult.TestName,
-		Reason:   rawResult.Reason,
-		UseTime:  time.Duration(rawResult.UseTime),
+		Case:    tc,
+		Type:    rawResult.Type,
+		Reason:  rawResult.Reason,
+		UseTime: time.Duration(rawResult.UseTime),
 	}
 	c.Events.OnTestEnd(testIndex, tc, result)
 
