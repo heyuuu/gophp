@@ -49,7 +49,7 @@ var allowSections = map[string]bool{
 	"FILE":                 true,
 	"FILEEOF":              true,
 	"FILE_EXTERNAL":        true,
-	//"REDIRECTTEST":         true,
+	"REDIRECTTEST":         true,
 	"CAPTURE_STDIO":        true,
 	"STDIN":                true,
 	"CGI":                  true,
