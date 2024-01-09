@@ -94,6 +94,7 @@ func (c Config) parallelRunTests(testFiles []string, limit int) (err error) {
 func (c Config) runTest(testIndex int, testFile string) (*TestResult, error) {
 	tc, err := parseTestCase(testFile, c.SrcDir)
 	if err != nil {
+		c.Events.Log(testIndex, "parse test case error: "+err.Error())
 		c.Events.OnTestEnd(testIndex, tc, nil)
 		return nil, fmt.Errorf("Parse test case file failed: file=%s, err=%w", testFile, err)
 	}
@@ -108,6 +109,7 @@ func (c Config) runTest(testIndex int, testFile string) (*TestResult, error) {
 func (c Config) runTestReal(testIndex int, tc *TestCase) (*TestResult, error) {
 	rawResult, err := runPhpScript(tc.File)
 	if err != nil {
+		c.Events.Log(testIndex, "run php script error: "+err.Error())
 		return nil, err
 	}
 
