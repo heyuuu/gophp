@@ -99,6 +99,7 @@ func parseTestCaseSections(file string) (map[string]string, error) {
 				return nil, fmt.Errorf(`unknown section "%s"`, section)
 			}
 
+			sections[section] = ""
 			sectionFile = section == "FILE" || section == "FILEEOF" || section == "FILE_EXTERNAL"
 			sectionDone = false
 			continue
@@ -126,7 +127,7 @@ func parseTestCaseSections(file string) (map[string]string, error) {
 	for _, prefix := range []string{"FILE", "EXPECT", "EXPECTF", "EXPECTREGEX"} {
 		key := prefix + "_EXTERNAL"
 		if sections[key] != "" {
-			sections[key] = filepath.Join(filepath.Dir(file), strings.ReplaceAll(sections[key], "..", ""))
+			sections[key] = filepath.Join(filepath.Dir(file), strings.TrimSpace(strings.ReplaceAll(sections[key], "..", "")))
 			sections[prefix], err = fileGetContents(sections[key])
 			if err == nil {
 				delete(sections, key)

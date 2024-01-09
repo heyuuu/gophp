@@ -1,12 +1,14 @@
 package tests
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 type scriptArgs struct {
@@ -39,7 +41,11 @@ func runPhpScript(testFile string) (*scriptResult, error) {
 		return nil, err
 	}
 
-	cmd := exec.Command(phpBin, scriptPath, argsJson)
+	// 超时控制
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, phpBin, scriptPath, argsJson)
 	//log.Println("Run Cmd: " + cmd.String())
 	output, err := cmd.CombinedOutput()
 	if err != nil {
