@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -151,9 +152,11 @@ func (l *DefaultEventHandler) logExtSummary(summary *Summary) {
 type ParallelHandler struct {
 	inner        EventHandler
 	testIndex    int
+	testCount    int
 	testDone     []bool
 	testDoneChan chan int
 	testEvents   [][]func()
+	wg           sync.WaitGroup
 }
 
 func NewParallelHandler(inner EventHandler) *ParallelHandler {
@@ -162,9 +165,11 @@ func NewParallelHandler(inner EventHandler) *ParallelHandler {
 
 func (p *ParallelHandler) OnAllStart(startTime time.Time, testCount int) {
 	p.inner.OnAllStart(startTime, testCount)
+	p.testCount = testCount
 	p.testDone = make([]bool, testCount)
 	p.testEvents = make([][]func(), testCount)
-	p.testDoneChan = make(chan int, 100)
+	p.testDoneChan = make(chan int, 10)
+	p.wg.Add(testCount)
 
 	go func() {
 		var index int
@@ -173,13 +178,14 @@ func (p *ParallelHandler) OnAllStart(startTime time.Time, testCount int) {
 			case index = <-p.testDoneChan:
 				p.testDone[index] = true
 				if index == p.testIndex {
-					for p.testIndex < len(p.testDone) && p.testDone[p.testIndex] {
+					for p.testIndex < p.testCount && p.testDone[p.testIndex] {
 						for _, event := range p.testEvents[p.testIndex] {
 							event()
 						}
+						p.wg.Done()
 						p.testIndex++
 					}
-					if p.testIndex == len(p.testDone) {
+					if p.testIndex == p.testCount {
 						return
 					}
 				}
@@ -189,25 +195,31 @@ func (p *ParallelHandler) OnAllStart(startTime time.Time, testCount int) {
 }
 
 func (p *ParallelHandler) OnAllEnd(endTime time.Time) {
+	p.wg.Wait()
 	p.inner.OnAllEnd(endTime)
 }
 
+func (p *ParallelHandler) sortedEvent(index int, done bool, handler func()) {
+	p.testEvents[index] = append(p.testEvents[index], handler)
+	if done {
+		p.testDoneChan <- index
+	}
+}
+
 func (p *ParallelHandler) OnTestStart(testIndex int, tc *TestCase) {
-	p.testEvents[testIndex] = append(p.testEvents[testIndex], func() {
+	p.sortedEvent(testIndex, false, func() {
 		p.inner.OnTestStart(testIndex, tc)
 	})
 }
 
 func (p *ParallelHandler) OnTestEnd(testIndex int, tc *TestCase, tr *TestResult) {
-	p.testEvents[testIndex] = append(p.testEvents[testIndex], func() {
+	p.sortedEvent(testIndex, true, func() {
 		p.inner.OnTestEnd(testIndex, tc, tr)
 	})
-
-	p.testDoneChan <- testIndex
 }
 
 func (p *ParallelHandler) Log(testIndex int, message string) {
-	p.testEvents[testIndex] = append(p.testEvents[testIndex], func() {
+	p.sortedEvent(testIndex, false, func() {
 		p.inner.Log(testIndex, message)
 	})
 }
