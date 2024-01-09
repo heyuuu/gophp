@@ -24,7 +24,7 @@ type Config struct {
 }
 
 func (c Config) run() (err error) {
-	testFiles, err := findTestFiles(c.SrcDir)
+	testFiles, extSkipped, ignoreByExt, err := findTestFiles(c.SrcDir)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (c Config) run() (err error) {
 	}
 
 	testCount := len(testFiles)
-	c.Events.OnAllStart(time.Now(), testCount)
+	c.Events.OnAllStart(time.Now(), testCount, extSkipped, ignoreByExt)
 	if c.Workers > 1 {
 		err = c.parallelRunTests(testFiles, c.Workers)
 	} else {
@@ -125,26 +125,36 @@ func (c Config) runTest(testIndex int, testFile string) (*TestResult, error) {
 	return result, nil
 }
 
-func findTestFiles(dir string) ([]string, error) {
-	var files []string
-	handler := func(file string) error {
-		files = append(files, file)
-		return nil
-	}
-
-	for _, subDir := range []string{"Zend", "tests", "ext", "sapi"} {
-		if subDir == "ext" {
-			continue
-		}
-		err := eachTestFiles(filepath.Join(dir, subDir), handler)
+func findTestFiles(dir string) (files []string, extSkipped int, ignoreByExt int, err error) {
+	// main tests
+	for _, subDir := range []string{"Zend", "tests", "sapi"} {
+		err = eachTestFiles(filepath.Join(dir, subDir), func(file string) error {
+			files = append(files, file)
+			return nil
+		})
 		if err != nil {
-			return nil, err
+			return
 		}
 	}
-
 	sortTestFiles(files, dir)
 
-	return files, nil
+	// ext tests
+	extRoot := filepath.Join(dir, "ext")
+	exts, err := os.ReadDir(extRoot)
+	for _, ext := range exts {
+		if ext.IsDir() {
+			extSkipped++
+			err = eachTestFiles(filepath.Join(extRoot, ext.Name()), func(file string) error {
+				ignoreByExt++
+				return nil
+			})
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	return
 }
 
 func eachTestFiles(dir string, handle func(file string) error) error {

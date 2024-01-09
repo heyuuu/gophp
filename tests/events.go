@@ -7,7 +7,7 @@ import (
 )
 
 type EventHandler interface {
-	OnAllStart(startTime time.Time, testCount int)
+	OnAllStart(startTime time.Time, testCount int, extSkipped int, ignoreByExt int)
 	OnAllEnd(endTime time.Time)
 	OnTestStart(testIndex int, tc *TestCase)
 	OnTestEnd(testIndex int, tc *TestCase, tr *TestResult)
@@ -24,9 +24,12 @@ func NewDefaultEventHandler(w func(verbose int, message string)) *DefaultEventHa
 	return &DefaultEventHandler{w: w}
 }
 
-func (l *DefaultEventHandler) OnAllStart(startTime time.Time, testCount int) {
+func (l *DefaultEventHandler) OnAllStart(startTime time.Time, testCount int, extSkipped int, ignoreByExt int) {
 	l.summary = &Summary{}
 	l.summary.StartTime = startTime
+	l.summary.ExtSkipped = extSkipped
+	l.summary.ExtTested = ignoreByExt
+
 	l.testCount = testCount
 
 	l.printLn("=====================================================================")
@@ -68,11 +71,6 @@ func (l *DefaultEventHandler) printLn(message string) {
 }
 
 func (l *DefaultEventHandler) logSummary(summary *Summary) {
-	// debug start
-	summary.ExtSkipped = 72
-	summary.IgnoredByExt = 30
-	// debug end
-
 	total := len(summary.Results) + summary.IgnoredByExt
 
 	sumResults := map[ResultType]int{}
@@ -163,8 +161,8 @@ func NewParallelHandler(inner EventHandler) *ParallelHandler {
 	return &ParallelHandler{inner: inner}
 }
 
-func (p *ParallelHandler) OnAllStart(startTime time.Time, testCount int) {
-	p.inner.OnAllStart(startTime, testCount)
+func (p *ParallelHandler) OnAllStart(startTime time.Time, testCount int, extSkipped int, ignoreByExt int) {
+	p.inner.OnAllStart(startTime, testCount, extSkipped, ignoreByExt)
 	p.testCount = testCount
 	p.testDone = make([]bool, testCount)
 	p.testEvents = make([][]func(), testCount)
