@@ -56,9 +56,10 @@ func (l *DefaultEventHandler) OnTestStart(testIndex int, tc *TestCase) {
 }
 
 func (l *DefaultEventHandler) OnTestEnd(testIndex int, tc *TestCase, tr *TestResult) {
-	l.summary.AddResult(tc, tr)
-
-	l.printLn(fmt.Sprintf("%s %s [%s] %s", tr.Type, tr.TestName, tc.ShortFileName, tr.Reason))
+	if tr != nil {
+		l.summary.AddResult(tc, tr)
+		l.printLn(fmt.Sprintf("%s %s [%s] %s", tr.Type, tr.Case.TestName, tc.ShortFileName, tr.Reason))
+	}
 }
 
 func (l *DefaultEventHandler) Log(testIndex int, message string) {
@@ -133,7 +134,7 @@ func (l *DefaultEventHandler) logExtSummary(summary *Summary) {
 		l.printLn(title)
 		l.printLn("---------------------------------------------------------------------")
 		for _, result := range typeResults {
-			l.printLn(fmt.Sprintf("%s [%s] %s", result.TestName, result.Case.ShortFileName, result.Reason))
+			l.printLn(fmt.Sprintf("%s [%s] %s", result.Case.TestName, result.Case.ShortFileName, result.Reason))
 		}
 		l.printLn("=====================================================================")
 	}
@@ -174,6 +175,7 @@ func (p *ParallelHandler) OnAllStart(startTime time.Time, testCount int, extSkip
 		for {
 			select {
 			case index = <-p.testDoneChan:
+				fmt.Println(index)
 				p.testDone[index] = true
 				if index == p.testIndex {
 					for p.testIndex < p.testCount && p.testDone[p.testIndex] {
