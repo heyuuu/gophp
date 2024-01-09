@@ -2,6 +2,7 @@ package tests
 
 import (
 	"errors"
+	"fmt"
 	"github.com/heyuuu/gophp/shim/cmp"
 	"github.com/heyuuu/gophp/shim/slices"
 	"log"
@@ -94,14 +95,19 @@ func (c Config) runTest(testIndex int, testFile string) (*TestResult, error) {
 	tc, err := parseTestCase(testFile, c.SrcDir)
 	if err != nil {
 		c.Events.OnTestEnd(testIndex, tc, nil)
-		return nil, err
+		return nil, fmt.Errorf("Parse test case file failed: file=%s, err=%w", testFile, err)
 	}
 
 	c.Events.OnTestStart(testIndex, tc)
+	result, runErr := c.runTestReal(testIndex, tc)
+	c.Events.OnTestEnd(testIndex, tc, result)
 
+	return result, runErr
+}
+
+func (c Config) runTestReal(testIndex int, tc *TestCase) (*TestResult, error) {
 	rawResult, err := runPhpScript(tc.File)
 	if err != nil {
-		c.Events.OnTestEnd(testIndex, tc, nil)
 		return nil, err
 	}
 
@@ -113,7 +119,6 @@ func (c Config) runTest(testIndex int, testFile string) (*TestResult, error) {
 		Reason:  rawResult.Reason,
 		UseTime: time.Duration(rawResult.UseTime),
 	}
-	c.Events.OnTestEnd(testIndex, tc, result)
 
 	return result, nil
 }

@@ -175,7 +175,6 @@ func (p *ParallelHandler) OnAllStart(startTime time.Time, testCount int, extSkip
 		for {
 			select {
 			case index = <-p.testDoneChan:
-				fmt.Println(index)
 				p.testDone[index] = true
 				if index == p.testIndex {
 					for p.testIndex < p.testCount && p.testDone[p.testIndex] {
