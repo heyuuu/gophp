@@ -324,8 +324,10 @@ func (e *Executor) executeUnaryExpr(expr *ast.UnaryExpr) Val {
 	return nil
 }
 func (e *Executor) executeAssignExpr(expr *ast.AssignExpr) Val {
-	panic(perr.NewInternal("todo executeAssignExpr"))
-	return nil
+	variable := e.getVariable(expr.Var)
+	value := e.expr(expr.Expr)
+	variable.Set(value)
+	return value
 }
 func (e *Executor) executeAssignOpExpr(expr *ast.AssignOpExpr) Val {
 	panic(perr.NewInternal("todo executeAssignOpExpr"))
@@ -412,6 +414,17 @@ func (e *Executor) executeThrowExpr(expr *ast.ThrowExpr) Val {
 	return nil
 }
 func (e *Executor) executeVariableExpr(expr *ast.VariableExpr) Val {
+	var name string
+	switch nameNode := expr.Name.(type) {
+	case *ast.Ident:
+		name = nameNode.Name
+	case *ast.VariableExpr:
+		nameVal := e.expr(nameNode)
+		name = nameVal.String()
+	default:
+		panic(perr.NewInternal(fmt.Sprintf("unexpected VariableExpr.Name type: %T, %+v", v, v)))
+	}
+
 	panic(perr.NewInternal("todo executeVariableExpr"))
 	return nil
 }
@@ -467,4 +480,68 @@ func (e *Executor) executeMethodCallExpr(expr *ast.MethodCallExpr) Val {
 func (e *Executor) executeStaticCallExpr(expr *ast.StaticCallExpr) Val {
 	panic(perr.NewInternal("todo executeStaticCallExpr"))
 	return nil
+}
+
+type executeVariable interface {
+	Get() *types.Zval
+	Set(v *types.Zval)
+}
+
+type executeVariableFunc struct {
+	Getter func() *types.Zval
+	Setter func(v *types.Zval)
+}
+
+func (e executeVariableFunc) Get() *types.Zval  { return e.Getter() }
+func (e executeVariableFunc) Set(v *types.Zval) { e.Setter(v) }
+
+func (e *Executor) getVariable(variable ast.Expr) executeVariable {
+	switch v := variable.(type) {
+	case *ast.VariableExpr:
+		var name string
+		switch nameNode := v.Name.(type) {
+		case *ast.Ident:
+			name = nameNode.Name
+		case ast.Expr:
+			nameVal := e.expr(nameNode)
+			name = nameVal.String()
+		default:
+			panic(perr.NewInternal(fmt.Sprintf("unexpected VariableExpr.Name type: %T, %+v", v, v)))
+		}
+		return executeVariableFunc{
+			Getter: func() *types.Zval {
+				// todo
+				return types.NewZvalString("$" + name)
+			},
+			Setter: func(v *types.Zval) {
+				// todo
+			},
+		}
+	case *ast.IndexExpr:
+		if v.Dim == nil {
+			return executeVariableFunc{
+				Getter: func() *types.Zval {
+					// todo
+					//variable := e.getVariable(v.Var)
+					return types.NewZvalArray(nil)
+				},
+				Setter: func(v *types.Zval) {
+					// todo
+				},
+			}
+		} else {
+			//dim := e.expr(v.Dim)
+			return executeVariableFunc{
+				Getter: func() *types.Zval {
+					// todo
+					return types.NewZvalArray(nil)
+				},
+				Setter: func(v *types.Zval) {
+					// todo
+				},
+			}
+		}
+	default:
+		panic(perr.NewInternal(fmt.Sprintf("unsupported AssignExpr.Var type: %T, %+v", v, v)))
+	}
 }
