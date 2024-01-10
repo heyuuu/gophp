@@ -22,6 +22,10 @@ type Config struct {
 	Events  EventHandler
 	Limit   int
 	Workers int
+
+	PhpBin    string
+	PhpCgiBin string
+	PhpDbgBin string
 }
 
 func (c Config) run() (err error) {
@@ -100,7 +104,8 @@ func (c Config) runTest(testIndex int, testFile string) (*TestResult, error) {
 	}
 
 	c.Events.OnTestStart(testIndex, tc)
-	result, runErr := c.runTestReal(testIndex, tc)
+	//result, runErr := c.runTestReal(testIndex, tc)
+	result, runErr := c.runTestRealRaw(testIndex, tc)
 	c.Events.OnTestEnd(testIndex, tc, result)
 
 	return result, runErr

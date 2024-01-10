@@ -25,7 +25,15 @@ func parseTestCase(file string, srcDir string) (*TestCase, error) {
 		sections:      sections,
 	}
 
+	// parse fields
 	tc.TestName = strings.TrimSpace(sections["TEST"])
+
+	if capture, ok := sections["CAPTURE_STDIO"]; ok {
+		lcCapture := strings.ToLower(capture)
+		tc.CaptureStdin = strings.Contains(lcCapture, "stdin")
+		tc.CaptureStdout = strings.Contains(lcCapture, "stdout")
+		tc.CaptureStderr = strings.Contains(lcCapture, "stderr")
+	}
 
 	return tc, nil
 }
