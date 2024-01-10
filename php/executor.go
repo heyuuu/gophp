@@ -72,3 +72,13 @@ func (e *Executor) initNewExecuteData(args []Val) *ExecuteData {
 	e.executeData = NewExecuteData(e.ctx, args, e.executeData)
 	return e.executeData
 }
+
+func (e *Executor) zvalToArrayKey(dim Val) types.ArrayKey {
+	if dim.IsLong() {
+		return types.IdxKey(dim.Long())
+	} else if dim.IsString() {
+		return types.StrKey(dim.String())
+	} else {
+		panic(perr.NewInternal(fmt.Sprintf("暂不支持的内部数组 dim 类型: %s", types.ZvalGetType(dim))))
+	}
+}

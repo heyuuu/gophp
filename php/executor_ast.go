@@ -324,9 +324,8 @@ func (e *Executor) executeUnaryExpr(expr *ast.UnaryExpr) Val {
 	return nil
 }
 func (e *Executor) executeAssignExpr(expr *ast.AssignExpr) Val {
-	variable := e.getVariable(expr.Var)
 	value := e.expr(expr.Expr)
-	variable.Set(value)
+	e.assignVariable(expr.Var, value)
 	return value
 }
 func (e *Executor) executeAssignOpExpr(expr *ast.AssignOpExpr) Val {
@@ -414,21 +413,24 @@ func (e *Executor) executeThrowExpr(expr *ast.ThrowExpr) Val {
 	return nil
 }
 func (e *Executor) executeVariableExpr(expr *ast.VariableExpr) Val {
-	var name string
-	switch nameNode := expr.Name.(type) {
+	name := e.executeVariableName(expr.Name)
+	// todo undefined warning
+	symbols := e.executeData.symbols
+	return symbols.Get(name)
+}
+
+func (e *Executor) executeVariableName(nameNode ast.Node) string {
+	switch x := nameNode.(type) {
 	case *ast.Ident:
-		name = nameNode.Name
+		return x.Name
 	case *ast.VariableExpr:
-		nameVal := e.expr(nameNode)
-		name = nameVal.String()
+		nameVal := e.expr(x)
+		return nameVal.String()
 	default:
 		panic(perr.NewInternal(fmt.Sprintf("unexpected VariableExpr.Name type: %T, %+v", nameNode, nameNode)))
 	}
-
-	symbols := e.executeData.symbols
-	// todo undefined warning
-	return symbols.Get(name)
 }
+
 func (e *Executor) executeYieldExpr(expr *ast.YieldExpr) Val {
 	panic(perr.NewInternal("todo executeYieldExpr"))
 	return nil
@@ -495,6 +497,27 @@ type executeVariableFunc struct {
 
 func (e executeVariableFunc) Get() *types.Zval  { return e.Getter() }
 func (e executeVariableFunc) Set(v *types.Zval) { e.Setter(v) }
+
+func (e *Executor) assignVariable(variable ast.Expr, value *types.Zval) {
+	switch v := variable.(type) {
+	case *ast.VariableExpr:
+		name := e.executeVariableName(v.Name)
+		symbols := e.executeData.symbols
+		symbols.Set(name, value)
+	case *ast.IndexExpr:
+		arr := e.expr(v.Var)
+		// todo 转 arr 处理
+		if v.Dim == nil {
+			arr.Array().Append(value)
+		} else {
+			dim := e.expr(v.Dim)
+			key := e.zvalToArrayKey(dim)
+			arr.Array().Update(key, value)
+		}
+	default:
+		panic(perr.NewInternal(fmt.Sprintf("unsupported AssignExpr.Var type: %T, %+v", v, v)))
+	}
+}
 
 func (e *Executor) getVariable(variable ast.Expr) executeVariable {
 	switch v := variable.(type) {
