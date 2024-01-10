@@ -7,9 +7,18 @@ import (
 type TestCase struct {
 	File          string
 	ShortFileName string
+
 	TestName      string
+	CaptureStdin  bool
+	CaptureStdout bool
+	CaptureStderr bool
 
 	sections map[string]string
+}
+
+func (tc *TestCase) exists(key string) bool {
+	_, ok := tc.sections[key]
+	return ok
 }
 
 type ResultType string
