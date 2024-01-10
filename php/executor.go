@@ -46,13 +46,14 @@ func (e *Executor) function(fn *types.Function, args []Val) Val {
 		var retval Val
 
 		if handler, ok := fn.Handler().(ZifHandler); ok {
-			ex := e.initExecuteData(args)
-			handler(ex, retval)
+			e.initNewExecuteData(args)
+			handler(e.executeData, retval)
 		} else {
 			perr.Panic(fmt.Sprintf("不支持的内部函数 handler 类型: %T", fn.Handler()))
 		}
 		return retval
 	} else {
+		e.initNewExecuteData(args)
 		return e.userFunction(fn, args)
 	}
 }
@@ -67,6 +68,7 @@ func (e *Executor) initStringCall(name string) *types.Function {
 	return fn
 }
 
-func (e *Executor) initExecuteData(args []Val) *ExecuteData {
-	return NewExecuteData(e.ctx, args)
+func (e *Executor) initNewExecuteData(args []Val) *ExecuteData {
+	e.executeData = NewExecuteData(e.ctx, args, e.executeData)
+	return e.executeData
 }

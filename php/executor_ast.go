@@ -422,11 +422,12 @@ func (e *Executor) executeVariableExpr(expr *ast.VariableExpr) Val {
 		nameVal := e.expr(nameNode)
 		name = nameVal.String()
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("unexpected VariableExpr.Name type: %T, %+v", v, v)))
+		panic(perr.NewInternal(fmt.Sprintf("unexpected VariableExpr.Name type: %T, %+v", nameNode, nameNode)))
 	}
 
-	panic(perr.NewInternal("todo executeVariableExpr"))
-	return nil
+	symbols := e.executeData.symbols
+	// todo undefined warning
+	return symbols.Get(name)
 }
 func (e *Executor) executeYieldExpr(expr *ast.YieldExpr) Val {
 	panic(perr.NewInternal("todo executeYieldExpr"))
