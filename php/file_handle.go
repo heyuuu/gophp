@@ -3,6 +3,7 @@ package php
 import (
 	"io"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -21,6 +22,25 @@ func (f *FileHandle) ReadAll() (string, error) {
 		return "", err
 	}
 	return string(data), nil
+}
+
+func (f *FileHandle) Close() error {
+	if c, ok := f.reader.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
+}
+
+func NewFileHandleByFilename(file string) (*FileHandle, error) {
+	fp, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return &FileHandle{
+		reader:     fp,
+		openedPath: file,
+	}, nil
 }
 
 func NewFileHandleByString(code string) *FileHandle {

@@ -1,7 +1,6 @@
 package php
 
 import (
-	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
@@ -95,7 +94,7 @@ func (e *Executor) stmtList(stmts []ast.Stmt) (result executeResult) {
 			}
 		// todo
 		default:
-			panic(perr.NewInternal(fmt.Sprintf("todo executor.stmtList(%T)", x)))
+			panic(perr.Todof("todo executor.stmtList(%T)", x))
 		}
 	}
 	return
@@ -190,29 +189,27 @@ func (e *Executor) expr(expr ast.Expr) Val {
 	case *ast.StaticCallExpr:
 		return e.executeStaticCallExpr(x)
 	case *ast.ArrayItemExpr:
-		panic(perr.NewInternal(fmt.Sprintf("unexpected execute type: %T", x)))
+		panic(perr.Todof("unexpected execute type: %T", x))
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("todo executor.executeExpr(%T)", x)))
+		panic(perr.Todof("todo executor.executeExpr(%T)", x))
 	}
 }
 
 func (e *Executor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
-	op := e.operator
-
 	// && / || / ?? 操作比较特殊，右表达式节点可能不会执行
 	switch expr.Op {
 	case ast.BinaryOpBooleanAnd: // &&
 		left := e.expr(expr.Left)
 		right := func() Val { return e.expr(expr.Right) }
-		return op.BooleanAnd(left, right)
+		return OpBooleanAnd(e.ctx, left, right)
 	case ast.BinaryOpBooleanOr: // ||
 		left := e.expr(expr.Left)
 		right := func() Val { return e.expr(expr.Right) }
-		return op.BooleanAnd(left, right)
+		return OpBooleanAnd(e.ctx, left, right)
 	case ast.BinaryOpCoalesce: // ??
 		left := e.expr(expr.Left)
 		right := func() Val { return e.expr(expr.Right) }
-		return op.Coalesce(left, right)
+		return OpCoalesce(e.ctx, left, right)
 	}
 
 	// common
@@ -221,49 +218,49 @@ func (e *Executor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
 
 	switch expr.Op {
 	case ast.BinaryOpPlus: // +
-		return op.Add(left, right)
+		return OpAdd(e.ctx, left, right)
 	case ast.BinaryOpMinus: // -
-		return op.Sub(left, right)
+		return OpSub(e.ctx, left, right)
 	case ast.BinaryOpMul: // *
-		return op.Mul(left, right)
+		return OpMul(e.ctx, left, right)
 	case ast.BinaryOpDiv: // /
-		return op.Div(left, right)
+		return OpDiv(e.ctx, left, right)
 	case ast.BinaryOpMod: // %
-		return op.Mod(left, right)
+		return OpMod(e.ctx, left, right)
 	case ast.BinaryOpPow: // **
-		return op.Pow(left, right)
+		return OpPow(e.ctx, left, right)
 	case ast.BinaryOpBitwiseAnd: // &
-		return op.BitwiseAnd(left, right)
+		return OpBitwiseAnd(e.ctx, left, right)
 	case ast.BinaryOpBitwiseOr: // n|
-		return op.BitwiseOr(left, right)
+		return OpBitwiseOr(e.ctx, left, right)
 	case ast.BinaryOpBitwiseXor: // ^
-		return op.BitwiseXor(left, right)
+		return OpBitwiseXor(e.ctx, left, right)
 	case ast.BinaryOpConcat: // .
-		return op.Concat(left, right)
+		return OpConcat(e.ctx, left, right)
 	case ast.BinaryOpEqual: // ==
-		return op.Equal(left, right)
+		return OpEqual(e.ctx, left, right)
 	case ast.BinaryOpGreater: // >
-		return op.Greater(left, right)
+		return OpGreater(e.ctx, left, right)
 	case ast.BinaryOpGreaterOrEqual: // >=
-		return op.GreaterOrEqual(left, right)
+		return OpGreaterOrEqual(e.ctx, left, right)
 	case ast.BinaryOpIdentical: // ===
-		return op.Identical(left, right)
+		return OpIdentical(e.ctx, left, right)
 	case ast.BinaryOpBooleanXor: // xor
-		return op.BooleanXor(left, right)
+		return OpBooleanXor(e.ctx, left, right)
 	case ast.BinaryOpNotEqual: // !=
-		return op.NotEqual(left, right)
+		return OpNotEqual(e.ctx, left, right)
 	case ast.BinaryOpNotIdentical: // !==
-		return op.NotIdentical(left, right)
+		return OpNotIdentical(e.ctx, left, right)
 	case ast.BinaryOpShiftLeft: // <<
-		return op.SL(left, right)
+		return OpSL(e.ctx, left, right)
 	case ast.BinaryOpShiftRight: // >>
-		return op.SR(left, right)
+		return OpSR(e.ctx, left, right)
 	case ast.BinaryOpSmaller: // <
-		return op.Smaller(left, right)
+		return OpSmaller(e.ctx, left, right)
 	case ast.BinaryOpSmallerOrEqual: // <=
-		return op.SmallerOrEqual(left, right)
+		return OpSmallerOrEqual(e.ctx, left, right)
 	case ast.BinaryOpSpaceship: // <=>
-		return op.Spaceship(left, right)
+		return OpSpaceship(e.ctx, left, right)
 	default:
 		panic(perr.Unreachable())
 	}
@@ -282,7 +279,7 @@ func (e *Executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
 		if item.Key != nil {
 			key := e.expr(item.Key)
 			value := e.expr(item.Value)
-			arrayKey := e.operator.ZvalToArrayKey(key)
+			arrayKey := ZvalToArrayKey(e.ctx, key)
 			arr.Add(arrayKey, value)
 		} else {
 			value := e.expr(item.Value)
@@ -292,20 +289,35 @@ func (e *Executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
 	return Array(arr)
 }
 func (e *Executor) executeClosureExpr(expr *ast.ClosureExpr) Val {
-	panic(perr.NewInternal("todo executeClosureExpr"))
+	panic(perr.Todof("executeClosureExpr"))
 	return nil
 }
 func (e *Executor) executeClosureUseExpr(expr *ast.ClosureUseExpr) Val {
-	panic(perr.NewInternal("todo executeClosureUseExpr"))
+	panic(perr.Todof("executeClosureUseExpr"))
 	return nil
 }
 func (e *Executor) executeArrowFunctionExpr(expr *ast.ArrowFunctionExpr) Val {
-	panic(perr.NewInternal("todo executeArrowFunctionExpr"))
+	panic(perr.Todof("executeArrowFunctionExpr"))
 	return nil
 }
 func (e *Executor) executeIndexExpr(expr *ast.IndexExpr) Val {
-	panic(perr.NewInternal("todo executeIndexExpr"))
-	return nil
+	if expr.Dim == nil {
+		panic(perr.Todof("PHP Fatal error:  Cannot use [] for reading"))
+	}
+
+	arr := e.expr(expr.Var)
+	dim := e.expr(expr.Dim)
+	key := ZvalToArrayKey(e.ctx, dim)
+	value := e.arrayGet(arr, key)
+	if value == nil {
+		if key.IsStrKey() {
+			panic(perr.Todof(`Warning: Undefined array key "%v" in`, key.StrKey()))
+		} else {
+			panic(perr.Todof(`Warning: Undefined array key %d in`, key.IdxKey()))
+		}
+		return Null()
+	}
+	return value
 }
 func (e *Executor) executeCastExpr(expr *ast.CastExpr) Val {
 	switch expr.Kind {
@@ -320,107 +332,123 @@ func (e *Executor) executeCastExpr(expr *ast.CastExpr) Val {
 	return nil
 }
 func (e *Executor) executeUnaryExpr(expr *ast.UnaryExpr) Val {
-	panic(perr.NewInternal("todo executeUnaryExpr"))
+	panic(perr.Todof("executeUnaryExpr"))
 	return nil
 }
 func (e *Executor) executeAssignExpr(expr *ast.AssignExpr) Val {
-	panic(perr.NewInternal("todo executeAssignExpr"))
-	return nil
+	value := e.expr(expr.Expr)
+	e.assignVariable(expr.Var, value)
+	return value
 }
 func (e *Executor) executeAssignOpExpr(expr *ast.AssignOpExpr) Val {
-	panic(perr.NewInternal("todo executeAssignOpExpr"))
+	panic(perr.Todof("executeAssignOpExpr"))
 	return nil
 }
 func (e *Executor) executeAssignRefExpr(expr *ast.AssignRefExpr) Val {
-	panic(perr.NewInternal("todo executeAssignRefExpr"))
+	panic(perr.Todof("executeAssignRefExpr"))
 	return nil
 }
 func (e *Executor) executeIssetExpr(expr *ast.IssetExpr) Val {
-	panic(perr.NewInternal("todo executeIssetExpr"))
+	panic(perr.Todof("executeIssetExpr"))
 	return nil
 }
 func (e *Executor) executeEmptyExpr(expr *ast.EmptyExpr) Val {
-	panic(perr.NewInternal("todo executeEmptyExpr"))
+	panic(perr.Todof("executeEmptyExpr"))
 	return nil
 }
 func (e *Executor) executeEvalExpr(expr *ast.EvalExpr) Val {
-	panic(perr.NewInternal("todo executeEvalExpr"))
+	panic(perr.Todof("executeEvalExpr"))
 	return nil
 }
 func (e *Executor) executeIncludeExpr(expr *ast.IncludeExpr) Val {
-	panic(perr.NewInternal("todo executeIncludeExpr"))
+	panic(perr.Todof("executeIncludeExpr"))
 	return nil
 }
 func (e *Executor) executeCloneExpr(expr *ast.CloneExpr) Val {
-	panic(perr.NewInternal("todo executeCloneExpr"))
+	panic(perr.Todof("executeCloneExpr"))
 	return nil
 }
 func (e *Executor) executeErrorSuppressExpr(expr *ast.ErrorSuppressExpr) Val {
-	panic(perr.NewInternal("todo executeErrorSuppressExpr"))
+	panic(perr.Todof("executeErrorSuppressExpr"))
 	return nil
 }
 func (e *Executor) executeExitExpr(expr *ast.ExitExpr) Val {
-	panic(perr.NewInternal("todo executeExitExpr"))
+	panic(perr.Todof("executeExitExpr"))
 	return nil
 }
 func (e *Executor) executeConstFetchExpr(expr *ast.ConstFetchExpr) Val {
 	name := expr.Name.ToCodeString()
 	c := GetConstant(e.ctx, name)
 	if c == nil {
-		panic(perr.NewInternal("const not defined: " + name))
+		panic(perr.Todof("const not defined: " + name))
 	}
 	return c.Value()
 }
 func (e *Executor) executeClassConstFetchExpr(expr *ast.ClassConstFetchExpr) Val {
-	panic(perr.NewInternal("todo executeClassConstFetchExpr"))
+	panic(perr.Todof("executeClassConstFetchExpr"))
 	return nil
 }
 func (e *Executor) executeMagicConstExpr(expr *ast.MagicConstExpr) Val {
-	panic(perr.NewInternal("todo executeMagicConstExpr"))
+	panic(perr.Todof("executeMagicConstExpr"))
 	return nil
 }
 func (e *Executor) executeInstanceofExpr(expr *ast.InstanceofExpr) Val {
-	panic(perr.NewInternal("todo executeInstanceofExpr"))
+	panic(perr.Todof("executeInstanceofExpr"))
 	return nil
 }
 func (e *Executor) executeListExpr(expr *ast.ListExpr) Val {
-	panic(perr.NewInternal("todo executeListExpr"))
+	panic(perr.Todof("executeListExpr"))
 	return nil
 }
 func (e *Executor) executePrintExpr(expr *ast.PrintExpr) Val {
-	panic(perr.NewInternal("todo executePrintExpr"))
+	panic(perr.Todof("executePrintExpr"))
 	return nil
 }
 func (e *Executor) executePropertyFetchExpr(expr *ast.PropertyFetchExpr) Val {
-	panic(perr.NewInternal("todo executePropertyFetchExpr"))
+	panic(perr.Todof("executePropertyFetchExpr"))
 	return nil
 }
 func (e *Executor) executeStaticPropertyFetchExpr(expr *ast.StaticPropertyFetchExpr) Val {
-	panic(perr.NewInternal("todo executeStaticPropertyFetchExpr"))
+	panic(perr.Todof("executeStaticPropertyFetchExpr"))
 	return nil
 }
 func (e *Executor) executeShellExecExpr(expr *ast.ShellExecExpr) Val {
-	panic(perr.NewInternal("todo executeShellExecExpr"))
+	panic(perr.Todof("executeShellExecExpr"))
 	return nil
 }
 func (e *Executor) executeTernaryExpr(expr *ast.TernaryExpr) Val {
-	panic(perr.NewInternal("todo executeTernaryExpr"))
+	panic(perr.Todof("executeTernaryExpr"))
 	return nil
 }
 func (e *Executor) executeThrowExpr(expr *ast.ThrowExpr) Val {
-	panic(perr.NewInternal("todo executeThrowExpr"))
+	panic(perr.Todof("executeThrowExpr"))
 	return nil
 }
 func (e *Executor) executeVariableExpr(expr *ast.VariableExpr) Val {
-	panic(perr.NewInternal("todo executeVariableExpr"))
-	return nil
+	name := e.executeVariableName(expr.Name)
+	// todo undefined warning
+	symbols := e.executeData.symbols
+	return symbols.Get(name)
 }
+
+func (e *Executor) executeVariableName(nameNode ast.Node) string {
+	switch x := nameNode.(type) {
+	case *ast.Ident:
+		return x.Name
+	case *ast.VariableExpr:
+		nameVal := e.expr(x)
+		return nameVal.String()
+	default:
+		panic(perr.Todof("unexpected VariableExpr.Name type: %T, %+v", nameNode, nameNode))
+	}
+}
+
 func (e *Executor) executeYieldExpr(expr *ast.YieldExpr) Val {
-	panic(perr.NewInternal("todo executeYieldExpr"))
+	panic(perr.Todof("executeYieldExpr"))
 	return nil
 }
 func (e *Executor) executeYieldFromExpr(expr *ast.YieldFromExpr) Val {
-	panic(perr.NewInternal("todo executeYieldFromExpr"))
+	panic(perr.Todof("executeYieldFromExpr"))
 	return nil
 }
 func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
@@ -439,7 +467,7 @@ func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 		fn = e.initStringCall(name.String())
 	} else {
 		// todo 各种类型的 function name 处理
-		panic(perr.NewInternal("todo executeFuncCallExpr"))
+		panic(perr.Todof("executeFuncCallExpr"))
 	}
 
 	args := make([]Val, 0, len(expr.Args))
@@ -457,14 +485,158 @@ func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 	return e.function(fn, args)
 }
 func (e *Executor) executeNewExpr(expr *ast.NewExpr) Val {
-	panic(perr.NewInternal("todo executeNewExpr"))
+	panic(perr.Todof("executeNewExpr"))
 	return nil
 }
 func (e *Executor) executeMethodCallExpr(expr *ast.MethodCallExpr) Val {
-	panic(perr.NewInternal("todo executeMethodCallExpr"))
+	panic(perr.Todof("executeMethodCallExpr"))
 	return nil
 }
 func (e *Executor) executeStaticCallExpr(expr *ast.StaticCallExpr) Val {
-	panic(perr.NewInternal("todo executeStaticCallExpr"))
+	panic(perr.Todof("executeStaticCallExpr"))
 	return nil
+}
+
+type executeVariable interface {
+	Get() *types.Zval
+	Set(v *types.Zval)
+}
+
+type executeVariableFunc struct {
+	Getter func() *types.Zval
+	Setter func(v *types.Zval)
+}
+
+func (e executeVariableFunc) Get() *types.Zval  { return e.Getter() }
+func (e executeVariableFunc) Set(v *types.Zval) { e.Setter(v) }
+
+func (e *Executor) assignVariable(variable ast.Expr, value *types.Zval) {
+	switch v := variable.(type) {
+	case *ast.VariableExpr:
+		name := e.executeVariableName(v.Name)
+		symbols := e.executeData.symbols
+		symbols.Set(name, value)
+	case *ast.IndexExpr:
+		arr := e.getOrInitArray(v.Var)
+		// todo 转 arr 处理
+		if v.Dim == nil {
+			e.arrayAppend(arr, value)
+		} else {
+			dim := e.expr(v.Dim)
+			key := e.zvalToArrayKey(dim)
+			e.arrayUpdate(arr, key, value)
+		}
+	default:
+		panic(perr.Todof("unsupported AssignExpr.Var type: %T, %+v", v, v))
+	}
+}
+
+func (e *Executor) getOrInitArray(variable ast.Expr) Val {
+	switch v := variable.(type) {
+	case *ast.VariableExpr:
+		name := e.executeVariableName(v.Name)
+		symbols := e.executeData.symbols
+		if !symbols.Isset(name) {
+			symbols.Set(name, types.NewZvalEmptyArray())
+		}
+		return symbols.Get(name)
+	case *ast.IndexExpr:
+		arrVar := e.getOrInitArray(v.Var)
+		if v.Dim == nil {
+			result := types.NewZvalEmptyArray()
+			e.arrayAppend(arrVar, result)
+			return result
+		} else {
+			dim := e.expr(v.Dim)
+			key := e.zvalToArrayKey(dim)
+			result := e.arrayGet(arrVar, key)
+			if result == nil {
+				result = types.NewZvalEmptyArray()
+				e.arrayUpdate(result, key, result)
+			}
+			return result
+		}
+	default:
+		panic(perr.Todof("unsupported AssignExpr.Var type: %T, %+v", v, v))
+	}
+}
+
+func (e *Executor) arrayGet(arr Val, key types.ArrayKey) Val {
+	switch arr.Type() {
+	case types.IsArray:
+		return arr.Array().Find(key)
+	// todo ArrayAccess
+	default:
+		panic(perr.Todof("unsupported e.arrayGet arr type: %s", types.ZvalGetType(arr)))
+	}
+}
+
+func (e *Executor) arrayAppend(arr Val, value Val) {
+	switch arr.Type() {
+	case types.IsArray:
+		arr.Array().Append(value)
+	// todo ArrayAccess
+	default:
+		panic(perr.Todof("unsupported e.arrayAppend arr type: %s", types.ZvalGetType(arr)))
+	}
+}
+func (e *Executor) arrayUpdate(arr Val, key types.ArrayKey, value Val) {
+	switch arr.Type() {
+	case types.IsArray:
+		arr.Array().Update(key, value)
+	// todo ArrayAccess
+	default:
+		panic(perr.Todof("unsupported e.arrayUpdate arr type: %s", types.ZvalGetType(arr)))
+	}
+}
+
+func (e *Executor) getVariable(variable ast.Expr) executeVariable {
+	switch v := variable.(type) {
+	case *ast.VariableExpr:
+		var name string
+		switch nameNode := v.Name.(type) {
+		case *ast.Ident:
+			name = nameNode.Name
+		case ast.Expr:
+			nameVal := e.expr(nameNode)
+			name = nameVal.String()
+		default:
+			panic(perr.Todof("unexpected VariableExpr.Name type: %T, %+v", v, v))
+		}
+		return executeVariableFunc{
+			Getter: func() *types.Zval {
+				// todo
+				return types.NewZvalString("$" + name)
+			},
+			Setter: func(v *types.Zval) {
+				// todo
+			},
+		}
+	case *ast.IndexExpr:
+		if v.Dim == nil {
+			return executeVariableFunc{
+				Getter: func() *types.Zval {
+					// todo
+					//variable := e.getVariable(v.Var)
+					return types.NewZvalArray(nil)
+				},
+				Setter: func(v *types.Zval) {
+					// todo
+				},
+			}
+		} else {
+			//dim := e.expr(v.Dim)
+			return executeVariableFunc{
+				Getter: func() *types.Zval {
+					// todo
+					return types.NewZvalArray(nil)
+				},
+				Setter: func(v *types.Zval) {
+					// todo
+				},
+			}
+		}
+	default:
+		panic(perr.Todof("unsupported AssignExpr.Var type: %T, %+v", v, v))
+	}
 }

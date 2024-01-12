@@ -41,98 +41,98 @@ func (p *FastParser) nextArg() *types.Zval {
 
 func (p *FastParser) ParseBool() bool {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseBoolNullable() *bool {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseLong() int {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseLongNullable() *int {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseStrictLong() int {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseStrictLongNullable() *int {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseDouble() float64 {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseDoubleNullable() *float64 {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseString() string {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseStringNullable() *string {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParsePath() string {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParsePathNullable() *string {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseArray() *types.Array {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseArrayNullable() *types.Array {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseArrayOrObjectHt() *types.Array {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseArrayOrObject() *types.Zval {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseClass(baseCe *types.Class) *types.Class {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseObject() *types.Object {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseObjectNullable() *types.Object {
 
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseZval() *types.Zval {
@@ -158,7 +158,7 @@ func (p *FastParser) ParseZvalNullable() *types.Zval {
 
 func (p *FastParser) ParseZvalDeref() *types.Zval {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (p *FastParser) ParseVariadic() []*types.Zval {

@@ -6,14 +6,18 @@ import (
 )
 
 type ExecuteData struct {
-	ctx  *Context
-	args []*types.Zval
+	ctx     *Context
+	args    []*types.Zval
+	symbols ISymtable
+	prev    *ExecuteData
 }
 
-func NewExecuteData(ctx *Context, args []*types.Zval) *ExecuteData {
+func NewExecuteData(ctx *Context, args []*types.Zval, prev *ExecuteData) *ExecuteData {
 	return &ExecuteData{
-		ctx:  ctx,
-		args: args,
+		ctx:     ctx,
+		args:    args,
+		symbols: NewSymtable(),
+		prev:    prev,
 	}
 }
 
@@ -23,7 +27,7 @@ func (ex *ExecuteData) Ctx() *Context {
 
 func (ex *ExecuteData) CalleeName() string {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (ex *ExecuteData) NumArgs() int {
@@ -39,5 +43,5 @@ func (ex *ExecuteData) Arg(pos int) *types.Zval {
 
 func (ex *ExecuteData) IsArgUseStrictTypes() bool {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }

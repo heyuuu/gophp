@@ -2,7 +2,6 @@ package php
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/php/operators"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 )
@@ -16,14 +15,10 @@ func (e ExecutorError) Error() string { return string(e) }
 type Executor struct {
 	ctx         *Context
 	executeData *ExecuteData
-	operator    *operators.Operator
 }
 
 func NewExecutor(ctx *Context) *Executor {
-	return &Executor{
-		ctx:      ctx,
-		operator: ctx.Operator(),
-	}
+	return &Executor{ctx: ctx}
 }
 
 func (e *Executor) Execute(fn *types.Function) (retval Val, ret error) {
@@ -46,13 +41,14 @@ func (e *Executor) function(fn *types.Function, args []Val) Val {
 		var retval Val
 
 		if handler, ok := fn.Handler().(ZifHandler); ok {
-			ex := e.initExecuteData(args)
-			handler(ex, retval)
+			e.initNewExecuteData(args)
+			handler(e.executeData, retval)
 		} else {
 			perr.Panic(fmt.Sprintf("不支持的内部函数 handler 类型: %T", fn.Handler()))
 		}
 		return retval
 	} else {
+		e.initNewExecuteData(args)
 		return e.userFunction(fn, args)
 	}
 }
@@ -67,6 +63,17 @@ func (e *Executor) initStringCall(name string) *types.Function {
 	return fn
 }
 
-func (e *Executor) initExecuteData(args []Val) *ExecuteData {
-	return NewExecuteData(e.ctx, args)
+func (e *Executor) initNewExecuteData(args []Val) *ExecuteData {
+	e.executeData = NewExecuteData(e.ctx, args, e.executeData)
+	return e.executeData
+}
+
+func (e *Executor) zvalToArrayKey(dim Val) types.ArrayKey {
+	if dim.IsLong() {
+		return types.IdxKey(dim.Long())
+	} else if dim.IsString() {
+		return types.StrKey(dim.String())
+	} else {
+		panic(perr.Internalf("暂不支持的内部数组 dim 类型: %s", types.ZvalGetType(dim)))
+	}
 }

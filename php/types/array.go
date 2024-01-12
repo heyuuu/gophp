@@ -75,7 +75,7 @@ const maxArrayPos = math.MaxInt
 
 // Array
 type Array struct {
-	data      ArrayData
+	data ArrayData
 
 	// flags todo 待合并
 	protected bool
@@ -273,4 +273,9 @@ func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
 	// todo 细分可优化情况单独处理 (例如，预判是否 IsSorted 以跳过排序、对 List 类型不保留key的排序可直接操作等 )
 	ht.makeOperable()
 	ht.data.(*ArrayDataHt).Sort(comparer, renumber)
+}
+
+func (ht *Array) Clone() *Array {
+	// todo 懒复制逻辑
+	return ht
 }
