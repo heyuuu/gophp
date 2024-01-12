@@ -301,8 +301,23 @@ func (e *Executor) executeArrowFunctionExpr(expr *ast.ArrowFunctionExpr) Val {
 	return nil
 }
 func (e *Executor) executeIndexExpr(expr *ast.IndexExpr) Val {
-	panic(perr.Todof("executeIndexExpr"))
-	return nil
+	if expr.Dim == nil {
+		panic(perr.Todof("PHP Fatal error:  Cannot use [] for reading"))
+	}
+
+	arr := e.expr(expr.Var)
+	dim := e.expr(expr.Dim)
+	key := ZvalToArrayKey(e.ctx, dim)
+	value := e.arrayGet(arr, key)
+	if value == nil {
+		if key.IsStrKey() {
+			panic(perr.Todof(`Warning: Undefined array key "%v" in`, key.StrKey()))
+		} else {
+			panic(perr.Todof(`Warning: Undefined array key %d in`, key.IdxKey()))
+		}
+		return Null()
+	}
+	return value
 }
 func (e *Executor) executeCastExpr(expr *ast.CastExpr) Val {
 	switch expr.Kind {
