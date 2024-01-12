@@ -2,36 +2,15 @@ package php
 
 import (
 	"fmt"
+	"github.com/heyuuu/gophp/kits/mathkit"
 	"github.com/heyuuu/gophp/php/lang"
-	"github.com/heyuuu/gophp/php/operators"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/shim/cmp"
 	"math"
 	"strconv"
+	"strings"
 )
-
-func opPrecision() int {
-	panic(perr.NewInternal("implement me: opPrecision"))
-}
-func opError(level perr.ErrorType, message string) {
-	panic(perr.NewInternal("implement me: opError"))
-}
-func opThrowError(exceptionCe *types.Class, message string) {
-	panic(perr.NewInternal("implement me: opThrowError"))
-}
-func opThrowException(exceptionCe *types.Class, message string) {
-	panic(perr.NewInternal("implement me: opThrowException"))
-}
-func opNewObject(properties *types.Array) *types.Object {
-	panic(perr.NewInternal("implement me: opNewObject"))
-}
-func opObjectGetArray(obj *types.Object) *types.Array {
-	panic(perr.NewInternal("implement me: opObjectGetArray"))
-}
-func opHasException() bool {
-	panic(perr.NewInternal("implement me: opHasException"))
-}
 
 // bool
 func ZvalIsTrue(ctx *Context, v Val) bool {
@@ -84,12 +63,12 @@ again:
 	case types.IsLong:
 		return v.Long()
 	case types.IsDouble:
-		return operators.DoubleToLong(v.Double())
+		return DoubleToLong(v.Double())
 	case types.IsString:
-		var r Val = opParseNumberPrefix(ctx, v.String(), silent)
+		var r = opParseNumberPrefix(ctx, v.String(), silent)
 		if r == nil {
 			if !silent {
-				opError(perr.E_WARNING, "A non-numeric value encountered")
+				Error(ctx, perr.E_WARNING, "A non-numeric value encountered")
 			}
 			return 0
 		}
@@ -101,7 +80,7 @@ again:
 			 * We use use saturating conversion to emulate strtol()'s
 			 * behaviour.
 			 */
-			return operators.DoubleToLongCap(r.Double())
+			return DoubleToLongCap(r.Double())
 		}
 	case types.IsArray:
 		if v.Array().Len() != 0 {
@@ -124,7 +103,7 @@ again:
 	}
 }
 
-// TryToLong。 相比 ToLong，不考虑 Array/Object/Resource 等复杂类型。
+// ZvalTryGetLong。 相比 ZvalGetLong，不考虑 Array/Object/Resource 等复杂类型。
 func ZvalTryGetLong(ctx *Context, v Val) (int, bool) {
 	v = v.DeRef()
 	if v.Type() < types.IsString {
@@ -139,7 +118,7 @@ func ZvalTryGetLong(ctx *Context, v Val) (int, bool) {
 }
 
 // double
-func ZvalTryGetDouble(ctx *Context, v Val) float64 {
+func ZvalGetDouble(ctx *Context, v Val) float64 {
 	if v.IsDouble() {
 		return v.Double()
 	}
@@ -159,7 +138,7 @@ func ZvalTryGetDouble(ctx *Context, v Val) float64 {
 	case types.IsDouble:
 		return v.Double()
 	case types.IsString:
-		return operators.ParseDouble(v.String())
+		return ParseDouble(v.String())
 	case types.IsArray:
 		if v.Array().Len() != 0 {
 			return 1.0
@@ -179,8 +158,10 @@ func ZvalTryGetDouble(ctx *Context, v Val) float64 {
 }
 
 // scalar to number
-func opToNumber(ctx *Context, v Val) Val { return opToNumberEx(ctx, v, true) }
-func opToNumberEx(ctx *Context, v Val, silent bool) Val {
+func ZvalGetNumber(ctx *Context, v Val) Val {
+	return ZvalGetNumberEx(ctx, v, true)
+}
+func ZvalGetNumberEx(ctx *Context, v Val, silent bool) Val {
 	switch v.Type() {
 	case types.IsNull, types.IsFalse:
 		return Long(0)
@@ -194,7 +175,7 @@ func opToNumberEx(ctx *Context, v Val, silent bool) Val {
 		r := opParseNumberPrefix(ctx, v.String(), silent)
 		if r == nil {
 			if !silent {
-				opError(perr.E_WARNING, "A non-numeric value encountered")
+				Error(ctx, perr.E_WARNING, "A non-numeric value encountered")
 			}
 			return Long(0)
 		}
@@ -204,7 +185,7 @@ func opToNumberEx(ctx *Context, v Val, silent bool) Val {
 		return Long(l)
 	case types.IsObject:
 		dst := convertObjectToType(ctx, v.Object(), types.IsNumber)
-		if opHasException() {
+		if ctx.EG().HasException() {
 			return Long(1)
 		}
 		if dst.IsLong() || dst.IsDouble() {
@@ -219,19 +200,19 @@ func opToNumberEx(ctx *Context, v Val, silent bool) Val {
 }
 
 // string
-func opToStrVal(ctx *Context, v Val) string {
-	str, _ := optoStrEx(ctx, v, false)
+func ZvalGetStrVal(ctx *Context, v Val) string {
+	str, _ := zvalGetStrEx(ctx, v, false)
 	return str
 }
-func opToStr(ctx *Context, v Val) (string, bool) {
-	return optoStrEx(ctx, v, false)
+func ZvalGetStr(ctx *Context, v Val) (string, bool) {
+	return zvalGetStrEx(ctx, v, false)
 }
-func opTryToStrVal(ctx *Context, v Val) string {
-	str, _ := optoStrEx(ctx, v, true)
+func ZvalTryGetStrVal(ctx *Context, v Val) string {
+	str, _ := zvalGetStrEx(ctx, v, true)
 	return str
 }
-func opTryToStr(ctx *Context, v Val) (string, bool) {
-	return optoStrEx(ctx, v, true)
+func ZvalTryGetStr(ctx *Context, v Val) (string, bool) {
+	return zvalGetStrEx(ctx, v, true)
 }
 
 /**
@@ -239,7 +220,7 @@ func opTryToStr(ctx *Context, v Val) (string, bool) {
  * @return string 返回的字符串值。
  * @return bool   是否成功。
  */
-func optoStrEx(ctx *Context, v Val, try bool) (string, bool) {
+func zvalGetStrEx(ctx *Context, v Val, try bool) (string, bool) {
 	v = v.DeRef()
 	switch v.Type() {
 	case types.IsString:
@@ -255,8 +236,8 @@ func optoStrEx(ctx *Context, v Val, try bool) (string, bool) {
 	case types.IsDouble:
 		return fmt.Sprintf("%.*G", opPrecision(), v.Double()), true
 	case types.IsArray:
-		opError(perr.E_NOTICE, "Array to string conversion")
-		if try && opHasException() {
+		Error(ctx, perr.E_NOTICE, "Array to string conversion")
+		if try && ctx.EG().HasException() {
 			return "", false
 		}
 		return "Array", true
@@ -264,8 +245,8 @@ func optoStrEx(ctx *Context, v Val, try bool) (string, bool) {
 		if tmp, ok := v.Object().Cast(types.IsString); ok {
 			return tmp.String(), true
 		}
-		if !opHasException() {
-			opThrowError(nil, fmt.Sprintf("Object of class %s could not be converted to string", v.Object().CeName()))
+		if !ctx.EG().HasException() {
+			opThrowError(ctx, nil, fmt.Sprintf("Object of class %s could not be converted to string", v.Object().CeName()))
 		}
 		if try {
 			return "", false
@@ -278,13 +259,13 @@ func optoStrEx(ctx *Context, v Val, try bool) (string, bool) {
 }
 
 // array
-func opToArray(ctx *Context, v Val) *types.Array {
+func ZvalGetArray(ctx *Context, v Val) *types.Array {
 	v = v.DeRef()
 	switch v.Type() {
 	case types.IsArray:
 		return v.Array()
 	case types.IsObject:
-		return opObjectGetArray(v.Object())
+		return opObjectGetArray(ctx, v.Object())
 	case types.IsNull:
 		return types.NewArray()
 	default:
@@ -293,7 +274,7 @@ func opToArray(ctx *Context, v Val) *types.Array {
 }
 
 // object
-func opToObject(ctx *Context, v Val) *types.Object {
+func ZvalGetObject(ctx *Context, v Val) *types.Object {
 	v = v.DeRef()
 	switch v.Type() {
 	case types.IsArray:
@@ -315,22 +296,22 @@ func convertObjectToType(ctx *Context, obj *types.Object, ctype types.ZvalType) 
 	if result, ok := obj.Cast(ctype); ok {
 		return result
 	} else if obj.CanCast() {
-		opError(perr.E_RECOVERABLE_ERROR, fmt.Sprintf("Object of class %s could not be converted to %s", obj.CeName(), types.ZendGetTypeByConst(ctype)))
+		Error(ctx, perr.E_RECOVERABLE_ERROR, fmt.Sprintf("Object of class %s could not be converted to %s", obj.CeName(), types.ZendGetTypeByConst(ctype)))
 	}
 	return nil
 }
 
 // compare
-func opCompare(ctx *Context, v1 Val, v2 Val) int {
-	result, ok := opCompareEx(ctx, v1, v2)
+func ZvalCompare(ctx *Context, v1 Val, v2 Val) int {
+	result, ok := ZvalCompareEx(ctx, v1, v2)
 	if !ok {
 		// todo
 		panic(perr.Unreachable())
 	}
 	return result
 }
-func opCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
-	var converted int = 0
+func ZvalCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
+	var converted = 0
 
 	v1 = v1.DeRef()
 	v2 = v2.DeRef()
@@ -343,7 +324,7 @@ func opCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
 			d2 := fastGetDouble(v2)
 			return cmp.Compare(d1, d2), true
 		case IsArrayArray:
-			return opCompareArray(ctx, v1.Array(), v2.Array()), true
+			return OpCompareArray(ctx, v1.Array(), v2.Array()), true
 		case IsNullNull, IsNullFalse, IsFalseNull, IsFalseFalse, IsTrueTrue:
 			return 0, true
 		case IsNullTrue:
@@ -354,7 +335,7 @@ func opCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
 			if v1.String() == v2.String() {
 				return 0, true
 			}
-			return operators.SmartStrCompare(v1.String(), v2.String()), true
+			return SmartStrCompare(v1.String(), v2.String()), true
 		case IsNullString:
 			return lang.Cond(len(v2.String()) == 0, 0, -1), true
 		case IsStringNull:
@@ -381,14 +362,14 @@ func opCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
 			}
 			if v1.IsObject() && !v2.IsObject() && v1.Object().CanCast() {
 				if tmp, ok := v1.Object().Cast(v2.Type()); ok {
-					return opCompareEx(ctx, tmp, v2)
+					return ZvalCompareEx(ctx, tmp, v2)
 				} else {
 					return 1, true
 				}
 			}
 			if v2.IsObject() && !v1.IsObject() && v2.Object().CanCast() {
 				if tmp, ok := v2.Object().Cast(v1.Type()); ok {
-					return opCompareEx(ctx, v1, tmp)
+					return ZvalCompareEx(ctx, v1, tmp)
 				} else {
 					return -1, true
 				}
@@ -405,7 +386,7 @@ func opCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
 					return lang.Cond(ZvalIsTrue(ctx, v1), 0, -1), true
 				} else {
 					v1, v2 = opScalarGetNumberEx(ctx, v1, v2, true)
-					if opHasException() {
+					if ctx.EG().HasException() {
 						return 0, false
 					}
 					converted = 1
@@ -416,21 +397,72 @@ func opCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
 				return -1, true
 			} else {
 				perr.Assert(false)
-				opThrowError(nil, "Unsupported operand types")
+				opThrowError(ctx, nil, "Unsupported operand types")
 				return 0, false
 			}
 		}
 	}
 }
 
-func opCompareArray(ctx *Context, ht1, ht2 *types.Array) int {
+func OpCompareArray(ctx *Context, ht1, ht2 *types.Array) int {
 	// todo
 	panic("todo")
 }
 
+// SmartStrCompare: zendi_smart_strcmp
+func SmartStrCompare(s1 string, s2 string) int {
+	v1, overflow1 := ParseNumberEx(s1)
+	v2, overflow2 := ParseNumberEx(s2)
+	if v1 == nil || v2 == nil {
+		goto stringCmp
+	}
+
+	if overflow1 != 0 && overflow1 == overflow2 && v1.Double()-v2.Double() == 0.0 {
+		/* both values are integers overflown to the same side, and the
+		 * double comparison may have resulted in crucial accuracy lost */
+		goto stringCmp
+	}
+	if v1.IsDouble() || v2.IsDouble() {
+		dval1, dval2 := v1.Double(), v2.Double()
+		if v1.IsLong() {
+			if overflow2 != 0 {
+				/* 2nd operand is integer > LONG_MAX (oflow2==1) or < LONG_MIN (-1) */
+				return -1 * overflow2
+			}
+			dval1 = float64(v1.Long())
+		} else if v2.IsLong() {
+			if overflow1 != 0 {
+				return overflow1
+			}
+			dval2 = float64(v2.Long())
+		} else if v1.Double() == v2.Double() && !(mathkit.IsFinite(v1.Double())) {
+			/* Both values overflowed and have the same sign,
+			 * so a numeric comparison would be inaccurate */
+			goto stringCmp
+		}
+		return lang.Compare(dval1, dval2)
+	} else {
+		return lang.Compare(v1.Long(), v2.Long())
+	}
+
+stringCmp:
+	return strings.Compare(s1, s2)
+}
+
+// SmartStrEquals: zend_fast_equal_strings
+func SmartStrEquals(s1 string, s2 string) bool {
+	if s1 == s2 {
+		return true
+	} else if len(s1) > 0 && s1[0] <= '9' && len(s2) > 0 && s2[0] <= '9' {
+		return SmartStrCompare(s1, s2) == 0
+	} else {
+		return false
+	}
+}
+
 // equals
-func opEquals(ctx *Context, op1, op2 Val) bool {
-	result, ok := opIsEquals(ctx, op1, op2)
+func ZvalEquals(ctx *Context, op1, op2 Val) bool {
+	result, ok := ZvalEqualsEx(ctx, op1, op2)
 	if !ok {
 		// todo
 		panic(perr.Unreachable())
@@ -438,7 +470,7 @@ func opEquals(ctx *Context, op1, op2 Val) bool {
 	return result
 }
 
-func opIsEquals(ctx *Context, v1, v2 Val) (result bool, ok bool) {
+func ZvalEqualsEx(ctx *Context, v1, v2 Val) (result bool, ok bool) {
 	switch TypePair(v1, v2) {
 	case IsLongLong:
 		return v1.Long() == v2.Long(), true
@@ -447,9 +479,9 @@ func opIsEquals(ctx *Context, v1, v2 Val) (result bool, ok bool) {
 		d2 := fastGetDouble(v2)
 		return d1 == d2, true
 	case IsStringString:
-		return operators.SmartStrEquals(v1.String(), v2.String()), true
+		return SmartStrEquals(v1.String(), v2.String()), true
 	default:
-		ret, ok := opCompareEx(ctx, v1, v2)
+		ret, ok := ZvalCompareEx(ctx, v1, v2)
 		if !ok {
 			return false, false
 		}
@@ -458,7 +490,7 @@ func opIsEquals(ctx *Context, v1, v2 Val) (result bool, ok bool) {
 }
 
 // identical
-func opIsIdentical(ctx *Context, v1 Val, v2 Val) bool {
+func ZvalIsIdentical(ctx *Context, v1 Val, v2 Val) bool {
 	if v1.Type() != v2.Type() {
 		return false
 	}
@@ -474,7 +506,7 @@ func opIsIdentical(ctx *Context, v1 Val, v2 Val) bool {
 	case types.IsString:
 		return v1.String() == v2.String()
 	case types.IsArray:
-		return v1.Array() == v2.Array() || opIsIdenticalArray(ctx, v1.Array(), v2.Array())
+		return v1.Array() == v2.Array() || zvalIsIdenticalArray(ctx, v1.Array(), v2.Array())
 	case types.IsObject:
 		return v1.Object() == v2.Object()
 	default:
@@ -482,29 +514,29 @@ func opIsIdentical(ctx *Context, v1 Val, v2 Val) bool {
 	}
 }
 
-func opIsIdenticalArray(ctx *Context, ht1, ht2 *types.Array) bool {
+func zvalIsIdenticalArray(ctx *Context, ht1, ht2 *types.Array) bool {
 	// todo
 	return false
 }
 
 // Add
-func opAdd(ctx *Context, op1, op2 Val) Val {
+func OpAdd(ctx *Context, op1, op2 Val) Val {
 	op1 = op1.DeRef()
 	op2 = op2.DeRef()
 	converted := false
 again:
 	switch TypePair(op1, op2) {
 	case IsLongLong:
-		return opAddLong(ctx, op1.Long(), op2.Long())
+		return OpAddLong(ctx, op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		return Double(fastGetDouble(op1) + fastGetDouble(op2))
 	case IsArrayArray:
-		retArr := opAddArray(ctx, op1.Array(), op2.Array())
+		retArr := OpAddArray(ctx, op1.Array(), op2.Array())
 		return Array(retArr)
 	default:
 		if converted {
 			// fail
-			opThrowError(nil, "Unsupported operand types")
+			opThrowError(ctx, nil, "Unsupported operand types")
 		}
 
 		// convert
@@ -514,7 +546,7 @@ again:
 	}
 }
 
-func opAddLong(ctx *Context, i1, i2 int) Val {
+func OpAddLong(ctx *Context, i1, i2 int) Val {
 	if sign(i1) == sign(i2) && sign(i1) != sign(i1+i2) { // 判断相加是否越界
 		return Double(float64(i1) + float64(i2))
 	} else {
@@ -522,26 +554,26 @@ func opAddLong(ctx *Context, i1, i2 int) Val {
 	}
 }
 
-func opAddArray(ctx *Context, a1, a2 *types.Array) *types.Array {
+func OpAddArray(ctx *Context, a1, a2 *types.Array) *types.Array {
 	// todo AddArray
 	panic(perr.Unreachable())
 }
 
 // Sub
-func opSub(ctx *Context, op1, op2 Val) Val {
+func OpSub(ctx *Context, op1, op2 Val) Val {
 	op1 = op1.DeRef()
 	op2 = op2.DeRef()
 	converted := false
 again:
 	switch TypePair(op1, op2) {
 	case IsLongLong:
-		return opSubLong(ctx, op1.Long(), op2.Long())
+		return OpSubLong(ctx, op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		return Double(fastGetDouble(op1) - fastGetDouble(op2))
 	default:
 		if converted {
 			// fail
-			opThrowError(nil, "Unsupported operand types")
+			opThrowError(ctx, nil, "Unsupported operand types")
 		}
 
 		// convert
@@ -551,7 +583,7 @@ again:
 	}
 }
 
-func opSubLong(ctx *Context, i1, i2 int) Val {
+func OpSubLong(ctx *Context, i1, i2 int) Val {
 	if sign(i1) != sign(i2) && sign(i1) != sign(i1-i2) { // 判断是否越界
 		return Double(float64(i1) - float64(i2))
 	} else {
@@ -560,20 +592,20 @@ func opSubLong(ctx *Context, i1, i2 int) Val {
 }
 
 // Mul
-func opMul(ctx *Context, op1, op2 Val) Val {
+func OpMul(ctx *Context, op1, op2 Val) Val {
 	op1 = op1.DeRef()
 	op2 = op2.DeRef()
 	converted := false
 again:
 	switch TypePair(op1, op2) {
 	case IsLongLong:
-		return opMulLong(ctx, op1.Long(), op2.Long())
+		return OpMulLong(ctx, op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		return Double(fastGetDouble(op1) * fastGetDouble(op2))
 	default:
 		if converted {
 			// fail
-			opThrowError(nil, "Unsupported operand types")
+			opThrowError(ctx, nil, "Unsupported operand types")
 		}
 
 		// convert
@@ -583,15 +615,15 @@ again:
 	}
 }
 
-func opMulLong(ctx *Context, i1, i2 int) Val {
-	if iVal, dVal, overflow := opmulLong(ctx, i1, i2); !overflow {
+func OpMulLong(ctx *Context, i1, i2 int) Val {
+	if iVal, dVal, overflow := OpMulLongVal(ctx, i1, i2); !overflow {
 		return Long(iVal)
 	} else {
 		return Double(dVal)
 	}
 }
 
-func opmulLong(ctx *Context, i1, i2 int) (iVal int, dVal float64, overflow bool) {
+func OpMulLongVal(ctx *Context, i1, i2 int) (iVal int, dVal float64, overflow bool) {
 	// ZEND_SIGNED_MULTIPLY_LONG
 	iVal = i1 * i2
 	dVal = float64(i1) * float64(i2)
@@ -604,26 +636,26 @@ func opmulLong(ctx *Context, i1, i2 int) (iVal int, dVal float64, overflow bool)
 }
 
 // Div
-func opDiv(ctx *Context, op1, op2 Val) Val {
+func OpDiv(ctx *Context, op1, op2 Val) Val {
 	op1 = op1.DeRef()
 	op2 = op2.DeRef()
 	converted := false
 again:
 	switch TypePair(op1, op2) {
 	case IsLongLong:
-		return opDivLong(ctx, op1.Long(), op2.Long())
+		return OpDivLong(ctx, op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		d1 := fastGetDouble(op1)
 		d2 := fastGetDouble(op2)
 		if d2 == 0 {
-			opError(perr.E_WARNING, "Division by zero")
+			Error(ctx, perr.E_WARNING, "Division by zero")
 			return Double(math.Inf(int(d1)))
 		}
 		return Double(d1 / d2)
 	default:
 		if converted {
 			// fail
-			opThrowError(nil, "Unsupported operand types")
+			opThrowError(ctx, nil, "Unsupported operand types")
 		}
 
 		// convert
@@ -633,9 +665,9 @@ again:
 	}
 }
 
-func opDivLong(ctx *Context, i1, i2 int) Val {
+func OpDivLong(ctx *Context, i1, i2 int) Val {
 	if i2 == 0 {
-		opError(perr.E_WARNING, "Division by zero")
+		Error(ctx, perr.E_WARNING, "Division by zero")
 		return Double(math.Inf(i1))
 	} else if i2 == -1 && i1 == math.MinInt {
 		/* Prevent overflow error/crash */
@@ -649,7 +681,7 @@ func opDivLong(ctx *Context, i1, i2 int) Val {
 }
 
 // Mod
-func opMod(ctx *Context, op1, op2 Val) Val {
+func OpMod(ctx *Context, op1, op2 Val) Val {
 	var op1Lval int
 	var op2Lval int
 
@@ -669,7 +701,7 @@ func opMod(ctx *Context, op1, op2 Val) Val {
 
 	if op2Lval == 0 {
 		/* modulus by zero */
-		opThrowException(nil, "Modulo by zero")
+		opThrowException(ctx, nil, "Modulo by zero")
 	}
 
 	return Long(op1Lval % op2Lval)
@@ -695,7 +727,7 @@ func opSL(ctx *Context, op1, op2 Val) Val {
 	}
 
 	if op2Lval < 0 {
-		opThrowException(nil, "Bit shift by negative number")
+		opThrowException(ctx, nil, "Bit shift by negative number")
 	}
 
 	return Long(op1Lval << op2Lval)
@@ -721,14 +753,14 @@ func opSR(ctx *Context, op1, op2 Val) Val {
 	}
 
 	if op2Lval < 0 {
-		opThrowException(nil, "Bit shift by negative number")
+		opThrowException(ctx, nil, "Bit shift by negative number")
 	}
 
 	return Long(op1Lval >> op2Lval)
 }
 
 // Concat
-func opConcat(ctx *Context, op1, op2 Val) Val {
+func OpConcat(ctx *Context, op1, op2 Val) Val {
 	var s1, s2 string
 
 	op1 = op1.DeRef()
@@ -737,31 +769,31 @@ func opConcat(ctx *Context, op1, op2 Val) Val {
 	if op1.IsString() {
 		s1 = op1.String()
 	} else {
-		s1 = opToStrVal(ctx, op1)
+		s1 = ZvalGetStrVal(ctx, op1)
 	}
 
 	if op2.IsString() {
 		s2 = op2.String()
 	} else {
-		s2 = opToStrVal(ctx, op2)
+		s2 = ZvalGetStrVal(ctx, op2)
 	}
 
 	if len(s1)+len(s2) > math.MaxInt {
-		opThrowError(nil, "String size overflow")
+		opThrowError(ctx, nil, "String size overflow")
 	}
 
 	return String(s1 + s2)
 }
 
 // Pow
-func opPow(ctx *Context, op1, op2 Val) Val {
+func OpPow(ctx *Context, op1, op2 Val) Val {
 	op1 = op1.DeRef()
 	op2 = op2.DeRef()
 	converted := false
 again:
 	switch TypePair(op1, op2) {
 	case IsLongLong:
-		return opPowLong(ctx, op1.Long(), op2.Long())
+		return OpPowLong(ctx, op1.Long(), op2.Long())
 	case IsLongDouble, IsDoubleLong, IsDoubleDouble:
 		d1 := fastGetDouble(op1)
 		d2 := fastGetDouble(op2)
@@ -769,7 +801,7 @@ again:
 	default:
 		if converted {
 			// fail
-			opThrowError(nil, "Unsupported operand types")
+			opThrowError(ctx, nil, "Unsupported operand types")
 		}
 
 		// array type
@@ -787,7 +819,7 @@ again:
 	}
 }
 
-func opPowLong(ctx *Context, i1, i2 int) Val {
+func OpPowLong(ctx *Context, i1, i2 int) Val {
 	if i2 >= 0 {
 		if i2 == 0 || i1 == 1 {
 			return Long(1)
@@ -810,10 +842,10 @@ func opPowLong(ctx *Context, i1, i2 int) Val {
 		for pow >= 1 {
 			if pow%2 != 0 {
 				pow--
-				l1, _, overflow = opmulLong(ctx, l1, l2)
+				l1, _, overflow = OpMulLongVal(ctx, l1, l2)
 			} else {
 				i2 /= 2
-				l2, _, overflow = opmulLong(ctx, l2, l2)
+				l2, _, overflow = OpMulLongVal(ctx, l2, l2)
 			}
 			if overflow {
 				goto doubleVal
@@ -828,7 +860,7 @@ doubleVal:
 }
 
 // BitwiseAnd
-func opBitwiseAnd(ctx *Context, op1, op2 Val) Val {
+func OpBitwiseAnd(ctx *Context, op1, op2 Val) Val {
 	// fast
 	if op1.IsLong() && op2.IsLong() {
 		return Long(op1.Long() & op2.Long())
@@ -853,7 +885,7 @@ func opBitwiseAnd(ctx *Context, op1, op2 Val) Val {
 }
 
 // BitwiseOr
-func opBitwiseOr(ctx *Context, op1, op2 Val) Val {
+func OpBitwiseOr(ctx *Context, op1, op2 Val) Val {
 	// fast
 	if op1.IsLong() && op2.IsLong() {
 		return Long(op1.Long() | op2.Long())
@@ -875,7 +907,7 @@ func opBitwiseOr(ctx *Context, op1, op2 Val) Val {
 }
 
 // BitwiseXor
-func opBitwiseXor(ctx *Context, op1, op2 Val) Val {
+func OpBitwiseXor(ctx *Context, op1, op2 Val) Val {
 	// fast
 	if op1.IsLong() && op2.IsLong() {
 		return Long(op1.Long() ^ op2.Long())
@@ -898,14 +930,14 @@ func opBitwiseXor(ctx *Context, op1, op2 Val) Val {
 }
 
 // BitwiseNot
-func opBitwiseNot(ctx *Context, op1 Val) Val {
+func OpBitwiseNot(ctx *Context, op1 Val) Val {
 again:
 	switch op1.Type() {
 	case types.IsLong:
 		v := ^op1.Long()
 		return Long(v)
 	case types.IsDouble:
-		v := ^operators.DoubleToLong(op1.Double())
+		v := ^DoubleToLong(op1.Double())
 		return Long(v)
 	case types.IsString:
 		str := []byte(op1.String())
@@ -917,13 +949,13 @@ again:
 		op1 = op1.DeRef()
 		goto again
 	default:
-		opThrowError(nil, "Unsupported operand types")
+		opThrowError(ctx, nil, "Unsupported operand types")
 		panic("unreachable")
 	}
 }
 
 // Coalesce(??)
-func opCoalesce(ctx *Context, op1 Val, op2 func() Val) Val {
+func OpCoalesce(ctx *Context, op1 Val, op2 func() Val) Val {
 	if !op1.IsUndef() && !op1.IsNull() {
 		return op1
 	}
@@ -931,7 +963,7 @@ func opCoalesce(ctx *Context, op1 Val, op2 func() Val) Val {
 }
 
 // BooleanAnd
-func opBooleanAnd(ctx *Context, op1 Val, op2 func() Val) Val {
+func OpBooleanAnd(ctx *Context, op1 Val, op2 func() Val) Val {
 	op1Val := ZvalIsTrue(ctx, op1)
 	if !op1Val {
 		return False()
@@ -942,7 +974,7 @@ func opBooleanAnd(ctx *Context, op1 Val, op2 func() Val) Val {
 }
 
 // BooleanOr
-func opBooleanOr(ctx *Context, op1 Val, op2 func() Val) Val {
+func OpBooleanOr(ctx *Context, op1 Val, op2 func() Val) Val {
 	op1Val := ZvalIsTrue(ctx, op1)
 	if op1Val {
 		return True()
@@ -953,73 +985,75 @@ func opBooleanOr(ctx *Context, op1 Val, op2 func() Val) Val {
 }
 
 // BooleanNot
-func opBooleanNot(ctx *Context, op1 Val) Val {
+func OpBooleanNot(ctx *Context, op1 Val) Val {
 	op1Val := ZvalIsTrue(ctx, op1)
 	return Bool(!op1Val)
 }
 
 // BooleanXor
-func opBooleanXor(ctx *Context, op1, op2 Val) Val {
+func OpBooleanXor(ctx *Context, op1, op2 Val) Val {
 	op1Val := ZvalIsTrue(ctx, op1)
 	op2Val := ZvalIsTrue(ctx, op2)
 	return Bool(lang.Xor(op1Val, op2Val))
 }
 
 // Identical
-func opIdentical(ctx *Context, op1, op2 Val) Val {
-	return Bool(opIsIdentical(ctx, op1, op2))
+func OpIdentical(ctx *Context, op1, op2 Val) Val {
+	return Bool(ZvalIsIdentical(ctx, op1, op2))
 }
 
 // NotIdentical
-func opNotIdentical(ctx *Context, op1, op2 Val) Val {
-	return Bool(!opIsIdentical(ctx, op1, op2))
+func OpNotIdentical(ctx *Context, op1, op2 Val) Val {
+	return Bool(!ZvalIsIdentical(ctx, op1, op2))
 }
 
 // Equal
-func opEqual(ctx *Context, op1, op2 Val) Val {
-	result := opEquals(ctx, op1, op2)
+func OpEqual(ctx *Context, op1, op2 Val) Val {
+	result := ZvalEquals(ctx, op1, op2)
 	return Bool(result)
 }
 
 // NotEqual
-func opNotEqual(ctx *Context, op1, op2 Val) Val {
-	result := opEquals(ctx, op1, op2)
+func OpNotEqual(ctx *Context, op1, op2 Val) Val {
+	result := ZvalEquals(ctx, op1, op2)
 	return Bool(!result)
 }
 
 // Greater
-func opGreater(ctx *Context, op1, op2 Val) Val {
-	result := opCompare(ctx, op1, op2)
+func OpGreater(ctx *Context, op1, op2 Val) Val {
+	result := ZvalCompare(ctx, op1, op2)
 	return Bool(result > 0)
 }
 
 // GreaterOrEqual
-func opGreaterOrEqual(ctx *Context, op1, op2 Val) Val {
-	result := opCompare(ctx, op1, op2)
+func OpGreaterOrEqual(ctx *Context, op1, op2 Val) Val {
+	result := ZvalCompare(ctx, op1, op2)
 	return Bool(result >= 0)
 }
 
 // Smaller
-func opSmaller(ctx *Context, op1, op2 Val) Val {
-	result := opCompare(ctx, op1, op2)
+func OpSmaller(ctx *Context, op1, op2 Val) Val {
+	result := ZvalCompare(ctx, op1, op2)
 	return Bool(result < 0)
 }
 
 // SmallerOrEqual
-func opSmallerOrEqual(ctx *Context, op1, op2 Val) Val {
-	result := opCompare(ctx, op1, op2)
+func OpSmallerOrEqual(ctx *Context, op1, op2 Val) Val {
+	result := ZvalCompare(ctx, op1, op2)
 	return Bool(result <= 0)
 }
 
 // Spaceship
-func opSpaceship(ctx *Context, op1, op2 Val) Val {
-	result := opCompare(ctx, op1, op2)
+func OpSpaceship(ctx *Context, op1, op2 Val) Val {
+	result := ZvalCompare(ctx, op1, op2)
 	return Long(result)
 }
 
+// -- internal methods
+
 func opScalarGetNumber(ctx *Context, v1, v2 Val) (Val, Val) {
 	v1, v2 = opScalarGetNumberEx(ctx, v1, v2, false)
-	if opHasException() {
+	if ctx.EG().HasException() {
 		//return nil, false
 		panic(perr.Unreachable())
 	}
@@ -1028,10 +1062,10 @@ func opScalarGetNumber(ctx *Context, v1, v2 Val) (Val, Val) {
 
 func opScalarGetNumberEx(ctx *Context, v1, v2 Val, silent bool) (Val, Val) {
 	if v1 != v2 {
-		v1 = opToNumberEx(ctx, v1, silent)
-		v2 = opToNumberEx(ctx, v2, silent)
+		v1 = ZvalGetNumberEx(ctx, v1, silent)
+		v2 = ZvalGetNumberEx(ctx, v2, silent)
 	} else {
-		v1 = opToNumberEx(ctx, v1, silent)
+		v1 = ZvalGetNumberEx(ctx, v1, silent)
 		v2 = v1
 	}
 	return v1, v2
@@ -1046,18 +1080,18 @@ func opObjectCompare(ctx *Context, obj *types.Object, v1, v2 Val) (result int, o
 }
 
 func opParseNumberPrefix(ctx *Context, str string, silent bool) Val {
-	zv, matchLen := operators.ParseNumberPrefix(str)
+	zv, matchLen := ParseNumberPrefix(str)
 	if matchLen != len(str) && !silent {
 		// notice: 此处可能会触发 Exception
-		opError(perr.E_NOTICE, "A non well formed numeric value encountered")
-		if opHasException() {
+		Error(ctx, perr.E_NOTICE, "A non well formed numeric value encountered")
+		if ctx.EG().HasException() {
 			return nil
 		}
 	}
 	return zv
 }
 
-func opZvalToArrayKey(ctx *Context, offset Val) types.ArrayKey {
+func ZvalToArrayKey(ctx *Context, offset Val) types.ArrayKey {
 	if offset.IsString() {
 		// todo 字符串转数字
 		return types.StrKey(offset.String())
@@ -1068,4 +1102,22 @@ func opZvalToArrayKey(ctx *Context, offset Val) types.ArrayKey {
 		perr.Panic("此类型 key 转 ArrayKey 未完成: " + types.ZvalGetType(offset))
 		return types.IdxKey(0)
 	}
+}
+
+// todo
+func opThrowError(ctx *Context, exceptionCe *types.Class, message string) {
+	panic(perr.NewInternal("implement me: opThrowError"))
+}
+func opThrowException(ctx *Context, exceptionCe *types.Class, message string) {
+	panic(perr.NewInternal("implement me: opThrowException"))
+}
+func opObjectGetArray(ctx *Context, obj *types.Object) *types.Array {
+	panic(perr.NewInternal("implement me: opObjectGetArray"))
+}
+
+func opPrecision() int {
+	panic(perr.NewInternal("implement me: opPrecision"))
+}
+func opNewObject(properties *types.Array) *types.Object {
+	panic(perr.NewInternal("implement me: opNewObject"))
 }

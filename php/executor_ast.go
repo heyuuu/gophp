@@ -202,15 +202,15 @@ func (e *Executor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
 	case ast.BinaryOpBooleanAnd: // &&
 		left := e.expr(expr.Left)
 		right := func() Val { return e.expr(expr.Right) }
-		return opBooleanAnd(e.ctx, left, right)
+		return OpBooleanAnd(e.ctx, left, right)
 	case ast.BinaryOpBooleanOr: // ||
 		left := e.expr(expr.Left)
 		right := func() Val { return e.expr(expr.Right) }
-		return opBooleanAnd(e.ctx, left, right)
+		return OpBooleanAnd(e.ctx, left, right)
 	case ast.BinaryOpCoalesce: // ??
 		left := e.expr(expr.Left)
 		right := func() Val { return e.expr(expr.Right) }
-		return opCoalesce(e.ctx, left, right)
+		return OpCoalesce(e.ctx, left, right)
 	}
 
 	// common
@@ -219,49 +219,49 @@ func (e *Executor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
 
 	switch expr.Op {
 	case ast.BinaryOpPlus: // +
-		return opAdd(e.ctx, left, right)
+		return OpAdd(e.ctx, left, right)
 	case ast.BinaryOpMinus: // -
-		return opSub(e.ctx, left, right)
+		return OpSub(e.ctx, left, right)
 	case ast.BinaryOpMul: // *
-		return opMul(e.ctx, left, right)
+		return OpMul(e.ctx, left, right)
 	case ast.BinaryOpDiv: // /
-		return opDiv(e.ctx, left, right)
+		return OpDiv(e.ctx, left, right)
 	case ast.BinaryOpMod: // %
-		return opMod(e.ctx, left, right)
+		return OpMod(e.ctx, left, right)
 	case ast.BinaryOpPow: // **
-		return opPow(e.ctx, left, right)
+		return OpPow(e.ctx, left, right)
 	case ast.BinaryOpBitwiseAnd: // &
-		return opBitwiseAnd(e.ctx, left, right)
+		return OpBitwiseAnd(e.ctx, left, right)
 	case ast.BinaryOpBitwiseOr: // n|
-		return opBitwiseOr(e.ctx, left, right)
+		return OpBitwiseOr(e.ctx, left, right)
 	case ast.BinaryOpBitwiseXor: // ^
-		return opBitwiseXor(e.ctx, left, right)
+		return OpBitwiseXor(e.ctx, left, right)
 	case ast.BinaryOpConcat: // .
-		return opConcat(e.ctx, left, right)
+		return OpConcat(e.ctx, left, right)
 	case ast.BinaryOpEqual: // ==
-		return opEqual(e.ctx, left, right)
+		return OpEqual(e.ctx, left, right)
 	case ast.BinaryOpGreater: // >
-		return opGreater(e.ctx, left, right)
+		return OpGreater(e.ctx, left, right)
 	case ast.BinaryOpGreaterOrEqual: // >=
-		return opGreaterOrEqual(e.ctx, left, right)
+		return OpGreaterOrEqual(e.ctx, left, right)
 	case ast.BinaryOpIdentical: // ===
-		return opIdentical(e.ctx, left, right)
+		return OpIdentical(e.ctx, left, right)
 	case ast.BinaryOpBooleanXor: // xor
-		return opBooleanXor(e.ctx, left, right)
+		return OpBooleanXor(e.ctx, left, right)
 	case ast.BinaryOpNotEqual: // !=
-		return opNotEqual(e.ctx, left, right)
+		return OpNotEqual(e.ctx, left, right)
 	case ast.BinaryOpNotIdentical: // !==
-		return opNotIdentical(e.ctx, left, right)
+		return OpNotIdentical(e.ctx, left, right)
 	case ast.BinaryOpShiftLeft: // <<
 		return opSL(e.ctx, left, right)
 	case ast.BinaryOpShiftRight: // >>
 		return opSR(e.ctx, left, right)
 	case ast.BinaryOpSmaller: // <
-		return opSmaller(e.ctx, left, right)
+		return OpSmaller(e.ctx, left, right)
 	case ast.BinaryOpSmallerOrEqual: // <=
-		return opSmallerOrEqual(e.ctx, left, right)
+		return OpSmallerOrEqual(e.ctx, left, right)
 	case ast.BinaryOpSpaceship: // <=>
-		return opSpaceship(e.ctx, left, right)
+		return OpSpaceship(e.ctx, left, right)
 	default:
 		panic(perr.Unreachable())
 	}
@@ -280,7 +280,7 @@ func (e *Executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
 		if item.Key != nil {
 			key := e.expr(item.Key)
 			value := e.expr(item.Value)
-			arrayKey := opZvalToArrayKey(e.ctx, key)
+			arrayKey := ZvalToArrayKey(e.ctx, key)
 			arr.Add(arrayKey, value)
 		} else {
 			value := e.expr(item.Value)

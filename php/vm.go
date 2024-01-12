@@ -16,7 +16,7 @@ func vmBinaryOp(ctx *Context, op1, op2 Val, handler func(Val, Val) (Val, bool)) 
 }
 
 func vmEcho(ctx *Context, zv Val) {
-	str := ZvalGetString(zv)
+	str := ZvalGetStrVal(ctx, zv)
 	if len(str) > 0 {
 		ctx.WriteString(str)
 	}

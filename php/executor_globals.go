@@ -33,3 +33,8 @@ func (e *ExecutorGlobals) FindFunction(name string) *types.Function {
 	// todo 完善 caseIgnore 及命名空间处理
 	return e.functionTable.Get(name)
 }
+
+func (e *ExecutorGlobals) HasException() bool {
+	// todo
+	return false
+}
