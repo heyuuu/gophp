@@ -86,7 +86,7 @@ again:
 	case types.IsDouble:
 		return operators.DoubleToLong(v.Double())
 	case types.IsString:
-		var r Val = opparseNumberPrefix(ctx, v.String(), silent)
+		var r Val = opParseNumberPrefix(ctx, v.String(), silent)
 		if r == nil {
 			if !silent {
 				opError(perr.E_WARNING, "A non-numeric value encountered")
@@ -125,7 +125,7 @@ again:
 }
 
 // TryToLong。 相比 ToLong，不考虑 Array/Object/Resource 等复杂类型。
-func opTryToLong(ctx *Context, v Val) (int, bool) {
+func ZvalTryGetLong(ctx *Context, v Val) (int, bool) {
 	v = v.DeRef()
 	if v.Type() < types.IsString {
 		return ZvalGetLong(ctx, v), true
@@ -139,7 +139,7 @@ func opTryToLong(ctx *Context, v Val) (int, bool) {
 }
 
 // double
-func opToDouble(ctx *Context, v Val) float64 {
+func ZvalTryGetDouble(ctx *Context, v Val) float64 {
 	if v.IsDouble() {
 		return v.Double()
 	}
@@ -191,7 +191,7 @@ func opToNumberEx(ctx *Context, v Val, silent bool) Val {
 	case types.IsDouble:
 		return Double(v.Double())
 	case types.IsString:
-		r := opparseNumberPrefix(ctx, v.String(), silent)
+		r := opParseNumberPrefix(ctx, v.String(), silent)
 		if r == nil {
 			if !silent {
 				opError(perr.E_WARNING, "A non-numeric value encountered")
@@ -365,9 +365,9 @@ func opCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
 			return -1, true
 		default:
 			if v1.IsObject() && v1.Object().CanCompare() {
-				return opopObjectCompare(ctx, v1.Object(), v1, v2)
+				return opObjectCompare(ctx, v1.Object(), v1, v2)
 			} else if v2.IsObject() && v2.Object().CanCompare() {
-				return opopObjectCompare(ctx, v2.Object(), v1, v2)
+				return opObjectCompare(ctx, v2.Object(), v1, v2)
 			}
 			if v1.IsObject() && v2.IsObject() {
 				if v1.Object() == v2.Object() {
@@ -404,7 +404,7 @@ func opCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
 				} else if v2.IsTrue() {
 					return lang.Cond(ZvalIsTrue(ctx, v1), 0, -1), true
 				} else {
-					v1, v2 = opopScalarGetNumberEx(ctx, v1, v2, true)
+					v1, v2 = opScalarGetNumberEx(ctx, v1, v2, true)
 					if opHasException() {
 						return 0, false
 					}
@@ -509,7 +509,7 @@ again:
 
 		// convert
 		converted = true
-		op1, op2 = opopScalarGetNumber(ctx, op1, op2)
+		op1, op2 = opScalarGetNumber(ctx, op1, op2)
 		goto again
 	}
 }
@@ -546,7 +546,7 @@ again:
 
 		// convert
 		converted = true
-		op1, op2 = opopScalarGetNumber(ctx, op1, op2)
+		op1, op2 = opScalarGetNumber(ctx, op1, op2)
 		goto again
 	}
 }
@@ -578,7 +578,7 @@ again:
 
 		// convert
 		converted = true
-		op1, op2 = opopScalarGetNumber(ctx, op1, op2)
+		op1, op2 = opScalarGetNumber(ctx, op1, op2)
 		goto again
 	}
 }
@@ -628,7 +628,7 @@ again:
 
 		// convert
 		converted = true
-		op1, op2 = opopScalarGetNumber(ctx, op1, op2)
+		op1, op2 = opScalarGetNumber(ctx, op1, op2)
 		goto again
 	}
 }
@@ -780,7 +780,7 @@ again:
 		}
 
 		// convert
-		op1, op2 = opopScalarGetNumber(ctx, op1, op2)
+		op1, op2 = opScalarGetNumber(ctx, op1, op2)
 
 		converted = true
 		goto again
@@ -1017,8 +1017,8 @@ func opSpaceship(ctx *Context, op1, op2 Val) Val {
 	return Long(result)
 }
 
-func opopScalarGetNumber(ctx *Context, v1, v2 Val) (Val, Val) {
-	v1, v2 = opopScalarGetNumberEx(ctx, v1, v2, false)
+func opScalarGetNumber(ctx *Context, v1, v2 Val) (Val, Val) {
+	v1, v2 = opScalarGetNumberEx(ctx, v1, v2, false)
 	if opHasException() {
 		//return nil, false
 		panic(perr.Unreachable())
@@ -1026,7 +1026,7 @@ func opopScalarGetNumber(ctx *Context, v1, v2 Val) (Val, Val) {
 	return v1, v2
 }
 
-func opopScalarGetNumberEx(ctx *Context, v1, v2 Val, silent bool) (Val, Val) {
+func opScalarGetNumberEx(ctx *Context, v1, v2 Val, silent bool) (Val, Val) {
 	if v1 != v2 {
 		v1 = opToNumberEx(ctx, v1, silent)
 		v2 = opToNumberEx(ctx, v2, silent)
@@ -1037,7 +1037,7 @@ func opopScalarGetNumberEx(ctx *Context, v1, v2 Val, silent bool) (Val, Val) {
 	return v1, v2
 }
 
-func opopObjectCompare(ctx *Context, obj *types.Object, v1, v2 Val) (result int, ok bool) {
+func opObjectCompare(ctx *Context, obj *types.Object, v1, v2 Val) (result int, ok bool) {
 	if v1.Object() == v2.Object() {
 		return 0, true
 	}
@@ -1045,7 +1045,7 @@ func opopObjectCompare(ctx *Context, obj *types.Object, v1, v2 Val) (result int,
 	return 0, false
 }
 
-func opparseNumberPrefix(ctx *Context, str string, silent bool) Val {
+func opParseNumberPrefix(ctx *Context, str string, silent bool) Val {
 	zv, matchLen := operators.ParseNumberPrefix(str)
 	if matchLen != len(str) && !silent {
 		// notice: 此处可能会触发 Exception

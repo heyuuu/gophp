@@ -10,8 +10,6 @@ type Context struct {
 	cg     CompilerGlobals
 	eg     ExecutorGlobals
 	og     OutputGlobals
-
-	operator *Operator
 }
 
 func initContext(e *Engine, baseCtx *Context, request *http.Request, response http.ResponseWriter) *Context {
@@ -26,7 +24,6 @@ func initContext(e *Engine, baseCtx *Context, request *http.Request, response ht
 		ctx.og.Init()
 	}
 
-	ctx.operator = NewOperator(ctx)
 	return ctx
 }
 
@@ -39,8 +36,6 @@ func (c *Context) Engine() *Engine { return c.engine }
 func (c *Context) CG() *CompilerGlobals { return &c.cg }
 func (c *Context) EG() *ExecutorGlobals { return &c.eg }
 func (c *Context) OG() *OutputGlobals   { return &c.og }
-
-func (c *Context) Operator() *Operator { return c.operator }
 
 // output
 func (c *Context) Write(data []byte)        { c.og.Write(data) }

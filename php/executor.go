@@ -15,14 +15,10 @@ func (e ExecutorError) Error() string { return string(e) }
 type Executor struct {
 	ctx         *Context
 	executeData *ExecuteData
-	operator    *Operator
 }
 
 func NewExecutor(ctx *Context) *Executor {
-	return &Executor{
-		ctx:      ctx,
-		operator: ctx.Operator(),
-	}
+	return &Executor{ctx: ctx}
 }
 
 func (e *Executor) Execute(fn *types.Function) (retval Val, ret error) {
