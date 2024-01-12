@@ -54,6 +54,7 @@ func NewZvalArray(arr *Array) *Zval {
 }
 func NewZvalObject(obj *Object) *Zval     { return &Zval{v: obj} }
 func NewZvalResource(res *Resource) *Zval { return &Zval{v: res} }
+func NewZvalEmptyArray() *Zval            { return NewZvalArray(NewArray()) }
 
 // Zval setter
 func (zv *Zval) SetUndef()           { zv.v = nil }

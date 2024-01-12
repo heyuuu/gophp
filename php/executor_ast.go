@@ -503,17 +503,76 @@ func (e *Executor) assignVariable(variable ast.Expr, value *types.Zval) {
 		symbols := e.executeData.symbols
 		symbols.Set(name, value)
 	case *ast.IndexExpr:
-		arr := e.expr(v.Var)
+		arr := e.getOrInitArray(v.Var)
 		// todo 转 arr 处理
 		if v.Dim == nil {
-			arr.Array().Append(value)
+			e.arrayAppend(arr, value)
 		} else {
 			dim := e.expr(v.Dim)
 			key := e.zvalToArrayKey(dim)
-			arr.Array().Update(key, value)
+			e.arrayUpdate(arr, key, value)
 		}
 	default:
 		panic(perr.NewInternal(fmt.Sprintf("unsupported AssignExpr.Var type: %T, %+v", v, v)))
+	}
+}
+
+func (e *Executor) getOrInitArray(variable ast.Expr) Val {
+	switch v := variable.(type) {
+	case *ast.VariableExpr:
+		name := e.executeVariableName(v.Name)
+		symbols := e.executeData.symbols
+		if !symbols.Isset(name) {
+			symbols.Set(name, types.NewZvalEmptyArray())
+		}
+		return symbols.Get(name)
+	case *ast.IndexExpr:
+		arrVar := e.getOrInitArray(v.Var)
+		if v.Dim == nil {
+			result := types.NewZvalEmptyArray()
+			e.arrayAppend(arrVar, result)
+			return result
+		} else {
+			dim := e.expr(v.Dim)
+			key := e.zvalToArrayKey(dim)
+			result := e.arrayGet(arrVar, key)
+			if result == nil {
+				result = types.NewZvalEmptyArray()
+				e.arrayUpdate(result, key, result)
+			}
+			return result
+		}
+	default:
+		panic(perr.NewInternal(fmt.Sprintf("unsupported AssignExpr.Var type: %T, %+v", v, v)))
+	}
+}
+
+func (e *Executor) arrayGet(arr Val, key types.ArrayKey) Val {
+	switch arr.Type() {
+	case types.IsArray:
+		return arr.Array().Find(key)
+	// todo ArrayAccess
+	default:
+		panic(perr.NewInternal(fmt.Sprintf("unsupported e.arrayGet arr type: %s", types.ZvalGetType(arr))))
+	}
+}
+
+func (e *Executor) arrayAppend(arr Val, value Val) {
+	switch arr.Type() {
+	case types.IsArray:
+		arr.Array().Append(value)
+	// todo ArrayAccess
+	default:
+		panic(perr.NewInternal(fmt.Sprintf("unsupported e.arrayAppend arr type: %s", types.ZvalGetType(arr))))
+	}
+}
+func (e *Executor) arrayUpdate(arr Val, key types.ArrayKey, value Val) {
+	switch arr.Type() {
+	case types.IsArray:
+		arr.Array().Update(key, value)
+	// todo ArrayAccess
+	default:
+		panic(perr.NewInternal(fmt.Sprintf("unsupported e.arrayUpdate arr type: %s", types.ZvalGetType(arr))))
 	}
 }
 
