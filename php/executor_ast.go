@@ -253,9 +253,9 @@ func (e *Executor) executeBinaryOpExpr(expr *ast.BinaryOpExpr) (val Val) {
 	case ast.BinaryOpNotIdentical: // !==
 		return OpNotIdentical(e.ctx, left, right)
 	case ast.BinaryOpShiftLeft: // <<
-		return opSL(e.ctx, left, right)
+		return OpSL(e.ctx, left, right)
 	case ast.BinaryOpShiftRight: // >>
-		return opSR(e.ctx, left, right)
+		return OpSR(e.ctx, left, right)
 	case ast.BinaryOpSmaller: // <
 		return OpSmaller(e.ctx, left, right)
 	case ast.BinaryOpSmallerOrEqual: // <=

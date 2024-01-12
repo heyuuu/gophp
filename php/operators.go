@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+// -- zval functions
+
 // bool
 func ZvalIsTrue(ctx *Context, v Val) bool {
 again:
@@ -440,9 +442,9 @@ func SmartStrCompare(s1 string, s2 string) int {
 			 * so a numeric comparison would be inaccurate */
 			goto stringCmp
 		}
-		return lang.Compare(dval1, dval2)
+		return cmp.Compare(dval1, dval2)
 	} else {
-		return lang.Compare(v1.Long(), v2.Long())
+		return cmp.Compare(v1.Long(), v2.Long())
 	}
 
 stringCmp:
@@ -708,7 +710,7 @@ func OpMod(ctx *Context, op1, op2 Val) Val {
 }
 
 // ShiftLeft (SL)
-func opSL(ctx *Context, op1, op2 Val) Val {
+func OpSL(ctx *Context, op1, op2 Val) Val {
 	var op1Lval int
 	var op2Lval int
 
@@ -734,7 +736,7 @@ func opSL(ctx *Context, op1, op2 Val) Val {
 }
 
 // ShiftRight (SR)
-func opSR(ctx *Context, op1, op2 Val) Val {
+func OpSR(ctx *Context, op1, op2 Val) Val {
 	var op1Lval int
 	var op2Lval int
 
