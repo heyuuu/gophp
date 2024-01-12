@@ -1,7 +1,6 @@
 package php
 
 import (
-	"github.com/heyuuu/gophp/php/operators"
 	"net/http"
 )
 
@@ -12,7 +11,7 @@ type Context struct {
 	eg     ExecutorGlobals
 	og     OutputGlobals
 
-	operator *operators.Operator
+	operator *Operator
 }
 
 func initContext(e *Engine, baseCtx *Context, request *http.Request, response http.ResponseWriter) *Context {
@@ -41,7 +40,7 @@ func (c *Context) CG() *CompilerGlobals { return &c.cg }
 func (c *Context) EG() *ExecutorGlobals { return &c.eg }
 func (c *Context) OG() *OutputGlobals   { return &c.og }
 
-func (c *Context) Operator() *operators.Operator { return c.operator }
+func (c *Context) Operator() *Operator { return c.operator }
 
 // output
 func (c *Context) Write(data []byte)        { c.og.Write(data) }

@@ -3,6 +3,7 @@ package operators
 import (
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/kits/mathkit"
+	"github.com/heyuuu/gophp/php"
 	"log"
 	"math"
 	"strconv"
@@ -17,18 +18,18 @@ func ParseDouble(str string) float64 {
 	return d
 }
 
-func ParseNumber(str string) Val {
+func ParseNumber(str string) php.Val {
 	zv, _ := ParseNumberEx(str)
 	return zv
 }
-func ParseNumberEx(str string) (Val, int) {
+func ParseNumberEx(str string) (php.Val, int) {
 	zv, overflow, matchLen := parseNumberPrefix(str)
 	if matchLen != len(str) {
 		return nil, 0
 	}
 	return zv, overflow
 }
-func ParseNumberPrefix(str string) (Val, int) {
+func ParseNumberPrefix(str string) (php.Val, int) {
 	zv, _, matchLen := parseNumberPrefix(str)
 	return zv, matchLen
 }
@@ -69,7 +70,7 @@ const maxLengthOfLong = 20
 
 // _is_numeric_string_ex
 // 尽量尝试转换字符串前缀为数字，返回转换结果+匹配长度 (类似 strconv.parseFloatPrefix())
-func parseNumberPrefix(str string) (zv Val, overflow int, matchLen int) {
+func parseNumberPrefix(str string) (zv php.Val, overflow int, matchLen int) {
 	matchStr, matchLen, maybeLong := matchNumberPrefix(str)
 	if matchStr == "" { // not match
 		return
@@ -82,7 +83,7 @@ func parseNumberPrefix(str string) (zv Val, overflow int, matchLen int) {
 		if len(matchStr) < maxLengthOfLong {
 			lval, err := strconv.Atoi(matchStr)
 			if err == nil {
-				return Long(lval), overflow, matchLen
+				return php.Long(lval), overflow, matchLen
 			}
 		}
 		// 整数溢出, 记录溢出信息
@@ -97,7 +98,7 @@ func parseNumberPrefix(str string) (zv Val, overflow int, matchLen int) {
 	if err != nil {
 		log.Panicf("代码逻辑错误，预期为数字字符串，但转换失败了: s=%s ,err=%s", matchStr, err.Error())
 	}
-	return Double(dval), overflow, matchLen
+	return php.Double(dval), overflow, matchLen
 }
 
 // 尽量尝试匹配字符串中可能为数字的前缀，返回匹配位置及是否可能为整形

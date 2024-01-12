@@ -2,7 +2,6 @@ package php
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/php/operators"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 )
@@ -16,7 +15,7 @@ func (e ExecutorError) Error() string { return string(e) }
 type Executor struct {
 	ctx         *Context
 	executeData *ExecuteData
-	operator    *operators.Operator
+	operator    *Operator
 }
 
 func NewExecutor(ctx *Context) *Executor {

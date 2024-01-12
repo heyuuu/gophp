@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/php"
+	_ "github.com/heyuuu/gophp/php/boot"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/shim/slices"
 )
