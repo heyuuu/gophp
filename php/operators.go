@@ -1108,18 +1108,18 @@ func ZvalToArrayKey(ctx *Context, offset Val) types.ArrayKey {
 
 // todo
 func opThrowError(ctx *Context, exceptionCe *types.Class, message string) {
-	panic(perr.NewInternal("implement me: opThrowError"))
+	panic(perr.Todof("opThrowError"))
 }
 func opThrowException(ctx *Context, exceptionCe *types.Class, message string) {
-	panic(perr.NewInternal("implement me: opThrowException"))
+	panic(perr.Todof("opThrowException"))
 }
 func opObjectGetArray(ctx *Context, obj *types.Object) *types.Array {
-	panic(perr.NewInternal("implement me: opObjectGetArray"))
+	panic(perr.Todof("opObjectGetArray"))
 }
 
 func opPrecision() int {
-	panic(perr.NewInternal("implement me: opPrecision"))
+	panic(perr.Todof("opPrecision"))
 }
 func opNewObject(properties *types.Array) *types.Object {
-	panic(perr.NewInternal("implement me: opNewObject"))
+	panic(perr.Todof("opNewObject"))
 }

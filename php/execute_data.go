@@ -27,7 +27,7 @@ func (ex *ExecuteData) Ctx() *Context {
 
 func (ex *ExecuteData) CalleeName() string {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }
 
 func (ex *ExecuteData) NumArgs() int {
@@ -43,5 +43,5 @@ func (ex *ExecuteData) Arg(pos int) *types.Zval {
 
 func (ex *ExecuteData) IsArgUseStrictTypes() bool {
 	//TODO implement me
-	panic(perr.NewInternal("implement me"))
+	panic(perr.Todo())
 }

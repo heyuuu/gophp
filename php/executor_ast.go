@@ -1,7 +1,6 @@
 package php
 
 import (
-	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
@@ -95,7 +94,7 @@ func (e *Executor) stmtList(stmts []ast.Stmt) (result executeResult) {
 			}
 		// todo
 		default:
-			panic(perr.NewInternal(fmt.Sprintf("todo executor.stmtList(%T)", x)))
+			panic(perr.Todof("todo executor.stmtList(%T)", x))
 		}
 	}
 	return
@@ -190,9 +189,9 @@ func (e *Executor) expr(expr ast.Expr) Val {
 	case *ast.StaticCallExpr:
 		return e.executeStaticCallExpr(x)
 	case *ast.ArrayItemExpr:
-		panic(perr.NewInternal(fmt.Sprintf("unexpected execute type: %T", x)))
+		panic(perr.Todof("unexpected execute type: %T", x))
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("todo executor.executeExpr(%T)", x)))
+		panic(perr.Todof("todo executor.executeExpr(%T)", x))
 	}
 }
 
@@ -290,19 +289,19 @@ func (e *Executor) executeArrayExpr(expr *ast.ArrayExpr) Val {
 	return Array(arr)
 }
 func (e *Executor) executeClosureExpr(expr *ast.ClosureExpr) Val {
-	panic(perr.NewInternal("todo executeClosureExpr"))
+	panic(perr.Todof("executeClosureExpr"))
 	return nil
 }
 func (e *Executor) executeClosureUseExpr(expr *ast.ClosureUseExpr) Val {
-	panic(perr.NewInternal("todo executeClosureUseExpr"))
+	panic(perr.Todof("executeClosureUseExpr"))
 	return nil
 }
 func (e *Executor) executeArrowFunctionExpr(expr *ast.ArrowFunctionExpr) Val {
-	panic(perr.NewInternal("todo executeArrowFunctionExpr"))
+	panic(perr.Todof("executeArrowFunctionExpr"))
 	return nil
 }
 func (e *Executor) executeIndexExpr(expr *ast.IndexExpr) Val {
-	panic(perr.NewInternal("todo executeIndexExpr"))
+	panic(perr.Todof("executeIndexExpr"))
 	return nil
 }
 func (e *Executor) executeCastExpr(expr *ast.CastExpr) Val {
@@ -318,7 +317,7 @@ func (e *Executor) executeCastExpr(expr *ast.CastExpr) Val {
 	return nil
 }
 func (e *Executor) executeUnaryExpr(expr *ast.UnaryExpr) Val {
-	panic(perr.NewInternal("todo executeUnaryExpr"))
+	panic(perr.Todof("executeUnaryExpr"))
 	return nil
 }
 func (e *Executor) executeAssignExpr(expr *ast.AssignExpr) Val {
@@ -327,87 +326,87 @@ func (e *Executor) executeAssignExpr(expr *ast.AssignExpr) Val {
 	return value
 }
 func (e *Executor) executeAssignOpExpr(expr *ast.AssignOpExpr) Val {
-	panic(perr.NewInternal("todo executeAssignOpExpr"))
+	panic(perr.Todof("executeAssignOpExpr"))
 	return nil
 }
 func (e *Executor) executeAssignRefExpr(expr *ast.AssignRefExpr) Val {
-	panic(perr.NewInternal("todo executeAssignRefExpr"))
+	panic(perr.Todof("executeAssignRefExpr"))
 	return nil
 }
 func (e *Executor) executeIssetExpr(expr *ast.IssetExpr) Val {
-	panic(perr.NewInternal("todo executeIssetExpr"))
+	panic(perr.Todof("executeIssetExpr"))
 	return nil
 }
 func (e *Executor) executeEmptyExpr(expr *ast.EmptyExpr) Val {
-	panic(perr.NewInternal("todo executeEmptyExpr"))
+	panic(perr.Todof("executeEmptyExpr"))
 	return nil
 }
 func (e *Executor) executeEvalExpr(expr *ast.EvalExpr) Val {
-	panic(perr.NewInternal("todo executeEvalExpr"))
+	panic(perr.Todof("executeEvalExpr"))
 	return nil
 }
 func (e *Executor) executeIncludeExpr(expr *ast.IncludeExpr) Val {
-	panic(perr.NewInternal("todo executeIncludeExpr"))
+	panic(perr.Todof("executeIncludeExpr"))
 	return nil
 }
 func (e *Executor) executeCloneExpr(expr *ast.CloneExpr) Val {
-	panic(perr.NewInternal("todo executeCloneExpr"))
+	panic(perr.Todof("executeCloneExpr"))
 	return nil
 }
 func (e *Executor) executeErrorSuppressExpr(expr *ast.ErrorSuppressExpr) Val {
-	panic(perr.NewInternal("todo executeErrorSuppressExpr"))
+	panic(perr.Todof("executeErrorSuppressExpr"))
 	return nil
 }
 func (e *Executor) executeExitExpr(expr *ast.ExitExpr) Val {
-	panic(perr.NewInternal("todo executeExitExpr"))
+	panic(perr.Todof("executeExitExpr"))
 	return nil
 }
 func (e *Executor) executeConstFetchExpr(expr *ast.ConstFetchExpr) Val {
 	name := expr.Name.ToCodeString()
 	c := GetConstant(e.ctx, name)
 	if c == nil {
-		panic(perr.NewInternal("const not defined: " + name))
+		panic(perr.Todof("const not defined: " + name))
 	}
 	return c.Value()
 }
 func (e *Executor) executeClassConstFetchExpr(expr *ast.ClassConstFetchExpr) Val {
-	panic(perr.NewInternal("todo executeClassConstFetchExpr"))
+	panic(perr.Todof("executeClassConstFetchExpr"))
 	return nil
 }
 func (e *Executor) executeMagicConstExpr(expr *ast.MagicConstExpr) Val {
-	panic(perr.NewInternal("todo executeMagicConstExpr"))
+	panic(perr.Todof("executeMagicConstExpr"))
 	return nil
 }
 func (e *Executor) executeInstanceofExpr(expr *ast.InstanceofExpr) Val {
-	panic(perr.NewInternal("todo executeInstanceofExpr"))
+	panic(perr.Todof("executeInstanceofExpr"))
 	return nil
 }
 func (e *Executor) executeListExpr(expr *ast.ListExpr) Val {
-	panic(perr.NewInternal("todo executeListExpr"))
+	panic(perr.Todof("executeListExpr"))
 	return nil
 }
 func (e *Executor) executePrintExpr(expr *ast.PrintExpr) Val {
-	panic(perr.NewInternal("todo executePrintExpr"))
+	panic(perr.Todof("executePrintExpr"))
 	return nil
 }
 func (e *Executor) executePropertyFetchExpr(expr *ast.PropertyFetchExpr) Val {
-	panic(perr.NewInternal("todo executePropertyFetchExpr"))
+	panic(perr.Todof("executePropertyFetchExpr"))
 	return nil
 }
 func (e *Executor) executeStaticPropertyFetchExpr(expr *ast.StaticPropertyFetchExpr) Val {
-	panic(perr.NewInternal("todo executeStaticPropertyFetchExpr"))
+	panic(perr.Todof("executeStaticPropertyFetchExpr"))
 	return nil
 }
 func (e *Executor) executeShellExecExpr(expr *ast.ShellExecExpr) Val {
-	panic(perr.NewInternal("todo executeShellExecExpr"))
+	panic(perr.Todof("executeShellExecExpr"))
 	return nil
 }
 func (e *Executor) executeTernaryExpr(expr *ast.TernaryExpr) Val {
-	panic(perr.NewInternal("todo executeTernaryExpr"))
+	panic(perr.Todof("executeTernaryExpr"))
 	return nil
 }
 func (e *Executor) executeThrowExpr(expr *ast.ThrowExpr) Val {
-	panic(perr.NewInternal("todo executeThrowExpr"))
+	panic(perr.Todof("executeThrowExpr"))
 	return nil
 }
 func (e *Executor) executeVariableExpr(expr *ast.VariableExpr) Val {
@@ -425,16 +424,16 @@ func (e *Executor) executeVariableName(nameNode ast.Node) string {
 		nameVal := e.expr(x)
 		return nameVal.String()
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("unexpected VariableExpr.Name type: %T, %+v", nameNode, nameNode)))
+		panic(perr.Todof("unexpected VariableExpr.Name type: %T, %+v", nameNode, nameNode))
 	}
 }
 
 func (e *Executor) executeYieldExpr(expr *ast.YieldExpr) Val {
-	panic(perr.NewInternal("todo executeYieldExpr"))
+	panic(perr.Todof("executeYieldExpr"))
 	return nil
 }
 func (e *Executor) executeYieldFromExpr(expr *ast.YieldFromExpr) Val {
-	panic(perr.NewInternal("todo executeYieldFromExpr"))
+	panic(perr.Todof("executeYieldFromExpr"))
 	return nil
 }
 func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
@@ -453,7 +452,7 @@ func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 		fn = e.initStringCall(name.String())
 	} else {
 		// todo 各种类型的 function name 处理
-		panic(perr.NewInternal("todo executeFuncCallExpr"))
+		panic(perr.Todof("executeFuncCallExpr"))
 	}
 
 	args := make([]Val, 0, len(expr.Args))
@@ -471,15 +470,15 @@ func (e *Executor) executeFuncCallExpr(expr *ast.FuncCallExpr) Val {
 	return e.function(fn, args)
 }
 func (e *Executor) executeNewExpr(expr *ast.NewExpr) Val {
-	panic(perr.NewInternal("todo executeNewExpr"))
+	panic(perr.Todof("executeNewExpr"))
 	return nil
 }
 func (e *Executor) executeMethodCallExpr(expr *ast.MethodCallExpr) Val {
-	panic(perr.NewInternal("todo executeMethodCallExpr"))
+	panic(perr.Todof("executeMethodCallExpr"))
 	return nil
 }
 func (e *Executor) executeStaticCallExpr(expr *ast.StaticCallExpr) Val {
-	panic(perr.NewInternal("todo executeStaticCallExpr"))
+	panic(perr.Todof("executeStaticCallExpr"))
 	return nil
 }
 
@@ -513,7 +512,7 @@ func (e *Executor) assignVariable(variable ast.Expr, value *types.Zval) {
 			e.arrayUpdate(arr, key, value)
 		}
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("unsupported AssignExpr.Var type: %T, %+v", v, v)))
+		panic(perr.Todof("unsupported AssignExpr.Var type: %T, %+v", v, v))
 	}
 }
 
@@ -543,7 +542,7 @@ func (e *Executor) getOrInitArray(variable ast.Expr) Val {
 			return result
 		}
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("unsupported AssignExpr.Var type: %T, %+v", v, v)))
+		panic(perr.Todof("unsupported AssignExpr.Var type: %T, %+v", v, v))
 	}
 }
 
@@ -553,7 +552,7 @@ func (e *Executor) arrayGet(arr Val, key types.ArrayKey) Val {
 		return arr.Array().Find(key)
 	// todo ArrayAccess
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("unsupported e.arrayGet arr type: %s", types.ZvalGetType(arr))))
+		panic(perr.Todof("unsupported e.arrayGet arr type: %s", types.ZvalGetType(arr)))
 	}
 }
 
@@ -563,7 +562,7 @@ func (e *Executor) arrayAppend(arr Val, value Val) {
 		arr.Array().Append(value)
 	// todo ArrayAccess
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("unsupported e.arrayAppend arr type: %s", types.ZvalGetType(arr))))
+		panic(perr.Todof("unsupported e.arrayAppend arr type: %s", types.ZvalGetType(arr)))
 	}
 }
 func (e *Executor) arrayUpdate(arr Val, key types.ArrayKey, value Val) {
@@ -572,7 +571,7 @@ func (e *Executor) arrayUpdate(arr Val, key types.ArrayKey, value Val) {
 		arr.Array().Update(key, value)
 	// todo ArrayAccess
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("unsupported e.arrayUpdate arr type: %s", types.ZvalGetType(arr))))
+		panic(perr.Todof("unsupported e.arrayUpdate arr type: %s", types.ZvalGetType(arr)))
 	}
 }
 
@@ -587,7 +586,7 @@ func (e *Executor) getVariable(variable ast.Expr) executeVariable {
 			nameVal := e.expr(nameNode)
 			name = nameVal.String()
 		default:
-			panic(perr.NewInternal(fmt.Sprintf("unexpected VariableExpr.Name type: %T, %+v", v, v)))
+			panic(perr.Todof("unexpected VariableExpr.Name type: %T, %+v", v, v))
 		}
 		return executeVariableFunc{
 			Getter: func() *types.Zval {
@@ -623,6 +622,6 @@ func (e *Executor) getVariable(variable ast.Expr) executeVariable {
 			}
 		}
 	default:
-		panic(perr.NewInternal(fmt.Sprintf("unsupported AssignExpr.Var type: %T, %+v", v, v)))
+		panic(perr.Todof("unsupported AssignExpr.Var type: %T, %+v", v, v))
 	}
 }

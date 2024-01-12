@@ -74,6 +74,6 @@ func (e *Executor) zvalToArrayKey(dim Val) types.ArrayKey {
 	} else if dim.IsString() {
 		return types.StrKey(dim.String())
 	} else {
-		panic(perr.NewInternal(fmt.Sprintf("暂不支持的内部数组 dim 类型: %s", types.ZvalGetType(dim))))
+		panic(perr.Internalf("暂不支持的内部数组 dim 类型: %s", types.ZvalGetType(dim)))
 	}
 }

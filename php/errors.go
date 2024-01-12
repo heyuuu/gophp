@@ -16,7 +16,7 @@ func Error(ctx *Context, typ perr.ErrorType, message string) {
 func ErrorNoreturn(ctx *Context, typ perr.ErrorType, message string) {
 	Error(ctx, typ, message)
 	/* Should never reach this. */
-	panic(perr.NewInternal("unreachable"))
+	panic(perr.Unreachable())
 }
 func ErrorAt(ctx *Context, typ perr.ErrorType, lineno uint32, message string) {
 	filename, _ := errorGetFilenameLineno(ctx, typ)
@@ -25,7 +25,7 @@ func ErrorAt(ctx *Context, typ perr.ErrorType, lineno uint32, message string) {
 func ErrorAtNoreturn(ctx *Context, typ perr.ErrorType, lineno uint32, message string) {
 	ErrorAt(ctx, typ, lineno, message)
 	/* Should never reach this. */
-	panic(perr.NewInternal("unreachable"))
+	panic(perr.Unreachable())
 }
 
 func ThrowError(ctx *Context, exceptionCe *types.Class, message string) {
