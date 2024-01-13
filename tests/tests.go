@@ -23,9 +23,11 @@ type Config struct {
 	Limit   int
 	Workers int
 
-	PhpBin    string
-	PhpCgiBin string
-	PhpDbgBin string
+	PhpBin     string
+	PhpCgiBin  string
+	PhpDbgBin  string
+	TempSource string
+	TempTarget string
 }
 
 func (c Config) run() (err error) {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/heyuuu/gophp/tests"
@@ -30,6 +31,9 @@ func run(args []string) error {
 		if err != nil {
 			return err
 		}
+	}
+	if conf.SrcDir == "" {
+		return errors.New(`the "--src-dir" must be specified`)
 	}
 
 	eventHandler, eventCloser := initEventHandler(logFile)
