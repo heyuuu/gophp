@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"strings"
 	"time"
 )
 
@@ -12,8 +13,30 @@ type TestCase struct {
 	CaptureStdin  bool
 	CaptureStdout bool
 	CaptureStderr bool
+	UseCgi        bool
+	UseDbg        bool
 
 	sections map[string]string
+}
+
+func NewTestCase(file string, shortFileName string, sections map[string]string) *TestCase {
+	tc := &TestCase{File: file, ShortFileName: shortFileName, sections: sections}
+	tc.init()
+	return tc
+}
+
+func (tc *TestCase) init() {
+	tc.TestName = strings.TrimSpace(tc.sections["TEST"])
+
+	if capture, ok := tc.sections["CAPTURE_STDIO"]; ok {
+		lcCapture := strings.ToLower(capture)
+		tc.CaptureStdin = strings.Contains(lcCapture, "stdin")
+		tc.CaptureStdout = strings.Contains(lcCapture, "stdout")
+		tc.CaptureStderr = strings.Contains(lcCapture, "stderr")
+	}
+
+	/* For GET/POST/PUT tests, check if cgi sapi is available and if it is, use it. */
+
 }
 
 func (tc *TestCase) exists(key string) bool {
@@ -62,6 +85,10 @@ type TestResult struct {
 	UseTime time.Duration
 }
 
+func NewTestResult(Case *TestCase, Type ResultType, reason string, useTime time.Duration) *TestResult {
+	return &TestResult{Case: Case, Type: Type, Reason: reason, UseTime: useTime}
+}
+
 type Summary struct {
 	StartTime    time.Time
 	EndTime      time.Time
@@ -73,4 +100,7 @@ type Summary struct {
 
 func (summary *Summary) AddResult(tc *TestCase, r *TestResult) {
 	summary.Results = append(summary.Results, *r)
+}
+
+type Environments struct {
 }

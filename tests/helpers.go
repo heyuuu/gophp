@@ -66,6 +66,11 @@ func readLines(file string) ([]string, error) {
 	return lines, nil
 }
 
+func isDir(dir string) bool {
+	s, err := os.Stat(dir)
+	return err == nil && s.IsDir()
+}
+
 func fileExists(file string) bool {
 	_, err := os.Stat(file)
 	return err == nil
@@ -82,13 +87,17 @@ func fileGetContents(file string) (string, error) {
 func filePutContents(file string, text string) error {
 	dir := filepath.Dir(file)
 	if !fileExists(dir) {
-		err := os.MkdirAll(dir, 0644)
+		err := os.MkdirAll(dir, 0755)
 		if err != nil {
 			return err
 		}
 	}
 
 	return os.WriteFile(file, []byte(text), 0644)
+}
+
+func unlink(filename string) error {
+	return os.Remove(filename)
 }
 
 func basename(path string, suffix string) string {

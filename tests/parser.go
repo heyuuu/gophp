@@ -19,23 +19,7 @@ func parseTestCase(file string, srcDir string) (*TestCase, error) {
 		shortFileName = file[len(srcDir)+1:]
 	}
 
-	tc := &TestCase{
-		File:          file,
-		ShortFileName: shortFileName,
-		sections:      sections,
-	}
-
-	// parse fields
-	tc.TestName = strings.TrimSpace(sections["TEST"])
-
-	if capture, ok := sections["CAPTURE_STDIO"]; ok {
-		lcCapture := strings.ToLower(capture)
-		tc.CaptureStdin = strings.Contains(lcCapture, "stdin")
-		tc.CaptureStdout = strings.Contains(lcCapture, "stdout")
-		tc.CaptureStderr = strings.Contains(lcCapture, "stderr")
-	}
-
-	return tc, nil
+	return NewTestCase(file, shortFileName, sections), nil
 }
 
 var allowSections = map[string]bool{
@@ -150,6 +134,11 @@ func parseTestCaseSections(file string) (map[string]string, error) {
 	}
 
 	return sections, nil
+}
+
+func existKey[K comparable, V any](m map[K]V, key K) bool {
+	_, exists := m[key]
+	return exists
 }
 
 func existKeys[K comparable, V any](m map[K]V, keys ...K) int {
