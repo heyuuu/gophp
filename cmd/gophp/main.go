@@ -7,6 +7,15 @@ import (
 )
 
 func main() {
-	code := sapi.Run(os.Args)
-	os.Exit(code)
+	err := sapi.Run(os.Args)
+	if err != nil {
+		var code int
+		if codeErr, ok := err.(interface{ Code() int }); ok {
+			code = codeErr.Code()
+		}
+		if code == 0 {
+			code = 1
+		}
+		os.Exit(code)
+	}
 }
