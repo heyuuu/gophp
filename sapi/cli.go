@@ -7,7 +7,6 @@ import (
 )
 
 func RunCli(engine *php.Engine, optArgs *OptArgs) error {
-	fmt.Printf("run cli:%+v\n", optArgs)
 	var fileHandle *php.FileHandle
 	var err error
 	var skipShebang bool
