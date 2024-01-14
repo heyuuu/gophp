@@ -165,7 +165,7 @@ func ZvalGetNumber(ctx *Context, v Val) Val {
 }
 func ZvalGetNumberEx(ctx *Context, v Val, silent bool) Val {
 	switch v.Type() {
-	case types.IsNull, types.IsFalse:
+	case types.IsUndef, types.IsNull, types.IsFalse:
 		return Long(0)
 	case types.IsTrue:
 		return Long(1)

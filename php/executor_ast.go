@@ -2,6 +2,7 @@ package php
 
 import (
 	"github.com/heyuuu/gophp/compile/ast"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 )
@@ -59,7 +60,7 @@ func (e *Executor) userFunction(fn *types.Function, args []Val) Val {
 	return nil
 }
 
-func (e *Executor) stmtList(stmts []ast.Stmt) (result executeResult) {
+func (e *Executor) stmtList(stmts []ast.Stmt) executeResult {
 	var labels = map[string]int{}
 	for i, stmt := range stmts {
 		if label, ok := stmt.(*ast.LabelStmt); ok {
@@ -69,6 +70,7 @@ func (e *Executor) stmtList(stmts []ast.Stmt) (result executeResult) {
 
 	l := len(stmts)
 	for i := 0; i < l; i++ {
+		var result executeResult
 		switch x := stmts[i].(type) {
 		case *ast.EmptyStmt: // pass
 		case *ast.ExprStmt:
@@ -78,27 +80,229 @@ func (e *Executor) stmtList(stmts []ast.Stmt) (result executeResult) {
 			return returnResult{retVal: retVal}
 		case *ast.LabelStmt:
 			// pass
-			// todo goto 能跳到非循环结构内(比如 if)
 		case *ast.GotoStmt:
-			// todo goto 处理逻辑
 			labelName := x.Name.Name
-			if v, ok := labels[labelName]; ok {
-				i = v
-			} else {
-				return gotoResult{labelName}
+			result = gotoResult{labelName}
+		case *ast.BreakStmt:
+			num := 1
+			if x.Num != nil {
+				num = ZvalGetLong(e.ctx, e.expr(x.Num))
 			}
+			result = breakResult{num: num}
+		case *ast.ContinueStmt:
+			num := 1
+			if x.Num != nil {
+				num = ZvalGetLong(e.ctx, e.expr(x.Num))
+			}
+			result = continueResult{num: num}
 		case *ast.EchoStmt:
 			values := e.exprList(x.Exprs)
 			for _, value := range values {
 				vmEcho(e.ctx, value)
 			}
+		case *ast.IfStmt:
+			result = e.ifStmt(x)
+		case *ast.SwitchStmt:
+			result = e.switchStmt(x)
+		case *ast.ForStmt:
+			result = e.forStmt(x)
+		case *ast.ForeachStmt:
+			result = e.foreachStmt(x)
+		case *ast.WhileStmt:
+			result = e.whileStmt(x)
+		case *ast.DoStmt:
+			result = e.doStmt(x)
+		case *ast.TryCatchStmt:
+			result = e.tryCatchStmt(x)
+		case *ast.ConstStmt:
+			result = e.constStmt(x)
+		case *ast.HaltCompilerStmt:
+			// 中断执行，返回结果
+			return nil
+		case *ast.InlineHTMLStmt:
+			e.ctx.WriteString(x.Value)
 		// todo
 		default:
 			panic(perr.Todof("todo executor.stmtList(%T)", x))
 		}
+		if result != nil {
+			switch r := result.(type) {
+			case gotoResult:
+				// todo goto 能跳到非循环结构内(比如 if)
+				if v, ok := labels[r.label]; ok {
+					i = v
+				} else {
+					return r
+				}
+			default:
+				return r
+			}
+		}
 	}
-	return
+	return nil
 }
+
+func (e *Executor) ifStmt(x *ast.IfStmt) executeResult {
+	cond := e.expr(x.Cond)
+	if ZvalIsTrue(e.ctx, cond) {
+		return e.stmtList(x.Stmts)
+	}
+
+	for _, elseIfStmt := range x.Elseifs {
+		elseIfCond := e.expr(elseIfStmt.Cond)
+		if ZvalIsTrue(e.ctx, elseIfCond) {
+			return e.stmtList(x.Stmts)
+		}
+	}
+
+	if x.Else != nil {
+		return e.stmtList(x.Else.Stmts)
+	}
+
+	return nil
+}
+func (e *Executor) switchStmt(x *ast.SwitchStmt) executeResult {
+	cond := e.expr(x.Cond)
+
+	matchIndex := -1
+	for i, caseStmt := range x.Cases {
+		if caseStmt.Cond == nil {
+			matchIndex = i
+			continue
+		}
+		caseCond := e.expr(caseStmt.Cond)
+		if ZvalEquals(e.ctx, cond, caseCond) {
+			matchIndex = i
+			break
+		}
+	}
+	if matchIndex < 0 {
+		return nil
+	}
+
+	for _, caseStmt := range x.Cases[matchIndex:] {
+		result, stop := e.handleSwitchStmts(caseStmt.Stmts)
+		if stop {
+			return result
+		}
+	}
+	return nil
+}
+func (e *Executor) forStmt(x *ast.ForStmt) executeResult {
+	// init
+	for _, expr := range x.Init {
+		e.expr(expr)
+	}
+
+	for {
+		// cond
+		conds := e.exprList(x.Cond)
+		if len(conds) != 0 && !ZvalIsTrue(e.ctx, conds[len(conds)-1]) {
+			break
+		}
+
+		// body
+		result, stop := e.handleLoopStmts(x.Stmts)
+		if stop {
+			return result
+		}
+
+		// step
+		e.exprList(x.Loop)
+	}
+
+	return nil
+}
+func (e *Executor) foreachStmt(x *ast.ForeachStmt) executeResult {
+	variable := e.expr(x.Expr)
+	if variable.IsArray() {
+		// todo array 懒复制，避免循环时修改数组
+		var result executeResult
+		var stop bool
+		variable.Array().EachEx(func(key types.ArrayKey, value *types.Zval) error {
+			// foreach(x as $key => $value)
+			if x.KeyVar != nil {
+				e.assignVariable(x.KeyVar, key.ToZval())
+			}
+			// todo byRef
+			e.assignVariable(x.ValueVar, value)
+
+			// body
+			result, stop = e.handleLoopStmts(x.Stmts)
+			if stop {
+				return lang.BreakErr
+			}
+			return nil
+		})
+		return result
+	} else {
+		panic(perr.Todof("暂未支持非数组的 foreach 操作"))
+	}
+}
+func (e *Executor) whileStmt(x *ast.WhileStmt) executeResult {
+	for {
+		if !ZvalIsTrue(e.ctx, e.expr(x.Cond)) {
+			break
+		}
+
+		result, stop := e.handleLoopStmts(x.Stmts)
+		if stop {
+			return result
+		}
+	}
+	return nil
+}
+func (e *Executor) doStmt(x *ast.DoStmt) executeResult {
+	first := true
+	for {
+		if !first && !ZvalIsTrue(e.ctx, e.expr(x.Cond)) {
+			break
+		}
+		first = false
+
+		result, stop := e.handleLoopStmts(x.Stmts)
+		if stop {
+			return result
+		}
+	}
+	return nil
+}
+
+func (e *Executor) handleLoopStmts(stmts []ast.Stmt) (result executeResult, stop bool) {
+	switch r := e.stmtList(stmts).(type) {
+	case nil:
+		return nil, false
+	case breakResult:
+		if r.num > 1 {
+			return breakResult{num: r.num - 1}, true
+		}
+		return nil, true
+	case continueResult:
+		if r.num > 1 {
+			return continueResult{num: r.num - 1}, true
+		}
+		return nil, false
+	default:
+		return r, true
+	}
+}
+
+func (e *Executor) handleSwitchStmts(stmts []ast.Stmt) (result executeResult, stop bool) {
+	switch r := e.stmtList(stmts).(type) {
+	case nil:
+		return nil, false
+	case breakResult:
+		if r.num > 1 {
+			return breakResult{num: r.num - 1}, true
+		}
+		return nil, true
+	default:
+		return r, true
+	}
+}
+
+func (e *Executor) tryCatchStmt(x *ast.TryCatchStmt) executeResult { panic(perr.Todof("TryCatchStmt")) }
+func (e *Executor) constStmt(x *ast.ConstStmt) executeResult       { panic(perr.Todof("ConstStmt")) }
 
 func (e *Executor) exprList(exprs []ast.Expr) []Val {
 	values := make([]Val, len(exprs))
@@ -332,8 +536,46 @@ func (e *Executor) executeCastExpr(expr *ast.CastExpr) Val {
 	return nil
 }
 func (e *Executor) executeUnaryExpr(expr *ast.UnaryExpr) Val {
-	panic(perr.Todof("executeUnaryExpr"))
-	return nil
+	// todo 考虑是否需要用 unary 原生替代 v = v + 1 的模拟
+
+	var oldValue = e.expr(expr.Var)
+	if oldValue == nil {
+		oldValue = types.NewZvalUndef()
+	}
+
+	var newValue Val
+	var useOldValue = false
+
+	switch expr.Op {
+	case ast.UnaryOpPlus:
+		newValue = OpMul(e.ctx, oldValue, Long(1))
+	case ast.UnaryOpMinus:
+		newValue = OpMul(e.ctx, oldValue, Long(-1))
+	case ast.UnaryOpBooleanNot:
+		newValue = OpBooleanNot(e.ctx, oldValue)
+	case ast.UnaryOpBitwiseNot:
+		newValue = OpBitwiseNot(e.ctx, oldValue)
+	case ast.UnaryOpPreInc:
+		newValue = OpAdd(e.ctx, oldValue, Long(1))
+	case ast.UnaryOpPreDec:
+		newValue = OpSub(e.ctx, oldValue, Long(1))
+	case ast.UnaryOpPostInc:
+		newValue = OpAdd(e.ctx, oldValue, Long(1))
+		useOldValue = true
+	case ast.UnaryOpPostDec:
+		newValue = OpSub(e.ctx, oldValue, Long(1))
+		useOldValue = true
+	default:
+		panic(perr.Internalf("Unexpected ast.UnaryExpr.Op: %+v", expr.Op))
+	}
+
+	e.assignVariable(expr.Var, newValue)
+
+	if useOldValue {
+		return oldValue
+	} else {
+		return newValue
+	}
 }
 func (e *Executor) executeAssignExpr(expr *ast.AssignExpr) Val {
 	value := e.expr(expr.Expr)
