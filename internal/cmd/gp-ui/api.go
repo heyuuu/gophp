@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,8 +12,10 @@ import (
 	_ "github.com/heyuuu/gophp/php/boot"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 type ApiResponse[T any] struct {
@@ -40,7 +43,8 @@ const (
 	TypeAst      = "AST"
 	TypeAstPrint = "AST-print"
 	TypeRun      = "Run"
-	TypeRawRun   = "Raw-Run"
+	TypeRawRun   = "Run-Raw"
+	TypeDiffRun  = "Run-Diff"
 )
 
 type ApiTypeResult struct {
@@ -97,6 +101,10 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 	rawOutput := rawRunCode(code)
 	result = append(result, ApiTypeResult{Type: TypeRawRun, Content: rawOutput})
 
+	// diff run
+	diff := diffOutput(output, rawOutput)
+	result = append(result, ApiTypeResult{Type: TypeDiffRun, Content: diff})
+
 	return
 }
 
@@ -112,21 +120,21 @@ func runCode(code string) (output string) {
 	}()
 
 	engine := php.NewEngine()
-	engine.Start()
+	err := engine.Start()
+	if err != nil {
+		buf.WriteString("engine start failed: " + err.Error())
+		return
+	}
 
 	ctx := engine.NewContext(nil, nil)
 	engine.HandleContext(ctx, func(ctx *php.Context) {
-		buf.WriteString(">>> output start:\n")
 		ctx.OG().PushHandler(&buf)
 
 		fileHandle := php.NewFileHandleByString(code)
-		retval, err := php.ExecuteScript(ctx, fileHandle, false)
+		_, err = php.ExecuteScript(ctx, fileHandle, false)
 
-		buf.WriteString("\n>>> output end\n\n")
 		if err != nil {
 			buf.WriteString("Execute failed: " + err.Error())
-		} else {
-			buf.WriteString(fmt.Sprintf("Execute succed, retval = %v", retval))
 		}
 	})
 
@@ -140,11 +148,55 @@ func rawRunCode(code string) string {
 		code = "?>" + code
 	}
 
-	command := exec.Command("php", "-r", code)
-	log.Printf("raw run code: %s\n", command.String())
-	if output, err := command.CombinedOutput(); err == nil {
-		return string(output)
+	output, err := runCommand(5*time.Second, "php", "-r", code)
+	if err != nil {
+		return output + "\n" + err.Error()
+	}
+	return output
+}
+
+func diffOutput(text1 string, text2 string) string {
+	f1, err := createTmpFile(text1)
+	if err != nil {
+		return err.Error()
+	}
+
+	f2, err := createTmpFile(text2)
+	if err != nil {
+		return err.Error()
+	}
+
+	output, err := runCommand(5*time.Second, "diff", f1, f2)
+	if output == "" && err != nil {
+		return "run diff command failed: " + err.Error()
+	}
+
+	return output
+}
+
+func createTmpFile(content string) (string, error) {
+	f, err := os.CreateTemp(os.TempDir(), "gophp-")
+	if err != nil {
+		return "", fmt.Errorf("create tmp file failed: %w", err)
+	}
+	name := f.Name()
+	f.WriteString(content)
+	f.Close()
+	return name, nil
+}
+
+func runCommand(timeout time.Duration, name string, args ...string) (string, error) {
+	// 超时控制
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, name, args...)
+	log.Printf("run command: %s\n", cmd.String())
+	if output, err := cmd.CombinedOutput(); err == nil {
+		return string(output), nil
+	} else if ctx.Err() != nil && errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return string(output), fmt.Errorf("run timeout: %w", err)
 	} else {
-		return fmt.Sprintf("run fail: %s\n", err.Error())
+		return string(output), fmt.Errorf("run fail: %w", err)
 	}
 }
