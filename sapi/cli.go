@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func RunCli(engine *php.Engine, optArgs *OptArgs) int {
+func RunCli(engine *php.Engine, optArgs *OptArgs) error {
 	fmt.Printf("run cli:%+v\n", optArgs)
 	var fileHandle *php.FileHandle
 	var err error
@@ -24,12 +24,10 @@ func RunCli(engine *php.Engine, optArgs *OptArgs) int {
 	}
 
 	ctx := engine.NewContext(nil, nil)
-	retval, err := php.ExecuteScript(ctx, fileHandle, skipShebang)
+	_, err = php.ExecuteScript(ctx, fileHandle, skipShebang)
 	if err != nil {
-		log.Println("Execute failed: " + err.Error())
-		return fail
+		return withCode(1, fmt.Errorf("Execute failed: %w", err))
 	}
-	log.Printf("Execute succed, retval = %v", retval)
 
-	return ok
+	return nil
 }

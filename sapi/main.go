@@ -67,11 +67,23 @@ const (
 	modeCgiServer
 )
 
-const (
-	ok   = 0
-	fail = 1
-)
+// RunError
+type RunError struct {
+	code  int
+	inner error
+}
 
+func (e RunError) Code() int     { return e.code }
+func (e RunError) Error() string { return e.inner.Error() }
+func (e RunError) Unwrap() error { return e.inner }
+
+func withCode(code int, err error) error {
+	return RunError{code: code, inner: err}
+}
+
+var errRunFail = withCode(1, errors.New("run failed"))
+
+// opts
 type OptArgs struct {
 	mode runMode
 	// ini opts
@@ -166,16 +178,16 @@ func parseArgs(args []string) (*OptArgs, error) {
 	return &optArgs, nil
 }
 
-func Run(args []string) int {
+func Run(args []string) error {
 	if len(args) == 0 {
-		return fail
+		return errRunFail
 	}
 
 	optArgs, err := parseArgs(args)
 	if err != nil {
 		fmt.Println(err.Error())
 		showHelp()
-		return fail
+		return errRunFail
 	}
 
 	// prepare engine
@@ -199,7 +211,7 @@ func Run(args []string) int {
 	default:
 		showHelp()
 	}
-	return ok
+	return nil
 }
 
 func showHelp() {
@@ -210,19 +222,19 @@ func showVersion() {
 	fmt.Printf("gophp (php version %s)", "7.4.33")
 }
 
-func showInfo(engine *php.Engine) int {
+func showInfo(engine *php.Engine) error {
 	// todo show info
-	return ok
+	return nil
 }
 
-func showIni(engine *php.Engine) int {
+func showIni(engine *php.Engine) error {
 	// todo show ini
-	return ok
+	return nil
 }
 
-func showModules(engine *php.Engine) int {
+func showModules(engine *php.Engine) error {
 	fmt.Println("[PHP Modules]")
 	// todo show modules
 	fmt.Println("")
-	return ok
+	return nil
 }
