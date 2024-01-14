@@ -1,16 +1,18 @@
 package main
 
 import (
+	"embed"
 	_ "embed"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 var (
-	//go:embed static/index.html
-	indexHtml []byte
+	//go:embed static
+	staticFS embed.FS
 )
 
 func main() {
@@ -24,7 +26,8 @@ func main() {
 	fmt.Printf("Web UI Url:  http://%s/\n\n", addr)
 
 	// start server
-	http.HandleFunc("/", staticHandler(indexHtml))
+	http.HandleFunc("/", staticHandler())
+	http.HandleFunc("/static/", staticHandler())
 	http.HandleFunc("/api", ApiWrapHandler(apiHandler))
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
@@ -46,8 +49,30 @@ func wrapHandler(handler func(*http.Request) ([]byte, error)) http.HandlerFunc {
 	}
 }
 
-func staticHandler(content []byte) http.HandlerFunc {
+var defaultContentType = map[string]string{
+	".html": "text/html",
+	".js":   "text/javascript",
+	".css":  "text/css",
+}
+
+func staticHandler() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
+		path := request.RequestURI[1:]
+		if path == "" {
+			path = "static/index.html"
+		}
+
+		content, err := staticFS.ReadFile(path)
+		if err != nil {
+			writer.WriteHeader(404)
+			_, _ = writer.Write([]byte("404 page not found"))
+			return
+		}
+
+		if contentType, ok := defaultContentType[filepath.Ext(path)]; ok {
+			writer.Header().Set("Content-Type", contentType)
+		}
+
 		writer.WriteHeader(200)
 		_, _ = writer.Write(content)
 	}
