@@ -2,12 +2,14 @@ package tests
 
 import (
 	"fmt"
+	"github.com/heyuuu/gophp/sapi"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var rawSupportSections = map[string]bool{
@@ -223,6 +225,7 @@ func (c Config) runTestRealRaw(testIndex int, tc *TestCase) (*TestResult, error)
 	}
 
 	var cmd string
+	var cmdArgs []string
 	if postRaw := sections["POST_RAW"]; postRaw != "" {
 		post := strings.TrimSpace(postRaw)
 		var requestLines []string
@@ -291,6 +294,7 @@ func (c Config) runTestRealRaw(testIndex int, tc *TestCase) (*TestResult, error)
 		env.Set("CONTENT_LENGTH", "")
 
 		cmd = fmt.Sprintf(`%s %s %s -f "%s" %s%s`, php, c.PassOption, iniSettingsParam, testFile, args, cmdRedirect)
+		cmdArgs = []string{php, c.PassOption, iniSettingsParam, "-f", testFile, args, cmdRedirect}
 	}
 
 	c.Events.Log(testIndex, "CONTENT_LENGTH  = "+env.Get("CONTENT_LENGTH"))
@@ -302,6 +306,9 @@ func (c Config) runTestRealRaw(testIndex int, tc *TestCase) (*TestResult, error)
 	c.Events.Log(testIndex, "SCRIPT_FILENAME = "+env.Get("SCRIPT_FILENAME"))
 	c.Events.Log(testIndex, "HTTP_COOKIE     = "+env.Get("HTTP_COOKIE"))
 	c.Events.Log(testIndex, "COMMAND "+cmd)
+
+	startTime := time.Now()
+	out := c.systemWithTimeout(cmdArgs, env, sections["STDIN"], captureStdIn, captureStdOut, captureStdErr)
 
 	return NewTestResult(tc, SKIP, "", 0), nil
 }
@@ -368,6 +375,8 @@ func (c Config) errorf(format string, v ...any) {
 	log.Panicf(format, v...)
 }
 
-func (c Config) systemWithTimeout(cmd []string, env *Environments) string {
+func (c Config) systemWithTimeout(cmdArgs []string, env *Environments, stdin string, captureStdIn string, captureStdOut bool, captureStdErr bool) string {
+	code := sapi.Run(cmdArgs)
+
 	return ""
 }
