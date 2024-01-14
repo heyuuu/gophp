@@ -27,6 +27,11 @@ func run(args []string) error {
 		flagSet.IntVar(&conf.Limit, "limit", 0, "")
 		flagSet.IntVar(&conf.Workers, "j", 0, "")
 		flagSet.StringVar(&logFile, "log-file", "", "")
+
+		flagSet.StringVar(&conf.PhpBin, "php", "", "")
+		flagSet.StringVar(&conf.PhpCgiBin, "php-cgi", "", "")
+		flagSet.StringVar(&conf.PhpDbgBin, "phpdbg", "", "")
+
 		err := flagSet.Parse(args[1:])
 		if err != nil {
 			return err

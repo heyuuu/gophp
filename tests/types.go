@@ -102,5 +102,24 @@ func (summary *Summary) AddResult(tc *TestCase, r *TestResult) {
 	summary.Results = append(summary.Results, *r)
 }
 
+type IniEntry struct {
+	name  string
+	value string
+}
+
 type Environments struct {
+	m map[string]string
+}
+
+func (env *Environments) Set(key string, value string) {
+	if env.m == nil {
+		env.m = map[string]string{}
+	}
+	env.m[key] = value
+}
+func (env *Environments) Get(key string) string {
+	if env.m == nil {
+		return ""
+	}
+	return env.m[key]
 }

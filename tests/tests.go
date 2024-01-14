@@ -28,6 +28,13 @@ type Config struct {
 	PhpDbgBin  string
 	TempSource string
 	TempTarget string
+
+	PassOption    string
+	IniOverwrites []IniEntry
+
+	ExtensionDir string
+
+	IsWin bool
 }
 
 func (c Config) run() (err error) {
