@@ -6,18 +6,16 @@ import (
 )
 
 // fast type and functions
-type Val = *types.Zval
+type Val = types.Zval
 
-var NewVal = types.NewZvalUndef
-var Null = types.NewZvalNull
-var False = types.NewZvalFalse
-var True = types.NewZvalTrue
-var Bool = types.NewZvalBool
-var Long = types.NewZvalLong
-var Double = types.NewZvalDouble
-var String = types.NewZvalString
-var Array = types.NewZvalArray
-var Resource = types.NewZvalResource
+var False = types.ZvalFalse
+var True = types.ZvalTrue
+var Bool = types.ZvalBool
+var Long = types.ZvalLong
+var Double = types.ZvalDouble
+var String = types.ZvalString
+var Array = types.ZvalArray
+var Resource = types.ZvalResource
 
 type ZvalTypePair uint
 

@@ -31,7 +31,7 @@ again:
 		return v.Array().Len() != 0
 	case types.IsObject:
 		dst := convertObjectToType(ctx, v.Object(), types.IsBool)
-		if dst != nil {
+		if dst.IsNotUndef() {
 			return dst.IsTrue()
 		}
 		return true
@@ -68,7 +68,7 @@ again:
 		return DoubleToLong(v.Double())
 	case types.IsString:
 		var r = opParseNumberPrefix(ctx, v.String(), silent)
-		if r == nil {
+		if r.IsUndef() {
 			if !silent {
 				Error(ctx, perr.E_WARNING, "A non-numeric value encountered")
 			}
@@ -165,7 +165,7 @@ func ZvalGetNumber(ctx *Context, v Val) Val {
 }
 func ZvalGetNumberEx(ctx *Context, v Val, silent bool) Val {
 	switch v.Type() {
-	case types.IsNull, types.IsFalse:
+	case types.IsUndef, types.IsNull, types.IsFalse:
 		return Long(0)
 	case types.IsTrue:
 		return Long(1)
@@ -175,7 +175,7 @@ func ZvalGetNumberEx(ctx *Context, v Val, silent bool) Val {
 		return Double(v.Double())
 	case types.IsString:
 		r := opParseNumberPrefix(ctx, v.String(), silent)
-		if r == nil {
+		if r.IsUndef() {
 			if !silent {
 				Error(ctx, perr.E_WARNING, "A non-numeric value encountered")
 			}
@@ -197,7 +197,7 @@ func ZvalGetNumberEx(ctx *Context, v Val, silent bool) Val {
 		}
 	default:
 		// todo fail log
-		return nil
+		panic(perr.Internalf("ZvalGetNumberEx() 预期外的 v 类型: %+v", v))
 	}
 }
 
@@ -300,7 +300,7 @@ func convertObjectToType(ctx *Context, obj *types.Object, ctype types.ZvalType) 
 	} else if obj.CanCast() {
 		Error(ctx, perr.E_RECOVERABLE_ERROR, fmt.Sprintf("Object of class %s could not be converted to %s", obj.CeName(), types.ZendGetTypeByConst(ctype)))
 	}
-	return nil
+	return types.Undef
 }
 
 // compare
@@ -415,7 +415,7 @@ func OpCompareArray(ctx *Context, ht1, ht2 *types.Array) int {
 func SmartStrCompare(s1 string, s2 string) int {
 	v1, overflow1 := ParseNumberEx(s1)
 	v2, overflow2 := ParseNumberEx(s2)
-	if v1 == nil || v2 == nil {
+	if v1.IsUndef() || v2.IsUndef() {
 		goto stringCmp
 	}
 
@@ -1087,7 +1087,7 @@ func opParseNumberPrefix(ctx *Context, str string, silent bool) Val {
 		// notice: 此处可能会触发 Exception
 		Error(ctx, perr.E_NOTICE, "A non well formed numeric value encountered")
 		if ctx.EG().HasException() {
-			return nil
+			return types.Undef
 		}
 	}
 	return zv

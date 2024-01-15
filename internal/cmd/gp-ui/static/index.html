@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>GoPhp UI</title>
-    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-4.6.2.min.css" rel="stylesheet">
     <style>
         .changed {
             animation: changed 2s;
@@ -36,7 +36,8 @@
             </div>
             <div class="form-group">
                 <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="auto-refresh-switch" :value="autoRefresh" @change="toggleAutoRefresh">
+                    <input type="checkbox" class="custom-control-input" id="auto-refresh-switch" :value="autoRefresh"
+                           @change="toggleAutoRefresh">
                     <label class="custom-control-label" for="auto-refresh-switch">定时自动更新</label>
                 </div>
                 <textarea class="form-control" rows="20" v-model="code" @input="codeChange"></textarea>
@@ -54,8 +55,8 @@
     </div>
 </div>
 
-<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/petite-vue/0.4.1/petite-vue.iife.min.js"></script>
+<script src="/static/js/jquery-3.6.3.js"></script>
+<script src="/static/js/petite-vue-0.4.1.iife.min.js"></script>
 <script>
     // storage
     const storageKey = "code"

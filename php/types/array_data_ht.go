@@ -2,31 +2,20 @@ package types
 
 import (
 	"github.com/heyuuu/gophp/kits/mapkit"
+	"github.com/heyuuu/gophp/shim/maps"
+	"github.com/heyuuu/gophp/shim/slices"
 	"sort"
 )
 
-// bucket
-type bucket struct {
-	key ArrayKey
-	val Zval
-}
-
-func makeBucket(key ArrayKey, val *Zval) bucket {
-	return bucket{key: key, val: *val}
-}
-
-func (bkt *bucket) Key() ArrayKey       { return bkt.key }
-func (bkt *bucket) SetKey(key ArrayKey) { bkt.key = key }
-func (bkt *bucket) Val() *Zval          { return &bkt.val }
-func (bkt *bucket) SetVal(val *Zval)    { bkt.val = *val }
-func (bkt *bucket) IsValid() bool       { return !bkt.val.IsUndef() }
-func (bkt *bucket) MarkInvalid()        { bkt.val.SetUndef() }
-
-// ArrayDataHt
+/**
+ * ArrayDataHt 默认数据数据
+ * - ArrayData 的基础数据类型，能实现除符号表(SymtableData)外的所有数据操作
+ * - 此类型内所有 Zval 值都不为 IsIndirect 类型
+ */
 type ArrayDataHt struct {
 	elementsCount   int
 	nextFreeElement int
-	data            []bucket         // 实际存储数据的地方
+	data            []ArrayPair      // 实际存储数据的地方
 	indexes         map[ArrayKey]int // 索引到具体位置的映射
 	writable        bool
 }
@@ -34,80 +23,81 @@ type ArrayDataHt struct {
 func newArrayDataHt(cap int) *ArrayDataHt {
 	return &ArrayDataHt{
 		indexes:  make(map[ArrayKey]int, cap),
-		data:     make([]bucket, 0, cap),
+		data:     make([]ArrayPair, 0, cap),
 		writable: true,
 	}
 }
+func newArrayDataHtByData(pairs []ArrayPair) *ArrayDataHt {
+	ht := &ArrayDataHt{
+		data:     slices.Clone(pairs),
+		writable: true,
+	}
+	ht.rehash()
+	return ht
+}
 
 func (ht *ArrayDataHt) Clone() ArrayData {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (ht *ArrayDataHt) Len() int  { return ht.elementsCount }
-func (ht *ArrayDataHt) Used() int { return len(ht.data) }
-func (ht *ArrayDataHt) Cap() int  { return cap(ht.data) }
-func (ht *ArrayDataHt) Count() int {
-	var num = 0
-	for i, _ := range ht.data {
-		if !ht.data[i].IsValid() {
-			continue
-		}
-		num++
+	return &ArrayDataHt{
+		elementsCount:   ht.elementsCount,
+		nextFreeElement: ht.nextFreeElement,
+		data:            slices.Clone(ht.data),
+		indexes:         maps.Clone(ht.indexes),
+		writable:        true,
 	}
-	return num
 }
 
+func (ht *ArrayDataHt) Len() int   { return ht.elementsCount }
+func (ht *ArrayDataHt) Used() int  { return len(ht.data) }
+func (ht *ArrayDataHt) Cap() int   { return cap(ht.data) }
+func (ht *ArrayDataHt) Count() int { return ht.elementsCount }
 func (ht *ArrayDataHt) Exists(key ArrayKey) bool {
 	_, ok := ht.indexes[key]
 	return ok
 }
-func (ht *ArrayDataHt) Find(key ArrayKey) (*Zval, ArrayPosition) {
+func (ht *ArrayDataHt) Find(key ArrayKey) (Zval, ArrayPosition) {
 	if pos, ok := ht.indexes[key]; ok {
-		return ht.data[pos].Val(), pos
+		return ht.data[pos].Val, pos
 	}
-	return nil, InvalidArrayPos
+	return Undef, InvalidArrayPos
 }
-func (ht *ArrayDataHt) Each(handler func(key ArrayKey, value *Zval) error) error {
+func (ht *ArrayDataHt) Each(handler func(key ArrayKey, value Zval) error) error {
 	for i, _ := range ht.data {
-		bkt := &ht.data[i]
-		if !bkt.IsValid() {
+		if !ht.isValid(i) {
 			continue
 		}
-		err := handler(bkt.Key(), bkt.Val())
+
+		p := ht.data[i]
+		err := handler(p.Key, p.Val)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
 }
-func (ht *ArrayDataHt) EachReserve(handler func(key ArrayKey, value *Zval) error) error {
+func (ht *ArrayDataHt) EachReserve(handler func(key ArrayKey, value Zval) error) error {
 	for i := len(ht.data) - 1; i >= 0; i-- {
-		bkt := &ht.data[i]
-		if !bkt.IsValid() {
+		if !ht.isValid(i) {
 			continue
 		}
-		err := handler(bkt.Key(), bkt.Val())
+
+		p := ht.data[i]
+		err := handler(p.Key, p.Val)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
 }
-func (ht *ArrayDataHt) Pos(pos ArrayPosition) (key ArrayKey, value *Zval) {
-	if pos < 0 || pos >= len(ht.data) {
+func (ht *ArrayDataHt) Pos(pos ArrayPosition) (key ArrayKey, value Zval) {
+	if pos < 0 || pos >= len(ht.data) || !ht.isValid(pos) {
 		return
 	}
 
 	bkt := &ht.data[pos]
-	if !bkt.IsValid() {
-		return
-	}
-
-	return bkt.Key(), bkt.Val()
+	return bkt.Key, bkt.Val
 }
 
-func (ht *ArrayDataHt) Add(key ArrayKey, value *Zval) (bool, error) {
+func (ht *ArrayDataHt) Add(key ArrayKey, value Zval) (bool, error) {
 	ht.assertWritable()
 	if _, exists := ht.indexes[key]; exists {
 		return false, nil
@@ -116,10 +106,11 @@ func (ht *ArrayDataHt) Add(key ArrayKey, value *Zval) (bool, error) {
 		return true, nil
 	}
 }
-func (ht *ArrayDataHt) Update(key ArrayKey, value *Zval) error {
+func (ht *ArrayDataHt) Update(key ArrayKey, value Zval) error {
 	ht.assertWritable()
 	if pos, exists := ht.indexes[key]; exists {
-		ht.data[pos].SetVal(value)
+		// todo 此处需要做懒复制(主要针对数组)
+		ht.data[pos].Val = value
 	} else {
 		ht.appendBucket(key, value)
 	}
@@ -134,13 +125,21 @@ func (ht *ArrayDataHt) Delete(key ArrayKey) (bool, error) {
 		return false, nil
 	}
 }
-func (ht *ArrayDataHt) Append(value *Zval) (int, error) {
+func (ht *ArrayDataHt) Append(value Zval) (int, error) {
 	ht.assertWritable()
 	idx := ht.nextFreeElement
 	key := IdxKey(idx)
 	assert(!ht.Exists(key))
 	ht.appendBucket(key, value)
 	return idx, nil
+}
+func (ht *ArrayDataHt) Clean() {
+	ht.assertWritable()
+
+	ht.elementsCount = 0
+	ht.nextFreeElement = 0
+	ht.data = nil
+	ht.indexes = make(map[ArrayKey]int)
 }
 
 func (ht *ArrayDataHt) Sort(comparer ArrayComparer, renumber bool) {
@@ -153,15 +152,13 @@ func (ht *ArrayDataHt) Sort(comparer ArrayComparer, renumber bool) {
 	ht.removeHoles()
 
 	sort.SliceStable(ht.data, func(i, j int) bool {
-		bkt1 := &ht.data[i]
-		bkt2 := &ht.data[j]
-		ret := comparer.Compare(bkt1.Key(), bkt1.Val(), bkt2.Key(), bkt2.Val())
+		ret := comparer.Compare(ht.data[i], ht.data[j])
 		return ret < 0
 	})
 
 	if renumber {
 		for pos, _ := range ht.data {
-			ht.data[pos].SetKey(IdxKey(pos))
+			ht.data[pos].Key = IdxKey(pos)
 		}
 		ht.nextFreeElement = len(ht.data)
 	}
@@ -169,16 +166,20 @@ func (ht *ArrayDataHt) Sort(comparer ArrayComparer, renumber bool) {
 	ht.rehash()
 }
 
+/**
+ * Internal methods
+ */
+
 func (ht *ArrayDataHt) assertWritable() { assert(ht.writable) }
 
-func (ht *ArrayDataHt) appendBucket(key ArrayKey, value *Zval) {
+func (ht *ArrayDataHt) appendBucket(key ArrayKey, value Zval) {
 	// 尝试 resize
 	ht.resizeIfFull()
 
 	// 添加数据，更新元素计数
 	ht.elementsCount++
 	ht.indexes[key] = len(ht.data)
-	ht.data = append(ht.data, makeBucket(key, value))
+	ht.data = append(ht.data, MakeArrayPair(key, value))
 
 	// 更新 ht.nextFreeElement
 	if key.IsIdxKey() {
@@ -206,19 +207,17 @@ func (ht *ArrayDataHt) resizeIfFull() {
 func (ht *ArrayDataHt) deleteBucket(pos int) {
 	ht.assertWritable()
 	assert(0 <= pos && pos < len(ht.data))
-
-	bkt := &ht.data[pos]
-	assert(bkt.IsValid())
+	assert(ht.isValid(pos))
 
 	// 移除数据，更新元素计数
 	ht.elementsCount--
-	delete(ht.indexes, bkt.Key())
-	bkt.MarkInvalid()
+	delete(ht.indexes, ht.data[pos].Key)
+	ht.data[pos].Val = Undef
 
 	// 若删除队尾元素，尝试清除 data 队尾无用数据
 	if pos == len(ht.data)-1 {
 		newDataSize := len(ht.data) - 1
-		for newDataSize > 0 && !ht.data[newDataSize-1].IsValid() {
+		for newDataSize > 0 && !ht.isValid(newDataSize-1) {
 			newDataSize--
 		}
 
@@ -243,9 +242,16 @@ func (ht *ArrayDataHt) rehash() {
 	// 重建 hash
 	for pos, _ := range ht.data {
 		// removeHoles 后，此处不用判断 p.IsValid()
-		key := ht.data[pos].Key()
+		key := ht.data[pos].Key
 		ht.indexes[key] = pos
 	}
+}
+
+func (ht *ArrayDataHt) isValid(pos int) bool {
+	return !ht.data[pos].Val.IsUndef()
+}
+func (ht *ArrayDataHt) markInvalid(pos int) {
+	ht.data[pos].Val = Undef
 }
 
 // 移除 this.data 数据中的 holes
@@ -258,7 +264,7 @@ func (ht *ArrayDataHt) removeHoles() {
 
 	newPos := 0
 	for pos, _ := range ht.data {
-		if !ht.data[pos].IsValid() {
+		if !ht.isValid(pos) {
 			continue
 		}
 		if newPos != pos {

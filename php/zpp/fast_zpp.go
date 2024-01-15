@@ -29,9 +29,9 @@ func (p *FastParser) HasError() bool {
 	return p.err != nil
 }
 
-func (p *FastParser) nextArg() *types.Zval {
+func (p *FastParser) nextArg() types.Zval {
 	if p.err != nil || p.argIndex >= p.ex.NumArgs() {
-		return nil
+		return types.Undef
 	}
 
 	arg := p.ex.Arg(p.argIndex)
@@ -137,23 +137,23 @@ func (p *FastParser) ParseObjectNullable() *types.Object {
 
 func (p *FastParser) ParseZval() *types.Zval {
 	arg := p.nextArg()
-	if arg == nil {
+	if arg.IsUndef() {
 		return nil
 	}
 
-	return arg
+	return &arg
 }
 
 func (p *FastParser) ParseZvalNullable() *types.Zval {
 	arg := p.nextArg()
-	if arg == nil {
+	if arg.IsUndef() {
 		return nil
 	}
 
 	if arg.IsNull() {
 		return nil
 	}
-	return arg
+	return &arg
 }
 
 func (p *FastParser) ParseZvalDeref() *types.Zval {
@@ -161,11 +161,11 @@ func (p *FastParser) ParseZvalDeref() *types.Zval {
 	panic(perr.Todo())
 }
 
-func (p *FastParser) ParseVariadic() []*types.Zval {
-	var args []*types.Zval
+func (p *FastParser) ParseVariadic() []types.Zval {
+	var args []types.Zval
 	for {
 		arg := p.nextArg()
-		if arg == nil {
+		if arg.IsUndef() {
 			break
 		}
 		args = append(args, arg)

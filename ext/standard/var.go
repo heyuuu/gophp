@@ -12,7 +12,7 @@ type stringWriter interface {
 	WriteString(s string)
 }
 
-func PhpArrayElementDump(w stringWriter, zv *types.Zval, key types.ArrayKey, level int) {
+func PhpArrayElementDump(w stringWriter, zv types.Zval, key types.ArrayKey, level int) {
 	if key.IsStrKey() {
 		w.WriteString(fmt.Sprintf(`%*c["`, level+1, ' '))
 		w.WriteString(key.StrKey())
@@ -51,7 +51,7 @@ func PhpArrayElementDump(w stringWriter, zv *types.Zval, key types.ArrayKey, lev
 //		PhpVarDump(w, zv, level+2)
 //	}
 //}
-func PhpVarDump(w stringWriter, struc *types.Zval, level int) {
+func PhpVarDump(w stringWriter, struc types.Zval, level int) {
 	isRef := false
 	if level > 1 {
 		w.WriteString(fmt.Sprintf("%*c", level-1, ' '))
@@ -73,7 +73,7 @@ again:
 	case types.IsDouble:
 		w.WriteString(fmt.Sprintf("%sfloat(%.*G)\n", common, php.Precision, struc.Double()))
 	case types.IsString:
-		w.WriteString(fmt.Sprintf(`%sstring(%zd) "`, common, len(struc.String())))
+		w.WriteString(fmt.Sprintf(`%sstring(%d) "`, common, len(struc.String())))
 		w.WriteString(struc.String())
 		w.WriteString("\"\n")
 	case types.IsArray:
@@ -87,7 +87,7 @@ again:
 		}
 		count := myht.Count()
 		w.WriteString(fmt.Sprintf("%sarray(%d) {\n", common, count))
-		myht.Each(func(key types.ArrayKey, value *types.Zval) {
+		myht.Each(func(key types.ArrayKey, value types.Zval) {
 			PhpArrayElementDump(w, value, key, level)
 		})
 		if level > 1 {
@@ -108,7 +108,7 @@ again:
 		className := obj.ClassName()
 		w.WriteString(fmt.Sprintf("%sobject(%s)#%d (%d) {\n", common, className, obj.Handle(), lang.CondF1(myht != nil, func() int { return myht.Count() }, 0)))
 		if myht != nil {
-			myht.Each(func(key types.ArrayKey, value *types.Zval) {
+			myht.Each(func(key types.ArrayKey, value types.Zval) {
 				//		var prop_info *types.PropertyInfo = nil
 				//		if value.IsIndirect() {
 				//			value = value.Indirect()
@@ -138,7 +138,7 @@ again:
 		w.WriteString(fmt.Sprintf("%sUNKNOWN:0\n", common))
 	}
 }
-func ZifVarDump(ctx zpp.Ctx, vars []*types.Zval) {
+func ZifVarDump(ctx zpp.Ctx, vars []types.Zval) {
 	for _, zv := range vars {
 		PhpVarDump(ctx, zv, 1)
 	}

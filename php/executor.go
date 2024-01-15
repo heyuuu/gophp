@@ -37,18 +37,22 @@ func (e *Executor) Execute(fn *types.Function) (retval Val, ret error) {
 
 func (e *Executor) function(fn *types.Function, args []Val) Val {
 	perr.Assert(fn != nil)
-	if fn.IsInternalFunction() {
-		var retval Val
 
+	// push && pop executeData
+	e.executeData = NewExecuteData(e.ctx, args, e.executeData)
+	defer func() {
+		e.executeData = e.executeData.prev
+	}()
+
+	if fn.IsInternalFunction() {
+		var retval types.Zval
 		if handler, ok := fn.Handler().(ZifHandler); ok {
-			e.initNewExecuteData(args)
-			handler(e.executeData, retval)
+			handler(e.executeData, &retval)
 		} else {
 			perr.Panic(fmt.Sprintf("不支持的内部函数 handler 类型: %T", fn.Handler()))
 		}
 		return retval
 	} else {
-		e.initNewExecuteData(args)
 		return e.userFunction(fn, args)
 	}
 }
