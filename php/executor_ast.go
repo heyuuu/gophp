@@ -138,7 +138,7 @@ func (e *Executor) ifStmt(x *ast.IfStmt) executeResult {
 	for _, elseIfStmt := range x.Elseifs {
 		elseIfCond := e.expr(elseIfStmt.Cond)
 		if ZvalIsTrue(e.ctx, elseIfCond) {
-			return e.stmtList(x.Stmts)
+			return e.stmtList(elseIfStmt.Stmts)
 		}
 	}
 
@@ -289,7 +289,15 @@ func (e *Executor) handleSwitchStmts(stmts []ast.Stmt) (result executeResult, st
 }
 
 func (e *Executor) tryCatchStmt(x *ast.TryCatchStmt) executeResult { panic(perr.Todof("TryCatchStmt")) }
-func (e *Executor) constStmt(x *ast.ConstStmt) executeResult       { panic(perr.Todof("ConstStmt")) }
+func (e *Executor) constStmt(x *ast.ConstStmt) executeResult {
+	// todo 确认必须在 global 域内执行
+	perr.Assert(x.NamespacedName != nil)
+	name := x.NamespacedName.ToCodeString()
+	value := e.expr(x.Value)
+
+	RegisterConstant(e.ctx, 0, name, value)
+	return nil
+}
 
 func (e *Executor) exprList(exprs []ast.Expr) []Val {
 	values := make([]Val, len(exprs))
@@ -590,6 +598,7 @@ func (e *Executor) executeExitExpr(expr *ast.ExitExpr) Val {
 	panic(perr.Todof("executeExitExpr"))
 }
 func (e *Executor) executeConstFetchExpr(expr *ast.ConstFetchExpr) Val {
+	// todo 在命名空间内，使用非限定名时的常量获取逻辑
 	name := expr.Name.ToCodeString()
 	c := GetConstant(e.ctx, name)
 	if c == nil {
@@ -604,6 +613,17 @@ func (e *Executor) executeMagicConstExpr(expr *ast.MagicConstExpr) Val {
 	panic(perr.Todof("executeMagicConstExpr"))
 }
 func (e *Executor) executeInstanceofExpr(expr *ast.InstanceofExpr) Val {
+	//val := e.expr(expr)
+	//var className string
+	//switch c := expr.Class.(type) {
+	//case *ast.Name:
+	//	className = c.ToCodeString()
+	//case ast.Expr:
+	//	className = ZvalGetStrVal(e.ctx, e.expr(c))
+	//default:
+	//	panic(perr.Internalf("预期外的 InstanceofExpr.Class 类型: %+v", c))
+	//}
+
 	panic(perr.Todof("executeInstanceofExpr"))
 }
 func (e *Executor) executeListExpr(expr *ast.ListExpr) Val {
@@ -785,56 +805,5 @@ func (e *Executor) arrayUpdate(arr Val, key types.ArrayKey, value Val) {
 	// todo ArrayAccess
 	default:
 		panic(perr.Todof("unsupported e.arrayUpdate arr type: %s", types.ZvalGetType(arr)))
-	}
-}
-
-func (e *Executor) getVariable(variable ast.Expr) executeVariable {
-	switch v := variable.(type) {
-	case *ast.VariableExpr:
-		var name string
-		switch nameNode := v.Name.(type) {
-		case *ast.Ident:
-			name = nameNode.Name
-		case ast.Expr:
-			nameVal := e.expr(nameNode)
-			name = nameVal.String()
-		default:
-			panic(perr.Todof("unexpected VariableExpr.Name type: %T, %+v", v, v))
-		}
-		return executeVariableFunc{
-			Getter: func() *types.Zval {
-				// todo
-				return types.NewZvalString("$" + name)
-			},
-			Setter: func(v *types.Zval) {
-				// todo
-			},
-		}
-	case *ast.IndexExpr:
-		if v.Dim == nil {
-			return executeVariableFunc{
-				Getter: func() *types.Zval {
-					// todo
-					//variable := e.getVariable(v.Var)
-					return types.NewZvalArray(nil)
-				},
-				Setter: func(v *types.Zval) {
-					// todo
-				},
-			}
-		} else {
-			//dim := e.expr(v.Dim)
-			return executeVariableFunc{
-				Getter: func() *types.Zval {
-					// todo
-					return types.NewZvalArray(nil)
-				},
-				Setter: func(v *types.Zval) {
-					// todo
-				},
-			}
-		}
-	default:
-		panic(perr.Todof("unsupported AssignExpr.Var type: %T, %+v", v, v))
 	}
 }
