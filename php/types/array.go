@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"math"
 )
 
@@ -49,24 +50,19 @@ func (k ArrayKey) ToZval() Zval {
 }
 
 // ArrayPair
+// Array内的键值对。纯数值无引用，直接修改不会影响数组
 type ArrayPair struct {
-	key ArrayKey
-	val Zval
+	Key ArrayKey
+	Val Zval
 }
 
 func MakeArrayPair(key ArrayKey, val Zval) ArrayPair {
-	return ArrayPair{key: key, val: val}
+	return ArrayPair{Key: key, Val: val}
 }
-func (p ArrayPair) IsStrKey() bool { return p.key.IsStrKey() }
-func (p ArrayPair) StrKey() string { return p.key.StrKey() }
-func (p ArrayPair) IdxKey() int    { return p.key.IdxKey() }
-func (p ArrayPair) Key() ArrayKey  { return p.key }
-func (p ArrayPair) Val() Zval      { return p.val }
-func (p ArrayPair) IsValid() bool  { return !p.val.IsUndef() }
-
-func (p ArrayPair) Invalid() ArrayPair             { return ArrayPair{key: p.key, val: Undef} }
-func (p ArrayPair) WithKey(key ArrayKey) ArrayPair { return ArrayPair{key: key, val: p.val} }
-func (p ArrayPair) WithVal(val Zval) ArrayPair     { return ArrayPair{key: p.key, val: val} }
+func (p ArrayPair) IsStrKey() bool { return p.Key.IsStrKey() }
+func (p ArrayPair) StrKey() string { return p.Key.StrKey() }
+func (p ArrayPair) IdxKey() int    { return p.Key.IdxKey() }
+func (p ArrayPair) IsValid() bool  { return !p.Val.IsUndef() }
 
 // ArrayPosition
 type ArrayPosition = int
@@ -79,6 +75,7 @@ type Array struct {
 	data ArrayData
 
 	// flags todo 待合并
+	flags     uint8
 	protected bool
 	writable  bool // todo 完成写锁逻辑
 }
@@ -94,7 +91,10 @@ func NewArrayCap(cap int) *Array {
 	if cap > 0 {
 		data = newArrayDataHt(cap)
 	}
-
+	return &Array{data: data, writable: true}
+}
+func NewSymtableArray(cap int) *Array {
+	data := newSymtableData(cap)
 	return &Array{data: data, writable: true}
 }
 func NewArrayOf(values ...Zval) *Array {
@@ -134,6 +134,21 @@ func NewArrayOfString(values []string) *Array {
 	)
 	return &Array{data: data, writable: true}
 }
+func NewArrayOfPairs(pairs []ArrayPair) *Array {
+	data := newArrayDataHtByData(pairs)
+	return &Array{data: data, writable: true}
+}
+
+func (ht *Array) Clone() *Array {
+	// todo 懒复制逻辑
+	return ht
+}
+
+func (ht *Array) Clean() {
+	ht.assertWritable()
+	ht.data = emptyArrayData
+	ht.protected = false
+}
 
 // 常用读操作
 
@@ -167,8 +182,8 @@ func (ht *Array) Add(key ArrayKey, value Zval) bool {
 	assert(value.IsNotUndef())
 	ht.assertWritable()
 	ret, err := ht.data.Add(key, value)
-	if err == arrayDataUnsupported && ht.makeOperable() {
-		ret, _ = ht.data.Add(key, value)
+	if errors.Is(err, arrayDataUnsupported) {
+		ret, _ = ht.operableData().Add(key, value)
 	}
 	return ret
 }
@@ -176,15 +191,15 @@ func (ht *Array) Update(key ArrayKey, value Zval) {
 	assert(value.IsNotUndef())
 	ht.assertWritable()
 	err := ht.data.Update(key, value)
-	if err == arrayDataUnsupported && ht.makeOperable() {
-		_ = ht.data.Update(key, value)
+	if errors.Is(err, arrayDataUnsupported) {
+		_ = ht.operableData().Update(key, value)
 	}
 }
 func (ht *Array) Delete(key ArrayKey) bool {
 	ht.assertWritable()
 	ret, err := ht.data.Delete(key)
-	if err == arrayDataUnsupported && ht.makeOperable() {
-		ret, _ = ht.data.Delete(key)
+	if errors.Is(err, arrayDataUnsupported) {
+		ret, _ = ht.operableData().Delete(key)
 	}
 	return ret
 }
@@ -192,19 +207,19 @@ func (ht *Array) Append(value Zval) int {
 	assert(value.IsNotUndef())
 	ht.assertWritable()
 	ret, err := ht.data.Append(value)
-	if err == arrayDataUnsupported && ht.makeOperable() {
-		ret, _ = ht.data.Append(value)
+	if errors.Is(err, arrayDataUnsupported) {
+		ret, _ = ht.operableData().Append(value)
 	}
 	return ret
 }
 
 func (ht *Array) assertWritable() { assert(ht.writable) }
 
-// 使 ArrayData 支持所有操作
-func (ht *Array) makeOperable() bool {
+// 返回支持所有操作的 ArrayData (隐式转换为 ht.data 为 *ArrayDataHt)
+func (ht *Array) operableData() *ArrayDataHt {
 	// 已经是 ArrayDataHt，就无法再转化了
-	if _, ok := ht.data.(*ArrayDataHt); ok {
-		return false
+	if d, ok := ht.data.(*ArrayDataHt); ok {
+		return d
 	}
 
 	// 构建 ArrayDataHt 类型的 data 并拷贝已有数据
@@ -215,7 +230,7 @@ func (ht *Array) makeOperable() bool {
 		return nil
 	})
 	ht.data = newData
-	return true
+	return newData
 }
 
 // Methods use idx key
@@ -242,26 +257,20 @@ func (ht *Array) UnprotectRecursive() { ht.protected = false }
 
 // sort
 type ArrayComparer interface {
-	Compare(k1 ArrayKey, v1 Zval, k2 ArrayKey, v2 Zval) int
+	Compare(p1, p2 ArrayPair) int
 }
 
 type ArrayPairComparer func(p1, p2 ArrayPair) int
 
-func (c ArrayPairComparer) Compare(k1 ArrayKey, v1 Zval, k2 ArrayKey, v2 Zval) int {
-	return c(MakeArrayPair(k1, v1), MakeArrayPair(k2, v2))
-}
+func (c ArrayPairComparer) Compare(p1, p2 ArrayPair) int { return c(p1, p2) }
 
 type ArrayKeyComparer func(k1, k2 ArrayKey) int
 
-func (c ArrayKeyComparer) Compare(k1 ArrayKey, v1 Zval, k2 ArrayKey, v2 Zval) int {
-	return c(k1, k2)
-}
+func (c ArrayKeyComparer) Compare(p1, p2 ArrayPair) int { return c(p1.Key, p2.Key) }
 
 type ArrayValueComparer func(v1, v2 Zval) int
 
-func (c ArrayValueComparer) Compare(k1 ArrayKey, v1 Zval, k2 ArrayKey, v2 Zval) int {
-	return c(v1, v2)
-}
+func (c ArrayValueComparer) Compare(p1, p2 ArrayPair) int { return c(p1.Val, p2.Val) }
 
 func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
 	ht.assertWritable()
@@ -272,11 +281,29 @@ func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
 
 	// 将 ht.data 转成 *ArrayDataHt 后排序
 	// todo 细分可优化情况单独处理 (例如，预判是否 IsSorted 以跳过排序、对 List 类型不保留key的排序可直接操作等 )
-	ht.makeOperable()
-	ht.data.(*ArrayDataHt).Sort(comparer, renumber)
+	ht.operableData().Sort(comparer, renumber)
 }
 
-func (ht *Array) Clone() *Array {
-	// todo 懒复制逻辑
-	return ht
+// fast methods
+
+func (ht *Array) Keys() []ArrayKey {
+	var keys = make([]ArrayKey, 0, ht.Len())
+	ht.Each(func(key ArrayKey, value Zval) {
+		keys = append(keys, key)
+	})
+	return keys
+}
+func (ht *Array) Values() []Zval {
+	var values = make([]Zval, 0, ht.Len())
+	ht.Each(func(key ArrayKey, value Zval) {
+		values = append(values, value)
+	})
+	return values
+}
+func (ht *Array) Pairs() []ArrayPair {
+	var pairs = make([]ArrayPair, 0, ht.Len())
+	ht.Each(func(key ArrayKey, value Zval) {
+		pairs = append(pairs, MakeArrayPair(key, value))
+	})
+	return pairs
 }

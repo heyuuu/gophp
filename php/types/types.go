@@ -27,6 +27,7 @@ const (
 	IsNumber   ZvalType = 20 // _IS_NUMBER
 )
 
+// Zval value
 var (
 	Undef = Zval{nil}
 	Null  = Zval{IsNull}
