@@ -7,7 +7,7 @@ import (
 type ExecuteData interface {
 	CalleeName() string
 	NumArgs() int
-	Arg(pos int) *types.Zval
+	Arg(pos int) types.Zval
 	IsArgUseStrictTypes() bool
 }
 
@@ -40,7 +40,7 @@ type IParser interface {
 	ParseZval() *types.Zval
 	ParseZvalNullable() *types.Zval
 	ParseZvalDeref() *types.Zval
-	ParseVariadic() []*types.Zval
+	ParseVariadic() []types.Zval
 
 	// ref type
 	//ParseRefZval() *types.Zval

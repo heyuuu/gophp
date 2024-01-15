@@ -1,7 +1,7 @@
 package types
 
 // zval 类型展示名
-func ZvalGetType(v *Zval) string {
+func ZvalGetType(v Zval) string {
 	switch v.Type() {
 	case IsNull:
 		return "NULL"
@@ -24,7 +24,7 @@ func ZvalGetType(v *Zval) string {
 	}
 }
 
-func ZendZvalTypeName(arg *Zval) string {
+func ZendZvalTypeName(arg Zval) string {
 	return ZendGetTypeByConst(arg.DeRef().Type())
 }
 

@@ -27,7 +27,7 @@ func RegisterCodeClasses(ctx *Context, moduleNumber int) {
 }
 
 func RegisterStandardConstants(ctx *Context, moduleNumber int) {
-	RegisterConstantEx(ctx, moduleNumber, "TRUE", True(), types.ConstPersistent|types.ConstCtSubst)
-	RegisterConstantEx(ctx, moduleNumber, "FALSE", False(), types.ConstPersistent|types.ConstCtSubst)
-	RegisterConstantEx(ctx, moduleNumber, "NULL", False(), types.ConstPersistent|types.ConstCtSubst)
+	RegisterConstantEx(ctx, moduleNumber, "TRUE", types.True, types.ConstPersistent|types.ConstCtSubst)
+	RegisterConstantEx(ctx, moduleNumber, "FALSE", types.False, types.ConstPersistent|types.ConstCtSubst)
+	RegisterConstantEx(ctx, moduleNumber, "NULL", types.Null, types.ConstPersistent|types.ConstCtSubst)
 }

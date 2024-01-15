@@ -27,13 +27,13 @@ type Constant struct {
 	flags        ConstFlag
 }
 
-func NewConstant(name string, value *Zval, flags ConstFlag, moduleNumber int) *Constant {
-	c := &Constant{name: name, value: *value, moduleNumber: moduleNumber, flags: flags}
+func NewConstant(name string, value Zval, flags ConstFlag, moduleNumber int) *Constant {
+	c := &Constant{name: name, value: value, moduleNumber: moduleNumber, flags: flags}
 	return c
 }
 
 func (c *Constant) Name() string      { return c.name }
-func (c *Constant) Value() *Zval      { return &c.value }
+func (c *Constant) Value() Zval       { return c.value }
 func (c *Constant) ModuleNumber() int { return c.moduleNumber }
 
 func (c *Constant) IsCaseSensitive() bool { return c.flags&ConstCs != 0 }

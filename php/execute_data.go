@@ -7,12 +7,12 @@ import (
 
 type ExecuteData struct {
 	ctx     *Context
-	args    []*types.Zval
+	args    []types.Zval
 	symbols ISymtable
 	prev    *ExecuteData
 }
 
-func NewExecuteData(ctx *Context, args []*types.Zval, prev *ExecuteData) *ExecuteData {
+func NewExecuteData(ctx *Context, args []types.Zval, prev *ExecuteData) *ExecuteData {
 	return &ExecuteData{
 		ctx:     ctx,
 		args:    args,
@@ -34,11 +34,11 @@ func (ex *ExecuteData) NumArgs() int {
 	return len(ex.args)
 }
 
-func (ex *ExecuteData) Arg(pos int) *types.Zval {
+func (ex *ExecuteData) Arg(pos int) types.Zval {
 	if pos >= 0 && pos < len(ex.args) {
 		return ex.args[pos]
 	}
-	return nil
+	return types.Undef
 }
 
 func (ex *ExecuteData) IsArgUseStrictTypes() bool {

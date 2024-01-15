@@ -3,6 +3,7 @@ package php
 import (
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/kits/mathkit"
+	"github.com/heyuuu/gophp/php/types"
 	"log"
 	"math"
 	"strconv"
@@ -24,7 +25,7 @@ func ParseNumber(str string) Val {
 func ParseNumberEx(str string) (Val, int) {
 	zv, overflow, matchLen := parseNumberPrefix(str)
 	if matchLen != len(str) {
-		return nil, 0
+		return types.Undef, 0
 	}
 	return zv, overflow
 }

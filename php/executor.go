@@ -45,10 +45,9 @@ func (e *Executor) function(fn *types.Function, args []Val) Val {
 	}()
 
 	if fn.IsInternalFunction() {
-		var retval Val
-
+		var retval types.Zval
 		if handler, ok := fn.Handler().(ZifHandler); ok {
-			handler(e.executeData, retval)
+			handler(e.executeData, &retval)
 		} else {
 			perr.Panic(fmt.Sprintf("不支持的内部函数 handler 类型: %T", fn.Handler()))
 		}

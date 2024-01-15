@@ -39,9 +39,9 @@ func (o *Object) CanCast() bool {
 	return false
 }
 
-func (o *Object) Cast(typ ZvalType) (*Zval, bool) {
+func (o *Object) Cast(typ ZvalType) (Zval, bool) {
 	// todo
-	return nil, false
+	return Undef, false
 }
 
 func (o *Object) CanCompare() bool {

@@ -27,11 +27,32 @@ const (
 	IsNumber   ZvalType = 20 // _IS_NUMBER
 )
 
+var (
+	Undef = Zval{nil}
+	Null  = Zval{IsNull}
+	False = Zval{false}
+	True  = Zval{true}
+)
+
+func ZvalUndef() Zval                 { return Zval{nil} }
+func ZvalNull() Zval                  { return Zval{IsNull} }
+func ZvalFalse() Zval                 { return Zval{false} }
+func ZvalTrue() Zval                  { return Zval{true} }
+func ZvalBool(b bool) Zval            { return Zval{b} }
+func ZvalLong(l int) Zval             { return Zval{l} }
+func ZvalDouble(d float64) Zval       { return Zval{d} }
+func ZvalString(s string) Zval        { return Zval{s} }
+func ZvalArray(arr *Array) Zval       { perr.Assert(arr != nil); return Zval{arr} }
+func ZvalObject(obj *Object) Zval     { perr.Assert(obj != nil); return Zval{obj} }
+func ZvalResource(res *Resource) Zval { perr.Assert(res != nil); return Zval{res} }
+
+func InitZvalArray() Zval { return Zval{NewArray()} }
+
 /**
  * Zval
  *
  * tips:
- * - 零值为合法的 Undef 类型，无需 SetUndef() 初始化
+ * - 零值为合法的 Undef 类型
  */
 type Zval struct {
 	v any
@@ -75,7 +96,7 @@ func (zv *Zval) SetObject(obj *Object)     { zv.v = obj }
 func (zv *Zval) SetResource(res *Resource) { zv.v = res }
 func (zv *Zval) SetBy(val *Zval) {
 	if val == nil {
-		zv.SetUndef()
+		*zv = Undef
 	}
 	zv.v = val.v
 	// 除数组外，基础类型都复制了值，引用类型都复制了指针；仅数组需要做写时复制
@@ -91,7 +112,7 @@ func (zv *Zval) Clone() *Zval {
 }
 
 // Zval getter
-func (zv *Zval) Type() ZvalType {
+func (zv Zval) Type() ZvalType {
 	switch v := zv.v.(type) {
 	case nil:
 		return IsUndef
@@ -122,45 +143,42 @@ func (zv *Zval) Type() ZvalType {
 	}
 }
 
-func (zv *Zval) IsType(typ ZvalType) bool { return zv.Type() == typ }
-func (zv *Zval) IsUndef() bool            { return zv.v == nil }
-func (zv *Zval) IsNotUndef() bool         { return zv.v != nil }
-func (zv *Zval) IsNull() bool             { return zv.v == IsNull }
-func (zv *Zval) IsFalse() bool            { return zv.v == false }
-func (zv *Zval) IsTrue() bool             { return zv.v == true }
-func (zv *Zval) IsBool() bool             { _, ok := zv.v.(bool); return ok }
-func (zv *Zval) IsLong() bool             { _, ok := zv.v.(int); return ok }
-func (zv *Zval) IsDouble() bool           { _, ok := zv.v.(float64); return ok }
-func (zv *Zval) IsString() bool           { _, ok := zv.v.(string); return ok }
-func (zv *Zval) IsArray() bool            { _, ok := zv.v.(*Array); return ok }
-func (zv *Zval) IsObject() bool           { _, ok := zv.v.(*Object); return ok }
-func (zv *Zval) IsResource() bool         { _, ok := zv.v.(*Resource); return ok }
-func (zv *Zval) IsRef() bool              { _, ok := zv.v.(*Ref); return ok }
+func (zv Zval) IsType(typ ZvalType) bool { return zv.Type() == typ }
+func (zv Zval) IsUndef() bool            { return zv.v == nil }
+func (zv Zval) IsNotUndef() bool         { return zv.v != nil }
+func (zv Zval) IsNull() bool             { return zv.v == IsNull }
+func (zv Zval) IsFalse() bool            { return zv.v == false }
+func (zv Zval) IsTrue() bool             { return zv.v == true }
+func (zv Zval) IsBool() bool             { _, ok := zv.v.(bool); return ok }
+func (zv Zval) IsLong() bool             { _, ok := zv.v.(int); return ok }
+func (zv Zval) IsDouble() bool           { _, ok := zv.v.(float64); return ok }
+func (zv Zval) IsString() bool           { _, ok := zv.v.(string); return ok }
+func (zv Zval) IsArray() bool            { _, ok := zv.v.(*Array); return ok }
+func (zv Zval) IsObject() bool           { _, ok := zv.v.(*Object); return ok }
+func (zv Zval) IsResource() bool         { _, ok := zv.v.(*Resource); return ok }
+func (zv Zval) IsRef() bool              { _, ok := zv.v.(*Ref); return ok }
 
 // 返回是否为 undef、null、false，用于快速类型判断
-func (zv *Zval) IsSignFalse() bool { return zv.Type() <= IsFalse }
+func (zv Zval) IsSignFalse() bool { return zv.Type() <= IsFalse }
 
 // 返回是否为 undef、null、false 或 true，用于快速类型判断
-func (zv *Zval) IsSignType() bool { return zv.Type() <= IsTrue }
+func (zv Zval) IsSignType() bool { return zv.Type() <= IsTrue }
 
-func zvalValue[T any](zv *Zval) T {
+func zvalValue[T any](zv Zval) T {
 	if v, ok := zv.v.(T); ok {
 		return v
 	}
 	panic("Get Zval value by a mismatched type")
 }
-func (zv *Zval) Bool() bool          { return zvalValue[bool](zv) }
-func (zv *Zval) Long() int           { return zvalValue[int](zv) }
-func (zv *Zval) Double() float64     { return zvalValue[float64](zv) }
-func (zv *Zval) String() string      { return zvalValue[string](zv) }
-func (zv *Zval) Array() *Array       { return zvalValue[*Array](zv) }
-func (zv *Zval) Object() *Object     { return zvalValue[*Object](zv) }
-func (zv *Zval) Resource() *Resource { return zvalValue[*Resource](zv) }
-func (zv *Zval) Ref() *Ref           { return zvalValue[*Ref](zv) }
-func (zv *Zval) DeRef() *Zval {
-	if zv == nil {
-		return nil
-	}
+func (zv Zval) Bool() bool          { return zvalValue[bool](zv) }
+func (zv Zval) Long() int           { return zvalValue[int](zv) }
+func (zv Zval) Double() float64     { return zvalValue[float64](zv) }
+func (zv Zval) String() string      { return zvalValue[string](zv) }
+func (zv Zval) Array() *Array       { return zvalValue[*Array](zv) }
+func (zv Zval) Object() *Object     { return zvalValue[*Object](zv) }
+func (zv Zval) Resource() *Resource { return zvalValue[*Resource](zv) }
+func (zv Zval) Ref() *Ref           { return zvalValue[*Ref](zv) }
+func (zv Zval) DeRef() Zval {
 	if ref, ok := zv.v.(*Ref); ok {
 		return ref.Val()
 	}
@@ -168,9 +186,9 @@ func (zv *Zval) DeRef() *Zval {
 }
 
 // fast property
-func (zv *Zval) ResourceHandle() int { return zv.Resource().Handle() }
-func (zv *Zval) ResourceType() int   { return zv.Resource().Type() }
-func (zv *Zval) RefVal() *Zval       { return zv.Ref().Val() }
+func (zv Zval) ResourceHandle() int { return zv.Resource().Handle() }
+func (zv Zval) ResourceType() int   { return zv.Resource().Type() }
+func (zv Zval) RefVal() Zval        { return zv.Ref().Val() }
 
 // Resource
 type Resource struct {
@@ -194,4 +212,4 @@ type Reference struct {
 	// todo
 }
 
-func (ref *Reference) Val() *Zval { return &ref.val }
+func (ref *Reference) Val() Zval { return ref.val }
