@@ -8,18 +8,12 @@ import (
 	"strings"
 )
 
-func parseTestCase(file string, srcDir string) (*TestCase, error) {
+func parseTestCase(name string, file string) (*TestCase, error) {
 	sections, err := parseTestCaseSections(file)
 	if err != nil {
 		return nil, err
 	}
-
-	shortFileName := file
-	if strings.HasPrefix(file, srcDir+"/") {
-		shortFileName = file[len(srcDir)+1:]
-	}
-
-	return NewTestCase(file, shortFileName, sections), nil
+	return NewTestCase(name, file, sections), nil
 }
 
 var allowSections = map[string]bool{
