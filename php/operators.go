@@ -968,7 +968,7 @@ func OpCoalesce(ctx *Context, op1 Val, op2 func() Val) Val {
 func OpBooleanAnd(ctx *Context, op1 Val, op2 func() Val) Val {
 	op1Val := ZvalIsTrue(ctx, op1)
 	if !op1Val {
-		return False()
+		return types.False
 	}
 
 	op2Val := ZvalIsTrue(ctx, op2())
@@ -979,7 +979,7 @@ func OpBooleanAnd(ctx *Context, op1 Val, op2 func() Val) Val {
 func OpBooleanOr(ctx *Context, op1 Val, op2 func() Val) Val {
 	op1Val := ZvalIsTrue(ctx, op1)
 	if op1Val {
-		return True()
+		return types.True
 	}
 
 	op2Val := ZvalIsTrue(ctx, op2())

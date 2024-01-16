@@ -633,12 +633,26 @@ func (e *Executor) indexExpr(expr *ast.IndexExpr) types.Zval {
 func (e *Executor) castExpr(expr *ast.CastExpr) types.Zval {
 	switch expr.Kind {
 	case ast.CastArray:
+		value := e.expr(expr.Expr)
+		return Array(ZvalGetArray(e.ctx, value))
 	case ast.CastBool:
+		value := e.expr(expr.Expr)
+		return Bool(ZvalIsTrue(e.ctx, value))
 	case ast.CastDouble:
+		value := e.expr(expr.Expr)
+		return Double(ZvalGetDouble(e.ctx, value))
 	case ast.CastInt:
+		value := e.expr(expr.Expr)
+		return Long(ZvalGetLong(e.ctx, value))
 	case ast.CastObject:
+		value := e.expr(expr.Expr)
+		return types.ZvalObject(ZvalGetObject(e.ctx, value))
 	case ast.CastString:
+		value := e.expr(expr.Expr)
+		return String(ZvalGetStrVal(e.ctx, value))
 	case ast.CastUnset:
+		// notice: deprecated in php >=7.2, trigger fatal error in php >= 8.0
+		return types.Null
 	}
 	panic(perr.Todof("castExpr: %v", expr))
 }

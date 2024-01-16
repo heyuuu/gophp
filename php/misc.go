@@ -8,14 +8,11 @@ import (
 // fast type and functions
 type Val = types.Zval
 
-var False = types.ZvalFalse
-var True = types.ZvalTrue
 var Bool = types.ZvalBool
 var Long = types.ZvalLong
 var Double = types.ZvalDouble
 var String = types.ZvalString
 var Array = types.ZvalArray
-var Resource = types.ZvalResource
 
 type ZvalTypePair uint
 
