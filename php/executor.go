@@ -175,12 +175,8 @@ func (e *Executor) stmt(stmt ast.Stmt) execResult {
 		return e.inlineHTMLStmt(x)
 	case *ast.StaticStmt:
 		return e.staticStmt(x)
-	case *ast.StaticVarStmt:
-		return e.staticVarStmt(x)
 	case *ast.UnsetStmt:
 		return e.unsetStmt(x)
-	case *ast.UseStmt:
-		return e.useStmt(x)
 	case *ast.DeclareStmt:
 		return e.declareStmt(x)
 	case *ast.DeclareDeclareStmt:
@@ -395,7 +391,7 @@ func (e *Executor) constStmt(x *ast.ConstStmt) execResult {
 
 func (e *Executor) echoStmt(x *ast.EchoStmt) execResult {
 	for _, expr := range x.Exprs {
-		vmEcho(e.ctx, e.expr(expr))
+		Print(e.ctx, e.expr(expr))
 	}
 	return nil
 }
@@ -410,19 +406,14 @@ func (e *Executor) inlineHTMLStmt(x *ast.InlineHTMLStmt) execResult {
 }
 
 func (e *Executor) staticStmt(x *ast.StaticStmt) execResult {
+	for _, staticVarStmt := range x.Vars {
+		_ = staticVarStmt
+	}
 	panic(perr.Todof("e.staticStmt"))
-}
-
-func (e *Executor) staticVarStmt(x *ast.StaticVarStmt) execResult {
-	panic(perr.Todof("e.staticVarStmt"))
 }
 
 func (e *Executor) unsetStmt(x *ast.UnsetStmt) execResult {
 	panic(perr.Todof("e.unsetStmt"))
-}
-
-func (e *Executor) useStmt(x *ast.UseStmt) execResult {
-	panic(perr.Todof("e.useStmt"))
 }
 
 func (e *Executor) declareStmt(x *ast.DeclareStmt) execResult {
@@ -845,7 +836,8 @@ func (e *Executor) listExpr(expr *ast.ListExpr) types.Zval {
 }
 
 func (e *Executor) printExpr(expr *ast.PrintExpr) types.Zval {
-	panic(perr.Todof("e.printExpr"))
+	Print(e.ctx, e.expr(expr.Expr))
+	return Long(1)
 }
 
 func (e *Executor) propertyFetchExpr(expr *ast.PropertyFetchExpr) types.Zval {
@@ -861,7 +853,16 @@ func (e *Executor) shellExecExpr(expr *ast.ShellExecExpr) types.Zval {
 }
 
 func (e *Executor) ternaryExpr(expr *ast.TernaryExpr) types.Zval {
-	panic(perr.Todof("e.ternaryExpr"))
+	cond := e.expr(expr.Cond)
+	if ZvalIsTrue(e.ctx, cond) {
+		if expr.If == nil {
+			return cond
+		} else {
+			return e.expr(expr.If)
+		}
+	} else {
+		return e.expr(expr.Else)
+	}
 }
 
 func (e *Executor) throwExpr(expr *ast.ThrowExpr) types.Zval {
