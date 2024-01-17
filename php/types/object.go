@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/heyuuu/gophp/php/assert"
 	"unsafe"
 )
 
@@ -13,7 +14,7 @@ type Object struct {
 }
 
 func NewObject(ce *Class) *Object {
-	assert(ce != nil)
+	assert.Assert(ce != nil)
 	return initObject(ce)
 }
 

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/shim/maps"
 	"github.com/heyuuu/gophp/shim/slices"
 )
@@ -149,12 +150,12 @@ func (ht *SymtableData) Append(value Zval) (int, error) {
 	ht.assertWritable()
 	idx := ht.nextFreeElement
 	key := IdxKey(idx)
-	assert(!ht.Exists(key))
+	assert.Assert(!ht.Exists(key))
 	ht.appendBucket(key, value)
 	return idx, nil
 }
 
-func (ht *SymtableData) assertWritable() { assert(ht.writable) }
+func (ht *SymtableData) assertWritable() { assert.Assert(ht.writable) }
 
 func (ht *SymtableData) appendBucket(key ArrayKey, value Zval) {
 	// 添加数据，更新元素计数
@@ -177,8 +178,8 @@ func (ht *SymtableData) appendBucket(key ArrayKey, value Zval) {
 
 func (ht *SymtableData) deleteBucket(pos int) {
 	ht.assertWritable()
-	assert(0 <= pos && pos < len(ht.data))
-	assert(ht.isValid(pos))
+	assert.Assert(0 <= pos && pos < len(ht.data))
+	assert.Assert(ht.isValid(pos))
 
 	// 移除数据，更新元素计数
 	ht.elementsCount--

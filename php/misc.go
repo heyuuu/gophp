@@ -1,7 +1,7 @@
 package php
 
 import (
-	"github.com/heyuuu/gophp/php/perr"
+	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -76,8 +76,8 @@ const (
 )
 
 // helpers
-func Assert(cond bool)                   { perr.Assert(cond) }
-func AssertEx(cond bool, message string) { perr.AssertEx(cond, message) }
+func Assert(cond bool)                   { assert.Assert(cond) }
+func AssertEx(cond bool, message string) { assert.AssertEx(cond, message) }
 
 // internal functions
 func sign(i int) int {

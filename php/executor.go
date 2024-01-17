@@ -3,6 +3,7 @@ package php
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
+	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
@@ -39,7 +40,7 @@ func (e *Executor) Execute(fn *types.Function) (retVal types.Zval, ret error) {
 }
 
 func (e *Executor) function(fn *types.Function, args []types.Zval) types.Zval {
-	perr.Assert(fn != nil)
+	assert.Assert(fn != nil)
 
 	// push && pop executeData
 	e.executeData = NewExecuteData(e.ctx, args, e.executeData)
@@ -381,7 +382,7 @@ func (e *Executor) tryCatchStmt(x *ast.TryCatchStmt) execResult {
 
 func (e *Executor) constStmt(x *ast.ConstStmt) execResult {
 	// todo 确认必须在 global 域内执行
-	perr.Assert(x.NamespacedName != nil)
+	assert.Assert(x.NamespacedName != nil)
 	name := x.NamespacedName.ToCodeString()
 	value := e.expr(x.Value)
 

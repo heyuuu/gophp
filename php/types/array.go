@@ -2,6 +2,7 @@ package types
 
 import (
 	"errors"
+	"github.com/heyuuu/gophp/php/assert"
 	"math"
 )
 
@@ -179,7 +180,7 @@ func (ht *Array) EachReserve(handler func(key ArrayKey, value Zval)) {
 // 常用写操作
 
 func (ht *Array) Add(key ArrayKey, value Zval) bool {
-	assert(value.IsNotUndef())
+	assert.Assert(value.IsNotUndef())
 	ht.assertWritable()
 	ret, err := ht.data.Add(key, value)
 	if errors.Is(err, arrayDataUnsupported) {
@@ -188,7 +189,7 @@ func (ht *Array) Add(key ArrayKey, value Zval) bool {
 	return ret
 }
 func (ht *Array) Update(key ArrayKey, value Zval) {
-	assert(value.IsNotUndef())
+	assert.Assert(value.IsNotUndef())
 	ht.assertWritable()
 	err := ht.data.Update(key, value)
 	if errors.Is(err, arrayDataUnsupported) {
@@ -204,7 +205,7 @@ func (ht *Array) Delete(key ArrayKey) bool {
 	return ret
 }
 func (ht *Array) Append(value Zval) int {
-	assert(value.IsNotUndef())
+	assert.Assert(value.IsNotUndef())
 	ht.assertWritable()
 	ret, err := ht.data.Append(value)
 	if errors.Is(err, arrayDataUnsupported) {
@@ -213,7 +214,7 @@ func (ht *Array) Append(value Zval) int {
 	return ret
 }
 
-func (ht *Array) assertWritable() { assert(ht.writable) }
+func (ht *Array) assertWritable() { assert.Assert(ht.writable) }
 
 // 返回支持所有操作的 ArrayData (隐式转换为 ht.data 为 *ArrayDataHt)
 func (ht *Array) operableData() *ArrayDataHt {

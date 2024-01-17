@@ -3,6 +3,7 @@ package php
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/kits/mathkit"
+	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
@@ -398,7 +399,7 @@ func ZvalCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
 			} else if v2.IsArray() {
 				return -1, true
 			} else {
-				perr.Assert(false)
+				assert.Assert(false)
 				opThrowError(ctx, nil, "Unsupported operand types")
 				return 0, false
 			}

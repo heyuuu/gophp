@@ -1,6 +1,9 @@
 package types
 
-import "github.com/heyuuu/gophp/php/perr"
+import (
+	assert2 "github.com/heyuuu/gophp/php/assert"
+	"github.com/heyuuu/gophp/php/perr"
+)
 
 // ZvalType
 type ZvalType uint8
@@ -43,9 +46,9 @@ func ZvalBool(b bool) Zval            { return Zval{b} }
 func ZvalLong(l int) Zval             { return Zval{l} }
 func ZvalDouble(d float64) Zval       { return Zval{d} }
 func ZvalString(s string) Zval        { return Zval{s} }
-func ZvalArray(arr *Array) Zval       { perr.Assert(arr != nil); return Zval{arr} }
-func ZvalObject(obj *Object) Zval     { perr.Assert(obj != nil); return Zval{obj} }
-func ZvalResource(res *Resource) Zval { perr.Assert(res != nil); return Zval{res} }
+func ZvalArray(arr *Array) Zval       { assert2.Assert(arr != nil); return Zval{arr} }
+func ZvalObject(obj *Object) Zval     { assert2.Assert(obj != nil); return Zval{obj} }
+func ZvalResource(res *Resource) Zval { assert2.Assert(res != nil); return Zval{res} }
 
 func InitZvalArray() Zval { return Zval{NewArray()} }
 
