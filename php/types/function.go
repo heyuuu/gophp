@@ -12,6 +12,8 @@ const (
 	TypeEvalCode         FunctionType = 4
 )
 
+
+// Function
 type Function struct {
 	typ          FunctionType
 	functionName string

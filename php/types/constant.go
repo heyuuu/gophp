@@ -21,22 +21,21 @@ const (
 
 // Constant
 type Constant struct {
-	value        Zval
 	name         string
-	moduleNumber int
+	value        Zval
 	flags        ConstFlag
+	moduleNumber int
 }
 
 func NewConstant(name string, value Zval, flags ConstFlag, moduleNumber int) *Constant {
-	c := &Constant{name: name, value: value, moduleNumber: moduleNumber, flags: flags}
-	return c
+	return &Constant{name: name, value: value, flags: flags, moduleNumber: moduleNumber}
 }
 
-func (c *Constant) Name() string      { return c.name }
-func (c *Constant) Value() Zval       { return c.value }
-func (c *Constant) ModuleNumber() int { return c.moduleNumber }
+func (c Constant) Name() string      { return c.name }
+func (c Constant) Value() Zval       { return c.value }
+func (c Constant) ModuleNumber() int { return c.moduleNumber }
 
-func (c *Constant) IsCaseSensitive() bool { return c.flags&ConstCs != 0 }
-func (c *Constant) IsPersistent() bool    { return c.flags&ConstPersistent != 0 }
-func (c *Constant) IsCtSubst() bool       { return c.flags&ConstCtSubst != 0 }
-func (c *Constant) IsNoFileCache() bool   { return c.flags&ConstNoFileCache != 0 }
+func (c Constant) IsCaseSensitive() bool { return c.flags&ConstCs != 0 }
+func (c Constant) IsPersistent() bool    { return c.flags&ConstPersistent != 0 }
+func (c Constant) IsCtSubst() bool       { return c.flags&ConstCtSubst != 0 }
+func (c Constant) IsNoFileCache() bool   { return c.flags&ConstNoFileCache != 0 }
