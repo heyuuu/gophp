@@ -12,7 +12,6 @@ const (
 	TypeEvalCode         FunctionType = 4
 )
 
-
 // Function
 type Function struct {
 	typ          FunctionType
@@ -47,3 +46,8 @@ func (f *Function) Name() string        { return f.functionName }
 func (f *Function) ArgInfos() []ArgInfo { return f.argInfos }
 
 func (f *Function) Handler() any { return f.handler }
+
+func (f *Function) IsStrictTypes() bool {
+	// todo
+	return false
+}

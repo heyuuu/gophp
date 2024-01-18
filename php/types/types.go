@@ -114,6 +114,8 @@ func (zv *Zval) Clone() *Zval {
 	tmp.SetBy(zv)
 	return &tmp
 }
+func (zv *Zval) Val() Zval     { return *zv }
+func (zv *Zval) SetVal(v Zval) { *zv = v }
 
 // Zval getter
 func (zv Zval) Type() ZvalType {
@@ -217,3 +219,11 @@ type Reference struct {
 }
 
 func (ref *Reference) Val() Zval { return ref.val }
+
+// RefZval
+type RefZval interface {
+	Val() Zval
+	SetVal(v Zval)
+}
+
+var _ RefZval = (*Zval)(nil)

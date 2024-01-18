@@ -4,15 +4,10 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 )
 
-type ExecuteData interface {
-	CalleeName() string
-	NumArgs() int
-	Arg(pos int) types.Zval
-	IsArgUseStrictTypes() bool
-}
-
 type IParser interface {
 	HasError() bool
+
+	StartOptional()
 
 	// exactly type
 	ParseBool() bool
@@ -30,18 +25,24 @@ type IParser interface {
 	ParseArray() *types.Array
 	ParseArrayNullable() *types.Array
 	ParseArrayOrObjectHt() *types.Array
-	ParseArrayOrObject() *types.Zval
-	ParseClass(baseCe *types.Class) *types.Class
+	ParseArrayOrObjectZval() types.Zval
+	//ParseClass(baseCe *types.Class) *types.Class
 	ParseObject() *types.Object
 	ParseObjectNullable() *types.Object
-	//ParseResource() *types.Resource
+	ParseResource() types.Zval
+	ParseResourceNullable() *types.Zval
+	ParseCallable() *types.UserCallable
 
 	// zval
-	ParseZval() *types.Zval
+	ParseZval() types.Zval
+	ParseZvalPtr() *types.Zval
 	ParseZvalNullable() *types.Zval
-	ParseZvalDeref() *types.Zval
-	ParseVariadic() []types.Zval
+	ParseVariadic(postVarargs uint) []types.Zval
+	ParseVariadicPtr(postVarargs uint) []*types.Zval
 
 	// ref type
-	//ParseRefZval() *types.Zval
+	ParseRefZval() types.RefZval
+	ParseRefArrayOrObject() types.RefZval
+	ParseRefArray() *types.Array
+	ParseRefVariadic(postVarargs uint) []types.RefZval
 }
