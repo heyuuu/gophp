@@ -3,7 +3,6 @@ package standard
 import (
 	"encoding/hex"
 	"fmt"
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/kits/strkit"
 	"github.com/heyuuu/gophp/php"
@@ -63,51 +62,34 @@ func RegisterStringConstants(ctx *php.Context, moduleNumber int) {
 	php.RegisterConstant(ctx, moduleNumber, "LC_ALL", php.Long(LC_ALL))
 }
 
-func ZifParseStr(ctx *php.Context, encodedString string, _ zpp.Opt, result zpp.RefZval) {
-	if result == nil {
-		if !php.ForbidDynamicCall(ctx, "parse_str() with a single argument") {
-			return
-		}
-		php.ErrorDocRef(ctx, "", perr.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
-		var symbolTable = php.ZendRebuildSymbolTable(ctx)
-		var tmp = php.Array(symbolTable.Ht())
-		php.PhpDefaultTreatStringData(ctx, encodedString, tmp)
-		if symbolTable.KeyDelete(types.STR_THIS) {
-			php.ThrowError(ctx, nil, "Cannot re-assign $this")
-		}
-	} else {
-		result = php.ZendTryArrayInit(ctx, result)
-		if result == nil {
-			return
-		}
-		php.PhpDefaultTreatStringData(ctx, encodedString, result)
-	}
-}
-
-func ZifStrGetcsv(return_value zpp.Ret, string_ string, _ zpp.Opt, delimiter string, enclosure string, escape *string) *types.Array {
-	var csvSetting = CsvSetting{
-		Delimiter: lang.Cond(delimiter != "", delimiter[0], ','),
-		Enclosure: lang.Cond(enclosure != "", enclosure[0], '"'),
-		Escape:    '\\',
-	}
-	if escape != nil {
-		if *escape != "" {
-			csvSetting.Escape = (*escape)[0]
-		} else {
-			csvSetting.NoEscape = true
-		}
-	}
-
-	PhpFgetcsv(nil, csvSetting, len(string_), string_, return_value)
-}
-
-func ZifSscanf(ctx *php.Context, str string, format string, vars []zpp.RefZval) *types.Zval {
-	retval, result := SscanfInternal(ctx, str, format, vars)
-	if SCAN_ERROR_WRONG_PARAM_COUNT == result {
-		php.ZendWrongParamCount(ctx)
-	}
-	return retval
-}
+//func ZifParseStr(ctx *php.Context, encodedString string, _ zpp.Opt, result zpp.RefZval) {
+//	if result == nil {
+//		if !php.ForbidDynamicCall(ctx, "parse_str() with a single argument") {
+//			return
+//		}
+//		php.ErrorDocRef(ctx, "", perr.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
+//		var symbolTable = php.ZendRebuildSymbolTable(ctx)
+//		var tmp = php.Array(symbolTable.Ht())
+//		php.PhpDefaultTreatStringData(ctx, encodedString, tmp)
+//		if symbolTable.KeyDelete(types.STR_THIS) {
+//			php.ThrowError(ctx, nil, "Cannot re-assign $this")
+//		}
+//	} else {
+//		result = php.ZendTryArrayInit(ctx, result)
+//		if result == nil {
+//			return
+//		}
+//		php.PhpDefaultTreatStringData(ctx, encodedString, result)
+//	}
+//}
+//
+//func ZifSscanf(ctx *php.Context, str string, format string, vars []zpp.RefZval) *types.Zval {
+//	retval, result := SscanfInternal(ctx, str, format, vars)
+//	if SCAN_ERROR_WRONG_PARAM_COUNT == result {
+//		php.ZendWrongParamCount(ctx)
+//	}
+//	return retval
+//}
 
 func ZifUtf8Encode(data string) string {
 	var buf strings.Builder
@@ -121,23 +103,24 @@ func ZifUtf8Encode(data string) string {
 	}
 	return buf.String()
 }
-func ZifUtf8Decode(data string) string {
-	var pos = 0
-	var buf strings.Builder
-	for pos < len(data) {
-		var status = types.FAILURE
-		c := PhpNextUtf8Char((*uint8)(data), len(data), &pos, &status)
 
-		/* The lower 256 codepoints of Unicode are identical to Latin-1,
-		 * so we don't need to do any mapping here beyond replacing non-Latin-1
-		 * characters. */
-		if status == types.FAILURE || c > 0xff {
-			c = '?'
-		}
-		buf.WriteRune(rune(c))
-	}
-	return buf.String()
-}
+//func ZifUtf8Decode(data string) string {
+//	var pos = 0
+//	var buf strings.Builder
+//	for pos < len(data) {
+//		var status = types.FAILURE
+//		c := PhpNextUtf8Char((*uint8)(data), len(data), &pos, &status)
+//
+//		/* The lower 256 codepoints of Unicode are identical to Latin-1,
+//		 * so we don't need to do any mapping here beyond replacing non-Latin-1
+//		 * characters. */
+//		if status == types.FAILURE || c > 0xff {
+//			c = '?'
+//		}
+//		buf.WriteRune(rune(c))
+//	}
+//	return buf.String()
+//}
 
 func substr(str string, offset int, length *int) (string, bool) {
 	negativeOffset := offset < 0
@@ -695,7 +678,7 @@ func ZifDirname(ctx *php.Context, path string, _ zpp.Opt, levels_ *int) string {
 	}
 }
 
-func ZifPathinfo(path string, _ zpp.Opt, options *int) *types.Zval {
+func ZifPathinfo(path string, _ zpp.Opt, options *int) types.Zval {
 	opt := lang.Option(options, PHP_PATHINFO_ALL)
 
 	arr := types.NewArray()
@@ -724,13 +707,13 @@ func ZifPathinfo(path string, _ zpp.Opt, options *int) *types.Zval {
 	}
 
 	if opt == PHP_PATHINFO_ALL {
-		return types.NewZvalArray(arr)
+		return types.ZvalArray(arr)
 	} else {
 		p := arr.First()
 		if p != nil {
 			return p.Val
 		} else {
-			return types.NewZvalString("")
+			return types.ZvalString("")
 		}
 	}
 }
@@ -757,7 +740,7 @@ func PhpStrcspnEx(s1 string, s2 string) int {
 	}
 	return len(s1)
 }
-func PhpNeedleChar(ctx *php.Context, needle *types.Zval) (byte, bool) {
+func PhpNeedleChar(ctx *php.Context, needle types.Zval) (byte, bool) {
 	switch needle.Type() {
 	case types.IsLong:
 		return byte(needle.Long()), true
@@ -772,7 +755,7 @@ func PhpNeedleChar(ctx *php.Context, needle *types.Zval) (byte, bool) {
 		return 0, false
 	}
 }
-func ZifStristr(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
+func ZifStristr(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, part bool) (string, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok {
 		return "", false
@@ -796,7 +779,7 @@ func ZifStristr(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt
 }
 
 //@zif(alias="strchr")
-func ZifStrstr(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
+func ZifStrstr(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, part bool) (string, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok {
 		return "", false
@@ -830,7 +813,7 @@ func posSubstr(ctx *php.Context, str string, offset int) (string, bool) {
 	}
 	return str, true
 }
-func parseNeedle(ctx *php.Context, needle *types.Zval) (string, bool) {
+func parseNeedle(ctx *php.Context, needle types.Zval) (string, bool) {
 	if needle.IsString() {
 		return needle.String(), true
 	} else {
@@ -849,7 +832,7 @@ func parseNeedle(ctx *php.Context, needle *types.Zval) (string, bool) {
 	}
 }
 
-func ZifStrpos(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
+func ZifStrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	haystack, ok := posSubstr(ctx, haystack, offset)
 	if !ok {
 		return 0, false
@@ -869,7 +852,7 @@ func ZifStrpos(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt,
 		return 0, false
 	}
 }
-func ZifStripos(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
+func ZifStripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	haystack, ok := posSubstr(ctx, haystack, offset)
 	if !ok {
 		return 0, false
@@ -891,7 +874,7 @@ func ZifStripos(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt
 		return 0, false
 	}
 }
-func ZifStrrpos(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
+func ZifStrrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok {
 		return 0, false
@@ -928,7 +911,7 @@ func ZifStrrpos(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt
 		}
 	}
 }
-func ZifStrripos(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
+func ZifStrripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok {
 		return 0, false
@@ -967,7 +950,7 @@ func ZifStrripos(ctx *php.Context, haystack string, needle *types.Zval, _ zpp.Op
 		}
 	}
 }
-func ZifStrrchr(ctx *php.Context, haystack string, needle *types.Zval) (string, bool) {
+func ZifStrrchr(ctx *php.Context, haystack string, needle types.Zval) (string, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok || needleStr == "" {
 		return "", false
@@ -1149,7 +1132,7 @@ func substrReplaceArray(ctx *php.Context, str *types.Array, replace types.Zval, 
 
 		ret := substrReplaceSingle(origStr, replStr, f, l)
 		if key.IsStrKey() {
-			arr.SymtableUpdate(key.StrKey(), types.NewZvalString(ret))
+			arr.SymtableUpdate(key.StrKey(), types.ZvalString(ret))
 		} else {
 			arr.IndexUpdate(key.IdxKey(), types.ZvalString(ret))
 		}
@@ -1172,7 +1155,7 @@ func ZifSubstrReplace(ctx *php.Context, returnValue zpp.Ret, str types.Zval, rep
 	if length != nil && !length.IsArray() {
 		length.SetLong(php.ZvalGetLong(ctx, *length))
 	}
-	if php.EG__(ctx).HasException() {
+	if ctx.EG().HasException() {
 		return
 	}
 
@@ -1270,18 +1253,23 @@ func Strtr(str string, from string, to string) string {
 
 func phpStrtrArray(ctx *php.Context, str string, pats *types.Array) (string, bool) {
 	// 扫描替换数组
-	var minLen = 128 * 1024            // 最长扫描字符串长度
-	var maxLen = 0                     // 最短扫描字符串长度
-	numBitset := b.NewBitset(len(str)) // 标记是否有对应长度的扫描字符串
-	bitset := ascii.NewAsciiSet()      // 标记是否有对应字符开头的扫描字符串
+	var minLen = 128 * 1024               // 最长扫描字符串长度
+	var maxLen = 0                        // 最短扫描字符串长度
+	lenExists := make(map[int]struct{})   // 标记是否有对应长度的扫描字符串
+	headExists := make(map[byte]struct{}) // 标记是否有对应字符开头的扫描字符串
 
-	var strMap = make(map[string]*types.Zval, pats.Len())
-	pats.EachOld(func(key types.ArrayKey, value *types.Zval) {
+	var strMap = make(map[string]types.Zval, pats.Len())
+	pats.Each(func(key types.ArrayKey, value types.Zval) {
 		var strKey string
 		if !key.IsStrKey() {
 			strKey = strconv.Itoa(key.IdxKey())
 		} else {
 			strKey = key.StrKey()
+		}
+
+		/* skip empty patterns */
+		if strKey == "" {
+			return
 		}
 
 		/* skip long patterns */
@@ -1293,16 +1281,11 @@ func phpStrtrArray(ctx *php.Context, str string, pats *types.Array) (string, boo
 		minLen = lang.Min(minLen, len(strKey))
 
 		/* remember possible key length */
-		numBitset.Mark(len(strKey))
-		bitset.Mark(strKey[0])
+		lenExists[len(strKey)] = struct{}{}
+		headExists[strKey[0]] = struct{}{}
 
 		strMap[strKey] = value
 	})
-
-	// 特殊case, key 为空字符串时，直接返回false (此行为在PHP8中有所不同)
-	if _, ok := strMap[""]; ok {
-		return "", false
-	}
 
 	if len(strMap) == 0 {
 		/* return the original string */
@@ -1312,16 +1295,16 @@ func phpStrtrArray(ctx *php.Context, str string, pats *types.Array) (string, boo
 	oldPos := 0
 	var result strings.Builder
 	for pos := 0; pos <= len(str)-minLen; pos++ {
-		if !bitset.Contains(str[pos]) {
+		if _, exists := headExists[str[pos]]; !exists {
 			continue
 		}
 
-		for len_ := lang.Min(maxLen, len(str)-pos); len_ >= minLen; len_-- {
-			if numBitset.Marked(len_) {
+		for l := lang.Min(maxLen, len(str)-pos); l >= minLen; l-- {
+			if _, exists := lenExists[l]; !exists {
 				continue
 			}
 
-			search := str[pos : pos+len_]
+			search := str[pos : pos+l]
 			replaceZval, ok := strMap[search]
 			if !ok {
 				continue
@@ -1330,7 +1313,7 @@ func phpStrtrArray(ctx *php.Context, str string, pats *types.Array) (string, boo
 			replaceStr := php.ZvalGetStrVal(ctx, replaceZval)
 			result.WriteString(str[oldPos:pos])
 			result.WriteString(replaceStr)
-			oldPos = pos + len_
+			oldPos = pos + l
 			pos = oldPos - 1
 			break
 		}
@@ -1416,7 +1399,7 @@ func PhpStrToStrI(haystack string, lcHaystack string, needle string, str string)
 	}
 }
 
-func ZifStrtr(ctx *php.Context, str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, bool) {
+func ZifStrtr(ctx *php.Context, str string, from types.Zval, _ zpp.Opt, to_ *string) (string, bool) {
 	// 支持两种参数形式:
 	// - strtr(string, array)
 	// - strtr(string, string, string)
@@ -1532,7 +1515,7 @@ func ZifAddcslashes(ctx *php.Context, str string, charlist string) string {
 func ZifStripslashes(str string) string  { return PhpStripslashes(str) }
 func ZifStripcslashes(str string) string { return PhpStripcslashes(str) }
 
-func strReplaceStr(ctx *php.Context, subject string, search *types.Zval, replace *types.Zval, caseSensitivity bool) (string, int) {
+func strReplaceStr(ctx *php.Context, subject string, search types.Zval, replace types.Zval, caseSensitivity bool) (string, int) {
 	if subject == "" {
 		return "", 0
 	}
@@ -1608,11 +1591,11 @@ func strReplaceStr(ctx *php.Context, subject string, search *types.Zval, replace
 		}
 	}
 }
-func strReplaceArray(ctx *php.Context, subject *types.Array, search *types.Zval, replace *types.Zval, caseSensitivity bool) (*types.Array, int) {
+func strReplaceArray(ctx *php.Context, subject *types.Array, search types.Zval, replace types.Zval, caseSensitivity bool) (*types.Array, int) {
 	arr := types.NewArrayCap(subject.Len())
 	replaceCount := 0
-	subject.EachOld(func(key types.ArrayKey, value *types.Zval) {
-		value = types.ZVAL_DEREF(value)
+	subject.Each(func(key types.ArrayKey, value types.Zval) {
+		value = value.DeRef()
 
 		var result types.Zval
 		if !value.IsArray() && !value.IsObject() {
@@ -1620,23 +1603,23 @@ func strReplaceArray(ctx *php.Context, subject *types.Array, search *types.Zval,
 			result.SetString(tmpResult)
 			replaceCount += count
 		} else {
-			types.ZVAL_COPY(&result, value)
+			result = value
 		}
 
-		arr.Add(key, &result)
+		arr.Add(key, result)
 	})
 	return arr, replaceCount
 }
-func strReplace(ctx *php.Context, returnValue *types.Zval, search *types.Zval, replace *types.Zval, subject *types.Zval, replaceCount zpp.RefZval, caseSensitivity bool) {
+func strReplace(ctx *php.Context, returnValue *types.Zval, search types.Zval, replace types.Zval, subject types.Zval, replaceCount zpp.RefZval, caseSensitivity bool) {
 	// 限定参数类型
 	// - str_replace(array|string $search, array|string $replace, array|string $subject, int|null &$count == null): string|array
 	if !search.IsArray() {
-		php.ConvertToString(ctx, search)
-		php.ConvertToString(ctx, replace)
+		php.ConvertToString(ctx, &search)
+		php.ConvertToString(ctx, &replace)
 	} else if !replace.IsArray() {
-		php.ConvertToString(ctx, replace)
+		php.ConvertToString(ctx, &replace)
 	}
-	if php.EG__(ctx).HasException() {
+	if ctx.EG().HasException() {
 		return
 	}
 
@@ -1657,10 +1640,10 @@ func strReplace(ctx *php.Context, returnValue *types.Zval, search *types.Zval, r
 	}
 }
 
-func ZifStrReplace(ctx *php.Context, returnValue zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
+func ZifStrReplace(ctx *php.Context, returnValue zpp.Ret, search types.Zval, replace types.Zval, subject types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
 	strReplace(ctx, returnValue, search, replace, subject, replaceCount, true)
 }
-func ZifStrIreplace(ctx *php.Context, returnValue zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
+func ZifStrIreplace(ctx *php.Context, returnValue zpp.Ret, search types.Zval, replace types.Zval, subject types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
 	strReplace(ctx, returnValue, search, replace, subject, replaceCount, false)
 }
 
@@ -2107,7 +2090,7 @@ func ZifStripTags(ctx *php.Context, str string, _ zpp.Opt, allowableTags *types.
 	if allow != nil {
 		if allow.IsArray() {
 			var buf strings.Builder
-			allow.Array().EachOld(func(key types.ArrayKey, value *types.Zval) {
+			allow.Array().Each(func(key types.ArrayKey, value types.Zval) {
 				tag := php.ZvalGetStrVal(ctx, value)
 				buf.WriteByte('<')
 				buf.WriteString(tag)
@@ -2116,7 +2099,7 @@ func ZifStripTags(ctx *php.Context, str string, _ zpp.Opt, allowableTags *types.
 			allowTagsStr = buf.String()
 		} else {
 			/* To maintain a certain BC, we allow anything for the second parameter and return original string */
-			allow.SetString(php.ZvalTryGetStrVal(ctx, allow))
+			allow.SetString(php.ZvalTryGetStrVal(ctx, *allow))
 			allowTagsStr = allowableTags.String()
 		}
 	}
@@ -2154,7 +2137,7 @@ func ZifCountChars(ctx *php.Context, input string, _ zpp.Opt, mode int) (*types.
 		for i := 0; i < 256; i++ {
 			count := charCount[i]
 			if mode == 0 || (mode == 1 && count != 0) || (mode == 2 && count == 0) {
-				arr.IndexUpdate(i, types.NewZvalLong(charCount[i]))
+				arr.IndexUpdate(i, types.ZvalLong(charCount[i]))
 			}
 		}
 		return types.NewZvalArray(arr), true
@@ -2228,7 +2211,7 @@ func ZifStrPad(ctx *php.Context, input string, padLength int, _ zpp.Opt, padStri
 		return "", false
 	}
 	numPadChars := padLength - len(input)
-	if numPadChars >= php.INT_MAX {
+	if numPadChars >= math.MaxInt {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Padding length is too long")
 		return "", false
 	}
@@ -2325,13 +2308,13 @@ func ZifStrWordCount(ctx *php.Context, str string, _ zpp.Opt, format int, charli
 	case 1:
 		arr := types.NewArrayCap(len(spans))
 		for _, span := range spans {
-			arr.Append(types.NewZvalString(str[span.start:span.end]))
+			arr.Append(types.ZvalString(str[span.start:span.end]))
 		}
 		return types.NewZvalArray(arr), true
 	case 2:
 		arr := types.NewArrayCap(len(spans))
 		for _, span := range spans {
-			arr.IndexUpdate(span.start, types.NewZvalString(str[span.start:span.end]))
+			arr.IndexUpdate(span.start, types.ZvalString(str[span.start:span.end]))
 		}
 		return types.NewZvalArray(arr), true
 	default:

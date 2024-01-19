@@ -650,41 +650,35 @@ func (e *Executor) castExpr(expr *ast.CastExpr) types.Zval {
 }
 
 func (e *Executor) unaryExpr(expr *ast.UnaryExpr) types.Zval {
-	// todo 考虑是否需要用 unary 原生替代 v = v + 1 的模拟
-
-	var oldValue = e.expr(expr.Var)
-	var newValue Val
-	var useOldValue = false
-
+	var value = e.expr(expr.Var)
 	switch expr.Op {
 	case ast.UnaryOpPlus:
-		newValue = OpMul(e.ctx, oldValue, Long(1))
+		return OpMul(e.ctx, value, Long(1))
 	case ast.UnaryOpMinus:
-		newValue = OpMul(e.ctx, oldValue, Long(-1))
+		return OpMul(e.ctx, value, Long(-1))
 	case ast.UnaryOpBooleanNot:
-		newValue = OpBooleanNot(e.ctx, oldValue)
+		return OpBooleanNot(e.ctx, value)
 	case ast.UnaryOpBitwiseNot:
-		newValue = OpBitwiseNot(e.ctx, oldValue)
+		return OpBitwiseNot(e.ctx, value)
+	// todo 考虑是否需要用 unary 原生替代 v = v + 1 的模拟
 	case ast.UnaryOpPreInc:
-		newValue = OpAdd(e.ctx, oldValue, Long(1))
+		newValue := OpAdd(e.ctx, value, Long(1))
+		e.assignVariable(expr.Var, newValue)
+		return newValue
 	case ast.UnaryOpPreDec:
-		newValue = OpSub(e.ctx, oldValue, Long(1))
+		newValue := OpSub(e.ctx, value, Long(1))
+		e.assignVariable(expr.Var, newValue)
+		return newValue
 	case ast.UnaryOpPostInc:
-		newValue = OpAdd(e.ctx, oldValue, Long(1))
-		useOldValue = true
+		newValue := OpAdd(e.ctx, value, Long(1))
+		e.assignVariable(expr.Var, newValue)
+		return value
 	case ast.UnaryOpPostDec:
-		newValue = OpSub(e.ctx, oldValue, Long(1))
-		useOldValue = true
+		newValue := OpSub(e.ctx, value, Long(1))
+		e.assignVariable(expr.Var, newValue)
+		return value
 	default:
 		panic(perr.Internalf("Unexpected ast.UnaryExpr.Op: %+v", expr.Op))
-	}
-
-	e.assignVariable(expr.Var, newValue)
-
-	if useOldValue {
-		return oldValue
-	} else {
-		return newValue
 	}
 }
 
@@ -962,7 +956,7 @@ func (e *Executor) assignVariable(variable ast.Expr, value types.Zval) {
 			e.arrayUpdate(arr, key, value)
 		}
 	default:
-		panic(perr.Todof("unsupported AssignExpr.Var type: %T, %+v", v, v))
+		panic(perr.Todof("unsupported assignVariable.Var type: %T, %+v", v, v))
 	}
 }
 
@@ -992,7 +986,7 @@ func (e *Executor) getOrInitArray(variable ast.Expr) types.Zval {
 			return result
 		}
 	default:
-		panic(perr.Todof("unsupported AssignExpr.Var type: %T, %+v", v, v))
+		panic(perr.Todof("unsupported getOrInitArray.Var type: %T, %+v", v, v))
 	}
 }
 

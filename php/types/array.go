@@ -50,12 +50,68 @@ func (k ArrayKey) ToZval() Zval {
 	}
 }
 
+func NumericKey(key string) ArrayKey {
+	if idx, ok := ParseNumericStr(key); ok {
+		return IdxKey(idx)
+	} else {
+		return StrKey(key)
+	}
+}
+
+const maxLengthOfLong = 20
+
+func ParseNumericStr(str string) (int, bool) {
+	// 首字符非数字快速失败
+	if len(str) == 0 {
+		return 0, false
+	}
+	if (str[0] < '9' || str[0] > '0') && str[0] != '-' {
+		return 0, false
+	}
+
+	// 字符串转数字
+	var length = len(str)
+	var i = 0
+	if str[i] == '-' {
+		i++
+	}
+	if (length > 1 && str[i] == '0') /* numbers with leading zeros */ ||
+		(length-i > maxLengthOfLong-1) /* number too long */ {
+		return 0, false
+	}
+
+	var number = 0
+	for _, c := range str[i:] {
+		if c >= '0' && c <= '9' {
+			number = number*10 + int(c-'0')
+		} else {
+			return 0, false
+		}
+	}
+
+	// 处理符号和 overflow
+	if str[0] == '-' {
+		if number-1 > math.MaxInt {
+			return 0, false
+		}
+		number = -number
+	} else {
+		if number > math.MaxInt {
+			return 0, false
+		}
+	}
+
+	return number, true
+}
+
 // ArrayPair
 // Array内的键值对。纯数值无引用，直接修改不会影响数组
 type ArrayPair struct {
 	Key ArrayKey
 	Val Zval
 }
+
+var invalidArrayPair = ArrayPair{}
 
 func MakeArrayPair(key ArrayKey, val Zval) ArrayPair {
 	return ArrayPair{Key: key, Val: val}
@@ -149,6 +205,11 @@ func (ht *Array) Clean() {
 	ht.assertWritable()
 	ht.data = emptyArrayData
 	ht.protected = false
+}
+
+func (ht *Array) SetDataByArray(arr *Array) {
+	ht.assertWritable()
+	ht.data = arr.data
 }
 
 // 常用读操作
@@ -250,6 +311,14 @@ func (ht *Array) KeyAdd(key string, value Zval) bool { return ht.Add(StrKey(key)
 func (ht *Array) KeyUpdate(key string, value Zval)   { ht.Update(StrKey(key), value) }
 func (ht *Array) KeyDelete(key string) bool          { return ht.Delete(StrKey(key)) }
 
+// Methods use numeric key
+
+func (ht *Array) SymtableExists(key string) bool          { return ht.Exists(NumericKey(key)) }
+func (ht *Array) SymtableFind(key string) Zval            { return ht.Find(NumericKey(key)) }
+func (ht *Array) SymtableAdd(key string, value Zval) bool { return ht.Add(NumericKey(key), value) }
+func (ht *Array) SymtableUpdate(key string, value Zval)   { ht.Update(NumericKey(key), value) }
+func (ht *Array) SymtableDelete(key string) bool          { return ht.Delete(NumericKey(key)) }
+
 // recursive
 
 func (ht *Array) IsRecursive() bool   { return ht.protected }
@@ -307,4 +376,65 @@ func (ht *Array) Pairs() []ArrayPair {
 		pairs = append(pairs, MakeArrayPair(key, value))
 	})
 	return pairs
+}
+
+func (ht *Array) AddAssocZval(key string, v Zval)      { ht.SymtableUpdate(key, v) }
+func (ht *Array) AddAssocNull(key string)              { ht.SymtableUpdate(key, ZvalNull()) }
+func (ht *Array) AddAssocBool(key string, b bool)      { ht.SymtableUpdate(key, ZvalBool(b)) }
+func (ht *Array) AddAssocLong(key string, n int)       { ht.SymtableUpdate(key, ZvalLong(n)) }
+func (ht *Array) AddAssocDouble(key string, d float64) { ht.SymtableUpdate(key, ZvalDouble(d)) }
+func (ht *Array) AddAssocStr(key string, str string)   { ht.SymtableUpdate(key, ZvalString(str)) }
+
+func (ht *Array) AddIndexZval(idx int, v Zval)      { ht.IndexUpdate(idx, v) }
+func (ht *Array) AddIndexNull(idx int)              { ht.IndexUpdate(idx, ZvalNull()) }
+func (ht *Array) AddIndexBool(idx int, b bool)      { ht.IndexUpdate(idx, ZvalBool(b)) }
+func (ht *Array) AddIndexLong(idx int, n int)       { ht.IndexUpdate(idx, ZvalLong(n)) }
+func (ht *Array) AddIndexDouble(idx int, d float64) { ht.IndexUpdate(idx, ZvalDouble(d)) }
+func (ht *Array) AddIndexStr(idx int, str string)   { ht.IndexUpdate(idx, ZvalString(str)) }
+
+func (ht *Array) AddNextIndexZval(v Zval)      { ht.Append(v) }
+func (ht *Array) AddNextIndexNull()            { ht.Append(ZvalNull()) }
+func (ht *Array) AddNextIndexBool(b bool)      { ht.Append(ZvalBool(b)) }
+func (ht *Array) AddNextIndexLong(n int)       { ht.Append(ZvalLong(n)) }
+func (ht *Array) AddNextIndexDouble(d float64) { ht.Append(ZvalDouble(d)) }
+func (ht *Array) AddNextIndexStr(str string)   { ht.Append(ZvalString(str)) }
+
+// pos
+
+func (ht *Array) Pos(pos ArrayPosition) ArrayPair {
+	key, value := ht.data.Pos(pos)
+	return MakeArrayPair(key, value)
+}
+
+func (ht *Array) findPos(pos ArrayPosition) (ArrayPair, ArrayPosition) {
+	posSize := ht.data.Used()
+	for i := pos; i < posSize; i++ {
+		key, value := ht.data.Pos(pos)
+		if value.IsUndef() {
+			continue
+		}
+		return MakeArrayPair(key, value), i
+	}
+	return invalidArrayPair, posSize
+}
+
+func (ht *Array) findPosReserve(pos ArrayPosition) (ArrayPair, ArrayPosition) {
+	// prev 需要用 0 表示已搜索全表，所以 pos = 实际索引 + 1
+	for i := pos; i > 0; i-- {
+		key, value := ht.data.Pos(i - 1)
+		if value.IsNotUndef() {
+			continue
+		}
+
+		return MakeArrayPair(key, value), i - 1
+	}
+	return invalidArrayPair, 0
+}
+
+func (ht *Array) First() *ArrayPair {
+	pair, _ := ht.findPos(0)
+	if pair.IsValid() {
+		return &pair
+	}
+	return nil
 }

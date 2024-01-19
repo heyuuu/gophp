@@ -1,6 +1,8 @@
 package php
 
 import (
+	"github.com/heyuuu/gophp/php/types"
+	"github.com/heyuuu/gophp/php/zpp"
 	"math"
 	"path/filepath"
 	"strings"
@@ -39,4 +41,18 @@ func ZendDirname(path string) string {
 		return string(filepath.Separator)
 	}
 	return path
+}
+
+func ConvertToString(ctx *Context, zv *types.Zval) {
+	if v, ok := ZvalTryGetStr(ctx, *zv); ok {
+		zv.SetString(v)
+	}
+}
+
+func ZendTryAssignRefDouble(ctx *Context, percent zpp.RefZval, float float64) {
+
+}
+
+func ZendTryAssignRefLong(ctx *Context, count zpp.RefZval, count2 int) {
+
 }
