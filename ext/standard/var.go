@@ -5,7 +5,6 @@ import (
 	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/php/zpp"
 )
 
 type stringWriter interface {
@@ -138,7 +137,7 @@ again:
 		w.WriteString(fmt.Sprintf("%sUNKNOWN:0\n", common))
 	}
 }
-func ZifVarDump(ctx zpp.Ctx, vars []types.Zval) {
+func ZifVarDump(ctx *php.Context, vars []types.Zval) {
 	for _, zv := range vars {
 		PhpVarDump(ctx, zv, 1)
 	}

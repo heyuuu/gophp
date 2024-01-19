@@ -98,6 +98,11 @@ func (zv *Zval) SetArray(arr *Array) {
 }
 func (zv *Zval) SetObject(obj *Object)     { zv.v = obj }
 func (zv *Zval) SetResource(res *Resource) { zv.v = res }
+
+func (zv *Zval) SetArrayOfInt(arr []int)       { zv.SetArray(NewArrayOfInt(arr)) }
+func (zv *Zval) SetArrayOfString(arr []string) { zv.SetArray(NewArrayOfString(arr)) }
+func (zv *Zval) SetArrayOfZval(arr []Zval)     { zv.SetArray(NewArrayOfZval(arr)) }
+
 func (zv *Zval) SetBy(val *Zval) {
 	if val == nil {
 		*zv = Undef

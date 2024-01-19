@@ -10,6 +10,8 @@ type Context struct {
 	cg     CompilerGlobals
 	eg     ExecutorGlobals
 	og     OutputGlobals
+
+	values map[string]any
 }
 
 func initContext(e *Engine, baseCtx *Context, request *http.Request, response http.ResponseWriter) *Context {
@@ -41,3 +43,21 @@ func (c *Context) OG() *OutputGlobals   { return &c.og }
 func (c *Context) Write(data []byte)        { c.og.Write(data) }
 func (c *Context) WriteString(str string)   { c.og.WriteString(str) }
 func (c *Context) WriteStringUb(str string) { c.og.WriteStringUnbuffered(str) }
+
+// values
+func (c *Context) GetValue(key string) any        { return c.values[key] }
+func (c *Context) SetValue(key string, value any) { c.values[key] = value }
+
+func ContextGetOrInit[T any](ctx *Context, key string, initializer func() T) (T, bool) {
+	if v, ok := ctx.values[key]; ok {
+		if result, typeMatch := v.(T); typeMatch {
+			return result, true
+		} else {
+			return result, false
+		}
+	} else {
+		result := initializer()
+		ctx.values[key] = result
+		return result, true
+	}
+}

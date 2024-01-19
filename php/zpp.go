@@ -215,7 +215,7 @@ func (p *FastParamParser) ParseStrictLongNullable() *int {
 func (p *FastParamParser) parseLongEx(checkNull bool, separate bool, strict bool) (dest int, isNull bool) {
 	arg, ok := p.nextArg(separate, separate)
 	if !ok {
-		return
+		return 0, true
 	}
 
 	// check null

@@ -1,7 +1,6 @@
 package zpp
 
 import (
-	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -10,9 +9,7 @@ import (
  */
 type (
 	/* special */
-	Ex  = *php.ExecuteData
 	Ret = *types.Zval
-	Ctx = *php.Context
 
 	// FAST_ZPP: Z_PARAM_OPTIONAL
 	Opt any

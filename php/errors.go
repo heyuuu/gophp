@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/plog"
 	"github.com/heyuuu/gophp/php/types"
 	"log"
+	"strings"
 )
 
 // functions
@@ -26,6 +27,12 @@ func ErrorAtNoreturn(ctx *Context, typ perr.ErrorType, lineno uint32, message st
 	ErrorAt(ctx, typ, lineno, message)
 	/* Should never reach this. */
 	panic(perr.Unreachable())
+}
+
+func ErrorDocRef(ctx *Context, docRef string, typ perr.ErrorType, buffer string, params ...string) {
+	// todo
+	message := fmt.Sprintf("%s: %s", buffer, strings.Join(params, ","))
+	Error(ctx, typ, message)
 }
 
 func ThrowError(ctx *Context, exceptionCe *types.Class, message string) {
