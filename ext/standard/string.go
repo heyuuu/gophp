@@ -1199,7 +1199,7 @@ func ZifOrd(character string) int {
 }
 func ZifChr(codepoint int) string {
 	c := byte(codepoint & 0xff)
-	return string(c)
+	return string([]byte{c})
 }
 func ZifUcfirst(str string) string {
 	if str != "" && ascii.IsLower(str[0]) {

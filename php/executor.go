@@ -759,7 +759,42 @@ func (e *Executor) assignExpr(expr *ast.AssignExpr) types.Zval {
 }
 
 func (e *Executor) assignOpExpr(expr *ast.AssignOpExpr) types.Zval {
-	panic(perr.Todof("e.assignOpExpr"))
+	left := e.expr(expr.Var)
+
+	var value types.Zval
+	switch expr.Op {
+	case ast.AssignOpBitwiseAnd: // &=
+		value = OpBitwiseAnd(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpBitwiseOr: // |=
+		value = OpBitwiseOr(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpBitwiseXor: // ^=
+		value = OpBitwiseXor(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpCoalesce: // ??=
+		value = OpCoalesce(e.ctx, left, func() Val { return e.expr(expr.Expr) })
+	case ast.AssignOpConcat: // .=
+		value = OpConcat(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpDiv: // /=
+		value = OpDiv(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpMinus: // -=
+		value = OpSub(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpMod: // %=
+		value = OpMod(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpMul: // *=
+		value = OpMul(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpPlus: // +=
+		value = OpAdd(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpPow: // **=
+		value = OpPow(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpShiftLeft: // <<=
+		value = OpSL(e.ctx, left, e.expr(expr.Expr))
+	case ast.AssignOpShiftRight: // >>=
+		value = OpSR(e.ctx, left, e.expr(expr.Expr))
+	default:
+		panic(perr.Unreachable())
+	}
+
+	e.assignVariable(expr.Var, value)
+	return value
 }
 
 func (e *Executor) assignRefExpr(expr *ast.AssignRefExpr) types.Zval {

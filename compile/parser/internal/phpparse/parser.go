@@ -1,7 +1,6 @@
 package phpparse
 
 import (
-	"errors"
 	"github.com/heyuuu/gophp/compile/ast"
 	"log"
 	"os"
@@ -17,22 +16,15 @@ func ParseCode(code string) (*ast.File, error) {
 }
 
 /* Parser 脚本相关 */
-var scriptPath = "./tools/parser/parser.php"
-
-func SetScriptPath(newScriptPath string) {
-	scriptPath = newScriptPath
-}
+var scriptPath = "/Users/heyu/Code/sik/gophp/tools/parser/parser.php"
 
 func runParser(args ...string) ([]byte, error) {
-	if len(scriptPath) == 0 {
-		return nil, errors.New("PHP Parser 脚本路径未设置")
-	}
 	if _, err := os.Stat(scriptPath); err != nil {
-		return nil, errors.New("PHP Parser 脚本路径不存在或不可读")
+		log.Panicln("PHP Parser 脚本路径不存在或不可读")
 	}
 
 	commandArgs := append([]string{scriptPath}, args...)
 	command := exec.Command("php", commandArgs...)
-	log.Printf("Run command: %s\n", command.String())
+	//log.Printf("Run command: %s\n", command.String())
 	return command.CombinedOutput()
 }
