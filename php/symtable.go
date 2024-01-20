@@ -1,7 +1,7 @@
 package php
 
 import (
-	"github.com/heyuuu/gophp/php/perr"
+	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -31,6 +31,6 @@ func (t *Symtable) Get(name string) types.Zval {
 }
 
 func (t *Symtable) Set(name string, value types.Zval) {
-	perr.Assert(value.IsNotUndef())
+	assert.Assert(value.IsNotUndef())
 	t.table[name] = value
 }

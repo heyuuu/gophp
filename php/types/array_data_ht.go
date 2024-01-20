@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/heyuuu/gophp/kits/mapkit"
+	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/shim/maps"
 	"github.com/heyuuu/gophp/shim/slices"
 	"sort"
@@ -129,7 +130,7 @@ func (ht *ArrayDataHt) Append(value Zval) (int, error) {
 	ht.assertWritable()
 	idx := ht.nextFreeElement
 	key := IdxKey(idx)
-	assert(!ht.Exists(key))
+	assert.Assert(!ht.Exists(key))
 	ht.appendBucket(key, value)
 	return idx, nil
 }
@@ -170,7 +171,7 @@ func (ht *ArrayDataHt) Sort(comparer ArrayComparer, renumber bool) {
  * Internal methods
  */
 
-func (ht *ArrayDataHt) assertWritable() { assert(ht.writable) }
+func (ht *ArrayDataHt) assertWritable() { assert.Assert(ht.writable) }
 
 func (ht *ArrayDataHt) appendBucket(key ArrayKey, value Zval) {
 	// 尝试 resize
@@ -206,8 +207,8 @@ func (ht *ArrayDataHt) resizeIfFull() {
 
 func (ht *ArrayDataHt) deleteBucket(pos int) {
 	ht.assertWritable()
-	assert(0 <= pos && pos < len(ht.data))
-	assert(ht.isValid(pos))
+	assert.Assert(0 <= pos && pos < len(ht.data))
+	assert.Assert(ht.isValid(pos))
 
 	// 移除数据，更新元素计数
 	ht.elementsCount--

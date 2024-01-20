@@ -1,21 +1,18 @@
 package php
 
 import (
-	"github.com/heyuuu/gophp/php/perr"
+	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/types"
 )
 
 // fast type and functions
 type Val = types.Zval
 
-var False = types.ZvalFalse
-var True = types.ZvalTrue
 var Bool = types.ZvalBool
 var Long = types.ZvalLong
 var Double = types.ZvalDouble
 var String = types.ZvalString
 var Array = types.ZvalArray
-var Resource = types.ZvalResource
 
 type ZvalTypePair uint
 
@@ -79,8 +76,8 @@ const (
 )
 
 // helpers
-func Assert(cond bool)                   { perr.Assert(cond) }
-func AssertEx(cond bool, message string) { perr.AssertEx(cond, message) }
+func Assert(cond bool)                   { assert.Assert(cond) }
+func AssertEx(cond bool, message string) { assert.AssertEx(cond, message) }
 
 // internal functions
 func sign(i int) int {

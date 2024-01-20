@@ -1,6 +1,9 @@
 package types
 
-import "github.com/heyuuu/gophp/php/perr"
+import (
+	"github.com/heyuuu/gophp/php/assert"
+	"github.com/heyuuu/gophp/php/perr"
+)
 
 // ZvalType
 type ZvalType uint8
@@ -43,9 +46,9 @@ func ZvalBool(b bool) Zval            { return Zval{b} }
 func ZvalLong(l int) Zval             { return Zval{l} }
 func ZvalDouble(d float64) Zval       { return Zval{d} }
 func ZvalString(s string) Zval        { return Zval{s} }
-func ZvalArray(arr *Array) Zval       { perr.Assert(arr != nil); return Zval{arr} }
-func ZvalObject(obj *Object) Zval     { perr.Assert(obj != nil); return Zval{obj} }
-func ZvalResource(res *Resource) Zval { perr.Assert(res != nil); return Zval{res} }
+func ZvalArray(arr *Array) Zval       { assert.Assert(arr != nil); return Zval{arr} }
+func ZvalObject(obj *Object) Zval     { assert.Assert(obj != nil); return Zval{obj} }
+func ZvalResource(res *Resource) Zval { assert.Assert(res != nil); return Zval{res} }
 
 func InitZvalArray() Zval { return Zval{NewArray()} }
 
@@ -95,6 +98,11 @@ func (zv *Zval) SetArray(arr *Array) {
 }
 func (zv *Zval) SetObject(obj *Object)     { zv.v = obj }
 func (zv *Zval) SetResource(res *Resource) { zv.v = res }
+
+func (zv *Zval) SetArrayOfInt(arr []int)       { zv.SetArray(NewArrayOfInt(arr)) }
+func (zv *Zval) SetArrayOfString(arr []string) { zv.SetArray(NewArrayOfString(arr)) }
+func (zv *Zval) SetArrayOfZval(arr []Zval)     { zv.SetArray(NewArrayOfZval(arr)) }
+
 func (zv *Zval) SetBy(val *Zval) {
 	if val == nil {
 		*zv = Undef
@@ -111,6 +119,8 @@ func (zv *Zval) Clone() *Zval {
 	tmp.SetBy(zv)
 	return &tmp
 }
+func (zv *Zval) Val() Zval     { return *zv }
+func (zv *Zval) SetVal(v Zval) { *zv = v }
 
 // Zval getter
 func (zv Zval) Type() ZvalType {
@@ -214,3 +224,11 @@ type Reference struct {
 }
 
 func (ref *Reference) Val() Zval { return ref.val }
+
+// RefZval
+type RefZval interface {
+	Val() Zval
+	SetVal(v Zval)
+}
+
+var _ RefZval = (*Zval)(nil)

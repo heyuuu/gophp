@@ -5,7 +5,6 @@ import (
 	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/php/zpp"
 )
 
 type stringWriter interface {
@@ -23,7 +22,7 @@ func PhpArrayElementDump(w stringWriter, zv types.Zval, key types.ArrayKey, leve
 	PhpVarDump(w, zv, level+2)
 }
 
-//func PhpObjectPropertyDump(w stringWriter, propInfo *types.PropertyInfo, zv *types.Zval, key_ types.ArrayKey, level int) {
+//func PhpObjectPropertyDump(w stringWriter, propInfo *types.Property, zv *types.Zval, key_ types.ArrayKey, level int) {
 //	if !key_.IsStrKey() {
 //		w.WriteString(fmt.Sprintf("%*c[%d]=>\n", level+1, ' ', key_.IdxKey()))
 //	} else {
@@ -109,7 +108,7 @@ again:
 		w.WriteString(fmt.Sprintf("%sobject(%s)#%d (%d) {\n", common, className, obj.Handle(), lang.CondF1(myht != nil, func() int { return myht.Count() }, 0)))
 		if myht != nil {
 			myht.Each(func(key types.ArrayKey, value types.Zval) {
-				//		var prop_info *types.PropertyInfo = nil
+				//		var prop_info *types.Property = nil
 				//		if value.IsIndirect() {
 				//			value = value.Indirect()
 				//			if key.IsStrKey() {
@@ -138,7 +137,7 @@ again:
 		w.WriteString(fmt.Sprintf("%sUNKNOWN:0\n", common))
 	}
 }
-func ZifVarDump(ctx zpp.Ctx, vars []types.Zval) {
+func ZifVarDump(ctx *php.Context, vars []types.Zval) {
 	for _, zv := range vars {
 		PhpVarDump(ctx, zv, 1)
 	}
