@@ -29,6 +29,10 @@
         .cell-name::-webkit-scrollbar {
             display: none;
         }
+        .btn-small {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -58,7 +62,10 @@
                     <td>{{testIdx + 1}}</td>
                     <td class="cell-name">{{test.name}}</td>
                     <td>{{test.status}}</td>
-                    <td><a :href="testShowPage(testIdx)" target="_blank">#</a></td>
+                    <td>
+                        <button class="btn btn-link btn-small" @click="gotoShowPage(testIdx)">detail</button>
+                        <button class="btn btn-link btn-small" @click="runTest(testIdx)">retry</button>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -129,7 +136,7 @@
         // 当前统计信息
         statLine() {
             return "total: " + this.tests.length +
-                ", running:" + this.count[RUNNING] +
+                ", wait:" + this.count[WAITING] +
                 ", pass:" + this.count[PASS] +
                 ", skip:" + this.count[SKIP] +
                 ", fail:" + this.count[FAIL]
@@ -172,13 +179,17 @@
         activeTest(testIdx) {
             this.activeIndex = testIdx
         },
-        // 跳转详情页的url
+        // 按钮事件
         testShowPage(testIdx) {
             let test = this.tests[testIdx]
             if (!test) {
                 return ""
             }
             return "/?test=" + test.name
+        },
+        gotoShowPage(testIdx) {
+            const url = this.testShowPage(testIdx)
+            window.open(url)
         },
         // start
         start() {
@@ -229,7 +240,7 @@
             test.content = content
         },
         runTest(index) {
-            const test = this.tests[this.waitingIndex]
+            const test = this.tests[index]
             if (!test) {
                 return
             }
