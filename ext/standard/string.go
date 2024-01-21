@@ -191,7 +191,6 @@ func PhpAddcslashes(ctx *php.Context, str string, what string) string {
 	mask, _ := PhpCharmaskEx(ctx, what)
 
 	strings.NewReplacer()
-
 	var buf strings.Builder
 	for _, c := range []byte(str) {
 		if strings.ContainsRune(mask, rune(c)) {
@@ -363,9 +362,9 @@ func PhpCharmaskEx(ctx *php.Context, input string) (string, bool) {
 		}
 
 		// e.g. "a..z"
-		if pos > 0 && pos+2 < len(input)-1 && input[pos-1] <= input[pos+2] {
+		if pos > 0 && pos+2 < len(input) && input[pos-1] <= input[pos+2] {
 			buf.WriteString(input[:pos-1])
-			for c := input[pos-1]; c < input[pos+2]; c++ {
+			for c := input[pos-1]; c <= input[pos+2]; c++ {
 				buf.WriteByte(c)
 			}
 			input = input[pos+3:]
@@ -376,7 +375,7 @@ func PhpCharmaskEx(ctx *php.Context, input string) (string, bool) {
 				php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid '..'-range, no character to the left of '..'")
 				return "", false
 			}
-			if pos+2 >= len(input)-1 {
+			if pos+2 >= len(input) {
 				php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid '..'-range, no character to the right of '..'")
 				return "", false
 			}

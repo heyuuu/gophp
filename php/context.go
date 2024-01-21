@@ -14,6 +14,10 @@ type Context struct {
 	values map[string]any
 }
 
+func MockContext() *Context {
+	return &Context{}
+}
+
 func initContext(e *Engine, baseCtx *Context, request *http.Request, response http.ResponseWriter) *Context {
 	ctx := &Context{engine: e}
 	if baseCtx != nil {

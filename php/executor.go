@@ -822,7 +822,8 @@ func (e *Executor) cloneExpr(expr *ast.CloneExpr) types.Zval {
 }
 
 func (e *Executor) errorSuppressExpr(expr *ast.ErrorSuppressExpr) types.Zval {
-	panic(perr.Todof("e.errorSuppressExpr"))
+	// todo errorSuppressExpr
+	return e.expr(expr.Expr)
 }
 
 func (e *Executor) exitExpr(expr *ast.ExitExpr) types.Zval {
