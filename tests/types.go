@@ -16,19 +16,19 @@ type TestCase struct {
 	CaptureStderr bool
 	UseCgi        bool
 	UseDbg        bool
-	sections      map[string]string
+	Sections      map[string]string
 }
 
 func NewTestCase(file string, fileName string, sections map[string]string) *TestCase {
-	tc := &TestCase{File: file, FileName: fileName, sections: sections}
+	tc := &TestCase{File: file, FileName: fileName, Sections: sections}
 	tc.init()
 	return tc
 }
 
 func (tc *TestCase) init() {
-	tc.Desc = strings.TrimSpace(tc.sections["TEST"])
+	tc.Desc = strings.TrimSpace(tc.Sections["TEST"])
 
-	if capture, ok := tc.sections["CAPTURE_STDIO"]; ok {
+	if capture, ok := tc.Sections["CAPTURE_STDIO"]; ok {
 		lcCapture := strings.ToLower(capture)
 		tc.CaptureStdin = strings.Contains(lcCapture, "stdin")
 		tc.CaptureStdout = strings.Contains(lcCapture, "stdout")
@@ -40,7 +40,7 @@ func (tc *TestCase) init() {
 }
 
 func (tc *TestCase) exists(key string) bool {
-	_, ok := tc.sections[key]
+	_, ok := tc.Sections[key]
 	return ok
 }
 

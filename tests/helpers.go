@@ -107,3 +107,18 @@ func basename(path string, suffix string) string {
 	}
 	return base
 }
+
+func existKey[K comparable, V any](m map[K]V, key K) bool {
+	_, exists := m[key]
+	return exists
+}
+
+func existKeys[K comparable, V any](m map[K]V, keys ...K) int {
+	count := 0
+	for _, key := range keys {
+		if _, exists := m[key]; exists {
+			count++
+		}
+	}
+	return count
+}

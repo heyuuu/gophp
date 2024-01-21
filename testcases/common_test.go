@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"github.com/heyuuu/gophp/tests"
 	"os"
 	"path/filepath"
@@ -40,18 +39,15 @@ func runTestCaseReal(t *testing.T, testName string, testFile string) {
 		}
 	}()
 
-	tr, err := tests.RunCaseBuiltin(0, testName, testFile)
+	tr, err := tests.RunTestFile(0, testName, testFile)
 	if err != nil {
-		if errors.Is(err, tests.ErrUnsupportedSection) {
-			t.SkipNow()
-			return
-		}
-
 		t.Errorf("runTestCase() error = %v", err)
 		return
 	}
 	switch tr.Type {
 	case tests.PASS:
+	case tests.SKIP:
+		t.SkipNow()
 	default:
 		t.Errorf("runTestCase() fail = %s", tr.Reason)
 	}

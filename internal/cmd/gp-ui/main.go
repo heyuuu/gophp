@@ -29,6 +29,9 @@ func main() {
 	http.HandleFunc("/", staticHandler())
 	http.HandleFunc("/static/", staticHandler())
 	http.HandleFunc("/api", ApiWrapHandler(apiHandler))
+	http.HandleFunc("/api/test/list", ApiWrapHandler(apiTestListHandler))
+	http.HandleFunc("/api/test/run", ApiWrapHandler(apiTestRunHandler))
+
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatal(err)

@@ -108,7 +108,7 @@ func (c Config) runTest(testIndex int, testFile string) (*TestResult, error) {
 		testName = testFile[len(c.SrcDir)+1:]
 	}
 
-	tc, err := parseTestCase(testName, testFile)
+	tc, err := ParseTestFile(testName, testFile)
 	if err != nil {
 		c.Events.Log(testIndex, "parse test case error: "+err.Error())
 		c.Events.OnTestEnd(testIndex, tc, nil)
