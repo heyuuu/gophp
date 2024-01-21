@@ -5,7 +5,6 @@ import (
 	"github.com/heyuuu/gophp/tests"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"testing"
 )
@@ -17,8 +16,7 @@ func init() {
 }
 
 func runTestCaseInDir(t *testing.T, dir string) {
-	files := findFiles(dir, true)
-	sort.Strings(files)
+	files, _ := tests.FindTestFiles(dir, true)
 	for _, file := range files {
 		name := file
 		if strings.HasPrefix(name, pwd) {

@@ -3,8 +3,6 @@ package tests
 import (
 	"errors"
 	"fmt"
-	"github.com/heyuuu/gophp/shim/cmp"
-	"github.com/heyuuu/gophp/shim/slices"
 	"log"
 	"os"
 	"path/filepath"
@@ -147,7 +145,7 @@ func (c Config) runTestReal(testIndex int, tc *TestCase) (*TestResult, error) {
 func findTestFiles(dir string) (files []string, extSkipped int, ignoreByExt int, err error) {
 	// main tests
 	for _, subDir := range []string{"Zend", "tests", "sapi"} {
-		err = eachTestFiles(filepath.Join(dir, subDir), func(file string) error {
+		err = EachTestFile(filepath.Join(dir, subDir), true, func(file string) error {
 			files = append(files, file)
 			return nil
 		})
@@ -163,7 +161,7 @@ func findTestFiles(dir string) (files []string, extSkipped int, ignoreByExt int,
 	for _, ext := range exts {
 		if ext.IsDir() {
 			extSkipped++
-			err = eachTestFiles(filepath.Join(extRoot, ext.Name()), func(file string) error {
+			err = EachTestFile(filepath.Join(extRoot, ext.Name()), true, func(file string) error {
 				ignoreByExt++
 				return nil
 			})
@@ -174,51 +172,4 @@ func findTestFiles(dir string) (files []string, extSkipped int, ignoreByExt int,
 	}
 
 	return
-}
-
-func eachTestFiles(dir string, handle func(file string) error) error {
-	files, err := os.ReadDir(dir)
-	if err != nil {
-		return err
-	}
-
-	for _, file := range files {
-		if file.Name() == "" || file.Name()[0] == '.' {
-			continue
-		}
-
-		path := filepath.Join(dir, file.Name())
-		if file.IsDir() {
-			err = eachTestFiles(path, handle)
-		} else {
-			if strings.HasSuffix(path, ".phpt") {
-				err = handle(path)
-			}
-		}
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func sortTestFiles(files []string, srcDir string) {
-	runTestDir := filepath.Join(srcDir, "tests/run-test")
-	testDir := filepath.Join(srcDir, "tests")
-	scorer := func(file string) int {
-		if strings.HasPrefix(file, runTestDir) {
-			return 2
-		} else if strings.HasPrefix(file, testDir) {
-			return 1
-		}
-		return 0
-	}
-	slices.SortStableFunc(files, func(file1, file2 string) int {
-		score1, score2 := scorer(file1), scorer(file2)
-		if score1 == score2 {
-			return cmp.Compare(file1, file2)
-		} else {
-			return -cmp.Compare(score1, score2)
-		}
-	})
 }
