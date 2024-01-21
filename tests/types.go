@@ -6,27 +6,27 @@ import (
 )
 
 type TestCase struct {
-	File          string
-	ShortFileName string
-
-	TestName      string
+	// Case 名及路径
+	FileName string
+	File     string
+	// Case 文件解析的信息
+	Desc          string
 	CaptureStdin  bool
 	CaptureStdout bool
 	CaptureStderr bool
 	UseCgi        bool
 	UseDbg        bool
-
-	sections map[string]string
+	sections      map[string]string
 }
 
-func NewTestCase(file string, shortFileName string, sections map[string]string) *TestCase {
-	tc := &TestCase{File: file, ShortFileName: shortFileName, sections: sections}
+func NewTestCase(file string, fileName string, sections map[string]string) *TestCase {
+	tc := &TestCase{File: file, FileName: fileName, sections: sections}
 	tc.init()
 	return tc
 }
 
 func (tc *TestCase) init() {
-	tc.TestName = strings.TrimSpace(tc.sections["TEST"])
+	tc.Desc = strings.TrimSpace(tc.sections["TEST"])
 
 	if capture, ok := tc.sections["CAPTURE_STDIO"]; ok {
 		lcCapture := strings.ToLower(capture)
