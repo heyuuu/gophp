@@ -164,7 +164,7 @@ func (p *FastParamParser) ParseBoolNullable() *bool {
 func (p *FastParamParser) parseBoolEx(checkNull bool, separate bool) (dest bool, isNull bool) {
 	arg, ok := p.nextArg(separate, separate)
 	if !ok {
-		return
+		return false, true
 	}
 
 	// check null
@@ -253,7 +253,7 @@ func (p *FastParamParser) ParseDoubleNullable() *float64 {
 func (p *FastParamParser) parseDoubleEx(checkNull bool, separate bool) (dest float64, isNull bool) {
 	arg, ok := p.nextArg(separate, separate)
 	if !ok {
-		return
+		return 0, true
 	}
 
 	// check null
@@ -294,7 +294,7 @@ func (p *FastParamParser) ParseStringNullable() *string {
 func (p *FastParamParser) parseStringEx(checkNull bool, separate bool) (dest string, isNull bool) {
 	arg, ok := p.nextArg(separate, separate)
 	if !ok {
-		return
+		return "", true
 	}
 
 	// check null
@@ -333,7 +333,7 @@ func (p *FastParamParser) ParsePathNullable() *string {
 func (p *FastParamParser) parsePathEx(checkNull bool, separate bool) (dest string, isNull bool) {
 	arg, ok := p.nextArg(separate, separate)
 	if !ok {
-		return
+		return "", true
 	}
 
 	// check null
@@ -451,7 +451,7 @@ func (p *FastParamParser) ParseResourceNullable() *types.Zval {
 func (p *FastParamParser) parseResourceEx(checkNull bool, separate bool) (dest types.Zval, isNull bool) {
 	arg, ok := p.nextArg(separate, separate)
 	if !ok {
-		return
+		return types.Undef, true
 	}
 
 	// check null

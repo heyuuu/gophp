@@ -979,10 +979,19 @@ func ZifChunkSplit(ctx *php.Context, str string, _ zpp.Opt, chunklen_ *int, endi
 		return str + ending, true
 	}
 
+	// 确保结果长度不溢出
+	strLen, endingLen := len(str), len(ending)
+	chunks := strLen / chunklen
+	if endingLen > (types.MaxStrLen-strLen)/chunks {
+		return "", false
+	}
+	outLen := strLen + chunks*endingLen
+
 	// common
 	var buf strings.Builder
-	for i := 0; i < len(str); i += chunklen {
-		if i+chunklen <= len(str) {
+	buf.Grow(outLen)
+	for i := 0; i < strLen; i += chunklen {
+		if i+chunklen <= strLen {
 			buf.WriteString(str[i : i+chunklen])
 		} else {
 			buf.WriteString(str[i:])
@@ -991,6 +1000,7 @@ func ZifChunkSplit(ctx *php.Context, str string, _ zpp.Opt, chunklen_ *int, endi
 	}
 	return buf.String(), true
 }
+
 func ZifSubstr(str string, offset int, _ zpp.Opt, length *int) (string, bool) {
 	return substr(str, offset, length)
 }
