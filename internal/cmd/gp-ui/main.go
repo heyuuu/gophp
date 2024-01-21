@@ -27,7 +27,6 @@ func main() {
 
 	// start server
 	http.HandleFunc("/", staticHandler())
-	http.HandleFunc("/static/", staticHandler())
 	http.HandleFunc("/api", ApiWrapHandler(apiHandler))
 	http.HandleFunc("/api/test/list", ApiWrapHandler(apiTestListHandler))
 	http.HandleFunc("/api/test/run", ApiWrapHandler(apiTestRunHandler))
@@ -60,7 +59,7 @@ var defaultContentType = map[string]string{
 
 func staticHandler() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		path := request.RequestURI[1:]
+		path := request.URL.Path[1:]
 		if path == "" {
 			path = "static/index.html"
 		}

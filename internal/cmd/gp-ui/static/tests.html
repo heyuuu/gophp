@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GoPhp UI</title>
+    <link href="/static/css/bootstrap-4.6.2.min.css" rel="stylesheet">
+    <style>
+        .test-active {
+            font-weight: bold;
+        }
+
+        .test-list {
+            height: 100vh;
+            overflow-y: scroll;
+        }
+
+        .test-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cell-name {
+            max-width: 200px;
+            overflow-x: scroll;
+        }
+
+        .cell-name::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid" v-scope v-cloak>
+    <div class="row" style="margin-top: 10px">
+        <div class="col-sm-4 test-list">
+            <div>
+                <span class="custom-control custom-control-inline custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch1" v-model="hidePass">
+                    <label class="custom-control-label" for="customSwitch1">Hide Pass</label>
+                </span>
+                <span class="custom-control custom-control-inline custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch2" v-model="hideSkip">
+                    <label class="custom-control-label" for="customSwitch2">Hide Skip</label>
+                </span>
+                <span>{{statLine()}}</span>
+            </div>
+            <table class="table table-sm table-bordered table-hover">
+                <tr>
+                    <th>#</th>
+                    <th>name</th>
+                    <th>status</th>
+                    <th>herf</th>
+                </tr>
+                <tr v-for="(test, testIdx) in tests" :class="testShowClass(testIdx)" @click="activeTest(testIdx)"
+                    v-show="testIsShow(testIdx)">
+                    <td>{{testIdx + 1}}</td>
+                    <td class="cell-name">{{test.name}}</td>
+                    <td>{{test.status}}</td>
+                    <td><a :href="testShowPage(testIdx)" target="_blank">#</a></td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-8">
+            <div class="card" style="height: 100vh">
+                <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ currTest.content }}</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/jquery-3.6.3.js"></script>
+<script src="/static/js/petite-vue-0.4.1.iife.min.js"></script>
+<script>
+    // App
+    const apiUri = "/api"
+    const testListUri = "/api/test/list"
+    const testRunUri = "/api/test/run"
+
+    // status
+    const WAITING = 'WAIT'
+    const RUNNING = 'RUNNING'
+    const PASS = 'PASS'
+    const SKIP = 'SKIP'
+    const FAIL = 'FAIL'
+    const UNKNOWN = 'UNKNOWN'
+
+    const app = window.app = {
+        tests: [
+            {
+                name: "1231231.phpt",
+                status: PASS,
+                content: "111111",
+            },
+            {
+                name: "1231231.phpt",
+                status: FAIL,
+                content: "2222222",
+            },
+            {
+                name: "1231231.phpt",
+                status: SKIP,
+                content: "111111",
+            },
+            {
+                name: "1231231.phpt",
+                status: PASS,
+                content: "2222222",
+            },
+        ],
+        count: {
+            [WAITING]: 0,
+            [RUNNING]: 0,
+            [PASS]: 0,
+            [SKIP]: 0,
+            [FAIL]: 0,
+        },
+        activeIndex: 0,
+        waitingIndex: 0,
+
+        hidePass: false,
+        hideSkip: false,
+
+        // 当前选中的测试
+        get currTest() {
+            return this.tests[this.activeIndex]
+        },
+        // 当前统计信息
+        statLine() {
+            return "total: " + this.tests.length +
+                ", running:" + this.count[RUNNING] +
+                ", pass:" + this.count[PASS] +
+                ", skip:" + this.count[SKIP] +
+                ", fail:" + this.count[FAIL]
+        },
+        // 判断是否展示
+        testIsShow(testIdx) {
+            const test = this.tests[testIdx]
+            if (!test) {
+                return false
+            }
+            if (this.hidePass && test.status === PASS) {
+                return false
+            }
+            if (this.hideSkip && test.status === SKIP) {
+                return false
+            }
+            return true
+        },
+        // 判断当前测试类
+        testShowClass(testIdx) {
+            const test = this.tests[testIdx]
+            if (!test) {
+                return ""
+            }
+            let classes = ""
+
+            if (testIdx === this.activeIndex) {
+                classes = "test-active "
+            }
+            if (test.status === PASS) {
+                classes += "table-success"
+            } else if (test.status === SKIP) {
+                classes += "table-warning"
+            } else if (test.status === FAIL) {
+                classes += "table-danger"
+            }
+            return classes
+        },
+        // 点击具体case
+        activeTest(testIdx) {
+            this.activeIndex = testIdx
+        },
+        // 跳转详情页的url
+        testShowPage(testIdx) {
+            let test = this.tests[testIdx]
+            if (!test) {
+                return ""
+            }
+            return "/?test=" + test.name
+        },
+        // start
+        start() {
+            // init list
+            postJson(testListUri, {path: getQueryParam("path")}, (res) => {
+                const tests = []
+                for (name of res.data) {
+                    tests.push({
+                        name: name,
+                        status: WAITING,
+                        content: "",
+                    })
+                }
+                this.tests = tests
+                this.count[WAITING] = tests.length
+
+                // 开始逐个处理case
+                this.runNext()
+            })
+        },
+        // running
+        runNext() {
+            while (this.count[RUNNING] < 10 && this.waitingIndex < this.tests.length) {
+                const index = this.waitingIndex
+                const test = this.tests[this.waitingIndex]
+                this.waitingIndex++
+                if (test.status !== WAITING) {
+                    continue
+                }
+                this.runTest(index)
+            }
+        },
+        updateTest(index, status, content) {
+            const test = this.tests[index]
+            if (!test) {
+                return
+            }
+            if (test.status === status) {
+                return
+            }
+            if ([WAITING, RUNNING, PASS, SKIP, FAIL].includes(test.status)) {
+                this.count[test.status]--
+            }
+            if ([WAITING, RUNNING, PASS, SKIP, FAIL].includes(status)) {
+                this.count[status]++
+            }
+            test.status = status
+            test.content = content
+        },
+        runTest(index) {
+            const test = this.tests[this.waitingIndex]
+            if (!test) {
+                return
+            }
+            if (test.status === RUNNING) {
+                return
+            }
+            this.updateTest(index, RUNNING, "running...")
+
+            postJson(testRunUri, {name: test.name}, (res) => {
+                if (res.code !== 0) {
+                    this.updateTest(index, FAIL, "执行失败: error=" + res.error)
+                    this.runNext()
+                    return
+                }
+
+                this.updateTest(index, res.data.status, res.data.reason)
+                this.runNext()
+            }, () => {
+                this.updateTest(index, FAIL, "调用 url 失败")
+                this.runNext()
+            })
+        },
+    }
+    PetiteVue.createApp(app).mount()
+
+    app.start()
+
+    function getQueryParam(name) {
+        const usp = new URLSearchParams(window.location.search)
+        return usp.get(name)
+    }
+
+    function postJson(url, data, success, onError) {
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: success,
+            error: onError,
+            dataType: "json"
+        })
+    }
+</script>
+</body>
+</html>
