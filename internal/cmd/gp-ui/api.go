@@ -166,7 +166,7 @@ func diffOutput(text1 string, text2 string) string {
 		return err.Error()
 	}
 
-	output, err := runCommand(5*time.Second, "diff", f1, f2)
+	output, err := runCommand(5*time.Second, "diff", "-a", f1, f2)
 	if output == "" && err != nil {
 		return "run diff command failed: " + err.Error()
 	}

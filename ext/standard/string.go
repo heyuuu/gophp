@@ -172,12 +172,13 @@ func PhpAddslashes(str string) string {
 		return ""
 	}
 	replacer := strings.NewReplacer(
-		"\\000", "\\0",
+		"\000", "\\0",
 		`'`, `\'`,
 		`"`, `\"`,
 		`\`, `\\`,
 	)
-	return replacer.Replace(str)
+	result := replacer.Replace(str)
+	return result
 }
 
 func PhpAddcslashes(ctx *php.Context, str string, what string) string {
@@ -643,7 +644,7 @@ func PhpBasename(s string, suffix string) string {
 	if pos := strings.LastIndexByte(s, '/'); pos >= 0 {
 		s = s[pos+1:]
 	}
-	if suffix != "" && strings.HasSuffix(s, suffix) {
+	if suffix != "" && len(suffix) < len(s) && strings.HasSuffix(s, suffix) {
 		s = s[:len(s)-len(suffix)]
 	}
 	return s
