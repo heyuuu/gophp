@@ -1,6 +1,9 @@
 package php
 
-import "github.com/heyuuu/gophp/php/types"
+import (
+	"github.com/heyuuu/gophp/php/types"
+	"strings"
+)
 
 type ClassTable = *types.Table[*types.Class]
 type FunctionTable = *types.Table[*types.Function]
@@ -31,7 +34,8 @@ func (e *ExecutorGlobals) ClassTable() ClassTable       { return e.classTable }
 
 func (e *ExecutorGlobals) FindFunction(name string) *types.Function {
 	// todo 完善 caseIgnore 及命名空间处理
-	return e.functionTable.Get(name)
+	lcName := strings.ToLower(name)
+	return e.functionTable.Get(lcName)
 }
 
 func (e *ExecutorGlobals) HasException() bool {

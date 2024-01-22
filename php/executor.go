@@ -73,6 +73,12 @@ func (e *Executor) initStringCall(name string) *types.Function {
 
 func (e *Executor) userFunction(fn *types.Function, args []types.Zval) types.Zval {
 	// todo 初始化 args
+	for i, argInfo := range fn.ArgInfos() {
+		if i < len(args) {
+			e.currSymbols().Set(argInfo.Name, args[i])
+		}
+	}
+
 	res := e.stmtList(fn.Stmts())
 	switch r := res.(type) {
 	case *returnResult:
@@ -430,7 +436,27 @@ func (e *Executor) namespaceStmt(x *ast.NamespaceStmt) execResult {
 }
 
 func (e *Executor) functionStmt(x *ast.FunctionStmt) execResult {
-	panic(perr.Todof("e.functionStmt"))
+	var name string
+	if x.NamespacedName != nil {
+		name = x.NamespacedName.ToCodeString()
+	} else {
+		name = x.Name.Name
+	}
+
+	var argInfos []types.ArgInfo
+	if len(x.Params) > 0 {
+		argInfos = make([]types.ArgInfo, len(x.Params))
+		for i, param := range x.Params {
+			argInfos[i] = types.ArgInfo{
+				Name: param.Var.Name.(*ast.Ident).Name,
+			}
+		}
+	}
+
+	fn := types.NewAstFunction(name, argInfos, x.Stmts)
+	RegisterFunction(e.ctx, name, fn)
+
+	return nil
 }
 
 func (e *Executor) interfaceStmt(x *ast.InterfaceStmt) execResult {
