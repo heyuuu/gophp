@@ -42,16 +42,15 @@ func apiTestRunHandler(request *http.Request) (data any, err error) {
 		return nil, errors.New("name is empty")
 	}
 	testFile := realTestCasePath(name)
-	testResult, err := tests.RunTestFile(0, name, testFile)
-	if err != nil {
-		return nil, err
-	}
+	testResult := tests.RunTestFile(0, name, testFile)
 
 	data = map[string]any{
+		// case
+		"case": testResult.Case,
+		// result
 		"status":  testResult.Type,
 		"reason":  testResult.Reason,
 		"useTime": testResult.UseTime.Nanoseconds(),
-		"@":       testResult,
 	}
 	return data, nil
 }

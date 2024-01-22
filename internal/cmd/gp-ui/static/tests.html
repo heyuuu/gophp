@@ -29,6 +29,7 @@
         .cell-name::-webkit-scrollbar {
             display: none;
         }
+
         .btn-small {
             padding-top: 0;
             padding-bottom: 0;
@@ -99,21 +100,25 @@
                 name: "1231231.phpt",
                 status: PASS,
                 content: "111111",
+                code: "",
             },
             {
                 name: "1231231.phpt",
                 status: FAIL,
                 content: "2222222",
+                code: "",
             },
             {
                 name: "1231231.phpt",
                 status: SKIP,
                 content: "111111",
+                code: "",
             },
             {
                 name: "1231231.phpt",
                 status: PASS,
                 content: "2222222",
+                code: "",
             },
         ],
         count: {
@@ -181,15 +186,16 @@
         },
         // 按钮事件
         testShowPage(testIdx) {
-            let test = this.tests[testIdx]
+            const test = this.tests[testIdx]
             if (!test) {
                 return ""
             }
-            return "/?test=" + test.name
+            return "/?test=" + test.name + "&code=" + encodeURIComponent(test.code)
         },
         gotoShowPage(testIdx) {
             const url = this.testShowPage(testIdx)
-            window.open(url)
+            const newWindow = window.open(url)
+            newWindow.focus()
         },
         // start
         start() {
@@ -201,6 +207,7 @@
                         name: name,
                         status: WAITING,
                         content: "",
+                        code: "",
                     })
                 }
                 this.tests = tests
@@ -257,6 +264,12 @@
                 }
 
                 this.updateTest(index, res.data.status, res.data.reason)
+                const code = res.data.case.Sections.FILE
+                if (code) {
+                    test.code = code
+                } else {
+                    test.code = ""
+                }
                 this.runNext()
             }, () => {
                 this.updateTest(index, FAIL, "调用 url 失败")

@@ -60,9 +60,12 @@
 <script>
     // storage
     const storageKey = "code"
-    let initCode = localStorage.getItem(storageKey)
+    let initCode = getQueryParam("code")
     if (!initCode) {
-        initCode = "<?php\n\n"
+        initCode = localStorage.getItem(storageKey)
+        if (!initCode) {
+            initCode = "<?php\n\n"
+        }
     }
 
     const storageShowModeKey = "showMode"
@@ -200,6 +203,11 @@
     PetiteVue.createApp(app).mount()
 
     app.refresh()
+
+    function getQueryParam(name) {
+        const usp = new URLSearchParams(window.location.search)
+        return usp.get(name)
+    }
 
     function postJson(url, data, success, onError) {
         $.ajax({

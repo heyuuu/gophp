@@ -39,16 +39,13 @@ func runTestCaseReal(t *testing.T, testName string, testFile string) {
 		}
 	}()
 
-	tr, err := tests.RunTestFile(0, testName, testFile)
-	if err != nil {
-		t.Errorf("runTestCase() error = %v", err)
-		return
-	}
-	switch tr.Type {
+	result := tests.RunTestFile(0, testName, testFile)
+	switch result.Type {
 	case tests.PASS:
+		// pass
 	case tests.SKIP:
 		t.SkipNow()
 	default:
-		t.Errorf("runTestCase() fail = %s", tr.Reason)
+		t.Errorf("runTestCase() fail = %s", result.Reason)
 	}
 }
