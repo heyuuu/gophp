@@ -57,6 +57,8 @@
 
 <script src="/static/js/jquery-3.6.3.js"></script>
 <script src="/static/js/petite-vue-0.4.1.iife.min.js"></script>
+<script src="/static/js/qs-6.11.2.min.js"></script>
+<script src="/static/js/tools.js"></script>
 <script>
     // storage
     const storageKey = "code"
@@ -150,7 +152,14 @@
         },
         codeChange() {
             localStorage.setItem(storageKey, this.code)
+            this.queryChange()
             this.refresh()
+        },
+        queryChange() {
+            const query = getQuery()
+            query.code = this.code
+            query.mode = this.mode
+            setQuery(query)
         },
         updateResult(result) {
             const oldResult = this.result
