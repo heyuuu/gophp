@@ -1,6 +1,7 @@
 package boot
 
 import (
+	_ "github.com/heyuuu/gophp/ext/builtin"
 	_ "github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/php"
 )

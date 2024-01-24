@@ -25,6 +25,6 @@ func runParser(args ...string) ([]byte, error) {
 
 	commandArgs := append([]string{scriptPath}, args...)
 	command := exec.Command("php", commandArgs...)
-	//log.Printf("Run command: %s\n", command.String())
+	log.Printf("Run command: %s\n", command.String())
 	return command.CombinedOutput()
 }

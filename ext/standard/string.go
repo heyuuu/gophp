@@ -230,7 +230,7 @@ func PhpStripslashes(str string) string {
 		return ""
 	}
 	replacer := strings.NewReplacer(
-		"\\0", "\\000",
+		"\\0", "\000",
 		`\'`, `'`,
 		`\"`, `"`,
 		`\\`, `\`,

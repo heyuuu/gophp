@@ -81,7 +81,7 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 	// Ast
 	astNodes, err := parser.ParseCode(code)
 	if err != nil {
-		return
+		return nil, fmt.Errorf("ast parse fail: %w", err)
 	}
 
 	astDump := vardumper.Sprint(astNodes)
@@ -89,7 +89,7 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 
 	astPrint, err := ast.PrintFile(astNodes)
 	if err != nil {
-		return
+		return nil, fmt.Errorf("ast print fail: %w", err)
 	}
 	result = append(result, ApiTypeResult{Type: TypeAstPrint, Content: astPrint})
 
@@ -111,10 +111,10 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 func runCode(code string) (output string) {
 	var buf strings.Builder
 	defer func() {
-		if e := recover(); e != nil {
-			buf.WriteString(fmt.Sprintf(">>> Execute panic: %v", e))
-			log.Printf("%+v\n", e)
-		}
+		//if e := recover(); e != nil {
+		//	buf.WriteString(fmt.Sprintf(">>> Execute panic: %v", e))
+		//	log.Printf("%+v\n", e)
+		//}
 
 		output = buf.String()
 	}()
