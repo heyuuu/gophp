@@ -197,8 +197,31 @@ func NewArrayOfPairs(pairs []ArrayPair) *Array {
 }
 
 func (ht *Array) Clone() *Array {
-	// todo 懒复制逻辑
-	return ht
+	// todo 处理数组的懒复制逻辑(写时复制机制)，待完成
+	/*
+	 *	此处功能要求为:
+	 *  - 若原数组数据非只读，标记原数组数组为只读，设置原数组指向数组的一个只读 reader
+	 *  - 此方法返回底层数组数据的只读 reader
+	 *  只读 reader 要求
+	 *  - 读操作时直接读取数据
+	 *  - 写操作时，复制底层数组数据后指向新数据，在新数据上操作
+	 *  - pos 对应的数据不会发生改变
+	 */
+	return ht.RealClone()
+}
+
+func (ht *Array) RealClone() *Array {
+	return &Array{
+		data:      ht.data.Clone(),
+		flags:     ht.flags,
+		protected: false,
+		writable:  true,
+	}
+}
+
+// see: zend_array_dup()
+func (ht *Array) Dup() *Array {
+	return ht.RealClone()
 }
 
 func (ht *Array) Clean() {
@@ -330,17 +353,17 @@ type ArrayComparer interface {
 	Compare(p1, p2 ArrayPair) int
 }
 
-type ArrayPairComparer func(p1, p2 ArrayPair) int
+type ArrayComparerFunc func(p1, p2 ArrayPair) int
 
-func (c ArrayPairComparer) Compare(p1, p2 ArrayPair) int { return c(p1, p2) }
+func (c ArrayComparerFunc) Compare(p1, p2 ArrayPair) int { return c(p1, p2) }
 
-type ArrayKeyComparer func(k1, k2 ArrayKey) int
+type ArrayKeyComparerFunc func(k1, k2 ArrayKey) int
 
-func (c ArrayKeyComparer) Compare(p1, p2 ArrayPair) int { return c(p1.Key, p2.Key) }
+func (c ArrayKeyComparerFunc) Compare(p1, p2 ArrayPair) int { return c(p1.Key, p2.Key) }
 
-type ArrayValueComparer func(v1, v2 Zval) int
+type ArrayValueComparerFunc func(v1, v2 Zval) int
 
-func (c ArrayValueComparer) Compare(p1, p2 ArrayPair) int { return c(p1.Val, p2.Val) }
+func (c ArrayValueComparerFunc) Compare(p1, p2 ArrayPair) int { return c(p1.Val, p2.Val) }
 
 func (ht *Array) Sort(comparer ArrayComparer, renumber bool) {
 	ht.assertWritable()
@@ -399,42 +422,123 @@ func (ht *Array) AddNextIndexLong(n int)       { ht.Append(ZvalLong(n)) }
 func (ht *Array) AddNextIndexDouble(d float64) { ht.Append(ZvalDouble(d)) }
 func (ht *Array) AddNextIndexStr(str string)   { ht.Append(ZvalString(str)) }
 
-// pos
+// queue-like && stack-lick
 
-func (ht *Array) Pos(pos ArrayPosition) ArrayPair {
-	key, value := ht.data.Pos(pos)
-	return MakeArrayPair(key, value)
+func (ht *Array) Pop() ArrayPair {
+	ht.resetInternalPointer()
+
+	pair := ht.Last()
+	if !pair.IsValid() {
+		return invalidArrayPair
+	}
+
+	ht.Delete(pair.Key)
+	return pair
 }
 
-func (ht *Array) findPos(pos ArrayPosition) (ArrayPair, ArrayPosition) {
+func (ht *Array) MapWithKey(mapper func(key ArrayKey, value Zval) (ArrayKey, Zval)) *Array {
+	// todo 考虑 rehash 等操作 或 对其他属性的处理
+	arr := NewArrayCap(ht.Len())
+	ht.Each(func(key ArrayKey, value Zval) {
+		newKey, newValue := mapper(key, value)
+		arr.Add(newKey, newValue)
+	})
+	ht.resetInternalPointer()
+	return arr
+}
+
+func (ht *Array) Filter(handler func(key ArrayKey, value Zval) bool) bool {
+	var removeKeys []ArrayKey
+	ht.Each(func(key ArrayKey, value Zval) {
+		if !handler(key, value) {
+			removeKeys = append(removeKeys, key)
+		}
+	})
+
+	if len(removeKeys) > 0 {
+		for _, key := range removeKeys {
+			ht.Delete(key)
+		}
+	}
+
+	return true
+}
+
+// Pos 相关
+
+func (ht *Array) resetInternalPointer() {
+	if d, ok := ht.data.(*ArrayDataHt); ok {
+		d.ResetPointer()
+	}
+}
+
+func (ht *Array) internalPointer() int {
+	if d, ok := ht.data.(*ArrayDataHt); ok {
+		return d.Current()
+	}
+	return 0
+}
+
+func (ht *Array) maxPos() ArrayPosition {
+	return ArrayPosition(ht.data.Used()) - 1
+}
+
+func (ht *Array) Pos(pos ArrayPosition) ArrayPair {
+	return ht.data.Pos(pos)
+}
+
+func (ht *Array) FindPos(pos ArrayPosition) (ArrayPair, ArrayPosition) {
 	posSize := ht.data.Used()
 	for i := pos; i < posSize; i++ {
-		key, value := ht.data.Pos(pos)
-		if value.IsUndef() {
+		pair := ht.data.Pos(pos)
+		if !pair.IsValid() {
 			continue
 		}
-		return MakeArrayPair(key, value), i
+		return pair, i
 	}
 	return invalidArrayPair, posSize
 }
 
-func (ht *Array) findPosReserve(pos ArrayPosition) (ArrayPair, ArrayPosition) {
+func (ht *Array) FindPosReserve(pos ArrayPosition) (ArrayPair, ArrayPosition) {
 	// prev 需要用 0 表示已搜索全表，所以 pos = 实际索引 + 1
 	for i := pos; i > 0; i-- {
-		key, value := ht.data.Pos(i - 1)
-		if value.IsNotUndef() {
+		pair := ht.data.Pos(i - 1)
+		if !pair.IsValid() {
 			continue
 		}
 
-		return MakeArrayPair(key, value), i - 1
+		return pair, i - 1
 	}
 	return invalidArrayPair, 0
 }
 
-func (ht *Array) First() *ArrayPair {
-	pair, _ := ht.findPos(0)
-	if pair.IsValid() {
-		return &pair
+func (ht *Array) Current() ArrayPair {
+	return ht.Pos(ht.internalPointer())
+}
+
+func (ht *Array) MoveNext() {
+	ht.operableData().MoveNext()
+}
+func (ht *Array) MovePrev() {
+	ht.operableData().MovePrev()
+}
+func (ht *Array) MoveEnd() {
+	if ht.Len() <= 1 {
+		return
 	}
-	return nil
+	ht.operableData().MoveEnd()
+}
+
+func (ht *Array) First() ArrayPair {
+	pair, _ := ht.FindPos(0)
+	return pair
+}
+func (ht *Array) Last() ArrayPair {
+	pair, _ := ht.FindPosReserve(ht.maxPos())
+	return pair
+}
+
+func (ht *Array) Reset() ArrayPair {
+	ht.resetInternalPointer()
+	return ht.First()
 }

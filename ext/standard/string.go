@@ -710,7 +710,7 @@ func ZifPathinfo(path string, _ zpp.Opt, options *int) types.Zval {
 		return types.ZvalArray(arr)
 	} else {
 		p := arr.First()
-		if p != nil {
+		if p.IsValid() {
 			return p.Val
 		} else {
 			return types.ZvalString("")
@@ -1065,7 +1065,7 @@ func substrReplaceStr(ctx *php.Context, str string, replace types.Zval, start ty
 	var replStr string
 	if replace.IsArray() {
 		replPair := replace.Array().First()
-		if replPair != nil {
+		if replPair.IsValid() {
 			replStr = php.ZvalGetStrVal(ctx, replPair.Val)
 		} else {
 			replStr = ""

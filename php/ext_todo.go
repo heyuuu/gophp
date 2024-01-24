@@ -56,3 +56,23 @@ func ZendTryAssignRefDouble(ctx *Context, percent zpp.RefZval, float float64) {
 func ZendTryAssignRefLong(ctx *Context, count zpp.RefZval, count2 int) {
 
 }
+
+func NewZvalZval(zv types.Zval, copy bool, dtor bool) types.Zval {
+	if zv.IsRef() {
+		return zv.DeRef()
+	} else if copy && !dtor {
+		return zv
+	} else {
+		return zv
+	}
+}
+
+func HashOf(p types.Zval) *types.Array {
+	if p.IsArray() {
+		return p.Array()
+		//} else if p.IsObject() {
+		//	return p.Object().GetPropertiesArray()
+	} else {
+		return nil
+	}
+}

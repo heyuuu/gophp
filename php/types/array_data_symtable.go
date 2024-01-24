@@ -109,13 +109,13 @@ func (ht *SymtableData) EachReserve(handler func(key ArrayKey, value Zval) error
 	}
 	return nil
 }
-func (ht *SymtableData) Pos(pos ArrayPosition) (key ArrayKey, value Zval) {
+func (ht *SymtableData) Pos(pos ArrayPosition) ArrayPair {
 	if pos < 0 || pos >= len(ht.data) || !ht.isValid(pos) {
-		return
+		return invalidArrayPair
 	}
 
 	p := ht.data[pos]
-	return p.Key(), p.Val()
+	return MakeArrayPair(p.Key(), p.Val())
 }
 
 func (ht *SymtableData) Add(key ArrayKey, value Zval) (bool, error) {

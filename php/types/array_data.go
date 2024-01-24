@@ -28,7 +28,7 @@ type ArrayData interface {
 	 * - 在 [0, Used()] 之间可能有对应值，其他位置肯定无对应值
 	 * - 未进行写操作时，Used() 值及各 pos 对应的值不会发生变化
 	 */
-	Pos(pos ArrayPosition) (key ArrayKey, value Zval)
+	Pos(pos ArrayPosition) ArrayPair
 
 	/**
 	 * 写操作
@@ -61,7 +61,7 @@ func (d emptyArrayDataType) Exists(key ArrayKey) bool                           
 func (d emptyArrayDataType) Find(key ArrayKey) (Zval, ArrayPosition)                  { return Undef, InvalidArrayPos }
 func (d emptyArrayDataType) Each(f func(key ArrayKey, value Zval) error) error        { return nil }
 func (d emptyArrayDataType) EachReserve(f func(key ArrayKey, value Zval) error) error { return nil }
-func (d emptyArrayDataType) Pos(pos ArrayPosition) (key ArrayKey, value Zval)         { return }
+func (d emptyArrayDataType) Pos(pos ArrayPosition) ArrayPair                          { return invalidArrayPair }
 
 func (d emptyArrayDataType) Add(key ArrayKey, value Zval) (bool, error) {
 	return false, arrayDataUnsupported
@@ -127,11 +127,11 @@ func (l *ArrayDataList[T]) EachReserve(f func(key ArrayKey, value Zval) error) e
 	return nil
 }
 
-func (l *ArrayDataList[T]) Pos(pos ArrayPosition) (key ArrayKey, value Zval) {
+func (l *ArrayDataList[T]) Pos(pos ArrayPosition) ArrayPair {
 	if 0 <= pos && pos < len(l.data) {
-		return IdxKey(pos), l.wrap(l.data[pos])
+		return MakeArrayPair(IdxKey(pos), l.wrap(l.data[pos]))
 	}
-	return
+	return invalidArrayPair
 }
 
 func (l *ArrayDataList[T]) Add(key ArrayKey, value Zval) (bool, error) {

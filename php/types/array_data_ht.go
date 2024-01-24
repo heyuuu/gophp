@@ -15,6 +15,7 @@ import (
  */
 type ArrayDataHt struct {
 	elementsCount   int
+	internalPointer int
 	nextFreeElement int
 	data            []ArrayPair      // 实际存储数据的地方
 	indexes         map[ArrayKey]int // 索引到具体位置的映射
@@ -28,6 +29,7 @@ func newArrayDataHt(cap int) *ArrayDataHt {
 		writable: true,
 	}
 }
+
 func newArrayDataHtByData(pairs []ArrayPair) *ArrayDataHt {
 	ht := &ArrayDataHt{
 		data:     slices.Clone(pairs),
@@ -40,6 +42,7 @@ func newArrayDataHtByData(pairs []ArrayPair) *ArrayDataHt {
 func (ht *ArrayDataHt) Clone() ArrayData {
 	return &ArrayDataHt{
 		elementsCount:   ht.elementsCount,
+		internalPointer: ht.internalPointer,
 		nextFreeElement: ht.nextFreeElement,
 		data:            slices.Clone(ht.data),
 		indexes:         maps.Clone(ht.indexes),
@@ -89,13 +92,12 @@ func (ht *ArrayDataHt) EachReserve(handler func(key ArrayKey, value Zval) error)
 	}
 	return nil
 }
-func (ht *ArrayDataHt) Pos(pos ArrayPosition) (key ArrayKey, value Zval) {
+func (ht *ArrayDataHt) Pos(pos ArrayPosition) ArrayPair {
 	if pos < 0 || pos >= len(ht.data) || !ht.isValid(pos) {
-		return
+		return invalidArrayPair
 	}
 
-	bkt := &ht.data[pos]
-	return bkt.Key, bkt.Val
+	return ht.data[pos]
 }
 
 func (ht *ArrayDataHt) Add(key ArrayKey, value Zval) (bool, error) {
@@ -138,6 +140,7 @@ func (ht *ArrayDataHt) Clean() {
 	ht.assertWritable()
 
 	ht.elementsCount = 0
+	ht.internalPointer = 0
 	ht.nextFreeElement = 0
 	ht.data = nil
 	ht.indexes = make(map[ArrayKey]int)
@@ -151,6 +154,7 @@ func (ht *ArrayDataHt) Sort(comparer ArrayComparer, renumber bool) {
 	}
 
 	ht.removeHoles()
+	ht.internalPointer = 0
 
 	sort.SliceStable(ht.data, func(i, j int) bool {
 		ret := comparer.Compare(ht.data[i], ht.data[j])
@@ -213,7 +217,12 @@ func (ht *ArrayDataHt) deleteBucket(pos int) {
 	// 移除数据，更新元素计数
 	ht.elementsCount--
 	delete(ht.indexes, ht.data[pos].Key)
-	ht.data[pos].Val = Undef
+	ht.markInvalid(pos)
+
+	// 更新内部指针和遍历器指针
+	if ht.internalPointer == pos {
+		ht.internalPointer = ht.validPos(pos + 1)
+	}
 
 	// 若删除队尾元素，尝试清除 data 队尾无用数据
 	if pos == len(ht.data)-1 {
@@ -223,6 +232,9 @@ func (ht *ArrayDataHt) deleteBucket(pos int) {
 		}
 
 		ht.data = ht.data[:newDataSize]
+		if ht.internalPointer > newDataSize {
+			ht.internalPointer = newDataSize
+		}
 	}
 }
 
@@ -270,6 +282,9 @@ func (ht *ArrayDataHt) removeHoles() {
 		}
 		if newPos != pos {
 			ht.data[newPos] = ht.data[pos]
+			if ht.internalPointer == pos {
+				ht.internalPointer = newPos
+			}
 		}
 		newPos++
 	}
@@ -277,4 +292,46 @@ func (ht *ArrayDataHt) removeHoles() {
 	// 截取数据，记录有效元素数
 	ht.data = ht.data[:newPos]
 	ht.elementsCount = newPos
+}
+
+func (ht *ArrayDataHt) validPos(pos int) int {
+	for ; pos < len(ht.data); pos++ {
+		if ht.isValid(pos) {
+			return pos
+		}
+	}
+	return len(ht.data)
+}
+
+func (ht *ArrayDataHt) validPosReserve(pos int) int {
+	for ; pos >= 0; pos-- {
+		if ht.isValid(pos) {
+			return pos
+		}
+	}
+	return InvalidArrayPos
+}
+
+func (ht *ArrayDataHt) Current() int {
+	ht.internalPointer = ht.validPos(ht.internalPointer)
+	return ht.internalPointer
+}
+
+func (ht *ArrayDataHt) ResetPointer() {
+	ht.internalPointer = 0
+}
+
+func (ht *ArrayDataHt) MoveNext() int {
+	ht.internalPointer = ht.validPos(ht.internalPointer + 1)
+	return ht.internalPointer
+}
+
+func (ht *ArrayDataHt) MovePrev() int {
+	ht.internalPointer = ht.validPosReserve(ht.internalPointer - 1)
+	return ht.internalPointer
+}
+
+func (ht *ArrayDataHt) MoveEnd() int {
+	ht.internalPointer = ht.validPosReserve(len(ht.data) - 1)
+	return ht.internalPointer
 }

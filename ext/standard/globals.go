@@ -3,6 +3,8 @@ package standard
 import (
 	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/perr"
+	"math/rand"
+	"time"
 )
 
 const globalKey = "ext.standard.globals"
@@ -22,9 +24,24 @@ type StrTokState struct {
 }
 
 type BasicGlobals struct {
-	strTokState StrTokState
+	strTokState   StrTokState
+	randGenerator *rand.Rand
 }
 
 func (bg *BasicGlobals) StrTokState() *StrTokState {
 	return &bg.strTokState
+}
+
+func (bg *BasicGlobals) ResetRandGenerator() {
+	bg.randGenerator = nil
+}
+func (bg *BasicGlobals) InitRandGenerator(seed int64) {
+	bg.randGenerator = rand.New(rand.NewSource(seed))
+}
+func (bg *BasicGlobals) GetRandGenerator() *rand.Rand {
+	if bg.randGenerator == nil {
+		seed := time.Now().UnixNano()
+		bg.InitRandGenerator(seed)
+	}
+	return bg.randGenerator
 }

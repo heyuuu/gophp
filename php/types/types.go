@@ -99,9 +99,13 @@ func (zv *Zval) SetArray(arr *Array) {
 func (zv *Zval) SetObject(obj *Object)     { zv.v = obj }
 func (zv *Zval) SetResource(res *Resource) { zv.v = res }
 
+func (zv *Zval) SetEmptyArray()                { zv.v = NewArray() }
 func (zv *Zval) SetArrayOfInt(arr []int)       { zv.SetArray(NewArrayOfInt(arr)) }
 func (zv *Zval) SetArrayOfString(arr []string) { zv.SetArray(NewArrayOfString(arr)) }
 func (zv *Zval) SetArrayOfZval(arr []Zval)     { zv.SetArray(NewArrayOfZval(arr)) }
+func (zv *Zval) SetReference(ref *Reference)   { zv.v = ref }
+func (zv *Zval) SetNewEmptyRef()               { zv.SetReference(NewReference(nil)) }
+func (zv *Zval) SetNewRef(val *Zval)           { zv.SetReference(NewReference(val)) }
 
 func (zv *Zval) SetBy(val *Zval) {
 	if val == nil {
@@ -221,6 +225,11 @@ type Ref = Reference
 type Reference struct {
 	val Zval
 	// todo
+}
+
+func NewReference(val *Zval) *Reference {
+	var ref = &Reference{val: *val}
+	return ref
 }
 
 func (ref *Reference) Val() Zval { return ref.val }
