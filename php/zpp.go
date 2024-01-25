@@ -462,7 +462,7 @@ func (p *FastParamParser) parseResourceEx(checkNull bool, separate bool) (dest t
 
 	// parse
 	if arg.IsResource() {
-		return arg, true
+		return arg, false
 	} else {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_RESOURCE)
 	}

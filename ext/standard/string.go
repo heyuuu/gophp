@@ -1874,11 +1874,7 @@ func phpTagFind(tag string, set string) bool {
 	}
 	normalize.WriteByte('>')
 
-	if pos := strings.Index(set, normalize.String()); pos >= 0 {
-		return true
-	} else {
-		return false
-	}
+	return strings.Contains(set, normalize.String())
 }
 
 func StripTagsEx(str string, state uint8, allowTags string) (string, uint8) {

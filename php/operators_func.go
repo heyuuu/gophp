@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+func IsNumericString(str string) bool {
+	return ParseNumber(str).IsNotUndef()
+}
+
 // @see 替代 FastEqualCheckLong / FastEqualCheckString / FastEqualCheckFunction
 func FastEqualFunction(ctx *Context, v1, v2 Val) bool {
 	if v, ok := ZvalEqualsEx(ctx, v1, v2); ok {
