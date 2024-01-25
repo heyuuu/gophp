@@ -66,6 +66,7 @@
                     <td>
                         <button class="btn btn-link btn-small" @click="gotoShowPage(testIdx)">detail</button>
                         <button class="btn btn-link btn-small" @click="runTest(testIdx)">retry</button>
+                        <button class="btn btn-link btn-small" @click="copyTestName(testIdx)">paste</button>
                     </td>
                 </tr>
             </table>
@@ -80,6 +81,7 @@
 
 <script src="/static/js/jquery-3.6.3.js"></script>
 <script src="/static/js/petite-vue-0.4.1.iife.min.js"></script>
+<script src="/static/js/tools.js"></script>
 <script>
     // App
     const apiUri = "/api"
@@ -197,6 +199,23 @@
             const url = this.testShowPage(testIdx)
             const newWindow = window.open(url)
             newWindow.focus()
+        },
+        // 复制case名
+        copyTestName(testIdx) {
+            const test = this.tests[testIdx]
+            if (!test) {
+                return ""
+            }
+            const p = clipboardWriteText(test.name)
+            if (p) {
+                p.then(function () {
+                    console.log("copy success")
+                }).catch(function () {
+                    console.log("copy fail")
+                })
+            } else {
+                console.log("copy unsupported")
+            }
         },
         // start
         start() {

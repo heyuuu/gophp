@@ -10,3 +10,10 @@ function setQuery(q) {
     // window.location.search = query
     history.pushState('', '', '?' + query)
 }
+
+function clipboardWriteText(text) {
+    if (navigator.clipboard) {
+        const cb = navigator.clipboard
+        return cb.writeText(text)
+    }
+}
