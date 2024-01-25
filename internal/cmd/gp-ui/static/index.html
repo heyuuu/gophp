@@ -200,11 +200,6 @@
 
     app.refresh()
 
-    function getQueryParam(name) {
-        const usp = new URLSearchParams(window.location.search)
-        return usp.get(name)
-    }
-
     function postJson(url, data, success, onError) {
         $.ajax({
             type: "POST",

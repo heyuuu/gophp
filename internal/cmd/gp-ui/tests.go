@@ -2,12 +2,26 @@ package main
 
 import (
 	"errors"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/tests"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
+
+func getFormValueInt(request *http.Request, name string, defaultValue int) int {
+	value := request.FormValue(name)
+	if value == "" {
+		return defaultValue
+	}
+	if intVal, err := strconv.Atoi(value); err == nil {
+		return intVal
+	} else {
+		return defaultValue
+	}
+}
 
 func apiTestListHandler(request *http.Request) (data any, err error) {
 	path := request.FormValue("path")
@@ -18,6 +32,18 @@ func apiTestListHandler(request *http.Request) (data any, err error) {
 	if err != nil {
 		return nil, err
 	}
+
+	offset := getFormValueInt(request, "offset", 0)
+	limit := getFormValueInt(request, "limit", -1)
+
+	//
+	offset = lang.FixRange(offset, 0, len(testNames))
+	if limit < 0 || offset+limit >= len(testNames) {
+		testNames = testNames[offset:]
+	} else {
+		testNames = testNames[offset : offset+limit]
+	}
+
 	return testNames, nil
 }
 

@@ -5,6 +5,11 @@ function getQuery() {
     return Qs.parse(query)
 }
 
+function getQueryParam(name) {
+    const query = getQuery()
+    return query[name]
+}
+
 function setQuery(q) {
     const query = Qs.stringify(q)
     // window.location.search = query
@@ -16,4 +21,26 @@ function clipboardWriteText(text) {
         const cb = navigator.clipboard
         return cb.writeText(text)
     }
+}
+
+function getJson(url, data, success, onError) {
+    $.ajax({
+        type: "GET",
+        url: url,
+        data: data,
+        success: success,
+        error: onError,
+        dataType: "json"
+    })
+}
+
+function postJson(url, data, success, onError) {
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: data,
+        success: success,
+        error: onError,
+        dataType: "json"
+    })
 }

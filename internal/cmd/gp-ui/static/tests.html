@@ -49,6 +49,8 @@
                     <input type="checkbox" class="custom-control-input" id="customSwitch2" v-model="hideSkip">
                     <label class="custom-control-label" for="customSwitch2">Hide Skip</label>
                 </span>
+            </div>
+            <div>
                 <span>{{statLine()}}</span>
             </div>
             <table class="table table-sm table-bordered table-hover">
@@ -81,10 +83,10 @@
 
 <script src="/static/js/jquery-3.6.3.js"></script>
 <script src="/static/js/petite-vue-0.4.1.iife.min.js"></script>
+<script src="/static/js/qs-6.11.2.min.js"></script>
 <script src="/static/js/tools.js"></script>
 <script>
     // App
-    const apiUri = "/api"
     const testListUri = "/api/test/list"
     const testRunUri = "/api/test/run"
 
@@ -95,8 +97,14 @@
     const SKIP = 'SKIP'
     const FAIL = 'FAIL'
     const UNKNOWN = 'UNKNOWN'
+    const NET_ERROR = 'NET'
 
     const app = window.app = {
+        // query params
+        path: getQueryParam("path") || "",
+        offset: getQueryParam("offset") || 0,
+        limit: getQueryParam("limit") || -1,
+        // tests
         tests: [
             {
                 name: "1231231.phpt",
@@ -129,6 +137,7 @@
             [PASS]: 0,
             [SKIP]: 0,
             [FAIL]: 0,
+            [NET_ERROR]: 0,
         },
         activeIndex: -1,
         waitingIndex: 0,
@@ -146,7 +155,8 @@
                 ", wait:" + this.count[WAITING] +
                 ", pass:" + this.count[PASS] +
                 ", skip:" + this.count[SKIP] +
-                ", fail:" + this.count[FAIL]
+                ", fail:" + this.count[FAIL] +
+                ", net_err:" + this.count[NET_ERROR]
         },
         // 判断是否展示
         testIsShow(testIdx) {
@@ -223,7 +233,7 @@
         // start
         start() {
             // init list
-            postJson(testListUri, {path: getQueryParam("path")}, (res) => {
+            getJson(testListUri, {path: this.path, offset: this.offset, limit: this.limit}, (res) => {
                 const tests = []
                 for (name of res.data) {
                     tests.push({
@@ -260,10 +270,10 @@
             if (test.status === status) {
                 return
             }
-            if ([WAITING, RUNNING, PASS, SKIP, FAIL].includes(test.status)) {
+            if ([WAITING, RUNNING, PASS, SKIP, FAIL, NET_ERROR].includes(test.status)) {
                 this.count[test.status]--
             }
-            if ([WAITING, RUNNING, PASS, SKIP, FAIL].includes(status)) {
+            if ([WAITING, RUNNING, PASS, SKIP, FAIL, NET_ERROR].includes(status)) {
                 this.count[status]++
             }
             test.status = status
@@ -295,7 +305,7 @@
                 }
                 this.runNext()
             }, () => {
-                this.updateTest(index, FAIL, "调用 url 失败")
+                this.updateTest(index, NET_ERROR, "调用 url 失败")
                 this.runNext()
             })
         },
@@ -304,21 +314,6 @@
 
     app.start()
 
-    function getQueryParam(name) {
-        const usp = new URLSearchParams(window.location.search)
-        return usp.get(name)
-    }
-
-    function postJson(url, data, success, onError) {
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: data,
-            success: success,
-            error: onError,
-            dataType: "json"
-        })
-    }
 </script>
 </body>
 </html>
