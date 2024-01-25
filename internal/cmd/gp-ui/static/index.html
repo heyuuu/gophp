@@ -62,7 +62,7 @@
 <script>
     // storage
     let initCode = getQueryParam("code") || "<?php\n\n"
-    let initShowMode = getQueryParam("mode") || -1
+    let initShowMode = getQueryParam("mode") || 0b11100
 
     // App
     const apiUri = "/api"
@@ -145,7 +145,7 @@
         queryChange() {
             const query = getQuery()
             query.code = this.code
-            query.mode = this.mode
+            query.mode = this.showMode
             setQuery(query)
         },
         updateResult(result) {
