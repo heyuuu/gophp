@@ -10,6 +10,7 @@ type TestCase struct {
 	FileName string
 	File     string
 	// Case 文件解析的信息
+	TestName      string
 	Desc          string
 	CaptureStdin  bool
 	CaptureStdout bool
@@ -26,7 +27,8 @@ func NewTestCase(file string, fileName string, sections map[string]string) *Test
 }
 
 func (tc *TestCase) init() {
-	tc.Desc = strings.TrimSpace(tc.Sections["TEST"])
+	tc.TestName = strings.TrimSpace(tc.Sections["TEST"])
+	tc.Desc = strings.TrimSpace(tc.Sections["DESCRIPTION"])
 
 	if capture, ok := tc.Sections["CAPTURE_STDIO"]; ok {
 		lcCapture := strings.ToLower(capture)

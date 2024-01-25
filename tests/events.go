@@ -58,7 +58,7 @@ func (l *DefaultEventHandler) OnTestStart(testIndex int, tc *TestCase) {
 func (l *DefaultEventHandler) OnTestEnd(testIndex int, tc *TestCase, tr *TestResult) {
 	if tr != nil {
 		l.summary.AddResult(tc, tr)
-		l.printLn(fmt.Sprintf("%s %s [%s] %s", tr.Type, tr.Case.Desc, tc.FileName, tr.Reason))
+		l.printLn(fmt.Sprintf("%s %s [%s] %s", tr.Type, tr.Case.TestName, tc.FileName, tr.Reason))
 	}
 }
 
@@ -134,7 +134,7 @@ func (l *DefaultEventHandler) logExtSummary(summary *Summary) {
 		l.printLn(title)
 		l.printLn("---------------------------------------------------------------------")
 		for _, result := range typeResults {
-			l.printLn(fmt.Sprintf("%s [%s] %s", result.Case.Desc, result.Case.FileName, result.Reason))
+			l.printLn(fmt.Sprintf("%s [%s] %s", result.Case.TestName, result.Case.FileName, result.Reason))
 		}
 		l.printLn("=====================================================================")
 	}

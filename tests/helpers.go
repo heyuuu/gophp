@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/shim/slices"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -121,4 +122,22 @@ func existKeys[K comparable, V any](m map[K]V, keys ...K) int {
 		}
 	}
 	return count
+}
+
+func strpos(s string, substr string, offset int) int {
+	if offset < 0 {
+		offset += len(s)
+	}
+	if offset < 0 || offset >= len(s) {
+		return -1
+	}
+	if idx := strings.Index(s, substr[offset:]); idx >= 0 {
+		return idx + offset
+	} else {
+		return -1
+	}
+}
+
+func pregQuote(s string) string {
+	return regexp.QuoteMeta(s)
 }
