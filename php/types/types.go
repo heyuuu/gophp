@@ -49,6 +49,7 @@ func ZvalString(s string) Zval        { return Zval{s} }
 func ZvalArray(arr *Array) Zval       { assert.Assert(arr != nil); return Zval{arr} }
 func ZvalObject(obj *Object) Zval     { assert.Assert(obj != nil); return Zval{obj} }
 func ZvalResource(res *Resource) Zval { assert.Assert(res != nil); return Zval{res} }
+func ZvalRef(ref *Reference) Zval     { assert.Assert(ref != nil); return Zval{ref} }
 
 func InitZvalArray() Zval { return Zval{NewArray()} }
 
@@ -104,10 +105,17 @@ func (zv *Zval) SetArrayOfInt(arr []int)       { zv.SetArray(NewArrayOfInt(arr))
 func (zv *Zval) SetArrayOfString(arr []string) { zv.SetArray(NewArrayOfString(arr)) }
 func (zv *Zval) SetArrayOfZval(arr []Zval)     { zv.SetArray(NewArrayOfZval(arr)) }
 func (zv *Zval) SetReference(ref *Reference)   { zv.v = ref }
-func (zv *Zval) SetNewEmptyRef()               { zv.SetReference(NewReference(nil)) }
-func (zv *Zval) SetNewRef(val *Zval)           { zv.SetReference(NewReference(val)) }
+func (zv *Zval) SetNewEmptyRef()               { zv.SetReference(NewReference(Undef)) }
+func (zv *Zval) SetNewRef(val Zval)            { zv.SetReference(NewReference(val)) }
 
-func (zv *Zval) SetBy(val *Zval) {
+func (zv *Zval) SetBy(val Zval) {
+	zv.v = val.v
+	// 除数组外，基础类型都复制了值，引用类型都复制了指针；仅数组需要做写时复制
+	if zv.IsArray() {
+		zv.v = zv.Array().Clone()
+	}
+}
+func (zv *Zval) SetByPtr(val *Zval) {
 	if val == nil {
 		*zv = Undef
 	}
@@ -120,11 +128,10 @@ func (zv *Zval) SetBy(val *Zval) {
 
 func (zv *Zval) Clone() *Zval {
 	var tmp Zval
-	tmp.SetBy(zv)
+	tmp.SetByPtr(zv)
 	return &tmp
 }
-func (zv *Zval) Val() Zval     { return *zv }
-func (zv *Zval) SetVal(v Zval) { *zv = v }
+func (zv *Zval) Val() Zval { return *zv }
 
 // Zval getter
 func (zv Zval) Type() ZvalType {
@@ -151,7 +158,7 @@ func (zv Zval) Type() ZvalType {
 		return IsObject
 	case *Resource:
 		return IsResource
-	case *Ref:
+	case *Reference:
 		return IsRef
 	default:
 		panic(perr.Unreachable())
@@ -171,7 +178,7 @@ func (zv Zval) IsString() bool           { _, ok := zv.v.(string); return ok }
 func (zv Zval) IsArray() bool            { _, ok := zv.v.(*Array); return ok }
 func (zv Zval) IsObject() bool           { _, ok := zv.v.(*Object); return ok }
 func (zv Zval) IsResource() bool         { _, ok := zv.v.(*Resource); return ok }
-func (zv Zval) IsRef() bool              { _, ok := zv.v.(*Ref); return ok }
+func (zv Zval) IsRef() bool              { _, ok := zv.v.(*Reference); return ok }
 
 // 返回是否为 undef、null、false，用于快速类型判断
 func (zv Zval) IsSignFalse() bool { return zv.Type() <= IsFalse }
@@ -192,9 +199,9 @@ func (zv Zval) String() string      { return zvalValue[string](zv) }
 func (zv Zval) Array() *Array       { return zvalValue[*Array](zv) }
 func (zv Zval) Object() *Object     { return zvalValue[*Object](zv) }
 func (zv Zval) Resource() *Resource { return zvalValue[*Resource](zv) }
-func (zv Zval) Ref() *Ref           { return zvalValue[*Ref](zv) }
+func (zv Zval) Ref() *Reference     { return zvalValue[*Reference](zv) }
 func (zv Zval) DeRef() Zval {
-	if ref, ok := zv.v.(*Ref); ok {
+	if ref, ok := zv.v.(*Reference); ok {
 		return ref.Val()
 	}
 	return zv
@@ -221,23 +228,26 @@ func (res *Resource) Type() int   { return res.typ }
 func (res *Resource) Ptr() any    { return res.ptr }
 
 // Reference
-type Ref = Reference
 type Reference struct {
 	val Zval
 	// todo
 }
 
-func NewReference(val *Zval) *Reference {
-	var ref = &Reference{val: *val}
+func NewReference(val Zval) *Reference {
+	var ref = &Reference{val: val}
 	return ref
 }
 
-func (ref *Reference) Val() Zval { return ref.val }
+func (ref *Reference) Val() Zval {
+	return ref.val
+}
+func (ref *Reference) SetVal(v Zval) {
+	// todo check type
+	ref.val = v.DeRef()
+}
 
 // RefZval
 type RefZval interface {
 	Val() Zval
 	SetVal(v Zval)
 }
-
-var _ RefZval = (*Zval)(nil)

@@ -1,5 +1,7 @@
 package types
 
 type ArgInfo struct {
-	Name string
+	Name     string
+	ByRef    bool
+	Variadic bool
 }

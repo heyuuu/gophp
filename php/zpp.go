@@ -535,22 +535,29 @@ func (p *FastParamParser) eachVariadic(postVarargs uint, h func(arg types.Zval))
 
 func (p *FastParamParser) ParseRefZval() types.RefZval {
 	// todo ref 处理
-	return p.parseZvalEx(false, true)
+	v := p.parseZvalEx(false, true)
+	return p.asRefZval(*v)
 }
 func (p *FastParamParser) ParseRefArrayOrObject() types.RefZval {
-	// todo ref 处理
 	dest := p.parseArrayOrObjectEx(false, true)
-	return &dest
+	return p.asRefZval(dest)
 }
 func (p *FastParamParser) ParseRefArray() *types.Array {
 	// todo ref 处理
 	return p.parseArrayEx(false, false)
 }
 func (p *FastParamParser) ParseRefVariadic(postVarargs uint) []types.RefZval {
-	// todo ref 处理
 	var args []types.RefZval
 	p.eachVariadic(postVarargs, func(arg types.Zval) {
-		args = append(args, &arg)
+		args = append(args, p.asRefZval(arg))
 	})
 	return args
+}
+func (p *FastParamParser) asRefZval(v types.Zval) types.RefZval {
+	if v.IsRef() {
+		return v.Ref()
+	} else {
+		// todo 此处应不会触达
+		return types.NewReference(v)
+	}
 }

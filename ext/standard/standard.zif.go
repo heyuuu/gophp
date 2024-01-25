@@ -220,7 +220,7 @@ var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "array"}}, func(ex
 		return
 	}
 	ret := ZifEnd(array)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifPrev
@@ -234,7 +234,7 @@ var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "array"}}, func(
 		return
 	}
 	ret := ZifPrev(array)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifNext
@@ -248,7 +248,7 @@ var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{Name: "array"}}, func(
 		return
 	}
 	ret := ZifNext(array)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifReset
@@ -262,7 +262,7 @@ var DefZifReset = def.DefFunc("reset", 1, 1, []def.ArgInfo{{Name: "array"}}, fun
 		return
 	}
 	ret := ZifReset(array)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifCurrent
@@ -277,7 +277,7 @@ var DefZifCurrent = def.DefFunc("current", 1, 1, []def.ArgInfo{{Name: "array"}},
 	}
 	ret, ok := ZifCurrent(array)
 	if ok {
-		returnValue.SetVal(ret)
+		returnValue.SetBy(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -295,7 +295,7 @@ var DefZifPos = def.DefFunc("pos", 1, 1, []def.ArgInfo{{Name: "array"}}, func(ex
 	}
 	ret, ok := ZifCurrent(array)
 	if ok {
-		returnValue.SetVal(ret)
+		returnValue.SetBy(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -312,7 +312,7 @@ var DefZifKey = def.DefFunc("key", 1, 1, []def.ArgInfo{{Name: "array"}}, func(ex
 		return
 	}
 	ret := ZifKey(array)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifMin
@@ -327,7 +327,7 @@ var DefZifMin = def.DefFunc("min", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "a
 		return
 	}
 	ret := ZifMin(executeData.Ctx(), arg, args)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifMax
@@ -342,7 +342,7 @@ var DefZifMax = def.DefFunc("max", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "a
 		return
 	}
 	ret := ZifMax(executeData.Ctx(), arg, args)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayWalk
@@ -410,7 +410,7 @@ var DefZifArraySearch = def.DefFunc("array_search", 2, 3, []def.ArgInfo{{Name: "
 		return
 	}
 	ret := ZifArraySearch(executeData.Ctx(), needle, haystack, nil, strict)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayFill
@@ -514,7 +514,7 @@ var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{Name: "stack"
 		return
 	}
 	ret := ZifArrayPop(stack)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayShift
@@ -528,7 +528,7 @@ var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "st
 		return
 	}
 	ret := ZifArrayShift(executeData.Ctx(), stack)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayUnshift
@@ -621,7 +621,7 @@ var DefZifArrayReplace = def.DefFunc("array_replace", 0, -1, []def.ArgInfo{{Name
 		return
 	}
 	ret := ZifArrayReplace(executeData.Ctx(), arrays)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayReplaceRecursive
@@ -635,7 +635,7 @@ var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 0, -1, 
 		return
 	}
 	ret := ZifArrayReplaceRecursive(executeData.Ctx(), arrays)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayKeys
@@ -666,7 +666,7 @@ var DefZifArrayKeyFirst = def.DefFunc("array_key_first", 1, 1, []def.ArgInfo{{Na
 		return
 	}
 	ret := ZifArrayKeyFirst(array)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayKeyLast
@@ -680,7 +680,7 @@ var DefZifArrayKeyLast = def.DefFunc("array_key_last", 1, 1, []def.ArgInfo{{Name
 		return
 	}
 	ret := ZifArrayKeyLast(array)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayValues
@@ -1012,7 +1012,7 @@ var DefZifArrayDiff = def.DefFunc("array_diff", 0, -1, []def.ArgInfo{{Name: "arr
 		return
 	}
 	ret := ZifArrayDiff(executeData.Ctx(), arrays)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayUdiff
@@ -1137,7 +1137,7 @@ var DefZifArrayRand = def.DefFunc("array_rand", 1, 2, []def.ArgInfo{{Name: "arg"
 		return
 	}
 	ret := ZifArrayRand(executeData.Ctx(), arg, nil, num_req_)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArraySum
@@ -1151,7 +1151,7 @@ var DefZifArraySum = def.DefFunc("array_sum", 1, 1, []def.ArgInfo{{Name: "array"
 		return
 	}
 	ret := ZifArraySum(executeData.Ctx(), array)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayProduct
@@ -1165,7 +1165,7 @@ var DefZifArrayProduct = def.DefFunc("array_product", 1, 1, []def.ArgInfo{{Name:
 		return
 	}
 	ret := ZifArrayProduct(executeData.Ctx(), array)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayReduce
@@ -1182,7 +1182,7 @@ var DefZifArrayReduce = def.DefFunc("array_reduce", 2, 3, []def.ArgInfo{{Name: "
 		return
 	}
 	ret := ZifArrayReduce(array, callback, nil, initial)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayFilter
@@ -1214,7 +1214,7 @@ var DefZifArrayMap = def.DefFunc("array_map", 1, -1, []def.ArgInfo{{Name: "callb
 		return
 	}
 	ret := ZifArrayMap(executeData.Ctx(), callback, arrays)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifArrayKeyExists
@@ -1704,7 +1704,7 @@ var DefZifPathinfo = def.DefFunc("pathinfo", 1, 2, []def.ArgInfo{{Name: "path"},
 		return
 	}
 	ret := ZifPathinfo(path, nil, options)
-	returnValue.SetVal(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifStristr
@@ -2270,7 +2270,7 @@ var DefZifCountChars = def.DefFunc("count_chars", 1, 2, []def.ArgInfo{{Name: "in
 	}
 	ret, ok := ZifCountChars(executeData.Ctx(), input, nil, mode)
 	if ok {
-		returnValue.SetBy(ret)
+		returnValue.SetByPtr(ret)
 	} else {
 		returnValue.SetFalse()
 	}
@@ -2393,7 +2393,7 @@ var DefZifStrWordCount = def.DefFunc("str_word_count", 1, 3, []def.ArgInfo{{Name
 	}
 	ret, ok := ZifStrWordCount(executeData.Ctx(), str, nil, format, charlist)
 	if ok {
-		returnValue.SetBy(ret)
+		returnValue.SetByPtr(ret)
 	} else {
 		returnValue.SetFalse()
 	}

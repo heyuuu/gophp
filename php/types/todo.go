@@ -1,6 +1,9 @@
 package types
 
-import "github.com/heyuuu/gophp/php/assert"
+import (
+	"github.com/heyuuu/gophp/php/assert"
+	"github.com/heyuuu/gophp/php/perr"
+)
 
 func SeparateArray(zv *Zval) {
 	assert.Assert(zv.IsArray())
@@ -23,6 +26,9 @@ func ZVAL_MAKE_REF(zv *Zval) {
 	}
 }
 
-func ZVAL_NEW_REF(z *Zval, r *Zval) { z.SetNewRef(r) }
+func ZVAL_NEW_REF(z *Zval, r *Zval) {
+	//z.SetNewRef(r)
+	panic(perr.Todof("ZVAL_NEW_REF"))
+}
 
 func ZVAL_COPY_VALUE(z *Zval, v *Zval) { *z = *v }

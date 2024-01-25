@@ -315,10 +315,10 @@ func (e *Executor) foreachStmt(x *ast.ForeachStmt) execResult {
 		variable.Array().EachEx(func(key types.ArrayKey, value types.Zval) error {
 			// foreach(x as $key => $value)
 			if x.KeyVar != nil {
-				e.assignVariable(x.KeyVar, key.ToZval())
+				e.variableSet(x.KeyVar, key.ToZval())
 			}
 			// todo byRef
-			e.assignVariable(x.ValueVar, value)
+			e.variableSet(x.ValueVar, value)
 
 			// body
 			result, stop = e.handleLoopStmts(x.Stmts)
@@ -448,7 +448,9 @@ func (e *Executor) functionStmt(x *ast.FunctionStmt) execResult {
 		argInfos = make([]types.ArgInfo, len(x.Params))
 		for i, param := range x.Params {
 			argInfos[i] = types.ArgInfo{
-				Name: param.Var.Name.(*ast.Ident).Name,
+				Name:     param.Var.Name.(*ast.Ident).Name,
+				ByRef:    param.ByRef,
+				Variadic: param.Variadic,
 			}
 		}
 	}
@@ -595,20 +597,22 @@ func (e *Executor) expr(expr ast.Expr) types.Zval {
 func (e *Executor) arrayExpr(expr *ast.ArrayExpr) types.Zval {
 	arr := types.NewArrayCap(len(expr.Items))
 	for _, item := range expr.Items {
-		if item.ByRef {
-			// todo item byref
-			perr.Panic("todo item byref")
-		} else if item.Unpack && item.Key != nil {
+		if item.Unpack && item.Key != nil {
 			// todo item unpack with key
 			perr.Panic("todo item unpack with key")
 		}
 
+		var val types.Zval
+		if item.ByRef {
+			val = e.variableRefZval(item.Value)
+		} else {
+			val = e.expr(item.Value).DeRef()
+		}
+
 		if item.Key != nil {
 			key := ZvalToArrayKey(e.ctx, e.expr(item.Key))
-			val := e.expr(item.Value)
 			arr.Update(key, val)
 		} else {
-			val := e.expr(item.Value)
 			arr.Append(val)
 		}
 	}
@@ -689,19 +693,19 @@ func (e *Executor) unaryExpr(expr *ast.UnaryExpr) types.Zval {
 	// todo 考虑是否需要用 unary 原生替代 v = v + 1 的模拟
 	case ast.UnaryOpPreInc:
 		newValue := OpAdd(e.ctx, value, Long(1))
-		e.assignVariable(expr.Var, newValue)
+		e.variableSet(expr.Var, newValue)
 		return newValue
 	case ast.UnaryOpPreDec:
 		newValue := OpSub(e.ctx, value, Long(1))
-		e.assignVariable(expr.Var, newValue)
+		e.variableSet(expr.Var, newValue)
 		return newValue
 	case ast.UnaryOpPostInc:
 		newValue := OpAdd(e.ctx, value, Long(1))
-		e.assignVariable(expr.Var, newValue)
+		e.variableSet(expr.Var, newValue)
 		return value
 	case ast.UnaryOpPostDec:
 		newValue := OpSub(e.ctx, value, Long(1))
-		e.assignVariable(expr.Var, newValue)
+		e.variableSet(expr.Var, newValue)
 		return value
 	default:
 		panic(perr.Internalf("Unexpected ast.UnaryExpr.Op: %+v", expr.Op))
@@ -780,7 +784,7 @@ func (e *Executor) binaryOpExpr(expr *ast.BinaryOpExpr) (val types.Zval) {
 }
 func (e *Executor) assignExpr(expr *ast.AssignExpr) types.Zval {
 	value := e.expr(expr.Expr)
-	e.assignVariable(expr.Var, value)
+	e.variableSet(expr.Var, value)
 	return value
 }
 
@@ -819,12 +823,15 @@ func (e *Executor) assignOpExpr(expr *ast.AssignOpExpr) types.Zval {
 		panic(perr.Unreachable())
 	}
 
-	e.assignVariable(expr.Var, value)
+	e.variableSet(expr.Var, value)
 	return value
 }
 
 func (e *Executor) assignRefExpr(expr *ast.AssignRefExpr) types.Zval {
-	panic(perr.Todof("e.assignRefExpr"))
+	variable := e.variableRef(expr.Var)
+	value := e.variableRefZval(expr.Expr)
+	variable.Set(value)
+	return value
 }
 
 func (e *Executor) issetExpr(expr *ast.IssetExpr) types.Zval {
@@ -929,7 +936,11 @@ func (e *Executor) throwExpr(expr *ast.ThrowExpr) types.Zval {
 func (e *Executor) variableExpr(expr *ast.VariableExpr) types.Zval {
 	name := e.variableName(expr.Name)
 	// todo undefined warning
-	return e.currSymbols().Get(name)
+	value := e.currSymbols().Get(name)
+	if value.IsUndef() {
+		value = types.Null
+	}
+	return value
 }
 
 func (e *Executor) variableName(nameNode ast.Node) string {
@@ -966,20 +977,42 @@ func (e *Executor) funcCallExpr(expr *ast.FuncCallExpr) types.Zval {
 	if fn == nil {
 		panic(perr.Internalf("函数未找到: %s", name))
 	}
+	getArgInfo := func(i int) *types.ArgInfo {
+		// todo 变长参数下的类型获取
+		if i < len(fn.ArgInfos()) {
+			argInfo := fn.ArgInfos()[i]
+			return &argInfo
+		}
+		return nil
+	}
 
 	args := make([]types.Zval, 0, len(expr.Args))
 	for _, arg := range expr.Args {
-		argVal := e.expr(arg.Value)
-
 		if !arg.Unpack {
-			args = append(args, argVal)
-		} else {
-			if !argVal.IsArray() {
-				panic(perr.Internalf("unpack arg must be an array"))
+			argInfo := getArgInfo(len(args))
+			if argInfo != nil && argInfo.ByRef {
+				args = append(args, e.variableRefZval(arg.Value))
+			} else {
+				argVal := e.expr(arg.Value).DeRef()
+				args = append(args, argVal)
 			}
-			// todo 校验必须是序列数组
+		} else {
+			argVal := e.expr(arg.Value)
+			// todo Traversable
+			if !argVal.IsArray() {
+				panic(perr.Internalf("Only arrays and Traversables can be unpacked"))
+			}
 			argVal.Array().Each(func(key types.ArrayKey, value types.Zval) {
-				args = append(args, value)
+				if key.IsStrKey() {
+					panic(perr.Internalf("Cannot unpack array with string keys"))
+				}
+
+				argInfo := getArgInfo(len(args))
+				if argInfo != nil && argInfo.ByRef {
+					args = append(args, types.ZvalRef(newArrayDimVariable(e.ctx, argVal, key).MakeRef()))
+				} else {
+					args = append(args, value.DeRef())
+				}
 			})
 		}
 	}
@@ -1001,55 +1034,41 @@ func (e *Executor) staticCallExpr(expr *ast.StaticCallExpr) types.Zval {
 
 // ---
 
-func (e *Executor) assignVariable(variable ast.Expr, value types.Zval) {
-	switch v := variable.(type) {
-	case *ast.VariableExpr:
-		name := e.variableName(v.Name)
-		symbols := e.executeData.symbols
-		symbols.Set(name, value)
-	case *ast.IndexExpr:
-		arr := e.getOrInitArray(v.Var)
-		// todo 转 arr 处理
-		if v.Dim == nil {
-			e.arrayAppend(arr, value)
-		} else {
-			dim := e.expr(v.Dim)
-			key := ZvalToArrayKey(e.ctx, dim)
-			e.arrayUpdate(arr, key, value)
-		}
-	default:
-		panic(perr.Todof("unsupported assignVariable.Var type: %T, %+v", v, v))
-	}
+func (e *Executor) variableSet(variable ast.Expr, value types.Zval) {
+	e.variableRef(variable).Set(value)
 }
 
-func (e *Executor) getOrInitArray(variable ast.Expr) types.Zval {
-	switch v := variable.(type) {
+func (e *Executor) variableRefArray(variable ast.Expr) types.Zval {
+	ref := e.variableRef(variable)
+	value := ref.Get()
+	if value.IsUndef() {
+		value = types.InitZvalArray()
+		ref.Set(value)
+	}
+	return value
+}
+
+func (e *Executor) variableRef(expr ast.Expr) iVariable {
+	switch v := expr.(type) {
 	case *ast.VariableExpr:
 		name := e.variableName(v.Name)
-		symbols := e.executeData.symbols
-		if !symbols.Isset(name) {
-			symbols.Set(name, types.InitZvalArray())
-		}
-		return symbols.Get(name)
+		symbols := e.currSymbols()
+		return newSymbolVariable(symbols, name)
 	case *ast.IndexExpr:
-		arrVar := e.getOrInitArray(v.Var)
+		arr := e.variableRefArray(v.Var)
 		if v.Dim == nil {
-			result := types.InitZvalArray()
-			e.arrayAppend(arrVar, result)
-			return result
+			return newArrayAppendVariable(e.ctx, arr)
 		} else {
 			dim := e.expr(v.Dim)
 			key := ZvalToArrayKey(e.ctx, dim)
-			result := e.arrayGet(arrVar, key)
-			if result.IsUndef() {
-				result = types.InitZvalArray()
-				e.arrayUpdate(result, key, result)
-			}
-			return result
+			return newArrayDimVariable(e.ctx, arr, key)
 		}
 	default:
-		panic(perr.Todof("unsupported getOrInitArray.Var type: %T, %+v", v, v))
+		panic(perr.Todof("unsupported variableRef.Var type: %T, %+v", v, v))
 	}
+}
+func (e *Executor) variableRefZval(expr ast.Expr) types.Zval {
+	return types.ZvalRef(e.variableRef(expr).MakeRef())
 }
 
 func (e *Executor) arrayGet(arr types.Zval, key types.ArrayKey) types.Zval {

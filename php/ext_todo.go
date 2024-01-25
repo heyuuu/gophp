@@ -49,12 +49,12 @@ func ConvertToString(ctx *Context, zv *types.Zval) {
 	}
 }
 
-func ZendTryAssignRefDouble(ctx *Context, percent zpp.RefZval, float float64) {
-
+func ZendTryAssignRefLong(ctx *Context, refVal zpp.RefZval, value int) {
+	refVal.SetVal(types.ZvalLong(value))
 }
 
-func ZendTryAssignRefLong(ctx *Context, count zpp.RefZval, count2 int) {
-
+func ZendTryAssignRefDouble(ctx *Context, refVal zpp.RefZval, value float64) {
+	refVal.SetVal(types.ZvalDouble(value))
 }
 
 func NewZvalZval(zv types.Zval, copy bool, dtor bool) types.Zval {
