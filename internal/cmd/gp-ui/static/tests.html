@@ -130,7 +130,7 @@
             [SKIP]: 0,
             [FAIL]: 0,
         },
-        activeIndex: 0,
+        activeIndex: -1,
         waitingIndex: 0,
 
         hidePass: false,
@@ -153,6 +153,9 @@
             const test = this.tests[testIdx]
             if (!test) {
                 return false
+            }
+            if (testIdx === this.activeIndex) {
+                return true
             }
             if (this.hidePass && test.status === PASS) {
                 return false
