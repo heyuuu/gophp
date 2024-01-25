@@ -176,14 +176,14 @@ func convertExpectFormat2Regex(s string) string {
 		"%e", string([]byte{'\\', filepath.Separator}),
 		"%s", `[^\r\n]+`,
 		"%S", `[^\r\n]*`,
-		"%a", `.+'`,
-		"%A", `.*'`,
-		"%w", `\s*'`,
-		"%i", `[+-]?\d+'`,
-		"%d", `\d+'`,
-		"%x", `[0-9a-fA-F]+'`,
-		"%f", `[+-]?\.?\d+\.?\d*(?:[Ee][+-]?\d+)?'`,
-		"%c", `.'`,
+		"%a", `.+`,
+		"%A", `.*`,
+		"%w", `\s*`,
+		"%i", `[+-]?\d+`,
+		"%d", `\d+`,
+		"%x", `[0-9a-fA-F]+`,
+		"%f", `[+-]?\.?\d+\.?\d*(?:[Ee][+-]?\d+)?`,
+		"%c", `.`,
 	)
 	return replacer.Replace(s)
 }

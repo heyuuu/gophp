@@ -1417,7 +1417,7 @@ func ZifStrtr(ctx *php.Context, str string, from types.Zval, _ zpp.Opt, to_ *str
 	// 支持两种参数形式:
 	// - strtr(string, array)
 	// - strtr(string, string, string)
-	if to_ != nil && !from.IsArray() {
+	if to_ == nil && !from.IsArray() {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "The second argument is not an array")
 		return "", false
 	}
@@ -1848,45 +1848,40 @@ func phpTagFind(tag string, set string) bool {
 	if tag == "" {
 		return false
 	}
-	var norm_ strings.Builder
 
-	t := 0 // for tag
-	c := ascii.ToLower(tag[t])
-	done := false
+	var normalize strings.Builder
 	state := 0
-	for !done {
-		switch c {
-		case '<':
-			norm_.WriteByte(c)
-		case '>':
-			done = true
-		default:
+	for i, c := range []byte(tag) {
+		c = ascii.ToLower(c)
+		if c == '<' {
+			normalize.WriteByte(c)
+		} else if c == '>' {
+			break
+		} else {
 			if !ascii.IsSpace(c) {
 				if state == 0 {
 					state = 1
 				}
-				if c != '/' || (tag[t-1] != '<' && tag[t+1] != '>') {
-					norm_.WriteByte(c)
+				if c != '/' || ((i == 0 || tag[i-1] != '<') && (i == len(tag)-1 || tag[i+1] != '>')) {
+					normalize.WriteByte(c)
 				}
 			} else {
 				if state == 1 {
-					done = true
+					break
 				}
 			}
 		}
-		t++
-		c = ascii.ToLower(tag[t])
 	}
-	norm_.WriteByte('>')
+	normalize.WriteByte('>')
 
-	if pos := strings.Index(set, norm_.String()); pos >= 0 {
+	if pos := strings.Index(set, normalize.String()); pos >= 0 {
 		return true
 	} else {
 		return false
 	}
 }
 
-func PhpStripTags(str string, state uint8, allowTags string) (string, uint8) {
+func StripTagsEx(str string, state uint8, allowTags string) (string, uint8) {
 	var buf strings.Builder
 	var tagBuf strings.Builder
 	var br = 0
@@ -2116,7 +2111,7 @@ func ZifStripTags(ctx *php.Context, str string, _ zpp.Opt, allowableTags *types.
 		}
 	}
 
-	result, _ := PhpStripTags(str, 0, allowTagsStr)
+	result, _ := StripTagsEx(str, 0, allowTagsStr)
 	return result
 }
 

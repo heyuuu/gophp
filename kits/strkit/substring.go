@@ -45,9 +45,9 @@ func MapByte(mapping func(b byte) byte, s string) string {
 			}
 			changed = true
 			b.WriteString(s[:i])
-			b.WriteByte(c)
+			b.WriteByte(r)
 		} else {
-			b.WriteByte(c)
+			b.WriteByte(r)
 		}
 	}
 

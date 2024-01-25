@@ -62,7 +62,7 @@
                 </tr>
                 <tr v-for="(test, testIdx) in tests" :class="testShowClass(testIdx)" @click="activeTest(testIdx)"
                     v-show="testIsShow(testIdx)">
-                    <td>{{testIdx + 1}}</td>
+                    <td>{{testIdx + offset}}</td>
                     <td class="cell-name">{{test.name}}</td>
                     <td>{{test.status}}</td>
                     <td>
@@ -102,8 +102,8 @@
     const app = window.app = {
         // query params
         path: getQueryParam("path") || "",
-        offset: getQueryParam("offset") || 0,
-        limit: getQueryParam("limit") || -1,
+        offset: parseInt(getQueryParam("offset")) || 0,
+        limit: parseInt(getQueryParam("limit")) || -1,
         // tests
         tests: [
             {

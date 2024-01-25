@@ -37,6 +37,16 @@ func NewInternalFunction(name string, handler any, moduleNumber int) *Function {
 	}
 }
 
+func NewInternalFunctionByEntry(moduleNumber int, entry FunctionEntry) *Function {
+	return &Function{
+		typ:          TypeInternalFunction,
+		functionName: entry.name,
+		handler:      entry.handler,
+		argInfos:     entry.argInfos,
+		moduleNumber: moduleNumber,
+	}
+}
+
 func (f *Function) Type() FunctionType { return f.typ }
 
 func (f *Function) IsInternalFunction() bool { return f.typ == TypeInternalFunction }

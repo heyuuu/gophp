@@ -7,7 +7,7 @@ import (
 
 func RegisterModuleFunctions(ctx *Context, m *Module, functions []types.FunctionEntry) {
 	for _, entry := range functions {
-		fn := types.NewInternalFunction(entry.Name(), entry.Handler(), m.moduleNumber)
+		fn := types.NewInternalFunctionByEntry(m.moduleNumber, entry)
 		RegisterFunction(ctx, entry.Name(), fn)
 	}
 }

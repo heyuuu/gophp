@@ -123,3 +123,131 @@ func Test_stringReplaceIgnoreCase(t *testing.T) {
 		})
 	}
 }
+
+func TestStripTagsEx(t *testing.T) {
+	type args struct {
+		str       string
+		state     uint8
+		allowTags string
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  string
+		want1 uint8
+	}{
+		{
+			"1",
+			args{
+				`<a href="test?test\!!!test">test</a><!-- test -->`,
+				0,
+				"",
+			},
+			"test",
+			0,
+		},
+		{
+			"2",
+			args{
+				`<a href="test?test\!!!test">test</a><!-- test -->`,
+				0,
+				"<a>",
+			},
+			`<a href="test?test\!!!test">test</a>`,
+			0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := StripTagsEx(tt.args.str, tt.args.state, tt.args.allowTags)
+			if got != tt.want {
+				t.Errorf("StripTagsEx() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("StripTagsEx() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}
+
+func Test_phpTagFind(t *testing.T) {
+	type args struct {
+		tag string
+		set string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			"1",
+			args{
+				`<a href="test?test\!!!test">`,
+				`<a>`,
+			},
+			true,
+		},
+		{
+			"2",
+			args{
+				`</a>`,
+				`<a>`,
+			},
+			true,
+		},
+		{
+			"3",
+			args{
+				`<a>`,
+				`<a>`,
+			},
+			true,
+		},
+		{
+			"bad case",
+			args{
+				`/a>`,
+				`<a>`,
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := phpTagFind(tt.args.tag, tt.args.set); got != tt.want {
+				t.Errorf("phpTagFind() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestStrtr(t *testing.T) {
+	type args struct {
+		str  string
+		from string
+		to   string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			"bug-01",
+			args{
+				"Dot in brackets [.]\\n",
+				".",
+				"0",
+			},
+			"Dot in brackets [0]\\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Strtr(tt.args.str, tt.args.from, tt.args.to); got != tt.want {
+				t.Errorf("Strtr() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

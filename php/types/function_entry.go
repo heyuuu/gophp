@@ -1,14 +1,16 @@
 package types
 
 type FunctionEntry struct {
-	name    string
-	handler any
+	name     string
+	handler  any
+	argInfos []ArgInfo
 }
 
-func DefFunctionEntry(name string, handler any) FunctionEntry {
+func DefFunctionEntry(name string, handler any, argInfos []ArgInfo) FunctionEntry {
 	return FunctionEntry{
-		name:    name,
-		handler: handler,
+		name:     name,
+		handler:  handler,
+		argInfos: argInfos,
 	}
 }
 

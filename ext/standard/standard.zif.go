@@ -9,7 +9,7 @@ import (
 var zifFunctions = []def.FuncType{DefZifKrsort, DefZifKsort, DefZifCount, DefZifSizeof, DefZifNatsort, DefZifNatcasesort, DefZifAsort, DefZifArsort, DefZifSort, DefZifRsort, DefZifUsort, DefZifUasort, DefZifUksort, DefZifEnd, DefZifPrev, DefZifNext, DefZifReset, DefZifCurrent, DefZifPos, DefZifKey, DefZifMin, DefZifMax, DefZifArrayWalk, DefZifArrayWalkRecursive, DefZifInArray, DefZifArraySearch, DefZifArrayFill, DefZifArrayFillKeys, DefZifRange, DefZifShuffle, DefZifArrayPush, DefZifArrayPop, DefZifArrayShift, DefZifArrayUnshift, DefZifArraySplice, DefZifArraySlice, DefZifArrayMerge, DefZifArrayMergeRecursive, DefZifArrayReplace, DefZifArrayReplaceRecursive, DefZifArrayKeys, DefZifArrayKeyFirst, DefZifArrayKeyLast, DefZifArrayValues, DefZifArrayCountValues, DefZifArrayColumn, DefZifArrayReverse, DefZifArrayPad, DefZifArrayFlip, DefZifArrayChangeKeyCase, DefZifArrayUnique, DefZifArrayIntersectKey, DefZifArrayIntersectUkey, DefZifArrayIntersect, DefZifArrayUintersect, DefZifArrayIntersectAssoc, DefZifArrayIntersectUassoc, DefZifArrayUintersectAssoc, DefZifArrayUintersectUassoc, DefZifArrayDiffKey, DefZifArrayDiffUkey, DefZifArrayDiff, DefZifArrayUdiff, DefZifArrayDiffAssoc, DefZifArrayDiffUassoc, DefZifArrayUdiffAssoc, DefZifArrayUdiffUassoc, DefZifArrayMultisort, DefZifArrayRand, DefZifArraySum, DefZifArrayProduct, DefZifArrayReduce, DefZifArrayFilter, DefZifArrayMap, DefZifArrayKeyExists, DefZifKeyExists, DefZifArrayChunk, DefZifArrayCombine, DefZifMtSrand, DefZifSrand, DefZifMtGetrandmax, DefZifGetrandmax, DefZifMtRand, DefZifRand, DefZifUtf8Encode, DefZifBin2hex, DefZifHex2bin, DefZifStrspn, DefZifStrcspn, DefZifStrcoll, DefZifTrim, DefZifRtrim, DefZifChop, DefZifLtrim, DefZifWordwrap, DefZifExplode, DefZifImplode, DefZifJoin, DefZifStrtok, DefZifStrtoupper, DefZifStrtolower, DefZifBasename, DefZifDirname, DefZifPathinfo, DefZifStristr, DefZifStrstr, DefZifStrchr, DefZifStrpos, DefZifStripos, DefZifStrrpos, DefZifStrripos, DefZifStrrchr, DefZifChunkSplit, DefZifSubstr, DefZifSubstrReplace, DefZifQuotemeta, DefZifOrd, DefZifChr, DefZifUcfirst, DefZifLcfirst, DefZifUcwords, DefZifStrtr, DefZifStrrev, DefZifSimilarText, DefZifAddslashes, DefZifAddcslashes, DefZifStripslashes, DefZifStripcslashes, DefZifStrReplace, DefZifStrIreplace, DefZifHebrev, DefZifHebrevc, DefZifNl2br, DefZifStripTags, DefZifStrRepeat, DefZifCountChars, DefZifStrnatcmp, DefZifStrnatcasecmp, DefZifSubstrCount, DefZifStrPad, DefZifStrRot13, DefZifStrShuffle, DefZifStrWordCount, DefZifStrSplit, DefZifStrpbrk, DefZifSubstrCompare, DefZifVarDump}
 
 // generate by ZifKrsort
-var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 2, 0) {
 		return
 	}
@@ -25,7 +25,7 @@ var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Nam
 })
 
 // generate by ZifKsort
-var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 2, 0) {
 		return
 	}
@@ -73,7 +73,7 @@ var DefZifSizeof = def.DefFunc("sizeof", 1, 2, []def.ArgInfo{{Name: "var"}, {Nam
 })
 
 // generate by ZifNatsort
-var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{Name: "arg", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
@@ -87,7 +87,7 @@ var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{Name: "arg"}}, f
 })
 
 // generate by ZifNatcasesort
-var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{Name: "arg", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
@@ -101,7 +101,7 @@ var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{Name: "a
 })
 
 // generate by ZifAsort
-var DefZifAsort = def.DefFunc("asort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifAsort = def.DefFunc("asort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 2, 0) {
 		return
 	}
@@ -117,7 +117,7 @@ var DefZifAsort = def.DefFunc("asort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name:
 })
 
 // generate by ZifArsort
-var DefZifArsort = def.DefFunc("arsort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArsort = def.DefFunc("arsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 2, 0) {
 		return
 	}
@@ -133,7 +133,7 @@ var DefZifArsort = def.DefFunc("arsort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Nam
 })
 
 // generate by ZifSort
-var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 2, 0) {
 		return
 	}
@@ -149,7 +149,7 @@ var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "
 })
 
 // generate by ZifRsort
-var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 2, 0) {
 		return
 	}
@@ -165,7 +165,7 @@ var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name:
 })
 
 // generate by ZifUsort
-var DefZifUsort = def.DefFunc("usort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Name: "cmp_function"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifUsort = def.DefFunc("usort", 2, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "cmp_function"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 2, 2, 0) {
 		return
 	}
@@ -180,7 +180,7 @@ var DefZifUsort = def.DefFunc("usort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Name:
 })
 
 // generate by ZifUasort
-var DefZifUasort = def.DefFunc("uasort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Name: "cmp_function"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifUasort = def.DefFunc("uasort", 2, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "cmp_function"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 2, 2, 0) {
 		return
 	}
@@ -195,7 +195,7 @@ var DefZifUasort = def.DefFunc("uasort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Nam
 })
 
 // generate by ZifUksort
-var DefZifUksort = def.DefFunc("uksort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Name: "cmp_function"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifUksort = def.DefFunc("uksort", 2, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "cmp_function"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 2, 2, 0) {
 		return
 	}
@@ -210,7 +210,7 @@ var DefZifUksort = def.DefFunc("uksort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Nam
 })
 
 // generate by ZifEnd
-var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
@@ -224,7 +224,7 @@ var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "array"}}, func(ex
 })
 
 // generate by ZifPrev
-var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
@@ -238,7 +238,7 @@ var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "array"}}, func(
 })
 
 // generate by ZifNext
-var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
@@ -252,7 +252,7 @@ var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{Name: "array"}}, func(
 })
 
 // generate by ZifReset
-var DefZifReset = def.DefFunc("reset", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifReset = def.DefFunc("reset", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
@@ -316,7 +316,7 @@ var DefZifKey = def.DefFunc("key", 1, 1, []def.ArgInfo{{Name: "array"}}, func(ex
 })
 
 // generate by ZifMin
-var DefZifMin = def.DefFunc("min", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "args"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifMin = def.DefFunc("min", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -331,7 +331,7 @@ var DefZifMin = def.DefFunc("min", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "a
 })
 
 // generate by ZifMax
-var DefZifMax = def.DefFunc("max", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "args"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifMax = def.DefFunc("max", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -346,7 +346,7 @@ var DefZifMax = def.DefFunc("max", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "a
 })
 
 // generate by ZifArrayWalk
-var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{Name: "array"}, {Name: "callable"}, {Name: "arg"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{Name: "array", ByRef: true}, {Name: "callable"}, {Name: "arg"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 2, 3, 0) {
 		return
 	}
@@ -363,7 +363,7 @@ var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{Name: "arra
 })
 
 // generate by ZifArrayWalkRecursive
-var DefZifArrayWalkRecursive = def.DefFunc("array_walk_recursive", 2, 3, []def.ArgInfo{{Name: "array"}, {Name: "callable"}, {Name: "arg"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayWalkRecursive = def.DefFunc("array_walk_recursive", 2, 3, []def.ArgInfo{{Name: "array", ByRef: true}, {Name: "callable"}, {Name: "arg"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 2, 3, 0) {
 		return
 	}
@@ -470,7 +470,7 @@ var DefZifRange = def.DefFunc("range", 2, 3, []def.ArgInfo{{Name: "low"}, {Name:
 })
 
 // generate by ZifShuffle
-var DefZifShuffle = def.DefFunc("shuffle", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifShuffle = def.DefFunc("shuffle", 1, 1, []def.ArgInfo{{Name: "arg", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
@@ -484,7 +484,7 @@ var DefZifShuffle = def.DefFunc("shuffle", 1, 1, []def.ArgInfo{{Name: "arg"}}, f
 })
 
 // generate by ZifArrayPush
-var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{Name: "stack"}, {Name: "args"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{Name: "stack", ByRef: true}, {Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -504,7 +504,7 @@ var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{Name: "sta
 })
 
 // generate by ZifArrayPop
-var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{Name: "stack"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{Name: "stack", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
@@ -518,7 +518,7 @@ var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{Name: "stack"
 })
 
 // generate by ZifArrayShift
-var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "stack"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "stack", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, 1, 0) {
 		return
 	}
@@ -532,7 +532,7 @@ var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "st
 })
 
 // generate by ZifArrayUnshift
-var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{Name: "stack"}, {Name: "values"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{Name: "stack", ByRef: true}, {Name: "values", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -547,7 +547,7 @@ var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{Name
 })
 
 // generate by ZifArraySplice
-var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{Name: "array"}, {Name: "offset"}, {Name: "length"}, {Name: "replacement"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{Name: "array", ByRef: true}, {Name: "offset"}, {Name: "length"}, {Name: "replacement"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 2, 4, 0) {
 		return
 	}
@@ -583,7 +583,7 @@ var DefZifArraySlice = def.DefFunc("array_slice", 2, 4, []def.ArgInfo{{Name: "ar
 })
 
 // generate by ZifArrayMerge
-var DefZifArrayMerge = def.DefFunc("array_merge", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayMerge = def.DefFunc("array_merge", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -597,7 +597,7 @@ var DefZifArrayMerge = def.DefFunc("array_merge", 0, -1, []def.ArgInfo{{Name: "a
 })
 
 // generate by ZifArrayMergeRecursive
-var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -611,7 +611,7 @@ var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []de
 })
 
 // generate by ZifArrayReplace
-var DefZifArrayReplace = def.DefFunc("array_replace", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayReplace = def.DefFunc("array_replace", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -625,7 +625,7 @@ var DefZifArrayReplace = def.DefFunc("array_replace", 0, -1, []def.ArgInfo{{Name
 })
 
 // generate by ZifArrayReplaceRecursive
-var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -815,7 +815,7 @@ var DefZifArrayUnique = def.DefFunc("array_unique", 1, 2, []def.ArgInfo{{Name: "
 })
 
 // generate by ZifArrayIntersectKey
-var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -833,7 +833,7 @@ var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", 0, -1, []def.Ar
 })
 
 // generate by ZifArrayIntersectUkey
-var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_key_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_key_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -852,7 +852,7 @@ var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 1, -1, []def.
 })
 
 // generate by ZifArrayIntersect
-var DefZifArrayIntersect = def.DefFunc("array_intersect", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayIntersect = def.DefFunc("array_intersect", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -870,7 +870,7 @@ var DefZifArrayIntersect = def.DefFunc("array_intersect", 0, -1, []def.ArgInfo{{
 })
 
 // generate by ZifArrayUintersect
-var DefZifArrayUintersect = def.DefFunc("array_uintersect", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayUintersect = def.DefFunc("array_uintersect", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -889,7 +889,7 @@ var DefZifArrayUintersect = def.DefFunc("array_uintersect", 1, -1, []def.ArgInfo
 })
 
 // generate by ZifArrayIntersectAssoc
-var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -907,7 +907,7 @@ var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", 0, -1, []de
 })
 
 // generate by ZifArrayIntersectUassoc
-var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_key_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_key_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -926,7 +926,7 @@ var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 1, -1, []
 })
 
 // generate by ZifArrayUintersectAssoc
-var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -945,7 +945,7 @@ var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 1, -1, []
 })
 
 // generate by ZifArrayUintersectUassoc
-var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 2, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_compare_func"}, {Name: "callback_key_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 2, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_compare_func"}, {Name: "callback_key_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 2, -1, 0) {
 		return
 	}
@@ -965,7 +965,7 @@ var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 2, -1, 
 })
 
 // generate by ZifArrayDiffKey
-var DefZifArrayDiffKey = def.DefFunc("array_diff_key", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayDiffKey = def.DefFunc("array_diff_key", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -983,7 +983,7 @@ var DefZifArrayDiffKey = def.DefFunc("array_diff_key", 0, -1, []def.ArgInfo{{Nam
 })
 
 // generate by ZifArrayDiffUkey
-var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_key_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_key_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -1002,7 +1002,7 @@ var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 1, -1, []def.ArgInfo{{N
 })
 
 // generate by ZifArrayDiff
-var DefZifArrayDiff = def.DefFunc("array_diff", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayDiff = def.DefFunc("array_diff", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -1016,7 +1016,7 @@ var DefZifArrayDiff = def.DefFunc("array_diff", 0, -1, []def.ArgInfo{{Name: "arr
 })
 
 // generate by ZifArrayUdiff
-var DefZifArrayUdiff = def.DefFunc("array_udiff", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayUdiff = def.DefFunc("array_udiff", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -1035,7 +1035,7 @@ var DefZifArrayUdiff = def.DefFunc("array_udiff", 1, -1, []def.ArgInfo{{Name: "a
 })
 
 // generate by ZifArrayDiffAssoc
-var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -1053,7 +1053,7 @@ var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", 0, -1, []def.ArgInfo{
 })
 
 // generate by ZifArrayDiffUassoc
-var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_key_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_key_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -1072,7 +1072,7 @@ var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 1, -1, []def.ArgInf
 })
 
 // generate by ZifArrayUdiffAssoc
-var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 1, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -1091,7 +1091,7 @@ var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 1, -1, []def.ArgInf
 })
 
 // generate by ZifArrayUdiffUassoc
-var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 2, -1, []def.ArgInfo{{Name: "arrays"}, {Name: "callback_data_comp_func"}, {Name: "callback_key_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 2, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_comp_func"}, {Name: "callback_key_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 2, -1, 0) {
 		return
 	}
@@ -1111,7 +1111,7 @@ var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 2, -1, []def.ArgI
 })
 
 // generate by ZifArrayMultisort
-var DefZifArrayMultisort = def.DefFunc("array_multisort", 0, -1, []def.ArgInfo{{Name: "args"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayMultisort = def.DefFunc("array_multisort", 0, -1, []def.ArgInfo{{Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
@@ -1203,7 +1203,7 @@ var DefZifArrayFilter = def.DefFunc("array_filter", 1, 3, []def.ArgInfo{{Name: "
 })
 
 // generate by ZifArrayMap
-var DefZifArrayMap = def.DefFunc("array_map", 1, -1, []def.ArgInfo{{Name: "callback"}, {Name: "arrays"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifArrayMap = def.DefFunc("array_map", 1, -1, []def.ArgInfo{{Name: "callback"}, {Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 1, -1, 0) {
 		return
 	}
@@ -2058,7 +2058,7 @@ var DefZifStrrev = def.DefFunc("strrev", 1, 1, []def.ArgInfo{{Name: "str"}}, fun
 })
 
 // generate by ZifSimilarText
-var DefZifSimilarText = def.DefFunc("similar_text", 2, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "percent"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifSimilarText = def.DefFunc("similar_text", 2, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "percent", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 2, 3, 0) {
 		return
 	}
@@ -2132,7 +2132,7 @@ var DefZifStripcslashes = def.DefFunc("stripcslashes", 1, 1, []def.ArgInfo{{Name
 })
 
 // generate by ZifStrReplace
-var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{Name: "search"}, {Name: "replace"}, {Name: "subject"}, {Name: "replace_count"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{Name: "search"}, {Name: "replace"}, {Name: "subject"}, {Name: "replace_count", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 3, 4, 0) {
 		return
 	}
@@ -2149,7 +2149,7 @@ var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{Name: "se
 })
 
 // generate by ZifStrIreplace
-var DefZifStrIreplace = def.DefFunc("str_ireplace", 3, 4, []def.ArgInfo{{Name: "search"}, {Name: "replace"}, {Name: "subject"}, {Name: "replace_count"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifStrIreplace = def.DefFunc("str_ireplace", 3, 4, []def.ArgInfo{{Name: "search"}, {Name: "replace"}, {Name: "subject"}, {Name: "replace_count", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 3, 4, 0) {
 		return
 	}
@@ -2462,7 +2462,7 @@ var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Nam
 })
 
 // generate by ZifVarDump
-var DefZifVarDump = def.DefFunc("var_dump", 0, -1, []def.ArgInfo{{Name: "vars"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+var DefZifVarDump = def.DefFunc("var_dump", 0, -1, []def.ArgInfo{{Name: "vars", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	if !php.CheckNumArgs(executeData, 0, -1, 0) {
 		return
 	}
