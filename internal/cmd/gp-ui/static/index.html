@@ -61,20 +61,8 @@
 <script src="/static/js/tools.js"></script>
 <script>
     // storage
-    const storageKey = "code"
-    let initCode = getQueryParam("code")
-    if (!initCode) {
-        initCode = localStorage.getItem(storageKey)
-        if (!initCode) {
-            initCode = "<?php\n\n"
-        }
-    }
-
-    const storageShowModeKey = "showMode"
-    let initShowMode = localStorage.getItem(storageShowModeKey)
-    if (!initShowMode) {
-        initShowMode = -1
-    }
+    let initCode = getQueryParam("code") || "<?php\n\n"
+    let initShowMode = getQueryParam("mode") || -1
 
     // App
     const apiUri = "/api"
@@ -105,7 +93,7 @@
         },
         toggleShow(idx) {
             this.showMode ^= (1 << idx)
-            localStorage.setItem(storageShowModeKey, this.showMode)
+            this.queryChange()
         },
         isShow(idx) {
             return (this.showMode & (1 << idx)) !== 0
@@ -151,7 +139,6 @@
             }
         },
         codeChange() {
-            localStorage.setItem(storageKey, this.code)
             this.queryChange()
             this.refresh()
         },
