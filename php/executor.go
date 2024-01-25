@@ -835,11 +835,21 @@ func (e *Executor) assignRefExpr(expr *ast.AssignRefExpr) types.Zval {
 }
 
 func (e *Executor) issetExpr(expr *ast.IssetExpr) types.Zval {
-	panic(perr.Todof("e.issetExpr"))
+	for _, var_ := range expr.Vars {
+		value := e.variableRef(var_).Get()
+		if !ZvalIsTrue(e.ctx, value) {
+			return types.False
+		}
+	}
+	return types.True
 }
 
 func (e *Executor) emptyExpr(expr *ast.EmptyExpr) types.Zval {
-	panic(perr.Todof("e.emptyExpr"))
+	value := e.variableRef(expr.Expr).Get()
+	if ZvalIsTrue(e.ctx, value) {
+		return types.False
+	}
+	return types.True
 }
 
 func (e *Executor) evalExpr(expr *ast.EvalExpr) types.Zval {
@@ -855,8 +865,11 @@ func (e *Executor) cloneExpr(expr *ast.CloneExpr) types.Zval {
 }
 
 func (e *Executor) errorSuppressExpr(expr *ast.ErrorSuppressExpr) types.Zval {
-	// todo errorSuppressExpr
-	return e.expr(expr.Expr)
+	var result types.Zval
+	e.ctx.EG().ErrorSuppressScope(func() {
+		result = e.expr(expr.Expr)
+	})
+	return result
 }
 
 func (e *Executor) exitExpr(expr *ast.ExitExpr) types.Zval {

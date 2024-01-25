@@ -72,6 +72,7 @@ func NewParamParser(ex *ExecuteData, minNumArgs int, maxNumArgs int, flags int) 
 func NewFastParamParser(ex *ExecuteData, minNumArgs int, maxNumArgs int, flags int) *FastParamParser {
 	return &FastParamParser{
 		ex:         ex,
+		ctx:        ex.ctx,
 		numArgs:    ex.NumArgs(),
 		minNumArgs: minNumArgs,
 		maxNumArgs: maxNumArgs,
@@ -475,30 +476,33 @@ func (p *FastParamParser) ParseCallable() *types.UserCallable {
 }
 
 // @see Micro: Z_PARAM_ZVAL，Old: 'z'
-func (p *FastParamParser) ParseZval() types.Zval {
-	return *p.parseZvalEx(false, false)
+func (p *FastParamParser) ParseZval() (dest types.Zval) {
+	dest, _ = p.parseZvalEx(false, false)
+	return
 }
-func (p *FastParamParser) ParseZvalPtr() *types.Zval {
-	return p.parseZvalEx(false, false)
+func (p *FastParamParser) ParseZvalNullable() *types.Zval {
+	dest, isNull := p.parseZvalEx(true, false)
+	if isNull {
+		return nil
+	}
+	return &dest
 }
-func (p *FastParamParser) ParseZvalNullable() (dest *types.Zval) {
-	return p.parseZvalEx(true, false)
-}
-func (p *FastParamParser) parseZvalEx(checkNull bool, separate bool) (dest *types.Zval) {
+
+func (p *FastParamParser) parseZvalEx(checkNull bool, separate bool) (dest types.Zval, isNull bool) {
 	return p.parseZvalEx2(checkNull, separate, separate)
 }
-func (p *FastParamParser) parseZvalEx2(checkNull bool, deref bool, separate bool) (dest *types.Zval) {
+func (p *FastParamParser) parseZvalEx2(checkNull bool, deref bool, separate bool) (dest types.Zval, isNull bool) {
 	arg, ok := p.nextArg(deref, separate)
 	if !ok {
-		return
+		return types.Undef, true
 	}
 
 	// check null
 	if checkNull && arg.IsNull() {
-		return nil
+		return types.Undef, true
 	}
 
-	return &arg
+	return arg, false
 }
 
 // @see Micro: Z_PARAM_VARIADIC | Z_PARAM_VARIADIC_EX, Old: '+ and '*'
@@ -506,13 +510,6 @@ func (p *FastParamParser) ParseVariadic(postVarargs uint) []types.Zval {
 	var args []types.Zval
 	p.eachVariadic(postVarargs, func(arg types.Zval) {
 		args = append(args, arg)
-	})
-	return args
-}
-func (p *FastParamParser) ParseVariadicPtr(postVarargs uint) []*types.Zval {
-	var args []*types.Zval
-	p.eachVariadic(postVarargs, func(arg types.Zval) {
-		args = append(args, &arg)
 	})
 	return args
 }
@@ -535,8 +532,8 @@ func (p *FastParamParser) eachVariadic(postVarargs uint, h func(arg types.Zval))
 
 func (p *FastParamParser) ParseRefZval() types.RefZval {
 	// todo ref 处理
-	v := p.parseZvalEx(false, true)
-	return p.asRefZval(*v)
+	v, _ := p.parseZvalEx(false, true)
+	return p.asRefZval(v)
 }
 func (p *FastParamParser) ParseRefArrayOrObject() types.RefZval {
 	dest := p.parseArrayOrObjectEx(false, true)

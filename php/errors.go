@@ -90,10 +90,13 @@ func ErrorCb(ctx *Context, typ perr.ErrorType, errorFilename string, errorLineno
 		error_type_str = "Unknown error"
 	}
 	logBuffer := fmt.Sprintf("PHP %s:  %s in %s on line %d", error_type_str, message, errorFilename, errorLineno)
+	//logBuffer := fmt.Sprintf("%s:  %s in %s on line %d", error_type_str, message, errorFilename, errorLineno)
 	PhpLogErrWithSeverity(ctx, logBuffer, syslog_type_int)
 }
 
 func PhpLogErrWithSeverity(ctx *Context, logMessage string, syslogTypeInt plog.Level) {
-	ctx.WriteString(logMessage + "\n")
+	if !ctx.EG().ErrorSuppress() {
+		ctx.WriteString(logMessage + "\n")
+	}
 	log.Println(logMessage)
 }

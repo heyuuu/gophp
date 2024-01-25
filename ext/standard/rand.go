@@ -33,7 +33,7 @@ func PhpMtRand(ctx *php.Context) uint32 {
 }
 func PhpMtRandRange(ctx *php.Context, min int, max int) int {
 	php.Assert(min <= max)
-	return min + getRand(ctx).Intn(max-min)
+	return min + getRand(ctx).Intn(max-min+1)
 }
 
 //@zif(alias="srand")

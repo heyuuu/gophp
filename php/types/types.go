@@ -80,7 +80,6 @@ func NewZvalArray(arr *Array) *Zval {
 }
 func NewZvalObject(obj *Object) *Zval     { return &Zval{v: obj} }
 func NewZvalResource(res *Resource) *Zval { return &Zval{v: res} }
-func NewZvalEmptyArray() *Zval            { return NewZvalArray(NewArray()) }
 
 // Zval setter
 func (zv *Zval) SetUndef()           { zv.v = nil }
@@ -110,20 +109,12 @@ func (zv *Zval) SetNewRef(val Zval)            { zv.SetReference(NewReference(va
 
 func (zv *Zval) SetBy(val Zval) {
 	zv.v = val.v
-	// 除数组外，基础类型都复制了值，引用类型都复制了指针；仅数组需要做写时复制
-	if zv.IsArray() {
-		zv.v = zv.Array().Clone()
-	}
 }
 func (zv *Zval) SetByPtr(val *Zval) {
 	if val == nil {
 		*zv = Undef
 	}
 	zv.v = val.v
-	// 除数组外，基础类型都复制了值，引用类型都复制了指针；仅数组需要做写时复制
-	if zv.IsArray() {
-		zv.v = zv.Array().Clone()
-	}
 }
 
 func (zv *Zval) Clone() *Zval {
@@ -131,7 +122,6 @@ func (zv *Zval) Clone() *Zval {
 	tmp.SetByPtr(zv)
 	return &tmp
 }
-func (zv *Zval) Val() Zval { return *zv }
 
 // Zval getter
 func (zv Zval) Type() ZvalType {

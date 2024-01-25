@@ -61,6 +61,9 @@ func ContextGetOrInit[T any](ctx *Context, key string, initializer func() T) (T,
 		}
 	} else {
 		result := initializer()
+		if ctx.values == nil {
+			ctx.values = map[string]any{}
+		}
 		ctx.values[key] = result
 		return result, true
 	}

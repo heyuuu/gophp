@@ -350,49 +350,54 @@ func ZifStrcoll(str1 string, str2 string) int {
 	return strings.Compare(str1, str2)
 }
 func PhpCharmaskEx(ctx *php.Context, input string) (string, bool) {
+	return charmaskEx(input, func(err string) {
+		php.ErrorDocRef(ctx, "", perr.E_WARNING, err)
+	})
+}
+func charmaskEx(input string, onError func(string)) (string, bool) {
 	if pos := strings.Index(input, ".."); pos < 0 {
 		return input, true
 	}
 
+	var result = true
 	var buf strings.Builder
-	for {
-		pos := strings.Index(input, "..")
-		if pos < 0 {
-			buf.WriteString(input)
-			break
-		}
-
-		// e.g. "a..z"
-		if pos > 0 && pos+2 < len(input) && input[pos-1] <= input[pos+2] {
-			buf.WriteString(input[:pos-1])
-			for c := input[pos-1]; c <= input[pos+2]; c++ {
+	var length = len(input)
+	for i := 0; i < length; i++ {
+		if i+3 < length && input[i+1] == '.' && input[i+2] == '.' && input[i+3] >= input[i] {
+			for c := input[i]; c <= input[i+3]; c++ {
 				buf.WriteByte(c)
 			}
-			input = input[pos+3:]
-		} else {
+			i += 3
+		} else if i+1 < length && input[i] == '.' && input[i+1] == '.' {
 			/* Error, try to be as helpful as possible:
 			   (a range ending/starting with '.' won't be captured here) */
-			if pos == 0 {
-				php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid '..'-range, no character to the left of '..'")
-				return "", false
+			if i == 0 {
+				result = false
+				onError("Invalid '..'-range, no character to the left of '..'")
+				continue
 			}
-			if pos+2 >= len(input) {
-				php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid '..'-range, no character to the right of '..'")
-				return "", false
+			if i+2 >= len(input) {
+				result = false
+				onError("Invalid '..'-range, no character to the right of '..'")
+				continue
 			}
-			if input[pos-1] > input[pos+2] {
-				php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid '..'-range, '..'-range needs to be incrementing")
-				return "", false
+			if input[i-1] > input[i+2] {
+				result = false
+				onError("Invalid '..'-range, '..'-range needs to be incrementing")
+				continue
 			}
 
 			/* FIXME: better error (a..b..c is the only left possibility?) */
-			php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid '..'-range")
-			return "", false
+			result = false
+			onError("Invalid '..'-range")
+			continue
+		} else {
+			buf.WriteByte(input[i])
 		}
-
 	}
-	return buf.String(), true
+	return buf.String(), result
 }
+
 func PhpTrimAll(ctx *php.Context, str string, what *string) string {
 	var cutset = " \n\r\t\v\x00"
 	if what != nil {
@@ -1363,50 +1368,49 @@ func PhpCharToStr(str string, from byte, to string, caseSensitivity bool) (strin
 	return result, count
 }
 
-func PhpStrToStr(haystack string, needle string, str string) (string, int) {
-	if len(needle) > len(haystack) {
-		return haystack, 0
-	} else if needle == haystack {
-		return str, 1
+// @see php_str_to_str()
+func stringReplace(s string, search string, replace string) (string, int) {
+	if s == "" || search == "" || len(search) > len(s) {
+		return s, 0
 	}
 
-	count := strings.Count(haystack, needle)
-	result := strings.ReplaceAll(haystack, needle, str)
+	count := strings.Count(s, search)
+	if count == 0 {
+		return s, 0
+	}
+
+	result := strings.ReplaceAll(s, search, replace)
 	return result, count
 }
 
-func PhpStrToStrI(haystack string, lcHaystack string, needle string, str string) (string, int) {
-	php.Assert(len(needle) != 0)
-
-	if len(needle) > len(haystack) {
-		return haystack, 0
+// @see php_str_to_str_i_ex
+func stringReplaceIgnoreCase(s string, search string, replace string) (string, int) {
+	if s == "" || search == "" || len(search) > len(s) {
+		return s, 0
 	}
 
-	lcNeedle := ascii.StrToLower(needle)
-	if lcHaystack == lcNeedle {
-		return str, 1
+	lcStr := ascii.StrToLower(s)
+	lcSearch := ascii.StrToLower(search)
+	if lcStr == lcSearch {
+		return replace, 1
+	}
+
+	count := strings.Count(lcStr, lcSearch)
+	if count == 0 {
+		return s, 0
 	}
 
 	var buf strings.Builder
-	lastPos := 0
-	count := 0
-	for {
-		pos := strings.Index(lcHaystack[lastPos:], needle)
-		if pos < 0 {
-			break
-		}
-
-		buf.WriteString(haystack[lastPos : lastPos+pos])
-		buf.WriteString(str)
-		lastPos = lastPos + pos + len(needle)
-		count++
+	buf.Grow(len(s) + count*(len(replace)-len(search)))
+	start := 0
+	for i := 0; i < count; i++ {
+		j := start + strings.Index(lcStr[start:], lcSearch) // 已确定有 count 个 lcSearch, 此时 strings.Index() 结果肯定 >= 0
+		buf.WriteString(s[start:j])
+		buf.WriteString(replace)
+		start = j + len(search)
 	}
-	if count == 0 {
-		return haystack, 0
-	} else {
-		buf.WriteString(haystack[lastPos:])
-		return buf.String(), count
-	}
+	buf.WriteString(s[start:])
+	return buf.String(), count
 }
 
 func ZifStrtr(ctx *php.Context, str string, from types.Zval, _ zpp.Opt, to_ *string) (string, bool) {
@@ -1570,10 +1574,9 @@ func strReplaceStr(ctx *php.Context, subject string, search types.Zval, replace 
 				tmpResult, count = PhpCharToStr(result, searchStr[0], replaceStr, caseSensitivity)
 			} else {
 				if caseSensitivity {
-					tmpResult, count = PhpStrToStr(result, searchStr, replaceStr)
+					tmpResult, count = stringReplace(result, searchStr, replaceStr)
 				} else {
-					lcSubjectStr := ascii.StrToLower(result)
-					tmpResult, count = PhpStrToStrI(result, lcSubjectStr, searchStr, replaceStr)
+					tmpResult, count = stringReplaceIgnoreCase(result, searchStr, replaceStr)
 				}
 			}
 
@@ -1593,10 +1596,9 @@ func strReplaceStr(ctx *php.Context, subject string, search types.Zval, replace 
 			return PhpCharToStr(subject, searchStr[0], replaceStr, caseSensitivity)
 		} else {
 			if caseSensitivity {
-				return PhpStrToStr(subject, searchStr, replaceStr)
+				return stringReplace(subject, searchStr, replaceStr)
 			} else {
-				lcSubject := ascii.StrToLower(subject)
-				return PhpStrToStrI(subject, lcSubject, searchStr, replaceStr)
+				return stringReplaceIgnoreCase(subject, searchStr, replaceStr)
 			}
 		}
 	}

@@ -46,7 +46,7 @@ var DefZifCount = def.DefFunc("count", 1, 2, []def.ArgInfo{{Name: "var"}, {Name:
 		return
 	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
-	var_ := fp.ParseZvalPtr()
+	var_ := fp.ParseZvalNullable()
 	fp.StartOptional()
 	mode := fp.ParseLong()
 	if fp.HasError() {
@@ -62,7 +62,7 @@ var DefZifSizeof = def.DefFunc("sizeof", 1, 2, []def.ArgInfo{{Name: "var"}, {Nam
 		return
 	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
-	var_ := fp.ParseZvalPtr()
+	var_ := fp.ParseZvalNullable()
 	fp.StartOptional()
 	mode := fp.ParseLong()
 	if fp.HasError() {
@@ -354,7 +354,7 @@ var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{Name: "arra
 	array := fp.ParseRefArrayOrObject()
 	callable := fp.ParseCallable()
 	fp.StartOptional()
-	arg := fp.ParseZvalPtr()
+	arg := fp.ParseZvalNullable()
 	if fp.HasError() {
 		return
 	}
@@ -371,7 +371,7 @@ var DefZifArrayWalkRecursive = def.DefFunc("array_walk_recursive", 2, 3, []def.A
 	array := fp.ParseRefArrayOrObject()
 	callable := fp.ParseCallable()
 	fp.StartOptional()
-	arg := fp.ParseZvalPtr()
+	arg := fp.ParseZvalNullable()
 	if fp.HasError() {
 		return
 	}
@@ -646,7 +646,7 @@ var DefZifArrayKeys = def.DefFunc("array_keys", 1, 3, []def.ArgInfo{{Name: "arra
 	fp := php.NewParamParser(executeData, 1, 3, 0)
 	array := fp.ParseArray()
 	fp.StartOptional()
-	search_value := fp.ParseZvalPtr()
+	search_value := fp.ParseZvalNullable()
 	strict := fp.ParseBool()
 	if fp.HasError() {
 		return
@@ -1177,7 +1177,7 @@ var DefZifArrayReduce = def.DefFunc("array_reduce", 2, 3, []def.ArgInfo{{Name: "
 	array := fp.ParseArray()
 	callback := fp.ParseCallable()
 	fp.StartOptional()
-	initial := fp.ParseZvalPtr()
+	initial := fp.ParseZvalNullable()
 	if fp.HasError() {
 		return
 	}
@@ -1223,7 +1223,7 @@ var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{
 		return
 	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
-	key := fp.ParseZvalPtr()
+	key := fp.ParseZvalNullable()
 	array := fp.ParseArrayOrObjectZval()
 	if fp.HasError() {
 		return
@@ -1238,7 +1238,7 @@ var DefZifKeyExists = def.DefFunc("key_exists", 2, 2, []def.ArgInfo{{Name: "key"
 		return
 	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
-	key := fp.ParseZvalPtr()
+	key := fp.ParseZvalNullable()
 	array := fp.ParseArrayOrObjectZval()
 	if fp.HasError() {
 		return
@@ -1585,9 +1585,9 @@ var DefZifImplode = def.DefFunc("implode", 1, 2, []def.ArgInfo{{Name: "glue"}, {
 		return
 	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
-	glue_ := fp.ParseZvalPtr()
+	glue_ := fp.ParseZvalNullable()
 	fp.StartOptional()
-	pieces_ := fp.ParseZvalPtr()
+	pieces_ := fp.ParseZvalNullable()
 	if fp.HasError() {
 		return
 	}
@@ -1601,9 +1601,9 @@ var DefZifJoin = def.DefFunc("join", 1, 2, []def.ArgInfo{{Name: "glue"}, {Name: 
 		return
 	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
-	glue_ := fp.ParseZvalPtr()
+	glue_ := fp.ParseZvalNullable()
 	fp.StartOptional()
-	pieces_ := fp.ParseZvalPtr()
+	pieces_ := fp.ParseZvalNullable()
 	if fp.HasError() {
 		return
 	}
@@ -1925,7 +1925,7 @@ var DefZifSubstrReplace = def.DefFunc("substr_replace", 3, 4, []def.ArgInfo{{Nam
 	replace := fp.ParseZval()
 	start := fp.ParseZval()
 	fp.StartOptional()
-	length := fp.ParseZvalPtr()
+	length := fp.ParseZvalNullable()
 	if fp.HasError() {
 		return
 	}
@@ -2229,7 +2229,7 @@ var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{Name: "str"
 	fp := php.NewParamParser(executeData, 1, 2, 0)
 	str := fp.ParseString()
 	fp.StartOptional()
-	allowable_tags := fp.ParseZvalPtr()
+	allowable_tags := fp.ParseZvalNullable()
 	if fp.HasError() {
 		return
 	}

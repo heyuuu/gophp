@@ -1,7 +1,6 @@
 package php
 
 import (
-	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -28,7 +27,7 @@ func (ex *ExecuteData) Ctx() *Context {
 
 func (ex *ExecuteData) CalleeName() string {
 	//TODO implement me
-	panic(perr.Todo())
+	return ""
 }
 
 func (ex *ExecuteData) NumArgs() int {

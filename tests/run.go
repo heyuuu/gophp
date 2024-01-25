@@ -131,7 +131,7 @@ func compareExpect(output string, expect string) (equals bool, reason string) {
 	if strings.TrimSpace(output) == strings.TrimSpace(expect) {
 		return true, ""
 	} else {
-		reason = fmt.Sprintf("output = %s, expect %s", output, expect)
+		reason = fmt.Sprintf("output = \n%s\nexpect =\n%s\n", output, expect)
 		return false, reason
 	}
 }
@@ -192,7 +192,7 @@ func compareExpectRegex(output string, expect string) (equals bool, reason strin
 	if regexp.MustCompile(expect).MatchString(output) {
 		return true, ""
 	} else {
-		reason = fmt.Sprintf("output = %s, expect %s", output, expect)
+		reason = fmt.Sprintf("output = \n%s\nexpect =\n%s\n", output, expect)
 		return false, reason
 	}
 }

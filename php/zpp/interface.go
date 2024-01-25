@@ -35,10 +35,8 @@ type IParser interface {
 
 	// zval
 	ParseZval() types.Zval
-	ParseZvalPtr() *types.Zval
 	ParseZvalNullable() *types.Zval
 	ParseVariadic(postVarargs uint) []types.Zval
-	ParseVariadicPtr(postVarargs uint) []*types.Zval
 
 	// ref type
 	ParseRefZval() types.RefZval

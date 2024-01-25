@@ -237,7 +237,7 @@ func zvalGetStrEx(ctx *Context, v Val, try bool) (string, bool) {
 	case types.IsLong:
 		return strconv.Itoa(v.Long()), true
 	case types.IsDouble:
-		return fmt.Sprintf("%.*G", opPrecision(), v.Double()), true
+		return fmt.Sprintf("%.*G", ctx.EG().Precision(), v.Double()), true
 	case types.IsArray:
 		Error(ctx, perr.E_NOTICE, "Array to string conversion")
 		if try && ctx.EG().HasException() {
@@ -1118,9 +1118,6 @@ func opObjectGetArray(ctx *Context, obj *types.Object) *types.Array {
 	panic(perr.Todof("opObjectGetArray"))
 }
 
-func opPrecision() int {
-	panic(perr.Todof("opPrecision"))
-}
 func opNewObject(properties *types.Array) *types.Object {
 	panic(perr.Todof("opNewObject"))
 }
