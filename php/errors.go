@@ -95,7 +95,7 @@ func ErrorCb(ctx *Context, typ perr.ErrorType, errorFilename string, errorLineno
 	}
 
 	//logBuffer := fmt.Sprintf("PHP %s:  %s in %s on line %d", error_type_str, message, errorFilename, errorLineno)
-	logBuffer := fmt.Sprintf("%s:  %s in %s on line %d", error_type_str, message, errorFilename, errorLineno)
+	logBuffer := fmt.Sprintf("\n%s: %s in %s on line %d", error_type_str, message, errorFilename, errorLineno)
 	PhpLogErrWithSeverity(ctx, logBuffer, syslog_type_int)
 }
 

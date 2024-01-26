@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/zpp"
 )
 
-var zifFunctions = []def.FuncType{DefZifGcMemCaches, DefZifGcCollectCycles, DefZifGcEnabled, DefZifGcStatus, DefZifStrlen, DefZifStrcmp, DefZifStrncmp, DefZifStrcasecmp}
+var zifFunctions = []def.FuncType{DefZifGcMemCaches, DefZifGcCollectCycles, DefZifGcEnabled, DefZifGcStatus, DefZifStrlen, DefZifStrcmp, DefZifStrncmp, DefZifStrcasecmp, DefZifEach, DefZifErrorReporting}
 
 // generate by ZifGcMemCaches
 var DefZifGcMemCaches = def.DefFunc("gc_mem_caches", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
@@ -105,5 +105,38 @@ var DefZifStrcasecmp = def.DefFunc("strcasecmp", 2, 2, []def.ArgInfo{{Name: "str
 		return
 	}
 	ret := ZifStrcasecmp(str1, str2)
+	returnValue.SetLong(ret)
+})
+
+// generate by ZifEach
+var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	if !php.CheckNumArgs(executeData, 1, 1, zpp.FlagOldMode) {
+		return
+	}
+	fp := php.NewParamParser(executeData, 1, 1, zpp.FlagOldMode)
+	array := fp.ParseRefZval()
+	if fp.HasError() {
+		return
+	}
+	ret, ok := ZifEach(executeData.Ctx(), array)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
+})
+
+// generate by ZifErrorReporting
+var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{Name: "new_error_level"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	if !php.CheckNumArgs(executeData, 0, 1, 0) {
+		return
+	}
+	fp := php.NewParamParser(executeData, 0, 1, 0)
+	fp.StartOptional()
+	new_error_level := fp.ParseZvalNullable()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifErrorReporting(executeData.Ctx(), returnValue, nil, new_error_level)
 	returnValue.SetLong(ret)
 })

@@ -11,16 +11,19 @@ type ConstantTable = *types.Table[*types.Constant]
 
 // ExecutorGlobals
 type ExecutorGlobals struct {
-	errorSuppress int
-	precision     int
+	errorSuppress  int
+	errorReporting int
+	precision      int
 
 	constantTable ConstantTable
 	functionTable FunctionTable
 	classTable    ClassTable
 }
 
-func (e *ExecutorGlobals) Precision() int             { return e.precision }
-func (e *ExecutorGlobals) SetPrecision(precision int) { e.precision = precision }
+func (e *ExecutorGlobals) ErrorReporting() int                  { return e.errorReporting }
+func (e *ExecutorGlobals) SetErrorReporting(errorReporting int) { e.errorReporting = errorReporting }
+func (e *ExecutorGlobals) Precision() int                       { return e.precision }
+func (e *ExecutorGlobals) SetPrecision(precision int)           { e.precision = precision }
 
 func (e *ExecutorGlobals) Init(base *ExecutorGlobals) {
 	if base != nil {
@@ -54,7 +57,6 @@ func (e *ExecutorGlobals) HasException() bool {
 func (e *ExecutorGlobals) ErrorSuppress() bool {
 	return e.errorSuppress > 0
 }
-
 func (e *ExecutorGlobals) ErrorSuppressScope(block func()) {
 	e.errorSuppress += 1
 	defer func() {

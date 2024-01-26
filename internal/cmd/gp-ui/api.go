@@ -111,10 +111,10 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 func runCode(code string) (output string) {
 	var buf strings.Builder
 	defer func() {
-		//if e := recover(); e != nil {
-		//	buf.WriteString(fmt.Sprintf(">>> Execute panic: %v", e))
-		//	log.Printf("%+v\n", e)
-		//}
+		if e := recover(); e != nil {
+			buf.WriteString(fmt.Sprintf(">>> Execute panic: %v", e))
+			log.Printf("%+v\n", e)
+		}
 
 		output = buf.String()
 	}()

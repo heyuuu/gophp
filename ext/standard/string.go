@@ -2263,7 +2263,7 @@ func ZifStrShuffle(str string) string {
 
 	bin := []byte(str)
 	for i := len(str) - 1; i >= 0; i-- {
-		rndIdx := rand.Intn(i)
+		rndIdx := rand.Intn(i + 1)
 		if rndIdx != i {
 			bin[i], bin[rndIdx] = bin[rndIdx], bin[i]
 		}

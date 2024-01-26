@@ -41,6 +41,13 @@ func (ex *ExecuteData) Arg(pos int) types.Zval {
 	return types.Undef
 }
 
+func (ex *ExecuteData) Symbols() ISymtable           { return ex.symbols }
+func (ex *ExecuteData) SetSymbols(symbols ISymtable) { ex.symbols = symbols }
+func (ex *ExecuteData) Prev() *ExecuteData           { return ex.prev }
+func (ex *ExecuteData) SetPrev(prev *ExecuteData)    { ex.prev = prev }
+func (ex *ExecuteData) Fn() *types.Function          { return ex.fn }
+func (ex *ExecuteData) SetFn(fn *types.Function)     { ex.fn = fn }
+
 func (ex *ExecuteData) isStrictTypes() bool {
 	return ex != nil && ex.fn != nil && ex.fn.IsStrictTypes()
 }
