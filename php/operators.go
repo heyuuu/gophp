@@ -1095,12 +1095,19 @@ func opParseNumberPrefix(ctx *Context, str string, silent bool) Val {
 }
 
 func ZvalToArrayKey(ctx *Context, offset Val) types.ArrayKey {
-	if offset.IsString() {
-		// todo 字符串转数字
-		return types.StrKey(offset.String())
-	} else if offset.IsLong() {
+	offset = offset.DeRef()
+	switch offset.Type() {
+	case types.IsUndef, types.IsNull:
+		return types.StrKey("")
+	case types.IsFalse:
+		return types.IdxKey(0)
+	case types.IsTrue:
+		return types.IdxKey(1)
+	case types.IsLong:
 		return types.IdxKey(offset.Long())
-	} else {
+	case types.IsString:
+		return types.NumericKey(offset.String())
+	default:
 		// todo 其他类型处理
 		perr.Panic("此类型 key 转 ArrayKey 未完成: " + types.ZvalGetType(offset))
 		return types.IdxKey(0)

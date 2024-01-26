@@ -430,10 +430,10 @@ func ZifTrim(ctx *php.Context, str string, _ zpp.Opt, characterMask *string) str
 
 //@zif(alias="chop")
 func ZifRtrim(ctx *php.Context, str string, _ zpp.Opt, characterMask *string) string {
-	return PhpTrimLeft(ctx, str, characterMask)
+	return PhpTrimRight(ctx, str, characterMask)
 }
 func ZifLtrim(ctx *php.Context, str string, _ zpp.Opt, characterMask *string) string {
-	return PhpTrimRight(ctx, str, characterMask)
+	return PhpTrimLeft(ctx, str, characterMask)
 }
 
 func ZifWordwrap(ctx *php.Context, str string, _ zpp.Opt, width *int, break_ *string, cut bool) (string, bool) {
@@ -801,19 +801,17 @@ func ZifStrstr(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, 
 	}
 }
 
-func posSubstr(ctx *php.Context, str string, offset int) (string, bool) {
+func offsetSubstr(ctx *php.Context, str string, offset int) (result string, realOffset int, ok bool) {
 	if offset < 0 {
 		offset += len(str)
 	}
 	if offset < 0 || offset > len(str) {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Offset not contained in string")
-		return "", false
+		return "", 0, false
 	}
-	if offset == 0 {
-		str = str[offset:]
-	}
-	return str, true
+	return str[offset:], offset, true
 }
+
 func parseNeedle(ctx *php.Context, needle types.Zval) (string, bool) {
 	if needle.IsString() {
 		return needle.String(), true
@@ -834,7 +832,7 @@ func parseNeedle(ctx *php.Context, needle types.Zval) (string, bool) {
 }
 
 func ZifStrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
-	haystack, ok := posSubstr(ctx, haystack, offset)
+	haystack, offset, ok := offsetSubstr(ctx, haystack, offset)
 	if !ok {
 		return 0, false
 	}
@@ -847,14 +845,14 @@ func ZifStrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, 
 		return 0, false
 	}
 
-	if pos := strings.Index(haystack, needleStr); pos < 0 {
-		return pos, true
+	if pos := strings.Index(haystack, needleStr); pos >= 0 {
+		return offset + pos, true
 	} else {
 		return 0, false
 	}
 }
 func ZifStripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
-	haystack, ok := posSubstr(ctx, haystack, offset)
+	haystack, offset, ok := offsetSubstr(ctx, haystack, offset)
 	if !ok {
 		return 0, false
 	}
@@ -869,8 +867,8 @@ func ZifStripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt,
 
 	haystack = ascii.StrToLower(haystack)
 	needleStr = ascii.StrToLower(needleStr)
-	if pos := strings.Index(haystack, needleStr); pos < 0 {
-		return pos, true
+	if pos := strings.Index(haystack, needleStr); pos >= 0 {
+		return offset + pos, true
 	} else {
 		return 0, false
 	}
@@ -886,12 +884,12 @@ func ZifStrrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt,
 	}
 
 	if offset >= 0 {
-		haystack, ok = posSubstr(ctx, haystack, offset)
+		haystack, offset, ok = offsetSubstr(ctx, haystack, offset)
 		if !ok {
 			return 0, false
 		}
-		if pos := strings.Index(haystack, needleStr); pos >= 0 {
-			return pos, true
+		if pos := strings.LastIndex(haystack, needleStr); pos >= 0 {
+			return offset + pos, true
 		} else {
 			return 0, false
 		}
@@ -925,12 +923,13 @@ func ZifStrripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt
 	haystack = ascii.StrToLower(haystack)
 	needleStr = ascii.StrToLower(needleStr)
 	if offset >= 0 {
-		haystack, ok = posSubstr(ctx, haystack, offset)
+		var ok bool
+		haystack, offset, ok = offsetSubstr(ctx, haystack, offset)
 		if !ok {
 			return 0, false
 		}
 		if pos := strings.Index(haystack, needleStr); pos >= 0 {
-			return pos, true
+			return offset + pos, true
 		} else {
 			return 0, false
 		}

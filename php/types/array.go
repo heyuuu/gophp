@@ -65,7 +65,7 @@ func ParseNumericStr(str string) (int, bool) {
 	if len(str) == 0 {
 		return 0, false
 	}
-	if (str[0] < '9' || str[0] > '0') && str[0] != '-' {
+	if (str[0] < '0' || str[0] > '9') && str[0] != '-' {
 		return 0, false
 	}
 

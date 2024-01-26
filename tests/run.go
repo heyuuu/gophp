@@ -189,7 +189,7 @@ func convertExpectFormat2Regex(s string) string {
 }
 
 func compareExpectRegex(output string, expect string) (equals bool, reason string) {
-	if regexp.MustCompile(expect).MatchString(output) {
+	if regexp.MustCompile(expect).MatchString(strings.TrimSpace(output)) {
 		return true, ""
 	} else {
 		reason = fmt.Sprintf("output = \n%s\nexpect =\n%s\n", output, expect)

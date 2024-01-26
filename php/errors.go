@@ -89,8 +89,13 @@ func ErrorCb(ctx *Context, typ perr.ErrorType, errorFilename string, errorLineno
 	default:
 		error_type_str = "Unknown error"
 	}
-	logBuffer := fmt.Sprintf("PHP %s:  %s in %s on line %d", error_type_str, message, errorFilename, errorLineno)
-	//logBuffer := fmt.Sprintf("%s:  %s in %s on line %d", error_type_str, message, errorFilename, errorLineno)
+	// todo 待修复
+	if errorFilename == "" {
+		errorFilename = "__UNKNOWN_FILE__"
+	}
+
+	//logBuffer := fmt.Sprintf("PHP %s:  %s in %s on line %d", error_type_str, message, errorFilename, errorLineno)
+	logBuffer := fmt.Sprintf("%s:  %s in %s on line %d", error_type_str, message, errorFilename, errorLineno)
 	PhpLogErrWithSeverity(ctx, logBuffer, syslog_type_int)
 }
 

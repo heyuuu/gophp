@@ -145,6 +145,9 @@ func (p *FastParamParser) nextArg(deref bool, separate bool) (arg types.Zval, ok
 	}
 
 	arg = p.ex.Arg(p.argIndex)
+	if deref {
+		arg = arg.DeRef()
+	}
 	p.argIndex++
 	p.arg = arg
 	return arg, true
@@ -540,8 +543,16 @@ func (p *FastParamParser) ParseRefArrayOrObject() types.RefZval {
 	return p.asRefZval(dest)
 }
 func (p *FastParamParser) ParseRefArray() *types.Array {
-	// todo ref 处理
-	return p.parseArrayEx(false, false)
+	arg, ok := p.nextArg(true, false)
+	if !ok {
+		return nil
+	}
+
+	if !arg.IsArray() {
+		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
+	}
+
+	return arg.Array()
 }
 func (p *FastParamParser) ParseRefVariadic(postVarargs uint) []types.RefZval {
 	var args []types.RefZval

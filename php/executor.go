@@ -307,7 +307,7 @@ func (e *Executor) forStmt(x *ast.ForStmt) execResult {
 }
 
 func (e *Executor) foreachStmt(x *ast.ForeachStmt) execResult {
-	variable := e.expr(x.Expr)
+	variable := e.exprDeref(x.Expr)
 	if variable.IsArray() {
 		// todo array 懒复制，避免循环时修改数组
 		var result execResult
@@ -507,6 +507,10 @@ func (e *Executor) exprList(exprs []ast.Expr) []types.Zval {
 		values[i] = e.expr(expr)
 	}
 	return values
+}
+
+func (e *Executor) exprDeref(expr ast.Expr) types.Zval {
+	return e.expr(expr).DeRef()
 }
 
 func (e *Executor) expr(expr ast.Expr) types.Zval {
