@@ -19,7 +19,12 @@ class NodeEncoder
                 $data[$i] = $this->transform($item);
             }
         } elseif ($data instanceof Node) {
-            return ['nodeType' => $this->getNodeType($data)] + $this->transform(get_object_vars($data));
+            $objectVars = $this->transform(get_object_vars($data));
+            if ($data instanceof Node\Scalar\String_ || $data instanceof Node\Scalar\EncapsedStringPart) {
+                $objectVars["value"] = base64_encode($objectVars["value"]);
+            }
+
+            return ['nodeType' => $this->getNodeType($data)] + $objectVars;
         }
         return $data;
     }

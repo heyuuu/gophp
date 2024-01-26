@@ -1,6 +1,7 @@
 package phpparse
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
@@ -601,7 +602,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = expr
 	case "EncapsedStringPartScalar":
 		node = &ast.StringLit{
-			Value: data["value"].(string),
+			Value: base64decode(data["value"].(string)),
 		}
 	case "LNumberScalar":
 		node = &ast.IntLit{
@@ -625,7 +626,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.MagicConstExpr{Kind: ast.MagicConstTrait}
 	case "StringScalar":
 		node = &ast.StringLit{
-			Value: data["value"].(string),
+			Value: base64decode(data["value"].(string)),
 		}
 	case "BreakStmt":
 		node = &ast.BreakStmt{
@@ -949,4 +950,12 @@ func getUseType(typ int) (ast.UseType, error) {
 	default:
 		return 0, fmt.Errorf("unsupported StmtUseUse.type: %d", typ)
 	}
+}
+
+func base64decode(s string) string {
+	data, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return s
+	}
+	return string(data)
 }
