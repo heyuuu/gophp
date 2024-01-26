@@ -128,56 +128,16 @@ func (p *formatPrinter) AppendDouble(number float64, width int, precision int, f
 		p.AppendString("INF", 3, number < 0)
 		return
 	}
-	p.AppendString(strconv.FormatFloat(number, fmtTyp, precision, 64), width, number < 0)
+	str := strconv.FormatFloat(number, fmtTyp, precision, 64)
 
-	//var num_buf []byte
-	//var s *byte = nil
-	//var s_len = 0
-	//var is_negative = false
-	//var lconv *__struct__lconv
-	//if (p.flags.adjusting & ADJ_PRECISION) == 0 {
-	//	precision = FLOAT_PRECISION
-	//} else if precision > MAX_FLOAT_PRECISION {
-	//	php.ErrorDocRef(p.ctx, "", perr.E_NOTICE, fmt.Sprintf("Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, MAX_FLOAT_PRECISION))
-	//	precision = MAX_FLOAT_PRECISION
-	//}
-	//switch fmtTyp {
-	//case 'e', 'E', 'f', 'F':
-	//	lconv = localeconv()
-	//	s = php.PhpConvFp(lang.Cond(fmt == 'f', 'F', fmt), number, 0, precision, lang.Cond(fmt == 'f', lconv.decimal_point, '.'), &is_negative, &num_buf[1], &s_len)
-	//	if is_negative != 0 {
-	//		num_buf[0] = '-'
-	//		s = num_buf
-	//		s_len++
-	//	} else if p.flags.alwaysSign {
-	//		num_buf[0] = '+'
-	//		s = num_buf
-	//		s_len++
-	//	}
-	//case 'g':
-	//	fallthrough
-	//case 'G':
-	//	if precision == 0 {
-	//		precision = 1
-	//	}
-	//
-	//	/*
-	//	 * * We use &num_buf[ 1 ], so that we have room for the sign
-	//	 */
-	//
-	//	lconv = localeconv()
-	//	s = php.PhpGcvt(number, precision, lconv.decimal_point, lang.Cond(fmt == 'G', 'E', 'e'), &num_buf[1])
-	//	is_negative = 0
-	//	if (*s) == '-' {
-	//		is_negative = 1
-	//		s = &num_buf[1]
-	//	} else if p.flags.alwaysSign {
-	//		num_buf[0] = '+'
-	//		s = num_buf
-	//	}
-	//	s_len = strlen(s)
-	//}
-	//p.AppendString(s[:s_len], width, is_negative)
+	// fix: 科学计数法且位数为指数个位数时，go 默认会补齐到2位，但 php 保持位数不变。此处修复此差别
+	if idx := strings.LastIndexAny(str, "eE"); idx >= 0 {
+		if idx+3 < len(str) && str[idx+2] == '0' {
+			str = str[:idx+2] + str[idx+3:]
+		}
+	}
+
+	p.AppendString(str, width, number < 0)
 }
 
 func (p *formatPrinter) Append2n(number int, width int, n int, upperCase bool) {

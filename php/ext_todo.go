@@ -1,6 +1,7 @@
 package php
 
 import (
+	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
 	"math"
@@ -89,4 +90,8 @@ func ZendStrToLongN(s string, base int) (value int, n int) {
 		return 0, 0
 	}
 	return int(i), len(s)
+}
+
+func ThrowException(ctx *Context, ceError any, message string, code int) {
+	panic(perr.Todof("ThrowException: message=%s, code=%d", message, code))
 }

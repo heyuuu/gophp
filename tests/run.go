@@ -189,7 +189,10 @@ func convertExpectFormat2Regex(s string) string {
 }
 
 func compareExpectRegex(output string, expect string) (equals bool, reason string) {
-	if regexp.MustCompile(expect).MatchString(strings.TrimSpace(output)) {
+	if regexp.MustCompile(expect).MatchString(output) {
+		return true, ""
+	} else if regexp.MustCompile(strings.TrimSpace(expect)).MatchString(strings.TrimSpace(output)) {
+		// 目前先规避掉 phpt 换行格式导致的不匹配问题
 		return true, ""
 	} else {
 		reason = fmt.Sprintf("output = \n%s\nexpect =\n%s\n", output, expect)
