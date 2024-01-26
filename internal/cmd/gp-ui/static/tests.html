@@ -49,6 +49,10 @@
                     <input type="checkbox" class="custom-control-input" id="customSwitch2" v-model="hideSkip">
                     <label class="custom-control-label" for="customSwitch2">Hide Skip</label>
                 </span>
+                <span class="custom-control custom-control-inline custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch3" v-model="sortResult">
+                    <label class="custom-control-label" for="customSwitch3">Sort Result</label>
+                </span>
             </div>
             <div>
                 <span>{{statLine()}}</span>
@@ -60,15 +64,15 @@
                     <th>status</th>
                     <th>herf</th>
                 </tr>
-                <tr v-for="(test, testIdx) in tests" :class="testShowClass(testIdx)" @click="activeTest(testIdx)"
-                    v-show="testIsShow(testIdx)">
-                    <td>{{testIdx + offset}}</td>
+                <tr v-for="test in showTests" :class="testShowClass(test.idx)" @click="activeTest(test.idx)"
+                    v-show="testIsShow(test.idx)" :key="test.idx">
+                    <td>{{test.idx + offset}}</td>
                     <td class="cell-name">{{test.name}}</td>
                     <td>{{test.status}}</td>
                     <td>
-                        <button class="btn btn-link btn-small" @click="gotoShowPage(testIdx)">detail</button>
-                        <button class="btn btn-link btn-small" @click="runTest(testIdx)">retry</button>
-                        <button class="btn btn-link btn-small" @click="copyTestName(testIdx)">paste</button>
+                        <button class="btn btn-link btn-small" @click="gotoShowPage(test.idx)">detail</button>
+                        <button class="btn btn-link btn-small" @click="runTest(test.idx)">retry</button>
+                        <button class="btn btn-link btn-small" @click="copyTestName(test.idx)">paste</button>
                     </td>
                 </tr>
             </table>
@@ -96,8 +100,16 @@
     const PASS = 'PASS'
     const SKIP = 'SKIP'
     const FAIL = 'FAIL'
-    const UNKNOWN = 'UNKNOWN'
     const NET_ERROR = 'NET'
+    const StatusLevel = {
+        WAITING: 1,
+        RUNNING: 2,
+        PASS: 3,
+        SKIP: 4,
+        NET_ERROR: 5,
+        FAIL: 6,
+    }
+
 
     const app = window.app = {
         // query params
@@ -144,8 +156,34 @@
 
         hidePass: false,
         hideSkip: false,
+        sortResult: false,
 
         // 当前选中的测试
+        get showTests() {
+            const showTests = [];
+            for (let idx in this.tests) {
+                showTests.push({
+                    idx: parseInt(idx),
+                    ...this.tests[idx],
+                })
+            }
+            if (this.sortResult) {
+                showTests.sort(function (test1, test2) {
+                    const statusDiff = parseInt(StatusLevel[test1.status]) - parseInt(StatusLevel[test2.status])
+                    if (statusDiff !== 0) {
+                        return statusDiff
+                    }
+                    if (test1.content < test2.content) {
+                        return -1
+                    } else if (test1.content > test2.content) {
+                        return 1
+                    } else {
+                        return test1.idx - test2.idx
+                    }
+                })
+            }
+            return showTests
+        },
         get currTest() {
             return this.tests[this.activeIndex]
         },
@@ -235,7 +273,7 @@
             // init list
             getJson(testListUri, {path: this.path, offset: this.offset, limit: this.limit}, (res) => {
                 const tests = []
-                for (name of res.data) {
+                for (let name of res.data) {
                     tests.push({
                         name: name,
                         status: WAITING,
