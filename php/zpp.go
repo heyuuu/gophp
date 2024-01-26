@@ -118,18 +118,15 @@ func (p *FastParamParser) triggerError(errorCode int, err string) {
 			// pass
 		case ZPP_ERROR_WRONG_CALLBACK:
 			message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", p.ex.CalleeName(), p.argIndex, err)
-			//faults.InternalTypeError(p.ctx, p.isThrow(), message)
-			panic(perr.Internalf(message))
+			InternalTypeError(p.ctx, p.isThrow(), message)
 		case ZPP_ERROR_WRONG_CLASS:
 			name := err
 			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.ex.CalleeName(), p.argIndex, name, types.ZendZvalTypeName(p.arg))
-			//faults.InternalTypeError(p.ctx, p.isThrow(), message)
-			panic(perr.Internalf(message))
+			InternalTypeError(p.ctx, p.isThrow(), message)
 		case ZPP_ERROR_WRONG_ARG:
 			expectedType := err
 			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.ex.CalleeName(), p.argIndex, expectedType, types.ZendZvalTypeName(p.arg))
-			//faults.InternalTypeError(p.ctx, p.isThrow(), message)
-			panic(perr.Internalf(message))
+			InternalTypeError(p.ctx, p.isThrow(), message)
 		}
 	}
 }

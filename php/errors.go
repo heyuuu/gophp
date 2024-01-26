@@ -105,3 +105,11 @@ func PhpLogErrWithSeverity(ctx *Context, logMessage string, syslogTypeInt plog.L
 	}
 	log.Println(logMessage)
 }
+
+func InternalTypeError(ctx *Context, throwException bool, message string) {
+	if throwException {
+		ThrowException(ctx, nil, message, 0)
+	} else {
+		Error(ctx, perr.E_WARNING, message)
+	}
+}

@@ -52,6 +52,7 @@ var DefZifStrlen = def.DefFunc("strlen", 1, 1, []def.ArgInfo{{Name: "str"}}, fun
 	fp := php.NewParamParser(executeData, 1, 1, 0)
 	str := fp.ParseString()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrlen(str)
@@ -67,6 +68,7 @@ var DefZifStrcmp = def.DefFunc("strcmp", 2, 2, []def.ArgInfo{{Name: "str1"}, {Na
 	str1 := fp.ParseString()
 	str2 := fp.ParseString()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrcmp(str1, str2)
@@ -83,6 +85,7 @@ var DefZifStrncmp = def.DefFunc("strncmp", 3, 3, []def.ArgInfo{{Name: "str1"}, {
 	str2 := fp.ParseString()
 	len_ := fp.ParseLong()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrncmp(executeData.Ctx(), str1, str2, len_)
@@ -102,6 +105,7 @@ var DefZifStrcasecmp = def.DefFunc("strcasecmp", 2, 2, []def.ArgInfo{{Name: "str
 	str1 := fp.ParseString()
 	str2 := fp.ParseString()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrcasecmp(str1, str2)
@@ -116,6 +120,7 @@ var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{Name: "array", ByRef: 
 	fp := php.NewParamParser(executeData, 1, 1, zpp.FlagOldMode)
 	array := fp.ParseRefZval()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifEach(executeData.Ctx(), array)
@@ -135,6 +140,7 @@ var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{N
 	fp.StartOptional()
 	new_error_level := fp.ParseZvalNullable()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifErrorReporting(executeData.Ctx(), returnValue, nil, new_error_level)
