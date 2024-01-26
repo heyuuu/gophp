@@ -1615,11 +1615,11 @@ var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{Name: "separator
 	separator := fp.ParseString()
 	str := fp.ParseString()
 	fp.StartOptional()
-	limit_ := fp.ParseLongNullable()
+	limit := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ret, ok := ZifExplode(executeData.Ctx(), separator, str, nil, limit_)
+	ret, ok := ZifExplode(executeData.Ctx(), separator, str, nil, limit)
 	if ok {
 		returnValue.SetArrayOfString(ret)
 	} else {

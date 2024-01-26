@@ -525,29 +525,25 @@ func ZifWordwrap(ctx *php.Context, str string, _ zpp.Opt, width *int, break_ *st
 		return buf.String(), true
 	}
 }
-func ZifExplode(ctx *php.Context, separator string, str string, _ zpp.Opt, limit_ *int) ([]string, bool) {
-	var limit = math.MaxInt32
-	if limit_ != nil {
-		limit = *limit_
-	}
-
+func ZifExplode(ctx *php.Context, separator string, str string, _ zpp.Opt, limit *int) ([]string, bool) {
 	if len(separator) == 0 {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Empty delimiter")
 		return nil, false
 	}
 
-	// doc: If the limit parameter is zero, then this is treated as 1.
-	if limit == 0 {
-		limit = 1
-	}
-
 	var arr []string
-	if limit > 0 {
-		arr = strings.SplitN(str, separator, limit)
-	} else { // limit < 0
+	if limit == nil {
 		arr = strings.Split(str, separator)
-		if len(arr) > -limit {
-			arr = arr[:len(arr)+limit]
+	} else if *limit >= 0 {
+		// doc: If the limit parameter is zero, then this is treated as 1.
+		limitVal := lang.Max(*limit, 1)
+		limitVal = lang.Min(limitVal, strings.Count(str, separator))
+		arr = strings.SplitN(str, separator, limitVal)
+	} else {
+		limitVal := *limit // limitVal < 0
+		arr = strings.Split(str, separator)
+		if len(arr) > -limitVal {
+			arr = arr[:len(arr)+limitVal]
 		} else {
 			arr = nil
 		}
