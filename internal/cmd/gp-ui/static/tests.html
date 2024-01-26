@@ -66,6 +66,10 @@
                         <input type="checkbox" class="custom-control-input" id="customSwitch3" v-model="sortResult">
                         <label class="custom-control-label" for="customSwitch3">Sort Result</label>
                     </span>
+                    <span class="custom-control custom-control-inline custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="customSwitch4" v-model="lockList">
+                        <label class="custom-control-label" for="customSwitch4">Lock List</label>
+                    </span>
 
                     <div class="btn btn-link btn-small" @click="retryShowTests()">重试当前测试</div>
                 </div>
@@ -174,6 +178,8 @@
         hidePass: Boolean(initQuery.hidePass),
         hideSkip: Boolean(initQuery.hideSkip),
         sortResult: Boolean(initQuery.sortResult),
+        lockList: false,
+        lockListIndexes: [],
         searchName: "",
         searchContent: "",
 
@@ -199,14 +205,25 @@
         },
         // 当前选中的测试
         get showTests() {
-            // 生成
-            let showTests = [];
-            for (let idx in this.tests) {
-                showTests.push({
-                    idx: parseInt(idx),
-                    ...this.tests[idx],
-                })
+            // 判断是否锁列表
+            if (this.lockList) {
+                let showTests = []
+                for (const idx of this.lockListIndexes) {
+                    showTests.push(this.tests[idx])
+                }
+                return showTests
+            } else {
+                const showTests = this.filterTests()
+                const showListIndexes = []
+                for (const test of showTests) {
+                    showListIndexes.push(test.idx)
+                }
+                this.lockListIndexes = showListIndexes
+                return showTests
             }
+        },
+        filterTests() {
+            let showTests = [...this.tests]
             // 过滤
             showTests = showTests.filter((test) => {
                 if (test.idx === this.activeIndex) {
@@ -323,13 +340,16 @@
             // init list
             getJson(testListUri, {path: this.path, offset: this.offset, limit: this.limit}, (res) => {
                 const tests = []
+                let idx = 0
                 for (let name of res.data) {
                     tests.push({
+                        idx: idx,
                         name: name,
                         status: WAITING,
                         content: "",
                         code: "",
                     })
+                    idx++
                 }
                 this.tests = tests
                 this.count[WAITING] = tests.length
