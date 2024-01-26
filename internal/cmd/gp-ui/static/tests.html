@@ -110,7 +110,7 @@
         FAIL: 6,
     }
 
-
+    const initQuery = getQuery()
     const app = window.app = {
         // query params
         path: getQueryParam("path") || "",
@@ -154,10 +154,30 @@
         activeIndex: -1,
         waitingIndex: 0,
 
-        hidePass: false,
-        hideSkip: false,
-        sortResult: false,
+        hidePass: Boolean(initQuery.hidePass),
+        hideSkip: Boolean(initQuery.hideSkip),
+        sortResult: Boolean(initQuery.sortResult),
 
+        // 记录选项到 query
+        queryChange() {
+            const query = getQuery()
+            if (this.hidePass) {
+                query.hidePass = 1
+            } else {
+                delete query.hidePass
+            }
+            if (this.hideSkip) {
+                query.hideSkip = 1
+            } else {
+                delete query.hideSkip
+            }
+            if (this.sortResult) {
+                query.sortResult = 1
+            } else {
+                delete query.sortResult
+            }
+            setQuery(query)
+        },
         // 当前选中的测试
         get showTests() {
             const showTests = [];
@@ -349,6 +369,10 @@
         },
     }
     PetiteVue.createApp(app).mount()
+
+    setInterval(function () {
+        app.queryChange()
+    }, 500)
 
     app.start()
 
