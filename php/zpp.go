@@ -103,6 +103,10 @@ func (p *FastParamParser) HasError() bool {
 	return p.errorCode != ZPP_ERROR_OK
 }
 
+func (p *FastParamParser) CheckNumArgs() bool {
+	return CheckNumArgs(p.ex, p.minNumArgs, p.maxNumArgs, p.flags)
+}
+
 // @see Micro: Z_PARAM_OPTIONAL
 func (p *FastParamParser) StartOptional() {
 	p.optional = true

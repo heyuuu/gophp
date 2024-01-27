@@ -10,15 +10,12 @@ var zifFunctions = []def.FuncType{DefZifKrsort, DefZifKsort, DefZifCount, DefZif
 
 // generate by ZifKrsort
 var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifKrsort(arg, nil, sort_flags)
@@ -27,15 +24,12 @@ var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef
 
 // generate by ZifKsort
 var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifKsort(arg, nil, sort_flags)
@@ -44,15 +38,12 @@ var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: 
 
 // generate by ZifCount
 var DefZifCount = def.DefFunc("count", 1, 2, []def.ArgInfo{{Name: "var"}, {Name: "mode"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	fp.StartOptional()
 	mode := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifCount(executeData.Ctx(), var_, nil, mode)
@@ -61,15 +52,12 @@ var DefZifCount = def.DefFunc("count", 1, 2, []def.ArgInfo{{Name: "var"}, {Name:
 
 // generate by ZifCount
 var DefZifSizeof = def.DefFunc("sizeof", 1, 2, []def.ArgInfo{{Name: "var"}, {Name: "mode"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	fp.StartOptional()
 	mode := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifCount(executeData.Ctx(), var_, nil, mode)
@@ -78,13 +66,10 @@ var DefZifSizeof = def.DefFunc("sizeof", 1, 2, []def.ArgInfo{{Name: "var"}, {Nam
 
 // generate by ZifNatsort
 var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{Name: "arg", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifNatsort(arg)
@@ -93,13 +78,10 @@ var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{Name: "arg", ByR
 
 // generate by ZifNatcasesort
 var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{Name: "arg", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifNatcasesort(arg)
@@ -108,15 +90,12 @@ var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{Name: "a
 
 // generate by ZifAsort
 var DefZifAsort = def.DefFunc("asort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifAsort(executeData.Ctx(), arg, nil, sort_flags)
@@ -125,15 +104,12 @@ var DefZifAsort = def.DefFunc("asort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: 
 
 // generate by ZifArsort
 var DefZifArsort = def.DefFunc("arsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArsort(executeData.Ctx(), arg, nil, sort_flags)
@@ -142,15 +118,12 @@ var DefZifArsort = def.DefFunc("arsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef
 
 // generate by ZifSort
 var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifSort(executeData.Ctx(), arg, nil, sort_flags)
@@ -159,15 +132,12 @@ var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: tr
 
 // generate by ZifRsort
 var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifRsort(executeData.Ctx(), arg, nil, sort_flags)
@@ -176,14 +146,11 @@ var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: 
 
 // generate by ZifUsort
 var DefZifUsort = def.DefFunc("usort", 2, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "cmp_function"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	cmp_function := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifUsort(executeData.Ctx(), arg, cmp_function)
@@ -192,14 +159,11 @@ var DefZifUsort = def.DefFunc("usort", 2, 2, []def.ArgInfo{{Name: "arg", ByRef: 
 
 // generate by ZifUasort
 var DefZifUasort = def.DefFunc("uasort", 2, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "cmp_function"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	cmp_function := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifUasort(executeData.Ctx(), arg, cmp_function)
@@ -208,14 +172,11 @@ var DefZifUasort = def.DefFunc("uasort", 2, 2, []def.ArgInfo{{Name: "arg", ByRef
 
 // generate by ZifUksort
 var DefZifUksort = def.DefFunc("uksort", 2, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "cmp_function"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	cmp_function := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifUksort(executeData.Ctx(), arg, cmp_function)
@@ -224,13 +185,10 @@ var DefZifUksort = def.DefFunc("uksort", 2, 2, []def.ArgInfo{{Name: "arg", ByRef
 
 // generate by ZifEnd
 var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseRefArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifEnd(array)
@@ -239,13 +197,10 @@ var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "array", ByRef: tr
 
 // generate by ZifPrev
 var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseRefArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifPrev(array)
@@ -254,13 +209,10 @@ var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "array", ByRef: 
 
 // generate by ZifNext
 var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseRefArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifNext(array)
@@ -269,13 +221,10 @@ var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{Name: "array", ByRef: 
 
 // generate by ZifReset
 var DefZifReset = def.DefFunc("reset", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseRefArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifReset(array)
@@ -284,13 +233,10 @@ var DefZifReset = def.DefFunc("reset", 1, 1, []def.ArgInfo{{Name: "array", ByRef
 
 // generate by ZifCurrent
 var DefZifCurrent = def.DefFunc("current", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArrayOrObjectHt()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifCurrent(array)
@@ -303,13 +249,10 @@ var DefZifCurrent = def.DefFunc("current", 1, 1, []def.ArgInfo{{Name: "array"}},
 
 // generate by ZifCurrent
 var DefZifPos = def.DefFunc("pos", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArrayOrObjectHt()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifCurrent(array)
@@ -322,13 +265,10 @@ var DefZifPos = def.DefFunc("pos", 1, 1, []def.ArgInfo{{Name: "array"}}, func(ex
 
 // generate by ZifKey
 var DefZifKey = def.DefFunc("key", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArrayOrObjectHt()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifKey(array)
@@ -337,14 +277,11 @@ var DefZifKey = def.DefFunc("key", 1, 1, []def.ArgInfo{{Name: "array"}}, func(ex
 
 // generate by ZifMin
 var DefZifMin = def.DefFunc("min", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseZval()
 	args := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifMin(executeData.Ctx(), arg, args)
@@ -353,14 +290,11 @@ var DefZifMin = def.DefFunc("min", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "a
 
 // generate by ZifMax
 var DefZifMax = def.DefFunc("max", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseZval()
 	args := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifMax(executeData.Ctx(), arg, args)
@@ -369,16 +303,13 @@ var DefZifMax = def.DefFunc("max", 1, -1, []def.ArgInfo{{Name: "arg"}, {Name: "a
 
 // generate by ZifArrayWalk
 var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{Name: "array", ByRef: true}, {Name: "callable"}, {Name: "arg"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseRefArrayOrObject()
 	callable := fp.ParseCallable()
 	fp.StartOptional()
 	arg := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayWalk(executeData.Ctx(), array, callable, nil, arg)
@@ -387,16 +318,13 @@ var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{Name: "arra
 
 // generate by ZifArrayWalkRecursive
 var DefZifArrayWalkRecursive = def.DefFunc("array_walk_recursive", 2, 3, []def.ArgInfo{{Name: "array", ByRef: true}, {Name: "callable"}, {Name: "arg"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseRefArrayOrObject()
 	callable := fp.ParseCallable()
 	fp.StartOptional()
 	arg := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayWalkRecursive(executeData.Ctx(), array, callable, nil, arg)
@@ -405,16 +333,13 @@ var DefZifArrayWalkRecursive = def.DefFunc("array_walk_recursive", 2, 3, []def.A
 
 // generate by ZifInArray
 var DefZifInArray = def.DefFunc("in_array", 2, 3, []def.ArgInfo{{Name: "needle"}, {Name: "haystack"}, {Name: "strict"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	needle := fp.ParseZval()
 	haystack := fp.ParseArray()
 	fp.StartOptional()
 	strict := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifInArray(executeData.Ctx(), needle, haystack, nil, strict)
@@ -423,16 +348,13 @@ var DefZifInArray = def.DefFunc("in_array", 2, 3, []def.ArgInfo{{Name: "needle"}
 
 // generate by ZifArraySearch
 var DefZifArraySearch = def.DefFunc("array_search", 2, 3, []def.ArgInfo{{Name: "needle"}, {Name: "haystack"}, {Name: "strict"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	needle := fp.ParseZval()
 	haystack := fp.ParseArray()
 	fp.StartOptional()
 	strict := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArraySearch(executeData.Ctx(), needle, haystack, nil, strict)
@@ -441,15 +363,12 @@ var DefZifArraySearch = def.DefFunc("array_search", 2, 3, []def.ArgInfo{{Name: "
 
 // generate by ZifArrayFill
 var DefZifArrayFill = def.DefFunc("array_fill", 3, 3, []def.ArgInfo{{Name: "start_key"}, {Name: "num"}, {Name: "val"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 3, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 3, 3, 0)
+	fp.CheckNumArgs()
 	start_key := fp.ParseLong()
 	num := fp.ParseLong()
 	val := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayFill(executeData.Ctx(), start_key, num, val)
@@ -462,14 +381,11 @@ var DefZifArrayFill = def.DefFunc("array_fill", 3, 3, []def.ArgInfo{{Name: "star
 
 // generate by ZifArrayFillKeys
 var DefZifArrayFillKeys = def.DefFunc("array_fill_keys", 2, 2, []def.ArgInfo{{Name: "keys"}, {Name: "val"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	keys := fp.ParseArray()
 	val := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayFillKeys(executeData.Ctx(), keys, val)
@@ -478,16 +394,13 @@ var DefZifArrayFillKeys = def.DefFunc("array_fill_keys", 2, 2, []def.ArgInfo{{Na
 
 // generate by ZifRange
 var DefZifRange = def.DefFunc("range", 2, 3, []def.ArgInfo{{Name: "low"}, {Name: "high"}, {Name: "step"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	low := fp.ParseZval()
 	high := fp.ParseZval()
 	fp.StartOptional()
 	step := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifRange(executeData.Ctx(), low, high, nil, step)
@@ -500,13 +413,10 @@ var DefZifRange = def.DefFunc("range", 2, 3, []def.ArgInfo{{Name: "low"}, {Name:
 
 // generate by ZifShuffle
 var DefZifShuffle = def.DefFunc("shuffle", 1, 1, []def.ArgInfo{{Name: "arg", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifShuffle(executeData.Ctx(), arg)
@@ -515,15 +425,12 @@ var DefZifShuffle = def.DefFunc("shuffle", 1, 1, []def.ArgInfo{{Name: "arg", ByR
 
 // generate by ZifArrayPush
 var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{Name: "stack", ByRef: true}, {Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	stack := fp.ParseRefArray()
 	fp.StartOptional()
 	args := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayPush(executeData.Ctx(), stack, nil, args)
@@ -536,13 +443,10 @@ var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{Name: "sta
 
 // generate by ZifArrayPop
 var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{Name: "stack", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	stack := fp.ParseRefArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayPop(stack)
@@ -551,13 +455,10 @@ var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{Name: "stack"
 
 // generate by ZifArrayShift
 var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "stack", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	stack := fp.ParseRefArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayShift(executeData.Ctx(), stack)
@@ -566,14 +467,11 @@ var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "st
 
 // generate by ZifArrayUnshift
 var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{Name: "stack", ByRef: true}, {Name: "values", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	stack := fp.ParseRefArray()
 	values := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayUnshift(stack, values)
@@ -582,17 +480,14 @@ var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{Name
 
 // generate by ZifArraySplice
 var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{Name: "array", ByRef: true}, {Name: "offset"}, {Name: "length"}, {Name: "replacement"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 4, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseRefArray()
 	offset := fp.ParseLong()
 	fp.StartOptional()
 	length_ := fp.ParseLongNullable()
 	replacement := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArraySplice(executeData.Ctx(), array, offset, nil, length_, replacement)
@@ -601,17 +496,14 @@ var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{Name: "
 
 // generate by ZifArraySlice
 var DefZifArraySlice = def.DefFunc("array_slice", 2, 4, []def.ArgInfo{{Name: "array"}, {Name: "offset"}, {Name: "length"}, {Name: "preserve_keys"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 4, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	offset := fp.ParseLong()
 	fp.StartOptional()
 	length_ := fp.ParseZval()
 	preserve_keys := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArraySlice(executeData.Ctx(), array, offset, nil, length_, preserve_keys)
@@ -620,10 +512,8 @@ var DefZifArraySlice = def.DefFunc("array_slice", 2, 4, []def.ArgInfo{{Name: "ar
 
 // generate by ZifArrayMerge
 var DefZifArrayMerge = def.DefFunc("array_merge", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	fp.StartOptional()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
@@ -634,10 +524,8 @@ var DefZifArrayMerge = def.DefFunc("array_merge", 0, -1, []def.ArgInfo{{Name: "a
 
 // generate by ZifArrayMergeRecursive
 var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	fp.StartOptional()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
@@ -648,13 +536,10 @@ var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []de
 
 // generate by ZifArrayReplace
 var DefZifArrayReplace = def.DefFunc("array_replace", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayReplace(executeData.Ctx(), arrays)
@@ -663,13 +548,10 @@ var DefZifArrayReplace = def.DefFunc("array_replace", 0, -1, []def.ArgInfo{{Name
 
 // generate by ZifArrayReplaceRecursive
 var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayReplaceRecursive(executeData.Ctx(), arrays)
@@ -678,16 +560,13 @@ var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 0, -1, 
 
 // generate by ZifArrayKeys
 var DefZifArrayKeys = def.DefFunc("array_keys", 1, 3, []def.ArgInfo{{Name: "array"}, {Name: "search_value"}, {Name: "strict"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 3, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	fp.StartOptional()
 	search_value := fp.ParseZvalNullable()
 	strict := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayKeys(executeData.Ctx(), array, nil, search_value, strict)
@@ -696,13 +575,10 @@ var DefZifArrayKeys = def.DefFunc("array_keys", 1, 3, []def.ArgInfo{{Name: "arra
 
 // generate by ZifArrayKeyFirst
 var DefZifArrayKeyFirst = def.DefFunc("array_key_first", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayKeyFirst(array)
@@ -711,13 +587,10 @@ var DefZifArrayKeyFirst = def.DefFunc("array_key_first", 1, 1, []def.ArgInfo{{Na
 
 // generate by ZifArrayKeyLast
 var DefZifArrayKeyLast = def.DefFunc("array_key_last", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayKeyLast(array)
@@ -726,13 +599,10 @@ var DefZifArrayKeyLast = def.DefFunc("array_key_last", 1, 1, []def.ArgInfo{{Name
 
 // generate by ZifArrayValues
 var DefZifArrayValues = def.DefFunc("array_values", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayValues(array)
@@ -741,13 +611,10 @@ var DefZifArrayValues = def.DefFunc("array_values", 1, 1, []def.ArgInfo{{Name: "
 
 // generate by ZifArrayCountValues
 var DefZifArrayCountValues = def.DefFunc("array_count_values", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayCountValues(executeData.Ctx(), array)
@@ -756,16 +623,13 @@ var DefZifArrayCountValues = def.DefFunc("array_count_values", 1, 1, []def.ArgIn
 
 // generate by ZifArrayColumn
 var DefZifArrayColumn = def.DefFunc("array_column", 2, 3, []def.ArgInfo{{Name: "array"}, {Name: "column_key"}, {Name: "index_key"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	column_key := fp.ParseZvalNullable()
 	fp.StartOptional()
 	index_key := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayColumn(executeData.Ctx(), array, column_key, nil, index_key)
@@ -778,15 +642,12 @@ var DefZifArrayColumn = def.DefFunc("array_column", 2, 3, []def.ArgInfo{{Name: "
 
 // generate by ZifArrayReverse
 var DefZifArrayReverse = def.DefFunc("array_reverse", 1, 2, []def.ArgInfo{{Name: "array"}, {Name: "preserve_keys"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	fp.StartOptional()
 	preserve_keys := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayReverse(array, nil, preserve_keys)
@@ -795,15 +656,12 @@ var DefZifArrayReverse = def.DefFunc("array_reverse", 1, 2, []def.ArgInfo{{Name:
 
 // generate by ZifArrayPad
 var DefZifArrayPad = def.DefFunc("array_pad", 3, 3, []def.ArgInfo{{Name: "array"}, {Name: "pad_size"}, {Name: "pad_value"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 3, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 3, 3, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	pad_size := fp.ParseLong()
 	pad_value := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayPad(executeData.Ctx(), array, pad_size, pad_value)
@@ -816,13 +674,10 @@ var DefZifArrayPad = def.DefFunc("array_pad", 3, 3, []def.ArgInfo{{Name: "array"
 
 // generate by ZifArrayFlip
 var DefZifArrayFlip = def.DefFunc("array_flip", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayFlip(executeData.Ctx(), array)
@@ -831,15 +686,12 @@ var DefZifArrayFlip = def.DefFunc("array_flip", 1, 1, []def.ArgInfo{{Name: "arra
 
 // generate by ZifArrayChangeKeyCase
 var DefZifArrayChangeKeyCase = def.DefFunc("array_change_key_case", 1, 2, []def.ArgInfo{{Name: "array"}, {Name: "case"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	fp.StartOptional()
 	case_ := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayChangeKeyCase(array, nil, case_)
@@ -848,15 +700,12 @@ var DefZifArrayChangeKeyCase = def.DefFunc("array_change_key_case", 1, 2, []def.
 
 // generate by ZifArrayUnique
 var DefZifArrayUnique = def.DefFunc("array_unique", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseArray()
 	fp.StartOptional()
 	flags := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayUnique(executeData.Ctx(), arg, nil, flags)
@@ -865,13 +714,10 @@ var DefZifArrayUnique = def.DefFunc("array_unique", 1, 2, []def.ArgInfo{{Name: "
 
 // generate by ZifArrayIntersectKey
 var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayIntersectKey(executeData.Ctx(), arrays)
@@ -884,14 +730,11 @@ var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", 0, -1, []def.Ar
 
 // generate by ZifArrayIntersectUkey
 var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_key_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(1)
 	callback_key_compare_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayIntersectUkey(executeData.Ctx(), arrays, callback_key_compare_func)
@@ -904,13 +747,10 @@ var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 1, -1, []def.
 
 // generate by ZifArrayIntersect
 var DefZifArrayIntersect = def.DefFunc("array_intersect", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayIntersect(executeData.Ctx(), arrays)
@@ -923,14 +763,11 @@ var DefZifArrayIntersect = def.DefFunc("array_intersect", 0, -1, []def.ArgInfo{{
 
 // generate by ZifArrayUintersect
 var DefZifArrayUintersect = def.DefFunc("array_uintersect", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(1)
 	callback_data_compare_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayUintersect(executeData.Ctx(), arrays, callback_data_compare_func)
@@ -943,13 +780,10 @@ var DefZifArrayUintersect = def.DefFunc("array_uintersect", 1, -1, []def.ArgInfo
 
 // generate by ZifArrayIntersectAssoc
 var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayIntersectAssoc(executeData.Ctx(), arrays)
@@ -962,14 +796,11 @@ var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", 0, -1, []de
 
 // generate by ZifArrayIntersectUassoc
 var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_key_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(1)
 	callback_key_compare_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayIntersectUassoc(executeData.Ctx(), arrays, callback_key_compare_func)
@@ -982,14 +813,11 @@ var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 1, -1, []
 
 // generate by ZifArrayUintersectAssoc
 var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(1)
 	callback_data_compare_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayUintersectAssoc(executeData.Ctx(), arrays, callback_data_compare_func)
@@ -1002,15 +830,12 @@ var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 1, -1, []
 
 // generate by ZifArrayUintersectUassoc
 var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 2, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_compare_func"}, {Name: "callback_key_compare_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(2)
 	callback_data_compare_func := fp.ParseCallable()
 	callback_key_compare_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayUintersectUassoc(executeData.Ctx(), arrays, callback_data_compare_func, callback_key_compare_func)
@@ -1023,13 +848,10 @@ var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 2, -1, 
 
 // generate by ZifArrayDiffKey
 var DefZifArrayDiffKey = def.DefFunc("array_diff_key", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayDiffKey(executeData.Ctx(), arrays)
@@ -1042,14 +864,11 @@ var DefZifArrayDiffKey = def.DefFunc("array_diff_key", 0, -1, []def.ArgInfo{{Nam
 
 // generate by ZifArrayDiffUkey
 var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_key_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(1)
 	callback_key_comp_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayDiffUkey(executeData.Ctx(), arrays, callback_key_comp_func)
@@ -1062,13 +881,10 @@ var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 1, -1, []def.ArgInfo{{N
 
 // generate by ZifArrayDiff
 var DefZifArrayDiff = def.DefFunc("array_diff", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayDiff(executeData.Ctx(), arrays)
@@ -1077,14 +893,11 @@ var DefZifArrayDiff = def.DefFunc("array_diff", 0, -1, []def.ArgInfo{{Name: "arr
 
 // generate by ZifArrayUdiff
 var DefZifArrayUdiff = def.DefFunc("array_udiff", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(1)
 	callback_data_comp_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayUdiff(executeData.Ctx(), arrays, callback_data_comp_func)
@@ -1097,13 +910,10 @@ var DefZifArrayUdiff = def.DefFunc("array_udiff", 1, -1, []def.ArgInfo{{Name: "a
 
 // generate by ZifArrayDiffAssoc
 var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", 0, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayDiffAssoc(executeData.Ctx(), arrays)
@@ -1116,14 +926,11 @@ var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", 0, -1, []def.ArgInfo{
 
 // generate by ZifArrayDiffUassoc
 var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_key_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(1)
 	callback_key_comp_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayDiffUassoc(executeData.Ctx(), arrays, callback_key_comp_func)
@@ -1136,14 +943,11 @@ var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 1, -1, []def.ArgInf
 
 // generate by ZifArrayUdiffAssoc
 var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 1, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(1)
 	callback_data_comp_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayUdiffAssoc(executeData.Ctx(), arrays, callback_data_comp_func)
@@ -1156,15 +960,12 @@ var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 1, -1, []def.ArgInf
 
 // generate by ZifArrayUdiffUassoc
 var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 2, -1, []def.ArgInfo{{Name: "arrays", Variadic: true}, {Name: "callback_data_comp_func"}, {Name: "callback_key_comp_func"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, -1, 0)
+	fp.CheckNumArgs()
 	arrays := fp.ParseVariadic(2)
 	callback_data_comp_func := fp.ParseCallable()
 	callback_key_comp_func := fp.ParseCallable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayUdiffUassoc(executeData.Ctx(), arrays, callback_data_comp_func, callback_key_comp_func)
@@ -1177,13 +978,10 @@ var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 2, -1, []def.ArgI
 
 // generate by ZifArrayMultisort
 var DefZifArrayMultisort = def.DefFunc("array_multisort", 0, -1, []def.ArgInfo{{Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	args := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayMultisort(executeData.Ctx(), args)
@@ -1192,15 +990,12 @@ var DefZifArrayMultisort = def.DefFunc("array_multisort", 0, -1, []def.ArgInfo{{
 
 // generate by ZifArrayRand
 var DefZifArrayRand = def.DefFunc("array_rand", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "num_req"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	arg := fp.ParseArray()
 	fp.StartOptional()
 	num_req_ := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayRand(executeData.Ctx(), arg, nil, num_req_)
@@ -1209,13 +1004,10 @@ var DefZifArrayRand = def.DefFunc("array_rand", 1, 2, []def.ArgInfo{{Name: "arg"
 
 // generate by ZifArraySum
 var DefZifArraySum = def.DefFunc("array_sum", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArraySum(executeData.Ctx(), array)
@@ -1224,13 +1016,10 @@ var DefZifArraySum = def.DefFunc("array_sum", 1, 1, []def.ArgInfo{{Name: "array"
 
 // generate by ZifArrayProduct
 var DefZifArrayProduct = def.DefFunc("array_product", 1, 1, []def.ArgInfo{{Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayProduct(executeData.Ctx(), array)
@@ -1239,16 +1028,13 @@ var DefZifArrayProduct = def.DefFunc("array_product", 1, 1, []def.ArgInfo{{Name:
 
 // generate by ZifArrayReduce
 var DefZifArrayReduce = def.DefFunc("array_reduce", 2, 3, []def.ArgInfo{{Name: "array"}, {Name: "callback"}, {Name: "initial"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	callback := fp.ParseCallable()
 	fp.StartOptional()
 	initial := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayReduce(array, callback, nil, initial)
@@ -1257,16 +1043,13 @@ var DefZifArrayReduce = def.DefFunc("array_reduce", 2, 3, []def.ArgInfo{{Name: "
 
 // generate by ZifArrayFilter
 var DefZifArrayFilter = def.DefFunc("array_filter", 1, 3, []def.ArgInfo{{Name: "array"}, {Name: "callback"}, {Name: "mode"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 3, 0)
+	fp.CheckNumArgs()
 	array_ := fp.ParseArray()
 	fp.StartOptional()
 	callback := fp.ParseCallable()
 	mode := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayFilter(executeData.Ctx(), array_, nil, callback, mode)
@@ -1275,14 +1058,11 @@ var DefZifArrayFilter = def.DefFunc("array_filter", 1, 3, []def.ArgInfo{{Name: "
 
 // generate by ZifArrayMap
 var DefZifArrayMap = def.DefFunc("array_map", 1, -1, []def.ArgInfo{{Name: "callback"}, {Name: "arrays", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	callback := fp.ParseCallable()
 	arrays := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayMap(executeData.Ctx(), callback, arrays)
@@ -1291,14 +1071,11 @@ var DefZifArrayMap = def.DefFunc("array_map", 1, -1, []def.ArgInfo{{Name: "callb
 
 // generate by ZifArrayKeyExists
 var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{Name: "key"}, {Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	key := fp.ParseZvalNullable()
 	array := fp.ParseArrayOrObjectZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayKeyExists(executeData.Ctx(), key, array)
@@ -1307,14 +1084,11 @@ var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{
 
 // generate by ZifArrayKeyExists
 var DefZifKeyExists = def.DefFunc("key_exists", 2, 2, []def.ArgInfo{{Name: "key"}, {Name: "array"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	key := fp.ParseZvalNullable()
 	array := fp.ParseArrayOrObjectZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayKeyExists(executeData.Ctx(), key, array)
@@ -1323,16 +1097,13 @@ var DefZifKeyExists = def.DefFunc("key_exists", 2, 2, []def.ArgInfo{{Name: "key"
 
 // generate by ZifArrayChunk
 var DefZifArrayChunk = def.DefFunc("array_chunk", 2, 3, []def.ArgInfo{{Name: "array"}, {Name: "length"}, {Name: "preserve_keys"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	array := fp.ParseArray()
 	length := fp.ParseLong()
 	fp.StartOptional()
 	preserve_keys := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArrayChunk(executeData.Ctx(), array, length, nil, preserve_keys)
@@ -1341,14 +1112,11 @@ var DefZifArrayChunk = def.DefFunc("array_chunk", 2, 3, []def.ArgInfo{{Name: "ar
 
 // generate by ZifArrayCombine
 var DefZifArrayCombine = def.DefFunc("array_combine", 2, 2, []def.ArgInfo{{Name: "keys"}, {Name: "values"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	keys := fp.ParseArray()
 	values := fp.ParseArray()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifArrayCombine(executeData.Ctx(), keys, values)
@@ -1361,13 +1129,10 @@ var DefZifArrayCombine = def.DefFunc("array_combine", 2, 2, []def.ArgInfo{{Name:
 
 // generate by ZifBase64Encode
 var DefZifBase64Encode = def.DefFunc("base64_encode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifBase64Encode(str)
@@ -1376,15 +1141,12 @@ var DefZifBase64Encode = def.DefFunc("base64_encode", 1, 1, []def.ArgInfo{{Name:
 
 // generate by ZifBase64Decode
 var DefZifBase64Decode = def.DefFunc("base64_decode", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "strict"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	strict := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifBase64Decode(str, nil, strict)
@@ -1397,13 +1159,10 @@ var DefZifBase64Decode = def.DefFunc("base64_decode", 1, 2, []def.ArgInfo{{Name:
 
 // generate by ZifCrc32
 var DefZifCrc32 = def.DefFunc("crc32", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifCrc32(str)
@@ -1412,15 +1171,12 @@ var DefZifCrc32 = def.DefFunc("crc32", 1, 1, []def.ArgInfo{{Name: "str"}}, func(
 
 // generate by ZifSprintf
 var DefZifSprintf = def.DefFunc("sprintf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	format := fp.ParseZval()
 	fp.StartOptional()
 	args := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifSprintf(executeData.Ctx(), format, nil, args)
@@ -1433,14 +1189,11 @@ var DefZifSprintf = def.DefFunc("sprintf", 1, -1, []def.ArgInfo{{Name: "format"}
 
 // generate by ZifVsprintf
 var DefZifVsprintf = def.DefFunc("vsprintf", 2, 2, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	format := fp.ParseZval()
 	args := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifVsprintf(executeData.Ctx(), format, args)
@@ -1453,15 +1206,12 @@ var DefZifVsprintf = def.DefFunc("vsprintf", 2, 2, []def.ArgInfo{{Name: "format"
 
 // generate by ZifPrintf
 var DefZifPrintf = def.DefFunc("printf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, -1, 0)
+	fp.CheckNumArgs()
 	format := fp.ParseZval()
 	fp.StartOptional()
 	args := fp.ParseVariadic(0)
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifPrintf(executeData.Ctx(), format, nil, args)
@@ -1474,14 +1224,11 @@ var DefZifPrintf = def.DefFunc("printf", 1, -1, []def.ArgInfo{{Name: "format"}, 
 
 // generate by ZifVprintf
 var DefZifVprintf = def.DefFunc("vprintf", 2, 2, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	format := fp.ParseZval()
 	args := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifVprintf(executeData.Ctx(), format, args)
@@ -1494,10 +1241,8 @@ var DefZifVprintf = def.DefFunc("vprintf", 2, 2, []def.ArgInfo{{Name: "format"},
 
 // generate by ZifMtSrand
 var DefZifMtSrand = def.DefFunc("mt_srand", 0, 2, []def.ArgInfo{{Name: "seed"}, {Name: "mode"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, 2, 0)
+	fp.CheckNumArgs()
 	fp.StartOptional()
 	seed_ := fp.ParseLongNullable()
 	mode_ := fp.ParseLongNullable()
@@ -1509,10 +1254,8 @@ var DefZifMtSrand = def.DefFunc("mt_srand", 0, 2, []def.ArgInfo{{Name: "seed"}, 
 
 // generate by ZifMtSrand
 var DefZifSrand = def.DefFunc("srand", 0, 2, []def.ArgInfo{{Name: "seed"}, {Name: "mode"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, 2, 0)
+	fp.CheckNumArgs()
 	fp.StartOptional()
 	seed_ := fp.ParseLongNullable()
 	mode_ := fp.ParseLongNullable()
@@ -1524,7 +1267,9 @@ var DefZifSrand = def.DefFunc("srand", 0, 2, []def.ArgInfo{{Name: "seed"}, {Name
 
 // generate by ZifMtGetrandmax
 var DefZifMtGetrandmax = def.DefFunc("mt_getrandmax", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 0, 0) {
+	fp := php.NewParamParser(executeData, 0, 0, 0)
+	fp.CheckNumArgs()
+	if fp.HasError() {
 		return
 	}
 	ret := ZifMtGetrandmax()
@@ -1533,7 +1278,9 @@ var DefZifMtGetrandmax = def.DefFunc("mt_getrandmax", 0, 0, []def.ArgInfo{}, fun
 
 // generate by ZifMtGetrandmax
 var DefZifGetrandmax = def.DefFunc("getrandmax", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 0, 0) {
+	fp := php.NewParamParser(executeData, 0, 0, 0)
+	fp.CheckNumArgs()
+	if fp.HasError() {
 		return
 	}
 	ret := ZifMtGetrandmax()
@@ -1542,15 +1289,12 @@ var DefZifGetrandmax = def.DefFunc("getrandmax", 0, 0, []def.ArgInfo{}, func(exe
 
 // generate by ZifMtRand
 var DefZifMtRand = def.DefFunc("mt_rand", 0, 2, []def.ArgInfo{{Name: "min"}, {Name: "max"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, 2, 0)
+	fp.CheckNumArgs()
 	fp.StartOptional()
 	min_ := fp.ParseLongNullable()
 	max_ := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifMtRand(executeData.Ctx(), nil, min_, max_)
@@ -1563,15 +1307,12 @@ var DefZifMtRand = def.DefFunc("mt_rand", 0, 2, []def.ArgInfo{{Name: "min"}, {Na
 
 // generate by ZifRand
 var DefZifRand = def.DefFunc("rand", 0, 2, []def.ArgInfo{{Name: "min"}, {Name: "max"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, 2, 0)
+	fp.CheckNumArgs()
 	fp.StartOptional()
 	min_ := fp.ParseLongNullable()
 	max_ := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifRand(executeData.Ctx(), nil, min_, max_)
@@ -1580,13 +1321,10 @@ var DefZifRand = def.DefFunc("rand", 0, 2, []def.ArgInfo{{Name: "min"}, {Name: "
 
 // generate by ZifRandomBytes
 var DefZifRandomBytes = def.DefFunc("random_bytes", 1, 1, []def.ArgInfo{{Name: "length"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	length := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifRandomBytes(executeData.Ctx(), length)
@@ -1595,14 +1333,11 @@ var DefZifRandomBytes = def.DefFunc("random_bytes", 1, 1, []def.ArgInfo{{Name: "
 
 // generate by ZifRandomInt
 var DefZifRandomInt = def.DefFunc("random_int", 2, 2, []def.ArgInfo{{Name: "min"}, {Name: "max"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	min := fp.ParseLong()
 	max := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifRandomInt(executeData.Ctx(), min, max)
@@ -1611,15 +1346,12 @@ var DefZifRandomInt = def.DefFunc("random_int", 2, 2, []def.ArgInfo{{Name: "min"
 
 // generate by ZifSha1
 var DefZifSha1 = def.DefFunc("sha1", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "raw_output"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	raw_output := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifSha1(str, nil, raw_output)
@@ -1628,15 +1360,12 @@ var DefZifSha1 = def.DefFunc("sha1", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "
 
 // generate by ZifSha1File
 var DefZifSha1File = def.DefFunc("sha1_file", 1, 2, []def.ArgInfo{{Name: "filename"}, {Name: "raw_output"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	filename := fp.ParseString()
 	fp.StartOptional()
 	raw_output := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifSha1File(filename, nil, raw_output)
@@ -1649,13 +1378,10 @@ var DefZifSha1File = def.DefFunc("sha1_file", 1, 2, []def.ArgInfo{{Name: "filena
 
 // generate by ZifUtf8Encode
 var DefZifUtf8Encode = def.DefFunc("utf8_encode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	data := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifUtf8Encode(data)
@@ -1664,13 +1390,10 @@ var DefZifUtf8Encode = def.DefFunc("utf8_encode", 1, 1, []def.ArgInfo{{Name: "da
 
 // generate by ZifBin2hex
 var DefZifBin2hex = def.DefFunc("bin2hex", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	data := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifBin2hex(data)
@@ -1679,13 +1402,10 @@ var DefZifBin2hex = def.DefFunc("bin2hex", 1, 1, []def.ArgInfo{{Name: "data"}}, 
 
 // generate by ZifHex2bin
 var DefZifHex2bin = def.DefFunc("hex2bin", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	data := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifHex2bin(executeData.Ctx(), data)
@@ -1698,17 +1418,14 @@ var DefZifHex2bin = def.DefFunc("hex2bin", 1, 1, []def.ArgInfo{{Name: "data"}}, 
 
 // generate by ZifStrspn
 var DefZifStrspn = def.DefFunc("strspn", 2, 4, []def.ArgInfo{{Name: "str"}, {Name: "mask"}, {Name: "offset"}, {Name: "length"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 4, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	mask := fp.ParseString()
 	fp.StartOptional()
 	offset := fp.ParseLong()
 	length := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrspn(str, mask, nil, offset, length)
@@ -1721,17 +1438,14 @@ var DefZifStrspn = def.DefFunc("strspn", 2, 4, []def.ArgInfo{{Name: "str"}, {Nam
 
 // generate by ZifStrcspn
 var DefZifStrcspn = def.DefFunc("strcspn", 2, 4, []def.ArgInfo{{Name: "str"}, {Name: "mask"}, {Name: "offset"}, {Name: "length"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 4, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	mask := fp.ParseString()
 	fp.StartOptional()
 	offset := fp.ParseLong()
 	length := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrcspn(str, mask, nil, offset, length)
@@ -1744,14 +1458,11 @@ var DefZifStrcspn = def.DefFunc("strcspn", 2, 4, []def.ArgInfo{{Name: "str"}, {N
 
 // generate by ZifStrcoll
 var DefZifStrcoll = def.DefFunc("strcoll", 2, 2, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	str1 := fp.ParseString()
 	str2 := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrcoll(str1, str2)
@@ -1760,15 +1471,12 @@ var DefZifStrcoll = def.DefFunc("strcoll", 2, 2, []def.ArgInfo{{Name: "str1"}, {
 
 // generate by ZifTrim
 var DefZifTrim = def.DefFunc("trim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	character_mask := fp.ParseStringNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifTrim(executeData.Ctx(), str, nil, character_mask)
@@ -1777,15 +1485,12 @@ var DefZifTrim = def.DefFunc("trim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "
 
 // generate by ZifRtrim
 var DefZifRtrim = def.DefFunc("rtrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	character_mask := fp.ParseStringNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifRtrim(executeData.Ctx(), str, nil, character_mask)
@@ -1794,15 +1499,12 @@ var DefZifRtrim = def.DefFunc("rtrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 
 // generate by ZifRtrim
 var DefZifChop = def.DefFunc("chop", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	character_mask := fp.ParseStringNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifRtrim(executeData.Ctx(), str, nil, character_mask)
@@ -1811,15 +1513,12 @@ var DefZifChop = def.DefFunc("chop", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "
 
 // generate by ZifLtrim
 var DefZifLtrim = def.DefFunc("ltrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	character_mask := fp.ParseStringNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifLtrim(executeData.Ctx(), str, nil, character_mask)
@@ -1828,17 +1527,14 @@ var DefZifLtrim = def.DefFunc("ltrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 
 // generate by ZifWordwrap
 var DefZifWordwrap = def.DefFunc("wordwrap", 1, 4, []def.ArgInfo{{Name: "str"}, {Name: "width"}, {Name: "break"}, {Name: "cut"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 4, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	width := fp.ParseLongNullable()
 	break_ := fp.ParseStringNullable()
 	cut := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifWordwrap(executeData.Ctx(), str, nil, width, break_, cut)
@@ -1851,16 +1547,13 @@ var DefZifWordwrap = def.DefFunc("wordwrap", 1, 4, []def.ArgInfo{{Name: "str"}, 
 
 // generate by ZifExplode
 var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{Name: "separator"}, {Name: "str"}, {Name: "limit"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	separator := fp.ParseString()
 	str := fp.ParseString()
 	fp.StartOptional()
 	limit := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifExplode(executeData.Ctx(), separator, str, nil, limit)
@@ -1873,15 +1566,12 @@ var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{Name: "separator
 
 // generate by ZifImplode
 var DefZifImplode = def.DefFunc("implode", 1, 2, []def.ArgInfo{{Name: "glue"}, {Name: "pieces"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	glue_ := fp.ParseZvalNullable()
 	fp.StartOptional()
 	pieces_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifImplode(executeData.Ctx(), glue_, nil, pieces_)
@@ -1890,15 +1580,12 @@ var DefZifImplode = def.DefFunc("implode", 1, 2, []def.ArgInfo{{Name: "glue"}, {
 
 // generate by ZifImplode
 var DefZifJoin = def.DefFunc("join", 1, 2, []def.ArgInfo{{Name: "glue"}, {Name: "pieces"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	glue_ := fp.ParseZvalNullable()
 	fp.StartOptional()
 	pieces_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifImplode(executeData.Ctx(), glue_, nil, pieces_)
@@ -1907,15 +1594,12 @@ var DefZifJoin = def.DefFunc("join", 1, 2, []def.ArgInfo{{Name: "glue"}, {Name: 
 
 // generate by ZifStrtok
 var DefZifStrtok = def.DefFunc("strtok", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "token"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	token_ := fp.ParseStringNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrtok(executeData.Ctx(), str, nil, token_)
@@ -1928,13 +1612,10 @@ var DefZifStrtok = def.DefFunc("strtok", 1, 2, []def.ArgInfo{{Name: "str"}, {Nam
 
 // generate by ZifStrtoupper
 var DefZifStrtoupper = def.DefFunc("strtoupper", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrtoupper(str)
@@ -1943,13 +1624,10 @@ var DefZifStrtoupper = def.DefFunc("strtoupper", 1, 1, []def.ArgInfo{{Name: "str
 
 // generate by ZifStrtolower
 var DefZifStrtolower = def.DefFunc("strtolower", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrtolower(str)
@@ -1958,15 +1636,12 @@ var DefZifStrtolower = def.DefFunc("strtolower", 1, 1, []def.ArgInfo{{Name: "str
 
 // generate by ZifBasename
 var DefZifBasename = def.DefFunc("basename", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "suffix"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	path := fp.ParseString()
 	fp.StartOptional()
 	suffix := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifBasename(path, nil, suffix)
@@ -1975,15 +1650,12 @@ var DefZifBasename = def.DefFunc("basename", 1, 2, []def.ArgInfo{{Name: "path"},
 
 // generate by ZifDirname
 var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "levels"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	path := fp.ParseString()
 	fp.StartOptional()
 	levels_ := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifDirname(executeData.Ctx(), path, nil, levels_)
@@ -1992,15 +1664,12 @@ var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{Name: "path"}, {
 
 // generate by ZifPathinfo
 var DefZifPathinfo = def.DefFunc("pathinfo", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "options"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	path := fp.ParseString()
 	fp.StartOptional()
 	options := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifPathinfo(path, nil, options)
@@ -2009,16 +1678,13 @@ var DefZifPathinfo = def.DefFunc("pathinfo", 1, 2, []def.ArgInfo{{Name: "path"},
 
 // generate by ZifStristr
 var DefZifStristr = def.DefFunc("stristr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseZval()
 	fp.StartOptional()
 	part := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStristr(executeData.Ctx(), haystack, needle, nil, part)
@@ -2031,16 +1697,13 @@ var DefZifStristr = def.DefFunc("stristr", 2, 3, []def.ArgInfo{{Name: "haystack"
 
 // generate by ZifStrstr
 var DefZifStrstr = def.DefFunc("strstr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseZval()
 	fp.StartOptional()
 	part := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrstr(executeData.Ctx(), haystack, needle, nil, part)
@@ -2053,16 +1716,13 @@ var DefZifStrstr = def.DefFunc("strstr", 2, 3, []def.ArgInfo{{Name: "haystack"},
 
 // generate by ZifStrstr
 var DefZifStrchr = def.DefFunc("strchr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseZval()
 	fp.StartOptional()
 	part := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrstr(executeData.Ctx(), haystack, needle, nil, part)
@@ -2075,16 +1735,13 @@ var DefZifStrchr = def.DefFunc("strchr", 2, 3, []def.ArgInfo{{Name: "haystack"},
 
 // generate by ZifStrpos
 var DefZifStrpos = def.DefFunc("strpos", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseZval()
 	fp.StartOptional()
 	offset := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrpos(executeData.Ctx(), haystack, needle, nil, offset)
@@ -2097,16 +1754,13 @@ var DefZifStrpos = def.DefFunc("strpos", 2, 3, []def.ArgInfo{{Name: "haystack"},
 
 // generate by ZifStripos
 var DefZifStripos = def.DefFunc("stripos", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseZval()
 	fp.StartOptional()
 	offset := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStripos(executeData.Ctx(), haystack, needle, nil, offset)
@@ -2119,16 +1773,13 @@ var DefZifStripos = def.DefFunc("stripos", 2, 3, []def.ArgInfo{{Name: "haystack"
 
 // generate by ZifStrrpos
 var DefZifStrrpos = def.DefFunc("strrpos", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseZval()
 	fp.StartOptional()
 	offset := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrrpos(executeData.Ctx(), haystack, needle, nil, offset)
@@ -2141,16 +1792,13 @@ var DefZifStrrpos = def.DefFunc("strrpos", 2, 3, []def.ArgInfo{{Name: "haystack"
 
 // generate by ZifStrripos
 var DefZifStrripos = def.DefFunc("strripos", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseZval()
 	fp.StartOptional()
 	offset := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrripos(executeData.Ctx(), haystack, needle, nil, offset)
@@ -2163,14 +1811,11 @@ var DefZifStrripos = def.DefFunc("strripos", 2, 3, []def.ArgInfo{{Name: "haystac
 
 // generate by ZifStrrchr
 var DefZifStrrchr = def.DefFunc("strrchr", 2, 2, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrrchr(executeData.Ctx(), haystack, needle)
@@ -2183,16 +1828,13 @@ var DefZifStrrchr = def.DefFunc("strrchr", 2, 2, []def.ArgInfo{{Name: "haystack"
 
 // generate by ZifChunkSplit
 var DefZifChunkSplit = def.DefFunc("chunk_split", 1, 3, []def.ArgInfo{{Name: "str"}, {Name: "chunklen"}, {Name: "ending"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 3, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	chunklen_ := fp.ParseLongNullable()
 	ending_ := fp.ParseStringNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifChunkSplit(executeData.Ctx(), str, nil, chunklen_, ending_)
@@ -2205,16 +1847,13 @@ var DefZifChunkSplit = def.DefFunc("chunk_split", 1, 3, []def.ArgInfo{{Name: "st
 
 // generate by ZifSubstr
 var DefZifSubstr = def.DefFunc("substr", 2, 3, []def.ArgInfo{{Name: "str"}, {Name: "offset"}, {Name: "length"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	offset := fp.ParseLong()
 	fp.StartOptional()
 	length := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifSubstr(str, offset, nil, length)
@@ -2227,10 +1866,8 @@ var DefZifSubstr = def.DefFunc("substr", 2, 3, []def.ArgInfo{{Name: "str"}, {Nam
 
 // generate by ZifSubstrReplace
 var DefZifSubstrReplace = def.DefFunc("substr_replace", 3, 4, []def.ArgInfo{{Name: "str"}, {Name: "replace"}, {Name: "start"}, {Name: "length"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 3, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 3, 4, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseZval()
 	replace := fp.ParseZval()
 	start := fp.ParseZval()
@@ -2244,13 +1881,10 @@ var DefZifSubstrReplace = def.DefFunc("substr_replace", 3, 4, []def.ArgInfo{{Nam
 
 // generate by ZifQuotemeta
 var DefZifQuotemeta = def.DefFunc("quotemeta", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifQuotemeta(str)
@@ -2263,13 +1897,10 @@ var DefZifQuotemeta = def.DefFunc("quotemeta", 1, 1, []def.ArgInfo{{Name: "str"}
 
 // generate by ZifOrd
 var DefZifOrd = def.DefFunc("ord", 1, 1, []def.ArgInfo{{Name: "character"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	character := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifOrd(character)
@@ -2278,13 +1909,10 @@ var DefZifOrd = def.DefFunc("ord", 1, 1, []def.ArgInfo{{Name: "character"}}, fun
 
 // generate by ZifChr
 var DefZifChr = def.DefFunc("chr", 1, 1, []def.ArgInfo{{Name: "codepoint"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	codepoint := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifChr(codepoint)
@@ -2293,13 +1921,10 @@ var DefZifChr = def.DefFunc("chr", 1, 1, []def.ArgInfo{{Name: "codepoint"}}, fun
 
 // generate by ZifUcfirst
 var DefZifUcfirst = def.DefFunc("ucfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifUcfirst(str)
@@ -2308,13 +1933,10 @@ var DefZifUcfirst = def.DefFunc("ucfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, f
 
 // generate by ZifLcfirst
 var DefZifLcfirst = def.DefFunc("lcfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifLcfirst(str)
@@ -2323,15 +1945,12 @@ var DefZifLcfirst = def.DefFunc("lcfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, f
 
 // generate by ZifUcwords
 var DefZifUcwords = def.DefFunc("ucwords", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "delimiters"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	delimiters := fp.ParseStringNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifUcwords(executeData.Ctx(), str, nil, delimiters)
@@ -2340,16 +1959,13 @@ var DefZifUcwords = def.DefFunc("ucwords", 1, 2, []def.ArgInfo{{Name: "str"}, {N
 
 // generate by ZifStrtr
 var DefZifStrtr = def.DefFunc("strtr", 2, 3, []def.ArgInfo{{Name: "str"}, {Name: "from"}, {Name: "to"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	from := fp.ParseZval()
 	fp.StartOptional()
 	to_ := fp.ParseStringNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrtr(executeData.Ctx(), str, from, nil, to_)
@@ -2362,13 +1978,10 @@ var DefZifStrtr = def.DefFunc("strtr", 2, 3, []def.ArgInfo{{Name: "str"}, {Name:
 
 // generate by ZifStrrev
 var DefZifStrrev = def.DefFunc("strrev", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrrev(str)
@@ -2377,16 +1990,13 @@ var DefZifStrrev = def.DefFunc("strrev", 1, 1, []def.ArgInfo{{Name: "str"}}, fun
 
 // generate by ZifSimilarText
 var DefZifSimilarText = def.DefFunc("similar_text", 2, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "percent", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
 	str1 := fp.ParseString()
 	str2 := fp.ParseString()
 	fp.StartOptional()
 	percent := fp.ParseRefZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifSimilarText(executeData.Ctx(), str1, str2, nil, percent)
@@ -2395,13 +2005,10 @@ var DefZifSimilarText = def.DefFunc("similar_text", 2, 3, []def.ArgInfo{{Name: "
 
 // generate by ZifAddslashes
 var DefZifAddslashes = def.DefFunc("addslashes", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifAddslashes(str)
@@ -2410,14 +2017,11 @@ var DefZifAddslashes = def.DefFunc("addslashes", 1, 1, []def.ArgInfo{{Name: "str
 
 // generate by ZifAddcslashes
 var DefZifAddcslashes = def.DefFunc("addcslashes", 2, 2, []def.ArgInfo{{Name: "str"}, {Name: "charlist"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	charlist := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifAddcslashes(executeData.Ctx(), str, charlist)
@@ -2426,13 +2030,10 @@ var DefZifAddcslashes = def.DefFunc("addcslashes", 2, 2, []def.ArgInfo{{Name: "s
 
 // generate by ZifStripslashes
 var DefZifStripslashes = def.DefFunc("stripslashes", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStripslashes(str)
@@ -2441,13 +2042,10 @@ var DefZifStripslashes = def.DefFunc("stripslashes", 1, 1, []def.ArgInfo{{Name: 
 
 // generate by ZifStripcslashes
 var DefZifStripcslashes = def.DefFunc("stripcslashes", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStripcslashes(str)
@@ -2456,10 +2054,8 @@ var DefZifStripcslashes = def.DefFunc("stripcslashes", 1, 1, []def.ArgInfo{{Name
 
 // generate by ZifStrReplace
 var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{Name: "search"}, {Name: "replace"}, {Name: "subject"}, {Name: "replace_count", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 3, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 3, 4, 0)
+	fp.CheckNumArgs()
 	search := fp.ParseZval()
 	replace := fp.ParseZval()
 	subject := fp.ParseZval()
@@ -2473,10 +2069,8 @@ var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{Name: "se
 
 // generate by ZifStrIreplace
 var DefZifStrIreplace = def.DefFunc("str_ireplace", 3, 4, []def.ArgInfo{{Name: "search"}, {Name: "replace"}, {Name: "subject"}, {Name: "replace_count", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 3, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 3, 4, 0)
+	fp.CheckNumArgs()
 	search := fp.ParseZval()
 	replace := fp.ParseZval()
 	subject := fp.ParseZval()
@@ -2490,15 +2084,12 @@ var DefZifStrIreplace = def.DefFunc("str_ireplace", 3, 4, []def.ArgInfo{{Name: "
 
 // generate by ZifHebrev
 var DefZifHebrev = def.DefFunc("hebrev", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "max_chars_per_line"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	max_chars_per_line := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifHebrev(str, nil, max_chars_per_line)
@@ -2511,15 +2102,12 @@ var DefZifHebrev = def.DefFunc("hebrev", 1, 2, []def.ArgInfo{{Name: "str"}, {Nam
 
 // generate by ZifHebrevc
 var DefZifHebrevc = def.DefFunc("hebrevc", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "max_chars_per_line"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	max_chars_per_line := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifHebrevc(str, nil, max_chars_per_line)
@@ -2532,15 +2120,12 @@ var DefZifHebrevc = def.DefFunc("hebrevc", 1, 2, []def.ArgInfo{{Name: "str"}, {N
 
 // generate by ZifNl2br
 var DefZifNl2br = def.DefFunc("nl2br", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "is_xhtml"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	is_xhtml_ := fp.ParseBoolNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifNl2br(str, nil, is_xhtml_)
@@ -2549,15 +2134,12 @@ var DefZifNl2br = def.DefFunc("nl2br", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 
 // generate by ZifStripTags
 var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "allowable_tags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	allowable_tags := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStripTags(executeData.Ctx(), str, nil, allowable_tags)
@@ -2566,14 +2148,11 @@ var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{Name: "str"
 
 // generate by ZifStrRepeat
 var DefZifStrRepeat = def.DefFunc("str_repeat", 2, 2, []def.ArgInfo{{Name: "input"}, {Name: "mult"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	input := fp.ParseString()
 	mult := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrRepeat(executeData.Ctx(), input, mult)
@@ -2586,15 +2165,12 @@ var DefZifStrRepeat = def.DefFunc("str_repeat", 2, 2, []def.ArgInfo{{Name: "inpu
 
 // generate by ZifCountChars
 var DefZifCountChars = def.DefFunc("count_chars", 1, 2, []def.ArgInfo{{Name: "input"}, {Name: "mode"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	input := fp.ParseString()
 	fp.StartOptional()
 	mode := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifCountChars(executeData.Ctx(), input, nil, mode)
@@ -2607,14 +2183,11 @@ var DefZifCountChars = def.DefFunc("count_chars", 1, 2, []def.ArgInfo{{Name: "in
 
 // generate by ZifStrnatcmp
 var DefZifStrnatcmp = def.DefFunc("strnatcmp", 2, 2, []def.ArgInfo{{Name: "s1"}, {Name: "s2"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	s1 := fp.ParseString()
 	s2 := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrnatcmp(s1, s2)
@@ -2623,14 +2196,11 @@ var DefZifStrnatcmp = def.DefFunc("strnatcmp", 2, 2, []def.ArgInfo{{Name: "s1"},
 
 // generate by ZifStrnatcasecmp
 var DefZifStrnatcasecmp = def.DefFunc("strnatcasecmp", 2, 2, []def.ArgInfo{{Name: "s1"}, {Name: "s2"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	s1 := fp.ParseString()
 	s2 := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrnatcasecmp(s1, s2)
@@ -2639,17 +2209,14 @@ var DefZifStrnatcasecmp = def.DefFunc("strnatcasecmp", 2, 2, []def.ArgInfo{{Name
 
 // generate by ZifSubstrCount
 var DefZifSubstrCount = def.DefFunc("substr_count", 2, 4, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}, {Name: "length"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 4, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseString()
 	fp.StartOptional()
 	offset := fp.ParseLong()
 	length_ := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifSubstrCount(executeData.Ctx(), haystack, needle, nil, offset, length_)
@@ -2662,17 +2229,14 @@ var DefZifSubstrCount = def.DefFunc("substr_count", 2, 4, []def.ArgInfo{{Name: "
 
 // generate by ZifStrPad
 var DefZifStrPad = def.DefFunc("str_pad", 2, 4, []def.ArgInfo{{Name: "input"}, {Name: "pad_length"}, {Name: "pad_string"}, {Name: "pad_type"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 4, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 4, 0)
+	fp.CheckNumArgs()
 	input := fp.ParseString()
 	pad_length := fp.ParseLong()
 	fp.StartOptional()
 	pad_string_ := fp.ParseStringNullable()
 	pad_type_ := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrPad(executeData.Ctx(), input, pad_length, nil, pad_string_, pad_type_)
@@ -2685,13 +2249,10 @@ var DefZifStrPad = def.DefFunc("str_pad", 2, 4, []def.ArgInfo{{Name: "input"}, {
 
 // generate by ZifStrRot13
 var DefZifStrRot13 = def.DefFunc("str_rot13", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrRot13(str)
@@ -2700,13 +2261,10 @@ var DefZifStrRot13 = def.DefFunc("str_rot13", 1, 1, []def.ArgInfo{{Name: "str"}}
 
 // generate by ZifStrShuffle
 var DefZifStrShuffle = def.DefFunc("str_shuffle", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrShuffle(str)
@@ -2715,16 +2273,13 @@ var DefZifStrShuffle = def.DefFunc("str_shuffle", 1, 1, []def.ArgInfo{{Name: "st
 
 // generate by ZifStrWordCount
 var DefZifStrWordCount = def.DefFunc("str_word_count", 1, 3, []def.ArgInfo{{Name: "str"}, {Name: "format"}, {Name: "charlist"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 3, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	format := fp.ParseLong()
 	charlist := fp.ParseStringNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrWordCount(executeData.Ctx(), str, nil, format, charlist)
@@ -2737,15 +2292,12 @@ var DefZifStrWordCount = def.DefFunc("str_word_count", 1, 3, []def.ArgInfo{{Name
 
 // generate by ZifStrSplit
 var DefZifStrSplit = def.DefFunc("str_split", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "split_length"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
 	split_length_ := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrSplit(executeData.Ctx(), str, nil, split_length_)
@@ -2758,14 +2310,11 @@ var DefZifStrSplit = def.DefFunc("str_split", 1, 2, []def.ArgInfo{{Name: "str"},
 
 // generate by ZifStrpbrk
 var DefZifStrpbrk = def.DefFunc("strpbrk", 2, 2, []def.ArgInfo{{Name: "haystack"}, {Name: "char_list"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	char_list := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrpbrk(executeData.Ctx(), haystack, char_list)
@@ -2778,10 +2327,8 @@ var DefZifStrpbrk = def.DefFunc("strpbrk", 2, 2, []def.ArgInfo{{Name: "haystack"
 
 // generate by ZifSubstrCompare
 var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}, {Name: "length"}, {Name: "case_insensitivity"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 3, 5, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 3, 5, 0)
+	fp.CheckNumArgs()
 	haystack := fp.ParseString()
 	needle := fp.ParseString()
 	offset := fp.ParseLong()
@@ -2789,7 +2336,6 @@ var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Nam
 	length := fp.ParseLongNullable()
 	case_insensitivity := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifSubstrCompare(executeData.Ctx(), returnValue, haystack, needle, offset, nil, length, case_insensitivity)
@@ -2802,13 +2348,10 @@ var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Nam
 
 // generate by ZifGettype
 var DefZifGettype = def.DefFunc("gettype", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifGettype(var_)
@@ -2817,14 +2360,11 @@ var DefZifGettype = def.DefFunc("gettype", 1, 1, []def.ArgInfo{{Name: "var"}}, f
 
 // generate by ZifSettype
 var DefZifSettype = def.DefFunc("settype", 2, 2, []def.ArgInfo{{Name: "var", ByRef: true}, {Name: "typ"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseRefZval()
 	typ := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifSettype(executeData.Ctx(), var_, typ)
@@ -2833,15 +2373,12 @@ var DefZifSettype = def.DefFunc("settype", 2, 2, []def.ArgInfo{{Name: "var", ByR
 
 // generate by ZifIntval
 var DefZifIntval = def.DefFunc("intval", 1, 2, []def.ArgInfo{{Name: "var"}, {Name: "base"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZval()
 	fp.StartOptional()
 	base_ := fp.ParseLongNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIntval(executeData.Ctx(), var_, nil, base_)
@@ -2850,13 +2387,10 @@ var DefZifIntval = def.DefFunc("intval", 1, 2, []def.ArgInfo{{Name: "var"}, {Nam
 
 // generate by ZifFloatval
 var DefZifFloatval = def.DefFunc("floatval", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifFloatval(executeData.Ctx(), var_)
@@ -2865,13 +2399,10 @@ var DefZifFloatval = def.DefFunc("floatval", 1, 1, []def.ArgInfo{{Name: "var"}},
 
 // generate by ZifFloatval
 var DefZifDoubleval = def.DefFunc("doubleval", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifFloatval(executeData.Ctx(), var_)
@@ -2880,13 +2411,10 @@ var DefZifDoubleval = def.DefFunc("doubleval", 1, 1, []def.ArgInfo{{Name: "var"}
 
 // generate by ZifBoolval
 var DefZifBoolval = def.DefFunc("boolval", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifBoolval(executeData.Ctx(), var_)
@@ -2895,13 +2423,10 @@ var DefZifBoolval = def.DefFunc("boolval", 1, 1, []def.ArgInfo{{Name: "var"}}, f
 
 // generate by ZifStrval
 var DefZifStrval = def.DefFunc("strval", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrval(executeData.Ctx(), var_)
@@ -2910,13 +2435,10 @@ var DefZifStrval = def.DefFunc("strval", 1, 1, []def.ArgInfo{{Name: "var"}}, fun
 
 // generate by ZifIsNull
 var DefZifIsNull = def.DefFunc("is_null", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsNull(var_)
@@ -2925,13 +2447,10 @@ var DefZifIsNull = def.DefFunc("is_null", 1, 1, []def.ArgInfo{{Name: "var"}}, fu
 
 // generate by ZifIsResource
 var DefZifIsResource = def.DefFunc("is_resource", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsResource(var_)
@@ -2940,13 +2459,10 @@ var DefZifIsResource = def.DefFunc("is_resource", 1, 1, []def.ArgInfo{{Name: "va
 
 // generate by ZifIsBool
 var DefZifIsBool = def.DefFunc("is_bool", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsBool(var_)
@@ -2955,13 +2471,10 @@ var DefZifIsBool = def.DefFunc("is_bool", 1, 1, []def.ArgInfo{{Name: "var"}}, fu
 
 // generate by ZifIsInt
 var DefZifIsInt = def.DefFunc("is_int", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsInt(var_)
@@ -2970,13 +2483,10 @@ var DefZifIsInt = def.DefFunc("is_int", 1, 1, []def.ArgInfo{{Name: "var"}}, func
 
 // generate by ZifIsInt
 var DefZifIsInteger = def.DefFunc("is_integer", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsInt(var_)
@@ -2985,13 +2495,10 @@ var DefZifIsInteger = def.DefFunc("is_integer", 1, 1, []def.ArgInfo{{Name: "var"
 
 // generate by ZifIsInt
 var DefZifIsLong = def.DefFunc("is_long", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsInt(var_)
@@ -3000,13 +2507,10 @@ var DefZifIsLong = def.DefFunc("is_long", 1, 1, []def.ArgInfo{{Name: "var"}}, fu
 
 // generate by ZifIsFloat
 var DefZifIsFloat = def.DefFunc("is_float", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsFloat(var_)
@@ -3015,13 +2519,10 @@ var DefZifIsFloat = def.DefFunc("is_float", 1, 1, []def.ArgInfo{{Name: "var"}}, 
 
 // generate by ZifIsFloat
 var DefZifIsDouble = def.DefFunc("is_double", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsFloat(var_)
@@ -3030,13 +2531,10 @@ var DefZifIsDouble = def.DefFunc("is_double", 1, 1, []def.ArgInfo{{Name: "var"}}
 
 // generate by ZifIsString
 var DefZifIsString = def.DefFunc("is_string", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsString(var_)
@@ -3045,13 +2543,10 @@ var DefZifIsString = def.DefFunc("is_string", 1, 1, []def.ArgInfo{{Name: "var"}}
 
 // generate by ZifIsArray
 var DefZifIsArray = def.DefFunc("is_array", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsArray(var_)
@@ -3060,13 +2555,10 @@ var DefZifIsArray = def.DefFunc("is_array", 1, 1, []def.ArgInfo{{Name: "var"}}, 
 
 // generate by ZifIsObject
 var DefZifIsObject = def.DefFunc("is_object", 1, 1, []def.ArgInfo{{Name: "var"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsObject(var_)
@@ -3075,13 +2567,10 @@ var DefZifIsObject = def.DefFunc("is_object", 1, 1, []def.ArgInfo{{Name: "var"}}
 
 // generate by ZifIsNumeric
 var DefZifIsNumeric = def.DefFunc("is_numeric", 1, 1, []def.ArgInfo{{Name: "value"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	value := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsNumeric(value)
@@ -3090,13 +2579,10 @@ var DefZifIsNumeric = def.DefFunc("is_numeric", 1, 1, []def.ArgInfo{{Name: "valu
 
 // generate by ZifIsScalar
 var DefZifIsScalar = def.DefFunc("is_scalar", 1, 1, []def.ArgInfo{{Name: "value"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	value := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsScalar(value)
@@ -3105,15 +2591,12 @@ var DefZifIsScalar = def.DefFunc("is_scalar", 1, 1, []def.ArgInfo{{Name: "value"
 
 // generate by ZifUniqid
 var DefZifUniqid = def.DefFunc("uniqid", 0, 2, []def.ArgInfo{{Name: "prefix"}, {Name: "more_entropy"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, 2, 0)
+	fp.CheckNumArgs()
 	fp.StartOptional()
 	prefix := fp.ParseString()
 	more_entropy := fp.ParseBool()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifUniqid(nil, prefix, more_entropy)
@@ -3122,13 +2605,10 @@ var DefZifUniqid = def.DefFunc("uniqid", 0, 2, []def.ArgInfo{{Name: "prefix"}, {
 
 // generate by ZifConvertUuencode
 var DefZifConvertUuencode = def.DefFunc("convert_uuencode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	data := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifConvertUuencode(data)
@@ -3141,13 +2621,10 @@ var DefZifConvertUuencode = def.DefFunc("convert_uuencode", 1, 1, []def.ArgInfo{
 
 // generate by ZifConvertUudecode
 var DefZifConvertUudecode = def.DefFunc("convert_uudecode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	data := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifConvertUudecode(executeData.Ctx(), data)
@@ -3160,10 +2637,8 @@ var DefZifConvertUudecode = def.DefFunc("convert_uudecode", 1, 1, []def.ArgInfo{
 
 // generate by ZifVarDump
 var DefZifVarDump = def.DefFunc("var_dump", 0, -1, []def.ArgInfo{{Name: "vars", Variadic: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, -1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, -1, 0)
+	fp.CheckNumArgs()
 	vars := fp.ParseVariadic(0)
 	if fp.HasError() {
 		return

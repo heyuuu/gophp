@@ -10,7 +10,9 @@ var zifFunctions = []def.FuncType{DefZifGcMemCaches, DefZifGcCollectCycles, DefZ
 
 // generate by ZifGcMemCaches
 var DefZifGcMemCaches = def.DefFunc("gc_mem_caches", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 0, 0) {
+	fp := php.NewParamParser(executeData, 0, 0, 0)
+	fp.CheckNumArgs()
+	if fp.HasError() {
 		return
 	}
 	ret := ZifGcMemCaches()
@@ -19,7 +21,9 @@ var DefZifGcMemCaches = def.DefFunc("gc_mem_caches", 0, 0, []def.ArgInfo{}, func
 
 // generate by ZifGcCollectCycles
 var DefZifGcCollectCycles = def.DefFunc("gc_collect_cycles", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 0, 0) {
+	fp := php.NewParamParser(executeData, 0, 0, 0)
+	fp.CheckNumArgs()
+	if fp.HasError() {
 		return
 	}
 	ret := ZifGcCollectCycles()
@@ -28,7 +32,9 @@ var DefZifGcCollectCycles = def.DefFunc("gc_collect_cycles", 0, 0, []def.ArgInfo
 
 // generate by ZifGcEnabled
 var DefZifGcEnabled = def.DefFunc("gc_enabled", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 0, 0) {
+	fp := php.NewParamParser(executeData, 0, 0, 0)
+	fp.CheckNumArgs()
+	if fp.HasError() {
 		return
 	}
 	ret := ZifGcEnabled()
@@ -37,7 +43,9 @@ var DefZifGcEnabled = def.DefFunc("gc_enabled", 0, 0, []def.ArgInfo{}, func(exec
 
 // generate by ZifGcStatus
 var DefZifGcStatus = def.DefFunc("gc_status", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 0, 0) {
+	fp := php.NewParamParser(executeData, 0, 0, 0)
+	fp.CheckNumArgs()
+	if fp.HasError() {
 		return
 	}
 	ret := ZifGcStatus()
@@ -46,13 +54,10 @@ var DefZifGcStatus = def.DefFunc("gc_status", 0, 0, []def.ArgInfo{}, func(execut
 
 // generate by ZifStrlen
 var DefZifStrlen = def.DefFunc("strlen", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
 	str := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrlen(str)
@@ -61,14 +66,11 @@ var DefZifStrlen = def.DefFunc("strlen", 1, 1, []def.ArgInfo{{Name: "str"}}, fun
 
 // generate by ZifStrcmp
 var DefZifStrcmp = def.DefFunc("strcmp", 2, 2, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	str1 := fp.ParseString()
 	str2 := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrcmp(str1, str2)
@@ -77,15 +79,12 @@ var DefZifStrcmp = def.DefFunc("strcmp", 2, 2, []def.ArgInfo{{Name: "str1"}, {Na
 
 // generate by ZifStrncmp
 var DefZifStrncmp = def.DefFunc("strncmp", 3, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "len"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 3, 3, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 3, 3, 0)
+	fp.CheckNumArgs()
 	str1 := fp.ParseString()
 	str2 := fp.ParseString()
 	len_ := fp.ParseLong()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrncmp(executeData.Ctx(), str1, str2, len_)
@@ -98,14 +97,11 @@ var DefZifStrncmp = def.DefFunc("strncmp", 3, 3, []def.ArgInfo{{Name: "str1"}, {
 
 // generate by ZifStrcasecmp
 var DefZifStrcasecmp = def.DefFunc("strcasecmp", 2, 2, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 2, 2, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 2, 2, 0)
+	fp.CheckNumArgs()
 	str1 := fp.ParseString()
 	str2 := fp.ParseString()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrcasecmp(str1, str2)
@@ -114,13 +110,10 @@ var DefZifStrcasecmp = def.DefFunc("strcasecmp", 2, 2, []def.ArgInfo{{Name: "str
 
 // generate by ZifEach
 var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{Name: "array", ByRef: true}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 1, 1, zpp.FlagOldMode) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 1, 1, zpp.FlagOldMode)
+	fp.CheckNumArgs()
 	array := fp.ParseRefZval()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifEach(executeData.Ctx(), array)
@@ -133,14 +126,11 @@ var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{Name: "array", ByRef: 
 
 // generate by ZifErrorReporting
 var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{Name: "new_error_level"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
-	if !php.CheckNumArgs(executeData, 0, 1, 0) {
-		return
-	}
 	fp := php.NewParamParser(executeData, 0, 1, 0)
+	fp.CheckNumArgs()
 	fp.StartOptional()
 	new_error_level := fp.ParseZvalNullable()
 	if fp.HasError() {
-		returnValue.SetFalse()
 		return
 	}
 	ret := ZifErrorReporting(executeData.Ctx(), returnValue, nil, new_error_level)
