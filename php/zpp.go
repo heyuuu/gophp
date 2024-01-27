@@ -98,7 +98,7 @@ func (p *FastParamParser) isOldMode() bool { return p.flags&zpp.FlagOldMode != 0
 
 func (p *FastParamParser) useStrictTypes() bool { return p.ex.IsArgUseStrictTypes() }
 
-func (p *FastParamParser) isFinish() bool { return p.HasError() || p.errorCode != ZPP_ERROR_OK }
+func (p *FastParamParser) isFinish() bool { return p.HasError() || p.argIndex >= len(p.args) }
 
 func (p *FastParamParser) triggerError(errorCode int, err string) {
 	if errorCode == ZPP_ERROR_OK {
@@ -139,11 +139,7 @@ func (p *FastParamParser) triggerError(errorCode int, err string) {
 
 // Micro: Z_PARAM_PROLOGUE
 func (p *FastParamParser) nextArg(deref bool, separate bool) (arg types.Zval, ok bool) {
-	if p.isFinish() || p.HasError() {
-		return
-	}
-
-	if p.argIndex >= len(p.args) {
+	if p.isFinish() {
 		return
 	}
 
