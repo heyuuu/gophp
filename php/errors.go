@@ -113,3 +113,10 @@ func InternalTypeError(ctx *Context, throwException bool, message string) {
 		Error(ctx, perr.E_WARNING, message)
 	}
 }
+func InternalArgumentCountError(ctx *Context, throwException bool, message string) {
+	if throwException {
+		ThrowException(ctx, nil, message, 0)
+	} else {
+		Error(ctx, perr.E_WARNING, message)
+	}
+}

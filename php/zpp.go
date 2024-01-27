@@ -2,6 +2,7 @@ package php
 
 import (
 	"fmt"
+	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
@@ -9,12 +10,30 @@ import (
 )
 
 func CheckNumArgs(executeData *ExecuteData, minNumArgs int, maxNumArgs int, flags int) bool {
-	// todo
-	return true
-}
+	// 检查参数个数，若检查通过直接返回
+	numArgs := executeData.NumArgs()
+	if numArgs >= minNumArgs && (numArgs <= maxNumArgs || maxNumArgs < 0) {
+		return true
+	}
 
-func NewParser(executeData *ExecuteData, minNumArgs int, maxNumArgs int, flags int) zpp.IParser {
-	return NewFastParamParser(executeData, minNumArgs, maxNumArgs, flags)
+	// 非 Quiet 模式下，触发 PHP Error
+	if (flags & zpp.FlagQuiet) == 0 {
+		// 判断是否强制抛出异常或为 strict 模式
+		var throwException = (flags&zpp.FlagThrow) != 0 || executeData.IsArgUseStrictTypes()
+
+		// 构建错误信息
+		callee := executeData.CalleeName()
+		ctx := executeData.Ctx()
+		if minNumArgs == maxNumArgs {
+			InternalArgumentCountError(ctx, throwException, fmt.Sprintf("%s() expects exactly %d parameter%s, %d given", callee, minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
+		} else if numArgs < minNumArgs {
+			InternalArgumentCountError(ctx, throwException, fmt.Sprintf("%s() expects at least %d parameter%s, %d given", callee, minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
+		} else { // numArgs > maxNumArgs
+			InternalArgumentCountError(ctx, throwException, fmt.Sprintf("%s() expects at most %d parameter%s, %d given", callee, maxNumArgs, lang.Cond(maxNumArgs == 1, "", "s"), numArgs))
+		}
+	}
+
+	return false
 }
 
 // @see Micro CHECK_NULL_PATH
@@ -487,7 +506,6 @@ func (p *FastParamParser) ParseZvalNullable() *types.Zval {
 	}
 	return &dest
 }
-
 func (p *FastParamParser) parseZvalEx(checkNull bool, separate bool) (dest types.Zval, isNull bool) {
 	return p.parseZvalEx2(checkNull, separate, separate)
 }
@@ -532,7 +550,7 @@ func (p *FastParamParser) eachVariadic(postVarargs uint, h func(arg types.Zval))
 
 func (p *FastParamParser) ParseRefZval() types.RefZval {
 	// todo ref 处理
-	v, _ := p.parseZvalEx(false, true)
+	v, _ := p.parseZvalEx(false, false)
 	return p.asRefZval(v)
 }
 func (p *FastParamParser) ParseRefArrayOrObject() types.RefZval {
@@ -558,11 +576,11 @@ func (p *FastParamParser) ParseRefVariadic(postVarargs uint) []types.RefZval {
 	})
 	return args
 }
+
 func (p *FastParamParser) asRefZval(v types.Zval) types.RefZval {
 	if v.IsRef() {
 		return v.Ref()
 	} else {
-		// todo 此处应不会触达
-		return types.NewReference(v)
+		panic(perr.Internalf("参数不可为非 RefZval: %v", v))
 	}
 }

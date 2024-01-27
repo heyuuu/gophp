@@ -48,17 +48,20 @@ func (e *Executor) function(fn *types.Function, args []types.Zval) types.Zval {
 		e.executeData = e.executeData.prev
 	}()
 
+	var retval types.Zval
 	if fn.IsInternalFunction() {
-		var retval types.Zval
 		if handler, ok := fn.Handler().(ZifHandler); ok {
 			handler(e.executeData, &retval)
 		} else {
 			perr.Panic(fmt.Sprintf("不支持的内部函数 handler 类型: %T", fn.Handler()))
 		}
-		return retval
 	} else {
-		return e.userFunction(fn, args)
+		retval = e.userFunction(fn, args)
 	}
+	if retval.IsUndef() {
+		retval = types.Null
+	}
+	return retval
 }
 
 func (e *Executor) initStringCall(name string) *types.Function {
