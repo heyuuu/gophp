@@ -6,7 +6,7 @@ import (
 
 type IParser interface {
 	HasError() bool
-	CheckNumArgs() bool
+	CheckNumArgs()
 	StartOptional()
 
 	// exactly type

@@ -9,33 +9,6 @@ import (
 	"strings"
 )
 
-func CheckNumArgs(executeData *ExecuteData, minNumArgs int, maxNumArgs int, flags int) bool {
-	// 检查参数个数，若检查通过直接返回
-	numArgs := executeData.NumArgs()
-	if numArgs >= minNumArgs && (numArgs <= maxNumArgs || maxNumArgs < 0) {
-		return true
-	}
-
-	// 非 Quiet 模式下，触发 PHP Error
-	if (flags & zpp.FlagQuiet) == 0 {
-		// 判断是否强制抛出异常或为 strict 模式
-		var throwException = (flags&zpp.FlagThrow) != 0 || executeData.IsArgUseStrictTypes()
-
-		// 构建错误信息
-		callee := executeData.CalleeName()
-		ctx := executeData.Ctx()
-		if minNumArgs == maxNumArgs {
-			InternalArgumentCountError(ctx, throwException, fmt.Sprintf("%s() expects exactly %d parameter%s, %d given", callee, minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
-		} else if numArgs < minNumArgs {
-			InternalArgumentCountError(ctx, throwException, fmt.Sprintf("%s() expects at least %d parameter%s, %d given", callee, minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
-		} else { // numArgs > maxNumArgs
-			InternalArgumentCountError(ctx, throwException, fmt.Sprintf("%s() expects at most %d parameter%s, %d given", callee, maxNumArgs, lang.Cond(maxNumArgs == 1, "", "s"), numArgs))
-		}
-	}
-
-	return false
-}
-
 // @see Micro CHECK_NULL_PATH
 func CheckNullPath(s string) bool {
 	// 确认字符串是二进制安全的(即不包含 \0 字符)
@@ -70,13 +43,11 @@ const ZPP_ERROR_WRONG_COUNT = 5
 type FastParamParser struct {
 	ctx        *Context
 	ex         *ExecuteData
-	numArgs    int // 所需参数个数 (注意: zpp.FlagOldMode 模式下， numArgs 与 executeData.NumArgs() 不一定相等)
+	args       []types.Zval
 	minNumArgs int
 	maxNumArgs int
 	flags      int
-	err        error
 	errorCode  int
-	finish     bool // 解析已终止 (可能是已解析完成或出现错误)
 	argIndex   int
 	arg        types.Zval
 	optional   bool
@@ -92,7 +63,7 @@ func NewFastParamParser(ex *ExecuteData, minNumArgs int, maxNumArgs int, flags i
 	return &FastParamParser{
 		ex:         ex,
 		ctx:        ex.ctx,
-		numArgs:    ex.NumArgs(),
+		args:       ex.args,
 		minNumArgs: minNumArgs,
 		maxNumArgs: maxNumArgs,
 		flags:      flags,
@@ -103,8 +74,15 @@ func (p *FastParamParser) HasError() bool {
 	return p.errorCode != ZPP_ERROR_OK
 }
 
-func (p *FastParamParser) CheckNumArgs() bool {
-	return CheckNumArgs(p.ex, p.minNumArgs, p.maxNumArgs, p.flags)
+func (p *FastParamParser) CheckNumArgs() {
+	// 检查参数个数，若检查通过直接返回
+	numArgs, minNumArgs, maxNumArgs := len(p.args), p.minNumArgs, p.maxNumArgs
+	if numArgs >= minNumArgs && (numArgs <= maxNumArgs || maxNumArgs < 0) {
+		return
+	}
+
+	// 触发错误
+	p.triggerError(ZPP_ERROR_WRONG_COUNT, "")
 }
 
 // @see Micro: Z_PARAM_OPTIONAL
@@ -120,19 +98,15 @@ func (p *FastParamParser) isOldMode() bool { return p.flags&zpp.FlagOldMode != 0
 
 func (p *FastParamParser) useStrictTypes() bool { return p.ex.IsArgUseStrictTypes() }
 
-func (p *FastParamParser) isFinish() bool { return p.finish }
+func (p *FastParamParser) isFinish() bool { return p.HasError() || p.errorCode != ZPP_ERROR_OK }
 
 func (p *FastParamParser) triggerError(errorCode int, err string) {
-	// 记录错误信息
-	p.errorCode = errorCode
-	if errorCode != ZPP_ERROR_OK {
-		p.finish = true
-	}
-
-	// 若已有异常，不做error报错
-	if p.ctx.EG().HasException() {
+	if errorCode == ZPP_ERROR_OK {
 		return
 	}
+
+	// 记录错误信息
+	p.errorCode = errorCode
 
 	// 触发错误或异常
 	if !p.isQuiet() {
@@ -150,17 +124,26 @@ func (p *FastParamParser) triggerError(errorCode int, err string) {
 			expectedType := err
 			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.ex.CalleeName(), p.argIndex, expectedType, types.ZendZvalTypeName(p.arg))
 			InternalTypeError(p.ctx, p.isThrow(), message)
+		case ZPP_ERROR_WRONG_COUNT:
+			numArgs, minNumArgs, maxNumArgs := len(p.args), p.minNumArgs, p.maxNumArgs
+			if minNumArgs == maxNumArgs {
+				InternalArgumentCountError(p.ctx, p.isThrow(), fmt.Sprintf("%s() expects exactly %d parameter%s, %d given", p.ex.CalleeName(), minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
+			} else if numArgs < minNumArgs {
+				InternalArgumentCountError(p.ctx, p.isThrow(), fmt.Sprintf("%s() expects at least %d parameter%s, %d given", p.ex.CalleeName(), minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
+			} else { // numArgs > maxNumArgs
+				InternalArgumentCountError(p.ctx, p.isThrow(), fmt.Sprintf("%s() expects at most %d parameter%s, %d given", p.ex.CalleeName(), maxNumArgs, lang.Cond(maxNumArgs == 1, "", "s"), numArgs))
+			}
 		}
 	}
 }
 
 // Micro: Z_PARAM_PROLOGUE
 func (p *FastParamParser) nextArg(deref bool, separate bool) (arg types.Zval, ok bool) {
-	if p.isFinish() {
+	if p.isFinish() || p.HasError() {
 		return
 	}
 
-	if p.err != nil || p.argIndex >= p.ex.NumArgs() {
+	if p.argIndex >= len(p.args) {
 		return
 	}
 
@@ -540,7 +523,7 @@ func (p *FastParamParser) eachVariadic(postVarargs uint, h func(arg types.Zval))
 		return
 	}
 
-	numVarargs := p.numArgs - p.argIndex - int(postVarargs)
+	numVarargs := len(p.args) - p.argIndex - int(postVarargs)
 	for i := 0; i < numVarargs; i++ {
 		arg, ok := p.nextArg(false, false)
 		if !ok {

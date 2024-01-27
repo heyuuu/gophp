@@ -24,16 +24,10 @@ func NewExecuteData(ctx *Context, args []types.Zval, prev *ExecuteData) *Execute
 func (ex *ExecuteData) Ctx() *Context {
 	return ex.ctx
 }
-
-func (ex *ExecuteData) CalleeName() string {
-	//TODO implement me
-	return ""
-}
-
+func (ex *ExecuteData) Args() []types.Zval { return ex.args }
 func (ex *ExecuteData) NumArgs() int {
 	return len(ex.args)
 }
-
 func (ex *ExecuteData) Arg(pos int) types.Zval {
 	if pos >= 0 && pos < len(ex.args) {
 		return ex.args[pos]
@@ -47,6 +41,11 @@ func (ex *ExecuteData) Prev() *ExecuteData           { return ex.prev }
 func (ex *ExecuteData) SetPrev(prev *ExecuteData)    { ex.prev = prev }
 func (ex *ExecuteData) Fn() *types.Function          { return ex.fn }
 func (ex *ExecuteData) SetFn(fn *types.Function)     { ex.fn = fn }
+
+func (ex *ExecuteData) CalleeName() string {
+	//TODO implement me
+	return ""
+}
 
 func (ex *ExecuteData) isStrictTypes() bool {
 	return ex != nil && ex.fn != nil && ex.fn.IsStrictTypes()
