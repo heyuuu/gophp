@@ -1,5 +1,6 @@
 package perr
 
+//go:generate stringer -type=ErrorType
 type ErrorType uint32
 
 const (

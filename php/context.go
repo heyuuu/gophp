@@ -12,6 +12,8 @@ type Context struct {
 	og     OutputGlobals
 
 	values map[string]any
+
+	eh ErrorHandling
 }
 
 func MockContext() *Context {

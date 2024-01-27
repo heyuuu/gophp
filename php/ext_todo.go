@@ -92,6 +92,11 @@ func ZendStrToLongN(s string, base int) (value int, n int) {
 	return int(i), len(s)
 }
 
-func ThrowException(ctx *Context, ceError any, message string, code int) {
+func ThrowException(ctx *Context, ce *types.Class, message string, code int) {
+	if ctx.eh != nil {
+		ctx.eh.OnException(ce, message, code)
+		return
+	}
+
 	panic(perr.Todof("ThrowException: message=%s, code=%d", message, code))
 }

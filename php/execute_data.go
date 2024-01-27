@@ -44,7 +44,11 @@ func (ex *ExecuteData) SetFn(fn *types.Function)     { ex.fn = fn }
 
 func (ex *ExecuteData) CalleeName() string {
 	//TODO implement me
-	return ""
+	if ex.fn == nil {
+		return ""
+	}
+
+	return ex.fn.Name()
 }
 
 func (ex *ExecuteData) isStrictTypes() bool {

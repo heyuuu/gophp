@@ -11,6 +11,11 @@ import (
 
 // functions
 func Error(ctx *Context, typ perr.ErrorType, message string) {
+	if ctx.eh != nil {
+		ctx.eh.OnError(typ, message)
+		return
+	}
+
 	filename, lineno := errorGetFilenameLineno(ctx, typ)
 	ErrorTrigger(ctx, perr.NewAt(typ, message, filename, lineno))
 }
