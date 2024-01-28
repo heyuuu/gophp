@@ -41,8 +41,9 @@ const ZPP_ERROR_WRONG_COUNT = 5
  * FAST_ZPP 宏与原描述符对应表 (@see README.md):
  */
 type FastParamParser struct {
-	ctx        *Context
-	ex         *ExecuteData
+	ctx *Context
+	//ex         *ExecuteData
+	callee     string // 调用方名称
 	args       []types.Zval
 	minNumArgs int
 	maxNumArgs int
@@ -62,8 +63,9 @@ func NewParamParser(ex *ExecuteData, minNumArgs int, maxNumArgs int, flags int) 
 
 func NewFastParamParser(ex *ExecuteData, minNumArgs int, maxNumArgs int, flags int) *FastParamParser {
 	return &FastParamParser{
-		ex:         ex,
-		ctx:        ex.ctx,
+		ctx: ex.ctx,
+		//ex:         ex,
+		callee:     ex.CalleeName(),
 		args:       ex.args,
 		minNumArgs: minNumArgs,
 		maxNumArgs: maxNumArgs,
@@ -116,24 +118,24 @@ func (p *FastParamParser) triggerError(errorCode int, err string) {
 		case ZPP_ERROR_FAILURE:
 			// pass
 		case ZPP_ERROR_WRONG_CALLBACK:
-			message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", p.ex.CalleeName(), p.argIndex, err)
+			message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", p.callee, p.argIndex, err)
 			InternalTypeError(p.ctx, p.isThrow(), message)
 		case ZPP_ERROR_WRONG_CLASS:
 			name := err
-			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.ex.CalleeName(), p.argIndex, name, types.ZendZvalTypeName(p.arg))
+			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.callee, p.argIndex, name, types.ZendZvalTypeName(p.arg))
 			InternalTypeError(p.ctx, p.isThrow(), message)
 		case ZPP_ERROR_WRONG_ARG:
 			expectedType := err
-			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.ex.CalleeName(), p.argIndex, expectedType, types.ZendZvalTypeName(p.arg))
+			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.callee, p.argIndex, expectedType, types.ZendZvalTypeName(p.arg))
 			InternalTypeError(p.ctx, p.isThrow(), message)
 		case ZPP_ERROR_WRONG_COUNT:
 			numArgs, minNumArgs, maxNumArgs := len(p.args), p.minNumArgs, p.maxNumArgs
 			if minNumArgs == maxNumArgs {
-				InternalArgumentCountError(p.ctx, p.isThrow(), fmt.Sprintf("%s() expects exactly %d parameter%s, %d given", p.ex.CalleeName(), minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
+				InternalArgumentCountError(p.ctx, p.isThrow(), fmt.Sprintf("%s() expects exactly %d parameter%s, %d given", p.callee, minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
 			} else if numArgs < minNumArgs {
-				InternalArgumentCountError(p.ctx, p.isThrow(), fmt.Sprintf("%s() expects at least %d parameter%s, %d given", p.ex.CalleeName(), minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
+				InternalArgumentCountError(p.ctx, p.isThrow(), fmt.Sprintf("%s() expects at least %d parameter%s, %d given", p.callee, minNumArgs, lang.Cond(minNumArgs == 1, "", "s"), numArgs))
 			} else { // numArgs > maxNumArgs
-				InternalArgumentCountError(p.ctx, p.isThrow(), fmt.Sprintf("%s() expects at most %d parameter%s, %d given", p.ex.CalleeName(), maxNumArgs, lang.Cond(maxNumArgs == 1, "", "s"), numArgs))
+				InternalArgumentCountError(p.ctx, p.isThrow(), fmt.Sprintf("%s() expects at most %d parameter%s, %d given", p.callee, maxNumArgs, lang.Cond(maxNumArgs == 1, "", "s"), numArgs))
 			}
 		}
 	}
@@ -145,9 +147,12 @@ func (p *FastParamParser) nextArg(deref bool, separate bool) (arg types.Zval, ok
 		return
 	}
 
-	arg = p.ex.Arg(p.argIndex)
+	arg = p.args[p.argIndex]
 	if deref {
 		arg = arg.DeRef()
+	}
+	if arg.IsUndef() {
+		arg = types.ZvalNull() // 正常流程中传入 args 应没有
 	}
 	p.argIndex++
 	p.arg = arg
@@ -160,7 +165,7 @@ func (p *FastParamParser) ParseBool() (dest bool) {
 	return
 }
 func (p *FastParamParser) ParseBoolNullable() *bool {
-	dest, isNull := p.parseBoolEx(false, false)
+	dest, isNull := p.parseBoolEx(true, false)
 	if isNull {
 		return nil
 	}
@@ -219,7 +224,7 @@ func (p *FastParamParser) ParseStrictLongNullable() *int {
 	return &dest
 }
 func (p *FastParamParser) parseLongEx(checkNull bool, separate bool, strict bool) (dest int, isNull bool) {
-	arg, ok := p.nextArg(separate, separate)
+	arg, ok := p.nextArg(true, separate)
 	if !ok {
 		return 0, true
 	}
@@ -232,7 +237,7 @@ func (p *FastParamParser) parseLongEx(checkNull bool, separate bool, strict bool
 	// parse
 	ok = false
 	if p.useStrictTypes() { // strict type
-		if arg.IsBool() {
+		if arg.IsLong() {
 			dest, ok = arg.Long(), true
 		}
 	} else { // weak type
@@ -251,14 +256,14 @@ func (p *FastParamParser) ParseDouble() (dest float64) {
 	return
 }
 func (p *FastParamParser) ParseDoubleNullable() *float64 {
-	dest, isNull := p.parseDoubleEx(false, false)
+	dest, isNull := p.parseDoubleEx(true, false)
 	if isNull {
 		return nil
 	}
 	return &dest
 }
 func (p *FastParamParser) parseDoubleEx(checkNull bool, separate bool) (dest float64, isNull bool) {
-	arg, ok := p.nextArg(separate, separate)
+	arg, ok := p.nextArg(true, separate)
 	if !ok {
 		return 0, true
 	}
@@ -293,14 +298,14 @@ func (p *FastParamParser) ParseString() (dest string) {
 	return
 }
 func (p *FastParamParser) ParseStringNullable() *string {
-	dest, isNull := p.parseStringEx(false, false)
+	dest, isNull := p.parseStringEx(true, false)
 	if isNull {
 		return nil
 	}
 	return &dest
 }
 func (p *FastParamParser) parseStringEx(checkNull bool, separate bool) (dest string, isNull bool) {
-	arg, ok := p.nextArg(separate, separate)
+	arg, ok := p.nextArg(true, separate)
 	if !ok {
 		return "", true
 	}
