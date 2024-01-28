@@ -135,7 +135,9 @@ func (p *formatPrinter) AppendDouble(number float64, width int, precision int, f
 		php.ErrorDocRef(p.ctx, "", perr.E_NOTICE, fmt.Sprintf("Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, MAX_FLOAT_PRECISION))
 		precision = MAX_FLOAT_PRECISION
 	}
-
+	if fmtTyp == 'F' {
+		fmtTyp = 'f'
+	}
 	str := strconv.FormatFloat(number, fmtTyp, precision, 64)
 
 	// fix: 科学计数法且位数为指数个位数时，go 默认会补齐到2位，但 php 保持位数不变。此处修复此差别

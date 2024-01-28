@@ -14,7 +14,7 @@ func ParseDouble(str string) float64 {
 	if matchStr == "" { // not match
 		return 0 // todo 异常处理
 	}
-	d, _ := strconv.ParseFloat(str, 64)
+	d, _ := strconv.ParseFloat(matchStr, 64)
 	return d
 }
 
@@ -119,6 +119,9 @@ func matchNumberPrefix(str string) (matchStr string, matchLen int, maybeLong boo
 	// 扫描字符串，确认字符串为 整数|小数|非法字符串
 	state := 0 // 状态机: 0 未开始, 1 整数部分; 2 小数部分; 3 指数部分
 	idx := start
+	if idx < len(str) && (str[idx] == '+' || str[idx] == '-') {
+		idx++
+	}
 	for ; idx < len(str); idx++ {
 		c := str[idx]
 		if ascii.IsDigit(c) {
@@ -146,5 +149,8 @@ func matchNumberPrefix(str string) (matchStr string, matchLen int, maybeLong boo
 		break
 	}
 
+	if state == 0 {
+		return "", 0, false
+	}
 	return str[start:idx], idx, state == 1
 }

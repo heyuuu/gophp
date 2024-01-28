@@ -247,7 +247,7 @@ func PhpStripcslashes(str string) string {
 
 	var buf strings.Builder
 	for i := 0; i < len(str); i++ {
-		if str[i] != '\\' || i+1 > len(str) {
+		if str[i] != '\\' || i+1 >= len(str) {
 			buf.WriteByte(str[i])
 			continue
 		}
@@ -289,18 +289,17 @@ func PhpStripcslashes(str string) string {
 		default:
 			// try \[0-7]{1,3}
 			octSize := 0
-			for octSize < 3 && i+octSize+1 < len(str) && '0' <= str[i+octSize+1] && str[i+octSize+1] <= '7' {
+			for octSize < 3 && i+octSize < len(str) && '0' <= str[i+octSize] && str[i+octSize] <= '7' {
 				octSize++
 			}
 			if octSize > 0 {
-				hexNum, _ := strconv.ParseInt(str[i+1:i+octSize+1], 8, 0)
+				hexNum, _ := strconv.ParseInt(str[i:i+octSize], 8, 0)
 				buf.WriteByte(byte(hexNum))
-				i += octSize
+				i += octSize - 1
 				break
 			}
 
 			// fallback
-			buf.WriteByte('\\')
 			buf.WriteByte(str[i])
 		}
 	}
@@ -714,9 +713,21 @@ func PhpStrspnEx(s1 string, s2 string) int {
 	}
 	return len(s1)
 }
+
+func strLenCheckNull(s string) int {
+	if idx := strings.IndexByte(s, 0); idx >= 0 {
+		return idx
+	} else {
+		return len(s)
+	}
+}
+
 func PhpStrcspnEx(s1 string, s2 string) int {
 	if s1 == "" {
 		return 0
+	}
+	if s2 == "" {
+		return strLenCheckNull(s1)
 	}
 	for i, c := range []byte(s1) {
 		if strings.ContainsRune(s2, rune(c)) {
@@ -845,7 +856,7 @@ func ZifStripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt,
 	}
 
 	needleStr, ok := parseNeedle(ctx, needle)
-	if !ok {
+	if !ok || needleStr == "" {
 		return 0, false
 	}
 
