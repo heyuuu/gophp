@@ -33,7 +33,7 @@ func (tester *zppTester) init() {
 	ctx.eh = tester.eh
 
 	fn := types.NewInternalFunction("mockFunc", nil, 0)
-	ex := NewExecuteData(ctx, tester.args, nil)
+	ex := NewExecuteData(ctx, fn, tester.args)
 	ex.fn = fn
 
 	tester.fpp = NewFastParamParser(ex, tester.minNumArgs, tester.maxNumArgs, tester.flags)

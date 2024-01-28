@@ -36,7 +36,16 @@ func ErrorAtNoreturn(ctx *Context, typ perr.ErrorType, lineno uint32, message st
 
 func ErrorDocRef(ctx *Context, docRef string, typ perr.ErrorType, buffer string, params ...string) {
 	// todo
-	message := fmt.Sprintf("%s: %s", buffer, strings.Join(params, ","))
+	ex := ctx.CurrEX()
+
+	var origin string
+	if ex != nil && ex.Fn() != nil && ex.CalleeName() != "" {
+		origin = fmt.Sprintf("%s(%s)", ex.CalleeName(), strings.Join(params, ","))
+	} else {
+		origin = "Unknown"
+	}
+
+	message := fmt.Sprintf("%s: %s", origin, buffer)
 	Error(ctx, typ, message)
 }
 

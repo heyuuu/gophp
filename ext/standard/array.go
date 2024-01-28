@@ -147,13 +147,13 @@ func ZifCount(ctx *php.Context, var_ *types.Zval, _ zpp.Opt, mode int) int {
 		return 1
 	}
 }
-func ZifNatsort(arg zpp.RefArray) bool {
-	cmp := getKeyCompareFunc(PHP_SORT_NATURAL, false)
+func ZifNatsort(ctx *php.Context, arg zpp.RefArray) bool {
+	cmp := getArrayValueComparer(ctx, PHP_SORT_NATURAL, false)
 	arg.Sort(cmp, false)
 	return true
 }
-func ZifNatcasesort(arg zpp.RefArray) bool {
-	cmp := getKeyCompareFunc(PHP_SORT_NATURAL|PHP_SORT_FLAG_CASE, false)
+func ZifNatcasesort(ctx *php.Context, arg zpp.RefArray) bool {
+	cmp := getArrayValueComparer(ctx, PHP_SORT_NATURAL|PHP_SORT_FLAG_CASE, false)
 	arg.Sort(cmp, false)
 	return true
 }

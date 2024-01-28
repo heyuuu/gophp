@@ -6,18 +6,18 @@ import (
 
 type ExecuteData struct {
 	ctx     *Context
+	fn      *types.Function
 	args    []types.Zval
 	symbols ISymtable
 	prev    *ExecuteData
-	fn      *types.Function
 }
 
-func NewExecuteData(ctx *Context, args []types.Zval, prev *ExecuteData) *ExecuteData {
+func NewExecuteData(ctx *Context, fn *types.Function, args []types.Zval) *ExecuteData {
 	return &ExecuteData{
 		ctx:     ctx,
 		args:    args,
 		symbols: NewSymtable(),
-		prev:    prev,
+		fn:      fn,
 	}
 }
 

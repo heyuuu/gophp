@@ -32,6 +32,8 @@ const PHP_PATHINFO_ALL = PHP_PATHINFO_DIRNAME | PHP_PATHINFO_BASENAME | PHP_PATH
 const _HEB_BLOCK_TYPE_ENG = 1
 const _HEB_BLOCK_TYPE_HEB = 2
 
+const defaultTrimCutset = " \n\r\t\v\x00"
+
 const (
 	CHAR_MAX    = 127
 	LC_CTYPE    = 2
@@ -398,42 +400,28 @@ func charmaskEx(input string, onError func(string)) (string, bool) {
 	return buf.String(), result
 }
 
-func PhpTrimAll(ctx *php.Context, str string, what *string) string {
-	var cutset = " \n\r\t\v\x00"
-	if what != nil {
-		cutset, _ = PhpCharmaskEx(ctx, *what)
+func ZifTrim(ctx *php.Context, ex *php.ExecuteData, str string, _ zpp.Opt, characterMask string) string {
+	var cutset = defaultTrimCutset
+	if ex.NumArgs() >= 2 {
+		cutset, _ = PhpCharmaskEx(ctx, characterMask)
 	}
 	return strings.Trim(str, cutset)
 }
-func PhpTrimLeft(ctx *php.Context, str string, what *string) string {
-	var cutset = " \n\r\t\v\x00"
-	if what != nil {
-		cutset, _ = PhpCharmaskEx(ctx, *what)
-	}
-	return strings.TrimLeft(str, cutset)
-}
-func PhpTrimRight(ctx *php.Context, str string, what *string) string {
-	var cutset = " \n\r\t\v\x00"
-	if what != nil {
-		cutset, _ = PhpCharmaskEx(ctx, *what)
+
+//@zif(alias="chop")
+func ZifRtrim(ctx *php.Context, ex *php.ExecuteData, str string, _ zpp.Opt, characterMask string) string {
+	var cutset = defaultTrimCutset
+	if ex.NumArgs() >= 2 {
+		cutset, _ = PhpCharmaskEx(ctx, characterMask)
 	}
 	return strings.TrimRight(str, cutset)
 }
-
-func PhpTrimRightEx(str string) string {
-	return strings.TrimRight(str, " \n\r\t\v\x00")
-}
-
-func ZifTrim(ctx *php.Context, str string, _ zpp.Opt, characterMask *string) string {
-	return PhpTrimAll(ctx, str, characterMask)
-}
-
-//@zif(alias="chop")
-func ZifRtrim(ctx *php.Context, str string, _ zpp.Opt, characterMask *string) string {
-	return PhpTrimRight(ctx, str, characterMask)
-}
-func ZifLtrim(ctx *php.Context, str string, _ zpp.Opt, characterMask *string) string {
-	return PhpTrimLeft(ctx, str, characterMask)
+func ZifLtrim(ctx *php.Context, ex *php.ExecuteData, str string, _ zpp.Opt, characterMask string) string {
+	var cutset = defaultTrimCutset
+	if ex.NumArgs() >= 2 {
+		cutset, _ = PhpCharmaskEx(ctx, characterMask)
+	}
+	return strings.TrimLeft(str, cutset)
 }
 
 func ZifWordwrap(ctx *php.Context, str string, _ zpp.Opt, width *int, break_ *string, cut bool) (string, bool) {
@@ -1533,7 +1521,7 @@ func strReplaceStr(ctx *php.Context, subject string, search types.Zval, replace 
 		var replaceStrings []string
 		var replaceStr string
 		if replace.IsArray() {
-			replaceStrings = make([]string, replace.Array().Len())
+			replaceStrings = make([]string, 0, replace.Array().Len())
 			replace.Array().Each(func(key types.ArrayKey, value types.Zval) {
 				replaceStrings = append(replaceStrings, php.ZvalGetStrVal(ctx, value))
 			})

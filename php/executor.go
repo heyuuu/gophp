@@ -43,15 +43,17 @@ func (e *Executor) function(fn *types.Function, args []types.Zval) types.Zval {
 	assert.Assert(fn != nil)
 
 	// push && pop executeData
-	e.executeData = NewExecuteData(e.ctx, args, e.executeData)
+	ex := NewExecuteData(e.ctx, fn, args)
+	e.ctx.EG().PushExecuteData(ex)
 	defer func() {
-		e.executeData = e.executeData.prev
+		popEx := e.ctx.EG().PopExecuteData()
+		assert.AssertEx(ex == popEx, "push & pop executeData 的 executeData 对象不相同，执行堆栈可能有错误")
 	}()
 
 	var retval types.Zval
 	if fn.IsInternalFunction() {
 		if handler, ok := fn.Handler().(ZifHandler); ok {
-			handler(e.executeData, &retval)
+			handler(ex, &retval)
 		} else {
 			perr.Panic(fmt.Sprintf("不支持的内部函数 handler 类型: %T", fn.Handler()))
 		}
@@ -97,7 +99,7 @@ func (e *Executor) globalSymbols() ISymtable {
 }
 
 func (e *Executor) currSymbols() ISymtable {
-	return e.executeData.symbols
+	return e.ctx.CurrEX().Symbols()
 }
 
 // -- echo node types

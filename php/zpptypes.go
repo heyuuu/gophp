@@ -17,7 +17,7 @@ func zppParseBoolWeak(ctx *Context, arg types.Zval) (dest bool, ok bool) {
 func zppParseLongWeak(ctx *Context, arg types.Zval, cap bool) (dest int, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
-		arg, _ = ParseNumberPrefix(arg.String())
+		arg = opParseNumberPrefix(ctx, arg.String(), false)
 		if arg.IsUndef() || ctx.EG().HasException() {
 			return // fail
 		}

@@ -24,11 +24,11 @@ func initContext(e *Engine, baseCtx *Context, request *http.Request, response ht
 	ctx := &Context{engine: e}
 	if baseCtx != nil {
 		ctx.cg.Init()
-		ctx.eg.Init(&baseCtx.eg)
+		ctx.eg.Init(ctx, &baseCtx.eg)
 		ctx.og.Init()
 	} else {
 		ctx.cg.Init()
-		ctx.eg.Init(nil)
+		ctx.eg.Init(ctx, nil)
 		ctx.og.Init()
 	}
 
@@ -44,6 +44,9 @@ func (c *Context) Engine() *Engine { return c.engine }
 func (c *Context) CG() *CompilerGlobals { return &c.cg }
 func (c *Context) EG() *ExecutorGlobals { return &c.eg }
 func (c *Context) OG() *OutputGlobals   { return &c.og }
+
+// fast functions
+func (c *Context) CurrEX() *ExecuteData { return c.eg.CurrentExecuteData() }
 
 // output
 func (c *Context) Write(data []byte)        { c.og.Write(data) }

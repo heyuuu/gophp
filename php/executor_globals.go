@@ -11,6 +11,7 @@ type ConstantTable = *types.Table[*types.Constant]
 
 // ExecutorGlobals
 type ExecutorGlobals struct {
+	ctx            *Context
 	errorSuppress  int
 	errorReporting int
 	precision      int
@@ -18,6 +19,8 @@ type ExecutorGlobals struct {
 	constantTable ConstantTable
 	functionTable FunctionTable
 	classTable    ClassTable
+
+	currentExecuteData *ExecuteData
 }
 
 func (e *ExecutorGlobals) ErrorReporting() int                  { return e.errorReporting }
@@ -25,7 +28,8 @@ func (e *ExecutorGlobals) SetErrorReporting(errorReporting int) { e.errorReporti
 func (e *ExecutorGlobals) Precision() int                       { return e.precision }
 func (e *ExecutorGlobals) SetPrecision(precision int)           { e.precision = precision }
 
-func (e *ExecutorGlobals) Init(base *ExecutorGlobals) {
+func (e *ExecutorGlobals) Init(ctx *Context, base *ExecutorGlobals) {
+	e.ctx = ctx
 	if base != nil {
 		e.constantTable = base.constantTable.Clone()
 		e.functionTable = base.functionTable.Clone()
@@ -66,4 +70,24 @@ func (e *ExecutorGlobals) ErrorSuppressScope(block func()) {
 	}()
 
 	block()
+}
+
+func (e *ExecutorGlobals) CurrentExecuteData() *ExecuteData {
+	return e.currentExecuteData
+}
+func (e *ExecutorGlobals) SetCurrentExecuteData(currentExecuteData *ExecuteData) {
+	e.currentExecuteData = currentExecuteData
+}
+
+func (e *ExecutorGlobals) PushExecuteData(ex *ExecuteData) {
+	ex.prev = e.currentExecuteData
+	e.currentExecuteData = ex
+}
+
+func (e *ExecutorGlobals) PopExecuteData() *ExecuteData {
+	result := e.currentExecuteData
+	if result != nil {
+		e.currentExecuteData = result.prev
+	}
+	return result
 }

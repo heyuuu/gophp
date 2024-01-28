@@ -148,7 +148,7 @@ func rawRunCode(code string) string {
 		code = "?>" + code
 	}
 
-	output, err := runCommand(5*time.Second, "php", "-r", code)
+	output, err := runCommand(5*time.Second, "php74", "-r", code)
 	if err != nil {
 		return output + "\n" + err.Error()
 	}
@@ -192,7 +192,7 @@ func runCommand(timeout time.Duration, name string, args ...string) (string, err
 
 	cmd := exec.CommandContext(ctx, name, args...)
 	log.Printf("run command: %s\n", cmd.String())
-	if output, err := cmd.CombinedOutput(); err == nil {
+	if output, err := cmd.Output(); err == nil {
 		return string(output), nil
 	} else if ctx.Err() != nil && errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return string(output), fmt.Errorf("run timeout: %w", err)

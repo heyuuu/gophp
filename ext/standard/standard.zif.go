@@ -72,7 +72,7 @@ var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{Name: "arg", ByR
 	if fp.HasError() {
 		return
 	}
-	ret := ZifNatsort(arg)
+	ret := ZifNatsort(executeData.Ctx(), arg)
 	returnValue.SetBool(ret)
 })
 
@@ -84,7 +84,7 @@ var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{Name: "a
 	if fp.HasError() {
 		return
 	}
-	ret := ZifNatcasesort(arg)
+	ret := ZifNatcasesort(executeData.Ctx(), arg)
 	returnValue.SetBool(ret)
 })
 
@@ -1475,11 +1475,11 @@ var DefZifTrim = def.DefFunc("trim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "
 	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
-	character_mask := fp.ParseStringNullable()
+	character_mask := fp.ParseString()
 	if fp.HasError() {
 		return
 	}
-	ret := ZifTrim(executeData.Ctx(), str, nil, character_mask)
+	ret := ZifTrim(executeData.Ctx(), executeData, str, nil, character_mask)
 	returnValue.SetString(ret)
 })
 
@@ -1489,11 +1489,11 @@ var DefZifRtrim = def.DefFunc("rtrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
-	character_mask := fp.ParseStringNullable()
+	character_mask := fp.ParseString()
 	if fp.HasError() {
 		return
 	}
-	ret := ZifRtrim(executeData.Ctx(), str, nil, character_mask)
+	ret := ZifRtrim(executeData.Ctx(), executeData, str, nil, character_mask)
 	returnValue.SetString(ret)
 })
 
@@ -1503,11 +1503,11 @@ var DefZifChop = def.DefFunc("chop", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "
 	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
-	character_mask := fp.ParseStringNullable()
+	character_mask := fp.ParseString()
 	if fp.HasError() {
 		return
 	}
-	ret := ZifRtrim(executeData.Ctx(), str, nil, character_mask)
+	ret := ZifRtrim(executeData.Ctx(), executeData, str, nil, character_mask)
 	returnValue.SetString(ret)
 })
 
@@ -1517,11 +1517,11 @@ var DefZifLtrim = def.DefFunc("ltrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 	fp.CheckNumArgs()
 	str := fp.ParseString()
 	fp.StartOptional()
-	character_mask := fp.ParseStringNullable()
+	character_mask := fp.ParseString()
 	if fp.HasError() {
 		return
 	}
-	ret := ZifLtrim(executeData.Ctx(), str, nil, character_mask)
+	ret := ZifLtrim(executeData.Ctx(), executeData, str, nil, character_mask)
 	returnValue.SetString(ret)
 })
 
