@@ -32,7 +32,7 @@ const PHP_PATHINFO_ALL = PHP_PATHINFO_DIRNAME | PHP_PATHINFO_BASENAME | PHP_PATH
 const _HEB_BLOCK_TYPE_ENG = 1
 const _HEB_BLOCK_TYPE_HEB = 2
 
-const defaultTrimCutset = " \n\r\t\v\x00"
+const spaceCutset = " \n\r\t\v\x00"
 
 const (
 	CHAR_MAX    = 127
@@ -401,7 +401,7 @@ func charmaskEx(input string, onError func(string)) (string, bool) {
 }
 
 func ZifTrim(ctx *php.Context, ex *php.ExecuteData, str string, _ zpp.Opt, characterMask string) string {
-	var cutset = defaultTrimCutset
+	var cutset = spaceCutset
 	if ex.NumArgs() >= 2 {
 		cutset, _ = PhpCharmaskEx(ctx, characterMask)
 	}
@@ -410,14 +410,14 @@ func ZifTrim(ctx *php.Context, ex *php.ExecuteData, str string, _ zpp.Opt, chara
 
 //@zif(alias="chop")
 func ZifRtrim(ctx *php.Context, ex *php.ExecuteData, str string, _ zpp.Opt, characterMask string) string {
-	var cutset = defaultTrimCutset
+	var cutset = spaceCutset
 	if ex.NumArgs() >= 2 {
 		cutset, _ = PhpCharmaskEx(ctx, characterMask)
 	}
 	return strings.TrimRight(str, cutset)
 }
 func ZifLtrim(ctx *php.Context, ex *php.ExecuteData, str string, _ zpp.Opt, characterMask string) string {
-	var cutset = defaultTrimCutset
+	var cutset = spaceCutset
 	if ex.NumArgs() >= 2 {
 		cutset, _ = PhpCharmaskEx(ctx, characterMask)
 	}
@@ -540,7 +540,7 @@ func ZifExplode(ctx *php.Context, separator string, str string, _ zpp.Opt, limit
 }
 
 //@zif(alias="join")
-func ZifImplode(ctx *php.Context, glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
+func ZifImplode(ctx *php.Context, glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) types.Zval {
 	var arg1 = glue_
 	var arg2 = pieces_
 	var pieces *types.Array
@@ -553,7 +553,7 @@ func ZifImplode(ctx *php.Context, glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Z
 	if arg2 == nil {
 		if !arg1.IsArray() {
 			php.ErrorDocRef(ctx, "", perr.E_WARNING, "Argument must be an array")
-			return ""
+			return types.Null
 		}
 		glue = ""
 		pieces = arg1.Array()
@@ -567,10 +567,11 @@ func ZifImplode(ctx *php.Context, glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Z
 			pieces = arg2.Array()
 		} else {
 			php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid arguments passed")
-			return ""
+			return types.Null
 		}
 	}
-	return PhpImplode(ctx, glue, pieces)
+	result := PhpImplode(ctx, glue, pieces)
+	return php.String(result)
 }
 func PhpImplode(ctx *php.Context, glue string, pieces *types.Array) string {
 	var parts []string
@@ -641,30 +642,25 @@ func PhpBasename(s string, suffix string) string {
 func ZifBasename(path string, _ zpp.Opt, suffix string) string {
 	return PhpBasename(path, suffix)
 }
-func ZifDirname(ctx *php.Context, path string, _ zpp.Opt, levels_ *int) string {
+func ZifDirname(ctx *php.Context, path string, _ zpp.Opt, levels_ *int) types.Zval {
 	var levels = 1
 	if levels_ != nil {
 		levels = *levels_
+		if levels < 1 {
+			php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid argument, levels must be >= 1")
+			return types.Null
+		}
 	}
 
-	if levels == 1 {
-		/* Default case */
-		return php.ZendDirname(path)
-	} else if levels < 1 {
-		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid argument, levels must be >= 1")
-		return ""
-	} else {
-		/* Some levels up */
-		dir := path
-		for i := 0; i < levels; i++ {
-			newDir := php.ZendDirname(dir)
-			if newDir == dir {
-				break
-			}
-			dir = newDir
+	dir := path
+	for i := 0; i < levels; i++ {
+		newDir := php.ZendDirname(dir)
+		if newDir == dir {
+			break
 		}
-		return dir
+		dir = newDir
 	}
+	return types.ZvalString(dir)
 }
 
 func ZifPathinfo(path string, _ zpp.Opt, options *int) types.Zval {

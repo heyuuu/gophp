@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/zpp"
 )
 
-var zifFunctions = []def.FuncType{DefZifGcMemCaches, DefZifGcCollectCycles, DefZifGcEnabled, DefZifGcStatus, DefZifStrlen, DefZifStrcmp, DefZifStrncmp, DefZifStrcasecmp, DefZifEach, DefZifErrorReporting}
+var zifFunctions = []def.FuncType{DefZifGcMemCaches, DefZifGcCollectCycles, DefZifGcEnabled, DefZifGcStatus, DefZifStrlen, DefZifStrcmp, DefZifStrncmp, DefZifStrcasecmp, DefZifEach, DefZifErrorReporting, DefZifFunctionExists}
 
 // generate by ZifGcMemCaches
 var DefZifGcMemCaches = def.DefFunc("gc_mem_caches", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
@@ -135,4 +135,16 @@ var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{N
 	}
 	ret := ZifErrorReporting(executeData.Ctx(), returnValue, nil, new_error_level)
 	returnValue.SetLong(ret)
+})
+
+// generate by ZifFunctionExists
+var DefZifFunctionExists = def.DefFunc("function_exists", 1, 1, []def.ArgInfo{{Name: "function_name"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
+	function_name := fp.ParseString()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifFunctionExists(executeData.Ctx(), function_name)
+	returnValue.SetBool(ret)
 })

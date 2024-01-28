@@ -85,6 +85,7 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 	if err != nil {
 		return NewTestResult(tc, FAIL, "run code failed: "+err.Error(), 0)
 	}
+	output = strings.ReplaceAll(output, "\r\n", "\n")
 
 	var pass bool
 	var reason string

@@ -128,6 +128,14 @@ func (p *formatPrinter) AppendDouble(number float64, width int, precision int, f
 		p.AppendString("INF", 3, number < 0)
 		return
 	}
+
+	if p.flags.adjusting&ADJ_PRECISION == 0 {
+		precision = FLOAT_PRECISION
+	} else if precision > MAX_FLOAT_PRECISION {
+		php.ErrorDocRef(p.ctx, "", perr.E_NOTICE, fmt.Sprintf("Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, MAX_FLOAT_PRECISION))
+		precision = MAX_FLOAT_PRECISION
+	}
+
 	str := strconv.FormatFloat(number, fmtTyp, precision, 64)
 
 	// fix: 科学计数法且位数为指数个位数时，go 默认会补齐到2位，但 php 保持位数不变。此处修复此差别
@@ -247,6 +255,7 @@ func PhpFormattedPrint(ctx *php.Context, formatZval types.Zval, args []types.Zva
 				if num, n, ok := sprintfReadNumber(format); ok {
 					width = num
 					format = format[n:]
+					p.flags.adjusting |= ADJ_WIDTH
 				} else {
 					php.ErrorDocRef(ctx, "", perr.E_WARNING, fmt.Sprintf("Width must be greater than zero and less than %d", types.MaxLong))
 					return "", false
@@ -261,6 +270,7 @@ func PhpFormattedPrint(ctx *php.Context, formatZval types.Zval, args []types.Zva
 					if num, n, ok := sprintfReadNumber(format); ok {
 						precision = num
 						format = format[n:]
+						p.flags.adjusting |= ADJ_PRECISION
 					} else {
 						php.ErrorDocRef(ctx, "", perr.E_WARNING, fmt.Sprintf("Precision must be greater than zero and less than %d", types.MaxLong))
 						return "", false

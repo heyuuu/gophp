@@ -6,7 +6,6 @@ import (
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
-	"strings"
 )
 
 //func ZifZendVersion() string  { return php.ZEND_VERSION }
@@ -30,8 +29,10 @@ func ZifGcStatus() *types.Array {
 	return arr
 }
 
-func ZifStrlen(str string) int               { return len(str) }
-func ZifStrcmp(str1 string, str2 string) int { return strings.Compare(str1, str2) }
+func ZifStrlen(str string) int { return len(str) }
+func ZifStrcmp(str1 string, str2 string) int {
+	return compatibleStringCompare(str1, str2)
+}
 func ZifStrncmp(ctx *php.Context, str1 string, str2 string, len_ int) (int, bool) {
 	if len_ < 0 {
 		php.Error(ctx, perr.E_WARNING, "Length must be greater than or equal to 0")
@@ -43,10 +44,23 @@ func ZifStrncmp(ctx *php.Context, str1 string, str2 string, len_ int) (int, bool
 	if len(str2) > len_ {
 		str2 = str2[:len_]
 	}
-	return strings.Compare(str1, str2), true
+	return compatibleStringCompare(str1, str2), true
 }
 func ZifStrcasecmp(str1 string, str2 string) int {
-	return ascii.StrCaseCompare(str1, str2)
+	str1 = ascii.StrToLower(str1)
+	str2 = ascii.StrToLower(str2)
+	return compatibleStringCompare(str1, str2)
+}
+
+func compatibleStringCompare(s1, s2 string) int {
+	// notice: 在 PHP < 8.2.0 的版本，返回值范围很大而非限定 -1/0/1，故不能直接使用 strings.Compare
+	for i := 0; i < len(s1) && i < len(s2); i++ {
+		diff := int(s1[i]) - int(s2[i])
+		if diff != 0 {
+			return diff
+		}
+	}
+	return len(s1) - len(s2)
 }
 
 //@zif(oldMode="z/")
@@ -97,4 +111,23 @@ func ZifErrorReporting(ctx *php.Context, ret zpp.Ret, _ zpp.Opt, newErrorLevel *
 		ctx.EG().SetErrorReporting(newVal)
 	}
 	return oldVal
+}
+
+func ZifFunctionExists(ctx *php.Context, functionName string) bool {
+	var func_ *types.Function
+	var lcname string
+	if functionName[0] == '\\' {
+		lcname = ascii.StrToLower(functionName[1:])
+	} else {
+		lcname = ascii.StrToLower(functionName)
+	}
+
+	func_ = ctx.EG().FunctionTable().Get(lcname)
+
+	/*
+	 * A bit of a hack, but not a bad one: we see if the handler of the function
+	 * is actually one that displays "function is disabled" message.
+	 */
+	return func_ != nil
+	//return func_ != nil && !php.IsDisabledFunction(func_)
 }
