@@ -493,18 +493,15 @@ func (p *FastParamParser) ParseCallable() *types.UserCallable {
 
 // @see Micro: Z_PARAM_ZVAL，Old: 'z'
 func (p *FastParamParser) ParseZval() (dest types.Zval) {
-	dest, _ = p.parseZvalEx(false, false)
+	dest, _ = p.parseZvalEx2(false, true, false)
 	return
 }
 func (p *FastParamParser) ParseZvalNullable() *types.Zval {
-	dest, isNull := p.parseZvalEx(true, false)
+	dest, isNull := p.parseZvalEx2(true, true, false)
 	if isNull {
 		return nil
 	}
 	return &dest
-}
-func (p *FastParamParser) parseZvalEx(checkNull bool, separate bool) (dest types.Zval, isNull bool) {
-	return p.parseZvalEx2(checkNull, separate, separate)
 }
 func (p *FastParamParser) parseZvalEx2(checkNull bool, deref bool, separate bool) (dest types.Zval, isNull bool) {
 	arg, ok := p.nextArg(deref, separate)
@@ -547,7 +544,7 @@ func (p *FastParamParser) eachVariadic(postVarargs uint, h func(arg types.Zval))
 
 func (p *FastParamParser) ParseRefZval() types.RefZval {
 	// todo ref 处理
-	v, _ := p.parseZvalEx(false, false)
+	v, _ := p.parseZvalEx2(false, false, false)
 	return p.asRefZval(v)
 }
 func (p *FastParamParser) ParseRefArrayOrObject() types.RefZval {

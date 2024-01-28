@@ -1469,7 +1469,7 @@ func TestFastParamParser_ParseArray(t *testing.T) {
 			tester.checkError(t, tt.log)
 			var simpleGot any = lang.CondF1(got != nil, func() any { return got.Pairs() }, any(nil))
 			if !reflect.DeepEqual(simpleGot, tt.want) {
-				t.Errorf("ParsePathNullable() = %v, want %v", got, tt.want)
+				t.Errorf("ParseArray() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -1544,7 +1544,146 @@ func TestFastParamParser_ParseArrayNullable(t *testing.T) {
 			tester.checkError(t, tt.log)
 			var simpleGot any = lang.CondF1(got != nil, func() any { return got.Pairs() }, any(nil))
 			if !reflect.DeepEqual(simpleGot, tt.want) {
-				t.Errorf("ParsePathNullable() = %v, want %v", got, tt.want)
+				t.Errorf("ParseArrayNullable() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// ParseZval
+func testFastParamParser_deepEqualsZval(v1, v2 types.Zval) bool {
+	if reflect.DeepEqual(v1, v2) {
+		return true
+	}
+	if v1.IsArray() && v2.IsArray() {
+		return reflect.DeepEqual(v1.Array().Pairs(), v2.Array().Pairs())
+	}
+	return false
+}
+func testFastParamParser_deepEqualsZvalPtr(v1, v2 *types.Zval) bool {
+	if v1 == nil || v2 == nil {
+		return v1 == v2
+	}
+	return testFastParamParser_deepEqualsZval(*v1, *v2)
+}
+
+func TestFastParamParser_ParseZval(t *testing.T) {
+	refArgs := func(args ...types.Zval) []types.Zval {
+		refArgs := make([]types.Zval, len(args))
+		for i, arg := range args {
+			refArgs[i] = types.ZvalRef(types.NewReference(arg))
+		}
+		return refArgs
+	}
+	baseTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: args, strict: false}
+	}
+	refTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: false}
+	}
+	tests := []struct {
+		name   string
+		tester zppTester
+		want   types.Zval
+		log    string
+	}{
+		// base-type
+		{"type-undef", baseTester(types.Undef), types.Null, ""},
+		{"type-null", baseTester(types.Null), types.Null, ""},
+		{"type-false", baseTester(types.False), types.False, ""},
+		{"type-true", baseTester(types.True), types.True, ""},
+		{"type-long-0", baseTester(types.ZvalLong(0)), types.ZvalLong(0), ""},
+		{"type-long-1", baseTester(types.ZvalLong(5)), types.ZvalLong(5), ""},
+		{"type-double-0", baseTester(types.ZvalDouble(0)), types.ZvalDouble(0), ""},
+		{"type-double-1", baseTester(types.ZvalDouble(5)), types.ZvalDouble(5), ""},
+		{"type-string-0", baseTester(types.ZvalString("")), types.ZvalString(""), ""},
+		{"type-string-1", baseTester(types.ZvalString("0")), types.ZvalString("0"), ""},
+		{"type-string-2", baseTester(types.ZvalString("00")), types.ZvalString("00"), ""},
+		{"type-array-0", baseTester(types.ZvalArray(types.NewArray())), types.ZvalArray(types.NewArray()), ""},
+		{"type-array-1", baseTester(types.ZvalArray(types.NewArrayOf(types.Null))), types.ZvalArray(types.NewArrayOf(types.Null)), ""},
+		// ref-type
+		{"type-undef", refTester(types.Undef), types.Null, ""},
+		{"type-null", refTester(types.Null), types.Null, ""},
+		{"type-false", refTester(types.False), types.False, ""},
+		{"type-true", refTester(types.True), types.True, ""},
+		{"type-long-0", refTester(types.ZvalLong(0)), types.ZvalLong(0), ""},
+		{"type-long-1", refTester(types.ZvalLong(5)), types.ZvalLong(5), ""},
+		{"type-double-0", refTester(types.ZvalDouble(0)), types.ZvalDouble(0), ""},
+		{"type-double-1", refTester(types.ZvalDouble(5)), types.ZvalDouble(5), ""},
+		{"type-string-0", refTester(types.ZvalString("")), types.ZvalString(""), ""},
+		{"type-string-1", refTester(types.ZvalString("0")), types.ZvalString("0"), ""},
+		{"type-string-2", refTester(types.ZvalString("00")), types.ZvalString("00"), ""},
+		{"type-array-0", baseTester(types.ZvalArray(types.NewArray())), types.ZvalArray(types.NewArray()), ""},
+		{"type-array-1", baseTester(types.ZvalArray(types.NewArrayOf(types.Null))), types.ZvalArray(types.NewArrayOf(types.Null)), ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := tt.tester
+			got := tester.parser().ParseZval()
+			tester.checkError(t, tt.log)
+			if !testFastParamParser_deepEqualsZval(got, tt.want) {
+				t.Errorf("ParseZval() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFastParamParser_ParseZvalNullable(t *testing.T) {
+	refArgs := func(args ...types.Zval) []types.Zval {
+		refArgs := make([]types.Zval, len(args))
+		for i, arg := range args {
+			refArgs[i] = types.ZvalRef(types.NewReference(arg))
+		}
+		return refArgs
+	}
+	baseTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: args, strict: false}
+	}
+	refTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: false}
+	}
+	tests := []struct {
+		name   string
+		tester zppTester
+		want   *types.Zval
+		log    string
+	}{
+		// base-type
+		{"type-undef", baseTester(types.Undef), nil, ""},
+		{"type-null", baseTester(types.Null), nil, ""},
+		{"type-false", baseTester(types.False), types.NewZvalFalse(), ""},
+		{"type-true", baseTester(types.True), types.NewZvalTrue(), ""},
+		{"type-long-0", baseTester(types.ZvalLong(0)), types.NewZvalLong(0), ""},
+		{"type-long-1", baseTester(types.ZvalLong(5)), types.NewZvalLong(5), ""},
+		{"type-double-0", baseTester(types.ZvalDouble(0)), types.NewZvalDouble(0), ""},
+		{"type-double-1", baseTester(types.ZvalDouble(5)), types.NewZvalDouble(5), ""},
+		{"type-string-0", baseTester(types.ZvalString("")), types.NewZvalString(""), ""},
+		{"type-string-1", baseTester(types.ZvalString("0")), types.NewZvalString("0"), ""},
+		{"type-string-2", baseTester(types.ZvalString("00")), types.NewZvalString("00"), ""},
+		{"type-array-0", baseTester(types.ZvalArray(types.NewArray())), types.NewZvalArray(types.NewArray()), ""},
+		{"type-array-1", baseTester(types.ZvalArray(types.NewArrayOf(types.Null))), types.NewZvalArray(types.NewArrayOf(types.Null)), ""},
+		// ref-type
+		{"type-undef", refTester(types.Undef), nil, ""},
+		{"type-null", refTester(types.Null), nil, ""},
+		{"type-false", refTester(types.False), types.NewZvalFalse(), ""},
+		{"type-true", refTester(types.True), types.NewZvalTrue(), ""},
+		{"type-long-0", refTester(types.ZvalLong(0)), types.NewZvalLong(0), ""},
+		{"type-long-1", refTester(types.ZvalLong(5)), types.NewZvalLong(5), ""},
+		{"type-double-0", refTester(types.ZvalDouble(0)), types.NewZvalDouble(0), ""},
+		{"type-double-1", refTester(types.ZvalDouble(5)), types.NewZvalDouble(5), ""},
+		{"type-string-0", refTester(types.ZvalString("")), types.NewZvalString(""), ""},
+		{"type-string-1", refTester(types.ZvalString("0")), types.NewZvalString("0"), ""},
+		{"type-string-2", refTester(types.ZvalString("00")), types.NewZvalString("00"), ""},
+		{"type-array-0", baseTester(types.ZvalArray(types.NewArray())), types.NewZvalArray(types.NewArray()), ""},
+		{"type-array-1", baseTester(types.ZvalArray(types.NewArrayOf(types.Null))), types.NewZvalArray(types.NewArrayOf(types.Null)), ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := tt.tester
+			got := tester.parser().ParseZvalNullable()
+			tester.checkError(t, tt.log)
+			if !testFastParamParser_deepEqualsZvalPtr(got, tt.want) {
+				t.Errorf("ParseZval() = %v, want %v", got, tt.want)
 			}
 		})
 	}
