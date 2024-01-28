@@ -93,6 +93,8 @@ func uudecode(src string) (string, bool) {
 	}
 	return buf.String()[:totalLen], true
 }
+
+//@zif(onError=1)
 func ZifConvertUuencode(data string) (string, bool) {
 	// notice: PHP < 8.0 时，对空字符串输入会返回 false, >= 8.0 后取消了这个逻辑
 	if len(data) == 0 {
@@ -100,6 +102,8 @@ func ZifConvertUuencode(data string) (string, bool) {
 	}
 	return uuencode(data), true
 }
+
+//@zif(onError=1)
 func ZifConvertUudecode(ctx *php.Context, data string) (string, bool) {
 	if len(data) == 0 {
 		return "", false

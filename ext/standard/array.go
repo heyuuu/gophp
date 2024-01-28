@@ -72,11 +72,14 @@ func RegisterArrayConstants(ctx *php.Context, moduleNumber int) {
 	php.RegisterConstant(ctx, moduleNumber, "ARRAY_FILTER_USE_KEY", php.Long(ARRAY_FILTER_USE_KEY))
 }
 
+//@zif(onError=1)
 func ZifKrsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getKeyCompareFunc(sortFlags, true)
 	arg.Sort(cmp, false)
 	return true
 }
+
+//@zif(onError=1)
 func ZifKsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getKeyCompareFunc(sortFlags, false)
 	arg.Sort(cmp, false)
@@ -157,21 +160,29 @@ func ZifNatcasesort(ctx *php.Context, arg zpp.RefArray) bool {
 	arg.Sort(cmp, false)
 	return true
 }
+
+//@zif(onError=1)
 func ZifAsort(ctx *php.Context, arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getArrayValueComparer(ctx, sortFlags, false)
 	arg.Sort(cmp, false)
 	return true
 }
+
+//@zif(onError=1)
 func ZifArsort(ctx *php.Context, arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getArrayValueComparer(ctx, sortFlags, true)
 	arg.Sort(cmp, false)
 	return true
 }
+
+//@zif(onError=1)
 func ZifSort(ctx *php.Context, arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getArrayValueComparer(ctx, sortFlags, false)
 	arg.Sort(cmp, true)
 	return true
 }
+
+//@zif(onError=1)
 func ZifRsort(ctx *php.Context, arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getArrayValueComparer(ctx, sortFlags, true)
 	arg.Sort(cmp, true)
@@ -554,6 +565,7 @@ func rangeChar(low byte, high byte, step int) ([]types.Zval, bool) {
 	return arr, true
 }
 
+//@zif(onError=1)
 func ZifRange(ctx *php.Context, low types.Zval, high types.Zval, _ zpp.Opt, step types.Zval) ([]types.Zval, bool) {
 	var isStepDouble = false
 	var stepVal = 1.0
@@ -612,6 +624,8 @@ func arrayDataShuffle(ctx *php.Context, array *types.Array) *types.Array {
 	}
 	return types.NewArrayOfZval(values)
 }
+
+//@zif(onError=1)
 func ZifShuffle(ctx *php.Context, arg zpp.RefArray) bool {
 	if arg.Len() > 1 {
 		arg.SetDataByArray(arrayDataShuffle(ctx, arg))

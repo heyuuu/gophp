@@ -74,6 +74,8 @@ func ZifFloatval(ctx *php.Context, var_ types.Zval) float64 {
 func ZifBoolval(ctx *php.Context, var_ types.Zval) bool {
 	return php.ZvalIsTrue(ctx, var_)
 }
+
+//@zif(onError=1)
 func ZifStrval(ctx *php.Context, var_ types.Zval) string {
 	return php.ZvalGetStrVal(ctx, var_)
 }
@@ -91,6 +93,8 @@ func ZifIsResource(var_ *types.Zval) bool {
 
 	return false
 }
+
+//@zif(onError=1)
 func ZifIsBool(var_ *types.Zval) bool {
 	return var_.IsBool()
 }

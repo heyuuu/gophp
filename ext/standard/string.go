@@ -857,6 +857,8 @@ func ZifStripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt,
 		return 0, false
 	}
 }
+
+//@zif(onError=1)
 func ZifStrrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok {
@@ -894,6 +896,8 @@ func ZifStrrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt,
 		}
 	}
 }
+
+//@zif(onError=1)
 func ZifStrripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok {
@@ -1191,6 +1195,8 @@ func ZifOrd(character string) int {
 	}
 	return int(character[0])
 }
+
+//@zif(onError=2)
 func ZifChr(codepoint int) string {
 	c := byte(codepoint & 0xff)
 	return string([]byte{c})
@@ -2327,6 +2333,8 @@ func ZifStrSplit(ctx *php.Context, str string, _ zpp.Opt, splitLength_ *int) ([]
 	}
 	return result, true
 }
+
+//@zif(onError=1)
 func ZifStrpbrk(ctx *php.Context, haystack string, charList string) (string, bool) {
 	if charList == "" {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "The character list cannot be empty")
@@ -2337,6 +2345,8 @@ func ZifStrpbrk(ctx *php.Context, haystack string, charList string) (string, boo
 	}
 	return "", false
 }
+
+//@zif(onError=1)
 func ZifSubstrCompare(ctx *php.Context, return_value zpp.Ret, haystack string, needle string, offset int, _ zpp.Opt, length *int, caseInsensitivity bool) (int, bool) {
 	// check length
 	if length != nil && *length <= 0 {

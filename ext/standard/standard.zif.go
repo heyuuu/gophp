@@ -16,6 +16,7 @@ var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifKrsort(arg, nil, sort_flags)
@@ -30,6 +31,7 @@ var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: 
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifKsort(arg, nil, sort_flags)
@@ -96,6 +98,7 @@ var DefZifAsort = def.DefFunc("asort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: 
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifAsort(executeData.Ctx(), arg, nil, sort_flags)
@@ -110,6 +113,7 @@ var DefZifArsort = def.DefFunc("arsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifArsort(executeData.Ctx(), arg, nil, sort_flags)
@@ -124,6 +128,7 @@ var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: tr
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifSort(executeData.Ctx(), arg, nil, sort_flags)
@@ -138,6 +143,7 @@ var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: 
 	fp.StartOptional()
 	sort_flags := fp.ParseLong()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifRsort(executeData.Ctx(), arg, nil, sort_flags)
@@ -401,6 +407,7 @@ var DefZifRange = def.DefFunc("range", 2, 3, []def.ArgInfo{{Name: "low"}, {Name:
 	fp.StartOptional()
 	step := fp.ParseZval()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifRange(executeData.Ctx(), low, high, nil, step)
@@ -417,6 +424,7 @@ var DefZifShuffle = def.DefFunc("shuffle", 1, 1, []def.ArgInfo{{Name: "arg", ByR
 	fp.CheckNumArgs()
 	arg := fp.ParseRefArray()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifShuffle(executeData.Ctx(), arg)
@@ -1177,6 +1185,7 @@ var DefZifSprintf = def.DefFunc("sprintf", 1, -1, []def.ArgInfo{{Name: "format"}
 	fp.StartOptional()
 	args := fp.ParseVariadic(0)
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifSprintf(executeData.Ctx(), format, nil, args)
@@ -1194,6 +1203,7 @@ var DefZifVsprintf = def.DefFunc("vsprintf", 2, 2, []def.ArgInfo{{Name: "format"
 	format := fp.ParseZval()
 	args := fp.ParseZval()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifVsprintf(executeData.Ctx(), format, args)
@@ -1212,6 +1222,7 @@ var DefZifPrintf = def.DefFunc("printf", 1, -1, []def.ArgInfo{{Name: "format"}, 
 	fp.StartOptional()
 	args := fp.ParseVariadic(0)
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifPrintf(executeData.Ctx(), format, nil, args)
@@ -1229,6 +1240,7 @@ var DefZifVprintf = def.DefFunc("vprintf", 2, 2, []def.ArgInfo{{Name: "format"},
 	format := fp.ParseZval()
 	args := fp.ParseZval()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifVprintf(executeData.Ctx(), format, args)
@@ -1575,7 +1587,7 @@ var DefZifImplode = def.DefFunc("implode", 1, 2, []def.ArgInfo{{Name: "glue"}, {
 		return
 	}
 	ret := ZifImplode(executeData.Ctx(), glue_, nil, pieces_)
-	returnValue.SetString(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifImplode
@@ -1589,7 +1601,7 @@ var DefZifJoin = def.DefFunc("join", 1, 2, []def.ArgInfo{{Name: "glue"}, {Name: 
 		return
 	}
 	ret := ZifImplode(executeData.Ctx(), glue_, nil, pieces_)
-	returnValue.SetString(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifStrtok
@@ -1659,7 +1671,7 @@ var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{Name: "path"}, {
 		return
 	}
 	ret := ZifDirname(executeData.Ctx(), path, nil, levels_)
-	returnValue.SetString(ret)
+	returnValue.SetBy(ret)
 })
 
 // generate by ZifPathinfo
@@ -1780,6 +1792,7 @@ var DefZifStrrpos = def.DefFunc("strrpos", 2, 3, []def.ArgInfo{{Name: "haystack"
 	fp.StartOptional()
 	offset := fp.ParseLong()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrrpos(executeData.Ctx(), haystack, needle, nil, offset)
@@ -1799,6 +1812,7 @@ var DefZifStrripos = def.DefFunc("strripos", 2, 3, []def.ArgInfo{{Name: "haystac
 	fp.StartOptional()
 	offset := fp.ParseLong()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrripos(executeData.Ctx(), haystack, needle, nil, offset)
@@ -1912,9 +1926,6 @@ var DefZifChr = def.DefFunc("chr", 1, 1, []def.ArgInfo{{Name: "codepoint"}}, fun
 	fp := php.NewParamParser(executeData, 1, 1, 0)
 	fp.CheckNumArgs()
 	codepoint := fp.ParseLong()
-	if fp.HasError() {
-		return
-	}
 	ret := ZifChr(codepoint)
 	returnValue.SetString(ret)
 })
@@ -2315,6 +2326,7 @@ var DefZifStrpbrk = def.DefFunc("strpbrk", 2, 2, []def.ArgInfo{{Name: "haystack"
 	haystack := fp.ParseString()
 	char_list := fp.ParseString()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifStrpbrk(executeData.Ctx(), haystack, char_list)
@@ -2336,6 +2348,7 @@ var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Nam
 	length := fp.ParseLongNullable()
 	case_insensitivity := fp.ParseBool()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifSubstrCompare(executeData.Ctx(), returnValue, haystack, needle, offset, nil, length, case_insensitivity)
@@ -2427,6 +2440,7 @@ var DefZifStrval = def.DefFunc("strval", 1, 1, []def.ArgInfo{{Name: "var"}}, fun
 	fp.CheckNumArgs()
 	var_ := fp.ParseZval()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifStrval(executeData.Ctx(), var_)
@@ -2463,6 +2477,7 @@ var DefZifIsBool = def.DefFunc("is_bool", 1, 1, []def.ArgInfo{{Name: "var"}}, fu
 	fp.CheckNumArgs()
 	var_ := fp.ParseZvalNullable()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret := ZifIsBool(var_)
@@ -2609,6 +2624,7 @@ var DefZifConvertUuencode = def.DefFunc("convert_uuencode", 1, 1, []def.ArgInfo{
 	fp.CheckNumArgs()
 	data := fp.ParseString()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifConvertUuencode(data)
@@ -2625,6 +2641,7 @@ var DefZifConvertUudecode = def.DefFunc("convert_uudecode", 1, 1, []def.ArgInfo{
 	fp.CheckNumArgs()
 	data := fp.ParseString()
 	if fp.HasError() {
+		returnValue.SetFalse()
 		return
 	}
 	ret, ok := ZifConvertUudecode(executeData.Ctx(), data)
