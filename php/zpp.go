@@ -12,7 +12,7 @@ import (
 // @see Micro CHECK_NULL_PATH
 func CheckNullPath(s string) bool {
 	// 确认字符串是二进制安全的(即不包含 \0 字符)
-	return strings.ContainsRune(s, 0)
+	return !strings.ContainsRune(s, 0)
 }
 
 /* Fast parameter parsing API */
@@ -338,14 +338,14 @@ func (p *FastParamParser) ParsePath() (dest string) {
 	return
 }
 func (p *FastParamParser) ParsePathNullable() *string {
-	dest, isNull := p.parsePathEx(false, false)
+	dest, isNull := p.parsePathEx(true, false)
 	if isNull {
 		return nil
 	}
 	return &dest
 }
 func (p *FastParamParser) parsePathEx(checkNull bool, separate bool) (dest string, isNull bool) {
-	arg, ok := p.nextArg(separate, separate)
+	arg, ok := p.nextArg(true, separate)
 	if !ok {
 		return "", true
 	}
@@ -379,17 +379,19 @@ func (p *FastParamParser) ParseArrayNullable() (dest *types.Array) {
 	return p.parseArrayEx(true, false)
 }
 func (p *FastParamParser) parseArrayEx(checkNull bool, separate bool) (dest *types.Array) {
-	arg, ok := p.nextArg(separate, separate)
+	arg, ok := p.nextArg(true, separate)
 	if !ok {
-		return
+		return nil
 	}
 
-	dest, ok = zppParseArrayHt(arg, checkNull, false, separate)
-	if !ok {
+	if arg.IsArray() {
+		return arg.Array()
+	} else if checkNull && arg.IsNull() {
+		return nil
+	} else {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
+		return nil
 	}
-
-	return
 }
 
 // @see Micro: Z_PARAM_ARRAY_OR_OBJECT_HT，Old: 'H'

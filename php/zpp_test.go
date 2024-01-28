@@ -3,6 +3,7 @@ package php
 import (
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -1138,6 +1139,412 @@ func TestFastParamParser_ParseStringNullable_reftype(t *testing.T) {
 			var simpleGot any = lang.CondF1(got != nil, func() any { return *got }, any(nil))
 			if simpleGot != tt.want {
 				t.Errorf("ParseStringNullable() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// ParsePath
+
+func TestFastParamParser_ParsePath_basetype(t *testing.T) {
+	weakTester := func(args ...types.Zval) zppTester { return zppTester{args: args, strict: false} }
+	weakError := func(typ string) string {
+		return "E_WARNING: mockFunc() expects parameter 1 to be a valid path, " + typ + " given"
+	}
+	strictTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: args, strict: true}
+	}
+	strictError := func(typ string) string {
+		return "Exception: (0) mockFunc() expects parameter 1 to be a valid path, " + typ + " given"
+	}
+	tests := []struct {
+		name   string
+		tester zppTester
+		want   any
+		log    string
+	}{
+		// weak
+		{"type-undef", weakTester(types.Undef), "", ""},
+		{"type-null", weakTester(types.Null), "", ""},
+		{"type-false", weakTester(types.False), "", ""},
+		{"type-true", weakTester(types.True), "1", ""},
+		{"type-long-0", weakTester(types.ZvalLong(0)), "0", ""},
+		{"type-long-1", weakTester(types.ZvalLong(5)), "5", ""},
+		{"type-double-0", weakTester(types.ZvalDouble(0)), "0", ""},
+		{"type-double-1", weakTester(types.ZvalDouble(5)), "5", ""},
+		{"type-string-0", weakTester(types.ZvalString("")), "", ""},
+		{"type-string-1", weakTester(types.ZvalString("0")), "0", ""},
+		{"type-string-2", weakTester(types.ZvalString("00")), "00", ""},
+		{"type-array-0", weakTester(types.ZvalArray(types.NewArray())), "", weakError("array")},
+		{"type-array-1", weakTester(types.ZvalArray(types.NewArrayOf(types.Null))), "", weakError("array")},
+		// strict
+		{"strict-type-undef", strictTester(types.Undef), "", strictError("null")},
+		{"strict-type-null", strictTester(types.Null), "", strictError("null")},
+		{"strict-type-false", strictTester(types.False), "", strictError("bool")},
+		{"strict-type-true", strictTester(types.True), "", strictError("bool")},
+		{"strict-type-long-0", strictTester(types.ZvalLong(0)), "", strictError("int")},
+		{"strict-type-long-1", strictTester(types.ZvalLong(5)), "", strictError("int")},
+		{"strict-type-double-0", strictTester(types.ZvalDouble(0)), "", strictError("float")},
+		{"strict-type-double-1", strictTester(types.ZvalDouble(5)), "", strictError("float")},
+		{"strict-type-string-0", strictTester(types.ZvalString("")), "", ""},
+		{"strict-type-string-1", strictTester(types.ZvalString("0")), "0", ""},
+		{"strict-type-string-2", strictTester(types.ZvalString("00")), "00", ""},
+		{"strict-type-array-0", strictTester(types.ZvalArray(types.NewArray())), "", strictError("array")},
+		{"strict-type-array-1", strictTester(types.ZvalArray(types.NewArrayOf(types.Null))), "", strictError("array")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := tt.tester
+			got := tester.parser().ParsePath()
+			tester.checkError(t, tt.log)
+			if got != tt.want {
+				t.Errorf("ParsePath() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFastParamParser_ParsePath_reftype(t *testing.T) {
+	refArgs := func(args ...types.Zval) []types.Zval {
+		refArgs := make([]types.Zval, len(args))
+		for i, arg := range args {
+			refArgs[i] = types.ZvalRef(types.NewReference(arg))
+		}
+		return refArgs
+	}
+	weakTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: false}
+	}
+	weakError := func(typ string) string {
+		return "E_WARNING: mockFunc() expects parameter 1 to be a valid path, " + typ + " given"
+	}
+	strictTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: true}
+	}
+	strictError := func(typ string) string {
+		return "Exception: (0) mockFunc() expects parameter 1 to be a valid path, " + typ + " given"
+	}
+	tests := []struct {
+		name   string
+		tester zppTester
+		want   any
+		log    string
+	}{
+		// weak
+		{"type-undef", weakTester(types.Undef), "", ""},
+		{"type-null", weakTester(types.Null), "", ""},
+		{"type-false", weakTester(types.False), "", ""},
+		{"type-true", weakTester(types.True), "1", ""},
+		{"type-long-0", weakTester(types.ZvalLong(0)), "0", ""},
+		{"type-long-1", weakTester(types.ZvalLong(5)), "5", ""},
+		{"type-double-0", weakTester(types.ZvalDouble(0)), "0", ""},
+		{"type-double-1", weakTester(types.ZvalDouble(5)), "5", ""},
+		{"type-string-0", weakTester(types.ZvalString("")), "", ""},
+		{"type-string-1", weakTester(types.ZvalString("0")), "0", ""},
+		{"type-string-2", weakTester(types.ZvalString("00")), "00", ""},
+		{"type-array-0", weakTester(types.ZvalArray(types.NewArray())), "", weakError("array")},
+		{"type-array-1", weakTester(types.ZvalArray(types.NewArrayOf(types.Null))), "", weakError("array")},
+		// strict
+		{"strict-type-undef", strictTester(types.Undef), "", strictError("null")},
+		{"strict-type-null", strictTester(types.Null), "", strictError("null")},
+		{"strict-type-false", strictTester(types.False), "", strictError("bool")},
+		{"strict-type-true", strictTester(types.True), "", strictError("bool")},
+		{"strict-type-long-0", strictTester(types.ZvalLong(0)), "", strictError("int")},
+		{"strict-type-long-1", strictTester(types.ZvalLong(5)), "", strictError("int")},
+		{"strict-type-double-0", strictTester(types.ZvalDouble(0)), "", strictError("float")},
+		{"strict-type-double-1", strictTester(types.ZvalDouble(5)), "", strictError("float")},
+		{"strict-type-string-0", strictTester(types.ZvalString("")), "", ""},
+		{"strict-type-string-1", strictTester(types.ZvalString("0")), "0", ""},
+		{"strict-type-string-2", strictTester(types.ZvalString("00")), "00", ""},
+		{"strict-type-array-0", strictTester(types.ZvalArray(types.NewArray())), "", strictError("array")},
+		{"strict-type-array-1", strictTester(types.ZvalArray(types.NewArrayOf(types.Null))), "", strictError("array")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := tt.tester
+			got := tester.parser().ParsePath()
+			tester.checkError(t, tt.log)
+			if got != tt.want {
+				t.Errorf("ParsePath() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFastParamParser_ParsePathNullable_basetype(t *testing.T) {
+	weakTester := func(args ...types.Zval) zppTester { return zppTester{args: args, strict: false} }
+	weakError := func(typ string) string {
+		return "E_WARNING: mockFunc() expects parameter 1 to be a valid path, " + typ + " given"
+	}
+	strictTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: args, strict: true}
+	}
+	strictError := func(typ string) string {
+		return "Exception: (0) mockFunc() expects parameter 1 to be a valid path, " + typ + " given"
+	}
+	tests := []struct {
+		name   string
+		tester zppTester
+		want   any
+		log    string
+	}{
+		// weak
+		{"type-undef", weakTester(types.Undef), nil, ""},
+		{"type-null", weakTester(types.Null), nil, ""},
+		{"type-false", weakTester(types.False), "", ""},
+		{"type-true", weakTester(types.True), "1", ""},
+		{"type-long-0", weakTester(types.ZvalLong(0)), "0", ""},
+		{"type-long-1", weakTester(types.ZvalLong(5)), "5", ""},
+		{"type-double-0", weakTester(types.ZvalDouble(0)), "0", ""},
+		{"type-double-1", weakTester(types.ZvalDouble(5)), "5", ""},
+		{"type-string-0", weakTester(types.ZvalString("")), "", ""},
+		{"type-string-1", weakTester(types.ZvalString("0")), "0", ""},
+		{"type-string-2", weakTester(types.ZvalString("00")), "00", ""},
+		{"type-array-0", weakTester(types.ZvalArray(types.NewArray())), "", weakError("array")},
+		{"type-array-1", weakTester(types.ZvalArray(types.NewArrayOf(types.Null))), "", weakError("array")},
+		// strict
+		{"strict-type-undef", strictTester(types.Undef), nil, ""},
+		{"strict-type-null", strictTester(types.Null), nil, ""},
+		{"strict-type-false", strictTester(types.False), "", strictError("bool")},
+		{"strict-type-true", strictTester(types.True), "", strictError("bool")},
+		{"strict-type-long-0", strictTester(types.ZvalLong(0)), "", strictError("int")},
+		{"strict-type-long-1", strictTester(types.ZvalLong(5)), "", strictError("int")},
+		{"strict-type-double-0", strictTester(types.ZvalDouble(0)), "", strictError("float")},
+		{"strict-type-double-1", strictTester(types.ZvalDouble(5)), "", strictError("float")},
+		{"strict-type-string-0", strictTester(types.ZvalString("")), "", ""},
+		{"strict-type-string-1", strictTester(types.ZvalString("0")), "0", ""},
+		{"strict-type-string-2", strictTester(types.ZvalString("00")), "00", ""},
+		{"strict-type-array-0", strictTester(types.ZvalArray(types.NewArray())), "", strictError("array")},
+		{"strict-type-array-1", strictTester(types.ZvalArray(types.NewArrayOf(types.Null))), "", strictError("array")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := tt.tester
+			got := tester.parser().ParsePathNullable()
+			tester.checkError(t, tt.log)
+			var simpleGot any = lang.CondF1(got != nil, func() any { return *got }, any(nil))
+			if simpleGot != tt.want {
+				t.Errorf("ParsePathNullable() = %v, want %v", simpleGot, tt.want)
+			}
+		})
+	}
+}
+
+func TestFastParamParser_ParsePathNullable_reftype(t *testing.T) {
+	refArgs := func(args ...types.Zval) []types.Zval {
+		refArgs := make([]types.Zval, len(args))
+		for i, arg := range args {
+			refArgs[i] = types.ZvalRef(types.NewReference(arg))
+		}
+		return refArgs
+	}
+	weakTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: false}
+	}
+	weakError := func(typ string) string {
+		return "E_WARNING: mockFunc() expects parameter 1 to be a valid path, " + typ + " given"
+	}
+	strictTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: true}
+	}
+	strictError := func(typ string) string {
+		return "Exception: (0) mockFunc() expects parameter 1 to be a valid path, " + typ + " given"
+	}
+	tests := []struct {
+		name   string
+		tester zppTester
+		want   any
+		log    string
+	}{
+		// weak
+		{"type-undef", weakTester(types.Undef), nil, ""},
+		{"type-null", weakTester(types.Null), nil, ""},
+		{"type-false", weakTester(types.False), "", ""},
+		{"type-true", weakTester(types.True), "1", ""},
+		{"type-long-0", weakTester(types.ZvalLong(0)), "0", ""},
+		{"type-long-1", weakTester(types.ZvalLong(5)), "5", ""},
+		{"type-double-0", weakTester(types.ZvalDouble(0)), "0", ""},
+		{"type-double-1", weakTester(types.ZvalDouble(5)), "5", ""},
+		{"type-string-0", weakTester(types.ZvalString("")), "", ""},
+		{"type-string-1", weakTester(types.ZvalString("0")), "0", ""},
+		{"type-string-2", weakTester(types.ZvalString("00")), "00", ""},
+		{"type-array-0", weakTester(types.ZvalArray(types.NewArray())), "", weakError("array")},
+		{"type-array-1", weakTester(types.ZvalArray(types.NewArrayOf(types.Null))), "", weakError("array")},
+		// strict
+		{"strict-type-undef", strictTester(types.Undef), nil, ""},
+		{"strict-type-null", strictTester(types.Null), nil, ""},
+		{"strict-type-false", strictTester(types.False), "", strictError("bool")},
+		{"strict-type-true", strictTester(types.True), "", strictError("bool")},
+		{"strict-type-long-0", strictTester(types.ZvalLong(0)), "", strictError("int")},
+		{"strict-type-long-1", strictTester(types.ZvalLong(5)), "", strictError("int")},
+		{"strict-type-double-0", strictTester(types.ZvalDouble(0)), "", strictError("float")},
+		{"strict-type-double-1", strictTester(types.ZvalDouble(5)), "", strictError("float")},
+		{"strict-type-string-0", strictTester(types.ZvalString("")), "", ""},
+		{"strict-type-string-1", strictTester(types.ZvalString("0")), "0", ""},
+		{"strict-type-string-2", strictTester(types.ZvalString("00")), "00", ""},
+		{"strict-type-array-0", strictTester(types.ZvalArray(types.NewArray())), "", strictError("array")},
+		{"strict-type-array-1", strictTester(types.ZvalArray(types.NewArrayOf(types.Null))), "", strictError("array")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := tt.tester
+			got := tester.parser().ParsePathNullable()
+			tester.checkError(t, tt.log)
+			var simpleGot any = lang.CondF1(got != nil, func() any { return *got }, any(nil))
+			if simpleGot != tt.want {
+				t.Errorf("ParsePathNullable() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// ParseArray
+
+func TestFastParamParser_ParseArray(t *testing.T) {
+	refArgs := func(args ...types.Zval) []types.Zval {
+		refArgs := make([]types.Zval, len(args))
+		for i, arg := range args {
+			refArgs[i] = types.ZvalRef(types.NewReference(arg))
+		}
+		return refArgs
+	}
+	weakTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: false}
+	}
+	weakError := func(typ string) string {
+		return "E_WARNING: mockFunc() expects parameter 1 to be array, " + typ + " given"
+	}
+	strictTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: true}
+	}
+	strictError := func(typ string) string {
+		return "Exception: (0) mockFunc() expects parameter 1 to be array, " + typ + " given"
+	}
+	values := func(values ...types.Zval) []types.ArrayPair {
+		var pairs = make([]types.ArrayPair, len(values))
+		for i, value := range values {
+			pairs[i] = types.MakeArrayPair(types.IdxKey(i), value)
+		}
+		return pairs
+	}
+	tests := []struct {
+		name   string
+		tester zppTester
+		want   any
+		log    string
+	}{
+		// weak
+		{"type-undef", weakTester(types.Undef), nil, weakError("null")},
+		{"type-null", weakTester(types.Null), nil, weakError("null")},
+		{"type-false", weakTester(types.False), nil, weakError("bool")},
+		{"type-true", weakTester(types.True), nil, weakError("bool")},
+		{"type-long-0", weakTester(types.ZvalLong(0)), nil, weakError("int")},
+		{"type-long-1", weakTester(types.ZvalLong(5)), nil, weakError("int")},
+		{"type-double-0", weakTester(types.ZvalDouble(0)), nil, weakError("float")},
+		{"type-double-1", weakTester(types.ZvalDouble(5)), nil, weakError("float")},
+		{"type-string-0", weakTester(types.ZvalString("")), nil, weakError("string")},
+		{"type-string-1", weakTester(types.ZvalString("0")), nil, weakError("string")},
+		{"type-string-2", weakTester(types.ZvalString("00")), nil, weakError("string")},
+		{"type-array-0", weakTester(types.ZvalArray(types.NewArray())), values(), ""},
+		{"type-array-1", weakTester(types.ZvalArray(types.NewArrayOf(types.Null))), values(types.Null), ""},
+		// strict
+		{"strict-type-undef", strictTester(types.Undef), nil, strictError("null")},
+		{"strict-type-null", strictTester(types.Null), nil, strictError("null")},
+		{"strict-type-false", strictTester(types.False), nil, strictError("bool")},
+		{"strict-type-true", strictTester(types.True), nil, strictError("bool")},
+		{"strict-type-long-0", strictTester(types.ZvalLong(0)), nil, strictError("int")},
+		{"strict-type-long-1", strictTester(types.ZvalLong(5)), nil, strictError("int")},
+		{"strict-type-double-0", strictTester(types.ZvalDouble(0)), nil, strictError("float")},
+		{"strict-type-double-1", strictTester(types.ZvalDouble(5)), nil, strictError("float")},
+		{"strict-type-string-0", strictTester(types.ZvalString("")), nil, strictError("string")},
+		{"strict-type-string-1", strictTester(types.ZvalString("0")), nil, strictError("string")},
+		{"strict-type-string-2", strictTester(types.ZvalString("00")), nil, strictError("string")},
+		{"strict-type-array-0", strictTester(types.ZvalArray(types.NewArray())), values(), ""},
+		{"strict-type-array-1", strictTester(types.ZvalArray(types.NewArrayOf(types.Null))), values(types.Null), ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := tt.tester
+			got := tester.parser().ParseArray()
+			tester.checkError(t, tt.log)
+			var simpleGot any = lang.CondF1(got != nil, func() any { return got.Pairs() }, any(nil))
+			if !reflect.DeepEqual(simpleGot, tt.want) {
+				t.Errorf("ParsePathNullable() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFastParamParser_ParseArrayNullable(t *testing.T) {
+	refArgs := func(args ...types.Zval) []types.Zval {
+		refArgs := make([]types.Zval, len(args))
+		for i, arg := range args {
+			refArgs[i] = types.ZvalRef(types.NewReference(arg))
+		}
+		return refArgs
+	}
+	weakTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: false}
+	}
+	weakError := func(typ string) string {
+		return "E_WARNING: mockFunc() expects parameter 1 to be array, " + typ + " given"
+	}
+	strictTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: true}
+	}
+	strictError := func(typ string) string {
+		return "Exception: (0) mockFunc() expects parameter 1 to be array, " + typ + " given"
+	}
+	values := func(values ...types.Zval) []types.ArrayPair {
+		var pairs = make([]types.ArrayPair, len(values))
+		for i, value := range values {
+			pairs[i] = types.MakeArrayPair(types.IdxKey(i), value)
+		}
+		return pairs
+	}
+	tests := []struct {
+		name   string
+		tester zppTester
+		want   any
+		log    string
+	}{
+		// weak
+		{"type-undef", weakTester(types.Undef), nil, ""},
+		{"type-null", weakTester(types.Null), nil, ""},
+		{"type-false", weakTester(types.False), nil, weakError("bool")},
+		{"type-true", weakTester(types.True), nil, weakError("bool")},
+		{"type-long-0", weakTester(types.ZvalLong(0)), nil, weakError("int")},
+		{"type-long-1", weakTester(types.ZvalLong(5)), nil, weakError("int")},
+		{"type-double-0", weakTester(types.ZvalDouble(0)), nil, weakError("float")},
+		{"type-double-1", weakTester(types.ZvalDouble(5)), nil, weakError("float")},
+		{"type-string-0", weakTester(types.ZvalString("")), nil, weakError("string")},
+		{"type-string-1", weakTester(types.ZvalString("0")), nil, weakError("string")},
+		{"type-string-2", weakTester(types.ZvalString("00")), nil, weakError("string")},
+		{"type-array-0", weakTester(types.ZvalArray(types.NewArray())), values(), ""},
+		{"type-array-1", weakTester(types.ZvalArray(types.NewArrayOf(types.Null))), values(types.Null), ""},
+		// strict
+		{"strict-type-undef", strictTester(types.Undef), nil, ""},
+		{"strict-type-null", strictTester(types.Null), nil, ""},
+		{"strict-type-false", strictTester(types.False), nil, strictError("bool")},
+		{"strict-type-true", strictTester(types.True), nil, strictError("bool")},
+		{"strict-type-long-0", strictTester(types.ZvalLong(0)), nil, strictError("int")},
+		{"strict-type-long-1", strictTester(types.ZvalLong(5)), nil, strictError("int")},
+		{"strict-type-double-0", strictTester(types.ZvalDouble(0)), nil, strictError("float")},
+		{"strict-type-double-1", strictTester(types.ZvalDouble(5)), nil, strictError("float")},
+		{"strict-type-string-0", strictTester(types.ZvalString("")), nil, strictError("string")},
+		{"strict-type-string-1", strictTester(types.ZvalString("0")), nil, strictError("string")},
+		{"strict-type-string-2", strictTester(types.ZvalString("00")), nil, strictError("string")},
+		{"strict-type-array-0", strictTester(types.ZvalArray(types.NewArray())), values(), ""},
+		{"strict-type-array-1", strictTester(types.ZvalArray(types.NewArrayOf(types.Null))), values(types.Null), ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := tt.tester
+			got := tester.parser().ParseArrayNullable()
+			tester.checkError(t, tt.log)
+			var simpleGot any = lang.CondF1(got != nil, func() any { return got.Pairs() }, any(nil))
+			if !reflect.DeepEqual(simpleGot, tt.want) {
+				t.Errorf("ParsePathNullable() = %v, want %v", got, tt.want)
 			}
 		})
 	}
