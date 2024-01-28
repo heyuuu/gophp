@@ -40,7 +40,9 @@ type IParser interface {
 
 	// ref type
 	ParseRefZval() types.RefZval
+	ParseRefZvalNullable() types.RefZval
 	ParseRefArrayOrObject() types.RefZval
 	ParseRefArray() *types.Array
+	ParseRefArrayNullable() *types.Array
 	ParseRefVariadic(postVarargs uint) []types.RefZval
 }

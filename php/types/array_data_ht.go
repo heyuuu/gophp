@@ -32,8 +32,10 @@ func newArrayDataHt(cap int) *ArrayDataHt {
 
 func newArrayDataHtByData(pairs []ArrayPair) *ArrayDataHt {
 	ht := &ArrayDataHt{
-		data:     slices.Clone(pairs),
-		writable: true,
+		elementsCount: len(pairs),
+		indexes:       make(map[ArrayKey]int, len(pairs)),
+		data:          slices.Clone(pairs),
+		writable:      true,
 	}
 	ht.rehash()
 	return ht

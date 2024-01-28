@@ -71,6 +71,8 @@ type (
 
 	/* ref type */
 	RefZval          = types.RefZval
+	RefZvalNullable  = types.RefZval
 	RefArrayOrObject = types.RefZval
 	RefArray         = *types.Array
+	RefArrayNullable = *types.Array
 )

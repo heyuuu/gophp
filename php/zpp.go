@@ -26,6 +26,8 @@ const (
 	Z_EXPECTED_PATH     = "a valid path"
 	Z_EXPECTED_OBJECT   = "object"
 	Z_EXPECTED_DOUBLE   = "float"
+
+	Z_EXPECTED_REFERENCE = "reference"
 )
 
 const ZPP_ERROR_OK = 0
@@ -520,61 +522,86 @@ func (p *FastParamParser) parseZvalEx2(checkNull bool, deref bool, separate bool
 // @see Micro: Z_PARAM_VARIADIC | Z_PARAM_VARIADIC_EX, Old: '+ and '*'
 func (p *FastParamParser) ParseVariadic(postVarargs uint) []types.Zval {
 	var args []types.Zval
-	p.eachVariadic(postVarargs, func(arg types.Zval) {
-		args = append(args, arg)
-	})
-	return args
-}
-func (p *FastParamParser) eachVariadic(postVarargs uint, h func(arg types.Zval)) {
-	if p.isFinish() {
-		return
-	}
 
 	numVarargs := len(p.args) - p.argIndex - int(postVarargs)
 	for i := 0; i < numVarargs; i++ {
 		arg, ok := p.nextArg(false, false)
 		if !ok {
-			break
+			return nil
 		}
-		h(arg)
+		args = append(args, arg)
 	}
+
+	return args
 }
 
 // ref
 
 func (p *FastParamParser) ParseRefZval() types.RefZval {
-	// todo ref 处理
-	v, _ := p.parseZvalEx2(false, false, false)
-	return p.asRefZval(v)
+	return p.parseRefZval(false)
+}
+func (p *FastParamParser) ParseRefZvalNullable() types.RefZval {
+	return p.parseRefZval(true)
 }
 func (p *FastParamParser) ParseRefArrayOrObject() types.RefZval {
-	dest := p.parseArrayOrObjectEx(false, true)
-	return p.asRefZval(dest)
+	ref := p.parseRefZval(false)
+	if ref == nil {
+		return nil
+	}
+	if ref.Val().IsArray() || ref.Val().IsObject() {
+		return ref
+	} else {
+		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
+		return nil
+	}
 }
 func (p *FastParamParser) ParseRefArray() *types.Array {
-	arg, ok := p.nextArg(true, false)
+	ref := p.parseRefZval(false)
+	if ref == nil {
+		return nil
+	}
+	if !ref.Val().IsArray() {
+		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
+	}
+	return ref.Val().Array()
+}
+func (p *FastParamParser) ParseRefArrayNullable() *types.Array {
+	ref := p.parseRefZval(true)
+	if ref == nil {
+		return nil
+	}
+	if !ref.Val().IsArray() {
+		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
+	}
+	return ref.Val().Array()
+}
+func (p *FastParamParser) ParseRefVariadic(postVarargs uint) []types.RefZval {
+	var args []types.RefZval
+
+	numVarargs := len(p.args) - p.argIndex - int(postVarargs)
+	for i := 0; i < numVarargs; i++ {
+		ref := p.parseRefZval(false)
+		if ref == nil {
+			return nil
+		}
+		args = append(args, ref)
+	}
+
+	return args
+}
+
+func (p *FastParamParser) parseRefZval(checkNull bool) types.RefZval {
+	arg, ok := p.nextArg(false, false)
 	if !ok {
 		return nil
 	}
 
-	if !arg.IsArray() {
-		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
-	}
-
-	return arg.Array()
-}
-func (p *FastParamParser) ParseRefVariadic(postVarargs uint) []types.RefZval {
-	var args []types.RefZval
-	p.eachVariadic(postVarargs, func(arg types.Zval) {
-		args = append(args, p.asRefZval(arg))
-	})
-	return args
-}
-
-func (p *FastParamParser) asRefZval(v types.Zval) types.RefZval {
-	if v.IsRef() {
-		return v.Ref()
+	if arg.IsRef() {
+		return arg.Ref()
+	} else if checkNull && arg.IsNull() {
+		return nil
 	} else {
-		panic(perr.Internalf("参数不可为非 RefZval: %v", v))
+		p.triggerError(ZPP_ERROR_WRONG_ARG, "reference")
+		return nil
 	}
 }

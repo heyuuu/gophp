@@ -55,10 +55,10 @@ func (tester *zppTester) errorLog() string {
 func (tester *zppTester) checkError(t *testing.T, expectErrLog string) {
 	expectErr := expectErrLog != ""
 	if got := tester.parser().HasError(); got != expectErr {
-		t.Errorf("CheckNumArgs() error = %v, want = %v", got, expectErr)
+		t.Errorf("Parser.HasError() = %v, want = %v", got, expectErr)
 	}
 	if log := tester.errorLog(); strings.TrimSpace(log) != strings.TrimSpace(expectErrLog) {
-		t.Errorf("CheckNumArgs() log = %v, want = %v", log, expectErrLog)
+		t.Errorf("errorLog = %v, want = %v", log, expectErrLog)
 	}
 }
 
@@ -1685,6 +1685,287 @@ func TestFastParamParser_ParseZvalNullable(t *testing.T) {
 			if !testFastParamParser_deepEqualsZvalPtr(got, tt.want) {
 				t.Errorf("ParseZval() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+// ParseVariadic
+
+func TestFastParamParser_ParseVariadic(t *testing.T) {
+	refArgs := func(args ...types.Zval) []types.Zval {
+		refArgs := make([]types.Zval, len(args))
+		for i, arg := range args {
+			refArgs[i] = types.ZvalRef(types.NewReference(arg))
+		}
+		return refArgs
+	}
+	baseTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: args, strict: false}
+	}
+	refTester := func(args ...types.Zval) zppTester {
+		return zppTester{args: refArgs(args...), strict: false}
+	}
+
+	tests := []struct {
+		name        string
+		tester      zppTester
+		postVarargs uint
+		want        []types.Zval
+		log         string
+	}{
+		{
+			"base-0",
+			baseTester(Long(1), Long(2), Long(3), Long(4), Long(5)),
+			0,
+			[]types.Zval{Long(2), Long(3), Long(4), Long(5)},
+			"",
+		},
+		{
+			"base-1",
+			baseTester(Long(1), Long(2), Long(3), Long(4), Long(5)),
+			1,
+			[]types.Zval{Long(2), Long(3), Long(4)},
+			"",
+		},
+		{
+			"base-n",
+			baseTester(Long(1), Long(2), Long(3), Long(4), Long(5)),
+			100,
+			[]types.Zval{},
+			"",
+		},
+		{
+			"ref-0",
+			refTester(Long(1), Long(2), Long(3), Long(4), Long(5)),
+			0,
+			[]types.Zval{Long(2), Long(3), Long(4), Long(5)},
+			"",
+		},
+		{
+			"ref-1",
+			refTester(Long(1), Long(2), Long(3), Long(4), Long(5)),
+			1,
+			[]types.Zval{Long(2), Long(3), Long(4)},
+			"",
+		},
+		{
+			"ref-n",
+			refTester(Long(1), Long(2), Long(3), Long(4), Long(5)),
+			100,
+			[]types.Zval{},
+			"",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := tt.tester
+			tt.tester.parser().ParseZval()
+			got := tester.parser().ParseVariadic(tt.postVarargs)
+			tester.checkError(t, tt.log)
+			if reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseVariadic() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// ParseRefZval
+
+func testFastParamParser_checkRefZval(t *testing.T, got types.RefZval, rawVal types.Zval, wantNil bool) {
+	mockVal := types.ZvalString("mock-val-123")
+	if wantNil {
+		if got != nil {
+			t.Errorf("ParseRefZval() = %v, want nil", got)
+		}
+	} else {
+		if got == nil {
+			t.Errorf("ParseRefZval() = nil, want %v", rawVal)
+			return
+		}
+		if !rawVal.IsRef() {
+			t.Errorf("ParseRefZval() rawVal = %v, want reference val", rawVal)
+			return
+		}
+		if gotVal := got.Val(); gotVal != rawVal.RefVal() {
+			t.Errorf("ParseRefZval() gotval = %v, want %v", gotVal, rawVal.RefVal())
+			return
+		}
+
+		got.SetVal(mockVal)
+		if gotVal := got.Val(); gotVal != mockVal {
+			t.Errorf("ParseRefZval() setval = %v, want %v", gotVal, mockVal)
+			return
+		}
+		if derefRawVal := rawVal.RefVal(); derefRawVal != mockVal {
+			t.Errorf("ParseRefZval() rawval after setval = %v, want %v", derefRawVal, mockVal)
+			return
+		}
+	}
+}
+
+func TestFastParamParser_ParseRefZval(t *testing.T) {
+	ref := func(v types.Zval) types.Zval { return types.ZvalRef(types.NewReference(v)) }
+
+	tests := []struct {
+		name    string
+		val     types.Zval
+		wantNil bool
+		log     string
+	}{
+		// basic
+		{"ref-1", ref(types.Undef), false, ""},
+		{"ref-2", ref(types.Null), false, ""},
+		{"ref-3", ref(types.ZvalLong(1)), false, ""},
+		// noRef
+		{"noRef-1", types.Undef, true, "E_WARNING: mockFunc() expects parameter 1 to be reference, null given"},
+		{"noRef-2", types.Null, true, "E_WARNING: mockFunc() expects parameter 1 to be reference, null given"},
+		{"noRef-3", types.ZvalLong(1), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, int given"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := &zppTester{args: []types.Zval{tt.val}}
+			got := tester.parser().ParseRefZval()
+			tester.checkError(t, tt.log)
+			testFastParamParser_checkRefZval(t, got, tt.val, tt.wantNil)
+		})
+	}
+}
+
+func TestFastParamParser_ParseRefZvalNullable(t *testing.T) {
+	ref := func(v types.Zval) types.Zval { return types.ZvalRef(types.NewReference(v)) }
+
+	tests := []struct {
+		name    string
+		val     types.Zval
+		wantNil bool
+		log     string
+	}{
+		// basic
+		{"ref-1", ref(types.Undef), false, ""},
+		{"ref-2", ref(types.Null), false, ""},
+		{"ref-3", ref(types.ZvalLong(1)), false, ""},
+		// noRef
+		{"noRef-1", types.Undef, true, ""},
+		{"noRef-2", types.Null, true, ""},
+		{"noRef-3", types.ZvalLong(1), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, int given"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := &zppTester{args: []types.Zval{tt.val}}
+			got := tester.parser().ParseRefZvalNullable()
+			tester.checkError(t, tt.log)
+			testFastParamParser_checkRefZval(t, got, tt.val, tt.wantNil)
+		})
+	}
+}
+
+// ParseRefArray
+
+func testFastParamParser_checkRefZvalArray(t *testing.T, got *types.Array, rawVal types.Zval, wantNil bool) {
+	mockPairs := []types.ArrayPair{
+		types.MakeArrayPair(types.IdxKey(0), Bool(true)),
+		types.MakeArrayPair(types.IdxKey(1), Long(1234)),
+		types.MakeArrayPair(types.IdxKey(2), String("abc")),
+	}
+	if wantNil {
+		if got != nil {
+			t.Errorf("ParseRefZval() = %v, want nil", got)
+		}
+	} else {
+		if got == nil {
+			t.Errorf("ParseRefZval() = nil, want %v", rawVal)
+			return
+		}
+		if !rawVal.IsRef() || !rawVal.RefVal().IsArray() {
+			t.Errorf("ParseRefZval() rawVal = %v, want reference array val", rawVal)
+			return
+		}
+		rawArr := rawVal.RefVal().Array()
+
+		if gotPairs, rawPairs := got.Pairs(), rawArr.Pairs(); !reflect.DeepEqual(gotPairs, rawPairs) {
+			t.Errorf("ParseRefZval() gotPairs = %v, rawPairs = %v", gotPairs, rawPairs)
+			return
+		}
+
+		got.SetDataByArray(types.NewArrayOfPairs(mockPairs))
+		gotPairs, rawPairs := got.Pairs(), rawArr.Pairs()
+		if !reflect.DeepEqual(gotPairs, mockPairs) {
+			t.Errorf("ParseRefZval() gotPairs after setVal = %v, want = %v", gotPairs, mockPairs)
+			return
+		}
+		if !reflect.DeepEqual(rawPairs, mockPairs) {
+			t.Errorf("ParseRefZval() rawPairs after setVal = %v, want = %v", rawPairs, mockPairs)
+			return
+		}
+	}
+}
+
+func TestFastParamParser_ParseRefArray(t *testing.T) {
+	arr := func(values ...types.Zval) types.Zval { return types.ZvalArray(types.NewArrayOf(values...)) }
+	refArr := func(values ...types.Zval) types.Zval {
+		v := arr(values...)
+		return types.ZvalRef(types.NewReference(v))
+	}
+
+	tests := []struct {
+		name    string
+		val     types.Zval
+		wantNil bool
+		log     string
+	}{
+		// basic
+		{"ref-1", refArr(types.Undef), false, ""},
+		{"ref-2", refArr(types.Null), false, ""},
+		{"ref-3", refArr(types.ZvalLong(1)), false, ""},
+		// noRef
+		{"noRef-1", types.Undef, true, "E_WARNING: mockFunc() expects parameter 1 to be reference, null given"},
+		{"noRef-2", types.Null, true, "E_WARNING: mockFunc() expects parameter 1 to be reference, null given"},
+		{"noRef-3", types.ZvalLong(1), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, int given"},
+		{"noRef-4", arr(types.Undef), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, array given"},
+		{"noRef-5", arr(types.Null), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, array given"},
+		{"noRef-6", arr(types.ZvalLong(1)), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, array given"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := &zppTester{args: []types.Zval{tt.val}}
+			got := tester.parser().ParseRefArray()
+			tester.checkError(t, tt.log)
+			testFastParamParser_checkRefZvalArray(t, got, tt.val, tt.wantNil)
+		})
+	}
+}
+
+func TestFastParamParser_ParseRefArrayNullable(t *testing.T) {
+	arr := func(values ...types.Zval) types.Zval { return types.ZvalArray(types.NewArrayOf(values...)) }
+	refArr := func(values ...types.Zval) types.Zval {
+		v := arr(values...)
+		return types.ZvalRef(types.NewReference(v))
+	}
+
+	tests := []struct {
+		name    string
+		val     types.Zval
+		wantNil bool
+		log     string
+	}{
+		// basic
+		{"ref-1", refArr(types.Undef), false, ""},
+		{"ref-2", refArr(types.Null), false, ""},
+		{"ref-3", refArr(types.ZvalLong(1)), false, ""},
+		// noRef
+		{"noRef-1", types.Undef, true, ""},
+		{"noRef-2", types.Null, true, ""},
+		{"noRef-3", types.ZvalLong(1), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, int given"},
+		{"noRef-4", arr(types.Undef), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, array given"},
+		{"noRef-5", arr(types.Null), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, array given"},
+		{"noRef-6", arr(types.ZvalLong(1)), true, "E_WARNING: mockFunc() expects parameter 1 to be reference, array given"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tester := &zppTester{args: []types.Zval{tt.val}}
+			got := tester.parser().ParseRefArrayNullable()
+			tester.checkError(t, tt.log)
+			testFastParamParser_checkRefZvalArray(t, got, tt.val, tt.wantNil)
 		})
 	}
 }
