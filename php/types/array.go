@@ -402,21 +402,21 @@ func (ht *Array) Pairs() []ArrayPair {
 }
 
 func (ht *Array) AddAssocZval(key string, v Zval)      { ht.SymtableUpdate(key, v) }
-func (ht *Array) AddAssocNull(key string)              { ht.SymtableUpdate(key, ZvalNull()) }
+func (ht *Array) AddAssocNull(key string)              { ht.SymtableUpdate(key, Null) }
 func (ht *Array) AddAssocBool(key string, b bool)      { ht.SymtableUpdate(key, ZvalBool(b)) }
 func (ht *Array) AddAssocLong(key string, n int)       { ht.SymtableUpdate(key, ZvalLong(n)) }
 func (ht *Array) AddAssocDouble(key string, d float64) { ht.SymtableUpdate(key, ZvalDouble(d)) }
 func (ht *Array) AddAssocStr(key string, str string)   { ht.SymtableUpdate(key, ZvalString(str)) }
 
 func (ht *Array) AddIndexZval(idx int, v Zval)      { ht.IndexUpdate(idx, v) }
-func (ht *Array) AddIndexNull(idx int)              { ht.IndexUpdate(idx, ZvalNull()) }
+func (ht *Array) AddIndexNull(idx int)              { ht.IndexUpdate(idx, Null) }
 func (ht *Array) AddIndexBool(idx int, b bool)      { ht.IndexUpdate(idx, ZvalBool(b)) }
 func (ht *Array) AddIndexLong(idx int, n int)       { ht.IndexUpdate(idx, ZvalLong(n)) }
 func (ht *Array) AddIndexDouble(idx int, d float64) { ht.IndexUpdate(idx, ZvalDouble(d)) }
 func (ht *Array) AddIndexStr(idx int, str string)   { ht.IndexUpdate(idx, ZvalString(str)) }
 
 func (ht *Array) AddNextIndexZval(v Zval)      { ht.Append(v) }
-func (ht *Array) AddNextIndexNull()            { ht.Append(ZvalNull()) }
+func (ht *Array) AddNextIndexNull()            { ht.Append(Null) }
 func (ht *Array) AddNextIndexBool(b bool)      { ht.Append(ZvalBool(b)) }
 func (ht *Array) AddNextIndexLong(n int)       { ht.Append(ZvalLong(n)) }
 func (ht *Array) AddNextIndexDouble(d float64) { ht.Append(ZvalDouble(d)) }

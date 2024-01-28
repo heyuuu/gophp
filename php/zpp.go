@@ -47,6 +47,7 @@ type FastParamParser struct {
 	minNumArgs int
 	maxNumArgs int
 	flags      int
+	strictType bool
 	errorCode  int
 	argIndex   int
 	arg        types.Zval
@@ -67,6 +68,7 @@ func NewFastParamParser(ex *ExecuteData, minNumArgs int, maxNumArgs int, flags i
 		minNumArgs: minNumArgs,
 		maxNumArgs: maxNumArgs,
 		flags:      flags,
+		strictType: ex.IsArgUseStrictTypes(),
 	}
 }
 
@@ -92,11 +94,11 @@ func (p *FastParamParser) StartOptional() {
 
 func (p *FastParamParser) isQuiet() bool { return p.flags&zpp.FlagQuiet != 0 }
 func (p *FastParamParser) isThrow() bool {
-	return p.flags&zpp.FlagThrow != 0 || p.ex.IsArgUseStrictTypes()
+	return p.flags&zpp.FlagThrow != 0 || p.strictType
 }
 func (p *FastParamParser) isOldMode() bool { return p.flags&zpp.FlagOldMode != 0 }
 
-func (p *FastParamParser) useStrictTypes() bool { return p.ex.IsArgUseStrictTypes() }
+func (p *FastParamParser) useStrictTypes() bool { return p.strictType }
 
 func (p *FastParamParser) isFinish() bool { return p.HasError() || p.argIndex >= len(p.args) }
 
@@ -165,7 +167,7 @@ func (p *FastParamParser) ParseBoolNullable() *bool {
 	return &dest
 }
 func (p *FastParamParser) parseBoolEx(checkNull bool, separate bool) (dest bool, isNull bool) {
-	arg, ok := p.nextArg(separate, separate)
+	arg, ok := p.nextArg(true, separate)
 	if !ok {
 		return false, true
 	}
@@ -176,6 +178,7 @@ func (p *FastParamParser) parseBoolEx(checkNull bool, separate bool) (dest bool,
 	}
 
 	// parse
+	ok = false
 	if p.useStrictTypes() { // strict type
 		if arg.IsBool() {
 			dest, ok = arg.Bool(), true
@@ -227,6 +230,7 @@ func (p *FastParamParser) parseLongEx(checkNull bool, separate bool, strict bool
 	}
 
 	// parse
+	ok = false
 	if p.useStrictTypes() { // strict type
 		if arg.IsBool() {
 			dest, ok = arg.Long(), true
@@ -265,6 +269,7 @@ func (p *FastParamParser) parseDoubleEx(checkNull bool, separate bool) (dest flo
 	}
 
 	// parse
+	ok = false
 	if p.useStrictTypes() { // strict type
 		if arg.IsLong() {
 			dest, ok = float64(arg.Long()), true
@@ -306,6 +311,7 @@ func (p *FastParamParser) parseStringEx(checkNull bool, separate bool) (dest str
 	}
 
 	// parse
+	ok = false
 	if p.useStrictTypes() { // strict type
 		if arg.IsString() {
 			dest, ok = arg.String(), true
@@ -345,6 +351,7 @@ func (p *FastParamParser) parsePathEx(checkNull bool, separate bool) (dest strin
 	}
 
 	// parse
+	ok = false
 	if p.useStrictTypes() { // strict type
 		if arg.IsString() {
 			dest, ok = arg.String(), true
