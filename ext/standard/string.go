@@ -14,6 +14,7 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 /**
@@ -551,7 +552,7 @@ func ZifExplode(ctx *php.Context, separator string, str string, _ zpp.Opt, limit
 }
 
 //@zif(alias="join")
-func ZifImplode(ctx *php.Context, glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) types.Zval {
+func ZifImplode(ctx *php.Context, glue_ types.Zval, _ zpp.Opt, pieces_ types.Zval) types.Zval {
 	var arg1 = glue_
 	var arg2 = pieces_
 	var pieces *types.Array
@@ -561,7 +562,7 @@ func ZifImplode(ctx *php.Context, glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Z
 	// - implode(string $separator, array $array)
 	// - implode(array $array)
 	// - implode(array $array, string $separator)
-	if arg2 == nil {
+	if arg2.IsUndef() {
 		if !arg1.IsArray() {
 			php.ErrorDocRef(ctx, "", perr.E_WARNING, "Argument must be an array")
 			return types.Null
@@ -570,11 +571,11 @@ func ZifImplode(ctx *php.Context, glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Z
 		pieces = arg1.Array()
 	} else {
 		if arg1.IsArray() {
-			glue = php.ZvalGetStrVal(ctx, *arg2)
+			glue = php.ZvalGetStrVal(ctx, arg2)
 			pieces = arg1.Array()
 			php.ErrorDocRef(ctx, "", perr.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
 		} else if arg2.IsArray() {
-			glue = php.ZvalGetStrVal(ctx, *arg1)
+			glue = php.ZvalGetStrVal(ctx, arg1)
 			pieces = arg2.Array()
 		} else {
 			php.ErrorDocRef(ctx, "", perr.E_WARNING, "Invalid arguments passed")
@@ -1644,7 +1645,7 @@ func ZifStrIreplace(ctx *php.Context, returnValue zpp.Ret, search types.Zval, re
 func _isHeb(c byte) bool     { return 224 <= c && c <= 250 }
 func _isBlank(c byte) bool   { return c == ' ' || c == '\t' }
 func _isNewline(c byte) bool { return c == '\r' || c == '\n' }
-func _isPunct(c byte) bool   { panic("todo") } // todo
+func _isPunct(c byte) bool   { return unicode.IsPunct(rune(c)) }
 func PhpHebrev(str string, maxChars int, convertNewlines bool) (string, bool) {
 	if str == "" {
 		return "", false
@@ -1817,7 +1818,7 @@ func ZifNl2br(str string, _ zpp.Opt, isXhtml_ *bool) string {
 
 		buf.WriteString(br)
 		buf.WriteByte(c)
-		if i+1 < len(str) && (c == '\r' && str[i+1] == '\n') || (c == '\n' && str[i+1] == '\r') {
+		if i+1 < len(str) && (c == '\r' && str[i+1] == '\n' || c == '\n' && str[i+1] == '\r') {
 			i++
 			buf.WriteByte(str[i])
 		}
@@ -2319,12 +2320,12 @@ func ZifStrSplit(ctx *php.Context, str string, _ zpp.Opt, splitLength_ *int) ([]
 	}
 
 	size := (len(str) + splitLength - 1) / splitLength
-	result := make([]string, size)
+	result := make([]string, 0, size)
 	for i := 0; i < len(str); i += splitLength {
-		if i+splitLength <= len(str) {
-			result = append(result, str[i:])
-		} else {
+		if i+splitLength < len(str) {
 			result = append(result, str[i:i+splitLength])
+		} else {
+			result = append(result, str[i:])
 		}
 	}
 	return result, true

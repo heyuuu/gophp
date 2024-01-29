@@ -160,6 +160,20 @@ func asSlice[T any](data any) []T {
 	}
 	return items
 }
+func asSliceItemNullable[T any](data any) []T {
+	if data == nil {
+		return nil
+	}
+
+	var arr = data.([]any)
+	var items = make([]T, len(arr))
+	for i, item := range arr {
+		if item != nil {
+			items[i] = item.(T)
+		}
+	}
+	return items
+}
 
 func asStmtList(data any) []ast.Stmt {
 	var stmts []ast.Stmt

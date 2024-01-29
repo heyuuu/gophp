@@ -15,6 +15,14 @@ func RegisterConstant(ctx *Context, moduleNumber int, name string, value Val) {
 	RegisterConstantEx(ctx, moduleNumber, name, value, 0)
 }
 
+func RegisterLongConstant(ctx *Context, moduleNumber int, name string, value int) {
+	RegisterConstantEx(ctx, moduleNumber, name, types.ZvalLong(value), 0)
+}
+
+func RegisterStringConstant(ctx *Context, moduleNumber int, name string, value string) {
+	RegisterConstantEx(ctx, moduleNumber, name, types.ZvalString(value), 0)
+}
+
 func GetConstant(ctx *Context, name string) *types.Constant {
 	name = CleanNsName(name)
 	c := ctx.EG().ConstantTable().Get(name)

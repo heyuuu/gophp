@@ -68,6 +68,10 @@ func errorVaList(ctx *Context, typ perr.ErrorType, errorFilename string, errorLi
 }
 
 func ErrorCb(ctx *Context, typ perr.ErrorType, errorFilename string, errorLineno uint32, message string) {
+	if ctx.EG().ErrorReporting()&int(typ) == 0 {
+		return
+	}
+
 	var error_type_str string
 	var syslog_type_int plog.Level = plog.Notice
 	switch typ {

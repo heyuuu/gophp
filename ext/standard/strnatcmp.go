@@ -2,124 +2,97 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/kits/ascii"
+	"github.com/heyuuu/gophp/shim/cmp"
 )
 
-func compareRight(a string, ap int, b string, bp int) (result int, newAp int, newBp int) {
+func compareRight(a, b string) (result int, leftA string, leftB string) {
 	/* The longest run of digits wins.  That aside, the greatest
 	   value wins, but we can't know that it will until we've scanned
 	   both numbers to know that they have the same magnitude, so we
 	   remember it in BIAS. */
-
 	bias := 0
-	for ; ; ap, bp = ap+1, bp+1 {
-		if (ap == len(a) || !ascii.IsDigit(a[ap])) && (bp == len(b) || !ascii.IsDigit(b[bp])) {
-			return bias, ap, bp
-		} else if ap == len(a) || !ascii.IsDigit(a[ap]) {
-			return -1, ap, bp
-		} else if bp == len(b) || !ascii.IsDigit(b[bp]) {
-			return 1, ap, bp
-		} else if a[ap] < b[bp] {
-			if bias == 0 {
-				bias = -1
-			}
-		} else if a[ap] > b[bp] {
-			if bias == 0 {
-				bias = 1
-			}
+	for i := 0; ; i++ {
+		eof1 := i == len(a) || !ascii.IsDigit(a[i])
+		eof2 := i == len(b) || !ascii.IsDigit(b[i])
+		if eof1 && eof2 {
+			return bias, a[i:], b[i:]
+		} else if eof1 {
+			return -1, a[i:], b[i:]
+		} else if eof2 {
+			return 1, a[i:], b[i:]
+		}
+		if bias == 0 {
+			bias = cmp.Compare(a[i], b[i])
 		}
 	}
 }
-func compareLeft(a string, ap int, b string, bp int) (result int, newAp int, newBp int) {
-	/* Compare two left-aligned numbers: the first to have a different value wins. */
 
-	for ; ; ap, bp = ap+1, bp+1 {
-		if (ap == len(a) || !ascii.IsDigit(a[ap])) && (bp == len(b) || !ascii.IsDigit(b[bp])) {
-			return 0, ap, bp
-		} else if ap == len(a) || !ascii.IsDigit(a[ap]) {
-			return -1, ap, bp
-		} else if bp == len(b) || !ascii.IsDigit(b[bp]) {
-			return 1, ap, bp
-		} else if a[ap] < b[bp] {
-			return -1, ap, bp
-		} else if a[ap] > b[bp] {
-			return 1, ap, bp
+func compareLeft(a, b string) (result int, leftA string, leftB string) {
+	for i := 0; ; i++ {
+		eof1 := i == len(a) || !ascii.IsDigit(a[i])
+		eof2 := i == len(b) || !ascii.IsDigit(b[i])
+
+		if eof1 && eof2 {
+			return 0, a[i:], b[i:]
+		} else if eof1 {
+			return -1, a[i:], b[i:]
+		} else if eof2 {
+			return 1, a[i:], b[i:]
+		}
+
+		result = cmp.Compare(a[i], b[i])
+		if result != 0 {
+			return result, a[i:], b[i:]
 		}
 	}
 }
 
 func Strnatcmp(a string, b string, foldCase bool) int {
 	if a == "" || b == "" {
-		if a == b {
-			return 0
-		} else {
-			if len(a) > len(b) {
-				return 1
-			} else {
-				return -1
-			}
-		}
+		return cmp.Compare(len(a), len(b))
 	}
-
-	ap := 0 // for a
-	bp := 0 // for b
 
 	/* skip over leading zeros */
-	for a[ap] == '0' && ap+1 < len(a) && ascii.IsDigit(a[ap+1]) {
-		ap++
+	for len(a) >= 2 && a[0] == '0' && ascii.IsDigit(a[1]) {
+		a = a[1:]
 	}
-	for b[bp] == '0' && bp+1 < len(b) && ascii.IsDigit(b[bp+1]) {
-		bp++
+	for len(b) >= 2 && b[0] == '0' && ascii.IsDigit(b[1]) {
+		b = b[1:]
 	}
 
-	for {
-		/* Skip consecutive whitespace */
-		for ascii.IsSpace(a[ap]) {
-			ap++
-		}
-		for ascii.IsSpace(b[bp]) {
-			bp++
-		}
-
-		/* process run of digits */
-		if ascii.IsDigit(a[ap]) && ascii.IsDigit(b[bp]) {
-			var result int
-			if a[ap] == '0' || b[bp] == '0' {
-				result, ap, bp = compareLeft(a, ap, b, bp)
+	var result int
+	for a != "" && b != "" {
+		if ascii.IsSpace(a[0]) || ascii.IsSpace(b[0]) {
+			/* Skip consecutive whitespace */
+			for a != "" && ascii.IsSpace(a[0]) {
+				a = a[1:]
+			}
+			for b != "" && ascii.IsSpace(b[0]) {
+				b = b[1:]
+			}
+		} else if ascii.IsDigit(a[0]) && ascii.IsDigit(b[0]) {
+			/* process run of digits */
+			if a[0] == '0' || b[0] == '0' {
+				result, a, b = compareLeft(a, b)
 			} else {
-				result, ap, bp = compareRight(a, ap, b, bp)
+				result, a, b = compareRight(a, b)
 			}
 			if result != 0 {
 				return result
-			} else if ap == len(a) && bp == len(b) {
-				/* End of the strings. Let caller sort them out. */
-				return 0
-			} else if ap == len(a) {
-				return -1
-			} else if bp == len(b) {
-				return 1
 			}
-		}
-
-		//
-		ac := a[ap]
-		bc := b[bp]
-		if foldCase {
-			ac = ascii.ToLower(ac)
-			bc = ascii.ToLower(bc)
-		}
-		if ac < bc {
-			return -1
-		} else if ac > bc {
-			return 1
-		}
-		ap++
-		bp++
-		if ap == len(a) && bp == len(b) {
-			return 0
-		} else if ap == len(a) {
-			return -1
-		} else if bp == len(b) {
-			return 1
+		} else {
+			/* process run of char */
+			if foldCase {
+				result = cmp.Compare(ascii.ToLower(a[0]), ascii.ToLower(b[0]))
+			} else {
+				result = cmp.Compare(a[0], b[0])
+			}
+			if result != 0 {
+				return result
+			}
+			a, b = a[1:], b[1:]
 		}
 	}
+
+	return cmp.Compare(len(a), len(b))
 }

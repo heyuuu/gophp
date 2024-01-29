@@ -190,13 +190,32 @@ func convertExpectFormat2Regex(s string) string {
 }
 
 func compareExpectRegex(output string, expect string) (equals bool, reason string) {
-	if regexp.MustCompile(expect).MatchString(output) {
-		return true, ""
-	} else if regexp.MustCompile(strings.TrimSpace(expect)).MatchString(strings.TrimSpace(output)) {
-		// 目前先规避掉 phpt 换行格式导致的不匹配问题
-		return true, ""
-	} else {
-		reason = fmt.Sprintf("output = \n%s\nexpect =\n%s\n", output, expect)
-		return false, reason
+	equals, err := compareExpectRegexInternal(output, expect)
+	if err != nil {
+		return false, err.Error()
 	}
+	if equals {
+		return true, ""
+	}
+
+	// 目前先规避掉 phpt 换行格式导致的不匹配问题
+	equals, err = compareExpectRegexInternal(strings.TrimSpace(output), strings.TrimSpace(expect))
+	if err != nil {
+		return false, err.Error()
+	}
+	if equals {
+		return true, ""
+	}
+
+	// 匹配失败
+	reason = fmt.Sprintf("output = \n%s\nexpect =\n%s\n", output, expect)
+	return false, reason
+}
+
+func compareExpectRegexInternal(output string, expect string) (equals bool, err error) {
+	rule, err := regexp.Compile(expect)
+	if err != nil {
+		return false, fmt.Errorf("EXPECTREGEX rule parse fail, err = %w, expect = %s\n", err, expect)
+	}
+	return rule.MatchString(output), nil
 }

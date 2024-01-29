@@ -1,6 +1,7 @@
 package php
 
 import (
+	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"strings"
 )
@@ -30,6 +31,7 @@ func (e *ExecutorGlobals) SetPrecision(precision int)           { e.precision = 
 
 func (e *ExecutorGlobals) Init(ctx *Context, base *ExecutorGlobals) {
 	e.ctx = ctx
+	e.errorReporting = int(perr.E_ALL)
 	if base != nil {
 		e.constantTable = base.constantTable.Clone()
 		e.functionTable = base.functionTable.Clone()

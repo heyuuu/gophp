@@ -425,7 +425,10 @@ func (e *Executor) staticStmt(x *ast.StaticStmt) execResult {
 }
 
 func (e *Executor) unsetStmt(x *ast.UnsetStmt) execResult {
-	panic(perr.Todof("e.unsetStmt"))
+	for _, var_ := range x.Vars {
+		e.variableRef(var_).Unset()
+	}
+	return nil
 }
 
 func (e *Executor) declareStmt(x *ast.DeclareStmt) execResult {
@@ -1098,7 +1101,25 @@ func (e *Executor) arrayGet(arr types.Zval, key types.ArrayKey) types.Zval {
 	switch arr.Type() {
 	case types.IsArray:
 		return arr.Array().Find(key)
-	// todo ArrayAccess
+	case types.IsString:
+		var offset int
+		if key.IsStrKey() {
+			Error(e.ctx, perr.E_WARNING, fmt.Sprintf("Illegal string offset '%s'", key.StrKey()))
+			offset = 0
+		} else {
+			offset = key.IdxKey()
+		}
+
+		str := arr.String()
+		if 0 <= offset && offset < len(str) {
+			return types.ZvalString(str[offset : offset+1])
+		} else if offset < 0 && len(str)+offset >= 0 {
+			offset += len(str)
+			return types.ZvalString(str[offset : offset+1])
+		} else {
+			Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Uninitialized string offset: %d", offset))
+		}
+		return types.ZvalString("")
 	default:
 		panic(perr.Todof("unsupported e.arrayGet arr type: %s", types.ZvalGetType(arr)))
 	}

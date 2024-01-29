@@ -1580,9 +1580,9 @@ var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{Name: "separator
 var DefZifImplode = def.DefFunc("implode", 1, 2, []def.ArgInfo{{Name: "glue"}, {Name: "pieces"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	fp := php.NewParamParser(executeData, 1, 2, 0)
 	fp.CheckNumArgs()
-	glue_ := fp.ParseZvalNullable()
+	glue_ := fp.ParseZval()
 	fp.StartOptional()
-	pieces_ := fp.ParseZvalNullable()
+	pieces_ := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
@@ -1594,9 +1594,9 @@ var DefZifImplode = def.DefFunc("implode", 1, 2, []def.ArgInfo{{Name: "glue"}, {
 var DefZifJoin = def.DefFunc("join", 1, 2, []def.ArgInfo{{Name: "glue"}, {Name: "pieces"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	fp := php.NewParamParser(executeData, 1, 2, 0)
 	fp.CheckNumArgs()
-	glue_ := fp.ParseZvalNullable()
+	glue_ := fp.ParseZval()
 	fp.StartOptional()
-	pieces_ := fp.ParseZvalNullable()
+	pieces_ := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}

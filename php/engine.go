@@ -27,6 +27,7 @@ func (engine *Engine) init() {
 	engine.modules = types.NewTable[*Module]()
 	engine.baseCtx = initContext(engine, nil, nil, nil)
 
+	moduleStartupRegisterConstants(engine.baseCtx)
 	for _, entry := range builtinModuleEntries {
 		engine.RegisterModule(entry)
 	}

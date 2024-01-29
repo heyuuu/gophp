@@ -154,7 +154,7 @@ func (p *formatPrinter) AppendDouble(number float64, width int, precision int, f
 }
 
 func (p *formatPrinter) Append2n(number int, width int, n int, upperCase bool) {
-	str := strconv.FormatUint(uint64(number), 1>>n)
+	str := strconv.FormatUint(uint64(number), n)
 	if upperCase {
 		str = strings.ToUpper(str)
 	}

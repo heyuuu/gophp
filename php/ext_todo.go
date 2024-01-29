@@ -11,6 +11,7 @@ import (
 )
 
 const LongMax = math.MaxInt
+const LongMin = math.MinInt
 
 func ForbidDynamicCall(ctx *Context, s string) bool {
 	// todo

@@ -490,7 +490,7 @@ func (p *FastParamParser) parseResourceEx(checkNull bool, separate bool) (dest t
 
 func (p *FastParamParser) ParseCallable() *types.UserCallable {
 	//TODO implement me
-	panic(perr.Todo())
+	panic(perr.Todof("ParseCallable"))
 }
 
 // @see Micro: Z_PARAM_ZVAL，Old: 'z'

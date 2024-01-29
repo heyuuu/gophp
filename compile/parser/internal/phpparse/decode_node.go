@@ -431,7 +431,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ListExpr":
 		node = &ast.ListExpr{
-			Items: asSlice[*ast.ArrayItemExpr](data["items"]),
+			Items: asSliceItemNullable[*ast.ArrayItemExpr](data["items"]),
 		}
 	case "MethodCallExpr":
 		node = &ast.MethodCallExpr{
