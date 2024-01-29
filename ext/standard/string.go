@@ -231,13 +231,25 @@ func PhpStripslashes(str string) string {
 	if str == "" {
 		return ""
 	}
-	replacer := strings.NewReplacer(
-		"\\0", "\000",
-		`\'`, `'`,
-		`\"`, `"`,
-		`\\`, `\`,
-	)
-	return replacer.Replace(str)
+	if idx := strings.IndexByte(str, '\\'); idx < 0 {
+		return str
+	}
+	var buf strings.Builder
+	for i := 0; i < len(str); i++ {
+		if str[i] == '\\' {
+			i++ /* skip the slash */
+			if i < len(str) {
+				if str[i] == '0' {
+					buf.WriteByte(0)
+				} else {
+					buf.WriteByte(str[i])
+				}
+			}
+		} else {
+			buf.WriteByte(str[i])
+		}
+	}
+	return buf.String()
 }
 
 func PhpStripcslashes(str string) string {
@@ -951,11 +963,16 @@ func ZifStrripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt
 }
 func ZifStrrchr(ctx *php.Context, haystack string, needle types.Zval) (string, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
-	if !ok || needleStr == "" {
+	if !ok {
 		return "", false
 	}
-
-	if pos := strings.LastIndexByte(haystack, needleStr[0]); pos >= 0 {
+	var needleChar byte
+	if needleStr != "" {
+		needleChar = needleStr[0]
+	} else {
+		needleChar = 0
+	}
+	if pos := strings.LastIndexByte(haystack, needleChar); pos >= 0 {
 		return haystack[pos:], true
 	} else {
 		return "", false
