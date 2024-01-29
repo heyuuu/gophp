@@ -25,13 +25,13 @@ func (c ClassConstant) Name() string  { return c.name }
 func (c ClassConstant) Ce() *Class    { return c.ce }
 func (c ClassConstant) Value() Zval   { return c.value }
 
-// Property
-type Property struct {
+// PropertyInfo
+type PropertyInfo struct {
 	name  string
 	flags uint32
 	ce    *Class
 }
 
-func (p Property) Flags() uint32 { return p.flags }
-func (p Property) Name() string  { return p.name }
-func (p Property) Ce() *Class    { return p.ce }
+func (p PropertyInfo) Flags() uint32 { return p.flags }
+func (p PropertyInfo) Name() string  { return p.name }
+func (p PropertyInfo) Ce() *Class    { return p.ce }
