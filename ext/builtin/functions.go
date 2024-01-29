@@ -31,7 +31,7 @@ func ZifGcStatus() *types.Array {
 
 func ZifStrlen(str string) int { return len(str) }
 func ZifStrcmp(str1 string, str2 string) int {
-	return compatibleStringCompare(str1, str2)
+	return php.StringCompare(str1, str2)
 }
 func ZifStrncmp(ctx *php.Context, str1 string, str2 string, len_ int) (int, bool) {
 	if len_ < 0 {
@@ -44,23 +44,10 @@ func ZifStrncmp(ctx *php.Context, str1 string, str2 string, len_ int) (int, bool
 	if len(str2) > len_ {
 		str2 = str2[:len_]
 	}
-	return compatibleStringCompare(str1, str2), true
+	return php.StringCompare(str1, str2), true
 }
 func ZifStrcasecmp(str1 string, str2 string) int {
-	str1 = ascii.StrToLower(str1)
-	str2 = ascii.StrToLower(str2)
-	return compatibleStringCompare(str1, str2)
-}
-
-func compatibleStringCompare(s1, s2 string) int {
-	// notice: 在 PHP < 8.2.0 的版本，返回值范围很大而非限定 -1/0/1，故不能直接使用 strings.Compare
-	for i := 0; i < len(s1) && i < len(s2); i++ {
-		diff := int(s1[i]) - int(s2[i])
-		if diff != 0 {
-			return diff
-		}
-	}
-	return len(s1) - len(s2)
+	return php.StringCaseCompare(str1, str2)
 }
 
 //@zif(oldMode="z/")

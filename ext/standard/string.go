@@ -196,7 +196,7 @@ func PhpAddcslashes(ctx *php.Context, str string, what string) string {
 	strings.NewReplacer()
 	var buf strings.Builder
 	for _, c := range []byte(str) {
-		if strings.ContainsRune(mask, rune(c)) {
+		if strings.IndexByte(mask, c) >= 0 {
 			if c < 32 || c > 126 {
 				buf.WriteByte('\\')
 				switch c {
@@ -719,7 +719,7 @@ func PhpStrspnEx(s1 string, s2 string) int {
 		return 0
 	}
 	for i, c := range []byte(s1) {
-		if !strings.ContainsRune(s2, rune(c)) {
+		if strings.IndexByte(s2, c) < 0 {
 			return i
 		}
 	}
@@ -742,7 +742,7 @@ func PhpStrcspnEx(s1 string, s2 string) int {
 		return strLenCheckNull(s1)
 	}
 	for i, c := range []byte(s1) {
-		if strings.ContainsRune(s2, rune(c)) {
+		if strings.IndexByte(s2, c) >= 0 {
 			return i
 		}
 	}
@@ -881,85 +881,54 @@ func ZifStripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt,
 	}
 }
 
-//@zif(onError=1)
-func ZifStrrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
+func strrpos(ctx *php.Context, haystack string, needle types.Zval, offset int, caseIgnore bool) (int, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok {
 		return 0, false
 	}
 
-	if len(haystack) == 0 {
+	if len(haystack) == 0 || len(needleStr) == 0 {
 		return 0, false
 	}
 
+	if caseIgnore {
+		haystack = ascii.StrToLower(haystack)
+		needleStr = ascii.StrToLower(needleStr)
+	}
+	var prefixOffset int
 	if offset >= 0 {
-		haystack, offset, ok = offsetSubstr(ctx, haystack, offset)
-		if !ok {
+		if offset > len(haystack) {
+			php.ErrorDocRef(ctx, "", perr.E_WARNING, "Offset is greater than the length of haystack string")
 			return 0, false
 		}
-		if pos := strings.LastIndex(haystack, needleStr); pos >= 0 {
-			return offset + pos, true
-		} else {
-			return 0, false
-		}
+		haystack = haystack[offset:]
+		prefixOffset = offset
 	} else { // offset < 0
 		offset += len(haystack)
 		if offset < 0 {
 			php.ErrorDocRef(ctx, "", perr.E_WARNING, "Offset is greater than the length of haystack string")
 			return 0, false
 		}
-
 		if offset+len(needleStr) < len(haystack) {
 			haystack = haystack[:offset+len(needleStr)]
 		}
-		if pos := strings.LastIndex(haystack, needleStr); pos >= 0 {
-			return pos, true
-		} else {
-			return 0, false
-		}
+		prefixOffset = 0
+	}
+	if pos := strings.LastIndex(haystack, needleStr); pos >= 0 {
+		return prefixOffset + pos, true
+	} else {
+		return 0, false
 	}
 }
 
 //@zif(onError=1)
+func ZifStrrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
+	return strrpos(ctx, haystack, needle, offset, false)
+}
+
+//@zif(onError=1)
 func ZifStrripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
-	needleStr, ok := parseNeedle(ctx, needle)
-	if !ok {
-		return 0, false
-	}
-
-	if len(haystack) == 0 {
-		return 0, false
-	}
-
-	haystack = ascii.StrToLower(haystack)
-	needleStr = ascii.StrToLower(needleStr)
-	if offset >= 0 {
-		var ok bool
-		haystack, offset, ok = offsetSubstr(ctx, haystack, offset)
-		if !ok {
-			return 0, false
-		}
-		if pos := strings.Index(haystack, needleStr); pos >= 0 {
-			return offset + pos, true
-		} else {
-			return 0, false
-		}
-	} else { // offset < 0
-		offset += len(haystack)
-		if offset < 0 {
-			php.ErrorDocRef(ctx, "", perr.E_WARNING, "Offset is greater than the length of haystack string")
-			return 0, false
-		}
-
-		if offset+len(needleStr) < len(haystack) {
-			haystack = haystack[:offset+len(needleStr)]
-		}
-		if pos := strings.LastIndex(haystack, needleStr); pos >= 0 {
-			return pos, true
-		} else {
-			return 0, false
-		}
-	}
+	return strrpos(ctx, haystack, needle, offset, true)
 }
 func ZifStrrchr(ctx *php.Context, haystack string, needle types.Zval) (string, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
@@ -1253,8 +1222,8 @@ func ZifUcwords(ctx *php.Context, str string, _ zpp.Opt, delimiters *string) str
 
 	chars := []byte(str)
 	chars[0] = ascii.ToUpper(chars[0])
-	for i := 1; i < len(str)-1; i++ {
-		if strings.ContainsRune(mask, rune(chars[i-1])) {
+	for i := 1; i < len(str); i++ {
+		if strings.IndexByte(mask, chars[i-1]) >= 0 {
 			chars[i] = ascii.ToUpper(chars[i])
 		}
 	}
@@ -1484,18 +1453,16 @@ func ZifStrrev(str string) string {
 	return string(result)
 }
 
-func phpSimilarStr(txt1 string, txt2 string) (max int, count int, pos1 int, pos2 int) {
+// 相似度-获取最长共同子串位置
+func phpSimilarStr(txt1 string, txt2 string) (max int, pos1 int, pos2 int) {
 	for i := range []byte(txt1) {
 		for j := range []byte(txt2) {
 			l := 0
-			for l < len(txt1) && l < len(txt2) && txt1[l] == txt2[l] {
+			for i+l < len(txt1) && j+l < len(txt2) && txt1[i+l] == txt2[j+l] {
 				l++
 			}
 			if l > max {
-				max = l
-				count++
-				pos1 = i
-				pos2 = j
+				max, pos1, pos2 = l, i, j
 			}
 		}
 	}
@@ -1503,10 +1470,11 @@ func phpSimilarStr(txt1 string, txt2 string) (max int, count int, pos1 int, pos2
 }
 
 func phpSimilarChar(txt1 string, txt2 string) int {
-	max, count, pos1, pos2 := phpSimilarStr(txt1, txt2)
+	// 相似度 = 最长共同子串长度 + 前缀相似度 + 后缀相似度
+	max, pos1, pos2 := phpSimilarStr(txt1, txt2)
 	sum := max
-	if max != 0 {
-		if pos1 != 0 && pos2 != 0 && count > 1 {
+	if max > 0 {
+		if pos1 != 0 && pos2 != 0 {
 			sum += phpSimilarChar(txt1[:pos1], txt2[:pos2])
 		}
 		if pos1+max < len(txt1) && pos2+max < len(txt2) {
@@ -2303,7 +2271,7 @@ func ZifStrWordCount(ctx *php.Context, str string, _ zpp.Opt, format int, charli
 
 	start := -1
 	for end, c := range []byte(str) {
-		if ascii.IsAscii(c) || (mask != "" && strings.ContainsRune(mask, rune(c))) {
+		if ascii.IsAscii(c) || (mask != "" && strings.IndexByte(mask, c) >= 0) {
 			if start < 0 {
 				start = end
 			}
@@ -2413,8 +2381,8 @@ func ZifSubstrCompare(ctx *php.Context, return_value zpp.Ret, haystack string, n
 	}
 
 	if caseInsensitivity {
-		return strings.Compare(s1, s2), true
+		return php.StringCaseCompare(s1, s2), true
 	} else {
-		return ascii.StrCaseCompare(s1, s2), true
+		return php.StringCompare(s1, s2), true
 	}
 }

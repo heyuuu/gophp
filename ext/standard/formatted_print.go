@@ -139,6 +139,9 @@ func (p *formatPrinter) AppendDouble(number float64, width int, precision int, f
 		fmtTyp = 'f'
 	}
 	str := strconv.FormatFloat(number, fmtTyp, precision, 64)
+	if number >= 0 && p.flags.alwaysSign {
+		str = "+" + str
+	}
 
 	// fix: 科学计数法且位数为指数个位数时，go 默认会补齐到2位，但 php 保持位数不变。此处修复此差别
 	if idx := strings.LastIndexAny(str, "eE"); idx >= 0 {
@@ -273,6 +276,7 @@ func PhpFormattedPrint(ctx *php.Context, formatZval types.Zval, args []types.Zva
 						precision = num
 						format = format[n:]
 						p.flags.adjusting |= ADJ_PRECISION
+						p.flags.expPrec = true
 					} else {
 						php.ErrorDocRef(ctx, "", perr.E_WARNING, fmt.Sprintf("Precision must be greater than zero and less than %d", types.MaxLong))
 						return "", false

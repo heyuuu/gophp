@@ -17,7 +17,9 @@ func PhpBase64DecodeEx(str string, strict bool) (string, bool) {
 		return "", false
 	}
 
-	ret, err := base64.StdEncoding.DecodeString(cleanStr)
+	// notice: 此处通过过滤 padding + RawStdEncoding 来兼容有/无padding的情况
+	cleanStr = strings.TrimRight(cleanStr, string(base64.StdPadding))
+	ret, err := base64.RawStdEncoding.DecodeString(cleanStr)
 	if err != nil {
 		return "", false
 	}
@@ -27,7 +29,7 @@ func base64CleanStr(str string, strict bool) (string, bool) {
 	var buf strings.Builder
 	for _, c := range []byte(str) {
 		// todo 此处可优化为 mask 数组 (参考 strings.asciiSet)
-		if strings.ContainsRune(base64Table, rune(c)) {
+		if strings.IndexByte(base64Table, c) >= 0 {
 			buf.WriteByte(c)
 		} else if c == ' ' {
 			// skip spaces

@@ -12,7 +12,7 @@ import (
 // @see Micro CHECK_NULL_PATH
 func CheckNullPath(s string) bool {
 	// 确认字符串是二进制安全的(即不包含 \0 字符)
-	return !strings.ContainsRune(s, 0)
+	return strings.IndexByte(s, 0) < 0
 }
 
 /* Fast parameter parsing API */

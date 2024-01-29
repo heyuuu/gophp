@@ -70,7 +70,7 @@ func uudecode(src string) (string, bool) {
 		// read each chunk
 		for i := 0; i < length; i += 3 {
 			/* sanity check */
-			if idx >= srcLen {
+			if idx+4 > srcLen {
 				return "", false
 			}
 

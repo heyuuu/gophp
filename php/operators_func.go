@@ -7,6 +7,24 @@ import (
 	"strings"
 )
 
+// internal functions
+func sign(i int) int {
+	if i > 0 {
+		return 1
+	}
+	return 0
+}
+
+func fastGetDouble(v Val) float64 {
+	if v.IsLong() {
+		return float64(v.Long())
+	} else if v.IsDouble() {
+		return v.Double()
+	} else {
+		return 0
+	}
+}
+
 func IsNumericString(str string) bool {
 	return ParseNumber(str).IsNotUndef()
 }

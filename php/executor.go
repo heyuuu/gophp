@@ -960,6 +960,7 @@ func (e *Executor) variableExpr(expr *ast.VariableExpr) types.Zval {
 	// todo undefined warning
 	value := e.currSymbols().Get(name)
 	if value.IsUndef() {
+		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name))
 		value = types.Null
 	}
 	return value
