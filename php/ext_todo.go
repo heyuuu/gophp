@@ -12,6 +12,7 @@ import (
 
 const LongMax = math.MaxInt
 const LongMin = math.MinInt
+const PrintZvalIndent = 4
 
 func ForbidDynamicCall(ctx *Context, s string) bool {
 	// todo
@@ -100,4 +101,41 @@ func ThrowException(ctx *Context, ce *types.Class, message string, code int) {
 	}
 
 	panic(perr.Todof("ThrowException: message=%s, code=%d", message, code))
+}
+
+func ManglePropertyName(src1 string, src2 string) string {
+	return "\000" + src1 + "\000" + src2
+}
+
+func UnmanglePropertyName(ctx *Context, name string) (className string, propName string, ok bool) {
+	if len(name) == 0 || name[0] != '\000' {
+		return "", name, true
+	}
+	if len(name) < 3 || name[1] == '\000' {
+		Error(ctx, perr.E_NOTICE, "Illegal member variable name")
+		return "", name, false
+	}
+	/*
+	 * 可能的Name结构
+	 * -	\0 + {className} + \0 + {$propName}
+	 * -	\0 + {className} + \0 + {annoClassSrc} + \0 + {$propName}
+	 */
+	parts := strings.SplitN(name[1:], "\000", 3)
+	switch len(parts) {
+	case 2:
+		return parts[0], parts[1], true
+	case 3:
+		return parts[0], parts[2], true
+	default:
+		Error(ctx, perr.E_NOTICE, "Corrupt member variable name")
+		return "", name, false
+	}
+}
+
+func ZendGetPropertiesFor(v types.Zval, debug types.PropPurposeType) *types.Array {
+	return nil
+}
+
+func ZendRsrcListGetRsrcTypeEx(res *types.Resource) *string {
+	return nil
 }

@@ -32,3 +32,7 @@ func ZVAL_NEW_REF(z *Zval, r *Zval) {
 }
 
 func ZVAL_COPY_VALUE(z *Zval, v *Zval) { *z = *v }
+
+func Z_OBJPROP_P(v Zval) *Array {
+	return nil
+}

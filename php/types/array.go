@@ -500,16 +500,15 @@ func (ht *Array) FindPos(pos ArrayPosition) (ArrayPair, ArrayPosition) {
 }
 
 func (ht *Array) FindPosReserve(pos ArrayPosition) (ArrayPair, ArrayPosition) {
-	// prev 需要用 0 表示已搜索全表，所以 pos = 实际索引 + 1
 	for i := pos; i > 0; i-- {
-		pair := ht.data.Pos(i - 1)
+		pair := ht.data.Pos(i)
 		if !pair.IsValid() {
 			continue
 		}
 
-		return pair, i - 1
+		return pair, i
 	}
-	return invalidArrayPair, 0
+	return invalidArrayPair, InvalidArrayPos
 }
 
 func (ht *Array) Current() ArrayPair {
