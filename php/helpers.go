@@ -35,8 +35,13 @@ func FormatDouble(f float64, fmtTyp byte, prec int) string {
 	}
 	str := strconv.FormatFloat(f, fmtTyp, prec, 64)
 
-	// fix: 科学计数法且位数为指数个位数时，go 默认会补齐到2位，但 php 保持位数不变。此处修复此差别
+	// fix: 兼容细节差异
 	if idx := strings.LastIndexAny(str, "eE"); idx >= 0 {
+		// fix: 科学计数法基数为1位时，go 会省略小数点，但 php 为补充 .0
+		if pointIdx := strings.IndexByte(str[:idx], '.'); pointIdx < 0 {
+			str = str[:idx] + ".0" + str[idx:]
+		}
+		// fix: 科学计数法且位数为指数个位数时，go 默认会补齐到2位，但 php 保持位数不变。此处修复此差别
 		if idx+3 < len(str) && str[idx+2] == '0' {
 			str = str[:idx+2] + str[idx+3:]
 		}

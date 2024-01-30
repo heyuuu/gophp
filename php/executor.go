@@ -403,7 +403,7 @@ func (e *Executor) constStmt(x *ast.ConstStmt) execResult {
 
 func (e *Executor) echoStmt(x *ast.EchoStmt) execResult {
 	for _, expr := range x.Exprs {
-		Print(e.ctx, e.expr(expr))
+		PrintZval(e.ctx, e.expr(expr))
 	}
 	return nil
 }
@@ -934,7 +934,7 @@ func (e *Executor) listExpr(expr *ast.ListExpr) types.Zval {
 }
 
 func (e *Executor) printExpr(expr *ast.PrintExpr) types.Zval {
-	Print(e.ctx, e.expr(expr.Expr))
+	PrintZval(e.ctx, e.expr(expr.Expr))
 	return Long(1)
 }
 

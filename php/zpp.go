@@ -560,20 +560,24 @@ func (p *FastParamParser) ParseRefArray() *types.Array {
 	if ref == nil {
 		return nil
 	}
-	if !ref.Val().IsArray() {
+	if ref.Val().IsArray() {
+		return ref.Val().Array()
+	} else {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
+		return nil
 	}
-	return ref.Val().Array()
 }
 func (p *FastParamParser) ParseRefArrayNullable() *types.Array {
 	ref := p.parseRefZval(true)
 	if ref == nil {
 		return nil
 	}
-	if !ref.Val().IsArray() {
+	if ref.Val().IsArray() {
+		return ref.Val().Array()
+	} else {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
+		return nil
 	}
-	return ref.Val().Array()
 }
 func (p *FastParamParser) ParseRefVariadic(postVarargs uint) []types.RefZval {
 	var args []types.RefZval
