@@ -1160,7 +1160,7 @@ func ArrayColumnFetchProp(data *types.Zval, name *types.Zval) types.Zval {
 	}
 	return prop
 }
-func ZifArrayColumn(ctx *php.Context, array *types.Array, columnKey zpp.ZvalNullable, _ zpp.Opt, indexKey zpp.ZvalNullable) (*types.Array, bool) {
+func ZifArrayColumn(ctx *php.Context, array *types.Array, columnKey *types.Zval, _ zpp.Opt, indexKey zpp.ZvalNullable) (*types.Array, bool) {
 	if columnKey != nil && !ArrayColumnParamHelper(ctx, columnKey, "column") || indexKey != nil && !ArrayColumnParamHelper(ctx, indexKey, "index") {
 		return nil, false
 	}
@@ -1184,7 +1184,7 @@ func ZifArrayColumn(ctx *php.Context, array *types.Array, columnKey zpp.ZvalNull
 
 			// col
 			var columnVal types.Zval
-			if columnKey.IsUndef() {
+			if columnKey == nil {
 				columnVal = data
 			} else if columnVal = ArrayColumnFetchProp(&data, columnKey); columnVal.IsUndef() {
 				return
@@ -1859,10 +1859,10 @@ func ZifArrayKeyExists(ctx *php.Context, key *types.Zval, array zpp.ArrayOrObjec
 		return false
 	}
 }
-func ZifArrayChunk(ctx *php.Context, array *types.Array, length int, _ zpp.Opt, preserveKeys bool) *types.Array {
+func ZifArrayChunk(ctx *php.Context, array *types.Array, length int, _ zpp.Opt, preserveKeys bool) types.Zval {
 	if length < 1 {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Size parameter expected to be greater than 0")
-		return nil
+		return types.Null
 	}
 
 	chunkCount := (array.Len()-1)/length + 1 // ceil(len/length)
@@ -1883,7 +1883,7 @@ func ZifArrayChunk(ctx *php.Context, array *types.Array, length int, _ zpp.Opt, 
 		}
 		itemCount++
 	})
-	return retArr
+	return php.Array(retArr)
 }
 func ZifArrayCombine(ctx *php.Context, keys *types.Array, values *types.Array) (*types.Array, bool) {
 	if keys.Len() != values.Len() {
@@ -1907,7 +1907,7 @@ func ZifArrayCombine(ctx *php.Context, keys *types.Array, values *types.Array) (
 			retArr.IndexUpdate(key.Long(), value)
 		} else {
 			strKey := php.ZvalGetStrVal(ctx, key)
-			retArr.KeyUpdate(strKey, value)
+			retArr.SymtableUpdate(strKey, value)
 		}
 	}
 	return retArr, true

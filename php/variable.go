@@ -61,7 +61,13 @@ func newArrayAppendVariable(ctx *Context, arr types.Zval) *arrayAppendVariable {
 }
 
 func (v arrayAppendVariable) Get() types.Zval {
-	panic(perr.Todof("$var[] cannot be set"))
+	arr := v.arr
+	switch arr.Type() {
+	case types.IsArray:
+		return types.Undef
+	default:
+		panic(perr.Todof("unsupported arrayAppendVariable.Set arr type: %s", types.ZvalGetType(arr)))
+	}
 }
 
 func (v arrayAppendVariable) Set(value types.Zval) {
@@ -79,7 +85,15 @@ func (v arrayAppendVariable) Unset() {
 }
 
 func (v arrayAppendVariable) MakeRef() *types.Reference {
-	panic(perr.Todof("$var[] cannot make ref"))
+	arr := v.arr
+	switch arr.Type() {
+	case types.IsArray:
+		ref := types.NewReference(UninitializedZval())
+		arr.Array().Append(types.ZvalRef(ref))
+		return ref
+	default:
+		panic(perr.Todof("unsupported arrayAppendVariable.MakeRef arr type: %s", types.ZvalGetType(arr)))
+	}
 }
 
 type arrayDimVariable struct {
@@ -140,6 +154,9 @@ func (v arrayDimVariable) MakeRef() *types.Reference {
 		if raw.IsRef() {
 			return raw.Ref()
 		} else {
+			if raw.IsUndef() {
+				raw = UninitializedZval()
+			}
 			ref := types.NewReference(raw)
 			arr.Array().Update(v.key, types.ZvalRef(ref))
 			return ref

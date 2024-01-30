@@ -622,8 +622,9 @@ func (e *Executor) arrayExpr(expr *ast.ArrayExpr) types.Zval {
 		}
 
 		if item.Key != nil {
-			key := ZvalToArrayKey(e.ctx, e.expr(item.Key))
-			arr.Update(key, val)
+			if key, ok := ZvalToArrayKey(e.ctx, e.expr(item.Key)); ok {
+				arr.Update(key, val)
+			}
 		} else {
 			arr.Append(val)
 		}
@@ -651,7 +652,11 @@ func (e *Executor) indexExpr(expr *ast.IndexExpr) types.Zval {
 
 	arr := e.expr(expr.Var)
 	dim := e.expr(expr.Dim)
-	key := ZvalToArrayKey(e.ctx, dim)
+	key, ok := ZvalToArrayKey(e.ctx, dim)
+	if !ok {
+		return UninitializedZval()
+	}
+
 	value := e.arrayGet(arr, key)
 	if value.IsUndef() {
 		if key.IsStrKey() {
@@ -659,7 +664,7 @@ func (e *Executor) indexExpr(expr *ast.IndexExpr) types.Zval {
 		} else {
 			panic(perr.Todof(`Warning: Undefined array key %d in`, key.IdxKey()))
 		}
-		return types.Null
+		return UninitializedZval()
 	}
 	return value
 }
@@ -841,7 +846,11 @@ func (e *Executor) assignOpExpr(expr *ast.AssignOpExpr) types.Zval {
 
 func (e *Executor) assignRefExpr(expr *ast.AssignRefExpr) types.Zval {
 	variable := e.variableRef(expr.Var)
-	value := e.variableRefZval(expr.Expr)
+	valueVar := e.variableRef(expr.Expr)
+	if valueVar == nil {
+		return UninitializedZval()
+	}
+	value := types.ZvalRef(valueVar.MakeRef())
 	variable.Set(value)
 	return value
 }
@@ -1086,7 +1095,10 @@ func (e *Executor) variableRef(expr ast.Expr) iVariable {
 			return newArrayAppendVariable(e.ctx, arr)
 		} else {
 			dim := e.expr(v.Dim)
-			key := ZvalToArrayKey(e.ctx, dim)
+			key, ok := ZvalToArrayKey(e.ctx, dim)
+			if !ok {
+				return nil
+			}
 			return newArrayDimVariable(e.ctx, arr, key)
 		}
 	default:

@@ -280,7 +280,7 @@ func arrayDiffKey(array *types.Array, arrays []*types.Array, dataComparer types.
 	array.Each(func(key types.ArrayKey, val types.Zval) {
 		keep := true
 		for _, cmpArray := range arrays {
-			if data := cmpArray.Find(key); data.IsUndef() && (dataComparer == nil || dataComparer(val, data) == 0) {
+			if data := cmpArray.Find(key); data.IsNotUndef() && (dataComparer == nil || dataComparer(val, data) == 0) {
 				keep = false
 				break
 			}
@@ -317,15 +317,15 @@ func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayCo
 		sortPairs(cmpPairsList[i], cmp)
 	}
 
-	retArr := types.NewArrayCap(array.Len())
+	keepKeys := make(map[types.ArrayKey]struct{}, array.Len())
 	for _, pair := range basePairs {
 		keep := true // 标识会否保留此元素
-		for cmpIdx, cmpPairs := range cmpPairsList {
+		for cmpIdx := range cmpPairsList {
 			// 去除小于 pair 的元素，找到第一个 >= pair 的元素或到队尾
-			for len(cmpPairs) > 0 {
-				c := cmp.Compare(pair, cmpPairs[0])
+			for len(cmpPairsList[cmpIdx]) > 0 {
+				c := cmp.Compare(pair, cmpPairsList[cmpIdx][0])
 				if c > 0 {
-					cmpPairsList[cmpIdx] = cmpPairs[1:]
+					cmpPairsList[cmpIdx] = cmpPairsList[cmpIdx][1:]
 				} else {
 					if c < 0 {
 						keep = false
@@ -334,7 +334,7 @@ func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayCo
 				}
 			}
 			// 已到队尾说明没有上匹配任何值
-			if len(cmpPairs) == 0 {
+			if len(cmpPairsList[cmpIdx]) == 0 {
 				keep = false
 			}
 			if !keep {
@@ -342,9 +342,17 @@ func arrayIntersect(array *types.Array, arrays []*types.Array, cmp types.ArrayCo
 			}
 		}
 		if keep {
-			retArr.Update(pair.Key, pair.Val)
+			keepKeys[pair.Key] = struct{}{}
 		}
 	}
+
+	// 按原数组顺序构建新数组
+	retArr := types.NewArrayCap(len(keepKeys))
+	array.Each(func(key types.ArrayKey, value types.Zval) {
+		if _, exists := keepKeys[key]; exists {
+			retArr.Update(key, value)
+		}
+	})
 
 	return retArr
 }

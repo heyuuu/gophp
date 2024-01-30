@@ -1086,7 +1086,9 @@ func opParseNumberPrefix(ctx *Context, str string, silent bool) Val {
 	zv, matchLen := ParseNumberPrefix(str)
 	if matchLen != len(str) && !silent {
 		// notice: 此处可能会触发 Exception
-		Error(ctx, perr.E_NOTICE, "A non well formed numeric value encountered")
+		if matchLen > 0 {
+			Error(ctx, perr.E_NOTICE, "A non well formed numeric value encountered")
+		}
 		if ctx.EG().HasException() {
 			return types.Undef
 		}
@@ -1094,23 +1096,24 @@ func opParseNumberPrefix(ctx *Context, str string, silent bool) Val {
 	return zv
 }
 
-func ZvalToArrayKey(ctx *Context, offset Val) types.ArrayKey {
+func ZvalToArrayKey(ctx *Context, offset Val) (key types.ArrayKey, ok bool) {
 	offset = offset.DeRef()
 	switch offset.Type() {
 	case types.IsUndef, types.IsNull:
-		return types.StrKey("")
+		return types.StrKey(""), true
 	case types.IsFalse:
-		return types.IdxKey(0)
+		return types.IdxKey(0), true
 	case types.IsTrue:
-		return types.IdxKey(1)
+		return types.IdxKey(1), true
 	case types.IsLong:
-		return types.IdxKey(offset.Long())
+		return types.IdxKey(offset.Long()), true
+	case types.IsDouble:
+		return types.IdxKey(DoubleToLong(offset.Double())), true
 	case types.IsString:
-		return types.NumericKey(offset.String())
+		return types.NumericKey(offset.String()), true
 	default:
-		// todo 其他类型处理
-		perr.Panic("此类型 key 转 ArrayKey 未完成: " + types.ZvalGetType(offset))
-		return types.IdxKey(0)
+		ZendIllegalOffset(ctx)
+		return types.IdxKey(0), false
 	}
 }
 

@@ -138,3 +138,7 @@ func InternalArgumentCountError(ctx *Context, throwException bool, message strin
 		Error(ctx, perr.E_WARNING, message)
 	}
 }
+
+func ZendIllegalOffset(ctx *Context) {
+	Error(ctx, perr.E_WARNING, "Illegal offset type")
+}

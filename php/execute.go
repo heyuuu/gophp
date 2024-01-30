@@ -6,6 +6,8 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 )
 
+func UninitializedZval() types.Zval { return types.Null }
+
 func ExecuteScript(ctx *Context, fileHandle *FileHandle, skipShebang bool) (retval Val, err error) {
 	assert.Assert(fileHandle != nil)
 	topFunc, err := CompileFile(ctx, fileHandle, skipShebang)

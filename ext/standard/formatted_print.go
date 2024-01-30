@@ -138,16 +138,9 @@ func (p *formatPrinter) AppendDouble(number float64, width int, precision int, f
 	if fmtTyp == 'F' {
 		fmtTyp = 'f'
 	}
-	str := strconv.FormatFloat(number, fmtTyp, precision, 64)
+	str := php.FormatDouble(number, fmtTyp, precision)
 	if number >= 0 && p.flags.alwaysSign {
 		str = "+" + str
-	}
-
-	// fix: 科学计数法且位数为指数个位数时，go 默认会补齐到2位，但 php 保持位数不变。此处修复此差别
-	if idx := strings.LastIndexAny(str, "eE"); idx >= 0 {
-		if idx+3 < len(str) && str[idx+2] == '0' {
-			str = str[:idx+2] + str[idx+3:]
-		}
 	}
 
 	p.AppendString(str, width, number < 0)
