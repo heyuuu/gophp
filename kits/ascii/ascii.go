@@ -37,6 +37,18 @@ func IsXDigit(c byte) bool {
 	return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F')
 }
 
+func ParseXDigit(c byte) (byte, bool) {
+	if c >= '0' && c <= '9' {
+		return c - '0', true
+	} else if c >= 'A' && c <= 'F' {
+		return c - 'A' + 10, true
+	} else if c >= 'a' && c <= 'f' {
+		return c - 'a' + 10, true
+	} else {
+		return 0, false
+	}
+}
+
 func IsSpace(c byte) bool {
 	return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r'
 }

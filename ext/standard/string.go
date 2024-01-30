@@ -1160,7 +1160,7 @@ func ZifSubstrReplace(ctx *php.Context, returnValue zpp.Ret, str types.Zval, rep
 		returnValue.SetString(res)
 		return
 	} else {
-		res := substrReplaceArray(ctx, str.Array(), replace, str, length)
+		res := substrReplaceArray(ctx, str.Array(), replace, start, length)
 		returnValue.SetArray(res)
 		return
 	}
@@ -2178,27 +2178,27 @@ func ZifSubstrCount(ctx *php.Context, haystack string, needle string, _ zpp.Opt,
 	return strings.Count(searchStr, needle), true
 }
 
-func ZifStrPad(ctx *php.Context, input string, padLength int, _ zpp.Opt, padString_ *string, padType_ *int) (string, bool) {
+func ZifStrPad(ctx *php.Context, input string, padLength int, _ zpp.Opt, padString_ *string, padType_ *int) types.Zval {
 	padString := lang.Option(padString_, " ")
 	padType := lang.Option(padType_, STR_PAD_RIGHT)
 
 	/* If resulting string turns out to be shorter than input string,
 	   we simply copy the input and return. */
 	if padLength < 0 || padLength < len(input) {
-		return input, true
+		return php.String(input)
 	}
 	if padString == "" {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Padding string cannot be empty")
-		return "", false
+		return types.Null
 	}
 	if padType < STR_PAD_LEFT || padType > STR_PAD_BOTH {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH")
-		return "", false
+		return types.Null
 	}
 	numPadChars := padLength - len(input)
 	if numPadChars >= math.MaxInt {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Padding length is too long")
-		return "", false
+		return types.Null
 	}
 
 	/* We need to figure out the left/right padding lengths. */
@@ -2224,7 +2224,7 @@ func ZifStrPad(ctx *php.Context, input string, padLength int, _ zpp.Opt, padStri
 		buf.WriteByte(padString[i%len(padString)])
 	}
 
-	return buf.String(), true
+	return php.String(buf.String())
 }
 
 // 参数执行 ROT13 编码并将结果字符串返回。
