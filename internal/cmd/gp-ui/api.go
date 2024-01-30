@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -113,7 +114,12 @@ func runCode(code string) (output string) {
 	defer func() {
 		if e := recover(); e != nil {
 			buf.WriteString(fmt.Sprintf(">>> Execute panic: %v", e))
-			log.Printf("%+v\n", e)
+
+			// 打印堆栈
+			const size = 64 << 10
+			stack := make([]byte, size)
+			stack = stack[:runtime.Stack(stack, false)]
+			log.Printf(">>> Execute panic: %v\n%s", e, stack)
 		}
 
 		output = buf.String()
