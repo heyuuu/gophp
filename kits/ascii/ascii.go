@@ -89,7 +89,7 @@ func StrToUpper(s string) string {
 	return buf.String()
 }
 
-// 字符串转小写。与 strings.ToLower() 的区别是，它不支持除英文字母外的其他unicode字母
+// 字符串转小写。与 strings.ToLower() 的区别是，它不处理除英文字母外的其他unicode字母
 func StrToLower(s string) string {
 	var idx int
 	for idx = 0; idx < len(s); idx++ {

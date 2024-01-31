@@ -13,6 +13,7 @@ var Long = types.ZvalLong
 var Double = types.ZvalDouble
 var String = types.ZvalString
 var Array = types.ZvalArray
+var Object = types.ZvalObject
 
 type ZvalTypePair uint
 

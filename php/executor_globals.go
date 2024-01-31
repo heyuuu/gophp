@@ -22,6 +22,8 @@ type ExecutorGlobals struct {
 	classTable    ClassTable
 
 	currentExecuteData *ExecuteData
+
+	nextObjectHandle uint
 }
 
 func (e *ExecutorGlobals) ErrorReporting() int                  { return e.errorReporting }
@@ -92,4 +94,9 @@ func (e *ExecutorGlobals) PopExecuteData() *ExecuteData {
 		e.currentExecuteData = result.prev
 	}
 	return result
+}
+
+func (e *ExecutorGlobals) NextObjectHandle() uint {
+	e.nextObjectHandle++
+	return e.nextObjectHandle
 }

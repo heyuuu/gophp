@@ -1056,7 +1056,25 @@ func (e *Executor) funcCallExpr(expr *ast.FuncCallExpr) types.Zval {
 }
 
 func (e *Executor) newExpr(expr *ast.NewExpr) types.Zval {
-	panic(perr.Todof("e.newExpr"))
+	var ce *types.Class
+	switch x := expr.Class.(type) {
+	case *ast.Name:
+		ce = ZendFetchClassByName(e.ctx, x.ToCodeString(), "", 0)
+	default:
+		panic(perr.Todof("e.newExpr 为完成的"))
+	}
+	if ce == nil {
+		assert.Assert(e.ctx.EG().HasException())
+		return UninitializedZval()
+	}
+
+	obj := ObjectInitEx(e.ctx, ce)
+	if obj == nil {
+		return UninitializedZval()
+	}
+
+	// todo constructor
+	return Object(obj)
 }
 
 func (e *Executor) methodCallExpr(expr *ast.MethodCallExpr) types.Zval {

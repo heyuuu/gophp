@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/heyuuu/gophp/php/assert"
-	"unsafe"
 )
 
 // Object
@@ -13,16 +12,16 @@ type Object struct {
 	protected bool
 }
 
-func NewObject(ce *Class) *Object {
+func NewObject(ce *Class, handle uint) *Object {
 	assert.Assert(ce != nil)
-	return initObject(ce)
+	return initObject(ce, handle)
 }
 
-func initObject(ce *Class) *Object {
+func initObject(ce *Class, handle uint) *Object {
 	o := &Object{
-		ce: ce,
+		handle: handle,
+		ce:     ce,
 	}
-	o.handle = uint(uintptr(unsafe.Pointer(o)))
 	return o
 }
 
