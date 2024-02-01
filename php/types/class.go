@@ -29,44 +29,46 @@ func (n ClassName) LcName() string { return n.lcName }
 
 // Class
 type Class struct {
-	typ   byte
+	typ   byte `get:"Type"`
 	name  ClassName
-	flags uint32
+	flags uint32 `prop:""`
 
 	// 继承父类，在 link 前只有 parentName 可能有值，在 link 后只有 parent 可能有值(union)。
-	parentName string
-	parent     *Class
+	parentName string `prop:""`
+	parent     *Class `prop:""`
 
 	// 继承接口列表，在 link 前只有 interfaceNames 可能有值，在 link 后只有 interfaces 可能有值(union)。
-	interfaceNames []ClassName
-	interfaces     []*Class
+	interfaceNames []ClassName `get:""`
+	interfaces     []*Class    `get:""`
 
-	functionTable *FunctionTable
-	propertyTable *PropertyInfoTable
+	functionTable *FunctionTable      `get:""`
+	propertyTable *PropertyInfoTable  `get:""`
+	constantTable *ClassConstantTable `get:""`
 
 	// 魔术方法
-	constructor     *Function
-	destructor      *Function
-	clone           *Function
-	__get           *Function
-	__set           *Function
-	__unset         *Function
-	__isset         *Function
-	__call          *Function
-	__callstatic    *Function
-	__tostring      *Function
-	__debugInfo     *Function
-	serializeFunc   *Function
-	unserializeFunc *Function
+	constructor     *Function `prop:"@"`
+	destructor      *Function `prop:"@"`
+	clone           *Function `prop:"@"`
+	__get           *Function `prop:"@"`
+	__set           *Function `prop:"@"`
+	__unset         *Function `prop:"@"`
+	__isset         *Function `prop:"@"`
+	__call          *Function `prop:"@"`
+	__callstatic    *Function `prop:"@"`
+	__tostring      *Function `prop:"@"`
+	__debugInfo     *Function `prop:"@"`
+	serializeFunc   *Function `prop:"@"`
+	unserializeFunc *Function `prop:"@"`
 
 	// info.internal
-	moduleNumber int
+	moduleNumber int `get:""`
 	// info.user
 	blockInfo
 }
 
 func NewUserClass(name string) *Class {
 	ce := &Class{
+		typ:  typeUserClass,
 		name: MakeClassName(name),
 	}
 	ce.initData()
@@ -75,6 +77,7 @@ func NewUserClass(name string) *Class {
 
 func NewInternalClass(name string, moduleNumber int, flags uint32) *Class {
 	ce := &Class{
+		typ:          typeInternalClass,
 		name:         MakeClassName(name),
 		moduleNumber: moduleNumber,
 		flags:        flags,
@@ -82,18 +85,10 @@ func NewInternalClass(name string, moduleNumber int, flags uint32) *Class {
 	return ce
 }
 
-func NewClass(name string, moduleNumber int) *Class {
-	ce := &Class{
-		name:         MakeClassName(name),
-		moduleNumber: moduleNumber,
-	}
-
-	return ce
-}
-
 func (ce *Class) initData() {
 	ce.functionTable = NewFunctionTable()
 	ce.propertyTable = NewPropertyInfoTable()
+	ce.constantTable = NewClassConstantTable()
 }
 
 func (ce *Class) Name() string   { return ce.name.Name() }
