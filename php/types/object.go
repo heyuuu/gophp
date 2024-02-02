@@ -10,19 +10,29 @@ type Object struct {
 	ce     *Class
 
 	protected bool
+
+	properties map[string]Zval
 }
 
 func NewObject(ce *Class, handle uint) *Object {
 	assert.Assert(ce != nil)
-	return initObject(ce, handle)
+	obj := initObject(ce, handle)
+
+	return obj
 }
 
 func initObject(ce *Class, handle uint) *Object {
-	o := &Object{
-		handle: handle,
-		ce:     ce,
+	obj := &Object{
+		handle:     handle,
+		ce:         ce,
+		properties: make(map[string]Zval),
 	}
-	return o
+
+	ce.PropertyTable().Each(func(propName string, propInfo *PropertyInfo) {
+		obj.properties[propName] = propInfo.defaultVal
+	})
+
+	return obj
 }
 
 func (o *Object) Handle() uint      { return o.handle }
@@ -30,8 +40,16 @@ func (o *Object) Ce() *Class        { return o.ce }
 func (o *Object) ClassName() string { return o.ce.Name() }
 func (o *Object) CeName() string    { return o.ce.Name() }
 
+func (o *Object) ReadPropertyR(name string) Zval {
+	return o.properties[name]
+}
+
 func (o *Object) PropertiesFor(typ PropPurposeType) *Array {
-	return nil
+	arr := NewArrayCap(len(o.properties))
+	for name, zval := range o.properties {
+		arr.KeyAdd(name, zval)
+	}
+	return arr
 }
 
 func (o *Object) CanCast() bool {

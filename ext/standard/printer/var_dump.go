@@ -69,8 +69,12 @@ func (p *VarDumpPrinter) Zval(zv types.Zval, level int) {
 		}
 		obj.ProtectRecursive()
 		myht := obj.PropertiesFor(types.PropPurposeDebug)
+		propCount := 0
+		if myht != nil {
+			propCount = myht.Len()
+		}
 		className := obj.ClassName()
-		p.printf("%sobject(%s)#%d (%d) {\n", common, className, obj.Handle(), lang.CondF1(myht != nil, func() int { return myht.Count() }, 0))
+		p.printf("%sobject(%s)#%d (%d) {\n", common, className, obj.Handle(), propCount)
 		if myht != nil {
 			myht.Each(func(key types.ArrayKey, value types.Zval) {
 				var propInfo *types.PropertyInfo = nil
@@ -118,7 +122,7 @@ func (p *VarDumpPrinter) objectProperty(propInfo *types.PropertyInfo, zv types.Z
 		p.printIdent(level)
 		p.print("[")
 		if ok {
-			if className[0] == '*' {
+			if className != "" && className[0] == '*' {
 				p.printf(`"%s":protected`, propName)
 			} else {
 				p.printf(`"%s":"%s":private`, propName, className)

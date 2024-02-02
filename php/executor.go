@@ -3,6 +3,7 @@ package php
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
@@ -201,8 +202,6 @@ func (e *Executor) stmt(stmt ast.Stmt) execResult {
 		return e.interfaceStmt(x)
 	case *ast.ClassStmt:
 		return e.classStmt(x)
-	case *ast.ClassConstStmt:
-		return e.classConstStmt(x)
 	case *ast.PropertyStmt:
 		return e.propertyStmt(x)
 	case *ast.ClassMethodStmt:
@@ -472,11 +471,36 @@ func (e *Executor) interfaceStmt(x *ast.InterfaceStmt) execResult {
 }
 
 func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
-	panic(perr.Todof("e.classStmt"))
-}
+	var entry types.UserClassEntry
 
-func (e *Executor) classConstStmt(x *ast.ClassConstStmt) execResult {
-	panic(perr.Todof("e.classConstStmt"))
+	entry.Name = x.NamespacedName.ToCodeString()
+
+	for _, stmt := range x.Stmts {
+		switch s := stmt.(type) {
+		case *ast.ClassConstStmt:
+			constant := types.NewClassConstant(
+				s.Name.Name,
+				e.expr(s.Value),
+				"",
+				0,
+			)
+			entry.Constants = append(entry.Constants, constant)
+		case *ast.PropertyStmt:
+			property := types.NewPropertyInfo(
+				s.Name.Name,
+				0,
+				nil,
+				e.expr(s.Default),
+			)
+			entry.Properties = append(entry.Properties, property)
+		default:
+			panic(perr.Todof("class stmt type: %T", s))
+		}
+	}
+
+	_ = RegisterUserClass(e.ctx, &entry)
+
+	return nil
 }
 
 func (e *Executor) propertyStmt(x *ast.PropertyStmt) execResult {
@@ -902,7 +926,21 @@ func (e *Executor) constFetchExpr(expr *ast.ConstFetchExpr) types.Zval {
 }
 
 func (e *Executor) classConstFetchExpr(expr *ast.ClassConstFetchExpr) types.Zval {
-	panic(perr.Todof("e.classConstFetchExpr"))
+	className := e.nameOrExprAsString(expr.Class)
+	constName := expr.Name.Name
+
+	ce := ZendFetchClassByName(e.ctx, className, "", 0)
+	if ce == nil {
+		return UninitializedZval()
+	}
+
+	cc := ce.ConstantTable().Get(ascii.StrToLower(constName))
+	if cc == nil {
+		ThrowError(e.ctx, nil, fmt.Sprintf("Undefined class constant '%s'", constName))
+		return UninitializedZval()
+	}
+
+	return cc.Value()
 }
 
 func (e *Executor) magicConstExpr(expr *ast.MagicConstExpr) types.Zval {
@@ -933,7 +971,20 @@ func (e *Executor) printExpr(expr *ast.PrintExpr) types.Zval {
 }
 
 func (e *Executor) propertyFetchExpr(expr *ast.PropertyFetchExpr) types.Zval {
-	panic(perr.Todof("e.propertyFetchExpr"))
+	obj := e.exprDeref(expr.Var)
+	propName := e.identOrExprAsString(expr.Name)
+	if !obj.IsObject() {
+		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Trying to get property '%s' of non-object", propName))
+		return UninitializedZval()
+	}
+
+	ret := obj.Object().ReadPropertyR(propName).DeRef()
+	if ret.IsUndef() {
+		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", obj.Object().CeName(), propName))
+		return UninitializedZval()
+	}
+
+	return ret
 }
 
 func (e *Executor) staticPropertyFetchExpr(expr *ast.StaticPropertyFetchExpr) types.Zval {
@@ -980,6 +1031,28 @@ func (e *Executor) variableName(nameNode ast.Node) string {
 		return ZvalGetStrVal(e.ctx, e.expr(x))
 	default:
 		panic(perr.Todof("unexpected VariableExpr.Name type: %T, %+v", nameNode, nameNode))
+	}
+}
+
+func (e *Executor) identOrExprAsString(node ast.Node) string {
+	switch x := node.(type) {
+	case *ast.Ident:
+		return x.Name
+	case ast.Expr:
+		return ZvalGetStrVal(e.ctx, e.expr(x))
+	default:
+		panic(perr.Todof("expected Ident or Expr, %T given", node))
+	}
+}
+
+func (e *Executor) nameOrExprAsString(node ast.Node) string {
+	switch x := node.(type) {
+	case *ast.Name:
+		return x.ToCodeString()
+	case ast.Expr:
+		return ZvalGetStrVal(e.ctx, e.expr(x))
+	default:
+		panic(perr.Todof("expected Name or Expr, %T given", node))
 	}
 }
 

@@ -2,10 +2,15 @@ package types
 
 // PropertyInfo
 type PropertyInfo struct {
-	name  string
-	flags uint32
-	ce    *Class
-	typ   *TypeHint
+	name       string
+	flags      uint32
+	ce         *Class
+	typ        *TypeHint
+	defaultVal Zval
+}
+
+func NewPropertyInfo(name string, flags uint32, typ *TypeHint, defaultVal Zval) *PropertyInfo {
+	return &PropertyInfo{name: name, flags: flags, typ: typ, defaultVal: defaultVal}
 }
 
 func (p PropertyInfo) Flags() uint32   { return p.flags }

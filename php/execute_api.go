@@ -42,6 +42,7 @@ func ZendLookupClassEx(ctx *Context, name string, key string, flags uint32) *typ
 }
 
 func ZendFetchClassByName(ctx *Context, className string, key string, fetchType uint32) *types.Class {
+	className = trimClassName(className)
 	ce := ZendLookupClassEx(ctx, className, key, fetchType)
 	if ce != nil {
 		return ce

@@ -10,8 +10,8 @@ func RegisterInternalClass(ctx *Context, moduleNumber int, name string) *types.C
 	iRegisterClass(ctx, ce)
 	return ce
 }
-func RegisterUserClass(ctx *Context, name string) *types.Class {
-	ce := types.NewUserClass(name)
+func RegisterUserClass(ctx *Context, classEntry *types.UserClassEntry) *types.Class {
+	ce := types.NewUserClass(classEntry)
 	iRegisterClass(ctx, ce)
 	return ce
 }

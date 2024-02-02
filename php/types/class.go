@@ -66,29 +66,36 @@ type Class struct {
 	blockInfo
 }
 
-func NewUserClass(name string) *Class {
-	ce := &Class{
-		typ:  typeUserClass,
-		name: MakeClassName(name),
+func NewUserClass(entry *UserClassEntry) *Class {
+	ce := initClass(typeUserClass, entry.Name)
+	for _, constant := range entry.Constants {
+		constant.ce = ce
+		ce.ConstantTable().Add(ascii.StrToLower(constant.name), constant)
 	}
-	ce.initData()
+	for _, property := range entry.Properties {
+		property.ce = ce
+		ce.PropertyTable().Add(ascii.StrToLower(property.name), property)
+	}
+
 	return ce
 }
 
 func NewInternalClass(name string, moduleNumber int, flags uint32) *Class {
-	ce := &Class{
-		typ:          typeInternalClass,
-		name:         MakeClassName(name),
-		moduleNumber: moduleNumber,
-		flags:        flags,
-	}
+	ce := initClass(typeUserClass, name)
+	ce.moduleNumber = moduleNumber
+	ce.flags = flags
 	return ce
 }
 
-func (ce *Class) initData() {
-	ce.functionTable = NewFunctionTable()
-	ce.propertyTable = NewPropertyInfoTable()
-	ce.constantTable = NewClassConstantTable()
+func initClass(typ byte, name string) *Class {
+	ce := &Class{
+		typ:           typ,
+		name:          MakeClassName(name),
+		functionTable: NewFunctionTable(),
+		propertyTable: NewPropertyInfoTable(),
+		constantTable: NewClassConstantTable(),
+	}
+	return ce
 }
 
 func (ce *Class) Name() string   { return ce.name.Name() }
