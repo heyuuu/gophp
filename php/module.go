@@ -6,7 +6,7 @@ import "github.com/heyuuu/gophp/php/types"
 type ModuleEntry struct {
 	Name            string
 	Version         string
-	Functions       []types.FunctionEntry
+	Functions       []types.FunctionDecl
 	ModuleStartup   func(ctx *Context, moduleNumber int) bool
 	ModuleShutdown  func(ctx *Context, moduleNumber int) bool
 	RequestStartup  func(ctx *Context, moduleNumber int) bool

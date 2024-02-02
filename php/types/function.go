@@ -37,7 +37,7 @@ func NewInternalFunction(name string, handler any, moduleNumber int) *Function {
 	}
 }
 
-func NewInternalFunctionByEntry(moduleNumber int, entry FunctionEntry) *Function {
+func NewInternalFunctionByEntry(moduleNumber int, entry FunctionDecl) *Function {
 	return &Function{
 		typ:          TypeInternalFunction,
 		functionName: entry.name,

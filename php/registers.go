@@ -10,8 +10,8 @@ func RegisterInternalClass(ctx *Context, moduleNumber int, name string) *types.C
 	iRegisterClass(ctx, ce)
 	return ce
 }
-func RegisterUserClass(ctx *Context, classEntry *types.UserClassEntry) *types.Class {
-	ce := types.NewUserClass(classEntry)
+func RegisterUserClass(ctx *Context, decl *types.UserClassDecl) *types.Class {
+	ce := types.NewUserClass(decl)
 	iRegisterClass(ctx, ce)
 	return ce
 }
@@ -19,7 +19,7 @@ func iRegisterClass(ctx *Context, ce *types.Class) {
 	ctx.EG().ClassTable().Set(ce.LcName(), ce)
 }
 
-func RegisterModuleFunctions(ctx *Context, m *Module, functions []types.FunctionEntry) {
+func RegisterModuleFunctions(ctx *Context, m *Module, functions []types.FunctionDecl) {
 	for _, entry := range functions {
 		fn := types.NewInternalFunctionByEntry(m.moduleNumber, entry)
 		RegisterFunction(ctx, entry.Name(), fn)

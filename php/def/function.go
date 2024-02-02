@@ -5,7 +5,7 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 )
 
-type FuncType = types.FunctionEntry
+type FuncType = types.FunctionDecl
 type FuncHandler = php.ZifHandler
 type ArgInfo struct {
 	Name     string
@@ -27,5 +27,5 @@ func DefFunc(name string, minNumArgs uint32, maxNumArgs int32, argInfos []ArgInf
 		}
 	}
 
-	return types.DefFunctionEntry(name, handler, realArgInfos)
+	return types.DefFunc(name, handler, realArgInfos)
 }

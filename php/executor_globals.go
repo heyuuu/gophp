@@ -26,77 +26,77 @@ type ExecutorGlobals struct {
 	nextObjectHandle uint
 }
 
-func (e *ExecutorGlobals) ErrorReporting() int                  { return e.errorReporting }
-func (e *ExecutorGlobals) SetErrorReporting(errorReporting int) { e.errorReporting = errorReporting }
-func (e *ExecutorGlobals) Precision() int                       { return e.precision }
-func (e *ExecutorGlobals) SetPrecision(precision int)           { e.precision = precision }
+func (eg *ExecutorGlobals) ErrorReporting() int                  { return eg.errorReporting }
+func (eg *ExecutorGlobals) SetErrorReporting(errorReporting int) { eg.errorReporting = errorReporting }
+func (eg *ExecutorGlobals) Precision() int                       { return eg.precision }
+func (eg *ExecutorGlobals) SetPrecision(precision int)           { eg.precision = precision }
 
-func (e *ExecutorGlobals) Init(ctx *Context, base *ExecutorGlobals) {
-	e.ctx = ctx
-	e.errorReporting = int(perr.E_ALL)
+func (eg *ExecutorGlobals) Init(ctx *Context, base *ExecutorGlobals) {
+	eg.ctx = ctx
+	eg.errorReporting = int(perr.E_ALL)
 	if base != nil {
-		e.constantTable = base.constantTable.Clone()
-		e.functionTable = base.functionTable.Clone()
-		e.classTable = base.classTable.Clone()
+		eg.constantTable = base.constantTable.Clone()
+		eg.functionTable = base.functionTable.Clone()
+		eg.classTable = base.classTable.Clone()
 	} else {
-		e.constantTable = types.NewTable[*types.Constant]()
-		e.functionTable = types.NewTable[*types.Function]()
-		e.classTable = types.NewTable[*types.Class]()
+		eg.constantTable = types.NewTable[*types.Constant]()
+		eg.functionTable = types.NewTable[*types.Function]()
+		eg.classTable = types.NewTable[*types.Class]()
 	}
 	// todo init by ini
-	e.precision = 14
+	eg.precision = 14
 }
 
-func (e *ExecutorGlobals) ConstantTable() ConstantTable { return e.constantTable }
-func (e *ExecutorGlobals) FunctionTable() FunctionTable { return e.functionTable }
-func (e *ExecutorGlobals) ClassTable() ClassTable       { return e.classTable }
+func (eg *ExecutorGlobals) ConstantTable() ConstantTable { return eg.constantTable }
+func (eg *ExecutorGlobals) FunctionTable() FunctionTable { return eg.functionTable }
+func (eg *ExecutorGlobals) ClassTable() ClassTable       { return eg.classTable }
 
-func (e *ExecutorGlobals) FindFunction(name string) *types.Function {
+func (eg *ExecutorGlobals) FindFunction(name string) *types.Function {
 	// todo 完善 caseIgnore 及命名空间处理
 	lcName := strings.ToLower(name)
-	return e.functionTable.Get(lcName)
+	return eg.functionTable.Get(lcName)
 }
 
-func (e *ExecutorGlobals) HasException() bool {
+func (eg *ExecutorGlobals) HasException() bool {
 	// todo
 	return false
 }
 
-func (e *ExecutorGlobals) ErrorSuppress() bool {
-	return e.errorSuppress > 0
+func (eg *ExecutorGlobals) ErrorSuppress() bool {
+	return eg.errorSuppress > 0
 }
-func (e *ExecutorGlobals) ErrorSuppressScope(block func()) {
-	e.errorSuppress += 1
+func (eg *ExecutorGlobals) ErrorSuppressScope(block func()) {
+	eg.errorSuppress += 1
 	defer func() {
-		if e.errorSuppress > 0 {
-			e.errorSuppress--
+		if eg.errorSuppress > 0 {
+			eg.errorSuppress--
 		}
 	}()
 
 	block()
 }
 
-func (e *ExecutorGlobals) CurrentExecuteData() *ExecuteData {
-	return e.currentExecuteData
+func (eg *ExecutorGlobals) CurrentExecuteData() *ExecuteData {
+	return eg.currentExecuteData
 }
-func (e *ExecutorGlobals) SetCurrentExecuteData(currentExecuteData *ExecuteData) {
-	e.currentExecuteData = currentExecuteData
-}
-
-func (e *ExecutorGlobals) PushExecuteData(ex *ExecuteData) {
-	ex.prev = e.currentExecuteData
-	e.currentExecuteData = ex
+func (eg *ExecutorGlobals) SetCurrentExecuteData(currentExecuteData *ExecuteData) {
+	eg.currentExecuteData = currentExecuteData
 }
 
-func (e *ExecutorGlobals) PopExecuteData() *ExecuteData {
-	result := e.currentExecuteData
+func (eg *ExecutorGlobals) PushExecuteData(ex *ExecuteData) {
+	ex.prev = eg.currentExecuteData
+	eg.currentExecuteData = ex
+}
+
+func (eg *ExecutorGlobals) PopExecuteData() *ExecuteData {
+	result := eg.currentExecuteData
 	if result != nil {
-		e.currentExecuteData = result.prev
+		eg.currentExecuteData = result.prev
 	}
 	return result
 }
 
-func (e *ExecutorGlobals) NextObjectHandle() uint {
-	e.nextObjectHandle++
-	return e.nextObjectHandle
+func (eg *ExecutorGlobals) NextObjectHandle() uint {
+	eg.nextObjectHandle++
+	return eg.nextObjectHandle
 }

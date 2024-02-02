@@ -123,6 +123,14 @@ func (zv *Zval) Clone() *Zval {
 	return &tmp
 }
 
+func (zv Zval) CopyOrDup() Zval {
+	// 除数组外，基础类型都复制了值，引用类型都复制了指针；仅数组需要做写时复制
+	if zv.IsArray() {
+		zv.v = zv.Array().Dup()
+	}
+	return zv
+}
+
 // Zval getter
 func (zv Zval) Type() ZvalType {
 	switch v := zv.v.(type) {

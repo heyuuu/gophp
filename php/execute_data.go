@@ -10,6 +10,9 @@ type ExecuteData struct {
 	args    []types.Zval
 	symbols ISymtable
 	prev    *ExecuteData
+
+	thisClass *types.Class
+	thisObj   *types.Object
 }
 
 func NewExecuteData(ctx *Context, fn *types.Function, args []types.Zval) *ExecuteData {
@@ -49,6 +52,44 @@ func (ex *ExecuteData) CalleeName() string {
 	}
 
 	return ex.fn.Name()
+}
+
+// scope
+func (ex *ExecuteData) Scope() any {
+	if ex.thisObj != nil {
+		return ex.thisObj
+	} else if ex.thisClass != nil {
+		return ex.thisClass
+	} else {
+		return nil
+	}
+}
+
+func (ex *ExecuteData) SetScope(scope any) {
+	if scope == nil {
+		ex.thisClass, ex.thisObj = nil, nil
+		return
+	}
+
+	switch s := scope.(type) {
+	case *types.Object:
+		ex.thisClass, ex.thisObj = s.Ce(), s
+	case *types.Class:
+		ex.thisClass, ex.thisObj = s, nil
+	default:
+		panic("ExecuteData.SetScope() 只支持 *types.Object、*types.ClassEntry 或 nil 参数")
+	}
+}
+func (ex *ExecuteData) InScope() bool             { return ex.thisClass != nil }
+func (ex *ExecuteData) ThisObject() *types.Object { return ex.thisObj }
+func (ex *ExecuteData) ThisClass() *types.Class   { return ex.thisClass }
+
+// 临时兼容，后续使用 ThisObject 替代
+func (ex *ExecuteData) ThisObjectZval() *types.Zval {
+	if ex.thisObj != nil {
+		return types.NewZvalObject(ex.thisObj)
+	}
+	return nil
 }
 
 func (ex *ExecuteData) isStrictTypes() bool {

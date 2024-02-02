@@ -66,15 +66,19 @@ type Class struct {
 	blockInfo
 }
 
-func NewUserClass(entry *UserClassEntry) *Class {
-	ce := initClass(typeUserClass, entry.Name)
-	for _, constant := range entry.Constants {
+func NewUserClass(decl *UserClassDecl) *Class {
+	ce := initClass(typeUserClass, decl.Name)
+	for _, constant := range decl.Constants {
 		constant.ce = ce
 		ce.ConstantTable().Add(ascii.StrToLower(constant.name), constant)
 	}
-	for _, property := range entry.Properties {
+	for _, property := range decl.Properties {
 		property.ce = ce
 		ce.PropertyTable().Add(ascii.StrToLower(property.name), property)
+	}
+	for _, method := range decl.Methods {
+		method.scope = ce
+		ce.FunctionTable().Add(ascii.StrToLower(method.Name()), method)
 	}
 
 	return ce

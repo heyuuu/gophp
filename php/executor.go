@@ -37,7 +37,7 @@ func NewExecutor(ctx *Context) *Executor {
 }
 
 func (e *Executor) Execute(fn *types.Function) (retVal types.Zval, ret error) {
-	return e.function(fn, nil), nil
+	return e.doCall(fn, nil, nil), nil
 }
 
 func (e *Executor) function(fn *types.Function, args []types.Zval) types.Zval {
@@ -87,9 +87,9 @@ func (e *Executor) userFunction(fn *types.Function, args []types.Zval) types.Zva
 
 	res := e.stmtList(fn.Stmts())
 	switch r := res.(type) {
-	case *returnResult:
+	case returnResult:
 		return r.retVal
-	case *continueResult, *breakResult, *gotoResult:
+	case continueResult, breakResult, gotoResult:
 		panic(perr.Unreachable())
 	}
 	return types.Null
@@ -202,10 +202,6 @@ func (e *Executor) stmt(stmt ast.Stmt) execResult {
 		return e.interfaceStmt(x)
 	case *ast.ClassStmt:
 		return e.classStmt(x)
-	case *ast.PropertyStmt:
-		return e.propertyStmt(x)
-	case *ast.ClassMethodStmt:
-		return e.classMethodStmt(x)
 	case *ast.TraitStmt:
 		return e.traitStmt(x)
 	case *ast.TraitUseStmt:
@@ -471,9 +467,9 @@ func (e *Executor) interfaceStmt(x *ast.InterfaceStmt) execResult {
 }
 
 func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
-	var entry types.UserClassEntry
+	var decl types.UserClassDecl
 
-	entry.Name = x.NamespacedName.ToCodeString()
+	decl.Name = x.NamespacedName.ToCodeString()
 
 	for _, stmt := range x.Stmts {
 		switch s := stmt.(type) {
@@ -484,7 +480,7 @@ func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
 				"",
 				0,
 			)
-			entry.Constants = append(entry.Constants, constant)
+			decl.Constants = append(decl.Constants, constant)
 		case *ast.PropertyStmt:
 			property := types.NewPropertyInfo(
 				s.Name.Name,
@@ -492,13 +488,20 @@ func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
 				nil,
 				e.expr(s.Default),
 			)
-			entry.Properties = append(entry.Properties, property)
+			decl.Properties = append(decl.Properties, property)
+		case *ast.ClassMethodStmt:
+			method := types.NewAstFunction(
+				s.Name.Name,
+				nil,
+				s.Stmts,
+			)
+			decl.Methods = append(decl.Methods, method)
 		default:
 			panic(perr.Todof("class stmt type: %T", s))
 		}
 	}
 
-	_ = RegisterUserClass(e.ctx, &entry)
+	_ = RegisterUserClass(e.ctx, &decl)
 
 	return nil
 }
@@ -1079,47 +1082,7 @@ func (e *Executor) funcCallExpr(expr *ast.FuncCallExpr) types.Zval {
 	if fn == nil {
 		panic(perr.Internalf("函数未找到: %s", name))
 	}
-	getArgInfo := func(i int) *types.ArgInfo {
-		// todo 变长参数下的类型获取
-		if i < len(fn.ArgInfos()) {
-			argInfo := fn.ArgInfos()[i]
-			return &argInfo
-		}
-		return nil
-	}
-
-	args := make([]types.Zval, 0, len(expr.Args))
-	for _, arg := range expr.Args {
-		if !arg.Unpack {
-			argInfo := getArgInfo(len(args))
-			if argInfo != nil && argInfo.ByRef {
-				args = append(args, e.variableRefZval(arg.Value))
-			} else {
-				argVal := e.expr(arg.Value).DeRef()
-				args = append(args, argVal)
-			}
-		} else {
-			argVal := e.expr(arg.Value)
-			// todo Traversable
-			if !argVal.IsArray() {
-				panic(perr.Internalf("Only arrays and Traversables can be unpacked"))
-			}
-			argVal.Array().Each(func(key types.ArrayKey, value types.Zval) {
-				if key.IsStrKey() {
-					panic(perr.Internalf("Cannot unpack array with string keys"))
-				}
-
-				argInfo := getArgInfo(len(args))
-				if argInfo != nil && argInfo.ByRef {
-					args = append(args, types.ZvalRef(newArrayDimVariable(e.ctx, argVal, key).MakeRef()))
-				} else {
-					args = append(args, value.DeRef())
-				}
-			})
-		}
-	}
-
-	return e.function(fn, args)
+	return e.doCall(fn, expr.Args, nil)
 }
 
 func (e *Executor) newExpr(expr *ast.NewExpr) types.Zval {
@@ -1135,7 +1098,7 @@ func (e *Executor) newExpr(expr *ast.NewExpr) types.Zval {
 		return UninitializedZval()
 	}
 
-	obj := ObjectInitEx(e.ctx, ce)
+	obj := ObjectInit(e.ctx, ce)
 	if obj == nil {
 		return UninitializedZval()
 	}
@@ -1145,7 +1108,20 @@ func (e *Executor) newExpr(expr *ast.NewExpr) types.Zval {
 }
 
 func (e *Executor) methodCallExpr(expr *ast.MethodCallExpr) types.Zval {
-	panic(perr.Todof("e.methodCallExpr"))
+	obj := e.exprDeref(expr.Var)
+	methodName := e.identOrExprAsString(expr.Name)
+	if !obj.IsObject() {
+		ThrowError(e.ctx, nil, fmt.Sprintf("Call to a member function %s() on %s", methodName, types.ZendZvalTypeName(obj)))
+		return UninitializedZval()
+	}
+
+	method := obj.Object().GetMethod(methodName)
+	if method == nil {
+		ThrowError(e.ctx, nil, fmt.Sprintf("Call to undefined method %s::%s()", obj.Object().Ce().Name(), methodName))
+		return UninitializedZval()
+	}
+
+	return e.doCall(method, expr.Args, nil)
 }
 
 func (e *Executor) staticCallExpr(expr *ast.StaticCallExpr) types.Zval {
@@ -1239,4 +1215,85 @@ func (e *Executor) arrayUpdate(arr types.Zval, key types.ArrayKey, value types.Z
 	default:
 		panic(perr.Todof("unsupported e.arrayUpdate arr type: %s", types.ZvalGetType(arr)))
 	}
+}
+
+func (e *Executor) doCall(fn *types.Function, argNodes []*ast.Arg, scope any) types.Zval {
+	assert.Assert(fn != nil)
+
+	// init args
+	args := e.initCallArgs(fn, argNodes)
+
+	// push && pop executeData
+	ex := NewExecuteData(e.ctx, fn, args)
+	ex.SetScope(scope)
+	e.ctx.EG().PushExecuteData(ex)
+	defer func() {
+		popEx := e.ctx.EG().PopExecuteData()
+		assert.AssertEx(ex == popEx, "push & pop executeData 的 executeData 对象不相同，执行堆栈可能有错误")
+	}()
+
+	// do call
+	var retval types.Zval
+	if fn.IsInternalFunction() {
+		if handler, ok := fn.Handler().(ZifHandler); ok {
+			handler(ex, &retval)
+		} else {
+			perr.Panic(fmt.Sprintf("不支持的内部函数 handler 类型: %T", fn.Handler()))
+		}
+	} else {
+		retval = e.userFunction(fn, args)
+	}
+	if retval.IsUndef() {
+		retval = UninitializedZval()
+	}
+	return retval
+}
+
+func (e *Executor) initCallArgs(fn *types.Function, argNodes []*ast.Arg) []types.Zval {
+	if len(argNodes) == 0 {
+		return nil
+	}
+
+	// todo 参数长度检查？
+
+	getArgInfo := func(i int) *types.ArgInfo {
+		// todo 变长参数下的类型获取
+		if i < len(fn.ArgInfos()) {
+			argInfo := fn.ArgInfos()[i]
+			return &argInfo
+		}
+		return nil
+	}
+
+	args := make([]types.Zval, 0, len(argNodes))
+	for _, arg := range argNodes {
+		if !arg.Unpack {
+			argInfo := getArgInfo(len(args))
+			if argInfo != nil && argInfo.ByRef {
+				args = append(args, e.variableRefZval(arg.Value))
+			} else {
+				argVal := e.expr(arg.Value).DeRef()
+				args = append(args, argVal)
+			}
+		} else {
+			argVal := e.expr(arg.Value)
+			// todo Traversable
+			if !argVal.IsArray() {
+				panic(perr.Internalf("Only arrays and Traversables can be unpacked"))
+			}
+			argVal.Array().Each(func(key types.ArrayKey, value types.Zval) {
+				if key.IsStrKey() {
+					panic(perr.Internalf("Cannot unpack array with string keys"))
+				}
+
+				argInfo := getArgInfo(len(args))
+				if argInfo != nil && argInfo.ByRef {
+					args = append(args, types.ZvalRef(newArrayDimVariable(e.ctx, argVal, key).MakeRef()))
+				} else {
+					args = append(args, value.DeRef())
+				}
+			})
+		}
+	}
+	return args
 }

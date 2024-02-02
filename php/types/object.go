@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/assert"
 )
 
@@ -52,24 +53,27 @@ func (o *Object) PropertiesFor(typ PropPurposeType) *Array {
 	return arr
 }
 
-func (o *Object) CanCast() bool {
-	// todo
-	return false
+// method
+func (o *Object) GetMethod(method string) *Function {
+	lcMethod := ascii.StrToLower(method)
+	return o.ce.FunctionTable().Get(lcMethod)
 }
 
+// cast
+func (o *Object) CanCast() bool { return false }
 func (o *Object) Cast(typ ZvalType) (Zval, bool) {
 	// todo
 	return Undef, false
 }
 
-func (o *Object) CanCompare() bool {
-	// todo
-	return false
-}
-
 func (o *Object) CompareObjectsTo(other *Object) (int, bool) {
 	// todo
 	return 1, false
+}
+
+func (o *Object) CanCompare() bool {
+	// todo
+	return false
 }
 
 // recursive
