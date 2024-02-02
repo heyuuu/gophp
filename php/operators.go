@@ -249,7 +249,7 @@ func zvalGetStrEx(ctx *Context, v Val, try bool) (string, bool) {
 			return tmp.String(), true
 		}
 		if !ctx.EG().HasException() {
-			opThrowError(ctx, nil, fmt.Sprintf("Object of class %s could not be converted to string", v.Object().CeName()))
+			opThrowError(ctx, nil, fmt.Sprintf("Object of class %s could not be converted to string", v.Object().ClassName()))
 		}
 		if try {
 			return "", false
@@ -298,10 +298,10 @@ func ZvalGetObject(ctx *Context, v Val) *types.Object {
 func convertObjectToType(ctx *Context, obj *types.Object, ctype types.ZvalType) Val {
 	if result, ok := obj.Cast(ctype); ok {
 		return result
-	} else if obj.CanCast() {
-		Error(ctx, perr.E_RECOVERABLE_ERROR, fmt.Sprintf("Object of class %s could not be converted to %s", obj.CeName(), types.ZendGetTypeByConst(ctype)))
+	} else {
+		Error(ctx, perr.E_RECOVERABLE_ERROR, fmt.Sprintf("Object of class %s could not be converted to %s", obj.ClassName(), types.ZendGetTypeByConst(ctype)))
+		return types.Undef
 	}
-	return types.Undef
 }
 
 // compare
@@ -363,14 +363,14 @@ func ZvalCompareEx(ctx *Context, v1 Val, v2 Val) (int, bool) {
 				}
 				return 1, true
 			}
-			if v1.IsObject() && !v2.IsObject() && v1.Object().CanCast() {
+			if v1.IsObject() && !v2.IsObject() {
 				if tmp, ok := v1.Object().Cast(v2.Type()); ok {
 					return ZvalCompareEx(ctx, tmp, v2)
 				} else {
 					return 1, true
 				}
 			}
-			if v2.IsObject() && !v1.IsObject() && v2.Object().CanCast() {
+			if v2.IsObject() && !v1.IsObject() {
 				if tmp, ok := v2.Object().Cast(v1.Type()); ok {
 					return ZvalCompareEx(ctx, v1, tmp)
 				} else {
@@ -1119,7 +1119,8 @@ func ZvalToArrayKey(ctx *Context, offset Val) (key types.ArrayKey, ok bool) {
 
 // todo
 func opThrowError(ctx *Context, exceptionCe *types.Class, message string) {
-	panic(perr.Todof("opThrowError"))
+	ThrowError(ctx, exceptionCe, message)
+	panic(perr.Unreachable())
 }
 func opThrowException(ctx *Context, exceptionCe *types.Class, message string) {
 	panic(perr.Todof("opThrowException"))

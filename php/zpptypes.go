@@ -119,7 +119,7 @@ func zppParseArrayHt(arg types.Zval, checkNull bool, orObject bool, separate boo
 }
 
 func zppParseObject(arg types.Zval, ce *types.Class, checkNull bool) (dest *types.Object, ok bool) {
-	if arg.IsObject() { //&& (ce == nil || InstanceofFunction(arg.Object().Ce(), ce)) {
+	if arg.IsObject() { //&& (ce == nil || InstanceofFunction(arg.Object().Class(), ce)) {
 		return arg.Object(), true
 	} else if checkNull && arg.IsNull() {
 		return nil, true

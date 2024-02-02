@@ -68,7 +68,7 @@ func (p *VarDumpPrinter) Zval(zv types.Zval, level int) {
 			return
 		}
 		obj.ProtectRecursive()
-		myht := obj.PropertiesFor(types.PropPurposeDebug)
+		myht := obj.GetPropertiesFor(types.PropPurposeDebug)
 		propCount := 0
 		if myht != nil {
 			propCount = myht.Len()

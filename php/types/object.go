@@ -1,69 +1,96 @@
 package types
 
 import (
-	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/assert"
 )
 
 // Object
 type Object struct {
-	handle uint
-	ce     *Class
-
-	protected bool
-
+	handle     uint
+	ce         *Class
+	data       ObjectData
+	protected  bool
 	properties map[string]Zval
 }
 
-func NewObject(ce *Class, handle uint) *Object {
+func NewObject(ce *Class, handle uint, data ObjectData) *Object {
 	assert.Assert(ce != nil)
-	obj := initObject(ce, handle)
+	obj := initObject(ce, handle, data)
 
 	return obj
 }
 
-func initObject(ce *Class, handle uint) *Object {
+func initObject(ce *Class, handle uint, data ObjectData) *Object {
 	obj := &Object{
 		handle:     handle,
 		ce:         ce,
+		data:       data,
 		properties: make(map[string]Zval),
 	}
 
 	ce.PropertyTable().Each(func(propName string, propInfo *PropertyInfo) {
-		obj.properties[propName] = propInfo.defaultVal
+		obj.data.WriteProperty(ZvalString(propName), propInfo.defaultVal)
 	})
 
 	return obj
 }
 
 func (o *Object) Handle() uint      { return o.handle }
-func (o *Object) Ce() *Class        { return o.ce }
+func (o *Object) Class() *Class     { return o.ce }
 func (o *Object) ClassName() string { return o.ce.Name() }
-func (o *Object) CeName() string    { return o.ce.Name() }
 
-func (o *Object) ReadPropertyR(name string) Zval {
-	return o.properties[name]
+// property
+func (o *Object) ReadProperty(name Zval) Zval {
+	return o.data.ReadProperty(name)
+}
+func (o *Object) WriteProperty(member Zval, value Zval) {
+	o.data.WriteProperty(member, value)
+}
+func (o *Object) HasProperty(member Zval, hasSetExists int) bool {
+	return o.data.HasProperty(member, hasSetExists)
+}
+func (o *Object) UnsetProperty(member Zval) {
+	o.data.UnsetProperty(member)
 }
 
-func (o *Object) PropertiesFor(typ PropPurposeType) *Array {
-	arr := NewArrayCap(len(o.properties))
-	for name, zval := range o.properties {
-		arr.KeyAdd(name, zval)
-	}
-	return arr
+// properties
+func (o *Object) GetPropertiesArray() *Array {
+	return o.data.GetPropertiesArray()
+}
+func (o *Object) GetPropertiesFor(purpose PropPurposeType) *Array {
+	return o.data.GetPropertiesFor(purpose)
 }
 
-// method
+// dimension
+func (o *Object) ReadDimension(offset Zval, typ int) Zval {
+	return o.data.ReadDimension(offset, typ)
+}
+func (o *Object) WriteDimension(offset Zval, value Zval) {
+	o.data.WriteDimension(offset, value)
+}
+func (o *Object) HasDimension(offset Zval, checkEmpty int) bool {
+	return o.data.HasDimension(offset, checkEmpty)
+}
+func (o *Object) UnsetDimension(offset Zval) {
+	o.data.UnsetDimension(offset)
+}
+
+// elements
+func (o *Object) CountElements() (int, bool) {
+	return o.data.CountElements()
+}
+
+// methods
 func (o *Object) GetMethod(method string) *Function {
-	lcMethod := ascii.StrToLower(method)
-	return o.ce.FunctionTable().Get(lcMethod)
+	return o.data.GetMethod(method)
+}
+func (o *Object) GetConstructor() *Function {
+	return o.data.GetConstructor(o)
 }
 
-// cast
-func (o *Object) CanCast() bool { return false }
+// mixed
 func (o *Object) Cast(typ ZvalType) (Zval, bool) {
-	// todo
-	return Undef, false
+	return o.data.Cast(typ)
 }
 
 func (o *Object) CompareObjectsTo(other *Object) (int, bool) {

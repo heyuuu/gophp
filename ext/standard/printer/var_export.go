@@ -97,10 +97,10 @@ func (p *VarExportPrinter) Zval(zv types.Zval, level int) {
 
 		/* stdClass has no __set_state method, but can be casted to */
 
-		//if zv.Object().Ce() == php.ZendStandardClassDef {
+		//if zv.Object().Class() == php.ZendStandardClassDef {
 		//	p.print("(object) array(\n")
 		//} else {
-		//	p.print(zv.Object().CeName())
+		//	p.print(zv.Object().ClassName())
 		//	p.print("::__set_state(array(\n")
 		//}
 		if myht != nil {
@@ -111,7 +111,7 @@ func (p *VarExportPrinter) Zval(zv types.Zval, level int) {
 		if level > 1 {
 			p.printIdent(level)
 		}
-		//if zv.Object().Ce() == php.ZendStandardClassDef {
+		//if zv.Object().Class() == php.ZendStandardClassDef {
 		//	p.print(")")
 		//} else {
 		//	p.print("))")

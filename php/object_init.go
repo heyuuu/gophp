@@ -8,7 +8,8 @@ import (
 // 跳过对 classType 的检查，直接创建 object 实例
 func ObjectInitDirect(ctx *Context, classType *types.Class) *types.Object {
 	handle := ctx.EG().NextObjectHandle()
-	return types.NewObject(classType, handle)
+	objectData := NewStdObjectData(ctx, classType)
+	return types.NewObject(classType, handle, objectData)
 }
 
 // 常规对象初始化入口

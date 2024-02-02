@@ -73,7 +73,7 @@ func (ex *ExecuteData) SetScope(scope any) {
 
 	switch s := scope.(type) {
 	case *types.Object:
-		ex.thisClass, ex.thisObj = s.Ce(), s
+		ex.thisClass, ex.thisObj = s.Class(), s
 	case *types.Class:
 		ex.thisClass, ex.thisObj = s, nil
 	default:

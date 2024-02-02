@@ -72,14 +72,14 @@ func RegisterArrayConstants(ctx *php.Context, moduleNumber int) {
 	php.RegisterConstant(ctx, moduleNumber, "ARRAY_FILTER_USE_KEY", php.Long(ARRAY_FILTER_USE_KEY))
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifKrsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getKeyCompareFunc(sortFlags, true)
 	arg.Sort(cmp, false)
 	return true
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifKsort(arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getKeyCompareFunc(sortFlags, false)
 	arg.Sort(cmp, false)
@@ -105,7 +105,7 @@ func PhpCountRecursive(ctx *php.Context, ht *types.Array) int {
 	return cnt
 }
 
-//@zif(alias="sizeof")
+// @zif(alias="sizeof")
 func ZifCount(ctx *php.Context, var_ *types.Zval, _ zpp.Opt, mode int) int {
 	var array = var_
 	var cnt int
@@ -161,28 +161,28 @@ func ZifNatcasesort(ctx *php.Context, arg zpp.RefArray) bool {
 	return true
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifAsort(ctx *php.Context, arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getArrayValueComparer(ctx, sortFlags, false)
 	arg.Sort(cmp, false)
 	return true
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifArsort(ctx *php.Context, arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getArrayValueComparer(ctx, sortFlags, true)
 	arg.Sort(cmp, false)
 	return true
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifSort(ctx *php.Context, arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getArrayValueComparer(ctx, sortFlags, false)
 	arg.Sort(cmp, true)
 	return true
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifRsort(ctx *php.Context, arg zpp.RefArray, _ zpp.Opt, sortFlags int) bool {
 	cmp := getArrayValueComparer(ctx, sortFlags, true)
 	arg.Sort(cmp, true)
@@ -247,7 +247,7 @@ func ZifReset(array zpp.RefArray) types.Zval {
 	return pair.Val.DeRef()
 }
 
-//@zif(alias="pos")
+// @zif(alias="pos")
 func ZifCurrent(array zpp.ArrayOrObjectHt) (types.Zval, bool) {
 	pair := array.Current()
 	if !pair.IsValid() {
@@ -565,7 +565,7 @@ func rangeChar(low byte, high byte, step int) ([]types.Zval, bool) {
 	return arr, true
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifRange(ctx *php.Context, low types.Zval, high types.Zval, _ zpp.Opt, step types.Zval) ([]types.Zval, bool) {
 	var isStepDouble = false
 	var stepVal = 1.0
@@ -625,7 +625,7 @@ func arrayDataShuffle(ctx *php.Context, array *types.Array) *types.Array {
 	return types.NewArrayOfZval(values)
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifShuffle(ctx *php.Context, arg zpp.RefArray) bool {
 	if arg.Len() > 1 {
 		arg.SetDataByArray(arrayDataShuffle(ctx, arg))
@@ -992,7 +992,7 @@ func ZifArrayMergeRecursive(ctx *php.Context, returnValue zpp.Ret, _ zpp.Opt, ar
 	}
 }
 
-//@zif(numArgs="1,")
+// @zif(numArgs="1,")
 func ZifArrayReplace(ctx *php.Context, arrays []types.Zval) types.Zval {
 	php.Assert(len(arrays) >= 1)
 
@@ -1008,7 +1008,7 @@ func ZifArrayReplace(ctx *php.Context, arrays []types.Zval) types.Zval {
 	return types.ZvalArray(dest)
 }
 
-//@zif(numArgs="1,")
+// @zif(numArgs="1,")
 func ZifArrayReplaceRecursive(ctx *php.Context, arrays []types.Zval) types.Zval {
 	php.Assert(len(arrays) >= 1)
 
@@ -1138,7 +1138,7 @@ func ArrayColumnFetchProp(data *types.Zval, name *types.Zval) types.Zval {
 		 * implement __isset (which is not called in "exists" mode). */
 
 		//if data.Object().HasPropertyEx(name, php.ZEND_PROPERTY_EXISTS) || data.Object().HasPropertyEx(name, php.ZEND_PROPERTY_ISSET) {
-		//	prop = *data.Object().ReadPropertyEx(name, php.BP_VAR_R, &rv)
+		//	prop = *data.Object().ReadProperty(name, php.BP_VAR_R, &rv)
 		//	if prop.IsNotUndef() {
 		//		prop = prop.DeRef()
 		//	}
@@ -1348,24 +1348,24 @@ func ZvalCompare(ctx *php.Context, first types.Zval, second types.Zval) int {
 	return php.StringCompareFunction(ctx, first, second)
 }
 
-//@zif(numArgs="2,")
+// @zif(numArgs="2,")
 func ZifArrayIntersectKey(ctx *php.Context, arrays []types.Zval) (*types.Array, bool) {
 	return arrayIntersectKeyWrapper(ctx, arrays, nil)
 }
 
-//@zif(numArgs="3,")
+// @zif(numArgs="3,")
 func ZifArrayIntersectUkey(ctx *php.Context, arrays []types.Zval, callbackKeyCompareFunc zpp.Callable) (*types.Array, bool) {
 	cmp := arrayUserKeyComparer(ctx, callbackKeyCompareFunc)
 	return arrayIntersectWrapper(ctx, arrays, cmp)
 }
 
-//@zif(numArgs="2,")
+// @zif(numArgs="2,")
 func ZifArrayIntersect(ctx *php.Context, arrays []types.Zval) (*types.Array, bool) {
 	cmp := arrayValueComparerWithCtx(ctx, php.StringCompareFunction)
 	return arrayIntersectWrapper(ctx, arrays, cmp)
 }
 
-//@zif(numArgs="3,")
+// @zif(numArgs="3,")
 func ZifArrayUintersect(ctx *php.Context, arrays []types.Zval, callbackDataCompareFunc zpp.Callable) (*types.Array, bool) {
 	cmp := arrayUserValueComparer(ctx, callbackDataCompareFunc)
 	return arrayIntersectWrapper(ctx, arrays, cmp)
@@ -1388,7 +1388,7 @@ func ZifArrayUintersectAssoc(ctx *php.Context, arrays []types.Zval, callbackData
 	return arrayIntersectKeyWrapper(ctx, arrays, cmp)
 }
 
-//@zif(numArgs="4,")
+// @zif(numArgs="4,")
 func ZifArrayUintersectUassoc(ctx *php.Context, arrays []types.Zval, callbackDataCompareFunc zpp.Callable, callbackKeyCompareFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
 		arrayUserKeyComparer(ctx, callbackKeyCompareFunc),
@@ -1397,12 +1397,12 @@ func ZifArrayUintersectUassoc(ctx *php.Context, arrays []types.Zval, callbackDat
 	return arrayIntersectWrapper(ctx, arrays, cmp)
 }
 
-//@zif(numArgs="2,")
+// @zif(numArgs="2,")
 func ZifArrayDiffKey(ctx *php.Context, arrays []types.Zval) (*types.Array, bool) {
 	return arrayDiffKeyWrapper(ctx, arrays, nil)
 }
 
-//@zif(numArgs="3,")
+// @zif(numArgs="3,")
 func ZifArrayDiffUkey(ctx *php.Context, arrays []types.Zval, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := arrayUserKeyComparer(ctx, callbackKeyCompFunc)
 	return arrayDiffWrapper(ctx, arrays, cmp)
@@ -1435,7 +1435,7 @@ func simpleArrayDiff(ctx *php.Context, array *types.Array, arrays []*types.Array
 	return retArr
 }
 
-//@zif(numArgs="2,")
+// @zif(numArgs="2,")
 func ZifArrayDiff(ctx *php.Context, arrays []types.Zval) types.Zval {
 	arrayHts, ok := checkArrayArgs(ctx, arrays, 0)
 	if !ok {
@@ -1445,19 +1445,19 @@ func ZifArrayDiff(ctx *php.Context, arrays []types.Zval) types.Zval {
 	return types.ZvalArray(retArr)
 }
 
-//@zif(numArgs="3,")
+// @zif(numArgs="3,")
 func ZifArrayUdiff(ctx *php.Context, arrays []types.Zval, callbackDataCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := arrayUserValueComparer(ctx, callbackDataCompFunc)
 	return arrayDiffWrapper(ctx, arrays, cmp)
 }
 
-//@zif(numArgs="3,")
+// @zif(numArgs="3,")
 func ZifArrayDiffAssoc(ctx *php.Context, arrays []types.Zval) (*types.Array, bool) {
 	cmp := arrayValueComparerWithCtx(ctx, ZvalCompare)
 	return arrayDiffKeyWrapper(ctx, arrays, cmp)
 }
 
-//@zif(numArgs="3,")
+// @zif(numArgs="3,")
 func ZifArrayDiffUassoc(ctx *php.Context, arrays []types.Zval, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
 		arrayUserKeyComparer(ctx, callbackKeyCompFunc),
@@ -1466,13 +1466,13 @@ func ZifArrayDiffUassoc(ctx *php.Context, arrays []types.Zval, callbackKeyCompFu
 	return arrayDiffWrapper(ctx, arrays, cmp)
 }
 
-//@zif(numArgs="2,")
+// @zif(numArgs="2,")
 func ZifArrayUdiffAssoc(ctx *php.Context, arrays []types.Zval, callbackDataCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := arrayUserValueComparer(ctx, callbackDataCompFunc)
 	return arrayDiffKeyWrapper(ctx, arrays, cmp)
 }
 
-//@zif(numArgs="4,")
+// @zif(numArgs="4,")
 func ZifArrayUdiffUassoc(ctx *php.Context, arrays []types.Zval, callbackDataCompFunc zpp.Callable, callbackKeyCompFunc zpp.Callable) (*types.Array, bool) {
 	cmp := twiceComparer(
 		arrayUserKeyComparer(ctx, callbackKeyCompFunc),
@@ -1481,7 +1481,7 @@ func ZifArrayUdiffUassoc(ctx *php.Context, arrays []types.Zval, callbackDataComp
 	return arrayDiffWrapper(ctx, arrays, cmp)
 }
 
-//@zif(numArgs="1,")
+// @zif(numArgs="1,")
 func ZifArrayMultisort(ctx *php.Context, args []types.Zval) bool {
 	var parseState = [...]int{0, 0}
 
@@ -1816,7 +1816,7 @@ func arrayMapMulti(callback zpp.Callable, arrays []*types.Array) *types.Array {
 	return retArr
 }
 
-//@zif(numArgs="2,")
+// @zif(numArgs="2,")
 func ZifArrayMap(ctx *php.Context, callback zpp.Callable, arrays []types.Zval) types.Zval {
 	php.Assert(len(arrays) >= 1)
 
@@ -1838,7 +1838,7 @@ func ZifArrayMap(ctx *php.Context, callback zpp.Callable, arrays []types.Zval) t
 	return types.ZvalArray(retArr)
 }
 
-//@zif(alias="key_exists")
+// @zif(alias="key_exists")
 func ZifArrayKeyExists(ctx *php.Context, key *types.Zval, array zpp.ArrayOrObjectZval) bool {
 	var ht *types.Array
 	if array.IsArray() {

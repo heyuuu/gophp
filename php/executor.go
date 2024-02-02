@@ -975,15 +975,16 @@ func (e *Executor) printExpr(expr *ast.PrintExpr) types.Zval {
 
 func (e *Executor) propertyFetchExpr(expr *ast.PropertyFetchExpr) types.Zval {
 	obj := e.exprDeref(expr.Var)
+	// todo 次数 propName 应为 Zval 而非 string, 有特殊的非 string 属性存在
 	propName := e.identOrExprAsString(expr.Name)
 	if !obj.IsObject() {
 		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Trying to get property '%s' of non-object", propName))
 		return UninitializedZval()
 	}
 
-	ret := obj.Object().ReadPropertyR(propName).DeRef()
+	ret := obj.Object().ReadProperty(types.ZvalString(propName)).DeRef()
 	if ret.IsUndef() {
-		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", obj.Object().CeName(), propName))
+		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", obj.Object().ClassName(), propName))
 		return UninitializedZval()
 	}
 
@@ -1117,7 +1118,7 @@ func (e *Executor) methodCallExpr(expr *ast.MethodCallExpr) types.Zval {
 
 	method := obj.Object().GetMethod(methodName)
 	if method == nil {
-		ThrowError(e.ctx, nil, fmt.Sprintf("Call to undefined method %s::%s()", obj.Object().Ce().Name(), methodName))
+		ThrowError(e.ctx, nil, fmt.Sprintf("Call to undefined method %s::%s()", obj.Object().Class().Name(), methodName))
 		return UninitializedZval()
 	}
 
