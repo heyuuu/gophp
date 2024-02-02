@@ -652,13 +652,12 @@ func (p *printer) stmt(n Stmt) {
 		if x.Type != nil {
 			p.print(x.Type, " ")
 		}
-		p.print(x.Props, ";")
-	case *PropertyPropertyStmt:
 		if x.Default != nil {
 			p.print(x.Name, " = ", x.Default)
 		} else {
 			p.print(x.Name)
 		}
+		p.print(";")
 	case *ClassMethodStmt:
 		if x.Flags != 0 {
 			p.flags(x.Flags)

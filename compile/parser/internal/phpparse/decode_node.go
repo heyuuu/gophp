@@ -811,13 +811,17 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "NopStmt":
 		node = &ast.EmptyStmt{}
 	case "PropertyStmt":
-		node = &ast.PropertyStmt{
-			Flags: asFlags(data["flags"]),
-			Props: asSlice[*ast.PropertyPropertyStmt](data["props"]),
-			Type:  asTypeHint(data["type"]),
-		}
+		flags := asFlags(data["flags"])
+		typeHint := asTypeHint(data["type"])
+		properties := asSlice[*ast.PropertyStmt](data["props"])
+		stmts := slicekit.Map(properties, func(t *ast.PropertyStmt) ast.Stmt {
+			t.Flags = flags
+			t.Type = typeHint
+			return t
+		})
+		node = &ast.BlockStmt{List: stmts}
 	case "PropertyPropertyStmt":
-		node = &ast.PropertyPropertyStmt{
+		node = &ast.PropertyStmt{
 			Name:    data["name"].(*ast.Ident),
 			Default: asTypeOrNil[ast.Expr](data["default"]),
 		}

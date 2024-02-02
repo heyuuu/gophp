@@ -581,14 +581,10 @@ type (
 
 	// PropertyStmt : Stmt
 	PropertyStmt struct {
-		Flags Flags                   // @var Flags Modifiers
-		Props []*PropertyPropertyStmt // @var PropertyProperty[] Properties
-		Type  TypeHint                // @var TypeHint|null Type declaration
-	}
-
-	PropertyPropertyStmt struct {
-		Name    *Ident // @var Ident     Name
-		Default Expr   // @var Expr|null Default
+		Flags   Flags    // @var Flags Modifiers
+		Type    TypeHint // @var TypeHint|null Type declaration
+		Name    *Ident   // @var Ident     Name
+		Default Expr     // @var Expr|null Default
 	}
 
 	// ClassMethodStmt : Stmt, FunctionLike
@@ -725,7 +721,6 @@ func (*InterfaceStmt) stmtNode()                    {}
 func (*ClassStmt) stmtNode()                        {}
 func (*ClassConstStmt) stmtNode()                   {}
 func (*PropertyStmt) stmtNode()                     {}
-func (*PropertyPropertyStmt) stmtNode()             {}
 func (*ClassMethodStmt) stmtNode()                  {}
 func (*TraitStmt) stmtNode()                        {}
 func (*TraitUseStmt) stmtNode()                     {}
@@ -839,7 +834,6 @@ func (*InterfaceStmt) node()                    {}
 func (*ClassStmt) node()                        {}
 func (*ClassConstStmt) node()                   {}
 func (*PropertyStmt) node()                     {}
-func (*PropertyPropertyStmt) node()             {}
 func (*ClassMethodStmt) node()                  {}
 func (*TraitStmt) node()                        {}
 func (*TraitUseStmt) node()                     {}

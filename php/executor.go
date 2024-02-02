@@ -205,8 +205,6 @@ func (e *Executor) stmt(stmt ast.Stmt) execResult {
 		return e.classConstStmt(x)
 	case *ast.PropertyStmt:
 		return e.propertyStmt(x)
-	case *ast.PropertyPropertyStmt:
-		return e.propertyPropertyStmt(x)
 	case *ast.ClassMethodStmt:
 		return e.classMethodStmt(x)
 	case *ast.TraitStmt:
@@ -483,10 +481,6 @@ func (e *Executor) classConstStmt(x *ast.ClassConstStmt) execResult {
 
 func (e *Executor) propertyStmt(x *ast.PropertyStmt) execResult {
 	panic(perr.Todof("e.propertyStmt"))
-}
-
-func (e *Executor) propertyPropertyStmt(x *ast.PropertyPropertyStmt) execResult {
-	panic(perr.Todof("e.propertyPropertyStmt"))
 }
 
 func (e *Executor) classMethodStmt(x *ast.ClassMethodStmt) execResult {
