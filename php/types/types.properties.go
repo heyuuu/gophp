@@ -135,3 +135,23 @@ func (c *ClassConstant) Ce() *Class {
 func (c *ClassConstant) Flags() uint32 {
 	return c.flags
 }
+
+// properties for ClosureData
+func (t *ClosureData) Ce() *Class {
+	return t.ce
+}
+func (t *ClosureData) SetCe(v *Class) {
+	t.ce = v
+}
+func (t *ClosureData) Fn() *Function {
+	return t.fn
+}
+func (t *ClosureData) SetFn(v *Function) {
+	t.fn = v
+}
+func (t *ClosureData) Obj() *Object {
+	return t.obj
+}
+func (t *ClosureData) SetObj(v *Object) {
+	t.obj = v
+}

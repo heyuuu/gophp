@@ -2,12 +2,42 @@ package php
 
 import "github.com/heyuuu/gophp/php/types"
 
-var _ types.ObjectData = (*StdObjectData)(nil)
+var _ types.IObject = (*StdObjectData)(nil)
 
 type StdObjectData struct {
 	ctx        *Context
 	ce         *types.Class
 	properties map[string]types.Zval
+}
+
+func (o *StdObjectData) CanClone() bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (o *StdObjectData) Clone() *types.Object {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (o *StdObjectData) GetPropertyPtr(member types.Zval, typ int) *types.Zval {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (o *StdObjectData) CompareObjectTo(another *types.Object) (int, bool) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (o *StdObjectData) CompareTo(another types.Zval) (int, bool) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (o *StdObjectData) GetClosure() (*types.ClosureData, bool) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func NewStdObjectData(ctx *Context, ce *types.Class) *StdObjectData {
@@ -19,7 +49,7 @@ func NewStdObjectData(ctx *Context, ce *types.Class) *StdObjectData {
 }
 
 func (o *StdObjectData) Class() *types.Class { return o.ce }
-func (o *StdObjectData) ReadProperty(member types.Zval) types.Zval {
+func (o *StdObjectData) ReadProperty(member types.Zval, typ int) types.Zval {
 	name := ZvalGetStrVal(o.ctx, member)
 	return o.properties[name]
 }

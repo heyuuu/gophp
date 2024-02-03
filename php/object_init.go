@@ -9,7 +9,7 @@ import (
 func ObjectInitDirect(ctx *Context, classType *types.Class) *types.Object {
 	handle := ctx.EG().NextObjectHandle()
 	objectData := NewStdObjectData(ctx, classType)
-	return types.NewObject(classType, handle, objectData)
+	return types.NewObject(handle, objectData)
 }
 
 // 常规对象初始化入口

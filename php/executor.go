@@ -482,11 +482,17 @@ func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
 			)
 			decl.Constants = append(decl.Constants, constant)
 		case *ast.PropertyStmt:
+			var defaultValue types.Zval
+			if s.Default != nil {
+				defaultValue = e.expr(s.Default)
+			} else {
+				defaultValue = UninitializedZval()
+			}
 			property := types.NewPropertyInfo(
 				s.Name.Name,
 				0,
 				nil,
-				e.expr(s.Default),
+				defaultValue,
 			)
 			decl.Properties = append(decl.Properties, property)
 		case *ast.ClassMethodStmt:
@@ -982,7 +988,7 @@ func (e *Executor) propertyFetchExpr(expr *ast.PropertyFetchExpr) types.Zval {
 		return UninitializedZval()
 	}
 
-	ret := obj.Object().ReadProperty(types.ZvalString(propName)).DeRef()
+	ret := obj.Object().ReadProperty(types.ZvalString(propName), 0).DeRef()
 	if ret.IsUndef() {
 		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", obj.Object().ClassName(), propName))
 		return UninitializedZval()

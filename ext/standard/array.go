@@ -1667,7 +1667,7 @@ func ZifArraySum(ctx *php.Context, array *types.Array) types.Zval {
 		if entry.IsArray() || entry.IsObject() {
 			return
 		}
-		num := php.ZvalGetNumber(ctx, entry)
+		num := php.ConvertScalarToNumber(ctx, entry)
 		ret = php.OpAdd(ctx, ret, num)
 	})
 	return ret
@@ -1679,7 +1679,7 @@ func ZifArrayProduct(ctx *php.Context, array *types.Array) types.Zval {
 		if entry.IsArray() || entry.IsObject() {
 			return
 		}
-		num = php.ZvalGetNumber(ctx, entry)
+		num = php.ConvertScalarToNumber(ctx, entry)
 		if num.IsLong() && ret.IsLong() {
 			dval := float64(num.Long()) * float64(ret.Long())
 			if float64(math.MinInt) <= dval && dval <= float64(math.MaxInt) {
