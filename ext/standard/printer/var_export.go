@@ -96,13 +96,12 @@ func (p *VarExportPrinter) Zval(zv types.Zval, level int) {
 		}
 
 		/* stdClass has no __set_state method, but can be casted to */
-
-		//if zv.Object().Class() == php.ZendStandardClassDef {
-		//	p.print("(object) array(\n")
-		//} else {
-		//	p.print(zv.Object().ClassName())
-		//	p.print("::__set_state(array(\n")
-		//}
+		if zv.Object().ClassName() == php.StdClassName {
+			p.print("(object) array(\n")
+		} else {
+			p.print(zv.Object().ClassName())
+			p.print("::__set_state(array(\n")
+		}
 		if myht != nil {
 			myht.Each(func(key types.ArrayKey, value types.Zval) {
 				p.objectElement(value, key, level)
@@ -111,11 +110,11 @@ func (p *VarExportPrinter) Zval(zv types.Zval, level int) {
 		if level > 1 {
 			p.printIdent(level)
 		}
-		//if zv.Object().Class() == php.ZendStandardClassDef {
-		//	p.print(")")
-		//} else {
-		//	p.print("))")
-		//}
+		if zv.Object().ClassName() == php.StdClassName {
+			p.print(")")
+		} else {
+			p.print("))")
+		}
 	default:
 		p.print("NULL")
 	}

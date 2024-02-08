@@ -61,6 +61,7 @@ func (eg *ExecutorGlobals) HasException() bool {
 	// todo
 	return false
 }
+func (eg *ExecutorGlobals) NoException() bool { return !eg.HasException() }
 
 func (eg *ExecutorGlobals) ErrorSuppress() bool {
 	return eg.errorSuppress > 0

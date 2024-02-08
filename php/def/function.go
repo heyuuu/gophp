@@ -19,11 +19,7 @@ func DefFunc(name string, minNumArgs uint32, maxNumArgs int32, argInfos []ArgInf
 	if len(argInfos) > 0 {
 		realArgInfos = make([]types.ArgInfo, len(argInfos))
 		for i, argInfo := range argInfos {
-			realArgInfos[i] = types.ArgInfo{
-				Name:     argInfo.Name,
-				ByRef:    argInfo.ByRef,
-				Variadic: argInfo.Variadic,
-			}
+			realArgInfos[i] = types.MakeArgInfo(argInfo.Name, argInfo.ByRef, argInfo.Variadic)
 		}
 	}
 

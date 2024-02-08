@@ -81,7 +81,7 @@ func (e *Executor) userFunction(fn *types.Function, args []types.Zval) types.Zva
 	// todo 初始化 args
 	for i, argInfo := range fn.ArgInfos() {
 		if i < len(args) {
-			e.currSymbols().Set(argInfo.Name, args[i])
+			e.currSymbols().Set(argInfo.Name(), args[i])
 		}
 	}
 
@@ -210,8 +210,10 @@ func (e *Executor) stmt(stmt ast.Stmt) execResult {
 		return e.traitUseAdaptationAliasStmt(x)
 	case *ast.TraitUseAdaptationPrecedenceStmt:
 		return e.traitUseAdaptationPrecedenceStmt(x)
+	case *ast.UseStmt:
+		// pass
 	default:
-		panic(perr.Internalf("Unexpected stmt type: %+v", x))
+		panic(perr.Internalf("Unexpected stmt type: %T, %+v", x, x))
 	}
 	return nil
 }
@@ -448,11 +450,11 @@ func (e *Executor) functionStmt(x *ast.FunctionStmt) execResult {
 	if len(x.Params) > 0 {
 		argInfos = make([]types.ArgInfo, len(x.Params))
 		for i, param := range x.Params {
-			argInfos[i] = types.ArgInfo{
-				Name:     param.Var.Name.(*ast.Ident).Name,
-				ByRef:    param.ByRef,
-				Variadic: param.Variadic,
-			}
+			argInfos[i] = types.MakeArgInfo(
+				param.Var.Name.(*ast.Ident).Name,
+				param.ByRef,
+				param.Variadic,
+			)
 		}
 	}
 
@@ -466,10 +468,41 @@ func (e *Executor) interfaceStmt(x *ast.InterfaceStmt) execResult {
 	panic(perr.Todof("e.interfaceStmt"))
 }
 
-func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
-	var decl types.UserClassDecl
+func (e *Executor) parseFlags(astFlags ast.Flags) uint32 {
+	var flags uint32
+	if astFlags&ast.FlagProtected != 0 {
+		flags |= types.AccProtected
+	} else if astFlags&ast.FlagPrivate != 0 {
+		flags |= types.AccPrivate
+	} else {
+		flags |= types.AccPublic
+	}
+	if astFlags&ast.FlagStatic != 0 {
+		flags |= types.AccStatic
+	}
+	if astFlags&ast.FlagAbstract != 0 {
+		flags |= types.AccAbstract
+	}
+	if astFlags&ast.FlagFinal != 0 {
+		flags |= types.AccFinal
+	}
+	return flags
+}
 
-	decl.Name = x.NamespacedName.ToCodeString()
+func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
+	var decl = types.UserClassDecl{
+		Flags: e.parseFlags(x.Flags),
+		Name:  x.NamespacedName.ToString(),
+	}
+
+	if x.Extends != nil {
+		decl.Parent = x.Extends.ToString()
+	}
+	for _, implement := range x.Implements {
+		decl.Interfaces = append(decl.Interfaces, implement.ToString())
+	}
+
+	ce := RegisterUserClass(e.ctx, &decl)
 
 	for _, stmt := range x.Stmts {
 		switch s := stmt.(type) {
@@ -488,13 +521,8 @@ func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
 			} else {
 				defaultValue = UninitializedZval()
 			}
-			property := types.NewPropertyInfo(
-				s.Name.Name,
-				0,
-				nil,
-				defaultValue,
-			)
-			decl.Properties = append(decl.Properties, property)
+			flags := e.parseFlags(s.Flags)
+			DeclPropertyInfo(ce, flags, s.Name.Name, nil, defaultValue)
 		case *ast.ClassMethodStmt:
 			method := types.NewAstFunction(
 				s.Name.Name,
@@ -506,8 +534,6 @@ func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
 			panic(perr.Todof("class stmt type: %T", s))
 		}
 	}
-
-	_ = RegisterUserClass(e.ctx, &decl)
 
 	return nil
 }
@@ -981,20 +1007,13 @@ func (e *Executor) printExpr(expr *ast.PrintExpr) types.Zval {
 
 func (e *Executor) propertyFetchExpr(expr *ast.PropertyFetchExpr) types.Zval {
 	obj := e.exprDeref(expr.Var)
-	// todo 次数 propName 应为 Zval 而非 string, 有特殊的非 string 属性存在
-	propName := e.identOrExprAsString(expr.Name)
+	prop := e.identOrExprAsZval(expr.Name)
 	if !obj.IsObject() {
-		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Trying to get property '%s' of non-object", propName))
+		errorWrongPropertyRead(e.ctx, prop)
 		return UninitializedZval()
 	}
 
-	ret := obj.Object().ReadProperty(types.ZvalString(propName), 0).DeRef()
-	if ret.IsUndef() {
-		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", obj.Object().ClassName(), propName))
-		return UninitializedZval()
-	}
-
-	return ret
+	return obj.Object().ReadProperty(prop, 0).DeRef()
 }
 
 func (e *Executor) staticPropertyFetchExpr(expr *ast.StaticPropertyFetchExpr) types.Zval {
@@ -1025,6 +1044,14 @@ func (e *Executor) throwExpr(expr *ast.ThrowExpr) types.Zval {
 func (e *Executor) variableExpr(expr *ast.VariableExpr) types.Zval {
 	name := e.variableName(expr.Name)
 	// todo undefined warning
+	if name == "this" {
+		this := e.ctx.CurrEX().ThisObject()
+		if this == nil {
+			ThrowError(e.ctx, nil, "Using $this when not in object context")
+		}
+		return types.ZvalObject(this)
+	}
+
 	value := e.currSymbols().Get(name)
 	if value.IsUndef() {
 		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Undefined variable: %s", name))
@@ -1041,6 +1068,17 @@ func (e *Executor) variableName(nameNode ast.Node) string {
 		return ZvalGetStrVal(e.ctx, e.expr(x))
 	default:
 		panic(perr.Todof("unexpected VariableExpr.Name type: %T, %+v", nameNode, nameNode))
+	}
+}
+
+func (e *Executor) identOrExprAsZval(node ast.Node) types.Zval {
+	switch x := node.(type) {
+	case *ast.Ident:
+		return types.ZvalString(x.Name)
+	case ast.Expr:
+		return e.expr(x)
+	default:
+		panic(perr.Todof("expected Ident or Expr, %T given", node))
 	}
 }
 
@@ -1089,7 +1127,7 @@ func (e *Executor) funcCallExpr(expr *ast.FuncCallExpr) types.Zval {
 	if fn == nil {
 		panic(perr.Internalf("函数未找到: %s", name))
 	}
-	return e.doCall(fn, expr.Args, nil)
+	return e.doCallExprs(fn, expr.Args, nil)
 }
 
 func (e *Executor) newExpr(expr *ast.NewExpr) types.Zval {
@@ -1128,7 +1166,7 @@ func (e *Executor) methodCallExpr(expr *ast.MethodCallExpr) types.Zval {
 		return UninitializedZval()
 	}
 
-	return e.doCall(method, expr.Args, nil)
+	return e.doCallExprs(method, expr.Args, obj.Object())
 }
 
 func (e *Executor) staticCallExpr(expr *ast.StaticCallExpr) types.Zval {
@@ -1169,6 +1207,10 @@ func (e *Executor) variableRef(expr ast.Expr) iVariable {
 			}
 			return newArrayDimVariable(e.ctx, arr, key)
 		}
+	case *ast.PropertyFetchExpr:
+		obj := e.expr(v.Var)
+		member := e.identOrExprAsZval(v.Name)
+		return newPropertyVariable(obj.Object(), member)
 	default:
 		panic(perr.Todof("unsupported variableRef.Var type: %T, %+v", v, v))
 	}
@@ -1224,11 +1266,13 @@ func (e *Executor) arrayUpdate(arr types.Zval, key types.ArrayKey, value types.Z
 	}
 }
 
-func (e *Executor) doCall(fn *types.Function, argNodes []*ast.Arg, scope any) types.Zval {
-	assert.Assert(fn != nil)
-
-	// init args
+func (e *Executor) doCallExprs(fn *types.Function, argNodes []*ast.Arg, scope any) types.Zval {
 	args := e.initCallArgs(fn, argNodes)
+	return e.doCall(fn, args, scope)
+}
+
+func (e *Executor) doCall(fn *types.Function, args []types.Zval, scope any) types.Zval {
+	assert.Assert(fn != nil)
 
 	// push && pop executeData
 	ex := NewExecuteData(e.ctx, fn, args)
@@ -1276,7 +1320,7 @@ func (e *Executor) initCallArgs(fn *types.Function, argNodes []*ast.Arg) []types
 	for _, arg := range argNodes {
 		if !arg.Unpack {
 			argInfo := getArgInfo(len(args))
-			if argInfo != nil && argInfo.ByRef {
+			if argInfo != nil && argInfo.ByRef() {
 				args = append(args, e.variableRefZval(arg.Value))
 			} else {
 				argVal := e.expr(arg.Value).DeRef()
@@ -1294,7 +1338,7 @@ func (e *Executor) initCallArgs(fn *types.Function, argNodes []*ast.Arg) []types
 				}
 
 				argInfo := getArgInfo(len(args))
-				if argInfo != nil && argInfo.ByRef {
+				if argInfo != nil && argInfo.ByRef() {
 					args = append(args, types.ZvalRef(newArrayDimVariable(e.ctx, argVal, key).MakeRef()))
 				} else {
 					args = append(args, value.DeRef())

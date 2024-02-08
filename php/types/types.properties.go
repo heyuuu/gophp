@@ -1,5 +1,16 @@
 package types
 
+// properties for ArgInfo
+func (t *ArgInfo) Name() string {
+	return t.name
+}
+func (t *ArgInfo) ByRef() bool {
+	return t.byRef
+}
+func (t *ArgInfo) Variadic() bool {
+	return t.variadic
+}
+
 // properties for Class
 func (ce *Class) Type() byte {
 	return ce.typ
@@ -27,6 +38,18 @@ func (ce *Class) InterfaceNames() []ClassName {
 }
 func (ce *Class) Interfaces() []*Class {
 	return ce.interfaces
+}
+func (ce *Class) DefaultPropertiesCount() int {
+	return ce.defaultPropertiesCount
+}
+func (ce *Class) DefaultPropertiesTable() []Zval {
+	return ce.defaultPropertiesTable
+}
+func (ce *Class) DefaultStaticMembersCount() int {
+	return ce.defaultStaticMembersCount
+}
+func (ce *Class) DefaultStaticMembersTable() []Zval {
+	return ce.defaultStaticMembersTable
 }
 func (ce *Class) FunctionTable() *FunctionTable {
 	return ce.functionTable
@@ -115,6 +138,24 @@ func (ce *Class) GetUnserializeFunc() *Function {
 func (ce *Class) SetUnserializeFunc(v *Function) {
 	ce.unserializeFunc = v
 }
+func (ce *Class) GetCreateObject() func(classType *Class) *Object {
+	return ce.createObject
+}
+func (ce *Class) SetCreateObject(v func(classType *Class) *Object) {
+	ce.createObject = v
+}
+func (ce *Class) GetInterfaceGetsImplemented() func(iface *Class, classType *Class) int {
+	return ce.interfaceGetsImplemented
+}
+func (ce *Class) SetInterfaceGetsImplemented(v func(iface *Class, classType *Class) int) {
+	ce.interfaceGetsImplemented = v
+}
+func (ce *Class) SetSerialize(v func(object *Zval) (string, bool)) {
+	ce.serialize = v
+}
+func (ce *Class) SetUnserialize(v func(ce *Class, data string) (*Zval, bool)) {
+	ce.unserialize = v
+}
 func (ce *Class) ModuleNumber() int {
 	return ce.moduleNumber
 }
@@ -154,4 +195,76 @@ func (t *ClosureData) Obj() *Object {
 }
 func (t *ClosureData) SetObj(v *Object) {
 	t.obj = v
+}
+
+// properties for Function
+func (f *Function) Type() FunctionType {
+	return f.typ
+}
+func (f *Function) Flags() uint32 {
+	return f.flags
+}
+func (f *Function) SetFlags(v uint32) {
+	f.flags = v
+}
+func (f *Function) Name() string {
+	return f.name
+}
+func (f *Function) SetName(v string) {
+	f.name = v
+}
+func (f *Function) Scope() *Class {
+	return f.scope
+}
+func (f *Function) SetScope(v *Class) {
+	f.scope = v
+}
+
+// properties for PropertyInfo
+func (t *PropertyInfo) Offset() uint32 {
+	return t.offset
+}
+func (t *PropertyInfo) SetOffset(v uint32) {
+	t.offset = v
+}
+func (t *PropertyInfo) Flags() uint32 {
+	return t.flags
+}
+func (t *PropertyInfo) Name() string {
+	return t.name
+}
+func (t *PropertyInfo) DocComment() string {
+	return t.docComment
+}
+func (t *PropertyInfo) Ce() *Class {
+	return t.ce
+}
+func (t *PropertyInfo) Type() *TypeHint {
+	return t.typ
+}
+
+// properties for blockInfo
+func (b *blockInfo) Filename() string {
+	return b.filename
+}
+func (b *blockInfo) SetFilename(v string) {
+	b.filename = v
+}
+func (b *blockInfo) LineStart() uint32 {
+	return b.lineStart
+}
+func (b *blockInfo) SetLineStart(v uint32) {
+	b.lineStart = v
+}
+func (b *blockInfo) LineEnd() uint32 {
+	return b.lineEnd
+}
+func (b *blockInfo) SetLineEnd(v uint32) {
+	b.lineEnd = v
+}
+func (b *blockInfo) DocComment() string {
+	return b.docComment
+}
+func (b *blockInfo) SetDocComment(v string) {
+	b.docComment = v
 }

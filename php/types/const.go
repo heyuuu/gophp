@@ -4,6 +4,8 @@ import "math"
 
 const MaxLong = math.MaxInt
 const MinLong = math.MinInt
+const SizeofLong = 8
+const MaxLengthOfLong = 20
 
 const MaxArraySize = math.MaxInt32 + 1
 

@@ -37,6 +37,15 @@ type ClosureData struct {
 	obj *Object   `prop:""`
 }
 
+func NewClosureData(ce *Class, fn *Function, obj *Object) *ClosureData {
+	return &ClosureData{ce: ce, fn: fn, obj: obj}
+}
+
+// ObjectBindable
+type ObjectBindable interface {
+	Bind(o *Object)
+}
+
 // IObject 内部对象接口，用于适配各种对象实现
 type IObject interface {
 	Class() *Class
@@ -90,11 +99,21 @@ func NewObject(handle uint, intern IObject) *Object {
 	return obj
 }
 
+func NewObjectSkipPropertiesInit(handle uint, intern IObject) *Object {
+	return initObject(handle, intern)
+}
+
 func initObject(handle uint, intern IObject) *Object {
-	return &Object{
+	o := &Object{
 		handle: handle,
 		intern: intern,
 	}
+
+	if bindable, ok := intern.(ObjectBindable); ok {
+		bindable.Bind(o)
+	}
+
+	return o
 }
 
 func (o *Object) propertiesInit() {
@@ -107,7 +126,6 @@ func (o *Object) propertiesInit() {
 
 // guard
 func (o *Object) Guard(member string) *PropertyGuard {
-	assert.Assert(o.Class().IsUseGuards())
 	// php 原版设计，将 guard 附加在 propertiesTable 最后一位; gophp 中，将其抽出作为单独 map
 	if o.propertyGuards == nil {
 		var tmp PropertyGuard
@@ -129,7 +147,7 @@ func (o *Object) Guard(member string) *PropertyGuard {
 func (o *Object) Handle() uint      { return o.handle }
 func (o *Object) Class() *Class     { return o.intern.Class() }
 func (o *Object) ClassName() string { return o.intern.Class().Name() }
-func (o *Object) Data() IObject     { return o.intern }
+func (o *Object) Intern() IObject   { return o.intern }
 
 // clone
 func (o *Object) CanClone() bool { return o.intern.CanClone() }
@@ -174,7 +192,11 @@ func (o *Object) GetPropertiesArray() *Array {
 	return o.intern.GetPropertiesArray()
 }
 func (o *Object) GetPropertiesFor(purpose PropPurposeType) *Array {
-	return o.intern.GetPropertiesFor(purpose)
+	arr := o.intern.GetPropertiesFor(purpose)
+	if arr == nil {
+		arr = o.GetPropertiesArray()
+	}
+	return arr
 }
 
 // dimension

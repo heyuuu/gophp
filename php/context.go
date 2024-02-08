@@ -16,6 +16,8 @@ type Context struct {
 	values map[string]any
 
 	eh ErrorHandling
+
+	executor *Executor `get:""`
 }
 
 func MockContext() *Context {
@@ -35,6 +37,7 @@ func initContext(e *Engine, baseCtx *Context, request *http.Request, response ht
 		ctx.og.Init()
 		ctx.pg.Init()
 	}
+	ctx.executor = NewExecutor(ctx)
 
 	return ctx
 }

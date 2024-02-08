@@ -24,3 +24,19 @@ func ZifVarExport(ctx *php.Context, value types.Zval, _ zpp.Opt, return_ bool) t
 		return types.Null
 	}
 }
+func ZifSerialize(ctx *php.Context, var_ types.Zval) types.Zval {
+	serializer := InitSerializer(ctx)
+	serializer.Serialize(var_)
+	serializer.DestroyData()
+
+	if ctx.EG().HasException() {
+		return types.False
+	}
+
+	serializerStr := serializer.String()
+	if serializerStr != "" {
+		return types.ZvalString(serializerStr)
+	} else {
+		return types.Null
+	}
+}

@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"github.com/heyuuu/gophp/php"
+	"github.com/heyuuu/gophp/php/types"
 )
 
 func init() {
@@ -20,7 +21,9 @@ var BuiltinModuleEntry = php.ModuleEntry{
 }
 
 func RegisterStdClass(ctx *php.Context, moduleNumber int) {
-	php.RegisterInternalClass(ctx, moduleNumber, php.StdClassName)
+	php.RegisterInternalClass(ctx, moduleNumber, &types.InternalClassDecl{
+		Name: php.StdClassName,
+	})
 }
 
 func RegisterCoreClasses(ctx *php.Context, moduleNumber int) {

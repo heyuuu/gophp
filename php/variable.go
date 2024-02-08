@@ -166,3 +166,38 @@ func (v arrayDimVariable) MakeRef() *types.Reference {
 		panic(perr.Todof("unsupported arrayDimVariable.Set arr type: %s", types.ZvalGetType(arr)))
 	}
 }
+
+type propertyVariable struct {
+	obj    *types.Object
+	member types.Zval
+}
+
+func newPropertyVariable(obj *types.Object, member types.Zval) *propertyVariable {
+	return &propertyVariable{obj: obj, member: member}
+}
+
+func (v propertyVariable) Get() types.Zval {
+	return v.obj.ReadProperty(v.member, BP_VAR_R)
+}
+
+func (v propertyVariable) Set(value types.Zval) {
+	v.obj.WriteProperty(v.member, value)
+}
+
+func (v propertyVariable) Unset() {
+	v.obj.UnsetProperty(v.member)
+}
+
+func (v propertyVariable) MakeRef() *types.Reference {
+	raw := v.Get()
+	if raw.IsRef() {
+		return raw.Ref()
+	} else {
+		if raw.IsUndef() {
+			raw = UninitializedZval()
+		}
+		ref := types.NewReference(raw)
+		v.Set(types.ZvalRef(ref))
+		return ref
+	}
+}

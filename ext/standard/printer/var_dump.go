@@ -114,15 +114,15 @@ func (p *VarDumpPrinter) arrayElement(zv types.Zval, key types.ArrayKey, level i
 }
 func (p *VarDumpPrinter) objectProperty(propInfo *types.PropertyInfo, zv types.Zval, key types.ArrayKey, level int) {
 	if !key.IsStrKey() {
-		p.printIdent(level)
+		p.printIdent(level + 2)
 		p.printf("[%d]=>\n", key.IdxKey())
 	} else {
 		className, propName, ok := php.UnmanglePropertyName(p.ctx, key.StrKey())
 
-		p.printIdent(level)
+		p.printIdent(level + 2)
 		p.print("[")
-		if ok {
-			if className != "" && className[0] == '*' {
+		if className != "" && ok {
+			if className == "*" {
 				p.printf(`"%s":protected`, propName)
 			} else {
 				p.printf(`"%s":"%s":private`, propName, className)

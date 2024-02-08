@@ -6,13 +6,25 @@ import (
 )
 
 // 跳过对 classType 的检查，直接创建 object 实例
-func ObjectInitDirect(ctx *Context, classType *types.Class) *types.Object {
+func StdObjectInitDirect(ctx *Context, classType *types.Class) *types.Object {
 	handle := ctx.EG().NextObjectHandle()
-	objectData := NewStdObjectData(ctx, classType)
-	return types.NewObject(handle, objectData)
+	intern := NewStdInternObject(ctx, classType)
+	return types.NewObject(handle, intern)
+}
+
+func IsStdGetProperties(o *types.Object) bool {
+	// 目前没有很好的方法判断继承(组合)了 StdInternObject 的类型是否保留了 GetProperties 方法，所以目前只判断是否直接使用 StdInternObject
+	//std := php.ZendStdGetProperties
+	return IsStdObject(o)
+}
+
+func IsStdObject(o *types.Object) bool {
+	_, ok := o.Intern().(*StdInternObject)
+	return ok
 }
 
 // 常规对象初始化入口
+
 func ObjectInit(ctx *Context, classType *types.Class) *types.Object {
 	if classType.HasFlags(types.AccInterface | types.AccTrait | types.AccImplicitAbstractClass | types.AccExplicitAbstractClass) {
 		if classType.IsInterface() {
@@ -24,9 +36,17 @@ func ObjectInit(ctx *Context, classType *types.Class) *types.Object {
 		}
 		return nil
 	}
+	if !classType.IsLinked() {
+		DoLinkClass(ctx, classType)
+	}
+	if !classType.IsConstantsUpdated() {
 
-	// todo check properties
-	return ObjectInitDirect(ctx, classType)
+	}
+	if classType.GetCreateObject() == nil {
+		return StdObjectInitDirect(ctx, classType)
+	} else {
+		return classType.GetCreateObject()(classType)
+	}
 }
 
 func ObjectInitZval(ctx *Context, arg *types.Zval, classType *types.Class) bool {

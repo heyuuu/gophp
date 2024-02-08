@@ -6,10 +6,10 @@ import (
 
 func NewAstFunction(name string, argInfos []ArgInfo, stmts []ast.Stmt) *Function {
 	return &Function{
-		typ:          TypeUserFunction,
-		functionName: name,
-		argInfos:     argInfos,
-		stmts:        stmts,
+		typ:      TypeUserFunction,
+		name:     name,
+		argInfos: argInfos,
+		stmts:    stmts,
 	}
 }
 

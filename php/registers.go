@@ -1,22 +1,28 @@
 package php
 
 import (
+	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/types"
 	"strings"
 )
 
-func RegisterInternalClass(ctx *Context, moduleNumber int, name string) *types.Class {
-	ce := types.NewInternalClass(name, moduleNumber, 0)
-	iRegisterClass(ctx, ce)
+// register class
+func RegisterInternalInterface(ctx *Context, moduleNumber int, decl *types.InternalClassDecl) *types.Class {
+	decl.Flags |= types.AccInterface
+	return RegisterInternalClass(ctx, moduleNumber, decl)
+}
+
+func RegisterInternalClass(ctx *Context, moduleNumber int, decl *types.InternalClassDecl) *types.Class {
+	assert.Assert(decl.Name != "")
+	ce := types.NewInternalClass(decl, moduleNumber)
+	ctx.EG().ClassTable().Set(ce.LcName(), ce)
 	return ce
 }
+
 func RegisterUserClass(ctx *Context, decl *types.UserClassDecl) *types.Class {
 	ce := types.NewUserClass(decl)
-	iRegisterClass(ctx, ce)
-	return ce
-}
-func iRegisterClass(ctx *Context, ce *types.Class) {
 	ctx.EG().ClassTable().Set(ce.LcName(), ce)
+	return ce
 }
 
 func RegisterModuleFunctions(ctx *Context, m *Module, functions []types.FunctionDecl) {

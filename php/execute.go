@@ -18,6 +18,6 @@ func ExecuteScript(ctx *Context, fileHandle *FileHandle, skipShebang bool) (retv
 		return types.Undef, errors.New("compile code failed")
 	}
 
-	executor := NewExecutor(ctx)
+	executor := ctx.executor
 	return executor.Execute(topFunc)
 }

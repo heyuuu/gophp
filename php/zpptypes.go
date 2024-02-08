@@ -119,7 +119,7 @@ func zppParseArrayHt(arg types.Zval, checkNull bool, orObject bool, separate boo
 }
 
 func zppParseObject(arg types.Zval, ce *types.Class, checkNull bool) (dest *types.Object, ok bool) {
-	if arg.IsObject() { //&& (ce == nil || InstanceofFunction(arg.Object().Class(), ce)) {
+	if arg.IsObject() { //&& (class == nil || InstanceofFunction(arg.Object().Class(), class)) {
 		return arg.Object(), true
 	} else if checkNull && arg.IsNull() {
 		return nil, true
@@ -160,7 +160,7 @@ func zppParseZvalDeref(arg *types.Zval, checkNull bool) (dest *types.Zval) {
 }
 
 //
-//func zppParseClass(ctx *Context, arg types.Zval, baseCe *types.Class, num int, checkNull bool) (ce *types.Class, ok bool) {
+//func zppParseClass(ctx *Context, arg types.Zval, baseCe *types.Class, num int, checkNull bool) (class *types.Class, ok bool) {
 //	if checkNull && arg.IsNull() {
 //		return nil, true
 //	}
@@ -170,16 +170,16 @@ func zppParseZvalDeref(arg *types.Zval, checkNull bool) (dest *types.Zval) {
 //	} else {
 //		return nil, false
 //	}
-//	ce = ZendLookupClass(ctx, arg.String())
+//	class = ZendLookupClass(ctx, arg.String())
 //	if baseCe != nil {
-//		if ce == nil || !InstanceofFunction(ce, baseCe) {
+//		if class == nil || !InstanceofFunction(class, baseCe) {
 //			faults.InternalTypeError(ctx, CurrEX(ctx).IsArgUseStrictTypes(), fmt.Sprintf("%s() expects parameter %d to be a class name derived from %s, '%s' given", CurrEX(ctx).CalleeName(), num, baseCe.Name(), arg.String()))
 //			return nil, false
 //		}
 //	}
-//	if ce == nil {
+//	if class == nil {
 //		faults.InternalTypeError(ctx, CurrEX(ctx).IsArgUseStrictTypes(), fmt.Sprintf("%s() expects parameter %d to be a valid class name, '%s' given", CurrEX(ctx).CalleeName(), num, arg.String()))
 //		return nil, false
 //	}
-//	return ce, true
+//	return class, true
 //}

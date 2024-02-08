@@ -1,7 +1,16 @@
 package types
 
+// ArgInfo
 type ArgInfo struct {
-	Name     string
-	ByRef    bool
-	Variadic bool
+	name     string `get:""`
+	byRef    bool   `get:""`
+	variadic bool   `get:""`
+}
+
+func MakeArgInfo(name string, byRef bool, variadic bool) ArgInfo {
+	return ArgInfo{
+		name:     name,
+		byRef:    byRef,
+		variadic: variadic,
+	}
 }

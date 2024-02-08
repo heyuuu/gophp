@@ -142,3 +142,20 @@ func InternalArgumentCountError(ctx *Context, throwException bool, message strin
 func ZendIllegalOffset(ctx *Context) {
 	Error(ctx, perr.E_WARNING, "Illegal offset type")
 }
+
+func errorWrongPropertyRead(ctx *Context, property types.Zval) {
+	var propertyName = ZvalGetStrVal(ctx, property)
+	Error(ctx, perr.E_NOTICE, fmt.Sprintf("Trying to get property '%s' of non-object", propertyName))
+}
+
+func errorUndefinedProperty(ctx *Context, ce *types.Class, name string) {
+	Error(ctx, perr.E_NOTICE, fmt.Sprintf("Undefined property: %s::$%s", ce.Name(), name))
+}
+
+func errorDeprecatedFunction(ctx *Context, fn *types.Function) {
+	ctx.CurrEX().CalleeName()
+	Error(ctx, perr.E_DEPRECATED, fmt.Sprintf("Function %s() is deprecated", fn.CalleeName()))
+}
+func errorAbstractMethod(ctx *Context, fn *types.Function) {
+	ThrowError(ctx, nil, fmt.Sprintf("Cannot call abstract method %s()", fn.CalleeName()))
+}

@@ -433,6 +433,14 @@ func (ht *Array) Pop() ArrayPair {
 	}
 
 	ht.Delete(pair.Key)
+	if pair.Key.IsIdxKey() {
+		if htData, ok := ht.data.(*ArrayDataHt); ok {
+			if pair.Key.IdxKey() == htData.nextFreeElement-1 {
+				htData.nextFreeElement--
+			}
+		}
+	}
+
 	return pair
 }
 

@@ -74,8 +74,8 @@ func NewZvalZval(zv types.Zval, copy bool, dtor bool) types.Zval {
 func HashOf(p types.Zval) *types.Array {
 	if p.IsArray() {
 		return p.Array()
-		//} else if p.IsObject() {
-		//	return p.Object().GetPropertiesArray()
+	} else if p.IsObject() {
+		return p.Object().GetPropertiesArray()
 	} else {
 		return nil
 	}
