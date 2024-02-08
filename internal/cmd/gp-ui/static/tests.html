@@ -303,8 +303,7 @@
             if (!test) {
                 return ""
             }
-            return "/?code=" + encodeURIComponent(test.code)
-            // return "/?test=" + test.name + "&code=" + encodeURIComponent(test.code)
+            return "/static/diff.html?code=" + encodeURIComponent(test.code)
         },
         gotoShowPage(testIdx) {
             const url = this.testShowPage(testIdx)
