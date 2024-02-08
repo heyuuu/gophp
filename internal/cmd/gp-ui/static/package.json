@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "bootstrap": "^4.6.2",
+    "jquery": "^3.6.3",
+    "monaco-editor": "^0.32.1",
+    "petite-vue": "^0.4.1",
+    "qs": "^6.11.2"
+  }
+}
