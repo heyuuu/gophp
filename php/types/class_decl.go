@@ -1,14 +1,10 @@
 package types
 
 type ClassDecl struct {
-	Name       string
-	Flags      uint32
-	Parent     string
-	Interfaces []string
-	Constants  []*ClassConstant
-	Properties []*PropertyInfo
-	Methods    []*Function
-
+	Name        string
+	Flags       uint32
+	Parent      string
+	Interfaces  []string
 	Filename    string
 	StartLineno uint32
 	EndLineno   uint32

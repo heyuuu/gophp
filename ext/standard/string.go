@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 /**
@@ -107,23 +108,19 @@ func ZifUtf8Encode(data string) string {
 	return buf.String()
 }
 
-//func ZifUtf8Decode(data string) string {
-//	var pos = 0
-//	var buf strings.Builder
-//	for pos < len(data) {
-//		var status = types.FAILURE
-//		c := PhpNextUtf8Char((*uint8)(data), len(data), &pos, &status)
-//
-//		/* The lower 256 codepoints of Unicode are identical to Latin-1,
-//		 * so we don't need to do any mapping here beyond replacing non-Latin-1
-//		 * characters. */
-//		if status == types.FAILURE || c > 0xff {
-//			c = '?'
-//		}
-//		buf.WriteRune(rune(c))
-//	}
-//	return buf.String()
-//}
+func ZifUtf8Decode(data string) string {
+	var buf strings.Builder
+	for pos := 0; pos < len(data); {
+		r, size := utf8.DecodeRuneInString(data[pos:])
+		if r == utf8.RuneError {
+			buf.WriteRune('?')
+		} else {
+			buf.WriteRune(r)
+		}
+		pos += size
+	}
+	return buf.String()
+}
 
 func substr(str string, offset int, length *int) (string, bool) {
 	negativeOffset := offset < 0
@@ -420,7 +417,7 @@ func ZifTrim(ctx *php.Context, ex *php.ExecuteData, str string, _ zpp.Opt, chara
 	return strings.Trim(str, cutset)
 }
 
-//@zif(alias="chop")
+// @zif(alias="chop")
 func ZifRtrim(ctx *php.Context, ex *php.ExecuteData, str string, _ zpp.Opt, characterMask string) string {
 	var cutset = spaceCutset
 	if ex.NumArgs() >= 2 {
@@ -551,7 +548,7 @@ func ZifExplode(ctx *php.Context, separator string, str string, _ zpp.Opt, limit
 	return arr, true
 }
 
-//@zif(alias="join")
+// @zif(alias="join")
 func ZifImplode(ctx *php.Context, glue_ types.Zval, _ zpp.Opt, pieces_ types.Zval) types.Zval {
 	var arg1 = glue_
 	var arg2 = pieces_
@@ -787,7 +784,7 @@ func ZifStristr(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt,
 	}
 }
 
-//@zif(alias="strchr")
+// @zif(alias="strchr")
 func ZifStrstr(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, part bool) (string, bool) {
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok {
@@ -850,6 +847,10 @@ func ZifStrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, 
 
 	needleStr, ok := parseNeedle(ctx, needle)
 	if !ok {
+		return 0, false
+	}
+	if needleStr == "" {
+		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Empty needle")
 		return 0, false
 	}
 
@@ -922,12 +923,12 @@ func strrpos(ctx *php.Context, haystack string, needle types.Zval, offset int, c
 	}
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifStrrpos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	return strrpos(ctx, haystack, needle, offset, false)
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifStrripos(ctx *php.Context, haystack string, needle types.Zval, _ zpp.Opt, offset int) (int, bool) {
 	return strrpos(ctx, haystack, needle, offset, true)
 }
@@ -1194,7 +1195,7 @@ func ZifOrd(character string) int {
 	return int(character[0])
 }
 
-//@zif(onError=2)
+// @zif(onError=2)
 func ZifChr(codepoint int) string {
 	c := byte(codepoint & 0xff)
 	return string([]byte{c})
@@ -2093,17 +2094,17 @@ func ZifStripTags(ctx *php.Context, str string, _ zpp.Opt, allowableTags *types.
 	return result
 }
 
-func ZifStrRepeat(ctx *php.Context, input string, mult int) (string, bool) {
+func ZifStrRepeat(ctx *php.Context, input string, mult int) types.Zval {
 	if mult < 0 {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Second argument has to be greater than or equal to 0")
-		return "", false
+		return types.Null
 	}
 	/* Don't waste our time if it's empty */
 	if input == "" || mult == 0 {
-		return "", true
+		return types.ZvalString("")
 	}
 
-	return strings.Repeat(input, mult), true
+	return types.ZvalString(strings.Repeat(input, mult))
 }
 func ZifCountChars(ctx *php.Context, input string, _ zpp.Opt, mode int) (*types.Zval, bool) {
 	if mode < 0 || mode > 4 {
@@ -2331,7 +2332,7 @@ func ZifStrSplit(ctx *php.Context, str string, _ zpp.Opt, splitLength_ *int) ([]
 	return result, true
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifStrpbrk(ctx *php.Context, haystack string, charList string) (string, bool) {
 	if charList == "" {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "The character list cannot be empty")
@@ -2343,7 +2344,7 @@ func ZifStrpbrk(ctx *php.Context, haystack string, charList string) (string, boo
 	return "", false
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifSubstrCompare(ctx *php.Context, return_value zpp.Ret, haystack string, needle string, offset int, _ zpp.Opt, length *int, caseInsensitivity bool) (int, bool) {
 	// check length
 	if length != nil && *length <= 0 {

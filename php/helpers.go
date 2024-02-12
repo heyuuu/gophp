@@ -28,6 +28,16 @@ func StringCaseCompare(s1, s2 string) int {
 	return len(s1) - len(s2)
 }
 
+func StringNCaseCompare(s1, s2 string, n int) int {
+	if len(s1) > n {
+		s1 = s1[:n]
+	}
+	if len(s2) > n {
+		s2 = s2[:n]
+	}
+	return StringCaseCompare(s1, s2)
+}
+
 // php 对浮点数的格式化方式，兼容一些细微差异
 func FormatDouble(f float64, fmtTyp byte, prec int) string {
 	if fmtTyp == 'F' {

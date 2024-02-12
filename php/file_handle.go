@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const CommandLineFileName = "Command line code"
+
 type FileHandle struct {
 	reader     io.Reader
 	openedPath string

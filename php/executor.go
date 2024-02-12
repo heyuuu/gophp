@@ -507,13 +507,8 @@ func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
 	for _, stmt := range x.Stmts {
 		switch s := stmt.(type) {
 		case *ast.ClassConstStmt:
-			constant := types.NewClassConstant(
-				s.Name.Name,
-				e.expr(s.Value),
-				"",
-				0,
-			)
-			decl.Constants = append(decl.Constants, constant)
+			flags := e.parseFlags(s.Flags)
+			DeclClassConst(ce, flags, s.Name.Name, e.expr(s.Value))
 		case *ast.PropertyStmt:
 			var defaultValue types.Zval
 			if s.Default != nil {
@@ -529,21 +524,13 @@ func (e *Executor) classStmt(x *ast.ClassStmt) execResult {
 				nil,
 				s.Stmts,
 			)
-			decl.Methods = append(decl.Methods, method)
+			DeclMethod(ce, method)
 		default:
 			panic(perr.Todof("class stmt type: %T", s))
 		}
 	}
 
 	return nil
-}
-
-func (e *Executor) propertyStmt(x *ast.PropertyStmt) execResult {
-	panic(perr.Todof("e.propertyStmt"))
-}
-
-func (e *Executor) classMethodStmt(x *ast.ClassMethodStmt) execResult {
-	panic(perr.Todof("e.classMethodStmt"))
 }
 
 func (e *Executor) traitStmt(x *ast.TraitStmt) execResult {
@@ -1242,6 +1229,11 @@ func (e *Executor) arrayGet(arr types.Zval, key types.ArrayKey) types.Zval {
 			Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Uninitialized string offset: %d", offset))
 		}
 		return types.ZvalString("")
+	case types.IsNull, types.IsUndef:
+		Error(e.ctx, perr.E_NOTICE, fmt.Sprintf("Trying to access array offset on value of type %s", types.ZendZvalTypeName(arr)))
+		return UninitializedZval()
+	case types.IsObject:
+		fallthrough
 	default:
 		panic(perr.Todof("unsupported e.arrayGet arr type: %s", types.ZvalGetType(arr)))
 	}

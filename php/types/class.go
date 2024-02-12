@@ -109,40 +109,6 @@ func initClass(typ byte, moduleNumber int, decl *ClassDecl) *Class {
 		},
 	}
 
-	// class constants
-	for _, constant := range decl.Constants {
-		constant.ce = ce
-		ce.ConstantTable().Add(ascii.StrToLower(constant.name), constant)
-	}
-
-	// properties
-	for i, property := range decl.Properties {
-		property.ce = ce
-		property.offset = uint32(i)
-		ce.PropertyTable().Add(ascii.StrToLower(property.name), property)
-	}
-
-	// methods
-	for _, method := range decl.Methods {
-		method.scope = ce
-		ce.FunctionTable().Add(ascii.StrToLower(method.Name()), method)
-	}
-
-	// magic methods
-	ce.constructor = ce.functionTable.Get("__constructor")
-	ce.destructor = ce.functionTable.Get("__destructor")
-	ce.clone = ce.functionTable.Get("__clone")
-	ce.__get = ce.functionTable.Get("__get")
-	ce.__set = ce.functionTable.Get("__set")
-	ce.__unset = ce.functionTable.Get("__unset")
-	ce.__isset = ce.functionTable.Get("__isset")
-	ce.__call = ce.functionTable.Get("__call")
-	ce.__callstatic = ce.functionTable.Get("__callstatic")
-	ce.__tostring = ce.functionTable.Get("__tostring")
-	ce.__debugInfo = ce.functionTable.Get("__debugInfo")
-	ce.serializeFunc = ce.functionTable.Get("__serialize")
-	ce.unserializeFunc = ce.functionTable.Get("__unserialize")
-
 	return ce
 }
 

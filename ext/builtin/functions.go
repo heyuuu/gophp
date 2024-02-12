@@ -8,7 +8,7 @@ import (
 	"github.com/heyuuu/gophp/php/zpp"
 )
 
-//func ZifZendVersion() string  { return php.ZEND_VERSION }
+// func ZifZendVersion() string  { return php.ZEND_VERSION }
 func ZifGcMemCaches() int     { return 0 }
 func ZifGcCollectCycles() int { return 0 }
 func ZifGcEnabled() bool      { return true }
@@ -27,6 +27,18 @@ func ZifGcStatus() *types.Array {
 	arr.AddAssocLong("threshold", 0)
 	arr.AddAssocLong("roots", 0)
 	return arr
+}
+
+func ZifFuncNumArgs(ctx *php.Context, executeData *php.ExecuteData) int {
+	var ex = executeData.Prev()
+	//if (php.ZEND_CALL_INFO(ex) & php.ZEND_CALL_CODE) != 0 {
+	//	php.Error(ctx, perr.E_WARNING, "func_num_args():  Called from the global scope - no function context")
+	//	return -1
+	//}
+	if !php.ForbidDynamicCall(ctx, "func_num_args()") {
+		return -1
+	}
+	return ex.NumArgs()
 }
 
 func ZifStrlen(str string) int { return len(str) }
@@ -49,8 +61,15 @@ func ZifStrncmp(ctx *php.Context, str1 string, str2 string, len_ int) (int, bool
 func ZifStrcasecmp(str1 string, str2 string) int {
 	return php.StringCaseCompare(str1, str2)
 }
+func ZifStrncasecmp(ctx *php.Context, str1 string, str2 string, len_ int) (int, bool) {
+	if len_ < 0 {
+		php.Error(ctx, perr.E_WARNING, "Length must be greater than or equal to 0")
+		return 0, false
+	}
+	return php.StringNCaseCompare(str1, str2, len_), true
+}
 
-//@zif(oldMode="z/")
+// @zif(oldMode="z/")
 func ZifEach(ctx *php.Context, array zpp.RefZval) (*types.Array, bool) {
 	//if !ctx.EG().EachDeprecationThrown() {
 	//	php.Error(ctx, perr.E_DEPRECATED, "The each() function is deprecated. This message will be suppressed on further calls")
