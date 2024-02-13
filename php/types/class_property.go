@@ -24,6 +24,7 @@ func NewPropertyInfo(flags uint32, name string, typ *TypeHint, defaultVal Zval) 
 		defaultVal: defaultVal,
 	}
 }
+
 /* PropertyInfo.flags */
 func (prop *PropertyInfo) AddFlags(value uint32)      { prop.flags |= value }
 func (prop *PropertyInfo) HasFlags(value uint32) bool { return prop.flags&value != 0 }

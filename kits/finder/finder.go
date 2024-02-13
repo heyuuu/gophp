@@ -30,7 +30,6 @@ func OptOnlyFiles() Option            { return func(f *Finder) { f.mode = ModeOn
 func OptOnlyDirs() Option             { return func(f *Finder) { f.mode = ModeOnlyDirs } }
 func OptMaxDepth(maxDepth int) Option { return func(f *Finder) { f.maxDepth = maxDepth } }
 
-//
 type File struct {
 	Path         string
 	RelativePath string

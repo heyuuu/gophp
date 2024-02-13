@@ -322,19 +322,19 @@ exit:
 	return p.String(), true
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifSprintf(ctx *php.Context, format types.Zval, _ zpp.Opt, args []types.Zval) (string, bool) {
 	//@see PHP_FUNCTION(user_sprintf)
 	return PhpFormattedPrint(ctx, format, args)
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifVsprintf(ctx *php.Context, format types.Zval, args types.Zval) (string, bool) {
 	formatArgs := php.ZvalGetArray(ctx, args).Values()
 	return PhpFormattedPrint(ctx, format, formatArgs)
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifPrintf(ctx *php.Context, format types.Zval, _ zpp.Opt, args []types.Zval) (int, bool) {
 	//@see PHP_FUNCTION(user_printf)
 	result, ok := PhpFormattedPrint(ctx, format, args)
@@ -346,7 +346,7 @@ func ZifPrintf(ctx *php.Context, format types.Zval, _ zpp.Opt, args []types.Zval
 	}
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifVprintf(ctx *php.Context, format types.Zval, args types.Zval) (int, bool) {
 	formatArgs := php.ZvalGetArray(ctx, args).Values()
 	result, ok := PhpFormattedPrint(ctx, format, formatArgs)

@@ -36,7 +36,7 @@ func PhpMtRandRange(ctx *php.Context, min int, max int) int {
 	return min + getRand(ctx).Intn(max-min+1)
 }
 
-//@zif(alias="srand")
+// @zif(alias="srand")
 func ZifMtSrand(ctx *php.Context, _ zpp.Opt, seed_ *int, mode_ *int) {
 	var seed int64
 	if seed_ == nil {
@@ -47,7 +47,7 @@ func ZifMtSrand(ctx *php.Context, _ zpp.Opt, seed_ *int, mode_ *int) {
 	BG(ctx).InitRandGenerator(seed)
 }
 
-//@zif(alias="getrandmax")
+// @zif(alias="getrandmax")
 func ZifMtGetrandmax() int {
 	return PHP_MT_RAND_MAX
 }

@@ -67,7 +67,7 @@ func ZifIntval(ctx *php.Context, var_ types.Zval, _ zpp.Opt, base_ *int) int {
 	return php.ZendStrToLong(num.String(), base)
 }
 
-//@zif(alias="doubleval")
+// @zif(alias="doubleval")
 func ZifFloatval(ctx *php.Context, var_ types.Zval) float64 {
 	return php.ZvalGetDouble(ctx, var_)
 }
@@ -75,7 +75,7 @@ func ZifBoolval(ctx *php.Context, var_ types.Zval) bool {
 	return php.ZvalIsTrue(ctx, var_)
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifStrval(ctx *php.Context, var_ types.Zval) string {
 	return php.ZvalGetStrVal(ctx, var_)
 }
@@ -94,17 +94,17 @@ func ZifIsResource(var_ *types.Zval) bool {
 	return false
 }
 
-//@zif(onError=1)
+// @zif(onError=1)
 func ZifIsBool(var_ *types.Zval) bool {
 	return var_.IsBool()
 }
 
-//@zif(alias="is_integer,is_long")
+// @zif(alias="is_integer,is_long")
 func ZifIsInt(var_ *types.Zval) bool {
 	return var_.IsLong()
 }
 
-//@zif(alias="is_double")
+// @zif(alias="is_double")
 func ZifIsFloat(var_ *types.Zval) bool {
 	return var_.IsDouble()
 }
