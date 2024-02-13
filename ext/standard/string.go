@@ -113,9 +113,9 @@ func ZifUtf8Decode(data string) string {
 	for pos := 0; pos < len(data); {
 		r, size := utf8.DecodeRuneInString(data[pos:])
 		if r == utf8.RuneError {
-			buf.WriteRune('?')
+			buf.WriteByte('?')
 		} else {
-			buf.WriteRune(r)
+			buf.WriteByte(byte(r))
 		}
 		pos += size
 	}
@@ -2179,16 +2179,13 @@ func ZifSubstrCount(ctx *php.Context, haystack string, needle string, _ zpp.Opt,
 	return strings.Count(searchStr, needle), true
 }
 
-func ZifStrPad(ctx *php.Context, input string, padLength int, _ zpp.Opt, padString_ *string, padType_ *int) types.Zval {
+func ZifStrPad(ctx *php.Context, ex *php.ExecuteData, input string, padLength int, _ zpp.Opt, padString_ *string, padType_ *int) types.Zval {
 	padString := lang.Option(padString_, " ")
 	padType := lang.Option(padType_, STR_PAD_RIGHT)
 
 	/* If resulting string turns out to be shorter than input string,
 	   we simply copy the input and return. */
-	if padLength < 0 || padLength < len(input) {
-		return php.String(input)
-	}
-	if padString == "" {
+	if ex.NumArgs() >= 3 && (padString_ == nil || *padString_ == "") {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Padding string cannot be empty")
 		return types.Null
 	}
@@ -2200,6 +2197,9 @@ func ZifStrPad(ctx *php.Context, input string, padLength int, _ zpp.Opt, padStri
 	if numPadChars >= math.MaxInt {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Padding length is too long")
 		return types.Null
+	}
+	if padLength < 0 || padLength < len(input) {
+		return php.String(input)
 	}
 
 	/* We need to figure out the left/right padding lengths. */

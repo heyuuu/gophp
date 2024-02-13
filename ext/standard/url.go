@@ -25,6 +25,7 @@ const PHP_QUERY_RFC1738 = 1
 const PHP_QUERY_RFC3986 = 2
 
 const lcHexChars = "0123456789abcdef"
+const ucHexChars = "0123456789ABCDEF"
 
 // PhpUrl
 type PhpUrl struct {
@@ -294,31 +295,76 @@ func ZifParseUrl(ctx *php.Context, url string, _ zpp.Opt, component *int) types.
 	return types.ZvalArray(arr)
 }
 
-func PhpUrlEncode(str string) string {
+func PhpUrlEncode(s string) string {
 	var buf strings.Builder
-	for _, c := range []byte(str) {
+	for _, c := range []byte(s) {
 		if c == ' ' {
 			buf.WriteByte('+')
-		} else if c < '0' && c != '-' && c != '.' || c < 'A' && c > '9' || c > 'Z' && c < 'a' && c != '_' || c > 'z' {
+		} else if !ascii.IsAlphaNum(c) && c != '-' && c != '.' && c != '_' {
 			buf.WriteByte('%')
-			buf.WriteByte(lcHexChars[c>>4])
-			buf.WriteByte(lcHexChars[c&15])
+			buf.WriteByte(ucHexChars[c>>4])
+			buf.WriteByte(ucHexChars[c&0x0f])
 		} else {
 			buf.WriteByte(c)
 		}
 	}
 	return buf.String()
 }
-func PhpRawUrlEncode(str string) string {
+func PhpUrlDecode(s string) string {
 	var buf strings.Builder
-	for _, c := range []byte(str) {
-		if c < '0' && c != '-' && c != '.' || c < 'A' && c > '9' || c > 'Z' && c < 'a' && c != '_' || c > 'z' && c != '~' {
-			buf.WriteByte('%')
-			buf.WriteByte(lcHexChars[c>>4])
-			buf.WriteByte(lcHexChars[c&15])
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '+' {
+			buf.WriteByte(' ')
+		} else if c == '%' && i+2 < len(s) && ascii.IsXDigit(s[i+1]) && ascii.IsXDigit(s[i+2]) {
+			c1, _ := ascii.ParseXDigit(s[i+1])
+			c2, _ := ascii.ParseXDigit(s[i+2])
+			buf.WriteByte(c1<<4 + c2)
+			i += 2
 		} else {
 			buf.WriteByte(c)
 		}
 	}
 	return buf.String()
+}
+func ZifUrlencode(str string) string {
+	return PhpUrlEncode(str)
+}
+func ZifUrldecode(str string) string {
+	return PhpUrlDecode(str)
+}
+
+func PhpRawUrlEncode(s string) string {
+	var buf strings.Builder
+	for _, c := range []byte(s) {
+		if !ascii.IsAlphaNum(c) && c != '-' && c != '.' && c != '_' && c != '~' {
+			buf.WriteByte('%')
+			buf.WriteByte(ucHexChars[c>>4])
+			buf.WriteByte(ucHexChars[c&0x0f])
+		} else {
+			buf.WriteByte(c)
+		}
+	}
+	return buf.String()
+}
+func PhpRawUrlDecode(s string) string {
+	var buf strings.Builder
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '%' && i+2 < len(s) && ascii.IsXDigit(s[i+1]) && ascii.IsXDigit(s[i+2]) {
+			c1, _ := ascii.ParseXDigit(s[i+1])
+			c2, _ := ascii.ParseXDigit(s[i+2])
+			buf.WriteByte(c1<<4 + c2)
+			i += 2
+		} else {
+			buf.WriteByte(c)
+		}
+	}
+	return buf.String()
+}
+func ZifRawurlencode(str string) string {
+	return PhpRawUrlEncode(str)
+}
+func ZifRawurldecode(str string) string {
+	return PhpRawUrlDecode(str)
 }
