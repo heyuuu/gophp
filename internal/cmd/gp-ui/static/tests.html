@@ -98,9 +98,10 @@
             </table>
         </div>
         <div class="col-sm-8">
-            <div class="card" style="height: 100vh">
-                <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ currTest.content }}</pre>
+            <div class="card" style="height: 30vh">
+                <pre style="margin: 0; padding: 1rem 0; ">{{ currTest.content }}</pre>
             </div>
+            <div id="diff-editor" style="height: 70vh"></div>
         </div>
     </div>
 </div>
@@ -109,6 +110,14 @@
 <script src="/static/node_modules/petite-vue/dist/petite-vue.umd.js"></script>
 <script src="/static/node_modules/qs/dist/qs.js"></script>
 <script src="/static/js/tools.js"></script>
+
+<script>
+    var require = {paths: {vs: '/static/node_modules/monaco-editor/min/vs'}};
+</script>
+<script src="/static/node_modules/monaco-editor/min/vs/loader.js"></script>
+<script src="/static/node_modules/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
+<script src="/static/node_modules/monaco-editor/min/vs/editor/editor.main.js"></script>
+
 <script>
     // App
     const testListUri = "/api/test/list"
@@ -129,6 +138,9 @@
         NET_ERROR: 5,
         FAIL: 6,
     }
+
+    // diff-editor
+    let diffEditor = null
 
     const initQuery = getQuery()
     const app = window.app = {
@@ -296,6 +308,25 @@
         // 点击具体case
         activeTest(testIdx) {
             this.activeIndex = testIdx
+
+            //
+            const test = this.tests[testIdx]
+            if (!test) {
+                return
+            }
+            this.activeDiffEditor(test.output, test.expect)
+        },
+        activeDiffEditor(original, modified) {
+            if (!diffEditor) {
+                diffEditor = monaco.editor.createDiffEditor(document.getElementById('diff-editor'), {
+                    theme: "vs-dark",
+                })
+            }
+            diffEditor.layout()
+            diffEditor.setModel({
+                original: monaco.editor.createModel(original, 'text'),
+                modified: monaco.editor.createModel(modified, 'text'),
+            })
         },
         // 按钮事件
         testShowPage(testIdx) {
@@ -413,12 +444,9 @@
                 }
 
                 this.updateTest(index, res.data.status, res.data.reason)
-                const code = res.data.case.Sections.FILE
-                if (code) {
-                    test.code = code
-                } else {
-                    test.code = ""
-                }
+                test.code = res.data.case.Sections.FILE || ""
+                test.output = res.data.output || ""
+                test.expect = res.data.case.Sections.EXPECT || res.data.case.Sections.EXPECTF || ""
                 this.runNext()
             }, () => {
                 this.updateTest(index, NET_ERROR, "调用 url 失败")
@@ -433,7 +461,6 @@
     }, 500)
 
     app.start()
-
 </script>
 </body>
 </html>

@@ -85,6 +85,7 @@ type TestResult struct {
 	Type    ResultType
 	Reason  string
 	UseTime time.Duration
+	Output  string
 }
 
 func NewTestResult(Case *TestCase, Type ResultType, reason string, useTime time.Duration) *TestResult {

@@ -75,6 +75,7 @@ func apiTestRunHandler(request *http.Request) (data any, err error) {
 		"case": testResult.Case,
 		// result
 		"status":  testResult.Type,
+		"output":  testResult.Output,
 		"reason":  testResult.Reason,
 		"useTime": testResult.UseTime.Nanoseconds(),
 	}

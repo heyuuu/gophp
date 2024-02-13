@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -39,7 +40,6 @@ func ApiWrapHandler(handler func(r *http.Request) (any, error)) http.HandlerFunc
 	})
 }
 
-//
 const (
 	TypeAst      = "AST"
 	TypeAstPrint = "AST-print"
@@ -158,6 +158,10 @@ func rawRunCode(code string) string {
 	if err != nil {
 		return output + "\n" + err.Error()
 	}
+
+	// todo: 暂时屏蔽报错文件、行号信息的差异，待完善后移除
+	output = regexp.MustCompile(`in Command line code on line \d+`).ReplaceAllString(output, "in __UNKNOWN_FILE__ on line 0")
+
 	return output
 }
 

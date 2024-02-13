@@ -98,10 +98,12 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 	}
 
 	if pass {
-		return NewTestResult(tc, PASS, "", 0)
+		result = NewTestResult(tc, PASS, "", 0)
 	} else {
-		return NewTestResult(tc, FAIL, reason, 0)
+		result = NewTestResult(tc, FAIL, reason, 0)
 	}
+	result.Output = output
+	return result
 }
 
 func runCodeBuiltin(code string) (output string, err error) {
