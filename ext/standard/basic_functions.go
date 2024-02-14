@@ -44,7 +44,6 @@ func ZifIp2long(ipAddress string) (int, bool) {
 
 	bytes := []byte(ipV4)
 	num := int(bytes[0])<<24 + int(bytes[1])<<16 + int(bytes[2])<<8 + int(bytes[3])
-	//return_value.SetLong(ntohl(ip.s_addr))
 	return num, true
 }
 func ZifLong2ip(ipAddress int) string {

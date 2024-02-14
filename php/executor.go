@@ -1170,7 +1170,7 @@ func (e *Executor) variableRefArray(variable ast.Expr) types.Zval {
 	ref := e.variableRef(variable)
 	value := ref.Get()
 	if value.IsUndef() {
-		value = types.InitZvalArray()
+		value = types.ZvalArrayInit()
 		ref.Set(value)
 	}
 	return value

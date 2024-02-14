@@ -51,7 +51,10 @@ func ZvalObject(obj *Object) Zval     { assert.Assert(obj != nil); return Zval{o
 func ZvalResource(res *Resource) Zval { assert.Assert(res != nil); return Zval{res} }
 func ZvalRef(ref *Reference) Zval     { assert.Assert(ref != nil); return Zval{ref} }
 
-func InitZvalArray() Zval { return Zval{NewArray()} }
+func ZvalArrayInit() Zval                 { return Zval{NewArray()} }
+func ZvalArrayOfInt(arr []int) Zval       { return ZvalArray(NewArrayOfInt(arr)) }
+func ZvalArrayOfString(arr []string) Zval { return ZvalArray(NewArrayOfString(arr)) }
+func ZvalArrayOfZval(arr []Zval) Zval     { return ZvalArray(NewArrayOfZval(arr)) }
 
 /**
  * Zval
