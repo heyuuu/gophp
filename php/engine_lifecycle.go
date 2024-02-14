@@ -1,5 +1,7 @@
 package php
 
+import "github.com/heyuuu/gophp/php/types"
+
 func moduleStartupRegisterConstants(ctx *Context) {
 	//RegisterStringConstant(ctx, 0, "PHP_VERSION", PHP_VERSION)
 	//RegisterLongConstant(ctx, 0, "PHP_MAJOR_VERSION", PHP_MAJOR_VERSION)
@@ -28,8 +30,8 @@ func moduleStartupRegisterConstants(ctx *Context) {
 	//RegisterStringConstant(ctx, 0, "PHP_SHLIB_SUFFIX", PHP_SHLIB_SUFFIX)
 	//RegisterStringConstant(ctx, 0, "PHP_EOL", PHP_EOL)
 	//RegisterLongConstant(ctx, 0, "PHP_MAXPATHLEN", MAXPATHLEN)
-	RegisterLongConstant(ctx, 0, "PHP_INT_MAX", LongMax)
-	RegisterLongConstant(ctx, 0, "PHP_INT_MIN", LongMin)
+	RegisterLongConstant(ctx, 0, "PHP_INT_MAX", types.MaxLong)
+	RegisterLongConstant(ctx, 0, "PHP_INT_MIN", types.MinLong)
 	//RegisterLongConstant(ctx, 0, "PHP_INT_SIZE", SizeofLong)
 	//RegisterLongConstant(ctx, 0, "PHP_FD_SETSIZE", FD_SETSIZE)
 	//RegisterLongConstant(ctx, 0, "PHP_FLOAT_DIG", DBL_DIG)

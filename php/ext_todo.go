@@ -4,14 +4,11 @@ import (
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
-	"math"
 	"path/filepath"
 	"strconv"
 	"strings"
 )
 
-const LongMax = math.MaxInt
-const LongMin = math.MinInt
 const PrintZvalIndent = 4
 
 func ForbidDynamicCall(ctx *Context, s string) bool {

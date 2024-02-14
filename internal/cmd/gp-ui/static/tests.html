@@ -250,7 +250,7 @@
                 if (this.searchName && !test.name.includes(this.searchName)) {
                     return false
                 }
-                if (this.searchContent && !test.content.includes(this.searchContent)) {
+                if (this.searchContent && !test.content.includes(this.searchContent) && !test.code.includes(this.searchContent)) {
                     return false
                 }
                 return true

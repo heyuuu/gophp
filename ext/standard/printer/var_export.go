@@ -36,8 +36,8 @@ func (p *VarExportPrinter) Zval(zv types.Zval, level int) {
 		/* INT_MIN as a literal will be parsed as a float. Emit something like
 		 * -9223372036854775807-1 to avoid this. */
 
-		if zv.Long() == php.LongMin {
-			p.print(strconv.Itoa(php.LongMin + 1))
+		if zv.Long() == types.MinLong {
+			p.print(strconv.Itoa(types.MinLong + 1))
 			p.print("-1")
 			break
 		}

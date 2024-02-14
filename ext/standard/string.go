@@ -1014,8 +1014,8 @@ func substrReplaceSingle(str string, replace string, start int, l int) string {
 	} else if l > len(str) {
 		l = len(str)
 	}
-	php.Assert(0 <= f && f <= php.LongMax)
-	php.Assert(0 <= l && l <= php.LongMax)
+	php.Assert(0 <= f && f <= types.MaxLong)
+	php.Assert(0 <= l && l <= types.MaxLong)
 	if f+l > len(str) {
 		l = len(str) - f
 	}
