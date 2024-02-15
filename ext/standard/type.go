@@ -60,11 +60,11 @@ func ZifIntval(ctx *php.Context, var_ types.Zval, _ zpp.Opt, base_ *int) int {
 			}
 			if str[offset] == '0' && (str[offset+1] == 'b' || str[offset+1] == 'B') {
 				str = str[:offset] + str[offset+2:]
-				return php.ZendStrToLong(str, 2)
+				return php.ParseLong(str, 2)
 			}
 		}
 	}
-	return php.ZendStrToLong(num.String(), base)
+	return php.ParseLong(num.String(), base)
 }
 
 // @zif(alias="doubleval")

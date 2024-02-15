@@ -5,20 +5,18 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 )
 
-// fast type and functions
-type Val = types.Zval
+// fast type functions
 
 var Bool = types.ZvalBool
 var Long = types.ZvalLong
 var Double = types.ZvalDouble
 var String = types.ZvalString
 var Array = types.ZvalArray
-var Object = types.ZvalObject
 
 type ZvalTypePair uint
 
 // inline
-func TypePair(v1, v2 Val) ZvalTypePair {
+func TypePair(v1, v2 types.Zval) ZvalTypePair {
 	return ZvalTypePair(v1.Type())<<8 | ZvalTypePair(v2.Type())
 }
 

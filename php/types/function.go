@@ -27,6 +27,8 @@ type Function struct {
 	// fields for user function
 	stmts   []ast.Stmt
 	astFile *ast.File
+
+	blockInfo
 }
 
 func NewInternalFunction(name string, handler any, moduleNumber int) *Function {
@@ -50,6 +52,8 @@ func NewInternalFunctionByEntry(moduleNumber int, entry FunctionDecl) *Function 
 
 func (f *Function) IsInternalFunction() bool { return f.typ == TypeInternalFunction }
 func (f *Function) IsUserFunction() bool     { return f.typ == TypeUserFunction }
+func (f *Function) IsEvalCode() bool         { return f.typ == TypeEvalCode }
+func (f *Function) IsUserCode() bool         { return f.typ == TypeUserFunction || f.typ == TypeEvalCode }
 
 func (f *Function) ArgInfos() []ArgInfo { return f.argInfos }
 

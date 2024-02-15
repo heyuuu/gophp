@@ -8,7 +8,7 @@ import (
 
 func UninitializedZval() types.Zval { return types.Null }
 
-func ExecuteScript(ctx *Context, fileHandle *FileHandle, skipShebang bool) (retval Val, err error) {
+func ExecuteScript(ctx *Context, fileHandle *FileHandle, skipShebang bool) (retval types.Zval, err error) {
 	assert.Assert(fileHandle != nil)
 	topFunc, err := CompileFile(ctx, fileHandle, skipShebang)
 	if err != nil {

@@ -40,33 +40,6 @@ func (e *Executor) Execute(fn *types.Function) (retVal types.Zval, ret error) {
 	return e.doCall(fn, nil, nil), nil
 }
 
-func (e *Executor) function(fn *types.Function, args []types.Zval) types.Zval {
-	assert.Assert(fn != nil)
-
-	// push && pop executeData
-	ex := NewExecuteData(e.ctx, fn, args)
-	e.ctx.EG().PushExecuteData(ex)
-	defer func() {
-		popEx := e.ctx.EG().PopExecuteData()
-		assert.AssertEx(ex == popEx, "push & pop executeData 的 executeData 对象不相同，执行堆栈可能有错误")
-	}()
-
-	var retval types.Zval
-	if fn.IsInternalFunction() {
-		if handler, ok := fn.Handler().(ZifHandler); ok {
-			handler(ex, &retval)
-		} else {
-			perr.Panic(fmt.Sprintf("不支持的内部函数 handler 类型: %T", fn.Handler()))
-		}
-	} else {
-		retval = e.userFunction(fn, args)
-	}
-	if retval.IsUndef() {
-		retval = types.Null
-	}
-	return retval
-}
-
 func (e *Executor) initStringCall(name string) *types.Function {
 	// todo ZendInitDynamicCallString
 	fn := e.ctx.EG().FindFunction(name)
@@ -103,7 +76,7 @@ func (e *Executor) currSymbols() ISymtable {
 	return e.ctx.CurrEX().Symbols()
 }
 
-// -- echo node types
+// -- each node types
 
 func (e *Executor) stmtList(stmts []ast.Stmt) execResult {
 	var labels = map[string]int{}
@@ -857,7 +830,7 @@ func (e *Executor) assignOpExpr(expr *ast.AssignOpExpr) types.Zval {
 	case ast.AssignOpBitwiseXor: // ^=
 		value = OpBitwiseXor(e.ctx, left, e.expr(expr.Expr))
 	case ast.AssignOpCoalesce: // ??=
-		value = OpCoalesce(e.ctx, left, func() Val { return e.expr(expr.Expr) })
+		value = OpCoalesce(e.ctx, left, func() types.Zval { return e.expr(expr.Expr) })
 	case ast.AssignOpConcat: // .=
 		value = OpConcat(e.ctx, left, e.expr(expr.Expr))
 	case ast.AssignOpDiv: // /=
@@ -1136,7 +1109,7 @@ func (e *Executor) newExpr(expr *ast.NewExpr) types.Zval {
 	}
 
 	// todo constructor
-	return Object(obj)
+	return types.ZvalObject(obj)
 }
 
 func (e *Executor) methodCallExpr(expr *ast.MethodCallExpr) types.Zval {

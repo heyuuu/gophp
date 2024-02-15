@@ -1587,6 +1587,7 @@ func ZifArrayMultisort(ctx *php.Context, args []types.Zval) bool {
 		idx := 0
 		array.Array().Each(func(key types.ArrayKey, value types.Zval) {
 			matrix[idx] = append(matrix[idx], types.MakeArrayPair(key, value))
+			idx++
 		})
 	}
 
@@ -1616,6 +1617,7 @@ func ZifArrayMultisort(ctx *php.Context, args []types.Zval) bool {
 				newHash.Append(pair.Val)
 			}
 		}
+		array.Array().SetDataByArray(newHash)
 	}
 
 	return true

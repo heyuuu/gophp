@@ -19,6 +19,8 @@ const (
 	ConstNoFileCache ConstFlag = 1 << 3
 )
 
+const PhpUserConstant = 0x7fffff
+
 // Constant
 type Constant struct {
 	name         string

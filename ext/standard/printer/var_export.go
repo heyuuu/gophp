@@ -69,7 +69,9 @@ func (p *VarExportPrinter) Zval(zv types.Zval, level int) {
 			return
 		}
 		myht.ProtectRecursive()
-		p.print("\n")
+		if level > 0 {
+			p.print("\n")
+		}
 		p.printIdent(level)
 		p.print("array (\n")
 		myht.Each(func(key types.ArrayKey, value types.Zval) {

@@ -413,8 +413,14 @@ func ZvalCompareEx(ctx *Context, v1 types.Zval, v2 types.Zval) (int, bool) {
 }
 
 func OpCompareArray(ctx *Context, ht1, ht2 *types.Array) int {
-	// todo
-	panic("todo")
+	var comparer ZvalComparer = func(v1 types.Zval, v2 types.Zval) int {
+		if v, ok := ZvalCompareEx(ctx, v1, v2); ok {
+			return v
+		} else {
+			return 1
+		}
+	}
+	return iArrayCompare(ctx, ht1, ht2, comparer, false)
 }
 
 // SmartStrCompare: zendi_smart_strcmp
@@ -531,8 +537,16 @@ func ZvalIsIdentical(ctx *Context, v1 types.Zval, v2 types.Zval) bool {
 }
 
 func zvalIsIdenticalArray(ctx *Context, ht1, ht2 *types.Array) bool {
-	// todo
-	return false
+	var comparer ZvalComparer = func(v1 types.Zval, v2 types.Zval) int {
+		v1 = v1.DeRef()
+		v2 = v2.DeRef()
+		if ZvalIsIdentical(ctx, v1, v2) {
+			return 0
+		} else {
+			return 1
+		}
+	}
+	return iArrayCompare(ctx, ht1, ht2, comparer, true) == 0
 }
 
 // Add

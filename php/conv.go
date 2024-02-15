@@ -18,18 +18,18 @@ func ParseDouble(str string) float64 {
 	return d
 }
 
-func ParseNumber(str string) Val {
+func ParseNumber(str string) types.Zval {
 	zv, _ := ParseNumberEx(str)
 	return zv
 }
-func ParseNumberEx(str string) (Val, int) {
+func ParseNumberEx(str string) (types.Zval, int) {
 	zv, overflow, matchLen := parseNumberPrefix(str)
 	if matchLen != len(str) {
 		return types.Undef, 0
 	}
 	return zv, overflow
 }
-func ParseNumberPrefix(str string) (Val, int) {
+func ParseNumberPrefix(str string) (types.Zval, int) {
 	zv, _, matchLen := parseNumberPrefix(str)
 	return zv, matchLen
 }
@@ -70,7 +70,7 @@ const maxLengthOfLong = 20
 
 // _is_numeric_string_ex
 // 尽量尝试转换字符串前缀为数字，返回转换结果+匹配长度 (类似 strconv.parseFloatPrefix())
-func parseNumberPrefix(str string) (zv Val, overflow int, matchLen int) {
+func parseNumberPrefix(str string) (zv types.Zval, overflow int, matchLen int) {
 	matchStr, matchLen, maybeLong := matchNumberPrefix(str)
 	if matchStr == "" { // not match
 		return

@@ -5,7 +5,6 @@ import (
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -76,19 +75,6 @@ func HashOf(p types.Zval) *types.Array {
 	} else {
 		return nil
 	}
-}
-
-// strtoll(s0, s1, base)
-func ZendStrToLong(s string, base int) int {
-	value, _ := ZendStrToLongN(s, base)
-	return value
-}
-func ZendStrToLongN(s string, base int) (value int, n int) {
-	i, err := strconv.ParseInt(s, base, 64)
-	if err != nil {
-		return 0, 0
-	}
-	return int(i), len(s)
 }
 
 func ThrowException(ctx *Context, ce *types.Class, message string, code int) {

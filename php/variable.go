@@ -45,6 +45,9 @@ func (s symbolVariable) MakeRef() *types.Reference {
 	if raw.IsRef() {
 		return raw.Ref()
 	} else {
+		if raw.IsUndef() {
+			raw = UninitializedZval()
+		}
 		ref := types.NewReference(raw)
 		s.symbols.Set(s.name, types.ZvalRef(ref))
 		return ref

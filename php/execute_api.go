@@ -16,6 +16,44 @@ func ZendThrowOrError(ctx *Context, fetchType uint32, exceptionCe *types.Class, 
 	//}
 }
 
+func GetExecutedFilenameEx(ctx *Context) (string, bool) {
+	ex := ctx.CurrEX()
+	for ex != nil && (ex.Fn() == nil || !ex.Fn().IsUserFunction()) {
+		ex = ex.Prev()
+	}
+	if ex == nil {
+		return "", false
+	}
+	return ex.Fn().Filename(), true
+}
+func GetExecutedFilename(ctx *Context) string {
+	if name, ok := GetExecutedFilenameEx(ctx); ok {
+		return name
+	}
+	return "[no active file]"
+}
+func GetExecutedFilenameVal(ctx *Context) string {
+	name, _ := GetExecutedFilenameEx(ctx)
+	return name
+}
+func GetExecutedLineno(ctx *Context) int {
+	return 0
+}
+func GetExecutedScope(ctx *Context) *types.Class {
+	var ex = ctx.CurrEX()
+	for {
+		if ex == nil {
+			return nil
+		} else if ex.Fn() != nil && (ex.Fn().IsUserCode() || ex.Fn().Scope() != nil) {
+			return ex.Fn().Scope()
+		}
+		ex = ex.Prev()
+	}
+}
+func IsExecuting(ctx *Context) bool {
+	return ctx.CurrEX() != nil
+}
+
 func trimClassName(name string) string {
 	if name != "" && name[0] == '\\' {
 		return name[1:]

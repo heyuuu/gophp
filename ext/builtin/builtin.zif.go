@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/zpp"
 )
 
-var zifFunctions = []def.FuncType{DefZifGcMemCaches, DefZifGcCollectCycles, DefZifGcEnabled, DefZifGcStatus, DefZifFuncNumArgs, DefZifStrlen, DefZifStrcmp, DefZifStrncmp, DefZifStrcasecmp, DefZifStrncasecmp, DefZifEach, DefZifErrorReporting, DefZifFunctionExists}
+var zifFunctions = []def.FuncType{DefZifGcMemCaches, DefZifGcCollectCycles, DefZifGcEnabled, DefZifGcStatus, DefZifFuncNumArgs, DefZifFuncGetArg, DefZifFuncGetArgs, DefZifStrlen, DefZifStrcmp, DefZifStrncmp, DefZifStrcasecmp, DefZifStrncasecmp, DefZifEach, DefZifErrorReporting, DefZifDefine, DefZifDefined, DefZifGetClass, DefZifFunctionExists, DefZifSetTimeLimit}
 
 // generate by ZifGcMemCaches
 var DefZifGcMemCaches = def.DefFunc("gc_mem_caches", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
@@ -61,6 +61,33 @@ var DefZifFuncNumArgs = def.DefFunc("func_num_args", 0, 0, []def.ArgInfo{}, func
 	}
 	ret := ZifFuncNumArgs(executeData.Ctx(), executeData)
 	returnValue.SetLong(ret)
+})
+
+// generate by ZifFuncGetArg
+var DefZifFuncGetArg = def.DefFunc("func_get_arg", 1, 1, []def.ArgInfo{{Name: "arg_num"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 1, 1, zpp.FlagOldMode)
+	fp.CheckNumArgs()
+	arg_num := fp.ParseLong()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifFuncGetArg(executeData.Ctx(), executeData, returnValue, arg_num)
+	returnValue.SetBy(ret)
+})
+
+// generate by ZifFuncGetArgs
+var DefZifFuncGetArgs = def.DefFunc("func_get_args", 0, 0, []def.ArgInfo{}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 0, 0, 0)
+	fp.CheckNumArgs()
+	if fp.HasError() {
+		return
+	}
+	ret, ok := ZifFuncGetArgs(executeData.Ctx(), executeData)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStrlen
@@ -166,6 +193,50 @@ var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{N
 	returnValue.SetLong(ret)
 })
 
+// generate by ZifDefine
+var DefZifDefine = def.DefFunc("define", 2, 3, []def.ArgInfo{{Name: "constant_name"}, {Name: "value"}, {Name: "case_insensitive"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 2, 3, 0)
+	fp.CheckNumArgs()
+	constant_name := fp.ParseString()
+	value := fp.ParseZval()
+	fp.StartOptional()
+	case_insensitive := fp.ParseBool()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifDefine(executeData.Ctx(), constant_name, value, nil, case_insensitive)
+	returnValue.SetBool(ret)
+})
+
+// generate by ZifDefined
+var DefZifDefined = def.DefFunc("defined", 1, 1, []def.ArgInfo{{Name: "constant_name"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
+	constant_name := fp.ParseString()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifDefined(executeData.Ctx(), constant_name)
+	returnValue.SetBool(ret)
+})
+
+// generate by ZifGetClass
+var DefZifGetClass = def.DefFunc("get_class", 0, 1, []def.ArgInfo{{Name: "object"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 0, 1, zpp.FlagOldMode)
+	fp.CheckNumArgs()
+	fp.StartOptional()
+	object := fp.ParseZvalNullable()
+	if fp.HasError() {
+		return
+	}
+	ret, ok := ZifGetClass(executeData.Ctx(), nil, object)
+	if ok {
+		returnValue.SetString(ret)
+	} else {
+		returnValue.SetFalse()
+	}
+})
+
 // generate by ZifFunctionExists
 var DefZifFunctionExists = def.DefFunc("function_exists", 1, 1, []def.ArgInfo{{Name: "function_name"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
 	fp := php.NewParamParser(executeData, 1, 1, 0)
@@ -175,5 +246,17 @@ var DefZifFunctionExists = def.DefFunc("function_exists", 1, 1, []def.ArgInfo{{N
 		return
 	}
 	ret := ZifFunctionExists(executeData.Ctx(), function_name)
+	returnValue.SetBool(ret)
+})
+
+// generate by ZifSetTimeLimit
+var DefZifSetTimeLimit = def.DefFunc("set_time_limit", 1, 1, []def.ArgInfo{{Name: "seconds"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 1, 1, 0)
+	fp.CheckNumArgs()
+	seconds := fp.ParseLong()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifSetTimeLimit(executeData.Ctx(), seconds)
 	returnValue.SetBool(ret)
 })
