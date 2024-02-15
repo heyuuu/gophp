@@ -56,7 +56,7 @@ func zppParseArgWeak_DvalToLval(dval float64, cap bool) (int, bool) {
 func zppParseDoubleWeak(ctx *Context, arg types.Zval) (dest float64, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
-		arg, _ = ParseNumberPrefix(arg.String())
+		arg = opParseNumberPrefix(ctx, arg.String(), false)
 		if arg.IsUndef() || ctx.EG().HasException() {
 			return // fail
 		}

@@ -2,6 +2,7 @@ package php
 
 import (
 	"github.com/heyuuu/gophp/kits/ascii"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -40,6 +41,10 @@ func StringNCaseCompare(s1, s2 string, n int) int {
 
 // php 对浮点数的格式化方式，兼容一些细微差异
 func FormatDouble(f float64, fmtTyp byte, prec int) string {
+	if math.IsNaN(f) {
+		return "NAN"
+	}
+
 	if fmtTyp == 'F' {
 		fmtTyp = 'f'
 	}
