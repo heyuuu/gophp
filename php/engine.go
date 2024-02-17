@@ -34,6 +34,8 @@ func (engine *Engine) init() {
 }
 
 func (engine *Engine) Start() (err error) {
+	engine.baseCtx.INI().RegisterIniEntries(0, MainIniEntries)
+
 	// todo
 	err = engine.modules.EachEx(func(_ string, m *Module) error {
 		if !m.ModuleStartup(engine.baseCtx) {

@@ -9,9 +9,12 @@ func init() {
 }
 
 var BasicModuleEntry = php.ModuleEntry{
-	Name:          "standard",
-	Functions:     zifFunctions,
-	ModuleStartup: ZmStartupBasic,
+	Name:            "standard",
+	Functions:       zifFunctions,
+	ModuleStartup:   ZmStartupBasic,
+	ModuleShutdown:  ZmShutdownBasic,
+	RequestStartup:  ZmActivateBasic,
+	RequestShutdown: ZmDeactivateBasic,
 }
 
 func ZmStartupBasic(ctx *php.Context, moduleNumber int) bool {
@@ -29,5 +32,17 @@ func ZmStartupBasic(ctx *php.Context, moduleNumber int) bool {
 
 	RegisterStringConstants(ctx, moduleNumber)
 	RegisterArrayConstants(ctx, moduleNumber)
+	return true
+}
+
+func ZmShutdownBasic(ctx *php.Context, moduleNumber int) bool {
+	return true
+}
+
+func ZmActivateBasic(ctx *php.Context, moduleNumber int) bool {
+	return true
+}
+
+func ZmDeactivateBasic(ctx *php.Context, moduleNumber int) bool {
 	return true
 }

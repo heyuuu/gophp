@@ -12,6 +12,7 @@ type Context struct {
 	eg     ExecutorGlobals
 	og     OutputGlobals
 	pg     PhpCoreGlobals
+	ini    IniGlobals
 
 	values map[string]any
 
@@ -28,14 +29,16 @@ func initContext(e *Engine, baseCtx *Context, request *http.Request, response ht
 	ctx := &Context{engine: e}
 	if baseCtx != nil {
 		ctx.cg.Init()
-		ctx.eg.Init(ctx, &baseCtx.eg)
+		ctx.eg.Init(ctx, baseCtx.EG())
 		ctx.og.Init()
 		ctx.pg.Init()
+		ctx.ini.Init(ctx, baseCtx.INI())
 	} else {
 		ctx.cg.Init()
 		ctx.eg.Init(ctx, nil)
 		ctx.og.Init()
 		ctx.pg.Init()
+		ctx.ini.Init(ctx, nil)
 	}
 	ctx.executor = NewExecutor(ctx)
 
@@ -52,6 +55,7 @@ func (c *Context) CG() *CompilerGlobals { return &c.cg }
 func (c *Context) EG() *ExecutorGlobals { return &c.eg }
 func (c *Context) OG() *OutputGlobals   { return &c.og }
 func (c *Context) PG() *PhpCoreGlobals  { return &c.pg }
+func (c *Context) INI() *IniGlobals     { return &c.ini }
 
 // fast functions
 func (c *Context) CurrEX() *ExecuteData { return c.eg.CurrentExecuteData() }
