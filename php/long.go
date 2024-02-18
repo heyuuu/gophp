@@ -7,11 +7,11 @@ import (
 
 // strtoll(s0, s1, base)
 func ParseLong(s string, base int) int {
-	value, _ := parseLongPrefix(s, base)
+	value, _ := ParseLongPrefix(s, base)
 	return value
 }
 
-func parseLongPrefix(s string, base int) (value int, n int) {
+func ParseLongPrefix(s string, base int) (value int, n int) {
 	pos := 0
 	if pos < len(s) && (s[pos] == '-' || s[pos] == '+') {
 		pos++

@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php/zpp"
 )
 
-var zifFunctions = []def.FuncType{DefZifKrsort, DefZifKsort, DefZifCount, DefZifSizeof, DefZifNatsort, DefZifNatcasesort, DefZifAsort, DefZifArsort, DefZifSort, DefZifRsort, DefZifUsort, DefZifUasort, DefZifUksort, DefZifEnd, DefZifPrev, DefZifNext, DefZifReset, DefZifCurrent, DefZifPos, DefZifKey, DefZifMin, DefZifMax, DefZifArrayWalk, DefZifArrayWalkRecursive, DefZifInArray, DefZifArraySearch, DefZifArrayFill, DefZifArrayFillKeys, DefZifRange, DefZifShuffle, DefZifArrayPush, DefZifArrayPop, DefZifArrayShift, DefZifArrayUnshift, DefZifArraySplice, DefZifArraySlice, DefZifArrayMerge, DefZifArrayMergeRecursive, DefZifArrayReplace, DefZifArrayReplaceRecursive, DefZifArrayKeys, DefZifArrayKeyFirst, DefZifArrayKeyLast, DefZifArrayValues, DefZifArrayCountValues, DefZifArrayColumn, DefZifArrayReverse, DefZifArrayPad, DefZifArrayFlip, DefZifArrayChangeKeyCase, DefZifArrayUnique, DefZifArrayIntersectKey, DefZifArrayIntersectUkey, DefZifArrayIntersect, DefZifArrayUintersect, DefZifArrayIntersectAssoc, DefZifArrayIntersectUassoc, DefZifArrayUintersectAssoc, DefZifArrayUintersectUassoc, DefZifArrayDiffKey, DefZifArrayDiffUkey, DefZifArrayDiff, DefZifArrayUdiff, DefZifArrayDiffAssoc, DefZifArrayDiffUassoc, DefZifArrayUdiffAssoc, DefZifArrayUdiffUassoc, DefZifArrayMultisort, DefZifArrayRand, DefZifArraySum, DefZifArrayProduct, DefZifArrayReduce, DefZifArrayFilter, DefZifArrayMap, DefZifArrayKeyExists, DefZifKeyExists, DefZifArrayChunk, DefZifArrayCombine, DefZifBase64Encode, DefZifBase64Decode, DefZifInetNtop, DefZifInetPton, DefZifIp2long, DefZifLong2ip, DefZifIniGet, DefZifIniGetAll, DefZifIniSet, DefZifIniAlter, DefZifIniRestore, DefZifSetIncludePath, DefZifGetIncludePath, DefZifRestoreIncludePath, DefZifPrintR, DefZifCrc32, DefZifGethostname, DefZifGethostbyaddr, DefZifGethostbyname, DefZifGethostbynamel, DefZifDnsGetMx, DefZifGetmxrr, DefZifSprintf, DefZifVsprintf, DefZifPrintf, DefZifVprintf, DefZifHttpBuildQuery, DefZifAbs, DefZifCeil, DefZifFloor, DefZifRound, DefZifSin, DefZifCos, DefZifTan, DefZifAsin, DefZifAcos, DefZifAtan, DefZifAtan2, DefZifSinh, DefZifCosh, DefZifTanh, DefZifAsinh, DefZifAcosh, DefZifAtanh, DefZifPi, DefZifIsFinite, DefZifIsInfinite, DefZifIsNan, DefZifPow, DefZifExp, DefZifExpm1, DefZifLog1p, DefZifLog, DefZifLog10, DefZifSqrt, DefZifHypot, DefZifDeg2rad, DefZifRad2deg, DefZifBindec, DefZifHexdec, DefZifOctdec, DefZifDecbin, DefZifDecoct, DefZifDechex, DefZifBaseConvert, DefZifNumberFormat, DefZifFmod, DefZifIntdiv, DefZifMd5, DefZifMd5File, DefZifMicrotime, DefZifGettimeofday, DefZifGetrusage, DefZifNetGetInterfaces, DefZifPack, DefZifUnpack, DefZifQuotedPrintableDecode, DefZifQuotedPrintableEncode, DefZifMtSrand, DefZifSrand, DefZifMtGetrandmax, DefZifGetrandmax, DefZifMtRand, DefZifRand, DefZifRandomBytes, DefZifRandomInt, DefZifSha1, DefZifSha1File, DefZifSoundex, DefZifUtf8Encode, DefZifUtf8Decode, DefZifBin2hex, DefZifHex2bin, DefZifStrspn, DefZifStrcspn, DefZifStrcoll, DefZifTrim, DefZifRtrim, DefZifChop, DefZifLtrim, DefZifWordwrap, DefZifExplode, DefZifImplode, DefZifJoin, DefZifStrtok, DefZifStrtoupper, DefZifStrtolower, DefZifBasename, DefZifDirname, DefZifPathinfo, DefZifStristr, DefZifStrstr, DefZifStrchr, DefZifStrpos, DefZifStripos, DefZifStrrpos, DefZifStrripos, DefZifStrrchr, DefZifChunkSplit, DefZifSubstr, DefZifSubstrReplace, DefZifQuotemeta, DefZifOrd, DefZifChr, DefZifUcfirst, DefZifLcfirst, DefZifUcwords, DefZifStrtr, DefZifStrrev, DefZifSimilarText, DefZifAddslashes, DefZifAddcslashes, DefZifStripslashes, DefZifStripcslashes, DefZifStrReplace, DefZifStrIreplace, DefZifHebrev, DefZifHebrevc, DefZifNl2br, DefZifStripTags, DefZifStrRepeat, DefZifCountChars, DefZifStrnatcmp, DefZifStrnatcasecmp, DefZifSubstrCount, DefZifStrPad, DefZifStrRot13, DefZifStrShuffle, DefZifStrWordCount, DefZifStrSplit, DefZifStrpbrk, DefZifSubstrCompare, DefZifGettype, DefZifSettype, DefZifIntval, DefZifFloatval, DefZifDoubleval, DefZifBoolval, DefZifStrval, DefZifIsNull, DefZifIsResource, DefZifIsBool, DefZifIsInt, DefZifIsInteger, DefZifIsLong, DefZifIsFloat, DefZifIsDouble, DefZifIsString, DefZifIsArray, DefZifIsObject, DefZifIsNumeric, DefZifIsScalar, DefZifUniqid, DefZifParseUrl, DefZifUrlencode, DefZifUrldecode, DefZifRawurlencode, DefZifRawurldecode, DefZifConvertUuencode, DefZifConvertUudecode, DefZifVarDump, DefZifDebugZvalDump, DefZifVarExport, DefZifSerialize, DefZifVersionCompare}
+var zifFunctions = []def.FuncType{DefZifKrsort, DefZifKsort, DefZifCount, DefZifSizeof, DefZifNatsort, DefZifNatcasesort, DefZifAsort, DefZifArsort, DefZifSort, DefZifRsort, DefZifUsort, DefZifUasort, DefZifUksort, DefZifEnd, DefZifPrev, DefZifNext, DefZifReset, DefZifCurrent, DefZifPos, DefZifKey, DefZifMin, DefZifMax, DefZifArrayWalk, DefZifArrayWalkRecursive, DefZifInArray, DefZifArraySearch, DefZifArrayFill, DefZifArrayFillKeys, DefZifRange, DefZifShuffle, DefZifArrayPush, DefZifArrayPop, DefZifArrayShift, DefZifArrayUnshift, DefZifArraySplice, DefZifArraySlice, DefZifArrayMerge, DefZifArrayMergeRecursive, DefZifArrayReplace, DefZifArrayReplaceRecursive, DefZifArrayKeys, DefZifArrayKeyFirst, DefZifArrayKeyLast, DefZifArrayValues, DefZifArrayCountValues, DefZifArrayColumn, DefZifArrayReverse, DefZifArrayPad, DefZifArrayFlip, DefZifArrayChangeKeyCase, DefZifArrayUnique, DefZifArrayIntersectKey, DefZifArrayIntersectUkey, DefZifArrayIntersect, DefZifArrayUintersect, DefZifArrayIntersectAssoc, DefZifArrayIntersectUassoc, DefZifArrayUintersectAssoc, DefZifArrayUintersectUassoc, DefZifArrayDiffKey, DefZifArrayDiffUkey, DefZifArrayDiff, DefZifArrayUdiff, DefZifArrayDiffAssoc, DefZifArrayDiffUassoc, DefZifArrayUdiffAssoc, DefZifArrayUdiffUassoc, DefZifArrayMultisort, DefZifArrayRand, DefZifArraySum, DefZifArrayProduct, DefZifArrayReduce, DefZifArrayFilter, DefZifArrayMap, DefZifArrayKeyExists, DefZifKeyExists, DefZifArrayChunk, DefZifArrayCombine, DefZifBase64Encode, DefZifBase64Decode, DefZifInetNtop, DefZifInetPton, DefZifIp2long, DefZifLong2ip, DefZifIniGet, DefZifIniGetAll, DefZifIniSet, DefZifIniAlter, DefZifIniRestore, DefZifSetIncludePath, DefZifGetIncludePath, DefZifRestoreIncludePath, DefZifPrintR, DefZifCrc32, DefZifGethostname, DefZifGethostbyaddr, DefZifGethostbyname, DefZifGethostbynamel, DefZifDnsGetMx, DefZifGetmxrr, DefZifSprintf, DefZifVsprintf, DefZifPrintf, DefZifVprintf, DefZifHtmlspecialchars, DefZifHtmlspecialcharsDecode, DefZifHtmlEntityDecode, DefZifHtmlentities, DefZifGetHtmlTranslationTable, DefZifHttpBuildQuery, DefZifAbs, DefZifCeil, DefZifFloor, DefZifRound, DefZifSin, DefZifCos, DefZifTan, DefZifAsin, DefZifAcos, DefZifAtan, DefZifAtan2, DefZifSinh, DefZifCosh, DefZifTanh, DefZifAsinh, DefZifAcosh, DefZifAtanh, DefZifPi, DefZifIsFinite, DefZifIsInfinite, DefZifIsNan, DefZifPow, DefZifExp, DefZifExpm1, DefZifLog1p, DefZifLog, DefZifLog10, DefZifSqrt, DefZifHypot, DefZifDeg2rad, DefZifRad2deg, DefZifBindec, DefZifHexdec, DefZifOctdec, DefZifDecbin, DefZifDecoct, DefZifDechex, DefZifBaseConvert, DefZifNumberFormat, DefZifFmod, DefZifIntdiv, DefZifMd5, DefZifMd5File, DefZifMicrotime, DefZifGettimeofday, DefZifGetrusage, DefZifNetGetInterfaces, DefZifPack, DefZifUnpack, DefZifQuotedPrintableDecode, DefZifQuotedPrintableEncode, DefZifMtSrand, DefZifSrand, DefZifMtGetrandmax, DefZifGetrandmax, DefZifMtRand, DefZifRand, DefZifRandomBytes, DefZifRandomInt, DefZifSha1, DefZifSha1File, DefZifSoundex, DefZifUtf8Encode, DefZifUtf8Decode, DefZifBin2hex, DefZifHex2bin, DefZifStrspn, DefZifStrcspn, DefZifStrcoll, DefZifTrim, DefZifRtrim, DefZifChop, DefZifLtrim, DefZifWordwrap, DefZifExplode, DefZifImplode, DefZifJoin, DefZifStrtok, DefZifStrtoupper, DefZifStrtolower, DefZifBasename, DefZifDirname, DefZifPathinfo, DefZifStristr, DefZifStrstr, DefZifStrchr, DefZifStrpos, DefZifStripos, DefZifStrrpos, DefZifStrripos, DefZifStrrchr, DefZifChunkSplit, DefZifSubstr, DefZifSubstrReplace, DefZifQuotemeta, DefZifOrd, DefZifChr, DefZifUcfirst, DefZifLcfirst, DefZifUcwords, DefZifStrtr, DefZifStrrev, DefZifSimilarText, DefZifAddslashes, DefZifAddcslashes, DefZifStripslashes, DefZifStripcslashes, DefZifStrReplace, DefZifStrIreplace, DefZifHebrev, DefZifHebrevc, DefZifNl2br, DefZifStripTags, DefZifStrRepeat, DefZifCountChars, DefZifStrnatcmp, DefZifStrnatcasecmp, DefZifSubstrCount, DefZifStrPad, DefZifStrRot13, DefZifStrShuffle, DefZifStrWordCount, DefZifStrSplit, DefZifStrpbrk, DefZifSubstrCompare, DefZifGettype, DefZifSettype, DefZifIntval, DefZifFloatval, DefZifDoubleval, DefZifBoolval, DefZifStrval, DefZifIsNull, DefZifIsResource, DefZifIsBool, DefZifIsInt, DefZifIsInteger, DefZifIsLong, DefZifIsFloat, DefZifIsDouble, DefZifIsString, DefZifIsArray, DefZifIsObject, DefZifIsNumeric, DefZifIsScalar, DefZifUniqid, DefZifParseUrl, DefZifUrlencode, DefZifUrldecode, DefZifRawurlencode, DefZifRawurldecode, DefZifConvertUuencode, DefZifConvertUudecode, DefZifVarDump, DefZifDebugZvalDump, DefZifVarExport, DefZifSerialize, DefZifVersionCompare}
 
 // generate by ZifKrsort
 var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{Name: "arg", ByRef: true}, {Name: "sort_flags"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
@@ -1528,6 +1528,82 @@ var DefZifVprintf = def.DefFunc("vprintf", 2, 2, []def.ArgInfo{{Name: "format"},
 	} else {
 		returnValue.SetFalse()
 	}
+})
+
+// generate by ZifHtmlspecialchars
+var DefZifHtmlspecialchars = def.DefFunc("htmlspecialchars", 1, 4, []def.ArgInfo{{Name: "string"}, {Name: "quote_style"}, {Name: "encoding"}, {Name: "double_encode"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 1, 4, 0)
+	fp.CheckNumArgs()
+	string := fp.ParseString()
+	fp.StartOptional()
+	quote_style := fp.ParseLongNullable()
+	encoding := fp.ParseStringNullable()
+	double_encode_ := fp.ParseBoolNullable()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifHtmlspecialchars(executeData.Ctx(), string, nil, quote_style, encoding, double_encode_)
+	returnValue.SetString(ret)
+})
+
+// generate by ZifHtmlspecialcharsDecode
+var DefZifHtmlspecialcharsDecode = def.DefFunc("htmlspecialchars_decode", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "quote_style"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 1, 2, 0)
+	fp.CheckNumArgs()
+	str := fp.ParseString()
+	fp.StartOptional()
+	quote_style_ := fp.ParseLongNullable()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifHtmlspecialcharsDecode(executeData.Ctx(), str, nil, quote_style_)
+	returnValue.SetString(ret)
+})
+
+// generate by ZifHtmlEntityDecode
+var DefZifHtmlEntityDecode = def.DefFunc("html_entity_decode", 1, 3, []def.ArgInfo{{Name: "str"}, {Name: "quote_style"}, {Name: "encoding"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 1, 3, 0)
+	fp.CheckNumArgs()
+	str := fp.ParseString()
+	fp.StartOptional()
+	quote_style_ := fp.ParseLongNullable()
+	encoding := fp.ParseStringNullable()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifHtmlEntityDecode(executeData.Ctx(), str, nil, quote_style_, encoding)
+	returnValue.SetString(ret)
+})
+
+// generate by ZifHtmlentities
+var DefZifHtmlentities = def.DefFunc("htmlentities", 1, 4, []def.ArgInfo{{Name: "string"}, {Name: "quote_style"}, {Name: "encoding"}, {Name: "double_encode"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 1, 4, 0)
+	fp.CheckNumArgs()
+	string := fp.ParseString()
+	fp.StartOptional()
+	quote_style := fp.ParseLongNullable()
+	encoding := fp.ParseStringNullable()
+	double_encode_ := fp.ParseBoolNullable()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifHtmlentities(executeData.Ctx(), string, nil, quote_style, encoding, double_encode_)
+	returnValue.SetString(ret)
+})
+
+// generate by ZifGetHtmlTranslationTable
+var DefZifGetHtmlTranslationTable = def.DefFunc("get_html_translation_table", 0, 3, []def.ArgInfo{{Name: "table"}, {Name: "quote_style"}, {Name: "encoding"}}, func(executeData *php.ExecuteData, returnValue zpp.Ret) {
+	fp := php.NewParamParser(executeData, 0, 3, 0)
+	fp.CheckNumArgs()
+	fp.StartOptional()
+	table := fp.ParseLongNullable()
+	quote_style_ := fp.ParseLongNullable()
+	encoding := fp.ParseStringNullable()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifGetHtmlTranslationTable(executeData.Ctx(), returnValue, nil, table, quote_style_, encoding)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifHttpBuildQuery

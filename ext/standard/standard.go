@@ -32,6 +32,8 @@ func ZmStartupBasic(ctx *php.Context, moduleNumber int) bool {
 
 	RegisterStringConstants(ctx, moduleNumber)
 	RegisterArrayConstants(ctx, moduleNumber)
+	RegisterHtmlConstants(ctx, moduleNumber)
+
 	return true
 }
 
