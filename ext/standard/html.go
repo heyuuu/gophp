@@ -61,7 +61,15 @@ func mapEntityRow(table []EntityStage1Row, k uint) *EntityStage3Row {
 	if stage1Idx > 0x1d {
 		return nil
 	}
-	return table[stage1Idx][stage2Idx][stage3Idx]
+	stage1Row := table[stage1Idx]
+	if stage1Row == nil {
+		return nil
+	}
+	stage2Row := stage1Row[stage2Idx]
+	if stage2Row == nil {
+		return nil
+	}
+	return stage2Row[stage3Idx]
 }
 func codePointFromStages(i, j, k uint) uint {
 	return i<<12 | j<<6 | k
@@ -78,7 +86,9 @@ func eachUnicodeEntity(charset charsets.Charset, msTable []EntityStage1Row, hand
 		for i = 0; i <= 0xff; i++ {
 			uniCp := mapToUnicode(*toUniTable, i)
 			r := mapEntityRow(msTable, uniCp)
-			handler(i, r)
+			if r != nil {
+				handler(i, r)
+			}
 		}
 	}
 }
@@ -592,7 +602,6 @@ func PhpEscapeHtmlEntitiesEx(ctx *php.Context, old string, all bool, flags int, 
 	var entityTable EntityTableOpt
 	var toUniTable *EncToUni = nil
 	var invMap EntityMap = nil
-	_ = invMap
 
 	/* only used if flags includes ENT_HTML_IGNORE_ERRORS or ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS */
 	var replacement string
