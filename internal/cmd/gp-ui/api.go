@@ -10,6 +10,7 @@ import (
 	"github.com/heyuuu/gophp/kits/vardumper"
 	"github.com/heyuuu/gophp/php"
 	_ "github.com/heyuuu/gophp/php/boot"
+	"github.com/heyuuu/gophp/php/perr"
 	"log"
 	"net/http"
 	"os"
@@ -112,7 +113,7 @@ func parseCode(code string) (result []ApiTypeResult, err error) {
 func runCode(code string) (output string) {
 	var buf strings.Builder
 	defer func() {
-		if e := recover(); e != nil {
+		if e := recover(); e != nil && e != perr.ErrExit {
 			buf.WriteString(fmt.Sprintf(">>> Execute panic: %v", e))
 
 			// 打印堆栈

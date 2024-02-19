@@ -11,9 +11,9 @@ import (
 // Engine
 type Engine struct {
 	modules *types.Table[*Module]
-	host    string
-	port    int
-	baseCtx *Context
+	host    string   `get:""`
+	port    int      `get:""`
+	baseCtx *Context `get:""`
 }
 
 func NewEngine() *Engine {
@@ -25,7 +25,7 @@ func NewEngine() *Engine {
 
 func (engine *Engine) init() {
 	engine.modules = types.NewTable[*Module]()
-	engine.baseCtx = initContext(engine, nil, nil, nil)
+	engine.baseCtx = initBaseContext(engine)
 
 	moduleStartupRegisterConstants(engine.baseCtx)
 	for _, entry := range builtinModuleEntries {
@@ -34,6 +34,8 @@ func (engine *Engine) init() {
 }
 
 func (engine *Engine) Start() (err error) {
+	PhpInitConfig(engine.BaseCtx())
+
 	engine.baseCtx.INI().RegisterIniEntries(0, MainIniEntries)
 
 	// todo
@@ -57,7 +59,9 @@ func (engine *Engine) NewContext(request *http.Request, response http.ResponseWr
 
 func (engine *Engine) HandleContext(ctx *Context, handler func(ctx *Context)) {
 	ctx.Start()
-	defer ctx.Finish()
+	defer func() {
+		ctx.Finish()
+	}()
 	handler(ctx)
 }
 

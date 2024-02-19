@@ -3,6 +3,7 @@ package php
 import (
 	"errors"
 	"github.com/heyuuu/gophp/php/assert"
+	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 )
 
@@ -20,4 +21,13 @@ func ExecuteScript(ctx *Context, fileHandle *FileHandle, skipShebang bool) (retv
 
 	executor := ctx.executor
 	return executor.Execute(topFunc)
+}
+
+func Exit(ctx *Context) {
+	panic(perr.ErrExit)
+}
+
+func ExitWithCode(ctx *Context, code int) {
+	// todo handle code
+	Exit(ctx)
 }

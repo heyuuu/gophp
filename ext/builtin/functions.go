@@ -158,13 +158,13 @@ func ZifEach(ctx *php.Context, array zpp.RefZval) (*types.Array, bool) {
 	return result, true
 }
 
-func ZifErrorReporting(ctx *php.Context, ret zpp.Ret, _ zpp.Opt, newErrorLevel *types.Zval) int {
+func ZifErrorReporting(ctx *php.Context, _ zpp.Opt, newErrorLevel *types.Zval) int {
 	oldVal := ctx.EG().ErrorReporting()
 	if newErrorLevel != nil {
 		newVal := php.ZvalGetLong(ctx, *newErrorLevel)
-		ctx.EG().SetErrorReporting(newVal)
+		ctx.EG().SetErrorReporting(perr.ErrorType(newVal))
 	}
-	return oldVal
+	return int(oldVal)
 }
 
 func validateConstantArray(ctx *php.Context, ht *types.Array) bool {

@@ -44,7 +44,7 @@ func DoubleToLong(d float64) int {
 	// zend_dval_to_lval_slow
 	// 越界 mod 处理 (和 go 强制转换机制不同，无法直接转换)
 	dmod := math.Mod(d, 1<<64)
-	if dmod > math.MaxInt {
+	if dmod >= math.MaxInt {
 		dmod -= 1 << 64
 	} else if dmod < math.MinInt {
 		dmod += 1 << 64

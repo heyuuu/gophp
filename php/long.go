@@ -11,6 +11,18 @@ func ParseLong(s string, base int) int {
 	return value
 }
 
+func ParseLong10(s string) int {
+	return ParseLong(s, 10)
+}
+
+func TryParseLong(s string, base int) (int, bool) {
+	value, n := ParseLongPrefix(s, base)
+	if n > 0 {
+		return value, true
+	}
+	return 0, false
+}
+
 func ParseLongPrefix(s string, base int) (value int, n int) {
 	pos := 0
 	if pos < len(s) && (s[pos] == '-' || s[pos] == '+') {
@@ -44,4 +56,24 @@ func ParseLongPrefix(s string, base int) (value int, n int) {
 	}
 	num, _ := strconv.ParseInt(s[:pos], base, 64)
 	return int(num), pos
+}
+
+func ParseLongWithUnit(s string) (int, bool) {
+	retval, n := ParseLongPrefix(s, 0)
+	if n == 0 {
+		return 0, false
+	}
+	if n < len(s) {
+		switch s[n] {
+		case 'g', 'G':
+			retval *= 1024
+			fallthrough
+		case 'm', 'M':
+			retval *= 1024
+			fallthrough
+		case 'k', 'K':
+			retval *= 1024
+		}
+	}
+	return retval, true
 }

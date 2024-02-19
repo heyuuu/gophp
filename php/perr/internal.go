@@ -31,3 +31,7 @@ func Todof(format string, a ...any) error {
 	message := "todo: " + fmt.Sprintf(format, a...)
 	return Internal(message)
 }
+
+var (
+	ErrExit = errors.New("Exit")
+)

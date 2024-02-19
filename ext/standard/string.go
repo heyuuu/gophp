@@ -2193,13 +2193,13 @@ func ZifStrPad(ctx *php.Context, ex *php.ExecuteData, input string, padLength in
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH")
 		return types.Null
 	}
+	if padLength < 0 || padLength < len(input) {
+		return php.String(input)
+	}
 	numPadChars := padLength - len(input)
 	if numPadChars >= math.MaxInt {
 		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Padding length is too long")
 		return types.Null
-	}
-	if padLength < 0 || padLength < len(input) {
-		return php.String(input)
 	}
 
 	/* We need to figure out the left/right padding lengths. */

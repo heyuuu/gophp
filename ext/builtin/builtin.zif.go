@@ -189,7 +189,7 @@ var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{N
 	if fp.HasError() {
 		return
 	}
-	ret := ZifErrorReporting(executeData.Ctx(), returnValue, nil, new_error_level)
+	ret := ZifErrorReporting(executeData.Ctx(), nil, new_error_level)
 	returnValue.SetLong(ret)
 })
 

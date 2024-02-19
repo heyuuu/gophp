@@ -6,7 +6,7 @@ import (
 )
 
 func CompileFile(ctx *Context, fileHandle *FileHandle, skipShebang bool) (*types.Function, error) {
-	code, err := fileHandle.ReadAll()
+	code, err := fileHandle.ReadAllEx()
 	if err != nil {
 		return nil, err
 	}

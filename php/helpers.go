@@ -59,6 +59,7 @@ func FormatDouble(f float64, fmtTyp byte, prec int) string {
 				str = str[:idx] + ".0" + str[idx:]
 			}
 		}
+		fallthrough
 	case 'e', 'E':
 		// fix: e|E 模式下，指数不会有前导'0' (go 默认会补齐前导0至最少2位)
 		idx := strings.LastIndexAny(str, "eE")

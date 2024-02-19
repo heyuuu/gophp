@@ -909,7 +909,16 @@ func (e *Executor) errorSuppressExpr(expr *ast.ErrorSuppressExpr) types.Zval {
 }
 
 func (e *Executor) exitExpr(expr *ast.ExitExpr) types.Zval {
-	panic(perr.Todof("e.exitExpr"))
+	if expr.Expr == nil {
+		Exit(e.ctx)
+	} else if exitVal := e.expr(expr.Expr); exitVal.IsLong() {
+		ExitWithCode(e.ctx, exitVal.Long())
+	} else {
+		msg := ZvalGetStrVal(e.ctx, exitVal)
+		e.ctx.WriteString(msg)
+		Exit(e.ctx)
+	}
+	return UninitializedZval()
 }
 
 func (e *Executor) constFetchExpr(expr *ast.ConstFetchExpr) types.Zval {

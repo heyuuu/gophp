@@ -1,14 +1,32 @@
 package php
 
 import (
+	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/shim/maps"
 	"github.com/heyuuu/gophp/shim/slices"
+	"strings"
 )
 
 type IniDirectives = map[string]*IniEntry
 
 type IniGlobals struct {
 	ctx *Context
+
+	iniEntries      string             `prop:""`
+	iniIgnore       bool               `prop:""`
+	iniIgnoreCwd    bool               `prop:""`
+	iniPathOverride string             `prop:""`
+	iniDefaultsFunc func(*types.Array) `prop:""`
+
+	// config
+	hash             *types.Array
+	hasPerDirConfig  bool     `get:""`
+	hasPerHostConfig bool     `get:""`
+	zendExtensions   []string `get:""`
+	phpExtensions    []string `get:""`
+	iniOpenedPath    string   `prop:""`
+	iniScannedPath   string   `prop:""`
+	iniScannedFiles  string   `get:""`
 
 	// directives
 	iniDirectives         IniDirectives
@@ -24,6 +42,66 @@ func (ig *IniGlobals) Init(ctx *Context, base *IniGlobals) {
 		ig.iniDirectives = make(IniDirectives)
 		ig.modifiedIniDirectives = make(IniDirectives)
 	}
+}
+
+// ini config
+
+func (ig *IniGlobals) AppendIniEntries(iniEntries string) {
+	if strings.TrimSpace(iniEntries) == "" {
+		return
+	}
+
+	ig.iniEntries += "\n" + iniEntries
+}
+
+func (ig *IniGlobals) ConfigInit() {
+	ig.hash = types.NewArray()
+	if ig.iniDefaultsFunc != nil {
+		ig.iniDefaultsFunc(ig.hash)
+	}
+	ig.phpExtensions = nil
+	ig.zendExtensions = nil
+}
+func (ig *IniGlobals) ConfigShutdown() {
+	ig.hash.Clean()
+	ig.iniOpenedPath = ""
+	ig.iniScannedFiles = ""
+}
+func (ig *IniGlobals) ConfigSet(key string, value string) {
+	ig.hash.KeyUpdate(key, types.ZvalString(value))
+}
+func (ig *IniGlobals) ConfigGet(key string) types.Zval {
+	return ig.hash.KeyFind(key)
+}
+func (ig *IniGlobals) ConfigGetStr(key string) (string, bool) {
+	conf := ig.hash.KeyFind(key)
+	if conf.IsString() {
+		return conf.String(), true
+	}
+	return "", false
+}
+func (ig *IniGlobals) ConfigGetLong(key string) (int, bool) {
+	conf := ig.hash.KeyFind(key)
+	if conf.IsUndef() {
+		return 0, false
+	}
+	return ZvalGetLong(ig.ctx, conf), true
+}
+func (ig *IniGlobals) ConfigHash() *types.Array {
+	return ig.hash
+}
+
+func (ig *IniGlobals) LoadIniStr(s string) bool {
+	cb := NewDefaultIniParserCb(ig.ctx, ig.hash)
+	return IniParse(ig.ctx, s, IniScanNormal, cb)
+}
+
+func (ig *IniGlobals) LoadIniFile(fh *FileHandle) bool {
+	str, ok := fh.ReadAll()
+	if !ok {
+		return false
+	}
+	return ig.LoadIniStr(str)
 }
 
 // ini directives
@@ -53,7 +131,13 @@ func (ig *IniGlobals) RegisterIniEntries(moduleNumber int, iniEntryDefs []*IniEn
 		ig.iniDirectives[p.Name()] = p
 
 		// apply default value
-		p.EmitOnModifyBy(ig.ctx, p, IniStageStartup)
+		var defaultValue, ok = ig.ConfigGetStr(p.Name())
+		if ok && p.EmitOnModify(ig.ctx, defaultValue, true, IniStageStartup) {
+			p = p.WithNewValue(defaultValue, true)
+			ig.iniDirectives[p.Name()] = p
+		} else {
+			p.EmitOnModifyBy(ig.ctx, p, IniStageStartup)
+		}
 	}
 	return true
 }

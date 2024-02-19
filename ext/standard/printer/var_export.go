@@ -57,7 +57,7 @@ func (p *VarExportPrinter) Zval(zv types.Zval, level int) {
 		}
 	case types.IsString:
 		ztmp := p.escape(zv.String())
-		ztmp2 := strings.ReplaceAll(ztmp, "0", `' . "\0" . '`)
+		ztmp2 := strings.ReplaceAll(ztmp, "\x00", `' . "\0" . '`)
 		p.print(`'`)
 		p.print(ztmp2)
 		p.print(`'`)

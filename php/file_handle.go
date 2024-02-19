@@ -17,7 +17,12 @@ func (f *FileHandle) OpenedPath() string {
 	return f.openedPath
 }
 
-func (f *FileHandle) ReadAll() (string, error) {
+func (f *FileHandle) ReadAll() (string, bool) {
+	data, err := f.ReadAllEx()
+	return data, err == nil
+}
+
+func (f *FileHandle) ReadAllEx() (string, error) {
 	data, err := io.ReadAll(f.reader)
 	if err != nil {
 		return "", err

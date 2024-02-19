@@ -4,6 +4,7 @@ import (
 	"github.com/heyuuu/gophp/ext/standard/printer"
 	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/lang"
+	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
 	"net"
@@ -138,5 +139,76 @@ func ZifPrintR(ctx *php.Context, var_ types.Zval, _ zpp.Opt, return_ bool) *type
 	} else {
 		ctx.WriteString(s)
 		return types.NewZvalTrue()
+	}
+}
+
+func simpleIniSet(arr *types.Array, key string, value string) {
+	if baseKey, offset, ok := php.TryParseIniOffsetKey(key); ok {
+		var arrayKey types.ArrayKey
+		if key_, ok := php.ParseLongWithUnit(baseKey); ok {
+			arrayKey = types.IdxKey(key_)
+		} else {
+			arrayKey = types.StrKey(baseKey)
+		}
+
+		var findHash types.Zval
+		if findHash = arr.Find(arrayKey); !findHash.IsArray() {
+			arr.Update(arrayKey, php.Array(nil))
+			findHash = arr.Find(arrayKey)
+		}
+
+		if offset == "" {
+			findHash.Array().Append(php.String(value))
+		} else {
+			findHash.Array().SymtableUpdate(offset, php.String(value))
+		}
+
+		return
+	}
+
+	arr.SymtableUpdate(key, php.String(value))
+}
+
+func simpleIniParseCb(processSections bool) (php.IniScanCallback, *types.Array) {
+	arr := types.NewArray()
+	return php.IniScanCallbackFunc(func(section string, key string, value string) {
+		activeArr := arr
+		if processSections && section != "" {
+			if subArrZval := arr.KeyFind(section); subArrZval.IsArray() {
+				activeArr = subArrZval.Array()
+			} else {
+				activeArr = types.NewArray()
+				arr.KeyAdd(section, types.ZvalArray(activeArr))
+			}
+		}
+		simpleIniSet(activeArr, key, value)
+	}), arr
+}
+
+// @zif(onError=1)
+func ZifParseIniFile(ctx *php.Context, filename string, _ zpp.Opt, processSections bool, scannerMode int) (*types.Array, bool) {
+	if filename == "" {
+		php.ErrorDocRef(ctx, "", perr.E_WARNING, "Filename cannot be empty!")
+		return nil, false
+	}
+
+	iniParseCb, arr := simpleIniParseCb(processSections)
+
+	fh, err := php.NewFileHandleByFilename(filename)
+	if err == nil && php.IniParseFile(ctx, fh, scannerMode, iniParseCb) {
+		return arr, true
+	} else {
+		return nil, false
+	}
+}
+
+// @zif(onError=1)
+func ZifParseIniString(ctx *php.Context, iniString string, _ zpp.Opt, processSections bool, scannerMode int) (*types.Array, bool) {
+	iniParseCb, arr := simpleIniParseCb(processSections)
+
+	if php.IniParseString(ctx, iniString, scannerMode, iniParseCb) {
+		return arr, true
+	} else {
+		return nil, false
 	}
 }

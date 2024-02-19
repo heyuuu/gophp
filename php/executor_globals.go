@@ -1,6 +1,7 @@
 package php
 
 import (
+	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"strings"
@@ -14,42 +15,44 @@ type ConstantTable = *types.Table[*types.Constant]
 type ExecutorGlobals struct {
 	ctx            *Context
 	errorSuppress  int
-	errorReporting int
-	precision      int
+	symbolTable    ISymtable      `get:""`
+	errorReporting perr.ErrorType `prop:""`
+	exitStatus     int            `prop:""`
+	precision      int            `prop:""`
 
-	constantTable ConstantTable
-	functionTable FunctionTable
-	classTable    ClassTable
+	constantTable ConstantTable `get:""`
+	functionTable FunctionTable `get:""`
+	classTable    ClassTable    `get:""`
 
-	currentExecuteData *ExecuteData
+	currentExecuteData *ExecuteData `prop:""`
 
 	nextObjectHandle uint
 }
 
-func (eg *ExecutorGlobals) ErrorReporting() int                  { return eg.errorReporting }
-func (eg *ExecutorGlobals) SetErrorReporting(errorReporting int) { eg.errorReporting = errorReporting }
-func (eg *ExecutorGlobals) Precision() int                       { return eg.precision }
-func (eg *ExecutorGlobals) SetPrecision(precision int)           { eg.precision = precision }
-
-func (eg *ExecutorGlobals) Init(ctx *Context, base *ExecutorGlobals) {
-	eg.ctx = ctx
-	eg.errorReporting = int(perr.E_ALL)
-	if base != nil {
-		eg.constantTable = base.constantTable.Clone()
-		eg.functionTable = base.functionTable.Clone()
-		eg.classTable = base.classTable.Clone()
-	} else {
-		eg.constantTable = types.NewTable[*types.Constant]()
-		eg.functionTable = types.NewTable[*types.Function]()
-		eg.classTable = types.NewTable[*types.Class]()
+func (eg *ExecutorGlobals) InitBase(ctx *Context) {
+	*eg = ExecutorGlobals{
+		ctx:            ctx,
+		errorReporting: perr.E_ALL, // todo init by ini
+		precision:      14,         // todo init by ini
+		constantTable:  types.NewTable[*types.Constant](),
+		functionTable:  types.NewTable[*types.Function](),
+		classTable:     types.NewTable[*types.Class](),
 	}
-	// todo init by ini
-	eg.precision = 14
 }
 
-func (eg *ExecutorGlobals) ConstantTable() ConstantTable { return eg.constantTable }
-func (eg *ExecutorGlobals) FunctionTable() FunctionTable { return eg.functionTable }
-func (eg *ExecutorGlobals) ClassTable() ClassTable       { return eg.classTable }
+func (eg *ExecutorGlobals) Init(ctx *Context, base *ExecutorGlobals) {
+	assert.Assert(base != nil)
+	*eg = ExecutorGlobals{
+		ctx:            ctx,
+		symbolTable:    NewSymtable(),
+		errorReporting: base.errorReporting,
+		exitStatus:     0,
+		precision:      base.precision,
+		constantTable:  base.constantTable.Clone(),
+		functionTable:  base.functionTable.Clone(),
+		classTable:     base.classTable.Clone(),
+	}
+}
 
 func (eg *ExecutorGlobals) FindFunction(name string) *types.Function {
 	// todo 完善 caseIgnore 及命名空间处理
@@ -75,13 +78,6 @@ func (eg *ExecutorGlobals) ErrorSuppressScope(block func()) {
 	}()
 
 	block()
-}
-
-func (eg *ExecutorGlobals) CurrentExecuteData() *ExecuteData {
-	return eg.currentExecuteData
-}
-func (eg *ExecutorGlobals) SetCurrentExecuteData(currentExecuteData *ExecuteData) {
-	eg.currentExecuteData = currentExecuteData
 }
 
 func (eg *ExecutorGlobals) PushExecuteData(ex *ExecuteData) {

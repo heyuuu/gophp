@@ -1,13 +1,18 @@
 package tests
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/heyuuu/gophp/php"
 	_ "github.com/heyuuu/gophp/php/boot"
+	"github.com/heyuuu/gophp/php/perr"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
+	"unicode/utf8"
 )
 
 var rawSupportSections = map[string]bool{
@@ -33,10 +38,10 @@ var rawSupportSections = map[string]bool{
 	"INI": true,
 	//"ENV":                  true,
 	//"EXTENSIONS":           true,
-	//"SKIPIF":               true,
+	"SKIPIF": true,
 	//"XFAIL":                true,
 	//"XLEAK":                true,
-	//"CLEAN":                true,
+	"CLEAN":       true,
 	"CREDITS":     true,
 	"DESCRIPTION": true,
 	//"CONFLICTS":            true,
@@ -73,6 +78,17 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 		ini = iniReplacer.Replace(ini)
 	}
 
+	// 判断是否 SKIP
+	if skipIfText, ok := sections["SKIPIF"]; ok {
+		output, err := runCodeBuiltin(skipIfText, ini)
+		if err != nil {
+			return NewTestResult(tc, FAIL, "run SKIPIF code filed: "+err.Error(), 0)
+		}
+		if output != "" {
+			return NewTestResult(tc, SKIP, output, 0)
+		}
+	}
+
 	// 执行测试case
 	var code string
 	if fileText, ok := sections["FILE"]; ok {
@@ -81,7 +97,7 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 		return NewTestResult(tc, BORK, "no file section", 0)
 	}
 
-	output, err := runCodeBuiltin(code)
+	output, err := runCodeBuiltin(code, ini)
 	if err != nil {
 		return NewTestResult(tc, FAIL, "run code failed: "+err.Error(), 0)
 	}
@@ -106,16 +122,23 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 	return result
 }
 
-func runCodeBuiltin(code string) (output string, err error) {
+func runCodeBuiltin(code string, ini string) (output string, err error) {
 	var buf strings.Builder
 	defer func() {
 		output = buf.String()
-		if e := recover(); e != nil {
+		if e := recover(); e != nil && e != perr.ErrExit {
 			err = fmt.Errorf("runCodeBuiltin() panic: %v", e)
+
+			// 打印堆栈
+			const size = 64 << 10
+			stack := make([]byte, size)
+			stack = stack[:runtime.Stack(stack, false)]
+			log.Printf(">>> runCodeBuiltin() panic: %v\n%s", e, stack)
 		}
 	}()
 
 	engine := php.NewEngine()
+	engine.BaseCtx().INI().AppendIniEntries(ini)
 	err = engine.Start()
 	if err != nil {
 		return "", err
@@ -187,6 +210,7 @@ func convertExpectFormat2Regex(s string) string {
 		"%x", `[0-9a-fA-F]+`,
 		"%f", `[+-]?\.?\d+\.?\d*(?:[Ee][+-]?\d+)?`,
 		"%c", `.`,
+		"\x00", "\\0",
 	)
 	return replacer.Replace(s)
 }
@@ -215,9 +239,30 @@ func compareExpectRegex(output string, expect string) (equals bool, reason strin
 }
 
 func compareExpectRegexInternal(output string, expect string) (equals bool, err error) {
+	if !utf8.ValidString(expect) {
+		expect = utf8SafeString(expect)
+		output = utf8SafeString(output)
+	}
+
 	rule, err := regexp.Compile(expect)
 	if err != nil {
 		return false, fmt.Errorf("EXPECTREGEX rule parse fail, err = %w, expect = %s\n", err, expect)
 	}
 	return rule.MatchString(output), nil
+}
+
+func utf8SafeString(s string) string {
+	if utf8.ValidString(s) {
+		return s
+	}
+	var buf strings.Builder
+	for _, r := range s {
+		if utf8.ValidRune(r) {
+			buf.WriteRune(r)
+		} else {
+			buf.WriteString(`\x`)
+			buf.WriteString(hex.EncodeToString([]byte(string([]rune{r}))))
+		}
+	}
+	return buf.String()
 }

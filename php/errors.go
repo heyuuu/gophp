@@ -68,7 +68,7 @@ func errorVaList(ctx *Context, typ perr.ErrorType, errorFilename string, errorLi
 }
 
 func ErrorCb(ctx *Context, typ perr.ErrorType, errorFilename string, errorLineno uint32, message string) {
-	if ctx.EG().ErrorReporting()&int(typ) == 0 {
+	if ctx.EG().ErrorReporting()&typ == 0 {
 		return
 	}
 

@@ -3,9 +3,18 @@ package php
 import (
 	"bufio"
 	"fmt"
+	"github.com/heyuuu/gophp/kits/ascii"
 	"io"
 	"regexp"
 	"strings"
+)
+
+type IniScanMode = int
+
+const (
+	IniScanNormal IniScanMode = 0
+	IniScanRaw    IniScanMode = 1
+	IniScanTyped  IniScanMode = 2
 )
 
 // IniScanCallback
@@ -25,6 +34,10 @@ func (cb IniScanCallbackFunc) Pair(section string, key string, value string) {
 }
 
 func IniScan(str string, cb IniScanCallback) error {
+	if idx := strings.IndexByte(str, 0); idx >= 0 {
+		str = str[:idx]
+	}
+
 	buf := bufio.NewReader(strings.NewReader(str))
 
 	var line string
@@ -34,7 +47,7 @@ func IniScan(str string, cb IniScanCallback) error {
 	for err == nil {
 		lineno++
 		line, err = buf.ReadString('\n')
-		line = strings.TrimSpace(line)
+		line = strings.TrimLeftFunc(line, ascii.IsSpaceRune)
 		if line == "" {
 			continue
 		} else if line[0] == ';' || line[0] == '#' {

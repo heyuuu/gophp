@@ -1,6 +1,7 @@
 package php
 
 import (
+	"github.com/heyuuu/gophp/php/assert"
 	"io"
 	"net/http"
 )
@@ -25,21 +26,27 @@ func MockContext() *Context {
 	return &Context{}
 }
 
-func initContext(e *Engine, baseCtx *Context, request *http.Request, response http.ResponseWriter) *Context {
+func initBaseContext(e *Engine) *Context {
+	assert.Assert(e != nil)
 	ctx := &Context{engine: e}
-	if baseCtx != nil {
-		ctx.cg.Init()
-		ctx.eg.Init(ctx, baseCtx.EG())
-		ctx.og.Init()
-		ctx.pg.Init()
-		ctx.ini.Init(ctx, baseCtx.INI())
-	} else {
-		ctx.cg.Init()
-		ctx.eg.Init(ctx, nil)
-		ctx.og.Init()
-		ctx.pg.Init()
-		ctx.ini.Init(ctx, nil)
-	}
+
+	ctx.eg.InitBase(ctx)
+	ctx.ini.Init(ctx, nil)
+
+	return ctx
+}
+
+func initContext(e *Engine, baseCtx *Context, request *http.Request, response http.ResponseWriter) *Context {
+	assert.Assert(e != nil && baseCtx != nil)
+
+	ctx := &Context{engine: e}
+
+	ctx.cg.Init()
+	ctx.eg.Init(ctx, baseCtx.EG())
+	ctx.og.Init()
+	ctx.pg.Init()
+	ctx.ini.Init(ctx, baseCtx.INI())
+
 	ctx.executor = NewExecutor(ctx)
 
 	return ctx

@@ -530,10 +530,10 @@ func ZifUnpack(ctx *php.Context, format string, input string, _ zpp.Opt, offset 
 					v := order.Uint16(inputBytes[inputpos:])
 					result.AddAssocLong(n, int(v))
 				case 'i':
-					v := int(machineEndian.Uint64(inputBytes[inputpos:]))
+					v := int(machineEndian.Uint32(inputBytes[inputpos:]))
 					result.AddAssocLong(n, v)
 				case 'I':
-					v := uint(machineEndian.Uint64(inputBytes[inputpos:]))
+					v := uint(machineEndian.Uint32(inputBytes[inputpos:]))
 					result.AddAssocLong(n, int(v))
 				case 'l':
 					v := int32(machineEndian.Uint32(inputBytes[inputpos:]))

@@ -446,7 +446,7 @@
                 this.updateTest(index, res.data.status, res.data.reason)
                 test.code = res.data.case.Sections.FILE || ""
                 test.output = res.data.output || ""
-                test.expect = res.data.case.Sections.EXPECT || res.data.case.Sections.EXPECTF || ""
+                test.expect = res.data.case.Sections.EXPECT || res.data.case.Sections.EXPECTF || res.data.case.Sections.EXPECTREGEX || ""
                 this.runNext()
             }, () => {
                 this.updateTest(index, NET_ERROR, "调用 url 失败")
