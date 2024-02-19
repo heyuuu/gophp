@@ -1,15 +1,16 @@
 package tests
 
-import "strconv"
-
-const E_ALL = 32767
+import (
+	"github.com/heyuuu/gophp/php/perr"
+	"strconv"
+)
 
 var baseIniOverwrites = []string{
 	"output_handler=",
 	"open_basedir=",
 	"disable_functions=",
 	"output_buffering=Off",
-	"error_reporting=" + strconv.Itoa(E_ALL),
+	"error_reporting=" + strconv.Itoa(int(perr.E_ALL)),
 	"display_errors=1",
 	"display_startup_errors=1",
 	"log_errors=0",

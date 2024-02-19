@@ -124,7 +124,7 @@ func runCodeBuiltin(code string) (output string, err error) {
 	ctx := engine.NewContext(nil, nil)
 	engine.HandleContext(ctx, func(ctx *php.Context) {
 		ctx.OG().PushHandler(&buf)
-		fileHandle := php.NewFileHandleByString(code)
+		fileHandle := php.NewFileHandleByCommandLine(code)
 		_, err = php.ExecuteScript(ctx, fileHandle, false)
 	})
 	return

@@ -16,5 +16,8 @@ func CompileFile(ctx *Context, fileHandle *FileHandle, skipShebang bool) (*types
 		return nil, err
 	}
 
-	return types.NewAstTopFunction(astFile), nil
+	topFn := types.NewAstTopFunction(astFile)
+	topFn.SetFilename(fileHandle.OpenedPath())
+
+	return topFn, nil
 }

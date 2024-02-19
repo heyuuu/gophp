@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
+	"path/filepath"
 )
 
 type (
@@ -432,6 +433,7 @@ func (e *Executor) functionStmt(x *ast.FunctionStmt) execResult {
 	}
 
 	fn := types.NewAstFunction(name, argInfos, x.Stmts)
+	fn.SetFilename(GetExecutedFilenameVal(e.ctx))
 	RegisterFunction(e.ctx, name, fn)
 
 	return nil
@@ -939,7 +941,23 @@ func (e *Executor) classConstFetchExpr(expr *ast.ClassConstFetchExpr) types.Zval
 }
 
 func (e *Executor) magicConstExpr(expr *ast.MagicConstExpr) types.Zval {
-	panic(perr.Todof("e.magicConstExpr"))
+	switch expr.Kind {
+	//case ast.MagicConstClass: // __CLASS__
+	case ast.MagicConstDir: // __DIR__
+		file := GetExecutedFilenameVal(e.ctx)
+		dir := filepath.Dir(file)
+		return types.ZvalString(dir)
+	case ast.MagicConstFile: // __FILE__
+		file := GetExecutedFilenameVal(e.ctx)
+		return types.ZvalString(file)
+	//case ast.MagicConstFunction: // __FUNCTION__
+	//case ast.MagicConstLine: // __LINE__
+	//case ast.MagicConstMethod: // __METHOD__
+	//case ast.MagicConstNamespace: // __NAMESPACE__
+	//case ast.MagicConstTrait: // __TRAIT__
+	default:
+		panic(perr.Todof("e.magicConstExpr, kind=%d", expr.Kind))
+	}
 }
 
 func (e *Executor) instanceofExpr(expr *ast.InstanceofExpr) types.Zval {

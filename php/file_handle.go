@@ -2,7 +2,6 @@ package php
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -19,7 +18,7 @@ func (f *FileHandle) OpenedPath() string {
 }
 
 func (f *FileHandle) ReadAll() (string, error) {
-	data, err := ioutil.ReadAll(f.reader)
+	data, err := io.ReadAll(f.reader)
 	if err != nil {
 		return "", err
 	}
@@ -45,8 +44,13 @@ func NewFileHandleByFilename(file string) (*FileHandle, error) {
 	}, nil
 }
 
-func NewFileHandleByString(code string) *FileHandle {
+func NewFileHandleByCommandLine(code string) *FileHandle {
+	return NewFileHandleByString(CommandLineFileName, code)
+}
+
+func NewFileHandleByString(path string, code string) *FileHandle {
 	return &FileHandle{
-		reader: strings.NewReader(code),
+		reader:     strings.NewReader(code),
+		openedPath: path,
 	}
 }

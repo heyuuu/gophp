@@ -18,7 +18,7 @@ func RunCli(engine *php.Engine, optArgs *OptArgs) error {
 		}
 		skipShebang = false
 	} else {
-		fileHandle = php.NewFileHandleByString(optArgs.ScriptCode)
+		fileHandle = php.NewFileHandleByCommandLine(optArgs.ScriptCode)
 		skipShebang = true
 	}
 

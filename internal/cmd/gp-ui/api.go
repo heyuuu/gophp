@@ -136,7 +136,7 @@ func runCode(code string) (output string) {
 	engine.HandleContext(ctx, func(ctx *php.Context) {
 		ctx.OG().PushHandler(&buf)
 
-		fileHandle := php.NewFileHandleByString(code)
+		fileHandle := php.NewFileHandleByCommandLine(code)
 		_, err = php.ExecuteScript(ctx, fileHandle, false)
 
 		if err != nil {
