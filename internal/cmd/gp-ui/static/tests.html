@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>GoPhp UI</title>
+    <title>GoPhp Tests</title>
     <link href="/static/node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <style>
         .test-active {
@@ -138,6 +138,10 @@
         NET_ERROR: 5,
         FAIL: 6,
     }
+
+    // const
+    const KEY_UP = 38
+    const KEY_DOWN = 40
 
     // diff-editor
     let diffEditor = null
@@ -453,8 +457,45 @@
                 this.runNext()
             })
         },
+        handleKeyDown() {
+            console.log(arguments)
+        },
+        // 按键
+        keydown(e) {
+            const keyCode = e.keyCode || e.which || e.charCode
+            if (keyCode === KEY_UP || keyCode === KEY_DOWN) {
+                e.preventDefault()
+                this.moveActive(keyCode === KEY_DOWN)
+            }
+        },
+        moveActive(next) {
+            console.log(next ? "move next" : "move prev")
+            let offset = -1
+            const showTests = this.showTests
+            const length = this.showTests.length
+            if (length === 0) {
+                return
+            }
+            for (let i = 0; i < showTests.length; i++) {
+                if (showTests[i].idx === this.activeIndex) {
+                    offset = i
+                    break
+                }
+            }
+
+            let newOffset
+            if (offset < 0) { // not found
+                newOffset = next ? 0 : length - 1
+            } else {
+                newOffset = (next ? offset + 1 : offset + length - 1) % length
+            }
+            this.activeIndex = showTests[newOffset].idx
+        }
     }
     PetiteVue.createApp(app).mount()
+    window.addEventListener("keydown", function (e) {
+        app.keydown(e)
+    })
 
     setInterval(function () {
         app.queryChange()
