@@ -86,6 +86,7 @@ func RegisterStringConstants(ctx *php.Context, moduleNumber int) {
 //		php.PhpDefaultTreatStringData(ctx, encodedString, result)
 //	}
 //}
+
 //
 //func ZifSscanf(ctx *php.Context, str string, format string, vars []zpp.RefZval) *types.Zval {
 //	retval, result := SscanfInternal(ctx, str, format, vars)
@@ -534,7 +535,7 @@ func ZifExplode(ctx *php.Context, separator string, str string, _ zpp.Opt, limit
 	} else if *limit >= 0 {
 		// doc: If the limit parameter is zero, then this is treated as 1.
 		limitVal := lang.Max(*limit, 1)
-		limitVal = lang.Min(limitVal, strings.Count(str, separator))
+		limitVal = lang.Min(limitVal, strings.Count(str, separator)+1)
 		arr = strings.SplitN(str, separator, limitVal)
 	} else {
 		limitVal := *limit // limitVal < 0
@@ -1120,7 +1121,7 @@ func substrReplaceArray(ctx *php.Context, str *types.Array, replace types.Zval, 
 		// repl
 		var replStr = ""
 		if replace.IsArray() {
-			if idx <= len(replaceStr) {
+			if idx < len(replaceStr) {
 				replStr = replaceStr[idx]
 			}
 		} else {
@@ -2264,6 +2265,16 @@ func ZifStrWordCount(ctx *php.Context, str string, _ zpp.Opt, format int, charli
 		mask, _ = PhpCharmaskEx(ctx, *charlist)
 	}
 
+	head, tail := 0, len(str)
+	/* first character cannot be ' or -, unless explicitly allowed by the user */
+	if len(str) > 0 && (str[0] == '\'' && !strkit.ContainsByte(mask, '\'') || str[0] == '-' && !strkit.ContainsByte(mask, '-')) {
+		head++
+	}
+	/* last character cannot be -, unless explicitly allowed by the user */
+	if len(str) > 0 && str[tail-1] == '-' && !strkit.ContainsByte(mask, '-') {
+		tail--
+	}
+
 	// find spans
 	type span struct {
 		start int
@@ -2271,19 +2282,20 @@ func ZifStrWordCount(ctx *php.Context, str string, _ zpp.Opt, format int, charli
 	}
 	spans := make([]span, 0, 32)
 
-	start := -1
-	for end, c := range []byte(str) {
-		if ascii.IsAscii(c) || (mask != "" && strings.IndexByte(mask, c) >= 0) {
-			if start < 0 {
-				start = end
+	wordStart := -1
+	for i := head; i < tail; i++ {
+		c := str[i]
+		if ascii.IsAlpha(c) || (mask != "" && strings.IndexByte(mask, c) >= 0) || c == '\'' || c == '-' {
+			if wordStart < 0 {
+				wordStart = i
 			}
-		} else {
-			spans = append(spans, span{start, end})
-			start = -1
+		} else if wordStart >= 0 {
+			spans = append(spans, span{wordStart, i})
+			wordStart = -1
 		}
 	}
-	if start > 0 {
-		spans = append(spans, span{start, len(str)})
+	if wordStart >= 0 {
+		spans = append(spans, span{wordStart, tail})
 	}
 
 	// 区分三种输出格式返回

@@ -12,7 +12,7 @@ type Context struct {
 	cg     CompilerGlobals
 	eg     ExecutorGlobals
 	og     OutputGlobals
-	pg     PhpCoreGlobals
+	pg     PhpGlobals
 	ini    IniGlobals
 
 	values map[string]any
@@ -44,7 +44,7 @@ func initContext(e *Engine, baseCtx *Context, request *http.Request, response ht
 	ctx.cg.Init()
 	ctx.eg.Init(ctx, baseCtx.EG())
 	ctx.og.Init()
-	ctx.pg.Init()
+	ctx.pg.Init(ctx, baseCtx.PG())
 	ctx.ini.Init(ctx, baseCtx.INI())
 
 	ctx.executor = NewExecutor(ctx)
@@ -61,7 +61,7 @@ func (c *Context) Engine() *Engine { return c.engine }
 func (c *Context) CG() *CompilerGlobals { return &c.cg }
 func (c *Context) EG() *ExecutorGlobals { return &c.eg }
 func (c *Context) OG() *OutputGlobals   { return &c.og }
-func (c *Context) PG() *PhpCoreGlobals  { return &c.pg }
+func (c *Context) PG() *PhpGlobals      { return &c.pg }
 func (c *Context) INI() *IniGlobals     { return &c.ini }
 
 // fast functions

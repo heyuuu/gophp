@@ -17,6 +17,7 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -127,6 +128,7 @@ func runCode(code string) (output string) {
 	}()
 
 	engine := php.NewEngine()
+	engine.BaseCtx().INI().AppendIniEntries("error_reporting=" + strconv.Itoa(int(perr.E_ALL)))
 	err := engine.Start()
 	if err != nil {
 		buf.WriteString("engine start failed: " + err.Error())
@@ -160,8 +162,8 @@ func rawRunCode(code string) string {
 		return output + "\n" + err.Error()
 	}
 
-	// todo: 暂时屏蔽报错文件、行号信息的差异，待完善后移除
-	output = regexp.MustCompile(`in Command line code on line \d+`).ReplaceAllString(output, "in __UNKNOWN_FILE__ on line 0")
+	// todo: 暂时屏蔽行号信息的差异，待完善后移除
+	output = regexp.MustCompile(`in Command line code on line \d+`).ReplaceAllString(output, "in Command line code on line 0")
 
 	return output
 }

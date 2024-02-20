@@ -122,3 +122,16 @@ func ZendGetPropertiesFor(v types.Zval, debug types.PropPurposeType) *types.Arra
 func ZendRsrcListGetRsrcTypeEx(res *types.Resource) *string {
 	return nil
 }
+
+func ZendRebuildSymbolTable(ctx *Context) ISymtable {
+	ex := ctx.CurrEX()
+	if ex != nil {
+		return ex.Symbols()
+	}
+
+	return ctx.EG().SymbolTable()
+}
+
+func PhpCheckOpenBasedir(ctx *Context, value string) bool {
+	return true
+}

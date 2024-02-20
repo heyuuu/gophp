@@ -51,6 +51,48 @@ func (d *IniEntryDef) OnModify(onModify onModifyFunc) *IniEntryDef {
 	d.onModify = onModify
 	return d
 }
+func (d *IniEntryDef) OnModifyBool(handler func(*Context, bool)) *IniEntryDef {
+	return d.OnModify(func(ctx *Context, entry *IniEntry, newValue string, _ bool, stage IniStage) bool {
+		val := IniStringParseBool(newValue)
+		handler(ctx, val)
+		return true
+	})
+}
+func (d *IniEntryDef) OnModifyLong(handler func(*Context, int)) *IniEntryDef {
+	return d.OnModify(func(ctx *Context, entry *IniEntry, newValue string, _ bool, stage IniStage) bool {
+		val, ok := ParseLongWithUnit(newValue)
+		if !ok || val < 0 {
+			return false
+		}
+		handler(ctx, val)
+		return true
+	})
+}
+func (d *IniEntryDef) OnModifyLongGEZero(handler func(*Context, int)) *IniEntryDef {
+	return d.OnModify(func(ctx *Context, entry *IniEntry, newValue string, _ bool, stage IniStage) bool {
+		val, ok := ParseLongWithUnit(newValue)
+		if !ok || val < 0 {
+			return false
+		}
+		handler(ctx, val)
+		return true
+	})
+}
+func (d *IniEntryDef) OnModifyString(handler func(*Context, string)) *IniEntryDef {
+	return d.OnModify(func(ctx *Context, entry *IniEntry, newValue string, _ bool, stage IniStage) bool {
+		handler(ctx, newValue)
+		return true
+	})
+}
+func (d *IniEntryDef) OnModifyStringNotEmpty(handler func(*Context, string)) *IniEntryDef {
+	return d.OnModify(func(ctx *Context, entry *IniEntry, newValue string, hasValue bool, stage IniStage) bool {
+		if hasValue && newValue == "" {
+			return false
+		}
+		handler(ctx, newValue)
+		return true
+	})
+}
 
 // IniEntry: immutable ini entry
 type IniEntry struct {

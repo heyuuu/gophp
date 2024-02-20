@@ -4,18 +4,16 @@ import (
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/kits/mathkit"
 	"github.com/heyuuu/gophp/php/types"
-	"log"
 	"math"
 	"strconv"
 )
 
 func ParseDouble(str string) float64 {
-	matchStr, _, _ := matchNumberPrefix(str)
-	if matchStr == "" { // not match
-		return 0 // todo 异常处理
+	num, _, _ := parseNumberPrefix(str, false)
+	if num.IsDouble() {
+		return num.Double()
 	}
-	d, _ := strconv.ParseFloat(matchStr, 64)
-	return d
+	return 0
 }
 
 func ParseNumber(str string) types.Zval {
@@ -23,14 +21,14 @@ func ParseNumber(str string) types.Zval {
 	return zv
 }
 func ParseNumberEx(str string) (types.Zval, int) {
-	zv, overflow, matchLen := parseNumberPrefix(str)
+	zv, overflow, matchLen := parseNumberPrefix(str, true)
 	if matchLen != len(str) {
 		return types.Undef, 0
 	}
 	return zv, overflow
 }
 func ParseNumberPrefix(str string) (types.Zval, int) {
-	zv, _, matchLen := parseNumberPrefix(str)
+	zv, _, matchLen := parseNumberPrefix(str, true)
 	return zv, matchLen
 }
 
@@ -70,7 +68,7 @@ const maxLengthOfLong = 20
 
 // _is_numeric_string_ex
 // 尽量尝试转换字符串前缀为数字，返回转换结果+匹配长度 (类似 strconv.parseFloatPrefix())
-func parseNumberPrefix(str string) (zv types.Zval, overflow int, matchLen int) {
+func parseNumberPrefix(str string, tryLong bool) (zv types.Zval, overflow int, matchLen int) {
 	matchStr, matchLen, maybeLong := matchNumberPrefix(str)
 	if matchStr == "" { // not match
 		return
@@ -78,7 +76,7 @@ func parseNumberPrefix(str string) (zv types.Zval, overflow int, matchLen int) {
 
 	// 转义匹配字符串
 	overflow = 0
-	if maybeLong {
+	if tryLong && maybeLong {
 		// 尝试转 int，若成功直接返回
 		if len(matchStr) < maxLengthOfLong {
 			lval, err := strconv.Atoi(matchStr)
@@ -96,7 +94,8 @@ func parseNumberPrefix(str string) (zv types.Zval, overflow int, matchLen int) {
 
 	dval, err := strconv.ParseFloat(matchStr, 64)
 	if err != nil {
-		log.Panicf("代码逻辑错误，预期为数字字符串，但转换失败了: s=%s ,err=%s", matchStr, err.Error())
+		overflow = 0
+		return
 	}
 	return Double(dval), overflow, matchLen
 }
@@ -152,5 +151,6 @@ func matchNumberPrefix(str string) (matchStr string, matchLen int, maybeLong boo
 	if state == 0 {
 		return "", 0, false
 	}
+
 	return str[start:idx], idx, state == 1
 }

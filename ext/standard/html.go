@@ -126,12 +126,12 @@ func charsetLimitAll(all bool, doctype int, charset charsets.Charset) bool {
 	return all && !charset.PartialSupport() && doctype != EntHtmlDocXml1
 }
 func GetDefaultCharset(ctx *php.Context) string {
-	//if internalEncoding := ctx.PG().InternalEncoding(); internalEncoding != "" {
-	//	return internalEncoding
-	//}
-	//if defaultCharset := ctx.SG().DefaultCharset(); defaultCharset != "" {
-	//	return defaultCharset
-	//}
+	if internalEncoding := ctx.PG().InternalEncoding(); internalEncoding != "" {
+		return internalEncoding
+	}
+	if defaultCharset := ctx.PG().DefaultCharset(); defaultCharset != "" {
+		return defaultCharset
+	}
 	return ""
 }
 
@@ -146,9 +146,9 @@ func DetermineCharsetEx(ctx *php.Context, charsetHint *string) charsets.Charset 
 		return charsets.CsUtf8
 	}
 	charsetStr := *charsetHint
-	//if charsetStr == "" {
-	//	charsetStr = ctx.SG().DefaultCharset()
-	//}
+	if charsetStr == "" {
+		charsetStr = ctx.PG().DefaultCharset()
+	}
 	if charsetStr != "" {
 		/* look for the codeset */
 		if matchCharset, found := charsets.GetCharset(charsetStr); found {
@@ -325,7 +325,7 @@ func ProcessNumericEntity(s string) (cp uint, n int, ok bool) {
 		return 0, 0, false
 	}
 
-	var hexadecimal = s[0] == 'x' || s[1] == 'X'
+	var hexadecimal = s[0] == 'x' || s[0] == 'X'
 	if hexadecimal {
 		s = s[1:]
 		n++
@@ -574,7 +574,7 @@ func FindEntityForChar(k uint, table []EntityStage1Row, charReader *charsets.Cha
 		var mcpr = c.MultiCodepointTable()
 
 		/* peek at next char */
-		nextChar, ok := charReader.NextChar()
+		nextChar, n, ok := charReader.PeekChar()
 		if !ok {
 			return mcpr[0].DefaultEntity()
 		}
@@ -582,6 +582,7 @@ func FindEntityForChar(k uint, table []EntityStage1Row, charReader *charsets.Cha
 		/* we could do a binary search but it's not worth it since we have at most two entries... */
 		for _, row := range mcpr[1:] {
 			if row.SecondCp() == nextChar {
+				charReader.Skip(n)
 				return row.Entity()
 			}
 		}
@@ -632,7 +633,7 @@ func PhpEscapeHtmlEntitiesEx(ctx *php.Context, old string, all bool, flags int, 
 
 	/* initial estimate */
 	for charReader.Valid() {
-		thisChar, mbsequence, ok := charReader.NextCharEx()
+		thisChar, mbsequence, ok := charReader.ReadChar()
 
 		/* guarantee we have at least 40 bytes to write.
 		 * In HTML5, entities may take up to 33 bytes */
@@ -809,7 +810,9 @@ func writeS3rowData(r *EntityStage3Row, origCp uint, charset charsets.Charset, a
 		arr_.AddAssocStr(key1, "&"+r.Entity()+";")
 	} else {
 		var mcpr = r.MultiCodepointTable()
-		arr_.AddAssocStr(key1, "&"+mcpr[0].DefaultEntity()+";")
+		if mcpr[0].DefaultEntity() != "" {
+			arr_.AddAssocStr(key1, "&"+mcpr[0].DefaultEntity()+";")
+		}
 
 		numEntries := mcpr[0].Size()
 		for i := uint(1); i <= numEntries; i++ {

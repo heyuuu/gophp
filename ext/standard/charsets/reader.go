@@ -25,22 +25,18 @@ func (r *CharReader) Skip(n int) {
 func (r *CharReader) Valid() bool {
 	return r.cursor < len(r.str)
 }
-func (r *CharReader) NextChar() (uint, bool) {
+func (r *CharReader) PeekChar() (c uint, n int, ok bool) {
 	if r.cursor >= len(r.str) {
-		return 0, false
+		return 0, 0, false
 	}
 
-	c, n, ok := r.decoder(r.str[r.cursor:])
-	r.cursor += n
-	return c, ok
+	return r.decoder(r.str[r.cursor:])
 }
-func (r *CharReader) NextCharEx() (uint, string, bool) {
-	if r.cursor >= len(r.str) {
-		return 0, "", false
+func (r *CharReader) ReadChar() (c uint, raw string, ok bool) {
+	c, n, ok := r.PeekChar()
+	if n > 0 {
+		raw = r.str[r.cursor : r.cursor+n]
+		r.cursor += n
 	}
-
-	c, n, ok := r.decoder(r.str[r.cursor:])
-	match := r.str[r.cursor : r.cursor+n]
-	r.cursor += n
-	return c, match, ok
+	return c, raw, ok
 }

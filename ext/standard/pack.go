@@ -505,7 +505,7 @@ func ZifUnpack(ctx *php.Context, format string, input string, _ zpp.Opt, offset 
 
 					buf := make([]byte, len_+1)
 					hex.Encode(buf, inputBytes[inputpos:inputpos+len(buf)/2])
-					if !isLittleEndian {
+					if isLittleEndian {
 						for j := 0; j < len_; j += 2 {
 							buf[j], buf[j+1] = buf[j+1], buf[j]
 						}

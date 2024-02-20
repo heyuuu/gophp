@@ -457,9 +457,6 @@
                 this.runNext()
             })
         },
-        handleKeyDown() {
-            console.log(arguments)
-        },
         // 按键
         keydown(e) {
             const keyCode = e.keyCode || e.which || e.charCode
@@ -489,7 +486,7 @@
             } else {
                 newOffset = (next ? offset + 1 : offset + length - 1) % length
             }
-            this.activeIndex = showTests[newOffset].idx
+            this.activeTest(showTests[newOffset].idx)
         }
     }
     PetiteVue.createApp(app).mount()

@@ -80,7 +80,7 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 
 	// 判断是否 SKIP
 	if skipIfText, ok := sections["SKIPIF"]; ok {
-		output, err := runCodeBuiltin(skipIfText, ini)
+		output, err := runCodeBuiltin("", skipIfText, ini)
 		if err != nil {
 			return NewTestResult(tc, FAIL, "run SKIPIF code filed: "+err.Error(), 0)
 		}
@@ -97,7 +97,8 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 		return NewTestResult(tc, BORK, "no file section", 0)
 	}
 
-	output, err := runCodeBuiltin(code, ini)
+	mockFileName := strings.ReplaceAll(testFile, ".phpt", ".php")
+	output, err := runCodeBuiltin(mockFileName, code, ini)
 	if err != nil {
 		return NewTestResult(tc, FAIL, "run code failed: "+err.Error(), 0)
 	}
@@ -122,7 +123,11 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 	return result
 }
 
-func runCodeBuiltin(code string, ini string) (output string, err error) {
+func runCodeBuiltin(filename string, code string, ini string) (output string, err error) {
+	if filename == "" {
+		filename = php.CommandLineFileName
+	}
+
 	var buf strings.Builder
 	defer func() {
 		output = buf.String()
@@ -138,6 +143,10 @@ func runCodeBuiltin(code string, ini string) (output string, err error) {
 	}()
 
 	engine := php.NewEngine()
+
+	for _, overwriteIni := range baseIniOverwrites {
+		engine.BaseCtx().INI().AppendIniEntries(overwriteIni)
+	}
 	engine.BaseCtx().INI().AppendIniEntries(ini)
 	err = engine.Start()
 	if err != nil {
@@ -147,7 +156,7 @@ func runCodeBuiltin(code string, ini string) (output string, err error) {
 	ctx := engine.NewContext(nil, nil)
 	engine.HandleContext(ctx, func(ctx *php.Context) {
 		ctx.OG().PushHandler(&buf)
-		fileHandle := php.NewFileHandleByCommandLine(code)
+		fileHandle := php.NewFileHandleByString(filename, code)
 		_, err = php.ExecuteScript(ctx, fileHandle, false)
 	})
 	return
@@ -210,13 +219,12 @@ func convertExpectFormat2Regex(s string) string {
 		"%x", `[0-9a-fA-F]+`,
 		"%f", `[+-]?\.?\d+\.?\d*(?:[Ee][+-]?\d+)?`,
 		"%c", `.`,
-		"\x00", "\\0",
 	)
 	return replacer.Replace(s)
 }
 
 func compareExpectRegex(output string, expect string) (equals bool, reason string) {
-	equals, err := compareExpectRegexInternal(output, expect)
+	equals, err := compareExpectRegexInternal(output, expect, "raw")
 	if err != nil {
 		return false, err.Error()
 	}
@@ -225,7 +233,7 @@ func compareExpectRegex(output string, expect string) (equals bool, reason strin
 	}
 
 	// 目前先规避掉 phpt 换行格式导致的不匹配问题
-	equals, err = compareExpectRegexInternal(strings.TrimSpace(output), strings.TrimSpace(expect))
+	equals, err = compareExpectRegexInternal(strings.TrimSpace(output), strings.TrimSpace(expect), "trim")
 	if err != nil {
 		return false, err.Error()
 	}
@@ -238,11 +246,22 @@ func compareExpectRegex(output string, expect string) (equals bool, reason strin
 	return false, reason
 }
 
-func compareExpectRegexInternal(output string, expect string) (equals bool, err error) {
+func dumpFile(prefix string, name string, content string) {
+	path := "/Users/heyu/Code/local/php/try-php-0/dump/" + prefix + "-" + name + ".txt"
+	os.WriteFile(path, []byte(content), 0755)
+}
+
+func compareExpectRegexInternal(output string, expect string, prefix string) (equals bool, err error) {
+	dumpFile(prefix, "output", output)
+	dumpFile(prefix, "expect", expect)
+
 	if !utf8.ValidString(expect) {
 		expect = utf8SafeString(expect)
 		output = utf8SafeString(output)
 	}
+
+	dumpFile(prefix, "output-utf8safe", output)
+	dumpFile(prefix, "expect-utf8safe", expect)
 
 	rule, err := regexp.Compile(expect)
 	if err != nil {

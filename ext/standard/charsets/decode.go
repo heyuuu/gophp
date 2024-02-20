@@ -32,7 +32,7 @@ func DecodeCharUtf8(s string) (char uint, n int, ok bool) {
 	}
 
 	r, size := utf8.DecodeRuneInString(s)
-	if r == utf8.RuneError {
+	if r == utf8.RuneError && size <= 1 {
 		return 0, size, false
 	} else {
 		return uint(r), size, true

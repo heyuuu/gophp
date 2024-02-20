@@ -230,7 +230,7 @@ func zvalGetStrEx(ctx *Context, v types.Zval, try bool) (string, bool) {
 	case types.IsLong:
 		return strconv.Itoa(v.Long()), true
 	case types.IsDouble:
-		return fmt.Sprintf("%.*G", ctx.EG().Precision(), v.Double()), true
+		return FormatDouble(v.Double(), 'G', ctx.EG().Precision()), true
 	case types.IsArray:
 		Error(ctx, perr.E_NOTICE, "Array to string conversion")
 		if try && ctx.EG().HasException() {

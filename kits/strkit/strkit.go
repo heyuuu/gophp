@@ -12,3 +12,7 @@ func LastCut(s string, sep string) (before, after string, found bool) {
 	}
 	return "", s, false
 }
+
+func ContainsByte(s string, c byte) bool {
+	return strings.IndexByte(s, c) >= 0
+}

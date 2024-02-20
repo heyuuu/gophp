@@ -1,30 +1,14 @@
 --TEST--
-Bug #54238 (use-after-free in substr_replace())
+htmlentities() test 12 (default_charset / ISO-8859-1)
 --INI--
-error_reporting=E_ALL&~E_NOTICE
+output_handler=
+internal_encoding=pass
+default_charset=ISO-8859-1
 --FILE--
 <?php
-var_dump(ini_get("error_reporting"));
-var_dump(error_reporting());
-
-$f = array(array('A', 'A'));
-
-$z = substr_replace($f, $f, $f, 1);
-var_dump($z, $f);
+	print ini_get('default_charset')."\n";
+	var_dump(htmlentities("\xe4\xf6\xfc", ENT_QUOTES, ''));
 ?>
 --EXPECT--
-string(5) "32759"
-int(32759)
-array(1) {
-  [0]=>
-  string(9) "AArrayray"
-}
-array(1) {
-  [0]=>
-  array(2) {
-    [0]=>
-    string(1) "A"
-    [1]=>
-    string(1) "A"
-  }
-}
+ISO-8859-1
+string(18) "&auml;&ouml;&uuml;"

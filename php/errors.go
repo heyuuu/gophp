@@ -56,7 +56,7 @@ func ThrowError(ctx *Context, exceptionCe *types.Class, message string) {
 
 func errorGetFilenameLineno(ctx *Context, typ perr.ErrorType) (string, uint32) {
 	// todo
-	return "", 0
+	return GetExecutedFilenameVal(ctx), 0
 }
 
 func ErrorTrigger(ctx *Context, err perr.Error) {

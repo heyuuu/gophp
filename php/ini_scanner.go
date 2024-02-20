@@ -48,6 +48,7 @@ func IniScan(str string, cb IniScanCallback) error {
 		lineno++
 		line, err = buf.ReadString('\n')
 		line = strings.TrimLeftFunc(line, ascii.IsSpaceRune)
+		line = strings.TrimRight(line, "\n")
 		if line == "" {
 			continue
 		} else if line[0] == ';' || line[0] == '#' {

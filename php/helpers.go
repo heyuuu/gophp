@@ -39,6 +39,9 @@ func StringNCaseCompare(s1, s2 string, n int) int {
 	return StringCaseCompare(s1, s2)
 }
 
+// @see: FORMAT_CONV_MAX_PRECISION
+const formatMaxPrec = 500
+
 // php 对浮点数的格式化方式，兼容一些细微差异
 func FormatDouble(f float64, fmtTyp byte, prec int) string {
 	if math.IsNaN(f) {
@@ -47,6 +50,9 @@ func FormatDouble(f float64, fmtTyp byte, prec int) string {
 
 	if fmtTyp == 'F' {
 		fmtTyp = 'f'
+	}
+	if prec > formatMaxPrec {
+		prec = formatMaxPrec
 	}
 	str := strconv.FormatFloat(f, fmtTyp, prec, 64)
 
@@ -62,9 +68,10 @@ func FormatDouble(f float64, fmtTyp byte, prec int) string {
 		fallthrough
 	case 'e', 'E':
 		// fix: e|E 模式下，指数不会有前导'0' (go 默认会补齐前导0至最少2位)
-		idx := strings.LastIndexAny(str, "eE")
-		if idx+3 < len(str) && str[idx+2] == '0' {
-			str = str[:idx+2] + str[idx+3:]
+		if idx := strings.LastIndexAny(str, "eE"); idx >= 0 {
+			if idx+3 < len(str) && str[idx+2] == '0' {
+				str = str[:idx+2] + str[idx+3:]
+			}
 		}
 	}
 
