@@ -1,5 +1,7 @@
 package types
 
+import "github.com/heyuuu/gophp/compile/ast"
+
 // properties for ArgInfo
 func (t *ArgInfo) Name() string {
 	return t.name
@@ -161,20 +163,20 @@ func (ce *Class) ModuleNumber() int {
 }
 
 // properties for ClassConstant
-func (c *ClassConstant) Name() string {
-	return c.name
+func (t *ClassConstant) Name() string {
+	return t.name
 }
-func (c *ClassConstant) Value() Zval {
-	return c.value
+func (t *ClassConstant) Value() Zval {
+	return t.value
 }
-func (c *ClassConstant) DocComment() string {
-	return c.docComment
+func (t *ClassConstant) DocComment() string {
+	return t.docComment
 }
-func (c *ClassConstant) Ce() *Class {
-	return c.ce
+func (t *ClassConstant) Ce() *Class {
+	return t.ce
 }
-func (c *ClassConstant) Flags() uint32 {
-	return c.flags
+func (t *ClassConstant) Flags() uint32 {
+	return t.flags
 }
 
 // properties for ClosureData
@@ -219,52 +221,61 @@ func (f *Function) Scope() *Class {
 func (f *Function) SetScope(v *Class) {
 	f.scope = v
 }
+func (f *Function) ArgInfos() []ArgInfo {
+	return f.argInfos
+}
+func (f *Function) Handler() any {
+	return f.handler
+}
+func (f *Function) Stmts() []ast.Stmt {
+	return f.stmts
+}
 
 // properties for PropertyInfo
-func (t *PropertyInfo) Offset() uint32 {
-	return t.offset
+func (prop *PropertyInfo) Offset() uint32 {
+	return prop.offset
 }
-func (t *PropertyInfo) SetOffset(v uint32) {
-	t.offset = v
+func (prop *PropertyInfo) SetOffset(v uint32) {
+	prop.offset = v
 }
-func (t *PropertyInfo) Flags() uint32 {
-	return t.flags
+func (prop *PropertyInfo) Flags() uint32 {
+	return prop.flags
 }
-func (t *PropertyInfo) Name() string {
-	return t.name
+func (prop *PropertyInfo) Name() string {
+	return prop.name
 }
-func (t *PropertyInfo) DocComment() string {
-	return t.docComment
+func (prop *PropertyInfo) DocComment() string {
+	return prop.docComment
 }
-func (t *PropertyInfo) Ce() *Class {
-	return t.ce
+func (prop *PropertyInfo) Ce() *Class {
+	return prop.ce
 }
-func (t *PropertyInfo) Type() *TypeHint {
-	return t.typ
+func (prop *PropertyInfo) Type() *TypeHint {
+	return prop.typ
 }
 
 // properties for blockInfo
-func (b *blockInfo) Filename() string {
-	return b.filename
+func (t *blockInfo) Filename() string {
+	return t.filename
 }
-func (b *blockInfo) SetFilename(v string) {
-	b.filename = v
+func (t *blockInfo) SetFilename(v string) {
+	t.filename = v
 }
-func (b *blockInfo) LineStart() uint32 {
-	return b.lineStart
+func (t *blockInfo) LineStart() uint32 {
+	return t.lineStart
 }
-func (b *blockInfo) SetLineStart(v uint32) {
-	b.lineStart = v
+func (t *blockInfo) SetLineStart(v uint32) {
+	t.lineStart = v
 }
-func (b *blockInfo) LineEnd() uint32 {
-	return b.lineEnd
+func (t *blockInfo) LineEnd() uint32 {
+	return t.lineEnd
 }
-func (b *blockInfo) SetLineEnd(v uint32) {
-	b.lineEnd = v
+func (t *blockInfo) SetLineEnd(v uint32) {
+	t.lineEnd = v
 }
-func (b *blockInfo) DocComment() string {
-	return b.docComment
+func (t *blockInfo) DocComment() string {
+	return t.docComment
 }
-func (b *blockInfo) SetDocComment(v string) {
-	b.docComment = v
+func (t *blockInfo) SetDocComment(v string) {
+	t.docComment = v
 }

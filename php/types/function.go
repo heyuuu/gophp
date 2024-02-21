@@ -18,15 +18,14 @@ type Function struct {
 	flags    uint32       `prop:""`
 	name     string       `prop:""`
 	scope    *Class       `prop:""`
-	argInfos []ArgInfo
+	argInfos []ArgInfo    `get:""`
 
 	// fields for internal function
 	moduleNumber int
-	handler      any
+	handler      any `get:""`
 
 	// fields for user function
-	stmts   []ast.Stmt
-	astFile *ast.File
+	stmts []ast.Stmt `get:""`
 
 	blockInfo
 }
@@ -50,14 +49,19 @@ func NewInternalFunctionByEntry(moduleNumber int, entry FunctionDecl) *Function 
 	}
 }
 
+func NewAstFunction(name string, argInfos []ArgInfo, stmts []ast.Stmt) *Function {
+	return &Function{
+		typ:      TypeUserFunction,
+		name:     name,
+		argInfos: argInfos,
+		stmts:    stmts,
+	}
+}
+
 func (f *Function) IsInternalFunction() bool { return f.typ == TypeInternalFunction }
 func (f *Function) IsUserFunction() bool     { return f.typ == TypeUserFunction }
 func (f *Function) IsEvalCode() bool         { return f.typ == TypeEvalCode }
 func (f *Function) IsUserCode() bool         { return f.typ == TypeUserFunction || f.typ == TypeEvalCode }
-
-func (f *Function) ArgInfos() []ArgInfo { return f.argInfos }
-
-func (f *Function) Handler() any { return f.handler }
 
 /* flags */
 func (f *Function) AddFnFlags(value uint32)      { f.flags |= value }
