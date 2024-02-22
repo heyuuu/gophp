@@ -51,9 +51,13 @@ type (
 	// Object = *types.Object
 	ObjectNullable = *types.Object
 
+	// zpp.Resource 也可直接使用 *types.Resource
+	Resource         = *types.Resource
+	ResourceNullable = *types.Resource
+
 	// FAST_ZPP: Z_PARAM_RESOURCE, Type: 'r'
-	Resource         = types.Zval
-	ResourceNullable = *types.Zval
+	ResourceZval         = types.Zval
+	ResourceZvalNullable = *types.Zval
 
 	// FAST_ZPP: Z_PARAM_FUNC，Type: 'f' (参数略有差异，使用封装的结构体代替 fci + fcc 双指针)
 	Callable = *types.UserCallable

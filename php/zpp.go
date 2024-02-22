@@ -455,12 +455,24 @@ func (p *FastParamParser) parseObjectEx(checkNull bool, separate bool) *types.Ob
 	return dest
 }
 
+func (p *FastParamParser) ParseResource() *types.Resource {
+	dest, _ := p.parseResourceEx(false, false)
+	return dest.Resource()
+}
+func (p *FastParamParser) ParseResourceNullable() *types.Resource {
+	dest, isNull := p.parseResourceEx(true, false)
+	if isNull {
+		return nil
+	}
+	return dest.Resource()
+}
+
 // @see Micro: Z_PARAM_RESOURCE，Old: 'r'
-func (p *FastParamParser) ParseResource() (dest types.Zval) {
+func (p *FastParamParser) ParseResourceZval() (dest types.Zval) {
 	dest, _ = p.parseResourceEx(false, false)
 	return
 }
-func (p *FastParamParser) ParseResourceNullable() *types.Zval {
+func (p *FastParamParser) ParseResourceZvalNullable() *types.Zval {
 	dest, isNull := p.parseResourceEx(true, false)
 	if isNull {
 		return nil

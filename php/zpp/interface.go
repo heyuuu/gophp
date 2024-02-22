@@ -29,8 +29,10 @@ type IParser interface {
 	//ParseClass(baseCe *types.Class) *types.Class
 	ParseObject() *types.Object
 	ParseObjectNullable() *types.Object
-	ParseResource() types.Zval
-	ParseResourceNullable() *types.Zval
+	ParseResource() *types.Resource
+	ParseResourceNullable() *types.Resource
+	ParseResourceZval() types.Zval
+	ParseResourceZvalNullable() *types.Zval
 	ParseCallable() *types.UserCallable
 
 	// zval
