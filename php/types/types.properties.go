@@ -254,6 +254,17 @@ func (prop *PropertyInfo) Type() *TypeHint {
 	return prop.typ
 }
 
+// properties for Resource
+func (res *Resource) Handle() int {
+	return res.handle
+}
+func (res *Resource) Ptr() any {
+	return res.ptr
+}
+func (res *Resource) Type() ResourceType {
+	return res.typ
+}
+
 // properties for blockInfo
 func (t *blockInfo) Filename() string {
 	return t.filename

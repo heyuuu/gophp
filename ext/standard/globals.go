@@ -2,7 +2,6 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/php"
-	"github.com/heyuuu/gophp/php/perr"
 	"math/rand"
 	"time"
 )
@@ -10,13 +9,7 @@ import (
 const globalKey = "ext.standard.globals"
 
 func BG(ctx *php.Context) *BasicGlobals {
-	bg, ok := php.ContextGetOrInit(ctx, globalKey, func() *BasicGlobals {
-		return &BasicGlobals{}
-	})
-	if !ok {
-		panic(perr.Internalf("php.ContextGetOrInit() fail"))
-	}
-	return bg
+	return php.ContextGetOrInit(ctx, globalKey, NewBasicGlobals)
 }
 
 type StrTokState struct {
@@ -26,6 +19,10 @@ type StrTokState struct {
 type BasicGlobals struct {
 	strTokState   StrTokState
 	randGenerator *rand.Rand
+}
+
+func NewBasicGlobals() *BasicGlobals {
+	return &BasicGlobals{}
 }
 
 func (bg *BasicGlobals) StrTokState() *StrTokState {

@@ -3,7 +3,6 @@ package printer
 import (
 	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/assert"
-	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/types"
 	"io"
 )
@@ -93,7 +92,10 @@ func (p *VarDumpPrinter) Zval(zv types.Zval, level int) {
 		p.print("}\n")
 		obj.UnprotectRecursive()
 	case types.IsResource:
-		typeName := lang.Option(php.ZendRsrcListGetRsrcTypeEx(zv.Resource()), "Unknown")
+		typeName := zv.Resource().TypeName()
+		if typeName == "" {
+			typeName = "Unknown"
+		}
 		p.printf("%sresource(%d) of type (%s)\n", common, zv.ResourceHandle(), typeName)
 	default:
 		p.printf("%sUNKNOWN:0\n", common)

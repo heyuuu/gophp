@@ -135,3 +135,5 @@ func ZendRebuildSymbolTable(ctx *Context) ISymtable {
 func PhpCheckOpenBasedir(ctx *Context, value string) bool {
 	return true
 }
+
+const PHP_SOCK_CHUNK_SIZE = 8192

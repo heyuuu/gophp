@@ -210,23 +210,47 @@ func (zv Zval) DeRef() Zval {
 
 // fast property
 func (zv Zval) ResourceHandle() int { return zv.Resource().Handle() }
-func (zv Zval) ResourceType() int   { return zv.Resource().Type() }
 func (zv Zval) RefVal() Zval        { return zv.Ref().Val() }
 
-// Resource
-type Resource struct {
-	handle int
-	typ    int
-	ptr    any
+
+// -- Resource 相关
+
+type ResourceType string
+
+func (n ResourceType) Name() string {
+	return string(n)
 }
 
-func NewResource(handle int, typ int, ptr any) *Resource {
+type ResourceCloser interface {
+	ResourceClose() int // 返回运行的进程的终止状态。发生错误时会返回 -1。主要用于 `pclose` 方法.
+}
+
+type Resource struct {
+	handle int          `get:""`
+	ptr    any          `get:""`
+	typ    ResourceType `get:"Type"`
+}
+
+func NewResource(handle int, typ ResourceType, ptr any) *Resource {
 	return &Resource{handle: handle, typ: typ, ptr: ptr}
 }
 
-func (res *Resource) Handle() int { return res.handle }
-func (res *Resource) Type() int   { return res.typ }
-func (res *Resource) Ptr() any    { return res.ptr }
+func (res *Resource) TypeName() string { return string(res.typ) }
+func (res *Resource) Closed() bool     { return res.typ == "" }
+func (res *Resource) Close() int {
+	code := 0
+	if res.typ != "" {
+		// 先置空 ptr 后处理，避免循环调用
+		ptr := res.ptr
+		res.typ, res.ptr = "", nil
+
+		// 处理定义了接口的指针
+		if closer, ok := ptr.(ResourceCloser); ok {
+			code = closer.ResourceClose()
+		}
+	}
+	return code
+}
 
 // Reference
 type Reference struct {

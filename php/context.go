@@ -2,6 +2,7 @@ package php
 
 import (
 	"github.com/heyuuu/gophp/php/assert"
+	"github.com/heyuuu/gophp/php/perr"
 	"io"
 	"net/http"
 )
@@ -28,7 +29,7 @@ func MockContext() *Context {
 
 func initBaseContext(e *Engine) *Context {
 	assert.Assert(e != nil)
-	ctx := &Context{engine: e}
+	ctx := &Context{engine: e, values: map[string]any{}}
 
 	ctx.eg.InitBase(ctx)
 	ctx.ini.Init(ctx, nil)
@@ -39,7 +40,7 @@ func initBaseContext(e *Engine) *Context {
 func initContext(e *Engine, baseCtx *Context, request *http.Request, response http.ResponseWriter) *Context {
 	assert.Assert(e != nil && baseCtx != nil)
 
-	ctx := &Context{engine: e}
+	ctx := &Context{engine: e, values: map[string]any{}}
 
 	ctx.cg.Init()
 	ctx.eg.Init(ctx, baseCtx.EG())
@@ -80,12 +81,13 @@ func (c *Context) AsWriter() io.Writer {
 func (c *Context) GetValue(key string) any        { return c.values[key] }
 func (c *Context) SetValue(key string, value any) { c.values[key] = value }
 
-func ContextGetOrInit[T any](ctx *Context, key string, initializer func() T) (T, bool) {
+func ContextGetOrInit[T any](ctx *Context, key string, initializer func() T) T {
 	if v, ok := ctx.values[key]; ok {
 		if result, typeMatch := v.(T); typeMatch {
-			return result, true
+			return result
 		} else {
-			return result, false
+			var tmp T
+			panic(perr.Internalf("php.ContextGetOrInit() fail, expect type %T, got type %T, key=%s", tmp, v, key))
 		}
 	} else {
 		result := initializer()
@@ -93,6 +95,15 @@ func ContextGetOrInit[T any](ctx *Context, key string, initializer func() T) (T,
 			ctx.values = map[string]any{}
 		}
 		ctx.values[key] = result
-		return result, true
+		return result
 	}
+}
+
+func ContextGetOrInitPersistent[T any](ctx *Context, key string, initializer func() T) T {
+	// todo 考虑持久化 globals 和非持久化 globals 之间的区分和生命周期问题
+	return ContextGetOrInit(ctx, key, initializer)
+}
+
+func ContextDel(ctx *Context, key string) {
+	delete(ctx.values, key)
 }

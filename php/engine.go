@@ -98,3 +98,7 @@ func (engine *Engine) RegisterModule(entry ModuleEntry) *Module {
 
 	return module
 }
+
+func (engine *Engine) RegisterResourceType(stream types.ResourceType) {
+	// todo
+}

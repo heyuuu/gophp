@@ -26,8 +26,6 @@ const (
 	Z_EXPECTED_PATH     = "a valid path"
 	Z_EXPECTED_OBJECT   = "object"
 	Z_EXPECTED_DOUBLE   = "float"
-
-	Z_EXPECTED_REFERENCE = "reference"
 )
 
 const ZPP_ERROR_OK = 0
@@ -533,9 +531,8 @@ func (p *FastParamParser) parseZvalEx2(checkNull bool, deref bool, separate bool
 
 // @see Micro: Z_PARAM_VARIADIC | Z_PARAM_VARIADIC_EX, Old: '+ and '*'
 func (p *FastParamParser) ParseVariadic(postVarargs uint) []types.Zval {
-	var args []types.Zval
-
 	numVarargs := len(p.args) - p.argIndex - int(postVarargs)
+	args := make([]types.Zval, 0, numVarargs)
 	for i := 0; i < numVarargs; i++ {
 		arg, ok := p.nextArg(false, false)
 		if !ok {
@@ -543,7 +540,6 @@ func (p *FastParamParser) ParseVariadic(postVarargs uint) []types.Zval {
 		}
 		args = append(args, arg)
 	}
-
 	return args
 }
 
@@ -592,9 +588,8 @@ func (p *FastParamParser) ParseRefArrayNullable() *types.Array {
 	}
 }
 func (p *FastParamParser) ParseRefVariadic(postVarargs uint) []types.RefZval {
-	var args []types.RefZval
-
 	numVarargs := len(p.args) - p.argIndex - int(postVarargs)
+	args := make([]types.RefZval, 0, numVarargs)
 	for i := 0; i < numVarargs; i++ {
 		ref := p.parseRefZval(false)
 		if ref == nil {
@@ -602,7 +597,6 @@ func (p *FastParamParser) ParseRefVariadic(postVarargs uint) []types.RefZval {
 		}
 		args = append(args, ref)
 	}
-
 	return args
 }
 
