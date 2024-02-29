@@ -52,7 +52,7 @@ func loadTests(path string) ([]string, error) {
 	if _, err := os.Stat(realpath); err != nil {
 		return nil, err
 	}
-	testFiles, err := tests.FindTestFiles(realpath, true)
+	testFiles, err := tests.FindTestFiles(realpath)
 	if err != nil {
 		return nil, err
 	}
@@ -72,12 +72,12 @@ func apiTestRunHandler(request *http.Request) (data any, err error) {
 
 	data = map[string]any{
 		// case
-		"case": testResult.Case,
+		"case": testResult.Case(),
 		// result
-		"status":  testResult.Type,
-		"output":  testResult.Output,
-		"reason":  testResult.Reason,
-		"useTime": testResult.UseTime.Nanoseconds(),
+		"status":  testResult.MainType(),
+		"output":  testResult.Output(),
+		"reason":  testResult.Info(),
+		"useTime": testResult.UseTime().Nanoseconds(),
 	}
 	return data, nil
 }

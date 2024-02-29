@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"compress/gzip"
 	"fmt"
 	"github.com/heyuuu/gophp/shim/slices"
 	"os"
@@ -114,6 +115,15 @@ func existKey[K comparable, V any](m map[K]V, key K) bool {
 	return exists
 }
 
+func existAnyKey[K comparable, V any](m map[K]V, keys ...K) bool {
+	for _, key := range keys {
+		if _, exists := m[key]; exists {
+			return true
+		}
+	}
+	return false
+}
+
 func existKeys[K comparable, V any](m map[K]V, keys ...K) int {
 	count := 0
 	for _, key := range keys {
@@ -140,4 +150,47 @@ func strpos(s string, substr string, offset int) int {
 
 func pregQuote(s string) string {
 	return regexp.QuoteMeta(s)
+}
+
+func addslashes(s string) string {
+	if s == "" {
+		return ""
+	}
+	replacer := strings.NewReplacer(
+		"\000", "\\0",
+		`'`, `\'`,
+		`"`, `\"`,
+		`\`, `\\`,
+	)
+	return replacer.Replace(s)
+}
+
+func gzencode(str string) (string, error) {
+	var buf strings.Builder
+
+	gz := gzip.NewWriter(&buf)
+	_, err := gz.Write([]byte(str))
+	if err != nil {
+		return "", err
+	}
+
+	err = gz.Close()
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
+func gzcompress(s string) (string, error) {
+	// todo
+	return s, nil
+}
+
+func pregMatch(rule string, s string) bool {
+	reg, err := regexp.Compile(rule)
+	if err != nil {
+		return false
+	}
+	return reg.MatchString(s)
 }

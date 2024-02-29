@@ -11,7 +11,11 @@ import (
 	"strings"
 )
 
-func EachTestFile(dir string, deep bool, handle func(file string) error) error {
+func EachTestFile(dir string, handler func(file string) error) error {
+	return EachTestFileEx(dir, false, handler)
+}
+
+func EachTestFileEx(dir string, cleanTmp bool, handler func(file string) error) error {
 	files, err := os.ReadDir(dir)
 	if err != nil {
 		return err
@@ -24,13 +28,12 @@ func EachTestFile(dir string, deep bool, handle func(file string) error) error {
 
 		path := filepath.Join(dir, file.Name())
 		if file.IsDir() {
-			if deep {
-				err = EachTestFile(path, deep, handle)
-			}
-		} else {
-			if strings.HasSuffix(path, ".phpt") {
-				err = handle(path)
-			}
+			err = EachTestFileEx(path, cleanTmp, handler)
+		} else if strings.HasSuffix(path, ".phpt") {
+			err = handler(path)
+		} else if cleanTmp && strings.HasSuffix(path, ".tmp") {
+			// 清理上次执行未清理的 .tmp 文件，忽略清理异常
+			_ = os.Remove(path)
 		}
 		if err != nil {
 			return err
@@ -39,9 +42,9 @@ func EachTestFile(dir string, deep bool, handle func(file string) error) error {
 	return nil
 }
 
-func FindTestFiles(dir string, deep bool) ([]string, error) {
+func FindTestFiles(dir string) ([]string, error) {
 	var files []string
-	err := EachTestFile(dir, deep, func(file string) error {
+	err := EachTestFile(dir, func(file string) error {
 		files = append(files, file)
 		return nil
 	})
@@ -74,14 +77,6 @@ func sortTestFiles(files []string, srcDir string) {
 	})
 }
 
-func ParseTestFile(name string, file string) (*TestCase, error) {
-	sections, err := parseTestFileSections(file)
-	if err != nil {
-		return nil, err
-	}
-	return NewTestCase(name, file, sections), nil
-}
-
 var allowSections = map[string]bool{
 	"EXPECT":               true,
 	"EXPECTF":              true,
@@ -101,17 +96,15 @@ var allowSections = map[string]bool{
 	"FILE":                 true,
 	"FILEEOF":              true,
 	"FILE_EXTERNAL":        true,
-	"REDIRECTTEST":         true,
 	"CAPTURE_STDIO":        true,
 	"STDIN":                true,
 	"CGI":                  true,
-	"PHPDBG":               true,
 	"INI":                  true,
 	"ENV":                  true,
 	"EXTENSIONS":           true,
 	"SKIPIF":               true,
 	"XFAIL":                true,
-	"XLEAK":                true,
+	//"XLEAK":true,
 	"CLEAN":                true,
 	"CREDITS":              true,
 	"DESCRIPTION":          true,
@@ -169,23 +162,25 @@ func parseTestFileSections(file string) (map[string]string, error) {
 	}
 
 	// check sections
-	if existKeys(sections, "PHPDBG") == 0 && existKeys(sections, "FILE", "FILEEOF", "FILE_EXTERNAL") != 1 {
+	if existKeys(sections, "FILE", "FILEEOF", "FILE_EXTERNAL") != 1 {
 		return nil, errors.New("missing section --FILE--")
 	}
-	if sections["FILEEOF"] != "" {
+	if existKey(sections, "FILEEOF") {
 		sections["FILE"] = strings.TrimRight(sections["FILEEOF"], "\r\n")
 		delete(sections, "FILEEOF")
 	}
 	for _, prefix := range []string{"FILE", "EXPECT", "EXPECTF", "EXPECTREGEX"} {
 		key := prefix + "_EXTERNAL"
-		if sections[key] != "" {
-			sections[key] = filepath.Join(filepath.Dir(file), strings.TrimSpace(strings.ReplaceAll(sections[key], "..", "")))
-			sections[prefix], err = fileGetContents(sections[key])
-			if err == nil {
-				delete(sections, key)
-			} else {
-				return nil, fmt.Errorf("could not load --%s-- %s", section, sections[key])
+		if existKey(sections, key) {
+			// don't allow tests to retrieve files from anywhere but this subdirectory
+			path := filepath.Join(filepath.Dir(file), strings.TrimSpace(strings.ReplaceAll(sections[key], "..", "")))
+			content, err := fileGetContents(path)
+			if err != nil {
+				return nil, fmt.Errorf("could not load --%s-- %s", key, path)
 			}
+
+			sections[prefix] = content
+			delete(sections, key)
 		}
 	}
 

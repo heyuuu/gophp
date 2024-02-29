@@ -15,3 +15,7 @@ gp-ui: gp-gen
 gophp-dev:
 	${GO} build -o ${BULIDPATH} ./cmd/gophp
 	${BULIDPATH}gophp -r "echo 123, 456, 'abc';"
+
+dump-all:
+	rm -rf ./log/dump
+	go run ./cmd/gophp-test > ./log/dump-all.log

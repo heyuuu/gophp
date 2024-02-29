@@ -30,11 +30,9 @@ var rawSupportSections = map[string]bool{
 	//"GET":                  true,
 	//"COOKIE":               true,
 	//"ARGS":                 true,
-	//"REDIRECTTEST":         true,
 	//"CAPTURE_STDIO":        true,
 	//"STDIN":                true,
 	//"CGI":                  true,
-	//"PHPDBG":               true,
 	"INI": true,
 	//"ENV":                  true,
 	//"EXTENSIONS":           true,
@@ -48,14 +46,15 @@ var rawSupportSections = map[string]bool{
 	//"WHITESPACE_SENSITIVE": true,
 }
 
-func RunTestFile(testIndex int, testName string, testFile string) (result *TestResult) {
+func RunTestFile(testIndex int, testName string, testFile string) (result *Result) {
 	// 解析测试文件(.phpt文件)
-	tc, err := ParseTestFile(testName, testFile)
+	tc := NewTestCase(testIndex, testFile, testName)
+	err := tc.parse()
 	if err != nil {
-		return NewTestResult(tc, BORK, "parse test case failed", 0)
+		return SimpleResult(tc, BORK, "parse test case failed", 0)
 	}
 
-	sections := tc.Sections
+	sections := tc.sections
 
 	// 限制目前支持的字段
 	var unsupportedSections []string
@@ -65,7 +64,7 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 		}
 	}
 	if len(unsupportedSections) > 0 {
-		return NewTestResult(tc, SKIP, "unsupported section: "+strings.Join(unsupportedSections, ", "), 0)
+		return SimpleResult(tc, SKIP, "unsupported section: "+strings.Join(unsupportedSections, ", "), 0)
 	}
 
 	// todo INI 段
@@ -82,10 +81,10 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 	if skipIfText, ok := sections["SKIPIF"]; ok {
 		output, err := runCodeBuiltin("", skipIfText, ini)
 		if err != nil {
-			return NewTestResult(tc, FAIL, "run SKIPIF code filed: "+err.Error(), 0)
+			return SimpleResult(tc, FAIL, "run SKIPIF code filed: "+err.Error(), 0)
 		}
 		if output != "" {
-			return NewTestResult(tc, SKIP, output, 0)
+			return SimpleResult(tc, SKIP, output, 0)
 		}
 	}
 
@@ -94,13 +93,13 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 	if fileText, ok := sections["FILE"]; ok {
 		code = fileText
 	} else {
-		return NewTestResult(tc, BORK, "no file section", 0)
+		return SimpleResult(tc, BORK, "no file section", 0)
 	}
 
 	mockFileName := strings.ReplaceAll(testFile, ".phpt", ".php")
 	output, err := runCodeBuiltin(mockFileName, code, ini)
 	if err != nil {
-		return NewTestResult(tc, FAIL, "run code failed: "+err.Error(), 0)
+		return SimpleResult(tc, FAIL, "run code failed: "+err.Error(), 0)
 	}
 	output = strings.ReplaceAll(output, "\r\n", "\n")
 
@@ -115,11 +114,11 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *TestR
 	}
 
 	if pass {
-		result = NewTestResult(tc, PASS, "", 0)
+		result = SimpleResult(tc, PASS, "", 0)
 	} else {
-		result = NewTestResult(tc, FAIL, reason, 0)
+		result = SimpleResult(tc, FAIL, reason, 0)
 	}
-	result.Output = output
+	result.output = output
 	return result
 }
 
@@ -246,22 +245,11 @@ func compareExpectRegex(output string, expect string) (equals bool, reason strin
 	return false, reason
 }
 
-func dumpFile(prefix string, name string, content string) {
-	path := "/Users/heyu/Code/local/php/try-php-0/dump/" + prefix + "-" + name + ".txt"
-	os.WriteFile(path, []byte(content), 0755)
-}
-
 func compareExpectRegexInternal(output string, expect string, prefix string) (equals bool, err error) {
-	dumpFile(prefix, "output", output)
-	dumpFile(prefix, "expect", expect)
-
 	if !utf8.ValidString(expect) {
 		expect = utf8SafeString(expect)
 		output = utf8SafeString(output)
 	}
-
-	dumpFile(prefix, "output-utf8safe", output)
-	dumpFile(prefix, "expect-utf8safe", expect)
 
 	rule, err := regexp.Compile(expect)
 	if err != nil {

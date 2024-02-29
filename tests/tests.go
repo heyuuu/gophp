@@ -6,79 +6,135 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 )
 
 func Run(conf Config) error {
-	return conf.run()
+	return new(runner).run(conf)
 }
 
-type Config struct {
-	SrcDir  string
-	Events  EventHandler
-	Limit   int
-	Workers int
-
-	PhpBin     string
-	PhpCgiBin  string
-	PhpDbgBin  string
-	TempSource string
-	TempTarget string
-
-	PassOption    string
-	IniOverwrites []IniEntry
-
-	ExtensionDir string
-
-	IsWin bool
+type runner struct {
+	conf       Config
+	testFiles  []string
+	logger     Logger
+	summary    *Summary
+	passOption string
+	env        *Env
 }
 
-func (c Config) run() (err error) {
-	testFiles, extSkipped, ignoreByExt, err := findTestFiles(c.SrcDir)
-	if err != nil {
-		return
+func (r *runner) run(conf Config) error {
+	r.init(conf)
+
+	r.testFiles = r.loadTestFiles(r.conf.SrcDir)
+	if limit := r.conf.Limit; limit > 0 && len(r.testFiles) > limit {
+		r.testFiles = r.testFiles[:limit]
 	}
 
-	if limit := c.Limit; limit > 0 && len(testFiles) > limit {
-		testFiles = testFiles[:limit]
-	}
+	// write information
+	// todo
 
-	testCount := len(testFiles)
-	c.Events.OnAllStart(time.Now(), testCount, extSkipped, ignoreByExt)
-	if c.Workers > 1 {
-		err = c.parallelRunTests(testFiles, c.Workers)
+	// run all tests
+	r.summary.StartTime = time.Now()
+	r.logger.OnAllStart(r.summary.StartTime, len(r.testFiles))
+
+	if r.conf.Workers > 1 {
+		r.parallelRunTests()
 	} else {
-		err = c.simpleRunTests(testFiles)
-	}
-	if err != nil {
-		return err
+		r.runTests()
 	}
 
-	c.Events.OnAllEnd(time.Now())
+	r.summary.EndTime = time.Now()
+	r.logger.OnAllEnd(r.summary.EndTime, r.summary)
+
 	return nil
 }
 
-func (c Config) simpleRunTests(testFiles []string) error {
-	for i, file := range testFiles {
-		if _, err := c.runTest(i, file); err != nil {
-			return err
+func (r *runner) init(conf Config) {
+	r.conf = conf
+	r.summary = NewSummary()
+	r.logger = NewDumpLogger(conf.DumpRoot)
+
+	// init env
+	r.env = NewEnv() // $_ENV ?: getenv()
+	r.env.Set("TEMP", os.TempDir())
+
+	// init conf
+	r.passOption = ""
+	if conf.PassOptionN {
+		r.passOption += " -n"
+	}
+	if conf.PassOptionE {
+		r.passOption += " -e"
+	}
+	if conf.ConfPassed != "" {
+		r.passOption += " -c'" + conf.ConfPassed + "'"
+	}
+	if conf.Quite {
+		r.env.Set("NO_INTERACTION", "1")
+	}
+	if conf.TestTimeout != "" {
+		r.env.Set("TEST_TIMEOUT", conf.TestTimeout)
+	}
+	if conf.X {
+		r.env.Set("SKIP_SLOW_TESTS", "1")
+	}
+	if conf.Offline {
+		r.env.Set("SKIP_ONLINE_TESTS", "1")
+	}
+	if conf.Asan {
+		r.env.Set("USE_ZEND_ALLOC", "0")
+		r.env.Set("USE_TRACKED_ALLOC", "1")
+		r.env.Set("SKIP_ASAN", "1")
+		r.env.Set("SKIP_PERF_SENSITIVE", "1")
+
+		lsanSuppressions := filepath.Join(r.conf.SrcDir, "/azure/lsan-suppressions.txt")
+		if fileExists(lsanSuppressions) {
+			r.env.Set("LSAN_OPTIONS", "suppressions="+lsanSuppressions+":print_suppressions=0")
 		}
 	}
-	return nil
+
+	// verify config
+	if conf.PhpBin == "" || !fileExists(conf.PhpBin) {
+		panic(errors.New("Config.PhpBin must be set to specify PHP executable"))
+	}
 }
 
-func (c Config) parallelRunTests(testFiles []string, limit int) (err error) {
-	if limit <= 1 {
-		return errors.New("parallelRunTests 的并发数 limit 必须大于 1")
+func (r *runner) loadTestFiles(srcDir string) []string {
+	var testFiles []string
+	var dirs = []string{"Zend", "tests", "sapi"}
+	for _, dir := range dirs {
+		realDir := filepath.Join(srcDir, dir)
+		_ = EachTestFileEx(realDir, true, func(file string) error {
+			testFiles = append(testFiles, file)
+			return nil
+		})
 	}
+
+	sortTestFiles(testFiles, srcDir)
+
+	return testFiles
+}
+
+func (r *runner) runTests() {
+	for i, file := range r.testFiles {
+		testIndex := i + 1
+		r.runTest(testIndex, file)
+	}
+}
+
+func (r *runner) parallelRunTests() {
+	testFiles := r.testFiles
+	workers := r.conf.Workers
 
 	var wg sync.WaitGroup
 	wg.Add(len(testFiles))
 
 	// 用于限制并发数
-	var limitChan = make(chan struct{}, limit)
+	var limitChan = make(chan struct{}, workers)
 	defer close(limitChan)
 
 	// 遍历任务
@@ -93,83 +149,428 @@ func (c Config) parallelRunTests(testFiles []string, limit int) (err error) {
 				<-limitChan
 			}()
 
-			c.runTest(index, file)
-		}(i, testFile)
+			r.runTest(index, file)
+		}(i+1, testFile)
 	}
 
 	wg.Wait()
-
-	return nil
 }
 
-func (c Config) runTest(testIndex int, testFile string) (*TestResult, error) {
-	testName := testFile
-	if strings.HasPrefix(testFile, c.SrcDir+"/") {
-		testName = testFile[len(c.SrcDir)+1:]
+func (r *runner) runTest(testIndex int, testFile string) *Result {
+	shortFileName := testFile
+	if strings.HasPrefix(testFile, r.conf.SrcDir+"/") {
+		shortFileName = testFile[len(r.conf.SrcDir)+1:]
 	}
 
-	tc, err := ParseTestFile(testName, testFile)
+	tc := NewTestCase(testIndex, testFile, shortFileName)
+
+	fmt.Printf("RUN: %d %s\n", testIndex, shortFileName)
+	r.logger.OnTestStart(tc)
+	r.cleanTempFiles(tc, true)
+	result := r.runTestReal(tc)
+	r.cleanTempFiles(tc, false)
+	if r.conf.SlowMinTime > 0 && r.conf.SlowMinTime < result.useTime {
+		result.slow = true
+	}
+
+	r.showResult(tc, result)
+	r.logger.OnTestEnd(tc)
+
+	r.summary.AddResult(tc, result)
+
+	return result
+}
+
+func (r *runner) runTestReal(tc *TestCase) *Result {
+	if r.conf.Verbose {
+		r.logger.Logf(tc, "\n=================\nTEST %s\n", tc.file)
+	}
+
+	// Load the sections of the test file.
+	err := tc.parse()
 	if err != nil {
-		c.Events.Log(testIndex, "parse test case error: "+err.Error())
-		c.Events.OnTestEnd(testIndex, tc, nil)
-		return nil, fmt.Errorf("Parse test case file failed: file=%s, err=%w", testFile, err)
+		return SimpleResult(tc, BORK, err.Error(), 0)
+	}
+	sections := tc.sections
+
+	r.logger.Logf(tc, "TEST %d/%d [%s]\n", tc.index, len(r.testFiles), tc.shortFileName)
+
+	// stdio
+	var captureStdIn, captureStdOut, captureStdErr bool
+	if existKey(sections, "CAPTURE_STDIO") {
+		captureStdioText := strings.ToUpper(sections["CAPTURE_STDIO"])
+		captureStdIn = strings.Contains(captureStdioText, "STDIN")
+		captureStdOut = strings.Contains(captureStdioText, "STDOUT")
+		captureStdErr = strings.Contains(captureStdioText, "STDERR")
+	} else {
+		captureStdIn, captureStdOut, captureStdErr = true, true, true
+	}
+	_ = captureStdIn
+	var cmdRedirect string
+	if captureStdOut && captureStdErr {
+		cmdRedirect = "2>&1"
 	}
 
-	c.Events.OnTestStart(testIndex, tc)
-	//result, runErr := c.runTestReal(testIndex, tc)
-	result, runErr := c.runTestRealRaw(testIndex, tc)
-	c.Events.OnTestEnd(testIndex, tc, result)
+	/* For GET/POST/PUT tests, check if cgi sapi is available and if it is, use it. */
+	useCgi := existAnyKey(sections, "CGI", "GET", "POST", "GZIP_POST", "DEFLATE_POST", "POST_RAW", "PUT", "COOKIE", "EXPECTHEADERS")
 
-	return result, runErr
-}
+	var execCmd *command
 
-func (c Config) runTestReal(testIndex int, tc *TestCase) (*TestResult, error) {
-	rawResult, err := runPhpScript(tc.File)
-	if err != nil {
-		c.Events.Log(testIndex, "run php script error: "+err.Error())
-		return nil, err
-	}
-
-	c.Events.Log(testIndex, strings.TrimSpace(rawResult.Output))
-
-	result := &TestResult{
-		Case:    tc,
-		Type:    rawResult.Type,
-		Reason:  rawResult.Reason,
-		UseTime: time.Duration(rawResult.UseTime),
-	}
-
-	return result, nil
-}
-
-func findTestFiles(dir string) (files []string, extSkipped int, ignoreByExt int, err error) {
-	// main tests
-	for _, subDir := range []string{"Zend", "tests", "sapi"} {
-		err = EachTestFile(filepath.Join(dir, subDir), true, func(file string) error {
-			files = append(files, file)
-			return nil
-		})
-		if err != nil {
-			return
+	bin := r.conf.PhpBin
+	if useCgi {
+		if r.conf.PhpCgiBin == "" {
+			return SimpleResult(tc, SKIP, "reason: CGI not available", 0)
 		}
-	}
-	sortTestFiles(files, dir)
+		bin = r.conf.PhpCgiBin + " -C "
 
-	// ext tests
-	extRoot := filepath.Join(dir, "ext")
-	exts, err := os.ReadDir(extRoot)
-	for _, ext := range exts {
-		if ext.IsDir() {
-			extSkipped++
-			err = EachTestFile(filepath.Join(extRoot, ext.Name()), true, func(file string) error {
-				ignoreByExt++
-				return nil
-			})
-			if err != nil {
-				return
+		execCmd = newCommand(r.conf.PhpCgiBin).arg("-C")
+	} else {
+		execCmd = newCommand(r.conf.PhpBin)
+	}
+
+	// Reset environment from any previous test.
+	env := r.env.Clone()
+	env.Set("REDIRECT_STATUS", "")
+	env.Set("QUERY_STRING", "")
+	env.Set("PATH_TRANSLATED", "")
+	env.Set("SCRIPT_FILENAME", "")
+	env.Set("REQUEST_METHOD", "")
+	env.Set("CONTENT_TYPE", "")
+	env.Set("CONTENT_LENGTH", "")
+	env.Set("TZ", "")
+
+	if envText := sections["ENV"]; envText != "" {
+		for _, envLine := range strings.Split(envText, "\n") {
+			if envKey, envValue, ok := strings.Cut(envLine, "="); ok && envKey != "" {
+				env.Set(envKey, envValue)
 			}
 		}
 	}
 
-	return
+	// ini settings
+	var iniSettings = NewIniSettings()
+	if extText := strings.TrimSpace(sections["EXTENSIONS"]); extText != "" {
+		for _, ext := range strings.Split(extText, "\n") {
+			ext = strings.TrimSpace(ext)
+			if ext == "opcache" {
+				iniSettings.Add("zend_extension", filepath.Join(r.conf.ExtDir, ext+".so"))
+			} else {
+				iniSettings.Add("extension", filepath.Join(r.conf.ExtDir, ext+".so"))
+			}
+		}
+	}
+	iniSettings.Merge(r.conf.IniOverwrites)
+	origIniSettingsParam := iniSettings.ToParams()
+
+	// Any special ini settings
+	// these may overwrite the test defaults...
+	if iniText := sections["INI"]; iniText != "" {
+		iniText = strings.NewReplacer(
+			"{PWD}", filepath.Dir(tc.file),
+			"{TMP}", os.TempDir(),
+		).Replace(iniText)
+		iniSettings.Merge(strings.Split(iniText, "\n"))
+	}
+	iniSettingsParam := iniSettings.ToParams()
+
+	env.Set("TEST_PHP_EXTRA_ARGS", r.passOption+" "+iniSettingsParam)
+
+	// Check if test should be skipped.
+	if skipifText := sections["SKIPIF"]; strings.TrimSpace(skipifText) != "" {
+		r.showFileBlock(tc, blockSkip, skipifText)
+		r.saveText(tc, tc.testSkipif, skipifText)
+		extra := "unset REQUEST_METHOD; unset QUERY_STRING; unset PATH_TRANSLATED; unset SCRIPT_FILENAME; unset REQUEST_METHOD;"
+		output := r.systemWithTimeout(extra, bin, r.passOption, "-q", "") // todo
+		if len(output) >= 4 && strings.ToLower(output[:4]) == "skip" {
+			reason := ""
+			if match := regexp.MustCompile(`^\s*skip\s*(.+)\s*`).FindStringSubmatch(output); match != nil {
+				reason = "reason: " + match[1]
+			}
+			return SimpleResult(tc, SKIP, reason, 0)
+		}
+		// todo
+	}
+
+	if existAnyKey(sections, "GZIP_POST", "DEFLATE_POST") {
+		return SimpleResult(tc, SKIP, "reason: ext/zlib required", 0)
+	}
+
+	// We've satisfied the preconditions - run the test!
+	var testFile, queryString string
+	if existKey(sections, "FILE") {
+		testFile = tc.testFile
+		r.showFileBlock(tc, blockTest, sections["FILE"])
+		r.saveText(tc, testFile, sections["FILE"])
+	}
+	queryString = strings.TrimSpace(sections["GET"])
+
+	// env
+	env.Set("REDIRECT_STATUS", "1")
+	if env.Get("QUERY_STRING") == "" {
+		env.Set("QUERY_STRING", queryString)
+	}
+	if env.Get("PATH_TRANSLATED") == "" {
+		env.Set("PATH_TRANSLATED", testFile)
+	}
+	if env.Get("SCRIPT_FILENAME") == "" {
+		env.Set("SCRIPT_FILENAME", testFile)
+	}
+	env.Set("HTTP_COOKIE", strings.TrimSpace(sections["COOKIE"]))
+
+	// args
+	var args string
+	if existKey(sections, "ARGS") {
+		args = " -- " + sections["ARGS"]
+	}
+
+	// body
+	if request, ok := r.tryBuildRequestContent(sections, env); ok {
+		r.saveText(tc, tc.testPost, request)
+		execCmd.arg(r.passOption, iniSettingsParam, "-f").wrapArg(testFile).arg(cmdRedirect, "<").wrapArg(tc.testPost)
+	} else {
+		execCmd.arg(r.passOption, iniSettingsParam, "-f").wrapArg(testFile).arg(args, cmdRedirect)
+	}
+
+	// show before test exec
+	if r.conf.Verbose {
+		r.logger.Logf(tc, "\nCONTENT_LENGTH  = %s", env.Get("CONTENT_LENGTH"))
+		r.logger.Logf(tc, "\nCONTENT_TYPE    = %s", env.Get("CONTENT_TYPE"))
+		r.logger.Logf(tc, "\nPATH_TRANSLATED = %s", env.Get("PATH_TRANSLATED"))
+		r.logger.Logf(tc, "\nQUERY_STRING    = %s", env.Get("QUERY_STRING"))
+		r.logger.Logf(tc, "\nREDIRECT_STATUS = %s", env.Get("REDIRECT_STATUS"))
+		r.logger.Logf(tc, "\nREQUEST_METHOD  = %s", env.Get("REQUEST_METHOD"))
+		r.logger.Logf(tc, "\nSCRIPT_FILENAME = %s", env.Get("SCRIPT_FILENAME"))
+		r.logger.Logf(tc, "\nHTTP_COOKIE     = %s", env.Get("HTTP_COOKIE"))
+		r.logger.Logf(tc, "\nCOMMAND %s\n", execCmd.String())
+	}
+
+	startTime := time.Now()
+	output := r.runCommand(execCmd)
+	endTime := time.Now()
+	useTime := endTime.Sub(startTime)
+
+	if !r.conf.NoClean || r.conf.KeepCfg["clean"] {
+		if cleanText := strings.TrimSpace(sections["CLEAN"]); cleanText != "" {
+			r.showFileBlock(tc, blockClean, cleanText)
+			r.saveText(tc, tc.testClean, cleanText)
+
+			if !r.conf.NoClean {
+				extra := "unset REQUEST_METHOD; unset QUERY_STRING; unset PATH_TRANSLATED; unset SCRIPT_FILENAME; unset REQUEST_METHOD;"
+				r.systemWithTimeout(extra, bin, r.passOption, "-q", origIniSettingsParam, noFileCache, tc.testClean)
+			}
+		}
+	}
+
+	// Does the output match what is expected?
+	output = strings.ReplaceAll(strings.TrimSpace(output), "\r\n", "\n")
+
+	/* when using CGI, strip the headers from the output */
+	var headers = map[string]string{}
+	if useCgi {
+		if match := regexp.MustCompile(`^(.*?)\r?\n\r?\n(.*)`).FindStringSubmatch(output); match != nil {
+			output = strings.TrimSpace(match[2])
+			rh := strings.Split(match[1], "\n")
+
+			for _, line := range rh {
+				if name, value, ok := strings.Cut(line, ":"); ok {
+					headers[name] = value
+				}
+			}
+		}
+	}
+
+	var failedHeaders = false
+	var wantedHeaders, outputHeaders []string
+	if existKey(sections, "EXPECTHEADERS") {
+		var want = map[string]string{}
+		for _, line := range strings.Split(sections["EXPECTHEADERS"], "\n") {
+			if key, value, ok := strings.Cut(line, ":"); ok {
+				key, value = strings.TrimSpace(key), strings.TrimSpace(value)
+				want[key] = value
+				// wanted header
+				wantedHeaders = append(wantedHeaders, key+": "+value)
+				// output header
+				if existKey(headers, key) {
+					outputHeaders = append(outputHeaders, key+": "+headers[key])
+				}
+				if !existKey(headers, key) || headers[key] != value {
+					failedHeaders = true
+				}
+			}
+		}
+	}
+
+	r.showFileBlock(tc, blockOut, output)
+
+	var wanted, wantedReg, info string
+	var passed, warn bool
+	if existAnyKey(sections, "EXPECTF", "EXPECTREGEX") {
+		if existKey(sections, "EXPECTF") {
+			wanted = strings.TrimSpace(sections["EXPECTF"])
+		} else {
+			wanted = strings.TrimSpace(sections["EXPECTREGEX"])
+		}
+
+		r.showFileBlock(tc, blockExp, wanted)
+		wantedReg = strings.ReplaceAll(wanted, "\r\n", "\n")
+
+		if existKey(sections, "EXPECTF") {
+			// todo
+		}
+
+		passed = pregMatch(wantedReg, output)
+	} else {
+		wanted = strings.TrimSpace(sections["EXPECT"])
+		wanted = strings.ReplaceAll(wanted, "\r\n", "\n")
+		r.showFileBlock(tc, blockExp, wanted)
+
+		passed = output == wanted
+	}
+	if passed && !failedHeaders {
+		if existKey(sections, "XFAIL") {
+			warn = true
+			info = " (warn: XFAIL section but test passes)"
+		} else {
+			return SimpleResult(tc, PASS, "", useTime)
+		}
+	}
+
+	// Test failed so we need to report details.
+	if failedHeaders {
+		passed = false
+		wanted = strings.Join(wantedHeaders, "\n") + "\n--HEADERS--\n" + wanted
+		output = strings.Join(outputHeaders, "\n") + "\n--HEADERS--\n" + output
+
+		if wantedReg != "" {
+			wantedReg = pregQuote(strings.Join(wantedHeaders, "\n")+"\n--HEADERS--\n") + wantedReg
+		}
+	}
+
+	// result types
+	var resultTypes []ResultType
+	if warn {
+		resultTypes = append(resultTypes, WARN)
+	}
+	if !passed {
+		if existKey(sections, "XFAIL") {
+			resultTypes = append(resultTypes, XFAIL)
+			info = "  XFAIL REASON: " + strings.TrimSpace(sections["XFAIL"])
+		} else {
+			resultTypes = append(resultTypes, FAIL)
+		}
+	}
+	if !passed {
+		diff := generateDiff(wanted, wantedReg, output)
+		r.showFileBlock(tc, blockDiff, diff)
+	}
+
+	return ComplexResult(tc, resultTypes, info, 0)
+}
+
+func (r *runner) showFileBlock(tc *TestCase, typ string, block string) {
+	show := r.conf.ShowCfg[blockAll] || r.conf.ShowCfg[typ]
+	if show {
+		r.logger.Logf(tc, "\n========%s========\n%s\n========DONE========\n", typ, strings.TrimSpace(block))
+	}
+}
+
+func (r *runner) showResult(tc *TestCase, result *Result) {
+	r.logger.Logf(tc, "%s %s %s\n", result.ShowTypeNames(), tc.ShowName(), result.info)
+}
+
+func (r *runner) cleanTempFiles(tc *TestCase, force bool) {
+	if force || !r.conf.KeepCfg["php"] {
+		_ = unlink(tc.testFile)
+	}
+	if force || !r.conf.KeepCfg["skip"] {
+		_ = unlink(tc.testSkipif)
+	}
+	_ = unlink(tc.testClean)
+	_ = unlink(tc.testPost)
+}
+
+func (r *runner) saveText(tc *TestCase, file string, content string) {
+	err := filePutContents(file, content)
+	if err != nil {
+		panic(fmt.Errorf("cannot open file '%s' (save_text): %w", file, err))
+	}
+}
+
+func (r *runner) runCommand(cmd *command) string {
+	return ""
+}
+
+func (r *runner) systemWithTimeout(cmd ...string) string {
+	return ""
+}
+
+func (r *runner) tryBuildRequestContent(sectionText map[string]string, env *Env) (request string, ok bool) {
+	if postRawText := sectionText["POST_RAW"]; postRawText != "" {
+		request = r.buildBody(postRawText, env)
+
+		env.Set("CONTENT_LENGTH", strconv.Itoa(len(request)))
+		env.Set("REQUEST_METHOD", "POST")
+
+		return request, true
+	} else if putText := sectionText["PUT"]; putText != "" {
+		request = r.buildBody(postRawText, env)
+
+		env.Set("CONTENT_LENGTH", strconv.Itoa(len(request)))
+		env.Set("REQUEST_METHOD", "PUT")
+
+		return request, true
+	} else if postText := sectionText["POST"]; postText != "" {
+		request := strings.TrimSpace(postText)
+
+		env.Set("REQUEST_METHOD", "POST")
+		env.SetIfEmpty("CONTENT_TYPE", "application/x-www-form-urlencoded")
+		env.SetIfEmpty("CONTENT_LENGTH", strconv.Itoa(len(request)))
+
+		return request, true
+	} else if gzipPostText := sectionText["GZIP_POST"]; gzipPostText != "" {
+		request, _ := gzencode(strings.TrimSpace(gzipPostText))
+
+		env.Set("REQUEST_METHOD", "POST")
+		env.Set("CONTENT_TYPE", "application/x-www-form-urlencoded")
+		env.Set("CONTENT_LENGTH", strconv.Itoa(len(request)))
+		env.Set("HTTP_CONTENT_ENCODING", "gzip")
+
+		return request, true
+	} else if deflatePostText := sectionText["DEFLATE_POST"]; deflatePostText != "" {
+		request, _ := gzcompress(strings.TrimSpace(deflatePostText))
+
+		env.Set("REQUEST_METHOD", "POST")
+		env.Set("CONTENT_TYPE", "application/x-www-form-urlencoded")
+		env.Set("CONTENT_LENGTH", strconv.Itoa(len(request)))
+		env.Set("HTTP_CONTENT_ENCODING", "deflate")
+
+		return request, true
+	} else {
+		env.Set("REQUEST_METHOD", "GET")
+		env.Set("CONTENT_TYPE", "")
+		env.Set("CONTENT_LENGTH", "")
+
+		return "", false
+	}
+}
+
+func (r *runner) buildBody(text string, env *Env) string {
+	rawLines := strings.Split(strings.TrimSpace(text), "\n")
+
+	var buf strings.Builder
+	buf.Grow(len(text))
+	for _, line := range rawLines {
+		line = strings.TrimSpace(line)
+		if env.Get("CONTENT_TYPE") == "" && strings.HasPrefix(line, "Content-Type:") {
+			env.Set("CONTENT_TYPE", strings.TrimSpace(line[len("Content-Type:"):]))
+			continue
+		}
+
+		if buf.Len() > 0 {
+			buf.WriteByte('\n')
+		}
+		buf.WriteString(line)
+	}
+
+	return buf.String()
 }

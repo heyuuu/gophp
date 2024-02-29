@@ -1,104 +1,32 @@
 package tests
 
-import (
-	"context"
-	"encoding/base64"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"os/exec"
-	"strings"
-	"time"
-)
+import "strings"
 
-type scriptArgs struct {
-	TestFile string `json:"test_file"`
+type command struct {
+	bin  string
+	args []string
 }
 
-type scriptResponse struct {
-	Ok    bool         `json:"ok"`
-	Error string       `json:"error"`
-	Data  scriptResult `json:"data"`
+func newCommand(bin string) *command {
+	return &command{bin: bin}
 }
 
-type scriptResult struct {
-	Type     ResultType `json:"type"`
-	TestName string     `json:"testName"`
-	Reason   string     `json:"reason"`
-	UseTime  int        `json:"useTime"`
-	Output   string     `json:"output"`
+func (c *command) String() string {
+	return c.bin + " " + strings.Join(c.args, " ")
 }
 
-const phpBin = "/opt/homebrew/bin/php"
-const scriptPath = "/Users/heyu/Code/sik/php-tests/script.php"
-
-func runPhpScript(testFile string) (*scriptResult, error) {
-	args := scriptArgs{
-		TestFile: testFile,
-	}
-	argsJson, err := encodeScriptArgs(args)
-	if err != nil {
-		return nil, err
-	}
-
-	// 超时控制
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	cmd := exec.CommandContext(ctx, phpBin, scriptPath, argsJson)
-	//log.Println("Run Cmd: " + cmd.String())
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return nil, err
-	}
-	//log.Println("Run Cmd Result: " + string(output))
-
-	result, err := decodeScriptOutput(output)
-	if err != nil {
-		return nil, err
-	}
-
-	// 校验 type
-	if !ValidResultType(result.Type) {
-		return nil, fmt.Errorf(`unexpected type value: "%s"`, result.Type)
-	}
-
-	// 校验 output
-	if strings.HasPrefix(result.Output, "base64:") {
-		result.Output, err = base64Decode(result.Output[len("base64:"):])
-		if err != nil {
-			return nil, err
+func (c *command) arg(args ...string) *command {
+	for _, arg := range args {
+		arg = strings.TrimSpace(arg)
+		if arg == "" {
+			continue
 		}
+		c.args = append(c.args, arg)
 	}
-
-	return result, nil
+	return c
 }
 
-func encodeScriptArgs(v scriptArgs) (string, error) {
-	data, err := json.Marshal(v)
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
-}
-
-func decodeScriptOutput(output []byte) (*scriptResult, error) {
-	var response scriptResponse
-	err := json.Unmarshal(output, &response)
-	if err != nil {
-		return nil, err
-	}
-	if response.Ok {
-		return &response.Data, nil
-	} else {
-		return nil, errors.New(response.Error)
-	}
-}
-
-func base64Decode(output string) (string, error) {
-	data, err := base64.StdEncoding.DecodeString(output)
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
+func (c *command) wrapArg(arg string) *command {
+	c.args = append(c.args, `"`+arg+`"`)
+	return c
 }

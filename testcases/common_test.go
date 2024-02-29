@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/heyuuu/gophp/tests"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -15,7 +14,7 @@ func init() {
 }
 
 func runTestCaseInDir(t *testing.T, dir string) {
-	files, _ := tests.FindTestFiles(dir, true)
+	files, _ := tests.FindTestFiles(dir)
 	for _, file := range files {
 		name := file
 		if strings.HasPrefix(name, pwd) {
@@ -27,11 +26,6 @@ func runTestCaseInDir(t *testing.T, dir string) {
 	}
 }
 
-func runTestCase(t *testing.T, testName string) {
-	testFile := filepath.Join(pwd, testName)
-	runTestCaseReal(t, testName, testFile)
-}
-
 func runTestCaseReal(t *testing.T, testName string, testFile string) {
 	defer func() {
 		if e := recover(); e != nil {
@@ -40,12 +34,12 @@ func runTestCaseReal(t *testing.T, testName string, testFile string) {
 	}()
 
 	result := tests.RunTestFile(0, testName, testFile)
-	switch result.Type {
+	switch result.MainType() {
 	case tests.PASS:
 		// pass
 	case tests.SKIP:
 		t.SkipNow()
 	default:
-		t.Errorf("runTestCase() fail = %s", result.Reason)
+		t.Errorf("runTestCase() fail = %s", result.Info())
 	}
 }
