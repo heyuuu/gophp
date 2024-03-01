@@ -1,7 +1,7 @@
 package php
 
 import (
-	"github.com/heyuuu/gophp/shim/maps"
+	"github.com/heyuuu/gophp/kits/mapkit"
 	"reflect"
 	"sort"
 	"testing"
@@ -56,7 +56,7 @@ func diffOptsParserResult(t *testing.T, result map[string][]string, want map[str
 	for key := range want {
 		keySet[key] = true
 	}
-	keys := maps.Keys(keySet)
+	keys := mapkit.Keys(keySet)
 	sort.Strings(keys)
 
 	// echo key

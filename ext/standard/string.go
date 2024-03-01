@@ -534,8 +534,8 @@ func ZifExplode(ctx *php.Context, separator string, str string, _ zpp.Opt, limit
 		arr = strings.Split(str, separator)
 	} else if *limit >= 0 {
 		// doc: If the limit parameter is zero, then this is treated as 1.
-		limitVal := lang.Max(*limit, 1)
-		limitVal = lang.Min(limitVal, strings.Count(str, separator)+1)
+		limitVal := max(*limit, 1)
+		limitVal = min(limitVal, strings.Count(str, separator)+1)
 		arr = strings.SplitN(str, separator, limitVal)
 	} else {
 		limitVal := *limit // limitVal < 0
@@ -1234,7 +1234,7 @@ func ZifUcwords(ctx *php.Context, str string, _ zpp.Opt, delimiters *string) str
 }
 
 func Strtr(str string, from string, to string) string {
-	l := lang.Min(len(from), len(to))
+	l := min(len(from), len(to))
 	if l == 0 {
 		return str
 	}
@@ -1277,8 +1277,8 @@ func phpStrtrArray(ctx *php.Context, str string, pats *types.Array) (string, boo
 			return
 		}
 
-		maxLen = lang.Max(maxLen, len(strKey))
-		minLen = lang.Min(minLen, len(strKey))
+		maxLen = max(maxLen, len(strKey))
+		minLen = min(minLen, len(strKey))
 
 		/* remember possible key length */
 		lenExists[len(strKey)] = struct{}{}
@@ -1299,7 +1299,7 @@ func phpStrtrArray(ctx *php.Context, str string, pats *types.Array) (string, boo
 			continue
 		}
 
-		for l := lang.Min(maxLen, len(str)-pos); l >= minLen; l-- {
+		for l := min(maxLen, len(str)-pos); l >= minLen; l-- {
 			if _, exists := lenExists[l]; !exists {
 				continue
 			}

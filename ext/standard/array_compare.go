@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"cmp"
 	"fmt"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/kits/cmpkit"
@@ -10,7 +11,6 @@ import (
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
-	"github.com/heyuuu/gophp/shim/cmp"
 	"sort"
 	"strconv"
 	"strings"

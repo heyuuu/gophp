@@ -1,13 +1,13 @@
 package php
 
 import (
+	"cmp"
 	"fmt"
 	"github.com/heyuuu/gophp/kits/mathkit"
 	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/shim/cmp"
 	"math"
 	"strconv"
 	"strings"
@@ -901,7 +901,7 @@ func OpBitwiseAnd(ctx *Context, op1, op2 types.Zval) types.Zval {
 	op2 = op2.DeRef()
 	if op1.IsString() && op2.IsString() {
 		s1, s2 := op1.String(), op2.String()
-		str := make([]byte, lang.Min(len(s1), len(s2)))
+		str := make([]byte, min(len(s1), len(s2)))
 		for i := range str {
 			str[i] = s1[i] & s2[i]
 		}
@@ -924,7 +924,7 @@ func OpBitwiseOr(ctx *Context, op1, op2 types.Zval) types.Zval {
 	// common
 	if op1.IsString() && op2.IsString() {
 		s1, s2 := op1.String(), op2.String()
-		str := make([]byte, lang.Min(len(s1), len(s2)))
+		str := make([]byte, min(len(s1), len(s2)))
 		for i := range str {
 			str[i] = s1[i] | s2[i]
 		}
@@ -947,7 +947,7 @@ func OpBitwiseXor(ctx *Context, op1, op2 types.Zval) types.Zval {
 	op2 = op2.DeRef()
 	if op1.IsString() && op2.IsString() {
 		s1, s2 := op1.String(), op2.String()
-		str := make([]byte, lang.Min(len(s1), len(s2)))
+		str := make([]byte, min(len(s1), len(s2)))
 		for i := range str {
 			str[i] = s1[i] & s2[i]
 		}

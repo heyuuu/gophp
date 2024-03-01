@@ -1,9 +1,9 @@
 package tests
 
 import (
+	"cmp"
 	"fmt"
-	"github.com/heyuuu/gophp/shim/cmp"
-	"github.com/heyuuu/gophp/shim/slices"
+	"slices"
 	"strings"
 	"time"
 )

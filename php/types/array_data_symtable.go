@@ -2,8 +2,8 @@ package types
 
 import (
 	"github.com/heyuuu/gophp/php/assert"
-	"github.com/heyuuu/gophp/shim/maps"
-	"github.com/heyuuu/gophp/shim/slices"
+	"maps"
+	"slices"
 )
 
 // symtablePair

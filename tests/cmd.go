@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/heyuuu/gophp/shim/slices"
+	"slices"
 	"strings"
 )
 

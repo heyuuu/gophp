@@ -1,7 +1,7 @@
 package slicekit
 
 import (
-	"github.com/heyuuu/gophp/shim/slices"
+	"slices"
 )
 
 func Map[T any, R any](slice []T, mapper func(T) R) []R {

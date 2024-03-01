@@ -1,10 +1,11 @@
 package streams
 
 import (
+	"github.com/heyuuu/gophp/kits/mapkit"
 	"github.com/heyuuu/gophp/php"
 	"github.com/heyuuu/gophp/php/assert"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/shim/maps"
+	"maps"
 )
 
 var (
@@ -93,9 +94,9 @@ func (g *StreamGlobals) XportGet(protocol string) TransportFactory {
 // wrappers
 func (g *StreamGlobals) WrapperNames() []string {
 	if g.volatileWrappers != nil {
-		return maps.Keys(g.volatileWrappers)
+		return mapkit.Keys(g.volatileWrappers)
 	} else {
-		return maps.Keys(g.shared.wrappers)
+		return mapkit.Keys(g.shared.wrappers)
 	}
 }
 
@@ -160,9 +161,9 @@ func (g *StreamGlobals) WrapperRestore(protocol string) (existed bool, hasChange
 // filters
 func (g *StreamGlobals) FilterNames() []string {
 	if g.volatileFilters != nil {
-		return maps.Keys(g.volatileFilters)
+		return mapkit.Keys(g.volatileFilters)
 	} else {
-		return maps.Keys(g.shared.filters)
+		return mapkit.Keys(g.shared.filters)
 	}
 }
 

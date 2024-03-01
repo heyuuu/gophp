@@ -1,8 +1,8 @@
 package standard
 
 import (
+	"cmp"
 	"github.com/heyuuu/gophp/kits/ascii"
-	"github.com/heyuuu/gophp/shim/cmp"
 )
 
 func compareRight(a, b string) (result int, leftA string, leftB string) {

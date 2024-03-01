@@ -1,6 +1,6 @@
 package types
 
-import "github.com/heyuuu/gophp/shim/slices"
+import "slices"
 
 // ArrayData
 type ArrayData interface {

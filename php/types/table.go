@@ -1,8 +1,8 @@
 package types
 
 import (
-	"github.com/heyuuu/gophp/shim/maps"
-	"github.com/heyuuu/gophp/shim/slices"
+	"maps"
+	"slices"
 )
 
 /**

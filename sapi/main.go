@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/php"
 	_ "github.com/heyuuu/gophp/php/boot"
 	"github.com/heyuuu/gophp/php/lang"
-	"github.com/heyuuu/gophp/shim/slices"
+	"slices"
 )
 
 const usage = `Usage: php [options] [-f] <file> [--] [args...]

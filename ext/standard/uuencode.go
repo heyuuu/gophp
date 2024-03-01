@@ -2,7 +2,6 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/php"
-	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"strings"
 )
@@ -30,7 +29,7 @@ func uuencode(src string) string {
 				buf.WriteByte('\n')
 			}
 			// line length
-			length := lang.Min(45, srcLen-i)
+			length := min(45, srcLen-i)
 			buf.WriteByte(uuencodeByte(byte(length)))
 		}
 		// chunk

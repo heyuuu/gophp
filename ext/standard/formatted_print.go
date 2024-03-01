@@ -5,7 +5,6 @@ import (
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/kits/mathkit"
 	"github.com/heyuuu/gophp/php"
-	"github.com/heyuuu/gophp/php/lang"
 	"github.com/heyuuu/gophp/php/perr"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
@@ -61,7 +60,7 @@ func (p *formatPrinter) AppendStringEx(str string, minWidth int, maxWidth int, n
 	var copyLen int
 	var mWidth int
 	if expPrec {
-		copyLen = lang.Min(maxWidth, len(str))
+		copyLen = min(maxWidth, len(str))
 	} else {
 		copyLen = len(str)
 	}
@@ -70,7 +69,7 @@ func (p *formatPrinter) AppendStringEx(str string, minWidth int, maxWidth int, n
 	} else {
 		npad = minWidth - copyLen
 	}
-	mWidth = lang.Max(minWidth, copyLen)
+	mWidth = max(minWidth, copyLen)
 	if mWidth > types.MaxLong-buf.Len()-1 {
 		php.ErrorNoreturn(p.ctx, perr.E_ERROR, fmt.Sprintf("Field width %d is too long", mWidth))
 	}

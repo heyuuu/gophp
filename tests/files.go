@@ -1,13 +1,13 @@
 package tests
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
-	"github.com/heyuuu/gophp/shim/cmp"
-	"github.com/heyuuu/gophp/shim/slices"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 )
 

@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/shim/maps"
+	"maps"
 	"path/filepath"
 	"strings"
 	"time"

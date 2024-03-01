@@ -1,7 +1,7 @@
 package mathkit
 
 import (
-	"github.com/heyuuu/gophp/shim/cmp"
+	"cmp"
 	"math"
 )
 

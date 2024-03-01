@@ -3,10 +3,10 @@ package tests
 import (
 	"compress/gzip"
 	"fmt"
-	"github.com/heyuuu/gophp/shim/slices"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 )

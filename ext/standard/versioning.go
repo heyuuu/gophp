@@ -1,10 +1,10 @@
 package standard
 
 import (
+	"cmp"
 	"github.com/heyuuu/gophp/kits/ascii"
 	"github.com/heyuuu/gophp/php/types"
 	"github.com/heyuuu/gophp/php/zpp"
-	"github.com/heyuuu/gophp/shim/cmp"
 	"strconv"
 	"strings"
 )

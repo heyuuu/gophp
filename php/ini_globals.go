@@ -1,9 +1,10 @@
 package php
 
 import (
+	"github.com/heyuuu/gophp/kits/mapkit"
 	"github.com/heyuuu/gophp/php/types"
-	"github.com/heyuuu/gophp/shim/maps"
-	"github.com/heyuuu/gophp/shim/slices"
+	"maps"
+	"slices"
 	"strings"
 )
 
@@ -185,7 +186,7 @@ func (ig *IniGlobals) RestoreIni(name string, stage IniStage) {
 }
 
 func (ig *IniGlobals) EachIniDirective(sorted bool, h func(global *IniEntry, local *IniEntry)) {
-	names := maps.Keys(ig.iniDirectives)
+	names := mapkit.Keys(ig.iniDirectives)
 	if sorted {
 		slices.Sort(names)
 	}
