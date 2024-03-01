@@ -6,43 +6,81 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 type Logger interface {
-	OnAllStart(startTime time.Time, testCount int)
-	OnAllEnd(endTime time.Time, summary *Summary)
+	OnAllStart(testCount int)
+	OnAllEnd()
 	OnTestStart(tc *TestCase)
 	OnTestEnd(tc *TestCase)
 	Log(tc *TestCase, message string)
 	Logf(tc *TestCase, format string, a ...any)
 }
 
+var (
+	EmptyLogger   = LoggerFunc(func(tc *TestCase, event int, message string) {})
+	ConsoleLogger = LoggerFunc(func(tc *TestCase, event int, message string) { fmt.Print(message) })
+)
+
+// LoggerFunc
+const (
+	LoggerEventMessage = 0
+	LoggerEventStart   = 1
+	LoggerEventEnd     = 2
+)
+
+type LoggerFunc func(tc *TestCase, event int, message string)
+
+func (fn LoggerFunc) OnAllStart(testCount int) {
+	fn(nil, LoggerEventStart, "")
+}
+
+func (fn LoggerFunc) OnAllEnd() {
+	fn(nil, LoggerEventEnd, "")
+}
+
+func (fn LoggerFunc) OnTestStart(tc *TestCase) {
+	fn(tc, LoggerEventStart, "")
+}
+
+func (fn LoggerFunc) OnTestEnd(tc *TestCase) {
+	fn(tc, LoggerEventEnd, "")
+}
+
+func (fn LoggerFunc) Log(tc *TestCase, message string) {
+	fn(tc, 0, message)
+}
+
+func (fn LoggerFunc) Logf(tc *TestCase, format string, a ...any) {
+	fn(tc, 0, fmt.Sprintf(format, a...))
+}
+
+// DumpLogger
 type DumpLogger struct {
 	dumpRoot string
-	channels []*strings.Builder
+	channels []strings.Builder
 }
 
 func NewDumpLogger(dumpRoot string) *DumpLogger {
+	if dumpRoot == "" || !filepath.IsAbs(dumpRoot) {
+		panic("dumpRoot 必须不为空且是个绝对路径")
+	}
+
 	return &DumpLogger{dumpRoot: dumpRoot}
 }
 
-func (l *DumpLogger) OnAllStart(startTime time.Time, testCount int) {
-	l.channels = make([]*strings.Builder, testCount)
-
-	l.Log(nil, "=====================================================================\n")
-	l.Log(nil, "TIME START "+timeFormat(startTime, "Y-m-d H:i:s")+"\n")
-	l.Log(nil, "=====================================================================\n")
+func (l *DumpLogger) OnAllStart(testCount int) {
+	l.channels = make([]strings.Builder, testCount+1)
 }
 
-func (l *DumpLogger) OnAllEnd(endTime time.Time, summary *Summary) {
+func (l *DumpLogger) OnAllEnd() {
 	l.channels = nil
+}
 
-	l.Log(nil, "=====================================================================\n")
-	l.Log(nil, "TIME END "+timeFormat(endTime, "Y-m-d H:i:s")+"\n")
-	l.Log(nil, "=====================================================================\n")
-
-	l.Log(nil, summary.Summary())
+func (l *DumpLogger) checkIndexRange(index int) {
+	if index <= 0 || index > len(l.channels) {
+		panic(fmt.Sprintf("index(%d) must in 1~testCount(%d)", index, len(l.channels)))
+	}
 }
 
 func (l *DumpLogger) getWriter(tc *TestCase) io.Writer {
@@ -50,35 +88,20 @@ func (l *DumpLogger) getWriter(tc *TestCase) io.Writer {
 		return os.Stdout
 	}
 
-	testIndex := tc.index
-	if testIndex <= 0 || testIndex > len(l.channels) {
-		panic(fmt.Sprintf("index(%d) must in 1~testCount(%d)", testIndex, len(l.channels)))
-	}
-
-	index := testIndex - 1
-	if l.channels[index] == nil {
-		l.channels[index] = new(strings.Builder)
-	}
-	return l.channels[index]
+	l.checkIndexRange(tc.index)
+	return &l.channels[tc.index]
 }
 func (l *DumpLogger) closeWriter(tc *TestCase) {
 	if tc == nil {
 		return
 	}
 
-	testIndex := tc.index
-	if testIndex <= 0 || testIndex > len(l.channels) {
-		panic(fmt.Sprintf("index(%d) must in 1~testCount(%d)", testIndex, len(l.channels)))
-	}
+	l.checkIndexRange(tc.index)
 
-	index := testIndex - 1
-	w := l.channels[index]
-	l.channels[index] = nil
-
-	if w != nil {
-		dumpFile := filepath.Join(l.dumpRoot, tc.shortFileName)
-		_ = filePutContents(dumpFile, w.String())
-	}
+	w := &l.channels[tc.index]
+	dumpFile := filepath.Join(l.dumpRoot, tc.shortFileName)
+	_ = filePutContents(dumpFile, w.String())
+	w.Reset()
 }
 
 func (l *DumpLogger) OnTestStart(tc *TestCase) {

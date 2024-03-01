@@ -19,14 +19,12 @@ const (
 )
 
 type Config struct {
-	DumpRoot string
-	Limit    int
-	Workers  int
-	Logger   Logger
+	Logger Logger
 
-	SrcDir string
-	ExtDir string
-
+	SrcDir    string
+	ExtDir    string
+	Limit     int
+	Workers   int
 	PhpBin    string
 	PhpCgiBin string
 
@@ -51,11 +49,16 @@ type Config struct {
 
 func DefaultConfig() Config {
 	return Config{
-		Limit:         -1,
-		ShowCfg:       map[string]bool{blockAll: true},
-		KeepCfg:       make(map[string]bool),
-		IniOverwrites: baseIniOverwrites,
+		ShowCfg: map[string]bool{blockAll: true},
+		KeepCfg: make(map[string]bool),
 	}
+}
+
+func (c Config) IsShow(typ string) bool {
+	return c.ShowCfg != nil && (c.ShowCfg[blockAll] || c.ShowCfg[typ])
+}
+func (c Config) IsKeep(typ string) bool {
+	return c.KeepCfg != nil && (c.KeepCfg[blockAll] || c.KeepCfg[typ])
 }
 
 type TestCase struct {
@@ -246,16 +249,26 @@ func (setting *IniSettings) Merge(ini []string) {
 	}
 }
 
-func (setting *IniSettings) ToParams() string {
-	var buf strings.Builder
+func (setting *IniSettings) Len() int {
+	return len(setting.extensions) + len(setting.zendExtensions) + len(setting.keys)
+}
+
+func (setting *IniSettings) Each(h func(key, val string)) {
 	for _, extension := range setting.extensions {
-		_, _ = fmt.Fprintf(&buf, ` -d "%s=%s"`, "extension", addslashes(extension))
+		h("extension", extension)
 	}
 	for _, extension := range setting.zendExtensions {
-		_, _ = fmt.Fprintf(&buf, ` -d "%s=%s"`, "zend_extension", addslashes(extension))
+		h("zend_extension", extension)
 	}
 	for _, key := range setting.keys {
-		_, _ = fmt.Fprintf(&buf, ` -d "%s=%s"`, key, addslashes(setting.m[key]))
+		h(key, setting.m[key])
 	}
-	return buf.String()
+}
+
+func (setting *IniSettings) ToArgs() []commandArg {
+	args := make([]commandArg, 0, setting.Len()*2)
+	setting.Each(func(key, val string) {
+		args = append(args, commandArg{"-d", false}, commandArg{key + "=" + addslashes(val), true})
+	})
+	return args
 }

@@ -67,8 +67,7 @@ func apiTestRunHandler(request *http.Request) (data any, err error) {
 	if name == "" {
 		return nil, errors.New("name is empty")
 	}
-	testFile := realTestCasePath(name)
-	testResult := tests.RunTestFile(0, name, testFile)
+	testResult, log := apiRunTestCase(name)
 
 	data = map[string]any{
 		// case
@@ -76,10 +75,30 @@ func apiTestRunHandler(request *http.Request) (data any, err error) {
 		// result
 		"status":  testResult.MainType(),
 		"output":  testResult.Output(),
-		"reason":  testResult.Info(),
+		"reason":  testResult.Info() + "\n" + log,
 		"useTime": testResult.UseTime().Nanoseconds(),
 	}
 	return data, nil
+}
+
+func apiRunTestCase(name string) (*tests.Result, string) {
+	testFile := realTestCasePath(name)
+
+	conf := tests.DefaultConfig()
+	conf.SrcDir = "/Users/heyu/Code/src/php-7.4.33"
+	conf.ExtDir = "/__ext__"
+	conf.PhpBin = "/opt/homebrew/Cellar/php@7.4/7.4.33_6/bin/php"
+	conf.PhpCgiBin = "/opt/homebrew/Cellar/php@7.4/7.4.33_6/bin/php-cgi"
+	conf.Verbose = true
+
+	var buf strings.Builder
+	conf.Logger = tests.LoggerFunc(func(tc *tests.TestCase, event int, message string) {
+		if tc != nil {
+			buf.WriteString(message)
+		}
+	})
+
+	return tests.TestOneFile(&conf, testFile), buf.String()
 }
 
 var testCasesPath string

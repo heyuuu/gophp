@@ -142,3 +142,19 @@ func Unique[T comparable](slice []T) []T {
 		}
 	})
 }
+
+// Concat returns a new slice concatenating the passed in slices.
+func Concat[S ~[]E, E any](sliceArgs ...S) S {
+	size := 0
+	for _, s := range sliceArgs {
+		size += len(s)
+		if size < 0 {
+			panic("len out of range")
+		}
+	}
+	newslice := slices.Grow[S](nil, size)
+	for _, s := range sliceArgs {
+		newslice = append(newslice, s...)
+	}
+	return newslice
+}

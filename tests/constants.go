@@ -35,4 +35,7 @@ var baseIniOverwrites = []string{
 	"zend.exception_ignore_args=0",
 }
 
-const noFileCache = "-d opcache.file_cache= -d opcache.file_cache_only=0"
+var noFileCacheArgs = []commandArg{
+	arg("-d"), arg("opcache.file_cache="),
+	arg("-d"), arg("opcache.file_cache_only=0"),
+}

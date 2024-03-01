@@ -3,6 +3,7 @@ package tests
 import (
 	"errors"
 	"fmt"
+	"github.com/heyuuu/gophp/kits/slicekit"
 	"log"
 	"os"
 	"path/filepath"
@@ -13,65 +14,67 @@ import (
 	"time"
 )
 
-func Run(conf Config) error {
-	return new(runner).run(conf)
+func TestAll(conf *Config) error {
+	return newRunner(conf).TestAll()
+}
+func TestOneFile(conf *Config, testFile string) *Result {
+	return newRunner(conf).TestOnce(testFile)
 }
 
 type runner struct {
-	conf       Config
-	testFiles  []string
-	logger     Logger
-	summary    *Summary
-	passOption string
-	env        *Env
+	conf        *Config
+	testFiles   []string
+	logger      Logger
+	summary     *Summary
+	passOption  string
+	passOptions []commandArg
+	env         *Env
 }
 
-func (r *runner) run(conf Config) error {
+func newRunner(conf *Config) *runner {
+	r := &runner{conf: conf}
 	r.init(conf)
+	return r
+}
 
+func (r *runner) TestAll() error {
 	r.testFiles = r.loadTestFiles(r.conf.SrcDir)
 	if limit := r.conf.Limit; limit > 0 && len(r.testFiles) > limit {
 		r.testFiles = r.testFiles[:limit]
 	}
-
-	// write information
-	// todo
-
-	// run all tests
-	r.summary.StartTime = time.Now()
-	r.logger.OnAllStart(r.summary.StartTime, len(r.testFiles))
-
-	if r.conf.Workers > 1 {
-		r.parallelRunTests()
-	} else {
-		r.runTests()
-	}
-
-	r.summary.EndTime = time.Now()
-	r.logger.OnAllEnd(r.summary.EndTime, r.summary)
-
+	r.runTests()
 	return nil
 }
 
-func (r *runner) init(conf Config) {
+func (r *runner) TestOnce(testFile string) *Result {
+	r.testFiles = []string{testFile}
+	lastResult := r.runTests()
+	return lastResult
+}
+
+func (r *runner) init(conf *Config) {
 	r.conf = conf
+	if conf.Logger != nil {
+		r.logger = conf.Logger
+	} else {
+		r.logger = ConsoleLogger
+	}
 	r.summary = NewSummary()
-	r.logger = NewDumpLogger(conf.DumpRoot)
 
 	// init env
 	r.env = NewEnv() // $_ENV ?: getenv()
 	r.env.Set("TEMP", os.TempDir())
 
 	// init conf
-	r.passOption = ""
+	r.passOptions = nil
 	if conf.PassOptionN {
-		r.passOption += " -n"
+		r.passOptions = append(r.passOptions, arg("-n"))
 	}
 	if conf.PassOptionE {
-		r.passOption += " -e"
+		r.passOptions = append(r.passOptions, arg("-e"))
 	}
 	if conf.ConfPassed != "" {
-		r.passOption += " -c'" + conf.ConfPassed + "'"
+		r.passOptions = append(r.passOptions, arg("-c"), quoteArg(conf.ConfPassed))
 	}
 	if conf.Quite {
 		r.env.Set("NO_INTERACTION", "1")
@@ -119,14 +122,31 @@ func (r *runner) loadTestFiles(srcDir string) []string {
 	return testFiles
 }
 
-func (r *runner) runTests() {
-	for i, file := range r.testFiles {
-		testIndex := i + 1
-		r.runTest(testIndex, file)
+func (r *runner) runTests() (lastResult *Result) {
+	// write information
+	// todo
+
+	// run all tests
+	r.onAllStart()
+	if r.conf.Workers > 1 {
+		lastResult = r.parallelRunTests()
+	} else {
+		lastResult = r.simpleRunTests()
 	}
+	r.onAllEnd()
+
+	return
 }
 
-func (r *runner) parallelRunTests() {
+func (r *runner) simpleRunTests() (lastResult *Result) {
+	for i, file := range r.testFiles {
+		testIndex := i + 1
+		lastResult = r.runTest(testIndex, file)
+	}
+	return
+}
+
+func (r *runner) parallelRunTests() (lastResult *Result) {
 	testFiles := r.testFiles
 	workers := r.conf.Workers
 
@@ -149,11 +169,12 @@ func (r *runner) parallelRunTests() {
 				<-limitChan
 			}()
 
-			r.runTest(index, file)
+			lastResult = r.runTest(index, file)
 		}(i+1, testFile)
 	}
 
 	wg.Wait()
+	return
 }
 
 func (r *runner) runTest(testIndex int, testFile string) *Result {
@@ -164,28 +185,19 @@ func (r *runner) runTest(testIndex int, testFile string) *Result {
 
 	tc := NewTestCase(testIndex, testFile, shortFileName)
 
-	fmt.Printf("RUN: %d %s\n", testIndex, shortFileName)
-	r.logger.OnTestStart(tc)
+	r.onTestStart(tc)
 	r.cleanTempFiles(tc, true)
 	result := r.runTestReal(tc)
-	r.cleanTempFiles(tc, false)
+	//r.cleanTempFiles(tc, false)
 	if r.conf.SlowMinTime > 0 && r.conf.SlowMinTime < result.useTime {
 		result.slow = true
 	}
-
-	r.showResult(tc, result)
-	r.logger.OnTestEnd(tc)
-
-	r.summary.AddResult(tc, result)
+	r.onTestEnd(tc, result)
 
 	return result
 }
 
 func (r *runner) runTestReal(tc *TestCase) *Result {
-	if r.conf.Verbose {
-		r.logger.Logf(tc, "\n=================\nTEST %s\n", tc.file)
-	}
-
 	// Load the sections of the test file.
 	err := tc.parse()
 	if err != nil {
@@ -205,27 +217,19 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 	} else {
 		captureStdIn, captureStdOut, captureStdErr = true, true, true
 	}
-	_ = captureStdIn
-	var cmdRedirect string
-	if captureStdOut && captureStdErr {
-		cmdRedirect = "2>&1"
-	}
 
 	/* For GET/POST/PUT tests, check if cgi sapi is available and if it is, use it. */
 	useCgi := existAnyKey(sections, "CGI", "GET", "POST", "GZIP_POST", "DEFLATE_POST", "POST_RAW", "PUT", "COOKIE", "EXPECTHEADERS")
 
-	var execCmd *command
-
-	bin := r.conf.PhpBin
+	var baseCmd *command
 	if useCgi {
 		if r.conf.PhpCgiBin == "" {
 			return SimpleResult(tc, SKIP, "reason: CGI not available", 0)
 		}
-		bin = r.conf.PhpCgiBin + " -C "
 
-		execCmd = newCommand(r.conf.PhpCgiBin).arg("-C")
+		baseCmd = newCommand(r.conf.PhpCgiBin, arg("-C"))
 	} else {
-		execCmd = newCommand(r.conf.PhpBin)
+		baseCmd = newCommand(r.conf.PhpBin)
 	}
 
 	// Reset environment from any previous test.
@@ -259,8 +263,9 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 			}
 		}
 	}
+	iniSettings.Merge(baseIniOverwrites)
 	iniSettings.Merge(r.conf.IniOverwrites)
-	origIniSettingsParam := iniSettings.ToParams()
+	origIniSettingsParam := iniSettings.ToArgs()
 
 	// Any special ini settings
 	// these may overwrite the test defaults...
@@ -271,16 +276,25 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 		).Replace(iniText)
 		iniSettings.Merge(strings.Split(iniText, "\n"))
 	}
-	iniSettingsParam := iniSettings.ToParams()
+	iniSettingsParam := iniSettings.ToArgs()
 
-	env.Set("TEST_PHP_EXTRA_ARGS", r.passOption+" "+iniSettingsParam)
+	extraArgs := slicekit.Concat(r.passOptions, iniSettingsParam)
+	env.Set("TEST_PHP_EXTRA_ARGS", CommandArgsToString(extraArgs))
 
 	// Check if test should be skipped.
 	if skipifText := sections["SKIPIF"]; strings.TrimSpace(skipifText) != "" {
 		r.showFileBlock(tc, blockSkip, skipifText)
 		r.saveText(tc, tc.testSkipif, skipifText)
-		extra := "unset REQUEST_METHOD; unset QUERY_STRING; unset PATH_TRANSLATED; unset SCRIPT_FILENAME; unset REQUEST_METHOD;"
-		output := r.systemWithTimeout(extra, bin, r.passOption, "-q", "") // todo
+
+		//extra := "unset REQUEST_METHOD; unset QUERY_STRING; unset PATH_TRANSLATED; unset SCRIPT_FILENAME; unset REQUEST_METHOD;"
+		skipifCmd := baseCmd.clone().
+			add(r.passOptions...).
+			add(arg("-q")).
+			add(origIniSettingsParam...).
+			add(noFileCacheArgs...).
+			option("-d", "display_errors=0").
+			add(quoteArg(tc.testSkipif))
+		output := r.runCommand(skipifCmd)
 		if len(output) >= 4 && strings.ToLower(output[:4]) == "skip" {
 			reason := ""
 			if match := regexp.MustCompile(`^\s*skip\s*(.+)\s*`).FindStringSubmatch(output); match != nil {
@@ -324,11 +338,14 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 	}
 
 	// body
+	execCmd := baseCmd.clone()
+	execCmd.add(r.passOptions...).addIniSettings(iniSettings).add(arg("-f"), quoteArg(testFile))
+	execCmd.capture(captureStdIn, captureStdOut, captureStdErr)
 	if request, ok := r.tryBuildRequestContent(sections, env); ok {
 		r.saveText(tc, tc.testPost, request)
-		execCmd.arg(r.passOption, iniSettingsParam, "-f").wrapArg(testFile).arg(cmdRedirect, "<").wrapArg(tc.testPost)
+		execCmd.option("<", tc.testPost)
 	} else {
-		execCmd.arg(r.passOption, iniSettingsParam, "-f").wrapArg(testFile).arg(args, cmdRedirect)
+		execCmd.add(arg(args))
 	}
 
 	// show before test exec
@@ -349,14 +366,19 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 	endTime := time.Now()
 	useTime := endTime.Sub(startTime)
 
-	if !r.conf.NoClean || r.conf.KeepCfg["clean"] {
+	if !r.conf.NoClean || r.conf.IsKeep("clean") {
 		if cleanText := strings.TrimSpace(sections["CLEAN"]); cleanText != "" {
 			r.showFileBlock(tc, blockClean, cleanText)
 			r.saveText(tc, tc.testClean, cleanText)
 
 			if !r.conf.NoClean {
-				extra := "unset REQUEST_METHOD; unset QUERY_STRING; unset PATH_TRANSLATED; unset SCRIPT_FILENAME; unset REQUEST_METHOD;"
-				r.systemWithTimeout(extra, bin, r.passOption, "-q", origIniSettingsParam, noFileCache, tc.testClean)
+				//extra := "unset REQUEST_METHOD; unset QUERY_STRING; unset PATH_TRANSLATED; unset SCRIPT_FILENAME; unset REQUEST_METHOD;"
+				cleanCmd := baseCmd.clone().add(r.passOptions...).
+					add(arg("-q")).
+					add(origIniSettingsParam...).
+					add(noFileCacheArgs...).
+					add(quoteArg(tc.testClean))
+				r.runCommand(cleanCmd)
 			}
 		}
 	}
@@ -468,21 +490,16 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 }
 
 func (r *runner) showFileBlock(tc *TestCase, typ string, block string) {
-	show := r.conf.ShowCfg[blockAll] || r.conf.ShowCfg[typ]
-	if show {
+	if r.conf.IsShow(typ) {
 		r.logger.Logf(tc, "\n========%s========\n%s\n========DONE========\n", typ, strings.TrimSpace(block))
 	}
 }
 
-func (r *runner) showResult(tc *TestCase, result *Result) {
-	r.logger.Logf(tc, "%s %s %s\n", result.ShowTypeNames(), tc.ShowName(), result.info)
-}
-
 func (r *runner) cleanTempFiles(tc *TestCase, force bool) {
-	if force || !r.conf.KeepCfg["php"] {
+	if force || !r.conf.IsKeep("php") {
 		_ = unlink(tc.testFile)
 	}
-	if force || !r.conf.KeepCfg["skip"] {
+	if force || !r.conf.IsKeep("skip") {
 		_ = unlink(tc.testSkipif)
 	}
 	_ = unlink(tc.testClean)
@@ -573,4 +590,45 @@ func (r *runner) buildBody(text string, env *Env) string {
 	}
 
 	return buf.String()
+}
+
+// -- events
+
+func (r *runner) onAllStart() {
+	startTime := time.Now()
+
+	r.summary.StartTime = startTime
+
+	r.logger.OnAllStart(len(r.testFiles))
+	r.logger.Log(nil, "=====================================================================\n")
+	r.logger.Log(nil, "TIME START "+timeFormat(startTime, "Y-m-d H:i:s")+"\n")
+	r.logger.Log(nil, "=====================================================================\n")
+}
+
+func (r *runner) onAllEnd() {
+	endTime := time.Now()
+
+	r.summary.EndTime = endTime
+
+	r.logger.Log(nil, "=====================================================================\n")
+	r.logger.Log(nil, "TIME END "+timeFormat(endTime, "Y-m-d H:i:s")+"\n")
+	r.logger.Log(nil, "=====================================================================\n")
+	r.logger.Log(nil, r.summary.Summary())
+	r.logger.OnAllEnd()
+}
+
+func (r *runner) onTestStart(tc *TestCase) {
+	r.logger.Logf(nil, "RUN: %d %s\n", tc.index, tc.shortFileName)
+
+	r.logger.OnTestStart(tc)
+	if r.conf.Verbose {
+		r.logger.Logf(tc, "\n=================\nTEST %s\n", tc.file)
+	}
+}
+
+func (r *runner) onTestEnd(tc *TestCase, result *Result) {
+	r.summary.AddResult(tc, result)
+
+	r.logger.Logf(tc, "%s %s %s\n", result.ShowTypeNames(), tc.ShowName(), result.info)
+	r.logger.OnTestEnd(tc)
 }
