@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/kits/slicekit"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -142,34 +143,53 @@ func (r *runner) simpleRunTests() (lastResult *Result) {
 	for i, file := range r.testFiles {
 		testIndex := i + 1
 		lastResult = r.runTest(testIndex, file)
+		r.summary.AddResult(lastResult)
 	}
 	return
 }
 
 func (r *runner) parallelRunTests() (lastResult *Result) {
 	testFiles := r.testFiles
+	testCount := len(testFiles)
 	workers := r.conf.Workers
 
 	var wg sync.WaitGroup
-	wg.Add(len(testFiles))
+	wg.Add(testCount)
+
+	// 结果chan，串行处理结果
+	var resultChan = make(chan *Result, workers)
+	defer close(resultChan)
+
+	// 单独 goroutine 串行处理结果(因为 Summary 非并发安全)
+	go func() {
+		for i := 0; i < testCount; i++ {
+			lastResult = <-resultChan
+			if lastResult != nil {
+				r.summary.AddResult(lastResult)
+			}
+		}
+	}()
 
 	// 用于限制并发数
 	var limitChan = make(chan struct{}, workers)
 	defer close(limitChan)
 
-	// 遍历任务
+	// 并发遍历任务
 	for i, testFile := range testFiles {
 		limitChan <- struct{}{}
 		go func(index int, file string) {
+			var result *Result
 			defer func() {
 				if e := recover(); e != nil {
 					log.Printf("parallelRunTests painc: %v\n", e)
 				}
 				wg.Done()
+
+				resultChan <- result
 				<-limitChan
 			}()
 
-			lastResult = r.runTest(index, file)
+			result = r.runTest(index, file)
 		}(i+1, testFile)
 	}
 
@@ -192,7 +212,7 @@ func (r *runner) runTest(testIndex int, testFile string) *Result {
 	if r.conf.SlowMinTime > 0 && r.conf.SlowMinTime < result.useTime {
 		result.slow = true
 	}
-	r.onTestEnd(tc, result)
+	r.onTestEnd(result)
 
 	return result
 }
@@ -514,11 +534,25 @@ func (r *runner) saveText(tc *TestCase, file string, content string) {
 }
 
 func (r *runner) runCommand(cmd *command) string {
-	return ""
-}
+	var cmdName = cmd.bin
+	var cmdArgs = slicekit.Map(cmd.args, func(t commandArg) string {
+		return t.value
+	})
+	goCmd := exec.Command(cmdName, cmdArgs...)
 
-func (r *runner) systemWithTimeout(cmd ...string) string {
-	return ""
+	var buf strings.Builder
+	if cmd.captureStdOut {
+		goCmd.Stdout = &buf
+	}
+	if cmd.captureStdErr {
+		goCmd.Stderr = &buf
+	}
+	err := goCmd.Run()
+	if err != nil {
+		return "Run Error: " + err.Error()
+	}
+
+	return buf.String()
 }
 
 func (r *runner) tryBuildRequestContent(sectionText map[string]string, env *Env) (request string, ok bool) {
@@ -626,9 +660,8 @@ func (r *runner) onTestStart(tc *TestCase) {
 	}
 }
 
-func (r *runner) onTestEnd(tc *TestCase, result *Result) {
-	r.summary.AddResult(tc, result)
-
+func (r *runner) onTestEnd(result *Result) {
+	tc := result.tc
 	r.logger.Logf(tc, "%s %s %s\n", result.ShowTypeNames(), tc.ShowName(), result.info)
 	r.logger.OnTestEnd(tc)
 }

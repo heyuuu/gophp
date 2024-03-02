@@ -1,6 +1,9 @@
 package tests
 
 import (
+	"context"
+	"github.com/heyuuu/gophp/kits/slicekit"
+	"os/exec"
 	"slices"
 	"strings"
 )
@@ -86,8 +89,10 @@ func (c *command) String() string {
 
 	buf.WriteString(c.bin)
 	for _, cmdArg := range c.args {
-		buf.WriteByte(' ')
-		buf.WriteString(cmdArg.String())
+		if cmdArg.value != "" {
+			buf.WriteByte(' ')
+			buf.WriteString(cmdArg.String())
+		}
 	}
 
 	if c.captureStdOut && c.captureStdErr {
@@ -95,4 +100,32 @@ func (c *command) String() string {
 	}
 
 	return buf.String()
+}
+
+func (c *command) Run() (string, error) {
+	return c.RunEx(nil)
+}
+
+func (c *command) RunEx(ctx context.Context) (string, error) {
+	args := slicekit.Map(c.args, func(t commandArg) string {
+		return t.value
+	})
+
+	var cmd *exec.Cmd
+	if ctx != nil {
+		cmd = exec.CommandContext(ctx, c.bin, args...)
+	} else {
+		cmd = exec.Command(c.bin, args...)
+	}
+
+	var buf strings.Builder
+	if c.captureStdOut {
+		cmd.Stdout = &buf
+	}
+	if c.captureStdErr {
+		cmd.Stderr = &buf
+	}
+
+	err := cmd.Run()
+	return buf.String(), err
 }

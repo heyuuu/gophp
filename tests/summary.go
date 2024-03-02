@@ -25,7 +25,7 @@ func NewSummary() *Summary {
 	}
 }
 
-func (s *Summary) AddResult(tc *TestCase, result *Result) {
+func (s *Summary) AddResult(result *Result) {
 	s.total++
 
 	s.sumResults[result.MainType()]++
