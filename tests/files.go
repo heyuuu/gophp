@@ -56,6 +56,25 @@ func FindTestFiles(dir string) ([]string, error) {
 	return files, nil
 }
 
+func FindTestFilesInSrcDir(srcDir string, cleanTmp bool) ([]string, error) {
+	var files []string
+	var subDirs = []string{"Zend", "tests", "sapi"}
+	for _, subDir := range subDirs {
+		dir := filepath.Join(srcDir, subDir)
+		err := EachTestFileEx(dir, cleanTmp, func(file string) error {
+			files = append(files, file)
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	sortTestFiles(files, srcDir)
+
+	return files, nil
+}
+
 func sortTestFiles(files []string, srcDir string) {
 	runTestDir := filepath.Join(srcDir, "tests/run-test")
 	testDir := filepath.Join(srcDir, "tests")

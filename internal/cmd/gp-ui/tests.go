@@ -11,6 +11,14 @@ import (
 	"strings"
 )
 
+// -- START 临时写死的路径，后续需移除 --
+const SrcDir = "/Users/heyu/Code/src/php-7.4.33"
+const ExtDir = "/__ext__"
+const PhpBin = "/opt/homebrew/Cellar/php@7.4/7.4.33_6/bin/php"
+const PhpCgiBin = "/opt/homebrew/Cellar/php@7.4/7.4.33_6/bin/php-cgi"
+
+// -- END 临时写死的路径，后续需移除 --
+
 func getFormValueInt(request *http.Request, name string, defaultValue int) int {
 	value := request.FormValue(name)
 	if value == "" {
@@ -69,9 +77,13 @@ func apiTestRunHandler(request *http.Request) (data any, err error) {
 	}
 	testResult, log := apiRunTestCase(name)
 
+	sections := testResult.Case().Sections()
+
 	data = map[string]any{
 		// case
-		"case": testResult.Case(),
+		"code":   sections["FILE"],
+		"expect": sections["EXPECT"] + sections["EXPECTF"] + sections["EXPECTREGEX"],
+
 		// result
 		"status":  testResult.MainType(),
 		"output":  testResult.Output(),
@@ -85,10 +97,10 @@ func apiRunTestCase(name string) (*tests.Result, string) {
 	testFile := realTestCasePath(name)
 
 	conf := tests.DefaultConfig()
-	conf.SrcDir = "/Users/heyu/Code/src/php-7.4.33"
-	conf.ExtDir = "/__ext__"
-	conf.PhpBin = "/opt/homebrew/Cellar/php@7.4/7.4.33_6/bin/php"
-	conf.PhpCgiBin = "/opt/homebrew/Cellar/php@7.4/7.4.33_6/bin/php-cgi"
+	conf.SrcDir = SrcDir
+	conf.ExtDir = ExtDir
+	conf.PhpBin = PhpBin
+	conf.PhpCgiBin = PhpCgiBin
 	conf.Verbose = true
 
 	var buf strings.Builder

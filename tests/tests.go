@@ -6,7 +6,6 @@ import (
 	"github.com/heyuuu/gophp/kits/slicekit"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -30,6 +29,7 @@ type runner struct {
 	passOption  string
 	passOptions []commandArg
 	env         *Env
+	oneFileMode bool
 }
 
 func newRunner(conf *Config) *runner {
@@ -38,8 +38,11 @@ func newRunner(conf *Config) *runner {
 	return r
 }
 
-func (r *runner) TestAll() error {
-	r.testFiles = r.loadTestFiles(r.conf.SrcDir)
+func (r *runner) TestAll() (err error) {
+	r.testFiles, err = FindTestFilesInSrcDir(r.conf.SrcDir, true)
+	if err != nil {
+		return err
+	}
 	if limit := r.conf.Limit; limit > 0 && len(r.testFiles) > limit {
 		r.testFiles = r.testFiles[:limit]
 	}
@@ -49,6 +52,7 @@ func (r *runner) TestAll() error {
 
 func (r *runner) TestOnce(testFile string) *Result {
 	r.testFiles = []string{testFile}
+	r.oneFileMode = true
 	lastResult := r.runTests()
 	return lastResult
 }
@@ -89,38 +93,11 @@ func (r *runner) init(conf *Config) {
 	if conf.Offline {
 		r.env.Set("SKIP_ONLINE_TESTS", "1")
 	}
-	if conf.Asan {
-		r.env.Set("USE_ZEND_ALLOC", "0")
-		r.env.Set("USE_TRACKED_ALLOC", "1")
-		r.env.Set("SKIP_ASAN", "1")
-		r.env.Set("SKIP_PERF_SENSITIVE", "1")
-
-		lsanSuppressions := filepath.Join(r.conf.SrcDir, "/azure/lsan-suppressions.txt")
-		if fileExists(lsanSuppressions) {
-			r.env.Set("LSAN_OPTIONS", "suppressions="+lsanSuppressions+":print_suppressions=0")
-		}
-	}
 
 	// verify config
 	if conf.PhpBin == "" || !fileExists(conf.PhpBin) {
 		panic(errors.New("Config.PhpBin must be set to specify PHP executable"))
 	}
-}
-
-func (r *runner) loadTestFiles(srcDir string) []string {
-	var testFiles []string
-	var dirs = []string{"Zend", "tests", "sapi"}
-	for _, dir := range dirs {
-		realDir := filepath.Join(srcDir, dir)
-		_ = EachTestFileEx(realDir, true, func(file string) error {
-			testFiles = append(testFiles, file)
-			return nil
-		})
-	}
-
-	sortTestFiles(testFiles, srcDir)
-
-	return testFiles
 }
 
 func (r *runner) runTests() (lastResult *Result) {
@@ -221,7 +198,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 	// Load the sections of the test file.
 	err := tc.parse()
 	if err != nil {
-		return SimpleResult(tc, BORK, err.Error(), 0)
+		return SimpleResult(tc, BORK, err.Error())
 	}
 	sections := tc.sections
 
@@ -244,7 +221,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 	var baseCmd *command
 	if useCgi {
 		if r.conf.PhpCgiBin == "" {
-			return SimpleResult(tc, SKIP, "reason: CGI not available", 0)
+			return SimpleResult(tc, SKIP, "reason: CGI not available")
 		}
 
 		baseCmd = newCommand(r.conf.PhpCgiBin, arg("-C"))
@@ -320,13 +297,13 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 			if match := regexp.MustCompile(`^\s*skip\s*(.+)\s*`).FindStringSubmatch(output); match != nil {
 				reason = "reason: " + match[1]
 			}
-			return SimpleResult(tc, SKIP, reason, 0)
+			return SimpleResult(tc, SKIP, reason)
 		}
 		// todo
 	}
 
 	if existAnyKey(sections, "GZIP_POST", "DEFLATE_POST") {
-		return SimpleResult(tc, SKIP, "reason: ext/zlib required", 0)
+		return SimpleResult(tc, SKIP, "reason: ext/zlib required")
 	}
 
 	// We've satisfied the preconditions - run the test!
@@ -457,10 +434,13 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 		wantedReg = strings.ReplaceAll(wanted, "\r\n", "\n")
 
 		if existKey(sections, "EXPECTF") {
-			// todo
+			wantedReg = convertExpectFormat2Regex(wantedReg)
 		}
 
-		passed = pregMatch(wantedReg, output)
+		passed, err = safeExpectRegexCompare(wantedReg, output)
+		if err != nil {
+			return SimpleResult(tc, BORK, err.Error())
+		}
 	} else {
 		wanted = strings.TrimSpace(sections["EXPECT"])
 		wanted = strings.ReplaceAll(wanted, "\r\n", "\n")
@@ -473,7 +453,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 			warn = true
 			info = " (warn: XFAIL section but test passes)"
 		} else {
-			return SimpleResult(tc, PASS, "", useTime)
+			return PassResult(tc, output, useTime)
 		}
 	}
 
@@ -506,7 +486,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 		r.showFileBlock(tc, blockDiff, diff)
 	}
 
-	return ComplexResult(tc, resultTypes, info, 0)
+	return ComplexResult(tc, resultTypes, output, info, 0)
 }
 
 func (r *runner) showFileBlock(tc *TestCase, typ string, block string) {
@@ -534,25 +514,11 @@ func (r *runner) saveText(tc *TestCase, file string, content string) {
 }
 
 func (r *runner) runCommand(cmd *command) string {
-	var cmdName = cmd.bin
-	var cmdArgs = slicekit.Map(cmd.args, func(t commandArg) string {
-		return t.value
-	})
-	goCmd := exec.Command(cmdName, cmdArgs...)
-
-	var buf strings.Builder
-	if cmd.captureStdOut {
-		goCmd.Stdout = &buf
+	output, err := cmd.Run()
+	if err != nil && output == "" {
+		return output + "\nRun Error: " + err.Error()
 	}
-	if cmd.captureStdErr {
-		goCmd.Stderr = &buf
-	}
-	err := goCmd.Run()
-	if err != nil {
-		return "Run Error: " + err.Error()
-	}
-
-	return buf.String()
+	return output
 }
 
 func (r *runner) tryBuildRequestContent(sectionText map[string]string, env *Env) (request string, ok bool) {
@@ -647,7 +613,9 @@ func (r *runner) onAllEnd() {
 	r.logger.Log(nil, "=====================================================================\n")
 	r.logger.Log(nil, "TIME END "+timeFormat(endTime, "Y-m-d H:i:s")+"\n")
 	r.logger.Log(nil, "=====================================================================\n")
-	r.logger.Log(nil, r.summary.Summary())
+	if !r.oneFileMode {
+		r.logger.Log(nil, r.summary.Summary())
+	}
 	r.logger.OnAllEnd()
 }
 

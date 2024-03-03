@@ -44,7 +44,6 @@ type Config struct {
 	Verbose     bool
 	X           bool
 	Offline     bool
-	Asan        bool
 }
 
 func DefaultConfig() Config {
@@ -73,7 +72,7 @@ type TestCase struct {
 	testPost   string
 
 	// Case 文件解析的信息
-	sections map[string]string
+	sections map[string]string `get:""`
 	testName string
 }
 
@@ -147,11 +146,14 @@ type Result struct {
 	slow    bool
 }
 
-func SimpleResult(tc *TestCase, typ ResultType, info string, useTime time.Duration) *Result {
-	return &Result{tc: tc, types: []ResultType{typ}, info: info, useTime: useTime}
+func SimpleResult(tc *TestCase, typ ResultType, info string) *Result {
+	return &Result{tc: tc, types: []ResultType{typ}, info: info}
 }
-func ComplexResult(tc *TestCase, types []ResultType, info string, useTime time.Duration) *Result {
-	return &Result{tc: tc, types: types, info: info, useTime: useTime}
+func PassResult(tc *TestCase, output string, useTime time.Duration) *Result {
+	return &Result{tc: tc, types: []ResultType{PASS}, useTime: useTime, output: output}
+}
+func ComplexResult(tc *TestCase, types []ResultType, output string, info string, useTime time.Duration) *Result {
+	return &Result{tc: tc, types: types, info: info, useTime: useTime, output: output}
 }
 
 func (r *Result) Case() *TestCase        { return r.tc }

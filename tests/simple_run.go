@@ -51,7 +51,7 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *Resul
 	tc := NewTestCase(testIndex, testFile, testName)
 	err := tc.parse()
 	if err != nil {
-		return SimpleResult(tc, BORK, "parse test case failed", 0)
+		return SimpleResult(tc, BORK, "parse test case failed")
 	}
 
 	sections := tc.sections
@@ -64,7 +64,7 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *Resul
 		}
 	}
 	if len(unsupportedSections) > 0 {
-		return SimpleResult(tc, SKIP, "unsupported section: "+strings.Join(unsupportedSections, ", "), 0)
+		return SimpleResult(tc, SKIP, "unsupported section: "+strings.Join(unsupportedSections, ", "))
 	}
 
 	// todo INI 段
@@ -81,10 +81,10 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *Resul
 	if skipIfText, ok := sections["SKIPIF"]; ok {
 		output, err := runCodeBuiltin("", skipIfText, ini)
 		if err != nil {
-			return SimpleResult(tc, FAIL, "run SKIPIF code filed: "+err.Error(), 0)
+			return SimpleResult(tc, FAIL, "run SKIPIF code filed: "+err.Error())
 		}
 		if output != "" {
-			return SimpleResult(tc, SKIP, output, 0)
+			return SimpleResult(tc, SKIP, output)
 		}
 	}
 
@@ -93,13 +93,13 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *Resul
 	if fileText, ok := sections["FILE"]; ok {
 		code = fileText
 	} else {
-		return SimpleResult(tc, BORK, "no file section", 0)
+		return SimpleResult(tc, BORK, "no file section")
 	}
 
 	mockFileName := strings.ReplaceAll(testFile, ".phpt", ".php")
 	output, err := runCodeBuiltin(mockFileName, code, ini)
 	if err != nil {
-		return SimpleResult(tc, FAIL, "run code failed: "+err.Error(), 0)
+		return SimpleResult(tc, FAIL, "run code failed: "+err.Error())
 	}
 	output = strings.ReplaceAll(output, "\r\n", "\n")
 
@@ -114,9 +114,9 @@ func RunTestFile(testIndex int, testName string, testFile string) (result *Resul
 	}
 
 	if pass {
-		result = SimpleResult(tc, PASS, "", 0)
+		result = SimpleResult(tc, PASS, "")
 	} else {
-		result = SimpleResult(tc, FAIL, reason, 0)
+		result = SimpleResult(tc, FAIL, reason)
 	}
 	result.output = output
 	return result
@@ -231,15 +231,6 @@ func compareExpectRegex(output string, expect string) (equals bool, reason strin
 		return true, ""
 	}
 
-	// 目前先规避掉 phpt 换行格式导致的不匹配问题
-	equals, err = compareExpectRegexInternal(strings.TrimSpace(output), strings.TrimSpace(expect), "trim")
-	if err != nil {
-		return false, err.Error()
-	}
-	if equals {
-		return true, ""
-	}
-
 	// 匹配失败
 	reason = fmt.Sprintf("output = \n%s\nexpect =\n%s\n", output, expect)
 	return false, reason
@@ -256,6 +247,20 @@ func compareExpectRegexInternal(output string, expect string, prefix string) (eq
 		return false, fmt.Errorf("EXPECTREGEX rule parse fail, err = %w, expect = %s\n", err, expect)
 	}
 	return rule.MatchString(output), nil
+}
+
+func safeExpectRegexCompare(expect string, output string) (equals bool, err error) {
+	if !utf8.ValidString(expect) {
+		expect = utf8SafeString(expect)
+		output = utf8SafeString(output)
+	}
+
+	expectRule, err := regexp.Compile(expect)
+	if err != nil {
+		return false, fmt.Errorf("Parse Regexp Error: %w", err)
+	}
+
+	return expectRule.MatchString(output), nil
 }
 
 func utf8SafeString(s string) string {
