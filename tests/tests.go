@@ -64,6 +64,10 @@ func (r *runner) init(conf *Config) {
 	} else {
 		r.logger = ConsoleLogger
 	}
+	// 并发时，使用并发安全的 Logger
+	if conf.Workers > 1 {
+		r.logger = NewSyncLogger(r.logger)
+	}
 	r.summary = NewSummary()
 
 	// init env
@@ -202,7 +206,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 	}
 	sections := tc.sections
 
-	r.logger.Logf(tc, "TEST %d/%d [%s]\n", tc.index, len(r.testFiles), tc.shortFileName)
+	r.logger.Log(tc, fmt.Sprintf("TEST %d/%d [%s]\n", tc.index, len(r.testFiles), tc.shortFileName))
 
 	// stdio
 	var captureStdIn, captureStdOut, captureStdErr bool
@@ -347,15 +351,15 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 
 	// show before test exec
 	if r.conf.Verbose {
-		r.logger.Logf(tc, "\nCONTENT_LENGTH  = %s", env.Get("CONTENT_LENGTH"))
-		r.logger.Logf(tc, "\nCONTENT_TYPE    = %s", env.Get("CONTENT_TYPE"))
-		r.logger.Logf(tc, "\nPATH_TRANSLATED = %s", env.Get("PATH_TRANSLATED"))
-		r.logger.Logf(tc, "\nQUERY_STRING    = %s", env.Get("QUERY_STRING"))
-		r.logger.Logf(tc, "\nREDIRECT_STATUS = %s", env.Get("REDIRECT_STATUS"))
-		r.logger.Logf(tc, "\nREQUEST_METHOD  = %s", env.Get("REQUEST_METHOD"))
-		r.logger.Logf(tc, "\nSCRIPT_FILENAME = %s", env.Get("SCRIPT_FILENAME"))
-		r.logger.Logf(tc, "\nHTTP_COOKIE     = %s", env.Get("HTTP_COOKIE"))
-		r.logger.Logf(tc, "\nCOMMAND %s\n", execCmd.String())
+		r.logger.Log(tc, "\nCONTENT_LENGTH  = "+env.Get("CONTENT_LENGTH"))
+		r.logger.Log(tc, "\nCONTENT_TYPE    = "+env.Get("CONTENT_TYPE"))
+		r.logger.Log(tc, "\nPATH_TRANSLATED = "+env.Get("PATH_TRANSLATED"))
+		r.logger.Log(tc, "\nQUERY_STRING    = "+env.Get("QUERY_STRING"))
+		r.logger.Log(tc, "\nREDIRECT_STATUS = "+env.Get("REDIRECT_STATUS"))
+		r.logger.Log(tc, "\nREQUEST_METHOD  = "+env.Get("REQUEST_METHOD"))
+		r.logger.Log(tc, "\nSCRIPT_FILENAME = "+env.Get("SCRIPT_FILENAME"))
+		r.logger.Log(tc, "\nHTTP_COOKIE     = "+env.Get("HTTP_COOKIE"))
+		r.logger.Log(tc, "\nCOMMAND "+execCmd.String()+"\n")
 	}
 
 	startTime := time.Now()
@@ -491,7 +495,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 
 func (r *runner) showFileBlock(tc *TestCase, typ string, block string) {
 	if r.conf.IsShow(typ) {
-		r.logger.Logf(tc, "\n========%s========\n%s\n========DONE========\n", typ, strings.TrimSpace(block))
+		r.logger.Log(tc, fmt.Sprintf("\n========%s========\n%s\n========DONE========\n", typ, strings.TrimSpace(block)))
 	}
 }
 
@@ -599,7 +603,7 @@ func (r *runner) onAllStart() {
 
 	r.summary.StartTime = startTime
 
-	r.logger.OnAllStart(len(r.testFiles))
+	r.logger.OnAllStart()
 	r.logger.Log(nil, "=====================================================================\n")
 	r.logger.Log(nil, "TIME START "+timeFormat(startTime, "Y-m-d H:i:s")+"\n")
 	r.logger.Log(nil, "=====================================================================\n")
@@ -620,16 +624,16 @@ func (r *runner) onAllEnd() {
 }
 
 func (r *runner) onTestStart(tc *TestCase) {
-	r.logger.Logf(nil, "RUN: %d %s\n", tc.index, tc.shortFileName)
+	r.logger.Log(nil, fmt.Sprintf("RUN: %d %s\n", tc.index, tc.shortFileName))
 
 	r.logger.OnTestStart(tc)
 	if r.conf.Verbose {
-		r.logger.Logf(tc, "\n=================\nTEST %s\n", tc.file)
+		r.logger.Log(tc, fmt.Sprintf("\n=================\nTEST %s\n", tc.file))
 	}
 }
 
 func (r *runner) onTestEnd(result *Result) {
 	tc := result.tc
-	r.logger.Logf(tc, "%s %s %s\n", result.ShowTypeNames(), tc.ShowName(), result.info)
+	r.logger.Log(tc, fmt.Sprintf("%s %s %s\n", result.ShowTypeNames(), tc.ShowName(), result.info))
 	r.logger.OnTestEnd(tc)
 }

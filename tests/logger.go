@@ -6,15 +6,15 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 type Logger interface {
-	OnAllStart(testCount int)
+	OnAllStart()
 	OnAllEnd()
 	OnTestStart(tc *TestCase)
 	OnTestEnd(tc *TestCase)
 	Log(tc *TestCase, message string)
-	Logf(tc *TestCase, format string, a ...any)
 }
 
 var (
@@ -31,7 +31,7 @@ const (
 
 type LoggerFunc func(tc *TestCase, event int, message string)
 
-func (fn LoggerFunc) OnAllStart(testCount int) {
+func (fn LoggerFunc) OnAllStart() {
 	fn(nil, LoggerEventStart, "")
 }
 
@@ -48,17 +48,13 @@ func (fn LoggerFunc) OnTestEnd(tc *TestCase) {
 }
 
 func (fn LoggerFunc) Log(tc *TestCase, message string) {
-	fn(tc, 0, message)
-}
-
-func (fn LoggerFunc) Logf(tc *TestCase, format string, a ...any) {
-	fn(tc, 0, fmt.Sprintf(format, a...))
+	fn(tc, LoggerEventMessage, message)
 }
 
 // DumpLogger
 type DumpLogger struct {
 	dumpRoot string
-	channels []strings.Builder
+	channels map[int]*strings.Builder
 }
 
 func NewDumpLogger(dumpRoot string) *DumpLogger {
@@ -69,36 +65,35 @@ func NewDumpLogger(dumpRoot string) *DumpLogger {
 	return &DumpLogger{dumpRoot: dumpRoot}
 }
 
-func (l *DumpLogger) OnAllStart(testCount int) {
-	l.channels = make([]strings.Builder, testCount+1)
+func (l *DumpLogger) OnAllStart() {
+	l.channels = make(map[int]*strings.Builder)
 }
 
 func (l *DumpLogger) OnAllEnd() {
 	l.channels = nil
 }
 
-func (l *DumpLogger) checkIndexRange(index int) {
-	if index <= 0 || index > len(l.channels) {
-		panic(fmt.Sprintf("index(%d) must in 1~testCount(%d)", index, len(l.channels)))
-	}
-}
-
 func (l *DumpLogger) getWriter(tc *TestCase) io.Writer {
 	if tc == nil {
 		return os.Stdout
 	}
-
-	l.checkIndexRange(tc.index)
-	return &l.channels[tc.index]
+	w := l.channels[tc.index]
+	if w == nil {
+		w = new(strings.Builder)
+		l.channels[tc.index] = w
+	}
+	return w
 }
 func (l *DumpLogger) closeWriter(tc *TestCase) {
 	if tc == nil {
 		return
 	}
 
-	l.checkIndexRange(tc.index)
+	w := l.channels[tc.index]
+	if w == nil {
+		return
+	}
 
-	w := &l.channels[tc.index]
 	dumpFile := filepath.Join(l.dumpRoot, tc.shortFileName)
 	_ = filePutContents(dumpFile, w.String())
 	w.Reset()
@@ -118,7 +113,76 @@ func (l *DumpLogger) Log(tc *TestCase, message string) {
 	_, _ = fmt.Fprint(w, message)
 }
 
-func (l *DumpLogger) Logf(tc *TestCase, format string, a ...any) {
-	w := l.getWriter(tc)
-	_, _ = fmt.Fprintf(w, format, a...)
+// SyncLogger
+type syncLog struct {
+	tc      *TestCase
+	event   int
+	message string
+}
+type SyncLogger struct {
+	inner Logger
+	logCh chan syncLog
+	wg    sync.WaitGroup
+}
+
+func NewSyncLogger(inner Logger) *SyncLogger {
+	return &SyncLogger{inner: inner}
+}
+
+func (l *SyncLogger) OnAllStart() {
+	if l.logCh == nil {
+		l.logCh = make(chan syncLog, 10)
+		go func() {
+			for log := range l.logCh {
+				l.handle(log)
+			}
+		}()
+	}
+	l.push(nil, LoggerEventStart, "")
+}
+
+func (l *SyncLogger) OnAllEnd() {
+	l.push(nil, LoggerEventEnd, "")
+	if l.logCh != nil {
+		close(l.logCh)
+		l.logCh = nil
+	}
+}
+
+func (l *SyncLogger) OnTestStart(tc *TestCase) {
+	l.push(tc, LoggerEventStart, "")
+}
+
+func (l *SyncLogger) OnTestEnd(tc *TestCase) {
+	l.push(tc, LoggerEventEnd, "")
+}
+
+func (l *SyncLogger) Log(tc *TestCase, message string) {
+	l.push(tc, LoggerEventMessage, message)
+}
+
+func (l *SyncLogger) push(tc *TestCase, event int, message string) {
+	if c := l.logCh; c != nil {
+		c <- syncLog{tc: tc, event: event, message: message}
+		l.wg.Add(1)
+	}
+}
+
+func (l *SyncLogger) handle(log syncLog) {
+	switch log.event {
+	case LoggerEventStart:
+		if log.tc == nil {
+			l.inner.OnAllStart()
+		} else {
+			l.inner.OnTestStart(log.tc)
+		}
+	case LoggerEventEnd:
+		if log.tc == nil {
+			l.inner.OnAllEnd()
+		} else {
+			l.inner.OnTestEnd(log.tc)
+		}
+	default:
+		l.inner.Log(log.tc, log.message)
+	}
 }
