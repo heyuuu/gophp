@@ -35,7 +35,7 @@ func parseConf(args []string) (*tests.Config, error) {
 	conf := tests.DefaultConfig()
 
 	var logFile string
-	var dumpRoot string
+	var caseLogRoot string
 
 	if len(args) > 1 {
 		flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
@@ -47,16 +47,16 @@ func parseConf(args []string) (*tests.Config, error) {
 		flagSet.StringVar(&conf.PhpCgiBin, "php-cgi", "", "")
 		flagSet.BoolVar(&conf.Verbose, "verbose", false, "")
 
-		flagSet.StringVar(&dumpRoot, "dump-root", "", "")
 		flagSet.StringVar(&logFile, "log-file", "", "")
+		flagSet.StringVar(&caseLogRoot, "case-log-root", "", "")
 
 		err := flagSet.Parse(args[1:])
 		if err != nil {
 			return nil, err
 		}
 	}
-	if dumpRoot != "" {
-		conf.Logger = tests.NewDumpLogger(dumpRoot)
+	if logFile != "" || caseLogRoot != "" {
+		conf.Logger = tests.NewDumpLogger(logFile, caseLogRoot)
 	}
 
 	return &conf, nil

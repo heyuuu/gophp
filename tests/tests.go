@@ -348,6 +348,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 	} else {
 		execCmd.add(arg(args))
 	}
+	execCmd.stdin = sections["STDIN"]
 
 	// show before test exec
 	if r.conf.Verbose {

@@ -37,6 +37,7 @@ func CommandArgsToString(args []commandArg) string {
 type command struct {
 	bin           string
 	args          []commandArg
+	stdin         string
 	captureStdIn  bool
 	captureStdOut bool
 	captureStdErr bool
@@ -116,6 +117,10 @@ func (c *command) RunEx(ctx context.Context) (string, error) {
 		cmd = exec.CommandContext(ctx, c.bin, args...)
 	} else {
 		cmd = exec.Command(c.bin, args...)
+	}
+
+	if c.stdin != "" {
+		cmd.Stdin = strings.NewReader(c.stdin)
 	}
 
 	var buf strings.Builder

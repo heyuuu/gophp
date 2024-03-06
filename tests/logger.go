@@ -53,34 +53,45 @@ func (fn LoggerFunc) Log(tc *TestCase, message string) {
 
 // DumpLogger
 type DumpLogger struct {
-	dumpRoot string
-	channels map[int]*strings.Builder
+	logFile     string
+	caseLogRoot string
+	mainWriter  *os.File
+	caseWriters map[int]*strings.Builder
 }
 
-func NewDumpLogger(dumpRoot string) *DumpLogger {
-	if dumpRoot == "" || !filepath.IsAbs(dumpRoot) {
-		panic("dumpRoot 必须不为空且是个绝对路径")
+func NewDumpLogger(logFile string, caseLogRoot string) *DumpLogger {
+	return &DumpLogger{
+		logFile:     logFile,
+		caseLogRoot: caseLogRoot,
 	}
-
-	return &DumpLogger{dumpRoot: dumpRoot}
 }
 
 func (l *DumpLogger) OnAllStart() {
-	l.channels = make(map[int]*strings.Builder)
+	if l.logFile != "" {
+		l.mainWriter, _ = os.OpenFile(l.logFile, os.O_WRONLY, 0644)
+	}
+	if l.caseLogRoot != "" {
+		l.caseWriters = map[int]*strings.Builder{}
+	}
 }
-
 func (l *DumpLogger) OnAllEnd() {
-	l.channels = nil
+	if l.mainWriter != nil {
+		_ = l.mainWriter.Close()
+	}
+	l.caseWriters = nil
 }
 
 func (l *DumpLogger) getWriter(tc *TestCase) io.Writer {
 	if tc == nil {
-		return os.Stdout
+		if l.mainWriter == nil {
+			return os.Stdout
+		}
+		return l.mainWriter
 	}
-	w := l.channels[tc.index]
+	w := l.caseWriters[tc.index]
 	if w == nil {
 		w = new(strings.Builder)
-		l.channels[tc.index] = w
+		l.caseWriters[tc.index] = w
 	}
 	return w
 }
@@ -89,12 +100,12 @@ func (l *DumpLogger) closeWriter(tc *TestCase) {
 		return
 	}
 
-	w := l.channels[tc.index]
+	w := l.caseWriters[tc.index]
 	if w == nil {
 		return
 	}
 
-	dumpFile := filepath.Join(l.dumpRoot, tc.shortFileName)
+	dumpFile := filepath.Join(l.caseLogRoot, tc.shortFileName)
 	_ = filePutContents(dumpFile, w.String())
 	w.Reset()
 }
@@ -110,7 +121,9 @@ func (l *DumpLogger) OnTestEnd(tc *TestCase) {
 
 func (l *DumpLogger) Log(tc *TestCase, message string) {
 	w := l.getWriter(tc)
-	_, _ = fmt.Fprint(w, message)
+	if w != nil {
+		_, _ = fmt.Fprint(w, message)
+	}
 }
 
 // SyncLogger
