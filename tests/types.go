@@ -61,9 +61,9 @@ func (c Config) IsKeep(typ string) bool {
 }
 
 type TestCase struct {
-	index         int
-	file          string
-	shortFileName string
+	index    int
+	fileName string `get:""` // 测试case名，一般为文件相对于根目录的相对路径
+	filePath string `get:""` // 测试case文件绝对路径
 
 	// 预处理路径，方便使用
 	testFile   string
@@ -72,28 +72,36 @@ type TestCase struct {
 	testPost   string
 
 	// Case 文件解析的信息
+	parsed   bool
+	parseErr error
 	sections map[string]string `get:""`
-	testName string
 }
 
-func NewTestCase(index int, file string, shortFileName string) *TestCase {
-	tc := &TestCase{
-		index:         index,
-		file:          file,
-		shortFileName: shortFileName,
-	}
+func NewTestCase(fileName string, filePath string) *TestCase {
+	tc := &TestCase{fileName: fileName, filePath: filePath}
 	tc.initPath()
-
+	return tc
+}
+func NewTestCaseParsed(fileName string, filePath string, sections map[string]string) *TestCase {
+	tc := NewTestCase(fileName, filePath)
+	tc.sections = sections
+	tc.parseErr = checkFileSections(filePath, sections)
 	return tc
 }
 
 func (tc *TestCase) ShowName() string {
-	return fmt.Sprintf("%s [%s]", tc.testName, tc.shortFileName)
+	return fmt.Sprintf("%s [%s]", tc.TestName(), tc.fileName)
+}
+func (tc *TestCase) TestName() string {
+	if tc.sections == nil {
+		return ""
+	}
+	return strings.TrimSpace(tc.sections["TEST"])
 }
 
 func (tc *TestCase) initPath() {
-	testDir := filepath.Dir(tc.file)
-	mainFileName := filepath.Base(tc.file)
+	testDir := filepath.Dir(tc.filePath)
+	mainFileName := filepath.Base(tc.filePath)
 	if strings.HasSuffix(mainFileName, ".phpt") {
 		mainFileName = mainFileName[:len(mainFileName)-5]
 	}
@@ -103,15 +111,12 @@ func (tc *TestCase) initPath() {
 	tc.testPost = filepath.Join(testDir, mainFileName+".post")
 }
 
-func (tc *TestCase) parse() error {
-	sections, err := parseTestFileSections(tc.file)
-	if err != nil {
-		return err
+func (tc *TestCase) Parse() (map[string]string, error) {
+	if !tc.parsed {
+		tc.parsed = true
+		tc.sections, tc.parseErr = parseTestFileSections(tc.filePath)
 	}
-
-	tc.sections = sections
-	tc.testName = strings.TrimSpace(sections["TEST"])
-	return nil
+	return tc.sections, tc.parseErr
 }
 
 type ResultType string

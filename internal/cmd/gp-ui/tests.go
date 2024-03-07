@@ -60,14 +60,17 @@ func loadTests(path string) ([]string, error) {
 	if _, err := os.Stat(realpath); err != nil {
 		return nil, err
 	}
-	testFiles, err := tests.FindTestFiles(realpath)
+
+	testCases, err := tests.FindTestCases(SrcDir, realpath)
 	if err != nil {
 		return nil, err
 	}
-	for i, testFile := range testFiles {
-		testFiles[i] = relativeTestCasePath(testFile)
+
+	var testNames = make([]string, len(testCases))
+	for i, tc := range testCases {
+		testNames[i] = tc.TestName()
 	}
-	return testFiles, nil
+	return testNames, nil
 }
 
 func apiTestRunHandler(request *http.Request) (data any, err error) {

@@ -17,13 +17,18 @@ import (
 func TestAll(conf *Config) error {
 	return newRunner(conf).TestAll()
 }
-func TestOneFile(conf *Config, testFile string) *Result {
-	return newRunner(conf).TestOnce(testFile)
+func TestOneFile(conf *Config, testFilePath string) *Result {
+	testFileName, _ := filepath.Rel(conf.SrcDir, testFilePath)
+	tc := NewTestCase(testFileName, testFilePath)
+	return newRunner(conf).TestOnce(tc)
+}
+func TestOneCase(conf *Config, tc *TestCase) *Result {
+	return newRunner(conf).TestOnce(tc)
 }
 
 type runner struct {
 	conf        *Config
-	testFiles   []string
+	testCases   []*TestCase
 	logger      Logger
 	summary     *Summary
 	passOption  string
@@ -39,19 +44,19 @@ func newRunner(conf *Config) *runner {
 }
 
 func (r *runner) TestAll() (err error) {
-	r.testFiles, err = FindTestFilesInSrcDir(r.conf.SrcDir, true)
+	r.testCases, err = FindTestCasesInSrcDir(r.conf.SrcDir, true)
 	if err != nil {
 		return err
 	}
-	if limit := r.conf.Limit; limit > 0 && len(r.testFiles) > limit {
-		r.testFiles = r.testFiles[:limit]
+	if limit := r.conf.Limit; limit > 0 && len(r.testCases) > limit {
+		r.testCases = r.testCases[:limit]
 	}
 	r.runTests()
 	return nil
 }
 
-func (r *runner) TestOnce(testFile string) *Result {
-	r.testFiles = []string{testFile}
+func (r *runner) TestOnce(tc *TestCase) *Result {
+	r.testCases = []*TestCase{tc}
 	r.oneFileMode = true
 	lastResult := r.runTests()
 	return lastResult
@@ -108,6 +113,11 @@ func (r *runner) runTests() (lastResult *Result) {
 	// write information
 	// todo
 
+	// re-index testCases
+	for i, tc := range r.testCases {
+		tc.index = i + 1
+	}
+
 	// run all tests
 	r.onAllStart()
 	if r.conf.Workers > 1 {
@@ -121,17 +131,16 @@ func (r *runner) runTests() (lastResult *Result) {
 }
 
 func (r *runner) simpleRunTests() (lastResult *Result) {
-	for i, file := range r.testFiles {
-		testIndex := i + 1
-		lastResult = r.runTest(testIndex, file)
+	for _, tc := range r.testCases {
+		lastResult = r.runTest(tc)
 		r.summary.AddResult(lastResult)
 	}
 	return
 }
 
 func (r *runner) parallelRunTests() (lastResult *Result) {
-	testFiles := r.testFiles
-	testCount := len(testFiles)
+	testCases := r.testCases
+	testCount := len(testCases)
 	workers := r.conf.Workers
 
 	var wg sync.WaitGroup
@@ -156,9 +165,9 @@ func (r *runner) parallelRunTests() (lastResult *Result) {
 	defer close(limitChan)
 
 	// 并发遍历任务
-	for i, testFile := range testFiles {
+	for _, tc := range testCases {
 		limitChan <- struct{}{}
-		go func(index int, file string) {
+		go func(tc *TestCase) {
 			var result *Result
 			defer func() {
 				if e := recover(); e != nil {
@@ -170,22 +179,15 @@ func (r *runner) parallelRunTests() (lastResult *Result) {
 				<-limitChan
 			}()
 
-			result = r.runTest(index, file)
-		}(i+1, testFile)
+			result = r.runTest(tc)
+		}(tc)
 	}
 
 	wg.Wait()
 	return
 }
 
-func (r *runner) runTest(testIndex int, testFile string) *Result {
-	shortFileName := testFile
-	if strings.HasPrefix(testFile, r.conf.SrcDir+"/") {
-		shortFileName = testFile[len(r.conf.SrcDir)+1:]
-	}
-
-	tc := NewTestCase(testIndex, testFile, shortFileName)
-
+func (r *runner) runTest(tc *TestCase) *Result {
 	r.onTestStart(tc)
 	r.cleanTempFiles(tc, true)
 	result := r.runTestReal(tc)
@@ -200,13 +202,12 @@ func (r *runner) runTest(testIndex int, testFile string) *Result {
 
 func (r *runner) runTestReal(tc *TestCase) *Result {
 	// Load the sections of the test file.
-	err := tc.parse()
+	sections, err := tc.Parse()
 	if err != nil {
 		return SimpleResult(tc, BORK, err.Error())
 	}
-	sections := tc.sections
 
-	r.logger.Log(tc, fmt.Sprintf("TEST %d/%d [%s]\n", tc.index, len(r.testFiles), tc.shortFileName))
+	r.logger.Log(tc, fmt.Sprintf("TEST %d/%d [%s]\n", tc.index, len(r.testCases), tc.fileName))
 
 	// stdio
 	var captureStdIn, captureStdOut, captureStdErr bool
@@ -272,7 +273,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 	// these may overwrite the test defaults...
 	if iniText := sections["INI"]; iniText != "" {
 		iniText = strings.NewReplacer(
-			"{PWD}", filepath.Dir(tc.file),
+			"{PWD}", filepath.Dir(tc.filePath),
 			"{TMP}", os.TempDir(),
 		).Replace(iniText)
 		iniSettings.Merge(strings.Split(iniText, "\n"))
@@ -625,11 +626,11 @@ func (r *runner) onAllEnd() {
 }
 
 func (r *runner) onTestStart(tc *TestCase) {
-	r.logger.Log(nil, fmt.Sprintf("RUN: %d %s\n", tc.index, tc.shortFileName))
+	r.logger.Log(nil, fmt.Sprintf("RUN: %d %s\n", tc.index, tc.fileName))
 
 	r.logger.OnTestStart(tc)
 	if r.conf.Verbose {
-		r.logger.Log(tc, fmt.Sprintf("\n=================\nTEST %s\n", tc.file))
+		r.logger.Log(tc, fmt.Sprintf("\n=================\nTEST %s\n", tc.filePath))
 	}
 }
 

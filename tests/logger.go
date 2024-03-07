@@ -105,7 +105,7 @@ func (l *DumpLogger) closeWriter(tc *TestCase) {
 		return
 	}
 
-	dumpFile := filepath.Join(l.caseLogRoot, tc.shortFileName)
+	dumpFile := filepath.Join(l.caseLogRoot, tc.fileName)
 	_ = filePutContents(dumpFile, w.String())
 	w.Reset()
 }

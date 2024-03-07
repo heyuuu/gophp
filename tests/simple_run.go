@@ -48,13 +48,11 @@ var rawSupportSections = map[string]bool{
 
 func RunTestFile(testIndex int, testName string, testFile string) (result *Result) {
 	// 解析测试文件(.phpt文件)
-	tc := NewTestCase(testIndex, testFile, testName)
-	err := tc.parse()
+	tc := NewTestCase(testName, testFile)
+	sections, err := tc.Parse()
 	if err != nil {
 		return SimpleResult(tc, BORK, "parse test case failed")
 	}
-
-	sections := tc.sections
 
 	// 限制目前支持的字段
 	var unsupportedSections []string

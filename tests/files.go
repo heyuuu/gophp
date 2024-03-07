@@ -42,27 +42,39 @@ func EachTestFileEx(dir string, cleanTmp bool, handler func(file string) error) 
 	return nil
 }
 
-func FindTestFiles(dir string) ([]string, error) {
-	var files []string
-	err := EachTestFile(dir, func(file string) error {
-		files = append(files, file)
+func EachTestCase(srcDir string, dir string, handler func(tc *TestCase) error) error {
+	return EachTestCaseEx(srcDir, dir, false, handler)
+}
+
+func EachTestCaseEx(srcDir string, dir string, cleanTmp bool, handler func(tc *TestCase) error) error {
+	return EachTestFileEx(dir, cleanTmp, func(file string) error {
+		name, _ := filepath.Rel(srcDir, dir)
+		tc := NewTestCase(name, file)
+		return handler(tc)
+	})
+}
+
+func FindTestCases(srcDir string, dir string) ([]*TestCase, error) {
+	var cases []*TestCase
+	err := EachTestCase(srcDir, dir, func(tc *TestCase) error {
+		cases = append(cases, tc)
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	sortTestFiles(files, dir)
-	return files, nil
+	sortTestCases(cases)
+	return cases, nil
 }
 
-func FindTestFilesInSrcDir(srcDir string, cleanTmp bool) ([]string, error) {
-	var files []string
+func FindTestCasesInSrcDir(srcDir string, cleanTmp bool) ([]*TestCase, error) {
+	var cases []*TestCase
 	var subDirs = []string{"Zend", "tests", "sapi"}
 	for _, subDir := range subDirs {
 		dir := filepath.Join(srcDir, subDir)
-		err := EachTestFileEx(dir, cleanTmp, func(file string) error {
-			files = append(files, file)
+		err := EachTestCaseEx(srcDir, dir, cleanTmp, func(tc *TestCase) error {
+			cases = append(cases, tc)
 			return nil
 		})
 		if err != nil {
@@ -70,23 +82,22 @@ func FindTestFilesInSrcDir(srcDir string, cleanTmp bool) ([]string, error) {
 		}
 	}
 
-	sortTestFiles(files, srcDir)
+	sortTestCases(cases)
 
-	return files, nil
+	return cases, nil
 }
 
-func sortTestFiles(files []string, srcDir string) {
-	runTestDir := filepath.Join(srcDir, "tests/run-test")
-	testDir := filepath.Join(srcDir, "tests")
-	scorer := func(file string) int {
-		if strings.HasPrefix(file, runTestDir) {
+func sortTestCases(cases []*TestCase) {
+	scorer := func(fileName string) int {
+		if strings.HasPrefix(fileName, "tests/run-test") {
 			return 2
-		} else if strings.HasPrefix(file, testDir) {
+		} else if strings.HasPrefix(fileName, "tests") {
 			return 1
 		}
 		return 0
 	}
-	slices.SortStableFunc(files, func(file1, file2 string) int {
+	slices.SortStableFunc(cases, func(c1, c2 *TestCase) int {
+		file1, file2 := c1.FileName(), c2.FileName()
 		score1, score2 := scorer(file1), scorer(file2)
 		if score1 == score2 {
 			return cmp.Compare(file1, file2)
@@ -180,9 +191,24 @@ func parseTestFileSections(file string) (map[string]string, error) {
 		}
 	}
 
+	err = checkFileSections(file, sections)
+	if err != nil {
+		return nil, err
+	}
+
+	return sections, nil
+}
+
+func checkFileSections(file string, sections map[string]string) error {
+	for section, _ := range sections {
+		if !allowSections[section] {
+			return fmt.Errorf(`unknown section "%s"`, section)
+		}
+	}
+
 	// check sections
 	if existKeys(sections, "FILE", "FILEEOF", "FILE_EXTERNAL") != 1 {
-		return nil, errors.New("missing section --FILE--")
+		return errors.New("missing section --FILE--")
 	}
 	if existKey(sections, "FILEEOF") {
 		sections["FILE"] = strings.TrimRight(sections["FILEEOF"], "\r\n")
@@ -195,7 +221,7 @@ func parseTestFileSections(file string) (map[string]string, error) {
 			path := filepath.Join(filepath.Dir(file), strings.TrimSpace(strings.ReplaceAll(sections[key], "..", "")))
 			content, err := fileGetContents(path)
 			if err != nil {
-				return nil, fmt.Errorf("could not load --%s-- %s", key, path)
+				return fmt.Errorf("could not load --%s-- %s", key, path)
 			}
 
 			sections[prefix] = content
@@ -204,8 +230,8 @@ func parseTestFileSections(file string) (map[string]string, error) {
 	}
 
 	if existKeys(sections, "EXPECT", "EXPECTF", "EXPECTREGEX") != 1 {
-		return nil, errors.New("missing section --EXPECT--, --EXPECTF-- or --EXPECTREGEX--")
+		return errors.New("missing section --EXPECT--, --EXPECTF-- or --EXPECTREGEX--")
 	}
 
-	return sections, nil
+	return nil
 }
