@@ -59,5 +59,5 @@ func parseConf(args []string) (*tests.Config, error) {
 		conf.Logger = tests.NewDumpLogger(logFile, caseLogRoot)
 	}
 
-	return &conf, nil
+	return conf, nil
 }

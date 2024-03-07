@@ -46,8 +46,8 @@ type Config struct {
 	Offline     bool
 }
 
-func DefaultConfig() Config {
-	return Config{
+func DefaultConfig() *Config {
+	return &Config{
 		ShowCfg: map[string]bool{blockAll: true},
 		KeepCfg: make(map[string]bool),
 	}

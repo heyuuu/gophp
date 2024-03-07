@@ -113,7 +113,7 @@ func apiRunTestCase(name string) (*tests.Result, string) {
 		}
 	})
 
-	return tests.TestOneFile(&conf, testFile), buf.String()
+	return tests.TestOneFile(conf, testFile), buf.String()
 }
 
 var testCasesPath string

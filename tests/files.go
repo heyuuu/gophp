@@ -48,7 +48,7 @@ func EachTestCase(srcDir string, dir string, handler func(tc *TestCase) error) e
 
 func EachTestCaseEx(srcDir string, dir string, cleanTmp bool, handler func(tc *TestCase) error) error {
 	return EachTestFileEx(dir, cleanTmp, func(file string) error {
-		name, _ := filepath.Rel(srcDir, dir)
+		name, _ := filepath.Rel(srcDir, file)
 		tc := NewTestCase(name, file)
 		return handler(tc)
 	})
@@ -108,6 +108,7 @@ func sortTestCases(cases []*TestCase) {
 }
 
 var allowSections = map[string]bool{
+	"TEST":                 true,
 	"EXPECT":               true,
 	"EXPECTF":              true,
 	"EXPECTREGEX":          true,
