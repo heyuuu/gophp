@@ -104,7 +104,10 @@ func (r *runner) init(conf *Config) {
 	}
 
 	// verify config
-	if conf.PhpBin == "" || !fileExists(conf.PhpBin) {
+	if conf.SrcDir == "" {
+		panic(errors.New("Config.SrcPhp must be set to specify"))
+	}
+	if conf.PhpBin != "" && !fileExists(conf.PhpBin) {
 		panic(errors.New("Config.PhpBin must be set to specify PHP executable"))
 	}
 }

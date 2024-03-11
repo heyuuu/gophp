@@ -87,24 +87,74 @@ func FindTestCasesInSrcDir(srcDir string, cleanTmp bool) ([]*TestCase, error) {
 	return cases, nil
 }
 
-func sortTestCases(cases []*TestCase) {
-	scorer := func(fileName string) int {
-		if strings.HasPrefix(fileName, "tests/run-test") {
-			return 2
-		} else if strings.HasPrefix(fileName, "tests") {
-			return 1
-		}
-		return 0
+func eachTestPath(dir string, handler func(dir string)) bool {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		return false
 	}
-	slices.SortStableFunc(cases, func(c1, c2 *TestCase) int {
-		file1, file2 := c1.FileName(), c2.FileName()
-		score1, score2 := scorer(file1), scorer(file2)
-		if score1 == score2 {
-			return cmp.Compare(file1, file2)
-		} else {
-			return -cmp.Compare(score1, score2)
+
+	var isTestPath bool
+	for _, file := range files {
+		if file.Name() == "" || file.Name()[0] == '.' {
+			continue
 		}
+
+		if file.IsDir() {
+			if eachTestPath(filepath.Join(dir, file.Name()), handler) {
+				isTestPath = true
+			}
+		} else if !isTestPath && strings.HasSuffix(file.Name(), ".phpt") {
+			isTestPath = true
+		}
+	}
+	if isTestPath {
+		handler(dir)
+	}
+	return isTestPath
+}
+
+func FindTestPathsInSrcDir(srcDir string, includeExt bool) []string {
+	var subDirs = []string{"Zend", "tests", "sapi"}
+	if includeExt {
+		subDirs = append(subDirs, "ext")
+	}
+
+	var paths []string
+	for _, subDir := range subDirs {
+		dir := filepath.Join(srcDir, subDir)
+		eachTestPath(dir, func(dir string) {
+			path, _ := filepath.Rel(srcDir, dir)
+			paths = append(paths, path)
+		})
+	}
+
+	slices.SortFunc(paths, compareFileName)
+
+	return paths
+}
+
+func sortTestCases(cases []*TestCase) {
+	slices.SortStableFunc(cases, func(c1, c2 *TestCase) int {
+		return compareFileName(c1.FileName(), c2.FileName())
 	})
+}
+
+func scoreFileName(fileName string) int {
+	if strings.HasPrefix(fileName, "tests/run-test") {
+		return 2
+	} else if strings.HasPrefix(fileName, "tests") {
+		return 1
+	}
+	return 0
+}
+
+func compareFileName(file1, file2 string) int {
+	score1, score2 := scoreFileName(file1), scoreFileName(file2)
+	if score1 == score2 {
+		return cmp.Compare(file1, file2)
+	} else {
+		return -cmp.Compare(score1, score2)
+	}
 }
 
 var allowSections = map[string]bool{
