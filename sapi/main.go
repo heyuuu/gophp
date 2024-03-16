@@ -6,6 +6,10 @@ import (
 	"github.com/heyuuu/gophp/php"
 	_ "github.com/heyuuu/gophp/php/boot"
 	"github.com/heyuuu/gophp/php/lang"
+	"github.com/heyuuu/gophp/php/perr"
+	"io"
+	"log"
+	"runtime"
 	"slices"
 )
 
@@ -182,8 +186,40 @@ func Run(args []string) error {
 	if len(args) == 0 {
 		return errRunFail
 	}
+	return Command(args[1:]...).Run()
+}
 
-	optArgs, err := parseArgs(args)
+// Cmd
+type Cmd struct {
+	Args   []string
+	Stdin  io.Reader
+	Stdout io.Writer
+	Stderr io.Writer
+}
+
+func Command(args ...string) *Cmd {
+	return &Cmd{Args: args}
+}
+
+func (c *Cmd) RunSafe() (err error) {
+	// 异常兜底
+	defer func() {
+		if e := recover(); e != nil && e != perr.ErrExit {
+			err = fmt.Errorf("tests.Command.RunBuiltin() panic: %v", e)
+
+			// 打印堆栈
+			const size = 64 << 10
+			stack := make([]byte, size)
+			stack = stack[:runtime.Stack(stack, false)]
+			log.Printf(">>> tests.Command.RunBuiltin() panic: %v\n%s", e, stack)
+		}
+	}()
+
+	return c.Run()
+}
+
+func (c *Cmd) Run() error {
+	optArgs, err := parseArgs(c.Args)
 	if err != nil {
 		fmt.Println(err.Error())
 		showHelp()
@@ -192,6 +228,15 @@ func Run(args []string) error {
 
 	// prepare engine
 	engine := php.NewEngine()
+	err = engine.Start()
+	if err != nil {
+		return err
+	}
+
+	// ini
+	for _, ini := range optArgs.IniAppend {
+		engine.BaseCtx().INI().AppendIniEntries(ini)
+	}
 
 	switch optArgs.mode {
 	case modeVersion:
@@ -203,7 +248,7 @@ func Run(args []string) error {
 	case modeIni:
 		return showIni(engine)
 	case modeCliCode, modeCliFile:
-		return RunCli(engine, optArgs)
+		return c.runCli(engine, optArgs)
 	case modeCliServer, modeCgiServer:
 		return RunServer(engine, optArgs)
 	case modeHelp:

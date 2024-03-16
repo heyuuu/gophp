@@ -40,6 +40,7 @@ func parseConf(args []string) (*tests.Config, error) {
 	if len(args) > 1 {
 		flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
 		flagSet.StringVar(&conf.SrcDir, "src-dir", "", "")
+		flagSet.StringVar(&conf.ExtDir, "ext-dir", "", "")
 		flagSet.IntVar(&conf.Limit, "limit", 0, "")
 		flagSet.IntVar(&conf.Workers, "j", 0, "")
 		flagSet.StringVar(&conf.PhpBin, "php", "", "")

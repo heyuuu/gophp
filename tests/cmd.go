@@ -1,8 +1,9 @@
 package tests
 
 import (
-	"context"
-	"github.com/heyuuu/gophp/kits/slicekit"
+	"github.com/heyuuu/gophp/sapi"
+	"io"
+	"os"
 	"os/exec"
 	"slices"
 	"strings"
@@ -36,17 +37,19 @@ func CommandArgsToString(args []commandArg) string {
 
 type command struct {
 	bin           string
+	useCgi        bool
 	args          []commandArg
-	stdin         string
+	stdin         string `set:""`
+	stdinFile     string `set:""`
 	captureStdIn  bool
 	captureStdOut bool
 	captureStdErr bool
 }
 
-func newCommand(bin string, args ...commandArg) *command {
+func commandBuild(bin string, useCgi bool) *command {
 	cmd := &command{
 		bin:           bin,
-		args:          slices.Clone(args),
+		useCgi:        useCgi,
 		captureStdIn:  true,
 		captureStdOut: true,
 		captureStdErr: true,
@@ -61,13 +64,17 @@ func (c *command) clone() *command {
 }
 
 func (c *command) add(args ...commandArg) *command {
-	c.args = append(c.args, args...)
+	c.args = slices.Grow(c.args, len(args))
+	for _, cmdArg := range args {
+		if cmdArg.value != "" {
+			c.args = append(c.args, cmdArg)
+		}
+	}
 	return c
 }
 
 func (c *command) option(opt string, val string) *command {
-	c.args = append(c.args, arg(opt), quoteArg(val))
-	return c
+	return c.add(arg(opt), quoteArg(val))
 }
 
 func (c *command) addIniSettings(ini *IniSettings) *command {
@@ -84,11 +91,14 @@ func (c *command) capture(captureStdIn bool, captureStdOut bool, captureStdErr b
 	c.captureStdErr = captureStdErr
 }
 
-func (c *command) String() string {
+func (c *command) CliString() string {
 	var buf strings.Builder
 	buf.Grow(1024)
 
 	buf.WriteString(c.bin)
+	if c.useCgi {
+		buf.WriteString(" -C")
+	}
 	for _, cmdArg := range c.args {
 		if cmdArg.value != "" {
 			buf.WriteByte(' ')
@@ -99,28 +109,47 @@ func (c *command) String() string {
 	if c.captureStdOut && c.captureStdErr {
 		buf.WriteString(" 2>&1")
 	}
+	if c.stdinFile != "" {
+		buf.WriteString(` < "` + c.stdinFile + `"`)
+	}
 
 	return buf.String()
 }
 
-func (c *command) Run() (string, error) {
-	return c.RunEx(nil)
+func (c *command) cmdArgs() []string {
+	args := make([]string, 0, len(c.args)+1)
+	if c.useCgi {
+		args = append(args, "-C")
+	}
+	for _, cmdArg := range c.args {
+		args = append(args, cmdArg.value)
+	}
+	return args
 }
 
-func (c *command) RunEx(ctx context.Context) (string, error) {
-	args := slicekit.Map(c.args, func(t commandArg) string {
-		return t.value
-	})
-
-	var cmd *exec.Cmd
-	if ctx != nil {
-		cmd = exec.CommandContext(ctx, c.bin, args...)
+func (c *command) Run() (output string, err error) {
+	if c.bin == "" {
+		return c.runBuiltin()
 	} else {
-		cmd = exec.Command(c.bin, args...)
+		return c.runExec()
 	}
+}
 
+func (c *command) prepareStdin() (stdin io.Reader, err error) {
 	if c.stdin != "" {
-		cmd.Stdin = strings.NewReader(c.stdin)
+		return strings.NewReader(c.stdin), nil
+	} else if c.stdinFile != "" {
+		return os.Open(c.stdinFile)
+	}
+	return nil, nil
+}
+
+func (c *command) runBuiltin() (output string, err error) {
+	cmd := sapi.Command(c.cmdArgs()...)
+
+	cmd.Stdin, err = c.prepareStdin()
+	if err != nil {
+		return "", err
 	}
 
 	var buf strings.Builder
@@ -131,6 +160,20 @@ func (c *command) RunEx(ctx context.Context) (string, error) {
 		cmd.Stderr = &buf
 	}
 
-	err := cmd.Run()
+	err = cmd.RunSafe()
+	return buf.String(), err
+}
+
+func (c *command) runExec() (output string, err error) {
+	cmd := exec.Command("bash", "-c", c.CliString())
+
+	if c.stdin != "" {
+		cmd.Stdin = strings.NewReader(c.stdin)
+	}
+
+	var buf strings.Builder
+	cmd.Stdout = &buf
+
+	err = cmd.Run()
 	return buf.String(), err
 }

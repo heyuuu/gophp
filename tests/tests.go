@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/kits/slicekit"
@@ -12,6 +13,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 func TestAll(conf *Config) error {
@@ -232,9 +234,9 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 			return SimpleResult(tc, SKIP, "reason: CGI not available")
 		}
 
-		baseCmd = newCommand(r.conf.PhpCgiBin, arg("-C"))
+		baseCmd = commandBuild(r.conf.PhpCgiBin, true)
 	} else {
-		baseCmd = newCommand(r.conf.PhpBin)
+		baseCmd = commandBuild(r.conf.PhpBin, false)
 	}
 
 	// Reset environment from any previous test.
@@ -348,7 +350,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 	execCmd.capture(captureStdIn, captureStdOut, captureStdErr)
 	if request, ok := r.tryBuildRequestContent(sections, env); ok {
 		r.saveText(tc, tc.testPost, request)
-		execCmd.option("<", tc.testPost)
+		execCmd.stdinFile = tc.testPost
 	} else {
 		execCmd.add(arg(args))
 	}
@@ -364,7 +366,7 @@ func (r *runner) runTestReal(tc *TestCase) *Result {
 		r.logger.Log(tc, "\nREQUEST_METHOD  = "+env.Get("REQUEST_METHOD"))
 		r.logger.Log(tc, "\nSCRIPT_FILENAME = "+env.Get("SCRIPT_FILENAME"))
 		r.logger.Log(tc, "\nHTTP_COOKIE     = "+env.Get("HTTP_COOKIE"))
-		r.logger.Log(tc, "\nCOMMAND "+execCmd.String()+"\n")
+		r.logger.Log(tc, "\nCOMMAND "+execCmd.CliString()+"\n")
 	}
 
 	startTime := time.Now()
@@ -641,4 +643,81 @@ func (r *runner) onTestEnd(result *Result) {
 	tc := result.tc
 	r.logger.Log(tc, fmt.Sprintf("%s %s %s\n", result.ShowTypeNames(), tc.ShowName(), result.info))
 	r.logger.OnTestEnd(tc)
+}
+
+func convertExpectFormat2Regex(s string) string {
+	// do preg_quote, but miss out any %r delimited sections
+	var buf strings.Builder
+	length := len(s)
+	for offset := 0; offset < length; {
+		var start, end int
+		if start = strpos(s, "%r", offset); start >= 0 {
+			// we have found a start tag
+			end = strpos(s, "%r", start+2)
+			if end < 0 {
+				// unbalanced tag, ignore it.
+				start = length
+				end = length
+			}
+		} else {
+			// no more %r sections
+			start = length
+			end = length
+		}
+		// quote a non re portion of the string
+		buf.WriteString(pregQuote(s[offset:start]))
+		if end > start {
+			buf.WriteByte('(')
+			buf.WriteString(s[start+2 : end])
+			buf.WriteByte(')')
+		}
+		offset = end + 2
+	}
+	s = buf.String()
+
+	// Stick to basics
+	replacer := strings.NewReplacer(
+		"%e", string([]byte{'\\', filepath.Separator}),
+		"%s", `[^\r\n]+`,
+		"%S", `[^\r\n]*`,
+		"%a", `.+`,
+		"%A", `.*`,
+		"%w", `\s*`,
+		"%i", `[+-]?\d+`,
+		"%d", `\d+`,
+		"%x", `[0-9a-fA-F]+`,
+		"%f", `[+-]?\.?\d+\.?\d*(?:[Ee][+-]?\d+)?`,
+		"%c", `.`,
+	)
+	return replacer.Replace(s)
+}
+
+func safeExpectRegexCompare(expect string, output string) (equals bool, err error) {
+	if !utf8.ValidString(expect) {
+		expect = utf8SafeString(expect)
+		output = utf8SafeString(output)
+	}
+
+	expectRule, err := regexp.Compile(expect)
+	if err != nil {
+		return false, fmt.Errorf("Parse Regexp Error: %w", err)
+	}
+
+	return expectRule.MatchString(output), nil
+}
+
+func utf8SafeString(s string) string {
+	if utf8.ValidString(s) {
+		return s
+	}
+	var buf strings.Builder
+	for _, r := range s {
+		if utf8.ValidRune(r) {
+			buf.WriteRune(r)
+		} else {
+			buf.WriteString(`\x`)
+			buf.WriteString(hex.EncodeToString([]byte(string([]rune{r}))))
+		}
+	}
+	return buf.String()
 }

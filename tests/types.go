@@ -46,17 +46,10 @@ type Config struct {
 	Offline     bool
 }
 
-const ExtDir = "/__ext__"
-const PhpBin = "/opt/homebrew/Cellar/php@7.4/7.4.33_6/bin/php"
-const PhpCgiBin = "/opt/homebrew/Cellar/php@7.4/7.4.33_6/bin/php-cgi"
-
 func DefaultConfig() *Config {
 	return &Config{
-		ExtDir:    ExtDir,
-		PhpBin:    PhpBin,
-		PhpCgiBin: PhpCgiBin,
-		ShowCfg:   map[string]bool{blockAll: true},
-		KeepCfg:   map[string]bool{},
+		ShowCfg: map[string]bool{blockAll: true},
+		KeepCfg: map[string]bool{},
 	}
 }
 
@@ -91,6 +84,7 @@ func NewTestCase(fileName string, filePath string) *TestCase {
 }
 func NewTestCaseParsed(fileName string, filePath string, sections map[string]string) *TestCase {
 	tc := NewTestCase(fileName, filePath)
+	tc.parsed = true
 	tc.sections = sections
 	tc.parseErr = checkFileSections(filePath, sections)
 	return tc
