@@ -114,6 +114,6 @@ func urlEncodeHash(ctx *php.Context, ht *types.Array, buf *strings.Builder, numP
 func ZifHttpBuildQuery(ctx *php.Context, formdata types.Zval, _ zpp.Opt, prefix string, argSeparator string, encType_ *int) (string, bool) {
 	var encType = lang.Option(encType_, PHP_QUERY_RFC1738)
 	var buf strings.Builder
-	ret := urlEncodeHash(ctx, php.HashOf(formdata), &buf, prefix, "", "", lang.Cond(formdata.IsObject(), formdata.Object(), nil), argSeparator, encType)
+	ret := urlEncodeHash(ctx, php.HashOf(formdata), &buf, prefix, "", "", lang.CondF1(formdata.IsObject(), formdata.Object, nil), argSeparator, encType)
 	return buf.String(), ret
 }

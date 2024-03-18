@@ -16,7 +16,7 @@ func ParseCode(code string) (*ast.File, error) {
 }
 
 /* Parser 脚本相关 */
-var scriptPath = "/Users/heyu/Code/sik/gophp/tools/parser/parser.php"
+var scriptPath = "/Users/heyu/Code/sik/gophp-work/gophp/tools/parser/parser.php"
 
 func runParser(args ...string) ([]byte, error) {
 	if _, err := os.Stat(scriptPath); err != nil {

@@ -58,8 +58,9 @@ var Options = []php.Opt{
 
 type runMode uint8
 
+//go:generate stringer -type runMode
 const (
-	modeUnknown = iota
+	modeUnknown runMode = iota
 	modeHelp
 	modeVersion
 	modeInfo
@@ -107,7 +108,7 @@ type OptArgs struct {
 
 func parseArgs(args []string) (*OptArgs, error) {
 	var optArgs OptArgs
-	optsParser := php.NewOptsParser(args, Options, 1)
+	optsParser := php.NewOptsParser(args, Options, 0)
 	err := optsParser.EachEx(true, func(opt *php.Opt, optArg string) error {
 		switch opt.Char() {
 		// ini opts
@@ -186,11 +187,14 @@ func Run(args []string) error {
 	if len(args) == 0 {
 		return errRunFail
 	}
-	return Command(args[1:]...).Run()
+	cmd := Command(args[1:]...)
+	cmd.Bin = args[0]
+	return cmd.Run()
 }
 
 // Cmd
 type Cmd struct {
+	Bin    string
 	Args   []string
 	Stdin  io.Reader
 	Stdout io.Writer
@@ -238,6 +242,7 @@ func (c *Cmd) Run() error {
 		engine.BaseCtx().INI().AppendIniEntries(ini)
 	}
 
+	// switch mode
 	switch optArgs.mode {
 	case modeVersion:
 		showVersion()
@@ -264,7 +269,7 @@ func showHelp() {
 }
 
 func showVersion() {
-	fmt.Printf("gophp (php version %s)", "7.4.33")
+	fmt.Printf("gophp (php version %s)", php.PHP_VERSION)
 }
 
 func showInfo(engine *php.Engine) error {
