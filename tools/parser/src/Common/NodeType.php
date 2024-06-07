@@ -1,6 +1,6 @@
 <?php
 
-namespace GoPhp\Tools\Scripts;
+namespace GoPhp\Tools\Common;
 
 use GoPhp\Tools\Parse\NodeTool;
 use JsonSerializable;

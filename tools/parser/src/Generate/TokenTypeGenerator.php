@@ -1,19 +1,17 @@
 <?php
 
-require_once __DIR__ . '/bootstrap.php';
+namespace GoPhp\Tools\Generate;
 
-(new GenTokenTypes)->run();
-
-class GenTokenTypes
+class TokenTypeGenerator extends BaseGenerator
 {
-    private string $outputFile   = PROJ_ROOT . '/compile/token/token.go';
+    private string $outputFile   = MAIN_ROOT . '/compile/token/token.go';
     private array  $tokens       = [];
     private array  $tokenSamples = [];
     private string $template     = <<<'TEMPLATE'
 + - * / ++ -- %
 TEMPLATE;
 
-    public function run()
+    public function generate()
     {
         $this->initTokens();
 
@@ -36,7 +34,7 @@ const (
 )
 CODE;
 
-        file_put_contents($this->outputFile, $content);
+        $this->writeFile($this->outputFile, $content);
     }
 
     private function initTokens()
@@ -55,7 +53,7 @@ CODE;
         // init token samples
         foreach (explode(' ', $this->template) as $code) {
             $tokens = token_get_all('<?php ' . $code);
-            var_dump($tokens);
+            // var_dump($tokens);
         }
     }
 

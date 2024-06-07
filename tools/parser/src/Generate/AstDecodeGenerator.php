@@ -1,16 +1,14 @@
 <?php
 
-use GoPhp\Tools\Scripts\AstTool;
-use GoPhp\Tools\Scripts\NodeType;
-use GoPhp\Tools\Scripts\TypeHint;
+namespace GoPhp\Tools\Generate;
 
-require_once __DIR__ . '/bootstrap.php';
+use GoPhp\Tools\Common\AstTool;
+use GoPhp\Tools\Common\NodeType;
+use GoPhp\Tools\Common\TypeHint;
 
-(new GenAstDecoder)->run();
-
-class GenAstDecoder
+class AstDecodeGenerator extends BaseGenerator
 {
-    private string $outputFile = PROJ_ROOT . '/compile/parser/internal/phpparse/decode_node.go';
+    private string $outputFile = MAIN_ROOT . '/compile/parser/internal/phpparse/decode_node.go';
     private string $template   = <<<'CODE'
 package phpparse
 
@@ -26,7 +24,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 }
 CODE;
 
-    public function run()
+    public function generate()
     {
         $cases = [];
         foreach (AstTool::allTypes() as $type) {
@@ -36,7 +34,7 @@ CODE;
         }
 
         $code = sprintf($this->template, join("\n", $cases));
-        file_put_contents($this->outputFile, $code);
+        $this->writeFile($this->outputFile, $code);
     }
 
     private function caseType(NodeType $type): string
@@ -73,7 +71,7 @@ CASE;
 
                 $name = $typeHint->toGoType('ast.');
                 if ($typeHint->nullable) {
-                    return "asTypeOrNil[{$name}](${value})";
+                    return "asTypeOrNil[{$name}]({$value})";
                 } else {
                     return $value . ".({$name})";
                 }

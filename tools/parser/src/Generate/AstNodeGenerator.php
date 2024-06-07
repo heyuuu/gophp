@@ -1,17 +1,15 @@
 <?php
 
-use GoPhp\Tools\Scripts\AstTool;
-use GoPhp\Tools\Scripts\NodeType;
+namespace GoPhp\Tools\Generate;
 
-require_once __DIR__ . '/bootstrap.php';
+use GoPhp\Tools\Common\AstTool;
+use GoPhp\Tools\Common\NodeType;
 
-(new GenAstNodes)->run();
-
-class GenAstNodes
+class AstNodeGenerator extends BaseGenerator
 {
-    private string $outputFile = PROJ_ROOT . '/compile/ast/ast.go';
+    private string $outputFile = MAIN_ROOT . '/compile/ast/ast.go';
 
-    public function run()
+    public function generate()
     {
         $types      = AstTool::allTypes();
         $interfaces = [];
@@ -43,7 +41,7 @@ class GenAstNodes
             $code .= join("", $types);
         }
 
-        file_put_contents($this->outputFile, $code);
+        $this->writeFile($this->outputFile, $code);
     }
 
     private function printInterface(NodeType $type): string

@@ -1,6 +1,6 @@
 <?php
 
-namespace GoPhp\Tools\Scripts;
+namespace GoPhp\Tools\Common;
 
 use PhpParser\Node;
 use ReflectionClass;
@@ -16,7 +16,7 @@ class AstTool
     {
         $types  = [];
         $finder = new Finder();
-        $finder->in(PHP_ROOT . '/vendor/nikic/php-parser/lib/PhpParser/Node')->files();
+        $finder->in(PARSER_ROOT . '/vendor/nikic/php-parser/lib/PhpParser/Node')->files();
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
             $className = Node::class . '\\' . str_replace(['/', '.php'], ['\\', ''], $file->getRelativePathname());
