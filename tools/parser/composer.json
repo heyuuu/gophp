@@ -1,13 +1,15 @@
 {
-    "autoload": {
-        "psr-4": {
-            "GoPhp\\Tools\\": "src",
-            "GoPhp\\Tools\\Scripts\\": "scripts/lib"
-        }
-    },
-    "require": {
-        "ext-json": "*",
-        "nikic/php-parser": "^4.15",
-        "symfony/finder": "^6.2"
+  "autoload": {
+    "psr-4": {
+      "GoPhp\\Tools\\": "src",
+      "GoPhp\\Tools\\Scripts\\": "scripts/lib"
     }
+  },
+  "require": {
+    "php": "^8.3",
+    "ext-json": "*",
+    "nikic/php-parser": "^4.15",
+    "symfony/finder": "^6.2",
+    "symfony/console": "^7.1"
+  }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace GoPhp\Tools;
+namespace GoPhp\Tools\Parse;
 
 use PhpParser\Node;
 
@@ -23,6 +23,8 @@ class NodeEncoder
             if ($data instanceof Node\Scalar\String_ || $data instanceof Node\Scalar\EncapsedStringPart) {
                 $objectVars["value"] = base64_encode($objectVars["value"]);
             }
+
+            $objectVars['attributes'] = $data->getAttributes();
 
             return ['nodeType' => $this->getNodeType($data)] + $objectVars;
         }

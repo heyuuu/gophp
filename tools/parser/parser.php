@@ -1,25 +1,14 @@
 <?php
 
-// parse args
-use GoPhp\Tools\Application;
+use GoPhp\Tools\Commands\ParseCommand;
+use Symfony\Component\Console\Application;
 
-$opts = getopt("c:", ["code"]);
-$code = $opts["code"] ?? $opts["c"] ?? "";
+require_once __DIR__ . '/vendor/autoload.php';
 
-// main
-if ($code) {
-    require_once __DIR__ . '/vendor/autoload.php';
-    $app = new Application();
-    echo $app->parseCode($code);
-    exit();
-}
+$commands = [
+    new ParseCommand(),
+];
 
-// Show help
-echo <<<'HELP'
-Usage:
-    php parser.php [arguments]
-The arguments are:
-    -c|--code       source code string
-For example:
-    php parser.php -c "<?php var_dump(1);"
-HELP;
+$app = new Application('gophp-parser', '0.2.0');
+$app->addCommands($commands);
+$app->run();

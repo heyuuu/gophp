@@ -1,6 +1,8 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace GoPhp\Tools;
+declare(strict_types=1);
+
+namespace GoPhp\Tools\Parse;
 
 use PhpParser\Error;
 use PhpParser\NodeTraverser;

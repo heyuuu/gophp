@@ -8,7 +8,7 @@ import (
 )
 
 func ParseCode(code string) (*ast.File, error) {
-	output, err := runParser("-c", code)
+	output, err := runParser("parse", "-c", code)
 	if err != nil {
 		return nil, err
 	}
@@ -16,15 +16,14 @@ func ParseCode(code string) (*ast.File, error) {
 }
 
 /* Parser 脚本相关 */
-var scriptPath = "/Users/heyu/Code/sik/gophp-work/gophp/tools/parser/parser.php"
+var parser = "/usr/local/bin/gophp-parser"
 
 func runParser(args ...string) ([]byte, error) {
-	if _, err := os.Stat(scriptPath); err != nil {
+	if _, err := os.Stat(parser); err != nil {
 		log.Panicln("PHP Parser 脚本路径不存在或不可读")
 	}
 
-	commandArgs := append([]string{scriptPath}, args...)
-	command := exec.Command("php", commandArgs...)
+	command := exec.Command(parser, args...)
 	log.Printf("Run command: %s\n", command.String())
 	return command.CombinedOutput()
 }

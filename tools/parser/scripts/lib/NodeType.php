@@ -2,7 +2,7 @@
 
 namespace GoPhp\Tools\Scripts;
 
-use GoPhp\Tools\NodeTool;
+use GoPhp\Tools\Parse\NodeTool;
 use JsonSerializable;
 use PhpParser\Node;
 use ReflectionClass;

@@ -1,6 +1,6 @@
 <?php
 
-namespace GoPhp\Tools;
+namespace GoPhp\Tools\Parse;
 
 use PhpParser\Node;
 use PhpParser\NodeAbstract;
