@@ -9,11 +9,28 @@ type File struct {
 	Namespaces []*NamespaceStmt
 }
 
-type (
-	Node interface {
-		node()
-	}
+// Node
+type Node interface {
+	node()
+}
 
+// baseNode
+type baseNode struct{}
+
+func (*baseNode) node() {}
+
+// baseExpr
+type baseExpr struct{ baseNode }
+
+func (*baseExpr) exprNode() {}
+
+// baseStmt
+type baseStmt struct{ baseNode }
+
+func (*baseStmt) stmtNode() {}
+
+// node interfaces
+type (
 	Expr interface {
 		Node
 		exprNode()
@@ -52,11 +69,13 @@ type (
 // misc
 type (
 	Arg struct {
+		baseNode
 		Value  Expr // @var Expr Value to pass
 		Unpack bool // @var bool Whether to unpack the argument
 	}
 
 	Ident struct {
+		baseNode
 		Name string // @var string Ident as string
 		/**
 		 * Represents a name that is written in source code with a leading dollar,
@@ -69,6 +88,7 @@ type (
 	}
 
 	Param struct {
+		baseNode
 		Type     TypeHint      // @var TypeHint|null Type declaration
 		ByRef    bool          // @var bool Whether parameter is passed by reference
 		Variadic bool          // @var bool Whether this is a variadic argument
@@ -85,27 +105,32 @@ type TypeHint interface {
 
 type (
 	SimpleType struct {
+		baseNode
 		Name *Name
 	}
 
 	// IntersectionType : A & B & C
 	IntersectionType struct {
+		baseNode
 		Types []TypeHint // possible type: SimpleType
 	}
 
 	// UnionType : A | B | C
 	UnionType struct {
+		baseNode
 		Types []TypeHint // possible type: SimpleType or IntersectionType
 	}
 
 	// NullableType : ?A
 	NullableType struct {
+		baseNode
 		Type *SimpleType // possible type: SimpleType
 	}
 )
 
 // Name : Node
 type Name struct {
+	baseNode
 	Kind  NameKind // kind
 	Parts []string // @var string[] Parts of the name
 }
@@ -135,22 +160,27 @@ type (
 	// literal
 
 	IntLit struct {
+		baseExpr
 		Value int // number value
 	}
 
 	FloatLit struct {
+		baseExpr
 		Value float64 // number value
 	}
 
 	StringLit struct {
+		baseExpr
 		Value string // string value
 	}
 
 	ArrayExpr struct {
+		baseExpr
 		Items []*ArrayItemExpr // @var (ArrayItem|null)[] Items
 	}
 
 	ArrayItemExpr struct {
+		baseExpr
 		Key    Expr // @var Expr|null Key
 		Value  Expr // @var Expr Value
 		ByRef  bool // @var bool Whether to assign by reference
@@ -159,6 +189,7 @@ type (
 
 	// ClosureExpr : Expr, FunctionLike
 	ClosureExpr struct {
+		baseExpr
 		Static     bool              // @var bool Whether the closure is static
 		ByRef      bool              // @var bool Whether to return by reference
 		Params     []*Param          // @var Param[] Parameters
@@ -168,12 +199,14 @@ type (
 	}
 
 	ClosureUseExpr struct {
+		baseExpr
 		Var   *VariableExpr // @var VariableExpr Variable to use
 		ByRef bool          // @var bool Whether to use by reference
 	}
 
 	// ArrowFunctionExpr : Expr, FunctionLike
 	ArrowFunctionExpr struct {
+		baseExpr
 		Static     bool     // @var bool
 		ByRef      bool     // @var bool
 		Params     []*Param // @var Param[]
@@ -183,24 +216,28 @@ type (
 
 	// IndexExpr
 	IndexExpr struct {
+		baseExpr
 		Var Expr // @var Expr       Variable
 		Dim Expr // @var Expr|null  Array index / dim
 	}
 
 	// CastExpr
 	CastExpr struct {
+		baseExpr
 		Kind CastKind
 		Expr Expr // @var Expr Expression
 	}
 
 	// UnaryExpr
 	UnaryExpr struct {
+		baseExpr
 		Op  UnaryOpKind
 		Var Expr // variable
 	}
 
 	// BinaryOpExpr
 	BinaryOpExpr struct {
+		baseExpr
 		Op    BinaryOpKind
 		Left  Expr // @var Expr The left-hand side expression
 		Right Expr // @var Expr The right-hand side expression
@@ -208,96 +245,116 @@ type (
 
 	// AssignExpr
 	AssignExpr struct {
+		baseExpr
 		Var  Expr // @var Expr Variable
 		Expr Expr // @var Expr Expression
 	}
 
 	// AssignOpExpr
 	AssignOpExpr struct {
+		baseExpr
 		Op   AssignOpKind
 		Var  Expr // @var Expr Variable
 		Expr Expr // @var Expr Expression
 	}
 
 	AssignRefExpr struct {
+		baseExpr
 		Var  Expr // @var Expr Variable reference is assigned to
 		Expr Expr // @var Expr Variable which is referenced
 	}
 
 	IssetExpr struct {
+		baseExpr
 		Vars []Expr // @var Expr[] Variables
 	}
 
 	EmptyExpr struct {
+		baseExpr
 		Expr Expr // @var Expr Expression
 	}
 
 	EvalExpr struct {
+		baseExpr
 		Expr Expr // @var Expr Expression
 	}
 
 	IncludeExpr struct {
+		baseExpr
 		Kind IncludeKind // @var int Type of include
 		Expr Expr        // @var Expr Expression
 	}
 
 	CloneExpr struct {
+		baseExpr
 		Expr Expr // @var Expr Expression
 	}
 
 	ErrorSuppressExpr struct {
+		baseExpr
 		Expr Expr // @var Expr Expression
 	}
 
 	ExitExpr struct {
+		baseExpr
 		Expr Expr // @var Expr|null Expression
 	}
 
 	ConstFetchExpr struct {
+		baseExpr
 		Name *Name // @var Name Constant name
 	}
 
 	ClassConstFetchExpr struct {
+		baseExpr
 		Class Node   // @var Name|Expr Class name
 		Name  *Ident // @var Ident Constant name
 	}
 
 	MagicConstExpr struct {
+		baseExpr
 		Kind MagicConstKind
 	}
 
 	InstanceofExpr struct {
+		baseExpr
 		Expr  Expr // @var Expr Expression
 		Class Node // @var Name|Expr Class name
 	}
 
 	ListExpr struct {
+		baseExpr
 		Items []*ArrayItemExpr // @var (ArrayItem|null)[] List of items to assign to
 	}
 
 	PrintExpr struct {
+		baseExpr
 		Expr Expr // @var Expr Expression
 	}
 
 	// PropertyFetchExpr : Expr
 	PropertyFetchExpr struct {
+		baseExpr
 		Var      Expr // @var Expr Variable holding object
 		Name     Node // @var Ident|Expr Property name
 		Nullable bool
 	}
 
 	StaticPropertyFetchExpr struct {
+		baseExpr
 		Class Node // @var Name|Expr Class name
 		Name  Node // @var Ident|Expr Property name
 	}
 
 	// ShellExecExpr : Expr
 	ShellExecExpr struct {
+		baseExpr
 		Parts []Expr // @var array Encapsed string array
 	}
 
 	// TernaryExpr : Expr
 	TernaryExpr struct {
+		baseExpr
 		Cond Expr // @var Expr Condition
 		If   Expr // @var Expr|null Expression for true
 		Else Expr // @var Expr Expression for false
@@ -305,39 +362,46 @@ type (
 
 	// ThrowExpr : Expr
 	ThrowExpr struct {
+		baseExpr
 		Expr Expr // @var Expr Expression
 	}
 
 	// VariableExpr : Expr
 	VariableExpr struct {
+		baseExpr
 		Name Node // @var Ident|Expr Name
 	}
 
 	// YieldExpr : Expr
 	YieldExpr struct {
+		baseExpr
 		Key   Expr // @var Expr|null Key expression
 		Value Expr // @var Expr|null Value expression
 	}
 
 	// YieldFromExpr : Expr
 	YieldFromExpr struct {
+		baseExpr
 		Expr Expr // @var Expr Expression to yield from
 	}
 
 	// FuncCallExpr : CallLikeExpr
 	FuncCallExpr struct {
+		baseExpr
 		Name Node   // @var Name|Expr Function name
 		Args []*Arg // @var Arguments
 	}
 
 	// NewExpr : CallLikeExpr
 	NewExpr struct {
+		baseExpr
 		Class Node   // @var Name|Expr|ClassStmt Class name
 		Args  []*Arg // @var Arguments
 	}
 
 	// MethodCallExpr : CallLikeExpr
 	MethodCallExpr struct {
+		baseExpr
 		Var      Expr   // @var Expr Variable holding object
 		Name     Node   // @var Ident|Expr Method name
 		Args     []*Arg // @var Arguments
@@ -346,6 +410,7 @@ type (
 
 	// StaticCallExpr : CallLikeExpr
 	StaticCallExpr struct {
+		baseExpr
 		Class Node   // @var Name|Expr Class name
 		Name  Node   // @var Ident|Expr Method name
 		Args  []*Arg // @var Arguments
@@ -382,30 +447,38 @@ const (
 
 // Stmt
 type (
-	EmptyStmt struct{}
+	EmptyStmt struct {
+		baseStmt
+	}
 
 	BlockStmt struct {
+		baseStmt
 		List []Stmt
 	}
 
 	ExprStmt struct {
+		baseStmt
 		Expr Expr // @var Expr Expression
 	}
 
 	ReturnStmt struct {
+		baseStmt
 		Expr Expr // @var Expr|null Expression
 	}
 
 	LabelStmt struct {
+		baseStmt
 		Name *Ident // @var Ident Name
 	}
 
 	GotoStmt struct {
+		baseStmt
 		Name *Ident // @var Ident Name of label to jump to
 	}
 
 	// IfStmt
 	IfStmt struct {
+		baseStmt
 		Cond    Expr          // @var Expr 			condition expression
 		Stmts   []Stmt        // @var Stmt[] 		body statements
 		Elseifs []*ElseIfStmt // @var ElseIfStmt[] 	elseif branches
@@ -413,27 +486,32 @@ type (
 	}
 
 	ElseIfStmt struct {
+		baseStmt
 		Cond  Expr   // @var Expr 	Condition
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
 	ElseStmt struct {
+		baseStmt
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
 	// SwitchStmt
 	SwitchStmt struct {
+		baseStmt
 		Cond  Expr        // @var Expr Condition
 		Cases []*CaseStmt // @var Case_[] Case list
 	}
 
 	CaseStmt struct {
+		baseStmt
 		Cond  Expr   // @var Expr|null Condition (null for default)
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
 	// ForStmt
 	ForStmt struct {
+		baseStmt
 		Init  []Expr // @var Expr[] Init expressions
 		Cond  []Expr // @var Expr[] Loop conditions
 		Loop  []Expr // @var Expr[] Loop expressions
@@ -442,6 +520,7 @@ type (
 
 	// ForeachStmt
 	ForeachStmt struct {
+		baseStmt
 		Expr     Expr   // @var Expr Expression to iterate
 		KeyVar   Expr   // @var Expr|null Variable to assign key to
 		ByRef    bool   // @var bool Whether to assign value by reference
@@ -450,78 +529,94 @@ type (
 	}
 
 	BreakStmt struct {
+		baseStmt
 		Num Expr // @var Expr|null Number of loops to break
 	}
 
 	ContinueStmt struct {
+		baseStmt
 		Num Expr // @var Expr|null Number of loops to continue
 	}
 
 	// WhileStmt
 	WhileStmt struct {
+		baseStmt
 		Cond  Expr   // @var Expr Condition
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
 	// DoStmt
 	DoStmt struct {
+		baseStmt
 		Stmts []Stmt // @var Stmt[] Statements
 		Cond  Expr   // @var Expr Condition
 	}
 
 	// try-catch-finally
 	TryCatchStmt struct {
+		baseStmt
 		Stmts   []Stmt       // @var Stmt[] Statements
 		Catches []*CatchStmt // @var Catch_[] Catches
 		Finally *FinallyStmt // @var Finally_|null Optional finally node
 	}
 
 	CatchStmt struct {
+		baseStmt
 		Types []*Name       // @var Name[] Types of exceptions to catch
 		Var   *VariableExpr // @var VariableExpr|null Variable for exception
 		Stmts []Stmt        // @var Stmt[] Statements
 	}
 
 	FinallyStmt struct {
+		baseStmt
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
 	ConstStmt struct {
+		baseStmt
 		Name           *Ident // @var Ident Name
 		Value          Expr   // @var Expr Value
 		NamespacedName *Name  // @var Name|null Namespaced name (if using NameResolver)
 	}
 
 	EchoStmt struct {
+		baseStmt
 		Exprs []Expr // @var Expr[] Expressions
 	}
 
 	GlobalStmt struct {
+		baseStmt
 		Vars []Expr // @var Expr[] Variables
 	}
 
 	HaltCompilerStmt struct {
+		baseStmt
 		Remaining string // @var string Remaining text after halt compiler statement.
 	}
 
 	InlineHTMLStmt struct {
+		baseStmt
 		Value string // @var string String
 	}
 
 	StaticStmt struct {
+		baseStmt
 		Vars []*StaticVarStmt // @var StaticVar[] Variable definitions
 	}
 
 	StaticVarStmt struct {
+		baseStmt
 		Var     *VariableExpr // @var VariableExpr Variable
 		Default Expr          // @var Expr|null Default value
 	}
 
 	UnsetStmt struct {
+		baseStmt
 		Vars []Expr // @var Expr[] Variables to unset
 	}
 
 	UseStmt struct {
+		baseStmt
 		Type  UseType // @var UseType     UseNormal UseFunction Or UseConstant
 		Name  *Name   // @var Name        Namespace, class, function or constant to alias
 		Alias *Ident  // @var Ident|null  Alias Name, or nil
@@ -529,23 +624,27 @@ type (
 
 	// DeclareStmt
 	DeclareStmt struct {
+		baseStmt
 		Declares []*DeclareDeclareStmt // @var DeclareDeclare[] List of declares
 		Stmts    []Stmt                // @var Stmt[]|null Statements
 	}
 
 	DeclareDeclareStmt struct {
+		baseStmt
 		Key   *Ident // @var Ident Key
 		Value Expr   // @var Expr Value
 	}
 
 	// NamespaceStmt
 	NamespaceStmt struct {
+		baseStmt
 		Name  *Name  // @var Name|null Name
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
 	// FunctionStmt : Stmt, FunctionLike
 	FunctionStmt struct {
+		baseStmt
 		ByRef          bool     // @var bool Whether function returns by reference
 		Name           *Ident   // @var Ident Name
 		Params         []*Param // @var Param[] Parameters
@@ -556,6 +655,7 @@ type (
 
 	// InterfaceStmt
 	InterfaceStmt struct {
+		baseStmt
 		Extends        []*Name // @var Name[] Extended interfaces
 		Name           *Ident  // @var Ident|null Name
 		Stmts          []Stmt  // @var Stmt[] Statements
@@ -564,6 +664,7 @@ type (
 
 	// ClassStmt : ClassLikeStmt
 	ClassStmt struct {
+		baseStmt
 		Flags          Flags   // @var Flags      Type
 		Extends        *Name   // @var Name|null  Name of extended class
 		Implements     []*Name // @var Name[]     Names of implemented interfaces
@@ -574,6 +675,7 @@ type (
 
 	// ClassConstStmt : Stmt
 	ClassConstStmt struct {
+		baseStmt
 		Flags Flags  // @var Flags Modifiers
 		Name  *Ident // @var Ident Name
 		Value Expr   // @var Expr Value
@@ -581,6 +683,7 @@ type (
 
 	// PropertyStmt : Stmt
 	PropertyStmt struct {
+		baseStmt
 		Flags   Flags    // @var Flags Modifiers
 		Type    TypeHint // @var TypeHint|null Type declaration
 		Name    *Ident   // @var Ident     Name
@@ -589,6 +692,7 @@ type (
 
 	// ClassMethodStmt : Stmt, FunctionLike
 	ClassMethodStmt struct {
+		baseStmt
 		Flags      Flags    // @var Flags Modifiers
 		ByRef      bool     // @var bool Whether to return by reference
 		Name       *Ident   // @var Ident Name
@@ -599,18 +703,21 @@ type (
 
 	// TraitStmt : ClassLikeStmt
 	TraitStmt struct {
+		baseStmt
 		Name           *Ident // @var Ident|null Name
 		Stmts          []Stmt // @var Stmt[] Statements
 		NamespacedName *Name  // @var Name|null Namespaced name (if using NameResolver)
 	}
 
 	TraitUseStmt struct {
+		baseStmt
 		Traits      []*Name                  // @var Name[] Traits
 		Adaptations []TraitUseAdaptationStmt // @var TraitUseAdaptation[] Adaptations
 	}
 
 	// TraitUseAdaptationAliasStmt : TraitUseAdaptationStmt
 	TraitUseAdaptationAliasStmt struct {
+		baseStmt
 		NewModifier Flags  // @var Flags 	    New modifier, default 0
 		NewName     *Ident // @var Ident|null 	New name, or nil
 		Trait       *Name  // @var Name|null 	Trait name, or nil
@@ -619,6 +726,7 @@ type (
 
 	// TraitUseAdaptationPrecedenceStmt : TraitUseAdaptationStmt
 	TraitUseAdaptationPrecedenceStmt struct {
+		baseStmt
 		Insteadof []*Name // @var Name[] Overwritten traits
 		Trait     *Name   // @var Name|null Trait name
 		Method    *Ident  // @var Ident Method name
@@ -630,102 +738,6 @@ func (*SimpleType) typeHintNode()       {}
 func (*IntersectionType) typeHintNode() {}
 func (*UnionType) typeHintNode()        {}
 func (*NullableType) typeHintNode()     {}
-
-// Expr
-func (*IntLit) exprNode()        {}
-func (*FloatLit) exprNode()      {}
-func (*StringLit) exprNode()     {}
-func (*ArrayExpr) exprNode()     {}
-func (*ArrayItemExpr) exprNode() {}
-
-func (*ClosureExpr) exprNode()       {}
-func (*ClosureUseExpr) exprNode()    {}
-func (*ArrowFunctionExpr) exprNode() {}
-
-func (*IndexExpr) exprNode()     {}
-func (*CastExpr) exprNode()      {}
-func (*UnaryExpr) exprNode()     {}
-func (*BinaryOpExpr) exprNode()  {}
-func (*AssignExpr) exprNode()    {}
-func (*AssignOpExpr) exprNode()  {}
-func (*AssignRefExpr) exprNode() {}
-
-func (*IssetExpr) exprNode()         {}
-func (*EmptyExpr) exprNode()         {}
-func (*EvalExpr) exprNode()          {}
-func (*IncludeExpr) exprNode()       {}
-func (*CloneExpr) exprNode()         {}
-func (*ErrorSuppressExpr) exprNode() {}
-func (*ExitExpr) exprNode()          {}
-
-func (*ConstFetchExpr) exprNode()      {}
-func (*ClassConstFetchExpr) exprNode() {}
-func (*MagicConstExpr) exprNode()      {}
-
-func (*InstanceofExpr) exprNode()          {}
-func (*ListExpr) exprNode()                {}
-func (*PrintExpr) exprNode()               {}
-func (*PropertyFetchExpr) exprNode()       {}
-func (*StaticPropertyFetchExpr) exprNode() {}
-func (*ShellExecExpr) exprNode()           {}
-func (*TernaryExpr) exprNode()             {}
-func (*ThrowExpr) exprNode()               {}
-func (*VariableExpr) exprNode()            {}
-func (*YieldExpr) exprNode()               {}
-func (*YieldFromExpr) exprNode()           {}
-
-func (*FuncCallExpr) exprNode()   {}
-func (*NewExpr) exprNode()        {}
-func (*MethodCallExpr) exprNode() {}
-func (*StaticCallExpr) exprNode() {}
-
-// Stmt
-func (*EmptyStmt) stmtNode()  {}
-func (*BlockStmt) stmtNode()  {}
-func (*ExprStmt) stmtNode()   {}
-func (*ReturnStmt) stmtNode() {}
-
-func (*LabelStmt) stmtNode()    {}
-func (*GotoStmt) stmtNode()     {}
-func (*IfStmt) stmtNode()       {}
-func (*ElseIfStmt) stmtNode()   {}
-func (*ElseStmt) stmtNode()     {}
-func (*SwitchStmt) stmtNode()   {}
-func (*CaseStmt) stmtNode()     {}
-func (*ForStmt) stmtNode()      {}
-func (*ForeachStmt) stmtNode()  {}
-func (*BreakStmt) stmtNode()    {}
-func (*ContinueStmt) stmtNode() {}
-func (*WhileStmt) stmtNode()    {}
-func (*DoStmt) stmtNode()       {}
-func (*TryCatchStmt) stmtNode() {}
-func (*CatchStmt) stmtNode()    {}
-func (*FinallyStmt) stmtNode()  {}
-
-func (*ConstStmt) stmtNode()        {}
-func (*EchoStmt) stmtNode()         {}
-func (*GlobalStmt) stmtNode()       {}
-func (*HaltCompilerStmt) stmtNode() {}
-func (*InlineHTMLStmt) stmtNode()   {}
-func (*StaticStmt) stmtNode()       {}
-func (*StaticVarStmt) stmtNode()    {}
-
-func (*UnsetStmt) stmtNode()          {}
-func (*UseStmt) stmtNode()            {}
-func (*DeclareStmt) stmtNode()        {}
-func (*DeclareDeclareStmt) stmtNode() {}
-
-func (*NamespaceStmt) stmtNode()                    {}
-func (*FunctionStmt) stmtNode()                     {}
-func (*InterfaceStmt) stmtNode()                    {}
-func (*ClassStmt) stmtNode()                        {}
-func (*ClassConstStmt) stmtNode()                   {}
-func (*PropertyStmt) stmtNode()                     {}
-func (*ClassMethodStmt) stmtNode()                  {}
-func (*TraitStmt) stmtNode()                        {}
-func (*TraitUseStmt) stmtNode()                     {}
-func (*TraitUseAdaptationAliasStmt) stmtNode()      {}
-func (*TraitUseAdaptationPrecedenceStmt) stmtNode() {}
 
 // CallLikeExpr
 func (*FuncCallExpr) callLikeExprNode()   {}
@@ -747,95 +759,3 @@ func (*TraitStmt) classLikeStmtNode()     {}
 // TraitUseAdaptationStmt
 func (*TraitUseAdaptationAliasStmt) traitUseAdaptationStmtNode()      {}
 func (*TraitUseAdaptationPrecedenceStmt) traitUseAdaptationStmtNode() {}
-
-// All Node types
-func (*Arg) node()                              {}
-func (*Ident) node()                            {}
-func (*Param) node()                            {}
-func (*SimpleType) node()                       {}
-func (*IntersectionType) node()                 {}
-func (*UnionType) node()                        {}
-func (*NullableType) node()                     {}
-func (*Name) node()                             {}
-func (*IntLit) node()                           {}
-func (*FloatLit) node()                         {}
-func (*StringLit) node()                        {}
-func (*ArrayExpr) node()                        {}
-func (*ArrayItemExpr) node()                    {}
-func (*ClosureExpr) node()                      {}
-func (*ClosureUseExpr) node()                   {}
-func (*ArrowFunctionExpr) node()                {}
-func (*IndexExpr) node()                        {}
-func (*CastExpr) node()                         {}
-func (*UnaryExpr) node()                        {}
-func (*BinaryOpExpr) node()                     {}
-func (*AssignExpr) node()                       {}
-func (*AssignOpExpr) node()                     {}
-func (*AssignRefExpr) node()                    {}
-func (*IssetExpr) node()                        {}
-func (*EmptyExpr) node()                        {}
-func (*EvalExpr) node()                         {}
-func (*IncludeExpr) node()                      {}
-func (*CloneExpr) node()                        {}
-func (*ErrorSuppressExpr) node()                {}
-func (*ExitExpr) node()                         {}
-func (*ConstFetchExpr) node()                   {}
-func (*ClassConstFetchExpr) node()              {}
-func (*MagicConstExpr) node()                   {}
-func (*InstanceofExpr) node()                   {}
-func (*ListExpr) node()                         {}
-func (*PrintExpr) node()                        {}
-func (*PropertyFetchExpr) node()                {}
-func (*StaticPropertyFetchExpr) node()          {}
-func (*ShellExecExpr) node()                    {}
-func (*TernaryExpr) node()                      {}
-func (*ThrowExpr) node()                        {}
-func (*VariableExpr) node()                     {}
-func (*YieldExpr) node()                        {}
-func (*YieldFromExpr) node()                    {}
-func (*FuncCallExpr) node()                     {}
-func (*NewExpr) node()                          {}
-func (*MethodCallExpr) node()                   {}
-func (*StaticCallExpr) node()                   {}
-func (*EmptyStmt) node()                        {}
-func (*BlockStmt) node()                        {}
-func (*ExprStmt) node()                         {}
-func (*ReturnStmt) node()                       {}
-func (*LabelStmt) node()                        {}
-func (*GotoStmt) node()                         {}
-func (*IfStmt) node()                           {}
-func (*ElseIfStmt) node()                       {}
-func (*ElseStmt) node()                         {}
-func (*SwitchStmt) node()                       {}
-func (*CaseStmt) node()                         {}
-func (*ForStmt) node()                          {}
-func (*ForeachStmt) node()                      {}
-func (*BreakStmt) node()                        {}
-func (*ContinueStmt) node()                     {}
-func (*WhileStmt) node()                        {}
-func (*DoStmt) node()                           {}
-func (*TryCatchStmt) node()                     {}
-func (*CatchStmt) node()                        {}
-func (*FinallyStmt) node()                      {}
-func (*ConstStmt) node()                        {}
-func (*EchoStmt) node()                         {}
-func (*GlobalStmt) node()                       {}
-func (*HaltCompilerStmt) node()                 {}
-func (*InlineHTMLStmt) node()                   {}
-func (*StaticStmt) node()                       {}
-func (*StaticVarStmt) node()                    {}
-func (*UnsetStmt) node()                        {}
-func (*UseStmt) node()                          {}
-func (*DeclareStmt) node()                      {}
-func (*DeclareDeclareStmt) node()               {}
-func (*NamespaceStmt) node()                    {}
-func (*FunctionStmt) node()                     {}
-func (*InterfaceStmt) node()                    {}
-func (*ClassStmt) node()                        {}
-func (*ClassConstStmt) node()                   {}
-func (*PropertyStmt) node()                     {}
-func (*ClassMethodStmt) node()                  {}
-func (*TraitStmt) node()                        {}
-func (*TraitUseStmt) node()                     {}
-func (*TraitUseAdaptationAliasStmt) node()      {}
-func (*TraitUseAdaptationPrecedenceStmt) node() {}

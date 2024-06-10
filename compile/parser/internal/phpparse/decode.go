@@ -1,11 +1,10 @@
 package phpparse
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
+	"strings"
 )
 
 type result struct {
@@ -14,29 +13,16 @@ type result struct {
 	Error string `json:"error"`
 }
 
-func decodeOutput(output []byte) (*ast.File, error) {
-	var res result
-	if err := json.Unmarshal(output, &res); err != nil {
-		return nil, err
-	}
-
-	if !res.Ok {
-		return nil, errors.New(res.Error)
-	}
-
-	return decodeAstData([]byte(res.Data))
-}
-
-func decodeAstData(binData []byte) (file *ast.File, err error) {
+func decodeAstData(binData string) (file *ast.File, err error) {
 	defer func() {
-		if fault := recover(); fault != nil {
-			err = fmt.Errorf("decode ast data failed: %v", fault)
+		if e := recover(); e != nil {
+			err = fmt.Errorf("php parse decode ast data failed: %v", e)
 		}
 	}()
 
 	// json decode
 	var data any
-	decoder := json.NewDecoder(bytes.NewReader(binData))
+	decoder := json.NewDecoder(strings.NewReader(binData))
 	decoder.UseNumber()
 	if err = decoder.Decode(&data); err != nil {
 		return nil, err

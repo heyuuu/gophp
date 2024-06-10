@@ -1,6 +1,8 @@
 package phpparse
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
 	"log"
 	"os"
@@ -8,11 +10,34 @@ import (
 )
 
 func ParseCode(code string) (*ast.File, error) {
+	_, astFile, err := ParseCodeVerbose(code)
+	return astFile, err
+}
+
+func ParseCodeVerbose(code string) (raw string, astFile *ast.File, err error) {
+	raw, err = parseCodeRaw(code)
+	if err == nil {
+		astFile, err = decodeAstData(raw)
+	}
+	return
+}
+
+func parseCodeRaw(code string) (string, error) {
 	output, err := runParser("parse", "-c", code)
 	if err != nil {
-		return nil, err
+		return "", fmt.Errorf("php parse run failed: %w", err)
 	}
-	return decodeOutput(output)
+
+	var res result
+	if err = json.Unmarshal(output, &res); err != nil {
+		return "", fmt.Errorf("php parse json Unmarshal failed: %s", res.Error)
+	}
+
+	if !res.Ok {
+		return "", fmt.Errorf("php parse error: %s", res.Error)
+	}
+
+	return res.Data, nil
 }
 
 /* Parser 脚本相关 */
