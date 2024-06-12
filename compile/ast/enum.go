@@ -111,3 +111,30 @@ const (
 	NameFullyQualified
 	NameRelative
 )
+
+// UseType for UseStmt
+type UseType int
+
+const (
+	UseNormal   UseType = 1 // Class or namespace import
+	UseFunction UseType = 2 // Function import
+	UseConstant UseType = 3 // Constant import
+)
+
+// flags
+type Flags int
+
+func (f Flags) Is(flags Flags) bool { return f&flags != 0 }
+
+const (
+	// 此处不写成 1 << iota 形式，为了表示与 PHP Parser 对齐
+	FlagPublic    Flags = 1
+	FlagProtected Flags = 2
+	FlagPrivate   Flags = 4
+	FlagStatic    Flags = 8
+	FlagAbstract  Flags = 16
+	FlagFinal     Flags = 32
+	FlagReadonly  Flags = 64
+
+	VisibilityModifierMask = FlagPublic | FlagProtected | FlagPrivate
+)

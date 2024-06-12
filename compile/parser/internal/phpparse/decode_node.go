@@ -1,8 +1,6 @@
 package phpparse
 
 import (
-	"encoding/base64"
-	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/kits/slicekit"
@@ -354,9 +352,15 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ClassConstFetchExpr":
+		name := data["name"]
+		if _, ok := name.(ast.Expr); ok {
+			err = unsupported("unsupported high version php feature: php8.3 dynamic class const fetch name")
+			break
+		}
+
 		node = &ast.ClassConstFetchExpr{
 			Class: data["class"].(ast.Node),
-			Name:  data["name"].(*ast.Ident),
+			Name:  name.(*ast.Ident),
 		}
 	case "CloneExpr":
 		node = &ast.CloneExpr{
@@ -455,7 +459,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.PropertyFetchExpr{
 			Var:      data["var"].(ast.Expr),
 			Name:     data["name"].(ast.Node),
-			Nullable: true,
+			Nullsafe: true,
 		}
 	case "PostDecExpr":
 		node = &ast.UnaryExpr{
@@ -661,6 +665,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "ClassConstStmt":
 		flags := asFlags(data["flags"])
 		consts := asSlice[*ast.ConstStmt](data["consts"])
+		typ := asTypeHint(data["type"])
 		stmts := slicekit.Map(consts, func(c *ast.ConstStmt) ast.Stmt {
 			if c.NamespacedName != nil {
 				err = unsupported("ClassConst 不应有 NamespacedName")
@@ -668,6 +673,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 
 			return &ast.ClassConstStmt{
 				Flags: flags,
+				Type:  typ,
 				Name:  c.Name,
 				Value: c.Value,
 			}
@@ -758,24 +764,17 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Name: data["name"].(*ast.Ident),
 		}
 	case "GroupUseStmt":
-		typ := asInt(data["type"])
-		useType, err := getUseType(typ)
-		if err != nil {
-			return nil, err
-		}
-
+		typ := asUseType(data["type"])
 		prefix := data["prefix"].(*ast.Name)
 		uses := asSlice[*ast.UseStmt](data["uses"])
-
-		var stmts []ast.Stmt
-		for _, useStmt := range uses {
-			if useType != ast.UseNormal {
-				useStmt.Type = useType
+		stmts := slicekit.Map(uses, func(useStmt *ast.UseStmt) ast.Stmt {
+			if typ != ast.UseNormal {
+				useStmt.Type = typ
 			}
-			useStmt.Name = concatName(prefix, useStmt.Name)
+			useStmt.Name = ast.NewName(slicekit.Concat(prefix.Parts, useStmt.Name.Parts)...)
 
-			stmts = append(stmts, useStmt)
-		}
+			return useStmt
+		})
 		node = &ast.BlockStmt{List: stmts}
 	case "HaltCompilerStmt":
 		node = &ast.HaltCompilerStmt{
@@ -884,30 +883,18 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Vars: asSlice[ast.Expr](data["vars"]),
 		}
 	case "UseStmt":
-		typ := asInt(data["type"])
-		useType, err := getUseType(typ)
-		if err != nil {
-			return nil, err
-		}
-
+		typ := asUseType(data["type"])
 		uses := asSlice[*ast.UseStmt](data["uses"])
-
-		var stmts []ast.Stmt
-		for _, useStmt := range uses {
-			if useType != ast.UseNormal {
-				useStmt.Type = useType
+		stmts := slicekit.Map(uses, func(useStmt *ast.UseStmt) ast.Stmt {
+			if typ != ast.UseNormal {
+				useStmt.Type = typ
 			}
-			stmts = append(stmts, useStmt)
-		}
+			return useStmt
+		})
 		node = &ast.BlockStmt{List: stmts}
 	case "UseUseStmt":
-		typ := asInt(data["type"])
-		useType, err := getUseType(typ)
-		if err != nil {
-			return nil, err
-		}
 		node = &ast.UseStmt{
-			Type:  useType,
+			Type:  asUseType(data["type"]),
 			Name:  data["name"].(*ast.Name),
 			Alias: asTypeOrNil[*ast.Ident](data["alias"]),
 		}
@@ -936,30 +923,8 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	default:
 		err = unsupported("unexpected node type: " + nodeType)
 	}
+	if err == nil && node != nil && data["attributes"] != nil {
+		trySetMeta(node, data["attributes"])
+	}
 	return
-}
-
-func unsupported(message string) error {
-	return errors.New(message)
-}
-
-func getUseType(typ int) (ast.UseType, error) {
-	switch typ {
-	case 0, 1:
-		return ast.UseNormal, nil
-	case 2:
-		return ast.UseFunction, nil
-	case 3:
-		return ast.UseConstant, nil
-	default:
-		return 0, fmt.Errorf("unsupported StmtUseUse.type: %d", typ)
-	}
-}
-
-func base64decode(s string) string {
-	data, err := base64.StdEncoding.DecodeString(s)
-	if err != nil {
-		return s
-	}
-	return string(data)
 }

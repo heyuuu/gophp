@@ -1,7 +1,9 @@
 package phpparse
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
 	"strings"
@@ -164,9 +166,9 @@ func asSliceItemNullable[T any](data any) []T {
 func asStmtList(data any) []ast.Stmt {
 	var stmts []ast.Stmt
 	for _, stmt := range asSlice[ast.Stmt](data) {
-		switch stmt.(type) {
+		switch s := stmt.(type) {
 		case *ast.BlockStmt:
-			stmts = append(stmts, stmt.(*ast.BlockStmt).List...)
+			stmts = append(stmts, s.List...)
 		default:
 			stmts = append(stmts, stmt)
 		}
@@ -203,10 +205,47 @@ func asTypeHints(data any) []ast.TypeHint {
 	return items
 }
 
-func concatName(name1 *ast.Name, name2 *ast.Name) *ast.Name {
-	// 合并 Parts
-	parts := append(append([]string{}, name1.Parts...), name2.Parts...)
+func asUseType(data any) ast.UseType {
+	typ := asInt(data)
+	switch typ {
+	case 0, 1:
+		return ast.UseNormal
+	case 2:
+		return ast.UseFunction
+	case 3:
+		return ast.UseConstant
+	default:
+		err := fmt.Errorf("unsupported StmtUseUse.type: %d", typ)
+		panic(err)
+	}
+}
 
-	// newName 继承 name1 的其他属性
-	return &ast.Name{Kind: name1.Kind, Parts: parts}
+func unsupported(message string) error {
+	return errors.New(message)
+}
+
+func base64decode(s string) string {
+	data, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return s
+	}
+	return string(data)
+}
+
+func trySetMeta(n ast.Node, metaData any) {
+	if n == nil || metaData == nil {
+		return
+	}
+
+	meta, ok := metaData.(map[string]any)
+	if !ok {
+		return
+	}
+
+	setableNode, ok := n.(interface{ SetMeta(map[string]any) })
+	if !ok {
+		return
+	}
+
+	setableNode.SetMeta(meta)
 }

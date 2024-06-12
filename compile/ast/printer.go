@@ -407,7 +407,7 @@ func (p *printer) expr(n Expr) {
 	case *PrintExpr:
 		p.print("print ", x.Expr)
 	case *PropertyFetchExpr:
-		if !x.Nullable {
+		if !x.Nullsafe {
 			p.print(x.Var, "->", x.Name)
 		} else {
 			p.print(x.Var, "?->", x.Name)

@@ -15,17 +15,26 @@ type Node interface {
 }
 
 // baseNode
-type baseNode struct{}
+type baseNode struct {
+	Meta map[string]any `json:"@"`
+}
 
 func (*baseNode) node() {}
+func (n *baseNode) SetMeta(meta map[string]any) {
+	n.Meta = meta
+}
 
 // baseExpr
-type baseExpr struct{ baseNode }
+type baseExpr struct {
+	baseNode
+}
 
 func (*baseExpr) exprNode() {}
 
 // baseStmt
-type baseStmt struct{ baseNode }
+type baseStmt struct {
+	baseNode
+}
 
 func (*baseStmt) stmtNode() {}
 
@@ -41,7 +50,6 @@ type (
 		stmtNode()
 	}
 
-	// CallLikeExpr : Expr
 	CallLikeExpr interface {
 		Expr
 		callLikeExprNode()
@@ -53,13 +61,11 @@ type (
 		functionLikeNode()
 	}
 
-	// ClassLikeStmt : Stmt
 	ClassLikeStmt interface {
 		Stmt
 		classLikeStmtNode()
 	}
 
-	// TraitUseAdaptationStmt : Stmt
 	TraitUseAdaptationStmt interface {
 		Stmt
 		traitUseAdaptationStmtNode()
@@ -128,7 +134,7 @@ type (
 	}
 )
 
-// Name : Node
+// Name
 type Name struct {
 	baseNode
 	Kind  NameKind // kind
@@ -136,7 +142,7 @@ type Name struct {
 }
 
 func NewName(parts ...string) *Name {
-	return &Name{Parts: parts}
+	return &Name{Kind: NameNormal, Parts: parts}
 }
 
 func (n *Name) IsUnqualified() bool    { return n.Kind == NameNormal && len(n.Parts) == 1 }
@@ -161,14 +167,12 @@ type (
 
 	IntLit struct {
 		baseExpr
-		Value int // number value
+		Value int
 	}
-
 	FloatLit struct {
 		baseExpr
-		Value float64 // number value
+		Value float64
 	}
-
 	StringLit struct {
 		baseExpr
 		Value string // string value
@@ -187,7 +191,7 @@ type (
 		Unpack bool // @var bool Whether to unpack the argument
 	}
 
-	// ClosureExpr : Expr, FunctionLike
+	// ClosureExpr : FunctionLike
 	ClosureExpr struct {
 		baseExpr
 		Static     bool              // @var bool Whether the closure is static
@@ -214,7 +218,6 @@ type (
 		Expr       Expr     // @var Expr
 	}
 
-	// IndexExpr
 	IndexExpr struct {
 		baseExpr
 		Var Expr // @var Expr       Variable
@@ -281,8 +284,8 @@ type (
 
 	IncludeExpr struct {
 		baseExpr
-		Kind IncludeKind // @var int Type of include
-		Expr Expr        // @var Expr Expression
+		Kind IncludeKind
+		Expr Expr
 	}
 
 	CloneExpr struct {
@@ -332,12 +335,11 @@ type (
 		Expr Expr // @var Expr Expression
 	}
 
-	// PropertyFetchExpr : Expr
 	PropertyFetchExpr struct {
 		baseExpr
 		Var      Expr // @var Expr Variable holding object
 		Name     Node // @var Ident|Expr Property name
-		Nullable bool
+		Nullsafe bool
 	}
 
 	StaticPropertyFetchExpr struct {
@@ -346,13 +348,11 @@ type (
 		Name  Node // @var Ident|Expr Property name
 	}
 
-	// ShellExecExpr : Expr
 	ShellExecExpr struct {
 		baseExpr
 		Parts []Expr // @var array Encapsed string array
 	}
 
-	// TernaryExpr : Expr
 	TernaryExpr struct {
 		baseExpr
 		Cond Expr // @var Expr Condition
@@ -360,26 +360,22 @@ type (
 		Else Expr // @var Expr Expression for false
 	}
 
-	// ThrowExpr : Expr
 	ThrowExpr struct {
 		baseExpr
 		Expr Expr // @var Expr Expression
 	}
 
-	// VariableExpr : Expr
 	VariableExpr struct {
 		baseExpr
 		Name Node // @var Ident|Expr Name
 	}
 
-	// YieldExpr : Expr
 	YieldExpr struct {
 		baseExpr
 		Key   Expr // @var Expr|null Key expression
 		Value Expr // @var Expr|null Value expression
 	}
 
-	// YieldFromExpr : Expr
 	YieldFromExpr struct {
 		baseExpr
 		Expr Expr // @var Expr Expression to yield from
@@ -415,34 +411,6 @@ type (
 		Name  Node   // @var Ident|Expr Method name
 		Args  []*Arg // @var Arguments
 	}
-)
-
-// UseType for UseStmt
-type UseType int
-
-const (
-	_           = iota
-	UseNormal   = 1 // Class or namespace import
-	UseFunction = 2 // Function import
-	UseConstant = 3 // Constant import
-)
-
-// flags
-type Flags int
-
-func (f Flags) Is(flags Flags) bool { return f&flags != 0 }
-
-const (
-	// 此处不写成 1 << iota 形式，为了表示与 PHP Parser 对齐
-	FlagPublic    Flags = 1
-	FlagProtected Flags = 2
-	FlagPrivate   Flags = 4
-	FlagStatic    Flags = 8
-	FlagAbstract  Flags = 16
-	FlagFinal     Flags = 32
-	FlagReadonly  Flags = 64
-
-	VisibilityModifierMask = FlagPublic | FlagProtected | FlagPrivate
 )
 
 // Stmt
@@ -653,7 +621,7 @@ type (
 		NamespacedName *Name    // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	// InterfaceStmt
+	// InterfaceStmt : ClassLikeStmt
 	InterfaceStmt struct {
 		baseStmt
 		Extends        []*Name // @var Name[] Extended interfaces
@@ -673,20 +641,19 @@ type (
 		NamespacedName *Name   // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	// ClassConstStmt : Stmt
 	ClassConstStmt struct {
 		baseStmt
-		Flags Flags  // @var Flags Modifiers
-		Name  *Ident // @var Ident Name
-		Value Expr   // @var Expr Value
+		Flags Flags    // @var Flags Modifiers
+		Type  TypeHint // @var TypeHint|null Type declaration
+		Name  *Ident   // @var Ident Name
+		Value Expr     // @var Expr Value
 	}
 
-	// PropertyStmt : Stmt
 	PropertyStmt struct {
 		baseStmt
 		Flags   Flags    // @var Flags Modifiers
 		Type    TypeHint // @var TypeHint|null Type declaration
-		Name    *Ident   // @var Ident     Name
+		Name    *Ident   // @var Ident Name
 		Default Expr     // @var Expr|null Default
 	}
 
