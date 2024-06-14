@@ -242,10 +242,10 @@ func trySetMeta(n ast.Node, metaData any) {
 		return
 	}
 
-	setableNode, ok := n.(interface{ SetMeta(map[string]any) })
+	setableNode, ok := n.(interface{ SetMetaValues(map[string]any) })
 	if !ok {
 		return
 	}
 
-	setableNode.SetMeta(meta)
+	setableNode.SetMetaValues(meta)
 }

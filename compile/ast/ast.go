@@ -12,6 +12,7 @@ type File struct {
 // Node
 type Node interface {
 	node()
+	MetaValue(key string) any
 }
 
 // baseNode
@@ -20,7 +21,14 @@ type baseNode struct {
 }
 
 func (*baseNode) node() {}
-func (n *baseNode) SetMeta(meta map[string]any) {
+
+func (n *baseNode) MetaValue(key string) any {
+	if n.Meta == nil {
+		return nil
+	}
+	return n.Meta[key]
+}
+func (n *baseNode) SetMetaValues(meta map[string]any) {
 	n.Meta = meta
 }
 

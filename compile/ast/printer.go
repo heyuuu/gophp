@@ -2,8 +2,6 @@ package ast
 
 import (
 	"fmt"
-	"github.com/heyuuu/gophp/php/perr"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -14,13 +12,13 @@ import (
  */
 func PrintFile(file *File) (string, error) {
 	p := &printer{inCodeScope: false}
-	p.pFile(file)
+	p.file(file)
 	return p.result()
 }
 
 func PrintNode(node Node) (string, error) {
 	p := &printer{inCodeScope: true}
-	p.printNode(node)
+	p.node(node)
 	return p.result()
 }
 
@@ -63,7 +61,7 @@ func (p *printer) result() (string, error) {
 	return p.buf.String(), nil
 }
 
-func (p *printer) write(s string) {
+func (p *printer) string(s string) {
 	if s == "" {
 		return
 	}
@@ -84,13 +82,39 @@ func (p *printer) write(s string) {
 	}
 }
 
-func (p *printer) pFile(f *File) {
-	printList(p, f.Declares, "\n")
-	p.print("\n")
+func (p *printer) file(f *File) {
+	for _, declare := range f.Declares {
+		p.stmt(declare)
+		p.print("\n")
+	}
 
 	p.multiNamespace = len(f.Namespaces) > 1
-	printList(p, f.Namespaces, "\n")
-	p.print("\n")
+	for _, namespace := range f.Namespaces {
+		p.namespace(namespace)
+		p.print("\n")
+	}
+}
+
+func (p *printer) namespace(x *NamespaceStmt) {
+	if p.multiNamespace {
+		if x.Name != nil {
+			p.print("namespace ", x.Name, " {\n")
+		} else {
+			p.print("namespace {\n")
+		}
+		p.stmtList(x.Stmts, true)
+		p.print("}\n")
+	} else {
+		if x.Name != nil {
+			p.print("namespace ", x.Name, ";\n\n")
+		}
+		p.stmtList(x.Stmts, false)
+	}
+}
+
+func (p *printer) unexpect(n any) {
+	err := fmt.Errorf("printer: unexpected node type %T", n)
+	p.checkError(err)
 }
 
 func (p *printer) print(args ...any) {
@@ -101,11 +125,11 @@ func (p *printer) print(args ...any) {
 
 		switch v := arg.(type) {
 		case string:
-			p.write(v)
+			p.string(v)
 		case Node:
-			p.printNode(v)
+			p.node(v)
 		case fmt.Stringer:
-			p.write(v.String())
+			p.string(v.String())
 		// 以下 case 只是为了加快类型匹配
 		case []Stmt:
 			p.stmtList(v, true)
@@ -119,27 +143,26 @@ func (p *printer) print(args ...any) {
 			} else if nodes, ok := convertNodeList(arg); ok {
 				printList(p, nodes, ", ")
 			} else {
-				_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
-				panic("gophp/php/printer type")
+				p.unexpect(v)
 			}
 		}
 	}
 }
 
-func (p *printer) printNode(node Node) {
+func (p *printer) node(node Node) {
 	if node == nil || reflect.ValueOf(node).IsNil() {
-		p.write("nil")
+		p.string("nil")
 		return
 	}
 
 	switch x := node.(type) {
 	case *Ident:
 		if x.VarLike {
-			p.write("$")
+			p.string("$")
 		}
-		p.write(x.Name)
+		p.string(x.Name)
 	case *Name:
-		p.write(x.ToCodeString())
+		p.string(x.ToCodeString())
 	case Expr:
 		p.expr(x)
 	case Stmt:
@@ -151,17 +174,16 @@ func (p *printer) printNode(node Node) {
 	case *Arg:
 		p.arg(x)
 	default:
-		err := fmt.Errorf("printer: unsupported node type %T", node)
-		p.checkError(err)
+		p.unexpect(x)
 	}
 }
 
 func printList[T Node](p *printer, list []T, sep string) {
 	for i, item := range list {
 		if i != 0 {
-			p.write(sep)
+			p.string(sep)
 		}
-		p.printNode(item)
+		p.node(item)
 	}
 }
 
@@ -201,12 +223,14 @@ func convertStmtList(data any) ([]Stmt, bool) {
 	return nil, false
 }
 
-func (p *printer) stmtList(stmtList []Stmt, indent bool) {
+func (p *printer) stmtList(stmts []Stmt, indent bool) {
 	if indent {
 		p.indent++
 	}
-	printList(p, stmtList, "\n")
-	p.print("\n")
+	for _, stmt := range stmts {
+		p.stmt(stmt)
+		p.string("\n")
+	}
 	if indent {
 		p.indent--
 	}
@@ -302,17 +326,32 @@ func (p *printer) typeHint0(n TypeHint, wrap bool) {
 			p.print(")")
 		}
 	default:
-		panic(perr.Unreachable())
+		p.unexpect(t)
 	}
 }
 
 func (p *printer) expr(n Expr) {
 	switch x := n.(type) {
 	case *IntLit:
+		if rawValue := MetaRawValue(x); rawValue != "" {
+			p.print(rawValue)
+			break
+		}
+
 		p.print(strconv.Itoa(x.Value))
 	case *FloatLit:
+		if rawValue := MetaRawValue(x); rawValue != "" {
+			p.print(rawValue)
+			break
+		}
+
 		p.print(fmt.Sprintf("%f", x.Value))
 	case *StringLit:
+		if rawValue := MetaRawValue(x); rawValue != "" {
+			p.print(rawValue)
+			break
+		}
+
 		// todo escape
 		p.print(`"`, x.Value, `"`)
 	case *ArrayExpr:
@@ -341,6 +380,9 @@ func (p *printer) expr(n Expr) {
 		p.print("(", x.Params, ")")
 		if len(x.Uses) > 0 {
 			p.print(" use (", x.Uses, ")")
+		}
+		if x.ReturnType != nil {
+			p.print(" : ", x.ReturnType)
 		}
 		p.print(" {\n", x.Stmts, "}")
 	case *ClosureUseExpr:
@@ -434,7 +476,11 @@ func (p *printer) expr(n Expr) {
 	case *ThrowExpr:
 		p.print("throw ", x.Expr)
 	case *VariableExpr:
-		p.print("$", x.Name)
+		if nameIdent, ok := x.Name.(*Ident); ok {
+			p.print("$", nameIdent.Name)
+		} else {
+			p.print("${", x.Name, "}")
+		}
 	case *YieldExpr:
 		if x.Key == nil {
 			p.print("yield ", x.Value)
@@ -456,7 +502,7 @@ func (p *printer) expr(n Expr) {
 	case *StaticCallExpr:
 		p.print(x.Class, "::", x.Name, "(", x.Args, ")")
 	default:
-		panic(perr.Unreachable())
+		p.unexpect(n)
 	}
 }
 
@@ -505,14 +551,16 @@ func (p *printer) stmt(n Stmt) {
 		p.indent--
 		p.print("}")
 	case *ForStmt:
-		p.print("for (", x.Init, ";", x.Cond, ";", x.Loop, ") {\n", x.Stmts, "}")
+		p.print("for (", x.Init, "; ", x.Cond, "; ", x.Loop, ") {\n", x.Stmts, "}")
 	case *ForeachStmt:
+		p.print("foreach (", x.Expr, " as ")
 		if x.KeyVar != nil {
-			p.print("foreach (", x.Expr, " as ", x.KeyVar, " => ", x.ValueVar, ")")
-		} else {
-			p.print("foreach (", x.Expr, " as ", x.ValueVar, ")")
+			p.print(x.KeyVar, " => ")
 		}
-		p.print(" {\n", x.Stmts, "}")
+		if x.ByRef {
+			p.print("&")
+		}
+		p.print(x.ValueVar, ") {\n", x.Stmts, "}")
 	case *BreakStmt:
 		if x.Num != nil {
 			p.print("break ", x.Num, ";")
@@ -559,7 +607,7 @@ func (p *printer) stmt(n Stmt) {
 			p.print(x.Var)
 		}
 	case *UnsetStmt:
-		p.print("unset(", x.Vars, ")")
+		p.print("unset(", x.Vars, ");")
 	case *UseStmt:
 		var useType string
 		switch x.Type {
@@ -575,9 +623,7 @@ func (p *printer) stmt(n Stmt) {
 			p.print("use ", useType, x.Name, ";")
 		}
 	case *DeclareStmt:
-		p.print("declare(")
-		printList(p, x.Declares, ", ")
-		p.print(")")
+		p.print("declare(", x.Declares, ")")
 		if len(x.Stmts) == 0 {
 			p.print(";")
 		} else {
@@ -585,21 +631,6 @@ func (p *printer) stmt(n Stmt) {
 		}
 	case *DeclareDeclareStmt:
 		p.print(x.Key, "=", x.Value)
-	case *NamespaceStmt:
-		if p.multiNamespace {
-			if x.Name != nil {
-				p.print("namespace ", x.Name, " {\n")
-			} else {
-				p.print("namespace {\n")
-			}
-			p.stmtList(x.Stmts, true)
-			p.print("}\n")
-		} else {
-			if x.Name != nil {
-				p.print("namespace ", x.Name, ";\n\n")
-			}
-			p.stmtList(x.Stmts, false)
-		}
 	case *FunctionStmt:
 		p.print("function ")
 		if x.ByRef {
@@ -609,17 +640,13 @@ func (p *printer) stmt(n Stmt) {
 		if x.ReturnType != nil {
 			p.print(": ", x.ReturnType)
 		}
-		p.print("\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
+		p.print(" {\n", x.Stmts, "}")
 	case *InterfaceStmt:
 		p.print("interface ", x.Name)
 		if len(x.Extends) != 0 {
 			p.print(" extends ", x.Extends)
 		}
-		p.print("\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
+		p.print("\n{\n", x.Stmts, "}")
 	case *ClassStmt:
 		if x.Flags != 0 {
 			p.flags(x.Flags)
@@ -635,15 +662,17 @@ func (p *printer) stmt(n Stmt) {
 		if len(x.Implements) > 0 {
 			p.print(" implements ", x.Implements)
 		}
-		p.print("\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
+		p.print("\n{\n", x.Stmts, "}")
 	case *ClassConstStmt:
 		if x.Flags != 0 {
 			p.flags(x.Flags)
 			p.print(" ")
 		}
-		p.print("const ", x.Name, " = ", x.Value, ";")
+		p.print("const ")
+		if x.Type != nil {
+			p.print(x.Type, " ")
+		}
+		p.print(x.Name, " = ", x.Value, ";")
 	case *PropertyStmt:
 		if x.Flags != 0 {
 			p.flags(x.Flags)
@@ -671,13 +700,9 @@ func (p *printer) stmt(n Stmt) {
 		if x.ReturnType != nil {
 			p.print(": ", x.ReturnType)
 		}
-		p.print("\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
+		p.print("\n{\n", x.Stmts, "}")
 	case *TraitStmt:
-		p.print("trait ", x.Name, "\n{\n")
-		p.stmtList(x.Stmts, true)
-		p.print("}")
+		p.print("trait ", x.Name, "\n{\n", x.Stmts, "}")
 	case *TraitUseStmt:
 		if len(x.Adaptations) > 0 {
 			p.print("use ", x.Traits, " {\n", x.Adaptations, "}")
@@ -685,7 +710,10 @@ func (p *printer) stmt(n Stmt) {
 			p.print("use ", x.Traits, ";")
 		}
 	case *TraitUseAdaptationPrecedenceStmt:
-		p.print(x.Trait, "::", x.Method, " insteadof ", x.Insteadof, ";")
+		if x.Trait != nil {
+			p.print(x.Trait, "::")
+		}
+		p.print(x.Method, " insteadof ", x.Insteadof, ";")
 	case *TraitUseAdaptationAliasStmt:
 		if x.Trait != nil {
 			p.print(x.Trait, "::")
@@ -700,6 +728,6 @@ func (p *printer) stmt(n Stmt) {
 		}
 		p.print(";")
 	default:
-		panic(perr.Unreachable())
+		p.unexpect(n)
 	}
 }
