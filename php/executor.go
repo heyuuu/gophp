@@ -387,16 +387,11 @@ func (e *Executor) inlineHTMLStmt(x *ast.InlineHTMLStmt) execResult {
 }
 
 func (e *Executor) staticStmt(x *ast.StaticStmt) execResult {
-	for _, staticVarStmt := range x.Vars {
-		_ = staticVarStmt
-	}
 	panic(perr.Todof("e.staticStmt"))
 }
 
 func (e *Executor) unsetStmt(x *ast.UnsetStmt) execResult {
-	for _, var_ := range x.Vars {
-		e.variableRef(var_).Unset()
-	}
+	e.variableRef(x.Var).Unset()
 	return nil
 }
 

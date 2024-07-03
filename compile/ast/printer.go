@@ -506,6 +506,13 @@ func (p *printer) expr(n Expr) {
 	}
 }
 
+func (p *printer) stmtComments(n Node) {
+	comments := MetaComments(n)
+	for _, comment := range comments {
+		p.print(comment.Text, "\n")
+	}
+}
+
 func (p *printer) stmt(n Stmt) {
 	if html, ok := n.(*InlineHTMLStmt); ok {
 		p.leaveCodeScope()
@@ -514,6 +521,7 @@ func (p *printer) stmt(n Stmt) {
 	}
 
 	p.enterCodeScope()
+	p.stmtComments(n)
 	switch x := n.(type) {
 	case *EmptyStmt:
 		p.print(";")
@@ -595,19 +603,17 @@ func (p *printer) stmt(n Stmt) {
 	case *EchoStmt:
 		p.print("echo ", x.Exprs, ";")
 	case *GlobalStmt:
-		p.print("global ", x.Vars, ";")
+		p.print("global ", x.Var, ";")
 	case *HaltCompilerStmt:
 		p.print("__halt_compiler();", x.Remaining)
 	case *StaticStmt:
-		p.print("static ", x.Vars, ";")
-	case *StaticVarStmt:
 		if x.Default != nil {
-			p.print(x.Var, " = ", x.Default)
+			p.print("static ", x.Var, " = ", x.Default, ";")
 		} else {
-			p.print(x.Var)
+			p.print("static ", x.Var, ";")
 		}
 	case *UnsetStmt:
-		p.print("unset(", x.Vars, ");")
+		p.print("unset(", x.Var, ");")
 	case *UseStmt:
 		var useType string
 		switch x.Type {

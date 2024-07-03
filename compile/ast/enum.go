@@ -138,3 +138,10 @@ const (
 
 	VisibilityModifierMask = FlagPublic | FlagProtected | FlagPrivate
 )
+
+type CommentType int
+
+const (
+	CommentLine CommentType = iota
+	CommentDoc
+)

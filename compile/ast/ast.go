@@ -12,24 +12,23 @@ type File struct {
 // Node
 type Node interface {
 	node()
-	MetaValue(key string) any
+	Meta() *NodeMeta
+	SetMeta(meta *NodeMeta)
 }
 
 // baseNode
 type baseNode struct {
-	Meta map[string]any `json:"@"`
+	*NodeMeta `json:"@@"`
 }
 
 func (*baseNode) node() {}
 
-func (n *baseNode) MetaValue(key string) any {
-	if n.Meta == nil {
-		return nil
-	}
-	return n.Meta[key]
+func (n *baseNode) Meta() *NodeMeta {
+	return n.NodeMeta
 }
-func (n *baseNode) SetMetaValues(meta map[string]any) {
-	n.Meta = meta
+
+func (n *baseNode) SetMeta(meta *NodeMeta) {
+	n.NodeMeta = meta
 }
 
 // baseExpr
@@ -108,6 +107,12 @@ type (
 		Variadic bool          // @var bool Whether this is a variadic argument
 		Var      *VariableExpr // @var VariableExpr Parameter variable
 		Default  Expr          // @var Expr|null Default value
+	}
+
+	Comment struct {
+		baseNode
+		Type CommentType
+		Text string
 	}
 )
 
@@ -562,7 +567,7 @@ type (
 
 	GlobalStmt struct {
 		baseStmt
-		Vars []Expr // @var Expr[] Variables
+		Var Expr // @var Expr Variables
 	}
 
 	HaltCompilerStmt struct {
@@ -577,18 +582,13 @@ type (
 
 	StaticStmt struct {
 		baseStmt
-		Vars []*StaticVarStmt // @var StaticVar[] Variable definitions
-	}
-
-	StaticVarStmt struct {
-		baseStmt
 		Var     *VariableExpr // @var VariableExpr Variable
 		Default Expr          // @var Expr|null Default value
 	}
 
 	UnsetStmt struct {
 		baseStmt
-		Vars []Expr // @var Expr[] Variables to unset
+		Var Expr // @var Expr Variables to unset
 	}
 
 	UseStmt struct {

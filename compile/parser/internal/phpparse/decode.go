@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
+	"github.com/heyuuu/gophp/kits/slicekit"
 	"strings"
 )
 
@@ -51,6 +52,8 @@ func buildAstFile(stmts []ast.Stmt) *ast.File {
 			declareStmts = append(declareStmts, s)
 		case *ast.NamespaceStmt:
 			namespaceStmts = append(namespaceStmts, s)
+		case *ast.HaltCompilerStmt:
+			break
 		default:
 			globalStmts = append(globalStmts, s)
 		}
@@ -176,6 +179,14 @@ func asStmtList(data any) []ast.Stmt {
 	return stmts
 }
 
+func multiStmt[T ast.Stmt](stmts []T) ast.Stmt {
+	return &ast.BlockStmt{
+		List: slicekit.Map(stmts, func(stmt T) ast.Stmt {
+			return stmt
+		}),
+	}
+}
+
 func asTypeHint(data any) ast.TypeHint {
 	if data == nil {
 		return nil
@@ -221,7 +232,7 @@ func asUseType(data any) ast.UseType {
 }
 
 func unsupported(message string) error {
-	return errors.New(message)
+	return errors.New("parser.decode: " + message)
 }
 
 func base64decode(s string) string {
@@ -230,6 +241,25 @@ func base64decode(s string) string {
 		return s
 	}
 	return string(data)
+}
+
+func decodeMeta(data map[string]any) (meta *ast.NodeMeta) {
+	if len(data) == 0 {
+		return nil
+	}
+
+	meta = ast.NewNodeMeta()
+	for k, v := range data {
+		switch k {
+		case "rawValue":
+			meta.RawValue = v.(string)
+		case "comments":
+			meta.Comments = asSlice[*ast.Comment](v)
+		default:
+			meta.Others[k] = v
+		}
+	}
+	return
 }
 
 func trySetMeta(n ast.Node, metaData any) {
@@ -242,10 +272,5 @@ func trySetMeta(n ast.Node, metaData any) {
 		return
 	}
 
-	setableNode, ok := n.(interface{ SetMetaValues(map[string]any) })
-	if !ok {
-		return
-	}
-
-	setableNode.SetMetaValues(meta)
+	n.SetMeta(decodeMeta(meta))
 }

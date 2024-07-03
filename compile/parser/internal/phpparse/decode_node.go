@@ -678,7 +678,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 				Value: c.Value,
 			}
 		})
-		node = &ast.BlockStmt{List: stmts}
+		node = multiStmt(stmts)
 	case "ClassMethodStmt":
 		node = &ast.ClassMethodStmt{
 			Flags:      asFlags(data["flags"]),
@@ -690,7 +690,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ConstStmt":
 		stmts := asStmtList(data["consts"])
-		node = &ast.BlockStmt{List: stmts}
+		node = multiStmt(stmts)
 	case "ContinueStmt":
 		node = &ast.ContinueStmt{
 			Num: asTypeOrNil[ast.Expr](data["num"]),
@@ -756,9 +756,13 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
 	case "GlobalStmt":
-		node = &ast.GlobalStmt{
-			Vars: asSlice[ast.Expr](data["vars"]),
-		}
+		vars := asSlice[ast.Expr](data["vars"])
+		stmts := slicekit.Map(vars, func(v ast.Expr) ast.Stmt {
+			return &ast.GlobalStmt{
+				Var: v,
+			}
+		})
+		node = multiStmt(stmts)
 	case "GotoStmt":
 		node = &ast.GotoStmt{
 			Name: data["name"].(*ast.Ident),
@@ -775,7 +779,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 
 			return useStmt
 		})
-		node = &ast.BlockStmt{List: stmts}
+		node = multiStmt(stmts)
 	case "HaltCompilerStmt":
 		node = &ast.HaltCompilerStmt{
 			Remaining: data["remaining"].(string),
@@ -818,7 +822,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			t.Type = typeHint
 			return t
 		})
-		node = &ast.BlockStmt{List: stmts}
+		node = multiStmt(stmts)
 	case "PropertyPropertyStmt":
 		node = &ast.PropertyStmt{
 			Name:    data["name"].(*ast.Ident),
@@ -829,11 +833,10 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Expr: asTypeOrNil[ast.Expr](data["expr"]),
 		}
 	case "StaticStmt":
-		node = &ast.StaticStmt{
-			Vars: asSlice[*ast.StaticVarStmt](data["vars"]),
-		}
+		vars := asSlice[*ast.StaticStmt](data["vars"])
+		node = multiStmt(vars)
 	case "StaticVarStmt":
-		node = &ast.StaticVarStmt{
+		node = &ast.StaticStmt{
 			Var:     data["var"].(*ast.VariableExpr),
 			Default: asTypeOrNil[ast.Expr](data["default"]),
 		}
@@ -879,9 +882,13 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Finally: asTypeOrNil[*ast.FinallyStmt](data["finally"]),
 		}
 	case "UnsetStmt":
-		node = &ast.UnsetStmt{
-			Vars: asSlice[ast.Expr](data["vars"]),
-		}
+		vars := asSlice[ast.Expr](data["vars"])
+		stmts := slicekit.Map(vars, func(v ast.Expr) ast.Stmt {
+			return &ast.UnsetStmt{
+				Var: v,
+			}
+		})
+		node = multiStmt(stmts)
 	case "UseStmt":
 		typ := asUseType(data["type"])
 		uses := asSlice[*ast.UseStmt](data["uses"])
@@ -891,7 +898,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			}
 			return useStmt
 		})
-		node = &ast.BlockStmt{List: stmts}
+		node = multiStmt(stmts)
 	case "UseUseStmt":
 		node = &ast.UseStmt{
 			Type:  asUseType(data["type"]),
@@ -911,6 +918,11 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.Ident{
 			Name:    data["name"].(string),
 			VarLike: true,
+		}
+	case "Comment":
+		node = &ast.Comment{
+			Type: ast.CommentLine,
+			Text: data["text"].(string),
 		}
 	case "AttributeGroup", "Attribute":
 		err = unsupported("unsupported high version php feature: php8.0 attribute")
