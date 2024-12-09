@@ -2,29 +2,67 @@
 
 namespace GoPhp\Tools\Generate;
 
-use GoPhp\Tools\Common\AstTool;
+use GoPhp\Tools\Common\NodeTool;
 use GoPhp\Tools\Common\NodeType;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Stmt;
 
 class AstNodeGenerator extends BaseGenerator
 {
     private string $outputFile = MAIN_ROOT . '/compile/ast/ast.go';
+    private string $template   = <<<'CODE'
+package ast
+
+type File struct {
+	Declares   []*DeclareStmt
+	Namespaces []*NamespaceStmt
+}
+
+// Node
+type Node interface {
+	node()
+}
+
+// baseNode
+type baseNode struct {
+	Meta map[string]any `json:"@"`
+}
+
+func (*baseNode) node() {}
+
+// baseExpr
+type baseExpr struct {
+	baseNode
+}
+
+func (*baseExpr) exprNode() {}
+
+// baseStmt
+type baseStmt struct {
+	baseNode
+}
+
+func (*baseStmt) stmtNode() {}
+
+
+CODE;
 
     public function generate()
     {
-        $types      = AstTool::allTypes();
-        $interfaces = [];
-        $classes    = [];
-        $extends    = [];
+        $types      = NodeTool::allTypes();
+        $groupTypes = $this->groupTypes($types);
 
-        $interfaces[] = "    Node interface {\n        node()\n    }\n";
+        $code = $this->template;
+        $code .= $this->printTypes('node interfaces', $groupTypes['interface'] ?? [], [$this, 'printInterface']);
+        $code .= $this->printTypes('misc', $groupTypes['misc'] ?? [], fn(NodeType $type) => $this->printClass($type));
+        $code .= $this->printTypes('Expr', $groupTypes['expr'] ?? [], fn(NodeType $type) => $this->printClass($type, 'baseExpr'));
+        $code .= $this->printTypes('Stmt', $groupTypes['stmt'] ?? [], fn(NodeType $type) => $this->printClass($type, 'baseStmt'));
+
+        $extends = [];
         foreach ($types as $type) {
-            if ($type->isInterface) {
-                $interfaces[] = $this->printInterface($type);
-            } else {
-                $classes[]         = $this->printClass($type);
-                $extends["node"][] = "func (*{$type->typeName}) node() {}\n";
+            if (!$type->isInterface) {
                 foreach ($type->supers as $super) {
-                    if ($super === "Node") {
+                    if ($super === "Node" || $super === 'Expr' || $super === 'Stmt') {
                         continue;
                     }
                     $superMethod       = lcfirst($super) . "Node";
@@ -32,10 +70,6 @@ class AstNodeGenerator extends BaseGenerator
                 }
             }
         }
-
-        $code = "package ast\n\n";
-        $code .= "type (\n" . join("\n", $interfaces) . "\n)\n";
-        $code .= "type (\n" . join("\n", $classes) . "\n)\n";
         foreach ($extends as $super => $types) {
             $code .= "\n// $super\n";
             $code .= join("", $types);
@@ -44,36 +78,87 @@ class AstNodeGenerator extends BaseGenerator
         $this->writeFile($this->outputFile, $code);
     }
 
+    /**
+     * @param  NodeType[]  $types
+     * @return array<string, NodeType[]>
+     */
+    private function groupTypes(array $types): array
+    {
+        $groupTypes = [];
+        foreach ($types as $type) {
+            if ($type->isInterface) {
+                $groupTypes['interface'][] = $type;
+            } elseif (is_subclass_of($type->className, Expr::class)) {
+                $groupTypes['expr'][] = $type;
+            } elseif (is_subclass_of($type->className, Stmt::class)) {
+                $groupTypes['stmt'][] = $type;
+            } else {
+                $groupTypes['misc'][] = $type;
+            }
+        }
+
+        return $groupTypes;
+    }
+
+    /**
+     * @param  string  $lineComment
+     * @param  NodeType[]  $types
+     * @param  callable  $typePrinter
+     * @return string
+     */
+    private function printTypes(string $lineComment, array $types, callable $typePrinter): string
+    {
+        $typeCodes = array_map($typePrinter, $types);
+        return "// {$lineComment}\ntype (\n" . join("\n", $typeCodes) . "\n)\n";
+    }
+
     private function printInterface(NodeType $type): string
     {
-        $code = "    " . $this->buildClassComment($type) . "\n";
-        $code .= "    {$type->typeName} interface {\n";
+        $properties = [];
         foreach ($type->supers as $super) {
             if ($super == "PhpParserNodeAbstract") {
                 $super = "Node";
             }
-            $code .= "        " . $super . "\n";
+            $properties[] = $super;
         }
-        $code .= "        " . lcfirst($type->typeName) . "Node()\n";
-        $code .= "    }\n";
-        return $code;
+        $properties[]    = lcfirst($type->typeName) . 'Node()';
+        $propertiesLines = join("\n        ", $properties);
+
+        $typeComment = $this->buildClassComment($type);
+        $typeName    = $type->typeName;
+
+        return <<<CODE
+    {$typeComment}
+    {$typeName} interface {
+        {$propertiesLines}
+    }
+CODE;
     }
 
-    private function printClass(NodeType $type): string
+    private function printClass(NodeType $type, string $parent = 'baseNode'): string
     {
-        $code = "    " . $this->buildClassComment($type) . "\n";
-        $code .= "    {$type->typeName} struct {\n";
+        $properties = [];
         foreach ($type->fields as $field) {
             $docComment = $this->clearPropertyDocComment($field->docComment);
             $goType     = $field->typeHint?->toGoType() ?: 'any';
             if ($docComment) {
-                $code .= "        {$field->newName} {$goType} // {$docComment}\n";
+                $properties[] = "{$field->newName} {$goType} // {$docComment}";
             } else {
-                $code .= "        {$field->newName} {$goType}\n";
+                $properties[] = "{$field->newName} {$goType}";
             }
         }
-        $code .= "    }\n";
-        return $code;
+        $propertiesLines = join("\n        ", $properties);
+
+        $typeComment = $this->buildClassComment($type);
+        $typeName    = $type->typeName;
+
+        return <<<CODE
+    {$typeComment}
+    {$typeName} struct {
+        {$parent}
+        {$propertiesLines}
+    }
+CODE;
     }
 
     private function buildClassComment(NodeType $type): string
@@ -87,6 +172,7 @@ class AstNodeGenerator extends BaseGenerator
 
     private function clearPropertyDocComment(string $comment): string
     {
-        return trim(substr($comment, 3, strlen($comment) - 5));
+        $comment = trim(substr($comment, 3, strlen($comment) - 5));
+        return str_replace("\n", '\\n', $comment);
     }
 }

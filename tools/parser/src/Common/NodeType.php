@@ -8,17 +8,19 @@ use PhpParser\Node;
 use ReflectionClass;
 use Stringable;
 
-class NodeType
+readonly class NodeType
 {
-    public readonly string $typeName;
-    public readonly bool   $isInterface;
+    public string $className;
+    public string $typeName;
+    public bool   $isInterface;
     /** @var string[] */
-    public readonly array $supers;
+    public array $supers;
     /** @var NodeTypeField[] */
-    public readonly array $fields;
+    public array $fields;
 
     public function __construct(ReflectionClass $refClass)
     {
+        $this->className   = $refClass->name;
         $this->typeName    = NodeTool::getTypeName($refClass->name);
         $this->isInterface = $refClass->isInterface() || $refClass->isAbstract();
         $this->supers      = $this->initSupers($refClass);

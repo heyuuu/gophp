@@ -7,7 +7,7 @@ use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class AstTool
+class NodeTool
 {
     /**
      * @return NodeType[]

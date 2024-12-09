@@ -24,7 +24,7 @@ class NodeEncoder
                 $objectVars["value"] = base64_encode($objectVars["value"]);
             }
 
-            $objectVars['attributes'] = $data->getAttributes();
+            $objectVars['attributes'] = $this->transform($data->getAttributes());
 
             return ['nodeType' => $this->getNodeType($data)] + $objectVars;
         }

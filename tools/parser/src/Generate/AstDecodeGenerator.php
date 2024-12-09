@@ -2,7 +2,7 @@
 
 namespace GoPhp\Tools\Generate;
 
-use GoPhp\Tools\Common\AstTool;
+use GoPhp\Tools\Common\NodeTool;
 use GoPhp\Tools\Common\NodeType;
 use GoPhp\Tools\Common\TypeHint;
 
@@ -27,7 +27,7 @@ CODE;
     public function generate()
     {
         $cases = [];
-        foreach (AstTool::allTypes() as $type) {
+        foreach (NodeTool::allTypes() as $type) {
             if (!$type->isInterface) {
                 $cases[] = $this->caseType($type);
             }

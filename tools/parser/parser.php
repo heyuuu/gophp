@@ -14,6 +14,6 @@ $commands = [
     new GenerateCommand(),
 ];
 
-$app = new Application('gophp-parser', '0.2.0');
+$app = new Application('gophp-parser', '0.3.0');
 $app->addCommands($commands);
 $app->run();
