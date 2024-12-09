@@ -1,5 +1,5 @@
 module github.com/heyuuu/gophp
 
-go 1.21
+go 1.23
 
-require golang.org/x/sys v0.18.0
+require golang.org/x/sys v0.28.0

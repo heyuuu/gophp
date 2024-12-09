@@ -64,7 +64,6 @@ type (
 		callLikeExprNode()
 	}
 
-	// FunctionLike
 	FunctionLike interface {
 		Node
 		functionLikeNode()
@@ -85,13 +84,13 @@ type (
 type (
 	Arg struct {
 		baseNode
-		Value  Expr // @var Expr Value to pass
-		Unpack bool // @var bool Whether to unpack the argument
+		Value  Expr // value to pass
+		Unpack bool // whether to unpack the argument
 	}
 
 	Ident struct {
 		baseNode
-		Name string // @var string Ident as string
+		Name string
 		/**
 		 * Represents a name that is written in source code with a leading dollar,
 		 * but is not a proper variable. The leading dollar is not stored as part of the name.
@@ -152,8 +151,8 @@ type (
 // Name
 type Name struct {
 	baseNode
-	Kind  ast.NameKind // kind
-	Parts []string     // @var string[] Parts of the name
+	Kind  ast.NameKind
+	Parts []string // parts of the name
 }
 
 func NewName(parts ...string) *Name {
@@ -179,6 +178,7 @@ func (n *Name) ToCodeString() string {
 // Expr
 type (
 	// literal
+
 	NullLit struct {
 		baseExpr
 	}
@@ -199,7 +199,7 @@ type (
 	StringLit struct {
 		baseExpr
 		Raw   string
-		Value string // string value
+		Value string
 	}
 
 	ArrayExpr struct {
@@ -210,9 +210,9 @@ type (
 	ArrayItemExpr struct {
 		baseExpr
 		Key    Expr // @var Expr|null Key
-		Value  Expr // @var Expr Value
-		ByRef  bool // @var bool Whether to assign by reference
-		Unpack bool // @var bool Whether to unpack the argument
+		Value  Expr // Value
+		ByRef  bool // Whether to assign by reference
+		Unpack bool // Whether to unpack the argument
 	}
 
 	// ClosureExpr : FunctionLike
@@ -228,11 +228,11 @@ type (
 
 	ClosureUseExpr struct {
 		baseExpr
-		Var   *VariableExpr // @var VariableExpr Variable to use
-		ByRef bool          // @var bool Whether to use by reference
+		Var   *VariableExpr // variable to use
+		ByRef bool          // whether to use by reference
 	}
 
-	// ArrowFunctionExpr : Expr, FunctionLike
+	// ArrowFunctionExpr : FunctionLike
 	ArrowFunctionExpr struct {
 		baseExpr
 		Static     bool     // @var bool
@@ -248,47 +248,42 @@ type (
 		Dim Expr // @var Expr|null  Array index / dim
 	}
 
-	// CastExpr
 	CastExpr struct {
 		baseExpr
 		Kind ast.CastKind
-		Expr Expr // @var Expr Expression
+		Expr Expr
 	}
 
-	// UnaryExpr
 	UnaryExpr struct {
 		baseExpr
 		Op  ast.UnaryOpKind
 		Var Expr // variable
 	}
 
-	// BinaryOpExpr
 	BinaryOpExpr struct {
 		baseExpr
 		Op    ast.BinaryOpKind
-		Left  Expr // @var Expr The left-hand side expression
-		Right Expr // @var Expr The right-hand side expression
+		Left  Expr // the left hand side expression
+		Right Expr // the right hand side expression
 	}
 
-	// AssignExpr
 	AssignExpr struct {
 		baseExpr
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
+		Var  Expr // variable
+		Expr Expr // expression
 	}
 
-	// AssignOpExpr
 	AssignOpExpr struct {
 		baseExpr
 		Op   ast.AssignOpKind
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
+		Var  Expr // variable
+		Expr Expr // expression
 	}
 
 	AssignRefExpr struct {
 		baseExpr
-		Var  Expr // @var Expr Variable reference is assigned to
-		Expr Expr // @var Expr Variable which is referenced
+		Var  Expr // variable reference is assigned to
+		Expr Expr // variable which is referenced
 	}
 
 	IssetExpr struct {
@@ -298,12 +293,12 @@ type (
 
 	EmptyExpr struct {
 		baseExpr
-		Expr Expr // @var Expr Expression
+		Expr Expr
 	}
 
 	EvalExpr struct {
 		baseExpr
-		Expr Expr // @var Expr Expression
+		Expr Expr
 	}
 
 	IncludeExpr struct {
@@ -314,12 +309,12 @@ type (
 
 	CloneExpr struct {
 		baseExpr
-		Expr Expr // @var Expr Expression
+		Expr Expr
 	}
 
 	ErrorSuppressExpr struct {
 		baseExpr
-		Expr Expr // @var Expr Expression
+		Expr Expr
 	}
 
 	ExitExpr struct {
@@ -329,7 +324,7 @@ type (
 
 	ConstFetchExpr struct {
 		baseExpr
-		Name *Name // @var Name Constant name
+		Name *Name // constant name
 	}
 
 	ClassConstFetchExpr struct {
@@ -356,7 +351,7 @@ type (
 
 	PrintExpr struct {
 		baseExpr
-		Expr Expr // @var Expr Expression
+		Expr Expr
 	}
 
 	PropertyFetchExpr struct {
@@ -386,7 +381,7 @@ type (
 
 	ThrowExpr struct {
 		baseExpr
-		Expr Expr // @var Expr Expression
+		Expr Expr
 	}
 
 	VariableExpr struct {
@@ -402,21 +397,21 @@ type (
 
 	YieldFromExpr struct {
 		baseExpr
-		Expr Expr // @var Expr Expression to yield from
+		Expr Expr // Expression to yield from
 	}
 
 	// FuncCallExpr : CallLikeExpr
 	FuncCallExpr struct {
 		baseExpr
 		Name Node   // @var Name|Expr Function name
-		Args []*Arg // @var Arguments
+		Args []*Arg // Arguments
 	}
 
 	// NewExpr : CallLikeExpr
 	NewExpr struct {
 		baseExpr
-		Class Node   // @var Name|Expr|ClassStmt Class name
-		Args  []*Arg // @var Arguments
+		Class Node   // @var Name|Expr|ClassStmt class name
+		Args  []*Arg // Arguments
 	}
 
 	// MethodCallExpr : CallLikeExpr
@@ -424,7 +419,7 @@ type (
 		baseExpr
 		Var      Expr   // @var Expr Variable holding object
 		Name     Node   // @var Ident|Expr Method name
-		Args     []*Arg // @var Arguments
+		Args     []*Arg // arguments
 		Nullsafe bool
 	}
 
@@ -433,7 +428,7 @@ type (
 		baseExpr
 		Class Node   // @var Name|Expr Class name
 		Name  Node   // @var Ident|Expr Method name
-		Args  []*Arg // @var Arguments
+		Args  []*Arg // Arguments
 	}
 )
 
@@ -450,7 +445,7 @@ type (
 
 	ExprStmt struct {
 		baseStmt
-		Expr Expr // @var Expr Expression
+		Expr Expr
 	}
 
 	ReturnStmt struct {
@@ -468,7 +463,6 @@ type (
 		Name *Ident // @var Ident Name of label to jump to
 	}
 
-	// IfStmt
 	IfStmt struct {
 		baseStmt
 		Cond    Expr          // @var Expr 			condition expression
@@ -479,29 +473,27 @@ type (
 
 	ElseIfStmt struct {
 		baseStmt
-		Cond  Expr   // @var Expr 	Condition
-		Stmts []Stmt // @var Stmt[] Statements
+		Cond  Expr   // condition
+		Stmts []Stmt // statements
 	}
 
 	ElseStmt struct {
 		baseStmt
-		Stmts []Stmt // @var Stmt[] Statements
+		Stmts []Stmt // statements
 	}
 
-	// SwitchStmt
 	SwitchStmt struct {
 		baseStmt
-		Cond  Expr        // @var Expr Condition
-		Cases []*CaseStmt // @var Case_[] Case list
+		Cond  Expr        // condition
+		Cases []*CaseStmt // case list
 	}
 
 	CaseStmt struct {
 		baseStmt
 		Cond  Expr   // @var Expr|null Condition (null for default)
-		Stmts []Stmt // @var Stmt[] Statements
+		Stmts []Stmt // statements
 	}
 
-	// ForStmt
 	ForStmt struct {
 		baseStmt
 		Init  []Expr // @var Expr[] Init expressions
@@ -510,7 +502,6 @@ type (
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
-	// ForeachStmt
 	ForeachStmt struct {
 		baseStmt
 		Expr     Expr   // @var Expr Expression to iterate
@@ -522,7 +513,7 @@ type (
 
 	BreakStmt struct {
 		baseStmt
-		Num Expr // @var Expr|null Number of loops to break
+		Num Expr // @var Expr|null number of loops to break
 	}
 
 	ContinueStmt struct {
@@ -530,14 +521,12 @@ type (
 		Num Expr // @var Expr|null Number of loops to continue
 	}
 
-	// WhileStmt
 	WhileStmt struct {
 		baseStmt
-		Cond  Expr   // @var Expr Condition
-		Stmts []Stmt // @var Stmt[] Statements
+		Cond  Expr   // condition
+		Stmts []Stmt // statements
 	}
 
-	// DoStmt
 	DoStmt struct {
 		baseStmt
 		Stmts []Stmt // @var Stmt[] Statements
@@ -547,16 +536,16 @@ type (
 	// try-catch-finally
 	TryCatchStmt struct {
 		baseStmt
-		Stmts   []Stmt       // @var Stmt[] Statements
-		Catches []*CatchStmt // @var Catch_[] Catches
-		Finally *FinallyStmt // @var Finally_|null Optional finally node
+		Stmts   []Stmt       // statements
+		Catches []*CatchStmt // catches
+		Finally *FinallyStmt // @var FinallyStmt|null Optional finally node
 	}
 
 	CatchStmt struct {
 		baseStmt
-		Types []*Name       // @var Name[] Types of exceptions to catch
+		Types []*Name       // types of exceptions to catch
 		Var   *VariableExpr // @var VariableExpr|null Variable for exception
-		Stmts []Stmt        // @var Stmt[] Statements
+		Stmts []Stmt        // statements
 	}
 
 	FinallyStmt struct {
@@ -566,9 +555,9 @@ type (
 
 	ConstStmt struct {
 		baseStmt
-		Name           *Ident // @var Ident Name
-		Value          Expr   // @var Expr Value
-		NamespacedName *Name  // @var Name|null Namespaced name (if using NameResolver)
+		Name           *Ident
+		Value          Expr
+		NamespacedName *Name // @var Name|null namespaced name (if using NameResolver)
 	}
 
 	EchoStmt struct {
@@ -578,18 +567,18 @@ type (
 
 	GlobalStmt struct {
 		baseStmt
-		Var Expr // @var Expr Variables
+		Var Expr // variable
 	}
 
 	StaticStmt struct {
 		baseStmt
-		Var     *VariableExpr // @var VariableExpr Variable
-		Default Expr          // @var Expr|null Default value
+		Var     *VariableExpr // variable
+		Default Expr          // @var Expr|null default value
 	}
 
 	UnsetStmt struct {
 		baseStmt
-		Var Expr // @var Expr Variables to unset
+		Var Expr // variables to unset
 	}
 
 	UseStmt struct {
@@ -599,14 +588,13 @@ type (
 		Alias *Ident      // @var Ident|null  Alias Name, or nil
 	}
 
-	// NamespaceStmt
 	NamespaceStmt struct {
 		baseStmt
 		Name  *Name  // @var Name|null Name
 		Stmts []Stmt // @var Stmt[] Statements
 	}
 
-	// FunctionStmt : Stmt, FunctionLike
+	// FunctionStmt : FunctionLike
 	FunctionStmt struct {
 		baseStmt
 		ByRef          bool     // @var bool Whether function returns by reference
@@ -629,12 +617,12 @@ type (
 	// ClassStmt : ClassLikeStmt
 	ClassStmt struct {
 		baseStmt
-		Flags          ast.Flags // @var Flags      Type
-		Extends        *Name     // @var Name|null  Name of extended class
-		Implements     []*Name   // @var Name[]     Names of implemented interfaces
-		Name           *Ident    // @var Ident|null Name
-		Stmts          []Stmt    // @var Stmt[] Statements
-		NamespacedName *Name     // @var Name|null Namespaced name (if using NameResolver)
+		Flags          ast.Flags
+		Extends        *Name   // @var Name|null  Name of extended class
+		Implements     []*Name // @var Name[]     Names of implemented interfaces
+		Name           *Ident  // @var Ident|null Name
+		Stmts          []Stmt  // @var Stmt[] Statements
+		NamespacedName *Name   // @var Name|null Namespaced name (if using NameResolver)
 	}
 
 	ClassConstStmt struct {
@@ -653,7 +641,7 @@ type (
 		Default Expr      // @var Expr|null Default
 	}
 
-	// ClassMethodStmt : Stmt, FunctionLike
+	// ClassMethodStmt : FunctionLike
 	ClassMethodStmt struct {
 		baseStmt
 		Flags      ast.Flags // @var Flags Modifiers
@@ -681,7 +669,7 @@ type (
 	// TraitUseAdaptationAliasStmt : TraitUseAdaptationStmt
 	TraitUseAdaptationAliasStmt struct {
 		baseStmt
-		NewModifier ast.Flags // @var Flags 	    New modifier, default 0
+		NewModifier ast.Flags // new modifier, default 0
 		NewName     *Ident    // @var Ident|null 	New name, or nil
 		Trait       *Name     // @var Name|null 	Trait name, or nil
 		Method      *Ident    // @var Ident Method name

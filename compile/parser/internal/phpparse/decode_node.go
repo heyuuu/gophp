@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/heyuuu/gophp/compile/ast"
 	"github.com/heyuuu/gophp/kits/slicekit"
+	"slices"
 )
 
 func decodeNode(data map[string]any) (node ast.Node, err error) {
@@ -775,7 +776,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			if typ != ast.UseNormal {
 				useStmt.Type = typ
 			}
-			useStmt.Name = ast.NewName(slicekit.Concat(prefix.Parts, useStmt.Name.Parts)...)
+			useStmt.Name = ast.NewName(slices.Concat(prefix.Parts, useStmt.Name.Parts)...)
 
 			return useStmt
 		})

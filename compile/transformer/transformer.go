@@ -955,10 +955,6 @@ func (t *transformer) comments(n []*ast.Comment) []*ir.Comment {
 	})
 }
 
-func (t *transformer) stringList(n []string) []string {
-	return slices.Clone(n)
-}
-
 func (t *transformer) argList(n []*ast.Arg) []*ir.Arg {
 	return slicekit.Map(n, t.arg)
 }
