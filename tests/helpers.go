@@ -3,10 +3,10 @@ package tests
 import (
 	"compress/gzip"
 	"fmt"
+	"github.com/heyuuu/gophp/kits/oskit"
 	"os"
 	"path/filepath"
 	"regexp"
-	"slices"
 	"strings"
 	"time"
 )
@@ -34,25 +34,16 @@ func timeFormat(t time.Time, format string) string {
 	return buf.String()
 }
 
-func sliceUnique[T comparable](slice []T) []T {
-	existItems := map[T]struct{}{}
-	return slices.DeleteFunc(slice, func(e T) bool {
-		if _, exists := existItems[e]; exists {
-			return true
+func readLines(file string, content string) ([]string, error) {
+	// 若未传入内容，则从文件中读取
+	if content == "" {
+		var err error
+		content, err = oskit.ReadFileAsString(file)
+		if err != nil {
+			return nil, err
 		}
-
-		existItems[e] = struct{}{}
-		return false
-	})
-}
-
-func readLines(file string) ([]string, error) {
-	data, err := os.ReadFile(file)
-	if err != nil {
-		return nil, err
 	}
 
-	content := string(data)
 	lineCount := strings.Count(content, "\n") + 1
 	lines := make([]string, 0, lineCount)
 	for len(content) > 0 {
@@ -66,11 +57,6 @@ func readLines(file string) ([]string, error) {
 	}
 
 	return lines, nil
-}
-
-func isDir(dir string) bool {
-	s, err := os.Stat(dir)
-	return err == nil && s.IsDir()
 }
 
 func fileExists(file string) bool {
@@ -100,14 +86,6 @@ func filePutContents(file string, text string) error {
 
 func unlink(filename string) error {
 	return os.Remove(filename)
-}
-
-func basename(path string, suffix string) string {
-	base := filepath.Base(path)
-	if suffix != "" && strings.HasSuffix(base, suffix) {
-		base = base[:len(base)-len(suffix)]
-	}
-	return base
 }
 
 func existKey[K comparable, V any](m map[K]V, key K) bool {

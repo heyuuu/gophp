@@ -64,6 +64,7 @@ type TestCase struct {
 	index    int
 	fileName string `get:""` // 测试case名，一般为文件相对于根目录的相对路径
 	filePath string `get:""` // 测试case文件绝对路径
+	content  string // 测试case文本
 
 	// 预处理路径，方便使用
 	testFile   string
@@ -82,11 +83,9 @@ func NewTestCase(fileName string, filePath string) *TestCase {
 	tc.initPath()
 	return tc
 }
-func NewTestCaseParsed(fileName string, filePath string, sections map[string]string) *TestCase {
+func NewTestCaseCustom(fileName string, filePath string, content string) *TestCase {
 	tc := NewTestCase(fileName, filePath)
-	tc.parsed = true
-	tc.sections = sections
-	tc.parseErr = checkFileSections(filePath, sections)
+	tc.content = content
 	return tc
 }
 
@@ -115,7 +114,7 @@ func (tc *TestCase) initPath() {
 func (tc *TestCase) Parse() (map[string]string, error) {
 	if !tc.parsed {
 		tc.parsed = true
-		tc.sections, tc.parseErr = parseTestFileSections(tc.filePath)
+		tc.sections, tc.parseErr = parseTestFileSections(tc.filePath, tc.content)
 	}
 	return tc.sections, tc.parseErr
 }

@@ -196,8 +196,8 @@ var allowSections = map[string]bool{
 var regSectionTitle = regexp.MustCompile(`^--([_A-Z]+)--`)
 var regSectionDone = regexp.MustCompile(`^===DONE===\s*$`)
 
-func parseTestFileSections(file string) (map[string]string, error) {
-	lines, err := readLines(file)
+func parseTestFileSections(file string, content string) (map[string]string, error) {
+	lines, err := readLines(file, content)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open test file: %s", file)
 	} else if len(lines) == 0 {
